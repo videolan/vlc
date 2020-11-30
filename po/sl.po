@@ -4,7 +4,7 @@
 #
 # Translators:
 # Aljoša Žagar <anthon.manix@gmail.com>, 2013
-# janezm.74, 2014
+# Arnold Marko <arnold.marko@gmail.com>, 2020
 # Damir Jerovšek <jierro@windowslive.com>, 2014
 # Martin Srebotnjak <miles@filmsi.net>, 2013-2018
 # Matej Urbančič <mateju@svn.gnome.org>, 2005-2010, 2014-2018
@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2018-12-24 18:15+0100\n"
-"Last-Translator: Matej Urbančič <mateju@svn.gnome.org>, 2018\n"
+"PO-Revision-Date: 2020-11-30 21:47+0100\n"
+"Last-Translator: Arnold Marko <arnold.marko@gmail.com>, 2020\n"
 "Language-Team: Slovenian (https://www.transifex.com/yaron/teams/16553/sl/)\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -40,7 +40,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
-msgstr "Možnosti VLC"
+msgstr "Nastavitve VLC"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
@@ -122,12 +122,12 @@ msgstr "Zvokovni prevzorčevalnik"
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:260
 #: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:425
 msgid "Visualizations"
-msgstr "Predočenje"
+msgstr "Vizualizacije"
 
 #: include/vlc_config_cat.h:64 src/audio_output/output.c:321
 #: src/libvlc-module.c:206
 msgid "Audio visualizations"
-msgstr "Predočenje zvoka"
+msgstr "Vizualizacije zvoka"
 
 #: include/vlc_config_cat.h:66 include/vlc_config_cat.h:78
 msgid "Output modules"
@@ -308,7 +308,7 @@ msgid ""
 "always force a specific muxer. You should probably not do that.\n"
 "You can also set default parameters for each muxer."
 msgstr ""
-"Zvijalniki zvijajo osnovne zapise (zvok, slika videa ...) v enovit paket. "
+"Zvijalniki zvijejo osnovne zapise (zvok, slika videa ...) v enovit paket. "
 "Nastavitev omogoča uporabo vsiljenega zvijalnika. Za vsakega je mogoče "
 "določiti privzete parametre. Spreminjanje nastavitve ni priporočljivo."
 
@@ -447,7 +447,7 @@ msgstr "Izbor mape"
 
 #: include/vlc_intf_strings.h:55
 msgid "Media &Information"
-msgstr "Podrobnosti &predstavne datoteke"
+msgstr "Podatki o predstavn&i vsebini"
 
 #: include/vlc_intf_strings.h:56
 msgid "&Codec Information"
@@ -463,7 +463,7 @@ msgstr "Skoči na določen &čas"
 
 #: include/vlc_intf_strings.h:59
 msgid "Custom &Bookmarks"
-msgstr "&Zaznamki po meri"
+msgstr "&Lastni zaznamki"
 
 #: include/vlc_intf_strings.h:60
 msgid "&VLM Configuration"
@@ -808,32 +808,32 @@ msgstr ""
 "Ti bodo uvrščeni na seznam predvajanja.\n"
 "Prvi naveden predmet bo predvajan najprej.\n"
 "\n"
-"Možnosti-slogi:\n"
-"  --option Splošna možnost določena za celotno sejo\n"
-"   -option Enoznakovna različica splošne možnosti\n"
-"   :option Možnost le za pretok neposredno pred možnostjo\n"
-"            in prevzame predhodne nastavitve\n"
+"Slog izbir:\n"
+"  --možnost Splošna izbira določena za celotno sejo\n"
+"   -možnost Splošna izbira z le enim znakom\n"
+"   :možnost Izbira, ki se nanaša le na pretok neposredno\n"
+"pred njo in ki povozi predhodne izbire\n"
 "\n"
-"Skladnja pretoka MRL:\n"
+"Zapis za MRL pretok:\n"
 "  [[dostop][/odvijanje]://]URL[@[naslov][:poglavje][-[naslov][:poglavje]]]\n"
 "  [:možnost=vrednost ...]\n"
 "\n"
-"  Mnogo splošnih možnosti je primernih tudi za možnosti MRL.\n"
-"  Pare je mogoče navesti z zapisom :option=vrednost.\n"
+"  Več splošnih izbir je mogoče uporabiti tudi kot specifične možnosti MRL.\n"
+"  Določiti je mogoče več parov :možnost=vrednost.\n"
 "\n"
-"Skladnja naslova URL:\n"
-"  [file://]filename              Predstavna datoteka\n"
-"  http://ip:port/file            Naslov HTTP URL\n"
-"  ftp://ip:port/file             Naslov FTP URL\n"
-"  mms://ip:port/file             Naslov MMS URL\n"
+"Zapis naslova URL:\n"
+"  [file://]filename              Predstavnostna datoteka\n"
+"  http://ip:port/file            HTTP URL\n"
+"  ftp://ip:port/file              FTP URL\n"
+"  mms://ip:port/file           MMS URL\n"
 "  screen://                      Zajem zaslona\n"
 "  [dvd://][device][@raw_device]  Pogon DVD\n"
 "  [vcd://][device]               Pogon VCD\n"
-"  [cdda://][device]              Zvokovni pogon CD\n"
+"  [cdda://][device]              Zvočni CD pogon\n"
 "  udp:[[<izvorni naslov>]@[<naslov vezave>][:<vrata vezave>]]\n"
 "                                 pretok UDP, poslan preko pretočnega "
 "strežnika\n"
-"  vlc:pause:<seconds>            Zaustavitev predvajanja za določen čas\n"
+"  vlc:pause:<seconds>            Ustavi predvajanja za določen čas\n"
 "  vlc:quit                       Končaj program\n"
 
 #: src/config/help.c:490
@@ -1046,7 +1046,7 @@ msgstr "Kanali"
 #: src/input/es_out.c:3128 modules/access/alsa.c:39 modules/access/imem.c:75
 #: modules/audio_output/amem.c:47 modules/codec/fluidsynth.c:64
 msgid "Sample rate"
-msgstr "Hitrost vzorčenja"
+msgstr "Frekvenca vzorčenja"
 
 #: src/input/es_out.c:3128
 #, c-format
@@ -1055,7 +1055,7 @@ msgstr "%u Hz"
 
 #: src/input/es_out.c:3138
 msgid "Bits per sample"
-msgstr "Bitov na vzorec"
+msgstr "Bitna globina"
 
 #: src/input/es_out.c:3143 modules/access_output/shout.c:92
 #: modules/demux/playlist/shoutcast.c:327
@@ -1467,7 +1467,7 @@ msgstr "Predhodno poglavje"
 #: src/input/vlm.c:641 src/input/vlm.c:1018
 #, c-format
 msgid "Media: %s"
-msgstr "Predstavna datoteka: %s"
+msgstr "Predstavna vsebina: %s"
 
 #: src/interface/interface.c:82 modules/gui/macosx/VLCMainMenu.m:346
 #: modules/gui/macosx/VLCMainMenu.m:347
@@ -1606,8 +1606,9 @@ msgid ""
 "When this is enabled, the preferences and/or interfaces will show all "
 "available options, including those that most users should never touch."
 msgstr ""
-"Izbrana možnost omogoči prikaz vseh nastavitev, ki so na voljo, vključno s "
-"takimi, ki jih sicer ni priporočljivo spreminjati."
+"Kadar je vklopljeno, se bodo v nastavitvah in/ali v vmesnikih prikazale vse "
+"možnosti, ki so na voljo, tudi tiste, ki se jih večina uporabnikov ne bi "
+"smela dotakniti."
 
 #: src/libvlc-module.c:105
 msgid "Interface interaction"
@@ -1647,11 +1648,12 @@ msgstr ""
 
 #: src/libvlc-module.c:129
 msgid "Media role"
-msgstr "Vloga predvajalnika"
+msgstr "Predstavna vloga"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
-msgstr "Vloga predstavnega predvajalnika za operacijski sistem."
+msgstr ""
+"Vloga (predvajalnika) predstavne vsebine za pravila operacijskega sistema."
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:273
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:407
@@ -1821,7 +1823,7 @@ msgstr ""
 
 #: src/libvlc-module.c:208
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
-msgstr "Možnost doda module predočenja (spektralna analiza ...)."
+msgstr "To doda module za vizualizacijo (spektralna analiza ...)."
 
 #: src/libvlc-module.c:212
 msgid "Replay gain mode"
@@ -2680,8 +2682,8 @@ msgid ""
 "letter country code, you may use 'none' to avoid a fallback to another "
 "language)."
 msgstr ""
-"Jezik zvokovne sledi, ki naj bo uporabljen (to so z vejico ločene vrednosti, "
-"kode držav z dvema ali tremi črkami)."
+"Jezik zvočne steze, ki naj bo uporabljen (z vejico ločene vrednosti, kode "
+"držav iz dveh ali treh črk)."
 
 #: src/libvlc-module.c:593
 msgid "Subtitle language"
@@ -3077,7 +3079,7 @@ msgstr "Pogon VCD"
 
 #: src/libvlc-module.c:764 modules/access/cdda.c:701
 msgid "Audio CD device"
-msgstr "Zvokovni CD"
+msgstr "Zvočni CD"
 
 #: src/libvlc-module.c:768
 msgid ""
@@ -3113,7 +3115,7 @@ msgstr "Privzeto priklopno mesto pogona VCD."
 
 #: src/libvlc-module.c:785 modules/access/cdda.c:709
 msgid "This is the default Audio CD device to use."
-msgstr "Privzeto priklopno mesto pogona zvokovnega CD."
+msgstr "To je privzeta naprava za zvočne CD nosilce."
 
 #: src/libvlc-module.c:799
 msgid "TCP connection timeout"
@@ -3663,7 +3665,7 @@ msgstr "Zbiraj krajevno statistiko predvajanja"
 
 #: src/libvlc-module.c:1064
 msgid "Collect miscellaneous local statistics about the playing media."
-msgstr "Omogoči zbiranje krajevne statistike predvajanja videa in glasbe."
+msgstr "Omogoči zbiranje krajevne statistike predvajanja predstavnih vsebin"
 
 #: src/libvlc-module.c:1066
 msgid "Run as daemon process"
@@ -3695,11 +3697,11 @@ msgid ""
 "This option will allow you to play the file with the already running "
 "instance or enqueue it."
 msgstr ""
-"Nastavitev omejitve na le en sočasen zagon predvajalnika ima nekaj "
-"prednosti. Ko predvajalnik določene vrste predstavnih datotek zažene prek "
-"programskih vezi, najverjetneje ni zaželeno, da se vsakič odpre novo okno. "
-"Možnost omogoča predvajanje novega posnetka v istem oknu in postavitev novih "
-"predmetov v vrsto seznama predvajanja."
+"Nastavitev omejitve na le en zagnan VLC predvajalnik lahko ima v določenih "
+"primerih prednosti. Na primer kadar je VLC povezan z določeno vrsto datotek "
+"in si ne želite, da se ob vsakem odpiranju datoteke iz upravljalnika datotek "
+"zažene nov primerek VLC. Ta možnost omogoča predvajanje datoteke v trenutno "
+"zagnanem VLC ali njeno uvrstitev v vrsto za predvajanje."
 
 #: src/libvlc-module.c:1082
 msgid "VLC is started from file association"
@@ -3944,7 +3946,7 @@ msgid ""
 "The media library is automatically saved and reloaded each time you start "
 "VLC."
 msgstr ""
-"Zbirka predstavnih datotek se samodejno shrani in se ponovno naloži ob "
+"Knjižnica predstavnih vsebin se shrani samodejno in se ponovno naloži ob "
 "ponovnem zagonu predvajalnika."
 
 #: src/libvlc-module.c:1198 modules/gui/qt/ui/sprefs_interface.h:548
@@ -4838,11 +4840,11 @@ msgstr "Preklop načina ozadja odvoda videa"
 
 #: src/libvlc-module.c:1468
 msgid "Cycle through audio devices"
-msgstr "Kroži med zvokovnimi napravami"
+msgstr "Kroži med zvočnimi napravami"
 
 #: src/libvlc-module.c:1469
 msgid "Cycle through available audio devices"
-msgstr "Kroži med razpoložljivimi zvokovnimi napravami."
+msgstr "Kroži med razpoložljivimi zvočnimi napravami."
 
 #: src/libvlc-module.c:1598 src/video_output/vout_intf.c:274
 #: modules/gui/macosx/VLCMainMenu.m:434 modules/gui/macosx/VLCMainMenu.m:512
@@ -5120,39 +5122,39 @@ msgstr "Vstavljavka"
 
 #: src/misc/actions.c:82
 msgid "Media Angle"
-msgstr "Zorni kot predstavne vsebine"
+msgstr "Zorni kot vsebine"
 
 #: src/misc/actions.c:83
 msgid "Media Audio Track"
-msgstr "Zvokovna sled predstavne vsebine"
+msgstr "Zvočna steza vsebine"
 
 #: src/misc/actions.c:84
 msgid "Media Forward"
-msgstr "Naprej na predstavni vsebini"
+msgstr "Naprej po vsebini"
 
 #: src/misc/actions.c:85
 msgid "Media Menu"
-msgstr "Meni predstavne vsebine"
+msgstr "Meni vsebine"
 
 #: src/misc/actions.c:86
 msgid "Media Next Frame"
-msgstr "Naslednja sličica na predstavni vsebini"
+msgstr "Naslednja sličica vsebine"
 
 #: src/misc/actions.c:87
 msgid "Media Next Track"
-msgstr "Naslednja sled predstavne vsebine"
+msgstr "Naslednja steza vsebine"
 
 #: src/misc/actions.c:88
 msgid "Media Play Pause"
-msgstr "Odmor predvajanja predstavne vsebine"
+msgstr "Premor predvajanja vsebine"
 
 #: src/misc/actions.c:89
 msgid "Media Prev Frame"
-msgstr "Predhodna sličica predstavne vsebine"
+msgstr "Predhodna sličica vsebine"
 
 #: src/misc/actions.c:90
 msgid "Media Prev Track"
-msgstr "Predhodna sled predstavne vsebine"
+msgstr "Predhodna steza vsebine"
 
 #: src/misc/actions.c:91
 msgid "Media Record"
@@ -5160,19 +5162,19 @@ msgstr "Snemanje predstavne vsebine"
 
 #: src/misc/actions.c:92
 msgid "Media Repeat"
-msgstr "Ponovi predstavno vsebino"
+msgstr "Ponovi vsebino"
 
 #: src/misc/actions.c:93
 msgid "Media Rewind"
-msgstr "Previj predstavno vsebino"
+msgstr "Previj vsebino nazaj"
 
 #: src/misc/actions.c:94
 msgid "Media Select"
-msgstr "Izberi predstavno vsebino"
+msgstr "Izbor predstavne vsebine"
 
 #: src/misc/actions.c:95
 msgid "Media Shuffle"
-msgstr "Premešaj predstavne vsebine"
+msgstr "Premešaj vsebine"
 
 #: src/misc/actions.c:96
 msgid "Media Stop"
@@ -5180,7 +5182,7 @@ msgstr "Ustavi predstavno vsebino"
 
 #: src/misc/actions.c:97
 msgid "Media Subtitle"
-msgstr "Podnapis predstavne vsebine"
+msgstr "Podnapis za vsebino"
 
 #: src/misc/actions.c:98
 msgid "Media Time"
@@ -5188,7 +5190,7 @@ msgstr "Čas predstavne vsebine"
 
 #: src/misc/actions.c:99
 msgid "Media View"
-msgstr "Pogled predstavne vsebine"
+msgstr "Prikaz predstavne vsebine"
 
 #: src/misc/actions.c:100 modules/gui/qt/components/controller.cpp:568
 msgid "Menu"
@@ -5425,7 +5427,7 @@ msgstr "Posodobi predvajalnik VLC"
 #: modules/gui/macosx/VLCMainWindow.m:898
 #: modules/gui/qt/components/playlist/selector.cpp:236
 msgid "Media Library"
-msgstr "Zbirka predstavnih datotek"
+msgstr "Knjižnica predstavnih vsebin"
 
 #: src/text/iso-639_def.h:40
 msgid "Afar"
@@ -6185,15 +6187,15 @@ msgstr "Dovod priloge"
 
 #: modules/access/avaudiocapture.m:212
 msgid "No Audio Input device found"
-msgstr "Ni zaznane naprave za dovod zvoka"
+msgstr "Ni zaznane vhodne zvočne naprave"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
 "Your Mac does not seem to be equipped with a suitable audio input device."
 "Please check your connectors and drivers."
 msgstr ""
-"Vaš Mac najbrž ni opremljen z ustrezno vhodno napravo za zvok. Preverite "
-"povezave in gonilnike."
+"Vaš Mac najbrž ni opremljen z ustrezno vhodno zvočno napravo. Preverite "
+"priključke in gonilnike."
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
@@ -6206,6 +6208,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"Odprite \"System Preferences\" -> \"Security & Privacy\" in dovolite za VLC "
+"dostop do mikrofona."
 
 #: modules/access/avaudiocapture.m:341
 #, fuzzy
@@ -6250,6 +6254,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"Odprite \"System Preferences\" -> \"Security & Privacy\" in za VLC dovolite "
+"dostop do kamere."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -6495,7 +6501,7 @@ msgstr ""
 #: modules/access/decklink.cpp:66 modules/demux/rawaud.c:43
 #: modules/video_output/decklink.cpp:105
 msgid "Audio samplerate (Hz)"
-msgstr "Zvokovna vzorčna hitrost (Hz)"
+msgstr "Frekvenca vzorčenja zvoka (Hz)"
 
 #: modules/access/decklink.cpp:68
 msgid ""
@@ -6629,15 +6635,15 @@ msgstr ""
 #: modules/gui/qt/components/open_panels.cpp:831
 #: modules/gui/qt/components/open_panels.cpp:1052
 msgid "Audio device name"
-msgstr "Ime zvokovne naprave"
+msgstr "Ime zvočne naprave"
 
 #: modules/access/dshow/dshow.cpp:137
 msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
-"Ime zvokovne naprave, ki bo uporabljena prek vstavka DirectShow. Če ni "
-"navedena nobena naprava, bo program uporabil privzeto vrednost."
+"Ime zvočne naprave, ki jo bo uporabljal vtičnik DirectShow. Če ni navedena, "
+"bo uporabljena privzeta naprava."
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:798
@@ -6697,15 +6703,15 @@ msgstr "Prikaz okna lastnosti izbrane naprave pred začetkom predvajanja."
 
 #: modules/access/dshow/dshow.cpp:159
 msgid "Tuner properties"
-msgstr "Lastnosti uglaševala"
+msgstr "Lastnosti sprejemnika"
 
 #: modules/access/dshow/dshow.cpp:161
 msgid "Show the tuner properties [channel selection] page."
-msgstr "Prikaz strani lastnosti uglaševala [izbor kanalov]."
+msgstr "Prikaži nastavitve sprejemnika [izbor kanalov]."
 
 #: modules/access/dshow/dshow.cpp:162
 msgid "Tuner TV Channel"
-msgstr "Uglaševalo TV kanalov"
+msgstr "Sprejemnik TV kanalov"
 
 #: modules/access/dshow/dshow.cpp:164
 msgid "Set the TV channel the tuner will set to (0 means default)."
@@ -6727,23 +6733,23 @@ msgstr "Standard videa"
 
 #: modules/access/dshow/dshow.cpp:169
 msgid "Tuner country code"
-msgstr "Kode držav uglaševanja"
+msgstr "Koda države sprejemnika"
 
 #: modules/access/dshow/dshow.cpp:171
 msgid ""
 "Set the tuner country code that establishes the current channel-to-frequency "
 "mapping (0 means default)."
 msgstr ""
-"Določevanje kod držav, ki uvajajo trenutno preslikavo kanala-v-frekvenco (0 "
-"predstavlja privzeto)."
+"Določi kodo držav za sprejemnik, ki vzpostavi trenutno preslikavo kanala-v-"
+"frekvenco (0 predstavlja privzeto)."
 
 #: modules/access/dshow/dshow.cpp:173
 msgid "Tuner input type"
-msgstr "Vrsta uglaševala"
+msgstr "Vrsta vhoda sprejemnika"
 
 #: modules/access/dshow/dshow.cpp:175
 msgid "Select the tuner input type (Cable/Antenna)."
-msgstr "Izberite vrsto uglaševala (kabel/antena)."
+msgstr "Izberite vrsto vhoda na sprejemniku (kabel/antena)."
 
 #: modules/access/dshow/dshow.cpp:176
 msgid "Video input pin"
@@ -6790,15 +6796,15 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:192
 msgid "AM Tuner mode"
-msgstr "AM način uglaševanja"
+msgstr "AM način sprejemnika"
 
 #: modules/access/dshow/dshow.cpp:194
 msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
-"Način uglaševanja AM. Vrednost je lahko privzeto (0), TV (1), AM Radio (2), "
-"FM Radio (3) ali DSS (4)."
+"AM način delovanja sprejemnika. Vrednost je lahko privzeta (0), TV (1), AM "
+"Radio (2), FM Radio (3) ali DSS (4)."
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
@@ -6811,17 +6817,17 @@ msgstr ""
 #: modules/stream_out/transcode/transcode.c:94
 #: share/lua/http/dialogs/create_stream.html:281
 msgid "Audio sample rate"
-msgstr "Hitrost vzorčenja zvoka"
+msgstr "Frekvenca vzorčenja zvoka"
 
 #: modules/access/dshow/dshow.cpp:203
 msgid "Select audio input format with the given sample rate (if non 0)"
 msgstr ""
-"Izbor dovodnega zvokovnega zapisa za podano hitrost vzorčenja (kadar "
-"vrednost ni 0)"
+"Izbor format vhodnega zvoka za podano frekvenco vzorčenja (kadar vrednost ni "
+"0)"
 
 #: modules/access/dshow/dshow.cpp:205
 msgid "Audio bits per sample"
-msgstr "Zvokovni biti na vzorec"
+msgstr "Bitna globina zvoka"
 
 #: modules/access/dshow/dshow.cpp:207
 msgid "Select audio input format with the given bits/sample (if non 0)"
@@ -6844,7 +6850,7 @@ msgstr "Zajemanje je spodletelo"
 
 #: modules/access/dshow/dshow.cpp:517
 msgid "No video or audio device selected."
-msgstr "Ni izbrane zvokovne oz. slikovne naprave."
+msgstr "Video ali zvočna naprava ni določena."
 
 #: modules/access/dshow/dshow.cpp:591
 msgid "VLC cannot open ANY capture device. Check the error log for details."
@@ -6899,8 +6905,8 @@ msgid ""
 "If the adapter provides multiple independent tuner devices, the device "
 "number must be selected. Numbering starts from zero."
 msgstr ""
-"Če vmesnik podpira več neodvisnih naprav za uglaševanje, je treba izbrati "
-"številko naprave. Oštevilčenje se začne z 0."
+"Če vmesnik ponuja več neodvisnih sprejemnikov, morate izbrati številko "
+"naprave. Oštevilčeneje se začne z 0."
 
 #: modules/access/dtv/access.c:47
 msgid "Do not demultiplex"
@@ -7177,8 +7183,8 @@ msgid ""
 "the satellite transmission frequency. The intermediate frequency (IF) on the "
 "RF cable is the result."
 msgstr ""
-"Nizkošumni blok (LNB) izvleče frekvenco iz oddajne frekvence satelita. "
-"Posledica tega je vmesna frekvenca (intermediate frequency – IF) na kablu RF."
+"Nizkošumni blok (LNB) bo ločil frekvenco lokalnega oscilatorja in oddajno "
+"frekvenco satelita. Rezultat je vmesna frekvenca (IF) na kablu RF."
 
 #: modules/access/dtv/access.c:191
 msgid "Universal LNB switch frequency (kHz)"
@@ -7343,7 +7349,7 @@ msgid ""
 "The selected digital tuner does not support the specified parameters.\n"
 "Please check the preferences."
 msgstr ""
-"Izbrano digitalno uglaševalo ne podpira navedenih parametrov.\n"
+"Izbrani digitalni sprejemnik ne podpira izbranih parametrov.\n"
 "Preverite nastavitve."
 
 #: modules/access/dv.c:57
@@ -7458,6 +7464,9 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"Morda je macOS zablokiral dostop do diska. Odprite \"System Preferences\" -> "
+"\"Security & Privacy\"in dovolite za VLC dostop do zunanjih nosilcev v "
+"razdelku \"Files and Folders\" ."
 
 #: modules/access/dvdread.c:77
 msgid "DVD without menus"
@@ -7725,7 +7734,7 @@ msgstr "Jezik osnovnega pretoka, kot je opisano v standardu ISO639."
 
 #: modules/access/imem.c:77
 msgid "Sample rate of an audio elementary stream"
-msgstr "Hitrost vzorčenja osnovnega zvokovnega pretoka"
+msgstr "Frekvenca vzorčenja osnovnega zvočnega pretoka"
 
 #: modules/access/imem.c:79 modules/audio_output/amem.c:51
 msgid "Channels count"
@@ -8061,7 +8070,7 @@ msgstr ""
 
 #: modules/access/mms/mms.c:63
 msgid "Microsoft Media Server (MMS) input"
-msgstr "Microsoft Media Server (MMS) dovod"
+msgstr "Dovod za Microsoft Media Server (MMS)"
 
 #: modules/access/mtp.c:57
 msgid "MTP input"
@@ -8111,14 +8120,14 @@ msgstr "Zajem zvoka v stereo načinu."
 #: modules/access/oss.c:67 modules/access_output/shout.c:95
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
 msgid "Samplerate"
-msgstr "Vzorčna hitrost"
+msgstr "Frekvenca vzorčenja"
 
 #: modules/access/oss.c:69
 msgid ""
 "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100, "
 "48000)"
 msgstr ""
-"Vzorčna hitrost zajetega zvokovnega pretoka v Hz (na primer: 11025, 22050, "
+"Frekvenca vzorčenja zajetega zvočnega pretoka v Hz (na primer: 11025, 22050, "
 "44100, 48000)"
 
 #: modules/access/oss.c:76
@@ -8681,7 +8690,7 @@ msgstr "Radijska naprava"
 
 #: modules/access/v4l2/v4l2.c:74
 msgid "Radio tuner device node."
-msgstr "Vozlišče naprave za radijski sprejem."
+msgstr "Vozlišče naprave radijskega sprejemnika."
 
 #: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1079
 msgid "Frequency"
@@ -8689,7 +8698,7 @@ msgstr "Frekvenca"
 
 #: modules/access/v4l2/v4l2.c:77
 msgid "Tuner frequency in Hz or kHz (see debug output)."
-msgstr "Frekvenca uglaševala v Hz ali kHz (razhroščevanje)."
+msgstr "Frekvenca sprejemnika v Hz ali kHz (glej razhroščevanje)"
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
@@ -8697,7 +8706,7 @@ msgstr "Zvokovni način"
 
 #: modules/access/v4l2/v4l2.c:80
 msgid "Tuner audio mono/stereo and track selection."
-msgstr "Uglaševanje mono/stereo in izbor sledi"
+msgstr "Izbira mono/stereo zvoka in steze za sprejemnik"
 
 #: modules/access/v4l2/v4l2.c:82
 msgid "Reset controls"
@@ -9087,7 +9096,7 @@ msgstr "Dovod slike"
 
 #: modules/access/v4l2/v4l2.c:317
 msgid "Tuner"
-msgstr "Uglaševalnik"
+msgstr "Sprejemnik"
 
 #: modules/access/v4l2/v4l2.c:332
 msgid "Controls"
@@ -9494,7 +9503,7 @@ msgstr "Podrobnosti bitne hitrosti prekodiranega zapisa."
 
 #: modules/access_output/shout.c:96
 msgid "Samplerate information of the transcoded stream."
-msgstr "Podrobnosti vzorčne hitrosti prekodiranega zapisa."
+msgstr "Podatki o frekvenci vzorčenja prekodiranega zapisa."
 
 #: modules/access_output/shout.c:98
 msgid "Number of channels"
@@ -10258,7 +10267,7 @@ msgstr "Prevzorčevalnik Speex"
 
 #: modules/audio_filter/resampler/src.c:40
 msgid "Sample rate converter type"
-msgstr "Vrsta pretvornika hitrosti vzorčanja"
+msgstr "Vrsta pretvornika frekvence vzorčenja"
 
 #: modules/audio_filter/resampler/src.c:42
 msgid ""
@@ -10468,11 +10477,11 @@ msgstr "Navidezni odvod zvoka"
 
 #: modules/audio_output/alsa.c:64 modules/audio_output/oss.c:69
 msgid "Audio output device"
-msgstr "Odvodna zvokovna naprava"
+msgstr "Izhodna zvočna naprava"
 
 #: modules/audio_output/alsa.c:65
 msgid "Audio output device (using ALSA syntax)."
-msgstr "Odvodna zvokovna naprava (z uporabo skladnje ALSA)"
+msgstr "Izhodna zvočna naprava (z uporabo ALSA)"
 
 #: modules/audio_output/alsa.c:67 modules/audio_output/waveout.c:140
 msgid "Audio output channels"
@@ -10522,7 +10531,7 @@ msgid ""
 "The audio device \"%s\" could not be used:\n"
 "%s."
 msgstr ""
-"Zvokovne naprave »%s« ni mogoče uporabiti:\n"
+"Zvočne naprave »%s« ni mogoče uporabiti:\n"
 "%s."
 
 #: modules/audio_output/amem.c:36
@@ -10539,7 +10548,7 @@ msgstr "Oblika vzorčenja"
 
 #: modules/audio_output/auhal.c:45
 msgid "Last audio device"
-msgstr "Zadnja zvokovna naprava"
+msgstr "Zadnja zvočna naprava"
 
 #: modules/audio_output/auhal.c:53
 msgid "HAL AudioUnit output"
@@ -10556,7 +10565,7 @@ msgstr "%s (kodiran odvod)"
 
 #: modules/audio_output/auhal.c:1041
 msgid "Audio device is not configured"
-msgstr "Zvokovna naprava ni nastavljena"
+msgstr "Zvočna naprava ni nastavljena"
 
 #: modules/audio_output/auhal.c:1042
 msgid ""
@@ -10569,7 +10578,7 @@ msgstr ""
 #: modules/audio_output/auhal.c:1186
 msgid ""
 "The selected audio output device is exclusively in use by another program."
-msgstr "Izbrano z ime zvokovne napraveo napravo uporablja nek drug program."
+msgstr "Izbrano ime zvočne naprave ekskluzivno uporablja nek drug program."
 
 #: modules/audio_output/directsound.c:62 modules/audio_output/mmdevice.c:1465
 msgid "Output device"
@@ -10577,7 +10586,7 @@ msgstr "Odvodna naprava"
 
 #: modules/audio_output/directsound.c:63 modules/audio_output/mmdevice.c:1466
 msgid "Select your audio output device"
-msgstr "Izberite izhodno zvokovno napravo"
+msgstr "Izberite izhodno zvočno napravo"
 
 #: modules/audio_output/directsound.c:65
 msgid "Speaker configuration"
@@ -10675,7 +10684,7 @@ msgstr "Naprava"
 
 #: modules/audio_output/kai.c:95
 msgid "Select a proper audio device to be used by KAI."
-msgstr "Izbor ustrezne zvokovne naprave za podporo KAI."
+msgstr "Izbor ustrezne zvočne naprave za podporo KAI."
 
 #: modules/audio_output/kai.c:98
 msgid "Open audio in exclusive mode."
@@ -10717,7 +10726,7 @@ msgstr "Omogočeno"
 
 #: modules/audio_output/mmdevice.c:1473
 msgid "Windows Multimedia Device output"
-msgstr "Zvokovni odvod naprave Windows Multimedia"
+msgstr "Zvočni izhod naprave Windows Multimedia Device"
 
 #: modules/audio_output/mmdevice.c:1479
 msgid "Output back-end"
@@ -10757,15 +10766,15 @@ msgstr "Izhod API-ja Windows Audio Session"
 
 #: modules/audio_output/waveout.c:135
 msgid "Select Audio Device"
-msgstr "Izbor zvokovne naprave"
+msgstr "Izberi zvočno napravo"
 
 #: modules/audio_output/waveout.c:136
 msgid ""
 "Select special Audio device, or let windows decide (default), change needs "
 "VLC restart to apply."
 msgstr ""
-"Izberite posebno zvokovno napravo ali pa prepustite nastavitev sistemu; "
-"spremembe bodo privzete ob ponovnem zagonu predvajalnika."
+"Izberite posebno zvočno napravo ali prepustite izbiro sistemu (privzeto); za "
+"uveljavitev sprememb je potreben ponoven zagon VLC."
 
 #: modules/audio_output/waveout.c:149
 msgid "WaveOut audio output"
@@ -11350,12 +11359,13 @@ msgid ""
 "This is not an error inside VLC media player.\n"
 "Do not contact the VideoLAN project about this issue.\n"
 msgstr ""
-"Videti je, da je namestitev Libav/FFmpeg (libavcodec) brez kodirnika:\n"
+"Videti je, da namestitev Libav/FFmpeg (libavcodec) nima kodirnika:\n"
 "%s.\n"
-"V primeru, da ni takoj jasno, kako napako odpraviti, poiščite pomoč.\n"
+"Če ne veste, kako napako odpraviti, se obrnite na podporo za vaš operacijski "
+"sitem.\n"
 "\n"
 "To ni napaka predvajalnika VLC.\n"
-"Zaradi napake se obrnite na distributerja vašega operacijskega sistema.\n"
+"Zaradi te težave se ne obračajte na projekt VideoLAN.\n"
 
 #: modules/codec/avcodec/encoder.c:892
 msgid "unknown"
@@ -11495,11 +11505,11 @@ msgstr "Odloži odkodirnik"
 
 #: modules/codec/dmo/dmo.c:91
 msgid "DirectMedia Object decoder"
-msgstr "Odkodirnik DirectMedia Object"
+msgstr "DirectMedia Object odkodirnik"
 
 #: modules/codec/dmo/dmo.c:105
 msgid "DirectMedia Object encoder"
-msgstr "Kodirnik DirectMedia Object"
+msgstr "DirectMedia Object kodirnik"
 
 #: modules/codec/dvbsub.c:83
 msgid "Decoding X coordinate"
@@ -11709,9 +11719,9 @@ msgid ""
 "Please install a sound font and configure it from the VLC preferences "
 "(Input / Codecs > Audio codecs > FluidSynth).\n"
 msgstr ""
-"Za sintezo MIDI je zahtevana datoteka zvokovne pisave (.SF2).\n"
-"Namestiti je treba zvokovno pisavo in jo nastaviti med nastavitvami VLC "
-"(Vhod / Kodeki > Zvokovni kodeki > FluidSynth).\n"
+"Za MIDI sintezo je potrebna datoteka z zvočno pisavo (.SF2).\n"
+"Namestite zvočno pisavo in jo izberite v VLC nastavitvah (Vhod / Kodeki > "
+"Zvočni kodeki > FluidSynth).\n"
 
 #: modules/codec/g711.c:46
 msgid "G.711 decoder"
@@ -12021,7 +12031,7 @@ msgstr "Podnapisi (napredno)"
 
 #: modules/codec/libass.c:61
 msgid "Subtitle renderers using libass"
-msgstr "Izris podnapisov s knjižnico libass"
+msgstr "Izrisovalniki podnapisov s knjižnico libass"
 
 #: modules/codec/libass.c:249
 #: modules/text_renderer/freetype/fonts/fontconfig.c:78
@@ -12121,8 +12131,8 @@ msgid ""
 "Allow the use of the Intel Media SDK software implementation of the codecs "
 "if no QuickSync Video hardware acceleration is present on the system."
 msgstr ""
-"Omogoči uporabo vgradnje kodekov programske opreme Intel Media SDK, če na "
-"sistemu ni nameščenega strojnega pospeševanja slike QuickSync ."
+"Omogoči uporabo Intel Media SDK  programske izvedbe kodekov, če na sistemu "
+"ni nameščenega strojnega pospeševanja videa QuickSync ."
 
 #: modules/codec/qsv.c:61
 msgid "Codec Profile"
@@ -12513,7 +12523,7 @@ msgstr "Brez predfiltriranja"
 
 #: modules/codec/schroedinger.c:148
 msgid "Centre Weighted Median"
-msgstr "Mediano sredinjenje"
+msgstr "Uravnotežena sredina"
 
 #: modules/codec/schroedinger.c:149
 msgid "Gaussian Low Pass Filter"
@@ -12553,7 +12563,7 @@ msgstr ""
 
 #: modules/codec/schroedinger.c:166
 msgid "auto - let encoder decide based upon input (Best)"
-msgstr "samodejno – kodirnik določa glede na najboljši dovod (priporočljivo)"
+msgstr "samodejno – kodirnik se odloča glede na dovod (priporočljivo)"
 
 #: modules/codec/schroedinger.c:167
 msgid "force coding frame as single picture"
@@ -14126,7 +14136,9 @@ msgstr "Mrtvo območje inter luma deljenja"
 
 #: modules/codec/x264.c:368
 msgid "Set the size of the inter luma quantization deadzone. Range 0 to 32."
-msgstr "Določitev mrtvega območja deljenja inter lume. Območje je med 0 in 32."
+msgstr ""
+"Določitev mrtvega območja deljenja inter luma kvantizacije. Območje je med 0 "
+"in 32."
 
 #: modules/codec/x264.c:371
 msgid "Intra luma quantization deadzone"
@@ -14486,7 +14498,7 @@ msgstr "Splošne hitre tipke"
 #: modules/control/globalhotkeys/win32.c:50
 #: modules/control/globalhotkeys/xcb.c:53
 msgid "Global Hotkeys interface"
-msgstr "Vmesnik splošnih hitrih tipk"
+msgstr "Vmesnik globalnih hitrih tipk"
 
 #: modules/control/hotkeys.c:100
 #: modules/gui/macosx/VLCSimplePrefsController.m:243
@@ -14516,7 +14528,7 @@ msgstr "Naključno: %s"
 #: modules/control/hotkeys.c:530
 #, c-format
 msgid "Audio Device: %s"
-msgstr "Zvokovna naprava: %s"
+msgstr "Zvočna naprava: %s"
 
 #: modules/control/hotkeys.c:591
 msgid "Recording"
@@ -15009,7 +15021,7 @@ msgstr "| voldown [X] . . . . . . znižaj glasnost za X"
 
 #: modules/control/oldrc.c:827
 msgid "| adev [device]  . . . . . . . .  set/get audio device"
-msgstr "| adev [device] . . . . . . . . nastavi/pridobi zvokovno napravo"
+msgstr "| adev [naprava] . . . . . . . . določi/pridobi zvočno napravo"
 
 #: modules/control/oldrc.c:828
 msgid "| achan [X]. . . . . . . . . .  set/get audio channels"
@@ -16194,7 +16206,7 @@ msgstr "Odvijalnik PVA"
 
 #: modules/demux/rawaud.c:44
 msgid "Audio sample rate in Hertz. Default is 48000 Hz."
-msgstr "Hitrost vzorčenja v hertzih. Privzeta vrednost je 48000 Hz."
+msgstr "Frekvenca vzorčenja zvoka v hertzih. Privzeta vrednost je 48000 Hz."
 
 #: modules/demux/rawaud.c:46 modules/stream_out/transcode/transcode.c:100
 #: share/lua/http/dialogs/create_stream.html:316
@@ -16826,7 +16838,7 @@ msgstr "Začni!"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:138
 #: modules/gui/macosx/VLCMainWindow.m:194
 msgid "Drop media here"
-msgstr "Na to mesto spustite predstavno datoteko"
+msgstr "Sem povlecite predstavno datoteko"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:139
 #: modules/gui/macosx/VLCMainWindow.m:210
@@ -17022,8 +17034,8 @@ msgid ""
 "Media encapsulated as %@ cannot be streamed through the HTTP protocol for "
 "technical reasons."
 msgstr ""
-"Predstavnosti vdelane kot %@ ni mogoče pretakati preko protokola HTTP zaradi "
-"tehničnih razlogov."
+"Predstavne vsebine vdelane kot %@ ni mogoče pretakati preko protokola HTTP "
+"zaradi tehničnih razlogov."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:336
 msgid "Remove a profile"
@@ -17096,7 +17108,7 @@ msgstr "Počisti"
 
 #: modules/gui/macosx/VLCFSPanelController.m:111
 msgid "Play/Pause the current media"
-msgstr "Predvajaj/Ustavi predvajanje trenutnega vira"
+msgstr "Predvajaj/Premor za trenutno vsebino"
 
 #: modules/gui/macosx/VLCFSPanelController.m:117
 msgid "Go to the previous item"
@@ -17249,7 +17261,9 @@ msgstr "Nadzor predvajanja s predstavnimi tipkami"
 msgid ""
 "By default, VLC can be controlled using the media keys on modern Apple "
 "keyboards."
-msgstr "Privzeto VLC sprejme ukaze predstavnih tipk na Applovih tipkovnicah"
+msgstr ""
+"Privzeto je mogoče VLC upravljati preko predstavnih tipk na sodobnih "
+"Applovih tipkovnicah"
 
 #: modules/gui/macosx/macosx.m:92
 msgid "Run VLC with dark interface style"
@@ -17431,7 +17445,7 @@ msgstr "Obnašanje"
 
 #: modules/gui/macosx/macosx.m:180
 msgid "Apple Remote and media keys"
-msgstr "Daljinski upravljalnik Apple in tipke za predstavnost"
+msgstr "Apple daljinski upravljalnik in predstavne tipke"
 
 #: modules/gui/macosx/macosx.m:196
 msgid "Video output"
@@ -17439,11 +17453,11 @@ msgstr "Video izhod"
 
 #: modules/gui/macosx/VLCMain+OldPrefs.m:118
 msgid "Remove old preferences?"
-msgstr "Ali naj se počistijo stare možnosti?"
+msgstr "Brisanje starih nastavitev?"
 
 #: modules/gui/macosx/VLCMain+OldPrefs.m:119
 msgid "We just found an older version of VLC's preferences files."
-msgstr "Zaznana je starejša različica nastavitvenih datotek predvajalnika VLC."
+msgstr "Zaznana je starejša različica VLC nastavitvenih datotek."
 
 #: modules/gui/macosx/VLCMain+OldPrefs.m:120
 msgid "Move To Trash and Relaunch VLC"
@@ -17480,7 +17494,7 @@ msgstr "Preveri za posodobitve ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:342
 msgid "Preferences..."
-msgstr "Možnosti ..."
+msgstr "Nastavitve..."
 
 #: modules/gui/macosx/VLCMainMenu.m:348
 msgid "Services"
@@ -17632,7 +17646,7 @@ msgstr "Znižaj glasnost"
 
 #: modules/gui/macosx/VLCMainMenu.m:422 modules/gui/macosx/VLCMainMenu.m:423
 msgid "Audio Device"
-msgstr "Zvokovna naprava"
+msgstr "Zvočna naprava"
 
 #: modules/gui/macosx/VLCMainMenu.m:428
 msgid "Half Size"
@@ -17720,7 +17734,7 @@ msgstr "Glavno okno ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:478
 msgid "Audio Effects..."
-msgstr "Zvokovni učinki ..."
+msgstr "Zvočni učinki ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:479
 msgid "Video Effects..."
@@ -17736,7 +17750,7 @@ msgstr "Seznam predvajanja ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:482 modules/gui/macosx/VLCPlaylist.m:233
 msgid "Media Information..."
-msgstr "Podrobnosti predstavne datoteke ..."
+msgstr "Podatki o predstavni vsebini..."
 
 #: modules/gui/macosx/VLCMainMenu.m:483
 msgid "Messages..."
@@ -17808,7 +17822,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:211
 msgid "Open a dialog to select the media to play"
-msgstr "Odpri pogovorno okno za izbor predstavne vsebine"
+msgstr "Odpri pogovorno okno za izbor predstavne vsebine, ki naj se predvaja"
 
 #: modules/gui/macosx/VLCMainWindow.m:215
 #: modules/gui/macosx/VLCMainWindow.m:221
@@ -17919,7 +17933,7 @@ msgstr "Odprta koda"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:131
 msgid "Media Resource Locator (MRL)"
-msgstr "Naslov virov predstavnih datotek (MRL)"
+msgstr "Naslov virov predstavnih vsebin (MRL)"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:133
 #: modules/gui/macosx/VLCOpenWindowController.m:193
@@ -17941,7 +17955,7 @@ msgstr "Nastavitve ..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
 msgid "Choose media input type"
-msgstr "Izbor vrsto predstavne vsebine"
+msgstr "Izbor vrste predstavne vsebine"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:141
 msgid "Disc"
@@ -17973,7 +17987,7 @@ msgstr "Uporabi kot cev namesto datoteke"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:151
 msgid "Play another media synchronously"
-msgstr "Dodatno predstavno datoteko predvajaj usklajeno"
+msgstr "Hkrati predvajaj še eno predstavno vsebino"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:152
 #: modules/gui/macosx/VLCOpenWindowController.m:348
@@ -18226,7 +18240,7 @@ msgstr "Zloži vse"
 #: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
 msgid "Media Information"
-msgstr "Podrobnosti predstavne datoteke"
+msgstr "Podatki o predstavni vsebini"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:58
 msgid "Location"
@@ -18247,7 +18261,7 @@ msgstr "Podrobnosti kodeka"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:81
 msgid "Read at media"
-msgstr "Preberi pri predstavni datoteki"
+msgstr "Branje v predstavni datoteki"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:82
 #: modules/gui/qt/components/info_panels.cpp:578
@@ -18304,7 +18318,7 @@ msgstr "Nadaljuj"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
 msgid "Always continue media playback"
-msgstr "Vedno nadaljuj s predvajanjem predmeta"
+msgstr "Vedno nadaljuj s predvajanjem vsebine"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
@@ -18358,7 +18372,7 @@ msgstr "Omogoči pošiljanje last.fm"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:279
 msgid "Visualization"
-msgstr "Predočenje"
+msgstr "Vizualizacija"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:280
 msgid "Keep audio level between sessions"
@@ -18418,8 +18432,8 @@ msgid ""
 "Use the complete preferences to configure custom caching values for each "
 "access module."
 msgstr ""
-"Uporabi vse možnosti za nastavitev predpomnjenja po meri za vsak modul "
-"dostopa posebej."
+"Uporabi vse nastavitve za določanje vrednosti prilagojenega predpomnjenja za "
+"vsak dostopni modul."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:301
 msgid "Codecs / Muxers"
@@ -18589,7 +18603,7 @@ msgstr "Ponastavi vse"
 #: modules/gui/macosx/VLCSimplePrefsController.m:387
 #: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
 msgid "Preferences"
-msgstr "Možnosti"
+msgstr "Nastavitve"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:560
 msgid ""
@@ -18625,7 +18639,7 @@ msgstr "Najvišja zakasnitev"
 #: modules/gui/macosx/VLCSimplePrefsController.m:827
 #: modules/gui/qt/dialogs/preferences.cpp:336
 msgid "Reset Preferences"
-msgstr "Ponastavi možnosti"
+msgstr "Ponastavi nastavitve"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:830
 msgid ""
@@ -18641,11 +18655,11 @@ msgid ""
 msgstr ""
 "S tem dejanjem bodo ponastavljene vse nastavitve predvajalnika VLC.\n"
 "\n"
-"Upoštevajte, da se bo pri tem predvajalnik VLC ponovno zagnal, vaš trenutni "
-"seznam predvajanja bo izpraznjen in vsa morebitna dejanja predvajanja, "
-"pretakanja ali prekodiranja takoj zaustavljena.\n"
+"Upoštevajte, da se bo VLC ponovno zagnal, vaš trenutni seznam predvajanja bo "
+"izpraznjen, morebitno predvajanje, pretakanje ali prekodiranje pa bo "
+"zaustavljeno.\n"
 "\n"
-"Zbirka predstavnih datotek bo ostala nespremenjena.\n"
+"Knjižnica predstavnih vsebin  bo ostala nespremenjena.\n"
 "\n"
 "Ali ste prepričani, da želite nadaljevati?"
 
@@ -19467,14 +19481,14 @@ msgstr "Odpiranje predstavne vsebine"
 #: modules/gui/qt/components/controller.hpp:117
 msgid "Previous media in the playlist, skip backward when held"
 msgstr ""
-"- Skoči na predhodni predmet na seznamu seznama predvajanja\n"
-"- Pridržana tipka skoči za kratek korak nazaj"
+"Prejšnja predstavna vsebina s seznama predvajanja, pomik nazaj, kadar je "
+"pridržano"
 
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Next media in the playlist, skip forward when held"
 msgstr ""
-"- Skoči na naslednji predmet na seznamu seznama predvajanja\n"
-"- Pridržana tipka skoči za kratek korak naprej"
+"Naslednja predstavna vsebina s seznama predvajanja, pomik naprej, kadar je "
+"pridržano"
 
 #: modules/gui/qt/components/controller.hpp:119
 msgid "Toggle the video in fullscreen"
@@ -19516,11 +19530,11 @@ msgstr "Spremeni načina kroženja in ponavljanja predvajanja"
 
 #: modules/gui/qt/components/controller.hpp:125
 msgid "Previous media in the playlist"
-msgstr "Predhodna predstavna datoteka na seznamu"
+msgstr "Predhodna predstavna vsebina na seznamu predvajanja"
 
 #: modules/gui/qt/components/controller.hpp:125
 msgid "Next media in the playlist"
-msgstr "Naslednja predstavna datoteka na seznamu"
+msgstr "Naslednja vsebina na seznamu predvajanja"
 
 #: modules/gui/qt/components/controller.hpp:126
 #: modules/gui/qt/components/open_panels.cpp:259
@@ -19752,12 +19766,12 @@ msgid ""
 "Information about what your media or stream is made of.\n"
 "Muxer, Audio and Video Codecs, Subtitles are shown."
 msgstr ""
-"Podrobnosti o zgradbi predstavne datoteke ali pretoka vključujejo\n"
-"podatke o zvijalniku, kodeku zvoka in slike, podnapisih in druge podatke."
+"Podatki o zgradbi predstavne datoteke ali pretoka vključujejo\n"
+"podatke o zvijalniku, zvočnem in video kodeku, podnapisih in drugem."
 
 #: modules/gui/qt/components/info_panels.cpp:548
 msgid "Current media / stream statistics"
-msgstr "Statistika trenutne predstavne datoteke ali pretoka"
+msgstr "Statistika trenutne predstavne vsebine ali pretoka"
 
 #: modules/gui/qt/components/info_panels.cpp:574
 msgid "Input/Read"
@@ -19765,7 +19779,7 @@ msgstr "Vhod/Prebrano"
 
 #: modules/gui/qt/components/info_panels.cpp:576
 msgid "Media data size"
-msgstr "Podatkovna velikost predstavne datoteke"
+msgstr "Velikost predstavne datoteke"
 
 #: modules/gui/qt/components/info_panels.cpp:582
 msgid "Demuxed data size"
@@ -19927,7 +19941,7 @@ msgstr "TV – digitalno"
 
 #: modules/gui/qt/components/open_panels.cpp:922
 msgid "Tuner card"
-msgstr "Kartica uglaševalnika"
+msgstr "Kartica sprejemnika"
 
 #: modules/gui/qt/components/open_panels.cpp:923
 msgid "Delivery system"
@@ -19968,9 +19982,7 @@ msgstr "Napredne možnosti"
 
 #: modules/gui/qt/components/playlist/playlist.cpp:74
 msgid "Double click to get media information"
-msgstr ""
-"Z dvojnim klikom na izbran predmet si je mogoče ogledati podrobnosti "
-"predstavne datoteke."
+msgstr "Dvoklik za podatke o predstavni vsebini"
 
 #: modules/gui/qt/components/playlist/playlist.cpp:113
 msgid "Change playlistview"
@@ -20191,10 +20203,10 @@ msgid ""
 "You can define a unique one or configure them \n"
 "individually in the advanced preferences."
 msgstr ""
-"Če ta lastnost ni določena, so na voljo\n"
+"Če je ta lastnost prazna, se določijo\n"
 "različne vrednosti za DVD, VCD, in CDDA.\n"
-"Določiti je mogoče enoznačno vrednost,\n"
-"ali pa jo določiti v naprednih nastavitvah."
+"Lahko določite edinstveno vrednost,\n"
+"ali jih v naprednih nastavitvah določite posamično."
 
 #: modules/gui/qt/components/simple_preferences.cpp:693
 msgid "Lowest latency"
@@ -20460,7 +20472,7 @@ msgstr "Pokaži odvod"
 
 #: modules/gui/qt/dialogs/convert.cpp:119
 msgid "This display the resulting media, but can slow things down."
-msgstr "Omogoči predvajanje posnetka, vendar to upočasni pretvarjanje."
+msgstr "To prikaže predstavno vsebino, a lahko upočasni delovanje."
 
 #: modules/gui/qt/dialogs/convert.cpp:136
 msgid "&Start"
@@ -20501,7 +20513,7 @@ msgstr "Prilagoditve in učinki"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
 msgid "Stereo Widener"
-msgstr ""
+msgstr "Stereo razširitev"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -20538,7 +20550,7 @@ msgid ""
 "express consent for the media player to access the Internet automatically.</"
 "p>\n"
 msgstr ""
-"<p>Za zaščito zasebnosti <i>predvajalnik VLC</i> <b>ne zbira</b> osebnih "
+"<p>Zaradi zaščite zasebnosti <i>predvajalnik VLC</i> <b>ne zbira</b> osebnih "
 "podatkov in jih v nobeni obliki <b>ne pošilja</b> tretjim osebam.</p>\n"
 "<p>Program pa lahko prek spletnih storitev tretjih oseb pridobi podatke o "
 "predmetih, ki so v predstavni zbirki. To so na primer naslovnice albumov, "
@@ -20617,7 +20629,7 @@ msgstr "Na voljo je nova različica predvajalnika VLC (%1.%2.%3%4)."
 
 #: modules/gui/qt/dialogs/help.cpp:319
 msgid "You have the latest version of VLC media player."
-msgstr "Nameščena je novejša različica predvajalnika VLC."
+msgstr "Nameščena je zadnja različica predvajalnika VLC."
 
 #: modules/gui/qt/dialogs/help.cpp:326
 msgid "An error occurred while checking for updates..."
@@ -20625,7 +20637,7 @@ msgstr "Prišlo je do napake med preverjanjem posodobitev ..."
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:52
 msgid "Current Media Information"
-msgstr "Podatki o trenutno predvajani vsebini"
+msgstr "Podatki o trenutni vsebini"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:64
 msgid "&General"
@@ -20692,7 +20704,7 @@ msgstr "Počisti sporočila"
 #: modules/gui/qt/dialogs/open.cpp:78 modules/gui/qt/menus.cpp:934
 #: modules/gui/qt/menus.cpp:1131
 msgid "Open Media"
-msgstr "Izbor predstavne vsebine"
+msgstr "Odpri predstavno vsebino"
 
 #: modules/gui/qt/dialogs/open.cpp:90
 msgid "&File"
@@ -20746,7 +20758,7 @@ msgstr "Vnos naslova URL ..."
 
 #: modules/gui/qt/dialogs/openurl.cpp:67
 msgid "Please enter the URL or path to the media you want to play."
-msgstr "Naslov URL oziroma pot do predstavne vsebine"
+msgstr "Naslov URL oziroma pot do predstavne vsebine, ki jo želite predvajati"
 
 #: modules/gui/qt/dialogs/openurl.cpp:71
 msgid ""
@@ -20792,8 +20804,8 @@ msgid ""
 "Skins customize player's appearance. You can activate them through "
 "preferences."
 msgstr ""
-"Preobleke omogočajo prilagajanje videza predvajalnika. Videz je mogoče "
-"prilagajati med nastavitvami."
+"Preobleke omogočajo prilagajanje videza predvajalnika. Vklopite jih lahko v "
+"nastavitvah."
 
 #: modules/gui/qt/dialogs/plugins.cpp:382
 msgid ""
@@ -20884,11 +20896,11 @@ msgstr "Osnovne"
 
 #: modules/gui/qt/dialogs/preferences.cpp:77
 msgid "Switch to simple preferences view"
-msgstr "Preklopi na osnovne nastavitve programa"
+msgstr "Prikaži preproste nastavitve"
 
 #: modules/gui/qt/dialogs/preferences.cpp:80
 msgid "Switch to full preferences view"
-msgstr "Preklopi na zahtevnejše nastavitve programa"
+msgstr "Prikaži vse nastavitve"
 
 #: modules/gui/qt/dialogs/preferences.cpp:96
 msgid "Save and close the dialog"
@@ -20908,11 +20920,11 @@ msgstr "Pokaže le module, ki so povezani s trenutno predvajanim posnetkom."
 
 #: modules/gui/qt/dialogs/preferences.cpp:206
 msgid "Advanced Preferences"
-msgstr "Napredne možnosti nastavitev"
+msgstr "Napredne nastavitve"
 
 #: modules/gui/qt/dialogs/preferences.cpp:227
 msgid "Simple Preferences"
-msgstr "Osnovne možnosti nastavitev"
+msgstr "Preproste nastavitve"
 
 #: modules/gui/qt/dialogs/preferences.cpp:311
 msgid "Cannot save Configuration"
@@ -20925,8 +20937,7 @@ msgstr "Datoteke z nastavitvami ni mogoče shraniti"
 #: modules/gui/qt/dialogs/preferences.cpp:337
 msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr ""
-"Ali ste prepričani, da želite povrniti nastavitve predvajalnika VLC na "
-"privzete vrednosti?"
+"Ali ste prepričani, da želite ponastaviti nastavitve predvajalnika VLC?"
 
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:198
 msgid "Stream Output"
@@ -20939,10 +20950,10 @@ msgid ""
 "You should start by checking that source matches what you want your input to "
 "be and then press the \"Next\" button to continue.\n"
 msgstr ""
-"Čarovnik omogoča pretakanje in pretvarjanje vsebine na krajevni odvod "
-"znotraj zasebnega omrežja ali na internetu.\n"
-"Začnite s preverjanjem ali se vir ujema z želenim vnosom in pritisnite gumb "
-"»Naprej« za nadaljevanje.\n"
+"Čarovnik omogoča pretakanje in pretvarjanje predstavne vsebine za lokalno "
+"rabo v zasebnem omrežju ali na spletu.\n"
+"Najprej preverite ali se vir ujema s pričakovanim dovodom, nato pa "
+"pritisnite »Naprej« za nadaljevanje.\n"
 
 #: modules/gui/qt/dialogs/sout.cpp:58
 msgid ""
@@ -21222,7 +21233,7 @@ msgstr "V premoru"
 
 #: modules/gui/qt/menus.cpp:331
 msgid "&Media"
-msgstr "&Odpri"
+msgstr "&Predstavna vsebina"
 
 #: modules/gui/qt/menus.cpp:334
 msgid "P&layback"
@@ -21278,7 +21289,7 @@ msgstr "Odpri &pot iz odložišča"
 
 #: modules/gui/qt/menus.cpp:374
 msgid "Open &Recent Media"
-msgstr "Odpri &nedavno predvajano"
+msgstr "Odpri &nedavno vsebino"
 
 #: modules/gui/qt/menus.cpp:387
 msgid "Conve&rt / Save..."
@@ -21318,7 +21329,7 @@ msgstr "Prila&godi vmesnik ..."
 
 #: modules/gui/qt/menus.cpp:445
 msgid "&Preferences"
-msgstr "&Lastnosti"
+msgstr "&Nastavitve"
 
 #: modules/gui/qt/menus.cpp:466
 msgid "&View"
@@ -21362,7 +21373,7 @@ msgstr "Vrstica stanja"
 
 #: modules/gui/qt/menus.cpp:538
 msgid "Visualizations selector"
-msgstr "Izbirnik predočenja"
+msgstr "Izbor vizualizacije"
 
 #: modules/gui/qt/menus.cpp:596
 msgid "&Increase Volume"
@@ -21378,7 +21389,7 @@ msgstr "&Utišaj zvok"
 
 #: modules/gui/qt/menus.cpp:618
 msgid "Audio &Device"
-msgstr "&Zvokovna naprava"
+msgstr "&Zvočna naprava"
 
 #: modules/gui/qt/menus.cpp:622
 msgid "Audio &Track"
@@ -21390,7 +21401,7 @@ msgstr "&Stereo način"
 
 #: modules/gui/qt/menus.cpp:627
 msgid "&Visualizations"
-msgstr "&Predočenje"
+msgstr "&Vizualizacije"
 
 #: modules/gui/qt/menus.cpp:653
 msgid "Add &Subtitle File..."
@@ -21514,7 +21525,7 @@ msgstr "&Predvajanje"
 
 #: modules/gui/qt/menus.cpp:1174
 msgid "&Hide VLC media player in taskbar"
-msgstr "&Skrij predvajalnik VLC v opravilni vrstici"
+msgstr "&Skrij predvajalnik VLC v opravilno vrstico"
 
 #: modules/gui/qt/menus.cpp:1180
 msgid "Sho&w VLC media player"
@@ -21542,14 +21553,13 @@ msgstr "Poteka preiskovanje ..."
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
-msgstr "Pokaži napredne možnosti pred osnovnimi"
+msgstr "Pokaži napredne nastavitve pred osnovnimi"
 
 #: modules/gui/qt/qt.cpp:82
 msgid ""
 "Show advanced preferences and not simple preferences when opening the "
 "preferences dialog."
-msgstr ""
-"Prikaz naprednih nastavitev in ne le osnovnih ob pregledovanju nastavitev."
+msgstr "V nastavitvenem oknu prikaže napredne nastavitve, preprostih pa ne."
 
 #: modules/gui/qt/qt.cpp:86 modules/gui/skins2/src/skin_main.cpp:499
 msgid "Systray icon"
@@ -21560,8 +21570,8 @@ msgid ""
 "Show an icon in the systray allowing you to control VLC media player for "
 "basic actions."
 msgstr ""
-"Prikaže ikono predvajalnika v sistemski vrstici, prek nje pa tipke za osnovi "
-"nadzor predvajanja."
+"V sistemski vrstici prikaže ikono, ki omogoča osnovno upravljanje VLC "
+"predvajalnika."
 
 #: modules/gui/qt/qt.cpp:91
 msgid "Start VLC with only a systray icon"
@@ -21676,7 +21686,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:144
 msgid "Selection of the starting mode and look"
-msgstr "Izbor začetnega načina in videza"
+msgstr "Izbira zagonskega načina in videza"
 
 #: modules/gui/qt/qt.cpp:145
 msgid ""
@@ -22304,7 +22314,7 @@ msgstr "Journal"
 
 #: modules/logger/journal.c:78
 msgid "SystemD journal logger"
-msgstr "Dnevnik SystemD Journal"
+msgstr "SystemD beležnik dnevnika"
 
 #: modules/logger/syslog.c:138
 msgid "System log (syslog)"
@@ -22365,9 +22375,9 @@ msgid ""
 "password, or set a password in </p><p>Preferences &gt; All &gt; Main "
 "interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p>"
 msgstr ""
-"<p>Geslo za spletni vmesnik ni nastavljeno.</p><p>Uporabite --http-password "
-"ali nastavite geslo v</p><p>nastavitvah &gt; Vse &gt; Glavni vmesniki &gt; "
-"Lua &gt; Lua HTTP &gt; Geslo.</p>"
+"<p>Geslo za spletni vmesnik ni določeno.</p><p>Uporabite --http-password ali "
+"določite geslo v</p><p>Nastavitvah &gt; Vse &gt; Glavni vmesniki &gt; Lua "
+"&gt; Lua HTTP &gt; Geslo.</p>"
 
 #: modules/lua/vlc.c:49
 msgid "Lua interface"
@@ -22518,7 +22528,7 @@ msgstr "Blues"
 
 #: modules/meta_engine/ID3Genres.h:34
 msgid "Classic Rock"
-msgstr "Klasični rok"
+msgstr "Klasični rock"
 
 #: modules/meta_engine/ID3Genres.h:35
 msgid "Country"
@@ -22702,7 +22712,7 @@ msgstr "Sanjarjenje"
 
 #: modules/meta_engine/ID3Genres.h:89
 msgid "Southern Rock"
-msgstr "Južnjaški rok"
+msgstr "Južnjaški rock"
 
 #: modules/meta_engine/ID3Genres.h:90
 msgid "Comedy"
@@ -23026,7 +23036,7 @@ msgstr "Sodobna katoliška glasba"
 
 #: modules/meta_engine/ID3Genres.h:174
 msgid "Christian Rock"
-msgstr "Katoliški rok"
+msgstr "Krščanski rock"
 
 #: modules/meta_engine/ID3Genres.h:175
 msgid "Merengue"
@@ -23078,7 +23088,7 @@ msgstr ""
 
 #: modules/misc/addons/vorepository.c:72
 msgid "single .vlp archive addons finder"
-msgstr ""
+msgstr "iskalnik posameznih .vlp arhivskih dodatkov"
 
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
@@ -23132,11 +23142,11 @@ msgstr ""
 
 #: modules/misc/fingerprinter.c:73
 msgid "acoustid"
-msgstr ""
+msgstr "acoustid"
 
 #: modules/misc/fingerprinter.c:74
 msgid "Track fingerprinter (based on Acoustid)"
-msgstr ""
+msgstr "Prstni odtis skladbe (na osnovi Acoustid)"
 
 #: modules/misc/gnutls.c:485
 msgid ""
@@ -23205,6 +23215,8 @@ msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "operating system trust database to authenticate TLS sessions."
 msgstr ""
+"Zaupaj korenskim certifikatom Certificate Authorities, ki so shranjeni v "
+"bazi zaupanja operacijskega sistema, za overjanje TLS sej."
 
 #: modules/misc/gnutls.c:761
 msgid "Trust directory"
@@ -23255,7 +23267,7 @@ msgstr "Strežnik GNU TLS"
 
 #: modules/misc/inhibit/dbus.c:129
 msgid "Playing some media."
-msgstr "Predvajanje predstavnih datotek."
+msgstr "Predvajanje predstavne vsebine."
 
 #: modules/misc/inhibit/dbus.c:232
 msgid "D-Bus screensaver"
@@ -23436,9 +23448,9 @@ msgid ""
 "Windows Media Player will cache streamed content. Set to audio+video bitrate "
 "in bytes"
 msgstr ""
-"Ne ugibaj o ASF bitni hitrosti. Nastavitev omogoča nadzor nad predpomnjenjem "
-"vsebine pretoka predvajalnika Windows Media Player. Nastavite zvokovno in "
-"slikovno bitno hitrost v bajtih."
+"Ne skušajte uganiti bitne hitrosti za ASF. Nastavitev omogoča nadzor nad "
+"predpomnjenjem pretočne vsebine v Windows Media Player. Določite bitno "
+"hitrost zvoka in videa v bajtih."
 
 #: modules/mux/asf.c:73
 msgid "ASF muxer"
@@ -23880,9 +23892,8 @@ msgid "Zeroconf services"
 msgstr "Storitve Zeroconf"
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "Odkrivanje izrisovalnika mDNS"
+msgstr "Odkrivanje izrisovalnika Avahi"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
@@ -24890,11 +24901,11 @@ msgstr "Popravek prekrivanja"
 
 #: modules/stream_extractor/archive.c:54
 msgid "libarchive based stream directory"
-msgstr ""
+msgstr "imenik pretoka na temelju libarchive"
 
 #: modules/stream_extractor/archive.c:58
 msgid "libarchive based stream extractor"
-msgstr ""
+msgstr "ločilnik pretoka na temelju libarchive"
 
 #: modules/stream_filter/adf.c:42
 msgid "ADF stream filter"
@@ -25102,8 +25113,8 @@ msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr ""
-"Možnost določa vrata HTTP krajevnega strežnika, ki je uporabljen za "
-"pretakanje vsebine na Chromecast."
+"To določi  HTTP vrata krajevnega strežnika, ki je uporabljen za pretakanje "
+"vsebine na Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:192
 #: modules/stream_out/chromecast/cast.cpp:1198
@@ -25882,7 +25893,7 @@ msgstr "Ciljna bitna hitrost prekodiranega zvokovnega zapisa."
 msgid ""
 "Sample rate of the transcoded audio stream (11250, 22500, 44100 or 48000)."
 msgstr ""
-"Hitrost vzorčenja prekodiranega zvokovnega zapisa (11250, 22500, 44100 ali "
+"Frekvenca vzorčenja prekodiranega zvočnega zapisa (11250, 22500, 44100 ali "
 "48000)."
 
 #: modules/stream_out/transcode/transcode.c:99
@@ -26574,7 +26585,7 @@ msgstr "Filter platna videa"
 
 #: modules/video_filter/ci_filters.m:755
 msgid "Use a specific Core Image Filter"
-msgstr ""
+msgstr "Uporabi specifičen Core Image Filter"
 
 #: modules/video_filter/ci_filters.m:757
 msgid ""
@@ -27612,7 +27623,7 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:117
 msgid "Video connection for DeckLink output."
-msgstr "Slikovna povezava za izhod DeckLink."
+msgstr "Video povezava za DeckLink izhod."
 
 #: modules/video_output/decklink.cpp:121
 msgid "Use 10 bits per pixel for video frames."
@@ -28449,11 +28460,11 @@ msgstr "Stena slike"
 
 #: modules/visualization/glspectrum.c:56
 msgid "The width of the visualization window, in pixels."
-msgstr "Širina okna predočenja v točkah."
+msgstr "Širina okna vizualizacije v pikslih."
 
 #: modules/visualization/glspectrum.c:59
 msgid "The height of the visualization window, in pixels."
-msgstr "Višina okna predočenja v točkah."
+msgstr "Višina okna vizualizacije v pikslih."
 
 #: modules/visualization/glspectrum.c:62
 msgid "glSpectrum"
@@ -28461,7 +28472,7 @@ msgstr "Stolpčni spekter"
 
 #: modules/visualization/glspectrum.c:63
 msgid "3D OpenGL spectrum visualization"
-msgstr "Predočenje 3D OpenGL spectrum"
+msgstr "3D OpenGL spektralna vizualizacija"
 
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
@@ -28594,7 +28605,8 @@ msgstr "Okno FFT"
 
 #: modules/visualization/visual/visual.c:63
 msgid "The type of FFT window to use for spectrum-based visualizations."
-msgstr "Vrsta okna TFT za predočenja osnovana na sprektru."
+msgstr ""
+"Vrsta FFT okna uporabljenega za vizualizacije, ki temeljijo na spektru."
 
 #: modules/visualization/visual/visual.c:65
 msgid "Kaiser window parameter"
@@ -28773,7 +28785,7 @@ msgstr "Odvodna\tdatoteka"
 
 #: share/lua/http/dialogs/create_stream.html:355
 msgid "Input media"
-msgstr "Vhodna predstavnost"
+msgstr "Vhodna predstavna vsebina"
 
 #: share/lua/http/dialogs/create_stream.html:367
 msgid "Error:"
@@ -28835,7 +28847,7 @@ msgstr "Skrij / Prikaži zbirko"
 
 #: share/lua/http/index.html:216
 msgid "Hide / Show Viewer"
-msgstr "Skrij / Pokaži pregledovalnik"
+msgstr "Skrij / Pokaži  prikazovalnik"
 
 #: share/lua/http/index.html:217
 msgid "Manage Streams"
@@ -28900,8 +28912,8 @@ msgid ""
 "Once the stream is created, the <i>Media Viewer</i> window will display the "
 "stream."
 msgstr ""
-"Ko je pretok ustvarjen, bo okno <i>Pregledovalnika predstavnosti</i> "
-"prikazalo pretok."
+"Ko bo pretok ustvarjen, bo okno <i>Prikazovalnik vsebine</i> prikazalo "
+"pretok."
 
 #: share/lua/http/index.html:269
 msgid ""
@@ -29014,7 +29026,7 @@ msgstr "Izbor datoteke"
 
 #: modules/gui/qt/ui/open.h:281
 msgid "Change the start time for the media"
-msgstr "Spremeni čas začetka predstavne datoteke"
+msgstr "Spremeni začetni čas predstavne vsebine"
 
 #: modules/gui/qt/ui/open.h:283 modules/gui/qt/ui/open.h:287
 msgid "HH'H':mm'm':ss's'.zzz"
@@ -29022,13 +29034,11 @@ msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:285
 msgid "Change the stop time for the media"
-msgstr "Spremeni končni čas predstavne vsebine"
+msgstr "Spremeni zaustavitveni čas za predstavno vsebino"
 
 #: modules/gui/qt/ui/open.h:288
 msgid "Play another media synchronously (extra audio file, ...)"
-msgstr ""
-"Dodatno predstavno vsebino predvajaj usklajeno (dodatna zvokovna "
-"datoteka, ...)"
+msgstr "Hkrati predvajaj še eno predstavno vsebino (zvočno datoteko, ...)"
 
 #: modules/gui/qt/ui/open_capture.h:94
 msgid "Capture mode"
@@ -29244,7 +29254,7 @@ msgstr "Ime &profila"
 
 #: modules/gui/qt/ui/sout.h:200
 msgid "Set up media sources to stream"
-msgstr "Nastavite vire predstavnosti za pretakanje"
+msgstr "Nastavite predstavne vire pretoka"
 
 #: modules/gui/qt/ui/sout.h:202
 msgid "Destination Setup"
@@ -29320,7 +29330,7 @@ msgstr "Učinki"
 
 #: modules/gui/qt/ui/sprefs_audio.h:418
 msgid "Visualization:"
-msgstr "Predočenje:"
+msgstr "Vizualizacija:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:419
 msgid "Enable Time-Stretching audio"
@@ -29372,7 +29382,7 @@ msgstr "Raven kakovosti slike poopravilnega filtra"
 
 #: modules/gui/qt/ui/sprefs_input.h:358
 msgid "Skip H.264 in-loop deblocking filter"
-msgstr "Izpusti filter kroženja pri H.264"
+msgstr "Preskoči in-loop deblocking filter pri H.264"
 
 #: modules/gui/qt/ui/sprefs_input.h:359
 msgid "x264 preset and tuning selection"
@@ -29444,7 +29454,7 @@ msgstr "Ob skrčenju ustavi predvajanje"
 
 #: modules/gui/qt/ui/sprefs_interface.h:538
 msgid "Show media change popup:"
-msgstr "Prikaži pojavno okno spremembe predstavnosti:"
+msgstr "Prikaži pojavno okno spremembe vsebine:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:539
 msgid "Start in minimal view mode"
@@ -29516,7 +29526,7 @@ msgstr "Omogoči prikaz na zaslonu (OSD)"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:289
 msgid "Show media title on video start"
-msgstr "Prikaži naslov posnetka na začetku predvajanja"
+msgstr "Ob zagonu videa prikaži naslov"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:291
 msgid "Enable subtitles"
@@ -29738,7 +29748,7 @@ msgstr "Nastavitve VLM"
 
 #: modules/gui/qt/ui/vlm.h:284
 msgid "Media Manager Edition"
-msgstr "Urejevalnik upravljalnika predstavnih datotek"
+msgstr "Urejanje upravljalnika vsebin"
 
 #: modules/gui/qt/ui/vlm.h:285
 msgid "Name:"
@@ -29778,7 +29788,7 @@ msgstr "AAAA; "
 
 #: modules/gui/qt/ui/vlm.h:299
 msgid "Media Manager List"
-msgstr "Seznam upravljalnika predstavnih vsebin"
+msgstr "Seznam upravljalnika vsebin"
 
 #~ msgid "QTSound"
 #~ msgstr "QTSound"
