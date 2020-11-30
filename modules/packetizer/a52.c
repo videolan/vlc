@@ -109,9 +109,15 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
         /* Make sure we don't reuse the same pts twice
          * as A/52 in PES sends multiple times the same pts */
         if( p_sys->bytestream.p_block->i_pts != p_sys->i_prev_bytestream_pts )
-            date_Set( &p_sys->end_date, p_sys->bytestream.p_block->i_pts );
-        p_sys->i_prev_bytestream_pts = p_sys->bytestream.p_block->i_pts;
-        p_sys->bytestream.p_block->i_pts = VLC_TICK_INVALID;
+        {
+            date_t tempdate = p_sys->end_date;
+            date_Increment( &tempdate, p_sys->frame.i_samples );
+            vlc_tick_t samplesduration = date_Get( &tempdate ) - date_Get( &p_sys->end_date );
+            if( llabs(p_sys->bytestream.p_block->i_pts  - date_Get( &p_sys->end_date )) > samplesduration )
+                date_Set( &p_sys->end_date, p_sys->bytestream.p_block->i_pts );
+            p_sys->i_prev_bytestream_pts = p_sys->bytestream.p_block->i_pts;
+            p_sys->bytestream.p_block->i_pts = VLC_TICK_INVALID;
+        }
     }
 
     p_dec->fmt_out.audio.i_rate     = p_sys->frame.i_rate;
