@@ -712,7 +712,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     vout_display_t *vd = &osys->display;
     vd->source = &osys->source;
     vd->fmt = &osys->display_fmt;
-    vd->info = (vout_display_info_t){ };
+    vd->info = (vout_display_info_t){ 0 };
     vd->cfg = &osys->cfg;
     vd->ops = NULL;
     vd->sys = NULL;
