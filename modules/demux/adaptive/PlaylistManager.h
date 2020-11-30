@@ -52,7 +52,7 @@ namespace adaptive
                              AbstractAdaptationLogic::LogicType type );
             virtual ~PlaylistManager    ();
 
-            bool    init();
+            bool    init(bool = false);
             bool    start();
             bool    started() const;
             void    stop();
@@ -149,6 +149,7 @@ namespace adaptive
             bool         b_buffering;
             bool         b_canceled;
             mtime_t      pause_start;
+            bool         b_preparsing;
     };
 
 }
