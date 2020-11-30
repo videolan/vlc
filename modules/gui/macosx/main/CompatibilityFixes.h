@@ -41,3 +41,5 @@ extern NSString *const NSCollectionViewSupplementaryElementKind;
 #endif
 
 NS_ASSUME_NONNULL_END
+
+#define OSX_BIGSUR_AND_HIGHER (NSAppKitVersionNumber >= 2022.00)
