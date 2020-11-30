@@ -158,7 +158,7 @@ filter_chain_t *filter_chain_NewVideo( vlc_object_t *obj, bool allow_change,
         chain->parent_video_owner = *owner;
     }
     else
-        chain->parent_video_owner = (filter_owner_t){};
+        chain->parent_video_owner = (filter_owner_t){0};
     return chain;
 }
 
