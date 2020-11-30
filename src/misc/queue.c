@@ -59,7 +59,7 @@ static struct vlc_queue_entry **next_p(const struct vlc_queue_entry *e,
 static void next_set(struct vlc_queue_entry *e, struct vlc_queue_entry *next,
                      ptrdiff_t offset)
 {
-    return entry_set(next_p(e, offset), next);
+    entry_set(next_p(e, offset), next);
 }
 
 static struct vlc_queue_entry *next_get(const struct vlc_queue_entry *e,
