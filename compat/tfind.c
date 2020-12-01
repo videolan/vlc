@@ -32,10 +32,7 @@ typedef struct node {
 
 /* delete node with given key */
 void *
-tdelete(vkey, vrootp, compar)
-	const void *vkey;	/* key to be deleted */
-	void      **vrootp;	/* address of the root of tree */
-	int       (*compar) (const void *, const void *);
+tdelete(const void* vkey, void** vrootp, int (*compar)(const void*, const void*))
 {
 	node_t **rootp = (node_t **)vrootp;
 	node_t *p, *q, *r;
@@ -104,9 +101,7 @@ tdestroy_recurse(node_t* root, void (*free_action)(void *))
 }
 
 void
-tdestroy(vrootp, freefct)
-       void *vrootp;
-       void (*freefct)(void *);
+tdestroy(void *vrootp, void (*freefct)(void*))
 {
   node_t *root = (node_t *) vrootp;
 
@@ -130,10 +125,7 @@ tdestroy(vrootp, freefct)
 
 /* find a node, or return 0 */
 void *
-tfind(vkey, vrootp, compar)
-	const void *vkey;		/* key to be found */
-	void * const *vrootp;		/* address of the tree root */
-	int (*compar) (const void *, const void *);
+tfind(const void* vkey, void* const *vrootp, int (*compar) (const void *, const void *))
 {
 	node_t * const *rootp = (node_t * const*)vrootp;
 
@@ -171,10 +163,7 @@ tfind(vkey, vrootp, compar)
 
 /* find or insert datum into search tree */
 void *
-tsearch(vkey, vrootp, compar)
-	const void *vkey;		/* key to be located */
-	void **vrootp;			/* address of tree root */
-	int (*compar) (const void *, const void *);
+tsearch(const void* vkey, void** vrootp, int (*compar)(const void*, const void*))
 {
 	node_t *q;
 	node_t **rootp = (node_t **)vrootp;
@@ -221,10 +210,7 @@ tsearch(vkey, vrootp, compar)
 
 /* Walk the nodes of a tree */
 static void
-twalk_recurse(root, action, level)
-	const node_t *root;	/* Root of the tree to be walked */
-	void (*action) (const void *, VISIT, int);
-	int level;
+twalk_recurse(const node_t* root, void (*action)(const void*, VISIT, int), int level)
 {
 	assert(root != NULL);
 	assert(action != NULL);
@@ -244,9 +230,7 @@ twalk_recurse(root, action, level)
 
 /* Walk the nodes of a tree */
 void
-twalk(vroot, action)
-	const void *vroot;	/* Root of the tree to be walked */
-	void (*action) (const void *, VISIT, int);
+twalk(const void* vroot, void (*action)(const void*, VISIT, int))
 {
 	if (vroot != NULL && action != NULL)
 		twalk_recurse(vroot, action, 0);
