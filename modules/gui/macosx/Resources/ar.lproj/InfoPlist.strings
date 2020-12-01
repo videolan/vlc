@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "يريد VLC الوصول إلى الكاميرا حسب طلب المستخدم.";
+"NSMicrophoneUsageDescription" = "يريد VLC الوصول إلى الميكروفون حسب طلب المستخدم.";
+"NSAppleEventsUsageDescription" = "يريد VLC إيقاف مشغلات الوسائط الخارجية مؤقتًا واستئنافها.";
+"NSDesktopFolderUsageDescription" = "يريد VLC الوصول إلى مجلد سطح المكتب حسب طلب المستخدم.";
+"NSDocumentsFolderUsageDescription" = "يريد VLC الوصول إلى مجلد المستندات حسب طلب المستخدم.";
+"NSDownloadsFolderUsageDescription" = "يريد VLC الوصول إلى مجلد التنزيلات حسب طلب المستخدم.";
+"NSNetworkVolumesUsageDescription" = "يريد VLC الوصول إلى وحدة تخزين شبكة حسب طلب المستخدم.";
+"NSRemovableVolumesUsageDescription" = "يريد VLC الوصول إلى وحدة تخزين قابلة للإزالة حسب طلب المستخدم.";
