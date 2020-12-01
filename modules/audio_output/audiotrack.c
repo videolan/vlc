@@ -1965,6 +1965,22 @@ bailout:
     vlc_mutex_unlock( &p_sys->lock );
 }
 
+static void
+AudioTrack_SetVolume( JNIEnv *env, audio_output_t *p_aout, float volume )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+
+    if( jfields.AudioTrack.setVolume )
+    {
+        JNI_AT_CALL_INT( setVolume, volume );
+        CHECK_AT_EXCEPTION( "setVolume" );
+    } else
+    {
+        JNI_AT_CALL_INT( setStereoVolume, volume, volume );
+        CHECK_AT_EXCEPTION( "setStereoVolume" );
+    }
+}
+
 static int
 VolumeSet( audio_output_t *p_aout, float volume )
 {
@@ -1982,16 +1998,9 @@ VolumeSet( audio_output_t *p_aout, float volume )
 
     if( !p_sys->b_error && p_sys->p_audiotrack != NULL && ( env = GET_ENV() ) )
     {
-        if( jfields.AudioTrack.setVolume )
-        {
-            JNI_AT_CALL_INT( setVolume, volume );
-            CHECK_AT_EXCEPTION( "setVolume" );
-        } else
-        {
-            JNI_AT_CALL_INT( setStereoVolume, volume, volume );
-            CHECK_AT_EXCEPTION( "setStereoVolume" );
-        }
+        AudioTrack_SetVolume( env, p_aout, volume );
     }
+
     aout_VolumeReport(p_aout, volume);
     aout_GainRequest(p_aout, gain * gain * gain);
     return 0;
@@ -2005,17 +2014,8 @@ MuteSet( audio_output_t *p_aout, bool mute )
     p_sys->mute = mute;
 
     if( !p_sys->b_error && p_sys->p_audiotrack != NULL && ( env = GET_ENV() ) )
-    {
-        if( jfields.AudioTrack.setVolume )
-        {
-            JNI_AT_CALL_INT( setVolume, mute ? 0.0f : p_sys->volume );
-            CHECK_AT_EXCEPTION( "setVolume" );
-        } else
-        {
-            JNI_AT_CALL_INT( setStereoVolume, mute ? 0.0f : p_sys->volume, mute ? 0.0f : p_sys->volume );
-            CHECK_AT_EXCEPTION( "setStereoVolume" );
-        }
-    }
+        AudioTrack_SetVolume( env, p_aout, mute ? 0.0f : p_sys->volume );
+
     aout_MuteReport(p_aout, mute);
     return 0;
 }
