@@ -15,6 +15,7 @@ apps:
   vlc:
     desktop: usr/share/applications/vlc.desktop
     command: desktop-launch $SNAP/bin/vlc-snap-wrapper.sh
+    common-id: org.videolan.vlc
     plugs:
       - unity7
       - network
