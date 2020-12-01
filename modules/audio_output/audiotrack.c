@@ -2142,21 +2142,20 @@ VolumeSet( audio_output_t *p_aout, float volume )
     JNIEnv *env;
     float gain = 1.0f;
 
+    p_sys->volume = volume;
     if (volume > 1.f)
     {
-        p_sys->volume = 1.f;
-        gain = volume;
+        gain = volume * volume * volume;
+        volume = 1.f;
     }
-    else
-        p_sys->volume = volume;
 
     if( !p_sys->b_error && p_sys->p_audiotrack != NULL && ( env = GET_ENV() ) )
     {
         AudioTrack_SetVolume( env, p_aout, volume );
     }
 
-    aout_VolumeReport(p_aout, volume);
-    aout_GainRequest(p_aout, gain * gain * gain);
+    aout_VolumeReport(p_aout, p_sys->volume);
+    aout_GainRequest(p_aout, gain);
     return 0;
 }
 
