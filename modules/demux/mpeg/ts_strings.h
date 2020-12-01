@@ -67,12 +67,25 @@ static const char * const ISO13818_1_streamstypes_descs[] =
     "Video stream conforming to one or more profiles as defined in ITU-T T.800",
     "Additional 3D View ITU-T H.262",
     "Additional 3D View ITU-T H.264",
-    /* ^ 0x23 */
+    "HEVC video stream as defined in ITU-T Rec. H.265",
+    "HEVC temporal video subset as defined in ITU-T Rec. H.265",
+    "MVCD video subbitstream as defined in ITU-T Rec. H.264",
+    "Timeline and External Media Information Stream",
+    "HEVC enhancement sub partition as defined in ITU-T Rec. H.265",
+    "HEVC temporal enhancement sub partition as defined in ITU-T Rec. H.265",
+    /* ^ 0x29 */
+    "HEVC enhancement sub partition as defined in ITU-T Rec. H.265",
+    "HEVC temporal enhancement sub partition as defined in ITU-T Rec. H.265",
+    "Green access units carried in sections",
+    "ISO/IEC 23008-3 MHAS main audio",
+    "ISO/IEC 23008-3 MHAS auxiliary audio",
+    "Quality access units carried in sections",
+    /* ^ 0x2F */
 };
 
 static const char *ISO13818_1_Get_StreamType_Description(uint8_t i_type)
 {
-    if( i_type <= 0x23 )
+    if( i_type <= 0x2F )
         return ISO13818_1_streamstypes_descs[i_type];
     else if (i_type >= 0x0F && i_type < 0x7F)
         return ISO13818_1_streamstypes_descs[0];
@@ -145,12 +158,14 @@ static const char * const ISO13818_1_descriptors_descs[] =
     "MPEG-2 Stereoscopic Video Format",
     "Stereoscopic Program Info",
     "Stereoscopic Video Info",
-    /* ^ 0x36 */
+    "Transport profile",
+    "HEVC video"
+    /* ^ 0x38 */
 };
 
 static const char *ISO13818_1_Get_Descriptor_Description(uint8_t i_desc)
 {
-    if( i_desc < 0x36 )
+    if( i_desc < 0x38 )
         return ISO13818_1_descriptors_descs[i_desc];
     else
         return ISO13818_1_other_descs[1];
