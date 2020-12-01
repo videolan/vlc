@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "A VLC felhasználói kérésre szeretne hozzáférni a kamerához.";
+"NSMicrophoneUsageDescription" = "A VLC felhasználói kérésre szeretne hozzáférni a mikrofonhoz.";
+"NSAppleEventsUsageDescription" = "A VLC szüneteltetni és folytatni szeretné a külső médialejátszókat.";
+"NSDesktopFolderUsageDescription" = "A VLC felhasználói kérésre szeretne hozzáférni az asztal mappájához.";
+"NSDocumentsFolderUsageDescription" = "A VLC felhasználói kérésre szeretne hozzáférni a dokumentumok mappájához.";
+"NSDownloadsFolderUsageDescription" = "A VLC felhasználói kérésre szeretne hozzáférni a letöltések mappájához.";
+"NSNetworkVolumesUsageDescription" = "A VLC felhasználói kérésre szeretne hozzáférni egy hálózati kötethez.";
+"NSRemovableVolumesUsageDescription" = "A VLC felhasználó kérésre szeretne hozzáférni egy cserélhető kötethez.";
