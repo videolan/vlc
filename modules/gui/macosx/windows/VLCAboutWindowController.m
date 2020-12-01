@@ -88,11 +88,8 @@
 {
     [[self window] setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
 
-    /* Get the localized info dictionary (InfoPlist.strings) */
-    NSDictionary *localizedInfoDict = [[NSBundle mainBundle] localizedInfoDictionary];
-
-    /* Setup the copyright field */
-    [o_copyright_field setStringValue: [localizedInfoDict objectForKey:@"NSHumanReadableCopyright"]];
+    NSString *copyrightText = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"NSHumanReadableCopyright"];
+    [o_copyright_field setStringValue: copyrightText];
 
     /* l10n */
     [[self window] setTitle: _NS("About VLC media player")];
