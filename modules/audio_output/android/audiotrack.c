@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include "../video_output/android/utils.h"
+#include "device.h"
 
 #define SMOOTHPOS_SAMPLE_COUNT 10
 #define SMOOTHPOS_INTERVAL_US VLC_TICK_FROM_MS(30) // 30ms
@@ -42,49 +43,16 @@
 
 #define AUDIOTRACK_MAX_BUFFER_US VLC_TICK_FROM_MS(750) // 750ms
 
-static int  Open( vlc_object_t * );
-static void Close( vlc_object_t * );
-static void Stop( audio_output_t * );
-static int Start( audio_output_t *, audio_sample_format_t * );
+static void Stop( aout_stream_t * );
+static void Play( aout_stream_t *, block_t *, vlc_tick_t );
+static void Flush( aout_stream_t * );
+static void Pause( aout_stream_t *, bool, vlc_tick_t );
+static void VolumeSet( aout_stream_t *, float );
+static void MuteSet( aout_stream_t *, bool );
 static void *AudioTrack_Thread( void * );
-
-/* There is an undefined behavior when configuring AudioTrack with SPDIF or
- * more than 2 channels when there is no HDMI out. It may succeed and the
- * Android ressampler will be used to downmix to stereo. It may fails cleanly,
- * and this module will be able to recover and fallback to stereo. Finally, in
- * some rare cases, it may crash during init or while ressampling. Because of
- * the last case we don't try up to 8 channels and we use AT_DEV_STEREO device
- * per default */
-enum at_dev {
-    AT_DEV_STEREO = 0,
-    AT_DEV_PCM,
-    AT_DEV_ENCODED,
-};
-#define AT_DEV_DEFAULT AT_DEV_STEREO
-#define AT_DEV_MAX_CHANNELS 8
-
-static const struct {
-    const char *id;
-    const char *name;
-    enum at_dev at_dev;
-} at_devs[] = {
-    { "stereo", "Up to 2 channels (compat mode).", AT_DEV_STEREO },
-    { "pcm", "Up to 8 channels.", AT_DEV_PCM },
-
-    /* With "encoded", the module will try to play every audio codecs via
-     * passthrough.
-     *
-     * With "encoded:ENCODING_FLAGS_MASK", the module will try to play only
-     * codecs specified by ENCODING_FLAGS_MASK. This extra value is a long long
-     * that contains binary-shifted AudioFormat.ENCODING_* values. */
-    { "encoded", "Up to 8 channels, passthrough if available.", AT_DEV_ENCODED },
-    {  NULL, NULL, AT_DEV_DEFAULT },
-};
 
 typedef struct
 {
-    enum at_dev at_dev;
-
     jobject p_audiotrack; /* AudioTrack ref */
     jobject p_dp;
     float volume;
@@ -178,20 +146,6 @@ typedef struct
 /* Get AudioTrack native sample rate: if activated, most of  the resampling
  * will be done by VLC */
 #define AUDIOTRACK_NATIVE_SAMPLERATE
-
-#define AUDIOTRACK_SESSION_ID_TEXT " Id of audio session the AudioTrack must be attached to"
-
-vlc_module_begin ()
-    set_shortname( "AudioTrack" )
-    set_description( "Android AudioTrack audio output" )
-    set_capability( "audio output", 180 )
-    set_subcategory( SUBCAT_AUDIO_AOUT )
-    add_integer( "audiotrack-session-id", 0,
-            AUDIOTRACK_SESSION_ID_TEXT, NULL )
-        change_private()
-    add_shortcut( "audiotrack" )
-    set_callbacks( Open, Close )
-vlc_module_end ()
 
 #define THREAD_NAME "android_audiotrack"
 #define GET_ENV() android_getEnv( VLC_OBJECT(p_aout), THREAD_NAME )
@@ -297,14 +251,17 @@ static struct
 
 /* init all jni fields.
  * Done only one time during the first initialisation */
-static bool
-InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
+int
+AudioTrack_InitJNI( audio_output_t *p_aout )
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
     static int i_init_state = -1;
-    bool ret;
     jclass clazz;
     jfieldID field;
+    JNIEnv *env = GET_ENV();
+
+    if( env == NULL )
+        return VLC_EGENERIC;
 
     vlc_mutex_lock( &lock );
 
@@ -539,15 +496,12 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
 
     i_init_state = 1;
 end:
-    ret = i_init_state == 1;
-    if( !ret )
-        msg_Err( p_aout, "AudioTrack jni init failed" );
     vlc_mutex_unlock( &lock );
-    return ret;
+    return i_init_state == 1 ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static inline bool
-check_exception( JNIEnv *env, audio_output_t *p_aout,
+check_exception( JNIEnv *env, aout_stream_t *p_aout,
                  const char *class, const char *method )
 {
     if( (*env)->ExceptionCheck( env ) )
@@ -620,7 +574,7 @@ us_to_frames( aout_sys_t *p_sys, vlc_tick_t i_us )
  * true for all devices or Android versions.
  */
 static uint64_t
-AudioTrack_getPlaybackHeadPosition( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_getPlaybackHeadPosition( JNIEnv *env, aout_stream_t *p_aout )
 {
     /* Android doc:
      * getPlaybackHeadPosition: Returns the playback head position expressed in
@@ -651,7 +605,7 @@ AudioTrack_getPlaybackHeadPosition( JNIEnv *env, audio_output_t *p_aout )
  * Called after flush, or start
  */
 static void
-AudioTrack_ResetWrapCount( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_ResetWrapCount( JNIEnv *env, aout_stream_t *p_aout )
 {
     (void) env;
     aout_sys_t *p_sys = p_aout->sys;
@@ -667,7 +621,7 @@ AudioTrack_ResetWrapCount( JNIEnv *env, audio_output_t *p_aout )
  * Reset AudioTrack SmoothPosition and TimestampPosition
  */
 static void
-AudioTrack_ResetPositions( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_ResetPositions( JNIEnv *env, aout_stream_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
     VLC_UNUSED( env );
@@ -686,7 +640,7 @@ AudioTrack_ResetPositions( JNIEnv *env, audio_output_t *p_aout )
  * Reset all AudioTrack positions and internal state
  */
 static void
-AudioTrack_Reset( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_Reset( JNIEnv *env, aout_stream_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -696,7 +650,7 @@ AudioTrack_Reset( JNIEnv *env, audio_output_t *p_aout )
 }
 
 static vlc_tick_t
-AudioTrack_GetLatencyUs( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_GetLatencyUs( JNIEnv *env, aout_stream_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -725,7 +679,7 @@ AudioTrack_GetLatencyUs( JNIEnv *env, audio_output_t *p_aout )
  * precision (+/- 20ms on old devices).
  */
 static vlc_tick_t
-AudioTrack_GetSmoothPositionUs( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_GetSmoothPositionUs( JNIEnv *env, aout_stream_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
     uint64_t i_audiotrack_us;
@@ -762,7 +716,7 @@ bailout:
 }
 
 static vlc_tick_t
-AudioTrack_GetTimestampPositionUs( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_GetTimestampPositionUs( JNIEnv *env, aout_stream_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
     vlc_tick_t i_now;
@@ -831,7 +785,7 @@ AudioTrack_GetTimestampPositionUs( JNIEnv *env, audio_output_t *p_aout )
 }
 
 static int
-TimeGet( audio_output_t *p_aout, vlc_tick_t *restrict p_delay )
+TimeGet( aout_stream_t *p_aout, vlc_tick_t *restrict p_delay )
 {
     aout_sys_t *p_sys = p_aout->sys;
     vlc_tick_t i_audiotrack_us;
@@ -924,7 +878,7 @@ AudioTrack_GetChanOrder( uint16_t i_physical_channels, uint32_t p_chans_out[] )
 }
 
 static jobject
-AudioTrack_New21( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
+AudioTrack_New21( JNIEnv *env, aout_stream_t *p_aout, unsigned int i_rate,
                   int i_channel_config, int i_format, int i_size,
                   jint session_id )
 {
@@ -1006,7 +960,7 @@ del_local_refs:
 }
 
 static jobject
-AudioTrack_NewLegacy( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
+AudioTrack_NewLegacy( JNIEnv *env, aout_stream_t *p_aout, unsigned int i_rate,
                       int i_channel_config, int i_format, int i_size,
                       jint session_id )
 {
@@ -1021,7 +975,7 @@ AudioTrack_NewLegacy( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
  * returns -1 on error, 0 on success.
  */
 static int
-AudioTrack_New( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
+AudioTrack_New( JNIEnv *env, aout_stream_t *p_aout, unsigned int i_rate,
                 int i_channel_config, int i_format, int i_size )
 {
     aout_sys_t *p_sys = p_aout->sys;
@@ -1080,7 +1034,7 @@ AudioTrack_New( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
  * returns -1 on error, 0 on success.
  */
 static int
-AudioTrack_Recreate( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_Recreate( JNIEnv *env, aout_stream_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -1108,7 +1062,7 @@ AudioTrack_Recreate( JNIEnv *env, audio_output_t *p_aout )
  * returns -1 on configuration error, 0 on success.
  */
 static int
-AudioTrack_Create( JNIEnv *env, audio_output_t *p_aout,
+AudioTrack_Create( JNIEnv *env, aout_stream_t *p_aout,
                    unsigned int i_rate,
                    int i_format,
                    uint16_t i_physical_channels )
@@ -1166,13 +1120,11 @@ AudioTrack_Create( JNIEnv *env, audio_output_t *p_aout,
     return 0;
 }
 
-static bool
-AudioTrack_HasEncoding( audio_output_t *p_aout, vlc_fourcc_t i_format )
+bool
+AudioTrack_HasEncoding( long long encoding_flags, vlc_fourcc_t i_format )
 {
-    aout_sys_t *p_sys = p_aout->sys;
-
 #define MATCH_ENCODING_FLAG(x) jfields.AudioFormat.has_##x && \
-    ( p_sys->i_encoding_flags == 0 || p_sys->i_encoding_flags & (1 << jfields.AudioFormat.x) )
+    (encoding_flags == 0 || encoding_flags & (1 << jfields.AudioFormat.x) )
 
     switch( i_format )
     {
@@ -1188,7 +1140,7 @@ AudioTrack_HasEncoding( audio_output_t *p_aout, vlc_fourcc_t i_format )
         case VLC_CODEC_MLP:
             return MATCH_ENCODING_FLAG( ENCODING_DOLBY_TRUEHD );
         default:
-            return false;
+            return true;
     }
 }
 
@@ -1265,11 +1217,11 @@ static int GetPassthroughFmt( bool compat, audio_sample_format_t *fmt, int *at_f
 }
 
 static int
-StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
+StartPassthrough( JNIEnv *env, aout_stream_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
-    if( !AudioTrack_HasEncoding( p_aout, p_sys->fmt.i_format ) )
+    if( !AudioTrack_HasEncoding( p_sys->i_encoding_flags, p_sys->fmt.i_format ) )
         return VLC_EGENERIC;
 
     /* Try ENCODING_IEC61937 first, then fallback to ENCODING_[AC3|DTS|...] */
@@ -1304,7 +1256,7 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
 }
 
 static int
-StartPCM( JNIEnv *env, audio_output_t *p_aout, unsigned i_max_channels )
+StartPCM( JNIEnv *env, aout_stream_t *p_aout, unsigned i_max_channels )
 {
     aout_sys_t *p_sys = p_aout->sys;
     unsigned i_nb_channels;
@@ -1406,27 +1358,39 @@ StartPCM( JNIEnv *env, audio_output_t *p_aout, unsigned i_max_channels )
 }
 
 static int
-Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
+Start( aout_stream_t *p_aout, audio_sample_format_t *restrict p_fmt,
+       enum android_audio_device_type adev )
 {
-    aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
     int i_ret;
     bool b_try_passthrough;
     unsigned i_max_channels;
 
-    if( p_sys->at_dev == AT_DEV_ENCODED )
+    if( adev == ANDROID_AUDIO_DEVICE_ENCODED )
     {
         b_try_passthrough = true;
-        i_max_channels = AT_DEV_MAX_CHANNELS;
+        i_max_channels = ANDROID_AUDIO_DEVICE_MAX_CHANNELS;
     }
     else
     {
-        b_try_passthrough = var_InheritBool( p_aout, "spdif" );
-        i_max_channels = p_sys->at_dev == AT_DEV_STEREO ? 2 : AT_DEV_MAX_CHANNELS;
+        b_try_passthrough = false;
+        i_max_channels = adev == ANDROID_AUDIO_DEVICE_STEREO ? 2 : ANDROID_AUDIO_DEVICE_MAX_CHANNELS;
     }
 
     if( !( env = GET_ENV() ) )
         return VLC_EGENERIC;
+
+    aout_sys_t *p_sys = p_aout->sys = calloc( 1, sizeof (aout_sys_t) );
+
+    if( unlikely( p_sys == NULL ) )
+        return VLC_ENOMEM;
+
+    vlc_mutex_init(&p_sys->lock);
+    vlc_cond_init(&p_sys->aout_cond);
+    vlc_cond_init(&p_sys->thread_cond);
+
+    p_sys->volume = 1.0f;
+    p_sys->mute = false;
 
     p_sys->fmt = *p_fmt;
 
@@ -1448,10 +1412,13 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     else if( b_try_passthrough )
         i_ret = StartPassthrough( env, p_aout );
     else
-        return VLC_EGENERIC;
+        i_ret = VLC_EGENERIC;
 
     if( i_ret != 0 )
+    {
+        free( p_sys );
         return VLC_EGENERIC;
+    }
 
     if( jfields.AudioTrack.getBufferSizeInFrames )
         p_sys->i_max_audiotrack_samples = JNI_AT_CALL_INT( getBufferSizeInFrames );
@@ -1600,10 +1567,15 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
 
     *p_fmt = p_sys->fmt;
 
-    p_aout->volume_set(p_aout, p_sys->volume);
-    if (p_sys->mute)
-        p_aout->mute_set(p_aout, true);
     aout_FormatPrint( p_aout, "VLC will output:", &p_sys->fmt );
+
+    p_aout->stop = Stop;
+    p_aout->play = Play;
+    p_aout->pause = Pause;
+    p_aout->flush = Flush;
+    p_aout->time_get = TimeGet;
+    p_aout->volume_set = VolumeSet;
+    p_aout->mute_set = MuteSet;
 
     return VLC_SUCCESS;
 
@@ -1613,7 +1585,7 @@ error:
 }
 
 static void
-Stop( audio_output_t *p_aout )
+Stop( aout_stream_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
@@ -1643,21 +1615,14 @@ Stop( audio_output_t *p_aout )
                 JNI_AT_CALL_VOID( release );
         }
         (*env)->DeleteGlobalRef( env, p_sys->p_audiotrack );
-        p_sys->p_audiotrack = NULL;
     }
 
     if( p_sys->p_dp )
-    {
         (*env)->DeleteGlobalRef( env, p_sys->p_dp );
-        p_sys->p_dp = NULL;
-    }
 
     /* Release the timestamp object */
     if( p_sys->timestamp.p_obj )
-    {
         (*env)->DeleteGlobalRef( env, p_sys->timestamp.p_obj );
-        p_sys->timestamp.p_obj = NULL;
-    }
 
     /* Release the Circular buffer data */
     switch( p_sys->i_write_type )
@@ -1665,34 +1630,22 @@ Stop( audio_output_t *p_aout )
     case WRITE_BYTEARRAY:
     case WRITE_BYTEARRAYV23:
         if( p_sys->circular.u.p_bytearray )
-        {
             (*env)->DeleteGlobalRef( env, p_sys->circular.u.p_bytearray );
-            p_sys->circular.u.p_bytearray = NULL;
-        }
         break;
     case WRITE_SHORTARRAYV23:
         if( p_sys->circular.u.p_shortarray )
-        {
             (*env)->DeleteGlobalRef( env, p_sys->circular.u.p_shortarray );
-            p_sys->circular.u.p_shortarray = NULL;
-        }
         break;
     case WRITE_FLOATARRAY:
         if( p_sys->circular.u.p_floatarray )
-        {
             (*env)->DeleteGlobalRef( env, p_sys->circular.u.p_floatarray );
-            p_sys->circular.u.p_floatarray = NULL;
-        }
         break;
     case WRITE_BYTEBUFFER:
         free( p_sys->circular.u.bytebuffer.p_data );
-        p_sys->circular.u.bytebuffer.p_data = NULL;
         break;
     }
 
-    p_sys->b_audiotrack_exception = false;
-    p_sys->b_error = false;
-    p_sys->b_passthrough = false;
+    free( p_sys );
 }
 
 /**
@@ -1701,7 +1654,7 @@ Stop( audio_output_t *p_aout )
  * that we won't wait in AudioTrack.write() method.
  */
 static int
-AudioTrack_WriteByteArray( JNIEnv *env, audio_output_t *p_aout,
+AudioTrack_WriteByteArray( JNIEnv *env, aout_stream_t *p_aout,
                            size_t i_data_size, size_t i_data_offset,
                            bool b_force )
 {
@@ -1745,7 +1698,7 @@ AudioTrack_WriteByteArray( JNIEnv *env, audio_output_t *p_aout,
  * flags.
  */
 static int
-AudioTrack_WriteByteArrayV23( JNIEnv *env, audio_output_t *p_aout,
+AudioTrack_WriteByteArrayV23( JNIEnv *env, aout_stream_t *p_aout,
                               size_t i_data_size, size_t i_data_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
@@ -1761,7 +1714,7 @@ AudioTrack_WriteByteArrayV23( JNIEnv *env, audio_output_t *p_aout,
  * flags.
  */
 static int
-AudioTrack_WriteByteBuffer( JNIEnv *env, audio_output_t *p_aout,
+AudioTrack_WriteByteBuffer( JNIEnv *env, aout_stream_t *p_aout,
                             size_t i_data_size, size_t i_data_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
@@ -1798,7 +1751,7 @@ AudioTrack_WriteByteBuffer( JNIEnv *env, audio_output_t *p_aout,
  * flags.
  */
 static int
-AudioTrack_WriteShortArrayV23( JNIEnv *env, audio_output_t *p_aout,
+AudioTrack_WriteShortArrayV23( JNIEnv *env, aout_stream_t *p_aout,
                                size_t i_data_size, size_t i_data_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
@@ -1819,7 +1772,7 @@ AudioTrack_WriteShortArrayV23( JNIEnv *env, audio_output_t *p_aout,
  * flags.
  */
 static int
-AudioTrack_WriteFloatArray( JNIEnv *env, audio_output_t *p_aout,
+AudioTrack_WriteFloatArray( JNIEnv *env, aout_stream_t *p_aout,
                             size_t i_data_size, size_t i_data_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
@@ -1835,7 +1788,7 @@ AudioTrack_WriteFloatArray( JNIEnv *env, audio_output_t *p_aout,
 }
 
 static int
-AudioTrack_Write( JNIEnv *env, audio_output_t *p_aout, size_t i_data_size,
+AudioTrack_Write( JNIEnv *env, aout_stream_t *p_aout, size_t i_data_size,
                   size_t i_data_offset, bool b_force )
 {
     aout_sys_t *p_sys = p_aout->sys;
@@ -1902,7 +1855,7 @@ AudioTrack_Write( JNIEnv *env, audio_output_t *p_aout, size_t i_data_size,
 static void *
 AudioTrack_Thread( void *p_data )
 {
-    audio_output_t *p_aout = p_data;
+    aout_stream_t *p_aout = p_data;
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env = GET_ENV();
     vlc_tick_t i_last_time_blocked = 0;
@@ -1997,7 +1950,7 @@ AudioTrack_Thread( void *p_data )
 }
 
 static int
-ConvertFromIEC61937( audio_output_t *p_aout, block_t *p_buffer )
+ConvertFromIEC61937( aout_stream_t *p_aout, block_t *p_buffer )
 {
     /* This function is only used for Android API 23 when AudioTrack is
      * configured with ENCODING_ AC3/E_AC3/DTS. In that case, only the codec
@@ -2047,7 +2000,7 @@ ConvertFromIEC61937( audio_output_t *p_aout, block_t *p_buffer )
 }
 
 static void
-Play( audio_output_t *p_aout, block_t *p_buffer, vlc_tick_t i_date )
+Play( aout_stream_t *p_aout, block_t *p_buffer, vlc_tick_t i_date )
 {
     JNIEnv *env = NULL;
     size_t i_buffer_offset = 0;
@@ -2133,7 +2086,7 @@ bailout:
 }
 
 static void
-Pause( audio_output_t *p_aout, bool b_pause, vlc_tick_t i_date )
+Pause( aout_stream_t *p_aout, bool b_pause, vlc_tick_t i_date )
 {
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
@@ -2162,7 +2115,7 @@ bailout:
 }
 
 static void
-Flush( audio_output_t *p_aout )
+Flush( aout_stream_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
@@ -2212,7 +2165,7 @@ bailout:
 }
 
 static void
-AudioTrack_SetVolume( JNIEnv *env, audio_output_t *p_aout, float volume )
+AudioTrack_SetVolume( JNIEnv *env, aout_stream_t *p_aout, float volume )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -2227,8 +2180,8 @@ AudioTrack_SetVolume( JNIEnv *env, audio_output_t *p_aout, float volume )
     }
 }
 
-static int
-VolumeSet( audio_output_t *p_aout, float volume )
+static void
+VolumeSet( aout_stream_t *p_aout, float volume )
 {
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
@@ -2271,13 +2224,11 @@ VolumeSet( audio_output_t *p_aout, float volume )
         }
     }
 
-    aout_VolumeReport(p_aout, p_sys->volume);
-    aout_GainRequest(p_aout, gain);
-    return 0;
+    aout_stream_GainRequest(p_aout, gain);
 }
 
-static int
-MuteSet( audio_output_t *p_aout, bool mute )
+static void
+MuteSet( aout_stream_t *p_aout, bool mute )
 {
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;
@@ -2285,107 +2236,14 @@ MuteSet( audio_output_t *p_aout, bool mute )
 
     if( !p_sys->b_error && p_sys->p_audiotrack != NULL && ( env = GET_ENV() ) )
         AudioTrack_SetVolume( env, p_aout, mute ? 0.0f : p_sys->volume );
-
-    aout_MuteReport(p_aout, mute);
-    return 0;
 }
 
-static int DeviceSelect(audio_output_t *p_aout, const char *p_id)
-{
-    aout_sys_t *p_sys = p_aout->sys;
-    enum at_dev at_dev = AT_DEV_DEFAULT;
+vlc_module_begin ()
+    set_shortname("AudioTrack")
+    set_description("Android AudioTrack audio output")
 
-    if( p_id )
-    {
-        for( unsigned int i = 0; at_devs[i].id; ++i )
-        {
-            if( strncmp( p_id, at_devs[i].id, strlen( at_devs[i].id ) ) == 0 )
-            {
-                at_dev = at_devs[i].at_dev;
-                break;
-            }
-        }
-    }
+    set_subcategory(SUBCAT_AUDIO_AOUT)
 
-    long long i_encoding_flags = 0;
-    if( at_dev == AT_DEV_ENCODED )
-    {
-        const size_t i_prefix_size = strlen( "encoded:" );
-        if( strncmp( p_id, "encoded:", i_prefix_size ) == 0 )
-            i_encoding_flags = atoll( p_id + i_prefix_size );
-    }
-
-    if( at_dev != p_sys->at_dev || i_encoding_flags != p_sys->i_encoding_flags )
-    {
-        p_sys->at_dev = at_dev;
-        p_sys->i_encoding_flags = i_encoding_flags;
-        aout_RestartRequest( p_aout, AOUT_RESTART_OUTPUT );
-        msg_Dbg( p_aout, "selected device: %s", p_id );
-
-        if( at_dev == AT_DEV_ENCODED )
-        {
-            static const vlc_fourcc_t enc_fourccs[] = {
-                VLC_CODEC_DTS, VLC_CODEC_DTSHD, VLC_CODEC_A52, VLC_CODEC_EAC3,
-                VLC_CODEC_TRUEHD,
-            };
-            for( size_t i = 0;
-                 i < sizeof( enc_fourccs ) / sizeof( enc_fourccs[0] ); ++i )
-            {
-                if( AudioTrack_HasEncoding( p_aout, enc_fourccs[i] ) )
-                    msg_Dbg( p_aout, "device has %4.4s passthrough support",
-                             (const char *)&enc_fourccs[i] );
-            }
-        }
-    }
-    aout_DeviceReport( p_aout, p_id );
-    return VLC_SUCCESS;
-}
-
-static int
-Open( vlc_object_t *obj )
-{
-    audio_output_t *p_aout = (audio_output_t *) obj;
-    aout_sys_t *p_sys;
-    JNIEnv *env = GET_ENV();
-
-    if( !env || !InitJNIFields( p_aout, env ) )
-        return VLC_EGENERIC;
-
-    p_sys = calloc( 1, sizeof (aout_sys_t) );
-
-    if( unlikely( p_sys == NULL ) )
-        return VLC_ENOMEM;
-
-    p_sys->at_dev = AT_DEV_DEFAULT;
-    vlc_mutex_init(&p_sys->lock);
-    vlc_cond_init(&p_sys->aout_cond);
-    vlc_cond_init(&p_sys->thread_cond);
-
-    p_aout->sys = p_sys;
-    p_aout->start = Start;
-    p_aout->stop = Stop;
-    p_aout->play = Play;
-    p_aout->pause = Pause;
-    p_aout->flush = Flush;
-    p_aout->time_get = TimeGet;
-    p_aout->device_select = DeviceSelect;
-
-    for( unsigned int i = 0; at_devs[i].id; ++i )
-        aout_HotplugReport(p_aout, at_devs[i].id, at_devs[i].name);
-
-    p_aout->volume_set = VolumeSet;
-    p_aout->mute_set = MuteSet;
-    p_sys->volume = 1.0f;
-    p_sys->mute = false;
-
-    return VLC_SUCCESS;
-}
-
-static void
-Close( vlc_object_t *obj )
-{
-    audio_output_t *p_aout = (audio_output_t *) obj;
-    aout_sys_t *p_sys = p_aout->sys;
-
-    free( p_sys );
-}
+    set_capability("aout android stream", 180)
+    set_callback(Start)
+vlc_module_end ()

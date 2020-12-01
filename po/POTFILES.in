@@ -253,7 +253,7 @@ modules/audio_mixer/integer.c
 modules/audio_output/adummy.c
 modules/audio_output/alsa.c
 modules/audio_output/amem.c
-modules/audio_output/android/audiotrack.c
+modules/audio_output/android/device.c
 modules/audio_output/android/opensles.c
 modules/audio_output/audiounit_ios.m
 modules/audio_output/auhal.c

@@ -4,11 +4,14 @@ aout_LTLIBRARIES =
 libopensles_android_plugin_la_SOURCES = audio_output/android/opensles.c
 libopensles_android_plugin_la_LIBADD = libandroid_utils.la $(LIBDL) $(LIBM)
 
-libandroid_audiotrack_plugin_la_SOURCES = audio_output/android/audiotrack.c
+libandroid_audiotrack_plugin_la_SOURCES = audio_output/android/audiotrack.c audio_output/android/device.h
 libandroid_audiotrack_plugin_la_LIBADD = libandroid_utils.la
 
+libandroid_audiodevice_plugin_la_SOURCES = audio_output/android/device.c audio_output/android/device.h
+
 if HAVE_ANDROID
-aout_LTLIBRARIES += libandroid_audiotrack_plugin.la libopensles_android_plugin.la
+aout_LTLIBRARIES += libandroid_audiodevice_plugin.la libopensles_android_plugin.la \
+	libandroid_audiotrack_plugin.la
 endif
 
 libadummy_plugin_la_SOURCES = audio_output/adummy.c
