@@ -1370,6 +1370,12 @@ static const staticentry_t p_list_audio[] = {
         A("AACH"),
         A("AACP"), /* smooth streaming alias */
 
+    B(VLC_CODEC_MPEGH, "MPEG-H Audio"),
+        A("mha1"),
+        A("mha2"),
+        A("mhm1"),
+        A("mhm2"),
+
     /* ALS audio */
     B(VLC_CODEC_ALS, "MPEG-4 Audio Lossless (ALS)"),
         A("als "),

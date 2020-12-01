@@ -457,6 +457,7 @@
 /* Audio codec */
 #define VLC_CODEC_MPGA                       VLC_FOURCC('m','p','g','a')
 #define VLC_CODEC_MP4A                       VLC_FOURCC('m','p','4','a')
+#define VLC_CODEC_MPEGH                      VLC_FOURCC('M','H','A','S')
 #define VLC_CODEC_ALS                        VLC_FOURCC('a','l','s',' ')
 #define VLC_CODEC_A52                        VLC_FOURCC('a','5','2',' ')
 #define VLC_CODEC_EAC3                       VLC_FOURCC('e','a','c','3')
