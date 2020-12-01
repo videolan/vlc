@@ -86,6 +86,7 @@ typedef struct
     enum at_dev at_dev;
 
     jobject p_audiotrack; /* AudioTrack ref */
+    jobject p_dp;
     float volume;
     bool mute;
 
@@ -213,6 +214,7 @@ static struct
         jmethodID writeShortV23;
         jmethodID writeBufferV21;
         jmethodID writeFloat;
+        jmethodID getAudioSessionId;
         jmethodID getBufferSizeInFrames;
         jmethodID getLatency;
         jmethodID getPlaybackHeadPosition;
@@ -284,6 +286,12 @@ static struct
         jfieldID framePosition;
         jfieldID nanoTime;
     } AudioTimestamp;
+    struct {
+        jclass clazz;
+        jmethodID ctor;
+        jmethodID setInputGainAllChannelsTo;
+        jmethodID setEnabled;
+    } DynamicsProcessing;
 } jfields;
 
 /* init all jni fields.
@@ -363,6 +371,9 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
 #endif
     } else
         GET_ID( GetMethodID, AudioTrack.write, "write", "([BII)I", true );
+
+    GET_ID( GetMethodID, AudioTrack.getAudioSessionId,
+            "getAudioSessionId", "()I", true );
 
     GET_ID( GetMethodID, AudioTrack.getBufferSizeInFrames,
             "getBufferSizeInFrames", "()I", false );
@@ -496,6 +507,18 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     GET_CONST_INT( AudioManager.ERROR_DEAD_OBJECT, "ERROR_DEAD_OBJECT", false );
     jfields.AudioManager.has_ERROR_DEAD_OBJECT = field != NULL;
     GET_CONST_INT( AudioManager.STREAM_MUSIC, "STREAM_MUSIC", true );
+
+    GET_CLASS( "android/media/audiofx/DynamicsProcessing", false );
+    if( clazz )
+    {
+        jfields.DynamicsProcessing.clazz = (jclass) (*env)->NewGlobalRef( env, clazz );
+        CHECK_EXCEPTION( "NewGlobalRef", true );
+        GET_ID( GetMethodID, DynamicsProcessing.ctor, "<init>", "(I)V", true );
+        GET_ID( GetMethodID, DynamicsProcessing.setInputGainAllChannelsTo,
+                "setInputGainAllChannelsTo", "(F)V", true );
+        GET_ID( GetMethodID, DynamicsProcessing.setEnabled,
+                "setEnabled", "(Z)I", true );
+    }
 
 #undef CHECK_EXCEPTION
 #undef GET_CLASS
@@ -1018,6 +1041,24 @@ AudioTrack_New( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
     (*env)->DeleteLocalRef( env, p_audiotrack );
     if( !p_sys->p_audiotrack )
         return -1;
+
+    if( jfields.DynamicsProcessing.clazz )
+    {
+        if (session_id == 0 )
+            session_id = JNI_AT_CALL_INT( getAudioSessionId );
+
+        if( session_id != 0 )
+        {
+            jobject dp = JNI_CALL( NewObject, jfields.DynamicsProcessing.clazz,
+                                   jfields.DynamicsProcessing.ctor, session_id );
+
+            if( !CHECK_EXCEPTION( "DynamicsProcessing", "ctor" ) )
+            {
+                p_sys->p_dp = (*env)->NewGlobalRef( env, dp );
+                (*env)->DeleteLocalRef( env, dp );
+            }
+        }
+    }
 
     return 0;
 }
@@ -1570,6 +1611,12 @@ Stop( audio_output_t *p_aout )
         }
         (*env)->DeleteGlobalRef( env, p_sys->p_audiotrack );
         p_sys->p_audiotrack = NULL;
+    }
+
+    if( p_sys->p_dp )
+    {
+        (*env)->DeleteGlobalRef( env, p_sys->p_dp );
+        p_sys->p_dp = NULL;
     }
 
     /* Release the timestamp object */
@@ -2162,6 +2209,31 @@ VolumeSet( audio_output_t *p_aout, float volume )
     if( !p_sys->b_error && p_sys->p_audiotrack != NULL && ( env = GET_ENV() ) )
     {
         AudioTrack_SetVolume( env, p_aout, volume );
+
+        /* Apply gain > 1.0f via DynamicsProcessing if possible */
+        if( p_sys->p_dp != NULL )
+        {
+            if( gain <= 1.0f )
+            {
+                /* DynamicsProcessing is not needed anymore (using AudioTrack
+                 * volume) */
+                JNI_CALL_INT( p_sys->p_dp, jfields.DynamicsProcessing.setEnabled, false );
+                CHECK_EXCEPTION( "DynamicsProcessing", "setEnabled" );
+            }
+            else
+            {
+                /* convert linear gain to dB */
+                float dB = 20.0f * log10f(gain);
+
+                JNI_CALL_VOID( p_sys->p_dp, jfields.DynamicsProcessing.setInputGainAllChannelsTo, dB );
+                int ret = JNI_CALL_INT( p_sys->p_dp, jfields.DynamicsProcessing.setEnabled, true );
+
+                if( !CHECK_EXCEPTION( "DynamicsProcessing", "setEnabled" ) && ret == 0 )
+                    gain = 1.0; /* reset sw gain */
+                else
+                    msg_Warn( p_aout, "failed to set gain via DynamicsProcessing, fallback to sw gain");
+            }
+        }
     }
 
     aout_VolumeReport(p_aout, p_sys->volume);
