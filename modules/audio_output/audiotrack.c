@@ -861,10 +861,20 @@ AudioTrack_Recreate( JNIEnv *env, audio_output_t *p_aout )
     JNI_AT_CALL_VOID( release );
     (*env)->DeleteGlobalRef( env, p_sys->p_audiotrack );
     p_sys->p_audiotrack = NULL;
-    return AudioTrack_New( env, p_aout, p_sys->audiotrack_args.i_rate,
-                           p_sys->audiotrack_args.i_channel_config,
-                           p_sys->audiotrack_args.i_format,
-                           p_sys->audiotrack_args.i_size );
+
+    int ret = AudioTrack_New( env, p_aout, p_sys->audiotrack_args.i_rate,
+                              p_sys->audiotrack_args.i_channel_config,
+                              p_sys->audiotrack_args.i_format,
+                              p_sys->audiotrack_args.i_size );
+
+    if( ret == 0 )
+    {
+        p_aout->volume_set(p_aout, p_sys->volume);
+        if (p_sys->mute)
+            p_aout->mute_set(p_aout, true);
+    }
+
+    return ret;
 }
 
 /**
