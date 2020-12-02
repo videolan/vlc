@@ -740,7 +740,7 @@ libmacosx_plugin_la_RES += \
 	gui/macosx/Resources/vlc.scriptTerminology
 
 libmacosx_plugin_la_RES += \
-	gui/macosx/Resources/InfoPlist.strings
+	gui/macosx/Resources/Base.lproj/InfoPlist.strings
 
 if ENABLE_MACOSX_UI
 dist_libmacosx_plugin_la_DATA = $(libmacosx_plugin_la_RES)
