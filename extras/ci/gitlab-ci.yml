@@ -14,8 +14,8 @@ default:
 variables:
     VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20200702161720
     VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20200702144729
-    VLC_WIN_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-mingw:20200703084018
-    VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20200706065223
+    VLC_WIN_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-mingw:20201201162707
+    VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20201201150955
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20200229201904
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20200529135226
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-bionic:20190627090437
