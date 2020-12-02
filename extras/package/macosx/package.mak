@@ -5,10 +5,10 @@ endif
 # Symlink a pseudo-bundle
 pseudo-bundle:
 	$(MKDIR_P) $(top_builddir)/bin/Contents/Resources/
-	$(LN_S) -hf $(abs_top_builddir)/modules/gui/macosx/UI $(top_builddir)/bin/Contents/Resources/Base.lproj
-	$(LN_S) -hf $(abs_top_builddir)/share/macosx/Info.plist $(top_builddir)/bin/Contents/Info.plist
-	$(LN_S) -hf $(CONTRIB_DIR)/Frameworks
-	cd $(top_builddir)/bin/Contents/Resources/ && find $(abs_top_srcdir)/modules/gui/macosx/Resources/ -type f -exec $(LN_S) -f {} \;
+	$(LN_S) -nf $(abs_top_builddir)/modules/gui/macosx/UI $(top_builddir)/bin/Contents/Resources/Base.lproj
+	$(LN_S) -nf $(abs_top_builddir)/share/macosx/Info.plist $(top_builddir)/bin/Contents/Info.plist
+	$(LN_S) -nf $(CONTRIB_DIR)/Frameworks
+	cd $(top_builddir)/bin/Contents/Resources/ && find $(abs_top_srcdir)/modules/gui/macosx/Resources/ -type f -not -path "*.lproj/*" -exec $(LN_S) -f {} \;
 
 # VLC.app for packaging and giving it to your friends
 # use package-macosx to get a nice dmg
