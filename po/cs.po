@@ -6,30 +6,32 @@
 # Daniel Pastera <pasterad@gmail.com>, 2016
 # Jiri Sedlak <jiri_sedlak@users.sourceforge.net>, 2017
 # Kamil Páral <ripper42@gmail.com>, 2009
-# Lukáš Spurný <lukasspurny8@gmail.com>, 2018
 # Martin Zicha <zicha@centrum.cz>, 2012
 # Michal Vašíček <michalvasicek@icloud.com>, 2017
 # Miroslav Oujeský <oujesky@mail.muni.cz>, 2006
-# Pavel Řehák <pavel-rehak@email.cz>, 2018
+# Sofartin <hrubymar10@gmail.com>, 2013
+# dreddux <dreddux@gmail.com>, 2012
 # Petr Dolejší <dolejsi.petr@gmail.com>, 2019
 # Petr Nekvinda <petr.nekvinda@gmail.com>, 2015
 # Petr Šimáček <petr.simacek@gmail.com>, 2012
-# Roman Horník <roman.hornik@debian-linux.cz>, 2016,2020
+# Roman Horník <roman.hornik@debian-linux.cz>, 2016
 # Roman Ondráček <ondracek.roman@centrum.cz>, 2014-2015
 # Tadeáš Valenta <tadashicz@gmail.com>, 2019
-# Tomáš Chvátal <tomas.chvatal@gmail.com>, 2014-2020
+# Tomáš Chvátal <tomas.chvatal@gmail.com>, 2014-2018
 # Tomáš Souček <soucek.gns@gmail.com>, 2014
 # Václav Pavlíček <v.pavlicek@centrum.cz>, 2012
 # Vít Pelčák <vit@pelcak.org>, 2012,2015,2016,2018
 # Vojtěch Smejkal <smejkalv@gmail.com>, 2009
 # Zuzana Wolfová <painteddreaming@gmail.com>, 2014
+# Lukáš Spurný <lukasspurny8@gmail.com>, 2018
+# Pavel Řehák <pavel-rehak@email.cz>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-11-08 15:49+0100\n"
-"Last-Translator: Fourdee Foureight <x4D48@protonmail.ch>, 2020\n"
+"PO-Revision-Date: 2019-06-30 19:28+0200\n"
+"Last-Translator: Petr Dolejší <dolejsi.petr@gmail.com>, 2019\n"
 "Language-Team: Czech (https://www.transifex.com/yaron/teams/16553/cs/)\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -1238,17 +1240,17 @@ msgstr "Projekce"
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr "Natočení"
+msgstr ""
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Klopení"
+msgstr ""
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr "Náklon"
+msgstr ""
 
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
@@ -1286,7 +1288,7 @@ msgstr "Titulky"
 #: src/input/input.c:1821 modules/control/hotkeys.c:1512
 #, c-format
 msgid "Volume %ld%%"
-msgstr "Hlasitost %Id%%"
+msgstr ""
 
 #: src/input/input.c:2725
 msgid "Your input can't be opened"
@@ -1851,7 +1853,7 @@ msgstr "Výchozí zesílení přehrávání"
 
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
-msgstr "Zisk použitý pro stream bez informací o získání přehrávání"
+msgstr "Toto je zisk použitý pro stream bez informací o získání přehrávání"
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
@@ -4185,7 +4187,7 @@ msgstr "Vyberte předchozí DVD titul"
 
 #: src/libvlc-module.c:1308
 msgid "Select the key to choose the previous title from the DVD"
-msgstr "Vyberte klávesu pro výběr předchozího titulu na DVD"
+msgstr ""
 
 #: src/libvlc-module.c:1309
 msgid "Select next DVD title"
@@ -4201,7 +4203,7 @@ msgstr "Vyberte předchozí kapitolu DVD"
 
 #: src/libvlc-module.c:1312
 msgid "Select the key to choose the previous chapter from the DVD"
-msgstr "Vyberte klávesu pro výběr předchozí kapitoly na DVD"
+msgstr ""
 
 #: src/libvlc-module.c:1313
 msgid "Select next DVD chapter"
@@ -4268,7 +4270,7 @@ msgstr "Zmenšit text titulků"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
-msgstr "Vyberte klávesu pro změnu velikosti textu titulků."
+msgstr ""
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4477,7 +4479,7 @@ msgstr "10. záložka seznamu skladeb"
 
 #: src/libvlc-module.c:1387
 msgid "This allows you to define playlist bookmarks."
-msgstr "Toto umožňuje definovat záložky v playlistech."
+msgstr ""
 
 #: src/libvlc-module.c:1389
 msgid "Cycle audio track"
@@ -4489,11 +4491,11 @@ msgstr "Procházet dostupnými zvukovými stopami (jazyky)."
 
 #: src/libvlc-module.c:1391
 msgid "Cycle subtitle track in reverse order"
-msgstr "Procházet stopami titulků pozpátku"
+msgstr ""
 
 #: src/libvlc-module.c:1392
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr "Procházet dostupnými stopami titulků pozpátku."
+msgstr ""
 
 #: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
@@ -4593,7 +4595,7 @@ msgstr "Místní nabídka"
 
 #: src/libvlc-module.c:1419
 msgid "Show the contextual popup menu."
-msgstr "Zobrazit vyskakovací menu."
+msgstr ""
 
 #: src/libvlc-module.c:1420
 msgid "Take video snapshot"
@@ -6260,11 +6262,11 @@ msgstr ""
 
 #: modules/access/concat.c:308
 msgid "Concatenation"
-msgstr "Zřetězení"
+msgstr ""
 
 #: modules/access/concat.c:309
 msgid "Concatenated inputs"
-msgstr "Zřetězit vstupy"
+msgstr ""
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6272,7 +6274,7 @@ msgstr "DC1394"
 
 #: modules/access/dc1394.c:52
 msgid "IIDC Digital Camera (FireWire) input"
-msgstr "Vstup IIDC Digital Camera (FireWire)"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:43
 msgid "KDM file"
@@ -6288,7 +6290,7 @@ msgstr "DCP"
 
 #: modules/access/dcp/dcp.cpp:80
 msgid "Digital Cinema Package module"
-msgstr "Modul Digital Cinema Package"
+msgstr ""
 
 #: modules/access/decklink.cpp:49
 msgid "Input card to use"
@@ -6361,7 +6363,7 @@ msgstr "HDMI"
 
 #: modules/access/decklink.cpp:87
 msgid "Optical SDI"
-msgstr "Optické SDI"
+msgstr ""
 
 #: modules/access/decklink.cpp:87
 msgid "Component"
@@ -6559,7 +6561,7 @@ msgstr "Vyberte druh vstupu tuneru (kabel/anténa)."
 
 #: modules/access/dshow/dshow.cpp:176
 msgid "Video input pin"
-msgstr "Pin pro vstup videa"
+msgstr ""
 
 #: modules/access/dshow/dshow.cpp:178
 msgid ""
@@ -6571,23 +6573,23 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:182
 msgid "Audio input pin"
-msgstr "Pin pro vstup audia"
+msgstr ""
 
 #: modules/access/dshow/dshow.cpp:184
 msgid "Select the audio input source. See the \"video input\" option."
-msgstr "Vyberte zdroj pro vstup audia. Viz možnost \"video vstup\"."
+msgstr ""
 
 #: modules/access/dshow/dshow.cpp:185
 msgid "Video output pin"
-msgstr "Pin pro výstup videa"
+msgstr ""
 
 #: modules/access/dshow/dshow.cpp:187
 msgid "Select the video output type. See the \"video input\" option."
-msgstr "Vyberte typ výstupu videa. Viz možnost \"video vstup\"."
+msgstr ""
 
 #: modules/access/dshow/dshow.cpp:188
 msgid "Audio output pin"
-msgstr "Pin pro výstup audia"
+msgstr ""
 
 #: modules/access/dshow/dshow.cpp:190
 msgid "Select the audio output type. See the \"video input\" option."
@@ -8611,15 +8613,13 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:152
 msgid "Color killer"
-msgstr "Odpojovač barev"
+msgstr ""
 
 #: modules/access/v4l2/v4l2.c:154
 msgid ""
 "Enable the color killer, i.e. switch to black & white picture whenever the "
 "signal is weak."
 msgstr ""
-"Povolit odpojovač barev, tj. kdykoliv je signál slabý, přepnout na černobílý "
-"obraz."
 
 #: modules/access/v4l2/v4l2.c:156
 msgid "Color effect"
@@ -19653,19 +19653,10 @@ msgid ""
 "express consent for the media player to access the Internet automatically.</"
 "p>\n"
 msgstr ""
-"<p>Za účelem ochrany Vašeho soukromí multimedální přehrávač <i>VLC</i> "
-"<b>nesbírá</b> ani neodesílá osobní data a to ani v anonymizované formě.</"
-"p>\n"
-"<p>Nicméně, <i>VLC</i>umí prostřednictvím internetových služeb třetích stran "
-"automaticky získat informace o médiích z Vašeho seznamu skladeb. Toto se "
-"týká obalů alb, názvů skladeb, jmen interpretů a jiných metadat.</p>\n"
-"<p>Tato služba může vyžadovat identifikaci některých vašich mediálních "
-"souborů subjektům třetích stran. Vývojáři <i>VLC</i> proto vyžadují váš "
-"výslovný souhlas k automatickému přístupu přehrávače médií k internetu.</p>\n"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:88
 msgid "Network Access Policy"
-msgstr "Politika přístupu k síti"
+msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:100
 msgid "Regularly check for VLC updates"
@@ -19699,15 +19690,6 @@ msgid ""
 "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>Multimediální přehrávač VLC je svobodný přehrávač médií enkodér a "
-"streamer, který je zdarma. Byl vytvořen dobrovolníky z komunity <a href="
-"\"http://www.videolan.org/\"><span style=\" text-decoration: underline; "
-"color:#0057ae;\">VideoLAN</span></a>. <p>VLC používá vlastní kodeky, je "
-"dostupný na prakticky všech populárních platformách a umí přečíst téměř "
-"všechny soubory, CD, DVD, síťové proudy, zařízení pro záznam a jiné mediální "
-"formáty!</p><p><a href=\"http://www.videolan.org/contribute/\"><span style="
-"\" text-decoration: underline; color:#0057ae;\">Pomozte a přidejte se k nám!"
-"</span></a>"
 
 #: modules/gui/qt/dialogs/help.cpp:214
 msgid "&Recheck version"
@@ -23993,11 +23975,11 @@ msgstr ""
 #: modules/stream_out/chromecast/cast.cpp:192
 #: modules/stream_out/chromecast/cast.cpp:1198
 msgid "Performance warning"
-msgstr "Varování ohledně výkonu"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
 msgid "Display a performance warning when transcoding"
-msgstr "Zobrazit varování ohledně výkonu během kódování"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Enable Audio passthrough"
@@ -24053,7 +24035,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1197
 msgid "Ok, Don't warn me again"
-msgstr "OK, nevarovat mne znovu"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1199
 msgid ""
