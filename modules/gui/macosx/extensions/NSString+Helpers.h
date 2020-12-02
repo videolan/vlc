@@ -30,6 +30,16 @@
 
 #define _NS(s) ((s) ? toNSStr(vlc_gettext(s)) : @"")
 
+/**
+ * Get a contextualized translation string
+ *
+ * Sometimes a translations needs to be unique to a specific context
+ * even though it has the same ID (text) as a different translation.
+ * In this case, this macro should be used with a unique translation
+ * context as the first argument.
+ */
+#define _PNS(c, s) (toNSStr(vlc_pgettext(c, s)))
+
 /* Get an alternate version of the string.
  * This string is stored as '1:string' but when displayed it only displays
  * the translated string. the translation should be '1:translatedstring' though */
