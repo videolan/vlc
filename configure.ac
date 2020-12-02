@@ -213,7 +213,8 @@ case "${host_os}" in
              #if TARGET_OS_IPHONE
              yes
              #endif],
-             [HAVE_IOS="1"],
+             [HAVE_IOS="1"
+             ac_cv_func_wordexp=no],
              [HAVE_OSX="1"])
 
     AC_EGREP_CPP(yes,
