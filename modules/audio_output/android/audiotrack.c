@@ -241,18 +241,14 @@ static struct
         jfieldID framePosition;
         jfieldID nanoTime;
     } AudioTimestamp;
-    struct {
-        jclass clazz;
-        jmethodID ctor;
-        jmethodID setInputGainAllChannelsTo;
-        jmethodID setEnabled;
-    } DynamicsProcessing;
+    struct DynamicsProcessing_fields DynamicsProcessing;
 } jfields;
 
 /* init all jni fields.
  * Done only one time during the first initialisation */
 int
-AudioTrack_InitJNI( audio_output_t *p_aout )
+AudioTrack_InitJNI( audio_output_t *p_aout,
+                    struct DynamicsProcessing_fields *dp_fields )
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
     static int i_init_state = -1;
@@ -488,6 +484,7 @@ AudioTrack_InitJNI( audio_output_t *p_aout )
                     "setEnabled", "(Z)I", true );
         }
     }
+    *dp_fields = jfields.DynamicsProcessing;
 
 #undef CHECK_EXCEPTION
 #undef GET_CLASS
@@ -1008,22 +1005,13 @@ AudioTrack_New( JNIEnv *env, aout_stream_t *stream, unsigned int i_rate,
     if( !p_sys->p_audiotrack )
         return -1;
 
-    if( jfields.DynamicsProcessing.clazz && !p_sys->b_passthrough )
+    if( !p_sys->b_passthrough )
     {
         if (session_id == 0 )
             session_id = JNI_AT_CALL_INT( getAudioSessionId );
 
         if( session_id != 0 )
-        {
-            jobject dp = JNI_CALL( NewObject, jfields.DynamicsProcessing.clazz,
-                                   jfields.DynamicsProcessing.ctor, session_id );
-
-            if( !CHECK_EXCEPTION( "DynamicsProcessing", "ctor" ) )
-            {
-                p_sys->p_dp = (*env)->NewGlobalRef( env, dp );
-                (*env)->DeleteLocalRef( env, dp );
-            }
-        }
+            p_sys->p_dp = DynamicsProcessing_New( stream, session_id );
     }
 
     return 0;
@@ -1617,8 +1605,8 @@ Stop( aout_stream_t *stream )
         (*env)->DeleteGlobalRef( env, p_sys->p_audiotrack );
     }
 
-    if( p_sys->p_dp )
-        (*env)->DeleteGlobalRef( env, p_sys->p_dp );
+    if( p_sys->p_dp != NULL )
+        DynamicsProcessing_Delete( stream, p_sys->p_dp );
 
     /* Release the timestamp object */
     if( p_sys->timestamp.p_obj )
@@ -2205,18 +2193,13 @@ VolumeSet( aout_stream_t *stream, float volume )
             {
                 /* DynamicsProcessing is not needed anymore (using AudioTrack
                  * volume) */
-                JNI_CALL_INT( p_sys->p_dp, jfields.DynamicsProcessing.setEnabled, false );
-                CHECK_EXCEPTION( "DynamicsProcessing", "setEnabled" );
+                DynamicsProcessing_Disable( stream, p_sys->p_dp );
             }
             else
             {
-                /* convert linear gain to dB */
-                float dB = 20.0f * log10f(gain);
+                int ret = DynamicsProcessing_SetVolume( stream, p_sys->p_dp, gain );
 
-                JNI_CALL_VOID( p_sys->p_dp, jfields.DynamicsProcessing.setInputGainAllChannelsTo, dB );
-                int ret = JNI_CALL_INT( p_sys->p_dp, jfields.DynamicsProcessing.setEnabled, true );
-
-                if( !CHECK_EXCEPTION( "DynamicsProcessing", "setEnabled" ) && ret == 0 )
+                if( ret == VLC_SUCCESS )
                     gain = 1.0; /* reset sw gain */
                 else
                     msg_Warn( stream, "failed to set gain via DynamicsProcessing, fallback to sw gain");
