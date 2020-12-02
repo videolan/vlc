@@ -273,6 +273,7 @@ static int Decode(decoder_t *dec, block_t *block)
 static int OpenDecoder(vlc_object_t *p_this)
 {
     decoder_t *dec = (decoder_t *)p_this;
+    unsigned i_core_count = vlc_GetCPUCount();
 
     if (dec->fmt_in.i_codec != VLC_CODEC_AV1)
         return VLC_EGENERIC;
@@ -287,7 +288,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         p_sys->s.n_tile_threads = VLC_CLIP(vlc_GetCPUCount(), 1, 4);
     p_sys->s.n_frame_threads = var_InheritInteger(p_this, "dav1d-thread-frames");
     if (p_sys->s.n_frame_threads == 0)
-        p_sys->s.n_frame_threads = __MAX(1, vlc_GetCPUCount());
+        p_sys->s.n_frame_threads = (i_core_count < 16) ? i_core_count : 16;
     p_sys->s.allocator.cookie = dec;
     p_sys->s.allocator.alloc_picture_callback = NewPicture;
     p_sys->s.allocator.release_picture_callback = FreePicture;
