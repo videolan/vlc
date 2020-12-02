@@ -40,11 +40,6 @@
  */
 #define _PNS(c, s) (toNSStr(vlc_pgettext(c, s)))
 
-/* Get an alternate version of the string.
- * This string is stored as '1:string' but when displayed it only displays
- * the translated string. the translation should be '1:translatedstring' though */
-#define _ANS(s) [((s) ? toNSStr(vlc_gettext(s)) : @"") substringFromIndex:2]
-
 extern NSString *const kVLCMediaAudioCD;
 extern NSString *const kVLCMediaDVD;
 extern NSString *const kVLCMediaVCD;
