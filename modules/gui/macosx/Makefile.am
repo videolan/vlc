@@ -489,8 +489,32 @@ libmacosx_plugin_la_RES += \
 	gui/macosx/Resources/vlc.scriptSuite \
 	gui/macosx/Resources/vlc.scriptTerminology
 
-libmacosx_plugin_la_RES += \
-	gui/macosx/Resources/Base.lproj/InfoPlist.strings
+EXTRA_DIST += \
+	gui/macosx/Resources/Base.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ar.lproj/InfoPlist.strings \
+	gui/macosx/Resources/bg.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ca.lproj/InfoPlist.strings \
+	gui/macosx/Resources/cs.lproj/InfoPlist.strings \
+	gui/macosx/Resources/de.lproj/InfoPlist.strings \
+	gui/macosx/Resources/el.lproj/InfoPlist.strings \
+	gui/macosx/Resources/es.lproj/InfoPlist.strings \
+	gui/macosx/Resources/fr.lproj/InfoPlist.strings \
+	gui/macosx/Resources/gl.lproj/InfoPlist.strings \
+	gui/macosx/Resources/he.lproj/InfoPlist.strings \
+	gui/macosx/Resources/hu.lproj/InfoPlist.strings \
+	gui/macosx/Resources/it.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ja.lproj/InfoPlist.strings \
+	gui/macosx/Resources/lv.lproj/InfoPlist.strings \
+	gui/macosx/Resources/nl.lproj/InfoPlist.strings \
+	gui/macosx/Resources/pl.lproj/InfoPlist.strings \
+	gui/macosx/Resources/pt-BR.lproj/InfoPlist.strings \
+	gui/macosx/Resources/pt-PT.lproj/InfoPlist.strings \
+	gui/macosx/Resources/sk.lproj/InfoPlist.strings \
+	gui/macosx/Resources/sl.lproj/InfoPlist.strings \
+	gui/macosx/Resources/sv.lproj/InfoPlist.strings \
+	gui/macosx/Resources/tr.lproj/InfoPlist.strings \
+	gui/macosx/Resources/uk.lproj/InfoPlist.strings \
+	gui/macosx/Resources/zh-Hans.lproj/InfoPlist.strings
 
 if ENABLE_MACOSX_UI
 dist_libmacosx_plugin_la_DATA = $(libmacosx_plugin_la_RES)
