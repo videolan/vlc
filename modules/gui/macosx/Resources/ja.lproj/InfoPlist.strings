@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLCはユーザー要求と同様にカメラにアクセスする必要があります。";
+"NSMicrophoneUsageDescription" = "VLCはユーザー要求と同様にマイクにアクセスする必要があります。";
+"NSAppleEventsUsageDescription" = "VLCは外部のメディアプレイヤーを一時停止したり再開する必要があります。";
+"NSDesktopFolderUsageDescription" = "VLCはユーザー要求と同様にデスクトップフォルダーにアクセスする必要があります。";
+"NSDocumentsFolderUsageDescription" = "VLCはユーザー要求と同様にドキュメントフォルダーにアクセスする必要があります。";
+"NSDownloadsFolderUsageDescription" = "VLCはユーザー要求と同様にダウンロードフォルダーにアクセスする必要があります。";
+"NSNetworkVolumesUsageDescription" = "VLCはユーザー要求と同様にネットワークボリュームにアクセスする必要があります。";
+"NSRemovableVolumesUsageDescription" = "VLCはユーザー要求と同様にリムーバブルボリュームにアクセスする必要があります。";
