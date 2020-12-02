@@ -352,7 +352,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     /* this special case is needed to due to archiac legacy translations of the File menu
      * on the Mac to the German translation which resulted in 'Ablage' instead of 'Datei'.
      * This remains until the present day and does not affect the Windows world. */
-    [_fileMenu setTitle: _ANS("1:File")];
+    [_fileMenu setTitle: _PNS("macOS MainMenu", "File")];
     [_open_generic setTitle: _NS("Advanced Open File...")];
     [_open_file setTitle: _NS("Open File...")];
     [_open_disc setTitle: _NS("Open Disc...")];
