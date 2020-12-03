@@ -129,6 +129,11 @@ Widgets.NavigableFocusScope {
 
             ScrollIndicator.vertical: ScrollIndicator { }
 
+            highlight: Rectangle {
+                color: _colors.accent
+                opacity: 0.8
+            }
+
             delegate: ItemDelegate {
                 id: itemDelegate
 
@@ -139,6 +144,7 @@ Widgets.NavigableFocusScope {
                 background: Item {}
                 contentItem: Item {
                     implicitHeight: itemRow.implicitHeight
+                    width: itemDelegate.width
 
                     Rectangle {
                         anchors.fill: parent
