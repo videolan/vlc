@@ -191,7 +191,6 @@ NavigableFocusScope {
 
             property var rowModel: model
             property bool selected: selectionDelegateModel.isSelected(root.model.index(index, 0))
-            property alias showSeparator: separator.visible
             readonly property bool highlighted: selected || hoverArea.containsMouse || activeFocus
             readonly property int _index: index
             property int _modifiersOnLastPress: Qt.NoModifier
@@ -199,13 +198,6 @@ NavigableFocusScope {
             width: view.width
             height: root.rowHeight
             color: highlighted ? VLCStyle.colors.bgHover : "transparent"
-
-            onHighlightedChanged: {
-                showSeparator = !highlighted
-                var nextItem = view.itemAtIndex(index + 1)
-                if ( nextItem && lineView.ListView.nextSection === lineView.ListView.section)
-                    nextItem.showSeparator = !highlighted && !nextItem.highlighted
-            }
 
             Connections {
                 target: selectionDelegateModel
@@ -256,17 +248,6 @@ NavigableFocusScope {
                 onDoubleClicked: {
                     actionForSelection(selectionDelegateModel.selectedIndexes)
                     root.itemDoubleClicked(model)
-                }
-
-                Rectangle {
-                    id: separator
-
-                    anchors.top: parent.top
-                    anchors.right: content.right
-                    width: content.width + (lineView.ListView.previousSection !== lineView.ListView.section
-                                            ? VLCStyle.table_section_width : 0)
-                    height: VLCStyle.heightBar_xxxsmall
-                    color: VLCStyle.colors.separator
                 }
 
                 Row {
