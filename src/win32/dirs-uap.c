@@ -38,8 +38,41 @@
 #include <assert.h>
 
 #include <winstring.h>
-#include <windows.storage.h>
 #include <roapi.h>
+
+#define WIDL_using_Windows_Storage
+#include <windows.storage.h>
+
+#ifndef IStorageItem_get_Path
+typedef __x_ABI_CWindows_CStorage_CIStorageFolder IStorageFolder;
+typedef __x_ABI_CWindows_CStorage_CIStorageItem   IStorageItem;
+typedef __x_ABI_CWindows_CStorage_CIKnownFoldersStatics IKnownFoldersStatics;
+typedef __x_ABI_CWindows_CStorage_CIApplicationDataStatics IApplicationDataStatics;
+typedef __x_ABI_CWindows_CStorage_CIApplicationData IApplicationData;
+typedef __x_ABI_CWindows_CStorage_CIApplicationData2 IApplicationData2;
+
+#define IID_IStorageItem IID___x_ABI_CWindows_CStorage_CIStorageItem
+#define IID_IKnownFoldersStatics IID___x_ABI_CWindows_CStorage_CIKnownFoldersStatics
+#define IID_IApplicationDataStatics IID___x_ABI_CWindows_CStorage_CIApplicationDataStatics
+#define IID_IApplicationData2 IID___x_ABI_CWindows_CStorage_CIApplicationData2
+
+#define IKnownFoldersStatics_get_DocumentsLibrary(a,f) __x_ABI_CWindows_CStorage_CIKnownFoldersStatics_get_DocumentsLibrary(a,f)
+#define IKnownFoldersStatics_get_MusicLibrary(a,f) __x_ABI_CWindows_CStorage_CIKnownFoldersStatics_get_MusicLibrary(a,f)
+#define IKnownFoldersStatics_get_PicturesLibrary(a,f) __x_ABI_CWindows_CStorage_CIKnownFoldersStatics_get_PicturesLibrary(a,f)
+#define IKnownFoldersStatics_get_VideosLibrary(a,f) __x_ABI_CWindows_CStorage_CIKnownFoldersStatics_get_VideosLibrary(a,f)
+#define IStorageItem_get_Path(a,f) __x_ABI_CWindows_CStorage_CIStorageItem_get_Path(a,f)
+#define IStorageItem_Release(a) __x_ABI_CWindows_CStorage_CIStorageItem_Release(a)
+#define IStorageFolder_Release(a) __x_ABI_CWindows_CStorage_CIStorageFolder_Release(a)
+#define IStorageFolder_QueryInterface(a,i,v) __x_ABI_CWindows_CStorage_CIStorageFolder_QueryInterface(a,i,v)
+#define IKnownFoldersStatics_Release(a) __x_ABI_CWindows_CStorage_CIKnownFoldersStatics_Release(a)
+#define IApplicationDataStatics_get_Current(a,f) __x_ABI_CWindows_CStorage_CIApplicationDataStatics_get_Current(a,f)
+#define IApplicationData_get_LocalFolder(a,f) __x_ABI_CWindows_CStorage_CIApplicationData_get_LocalFolder(a,f)
+#define IApplicationDataStatics_Release(a) __x_ABI_CWindows_CStorage_CIApplicationDataStatics_Release(a)
+#define IApplicationData_Release(a) __x_ABI_CWindows_CStorage_CIApplicationData_Release(a)
+#define IApplicationData_QueryInterface(a,i,v) __x_ABI_CWindows_CStorage_CIApplicationData_QueryInterface(a,i,v)
+#define IApplicationData2_get_LocalCacheFolder(a,f) __x_ABI_CWindows_CStorage_CIApplicationData2_get_LocalCacheFolder(a,f)
+#define IApplicationData2_Release(a) __x_ABI_CWindows_CStorage_CIApplicationData2_Release(a)
+#endif
 
 static char * GetFolderName(IStorageFolder *folder)
 {
