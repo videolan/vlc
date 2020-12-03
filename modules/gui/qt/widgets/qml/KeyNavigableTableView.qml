@@ -62,6 +62,7 @@ NavigableFocusScope {
     property var headerItem: view.headerItem.loadedHeader
     property alias tableHeaderItem: view.headerItem
     property color headerColor
+    property int headerTopPadding: 0
 
     property alias footerItem: view.footerItem
     property alias footer: view.footer
@@ -102,7 +103,7 @@ NavigableFocusScope {
             property alias loadedHeader: headerLoader.item
 
             width: parent.width
-            height: col.height + VLCStyle.margin_xsmall
+            height: col.height
             color: headerColor
             visible: view.modelCount > 0
             z: 3
@@ -111,17 +112,19 @@ NavigableFocusScope {
                 x: contentX - VLCStyle.table_section_width
                 y: row.y
                 height: row.height
+                topPadding: root.headerTopPadding
                 leftPadding: VLCStyle.table_section_text_margin
                 text: view.currentSection
                 color: VLCStyle.colors.accent
-                visible: text !== "" && view.contentY > (VLCStyle.fontHeight_normal + VLCStyle.margin_xxsmall - col.height)
+                visible: text !== "" && view.contentY > (row.height - col.height - row.topPadding)
+                verticalAlignment: Text.AlignTop
             }
 
             Column {
                 id: col
 
                 width: parent.width
-                height: childrenRect.height
+                height: implicitHeight
 
                 Loader {
                     id: headerLoader
@@ -137,8 +140,9 @@ NavigableFocusScope {
                         rightMargin: VLCStyle.margin_xxxsmall
                         horizontalCenter: parent.horizontalCenter
                     }
-                    height: childrenRect.height + VLCStyle.margin_xxsmall
-                    topPadding: VLCStyle.margin_xxsmall
+                    height: implicitHeight
+                    topPadding: root.headerTopPadding
+                    bottomPadding: VLCStyle.margin_xsmall
                     spacing: root.horizontalSpacing
 
                     Repeater {
