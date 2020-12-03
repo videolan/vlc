@@ -204,6 +204,12 @@ enum vlc_module_properties
 #define CONCATENATE( y, z ) CRUDE_HACK( y, z )
 #define CRUDE_HACK( y, z )  y##__##z
 
+#if defined(__cplusplus)
+#define EXTERN_SYMBOL extern "C"
+#else
+#define EXTERN_SYMBOL
+#endif
+
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
 #ifdef __PLUGIN__
@@ -228,12 +234,6 @@ enum vlc_module_properties
 # endif
 #else
 # define DLL_SYMBOL
-#endif
-
-#if defined( __cplusplus )
-#   define EXTERN_SYMBOL           extern "C"
-#else
-#   define EXTERN_SYMBOL
 #endif
 
 EXTERN_SYMBOL typedef int (*vlc_set_cb) (void *, void *, int, ...);
