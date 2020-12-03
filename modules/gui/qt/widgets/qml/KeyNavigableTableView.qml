@@ -102,7 +102,7 @@ NavigableFocusScope {
             property alias loadedHeader: headerLoader.item
 
             width: parent.width
-            height: col.height
+            height: col.height + VLCStyle.margin_xsmall
             color: headerColor
             visible: view.modelCount > 0
             z: 3
