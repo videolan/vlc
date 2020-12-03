@@ -101,6 +101,7 @@ Widgets.NavigableFocusScope {
         Widgets.KeyNavigableListView {
             id: artistList
 
+            z: 1
             width: resizeHandle.clamp(root.width / resizeHandle.widthFactor,
                                       VLCStyle.colWidth(1) + VLCStyle.column_margin_width,
                                       root.width * .5)
@@ -202,11 +203,12 @@ Widgets.NavigableFocusScope {
                     top: parent.top
                     bottom: parent.bottom
                     right: parent.right
+
+                    rightMargin: -(width / 2)
                 }
                 sourceWidth: root.width
                 targetWidth: artistList.width
             }
-
         }
 
         MusicArtist {
@@ -223,7 +225,6 @@ Widgets.NavigableFocusScope {
                     ? artistModel.getDataAt(artistList.currentIndex)
                     : ({})
         }
-
     }
     }
 
