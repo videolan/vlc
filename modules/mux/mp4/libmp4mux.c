@@ -777,7 +777,7 @@ static bo_t *GetHvcCTag(const uint8_t *p_extra, size_t i_extra,
         return hvcC;
     }
 
-    struct hevc_dcr_params params = { };
+    struct hevc_dcr_params params = { 0 };
     const uint8_t *p_nal;
     size_t i_nal;
 
