@@ -105,7 +105,11 @@ VLC_API void vlc_object_vaLog(vlc_object_t *obj, int prio, const char *module,
 #define msg_Dbg(p_this, ...) \
     msg_Generic(p_this, VLC_MSG_DBG, __VA_ARGS__)
 
+#ifndef __cplusplus
 extern const char vlc_module_name[];
+#else
+extern "C" const char vlc_module_name[];
+#endif
 
 VLC_API const char *vlc_strerror(int);
 VLC_API const char *vlc_strerror_c(int);
