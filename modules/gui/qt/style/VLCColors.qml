@@ -87,7 +87,7 @@ Item {
     property color roundPlayCoverBorder: "#979797"
 
     // playlist
-    property color playlistSeparator: white
+    property color playlistSeparator: isThemeDark ? "white" : "#f2f2f2"
     property color plItemHover_Focus: bannerHover
     property color plItemSelect:      isThemeDark ? "#1E1E1E" : "#EDEDED"
 
