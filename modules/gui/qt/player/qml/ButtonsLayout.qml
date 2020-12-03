@@ -32,6 +32,10 @@ Widgets.NavigableFocusScope {
     property var defaultSize: VLCStyle.icon_normal
     property bool forceColors: false
 
+    property real minimumWidth: 0
+    property real extraWidth: undefined
+    property int expandableCount: 0 // widget count that can expand when extra width is available
+
     implicitWidth: buttonrow.implicitWidth
     implicitHeight: buttonrow.implicitHeight
 
@@ -63,13 +67,21 @@ Widgets.NavigableFocusScope {
                 if (item.focus) {
                     buttonrow._focusGiven = false
                 }
+
+                if (item.item.extraWidth !== undefined)
+                    buttonsLayout.expandableCount--
+
+                if (item.item.minimumWidth !== undefined)
+                    buttonsLayout.minimumWidth -= item.item.minimumWidth + buttonrow.spacing
+                else
+                    buttonsLayout.minimumWidth -= item.item.width + buttonrow.spacing
             }
 
             delegate: Loader {
                 id: buttonloader
 
-                sourceComponent: controlmodelbuttons.returnbuttondelegate(
-                                     model.id)
+                sourceComponent: controlmodelbuttons.returnbuttondelegate(model.id)
+
                 onLoaded: {
                     if (!buttonrow._focusGiven) {
                         buttonloader.focus = true
@@ -103,6 +115,18 @@ Widgets.NavigableFocusScope {
 
                     if (buttonloader.item.navigationLeft !== undefined)
                         buttonloader.item.navigationLeft = buttonsLayout.navigationLeft
+
+                    if (buttonloader.item.minimumWidth !== undefined)
+                        buttonsLayout.minimumWidth += buttonloader.item.minimumWidth + buttonrow.spacing
+                    else
+                        buttonsLayout.minimumWidth += buttonloader.item.width + buttonrow.spacing
+
+                    if (buttonloader.item.extraWidth !== undefined && buttonsLayout.extraWidth !== undefined) {
+                        buttonsLayout.expandableCount++
+                        buttonloader.item.extraWidth = Qt.binding( function() {
+                            return (buttonsLayout.extraWidth / buttonsLayout.expandableCount) // distribute extra width
+                        } )
+                    }
                 }
             }
         }

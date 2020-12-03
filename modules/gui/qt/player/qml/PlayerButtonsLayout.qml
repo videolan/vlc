@@ -26,8 +26,7 @@ import "qrc:///widgets/" as Widgets
 Widgets.NavigableFocusScope {
     id: playerButtonsLayout
 
-    implicitHeight: childrenRect.height
-    implicitWidth: childrenRect.width
+    implicitHeight: Math.max(buttonrow_left.implicitHeight, buttonrow_center.implicitHeight, buttonrow_right.implicitHeight)
 
     property alias isMiniplayer: controlmodelbuttons.isMiniplayer
     property alias parentWindow: controlmodelbuttons.parentWindow
@@ -39,15 +38,21 @@ Widgets.NavigableFocusScope {
 
     property bool forceColors: false
     
-    property var models: [] // 0: left, 1: center, 2: right
+    enum Alignment {
+        Left = 0,
+        Center = 1,
+        Right = 2
+    }
+
+    property var models: []
 
     Connections {
         target: mainInterface
 
         onToolBarConfUpdated: {
-            models[0].reloadModel()
-            models[1].reloadModel()
-            models[2].reloadModel()
+            models[PlayerButtonsLayout.Alignment.Left].reloadModel()
+            models[PlayerButtonsLayout.Alignment.Center].reloadModel()
+            models[PlayerButtonsLayout.Alignment.Right].reloadModel()
         }
     }
 
@@ -61,24 +66,22 @@ Widgets.NavigableFocusScope {
     ButtonsLayout {
         id: buttonrow_left
 
-        model: models[0]
+        model: models[PlayerButtonsLayout.Alignment.Left]
 
-        implicitHeight: buttonrow.implicitHeight
+        extraWidth: (buttonrow_center.x - buttonrow_left.x - minimumWidth)
 
         anchors {
             left: parent.left
-            top: parent.top
-            bottom: parent.bottom
+            verticalCenter: parent.verticalCenter
 
             leftMargin: playerButtonsLayout.marginLeft
-
             topMargin: playerButtonsLayout.marginTop
             bottomMargin: playerButtonsLayout.marginBottom
         }
 
         forceColors: playerButtonsLayout.forceColors
         
-        visible: model.count > 0 && (buttonrow_center.model.count > 0 ? ((x+width) < buttonrow_center.x) : true)
+        visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
 
         navigationParent: playerButtonsLayout
         navigationRightItem: buttonrow_center
@@ -89,7 +92,7 @@ Widgets.NavigableFocusScope {
     ButtonsLayout {
         id: buttonrow_center
 
-        model: models[1]
+        model: models[PlayerButtonsLayout.Alignment.Center]
 
         anchors {
             centerIn: parent
@@ -108,23 +111,22 @@ Widgets.NavigableFocusScope {
     ButtonsLayout {
         id: buttonrow_right
 
-        model: models[2]
+        model: models[PlayerButtonsLayout.Alignment.Right]
+
+        extraWidth: (playerButtonsLayout.width - (buttonrow_center.x + buttonrow_center.width) - minimumWidth)
 
         anchors {
             right: parent.right
-            top: parent.top
-            bottom: parent.bottom
+            verticalCenter: parent.verticalCenter
 
             rightMargin: playerButtonsLayout.marginRight
-
             topMargin: playerButtonsLayout.marginTop
             bottomMargin: playerButtonsLayout.marginBottom
         }
 
         forceColors: playerButtonsLayout.forceColors
-        
-        visible: model.count > 0 && (buttonrow_center.model.count > 0 ? ((buttonrow_center.x + buttonrow_center.width) < x)
-                                                                      : !(((buttonrow_left.x + buttonrow_left.width) > x) && buttonrow_center.left.count > 0))
+
+        visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
 
         navigationParent: playerButtonsLayout
         navigationLeftItem: buttonrow_center

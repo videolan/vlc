@@ -781,7 +781,11 @@ Item{
             property bool paintOnly: false
             property VLCColors _colors: VLCStyle.colors
 
-            implicitWidth: playingItemInfoRow.implicitWidth
+            readonly property real minimumWidth: cover.width
+            property real extraWidth: 0
+
+            implicitWidth: paintOnly ? playingItemInfoRow.implicitWidth : (minimumWidth + extraWidth)
+
             implicitHeight: playingItemInfoRow.implicitHeight
 
             Keys.onPressed: {
@@ -847,7 +851,9 @@ Item{
                     anchors.verticalCenter: parent.verticalCenter
                     leftPadding: VLCStyle.margin_xsmall
 
-                    width: implicitWidth + VLCStyle.margin_xsmall
+                    width: (implicitWidth + VLCStyle.margin_xsmall)
+
+                    visible: paintOnly || artworkInfoItem.extraWidth > 0
 
                     ToolTip {
                         text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
@@ -867,10 +873,12 @@ Item{
 
                     Widgets.MenuLabel {
                         id: titleLabel
+
                         width: {
                             if (!paintOnly)
-                                implicitWidth < VLCStyle.artworkInfoTextWidth ? implicitWidth : VLCStyle.artworkInfoTextWidth
+                                artworkInfoItem.implicitWidth - titleLabel.mapToItem(artworkInfoItem, titleLabel.x, titleLabel.y).x
                         }
+
                         text: {
                             if (paintOnly)
                                 i18n.qtr("Title")
@@ -885,7 +893,7 @@ Item{
                         id: artistLabel
                         width: {
                             if (!paintOnly)
-                                implicitWidth < VLCStyle.artworkInfoTextWidth ? implicitWidth : VLCStyle.artworkInfoTextWidth
+                                artworkInfoItem.implicitWidth - artistLabel.mapToItem(artworkInfoItem, artistLabel.x, artistLabel.y).x
                         }
                         text: {
                             if (paintOnly)
@@ -899,6 +907,10 @@ Item{
 
                     Widgets.MenuCaption {
                         id: progressIndicator
+                        width: {
+                            if (!paintOnly)
+                                artworkInfoItem.implicitWidth - progressIndicator.mapToItem(artworkInfoItem, progressIndicator.x, progressIndicator.y).x
+                        }
                         text: {
                             if (paintOnly)
                                 " -- / -- "
