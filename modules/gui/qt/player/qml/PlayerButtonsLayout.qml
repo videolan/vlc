@@ -93,6 +93,12 @@ RowLayout{
 
                 if (index > 0)
                     buttonloader.item.KeyNavigation.left = buttonrow.children[index].item
+
+                if (buttonloader.item.navigationRight !== undefined)
+                    buttonloader.item.navigationRight = playerButtonsLayout.navigationRight
+
+                if (buttonloader.item.navigationLeft !== undefined)
+                    buttonloader.item.navigationLeft = playerButtonsLayout.navigationLeft
             }
         }
     }
