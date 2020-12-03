@@ -828,9 +828,14 @@ Item{
                     Image {
                         id: cover
 
-                        source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
-                                ? mainPlaylistController.currentItem.artwork
-                                : VLCStyle.noArtAlbum
+                        source: {
+                            if (paintOnly)
+                                VLCStyle.noArtAlbum
+                            else
+                                (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
+                                                                ? mainPlaylistController.currentItem.artwork
+                                                                : VLCStyle.noArtAlbum
+                        }
                         fillMode: Image.PreserveAspectFit
 
                         width: VLCStyle.dp(60)
@@ -841,6 +846,8 @@ Item{
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
                     leftPadding: VLCStyle.margin_xsmall
+
+                    width: implicitWidth + VLCStyle.margin_xsmall
 
                     ToolTip {
                         text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
@@ -860,23 +867,44 @@ Item{
 
                     Widgets.MenuLabel {
                         id: titleLabel
-                        width: implicitWidth < VLCStyle.artworkInfoTextWidth ? implicitWidth : VLCStyle.artworkInfoTextWidth
-                        text: mainPlaylistController.currentItem.title
+                        width: {
+                            if (!paintOnly)
+                                implicitWidth < VLCStyle.artworkInfoTextWidth ? implicitWidth : VLCStyle.artworkInfoTextWidth
+                        }
+                        text: {
+                            if (paintOnly)
+                                i18n.qtr("Title")
+                            else
+                                mainPlaylistController.currentItem.title
+                        }
                         visible: text !== ""
                         color: _colors.text
                     }
 
                     Widgets.MenuCaption {
                         id: artistLabel
-                        width: implicitWidth < VLCStyle.artworkInfoTextWidth ? implicitWidth : VLCStyle.artworkInfoTextWidth
-                        text: mainPlaylistController.currentItem.artist
+                        width: {
+                            if (!paintOnly)
+                                implicitWidth < VLCStyle.artworkInfoTextWidth ? implicitWidth : VLCStyle.artworkInfoTextWidth
+                        }
+                        text: {
+                            if (paintOnly)
+                                i18n.qtr("Artist")
+                            else
+                                mainPlaylistController.currentItem.artist
+                        }
                         visible: text !== ""
                         color: _colors.menuCaption
                     }
 
                     Widgets.MenuCaption {
                         id: progressIndicator
-                        text: player.time.toString() + " / " + player.length.toString()
+                        text: {
+                            if (paintOnly)
+                                " -- / -- "
+                            else
+                                player.time.toString() + " / " + player.length.toString()
+                        }
                         visible: text !== ""
                         color: _colors.menuCaption
                     }
