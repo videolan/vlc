@@ -31,7 +31,7 @@ MouseArea {
     property bool held: false
     property bool dropVisible: false
     property var dndView: null
-    anchors.verticalCenter: parent.verticalCenter
+    anchors.verticalCenter: (!!parent) ? parent.verticalCenter : undefined
     cursorShape: Qt.OpenHandCursor
     drag.target: held ? content : undefined
     width: buttonloader.width

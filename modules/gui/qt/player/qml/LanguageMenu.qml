@@ -40,7 +40,7 @@ T.Menu {
     cascade: false
     closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
     height: VLCStyle.dp(296, VLCStyle.scale)
-    width: rootPlayer.width
+    width: (!!rootPlayer) ? rootPlayer.width : 0
 
     onOpened: {
         control._emitMenuClose = true

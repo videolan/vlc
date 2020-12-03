@@ -427,7 +427,7 @@ Item{
                 parent: rootPlayer
                 focus: true
                 x: 0
-                y: rootPlayer.positionSliderY - height
+                y: (!!rootPlayer) ? (rootPlayer.positionSliderY - height) : 0
                 z: 1
 
                 onOpened: rootPlayer._menu = langMenu
