@@ -793,7 +793,7 @@ static void InsertIntoDPB(decoder_sys_t *p_sys, frame_info_t *p_info)
         {
             p_info->p_next = *pp_lead_in;
             *pp_lead_in = p_info;
-            p_sys->i_pic_reorder += (p_info->b_field) ? 1 : 2;
+            p_sys->i_pic_reorder++;
             break;
         }
     }
@@ -835,7 +835,7 @@ static picture_t * RemoveOneFrameFromDPB(decoder_sys_t *p_sys)
         *pp_ret_last = p_field;
         pp_ret_last = &p_field->p_next;
 
-        p_sys->i_pic_reorder -= (p_info->b_field) ? 1 : 2;
+        p_sys->i_pic_reorder--;
 
         p_sys->p_pic_reorder = p_info->p_next;
         free(p_info);
@@ -917,7 +917,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     assert(p_info->p_picture);
-    while(p_info->b_flush || p_sys->i_pic_reorder >= (p_sys->i_pic_reorder_max * 2))
+    while(p_info->b_flush || p_sys->i_pic_reorder >= p_sys->i_pic_reorder_max)
     {
         /* First check if DPB sizing was correct before removing one frame */
         if (p_sys->p_pic_reorder && !p_info->b_flush &&
