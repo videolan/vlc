@@ -786,7 +786,7 @@ Item{
             readonly property real minimumWidth: cover.width
             property real extraWidth: 0
 
-            implicitWidth: paintOnly ? playingItemInfoRow.implicitWidth : (minimumWidth + extraWidth)
+            implicitWidth: paintOnly ? playingItemInfoRow.width : (minimumWidth + extraWidth)
 
             implicitHeight: playingItemInfoRow.implicitHeight
 
@@ -810,8 +810,10 @@ Item{
 
             Row {
                 id: playingItemInfoRow
+                width: (coverItem.width + infoColumn.width)
 
                 Item {
+                    id: coverItem
                     anchors.verticalCenter: parent.verticalCenter
                     implicitHeight: childrenRect.height
                     implicitWidth:  childrenRect.width
@@ -850,10 +852,11 @@ Item{
                 }
 
                 Column {
+                    id: infoColumn
                     anchors.verticalCenter: parent.verticalCenter
                     leftPadding: VLCStyle.margin_xsmall
 
-                    width: (implicitWidth + VLCStyle.margin_xsmall)
+                    width: (paintOnly ? Math.max(titleLabel.width, artistLabel.width, progressIndicator.width) : implicitWidth) + VLCStyle.margin_xsmall
 
                     visible: paintOnly || artworkInfoItem.extraWidth > 0
 
