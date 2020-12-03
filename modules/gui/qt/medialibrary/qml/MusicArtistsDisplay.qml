@@ -257,6 +257,7 @@ Widgets.PageLoader {
                 visible: artistModel.count === 0
                 text: i18n.qtr("No artists found\nPlease try adding sources, by going to the Network tab")
                 navigationParent: root
+                cover: VLCStyle.noArtArtistCover
             }
         }
     }

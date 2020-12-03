@@ -285,5 +285,6 @@ Widgets.NavigableFocusScope {
         focus: visible
         text: i18n.qtr("No albums found\nPlease try adding sources, by going to the Network tab")
         navigationParent: root
+        cover: VLCStyle.noArtAlbumCover
     }
 }

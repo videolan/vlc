@@ -25,20 +25,62 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///util/KeyHelper.js" as KeyHelper
 
 Widgets.NavigableFocusScope {
+    id: root
+
     property alias text: label.text
+    property alias showBrowseButton: browseButton.visible
+    property alias cover: cover.source
+    property alias coverWidth: coverContainer.width
+    property alias coverHeight: coverContainer.height
 
-    Label {
-        id: label
-        anchors.fill: parent
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        font.pixelSize: VLCStyle.fontSize_xxxlarge
-        color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        wrapMode: Text.WordWrap
+    Column {
+        anchors.verticalCenter: parent.verticalCenter
+        width: root.width
+        spacing: VLCStyle.margin_large
 
-        MouseArea {
-            anchors.fill: parent
+        Item {
+            id: coverContainer
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: VLCStyle.colWidth(1)
+            height: VLCStyle.colWidth(1)
+
+            Image {
+                id: cover
+
+                asynchronous: true
+                anchors.fill: parent
+                fillMode: Image.PreserveAspectFit
+            }
+
+            Widgets.ListCoverShadow {
+                anchors.fill: cover
+                source: cover
+            }
+        }
+
+        Label {
+            id: label
+
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: VLCStyle.fontSize_xxlarge
+            font.weight: Font.DemiBold
+            color:  VLCStyle.colors.text
+            wrapMode: Text.WordWrap
+            focus: false
+        }
+
+        Widgets.TabButtonExt {
+            id: browseButton
+
+            text: i18n.qtr("Browse")
+            focus: true
+            iconTxt: VLCIcons.topbar_network
+            anchors.horizontalCenter: parent.horizontalCenter
             onClicked: history.push(["mc", "network"])
+            width: VLCStyle.dp(84, VLCStyle.scale)
         }
     }
 
