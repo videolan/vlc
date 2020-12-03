@@ -178,8 +178,8 @@ bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
             return false;
 
         bool found = false;
-        stime_t stime = first->startTime.Get();
-        stime_t sduration = 0;
+        stime = first->startTime.Get();
+        sduration = 0;
         std::vector<Segment *>::const_iterator it = segments.begin();
         for(it = segments.begin(); it != segments.end(); ++it)
         {
