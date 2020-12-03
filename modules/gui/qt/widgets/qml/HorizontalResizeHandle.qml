@@ -41,7 +41,14 @@ MouseArea {
     width: VLCStyle.dp(8, VLCStyle.scale)
     acceptedButtons: Qt.LeftButton
 
-    onPressed: _previousX = mouseX
+    onPressed: {
+        mainInterface.setCursor(cursorShape)
+        _previousX = mouseX
+    }
+
+    onReleased: {
+        mainInterface.restoreCursor()
+    }
 
     onPositionChanged: {
         var f = atRight ? -1 : 1
