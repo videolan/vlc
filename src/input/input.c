@@ -630,7 +630,7 @@ static void MainLoopStatistics( input_thread_t *p_input )
         i_time = VLC_TICK_INVALID;
 
     if( demux_Control( priv->master->p_demux, DEMUX_GET_LENGTH, &i_length ) )
-        i_length = VLC_TICK_INVALID;
+        i_length = 0;
 
     /* In case of failure (not implemented or in case of seek), use the last
      * normal_time value (that is VLC_TICK_0 by default). */
@@ -1288,8 +1288,8 @@ static int Init( input_thread_t * p_input )
     /* Init length */
     vlc_tick_t i_length;
     if( demux_Control( master->p_demux, DEMUX_GET_LENGTH, &i_length ) )
-        i_length = VLC_TICK_INVALID;
-    if( i_length == VLC_TICK_INVALID )
+        i_length = 0;
+    if( i_length == 0 )
         i_length = input_item_GetDuration( priv->p_item );
 
     input_SendEventTimes( p_input, 0.0, VLC_TICK_INVALID, priv->normal_time,

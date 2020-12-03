@@ -3701,7 +3701,7 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
                     i_time = VLC_TICK_0;
             }
 
-            if( i_length != VLC_TICK_INVALID )
+            if( i_length != 0 )
                 f_position -= (double)i_delay / i_length;
             if( f_position < 0 )
                 f_position = 0;
