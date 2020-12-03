@@ -27,8 +27,13 @@ import "qrc:///widgets/" as Widgets
 Widgets.NavigableFocusScope {
     id: root
 
-    width: childrenRect.width
-    height: childrenRect.height
+    // when height/width is explicitly set (force size), implicit values will not be used.
+    // when height/width is not explicitly set, IconToolButton will set its ...
+    // height and width to these implicit counterparts because ...
+    // height and width will be set to implicit values when they are not ...
+    // explicitly set.
+    implicitWidth: button.implicitWidth
+    implicitHeight: button.implicitHeight
 
     property alias model: list.model
     property string textRole
@@ -48,6 +53,8 @@ Widgets.NavigableFocusScope {
 
     property bool _intSortOrder : false
 
+    property alias size: button.size
+
     signal sortSelected(var modelData)
     signal sortOrderSelected(var order)
 
@@ -64,7 +71,12 @@ Widgets.NavigableFocusScope {
     Widgets.IconToolButton {
         id: button
 
-        size: VLCStyle.banner_icon_size
+        // set height and width to root height and width so that ...
+        // we can forcefully set SortControl's width and height.
+        height: root.height
+        width: root.width
+
+        size: VLCStyle.icon_normal
         iconText: VLCIcons.topbar_sort
         text: i18n.qtr("Sort")
 

@@ -238,6 +238,7 @@ Widgets.NavigableFocusScope {
                             criteriaRole: "criteria"
                             listWidth: VLCStyle.widthSortBox
                             height: localToolbar.height
+                            size: VLCStyle.banner_icon_size
 
                             popupAlignment: Qt.AlignLeft | Qt.AlignBottom
 
