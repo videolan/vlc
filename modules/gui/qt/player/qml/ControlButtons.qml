@@ -138,6 +138,7 @@ Item{
             id: prevBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.previous
+            enabled: mainPlaylistController.hasPrev
             onClicked: mainPlaylistController.prev()
             property bool acceptFocus: true
             text: i18n.qtr("Previous")
@@ -354,6 +355,7 @@ Item{
             id: nextBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.next
+            enabled: mainPlaylistController.hasNext
             onClicked: mainPlaylistController.next()
             property bool acceptFocus: true
             text: i18n.qtr("Next")
