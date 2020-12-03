@@ -63,17 +63,24 @@ Widgets.NavigableFocusScope {
         acceptedButtons: Qt.AllButtons
     }
 
+    Widgets.FrostedGlassEffect {
+        anchors.fill: column
+
+        source: mainContent
+        sourceRect: Qt.rect(root.x, root.y, root.width, root.height)
+
+        tint: VLCStyle.colors.blendColors(VLCStyle.colors.bg, VLCStyle.colors.banner, 0.85)
+    }
+
     Column {
+        id: column
         anchors.left: parent.left
         anchors.right: parent.right
-
-        spacing: VLCStyle.dp(-progressBar.height / 2, VLCStyle.scale)
 
         SliderBar {
             id: progressBar
             value: player.position
             visible: progressBar.value >= 0.0 && progressBar.value <= 1.0
-            z: 1
 
             isMiniplayer: true
 
@@ -86,7 +93,6 @@ Widgets.NavigableFocusScope {
             Keys.onUpPressed: root.navigationUpItem.focus = true
         }
 
-
         Item {
             id: mainRect
 
@@ -94,17 +100,8 @@ Widgets.NavigableFocusScope {
                 left: parent.left
                 right: parent.right
             }
-            z: 0
+
             height: VLCStyle.miniPlayerHeight
-
-            Widgets.FrostedGlassEffect {
-                anchors.fill: parent
-
-                source: mainContent
-                sourceRect: Qt.rect(root.x, root.y, root.width, root.height)
-
-                tint: VLCStyle.colors.blendColors(VLCStyle.colors.bg, VLCStyle.colors.banner, 0.85)
-            }
 
             PlayerButtonsLayout {
                 id: buttonsLayout
