@@ -108,6 +108,7 @@ ToolbarEditorDialog::ToolbarEditorDialog( QWidget *_w, intf_thread_t *_p_intf)
     rootCtx->setContextProperty( "systemPalette", new SystemPalette(engine));
     rootCtx->setContextProperty( "medialib", nullptr );
     rootCtx->setContextProperty( "toolbareditor",  this);
+    rootCtx->setContextProperty( "rootPlayer", nullptr );
 
     editorView->setSource( QUrl ( QStringLiteral("qrc:/dialogs/ToolbarEditor.qml") ) );
 
