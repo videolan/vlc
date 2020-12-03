@@ -38,6 +38,8 @@ Widgets.NavigableFocusScope {
 
     property bool forceColors: false
 
+    property var defaultSize: VLCStyle.icon_normal // default size for IconToolButton based controls
+
     property real spacing: VLCStyle.margin_normal // spacing between controls
     property real layoutSpacing: VLCStyle.margin_xlarge // spacing between layouts (left, center, and right)
 
@@ -85,6 +87,8 @@ Widgets.NavigableFocusScope {
 
         forceColors: playerButtonsLayout.forceColors
         
+        defaultSize: playerButtonsLayout.defaultSize
+
         visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
 
         navigationParent: playerButtonsLayout
@@ -108,6 +112,8 @@ Widgets.NavigableFocusScope {
         }
 
         forceColors: playerButtonsLayout.forceColors
+
+        defaultSize: playerButtonsLayout.defaultSize
 
         navigationParent: playerButtonsLayout
         navigationLeftItem: buttonrow_left
@@ -134,6 +140,8 @@ Widgets.NavigableFocusScope {
         }
 
         forceColors: playerButtonsLayout.forceColors
+
+        defaultSize: playerButtonsLayout.defaultSize
 
         visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
 

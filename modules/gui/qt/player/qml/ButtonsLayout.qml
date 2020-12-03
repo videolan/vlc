@@ -93,7 +93,7 @@ Widgets.NavigableFocusScope {
                     buttonloader.item.focus = true
 
                     if (buttonloader.item instanceof Widgets.IconToolButton)
-                        buttonloader.item.size = buttonsLayout.defaultSize
+                        buttonloader.item.size = Qt.binding(function() { return buttonsLayout.defaultSize; })
 
                     //force buttons color
                     if (buttonsLayout.forceColors) {
