@@ -84,6 +84,8 @@ Widgets.NavigableFocusScope {
                 enabled: !mainPlaylistController.empty
                 popupAlignment: Qt.AlignRight | Qt.AlignTop
 
+                focusPolicy: Qt.NoFocus
+
                 model: [
                     { text: i18n.qtr("Title"),            criteria: PlaylistControllerModel.SORT_KEY_TITLE },
                     { text: i18n.qtr("Duration"),         criteria: PlaylistControllerModel.SORT_KEY_DURATION },
@@ -102,10 +104,6 @@ Widgets.NavigableFocusScope {
                 onSortSelected: {
                     root.sortPL(modelData.criteria)
                 }
-
-                Keys.priority: Keys.AfterItem
-                Keys.onPressed: defaultKeyAction(event, 0)
-                navigationParent: playlistToolbar
 
                 _colors: playlistToolbar._colors
 

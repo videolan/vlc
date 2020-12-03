@@ -108,13 +108,16 @@ Widgets.NavigableFocusScope {
 
             button.KeyNavigation.down = list
             button.highlighted = true
+
             list.forceActiveFocus()
         }
 
         onClosed: {
             button.KeyNavigation.down = null
             button.highlighted = false
-            button.forceActiveFocus()
+
+            if (button.focusPolicy !== Qt.NoFocus)
+                button.forceActiveFocus()
         }
 
         contentItem: ListView {
