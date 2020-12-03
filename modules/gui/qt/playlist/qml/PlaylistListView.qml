@@ -455,13 +455,17 @@ Widgets.NavigableFocusScope {
                     delay: 750
                 }
 
-                delegate: Column {
+                delegate: Item {
+                    implicitWidth: plitem.width
+                    implicitHeight: childrenRect.height
 
                     Loader {
+                        anchors.top: plitem.top
+
                         active: (index === 0) // load only for the first element to prevent overlapping
                         width: parent.width
                         height: 1
-                        z: 0
+                        z: (model.selected || plitem.hovered || plitem.activeFocus) ? 2 : 1
                         sourceComponent: Rectangle {
                             color: _colors.playlistSeparator
                             opacity: _colors.isThemeDark ? 0.05 : 1.0
@@ -544,10 +548,23 @@ Widgets.NavigableFocusScope {
                         }
                     }
 
+                    Connections {
+                        target: root
+
+                        onSetItemDropIndicatorVisible: {
+                            if ((index === model.index && !top) || (index === model.index + 1 && top)) {
+                                bottomSeparator.visible = !isVisible
+                            }
+                        }
+                    }
+
                     Rectangle {
+                        id: bottomSeparator
+                        anchors.top: plitem.bottom
+
                         width: parent.width
                         height: 1
-                        z: 0
+                        z: 2
                         color: _colors.playlistSeparator
                         opacity: _colors.isThemeDark ? 0.05 : 1.0
                     }

@@ -54,8 +54,6 @@ Rectangle {
 
     height: Math.max( VLCStyle.fontHeight_normal, VLCStyle.icon_normal ) + VLCStyle.margin_xsmall
 
-    property bool dropVisible: false
-
     function showTooltip(binding) {
         plInfoTooltip.close()
         plInfoTooltip.text = Qt.binding(function() { return (textInfo.text + '\n' + textArtist.text); })
@@ -90,7 +88,7 @@ Rectangle {
                 if (top)
                 {
                     // show top drop indicator bar
-                    dropVisible = isVisible
+                    topDropIndicator.visible = isVisible
                 }
                 else
                 {
@@ -103,12 +101,13 @@ Rectangle {
 
     // top drop indicator bar
     Rectangle {
-        z: 2
+        id: topDropIndicator
+        z: 1
         width: parent.width
         height: 1
         anchors.top: parent.top
         antialiasing: true
-        visible: dropVisible
+        visible: false
         color: _colors.accent
     }
 
@@ -119,7 +118,7 @@ Rectangle {
         active: model.index === root.plmodel.count - 1
         visible: false
 
-        z: 2
+        z: 1
         width: parent.width
         height: 1
         anchors.top: parent.bottom
@@ -293,10 +292,10 @@ Rectangle {
                     if(delta === 0 || delta === -1)
                         return
 
-                    dropVisible = true
+                    root.setItemDropIndicatorVisible(model.index, true, true)
                 }
                 onExited: {
-                    dropVisible = false
+                    root.setItemDropIndicatorVisible(model.index, false, true)
                 }
                 onDropped: {
                     var delta = 1
@@ -308,7 +307,7 @@ Rectangle {
                         return
 
                     plitem.dropedMovedAt(model.index, drop)
-                    dropVisible = false
+                    root.setItemDropIndicatorVisible(model.index, false, true)
                 }
             }
 
