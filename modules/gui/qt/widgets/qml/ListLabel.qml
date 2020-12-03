@@ -22,6 +22,7 @@ import "qrc:///style/"
 Label {
     elide: Text.ElideRight
     font.pixelSize: VLCStyle.fontSize_normal
+    font.weight: Font.DemiBold
     color: VLCStyle.colors.text
     verticalAlignment: Text.AlignVCenter
 }
