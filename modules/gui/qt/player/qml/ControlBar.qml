@@ -84,7 +84,7 @@ Widgets.NavigableFocusScope {
             Layout.alignment: Qt.AlignLeft | Qt.AlignTop
             Layout.fillWidth: true
             enabled: player.playingState == PlayerController.PLAYING_STATE_PLAYING || player.playingState == PlayerController.PLAYING_STATE_PAUSED
-            Keys.onDownPressed: buttons_left.focus = true
+            Keys.onDownPressed: playerButtonsLayout.focus = true
 
             parentWindow: mainInterfaceRect
         }
@@ -92,90 +92,26 @@ Widgets.NavigableFocusScope {
         Item {
             Layout.fillWidth: true
             Layout.bottomMargin: VLCStyle.margin_xsmall
-            Layout.preferredHeight: Math.max(buttons_left.implicitHeight, buttons_center.implicitHeight, buttons_right.implicitHeight)
+            Layout.preferredHeight: playerButtonsLayout.implicitHeight
 
             PlayerButtonsLayout {
-                id: buttons_left
+                id: playerButtonsLayout
 
-                model: playerControlBarModel_left
-                forceColors: true
+                anchors {
+                    fill: parent
 
-                focus: true
-
-                anchors.left: parent.left
-
-                visible: model.count > 0 && (playerControlBarModel_center.count > 0 ? ((x+width) < buttons_center.x) : true)
-
-                navigationParent: root
-                navigationUp: function(index) {
-                    if (trackPositionSlider.enabled)
-                        trackPositionSlider.focus = true
-                    else
-                        root.navigationUp(index)
+                    leftMargin: VLCStyle.applicationHorizontalMargin
+                    rightMargin: VLCStyle.applicationHorizontalMargin
+                    bottomMargin: VLCStyle.applicationVerticalMargin
                 }
 
-                navigationRightItem: buttons_center
+                models: [playerControlBarModel_left, playerControlBarModel_center, playerControlBarModel_right]
 
-                Keys.priority: Keys.AfterItem
-                Keys.onPressed: defaultKeyAction(event, 0)
-            }
+                navigationUpItem: trackPositionSlider.enabled ? trackPositionSlider : root.navigationUpItem
 
-            PlayerButtonsLayout {
-                id: buttons_center
-
-                model: playerControlBarModel_center
                 forceColors: true
-
-                focus: true
-
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                navigationParent: root
-                navigationUp: function(index) {
-                    if (trackPositionSlider.enabled)
-                        trackPositionSlider.focus = true
-                    else
-                        root.navigationUp(index)
-                }
-
-                navigationLeftItem: buttons_left
-                navigationRightItem: buttons_right
-
-                Keys.priority: Keys.AfterItem
-                Keys.onPressed: defaultKeyAction(event, 0)
-            }
-
-            PlayerButtonsLayout {
-                id: buttons_right
-
-                model: playerControlBarModel_right
-                forceColors: true
-
-                focus: true
-
-                anchors.right: parent.right
-
-                visible: model.count > 0 && (playerControlBarModel_center.count > 0 ? ((buttons_center.x + buttons_center.width) < x)
-                                                                              : !(((buttons_left.x + buttons_left.width) > x) && playerControlBarModel_left.count > 0))
-
-                navigationParent: root
-                navigationUp: function(index) {
-                    if (trackPositionSlider.enabled)
-                        trackPositionSlider.focus = true
-                    else
-                        root.navigationUp(index)
-                }
-
-                navigationLeftItem: buttons_center
-
-                Keys.priority: Keys.AfterItem
-                Keys.onPressed: defaultKeyAction(event, 0)
             }
         }
-    }
-    Connections{
-        target: mainInterface
-        onToolBarConfUpdated: playerControlBarModel.reloadModel()
     }
 
     PlayerControlBarModel{
@@ -195,11 +131,4 @@ Widgets.NavigableFocusScope {
         mainCtx: mainctx
         configName: "MainPlayerToolbar-right"
     }
-
-    ControlButtons{
-        id:controlmodelbuttons
-
-        parentWindow: mainInterfaceRect
-    }
-
 }

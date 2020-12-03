@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2020 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,93 +15,118 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
 import QtQuick 2.11
-import QtQuick.Controls 2.4
-import QtQuick.Layouts 1.3
-import QtQml.Models 2.11
 
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
+
 Widgets.NavigableFocusScope {
     id: playerButtonsLayout
-    property alias model: buttonsRepeater.model
-    property var defaultSize: VLCStyle.icon_medium
+
+    implicitHeight: childrenRect.height
+    implicitWidth: childrenRect.width
+
+    property alias isMiniplayer: controlmodelbuttons.isMiniplayer
+    property alias parentWindow: controlmodelbuttons.parentWindow
+
+    property real marginLeft: VLCStyle.margin_normal
+    property real marginRight: VLCStyle.margin_normal
+    property real marginTop: 0
+    property real marginBottom: 0
+
     property bool forceColors: false
+    
+    property var models: [] // 0: left, 1: center, 2: right
 
-    implicitWidth: buttonrow.implicitWidth
-    implicitHeight: buttonrow.implicitHeight
+    Connections {
+        target: mainInterface
 
-    visible: model.count > 0
-
-    Keys.priority: Keys.AfterItem
-    Keys.onPressed: {
-        if (!event.accepted)
-            defaultKeyAction(event, 0)
-    }
-
-RowLayout{
-    id: buttonrow
-    property bool _focusGiven: false
-
-    anchors.fill: parent
-
-    spacing: VLCStyle.margin_normal
-
-    VLCColors {id: vlcNightColors; state: "night"}
-
-    Repeater{
-        id: buttonsRepeater
-
-        onItemRemoved: {
-            if (item.focus) {
-                buttonrow._focusGiven = false
-            }
-        }
-
-        delegate: Loader{
-            id: buttonloader
-
-            sourceComponent: controlmodelbuttons.returnbuttondelegate(model.id)
-            onLoaded: {
-                if (!buttonrow._focusGiven) {
-                    buttonloader.focus = true
-                    buttonrow._focusGiven = true
-                }
-                buttonloader.item.focus = true
-
-                if(buttonloader.item instanceof Widgets.IconToolButton)
-                    buttonloader.item.size = playerButtonsLayout.defaultSize
-
-                //force buttons color
-                if (playerButtonsLayout.forceColors) {
-                    if ( buttonloader.item._colors ) {
-                        buttonloader.item._colors = vlcNightColors
-                    }
-                    else {
-                        if ( buttonloader.item.color )
-                            buttonloader.item.color = VLCStyle.colors.playerFg
-                        if ( buttonloader.item.bgColor )
-                            buttonloader.item.bgColor = VLCStyle.colors.setColorAlpha(VLCStyle.colors.playerBg, 0.8)
-                        if ( buttonloader.item.borderColor )
-                            buttonloader.item.borderColor = VLCStyle.colors.playerBorder
-                    }
-                }
-
-                if (index > 0)
-                    buttonloader.item.KeyNavigation.left = buttonrow.children[index].item
-
-                if (buttonloader.item.navigationRight !== undefined)
-                    buttonloader.item.navigationRight = playerButtonsLayout.navigationRight
-
-                if (buttonloader.item.navigationLeft !== undefined)
-                    buttonloader.item.navigationLeft = playerButtonsLayout.navigationLeft
-            }
+        onToolBarConfUpdated: {
+            models[0].reloadModel()
+            models[1].reloadModel()
+            models[2].reloadModel()
         }
     }
-}
 
+    ControlButtons {
+        id: controlmodelbuttons
+
+        isMiniplayer: false
+        parentWindow: mainInterfaceRect
+    }
+
+    ButtonsLayout {
+        id: buttonrow_left
+
+        model: models[0]
+
+        implicitHeight: buttonrow.implicitHeight
+
+        anchors {
+            left: parent.left
+            top: parent.top
+            bottom: parent.bottom
+
+            leftMargin: playerButtonsLayout.marginLeft
+
+            topMargin: playerButtonsLayout.marginTop
+            bottomMargin: playerButtonsLayout.marginBottom
+        }
+
+        forceColors: playerButtonsLayout.forceColors
+        
+        visible: model.count > 0 && (buttonrow_center.model.count > 0 ? ((x+width) < buttonrow_center.x) : true)
+
+        navigationParent: playerButtonsLayout
+        navigationRightItem: buttonrow_center
+
+        focus: true
+    }
+
+    ButtonsLayout {
+        id: buttonrow_center
+
+        model: models[1]
+
+        anchors {
+            centerIn: parent
+
+            topMargin: playerButtonsLayout.marginTop
+            bottomMargin: playerButtonsLayout.marginBottom
+        }
+
+        forceColors: playerButtonsLayout.forceColors
+
+        navigationParent: playerButtonsLayout
+        navigationLeftItem: buttonrow_left
+        navigationRightItem: buttonrow_right
+    }
+
+    ButtonsLayout {
+        id: buttonrow_right
+
+        model: models[2]
+
+        anchors {
+            right: parent.right
+            top: parent.top
+            bottom: parent.bottom
+
+            rightMargin: playerButtonsLayout.marginRight
+
+            topMargin: playerButtonsLayout.marginTop
+            bottomMargin: playerButtonsLayout.marginBottom
+        }
+
+        forceColors: playerButtonsLayout.forceColors
+        
+        visible: model.count > 0 && (buttonrow_center.model.count > 0 ? ((buttonrow_center.x + buttonrow_center.width) < x)
+                                                                      : !(((buttonrow_left.x + buttonrow_left.width) > x) && buttonrow_center.left.count > 0))
+
+        navigationParent: playerButtonsLayout
+        navigationLeftItem: buttonrow_center
+    }
 }
