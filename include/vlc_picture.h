@@ -296,7 +296,7 @@ static inline void vlc_picture_chain_GetAndClear(vlc_picture_chain_t *in,
  */
 static inline vlc_picture_chain_t picture_GetAndResetChain(picture_t *pic)
 {
-    vlc_picture_chain_t chain = (vlc_picture_chain_t) { pic->p_next, pic->p_next };
+    vlc_picture_chain_t chain = { pic->p_next, pic->p_next };
     while ( chain.tail && chain.tail->p_next ) // find the proper tail
         chain.tail = chain.tail->p_next;
     pic->p_next = NULL;
