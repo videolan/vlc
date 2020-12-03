@@ -277,4 +277,13 @@ Widgets.NavigableFocusScope {
             }
         }
     }
+
+    EmptyLabel {
+        anchors.fill: parent
+        visible: genreModel.count === 0
+        focus: genreModel.count === 0
+        text: i18n.qtr("No genres found\nPlease try adding sources, by going to the Network tab")
+        navigationParent: root
+        cover: VLCStyle.noArtAlbumCover
+    }
 }
