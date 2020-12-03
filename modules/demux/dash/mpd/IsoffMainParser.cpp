@@ -580,7 +580,7 @@ Profile IsoffMainParser::getProfile() const
         urn = root->getAttributeValue("profile"); //The standard spells it the both ways...
 
     size_t pos;
-    size_t nextpos = -1;
+    size_t nextpos = std::string::npos;
     do
     {
         pos = nextpos + 1;
