@@ -210,6 +210,7 @@ Widgets.NavigableFocusScope {
             section.property: "title_first_symbol"
             header: root.header
             dragItem: albumDragItem
+            rowHeight: VLCStyle.tableCoverRow_height
 
             sortModel:  [
                 { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: i18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },

@@ -74,6 +74,9 @@ Item {
     property int trackListAlbumCover_width: dp(32, scale)
     property int trackListAlbumCover_heigth: dp(32, scale)
 
+    property int tableCoverRow_height: Math.max(listAlbumCover_height, fontHeight_normal) + margin_xsmall * 2
+    property int tableRow_height: fontHeight_normal + margin_small * 2
+
     property int icon_xsmall: dp(8, scale);
     property int icon_small: dp(16, scale);
     property int icon_normal: dp(32, scale);

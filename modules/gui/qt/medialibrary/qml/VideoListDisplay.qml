@@ -70,7 +70,7 @@ MainInterface.MainTableView {
 
     section.property: "title_first_symbol"
 
-    rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
+    rowHeight: VLCStyle.tableCoverRow_height
 
     headerColor: VLCStyle.colors.bg
 

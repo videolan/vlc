@@ -195,6 +195,7 @@ Widgets.NavigableFocusScope {
                 Layout.fillHeight: true
                 Layout.topMargin: VLCStyle.margin_normal
 
+                rowHeight: VLCStyle.tableRow_height
                 headerColor: VLCStyle.colors.bgAlt
 
                 parentId : root.model.id

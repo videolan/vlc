@@ -250,7 +250,7 @@ Widgets.NavigableFocusScope {
                 history.previous()
             }
 
-            rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
+            rowHeight: VLCStyle.tableCoverRow_height
 
             header: Widgets.NavigableFocusScope {
                 width: view.width

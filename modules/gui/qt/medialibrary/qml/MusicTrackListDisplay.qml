@@ -62,6 +62,7 @@ MainInterface.MainTableView {
 
     model: rootmodel
     selectionDelegateModel: selectionModel
+    rowHeight: VLCStyle.tableCoverRow_height
 
     property alias parentId: rootmodel.parentId
 

@@ -204,6 +204,7 @@ Widgets.PageLoader {
                     headerColor: VLCStyle.colors.bg
                     navigationParent: root
                     dragItem: artistsDragItem
+                    rowHeight: VLCStyle.tableCoverRow_height
 
                     onActionForSelection: {
                         if (selection.length > 1) {
