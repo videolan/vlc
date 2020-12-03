@@ -365,13 +365,11 @@ Item{
     Component{
         id: chapterPreviousBtnDelegate
         Widgets.IconToolButton {
-            id: chapterPreviousBtnDelegate
+            id: chapterPreviousBtn
             size: VLCStyle.icon_medium
-            width: visible? VLCStyle.icon_medium : 0
             iconText: VLCIcons.dvd_prev
             onClicked: player.chapterPrev()
-            visible: player.hasChapters
-            enabled: visible
+            enabled: !paintOnly && player.hasChapters
             property bool acceptFocus: visible
             text: i18n.qtr("Previous chapter")
         }
@@ -381,13 +379,11 @@ Item{
     Component{
         id: chapterNextBtnDelegate
         Widgets.IconToolButton {
-            id: chapterPreviousBtnDelegate
+            id: chapterNextBtn
             size: VLCStyle.icon_medium
-            width: visible? VLCStyle.icon_medium : 0
             iconText: VLCIcons.dvd_next
             onClicked: player.chapterNext()
-            visible: player.hasChapters
-            enabled: visible
+            enabled: !paintOnly && player.hasChapters
             property bool acceptFocus: visible
             text: i18n.qtr("Next chapter")
         }
