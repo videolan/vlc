@@ -313,7 +313,7 @@ VLC_METADATA_EXPORTS
 #define set_callbacks( activate, deactivate ) \
     set_callback(activate) \
     if (vlc_module_set(VLC_MODULE_CB_CLOSE, #deactivate, \
-                       (void (*)(vlc_object_t *)){ deactivate })) \
+                       (void (*)(vlc_object_t *))( deactivate ))) \
         goto error;
 
 #define cannot_unload_broken_library( ) \
