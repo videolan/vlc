@@ -215,7 +215,7 @@ enum vlc_module_properties
 #ifdef __PLUGIN__
 # define VLC_SYMBOL(symbol) symbol
 # define VLC_MODULE_NAME_HIDDEN_SYMBOL \
-    const char vlc_module_name[] = MODULE_STRING;
+    EXTERN_SYMBOL const char vlc_module_name[] = MODULE_STRING;
 #else
 # define VLC_SYMBOL(symbol)  CONCATENATE(symbol, MODULE_NAME)
 # define VLC_MODULE_NAME_HIDDEN_SYMBOL
