@@ -37,7 +37,10 @@ Widgets.NavigableFocusScope {
     property real marginBottom: 0
 
     property bool forceColors: false
-    
+
+    property real spacing: VLCStyle.margin_normal // spacing between controls
+    property real layoutSpacing: VLCStyle.margin_xlarge // spacing between layouts (left, center, and right)
+
     enum Alignment {
         Left = 0,
         Center = 1,
@@ -68,15 +71,16 @@ Widgets.NavigableFocusScope {
 
         model: models[PlayerButtonsLayout.Alignment.Left]
 
-        extraWidth: (buttonrow_center.x - buttonrow_left.x - minimumWidth)
+        extraWidth: (buttonrow_center.x - buttonrow_left.x - minimumWidth - layoutSpacing)
 
         anchors {
             left: parent.left
             verticalCenter: parent.verticalCenter
 
-            leftMargin: playerButtonsLayout.marginLeft
-            topMargin: playerButtonsLayout.marginTop
-            bottomMargin: playerButtonsLayout.marginBottom
+            leftMargin: marginLeft
+            topMargin: marginTop
+            bottomMargin: marginBottom
+            rightMargin: layoutSpacing
         }
 
         forceColors: playerButtonsLayout.forceColors
@@ -87,6 +91,8 @@ Widgets.NavigableFocusScope {
         navigationRightItem: buttonrow_center
 
         focus: true
+
+        spacing: playerButtonsLayout.spacing
     }
 
     ButtonsLayout {
@@ -106,6 +112,8 @@ Widgets.NavigableFocusScope {
         navigationParent: playerButtonsLayout
         navigationLeftItem: buttonrow_left
         navigationRightItem: buttonrow_right
+
+        spacing: playerButtonsLayout.spacing
     }
 
     ButtonsLayout {
@@ -113,15 +121,16 @@ Widgets.NavigableFocusScope {
 
         model: models[PlayerButtonsLayout.Alignment.Right]
 
-        extraWidth: (playerButtonsLayout.width - (buttonrow_center.x + buttonrow_center.width) - minimumWidth)
+        extraWidth: (playerButtonsLayout.width - (buttonrow_center.x + buttonrow_center.width) - minimumWidth - (2 * layoutSpacing))
 
         anchors {
             right: parent.right
             verticalCenter: parent.verticalCenter
 
-            rightMargin: playerButtonsLayout.marginRight
-            topMargin: playerButtonsLayout.marginTop
-            bottomMargin: playerButtonsLayout.marginBottom
+            rightMargin: marginRight
+            topMargin: marginTop
+            bottomMargin: marginBottom
+            leftMargin: layoutSpacing
         }
 
         forceColors: playerButtonsLayout.forceColors
@@ -130,5 +139,7 @@ Widgets.NavigableFocusScope {
 
         navigationParent: playerButtonsLayout
         navigationLeftItem: buttonrow_center
+
+        spacing: playerButtonsLayout.spacing
     }
 }

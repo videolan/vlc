@@ -32,9 +32,12 @@ Widgets.NavigableFocusScope {
     property var defaultSize: VLCStyle.icon_normal
     property bool forceColors: false
 
-    property real minimumWidth: 0
+    property real _minimumWidth: 0 // minimumWidth without spacing (minimumWidth of all controls inside)
+    property real minimumWidth: _minimumWidth + ((buttonsRepeater.count - 1) * buttonrow.spacing) // minimumWidth with spacing
     property real extraWidth: undefined
     property int expandableCount: 0 // widget count that can expand when extra width is available
+
+    property alias spacing: buttonrow.spacing
 
     implicitWidth: buttonrow.implicitWidth
     implicitHeight: buttonrow.implicitHeight
@@ -72,9 +75,9 @@ Widgets.NavigableFocusScope {
                     buttonsLayout.expandableCount--
 
                 if (item.item.minimumWidth !== undefined)
-                    buttonsLayout.minimumWidth -= item.item.minimumWidth + buttonrow.spacing
+                    buttonsLayout._minimumWidth -= item.item.minimumWidth
                 else
-                    buttonsLayout.minimumWidth -= item.item.width + buttonrow.spacing
+                    buttonsLayout._minimumWidth -= item.item.width
             }
 
             delegate: Loader {
@@ -117,9 +120,9 @@ Widgets.NavigableFocusScope {
                         buttonloader.item.navigationLeft = buttonsLayout.navigationLeft
 
                     if (buttonloader.item.minimumWidth !== undefined)
-                        buttonsLayout.minimumWidth += buttonloader.item.minimumWidth + buttonrow.spacing
+                        buttonsLayout._minimumWidth += buttonloader.item.minimumWidth
                     else
-                        buttonsLayout.minimumWidth += buttonloader.item.width + buttonrow.spacing
+                        buttonsLayout._minimumWidth += buttonloader.item.width
 
                     if (buttonloader.item.extraWidth !== undefined && buttonsLayout.extraWidth !== undefined) {
                         buttonsLayout.expandableCount++
