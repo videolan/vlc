@@ -69,6 +69,7 @@ struct aout_stream
     void (*play)(aout_stream_t *, block_t *, vlc_tick_t);
     void (*pause)(aout_stream_t *, bool, vlc_tick_t);
     void (*flush)(aout_stream_t *);
+    void (*drain)(aout_stream_t *);
     void (*volume_set)(aout_stream_t *, float volume);
     void (*mute_set)(aout_stream_t *, bool mute);
 
@@ -79,6 +80,12 @@ static inline void
 aout_stream_GainRequest(aout_stream_t *s, float gain)
 {
     aout_GainRequest(s->aout, gain);
+}
+
+static inline
+void aout_stream_DrainedReport(aout_stream_t *s)
+{
+    aout_DrainedReport(s->aout);
 }
 
 typedef int (*aout_stream_start)(aout_stream_t *s, audio_sample_format_t *fmt,

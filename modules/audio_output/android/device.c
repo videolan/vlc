@@ -70,6 +70,16 @@ struct sys {
     float volume;
 };
 
+static void
+Drain(audio_output_t *aout)
+{
+    struct sys *sys = aout->sys;
+    assert(sys->stream != NULL);
+    assert(sys->stream->drain != NULL);
+
+    sys->stream->drain(sys->stream);
+}
+
 static int
 Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
@@ -98,6 +108,8 @@ Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
             assert(s->stop != NULL && s->time_get != NULL && s->play != NULL &&
                    s->pause != NULL && s->flush != NULL);
+
+            aout->drain = s->drain != NULL ? Drain : NULL;
 
             if (s->volume_set != NULL)
                 s->volume_set(s, sys->volume);
@@ -260,6 +272,7 @@ Open(vlc_object_t *obj)
     aout->play = Play;
     aout->pause = Pause;
     aout->flush = Flush;
+    aout->drain = NULL;
     aout->time_get = TimeGet;
     aout->device_select = DeviceSelect;
     aout->volume_set = VolumeSet;
