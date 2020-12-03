@@ -182,7 +182,7 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
         if(playlist->timeShiftBufferDepth.Get())
         {
             stime_t edgetime;
-            bool b_ret = timeline->getScaledPlaybackTimeDurationBySegmentNumber(timeline->maxElementNumber(),
+            b_ret = timeline->getScaledPlaybackTimeDurationBySegmentNumber(timeline->maxElementNumber(),
                                                                                 &edgetime, &duration);
             if(unlikely(!b_ret))
                 return 0;
