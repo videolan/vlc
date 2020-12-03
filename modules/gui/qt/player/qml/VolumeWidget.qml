@@ -82,12 +82,15 @@ FocusScope{
 
             Accessible.name: i18n.qtr("Volume")
 
+            Keys.onPressed: {
+                if (KeyHelper.matchOk(event)) {
+                    event.accepted = true
+                }
+            }
+
             Keys.onReleased: {
-                if (event.accepted)
-                    return;
                 if (KeyHelper.matchOk(event)) {
                     player.muted = !player.muted
-                    event.accepted = true
                 }
             }
 
