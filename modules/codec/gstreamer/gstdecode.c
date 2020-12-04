@@ -496,7 +496,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Get the list of all the available gstreamer decoders */
     p_list = gst_element_factory_list_get_elements(
             GST_ELEMENT_FACTORY_TYPE_DECODER, GST_RANK_MARGINAL );
-    VLC_GST_CHECK( p_list, NULL, "no decoder list found", VLC_ENOMOD );
     if( !dbin )
     {
         GList *p_l;
