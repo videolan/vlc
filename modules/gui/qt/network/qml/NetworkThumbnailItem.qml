@@ -40,6 +40,7 @@ Item {
     Rectangle {
         id: background
 
+        anchors.verticalCenter: parent.verticalCenter
         color: VLCStyle.colors.bg
         width: VLCStyle.listAlbumCover_width
         height: VLCStyle.listAlbumCover_height
@@ -56,7 +57,7 @@ Item {
         id: artwork
 
         x: (width - paintedWidth) / 2
-        y: (height - paintedHeight) / 2
+        y: (parent.height - paintedHeight) / 2
         width: VLCStyle.listAlbumCover_width
         height: VLCStyle.listAlbumCover_height
         fillMode: Image.PreserveAspectFit
