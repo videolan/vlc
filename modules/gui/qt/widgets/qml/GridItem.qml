@@ -339,7 +339,7 @@ FocusScope {
                     width: titleLabel.width
                     visible: root.title !== ""
 
-                    Widgets.MenuLabel {
+                    Widgets.ListLabel {
                         id: titleLabel
 
                         elide: Text.ElideNone
