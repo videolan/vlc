@@ -69,7 +69,8 @@ NavigableFocusScope {
 
     property var selectionDelegateModel
     property real rowHeight: VLCStyle.tableRow_height
-    readonly property real availableRowWidth: width - ( VLCStyle.table_section_width * 2 )
+    readonly property real availableRowWidth: width
+                                              - ( !!section.property ? VLCStyle.table_section_width * 2 : 0 )
     property alias spacing: view.spacing
     property int horizontalSpacing: VLCStyle.column_margin_width
 
