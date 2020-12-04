@@ -502,8 +502,6 @@ static int OpenDecoder( vlc_object_t *p_this )
         GList *p_l;
         /* Sort them as per ranks */
         p_list = g_list_sort( p_list, gst_plugin_feature_rank_compare_func );
-        VLC_GST_CHECK( p_list, NULL, "failed to sort decoders list",
-                VLC_ENOMOD );
         p_l = g_list_find_custom( p_list, &caps, find_decoder_func );
         VLC_GST_CHECK( p_l, NULL, "no suitable decoder found",
                 VLC_ENOMOD );
