@@ -530,8 +530,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Queue: GStreamer thread will dump buffers into this queue,
      * DecodeBlock() will pop out the buffers from the queue */
     p_sys->p_que = gst_atomic_queue_new( 0 );
-    VLC_GST_CHECK( p_sys->p_que, NULL, "failed to create queue",
-            VLC_ENOMEM );
 
     p_sys->p_decode_src = gst_element_factory_make( "appsrc", NULL );
     VLC_GST_CHECK( p_sys->p_decode_src, NULL, "appsrc not found",
