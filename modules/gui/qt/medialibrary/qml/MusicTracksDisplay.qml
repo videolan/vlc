@@ -21,6 +21,7 @@ import org.videolan.medialib 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
+import "qrc:///main/" as MainInterface
 
 Widgets.NavigableFocusScope {
     id: root
@@ -61,6 +62,8 @@ Widgets.NavigableFocusScope {
                 defaultNavigationCancel()
             else
                 tracklistdisplay_id.currentIndex = 0;
+        }
+        footer: MainInterface.MiniPlayerBottomMargin {
         }
     }
 
