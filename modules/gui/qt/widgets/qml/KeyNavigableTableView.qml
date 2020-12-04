@@ -69,8 +69,10 @@ NavigableFocusScope {
 
     property var selectionDelegateModel
     property real rowHeight: VLCStyle.tableRow_height
+    readonly property int _contextButtonHorizontalSpace: VLCStyle.icon_normal + VLCStyle.margin_xxsmall * 2
     readonly property real availableRowWidth: width
                                               - ( !!section.property ? VLCStyle.table_section_width * 2 : 0 )
+                                              - _contextButtonHorizontalSpace
     property alias spacing: view.spacing
     property int horizontalSpacing: VLCStyle.column_margin_width
 
@@ -140,6 +142,7 @@ NavigableFocusScope {
                         leftMargin: VLCStyle.margin_xxxsmall
                         rightMargin: VLCStyle.margin_xxxsmall
                         horizontalCenter: parent.horizontalCenter
+                        horizontalCenterOffset: - root._contextButtonHorizontalSpace / 2
                     }
                     height: implicitHeight
                     topPadding: root.headerTopPadding
@@ -264,6 +267,7 @@ NavigableFocusScope {
                         leftMargin: VLCStyle.margin_xxxsmall
                         rightMargin: VLCStyle.margin_xxxsmall
                         horizontalCenter: parent.horizontalCenter
+                        horizontalCenterOffset: - root._contextButtonHorizontalSpace / 2
                         top: parent.top
                         bottom: parent.bottom
                     }
@@ -299,9 +303,9 @@ NavigableFocusScope {
                 }
 
                 Widgets.ContextButton {
-                    anchors.right: content.right
-                    anchors.top: content.top
-                    anchors.bottom: content.bottom
+                    anchors.left: content.right
+                    anchors.leftMargin: VLCStyle.margin_xxsmall
+                    anchors.verticalCenter: content.verticalCenter
                     backgroundColor: hovered || activeFocus ?
                                          VLCStyle.colors.getBgColor( lineView.selected, hovered,
                                                                      activeFocus ) : "transparent"
