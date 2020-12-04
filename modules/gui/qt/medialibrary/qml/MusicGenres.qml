@@ -263,6 +263,7 @@ Widgets.NavigableFocusScope {
             navigationParent: root
             dragItem: genreDragItem
             rowHeight: VLCStyle.tableCoverRow_height
+            headerTopPadding: VLCStyle.margin_normal
 
             sortModel:  [
                 { isPrimary: true, criteria: "cover", width: VLCStyle.listAlbumCover_width, headerDelegate: thumbnailHeader, colDelegate: thumbnailColumn },

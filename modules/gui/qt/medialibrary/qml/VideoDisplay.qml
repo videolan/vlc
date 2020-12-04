@@ -177,6 +177,7 @@ Widgets.NavigableFocusScope {
             model: videoModel
             dragItem: videoDragItem
             navigationParent: root
+            headerTopPadding: VLCStyle.margin_normal
 
             selectionDelegateModel: selectionModel
 

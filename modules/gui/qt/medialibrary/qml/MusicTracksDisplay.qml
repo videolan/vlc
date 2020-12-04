@@ -56,6 +56,7 @@ Widgets.NavigableFocusScope {
         visible: model.count > 0
         focus: visible
         dragItem: trackDragItem
+        headerTopPadding: VLCStyle.margin_normal
         navigationParent: root
         navigationCancel: function() {
             if (tracklistdisplay_id.currentIndex <= 0)

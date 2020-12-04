@@ -205,6 +205,7 @@ Widgets.PageLoader {
                     navigationParent: root
                     dragItem: artistsDragItem
                     rowHeight: VLCStyle.tableCoverRow_height
+                    headerTopPadding: VLCStyle.margin_normal
 
                     onActionForSelection: {
                         if (selection.length > 1) {
