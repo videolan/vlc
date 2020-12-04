@@ -241,6 +241,7 @@
         <file alias="LocalTabBar.qml">widgets/qml/LocalTabBar.qml</file>
         <file alias="IconButton.qml">widgets/qml/IconButton.qml</file>
         <file alias="DragItem.qml">widgets/qml/DragItem.qml</file>
+        <file alias="CoverShadow.qml">widgets/qml/CoverShadow.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>

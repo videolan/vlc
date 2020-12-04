@@ -695,6 +695,7 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/CheckedDelegate.qml \
 	gui/qt/widgets/qml/ComboBoxExt.qml \
 	gui/qt/widgets/qml/ContextButton.qml \
+	gui/qt/widgets/qml/CoverShadow.qml \
 	gui/qt/widgets/qml/CSDWindowButton.qml \
 	gui/qt/widgets/qml/CSDWindowButtonSet.qml \
 	gui/qt/widgets/qml/CSDTitlebarTapNDrapHandler.qml \
