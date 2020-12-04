@@ -356,6 +356,7 @@ FocusScope {
                     visible: text !== ""
                     text: root.subtitle
                     width: pictureWidth
+                    topPadding: VLCStyle.margin_xsmall
                     color: selectionRect.visible
                            ? VLCStyle.colors.setColorAlpha(VLCStyle.colors.bgHoverText, .6)
                            : VLCStyle.colors.menuCaption
