@@ -65,13 +65,6 @@ FocusScope {
 
     readonly property int selectedBorderWidth: VLCStyle.column_margin_width - ( VLCStyle.margin_small * 2 )
 
-    property alias _primaryShadowVerticalOffset: primaryShadow.verticalOffset
-    property alias _primaryShadowRadius: primaryShadow.radius
-    property alias _primaryShadowSamples: primaryShadow.samples
-    property alias _secondaryShadowVerticalOffset: secondaryShadow.verticalOffset
-    property alias _secondaryShadowRadius: secondaryShadow.radius
-    property alias _secondaryShadowSamples: secondaryShadow.samples
-
     property int _newIndicatorMedian: VLCStyle.margin_xsmall
     property int _modifiersOnLastPress: Qt.NoModifier
 
@@ -79,27 +72,37 @@ FocusScope {
     states: [
         State {
             name: "unselected"
+
+            PropertyChanges {
+                target: shadow
+                primaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
+                primaryRadius: VLCStyle.dp(14, VLCStyle.scale)
+                primarySamples: 1 + VLCStyle.dp(14, VLCStyle.scale) * 2
+                secondaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
+                secondaryRadius: VLCStyle.dp(3, VLCStyle.scale)
+                secondarySamples: 1 + VLCStyle.dp(3, VLCStyle.scale) * 2
+            }
+
             PropertyChanges {
                 target: root
-                _primaryShadowVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-                _primaryShadowRadius: VLCStyle.dp(14, VLCStyle.scale)
-                _primaryShadowSamples: 1 + VLCStyle.dp(14, VLCStyle.scale) * 2
-                _secondaryShadowVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
-                _secondaryShadowRadius: VLCStyle.dp(3, VLCStyle.scale)
-                _secondaryShadowSamples: 1 + VLCStyle.dp(3, VLCStyle.scale) * 2
                 _newIndicatorMedian: VLCStyle.margin_xsmall
             }
         },
         State {
             name: "selected"
+
+            PropertyChanges {
+                target: shadow
+                primaryVerticalOffset: VLCStyle.dp(32, VLCStyle.scale)
+                primaryRadius: VLCStyle.dp(72, VLCStyle.scale)
+                primarySamples: 1 + VLCStyle.dp(72, VLCStyle.scale) * 2
+                secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
+                secondaryRadius: VLCStyle.dp(8, VLCStyle.scale)
+                secondarySamples: 1 + VLCStyle.dp(8, VLCStyle.scale) * 2
+            }
+
             PropertyChanges {
                 target: root
-                _primaryShadowVerticalOffset: VLCStyle.dp(32, VLCStyle.scale)
-                _primaryShadowRadius: VLCStyle.dp(72, VLCStyle.scale)
-                _primaryShadowSamples: 1 + VLCStyle.dp(72, VLCStyle.scale) * 2
-                _secondaryShadowVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-                _secondaryShadowRadius: VLCStyle.dp(8, VLCStyle.scale)
-                _secondaryShadowSamples: 1 + VLCStyle.dp(8, VLCStyle.scale) * 2
                 _newIndicatorMedian: VLCStyle.margin_small
             }
         }
@@ -107,14 +110,16 @@ FocusScope {
 
     transitions: Transition {
         to: "*"
+
         SequentialAnimation {
             PropertyAction {
-                properties: "_primaryShadowSamples,_secondaryShadowSamples"
+                properties: "primarySamples,secondarySamples"
             }
 
             SmoothedAnimation {
                 duration: 64
-                properties: "_primaryShadowVerticalOffset,_primaryShadowRadius,_secondaryShadowVerticalOffset,_secondaryShadowRadius,_newIndicatorMedian"
+                properties: "primaryVerticalOffset,primaryRadius,secondaryVerticalOffset,secondaryRadius,_newIndicatorMedian"
+                easing.type: Easing.InOutSine
             }
         }
     }
@@ -196,24 +201,11 @@ FocusScope {
                 color: VLCStyle.colors.bg
             }
 
-            DropShadow {
-                id: primaryShadow
+            CoverShadow {
+                id: shadow
 
-                anchors.fill: baseRect
                 source: baseRect
-                horizontalOffset: 0
-                spread: 0
-                color: Qt.rgba(0, 0, 0, .22)
-            }
-
-            DropShadow {
-                id: secondaryShadow
-
                 anchors.fill: baseRect
-                source: baseRect
-                horizontalOffset: 0
-                spread: 0
-                color: Qt.rgba(0, 0, 0, .18)
             }
 
             Column {
