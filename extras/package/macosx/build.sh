@@ -123,7 +123,11 @@ if [ "$QUIET" = "yes" ]; then
     out="/dev/null"
 fi
 
-info "Building VLC for the Mac OS X"
+BUILD_TRIPLET=$BUILD_ARCH-apple-darwin$OSX_KERNELVERSION
+HOST_TRIPLET=$ARCH-apple-darwin$OSX_KERNELVERSION
+ACTUAL_ARCH=`get_actual_arch $ARCH`
+
+info "Building VLC for macOS for architecture ${ACTUAL_ARCH} on a ${BUILD_ARCH} device"
 
 spushd `dirname $0`/../../..
 vlcroot=`pwd`
@@ -132,10 +136,6 @@ spopd
 builddir=`pwd`
 
 info "Building in \"$builddir\""
-
-BUILD_TRIPLET=$BUILD_ARCH-apple-darwin$OSX_KERNELVERSION
-HOST_TRIPLET=$ARCH-apple-darwin$OSX_KERNELVERSION
-ACTUAL_ARCH=`get_actual_arch $ARCH`
 
 python3Path=$(echo /Library/Frameworks/Python.framework/Versions/3.*/bin | awk '{print $1;}')
 if [ ! -d "$python3Path" ]; then
@@ -152,7 +152,6 @@ export STRINGS="`xcrun --find strings`"
 export STRIP="`xcrun --find strip`"
 export SDKROOT
 export PATH="${vlcroot}/extras/tools/build/bin:${vlcroot}/contrib/${TRIPLET}/bin:$python3Path:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
-
 
 # Select avcodec flavor to compile contribs with
 export USE_FFMPEG=1
@@ -310,7 +309,6 @@ if [ "${vlcroot}/configure" -nt Makefile ]; then
       $VLC_CONFIGURE_ARGS > $out
 fi
 
-
 #
 # make
 #
@@ -325,7 +323,6 @@ make -j$JOBS
 
 info "Preparing VLC.app"
 make VLC.app
-
 
 if [ "$PACKAGETYPE" = "u" ]; then
     info "Copying app with debug symbols into VLC-debug.app and stripping"
