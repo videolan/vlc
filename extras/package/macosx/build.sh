@@ -63,6 +63,14 @@ get_actual_arch() {
     fi
 }
 
+get_buildsystem_arch() {
+    if [ "$1" = "arm64" ]; then
+        echo "aarch64"
+    else
+        echo "$1"
+    fi
+}
+
 while getopts "hvrcpi:k:a:j:C:b:" OPTION
 do
      case $OPTION in
@@ -123,9 +131,10 @@ if [ "$QUIET" = "yes" ]; then
     out="/dev/null"
 fi
 
+ACTUAL_ARCH=`get_actual_arch $ARCH`
+BUILD_ARCH=`get_buildsystem_arch $BUILD_ARCH`
 BUILD_TRIPLET=$BUILD_ARCH-apple-darwin$OSX_KERNELVERSION
 HOST_TRIPLET=$ARCH-apple-darwin$OSX_KERNELVERSION
-ACTUAL_ARCH=`get_actual_arch $ARCH`
 
 info "Building VLC for macOS for architecture ${ACTUAL_ARCH} on a ${BUILD_ARCH} device"
 
