@@ -4,14 +4,11 @@
 #
 # Translators:
 # Abdulrahman Alothaim <ar.alothaim@gmail.com>, 2013
-# ahmed salah <kimoa196@gmail.com>, 2016
+# Ahmed Salah <kimoa196@gmail.com>, 2016
 # Albatul hamad <Suprgirl96@gmail.com>, 2014
-# Ali_Alshaya, 2013
-# Ammar Salem <amar_s1414@hotmail.com>, 2016
-# Faissal Chamekh <chamfay@gmail.com>, 2014
+# Ammar Salem <amar_s1414@hotmail.com>, 2016, 2020
 # Bourai Fouzia <bouraifouzia@hotmail.com>, 2006
-# free_voice <free8voice@gmail.com>, 2014
-# Abdulrahman Alothaim <ar.alothaim@gmail.com>, 2013
+# Faissal Chamekh <chamfay@gmail.com>, 2014
 # Islam Ouahouda <iouahouda@gmail.com>, 2014
 # Khaled Hosny <khaledhosny@eglug.org>, 2016
 # Mohammed bin Suleiman Alkindi <salkindi2009@hotmail.com>, 2015, 2019
@@ -29,9 +26,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-12-23 15:13+0100\n"
-"Last-Translator: Mohammed bin Suleiman Alkindi <salkindi2009@hotmail.com>, "
-"2019\n"
+"PO-Revision-Date: 2020-12-06 09:13+0100\n"
+"Last-Translator: Ammar Salem <amar_s1414@hotmail.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/yaron/teams/16553/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -201,6 +197,7 @@ msgstr "الترجمات/العرض على الشاشة"
 msgid ""
 "Settings related to On-Screen-Display, subtitles and \"overlay subpictures\""
 msgstr ""
+"الإعدادات المرتبطة بالمعروضات على الشاشة، و الترجمة، و أغطية الصور الفرعية"
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
@@ -257,6 +254,7 @@ msgstr "مرمازات الڤديو"
 #: include/vlc_config_cat.h:116
 msgid "Settings for the video, images or video+audio decoders and encoders."
 msgstr ""
+"إعدادات الفيديو، أو الصور، أو مرمزات أو ترميز وفك ترميز الفيديو + الصوت."
 
 #: include/vlc_config_cat.h:118
 msgid "Audio codecs"
@@ -660,7 +658,7 @@ msgstr "طيف"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "حجم الوحدة المترية"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -682,7 +680,7 @@ msgstr "أُحادي"
 
 #: src/audio_output/output.c:425
 msgid "Original"
-msgstr ""
+msgstr "أصلي"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -838,11 +836,11 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr ""
+msgstr " (الافتراضي مفعّل)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr ""
+msgstr "(الافتراضي معطّل)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -946,7 +944,7 @@ msgstr "فك الشفرة"
 #: modules/codec/avcodec/encoder.c:371 modules/codec/avcodec/encoder.c:905
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
-msgstr ""
+msgstr "فشل التدفق / تحويل الترميز"
 
 #: src/input/decoder.c:1918
 #, c-format
@@ -990,7 +988,7 @@ msgstr "نعم"
 #: src/input/es_out.c:2141
 #, c-format
 msgid "DTVCC Closed captions %u"
-msgstr ""
+msgstr "DTVCC المسميات التوضيحية المغلقة %u"
 
 #: src/input/es_out.c:2143
 #, c-format
@@ -1104,11 +1102,11 @@ msgstr "أعلى اليسار"
 
 #: src/input/es_out.c:3199
 msgid "Left top"
-msgstr ""
+msgstr "أعلى اليسار"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr ""
+msgstr "أسفل اليمين"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
@@ -1124,11 +1122,11 @@ msgstr "أدنى اليمين"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
-msgstr ""
+msgstr "أسفل اليسار"
 
 #: src/input/es_out.c:3202
 msgid "Right top"
-msgstr ""
+msgstr "أعلى اليمين"
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
@@ -1142,15 +1140,15 @@ msgstr "غير معرف"
 
 #: src/input/es_out.c:3212
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 سطر, 60 هِرتز)"
 
 #: src/input/es_out.c:3214
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 سطر, 50 هِرتز)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
-msgstr ""
+msgstr "الألوان الأولية"
 
 #: src/input/es_out.c:3229 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1159,7 +1157,7 @@ msgstr "خطي"
 
 #: src/input/es_out.c:3236
 msgid "Hybrid Log-Gamma"
-msgstr ""
+msgstr "هجين سجل-جاما"
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
@@ -1176,7 +1174,7 @@ msgstr "النطاق %s"
 
 #: src/input/es_out.c:3255
 msgid "Full"
-msgstr ""
+msgstr "كامل"
 
 #: src/input/es_out.c:3262 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1207,7 +1205,7 @@ msgstr "أدنى الوسط"
 
 #: src/input/es_out.c:3270
 msgid "Chroma location"
-msgstr ""
+msgstr "موقع الكروما"
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
