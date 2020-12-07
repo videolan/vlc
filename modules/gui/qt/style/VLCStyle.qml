@@ -71,8 +71,10 @@ Item {
 
     property int listAlbumCover_height: dp(32, scale)
     property int listAlbumCover_width: listAlbumCover_height * 16.0/9
+    property int listAlbumCover_radius: dp(3, scale)
     property int trackListAlbumCover_width: dp(32, scale)
     property int trackListAlbumCover_heigth: dp(32, scale)
+    property int trackListAlbumCover_radius: dp(2, scale)
 
     property int tableCoverRow_height: Math.max(listAlbumCover_height, fontHeight_normal) + margin_xsmall * 2
     property int tableRow_height: fontHeight_normal + margin_small * 2
