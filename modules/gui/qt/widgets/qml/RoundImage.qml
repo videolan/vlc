@@ -21,19 +21,36 @@ import QtGraphicalEffects 1.0
 
 import "qrc:///style/"
 
-Image {
-    id: cover
-    asynchronous: true
+Item {
+    id: root
+
     property real radius: 3
-    fillMode: Image.PreserveAspectCrop
-    sourceSize: Qt.size(width, height)
-    layer.enabled: true
-    layer.effect: OpacityMask {
-        maskSource: Rectangle {
-            radius: cover.radius
-            width: cover.width
-            height: cover.height
-            visible: false
+    property alias asynchronous: cover.asynchronous
+    property alias fillMode: cover.fillMode
+    property alias mipmap: cover.mipmap
+    property alias paintedHeight: cover.paintedHeight
+    property alias paintedWidth: cover.paintedWidth
+    property alias source: cover.source
+    property alias sourceSize: cover.sourceSize
+    property alias status: cover.status
+    property alias horizontalAlignment: cover.horizontalAlignment
+    property alias verticalAlignment: cover.verticalAlignment
+
+    Image {
+        id: cover
+
+        anchors.fill: parent
+        asynchronous: true
+        fillMode: Image.PreserveAspectCrop
+        sourceSize: Qt.size(width, height)
+        layer.enabled: true
+        layer.effect: OpacityMask {
+            maskSource: Rectangle {
+                radius: root.radius
+                width: root.width
+                height: root.height
+                visible: false
+            }
         }
     }
 }
