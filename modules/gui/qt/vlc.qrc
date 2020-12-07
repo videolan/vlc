@@ -242,6 +242,7 @@
         <file alias="IconButton.qml">widgets/qml/IconButton.qml</file>
         <file alias="DragItem.qml">widgets/qml/DragItem.qml</file>
         <file alias="CoverShadow.qml">widgets/qml/CoverShadow.qml</file>
+        <file alias="ListCoverShadow.qml">widgets/qml/ListCoverShadow.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>

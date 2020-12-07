@@ -714,6 +714,7 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/KeyNavigableListView.qml \
 	gui/qt/widgets/qml/KeyNavigableTableView.qml \
 	gui/qt/widgets/qml/LabelSeparator.qml \
+	gui/qt/widgets/qml/ListCoverShadow.qml \
 	gui/qt/widgets/qml/ListItem.qml \
 	gui/qt/widgets/qml/ListLabel.qml \
 	gui/qt/widgets/qml/LocalTabBar.qml \
