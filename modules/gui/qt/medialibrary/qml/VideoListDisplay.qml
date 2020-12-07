@@ -29,41 +29,10 @@ import "qrc:///style/"
 MainInterface.MainTableView {
     id: listView_id
 
-    property Component thumbnailHeader: Item {
-        Widgets.IconLabel {
-            height: VLCStyle.listAlbumCover_height
-            width: VLCStyle.listAlbumCover_width
-            horizontalAlignment: Text.AlignHCenter
-            text: VLCIcons.album_cover
-            color: VLCStyle.colors.caption
-        }
-    }
-
-    property Component thumbnailColumn: Item {
-
-        property var rowModel: parent.rowModel
-        property var model: parent.colModel
-        readonly property bool currentlyFocused: parent.currentlyFocused
-        readonly property bool containsMouse: parent.containsMouse
-
-        Widgets.MediaCover {
-            anchors.verticalCenter: parent.verticalCenter
-            source: ( !rowModel ? undefined : rowModel[model.criteria] ) || VLCStyle.noArtCover
-            playCoverVisible: currentlyFocused || containsMouse
-            playIconSize: VLCStyle.play_cover_small
-            onPlayIconClicked:  medialib.addAndPlay( rowModel.id )
-            labels: [
-                !rowModel ? "" : rowModel.resolution_name,
-                !rowModel ? "" : rowModel.channel
-            ].filter(function(a) { return a !== "" } )
-        }
-
-    }
-
     readonly property int _nbCols: VLCStyle.gridColumnsForWidth(listView_id.availableRowWidth)
 
     sortModel: [
-        { type: "image", criteria: "thumbnail", width: VLCStyle.colWidth(1), showSection: "", colDelegate: thumbnailColumn, headerDelegate: thumbnailHeader },
+        { type: "image", criteria: "thumbnail", width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
         { isPrimary: true, criteria: "title",   width: VLCStyle.colWidth(Math.max(listView_id._nbCols - 2, 1)), text: i18n.qtr("Title"),    showSection: "title" },
         { criteria: "duration_short",            width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate, showContextButton: true },
     ]
@@ -78,5 +47,16 @@ MainInterface.MainTableView {
 
     Widgets.TableColumns {
         id: tableColumns
+
+        showTitleText: false
+        titleCover_height: VLCStyle.listAlbumCover_height
+        titleCover_width: VLCStyle.listAlbumCover_width
+        titleCover_radius: VLCStyle.listAlbumCover_radius
+
+        function titlecoverLabels(model) {
+            return [!model ? "" : model.resolution_name
+                    , model ? "" : model.channel
+                    ].filter(function(a) { return a !== "" })
+        }
     }
 }
