@@ -23,6 +23,17 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 Item {
+    id: root
+
+    property bool showTitleText: true
+    property int titleCover_width: VLCStyle.trackListAlbumCover_width
+    property int titleCover_height: VLCStyle.trackListAlbumCover_heigth
+    property int titleCover_radius: VLCStyle.trackListAlbumCover_radius
+
+    function titlecoverLabels(model) {
+        // implement this function to show labels in title Cover
+        return []
+    }
 
     property Component titleDelegate: RowLayout {
         property var rowModel: parent.rowModel
@@ -33,24 +44,22 @@ Item {
         anchors.fill: parent
         spacing: VLCStyle.margin_normal
 
-        Image {
-            source: !rowModel ? VLCStyle.noArtCover : (rowModel.cover || VLCStyle.noArtCover)
+        Widgets.MediaCover {
+            source: ( !rowModel || root.showTitleText ? rowModel.cover : rowModel[model.criteria]) || VLCStyle.noArtCover
             mipmap: true // this widget can down scale the source a lot, so for better visuals we use mipmap
+            playCoverVisible: currentlyFocused || containsMouse
+            playIconSize: VLCStyle.play_cover_small
+            onPlayIconClicked: medialib.addAndPlay( rowModel.id )
+            radius: root.titleCover_radius
+            labels: root.titlecoverLabels(rowModel)
 
-            Layout.preferredHeight: VLCStyle.trackListAlbumCover_heigth
-            Layout.preferredWidth: VLCStyle.trackListAlbumCover_width
-
-            Widgets.PlayCover {
-                anchors.fill: parent
-                iconSize: VLCStyle.play_cover_small
-                visible: currentlyFocused || containsMouse
-
-                onIconClicked: medialib.addAndPlay( rowModel.id )
-            }
+            Layout.preferredHeight: root.titleCover_height
+            Layout.preferredWidth: root.titleCover_width
         }
 
         Widgets.ListLabel {
-            text: !rowModel ? "" : (rowModel[model.criteria] || i18n.qtr("Unknown Title"))
+            text: (!rowModel || !root.showTitleText) ? "" : (rowModel[model.criteria] || i18n.qtr("Unknown Title"))
+            visible: root.showTitleText
 
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -61,7 +70,7 @@ Item {
         spacing: VLCStyle.margin_normal
 
         Widgets.IconLabel {
-            width: VLCStyle.heightAlbumCover_xsmall
+            width: root.titleCover_width
             horizontalAlignment: Text.AlignHCenter
             text: VLCIcons.album_cover
             color: VLCStyle.colors.caption
@@ -69,6 +78,7 @@ Item {
 
         Widgets.CaptionLabel {
             text: model.text || ""
+            visible: root.showTitleText
         }
     }
 
