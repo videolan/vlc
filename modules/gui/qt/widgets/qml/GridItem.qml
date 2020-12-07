@@ -220,6 +220,7 @@ FocusScope {
                     height: pictureHeight
                     playCoverVisible: root._highlighted
                     onPlayIconClicked: root.playClicked()
+                    clip: true
 
                     /* new indicator (triangle at top-left of cover)*/
                     Rectangle {
