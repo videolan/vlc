@@ -44,6 +44,7 @@ Rectangle {
         fillMode: Image.PreserveAspectFit
         source: "qrc:/play_button.svg"
         visible: !root.onlyBorders
+        mipmap: width < VLCStyle.icon_normal
 
         MouseArea {
             anchors.fill: parent
