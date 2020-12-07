@@ -44,17 +44,27 @@ Item {
         anchors.fill: parent
         spacing: VLCStyle.margin_normal
 
-        Widgets.MediaCover {
-            source: ( !rowModel || root.showTitleText ? rowModel.cover : rowModel[model.criteria]) || VLCStyle.noArtCover
-            mipmap: true // this widget can down scale the source a lot, so for better visuals we use mipmap
-            playCoverVisible: currentlyFocused || containsMouse
-            playIconSize: VLCStyle.play_cover_small
-            onPlayIconClicked: medialib.addAndPlay( rowModel.id )
-            radius: root.titleCover_radius
-            labels: root.titlecoverLabels(rowModel)
-
+        Item {
             Layout.preferredHeight: root.titleCover_height
             Layout.preferredWidth: root.titleCover_width
+
+            ListCoverShadow {
+                source: cover
+                anchors.fill: cover
+            }
+
+            Widgets.MediaCover {
+                id: cover
+
+                anchors.fill: parent
+                source: ( !rowModel || root.showTitleText ? rowModel.cover : rowModel[model.criteria]) || VLCStyle.noArtCover
+                mipmap: true // this widget can down scale the source a lot, so for better visuals we use mipmap
+                playCoverVisible: currentlyFocused || containsMouse
+                playIconSize: VLCStyle.play_cover_small
+                onPlayIconClicked: medialib.addAndPlay( rowModel.id )
+                radius: root.titleCover_radius
+                labels: root.titlecoverLabels(rowModel)
+            }
         }
 
         Widgets.ListLabel {
