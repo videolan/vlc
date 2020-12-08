@@ -37,6 +37,11 @@ Item {
 
     signal playClicked(var index)
 
+    Widgets.ListCoverShadow {
+        anchors.fill: artwork.visible ? artwork : background
+        source: artwork.visible ? artwork : background
+    }
+
     Rectangle {
         id: background
 
@@ -44,12 +49,23 @@ Item {
         color: VLCStyle.colors.bg
         width: VLCStyle.listAlbumCover_width
         height: VLCStyle.listAlbumCover_height
+        radius: VLCStyle.listAlbumCover_radius
         visible: !artwork.visible
 
         NetworkCustomCover {
             networkModel: rowModel
             anchors.fill: parent
             iconSize: VLCStyle.icon_small
+        }
+
+        Widgets.PlayCover {
+            radius: background.radius
+            anchors.fill: parent
+            iconSize: VLCStyle.play_cover_small
+            visible: currentlyFocused || containsMouse
+            onIconClicked: playClicked(item.index)
+            onlyBorders: rowModel.type === NetworkMediaModel.TYPE_NODE
+                         || rowModel.type === NetworkMediaModel.TYPE_DIRECTORY
         }
     }
 
@@ -67,17 +83,15 @@ Item {
         visible: item.rowModel.artwork
                  && item.rowModel.artwork.toString() !== ""
         mipmap: true
-    }
 
-    Widgets.PlayCover {
-        x: artwork.visible ? artwork.x : background.x
-        y: artwork.visible ? artwork.y : background.y
-        width: artwork.visible ? artwork.paintedWidth : background.width
-        height: artwork.visible ? artwork.paintedHeight : background.height
-        iconSize: VLCStyle.play_cover_small
-        visible: currentlyFocused || containsMouse
-        onIconClicked: playClicked(item.index)
-        onlyBorders: rowModel.type === NetworkMediaModel.TYPE_NODE
-                     || rowModel.type === NetworkMediaModel.TYPE_DIRECTORY
+        Widgets.PlayCover {
+            width: artwork.paintedWidth
+            height: artwork.paintedHeight
+            iconSize: VLCStyle.play_cover_small
+            visible: currentlyFocused || containsMouse
+            onIconClicked: playClicked(item.index)
+            onlyBorders: rowModel.type === NetworkMediaModel.TYPE_NODE
+                         || rowModel.type === NetworkMediaModel.TYPE_DIRECTORY
+        }
     }
 }
