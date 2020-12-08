@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCMain.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2019 VLC authors and VideoLAN
+ * Copyright (C) 2002-2020 VLC authors and VideoLAN
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
@@ -35,6 +35,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 #include <stdatomic.h>
+#include <sys/sysctl.h>
 
 #include <vlc_common.h>
 #include <vlc_actions.h>
@@ -80,6 +81,8 @@
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
+NSString *const kIntel64UpdateURLString = @"https://update.videolan.org/vlc/sparkle/vlc-intel64.xml";
+NSString *const kARM64UpdateURLString = @"https://update.videolan.org/vlc/sparkle/vlc-arm64.xml";
 #endif
 
 NSString *VLCConfigurationChangedNotification = @"VLCConfigurationChangedNotification";
@@ -270,6 +273,26 @@ static VLCMain *sharedInstance = nil;
     [self migrateOldPreferences];
 
     _statusBarIcon = [[VLCStatusBarIcon alloc] init];
+
+    /* on macOS 11 and later, check whether the user attempts to deploy
+     * the x86_64 binary on ARM-64 - if yes, log it */
+    if (OSX_BIGSUR_AND_HIGHER) {
+        if ([self processIsTranslated] > 0) {
+            msg_Warn(getIntf(), "Process is translated!");
+        }
+    }
+}
+
+- (int)processIsTranslated
+{
+   int ret = 0;
+   size_t size = sizeof(ret);
+   if (sysctlbyname("sysctl.proc_translated", &ret, &size, NULL, 0) == -1) {
+      if (errno == ENOENT)
+         return 0;
+      return -1;
+   }
+   return ret;
 }
 
 #pragma mark -
@@ -318,6 +341,39 @@ static VLCMain *sharedInstance = nil;
         return NO;
 
     return YES;
+}
+
+/* use the correct feed depending on the hardware architecture */
+- (nullable NSString *)feedURLStringForUpdater:(SUUpdater *)updater
+{
+#ifdef __x86_64__
+    if (OSX_BIGSUR_AND_HIGHER) {
+        if ([self processIsTranslated] > 0) {
+            msg_Dbg(getIntf(), "Process is translated. On update, VLC will install the native ARM-64 binary.");
+            return kARM64UpdateURLString;
+        }
+    }
+    return kIntel64UpdateURLString;
+#elif __arm64__
+    return kARM64UpdateURLString;
+#else
+    #error unsupported architecture
+#endif
+}
+
+- (void)updaterDidNotFindUpdate:(SUUpdater *)updater
+{
+    msg_Dbg(getIntf(), "No update found");
+}
+
+- (void)updater:(SUUpdater *)updater failedToDownloadUpdate:(SUAppcastItem *)item error:(NSError *)error
+{
+    msg_Warn(getIntf(), "Failed to download update with error %li", error.code);
+}
+
+- (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error
+{
+    msg_Err(getIntf(), "Updater aborted with error %li", error.code);
 }
 #endif
 
