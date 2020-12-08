@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-05-02 11:30+0200\n"
-"Last-Translator: Предраг Љубеновић <predragljubenovic@gmail.com>, 2019\n"
+"PO-Revision-Date: 2020-12-08 23:48+0100\n"
+"Last-Translator: Branko Kokanovic <branko@kokanovic.org>, 2020\n"
 "Language-Team: Serbian (https://www.transifex.com/yaron/teams/16553/sr/)\n"
 "Language: sr\n"
 "MIME-Version: 1.0\n"
@@ -189,11 +189,11 @@ msgstr "Поставке екранског менија, текстуалних
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
-msgstr ""
+msgstr "Разделници"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr ""
+msgstr "Видео разделници деле један видео запис на њих више."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
@@ -1689,6 +1689,8 @@ msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
+"Поставља излазни режим аудио канала који ће се подразумевано користити ако "
+"су ваш хардвер и аудио ток компатибилни."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
