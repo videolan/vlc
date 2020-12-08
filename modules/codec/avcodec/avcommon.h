@@ -52,18 +52,9 @@
 #if (CLOCK_FREQ == AV_TIME_BASE)
 #define FROM_AV_TS_NZ(x)     (x)
 #define TO_AV_TS_NZ(x)       (x)
-#elif defined(USE_AV_RESCALEQ) /* until we migrate all conversions */
+#else
 #define FROM_AV_TS_NZ(x)  FROM_AVSCALE((x), AV_TIME_BASE_Q)
 #define TO_AV_TS_NZ(x)    TO_AVSCALE((x), AV_TIME_BASE_Q)
-#elif (CLOCK_FREQ % AV_TIME_BASE) == 0
-#define FROM_AV_TS_NZ(x)  ((x) * (CLOCK_FREQ / AV_TIME_BASE))
-#define TO_AV_TS_NZ(x)    ((x) / (CLOCK_FREQ / AV_TIME_BASE))
-#elif (AV_TIME_BASE % CLOCK_FREQ) == 0
-#define FROM_AV_TS_NZ(x)  ((x) / (AV_TIME_BASE / CLOCK_FREQ))
-#define TO_AV_TS_NZ(x)    ((x) * (AV_TIME_BASE / CLOCK_FREQ))
-#else
-#define FROM_AV_TS_NZ(x)  ((x) * CLOCK_FREQ / AV_TIME_BASE)
-#define TO_AV_TS_NZ(x)    ((x) * AV_TIME_BASE / CLOCK_FREQ)
 #endif
 
 #define FROM_AV_TS(x)     (FROM_AV_TS_NZ(x) + VLC_TICK_0)

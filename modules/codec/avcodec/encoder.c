@@ -1079,7 +1079,7 @@ static const struct vlc_block_callbacks vlc_av_packet_cbs =
     vlc_av_packet_Release,
 };
 
-static block_t *vlc_av_packet_Wrap(AVPacket *packet, vlc_tick_t i_length, AVCodecContext *context )
+static block_t *vlc_av_packet_Wrap(AVPacket *packet, AVCodecContext *context )
 {
     if ( packet->data == NULL &&
          packet->flags == 0 &&
@@ -1098,15 +1098,13 @@ static block_t *vlc_av_packet_Wrap(AVPacket *packet, vlc_tick_t i_length, AVCode
     p_block->cbs = &vlc_av_packet_cbs;
     b->packet = *packet;
 
-    p_block->i_length = i_length;
-    p_block->i_pts = FROM_AV_TS(packet->pts);
-    p_block->i_dts = FROM_AV_TS(packet->dts);
+    p_block->i_length = FROM_AVSCALE(packet->duration, context->time_base);
     if( unlikely( packet->flags & AV_PKT_FLAG_CORRUPT ) )
         p_block->i_flags |= BLOCK_FLAG_CORRUPTED;
     if( packet->flags & AV_PKT_FLAG_KEY )
         p_block->i_flags |= BLOCK_FLAG_TYPE_I;
-    p_block->i_pts = p_block->i_pts * CLOCK_FREQ * context->time_base.num / context->time_base.den;
-    p_block->i_dts = p_block->i_dts * CLOCK_FREQ * context->time_base.num / context->time_base.den;
+    p_block->i_pts = VLC_TICK_0 + FROM_AVSCALE(packet->pts, context->time_base);
+    p_block->i_dts = VLC_TICK_0 + FROM_AVSCALE(packet->dts, context->time_base);
 
     return p_block;
 }
@@ -1164,8 +1162,7 @@ static block_t *encode_avframe( encoder_t *p_enc, encoder_sys_t *p_sys, AVFrame 
         return NULL;
     }
 
-    block_t *p_block = vlc_av_packet_Wrap( &av_pkt,
-            av_pkt.duration / p_sys->p_context->time_base.den, p_sys->p_context );
+    block_t *p_block = vlc_av_packet_Wrap( &av_pkt, p_sys->p_context );
     if( unlikely(p_block == NULL) )
     {
         av_packet_unref( &av_pkt );
@@ -1208,8 +1205,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
          * avcodec likes pts to be in time_base units
          * frame number */
         if( likely( p_pict->date != VLC_TICK_INVALID ) )
-            frame->pts = p_pict->date * p_sys->p_context->time_base.den /
-                          CLOCK_FREQ / p_sys->p_context->time_base.num;
+            frame->pts = TO_AVSCALE( p_pict->date - VLC_TICK_0,
+                                     p_sys->p_context->time_base );
         else
             frame->pts = AV_NOPTS_VALUE;
 
@@ -1279,8 +1276,7 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, uns
     {
         /* Convert to AV timing */
         p_sys->frame->pts = date_Get( &p_sys->buffer_date ) - VLC_TICK_0;
-        p_sys->frame->pts = p_sys->frame->pts * p_sys->p_context->time_base.den /
-                            CLOCK_FREQ / p_sys->p_context->time_base.num;
+        p_sys->frame->pts = TO_AVSCALE( p_sys->frame->pts, p_sys->p_context->time_base );
         date_Increment( &p_sys->buffer_date, p_sys->frame->nb_samples );
     }
     else p_sys->frame->pts = AV_NOPTS_VALUE;
@@ -1407,8 +1403,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         {
             /* Convert to AV timing */
             p_sys->frame->pts = date_Get( &p_sys->buffer_date ) - VLC_TICK_0;
-            p_sys->frame->pts = p_sys->frame->pts * p_sys->p_context->time_base.den /
-                                CLOCK_FREQ / p_sys->p_context->time_base.num;
+            p_sys->frame->pts = TO_AVSCALE( p_sys->frame->pts, p_sys->p_context->time_base );
         }
         else p_sys->frame->pts = AV_NOPTS_VALUE;
 

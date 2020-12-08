@@ -37,8 +37,6 @@
 #include <vlc_charset.h>
 #include <vlc_avcodec.h>
 
-#define USE_AV_RESCALEQ
-
 #include "../../codec/avcodec/avcodec.h"
 #include "../../codec/avcodec/chroma.h"
 #include "../../codec/avcodec/avcommon_compat.h"

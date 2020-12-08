@@ -35,8 +35,6 @@
 
 #include <libavformat/avformat.h>
 
-#define USE_AV_RESCALEQ
-
 #include "avformat.h"
 #include "../../codec/avcodec/avcodec.h"
 #include "../../codec/avcodec/avcommon.h"
