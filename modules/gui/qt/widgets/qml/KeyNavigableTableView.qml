@@ -41,6 +41,7 @@ NavigableFocusScope {
 
         anchors.fill: parent
         text: !rowModel ? "" : (rowModel[model.criteria] || "")
+        color: parent.foregroundColor
     }
     property Component tableHeaderDelegate: Widgets.CaptionLabel {
         text: model.text || ""
@@ -200,6 +201,7 @@ NavigableFocusScope {
             property var rowModel: model
             property bool selected: selectionDelegateModel.isSelected(root.model.index(index, 0))
             readonly property bool highlighted: selected || hoverArea.containsMouse || activeFocus
+            readonly property color foregroundColor: highlighted ? VLCStyle.colors.bgHoverText : VLCStyle.colors.text
             readonly property int _index: index
             property int _modifiersOnLastPress: Qt.NoModifier
 
@@ -292,6 +294,7 @@ NavigableFocusScope {
                                 property var colModel: modelData
                                 readonly property bool currentlyFocused: lineView.activeFocus
                                 readonly property bool containsMouse: hoverArea.containsMouse
+                                readonly property color foregroundColor: lineView.foregroundColor
                                 readonly property int index: lineView._index
 
                                 anchors.fill: parent
@@ -306,6 +309,7 @@ NavigableFocusScope {
                     anchors.left: content.right
                     anchors.leftMargin: VLCStyle.margin_xxsmall
                     anchors.verticalCenter: content.verticalCenter
+                    color: lineView.foregroundColor
                     backgroundColor: hovered || activeFocus ?
                                          VLCStyle.colors.getBgColor( lineView.selected, hovered,
                                                                      activeFocus ) : "transparent"

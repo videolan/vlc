@@ -70,6 +70,7 @@ Item {
         Widgets.ListLabel {
             text: (!rowModel || !root.showTitleText) ? "" : (rowModel[model.criteria] || i18n.qtr("Unknown Title"))
             visible: root.showTitleText
+            color: foregroundColor
 
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -108,6 +109,7 @@ Item {
             height: parent.height
             horizontalAlignment: Text.AlignHCenter
             text: !rowModel ? "" : rowModel[model.criteria] || ""
+            color: foregroundColor
         }
     }
 
