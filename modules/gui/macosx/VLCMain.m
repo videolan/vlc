@@ -35,6 +35,7 @@
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
+#include <sys/sysctl.h>
 #include <vlc_common.h>
 #include <vlc_atomic.h>
 #include <vlc_actions.h>
@@ -68,6 +69,8 @@
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>                 /* we're the update delegate */
+NSString *const kIntel64UpdateURLString = @"https://update.videolan.org/vlc/sparkle/vlc-intel64.xml";
+NSString *const kARM64UpdateURLString = @"https://update.videolan.org/vlc/sparkle/vlc-arm64.xml";
 #endif
 
 #pragma mark -
@@ -319,6 +322,26 @@ static VLCMain *sharedInstance = nil;
     if (kidsAround && var_GetBool(p_playlist, "playlist-autostart"))
         playlist_Control(p_playlist, PLAYLIST_PLAY, true);
     PL_UNLOCK;
+
+    /* on macOS 11 and later, check whether the user attempts to deploy
+     * the x86_64 binary on ARM-64 - if yes, log it */
+    if (OSX_BIGSUR_AND_HIGHER) {
+        if ([self processIsTranslated] > 0) {
+            msg_Warn(p_intf, "Process is translated!");
+        }
+    }
+}
+
+- (int)processIsTranslated
+{
+   int ret = 0;
+   size_t size = sizeof(ret);
+   if (sysctlbyname("sysctl.proc_translated", &ret, &size, NULL, 0) == -1) {
+      if (errno == ENOENT)
+         return 0;
+      return -1;
+   }
+   return ret;
 }
 
 #pragma mark -
@@ -390,11 +413,17 @@ static VLCMain *sharedInstance = nil;
 - (nullable NSString *)feedURLStringForUpdater:(SUUpdater *)updater
 {
 #ifdef __x86_64__
-    return @"https://update.videolan.org/vlc/sparkle/vlc-intel64.xml";
+    if (OSX_BIGSUR_AND_HIGHER) {
+        if ([self processIsTranslated] > 0) {
+            msg_Dbg(p_intf, "Process is translated. On update, VLC will install the native ARM-64 binary.");
+            return kARM64UpdateURLString;
+        }
+    }
+    return kIntel64UpdateURLString;
 #elif __arm64__
-    return @"https://update.videolan.org/vlc/sparkle/vlc-arm64.xml";
+    return kARM64UpdateURLString;
 #else
-    #warning unsupported architecture
+    #error unsupported architecture
 #endif
 }
 
