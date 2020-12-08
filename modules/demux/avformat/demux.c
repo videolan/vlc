@@ -723,7 +723,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     }
 
     if( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE )
-        i_start_time = FROM_AV_TS(p_sys->ic->start_time);
+        i_start_time = FROM_AV_TS_NZ(p_sys->ic->start_time);
 
     msg_Dbg( p_demux, "AVFormat(%s %s) supported stream", AVPROVIDER(LIBAVFORMAT), LIBAVFORMAT_IDENT );
     msg_Dbg( p_demux, "    - format = %s (%s)",
@@ -731,12 +731,12 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     msg_Dbg( p_demux, "    - start time = %"PRId64, i_start_time );
     msg_Dbg( p_demux, "    - duration = %"PRId64,
              ( p_sys->ic->duration != (int64_t)AV_NOPTS_VALUE ) ?
-             FROM_AV_TS(p_sys->ic->duration) : -1 );
+             FROM_AV_TS_NZ(p_sys->ic->duration) : -1 );
 
     if( p_sys->ic->nb_chapters > 0 )
     {
         p_sys->p_title = vlc_input_title_New();
-        p_sys->p_title->i_length = FROM_AV_TS(p_sys->ic->duration);
+        p_sys->p_title->i_length = FROM_AV_TS_NZ(p_sys->ic->duration);
     }
 
     for( unsigned i = 0; i < p_sys->ic->nb_chapters; i++ )
@@ -752,7 +752,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
         }
         s->i_time_offset = FROM_AVSCALE( p_sys->ic->chapters[i]->start,
                                          p_sys->ic->chapters[i]->time_base )
-                 - (i_start_time != VLC_TICK_INVALID ? i_start_time : 0 );
+                 - (i_start_time != VLC_TICK_INVALID ? i_start_time : 0 ) + VLC_TICK_0;
         TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
     }
 
@@ -860,7 +860,7 @@ static int Demux( demux_t *p_demux )
     /* Used to avoid timestamps overlow */
     if( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE )
     {
-        i_start_time = FROM_AV_TS(p_sys->ic->start_time);
+        i_start_time = FROM_AV_TS_NZ(p_sys->ic->start_time);
     }
     else
         i_start_time = 0;
@@ -971,7 +971,7 @@ static void ResetTime( demux_t *p_demux, int64_t i_time )
     if( p_sys->ic->start_time == (int64_t)AV_NOPTS_VALUE || i_time < 0 )
         t = VLC_TICK_INVALID;
     else
-        t = VLC_TICK_0 + FROM_AV_TS( i_time );
+        t = FROM_AV_TS( i_time );
 
     p_sys->i_pcr = t;
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
@@ -1084,7 +1084,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             if( p_sys->ic->duration != (int64_t)AV_NOPTS_VALUE )
-                *va_arg( args, vlc_tick_t * ) = FROM_AV_TS(p_sys->ic->duration);
+                *va_arg( args, vlc_tick_t * ) = FROM_AV_TS_NZ(p_sys->ic->duration);
             else
                 *va_arg( args, vlc_tick_t * ) = 0;
             return VLC_SUCCESS;
