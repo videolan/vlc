@@ -30,7 +30,7 @@ Item {
     FontMetrics { id: fontMetrics_large;    font.pixelSize: dp(14, scale); }
     FontMetrics { id: fontMetrics_xlarge;   font.pixelSize: dp(16, scale); }
     FontMetrics { id: fontMetrics_xxlarge;  font.pixelSize: dp(20, scale); }
-    FontMetrics { id: fontMetrics_xxxlarge; font.pixelSize: dp(30, scale); }
+    FontMetrics { id: fontMetrics_xxxlarge; font.pixelSize: dp(24, scale); }
 
     property alias self: vlc_style
 
