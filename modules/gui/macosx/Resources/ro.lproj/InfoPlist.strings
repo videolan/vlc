@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC dorește să acceseze camera la cererea utilizatorului.";
+"NSMicrophoneUsageDescription" = "VLC dorește să acceseze microfonul la cererea utilizatorului.";
+"NSAppleEventsUsageDescription" = "VLC dorește să oprească redarea și să reia playerele media externe.";
+"NSDesktopFolderUsageDescription" = "VLC dorește să acceseze folderul desktop la cererea utilizatorului.";
+"NSDocumentsFolderUsageDescription" = "VLC dorește să acceseze folderul de documente la cererea utilizatorului.";
+"NSDownloadsFolderUsageDescription" = "VLC dorește să acceseze folderul de descărcări, la cererea utilizatorului.";
+"NSNetworkVolumesUsageDescription" = "VLC dorește să acceseze un volum din rețea la cererea utilizatorului.";
+"NSRemovableVolumesUsageDescription" = "VLC dorește să acceseze un volum amovibil, la cererea utilizatorului.";
