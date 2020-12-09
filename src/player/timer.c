@@ -178,43 +178,46 @@ vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
 {
     vlc_mutex_lock(&player->timer.lock);
 
-    if (state == VLC_PLAYER_TIMER_STATE_DISCONTINUITY)
-    {
-        assert(system_date == VLC_TICK_INVALID);
+    /* Discontinuity is signalled by all output clocks and the input.
+     * discard the event if it was already signalled or not on the good
+     * es_source. */
+    bool notify = false;
+    struct vlc_player_timer_source *bestsource = &player->timer.best_source;
 
-        /* Discontinuity is signalled by all output clocks and the input.
-         * discard the event if it was already signalled or not on the good
-         * es_source. */
-        bool signal_discontinuity = false;
-        for (size_t i = 0; i < VLC_PLAYER_TIMER_TYPE_COUNT; ++i)
-        {
-            struct vlc_player_timer_source *source = &player->timer.sources[i];
-            if (source->es == es_source
-             && source->point.system_date != VLC_TICK_INVALID)
-            {
-                source->point.system_date = VLC_TICK_INVALID;
-                /* signal discontinuity only on best source */
-                if (i == VLC_PLAYER_TIMER_TYPE_BEST)
-                    signal_discontinuity = true;
-            }
-        }
-        if (!signal_discontinuity)
-        {
-            vlc_mutex_unlock(&player->timer.lock);
-            return;
-        }
-    }
-    else
+    switch(state)
     {
-        assert(state == VLC_PLAYER_TIMER_STATE_PAUSED);
-        assert(system_date != VLC_TICK_INVALID);
+        case VLC_PLAYER_TIMER_STATE_DISCONTINUITY:
+            assert(system_date == VLC_TICK_INVALID);
+            for (size_t i = 0; i < VLC_PLAYER_TIMER_TYPE_COUNT; ++i)
+            {
+                struct vlc_player_timer_source *source = &player->timer.sources[i];
+                if (source->es != es_source)
+                    continue;
+                /* signal discontinuity only on best source */
+                if (source->point.system_date != VLC_TICK_INVALID)
+                    notify = bestsource->es == es_source;
+                source->point.system_date = VLC_TICK_INVALID;
+            }
+            break;
+
+        case VLC_PLAYER_TIMER_STATE_PAUSED:
+        default:
+            assert(state == VLC_PLAYER_TIMER_STATE_PAUSED);
+            notify = true;
+            assert(system_date != VLC_TICK_INVALID);
+            break;
     }
 
     player->timer.state = state;
 
-    struct vlc_player_timer_source *source = &player->timer.best_source;
+    if (!notify)
+    {
+        vlc_mutex_unlock(&player->timer.lock);
+        return;
+    }
+
     vlc_player_timer_id *timer;
-    vlc_list_foreach(timer, &source->listeners, node)
+    vlc_list_foreach(timer, &bestsource->listeners, node)
     {
         timer->last_update_date = VLC_TICK_INVALID;
         timer->cbs->on_discontinuity(system_date, timer->data);
