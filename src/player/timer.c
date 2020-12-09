@@ -299,6 +299,10 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
 
     assert(point->ts != VLC_TICK_INVALID);
 
+    vlc_tick_t system_date = point->system_date;
+    if (player->timer.state == VLC_PLAYER_TIMER_STATE_PAUSED)
+        system_date = INT64_MAX;
+
     /* An update after a discontinuity means that the playback is resumed */
     if (player->timer.state == VLC_PLAYER_TIMER_STATE_DISCONTINUITY)
         player->timer.state = VLC_PLAYER_TIMER_STATE_PLAYING;
@@ -328,11 +332,11 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
         /* When paused (INT64_MAX), the same ts can be send more than one time
          * from the video source, only send it if different in that case. */
         if (point->ts != player->timer.last_ts
-          || source->point.system_date != point->system_date
-          || point->system_date != INT64_MAX)
+          || source->point.system_date != system_date
+          || system_date != INT64_MAX)
         {
             vlc_player_UpdateTimerSource(player, source, point->rate, point->ts,
-                                         point->system_date);
+                                         system_date);
 
             if (!vlc_list_is_empty(&source->listeners))
                 vlc_player_SendTimerSourceUpdates(player, source, force_update,
@@ -361,7 +365,7 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
         if (point->ts != player->timer.last_ts && source->smpte.frame_rate != 0)
         {
             vlc_player_UpdateTimerSource(player, source, point->rate, point->ts,
-                                         point->system_date);
+                                         system_date);
 
             if (!vlc_list_is_empty(&source->listeners))
                 vlc_player_SendSmpteTimerSourceUpdates(player, source,
