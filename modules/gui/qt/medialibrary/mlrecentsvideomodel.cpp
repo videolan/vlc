@@ -125,15 +125,10 @@ size_t MLRecentsVideoModel::Loader::count() const
     MLQueryParams params = getParams();
     auto queryParams = params.toCQueryParams();
 
-    // FIXME: count() may not depend on load(), since the call to load()
-    // depends on count()
-
-    (void) queryParams;
-
-    if (m_numberOfItemsToShow == -1) {
-        return m_video_count;
-    }
-    return std::min(m_video_count, m_numberOfItemsToShow);
+    size_t realCount = vlc_ml_count_history_by_type( m_ml, &queryParams, VLC_ML_MEDIA_TYPE_VIDEO );
+    if (m_numberOfItemsToShow >= 0)
+        return std::min( realCount, static_cast<size_t>(m_numberOfItemsToShow) );
+    return realCount;
 }
 
 std::vector<std::unique_ptr<MLItem>>
@@ -142,17 +137,20 @@ MLRecentsVideoModel::Loader::load(size_t index, size_t count) const
     MLQueryParams params = getParams(index, count);
     auto queryParams = params.toCQueryParams();
 
-    ml_unique_ptr<vlc_ml_media_list_t> media_list{ vlc_ml_list_history(
-                m_ml, &queryParams ) };
+    std::vector<std::unique_ptr<MLItem>> res;
+    if (m_numberOfItemsToShow >= 0)
+    {
+        if (queryParams.i_offset <= static_cast<uint32_t>(m_numberOfItemsToShow))
+           queryParams.i_nbResults = static_cast<uint32_t>(m_numberOfItemsToShow) - queryParams.i_offset;
+        else
+            return res;
+    }
+
+    ml_unique_ptr<vlc_ml_media_list_t> media_list{ vlc_ml_list_history_by_type(
+                m_ml, &queryParams, VLC_ML_MEDIA_TYPE_VIDEO ) };
     if ( media_list == nullptr )
         return {};
-    std::vector<std::unique_ptr<MLItem>> res;
-    m_video_count = 0;
     for( vlc_ml_media_t &media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
-        if( media.i_type == VLC_ML_MEDIA_TYPE_VIDEO )
-        {
-            m_video_count++;
             res.emplace_back( std::make_unique<MLVideo>( m_ml, &media ) );
-        }
     return res;
 }

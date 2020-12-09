@@ -71,9 +71,6 @@ private:
 
     private:
         int m_numberOfItemsToShow;
-        // FIXME: count() may not depend on load(), since the call to load()
-        // depends on count()
-        mutable int m_video_count;
     };
 };
 
