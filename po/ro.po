@@ -20,8 +20,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-05-20 11:46+0200\n"
-"Last-Translator: Eduard Pintilie <eduard.pintilie@gmail.com>, 2019\n"
+"PO-Revision-Date: 2020-12-09 17:45+0100\n"
+"Last-Translator: Eduard Pintilie <eduard.pintilie@gmail.com>, 2020\n"
 "Language-Team: Romanian (https://www.transifex.com/yaron/teams/16553/ro/)\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -672,7 +672,7 @@ msgstr "Spectru"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "VU metru"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -1002,7 +1002,7 @@ msgstr "Da"
 #: src/input/es_out.c:2141
 #, c-format
 msgid "DTVCC Closed captions %u"
-msgstr ""
+msgstr "Subtitrări DTVCC %u"
 
 #: src/input/es_out.c:2143
 #, c-format
@@ -1179,12 +1179,12 @@ msgstr "Funcția de transfer de culoare"
 
 #: src/input/es_out.c:3253
 msgid "Color space"
-msgstr ""
+msgstr "Spațiu culori"
 
 #: src/input/es_out.c:3253
 #, c-format
 msgid "%s Range"
-msgstr ""
+msgstr "%s Gamă"
 
 #: src/input/es_out.c:3255
 msgid "Full"
@@ -1219,7 +1219,7 @@ msgstr "Centru jos"
 
 #: src/input/es_out.c:3270
 msgid "Chroma location"
-msgstr ""
+msgstr "Locație chroma"
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
@@ -1227,11 +1227,11 @@ msgstr "Dreptunghiular"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
-msgstr ""
+msgstr "Equirectangular"
 
 #: src/input/es_out.c:3285
 msgid "Cubemap"
-msgstr ""
+msgstr "Cubemap"
 
 #: src/input/es_out.c:3291
 msgid "Projection"
@@ -1245,7 +1245,7 @@ msgstr "Girație"
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Ton"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
@@ -1255,7 +1255,7 @@ msgstr ""
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "Câmp de vizualizare"
 
 #: src/input/es_out.c:3305
 msgid "Max. luminance"
@@ -1279,7 +1279,7 @@ msgstr ""
 
 #: src/input/es_out.c:3339
 msgid "White point"
-msgstr ""
+msgstr "Punctul alb"
 
 #: src/input/es_out.c:3354 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1654,11 +1654,11 @@ msgstr ""
 
 #: src/libvlc-module.c:129
 msgid "Media role"
-msgstr ""
+msgstr "Rolul media"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
-msgstr ""
+msgstr "Rolul media (player) pentru politica sistemului de operare."
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:273
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:407
@@ -1758,7 +1758,7 @@ msgstr ""
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
-msgstr ""
+msgstr "Forțează suportul S/PDIF"
 
 #: src/libvlc-module.c:176
 msgid ""
@@ -8324,7 +8324,7 @@ msgstr ""
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
-msgstr ""
+msgstr "Cere serverului să trimită fluxul ca și multicast"
 
 #: modules/access/satip.c:66 modules/lua/vlc.c:62
 #: share/lua/http/dialogs/stream_config_window.html:28
