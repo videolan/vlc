@@ -62,7 +62,11 @@ endif
 	cp "$(macos_destdir)$(prefix)/bin/vlc" $@/Contents/MacOS/VLC
 	install_name_tool -rpath "$(libdir)" "@executable_path/../Frameworks/" $@/Contents/MacOS/VLC
 	## Generate plugin cache
-	VLC_LIB_PATH="$@/Contents/Frameworks" bin/vlc-cache-gen $@/Contents/Frameworks/plugins
+	if test "$(build)" = "$(host)"; then \
+		VLC_LIB_PATH="$@/Contents/Frameworks" bin/vlc-cache-gen $@/Contents/Frameworks/plugins ; \
+	else \
+		echo "Cross-compilation: cache generation skipped!" ; \
+	fi
 	find $@ -type d -exec chmod ugo+rx '{}' \;
 	find $@ -type f -exec chmod ugo+r '{}' \;
 
