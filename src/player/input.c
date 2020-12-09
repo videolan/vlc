@@ -205,6 +205,9 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
             break;
         case VLC_PLAYER_STATE_PLAYING:
             input->pause_date = VLC_TICK_INVALID;
+            vlc_player_UpdateTimerState(player, NULL,
+                                        VLC_PLAYER_TIMER_STATE_PLAYING,
+                                        input->pause_date);
             /* fallthrough */
         case VLC_PLAYER_STATE_STARTED:
             if (player->started &&

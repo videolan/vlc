@@ -201,10 +201,12 @@ vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
             break;
 
         case VLC_PLAYER_TIMER_STATE_PAUSED:
-        default:
-            assert(state == VLC_PLAYER_TIMER_STATE_PAUSED);
             notify = true;
             assert(system_date != VLC_TICK_INVALID);
+            break;
+
+        default:
+        case VLC_PLAYER_TIMER_STATE_PLAYING:
             break;
     }
 
