@@ -882,6 +882,28 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
                 vlc_assert_unreachable();
             }
         }
+        case VLC_ML_COUNT_HISTORY_BY_TYPE:
+        case VLC_ML_LIST_HISTORY_BY_TYPE:
+        {
+            auto  type = va_arg(args, int);
+            auto query = m_ml->history(static_cast<medialibrary::IMedia::Type>( type ));
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+
+            switch ( listQuery )
+            {
+            case VLC_ML_LIST_HISTORY_BY_TYPE:
+                *va_arg( args, vlc_ml_media_list_t**) =
+                        ml_convert_list<vlc_ml_media_list_t, vlc_ml_media_t>(
+                            query->items( nbItems, offset ) );
+                return VLC_SUCCESS;
+            case VLC_ML_COUNT_HISTORY_BY_TYPE:
+                *va_arg( args, size_t* ) = query->count();
+                return VLC_SUCCESS;
+            default:
+                vlc_assert_unreachable();
+            }
+        }
         case VLC_ML_LIST_STREAM_HISTORY:
         case VLC_ML_COUNT_STREAM_HISTORY:
         {
