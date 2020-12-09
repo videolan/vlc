@@ -74,13 +74,21 @@ FocusScope {
             name: "unselected"
 
             PropertyChanges {
-                target: shadow
-                primaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-                primaryRadius: VLCStyle.dp(14, VLCStyle.scale)
-                primarySamples: 1 + VLCStyle.dp(14, VLCStyle.scale) * 2
-                secondaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
-                secondaryRadius: VLCStyle.dp(3, VLCStyle.scale)
-                secondarySamples: 1 + VLCStyle.dp(3, VLCStyle.scale) * 2
+                target: selectedShadow
+                opacity: 0
+                visible: false
+            }
+
+            PropertyChanges {
+                target: unselectedShadow
+                opacity: 1
+                visible: true
+            }
+
+            PropertyChanges {
+                target: picture
+                playCoverOpacity: 0
+                playCoverVisible: false
             }
 
             PropertyChanges {
@@ -92,13 +100,21 @@ FocusScope {
             name: "selected"
 
             PropertyChanges {
-                target: shadow
-                primaryVerticalOffset: VLCStyle.dp(32, VLCStyle.scale)
-                primaryRadius: VLCStyle.dp(72, VLCStyle.scale)
-                primarySamples: 1 + VLCStyle.dp(72, VLCStyle.scale) * 2
-                secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-                secondaryRadius: VLCStyle.dp(8, VLCStyle.scale)
-                secondarySamples: 1 + VLCStyle.dp(8, VLCStyle.scale) * 2
+                target: selectedShadow
+                opacity: 1
+                visible: true
+            }
+
+            PropertyChanges {
+                target: unselectedShadow
+                opacity: 0
+                visible: false
+            }
+
+            PropertyChanges {
+                target: picture
+                playCoverOpacity: 1
+                playCoverVisible: true
             }
 
             PropertyChanges {
@@ -108,21 +124,72 @@ FocusScope {
         }
     ]
 
-    transitions: Transition {
-        to: "*"
+    transitions: [
+        Transition {
+            from: "unselected"
+            to: "selected"
+            // reversible: true // doesn't work
 
-        SequentialAnimation {
-            PropertyAction {
-                properties: "primarySamples,secondarySamples"
+            SequentialAnimation {
+                PropertyAction {
+                    targets: [picture, selectedShadow]
+                    properties: "playCoverVisible,visible"
+                }
+
+                ParallelAnimation {
+                    NumberAnimation {
+                        properties: "opacity,playCoverOpacity"
+                        duration: 240
+                        easing.type: Easing.InSine
+                    }
+
+                    SmoothedAnimation {
+                        target: root
+                        property: "_newIndicatorMedian"
+                        duration: 240
+                        easing.type: Easing.InSine
+                    }
+                }
+
+                PropertyAction {
+                    target: unselectedShadow
+                    property: "visible"
+                }
             }
+        },
 
-            SmoothedAnimation {
-                duration: 64
-                properties: "primaryVerticalOffset,primaryRadius,secondaryVerticalOffset,secondaryRadius,_newIndicatorMedian"
-                easing.type: Easing.InOutSine
+        Transition {
+            from: "selected"
+            to: "unselected"
+
+            SequentialAnimation {
+                PropertyAction {
+                    target: unselectedShadow
+                    property: "visible"
+                }
+
+                ParallelAnimation {
+                    NumberAnimation {
+                        properties: "opacity,playCoverOpacity"
+                        duration: 200
+                        easing.type: Easing.OutSine
+                    }
+
+                    SmoothedAnimation {
+                        target: root
+                        duration: 200
+                        property: "_newIndicatorMedian"
+                        easing.type: Easing.OutSine
+                    }
+                }
+
+                PropertyAction {
+                    targets: [picture, selectedShadow]
+                    properties: "playCoverVisible,visible"
+                }
             }
         }
-    }
+    ]
 
     MouseArea {
         id: mouseArea
@@ -201,11 +268,35 @@ FocusScope {
                 color: VLCStyle.colors.bg
             }
 
+            // animating shadows properties are expensive and not smooth
+            // thus we use two different shadows for states "selected" and "unselected"
+            // and animate their opacity on state changes to get better animation
             CoverShadow {
-                id: shadow
+                id: unselectedShadow
 
-                source: baseRect
                 anchors.fill: baseRect
+                source: baseRect
+                cached: true
+                secondaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
+                secondaryRadius: VLCStyle.dp(2, VLCStyle.scale)
+                secondarySamples: 1 + VLCStyle.dp(2, VLCStyle.scale) * 2
+                primaryVerticalOffset: VLCStyle.dp(4, VLCStyle.scale)
+                primaryRadius: VLCStyle.dp(9, VLCStyle.scale)
+                primarySamples: 1 + VLCStyle.dp(9, VLCStyle.scale) * 2
+            }
+
+            CoverShadow {
+                id: selectedShadow
+
+                anchors.fill: baseRect
+                source: baseRect
+                cached: true
+                secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
+                secondaryRadius: VLCStyle.dp(18, VLCStyle.scale)
+                secondarySamples: 1 + VLCStyle.dp(18, VLCStyle.scale) * 2
+                primaryVerticalOffset: VLCStyle.dp(32, VLCStyle.scale)
+                primaryRadius: VLCStyle.dp(72, VLCStyle.scale)
+                primarySamples: 1 + VLCStyle.dp(72, VLCStyle.scale) * 2
             }
 
             Column {

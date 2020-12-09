@@ -28,6 +28,7 @@ Widgets.RoundImage {
 
     property var labels: []
     property alias progress: progressBar.value
+    property alias playCoverOpacity: playCover.opacity
     property alias playCoverVisible: playCover.visible
     property alias playCoverOnlyBorders: playCover.onlyBorders
     property alias playIconSize: playCover.iconSize
