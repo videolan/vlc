@@ -5,6 +5,7 @@
 # Translators:
 # Anh Phan <vietnamesel10n@gmail.com>, 2009-2010,2013-2014
 # bachien <bachien@ejnu.net>, 2018
+# brad freedom <brad.freedom@gmail.com>, 2020
 # Sortale <sortale.zerok@gmail.com>, 2014
 # Pham Kieu Thanh <thanhpk@live.com>, 2013
 msgid ""
@@ -12,8 +13,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2020-12-09 14:08+0100\n"
+"Last-Translator: brad freedom <brad.freedom@gmail.com>, 2020\n"
 "Language-Team: Vietnamese (https://www.transifex.com/yaron/teams/16553/vi/)\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
@@ -1805,7 +1806,7 @@ msgstr ""
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
-msgstr ""
+msgstr "Buộc hỗ trợ S/PDIF"
 
 #: src/libvlc-module.c:176
 msgid ""
@@ -2812,7 +2813,7 @@ msgstr "Số thứ tự của track phụ đề được sử dụng."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
-msgstr ""
+msgstr "Trình giải mã phụ đề mặc định"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -2946,11 +2947,11 @@ msgstr ""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
-msgstr ""
+msgstr "Thư mục ghi âm"
 
 #: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
-msgstr ""
+msgstr "Thư mục lưu các ghi âm"
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
@@ -3002,7 +3003,7 @@ msgstr ""
 
 #: src/libvlc-module.c:695
 msgid "Disable all lua plugins"
-msgstr ""
+msgstr "Tắt tất cả các plugin lua"
 
 #: src/libvlc-module.c:699
 msgid ""
@@ -3032,11 +3033,11 @@ msgstr ""
 
 #: src/libvlc-module.c:710
 msgid "Subtitles text scaling factor"
-msgstr ""
+msgstr "Kích thước văn bản phụ đề"
 
 #: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
-msgstr ""
+msgstr "Thay đổi kích thước phụ đề (khi có thể)"
 
 #: src/libvlc-module.c:713
 msgid "Enable sub-pictures"
@@ -14313,11 +14314,11 @@ msgstr "Thiết lập điều khiển đã sử dụng theo mặc định"
 
 #: modules/codec/x264.c:415
 msgid "x264 advanced options"
-msgstr ""
+msgstr "x264 tùy chọn nâng cao"
 
 #: modules/codec/x264.c:416
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
-msgstr ""
+msgstr "x264 tùy chọn nâng cao, hãy dùng {opt=val,op2=val2}."
 
 #: modules/codec/x264.c:421
 msgid "dia"
@@ -21011,7 +21012,7 @@ msgstr "Thanh công cụ thời gian"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:129
 msgid "Advanced Widget"
-msgstr ""
+msgstr "Widget nâng cao"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
