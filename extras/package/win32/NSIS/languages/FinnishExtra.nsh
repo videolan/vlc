@@ -57,6 +57,8 @@ ${LangFileString} Action_OnArrivalSVCDMovie "Toista SVCD-elokuva"
 ${LangFileString} Action_OnArrivalVideoFiles "Toista videotiedostot"
 ${LangFileString} Action_OnArrivalMusicFiles "Toista äänitiedostot"
 ${LangFileString} Action_OnArrivalDVDAudio "Toista ääni-DVD"
+${LangFileString} Action_OnArrivalBluray "Toista Blu-ray"
+
 ${LangFileString} License_NextText "Nyt olet tietoinen oikeuksistasi. Paina Seuraava jatkaaksesi."
 
 ${LangFileString} Detail_CheckProcesses "Tarkistetaan prosessit..."
