@@ -861,69 +861,58 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
         case VLC_ML_LIST_PLAYLISTS:
         case VLC_ML_COUNT_PLAYLISTS:
             return listPlaylist( listQuery, paramsPtr, psz_pattern, nbItems, offset, args );
-        case VLC_ML_LIST_HISTORY:
         case VLC_ML_COUNT_HISTORY:
+        case VLC_ML_LIST_HISTORY:
+        case VLC_ML_COUNT_HISTORY_BY_TYPE:
+        case VLC_ML_LIST_HISTORY_BY_TYPE:
+        case VLC_ML_COUNT_STREAM_HISTORY:
+        case VLC_ML_LIST_STREAM_HISTORY:
         {
-            auto query = m_ml->history();
+            medialibrary::Query<medialibrary::IMedia> query;
+
+            switch ( listQuery )
+            {
+            case VLC_ML_COUNT_HISTORY:
+            case VLC_ML_LIST_HISTORY:
+                query = m_ml->history();
+                break;
+            case VLC_ML_COUNT_HISTORY_BY_TYPE:
+            case VLC_ML_LIST_HISTORY_BY_TYPE:
+            {
+                auto  type = va_arg(args, int);
+                query = m_ml->history(static_cast<medialibrary::IMedia::Type>( type ));
+                break;
+            }
+            case VLC_ML_COUNT_STREAM_HISTORY:
+            case VLC_ML_LIST_STREAM_HISTORY:
+                query = m_ml->streamHistory();
+                break;
+            default:
+                vlc_assert_unreachable();
+            }
+
             if ( query == nullptr )
                 return VLC_EGENERIC;
 
             switch ( listQuery )
             {
             case VLC_ML_LIST_HISTORY:
+            case VLC_ML_LIST_HISTORY_BY_TYPE:
+            case VLC_ML_LIST_STREAM_HISTORY:
                 *va_arg( args, vlc_ml_media_list_t**) =
                         ml_convert_list<vlc_ml_media_list_t, vlc_ml_media_t>(
                             query->items( nbItems, offset ) );
                 return VLC_SUCCESS;
             case VLC_ML_COUNT_HISTORY:
-                *va_arg( args, size_t* ) = query->count();
-                return VLC_SUCCESS;
-            default:
-                vlc_assert_unreachable();
-            }
-        }
-        case VLC_ML_COUNT_HISTORY_BY_TYPE:
-        case VLC_ML_LIST_HISTORY_BY_TYPE:
-        {
-            auto  type = va_arg(args, int);
-            auto query = m_ml->history(static_cast<medialibrary::IMedia::Type>( type ));
-            if ( query == nullptr )
-                return VLC_EGENERIC;
-
-            switch ( listQuery )
-            {
-            case VLC_ML_LIST_HISTORY_BY_TYPE:
-                *va_arg( args, vlc_ml_media_list_t**) =
-                        ml_convert_list<vlc_ml_media_list_t, vlc_ml_media_t>(
-                            query->items( nbItems, offset ) );
-                return VLC_SUCCESS;
             case VLC_ML_COUNT_HISTORY_BY_TYPE:
+            case VLC_ML_COUNT_STREAM_HISTORY:
                 *va_arg( args, size_t* ) = query->count();
                 return VLC_SUCCESS;
             default:
                 vlc_assert_unreachable();
             }
         }
-        case VLC_ML_LIST_STREAM_HISTORY:
-        case VLC_ML_COUNT_STREAM_HISTORY:
-        {
-            auto query = m_ml->streamHistory();
-            if ( query == nullptr )
-                return VLC_EGENERIC;
-            switch ( listQuery )
-            {
-                case VLC_ML_LIST_STREAM_HISTORY:
-                    *va_arg( args, vlc_ml_media_list_t**) =
-                            ml_convert_list<vlc_ml_media_list_t, vlc_ml_media_t>(
-                                query->items( nbItems, offset ) );
-                    return VLC_SUCCESS;
-                case VLC_ML_COUNT_STREAM_HISTORY:
-                    *va_arg( args, size_t* ) = query->count();
-                    return VLC_SUCCESS;
-                default:
-                    vlc_assert_unreachable();
-            }
-        }
+
     }
     return VLC_SUCCESS;
 }
