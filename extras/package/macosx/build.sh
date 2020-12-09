@@ -17,7 +17,6 @@ VLCBUILDDIR=""
 CORE_COUNT=`getconf NPROCESSORS_ONLN 2>&1`
 let JOBS=$CORE_COUNT+1
 
-
 usage()
 {
 cat << EOF
@@ -34,7 +33,7 @@ OPTIONS:
    -p            Build packages for all artifacts
    -i <n|u>      Create an installable package (n: nightly, u: unsigned stripped release archive)
    -k <sdk>      Use the specified sdk (default: $SDKROOT)
-   -a <arch>     Use the specified arch (default: $ARCH)
+   -a <arch>     Use the specified arch (default: $HOST_ARCH)
    -C            Use the specified VLC build dir
    -b <url>      Enable breakpad support and send crash reports to this URL
    -d            Disable debug mode (on by default)
@@ -79,7 +78,7 @@ do
              PACKAGETYPE=$OPTARG
          ;;
          a)
-             ARCH=$OPTARG
+             HOST_ARCH=$OPTARG
          ;;
          k)
              SDKROOT=$OPTARG
@@ -115,9 +114,13 @@ if [ "$QUIET" = "yes" ]; then
     out="/dev/null"
 fi
 
-info "Building VLC for the Mac OS X"
+ACTUAL_HOST_ARCH=`get_actual_arch $HOST_ARCH`
+BUILD_ARCH=`get_buildsystem_arch $BUILD_ARCH`
 
-TRIPLET=$(vlcGetTriplet)
+info "Building VLC for macOS, architecture ${ACTUAL_HOST_ARCH} on a ${BUILD_ARCH} device"
+
+BUILD_TRIPLET=$(vlcGetBuildTriplet)
+HOST_TRIPLET=$(vlcGetHostTriplet)
 export SDKROOT
 vlcSetBaseEnvironment
 vlcroot="$(vlcGetRootDir)"
@@ -157,11 +160,11 @@ info "Building contribs"
 spushd "${vlcroot}/contrib"
 
 if [ "$REBUILD" = "yes" ]; then
-    rm -rf contrib-$TRIPLET
-    rm -rf $TRIPLET
+    rm -rf contrib-$HOST_TRIPLET
+    rm -rf $HOST_TRIPLET
 fi
-mkdir -p contrib-$TRIPLET && cd contrib-$TRIPLET
-../bootstrap --build=$TRIPLET --host=$TRIPLET > $out
+mkdir -p contrib-$HOST_TRIPLET && cd contrib-$HOST_TRIPLET
+../bootstrap --build=$BUILD_TRIPLET --host=$HOST_TRIPLET > $out
 
 if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
     make list
@@ -182,6 +185,7 @@ spopd
 
 
 vlcUnsetContribEnvironment
+vlcSetLibVLCEnvironment
 
 #
 # vlc/bootstrap
@@ -214,8 +218,8 @@ fi
 if [ "${vlcroot}/configure" -nt Makefile ]; then
 
   ${vlcroot}/extras/package/macosx/configure.sh \
-      --build=$TRIPLET \
-      --host=$TRIPLET \
+      --build=$BUILD_TRIPLET \
+      --host=$HOST_TRIPLET \
       --with-macosx-version-min=$MINIMAL_OSX_VERSION \
       --with-macosx-sdk=$SDKROOT \
       $CONFIGFLAGS \
@@ -237,7 +241,6 @@ make -j$JOBS
 info "Preparing VLC.app"
 make VLC.app
 
-
 if [ "$PACKAGETYPE" = "u" ]; then
     info "Copying app with debug symbols into VLC-debug.app and stripping"
     rm -rf VLC-debug.app
@@ -248,14 +251,15 @@ if [ "$PACKAGETYPE" = "u" ]; then
     (cd VLC-debug.app/Contents/MacOS/lib/ && rm libvlccore.dylib && mv libvlccore.*.dylib libvlccore.dylib)
     (cd VLC-debug.app/Contents/MacOS/lib/ && rm libvlc.dylib && mv libvlc.*.dylib libvlc.dylib)
 
-
     find VLC.app/ -name "*.dylib" -exec strip -x {} \;
     find VLC.app/ -type f -name "VLC" -exec strip -x {} \;
     find VLC.app/ -type f -name "Sparkle" -exec strip -x {} \;
     find VLC.app/ -type f -name "Growl" -exec strip -x {} \;
     find VLC.app/ -type f -name "Breakpad" -exec strip -x {} \;
 
-    bin/vlc-cache-gen VLC.app/Contents/MacOS/plugins
+    if [ "$BUILD_TRIPLET" = "$HOST_TRIPLET" ]; then
+        bin/vlc-cache-gen VLC.app/Contents/MacOS/plugins
+    fi
 
     info "Building VLC release archive"
     make package-macosx-release

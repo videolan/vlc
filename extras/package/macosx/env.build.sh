@@ -1,16 +1,40 @@
 #!/bin/bash
 
-ARCH="x86_64"
+HOST_ARCH="x86_64"
+BUILD_ARCH=`uname -m | cut -d. -f1`
 MINIMAL_OSX_VERSION="10.11"
 
+get_actual_arch() {
+    if [ "$1" = "aarch64" ]; then
+        echo "arm64"
+    else
+        echo "$1"
+    fi
+}
 
-vlcGetTriplet() {
+get_buildsystem_arch() {
+    if [ "$1" = "arm64" ]; then
+        echo "aarch64"
+    else
+        echo "$1"
+    fi
+}
+
+vlcGetOSXKernelVersion() {
     local OSX_KERNELVERSION=$(uname -r | cut -d. -f1)
     if [ ! -z "$VLC_FORCE_KERNELVERSION" ]; then
         OSX_KERNELVERSION="$VLC_FORCE_KERNELVERSION"
     fi
 
-    echo "$ARCH-apple-darwin$OSX_KERNELVERSION"
+    echo "$OSX_KERNELVERSION"
+}
+
+vlcGetBuildTriplet() {
+    echo "$BUILD_ARCH-apple-darwin$(vlcGetOSXKernelVersion)"
+}
+
+vlcGetHostTriplet() {
+    echo "$HOST_ARCH-apple-darwin$(vlcGetOSXKernelVersion)"
 }
 
 # Gets VLCs root dir based on location of this file, also follow symlinks
@@ -25,30 +49,31 @@ vlcGetRootDir() {
 }
 
 vlcSetBaseEnvironment() {
-    local LOCAL_TRIPLET="$TRIPLET"
-    if [ -z "$LOCAL_TRIPLET" ]; then
-        LOCAL_TRIPLET="$(vlcGetTriplet)"
+    local LOCAL_BUILD_TRIPLET="$BUILD_TRIPLET"
+    if [ -z "$LOCAL_BUILD_TRIPLET" ]; then
+        LOCAL_BUILD_TRIPLET="$(vlcGetBuildTriplet)"
     fi
 
     local VLC_ROOT_DIR="$(vlcGetRootDir)"
 
     echo "Setting base environment"
-    echo "Using VLC root dir $VLC_ROOT_DIR and triplet $LOCAL_TRIPLET"
+    echo "Using VLC root dir $VLC_ROOT_DIR, build triplet $LOCAL_BUILD_TRIPLET and host triplet $(vlcGetHostTriplet)"
 
+    export AR="$(xcrun --find ar)"
     export CC="$(xcrun --find clang)"
     export CXX="$(xcrun --find clang++)"
+    export NM="$(xcrun --find nm)"
     export OBJC="$(xcrun --find clang)"
     export OBJCXX="$(xcrun --find clang++)"
-    export AR="$(xcrun --find ar)"
     export RANLIB="$(xcrun --find ranlib)"
-    export NM="$(xcrun --find nm)"
+    export STRIP="$(xcrun --find strip)"
 
     python3Path=$(echo /Library/Frameworks/Python.framework/Versions/3.*/bin | awk '{print $1;}')
     if [ ! -d "$python3Path" ]; then
         python3Path=""
     fi
 
-    export PATH="${VLC_ROOT_DIR}/extras/tools/build/bin:${VLC_ROOT_DIR}/contrib/${LOCAL_TRIPLET}/bin:$python3Path:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
+    export PATH="${VLC_ROOT_DIR}/extras/tools/build/bin:${VLC_ROOT_DIR}/contrib/${LOCAL_BUILD_TRIPLET}/bin:$python3Path:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
 }
 
 vlcSetSymbolEnvironment() {
@@ -110,13 +135,13 @@ vlcSetContribEnvironment() {
     export CXXFLAGS="-Werror=partial-availability"
     export OBJCFLAGS="-Werror=partial-availability"
 
-    export EXTRA_CFLAGS="-isysroot $SDKROOT -mmacosx-version-min=$MINIMAL_OSX_VERSION -DMACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION"
-    export EXTRA_LDFLAGS="-isysroot $SDKROOT -mmacosx-version-min=$MINIMAL_OSX_VERSION -DMACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION"
+    export EXTRA_CFLAGS="-isysroot $SDKROOT -mmacosx-version-min=$MINIMAL_OSX_VERSION -DMACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION -arch $ACTUAL_HOST_ARCH"
+    export EXTRA_LDFLAGS="-isysroot $SDKROOT -mmacosx-version-min=$MINIMAL_OSX_VERSION -DMACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION -arch $ACTUAL_HOST_ARCH"
     export XCODE_FLAGS="MACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION -sdk $SDKROOT WARNING_CFLAGS=-Werror=partial-availability"
 }
 
 vlcUnsetContribEnvironment() {
-    echo "Unsetting contrib flags, prepare VLC flags"
+    echo "Unsetting contrib flags"
 
     unset CFLAGS
     unset CXXFLAGS
@@ -125,13 +150,26 @@ vlcUnsetContribEnvironment() {
     unset EXTRA_CFLAGS
     unset EXTRA_LDFLAGS
     unset XCODE_FLAGS
-
-    # Enable debug symbols by default
-    export CFLAGS="-g"
-    export CXXFLAGS="-g"
-    export OBJCFLAGS="-g"
 }
 
+vlcSetLibVLCEnvironment() {
+    echo "Setting libVLC flags"
+
+    # Enable debug symbols by default
+    export CFLAGS="-g -arch $ACTUAL_HOST_ARCH"
+    export CXXFLAGS="-g -arch $ACTUAL_HOST_ARCH"
+    export OBJCFLAGS="-g -arch $ACTUAL_HOST_ARCH"
+    export LDFLAGS="-arch $ACTUAL_HOST_ARCH"
+}
+
+vlcUnsetLibVLCEnvironment() {
+    echo "Unsetting libVLC flags"
+
+    unset CFLAGS
+    unset CXXFLAGS
+    unset OBJCFLAGS
+    unset LDFLAGS
+}
 
 # Parameter handling
 
@@ -151,9 +189,11 @@ fi
 if [ "$VLC_ENV_MODE" = "contrib" ]; then
     vlcSetBaseEnvironment
     vlcSetSymbolEnvironment
+    vlcUnsetLibVLCEnvironment
     vlcSetContribEnvironment "$MINIMAL_OSX_VERSION"
 elif [ "$VLC_ENV_MODE" = "vlc" ]; then
     vlcSetBaseEnvironment
     vlcSetSymbolEnvironment
     vlcUnsetContribEnvironment
+    vlcSetLibVLCEnvironment
 fi
