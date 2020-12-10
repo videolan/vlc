@@ -59,7 +59,7 @@ AttrsNode::AttrsNode(Type t, AttrsNode *parent_)
 
 AttrsNode::~AttrsNode()
 {
-    while(props.front())
+    while(!props.empty())
     {
         delete props.front();
         props.pop_front();
