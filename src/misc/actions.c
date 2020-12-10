@@ -255,7 +255,7 @@ found:
 
 /*** VLC key map ***/
 
-#define MAXACTION 26
+#define MAXACTION 27
 static const struct name2action
 {
     char psz[MAXACTION];
