@@ -42,10 +42,9 @@
 /*****************************************************************************
  * "RFC 2617: Basic and Digest Access Authentication" header parsing
  *****************************************************************************/
-static char *AuthGetParam( const char *psz_header, const char *psz_param )
+#define AuthGetParam( HEADER, PARAM ) AuthGetParamConcat( HEADER, PARAM "=\"" )
+static char *AuthGetParamConcat( const char *psz_header, const char *psz_what )
 {
-    char psz_what[strlen(psz_param)+3];
-    sprintf( psz_what, "%s=\"", psz_param );
     psz_header = strstr( psz_header, psz_what );
     if ( psz_header )
     {
@@ -62,10 +61,9 @@ static char *AuthGetParam( const char *psz_header, const char *psz_param )
     }
 }
 
-static char *AuthGetParamNoQuotes( const char *psz_header, const char *psz_param )
+#define AuthGetParamNoQuotes( HEADER, PARAM ) AuthGetParamNoQuotesConcat( HEADER, PARAM "=" )
+static char *AuthGetParamNoQuotesConcat( const char *psz_header, const char *psz_what )
 {
-    char psz_what[strlen(psz_param)+2];
-    sprintf( psz_what, "%s=", psz_param );
     psz_header = strstr( psz_header, psz_what );
     if ( psz_header )
     {
