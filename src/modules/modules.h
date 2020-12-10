@@ -66,6 +66,9 @@ extern struct vlc_plugin_t *vlc_plugins;
 /** Plugin entry point prototype */
 typedef int (*vlc_plugin_cb) (int (*)(void *, void *, int, ...), void *);
 
+/** Plugin deactivation callback */
+typedef void (*vlc_deactivate_cb)(vlc_object_t*);
+
 /** Core module */
 int vlc_entry__core (int (*)(void *, void *, int, ...), void *);
 
@@ -95,7 +98,7 @@ struct module_t
     const char *activate_name;
     const char *deactivate_name;
     void *pf_activate;
-    void (*deactivate)(vlc_object_t *);
+    vlc_deactivate_cb deactivate;
 };
 
 vlc_plugin_t *vlc_plugin_create(void);
