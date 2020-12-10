@@ -58,7 +58,7 @@ public:
     bool m_hasPrev = false;
     PlaylistControllerModel::PlaybackRepeat m_repeat = PlaylistControllerModel::PLAYBACK_REPEAT_NONE;
     bool m_random = false;
-    bool m_isPlayAndExit;
+    bool m_isPlayAndExit = false;
     bool m_empty = true;
     size_t m_count = 0;
     PlaylistControllerModel::SortKey m_sortKey = PlaylistControllerModel::SORT_KEY_NONE;
