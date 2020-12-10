@@ -2854,10 +2854,6 @@ main(void)
     test_init();
 
     struct ctx ctx;
-    ctx_init(&ctx, 0);
-    test_audio_loudness_meter(&ctx);
-    ctx_destroy(&ctx);
-    return 0;
 
     /* Test with --aout=none --vout=none */
     ctx_init(&ctx, DISABLE_VIDEO_OUTPUT | DISABLE_AUDIO_OUTPUT);
@@ -2883,7 +2879,6 @@ main(void)
     test_programs(&ctx);
     test_timers(&ctx);
     test_teletext(&ctx);
-    test_audio_loudness_meter(&ctx);
 
     test_delete_while_playback(VLC_OBJECT(ctx.vlc->p_libvlc_int), true);
     test_delete_while_playback(VLC_OBJECT(ctx.vlc->p_libvlc_int), false);
@@ -2892,6 +2887,7 @@ main(void)
     /* Test with --no-video */
     ctx_init(&ctx, DISABLE_VIDEO);
     test_es_selection_override(&ctx);
+    test_audio_loudness_meter(&ctx);
 
     ctx_destroy(&ctx);
     return 0;
