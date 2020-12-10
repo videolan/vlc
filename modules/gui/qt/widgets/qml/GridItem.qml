@@ -253,7 +253,7 @@ FocusScope {
                 y: - root.selectedBorderWidth
                 width: root.width + ( root.selectedBorderWidth * 2 )
                 height:  root.height + ( root.selectedBorderWidth * 2 )
-                color: VLCStyle.colors.bgAlt
+                color: VLCStyle.colors.bgHover
                 visible: root.selected || root._highlighted
             }
 
@@ -346,6 +346,7 @@ FocusScope {
                         width: pictureWidth
                         horizontalAlignment: root.textHorizontalAlignment
                         topPadding: root.titleMargin
+                        color: selectionRect.visible ? VLCStyle.colors.bgHoverText : VLCStyle.colors.text
                     }
                 }
 
@@ -355,6 +356,9 @@ FocusScope {
                     visible: text !== ""
                     text: root.subtitle
                     width: pictureWidth
+                    color: selectionRect.visible
+                           ? VLCStyle.colors.setColorAlpha(VLCStyle.colors.bgHoverText, .6)
+                           : VLCStyle.colors.menuCaption
                 }
             }
         }
