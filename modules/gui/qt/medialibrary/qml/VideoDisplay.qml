@@ -174,6 +174,8 @@ Widgets.NavigableFocusScope {
             expandDelegate: VideoInfoExpandPanel {
                 onRetract: videosGV.retract()
 
+                x: 0
+                width: videosGV.width
                 navigationParent: videosGV
                 navigationCancel:  function() {  videosGV.retract() }
                 navigationUp: function() {  videosGV.retract() }
