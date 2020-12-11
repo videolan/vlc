@@ -180,7 +180,7 @@ libvlc_media_list_t *libvlc_media_list_new(void)
 void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
 {
     if( !vlc_atomic_rc_dec( &p_mlist->rc ) )
-        return
+        return;
 
     /* Refcount null, time to free */
 
