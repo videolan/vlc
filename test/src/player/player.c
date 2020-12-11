@@ -2301,6 +2301,8 @@ test_timers_playback(struct ctx *ctx, struct timer_state timers[],
         struct timer_state *timer = &timers[timer_idx];
         vec_report_timer *vec = &timer->vec;
 
+        assert(vec->size > 1);
+
         for (size_t i = 1; i < vec->size; ++i)
         {
             struct report_timer *prev_report = &vec->data[i - 1];
@@ -2362,6 +2364,7 @@ test_timers_playback(struct ctx *ctx, struct timer_state timers[],
 
         /* It should not receive all update points */
         assert(vec->size < MAX_UPDATE_COUNT);
+        assert(vec->size > 1);
 
         for (size_t i = 1; i < vec->size; ++i)
         {
