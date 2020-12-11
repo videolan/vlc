@@ -1,5 +1,5 @@
 snap:
-	snapcraft prime
+	export SNAPCRAFT_BUILD_INFO=1
 	snapcraft snap
 
 snap-clean:
