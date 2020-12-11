@@ -453,10 +453,7 @@ NavigableFocusScope {
 
             if (root.expandIndex !== -1) {
                 var expandItemPos = root.getItemPos(expandItemGridId)
-                expandItem.x = expandItemPos[0]
                 expandItem.y = expandItemPos[1]
-
-                expandItem.width = root.getNbItemsPerRow() * root._effectiveCellWidth - root.horizontalSpacing
             }
 
             // Place the delegates after the expandItem
