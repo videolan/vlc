@@ -167,6 +167,7 @@ Item {
     property int expandCover_music_height: dp(171, scale)
     property int expandCover_music_width: dp(171, scale)
     property int expandCover_music_radius: gridCover_radius
+    property int expandDelegate_border: dp(1, scale)
 
     property int artistGridCover_radius: dp(90, scale)
 

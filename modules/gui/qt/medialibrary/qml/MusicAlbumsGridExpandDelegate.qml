@@ -36,6 +36,26 @@ Widgets.NavigableFocusScope {
     Rectangle {
         anchors.fill: parent
         color: VLCStyle.colors.bgAlt
+
+        Rectangle {
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
+            color: VLCStyle.colors.buttonBorder
+            height: VLCStyle.expandDelegate_border
+        }
+
+        Rectangle {
+            anchors {
+                bottom: parent.bottom
+                left: parent.left
+                right: parent.right
+            }
+            color: VLCStyle.colors.buttonBorder
+            height: VLCStyle.expandDelegate_border
+        }
     }
 
     RowLayout {
