@@ -45,6 +45,8 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+
+#define LUA_TEXT N_("Enable Lua plugins")
 #define INTF_TEXT N_("Lua interface")
 #define INTF_LONGTEXT N_("Lua interface module to load")
 
@@ -78,6 +80,7 @@ vlc_module_begin ()
         set_category( CAT_INTERFACE )
         set_subcategory( SUBCAT_INTERFACE_MAIN )
 
+        add_bool( "lua", true, LUA_TEXT, LUA_TEXT, true );
         add_string( "lua-intf", "dummy", INTF_TEXT, INTF_LONGTEXT, false )
         add_string( "lua-config", "", CONFIG_TEXT, CONFIG_LONGTEXT, false )
         set_capability( "interface", 0 )
