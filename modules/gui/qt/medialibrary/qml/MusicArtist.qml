@@ -304,6 +304,8 @@ Widgets.NavigableFocusScope {
             expandDelegate: MusicAlbumsGridExpandDelegate {
                 id: expandDelegateId
 
+                x: 0
+                width: gridView_id.width
                 onRetract: gridView_id.retract()
                 navigationParent: root
                 navigationCancel:  function() {  gridView_id.retract() }
