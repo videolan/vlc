@@ -76,14 +76,24 @@ Widgets.NavigableFocusScope {
                 spacing: VLCStyle.margin_normal
 
                 /* A bigger cover for the album */
-                Widgets.RoundImage {
-                    id: expand_cover_id
-                    asynchronous: true
+                Item {
                     height: VLCStyle.expandCover_music_height
                     width: VLCStyle.expandCover_music_width
-                    radius: VLCStyle.expandCover_music_radius
-                    source: model.cover || VLCStyle.noArtAlbum
-                    sourceSize: Qt.size(width, height)
+
+                    Widgets.RoundImage {
+                        id: expand_cover_id
+                        asynchronous: true
+                        height: VLCStyle.expandCover_music_height
+                        width: VLCStyle.expandCover_music_width
+                        radius: VLCStyle.expandCover_music_radius
+                        source: model.cover || VLCStyle.noArtAlbum
+                        sourceSize: Qt.size(width, height)
+                    }
+
+                    Widgets.ListCoverShadow {
+                        source: expand_cover_id
+                        anchors.fill: parent
+                    }
                 }
 
                 Widgets.NavigableRow {
