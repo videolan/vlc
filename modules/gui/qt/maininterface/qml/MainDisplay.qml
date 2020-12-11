@@ -37,6 +37,7 @@ Widgets.NavigableFocusScope {
 
     property alias g_mainDisplay: root
     property bool _inhibitMiniPlayer: false
+    property bool _showMiniPlayer: false
 
     onViewChanged: {
         viewProperties = ({})
@@ -73,6 +74,9 @@ Widgets.NavigableFocusScope {
             sourcesBanner.subSelectedIndex = stackView.currentItem.pageModel.findIndex(function (e) {
                 return e.name === stackView.currentItem.view
             })
+
+        if (player.hasVideoOutput && mainInterface.hasEmbededVideo)
+            _showMiniPlayer = true
     }
 
     navigationCancel: function() {
@@ -339,8 +343,8 @@ Widgets.NavigableFocusScope {
                 width: VLCStyle.dp(320, VLCStyle.scale)
                 height: VLCStyle.dp(180, VLCStyle.scale)
                 z: 2
-                visible: !root._inhibitMiniPlayer && mainInterface.hasEmbededVideo
-                enabled: !root._inhibitMiniPlayer && mainInterface.hasEmbededVideo
+                visible: !root._inhibitMiniPlayer && root._showMiniPlayer
+                enabled: !root._inhibitMiniPlayer && root._showMiniPlayer
 
                 dragXMin: 0
                 dragXMax: root.width - playerPip.width
@@ -384,11 +388,12 @@ Widgets.NavigableFocusScope {
             }
 
             Connections {
-                target: player.videoTracks.count
-                onCountChanged: {
-                    if (player.videoTracks.count > 0
-                            && player.playingState === PlayerController.PLAYING_STATE_PLAYING) {
+                target: player
+                onHasVideoOutputChanged: {
+                    if (player.hasVideoOutput && mainInterface.hasEmbededVideo) {
                         g_mainDisplay.showPlayer()
+                    } else {
+                        _showMiniPlayer = false;
                     }
                 }
             }
