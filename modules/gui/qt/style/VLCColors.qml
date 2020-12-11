@@ -118,6 +118,7 @@ Item {
 
     //vlc orange
     property color accent: "#FFFF950D";
+    property color accentText: "#ffffff";
 
     property color alert: "red";
 
