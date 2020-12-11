@@ -177,6 +177,7 @@ Widgets.NavigableFocusScope {
                     Widgets.ListLabel {
                         text: rowModel ? rowModel.track_number : ""
                         color: foregroundColor
+                        font.weight: Font.Normal
 
                         Layout.fillHeight: true
                         Layout.preferredWidth: VLCStyle.margin_large
