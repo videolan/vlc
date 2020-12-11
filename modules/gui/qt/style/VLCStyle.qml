@@ -161,6 +161,8 @@ Item {
 
     property int gridCover_video_width_large: dp(406, scale)
     property int gridCover_video_height_large: ( gridCover_video_width_large * 10.0 ) / 16
+    
+    property int gridCover_radius: dp(4, scale)
 
     property int expandCover_music_height: dp(171, scale)
     property int expandCover_music_width: dp(171, scale)

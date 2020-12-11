@@ -312,6 +312,7 @@ FocusScope {
                     playCoverVisible: root._highlighted
                     onPlayIconClicked: root.playClicked()
                     clip: true
+                    radius: VLCStyle.gridCover_radius
 
                     /* new indicator (triangle at top-left of cover)*/
                     Rectangle {
