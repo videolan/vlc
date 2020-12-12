@@ -457,6 +457,10 @@ VLC_API vlc_tls_t *vlc_tls_SocketOpenAddrInfo(const struct addrinfo *ai,
  * This function resolves a hostname, and attempts to establish a TCP/IP
  * connection to the specified host and port number.
  *
+ * @param obj optional object to log errors (may be NULL)
+ * @param hostname remote host name or IP address literal to connect to
+ * @param port remote TCP port number to connect to
+ *
  * @note The function currently iterates through the addrinfo linked list.
  * Future versions may implement different behaviour (e.g. RFC6555).
  *
