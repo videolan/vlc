@@ -36,6 +36,7 @@
 #include <vlc_plugin.h>
 #include <vlc_atomic.h>
 #include <vlc_filter.h>
+#include <vlc_mouse.h>
 #include <vlc_picture.h>
 #include "filter_picture.h"
 #include "../control/motionlib.h"
@@ -47,6 +48,8 @@ static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
+static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
+                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new );
 static picture_t *FilterPacked( filter_t *, picture_t * );
 
 static int RotateCallback( vlc_object_t *p_this, char const *psz_var,
@@ -149,6 +152,9 @@ static int Create( vlc_object_t *p_this )
             return VLC_EGENERIC;
     }
 
+    /* Add mouse filter */
+    p_filter->pf_video_mouse = Mouse;
+
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
@@ -196,6 +202,40 @@ static void Destroy( vlc_object_t *p_this )
                          RotateCallback, p_sys );
     }
     free( p_sys );
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
+                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+{
+    VLC_UNUSED( p_old );
+
+    const video_format_t *p_fmt = &p_filter->fmt_out.video;
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    *p_mouse = *p_new;
+
+    if( p_sys->p_motion != NULL )
+    {
+        int i_angle = motion_get_angle( p_sys->p_motion );
+        store_trigo( p_sys, i_angle / 20.f );
+    }
+
+    int i_sin, i_cos;
+    fetch_trigo( p_sys, &i_sin, &i_cos );
+
+    p_mouse->i_x = ( p_fmt->i_visible_width >> 1 );
+    p_mouse->i_y = ( p_fmt->i_visible_height >> 1 );
+
+    const int i_rx = ( p_new->i_x - p_mouse->i_x );
+    const int i_ry = ( p_new->i_y - p_mouse->i_y );
+
+    p_mouse->i_x += ( ( i_rx * i_cos - i_ry * i_sin )>> 12 );
+    p_mouse->i_y += ( ( i_rx * i_sin + i_ry * i_cos )>> 12 );
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
