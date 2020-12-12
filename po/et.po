@@ -5,17 +5,18 @@
 # Translators:
 # Ildar Kamaev <thetechnorat@gmail.com>, 2014
 # Ivar Smolin <okul@linux.ee>, 2012-2013
-# Mattias Põldaru <mahfiaz@gmail.com> 2010,2019
 # Joel Limberg <joel@stuudium.com>, 2014
+# Mattias Põldaru <mahfiaz@gmail.com> 2010,2019
 # Mihkel Vain <turakas@gmail.com>, 2010-2014
 # Mihkel Tõnnov <mihhkel@gmail.com>, 2018
+# Priit Jõerüüt <transifex@joeruut.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-11-25 07:00+0100\n"
-"Last-Translator: Mattias Põldaru <mahfiaz@gmail.com>, 2019\n"
+"PO-Revision-Date: 2020-12-12 19:37+0100\n"
+"Last-Translator: Priit Jõerüüt <transifex@joeruut.com>, 2020\n"
 "Language-Team: Estonian (https://www.transifex.com/yaron/teams/16553/et/)\n"
 "Language: et\n"
 "MIME-Version: 1.0\n"
@@ -915,7 +916,7 @@ msgstr "Koodek pole toetatud"
 #: src/input/decoder.c:1893
 #, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr ""
+msgstr "VLC ei suutnud dekodeerida vormingut \"%4.4s\" (%s)"
 
 #: src/input/decoder.c:1897
 msgid "Unidentified codec"
@@ -1133,11 +1134,11 @@ msgstr "Määramata"
 
 #: src/input/es_out.c:3212
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 rida, 60 Hz)"
 
 #: src/input/es_out.c:3214
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 rida, 50 Hz)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
@@ -18007,7 +18008,7 @@ msgstr ""
 #: modules/gui/macosx/VLCSimplePrefsController.m:827
 #: modules/gui/qt/dialogs/preferences.cpp:336
 msgid "Reset Preferences"
-msgstr "Lähtesta sätted"
+msgstr "Lähtesta eelistused"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:830
 msgid ""
@@ -18855,7 +18856,7 @@ msgstr "Laiendatud sätete kuvamine"
 
 #: modules/gui/qt/components/controller.hpp:120
 msgid "Toggle playlist"
-msgstr ""
+msgstr "Näita esitusloendit / peida esitusloend"
 
 #: modules/gui/qt/components/controller.hpp:121
 msgid "Take a snapshot"
