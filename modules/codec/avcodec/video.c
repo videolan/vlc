@@ -1079,7 +1079,11 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         /* Compute the PTS */
 #if LIBAVCODEC_VERSION_CHECK( 57, 24, 0, 61, 100 )
+# if LIBAVCODEC_VERSION_MICRO >= 100
+        int64_t av_pts = frame->best_effort_timestamp;
+# else
         int64_t av_pts = frame->pts;
+# endif
 #else
         int64_t av_pts = frame->pkt_pts;
 #endif
