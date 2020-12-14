@@ -34,7 +34,9 @@
 #include <vlc_network.h>
 #include <vlc_block.h>
 #include <vlc_url.h>
+#ifdef HAVE_POLL
 #include <poll.h>
+#endif
 
 #include "rist.h"
 
