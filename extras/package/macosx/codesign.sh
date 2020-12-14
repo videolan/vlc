@@ -79,13 +79,19 @@ if [ -e "./vlc-cache-gen" ]; then
     VLCCACHEGEN="./vlc-cache-gen"
 fi
 
+$VLCCACHEGEN --help 1>/dev/null 2>&1 && returncode=$? || returncode=$?
+if [ $returncode -ne 0 ]; then
+    info "WARN: Cannot execute vlc-cache-gen with path '$VLCCACHEGEN' (wrong arch?)"
+    VLCCACHEGEN=""
+fi
+
 if [ -z "$VLCCACHEGEN" ]; then
-info "WARN: Cannot find vlc-cache-gen, cache will be corrupt after signing"
+    info "WARN: Cannot find vlc-cache-gen, cache will be removed for signing"
 fi
 
 SCRIPTDIR=$(dirname "$0")
 if [ ! -z "$RUNTIME" ]; then
-RUNTIME_FLAGS="--options runtime --entitlements $SCRIPTDIR/vlc-hardening.entitlements"
+    RUNTIME_FLAGS="--options runtime --entitlements $SCRIPTDIR/vlc-hardening.entitlements"
 fi
 
 # Call with $1 = file or folder
@@ -124,9 +130,10 @@ done
 
 if [ ! -z "$VLCCACHEGEN" ]; then
     $VLCCACHEGEN VLC.app/Contents/Frameworks/plugins
+    sign "VLC.app/Contents/Frameworks/plugins/plugins.dat"
+else
+    rm "VLC.app/Contents/Frameworks/plugins/plugins.dat" || true
 fi
-
-sign "VLC.app/Contents/Frameworks/plugins/plugins.dat"
 
 info "Signing the libraries"
 
