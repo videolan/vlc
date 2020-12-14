@@ -1,6 +1,6 @@
 SUFFIXES += .xib
 
-libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -fobjc-arc 
+libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -fobjc-arc
 libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
 	-Wl,-framework,Cocoa -Wl,-framework,CoreServices \
 	-Wl,-framework,AVFoundation -Wl,-framework,CoreMedia -Wl,-framework,IOKit \
@@ -759,6 +759,7 @@ EXTRA_DIST += \
 	gui/macosx/Resources/pl.lproj/InfoPlist.strings \
 	gui/macosx/Resources/pt-BR.lproj/InfoPlist.strings \
 	gui/macosx/Resources/pt-PT.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ro.lproj/InfoPlist.strings \
 	gui/macosx/Resources/sk.lproj/InfoPlist.strings \
 	gui/macosx/Resources/sl.lproj/InfoPlist.strings \
 	gui/macosx/Resources/sv.lproj/InfoPlist.strings \
