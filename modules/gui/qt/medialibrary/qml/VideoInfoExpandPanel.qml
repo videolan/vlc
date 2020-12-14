@@ -88,16 +88,26 @@ Widgets.NavigableFocusScope {
 
                     spacing: VLCStyle.margin_normal
 
-                    /* A bigger cover for the album */
-                    Image {
-                        id: expand_cover_id
-                        asynchronous: true
-
+                    Item {
                         height: VLCStyle.gridCover_video_height
                         width: VLCStyle.gridCover_video_width
-                        source: model.thumbnail || VLCStyle.noArtCover
-                        sourceSize: Qt.size(width, height)
-                        fillMode: Image.PreserveAspectFit
+
+                        /* A bigger cover for the album */
+                        Widgets.RoundImage {
+                            id: expand_cover_id
+
+                            anchors.fill: parent
+                            asynchronous: true
+                            source: model.thumbnail || VLCStyle.noArtCover
+                            sourceSize: Qt.size(width, height)
+                            fillMode: Image.PreserveAspectFit
+                            radius: VLCStyle.gridCover_radius
+                        }
+
+                        Widgets.ListCoverShadow {
+                            anchors.fill: expand_cover_id
+                            source: expand_cover_id
+                        }
                     }
 
                     Widgets.NavigableRow {
