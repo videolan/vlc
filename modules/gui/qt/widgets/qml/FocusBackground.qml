@@ -21,47 +21,53 @@ import QtQuick 2.0
 import "qrc:///style/"
 
 Rectangle {
+    id: root
+
     property bool active: activeFocus
     property bool selected: false
 
-    onActiveChanged: {
-        animateSelected.running = false
-        if (active) {
-            animateActive.restart()
-        } else {
-            if (selected)
-                color = VLCStyle.colors.bgHoverInactive
-            else
-                color = "transparent"
-            animateActive.running = false
+    states: [
+        State {
+            name: "selected"
+
+            PropertyChanges {
+                target: root
+                color: VLCStyle.colors.bgHoverInactive
+            }
+        },
+        State {
+            name: "active"
+
+            PropertyChanges {
+                target: root
+                color: VLCStyle.colors.accent
+            }
+        },
+        State {
+            name: "normal"
+
+            PropertyChanges {
+                target: root
+                color: "transparent"
+            }
+        }
+    ]
+
+    transitions: Transition {
+        to: "*"
+
+        ColorAnimation {
+            property: "color"
+            duration: 100
+            easing.type: Easing.InOutSine
         }
     }
 
-    onSelectedChanged: {
-        if (active)
-            return
-        color = "transparent"
-        if (selected) {
-            animateSelected.restart()
-        } else {
-            animateSelected.running = false
-        }
-
-    }
-
-    color: "transparent"
-    ColorAnimation on color {
-        id: animateActive
-        running: false
-        to: VLCStyle.colors.accent
-        duration: 200
-        easing.type: Easing.OutCubic
-    }
-    ColorAnimation on color {
-        id: animateSelected
-        running: false
-        to: VLCStyle.colors.bgHoverInactive
-        duration: 200
-        easing.type: Easing.OutCubic
+    state: {
+        if (active || activeFocus)
+            return "active"
+        if (selected)
+            return "selected"
+        return "normal"
     }
 }
