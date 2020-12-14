@@ -42,6 +42,7 @@
 #include <map>
 #include <cctype>
 #include <algorithm>
+#include <limits>
 
 using namespace adaptive;
 using namespace adaptive::playlist;
