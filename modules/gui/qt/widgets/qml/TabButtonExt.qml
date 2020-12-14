@@ -37,12 +37,14 @@ T.TabButton {
 
     property string iconTxt: ""
     property bool selected: false
-    property color color: VLCStyle.colors.text
+    property color color: focusBackground.foregroundColor
     property bool busy: false
 
     font.pixelSize: VLCStyle.fontSize_normal
 
     background: FocusBackground {
+        id: focusBackground
+
         height: control.height
         width: control.width
         active: (control.activeFocus || control.hovered)

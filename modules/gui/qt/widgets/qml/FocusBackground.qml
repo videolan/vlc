@@ -25,6 +25,7 @@ Rectangle {
 
     property bool active: activeFocus
     property bool selected: false
+    property color foregroundColor: VLCStyle.colors.text
 
     states: [
         State {
@@ -33,6 +34,7 @@ Rectangle {
             PropertyChanges {
                 target: root
                 color: VLCStyle.colors.bgHoverInactive
+                foregroundColor: VLCStyle.colors.bgHoverText
             }
         },
         State {
@@ -41,6 +43,7 @@ Rectangle {
             PropertyChanges {
                 target: root
                 color: VLCStyle.colors.accent
+                foregroundColor: VLCStyle.colors.accentText
             }
         },
         State {
@@ -49,6 +52,7 @@ Rectangle {
             PropertyChanges {
                 target: root
                 color: "transparent"
+                foregroundColor: VLCStyle.colors.text
             }
         }
     ]
