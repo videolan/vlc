@@ -24,7 +24,9 @@ endif
 endif
 endif
 else ifdef HAVE_MACOSX
+ifneq ($(ARCH),aarch64) # macOS ARM-64 is unsupported
 RUST_TARGET = $(ARCH)-apple-darwin
+endif
 else ifdef HAVE_SOLARIS
 RUST_TARGET = x86_64-sun-solaris
 else ifdef HAVE_LINUX
