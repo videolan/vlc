@@ -23,6 +23,7 @@
 #endif
 
 #include "Inheritables.hpp"
+#include <limits>
 
 using namespace adaptive::playlist;
 using namespace adaptive;
