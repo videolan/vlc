@@ -31,6 +31,7 @@
 
 #include <new>
 #include <iterator>
+#include <limits>
 
 matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream, KaxSegment *p_seg )
     :segment(p_seg)

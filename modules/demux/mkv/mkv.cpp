@@ -34,6 +34,7 @@
 #include "stream_io_callback.hpp"
 
 #include <new>
+#include <limits>
 
 extern "C" {
     #include "../av1_unpack.h"
