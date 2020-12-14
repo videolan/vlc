@@ -30,6 +30,7 @@
 
 #include <new>
 #include <iterator>
+#include <limits>
 
 namespace mkv {
 

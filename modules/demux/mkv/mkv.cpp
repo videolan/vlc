@@ -31,6 +31,7 @@
 #include "Ebml_parser.hpp"
 
 #include <new>
+#include <limits>
 
 extern "C" {
     #include "../av1_unpack.h"
