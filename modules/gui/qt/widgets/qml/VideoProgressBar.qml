@@ -24,7 +24,7 @@ ProgressBar {
     id: progressBar
     background: Rectangle {
         implicitHeight: VLCStyle.dp(2, VLCStyle.scale)
-        color: VLCStyle.colors.text
+        color: "white"
     }
     contentItem: Item {
         Rectangle {
