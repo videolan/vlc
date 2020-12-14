@@ -91,7 +91,7 @@ T.TabButton {
             }
 
 
-            Widgets.MenuCaption {
+            Widgets.ListLabel {
                 text: control.text
                 color: control.color
             }
