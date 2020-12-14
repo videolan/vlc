@@ -4,26 +4,26 @@
 #
 # Translators:
 # Ahto Simakuutio <simakuutio@gmail.com>, 2016
-# Jouni Kähkönen, 2007
+# Joni Maatta <maatta.joni1@gmail.com>, 2014
 # Juha Jeronen <juha.jeronen@jyu.fi>, 2011,2012
-# joni.maatta <maatta.joni1@gmail.com>, 2014
-# Otto Kekäläinen, 2008-2010
+# Kasvain <kasvain@gmail.com>, 2014-2015
+# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2020
 # Marko <marko.sahakangas@gmail.com>, 2015
 # mrJalostaja <pauli.nykanen@yahoo.com>, 2014
+# Otto Kekäläinen, 2008-2010
 # Petri Huotari, 2014-2015
 # Rikkokiri <pilvi.rajala@gmail.com>, 2014
 # Riku Viitanen <riisseli4@gmail.com>, 2016
 # Saku Tiihonen <zackyistic@gmail.com>, 2016
 # Tero Pelander, 2009
 # Tomi Toivio <tomi@sange.fi>, 2013
-# Kasvain <kasvain@gmail.com>, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2020-12-14 22:27+0100\n"
+"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2020\n"
 "Language-Team: Finnish (https://www.transifex.com/yaron/teams/16553/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -197,11 +197,11 @@ msgstr ""
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
-msgstr ""
+msgstr "Jakajat"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr ""
+msgstr "Videonjakajat erottavat virtauksen useisiin videoihin."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
@@ -684,7 +684,7 @@ msgstr "Spektri"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "VU-mittari"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -706,7 +706,7 @@ msgstr "Mono"
 
 #: src/audio_output/output.c:425
 msgid "Original"
-msgstr ""
+msgstr "Alkuperäinen"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -864,11 +864,11 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr ""
+msgstr " (oletusarvo käytössä)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr ""
+msgstr " (oletusarvo pois käytöstä)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -1015,7 +1015,7 @@ msgstr "Kyllä"
 #: src/input/es_out.c:2141
 #, c-format
 msgid "DTVCC Closed captions %u"
-msgstr ""
+msgstr "DTVCC tekstitykset %u"
 
 #: src/input/es_out.c:2143
 #, c-format
@@ -1103,11 +1103,11 @@ msgstr "%.2f dB"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr "Videon tarkkuus"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
-msgstr ""
+msgstr "Puskurin mitat"
 
 #: src/input/es_out.c:3183 src/input/es_out.c:3186 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1125,39 +1125,39 @@ msgstr "Purettu formaatti"
 
 #: src/input/es_out.c:3199
 msgid "Top left"
-msgstr ""
+msgstr "Vasen ylänurkka"
 
 #: src/input/es_out.c:3199
 msgid "Left top"
-msgstr ""
+msgstr "Vasen yläosa"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr ""
+msgstr "Oikea alaosa"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
-msgstr ""
+msgstr "Oikea ylänurkka"
 
 #: src/input/es_out.c:3201
 msgid "Bottom left"
-msgstr ""
+msgstr "Vasen alanurkka"
 
 #: src/input/es_out.c:3201
 msgid "Bottom right"
-msgstr ""
+msgstr "Oikea alanurkka"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
-msgstr ""
+msgstr "Vasen alaosa"
 
 #: src/input/es_out.c:3202
 msgid "Right top"
-msgstr ""
+msgstr "Oikea yläosa"
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
-msgstr ""
+msgstr "Asento"
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
@@ -1167,15 +1167,15 @@ msgstr "Määrittelemätön"
 
 #: src/input/es_out.c:3212
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 juovaa, 60 Hz)"
 
 #: src/input/es_out.c:3214
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 juovaa, 50 Hz)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
-msgstr ""
+msgstr "Perusvärit"
 
 #: src/input/es_out.c:3229 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1188,20 +1188,20 @@ msgstr ""
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
-msgstr ""
+msgstr "Värin siirtotoiminto"
 
 #: src/input/es_out.c:3253
 msgid "Color space"
-msgstr ""
+msgstr "Väriavaruus"
 
 #: src/input/es_out.c:3253
 #, c-format
 msgid "%s Range"
-msgstr ""
+msgstr "%s Alue"
 
 #: src/input/es_out.c:3255
 msgid "Full"
-msgstr ""
+msgstr "Täysi"
 
 #: src/input/es_out.c:3262 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1216,83 +1216,83 @@ msgstr "Keski"
 
 #: src/input/es_out.c:3263
 msgid "Top Left"
-msgstr ""
+msgstr "Vasen ylänurkka"
 
 #: src/input/es_out.c:3264
 msgid "Top Center"
-msgstr ""
+msgstr "Keskellä yläosa"
 
 #: src/input/es_out.c:3265
 msgid "Bottom Left"
-msgstr ""
+msgstr "Vasen alanurkka"
 
 #: src/input/es_out.c:3266
 msgid "Bottom Center"
-msgstr ""
+msgstr "Keskellä alaosa"
 
 #: src/input/es_out.c:3270
 msgid "Chroma location"
-msgstr ""
+msgstr "Värikylläisyyden sijainti"
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
-msgstr ""
+msgstr "Suorakulmainen"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
-msgstr ""
+msgstr "Tasakulmainen"
 
 #: src/input/es_out.c:3285
 msgid "Cubemap"
-msgstr ""
+msgstr "Kuutio"
 
 #: src/input/es_out.c:3291
 msgid "Projection"
-msgstr ""
+msgstr "Projektio"
 
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Poikkeus"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Sävel"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "Rulla"
 
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "Näkökenttä"
 
 #: src/input/es_out.c:3305
 msgid "Max. luminance"
-msgstr ""
+msgstr "Maksimi kirkkaus"
 
 #: src/input/es_out.c:3310
 msgid "Min. luminance"
-msgstr ""
+msgstr "Minimi kirkkaus"
 
 #: src/input/es_out.c:3318
 msgid "Primary R"
-msgstr ""
+msgstr "Ensisijainen R"
 
 #: src/input/es_out.c:3325
 msgid "Primary G"
-msgstr ""
+msgstr "Ensisijainen G"
 
 #: src/input/es_out.c:3332
 msgid "Primary B"
-msgstr ""
+msgstr "Ensisijainen B"
 
 #: src/input/es_out.c:3339
 msgid "White point"
-msgstr ""
+msgstr "Valkoinen piste"
 
 #: src/input/es_out.c:3354 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1412,11 +1412,11 @@ msgstr "Näyttelijät"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 msgid "Album Artist"
-msgstr ""
+msgstr "Albumin esittäjä"
 
 #: src/input/meta.c:80
 msgid "Disc number"
-msgstr ""
+msgstr "Levyn numero"
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1458,11 +1458,11 @@ msgstr "Edellinen nimi"
 
 #: src/input/var.c:278
 msgid "Menu title"
-msgstr ""
+msgstr "Valikon otsikko"
 
 #: src/input/var.c:285
 msgid "Menu popup"
-msgstr ""
+msgstr "Valikon ilmoitus"
 
 #: src/input/var.c:319
 #, c-format
@@ -1615,6 +1615,9 @@ msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
+"Tämä mahdollistaa värilliset viestit konsolissa, joka näkyy komentorivi-"
+"ikkunassa, josta VLC avattiin. Terminalissa on oltava Linux-värituki, jotta "
+"tämä toimii."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1667,11 +1670,11 @@ msgstr ""
 
 #: src/libvlc-module.c:129
 msgid "Media role"
-msgstr ""
+msgstr "Median rooli"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
-msgstr ""
+msgstr "Median (soittimen) rooli järjestelmässä."
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:273
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:407
@@ -1688,11 +1691,11 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "Musiikki"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
-msgstr ""
+msgstr "Viestintä"
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
@@ -1700,23 +1703,23 @@ msgstr "Peli"
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "Ilmoitus"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
-msgstr ""
+msgstr "Animaatio"
 
 #: src/libvlc-module.c:143
 msgid "Production"
-msgstr ""
+msgstr "Tuotanto"
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
-msgstr ""
+msgstr "Käytettävyys"
 
 #: src/libvlc-module.c:144
 msgid "Test"
-msgstr ""
+msgstr "Kokeilu"
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
@@ -1769,13 +1772,15 @@ msgstr ""
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
-msgstr ""
+msgstr "Pakota S/PDIF-tuki"
 
 #: src/libvlc-module.c:176
 msgid ""
 "This option should be used when the audio output can't negotiate S/PDIF "
 "support."
 msgstr ""
+"Tätä tulisi käyttää, jos äänen ulostulo ei pysty neuvottelemaan S/PDIF-"
+"tuesta."
 
 #: src/libvlc-module.c:178
 msgid "Force detection of Dolby Surround"
@@ -1845,7 +1850,7 @@ msgstr "Toistonvahvistustila (replay gain)"
 
 #: src/libvlc-module.c:214
 msgid "Select the replay gain mode"
-msgstr ""
+msgstr "Valitse toiston vahvistus"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
@@ -1856,6 +1861,8 @@ msgid ""
 "This allows you to change the default target level (89 dB) for stream with "
 "replay gain information"
 msgstr ""
+"Tällä valitaan oletusarvoinen äänivirran kohdetaso (89 dB) käyttämällä "
+"toiston esivahvistustietoja"
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
@@ -1864,6 +1871,8 @@ msgstr "Oletusarvoinen toistonvahvistus (replay gain)"
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
 msgstr ""
+"Tätä vahvistusta käytetään äänivirroille, joissa ei ole toiston "
+"vahvistustietoja"
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
@@ -1871,7 +1880,7 @@ msgstr "Huippujen suojaus"
 
 #: src/libvlc-module.c:227
 msgid "Protect against sound clipping"
-msgstr ""
+msgstr "Suojaudu äänen leikkaantumiselta"
 
 #: src/libvlc-module.c:230
 msgid "Enable time stretching audio"
@@ -1882,6 +1891,8 @@ msgid ""
 "This allows playing audio at lower or higher speed without affecting the "
 "audio pitch"
 msgstr ""
+"Tämä mahdollistaa äänen toistamisen hitaammin tai nopeammin muuttamatta "
+"äänenkorkeutta"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1131
 #: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:109
@@ -2113,7 +2124,7 @@ msgstr "Koko näytön video"
 
 #: src/libvlc-module.c:313
 msgid "Start video in fullscreen mode"
-msgstr ""
+msgstr "Käynnistä video koko näytön tilassa"
 
 #: src/libvlc-module.c:315 src/video_output/vout_intf.c:253
 msgid "Always on top"
@@ -2125,7 +2136,7 @@ msgstr "Sijoita videoikkuna aina kaikkien ikkunoiden ylle."
 
 #: src/libvlc-module.c:319
 msgid "Enable wallpaper mode"
-msgstr ""
+msgstr "Ota taustakuva käyttöön"
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2240,7 +2251,7 @@ msgstr "Videomonistinmoduuli"
 
 #: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
-msgstr ""
+msgstr "Tämä lisää videon suodattimia kuten kloonaus tai seinä"
 
 #: src/libvlc-module.c:383
 msgid "Video filter module"
@@ -2272,7 +2283,7 @@ msgstr "Videoruudunkaappauksen muoto"
 
 #: src/libvlc-module.c:399
 msgid "Image format which will be used to store the video snapshots"
-msgstr ""
+msgstr "Videoruudunkaappausten tallentamiseen käytetty kuvatiedostomuoto"
 
 #: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
@@ -2289,6 +2300,7 @@ msgstr "Käytä aikaleiman sijasta järjestysnumeroita"
 #: src/libvlc-module.c:407
 msgid "Use sequential numbers instead of timestamps for snapshot numbering"
 msgstr ""
+"Käytä ruudunkaappausten numerointiin aikaleiman sijasta järjestysnumeroita"
 
 #: src/libvlc-module.c:409
 msgid "Video snapshot width"
@@ -2437,6 +2449,8 @@ msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr ""
+"Mahdollistaa ruutujen ohittamisen MPEG2-videovirrassa. Ruutuja ohitetaan, "
+"jos tietokone on liian hidas purkamaan ja näyttämään kaikki ruudut."
 
 #: src/libvlc-module.c:473
 msgid "Drop late frames"
@@ -2756,7 +2770,7 @@ msgstr "Käytettävän tekstitysraidan tunniste (ID)."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
-msgstr ""
+msgstr "Ensisijainen suljetun tekstityksen purkaja"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -2804,7 +2818,7 @@ msgstr "Syötteiden kertauksia"
 
 #: src/libvlc-module.c:632
 msgid "Number of time the same input will be repeated"
-msgstr ""
+msgstr "Kuinka monta kertaa samaa syötettä toistetaan"
 
 #: src/libvlc-module.c:634 modules/gui/macosx/VLCOpenWindowController.m:159
 msgid "Start time"
@@ -2836,7 +2850,7 @@ msgstr "Nopea kelaus"
 
 #: src/libvlc-module.c:648
 msgid "Favor speed over precision while seeking"
-msgstr ""
+msgstr "Suosi nopeutta tarkkuuden sijaan lukukohtaa siirrettäessä"
 
 #: src/libvlc-module.c:650
 msgid "Playback speed"
@@ -2883,14 +2897,17 @@ msgid ""
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
 "{...}\""
 msgstr ""
+"Voit syöttää tähän käsin kirjanmerkkejä video- tai äänivirralle. Siirtymät "
+"lasketaan tietovirran alusta. Muoto on \"{name=kirjanmerkin-nimi,"
+"time=valinnainen-aikasiirtymä,bytes=valinnainen-tavusiirtymä},{...}\""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
-msgstr ""
+msgstr "Tallennus hakemisto"
 
 #: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
-msgstr ""
+msgstr "Kansio, johon äänitys tallennetaan"
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
@@ -2901,6 +2918,8 @@ msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
 msgstr ""
+"Mikäli mahdollista, lähdevirta äänitetään sellaisenaan sen sijaan, että se "
+"ajettaisiin suoratoiston lähtömoduuliin."
 
 #: src/libvlc-module.c:680
 msgid "Timeshift directory"
@@ -2942,7 +2961,7 @@ msgstr ""
 
 #: src/libvlc-module.c:695
 msgid "Disable all lua plugins"
-msgstr ""
+msgstr "Poista käytöstä kaikki lua-laajennukset"
 
 #: src/libvlc-module.c:699
 msgid ""
@@ -2972,11 +2991,11 @@ msgstr ""
 
 #: src/libvlc-module.c:710
 msgid "Subtitles text scaling factor"
-msgstr ""
+msgstr "Tekstityksen tekstin skaalauskerroin"
 
 #: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
-msgstr ""
+msgstr "Muuttaa tekstityksen kokoa mahdollisuuksien mukaan"
 
 #: src/libvlc-module.c:713
 msgid "Enable sub-pictures"
@@ -3113,18 +3132,24 @@ msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
+"Tämä on oletusarvoisesti käytettävä DVD-laite (tai tiedosto). Muista "
+"kaksoispiste asematunnuksen jälkeen (esim. D:)"
 
 #: src/libvlc-module.c:771
 msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
+"Tämä on oletusarvoisesti käytettävä VCD-laite (tai tiedosto). Muista "
+"kaksoispiste asematunnuksen jälkeen (esim. D:)"
 
 #: src/libvlc-module.c:774 modules/access/cdda.c:704
 msgid ""
 "This is the default Audio CD drive (or file) to use. Don't forget the colon "
 "after the drive letter (e.g. D:)"
 msgstr ""
+"Tämä on ääni- CD-aseman (tai tiedoston) oletusarvo. Älä unohda "
+"kaksoispistettä asemakirjaimen jälkeen (esim.D :)"
 
 #: src/libvlc-module.c:781
 msgid "This is the default DVD device to use."
@@ -3144,7 +3169,7 @@ msgstr "TCP-yhteyden aikakatkaisu"
 
 #: src/libvlc-module.c:801
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr ""
+msgstr "Oletus TCP-yhteyden aikakatkaisu (millisekunteina)."
 
 #: src/libvlc-module.c:803
 msgid "HTTP server address"
@@ -3274,6 +3299,8 @@ msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
 msgstr ""
+"SOCKS-välityspalvelin, jota käytetään. Tämän on oltava muotoa osoite:portti. "
+"Välityspalvelinta käytetään kaikille TCP-yhteyksille."
 
 #: src/libvlc-module.c:862
 msgid "SOCKS user name"
@@ -3418,7 +3445,7 @@ msgstr "Lähetä kaikki ES:t"
 
 #: src/libvlc-module.c:937
 msgid "Stream all elementary streams (video, audio and subtitles)"
-msgstr ""
+msgstr "Lähetä kaikki perusvirrat (video, ääni ja tekstitykset)"
 
 #: src/libvlc-module.c:939
 msgid "Display while streaming"
@@ -3474,6 +3501,9 @@ msgid ""
 "playlist item (automatically insert the gather stream output if not "
 "specified)"
 msgstr ""
+"Tämä mahdollistaa useamman soittolistan kohteen lähettämisen peräkkäin saman "
+"suoratoiston läpi (lisää automaattisesti ulostulon, jos sitä ei ole "
+"määritetty)"
 
 #: src/libvlc-module.c:964
 msgid "Stream output muxer caching (ms)"
@@ -3484,6 +3514,8 @@ msgid ""
 "This allow you to configure the initial caching amount for stream output "
 "muxer. This value should be set in milliseconds."
 msgstr ""
+"Voit määrittää välimuistin määrän lähetyksen ulostulolle. Tämä arvo on "
+"asetettava millisekunteina."
 
 #: src/libvlc-module.c:969
 msgid "Preferred packetizer list"
@@ -3833,7 +3865,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1147
 msgid "Show hidden files"
-msgstr ""
+msgstr "Näytä piilotiedostot"
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
@@ -4708,7 +4740,7 @@ msgstr "Käy saatavilla olevat lomituksenpoistotilat läpi."
 
 #: src/libvlc-module.c:1415
 msgid "Show controller in fullscreen"
-msgstr "Näytä kontrollit kokoruututilassa"
+msgstr "Näytä ohjaimet koko näytön tilassa"
 
 #: src/libvlc-module.c:1416
 msgid "Boss key"
@@ -6202,7 +6234,7 @@ msgstr ""
 
 #: modules/access/avcapture.m:295 modules/access/avcapture.m:324
 msgid "No video devices found"
-msgstr ""
+msgstr "Videolaitteita ei löydetty"
 
 #: modules/access/avcapture.m:296
 msgid ""
@@ -6314,7 +6346,7 @@ msgstr ""
 
 #: modules/access/bluray.c:922
 msgid "Java required"
-msgstr ""
+msgstr "Java vaaditaan"
 
 #: modules/access/bluray.c:923
 #, c-format
@@ -6325,7 +6357,7 @@ msgstr ""
 
 #: modules/access/bluray.c:924
 msgid "Java was not found on your system."
-msgstr ""
+msgstr "Javaa ei löytynyt järjestelmästä."
 
 #: modules/access/bluray.c:947
 msgid "Failed to start bluray playback. Please try without menu support."
@@ -6404,7 +6436,7 @@ msgstr "IIDC Digitaalisen kameran (FireWire) sisääntulo"
 
 #: modules/access/dcp/dcp.cpp:43
 msgid "KDM file"
-msgstr ""
+msgstr "KDM-tiedosto"
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
@@ -6825,7 +6857,7 @@ msgstr "Laite \"%s\" ei tue tarvittavia parametrejä."
 
 #: modules/access/dsm/access.c:72 modules/access/dsm/sd.c:138
 msgid "Windows networks"
-msgstr ""
+msgstr "Windows-verkot"
 
 #: modules/access/dsm/access.c:74
 msgid "libdsm's SMB (Windows network shares) input and browser"
@@ -7348,11 +7380,11 @@ msgstr ""
 
 #: modules/access/dvb/access.c:79
 msgid "DVB"
-msgstr ""
+msgstr "DVB"
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
-msgstr ""
+msgstr "DVB-tulo v4l2-tuella"
 
 #: modules/access/dvb/scan.c:817
 #, c-format
@@ -7521,7 +7553,7 @@ msgstr "Käyttäjätunnus, jota käytetään yhteyden avaamiseen."
 
 #: modules/access/ftp.c:78
 msgid "FTP authentication"
-msgstr ""
+msgstr "FTP-todentaminen"
 
 #: modules/access/ftp.c:79
 #, c-format
@@ -7586,7 +7618,7 @@ msgstr ""
 
 #: modules/access/http/access.c:289
 msgid "HTTPS"
-msgstr ""
+msgstr "HTTPS"
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -8052,7 +8084,7 @@ msgstr ""
 
 #: modules/access/nfs.c:57
 msgid "NFS"
-msgstr ""
+msgstr "NFS"
 
 #: modules/access/nfs.c:58
 msgid "NFS input"
@@ -8510,7 +8542,7 @@ msgstr "Alue/työryhmä jota käytetään yhteyteen."
 
 #: modules/access/smb_common.h:34
 msgid "SMB authentication required"
-msgstr ""
+msgstr "SMB-todentaminen vaaditaan"
 
 #: modules/access/smb_common.h:35
 #, c-format
@@ -9129,7 +9161,7 @@ msgstr "X.509-asiakkaan sertifikaatti"
 
 #: modules/access/vnc.c:53
 msgid "Certificate for client authentication"
-msgstr ""
+msgstr "Sertifikaatti asiakasohjelman todennusta varten"
 
 #: modules/access/vnc.c:54
 msgid "X.509 Client private key"
@@ -10676,7 +10708,7 @@ msgstr "Pulseaudio-äänilähtö"
 
 #: modules/audio_output/sndio.c:39
 msgid "OpenBSD sndio audio output"
-msgstr "OpenBSD sndio-äänilähtö"
+msgstr "OpenBSD sndio -äänilähtö"
 
 #: modules/audio_output/volume.h:30
 msgid "Software gain"
@@ -12001,7 +12033,7 @@ msgstr "Videopakkaaja (käyttäen OpenMAX IL:ää)"
 
 #: modules/codec/omxil/vout.c:49
 msgid "OpenMAX IL video output"
-msgstr "OpenMAX IL-videoulostulo"
+msgstr "OpenMAX IL -videoulostulo"
 
 #: modules/codec/opus.c:62
 msgid "Opus audio decoder"
@@ -12617,7 +12649,7 @@ msgstr ""
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
-msgstr ""
+msgstr "SCTE-18"
 
 #: modules/codec/scte18.h:24
 msgid "Emergency Alert Messaging for Cable"
@@ -12629,7 +12661,7 @@ msgstr ""
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
-msgstr ""
+msgstr "SCTE-27"
 
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
@@ -14171,7 +14203,7 @@ msgstr ""
 
 #: modules/codec/x264.c:439
 msgid "2D"
-msgstr ""
+msgstr "2D"
 
 #: modules/codec/x264.c:443
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
@@ -14233,15 +14265,15 @@ msgstr "1"
 
 #: modules/codec/zvbi.c:88
 msgid "1.5"
-msgstr ""
+msgstr "1.5"
 
 #: modules/codec/zvbi.c:88
 msgid "2.5"
-msgstr ""
+msgstr "2.5"
 
 #: modules/codec/zvbi.c:88
 msgid "3.5"
-msgstr ""
+msgstr "3.5"
 
 #: modules/codec/zvbi.c:95
 msgid "VBI and Teletext decoder"
@@ -16261,7 +16293,7 @@ msgstr "Tietoja VLC-mediasoittimesta"
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/qt/dialogs/help.cpp:125
 msgid "Credits"
-msgstr ""
+msgstr "Kiitokset"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:101
 #: modules/gui/macosx/VLCMainMenu.m:490 modules/gui/qt/dialogs/help.cpp:119
@@ -16648,7 +16680,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
-msgstr "Muunna & Virtauta"
+msgstr "Muunna & virtauta"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:137
 msgid "Go!"
@@ -16905,7 +16937,7 @@ msgstr "Mukauta"
 
 #: modules/gui/macosx/VLCCoreDialogProvider.m:195
 msgid "Remember"
-msgstr ""
+msgstr "Muista"
 
 #: modules/gui/macosx/VLCCoreInteraction.m:417
 msgid "Random On"
@@ -16934,7 +16966,7 @@ msgstr ""
 #: modules/gui/macosx/VLCFSPanelController.m:125
 #: modules/gui/macosx/VLCFSPanelController.m:126
 msgid "Leave fullscreen"
-msgstr ""
+msgstr "Poistu koko näytöstä"
 
 #: modules/gui/macosx/VLCFSPanelController.m:128
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:80
@@ -17116,7 +17148,7 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:104
 #: modules/gui/macosx/VLCSimplePrefsController.m:362 modules/gui/qt/qt.cpp:178
 msgid "Pause the video playback when minimized"
-msgstr "Videotoisto tauolle, kun ikkuna minimoidaan"
+msgstr "Videotoisto tauolle, kun ikkuna pienennetään"
 
 #: modules/gui/macosx/macosx.m:105 modules/gui/qt/qt.cpp:180
 msgid ""
@@ -17427,11 +17459,11 @@ msgstr "Hyppää aikaan"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
-msgstr ""
+msgstr "Renderöijä"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
-msgstr ""
+msgstr "Ei renderöijää"
 
 #: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
@@ -17903,7 +17935,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Select a subtitle file"
-msgstr ""
+msgstr "Valitse tekstitystiedosto"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:353
 msgid "Override parameters"
@@ -18241,7 +18273,7 @@ msgstr "Huomioi että nämä ovat järjestelmän laajuisia asetuksia."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:316
 msgid "General settings"
-msgstr ""
+msgstr "Yleiset asetukset"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:318
 msgid "Interface style"
@@ -18261,7 +18293,7 @@ msgstr "Jatka toistoa"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:329
 msgid "Playback behaviour"
-msgstr ""
+msgstr "Toiston toiminta"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:330
 msgid "Enable notifications on playlist item change"
@@ -18344,11 +18376,11 @@ msgstr "Näytä video pääikkunassa"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:366
 msgid "Fullscreen settings"
-msgstr ""
+msgstr "Koko näytön asetukset"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:367
 msgid "Start in fullscreen"
-msgstr ""
+msgstr "Käynnistä koko näytön tilassa"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:368
 msgid "Black screens in Fullscreen mode"
@@ -18485,7 +18517,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
 msgid "Show Main Window"
-msgstr ""
+msgstr "Näytä pääikkuna"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
@@ -18502,7 +18534,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
 msgid "Copy URL to clipboard"
-msgstr ""
+msgstr "Kopioi URL-osoite leikepöydälle"
 
 #: modules/gui/macosx/VLCStringUtility.m:242
 msgid "Not Set"
@@ -19093,11 +19125,11 @@ msgstr " ↑,↓                    Siirry +/-5%%"
 
 #: modules/gui/ncurses.c:1046
 msgid "[Repeat]"
-msgstr ""
+msgstr "[Toista]"
 
 #: modules/gui/ncurses.c:1047
 msgid "[Random]"
-msgstr ""
+msgstr "[Satunnainen]"
 
 #: modules/gui/ncurses.c:1048
 msgid "[Loop]"
@@ -19138,7 +19170,7 @@ msgstr " Luku     : %<PRId64>/%d"
 
 #: modules/gui/ncurses.c:1113
 msgid " Source: <no current item>"
-msgstr ""
+msgstr " Lähde: <no current item>"
 
 #: modules/gui/ncurses.c:1115
 msgid " [ h for help ]"
@@ -19196,7 +19228,7 @@ msgstr "Seuraava/eteenpäin"
 
 #: modules/gui/qt/components/controller.hpp:109
 msgid "De-Fullscreen"
-msgstr "Poistu kokonäyttötilasta"
+msgstr "Poistu koko näytön tilasta"
 
 #: modules/gui/qt/components/controller.hpp:109
 msgid "Extended panel"
@@ -19252,11 +19284,11 @@ msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:119
 msgid "Toggle the video in fullscreen"
-msgstr "Kokoruututila päälle/pois"
+msgstr "Koko näytön tila päälle/pois"
 
 #: modules/gui/qt/components/controller.hpp:119
 msgid "Toggle the video out fullscreen"
-msgstr "Kokoruututila päälle/pois"
+msgstr "Koko näytön tila päälle/pois"
 
 #: modules/gui/qt/components/controller.hpp:120
 msgid "Show extended settings"
@@ -19340,12 +19372,12 @@ msgstr "Kuvasuhde"
 
 #: modules/gui/qt/components/epg/EPGWidget.cpp:65
 msgid "No EPG Data Available"
-msgstr ""
+msgstr "EPG-tietoja ei ole saatavilla"
 
 #: modules/gui/qt/components/extended_panels.cpp:380
 #: modules/gui/qt/components/extended_panels.cpp:393
 msgid "Image Files"
-msgstr ""
+msgstr "Kuvatiedostot"
 
 #: modules/gui/qt/components/extended_panels.cpp:382 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19869,6 +19901,8 @@ msgid ""
 "Select or double click an action to change the associated hotkey. Use delete "
 "key to remove hotkeys."
 msgstr ""
+"Valitse tai kaksoisnapsauta toimintoa vaihtaaksesi siihen määritetyn "
+"pikanäppäimen. Käytä poistopainiketta poistaaksesi pikanäppäimiä."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "in"
@@ -20758,7 +20792,7 @@ msgstr "Edistyksellinen pienoisohjelma"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
-msgstr "Koko näyttö -tilan säätimet"
+msgstr "Koko näytön tilan ohjaimet"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:147
 msgid "New profile"
@@ -20956,7 +20990,7 @@ msgstr "Jatka toistoa siitä, mihin jäätiin"
 
 #: modules/gui/qt/main_interface.cpp:379
 msgid "&Continue"
-msgstr ""
+msgstr "&Jatka"
 
 #: modules/gui/qt/main_interface.cpp:1412
 msgid "Control menu for the player"
@@ -20988,7 +21022,7 @@ msgstr "&Tekstitys"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
 msgid "Tool&s"
-msgstr ""
+msgstr "Ty&ökalut"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -21028,7 +21062,7 @@ msgstr "V&iimeisimmät mediat"
 
 #: modules/gui/qt/menus.cpp:387
 msgid "Conve&rt / Save..."
-msgstr "&Muunna / Tallenna..."
+msgstr "&Muunna / tallenna..."
 
 #: modules/gui/qt/menus.cpp:389
 msgid "&Stream..."
@@ -21084,7 +21118,7 @@ msgstr "&Telakoitu soittolista"
 
 #: modules/gui/qt/menus.cpp:501
 msgid "Always on &top"
-msgstr ""
+msgstr "Aina &päällimäisenä"
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
@@ -21096,7 +21130,7 @@ msgstr "Ctrl+H"
 
 #: modules/gui/qt/menus.cpp:519
 msgid "&Fullscreen Interface"
-msgstr "&Kokoruututila"
+msgstr "&Koko näytön tila"
 
 #: modules/gui/qt/menus.cpp:527
 msgid "&Advanced Controls"
@@ -21116,7 +21150,7 @@ msgstr "&Lisää äänenvoimakkuutta"
 
 #: modules/gui/qt/menus.cpp:599
 msgid "D&ecrease Volume"
-msgstr ""
+msgstr "V&ähennä äänenvoimakkuutta"
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -21252,7 +21286,7 @@ msgstr "Avaa &verkko..."
 
 #: modules/gui/qt/menus.cpp:1035
 msgid "Leave Fullscreen"
-msgstr "Poistu kokoruututilasta"
+msgstr "Poistu koko näytön tilasta"
 
 #: modules/gui/qt/menus.cpp:1069
 msgid "&Playback"
@@ -21276,7 +21310,7 @@ msgstr "&Tyhjennä"
 
 #: modules/gui/qt/menus.cpp:1629
 msgid "&Renderer"
-msgstr ""
+msgstr "&Renderöijä"
 
 #: modules/gui/qt/menus.cpp:1633
 msgid "<Local>"
@@ -21435,7 +21469,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:151
 msgid "Show a controller in fullscreen mode"
-msgstr "Näytä kontrollit kokoruututilassa"
+msgstr "Näytä ohjaimet koko näytön tilassa"
 
 #: modules/gui/qt/qt.cpp:152
 msgid "Embed the file browser in open dialog"
@@ -21545,11 +21579,11 @@ msgstr "Ulkoasut |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
-msgstr ""
+msgstr "Soittolistatiedostot |"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
-msgstr ""
+msgstr "|Kaikki tiedostot |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -21632,7 +21666,7 @@ msgstr "Valitse ulkoasutiedosto"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
 msgid "Open skin..."
-msgstr ""
+msgstr "Avaa ulkoasutiedosto..."
 
 #: modules/hw/d3d11/d3d11_filters.c:86 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -21869,7 +21903,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:47
 msgid "System default"
-msgstr ""
+msgstr "Järjestelmän oletus"
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock"
@@ -21974,7 +22008,7 @@ msgstr ""
 
 #: modules/logger/file.c:193
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: modules/logger/file.c:203
 msgid "Info"
@@ -22076,7 +22110,7 @@ msgstr ""
 
 #: modules/lua/extension.c:1194
 msgid "Extension not responding!"
-msgstr ""
+msgstr "Laajennus ei vastaa!"
 
 #: modules/lua/extension.c:1195
 #, c-format
@@ -22920,7 +22954,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:756
 msgid "Use system trust database"
-msgstr ""
+msgstr "Käytä järjestelmän luottamustietokantaa"
 
 #: modules/misc/gnutls.c:758
 msgid ""
@@ -23494,7 +23528,7 @@ msgstr "Toistetaan"
 
 #: modules/notify/osx_notifications.m:402
 msgid "Skip"
-msgstr ""
+msgstr "Ohita"
 
 #: modules/notify/notify.c:55
 msgid "Timeout (ms)"
@@ -24645,7 +24679,7 @@ msgstr ""
 
 #: modules/stream_filter/prefetch.c:534
 msgid "Buffer size"
-msgstr ""
+msgstr "Puskurin koko"
 
 #: modules/stream_filter/prefetch.c:535
 msgid "Prefetch buffer size (KiB)"
@@ -24803,7 +24837,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:189
 msgid "HTTP port"
-msgstr ""
+msgstr "HTTP-portti"
 
 #: modules/stream_out/chromecast/cast.cpp:190
 msgid ""
@@ -24814,7 +24848,7 @@ msgstr ""
 #: modules/stream_out/chromecast/cast.cpp:192
 #: modules/stream_out/chromecast/cast.cpp:1198
 msgid "Performance warning"
-msgstr ""
+msgstr "Suorituskykyvaroitus"
 
 #: modules/stream_out/chromecast/cast.cpp:193
 msgid "Display a performance warning when transcoding"
@@ -24846,7 +24880,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Conversion quality"
-msgstr ""
+msgstr "Muunnoksen laatu"
 
 #: modules/stream_out/chromecast/cast.cpp:224
 msgid "Change this option to increase conversion speed or quality."
@@ -24858,7 +24892,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:228
 msgid "Chromecast port"
-msgstr ""
+msgstr "Chromecast-portti"
 
 #: modules/stream_out/chromecast/cast.cpp:229
 msgid "The port used to talk to the Chromecast."
@@ -24866,7 +24900,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:239
 msgid "Chromecast"
-msgstr ""
+msgstr "Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:240
 msgid "Chromecast stream output"
@@ -24874,7 +24908,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1197
 msgid "Ok, Don't warn me again"
-msgstr ""
+msgstr "OK, älä varoita uudelleen"
 
 #: modules/stream_out/chromecast/cast.cpp:1199
 msgid ""
@@ -27702,7 +27736,7 @@ msgstr "Videomuisti"
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
 msgid "Wayland display"
-msgstr ""
+msgstr "Wayland-näyttö"
 
 #: modules/video_output/wayland/shell.c:407
 #: modules/video_output/wayland/xdg-shell.c:376
@@ -27838,7 +27872,7 @@ msgstr ""
 
 #: modules/video_output/yuv.c:48
 msgid "Add a YUV4MPEG2 header"
-msgstr ""
+msgstr "Lisää YUV4MPEG2-otsake"
 
 #: modules/video_output/yuv.c:49
 msgid ""
@@ -28398,7 +28432,7 @@ msgstr "Spektrin tarkastelu"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Hann"
-msgstr ""
+msgstr "Hann"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Flat Top"
@@ -28406,11 +28440,11 @@ msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Blackman-Harris"
-msgstr ""
+msgstr "Blackman-Harris"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Kaiser"
-msgstr ""
+msgstr "Kaiser"
 
 #: modules/visualization/vsxu.cpp:59 modules/visualization/vsxu.cpp:60
 msgid "vsxu"
@@ -28810,11 +28844,11 @@ msgstr "Profiilin muokkaus"
 
 #: modules/gui/qt/ui/profiles.h:700
 msgid "FLAC"
-msgstr ""
+msgstr "FLAC"
 
 #: modules/gui/qt/ui/profiles.h:701
 msgid "MP&4/MOV"
-msgstr ""
+msgstr "MP&4/MOV"
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "Ogg/Ogm"
@@ -28822,11 +28856,11 @@ msgstr "Ogg/Ogm"
 
 #: modules/gui/qt/ui/profiles.h:703
 msgid "M&KV"
-msgstr ""
+msgstr "M&KV"
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "M&JPEG"
-msgstr ""
+msgstr "M&JPEG"
 
 #: modules/gui/qt/ui/profiles.h:705
 msgid "MPEG-PS"
@@ -28834,11 +28868,11 @@ msgstr "MPEG-PS"
 
 #: modules/gui/qt/ui/profiles.h:706
 msgid "F&LV"
-msgstr ""
+msgstr "F&LV"
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "&MPEG-TS"
-msgstr ""
+msgstr "&MPEG-TS"
 
 #: modules/gui/qt/ui/profiles.h:708
 msgid "RAW"
@@ -28854,7 +28888,7 @@ msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:711
 msgid "MPEG &1"
-msgstr ""
+msgstr "MPEG &1"
 
 #: modules/gui/qt/ui/profiles.h:712
 msgid "AVI"
@@ -28866,7 +28900,7 @@ msgstr "ASF/WMV"
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "MP&3"
-msgstr ""
+msgstr "MP&3"
 
 #: modules/gui/qt/ui/profiles.h:715
 msgid "Features"
@@ -28902,7 +28936,7 @@ msgstr "Erikoisasetukset"
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid "&Quality"
-msgstr ""
+msgstr "&Laatu"
 
 #: modules/gui/qt/ui/profiles.h:734 modules/gui/qt/ui/profiles.h:735
 msgid "Not Used"
@@ -28930,7 +28964,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:764
 msgid "Profile &Name"
-msgstr ""
+msgstr "Profiilin &nimi"
 
 #: modules/gui/qt/ui/sout.h:200
 msgid "Set up media sources to stream"
@@ -29042,7 +29076,7 @@ msgstr "Käyttäjätunnus"
 
 #: modules/gui/qt/ui/sprefs_audio.h:426
 msgid "Submit played tracks stats to Last.fm"
-msgstr ""
+msgstr "Lähetä toistettujen kappaleiden tilastotiedot Last.fm:ään"
 
 #: modules/gui/qt/ui/sprefs_input.h:354
 msgid "Codecs"
@@ -29126,15 +29160,15 @@ msgstr "Muuta käyttöliittymä videon kokoiseksi"
 
 #: modules/gui/qt/ui/sprefs_interface.h:536
 msgid "Show controls in full screen mode"
-msgstr "Näytä ohjaimet kokoruututilassa"
+msgstr "Näytä ohjaimet koko näytön tilassa"
 
 #: modules/gui/qt/ui/sprefs_interface.h:537
 msgid "Pause playback when minimized"
-msgstr "Toisto tauolle, kun ikkuna minimoidaan"
+msgstr "Toisto tauolle, kun ikkuna pienennetään"
 
 #: modules/gui/qt/ui/sprefs_interface.h:538
 msgid "Show media change popup:"
-msgstr ""
+msgstr "Näytä ilmoitus median vaihtuessa:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:539
 msgid "Start in minimal view mode"
@@ -29154,7 +29188,7 @@ msgstr "Näytä kuvake tehtäväpalkissa"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
 msgid "Auto raising the interface:"
-msgstr ""
+msgstr "Käyttöliittymän automaattinen nostaminen:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Skin resource file:"
