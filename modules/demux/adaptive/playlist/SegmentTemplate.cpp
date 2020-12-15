@@ -71,16 +71,16 @@ void SegmentTemplate::setSourceUrl( const std::string &url )
 
 void SegmentTemplate::pruneByPlaybackTime(vlc_tick_t time)
 {
-    const AbstractAttr *p = getAttribute(Type::TIMELINE);
+    AbstractAttr *p = getAttribute(Type::TIMELINE);
     if(p)
-        return ((SegmentTimeline *) p)->pruneByPlaybackTime(time);
+        return static_cast<SegmentTimeline *> (p)->pruneByPlaybackTime(time);
 }
 
 size_t SegmentTemplate::pruneBySequenceNumber(uint64_t number)
 {
-    const AbstractAttr *p = getAttribute(Type::TIMELINE);
+    AbstractAttr *p = getAttribute(Type::TIMELINE);
     if(p)
-        return ((SegmentTimeline *) p)->pruneBySequenceNumber(number);
+        return static_cast<SegmentTimeline *> (p)->pruneBySequenceNumber(number);
     return 0;
 }
 
@@ -115,7 +115,7 @@ void SegmentTemplate::debug(vlc_object_t *obj, int indent) const
     (*segments.begin())->debug(obj, indent);
     const AbstractAttr *p = getAttribute(Type::TIMELINE);
     if(p)
-        ((SegmentTimeline *) p)->debug(obj, indent + 1);
+        static_cast<const SegmentTimeline *> (p)->debug(obj, indent + 1);
 }
 
 vlc_tick_t SegmentTemplate::getMinAheadTime(uint64_t number) const

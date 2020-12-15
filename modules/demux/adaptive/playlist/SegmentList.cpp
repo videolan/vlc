@@ -302,5 +302,5 @@ void SegmentList::debug(vlc_object_t *obj, int indent) const
         (*it)->debug(obj, indent);
     const AbstractAttr *p = getAttribute(Type::TIMELINE);
     if(p)
-        ((SegmentTimeline *) p)->debug(obj, indent + 1);
+        static_cast<const SegmentTimeline *> (p)->debug(obj, indent + 1);
 }

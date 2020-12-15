@@ -213,11 +213,11 @@ AbstractSegmentBaseType * SegmentInformation::getProfile() const
 {
     AbstractAttr *p;
     if((p = getAttribute(Type::SEGMENTTEMPLATE)))
-        return (SegmentTemplate *) p;
+        return static_cast<SegmentTemplate *> (p);
     else if((p = getAttribute(Type::SEGMENTLIST)))
-        return (SegmentList *) p;
+        return static_cast<SegmentList *> (p);
     else if((p = getAttribute(Type::SEGMENTBASE)))
-        return (SegmentBase *) p;
+        return static_cast<SegmentBase *> (p);
 
     return NULL;
 }
