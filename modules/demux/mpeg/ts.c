@@ -450,7 +450,7 @@ static int Open( vlc_object_t *p_this )
     if( psz_string && *psz_string )
     {
         int i_res;
-        char* psz_csa2;
+        char* psz_csa2 = NULL;
 
         p_sys->csa = csa_New();
 
