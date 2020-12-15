@@ -740,7 +740,7 @@ libmacosx_plugin_la_RES += \
 	gui/macosx/Resources/vlc.scriptTerminology
 
 EXTRA_DIST += \
-	gui/macosx/Resources/Base.lproj/InfoPlist.strings \
+	gui/macosx/Resources/English.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ar.lproj/InfoPlist.strings \
 	gui/macosx/Resources/bg.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ca.lproj/InfoPlist.strings \
