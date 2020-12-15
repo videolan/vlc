@@ -39,7 +39,6 @@
 #include <poll.h>
 #endif
 #include <sys/time.h>
-#include <sys/socket.h>
 
 #include "../access/rist.h"
 
