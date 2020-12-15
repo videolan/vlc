@@ -7,6 +7,7 @@
 # Chaisiri Toomthong <chaisiri_tt@hotmail.com>, 2015
 # Chalermpon Dasri <d.chalermpon@gmail.com>, 2013
 # Juro Timothy Symon <urashimon@gmail.com>, 2020
+# Nattee Niparnan <nattee@gmail.com>, 2020
 # Phattanon Duangdara <sfalpha@gmail.com>, 2017
 # Rockers <sumorock@hotmail.com>, 2017-2018
 # T. Chomphuming <jernghan@gmail.com> , 2011,2014
@@ -16,8 +17,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-28 00:50+0100\n"
-"Last-Translator: Juro Timothy Symon <urashimon@gmail.com>, 2020\n"
+"PO-Revision-Date: 2020-12-15 11:25+0100\n"
+"Last-Translator: Nattee Niparnan <nattee@gmail.com>, 2020\n"
 "Language-Team: Thai (https://www.transifex.com/yaron/teams/16553/th/)\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
@@ -5231,11 +5232,11 @@ msgstr "คลังสื่อ"
 
 #: src/text/iso-639_def.h:40
 msgid "Afar"
-msgstr ""
+msgstr "Afar"
 
 #: src/text/iso-639_def.h:41
 msgid "Abkhazian"
-msgstr ""
+msgstr "Abkhazian"
 
 #: src/text/iso-639_def.h:42
 msgid "Afrikaans"
@@ -5267,7 +5268,7 @@ msgstr "อเวสถาน"
 
 #: src/text/iso-639_def.h:49
 msgid "Aymara"
-msgstr ""
+msgstr "Aymara"
 
 #: src/text/iso-639_def.h:50
 msgid "Azerbaijani"
@@ -5295,7 +5296,7 @@ msgstr "พิหาร"
 
 #: src/text/iso-639_def.h:56
 msgid "Bislama"
-msgstr ""
+msgstr "Bislama"
 
 #: src/text/iso-639_def.h:57
 msgid "Bosnian"
@@ -5319,7 +5320,7 @@ msgstr "คาตะลาน"
 
 #: src/text/iso-639_def.h:62
 msgid "Chamorro"
-msgstr ""
+msgstr "Chamorro"
 
 #: src/text/iso-639_def.h:63
 msgid "Chechen"
@@ -5331,7 +5332,7 @@ msgstr "จีน"
 
 #: src/text/iso-639_def.h:65
 msgid "Church Slavic"
-msgstr ""
+msgstr "Church Slavic"
 
 #: src/text/iso-639_def.h:66
 msgid "Chuvash"
@@ -5339,11 +5340,11 @@ msgstr "ชูวาช"
 
 #: src/text/iso-639_def.h:67
 msgid "Cornish"
-msgstr ""
+msgstr "Cornish"
 
 #: src/text/iso-639_def.h:68
 msgid "Corsican"
-msgstr ""
+msgstr "Corsican"
 
 #: src/text/iso-639_def.h:69
 msgid "Czech"
@@ -5391,7 +5392,7 @@ msgstr "ฝรั่งเศส"
 
 #: src/text/iso-639_def.h:80
 msgid "Frisian"
-msgstr ""
+msgstr "Frisian"
 
 #: src/text/iso-639_def.h:81
 msgid "Georgian"
@@ -5411,11 +5412,11 @@ msgstr "ไอริช"
 
 #: src/text/iso-639_def.h:85
 msgid "Gallegan"
-msgstr ""
+msgstr "Gallegan"
 
 #: src/text/iso-639_def.h:86
 msgid "Manx"
-msgstr ""
+msgstr "Manx"
 
 #: src/text/iso-639_def.h:87
 msgid "Greek, Modern"
@@ -5423,7 +5424,7 @@ msgstr "กรีก (ปัจจุบัน)"
 
 #: src/text/iso-639_def.h:88
 msgid "Guarani"
-msgstr ""
+msgstr "Guarani"
 
 #: src/text/iso-639_def.h:89
 msgid "Gujarati"
@@ -5435,7 +5436,7 @@ msgstr "ฮีบรู"
 
 #: src/text/iso-639_def.h:91
 msgid "Herero"
-msgstr ""
+msgstr "Herero"
 
 #: src/text/iso-639_def.h:92
 msgid "Hindi"
@@ -5443,7 +5444,7 @@ msgstr "ฮินดี"
 
 #: src/text/iso-639_def.h:93
 msgid "Hiri Motu"
-msgstr ""
+msgstr "Hiri Motu"
 
 #: src/text/iso-639_def.h:94
 msgid "Hungarian"
@@ -5487,7 +5488,7 @@ msgstr "ญี่ปุ่น"
 
 #: src/text/iso-639_def.h:104
 msgid "Greenlandic, Kalaallisut"
-msgstr ""
+msgstr "Greenlandic, Kalaallisut"
 
 #: src/text/iso-639_def.h:105
 msgid "Kannada"
@@ -5507,7 +5508,7 @@ msgstr "เขมร"
 
 #: src/text/iso-639_def.h:109
 msgid "Kikuyu"
-msgstr ""
+msgstr "Kikuyu"
 
 #: src/text/iso-639_def.h:110
 msgid "Kinyarwanda"
@@ -5519,7 +5520,7 @@ msgstr "คีร์กีซสถาน"
 
 #: src/text/iso-639_def.h:112
 msgid "Komi"
-msgstr ""
+msgstr "Komi"
 
 #: src/text/iso-639_def.h:113
 msgid "Korean"
@@ -5527,7 +5528,7 @@ msgstr "เกาหลี"
 
 #: src/text/iso-639_def.h:114
 msgid "Kuanyama"
-msgstr ""
+msgstr "Kuanyama"
 
 #: src/text/iso-639_def.h:115
 msgid "Kurdish"
@@ -5607,11 +5608,11 @@ msgstr "นาวาโฮ"
 
 #: src/text/iso-639_def.h:134
 msgid "Ndebele, South"
-msgstr ""
+msgstr "Ndebele, South"
 
 #: src/text/iso-639_def.h:135
 msgid "Ndebele, North"
-msgstr ""
+msgstr "Ndebele, North"
 
 #: src/text/iso-639_def.h:136
 msgid "Ndonga"
