@@ -171,7 +171,6 @@ Widgets.NavigableFocusScope {
                 Widgets.CaptionLabel {
                     text: model.duration
                     color: VLCStyle.colors.text
-                    topPadding: VLCStyle.margin_xxsmall
                     width: parent.width
                 }
 
