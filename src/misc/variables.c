@@ -96,6 +96,8 @@ struct variable_t
     callback_entry_t    *value_callbacks;
     /** Registered list callbacks */
     callback_entry_t    *list_callbacks;
+
+    vlc_cond_t   wait;
 };
 
 static int CmpBool( vlc_value_t v, vlc_value_t w )
@@ -228,7 +230,7 @@ static void WaitUnused(vlc_object_t *obj, variable_t *var)
 
     mutex_cleanup_push(&priv->var_lock);
     while (var->b_incallback)
-        vlc_cond_wait(&priv->var_wait, &priv->var_lock);
+        vlc_cond_wait(&var->wait, &priv->var_lock);
     vlc_cleanup_pop();
 }
 
@@ -256,7 +258,7 @@ static void TriggerCallback(vlc_object_t *obj, variable_t *var,
 
     vlc_mutex_lock(&priv->var_lock);
     var->b_incallback = false;
-    vlc_cond_broadcast(&priv->var_wait);
+    vlc_cond_broadcast(&var->wait);
 }
 
 static void TriggerListCallback(vlc_object_t *obj, variable_t *var,
@@ -283,7 +285,7 @@ static void TriggerListCallback(vlc_object_t *obj, variable_t *var,
 
     vlc_mutex_lock(&priv->var_lock);
     var->b_incallback = false;
-    vlc_cond_broadcast(&priv->var_wait);
+    vlc_cond_broadcast(&var->wait);
 }
 
 int (var_Create)( vlc_object_t *p_this, const char *psz_name, int i_type )

@@ -69,7 +69,6 @@ int vlc_object_init(vlc_object_t *restrict obj, vlc_object_t *parent,
     priv->typename = typename;
     priv->var_root = NULL;
     vlc_mutex_init (&priv->var_lock);
-    vlc_cond_init (&priv->var_wait);
     priv->resources = NULL;
 
     obj->priv = priv;

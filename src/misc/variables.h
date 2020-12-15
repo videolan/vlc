@@ -40,7 +40,6 @@ struct vlc_object_internals
     /* Object variables */
     void           *var_root;
     vlc_mutex_t     var_lock;
-    vlc_cond_t      var_wait;
 
     /* Object resources */
     struct vlc_res *resources;
