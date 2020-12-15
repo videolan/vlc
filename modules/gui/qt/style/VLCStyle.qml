@@ -149,15 +149,15 @@ Item {
 
     property int gridCover_network_width: colWidth(1)
     property int gridCover_network_height: gridCover_network_width
-    property int gridCover_network_border: dp(2, scale)
+    property int gridCover_network_border: dp(3, scale)
 
     property int gridCover_music_width: colWidth(1)
     property int gridCover_music_height: gridCover_music_width
-    property int gridCover_music_border: dp(2, scale)
+    property int gridCover_music_border: dp(3, scale)
 
     property int gridCover_video_width: colWidth(2)
     property int gridCover_video_height: ( gridCover_video_width * 10.0 ) / 16
-    property int gridCover_video_border: dp(3, scale)
+    property int gridCover_video_border: dp(4, scale)
 
     property int gridCover_video_width_large: dp(406, scale)
     property int gridCover_video_height_large: ( gridCover_video_width_large * 10.0 ) / 16
