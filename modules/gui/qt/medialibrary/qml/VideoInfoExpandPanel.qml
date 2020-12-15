@@ -149,9 +149,23 @@ Widgets.NavigableFocusScope {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignTop
 
-                Widgets.SubtitleLabel {
-                    text: model.title || i18n.qtr("Unknown title")
+                RowLayout {
                     width: parent.width
+
+                    Widgets.SubtitleLabel {
+                        text: model.title || i18n.qtr("Unknown title")
+
+                        Layout.fillWidth: true
+                    }
+
+                    Widgets.IconLabel {
+                        text: VLCIcons.close
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: expandRect.retract()
+                        }
+                    }
                 }
 
                 Widgets.CaptionLabel {
@@ -281,18 +295,6 @@ Widgets.NavigableFocusScope {
                         }
 
                     }
-                }
-            }
-
-            Widgets.IconLabel {
-                text: VLCIcons.close
-                color: VLCStyle.colors.caption
-
-                Layout.alignment: Qt.AlignTop
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: expandRect.retract()
                 }
             }
         }
