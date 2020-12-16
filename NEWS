@@ -1,3 +1,10 @@
+Changes between 3.0.12 and 3.0.12.1:
+----------------------------------
+
+macOS:
+ * 3.0.12.1 is the first release for Apple Silicon macs
+ * Version bump to allow an automatic upgrade path
+
 Changes between 3.0.11.1 and 3.0.12:
 ----------------------------------
 
