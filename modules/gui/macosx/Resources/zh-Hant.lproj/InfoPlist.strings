@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC希望根據用戶要求存取攝像機。";
+"NSMicrophoneUsageDescription" = "VLC希望根據用戶要求存取麥克風。";
+"NSAppleEventsUsageDescription" = "VLC希望暫停並恢復外部媒體播放器。";
+"NSDesktopFolderUsageDescription" = "VLC希望根據用戶請求存取桌面文件夾。";
+"NSDocumentsFolderUsageDescription" = "VLC希望根據用戶請求存取文件。";
+"NSDownloadsFolderUsageDescription" = "VLC希望根據用戶請求存取下載文件夾。";
+"NSNetworkVolumesUsageDescription" = "VLC希望根據用戶請求存取網絡資料夾。";
+"NSRemovableVolumesUsageDescription" = "VLC希望根據用戶請求存取可移除的儲存媒體。";
