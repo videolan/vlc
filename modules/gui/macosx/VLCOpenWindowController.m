@@ -414,8 +414,11 @@ static NSString *kCaptureTabViewId  = @"capture";
     // load window
     [self window];
 
-    [_tabView selectTabViewItemWithIdentifier:identifier];
-    [_fileSubCheckbox setState: NSOffState];
+    // Delay this to allow the full animation to run inside the modal event loop
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_tabView selectTabViewItemWithIdentifier:identifier];
+        [_fileSubCheckbox setState: NSOffState];
+    });
 
     int i_result = [NSApp runModalForWindow: self.window];
     [self.window close];
