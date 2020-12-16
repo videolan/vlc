@@ -457,7 +457,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
             msg_Err(p_dec, "Failed to create a pool of %d %4.4s pictures",
                            dpb_size + p_dec->i_extra_picture_buffers + 1,
                            (char*)&p_dec->fmt_out.video.i_chroma);
-            return -1;
+            goto error;
         }
 
         vlc_mutex_lock( &p_owner->lock );
@@ -481,6 +481,18 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         return 0;
     }
 
+error:
+    /* Clean fmt and vctx to trigger a new vout creation on the next update
+     * call */
+    vlc_mutex_lock( &p_owner->lock );
+    es_format_Clean( &p_owner->fmt );
+    vlc_mutex_unlock( &p_owner->lock );
+
+    if (p_owner->vctx != NULL)
+    {
+        vlc_video_context_Release(p_owner->vctx);
+        p_owner->vctx = NULL;
+    }
     return -1;
 }
 
