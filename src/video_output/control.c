@@ -39,6 +39,7 @@ void vout_control_Init(vout_control_t *ctrl)
     ctrl->is_held = false;
     ctrl->is_waiting = false;
     ctrl->can_sleep = true;
+    ctrl->is_terminated = false;
     ARRAY_INIT(ctrl->cmd);
 }
 
@@ -70,12 +71,8 @@ void vout_control_Wake(vout_control_t *ctrl)
 
 void vout_control_PushTerminate(vout_control_t *ctrl)
 {
-    vout_control_cmd_t cmd = {
-        VOUT_CONTROL_TERMINATE, {0},
-    };
-
     vlc_mutex_lock(&ctrl->lock);
-    ARRAY_APPEND(ctrl->cmd, cmd);
+    ctrl->is_terminated = true;
     vlc_cond_signal(&ctrl->wait_request);
     vlc_mutex_unlock(&ctrl->lock);
 }
@@ -101,9 +98,10 @@ void vout_control_Release(vout_control_t *ctrl)
 int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
                      vlc_tick_t deadline)
 {
+    bool has_cmd = false;
     vlc_mutex_lock(&ctrl->lock);
 
-    if (ctrl->cmd.i_size <= 0) {
+    if (ctrl->cmd.i_size <= 0 && !ctrl->is_terminated) {
         /* Spurious wakeups are perfectly fine */
         if (deadline != VLC_TICK_INVALID && ctrl->can_sleep) {
             ctrl->is_waiting = true;
@@ -116,15 +114,19 @@ int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
     while (ctrl->is_held)
         vlc_cond_wait(&ctrl->wait_available, &ctrl->lock);
 
-    bool has_cmd;
+    if (ctrl->is_terminated) {
+        *cmd = (vout_control_cmd_t) { VOUT_CONTROL_TERMINATE, {0} };
+        goto done;
+    }
+
     if (ctrl->cmd.i_size > 0) {
         has_cmd = true;
         *cmd = ARRAY_VAL(ctrl->cmd, 0);
         ARRAY_REMOVE(ctrl->cmd, 0);
     } else {
-        has_cmd = false;
         ctrl->can_sleep = true;
     }
+done:
     vlc_mutex_unlock(&ctrl->lock);
 
     return has_cmd ? VLC_SUCCESS : VLC_EGENERIC;

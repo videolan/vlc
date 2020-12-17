@@ -46,6 +46,7 @@ typedef struct {
     bool can_sleep;
     bool is_waiting;
     bool is_held;
+    bool is_terminated;
     DECL_ARRAY(vout_control_cmd_t) cmd;
 } vout_control_t;
 
