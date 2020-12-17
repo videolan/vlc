@@ -492,5 +492,13 @@ libadaptive_plugin_la_CXXFLAGS = $(libvlc_adaptive_la_CXXFLAGS)
 libadaptive_plugin_la_LIBADD = libvlc_adaptive.la
 demux_LTLIBRARIES += libadaptive_plugin.la
 
+adaptive_test_SOURCES = \
+    demux/adaptive/test/playlist/TemplatedUri.cpp \
+    demux/adaptive/test/test.cpp \
+    demux/adaptive/test/test.hpp
+adaptive_test_LDADD = libvlc_adaptive.la
+check_PROGRAMS += adaptive_test
+TESTS += adaptive_test
+
 libnoseek_plugin_la_SOURCES = demux/filter/noseek.c
 demux_LTLIBRARIES += libnoseek_plugin.la
