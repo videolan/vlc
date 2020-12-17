@@ -267,7 +267,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
 /*****************************************************************************
  * config_CreateDir: Create configuration directory if it doesn't exist.
  *****************************************************************************/
-int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
+static int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
 {
     if( !psz_dirname || !*psz_dirname ) return -1;
 

@@ -27,7 +27,6 @@ extern "C" {
 
 /* Internal configuration prototypes and structures */
 
-int  config_CreateDir( vlc_object_t *, const char * );
 int  config_AutoSaveConfigFile( vlc_object_t * );
 
 void config_Free (module_config_t *, size_t);
