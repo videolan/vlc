@@ -34,13 +34,8 @@ enum {
 
 typedef struct {
     int type;
-
-    union {
-        vlc_mouse_t mouse;
-    };
+    vlc_mouse_t mouse;
 } vout_control_cmd_t;
-
-void vout_control_cmd_Init(vout_control_cmd_t *, int type);
 
 typedef struct {
     vlc_mutex_t lock;
@@ -60,8 +55,8 @@ void vout_control_Init(vout_control_t *);
 void vout_control_Clean(vout_control_t *);
 
 /* controls outside of the vout thread */
-void vout_control_Push(vout_control_t *, vout_control_cmd_t *);
-void vout_control_PushVoid(vout_control_t *, int type);
+void vout_control_PushMouse(vout_control_t *, const vlc_mouse_t *);
+void vout_control_PushTerminate(vout_control_t *);
 void vout_control_Wake(vout_control_t *);
 void vout_control_Hold(vout_control_t *);
 void vout_control_Release(vout_control_t *);

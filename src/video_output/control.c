@@ -30,13 +30,6 @@
 #include "control.h"
 
 /* */
-void vout_control_cmd_Init(vout_control_cmd_t *cmd, int type)
-{
-    memset(cmd, 0, sizeof(*cmd));
-    cmd->type = type;
-}
-
-/* */
 void vout_control_Init(vout_control_t *ctrl)
 {
     vlc_mutex_init(&ctrl->lock);
@@ -63,7 +56,7 @@ void vout_control_Dead(vout_control_t *ctrl)
     vlc_mutex_unlock(&ctrl->lock);
 }
 
-void vout_control_Push(vout_control_t *ctrl, vout_control_cmd_t *cmd)
+static void vout_control_Push(vout_control_t *ctrl, vout_control_cmd_t *cmd)
 {
     vlc_mutex_lock(&ctrl->lock);
     if (!ctrl->is_dead) {
@@ -71,6 +64,15 @@ void vout_control_Push(vout_control_t *ctrl, vout_control_cmd_t *cmd)
         vlc_cond_signal(&ctrl->wait_request);
     }
     vlc_mutex_unlock(&ctrl->lock);
+}
+
+void vout_control_PushMouse(vout_control_t *ctrl, const vlc_mouse_t *video_mouse)
+{
+    vout_control_cmd_t cmd = {
+        VOUT_CONTROL_MOUSE_STATE, *video_mouse,
+    };
+
+    vout_control_Push(ctrl, &cmd);
 }
 
 void vout_control_Wake(vout_control_t *ctrl)
@@ -81,11 +83,12 @@ void vout_control_Wake(vout_control_t *ctrl)
     vlc_mutex_unlock(&ctrl->lock);
 }
 
-void vout_control_PushVoid(vout_control_t *ctrl, int type)
+void vout_control_PushTerminate(vout_control_t *ctrl)
 {
-    vout_control_cmd_t cmd;
+    vout_control_cmd_t cmd = {
+        VOUT_CONTROL_TERMINATE, {0},
+    };
 
-    vout_control_cmd_Init(&cmd, type);
     vout_control_Push(ctrl, &cmd);
 }
 

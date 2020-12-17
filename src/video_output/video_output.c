@@ -382,18 +382,17 @@ void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *mouse)
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
     assert(mouse);
-    vout_control_cmd_t cmd;
-    vout_control_cmd_Init(&cmd, VOUT_CONTROL_MOUSE_STATE);
 
     /* Translate window coordinates to video coordinates */
     vlc_mutex_lock(&sys->display_lock);
+    vlc_mouse_t video_mouse;
     if (sys->display)
-        vout_display_TranslateMouseState(sys->display, &cmd.mouse, mouse);
+        vout_display_TranslateMouseState(sys->display, &video_mouse, mouse);
     else
-        cmd.mouse = *mouse;
+        video_mouse = *mouse;
     vlc_mutex_unlock(&sys->display_lock);
 
-    vout_control_Push(&sys->control, &cmd);
+    vout_control_PushMouse(&sys->control, &video_mouse);
 }
 
 void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
@@ -1972,7 +1971,7 @@ void vout_StopDisplay(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
 
-    vout_control_PushVoid(&sys->control, VOUT_CONTROL_TERMINATE);
+    vout_control_PushTerminate(&sys->control);
     vlc_join(sys->thread, NULL);
 
     vout_ReleaseDisplay(sys);
