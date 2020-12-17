@@ -2010,7 +2010,6 @@ void vout_Close(vout_thread_t *vout)
 
     vout_IntfDeinit(VLC_OBJECT(vout));
     vout_snapshot_End(sys->snapshot);
-    vout_control_Dead(&sys->control);
     vout_chrono_Clean(&sys->render);
 
     if (sys->spu)

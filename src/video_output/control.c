@@ -38,7 +38,6 @@ void vout_control_Init(vout_control_t *ctrl)
 
     ctrl->is_held = false;
     ctrl->is_waiting = false;
-    ctrl->is_dead = false;
     ctrl->can_sleep = true;
     ARRAY_INIT(ctrl->cmd);
 }
@@ -49,20 +48,11 @@ void vout_control_Clean(vout_control_t *ctrl)
     ARRAY_RESET(ctrl->cmd);
 }
 
-void vout_control_Dead(vout_control_t *ctrl)
-{
-    vlc_mutex_lock(&ctrl->lock);
-    ctrl->is_dead = true;
-    vlc_mutex_unlock(&ctrl->lock);
-}
-
 static void vout_control_Push(vout_control_t *ctrl, vout_control_cmd_t *cmd)
 {
     vlc_mutex_lock(&ctrl->lock);
-    if (!ctrl->is_dead) {
-        ARRAY_APPEND(ctrl->cmd, *cmd);
-        vlc_cond_signal(&ctrl->wait_request);
-    }
+    ARRAY_APPEND(ctrl->cmd, *cmd);
+    vlc_cond_signal(&ctrl->wait_request);
     vlc_mutex_unlock(&ctrl->lock);
 }
 

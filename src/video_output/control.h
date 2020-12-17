@@ -43,7 +43,6 @@ typedef struct {
     vlc_cond_t  wait_available;
 
     /* */
-    bool is_dead;
     bool can_sleep;
     bool is_waiting;
     bool is_held;
@@ -63,6 +62,5 @@ void vout_control_Release(vout_control_t *);
 
 /* control inside of the vout thread */
 int vout_control_Pop(vout_control_t *, vout_control_cmd_t *, vlc_tick_t deadline);
-void vout_control_Dead(vout_control_t *);
 
 #endif
