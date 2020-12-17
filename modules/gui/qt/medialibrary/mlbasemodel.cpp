@@ -27,16 +27,11 @@ static constexpr ssize_t COUNT_UNINITIALIZED =
 
 MLBaseModel::MLBaseModel(QObject *parent)
     : QAbstractListModel(parent)
-    , m_ml(nullptr)
     , m_ml_event_handle( nullptr, [this](vlc_ml_event_callback_t* cb ) {
             assert( m_ml != nullptr );
             vlc_ml_event_unregister_callback( m_ml, cb );
         })
-    , m_need_reset( false )
 {
-    m_sort = VLC_ML_SORTING_DEFAULT;
-    m_sort_desc = false;
-
     connect( this, &MLBaseModel::resetRequested, this, &MLBaseModel::onResetRequested );
 }
 

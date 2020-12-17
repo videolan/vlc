@@ -142,15 +142,15 @@ public:
 protected:
     MLItemId m_parent;
 
-    vlc_medialibrary_t* m_ml;
+    vlc_medialibrary_t* m_ml = nullptr;
     MediaLib* m_mediaLib = nullptr;
     QString m_search_pattern;
-    vlc_ml_sorting_criteria_t m_sort;
-    bool m_sort_desc;
+    vlc_ml_sorting_criteria_t m_sort = VLC_ML_SORTING_DEFAULT;
+    bool m_sort_desc = false;
 
     std::unique_ptr<vlc_ml_event_callback_t,
                     std::function<void(vlc_ml_event_callback_t*)>> m_ml_event_handle;
-    bool m_need_reset;
+    bool m_need_reset = false;
 
     mutable std::unique_ptr<ListCache<std::unique_ptr<MLItem>>> m_cache;
 };
