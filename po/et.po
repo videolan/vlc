@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-12-12 19:37+0100\n"
+"PO-Revision-Date: 2020-12-17 20:06+0100\n"
 "Last-Translator: Priit Jõerüüt <transifex@joeruut.com>, 2020\n"
 "Language-Team: Estonian (https://www.transifex.com/yaron/teams/16553/et/)\n"
 "Language: et\n"
@@ -20602,7 +20602,7 @@ msgstr "Voo&g..."
 
 #: modules/gui/qt/menus.cpp:394
 msgid "Quit at the end of playlist"
-msgstr "VLC sulgemine esitusloendi lõppedes"
+msgstr "Esitusloendi lõppedes sulge VLC"
 
 #: modules/gui/qt/menus.cpp:401
 msgid "Close to systray"
