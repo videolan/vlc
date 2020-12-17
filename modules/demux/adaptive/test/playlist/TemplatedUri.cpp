@@ -21,9 +21,10 @@
 # include "config.h"
 #endif
 
-#include "../modules/demux/dash/mpd/TemplatedUri.cpp"
+#include "../test.hpp"
 
-#include <iostream>
+#include "../../../dash/mpd/TemplatedUri.hpp"
+
 #include <cstring>
 #include <vlc_common.h>
 
@@ -104,62 +105,65 @@ static const struct
     },
 };
 
-int main(int, char **)
+int TemplatedUri_test()
 {
-    for(size_t i=0; i<ARRAY_SIZE(dataset); i++)
-    {
-        std::string str = std::string(dataset[i].src);
-
-        std::cout << str << std::endl;
-
-        std::string::size_type pos = 0;
-        while(pos < str.length())
+    try {
+        for(size_t i=0; i<ARRAY_SIZE(dataset); i++)
         {
-            TemplatedUri::Token token;
+            std::string str = std::string(dataset[i].src);
 
-            if(str[pos] == '$' && TemplatedUri::IsDASHToken(str, pos, token))
+            std::cerr << str << std::endl;
+
+            std::string::size_type pos = 0;
+            while(pos < str.length())
             {
-                std::cout << " * token " << str.substr(pos, token.fulllength)
-                          << " " << token.width << std::endl;
+                TemplatedUri::Token token;
 
-                TemplatedUri::TokenReplacement replparam;
-
-                switch(token.type)
+                if(str[pos] == '$' && TemplatedUri::IsDASHToken(str, pos, token))
                 {
-                    case TemplatedUri::Token::TOKEN_TIME:
-                    case TemplatedUri::Token::TOKEN_BANDWIDTH:
-                    case TemplatedUri::Token::TOKEN_NUMBER:
-                        replparam.value = dataset[i].val;
-                        break;
-                    case TemplatedUri::Token::TOKEN_REPRESENTATION:
+                    std::cerr << " * token " << str.substr(pos, token.fulllength)
+                              << " " << token.width << std::endl;
+
+                    TemplatedUri::TokenReplacement replparam;
+
+                    switch(token.type)
                     {
-                        if(!dataset[i].str)
-                            return -1;
-                        replparam.str = std::string(dataset[i].str);
-                        break;
+                        case TemplatedUri::Token::TOKEN_TIME:
+                        case TemplatedUri::Token::TOKEN_BANDWIDTH:
+                        case TemplatedUri::Token::TOKEN_NUMBER:
+                            replparam.value = dataset[i].val;
+                            break;
+                        case TemplatedUri::Token::TOKEN_REPRESENTATION:
+                        {
+                            Expect(dataset[i].str);
+                            replparam.str = std::string(dataset[i].str);
+                            break;
+                        }
+                        case TemplatedUri::Token::TOKEN_ESCAPE:
+                            break;
+
+                        default:
+                            pos += token.fulllength;
+                            continue;
                     }
-                    case TemplatedUri::Token::TOKEN_ESCAPE:
-                        break;
 
-                    default:
-                        pos += token.fulllength;
-                        continue;
+                    std::string::size_type newlen =
+                            TemplatedUri::ReplaceDASHToken(str, pos, token, replparam);
+                    Expect(newlen != std::string::npos);
+                    pos += newlen;
                 }
-
-                std::string::size_type newlen =
-                    TemplatedUri::ReplaceDASHToken(str, pos, token, replparam);
-                if(newlen == std::string::npos)
-                    return -1;
-                pos += newlen;
+                else pos++;
             }
-            else pos++;
+
+            std::cerr << " -> " << str << std::endl;
+
+            Expect(!std::strcmp(dataset[i].dst, str.c_str()));
         }
 
-        std::cout << " -> " << str << std::endl;
-
-        if(std::strcmp(dataset[i].dst, str.c_str()))
-            return 1;
+        return 0;
     }
-
-    return 0;
+    catch (...)
+    {
+        return 1;
+    }
 }
