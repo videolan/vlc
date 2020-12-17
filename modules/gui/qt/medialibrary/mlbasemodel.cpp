@@ -237,7 +237,7 @@ void MLBaseModel::unsetSortCriteria()
 
 int MLBaseModel::rowCount(const QModelIndex &parent) const
 {
-    if (parent.isValid())
+    if (!m_mediaLib || parent.isValid())
         return 0;
 
     validateCache();
@@ -302,7 +302,10 @@ QVariantList MLBaseModel::getIdsForIndexes(QVariantList indexes) const
 
 unsigned MLBaseModel::getCount() const
 {
-    if (!m_cache || m_cache->count() == COUNT_UNINITIALIZED)
+    if (!m_mediaLib)
+        return 0;
+    validateCache();
+    if (m_cache->count() == COUNT_UNINITIALIZED)
         return 0;
     return static_cast<unsigned>(m_cache->count());
 }
