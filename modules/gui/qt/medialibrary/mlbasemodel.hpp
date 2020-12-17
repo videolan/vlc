@@ -143,7 +143,7 @@ protected:
     MLItemId m_parent;
 
     vlc_medialibrary_t* m_ml;
-    MediaLib* m_mediaLib;
+    MediaLib* m_mediaLib = nullptr;
     QString m_search_pattern;
     vlc_ml_sorting_criteria_t m_sort;
     bool m_sort_desc;
