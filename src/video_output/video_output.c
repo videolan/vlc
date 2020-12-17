@@ -1890,8 +1890,6 @@ static void *Thread(void *object)
     bool wait = false;
 
     for (;;) {
-        vout_control_cmd_t cmd;
-
         if (wait)
         {
             const vlc_tick_t max_deadline = vlc_tick_now() + VLC_TICK_FROM_MS(100);
@@ -1900,15 +1898,15 @@ static void *Thread(void *object)
             deadline = VLC_TICK_INVALID;
         }
 
-        while (!vout_control_Pop(&sys->control, &cmd, deadline)) {
-            switch(cmd.type) {
-                case VOUT_CONTROL_TERMINATE:
-                    return NULL; /* no need to clean &cmd */
-                case VOUT_CONTROL_MOUSE_STATE:
-                    ThreadProcessMouseState(vout, &cmd.mouse);
-                    break;
-            }
+        bool terminated = false;
+        vlc_mouse_t video_mouse;
+        while (vout_control_Pop(&sys->control, &video_mouse, &terminated,
+                                deadline) == VLC_SUCCESS && !terminated) {
+            ThreadProcessMouseState(vout, &video_mouse);
         }
+
+        if (terminated)
+            break;
 
         wait = ThreadDisplayPicture(vout, &deadline) != VLC_SUCCESS;
 
@@ -1916,6 +1914,7 @@ static void *Thread(void *object)
 
         vout_SetInterlacingState(&vout->obj, &sys->private, picture_interlaced);
     }
+    return NULL;
 }
 
 static void vout_ReleaseDisplay(vout_thread_sys_t *vout)

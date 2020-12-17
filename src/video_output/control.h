@@ -26,17 +26,6 @@
 #include <vlc_viewpoint.h>
 
 /* */
-enum {
-    VOUT_CONTROL_TERMINATE,
-
-    VOUT_CONTROL_MOUSE_STATE,           /* vlc_mouse_t */
-};
-
-typedef struct {
-    int type;
-    vlc_mouse_t mouse;
-} vout_control_cmd_t;
-
 typedef struct {
     vlc_mutex_t lock;
     vlc_cond_t  wait_request;
@@ -47,7 +36,7 @@ typedef struct {
     bool is_waiting;
     bool is_held;
     bool is_terminated;
-    DECL_ARRAY(vout_control_cmd_t) cmd;
+    DECL_ARRAY(vlc_mouse_t) cmd;
 } vout_control_t;
 
 /* */
@@ -62,6 +51,6 @@ void vout_control_Hold(vout_control_t *);
 void vout_control_Release(vout_control_t *);
 
 /* control inside of the vout thread */
-int vout_control_Pop(vout_control_t *, vout_control_cmd_t *, vlc_tick_t deadline);
+int vout_control_Pop(vout_control_t *, vlc_mouse_t *, bool *, vlc_tick_t deadline);
 
 #endif

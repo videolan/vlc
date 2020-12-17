@@ -51,12 +51,8 @@ void vout_control_Clean(vout_control_t *ctrl)
 
 void vout_control_PushMouse(vout_control_t *ctrl, const vlc_mouse_t *video_mouse)
 {
-    vout_control_cmd_t cmd = {
-        VOUT_CONTROL_MOUSE_STATE, *video_mouse,
-    };
-
     vlc_mutex_lock(&ctrl->lock);
-    ARRAY_APPEND(ctrl->cmd, cmd);
+    ARRAY_APPEND(ctrl->cmd, *video_mouse);
     vlc_cond_signal(&ctrl->wait_request);
     vlc_mutex_unlock(&ctrl->lock);
 }
@@ -95,8 +91,8 @@ void vout_control_Release(vout_control_t *ctrl)
     vlc_mutex_unlock(&ctrl->lock);
 }
 
-int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
-                     vlc_tick_t deadline)
+int vout_control_Pop(vout_control_t *ctrl, vlc_mouse_t *mouse,
+                     bool *is_terminated, vlc_tick_t deadline)
 {
     bool has_cmd = false;
     vlc_mutex_lock(&ctrl->lock);
@@ -114,19 +110,18 @@ int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
     while (ctrl->is_held)
         vlc_cond_wait(&ctrl->wait_available, &ctrl->lock);
 
-    if (ctrl->is_terminated) {
-        *cmd = (vout_control_cmd_t) { VOUT_CONTROL_TERMINATE, {0} };
+    if (ctrl->is_terminated)
         goto done;
-    }
 
     if (ctrl->cmd.i_size > 0) {
         has_cmd = true;
-        *cmd = ARRAY_VAL(ctrl->cmd, 0);
+        *mouse = ARRAY_VAL(ctrl->cmd, 0);
         ARRAY_REMOVE(ctrl->cmd, 0);
     } else {
         ctrl->can_sleep = true;
     }
 done:
+    *is_terminated = ctrl->is_terminated;
     vlc_mutex_unlock(&ctrl->lock);
 
     return has_cmd ? VLC_SUCCESS : VLC_EGENERIC;
