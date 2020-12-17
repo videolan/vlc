@@ -267,7 +267,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
 /*****************************************************************************
  * config_CreateDir: Create configuration directory if it doesn't exist.
  *****************************************************************************/
-static int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
+static int config_CreateDir( vlc_object_t *p_this, char *psz_dirname )
 {
     if( !psz_dirname || !*psz_dirname ) return -1;
 
@@ -282,14 +282,13 @@ static int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
         case ENOENT:
         {
             /* Let's try to create the parent directory */
-            char psz_parent[strlen( psz_dirname ) + 1], *psz_end;
-            strcpy( psz_parent, psz_dirname );
-
-            psz_end = strrchr( psz_parent, DIR_SEP_CHAR );
-            if( psz_end && psz_end != psz_parent )
+            char *psz_end = strrchr( psz_dirname, DIR_SEP_CHAR );
+            if( psz_end && psz_end != psz_dirname )
             {
                 *psz_end = '\0';
-                if( config_CreateDir( p_this, psz_parent ) == 0 )
+                int res = config_CreateDir( p_this, psz_dirname );
+                *psz_end = DIR_SEP_CHAR;
+                if( res == 0 )
                 {
                     if( !vlc_mkdir( psz_dirname, 0700 ) )
                         return 0;
