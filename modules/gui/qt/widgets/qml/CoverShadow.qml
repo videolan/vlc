@@ -24,6 +24,7 @@ import "qrc:///style/"
 Item {
     id: root
 
+    property alias cached: primaryShadow.cached
     property alias source: primaryShadow.source
     property alias primaryVerticalOffset: primaryShadow.verticalOffset
     property alias primaryRadius: primaryShadow.radius
@@ -51,5 +52,6 @@ Item {
         spread: 0
         color: Qt.rgba(0, 0, 0, .18)
         samples: 1 + radius * 2
+        cached: root.cached
     }
 }
