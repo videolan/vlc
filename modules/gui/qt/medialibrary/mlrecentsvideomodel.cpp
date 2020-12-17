@@ -96,6 +96,9 @@ void MLRecentsVideoModel::onVlcMlEvent( const MLEvent &event )
 {
     switch ( event.i_type )
     {
+        case VLC_ML_EVENT_HISTORY_CHANGED:
+            emit resetRequested();
+            break;
         case VLC_ML_EVENT_MEDIA_ADDED:
         case VLC_ML_EVENT_MEDIA_UPDATED:
         case VLC_ML_EVENT_MEDIA_DELETED:
