@@ -83,21 +83,6 @@ class MLVideo : public QObject, public MLItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(MLItemId id READ getId CONSTANT);
-    Q_PROPERTY(QString title READ getTitle CONSTANT);
-    Q_PROPERTY(QString thumbnail READ getThumbnail NOTIFY onThumbnailChanged);
-    Q_PROPERTY(QString duration READ getDuration CONSTANT);
-    Q_PROPERTY(QString durationShort READ getDurationShort CONSTANT);
-    Q_PROPERTY(QString mrl READ getMRL CONSTANT);
-    Q_PROPERTY(QString displayMrl READ getDisplayMRL CONSTANT)
-    Q_PROPERTY(float progress READ getProgress CONSTANT);
-    Q_PROPERTY(unsigned int playCount READ getPlayCount CONSTANT);
-    Q_PROPERTY(QString resolution_name READ getResolutionName CONSTANT);
-    Q_PROPERTY(QString channel READ getChannel CONSTANT);
-    Q_PROPERTY(QString progressTime READ getProgressTime CONSTANT);
-    Q_PROPERTY(QObjectList audioDesc READ getAudioDesc CONSTANT);
-    Q_PROPERTY(QObjectList videoDesc READ getVideoDesc CONSTANT);
-
 public:
     MLVideo(vlc_medialibrary_t *ml, const vlc_ml_media_t *data, QObject *parent = nullptr);
 
@@ -116,9 +101,6 @@ public:
     QObjectList getVideoDesc() const;
 
     MLVideo* clone(QObject* parent = nullptr) const;
-
-signals:
-    void onThumbnailChanged( QString );
 
 private:
     MLVideo(const MLVideo& video, QObject* parent = nullptr);

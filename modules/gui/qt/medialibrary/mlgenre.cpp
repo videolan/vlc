@@ -262,11 +262,10 @@ QString MLGenre::getCover() const
     return m_cover;
 }
 
-void MLGenre::setCover(const QString cover)
+void MLGenre::setCover(QString cover)
 {
     m_cover = cover;
     //TODO store in media library
-    emit coverChanged(m_cover);
 }
 
 MLGenre *MLGenre::clone(QObject *parent) const

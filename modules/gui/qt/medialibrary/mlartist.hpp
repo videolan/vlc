@@ -38,13 +38,6 @@ class MLArtist : public QObject, public MLItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(MLItemId id READ getId CONSTANT)
-    Q_PROPERTY(QString name READ getName CONSTANT)
-    Q_PROPERTY(QString shortbio READ getShortBio CONSTANT)
-    Q_PROPERTY(QString cover READ getCover CONSTANT)
-    Q_PROPERTY(unsigned int nbalbums READ getNbAlbums CONSTANT)
-    Q_PROPERTY(unsigned int nbtracks READ getNbTracks CONSTANT)
-
 public:
     MLArtist(const vlc_ml_artist_t *_data, QObject *_parent = nullptr);
 

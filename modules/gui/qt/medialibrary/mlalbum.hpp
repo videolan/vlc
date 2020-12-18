@@ -35,16 +35,6 @@ class MLAlbum : public QObject, public MLItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(MLItemId id READ getId CONSTANT)
-    Q_PROPERTY(QString title READ getTitle CONSTANT)
-    Q_PROPERTY(unsigned int releaseyear READ getReleaseYear CONSTANT)
-    Q_PROPERTY(QString shortsummary READ getShortSummary CONSTANT)
-    Q_PROPERTY(QString cover READ getCover CONSTANT)
-    Q_PROPERTY(QString artist READ getArtist CONSTANT)
-    Q_PROPERTY(unsigned int nbtracks READ getNbTracks CONSTANT)
-    Q_PROPERTY(QString duration READ getDuration CONSTANT)
-    Q_PROPERTY(QString durationShort READ getDuration CONSTANT)
-
 public:
     MLAlbum(vlc_medialibrary_t* _ml, const vlc_ml_album_t *_data, QObject *_parent = nullptr);
 
