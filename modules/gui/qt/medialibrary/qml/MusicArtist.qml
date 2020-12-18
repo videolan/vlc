@@ -111,7 +111,7 @@ Widgets.NavigableFocusScope {
                         delegate: Widgets.GridItem {
                             image: model.cover || VLCStyle.noArtAlbum
                             title: model.title || i18n.qtr("Unknown title")
-                            subtitle: model.release_year || i18n.qtr("")
+                            subtitle: model.release_year || ""
                             textHorizontalAlignment: Text.AlignHCenter
                             x: selectedBorderWidth
                             y: selectedBorderWidth
