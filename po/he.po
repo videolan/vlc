@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-11-26 08:49+0100\n"
+"PO-Revision-Date: 2020-12-18 09:32+0100\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2020\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/16553/he/)\n"
 "Language: he\n"
@@ -8323,6 +8323,9 @@ msgid ""
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
 "I420, I411, I410, MJPG"
 msgstr ""
+"לאלץ את התקן הווידאו Video4Linux2 להשתמש בתצורת כרומה מסוימת (למשל I420 או "
+"I422 לתמונות גולמיות, MJPG עבור קלט M-JPEG דחוס). רשימה מלאה: GREY,‏ I240,‏ "
+"RV16,‏ RV15,‏ RV24,‏ RV32,‏ YUY2,‏ YUYV,‏ UYVY,‏ I41N,‏ I422,‏ I420,‏ I411,‏ I410,‏ MJPG"
 
 #: modules/access/v4l2/v4l2.c:61
 msgid "Input of the card to use (see debug)."
@@ -8341,10 +8344,11 @@ msgid ""
 "The specified pixel resolution is forced (if both width and height are "
 "strictly positive)."
 msgstr ""
+"רזולוציית הפיקסלים המסוימת אולצה (אם גם הרוחב וגם הגובה הם חיוביים בבירור)."
 
 #: modules/access/v4l2/v4l2.c:71
 msgid "Maximum frame rate to use (0 = no limits)."
-msgstr ""
+msgstr "קצב התמוניות המרבי לשימוש (0 = ללא הגבלה)."
 
 #: modules/access/v4l2/v4l2.c:73
 msgid "Radio device"
@@ -8360,7 +8364,7 @@ msgstr "תדירות"
 
 #: modules/access/v4l2/v4l2.c:77
 msgid "Tuner frequency in Hz or kHz (see debug output)."
-msgstr ""
+msgstr "תדירות הטיונר בהרץ או בקילוהרץ (יש לעיין בפלט ניפוי השגיאות)."
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
@@ -8368,7 +8372,7 @@ msgstr "מצב שמע"
 
 #: modules/access/v4l2/v4l2.c:80
 msgid "Tuner audio mono/stereo and track selection."
-msgstr ""
+msgstr "בחירת שמע מונו/סטריאו ורצועה."
 
 #: modules/access/v4l2/v4l2.c:82
 msgid "Reset controls"
@@ -8438,13 +8442,15 @@ msgstr "כוונון גוון התמונה אוטומטית."
 
 #: modules/access/v4l2/v4l2.c:98
 msgid "White balance temperature (K)"
-msgstr ""
+msgstr "טמפרטורת איזון לבן (ק׳)"
 
 #: modules/access/v4l2/v4l2.c:100
 msgid ""
 "White balance temperature as a color temperation in Kelvin (2800 is minimum "
 "incandescence, 6500 is maximum daylight)."
 msgstr ""
+"טמפרטורת איזון לבן בתור חום צבע בקלווין (2800 זאת ההתלהטות המזערית, 6500 זה "
+"אור יום מרבי)."
 
 #: modules/access/v4l2/v4l2.c:102
 msgid "Automatic white balance"
@@ -8522,11 +8528,11 @@ msgstr "שליטה אוטומטית בהגברת הכרומה."
 
 #: modules/access/v4l2/v4l2.c:127
 msgid "Power line frequency"
-msgstr ""
+msgstr "תדירות קו מתח"
 
 #: modules/access/v4l2/v4l2.c:129
 msgid "Power line frequency anti-flicker filter."
-msgstr ""
+msgstr "מסנן מונע ריצוד של תדירות קו מתח."
 
 #: modules/access/v4l2/v4l2.c:137
 msgid "50 Hz"
@@ -8747,7 +8753,7 @@ msgstr "קלט וידאו"
 
 #: modules/access/v4l2/v4l2.c:317
 msgid "Tuner"
-msgstr ""
+msgstr "טיונר"
 
 #: modules/access/v4l2/v4l2.c:332
 msgid "Controls"
@@ -9082,7 +9088,7 @@ msgstr "מספר המקטע הראשון שנוצר"
 
 #: modules/access_output/livehttp.c:109
 msgid "HTTP Live streaming output"
-msgstr ""
+msgstr "פלט תזרים HTTP חי"
 
 #: modules/access_output/livehttp.c:110
 msgid "LiveHTTP"
@@ -9460,7 +9466,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/trivial.c:42
 msgid "Audio filter for trivial channel mixing"
-msgstr ""
+msgstr "מסנן שמע לערבוב ערוצים טריוויאלי"
 
 #: modules/audio_filter/chorus_flanger.c:74
 msgid "Sound Delay"
@@ -11259,7 +11265,7 @@ msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:79
 msgid "Use DecodeBin"
-msgstr ""
+msgstr "להשתמש ב־DecodeBin"
 
 #: modules/codec/gstreamer/gstdecode.c:81
 msgid ""
@@ -11268,15 +11274,18 @@ msgid ""
 "parsers which can provide more info such as codec profile, level and other "
 "attributes, in the form of GstCaps (Stream Capabilities) to decoder."
 msgstr ""
+"DecodeBin הוא רכיב תכולה שיכול להוסיף ולנהל מגוון רכיבים. חוץ מהוספת "
+"מפענחים, decodebin מוסיף גם מנתחים שיכולים לספק מידע נוסף כגון פרופיל פענוח, "
+"רמה ומאפיינים נוספים, בתצורת GstCaps (יכולות תזרים) למפענח."
 
 #: modules/codec/gstreamer/gstdecode.c:93
 msgid "GStreamer Based Decoder"
-msgstr ""
+msgstr "מפענח מבוסס GStreamer"
 
 #: modules/codec/jpeg.c:52
 msgid ""
 "Quality level for encoding (this can enlarge or reduce output image size)."
-msgstr ""
+msgstr "רמת איכות ההצפנה (יכול להגדיל או להקטין את גודל תמונת הפלט)."
 
 #: modules/codec/jpeg.c:111
 msgid "JPEG image decoder"
@@ -11399,23 +11408,26 @@ msgstr "כחול אקווה"
 
 #: modules/codec/kate.c:211
 msgid "Use Tiger for rendering"
-msgstr ""
+msgstr "להשתמש ב־Tiger לעיבוד"
 
 #: modules/codec/kate.c:212
 msgid ""
 "Kate streams can be rendered using the Tiger library. Disabling this will "
 "only render static text and bitmap based streams."
 msgstr ""
+"ניתן לעבד תזרימי Kate בעזרת ספריית Tiger. השבתת האפשרות תוביל לעיבוד של "
+"תזרימים מבוססי טקסט ומפות סיביות."
 
 #: modules/codec/kate.c:216
 msgid "Rendering quality"
-msgstr ""
+msgstr "איכות עיבוד"
 
 #: modules/codec/kate.c:217
 msgid ""
 "Select rendering quality, at the expense of speed. 0 is fastest, 1 is "
 "highest quality."
 msgstr ""
+"בחירת איכות עיבוד על חשבון מהירות. 0 זה המהיר ביותר, 1 זה האיכותי ביותר."
 
 #: modules/codec/kate.c:221
 msgid "Default font effect"
@@ -11587,19 +11599,19 @@ msgstr ""
 
 #: modules/codec/omxil/vout.c:49
 msgid "OpenMAX IL video output"
-msgstr ""
+msgstr "פלט וידאו OpenMAX IL"
 
 #: modules/codec/opus.c:62
 msgid "Opus audio decoder"
-msgstr ""
+msgstr "מפענח שמע Opus"
 
 #: modules/codec/opus.c:64 modules/codec/opus.c:71
 msgid "Opus"
-msgstr ""
+msgstr "Opus"
 
 #: modules/codec/opus.c:69
 msgid "Opus audio encoder"
-msgstr ""
+msgstr "מצפין שמע Opus"
 
 #: modules/codec/png.c:91
 msgid "PNG video decoder"
@@ -11607,21 +11619,23 @@ msgstr "מפענח וידאו PNG"
 
 #: modules/codec/png.c:100
 msgid "PNG video encoder"
-msgstr ""
+msgstr "מצפין וידאו PNG"
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
-msgstr ""
+msgstr "הפעלת מצב תכנה"
 
 #: modules/codec/qsv.c:57
 msgid ""
 "Allow the use of the Intel Media SDK software implementation of the codecs "
 "if no QuickSync Video hardware acceleration is present on the system."
 msgstr ""
+"לאפשר להשתמש בהטמעה התכנתית של ה־SDK של Intel Media של המפענחים אם לא נמצאה "
+"האצת חומרה מסוג QuickSync לווידאו במערכת."
 
 #: modules/codec/qsv.c:61
 msgid "Codec Profile"
-msgstr ""
+msgstr "פרופיל מפענח"
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -11629,6 +11643,8 @@ msgid ""
 "the correct profile from other sources, such as resolution and bitrate. E.g. "
 "'high'"
 msgstr ""
+"לציין את פרופיל המפענח במפורש. אם לא יצוין, המפענח יקבע את הפרופיל המתאים "
+"ממקורות אחרים, כגון רזולוציה וקצב סיביות. למשל: ‚high’ (גבוה)"
 
 #: modules/codec/qsv.c:67
 msgid "Codec Level"
