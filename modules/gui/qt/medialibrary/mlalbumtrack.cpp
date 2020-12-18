@@ -82,21 +82,6 @@ MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data,
     }
 }
 
-MLAlbumTrack::MLAlbumTrack(const MLAlbumTrack &albumtrack, QObject *_parent)
-    : QObject( _parent )
-    , MLItem         ( albumtrack.getId() )
-    , m_title        ( albumtrack.m_title )
-    , m_albumTitle   ( albumtrack.m_albumTitle )
-    , m_artist       ( albumtrack.m_artist )
-    , m_cover        ( albumtrack.m_cover )
-    , m_trackNumber  ( albumtrack.m_trackNumber )
-    , m_discNumber   ( albumtrack.m_discNumber )
-    , m_duration     ( albumtrack.m_duration )
-    , m_durationShort( albumtrack.m_durationShort )
-    , m_mrl          ( albumtrack.m_mrl )
-{
-}
-
 QString MLAlbumTrack::getTitle() const
 {
     return m_title;
@@ -141,9 +126,3 @@ QString MLAlbumTrack::getMRL() const
 {
     return m_mrl;
 }
-
-MLAlbumTrack *MLAlbumTrack::clone(QObject *parent) const
-{
-    return new MLAlbumTrack(*this, parent);
-}
-

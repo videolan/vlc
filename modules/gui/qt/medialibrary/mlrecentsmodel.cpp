@@ -33,11 +33,6 @@ MLRecentMedia::MLRecentMedia( const MLRecentMedia& media )
 {
 }
 
-MLRecentMedia* MLRecentMedia::clone() const {
-    return new MLRecentMedia( *this );
-}
-
-
 MLRecentsModel::MLRecentsModel( QObject* parent )
     : MLBaseModel( parent )
 {

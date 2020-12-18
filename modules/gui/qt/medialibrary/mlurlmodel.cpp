@@ -122,10 +122,6 @@ QString MLUrl::getLastPlayedDate() const
     return m_lastPlayedDate;
 }
 
-MLUrl *MLUrl::clone() const {
-    return new MLUrl( *this );
-}
-
 ListCacheLoader<std::unique_ptr<MLItem>> *
 MLUrlModel::createLoader() const
 {

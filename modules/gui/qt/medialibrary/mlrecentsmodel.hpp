@@ -41,8 +41,6 @@ public:
     inline QUrl getUrl() const { return m_url; }
     inline QDateTime getLastPlayedDate() const { return m_lastPlayedDate; }
 
-    MLRecentMedia *clone() const;
-
 private:
     QUrl m_url;
     QDateTime m_lastPlayedDate;

@@ -47,16 +47,11 @@ public:
     QString getDuration() const;
     QString getDurationShort() const;
 
-    MLAlbum* clone(QObject *parent = nullptr) const;
-
     Q_INVOKABLE QString getPresName() const;
     Q_INVOKABLE QString getPresImage() const;
     Q_INVOKABLE QString getPresInfo() const;
 
 private:
-    //private ctor for cloning
-    MLAlbum(const MLAlbum &_album, QObject *_parent = nullptr);
-
     vlc_medialibrary_t* m_ml;
 
     QString m_title;

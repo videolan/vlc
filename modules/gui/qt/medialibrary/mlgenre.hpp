@@ -47,8 +47,6 @@ public:
 
     void setCover(QString cover);
 
-    MLGenre* clone(QObject *parent = nullptr) const;
-
 signals:
     void askGenerateCover( QPrivateSignal ) const;
 
@@ -56,8 +54,6 @@ private slots:
     void generateThumbnail();
 
 private:
-    MLGenre( const MLGenre& genre, QObject *_parent = nullptr);
-
     vlc_medialibrary_t* m_ml;
 
     QString m_name;

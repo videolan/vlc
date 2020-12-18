@@ -221,16 +221,6 @@ MLGenre::MLGenre(vlc_medialibrary_t* ml, const vlc_ml_genre_t *_data, QObject *_
     connect(this, &MLGenre::askGenerateCover, this, &MLGenre::generateThumbnail);
 }
 
-MLGenre::MLGenre(const MLGenre &genre, QObject *_parent)
-    : QObject(_parent)
-    , MLItem    ( genre.getId() )
-    , m_ml      ( genre.m_ml )
-    , m_name    ( genre.m_name )
-    , m_nbTracks( genre.m_nbTracks )
-{
-
-}
-
 MLGenre::~MLGenre()
 {
     if (m_coverTask) {
@@ -267,13 +257,6 @@ void MLGenre::setCover(QString cover)
     m_cover = cover;
     //TODO store in media library
 }
-
-MLGenre *MLGenre::clone(QObject *parent) const
-{
-    return new MLGenre(*this, parent);
-}
-
-
 
 void MLGenre::generateThumbnail()
 {

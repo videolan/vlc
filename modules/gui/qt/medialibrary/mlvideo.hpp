@@ -100,11 +100,7 @@ public:
     QObjectList getAudioDesc() const;
     QObjectList getVideoDesc() const;
 
-    MLVideo* clone(QObject* parent = nullptr) const;
-
 private:
-    MLVideo(const MLVideo& video, QObject* parent = nullptr);
-
     static void onMlEvent( void* data, const vlc_ml_event_t* event );
     void onMlEvent( const vlc_ml_event_t* event );
 

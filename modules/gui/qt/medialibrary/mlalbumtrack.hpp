@@ -48,11 +48,7 @@ public:
     QString getDurationShort() const;
     QString getMRL() const;
 
-    MLAlbumTrack* clone(QObject *parent = nullptr) const;
-
 private:
-    MLAlbumTrack(const MLAlbumTrack& albumtrack, QObject *_parent = nullptr);
-
     QString m_title;
     QString m_albumTitle;
     QString m_artist;

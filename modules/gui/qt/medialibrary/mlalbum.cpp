@@ -55,21 +55,6 @@ MLAlbum::MLAlbum(vlc_medialibrary_t* _ml, const vlc_ml_album_t *_data, QObject *
     }
 }
 
-//private ctor for cloning
-MLAlbum::MLAlbum(const MLAlbum& _album, QObject *_parent)
-    : QObject( _parent )
-    , MLItem        ( _album.getId() )
-    , m_ml          ( _album.m_ml )
-    , m_title       ( _album.m_title )
-    , m_releaseYear ( _album.m_releaseYear )
-    , m_shortSummary( _album.m_shortSummary )
-    , m_cover       ( _album.m_cover )
-    , m_mainArtist  ( _album.m_mainArtist )
-    , m_nbTracks    ( _album.m_nbTracks )
-    , m_duration    ( _album.m_duration )
-{
-}
-
 QString MLAlbum::getTitle() const
 {
     return m_title;
@@ -109,11 +94,6 @@ QString MLAlbum::getDuration() const
 QString MLAlbum::getDurationShort() const
 {
     return m_durationShort;
-}
-
-MLAlbum *MLAlbum::clone(QObject *parent) const
-{
-    return new MLAlbum(*this, parent);
 }
 
 QString MLAlbum::getPresName() const

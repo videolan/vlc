@@ -141,19 +141,6 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
         m_resolution = "720p";  
     }
 
-MLVideo::MLVideo(const MLVideo& video, QObject* parent)
-    : QObject( parent )
-    , MLItem( video.getId() )
-    , m_ml( video.m_ml )
-    , m_title( video.m_title )
-    , m_thumbnail( video.m_thumbnail )
-    , m_duration( video.m_duration )
-    , m_mrl( video.m_mrl )
-    , m_progress( video.m_progress )
-    , m_playCount( video.m_playCount )
-{
-}
-
 void MLVideo::onMlEvent( void* data, const vlc_ml_event_t* event )
 {
     auto self = static_cast<MLVideo*>(data);
@@ -249,9 +236,4 @@ QObjectList MLVideo::getVideoDesc() const
 QObjectList MLVideo::getAudioDesc() const
 {
     return m_audioDesc;
-}
-
-MLVideo*MLVideo::clone(QObject* parent) const
-{
-    return new MLVideo(*this, parent);
 }

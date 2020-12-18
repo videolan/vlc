@@ -47,15 +47,11 @@ public:
     unsigned int getNbAlbums() const;
     unsigned int getNbTracks() const;
 
-    MLArtist* clone(QObject *parent = nullptr) const;
-
     Q_INVOKABLE QString getPresName() const;
     Q_INVOKABLE QString getPresImage() const;
     Q_INVOKABLE QString getPresInfo() const;
 
 private:
-    MLArtist(const MLArtist &artist, QObject *_parent = nullptr);
-
     QString m_name;
     QString m_shortBio;
     QString m_cover;

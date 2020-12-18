@@ -39,8 +39,6 @@ public:
     QString getUrl() const;
     QString getLastPlayedDate() const;
 
-    MLUrl *clone() const;
-
 private:
     QString m_url;
     QString m_lastPlayedDate;
