@@ -85,12 +85,10 @@ private:
 
 Q_DECLARE_METATYPE(AudioDescription)
 
-class MLVideo : public QObject, public MLItem
+class MLVideo : public MLItem
 {
-    Q_OBJECT
-
 public:
-    MLVideo(vlc_medialibrary_t *ml, const vlc_ml_media_t *data, QObject *parent = nullptr);
+    MLVideo(vlc_medialibrary_t *ml, const vlc_ml_media_t *data);
 
     QString getTitle() const;
     QString getThumbnail();

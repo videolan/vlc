@@ -72,9 +72,8 @@ unsigned int AudioDescription::getSampleRate() const
     return m_sampleRate;
 }
 
-MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* parent)
-    : QObject( parent )
-    , MLItem( MLItemId( data->i_id, VLC_ML_PARENT_UNKNOWN ) )
+MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data)
+    : MLItem( MLItemId( data->i_id, VLC_ML_PARENT_UNKNOWN ) )
     , m_ml( ml )
     , m_title( QString::fromUtf8( data->psz_title ) )
     , m_thumbnail( QString::fromUtf8( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
