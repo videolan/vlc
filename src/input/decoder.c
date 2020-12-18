@@ -481,6 +481,10 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         p_owner->vout_started = true;
         vlc_mutex_unlock( &p_owner->lock );
 
+        vlc_fifo_Lock( p_owner->p_fifo );
+        p_owner->reset_out_state = true;
+        vlc_fifo_Unlock( p_owner->p_fifo );
+
         if (has_started)
             decoder_Notify(p_owner, on_vout_started, p_vout, p_owner->vout_order);
         return 0;
@@ -579,10 +583,6 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner)
         msg_Err( p_dec, "failed to create video output" );
         return -1;
     }
-
-    vlc_fifo_Lock( p_owner->p_fifo );
-    p_owner->reset_out_state = true;
-    vlc_fifo_Unlock( p_owner->p_fifo );
 
     return 1; // new vout was created
 }
