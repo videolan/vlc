@@ -60,8 +60,6 @@ void vout_control_Init(vout_control_t *);
 void vout_control_Clean(vout_control_t *);
 
 /* controls outside of the vout thread */
-void vout_control_WaitEmpty(vout_control_t *);
-
 void vout_control_Push(vout_control_t *, vout_control_cmd_t *);
 void vout_control_PushVoid(vout_control_t *, int type);
 void vout_control_Wake(vout_control_t *);
