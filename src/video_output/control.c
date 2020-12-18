@@ -33,11 +33,9 @@
 void vout_control_Init(vout_control_t *ctrl)
 {
     vlc_mutex_init(&ctrl->lock);
-    vlc_cond_init(&ctrl->wait_request);
     vlc_cond_init(&ctrl->wait_available);
 
     ctrl->is_held = false;
-    ctrl->is_waiting = false;
     ctrl->forced_awake = false;
     ARRAY_INIT(ctrl->cmd);
 }
@@ -52,7 +50,7 @@ void vout_control_PushMouse(vout_control_t *ctrl, const vlc_mouse_t *video_mouse
 {
     vlc_mutex_lock(&ctrl->lock);
     ARRAY_APPEND(ctrl->cmd, *video_mouse);
-    vlc_cond_signal(&ctrl->wait_request);
+    vlc_cond_signal(&ctrl->wait_available);
     vlc_mutex_unlock(&ctrl->lock);
 }
 
@@ -60,14 +58,14 @@ void vout_control_Wake(vout_control_t *ctrl)
 {
     vlc_mutex_lock(&ctrl->lock);
     ctrl->forced_awake = true;
-    vlc_cond_signal(&ctrl->wait_request);
+    vlc_cond_signal(&ctrl->wait_available);
     vlc_mutex_unlock(&ctrl->lock);
 }
 
 void vout_control_Hold(vout_control_t *ctrl)
 {
     vlc_mutex_lock(&ctrl->lock);
-    while (ctrl->is_held || !ctrl->is_waiting)
+    while (ctrl->is_held)
         vlc_cond_wait(&ctrl->wait_available, &ctrl->lock);
     ctrl->is_held = true;
     vlc_mutex_unlock(&ctrl->lock);
@@ -87,18 +85,23 @@ int vout_control_Pop(vout_control_t *ctrl, vlc_mouse_t *mouse, vlc_tick_t deadli
     bool has_cmd = false;
     vlc_mutex_lock(&ctrl->lock);
 
+    while (ctrl->is_held)
+        // wait until code outside the vout thread loop has finished doing things
+        vlc_cond_wait(&ctrl->wait_available, &ctrl->lock);
+
     if (ctrl->cmd.i_size <= 0) {
         /* Spurious wakeups are perfectly fine */
         if (deadline != VLC_TICK_INVALID && !ctrl->forced_awake) {
-            ctrl->is_waiting = true;
+            ctrl->is_held = true;
+            // wait for something to happen while blocking vout_control_Hold
+            // - new mouse state received
+            // - control_Wake called: new picture arrived or terminating vout
+            vlc_cond_timedwait(&ctrl->wait_available, &ctrl->lock, deadline);
+            // allow vout_control_Hold again
+            ctrl->is_held = false;
             vlc_cond_signal(&ctrl->wait_available);
-            vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, deadline);
-            ctrl->is_waiting = false;
         }
     }
-
-    while (ctrl->is_held)
-        vlc_cond_wait(&ctrl->wait_available, &ctrl->lock);
 
     if (ctrl->cmd.i_size > 0) {
         has_cmd = true;
