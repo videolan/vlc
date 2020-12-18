@@ -32,7 +32,7 @@ typedef struct {
     vlc_cond_t  wait_available;
 
     /* */
-    bool can_sleep;
+    bool forced_awake;
     bool is_waiting;
     bool is_held;
     DECL_ARRAY(vlc_mouse_t) cmd;
