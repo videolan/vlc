@@ -203,6 +203,10 @@
 # define likely(p)     __builtin_expect(!!(p), 1)
 # define unlikely(p)   __builtin_expect(!!(p), 0)
 # define unreachable() __builtin_unreachable()
+#elif defined(_MSC_VER)
+# define likely(p)     (!!(p))
+# define unlikely(p)   (!!(p))
+# define unreachable() (__assume(0))
 #else
 /**
  * Predicted true condition
