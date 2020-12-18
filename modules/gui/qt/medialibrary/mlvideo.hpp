@@ -32,16 +32,17 @@
 
 #include <functional>
 
-class VideoDescription : public QObject
+class VideoDescription
 {
-    Q_OBJECT
+    Q_GADGET
 
     Q_PROPERTY(QString codec READ getCodec CONSTANT)
     Q_PROPERTY(QString language READ getLanguage CONSTANT)
     Q_PROPERTY(unsigned int fps READ getFps CONSTANT)
 
 public:
-    VideoDescription(const QString& codec, const QString& language, unsigned int fps, QObject *parent = nullptr);
+    VideoDescription() = default;
+    VideoDescription(const QString& codec, const QString& language, unsigned int fps);
 
     QString getCodec() const;
     QString getLanguage() const;
@@ -54,9 +55,11 @@ private:
     unsigned int m_fps;
 };
 
-class AudioDescription : public QObject
+Q_DECLARE_METATYPE(VideoDescription)
+
+class AudioDescription
 {
-    Q_OBJECT
+    Q_GADGET
 
     Q_PROPERTY(QString codec READ getCodec CONSTANT)
     Q_PROPERTY(QString language READ getLanguage CONSTANT)
@@ -64,7 +67,8 @@ class AudioDescription : public QObject
     Q_PROPERTY(unsigned int sampleRate READ getSampleRate CONSTANT)
 
 public:
-    AudioDescription(const QString& codec, const QString& language, unsigned int nbChannels, unsigned int sampleRate, QObject *parent = nullptr);
+    AudioDescription() = default;
+    AudioDescription(const QString& codec, const QString& language, unsigned int nbChannels, unsigned int sampleRate);
 
     QString getCodec() const;
     QString getLanguage() const;
@@ -78,6 +82,8 @@ private:
     unsigned int m_nbchannels;
     unsigned int m_sampleRate;
 };
+
+Q_DECLARE_METATYPE(AudioDescription)
 
 class MLVideo : public QObject, public MLItem
 {
@@ -97,8 +103,8 @@ public:
     float getProgress() const;
     unsigned int getPlayCount() const;
     QString getProgressTime() const;
-    QObjectList getAudioDesc() const;
-    QObjectList getVideoDesc() const;
+    QList<AudioDescription> getAudioDesc() const;
+    QList<VideoDescription> getVideoDesc() const;
 
 private:
     static void onMlEvent( void* data, const vlc_ml_event_t* event );
@@ -115,8 +121,8 @@ private:
     QString m_progressTime;
     unsigned int m_playCount;
     vlc_ml_thumbnail_status_t m_thumbnailStatus;
-    QObjectList m_audioDesc;
-    QObjectList m_videoDesc;
+    QList<AudioDescription> m_audioDesc;
+    QList<VideoDescription> m_videoDesc;
 
     std::unique_ptr<vlc_ml_event_callback_t,
                     std::function<void(vlc_ml_event_callback_t*)>> m_ml_event_handle;

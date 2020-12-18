@@ -22,9 +22,8 @@
 
 #include <vlc_thumbnailer.h>
 
-VideoDescription::VideoDescription(const QString &codec, const QString &language, const unsigned int fps, QObject *parent)
-    : QObject(parent)
-    , m_codec(codec)
+VideoDescription::VideoDescription(const QString &codec, const QString &language, const unsigned int fps)
+    : m_codec(codec)
     , m_language(language)
     , m_fps(fps)
 {
@@ -45,9 +44,8 @@ unsigned int VideoDescription::getFps() const
     return m_fps;
 }
 
-AudioDescription::AudioDescription(const QString &codec, const QString &language, const unsigned int nbChannels, const unsigned int sampleRate, QObject *parent)
-    : QObject(parent)
-    , m_codec(codec)
+AudioDescription::AudioDescription(const QString &codec, const QString &language, const unsigned int nbChannels, const unsigned int sampleRate)
+    : m_codec(codec)
     , m_language(language)
     , m_nbchannels(nbChannels)
     , m_sampleRate(sampleRate)
@@ -105,22 +103,20 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
         if ( track.i_type == VLC_ML_TRACK_TYPE_AUDIO ) {
             numChannel = std::max( numChannel , track.a.i_nbChannels );
 
-            m_audioDesc.push_back( new AudioDescription ( QString::fromUtf8( track.psz_codec ) ,
-                                                         QString::fromUtf8( track.psz_language  ) ,
-                                                         track.a.i_nbChannels ,
-                                                         track.a.i_sampleRate ,
-                                                         this )
-                                   );
+            m_audioDesc.push_back( { QString::fromUtf8( track.psz_codec ) ,
+                                     QString::fromUtf8( track.psz_language  ) ,
+                                     track.a.i_nbChannels ,
+                                     track.a.i_sampleRate }
+                                 );
         }
         else if ( track.i_type == VLC_ML_TRACK_TYPE_VIDEO ){
             maxWidth = std::max( maxWidth, track.v.i_width );
             maxHeight = std::max( maxHeight, track.v.i_height );
 
-            m_videoDesc.push_back(  new VideoDescription( QString::fromUtf8( track.psz_codec ) ,
-                                                        QString::fromUtf8( track.psz_language ) ,
-                                                        track.v.i_fpsNum,
-                                                        this )
-                                  );
+            m_videoDesc.push_back( { QString::fromUtf8( track.psz_codec ) ,
+                                     QString::fromUtf8( track.psz_language ) ,
+                                     track.v.i_fpsNum }
+                                 );
         }
     }
 
@@ -228,12 +224,12 @@ QString MLVideo::getProgressTime() const
     return MsToString(m_duration * m_progress);
 }
 
-QObjectList MLVideo::getVideoDesc() const
+QList<VideoDescription> MLVideo::getVideoDesc() const
 {
     return m_videoDesc;
 }
 
-QObjectList MLVideo::getAudioDesc() const
+QList<AudioDescription> MLVideo::getAudioDesc() const
 {
     return m_audioDesc;
 }
