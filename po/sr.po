@@ -3,20 +3,20 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
+# Aleksa Savić <unstoppablegamers87@gmail.com>, 2020
 # DakSrbija <vlabotami@gmail.com>, 2013
 # George Vasiljevich <djordje.vasiljevich@gmail.com>, 2013-2015
 # Gorana Milicevic <gorana.milicevic@gmail.com>, 2008
 # Marko Uskokovic <uskokovic@etf.bg.ac.yu>, 2007-2008
 # Milan Tair <milan.tair@gmail.com>, 2014
 # Предраг Љубеновић <predragljubenovic@gmail.com>, 2010,2013-2019
-# Serbian linux distribution cp6Linux
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-12-08 23:48+0100\n"
-"Last-Translator: Branko Kokanovic <branko@kokanovic.org>, 2020\n"
+"PO-Revision-Date: 2020-12-19 13:38+0100\n"
+"Last-Translator: Aleksa Savić <unstoppablegamers87@gmail.com>, 2020\n"
 "Language-Team: Serbian (https://www.transifex.com/yaron/teams/16553/sr/)\n"
 "Language: sr\n"
 "MIME-Version: 1.0\n"
@@ -6138,7 +6138,7 @@ msgstr ""
 
 #: modules/access/bluray.c:922
 msgid "Java required"
-msgstr ""
+msgstr "Јава је обавезна"
 
 #: modules/access/bluray.c:923
 #, c-format
@@ -6149,7 +6149,7 @@ msgstr ""
 
 #: modules/access/bluray.c:924
 msgid "Java was not found on your system."
-msgstr ""
+msgstr "Јава није пронађена на Вашем систему."
 
 #: modules/access/bluray.c:947
 msgid "Failed to start bluray playback. Please try without menu support."
@@ -16995,7 +16995,7 @@ msgstr "Направи донацију..."
 
 #: modules/gui/macosx/VLCMainMenu.m:494
 msgid "Online Forum..."
-msgstr ""
+msgstr "Онлајн форум"
 
 #: modules/gui/macosx/VLCMainMenu.m:1158
 msgid "File Format:"
@@ -17070,7 +17070,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:252
 msgid "No, Thanks"
-msgstr ""
+msgstr "Не, хвала"
 
 #: modules/gui/macosx/VLCMainWindow.m:252
 msgid ""
@@ -24084,7 +24084,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Conversion quality"
-msgstr ""
+msgstr "Квалитет конверзије"
 
 #: modules/stream_out/chromecast/cast.cpp:224
 msgid "Change this option to increase conversion speed or quality."
