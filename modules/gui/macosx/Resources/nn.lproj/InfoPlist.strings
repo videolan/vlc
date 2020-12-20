@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC ynskjer tilgang til kameraet slik brukaren har bedd om.";
+"NSMicrophoneUsageDescription" = "VLC ynskjer tilgang til mikrofonen slik brukaren har bedd om.";
+"NSAppleEventsUsageDescription" = "VLC ynskjer å setja i pause og å setja i gong eksterne mediespelarar.";
+"NSDesktopFolderUsageDescription" = "VLC ynskjer tilgang til skrivebordsmapper slik brukaren har bedd om.";
+"NSDocumentsFolderUsageDescription" = "VLC ynskjer tilgang til dokumentmappa slik brukaren har bedd om.";
+"NSDownloadsFolderUsageDescription" = "VLC ynskjer tilgang til nedlastingsmappa slik brukaren har bedd om.";
+"NSNetworkVolumesUsageDescription" = "VLC ynskjer tilgang til eit nettverksområde slik brukaren har bedd om.";
+"NSRemovableVolumesUsageDescription" = "VLC ynskjer tilgang til ei flyttbar eining slik brukaren har bedd om.";
