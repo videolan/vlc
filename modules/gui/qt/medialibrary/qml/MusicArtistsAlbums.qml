@@ -138,19 +138,28 @@ Widgets.NavigableFocusScope {
                 topPadding: VLCStyle.margin_normal
             }
 
-            delegate: Widgets.ListItem {
+            delegate: Rectangle {
+                id: item
+
+                property bool _highlighted: mouseArea.containsMouse || this.activeFocus
+
                 height: VLCStyle.play_cover_small + (VLCStyle.margin_xsmall * 2)
                 width: artistList.width
+                color: _highlighted ? VLCStyle.colors.bgHover : "transparent"
 
-                property bool selected: artistList.currentIndex === index
-                property bool _highlighted: selected || this.hovered || this.activeFocus
+                Widgets.CurrentIndicator {
+                   visible: item.ListView.isCurrentItem
+                }
 
-                color: VLCStyle.colors.getBgColor(selected, this.hovered, this.activeFocus)
-
-                cover: Item {
-
-                    width: VLCStyle.play_cover_small
-                    height: VLCStyle.play_cover_small
+                RowLayout {
+                    spacing: VLCStyle.margin_xsmall
+                    anchors {
+                        fill: parent
+                        leftMargin: VLCStyle.margin_normal
+                        rightMargin: VLCStyle.margin_normal
+                        topMargin: VLCStyle.margin_xsmall
+                        bottomMargin: VLCStyle.margin_xsmall
+                    }
 
                     Widgets.RoundImage {
                         source: model.cover || VLCStyle.noArtArtistSmall
@@ -158,34 +167,46 @@ Widgets.NavigableFocusScope {
                         width: VLCStyle.play_cover_small
                         radius: VLCStyle.play_cover_small
                         mipmap: true
+
+                        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "transparent"
+                            radius: VLCStyle.play_cover_small
+                            border.width: VLCStyle.dp(1, VLCStyle.scale)
+                            border.color: !_highlighted ? VLCStyle.colors.roundPlayCoverBorder : VLCStyle.colors.accent
+                        }
                     }
 
-                    Rectangle {
-                        height: VLCStyle.play_cover_small
-                        width: VLCStyle.play_cover_small
-                        radius: VLCStyle.play_cover_small
-                        color: 'transparent'
-                        border.width: VLCStyle.dp(1, VLCStyle.scale)
-                        border.color: !_highlighted ? VLCStyle.colors.roundPlayCoverBorder : VLCStyle.colors.accent
+                    Widgets.ListLabel {
+                        text: model.name || i18n.qtr("Unknown artist")
+                        color: _highlighted ? VLCStyle.colors.bgHoverText : VLCStyle.colors.text
+
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
                     }
                 }
 
-                line1: model.name || i18n.qtr("Unknown artist")
+                MouseArea {
+                    id: mouseArea
 
-                actionButtons: []
+                    anchors.fill: parent
+                    hoverEnabled: true
 
-                onItemClicked: {
-                    artistId = model.id
-                    selectionModel.updateSelection( modifier , artistList.currentIndex, index)
-                    artistList.currentIndex = index
-                    artistList.forceActiveFocus()
-                }
+                    onClicked: {
+                        artistId = model.id
+                        selectionModel.updateSelection( mouse.modifiers , artistList.currentIndex, index)
+                        artistList.currentIndex = index
+                        artistList.forceActiveFocus()
+                    }
 
-                onItemDoubleClicked: {
-                    if (keys === Qt.RightButton)
-                        medialib.addAndPlay( model.id )
-                    else
-                        albumSubView.forceActiveFocus()
+                    onDoubleClicked: {
+                        if (mouse.buttons === Qt.LeftButton)
+                            medialib.addAndPlay( model.id )
+                        else
+                            albumSubView.forceActiveFocus()
+                    }
                 }
             }
 
