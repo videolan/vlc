@@ -114,7 +114,7 @@ Widgets.NavigableFocusScope {
             url: "qrc:///main/NoMedialibHome.qml"
         }, {
             listed: true,
-            displayText: i18n.qtr("Network"),
+            displayText: i18n.qtr("Browse"),
             icon: VLCIcons.topbar_network,
             name: "network",
             url: "qrc:///network/NetworkDisplay.qml"
