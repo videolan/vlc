@@ -72,9 +72,11 @@ T.TabButton {
                                                                 : ((control.selected) ? VLCStyle.colors.accent : VLCStyle.colors.text)
             }
 
-            Widgets.MenuLabel {
+            Label {
                 id: txt
+
                 visible: showText
+                font.pixelSize: VLCStyle.fontSize_normal
                 font.weight: (control.activeFocus || control.hovered || control.selected) ? Font.DemiBold : Font.Normal
                 color: (control.activeFocus || control.hovered) ? VLCStyle.colors.accentText
                                                                 : ((control.selected) ? VLCStyle.colors.text : VLCStyle.colors.menuCaption)
