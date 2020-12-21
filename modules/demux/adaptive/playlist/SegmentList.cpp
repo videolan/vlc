@@ -167,7 +167,8 @@ bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     }
     else
     {
-        *time = *dur = VLC_TS_INVALID;
+        *time = VLC_TS_INVALID;
+        *dur = 0;
         timescale = inheritTimescale();
 
         if(segments.empty())
@@ -205,7 +206,7 @@ bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     }
 
     *time = VLC_TS_0 + timescale.ToTime(stime);
-    *dur = VLC_TS_0 + timescale.ToTime(sduration);
+    *dur = timescale.ToTime(sduration);
     return true;
 }
 
