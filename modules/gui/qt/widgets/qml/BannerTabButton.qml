@@ -68,15 +68,16 @@ T.TabButton {
 
                 text: control.iconTxt
                 font.pixelSize: VLCIcons.pixelSize(VLCStyle.banner_icon_size)
-                color: control.selected && !(control.activeFocus || control.hovered) ? VLCStyle.colors.accent
-                                                                                     : VLCStyle.colors.text
+                color: (control.activeFocus || control.hovered) ? VLCStyle.colors.accentText
+                                                                : ((control.selected) ? VLCStyle.colors.accent : VLCStyle.colors.text)
             }
 
             Widgets.MenuLabel {
                 id: txt
                 visible: showText
                 font.weight: (control.activeFocus || control.hovered || control.selected) ? Font.DemiBold : Font.Normal
-                color: (control.activeFocus || control.hovered || control.selected) ? VLCStyle.colors.text : VLCStyle.colors.menuCaption
+                color: (control.activeFocus || control.hovered) ? VLCStyle.colors.accentText
+                                                                : ((control.selected) ? VLCStyle.colors.text : VLCStyle.colors.menuCaption)
                 text: control.text
             }
         }
