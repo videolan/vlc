@@ -190,6 +190,7 @@
         <file alias="CSDWindowButton.qml">widgets/qml/CSDWindowButton.qml</file>
         <file alias="CSDWindowButtonSet.qml">widgets/qml/CSDWindowButtonSet.qml</file>
         <file alias="CSDTitlebarTapNDrapHandler.qml">widgets/qml/CSDTitlebarTapNDrapHandler.qml</file>
+        <file alias="CurrentIndicator.qml">widgets/qml/CurrentIndicator.qml</file>
         <file alias="GridItem.qml">widgets/qml/GridItem.qml</file>
         <file alias="ListItem.qml">widgets/qml/ListItem.qml</file>
         <file alias="DrawerExt.qml">widgets/qml/DrawerExt.qml</file>
