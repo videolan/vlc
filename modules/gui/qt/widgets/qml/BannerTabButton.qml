@@ -29,6 +29,7 @@ T.TabButton {
 
     property color color: VLCStyle.colors.banner
     property bool showText: true
+    property bool showCurrentIndicator: true
 
     text: model.displayText
     padding: 0
@@ -79,6 +80,13 @@ T.TabButton {
                                                                 : ((control.selected) ? VLCStyle.colors.text : VLCStyle.colors.menuCaption)
                 text: control.text
             }
+        }
+
+        Widgets.CurrentIndicator {
+            width: tabRow.width
+            orientation: Qt.Horizontal
+            margin: VLCStyle.dp(3, VLCStyle.scale)
+            visible: control.showCurrentIndicator && control.selected
         }
     }
 }
