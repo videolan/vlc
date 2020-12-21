@@ -133,9 +133,10 @@ Widgets.NavigableFocusScope {
 
             header: Widgets.SubtitleLabel {
                 text: i18n.qtr("Artists")
+                font.pixelSize: VLCStyle.fontSize_large
                 leftPadding: VLCStyle.margin_normal
-                bottomPadding: VLCStyle.margin_normal
-                topPadding: VLCStyle.margin_normal
+                bottomPadding: VLCStyle.margin_small
+                topPadding: VLCStyle.margin_xlarge
             }
 
             delegate: Rectangle {
