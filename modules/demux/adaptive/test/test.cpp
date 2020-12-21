@@ -27,9 +27,25 @@
 
 #include "test.hpp"
 
+#include <iostream>
+
 extern const char vlc_module_name[] = "foobar";
+
+#define TEST(func) []() { std::cerr << "Testing "#func << std::endl;\
+                          return func##_test(); }()
 
 int main()
 {
-    return TemplatedUri_test();
+    return
+    TEST(Inheritables) ||
+    TEST(SegmentBase) ||
+    TEST(SegmentList) ||
+    TEST(SegmentTemplate) ||
+    TEST(Timeline) ||
+    TEST(Conversions) ||
+    TEST(TemplatedUri) ||
+    TEST(BufferingLogic) ||
+    TEST(CommandsQueue) ||
+    TEST(M3U8MasterPlaylist) ||
+    TEST(M3U8Playlist);
 }

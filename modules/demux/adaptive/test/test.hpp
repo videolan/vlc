@@ -36,6 +36,16 @@
 
 #define Expect(testcond) DoExpect((testcond), __FUNCTION__, __LINE__)
 
+int Inheritables_test();
 int TemplatedUri_test();
+int SegmentBase_test();
+int SegmentList_test();
+int SegmentTemplate_test();
+int Timeline_test();
+int Conversions_test();
+int M3U8MasterPlaylist_test();
+int M3U8Playlist_test();
+int CommandsQueue_test();
+int BufferingLogic_test();
 
 #endif
