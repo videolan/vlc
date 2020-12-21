@@ -505,7 +505,16 @@ libadaptive_plugin_la_LIBADD = libvlc_adaptive.la
 demux_LTLIBRARIES += libadaptive_plugin.la
 
 adaptive_test_SOURCES = \
+    demux/adaptive/test/logic/BufferingLogic.cpp \
+    demux/adaptive/test/tools/Conversions.cpp \
+    demux/adaptive/test/playlist/Inheritables.cpp \
+    demux/adaptive/test/playlist/M3U8.cpp \
+    demux/adaptive/test/playlist/SegmentBase.cpp \
+    demux/adaptive/test/playlist/SegmentList.cpp \
+    demux/adaptive/test/playlist/SegmentTemplate.cpp \
+    demux/adaptive/test/playlist/SegmentTimeline.cpp \
     demux/adaptive/test/playlist/TemplatedUri.cpp \
+    demux/adaptive/test/plumbing/CommandsQueue.cpp \
     demux/adaptive/test/test.cpp \
     demux/adaptive/test/test.hpp
 adaptive_test_LDADD = libvlc_adaptive.la
