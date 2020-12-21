@@ -33,7 +33,6 @@ NavigableRow {
         selected: model.name === row.currentView
         height: VLCStyle.localToolbar_height
         color: VLCStyle.colors.bg
-        colorSelected: VLCStyle.colors.bg
         onClicked: row.clicked(index)
     }
 }

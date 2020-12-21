@@ -28,7 +28,6 @@ T.TabButton {
     id: control
 
     property color color: VLCStyle.colors.banner
-    property color colorSelected: VLCStyle.colors.bg
     property bool showText: true
 
     text: model.displayText
@@ -45,7 +44,7 @@ T.TabButton {
         height: control.height
         width: control.width
         color: (control.activeFocus || control.hovered) ? VLCStyle.colors.accent
-                                                        :  (control.selected ? control.colorSelected : control.color)
+                                                        : control.color
         Behavior on color {
             ColorAnimation {
                 duration: 128
