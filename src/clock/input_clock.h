@@ -30,7 +30,7 @@
 /** @struct input_clock_t
  * This structure is used to manage clock drift and reception jitters
  *
- * All functions MUST be called from one and only one thread.
+ * This API is reentrant but not thread-safe.
  */
 typedef struct input_clock_t input_clock_t;
 

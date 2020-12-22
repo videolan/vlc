@@ -104,9 +104,6 @@
 /* */
 struct input_clock_t
 {
-    /* */
-    vlc_mutex_t lock;
-
     /* Last point
      * It is used to detect unexpected stream discontinuities */
     clock_point_t last;
@@ -154,7 +151,6 @@ input_clock_t *input_clock_New( float rate )
     if( !cl )
         return NULL;
 
-    vlc_mutex_init( &cl->lock );
     cl->b_has_reference = false;
     cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
     cl->b_has_external_clock = false;
@@ -200,8 +196,6 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
     bool b_reset_reference = false;
 
     assert( i_ck_stream != VLC_TICK_INVALID && i_ck_system != VLC_TICK_INVALID );
-
-    vlc_mutex_lock( &cl->lock );
 
     if( !cl->b_has_reference )
     {
@@ -277,8 +271,6 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         cl->late.i_index = ( cl->late.i_index + 1 ) % INPUT_CLOCK_LATE_COUNT;
     }
 
-    vlc_mutex_unlock( &cl->lock );
-
     return i_late;
 }
 
@@ -287,13 +279,9 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
  *****************************************************************************/
 void input_clock_Reset( input_clock_t *cl )
 {
-    vlc_mutex_lock( &cl->lock );
-
     cl->b_has_reference = false;
     cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
     cl->b_has_external_clock = false;
-
-    vlc_mutex_unlock( &cl->lock );
 }
 
 /*****************************************************************************
@@ -301,8 +289,6 @@ void input_clock_Reset( input_clock_t *cl )
  *****************************************************************************/
 void input_clock_ChangeRate( input_clock_t *cl, float rate )
 {
-    vlc_mutex_lock( &cl->lock );
-
     if( cl->b_has_reference )
     {
         /* Move the reference point (as if we were playing at the new rate
@@ -310,8 +296,6 @@ void input_clock_ChangeRate( input_clock_t *cl, float rate )
         cl->ref.system = cl->last.system - (vlc_tick_t) ((cl->last.system - cl->ref.system) / rate * cl->rate);
     }
     cl->rate = rate;
-
-    vlc_mutex_unlock( &cl->lock );
 }
 
 /*****************************************************************************
@@ -319,7 +303,6 @@ void input_clock_ChangeRate( input_clock_t *cl, float rate )
  *****************************************************************************/
 void input_clock_ChangePause( input_clock_t *cl, bool b_paused, vlc_tick_t i_date )
 {
-    vlc_mutex_lock( &cl->lock );
     assert( (!cl->b_paused) != (!b_paused) );
 
     if( cl->b_paused )
@@ -334,8 +317,6 @@ void input_clock_ChangePause( input_clock_t *cl, bool b_paused, vlc_tick_t i_dat
     }
     cl->i_pause_date = i_date;
     cl->b_paused = b_paused;
-
-    vlc_mutex_unlock( &cl->lock );
 }
 
 /*****************************************************************************
@@ -345,13 +326,9 @@ vlc_tick_t input_clock_GetWakeup( input_clock_t *cl )
 {
     vlc_tick_t i_wakeup = 0;
 
-    vlc_mutex_lock( &cl->lock );
-
     /* Synchronized, we can wait */
     if( cl->b_has_reference )
         i_wakeup = ClockStreamToSystem( cl, cl->last.stream + AvgGet( &cl->drift ) - cl->i_buffering_duration );
-
-    vlc_mutex_unlock( &cl->lock );
 
     return i_wakeup;
 }
@@ -361,24 +338,15 @@ vlc_tick_t input_clock_GetWakeup( input_clock_t *cl )
  *****************************************************************************/
 float input_clock_GetRate( input_clock_t *cl )
 {
-    vlc_mutex_lock( &cl->lock );
-    float rate = cl->rate;
-    vlc_mutex_unlock( &cl->lock );
-
-    return rate;
+    return cl->rate;
 }
 
 int input_clock_GetState( input_clock_t *cl,
                           vlc_tick_t *pi_stream_start, vlc_tick_t *pi_system_start,
                           vlc_tick_t *pi_stream_duration, vlc_tick_t *pi_system_duration )
 {
-    vlc_mutex_lock( &cl->lock );
-
     if( !cl->b_has_reference )
-    {
-        vlc_mutex_unlock( &cl->lock );
         return VLC_EGENERIC;
-    }
 
     *pi_stream_start = cl->ref.stream;
     *pi_system_start = cl->ref.system;
@@ -386,15 +354,11 @@ int input_clock_GetState( input_clock_t *cl,
     *pi_stream_duration = cl->last.stream - cl->ref.stream;
     *pi_system_duration = cl->last.system - cl->ref.system;
 
-    vlc_mutex_unlock( &cl->lock );
-
     return VLC_SUCCESS;
 }
 
 void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, vlc_tick_t i_system )
 {
-    vlc_mutex_lock( &cl->lock );
-
     assert( cl->b_has_reference );
     vlc_tick_t i_offset;
     if( b_absolute )
@@ -413,29 +377,21 @@ void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, vlc_tic
 
     cl->ref.system += i_offset;
     cl->last.system += i_offset;
-
-    vlc_mutex_unlock( &cl->lock );
 }
 
 void input_clock_GetSystemOrigin( input_clock_t *cl, vlc_tick_t *pi_system, vlc_tick_t *pi_delay )
 {
-    vlc_mutex_lock( &cl->lock );
-
     assert( cl->b_has_reference );
 
     *pi_system = cl->ref.system;
     if( pi_delay )
         *pi_delay  = cl->i_pts_delay;
-
-    vlc_mutex_unlock( &cl->lock );
 }
 
 #warning "input_clock_SetJitter needs more work"
 void input_clock_SetJitter( input_clock_t *cl,
                             vlc_tick_t i_pts_delay, int i_cr_average )
 {
-    vlc_mutex_lock( &cl->lock );
-
     /* Update late observations */
     const vlc_tick_t i_delay_delta = i_pts_delay - cl->i_pts_delay;
     vlc_tick_t pi_late[INPUT_CLOCK_LATE_COUNT];
@@ -466,14 +422,10 @@ void input_clock_SetJitter( input_clock_t *cl,
 
     if( cl->drift.range != i_cr_average )
         AvgRescale( &cl->drift, i_cr_average );
-
-    vlc_mutex_unlock( &cl->lock );
 }
 
 vlc_tick_t input_clock_GetJitter( input_clock_t *cl )
 {
-    vlc_mutex_lock( &cl->lock );
-
 #if INPUT_CLOCK_LATE_COUNT != 3
 #   error "unsupported INPUT_CLOCK_LATE_COUNT"
 #endif
@@ -486,8 +438,6 @@ vlc_tick_t input_clock_GetJitter( input_clock_t *cl )
     const vlc_tick_t *p = cl->late.pi_value;
     vlc_tick_t i_late_median = p[0] + p[1] + p[2] - __MIN(__MIN(p[0],p[1]),p[2]) - __MAX(__MAX(p[0],p[1]),p[2]);
     vlc_tick_t i_pts_delay = cl->i_pts_delay ;
-
-    vlc_mutex_unlock( &cl->lock );
 
     return i_pts_delay + i_late_median;
 }
