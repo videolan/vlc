@@ -27,9 +27,15 @@
 FT2Bitmap::FT2Bitmap( intf_thread_t *pIntf, int width, int height ):
     GenericBitmap( pIntf ), m_width( width ), m_height( height )
 {
+    unsigned size;
+
+    if (mul_overflow((unsigned)width, (unsigned)height, &size)
+     || mul_overflow(size, 4, &size))
+        throw std::bad_alloc();
+
     // Allocate memory for the buffer
-    m_pData = new uint8_t[m_height * m_width * 4];
-    memset( m_pData, 0, m_height * m_width * 4 );
+    m_pData = new uint8_t[size];
+    memset(m_pData, 0, size);
 }
 
 

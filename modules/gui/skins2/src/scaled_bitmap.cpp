@@ -28,10 +28,14 @@ ScaledBitmap::ScaledBitmap( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
                             int width, int height ):
     GenericBitmap( pIntf ), m_width( width ), m_height( height )
 {
-    // XXX We should check that width and height are positive...
+    unsigned size;
+
+    if (mul_overflow((unsigned)width, (unsigned)height, &size)
+     || mul_overflow(size, 4, &size))
+        throw std::bad_alloc();
 
     // Allocate memory for the buffer
-    m_pData = new uint8_t[m_height * m_width * 4];
+    m_pData = new uint8_t[size];
 
     int srcWidth = rBitmap.getWidth();
     int srcHeight = rBitmap.getHeight();

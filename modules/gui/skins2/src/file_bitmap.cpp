@@ -38,6 +38,7 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
 {
     video_format_t fmt_out;
     picture_t *pPic;
+    unsigned size;
 
     video_format_Init( &fmt_out, VLC_CODEC_RGBA );
 
@@ -61,7 +62,11 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
     m_height = fmt_out.i_height;
     video_format_Clean( &fmt_out );
 
-    m_pData = new uint8_t[m_height * m_width * 4];
+    if (mul_overflow((unsigned)m_width, (unsigned)m_height, &size)
+     || mul_overflow(size, 4, &size))
+        throw std::bad_alloc();
+
+    m_pData = new uint8_t[size];
 
     // Compute the alpha layer
     uint8_t *pData = m_pData, *pSrc = pPic->p->p_pixels;

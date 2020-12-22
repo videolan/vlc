@@ -57,8 +57,14 @@ BitmapImpl::BitmapImpl( intf_thread_t *pIntf, int width, int height,
     GenericBitmap( pIntf, nbFrames, fps, nbLoops ), m_width( width ),
     m_height( height ), m_pData( NULL )
 {
-    m_pData = new uint8_t[width * height * 4];
-    memset( m_pData, 0, width * height * 4 );
+    unsigned size;
+
+    if (mul_overflow((unsigned)width, (unsigned)height, &size)
+     || mul_overflow(size, 4, &size))
+        throw std::bad_alloc();
+
+    m_pData = new uint8_t[size];
+    memset(m_pData, 0, size);
 }
 
 
