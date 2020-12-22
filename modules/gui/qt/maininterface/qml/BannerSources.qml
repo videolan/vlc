@@ -245,8 +245,8 @@ Widgets.NavigableFocusScope {
                                 }
                             }
 
-                            sortKey: contentModel.sortCriteria
-                            sortOrder: contentModel.sortOrder
+                            sortKey: contentModel ? contentModel.sortCriteria : PlaylistControllerModel.SORT_KEY_NONE
+                            sortOrder: contentModel ? contentModel.sortOrder : undefined
                         }
                     }
 
