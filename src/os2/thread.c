@@ -131,7 +131,6 @@ static ULONG vlc_Sleep (ULONG ulTimeout)
 
 static vlc_mutex_t super_mutex;
 static vlc_cond_t  super_variable;
-extern vlc_rwlock_t config_lock;
 
 int _CRT_init(void);
 void _CRT_term(void);
@@ -151,12 +150,10 @@ unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
             vlc_mutex_init (&super_mutex);
             vlc_cond_init (&super_variable);
             vlc_threadvar_create (&thread_key, NULL);
-            vlc_rwlock_init (&config_lock);
 
             return 1;
 
         case 1 :    /* Termination */
-            vlc_rwlock_destroy (&config_lock);
             vlc_threadvar_delete (&thread_key);
 
             _CRT_term();
