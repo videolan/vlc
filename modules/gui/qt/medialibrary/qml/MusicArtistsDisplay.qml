@@ -163,7 +163,7 @@ Widgets.PageLoader {
                     delegate: AudioGridItem {
                         id: gridItem
 
-                        title: model.name
+                        title: model.name || i18n.qtr("Unknown artist")
                         subtitle: model.nb_tracks > 1 ? i18n.qtr("%1 songs").arg(model.nb_tracks) : i18n.qtr("%1 song").arg(model.nb_tracks)
                         pictureRadius: VLCStyle.artistGridCover_radius
                         pictureHeight: VLCStyle.artistGridCover_radius
