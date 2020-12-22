@@ -185,7 +185,7 @@ Widgets.NavigableFocusScope {
                              elide: Text.ElideRight
                              font.pixelSize: VLCStyle.fontSize_large
                              font.weight: Font.DemiBold
-                             text: model.name
+                             text: model.name || i18n.qtr("Unknown genre")
                              color: "white"
                              horizontalAlignment: Text.AlignHCenter
                         }
