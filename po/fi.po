@@ -22,7 +22,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-12-14 22:27+0100\n"
+"PO-Revision-Date: 2020-12-22 20:46+0100\n"
 "Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2020\n"
 "Language-Team: Finnish (https://www.transifex.com/yaron/teams/16553/fi/)\n"
 "Language: fi\n"
@@ -1769,6 +1769,8 @@ msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
+"Tämä määrittää äänen ulostulon kanavien määrä. Käytetään oletuksena, mikäli "
+"mahdollista, kun sekä laitteisto ja toistettava äänivirta tukevat sitä."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -3533,7 +3535,7 @@ msgstr "Kanavointimoduuli"
 
 #: src/libvlc-module.c:976
 msgid "This is a legacy entry to let you configure mux modules"
-msgstr ""
+msgstr "Tämä on vanha merkintä, jonka avulla määrität mux-moduulit"
 
 #: src/libvlc-module.c:978
 msgid "Access output module"
@@ -3542,6 +3544,7 @@ msgstr "Käyttölähtömoduuli"
 #: src/libvlc-module.c:980
 msgid "This is a legacy entry to let you configure access output modules"
 msgstr ""
+"Tämä on vanha merkintä, jonka avulla määrität oikeudet ulostulon moduuleihin"
 
 #: src/libvlc-module.c:983
 msgid ""
@@ -3592,15 +3595,16 @@ msgstr "Tietovirtasuodinmoduuli"
 
 #: src/libvlc-module.c:1009
 msgid "Stream filters are used to modify the stream that is being read."
-msgstr ""
+msgstr "Lähetyksen suodattimia käytetään muokkaamaan luettavaa videovirtaa."
 
 #: src/libvlc-module.c:1011
 msgid "Demux filter module"
-msgstr ""
+msgstr "Demux suodatin"
 
 #: src/libvlc-module.c:1013
 msgid "Demux filters are used to modify/control the stream that is being read."
 msgstr ""
+"Demux suodattimia käytetään muokkaamaan/ohjaamaan luettavaa videovirtaa."
 
 #: src/libvlc-module.c:1015
 msgid "Demux module"
@@ -3627,6 +3631,8 @@ msgid ""
 "You can select which VoD server module you want to use. Set this to "
 "'vod_rtsp' to switch back to the old, legacy module."
 msgstr ""
+"Voit valita mitä VoD-palvelimen moduulia käytetään. Aseta 'vod_rtsp', jos "
+"haluat palata vanhaan, aiempaan moduuliin."
 
 #: src/libvlc-module.c:1027
 msgid "Allow real-time priority"
@@ -3663,7 +3669,7 @@ msgstr ""
 #: src/libvlc-module.c:1042
 msgid ""
 "This option is useful if you want to lower the latency when reading a stream"
-msgstr ""
+msgstr "Tämä on hyödyllinen, jos haluat lyhentää videovirran lukulatenssia."
 
 #: src/libvlc-module.c:1045
 msgid "VLM configuration file"
@@ -3685,21 +3691,23 @@ msgstr ""
 
 #: src/libvlc-module.c:1053
 msgid "Scan for new plugins"
-msgstr ""
+msgstr "Etsi uusia laajennuksia"
 
 #: src/libvlc-module.c:1055
 msgid ""
 "Scan plugin directories for new plugins at startup. This increases the "
 "startup time of VLC."
 msgstr ""
+"Skannaa uusia laajennuksia käynnistyksen yhteydessä. Tämä pidentää VLC:n "
+"käynnistymistä."
 
 #: src/libvlc-module.c:1058
 msgid "Preferred keystore list"
-msgstr ""
+msgstr "Avaimien ensisijainen luettelo"
 
 #: src/libvlc-module.c:1060
 msgid "List of keystores that VLC will use in priority."
-msgstr ""
+msgstr "Lista näppäimistä, joita VLC käyttää ensisijaisesti."
 
 #: src/libvlc-module.c:1062
 msgid "Locally collect statistics"
@@ -3737,6 +3745,11 @@ msgid ""
 "This option will allow you to play the file with the already running "
 "instance or enqueue it."
 msgstr ""
+"Vain yhden käynnissä olevan VLC:n salliminen voi joskus olla käytännöllistä. "
+"Esimerkiksi, jos olet määrittänyt VLC:n oletussoittimeksi joillekin "
+"mediatyypeille, etkä halua avata uutta esiintymää aina kun avaat tiedoston "
+"tiedostonhallinnassa. Tämän avulla voit toistaa tiedoston jo käynnissä "
+"olevalla ohjelmalla."
 
 #: src/libvlc-module.c:1082
 msgid "VLC is started from file association"
@@ -3744,7 +3757,7 @@ msgstr "Käynnistys tiedostoassosiaatiosta"
 
 #: src/libvlc-module.c:1084
 msgid "Tell VLC that it is being launched due to a file association in the OS"
-msgstr ""
+msgstr "Kerro VLC:lle, että se käynnistetään jonkin tiedostotyypin oletuksena"
 
 #: src/libvlc-module.c:1087 modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Use only one instance when started from file manager"
@@ -3783,11 +3796,12 @@ msgstr ""
 
 #: src/libvlc-module.c:1104
 msgid "Expose media player via D-Bus"
-msgstr ""
+msgstr "Näytä mediasoitin D-Busin kautta"
 
 #: src/libvlc-module.c:1105
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
 msgstr ""
+"Salli muiden sovellusten hallita VLC:tä D-Bus MPRIS -protokollan avulla."
 
 #: src/libvlc-module.c:1114
 msgid ""
@@ -3799,21 +3813,23 @@ msgstr ""
 
 #: src/libvlc-module.c:1117
 msgid "Automatically preparse items"
-msgstr ""
+msgstr "Valmistele kohteet automaattisesti"
 
 #: src/libvlc-module.c:1119
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
 msgstr ""
+"Valmistele soittolistaan lisätyt kohteet automaattisesti (joidenkin "
+"metatietojen noutamiseksi)."
 
 #: src/libvlc-module.c:1122
 msgid "Preparsing timeout"
-msgstr ""
+msgstr "Valmistelun aikakatkaisu"
 
 #: src/libvlc-module.c:1124
 msgid "Maximum time allowed to preparse an item, in milliseconds"
-msgstr ""
+msgstr "Kohteen valmisteluun käytetty enimmäisaika millisekunteina"
 
 #: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:334
 #: modules/gui/qt/dialogs/firstrun.cpp:95
@@ -3869,7 +3885,7 @@ msgstr "Näytä piilotiedostot"
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
-msgstr ""
+msgstr "Ohita tiedostot, jotka alkavat \".\""
 
 #: src/libvlc-module.c:1151
 msgid "Services discovery modules"
@@ -3935,11 +3951,11 @@ msgstr "Keskeytä (pause) soittolista jokaisen kohteen lopussa."
 
 #: src/libvlc-module.c:1180
 msgid "Start paused"
-msgstr ""
+msgstr "Käynnistä pysäytettynä"
 
 #: src/libvlc-module.c:1182
 msgid "Pause each item in the playlist on the first frame."
-msgstr ""
+msgstr "Keskeytä soittolista jokaisen kohteen lopussa."
 
 #: src/libvlc-module.c:1184
 msgid "Auto start"
@@ -3994,35 +4010,39 @@ msgstr "Älä huomioi"
 
 #: src/libvlc-module.c:1214
 msgid "Volume control"
-msgstr ""
+msgstr "Äänenvoimakkuuden säätö"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
-msgstr ""
+msgstr "Sijainnin ohjaus"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
-msgstr ""
+msgstr "Sijainnin käänteinen ohjaus"
 
 #: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
-msgstr ""
+msgstr "Hiiren rullan pystyakselin ohjaus"
 
 #: src/libvlc-module.c:1220
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
+"Hiiren rullan pystyakseli (ylös-alas) voi ohjata äänen voimakkuutta, "
+"sijaintia tai sen toiminta voidaan ohittaa."
 
 #: src/libvlc-module.c:1222
 msgid "Mouse wheel horizontal axis control"
-msgstr ""
+msgstr "Hiiren rullan vaaka-akselin ohjaus"
 
 #: src/libvlc-module.c:1224
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr ""
+"Hiiren rullan vaaka-akseli (vasen-oikea) voi ohjata äänenvoimakkuutta, "
+"sijaintia tai sen toiminta voidaan ohittaa."
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:98
@@ -4287,6 +4307,7 @@ msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
 msgstr ""
+"Valitse näppäin, jolla liikut DVD-valikossa / Siirrät näkymää ylös (pitch)."
 
 #: src/libvlc-module.c:1297
 msgid "Navigate down"
@@ -4297,6 +4318,7 @@ msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
 msgstr ""
+"Valitse näppäin, jolla liikut DVD-valikossa / Siirrät näkymää alas (pitch)."
 
 #: src/libvlc-module.c:1299
 msgid "Navigate left"
@@ -4307,6 +4329,8 @@ msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
 msgstr ""
+"Valitse näppäin, jolla liikut DVD-valikossa / Siirrät näkymää vasemmalle "
+"(yaw)."
 
 #: src/libvlc-module.c:1301
 msgid "Navigate right"
@@ -4317,6 +4341,7 @@ msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
 msgstr ""
+"Valitse näppäin, jolla liikut DVD-valikossa / Siirrät näkymää oikealle (yaw)."
 
 #: src/libvlc-module.c:1303
 msgid "Activate"
@@ -4332,7 +4357,7 @@ msgstr "Siirry DVD-valikkoon"
 
 #: src/libvlc-module.c:1306
 msgid "Select the key to take you to the DVD menu"
-msgstr ""
+msgstr "Valitse näppäin, joka vie sinut DVD-valikkoon"
 
 #: src/libvlc-module.c:1307
 msgid "Select previous DVD title"
@@ -4340,7 +4365,7 @@ msgstr "Edellinen DVD-nimi"
 
 #: src/libvlc-module.c:1308
 msgid "Select the key to choose the previous title from the DVD"
-msgstr ""
+msgstr "Valitse näppäin, joka siirtää edelliseen nimeen DVD-levyllä."
 
 #: src/libvlc-module.c:1309
 msgid "Select next DVD title"
@@ -4348,7 +4373,7 @@ msgstr "Seuraava DVD-nimi"
 
 #: src/libvlc-module.c:1310
 msgid "Select the key to choose the next title from the DVD"
-msgstr ""
+msgstr "Valitse näppäin, joka siirtää seuraavaan nimeen DVD-levyllä."
 
 #: src/libvlc-module.c:1311
 msgid "Select prev DVD chapter"
@@ -4356,7 +4381,7 @@ msgstr "Edellinen DVD-luku"
 
 #: src/libvlc-module.c:1312
 msgid "Select the key to choose the previous chapter from the DVD"
-msgstr ""
+msgstr "Valitse näppäin, joka siirtää edelliseen lukuun DVD-levyllä."
 
 #: src/libvlc-module.c:1313
 msgid "Select next DVD chapter"
@@ -4364,7 +4389,7 @@ msgstr "Seuraava DVD-luku"
 
 #: src/libvlc-module.c:1314
 msgid "Select the key to choose the next chapter from the DVD"
-msgstr ""
+msgstr "Valitse näppäin, joka siirtää seuraavaan lukuun DVD-levyllä."
 
 #: src/libvlc-module.c:1315
 msgid "Volume up"
@@ -4411,19 +4436,19 @@ msgstr "Valitse millä näppäimellä tekstityksen viivettä vähennetään."
 
 #: src/libvlc-module.c:1325
 msgid "Reset subtitles text scale"
-msgstr ""
+msgstr "Nollaa tekstityksen skaalaus"
 
 #: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
-msgstr ""
+msgstr "Suurenna tekstitystä"
 
 #: src/libvlc-module.c:1327
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "Pienennä tekstitystä"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
-msgstr ""
+msgstr "Valitse näppäin vaihtaaksesi tekstityksen skaalausta"
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4444,6 +4469,8 @@ msgstr ""
 #: src/libvlc-module.c:1332
 msgid "Select the key to bookmark subtitle timestamp when syncing subtitles."
 msgstr ""
+"Valitse näppäin tekstityksen aikaleiman lisäämiseksi kun tekstitystä "
+"synkronoidaan."
 
 #: src/libvlc-module.c:1333
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
@@ -4452,14 +4479,17 @@ msgstr "Tekstityksen synkronointi / synkronoi äänen & tekstityksen aikaleimat"
 #: src/libvlc-module.c:1334
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
 msgstr ""
+"Valitse näppäin aikaleiman lisäämiseksi kun ääni & tekstitys synkronoidaan."
 
 #: src/libvlc-module.c:1335
 msgid "Subtitle sync / reset audio & subtitle synchronization"
-msgstr ""
+msgstr "Tekstityksen synkronointi / nollaa ääni ja tekstitys"
 
 #: src/libvlc-module.c:1336
 msgid "Select the key to reset synchronization of audio & subtitle timestamps."
 msgstr ""
+"Valitse näppäin nollataksesi äänen ja tekstityksen aikaleimojen "
+"synkronoinnin."
 
 #: src/libvlc-module.c:1337
 msgid "Subtitle position up"
@@ -4646,11 +4676,12 @@ msgstr ""
 
 #: src/libvlc-module.c:1391
 msgid "Cycle subtitle track in reverse order"
-msgstr ""
+msgstr "Vaihda tekstitysraita päinvastaiseen järjestykseen"
 
 #: src/libvlc-module.c:1392
 msgid "Cycle through the available subtitle tracks in reverse order."
 msgstr ""
+"Selaa käytettävissä olevia tekstitysraitoja päinvastaisessa järjestyksessä."
 
 #: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
@@ -4664,27 +4695,27 @@ msgstr ""
 
 #: src/libvlc-module.c:1395
 msgid "Toggle subtitles"
-msgstr ""
+msgstr "Vaihda tekstitys"
 
 #: src/libvlc-module.c:1396
 msgid "Toggle subtitle track visibility."
-msgstr ""
+msgstr "Vaihda tekstitysraidan näkyvyyttä."
 
 #: src/libvlc-module.c:1397
 msgid "Cycle next program Service ID"
-msgstr ""
+msgstr "Vaihda seuraavan ohjelman Palvelun ID"
 
 #: src/libvlc-module.c:1398
 msgid "Cycle through the available next program Service IDs (SIDs)."
-msgstr ""
+msgstr "Selaa käytettävissä olevia seuraavia ohjelman palvelutunnuksia (SID)."
 
 #: src/libvlc-module.c:1399
 msgid "Cycle previous program Service ID"
-msgstr ""
+msgstr "Vaihda edellisen ohjelman Palvelun ID"
 
 #: src/libvlc-module.c:1400
 msgid "Cycle through the available previous program Service IDs (SIDs)."
-msgstr ""
+msgstr "Selaa käytettävissä olevia edellisen ohjelman palvelutunnuksia (SID)."
 
 #: src/libvlc-module.c:1401
 msgid "Cycle source aspect ratio"
@@ -4783,11 +4814,11 @@ msgstr "Normaali/Kierto/Uudelleentoista"
 
 #: src/libvlc-module.c:1427
 msgid "Toggle Normal/Loop/Repeat playlist modes"
-msgstr ""
+msgstr "Vaihda soittolistan tilat Normaali/Silmukka/Jatkuva toisto"
 
 #: src/libvlc-module.c:1430
 msgid "Toggle random playlist playback"
-msgstr ""
+msgstr "Vaihda soittolistan satunnaistoisto"
 
 #: src/libvlc-module.c:1435 src/libvlc-module.c:1436
 msgid "Un-Zoom"
@@ -5314,7 +5345,7 @@ msgstr "%.1f Gt"
 #: src/misc/update.c:488
 #, c-format
 msgid "%<PRIu64> B"
-msgstr ""
+msgstr "%<PRIu64> B"
 
 #: src/misc/update.c:580
 msgid "Saving file failed"
@@ -6123,6 +6154,8 @@ msgid ""
 "Pass alsa:// to open the default ALSA capture device, or alsa://SOURCE to "
 "open a specific device named SOURCE."
 msgstr ""
+"Käytä alsa:// oletus ALSA-tallennus laitteen valintaan tai alsa://SOURCE "
+"avaten tietyn laitteen nimellä SOURCE."
 
 #: modules/access/alsa.c:49
 msgid "192000 Hz"
@@ -6194,43 +6227,44 @@ msgstr "Liitelähde"
 
 #: modules/access/avaudiocapture.m:212
 msgid "No Audio Input device found"
-msgstr ""
+msgstr "Äänen sisääntuloa ei löytynyt"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
 "Your Mac does not seem to be equipped with a suitable audio input device."
 "Please check your connectors and drivers."
 msgstr ""
+"Sinun Mac koneessa ei näytä olevan sopivaa äänen sisääntuloa. Tarkista "
+"liittimet ja ajurit."
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "Ongelman tiedot ja järjestelmäkokoonpano"
+msgstr "Järjestelmäresurssin pääsyongelma"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"Avaa \"Järjestelmän asetukset\" -> \"Turvallisuus\" ja anna VLC:n käyttää "
+"mikrofoniasi."
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "Äänikaappaus"
+msgstr "AVFoundation äänen tallennus"
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "Äänilähtömoduuli"
+msgstr "AVFoundation äänen tallennus moduuli"
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
-msgstr ""
+msgstr "AVFoundation videon tallennus"
 
 #: modules/access/avcapture.m:67
 msgid "AVFoundation video capture module."
-msgstr ""
+msgstr "AVFoundation videon tallennus moduuli"
 
 #: modules/access/avcapture.m:295 modules/access/avcapture.m:324
 msgid "No video devices found"
@@ -6241,6 +6275,8 @@ msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
 msgstr ""
+"Sinun Mac koneessa ei näytä olevan sopivaa videon sisääntuloa. Tarkista "
+"liittimet ja ajurit."
 
 #: modules/access/avcapture.m:325
 msgid ""
@@ -6255,6 +6291,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"Avaa \"Järjestelmän asetukset\" -> \"Turvallisuus\" ja anna VLC:n käyttää "
+"kameraasi."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -6307,6 +6345,8 @@ msgid ""
 "This Blu-ray Disc needs a library for AACS decoding, and your system does "
 "not have it."
 msgstr ""
+"Tämä Blu-ray levy tarvitsee kirjaston AACS -purkukoodausta varten, eikä sitä "
+"ole järjestelmässä."
 
 #: modules/access/bluray.c:866
 msgid "Blu-ray Disc is corrupted."
@@ -6318,11 +6358,12 @@ msgstr "AACS-konfiguraatiotiedosto puuttuu!"
 
 #: modules/access/bluray.c:870
 msgid "No valid processing key found in AACS config file."
-msgstr ""
+msgstr "Määritystiedostosta ei löytynyt kelvollista AACS -avainta."
 
 #: modules/access/bluray.c:872
 msgid "No valid host certificate found in AACS config file."
 msgstr ""
+"Määritystiedostosta ei löytynyt kelvollista AACS -nimen sertifikaattia."
 
 #: modules/access/bluray.c:874
 msgid "AACS Host certificate revoked."
@@ -6337,6 +6378,8 @@ msgid ""
 "This Blu-ray Disc needs a library for BD+ decoding, and your system does not "
 "have it."
 msgstr ""
+"Tämä Blu-ray levy tarvitsee kirjaston BD+ purkukoodausta varten, eikä sitä "
+"ole järjestelmässä."
 
 #: modules/access/bluray.c:889
 msgid "Your system BD+ decoding library does not work. Missing configuration?"
@@ -6354,6 +6397,8 @@ msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
 "The disc will be played without menus."
 msgstr ""
+"Tämä Blu-ray levy vaatii Java-tuen valikoihin. %s\n"
+"Levy toistetaan ilman valikoita."
 
 #: modules/access/bluray.c:924
 msgid "Java was not found on your system."
@@ -6412,19 +6457,19 @@ msgstr "Käytettävä CDDB-palvelimen portti."
 
 #: modules/access/concat.c:303
 msgid "Inputs list"
-msgstr ""
+msgstr "Sisääntulojen lista"
 
 #: modules/access/concat.c:305
 msgid "Comma-separated list of input URLs to concatenate."
-msgstr ""
+msgstr "Pilkuilla erotettu luettelo ketjutetuista verkko-osoitteista."
 
 #: modules/access/concat.c:308
 msgid "Concatenation"
-msgstr ""
+msgstr "Ketjutettu"
 
 #: modules/access/concat.c:309
 msgid "Concatenated inputs"
-msgstr ""
+msgstr "Ketjutetut sisääntulot"
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6551,7 +6596,7 @@ msgstr "Komposiitti"
 
 #: modules/access/decklink.cpp:87
 msgid "S-Video"
-msgstr ""
+msgstr "S-Video"
 
 #: modules/access/decklink.cpp:94
 msgid "Embedded"
@@ -8554,7 +8599,7 @@ msgstr ""
 
 #: modules/access/srt.c:386 modules/access_output/srt.c:436
 msgid "SRT"
-msgstr ""
+msgstr "SRT"
 
 #: modules/access/srt.c:387
 msgid "SRT input"
@@ -9209,11 +9254,11 @@ msgstr ""
 
 #: modules/access/wasapi.c:489
 msgid "WASAPI"
-msgstr ""
+msgstr "WASAPI"
 
 #: modules/access/wasapi.c:490
 msgid "Windows Audio Session API input"
-msgstr ""
+msgstr "Windows Audio Session API sisääntulo"
 
 #: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
 msgid "Dummy stream output"
@@ -9517,23 +9562,23 @@ msgstr ""
 
 #: modules/access_output/srt.c:57
 msgid "16 bytes"
-msgstr ""
+msgstr "16 tavua"
 
 #: modules/access_output/srt.c:57
 msgid "24 bytes"
-msgstr ""
+msgstr "24 tavua"
 
 #: modules/access_output/srt.c:57
 msgid "32 bytes"
-msgstr ""
+msgstr "32 tavua"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
-msgstr ""
+msgstr "SRT suoratoiston ulostulo"
 
 #: modules/access_output/srt.c:446
 msgid "Password for stream encryption"
-msgstr ""
+msgstr "Suoratoiston salauksen salasana"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10672,7 +10717,7 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1460
 msgid "Disabled"
-msgstr ""
+msgstr "Poistettu käytöstä"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
@@ -10680,7 +10725,7 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
-msgstr ""
+msgstr "Käytössä"
 
 #: modules/audio_output/mmdevice.c:1473
 msgid "Windows Multimedia Device output"
@@ -11299,7 +11344,7 @@ msgstr ""
 
 #: modules/codec/avcodec/d3d11va.c:63
 msgid "Direct3D11 Video Acceleration"
-msgstr ""
+msgstr "Direct3D11 videon kiihdytys"
 
 #: modules/codec/avcodec/dxva2.c:51
 msgid "DirectX Video Acceleration (DXVA) 2.0"
@@ -11344,11 +11389,11 @@ msgstr "VA-API-videodekooderi DRM:n kautta"
 
 #: modules/codec/avcodec/vaapi.c:357
 msgid "VA-API video decoder"
-msgstr ""
+msgstr "VA-API videon purkukooderi"
 
 #: modules/codec/bpg.c:49
 msgid "BPG image decoder"
-msgstr ""
+msgstr "BPG kuvan purkukooderi"
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:353 modules/spu/marq.c:108
@@ -11404,7 +11449,7 @@ msgstr ""
 
 #: modules/codec/daala.c:120
 msgid "Daala video decoder"
-msgstr ""
+msgstr "Daala videon purkukooderi"
 
 #: modules/codec/daala.c:125
 msgid "Daala video packetizer"
