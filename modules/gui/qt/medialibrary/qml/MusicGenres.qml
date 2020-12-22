@@ -72,11 +72,6 @@ Widgets.NavigableFocusScope {
             view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
     }
 
-    Connections {
-        target: medialib
-        onGridViewChanged: loadView()
-    }
-
     MLGenreModel {
         id: genreModel
         ml: medialib
