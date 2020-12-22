@@ -103,36 +103,6 @@ vlc_thread_fatal (const char *action, int error,
 # define VLC_THREAD_ASSERT( action ) ((void)val)
 #endif
 
-void vlc_rwlock_init (vlc_rwlock_t *lock)
-{
-    if (unlikely(pthread_rwlock_init (lock, NULL)))
-        abort ();
-}
-
-void vlc_rwlock_destroy (vlc_rwlock_t *lock)
-{
-    int val = pthread_rwlock_destroy (lock);
-    VLC_THREAD_ASSERT ("destroying R/W lock");
-}
-
-void vlc_rwlock_rdlock (vlc_rwlock_t *lock)
-{
-    int val = pthread_rwlock_rdlock (lock);
-    VLC_THREAD_ASSERT ("acquiring R/W lock for reading");
-}
-
-void vlc_rwlock_wrlock (vlc_rwlock_t *lock)
-{
-    int val = pthread_rwlock_wrlock (lock);
-    VLC_THREAD_ASSERT ("acquiring R/W lock for writing");
-}
-
-void vlc_rwlock_unlock (vlc_rwlock_t *lock)
-{
-    int val = pthread_rwlock_unlock (lock);
-    VLC_THREAD_ASSERT ("releasing R/W lock");
-}
-
 int vlc_threadvar_create (vlc_threadvar_t *key, void (*destr) (void *))
 {
     return pthread_key_create (key, destr);

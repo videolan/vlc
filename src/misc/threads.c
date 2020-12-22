@@ -372,10 +372,7 @@ int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,
     return ret;
 }
 
-#ifdef LIBVLC_NEED_RWLOCK
 /*** Generic read/write locks ***/
-#include <stdlib.h>
-#include <limits.h>
 /* NOTE:
  * lock->state is a signed long integer:
  *  - The sign bit is set when the lock is held for writing.
@@ -444,7 +441,6 @@ void vlc_rwlock_unlock (vlc_rwlock_t *lock)
     }
     vlc_mutex_unlock (&lock->mutex);
 }
-#endif /* LIBVLC_NEED_RWLOCK */
 
 /*** Generic semaphores ***/
 

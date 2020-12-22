@@ -60,7 +60,6 @@ typedef struct vlc_thread *vlc_thread_t;
 # define VLC_THREAD_CANCELED NULL
 
 # define LIBVLC_NEED_SLEEP
-#define LIBVLC_NEED_RWLOCK
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
@@ -89,7 +88,6 @@ static inline int vlc_poll(struct pollfd *fds, unsigned nfds, int timeout)
 typedef struct vlc_thread *vlc_thread_t;
 #define VLC_THREAD_CANCELED NULL
 
-#define LIBVLC_NEED_RWLOCK
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
@@ -130,7 +128,6 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 # include <poll.h>
 # define LIBVLC_USE_PTHREAD_CLEANUP   1
 # define LIBVLC_NEED_SLEEP
-# define LIBVLC_NEED_RWLOCK
 
 typedef struct vlc_thread *vlc_thread_t;
 #define VLC_THREAD_CANCELED NULL
@@ -190,22 +187,6 @@ typedef struct
  * Return value of a canceled thread.
  */
 #define VLC_THREAD_CANCELED PTHREAD_CANCELED
-
-/**
- * Read/write lock.
- *
- * Storage space for a slim reader/writer lock.
- *
- * \ingroup rwlock
- */
-typedef pthread_rwlock_t vlc_rwlock_t;
-
-/**
- * Static initializer for (static) read/write lock.
- *
- * \ingroup rwlock
- */
-#define VLC_STATIC_RWLOCK PTHREAD_RWLOCK_INITIALIZER
 
 /**
  * Thread-local key handle.
@@ -544,15 +525,22 @@ VLC_API int vlc_sem_timedwait(vlc_sem_t *sem, vlc_tick_t deadline) VLC_USED;
  * @{
  */
 
-#ifdef LIBVLC_NEED_RWLOCK
+/**
+ * Read/write lock.
+ *
+ * Storage space for a slim reader/writer lock.
+ */
 typedef struct vlc_rwlock
 {
     vlc_mutex_t   mutex;
     vlc_cond_t    wait;
     long          state;
 } vlc_rwlock_t;
-# define VLC_STATIC_RWLOCK { VLC_STATIC_MUTEX, VLC_STATIC_COND, 0 }
-#endif
+
+/**
+ * Static initializer for (static) read/write lock.
+ */
+#define VLC_STATIC_RWLOCK { VLC_STATIC_MUTEX, VLC_STATIC_COND, 0 }
 
 /**
  * Initializes a read/write lock.
