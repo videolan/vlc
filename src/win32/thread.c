@@ -785,8 +785,6 @@ void vlc_threads_setup(libvlc_int_t *vlc)
 
 #define LOOKUP(s) (((s##_) = (void *)GetProcAddress(h, #s)) != NULL)
 
-extern vlc_rwlock_t config_lock;
-
 BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
     (void) hinstDll;
@@ -816,12 +814,10 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             InitializeCriticalSection(&setup_lock);
             InitializeCriticalSection(&super_mutex);
             InitializeConditionVariable(&super_variable);
-            vlc_rwlock_init (&config_lock);
             break;
         }
 
         case DLL_PROCESS_DETACH:
-            vlc_rwlock_destroy (&config_lock);
             DeleteCriticalSection(&super_mutex);
             DeleteCriticalSection(&setup_lock);
             TlsFree(thread_key);
