@@ -133,17 +133,26 @@ UTCTime::UTCTime(const std::string &str)
         }
         else if (!in.eof() && (in.peek() == '+' || in.peek() == '-'))
         {
-            int i, tz = (in.peek() == '+') ? -60 : +60;
+            int sign = (in.peek() == '+') ? 1 : -1;
+            int tz = 0;
             in.ignore(1);
+
             if(!in.eof())
             {
-                in >> i;
-                tz *= i;
-                in.ignore(1);
-                if(!in.eof())
+                std::string tzspec;
+                in >> tzspec;
+
+                if(tzspec.length() >= 4)
                 {
-                    in >> i;
-                    tz += i;
+                    tz = sign * std::stoul(tzspec.substr(0, 2)) * 60;
+                    if(tzspec.length() == 5 && tzspec.find(':') == 2)
+                        tz += sign * std::stoul(tzspec.substr(3, 2));
+                    else
+                        tz += sign * std::stoul(tzspec.substr(2, 2));
+                }
+                else
+                {
+                    tz = sign * std::stoul(tzspec) * 60;
                 }
                 values[UTCTIME_TZ] = tz;
             }
@@ -161,7 +170,7 @@ UTCTime::UTCTime(const std::string &str)
             tm.tm_isdst = 0;
 
             int64_t mst = timegm( &tm );
-            mst += values[UTCTIME_TZ] * 60;
+            mst += values[UTCTIME_TZ] * -60;
             mst *= 1000;
             mst += values[UTCTIME_MSEC];
             t = VLC_TICK_FROM_MS(mst);
