@@ -211,6 +211,9 @@ Item {
     property int bannerTabButton_width_small: banner_icon_size
     property int bannerTabButton_width_large: column_width
 
+    property int bannerButton_height: dp(32, scale)
+    property int bannerButton_width: dp(40, scale)
+
     //timings
     property int delayToolTipAppear: 500;
     property int timingPlaylistClose: 1000;
