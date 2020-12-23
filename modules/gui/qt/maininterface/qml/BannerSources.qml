@@ -113,6 +113,7 @@ Widgets.NavigableFocusScope {
                             id: globalToolbarLeft
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left: parent.left
+                            anchors.leftMargin: VLCStyle.margin_xsmall
                             spacing: VLCStyle.margin_xxxsmall
 
                             Widgets.IconToolButton {
@@ -201,7 +202,7 @@ Widgets.NavigableFocusScope {
                         top: parent.top
                         left: parent.left
                         bottom: parent.bottom
-                        leftMargin: VLCStyle.applicationHorizontalMargin
+                        leftMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xsmall
                     }
 
                     model: ObjectModel {
@@ -278,6 +279,7 @@ Widgets.NavigableFocusScope {
                     readonly property int availableWidth: parent.width
                                                           - (localContextGroup.width + playlistGroup.width)
                                                           - (VLCStyle.applicationHorizontalMargin * 2)
+                                                          - (VLCStyle.margin_xsmall * 2)
                                                           - (VLCStyle.margin_xxsmall * 2)
                     readonly property bool _alignHCenter: ((localToolbar.width - width) / 2) + width < playlistGroup.x
 
@@ -355,7 +357,7 @@ Widgets.NavigableFocusScope {
                         top: parent.top
                         right: parent.right
                         bottom: parent.bottom
-                        rightMargin: VLCStyle.applicationHorizontalMargin
+                        rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xsmall
                     }
                     spacing: VLCStyle.margin_xxxsmall
 
