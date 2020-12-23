@@ -31,6 +31,7 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
+    property bool isViewMultiView: false
     property var sortModel
     property var model
     property Component localMenuDelegate: null
@@ -54,6 +55,7 @@ Widgets.PageLoader {
         sortModel = currentItem.sortModel
         model = currentItem.model
         localMenuDelegate = !!currentItem.addressBar ? currentItem.addressBar : null
+        isViewMultiView = currentItem.isViewMultiView === undefined || currentItem.isViewMultiView
     }
 
     Component {
@@ -140,6 +142,8 @@ Widgets.PageLoader {
 
         Widgets.KeyNavigableListView {
             id: servicesView
+
+            readonly property bool isViewMultiView: false
 
             model: discoveryFilterModel
             topMargin: VLCStyle.margin_large
@@ -278,6 +282,8 @@ Widgets.PageLoader {
 
         MainInterface.MainGridView {
             id: gridView
+
+            readonly property bool isViewMultiView: false
 
             delegateModel: selectionModel
             model: sourcesFilterModel

@@ -29,6 +29,8 @@ import "qrc:///style/"
 Widgets.NavigableFocusScope {
     id: root
 
+    readonly property bool isViewMultiView: false
+
     Column {
         anchors.fill: parent
 

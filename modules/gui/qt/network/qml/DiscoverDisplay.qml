@@ -31,6 +31,7 @@ Widgets.PageLoader {
 
     property var sortModel
     property var contentModel
+    property bool isViewMultiView: false
 
     //name and properties of the tab to be initially loaded
     defaultPage: "services"
@@ -50,6 +51,7 @@ Widgets.PageLoader {
         sortModel = currentItem.sortModel
         contentModel = currentItem.model
         localMenuDelegate = !!currentItem.localMenuDelegate ? currentItem.localMenuDelegate : menuDelegate
+        isViewMultiView = currentItem.isViewMultiView === undefined || currentItem.isViewMultiView
     }
 
 
