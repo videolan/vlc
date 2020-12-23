@@ -21,7 +21,7 @@ import "qrc:///style/"
 
 Label {
     elide: Text.ElideRight
-    color: VLCStyle.colors.text
+    color: VLCStyle.colors.icon
 
     font {
         pixelSize: VLCStyle.icon_small
