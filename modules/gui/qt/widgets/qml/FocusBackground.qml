@@ -35,7 +35,7 @@ Rectangle {
             PropertyChanges {
                 target: root
                 color: VLCStyle.colors.bgHoverInactive
-                foregroundColor: VLCStyle.colors.bgHoverText
+                foregroundColor: VLCStyle.colors.bgHoverTextInactive
             }
         },
         State {
