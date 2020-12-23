@@ -25,6 +25,7 @@ Rectangle {
 
     property bool active: activeFocus
     property bool selected: false
+    property color defaultForeground: VLCStyle.colors.text
     property color foregroundColor: VLCStyle.colors.text
 
     states: [
@@ -52,7 +53,7 @@ Rectangle {
             PropertyChanges {
                 target: root
                 color: "transparent"
-                foregroundColor: VLCStyle.colors.text
+                foregroundColor: root.defaultForeground
             }
         }
     ]
