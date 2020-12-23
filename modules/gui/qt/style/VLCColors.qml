@@ -69,6 +69,8 @@ Item {
     property color buttonText: systemPalette.buttonText;
     property color buttonBorder: blendColors(systemPalette.button, systemPalette.buttonText, 0.8);
 
+    property color icon: blendColors(text, bg, 0.6);
+
     property color textActiveSource: "red";
 
     property color banner: systemPalette.window;
