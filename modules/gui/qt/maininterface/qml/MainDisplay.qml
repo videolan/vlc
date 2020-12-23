@@ -64,6 +64,9 @@ Widgets.NavigableFocusScope {
         sourcesBanner.sortModel = Qt.binding(function () { return stackView.currentItem.sortModel  })
         sourcesBanner.contentModel = Qt.binding(function () { return stackView.currentItem.contentModel })
         sourcesBanner.extraLocalActions = Qt.binding(function () { return stackView.currentItem.extraLocalActions })
+        sourcesBanner.isViewMultiView = Qt.binding(function () {
+            return stackView.currentItem.isViewMultiView === undefined || stackView.currentItem.isViewMultiView
+        })
         // Restore sourcesBanner state
         sourcesBanner.selectedIndex = pageModel.filter(function (e) {
             return e.listed;

@@ -44,7 +44,7 @@ Widgets.NavigableFocusScope {
 
     property alias sortModel: sortControl.model
     property var contentModel
-
+    property alias isViewMultiView: list_grid_btn.visible
     property alias model: pLBannerSources.model
     signal toogleMenu()
 
@@ -204,6 +204,7 @@ Widgets.NavigableFocusScope {
                         left: parent.left
                         leftMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xsmall
                     }
+                    enabled: list_grid_btn.visible || sortControl.visible
 
                     model: ObjectModel {
                         id: localContextModel
