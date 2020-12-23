@@ -171,7 +171,10 @@ static int decoder_device_Open(void *func, bool forced, va_list ap)
     vlc_decoder_device_Open open = func;
     vlc_decoder_device *device = va_arg(ap, vlc_decoder_device *);
     vout_window_t *window = va_arg(ap, vout_window_t *);
-    return open(device, window);
+    int ret = open(device, window);
+    if (ret != VLC_SUCCESS)
+        vlc_objres_clear(&device->obj);
+    return ret;
 }
 
 vlc_decoder_device *
