@@ -29,6 +29,7 @@ Widgets.NavigableFocusScope {
     width: content.width
 
     property variant contentModel
+    property alias buttonWidth: icon.width
 
     property bool expanded: false
 
