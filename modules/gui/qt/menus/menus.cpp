@@ -861,7 +861,7 @@ QMenu* VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
             /* Open skin dialog box */
             if (var_Type(p_object, "intf-skins-interactive") & VLC_VAR_ISCOMMAND)
             {
-                QAction* openSkinAction = new QAction(qtr("Open skin..."));
+                QAction* openSkinAction = new QAction(qtr("Open skin..."), menu);
                 openSkinAction->setShortcut( QKeySequence( "Ctrl+Shift+S" ));
                 connect(openSkinAction, &QAction::triggered, [=]() {
                     var_TriggerCallback(p_object, "intf-skins-interactive");
