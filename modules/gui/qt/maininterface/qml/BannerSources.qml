@@ -200,9 +200,8 @@ Widgets.NavigableFocusScope {
                 Widgets.NavigableRow {
                     id: localContextGroup
                     anchors {
-                        top: parent.top
+                        verticalCenter: parent.verticalCenter
                         left: parent.left
-                        bottom: parent.bottom
                         leftMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xsmall
                     }
 
@@ -358,9 +357,8 @@ Widgets.NavigableFocusScope {
                 Widgets.NavigableRow {
                     id: playlistGroup
                     anchors {
-                        top: parent.top
+                        verticalCenter: parent.verticalCenter
                         right: parent.right
-                        bottom: parent.bottom
                         rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xsmall
                     }
                     spacing: VLCStyle.margin_xxxsmall
