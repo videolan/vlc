@@ -382,9 +382,9 @@ Widgets.NavigableFocusScope {
                             text: i18n.qtr("Playlist")
                             width: VLCStyle.bannerButton_width
                             height: VLCStyle.bannerButton_height
+                            highlighted: mainInterface.playlistVisible
 
                             onClicked:  mainInterface.playlistVisible = !mainInterface.playlistVisible
-                            color: mainInterface.playlistVisible && !playlist_btn.backgroundVisible ? VLCStyle.colors.accent : VLCStyle.colors.buttonText
                         }
 
                         Widgets.IconToolButton {
