@@ -157,17 +157,6 @@ namespace adaptive
                virtual ~StreamUrlConnectionFactory() {}
                virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &);
        };
-
-       class ConnectionFactory : public AbstractConnectionFactory
-       {
-           public:
-               ConnectionFactory( AuthStorage * );
-               virtual ~ConnectionFactory();
-               virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &);
-           private:
-               NativeConnectionFactory *native;
-               StreamUrlConnectionFactory *streamurl;
-       };
     }
 }
 

@@ -24,6 +24,7 @@
 #include "SharedResources.hpp"
 #include "http/AuthStorage.hpp"
 #include "http/HTTPConnectionManager.h"
+#include "http/HTTPConnection.hpp"
 #include "encryption/Keyring.hpp"
 
 #include <vlc_common.h>
@@ -34,9 +35,15 @@ SharedResources::SharedResources(vlc_object_t *obj, bool local)
 {
     authStorage = new AuthStorage(obj);
     encryptionKeyring = new Keyring(obj);
-    HTTPConnectionManager *m = new HTTPConnectionManager(obj, authStorage);
-    if(m && local)
-        m->setLocalConnectionsAllowed();
+    HTTPConnectionManager *m = new HTTPConnectionManager(obj);
+    if(m)
+    {
+        if(!var_InheritBool(obj, "adaptive-use-access")) /* only use http from access */
+            m->addFactory(new NativeConnectionFactory(authStorage));
+        m->addFactory(new StreamUrlConnectionFactory());
+        if(local)
+            m->setLocalConnectionsAllowed();
+    }
     connManager = m;
 }
 
