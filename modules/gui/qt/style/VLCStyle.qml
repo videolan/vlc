@@ -205,7 +205,7 @@ Item {
     property int applicationVerticalMargin: mainInterface.clientSideDecoration ? dp(5, scale) : 0
 
     property int globalToolbar_height: dp(40, scale)
-    property int localToolbar_height: dp(40, scale)
+    property int localToolbar_height: dp(48, scale)
     property int banner_icon_size: dp(38, scale)
 
     property int bannerTabButton_width_small: banner_icon_size
