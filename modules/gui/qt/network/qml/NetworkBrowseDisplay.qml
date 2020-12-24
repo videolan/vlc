@@ -40,6 +40,10 @@ Widgets.NavigableFocusScope {
     readonly property var currentIndex: view.currentItem.currentIndex
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
+    property var sortModel: [
+        { text: i18n.qtr("Alphabetic"), criteria: "name"},
+        { text: i18n.qtr("Url"), criteria: "mrl" }
+    ]
 
     function changeTree(new_tree) {
         history.push(["mc", "network", { tree: new_tree }]);
