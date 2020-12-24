@@ -35,6 +35,7 @@ Widgets.NavigableFocusScope {
     Component.onCompleted: loadView()
 
     property var contentModel
+    property var sortModel
 
     //reset view
     function loadDefaultView() {
@@ -59,6 +60,7 @@ Widgets.NavigableFocusScope {
         view.replace(page, props)
         if (view.currentItem.model)
             root.contentModel = view.currentItem.model
+        root.sortModel = view.currentItem.sortModel
     }
 
     Component {
