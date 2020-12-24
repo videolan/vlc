@@ -280,13 +280,6 @@ static void Close(vlc_object_t *p_obj)
 /*****************************************************************************
  *
  *****************************************************************************/
-static bool IsLocalResource(const std::string & url)
-{
-    ConnectionParams params(url);
-    return params.isLocal();
-}
-
-
 static PlaylistManager * HandleDash(demux_t *p_demux, DOMParser &xmlParser,
                                     const std::string & playlisturl,
                                     AbstractAdaptationLogic::LogicType logic)
@@ -305,8 +298,8 @@ static PlaylistManager * HandleDash(demux_t *p_demux, DOMParser &xmlParser,
         return NULL;
     }
 
-    SharedResources *resources = new (std::nothrow) SharedResources(VLC_OBJECT(p_demux),
-                                                                    IsLocalResource(playlisturl));
+    SharedResources *resources =
+            SharedResources::createDefault(VLC_OBJECT(p_demux), playlisturl);
     DASHStreamFactory *factory = new (std::nothrow) DASHStreamFactory;
     DASHManager *manager = NULL;
     if(!resources || !factory ||
@@ -338,8 +331,8 @@ static PlaylistManager * HandleSmooth(demux_t *p_demux, DOMParser &xmlParser,
         return NULL;
     }
 
-    SharedResources *resources = new (std::nothrow) SharedResources(VLC_OBJECT(p_demux),
-                                                                    IsLocalResource(playlisturl));
+    SharedResources *resources =
+            SharedResources::createDefault(VLC_OBJECT(p_demux), playlisturl);
     SmoothStreamFactory *factory = new (std::nothrow) SmoothStreamFactory;
     SmoothManager *manager = NULL;
     if(!resources || !factory ||
@@ -357,8 +350,8 @@ static PlaylistManager * HandleHLS(demux_t *p_demux,
                                    const std::string & playlisturl,
                                    AbstractAdaptationLogic::LogicType logic)
 {
-    SharedResources *resources = new SharedResources(VLC_OBJECT(p_demux),
-                                                     IsLocalResource(playlisturl));
+    SharedResources *resources =
+            SharedResources::createDefault(VLC_OBJECT(p_demux), playlisturl);
     if(!resources)
         return NULL;
 
