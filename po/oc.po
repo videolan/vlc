@@ -7,13 +7,14 @@
 # Gos Groc <gosgroc@gmail.com>, 2013
 # Laurent Jonqueres, 2006
 # Mertyl <tony.gaillard@supinfo.com>, 2009
+# Quentin PAGÈS <quentinantonin@free.fr>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2020-12-24 09:22+0100\n"
+"Last-Translator: Quentin PAGÈS <quentinantonin@free.fr>, 2020\n"
 "Language-Team: Occitan (post 1500) (https://www.transifex.com/yaron/"
 "teams/16553/oc/)\n"
 "Language: oc\n"
@@ -1682,7 +1683,7 @@ msgstr "Jòcs"
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "Notificacion"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
@@ -24991,7 +24992,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:189
 msgid "HTTP port"
-msgstr ""
+msgstr "Pòrt HTTP"
 
 #: modules/stream_out/chromecast/cast.cpp:190
 msgid ""
@@ -29022,11 +29023,11 @@ msgstr "Modificar lo perfil"
 
 #: modules/gui/qt/ui/profiles.h:700
 msgid "FLAC"
-msgstr ""
+msgstr "FLAC"
 
 #: modules/gui/qt/ui/profiles.h:701
 msgid "MP&4/MOV"
-msgstr ""
+msgstr "MP&4/MOV"
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "Ogg/Ogm"
@@ -29034,11 +29035,11 @@ msgstr "Ogg/Ogm"
 
 #: modules/gui/qt/ui/profiles.h:703
 msgid "M&KV"
-msgstr ""
+msgstr "M&KV"
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "M&JPEG"
-msgstr ""
+msgstr "M&JPEG"
 
 #: modules/gui/qt/ui/profiles.h:705
 msgid "MPEG-PS"
@@ -29046,11 +29047,11 @@ msgstr "MPEG-PS"
 
 #: modules/gui/qt/ui/profiles.h:706
 msgid "F&LV"
-msgstr ""
+msgstr "F&LV"
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "&MPEG-TS"
-msgstr ""
+msgstr "&MPEG-TS"
 
 #: modules/gui/qt/ui/profiles.h:708
 msgid "RAW"
@@ -29066,7 +29067,7 @@ msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:711
 msgid "MPEG &1"
-msgstr ""
+msgstr "MPEG &1"
 
 #: modules/gui/qt/ui/profiles.h:712
 msgid "AVI"
@@ -29078,7 +29079,7 @@ msgstr "ASF/WMV"
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "MP&3"
-msgstr ""
+msgstr "MP&3"
 
 #: modules/gui/qt/ui/profiles.h:715
 msgid "Features"
@@ -29114,7 +29115,7 @@ msgstr "Opcions personalizadas"
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid "&Quality"
-msgstr ""
+msgstr "&Qualitat"
 
 #: modules/gui/qt/ui/profiles.h:734 modules/gui/qt/ui/profiles.h:735
 msgid "Not Used"
