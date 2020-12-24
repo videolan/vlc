@@ -33,6 +33,8 @@ class SortFilterProxyModel : public QSortFilterProxyModel
 
     Q_PROPERTY( QByteArray searchRole READ searchRole WRITE setSearchRole NOTIFY searchRoleChanged )
     Q_PROPERTY( QString searchPattern READ searchPattern WRITE setSearchPattern NOTIFY searchPatternChanged )
+    Q_PROPERTY( QString sortCriteria READ sortCriteria WRITE setSortCriteria NOTIFY sortCriteriaChanged )
+    Q_PROPERTY( Qt::SortOrder sortOrder READ sortOrder WRITE setSortOrder NOTIFY sortOrderChanged )
     Q_PROPERTY( int count READ count NOTIFY countChanged )
 
 public:
@@ -44,6 +46,12 @@ public:
     QByteArray searchRole() const;
     void setSearchRole( const QByteArray &searchRole );
 
+    QString sortCriteria() const;
+    void setSortCriteria( const QString &sortCriteria );
+
+    Qt::SortOrder sortOrder() const;
+    void setSortOrder(Qt::SortOrder sortOrder);
+
     int count() const;
 
     Q_INVOKABLE QMap<QString, QVariant> getDataAt( int idx );
@@ -54,12 +62,17 @@ signals:
     void searchPatternChanged();
     void searchRoleChanged();
     void countChanged();
+    void sortCriteriaChanged();
+    void sortOrderChanged();
 
 private slots:
     void updateFilterRole();
+    void updateSortRole();
 
 private:
     QByteArray m_searchRole;
+    QString m_sortCriteria;
+    Qt::SortOrder m_sortOrder;
 };
 
 #endif // SORT_FILTER_PROXY_MODEL
