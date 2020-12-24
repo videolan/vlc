@@ -21,6 +21,7 @@
 #define SHAREDRESOURCES_H_
 
 #include <vlc_common.h>
+#include <string>
 
 namespace adaptive
 {
@@ -41,11 +42,13 @@ namespace adaptive
     class SharedResources
     {
         public:
-            SharedResources(vlc_object_t *, bool = false);
+            SharedResources(AuthStorage *, Keyring *, AbstractConnectionManager *);
             ~SharedResources();
             AuthStorage *getAuthStorage();
             Keyring     *getKeyring();
             AbstractConnectionManager *getConnManager();
+            /* Helper */
+            static SharedResources * createDefault(vlc_object_t *, const std::string &);
 
         private:
             AuthStorage *authStorage;

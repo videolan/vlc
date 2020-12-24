@@ -27,24 +27,14 @@
 #include "http/HTTPConnection.hpp"
 #include "encryption/Keyring.hpp"
 
-#include <vlc_common.h>
-
 using namespace adaptive;
 
-SharedResources::SharedResources(vlc_object_t *obj, bool local)
+SharedResources::SharedResources(AuthStorage *auth, Keyring *ring,
+                                 AbstractConnectionManager *conn)
 {
-    authStorage = new AuthStorage(obj);
-    encryptionKeyring = new Keyring(obj);
-    HTTPConnectionManager *m = new HTTPConnectionManager(obj);
-    if(m)
-    {
-        if(!var_InheritBool(obj, "adaptive-use-access")) /* only use http from access */
-            m->addFactory(new NativeConnectionFactory(authStorage));
-        m->addFactory(new StreamUrlConnectionFactory());
-        if(local)
-            m->setLocalConnectionsAllowed();
-    }
-    connManager = m;
+    authStorage = auth;
+    encryptionKeyring = ring;
+    connManager = conn;
 }
 
 SharedResources::~SharedResources()
@@ -67,4 +57,19 @@ Keyring * SharedResources::getKeyring()
 AbstractConnectionManager * SharedResources::getConnManager()
 {
     return connManager;
+}
+
+SharedResources * SharedResources::createDefault(vlc_object_t *obj,
+                                                 const std::string & playlisturl)
+{
+    AuthStorage *auth = new AuthStorage(obj);
+    Keyring *keyring = new Keyring(obj);
+    HTTPConnectionManager *m = new HTTPConnectionManager(obj);
+    if(!var_InheritBool(obj, "adaptive-use-access")) /* only use http from access */
+        m->addFactory(new NativeConnectionFactory(auth));
+    m->addFactory(new StreamUrlConnectionFactory());
+    ConnectionParams params(playlisturl);
+    if(params.isLocal())
+        m->setLocalConnectionsAllowed();
+    return new SharedResources(auth, keyring, m);
 }
