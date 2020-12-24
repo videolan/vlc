@@ -163,6 +163,7 @@ vlc_gl_interop_DeleteTextures(const struct vlc_gl_interop *interop,
 static int GetTexFormatSize(const opengl_vtable_t *vt, int target,
                             int tex_format, int tex_internal, int tex_type)
 {
+    GL_ASSERT_NOERROR(vt);
     if (!vt->GetTexLevelParameteriv)
         return -1;
 
@@ -192,6 +193,14 @@ static int GetTexFormatSize(const opengl_vtable_t *vt, int target,
     vt->GetTexLevelParameteriv(target, 0, tex_param_size, &size);
 
     vt->DeleteTextures(1, &texture);
+
+    bool has_error = false;
+    while (vt->GetError() != GL_NO_ERROR)
+        has_error = true;
+
+    if (has_error)
+        return -1;
+
     return size > 0 ? size * mul : size;
 }
 
