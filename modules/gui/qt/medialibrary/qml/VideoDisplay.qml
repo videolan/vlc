@@ -35,6 +35,10 @@ Widgets.NavigableFocusScope {
     property var initialIndex: 0
 
     property alias contentModel: videoModel
+    property var sortModel: [
+        { text: i18n.qtr("Alphabetic"),  criteria: "title"},
+        { text: i18n.qtr("Duration"),    criteria: "duration_short" }
+    ]
 
     navigationCancel: function() {
         if (view.currentItem.currentIndex <= 0) {
