@@ -171,7 +171,6 @@
     /* The UIView must not be attached before releasing. Disable() is doing
      * exactly this asynchronously in the main thread so ensure it was called
      * here before detaching from the parent. */
-    assert(!_enabled);
     _wnd = NULL;
     vlc_mutex_unlock(&_mutex);
 }
