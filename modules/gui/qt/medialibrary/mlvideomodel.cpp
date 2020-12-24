@@ -99,6 +99,7 @@ vlc_ml_sorting_criteria_t MLVideoModel::roleToCriteria(int role) const
         case VIDEO_TITLE:
             return VLC_ML_SORTING_ALPHA;
         case VIDEO_DURATION:
+        case VIDEO_DURATION_SHORT:
             return VLC_ML_SORTING_DURATION;
         case VIDEO_PLAYCOUNT:
             return VLC_ML_SORTING_PLAYCOUNT;
