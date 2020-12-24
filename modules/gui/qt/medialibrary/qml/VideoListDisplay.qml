@@ -59,4 +59,17 @@ MainInterface.MainTableView {
                     ].filter(function(a) { return a !== "" })
         }
     }
+
+    Connections {
+        target: model
+        onSortCriteriaChanged: {
+            switch (model.sortCriteria) {
+            case "title":
+                listView_id.section.property = "title_first_symbol"
+                break;
+            default:
+                listView_id.section.property = ""
+            }
+        }
+    }
 }
