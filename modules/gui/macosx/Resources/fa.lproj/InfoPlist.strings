@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC طبق درخواست کاربر، اجرا دسترسی به دوربین را می خواهد.";
+"NSMicrophoneUsageDescription" = "VLC طبق درخواست کاربر، اجازه دسترسی به میکروفون را می خواهد.";
+"NSAppleEventsUsageDescription" = "VLC wants to pause and resume external media players.";
+"NSDesktopFolderUsageDescription" = "VLC wants to access the desktop folder as requested by the user.";
+"NSDocumentsFolderUsageDescription" = "VLC wants to access the documents folder as requested by the user.";
+"NSDownloadsFolderUsageDescription" = "VLC wants to access the downloads folder as requested by the user.";
+"NSNetworkVolumesUsageDescription" = "VLC wants to access a network volume as requested by the user.";
+"NSRemovableVolumesUsageDescription" = "VLC wants to access a removable volume as requested by the user.";
