@@ -6,16 +6,18 @@
 # Daniel Pastera <pasterad@gmail.com>, 2016
 # Jiri Sedlak <jiri_sedlak@users.sourceforge.net>, 2017
 # Kamil Páral <ripper42@gmail.com>, 2009
+# Lukáš Spurný <lukasspurny8@gmail.com>, 2018
 # Martin Zicha <zicha@centrum.cz>, 2012
+# Michal Várady <miko.vaji@gmail.com>, 2020
 # Michal Vašíček <michalvasicek@icloud.com>, 2017
 # Miroslav Oujeský <oujesky@mail.muni.cz>, 2006
-# Sofartin <hrubymar10@gmail.com>, 2013
-# dreddux <dreddux@gmail.com>, 2012
+# Pavel Řehák <pavel-rehak@email.cz>, 2018
 # Petr Dolejší <dolejsi.petr@gmail.com>, 2019
 # Petr Nekvinda <petr.nekvinda@gmail.com>, 2015
 # Petr Šimáček <petr.simacek@gmail.com>, 2012
 # Roman Horník <roman.hornik@debian-linux.cz>, 2016
 # Roman Ondráček <ondracek.roman@centrum.cz>, 2014-2015
+# Sofartin <hrubymar10@gmail.com>, 2013
 # Tadeáš Valenta <tadashicz@gmail.com>, 2019
 # Tomáš Chvátal <tomas.chvatal@gmail.com>, 2014-2018
 # Tomáš Souček <soucek.gns@gmail.com>, 2014
@@ -23,15 +25,13 @@
 # Vít Pelčák <vit@pelcak.org>, 2012,2015,2016,2018
 # Vojtěch Smejkal <smejkalv@gmail.com>, 2009
 # Zuzana Wolfová <painteddreaming@gmail.com>, 2014
-# Lukáš Spurný <lukasspurny8@gmail.com>, 2018
-# Pavel Řehák <pavel-rehak@email.cz>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-12-09 08:31+0100\n"
-"Last-Translator: Tomáš Chvátal <tomas.chvatal@gmail.com>, 2020\n"
+"PO-Revision-Date: 2020-12-25 01:27+0100\n"
+"Last-Translator: Michal Várady <miko.vaji@gmail.com>, 2020\n"
 "Language-Team: Czech (https://www.transifex.com/yaron/teams/16553/cs/)\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -12723,7 +12723,7 @@ msgstr ""
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
-msgstr ""
+msgstr "Demultiplexer TTML"
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -14513,11 +14513,11 @@ msgstr ""
 
 #: modules/demux/aiff.c:50
 msgid "AIFF demuxer"
-msgstr ""
+msgstr "Demultiplexer AIFF"
 
 #: modules/demux/asf/asf.c:62
 msgid "ASF/WMV demuxer"
-msgstr ""
+msgstr "Demultiplexer ASF/WMV"
 
 #: modules/demux/asf/asf.c:267 modules/demux/asf/asf.c:821
 msgid "Could not demux ASF stream"
@@ -14529,7 +14529,7 @@ msgstr "Selhalo načítání hlavičky ASF."
 
 #: modules/demux/au.c:51
 msgid "AU demuxer"
-msgstr ""
+msgstr "Demultiplexer AU"
 
 #: modules/demux/avformat/avformat.c:41
 msgid "Avformat demuxer"
@@ -14541,7 +14541,7 @@ msgstr ""
 
 #: modules/demux/avformat/avformat.c:45
 msgid "Demuxer"
-msgstr ""
+msgstr "Demultiplexer"
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
@@ -15096,7 +15096,7 @@ msgstr "Demultiplexer videa H264"
 
 #: modules/demux/mpeg/h26x.c:64 modules/demux/mpeg/h26x.c:66
 msgid "HEVC/H.265 video demuxer"
-msgstr ""
+msgstr "Demultiplexer videa HEVC/H.265"
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
@@ -15455,7 +15455,7 @@ msgstr ""
 
 #: modules/demux/rawaud.c:53
 msgid "Forces the audio language"
-msgstr ""
+msgstr "Vynutí jazyk zvuku"
 
 #: modules/demux/rawaud.c:54
 msgid ""
@@ -15508,11 +15508,11 @@ msgstr ""
 
 #: modules/demux/sid.cpp:53
 msgid "C64 sid demuxer"
-msgstr ""
+msgstr "Demultiplexer C64 sid"
 
 #: modules/demux/smf.c:725
 msgid "SMF demuxer"
-msgstr ""
+msgstr "Demultiplexer SMF"
 
 #: modules/demux/stl.c:43
 msgid "EBU STL subtitles parser"
@@ -15584,7 +15584,7 @@ msgstr ""
 
 #: modules/demux/vc1.c:50
 msgid "VC1 video demuxer"
-msgstr ""
+msgstr "Demultiplexer videa VC1"
 
 #: modules/demux/vobsub.c:51
 msgid "Vobsub subtitles parser"
@@ -16621,7 +16621,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:196
 msgid "Video output"
-msgstr ""
+msgstr "Výstup videa"
 
 #: modules/gui/macosx/VLCMain+OldPrefs.m:118
 msgid "Remove old preferences?"
@@ -17169,7 +17169,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:166
 msgid "Open VIDEO_TS / BDMV folder"
-msgstr ""
+msgstr "Otevřít složku VIDEO_TS / BDMV"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:167
 msgid "Insert Disc"
@@ -21095,7 +21095,7 @@ msgstr ""
 
 #: modules/hw/mmal/vout.c:63
 msgid "Force interlaced video mode."
-msgstr ""
+msgstr "Vynutit prokládaný režim videa."
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
@@ -22507,7 +22507,7 @@ msgstr ""
 
 #: modules/mux/mp4/mp4.c:64
 msgid "MP4/MOV muxer"
-msgstr ""
+msgstr "Multiplexer MP4/MOV"
 
 #: modules/mux/mp4/mp4.c:77
 msgid "Fragmented and streamable MP4 muxer"
