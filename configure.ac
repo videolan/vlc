@@ -4316,6 +4316,11 @@ dnl  SRT plugin
 dnl
 PKG_ENABLE_MODULES_VLC([SRT], [access_srt access_output_srt], [srt >= 1.3.0], [SRT input/output plugin], [auto], [], [], [-DENABLE_SRT])
 
+dnl
+dnl  RIST plugin
+dnl
+PKG_ENABLE_MODULES_VLC([RIST], [rist access_output_rist], [librist], [RIST input/output plugin (default auto)])
+
 EXTEND_HELP_STRING([Visualisations and Video filter plugins:])
 dnl
 dnl  goom visualization plugin
