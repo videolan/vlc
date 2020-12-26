@@ -445,3 +445,12 @@ libaccess_srt_plugin_la_LIBADD = $(SRT_LIBS)
 libaccess_srt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBaccess_srt)
 EXTRA_LTLIBRARIES += libaccess_srt_plugin.la
+
+### RIST ###
+
+librist_plugin_la_SOURCES = access/rist.c access/rist.h
+librist_plugin_la_CFLAGS = $(AM_CFLAGS) $(RIST_CFLAGS)
+librist_plugin_la_LIBADD = $(RIST_LIBS) $(SOCKET_LIBS) $(LIBPTHREAD)
+librist_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
+access_LTLIBRARIES += $(LTLIBrist)
+EXTRA_LTLIBRARIES += librist_plugin.la
