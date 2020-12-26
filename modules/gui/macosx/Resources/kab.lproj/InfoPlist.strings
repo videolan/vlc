@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC ibɣa ad ikcem ɣer tkamirat akken i d-yessuter useqdac. ";
+"NSMicrophoneUsageDescription" = "VLC ibɣa ad ikcem ɣer usawaḍ akken i d-yessuter useqdac. ";
+"NSAppleEventsUsageDescription" = "VLC ibɣa ad iḥbes ad iɛawed ad isseddu imeɣriyen imidyaten izɣarayen. ";
+"NSDesktopFolderUsageDescription" = "VLC ibɣa ad ikcem ɣer ukaram n uselkim akken i d-yessuter useqdac. ";
+"NSDocumentsFolderUsageDescription" = "VLC ibɣa ad ikcem ɣer ukaram n yisemliyen akken i d-yessuter useqdac. ";
+"NSDownloadsFolderUsageDescription" = "VLC ibɣa ad ikcem ɣer ukaram n yisadaren akken i d-yessuter useqdac. ";
+"NSNetworkVolumesUsageDescription" = "VLC ibɣa ad ikcem ɣer ubleɣ n uzeṭṭa akken i t-id-yessuter useqdac. ";
+"NSRemovableVolumesUsageDescription" = "VLC ibɣa ad ikcem ɣer ubleɣ yettwakkasen akken i d-yessuter useqdac. ";
