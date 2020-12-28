@@ -78,7 +78,7 @@ mtime_t SegmentTimeline::getMinAheadScaledTime(uint64_t number) const
         const Element *el = *it;
         if(number > el->number + el->r)
             break;
-        else if(number < el->number + el->r)
+        else if(number < el->number)
             totalscaledtime += (el->d * (el->r + 1));
         else /* within repeat range */
             totalscaledtime += el->d * (el->number + el->r - number);
