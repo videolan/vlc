@@ -27,15 +27,48 @@ AbstractButton {
 
     property bool onlyIcon: true
     property bool highlighted: false
+    property color color
+    property color foregroundColor
 
     font.pixelSize: onlyIcon ? VLCIcons.pixelSize(VLCStyle.icon_normal) : VLCStyle.fontSize_large
     padding: VLCStyle.margin_xxsmall
     width: implicitWidth
     height: implicitHeight
 
+    state: (button.hovered || button.activeFocus) ? "active" : "normal"
+    states: [
+        State {
+            name: "active"
+            PropertyChanges {
+                target: button
+
+                color: VLCStyle.colors.accent
+                foregroundColor: VLCStyle.colors.accentText
+            }
+        },
+        State {
+            name: "normal"
+            PropertyChanges {
+                target: button
+
+                color: "transparent"
+                foregroundColor: VLCStyle.colors.text
+            }
+        }
+    ]
+
+    transitions: Transition {
+        to: "*"
+
+        ColorAnimation {
+            duration: 200
+            properties: "foregroundColor,color"
+        }
+    }
+
     contentItem: contentLoader.item
     background: Rectangle {
-        color: (button.hovered || button.activeFocus) ? VLCStyle.colors.accent : "transparent"
+        color: button.color
     }
 
     Loader {
@@ -51,7 +84,7 @@ AbstractButton {
             text: button.text
             elide: Text.ElideRight
             font.pixelSize: button.font.pixelSize
-            color: VLCStyle.colors.text
+            color: button.foregroundColor
             opacity: (button.highlighted  || button.hovered || button.activeFocus) ? 1 : .6
             verticalAlignment: Text.AlignVCenter
         }
@@ -65,7 +98,7 @@ AbstractButton {
             elide: Text.ElideRight
             font.pixelSize: button.font.pixelSize
             font.weight: button.highlighted ? Font.DemiBold : Font.Normal
-            color: VLCStyle.colors.text
+            color: button.foregroundColor
             opacity: (button.highlighted || button.hovered || button.activeFocus) ? 1 : .6
             verticalAlignment: Text.AlignVCenter
         }
