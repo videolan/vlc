@@ -110,8 +110,11 @@
         <file alias="menu.svg">pixmaps/menu.svg</file>
         <file alias="VLCIcons.ttf">pixmaps/VLCIcons.ttf</file>
         <file alias="noart_album.svg">pixmaps/noart_album.svg</file>
+        <file alias="noart_albumCover.svg">pixmaps/noart_albumCover.svg</file>
         <file alias="noart_artist.svg">pixmaps/noart_artist.svg</file>
         <file alias="noart_artist_small.svg">pixmaps/noart_artist_small.svg</file>
+        <file alias="noart_artistCover.svg">pixmaps/noart_artistCover.svg</file>
+        <file alias="noart_videoCover.svg">pixmaps/noart_videoCover.svg</file>
         <file alias="play_button.svg">pixmaps/play_button.svg</file>
         <file alias="back.svg">pixmaps/back.svg</file>
     </qresource>

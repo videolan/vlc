@@ -226,6 +226,9 @@ Item {
     property url noArtAlbum: "qrc:///noart_album.svg";
     property url noArtArtist: "qrc:///noart_artist.svg";
     property url noArtArtistSmall: "qrc:///noart_artist_small.svg";
+    property url noArtAlbumCover: "qrc:///noart_albumCover.svg";
+    property url noArtArtistCover: "qrc:///noart_artistCover.svg";
+    property url noArtVideoCover: "qrc:///noart_videoCover.svg";
 
     //device pixel
     function dp(px, scale) {
