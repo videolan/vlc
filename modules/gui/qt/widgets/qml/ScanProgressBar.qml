@@ -22,64 +22,103 @@ import QtQuick.Templates 2.4 as T
 import "qrc:///style/"
 
 T.ProgressBar {
-    visible: !medialib.idle
-
     id: control
+
     from: 0
     to: 100
-    height: progressText_id.height
     value: medialib.parsingProgress
     indeterminate: medialib.discoveryPending
+    visible: !medialib.idle
+    height: contentItem.implicitHeight
+    width: implicitWidth
 
-    contentItem: Item {
-        implicitHeight: 24
-        implicitWidth: 120
+    contentItem: Column {
+        spacing: VLCStyle.margin_normal
+        width: control.width
+        height: implicitHeight
+        visible: control.visible
 
         Rectangle {
-            width: control.indeterminate ?  parent.width : (control.visualPosition * parent.width)
-            height: parent.height
+            id: bg
+
+            width: parent.width
+            height: VLCStyle.heightBar_xsmall
             color: VLCStyle.colors.bgAlt
 
-            Rectangle {
-                width: control.width * 0.2
-                height: parent.height
-                visible: control.indeterminate
-                color: VLCStyle.colors.buffer
+            function fromRGB(r, g, b, a) {
+                return Qt.rgba( r / 255, g / 255, b / 255, a / 255)
+            }
 
-                property double pos: 0
-                x: (pos / 1000) * (parent.width * 0.8)
+            Rectangle {
+                id: progressBar
+
+                width: parent.height
+                height: parent.width * control.visualPosition
+                rotation: -90
+                y: width
+                transformOrigin: Item.TopLeft
+                visible: !control.indeterminate
+                gradient: Gradient {
+                    GradientStop { position: 0.00; color: bg.fromRGB(248, 154, 6, 200) }
+                    GradientStop { position: 0.48; color: bg.fromRGB(226, 90, 1, 255) }
+                    GradientStop { position: 0.89; color: bg.fromRGB(248, 124, 6, 255) }
+                    GradientStop { position: 1.00; color: bg.fromRGB(255, 136, 0, 100) }
+                }
+            }
+
+            Rectangle {
+                id: indeterminateBar
+
+                property real pos: 0
+
+                anchors.centerIn: parent
+                anchors.horizontalCenterOffset: ((bg.width - indeterminateBar.height) / 2) * pos
+                width: parent.height
+                height: parent.width * .24
+                rotation: 90
+                visible: control.indeterminate
+                gradient: Gradient {
+                    GradientStop { position: 0.00; color: bg.fromRGB(248, 154, 6, 0) }
+                    GradientStop { position: 0.09; color: bg.fromRGB(253, 136, 0, 0) }
+                    GradientStop { position: 0.48; color: bg.fromRGB(226, 90, 1, 255) }
+                    GradientStop { position: 0.89; color: bg.fromRGB(248, 124, 6, 255) }
+                    GradientStop { position: 1.00; color: bg.fromRGB(255, 136, 0, 0) }
+                }
 
                 SequentialAnimation on pos {
                     id: loadingAnim
-                    running: control.indeterminate
+
                     loops: Animation.Infinite
-                    PropertyAnimation {
-                        from: 0.0
-                        to: 1000
+
+                    NumberAnimation {
+                        from: - 1
+                        to: 1
                         duration: 2000
-                        easing.type: "OutBounce"
+                        easing.type: Easing.OutBounce
                     }
+
                     PauseAnimation {
                         duration: 500
                     }
-                    PropertyAnimation {
-                        from: 1000
-                        to: 0.0
+
+                    NumberAnimation {
+                        to: - 1
+                        from: 1
                         duration: 2000
-                        easing.type: "OutBounce"
+                        easing.type: Easing.OutBounce
                     }
+
                     PauseAnimation {
                         duration: 500
                     }
                 }
             }
         }
-    }
 
-    background: Rectangle {
-        implicitHeight: 24
-        implicitWidth: 120
-        radius: 2
-        color: VLCStyle.colors.bg
+        SubtitleLabel {
+            text:  medialib.discoveryPending ? medialib.discoveryEntryPoint : (medialib.parsingProgress + "%")
+            font.weight: Font.Normal
+            width: parent.width
+        }
     }
 }
