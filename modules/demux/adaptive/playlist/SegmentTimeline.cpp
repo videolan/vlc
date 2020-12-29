@@ -204,6 +204,7 @@ size_t SegmentTimeline::pruneBySequenceNumber(uint64_t number)
             el->t += count * el->d;
             el->r -= count;
             prunednow += count;
+            totalLength -= count * el->d;
             break;
         }
         else
