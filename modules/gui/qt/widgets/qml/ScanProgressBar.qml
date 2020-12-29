@@ -82,15 +82,4 @@ T.ProgressBar {
         radius: 2
         color: VLCStyle.colors.bg
     }
-
-    Text {
-        id: progressText_id
-        color: VLCStyle.colors.text
-        style: Text.Outline
-        styleColor: VLCStyle.colors.bg
-        text:  medialib.discoveryPending ? medialib.discoveryEntryPoint : (medialib.parsingProgress + "%")
-        z: control.z + 1
-        anchors.horizontalCenter: parent.horizontalCenter
-        visible: true
-    }
 }
