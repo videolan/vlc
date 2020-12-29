@@ -967,8 +967,9 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
             }
             break;
         }
-        case VLC_CODEC_TRUEHD:
+        case VLC_FOURCC( 'm', 'l', 'p', 'a' ):
             /* spec violation: 32 bits rate instead of fixed point */
+            p_fmt->i_codec = VLC_CODEC_TRUEHD;
             p_fmt->audio.i_rate = (p_soun->i_sampleratehi << 16) | p_soun->i_sampleratelo;
             break;
 
