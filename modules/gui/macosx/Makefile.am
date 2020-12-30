@@ -741,31 +741,74 @@ libmacosx_plugin_la_RES += \
 
 EXTRA_DIST += \
 	gui/macosx/Resources/English.lproj/InfoPlist.strings \
+	gui/macosx/Resources/an.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ar.lproj/InfoPlist.strings \
+	gui/macosx/Resources/as-IN.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ast.lproj/InfoPlist.strings \
+	gui/macosx/Resources/be.lproj/InfoPlist.strings \
 	gui/macosx/Resources/bg.lproj/InfoPlist.strings \
+	gui/macosx/Resources/bn-IN.lproj/InfoPlist.strings \
+	gui/macosx/Resources/brx.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ca.lproj/InfoPlist.strings \
+	gui/macosx/Resources/co.lproj/InfoPlist.strings \
 	gui/macosx/Resources/cs.lproj/InfoPlist.strings \
+	gui/macosx/Resources/cy.lproj/InfoPlist.strings \
+	gui/macosx/Resources/da.lproj/InfoPlist.strings \
 	gui/macosx/Resources/de.lproj/InfoPlist.strings \
 	gui/macosx/Resources/el.lproj/InfoPlist.strings \
+	gui/macosx/Resources/en-GB.lproj/InfoPlist.strings \
+	gui/macosx/Resources/es-MX.lproj/InfoPlist.strings \
 	gui/macosx/Resources/es.lproj/InfoPlist.strings \
+	gui/macosx/Resources/et.lproj/InfoPlist.strings \
+	gui/macosx/Resources/eu.lproj/InfoPlist.strings \
+	gui/macosx/Resources/fa.lproj/InfoPlist.strings \
+	gui/macosx/Resources/fi.lproj/InfoPlist.strings \
 	gui/macosx/Resources/fr.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ga.lproj/InfoPlist.strings \
+	gui/macosx/Resources/gd.lproj/InfoPlist.strings \
 	gui/macosx/Resources/gl.lproj/InfoPlist.strings \
+	gui/macosx/Resources/gu-IN.lproj/InfoPlist.strings \
 	gui/macosx/Resources/he.lproj/InfoPlist.strings \
+	gui/macosx/Resources/hr.lproj/InfoPlist.strings \
 	gui/macosx/Resources/hu.lproj/InfoPlist.strings \
+	gui/macosx/Resources/id.lproj/InfoPlist.strings \
+	gui/macosx/Resources/is.lproj/InfoPlist.strings \
 	gui/macosx/Resources/it.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ja.lproj/InfoPlist.strings \
+	gui/macosx/Resources/kab.lproj/InfoPlist.strings \
+	gui/macosx/Resources/kk.lproj/InfoPlist.strings \
+	gui/macosx/Resources/km.lproj/InfoPlist.strings \
+	gui/macosx/Resources/kn.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ko.lproj/InfoPlist.strings \
+	gui/macosx/Resources/lt.lproj/InfoPlist.strings \
 	gui/macosx/Resources/lv.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ml.lproj/InfoPlist.strings \
+	gui/macosx/Resources/mr.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ms.lproj/InfoPlist.strings \
+	gui/macosx/Resources/nb.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ne.lproj/InfoPlist.strings \
 	gui/macosx/Resources/nl.lproj/InfoPlist.strings \
+	gui/macosx/Resources/nn.lproj/InfoPlist.strings \
+	gui/macosx/Resources/oc.lproj/InfoPlist.strings \
+	gui/macosx/Resources/pa.lproj/InfoPlist.strings \
 	gui/macosx/Resources/pl.lproj/InfoPlist.strings \
 	gui/macosx/Resources/pt-BR.lproj/InfoPlist.strings \
 	gui/macosx/Resources/pt-PT.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ro.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ru.lproj/InfoPlist.strings \
+	gui/macosx/Resources/sc.lproj/InfoPlist.strings \
+	gui/macosx/Resources/si.lproj/InfoPlist.strings \
 	gui/macosx/Resources/sk.lproj/InfoPlist.strings \
 	gui/macosx/Resources/sl.lproj/InfoPlist.strings \
+	gui/macosx/Resources/sr.lproj/InfoPlist.strings \
 	gui/macosx/Resources/sv.lproj/InfoPlist.strings \
+	gui/macosx/Resources/th.lproj/InfoPlist.strings \
 	gui/macosx/Resources/tr.lproj/InfoPlist.strings \
 	gui/macosx/Resources/uk.lproj/InfoPlist.strings \
-	gui/macosx/Resources/zh-Hans.lproj/InfoPlist.strings
+	gui/macosx/Resources/vi.lproj/InfoPlist.strings \
+	gui/macosx/Resources/wa.lproj/InfoPlist.strings \
+	gui/macosx/Resources/zh-Hans.lproj/InfoPlist.strings \
+	gui/macosx/Resources/zh-Hant.lproj/InfoPlist.strings
 
 if ENABLE_MACOSX_UI
 dist_libmacosx_plugin_la_DATA = $(libmacosx_plugin_la_RES)
