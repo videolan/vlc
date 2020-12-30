@@ -35,6 +35,7 @@
 
 #include "menus.hpp"             /* Popup menu on bgWidget */
 
+#include <QDate>
 #include <QLabel>
 #include <QToolButton>
 #include <QPalette>
@@ -445,6 +446,8 @@ void BackgroundWidget::titleUpdated( const QString& title )
             i_pos + 5 == title.indexOf( "Bi" /* directional */ "ll",
                                        i_pos, Qt::CaseInsensitive ) )
                 updateDefaultArt( ":/logo/vlc128-kb.png" );
+        else if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY )
+                updateDefaultArt( ":/logo/vlc128-xmas.png" );
         else
                 updateDefaultArt( ":/logo/vlc128.png" );
     }
