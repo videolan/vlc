@@ -24,7 +24,7 @@
 #include "SmoothSegment.hpp"
 
 #include "../../adaptive/playlist/BaseRepresentation.h"
-#include "../../adaptive/playlist/AbstractPlaylist.hpp"
+#include "../../adaptive/playlist/BasePlaylist.hpp"
 #include "../mp4/IndexReader.hpp"
 
 using namespace smooth::playlist;

@@ -26,7 +26,7 @@
 #include "PlaylistManager.h"
 #include "SegmentTracker.hpp"
 #include "SharedResources.hpp"
-#include "playlist/AbstractPlaylist.hpp"
+#include "playlist/BasePlaylist.hpp"
 #include "playlist/BasePeriod.h"
 #include "playlist/BaseAdaptationSet.h"
 #include "playlist/BaseRepresentation.h"
@@ -51,7 +51,7 @@ using namespace adaptive;
 
 PlaylistManager::PlaylistManager( demux_t *p_demux_,
                                   SharedResources *res,
-                                  AbstractPlaylist *pl,
+                                  BasePlaylist *pl,
                                   AbstractStreamFactory *factory,
                                   AbstractAdaptationLogic::LogicType type ) :
              logicType      ( type ),

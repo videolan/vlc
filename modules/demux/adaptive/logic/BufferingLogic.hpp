@@ -29,7 +29,7 @@ namespace adaptive
     namespace playlist
     {
         class BaseRepresentation;
-        class AbstractPlaylist;
+        class BasePlaylist;
     }
 
     namespace logic
@@ -43,9 +43,9 @@ namespace adaptive
                 virtual ~AbstractBufferingLogic() {}
 
                 virtual uint64_t getStartSegmentNumber(BaseRepresentation *) const = 0;
-                virtual mtime_t getMinBuffering(const AbstractPlaylist *) const = 0;
-                virtual mtime_t getMaxBuffering(const AbstractPlaylist *) const = 0;
-                virtual mtime_t getLiveDelay(const AbstractPlaylist *) const = 0;
+                virtual mtime_t getMinBuffering(const BasePlaylist *) const = 0;
+                virtual mtime_t getMaxBuffering(const BasePlaylist *) const = 0;
+                virtual mtime_t getLiveDelay(const BasePlaylist *) const = 0;
                 void setUserMinBuffering(mtime_t);
                 void setUserMaxBuffering(mtime_t);
                 void setUserLiveDelay(mtime_t);
@@ -68,14 +68,14 @@ namespace adaptive
                 DefaultBufferingLogic();
                 virtual ~DefaultBufferingLogic() {}
                 virtual uint64_t getStartSegmentNumber(BaseRepresentation *) const; /* impl */
-                virtual mtime_t getMinBuffering(const AbstractPlaylist *) const; /* impl */
-                virtual mtime_t getMaxBuffering(const AbstractPlaylist *) const; /* impl */
-                virtual mtime_t getLiveDelay(const AbstractPlaylist *) const; /* impl */
+                virtual mtime_t getMinBuffering(const BasePlaylist *) const; /* impl */
+                virtual mtime_t getMaxBuffering(const BasePlaylist *) const; /* impl */
+                virtual mtime_t getLiveDelay(const BasePlaylist *) const; /* impl */
 
             protected:
-                mtime_t getBufferingOffset(const AbstractPlaylist *) const;
+                mtime_t getBufferingOffset(const BasePlaylist *) const;
                 uint64_t getLiveStartSegmentNumber(BaseRepresentation *) const;
-                bool isLowLatency(const AbstractPlaylist *) const;
+                bool isLowLatency(const BasePlaylist *) const;
         };
     }
 }

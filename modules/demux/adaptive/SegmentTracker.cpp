@@ -23,7 +23,7 @@
 #endif
 
 #include "SegmentTracker.hpp"
-#include "playlist/AbstractPlaylist.hpp"
+#include "playlist/BasePlaylist.hpp"
 #include "playlist/BaseRepresentation.h"
 #include "playlist/BaseAdaptationSet.h"
 #include "playlist/Segment.h"

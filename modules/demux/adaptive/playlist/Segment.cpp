@@ -29,7 +29,7 @@
 #include "Segment.h"
 #include "BaseAdaptationSet.h"
 #include "BaseRepresentation.h"
-#include "AbstractPlaylist.hpp"
+#include "BasePlaylist.hpp"
 #include "SegmentChunk.hpp"
 #include "../http/BytesRange.hpp"
 #include "../http/HTTPConnectionManager.h"

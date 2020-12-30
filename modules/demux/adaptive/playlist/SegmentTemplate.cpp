@@ -27,7 +27,7 @@
 #include "SegmentTemplate.h"
 #include "SegmentTimeline.h"
 #include "SegmentInformation.hpp"
-#include "AbstractPlaylist.hpp"
+#include "BasePlaylist.hpp"
 #include <limits>
 
 using namespace adaptive::playlist;
@@ -165,7 +165,7 @@ Segment *  SegmentTemplate::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newp
     else
     {
         /* check template upper bound */
-        const AbstractPlaylist *playlist = parentSegmentInformation->getPlaylist();
+        const BasePlaylist *playlist = parentSegmentInformation->getPlaylist();
         if(!playlist->isLive())
         {
             const Timescale timescale = inheritTimescale();
@@ -211,7 +211,7 @@ bool SegmentTemplate::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
     const stime_t duration = inheritDuration();
     if( duration && parent )
     {
-        AbstractPlaylist *playlist = parent->getPlaylist();
+        BasePlaylist *playlist = parent->getPlaylist();
         if( playlist->isLive() )
         {
             mtime_t now = CLOCK_FREQ * ::time(NULL);

@@ -27,7 +27,7 @@
 #endif
 
 #include "BasePeriod.h"
-#include "AbstractPlaylist.hpp"
+#include "BasePlaylist.hpp"
 #include "SegmentBaseType.hpp"
 #include "../Streams.hpp"
 
@@ -37,7 +37,7 @@
 
 using namespace adaptive::playlist;
 
-BasePeriod::BasePeriod(AbstractPlaylist *playlist_) :
+BasePeriod::BasePeriod(BasePlaylist *playlist_) :
     SegmentInformation( playlist_ )
 {
     duration.Set(0);
@@ -51,7 +51,7 @@ BasePeriod::~BasePeriod ()
     childs.clear();
 }
 
-AbstractPlaylist *BasePeriod::getPlaylist() const
+BasePlaylist *BasePeriod::getPlaylist() const
 {
     return playlist;
 }

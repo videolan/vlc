@@ -39,7 +39,7 @@ namespace adaptive
     namespace playlist
     {
         class BaseAdaptationSet;
-        class AbstractPlaylist;
+        class BasePlaylist;
         class SegmentTemplateSegment;
 
         class BaseRepresentation : public CommonAttributesElements,

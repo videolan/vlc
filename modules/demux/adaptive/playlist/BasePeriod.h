@@ -37,7 +37,7 @@ namespace adaptive
         class BasePeriod : public SegmentInformation
         {
             public:
-                BasePeriod(AbstractPlaylist *);
+                BasePeriod(BasePlaylist *);
                 virtual ~BasePeriod ();
 
                 const std::vector<BaseAdaptationSet *>& getAdaptationSets   () const;
@@ -47,14 +47,14 @@ namespace adaptive
 
                 virtual mtime_t getPeriodStart() const; /* reimpl */
                 virtual mtime_t getPeriodDuration() const;
-                virtual AbstractPlaylist *getPlaylist() const; /* reimpl */
+                virtual BasePlaylist *getPlaylist() const; /* reimpl */
 
                 Property<mtime_t> duration;
                 Property<mtime_t> startTime;
 
             private:
                 std::vector<BaseAdaptationSet *>    adaptationSets;
-                AbstractPlaylist *playlist;
+                BasePlaylist *playlist;
         };
     }
 }
