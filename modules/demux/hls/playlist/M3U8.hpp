@@ -36,9 +36,6 @@ namespace hls
                 virtual ~M3U8();
 
                 virtual bool                    isLive() const;
-
-            private:
-                std::string data;
         };
     }
 }
