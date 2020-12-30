@@ -1,10 +1,10 @@
 /* Localized versions of Info.plist keys */
 
-"NSCameraUsageDescription" = "VLC wants to access the camera as requested by the user.";
-"NSMicrophoneUsageDescription" = "VLC wants to access the microphone as requested by the user.";
-"NSAppleEventsUsageDescription" = "VLC wants to pause and resume external media players.";
-"NSDesktopFolderUsageDescription" = "VLC wants to access the desktop folder as requested by the user.";
-"NSDocumentsFolderUsageDescription" = "VLC wants to access the documents folder as requested by the user.";
-"NSDownloadsFolderUsageDescription" = "VLC wants to access the downloads folder as requested by the user.";
-"NSNetworkVolumesUsageDescription" = "VLC wants to access a network volume as requested by the user.";
-"NSRemovableVolumesUsageDescription" = "VLC wants to access a removable volume as requested by the user.";
+"NSCameraUsageDescription" = "VLC нужно обращаться к камере по запросу пользователя.";
+"NSMicrophoneUsageDescription" = "VLC нужно обращаться к микрофону по запросу пользователя.";
+"NSAppleEventsUsageDescription" = "VLC нужно приостанавливать/продолжать воспроизведение на внешних плеерах.";
+"NSDesktopFolderUsageDescription" = "VLC нужно обращаться к папке на рабочем столе по запросу пользователя.";
+"NSDocumentsFolderUsageDescription" = "VLC нужно обращаться к папке документов по запросу пользователя.";
+"NSDownloadsFolderUsageDescription" = "VLC нужно обращаться к папке с загруженными файлами по запросу пользователя.";
+"NSNetworkVolumesUsageDescription" = "VLC нужно обращаться к сетевому ресурсу по запросу пользователя.";
+"NSRemovableVolumesUsageDescription" = "VLC нужно обращаться к съёмному носителю по запросу пользователя.";
