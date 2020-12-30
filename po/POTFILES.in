@@ -814,6 +814,7 @@ modules/gui/qt/medialibrary/qml/MusicTrackListDisplay.qml
 modules/gui/qt/medialibrary/qml/MusicTracksDisplay.qml
 modules/gui/qt/medialibrary/qml/UrlListDisplay.qml
 modules/gui/qt/medialibrary/qml/VideoDisplay.qml
+modules/gui/qt/medialibrary/qml/VideoDisplayRecentVideos.qml
 modules/gui/qt/medialibrary/qml/VideoGridItem.qml
 modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml
 modules/gui/qt/medialibrary/qml/VideoListDisplay.qml

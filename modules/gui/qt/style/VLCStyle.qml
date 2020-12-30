@@ -159,6 +159,9 @@ Item {
     property int gridCover_video_height: ( gridCover_video_width * 10.0 ) / 16
     property int gridCover_video_border: dp(3, scale)
 
+    property int gridCover_video_width_large: dp(406, scale)
+    property int gridCover_video_height_large: ( gridCover_video_width_large * 10.0 ) / 16
+
     property int expandCover_music_height: dp(171, scale)
     property int expandCover_music_width: dp(171, scale)
 
@@ -174,13 +177,17 @@ Item {
     property int gridItem_video_width: VLCStyle.gridCover_video_width
     property int gridItem_video_height: VLCStyle.gridCover_video_height + VLCStyle.margin_xxsmall + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small
 
+    property int gridItem_video_width_large: VLCStyle.gridCover_video_width_large
+    property int gridItem_video_height_large: VLCStyle.gridCover_video_height_large + VLCStyle.margin_xxsmall + VLCStyle.fontHeight_large +
+                                              VLCStyle.margin_xxsmall + VLCStyle.fontHeight_normal
+
     property int column_width: dp(114, scale)
     property int column_margin_width: dp(32, scale)
 
     property int table_cover_border: dp(2, scale)
 
     property int artistBanner_height: dp(200, scale)
-    
+
     //global application size, updated by the root widget
     property int appWidth: 0
     property int appHeight: 0

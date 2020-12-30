@@ -642,6 +642,7 @@ libqt_plugin_la_QML = \
 	gui/qt/medialibrary/qml/MusicTracksDisplay.qml \
 	gui/qt/medialibrary/qml/UrlListDisplay.qml \
 	gui/qt/medialibrary/qml/VideoDisplay.qml \
+	gui/qt/medialibrary/qml/VideoDisplayRecentVideos.qml \
 	gui/qt/medialibrary/qml/VideoGridItem.qml \
 	gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml \
 	gui/qt/medialibrary/qml/VideoListDisplay.qml \

@@ -30,10 +30,11 @@ import "qrc:///style/"
 Widgets.NavigableFocusScope {
     id: root
     readonly property var currentIndex: view.currentItem.currentIndex
+    property Item headerItem: view.currentItem.headerItem
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
 
-    property alias contentModel: videoModel ;
+    property alias contentModel: videoModel
 
     navigationCancel: function() {
         if (view.currentItem.currentIndex <= 0) {
@@ -52,9 +53,8 @@ Widgets.NavigableFocusScope {
     onContentModelChanged: resetFocus()
 
     function resetFocus() {
-        if (videoModel.count === 0) {
+        if (videoModel.count === 0)
             return
-        }
         var initialIndex = root.initialIndex
         if (initialIndex >= videoModel.count)
             initialIndex = 0
@@ -89,6 +89,52 @@ Widgets.NavigableFocusScope {
         model: videoModel
     }
 
+    MLRecentsVideoModel {
+        id: recentVideoModel
+        ml: medialib
+    }
+
+    property Component header: Column {
+        id: videoHeader
+
+        width: root.width
+
+        property Item focusItem: recentVideosViewLoader.item.focusItem
+
+        topPadding: VLCStyle.margin_normal
+        spacing: VLCStyle.margin_normal
+
+        Loader {
+            id: recentVideosViewLoader
+            width: parent.width
+            height: item.implicitHeight
+            active: recentVideoModel.count > 0
+            visible: recentVideoModel.count > 0
+            focus: true
+
+            sourceComponent: VideoDisplayRecentVideos {
+                id: recentVideosView
+
+                width: parent.width
+
+                model: recentVideoModel
+                focus: true
+                navigationParent: root
+                navigationDown: function() {
+                    recentVideosView.focus = false
+                    view.currentItem.setCurrentItemFocus()
+                }
+            }
+        }
+
+        Widgets.SubtitleLabel {
+            id: videosLabel
+            leftPadding: VLCStyle.margin_xlarge
+            bottomPadding: VLCStyle.margin_xsmall
+            width: root.width
+            text: i18n.qtr("Videos")
+        }
+    }
 
     Component {
         id: gridComponent
@@ -101,13 +147,7 @@ Widgets.NavigableFocusScope {
             delegateModel: selectionModel
             model: videoModel
 
-            headerDelegate: Widgets.SubtitleLabel {
-                text: i18n.qtr("Videos")
-                leftPadding: videosGV.rowX
-                topPadding: VLCStyle.margin_large
-                bottomPadding: VLCStyle.margin_normal
-                width: root.width
-            }
+            headerDelegate: root.header
 
             delegate: VideoGridItem {
                 id: videoGridItem
@@ -141,6 +181,7 @@ Widgets.NavigableFocusScope {
             }
 
             navigationParent: root
+            navigationUpItem: headerItem.focusItem
 
             /*
              *define the intial position/selection
@@ -168,7 +209,6 @@ Widgets.NavigableFocusScope {
 
     }
 
-
     Component {
         id: listComponent
         VideoListDisplay {
@@ -177,7 +217,11 @@ Widgets.NavigableFocusScope {
             model: videoModel
             dragItem: videoDragItem
             navigationParent: root
+            navigationUpItem: headerItem.focusItem
+
+            header: root.header
             headerTopPadding: VLCStyle.margin_normal
+            headerPositioning: ListView.InlineHeader
 
             selectionDelegateModel: selectionModel
 
@@ -185,6 +229,9 @@ Widgets.NavigableFocusScope {
 
             onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos )
 
+            function setCurrentItemFocus() {
+                currentItem.forceActiveFocus()
+            }
         }
     }
 
@@ -225,7 +272,6 @@ Widgets.NavigableFocusScope {
                     view.replace(listComponent)
             }
         }
-
     }
 
     EmptyLabel {
