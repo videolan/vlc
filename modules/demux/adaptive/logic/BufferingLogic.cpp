@@ -69,6 +69,12 @@ void AbstractBufferingLogic::setUserLiveDelay(vlc_tick_t v)
     userLiveDelay = v;
 }
 
+/* Try to never buffer up to really end */
+/* Enforce no overlap for demuxers segments 3.0.0 */
+/* FIXME: check duration instead ? */
+const unsigned DefaultBufferingLogic::SAFETY_BUFFERING_EDGE_OFFSET = 1;
+const unsigned DefaultBufferingLogic::SAFETY_EXPURGING_OFFSET = 2;
+
 DefaultBufferingLogic::DefaultBufferingLogic()
     : AbstractBufferingLogic()
 {
@@ -129,12 +135,6 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
 
     /* Get buffering offset min <= max <= live delay */
     vlc_tick_t i_buffering = getBufferingOffset(playlist);
-
-    /* Try to never buffer up to really end */
-    /* Enforce no overlap for demuxers segments 3.0.0 */
-    /* FIXME: check duration instead ? */
-    const unsigned SAFETY_BUFFERING_EDGE_OFFSET = 1;
-    const unsigned SAFETY_EXPURGING_OFFSET = 2;
 
     SegmentList *segmentList = rep->inheritSegmentList();
     SegmentBase *segmentBase = rep->inheritSegmentBase();

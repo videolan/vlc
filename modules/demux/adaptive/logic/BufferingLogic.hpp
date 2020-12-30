@@ -71,6 +71,8 @@ namespace adaptive
                 virtual vlc_tick_t getMinBuffering(const BasePlaylist *) const; /* impl */
                 virtual vlc_tick_t getMaxBuffering(const BasePlaylist *) const; /* impl */
                 virtual vlc_tick_t getLiveDelay(const BasePlaylist *) const; /* impl */
+                static const unsigned SAFETY_BUFFERING_EDGE_OFFSET;
+                static const unsigned SAFETY_EXPURGING_OFFSET;
 
             protected:
                 vlc_tick_t getBufferingOffset(const BasePlaylist *) const;
