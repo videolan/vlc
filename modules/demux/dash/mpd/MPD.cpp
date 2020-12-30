@@ -38,7 +38,7 @@
 using namespace dash::mpd;
 
 MPD::MPD (vlc_object_t *p_object, Profile profile_) :
-    AbstractPlaylist(p_object),
+    BasePlaylist(p_object),
     profile( profile_ )
 {
     programInfo.Set( NULL );

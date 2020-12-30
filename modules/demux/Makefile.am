@@ -296,12 +296,12 @@ demux_LTLIBRARIES += libts_plugin.la
 endif
 
 libadaptive_plugin_la_SOURCES = \
-    demux/adaptive/playlist/AbstractPlaylist.cpp \
-    demux/adaptive/playlist/AbstractPlaylist.hpp \
     demux/adaptive/playlist/BaseAdaptationSet.cpp \
     demux/adaptive/playlist/BaseAdaptationSet.h \
     demux/adaptive/playlist/BasePeriod.cpp \
     demux/adaptive/playlist/BasePeriod.h \
+    demux/adaptive/playlist/BasePlaylist.cpp \
+    demux/adaptive/playlist/BasePlaylist.hpp \
     demux/adaptive/playlist/BaseRepresentation.cpp \
     demux/adaptive/playlist/BaseRepresentation.h \
     demux/adaptive/playlist/CommonAttributesElements.cpp \

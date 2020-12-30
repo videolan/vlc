@@ -114,7 +114,7 @@ void Representation::scheduleNextUpdate(uint64_t, bool b_updated)
     }
 
     const vlc_tick_t now = vlc_tick_now();
-    const AbstractPlaylist *playlist = getPlaylist();
+    const BasePlaylist *playlist = getPlaylist();
 
     msg_Dbg(playlist->getVLCObject(), "Updated playlist ID %s, after %" PRId64 "s",
             getID().str().c_str(),
@@ -152,7 +152,7 @@ bool Representation::needsUpdate(uint64_t number) const
 
 bool Representation::runLocalUpdates(SharedResources *res)
 {
-    AbstractPlaylist *playlist = getPlaylist();
+    BasePlaylist *playlist = getPlaylist();
     M3U8Parser parser(res);
     if(!parser.appendSegmentsFromPlaylistURI(playlist->getVLCObject(), this))
         b_failed = true;

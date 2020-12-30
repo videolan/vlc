@@ -29,7 +29,7 @@
 
 #include "BaseRepresentation.h"
 #include "BaseAdaptationSet.h"
-#include "AbstractPlaylist.hpp"
+#include "BasePlaylist.hpp"
 #include "SegmentTemplate.h"
 #include "SegmentTimeline.h"
 #include "SegmentList.h"

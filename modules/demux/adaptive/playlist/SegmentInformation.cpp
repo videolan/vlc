@@ -28,7 +28,7 @@
 #include "SegmentList.h"
 #include "SegmentTemplate.h"
 #include "SegmentTimeline.h"
-#include "AbstractPlaylist.hpp"
+#include "BasePlaylist.hpp"
 #include "BaseRepresentation.h"
 #include "../encryption/CommonEncryption.hpp"
 
@@ -46,7 +46,7 @@ SegmentInformation::SegmentInformation(SegmentInformation *parent_) :
     init();
 }
 
-SegmentInformation::SegmentInformation(AbstractPlaylist * parent_) :
+SegmentInformation::SegmentInformation(BasePlaylist * parent_) :
     ICanonicalUrl(parent_),
     AttrsNode( AbstractAttr::SEGMENTINFORMATION, NULL )
 {
@@ -64,7 +64,7 @@ SegmentInformation::~SegmentInformation()
     delete baseUrl.Get();
 }
 
-AbstractPlaylist * SegmentInformation::getPlaylist() const
+BasePlaylist * SegmentInformation::getPlaylist() const
 {
     if(parent)
         return parent->getPlaylist();

@@ -29,7 +29,7 @@ namespace adaptive
     namespace playlist
     {
         class BaseRepresentation;
-        class AbstractPlaylist;
+        class BasePlaylist;
     }
 
     namespace logic
@@ -43,9 +43,9 @@ namespace adaptive
                 virtual ~AbstractBufferingLogic() {}
 
                 virtual uint64_t getStartSegmentNumber(BaseRepresentation *) const = 0;
-                virtual vlc_tick_t getMinBuffering(const AbstractPlaylist *) const = 0;
-                virtual vlc_tick_t getMaxBuffering(const AbstractPlaylist *) const = 0;
-                virtual vlc_tick_t getLiveDelay(const AbstractPlaylist *) const = 0;
+                virtual vlc_tick_t getMinBuffering(const BasePlaylist *) const = 0;
+                virtual vlc_tick_t getMaxBuffering(const BasePlaylist *) const = 0;
+                virtual vlc_tick_t getLiveDelay(const BasePlaylist *) const = 0;
                 void setUserMinBuffering(vlc_tick_t);
                 void setUserMaxBuffering(vlc_tick_t);
                 void setUserLiveDelay(vlc_tick_t);
@@ -68,14 +68,14 @@ namespace adaptive
                 DefaultBufferingLogic();
                 virtual ~DefaultBufferingLogic() {}
                 virtual uint64_t getStartSegmentNumber(BaseRepresentation *) const; /* impl */
-                virtual vlc_tick_t getMinBuffering(const AbstractPlaylist *) const; /* impl */
-                virtual vlc_tick_t getMaxBuffering(const AbstractPlaylist *) const; /* impl */
-                virtual vlc_tick_t getLiveDelay(const AbstractPlaylist *) const; /* impl */
+                virtual vlc_tick_t getMinBuffering(const BasePlaylist *) const; /* impl */
+                virtual vlc_tick_t getMaxBuffering(const BasePlaylist *) const; /* impl */
+                virtual vlc_tick_t getLiveDelay(const BasePlaylist *) const; /* impl */
 
             protected:
-                vlc_tick_t getBufferingOffset(const AbstractPlaylist *) const;
+                vlc_tick_t getBufferingOffset(const BasePlaylist *) const;
                 uint64_t getLiveStartSegmentNumber(BaseRepresentation *) const;
-                bool isLowLatency(const AbstractPlaylist *) const;
+                bool isLowLatency(const BasePlaylist *) const;
         };
     }
 }

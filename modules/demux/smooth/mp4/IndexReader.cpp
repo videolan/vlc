@@ -26,7 +26,7 @@
 #include "../../adaptive/playlist/BaseAdaptationSet.h"
 #include "../../adaptive/playlist/SegmentTemplate.h"
 #include "../../adaptive/playlist/SegmentTimeline.h"
-#include "../../adaptive/playlist/AbstractPlaylist.hpp"
+#include "../../adaptive/playlist/BasePlaylist.hpp"
 
 using namespace adaptive::mp4;
 using namespace smooth::mp4;

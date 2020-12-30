@@ -32,7 +32,7 @@ namespace adaptive
 {
     namespace playlist
     {
-        class AbstractPlaylist;
+        class BasePlaylist;
         class BasePeriod;
     }
 
@@ -49,7 +49,7 @@ namespace adaptive
         public:
             PlaylistManager( demux_t *,
                              SharedResources *,
-                             AbstractPlaylist *,
+                             BasePlaylist *,
                              AbstractStreamFactory *,
                              AbstractAdaptationLogic::LogicType type );
             virtual ~PlaylistManager    ();
@@ -99,7 +99,7 @@ namespace adaptive
             AbstractAdaptationLogic::LogicType  logicType;
             AbstractAdaptationLogic             *logic;
             AbstractBufferingLogic              *bufferingLogic;
-            AbstractPlaylist                    *playlist;
+            BasePlaylist                    *playlist;
             AbstractStreamFactory               *streamFactory;
             demux_t                             *p_demux;
             std::vector<AbstractStream *>        streams;

@@ -24,7 +24,7 @@
 #include "BufferingLogic.hpp"
 #include "../playlist/BaseRepresentation.h"
 #include "../playlist/BasePeriod.h"
-#include "../playlist/AbstractPlaylist.hpp"
+#include "../playlist/BasePlaylist.hpp"
 #include "../playlist/SegmentTemplate.h"
 #include "../playlist/SegmentTimeline.h"
 #include "../playlist/SegmentList.h"
@@ -84,7 +84,7 @@ uint64_t DefaultBufferingLogic::getStartSegmentNumber(BaseRepresentation *rep) c
     return profile ? profile->getStartSegmentNumber() : 0;
 }
 
-vlc_tick_t DefaultBufferingLogic::getMinBuffering(const AbstractPlaylist *p) const
+vlc_tick_t DefaultBufferingLogic::getMinBuffering(const BasePlaylist *p) const
 {
     if(isLowLatency(p))
         return BUFFERING_LOWEST_LIMIT;
@@ -96,7 +96,7 @@ vlc_tick_t DefaultBufferingLogic::getMinBuffering(const AbstractPlaylist *p) con
     return std::max(buffering, BUFFERING_LOWEST_LIMIT);
 }
 
-vlc_tick_t DefaultBufferingLogic::getMaxBuffering(const AbstractPlaylist *p) const
+vlc_tick_t DefaultBufferingLogic::getMaxBuffering(const BasePlaylist *p) const
 {
     if(isLowLatency(p))
         return getMinBuffering(p);
@@ -110,7 +110,7 @@ vlc_tick_t DefaultBufferingLogic::getMaxBuffering(const AbstractPlaylist *p) con
     return std::max(buffering, getMinBuffering(p));
 }
 
-vlc_tick_t DefaultBufferingLogic::getLiveDelay(const AbstractPlaylist *p) const
+vlc_tick_t DefaultBufferingLogic::getLiveDelay(const BasePlaylist *p) const
 {
     if(isLowLatency(p))
         return getMinBuffering(p);
@@ -125,7 +125,7 @@ vlc_tick_t DefaultBufferingLogic::getLiveDelay(const AbstractPlaylist *p) const
 
 uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *rep) const
 {
-    AbstractPlaylist *playlist = rep->getPlaylist();
+    BasePlaylist *playlist = rep->getPlaylist();
 
     /* Get buffering offset min <= max <= live delay */
     vlc_tick_t i_buffering = getBufferingOffset(playlist);
@@ -358,12 +358,12 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
     return std::numeric_limits<uint64_t>::max();
 }
 
-vlc_tick_t DefaultBufferingLogic::getBufferingOffset(const AbstractPlaylist *p) const
+vlc_tick_t DefaultBufferingLogic::getBufferingOffset(const BasePlaylist *p) const
 {
     return p->isLive() ? getLiveDelay(p) : getMaxBuffering(p);
 }
 
-bool DefaultBufferingLogic::isLowLatency(const AbstractPlaylist *p) const
+bool DefaultBufferingLogic::isLowLatency(const BasePlaylist *p) const
 {
     if(userLowLatency.isSet())
         return userLowLatency.value();

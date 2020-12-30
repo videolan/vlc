@@ -38,7 +38,7 @@ namespace adaptive
         class SegmentTimeline;
         class SegmentTemplate;
         class SegmentTemplate;
-        class AbstractPlaylist;
+        class BasePlaylist;
         class ISegment;
 
         /* common segment elements for period/adaptset/rep 5.3.9.1,
@@ -51,12 +51,12 @@ namespace adaptive
 
             public:
                 SegmentInformation( SegmentInformation * = 0 );
-                explicit SegmentInformation( AbstractPlaylist * );
+                explicit SegmentInformation( BasePlaylist * );
                 virtual ~SegmentInformation();
 
                 virtual vlc_tick_t getPeriodStart() const;
                 virtual vlc_tick_t getPeriodDuration() const;
-                virtual AbstractPlaylist *getPlaylist() const;
+                virtual BasePlaylist *getPlaylist() const;
 
                 class SplitPoint
                 {

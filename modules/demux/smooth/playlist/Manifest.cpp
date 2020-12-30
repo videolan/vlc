@@ -29,7 +29,7 @@
 using namespace smooth::playlist;
 
 Manifest::Manifest (vlc_object_t *p_object) :
-    AbstractPlaylist(p_object)
+    BasePlaylist(p_object)
 {
     minUpdatePeriod.Set( VLC_TICK_FROM_SEC(5) );
     addAttribute(new TimescaleAttr(Timescale(10000000))); // 100ns
@@ -44,11 +44,4 @@ Manifest::~Manifest()
 bool Manifest::isLive() const
 {
     return b_live;
-}
-
-void Manifest::debug()
-{
-    std::vector<BasePeriod *>::const_iterator i;
-    for(i = periods.begin(); i != periods.end(); ++i)
-        (*i)->debug(VLC_OBJECT(p_object));
 }

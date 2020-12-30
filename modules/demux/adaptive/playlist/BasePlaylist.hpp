@@ -1,8 +1,8 @@
 /*
- * AbstractPlaylist.hpp
+ * BasePlaylist.hpp
  *****************************************************************************
  * Copyright (C) 2010 - 2011 Klagenfurt University
- * Copyright (C) 2015 VideoLAN and VLC authors
+ * Copyright (C) 2015 - 2020 VideoLabs, VideoLAN and VLC authors
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -18,8 +18,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef ABSTRACTPLAYLIST_HPP_
-#define ABSTRACTPLAYLIST_HPP_
+#ifndef BASEPLAYLIST_HPP_
+#define BASEPLAYLIST_HPP_
 
 #include <vector>
 #include <string>
@@ -35,21 +35,21 @@ namespace adaptive
     {
         class BasePeriod;
 
-        class AbstractPlaylist : public ICanonicalUrl,
-                                 public AttrsNode
+        class BasePlaylist : public ICanonicalUrl,
+                             public AttrsNode
         {
             public:
-                AbstractPlaylist(vlc_object_t *);
-                virtual ~AbstractPlaylist();
+                BasePlaylist(vlc_object_t *);
+                virtual ~BasePlaylist();
 
-                virtual bool                    isLive() const = 0;
+                virtual bool                    isLive() const;
                 virtual bool                    isLowLatency() const;
                 void                            setType(const std::string &);
                 void                            setMinBuffering( vlc_tick_t );
                 void                            setMaxBuffering( vlc_tick_t );
                 vlc_tick_t                      getMinBuffering() const;
                 vlc_tick_t                      getMaxBuffering() const;
-                virtual void                    debug() = 0;
+                void                            debug() const;
 
                 void    addPeriod               (BasePeriod *period);
                 void    addBaseUrl              (const std::string &);
@@ -63,7 +63,7 @@ namespace adaptive
                 virtual BasePeriod*                      getNextPeriod(BasePeriod *period);
 
                 bool                needsUpdates() const;
-                void                updateWith(AbstractPlaylist *);
+                void                updateWith(BasePlaylist *);
 
                 Property<vlc_tick_t>                   duration;
                 Property<time_t>                    playbackStart;
@@ -86,4 +86,4 @@ namespace adaptive
         };
     }
 }
-#endif /* ABSTRACTPLAYLIST_HPP_ */
+#endif /* BASEPLAYLIST_HPP_ */
