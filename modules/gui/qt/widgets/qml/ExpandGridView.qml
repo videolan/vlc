@@ -72,7 +72,7 @@ NavigableFocusScope {
     property alias expandItem: expandItemLoader.item
 
     property Component headerDelegate: Item{}
-    property int headerHeight: headerItemLoader.implicitHeight
+    property alias headerHeight: headerItemLoader.implicitHeight
     property alias headerItem: headerItemLoader.item
 
     property alias footerItem: footerItemLoader.item
@@ -364,6 +364,13 @@ NavigableFocusScope {
             focus: item.focus
             y: root.topMargin + root.headerHeight + (root._effectiveCellHeight * (Math.ceil(model.count / getNbItemsPerRow()))) +
                _expandItemVerticalSpace
+        }
+
+        Connections {
+            target: headerItemLoader
+            onHeightChanged: {
+                flickable.layout(true)
+            }
         }
 
         Connections {
