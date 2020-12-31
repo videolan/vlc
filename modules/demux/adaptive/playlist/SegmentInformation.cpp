@@ -251,33 +251,23 @@ void SegmentInformation::setSegmentTemplate(SegmentTemplate *templ)
     }
 }
 
-static void insertIntoSegment(std::vector<Segment *> &seglist, size_t start,
+static void insertIntoSegment(Segment *container, size_t start,
                               size_t end, stime_t time, stime_t duration)
 {
-    std::vector<Segment *>::iterator segIt;
-    for(segIt = seglist.begin(); segIt < seglist.end(); ++segIt)
+    if(end == 0 || container->contains(end))
     {
-        Segment *segment = *segIt;
-        if(segment->getClassId() == Segment::CLASSID_SEGMENT &&
-           (end == 0 || segment->contains(end)))
-        {
-            SubSegment *subsegment = new SubSegment(segment, start, (end != 0) ? end : 0);
-            subsegment->startTime.Set(time);
-            subsegment->duration.Set(duration);
-            segment->addSubSegment(subsegment);
-            break;
-        }
+        SubSegment *subsegment = new SubSegment(container, start, (end != 0) ? end : 0);
+        subsegment->startTime.Set(time);
+        subsegment->duration.Set(duration);
+        container->addSubSegment(subsegment);
     }
 }
 
 void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
 {
-    SegmentBase *segmentBase = inheritSegmentBase();
+    Segment *segmentBase = inheritSegmentBase();
     if(!segmentBase)
         return;
-
-    std::vector<Segment *> seglist;
-    seglist.push_back( segmentBase );
 
     size_t prevstart = 0;
     stime_t prevtime = 0;
@@ -290,7 +280,7 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
         if(splitIt != splitlist.begin())
         {
             /* do previous splitpoint */
-            insertIntoSegment(seglist, prevstart, split.offset - 1, prevtime, split.duration);
+            insertIntoSegment(segmentBase, prevstart, split.offset - 1, prevtime, split.duration);
         }
         prevstart = split.offset;
         prevtime = split.time;
@@ -298,11 +288,11 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
 
     if(splitlist.size() == 1)
     {
-        insertIntoSegment(seglist, prevstart, 0, prevtime, split.duration);
+        insertIntoSegment(segmentBase, prevstart, 0, prevtime, split.duration);
     }
     else if(splitlist.size() > 1)
     {
-        insertIntoSegment(seglist, prevstart, split.offset - 1, prevtime, split.duration);
+        insertIntoSegment(segmentBase, prevstart, split.offset - 1, prevtime, split.duration);
     }
 }
 

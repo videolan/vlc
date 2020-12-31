@@ -37,7 +37,6 @@ SegmentTemplateSegment::SegmentTemplateSegment( SegmentTemplate *templ_,
     Segment( parent )
 {
     debugName = "SegmentTemplateSegment";
-    classId = Segment::CLASSID_SEGMENT;
     templated = true;
     templ = templ_;
 }
@@ -275,7 +274,6 @@ SegmentTemplateInit::SegmentTemplateInit( SegmentTemplate *templ_,
     InitSegment(parent)
 {
     debugName = "InitSegmentTemplate";
-    classId = InitSegment::CLASSID_INITSEGMENT;
     templ = templ_;
 }
 

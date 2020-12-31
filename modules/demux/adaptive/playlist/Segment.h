@@ -75,12 +75,9 @@ namespace adaptive
                 virtual bool                            contains        (size_t byte) const;
                 virtual int                             compare         (ISegment *) const;
                 void                                    setEncryption   (CommonEncryption &);
-                int                                     getClassId      () const;
                 Property<stime_t>       startTime;
                 Property<stime_t>       duration;
                 bool                    discontinuity;
-
-                static const int CLASSID_ISEGMENT = 0;
 
             protected:
                 virtual bool                            prepareChunk    (SharedResources *,
@@ -90,7 +87,6 @@ namespace adaptive
                 size_t                  startByte;
                 size_t                  endByte;
                 std::string             debugName;
-                int                     classId;
                 bool                    templated;
                 uint64_t                sequence;
         };
@@ -106,7 +102,6 @@ namespace adaptive
                 virtual const std::vector<Segment*> & subSegments() const;
                 virtual void debug(vlc_object_t *,int = 0) const;
                 virtual void addSubSegment(SubSegment *);
-                static const int CLASSID_SEGMENT = 1;
 
             protected:
                 std::vector<Segment *> subsegments;
@@ -118,21 +113,18 @@ namespace adaptive
         {
             public:
                 InitSegment( ICanonicalUrl *parent );
-                static const int CLASSID_INITSEGMENT = 2;
         };
 
         class IndexSegment : public Segment
         {
             public:
                 IndexSegment( ICanonicalUrl *parent );
-                static const int CLASSID_INDEXSEGMENT = 3;
         };
 
         class SubSegment : public Segment
         {
             public:
                 SubSegment(Segment *, size_t start, size_t end);
-                static const int CLASSID_SUBSEGMENT = 4;
         };
     }
 }
