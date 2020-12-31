@@ -106,7 +106,6 @@ namespace adaptive
             protected:
                 std::vector<Segment *> subsegments;
                 Url sourceUrl;
-                int size;
         };
 
         class InitSegment : public Segment
