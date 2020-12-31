@@ -568,7 +568,7 @@ void IsoffMainParser::parseProgramInformation(Node * node, MPD *mpd)
 
 Profile IsoffMainParser::getProfile() const
 {
-    Profile res(Profile::Unknown);
+    Profile res(Profile::Name::Unknown);
     if(this->root == NULL)
         return res;
 
@@ -584,7 +584,7 @@ Profile IsoffMainParser::getProfile() const
         nextpos = urn.find_first_of(",", pos);
         res = Profile(urn.substr(pos, nextpos - pos));
     }
-    while (nextpos != std::string::npos && res == Profile::Unknown);
+    while (nextpos != std::string::npos && res == Profile::Name::Unknown);
 
     return res;
 }

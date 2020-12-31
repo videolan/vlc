@@ -62,14 +62,14 @@ namespace adaptive
             SegmentTrackerEvent(const ID &, bool);
             SegmentTrackerEvent(const ID &, mtime_t, mtime_t, mtime_t);
             SegmentTrackerEvent(const ID &, mtime_t);
-            enum
+            enum class Type
             {
-                DISCONTINUITY,
-                SWITCHING,
-                FORMATCHANGE,
-                BUFFERING_STATE,
-                BUFFERING_LEVEL_CHANGE,
-                SEGMENT_CHANGE,
+                Discontinuity,
+                RepresentationSwitch,
+                FormatChange,
+                SegmentChange,
+                BufferingStateUpdate,
+                BufferingLevelChange,
             } type;
             union
             {

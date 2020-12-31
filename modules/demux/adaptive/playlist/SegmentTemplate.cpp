@@ -53,7 +53,7 @@ void SegmentTemplateSegment::setSourceUrl(const std::string &url)
 }
 
 SegmentTemplate::SegmentTemplate( SegmentInformation *parent ) :
-    AbstractMultipleSegmentBaseType( parent, AbstractAttr::Type::SEGMENTTEMPLATE )
+    AbstractMultipleSegmentBaseType( parent, AbstractAttr::Type::SegmentTemplate )
 {
     initialisationSegment.Set( NULL );
     parentSegmentInformation = parent;
@@ -72,14 +72,14 @@ void SegmentTemplate::setSourceUrl( const std::string &url )
 
 void SegmentTemplate::pruneByPlaybackTime(mtime_t time)
 {
-    AbstractAttr *p = getAttribute(Type::TIMELINE);
+    AbstractAttr *p = getAttribute(Type::Timeline);
     if(p)
         return static_cast<SegmentTimeline *> (p)->pruneByPlaybackTime(time);
 }
 
 size_t SegmentTemplate::pruneBySequenceNumber(uint64_t number)
 {
-    AbstractAttr *p = getAttribute(Type::TIMELINE);
+    AbstractAttr *p = getAttribute(Type::Timeline);
     if(p)
         return static_cast<SegmentTimeline *> (p)->pruneBySequenceNumber(number);
     return 0;
@@ -114,7 +114,7 @@ void SegmentTemplate::debug(vlc_object_t *obj, int indent) const
 {
     AbstractSegmentBaseType::debug(obj, indent);
     (*segments.begin())->debug(obj, indent);
-    const AbstractAttr *p = getAttribute(Type::TIMELINE);
+    const AbstractAttr *p = getAttribute(Type::Timeline);
     if(p)
         static_cast<const SegmentTimeline *> (p)->debug(obj, indent + 1);
 }

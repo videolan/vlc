@@ -62,7 +62,7 @@ bool ISegment::prepareChunk(SharedResources *res, SegmentChunk *chunk, BaseRepre
     CommonEncryption enc = encryption;
     enc.mergeWith(rep->intheritEncryption());
 
-    if(enc.method != CommonEncryption::Method::NONE)
+    if(enc.method != CommonEncryption::Method::None)
     {
         CommonEncryptionSession *encryptionSession = new CommonEncryptionSession();
         if(!encryptionSession->start(res, enc))

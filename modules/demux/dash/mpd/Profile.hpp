@@ -29,7 +29,7 @@ namespace dash
         class Profile
         {
             public:
-                enum Name
+                enum class Name
                 {
                     Unknown,
                     Full,

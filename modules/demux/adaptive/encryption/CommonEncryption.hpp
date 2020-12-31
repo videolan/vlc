@@ -34,11 +34,11 @@ namespace adaptive
             public:
                 CommonEncryption();
                 void mergeWith(const CommonEncryption &);
-                enum Method
+                enum class Method
                 {
-                    NONE,
+                    None,
                     AES_128,
-                    AES_SAMPLE,
+                    AES_Sample,
                 } method;
                 std::string uri;
                 std::vector<unsigned char> iv;
