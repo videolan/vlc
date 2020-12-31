@@ -33,7 +33,7 @@ namespace adaptive
 
     namespace encryption
     {
-        typedef std::vector<unsigned char> KeyringKey;
+        using KeyringKey = std::vector<unsigned char>;
 
         class Keyring
         {
