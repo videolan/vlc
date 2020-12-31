@@ -200,7 +200,7 @@ void PlaylistManager::stop()
 
 struct PrioritizedAbstractStream
 {
-    AbstractStream::buffering_status status;
+    AbstractStream::BufferingStatus status;
     mtime_t demuxed_amount;
     AbstractStream *st;
 };
@@ -217,10 +217,10 @@ static bool streamCompare(const PrioritizedAbstractStream &a,  const Prioritized
     return false;
 }
 
-AbstractStream::buffering_status PlaylistManager::bufferize(mtime_t i_nzdeadline,
-                                                            unsigned i_min_buffering, unsigned i_extra_buffering)
+AbstractStream::BufferingStatus PlaylistManager::bufferize(mtime_t i_nzdeadline,
+                                                            mtime_t i_min_buffering, mtime_t i_extra_buffering)
 {
-    AbstractStream::buffering_status i_return = AbstractStream::buffering_end;
+    AbstractStream::BufferingStatus i_return = AbstractStream::BufferingStatus::End;
 
     /* First reorder by status >> buffering level */
     std::vector<PrioritizedAbstractStream> prioritized_streams(streams.size());
@@ -254,24 +254,24 @@ AbstractStream::buffering_status PlaylistManager::bufferize(mtime_t i_nzdeadline
             /* initial */
         }
 
-        AbstractStream::buffering_status i_ret = st->bufferize(i_nzdeadline,
+        AbstractStream::BufferingStatus i_ret = st->bufferize(i_nzdeadline,
                                                                i_min_buffering,
                                                                i_extra_buffering,
                                                                getActiveStreamsCount() <= 1);
-        if(i_return != AbstractStream::buffering_ongoing) /* Buffering streams need to keep going */
+        if(i_return != AbstractStream::BufferingStatus::Ongoing) /* Buffering streams need to keep going */
         {
             if(i_ret > i_return)
                 i_return = i_ret;
         }
 
         /* Bail out, will start again (high prio could be same starving stream) */
-        if( i_return == AbstractStream::buffering_lessthanmin )
+        if( i_return == AbstractStream::BufferingStatus::Lessthanmin )
             break;
     }
 
     vlc_mutex_lock(&demux.lock);
     if(demux.i_nzpcr == VLC_TS_INVALID &&
-       i_return != AbstractStream::buffering_lessthanmin /* prevents starting before buffering is reached */ )
+       i_return != AbstractStream::BufferingStatus::Lessthanmin /* prevents starting before buffering is reached */ )
     {
         demux.i_nzpcr = getFirstDTS();
     }
@@ -280,9 +280,9 @@ AbstractStream::buffering_status PlaylistManager::bufferize(mtime_t i_nzdeadline
     return i_return;
 }
 
-AbstractStream::status PlaylistManager::dequeue(mtime_t i_floor, mtime_t *pi_nzbarrier)
+AbstractStream::Status PlaylistManager::dequeue(mtime_t i_floor, mtime_t *pi_nzbarrier)
 {
-    AbstractStream::status i_return = AbstractStream::status_eof;
+    AbstractStream::Status i_return = AbstractStream::Status::Eof;
 
     const mtime_t i_nzdeadline = *pi_nzbarrier;
 
@@ -290,9 +290,8 @@ AbstractStream::status PlaylistManager::dequeue(mtime_t i_floor, mtime_t *pi_nzb
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
         AbstractStream *st = *it;
-
         mtime_t i_pcr;
-        AbstractStream::status i_ret = st->dequeue(i_nzdeadline, &i_pcr);
+        AbstractStream::Status i_ret = st->dequeue(i_nzdeadline, &i_pcr);
         if( i_ret > i_return )
             i_return = i_ret;
 
@@ -452,7 +451,7 @@ int PlaylistManager::doDemux(int64_t increment)
         if(!b_dead)
             vlc_cond_timedwait(&demux.cond, &demux.lock, mdate() + CLOCK_FREQ / 20);
         vlc_mutex_unlock(&demux.lock);
-        return (b_dead || b_all_disabled) ? AbstractStream::status_eof : AbstractStream::status_buffering;
+        return (b_dead || b_all_disabled) ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
     }
 
     if(demux.i_firstpcr == VLC_TS_INVALID)
@@ -461,13 +460,13 @@ int PlaylistManager::doDemux(int64_t increment)
     mtime_t i_nzbarrier = demux.i_nzpcr + increment;
     vlc_mutex_unlock(&demux.lock);
 
-    AbstractStream::status status = dequeue(demux.i_nzpcr, &i_nzbarrier);
+    AbstractStream::Status status = dequeue(demux.i_nzpcr, &i_nzbarrier);
 
     updateControlsPosition();
 
     switch(status)
     {
-    case AbstractStream::status_eof:
+    case AbstractStream::Status::Eof:
         {
             /* might be end of current period */
             if(currentPeriod)
@@ -489,19 +488,19 @@ int PlaylistManager::doDemux(int64_t increment)
             }
         }
         break;
-    case AbstractStream::status_buffering:
+    case AbstractStream::Status::Buffering:
         vlc_mutex_lock(&demux.lock);
         vlc_cond_timedwait(&demux.cond, &demux.lock, mdate() + CLOCK_FREQ / 20);
         vlc_mutex_unlock(&demux.lock);
         break;
-    case AbstractStream::status_discontinuity:
+    case AbstractStream::Status::Discontinuity:
         vlc_mutex_lock(&demux.lock);
         demux.i_nzpcr = VLC_TS_INVALID;
         demux.i_firstpcr = VLC_TS_INVALID;
         es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
         vlc_mutex_unlock(&demux.lock);
         break;
-    case AbstractStream::status_demuxed:
+    case AbstractStream::Status::Demuxed:
         vlc_mutex_lock(&demux.lock);
         if( demux.i_nzpcr != VLC_TS_INVALID && i_nzbarrier != demux.i_nzpcr )
         {
@@ -663,19 +662,19 @@ void PlaylistManager::Run()
         vlc_mutex_unlock(&demux.lock);
 
         int canc = vlc_savecancel();
-        AbstractStream::buffering_status i_return = bufferize(i_nzpcr, i_min_buffering, i_extra_buffering);
+        AbstractStream::BufferingStatus i_return = bufferize(i_nzpcr, i_min_buffering, i_extra_buffering);
         vlc_restorecancel( canc );
 
-        if(i_return != AbstractStream::buffering_lessthanmin)
+        if(i_return != AbstractStream::BufferingStatus::Lessthanmin)
         {
             mtime_t i_deadline = mdate();
-            if(i_return == AbstractStream::buffering_ongoing)
+            if(i_return == AbstractStream::BufferingStatus::Ongoing)
                 i_deadline += (CLOCK_FREQ / 100);
-            else if(i_return == AbstractStream::buffering_full)
+            else if(i_return == AbstractStream::BufferingStatus::Full)
                 i_deadline += (CLOCK_FREQ / 10);
-            else if(i_return == AbstractStream::buffering_end)
+            else if(i_return == AbstractStream::BufferingStatus::End)
                 i_deadline += (CLOCK_FREQ);
-            else /*if(i_return == AbstractStream::buffering_suspended)*/
+            else /*if(i_return == AbstractStream::BufferingStatus::suspended)*/
                 i_deadline += (CLOCK_FREQ / 4);
 
             vlc_mutex_lock(&demux.lock);

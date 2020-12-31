@@ -32,11 +32,11 @@ namespace adaptive
     class AbstractDemuxer
     {
         public:
-            enum Status
+            enum class Status
             {
-                STATUS_SUCCESS,
-                STATUS_ERROR,
-                STATUS_END_OF_FILE,
+                Success,
+                Error,
+                Eof,
             };
             AbstractDemuxer();
             virtual ~AbstractDemuxer();

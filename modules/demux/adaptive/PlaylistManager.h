@@ -57,8 +57,8 @@ namespace adaptive
             bool    started() const;
             void    stop();
 
-            AbstractStream::buffering_status bufferize(mtime_t, unsigned, unsigned);
-            AbstractStream::status dequeue(mtime_t, mtime_t *);
+            AbstractStream::BufferingStatus bufferize(mtime_t, mtime_t, mtime_t);
+            AbstractStream::Status dequeue(mtime_t, mtime_t *);
             void drain();
 
             virtual bool needsUpdate() const;

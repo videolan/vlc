@@ -69,23 +69,23 @@ namespace adaptive
         virtual bool reactivate(mtime_t);
         bool isDisabled() const;
         bool isValid() const;
-        typedef enum {
-            status_eof = 0, /* prioritized */
-            status_discontinuity,
-            status_demuxed,
-            status_buffering,
-        } status;
-        typedef enum {
-            buffering_end = 0, /* prioritized */
-            buffering_suspended,
-            buffering_full,
-            buffering_ongoing,
-            buffering_lessthanmin,
-        } buffering_status;
-        buffering_status bufferize(mtime_t, mtime_t, mtime_t, bool = false);
-        buffering_status getLastBufferStatus() const;
+        enum class Status {
+            Eof = 0, /* prioritized */
+            Discontinuity,
+            Demuxed,
+            Buffering,
+        };
+        enum class BufferingStatus {
+            End = 0, /* prioritized */
+            Suspended,
+            Full,
+            Ongoing,
+            Lessthanmin,
+        };
+        BufferingStatus bufferize(mtime_t, mtime_t, mtime_t, bool = false);
+        BufferingStatus getLastBufferStatus() const;
         mtime_t getDemuxedAmount(mtime_t) const;
-        status dequeue(mtime_t, mtime_t *);
+        Status dequeue(mtime_t, mtime_t *);
         bool decodersDrained();
         virtual bool setPosition(mtime_t, bool);
         bool getMediaPlaybackTimes(mtime_t *, mtime_t *, mtime_t *,
@@ -137,8 +137,8 @@ namespace adaptive
 
     private:
         void declaredCodecs();
-        buffering_status doBufferize(mtime_t, mtime_t, mtime_t, bool);
-        buffering_status last_buffer_status;
+        BufferingStatus doBufferize(mtime_t, mtime_t, mtime_t, bool);
+        BufferingStatus last_buffer_status;
         bool valid;
         bool disabled;
         unsigned notfound_sequence;
