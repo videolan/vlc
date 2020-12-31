@@ -36,11 +36,11 @@ $(TARBALLS)/dxva2api.idl:
 
 $(DST_D3D9CAPS_H): $(TARBALLS)/d3d9caps.h .sum-d3d9
 	mkdir -p -- "$(PREFIX)/include/"
-	cd $(TARBALLS) && patch -fp1 < $(SRC)/d3d9/d3d9caps.patch -o $@
+	(cd $(TARBALLS) && patch -fp1 -o $@) < $(SRC)/d3d9/d3d9caps.patch
 
 $(DST_D3D9_H): $(TARBALLS)/d3d9.h .sum-d3d9
 	mkdir -p -- "$(PREFIX)/include/"
-	cd $(TARBALLS) && patch -fp1 < $(SRC)/d3d9/d3d9.patch -o $@
+	(cd $(TARBALLS) && patch -fp1 -o $@) < $(SRC)/d3d9/d3d9.patch
 
 dxva2api/dxva2api.idl: .sum-d3d9
 	mkdir -p dxva2api
