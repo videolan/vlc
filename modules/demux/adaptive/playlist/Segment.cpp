@@ -45,7 +45,6 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     endByte    (0)
 {
     debugName = "Segment";
-    classId = CLASSID_ISEGMENT;
     startTime.Set(0);
     duration.Set(0);
     sequence = 0;
@@ -182,16 +181,10 @@ void ISegment::setEncryption(CommonEncryption &e)
     encryption = e;
 }
 
-int ISegment::getClassId() const
-{
-    return classId;
-}
-
 Segment::Segment(ICanonicalUrl *parent) :
         ISegment(parent)
 {
     size = -1;
-    classId = CLASSID_SEGMENT;
 }
 
 SegmentChunk* Segment::createChunk(AbstractChunkSource *source, BaseRepresentation *rep)
@@ -265,14 +258,12 @@ InitSegment::InitSegment(ICanonicalUrl *parent) :
     Segment(parent)
 {
     debugName = "InitSegment";
-    classId = CLASSID_INITSEGMENT;
 }
 
 IndexSegment::IndexSegment(ICanonicalUrl *parent) :
     Segment(parent)
 {
     debugName = "IndexSegment";
-    classId = CLASSID_INDEXSEGMENT;
 }
 
 SubSegment::SubSegment(Segment *main, size_t start, size_t end) :
@@ -280,7 +271,6 @@ SubSegment::SubSegment(Segment *main, size_t start, size_t end) :
 {
     setByteRange(start, end);
     debugName = "SubSegment";
-    classId = CLASSID_SUBSEGMENT;
 }
 
 
