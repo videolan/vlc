@@ -34,7 +34,7 @@
 using namespace adaptive::playlist;
 
 BasePlaylist::BasePlaylist (vlc_object_t *p_object_) :
-    ICanonicalUrl(), AttrsNode(Type::PLAYLIST),
+    ICanonicalUrl(), AttrsNode(Type::Playlist),
     p_object(p_object_)
 {
     playbackStart.Set(0);

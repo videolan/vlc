@@ -54,7 +54,7 @@ AttrsNode::AttrsNode(Type t, AttrsNode *parent_)
     : AbstractAttr( t )
 {
     setParentNode(parent_);
-    is_canonical_root = (t == SEGMENTINFORMATION);
+    is_canonical_root = (t == Type::SegmentInformation);
 }
 
 AttrsNode::~AttrsNode()
@@ -139,7 +139,7 @@ AbstractAttr * AttrsNode::inheritAttribute(AbstractAttr::Type type) const
 
 stime_t AttrsNode::inheritDuration() const
 {
-    const AbstractAttr *p = inheritAttribute(Type::DURATION);
+    const AbstractAttr *p = inheritAttribute(Type::Duration);
     if(p && p->isValid())
         return (const stime_t &) *(static_cast<const DurationAttr *>(p));
     return 0;
@@ -147,7 +147,7 @@ stime_t AttrsNode::inheritDuration() const
 
 uint64_t AttrsNode::inheritStartNumber() const
 {
-    const AbstractAttr *p = inheritAttribute(Type::STARTNUMBER);
+    const AbstractAttr *p = inheritAttribute(Type::StartNumber);
     if(p && p->isValid())
         return (const uint64_t &) *(static_cast<const StartnumberAttr *>(p));
     return std::numeric_limits<uint64_t>::max();
@@ -155,7 +155,7 @@ uint64_t AttrsNode::inheritStartNumber() const
 
 Timescale AttrsNode::inheritTimescale() const
 {
-    const AbstractAttr *p = inheritAttribute(Type::TIMESCALE);
+    const AbstractAttr *p = inheritAttribute(Type::Timescale);
     if(p && p->isValid())
         return (Timescale) *(static_cast<const TimescaleAttr *>(p));
     else
@@ -164,7 +164,7 @@ Timescale AttrsNode::inheritTimescale() const
 
 vlc_tick_t AttrsNode::inheritAvailabilityTimeOffset() const
 {
-    const AbstractAttr *p = inheritAttribute(Type::AVAILABILITYTTIMEOFFSET);
+    const AbstractAttr *p = inheritAttribute(Type::AvailabilityTimeOffset);
     if(p && p->isValid())
         return (const vlc_tick_t &) *(static_cast<const AvailabilityTimeOffsetAttr *>(p));
     return 0;
@@ -172,7 +172,7 @@ vlc_tick_t AttrsNode::inheritAvailabilityTimeOffset() const
 
 bool AttrsNode::inheritAvailabilityTimeComplete() const
 {
-    const AbstractAttr *p = inheritAttribute(Type::AVAILABILITYTTIMECOMPLETE);
+    const AbstractAttr *p = inheritAttribute(Type::AvailabilityTimeComplete);
     if(p && p->isValid())
         return (const bool &) *(static_cast<const AvailabilityTimeCompleteAttr *>(p));
     return true;
@@ -180,7 +180,7 @@ bool AttrsNode::inheritAvailabilityTimeComplete() const
 
 SegmentBase * AttrsNode::inheritSegmentBase() const
 {
-    AbstractAttr *p = inheritAttribute(Type::SEGMENTBASE);
+    AbstractAttr *p = inheritAttribute(Type::SegmentBase);
     if(p && p->isValid())
         return static_cast<SegmentBase *>(p);
     return NULL;
@@ -188,7 +188,7 @@ SegmentBase * AttrsNode::inheritSegmentBase() const
 
 SegmentList * AttrsNode::inheritSegmentList() const
 {
-    AbstractAttr *p = inheritAttribute(Type::SEGMENTLIST);
+    AbstractAttr *p = inheritAttribute(Type::SegmentList);
     if(p && p->isValid())
         return static_cast<SegmentList *> (p);
     return NULL;
@@ -196,7 +196,7 @@ SegmentList * AttrsNode::inheritSegmentList() const
 
 SegmentTemplate * AttrsNode::inheritSegmentTemplate() const
 {
-    AbstractAttr *p = inheritAttribute(Type::SEGMENTTEMPLATE);
+    AbstractAttr *p = inheritAttribute(Type::SegmentTemplate);
     if(p && p->isValid())
         return static_cast<SegmentTemplate *> (p);
     return NULL;
@@ -204,7 +204,7 @@ SegmentTemplate * AttrsNode::inheritSegmentTemplate() const
 
 SegmentTimeline * AttrsNode::inheritSegmentTimeline() const
 {
-    AbstractAttr *p = inheritAttribute(Type::TIMELINE);
+    AbstractAttr *p = inheritAttribute(Type::Timeline);
     if(p && p->isValid())
         return static_cast<SegmentTimeline *> (p);
     return NULL;

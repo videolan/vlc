@@ -54,7 +54,7 @@ bool MPD::isLive() const
 {
     if(type.empty())
     {
-        Profile live(Profile::ISOLive);
+        Profile live(Profile::Name::ISOLive);
         return profile == live;
     }
     else

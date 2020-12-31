@@ -35,7 +35,7 @@
 using namespace adaptive::playlist;
 
 SegmentList::SegmentList( SegmentInformation *parent_ ):
-    AbstractMultipleSegmentBaseType( parent_, AttrsNode::Type::SEGMENTLIST )
+    AbstractMultipleSegmentBaseType( parent_, AttrsNode::Type::SegmentList )
 {
     totalLength = 0;
 }
@@ -301,7 +301,7 @@ void SegmentList::debug(vlc_object_t *obj, int indent) const
     std::vector<Segment *>::const_iterator it;
     for(it = segments.begin(); it != segments.end(); ++it)
         (*it)->debug(obj, indent);
-    const AbstractAttr *p = getAttribute(Type::TIMELINE);
+    const AbstractAttr *p = getAttribute(Type::Timeline);
     if(p)
         static_cast<const SegmentTimeline *> (p)->debug(obj, indent + 1);
 }

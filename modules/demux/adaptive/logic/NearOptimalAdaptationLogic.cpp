@@ -198,7 +198,7 @@ void NearOptimalAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
 {
     switch(event.type)
     {
-    case SegmentTrackerEvent::SWITCHING:
+    case SegmentTrackerEvent::Type::RepresentationSwitch:
         {
             vlc_mutex_lock(&lock);
             if(event.u.switching.prev)
@@ -210,7 +210,7 @@ void NearOptimalAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
         }
         break;
 
-    case SegmentTrackerEvent::BUFFERING_STATE:
+    case SegmentTrackerEvent::Type::BufferingStateUpdate:
         {
             const ID &id = *event.u.buffering.id;
             vlc_mutex_lock(&lock);
@@ -234,7 +234,7 @@ void NearOptimalAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
         }
         break;
 
-    case SegmentTrackerEvent::BUFFERING_LEVEL_CHANGE:
+    case SegmentTrackerEvent::Type::BufferingLevelChange:
         {
             const ID &id = *event.u.buffering.id;
             vlc_mutex_lock(&lock);

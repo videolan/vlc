@@ -643,11 +643,11 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
 {
     switch(event.type)
     {
-        case SegmentTrackerEvent::DISCONTINUITY:
+        case SegmentTrackerEvent::Type::Discontinuity:
             discontinuity = true;
             break;
 
-        case SegmentTrackerEvent::FORMATCHANGE:
+        case SegmentTrackerEvent::Type::FormatChange:
             /* Check if our current demux is still valid */
             if(*event.u.format.f != format || format == StreamFormat(StreamFormat::UNKNOWN))
             {
@@ -661,7 +661,7 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
             }
             break;
 
-        case SegmentTrackerEvent::SWITCHING:
+        case SegmentTrackerEvent::Type::RepresentationSwitch:
             if(demuxer && !inrestart)
             {
                 if(!demuxer->bitstreamSwitchCompatible() ||
@@ -677,7 +677,7 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
                     event.u.switching.next ? event.u.switching.next->getStreamFormat().str().c_str() : ""));
             break;
 
-        case SegmentTrackerEvent::SEGMENT_CHANGE:
+        case SegmentTrackerEvent::Type::SegmentChange:
             if(demuxer && demuxer->needsRestartOnEachSegment() && !inrestart)
             {
                 needrestart = true;

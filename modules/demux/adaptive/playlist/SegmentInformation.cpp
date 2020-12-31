@@ -40,7 +40,7 @@ using namespace adaptive::playlist;
 
 SegmentInformation::SegmentInformation(SegmentInformation *parent_) :
     ICanonicalUrl( parent_ ),
-    AttrsNode( AbstractAttr::SEGMENTINFORMATION, parent_ )
+    AttrsNode( AbstractAttr::Type::SegmentInformation, parent_ )
 {
     parent = parent_;
     init();
@@ -48,7 +48,7 @@ SegmentInformation::SegmentInformation(SegmentInformation *parent_) :
 
 SegmentInformation::SegmentInformation(BasePlaylist * parent_) :
     ICanonicalUrl(parent_),
-    AttrsNode( AbstractAttr::SEGMENTINFORMATION, NULL )
+    AttrsNode( AbstractAttr::Type::SegmentInformation, NULL )
 {
     parent = NULL;
     init();
@@ -131,14 +131,14 @@ SegmentInformation * SegmentInformation::getChildByID(const adaptive::ID &id)
 void SegmentInformation::updateWith(SegmentInformation *updated)
 {
     /* Support Segment List for now */
-    AbstractAttr *p = getAttribute(Type::SEGMENTLIST);
-    if(p && p->isValid() && updated->getAttribute(Type::SEGMENTLIST))
+    AbstractAttr *p = getAttribute(Type::SegmentList);
+    if(p && p->isValid() && updated->getAttribute(Type::SegmentList))
     {
         inheritSegmentList()->updateWith(updated->inheritSegmentList());
     }
 
-    p = getAttribute(Type::SEGMENTTEMPLATE);
-    if(p && p->isValid() && updated->getAttribute(Type::SEGMENTTEMPLATE))
+    p = getAttribute(Type::SegmentTemplate);
+    if(p && p->isValid() && updated->getAttribute(Type::SegmentTemplate))
     {
         inheritSegmentTemplate()->updateWith(updated->inheritSegmentTemplate());
     }
@@ -156,11 +156,11 @@ void SegmentInformation::updateWith(SegmentInformation *updated)
 
 void SegmentInformation::pruneByPlaybackTime(vlc_tick_t time)
 {
-    SegmentList *segmentList = static_cast<SegmentList *>(getAttribute(Type::SEGMENTLIST));
+    SegmentList *segmentList = static_cast<SegmentList *>(getAttribute(Type::SegmentList));
     if(segmentList)
         segmentList->pruneByPlaybackTime(time);
 
-    SegmentTemplate *templ = static_cast<SegmentTemplate *>(getAttribute(Type::SEGMENTTEMPLATE));
+    SegmentTemplate *templ = static_cast<SegmentTemplate *>(getAttribute(Type::SegmentTemplate));
     if(templ)
         templ->pruneByPlaybackTime(time);
 
@@ -173,18 +173,18 @@ void SegmentInformation::pruneBySegmentNumber(uint64_t num)
 {
     assert(dynamic_cast<BaseRepresentation *>(this));
 
-    SegmentList *segmentList = static_cast<SegmentList *>(getAttribute(Type::SEGMENTLIST));
+    SegmentList *segmentList = static_cast<SegmentList *>(getAttribute(Type::SegmentList));
     if(segmentList)
         segmentList->pruneBySegmentNumber(num);
 
-    SegmentTemplate *templ = static_cast<SegmentTemplate *>(getAttribute(Type::SEGMENTTEMPLATE));
+    SegmentTemplate *templ = static_cast<SegmentTemplate *>(getAttribute(Type::SegmentTemplate));
     if(templ)
         templ->pruneBySequenceNumber(num);
 }
 
 const CommonEncryption & SegmentInformation::intheritEncryption() const
 {
-    if(parent && commonEncryption.method == CommonEncryption::Method::NONE)
+    if(parent && commonEncryption.method == CommonEncryption::Method::None)
         return parent->intheritEncryption();
     return commonEncryption;
 }
@@ -213,11 +213,11 @@ vlc_tick_t SegmentInformation::getPeriodDuration() const
 AbstractSegmentBaseType * SegmentInformation::getProfile() const
 {
     AbstractAttr *p;
-    if((p = getAttribute(Type::SEGMENTTEMPLATE)))
+    if((p = getAttribute(Type::SegmentTemplate)))
         return static_cast<SegmentTemplate *> (p);
-    else if((p = getAttribute(Type::SEGMENTLIST)))
+    else if((p = getAttribute(Type::SegmentList)))
         return static_cast<SegmentList *> (p);
-    else if((p = getAttribute(Type::SEGMENTBASE)))
+    else if((p = getAttribute(Type::SegmentBase)))
         return static_cast<SegmentBase *> (p);
 
     return NULL;
@@ -225,7 +225,7 @@ AbstractSegmentBaseType * SegmentInformation::getProfile() const
 
 void SegmentInformation::updateSegmentList(SegmentList *list, bool restamp)
 {
-    SegmentList *segmentList = static_cast<SegmentList *>(getAttribute(Type::SEGMENTLIST));
+    SegmentList *segmentList = static_cast<SegmentList *>(getAttribute(Type::SegmentList));
     if(segmentList && restamp)
     {
         segmentList->updateWith(list, restamp);
@@ -239,7 +239,7 @@ void SegmentInformation::updateSegmentList(SegmentList *list, bool restamp)
 
 void SegmentInformation::setSegmentTemplate(SegmentTemplate *templ)
 {
-    SegmentTemplate *local = static_cast<SegmentTemplate *>(getAttribute(Type::SEGMENTTEMPLATE));
+    SegmentTemplate *local = static_cast<SegmentTemplate *>(getAttribute(Type::SegmentTemplate));
     if(local)
     {
         local->updateWith(templ);

@@ -32,15 +32,15 @@ struct
 }
 const urnmap[] =
 {
-    { Profile::Full,         "urn:mpeg:dash:profile:full:2011" },
-    { Profile::ISOOnDemand,  "urn:mpeg:dash:profile:isoff-on-demand:2011" },
-    { Profile::ISOOnDemand,  "urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm" },
-    { Profile::ISOOnDemand,  "urn:mpeg:dash:profile:isoff-ondemand:2011" },
-    { Profile::ISOMain,      "urn:mpeg:dash:profile:isoff-main:2011" },
-    { Profile::ISOLive,      "urn:mpeg:dash:profile:isoff-live:2011" },
-    { Profile::MPEG2TSMain,  "urn:mpeg:dash:profile:mp2t-main:2011" },
-    { Profile::MPEG2TSSimple,"urn:mpeg:dash:profile:mp2t-simple:2011" },
-    { Profile::Unknown,      "" },
+    { Profile::Name::Full,         "urn:mpeg:dash:profile:full:2011" },
+    { Profile::Name::ISOOnDemand,  "urn:mpeg:dash:profile:isoff-on-demand:2011" },
+    { Profile::Name::ISOOnDemand,  "urn:mpeg:mpegB:profile:dash:isoff-basic-on-demand:cm" },
+    { Profile::Name::ISOOnDemand,  "urn:mpeg:dash:profile:isoff-ondemand:2011" },
+    { Profile::Name::ISOMain,      "urn:mpeg:dash:profile:isoff-main:2011" },
+    { Profile::Name::ISOLive,      "urn:mpeg:dash:profile:isoff-live:2011" },
+    { Profile::Name::MPEG2TSMain,  "urn:mpeg:dash:profile:mp2t-main:2011" },
+    { Profile::Name::MPEG2TSSimple,"urn:mpeg:dash:profile:mp2t-simple:2011" },
+    { Profile::Name::Unknown,      "" },
 };
 
 Profile::Profile(Name name)
@@ -55,12 +55,12 @@ Profile::Profile(const std::string &urn)
 
 Profile::Name Profile::getNameByURN(const std::string &urn) const
 {
-    for( int i=0; urnmap[i].name != Unknown; i++ )
+    for( int i=0; urnmap[i].name != Name::Unknown; i++ )
     {
         if ( urn == urnmap[i].urn )
             return urnmap[i].name;
     }
-    return Unknown;
+    return Name::Unknown;
 }
 
 Profile::operator Profile::Name ()
@@ -70,7 +70,7 @@ Profile::operator Profile::Name ()
 
 Profile::operator std::string ()
 {
-    for( int i=0; urnmap[i].name != Unknown; i++ )
+    for( int i=0; urnmap[i].name != Name::Unknown; i++ )
     {
         if ( urnmap[i].name == type )
             return std::string( urnmap[i].urn );

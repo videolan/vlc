@@ -86,13 +86,13 @@ static void Close   (vlc_object_t *);
 #define ADAPT_LOWLATENCY_LONGTEXT N_("Overrides low latency parameters")
 
 static const AbstractAdaptationLogic::LogicType pi_logics[] = {
-                                AbstractAdaptationLogic::Default,
-                                AbstractAdaptationLogic::Predictive,
-                                AbstractAdaptationLogic::NearOptimal,
-                                AbstractAdaptationLogic::RateBased,
-                                AbstractAdaptationLogic::FixedRate,
-                                AbstractAdaptationLogic::AlwaysLowest,
-                                AbstractAdaptationLogic::AlwaysBest};
+                                AbstractAdaptationLogic::LogicType::Default,
+                                AbstractAdaptationLogic::LogicType::Predictive,
+                                AbstractAdaptationLogic::LogicType::NearOptimal,
+                                AbstractAdaptationLogic::LogicType::RateBased,
+                                AbstractAdaptationLogic::LogicType::FixedRate,
+                                AbstractAdaptationLogic::LogicType::AlwaysLowest,
+                                AbstractAdaptationLogic::LogicType::AlwaysBest};
 
 static const char *const ppsz_logics_values[] = {
                                 "",
@@ -180,7 +180,7 @@ static int Open(vlc_object_t *p_obj)
     PlaylistManager *p_manager = NULL;
 
     char *psz_logic = var_InheritString(p_obj, "adaptive-logic");
-    AbstractAdaptationLogic::LogicType logic = AbstractAdaptationLogic::Default;
+    AbstractAdaptationLogic::LogicType logic = AbstractAdaptationLogic::LogicType::Default;
     if( psz_logic )
     {
         bool b_found = false;

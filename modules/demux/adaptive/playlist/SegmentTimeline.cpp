@@ -34,7 +34,7 @@
 using namespace adaptive::playlist;
 
 SegmentTimeline::SegmentTimeline(AbstractMultipleSegmentBaseType *parent_)
-    : AttrsNode(Type::TIMELINE, parent_)
+    : AttrsNode(Type::Timeline, parent_)
 {
     totalLength = 0;
     parent = parent_;

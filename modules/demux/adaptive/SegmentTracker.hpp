@@ -62,14 +62,14 @@ namespace adaptive
             SegmentTrackerEvent(const ID &, bool);
             SegmentTrackerEvent(const ID &, vlc_tick_t, vlc_tick_t, vlc_tick_t);
             SegmentTrackerEvent(const ID &, vlc_tick_t);
-            enum
+            enum class Type
             {
-                DISCONTINUITY,
-                SWITCHING,
-                FORMATCHANGE,
-                BUFFERING_STATE,
-                BUFFERING_LEVEL_CHANGE,
-                SEGMENT_CHANGE,
+                Discontinuity,
+                RepresentationSwitch,
+                FormatChange,
+                SegmentChange,
+                BufferingStateUpdate,
+                BufferingLevelChange,
             } type;
             union
             {

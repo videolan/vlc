@@ -106,8 +106,8 @@ AbstractMultipleSegmentBaseType::~AbstractMultipleSegmentBaseType()
 void AbstractMultipleSegmentBaseType::updateWith(AbstractMultipleSegmentBaseType *updated,
                                                  bool)
 {
-    SegmentTimeline *local = static_cast<SegmentTimeline *>(getAttribute(Type::TIMELINE));
-    SegmentTimeline *other = static_cast<SegmentTimeline *>(updated->getAttribute(Type::TIMELINE));
+    SegmentTimeline *local = static_cast<SegmentTimeline *>(getAttribute(Type::Timeline));
+    SegmentTimeline *other = static_cast<SegmentTimeline *>(updated->getAttribute(Type::Timeline));
     if(local && other)
         local->updateWith(*other);
 }

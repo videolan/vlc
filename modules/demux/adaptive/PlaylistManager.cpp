@@ -775,19 +775,19 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
     AbstractAdaptationLogic *logic = NULL;
     switch(type)
     {
-        case AbstractAdaptationLogic::FixedRate:
+        case AbstractAdaptationLogic::LogicType::FixedRate:
         {
             size_t bps = var_InheritInteger(p_demux, "adaptive-bw") * 8192;
             logic = new (std::nothrow) FixedRateAdaptationLogic(obj, bps);
             break;
         }
-        case AbstractAdaptationLogic::AlwaysLowest:
+        case AbstractAdaptationLogic::LogicType::AlwaysLowest:
             logic = new (std::nothrow) AlwaysLowestAdaptationLogic(obj);
             break;
-        case AbstractAdaptationLogic::AlwaysBest:
+        case AbstractAdaptationLogic::LogicType::AlwaysBest:
             logic = new (std::nothrow) AlwaysBestAdaptationLogic(obj);
             break;
-        case AbstractAdaptationLogic::RateBased:
+        case AbstractAdaptationLogic::LogicType::RateBased:
         {
             RateBasedAdaptationLogic *ratelogic =
                     new (std::nothrow) RateBasedAdaptationLogic(obj);
@@ -796,13 +796,13 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
             logic = ratelogic;
             break;
         }
-        case AbstractAdaptationLogic::Default:
+        case AbstractAdaptationLogic::LogicType::Default:
 #ifdef ADAPTIVE_DEBUGGING_LOGIC
             logic = new (std::nothrow) RoundRobinLogic(obj);
             msg_Warn(p_demux, "using RoundRobinLogic every %u", RoundRobinLogic::QUANTUM);
             break;
 #endif
-        case AbstractAdaptationLogic::NearOptimal:
+        case AbstractAdaptationLogic::LogicType::NearOptimal:
         {
             NearOptimalAdaptationLogic *noplogic =
                     new (std::nothrow) NearOptimalAdaptationLogic(obj);
@@ -811,7 +811,7 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
             logic = noplogic;
             break;
         }
-        case AbstractAdaptationLogic::Predictive:
+        case AbstractAdaptationLogic::LogicType::Predictive:
         {
             AbstractAdaptationLogic *predictivelogic =
                     new (std::nothrow) PredictiveAdaptationLogic(obj);

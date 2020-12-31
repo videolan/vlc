@@ -107,7 +107,7 @@ void RateBasedAdaptationLogic::updateDownloadRate(const ID &, size_t size, vlc_t
 
 void RateBasedAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
 {
-    if(event.type == SegmentTrackerEvent::SWITCHING)
+    if(event.type == SegmentTrackerEvent::Type::RepresentationSwitch)
     {
         vlc_mutex_lock(&lock);
         if(event.u.switching.prev)

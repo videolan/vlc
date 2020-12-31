@@ -40,33 +40,33 @@ using namespace adaptive::playlist;
 
 SegmentTrackerEvent::SegmentTrackerEvent(SegmentChunk *s)
 {
-    type = DISCONTINUITY;
+    type = Type::Discontinuity;
     u.discontinuity.sc = s;
 }
 
 SegmentTrackerEvent::SegmentTrackerEvent(BaseRepresentation *prev, BaseRepresentation *next)
 {
-    type = SWITCHING;
+    type = Type::RepresentationSwitch;
     u.switching.prev = prev;
     u.switching.next = next;
 }
 
 SegmentTrackerEvent::SegmentTrackerEvent(const StreamFormat *fmt)
 {
-    type = FORMATCHANGE;
+    type = Type::FormatChange;
     u.format.f = fmt;
 }
 
 SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, bool enabled)
 {
-    type = BUFFERING_STATE;
+    type = Type::BufferingStateUpdate;
     u.buffering.enabled = enabled;
     u.buffering.id = &id;
 }
 
 SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, vlc_tick_t min, vlc_tick_t current, vlc_tick_t target)
 {
-    type = BUFFERING_LEVEL_CHANGE;
+    type = Type::BufferingLevelChange;
     u.buffering_level.minimum = min;
     u.buffering_level.current = current;
     u.buffering_level.target = target;
@@ -75,7 +75,7 @@ SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, vlc_tick_t min, vlc_tick_
 
 SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, vlc_tick_t duration)
 {
-    type = SEGMENT_CHANGE;
+    type = Type::SegmentChange;
     u.segment.duration = duration;
     u.segment.id = &id;
 }

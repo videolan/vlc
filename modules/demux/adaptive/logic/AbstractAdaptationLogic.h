@@ -52,7 +52,7 @@ namespace adaptive
                 virtual void                trackerEvent           (const SegmentTrackerEvent &) {}
                 void                        setMaxDeviceResolution (int, int);
 
-                enum LogicType
+                enum class LogicType
                 {
                     Default = 0,
                     AlwaysBest,

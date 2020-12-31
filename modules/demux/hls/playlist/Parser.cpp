@@ -199,7 +199,7 @@ static bool parseEncryption(const AttributesTag *keytag, const Url &playlistUrl,
     else
     {
         /* unsupported or invalid */
-        encryption.method = CommonEncryption::Method::NONE;
+        encryption.method = CommonEncryption::Method::None;
         encryption.uri.clear();
         encryption.iv.clear();
         return false;
@@ -296,7 +296,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                     discontinuity = false;
                 }
 
-                if(encryption.method != CommonEncryption::Method::NONE)
+                if(encryption.method != CommonEncryption::Method::None)
                     segment->setEncryption(encryption);
             }
             break;

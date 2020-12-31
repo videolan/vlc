@@ -38,13 +38,13 @@ using namespace adaptive::encryption;
 
 CommonEncryption::CommonEncryption()
 {
-    method = CommonEncryption::Method::NONE;
+    method = CommonEncryption::Method::None;
 }
 
 void CommonEncryption::mergeWith(const CommonEncryption &other)
 {
-    if(method == CommonEncryption::Method::NONE &&
-       other.method != CommonEncryption::Method::NONE)
+    if(method == CommonEncryption::Method::None &&
+       other.method != CommonEncryption::Method::None)
         method = other.method;
     if(uri.empty() && !other.uri.empty())
         uri = other.uri;
@@ -138,7 +138,7 @@ size_t CommonEncryptionSession::decrypt(void *inputdata, size_t inputbytes, bool
     }
     else
 #endif
-    if(encryption.method != CommonEncryption::Method::NONE)
+    if(encryption.method != CommonEncryption::Method::None)
     {
         inputbytes = 0;
     }
