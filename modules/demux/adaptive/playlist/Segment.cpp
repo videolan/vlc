@@ -184,7 +184,6 @@ void ISegment::setEncryption(CommonEncryption &e)
 Segment::Segment(ICanonicalUrl *parent) :
         ISegment(parent)
 {
-    size = -1;
 }
 
 SegmentChunk* Segment::createChunk(AbstractChunkSource *source, BaseRepresentation *rep)
