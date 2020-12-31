@@ -92,7 +92,7 @@ static inline void vlc_list_add_after(struct vlc_list *restrict node,
  * Inserts an element before another.
  *
  * \param node Node pointer of the element to insert [OUT].
- * \param prev Node pointer of the next element.
+ * \param next Node pointer of the next element.
  */
 static inline void vlc_list_add_before(struct vlc_list *restrict node,
                                        struct vlc_list *next)
@@ -143,7 +143,7 @@ static inline void vlc_list_remove(struct vlc_list *restrict node)
 /**
  * Replaces an element with another one.
  *
- * \param origin Node pointer of the element to remove from the list [IN].
+ * \param original Node pointer of the element to remove from the list [IN].
  * \param substitute Node pointer of the replacement [OUT].
  */
 static inline void vlc_list_replace(const struct vlc_list *original,
