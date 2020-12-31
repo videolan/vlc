@@ -55,6 +55,8 @@ namespace adaptive
                 };
                 AbstractAttr(enum Type);
                 virtual ~AbstractAttr();
+                AbstractAttr(const AbstractAttr &) = delete;
+                AbstractAttr & operator=(const AbstractAttr &) = delete;
                 Type getType() const;
                 bool operator ==(const AbstractAttr &t) const { return type == t.getType(); }
                 bool operator !=(const AbstractAttr &t) const { return type != t.getType(); }
@@ -71,6 +73,8 @@ namespace adaptive
             public:
                 AttrsNode( Type, AttrsNode * = NULL );
                 ~AttrsNode();
+                AttrsNode(const AttrsNode &) = delete;
+                AttrsNode & operator=(const AttrsNode &) = delete;
                 void addAttribute( AbstractAttr * );
                 void replaceAttribute( AbstractAttr * );
                 AbstractAttr * inheritAttribute(AbstractAttr::Type);
@@ -102,6 +106,8 @@ namespace adaptive
             public:
                 AttrWrapper(T v) : AbstractAttr(e) { value = v; }
                 virtual ~AttrWrapper() {}
+                AttrWrapper(const AttrWrapper &) = delete;
+                AttrWrapper<e, T> & operator=(const AttrWrapper<e, T> &) = delete;
                 operator const T&() const { return value; }
 
             protected:
