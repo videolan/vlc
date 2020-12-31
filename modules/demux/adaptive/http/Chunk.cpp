@@ -66,7 +66,7 @@ std::string AbstractChunkSource::getContentType() const
     return std::string();
 }
 
-enum RequestStatus AbstractChunkSource::getRequestStatus() const
+RequestStatus AbstractChunkSource::getRequestStatus() const
 {
     return requeststatus;
 }
@@ -87,7 +87,7 @@ std::string AbstractChunk::getContentType()
     return source->getContentType();
 }
 
-enum RequestStatus AbstractChunk::getRequestStatus() const
+RequestStatus AbstractChunk::getRequestStatus() const
 {
     return source->getRequestStatus();
 }

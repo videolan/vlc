@@ -29,7 +29,7 @@ namespace adaptive
     {
         class Transport;
 
-        enum RequestStatus
+        enum class RequestStatus
         {
             Success,
             Redirection,

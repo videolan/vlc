@@ -140,8 +140,8 @@ void HTTPConnection::disconnect()
     transport->disconnect();
 }
 
-enum RequestStatus
-    HTTPConnection::request(const std::string &path, const BytesRange &range)
+RequestStatus HTTPConnection::request(const std::string &path,
+                                      const BytesRange &range)
 {
     queryOk = false;
     chunked = false;
@@ -187,7 +187,7 @@ enum RequestStatus
         return RequestStatus::GenericError;
     }
 
-    enum RequestStatus status = parseReply();
+    RequestStatus status = parseReply();
     if(status == RequestStatus::Success)
     {
         queryOk = true;
@@ -252,8 +252,7 @@ bool HTTPConnection::send(const void *buf, size_t size)
     return transport->send(buf, size);
 }
 
-enum RequestStatus
-    HTTPConnection::parseReply()
+RequestStatus HTTPConnection::parseReply()
 {
     std::string statusline = readLine();
 
@@ -507,8 +506,8 @@ bool StreamUrlConnection::canReuse(const ConnectionParams &params_) const
             params.getPort() == params_.getPort());
 }
 
-enum RequestStatus
-    StreamUrlConnection::request(const std::string &path, const BytesRange &range)
+RequestStatus StreamUrlConnection::request(const std::string &path,
+                                           const BytesRange &range)
 {
     reset();
 

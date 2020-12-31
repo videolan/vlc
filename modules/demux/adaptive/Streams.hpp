@@ -69,23 +69,23 @@ namespace adaptive
         virtual bool reactivate(vlc_tick_t);
         bool isDisabled() const;
         bool isValid() const;
-        typedef enum {
-            status_eof = 0, /* prioritized */
-            status_discontinuity,
-            status_demuxed,
-            status_buffering,
-        } status;
-        typedef enum {
-            buffering_end = 0, /* prioritized */
-            buffering_suspended,
-            buffering_full,
-            buffering_ongoing,
-            buffering_lessthanmin,
-        } buffering_status;
-        buffering_status bufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t, bool = false);
-        buffering_status getLastBufferStatus() const;
+        enum class Status {
+            Eof = 0, /* prioritized */
+            Discontinuity,
+            Demuxed,
+            Buffering,
+        };
+        enum class BufferingStatus {
+            End = 0, /* prioritized */
+            Suspended,
+            Full,
+            Ongoing,
+            Lessthanmin,
+        };
+        BufferingStatus bufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t, bool = false);
+        BufferingStatus getLastBufferStatus() const;
         vlc_tick_t getDemuxedAmount(vlc_tick_t) const;
-        status dequeue(vlc_tick_t, vlc_tick_t *);
+        Status dequeue(vlc_tick_t, vlc_tick_t *);
         bool decodersDrained();
         virtual bool setPosition(vlc_tick_t, bool);
         bool getMediaPlaybackTimes(vlc_tick_t *, vlc_tick_t *, vlc_tick_t *,
@@ -137,8 +137,8 @@ namespace adaptive
 
     private:
         void declaredCodecs();
-        buffering_status doBufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t, bool);
-        buffering_status last_buffer_status;
+        BufferingStatus doBufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t, bool);
+        BufferingStatus last_buffer_status;
         bool valid;
         bool disabled;
         unsigned notfound_sequence;

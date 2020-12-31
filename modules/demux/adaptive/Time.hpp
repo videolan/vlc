@@ -23,7 +23,7 @@
 #include <vlc_common.h>
 
 /* Scaled time */
-typedef int64_t stime_t;
+using stime_t = int64_t;
 
 class Timescale
 {

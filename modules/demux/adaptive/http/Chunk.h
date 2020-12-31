@@ -54,10 +54,10 @@ namespace adaptive
                 void                setBytesRange   (const BytesRange &);
                 const BytesRange &  getBytesRange   () const;
                 virtual std::string getContentType  () const;
-                enum RequestStatus  getRequestStatus() const;
+                RequestStatus       getRequestStatus() const;
 
             protected:
-                enum RequestStatus  requeststatus;
+                RequestStatus       requeststatus;
                 size_t              contentLength;
                 BytesRange          bytesRange;
         };
@@ -68,7 +68,7 @@ namespace adaptive
                 virtual ~AbstractChunk();
 
                 std::string         getContentType          ();
-                enum RequestStatus  getRequestStatus        () const;
+                RequestStatus       getRequestStatus        () const;
                 size_t              getBytesRead            () const;
                 uint64_t            getStartByteInFile      () const;
                 bool                isEmpty                 () const;

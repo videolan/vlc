@@ -81,11 +81,11 @@ AbstractDemuxer::Status AbstractDemuxer::returnCode(int i_ret)
     switch(i_ret)
     {
         case VLC_DEMUXER_SUCCESS:
-            return Status::STATUS_SUCCESS;
+            return Status::Success;
         case VLC_DEMUXER_EGENERIC:
-            return Status::STATUS_END_OF_FILE;
+            return Status::Eof;
         default:
-            return Status::STATUS_ERROR;
+            return Status::Error;
     };
 }
 
@@ -166,7 +166,7 @@ void MimeDemuxer::drain()
 AbstractDemuxer::Status MimeDemuxer::demux(vlc_tick_t t)
 {
     if(!demuxer)
-        return Status::STATUS_END_OF_FILE;
+        return Status::Eof;
     return demuxer->demux(t);
 }
 
@@ -238,7 +238,7 @@ void Demuxer::drain()
 Demuxer::Status Demuxer::demux(vlc_tick_t)
 {
     if(!p_demux || b_eof)
-        return Status::STATUS_END_OF_FILE;
+        return Status::Eof;
     int i_ret = demux_Demux(p_demux);
     if(i_ret != VLC_DEMUXER_SUCCESS)
         b_eof = true;
@@ -278,7 +278,7 @@ AbstractDemuxer::Status SlaveDemuxer::demux(vlc_tick_t nz_deadline)
     if( demux_Control(p_demux, DEMUX_SET_NEXT_DEMUX_TIME, i_next_demux_time ) != VLC_SUCCESS )
     {
         b_eof = true;
-        return Status::STATUS_END_OF_FILE;
+        return Status::Eof;
     }
     Status status = Demuxer::demux(i_next_demux_time);
     es_out_Control(p_es_out, ES_OUT_SET_GROUP_PCR, 0, i_next_demux_time);
