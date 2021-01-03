@@ -571,6 +571,10 @@ static void CleanFromVideoContext(void *priv)
 
 static void ReleaseAllPictureContexts(decoder_sys_t *p_sys)
 {
+    /* No picture context if no direct rendering. */
+    if (p_sys->video.ctx == NULL)
+        return;
+
     for (size_t i = 0; i < ARRAY_SIZE(p_sys->video.apic_ctxs); ++i)
     {
         struct android_picture_ctx *apctx = &p_sys->video.apic_ctxs[i];
