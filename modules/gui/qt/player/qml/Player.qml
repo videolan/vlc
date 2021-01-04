@@ -215,7 +215,7 @@ Widgets.NavigableFocusScope {
             width: rootPlayer.width
             height: VLCStyle.dp(206, VLCStyle.scale)
             gradient: Gradient {
-                GradientStop { position: 0; color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.playerBg, .8) }
+                GradientStop { position: 0; color: Qt.rgba(0, 0, 0, .8) }
                 GradientStop { position: 1; color: "transparent" }
             }
         }
@@ -234,7 +234,8 @@ Widgets.NavigableFocusScope {
             height: VLCStyle.dp(206, VLCStyle.scale)
             gradient: Gradient {
                 GradientStop { position: 0; color: "transparent" }
-                GradientStop { position: 1; color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.playerBg, .8) }
+                GradientStop { position: .64; color: Qt.rgba(0, 0, 0, .8) }
+                GradientStop { position: 1; color: "black" }
             }
         }
     }
