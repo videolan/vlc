@@ -55,6 +55,7 @@ struct avformat_track_s
 {
     es_out_id_t *p_es;
     vlc_tick_t i_pcr;
+    es_format_t es_format;
 };
 
 /*****************************************************************************
@@ -712,6 +713,8 @@ int avformat_OpenDemux( vlc_object_t *p_this )
 
             es_fmt.i_id = i;
             p_track->p_es = es_out_Add( p_demux->out, &es_fmt );
+            if( p_track->p_es != NULL )
+                es_format_Copy( &p_track->es_format, &es_fmt );
             if( p_track->p_es && (s->disposition & AV_DISPOSITION_DEFAULT) )
                 es_out_Control( p_demux->out, ES_OUT_SET_ES_DEFAULT, p_track->p_es );
 
@@ -767,6 +770,8 @@ void avformat_CloseDemux( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    for( unsigned i = 0; i < p_sys->i_tracks; i++ )
+        es_format_Clean( &p_sys->tracks[i].es_format );
     free( p_sys->tracks );
 
     if( p_sys->ic )
@@ -822,6 +827,37 @@ static int Demux( demux_t *p_demux )
         av_packet_unref( &pkt );
         return 1;
     }
+
+    // handle extra data change, this can happen for FLV
+    int side_data_size;
+    uint8_t *side_data = av_packet_get_side_data( &pkt, AV_PKT_DATA_NEW_EXTRADATA, &side_data_size );
+    if( side_data_size > 0 ) {
+        // ignore new extradata which is the same as previous version
+        if( side_data_size != p_track->es_format.i_extra ||
+            memcmp( side_data, p_track->es_format.p_extra, side_data_size ) != 0 )
+        {
+            msg_Warn( p_demux, "New extra data found, seek may not work as expected" );
+            void *p_extra = realloc( p_track->es_format.p_extra, side_data_size );
+            bool success = p_extra != NULL;
+            if( likely(success) )
+            {
+                p_track->es_format.p_extra = p_extra;
+                memcpy( p_track->es_format.p_extra, side_data, side_data_size );
+                p_track->es_format.i_extra = side_data_size;
+                success = es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
+                        p_track->p_es, &p_track->es_format ) == VLC_SUCCESS;
+            }
+
+            if( !success )
+            {
+                FREENULL( p_track->es_format.p_extra );
+                p_track->es_format.i_extra = 0;
+                av_packet_unref( &pkt );
+                return 0;
+            }
+        }
+    }
+
     if( p_stream->codecpar->codec_id == AV_CODEC_ID_SSA )
     {
         p_frame = BuildSsaFrame( &pkt, p_sys->i_ssa_order++ );
