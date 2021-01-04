@@ -341,6 +341,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     p_sys->ic = 0;
     p_sys->fmt = fmt;
     p_sys->tracks = NULL;
+    p_sys->i_tracks = 0;
     p_sys->i_ssa_order = 0;
     TAB_INIT( p_sys->i_attachments, p_sys->attachments);
     p_sys->p_title = NULL;
