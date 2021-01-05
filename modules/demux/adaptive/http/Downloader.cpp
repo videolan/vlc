@@ -33,7 +33,7 @@ Downloader::Downloader()
 {
     killed = false;
     thread_handle_valid = false;
-    current = NULL;
+    current = nullptr;
 }
 
 bool Downloader::start()
@@ -53,7 +53,7 @@ Downloader::~Downloader()
     kill();
 
     if(thread_handle_valid)
-        vlc_join(thread_handle, NULL);
+        vlc_join(thread_handle, nullptr);
 }
 
 void Downloader::kill()
@@ -88,7 +88,7 @@ void * Downloader::downloaderThread(void *opaque)
 {
     Downloader *instance = static_cast<Downloader *>(opaque);
     instance->Run();
-    return NULL;
+    return nullptr;
 }
 
 void Downloader::Run()
@@ -115,7 +115,7 @@ void Downloader::Run()
             chunks.pop_front();
             current->release();
         }
-        current = NULL;
+        current = nullptr;
         updated_cond.signal();
         lock.unlock();
     }

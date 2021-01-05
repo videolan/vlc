@@ -38,7 +38,7 @@ block_t * DASHStream::checkBlock(block_t *p_block, bool)
 AbstractDemuxer *DASHStream::newDemux(vlc_object_t *p_obj, const StreamFormat &format,
                                       es_out_t *out, AbstractSourceStream *source) const
 {
-    AbstractDemuxer *ret = NULL;
+    AbstractDemuxer *ret = nullptr;
     switch((unsigned)format)
     {
         case StreamFormat::MP4:
@@ -73,7 +73,7 @@ AbstractStream * DASHStreamFactory::create(demux_t *realdemux, const StreamForma
     if(stream && !stream->init(format, tracker, manager))
     {
         delete stream;
-        return NULL;
+        return nullptr;
     }
     return stream;
 }

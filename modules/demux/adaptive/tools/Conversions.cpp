@@ -30,7 +30,7 @@
 /*
   Decodes a duration as defined by ISO 8601
   http://en.wikipedia.org/wiki/ISO_8601#Durations
-  @param str A null-terminated string to convert
+  @param str A nullptr-terminated string to convert
   @return: The duration in seconds. -1 if an error occurred.
 
   Exemple input string: "PT0H9M56.46S"
@@ -41,7 +41,7 @@ static vlc_tick_t str_duration( const char *psz_duration )
     vlc_tick_t  res = 0;
     char*       end_ptr;
 
-    if ( psz_duration == NULL )
+    if ( psz_duration == nullptr )
         return -1;
     if ( ( *(psz_duration++) ) != 'P' )
         return -1;

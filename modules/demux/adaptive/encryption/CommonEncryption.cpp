@@ -54,7 +54,7 @@ void CommonEncryption::mergeWith(const CommonEncryption &other)
 
 CommonEncryptionSession::CommonEncryptionSession()
 {
-    ctx = NULL;
+    ctx = nullptr;
 }
 
 
@@ -89,7 +89,7 @@ bool CommonEncryptionSession::start(SharedResources *res, const CommonEncryption
                 gcry_cipher_setiv(handle, &encryption.iv[0], 16) )
         {
             gcry_cipher_close(handle);
-            ctx = NULL;
+            ctx = nullptr;
             return false;
         }
         ctx = handle;
@@ -104,7 +104,7 @@ void CommonEncryptionSession::close()
     gcry_cipher_hd_t handle = reinterpret_cast<gcry_cipher_hd_t>(ctx);
     if(ctx)
         gcry_cipher_close(handle);
-    ctx = NULL;
+    ctx = nullptr;
 #endif
 }
 
@@ -118,7 +118,7 @@ size_t CommonEncryptionSession::decrypt(void *inputdata, size_t inputbytes, bool
     if(encryption.method == CommonEncryption::Method::AES_128 && ctx)
     {
         if ((inputbytes % 16) != 0 || inputbytes < 16 ||
-            gcry_cipher_decrypt(handle, inputdata, inputbytes, NULL, 0))
+            gcry_cipher_decrypt(handle, inputdata, inputbytes, nullptr, 0))
         {
             inputbytes = 0;
         }

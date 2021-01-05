@@ -58,7 +58,7 @@ Segment * SegmentList::getMediaSegment(uint64_t number) const
     {
         uint64_t listindex = timeline->getElementIndexBySequence(number);
         if(listindex >= segments.size())
-            return NULL;
+            return nullptr;
         return segments.at(listindex);
     }
 
@@ -75,7 +75,7 @@ Segment * SegmentList::getMediaSegment(uint64_t number) const
             break;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void SegmentList::addSegment(Segment *seg)
@@ -94,7 +94,7 @@ void SegmentList::updateWith(AbstractMultipleSegmentBaseType *updated_,
     if(!updated || updated->segments.empty())
         return;
 
-    const Segment * lastSegment = (segments.empty()) ? NULL : segments.back();
+    const Segment * lastSegment = (segments.empty()) ? nullptr : segments.back();
     const Segment * prevSegment = lastSegment;
 
     uint64_t firstnumber = updated->segments.front()->getSequenceNumber();
@@ -250,7 +250,7 @@ Segment *  SegmentList::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newpos,
     {
         uint64_t listindex = timeline->getElementIndexBySequence(i_pos);
         if(listindex >= segments.size())
-            return NULL;
+            return nullptr;
         return segments.at(listindex);
     }
 
@@ -265,7 +265,7 @@ Segment *  SegmentList::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newpos,
             return seg;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 uint64_t SegmentList::getStartSegmentNumber() const

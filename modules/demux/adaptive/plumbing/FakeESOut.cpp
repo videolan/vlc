@@ -138,7 +138,7 @@ FakeESOut * FakeESOut::LockedFakeEsOut::operator ->()
 FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
     : AbstractFakeEsOut()
     , real_es_out( es )
-    , extrainfo( NULL )
+    , extrainfo( nullptr )
     , commandsqueue( queue )
     , timestamps_offset( 0 )
 {
@@ -241,7 +241,7 @@ FakeESOutID * FakeESOut::createNewID( const es_format_t *p_fmt )
 void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
 {
     std::list<FakeESOutID *>::iterator it;
-    es_out_id_t *realid = NULL;
+    es_out_id_t *realid = nullptr;
 
     /* declared ES must are temporary until real ES decl */
     recycle_candidates.insert(recycle_candidates.begin(), declared.begin(), declared.end());
@@ -255,7 +255,7 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
         if ( cand->isCompatible( es_id ) )
         {
             realid = cand->realESID();
-            cand->setRealESID( NULL );
+            cand->setRealESID( nullptr );
             delete *it;
             recycle_candidates.erase( it );
             break;
@@ -465,7 +465,7 @@ es_out_id_t * FakeESOut::esOutAdd(const es_format_t *p_fmt)
     vlc_mutex_locker locker(&lock);
 
     if( p_fmt->i_cat != VIDEO_ES && p_fmt->i_cat != AUDIO_ES && p_fmt->i_cat != SPU_ES )
-        return NULL;
+        return nullptr;
 
     /* Feed the slave demux/stream_Demux with FakeESOutID struct,
      * we'll create real ES later on main demux on execution */
@@ -485,7 +485,7 @@ es_out_id_t * FakeESOut::esOutAdd(const es_format_t *p_fmt)
             delete es_id;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 int FakeESOut::esOutSend(es_out_id_t *p_es, block_t *p_block)

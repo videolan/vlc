@@ -107,7 +107,7 @@ stream_t * AbstractChunksSourceStream::makeStream()
     {
         p_stream->pf_control = control_Callback;
         p_stream->pf_read = read_Callback;
-        p_stream->pf_readdir = NULL;
+        p_stream->pf_readdir = nullptr;
         p_stream->pf_seek = seek_Callback;
         p_stream->p_sys = this;
     }
@@ -117,7 +117,7 @@ stream_t * AbstractChunksSourceStream::makeStream()
 ChunksSourceStream::ChunksSourceStream(vlc_object_t *p_obj_, AbstractSource *source_)
     : AbstractChunksSourceStream(p_obj_, source_)
 {
-    p_block = NULL;
+    p_block = nullptr;
 }
 
 ChunksSourceStream::~ChunksSourceStream()
@@ -130,7 +130,7 @@ void ChunksSourceStream::Reset()
 {
     if(p_block)
         block_Release(p_block);
-    p_block = NULL;
+    p_block = nullptr;
     AbstractChunksSourceStream::Reset();
 }
 
@@ -186,7 +186,7 @@ ssize_t ChunksSourceStream::Read(uint8_t *buf, size_t size)
             i_copied += p_block->i_buffer;
             i_toread -= p_block->i_buffer;
             block_Release(p_block);
-            p_block = NULL;
+            p_block = nullptr;
         }
     }
 
@@ -204,7 +204,7 @@ BufferedChunksSourceStream::BufferedChunksSourceStream(vlc_object_t *p_obj_, Abs
     i_global_offset = 0;
     i_bytestream_offset = 0;
     block_BytestreamInit( &bs );
-    p_peekdata = NULL;
+    p_peekdata = nullptr;
 }
 
 BufferedChunksSourceStream::~BufferedChunksSourceStream()
@@ -258,7 +258,7 @@ ssize_t BufferedChunksSourceStream::Read(uint8_t *buf, size_t i_toread)
         const size_t i_drop = i_bytestream_offset - MAX_BACKEND;
         if(i_drop >= MIN_BACKEND_CLEANUP) /* Dont flush for few bytes */
         {
-            block_GetBytes(&bs, NULL, i_drop);
+            block_GetBytes(&bs, nullptr, i_drop);
             block_BytestreamFlush(&bs);
             i_bytestream_offset -= i_drop;
             i_global_offset += i_drop;
@@ -328,6 +328,6 @@ void BufferedChunksSourceStream::invalidatePeek()
     if(p_peekdata)
     {
         block_Release(p_peekdata);
-        p_peekdata = NULL;
+        p_peekdata = nullptr;
     }
 }

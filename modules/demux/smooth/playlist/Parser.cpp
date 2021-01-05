@@ -54,7 +54,7 @@ ManifestParser::~ManifestParser()
 
 static SegmentTimeline *createTimeline(Node *streamIndexNode)
 {
-    SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline(NULL);
+    SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline(nullptr);
     if(timeline)
     {
         std::vector<Node *> chunks = DOMHelper::getElementByTagName(streamIndexNode, "c", true);
@@ -264,7 +264,7 @@ Manifest * ManifestParser::parse()
 {
     Manifest *manifest = new (std::nothrow) Manifest(p_object);
     if(!manifest)
-        return NULL;
+        return nullptr;
 
     manifest->setPlaylistUrl(Helper::getDirectoryPath(playlisturl).append("/"));
 

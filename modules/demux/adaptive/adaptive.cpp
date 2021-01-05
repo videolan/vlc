@@ -129,7 +129,7 @@ vlc_module_begin ()
         set_capability( "demux", 12 )
         set_category( CAT_INPUT )
         set_subcategory( SUBCAT_INPUT_DEMUX )
-        add_string( "adaptive-logic",  "", ADAPT_LOGIC_TEXT, NULL, false )
+        add_string( "adaptive-logic",  "", ADAPT_LOGIC_TEXT, nullptr, false )
             change_string_list( ppsz_logics_values, ppsz_logics )
         add_integer( "adaptive-maxwidth",  0,
                      ADAPT_WIDTH_TEXT,  ADAPT_WIDTH_TEXT,  false )
@@ -142,7 +142,7 @@ vlc_module_begin ()
                      ADAPT_BUFFER_TEXT, ADAPT_BUFFER_LONGTEXT, true );
         add_integer( "adaptive-maxbuffer",
                      MS_FROM_VLC_TICK(AbstractBufferingLogic::DEFAULT_MAX_BUFFERING),
-                     ADAPT_MAXBUFFER_TEXT, NULL, true );
+                     ADAPT_MAXBUFFER_TEXT, nullptr, true );
         add_integer( "adaptive-lowlatency", -1, ADAPT_LOWLATENCY_TEXT, ADAPT_LOWLATENCY_LONGTEXT, true );
             change_integer_list(rgi_latency, ppsz_latency)
         set_callbacks( Open, Close )
@@ -177,7 +177,7 @@ static int Open(vlc_object_t *p_obj)
         free(psz_mime);
     }
 
-    PlaylistManager *p_manager = NULL;
+    PlaylistManager *p_manager = nullptr;
 
     char *psz_logic = var_InheritString(p_obj, "adaptive-logic");
     AbstractAdaptationLogic::LogicType logic = AbstractAdaptationLogic::LogicType::Default;
@@ -287,21 +287,21 @@ static PlaylistManager * HandleDash(demux_t *p_demux, DOMParser &xmlParser,
     if(!xmlParser.reset(p_demux->s) || !xmlParser.parse(true))
     {
         msg_Err(p_demux, "Cannot parse MPD");
-        return NULL;
+        return nullptr;
     }
     IsoffMainParser mpdparser(xmlParser.getRootNode(), VLC_OBJECT(p_demux),
                               p_demux->s, playlisturl);
     MPD *p_playlist = mpdparser.parse();
-    if(p_playlist == NULL)
+    if(p_playlist == nullptr)
     {
         msg_Err( p_demux, "Cannot create/unknown MPD for profile");
-        return NULL;
+        return nullptr;
     }
 
     SharedResources *resources =
             SharedResources::createDefault(VLC_OBJECT(p_demux), playlisturl);
     DASHStreamFactory *factory = new (std::nothrow) DASHStreamFactory;
-    DASHManager *manager = NULL;
+    DASHManager *manager = nullptr;
     if(!resources || !factory ||
        !(manager = new (std::nothrow) DASHManager(p_demux, resources,
                                                   p_playlist, factory, logic)))
@@ -320,21 +320,21 @@ static PlaylistManager * HandleSmooth(demux_t *p_demux, DOMParser &xmlParser,
     if(!xmlParser.reset(p_demux->s) || !xmlParser.parse(true))
     {
         msg_Err(p_demux, "Cannot parse Manifest");
-        return NULL;
+        return nullptr;
     }
     ManifestParser mparser(xmlParser.getRootNode(), VLC_OBJECT(p_demux),
                            p_demux->s, playlisturl);
     Manifest *p_playlist = mparser.parse();
-    if(p_playlist == NULL)
+    if(p_playlist == nullptr)
     {
         msg_Err( p_demux, "Cannot create Manifest");
-        return NULL;
+        return nullptr;
     }
 
     SharedResources *resources =
             SharedResources::createDefault(VLC_OBJECT(p_demux), playlisturl);
     SmoothStreamFactory *factory = new (std::nothrow) SmoothStreamFactory;
-    SmoothManager *manager = NULL;
+    SmoothManager *manager = nullptr;
     if(!resources || !factory ||
        !(manager = new (std::nothrow) SmoothManager(p_demux, resources,
                                                     p_playlist, factory, logic)))
@@ -353,7 +353,7 @@ static PlaylistManager * HandleHLS(demux_t *p_demux,
     SharedResources *resources =
             SharedResources::createDefault(VLC_OBJECT(p_demux), playlisturl);
     if(!resources)
-        return NULL;
+        return nullptr;
 
     M3U8Parser parser(resources);
     M3U8 *p_playlist = parser.parse(VLC_OBJECT(p_demux),p_demux->s, playlisturl);
@@ -361,11 +361,11 @@ static PlaylistManager * HandleHLS(demux_t *p_demux,
     {
         msg_Err( p_demux, "Could not parse playlist" );
         delete resources;
-        return NULL;
+        return nullptr;
     }
 
     HLSStreamFactory *factory = new (std::nothrow) HLSStreamFactory;
-    HLSManager *manager = NULL;
+    HLSManager *manager = nullptr;
     if(!factory ||
        !(manager = new (std::nothrow) HLSManager(p_demux, resources,
                                                  p_playlist, factory, logic)))

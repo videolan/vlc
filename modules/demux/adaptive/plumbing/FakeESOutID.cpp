@@ -29,7 +29,7 @@ using namespace adaptive;
 
 FakeESOutID::FakeESOutID( FakeESOut *fakeesout, const es_format_t *p_fmt )
     : fakeesout( fakeesout )
-    , p_real_es_id( NULL )
+    , p_real_es_id( nullptr )
     , pending_delete( false )
 {
     es_format_Copy( &fmt, p_fmt );

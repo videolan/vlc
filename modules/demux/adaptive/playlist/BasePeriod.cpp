@@ -63,7 +63,7 @@ const std::vector<BaseAdaptationSet*>&  BasePeriod::getAdaptationSets() const
 
 void BasePeriod::addAdaptationSet(BaseAdaptationSet *adaptationSet)
 {
-    if ( adaptationSet != NULL )
+    if ( adaptationSet != nullptr )
     {
         if(adaptationSet->getRepresentations().empty())
         {
@@ -83,7 +83,7 @@ BaseAdaptationSet *BasePeriod::getAdaptationSetByID(const adaptive::ID &id)
         if( (*it)->getID() == id )
             return *it;
     }
-    return NULL;
+    return nullptr;
 }
 
 void BasePeriod::debug(vlc_object_t *obj, int indent) const

@@ -48,7 +48,7 @@ ForgedInitSegment::ForgedInitSegment(ICanonicalUrl *parent,
 {
     type = type_;
     duration.Set(duration_);
-    extradata = NULL;
+    extradata = nullptr;
     i_extradata = 0;
     timescale = timescale_;
     formatex.cbSize = 0;
@@ -76,7 +76,7 @@ static uint8_t *HexDecode(const std::string &s, size_t *decoded_size)
     if(data)
     {
         for(size_t i=0; i<*decoded_size; i++)
-            data[i] = std::strtoul(s.substr(i*2, 2).c_str(), NULL, 16);
+            data[i] = std::strtoul(s.substr(i*2, 2).c_str(), nullptr, 16);
     }
     return data;
 }
@@ -86,7 +86,7 @@ void ForgedInitSegment::fromWaveFormatEx(const uint8_t *p_data, size_t i_data)
     if(i_data >= sizeof(WAVEFORMATEX))
     {
         formatex.wFormatTag = GetWLE(p_data);
-        wf_tag_to_fourcc(formatex.wFormatTag, &fourcc, NULL);
+        wf_tag_to_fourcc(formatex.wFormatTag, &fourcc, nullptr);
         formatex.nChannels = GetWLE(&p_data[2]);
         formatex.nSamplesPerSec = GetDWLE(&p_data[4]);
         formatex.nAvgBytesPerSec = GetDWLE(&p_data[8]);
@@ -98,7 +98,7 @@ void ForgedInitSegment::fromWaveFormatEx(const uint8_t *p_data, size_t i_data)
             if(extradata)
             {
                 free(extradata);
-                extradata = NULL;
+                extradata = nullptr;
                 i_extradata = 0;
             }
             formatex.cbSize = __MIN(i_data - sizeof(WAVEFORMATEX), formatex.cbSize);
@@ -132,7 +132,7 @@ void ForgedInitSegment::setCodecPrivateData(const std::string &extra)
     if(extradata)
     {
         free(extradata);
-        extradata = NULL;
+        extradata = nullptr;
         i_extradata = 0;
     }
     extradata = HexDecode(extra, &i_extradata);
@@ -175,7 +175,7 @@ void ForgedInitSegment::setTrackID(unsigned i)
 
 void ForgedInitSegment::setAudioTag(uint16_t i)
 {
-    wf_tag_to_fourcc(i, &fourcc, NULL);
+    wf_tag_to_fourcc(i, &fourcc, nullptr);
 }
 
 void ForgedInitSegment::setFourCC(const std::string &fcc)
@@ -272,11 +272,11 @@ block_t * ForgedInitSegment::buildMoovBox()
     if(!language.empty())
         fmt.psz_language = strdup(language.c_str());
 
-    bo_t *box = NULL;
+    bo_t *box = nullptr;
     mp4mux_handle_t *muxh = mp4mux_New(FRAGMENTED);
     if(muxh)
     {
-        if(mp4mux_CanMux(NULL, &fmt, VLC_FOURCC('s', 'm', 'o', 'o'), true ))
+        if(mp4mux_CanMux(nullptr, &fmt, VLC_FOURCC('s', 'm', 'o', 'o'), true ))
         {
             mp4mux_trackinfo_t *p_track = mp4mux_track_Add(muxh,
                                      0x01, /* Will always be 1st and unique track; tfhd patched on block read */
@@ -285,14 +285,14 @@ block_t * ForgedInitSegment::buildMoovBox()
                 mp4mux_track_ForceDuration(p_track, duration.Get());
         }
 
-        box = mp4mux_GetMoov(muxh, NULL, timescale.ToTime(duration.Get()));
+        box = mp4mux_GetMoov(muxh, nullptr, timescale.ToTime(duration.Get()));
     }
     es_format_Clean(&fmt);
 
     if(!box)
     {
         mp4mux_Delete(muxh);
-        return NULL;
+        return nullptr;
     }
 
     block_t *moov = box->b;
@@ -332,5 +332,5 @@ SegmentChunk* ForgedInitSegment::toChunk(SharedResources *, AbstractConnectionMa
                 delete source;
         }
     }
-    return NULL;
+    return nullptr;
 }

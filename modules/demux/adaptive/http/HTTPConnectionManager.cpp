@@ -39,7 +39,7 @@ AbstractConnectionManager::AbstractConnectionManager(vlc_object_t *p_object_)
     : IDownloadRateObserver()
 {
     p_object = p_object_;
-    rateObserver = NULL;
+    rateObserver = nullptr;
 }
 
 AbstractConnectionManager::~AbstractConnectionManager()
@@ -103,18 +103,18 @@ AbstractConnection * HTTPConnectionManager::reuseConnection(ConnectionParams &pa
         if(conn->canReuse(params))
             return conn;
     }
-    return NULL;
+    return nullptr;
 }
 
 AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &params)
 {
     if(unlikely(factories.empty() || !downloader))
-        return NULL;
+        return nullptr;
 
     if(params.isLocal())
     {
         if(!localAllowed)
-            return NULL;
+            return nullptr;
     }
 
     vlc_mutex_lock(&lock);
@@ -127,7 +127,7 @@ AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &para
         if(!conn)
         {
             vlc_mutex_unlock(&lock);
-            return NULL;
+            return nullptr;
         }
 
         connectionPool.push_back(conn);
@@ -135,7 +135,7 @@ AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &para
         if (!conn->prepare(params))
         {
             vlc_mutex_unlock(&lock);
-            return NULL;
+            return nullptr;
         }
     }
 

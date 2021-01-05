@@ -44,7 +44,7 @@ AbstractStream::AbstractStream(demux_t * demux_)
 {
     p_realdemux = demux_;
     format = StreamFormat::UNKNOWN;
-    currentChunk = NULL;
+    currentChunk = nullptr;
     eof = false;
     valid = true;
     disabled = false;
@@ -52,10 +52,10 @@ AbstractStream::AbstractStream(demux_t * demux_)
     needrestart = false;
     inrestart = false;
     demuxfirstchunk = false;
-    segmentTracker = NULL;
-    demuxersource = NULL;
-    demuxer = NULL;
-    fakeesout = NULL;
+    segmentTracker = nullptr;
+    demuxersource = nullptr;
+    demuxer = nullptr;
+    fakeesout = nullptr;
     notfound_sequence = 0;
     last_buffer_status = BufferingStatus::Lessthanmin;
     vlc_mutex_init(&lock);
@@ -96,7 +96,7 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, 
                     return true;
                 }
                 delete commandsqueue;
-                commandsqueue = NULL;
+                commandsqueue = nullptr;
             }
             else
             {
@@ -137,7 +137,7 @@ void AbstractStream::prepareRestart(bool b_discontinuity)
         fakeEsOut()->commandsQueue()->setDrop(true);
         delete demuxer;
         fakeEsOut()->commandsQueue()->setDrop(false);
-        demuxer = NULL;
+        demuxer = nullptr;
     }
 }
 
@@ -469,7 +469,7 @@ AbstractStream::Status AbstractStream::dequeue(vlc_tick_t nz_deadline, vlc_tick_
 
 std::string AbstractStream::getContentType()
 {
-    if (currentChunk == NULL && !eof)
+    if (currentChunk == nullptr && !eof)
     {
         const bool b_restarting = fakeEsOut()->restarting();
         currentChunk = segmentTracker->getNextChunk(!b_restarting, connManager);
@@ -482,7 +482,7 @@ std::string AbstractStream::getContentType()
 
 block_t * AbstractStream::readNextBlock()
 {
-    if (currentChunk == NULL && !eof)
+    if (currentChunk == nullptr && !eof)
     {
         const bool b_restarting = fakeEsOut()->restarting();
         currentChunk = segmentTracker->getNextChunk(!b_restarting, connManager);
@@ -498,19 +498,19 @@ block_t * AbstractStream::readNextBlock()
     {
         msg_Info(p_realdemux, "Encountered discontinuity");
         /* Force stream/demuxer to end for this call */
-        return NULL;
+        return nullptr;
     }
 
-    if(currentChunk == NULL)
+    if(currentChunk == nullptr)
     {
         eof = true;
-        return NULL;
+        return nullptr;
     }
 
     const bool b_segment_head_chunk = (currentChunk->getBytesRead() == 0);
 
     block_t *block = currentChunk->readBlock();
-    if(block == NULL)
+    if(block == nullptr)
     {
         if(currentChunk->getRequestStatus() == RequestStatus::NotFound &&
            ++notfound_sequence < 3)
@@ -518,8 +518,8 @@ block_t * AbstractStream::readNextBlock()
             discontinuity = true;
         }
         delete currentChunk;
-        currentChunk = NULL;
-        return NULL;
+        currentChunk = nullptr;
+        return nullptr;
     }
     else notfound_sequence = 0;
 
@@ -528,7 +528,7 @@ block_t * AbstractStream::readNextBlock()
     if (currentChunk->isEmpty())
     {
         delete currentChunk;
-        currentChunk = NULL;
+        currentChunk = nullptr;
     }
 
     block = checkBlock(block, b_segment_head_chunk);
@@ -553,7 +553,7 @@ bool AbstractStream::setPosition(vlc_tick_t time, bool tryonly)
         {
             if(currentChunk)
                 delete currentChunk;
-            currentChunk = NULL;
+            currentChunk = nullptr;
             needrestart = false;
 
             fakeEsOut()->resetTimestamps();
@@ -611,7 +611,7 @@ AbstractDemuxer * AbstractStream::createDemux(const StreamFormat &format)
     if(ret && !ret->create())
     {
         delete ret;
-        ret = NULL;
+        ret = nullptr;
     }
     else fakeEsOut()->commandsQueue()->Commit();
 
@@ -621,7 +621,7 @@ AbstractDemuxer * AbstractStream::createDemux(const StreamFormat &format)
 AbstractDemuxer *AbstractStream::newDemux(vlc_object_t *p_obj, const StreamFormat &format,
                                           es_out_t *out, AbstractSourceStream *source) const
 {
-    AbstractDemuxer *ret = NULL;
+    AbstractDemuxer *ret = nullptr;
     switch((unsigned)format)
     {
         case StreamFormat::MP4:

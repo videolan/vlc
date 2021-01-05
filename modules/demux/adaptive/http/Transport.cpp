@@ -27,8 +27,8 @@ using namespace adaptive::http;
 
 Transport::Transport(bool b_secure_)
 {
-    creds = NULL;
-    tls = NULL;
+    creds = nullptr;
+    tls = nullptr;
     b_secure = b_secure_;
 }
 
@@ -49,11 +49,11 @@ bool Transport::connect(vlc_object_t *p_object, const std::string &hostname, int
         if(!creds)
             return false;
         tls = vlc_tls_SocketOpenTLS(creds, hostname.c_str(), port, "https",
-                                    NULL, NULL );
+                                    nullptr, nullptr );
         if(!tls)
         {
             vlc_tls_ClientDelete(creds);
-            creds = NULL;
+            creds = nullptr;
         }
     }
     else
@@ -61,12 +61,12 @@ bool Transport::connect(vlc_object_t *p_object, const std::string &hostname, int
         tls = vlc_tls_SocketOpenTCP(p_object, hostname.c_str(), port);
     }
 
-    return tls != NULL;
+    return tls != nullptr;
 }
 
 bool Transport::connected() const
 {
-    return tls != NULL;
+    return tls != nullptr;
 }
 
 void Transport::disconnect()
@@ -74,13 +74,13 @@ void Transport::disconnect()
     if(tls)
     {
         vlc_tls_Close(tls);
-        tls = NULL;
+        tls = nullptr;
     }
 
     if(creds)
     {
         vlc_tls_ClientDelete(creds);
-        creds = NULL;
+        creds = nullptr;
     }
 }
 
@@ -92,7 +92,7 @@ ssize_t Transport::read(void *p_buffer, size_t len)
 std::string Transport::readline()
 {
     char *line = ::vlc_tls_GetLine(tls);
-    if(line == NULL)
+    if(line == nullptr)
         return "";
 
     std::string ret(line);

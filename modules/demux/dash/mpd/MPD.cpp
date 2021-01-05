@@ -41,7 +41,7 @@ MPD::MPD (vlc_object_t *p_object, Profile profile_) :
     BasePlaylist(p_object),
     profile( profile_ )
 {
-    programInfo.Set( NULL );
+    programInfo.Set( nullptr );
     lowLatency = false;
 }
 

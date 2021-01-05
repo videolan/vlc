@@ -102,7 +102,7 @@ SegmentTracker::~SegmentTracker()
 SegmentTracker::Position::Position()
 {
     number = std::numeric_limits<uint64_t>::max();
-    rep = NULL;
+    rep = nullptr;
     init_sent = false;
     index_sent = false;
 }
@@ -118,7 +118,7 @@ SegmentTracker::Position::Position(BaseRepresentation *rep, uint64_t number)
 bool SegmentTracker::Position::isValid() const
 {
     return number != std::numeric_limits<uint64_t>::max() &&
-           rep != NULL;
+           rep != nullptr;
 }
 
 std::string SegmentTracker::Position::toString() const
@@ -160,7 +160,7 @@ StreamFormat SegmentTracker::getCurrentFormat() const
 {
     BaseRepresentation *rep = current.rep;
     if(!rep)
-        rep = logic->getNextRepresentation(adaptationSet, NULL);
+        rep = logic->getNextRepresentation(adaptationSet, nullptr);
     if(rep)
     {
         /* Ensure ephemere content is updated/loaded */
@@ -175,7 +175,7 @@ std::list<std::string> SegmentTracker::getCurrentCodecs() const
 {
     BaseRepresentation *rep = current.rep;
     if(!rep)
-        rep = logic->getNextRepresentation(adaptationSet, NULL);
+        rep = logic->getNextRepresentation(adaptationSet, nullptr);
     if(rep)
         return rep->getCodecs();
     return std::list<std::string>();
@@ -198,7 +198,7 @@ const Role & SegmentTracker::getStreamRole() const
 
 void SegmentTracker::reset()
 {
-    notify(SegmentTrackerEvent(current.rep, NULL));
+    notify(SegmentTrackerEvent(current.rep, nullptr));
     current = Position();
     next = Position();
     initializing = true;
@@ -211,7 +211,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     ISegment *segment;
 
     if(!adaptationSet)
-        return NULL;
+        return nullptr;
 
     bool b_updated = false;
     bool b_switched = false;
@@ -253,7 +253,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     }
 
     if(!next.isValid())
-        return NULL;
+        return nullptr;
 
     if(b_switched)
     {
@@ -277,7 +277,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
         {
             format = current.rep->getStreamFormat();
             notify(SegmentTrackerEvent(&format)); /* Notify new demux format */
-            return NULL; /* Force current demux to end */
+            return nullptr; /* Force current demux to end */
         }
     }
     else if(format == StreamFormat(StreamFormat::UNKNOWN) && b_switched)
@@ -285,12 +285,12 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
         /* Handle the corner case when only the demuxer can know the format and
          * demuxer starts after the format change (Probe != buffering) */
         notify(SegmentTrackerEvent(&format)); /* Notify new demux format */
-        return NULL; /* Force current demux to end */
+        return nullptr; /* Force current demux to end */
     }
 
     if(format == StreamFormat(StreamFormat::UNSUPPORTED))
     {
-        return NULL; /* Can't return chunk because no demux will be created */
+        return nullptr; /* Can't return chunk because no demux will be created */
     }
 
     if(!current.init_sent)
@@ -317,7 +317,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     bool b_gap = false;
     segment = current.rep->getNextMediaSegment(current.number, &current.number, &b_gap);
     if(!segment)
-        return NULL;
+        return nullptr;
     if(b_gap)
         next = current;
 
@@ -361,7 +361,7 @@ bool SegmentTracker::setPositionByTime(vlc_tick_t time, bool restarted, bool try
 {
     Position pos = Position(current.rep, current.number);
     if(!pos.isValid())
-        pos.rep = logic->getNextRepresentation(adaptationSet, NULL);
+        pos.rep = logic->getNextRepresentation(adaptationSet, nullptr);
 
     if(!pos.rep)
         return false;
@@ -395,7 +395,7 @@ void SegmentTracker::setPosition(const Position &pos, bool restarted)
 SegmentTracker::Position SegmentTracker::getStartPosition()
 {
     Position pos;
-    pos.rep = logic->getNextRepresentation(adaptationSet, NULL);
+    pos.rep = logic->getNextRepresentation(adaptationSet, nullptr);
     if(pos.rep)
     {
         /* Ensure ephemere content is updated/loaded */
@@ -425,7 +425,7 @@ vlc_tick_t SegmentTracker::getPlaybackTime(bool b_next) const
 
     BaseRepresentation *rep = current.rep;
     if(!rep)
-        rep = logic->getNextRepresentation(adaptationSet, NULL);
+        rep = logic->getNextRepresentation(adaptationSet, nullptr);
 
     if(rep &&
        rep->getPlaybackTimeDurationBySegmentNumber(b_next ? next.number : current.number, &time, &duration))
@@ -447,7 +447,7 @@ vlc_tick_t SegmentTracker::getMinAheadTime() const
 {
     BaseRepresentation *rep = current.rep;
     if(!rep)
-        rep = logic->getNextRepresentation(adaptationSet, NULL);
+        rep = logic->getNextRepresentation(adaptationSet, nullptr);
     if(rep)
     {
         /* Ensure ephemere content is updated/loaded */

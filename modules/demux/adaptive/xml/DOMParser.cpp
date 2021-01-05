@@ -34,16 +34,16 @@
 using namespace adaptive::xml;
 
 DOMParser::DOMParser() :
-    root( NULL ),
-    stream( NULL ),
-    vlc_reader( NULL )
+    root( nullptr ),
+    stream( nullptr ),
+    vlc_reader( nullptr )
 {
 }
 
 DOMParser::DOMParser    (stream_t *stream) :
-    root( NULL ),
+    root( nullptr ),
     stream( stream ),
-    vlc_reader( NULL )
+    vlc_reader( nullptr )
 {
 }
 
@@ -68,10 +68,10 @@ bool    DOMParser::parse                    (bool b)
 
     struct vlc_logger *const logger = vlc_reader->obj.logger;
     if(!b)
-        vlc_reader->obj.logger = NULL;
+        vlc_reader->obj.logger = nullptr;
     root = processNode(b);
     vlc_reader->obj.logger = logger;
-    if ( root == NULL )
+    if ( root == nullptr )
         return false;
 
     return true;
@@ -83,7 +83,7 @@ bool DOMParser::reset(stream_t *s)
     if(!vlc_reader)
         return true;
     delete root;
-    root = NULL;
+    root = nullptr;
 
     xml_ReaderDelete(vlc_reader);
     vlc_reader = xml_ReaderCreate(s, s);
@@ -129,7 +129,7 @@ Node* DOMParser::processNode(bool b_strict)
             case XML_READER_ENDELEM:
             {
                 if(lifo.empty())
-                    return NULL;
+                    return nullptr;
 
                 Node *node = lifo.top();
                 lifo.pop();
@@ -145,12 +145,12 @@ Node* DOMParser::processNode(bool b_strict)
     while( lifo.size() > 1 )
         lifo.pop();
 
-    Node *node = (!lifo.empty()) ? lifo.top() : NULL;
+    Node *node = (!lifo.empty()) ? lifo.top() : nullptr;
 
     if(b_strict && node)
     {
         delete node;
-        return NULL;
+        return nullptr;
     }
 
     return node;
@@ -161,7 +161,7 @@ void    DOMParser::addAttributesToNode      (Node *node)
     const char *attrValue;
     const char *attrName;
 
-    while((attrName = xml_ReaderNextAttr(this->vlc_reader, &attrValue)) != NULL)
+    while((attrName = xml_ReaderNextAttr(this->vlc_reader, &attrValue)) != nullptr)
     {
         std::string key     = attrName;
         std::string value   = attrValue;

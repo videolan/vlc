@@ -128,7 +128,7 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
 AbstractDemuxer *HLSStream::newDemux(vlc_object_t *p_obj, const StreamFormat &format,
                                      es_out_t *out, AbstractSourceStream *source) const
 {
-    AbstractDemuxer *ret = NULL;
+    AbstractDemuxer *ret = nullptr;
     switch((unsigned)format)
     {
         case StreamFormat::PACKEDAAC:
@@ -171,7 +171,7 @@ AbstractStream * HLSStreamFactory::create(demux_t *realdemux, const StreamFormat
     if(stream && !stream->init(format, tracker, manager))
     {
         delete stream;
-        return NULL;
+        return nullptr;
     }
     return stream;
 }

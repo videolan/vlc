@@ -58,7 +58,7 @@ void FormatNamespace::ParseMPEG4Elements(const std::vector<std::string> &element
         return;
 
     uint8_t objectType = std::stoi(elements.at(0).substr(0,2), nullptr, 16);
-    if(!MPEG4_Codec_By_ObjectType(objectType, NULL, 0,
+    if(!MPEG4_Codec_By_ObjectType(objectType, nullptr, 0,
                                   &fmt.i_codec,
                                   &fmt.i_profile))
         return;

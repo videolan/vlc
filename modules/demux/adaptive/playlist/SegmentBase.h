@@ -40,7 +40,7 @@ namespace adaptive
                             public AbstractSegmentBaseType
         {
             public:
-                SegmentBase             (SegmentInformation * = NULL);
+                SegmentBase             (SegmentInformation * = nullptr);
                 virtual ~SegmentBase    ();
 
                 virtual vlc_tick_t getMinAheadTime(uint64_t curnum) const; /* impl */

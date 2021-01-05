@@ -39,49 +39,49 @@ static const struct
     {
         "",
         "",
-        NULL,
+        nullptr,
         0,
     },
     {
         "$",
         "$",
-        NULL,
+        nullptr,
         0,
     },
     {
         "/Num$$ber.m4v",
         "/Num$ber.m4v",
-        NULL,
+        nullptr,
         0,
     },
     {
         "/$Number$.m4v",
         "/123.m4v",
-        NULL,
+        nullptr,
         123,
     },
     {
         "/$$$Number$.m4v",
         "/$456789123.m4v",
-        NULL,
+        nullptr,
         456789123,
     },
     {
         "$Number%d$",
         "123",
-        NULL,
+        nullptr,
         123,
     },
     {
         "/$Number%5d$.m4v",
         "/00001.m4v",
-        NULL,
+        nullptr,
         1,
     },
     {
         "/$Number%2d$.m4v",
         "/123456.m4v",
-        NULL,
+        nullptr,
         123456, /* Must not truncate */
     },
     {

@@ -88,7 +88,7 @@ stime_t SegmentTimeline::getMinAheadScaledTime(uint64_t number) const
 
 uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) const
 {
-    const Element *prevel = NULL;
+    const Element *prevel = nullptr;
     std::list<Element *>::const_iterator it;
 
     if(!elements.size())

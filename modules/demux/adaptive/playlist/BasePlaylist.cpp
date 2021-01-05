@@ -137,7 +137,7 @@ BasePeriod* BasePlaylist::getFirstPeriod()
     if( !periods.empty() )
         return periods.front();
     else
-        return NULL;
+        return nullptr;
 }
 
 BasePeriod* BasePlaylist::getNextPeriod(BasePeriod *period)
@@ -150,7 +150,7 @@ BasePeriod* BasePlaylist::getNextPeriod(BasePeriod *period)
             return periods.at(i + 1);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool BasePlaylist::needsUpdates() const

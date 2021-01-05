@@ -146,7 +146,7 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
     else if(segmentList)
         timeline = segmentList->inheritSegmentTimeline();
     else
-        timeline = NULL;
+        timeline = nullptr;
 
     if(timeline)
     {
@@ -218,7 +218,7 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
         if(scaledduration)
         {
             /* Compute playback offset and effective finished segment from wall time */
-            vlc_tick_t now = vlc_tick_from_sec(time(NULL));
+            vlc_tick_t now = vlc_tick_from_sec(time(nullptr));
             vlc_tick_t playbacktime = now - i_buffering;
             vlc_tick_t minavailtime = playlist->availabilityStartTime.Get() + rep->getPeriodStart();
             const uint64_t startnumber = mediaSegmentTemplate->inheritStartNumber();

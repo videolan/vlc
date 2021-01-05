@@ -92,7 +92,7 @@ SegmentChunk* ISegment::toChunk(SharedResources *res, AbstractConnectionManager 
             if(!prepareChunk(res, chunk, rep))
             {
                 delete chunk;
-                return NULL;
+                return nullptr;
             }
             connManager->start(source);
             return chunk;
@@ -102,7 +102,7 @@ SegmentChunk* ISegment::toChunk(SharedResources *res, AbstractConnectionManager 
             delete source;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 bool ISegment::isTemplate() const

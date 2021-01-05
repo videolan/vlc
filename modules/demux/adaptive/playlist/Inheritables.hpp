@@ -71,7 +71,7 @@ namespace adaptive
         class AttrsNode : public AbstractAttr
         {
             public:
-                AttrsNode( Type, AttrsNode * = NULL );
+                AttrsNode( Type, AttrsNode * = nullptr );
                 ~AttrsNode();
                 AttrsNode(const AttrsNode &) = delete;
                 AttrsNode & operator=(const AttrsNode &) = delete;

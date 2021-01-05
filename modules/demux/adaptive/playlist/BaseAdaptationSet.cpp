@@ -74,7 +74,7 @@ BaseRepresentation * BaseAdaptationSet::getRepresentationByID(const ID &id)
         if((*it)->getID() == id)
             return *it;
     }
-    return NULL;
+    return nullptr;
 }
 
 void BaseAdaptationSet::addRepresentation(BaseRepresentation *rep)

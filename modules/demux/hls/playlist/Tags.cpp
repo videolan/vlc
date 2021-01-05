@@ -190,7 +190,7 @@ const Attribute * AttributesTag::getAttributeByName(const char *name) const
         if((*it)->name == name)
             return *it;
 
-    return NULL;
+    return nullptr;
 }
 
 void AttributesTag::addAttribute(Attribute *attr)
@@ -323,7 +323,7 @@ Tag * TagFactory::createTagByName(const std::string &name, const std::string &va
         {"EXT-X-SESSION-KEY",               AttributesTag::EXTXSESSIONKEY},
         {"EXTINF",                          ValuesListTag::EXTINF},
         {"",                                SingleValueTag::URI},
-        {NULL,                              0},
+        {nullptr,                              0},
     };
 
 
@@ -364,5 +364,5 @@ Tag * TagFactory::createTagByName(const std::string &name, const std::string &va
     }
 
 
-    return NULL;
+    return nullptr;
 }

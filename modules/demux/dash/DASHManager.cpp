@@ -65,7 +65,7 @@ DASHManager::~DASHManager   ()
 
 void DASHManager::scheduleNextUpdate()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
 
     vlc_tick_t minbuffer = 0;
     std::vector<AbstractStream *>::const_iterator it;
@@ -90,7 +90,7 @@ void DASHManager::scheduleNextUpdate()
 
 bool DASHManager::needsUpdate() const
 {
-    if(nextPlaylistupdate && time(NULL) < nextPlaylistupdate)
+    if(nextPlaylistupdate && time(nullptr) < nextPlaylistupdate)
         return false;
 
     return PlaylistManager::needsUpdate();
@@ -152,7 +152,7 @@ int DASHManager::doControl(int i_query, va_list args)
 
             vlc_meta_t *p_meta = va_arg (args, vlc_meta_t *);
             vlc_meta_t *meta = vlc_meta_New();
-            if (meta == NULL)
+            if (meta == nullptr)
                 return VLC_EGENERIC;
 
             if(!mpd->programInfo.Get()->getTitle().empty())

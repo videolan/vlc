@@ -97,7 +97,7 @@ MimeDemuxer::MimeDemuxer(vlc_object_t *p_obj_,
     p_es_out = out;
     factory = factory_;
     p_obj = p_obj_;
-    demuxer = NULL;
+    demuxer = nullptr;
     sourcestream = source;
 }
 
@@ -152,7 +152,7 @@ void MimeDemuxer::destroy()
     if(demuxer)
     {
         delete demuxer;
-        demuxer = NULL;
+        demuxer = nullptr;
     }
     sourcestream->Reset();
 }
@@ -177,7 +177,7 @@ Demuxer::Demuxer(vlc_object_t *p_obj_, const std::string &name_,
     p_es_out = out;
     name = name_;
     p_obj = p_obj_;
-    p_demux = NULL;
+    p_demux = nullptr;
     b_eof = false;
     sourcestream = source;
 
@@ -225,7 +225,7 @@ void Demuxer::destroy()
     if(p_demux)
     {
         demux_Delete(p_demux);
-        p_demux = NULL;
+        p_demux = nullptr;
     }
     sourcestream->Reset();
 }

@@ -59,14 +59,14 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
                                   AbstractStreamFactory *factory,
                                   AbstractAdaptationLogic::LogicType type ) :
              logicType      ( type ),
-             logic          ( NULL ),
+             logic          ( nullptr ),
              playlist       ( pl ),
              streamFactory  ( factory ),
              p_demux        ( p_demux_ )
 {
     currentPeriod = playlist->getFirstPeriod();
     resources = res;
-    bufferingLogic = NULL;
+    bufferingLogic = nullptr;
     failedupdates = 0;
     b_thread = false;
     b_buffering = false;
@@ -151,7 +151,7 @@ bool PlaylistManager::init()
     if(!setupPeriod())
         return false;
 
-    playlist->playbackStart.Set(time(NULL));
+    playlist->playbackStart.Set(time(nullptr));
     nextPlaylistupdate = playlist->playbackStart.Get();
 
     updateControlsPosition();
@@ -190,7 +190,7 @@ void PlaylistManager::stop()
         waitcond.signal();
     }
 
-    vlc_join(thread, NULL);
+    vlc_join(thread, nullptr);
     b_thread = false;
 }
 
@@ -673,14 +673,14 @@ void PlaylistManager::Run()
 void * PlaylistManager::managerThread(void *opaque)
 {
     static_cast<PlaylistManager *>(opaque)->Run();
-    return NULL;
+    return nullptr;
 }
 
 void PlaylistManager::updateControlsPosition()
 {
     vlc_mutex_locker locker(&cached.lock);
 
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     if(now - cached.lastupdate < 1)
         return;
     cached.lastupdate = now;
@@ -772,7 +772,7 @@ void PlaylistManager::updateControlsPosition()
 AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::LogicType type, AbstractConnectionManager *conn)
 {
     vlc_object_t *obj = VLC_OBJECT(p_demux);
-    AbstractAdaptationLogic *logic = NULL;
+    AbstractAdaptationLogic *logic = nullptr;
     switch(type)
     {
         case AbstractAdaptationLogic::LogicType::FixedRate:
