@@ -22,6 +22,7 @@
 
 #include "util/qml_main_context.hpp"
 #include "util/qmleventfilter.hpp"
+#include "util/imageluminanceextractor.hpp"
 #include "util/i18n.hpp"
 #include "util/systempalette.hpp"
 #include "util/sortfilterproxymodel.hpp"
@@ -197,6 +198,7 @@ void MainUI::registerQMLTypes()
     qmlRegisterType<NetworkSourcesModel>( "org.videolan.vlc", 0, 1, "NetworkSourcesModel");
     qmlRegisterType<ServicesDiscoveryModel>( "org.videolan.vlc", 0, 1, "ServicesDiscoveryModel");
     qmlRegisterType<MlFoldersModel>( "org.videolan.vlc", 0, 1, "MLFolderModel");
+    qmlRegisterType<ImageLuminanceExtractor>( "org.videolan.vlc", 0, 1, "ImageLuminanceExtractor");
 
     qmlRegisterUncreatableType<NavigationHistory>("org.videolan.vlc", 0, 1, "History", "Type of global variable history" );
 
