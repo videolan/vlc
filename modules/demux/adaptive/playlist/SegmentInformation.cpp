@@ -36,6 +36,7 @@
 #include <cassert>
 #include <limits>
 
+using namespace adaptive;
 using namespace adaptive::playlist;
 
 SegmentInformation::SegmentInformation(SegmentInformation *parent_) :

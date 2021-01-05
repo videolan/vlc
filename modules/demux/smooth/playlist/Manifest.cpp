@@ -26,6 +26,7 @@
 
 #include <vlc_common.h>
 
+using namespace adaptive;
 using namespace smooth::playlist;
 
 Manifest::Manifest (vlc_object_t *p_object) :

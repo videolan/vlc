@@ -32,6 +32,7 @@
 
 #include <limits>
 
+using namespace adaptive;
 using namespace adaptive::playlist;
 
 SegmentList::SegmentList( SegmentInformation *parent_ ):

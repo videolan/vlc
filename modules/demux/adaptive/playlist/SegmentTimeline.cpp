@@ -31,6 +31,7 @@
 #include <sstream>
 #include <limits>
 
+using namespace adaptive;
 using namespace adaptive::playlist;
 
 SegmentTimeline::SegmentTimeline(AbstractMultipleSegmentBaseType *parent_)
