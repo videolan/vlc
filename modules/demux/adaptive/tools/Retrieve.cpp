@@ -39,7 +39,7 @@ block_t * Retrieve::HTTP(SharedResources *resources, const std::string &uri)
     {
         datachunk = new HTTPChunk(uri, resources->getConnManager(), ID(), true);
     } catch (...) {
-        return NULL;
+        return nullptr;
     }
 
     block_t *block = datachunk->read(1<<25);

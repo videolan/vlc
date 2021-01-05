@@ -85,7 +85,7 @@ void EsOutSendCommand::Execute( es_out_t *out )
     p_fakeid->notifyData();
     if( p_fakeid->realESID() &&
             es_out_Send( out, p_fakeid->realESID(), p_block ) == VLC_SUCCESS )
-        p_block = NULL;
+        p_block = nullptr;
     p_fakeid->notifyData();
 }
 
@@ -223,7 +223,7 @@ EsOutMetaCommand * CommandsFactory::createEsOutMetaCommand( int group, const vlc
         vlc_meta_Merge( p_dup, p_meta );
         return new (std::nothrow) EsOutMetaCommand( group, p_dup );
     }
-    return NULL;
+    return nullptr;
 }
 
 /*

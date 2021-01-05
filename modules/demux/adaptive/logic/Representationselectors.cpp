@@ -43,7 +43,7 @@ RepresentationSelector::~RepresentationSelector()
 BaseRepresentation * RepresentationSelector::lowest(BaseAdaptationSet *adaptSet) const
 {
     std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
-    return (reps.empty()) ? NULL : *(reps.begin());
+    return (reps.empty()) ? nullptr : *(reps.begin());
 }
 
 BaseRepresentation * RepresentationSelector::highest(BaseAdaptationSet *adaptSet) const
@@ -84,8 +84,8 @@ BaseRepresentation * RepresentationSelector::select(BaseAdaptationSet *adaptSet)
 }
 BaseRepresentation * RepresentationSelector::select(BaseAdaptationSet *adaptSet, uint64_t bitrate) const
 {
-    if (adaptSet == NULL)
-        return NULL;
+    if (adaptSet == nullptr)
+        return nullptr;
 
     std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
     return select(reps, 0, bitrate);
@@ -94,7 +94,7 @@ BaseRepresentation * RepresentationSelector::select(BaseAdaptationSet *adaptSet,
 BaseRepresentation * RepresentationSelector::select(std::vector<BaseRepresentation *>& reps,
                                                 uint64_t minbitrate, uint64_t maxbitrate) const
 {
-    BaseRepresentation  *candidate = NULL, *lowest = NULL;
+    BaseRepresentation  *candidate = nullptr, *lowest = nullptr;
     std::vector<BaseRepresentation *>::const_iterator repIt;
     for(repIt=reps.begin(); repIt!=reps.end(); ++repIt)
     {

@@ -40,7 +40,7 @@ namespace smooth
         class SmoothSegmentTemplate : public SegmentTemplate
         {
             public:
-                SmoothSegmentTemplate(SegmentInformation * = NULL);
+                SmoothSegmentTemplate(SegmentInformation * = nullptr);
                 ~SmoothSegmentTemplate();
                 virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *); /* reimpl */
         };

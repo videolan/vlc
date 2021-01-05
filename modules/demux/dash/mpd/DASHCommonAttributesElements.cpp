@@ -113,7 +113,7 @@ const std::list<ContentDescription*> &DASHCommonAttributesElements::getContentPr
 
 void DASHCommonAttributesElements::addContentProtection(ContentDescription *desc)
 {
-    if ( desc != NULL )
+    if ( desc != nullptr )
         this->contentProtections.push_back( desc );
 }
 

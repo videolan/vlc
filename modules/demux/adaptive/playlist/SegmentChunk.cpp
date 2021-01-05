@@ -38,7 +38,7 @@ SegmentChunk::SegmentChunk(AbstractChunkSource *source, BaseRepresentation *rep_
     AbstractChunk(source)
 {
     rep = rep_;
-    encryptionSession = NULL;
+    encryptionSession = nullptr;
 }
 
 SegmentChunk::~SegmentChunk()

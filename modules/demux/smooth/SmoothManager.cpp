@@ -61,13 +61,13 @@ Manifest * SmoothManager::fetchManifest()
 
     block_t *p_block = Retrieve::HTTP(resources, playlisturl);
     if(!p_block)
-        return NULL;
+        return nullptr;
 
     stream_t *memorystream = vlc_stream_MemoryNew(p_demux, p_block->p_buffer, p_block->i_buffer, true);
     if(!memorystream)
     {
         block_Release(p_block);
-        return NULL;
+        return nullptr;
     }
 
     xml::DOMParser parser(memorystream);
@@ -75,10 +75,10 @@ Manifest * SmoothManager::fetchManifest()
     {
         vlc_stream_Delete(memorystream);
         block_Release(p_block);
-        return NULL;
+        return nullptr;
     }
 
-    Manifest *manifest = NULL;
+    Manifest *manifest = nullptr;
 
     ManifestParser *manifestParser = new (std::nothrow) ManifestParser(parser.getRootNode(), VLC_OBJECT(p_demux),
                                                                        memorystream, playlisturl);
@@ -119,7 +119,7 @@ bool SmoothManager::updatePlaylist()
 
 void SmoothManager::scheduleNextUpdate()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
 
     mtime_t minbuffer = 0;
     std::vector<AbstractStream *>::const_iterator it;
@@ -148,7 +148,7 @@ void SmoothManager::scheduleNextUpdate()
 
 bool SmoothManager::needsUpdate() const
 {
-    if(nextPlaylistupdate && time(NULL) < nextPlaylistupdate)
+    if(nextPlaylistupdate && time(nullptr) < nextPlaylistupdate)
         return false;
 
     return PlaylistManager::needsUpdate();

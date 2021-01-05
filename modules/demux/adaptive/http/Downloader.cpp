@@ -35,7 +35,7 @@ Downloader::Downloader()
     vlc_cond_init(&updatedcond);
     killed = false;
     thread_handle_valid = false;
-    current = NULL;
+    current = nullptr;
 }
 
 bool Downloader::start()
@@ -58,7 +58,7 @@ Downloader::~Downloader()
     vlc_mutex_unlock( &lock );
 
     if(thread_handle_valid)
-        vlc_join(thread_handle, NULL);
+        vlc_join(thread_handle, nullptr);
     vlc_mutex_destroy(&lock);
     vlc_cond_destroy(&waitcond);
 }
@@ -89,7 +89,7 @@ void * Downloader::downloaderThread(void *opaque)
 {
     Downloader *instance = static_cast<Downloader *>(opaque);
     instance->Run();
-    return NULL;
+    return nullptr;
 }
 
 void Downloader::Run()
@@ -112,7 +112,7 @@ void Downloader::Run()
             chunks.pop_front();
             current->release();
         }
-        current = NULL;
+        current = nullptr;
         vlc_cond_signal(&updatedcond);
     }
     vlc_mutex_unlock(&lock);

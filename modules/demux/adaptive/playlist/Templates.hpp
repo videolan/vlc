@@ -30,7 +30,7 @@ namespace adaptive
         public:
             Initializable()
             {
-                initialisationSegment.Set(NULL);
+                initialisationSegment.Set(nullptr);
             }
             ~Initializable()
             {
@@ -44,7 +44,7 @@ namespace adaptive
         public:
             Indexable()
             {
-                indexSegment.Set(NULL);
+                indexSegment.Set(nullptr);
             }
             ~Indexable()
             {

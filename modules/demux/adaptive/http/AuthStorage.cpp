@@ -32,7 +32,7 @@ AuthStorage::AuthStorage( vlc_object_t *p_obj )
         p_cookies_jar = static_cast<vlc_http_cookie_jar_t *>
                 (var_InheritAddress( p_obj, "http-cookies" ));
     else
-        p_cookies_jar = NULL;
+        p_cookies_jar = nullptr;
 }
 
 AuthStorage::~AuthStorage()

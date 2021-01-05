@@ -34,9 +34,9 @@ Segment * AbstractSegmentBaseType::findSegmentByScaledTime(const std::vector<Seg
                                                                  stime_t time)
 {
     if(segments.empty() || (segments.size() > 1 && segments[1]->startTime.Get() == 0) )
-        return NULL;
+        return nullptr;
 
-    Segment *ret = NULL;
+    Segment *ret = nullptr;
     std::vector<Segment *>::const_iterator it = segments.begin();
     while(it != segments.end())
     {
@@ -44,7 +44,7 @@ Segment * AbstractSegmentBaseType::findSegmentByScaledTime(const std::vector<Seg
         if(seg->startTime.Get() > time)
         {
             if(it == segments.begin())
-                return NULL;
+                return nullptr;
             else
                 break;
         }

@@ -104,7 +104,7 @@ Url & Url::append(const Url &url)
 
 std::string Url::toString() const
 {
-    return toString(0, NULL);
+    return toString(0, nullptr);
 }
 
 std::string Url::toString(size_t index, const BaseRepresentation *rep) const

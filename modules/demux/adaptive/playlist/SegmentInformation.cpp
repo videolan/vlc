@@ -48,15 +48,15 @@ SegmentInformation::SegmentInformation(SegmentInformation *parent_) :
 
 SegmentInformation::SegmentInformation(BasePlaylist * parent_) :
     ICanonicalUrl(parent_),
-    AttrsNode( AbstractAttr::Type::SegmentInformation, NULL )
+    AttrsNode( AbstractAttr::Type::SegmentInformation, nullptr )
 {
-    parent = NULL;
+    parent = nullptr;
     init();
 }
 
 void SegmentInformation::init()
 {
-    baseUrl.Set(NULL);
+    baseUrl.Set(nullptr);
 }
 
 SegmentInformation::~SegmentInformation()
@@ -69,7 +69,7 @@ BasePlaylist * SegmentInformation::getPlaylist() const
     if(parent)
         return parent->getPlaylist();
     else
-        return NULL;
+        return nullptr;
 }
 
 const AbstractSegmentBaseType * SegmentInformation::inheritSegmentProfile() const
@@ -89,7 +89,7 @@ Segment *  SegmentInformation::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_n
 {
     const AbstractSegmentBaseType *profile = inheritSegmentProfile();
     if(!profile)
-        return NULL;
+        return nullptr;
     return profile->getNextMediaSegment(i_pos, pi_newpos, pb_gap);
 }
 
@@ -97,7 +97,7 @@ InitSegment * SegmentInformation::getInitSegment() const
 {
     const AbstractSegmentBaseType *profile = inheritSegmentProfile();
     if(!profile)
-        return NULL;
+        return nullptr;
     return profile->getInitSegment();
 }
 
@@ -105,7 +105,7 @@ IndexSegment *SegmentInformation::getIndexSegment() const
 {
     const AbstractSegmentBaseType *profile = inheritSegmentProfile();
     if(!profile)
-        return NULL;
+        return nullptr;
     return profile->getIndexSegment();
 }
 
@@ -113,7 +113,7 @@ Segment * SegmentInformation::getMediaSegment(uint64_t pos) const
 {
     const AbstractSegmentBaseType *profile = inheritSegmentProfile();
     if(!profile)
-        return NULL;
+        return nullptr;
     return profile->getMediaSegment(pos);
 }
 
@@ -125,7 +125,7 @@ SegmentInformation * SegmentInformation::getChildByID(const adaptive::ID &id)
         if( (*it)->getID() == id )
             return *it;
     }
-    return NULL;
+    return nullptr;
 }
 
 void SegmentInformation::updateWith(SegmentInformation *updated)
@@ -220,7 +220,7 @@ AbstractSegmentBaseType * SegmentInformation::getProfile() const
     else if((p = getAttribute(Type::SegmentBase)))
         return static_cast<SegmentBase *> (p);
 
-    return NULL;
+    return nullptr;
 }
 
 void SegmentInformation::updateSegmentList(SegmentList *list, bool restamp)

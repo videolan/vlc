@@ -228,7 +228,7 @@ void IsoffMainParser::parseMultipleSegmentBaseType(MPD *mpd, Node *node,
 size_t IsoffMainParser::parseSegmentTemplate(MPD *mpd, Node *templateNode, SegmentInformation *info)
 {
     size_t total = 0;
-    if (templateNode == NULL)
+    if (templateNode == nullptr)
         return total;
 
     std::string mediaurl;
@@ -389,7 +389,7 @@ void    IsoffMainParser::parseRepresentations (MPD *mpd, Node *adaptationSetNode
         /* Empty Representation with just baseurl (ex: subtitles) */
         if(i_total == 0 &&
            (currentRepresentation->baseUrl.Get() && !currentRepresentation->baseUrl.Get()->empty()) &&
-            adaptationSet->getMediaSegment(0) == NULL)
+            adaptationSet->getMediaSegment(0) == nullptr)
         {
             SegmentBase *base = new (std::nothrow) SegmentBase(currentRepresentation);
             if(base)
@@ -569,7 +569,7 @@ void IsoffMainParser::parseProgramInformation(Node * node, MPD *mpd)
 Profile IsoffMainParser::getProfile() const
 {
     Profile res(Profile::Name::Unknown);
-    if(this->root == NULL)
+    if(this->root == nullptr)
         return res;
 
     std::string urn = root->getAttributeValue("profiles");

@@ -37,7 +37,7 @@ using namespace adaptive;
 AbstractAttr::AbstractAttr(Type t)
 {
     type = t;
-    parentNode = NULL;
+    parentNode = nullptr;
 }
 
 AbstractAttr::~AbstractAttr()
@@ -183,7 +183,7 @@ SegmentBase * AttrsNode::inheritSegmentBase() const
     AbstractAttr *p = inheritAttribute(Type::SegmentBase);
     if(p && p->isValid())
         return static_cast<SegmentBase *>(p);
-    return NULL;
+    return nullptr;
 }
 
 SegmentList * AttrsNode::inheritSegmentList() const
@@ -191,7 +191,7 @@ SegmentList * AttrsNode::inheritSegmentList() const
     AbstractAttr *p = inheritAttribute(Type::SegmentList);
     if(p && p->isValid())
         return static_cast<SegmentList *> (p);
-    return NULL;
+    return nullptr;
 }
 
 SegmentTemplate * AttrsNode::inheritSegmentTemplate() const
@@ -199,7 +199,7 @@ SegmentTemplate * AttrsNode::inheritSegmentTemplate() const
     AbstractAttr *p = inheritAttribute(Type::SegmentTemplate);
     if(p && p->isValid())
         return static_cast<SegmentTemplate *> (p);
-    return NULL;
+    return nullptr;
 }
 
 SegmentTimeline * AttrsNode::inheritSegmentTimeline() const
@@ -207,7 +207,7 @@ SegmentTimeline * AttrsNode::inheritSegmentTimeline() const
     AbstractAttr *p = inheritAttribute(Type::Timeline);
     if(p && p->isValid())
         return static_cast<SegmentTimeline *> (p);
-    return NULL;
+    return nullptr;
 }
 
 AttrsNode * AttrsNode::matchPath(std::list<AbstractAttr::Type>&path)
@@ -218,10 +218,10 @@ AttrsNode * AttrsNode::matchPath(std::list<AbstractAttr::Type>&path)
     {
         AbstractAttr *p = pn->getAttribute(*it);
         if(!p || !p->isValid())
-            return NULL;
+            return nullptr;
         pn = dynamic_cast<AttrsNode *>(p);
-        if(pn == NULL)
-            return NULL;
+        if(pn == nullptr)
+            return nullptr;
     }
     return pn;
 }
@@ -233,7 +233,7 @@ AbstractAttr * AttrsNode::getAttribute(AbstractAttr::Type type)
         if((*it)->getType() == type)
             return *it;
     }
-    return NULL;
+    return nullptr;
 }
 
 AbstractAttr * AttrsNode::getAttribute(AbstractAttr::Type type) const
@@ -251,5 +251,5 @@ AbstractAttr * AttrsNode::getAttribute(AbstractAttr::Type type,
         if(p && p->isValid())
             return p;
     }
-    return NULL;
+    return nullptr;
 }

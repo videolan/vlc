@@ -54,7 +54,7 @@ void SegmentTemplateSegment::setSourceUrl(const std::string &url)
 SegmentTemplate::SegmentTemplate( SegmentInformation *parent ) :
     AbstractMultipleSegmentBaseType( parent, AbstractAttr::Type::SegmentTemplate )
 {
-    initialisationSegment.Set( NULL );
+    initialisationSegment.Set( nullptr );
     parentSegmentInformation = parent;
     segments.push_back( new SegmentTemplateSegment( this, parent ) );
 }
@@ -129,7 +129,7 @@ mtime_t SegmentTemplate::getMinAheadTime(uint64_t number) const
     else
     {
         const Timescale timescale = inheritTimescale();
-        uint64_t current = getLiveTemplateNumber(CLOCK_FREQ * time(NULL));
+        uint64_t current = getLiveTemplateNumber(CLOCK_FREQ * time(nullptr));
         stime_t i_length = (current - number) * inheritDuration();
         return timescale.ToTime(i_length);
     }
@@ -138,9 +138,9 @@ mtime_t SegmentTemplate::getMinAheadTime(uint64_t number) const
 Segment * SegmentTemplate::getMediaSegment(uint64_t number) const
 {
     const SegmentTimeline *tl = inheritSegmentTimeline();
-    if(tl == NULL || tl->maxElementNumber() > number)
+    if(tl == nullptr || tl->maxElementNumber() > number)
         return *segments.begin();
-    return NULL;
+    return nullptr;
 }
 
 InitSegment * SegmentTemplate::getInitSegment() const
@@ -159,7 +159,7 @@ Segment *  SegmentTemplate::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newp
     {
         *pi_newpos = std::max(timeline->minElementNumber(), i_pos);
         if (timeline->maxElementNumber() < i_pos)
-            return NULL;
+            return nullptr;
     }
     else
     {
@@ -179,7 +179,7 @@ Segment *  SegmentTemplate::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newp
                 if(i_pos >= endnum)
                 {
                     *pi_newpos = i_pos;
-                    return NULL;
+                    return nullptr;
                 }
             }
         }
@@ -213,7 +213,7 @@ bool SegmentTemplate::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
         BasePlaylist *playlist = parent->getPlaylist();
         if( playlist->isLive() )
         {
-            mtime_t now = CLOCK_FREQ * ::time(NULL);
+            mtime_t now = CLOCK_FREQ * ::time(nullptr);
             if(playlist->availabilityStartTime.Get())
             {
                 if(time >= playlist->availabilityStartTime.Get() && time < now)

@@ -471,7 +471,7 @@ const ConnectionParams & HTTPConnection::getRedirection() const
 StreamUrlConnection::StreamUrlConnection(vlc_object_t *p_object)
     : AbstractConnection(p_object)
 {
-    p_streamurl = NULL;
+    p_streamurl = nullptr;
     bytesRead = 0;
     contentLength = 0;
 }
@@ -485,7 +485,7 @@ void StreamUrlConnection::reset()
 {
     if(p_streamurl)
         vlc_stream_Delete(p_streamurl);
-    p_streamurl = NULL;
+    p_streamurl = nullptr;
     bytesRead = 0;
     contentLength = 0;
     contentType = std::string();
@@ -599,7 +599,7 @@ AbstractConnection * NativeConnectionFactory::createConnection(vlc_object_t *p_o
     if(params.usesAccess() ||
        (params.getScheme() != "http" && params.getScheme() != "https") ||
        params.getHostname().empty())
-        return NULL;
+        return nullptr;
 
     ConnectionParams proxy;
 
@@ -615,14 +615,14 @@ AbstractConnection * NativeConnectionFactory::createConnection(vlc_object_t *p_o
 
     Transport *socket = new (std::nothrow) Transport(params.getScheme() == "https");
     if(!socket)
-        return NULL;
+        return nullptr;
 
     HTTPConnection *conn = new (std::nothrow)
             HTTPConnection(p_object, authStorage, socket, proxy);
     if(!conn)
     {
         delete socket;
-        return NULL;
+        return nullptr;
     }
 
     return conn;

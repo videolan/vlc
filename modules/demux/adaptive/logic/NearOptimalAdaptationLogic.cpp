@@ -68,14 +68,14 @@ BaseRepresentation *
 NearOptimalAdaptationLogic::getNextQualityIndex( BaseAdaptationSet *adaptSet, RepresentationSelector &selector,
                                                  float gammaP, mtime_t VD, mtime_t Q )
 {
-    BaseRepresentation *ret = NULL;
-    BaseRepresentation *prev = NULL;
+    BaseRepresentation *ret = nullptr;
+    BaseRepresentation *prev = nullptr;
     float argmax;
     for(BaseRepresentation *rep = selector.lowest(adaptSet);
                             rep && rep != prev; rep = selector.higher(adaptSet, rep))
     {
         float arg = ( VD * (getUtility(rep) + gammaP) - Q ) / rep->getBandwidth();
-        if(ret == NULL || argmax <= arg)
+        if(ret == nullptr || argmax <= arg)
         {
             ret = rep;
             argmax = arg;
@@ -91,8 +91,8 @@ BaseRepresentation *NearOptimalAdaptationLogic::getNextRepresentation(BaseAdapta
 
     BaseRepresentation *lowest = selector.lowest(adaptSet);
     BaseRepresentation *highest = selector.highest(adaptSet);
-    if(lowest == NULL || highest == NULL)
-        return NULL;
+    if(lowest == nullptr || highest == nullptr)
+        return nullptr;
 
     const float umin = getUtility(lowest);
     const float umax = getUtility(highest);
@@ -115,7 +115,7 @@ BaseRepresentation *NearOptimalAdaptationLogic::getNextRepresentation(BaseAdapta
     const float Vd = ((float)ctxcopy.buffering_min / CLOCK_FREQ - 1.0) / (umin + gammaP);
 
     BaseRepresentation *m;
-    if(prevRep == NULL) /* Starting */
+    if(prevRep == nullptr) /* Starting */
     {
         m = selector.select(adaptSet, bps);
     }

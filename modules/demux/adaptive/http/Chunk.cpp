@@ -107,7 +107,7 @@ uint64_t AbstractChunk::getStartByteInFile() const
 block_t * AbstractChunk::doRead(size_t size, bool b_block)
 {
     if(!source)
-        return NULL;
+        return nullptr;
 
     block_t *block = (b_block) ? source->readBlock() : source->read(size);
     if(block)
@@ -140,7 +140,7 @@ block_t * AbstractChunk::read(size_t size)
 HTTPChunkSource::HTTPChunkSource(const std::string& url, AbstractConnectionManager *manager,
                                  const adaptive::ID &id, bool access) :
     AbstractChunkSource(),
-    connection   (NULL),
+    connection   (nullptr),
     connManager  (manager),
     consumed     (0)
 {
@@ -191,13 +191,13 @@ block_t * HTTPChunkSource::read(size_t readsize)
     if(!prepare())
     {
         eof = true;
-        return NULL;
+        return nullptr;
     }
 
     if(consumed == contentLength && consumed > 0)
     {
         eof = true;
-        return NULL;
+        return nullptr;
     }
 
     if(contentLength && readsize > contentLength - consumed)
@@ -207,7 +207,7 @@ block_t * HTTPChunkSource::read(size_t readsize)
     if(!p_block)
     {
         eof = true;
-        return NULL;
+        return nullptr;
     }
 
     mtime_t time = mdate();
@@ -216,7 +216,7 @@ block_t * HTTPChunkSource::read(size_t readsize)
     if(ret < 0)
     {
         block_Release(p_block);
-        p_block = NULL;
+        p_block = nullptr;
         eof = true;
     }
     else
@@ -270,7 +270,7 @@ bool HTTPChunkSource::prepare()
                 if(httpconn)
                     connparams = httpconn->getRedirection();
                 connection->setUsed(false);
-                connection = NULL;
+                connection = nullptr;
                 if(httpconn)
                     continue;
             }
@@ -295,7 +295,7 @@ block_t * HTTPChunkSource::readBlock()
 HTTPChunkBufferedSource::HTTPChunkBufferedSource(const std::string& url, AbstractConnectionManager *manager,
                                                  const adaptive::ID &sourceid, bool access) :
     HTTPChunkSource(url, manager, sourceid, access),
-    p_head     (NULL),
+    p_head     (nullptr),
     pp_tail    (&p_head),
     buffered     (0)
 {
@@ -319,7 +319,7 @@ HTTPChunkBufferedSource::~HTTPChunkBufferedSource()
     if(p_head)
     {
         block_ChainRelease(p_head);
-        p_head = NULL;
+        p_head = nullptr;
         pp_tail = &p_head;
     }
     buffered = 0;
@@ -384,7 +384,7 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
     if(ret <= 0)
     {
         block_Release(p_block);
-        p_block = NULL;
+        p_block = nullptr;
         vlc_mutex_locker locker( &lock );
         done = true;
         rate.size = buffered + consumed;
@@ -432,7 +432,7 @@ bool HTTPChunkBufferedSource::hasMoreData() const
 
 block_t * HTTPChunkBufferedSource::readBlock()
 {
-    block_t *p_block = NULL;
+    block_t *p_block = nullptr;
 
     vlc_mutex_locker locker(&lock);
 
@@ -450,13 +450,13 @@ block_t * HTTPChunkBufferedSource::readBlock()
     /* dequeue */
     p_block = p_head;
     p_head = p_head->p_next;
-    if(p_head == NULL)
+    if(p_head == nullptr)
     {
         pp_tail = &p_head;
         if(done)
             eof = true;
     }
-    p_block->p_next = NULL;
+    p_block->p_next = nullptr;
 
     consumed += p_block->i_buffer;
     buffered -= p_block->i_buffer;
@@ -471,11 +471,11 @@ block_t * HTTPChunkBufferedSource::read(size_t readsize)
     while(readsize > buffered && !done)
         vlc_cond_wait(&avail, &lock);
 
-    block_t *p_block = NULL;
+    block_t *p_block = nullptr;
     if(!readsize || !buffered || !(p_block = block_Alloc(readsize)) )
     {
         eof = true;
-        return NULL;
+        return nullptr;
     }
 
     size_t copied = 0;
@@ -491,10 +491,10 @@ block_t * HTTPChunkBufferedSource::read(size_t readsize)
         if(p_head->i_buffer == 0)
         {
             block_t *next = p_head->p_next;
-            p_head->p_next = NULL;
+            p_head->p_next = nullptr;
             block_Release(p_head);
             p_head = next;
-            if(next == NULL)
+            if(next == nullptr)
                 pp_tail = &p_head;
         }
     }

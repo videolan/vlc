@@ -38,7 +38,7 @@ namespace adaptive
         class SegmentList : public AbstractMultipleSegmentBaseType
         {
             public:
-                SegmentList             ( SegmentInformation * = NULL );
+                SegmentList             ( SegmentInformation * = nullptr );
                 virtual ~SegmentList    ();
 
                 const std::vector<Segment *>&   getSegments() const;

@@ -29,7 +29,7 @@ using namespace adaptive::mp4;
 AtomsReader::AtomsReader(vlc_object_t *object_)
 {
     object = object_;
-    rootbox = NULL;
+    rootbox = nullptr;
 }
 
 AtomsReader::~AtomsReader()
@@ -40,7 +40,7 @@ AtomsReader::~AtomsReader()
 void AtomsReader::clean()
 {
     MP4_BoxFree(rootbox);
-    rootbox = NULL;
+    rootbox = nullptr;
 }
 
 bool AtomsReader::parseBlock(block_t *p_block)
@@ -60,7 +60,7 @@ bool AtomsReader::parseBlock(block_t *p_block)
         memset(rootbox, 0, sizeof(*rootbox));
         rootbox->i_type = ATOM_root;
         rootbox->i_size = p_block->i_buffer;
-        if ( MP4_ReadBoxContainerChildren( stream, rootbox, NULL ) == 1 )
+        if ( MP4_ReadBoxContainerChildren( stream, rootbox, nullptr ) == 1 )
         {
 #ifndef NDEBUG
             MP4_BoxDumpStructure(stream, rootbox);

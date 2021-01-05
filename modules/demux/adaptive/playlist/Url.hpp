@@ -38,7 +38,7 @@ namespace adaptive
                 {
                     friend class Url;
                     public:
-                        Component(const std::string &, const SegmentTemplate * = NULL);
+                        Component(const std::string &, const SegmentTemplate * = nullptr);
 
                     protected:
                         std::string component;

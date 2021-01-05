@@ -78,5 +78,5 @@ Node*           DOMHelper::getFirstChildElementByName( Node *root, const std::st
         if( root->getSubNodes().at( i )->getName() == name )
             return root->getSubNodes().at( i );
     }
-    return NULL;
+    return nullptr;
 }
