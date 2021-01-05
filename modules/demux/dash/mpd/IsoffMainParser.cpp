@@ -33,9 +33,9 @@
 #include "../../adaptive/playlist/SegmentList.h"
 #include "../../adaptive/playlist/SegmentTimeline.h"
 #include "../../adaptive/playlist/SegmentInformation.hpp"
+#include "../../adaptive/playlist/BasePeriod.h"
 #include "MPD.h"
 #include "Representation.h"
-#include "Period.h"
 #include "AdaptationSet.h"
 #include "ProgramInformation.h"
 #include "DASHSegment.h"
@@ -162,7 +162,7 @@ void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)
 
     for(it = periods.begin(); it != periods.end(); ++it)
     {
-        Period *period = new (std::nothrow) Period(mpd);
+        BasePeriod *period = new (std::nothrow) BasePeriod(mpd);
         if (!period)
             continue;
         parseSegmentInformation(mpd, *it, period, &nextid);
@@ -174,7 +174,7 @@ void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)
         if(!baseUrls.empty())
         {
             period->baseUrl.Set( new Url( baseUrls.front()->getText() ) );
-            parseAvailability<Period>(mpd, baseUrls.front(), period);
+            parseAvailability<BasePeriod>(mpd, baseUrls.front(), period);
         }
 
         parseAdaptationSets(mpd, *it, period);
@@ -283,7 +283,7 @@ size_t IsoffMainParser::parseSegmentInformation(MPD *mpd, Node *node,
     return total;
 }
 
-void    IsoffMainParser::parseAdaptationSets  (MPD *mpd, Node *periodNode, Period *period)
+void    IsoffMainParser::parseAdaptationSets  (MPD *mpd, Node *periodNode, BasePeriod *period)
 {
     std::vector<Node *> adaptationSets = DOMHelper::getElementByTagName(periodNode, "AdaptationSet", false);
     std::vector<Node *>::const_iterator it;

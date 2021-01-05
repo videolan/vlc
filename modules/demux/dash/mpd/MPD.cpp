@@ -30,7 +30,7 @@
 
 #include "MPD.h"
 #include "ProgramInformation.h"
-#include "Period.h"
+#include "../../adaptive/playlist/BasePeriod.h"
 
 #include <vlc_common.h>
 #include <vlc_stream.h>

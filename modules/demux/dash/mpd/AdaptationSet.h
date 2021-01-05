@@ -45,7 +45,7 @@ namespace dash
                               public DASHCommonAttributesElements
         {
             public:
-                AdaptationSet(Period *);
+                AdaptationSet(playlist::BasePeriod *);
                 virtual ~AdaptationSet();
 
                 virtual StreamFormat            getStreamFormat() const; /* reimpl */
