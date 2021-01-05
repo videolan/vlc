@@ -598,13 +598,24 @@ int MediaLibrary::Control( int query, va_list args )
             *va_arg( args, vlc_ml_media_t**) = CreateAndConvert<vlc_ml_media_t>( media.get() );
             return VLC_SUCCESS;
         }
+        case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
+        {
+            auto mediaId = va_arg( args, int64_t );
+            auto sizeType = va_arg( args, int );
+            auto width = va_arg( args, uint32_t );
+            auto height = va_arg( args, uint32_t );
+            auto position = va_arg( args, double );
+            auto res = m_ml->requestThumbnail( mediaId,
+                                               static_cast<medialibrary::ThumbnailSizeType>( sizeType ),
+                                               width, height, position );
+            return res == true ? VLC_SUCCESS : VLC_EGENERIC;
+        }
         case VLC_ML_MEDIA_UPDATE_PROGRESS:
         case VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE:
         case VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_STATE:
         case VLC_ML_MEDIA_GET_ALL_MEDIA_PLAYBACK_STATES:
         case VLC_ML_MEDIA_SET_ALL_MEDIA_PLAYBACK_STATES:
         case VLC_ML_MEDIA_SET_THUMBNAIL:
-        case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
         case VLC_ML_MEDIA_ADD_EXTERNAL_MRL:
         case VLC_ML_MEDIA_SET_TYPE:
         case VLC_ML_MEDIA_ADD_BOOKMARK:
@@ -1227,16 +1238,6 @@ int MediaLibrary::controlMedia( int query, va_list args )
             auto sizeType = va_arg( args, int );
             m->setThumbnail( mrl, static_cast<medialibrary::ThumbnailSizeType>( sizeType ) );
             return VLC_SUCCESS;
-        }
-        case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
-        {
-            auto sizeType = va_arg( args, int );
-            auto width = va_arg( args, uint32_t );
-            auto height = va_arg( args, uint32_t );
-            auto position = va_arg( args, double );
-            auto res = m->requestThumbnail( static_cast<medialibrary::ThumbnailSizeType>( sizeType ),
-                                            width, height, position );
-            return res == true ? VLC_SUCCESS : VLC_EGENERIC;
         }
         case VLC_ML_MEDIA_ADD_EXTERNAL_MRL:
         {
