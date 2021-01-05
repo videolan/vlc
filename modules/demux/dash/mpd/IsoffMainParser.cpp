@@ -237,7 +237,7 @@ size_t IsoffMainParser::parseSegmentTemplate(MPD *mpd, Node *templateNode, Segme
     if(templateNode->hasAttribute("media"))
         mediaurl = templateNode->getAttributeValue("media");
 
-    SegmentTemplate *mediaTemplate = new (std::nothrow) SegmentTemplate(info);
+    SegmentTemplate *mediaTemplate = new (std::nothrow) SegmentTemplate(new SegmentTemplateSegment(), info);
     if(!mediaTemplate)
         return total;
     mediaTemplate->setSourceUrl(mediaurl);

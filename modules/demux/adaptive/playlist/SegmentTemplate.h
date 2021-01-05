@@ -39,9 +39,10 @@ namespace adaptive
         class SegmentTemplateSegment : public Segment
         {
             public:
-                SegmentTemplateSegment( SegmentTemplate *, ICanonicalUrl * = nullptr );
+                SegmentTemplateSegment( ICanonicalUrl * = nullptr );
                 virtual ~SegmentTemplateSegment();
                 virtual void setSourceUrl( const std::string &url ); /* reimpl */
+                void setParentTemplate( SegmentTemplate * );
 
             protected:
                 const SegmentTemplate *templ;
@@ -50,7 +51,7 @@ namespace adaptive
         class SegmentTemplate : public AbstractMultipleSegmentBaseType
         {
             public:
-                SegmentTemplate( SegmentInformation * = nullptr );
+                SegmentTemplate( SegmentTemplateSegment *, SegmentInformation * = nullptr );
                 virtual ~SegmentTemplate();
                 void setSourceUrl( const std::string &url );
                 uint64_t getLiveTemplateNumber(vlc_tick_t, bool = true) const;

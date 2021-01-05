@@ -31,13 +31,12 @@
 
 using namespace adaptive::playlist;
 
-SegmentTemplateSegment::SegmentTemplateSegment( SegmentTemplate *templ_,
-                                                ICanonicalUrl *parent ) :
+SegmentTemplateSegment::SegmentTemplateSegment( ICanonicalUrl *parent ) :
     Segment( parent )
 {
     debugName = "SegmentTemplateSegment";
     templated = true;
-    templ = templ_;
+    templ = nullptr;
 }
 
 SegmentTemplateSegment::~SegmentTemplateSegment()
@@ -50,12 +49,19 @@ void SegmentTemplateSegment::setSourceUrl(const std::string &url)
     sourceUrl = Url(Url::Component(url, templ));
 }
 
-SegmentTemplate::SegmentTemplate( SegmentInformation *parent ) :
+void SegmentTemplateSegment::setParentTemplate( SegmentTemplate *templ_ )
+{
+    templ = templ_;
+}
+
+SegmentTemplate::SegmentTemplate( SegmentTemplateSegment *seg, SegmentInformation *parent ) :
     AbstractMultipleSegmentBaseType( parent, AbstractAttr::Type::SegmentTemplate )
 {
     initialisationSegment.Set( nullptr );
     parentSegmentInformation = parent;
-    virtualsegment = new SegmentTemplateSegment( this, parent );
+    virtualsegment = seg;
+    virtualsegment->setParent( parentSegmentInformation );
+    virtualsegment->setParentTemplate( this );
 }
 
 SegmentTemplate::~SegmentTemplate()
