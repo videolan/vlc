@@ -45,8 +45,8 @@ namespace smooth
                 Representation(BaseAdaptationSet *);
                 virtual ~Representation ();
 
-                virtual InitSegment * getInitSegment() const; /* reimpl */
-                virtual StreamFormat getStreamFormat() const; /* reimpl */
+                virtual InitSegment * getInitSegment() const override;
+                virtual StreamFormat getStreamFormat() const override;
 
                 /* for segment templates */
                 virtual std::string contextualize(size_t, const std::string &,

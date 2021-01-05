@@ -40,7 +40,7 @@ namespace smooth
                                   uint64_t, vlc_tick_t);
                 virtual ~ForgedInitSegment();
                 virtual SegmentChunk* toChunk(SharedResources *, AbstractConnectionManager *,
-                                              size_t, BaseRepresentation *); /* reimpl */
+                                              size_t, BaseRepresentation *) override;
                 void setWaveFormatEx(const std::string &);
                 void setCodecPrivateData(const std::string &);
                 void setChannels(uint16_t);

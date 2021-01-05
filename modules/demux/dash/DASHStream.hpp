@@ -32,9 +32,9 @@ namespace dash
             DASHStream(demux_t *);
 
         protected:
-            virtual block_t *checkBlock(block_t *, bool); /* impl */
+            virtual block_t *checkBlock(block_t *, bool) override;
             virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
-                                               es_out_t *, AbstractSourceStream *) const; /* reimpl */
+                                               es_out_t *, AbstractSourceStream *) const override;
     };
 
     class DASHStreamFactory : public AbstractStreamFactory

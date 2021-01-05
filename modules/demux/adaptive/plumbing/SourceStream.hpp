@@ -43,8 +43,8 @@ namespace adaptive
         public:
             AbstractChunksSourceStream(vlc_object_t *, AbstractSource *);
             virtual ~AbstractChunksSourceStream();
-            virtual void Reset(); /* impl */
-            virtual stream_t *makeStream(); /* impl */
+            virtual void Reset() override;
+            virtual stream_t *makeStream() override;
 
         protected:
             virtual ssize_t Read(uint8_t *, size_t) = 0;
@@ -66,13 +66,13 @@ namespace adaptive
         public:
             ChunksSourceStream(vlc_object_t *, AbstractSource *);
             virtual ~ChunksSourceStream();
-            virtual void Reset(); /* reimpl */
+            virtual void Reset() override;
 
         protected:
-            virtual ssize_t Read(uint8_t *, size_t); /* impl */
-            virtual int     Seek(uint64_t); /* impl */
-            virtual size_t  Peek(const uint8_t **, size_t); /* impl */
-            virtual std::string getContentType(); /* impl */
+            virtual ssize_t Read(uint8_t *, size_t) override;
+            virtual int     Seek(uint64_t) override;
+            virtual size_t  Peek(const uint8_t **, size_t) override;
+            virtual std::string getContentType() override;
 
         private:
             block_t *p_block;
@@ -83,13 +83,13 @@ namespace adaptive
         public:
             BufferedChunksSourceStream(vlc_object_t *, AbstractSource *);
             virtual ~BufferedChunksSourceStream();
-            virtual void Reset(); /* reimpl */
+            virtual void Reset() override;
 
         protected:
-            virtual ssize_t Read(uint8_t *, size_t); /* impl */
-            virtual int     Seek(uint64_t); /* impl */
-            virtual size_t  Peek(const uint8_t **, size_t); /* impl */
-            virtual std::string getContentType(); /* impl */
+            virtual ssize_t Read(uint8_t *, size_t) override;
+            virtual int     Seek(uint64_t) override;
+            virtual size_t  Peek(const uint8_t **, size_t) override;
+            virtual std::string getContentType() override;
 
         private:
             ssize_t doRead(uint8_t *, size_t);

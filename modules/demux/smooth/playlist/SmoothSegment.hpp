@@ -34,7 +34,7 @@ namespace smooth
             public:
                 SmoothSegmentChunk(AbstractChunkSource *, BaseRepresentation *);
                 virtual ~SmoothSegmentChunk();
-                virtual void onDownload(block_t **); /* reimpl */
+                virtual void onDownload(block_t **) override;
         };
 
         class SmoothSegmentTemplateSegment : public SegmentTemplateSegment
@@ -42,7 +42,7 @@ namespace smooth
             public:
                 SmoothSegmentTemplateSegment( ICanonicalUrl * = nullptr );
                 virtual ~SmoothSegmentTemplateSegment();
-                virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *); /* reimpl */
+                virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *) override;
         };
     }
 }

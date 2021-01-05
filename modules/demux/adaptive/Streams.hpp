@@ -93,12 +93,12 @@ namespace adaptive
         void runUpdates();
 
         /* Used by demuxers fake streams */
-        virtual std::string getContentType(); /* impl */
-        virtual block_t *readNextBlock(); /* impl */
+        virtual std::string getContentType() override;
+        virtual block_t *readNextBlock() override;
 
         /**/
-        virtual void fillExtraFMTInfo( es_format_t * ) const; /* impl */
-        virtual void trackerEvent(const SegmentTrackerEvent &); /* impl */
+        virtual void fillExtraFMTInfo( es_format_t * ) const  override;
+        virtual void trackerEvent(const SegmentTrackerEvent &)  override;
 
     protected:
         bool seekAble() const;
@@ -106,7 +106,7 @@ namespace adaptive
         virtual block_t *checkBlock(block_t *, bool) = 0;
         AbstractDemuxer * createDemux(const StreamFormat &);
         virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
-                                           es_out_t *, AbstractSourceStream *) const; /* impl */
+                                           es_out_t *, AbstractSourceStream *) const  override;
         virtual bool startDemux();
         virtual bool restartDemux();
 

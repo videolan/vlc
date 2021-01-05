@@ -48,7 +48,7 @@ namespace dash
                 AdaptationSet(playlist::BasePeriod *);
                 virtual ~AdaptationSet();
 
-                virtual StreamFormat            getStreamFormat() const; /* reimpl */
+                virtual StreamFormat            getStreamFormat() const override;
                 bool                            getSubsegmentAlignmentFlag() const;
                 void                            setSubsegmentAlignmentFlag( bool alignment );
 

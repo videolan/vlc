@@ -46,7 +46,7 @@ namespace dash
                 Representation( AdaptationSet * );
                 virtual ~Representation ();
 
-                virtual StreamFormat getStreamFormat() const; /* reimpl */
+                virtual StreamFormat getStreamFormat() const override;
 
                 /* for segment templates */
                 virtual std::string contextualize(size_t, const std::string &,

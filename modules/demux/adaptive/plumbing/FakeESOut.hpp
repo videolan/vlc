@@ -97,11 +97,11 @@ namespace adaptive
         private:
             friend class LockedFakeESOut;
             vlc_mutex_t lock;
-            virtual es_out_id_t *esOutAdd( const es_format_t * ); /* impl */
-            virtual int esOutSend( es_out_id_t *, block_t * ); /* impl */
-            virtual void esOutDel( es_out_id_t * ); /* impl */
-            virtual int esOutControl( int, va_list ); /* impl */
-            virtual void esOutDestroy(); /* impl */
+            virtual es_out_id_t *esOutAdd( const es_format_t * ) override;
+            virtual int esOutSend( es_out_id_t *, block_t * ) override;
+            virtual void esOutDel( es_out_id_t * ) override;
+            virtual int esOutControl( int, va_list ) override;
+            virtual void esOutDestroy() override;
             es_out_t *real_es_out;
             FakeESOutID * createNewID( const es_format_t * );
             ExtraFMTInfoInterface *extrainfo;

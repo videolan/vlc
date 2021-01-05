@@ -40,8 +40,8 @@ namespace adaptive
                 virtual ~RateBasedAdaptationLogic   ();
 
                 BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *);
-                virtual void updateDownloadRate(const ID &, size_t, vlc_tick_t); /* reimpl */
-                virtual void trackerEvent(const SegmentTrackerEvent &); /* reimpl */
+                virtual void updateDownloadRate(const ID &, size_t, vlc_tick_t) override;
+                virtual void trackerEvent(const SegmentTrackerEvent &) override;
 
             private:
                 size_t                  bpsAvg;

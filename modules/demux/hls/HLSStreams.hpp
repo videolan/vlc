@@ -33,9 +33,9 @@ namespace hls
             virtual ~HLSStream();
 
         protected:
-            virtual block_t *checkBlock(block_t *, bool); /* reimpl */
+            virtual block_t *checkBlock(block_t *, bool) override;
             virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
-                                               es_out_t *, AbstractSourceStream *) const; /* reimpl */
+                                               es_out_t *, AbstractSourceStream *) const override;
             virtual bool setPosition(vlc_tick_t, bool);
 
         private:

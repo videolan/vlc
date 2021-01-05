@@ -41,18 +41,18 @@ namespace hls
             public:
                 Representation( BaseAdaptationSet * );
                 virtual ~Representation ();
-                virtual StreamFormat getStreamFormat() const; /* reimpl */
+                virtual StreamFormat getStreamFormat() const override;
 
                 void setPlaylistUrl(const std::string &);
                 Url getPlaylistUrl() const;
                 bool isLive() const;
                 bool initialized() const;
-                virtual void scheduleNextUpdate(uint64_t, bool); /* reimpl */
-                virtual bool needsUpdate(uint64_t) const;  /* reimpl */
-                virtual void debug(vlc_object_t *, int) const;  /* reimpl */
-                virtual bool runLocalUpdates(SharedResources *); /* reimpl */
+                virtual void scheduleNextUpdate(uint64_t, bool) override;
+                virtual bool needsUpdate(uint64_t) const override;
+                virtual void debug(vlc_object_t *, int) const override;
+                virtual bool runLocalUpdates(SharedResources *) override;
 
-                virtual uint64_t translateSegmentNumber(uint64_t, const BaseRepresentation *) const; /* reimpl */
+                virtual uint64_t translateSegmentNumber(uint64_t, const BaseRepresentation *) const override;
 
             private:
                 StreamFormat streamFormat;
