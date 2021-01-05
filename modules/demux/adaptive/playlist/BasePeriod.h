@@ -45,9 +45,9 @@ namespace adaptive
                 void                                addAdaptationSet    (BaseAdaptationSet *AdaptationSet);
                 void                                debug               (vlc_object_t *,int = 0) const;
 
-                virtual mtime_t getPeriodStart() const; /* reimpl */
+                virtual mtime_t getPeriodStart() const override;
                 virtual mtime_t getPeriodDuration() const;
-                virtual BasePlaylist *getPlaylist() const; /* reimpl */
+                virtual BasePlaylist *getPlaylist() const override;
 
                 Property<mtime_t> duration;
                 Property<mtime_t> startTime;

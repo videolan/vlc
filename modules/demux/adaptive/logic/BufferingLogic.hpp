@@ -67,10 +67,10 @@ namespace adaptive
             public:
                 DefaultBufferingLogic();
                 virtual ~DefaultBufferingLogic() {}
-                virtual uint64_t getStartSegmentNumber(BaseRepresentation *) const; /* impl */
-                virtual mtime_t getMinBuffering(const BasePlaylist *) const; /* impl */
-                virtual mtime_t getMaxBuffering(const BasePlaylist *) const; /* impl */
-                virtual mtime_t getLiveDelay(const BasePlaylist *) const; /* impl */
+                virtual uint64_t getStartSegmentNumber(BaseRepresentation *) const override;
+                virtual mtime_t getMinBuffering(const BasePlaylist *) const override;
+                virtual mtime_t getMaxBuffering(const BasePlaylist *) const override;
+                virtual mtime_t getLiveDelay(const BasePlaylist *) const override;
                 static const unsigned SAFETY_BUFFERING_EDGE_OFFSET;
                 static const unsigned SAFETY_EXPURGING_OFFSET;
 

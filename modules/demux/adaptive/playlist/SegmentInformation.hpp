@@ -87,7 +87,7 @@ namespace adaptive
                 AbstractSegmentBaseType *getProfile() const;
                 void updateSegmentList(SegmentList *, bool = false);
                 void setSegmentTemplate(SegmentTemplate *);
-                virtual Url getUrlSegment() const; /* impl */
+                virtual Url getUrlSegment() const override;
                 Property<Url *> baseUrl;
                 const AbstractSegmentBaseType * inheritSegmentProfile() const;
 

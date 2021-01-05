@@ -55,7 +55,7 @@ namespace adaptive
                 void    addBaseUrl              (const std::string &);
                 void    setPlaylistUrl          (const std::string &);
 
-                virtual Url         getUrlSegment() const; /* impl */
+                virtual Url         getUrlSegment() const override;
                 vlc_object_t *      getVLCObject()  const;
 
                 virtual const std::vector<BasePeriod *>& getPeriods();

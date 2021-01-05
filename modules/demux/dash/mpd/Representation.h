@@ -47,7 +47,7 @@ namespace dash
                 Representation( AdaptationSet * );
                 virtual ~Representation ();
 
-                virtual StreamFormat getStreamFormat() const; /* reimpl */
+                virtual StreamFormat getStreamFormat() const override;
                 int                 getQualityRanking       () const;
                 void                setQualityRanking       ( int qualityRanking );
                 const std::list<const Representation*>&     getDependencies() const;

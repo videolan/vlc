@@ -40,7 +40,7 @@ namespace dash
             public:
                 DashIndexChunk(AbstractChunkSource *, BaseRepresentation *);
                 ~DashIndexChunk();
-                virtual void onDownload(block_t **); /* reimpl */
+                virtual void onDownload(block_t **) override;
         };
 
         class DashIndexSegment : public IndexSegment
@@ -48,7 +48,7 @@ namespace dash
             public:
                 DashIndexSegment( ICanonicalUrl *parent );
                 ~DashIndexSegment();
-                virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *); /* reimpl */
+                virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *) override;
         };
 
     }

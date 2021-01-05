@@ -42,7 +42,7 @@ namespace adaptive
             public:
                 SegmentTemplateSegment( ICanonicalUrl * = nullptr );
                 virtual ~SegmentTemplateSegment();
-                virtual void setSourceUrl( const std::string &url ); /* reimpl */
+                virtual void setSourceUrl( const std::string &url ) override;
                 void setParentTemplate( SegmentTemplate * );
 
             protected:
@@ -59,17 +59,17 @@ namespace adaptive
                 void pruneByPlaybackTime(mtime_t);
                 size_t pruneBySequenceNumber(uint64_t);
 
-                virtual mtime_t getMinAheadTime(uint64_t curnum) const; /* impl */
-                virtual Segment * getMediaSegment(uint64_t number) const; /* impl */
-                virtual Segment * getNextMediaSegment(uint64_t, uint64_t *, bool *) const; /* impl */
-                virtual InitSegment *getInitSegment() const;/* reimpl */
-                virtual uint64_t getStartSegmentNumber() const; /* impl */
+                virtual mtime_t getMinAheadTime(uint64_t curnum) const override;
+                virtual Segment * getMediaSegment(uint64_t number) const override;
+                virtual Segment * getNextMediaSegment(uint64_t, uint64_t *, bool *) const override;
+                virtual InitSegment *getInitSegment() const override;
+                virtual uint64_t getStartSegmentNumber() const override;
 
-                virtual bool getSegmentNumberByTime(mtime_t time, uint64_t *ret) const; /* impl */
+                virtual bool getSegmentNumberByTime(mtime_t time, uint64_t *ret) const override;
                 virtual bool getPlaybackTimeDurationBySegmentNumber(uint64_t number,
-                                            mtime_t *time, mtime_t *duration) const; /* impl */
+                                            mtime_t *time, mtime_t *duration) const override;
 
-                virtual void debug(vlc_object_t *, int = 0) const; /* reimpl */
+                virtual void debug(vlc_object_t *, int = 0) const override;
 
             protected:
                 SegmentInformation *parentSegmentInformation;
@@ -81,7 +81,7 @@ namespace adaptive
             public:
                 SegmentTemplateInit( SegmentTemplate *, ICanonicalUrl * = nullptr );
                 virtual ~SegmentTemplateInit();
-                virtual void setSourceUrl( const std::string &url ); /* reimpl */
+                virtual void setSourceUrl( const std::string &url ) override;
 
             protected:
                 const SegmentTemplate *templ;
