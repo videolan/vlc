@@ -29,6 +29,7 @@
 #include "SegmentInformation.hpp"
 
 #include <limits>
+#include <algorithm>
 
 using namespace adaptive::playlist;
 
@@ -44,59 +45,38 @@ SegmentBase::~SegmentBase   ()
 
 vlc_tick_t SegmentBase::getMinAheadTime(uint64_t curnum) const
 {
-    const std::vector<Segment *> &segments = subSegments();
+    if(subsegments.size() == 0 || curnum >= subsegments.size() - 1)
+        return 0;
 
-    vlc_tick_t minTime = 0;
     const Timescale timescale = inheritTimescale();
-    std::vector<Segment *>::const_iterator it;
-    for(it = segments.begin(); it != segments.end(); ++it)
-    {
-        const Segment *seg = *it;
-        if(seg->getSequenceNumber() > curnum)
-            minTime += timescale.ToTime(seg->duration.Get());
-    }
-    return minTime;
+    if(!timescale.isValid())
+        return 0;
+
+    stime_t minTime = 0;
+    std::for_each(subsegments.cbegin() + curnum + 1, subsegments.cend(),
+        [&minTime,timescale](const Segment * seg){
+            minTime += seg->duration.Get();
+        });
+
+    return timescale.ToTime(minTime);
 }
 
 Segment * SegmentBase::getMediaSegment(uint64_t pos) const
 {
-    std::vector<Segment *>::const_iterator it;
-    for(it =  subsegments.begin(); it != subsegments.end(); ++it)
-    {
-        Segment *seg = *it;
-        if(seg->getSequenceNumber() >= pos)
-        {
-            if(seg->getSequenceNumber() == pos)
-                return seg;
-            else
-                return NULL;
-        }
-    }
-    return NULL;
+    return (pos < subsegments.size()) ? subsegments.at(pos) : nullptr;
 }
 
 Segment *  SegmentBase::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newpos,
                                             bool *pb_gap) const
 {
-    std::vector<Segment *>::const_iterator it;
-    for(it = subsegments.begin(); it != subsegments.end(); ++it)
-    {
-        Segment *seg = *it;
-        if(seg->getSequenceNumber() >= i_pos)
-        {
-            *pi_newpos = seg->getSequenceNumber();
-            *pb_gap = (*pi_newpos != i_pos);
-            return seg;
-        }
-    }
     *pb_gap = false;
     *pi_newpos = i_pos;
-    return NULL;
+    return getMediaSegment(i_pos);
 }
 
 uint64_t SegmentBase::getStartSegmentNumber() const
 {
-    return subsegments.empty() ? 0 : subsegments.front()->getSequenceNumber();
+    return 0;
 }
 
 bool SegmentBase::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) const
@@ -127,7 +107,6 @@ bool SegmentBase::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
 void SegmentBase::debug(vlc_object_t *obj, int indent) const
 {
     AbstractSegmentBaseType::debug(obj, indent);
-    std::vector<Segment *>::const_iterator it;
-    for(it = subsegments.begin(); it != subsegments.end(); ++it)
-        (*it)->debug(obj, indent);
+    std::for_each(subsegments.cbegin(), subsegments.cend(),
+                  [&](const Segment *seg){seg->debug(obj, indent);});
 }
