@@ -64,19 +64,20 @@ void SmoothSegmentChunk::onDownload(block_t **pp_block)
     }
 }
 
-SmoothSegmentTemplate::SmoothSegmentTemplate(SegmentInformation *parent) :
-    SegmentTemplate( parent )
+SmoothSegmentTemplateSegment::SmoothSegmentTemplateSegment(ICanonicalUrl *parent)
+    : SegmentTemplateSegment(parent)
 {
 
 }
 
-SmoothSegmentTemplate::~SmoothSegmentTemplate()
+SmoothSegmentTemplateSegment::~SmoothSegmentTemplateSegment()
 {
 
 }
 
-SegmentChunk* SmoothSegmentTemplate::createChunk(AbstractChunkSource *source, BaseRepresentation *rep)
+SegmentChunk* SmoothSegmentTemplateSegment::createChunk(AbstractChunkSource *source, BaseRepresentation *rep)
 {
      /* act as factory */
     return new (std::nothrow) SmoothSegmentChunk(source, rep);
 }
+
