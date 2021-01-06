@@ -88,6 +88,7 @@ SegmentChunk* ISegment::toChunk(SharedResources *res, AbstractConnectionManager 
         SegmentChunk *chunk = createChunk(source, rep);
         if(chunk)
         {
+            chunk->sequence = index;
             chunk->discontinuity = discontinuity;
             if(!prepareChunk(res, chunk, rep))
             {
