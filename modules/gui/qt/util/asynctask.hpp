@@ -128,6 +128,9 @@
  * to declare that it won't use it anymore (and don't want the result). When
  * both conditions are met, the task is deleted via `QObject::deleteLater()`.
  *
+ * For convenience, a `TaskHandle` smart pointer is provided to call
+ * `abandon()` using RAII.
+ *
  * The task result is provided via a separate method `takeResult()` instead of
  * a slot parameter, because otherwise, Qt would require its type to be:
  *  - non-template (like `std::vector<T>`),
@@ -242,5 +245,24 @@ private:
     friend class AsyncTask<T>;
     AsyncTask<T> *m_task;
 };
+
+template <typename T>
+struct TaskDeleter
+{
+    void operator()(T *task) { task->abandon(); }
+};
+
+/**
+ * Task handle to abandon() a task using RAII
+ *
+ * It behaves like a unique_ptr, but its deleter calls AsyncTask<T>::abandon(),
+ * which indicates that the client cancels the task and requests deletion when
+ * possible.
+ *
+ * The actual deletion may happen later (when the runnable also finished its
+ * work).
+ */
+template <typename T>
+using TaskHandle = std::unique_ptr<T, TaskDeleter<T>>;
 
 #endif

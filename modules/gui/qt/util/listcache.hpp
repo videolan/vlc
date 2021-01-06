@@ -115,7 +115,6 @@ public:
         : m_threadPool(threadPool)
         , m_loader(loader)
         , m_chunkSize(chunkSize) {}
-    ~ListCache();
 
     /**
      * Return the item at specified index
@@ -167,18 +166,9 @@ private:
     bool m_countRequested = false;
     MLRange m_lastRangeRequested;
 
-    LoadTask<T> *m_loadTask = nullptr;
-    CountTask<T> *m_countTask = nullptr;
+    TaskHandle<LoadTask<T>> m_loadTask;
+    TaskHandle<CountTask<T>> m_countTask;
 };
-
-template <typename T>
-ListCache<T>::~ListCache()
-{
-    if (m_countTask)
-        m_countTask->abandon();
-    if (m_loadTask)
-        m_loadTask->abandon();
-}
 
 template <typename T>
 const T *ListCache<T>::get(size_t index) const
@@ -248,8 +238,8 @@ void ListCache<T>::asyncCount()
 {
     assert(!m_countTask);
 
-    m_countTask = new CountTask<T>(m_loader);
-    connect(m_countTask, &BaseAsyncTask::result,
+    m_countTask.reset(new CountTask<T>(m_loader));
+    connect(m_countTask.get(), &BaseAsyncTask::result,
             this, &ListCache<T>::onCountResult);
     m_countRequested = true;
     m_countTask->start(m_threadPool);
@@ -259,15 +249,14 @@ template <typename T>
 void ListCache<T>::onCountResult()
 {
     CountTask<T> *task = static_cast<CountTask<T> *>(sender());
-    assert(task == m_countTask);
+    assert(task == m_countTask.get());
 
     m_offset = 0;
     m_list.clear();
     m_total_count = static_cast<ssize_t>(task->takeResult());
     emit localSizeChanged(m_total_count);
 
-    task->abandon();
-    m_countTask = nullptr;
+    m_countTask.reset();
 }
 
 template <typename T>
@@ -298,12 +287,8 @@ private:
 template <typename T>
 void ListCache<T>::asyncLoad(size_t offset, size_t count)
 {
-    if (m_loadTask)
-        /* Cancel any current pending task */
-        m_loadTask->abandon();
-
-    m_loadTask = new LoadTask<T>(m_loader, offset, count);
-    connect(m_loadTask, &BaseAsyncTask::result,
+    m_loadTask.reset(new LoadTask<T>(m_loader, offset, count));
+    connect(m_loadTask.get(), &BaseAsyncTask::result,
             this, &ListCache<T>::onLoadResult);
     m_lastRangeRequested = { offset, count };
     m_loadTask->start(m_threadPool);
@@ -313,15 +298,14 @@ template <typename T>
 void ListCache<T>::onLoadResult()
 {
     LoadTask<T> *task = static_cast<LoadTask<T> *>(sender());
-    assert(task == m_loadTask);
+    assert(task == m_loadTask.get());
 
     m_offset = task->m_offset;
     m_list = task->takeResult();
     if (m_list.size())
         emit localDataChanged(m_offset, m_list.size());
 
-    task->abandon();
-    m_loadTask = nullptr;
+    m_loadTask.reset();
 }
 
 #endif
