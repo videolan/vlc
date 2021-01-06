@@ -71,7 +71,7 @@ namespace adaptive
 
             protected:
                 SegmentInformation *parentSegmentInformation;
-                std::vector<SegmentTemplateSegment *> segments; /* should have only 1 */
+                SegmentTemplateSegment *virtualsegment;
         };
 
         class SegmentTemplateInit : public InitSegment

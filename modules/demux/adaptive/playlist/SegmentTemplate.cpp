@@ -55,17 +55,17 @@ SegmentTemplate::SegmentTemplate( SegmentInformation *parent ) :
 {
     initialisationSegment.Set( nullptr );
     parentSegmentInformation = parent;
-    segments.push_back( new SegmentTemplateSegment( this, parent ) );
+    virtualsegment = new SegmentTemplateSegment( this, parent );
 }
 
 SegmentTemplate::~SegmentTemplate()
 {
-    delete *segments.begin();
+    delete virtualsegment;
 }
 
 void SegmentTemplate::setSourceUrl( const std::string &url )
 {
-    (*segments.begin())->setSourceUrl(url);
+    virtualsegment->setSourceUrl(url);
 }
 
 void SegmentTemplate::pruneByPlaybackTime(vlc_tick_t time)
@@ -111,7 +111,8 @@ uint64_t SegmentTemplate::getLiveTemplateNumber(vlc_tick_t playbacktime, bool ab
 void SegmentTemplate::debug(vlc_object_t *obj, int indent) const
 {
     AbstractSegmentBaseType::debug(obj, indent);
-    (*segments.begin())->debug(obj, indent);
+    if(virtualsegment)
+        virtualsegment->debug(obj, indent);
     const AbstractAttr *p = getAttribute(Type::Timeline);
     if(p)
         static_cast<const SegmentTimeline *> (p)->debug(obj, indent + 1);
@@ -138,7 +139,7 @@ Segment * SegmentTemplate::getMediaSegment(uint64_t number) const
 {
     const SegmentTimeline *tl = inheritSegmentTimeline();
     if(tl == nullptr || tl->maxElementNumber() > number)
-        return *segments.begin();
+        return virtualsegment;
     return nullptr;
 }
 
@@ -186,7 +187,7 @@ Segment *  SegmentTemplate::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newp
         /* start number */
         *pi_newpos = std::max(inheritStartNumber(), i_pos);
     }
-    return *segments.begin();
+    return virtualsegment;
 }
 
 uint64_t SegmentTemplate::getStartSegmentNumber() const
