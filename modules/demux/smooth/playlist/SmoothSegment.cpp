@@ -49,7 +49,7 @@ void SmoothSegmentChunk::onDownload(block_t **pp_block)
         return;
 
     IndexReader br(rep->getPlaylist()->getVLCObject());
-    br.parseIndex(*pp_block, rep);
+    br.parseIndex(*pp_block, rep, sequence);
 
     /* If timeshift depth is present, we use it for expiring segments
        as we never update playlist itself */

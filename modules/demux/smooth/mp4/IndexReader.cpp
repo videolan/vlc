@@ -36,12 +36,18 @@ IndexReader::IndexReader(vlc_object_t *obj)
 {
 }
 
-bool IndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep)
+bool IndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep, uint64_t sequence)
 {
     if(!rep || !parseBlock(p_block))
         return false;
 
-    /* Do track ID fixup */
+    /* Fixup moof sequence as they do not monotonically increase
+       nor provide a way to have moof time on implicit discontinuity */
+    const MP4_Box_t *mfhd_box = MP4_BoxGet( rootbox, "moof/mfhd" );
+    if( mfhd_box )
+        SetDWBE( &p_block->p_buffer[mfhd_box->i_pos + 8 + 4], sequence );
+
+    /* Do track ID fixup, must match track #1 */
     const MP4_Box_t *tfhd_box = MP4_BoxGet( rootbox, "moof/traf/tfhd" );
     if ( tfhd_box )
         SetDWBE( &p_block->p_buffer[tfhd_box->i_pos + 8 + 4], 0x01 );
