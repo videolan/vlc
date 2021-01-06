@@ -1,5 +1,5 @@
 /*****************************************************************************
- * medialib.cpp: medialibrary module
+ * medialibrary.cpp: medialibrary module
  *****************************************************************************
  * Copyright © 2008-2018 VLC authors, VideoLAN and VideoLabs
  *

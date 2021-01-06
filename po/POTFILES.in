@@ -1098,7 +1098,7 @@ modules/misc/inhibit/dbus.c
 modules/misc/inhibit/iokit-inhibit.c
 modules/misc/inhibit/wl-idle-inhibit.c
 modules/misc/inhibit/xdg.c
-modules/misc/medialibrary/medialib.cpp
+modules/misc/medialibrary/medialibrary.cpp
 modules/misc/playlist/export.c
 modules/misc/playlist/html.c
 modules/misc/playlist/m3u.c

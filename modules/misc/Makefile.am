@@ -106,7 +106,7 @@ EXTRA_LTLIBRARIES += libxml_plugin.la
 misc_LTLIBRARIES += $(LTLIBxml)
 
 libmedialibrary_plugin_la_SOURCES = \
-	misc/medialibrary/medialib.cpp \
+	misc/medialibrary/medialibrary.cpp \
 	misc/medialibrary/MetadataExtractor.cpp \
 	misc/medialibrary/entities.cpp \
 	misc/medialibrary/Thumbnailer.cpp \
