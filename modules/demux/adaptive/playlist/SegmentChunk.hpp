@@ -46,6 +46,7 @@ namespace adaptive
             void         setEncryptionSession(CommonEncryptionSession *);
             StreamFormat getStreamFormat() const;
             bool discontinuity;
+            uint64_t sequence;
 
         protected:
             bool         decrypt(block_t **);
