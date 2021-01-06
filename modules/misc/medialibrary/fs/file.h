@@ -36,7 +36,7 @@ public:
     const std::string& mrl() const override;
     const std::string& name() const override;
     const std::string& extension() const override;
-    unsigned int lastModificationDate() const override;
+    time_t lastModificationDate() const override;
     int64_t size() const override;
     inline bool isNetwork() const override { return true; }
     LinkedFileType linkedType() const override;

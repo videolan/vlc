@@ -53,7 +53,7 @@ SDFile::extension() const
     return m_extension;
 }
 
-unsigned int
+time_t
 SDFile::lastModificationDate() const
 {
     return 0;

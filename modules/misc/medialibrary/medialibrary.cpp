@@ -575,7 +575,7 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_NEW_EXTERNAL_MEDIA:
         {
             auto mrl = va_arg( args, const char* );
-            auto media = m_ml->addExternalMedia( mrl );
+            auto media = m_ml->addExternalMedia( mrl, -1 );
             if ( media == nullptr )
                 return VLC_EGENERIC;
             *va_arg( args, vlc_ml_media_t**) = CreateAndConvert<vlc_ml_media_t>( media.get() );
