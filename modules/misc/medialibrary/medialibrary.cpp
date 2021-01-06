@@ -462,6 +462,10 @@ bool MediaLibrary::Start()
     if ( Init() == false )
         return false;
 
+    if ( m_started.test_and_set() )
+        /* The code below should be executed at most once */
+        return true;
+
     /*
      * If we already provided the medialib with some entry points, then we have
      * nothing left to do

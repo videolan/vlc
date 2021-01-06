@@ -170,6 +170,8 @@ private:
     vlc::threads::mutex m_mutex;
     bool m_initialized = false; /* protected by m_mutex */
 
+    std::atomic_flag m_started = ATOMIC_FLAG_INIT;
+
     // IMediaLibraryCb interface
 public:
     virtual void onMediaAdded(std::vector<medialibrary::MediaPtr> media) override;
