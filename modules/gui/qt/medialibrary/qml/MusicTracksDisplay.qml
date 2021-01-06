@@ -28,6 +28,7 @@ Widgets.NavigableFocusScope {
     property alias sortModel: tracklistdisplay_id.sortModel
     property alias model: tracklistdisplay_id.model
     property alias selectionModel: tracklistdisplay_id.selectionDelegateModel
+    readonly property bool isViewMultiView: false
 
     Widgets.DragItem {
         id: trackDragItem

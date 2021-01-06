@@ -32,6 +32,7 @@ Widgets.PageLoader {
 
     property var sortModel
     property var contentModel
+    property bool isViewMultiView: true
 
     defaultPage: "artists"
     pageModel: [{
@@ -56,6 +57,7 @@ Widgets.PageLoader {
     onCurrentItemChanged: {
         sortModel = currentItem.sortModel
         contentModel = currentItem.model
+        isViewMultiView = currentItem.isViewMultiView === undefined || currentItem.isViewMultiView
     }
 
     function loadIndex(index) {
