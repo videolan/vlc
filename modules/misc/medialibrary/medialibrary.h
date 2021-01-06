@@ -167,6 +167,9 @@ private:
     std::unique_ptr<Logger> m_logger;
     std::unique_ptr<medialibrary::IMediaLibrary> m_ml;
 
+    vlc::threads::mutex m_mutex;
+    bool m_initialized = false; /* protected by m_mutex */
+
     // IMediaLibraryCb interface
 public:
     virtual void onMediaAdded(std::vector<medialibrary::MediaPtr> media) override;

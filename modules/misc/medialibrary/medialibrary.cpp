@@ -388,8 +388,10 @@ MediaLibrary::MediaLibrary( vlc_medialibrary_module_t* ml )
 
 bool MediaLibrary::Init()
 {
-    if ( m_ml->isInitialized() == true )
+    vlc::threads::mutex_locker lock( m_mutex );
+    if( m_initialized )
         return true;
+
     auto userDir = vlc::wrap_cptr( config_GetUserDir( VLC_USERDATA_DIR ) );
     std::string mlDir = std::string{ userDir.get() } + "/ml/";
 
@@ -403,6 +405,7 @@ bool MediaLibrary::Init()
     switch ( initStatus )
     {
         case medialibrary::InitializeResult::AlreadyInitialized:
+            assert(!"initialize() should not have been called if already initialized");
             return true;
         case medialibrary::InitializeResult::Failed:
             msg_Err( m_vlc_ml, "Medialibrary failed to initialize" );
@@ -450,6 +453,7 @@ bool MediaLibrary::Init()
 
     m_ml->setDiscoverNetworkEnabled( true );
 
+    m_initialized = true;
     return true;
 }
 
