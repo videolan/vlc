@@ -75,7 +75,7 @@ Widgets.NavigableFocusScope {
             id: recentVideosListView
 
             width: parent.width
-            implicitHeight: VLCStyle.gridItem_video_height_large
+            implicitHeight: VLCStyle.gridItem_video_height_large + VLCStyle.gridItemSelectedBorder + VLCStyle.margin_xlarge
             spacing: VLCStyle.column_margin_width
             orientation: ListView.Horizontal
 
@@ -96,6 +96,8 @@ Widgets.NavigableFocusScope {
                 id: recentVideoGridItem
 
                 focus: true
+                x: selectedBorderWidth
+                y: selectedBorderWidth
 
                 image: model.thumbnail || VLCStyle.noArtCover
                 title: model.title || i18n.qtr("Unknown title")
