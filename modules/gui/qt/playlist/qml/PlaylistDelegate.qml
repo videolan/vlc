@@ -19,6 +19,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+
 import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
@@ -35,7 +36,7 @@ Rectangle {
     readonly property bool isLastItem: (index === listView.modelCount - 1)
     readonly property bool selected : model.selected
 
-    property alias hovered: mouse.containsMouse
+    property alias hovered: mouseArea.containsMouse
 
     color: {
         if (selected)
@@ -86,16 +87,19 @@ Rectangle {
     // top drop indicator bar
     Rectangle {
         id: topDropIndicator
-        z: 1
-        width: parent.width
-        height: 1
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+        height: VLCStyle.dp(1)
         anchors.top: parent.top
+
         visible: false
         color: colors.accent
     }
 
     MouseArea {
-        id: mouse
+        id: mouseArea
 
         width: parent.width
         implicitHeight: childrenRect.height
@@ -106,14 +110,14 @@ Rectangle {
 
         onContainsMouseChanged: {
             if (containsMouse) {
-                var bottomItemIndex = listView.listView.indexAt(delegate.width / 2, (listView.listView.contentY + listView.height) - 2)
-                var topItemIndex = listView.listView.indexAt(delegate.width / 2, listView.listView.contentY + 2)
+                var bottomItemIndex = listView.listView.indexAt(delegate.width / 2, (listView.listView.contentY + listView.height) + 1)
+                var topItemIndex = listView.listView.indexAt(delegate.width / 2, listView.listView.contentY - 1)
 
                 if(bottomItemIndex !== -1 && model.index >= bottomItemIndex - 1)
                 {
                     listView.fadeRectBottomHovered = Qt.binding(function() {return delegate.hovered})
                 }
-                if(topItemIndex !== -1 && model.index <= topItemIndex + 1)
+                if(model.index <= topItemIndex + 1)
                 {
                     listView.fadeRectTopHovered = Qt.binding(function() {return delegate.hovered})
                 }
@@ -153,7 +157,7 @@ Rectangle {
         drag.target: dragItem
 
         Connections {
-            target: mouse.drag
+            target: mouseArea.drag
             onActiveChanged: {
                 if (target.active) {
                     if (!root.model.isSelected(index)) {

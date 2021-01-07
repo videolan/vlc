@@ -43,23 +43,30 @@ Widgets.NavigableFocusScope {
         Move // Keyboard item move mode, activated through PlaylistOverlayMenu
     }
 
+    function isValidInstanceOf(object, type) {
+        return (!!object && (object instanceof type))
+    }
+
     function isDropAcceptable(drop, index) {
-        return drop.hasUrls
-                || ((!!drop.source && (drop.source instanceof PlaylistDroppable))
-                     && drop.source.canInsertIntoPlaylist(index))
+        return drop.hasUrls || // external drop (i.e. from filesystem)
+                (isValidInstanceOf(drop.source, Widgets.DragItem) && drop.source.canInsertIntoPlaylist(index)) // internal drop (inter-view or intra-playlist)
     }
 
     function acceptDrop(index, drop) {
-        if (!!drop.source && (drop.source instanceof PlaylistDroppable)) {
+        if (isValidInstanceOf(drop.source, Widgets.DragItem)) {
+            // dropping Medialib view content into playlist or intra-playlist dragging:
             drop.source.insertIntoPlaylist(index)
         } else if (drop.hasUrls) {
-            //force conversion to an actual list
+            // dropping an external item (i.e. filesystem drag) into playlist:
+            // force conversion to an actual list
             var urlList = []
             for ( var url in drop.urls)
                 urlList.push(drop.urls[url])
             mainPlaylistController.insert(index, urlList, false)
+
+            // This is required otherwise backend may handle the drop as well yielding double addition
+            drop.accept(Qt.IgnoreAction)
         }
-        drop.accept(Qt.IgnoreAction)
     }
 
     PlaylistOverlayMenu {
@@ -81,7 +88,6 @@ Widgets.NavigableFocusScope {
                 listView.forceActiveFocus()
         }
 
-        //label for DnD
         Widgets.DNDLabel {
             id: dragItem
 
@@ -124,6 +130,7 @@ Widgets.NavigableFocusScope {
                 }
             }
 
+            // FIXME: Drag animation for listView sometimes messes up dragging (dragged item sticking to the cursor).
             SmoothedAnimation {
                 id: upAnimation
                 target: listView.listView
@@ -131,7 +138,7 @@ Widgets.NavigableFocusScope {
                 to: 0
                 running: dragItem._scrollingDirection === -1 && dragItem.visible
 
-                velocity: VLCStyle.dp(150, VLCStyle.scale)
+                velocity: VLCStyle.dp(225, VLCStyle.scale)
             }
 
             SmoothedAnimation {
@@ -141,7 +148,7 @@ Widgets.NavigableFocusScope {
                 to: listView.listView.contentHeight - listView.height
                 running: dragItem._scrollingDirection === 1 && dragItem.visible
 
-                velocity: VLCStyle.dp(150, VLCStyle.scale)
+                velocity: VLCStyle.dp(225, VLCStyle.scale)
             }
         }
 
@@ -276,30 +283,33 @@ Widgets.NavigableFocusScope {
                 signal setItemDropIndicatorVisible(int index, bool visible)
 
                 Connections {
-                    target: root.model
+                    target: listView.model
+
                     onRowsInserted: {
-                        if (listView.currentIndex == -1)
+                        if (listView.currentIndex === -1)
                             listView.currentIndex = 0
                     }
+
                     onModelReset: {
-                        if (listView.currentIndex == -1 &&  root.model.count > 0)
+                        if (listView.currentIndex === -1 && root.model.count > 0)
                             listView.currentIndex = 0
                     }
+
                     onSelectedCountChanged: {
-                        var selectedIndexes = root.model.getSelection()
+                        var selectedIndexes = listView.model.getSelection()
 
                         if (listView.modelCount === 0 || selectedIndexes.length === 0)
                             return
 
-                        var bottomItemIndex = listView.listView.indexAt(listView.listView.contentX, (listView.listView.contentY + listView.height) - 2)
-                        var topItemIndex    = listView.listView.indexAt(listView.listView.contentX, listView.listView.contentY + 2)
+                        var bottomItemIndex = listView.listView.indexAt(listView.width / 2, (listView.listView.contentY + listView.height) + 1)
+                        var topItemIndex = listView.listView.indexAt(listView.width / 2, listView.listView.contentY - 1)
 
-                        if (topItemIndex !== -1 && (root.model.isSelected(topItemIndex) || (modelCount >= 2 && root.model.isSelected(topItemIndex + 1))))
+                        if (listView.model.isSelected(topItemIndex) || (listView.model.isSelected(topItemIndex + 1)))
                             listView.fadeRectTopHovered = true
                         else
                             listView.fadeRectTopHovered = false
 
-                        if (bottomItemIndex !== -1 && (root.model.isSelected(bottomItemIndex) || (root.model.isSelected(bottomItemIndex - 1))))
+                        if (listView.model.isSelected(bottomItemIndex) || (bottomItemIndex !== -1 && listView.model.isSelected(bottomItemIndex - 1)))
                             listView.fadeRectBottomHovered = true
                         else
                             listView.fadeRectBottomHovered = false
@@ -508,6 +518,7 @@ Widgets.NavigableFocusScope {
                 }
 
                 Column {
+                    id: noContentInfoColumn
                     anchors.centerIn: parent
                     visible: model.count === 0
 
@@ -521,7 +532,6 @@ Widgets.NavigableFocusScope {
                         opacity: 0.3
                     }
 
-                    // ToDo: Use TitleLabel
                     Label {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.topMargin: VLCStyle.margin_xlarge
@@ -533,7 +543,6 @@ Widgets.NavigableFocusScope {
                         opacity: 0.4
                     }
 
-                    // ToDo: Use BodyLabel
                     Label {
                         anchors.topMargin: VLCStyle.margin_normal
                         text: i18n.qtr("Drag & Drop some content here!")
