@@ -609,8 +609,6 @@ static void *Thread( void *obj )
     QApplication::setAttribute( Qt::AA_DontCheckOpenGLContextThreadAffinity );
     QQuickWindow::setDefaultAlphaBuffer(true);
 
-    QQuickStyle::setStyle("fusion");
-
     /* Start the QApplication here */
     QVLCApp app( argc, argv );
 
