@@ -26,6 +26,8 @@ import QtGraphicalEffects 1.0
 Playlist.PlaylistDroppable {
     id: dragItem
 
+    property VLCColors colors: VLCStyle.colors
+
     readonly property int coverSize: VLCStyle.icon_normal
     readonly property int _maxCovers: 3
     readonly property int _displayedCoversCount: Math.min(_model.count, _maxCovers + 1)
@@ -58,8 +60,8 @@ Playlist.PlaylistDroppable {
     Rectangle {
         /* background */
         anchors.fill: parent
-        color: VLCStyle.colors.button
-        border.color: VLCStyle.colors.buttonBorder
+        color: colors.button
+        border.color: colors.buttonBorder
         border.width: VLCStyle.dp(1, VLCStyle.scale)
         radius: VLCStyle.dp(6, VLCStyle.scale)
     }
@@ -74,7 +76,7 @@ Playlist.PlaylistDroppable {
     RectangularGlow {
         anchors.fill: parent
         glowRadius: VLCStyle.dp(8, VLCStyle.scale)
-        color: VLCStyle.colors.glowColor
+        color: colors.glowColor
         spread: 0.2
     }
 
@@ -93,7 +95,7 @@ Playlist.PlaylistDroppable {
 
                 radius: coverRepeater.count > 1 ? dragItem.coverSize : VLCStyle.dp(2, VLCStyle.scale)
                 anchors.fill: parent
-                color: VLCStyle.colors.bg
+                color: colors.bg
             }
 
             DropShadow {
@@ -142,7 +144,7 @@ Playlist.PlaylistDroppable {
                 // for cover border
                 color: "transparent"
                 border.width: VLCStyle.dp(1, VLCStyle.scale)
-                border.color: VLCStyle.colors.buttonBorder
+                border.color: colors.buttonBorder
                 anchors.fill: parent
                 radius: bg.radius
             }
@@ -158,13 +160,13 @@ Playlist.PlaylistDroppable {
         height: dragItem.coverSize
         radius: dragItem.coverSize
         visible: _model.count > dragItem._maxCovers
-        color: VLCStyle.colors.bgAlt
+        color: colors.bgAlt
         border.width: VLCStyle.dp(1, VLCStyle.scale)
-        border.color: VLCStyle.colors.buttonBorder
+        border.color: colors.buttonBorder
 
         MenuLabel {
             anchors.centerIn: parent
-            color: VLCStyle.colors.accent
+            color: colors.accent
             text: "+" + (_model.count - dragItem._maxCovers)
         }
     }
@@ -213,7 +215,7 @@ Playlist.PlaylistDroppable {
                 width: parent.width
                 elide: Text.ElideNone
                 font.pixelSize: VLCStyle.fontSize_large
-                color: VLCStyle.colors.buttonText
+                color: colors.buttonText
             }
         }
 
