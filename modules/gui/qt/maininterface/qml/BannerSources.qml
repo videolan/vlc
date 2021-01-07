@@ -224,9 +224,9 @@ Widgets.NavigableFocusScope {
 
                             textRole: "text"
                             criteriaRole: "criteria"
-                            listWidth: VLCStyle.widthSortBox
+
                             height: localToolbar.height
-                            size: VLCStyle.banner_icon_size
+                            iconSize: VLCStyle.banner_icon_size
 
                             popupAlignment: Qt.AlignLeft | Qt.AlignBottom
 
@@ -235,13 +235,13 @@ Widgets.NavigableFocusScope {
 
                             onSortSelected: {
                                 if (contentModel !== undefined) {
-                                    contentModel.sortCriteria = modelData[criteriaRole]
+                                    contentModel.sortCriteria = type
                                 }
                             }
 
                             onSortOrderSelected: {
                                 if (contentModel !== undefined) {
-                                    contentModel.sortOrder = order
+                                    contentModel.sortOrder = type
                                 }
                             }
 

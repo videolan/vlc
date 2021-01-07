@@ -35,36 +35,38 @@ Widgets.NavigableFocusScope {
     implicitWidth: button.implicitWidth
     implicitHeight: button.implicitHeight
 
-    property alias model: list.model
+    property alias model: listView.model
     property string textRole
     property string criteriaRole
+    // provided for convenience:
+    property alias titleRole: root.textRole
+    property alias keyRole: root.criteriaRole
 
     property int popupAlignment: Qt.AlignRight | Qt.AlignBottom
-    property int listWidth
-    property alias currentIndex: list.currentIndex
+    property real listWidth: VLCStyle.widthSortBox
     property alias focusPolicy: button.focusPolicy
+    property alias iconSize: button.size
 
     property VLCColors colors: VLCStyle.colors
 
     // properties that should be handled by parent
-    // if they are not updated, SortControl will behave as before
-    property var sortKey : PlaylistControllerModel.SORT_KEY_NONE
-    property var sortOrder : undefined
+    // if they are not updated, tick mark and order mark will not be shown
+    property var sortKey: undefined
+    property var sortOrder: undefined
 
-    property bool _intSortOrder : false
-
-    property alias size: button.size
-
-    signal sortSelected(var modelData)
-    signal sortOrderSelected(var order)
-
-    onFocusChanged: {
-        if (!focus)
-            popup.close()
-    }
+    // sortSelected is triggered with new sorting key when a different sorting key is selected
+    // sortOrderSelected is triggered with Qt.AscendingOrder when different sorting key is selected
+    // sortOrderSelected is triggered with Qt.AscendingOrder or Qt.DescendingOrder when the same sorting key is selected
+    signal sortSelected(var type)
+    signal sortOrderSelected(var type)
 
     onVisibleChanged: {
         if (!visible)
+            popup.close()
+    }
+
+    onEnabledChanged: {
+        if (!enabled)
             popup.close()
     }
 
@@ -82,36 +84,33 @@ Widgets.NavigableFocusScope {
 
         focus: true
 
-        color: colors.buttonText
-        colorDisabled: colors.textInactive
-
         onClicked: {
-            if (popup.opened)
+            if (popup.visible)
                 popup.close()
             else
                 popup.open()
         }
-
     }
 
     Popup {
         id: popup
 
-        y: (popupAlignment & Qt.AlignBottom) ? (root.height + 1) : - (implicitHeight + 1)
-        x: (popupAlignment & Qt.AlignRight) ? (button.width - width) :  0
-        width: root.listWidth
-        implicitHeight: contentItem.implicitHeight + padding * 2
-        padding: 1
+        y: (popupAlignment & Qt.AlignBottom) ? (root.height) : -(height)
+        x: (popupAlignment & Qt.AlignRight) ? (button.width - width) : 0
+
+        width: listWidth
+
+        padding: bgRect.border.width
+
+        clip: true
 
         onOpened: {
-            button.KeyNavigation.down = list
             button.highlighted = true
 
-            list.forceActiveFocus()
+            listView.forceActiveFocus()
         }
 
         onClosed: {
-            button.KeyNavigation.down = null
             button.highlighted = false
 
             if (button.focusPolicy !== Qt.NoFocus)
@@ -119,50 +118,65 @@ Widgets.NavigableFocusScope {
         }
 
         contentItem: ListView {
-            id: list
+            id: listView
 
-            clip: true
             implicitHeight: contentHeight
-            spacing: 0
+
+            onActiveFocusChanged: {
+                // since Popup.CloseOnReleaseOutside closePolicy is limited to
+                // modal popups, this is an alternative way of closing the popup
+                // when the focus is lost
+                if (!activeFocus && !button.activeFocus)
+                    popup.close()
+            }
 
             ScrollIndicator.vertical: ScrollIndicator { }
 
-            highlight: Rectangle {
-                color: colors.accent
-                opacity: 0.8
-            }
+            property bool containsMouse: false
 
             delegate: ItemDelegate {
                 id: itemDelegate
 
-                anchors.left: parent.left
-                anchors.right: parent.right
-                padding: 0
+                width: parent.width
 
-                background: Item {}
+                readonly property var delegateSortKey: modelData[root.criteriaRole]
+
+                readonly property bool isActive: (delegateSortKey === sortKey)
+
+                background: Rectangle {
+                    color: colors.accent
+                    visible: itemDelegate.hovered || (!listView.containsMouse && itemDelegate.activeFocus)
+                    opacity: 0.8
+                }
+
+                onHoveredChanged: {
+                    listView.containsMouse = hovered
+                    itemDelegate.forceActiveFocus()
+                }
+
                 contentItem: Item {
-                    implicitHeight: itemRow.implicitHeight
+                    implicitHeight: itemRow.height
                     width: itemDelegate.width
-
-                    Rectangle {
-                        anchors.fill: parent
-                        color: colors.accent
-                        visible: mouseArea.containsMouse
-                        opacity: 0.8
-                    }
 
                     RowLayout {
                         id: itemRow
-                        anchors.fill: parent
+
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+
+                        anchors {
+                            leftMargin: VLCStyle.margin_xxsmall
+                            rightMargin: VLCStyle.margin_xxsmall
+                        }
 
                         MenuCaption {
-                            id: isActiveText
                             Layout.preferredHeight: itemText.implicitHeight
                             Layout.preferredWidth: tickMetric.width
-                            Layout.leftMargin: VLCStyle.margin_xsmall
 
-                            text: root.criteriaRole ? (Array.isArray(root.model) ? (modelData[root.criteriaRole] === sortKey ? "✓" : "")
-                                                                                 : (model[root.criteriaRole] === sortKey ? "✓" : "")) : ""
+                            horizontalAlignment: Text.AlignHCenter
+
+                            text: isActive ? tickMetric.text : ""
+
                             color: colors.buttonText
 
                             TextMetrics {
@@ -173,52 +187,32 @@ Widgets.NavigableFocusScope {
 
                         MenuCaption {
                             Layout.fillWidth: true
-                            Layout.topMargin: VLCStyle.margin_xxsmall
-                            Layout.bottomMargin: VLCStyle.margin_xxsmall
-                            Layout.leftMargin: VLCStyle.margin_xsmall
+                            Layout.leftMargin: VLCStyle.margin_xxsmall
 
                             id: itemText
-                            text: root.textRole ? (Array.isArray(root.model) ? modelData[root.textRole] : model[root.textRole]) : modelData
+                            text: modelData[root.textRole]
 
                             color: colors.buttonText
                         }
 
                         MenuCaption {
                             Layout.preferredHeight: itemText.implicitHeight
-                            Layout.rightMargin: VLCStyle.margin_xsmall
 
-                            text: (isActiveText.text === "" ? "" : (sortOrder === PlaylistControllerModel.SORT_ORDER_ASC ? "↓" : "↑"))
+                            text: (sortOrder === Qt.AscendingOrder ? "↓" : "↑")
+                            visible: isActive
 
                             color: colors.buttonText
                         }
                     }
-
-                    MouseArea {
-                        id: mouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: itemDelegate.clicked(mouse)
-                    }
                 }
 
                 onClicked: {
-                    root.currentIndex = index
-
-                    if (root.sortOrder !== undefined) {
-                        var _sortOrder = root.sortOrder
-                        var _sortKey = root.sortKey
+                    if (root.sortKey !== delegateSortKey) {
+                        root.sortSelected(delegateSortKey)
+                        root.sortOrderSelected(Qt.AscendingOrder)
                     }
-
-                    root.sortSelected(Array.isArray(root.model) ? modelData : model)
-
-                    if (root.sortOrder !== undefined) {
-                        if (root.sortKey !== _sortKey)
-                            root._intSortOrder = false
-
-                        if (root.sortOrder === _sortOrder) {
-                            root.sortOrderSelected(root._intSortOrder ? PlaylistControllerModel.SORT_ORDER_DESC : PlaylistControllerModel.SORT_ORDER_ASC)
-                            root._intSortOrder = !root._intSortOrder
-                        }
+                    else {
+                        root.sortOrderSelected(root.sortOrder === Qt.AscendingOrder ? Qt.DescendingOrder : Qt.AscendingOrder)
                     }
 
                     popup.close()
@@ -227,6 +221,8 @@ Widgets.NavigableFocusScope {
         }
 
         background: Rectangle {
+            id: bgRect
+
             border.width: VLCStyle.dp(1)
             border.color: colors.accent
 
@@ -246,7 +242,7 @@ Widgets.NavigableFocusScope {
 
                         // since Popup is not an Item, we can not directly map its position
                         // to the source item. Instead, we can use root because popup's
-                        // position is relative to its position.
+                        // position is relative to root's position.
                         // This method unfortunately causes issues when source item is resized.
                         // But in that case, we reload the effectLoader to redraw the effect.
                         property point popupMappedPos: g_root.mapFromItem(root, popup.x, popup.y)

@@ -90,14 +90,30 @@ Widgets.NavigableFocusScope {
                 textRole: "title"
                 criteriaRole: "key"
 
-                listWidth: VLCStyle.widthSortBox
                 onSortSelected: {
-                    mainPlaylistController.sort(modelData.key)
+                    mainPlaylistController.sortKey = type
+                }
+
+                onSortOrderSelected: {
+                    if (type === Qt.AscendingOrder)
+                        mainPlaylistController.sortOrder = PlaylistControllerModel.SORT_ORDER_ASC
+                    else if (type === Qt.DescendingOrder)
+                        mainPlaylistController.sortOrder = PlaylistControllerModel.SORT_ORDER_DESC
+
+                    mainPlaylistController.sort()
                 }
 
                 colors: playlistToolbar.colors
 
-                sortOrder: mainPlaylistController.sortOrder
+                sortOrder: {
+                    if (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_ASC) {
+                        Qt.AscendingOrder
+                    }
+                    else if (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_DESC) {
+                        Qt.DescendingOrder
+                    }
+                }
+
                 sortKey: mainPlaylistController.sortKey
             }
 
