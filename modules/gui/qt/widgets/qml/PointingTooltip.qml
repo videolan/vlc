@@ -39,6 +39,8 @@ Item {
     property real xPos: Math.max(Math.min(mouseArea.mouseX, mouseArea.width), 0.0)
     property real yPos: Math.max(Math.min(mouseArea.mouseY, mouseArea.height), 0.0)
 
+    property VLCColors colors: VLCStyle.colors
+
     width: childrenRect.width
     height: childrenRect.height
 
@@ -99,7 +101,7 @@ Item {
 
             property int diff: 0
 
-            color: VLCStyle.colors.bgAlt
+            color: colors.bgAlt
 
             rotation: 45
 
@@ -107,7 +109,7 @@ Item {
                 anchors.fill: parent
                 glowRadius: VLCStyle.dp(2, VLCStyle.scale)
                 spread: 0.2
-                color: VLCStyle.colors.glowColor
+                color: colors.glowColor
             }
         }
     }
@@ -117,7 +119,7 @@ Item {
         width: timeMetrics.width + VLCStyle.dp(10, VLCStyle.scale)
         height: timeMetrics.height + VLCStyle.dp(5, VLCStyle.scale)
 
-        color: VLCStyle.colors.bgAlt
+        color: colors.bgAlt
         radius: VLCStyle.dp(6, VLCStyle.scale)
 
         RectangularGlow {
@@ -127,13 +129,13 @@ Item {
             cornerRadius: parent.radius
             spread: 0.2
 
-            color: VLCStyle.colors.glowColor
+            color: colors.glowColor
         }
 
         Text {
             anchors.fill: parent
             text: timeMetrics.text
-            color: VLCStyle.colors.text
+            color: colors.text
 
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
