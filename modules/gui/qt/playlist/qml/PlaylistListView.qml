@@ -101,11 +101,11 @@ Widgets.NavigableFocusScope {
             }
 
             on_PosChanged: {
-                var dragItemY = root.mapToGlobal(dragItem._pos.x, dragItem._pos.y).y
-                var viewY     = root.mapToGlobal(listView.x, listView.y).y
+                var dragItemY = dragItem._pos.y
+                var viewY     = root.mapFromItem(listView, listView.x, listView.y).y
 
                 var topDiff    = (viewY + VLCStyle.dp(20, VLCStyle.scale)) - dragItemY
-                var bottomDiff = dragItemY - (viewY + listView.height - VLCStyle.dp(20, VLCStyle.scale))
+                var bottomDiff = dragItemY - (viewY + listView.height - toolbar.height - VLCStyle.dp(20, VLCStyle.scale))
 
                 if(!listView.listView.atYBeginning && topDiff > 0) {
                     _scrollingDirection = -1
@@ -624,6 +624,8 @@ Widgets.NavigableFocusScope {
             }
 
             PlaylistToolbar {
+                id: toolbar
+
                 Layout.fillWidth: true
 
                 Layout.leftMargin: root.leftPadding
