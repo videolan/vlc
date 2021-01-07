@@ -257,9 +257,6 @@ static bool dsc_is_rotated(const transform_description_t *dsc)
     return dsc->plane32 != dsc->yuyv;
 }
 
-static const size_t n_transforms =
-    sizeof (descriptions) / sizeof (descriptions[0]);
-
 typedef struct
 {
     const vlc_chroma_description_t *chroma;
@@ -325,7 +322,7 @@ static int Open(filter_t *filter)
     char *type_name = var_InheritString(filter, CFG_PREFIX"type");
     const transform_description_t *dsc = NULL;
 
-    for (size_t i = 0; i < n_transforms; i++)
+    for (size_t i = 0; i < ARRAY_SIZE(descriptions); i++)
         if (type_name && !strcmp(descriptions[i].name, type_name)) {
             dsc = &descriptions[i];
             break;
