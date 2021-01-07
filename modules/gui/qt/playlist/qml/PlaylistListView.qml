@@ -88,21 +88,51 @@ Widgets.NavigableFocusScope {
                 listView.forceActiveFocus()
         }
 
-        Widgets.DNDLabel {
+        Widgets.DragItem {
             id: dragItem
 
-            colors: root.colors
-            color: parent.color
+            property int index: -1
 
-            property int _scrollingDirection: 0
+            colors: root.colors
+
+            function updateComponents(maxCovers) {
+                var count = root.model.selectedCount
+                var selection = root.model.getSelection()
+
+                var title = selection.map(function (index){
+                    return root.model.itemAt(index).title
+                }).join(", ")
+
+                var covers = selection.map(function (index) {
+                    var artwork = root.model.itemAt(index).artwork
+                    return {artwork: (artwork && artwork.toString()) ? artwork : VLCStyle.noArtCover}
+                })
+
+                return ({covers: covers, title: title, count: root.model.selectedCount})
+            }
 
             function insertIntoPlaylist(index) {
                 root.model.moveItemsPre(root.model.getSelection(), index)
             }
 
             function canInsertIntoPlaylist(index) {
-                var delta = model.index - index
-                return delta !== 0 && delta !== -1 && index !== model.index
+                var diff = dragItem.index - index
+                if (diff === 0 || diff === -1)
+                    return false
+                else
+                    return true
+            }
+
+            property point _pos: null
+            property int _scrollingDirection: 0
+
+            function updatePos(pos) {
+                dragItem.x = pos.x + VLCStyle.dp(15)
+                dragItem.y = pos.y // y should be same otherwise dropIndicator will not be shown correctly (DropArea cares about itemY not mouseY)
+
+                // since we override position update during dragging with updatePos(),
+                // we have to track the final position:
+                _pos = pos
             }
 
             on_PosChanged: {

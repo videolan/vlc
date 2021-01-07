@@ -162,28 +162,25 @@ Rectangle {
 
         drag.target: dragItem
 
-        Connections {
-            target: mouseArea.drag
-            onActiveChanged: {
-                if (target.active) {
-                    if (!root.model.isSelected(index)) {
-                        /* the dragged item is not in the selection, replace the selection */
-                        root.model.setSelection([index])
-                    }
-                    dragItem.model = root.model
-                    dragItem.count = root.model.getSelection().length
-                    dragItem.visible = true
-                } else {
-                    dragItem.Drag.drop()
-                    dragItem.visible = false
+        drag.onActiveChanged: {
+            if (drag.active) {
+                if (!selected) {
+                    /* the dragged item is not in the selection, replace the selection */
+                    root.model.setSelection([index])
                 }
+
+                dragItem.index = index
+                dragItem.Drag.active = drag.active
+            }
+            else {
+                dragItem.Drag.drop()
             }
         }
 
         onPositionChanged: {
-            if (dragItem.visible) {
-                var pos = this.mapToGlobal(mouseX, mouseY)
-                dragItem.updatePos(pos.x + VLCStyle.dp(15, VLCStyle.scale), pos.y)
+            if (drag.active) {
+                var pos = drag.target.parent.mapFromItem(mouseArea, mouseX, mouseY)
+                dragItem.updatePos(pos)
             }
         }
 
