@@ -777,7 +777,8 @@ Item{
             id: artworkInfoItem
 
             property bool paintOnly: false
-            property VLCColors _colors: VLCStyle.colors
+
+            property VLCColors colors: VLCStyle.colors
 
             readonly property real minimumWidth: cover.width
             property real extraWidth: 0
@@ -817,7 +818,7 @@ Item{
                     Rectangle {
                         id: coverRect
                         anchors.fill: cover
-                        color: _colors.bg
+                        color: colors.bg
                     }
 
                     DropShadow {
@@ -864,11 +865,11 @@ Item{
                          
                         contentItem: Text {
                                   text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
-                                  color: _colors.tooltipTextColor
+                                  color: colors.tooltipTextColor
                         }
 
                         background: Rectangle {
-                            color: _colors.tooltipColor
+                            color: colors.tooltipColor
                         }
                     }
 
@@ -887,7 +888,7 @@ Item{
                                 mainPlaylistController.currentItem.title
                         }
                         visible: text !== ""
-                        color: _colors.text
+                        color: colors.text
                     }
 
                     Widgets.MenuCaption {
@@ -903,7 +904,7 @@ Item{
                                 mainPlaylistController.currentItem.artist
                         }
                         visible: text !== ""
-                        color: _colors.menuCaption
+                        color: colors.menuCaption
                     }
 
                     Widgets.MenuCaption {
@@ -919,7 +920,7 @@ Item{
                                 player.time.toString() + " / " + player.length.toString()
                         }
                         visible: text !== ""
-                        color: _colors.menuCaption
+                        color: colors.menuCaption
                     }
                 }
             }

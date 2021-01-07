@@ -29,15 +29,11 @@ Widgets.NavigableFocusScope {
     id: buttonsLayout
 
     property alias model: buttonsRepeater.model
-    property var defaultSize: VLCStyle.icon_normal
-    property bool forceColors: false
 
     property real _minimumWidth: 0 // minimumWidth without spacing (minimumWidth of all controls inside)
     property real minimumWidth: _minimumWidth + ((buttonsRepeater.count - 1) * buttonrow.spacing) // minimumWidth with spacing
     property real extraWidth: undefined
     property int expandableCount: 0 // widget count that can expand when extra width is available
-
-    property alias spacing: buttonrow.spacing
 
     implicitWidth: buttonrow.implicitWidth
     implicitHeight: buttonrow.implicitHeight
@@ -56,12 +52,7 @@ Widgets.NavigableFocusScope {
 
         anchors.fill: parent
 
-        spacing: VLCStyle.margin_normal
-
-        VLCColors {
-            id: vlcNightColors
-            state: "night"
-        }
+        spacing: playerButtonsLayout.spacing
 
         Repeater {
             id: buttonsRepeater
@@ -93,25 +84,25 @@ Widgets.NavigableFocusScope {
                     buttonloader.item.focus = true
 
                     if (buttonloader.item instanceof Widgets.IconToolButton)
-                        buttonloader.item.size = Qt.binding(function() { return buttonsLayout.defaultSize; })
+                        buttonloader.item.size = Qt.binding(function() { return defaultSize; })
 
-                    //force buttons color
-                    if (buttonsLayout.forceColors) {
-                        if (buttonloader.item._colors) {
-                            buttonloader.item._colors = vlcNightColors
-                        } else {
-                            if (buttonloader.item.color)
-                                buttonloader.item.color = VLCStyle.colors.playerFg
-                            if (buttonloader.item.bgColor)
-                                buttonloader.item.bgColor = VLCStyle.colors.setColorAlpha(
-                                            VLCStyle.colors.playerBg, 0.8)
-                            if (buttonloader.item.borderColor)
-                                buttonloader.item.borderColor = VLCStyle.colors.playerBorder
-                        }
+                    // force colors:
+                    if (!!colors) {
+                        if (!!buttonloader.item.colors)
+                            buttonloader.item.colors = Qt.binding(function() { return colors; })
+                        else
+                            // legacy color forcing for IconToolButton etc. :
+                            if (!!buttonloader.item.color)
+                                buttonloader.item.color = Qt.binding(function() { return colors.playerFg; })
+                            if (!!buttonloader.item.bgColor)
+                                buttonloader.item.bgColor = Qt.binding(function() {
+                                    return VLCStyle.colors.setColorAlpha(colors.playerBg, 0.8); })
+                            if (!!buttonloader.item.borderColor)
+                                buttonloader.item.borderColor = Qt.binding(function() { return colors.playerBorder; })
                     }
 
                     if (index > 0)
-                        buttonloader.item.KeyNavigation.left = buttonrow.children[index].item
+                        buttonloader.item.KeyNavigation.left = buttonrow.children[index-1].item
 
                     if (buttonloader.item.navigationRight !== undefined)
                         buttonloader.item.navigationRight = buttonsLayout.navigationRight

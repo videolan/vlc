@@ -29,7 +29,7 @@ Playlist.PlaylistDroppable {
     property alias text: label.text
     property alias model: plitem.model
     property alias color: bg.color
-    property VLCColors _colors: VLCStyle.colors
+    property VLCColors colors: VLCStyle.colors
 
     z: 1
     width:  plitem.visible ? plitem.width : label.width
@@ -41,8 +41,8 @@ Playlist.PlaylistDroppable {
         id: bg
 
         anchors.fill: parent
-        color: _colors.button
-        border.color : _colors.buttonBorder
+        color: colors.button
+        border.color : colors.buttonBorder
         radius: 6
     }
 
@@ -65,7 +65,7 @@ Playlist.PlaylistDroppable {
     RectangularGlow {
         anchors.fill: parent
         glowRadius: VLCStyle.dp(8, VLCStyle.scale)
-        color: _colors.glowColor
+        color: colors.glowColor
         spread: 0.2
     }
 
@@ -74,7 +74,7 @@ Playlist.PlaylistDroppable {
         width: implicitWidth + VLCStyle.dp(10, VLCStyle.scale)
         height: implicitHeight + VLCStyle.dp(10, VLCStyle.scale)
         font.pixelSize: VLCStyle.fontSize_normal
-        color: _colors.text
+        color: colors.text
         text: i18n.qtr("%1 tracks selected").arg(count)
         visible: count > 1 || !model
         verticalAlignment: Text.AlignVCenter
@@ -116,7 +116,7 @@ Playlist.PlaylistDroppable {
                     height: VLCStyle.icon_normal
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
-                    color: _colors.accent
+                    color: colors.accent
                     text: player.playingState === PlayerController.PLAYING_STATE_PLAYING ? VLCIcons.volume_high :
                                                     player.playingState === PlayerController.PLAYING_STATE_PAUSED ? VLCIcons.pause :
                                                         player.playingState === PlayerController.PLAYING_STATE_STOPPED ? VLCIcons.stop : ""
@@ -130,7 +130,7 @@ Playlist.PlaylistDroppable {
 
                     font.weight: model && model.isCurrent ? Font.DemiBold : Font.Normal
                     text: model ? model.title : ""
-                    color: _colors.text
+                    color: colors.text
                 }
 
                 Widgets.ListSubtitleLabel {
@@ -139,7 +139,7 @@ Playlist.PlaylistDroppable {
 
                     font.weight: (model && model.isCurrent) ? Font.DemiBold : Font.Normal
                     text: ((model && model.artist) ? model.artist : i18n.qtr("Unknown Artist"))
-                    color: _colors.text
+                    color: colors.text
                 }
             }
 
@@ -148,7 +148,7 @@ Playlist.PlaylistDroppable {
                 Layout.rightMargin: VLCStyle.margin_xsmall
 
                 text: model ? model.duration : ""
-                color: _colors.text
+                color: colors.text
             }
         }
     }

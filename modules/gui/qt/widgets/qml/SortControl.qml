@@ -44,7 +44,7 @@ Widgets.NavigableFocusScope {
     property alias currentIndex: list.currentIndex
     property alias focusPolicy: button.focusPolicy
 
-    property VLCColors _colors: VLCStyle.colors
+    property VLCColors colors: VLCStyle.colors
 
     // properties that should be handled by parent
     // if they are not updated, SortControl will behave as before
@@ -82,8 +82,8 @@ Widgets.NavigableFocusScope {
 
         focus: true
 
-        color: _colors.buttonText
-        colorDisabled: _colors.textInactive
+        color: colors.buttonText
+        colorDisabled: colors.textInactive
 
         onClicked: {
             if (popup.opened)
@@ -130,7 +130,7 @@ Widgets.NavigableFocusScope {
             ScrollIndicator.vertical: ScrollIndicator { }
 
             highlight: Rectangle {
-                color: _colors.accent
+                color: colors.accent
                 opacity: 0.8
             }
 
@@ -148,7 +148,7 @@ Widgets.NavigableFocusScope {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: _colors.accent
+                        color: colors.accent
                         visible: mouseArea.containsMouse
                         opacity: 0.8
                     }
@@ -165,7 +165,7 @@ Widgets.NavigableFocusScope {
 
                             text: root.criteriaRole ? (Array.isArray(root.model) ? (modelData[root.criteriaRole] === sortKey ? "✓" : "")
                                                                                  : (model[root.criteriaRole] === sortKey ? "✓" : "")) : ""
-                            color: _colors.buttonText
+                            color: colors.buttonText
 
                             TextMetrics {
                                 id: tickMetric
@@ -182,7 +182,7 @@ Widgets.NavigableFocusScope {
                             id: itemText
                             text: root.textRole ? (Array.isArray(root.model) ? modelData[root.textRole] : model[root.textRole]) : modelData
 
-                            color: _colors.buttonText
+                            color: colors.buttonText
                         }
 
                         MenuCaption {
@@ -191,7 +191,7 @@ Widgets.NavigableFocusScope {
 
                             text: (isActiveText.text === "" ? "" : (sortOrder === PlaylistControllerModel.SORT_ORDER_ASC ? "↓" : "↑"))
 
-                            color: _colors.buttonText
+                            color: colors.buttonText
                         }
                     }
 
@@ -234,7 +234,7 @@ Widgets.NavigableFocusScope {
 
         background: Rectangle {
             border.width: VLCStyle.dp(1)
-            border.color: _colors.accent
+            border.color: colors.accent
 
             Widgets.FrostedGlassEffect {
                 id: glassEffect
@@ -246,7 +246,7 @@ Widgets.NavigableFocusScope {
                 property point popupGlobalPos
                 sourceRect: Qt.rect(popupGlobalPos.x, popupGlobalPos.y, glassEffect.width, glassEffect.height)
 
-                tint: _colors.bg
+                tint: colors.bg
                 tintStrength: 0.3
             }
         }

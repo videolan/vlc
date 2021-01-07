@@ -180,7 +180,7 @@ Widgets.NavigableFocusScope {
                 focus: true
                 anchors.fill: parent
 
-                forceDark: true
+                colors: VLCStyle.nightColors
                 navigationParent: rootPlayer
                 navigationUpItem: csdGroup
                 navigationDownItem: controlBarView

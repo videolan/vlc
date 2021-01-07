@@ -109,7 +109,7 @@ Widgets.NavigableFocusScope {
 
                 navigationUpItem: trackPositionSlider.enabled ? trackPositionSlider : root.navigationUpItem
 
-                forceColors: true
+                colors: VLCStyle.nightColors
             }
         }
     }

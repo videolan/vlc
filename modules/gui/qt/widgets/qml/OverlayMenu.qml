@@ -25,11 +25,6 @@ import "qrc:///style/"
 Item {
     id: root
 
-    VLCColors {
-        id: vlcNightColors
-        state: "night"
-    }
-
     property real widthRatio: (3 / 4)
     property bool isRight: true // when set, menu is placed on the right side
 
@@ -123,7 +118,7 @@ Item {
             readonly property point overlayPos: backgroundItem.mapFromItem(root, parentItem.x, parentItem.y)
             sourceRect: Qt.rect(overlayPos.x, overlayPos.y, width, height)
 
-            tint: VLCStyle.colors.blendColors(vlcNightColors.black, vlcNightColors.banner, 0.85)
+            tint: VLCStyle.colors.blendColors(VLCStyle.nightColors.black, VLCStyle.nightColors.banner, 0.85)
         }
 
         KeyNavigableListView {
@@ -176,7 +171,7 @@ Item {
                 font.pixelSize: VLCStyle.fontSize_xlarge
                 text: listView.currentModel.title
 
-                color: vlcNightColors.text
+                color: VLCStyle.nightColors.text
 
                 leftPadding: root.leftPadding
                 rightPadding: root.rightPadding
@@ -247,7 +242,7 @@ Item {
                                 IconLabel {
                                     horizontalAlignment: Text.AlignHCenter
                                     text: modelData.fontIcon
-                                    color: vlcNightColors.text
+                                    color: VLCStyle.nightColors.text
                                 }
                             }
 
@@ -256,7 +251,7 @@ Item {
                                 ListLabel {
                                     horizontalAlignment: Text.AlignHCenter
                                     text: "✓"
-                                    color: vlcNightColors.text
+                                    color: VLCStyle.nightColors.text
                                 }
                             }
 
@@ -279,7 +274,7 @@ Item {
 
                         font.weight: Font.Normal
                         text: modelData.text
-                        color: vlcNightColors.text
+                        color: VLCStyle.nightColors.text
                     }
 
                     ListLabel {
@@ -293,7 +288,7 @@ Item {
                             else if (!!modelData.marking)
                                 modelData.marking
                         }
-                        color: vlcNightColors.text
+                        color: VLCStyle.nightColors.text
                     }
                 }
 
