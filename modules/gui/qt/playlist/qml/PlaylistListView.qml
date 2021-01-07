@@ -34,7 +34,6 @@ Widgets.NavigableFocusScope {
 
     property int leftPadding: 0
     property int rightPadding: 0
-    property alias backgroundColor: parentRect.color
 
     property VLCColors colors: VLCStyle.colors
 
@@ -248,7 +247,7 @@ Widgets.NavigableFocusScope {
                 }
                 modelCount: root.model.count
 
-                fadeColor: root.backgroundColor
+                fadeColor: parentRect.color
 
                 property int shiftIndex: -1
                 property int mode: PlaylistListView.Mode.Normal
