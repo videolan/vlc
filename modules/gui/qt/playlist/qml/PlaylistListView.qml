@@ -42,6 +42,12 @@ Widgets.NavigableFocusScope {
 
     signal setItemDropIndicatorVisible(int index, bool isVisible, bool top)
 
+    enum Mode {
+        Normal,
+        Select, // Keyboard item selection mode, activated through PlaylistOverlayMenu
+        Move // Keyboard item move mode, activated through PlaylistOverlayMenu
+    }
+
     function isDropAcceptable(drop, index) {
         return drop.hasUrls
                 || ((!!drop.source && (drop.source instanceof PlaylistDroppable))
@@ -245,7 +251,7 @@ Widgets.NavigableFocusScope {
                 fadeColor: root.backgroundColor
 
                 property int shiftIndex: -1
-                property string mode: "normal"
+                property int mode: PlaylistListView.Mode.Normal
 
                 Connections {
                     target: root.plmodel
@@ -356,7 +362,7 @@ Widgets.NavigableFocusScope {
                         onItemClicked : {
                             /* to receive keys events */
                             view.forceActiveFocus()
-                            if (view.mode == "move") {
+                            if (view.mode === PlaylistListView.Mode.Move) {
                                 var selectedIndexes = root.plmodel.getSelection()
                                 if (selectedIndexes.length === 0)
                                     return
@@ -368,7 +374,7 @@ Widgets.NavigableFocusScope {
                                 view.currentIndex = selectedIndexes[0]
                                 root.plmodel.moveItemsPre(selectedIndexes, preTarget)
                                 return
-                            } else if (view.mode == "select") {
+                            } else if (view.mode === PlaylistListView.Mode.Select) {
                             } else if (!(root.plmodel.isSelected(index) && button === Qt.RightButton)) {
                                 view.updateSelection(modifier, view.currentIndex, index)
                                 view.currentIndex = index
@@ -443,9 +449,9 @@ Widgets.NavigableFocusScope {
 
                 onSelectAll: root.plmodel.selectAll()
                 onSelectionUpdated: {
-                    if (view.mode === "select") {
+                    if (view.mode === PlaylistListView.Mode.Select) {
                         console.log("update selection select")
-                    } else if (mode == "move") {
+                    } else if (view.mode === PlaylistListView.Mode.Move) {
                         var selectedIndexes = root.plmodel.getSelection()
                         if (selectedIndexes.length === 0)
                             return
@@ -475,17 +481,17 @@ Widgets.NavigableFocusScope {
                     overlayMenu.open()
                 }
                 navigationLeft: function(index) {
-                    if (mode === "normal") {
+                    if (mode === PlaylistListView.Mode.Normal) {
                         root.navigationLeft(index)
                     } else {
-                        mode = "normal"
+                        mode = PlaylistListView.Mode.Normal
                     }
                 }
                 navigationCancel: function(index) {
-                    if (mode === "normal") {
+                    if (mode === PlaylistListView.Mode.Normal) {
                         root.navigationCancel(index)
                     } else {
-                        mode = "normal"
+                        mode = PlaylistListView.Mode.Normal
                     }
                 }
 
@@ -493,7 +499,7 @@ Widgets.NavigableFocusScope {
                     if (index < 0)
                         return
 
-                    if (mode === "select")
+                    if (mode === PlaylistListView.Mode.Select)
                         root.plmodel.toggleSelected(index)
                     else //normal
                         // play
@@ -621,9 +627,9 @@ Widgets.NavigableFocusScope {
                     anchors.centerIn: parent
                     horizontalAlignment: Text.AlignHCenter
 
-                    text: (view.mode === "select")
+                    text: (view.mode === PlaylistListView.Mode.Select)
                             ? i18n.qtr("Select tracks (%1)").arg(plmodel.selectedCount)
-                        : (view.mode === "move")
+                        : (view.mode === PlaylistListView.Mode.Move)
                             ? i18n.qtr("Move tracks (%1)").arg(plmodel.selectedCount)
                         : ""
                     font.pixelSize: VLCStyle.fontSize_large
