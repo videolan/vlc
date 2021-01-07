@@ -144,7 +144,7 @@ vlc_tick_t SegmentTemplate::getMinAheadTime(uint64_t number) const
 Segment * SegmentTemplate::getMediaSegment(uint64_t number) const
 {
     const SegmentTimeline *tl = inheritSegmentTimeline();
-    if(tl == nullptr || tl->maxElementNumber() > number)
+    if(tl == nullptr || (tl->maxElementNumber() >= number && tl->minElementNumber() <= number))
         return virtualsegment;
     return nullptr;
 }
