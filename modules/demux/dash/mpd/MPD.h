@@ -50,7 +50,7 @@ namespace dash
                 virtual bool                    isLive() const override;
                 virtual bool                    isLowLatency() const override;
                 void                            setLowLatency(bool);
-                virtual void                    debug();
+                virtual void                    debug() const override;
 
                 Property<ProgramInformation *>      programInfo;
 

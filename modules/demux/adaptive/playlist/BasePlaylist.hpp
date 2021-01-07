@@ -49,7 +49,7 @@ namespace adaptive
                 void                            setMaxBuffering( mtime_t );
                 mtime_t                         getMinBuffering() const;
                 mtime_t                         getMaxBuffering() const;
-                void                            debug() const;
+                virtual void                    debug() const;
 
                 void    addPeriod               (BasePeriod *period);
                 void    addBaseUrl              (const std::string &);
