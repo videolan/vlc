@@ -62,12 +62,12 @@ Widgets.NavigableFocusScope {
 
     onVisibleChanged: {
         if (!visible)
-            popup.close()
+            popup._close()
     }
 
     onEnabledChanged: {
         if (!enabled)
-            popup.close()
+            popup._close()
     }
 
     Widgets.IconToolButton {
@@ -85,10 +85,10 @@ Widgets.NavigableFocusScope {
         focus: true
 
         onClicked: {
-            if (popup.visible)
-                popup.close()
+            if (popup.visible && !closeAnimation.running)
+                popup._close()
             else
-                popup.open()
+                popup._open()
         }
     }
 
@@ -104,13 +104,49 @@ Widgets.NavigableFocusScope {
 
         clip: true
 
+        height: 0
+
+        NumberAnimation {
+            id: openAnimation
+            target: popup
+            property: "height"
+            duration: 125
+            easing.type: Easing.InOutSine
+            to: popup.implicitHeight
+
+            onStarted: closeAnimation.stop()
+        }
+
+        NumberAnimation {
+            id: closeAnimation
+            target: popup
+            property: "height"
+            duration: 125
+            easing.type: Easing.InOutSine
+            to: 0
+
+            onStarted: openAnimation.stop()
+            onStopped: if (!openAnimation.running) popup.close()
+        }
+
+        function _open() {
+            if (!popup.visible)
+                popup.open()
+            openAnimation.start()
+        }
+
+        function _close() {
+            closeAnimation.start()
+        }
+
         onOpened: {
             button.highlighted = true
-
             listView.forceActiveFocus()
         }
 
         onClosed: {
+            popup.height = 0
+
             button.highlighted = false
 
             if (button.focusPolicy !== Qt.NoFocus)
@@ -127,7 +163,7 @@ Widgets.NavigableFocusScope {
                 // modal popups, this is an alternative way of closing the popup
                 // when the focus is lost
                 if (!activeFocus && !button.activeFocus)
-                    popup.close()
+                    popup._close()
             }
 
             ScrollIndicator.vertical: ScrollIndicator { }
@@ -145,7 +181,8 @@ Widgets.NavigableFocusScope {
 
                 background: Rectangle {
                     color: colors.accent
-                    visible: itemDelegate.hovered || (!listView.containsMouse && itemDelegate.activeFocus)
+                    visible: !closeAnimation.running &&
+                             (itemDelegate.hovered || (!listView.containsMouse && itemDelegate.activeFocus))
                     opacity: 0.8
                 }
 
