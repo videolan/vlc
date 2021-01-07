@@ -35,7 +35,7 @@ namespace hls
                 M3U8(vlc_object_t *);
                 virtual ~M3U8();
 
-                virtual bool                    isLive() const;
+                virtual bool isLive() const override;
         };
     }
 }

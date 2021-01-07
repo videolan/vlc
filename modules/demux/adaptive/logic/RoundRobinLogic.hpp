@@ -16,7 +16,7 @@ namespace adaptive
                 RoundRobinLogic(vlc_object_t *);
 
                 virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *,
-                                                                  BaseRepresentation *);
+                                                                  BaseRepresentation *) override;
                 static const unsigned QUANTUM = 2;
             private:
                 size_t index;

@@ -71,12 +71,12 @@ namespace adaptive
                                const ConnectionParams &, bool = false);
                 virtual ~HTTPConnection();
 
-                virtual bool    canReuse     (const ConnectionParams &) const;
+                virtual bool    canReuse     (const ConnectionParams &) const override;
                 virtual RequestStatus request(const std::string& path,
-                                              const BytesRange & = BytesRange());
-                virtual ssize_t read        (void *p_buffer, size_t len);
+                                              const BytesRange & = BytesRange()) override;
+                virtual ssize_t read        (void *p_buffer, size_t len) override;
 
-                void setUsed( bool );
+                void setUsed( bool ) override;
                 const ConnectionParams &getRedirection() const;
                 static const unsigned MAX_REDIRECTS = 3;
 
@@ -119,13 +119,13 @@ namespace adaptive
                 StreamUrlConnection(vlc_object_t *);
                 virtual ~StreamUrlConnection();
 
-                virtual bool    canReuse     (const ConnectionParams &) const;
+                virtual bool    canReuse     (const ConnectionParams &) const override;
 
                 virtual RequestStatus request(const std::string& path,
-                                              const BytesRange & = BytesRange());
-                virtual ssize_t read        (void *p_buffer, size_t len);
+                                              const BytesRange & = BytesRange()) override;
+                virtual ssize_t read        (void *p_buffer, size_t len) override;
 
-                virtual void    setUsed( bool );
+                virtual void    setUsed( bool ) override;
 
             protected:
                 void reset();
@@ -145,7 +145,7 @@ namespace adaptive
            public:
                NativeConnectionFactory( AuthStorage * );
                virtual ~NativeConnectionFactory();
-               virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &);
+               virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &) override;
            private:
                AuthStorage *authStorage;
        };
@@ -155,7 +155,7 @@ namespace adaptive
            public:
                StreamUrlConnectionFactory();
                virtual ~StreamUrlConnectionFactory() {}
-               virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &);
+               virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &) override;
        };
     }
 }

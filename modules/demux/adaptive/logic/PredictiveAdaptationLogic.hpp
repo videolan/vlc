@@ -51,7 +51,8 @@ namespace adaptive
                 PredictiveAdaptationLogic(vlc_object_t *);
                 virtual ~PredictiveAdaptationLogic();
 
-                virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *);
+                virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *,
+                                                                  BaseRepresentation *) override;
                 virtual void                updateDownloadRate     (const ID &, size_t, vlc_tick_t) override;
                 virtual void                trackerEvent           (const SegmentTrackerEvent &) override;
 

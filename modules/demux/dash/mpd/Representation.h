@@ -50,7 +50,7 @@ namespace dash
 
                 /* for segment templates */
                 virtual std::string contextualize(size_t, const std::string &,
-                                                  const SegmentTemplate *) const; // reimpl
+                                                  const SegmentTemplate *) const override;
 
             private:
 

@@ -36,7 +36,7 @@ namespace smooth
                 Manifest(vlc_object_t *);
                 virtual ~Manifest();
 
-                virtual bool                    isLive() const;
+                virtual bool                    isLive() const override;
 
             private:
                 bool b_live;

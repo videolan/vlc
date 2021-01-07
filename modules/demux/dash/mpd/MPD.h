@@ -47,8 +47,8 @@ namespace dash
                 virtual ~MPD();
 
                 Profile                         getProfile() const;
-                virtual bool                    isLive() const;
-                virtual bool                    isLowLatency() const;
+                virtual bool                    isLive() const override;
+                virtual bool                    isLowLatency() const override;
                 void                            setLowLatency(bool);
                 virtual void                    debug();
 

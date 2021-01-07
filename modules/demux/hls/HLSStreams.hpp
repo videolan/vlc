@@ -36,7 +36,7 @@ namespace hls
             virtual block_t *checkBlock(block_t *, bool) override;
             virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
                                                es_out_t *, AbstractSourceStream *) const override;
-            virtual bool setPosition(vlc_tick_t, bool);
+            virtual bool setPosition(vlc_tick_t, bool) override;
 
         private:
             static int ID3TAG_Parse_Handler(uint32_t, const uint8_t *, size_t, void *);
@@ -52,7 +52,7 @@ namespace hls
     {
         public:
             virtual AbstractStream *create(demux_t *, const StreamFormat &,
-                                   SegmentTracker *, AbstractConnectionManager *) const;
+                                   SegmentTracker *, AbstractConnectionManager *) const override;
     };
 
 }
