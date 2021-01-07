@@ -62,7 +62,7 @@ CARGO_INSTALL = $(CARGO) install $(CARGO_INSTALL_ARGS)
 
 CARGOC_INSTALL = export TARGET_CC=$(CC) && export TARGET_AR=$(AR) && \
 	export TARGET_CFLAGS="$(CFLAGS)" && \
-	export RUSTFLAGS="-C lto -C panic=abort -C opt-level=z" && \
+	export RUSTFLAGS="-C panic=abort -C opt-level=z" && \
 	$(CARGO) capi install $(CARGO_INSTALL_ARGS)
 
 download_vendor = \
