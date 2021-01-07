@@ -836,6 +836,7 @@ modules/gui/qt/player/qml/VolumeWidget.qml
 modules/gui/qt/playlist/qml/PLItem.qml
 modules/gui/qt/playlist/qml/PlaylistDetachedWindow.qml
 modules/gui/qt/playlist/qml/PlaylistListView.qml
+modules/gui/qt/playlist/qml/PlaylistOverlayMenu.qml
 modules/gui/qt/playlist/qml/PlaylistToolbar.qml
 modules/gui/qt/widgets/qml/DNDLabel.qml
 modules/gui/qt/widgets/qml/DragItem.qml

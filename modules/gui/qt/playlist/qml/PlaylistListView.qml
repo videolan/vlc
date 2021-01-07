@@ -76,10 +76,23 @@ Widgets.NavigableFocusScope {
         mainPlaylistController.sort()
     }
 
+    PlaylistOverlayMenu {
+        id: overlayMenu
+        anchors.fill: parent
+        z: 1
+
+        backgroundItem: parentRect
+    }
+
     Rectangle {
         id: parentRect
         anchors.fill: parent
         color: _colors.banner
+
+        onActiveFocusChanged: {
+            if (activeFocus)
+                view.forceActiveFocus()
+        }
 
         //label for DnD
         Widgets.DNDLabel {
@@ -149,154 +162,6 @@ Widgets.NavigableFocusScope {
             id: contextMenu
             model: root.plmodel
             controler: mainPlaylistController
-        }
-
-        PlaylistMenu {
-            id: overlayMenu
-            anchors.fill: parent
-            z: 2
-
-            navigationParent: root
-            navigationLeftItem: view
-
-            leftPadding: root.leftPadding
-            rightPadding: root.rightPadding
-
-            isPLEmpty: (root.plmodel.count === 0)
-            isItemNotSelected: (root.plmodel.selectedCount === 0)
-
-            //rootmenu
-            Action { id:playAction;         text: i18n.qtr("Play");                      onTriggered: mainPlaylistController.goTo(root.plmodel.getSelection()[0], true); icon.source: "qrc:///toolbar/play_b.svg"                   }
-            Action { id:streamAction;       text: i18n.qtr("Stream");                    onTriggered: dialogProvider.streamingDialog(root.plmodel.getSelection().map(function(i) { return root.plmodel.itemAt(i).url; }), false); icon.source: "qrc:/menu/stream.svg" }
-            Action { id:saveAction;         text: i18n.qtr("Save");                      onTriggered: dialogProvider.streamingDialog(root.plmodel.getSelection().map(function(i) { return root.plmodel.itemAt(i).url; }));          }
-            Action { id:infoAction;         text: i18n.qtr("Information");               onTriggered: dialogProvider.mediaInfoDialog(root.plmodel.itemAt(root.plmodel.getSelection()[0])); icon.source: "qrc:/menu/info.svg"        }
-            Action { id:exploreAction;      text: i18n.qtr("Show Containing Directory"); onTriggered: mainPlaylistController.explore(root.plmodel.itemAt(root.plmodel.getSelection()[0])); icon.source: "qrc:/type/folder-grey.svg" }
-            Action { id:addFileAction;      text: i18n.qtr("Add File...");               onTriggered: dialogProvider.simpleOpenDialog(false);                             icon.source: "qrc:/buttons/playlist/playlist_add.svg"     }
-            Action { id:addDirAction;       text: i18n.qtr("Add Directory...");          onTriggered: dialogProvider.PLAppendDir();                                       icon.source: "qrc:/buttons/playlist/playlist_add.svg"     }
-            Action { id:addAdvancedAction;  text: i18n.qtr("Advanced Open...");          onTriggered: dialogProvider.PLAppendDialog();                                    icon.source: "qrc:/buttons/playlist/playlist_add.svg"     }
-            Action { id:savePlAction;       text: i18n.qtr("Save Playlist to File...");  onTriggered: dialogProvider.savePlayingToPlaylist();                                                                                       }
-            Action { id:clearAllAction;     text: i18n.qtr("Clear Playlist");            onTriggered: mainPlaylistController.clear();                                     icon.source: "qrc:/toolbar/clear.svg"                     }
-            Action { id:selectAllAction;    text: i18n.qtr("Select All");                onTriggered: root.plmodel.selectAll();                                                                                                     }
-            Action { id:shuffleAction;      text: i18n.qtr("Shuffle Playlist");          onTriggered: mainPlaylistController.shuffle();                                   icon.source: "qrc:///buttons/playlist/shuffle_on.svg"     }
-            Action { id:sortAction;         text: i18n.qtr("Sort");                      property string subMenu: "sortmenu";                                                                                                       }
-            Action { id:selectTracksAction; text: i18n.qtr("Select Tracks");             onTriggered: view.mode = "select";                                                                                                         }
-            Action { id:moveTracksAction;   text: i18n.qtr("Move Selection");            onTriggered: view.mode = "move";                                                                                                           }
-            Action { id:deleteAction;       text: i18n.qtr("Remove Selected");           onTriggered: view.onDelete();                                                                                                              }
-
-            readonly property var sortList: [sortTitleAction,
-                                            sortDurationAction,
-                                            sortArtistAction,
-                                            sortAlbumAction,
-                                            sortGenreAction,
-                                            sortDateAction,
-                                            sortTrackAction,
-                                            sortURLAction,
-                                            sortRatingAction]
-
-            Connections {
-                id: plControllerConnections
-                target: mainPlaylistController
-
-                property alias sortList: overlayMenu.sortList
-
-                function setMark() {
-                    for (var i = 0; i < sortList.length; i++) {
-                        if(sortList[i].key === mainPlaylistController.sortKey) {
-                            sortList[i].sortActiveMark = "✓"
-                            sortList[i].sortOrderMark  = (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_ASC ? "↓" : "↑")
-                            continue
-                        }
-
-                        sortList[i].sortActiveMark = ""
-                        sortList[i].sortOrderMark  = ""
-                    }
-                }
-
-                onSortOrderChanged: {
-                    plControllerConnections.setMark()
-                }
-
-                onSortKeyChanged: {
-                    plControllerConnections.setMark()
-                }
-            }
-
-            // sortmenu
-            Action { id: sortTitleAction;   text: i18n.qtr("Title"); onTriggered: root.sortPL(key);
-                readonly property int key: PlaylistControllerModel.SORT_KEY_TITLE;
-                property string sortActiveMark; property string sortOrderMark }
-            Action { id: sortDurationAction; text: i18n.qtr("Duration"); onTriggered: root.sortPL(key);
-                readonly property int key: PlaylistControllerModel.SORT_KEY_DURATION
-                property string sortActiveMark; property string sortOrderMark }
-            Action { id: sortArtistAction;  text: i18n.qtr("Artist"); onTriggered: root.sortPL(key);
-                readonly property int key: PlaylistControllerModel.SORT_KEY_ARTIST
-                property string sortActiveMark; property string sortOrderMark }
-            Action { id: sortAlbumAction;   text: i18n.qtr("Album"); onTriggered: root.sortPL(key);
-                readonly property int key: PlaylistControllerModel.SORT_KEY_ALBUM
-                property string sortActiveMark; property string sortOrderMark }
-            Action { id: sortGenreAction;   text: i18n.qtr("Genre"); onTriggered: root.sortPL(key);
-                readonly property int key: PlaylistControllerModel.SORT_KEY_GENRE
-                property string sortActiveMark; property string sortOrderMark }
-            Action { id: sortDateAction;    text: i18n.qtr("Date"); onTriggered: root.sortPL(key);
-                readonly property int key: PlaylistControllerModel.SORT_KEY_DATE
-                property string sortActiveMark; property string sortOrderMark }
-            Action { id: sortTrackAction;   text: i18n.qtr("Track Number"); onTriggered: root.sortPL(key);
-                readonly property int key: PlaylistControllerModel.SORT_KEY_TRACK_NUMBER
-                property string sortActiveMark; property string sortOrderMark }
-            Action { id: sortURLAction;     text: i18n.qtr("URL"); onTriggered: root.sortPL(key);
-                readonly property int key: PlaylistControllerModel.SORT_KEY_URL
-                property string sortActiveMark; property string sortOrderMark }
-            Action { id: sortRatingAction;  text: i18n.qtr("Rating"); onTriggered: root.sortPL(key);
-                readonly property int key: PlaylistControllerModel.SORT_KEY_RATING
-                property string sortActiveMark; property string sortOrderMark }
-
-            models: {
-                "rootmenu" : {
-                    title: i18n.qtr("Playlist"),
-                    entries: [
-                        playAction,
-                        streamAction,
-                        saveAction,
-                        infoAction,
-                        exploreAction,
-                        addFileAction,
-                        addDirAction,
-                        addAdvancedAction,
-                        savePlAction,
-                        clearAllAction,
-                        selectAllAction,
-                        shuffleAction,
-                        sortAction,
-                        selectTracksAction,
-                        moveTracksAction,
-                        deleteAction
-                    ]
-                },
-                "rootmenu_plempty" : {
-                    title: i18n.qtr("Playlist"),
-                    entries: [
-                        addFileAction,
-                        addDirAction,
-                        addAdvancedAction
-                    ]
-                },
-                "rootmenu_noselection" : {
-                    title: i18n.qtr("Playlist"),
-                    entries: [
-                        addFileAction,
-                        addDirAction,
-                        addAdvancedAction,
-                        savePlAction,
-                        clearAllAction,
-                        sortAction,
-                        selectTracksAction
-                    ]
-                },
-                "sortmenu" :{
-                    title: i18n.qtr("Sort Playlist"),
-                    entries: sortList
-                }
-            }
         }
 
         ColumnLayout {
