@@ -116,19 +116,19 @@ Widgets.OverlayMenu {
     Action {
         id: selectTracksAction
         text: i18n.qtr("Select Tracks")
-        onTriggered: view.mode = PlaylistListView.Mode.Select
+        onTriggered: listView.mode = PlaylistListView.Mode.Select
     }
 
     Action {
         id: moveTracksAction
         text: i18n.qtr("Move Selection")
-        onTriggered: view.mode = PlaylistListView.Mode.Move
+        onTriggered: listView.mode = PlaylistListView.Mode.Move
     }
 
     Action {
         id: deleteAction
         text: i18n.qtr("Remove Selected")
-        onTriggered: view.onDelete()
+        onTriggered: listView.onDelete()
     }
 
     property var rootMenu: ({

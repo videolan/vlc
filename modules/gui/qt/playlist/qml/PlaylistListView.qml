@@ -82,7 +82,7 @@ Widgets.NavigableFocusScope {
 
         onActiveFocusChanged: {
             if (activeFocus)
-                view.forceActiveFocus()
+                listView.forceActiveFocus()
         }
 
         //label for DnD
@@ -105,32 +105,32 @@ Widgets.NavigableFocusScope {
 
             on_PosChanged: {
                 var dragItemY = root.mapToGlobal(dragItem._pos.x, dragItem._pos.y).y
-                var viewY     = root.mapToGlobal(view.x, view.y).y
+                var viewY     = root.mapToGlobal(listView.x, listView.y).y
 
                 var topDiff    = (viewY + VLCStyle.dp(20, VLCStyle.scale)) - dragItemY
-                var bottomDiff = dragItemY - (viewY + view.height - VLCStyle.dp(20, VLCStyle.scale))
+                var bottomDiff = dragItemY - (viewY + listView.height - VLCStyle.dp(20, VLCStyle.scale))
 
-                if(!view.listView.atYBeginning && topDiff > 0) {
+                if(!listView.listView.atYBeginning && topDiff > 0) {
                     _scrollingDirection = -1
 
-                    view.fadeRectTopHovered = true
+                    listView.fadeRectTopHovered = true
                 }
-                else if( !view.listView.atYEnd && bottomDiff > 0) {
+                else if( !listView.listView.atYEnd && bottomDiff > 0) {
                     _scrollingDirection = 1
 
-                    view.fadeRectBottomHovered = true
+                    listView.fadeRectBottomHovered = true
                 }
                 else {
                     _scrollingDirection = 0
 
-                    view.fadeRectTopHovered = false
-                    view.fadeRectBottomHovered = false
+                    listView.fadeRectTopHovered = false
+                    listView.fadeRectBottomHovered = false
                 }
             }
 
             SmoothedAnimation {
                 id: upAnimation
-                target: view.listView
+                target: listView.listView
                 property: "contentY"
                 to: 0
                 running: dragItem._scrollingDirection === -1 && dragItem.visible
@@ -140,9 +140,9 @@ Widgets.NavigableFocusScope {
 
             SmoothedAnimation {
                 id: downAnimation
-                target: view.listView
+                target: listView.listView
                 property: "contentY"
-                to: view.listView.contentHeight - view.height
+                to: listView.listView.contentHeight - listView.height
                 running: dragItem._scrollingDirection === 1 && dragItem.visible
 
                 velocity: VLCStyle.dp(150, VLCStyle.scale)
@@ -202,7 +202,7 @@ Widgets.NavigableFocusScope {
 
                 Layout.topMargin: VLCStyle.margin_normal
                 Layout.leftMargin: root.leftPadding + VLCStyle.margin_normal
-                Layout.rightMargin: root.rightPadding + view.scrollBarWidth
+                Layout.rightMargin: root.rightPadding + listView.scrollBarWidth
 
                 Widgets.IconLabel {
                     Layout.preferredWidth: VLCStyle.icon_normal
@@ -238,7 +238,7 @@ Widgets.NavigableFocusScope {
             }
 
             Widgets.KeyNavigableListView {
-                id: view
+                id: listView
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -256,12 +256,12 @@ Widgets.NavigableFocusScope {
                 Connections {
                     target: root.plmodel
                     onRowsInserted: {
-                        if (view.currentIndex == -1)
-                            view.currentIndex = 0
+                        if (listView.currentIndex == -1)
+                            listView.currentIndex = 0
                     }
                     onModelReset: {
-                        if (view.currentIndex == -1 &&  root.plmodel.count > 0)
-                            view.currentIndex = 0
+                        if (listView.currentIndex == -1 &&  root.plmodel.count > 0)
+                            listView.currentIndex = 0
                     }
                     onSelectedCountChanged: {
                         var selectedIndexes = root.plmodel.getSelection()
@@ -270,31 +270,31 @@ Widgets.NavigableFocusScope {
                         if (modelCount === 0 || selectedIndexes.length === 0)
                             return
 
-                        var bottomItemIndex = view.listView.indexAt(view.listView.contentX, (view.listView.contentY + view.height) - 2)
-                        var topItemIndex    = view.listView.indexAt(view.listView.contentX, view.listView.contentY + 2)
+                        var bottomItemIndex = listView.listView.indexAt(listView.listView.contentX, (listView.listView.contentY + listView.height) - 2)
+                        var topItemIndex    = listView.listView.indexAt(listView.listView.contentX, listView.listView.contentY + 2)
 
                         if (topItemIndex !== -1 && (root.plmodel.isSelected(topItemIndex) || (modelCount >= 2 && root.plmodel.isSelected(topItemIndex + 1))))
-                            view.fadeRectTopHovered = true
+                            listView.fadeRectTopHovered = true
                         else
-                            view.fadeRectTopHovered = false
+                            listView.fadeRectTopHovered = false
 
                         if (bottomItemIndex !== -1 && (root.plmodel.isSelected(bottomItemIndex) || (root.plmodel.isSelected(bottomItemIndex - 1))))
-                            view.fadeRectBottomHovered = true
+                            listView.fadeRectBottomHovered = true
                         else
-                            view.fadeRectBottomHovered = false
+                            listView.fadeRectBottomHovered = false
                     }
                 }
 
                 footer: Item {
                     width: parent.width
-                    height: Math.max(VLCStyle.icon_normal, view.height - y)
+                    height: Math.max(VLCStyle.icon_normal, listView.height - y)
 
                     MouseArea {
                         anchors.fill: parent
                         acceptedButtons: Qt.RightButton | Qt.LeftButton
 
                         onClicked: {
-                            view.forceActiveFocus()
+                            listView.forceActiveFocus()
                             if( mouse.button === Qt.RightButton )
                                 contextMenu.popup(-1, this.mapToGlobal(mouse.x, mouse.y))
                             else if ( mouse.button === Qt.LeftButton )
@@ -308,18 +308,18 @@ Widgets.NavigableFocusScope {
                             if(!root.isDropAcceptable(drag, root.plmodel.count))
                                 return
 
-                            root.setItemDropIndicatorVisible(view.modelCount - 1, true, false);
+                            root.setItemDropIndicatorVisible(listView.modelCount - 1, true, false);
                         }
                         onExited: {
 
 
-                            root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
+                            root.setItemDropIndicatorVisible(listView.modelCount - 1, false, false);
                         }
                         onDropped: {
                             if(!root.isDropAcceptable(drop, root.plmodel.count))
                                 return
                             root.acceptDrop(root.plmodel.count, drop)
-                            root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
+                            root.setItemDropIndicatorVisible(listView.modelCount - 1, false, false);
                         }
                     }
                 }
@@ -357,12 +357,12 @@ Widgets.NavigableFocusScope {
                         width: root.width
                         z: 1
                         leftPadding: root.leftPadding + VLCStyle.margin_normal
-                        rightPadding: root.rightPadding + view.scrollBarWidth
+                        rightPadding: root.rightPadding + listView.scrollBarWidth
 
                         onItemClicked : {
                             /* to receive keys events */
-                            view.forceActiveFocus()
-                            if (view.mode === PlaylistListView.Mode.Move) {
+                            listView.forceActiveFocus()
+                            if (listView.mode === PlaylistListView.Mode.Move) {
                                 var selectedIndexes = root.plmodel.getSelection()
                                 if (selectedIndexes.length === 0)
                                     return
@@ -371,13 +371,13 @@ Widgets.NavigableFocusScope {
                                  * _below_ the clicked item if move down */
                                 if (preTarget > selectedIndexes[0])
                                     preTarget++
-                                view.currentIndex = selectedIndexes[0]
+                                listView.currentIndex = selectedIndexes[0]
                                 root.plmodel.moveItemsPre(selectedIndexes, preTarget)
                                 return
-                            } else if (view.mode === PlaylistListView.Mode.Select) {
+                            } else if (listView.mode === PlaylistListView.Mode.Select) {
                             } else if (!(root.plmodel.isSelected(index) && button === Qt.RightButton)) {
-                                view.updateSelection(modifier, view.currentIndex, index)
-                                view.currentIndex = index
+                                listView.updateSelection(modifier, listView.currentIndex, index)
+                                listView.currentIndex = index
                             }
 
                             if (button === Qt.RightButton)
@@ -402,16 +402,16 @@ Widgets.NavigableFocusScope {
                         }
 
                         onHoveredChanged: {
-                            var bottomItemIndex = view.listView.indexAt(plitem.width / 2, (view.listView.contentY + view.height) - 2)
-                            var topItemIndex = view.listView.indexAt(plitem.width / 2, view.listView.contentY + 2)
+                            var bottomItemIndex = listView.listView.indexAt(plitem.width / 2, (listView.listView.contentY + listView.height) - 2)
+                            var topItemIndex = listView.listView.indexAt(plitem.width / 2, listView.listView.contentY + 2)
 
                             if(bottomItemIndex !== -1 && model.index >= bottomItemIndex - 1)
                             {
-                                view.fadeRectBottomHovered = plitem.hovered
+                                listView.fadeRectBottomHovered = plitem.hovered
                             }
                             if(topItemIndex !== -1 && model.index <= topItemIndex + 1)
                             {
-                                view.fadeRectTopHovered = plitem.hovered
+                                listView.fadeRectTopHovered = plitem.hovered
                             }
                         }
                     }
@@ -449,7 +449,7 @@ Widgets.NavigableFocusScope {
 
                 onSelectAll: root.plmodel.selectAll()
                 onSelectionUpdated: {
-                    if (view.mode === PlaylistListView.Mode.Select) {
+                    if (listView.mode === PlaylistListView.Mode.Select) {
                         console.log("update selection select")
                     } else if (view.mode === PlaylistListView.Mode.Move) {
                         var selectedIndexes = root.plmodel.getSelection()
@@ -465,7 +465,7 @@ Widgets.NavigableFocusScope {
                             target--
                         }
 
-                        view.currentIndex = selectedIndexes[0]
+                        listView.currentIndex = selectedIndexes[0]
                         /* the target is the position _after_ the move is applied */
                         root.plmodel.moveItemsPost(selectedIndexes, target)
                     } else { // normal
@@ -571,7 +571,7 @@ Widgets.NavigableFocusScope {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         text: VLCIcons.playlist
-                        color: view.activeFocus ? colors.accent : colors.text
+                        color: listView.activeFocus ? colors.accent : colors.text
                         opacity: 0.3
                     }
 
@@ -583,7 +583,7 @@ Widgets.NavigableFocusScope {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pixelSize: VLCStyle.fontSize_xxlarge
-                        color: view.activeFocus ? colors.accent : colors.text
+                        color: listView.activeFocus ? colors.accent : colors.text
                         opacity: 0.4
                     }
 
@@ -594,7 +594,7 @@ Widgets.NavigableFocusScope {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pixelSize: VLCStyle.fontSize_large
-                        color: view.activeFocus ? colors.accent : colors.text
+                        color: listView.activeFocus ? colors.accent : colors.text
                         opacity: 0.4
                     }
                 }
@@ -627,9 +627,9 @@ Widgets.NavigableFocusScope {
                     anchors.centerIn: parent
                     horizontalAlignment: Text.AlignHCenter
 
-                    text: (view.mode === PlaylistListView.Mode.Select)
+                    text: (listView.mode === PlaylistListView.Mode.Select)
                             ? i18n.qtr("Select tracks (%1)").arg(plmodel.selectedCount)
-                        : (view.mode === PlaylistListView.Mode.Move)
+                        : (listView.mode === PlaylistListView.Mode.Move)
                             ? i18n.qtr("Move tracks (%1)").arg(plmodel.selectedCount)
                         : ""
                     font.pixelSize: VLCStyle.fontSize_large
