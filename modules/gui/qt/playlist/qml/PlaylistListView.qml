@@ -377,19 +377,6 @@ Widgets.NavigableFocusScope {
                     implicitWidth: delegate.width
                     implicitHeight: childrenRect.height
 
-                    Loader {
-                        anchors.top: delegate.top
-
-                        active: (index === 0) // load only for the first element to prevent overlapping
-                        width: parent.width
-                        height: 1
-                        z: (model.selected || delegate.hovered || delegate.activeFocus) ? 2 : 1
-                        sourceComponent: Rectangle {
-                            color: colors.playlistSeparator
-                            opacity: colors.isThemeDark ? 0.05 : 1.0
-                        }
-                    }
-
                     PlaylistDelegate {
                         /*
                          * implicit variables:
@@ -462,17 +449,6 @@ Widgets.NavigableFocusScope {
                                 listView.fadeRectTopHovered = delegate.hovered
                             }
                         }
-                    }
-
-                    Rectangle {
-                        id: bottomSeparator
-                        anchors.top: delegate.bottom
-
-                        width: parent.width
-                        height: 1
-                        z: 2
-                        color: colors.playlistSeparator
-                        opacity: colors.isThemeDark ? 0.05 : 1.0
                     }
                 }
 
