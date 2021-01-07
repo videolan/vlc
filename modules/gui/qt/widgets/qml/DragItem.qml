@@ -42,9 +42,12 @@ Playlist.PlaylistDroppable {
     }
 
     Drag.onActiveChanged: {
-        if (!Drag.active)
-            return
-        _model = updateComponents(_maxCovers)
+        if (Drag.active) {
+            _model = updateComponents(_maxCovers)
+            mainInterface.setCursor(Qt.DragMoveCursor)
+        } else {
+            mainInterface.restoreCursor()
+        }
     }
 
     function coversXPos(index) {
