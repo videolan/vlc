@@ -178,13 +178,28 @@ Widgets.NavigableFocusScope {
                 }
 
                 Widgets.CaptionLabel {
+                    color: (listView.mode === PlaylistListView.Mode.Select || listView.mode === PlaylistListView.Mode.Move)
+                           ? colors.accent : colors.caption
+                    visible: model.count !== 0
+                    text: {
+                        switch (listView.mode) {
+                        case PlaylistListView.Mode.Select:
+                            return i18n.qtr("Selected tracks: %1").arg(model.selectedCount)
+                        case PlaylistListView.Mode.Move:
+                            return i18n.qtr("Moving tracks: %1").arg(model.selectedCount)
+                        case PlaylistListView.Mode.Normal:
+                        default:
+                            return i18n.qtr("%1 elements, %2").arg(model.count).arg(getHoursMinutesText(model.duration))
+                        }
+                    }
+
                     function getHoursMinutesText(duration) {
                         var hours = duration.toHours()
                         var minutes = duration.toMinutes()
                         var text
                         if (hours >= 1) {
                             minutes = minutes % 60
-                            text = i18n.qtr("%1h %2min").arg(hours).arg(minutes)
+                            text = i18n.qtr("%1h %2 min").arg(hours).arg(minutes)
                         }
                         else if (minutes > 0) {
                             text = i18n.qtr("%1 min").arg(minutes)
@@ -195,11 +210,6 @@ Widgets.NavigableFocusScope {
 
                         return text
                     }
-
-                    anchors.topMargin: VLCStyle.margin_small
-                    visible: model.count !== 0
-                    text: i18n.qtr("%1 elements, %2").arg(root.model.count).arg(getHoursMinutesText(model.duration))
-                    color: colors.caption
                 }
             }
 
@@ -609,44 +619,6 @@ Widgets.NavigableFocusScope {
                         color: listView.activeFocus ? colors.accent : colors.text
                         opacity: 0.4
                     }
-                }
-            }
-
-            Item {
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
-                height: VLCStyle.heightBar_normal
-                visible: !(infoText.text === "")
-
-                RectangularGlow {
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    width: infoText.width + VLCStyle.dp(18, VLCStyle.scale)
-                    height: infoText.height + VLCStyle.dp(12, VLCStyle.scale)
-
-                    glowRadius: 2
-                    cornerRadius: 10
-                    spread: 0.1
-                    color: colors.glowColorBanner
-                }
-
-                Label {
-                    id: infoText
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    anchors.centerIn: parent
-                    horizontalAlignment: Text.AlignHCenter
-
-                    text: (listView.mode === PlaylistListView.Mode.Select)
-                            ? i18n.qtr("Select tracks (%1)").arg(model.selectedCount)
-                        : (listView.mode === PlaylistListView.Mode.Move)
-                            ? i18n.qtr("Move tracks (%1)").arg(model.selectedCount)
-                        : ""
-                    font.pixelSize: VLCStyle.fontSize_large
-                    color: colors.text
-                    elide: Text.ElideRight
                 }
             }
 
