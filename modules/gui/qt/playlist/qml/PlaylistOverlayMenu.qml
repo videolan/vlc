@@ -187,120 +187,51 @@ Widgets.OverlayMenu {
 
     // Sort menu:
 
-    function sortOrderMarkRetriever(key) {
-        if (key === mainPlaylistController.sortKey) {
-            return (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_ASC ? "↓" : "↑")
-        }
-        else {
-            return null
-        }
-    }
-
-    Action {
-        id: sortTitleAction
-        text: i18n.qtr("Title")
-        onTriggered: mainPlaylistController.sort(key)
-        readonly property int key: PlaylistControllerModel.SORT_KEY_TITLE
-        readonly property string marking: sortOrderMarkRetriever(key)
-        readonly property bool tickMark: (key === mainPlaylistController.sortKey)
-    }
-
-    Action {
-        id: sortDurationAction
-        text: i18n.qtr("Duration")
-        onTriggered: mainPlaylistController.sort(key)
-        readonly property int key: PlaylistControllerModel.SORT_KEY_DURATION
-        readonly property string marking: sortOrderMarkRetriever(key)
-        readonly property bool tickMark: (key === mainPlaylistController.sortKey)
-    }
-
-    Action {
-        id: sortArtistAction
-        text: i18n.qtr("Artist")
-        onTriggered: mainPlaylistController.sort(key)
-        readonly property int key: PlaylistControllerModel.SORT_KEY_ARTIST
-        readonly property string marking: sortOrderMarkRetriever(key)
-        readonly property bool tickMark: (key === mainPlaylistController.sortKey)
-    }
-
-    Action {
-        id: sortAlbumAction
-        text: i18n.qtr("Album")
-        onTriggered: mainPlaylistController.sort(key)
-        readonly property int key: PlaylistControllerModel.SORT_KEY_ALBUM
-        readonly property string marking: sortOrderMarkRetriever(key)
-        readonly property bool tickMark: (key === mainPlaylistController.sortKey)
-    }
-
-    Action {
-        id: sortAlbumArtistAction
-        text: i18n.qtr("Album Artist")
-        onTriggered: mainPlaylistController.sort(key)
-        readonly property int key: PlaylistControllerModel.SORT_KEY_ALBUM_ARTIST
-        readonly property string marking: sortOrderMarkRetriever(key)
-        readonly property bool tickMark: (key === mainPlaylistController.sortKey)
-    }
-
-    Action {
-        id: sortGenreAction
-        text: i18n.qtr("Genre")
-        onTriggered: mainPlaylistController.sort(key)
-        readonly property int key: PlaylistControllerModel.SORT_KEY_GENRE
-        readonly property string marking: sortOrderMarkRetriever(key)
-        readonly property bool tickMark: (key === mainPlaylistController.sortKey)
-    }
-
-    Action {
-        id: sortDateAction
-        text: i18n.qtr("Date")
-        onTriggered: mainPlaylistController.sort(key)
-        readonly property int key: PlaylistControllerModel.SORT_KEY_DATE
-        readonly property string marking: sortOrderMarkRetriever(key)
-        readonly property bool tickMark: (key === mainPlaylistController.sortKey)
-    }
-
-    Action {
-        id: sortTrackNumberAction
-        text: i18n.qtr("Track Number")
-        onTriggered: mainPlaylistController.sort(key)
-        readonly property int key: PlaylistControllerModel.SORT_KEY_TRACK_NUMBER
-        readonly property string marking: sortOrderMarkRetriever(key)
-        readonly property bool tickMark: (key === mainPlaylistController.sortKey)
-    }
-
-    Action {
-        id: sortURLAction
-        text: i18n.qtr("URL")
-        onTriggered: mainPlaylistController.sort(key)
-        readonly property int key: PlaylistControllerModel.SORT_KEY_URL
-        readonly property string marking: sortOrderMarkRetriever(key)
-        readonly property bool tickMark: (key === mainPlaylistController.sortKey)
-    }
-
-    Action {
-        id: sortRatingAction
-        text: i18n.qtr("Rating")
-        onTriggered: mainPlaylistController.sort(key)
-        readonly property int key: PlaylistControllerModel.SORT_KEY_RATING
-        readonly property string marking: sortOrderMarkRetriever(key)
-        readonly property bool tickMark: (key === mainPlaylistController.sortKey)
-    }
-
     property var sortMenu: ({
                                 title: i18n.qtr("Sort Menu"),
-                                entries: [
-                                    sortTitleAction,
-                                    sortDurationAction,
-                                    sortArtistAction,
-                                    sortAlbumAction,
-                                    sortAlbumArtistAction,
-                                    sortGenreAction,
-                                    sortDateAction,
-                                    sortTrackNumberAction,
-                                    sortURLAction,
-                                    sortRatingAction
-                                ]
+                                entries: []
                             })
 
+    Component {
+        id: sortActionDelegate
 
+        Action {
+            property int key: undefined
+            readonly property string marking: {
+                if (key === mainPlaylistController.sortKey) {
+                    return (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_ASC ? "↓" : "↑")
+                }
+                else {
+                    return null
+                }
+            }
+            readonly property bool tickMark: (key === mainPlaylistController.sortKey)
+
+            onTriggered: mainPlaylistController.sort(key)
+        }
+    }
+
+    Repeater {
+        model: [{title: i18n.qtr("Title"), key: PlaylistControllerModel.SORT_KEY_TITLE},
+                {title: i18n.qtr("Duration"), key: PlaylistControllerModel.SORT_KEY_DURATION},
+                {title: i18n.qtr("Artist"), key: PlaylistControllerModel.SORT_KEY_ARTIST},
+                {title: i18n.qtr("Album"), key: PlaylistControllerModel.SORT_KEY_ALBUM},
+                {title: i18n.qtr("Album Artist"), key: PlaylistControllerModel.SORT_KEY_ALBUM_ARTIST},
+                {title: i18n.qtr("Genre"), key: PlaylistControllerModel.SORT_KEY_GENRE},
+                {title: i18n.qtr("Date"), key: PlaylistControllerModel.SORT_KEY_DATE},
+                {title: i18n.qtr("Track Number"), key: PlaylistControllerModel.SORT_KEY_TRACK_NUMBER},
+                {title: i18n.qtr("URL"), key: PlaylistControllerModel.SORT_KEY_URL},
+                {title: i18n.qtr("Rating"), key: PlaylistControllerModel.SORT_KEY_RATING}]
+
+        delegate: Loader {
+            asynchronous: true
+            sourceComponent: sortActionDelegate
+
+            onLoaded: {
+                item.text = modelData.title
+                item.key = modelData.key
+                overlayMenu.sortMenu.entries.push(item)
+            }
+        }
+    }
 }
