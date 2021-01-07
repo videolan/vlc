@@ -33,6 +33,8 @@ Slider {
 
     property alias parentWindow: timeTooltip.parentWindow
 
+    property VLCColors colors: VLCStyle.colors
+
     anchors.margins: isMiniplayer ? 0 : VLCStyle.margin_xxsmall
 
     Keys.onRightPressed: player.jumpFwd()
@@ -55,6 +57,8 @@ Slider {
                    " - " + player.chapters.getNameAtPosition(timeTooltip.position) : "")
 
         mouseArea: sliderRectMouseArea
+
+        colors: control.colors
     }
 
     Connections {    
@@ -81,7 +85,7 @@ Slider {
         width: control.availableWidth
         implicitHeight: control.implicitHeight
         height: implicitHeight
-        color:  isMiniplayer ? (VLCStyle.colors.sliderBarMiniplayerBgColor) : VLCStyle.colors.setColorAlpha( VLCStyle.colors.playerFg, 0.2 )
+        color:  isMiniplayer ? (control.colors.sliderBarMiniplayerBgColor) : control.colors.setColorAlpha( control.colors.playerFg, 0.2 )
         radius: implicitHeight
 
         MouseArea {
@@ -121,7 +125,7 @@ Slider {
             id: progressRect
             width: control.visualPosition * parent.width
             height: control.barHeight
-            color: (control.activeFocus || control.isMiniplayer) ? VLCStyle.colors.accent : VLCStyle.colors.bgHover
+            color: (control.activeFocus || control.isMiniplayer) ? control.colors.accent : control.colors.bgHover
             radius: control.barHeight
         }
 
@@ -134,7 +138,7 @@ Slider {
 
             height: control.barHeight
             opacity: 0.4
-            color: VLCStyle.colors.buffer
+            color: control.colors.buffer
             radius: control.barHeight
 
             states: [
@@ -209,7 +213,7 @@ Slider {
                     id: seekpointsRect
                     property real position: model.position === undefined ? 0.0 : model.position
 
-                    color: VLCStyle.colors.seekpoint
+                    color: control.colors.seekpoint
                     width: VLCStyle.dp(1, VLCStyle.scale)
                     height: control.barHeight
                     x: sliderRect.width * seekpointsRect.position
@@ -238,7 +242,7 @@ Slider {
         implicitWidth: VLCStyle.margin_small
         implicitHeight: VLCStyle.margin_small
         radius: VLCStyle.margin_small
-        color: VLCStyle.colors.accent
+        color: control.colors.accent
 
         transitions: [
             Transition {
