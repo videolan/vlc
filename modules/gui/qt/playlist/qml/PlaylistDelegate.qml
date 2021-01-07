@@ -47,12 +47,14 @@ Rectangle {
     }
 
     color: {
-        if (selected)
-            colors.plItemSelected
+        if ((activeFocus && listView.mode !== PlaylistListView.Mode.Select) || (hovered && selected))
+            colors.plItemFocused
         else if (hovered)
             colors.plItemHovered
+        else if (selected)
+            colors.plItemSelected
         else
-            return "transparent"
+            "transparent"
     }
 
     height: artworkItem.height * 1.5
