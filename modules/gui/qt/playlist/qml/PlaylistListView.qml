@@ -30,7 +30,7 @@ import "qrc:///style/"
 Widgets.NavigableFocusScope {
     id: root
 
-    property var plmodel: PlaylistListModel {
+    property var model: PlaylistListModel {
         playlistId: mainctx.playlist
     }
 
@@ -95,7 +95,7 @@ Widgets.NavigableFocusScope {
             property int _scrollingDirection: 0
 
             function insertIntoPlaylist(index) {
-                root.plmodel.moveItemsPre(root.plmodel.getSelection(), index)
+                root.model.moveItemsPre(root.model.getSelection(), index)
             }
 
             function canInsertIntoPlaylist(index) {
@@ -151,7 +151,7 @@ Widgets.NavigableFocusScope {
 
         PlaylistContextMenu {
             id: contextMenu
-            model: root.plmodel
+            model: root.model
             controler: mainPlaylistController
         }
 
@@ -190,15 +190,15 @@ Widgets.NavigableFocusScope {
                     }
 
                     anchors.topMargin: VLCStyle.margin_small
-                    visible: plmodel.count !== 0
-                    text: i18n.qtr("%1 elements, %2").arg(root.plmodel.count).arg(getHoursMinutesText(plmodel.duration))
+                    visible: model.count !== 0
+                    text: i18n.qtr("%1 elements, %2").arg(root.model.count).arg(getHoursMinutesText(model.duration))
                     color: colors.caption
                 }
             }
 
             RowLayout {
                 id: content
-                visible: plmodel.count !== 0
+                visible: model.count !== 0
 
                 Layout.topMargin: VLCStyle.margin_normal
                 Layout.leftMargin: root.leftPadding + VLCStyle.margin_normal
@@ -245,8 +245,8 @@ Widgets.NavigableFocusScope {
 
                 focus: true
 
-                model: root.plmodel
-                modelCount: root.plmodel.count
+                model: root.model
+                modelCount: root.model.count
 
                 fadeColor: root.backgroundColor
 
@@ -254,18 +254,18 @@ Widgets.NavigableFocusScope {
                 property int mode: PlaylistListView.Mode.Normal
 
                 Connections {
-                    target: root.plmodel
+                    target: root.model
                     onRowsInserted: {
                         if (listView.currentIndex == -1)
                             listView.currentIndex = 0
                     }
                     onModelReset: {
-                        if (listView.currentIndex == -1 &&  root.plmodel.count > 0)
+                        if (listView.currentIndex == -1 &&  root.model.count > 0)
                             listView.currentIndex = 0
                     }
                     onSelectedCountChanged: {
-                        var selectedIndexes = root.plmodel.getSelection()
-                        var modelCount = root.plmodel.count
+                        var selectedIndexes = root.model.getSelection()
+                        var modelCount = root.model.count
 
                         if (modelCount === 0 || selectedIndexes.length === 0)
                             return
@@ -273,12 +273,12 @@ Widgets.NavigableFocusScope {
                         var bottomItemIndex = listView.listView.indexAt(listView.listView.contentX, (listView.listView.contentY + listView.height) - 2)
                         var topItemIndex    = listView.listView.indexAt(listView.listView.contentX, listView.listView.contentY + 2)
 
-                        if (topItemIndex !== -1 && (root.plmodel.isSelected(topItemIndex) || (modelCount >= 2 && root.plmodel.isSelected(topItemIndex + 1))))
+                        if (topItemIndex !== -1 && (root.model.isSelected(topItemIndex) || (modelCount >= 2 && root.model.isSelected(topItemIndex + 1))))
                             listView.fadeRectTopHovered = true
                         else
                             listView.fadeRectTopHovered = false
 
-                        if (bottomItemIndex !== -1 && (root.plmodel.isSelected(bottomItemIndex) || (root.plmodel.isSelected(bottomItemIndex - 1))))
+                        if (bottomItemIndex !== -1 && (root.model.isSelected(bottomItemIndex) || (root.model.isSelected(bottomItemIndex - 1))))
                             listView.fadeRectBottomHovered = true
                         else
                             listView.fadeRectBottomHovered = false
@@ -298,14 +298,14 @@ Widgets.NavigableFocusScope {
                             if( mouse.button === Qt.RightButton )
                                 contextMenu.popup(-1, this.mapToGlobal(mouse.x, mouse.y))
                             else if ( mouse.button === Qt.LeftButton )
-                                root.plmodel.deselectAll()
+                                root.model.deselectAll()
                         }
                     }
 
                     DropArea {
                         anchors.fill: parent
                         onEntered: {
-                            if(!root.isDropAcceptable(drag, root.plmodel.count))
+                            if(!root.isDropAcceptable(drag, root.model.count))
                                 return
 
                             root.setItemDropIndicatorVisible(listView.modelCount - 1, true, false);
@@ -316,9 +316,9 @@ Widgets.NavigableFocusScope {
                             root.setItemDropIndicatorVisible(listView.modelCount - 1, false, false);
                         }
                         onDropped: {
-                            if(!root.isDropAcceptable(drop, root.plmodel.count))
+                            if(!root.isDropAcceptable(drop, root.model.count))
                                 return
-                            root.acceptDrop(root.plmodel.count, drop)
+                            root.acceptDrop(root.model.count, drop)
                             root.setItemDropIndicatorVisible(listView.modelCount - 1, false, false);
                         }
                     }
@@ -353,7 +353,7 @@ Widgets.NavigableFocusScope {
                          *  - index: the index of this item in the list
                          */
                         id: plitem
-                        plmodel: root.plmodel
+                        _model: root.model
                         width: root.width
                         z: 1
                         leftPadding: root.leftPadding + VLCStyle.margin_normal
@@ -363,7 +363,7 @@ Widgets.NavigableFocusScope {
                             /* to receive keys events */
                             listView.forceActiveFocus()
                             if (listView.mode === PlaylistListView.Mode.Move) {
-                                var selectedIndexes = root.plmodel.getSelection()
+                                var selectedIndexes = root.model.getSelection()
                                 if (selectedIndexes.length === 0)
                                     return
                                 var preTarget = index
@@ -372,10 +372,10 @@ Widgets.NavigableFocusScope {
                                 if (preTarget > selectedIndexes[0])
                                     preTarget++
                                 listView.currentIndex = selectedIndexes[0]
-                                root.plmodel.moveItemsPre(selectedIndexes, preTarget)
+                                root.model.moveItemsPre(selectedIndexes, preTarget)
                                 return
                             } else if (listView.mode === PlaylistListView.Mode.Select) {
-                            } else if (!(root.plmodel.isSelected(index) && button === Qt.RightButton)) {
+                            } else if (!(root.model.isSelected(index) && button === Qt.RightButton)) {
                                 listView.updateSelection(modifier, listView.currentIndex, index)
                                 listView.currentIndex = index
                             }
@@ -387,9 +387,9 @@ Widgets.NavigableFocusScope {
                         colors: root.colors
 
                         onDragStarting: {
-                            if (!root.plmodel.isSelected(index)) {
+                            if (!root.model.isSelected(index)) {
                                 /* the dragged item is not in the selection, replace the selection */
-                                root.plmodel.setSelection([index])
+                                root.model.setSelection([index])
                             }
                         }
 
@@ -447,12 +447,12 @@ Widgets.NavigableFocusScope {
                     NumberAnimation { property: "opacity"; to: 1.0 }
                 }
 
-                onSelectAll: root.plmodel.selectAll()
+                onSelectAll: root.model.selectAll()
                 onSelectionUpdated: {
                     if (listView.mode === PlaylistListView.Mode.Select) {
                         console.log("update selection select")
-                    } else if (view.mode === PlaylistListView.Mode.Move) {
-                        var selectedIndexes = root.plmodel.getSelection()
+                    } else if (listView.mode === PlaylistListView.Mode.Move) {
+                        var selectedIndexes = root.model.getSelection()
                         if (selectedIndexes.length === 0)
                             return
                         /* always move relative to the first item of the selection */
@@ -467,7 +467,7 @@ Widgets.NavigableFocusScope {
 
                         listView.currentIndex = selectedIndexes[0]
                         /* the target is the position _after_ the move is applied */
-                        root.plmodel.moveItemsPost(selectedIndexes, target)
+                        root.model.moveItemsPost(selectedIndexes, target)
                     } else { // normal
                         updateSelection(keyModifiers, oldIndex, newIndex);
                     }
@@ -500,32 +500,32 @@ Widgets.NavigableFocusScope {
                         return
 
                     if (mode === PlaylistListView.Mode.Select)
-                        root.plmodel.toggleSelected(index)
+                        root.model.toggleSelected(index)
                     else //normal
                         // play
                         mainPlaylistController.goTo(index, true)
                 }
 
                 function onPlay() {
-                    let selection = root.plmodel.getSelection()
+                    let selection = root.model.getSelection()
                     if (selection.length === 0)
                         return
                     mainPlaylistController.goTo(selection[0], true)
                 }
 
                 function onDelete() {
-                    let selection = root.plmodel.getSelection()
+                    let selection = root.model.getSelection()
                     if (selection.length === 0)
                         return
-                    root.plmodel.removeItems(selection)
+                    root.model.removeItems(selection)
                 }
 
                 function _addRange(from, to) {
-                    root.plmodel.setRangeSelected(from, to - from + 1, true)
+                    root.model.setRangeSelected(from, to - from + 1, true)
                 }
 
                 function _delRange(from, to) {
-                    root.plmodel.setRangeSelected(from, to - from + 1, false)
+                    root.model.setRangeSelected(from, to - from + 1, false)
                 }
 
                 // copied from SelectableDelegateModel, which is intended to be removed
@@ -554,16 +554,16 @@ Widgets.NavigableFocusScope {
                     } else {
                         shiftIndex = newIndex
                         if (keymodifiers & Qt.ControlModifier) {
-                            root.plmodel.toggleSelected(newIndex)
+                            root.model.toggleSelected(newIndex)
                         } else {
-                            root.plmodel.setSelection([newIndex])
+                            root.model.setSelection([newIndex])
                         }
                     }
                 }
 
                 Column {
                     anchors.centerIn: parent
-                    visible: plmodel.count === 0
+                    visible: model.count === 0
 
                     Widgets.IconLabel {
                         font.pixelSize: VLCStyle.dp(48, VLCStyle.scale)
@@ -628,9 +628,9 @@ Widgets.NavigableFocusScope {
                     horizontalAlignment: Text.AlignHCenter
 
                     text: (listView.mode === PlaylistListView.Mode.Select)
-                            ? i18n.qtr("Select tracks (%1)").arg(plmodel.selectedCount)
+                            ? i18n.qtr("Select tracks (%1)").arg(model.selectedCount)
                         : (listView.mode === PlaylistListView.Mode.Move)
-                            ? i18n.qtr("Move tracks (%1)").arg(plmodel.selectedCount)
+                            ? i18n.qtr("Move tracks (%1)").arg(model.selectedCount)
                         : ""
                     font.pixelSize: VLCStyle.fontSize_large
                     color: colors.text
@@ -656,7 +656,7 @@ Widgets.NavigableFocusScope {
     Keys.onPressed: {
         if (event.matches(StandardKey.SelectAll))
         {
-            root.plmodel.selectAll();
+            root.model.selectAll();
         }
         else
         {

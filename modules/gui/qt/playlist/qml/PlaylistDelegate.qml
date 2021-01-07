@@ -30,7 +30,8 @@ import "qrc:///style/"
 Rectangle {
     id: plitem
 
-    property var plmodel
+    // starts with an underscore to prevent the implicit delegate 'model' property
+    property var _model
 
     signal itemClicked(int button, int modifier, var globalMousePos)
     signal itemDoubleClicked(int keys, int modifier, var globalMousePos)
@@ -58,7 +59,7 @@ Rectangle {
         plInfoTooltip.close()
         plInfoTooltip.text = Qt.binding(function() { return (textInfo.text + '\n' + textArtist.text); })
         plInfoTooltip.parent = textInfoColumn
-        if (plmodel.getSelection().length > 1 && binding)
+        if (_model.getSelection().length > 1 && binding)
             plInfoTooltip.timeout = 2000
         else
             plInfoTooltip.timeout = 0
@@ -129,7 +130,7 @@ Rectangle {
     // only active when the item is the last item in the list
     Loader {
         id: bottomDropIndicator
-        active: model.index === root.plmodel.count - 1
+        active: model.index === _model.count - 1
         visible: false
 
         z: 1
@@ -169,8 +170,8 @@ Rectangle {
                     return
                 if (target.active) {
                     plitem.dragStarting()
-                    dragItem.model = model
-                    dragItem.count = plmodel.getSelection().length
+                    dragItem.model = _model
+                    dragItem.count = _model.getSelection().length
                     dragItem.visible = true
                 } else {
                     dragItem.Drag.drop()
@@ -318,7 +319,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                readonly property bool _isLastItem: model.index === plitem.plmodel.count - 1
+                readonly property bool _isLastItem: model.index === plitem._model.count - 1
                 readonly property int _targetIndex: _isLastItem ? model.index + 1 : model.index
 
                 onEntered: {

@@ -29,34 +29,34 @@ Widgets.OverlayMenu {
     Action {
         id: playAction
         text: i18n.qtr("Play")
-        onTriggered: mainPlaylistController.goTo(root.plmodel.getSelection()[0], true)
+        onTriggered: mainPlaylistController.goTo(root.model.getSelection()[0], true)
         property string fontIcon: VLCIcons.play
     }
 
     Action {
         id: streamAction
         text: i18n.qtr("Stream")
-        onTriggered: dialogProvider.streamingDialog(root.plmodel.getSelection().map(function(i) { return root.plmodel.itemAt(i).url; }), false)
+        onTriggered: dialogProvider.streamingDialog(root.model.getSelection().map(function(i) { return root.model.itemAt(i).url; }), false)
         property string fontIcon: VLCIcons.stream
     }
 
     Action {
         id: saveAction
         text: i18n.qtr("Save")
-        onTriggered: dialogProvider.streamingDialog(root.plmodel.getSelection().map(function(i) { return root.plmodel.itemAt(i).url; }))
+        onTriggered: dialogProvider.streamingDialog(root.model.getSelection().map(function(i) { return root.model.itemAt(i).url; }))
     }
 
     Action {
         id: infoAction
         text: i18n.qtr("Information")
-        onTriggered: dialogProvider.mediaInfoDialog(root.plmodel.itemAt(root.plmodel.getSelection()[0]))
+        onTriggered: dialogProvider.mediaInfoDialog(root.model.itemAt(root.model.getSelection()[0]))
         icon.source: "qrc:/menu/info.svg"
     }
 
     Action {
         id: exploreAction
         text: i18n.qtr("Show Containing Directory")
-        onTriggered: mainPlaylistController.explore(root.plmodel.itemAt(root.plmodel.getSelection()[0]))
+        onTriggered: mainPlaylistController.explore(root.model.itemAt(root.model.getSelection()[0]))
         icon.source: "qrc:/type/folder-grey.svg"
     }
 
@@ -97,7 +97,7 @@ Widgets.OverlayMenu {
     Action {
         id: selectAllAction
         text: i18n.qtr("Select All")
-        onTriggered: root.plmodel.selectAll()
+        onTriggered: root.model.selectAll()
     }
 
     Action {
@@ -177,9 +177,9 @@ Widgets.OverlayMenu {
                                         })
 
     model: {
-        if (root.plmodel.count === 0)
+        if (root.model.count === 0)
             rootMenu_PLEmpty
-        else if (root.plmodel.selectedCount === 0)
+        else if (root.model.selectedCount === 0)
             rootMenu_noSelection
         else
             rootMenu
