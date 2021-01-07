@@ -49,6 +49,8 @@ Item {
     // Example usage can be found in 'Playlist/PlaylistOverlayMenu.qml' file
     property var model: undefined
 
+    property VLCColors colors: VLCStyle.colors
+
     onModelChanged: {
         listView.currentModel = model
         listView.resetStack()
@@ -118,7 +120,8 @@ Item {
             readonly property point overlayPos: backgroundItem.mapFromItem(root, parentItem.x, parentItem.y)
             sourceRect: Qt.rect(overlayPos.x, overlayPos.y, width, height)
 
-            tint: VLCStyle.colors.blendColors(VLCStyle.nightColors.black, VLCStyle.nightColors.banner, 0.85)
+            tintStrength: 0.0
+            exclusionStrength: 0.1
         }
 
         KeyNavigableListView {
@@ -171,7 +174,7 @@ Item {
                 font.pixelSize: VLCStyle.fontSize_xlarge
                 text: listView.currentModel.title
 
-                color: VLCStyle.nightColors.text
+                color: colors.text
 
                 leftPadding: root.leftPadding
                 rightPadding: root.rightPadding
@@ -242,7 +245,7 @@ Item {
                                 IconLabel {
                                     horizontalAlignment: Text.AlignHCenter
                                     text: modelData.fontIcon
-                                    color: VLCStyle.nightColors.text
+                                    color: colors.text
                                 }
                             }
 
@@ -251,7 +254,7 @@ Item {
                                 ListLabel {
                                     horizontalAlignment: Text.AlignHCenter
                                     text: "✓"
-                                    color: VLCStyle.nightColors.text
+                                    color: colors.text
                                 }
                             }
 
@@ -274,7 +277,7 @@ Item {
 
                         font.weight: Font.Normal
                         text: modelData.text
-                        color: VLCStyle.nightColors.text
+                        color: colors.text
                     }
 
                     ListLabel {
@@ -288,13 +291,13 @@ Item {
                             else if (!!modelData.marking)
                                 modelData.marking
                         }
-                        color: VLCStyle.nightColors.text
+                        color: colors.text
                     }
                 }
 
                 background: Rectangle {
                     visible: button.activeFocus
-                    color: VLCStyle.colors.accent
+                    color: colors.accent
                     opacity: 0.8
                 }
             }
