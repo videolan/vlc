@@ -348,7 +348,7 @@ static int Open(filter_t *filter)
         default:
             msg_Err(filter, "Unsupported pixel size %u (chroma %4.4s)",
                     chroma->pixel_size, (char *)&src->i_chroma);
-            goto error;
+            return VLC_EGENERIC;
     }
 
     for (unsigned i = 1; i < PICTURE_PLANE_MAX; i++)
@@ -367,7 +367,7 @@ static int Open(filter_t *filter)
                      != chroma->p[i].h.num * chroma->p[i].w.den) {
                         msg_Err(filter, "Format rotation not possible "
                                 "(chroma %4.4s)", (char *)&src->i_chroma);
-                        goto error;
+                        return VLC_EGENERIC;
                     }
             }
         }
@@ -393,7 +393,7 @@ static int Open(filter_t *filter)
          dst->i_y_offset       != src_trans.i_y_offset)) {
 
             msg_Err(filter, "Format change is not allowed");
-            goto error;
+            return VLC_EGENERIC;
     }
     else if(filter->b_allow_fmt_out_change) {
 
@@ -414,7 +414,7 @@ static int Open(filter_t *filter)
             if (dsc_is_rotated(dsc)) {
                 msg_Err(filter, "Format rotation not possible (chroma %4.4s)",
                         (char *)&src->i_chroma);
-                goto error;
+                return VLC_EGENERIC;
             }
             /* fallthrough */
         case VLC_CODEC_YUYV:
@@ -423,7 +423,7 @@ static int Open(filter_t *filter)
             break;
         case VLC_CODEC_NV12:
         case VLC_CODEC_NV21:
-            goto error;
+            return VLC_EGENERIC;
     }
 
     static const struct vlc_filter_operations filter_ops =
@@ -434,7 +434,4 @@ static int Open(filter_t *filter)
     filter->ops = &filter_ops;
     filter->p_sys           = sys;
     return VLC_SUCCESS;
-error:
-    vlc_obj_free(VLC_OBJECT(filter), sys);
-    return VLC_EGENERIC;
 }
