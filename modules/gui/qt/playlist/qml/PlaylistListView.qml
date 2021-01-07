@@ -61,18 +61,6 @@ Widgets.NavigableFocusScope {
         drop.accept(Qt.IgnoreAction)
     }
 
-    function sortPL(key) {
-        if (mainPlaylistController.sortKey !== key) {
-            mainPlaylistController.setSortOrder(PlaylistControllerModel.SORT_ORDER_ASC)
-            mainPlaylistController.setSortKey(key)
-        }
-        else {
-            mainPlaylistController.switchSortOrder()
-        }
-
-        mainPlaylistController.sort()
-    }
-
     PlaylistOverlayMenu {
         id: overlayMenu
         anchors.fill: parent

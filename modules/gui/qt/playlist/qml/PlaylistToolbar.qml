@@ -102,7 +102,7 @@ Widgets.NavigableFocusScope {
 
                 listWidth: VLCStyle.widthSortBox
                 onSortSelected: {
-                    root.sortPL(modelData.criteria)
+                    mainPlaylistController.sort(modelData.criteria)
                 }
 
                 colors: playlistToolbar.colors

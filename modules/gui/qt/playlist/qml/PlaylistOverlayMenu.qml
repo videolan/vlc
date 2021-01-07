@@ -199,7 +199,7 @@ Widgets.OverlayMenu {
     Action {
         id: sortTitleAction
         text: i18n.qtr("Title")
-        onTriggered: root.sortPL(key)
+        onTriggered: mainPlaylistController.sort(key)
         readonly property int key: PlaylistControllerModel.SORT_KEY_TITLE
         readonly property string marking: sortOrderMarkRetriever(key)
         readonly property bool tickMark: (key === mainPlaylistController.sortKey)
@@ -208,7 +208,7 @@ Widgets.OverlayMenu {
     Action {
         id: sortDurationAction
         text: i18n.qtr("Duration")
-        onTriggered: root.sortPL(key)
+        onTriggered: mainPlaylistController.sort(key)
         readonly property int key: PlaylistControllerModel.SORT_KEY_DURATION
         readonly property string marking: sortOrderMarkRetriever(key)
         readonly property bool tickMark: (key === mainPlaylistController.sortKey)
@@ -217,7 +217,7 @@ Widgets.OverlayMenu {
     Action {
         id: sortArtistAction
         text: i18n.qtr("Artist")
-        onTriggered: root.sortPL(key)
+        onTriggered: mainPlaylistController.sort(key)
         readonly property int key: PlaylistControllerModel.SORT_KEY_ARTIST
         readonly property string marking: sortOrderMarkRetriever(key)
         readonly property bool tickMark: (key === mainPlaylistController.sortKey)
@@ -226,7 +226,7 @@ Widgets.OverlayMenu {
     Action {
         id: sortAlbumAction
         text: i18n.qtr("Album")
-        onTriggered: root.sortPL(key)
+        onTriggered: mainPlaylistController.sort(key)
         readonly property int key: PlaylistControllerModel.SORT_KEY_ALBUM
         readonly property string marking: sortOrderMarkRetriever(key)
         readonly property bool tickMark: (key === mainPlaylistController.sortKey)
@@ -235,7 +235,7 @@ Widgets.OverlayMenu {
     Action {
         id: sortAlbumArtistAction
         text: i18n.qtr("Album Artist")
-        onTriggered: root.sortPL(key)
+        onTriggered: mainPlaylistController.sort(key)
         readonly property int key: PlaylistControllerModel.SORT_KEY_ALBUM_ARTIST
         readonly property string marking: sortOrderMarkRetriever(key)
         readonly property bool tickMark: (key === mainPlaylistController.sortKey)
@@ -244,7 +244,7 @@ Widgets.OverlayMenu {
     Action {
         id: sortGenreAction
         text: i18n.qtr("Genre")
-        onTriggered: root.sortPL(key)
+        onTriggered: mainPlaylistController.sort(key)
         readonly property int key: PlaylistControllerModel.SORT_KEY_GENRE
         readonly property string marking: sortOrderMarkRetriever(key)
         readonly property bool tickMark: (key === mainPlaylistController.sortKey)
@@ -253,7 +253,7 @@ Widgets.OverlayMenu {
     Action {
         id: sortDateAction
         text: i18n.qtr("Date")
-        onTriggered: root.sortPL(key)
+        onTriggered: mainPlaylistController.sort(key)
         readonly property int key: PlaylistControllerModel.SORT_KEY_DATE
         readonly property string marking: sortOrderMarkRetriever(key)
         readonly property bool tickMark: (key === mainPlaylistController.sortKey)
@@ -262,7 +262,7 @@ Widgets.OverlayMenu {
     Action {
         id: sortTrackNumberAction
         text: i18n.qtr("Track Number")
-        onTriggered: root.sortPL(key)
+        onTriggered: mainPlaylistController.sort(key)
         readonly property int key: PlaylistControllerModel.SORT_KEY_TRACK_NUMBER
         readonly property string marking: sortOrderMarkRetriever(key)
         readonly property bool tickMark: (key === mainPlaylistController.sortKey)
@@ -271,7 +271,7 @@ Widgets.OverlayMenu {
     Action {
         id: sortURLAction
         text: i18n.qtr("URL")
-        onTriggered: root.sortPL(key)
+        onTriggered: mainPlaylistController.sort(key)
         readonly property int key: PlaylistControllerModel.SORT_KEY_URL
         readonly property string marking: sortOrderMarkRetriever(key)
         readonly property bool tickMark: (key === mainPlaylistController.sortKey)
@@ -280,7 +280,7 @@ Widgets.OverlayMenu {
     Action {
         id: sortRatingAction
         text: i18n.qtr("Rating")
-        onTriggered: root.sortPL(key)
+        onTriggered: mainPlaylistController.sort(key)
         readonly property int key: PlaylistControllerModel.SORT_KEY_RATING
         readonly property string marking: sortOrderMarkRetriever(key)
         readonly property bool tickMark: (key === mainPlaylistController.sortKey)
