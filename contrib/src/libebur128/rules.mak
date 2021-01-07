@@ -20,7 +20,6 @@ libebur128: libebur128-$(LIBEBUR128_VERSION).tar.gz .sum-libebur128
 	$(MOVE)
 
 .libebur128: libebur128 toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) $(CMAKE) -DENABLE_INTERNAL_QUEUE_H=TRUE
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) -DENABLE_INTERNAL_QUEUE_H=TRUE -DBUILD_SHARED_LIBS=FALSE
 	cd $< && $(CMAKEBUILD) . --target install
-	rm -f $(PREFIX)/lib/libebur128.so*
 	touch $@
