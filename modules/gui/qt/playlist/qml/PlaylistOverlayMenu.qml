@@ -212,16 +212,7 @@ Widgets.OverlayMenu {
     }
 
     Repeater {
-        model: [{title: i18n.qtr("Title"), key: PlaylistControllerModel.SORT_KEY_TITLE},
-                {title: i18n.qtr("Duration"), key: PlaylistControllerModel.SORT_KEY_DURATION},
-                {title: i18n.qtr("Artist"), key: PlaylistControllerModel.SORT_KEY_ARTIST},
-                {title: i18n.qtr("Album"), key: PlaylistControllerModel.SORT_KEY_ALBUM},
-                {title: i18n.qtr("Album Artist"), key: PlaylistControllerModel.SORT_KEY_ALBUM_ARTIST},
-                {title: i18n.qtr("Genre"), key: PlaylistControllerModel.SORT_KEY_GENRE},
-                {title: i18n.qtr("Date"), key: PlaylistControllerModel.SORT_KEY_DATE},
-                {title: i18n.qtr("Track Number"), key: PlaylistControllerModel.SORT_KEY_TRACK_NUMBER},
-                {title: i18n.qtr("URL"), key: PlaylistControllerModel.SORT_KEY_URL},
-                {title: i18n.qtr("Rating"), key: PlaylistControllerModel.SORT_KEY_RATING}]
+        model: mainPlaylistController.sortKeyTitleList
 
         delegate: Loader {
             asynchronous: true
