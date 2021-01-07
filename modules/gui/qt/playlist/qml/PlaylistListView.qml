@@ -309,6 +309,10 @@ Widgets.NavigableFocusScope {
                     width: parent.width
                     height: Math.max(VLCStyle.icon_normal, listView.height - y)
 
+                    function setDropIndicatorVisible(visible) {
+                        dropIndicator.visible = visible
+                    }
+
                     MouseArea {
                         anchors.fill: parent
                         acceptedButtons: Qt.RightButton | Qt.LeftButton
@@ -317,29 +321,42 @@ Widgets.NavigableFocusScope {
                             listView.forceActiveFocus()
                             if( mouse.button === Qt.RightButton )
                                 contextMenu.popup(-1, this.mapToGlobal(mouse.x, mouse.y))
-                            else if ( mouse.button === Qt.LeftButton )
-                                root.model.deselectAll()
                         }
                     }
 
+                    Rectangle {
+                        id: dropIndicator
+
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: VLCStyle.dp(1)
+                        anchors.top: parent.top
+
+                        visible: false
+                        color: colors.accent
+                    }
+
                     DropArea {
+                        id: dropArea
+
                         anchors.fill: parent
+
                         onEntered: {
                             if(!root.isDropAcceptable(drag, root.model.count))
                                 return
 
-                            root.setItemDropIndicatorVisible(listView.modelCount - 1, true, false);
+                            dropIndicator.visible = true
                         }
                         onExited: {
-
-
-                            root.setItemDropIndicatorVisible(listView.modelCount - 1, false, false);
+                            dropIndicator.visible = false
                         }
                         onDropped: {
                             if(!root.isDropAcceptable(drop, root.model.count))
                                 return
+
                             root.acceptDrop(root.model.count, drop)
-                            root.setItemDropIndicatorVisible(listView.modelCount - 1, false, false);
+
+                            dropIndicator.visible = false
                         }
                     }
                 }

@@ -126,24 +126,6 @@ Rectangle {
         color: colors.accent
     }
 
-    // bottom drop indicator bar
-    // only active when the item is the last item in the list
-    Loader {
-        id: bottomDropIndicator
-        active: model.index === _model.count - 1
-        visible: false
-
-        z: 1
-        width: parent.width
-        height: 1
-        anchors.top: parent.bottom
-        antialiasing: true
-
-        sourceComponent: Rectangle {
-            color: colors.accent
-        }
-    }
-
     MouseArea {
         id: mouse
         anchors.fill: parent
