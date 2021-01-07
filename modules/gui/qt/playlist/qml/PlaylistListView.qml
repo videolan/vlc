@@ -320,6 +320,8 @@ Widgets.NavigableFocusScope {
                     width: parent.width
                     height: Math.max(VLCStyle.icon_normal, listView.height - y)
 
+                    property alias firstItemIndicatorVisible: firstItemIndicator.visible
+
                     function setDropIndicatorVisible(visible) {
                         dropIndicator.visible = visible
                     }
@@ -353,6 +355,33 @@ Widgets.NavigableFocusScope {
                         color: colors.accent
                     }
 
+                    Rectangle {
+                        id: firstItemIndicator
+
+                        anchors.fill: parent
+                        anchors.margins: VLCStyle.margin_small
+
+                        border.width: VLCStyle.dp(2)
+                        border.color: colors.accent
+
+                        color: "transparent"
+
+                        visible: false
+
+                        opacity: 0.8
+
+                        Label {
+                            anchors.centerIn: parent
+
+                            text: VLCIcons.add
+
+                            font.pointSize: VLCStyle.fontHeight_xxxlarge
+
+                            font.family: VLCIcons.fontFamily
+                            color: colors.accent
+                        }
+                    }
+
                     DropArea {
                         id: dropArea
 
@@ -362,10 +391,16 @@ Widgets.NavigableFocusScope {
                             if(!root.isDropAcceptable(drag, root.model.count))
                                 return
 
-                            dropIndicator.visible = true
+                            if (root.model.count === 0)
+                                firstItemIndicator.visible = true
+                            else
+                                dropIndicator.visible = true
                         }
                         onExited: {
-                            dropIndicator.visible = false
+                            if (root.model.count === 0)
+                                firstItemIndicator.visible = false
+                            else
+                                dropIndicator.visible = false
                         }
                         onDropped: {
                             if(!root.isDropAcceptable(drop, root.model.count))
@@ -373,7 +408,10 @@ Widgets.NavigableFocusScope {
 
                             root.acceptDrop(root.model.count, drop)
 
-                            dropIndicator.visible = false
+                            if (root.model.count === 0)
+                                firstItemIndicator.visible = false
+                            else
+                                dropIndicator.visible = false
                         }
                     }
                 }
@@ -520,7 +558,7 @@ Widgets.NavigableFocusScope {
                 Column {
                     id: noContentInfoColumn
                     anchors.centerIn: parent
-                    visible: model.count === 0
+                    visible: model.count === 0 && !listView.footerItem.firstItemIndicatorVisible
 
                     Widgets.IconLabel {
                         font.pixelSize: VLCStyle.dp(48, VLCStyle.scale)
