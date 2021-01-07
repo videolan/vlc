@@ -403,7 +403,11 @@ Widgets.NavigableFocusScope {
                             if (button === Qt.RightButton)
                                 contextMenu.popup(index, globalMousePos)
                         }
-                        onItemDoubleClicked: mainPlaylistController.goTo(index, true)
+                        onItemDoubleClicked: {
+                            if (listView.mode === PlaylistListView.Mode.Normal)
+                                mainPlaylistController.goTo(index, true)
+                        }
+
                         colors: root.colors
 
                         onDragStarting: {
@@ -521,8 +525,7 @@ Widgets.NavigableFocusScope {
 
                     if (mode === PlaylistListView.Mode.Select)
                         root.model.toggleSelected(index)
-                    else //normal
-                        // play
+                    else if (mode === PlaylistListView.Mode.Normal)
                         mainPlaylistController.goTo(index, true)
                 }
 
