@@ -25,112 +25,119 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
-    id: playlistToolbar
 
-    property int leftPadding: 0
-    property int rightPadding: 0
+RowLayout {
+    id: rowLayout
+
     height: VLCStyle.heightBar_normal
+    spacing: VLCStyle.margin_normal
 
-    property VLCColors colors: VLCStyle.colors
+    Item {
+        Layout.fillWidth: true
+        implicitHeight: childrenRect.height
 
-    Rectangle {
-        anchors.fill: parent
-        color: colors.banner
+        Widgets.IconToolButton {
+            id: loop
 
-        RowLayout {
-            anchors {
-                fill: parent
-                leftMargin: playlistToolbar.leftPadding
-                rightMargin: playlistToolbar.rightPadding
+            anchors.centerIn: parent
+
+            size: VLCStyle.icon_normal
+            iconText: (mainPlaylistController.repeatMode === PlaylistControllerModel.PLAYBACK_REPEAT_CURRENT)
+                      ? VLCIcons.repeat_one
+                      : VLCIcons.repeat_all
+            checked: mainPlaylistController.repeatMode !== PlaylistControllerModel.PLAYBACK_REPEAT_NONE
+            onClicked: mainPlaylistController.toggleRepeatMode()
+            focusPolicy: Qt.NoFocus
+
+            color: colors.buttonText
+            colorDisabled: colors.textInactive
+        }
+    }
+
+
+    Item {
+        Layout.fillWidth: true
+        implicitHeight: childrenRect.height
+
+        Widgets.IconToolButton {
+            id: shuffle
+
+            anchors.centerIn: parent
+
+            enabled: mainPlaylistController.count > 1
+            size: VLCStyle.icon_normal
+            iconText: VLCIcons.shuffle_on
+            onClicked: mainPlaylistController.shuffle()
+            focusPolicy: Qt.NoFocus
+
+            color: colors.buttonText
+            colorDisabled: colors.textInactive
+        }
+    }
+
+    Item {
+        Layout.fillWidth: true
+        implicitHeight: childrenRect.height
+
+        Widgets.SortControl {
+            id: sort
+
+            anchors.centerIn: parent
+
+            enabled: mainPlaylistController.count > 1
+            popupAlignment: Qt.AlignRight | Qt.AlignTop
+
+            focusPolicy: Qt.NoFocus
+
+            model: mainPlaylistController.sortKeyTitleList
+            textRole: "title"
+            criteriaRole: "key"
+
+            onSortSelected: {
+                mainPlaylistController.sortKey = type
             }
 
-            spacing: VLCStyle.margin_normal
+            onSortOrderSelected: {
+                if (type === Qt.AscendingOrder)
+                    mainPlaylistController.sortOrder = PlaylistControllerModel.SORT_ORDER_ASC
+                else if (type === Qt.DescendingOrder)
+                    mainPlaylistController.sortOrder = PlaylistControllerModel.SORT_ORDER_DESC
 
-            Widgets.IconToolButton {
-                id: loop
-                Layout.alignment: Qt.AlignHCenter
-                //Layout.minimumWidth: VLCStyle.icon_normal * 2
-                size: VLCStyle.icon_normal
-                iconText: (mainPlaylistController.repeatMode === PlaylistControllerModel.PLAYBACK_REPEAT_CURRENT)
-                          ? VLCIcons.repeat_one
-                          : VLCIcons.repeat_all
-                checked: mainPlaylistController.repeatMode !== PlaylistControllerModel.PLAYBACK_REPEAT_NONE
-                onClicked: mainPlaylistController.toggleRepeatMode()
-                focusPolicy: Qt.NoFocus
-
-                color: colors.buttonText
-                colorDisabled: colors.textInactive
+                mainPlaylistController.sort()
             }
 
-            Widgets.IconToolButton {
-                id: shuffle
-                Layout.alignment: Qt.AlignHCenter
-                //Layout.minimumWidth: VLCStyle.icon_normal * 2
-                enabled: !mainPlaylistController.empty
-                size: VLCStyle.icon_normal
-                iconText: VLCIcons.shuffle_on
-                onClicked: mainPlaylistController.shuffle()
-                focusPolicy: Qt.NoFocus
+            colors: root.colors
 
-                color: colors.buttonText
-                colorDisabled: colors.textInactive
-            }
-
-            Widgets.SortControl {
-                id: sort
-                Layout.alignment: Qt.AlignHCenter
-                //Layout.minimumWidth: VLCStyle.icon_normal * 2
-                enabled: !mainPlaylistController.empty
-                popupAlignment: Qt.AlignRight | Qt.AlignTop
-
-                focusPolicy: Qt.NoFocus
-
-                model: mainPlaylistController.sortKeyTitleList
-                textRole: "title"
-                criteriaRole: "key"
-
-                onSortSelected: {
-                    mainPlaylistController.sortKey = type
+            sortOrder: {
+                if (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_ASC) {
+                    Qt.AscendingOrder
                 }
-
-                onSortOrderSelected: {
-                    if (type === Qt.AscendingOrder)
-                        mainPlaylistController.sortOrder = PlaylistControllerModel.SORT_ORDER_ASC
-                    else if (type === Qt.DescendingOrder)
-                        mainPlaylistController.sortOrder = PlaylistControllerModel.SORT_ORDER_DESC
-
-                    mainPlaylistController.sort()
+                else if (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_DESC) {
+                    Qt.DescendingOrder
                 }
-
-                colors: playlistToolbar.colors
-
-                sortOrder: {
-                    if (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_ASC) {
-                        Qt.AscendingOrder
-                    }
-                    else if (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_DESC) {
-                        Qt.DescendingOrder
-                    }
-                }
-
-                sortKey: mainPlaylistController.sortKey
             }
 
-            Widgets.IconToolButton {
-                id: clear
-                Layout.alignment: Qt.AlignHCenter
-                //Layout.minimumWidth: VLCStyle.icon_normal * 2
-                size: VLCStyle.icon_normal
-                enabled: !mainPlaylistController.empty
-                iconText: VLCIcons.playlist_clear
-                onClicked: mainPlaylistController.clear()
-                focusPolicy: Qt.NoFocus
+            sortKey: mainPlaylistController.sortKey
+        }
+    }
 
-                color: colors.buttonText
-                colorDisabled: colors.textInactive
-            }
+    Item {
+        Layout.fillWidth: true
+        implicitHeight: childrenRect.height
+
+        Widgets.IconToolButton {
+            id: clear
+
+            anchors.centerIn: parent
+
+            size: VLCStyle.icon_normal
+            enabled: !mainPlaylistController.empty
+            iconText: VLCIcons.playlist_clear
+            onClicked: mainPlaylistController.clear()
+            focusPolicy: Qt.NoFocus
+
+            color: colors.buttonText
+            colorDisabled: colors.textInactive
         }
     }
 }
-
