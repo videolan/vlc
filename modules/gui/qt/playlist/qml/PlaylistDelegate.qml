@@ -53,7 +53,7 @@ Rectangle {
     // This item will become the parent of the dragged item during the drag operation
     //property alias draggedItemParent: draggable_item.draggedItemParent
 
-    height: Math.max( VLCStyle.fontHeight_normal, VLCStyle.icon_normal ) + VLCStyle.margin_xsmall
+    height: artworkItem.height * 1.5
 
     function showTooltip(binding) {
         plInfoTooltip.close()
@@ -200,15 +200,23 @@ Rectangle {
 
         RowLayout {
             id: content
+
+            height: delegate.height
+            spacing: 0
+
             anchors {
-                fill: parent
-                leftMargin: delegate.leftPadding
-                rightMargin: delegate.rightPadding
+                left: parent.left
+                right: parent.right
+
+                leftMargin: VLCStyle.margin_normal
+                rightMargin: listView.scrollBarWidth
             }
 
             Item {
+                id: artworkItem
                 Layout.preferredHeight: VLCStyle.icon_normal
                 Layout.preferredWidth: VLCStyle.icon_normal
+                Layout.alignment: Qt.AlignVCenter
 
                 DropShadow {
                     id: effect
@@ -243,17 +251,20 @@ Rectangle {
                 }
             }
 
-            Column {
+            ColumnLayout {
                 id: textInfoColumn
                 Layout.fillWidth: true
                 Layout.leftMargin: VLCStyle.margin_large
+                Layout.preferredHeight: artworkItem.height * 1.25
+                spacing: 0
 
                 Widgets.ListLabel {
                     id: textInfo
 
-                    width: parent.width
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
 
-                    font.weight: model.isCurrent ? Font.Bold : Font.Normal
+                    font.weight: model.isCurrent ? Font.Bold : Font.DemiBold
                     text: model.title
                     color: colors.text
                 }
@@ -261,7 +272,8 @@ Rectangle {
                 Widgets.ListSubtitleLabel {
                     id: textArtist
 
-                    width: parent.width
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
 
                     font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
                     text: (model.artist ? model.artist : i18n.qtr("Unknown Artist"))
@@ -277,26 +289,18 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 color: colors.text
-
-                TextMetrics {
-                    id: durationMetric
-                    font.pixelSize: VLCStyle.fontSize_normal
-                    text: "-00:00-"
-                }
+                opacity: 0.5
             }
         }
 
         ColumnLayout {
-            anchors.fill: parent
-            // exceed bottom boundary by the height of item separator to prevent drop indicator bar visible glitch
-            anchors.bottomMargin: -1
-
+            anchors.fill: content
             spacing: 0
 
             DropArea {
                 id: higherDropArea
                 Layout.fillWidth: true
-                Layout.preferredHeight: parent.height / 2
+                Layout.fillHeight: true
 
                 onEntered: {
                     if (isDropAcceptable(drag, model.index))

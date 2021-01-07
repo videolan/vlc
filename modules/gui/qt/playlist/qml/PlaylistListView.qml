@@ -154,17 +154,27 @@ Widgets.NavigableFocusScope {
 
         ColumnLayout {
             anchors.fill: parent
+            anchors.topMargin: VLCStyle.margin_normal
             anchors.bottomMargin: VLCStyle.margin_normal
+
+            anchors.leftMargin: root.leftPadding
+            anchors.rightMargin: root.rightPadding
+
+            spacing: 0
 
             ColumnLayout {
                 id: headerTextLayout
+
                 Layout.fillWidth: true
-                Layout.leftMargin: root.leftPadding + VLCStyle.margin_normal
-                Layout.topMargin: VLCStyle.margin_normal
+                Layout.leftMargin: VLCStyle.margin_normal
+
+                spacing: VLCStyle.margin_xxxsmall
 
                 Widgets.SubtitleLabel {
                     text: i18n.qtr("Playqueue")
                     color: colors.text
+                    font.weight: Font.Bold
+                    font.pixelSize: VLCStyle.dp(24, VLCStyle.scale)
                 }
 
                 Widgets.CaptionLabel {
@@ -194,15 +204,17 @@ Widgets.NavigableFocusScope {
             }
 
             RowLayout {
-                id: content
                 visible: model.count !== 0
 
                 Layout.topMargin: VLCStyle.margin_normal
-                Layout.leftMargin: root.leftPadding + VLCStyle.margin_normal
-                Layout.rightMargin: root.rightPadding + listView.scrollBarWidth
+                Layout.leftMargin: VLCStyle.margin_normal
+                Layout.rightMargin: listView.scrollBarWidth
+
+                spacing: 0
 
                 Widgets.IconLabel {
                     Layout.preferredWidth: VLCStyle.icon_normal
+
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     text: VLCIcons.album_cover
@@ -212,6 +224,7 @@ Widgets.NavigableFocusScope {
                 Widgets.CaptionLabel {
                     Layout.fillWidth: true
                     Layout.leftMargin: VLCStyle.margin_large
+
                     verticalAlignment: Text.AlignVCenter
                     text: i18n.qtr("Title")
                     color: colors.caption
@@ -640,12 +653,8 @@ Widgets.NavigableFocusScope {
             PlaylistToolbar {
                 Layout.fillWidth: true
 
-                leftPadding: root.leftPadding
-                rightPadding: root.rightPadding
-                navigationParent: root
-                navigationUpItem: view
-
-                colors: root.colors
+                Layout.leftMargin: root.leftPadding
+                Layout.rightMargin: root.rightPadding
             }
         }
     }
