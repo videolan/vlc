@@ -67,6 +67,7 @@ Widgets.NavigableFocusScope {
         anchors.fill: parent
         z: 1
 
+        colors: root.colors
         backgroundItem: parentRect
     }
 
