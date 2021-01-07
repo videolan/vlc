@@ -36,7 +36,7 @@ FocusScope{
     property bool acceptFocus: true
     Component.onCompleted: paintOnly = false
 
-    property color color: VLCStyle.colors.buttonText
+    property color color: colors.buttonText
 
     property alias parentWindow: volumeTooltip.parentWindow
 
@@ -44,6 +44,8 @@ FocusScope{
     // not 'undefined' because the loader must know if they exist
     property var navigationLeft: null
     property var navigationRight: null
+
+    property VLCColors colors: VLCStyle.colors
 
     RowLayout{
         id: volumeWidget
@@ -140,7 +142,7 @@ FocusScope{
                     navigationLeft()
             }
 
-            property color sliderColor: (volControl.position > fullvolpos) ? VLCStyle.colors.volmax : widgetfscope.color
+            property color sliderColor: (volControl.position > fullvolpos) ? colors.volmax : widgetfscope.color
             property int maxvol: 125
             property double fullvolpos: 100 / maxvol
             property double maxvolpos: maxvol / 100
@@ -160,6 +162,8 @@ FocusScope{
                 mouseArea: sliderMouseArea
 
                 xPos: (handle.x + handle.width / 2)
+
+                colors: widgetfscope.colors
             }
 
             background: Rectangle {
@@ -171,7 +175,7 @@ FocusScope{
                 height: implicitHeight
                 width: volControl.availableWidth
                 radius: VLCStyle.dp(4, VLCStyle.scale)
-                color: VLCStyle.colors.volsliderbg
+                color: colors.volsliderbg
 
                 MouseArea {
                     id: sliderMouseArea
@@ -226,10 +230,10 @@ FocusScope{
                         start: Qt.point(0, 0)
                         end: Qt.point(sliderBg.width, 0)
                         gradient: Gradient {
-                            GradientStop { position: 0.30; color: VLCStyle.colors.volbelowmid }
-                            GradientStop { position: 0.80; color: VLCStyle.colors.volabovemid }
-                            GradientStop { position: 0.85; color: VLCStyle.colors.volhigh }
-                            GradientStop { position: 1.00; color: VLCStyle.colors.volmax }
+                            GradientStop { position: 0.30; color: colors.volbelowmid }
+                            GradientStop { position: 0.80; color: colors.volabovemid }
+                            GradientStop { position: 0.85; color: colors.volhigh }
+                            GradientStop { position: 1.00; color: colors.volmax }
                         }
                     }
                 }
