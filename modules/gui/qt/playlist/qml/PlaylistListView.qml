@@ -373,83 +373,13 @@ Widgets.NavigableFocusScope {
                     delay: 750
                 }
 
-                delegate: Item {
-                    implicitWidth: delegate.width
-                    implicitHeight: childrenRect.height
+                delegate: PlaylistDelegate {
+                    id: delegate
 
-                    PlaylistDelegate {
-                        /*
-                         * implicit variables:
-                         *  - model: gives access to the values associated to PlaylistListModel roles
-                         *  - index: the index of this item in the list
-                         */
-                        id: delegate
-                        _model: root.model
-                        width: root.width
-                        z: 1
-                        leftPadding: root.leftPadding + VLCStyle.margin_normal
-                        rightPadding: root.rightPadding + listView.scrollBarWidth
+                    // Instead of property forwarding, PlaylistDelegate is tightly coupled with PlaylistlistView
+                    // since PlaylistDelegate is expected to be used only within PlaylistlistView
 
-                        onItemClicked : {
-                            /* to receive keys events */
-                            listView.forceActiveFocus()
-                            if (listView.mode === PlaylistListView.Mode.Move) {
-                                var selectedIndexes = root.model.getSelection()
-                                if (selectedIndexes.length === 0)
-                                    return
-                                var preTarget = index
-                                /* move to _above_ the clicked item if move up, but
-                                 * _below_ the clicked item if move down */
-                                if (preTarget > selectedIndexes[0])
-                                    preTarget++
-                                listView.currentIndex = selectedIndexes[0]
-                                root.model.moveItemsPre(selectedIndexes, preTarget)
-                                return
-                            } else if (listView.mode === PlaylistListView.Mode.Select) {
-                            } else if (!(root.model.isSelected(index) && button === Qt.RightButton)) {
-                                listView.updateSelection(modifier, listView.currentIndex, index)
-                                listView.currentIndex = index
-                            }
-
-                            if (button === Qt.RightButton)
-                                contextMenu.popup(index, globalMousePos)
-                        }
-                        onItemDoubleClicked: {
-                            if (listView.mode === PlaylistListView.Mode.Normal)
-                                mainPlaylistController.goTo(index, true)
-                        }
-
-                        colors: root.colors
-
-                        onDragStarting: {
-                            if (!root.model.isSelected(index)) {
-                                /* the dragged item is not in the selection, replace the selection */
-                                root.model.setSelection([index])
-                            }
-                        }
-
-                        function isDropAcceptable(drop, index) {
-                            return root.isDropAcceptable(drop, index)
-                        }
-
-                        onDropedMovedAt: {
-                            root.acceptDrop(target, drop)
-                        }
-
-                        onHoveredChanged: {
-                            var bottomItemIndex = listView.listView.indexAt(delegate.width / 2, (listView.listView.contentY + listView.height) - 2)
-                            var topItemIndex = listView.listView.indexAt(delegate.width / 2, listView.listView.contentY + 2)
-
-                            if(bottomItemIndex !== -1 && model.index >= bottomItemIndex - 1)
-                            {
-                                listView.fadeRectBottomHovered = delegate.hovered
-                            }
-                            if(topItemIndex !== -1 && model.index <= topItemIndex + 1)
-                            {
-                                listView.fadeRectTopHovered = delegate.hovered
-                            }
-                        }
-                    }
+                    width: parent.width
                 }
 
                 add: Transition {

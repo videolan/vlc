@@ -30,43 +30,12 @@ import "qrc:///style/"
 Rectangle {
     id: delegate
 
-    // starts with an underscore to prevent the implicit delegate 'model' property
-    property var _model
+    readonly property int selectionLength: root.model.selectedCount
 
-    signal itemClicked(int button, int modifier, var globalMousePos)
-    signal itemDoubleClicked(int keys, int modifier, var globalMousePos)
-    signal dragStarting()
+    readonly property bool isLastItem: (index === listView.modelCount - 1)
+    readonly property bool selected : model.selected
 
     property alias hovered: mouse.containsMouse
-
-    property var dragitem: null
-    signal dropedMovedAt(int target, var drop)
-
-    property int leftPadding: 0
-    property int rightPadding: 0
-
-    property VLCColors colors: VLCStyle.colors
-
-    // Should the cover be displayed
-    //property alias showCover: cover.visible
-
-    // This item will become the parent of the dragged item during the drag operation
-    //property alias draggedItemParent: draggable_item.draggedItemParent
-
-    height: artworkItem.height * 1.5
-
-    function showTooltip(binding) {
-        plInfoTooltip.close()
-        plInfoTooltip.text = Qt.binding(function() { return (textInfo.text + '\n' + textArtist.text); })
-        plInfoTooltip.parent = textInfoColumn
-        if (_model.getSelection().length > 1 && binding)
-            plInfoTooltip.timeout = 2000
-        else
-            plInfoTooltip.timeout = 0
-        plInfoTooltip.visible = Qt.binding(function() { return ( (binding ? model.selected : delegate.hovered) && !overlayMenu.visible &&
-                                                                (textInfo.implicitWidth > textInfo.width || textArtist.implicitWidth > textArtist.width)); })
-
-    }
 
     color: {
         if (selected)
@@ -78,20 +47,29 @@ Rectangle {
         else
             return "transparent"
     }
-    function isDropAcceptable(drop, index) {
-        console.assert(false, "parent should reimplement this function")
-    }
+
+    height: artworkItem.height * 1.5
 
     onHoveredChanged: {
         if(hovered)
             showTooltip(false)
     }
 
-    readonly property bool selected : model.selected
-
     onSelectedChanged: {
         if(selected)
             showTooltip(true)
+    }
+
+    function showTooltip(selectAction) {
+        plInfoTooltip.close()
+        plInfoTooltip.text = Qt.binding(function() { return (textInfo.text + '\n' + textArtist.text); })
+        plInfoTooltip.parent = textInfoColumn
+        if (selectionLength > 1 && selectAction)
+            plInfoTooltip.timeout = 2000
+        else
+            plInfoTooltip.timeout = 0
+        plInfoTooltip.visible = Qt.binding(function() { return ( (selectAction ? selected : hovered) && !overlayMenu.visible && mainInterface.playlistVisible &&
+                                                                (textInfo.implicitWidth > textInfo.width || textArtist.implicitWidth > textArtist.width)); })
     }
 
     Connections {
@@ -118,32 +96,72 @@ Rectangle {
 
     MouseArea {
         id: mouse
-        anchors.fill: parent
+
+        width: parent.width
+        implicitHeight: childrenRect.height
+
         hoverEnabled: true
 
         acceptedButtons: acceptedButtons | Qt.RightButton
 
-        onClicked:{
-            delegate.itemClicked(mouse.button, mouse.modifiers, this.mapToGlobal(mouse.x, mouse.y));
+        onContainsMouseChanged: {
+            if (containsMouse) {
+                var bottomItemIndex = listView.listView.indexAt(delegate.width / 2, (listView.listView.contentY + listView.height) - 2)
+                var topItemIndex = listView.listView.indexAt(delegate.width / 2, listView.listView.contentY + 2)
+
+                if(bottomItemIndex !== -1 && model.index >= bottomItemIndex - 1)
+                {
+                    listView.fadeRectBottomHovered = Qt.binding(function() {return delegate.hovered})
+                }
+                if(topItemIndex !== -1 && model.index <= topItemIndex + 1)
+                {
+                    listView.fadeRectTopHovered = Qt.binding(function() {return delegate.hovered})
+                }
+            }
         }
+
+        onClicked: {
+            /* to receive keys events */
+            listView.forceActiveFocus()
+            if (listView.mode === PlaylistListView.Mode.Move) {
+                var selectedIndexes = root.model.getSelection()
+                if (selectedIndexes.length === 0)
+                    return
+                var preTarget = index
+                /* move to _above_ the clicked item if move up, but
+                 * _below_ the clicked item if move down */
+                if (preTarget > selectedIndexes[0])
+                    preTarget++
+                listView.currentIndex = selectedIndexes[0]
+                root.model.moveItemsPre(selectedIndexes, preTarget)
+                return
+            } else if (listView.mode === PlaylistListView.Mode.Select) {
+            } else if (!(root.model.isSelected(index) && mouse.button === Qt.RightButton)) {
+                listView.updateSelection(mouse.modifiers, listView.currentIndex, index)
+                listView.currentIndex = index
+            }
+
+            if (mouse.button === Qt.RightButton)
+                contextMenu.popup(index, this.mapToGlobal(mouse.x, mouse.y))
+        }
+
         onDoubleClicked: {
-            if (mouse.button !== Qt.RightButton)
-                delegate.itemDoubleClicked(mouse.buttons, mouse.modifiers, this.mapToGlobal(mouse.x, mouse.y));
+            if (mouse.button !== Qt.RightButton && listView.mode === PlaylistListView.Mode.Normal)
+                mainPlaylistController.goTo(index, true)
         }
 
         drag.target: dragItem
 
-        property bool __rightButton : false
-
         Connections {
             target: mouse.drag
             onActiveChanged: {
-                if (mouse.__rightButton)
-                    return
                 if (target.active) {
-                    delegate.dragStarting()
-                    dragItem.model = _model
-                    dragItem.count = _model.getSelection().length
+                    if (!root.model.isSelected(index)) {
+                        /* the dragged item is not in the selection, replace the selection */
+                        root.model.setSelection([index])
+                    }
+                    dragItem.model = root.model
+                    dragItem.count = root.model.getSelection().length
                     dragItem.visible = true
                 } else {
                     dragItem.Drag.drop()
@@ -152,20 +170,9 @@ Rectangle {
             }
         }
 
-        onPressed:  {
-            if (mouse.button === Qt.RightButton)
-            {
-                __rightButton = true
-                return
-            }
-            else
-                __rightButton = false
-        }
-
         onPositionChanged: {
-            if (dragItem.visible)
-            {
-                var pos = this.mapToGlobal( mouseX, mouseY)
+            if (dragItem.visible) {
+                var pos = this.mapToGlobal(mouseX, mouseY)
                 dragItem.updatePos(pos.x + VLCStyle.dp(15, VLCStyle.scale), pos.y)
             }
         }
@@ -284,7 +291,7 @@ Rectangle {
                     topDropIndicator.visible = false
                 }
                 onDropped: {
-                    if (!isDropAcceptable(drop, model.index))
+                    if (!isDropAcceptable(drop, index))
                         return
 
                     root.acceptDrop(index, drop)
@@ -299,7 +306,7 @@ Rectangle {
                 Layout.fillHeight: true
 
                 function handleDropIndicators(visible) {
-                    if ( index === _model.count - 1 )
+                    if (isLastItem)
                         listView.footerItem.setDropIndicatorVisible(visible)
                     else
                         listView.setItemDropIndicatorVisible(index + 1, visible)
