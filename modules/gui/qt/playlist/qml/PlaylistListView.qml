@@ -519,6 +519,16 @@ Widgets.NavigableFocusScope {
                     }
                 }
 
+                navigationUp: function(index) {
+                    if (mode === PlaylistListView.Mode.Normal)
+                        root.navigationUp(index)
+                }
+
+                navigationDown: function(index) {
+                    if (mode === PlaylistListView.Mode.Normal)
+                        root.navigationDown(index)
+                }
+
                 onActionAtIndex: {
                     if (index < 0)
                         return
