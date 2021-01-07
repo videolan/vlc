@@ -91,7 +91,6 @@ Item {
     // playlist
     property color plItemHovered:  bannerHover
     property color plItemSelected: isThemeDark ? "#1E1E1E" : "#EDEDED"
-    property color plItemFocused:  blendColors(plItemSelected, plItemHovered, 0.25)
 
     // basic color definitions for color blending:
     property color black: "black"

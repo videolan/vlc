@@ -38,13 +38,19 @@ Rectangle {
 
     property alias hovered: mouseArea.containsMouse
 
+    border.width: VLCStyle.dp(1)
+    border.color: {
+        if (activeFocus && (listView.mode === PlaylistListView.Mode.Select))
+            colors.caption
+        else
+            "transparent"
+    }
+
     color: {
         if (selected)
             colors.plItemSelected
         else if (hovered)
             colors.plItemHovered
-        else if (activeFocus)
-            colors.plItemFocused
         else
             return "transparent"
     }
