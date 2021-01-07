@@ -104,8 +104,6 @@ Widgets.NavigableFocusScope {
         padding: 1
 
         onOpened: {
-            updateBgRect()
-
             button.KeyNavigation.down = list
             button.highlighted = true
 
@@ -228,26 +226,46 @@ Widgets.NavigableFocusScope {
             }
         }
 
-        function updateBgRect() {
-            glassEffect.popupGlobalPos = g_root.mapFromItem(root, popup.x, popup.y)
-        }
-
         background: Rectangle {
             border.width: VLCStyle.dp(1)
             border.color: colors.accent
 
-            Widgets.FrostedGlassEffect {
-                id: glassEffect
-                source: g_root
+            Loader {
+                id: effectLoader
 
                 anchors.fill: parent
                 anchors.margins: VLCStyle.dp(1)
 
-                property point popupGlobalPos
-                sourceRect: Qt.rect(popupGlobalPos.x, popupGlobalPos.y, glassEffect.width, glassEffect.height)
+                asynchronous: true
 
-                tint: colors.bg
-                tintStrength: 0.3
+                Component {
+                    id: frostedGlassEffect
+
+                    Widgets.FrostedGlassEffect {
+                        source: g_root
+
+                        // since Popup is not an Item, we can not directly map its position
+                        // to the source item. Instead, we can use root because popup's
+                        // position is relative to its position.
+                        // This method unfortunately causes issues when source item is resized.
+                        // But in that case, we reload the effectLoader to redraw the effect.
+                        property point popupMappedPos: g_root.mapFromItem(root, popup.x, popup.y)
+                        sourceRect: Qt.rect(popupMappedPos.x, popupMappedPos.y, width, height)
+
+                        tint: colors.bg
+                        tintStrength: 0.3
+                    }
+                }
+
+                sourceComponent: frostedGlassEffect
+
+                function reload() {
+                    if (status != Loader.Ready)
+                        return
+
+                    sourceComponent = undefined
+                    sourceComponent = frostedGlassEffect
+                }
             }
         }
 
@@ -257,29 +275,11 @@ Widgets.NavigableFocusScope {
             enabled: popup.visible
 
             onWidthChanged: {
-                popup.updateBgRect()
+                effectLoader.reload()
             }
 
             onHeightChanged: {
-                popup.updateBgRect()
-            }
-        }
-
-        Connections {
-            target: mainInterface
-
-            enabled: popup.visible
-
-            onIntfScaleFactorChanged: {
-                popup.updateBgRect()
-            }
-        }
-
-        Connections {
-            target: playlistColumn
-
-            onWidthChanged: {
-                popup.updateBgRect()
+                effectLoader.reload()
             }
         }
     }
