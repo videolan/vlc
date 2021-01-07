@@ -539,13 +539,6 @@ Widgets.NavigableFocusScope {
                         mainPlaylistController.goTo(index, true)
                 }
 
-                function onPlay() {
-                    let selection = root.model.getSelection()
-                    if (selection.length === 0)
-                        return
-                    mainPlaylistController.goTo(selection[0], true)
-                }
-
                 function onDelete() {
                     let selection = root.model.getSelection()
                     if (selection.length === 0)
