@@ -833,7 +833,7 @@ modules/gui/qt/player/qml/ResumeDialog.qml
 modules/gui/qt/player/qml/TeletextWidget.qml
 modules/gui/qt/player/qml/TopBar.qml
 modules/gui/qt/player/qml/VolumeWidget.qml
-modules/gui/qt/playlist/qml/PLItem.qml
+modules/gui/qt/playlist/qml/PlaylistDelegate.qml
 modules/gui/qt/playlist/qml/PlaylistDetachedWindow.qml
 modules/gui/qt/playlist/qml/PlaylistListView.qml
 modules/gui/qt/playlist/qml/PlaylistOverlayMenu.qml

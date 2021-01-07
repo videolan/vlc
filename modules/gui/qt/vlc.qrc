@@ -289,7 +289,7 @@
         <file alias="VLCIcons.qml">style/VLCIcons.qml</file>
     </qresource>
     <qresource prefix="/playlist">
-        <file alias="PLItem.qml">playlist/qml/PLItem.qml</file>
+        <file alias="PlaylistDelegate.qml">playlist/qml/PlaylistDelegate.qml</file>
         <file alias="PlaylistDroppable.qml">playlist/qml/PlaylistDroppable.qml</file>
         <file alias="PlaylistListView.qml">playlist/qml/PlaylistListView.qml</file>
         <file alias="PlaylistOverlayMenu.qml">playlist/qml/PlaylistOverlayMenu.qml</file>

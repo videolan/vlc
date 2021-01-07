@@ -340,7 +340,7 @@ Widgets.NavigableFocusScope {
                         }
                     }
 
-                    PLItem {
+                    PlaylistDelegate {
                         /*
                          * implicit variables:
                          *  - model: gives access to the values associated to PlaylistListModel roles
