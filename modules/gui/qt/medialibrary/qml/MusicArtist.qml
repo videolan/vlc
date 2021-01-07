@@ -30,7 +30,6 @@ import "qrc:///style/"
 Widgets.NavigableFocusScope {
     id: root
 
-    property alias parentId: albumModel.parentId
     property var artist: ({})
     readonly property var currentIndex: headerItem.albumsListView.currentIndex || view.currentItem.currentIndex
     property Item headerItem: view.currentItem.headerItem
@@ -199,7 +198,9 @@ Widgets.NavigableFocusScope {
 
     MLAlbumModel {
         id: albumModel
+
         ml: medialib
+        parentId: artist.id
 
         onCountChanged: {
             if (albumModel.count > 0 && !albumSelectionModel.hasSelection) {
@@ -238,7 +239,7 @@ Widgets.NavigableFocusScope {
         id: trackModel
 
         ml: medialib
-        parentId: root.parentId
+        parentId: albumModel.parentId
 
         onCountChanged: {
             if (trackModel.count > 0) {

@@ -29,20 +29,21 @@ import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
     id: root
+
     property alias model: artistModel
     property var sortModel: [
         { text: i18n.qtr("Alphabetic"),  criteria: "title" }
     ]
 
-    property var artistId
-
     property alias currentIndex: artistList.currentIndex
     property alias currentAlbumIndex: albumSubView.currentIndex
     property int initialIndex: 0
     property int initialAlbumIndex: 0
+    property alias currentArtist: albumSubView.artist
 
     onInitialAlbumIndexChanged: resetFocus()
     onInitialIndexChanged: resetFocus()
+    onCurrentIndexChanged: currentArtist = model.getDataAt(currentIndex)
 
     function resetFocus() {
         if (artistModel.count === 0) {
@@ -75,6 +76,11 @@ Widgets.NavigableFocusScope {
                     initialIndex = 0
                 artistList.currentIndex = initialIndex
             }
+        }
+
+        onDataChanged: {
+            if (topLeft.row <= currentIndex && bottomRight.row >= currentIndex)
+                currentArtist = artistModel.getDataAt(currentIndex)
         }
     }
 
@@ -112,14 +118,6 @@ Widgets.NavigableFocusScope {
 
             focus: true
             footer: MainInterface.MiniPlayerBottomMargin {
-            }
-
-            onCurrentIndexChanged: {
-                if (artistList.currentIndex < artistModel.count) {
-                    root.artistId =  artistModel.getIdForIndex(artistList.currentIndex)
-                } else {
-                    root.artistId = undefined
-                }
             }
 
             navigationParent: root
@@ -196,7 +194,6 @@ Widgets.NavigableFocusScope {
                     hoverEnabled: true
 
                     onClicked: {
-                        artistId = model.id
                         selectionModel.updateSelection( mouse.modifiers , artistList.currentIndex, index)
                         artistList.currentIndex = index
                         artistList.forceActiveFocus()
@@ -239,13 +236,9 @@ Widgets.NavigableFocusScope {
             height: parent.height
             width: root.width - artistList.width
             focus: true
-            parentId: root.artistId
             initialIndex: root.initialAlbumIndex
             navigationParent: root
             navigationLeftItem: artistList
-            artist: (artistList.currentIndex >= 0)
-                    ? artistModel.getDataAt(artistList.currentIndex)
-                    : ({})
         }
     }
     }
