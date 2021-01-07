@@ -162,7 +162,6 @@ Item{
             property bool acceptFocus: true
 
             property bool paintOnly: false
-            enabled: !paintOnly
 
             property bool realHovered: false
 
@@ -369,7 +368,7 @@ Item{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.dvd_prev
             onClicked: player.chapterPrev()
-            enabled: !paintOnly && player.hasChapters
+            enabled: player.hasChapters
             property bool acceptFocus: visible
             text: i18n.qtr("Previous chapter")
         }
@@ -383,7 +382,7 @@ Item{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.dvd_next
             onClicked: player.chapterNext()
-            enabled: !paintOnly && player.hasChapters
+            enabled: player.hasChapters
             property bool acceptFocus: visible
             text: i18n.qtr("Next chapter")
         }
@@ -535,7 +534,7 @@ Item{
         Widgets.IconToolButton{
             id: fullScreenBtn
             size: VLCStyle.icon_medium
-            enabled: !paintOnly && player.hasVideoOutput
+            enabled: player.hasVideoOutput
             iconText: player.fullscreen ? VLCIcons.defullscreen :VLCIcons.fullscreen
             onClicked: player.fullscreen = !player.fullscreen
             property bool acceptFocus: true
@@ -549,7 +548,7 @@ Item{
             id: recordBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.record
-            enabled: !paintOnly && player.isPlaying
+            enabled: player.isPlaying
             checked: player.isRecording
             onClicked: player.toggleRecord()
             property bool acceptFocus: true
@@ -586,7 +585,7 @@ Item{
         Widgets.IconToolButton{
             id: snapshotBtn
             size: VLCStyle.icon_medium
-            enabled: !paintOnly && player.isPlaying
+            enabled: player.isPlaying
             iconText: VLCIcons.snapshot
             onClicked: player.snapshot()
             property bool acceptFocus: true
@@ -600,7 +599,7 @@ Item{
         Widgets.IconToolButton{
             id: stopBtn
             size: VLCStyle.icon_medium
-            enabled: !paintOnly && player.isPlaying
+            enabled: player.isPlaying
             iconText: VLCIcons.stop
             onClicked: mainPlaylistController.stop()
             property bool acceptFocus: true
@@ -613,7 +612,7 @@ Item{
         Widgets.IconToolButton{
             id: infoBtn
             size: VLCStyle.icon_medium
-            enabled: !paintOnly && player.isPlaying
+            enabled: player.isPlaying
             iconText: VLCIcons.info
             onClicked: dialogProvider.mediaInfoDialog()
             property bool acceptFocus: true
@@ -627,7 +626,7 @@ Item{
         Widgets.IconToolButton{
             id: frameBtn
             size: VLCStyle.icon_medium
-            enabled: !paintOnly && player.isPlaying
+            enabled: player.isPlaying
             iconText: VLCIcons.frame_by_frame
             onClicked: player.frameNext()
             property bool acceptFocus: true
@@ -725,7 +724,6 @@ Item{
         id: aspectRatioDelegate
         Widgets.ComboBoxExt {
             property bool paintOnly: false
-            enabled: !paintOnly
             Layout.alignment: Qt.AlignVCenter
             width: VLCStyle.combobox_width_normal
             height: VLCStyle.combobox_height_normal
@@ -753,7 +751,6 @@ Item{
 
         Widgets.IconToolButton{
             size: VLCStyle.icon_medium
-            enabled: !paintOnly
             iconText: VLCIcons.fullscreen
 
             onClicked: {
