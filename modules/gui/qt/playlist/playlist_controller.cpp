@@ -465,6 +465,24 @@ void PlaylistControllerModel::sort(PlaylistControllerModel::SortKey key, Playlis
     sort();
 }
 
+void PlaylistControllerModel::sort(PlaylistControllerModel::SortKey key)
+{
+    if (key == SortKey::SORT_KEY_NONE)
+        return;
+
+    if (getSortKey() != key)
+    {
+        setSortOrder(SortOrder::SORT_ORDER_ASC);
+        setSortKey(key);
+    }
+    else
+    {
+        switchSortOrder();
+    }
+
+    sort();
+}
+
 void PlaylistControllerModel::sort(void)
 {
     Q_D(PlaylistControllerModel);

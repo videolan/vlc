@@ -112,6 +112,7 @@ public:
     void sort(const QVector<vlc_playlist_sort_criterion> &);
 
     Q_INVOKABLE void sort(SortKey key, SortOrder order);
+    Q_INVOKABLE void sort(SortKey key);
     Q_INVOKABLE void sort(void);
 
     Q_INVOKABLE void explore(const PlaylistItem& pItem);
