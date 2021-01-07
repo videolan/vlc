@@ -37,8 +37,6 @@ Widgets.NavigableFocusScope {
 
     property VLCColors colors: VLCStyle.colors
 
-    signal setItemDropIndicatorVisible(int index, bool isVisible, bool top)
-
     enum Mode {
         Normal,
         Select, // Keyboard item selection mode, activated through PlaylistOverlayMenu
@@ -274,6 +272,8 @@ Widgets.NavigableFocusScope {
                 property int shiftIndex: -1
                 property int mode: PlaylistListView.Mode.Normal
 
+                signal setItemDropIndicatorVisible(int index, bool visible)
+
                 Connections {
                     target: root.model
                     onRowsInserted: {
@@ -453,16 +453,6 @@ Widgets.NavigableFocusScope {
                             if(topItemIndex !== -1 && model.index <= topItemIndex + 1)
                             {
                                 listView.fadeRectTopHovered = delegate.hovered
-                            }
-                        }
-                    }
-
-                    Connections {
-                        target: root
-
-                        onSetItemDropIndicatorVisible: {
-                            if ((index === model.index && !top) || (index === model.index + 1 && top)) {
-                                bottomSeparator.visible = !isVisible
                             }
                         }
                     }

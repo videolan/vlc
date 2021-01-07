@@ -95,21 +95,12 @@ Rectangle {
     }
 
     Connections {
-        target: root
+        target: listView
 
         onSetItemDropIndicatorVisible: {
-            if (index === model.index)
-            {
-                if (top)
-                {
-                    // show top drop indicator bar
-                    topDropIndicator.visible = isVisible
-                }
-                else
-                {
-                    // show bottom drop indicator bar
-                    bottomDropIndicator.visible = isVisible
-                }
+            if (index === model.index) {
+                // show top drop indicator bar
+                topDropIndicator.visible = visible
             }
         }
     }
@@ -121,7 +112,6 @@ Rectangle {
         width: parent.width
         height: 1
         anchors.top: parent.top
-        antialiasing: true
         visible: false
         color: colors.accent
     }
@@ -285,18 +275,21 @@ Rectangle {
                 Layout.fillHeight: true
 
                 onEntered: {
-                    if (isDropAcceptable(drag, model.index))
-                        root.setItemDropIndicatorVisible(model.index, true, true)
+                    if (!isDropAcceptable(drag, index))
+                        return
+
+                    topDropIndicator.visible = true
                 }
                 onExited: {
-                    root.setItemDropIndicatorVisible(model.index, false, true)
+                    topDropIndicator.visible = false
                 }
                 onDropped: {
                     if (!isDropAcceptable(drop, model.index))
                         return
 
-                    delegate.dropedMovedAt(model.index, drop)
-                    root.setItemDropIndicatorVisible(model.index, false, true)
+                    root.acceptDrop(index, drop)
+
+                    topDropIndicator.visible = false
                 }
             }
 
@@ -305,24 +298,29 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                readonly property bool _isLastItem: model.index === delegate._model.count - 1
-                readonly property int _targetIndex: _isLastItem ? model.index + 1 : model.index
+                function handleDropIndicators(visible) {
+                    if ( index === _model.count - 1 )
+                        listView.footerItem.setDropIndicatorVisible(visible)
+                    else
+                        listView.setItemDropIndicatorVisible(index + 1, visible)
+                }
 
                 onEntered: {
-                    if (!isDropAcceptable(drag, _targetIndex))
+                    if (!isDropAcceptable(drag, index + 1))
                         return
 
-                    root.setItemDropIndicatorVisible(_targetIndex, true, !_isLastItem)
+                    handleDropIndicators(true)
                 }
                 onExited: {
-                    root.setItemDropIndicatorVisible(_targetIndex, false, !_isLastItem)
+                    handleDropIndicators(false)
                 }
                 onDropped: {
-                    if(!isDropAcceptable(drop, _targetIndex))
+                    if(!isDropAcceptable(drop, index + 1))
                         return
 
-                    delegate.dropedMovedAt(_targetIndex, drop)
-                    root.setItemDropIndicatorVisible(_targetIndex, false, !_isLastItem)
+                    root.acceptDrop(index + 1, drop)
+
+                    handleDropIndicators(false)
                 }
             }
         }
