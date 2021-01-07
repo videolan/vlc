@@ -30,9 +30,7 @@ import "qrc:///style/"
 Widgets.NavigableFocusScope {
     id: root
 
-    property var model: PlaylistListModel {
-        playlistId: mainctx.playlist
-    }
+    property alias model: listView.model
 
     property int leftPadding: 0
     property int rightPadding: 0
@@ -245,7 +243,9 @@ Widgets.NavigableFocusScope {
 
                 focus: true
 
-                model: root.model
+                model: PlaylistListModel {
+                    playlistId: mainctx.playlist
+                }
                 modelCount: root.model.count
 
                 fadeColor: root.backgroundColor
