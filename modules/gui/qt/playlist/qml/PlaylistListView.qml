@@ -320,8 +320,14 @@ Widgets.NavigableFocusScope {
 
                         onClicked: {
                             listView.forceActiveFocus()
-                            if( mouse.button === Qt.RightButton )
+
+                            if ( mouse.button === Qt.LeftButton || mouse.button === Qt.RightButton ) {
+                                root.model.deselectAll()
+                            }
+
+                            if ( mouse.button === Qt.RightButton ) {
                                 contextMenu.popup(-1, this.mapToGlobal(mouse.x, mouse.y))
+                            }
                         }
                     }
 
