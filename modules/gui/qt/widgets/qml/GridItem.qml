@@ -63,7 +63,7 @@ FocusScope {
 
     readonly property bool _highlighted: mouseArea.containsMouse || content.activeFocus
 
-    readonly property int selectedBorderWidth: VLCStyle.column_margin_width - ( VLCStyle.margin_small * 2 )
+    readonly property int selectedBorderWidth: VLCStyle.gridItemSelectedBorder
 
     property int _newIndicatorMedian: VLCStyle.margin_xsmall
     property int _modifiersOnLastPress: Qt.NoModifier

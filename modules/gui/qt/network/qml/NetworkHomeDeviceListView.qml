@@ -73,7 +73,7 @@ Widgets.NavigableFocusScope {
 
         currentIndex: root._currentIndex
 
-        implicitHeight: VLCStyle.gridItem_network_height + VLCStyle.margin_xlarge
+        implicitHeight: VLCStyle.gridItem_network_height + VLCStyle.gridItemSelectedBorder + VLCStyle.margin_large
         orientation: ListView.Horizontal
         anchors.fill: parent
         spacing: VLCStyle.column_margin_width

@@ -189,6 +189,8 @@ Item {
     property int gridItem_video_height_large: VLCStyle.gridCover_video_height_large + VLCStyle.margin_xxsmall + VLCStyle.fontHeight_large +
                                               VLCStyle.margin_xxsmall + VLCStyle.fontHeight_normal
 
+    property int gridItemSelectedBorder: dp(8, scale)
+
     property int column_width: dp(114, scale)
     property int column_margin_width: dp(32, scale)
 
