@@ -72,6 +72,8 @@ Widgets.NavigableFocusScope {
             // This is required otherwise backend may handle the drop as well yielding double addition
             drop.accept(Qt.IgnoreAction)
         }
+
+        listView.forceActiveFocus()
     }
 
     PlaylistOverlayMenu {
