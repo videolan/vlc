@@ -32,6 +32,11 @@ Widgets.NavigableFocusScope {
 
     property alias model: listView.model
 
+    readonly property real minimumWidth: noContentInfoColumn.implicitWidth +
+                                         leftPadding +
+                                         rightPadding +
+                                         2 * (VLCStyle.margin_xsmall)
+
     property int leftPadding: 0
     property int rightPadding: 0
 

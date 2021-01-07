@@ -250,7 +250,7 @@ Widgets.NavigableFocusScope {
                                 PropertyChanges {
                                     target: playlistColumn
                                     width: resizeHandle.clamp(root.width / resizeHandle.widthFactor,
-                                                              VLCStyle.dp(225, VLCStyle.scale),
+                                                              playlist.minimumWidth,
                                                               root.width / 2)
                                     visible: true
                                 }
