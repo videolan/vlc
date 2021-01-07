@@ -261,6 +261,6 @@ Slider {
             }
         ]
 
-        state: isMiniplayer ? (control.hovered ? "visible" : "hidden") : undefined
+        state: isMiniplayer ? ((control.hovered || control.activeFocus) ? "visible" : "hidden") : undefined
     }
 }
