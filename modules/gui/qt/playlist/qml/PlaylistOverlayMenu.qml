@@ -64,21 +64,21 @@ Widgets.OverlayMenu {
         id: addFileAction
         text: i18n.qtr("Add File...")
         onTriggered: dialogProvider.simpleOpenDialog(false)
-        icon.source: "qrc:/buttons/playlist/playlist_add.svg"
+        property string fontIcon: VLCIcons.add
     }
 
     Action {
         id: addDirAction
         text: i18n.qtr("Add Directory...")
         onTriggered: dialogProvider.PLAppendDir()
-        icon.source: "qrc:/buttons/playlist/playlist_add.svg"
+        property string fontIcon: VLCIcons.add
     }
 
     Action {
         id: addAdvancedAction
         text: i18n.qtr("Advanced Open...")
         onTriggered: dialogProvider.PLAppendDialog()
-        icon.source: "qrc:/buttons/playlist/playlist_add.svg"
+        property string fontIcon: VLCIcons.add
     }
 
     Action {
@@ -104,7 +104,7 @@ Widgets.OverlayMenu {
         id: shuffleAction
         text: i18n.qtr("Shuffle Playlist")
         onTriggered: mainPlaylistController.shuffle()
-        icon.source: "qrc:/buttons/playlist/shuffle_on.svg"
+        property string fontIcon: VLCIcons.shuffle_on
     }
 
     Action {
