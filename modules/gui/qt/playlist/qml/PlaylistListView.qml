@@ -268,7 +268,6 @@ Widgets.NavigableFocusScope {
                 model: PlaylistListModel {
                     playlistId: mainctx.playlist
                 }
-                modelCount: root.model.count
 
                 fadeColor: parentRect.color
 
@@ -287,9 +286,8 @@ Widgets.NavigableFocusScope {
                     }
                     onSelectedCountChanged: {
                         var selectedIndexes = root.model.getSelection()
-                        var modelCount = root.model.count
 
-                        if (modelCount === 0 || selectedIndexes.length === 0)
+                        if (listView.modelCount === 0 || selectedIndexes.length === 0)
                             return
 
                         var bottomItemIndex = listView.listView.indexAt(listView.listView.contentX, (listView.listView.contentY + listView.height) - 2)
