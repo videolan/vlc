@@ -10,10 +10,9 @@ import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
-
     id: root
 
-    readonly property bool expanded: root.implicitHeight === root.childrenRect.height
+    readonly property bool expanded: root.implicitHeight === VLCStyle.miniPlayerHeight
 
     property var mainContent: undefined
 
@@ -81,6 +80,8 @@ Widgets.NavigableFocusScope {
             id: progressBar
             value: player.position
             visible: progressBar.value >= 0.0 && progressBar.value <= 1.0
+
+            focus: true
 
             isMiniplayer: true
 
