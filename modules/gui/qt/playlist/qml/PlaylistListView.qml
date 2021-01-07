@@ -460,7 +460,7 @@ Widgets.NavigableFocusScope {
                 }
 
                 function onDelete() {
-                    let selection = root.model.getSelection()
+                    var selection = root.model.getSelection()
                     if (selection.length === 0)
                         return
                     root.model.removeItems(selection)
