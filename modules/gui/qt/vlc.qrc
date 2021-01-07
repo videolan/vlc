@@ -196,7 +196,6 @@
         <file alias="KeyNavigableGridView.qml">widgets/qml/KeyNavigableGridView.qml</file>
         <file alias="KeyNavigableListView.qml">widgets/qml/KeyNavigableListView.qml</file>
         <file alias="ToolTipArea.qml">widgets/qml/ToolTipArea.qml</file>
-        <file alias="DNDLabel.qml">widgets/qml/DNDLabel.qml</file>
         <file alias="KeyNavigableTableView.qml">widgets/qml/KeyNavigableTableView.qml</file>
         <file alias="TableColumns.qml">widgets/qml/TableColumns.qml</file>
         <file alias="TransparentSpinBox.qml">widgets/qml/TransparentSpinBox.qml</file>

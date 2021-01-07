@@ -700,7 +700,6 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/CSDWindowButton.qml \
 	gui/qt/widgets/qml/CSDWindowButtonSet.qml \
 	gui/qt/widgets/qml/CSDTitlebarTapNDrapHandler.qml \
-	gui/qt/widgets/qml/DNDLabel.qml \
 	gui/qt/widgets/qml/DragItem.qml \
 	gui/qt/widgets/qml/DrawerExt.qml \
 	gui/qt/widgets/qml/ExpandGridView.qml \
