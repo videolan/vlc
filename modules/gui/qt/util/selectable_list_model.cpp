@@ -37,7 +37,10 @@ void SelectableListModel::setSelected(int row, bool selected)
 
 bool SelectableListModel::isSelected(int row) const
 {
-    assert( row >= 0 && row < rowCount() );
+    assert( row >= -1 && row < rowCount() );
+
+    if ( row == -1 )
+        return false;
 
     return isRowSelected(row);
 }
