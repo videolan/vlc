@@ -89,19 +89,9 @@ Item {
     property color roundPlayCoverBorder: "#979797"
 
     // playlist
-    property color playlistSeparator: isThemeDark ? "white" : "#f2f2f2"
-    property color plItemHover_Focus: bannerHover
-    property color plItemSelect:      isThemeDark ? "#1E1E1E" : "#EDEDED"
-
-    function getPLItemColor(selected, hovered, focus)
-    {
-        if (hovered || focus)
-            return plItemHover_Focus
-        else if ( selected )
-            return plItemSelect
-        else
-            return "transparent"
-    }
+    property color plItemHovered:  bannerHover
+    property color plItemSelected: isThemeDark ? "#1E1E1E" : "#EDEDED"
+    property color plItemFocused:  blendColors(plItemSelected, plItemHovered, 0.25)
 
     // basic color definitions for color blending:
     property color black: "black"

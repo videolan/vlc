@@ -378,7 +378,6 @@ Widgets.NavigableFocusScope {
                                 contextMenu.popup(index, globalMousePos)
                         }
                         onItemDoubleClicked: mainPlaylistController.goTo(index, true)
-                        color: colors.getPLItemColor(model.selected, plitem.hovered, plitem.activeFocus)
                         colors: root.colors
 
                         onDragStarting: {

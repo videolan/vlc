@@ -67,6 +67,16 @@ Rectangle {
 
     }
 
+    color: {
+        if (selected)
+            colors.plItemSelected
+        else if (hovered)
+            colors.plItemHovered
+        else if (activeFocus)
+            colors.plItemFocused
+        else
+            return "transparent"
+    }
     function isDropAcceptable(drop, index) {
         console.assert(false, "parent should reimplement this function")
     }
