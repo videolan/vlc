@@ -330,16 +330,16 @@ Widgets.NavigableFocusScope {
                 }
 
                 delegate: Item {
-                    implicitWidth: plitem.width
+                    implicitWidth: delegate.width
                     implicitHeight: childrenRect.height
 
                     Loader {
-                        anchors.top: plitem.top
+                        anchors.top: delegate.top
 
                         active: (index === 0) // load only for the first element to prevent overlapping
                         width: parent.width
                         height: 1
-                        z: (model.selected || plitem.hovered || plitem.activeFocus) ? 2 : 1
+                        z: (model.selected || delegate.hovered || delegate.activeFocus) ? 2 : 1
                         sourceComponent: Rectangle {
                             color: colors.playlistSeparator
                             opacity: colors.isThemeDark ? 0.05 : 1.0
@@ -352,7 +352,7 @@ Widgets.NavigableFocusScope {
                          *  - model: gives access to the values associated to PlaylistListModel roles
                          *  - index: the index of this item in the list
                          */
-                        id: plitem
+                        id: delegate
                         _model: root.model
                         width: root.width
                         z: 1
@@ -402,16 +402,16 @@ Widgets.NavigableFocusScope {
                         }
 
                         onHoveredChanged: {
-                            var bottomItemIndex = listView.listView.indexAt(plitem.width / 2, (listView.listView.contentY + listView.height) - 2)
-                            var topItemIndex = listView.listView.indexAt(plitem.width / 2, listView.listView.contentY + 2)
+                            var bottomItemIndex = listView.listView.indexAt(delegate.width / 2, (listView.listView.contentY + listView.height) - 2)
+                            var topItemIndex = listView.listView.indexAt(delegate.width / 2, listView.listView.contentY + 2)
 
                             if(bottomItemIndex !== -1 && model.index >= bottomItemIndex - 1)
                             {
-                                listView.fadeRectBottomHovered = plitem.hovered
+                                listView.fadeRectBottomHovered = delegate.hovered
                             }
                             if(topItemIndex !== -1 && model.index <= topItemIndex + 1)
                             {
-                                listView.fadeRectTopHovered = plitem.hovered
+                                listView.fadeRectTopHovered = delegate.hovered
                             }
                         }
                     }
@@ -428,7 +428,7 @@ Widgets.NavigableFocusScope {
 
                     Rectangle {
                         id: bottomSeparator
-                        anchors.top: plitem.bottom
+                        anchors.top: delegate.bottom
 
                         width: parent.width
                         height: 1

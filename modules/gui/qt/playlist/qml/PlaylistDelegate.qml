@@ -28,7 +28,7 @@ import "qrc:///style/"
 
 
 Rectangle {
-    id: plitem
+    id: delegate
 
     // starts with an underscore to prevent the implicit delegate 'model' property
     property var _model
@@ -63,7 +63,7 @@ Rectangle {
             plInfoTooltip.timeout = 2000
         else
             plInfoTooltip.timeout = 0
-        plInfoTooltip.visible = Qt.binding(function() { return ( (binding ? model.selected : plitem.hovered) && !overlayMenu.visible &&
+        plInfoTooltip.visible = Qt.binding(function() { return ( (binding ? model.selected : delegate.hovered) && !overlayMenu.visible &&
                                                                 (textInfo.implicitWidth > textInfo.width || textArtist.implicitWidth > textArtist.width)); })
 
     }
@@ -152,11 +152,11 @@ Rectangle {
         acceptedButtons: acceptedButtons | Qt.RightButton
 
         onClicked:{
-            plitem.itemClicked(mouse.button, mouse.modifiers, this.mapToGlobal(mouse.x, mouse.y));
+            delegate.itemClicked(mouse.button, mouse.modifiers, this.mapToGlobal(mouse.x, mouse.y));
         }
         onDoubleClicked: {
             if (mouse.button !== Qt.RightButton)
-                plitem.itemDoubleClicked(mouse.buttons, mouse.modifiers, this.mapToGlobal(mouse.x, mouse.y));
+                delegate.itemDoubleClicked(mouse.buttons, mouse.modifiers, this.mapToGlobal(mouse.x, mouse.y));
         }
 
         drag.target: dragItem
@@ -169,7 +169,7 @@ Rectangle {
                 if (mouse.__rightButton)
                     return
                 if (target.active) {
-                    plitem.dragStarting()
+                    delegate.dragStarting()
                     dragItem.model = _model
                     dragItem.count = _model.getSelection().length
                     dragItem.visible = true
@@ -202,8 +202,8 @@ Rectangle {
             id: content
             anchors {
                 fill: parent
-                leftMargin: plitem.leftPadding
-                rightMargin: plitem.rightPadding
+                leftMargin: delegate.leftPadding
+                rightMargin: delegate.rightPadding
             }
 
             Item {
@@ -309,7 +309,7 @@ Rectangle {
                     if (!isDropAcceptable(drop, model.index))
                         return
 
-                    plitem.dropedMovedAt(model.index, drop)
+                    delegate.dropedMovedAt(model.index, drop)
                     root.setItemDropIndicatorVisible(model.index, false, true)
                 }
             }
@@ -319,7 +319,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                readonly property bool _isLastItem: model.index === plitem._model.count - 1
+                readonly property bool _isLastItem: model.index === delegate._model.count - 1
                 readonly property int _targetIndex: _isLastItem ? model.index + 1 : model.index
 
                 onEntered: {
@@ -335,7 +335,7 @@ Rectangle {
                     if(!isDropAcceptable(drop, _targetIndex))
                         return
 
-                    plitem.dropedMovedAt(_targetIndex, drop)
+                    delegate.dropedMovedAt(_targetIndex, drop)
                     root.setItemDropIndicatorVisible(_targetIndex, false, !_isLastItem)
                 }
             }
