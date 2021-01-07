@@ -638,15 +638,6 @@ Widgets.NavigableFocusScope {
     }
 
     Keys.priority: Keys.AfterItem
-    Keys.forwardTo: view
-    Keys.onPressed: {
-        if (event.matches(StandardKey.SelectAll))
-        {
-            root.model.selectAll();
-        }
-        else
-        {
-            defaultKeyAction(event, 0)
-        }
-    }
+    Keys.forwardTo: listView
+    Keys.onPressed: defaultKeyAction(event, 0)
 }
