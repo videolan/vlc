@@ -49,7 +49,7 @@ namespace adaptive
                 void                            setMaxBuffering( vlc_tick_t );
                 vlc_tick_t                      getMinBuffering() const;
                 vlc_tick_t                      getMaxBuffering() const;
-                void                            debug() const;
+                virtual void                    debug() const;
 
                 void    addPeriod               (BasePeriod *period);
                 void    addBaseUrl              (const std::string &);

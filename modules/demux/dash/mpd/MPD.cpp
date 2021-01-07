@@ -76,7 +76,7 @@ Profile MPD::getProfile() const
     return profile;
 }
 
-void MPD::debug()
+void MPD::debug() const
 {
     msg_Dbg(p_object, "MPD profile=%s mediaPresentationDuration=%" PRId64
             " minBufferTime=%" PRId64,
@@ -85,7 +85,5 @@ void MPD::debug()
             minBufferTime);
     msg_Dbg(p_object, "BaseUrl=%s", getUrlSegment().toString().c_str());
 
-    std::vector<BasePeriod *>::const_iterator i;
-    for(i = periods.begin(); i != periods.end(); ++i)
-        (*i)->debug(VLC_OBJECT(p_object));
+    BasePlaylist::debug();
 }
