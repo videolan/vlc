@@ -39,6 +39,7 @@ Widgets.NavigableFocusScope{
     property bool lockAutoHide: false
 
     property alias title: titleText.text
+    property VLCColors colors: VLCStyle.nightColors
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)
@@ -100,7 +101,7 @@ Widgets.NavigableFocusScope{
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.topbar_previous
                             text: i18n.qtr("Back")
-                            color: VLCStyle.colors.playerFg
+                            color: topFocusScope.colors.playerFg
                             onClicked: {
                                 if (mainInterface.hasEmbededVideo && !mainInterface.canShowVideoPIP) {
                                    mainPlaylistController.stop()
@@ -127,7 +128,7 @@ Widgets.NavigableFocusScope{
                         width: rowLayout.width - anchors.leftMargin
 
                         horizontalAlignment: Text.AlignLeft
-                        color: VLCStyle.colors.playerFg
+                        color: topFocusScope.colors.playerFg
                         font.pixelSize: VLCStyle.fontSize_xxlarge
                         font.weight: Font.DemiBold
                         textFormat: Text.PlainText
