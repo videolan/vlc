@@ -149,11 +149,6 @@ Segment * SegmentTemplate::getMediaSegment(uint64_t number) const
     return nullptr;
 }
 
-InitSegment * SegmentTemplate::getInitSegment() const
-{
-    return initialisationSegment.Get();
-}
-
 Segment *  SegmentTemplate::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newpos,
                                                      bool *pb_gap) const
 {
