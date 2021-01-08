@@ -37,6 +37,8 @@ Widgets.NavigableFocusScope {
     property bool hasEmbededVideo: mainInterface.hasEmbededVideo
     readonly property int positionSliderY: controlBarView.y + VLCStyle.fontHeight_normal + VLCStyle.margin_xsmall
 
+    property VLCColors colors: VLCStyle.nightColors
+
     function dismiss() {
         if (_menu)
             _menu.dismiss()
@@ -100,8 +102,8 @@ Widgets.NavigableFocusScope {
                 visible: mainInterface.clientSideDecoration
                 source: "qrc:///widgets/CSDWindowButtonSet.qml"
                 onLoaded: {
-                    item.color = VLCStyle.colors.playerFg
-                    item.hoverColor = VLCStyle.colors.windowCSDButtonDarkBg
+                    item.color = Qt.binding(function() { return rootPlayer.colors.playerFg })
+                    item.hoverColor = Qt.binding(function() { return rootPlayer.colors.windowCSDButtonDarkBg })
                 }
             }
 
@@ -117,7 +119,7 @@ Widgets.NavigableFocusScope {
                     size: VLCStyle.banner_icon_size
                     iconText: VLCIcons.ellipsis
                     text: i18n.qtr("Menu")
-                    color: VLCStyle.colors.playerFg
+                    color: rootPlayer.colors.playerFg
                     property bool acceptFocus: true
 
                     onClicked: contextMenu.popup(this.mapToGlobal(0, height))
@@ -138,7 +140,7 @@ Widgets.NavigableFocusScope {
                     size: VLCStyle.banner_icon_size
                     iconText: VLCIcons.playlist
                     text: i18n.qtr("Playlist")
-                    color: VLCStyle.colors.playerFg
+                    color: rootPlayer.colors.playerFg
                     focus: false
                     onClicked:  {
                         if (mainInterface.playlistDocked)
@@ -171,7 +173,7 @@ Widgets.NavigableFocusScope {
         edge: Widgets.DrawerExt.Edges.Right
         state: showPlaylist && mainInterface.playlistDocked ? "visible" : "hidden"
         component: Rectangle {
-            color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
+            color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.banner, 0.8)
             width: rootPlayer.width/4
             height: playlistpopup.height
 
@@ -180,7 +182,7 @@ Widgets.NavigableFocusScope {
                 focus: true
                 anchors.fill: parent
 
-                colors: VLCStyle.nightColors
+                colors: rootPlayer.colors
                 navigationParent: rootPlayer
                 navigationUpItem: csdGroup
                 navigationDownItem: controlBarView
@@ -279,6 +281,7 @@ Widgets.NavigableFocusScope {
 
                     lockAutoHide: playlistpopup.state === "visible"
                     title: mainPlaylistController.currentItem.title
+                    colors: rootPlayer.colors
 
                     navigationParent: rootPlayer
                     navigationDownItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
@@ -289,7 +292,7 @@ Widgets.NavigableFocusScope {
                     id: resumeDialog
 
                     anchors.fill: parent
-
+                    colors: rootPlayer.colors
                     navigationParent: rootPlayer
 
                     onHidden: {
@@ -371,7 +374,7 @@ Widgets.NavigableFocusScope {
                     text: mainPlaylistController.currentItem.album
                     font.weight: Font.Light
                     horizontalAlignment: Text.AlignHCenter
-                    color: VLCStyle.colors.playerFg
+                    color: rootPlayer.colors.playerFg
                     Accessible.description: i18n.qtr("album")
                 }
 
@@ -385,7 +388,7 @@ Widgets.NavigableFocusScope {
                     text: mainPlaylistController.currentItem.artist
                     font.weight: Font.Light
                     horizontalAlignment: Text.AlignHCenter
-                    color: VLCStyle.colors.playerFg
+                    color: rootPlayer.colors.playerFg
                     Accessible.description: i18n.qtr("artist")
                 }
 
@@ -408,7 +411,7 @@ Widgets.NavigableFocusScope {
                             iconText: VLCIcons.skip_back
                             onClicked: player.jumpBwd()
                             text: i18n.qtr("Step back")
-                            color: VLCStyle.colors.playerFg
+                            color: rootPlayer.colors.playerFg
                         }
 
                         Widgets.IconToolButton {
@@ -416,7 +419,7 @@ Widgets.NavigableFocusScope {
                             iconText: VLCIcons.visualization
                             onClicked: player.toggleVisualization()
                             text: i18n.qtr("Visualization")
-                            color: VLCStyle.colors.playerFg
+                            color: rootPlayer.colors.playerFg
                         }
 
                         Widgets.IconToolButton{
@@ -424,7 +427,7 @@ Widgets.NavigableFocusScope {
                             iconText: VLCIcons.skip_for
                             onClicked: player.jumpFwd()
                             text: i18n.qtr("Step forward")
-                            color: VLCStyle.colors.playerFg
+                            color: rootPlayer.colors.playerFg
                         }
                     }
                 }
@@ -470,6 +473,7 @@ Widgets.NavigableFocusScope {
                         anchors.leftMargin: VLCStyle.applicationHorizontalMargin
                         anchors.rightMargin: VLCStyle.applicationHorizontalMargin
                         anchors.bottomMargin: VLCStyle.applicationVerticalMargin
+                        colors: rootPlayer.colors
 
                         lockAutoHide: playlistpopup.state === "visible"
                             || !player.hasVideoOutput
@@ -493,7 +497,7 @@ Widgets.NavigableFocusScope {
     Rectangle {
         visible: !rootPlayer.hasEmbededVideo
         focus: false
-        color: VLCStyle.colors.bg
+        color: rootPlayer.colors.bg
         anchors.fill: parent
 
         z: 0
