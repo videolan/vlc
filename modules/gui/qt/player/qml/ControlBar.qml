@@ -33,6 +33,7 @@ Widgets.NavigableFocusScope {
 
     signal showTrackBar()
 
+    property VLCColors colors: VLCStyle.nightColors
     property bool autoHide: _lockAutoHide === 0 && !lockAutoHide
     property bool lockAutoHide: false
     property int  _lockAutoHide: 0 //count the number of element locking the autoHide
@@ -53,7 +54,7 @@ Widgets.NavigableFocusScope {
         RowLayout {
             Text {
                 text: player.time.toString()
-                color: VLCStyle.colors.playerFg
+                color: root.colors.playerFg
                 font.pixelSize: VLCStyle.fontSize_normal
                 font.bold: true
                 Layout.alignment: Qt.AlignLeft
@@ -68,7 +69,7 @@ Widgets.NavigableFocusScope {
                 text: (mainInterface.showRemainingTime && player.remainingTime.valid())
                       ? "-" + player.remainingTime.toString()
                       : player.length.toString()
-                color: VLCStyle.colors.playerFg
+                color: root.colors.playerFg
                 font.pixelSize: VLCStyle.fontSize_normal
                 font.bold: true
                 Layout.alignment: Qt.AlignRight
@@ -88,7 +89,7 @@ Widgets.NavigableFocusScope {
 
             parentWindow: g_root
 
-            colors: VLCStyle.nightColors
+            colors: root.colors
         }
 
         Item {
@@ -111,7 +112,7 @@ Widgets.NavigableFocusScope {
 
                 navigationUpItem: trackPositionSlider.enabled ? trackPositionSlider : root.navigationUpItem
 
-                colors: VLCStyle.nightColors
+                colors: root.colors
             }
         }
     }
