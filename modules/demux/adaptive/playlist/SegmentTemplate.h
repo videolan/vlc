@@ -62,7 +62,6 @@ namespace adaptive
                 virtual mtime_t getMinAheadTime(uint64_t curnum) const override;
                 virtual Segment * getMediaSegment(uint64_t number) const override;
                 virtual Segment * getNextMediaSegment(uint64_t, uint64_t *, bool *) const override;
-                virtual InitSegment *getInitSegment() const override;
                 virtual uint64_t getStartSegmentNumber() const override;
 
                 virtual bool getSegmentNumberByTime(mtime_t time, uint64_t *ret) const override;
