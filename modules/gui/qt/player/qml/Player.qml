@@ -212,6 +212,7 @@ Widgets.NavigableFocusScope {
         edge: Widgets.DrawerExt.Edges.Top
         state: topcontrolView.state
         width: parent.width
+        visible: rootPlayer.hasEmbededVideo
         height: VLCStyle.dp(206, VLCStyle.scale)
         component: Rectangle {
             width: rootPlayer.width
@@ -228,6 +229,7 @@ Widgets.NavigableFocusScope {
         z: 1
         anchors.bottom: parent.bottom
         width: parent.width
+        visible: rootPlayer.hasEmbededVideo
         edge: Widgets.DrawerExt.Edges.Bottom
         state: topcontrolView.state
         height: VLCStyle.dp(206, VLCStyle.scale)
@@ -460,6 +462,28 @@ Widgets.NavigableFocusScope {
                 width: controlBarView.width
                 height: controllerId.implicitHeight + controllerId.anchors.bottomMargin
                 property alias autoHide: controllerId.autoHide
+
+                Item {
+                    anchors.fill: parent
+                    anchors.topMargin: rootPlayer.positionSliderY - controlBarView.y
+                    visible: !rootPlayer.hasEmbededVideo
+
+                    Rectangle {
+                        id: controlBarBackground
+
+                        anchors.fill: parent
+                        color: rootPlayer.colors.playerBg
+                        visible: false
+                    }
+
+                    GaussianBlur {
+                        anchors.fill: parent
+                        source: controlBarBackground
+                        radius: 22
+                        samples: 46
+                        opacity: .7
+                    }
+                }
 
                 MouseArea {
                     id: controllerMouseArea
