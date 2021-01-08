@@ -39,6 +39,7 @@ Item {
     // When trying to force night/dark theme colors for items,
     // this can be used:
     property VLCColors nightColors: VLCColors { state: "night" }
+    property VLCColors dayColors: VLCColors { state: "day" }
 
     // Sizes
     property double margin_xxxsmall: dp(2, scale);
