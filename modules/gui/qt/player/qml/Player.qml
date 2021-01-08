@@ -326,9 +326,8 @@ Widgets.NavigableFocusScope {
                 }
 
                 Item {
-                    Layout.fillHeight: true
                     Layout.preferredHeight: Math.max(Math.min(parent.height, parent.width - VLCStyle.margin_small * 2), 0)
-                    Layout.maximumHeight: rootPlayer.height / 2
+                    Layout.maximumHeight: rootPlayer.height / 2.7182
                     Layout.minimumHeight: 1
                     Layout.preferredWidth: height * cover.sar
                     Layout.alignment: Qt.AlignHCenter
