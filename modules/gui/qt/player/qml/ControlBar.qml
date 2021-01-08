@@ -53,11 +53,10 @@ Widgets.NavigableFocusScope {
             Layout.leftMargin: VLCStyle.margin_normal
             Layout.rightMargin: VLCStyle.margin_normal
 
-            Text {
+            Label {
                 text: player.time.toString()
                 color: root.colors.playerFg
                 font.pixelSize: VLCStyle.fontSize_normal
-                font.bold: true
                 Layout.alignment: Qt.AlignLeft
             }
 
@@ -65,14 +64,12 @@ Widgets.NavigableFocusScope {
                 Layout.fillWidth: true
             }
 
-
-            Text {
+            Label {
                 text: (mainInterface.showRemainingTime && player.remainingTime.valid())
                       ? "-" + player.remainingTime.toString()
                       : player.length.toString()
                 color: root.colors.playerFg
                 font.pixelSize: VLCStyle.fontSize_normal
-                font.bold: true
                 Layout.alignment: Qt.AlignRight
                 MouseArea {
                     anchors.fill: parent
