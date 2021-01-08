@@ -47,11 +47,12 @@ Widgets.NavigableFocusScope {
     ColumnLayout {
         id: columnLayout
         anchors.fill: parent
-        spacing: VLCStyle.margin_xsmall
-        anchors.leftMargin: VLCStyle.margin_xlarge
-        anchors.rightMargin: VLCStyle.margin_xlarge
+        spacing: VLCStyle.margin_small
 
         RowLayout {
+            Layout.leftMargin: VLCStyle.margin_normal
+            Layout.rightMargin: VLCStyle.margin_normal
+
             Text {
                 text: player.time.toString()
                 color: root.colors.playerFg
@@ -94,6 +95,8 @@ Widgets.NavigableFocusScope {
 
         Item {
             Layout.fillWidth: true
+            Layout.leftMargin: VLCStyle.margin_normal
+            Layout.rightMargin: VLCStyle.margin_normal
             Layout.bottomMargin: VLCStyle.margin_xsmall
             Layout.preferredHeight: playerButtonsLayout.implicitHeight
 

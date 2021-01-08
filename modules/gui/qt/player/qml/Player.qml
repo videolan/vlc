@@ -35,7 +35,7 @@ Widgets.NavigableFocusScope {
     property var _menu: undefined
 
     property bool hasEmbededVideo: mainInterface.hasEmbededVideo
-    readonly property int positionSliderY: controlBarView.y + VLCStyle.fontHeight_normal + VLCStyle.margin_xsmall
+    readonly property int positionSliderY: controlBarView.y + VLCStyle.fontHeight_normal + VLCStyle.margin_small
 
     property VLCColors colors: VLCStyle.nightColors
 
