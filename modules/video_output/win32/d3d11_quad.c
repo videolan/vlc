@@ -427,9 +427,9 @@ static void SetupQuadSphere(d3d_vertex_t *dst_data, const RECT *output,
 
             sincosf(phi, &sinPhi, &cosPhi);
 
-            float x = cosPhi * sinTheta;
+            float x = -sinPhi * sinTheta;
             float y = cosTheta;
-            float z = sinPhi * sinTheta;
+            float z = cosPhi * sinTheta;
 
             unsigned off1 = lat * (nbLonBands + 1) + lon;
             dst_data[off1].position.x = SPHERE_RADIUS * x;
