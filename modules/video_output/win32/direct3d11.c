@@ -1340,4 +1340,3 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
     }
     return VLC_SUCCESS;
 }
-

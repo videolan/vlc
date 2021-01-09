@@ -431,8 +431,8 @@ vlc_gl_renderer_SetViewpoint(struct vlc_gl_renderer *renderer,
     // Convert degree into radian
     float f_fovx = p_vp->fov * (float)M_PI / 180.f;
 
-    /* vgl->vp needs to be converted into world transform */
-    vlc_viewpoint_reverse(&renderer->vp, p_vp);
+    /* Copy the viewpoint for future pictures. */
+    renderer->vp = *p_vp;
 
     if (fabsf(f_fovx - renderer->f_fovx) >= 0.001f)
     {

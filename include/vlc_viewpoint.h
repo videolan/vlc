@@ -60,31 +60,10 @@ static inline void vlc_viewpoint_clip( vlc_viewpoint_t *p_vp )
 }
 
 /**
- * Reverse the viewpoint rotation.
- *
- * It can be used to convert a camera view into a world transformation.
- * It will also copy non-rotation related data from \p src to \p dst.
- *
- * \param dst the viewpoint with the final reversed rotation
- * \param src the viewpoint for which the rotation need to be reversed
- */
-static inline void vlc_viewpoint_reverse( vlc_viewpoint_t *dst,
-                                          const vlc_viewpoint_t *src )
-{
-    dst->yaw   = -src->yaw;
-    dst->pitch = -src->pitch;
-    dst->roll  = -src->roll;
-
-    dst->fov   = src->fov;
-}
-
-/**
  * Generate the 4x4 transform matrix corresponding to a viewpoint
  *
  * Convert a vlc_viewpoint_t into a 4x4 transform matrix with a column-major
  * layout.
- * The transformation is applied as-is. you have to reverse the viewpoint with
- * \ref vlc_viewpoint_reverse first if you want to transform the world.
  *
  * \param vp a valid viewpoint object
  * \param matrix a 4x4-sized array which will contain the matrix data

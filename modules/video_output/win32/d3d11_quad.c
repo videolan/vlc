@@ -739,12 +739,10 @@ void (D3D11_UpdateViewpoint)(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_
 
     float f_fovy = UpdateFOVy(f_fovx, f_sar);
     float f_z = UpdateZ(f_fovx, f_fovy);
-    vlc_viewpoint_t vp;
-    vlc_viewpoint_reverse(&vp, viewpoint);
 
     getZoomMatrix(SPHERE_RADIUS * f_z, quad->vertexConstants.Zoom);
     getProjectionMatrix(f_sar, f_fovy, quad->vertexConstants.Projection);
-    vlc_viewpoint_to_4x4(&vp, quad->vertexConstants.View);
+    vlc_viewpoint_to_4x4(viewpoint, quad->vertexConstants.View);
 
     ShaderUpdateConstants(o, d3d_dev, quad, VS_CONST_VIEWPOINT, &quad->vertexConstants);
 }

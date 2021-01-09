@@ -28,9 +28,9 @@
 
 void vlc_viewpoint_to_4x4( const vlc_viewpoint_t *vp, float *m )
 {
-    float yaw   = vp->yaw   * (float)M_PI / 180.f + (float)M_PI_2;
-    float pitch = vp->pitch * (float)M_PI / 180.f;
-    float roll  = vp->roll  * (float)M_PI / 180.f;
+    float yaw   = -vp->yaw   * (float)M_PI / 180.f + (float)M_PI_2;
+    float pitch = -vp->pitch * (float)M_PI / 180.f;
+    float roll  = -vp->roll  * (float)M_PI / 180.f;
 
     float s, c;
 
