@@ -74,7 +74,7 @@ typedef struct
 
     vlc_video_context *vctx;
 
-    // Lock to avoid pic update & allocate happenening simultainiously
+    // Lock to avoid pic update & allocate happening simultaneously
     // * We should be able to arrange life s.t. this isn't needed
     //   but while we are confused apply belt & braces
     vlc_mutex_t pic_lock;
