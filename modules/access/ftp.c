@@ -38,6 +38,7 @@
 #include <vlc_access.h>
 #include <vlc_dialog.h>
 #include <vlc_input_item.h>
+#include <vlc_memstream.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
 #include <vlc_tls.h>
@@ -955,22 +956,37 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
         else
             psz_file = psz_line;
 
-        char *psz_uri;
         char *psz_filename = vlc_uri_encode( psz_file );
-        if( psz_filename != NULL &&
-            asprintf( &psz_uri, "%s://%s:%d%s%s/%s",
-                      ( p_sys->tlsmode == NONE ) ? "ftp" :
-                      ( ( p_sys->tlsmode == IMPLICIT ) ? "ftps" : "ftpes" ),
-                      p_sys->url.psz_host, p_sys->url.i_port,
-                      p_sys->url.psz_path ? "/" : "",
-                      p_sys->url.psz_path ? p_sys->url.psz_path : "",
-                      psz_filename ) != -1 )
+
+        if (unlikely(psz_filename == NULL))
+            continue;
+
+        struct vlc_memstream ms;
+
+        vlc_memstream_open(&ms);
+        vlc_memstream_puts(&ms, "ftp");
+        if (p_sys->tlsmode != NONE)
         {
-            i_ret = vlc_readdir_helper_additem( &rdh, psz_uri, NULL, psz_file,
-                                                type, ITEM_NET );
-            free( psz_uri );
+            if (p_sys->tlsmode != IMPLICIT)
+                vlc_memstream_putc(&ms, 'e');
+            vlc_memstream_putc(&ms, 's');
         }
-        free( psz_filename );
+        vlc_memstream_puts(&ms, "://");
+        vlc_memstream_puts(&ms, p_sys->url.psz_host);
+        vlc_memstream_printf(&ms, ":%d", p_sys->url.i_port);
+        if (p_sys->url.psz_path != NULL)
+            vlc_memstream_printf(&ms, "/%s", p_sys->url.psz_path);
+        vlc_memstream_puts(&ms, psz_filename);
+        free(psz_filename);
+
+        if (likely(vlc_memstream_close(&ms) == 0))
+        {
+            msg_Err(p_access, "%s -> %s", p_sys->url.psz_path, ms.ptr);
+
+            i_ret = vlc_readdir_helper_additem( &rdh, ms.ptr, NULL, psz_file,
+                                                type, ITEM_NET );
+            free(ms.ptr);
+        }
         free( psz_line );
     }
 
