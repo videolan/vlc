@@ -956,6 +956,13 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
         else
             psz_file = psz_line;
 
+        /* Exclude this and parent directory */
+        if (strcmp(psz_file, ".") == 0 || strcmp(psz_file, "..") == 0)
+        {
+            free(psz_line);
+            continue;
+        }
+
         char *psz_filename = vlc_uri_encode( psz_file );
 
         if (unlikely(psz_filename == NULL))
