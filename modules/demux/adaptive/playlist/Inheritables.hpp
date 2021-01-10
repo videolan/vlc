@@ -105,12 +105,14 @@ namespace adaptive
         {
             public:
                 AttrWrapper(T v) : AbstractAttr(e) { value = v; }
-                virtual ~AttrWrapper() {}
+                virtual ~AttrWrapper() { condDeleteValue(value); }
                 AttrWrapper(const AttrWrapper &) = delete;
                 AttrWrapper<e, T> & operator=(const AttrWrapper<e, T> &) = delete;
                 operator const T&() const { return value; }
 
             protected:
+                void condDeleteValue(const T &) {}
+                void condDeleteValue(T* &v) { delete v; }
                 T value;
         };
 
