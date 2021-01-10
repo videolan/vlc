@@ -544,16 +544,8 @@ typedef struct vlc_rwlock
 
 /**
  * Initializes a read/write lock.
- *
- * After use, a read/write lock must be deinitialized with
- * vlc_rwlock_destroy().
  */
 VLC_API void vlc_rwlock_init(vlc_rwlock_t *);
-
-/**
- * Destroys an initialized unused read/write lock.
- */
-VLC_API void vlc_rwlock_destroy(vlc_rwlock_t *);
 
 /**
  * Acquires a read/write lock for reading.

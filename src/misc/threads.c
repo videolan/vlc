@@ -391,11 +391,6 @@ void vlc_rwlock_init (vlc_rwlock_t *lock)
     lock->state = 0;
 }
 
-void vlc_rwlock_destroy (vlc_rwlock_t *lock)
-{
-    (void) lock;
-}
-
 void vlc_rwlock_rdlock (vlc_rwlock_t *lock)
 {
     vlc_mutex_lock (&lock->mutex);

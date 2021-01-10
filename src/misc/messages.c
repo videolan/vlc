@@ -332,7 +332,6 @@ static void vlc_LogSwitchClose(void *d)
     logswitch->backend = &discard_log;
     backend->ops->destroy(backend);
 
-    vlc_rwlock_destroy(&logswitch->lock);
     free(logswitch);
 }
 
