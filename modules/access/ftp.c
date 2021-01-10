@@ -980,7 +980,11 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
         }
         vlc_memstream_puts(&ms, "://");
         vlc_memstream_puts(&ms, p_sys->url.psz_host);
-        vlc_memstream_printf(&ms, ":%d", p_sys->url.i_port);
+
+        if (p_sys->url.i_port != ((p_sys->tlsmode != IMPLICIT) ? IPPORT_FTP
+                                                               : IPPORT_FTPS))
+            vlc_memstream_printf(&ms, ":%d", p_sys->url.i_port);
+
         if (p_sys->url.psz_path != NULL)
             vlc_memstream_printf(&ms, "/%s", p_sys->url.psz_path);
         vlc_memstream_puts(&ms, psz_filename);
