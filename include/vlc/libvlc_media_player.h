@@ -500,12 +500,12 @@ void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_cleanup_cb cleanup );
 
 
-typedef struct
+typedef struct libvlc_video_setup_device_cfg_t
 {
     bool hardware_decoding; /** set if D3D11_CREATE_DEVICE_VIDEO_SUPPORT is needed for D3D11 */
 } libvlc_video_setup_device_cfg_t;
 
-typedef struct
+typedef struct libvlc_video_setup_device_info_t
 {
     union {
         struct {
@@ -552,7 +552,7 @@ typedef bool (*libvlc_video_output_setup_cb)(void **opaque,
  */
 typedef void (*libvlc_video_output_cleanup_cb)(void* opaque);
 
-typedef struct
+typedef struct libvlc_video_render_cfg_t
 {
     unsigned width;                        /** rendering video width in pixel */
     unsigned height;                      /** rendering video height in pixel */
@@ -564,7 +564,7 @@ typedef struct
     void *device;   /** device used for rendering, IDirect3DDevice9* for D3D9 */
 } libvlc_video_render_cfg_t;
 
-typedef struct
+typedef struct libvlc_video_output_cfg_t
 {
     union {
         int dxgi_format;  /** the rendering DXGI_FORMAT for \ref libvlc_video_engine_d3d11*/
@@ -647,7 +647,7 @@ typedef bool (*libvlc_video_makeCurrent_cb)(void* opaque, bool enter);
  */
 typedef void* (*libvlc_video_getProcAddress_cb)(void* opaque, const char* fct_name);
 
-typedef struct
+typedef struct libvlc_video_frame_hdr10_metadata_t
 {
     /* similar to SMPTE ST 2086 mastering display color volume */
     uint16_t RedPrimary[2];
