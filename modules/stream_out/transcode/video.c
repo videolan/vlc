@@ -73,6 +73,9 @@ static const struct encoder_owner_callbacks encoder_video_transcode_cbs = {
 
 static vlc_decoder_device * video_get_decoder_device( decoder_t *p_dec )
 {
+    if( !var_InheritBool( p_dec, "hw-dec" ) )
+        return NULL;
+
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     return TranscodeHoldDecoderDevice(&p_dec->obj, p_owner->id);
 }
