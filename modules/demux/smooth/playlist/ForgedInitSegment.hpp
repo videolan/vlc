@@ -21,6 +21,7 @@
 #define FORGEDINITSEGMENT_HPP
 
 #include "../../adaptive/playlist/Segment.h"
+#include "CodecParameters.hpp"
 
 #include <vlc_es.h>
 #include <vlc_codecs.h>
@@ -33,6 +34,8 @@ namespace smooth
         using namespace adaptive::playlist;
         using namespace adaptive::http;
 
+        class CodecParameters;
+
         class ForgedInitSegment : public InitSegment
         {
             public:
@@ -41,31 +44,15 @@ namespace smooth
                 virtual ~ForgedInitSegment();
                 virtual SegmentChunk* toChunk(SharedResources *, AbstractConnectionManager *,
                                               size_t, BaseRepresentation *) override;
-                void setWaveFormatEx(const std::string &);
-                void setCodecPrivateData(const std::string &);
-                void setChannels(uint16_t);
-                void setPacketSize(uint16_t);
-                void setSamplingRate(uint32_t);
-                void setBitsPerSample(uint16_t);
                 void setVideoSize(unsigned w, unsigned h);
-                void setFourCC(const std::string &);
-                void setAudioTag(uint16_t);
                 void setTrackID(unsigned);
                 void setLanguage(const std::string &);
 
             private:
-                void fromWaveFormatEx(const uint8_t *p_data, size_t i_data);
-                void fromVideoInfoHeader(const uint8_t *p_data, size_t i_data);
-                block_t * buildMoovBox();
-                std::string data;
+                block_t * buildMoovBox(const CodecParameters &);
                 std::string type;
                 std::string language;
-                uint8_t *extradata;
-                size_t   i_extradata;
-                WAVEFORMATEX formatex;
                 unsigned width, height;
-                vlc_fourcc_t fourcc;
-                enum es_format_category_e es_type;
                 unsigned track_id;
                 Timescale timescale;
         };

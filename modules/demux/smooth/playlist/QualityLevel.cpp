@@ -91,3 +91,13 @@ std::string QualityLevel::contextualize(size_t number, const std::string &compon
 
     return ret;
 }
+
+const CodecParameters & QualityLevel::getCodecParameters() const
+{
+    return codecParameters;
+}
+
+void QualityLevel::setCodecParameters(const CodecParameters &c)
+{
+    codecParameters = c;
+}

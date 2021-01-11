@@ -27,6 +27,7 @@
 #include "QualityLevel.hpp"
 #include "ForgedInitSegment.hpp"
 #include "SmoothSegment.hpp"
+#include "CodecParameters.hpp"
 #include "../../adaptive/playlist/BasePeriod.h"
 #include "../../adaptive/playlist/BaseAdaptationSet.h"
 #include "../../adaptive/playlist/SegmentTimeline.h"
@@ -167,6 +168,34 @@ static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const
         if(qualNode->hasAttribute("FourCC"))
             rep->addCodecs(qualNode->getAttributeValue("FourCC"));
 
+        CodecParameters params;
+
+        if(qualNode->hasAttribute("FourCC"))
+            params.setFourCC(qualNode->getAttributeValue("FourCC"));
+
+        if(qualNode->hasAttribute("PacketSize"))
+            params.setPacketSize(Integer<uint16_t>(qualNode->getAttributeValue("PacketSize")));
+
+        if(qualNode->hasAttribute("Channels"))
+            params.setChannels(Integer<uint16_t>(qualNode->getAttributeValue("Channels")));
+
+        if(qualNode->hasAttribute("SamplingRate"))
+            params.setSamplingRate(Integer<uint32_t>(qualNode->getAttributeValue("SamplingRate")));
+
+        if(qualNode->hasAttribute("BitsPerSample"))
+            params.setBitsPerSample(Integer<uint32_t>(qualNode->getAttributeValue("BitsPerSample")));
+
+        if(qualNode->hasAttribute("CodecPrivateData"))
+            params.setCodecPrivateData(qualNode->getAttributeValue("CodecPrivateData"));
+
+        if(qualNode->hasAttribute("AudioTag"))
+            params.setAudioTag(Integer<uint16_t>(qualNode->getAttributeValue("AudioTag")));
+
+        if(qualNode->hasAttribute("WaveFormatEx"))
+            params.setWaveFormatEx(qualNode->getAttributeValue("WaveFormatEx"));
+
+        rep->setCodecParameters(params);
+
         ForgedInitSegment *initSegment = new (std::nothrow)
                 ForgedInitSegment(rep, type,
                                   timescale,
@@ -180,30 +209,6 @@ static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const
 
             if(rep->getWidth() > 0 && rep->getHeight() > 0)
                 initSegment->setVideoSize(rep->getWidth(), rep->getHeight());
-
-            if(qualNode->hasAttribute("FourCC"))
-                initSegment->setFourCC(qualNode->getAttributeValue("FourCC"));
-
-            if(qualNode->hasAttribute("PacketSize"))
-                initSegment->setPacketSize(Integer<uint16_t>(qualNode->getAttributeValue("PacketSize")));
-
-            if(qualNode->hasAttribute("Channels"))
-                initSegment->setChannels(Integer<uint16_t>(qualNode->getAttributeValue("Channels")));
-
-            if(qualNode->hasAttribute("SamplingRate"))
-                initSegment->setSamplingRate(Integer<uint32_t>(qualNode->getAttributeValue("SamplingRate")));
-
-            if(qualNode->hasAttribute("BitsPerSample"))
-                initSegment->setBitsPerSample(Integer<uint32_t>(qualNode->getAttributeValue("BitsPerSample")));
-
-            if(qualNode->hasAttribute("CodecPrivateData"))
-                initSegment->setCodecPrivateData(qualNode->getAttributeValue("CodecPrivateData"));
-
-            if(qualNode->hasAttribute("AudioTag"))
-                initSegment->setAudioTag(Integer<uint16_t>(qualNode->getAttributeValue("AudioTag")));
-
-            if(qualNode->hasAttribute("WaveFormatEx"))
-                initSegment->setWaveFormatEx(qualNode->getAttributeValue("WaveFormatEx"));
 
             initSegment->setSourceUrl("forged://");
 

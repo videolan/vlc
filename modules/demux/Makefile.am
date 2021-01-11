@@ -466,6 +466,8 @@ libvlc_adaptive_la_SOURCES += meta_engine/ID3Meta.h
 libvlc_adaptive_la_SOURCES += \
     demux/smooth/mp4/SmoothIndexReader.cpp \
     demux/smooth/mp4/SmoothIndexReader.hpp \
+    demux/smooth/playlist/CodecParameters.cpp \
+    demux/smooth/playlist/CodecParameters.hpp \
     demux/smooth/playlist/ForgedInitSegment.hpp \
     demux/smooth/playlist/ForgedInitSegment.cpp \
     demux/smooth/playlist/Manifest.hpp \

@@ -24,6 +24,8 @@
 #include "ForgedInitSegment.hpp"
 #include "MemoryChunk.hpp"
 #include "../../adaptive/playlist/SegmentChunk.hpp"
+#include "QualityLevel.hpp"
+#include "CodecParameters.hpp"
 
 #include <vlc_common.h>
 
@@ -48,118 +50,13 @@ ForgedInitSegment::ForgedInitSegment(ICanonicalUrl *parent,
 {
     type = type_;
     duration.Set(duration_);
-    extradata = nullptr;
-    i_extradata = 0;
     timescale = timescale_;
-    formatex.cbSize = 0;
-    formatex.nAvgBytesPerSec = 0;
-    formatex.nBlockAlign = 0;
-    formatex.nChannels = 0;
-    formatex.nSamplesPerSec = 0;
-    formatex.wBitsPerSample = 0;
-    formatex.wFormatTag = 0;
     width = height = 0;
-    fourcc = 0;
-    es_type = UNKNOWN_ES;
     track_id = 1;
 }
 
 ForgedInitSegment::~ForgedInitSegment()
 {
-    free(extradata);
-}
-
-static uint8_t *HexDecode(const std::string &s, size_t *decoded_size)
-{
-    *decoded_size = s.size() / 2;
-    uint8_t *data = (uint8_t *) malloc(*decoded_size);
-    if(data)
-    {
-        for(size_t i=0; i<*decoded_size; i++)
-            data[i] = std::strtoul(s.substr(i*2, 2).c_str(), nullptr, 16);
-    }
-    return data;
-}
-
-void ForgedInitSegment::fromWaveFormatEx(const uint8_t *p_data, size_t i_data)
-{
-    if(i_data >= sizeof(WAVEFORMATEX))
-    {
-        formatex.wFormatTag = GetWLE(p_data);
-        wf_tag_to_fourcc(formatex.wFormatTag, &fourcc, nullptr);
-        formatex.nChannels = GetWLE(&p_data[2]);
-        formatex.nSamplesPerSec = GetDWLE(&p_data[4]);
-        formatex.nAvgBytesPerSec = GetDWLE(&p_data[8]);
-        formatex.nBlockAlign = GetWLE(&p_data[12]);
-        formatex.wBitsPerSample = GetWLE(&p_data[14]);
-        formatex.cbSize = GetWLE(&p_data[16]);
-        if(i_data > sizeof(WAVEFORMATEX))
-        {
-            if(extradata)
-            {
-                free(extradata);
-                extradata = nullptr;
-                i_extradata = 0;
-            }
-            formatex.cbSize = __MIN(i_data - sizeof(WAVEFORMATEX), formatex.cbSize);
-            extradata = (uint8_t*)malloc(formatex.cbSize);
-            if(extradata)
-            {
-                memcpy(extradata, &p_data[sizeof(WAVEFORMATEX)], formatex.cbSize);
-                i_extradata = formatex.cbSize;
-            }
-        }
-        es_type = AUDIO_ES;
-    }
-}
-
-void ForgedInitSegment::fromVideoInfoHeader(const uint8_t *, size_t)
-{
-//    VIDEOINFOHEADER
-    es_type = VIDEO_ES;
-}
-
-void ForgedInitSegment::setWaveFormatEx(const std::string &waveformat)
-{
-    size_t i_data;
-    uint8_t *p_data = HexDecode(waveformat, &i_data);
-    fromWaveFormatEx(p_data, i_data);
-    free(p_data);
-}
-
-void ForgedInitSegment::setCodecPrivateData(const std::string &extra)
-{
-    if(extradata)
-    {
-        free(extradata);
-        extradata = nullptr;
-        i_extradata = 0;
-    }
-    extradata = HexDecode(extra, &i_extradata);
-    if(fourcc == VLC_CODEC_WMAP)
-    {
-        //fromWaveFormatEx(const std::string &extra);
-    }
-}
-
-void ForgedInitSegment::setChannels(uint16_t i)
-{
-    formatex.nChannels = i;
-}
-
-void ForgedInitSegment::setPacketSize(uint16_t i)
-{
-    formatex.nBlockAlign = i;
-}
-
-void ForgedInitSegment::setSamplingRate(uint32_t i)
-{
-    formatex.nSamplesPerSec = i;
-}
-
-void ForgedInitSegment::setBitsPerSample(uint16_t i)
-{
-    formatex.wBitsPerSample = i;
 }
 
 void ForgedInitSegment::setVideoSize(unsigned w, unsigned h)
@@ -173,100 +70,21 @@ void ForgedInitSegment::setTrackID(unsigned i)
     track_id = i;
 }
 
-void ForgedInitSegment::setAudioTag(uint16_t i)
-{
-    wf_tag_to_fourcc(i, &fourcc, nullptr);
-}
-
-void ForgedInitSegment::setFourCC(const std::string &fcc)
-{
-    if(fcc.size() == 4)
-    {
-        fourcc = VLC_FOURCC(fcc[0], fcc[1], fcc[2], fcc[3]);
-        switch(fourcc)
-        {
-            case VLC_FOURCC( 'A', 'V', 'C', '1' ):
-            case VLC_FOURCC( 'A', 'V', 'C', 'B' ):
-            case VLC_FOURCC( 'H', '2', '6', '4' ):
-            case VLC_FOURCC( 'W', 'V', 'C', '1' ):
-                es_type = VIDEO_ES;
-                break;
-            case VLC_FOURCC( 'T', 'T', 'M', 'L' ):
-                es_type = SPU_ES;
-                break;
-            case VLC_FOURCC( 'A', 'A', 'C', 'L' ):
-            case VLC_FOURCC( 'W', 'M', 'A', 'P' ):
-            default:
-                es_type = AUDIO_ES;
-                break;
-        }
-    }
-}
-
 void ForgedInitSegment::setLanguage(const std::string &lang)
 {
     language = lang;
 }
 
-block_t * ForgedInitSegment::buildMoovBox()
+block_t * ForgedInitSegment::buildMoovBox(const CodecParameters &codecparameters)
 {
     es_format_t fmt;
-    es_format_Init(&fmt, es_type, vlc_fourcc_GetCodec(es_type, fourcc));
-    fmt.i_original_fourcc = fourcc;
-    switch(es_type)
+    codecparameters.initAndFillEsFmt(&fmt);
+    if(fmt.i_cat == VIDEO_ES)
     {
-        case VIDEO_ES:
-            if( fourcc == VLC_FOURCC( 'A', 'V', 'C', '1' ) ||
-                fourcc == VLC_FOURCC( 'A', 'V', 'C', 'B' ) ||
-                fourcc == VLC_FOURCC( 'H', '2', '6', '4' ) )
-            {
-                fmt.i_codec = VLC_CODEC_H264;
-            }
-            else if( fourcc == VLC_FOURCC( 'W', 'V', 'C', '1' ) )
-            {
-                fmt.i_codec = VLC_CODEC_VC1;
-//                fmt.video.i_bits_per_pixel = 0x18; // No clue why this was set in smooth streamfilter
-            }
-
-            fmt.video.i_width = width;
-            fmt.video.i_height = height;
-            fmt.video.i_visible_width = width;
-            fmt.video.i_visible_height = height;
-
-            if(i_extradata && extradata)
-            {
-                fmt.p_extra = malloc(i_extradata);
-                if(fmt.p_extra)
-                {
-                    memcpy(fmt.p_extra, extradata, i_extradata);
-                    fmt.i_extra = i_extradata;
-                }
-            }
-            break;
-
-        case AUDIO_ES:
-            fmt.audio.i_channels = formatex.nChannels;
-            fmt.audio.i_rate = formatex.nSamplesPerSec;
-            fmt.audio.i_bitspersample = formatex.wBitsPerSample;
-            fmt.audio.i_blockalign = formatex.nBlockAlign;
-            fmt.i_bitrate = formatex.nAvgBytesPerSec * 8; // FIXME (use bitrate) ?
-
-            if(i_extradata && extradata)
-            {
-                fmt.p_extra = malloc(i_extradata);
-                if(fmt.p_extra)
-                {
-                    memcpy(fmt.p_extra, extradata, i_extradata);
-                    fmt.i_extra = i_extradata;
-                }
-            }
-            break;
-
-        case SPU_ES:
-            break;
-
-        default:
-            break;
+        fmt.video.i_width = width;
+        fmt.video.i_height = height;
+        fmt.video.i_visible_width = width;
+        fmt.video.i_visible_height = height;
     }
 
     if(!language.empty())
@@ -319,7 +137,11 @@ block_t * ForgedInitSegment::buildMoovBox()
 SegmentChunk* ForgedInitSegment::toChunk(SharedResources *, AbstractConnectionManager *,
                                          size_t, BaseRepresentation *rep)
 {
-    block_t *moov = buildMoovBox();
+    QualityLevel *lvl = dynamic_cast<QualityLevel *>(rep);
+    if(lvl == nullptr)
+        return nullptr;
+
+    block_t *moov = buildMoovBox(lvl->getCodecParameters());
     if(moov)
     {
         MemoryChunkSource *source = new (std::nothrow) MemoryChunkSource(moov);

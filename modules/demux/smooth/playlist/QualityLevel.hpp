@@ -22,6 +22,7 @@
 
 #include "../../adaptive/playlist/SegmentBaseType.hpp"
 #include "../../adaptive/playlist/BaseRepresentation.h"
+#include "CodecParameters.hpp"
 
 namespace adaptive
 {
@@ -51,6 +52,12 @@ namespace smooth
                 /* for segment templates */
                 virtual std::string contextualize(size_t, const std::string &,
                                                   const SegmentTemplate *) const override;
+
+                void setCodecParameters( const CodecParameters & );
+                const CodecParameters & getCodecParameters() const;
+
+            protected:
+                CodecParameters codecParameters;
         };
     }
 }
