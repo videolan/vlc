@@ -293,7 +293,7 @@ static const char *bitdepth_values_name_list[] = {N_("8 bpp"), N_("10 bpp")};
 vlc_module_begin()
     set_shortname("rav1e")
     set_description(N_("rav1e video encoder"))
-    set_capability("encoder", 101)
+    set_capability("encoder", 105)
     set_callbacks(OpenEncoder, CloseEncoder)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
