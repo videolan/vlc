@@ -25,6 +25,7 @@ endif
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/libarchive/winrt.patch
 endif
+	$(APPLY) $(SRC)/libarchive/configure.ac-add-AC_PROG_CPP.patch
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 

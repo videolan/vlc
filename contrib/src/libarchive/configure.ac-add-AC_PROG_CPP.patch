@@ -1,0 +1,27 @@
+From b4c5bf51436d876631e12ed8533e86405f8581d7 Mon Sep 17 00:00:00 2001
+From: Alexandre Janniaux <ajanni@videolabs.io>
+Date: Mon, 11 Jan 2021 12:31:53 +0100
+Subject: [PATCH] configure.ac: add AC_PROG_CPP
+
+Otherwise, the preprocessor is not detected and it leads to failure with
+empty $CPP variable being used on la_TYPE_UID_T, leading to a cascade of
+detection errors and redefinition of some types.
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index 3b4602f5..d51fa19c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -107,6 +107,7 @@ AC_SUBST(PLATFORMCPPFLAGS)
+ AC_PROG_CC
+ AC_PROG_CC_C99
+ AM_PROG_CC_C_O
++AC_PROG_CPP
+ AC_USE_SYSTEM_EXTENSIONS
+ AC_LIBTOOL_WIN32_DLL
+ AC_PROG_LIBTOOL
+-- 
+2.30.0
+
