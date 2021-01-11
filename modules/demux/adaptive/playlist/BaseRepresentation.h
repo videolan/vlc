@@ -29,6 +29,7 @@
 #include <list>
 
 #include "CommonAttributesElements.h"
+#include "CodecDescription.hpp"
 #include "SegmentInformation.hpp"
 #include "../StreamFormat.hpp"
 
@@ -61,6 +62,7 @@ namespace adaptive
                 void                setBandwidth            ( uint64_t bandwidth );
                 const std::list<std::string> & getCodecs    () const;
                 void                addCodecs               (const std::string &);
+                void                getCodecsDesc           (CodecDescriptionList *) const;
                 bool                consistentSegmentNumber () const;
                 virtual void        pruneByPlaybackTime     (vlc_tick_t) override;
 
@@ -86,6 +88,7 @@ namespace adaptive
                                                                vlc_tick_t *rangeEnd,
                                                                vlc_tick_t *rangeLength) const;
             protected:
+                virtual CodecDescription * makeCodecDescription(const std::string &) const;
                 virtual bool        validateCodec(const std::string &) const;
                 BaseAdaptationSet                  *adaptationSet;
                 uint64_t                            bandwidth;

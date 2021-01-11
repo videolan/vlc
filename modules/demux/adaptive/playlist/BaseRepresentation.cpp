@@ -87,6 +87,39 @@ void BaseRepresentation::addCodecs(const std::string &s)
         codecs.push_back(*it);
 }
 
+void BaseRepresentation::getCodecsDesc(CodecDescriptionList *desc) const
+{
+    std::list<std::string> codecs = getCodecs();
+    if(codecs.empty())
+    {
+        const StreamFormat format = getStreamFormat();
+        switch(format)
+        {
+            case StreamFormat::TTML:
+                codecs.push_front("stpp");
+                break;
+            case StreamFormat::WEBVTT:
+                codecs.push_front("wvtt");
+                break;
+            default:
+                break;
+        }
+    }
+
+    for(auto it = codecs.cbegin(); it != codecs.cend(); ++it)
+    {
+        CodecDescription *dsc = makeCodecDescription(*it);
+        dsc->setDescription(adaptationSet->description.Get());
+        dsc->setLanguage(adaptationSet->getLang());
+        desc->push_back(dsc);
+    }
+}
+
+CodecDescription * BaseRepresentation::makeCodecDescription(const std::string &codec) const
+{
+    return new CodecDescription(codec);
+}
+
 bool BaseRepresentation::needsUpdate(uint64_t) const
 {
     return false;

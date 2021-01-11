@@ -304,6 +304,8 @@ libvlc_adaptive_la_SOURCES = \
     demux/adaptive/playlist/BasePlaylist.hpp \
     demux/adaptive/playlist/BaseRepresentation.cpp \
     demux/adaptive/playlist/BaseRepresentation.h \
+    demux/adaptive/playlist/CodecDescription.cpp \
+    demux/adaptive/playlist/CodecDescription.hpp \
     demux/adaptive/playlist/CommonAttributesElements.cpp \
     demux/adaptive/playlist/CommonAttributesElements.h \
     demux/adaptive/playlist/ICanonicalUrl.hpp \

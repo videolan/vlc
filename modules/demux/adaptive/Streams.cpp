@@ -31,7 +31,6 @@
 #include "playlist/SegmentChunk.hpp"
 #include "plumbing/SourceStream.hpp"
 #include "plumbing/CommandsQueue.hpp"
-#include "tools/FormatNamespace.hpp"
 #include "tools/Debug.hpp"
 #include <vlc_demux.h>
 
@@ -713,54 +712,12 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
     }
 }
 
-static void add_codec_string_from_fourcc(vlc_fourcc_t fourcc,
-                                         std::list<std::string> &codecs)
-{
-    std::string codec;
-    codec.insert(0, reinterpret_cast<const char *>(&fourcc), 4);
-    codecs.push_back(codec);
-}
-
 void AbstractStream::declaredCodecs()
 {
-    const std::string & streamDesc = segmentTracker->getStreamDescription();
-    const std::string & streamLang = segmentTracker->getStreamLanguage();
-    std::list<std::string> codecs =  segmentTracker->getCurrentCodecs();
-
-    if(codecs.empty())
-    {
-        const StreamFormat format = segmentTracker->getCurrentFormat();
-        switch(format)
-        {
-            case StreamFormat::TTML:
-                add_codec_string_from_fourcc(VLC_CODEC_TTML, codecs);
-                break;
-            case StreamFormat::WEBVTT:
-                add_codec_string_from_fourcc(VLC_CODEC_WEBVTT, codecs);
-                break;
-            default:
-                break;
-        }
-    }
-
-    for(std::list<std::string>::const_iterator it = codecs.begin();
-                                               it != codecs.end(); ++it)
-    {
-        FormatNamespace fnsp(*it);
-
-        es_format_t fmt;
-        es_format_Init(&fmt, fnsp.getFmt()->i_cat, fnsp.getFmt()->i_codec);
-        es_format_Copy(&fmt, fnsp.getFmt());
-
-        if(!streamLang.empty())
-            fmt.psz_language = strdup(streamLang.c_str());
-        if(!streamDesc.empty())
-            fmt.psz_description = strdup(streamDesc.c_str());
-
-        fakeEsOut()->declareEs( &fmt );
-
-        es_format_Clean(&fmt);
-    }
+    CodecDescriptionList descs;
+    segmentTracker->getCodecsDesc(&descs);
+    for(auto it = descs.cbegin(); it != descs.cend(); ++it)
+        fakeEsOut()->declareEs((*it)->getFmt());
 }
 
 FakeESOut::LockedFakeEsOut AbstractStream::fakeEsOut()

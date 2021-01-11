@@ -21,6 +21,7 @@
 #define SEGMENTTRACKER_HPP
 
 #include "StreamFormat.hpp"
+#include "playlist/CodecDescription.hpp"
 #include "playlist/Role.hpp"
 
 #include <vlc_common.h>
@@ -178,9 +179,7 @@ namespace adaptive
             };
 
             StreamFormat getCurrentFormat() const;
-            std::list<std::string> getCurrentCodecs() const;
-            const std::string & getStreamDescription() const;
-            const std::string & getStreamLanguage() const;
+            void getCodecsDesc(CodecDescriptionList *) const;
             const Role & getStreamRole() const;
             void reset();
             SegmentChunk* getNextChunk(bool, AbstractConnectionManager *);

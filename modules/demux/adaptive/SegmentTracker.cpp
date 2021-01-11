@@ -194,24 +194,13 @@ StreamFormat SegmentTracker::getCurrentFormat() const
     return StreamFormat();
 }
 
-std::list<std::string> SegmentTracker::getCurrentCodecs() const
+void SegmentTracker::getCodecsDesc(CodecDescriptionList *descs) const
 {
     BaseRepresentation *rep = current.rep;
     if(!rep)
         rep = logic->getNextRepresentation(adaptationSet, nullptr);
     if(rep)
-        return rep->getCodecs();
-    return std::list<std::string>();
-}
-
-const std::string & SegmentTracker::getStreamDescription() const
-{
-    return adaptationSet->description.Get();
-}
-
-const std::string & SegmentTracker::getStreamLanguage() const
-{
-    return adaptationSet->getLang();
+        rep->getCodecsDesc(descs);
 }
 
 const Role & SegmentTracker::getStreamRole() const
