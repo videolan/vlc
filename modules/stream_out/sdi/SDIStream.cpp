@@ -483,6 +483,9 @@ void VideoDecodedStream::VideoDecCallback_queue_cc(decoder_t *p_dec, block_t *p_
 
 vlc_decoder_device * VideoDecodedStream::VideoDecCallback_get_device(decoder_t *p_dec)
 {
+    if( !var_InheritBool( p_dec, "hw-dec" ) )
+        return NULL;
+
     struct decoder_owner *p_owner;
     p_owner = container_of(p_dec, struct decoder_owner, dec);
     if (p_owner->dec_dev == NULL)
