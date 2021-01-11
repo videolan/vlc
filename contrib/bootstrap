@@ -219,7 +219,7 @@ check_ios_sdk()
 check_macosx_sdk()
 {
 	if [ -z "$SDKROOT" ]; then
-		SDKROOT=$(xcrun --show-sdk-path)
+		SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 		echo "SDKROOT not specified, assuming $SDKROOT"
 	fi
 
