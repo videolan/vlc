@@ -69,13 +69,14 @@ Widgets.NavigableFocusScope{
             RowLayout {
                 id: rowLayout
                 anchors.fill: parent
+                anchors.leftMargin: VLCStyle.margin_xxsmall
 
                 Column{
                     id: backAndTitleLayout
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignTop | Qt.AlignLeft
 
-                    spacing: 0
+                    spacing: VLCStyle.margin_large
 
                     Menus.Menubar {
                         id: menubar
@@ -90,7 +91,7 @@ Widgets.NavigableFocusScope{
 
                     RowLayout {
                         anchors.left: parent.left
-                        spacing: 0
+                        spacing: VLCStyle.margin_xxsmall
 
                         Widgets.IconToolButton {
                             id: backBtn
@@ -98,7 +99,7 @@ Widgets.NavigableFocusScope{
                             Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
 
                             objectName: "IconToolButton"
-                            size: VLCStyle.icon_normal
+                            size: VLCStyle.banner_icon_size
                             iconText: VLCIcons.topbar_previous
                             text: i18n.qtr("Back")
                             color: topFocusScope.colors.playerFg
@@ -112,6 +113,8 @@ Widgets.NavigableFocusScope{
                         }
 
                         Image {
+                            id: logo
+
                             Layout.alignment: Qt.AlignVCenter
                             sourceSize.width: VLCStyle.icon_small
                             sourceSize.height: VLCStyle.icon_small
@@ -124,12 +127,12 @@ Widgets.NavigableFocusScope{
                         id: titleText
 
                         anchors.left: parent.left
-                        anchors.leftMargin: VLCStyle.icon_normal
+                        anchors.leftMargin: logo.x
                         width: rowLayout.width - anchors.leftMargin
 
                         horizontalAlignment: Text.AlignLeft
                         color: topFocusScope.colors.playerFg
-                        font.pixelSize: VLCStyle.fontSize_xxlarge
+                        font.pixelSize: VLCStyle.dp(18, VLCStyle.scale)
                         font.weight: Font.DemiBold
                         textFormat: Text.PlainText
                         elide: Text.ElideRight
