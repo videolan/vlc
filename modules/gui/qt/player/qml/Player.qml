@@ -36,8 +36,11 @@ Widgets.NavigableFocusScope {
 
     property bool hasEmbededVideo: mainInterface.hasEmbededVideo
     readonly property int positionSliderY: controlBarView.y + VLCStyle.fontHeight_normal + VLCStyle.margin_small
-
-    property VLCColors colors: VLCStyle.nightColors
+    readonly property string coverSource: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
+                                          ? mainPlaylistController.currentItem.artwork
+                                          : VLCStyle.noArtCover
+    readonly property VLCColors colors: (mainInterface.hasEmbededVideo || (coverLuminance.luminance < 140))
+                                        ? VLCStyle.nightColors : VLCStyle.dayColors
 
     function dismiss() {
         if (_menu)
@@ -74,6 +77,13 @@ Widgets.NavigableFocusScope {
             }
             history.previous()
         }
+    }
+
+    ImageLuminanceExtractor {
+        id: coverLuminance
+
+        enabled: !rootPlayer.hasEmbededVideo
+        source: rootPlayer.coverSource
     }
 
     Widgets.DrawerExt {
@@ -334,9 +344,8 @@ Widgets.NavigableFocusScope {
 
                     Image {
                         id: cover
-                        source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
-                                ? mainPlaylistController.currentItem.artwork
-                                : VLCStyle.noArtCover
+
+                        source: rootPlayer.coverSource
                         fillMode: Image.PreserveAspectFit
 
                         //source aspect ratio
