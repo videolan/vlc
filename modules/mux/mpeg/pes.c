@@ -109,7 +109,7 @@ static inline int PESHeader( uint8_t *p_hdr, int64_t i_pts, int64_t i_dts,
                 int i_pts_dts;
                 bool b_pes_extension_flag = false;
 
-                if( i_pts > 0 && i_dts > 0 &&
+                if( i_pts > 0 && i_dts > 0 && i_pts != i_dts &&
                     ( i_pts != i_dts || ( p_fmt->i_cat == VIDEO_ES &&
                       p_fmt->i_codec != VLC_CODEC_MPGV &&
                       p_fmt->i_codec != VLC_CODEC_MP2V &&
