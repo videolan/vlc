@@ -46,11 +46,6 @@ int webvtt_OpenEncoder( vlc_object_t *p_this )
 }
 
 
-void webvtt_CloseEncoder( vlc_object_t *p_this )
-{
-    (void)p_this;
-}
-
 static void WriteText( const char *psz, bo_t *box, char *c_last )
 {
     /* We need to break any double newline sequence

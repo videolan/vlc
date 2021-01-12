@@ -63,7 +63,7 @@ vlc_module_begin ()
         set_description( "WEBVTT text encoder" )
         set_capability( "encoder", 101 )
         set_subcategory( SUBCAT_INPUT_SCODEC )
-        set_callbacks( webvtt_OpenEncoder, webvtt_CloseEncoder )
+        set_callback( webvtt_OpenEncoder )
 #endif
 vlc_module_end ()
 
