@@ -35,6 +35,7 @@
 #include <assert.h>
 
 #include "pes.h"
+#include "repack.h"
 #include "bits.h"
 
 #include "../../demux/mpeg/timestamps.h"
@@ -344,44 +345,16 @@ void EStoPES ( block_t **pp_pes,
         i_max_pes_size = PES_PAYLOAD_SIZE_MAX;
     }
 
-    if( ( p_fmt->i_codec == VLC_CODEC_MP4V ||
-          p_fmt->i_codec == VLC_CODEC_H264 ||
-          p_fmt->i_codec == VLC_CODEC_HEVC) &&
-        p_es->i_flags & BLOCK_FLAG_TYPE_I )
-    {
-        /* For MPEG4 video, add VOL before I-frames,
-           for H264 add SPS/PPS before keyframes*/
-        p_es = block_Realloc( p_es, p_fmt->i_extra, p_es->i_buffer );
-
-        memcpy( p_es->p_buffer, p_fmt->p_extra, p_fmt->i_extra );
-    }
-
-    if( p_fmt->i_codec == VLC_CODEC_H264 )
-    {
-        unsigned offset=2;
-        while(offset < p_es->i_buffer )
-        {
-            if( p_es->p_buffer[offset-2] == 0 &&
-                p_es->p_buffer[offset-1] == 0 &&
-                p_es->p_buffer[offset] == 1 )
-                break;
-            offset++;
-        }
-        offset++;
-        if( offset+4 <= p_es->i_buffer &&
-            ((p_es->p_buffer[offset] & 0x1f) != 9) ) /* Not AUD */
-        {
-            /* Make similar AUD as libavformat does */
-            p_es = block_Realloc( p_es, 6, p_es->i_buffer );
-            p_es->p_buffer[0] = 0x00;
-            p_es->p_buffer[1] = 0x00;
-            p_es->p_buffer[2] = 0x00;
-            p_es->p_buffer[3] = 0x01;
-            p_es->p_buffer[4] = 0x09; /* FIXME: primary_pic_type from SPS/PPS */
-            p_es->p_buffer[5] = 0xf0;
-        }
-
-    }
+    /* AUD Fixing
+     * For MPEG4 video, add VOL before I-frames,
+     * for H264/HEVC add xPS before keyframes */
+    p_es = PES_Repack( p_fmt->i_codec,
+                       (const uint8_t *) p_fmt->p_extra,
+                       (p_es->i_flags & BLOCK_FLAG_TYPE_I) ? p_fmt->i_extra : 0,
+                       pp_pes );
+    assert(*pp_pes == p_es);
+    if( !p_es )
+        return;
 
     int64_t i_dts = 0;
     int64_t i_pts = 0;

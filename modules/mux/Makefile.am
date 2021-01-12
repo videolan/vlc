@@ -18,6 +18,7 @@ libmux_mp4_plugin_la_SOURCES += $(extradata_builder_SOURCES)
 libmux_mpjpeg_plugin_la_SOURCES = mux/mpjpeg.c
 libmux_ps_plugin_la_SOURCES = \
 	mux/mpeg/pes.c mux/mpeg/pes.h \
+	mux/mpeg/repack.c mux/mpeg/repack.h \
 	mux/mpeg/ps.c mux/mpeg/bits.h \
 	demux/mpeg/timestamps.h
 libmux_wav_plugin_la_SOURCES = mux/wav.c
@@ -40,6 +41,7 @@ mux_LTLIBRARIES += $(LTLIBmux_ogg)
 
 libmux_ts_plugin_la_SOURCES = \
 	mux/mpeg/pes.c mux/mpeg/pes.h \
+	mux/mpeg/repack.c mux/mpeg/repack.h \
 	mux/mpeg/csa.c mux/mpeg/csa.h \
 	mux/mpeg/streams.h \
 	mux/mpeg/tables.c mux/mpeg/tables.h \
