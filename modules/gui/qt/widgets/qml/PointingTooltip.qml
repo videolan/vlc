@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
+import QtQuick.Controls 2.4
 import QtGraphicalEffects 1.0
 
 import "qrc:///style/"
@@ -132,7 +133,7 @@ Item {
             color: colors.glowColor
         }
 
-        Text {
+        Label {
             anchors.fill: parent
             text: timeMetrics.text
             color: colors.text
