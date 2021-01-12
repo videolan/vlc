@@ -482,7 +482,7 @@ DQ
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="166">
-                                            <rect key="frame" x="6" y="269" width="52" height="18"/>
+                                            <rect key="frame" x="8" y="270" width="51" height="16"/>
                                             <buttonCell key="cell" type="check" title="Video" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="167">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -492,7 +492,7 @@ DQ
                                             </connections>
                                         </button>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="168">
-                                            <rect key="frame" x="15" y="249" width="152" height="18"/>
+                                            <rect key="frame" x="17" y="248" width="151" height="16"/>
                                             <buttonCell key="cell" type="check" title="Keep original video track" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="169">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -502,13 +502,13 @@ DQ
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="523">
-                                            <rect key="frame" x="6" y="11" width="500" height="248"/>
+                                            <rect key="frame" x="6" y="10" width="500" height="248"/>
                                             <view key="contentView" id="obk-BV-A6E">
                                                 <rect key="frame" x="1" y="1" width="498" height="232"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="170">
-                                                        <rect key="frame" x="15" y="206" width="38" height="14"/>
+                                                        <rect key="frame" x="15" y="205" width="38" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Codec" id="171">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -516,7 +516,7 @@ DQ
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="178">
-                                                        <rect key="frame" x="15" y="180" width="39" height="14"/>
+                                                        <rect key="frame" x="15" y="181" width="39" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Bitrate" id="179">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -524,7 +524,7 @@ DQ
                                                         </textFieldCell>
                                                     </textField>
                                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="172">
-                                                        <rect key="frame" x="415" y="201" width="68" height="22"/>
+                                                        <rect key="frame" x="414" y="200" width="66" height="22"/>
                                                         <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="175" id="173">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
@@ -538,7 +538,7 @@ DQ
                                                         </popUpButtonCell>
                                                     </popUpButton>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="180">
-                                                        <rect key="frame" x="300" y="178" width="161" height="19"/>
+                                                        <rect key="frame" x="296" y="178" width="161" height="19"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="161" id="oJs-v2-sjN"/>
                                                         </constraints>
@@ -563,7 +563,7 @@ DQ
                                                         </connections>
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="184">
-                                                        <rect key="frame" x="467" y="176" width="15" height="22"/>
+                                                        <rect key="frame" x="463" y="176" width="15" height="22"/>
                                                         <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="100" maxValue="100000" id="185">
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </stepperCell>
@@ -580,7 +580,7 @@ DQ
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="187">
-                                                        <rect key="frame" x="300" y="149" width="161" height="19"/>
+                                                        <rect key="frame" x="296" y="149" width="161" height="19"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="190">
                                                             <numberFormatter key="formatter" formatterBehavior="10_0" positiveFormat="0" negativeFormat="-0" hasThousandSeparators="NO" thousandSeparator="." id="514">
                                                                 <real key="minimum" value="0.0"/>
@@ -599,7 +599,7 @@ DQ
                                                         </connections>
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="188">
-                                                        <rect key="frame" x="467" y="147" width="15" height="22"/>
+                                                        <rect key="frame" x="463" y="147" width="15" height="22"/>
                                                         <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="100" id="189">
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </stepperCell>
@@ -608,7 +608,7 @@ DQ
                                                         </connections>
                                                     </stepper>
                                                     <box autoresizesSubviews="NO" title="Resolution" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="206">
-                                                        <rect key="frame" x="52" y="10" width="394" height="133"/>
+                                                        <rect key="frame" x="50" y="10" width="394" height="133"/>
                                                         <view key="contentView" id="4gP-3n-rkP">
                                                             <rect key="frame" x="1" y="1" width="392" height="117"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -632,7 +632,7 @@ DQ
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="202">
-                                                                    <rect key="frame" x="240" y="90" width="33" height="14"/>
+                                                                    <rect key="frame" x="236" y="89" width="33" height="14"/>
                                                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Scale" id="205">
                                                                         <font key="font" metaFont="smallSystem"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -671,7 +671,7 @@ DQ
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="192">
-                                                                    <rect key="frame" x="16" y="14" width="360" height="28"/>
+                                                                    <rect key="frame" x="15" y="14" width="358" height="28"/>
                                                                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="center" title="You just need to fill one of the three following parameters, VLC will autodetect the other using the original aspect ratio" id="193">
                                                                         <font key="font" metaFont="smallSystem"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -679,7 +679,7 @@ DQ
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="287">
-                                                                    <rect key="frame" x="275" y="85" width="102" height="22"/>
+                                                                    <rect key="frame" x="270" y="84" width="104" height="22"/>
                                                                     <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="290" id="288">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="smallSystem"/>
@@ -757,8 +757,8 @@ DQ
                                         <constraint firstItem="168" firstAttribute="leading" secondItem="166" secondAttribute="leading" constant="9" id="Xar-cb-bXF"/>
                                         <constraint firstItem="523" firstAttribute="centerX" secondItem="136" secondAttribute="centerX" id="Yo3-0K-vTM"/>
                                         <constraint firstItem="166" firstAttribute="leading" secondItem="523" secondAttribute="leading" id="c0i-vf-zgB"/>
-                                        <constraint firstItem="166" firstAttribute="top" secondItem="136" secondAttribute="top" constant="4" id="fpd-Ei-LnS"/>
-                                        <constraint firstItem="523" firstAttribute="top" secondItem="136" secondAttribute="top" constant="29" id="rba-qX-eV7"/>
+                                        <constraint firstItem="166" firstAttribute="top" secondItem="136" secondAttribute="top" constant="3" id="fpd-Ei-LnS"/>
+                                        <constraint firstItem="523" firstAttribute="top" secondItem="136" secondAttribute="top" constant="30" id="rba-qX-eV7"/>
                                     </constraints>
                                 </view>
                             </tabViewItem>
@@ -768,7 +768,7 @@ DQ
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="207">
-                                            <rect key="frame" x="6" y="268" width="52" height="18"/>
+                                            <rect key="frame" x="8" y="270" width="51" height="16"/>
                                             <buttonCell key="cell" type="check" title="Audio" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="210">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -777,8 +777,8 @@ DQ
                                                 <action selector="audioSettingsChanged:" target="-2" id="638"/>
                                             </connections>
                                         </button>
-                                        <button misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="208">
-                                            <rect key="frame" x="15" y="248" width="153" height="18"/>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="208">
+                                            <rect key="frame" x="17" y="248" width="151" height="16"/>
                                             <buttonCell key="cell" type="check" title="Keep original audio track" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="209">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
@@ -794,7 +794,7 @@ DQ
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="211">
-                                                        <rect key="frame" x="15" y="102" width="38" height="14"/>
+                                                        <rect key="frame" x="15" y="101" width="38" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Codec" id="230">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -802,7 +802,7 @@ DQ
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="212">
-                                                        <rect key="frame" x="15" y="73" width="39" height="14"/>
+                                                        <rect key="frame" x="15" y="74" width="39" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Bitrate" id="229">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -810,7 +810,7 @@ DQ
                                                         </textFieldCell>
                                                     </textField>
                                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="213">
-                                                        <rect key="frame" x="415" y="97" width="68" height="22"/>
+                                                        <rect key="frame" x="414" y="96" width="66" height="22"/>
                                                         <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="228" id="224">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
@@ -824,7 +824,7 @@ DQ
                                                         </popUpButtonCell>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="233">
-                                                        <rect key="frame" x="297" y="10" width="186" height="22"/>
+                                                        <rect key="frame" x="292" y="11" width="188" height="22"/>
                                                         <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="236" id="234">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
@@ -838,7 +838,7 @@ DQ
                                                         </popUpButtonCell>
                                                     </popUpButton>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="214">
-                                                        <rect key="frame" x="300" y="71" width="161" height="19"/>
+                                                        <rect key="frame" x="296" y="71" width="161" height="19"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="161" id="l4O-68-sv0"/>
                                                         </constraints>
@@ -860,7 +860,7 @@ DQ
                                                         </connections>
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="215">
-                                                        <rect key="frame" x="467" y="69" width="15" height="22"/>
+                                                        <rect key="frame" x="463" y="69" width="15" height="22"/>
                                                         <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="8" maxValue="100000" id="222">
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </stepperCell>
@@ -869,7 +869,7 @@ DQ
                                                         </connections>
                                                     </stepper>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="216">
-                                                        <rect key="frame" x="15" y="44" width="53" height="14"/>
+                                                        <rect key="frame" x="15" y="45" width="53" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Channels" id="221">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -877,7 +877,7 @@ DQ
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="231">
-                                                        <rect key="frame" x="15" y="15" width="70" height="14"/>
+                                                        <rect key="frame" x="15" y="16" width="70" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Sample Rate" id="232">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -885,7 +885,7 @@ DQ
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="217">
-                                                        <rect key="frame" x="300" y="42" width="161" height="19"/>
+                                                        <rect key="frame" x="296" y="42" width="161" height="19"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="220">
                                                             <numberFormatter key="formatter" formatterBehavior="10_0" positiveFormat="0" negativeFormat="-0" hasThousandSeparators="NO" thousandSeparator="." id="516">
                                                                 <real key="minimum" value="0.0"/>
@@ -904,7 +904,7 @@ DQ
                                                         </connections>
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="218">
-                                                        <rect key="frame" x="467" y="40" width="15" height="22"/>
+                                                        <rect key="frame" x="463" y="40" width="15" height="22"/>
                                                         <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="14" id="219">
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </stepperCell>
@@ -1006,7 +1006,7 @@ DQ
                         </tabViewItems>
                     </tabView>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="156">
-                        <rect key="frame" x="469" y="12" width="75" height="32"/>
+                        <rect key="frame" x="476" y="12" width="69" height="32"/>
                         <buttonCell key="cell" type="push" title="Apply" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="159">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -1019,7 +1019,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="157">
-                        <rect key="frame" x="387" y="12" width="82" height="32"/>
+                        <rect key="frame" x="402" y="12" width="76" height="32"/>
                         <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="158">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -1032,7 +1032,7 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="294">
-                        <rect key="frame" x="14" y="12" width="169" height="32"/>
+                        <rect key="frame" x="13" y="12" width="163" height="32"/>
                         <buttonCell key="cell" type="push" title="Save as new Profile..." bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="295">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -1058,6 +1058,7 @@ Gw
                     <constraint firstItem="133" firstAttribute="leading" secondItem="132" secondAttribute="leading" constant="20" id="hzn-HL-hW8"/>
                 </constraints>
             </view>
+            <point key="canvasLocation" x="86" y="476"/>
         </window>
         <window title="Stream Panel" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="308" userLabel="Stream">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
@@ -1395,6 +1396,7 @@ Gw
             <connections>
                 <outlet property="initialFirstResponder" destination="311" id="386"/>
             </connections>
+            <point key="canvasLocation" x="86" y="144"/>
         </window>
         <customView id="387" userLabel="File Dest">
             <rect key="frame" x="0.0" y="0.0" width="531" height="72"/>
