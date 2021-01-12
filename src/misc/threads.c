@@ -157,10 +157,8 @@ bool vlc_mutex_held(const vlc_mutex_t *mtx)
 
 void vlc_mutex_lock(vlc_mutex_t *mtx)
 {
-    unsigned value;
-
     /* This is the Drepper (non-recursive) mutex algorithm
-     * from his "Futexes are tricky" paper. The mutex can value be:
+     * from his "Futexes are tricky" paper. The mutex value can be:
      * - 0: the mutex is free
      * - 1: the mutex is locked and uncontended
      * - 2: the mutex is contended (i.e., unlock needs to wake up a waiter)
@@ -170,8 +168,7 @@ void vlc_mutex_lock(vlc_mutex_t *mtx)
 
     int canc = vlc_savecancel(); /* locking is never a cancellation point */
 
-    while ((value = atomic_exchange_explicit(&mtx->value, 2,
-                                             memory_order_acquire)) != 0)
+    while (atomic_exchange_explicit(&mtx->value, 2, memory_order_acquire))
         vlc_atomic_wait(&mtx->value, 2);
 
     vlc_restorecancel(canc);
