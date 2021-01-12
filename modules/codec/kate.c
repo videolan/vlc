@@ -1164,7 +1164,6 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
         CreateKatePalette( fmt.p_palette, ev->palette );
 
         p_bitmap_region = subpicture_region_New( &fmt );
-        video_format_Clean( &fmt );
         if( !p_bitmap_region )
         {
             msg_Err( p_dec, "cannot allocate SPU region" );
