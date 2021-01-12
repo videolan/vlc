@@ -368,10 +368,10 @@ Widgets.NavigableFocusScope {
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: implicitHeight
-                    Layout.topMargin: VLCStyle.margin_normal
+                    Layout.topMargin: VLCStyle.margin_xxlarge
 
                     text: mainPlaylistController.currentItem.album
-                    font.weight: Font.Light
+                    font.pixelSize: VLCStyle.fontSize_xxlarge
                     horizontalAlignment: Text.AlignHCenter
                     color: rootPlayer.colors.playerFg
                     Accessible.description: i18n.qtr("album")
@@ -382,7 +382,7 @@ Widgets.NavigableFocusScope {
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: implicitHeight
-                    Layout.topMargin: VLCStyle.margin_xxsmall
+                    Layout.topMargin: VLCStyle.margin_small
 
                     text: mainPlaylistController.currentItem.artist
                     font.weight: Font.Light
@@ -396,17 +396,18 @@ Widgets.NavigableFocusScope {
 
                     Layout.preferredHeight: implicitHeight
                     Layout.preferredWidth: implicitWidth
-                    Layout.topMargin: VLCStyle.margin_xsmall
+                    Layout.topMargin: VLCStyle.margin_large
                     Layout.alignment: Qt.AlignHCenter
                     visible: player.videoTracks.count === 0
                     focus: visible
+                    spacing: VLCStyle.margin_xxsmall
                     navigationParent: rootPlayer
                     KeyNavigation.up: topcontrolView
                     KeyNavigation.down: controlBarView
 
                     model: ObjectModel {
                         Widgets.IconToolButton {
-                            size: VLCStyle.icon_medium
+                            size: VLCIcons.pixelSize(VLCStyle.icon_large)
                             iconText: VLCIcons.skip_back
                             onClicked: player.jumpBwd()
                             text: i18n.qtr("Step back")
@@ -414,7 +415,7 @@ Widgets.NavigableFocusScope {
                         }
 
                         Widgets.IconToolButton {
-                            size: VLCStyle.icon_medium
+                            size: VLCIcons.pixelSize(VLCStyle.icon_large)
                             iconText: VLCIcons.visualization
                             onClicked: player.toggleVisualization()
                             text: i18n.qtr("Visualization")
@@ -422,7 +423,7 @@ Widgets.NavigableFocusScope {
                         }
 
                         Widgets.IconToolButton{
-                            size: VLCStyle.icon_medium
+                            size: VLCIcons.pixelSize(VLCStyle.icon_large)
                             iconText: VLCIcons.skip_for
                             onClicked: player.jumpFwd()
                             text: i18n.qtr("Step forward")
