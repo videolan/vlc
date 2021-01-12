@@ -816,8 +816,6 @@ static int  Open ( vlc_object_t *p_this )
 
     fullrange = var_GetBool( p_enc, SOUT_CFG_PREFIX "fullrange" );
     fullrange |= p_enc->fmt_in.video.color_range == COLOR_RANGE_FULL;
-    p_enc->fmt_in.i_codec = fullrange ? VLC_CODEC_J420 : VLC_CODEC_I420;
-    p_sys->i_colorspace = X264_CSP_I420;
     char *psz_profile = var_GetString( p_enc, SOUT_CFG_PREFIX "profile" );
 # ifdef MODULE_NAME_IS_x26410b
     const int mask = X264_CSP_HIGH_DEPTH;
@@ -842,23 +840,29 @@ static int  Open ( vlc_object_t *p_this )
             p_enc->fmt_in.i_codec = mask ? VLC_CODEC_I444_10L : fullrange ? VLC_CODEC_J444 : VLC_CODEC_I444;
             p_sys->i_colorspace = X264_CSP_I444 | mask;
         }
-# ifdef MODULE_NAME_IS_x26410b
         else
         {
+# ifdef MODULE_NAME_IS_x26410b
             msg_Err( p_enc, "Only high-profiles and 10-bit are supported");
             free( psz_profile );
             return VLC_EGENERIC;
-        }
+# else // !MODULE_NAME_IS_x26410b
+            p_enc->fmt_in.i_codec = fullrange ? VLC_CODEC_J420 : VLC_CODEC_I420;
+            p_sys->i_colorspace = X264_CSP_I420;
 # endif
+        }
+        free( psz_profile );
     }
-# ifdef MODULE_NAME_IS_x26410b
     else
     {
+# ifdef MODULE_NAME_IS_x26410b
         msg_Err( p_enc, "Only high-profiles and 10-bit are supported");
         return VLC_EGENERIC;
-    }
+# else // !MODULE_NAME_IS_x26410b
+        p_enc->fmt_in.i_codec = fullrange ? VLC_CODEC_J420 : VLC_CODEC_I420;
+        p_sys->i_colorspace = X264_CSP_I420;
 # endif
-    free( psz_profile );
+    }
 
     p_enc->pf_encode_video = Encode;
     p_enc->pf_encode_audio = NULL;
