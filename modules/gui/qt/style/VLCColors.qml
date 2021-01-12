@@ -81,10 +81,10 @@ Item {
     property color volhigh: "#ffc70f"
     property color volmax: "#f5271d"
 
-    property color playerFg: "white"
-    property color playerFgInactive: "#888888"
-    property color playerBg: "black"
-    property color playerBorder: "#222222"
+    property color playerFg: text
+    property color playerFgInactive: textInactive
+    property color playerBg: bg
+    property color playerBorder: buttonText
 
     property color separator: blendColors(bg, text, .95)
     
