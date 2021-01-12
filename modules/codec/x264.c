@@ -804,7 +804,7 @@ static int  Open ( vlc_object_t *p_this )
 
     config_ChainParse( p_enc, SOUT_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg );
 
-    p_enc->fmt_out.i_cat = VIDEO_ES;
+    assert(p_enc->fmt_out.i_cat == VIDEO_ES);
 #ifdef MODULE_NAME_IS_x262
     p_enc->fmt_out.i_codec = VLC_CODEC_MP2V;
 #else
