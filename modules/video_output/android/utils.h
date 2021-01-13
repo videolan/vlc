@@ -131,7 +131,7 @@ JNIEnv *android_getEnv(vlc_object_t *p_obj, const char *psz_thread_name);
  * \return a valid AWindowHandler * or NULL. It must be released with
  * AWindowHandler_destroy.
  */
-AWindowHandler *AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events);
+AWindowHandler *AWindowHandler_new(vlc_object_t *obj, vout_window_t *wnd, awh_events_t *p_events);
 void AWindowHandler_destroy(AWindowHandler *p_awh);
 
 /**

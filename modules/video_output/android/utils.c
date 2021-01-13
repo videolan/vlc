@@ -809,35 +809,35 @@ AWindowHandler_getEnv(AWindowHandler *p_awh)
 }
 
 AWindowHandler *
-AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events)
+AWindowHandler_new(vlc_object_t *obj, vout_window_t *wnd, awh_events_t *p_events)
 {
 #define AWINDOW_REGISTER_FLAGS_SUCCESS 0x1
 #define AWINDOW_REGISTER_FLAGS_HAS_VIDEO_LAYOUT_LISTENER 0x2
 
     AWindowHandler *p_awh;
     JNIEnv *p_env;
-    JavaVM *p_jvm = var_InheritAddress(wnd, "android-jvm");
-    jobject jobj = var_InheritAddress(wnd, "drawable-androidwindow");
+    JavaVM *p_jvm = var_InheritAddress(obj, "android-jvm");
+    jobject jobj = var_InheritAddress(obj, "drawable-androidwindow");
 
     if (!p_jvm || !jobj)
     {
-        msg_Err(wnd, "libvlc_media_player options not set");
+        msg_Err(obj, "libvlc_media_player options not set");
         return NULL;
     }
 
     p_env = android_getEnvCommon(NULL, p_jvm, "AWindowHandler");
     if (!p_env)
     {
-        msg_Err(wnd, "can't get JNIEnv");
+        msg_Err(obj, "can't get JNIEnv");
         return NULL;
     }
 
-    if (InitJNIFields(p_env, VLC_OBJECT(wnd), jobj) != VLC_SUCCESS)
+    if (InitJNIFields(p_env, obj, jobj) != VLC_SUCCESS)
     {
-        msg_Err(wnd, "InitJNIFields failed");
+        msg_Err(obj, "InitJNIFields failed");
         return NULL;
     }
-    msg_Dbg(wnd, "InitJNIFields success");
+    msg_Dbg(obj, "InitJNIFields success");
 
     p_awh = calloc(1, sizeof(AWindowHandler));
     if (!p_awh)
@@ -847,7 +847,8 @@ AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events)
     p_awh->jobj = (*p_env)->NewGlobalRef(p_env, jobj);
 
     p_awh->wnd = wnd;
-    p_awh->event.cb = *p_events;
+    if (p_events)
+        p_awh->event.cb = *p_events;
 
     jfloatArray jarray = (*p_env)->NewFloatArray(p_env, 16);
     if ((*p_env)->ExceptionCheck(p_env))
@@ -860,22 +861,27 @@ AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events)
     (*p_env)->DeleteLocalRef(p_env, jarray);
     p_awh->stex.jtransform_mtx = NULL;
 
-    const jint flags = JNI_ANWCALL(CallIntMethod, registerNative,
-                                   (jlong)(intptr_t)p_awh);
-    if ((flags & AWINDOW_REGISTER_FLAGS_SUCCESS) == 0)
+    /* If we don't have window, don't register window handler. */
+    jint flags = 0;
+    if (p_events != NULL && wnd != NULL)
     {
-        msg_Err(wnd, "AWindow already registered");
-        (*p_env)->DeleteGlobalRef(p_env, p_awh->jobj);
-        (*p_env)->DeleteGlobalRef(p_env, p_awh->stex.jtransform_mtx_array);
-        free(p_awh);
-        return NULL;
+        flags = JNI_ANWCALL(CallIntMethod, registerNative,
+                                       (jlong)(intptr_t)p_awh);
+        if ((flags & AWINDOW_REGISTER_FLAGS_SUCCESS) == 0)
+        {
+            msg_Err(obj, "AWindow already registered");
+            (*p_env)->DeleteGlobalRef(p_env, p_awh->jobj);
+            (*p_env)->DeleteGlobalRef(p_env, p_awh->stex.jtransform_mtx_array);
+            free(p_awh);
+            return NULL;
+        }
     }
     LoadNativeWindowAPI(p_awh);
 
     p_awh->b_has_video_layout_listener =
-        flags & AWINDOW_REGISTER_FLAGS_HAS_VIDEO_LAYOUT_LISTENER;
+        wnd && flags & AWINDOW_REGISTER_FLAGS_HAS_VIDEO_LAYOUT_LISTENER;
 
-    if (p_awh->b_has_video_layout_listener)
+    if (p_awh->b_has_video_layout_listener && p_events != NULL)
     {
         /* XXX: HACK: force mediacodec to setup an OpenGL surface when the vout
          * is forced to gles2. Indeed, setting b_has_video_layout_listener to

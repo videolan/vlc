@@ -90,7 +90,7 @@ static const struct vout_window_operations ops = {
  */
 static int Open(vout_window_t *wnd)
 {
-    AWindowHandler *p_awh = AWindowHandler_new(wnd,
+    AWindowHandler *p_awh = AWindowHandler_new(VLC_OBJECT(wnd), wnd,
         &(awh_events_t) { OnNewWindowSize, OnNewMouseCoords });
     if (p_awh == NULL)
         return VLC_EGENERIC;
@@ -114,8 +114,11 @@ static void Close(vout_window_t *wnd)
 static int
 OpenDecDevice(vlc_decoder_device *device, vout_window_t *window)
 {
-    if (!window || window->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
-        return VLC_EGENERIC;
+    AWindowHandler *awh;
+    if (window && window->type == VOUT_WINDOW_TYPE_ANDROID_NATIVE)
+        awh = window->handle.anativewindow;
+    else
+        awh = AWindowHandler_new(VLC_OBJECT(device), NULL, NULL);
 
     static const struct vlc_decoder_device_operations ops = 
     {
@@ -123,7 +126,7 @@ OpenDecDevice(vlc_decoder_device *device, vout_window_t *window)
     };
     device->ops = &ops;
     device->type = VLC_DECODER_DEVICE_AWINDOW;
-    device->opaque = window->handle.anativewindow;
+    device->opaque = awh;
 
     return VLC_SUCCESS;
 }
