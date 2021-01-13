@@ -683,6 +683,8 @@ CreateVideoContext(decoder_t *p_dec)
             goto error;
         p_sys->video.p_surface = p_sys->video.surfacetexture->window;
         p_sys->video.p_jsurface = p_sys->video.surfacetexture->jsurface;
+        assert(p_sys->video.p_surface);
+        assert(p_sys->video.p_jsurface);
     }
 
     static const struct vlc_video_context_operations ops =
