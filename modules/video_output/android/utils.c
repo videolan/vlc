@@ -965,7 +965,7 @@ static struct vlc_asurfacetexture_priv* CreateSurfaceTexture(
     if (jfields.SurfaceTexture.init_z == NULL)
         goto init_iz;
 
-    msg_Info(p_awh->wnd, "Using SurfaceTexture constructor init_z");
+    msg_Dbg(p_awh->wnd, "Using SurfaceTexture constructor init_z");
 
     /* We can create a SurfaceTexture in detached mode directly */
     surfacetexture = (*p_env)->NewObject(p_env,
@@ -977,7 +977,7 @@ static struct vlc_asurfacetexture_priv* CreateSurfaceTexture(
     goto success;
 
 init_iz:
-    msg_Info(p_awh->wnd, "Initializing OpenGL context to create SurfaceTexture");
+    msg_Dbg(p_awh->wnd, "Initializing OpenGL context to create SurfaceTexture");
     /* Old Android APIs are constructing SurfaceTexture in an attached state
      * so we need a dummy context before detaching it, for any other
      * constructor than the previous one. That's crap.
@@ -1037,7 +1037,7 @@ init_iz:
     if (jfields.SurfaceTexture.init_iz == NULL)
         goto init_i;
 
-    msg_Info(p_awh->wnd, "Using SurfaceTexture constructor init_iz");
+    msg_Dbg(p_awh->wnd, "Using SurfaceTexture constructor init_iz");
     surfacetexture = (*p_env)->NewObject(p_env,
       jfields.SurfaceTexture.clazz, jfields.SurfaceTexture.init_iz, texture, false);
 
@@ -1049,7 +1049,7 @@ init_iz:
 init_i:
     /* We can't get here without this constructor being loaded. */
     assert(jfields.SurfaceTexture.init_i != NULL);
-    msg_Info(p_awh->wnd, "Using SurfaceTexture constructor init_i");
+    msg_Dbg(p_awh->wnd, "Using SurfaceTexture constructor init_i");
 
     surfacetexture = (*p_env)->NewObject(p_env,
       jfields.SurfaceTexture.clazz, jfields.SurfaceTexture.init_i, texture);
@@ -1060,7 +1060,6 @@ init_i:
     /* fall-through success */
 success:
 
-    msg_Info(p_awh->wnd, "Adding reference to surfacetexture");
     handle->jtexture = (*p_env)->NewGlobalRef(p_env, surfacetexture);
     (*p_env)->DeleteLocalRef(p_env, surfacetexture);
 
@@ -1069,7 +1068,7 @@ success:
 
     if (p_awh->b_has_ndk_ast_api)
     {
-        msg_Info(p_awh->wnd, "Using NDK API to init SurfaceTextureHandle");
+        msg_Dbg(p_awh->wnd, "Using NDK API to init vlc_asurfacetexture");
         handle->texture = p_awh->ndk_ast_api.pf_astFromst(p_env, handle->jtexture);
         handle->surface.ops = &NDKSurfaceAPI;
         handle->surface.window = p_awh->ndk_ast_api.pf_acquireAnw(handle->texture);
@@ -1085,7 +1084,7 @@ success:
     }
     else
     {
-        msg_Info(p_awh->wnd, "Using JNI API to init SurfaceTextureHandle");
+        msg_Dbg(p_awh->wnd, "Using JNI API to init vlc_asurfacetexture");
         handle->texture = NULL;
         /* Create Surface(SurfaceTexture), ie. producer side of the buffer
          * queue in Android. */
@@ -1103,7 +1102,7 @@ success:
         handle->surface.ops = &JNISurfaceAPI;
     }
 
-    msg_Info(p_awh->wnd, "Successfully initialized SurfaceTexture");
+    msg_Dbg(p_awh->wnd, "Successfully initialized SurfaceTexture");
 
     if (display != EGL_NO_DISPLAY)
     {
