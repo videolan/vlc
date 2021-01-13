@@ -437,6 +437,8 @@ static int Open(vlc_object_t *this)
 
     enc->p_sys = sys;
 
+    vlc_list_init(&sys->packets);
+
     config_ChainParse(enc, SOUT_CFG_PREFIX, sout_options, enc->p_cfg);
 
     /* Checking if we are on software and are allowing it */
@@ -603,7 +605,6 @@ static int Open(vlc_object_t *this)
     enc->fmt_out.i_extra = i_extra;
 
     sys->async_depth = sys->params.AsyncDepth;
-    vlc_list_init(&sys->packets);
 
     /* Vlc module configuration */
     enc->fmt_in.i_codec                = VLC_CODEC_NV12; // Intel Media SDK requirement
