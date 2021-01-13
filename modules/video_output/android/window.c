@@ -120,7 +120,7 @@ OpenDecDevice(vlc_decoder_device *device, vout_window_t *window)
     else
         awh = AWindowHandler_new(VLC_OBJECT(device), NULL, NULL);
 
-    static const struct vlc_decoder_device_operations ops = 
+    static const struct vlc_decoder_device_operations ops =
     {
         .close = NULL,
     };
