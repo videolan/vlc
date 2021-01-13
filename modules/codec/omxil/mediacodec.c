@@ -663,16 +663,7 @@ CreateVideoContext(decoder_t *p_dec)
      || !AWindowHandler_canSetVideoLayout(awh)
      || !has_subtitle_surface;
 
-    if (use_surfacetexture)
-    {
-        p_sys->video.surfacetexture = vlc_asurfacetexture_New(awh, false);
-        assert(p_sys->video.surfacetexture);
-        if (p_sys->video.surfacetexture == NULL)
-            goto error;
-        p_sys->video.p_surface = p_sys->video.surfacetexture->window;
-        p_sys->video.p_jsurface = p_sys->video.surfacetexture->jsurface;
-    }
-    else
+    if (!use_surfacetexture)
     {
         p_sys->video.p_surface = AWindowHandler_getANativeWindow(awh, AWindow_Video);
         p_sys->video.p_jsurface = AWindowHandler_getSurface(awh, AWindow_Video);
@@ -682,6 +673,16 @@ CreateVideoContext(decoder_t *p_dec)
             msg_Err(p_dec, "Could not find a valid ANativeWindow");
             goto error;
         }
+    }
+
+    if (use_surfacetexture || p_sys->video.p_surface == NULL)
+    {
+        p_sys->video.surfacetexture = vlc_asurfacetexture_New(awh, false);
+        assert(p_sys->video.surfacetexture);
+        if (p_sys->video.surfacetexture == NULL)
+            goto error;
+        p_sys->video.p_surface = p_sys->video.surfacetexture->window;
+        p_sys->video.p_jsurface = p_sys->video.surfacetexture->jsurface;
     }
 
     static const struct vlc_video_context_operations ops =
