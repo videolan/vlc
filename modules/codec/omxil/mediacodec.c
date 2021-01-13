@@ -665,7 +665,7 @@ CreateVideoContext(decoder_t *p_dec)
 
     if (use_surfacetexture)
     {
-        p_sys->video.surfacetexture = vlc_asurfacetexture_New(awh);
+        p_sys->video.surfacetexture = vlc_asurfacetexture_New(awh, false);
         assert(p_sys->video.surfacetexture);
         if (p_sys->video.surfacetexture == NULL)
             goto error;

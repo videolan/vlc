@@ -203,7 +203,7 @@ SurfaceTexture_detachFromGLContext(struct vlc_asurfacetexture *st);
  * See Android SurfaceTexture
  */
 struct vlc_asurfacetexture *
-vlc_asurfacetexture_New(AWindowHandler *p_awh);
+vlc_asurfacetexture_New(AWindowHandler *p_awh, bool single_buffer);
 
 /**
  * Delete a SurfaceTexture object created with SurfaceTexture_New.

@@ -959,7 +959,7 @@ AWindowHandler_getANativeWindowAPI(AWindowHandler *p_awh)
 }
 
 static struct vlc_asurfacetexture_priv* CreateSurfaceTexture(
-        AWindowHandler *p_awh, JNIEnv *p_env)
+        AWindowHandler *p_awh, JNIEnv *p_env, bool single_buffer)
 {
     /* Needed in case of old API, see comments below. */
     EGLDisplay display = EGL_NO_DISPLAY;
@@ -990,7 +990,7 @@ static struct vlc_asurfacetexture_priv* CreateSurfaceTexture(
 
     /* We can create a SurfaceTexture in detached mode directly */
     surfacetexture = (*p_env)->NewObject(p_env,
-      p_awh->jfields.SurfaceTexture.clazz, p_awh->jfields.SurfaceTexture.init_z, false);
+      p_awh->jfields.SurfaceTexture.clazz, p_awh->jfields.SurfaceTexture.init_z, single_buffer);
 
     if (surfacetexture == NULL)
         goto error;
@@ -1060,7 +1060,7 @@ init_iz:
 
     msg_Dbg(p_awh->wnd, "Using SurfaceTexture constructor init_iz");
     surfacetexture = (*p_env)->NewObject(p_env,
-      p_awh->jfields.SurfaceTexture.clazz, p_awh->jfields.SurfaceTexture.init_iz, texture, false);
+      p_awh->jfields.SurfaceTexture.clazz, p_awh->jfields.SurfaceTexture.init_iz, texture, single_buffer);
 
     if (surfacetexture == NULL)
         goto error;
@@ -1071,6 +1071,9 @@ init_i:
     /* We can't get here without this constructor being loaded. */
     assert(p_awh->jfields.SurfaceTexture.init_i != NULL);
     msg_Dbg(p_awh->wnd, "Using SurfaceTexture constructor init_i");
+
+    if (single_buffer)
+        goto error;
 
     surfacetexture = (*p_env)->NewObject(p_env,
       p_awh->jfields.SurfaceTexture.clazz, p_awh->jfields.SurfaceTexture.init_i, texture);
@@ -1168,11 +1171,11 @@ error:
 }
 
 struct vlc_asurfacetexture *
-vlc_asurfacetexture_New(AWindowHandler *p_awh)
+vlc_asurfacetexture_New(AWindowHandler *p_awh, bool single_buffer)
 {
     JNIEnv *p_env = android_getEnvCommon(NULL, p_awh->p_jvm, "SurfaceTexture");
     struct vlc_asurfacetexture_priv *surfacetexture =
-        CreateSurfaceTexture(p_awh, p_env);
+        CreateSurfaceTexture(p_awh, p_env, single_buffer);
     if (surfacetexture == NULL)
         return NULL;
     return &surfacetexture->surface;
