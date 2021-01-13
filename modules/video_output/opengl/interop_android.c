@@ -34,10 +34,10 @@
 
 struct priv
 {
-    android_video_context_t *avctx;
     const float *transform_mtx;
     bool stex_attached;
     struct vlc_asurfacetexture *previous_texture;
+    picture_t *current_picture;
 };
 
 static int
@@ -48,48 +48,43 @@ tc_anop_allocate_textures(const struct vlc_gl_interop *interop, GLuint *textures
     struct priv *priv = interop->priv;
     assert(textures[0] != 0);
 
-    if (priv->avctx->texture)
-    {
-        if (SurfaceTexture_attachToGLContext(priv->avctx->texture, textures[0]) != 0)
-        {
-            msg_Err(interop->gl, "SurfaceTexture_attachToGLContext failed");
-            return VLC_EGENERIC;
-        }
-        priv->stex_attached = true;
-        priv->previous_texture = priv->avctx->texture;
-    }
     return VLC_SUCCESS;
 }
 
 static int
-tc_anop_update(const struct vlc_gl_interop *interop, GLuint *textures,
+tc_anop_update(struct vlc_gl_interop *interop, GLuint *textures,
                const GLsizei *tex_width, const GLsizei *tex_height,
                picture_t *pic, const size_t *plane_offset)
 {
+    struct priv *priv = interop->priv;
+
     (void) tex_width; (void) tex_height; (void) plane_offset;
     assert(pic->context);
     assert(textures[0] != 0);
 
+    if (priv->current_picture)
+        picture_Release(priv->current_picture);
+    priv->current_picture = picture_Hold(pic);
+
+    struct vlc_video_context *vctx = pic->context->vctx;
+    android_video_context_t *avctx =
+        vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_AWINDOW);
+    if (avctx == NULL)
+        return VLC_EGENERIC;
+
     if (plane_offset != NULL)
         return VLC_EGENERIC;
 
-    struct priv *priv = interop->priv;
-
-    assert(priv->avctx);
-    assert(priv->avctx->get_texture);
-    assert(pic->context);
-    struct vlc_android_surfacetexture *texture =
-        priv->avctx->get_texture(pic->context);
-
-    assert(texture);
+    struct vlc_asurfacetexture *texture =
+        avctx->get_texture(pic->context);
 
     struct vlc_asurfacetexture *previous_texture = priv->previous_texture;
 
     if (previous_texture != texture)
     {
-        if (priv->previous_texture != NULL)
+        if (previous_texture != NULL)
         {
-            SurfaceTexture_detachFromGLContext(priv->previous_texture);
+            SurfaceTexture_detachFromGLContext(previous_texture);
             /* SurfaceTexture_detachFromGLContext will destroy the previous
              * texture name, so we need to regenerate it. */
             interop->api->vt.GenTextures(1, &textures[0]);
@@ -102,7 +97,7 @@ tc_anop_update(const struct vlc_gl_interop *interop, GLuint *textures,
         priv->previous_texture = texture;
     }
 
-    if (!priv->avctx->render(pic->context))
+    if (!avctx->render(pic->context))
         return VLC_SUCCESS; /* already rendered */
 
     /* Release previous image */
@@ -134,8 +129,11 @@ Close(struct vlc_gl_interop *interop)
 {
     struct priv *priv = interop->priv;
 
-    if (priv->stex_attached)
-        SurfaceTexture_detachFromGLContext(priv->avctx->texture);
+    if (priv->previous_texture)
+        SurfaceTexture_detachFromGLContext(priv->previous_texture);
+
+    if (priv->current_picture)
+        picture_Release(priv->current_picture);
 
     free(priv);
 }
@@ -161,7 +159,7 @@ Open(vlc_object_t *obj)
     android_video_context_t *avctx =
         vlc_video_context_GetPrivate(interop->vctx, VLC_VIDEO_CONTEXT_AWINDOW);
 
-    if (avctx == NULL || avctx->texture == NULL)
+    if (avctx == NULL || (avctx->texture == NULL && avctx->get_texture == NULL))
         return VLC_EGENERIC;
 
     interop->priv = malloc(sizeof(struct priv));
@@ -169,8 +167,8 @@ Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     struct priv *priv = interop->priv;
-    priv->avctx = avctx;
     priv->transform_mtx = NULL;
+    priv->current_picture = NULL;
     priv->previous_texture = NULL;
     priv->stex_attached = false;
 
