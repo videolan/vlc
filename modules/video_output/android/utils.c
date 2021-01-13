@@ -84,7 +84,7 @@ struct ASurfaceTextureAPI
     ptr_ANativeWindow_toSurface pf_anwToSurface;
 };
 
-static struct
+struct vlc_android_jfields
 {
     struct {
         jclass clazz;
@@ -109,13 +109,15 @@ static struct
         jclass clazz;
         jmethodID init_st;
     } Surface;
-} jfields;
+};
 
 struct AWindowHandler
 {
     JavaVM *p_jvm;
     jobject jobj;
     vout_window_t *wnd;
+
+    struct vlc_android_jfields jfields;
 
     struct {
         jobject jsurface;
@@ -142,11 +144,11 @@ struct AWindowHandler
 };
 
 #define JNI_CALL(what, obj, method, ...) \
-    (*p_env)->what(p_env, obj, jfields.method, ##__VA_ARGS__)
+    (*p_env)->what(p_env, obj, p_awh->jfields.method, ##__VA_ARGS__)
 #define JNI_ANWCALL(what, method, ...) \
-    (*p_env)->what(p_env, p_awh->jobj, jfields.AWindow.method, ##__VA_ARGS__)
+    (*p_env)->what(p_env, p_awh->jobj, p_awh->jfields.AWindow.method, ##__VA_ARGS__)
 #define JNI_STEXCALL(what, method, ...) \
-    (*p_env)->what(p_env, p_awh->jobj, jfields.AWindow.method, ##__VA_ARGS__)
+    (*p_env)->what(p_env, p_awh->jobj, p_awh->jfields.AWindow.method, ##__VA_ARGS__)
 
 /*
  * Andoid JNIEnv helper
@@ -484,7 +486,7 @@ JNISurfaceTexture_attachToGLContext(
         return VLC_EGENERIC;
 
     (*p_env)->CallVoidMethod(p_env, handle->jtexture,
-                             jfields.SurfaceTexture.attachToGLContext,
+                             handle->awh->jfields.SurfaceTexture.attachToGLContext,
                              tex_name);
 
     return VLC_SUCCESS;
@@ -503,7 +505,7 @@ JNISurfaceTexture_detachFromGLContext(
         return;
 
     (*p_env)->CallVoidMethod(p_env, handle->jtexture,
-                             jfields.SurfaceTexture.detachFromGLContext);
+                             handle->awh->jfields.SurfaceTexture.detachFromGLContext);
 
     if (handle->awh->stex.jtransform_mtx != NULL)
     {
@@ -533,10 +535,10 @@ JNISurfaceTexture_updateTexImage(
                                             JNI_ABORT);
 
     (*p_env)->CallVoidMethod(p_env, handle->jtexture,
-                             jfields.SurfaceTexture.updateTexImage);
+                             handle->awh->jfields.SurfaceTexture.updateTexImage);
 
     (*p_env)->CallVoidMethod(p_env, handle->jtexture,
-                             jfields.SurfaceTexture.getTransformMatrix,
+                             handle->awh->jfields.SurfaceTexture.getTransformMatrix,
                              handle->awh->stex.jtransform_mtx_array);
     handle->awh->stex.jtransform_mtx = (*p_env)->GetFloatArrayElements(p_env,
                                         handle->awh->stex.jtransform_mtx_array, NULL);
@@ -552,13 +554,12 @@ JNISurfaceTexture_releaseTexImage(
     struct vlc_asurfacetexture_priv *handle =
         container_of(surface, struct vlc_asurfacetexture_priv, surface);
 
-    AWindowHandler *p_awh = handle->awh;
     JNIEnv *p_env = android_getEnvCommon(NULL, handle->awh->p_jvm, "SurfaceTexture");
     if (!p_env)
         return;
 
     (*p_env)->CallVoidMethod(p_env, handle->jtexture,
-                             jfields.SurfaceTexture.releaseTexImage);
+                             handle->awh->jfields.SurfaceTexture.releaseTexImage);
 }
 
 static void JNISurfaceTexture_destroy(
@@ -673,10 +674,10 @@ const JNINativeMethod jni_callbacks[] = {
 };
 
 static int
-InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
+InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj, AWindowHandler *awh)
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
-    static int i_init_state = -1;
+    int i_init_state = -1;
     int ret;
     jclass clazz;
 
@@ -697,15 +698,15 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
     } \
 } while( 0 )
 #define GET_METHOD(id_clazz, id, str, args, critical) do { \
-    jfields.id_clazz.id = (*env)->GetMethodID(\
-            env, jfields.id_clazz.clazz, (str), (args)); \
+    awh->jfields.id_clazz.id = (*env)->GetMethodID(\
+            env, awh->jfields.id_clazz.clazz, (str), (args)); \
     CHECK_EXCEPTION("GetMethodID("str")", critical); \
 } while( 0 )
 
     clazz = (*env)->GetObjectClass(env, jobj);
     CHECK_EXCEPTION("AndroidNativeWindow clazz", true);
 
-    jfields.AWindow.clazz = (*env)->NewGlobalRef(env, clazz);
+    awh->jfields.AWindow.clazz = (*env)->NewGlobalRef(env, clazz);
     (*env)->DeleteLocalRef(env, clazz);
 
     GET_METHOD(AWindow, getVideoSurface,
@@ -719,23 +720,23 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
     GET_METHOD(AWindow, setVideoLayout,
                "setVideoLayout", "(IIIIII)V", true);
 
-    if ((*env)->RegisterNatives(env, jfields.AWindow.clazz, jni_callbacks, 2) < 0)
+    if ((*env)->RegisterNatives(env, awh->jfields.AWindow.clazz, jni_callbacks, 2) < 0)
     {
         msg_Err(p_obj, "RegisterNatives failed");
         i_init_state = 0;
         goto end;
     }
 
-    jfields.SurfaceTexture.clazz = NULL;
-    jfields.Surface.clazz = NULL;
+    awh->jfields.SurfaceTexture.clazz = NULL;
+    awh->jfields.Surface.clazz = NULL;
 
     jclass surfacetexture_class =
         (*env)->FindClass(env, "android/graphics/SurfaceTexture");
     CHECK_EXCEPTION("SurfaceTexture clazz", true);
-    jfields.SurfaceTexture.clazz =
+    awh->jfields.SurfaceTexture.clazz =
         (*env)->NewGlobalRef(env, surfacetexture_class);
     (*env)->DeleteLocalRef(env, surfacetexture_class);
-    if (jfields.SurfaceTexture.clazz == NULL)
+    if (awh->jfields.SurfaceTexture.clazz == NULL)
         goto end;
 
     GET_METHOD(SurfaceTexture, init_i, "<init>", "(I)V", false);
@@ -760,17 +761,17 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
 
     /* We cannot create any SurfaceTexture if we cannot load the SurfaceTexture
      * methods. */
-    if (!jfields.SurfaceTexture.init_i &&
-        !jfields.SurfaceTexture.init_iz &&
-        !jfields.SurfaceTexture.init_z)
+    if (!awh->jfields.SurfaceTexture.init_i &&
+        !awh->jfields.SurfaceTexture.init_iz &&
+        !awh->jfields.SurfaceTexture.init_z)
         goto error;
 
     jclass surface_class = (*env)->FindClass(env, "android/view/Surface");
     CHECK_EXCEPTION("android/view/Surface class", true);
 
-    jfields.Surface.clazz = (*env)->NewGlobalRef(env, surface_class);
+    awh->jfields.Surface.clazz = (*env)->NewGlobalRef(env, surface_class);
     (*env)->DeleteLocalRef(env, surface_class);
-    if (jfields.Surface.clazz == NULL)
+    if (awh->jfields.Surface.clazz == NULL)
         goto error;
 
     GET_METHOD(Surface, init_st, "<init>",
@@ -789,13 +790,13 @@ end:
 
 error:
     i_init_state = 0;
-    if (jfields.SurfaceTexture.clazz)
-        (*env)->DeleteGlobalRef(env, jfields.SurfaceTexture.clazz);
-    jfields.SurfaceTexture.clazz = NULL;
+    if (awh->jfields.SurfaceTexture.clazz)
+        (*env)->DeleteGlobalRef(env, awh->jfields.SurfaceTexture.clazz);
+    awh->jfields.SurfaceTexture.clazz = NULL;
 
-    if (jfields.Surface.clazz)
-        (*env)->DeleteGlobalRef(env, jfields.Surface.clazz);
-    jfields.Surface.clazz = NULL;
+    if (awh->jfields.Surface.clazz)
+        (*env)->DeleteGlobalRef(env, awh->jfields.Surface.clazz);
+    awh->jfields.Surface.clazz = NULL;
 
     vlc_mutex_unlock(&lock);
     msg_Err(p_obj, "Failed to load jfields table");
@@ -832,19 +833,15 @@ AWindowHandler_new(vlc_object_t *obj, vout_window_t *wnd, awh_events_t *p_events
         return NULL;
     }
 
-    if (InitJNIFields(p_env, obj, jobj) != VLC_SUCCESS)
-    {
-        msg_Err(obj, "InitJNIFields failed");
-        return NULL;
-    }
-    msg_Dbg(obj, "InitJNIFields success");
-
     p_awh = calloc(1, sizeof(AWindowHandler));
     if (!p_awh)
         return NULL;
 
     p_awh->p_jvm = p_jvm;
     p_awh->jobj = (*p_env)->NewGlobalRef(p_env, jobj);
+
+    /* Zero the jfields structure before usage. */
+    p_awh->jfields = (struct vlc_android_jfields) { .AWindow.clazz = NULL };
 
     p_awh->wnd = wnd;
     if (p_events)
@@ -860,6 +857,12 @@ AWindowHandler_new(vlc_object_t *obj, vout_window_t *wnd, awh_events_t *p_events
     p_awh->stex.jtransform_mtx_array = (*p_env)->NewGlobalRef(p_env, jarray);
     (*p_env)->DeleteLocalRef(p_env, jarray);
     p_awh->stex.jtransform_mtx = NULL;
+
+    if (InitJNIFields(p_env, obj, jobj, p_awh) != VLC_SUCCESS)
+    {
+        msg_Err(obj, "InitJNIFields failed");
+        return NULL;
+    }
 
     /* If we don't have window, don't register window handler. */
     jint flags = 0;
@@ -924,6 +927,12 @@ AWindowHandler_destroy(AWindowHandler *p_awh)
 
     if (p_env)
     {
+        if (p_awh->jfields.SurfaceTexture.clazz)
+            (*p_env)->DeleteGlobalRef(p_env, p_awh->jfields.SurfaceTexture.clazz);
+
+        if (p_awh->jfields.Surface.clazz)
+            (*p_env)->DeleteGlobalRef(p_env, p_awh->jfields.Surface.clazz);
+
         JNI_ANWCALL(CallVoidMethod, unregisterNative);
         AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Video);
         AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Subtitles);
@@ -968,14 +977,14 @@ static struct vlc_asurfacetexture_priv* CreateSurfaceTexture(
     handle->surface.ops = NULL;
 
     /* API 26 */
-    if (jfields.SurfaceTexture.init_z == NULL)
+    if (p_awh->jfields.SurfaceTexture.init_z == NULL)
         goto init_iz;
 
     msg_Dbg(p_awh->wnd, "Using SurfaceTexture constructor init_z");
 
     /* We can create a SurfaceTexture in detached mode directly */
     surfacetexture = (*p_env)->NewObject(p_env,
-      jfields.SurfaceTexture.clazz, jfields.SurfaceTexture.init_z, false);
+      p_awh->jfields.SurfaceTexture.clazz, p_awh->jfields.SurfaceTexture.init_z, false);
 
     if (surfacetexture == NULL)
         goto error;
@@ -1040,12 +1049,12 @@ init_iz:
     glGenTextures(1, &texture);
 
     /* API 19 */
-    if (jfields.SurfaceTexture.init_iz == NULL)
+    if (p_awh->jfields.SurfaceTexture.init_iz == NULL)
         goto init_i;
 
     msg_Dbg(p_awh->wnd, "Using SurfaceTexture constructor init_iz");
     surfacetexture = (*p_env)->NewObject(p_env,
-      jfields.SurfaceTexture.clazz, jfields.SurfaceTexture.init_iz, texture, false);
+      p_awh->jfields.SurfaceTexture.clazz, p_awh->jfields.SurfaceTexture.init_iz, texture, false);
 
     if (surfacetexture == NULL)
         goto error;
@@ -1054,11 +1063,11 @@ init_iz:
 
 init_i:
     /* We can't get here without this constructor being loaded. */
-    assert(jfields.SurfaceTexture.init_i != NULL);
+    assert(p_awh->jfields.SurfaceTexture.init_i != NULL);
     msg_Dbg(p_awh->wnd, "Using SurfaceTexture constructor init_i");
 
     surfacetexture = (*p_env)->NewObject(p_env,
-      jfields.SurfaceTexture.clazz, jfields.SurfaceTexture.init_i, texture);
+      p_awh->jfields.SurfaceTexture.clazz, p_awh->jfields.SurfaceTexture.init_i, texture);
 
     if (surfacetexture == NULL)
         goto error;
@@ -1095,7 +1104,7 @@ success:
         /* Create Surface(SurfaceTexture), ie. producer side of the buffer
          * queue in Android. */
         jobject jsurface = (*p_env)->NewObject(p_env,
-            jfields.Surface.clazz, jfields.Surface.init_st, handle->jtexture);
+            p_awh->jfields.Surface.clazz, p_awh->jfields.Surface.init_st, handle->jtexture);
         if (!jsurface)
             goto error;
         handle->surface.jsurface = (*p_env)->NewGlobalRef(p_env, jsurface);
