@@ -718,38 +718,21 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt
     p_enc->p_module = NULL;
     es_format_InitFromVideo( &p_enc->fmt_in, fmt_in );
 
-    if( p_enc->fmt_in.video.i_visible_width == 0 ||
-        p_enc->fmt_in.video.i_visible_height == 0 ||
-        p_enc->fmt_out.video.i_visible_width == 0 ||
-        p_enc->fmt_out.video.i_visible_height == 0 )
+    if( fmt_out->i_width > 0 && fmt_out->i_height > 0 )
     {
-        if( fmt_out->i_width > 0 && fmt_out->i_height > 0 )
-        {
-            p_enc->fmt_in.video.i_width = fmt_out->i_width;
-            p_enc->fmt_in.video.i_height = fmt_out->i_height;
+        p_enc->fmt_in.video.i_width = fmt_out->i_width;
+        p_enc->fmt_in.video.i_height = fmt_out->i_height;
 
-            if( fmt_out->i_visible_width > 0 &&
-                fmt_out->i_visible_height > 0 )
-            {
-                p_enc->fmt_in.video.i_visible_width = fmt_out->i_visible_width;
-                p_enc->fmt_in.video.i_visible_height = fmt_out->i_visible_height;
-            }
-            else
-            {
-                p_enc->fmt_in.video.i_visible_width = fmt_out->i_width;
-                p_enc->fmt_in.video.i_visible_height = fmt_out->i_height;
-            }
+        if( fmt_out->i_visible_width > 0 && fmt_out->i_visible_height > 0 )
+        {
+            p_enc->fmt_in.video.i_visible_width = fmt_out->i_visible_width;
+            p_enc->fmt_in.video.i_visible_height = fmt_out->i_visible_height;
         }
-    } else if( fmt_out->i_sar_num && fmt_out->i_sar_den &&
-               fmt_out->i_sar_num * fmt_in->i_sar_den !=
-               fmt_out->i_sar_den * fmt_in->i_sar_num )
-    {
-        p_enc->fmt_in.video.i_width =
-            fmt_in->i_sar_num * (int64_t)fmt_out->i_sar_den * fmt_in->i_width /
-            fmt_in->i_sar_den / fmt_out->i_sar_num;
-        p_enc->fmt_in.video.i_visible_width =
-            fmt_in->i_sar_num * (int64_t)fmt_out->i_sar_den *
-            fmt_in->i_visible_width / fmt_in->i_sar_den / fmt_out->i_sar_num;
+        else
+        {
+            p_enc->fmt_in.video.i_visible_width = fmt_out->i_width;
+            p_enc->fmt_in.video.i_visible_height = fmt_out->i_height;
+        }
     }
 
     p_enc->fmt_in.video.i_frame_rate = 25;
