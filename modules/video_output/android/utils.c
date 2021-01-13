@@ -130,6 +130,7 @@ static struct
           jmethodID init_iz;
           jmethodID init_z;
           jmethodID updateTexImage;
+          jmethodID releaseTexImage;
           jmethodID getTransformMatrix;
           jmethodID detachFromGLContext;
           jmethodID attachToGLContext;
@@ -458,11 +459,15 @@ static void NDKSurfaceTexture_destroy(
     free(handle);
 }
 
+static void
+JNISurfaceTexture_releaseTexImage(struct vlc_asurfacetexture *surface);
+
 static const struct vlc_asurfacetexture_operations NDKSurfaceAPI =
 {
     .attach_to_gl_context = NDKSurfaceTexture_attachToGLContext,
     .update_tex_image = NDKSurfaceTexture_updateTexImage,
     .detach_from_gl_context = NDKSurfaceTexture_detachFromGLContext,
+    .release_tex_image = JNISurfaceTexture_releaseTexImage,
     .destroy = NDKSurfaceTexture_destroy,
 };
 
@@ -540,6 +545,22 @@ JNISurfaceTexture_updateTexImage(
     return VLC_SUCCESS;
 }
 
+static void
+JNISurfaceTexture_releaseTexImage(
+        struct vlc_asurfacetexture *surface)
+{
+    struct vlc_asurfacetexture_priv *handle =
+        container_of(surface, struct vlc_asurfacetexture_priv, surface);
+
+    AWindowHandler *p_awh = handle->awh;
+    JNIEnv *p_env = android_getEnvCommon(NULL, handle->awh->p_jvm, "SurfaceTexture");
+    if (!p_env)
+        return;
+
+    (*p_env)->CallVoidMethod(p_env, handle->jtexture,
+                             jfields.SurfaceTexture.releaseTexImage);
+}
+
 static void JNISurfaceTexture_destroy(
         struct vlc_asurfacetexture *surface)
 {
@@ -563,6 +584,7 @@ static const struct vlc_asurfacetexture_operations JNISurfaceAPI =
     .attach_to_gl_context = JNISurfaceTexture_attachToGLContext,
     .update_tex_image = JNISurfaceTexture_updateTexImage,
     .detach_from_gl_context = JNISurfaceTexture_detachFromGLContext,
+    .release_tex_image = JNISurfaceTexture_releaseTexImage,
     .destroy = JNISurfaceTexture_destroy,
 };
 
@@ -725,6 +747,9 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
 
     GET_METHOD(SurfaceTexture, getTransformMatrix,
                "getTransformMatrix", "([F)V", true);
+
+    GET_METHOD(SurfaceTexture, releaseTexImage,
+               "releaseTexImage", "()V", false);
 
     GET_METHOD(SurfaceTexture, attachToGLContext,
                "attachToGLContext", "(I)V", true);
@@ -1269,4 +1294,10 @@ int
 SurfaceTexture_updateTexImage(struct vlc_asurfacetexture *st, const float **pp_transform_mtx)
 {
     return st->ops->update_tex_image(st, pp_transform_mtx);
+}
+
+void
+SurfaceTexture_releaseTexImage(struct vlc_asurfacetexture *st)
+{
+    return st->ops->release_tex_image(st);
 }

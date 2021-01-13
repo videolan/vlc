@@ -104,6 +104,9 @@ struct vlc_asurfacetexture_operations
             struct vlc_asurfacetexture *surface,
             const float **pp_transform_mtx);
 
+    void (*release_tex_image)(
+            struct vlc_asurfacetexture *st);
+
     void (*destroy)(
             struct vlc_asurfacetexture *surface);
 };
@@ -219,3 +222,6 @@ vlc_asurfacetexture_Delete(struct vlc_asurfacetexture *st)
  */
 int
 SurfaceTexture_updateTexImage(struct vlc_asurfacetexture *st, const float **pp_transform_mtx);
+
+void
+SurfaceTexture_releaseTexImage(struct vlc_asurfacetexture *st);
