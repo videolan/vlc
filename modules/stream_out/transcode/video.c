@@ -524,10 +524,12 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             /* The fmt_in may have been overriden by the encoder. */
             const es_format_t *encoder_fmt_in = transcode_encoder_format_in( id->encoder );
 
-            /* In case the encoder wasn't open yet, check if we need to add
-             * a converter between last user filter and encoder. */
-            if( !is_encoder_open &&
-                filter_fmt_out.i_codec != encoder_fmt_in->i_codec )
+            /* check if we need to add a converter between last user filter and encoder. */
+            if( filter_fmt_out.i_codec != encoder_fmt_in->i_codec ||
+                id->decoder_out.video.i_width  != encoder_fmt_in->video.i_width ||
+                id->decoder_out.video.i_height != encoder_fmt_in->video.i_height ||
+                id->decoder_out.video.i_visible_width  != encoder_fmt_in->video.i_visible_width ||
+                id->decoder_out.video.i_visible_height != encoder_fmt_in->video.i_visible_height )
             {
                 if ( !id->p_final_conv_static )
                     id->p_final_conv_static =
@@ -544,9 +546,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 }
 
                 filter_chain_Reset( id->p_final_conv_static,
-                                    p_fmt_filtered,
-                                    //encoder_vctx_in,
-                                    NULL,
+                                    &id->decoder_out,
+                                    picture_GetVideoContext(p_pic),
                                     encoder_fmt_in );
                 filter_chain_AppendConverter( id->p_final_conv_static, NULL );
             }
