@@ -247,9 +247,6 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     p_enc_owner->id = id;
     p_enc_owner->enc.cbs = &encoder_video_transcode_cbs;
 
-    /* Will use this format as encoder input for now */
-    transcode_encoder_update_format_in( id->encoder, &encoder_tested_fmt_in );
-
     es_format_Clean( &encoder_tested_fmt_in );
 
     return VLC_SUCCESS;
