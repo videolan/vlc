@@ -372,8 +372,10 @@ static int ParseVOL( decoder_t *p_dec, es_format_t *fmt,
         if( i_vol <= 5 )
             return VLC_EGENERIC;
 
-        if( p_vol[0] == 0x00 && p_vol[1] == 0x00 && p_vol[2] == 0x01 &&
-            p_vol[3] >= 0x20 && p_vol[3] <= 0x2f ) break;
+        uint32_t i_startcode = GetDWBE( p_vol );
+        if( i_startcode >= VIDEO_OBJECT_LAYER_START_CODE &&
+            i_startcode < RESERVED_START_CODE )
+            break;
 
         p_vol++; i_vol--;
     }
