@@ -703,28 +703,31 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj, AWindowHandler *a
     CHECK_EXCEPTION("GetMethodID("str")", critical); \
 } while( 0 )
 
-    clazz = (*env)->GetObjectClass(env, jobj);
-    CHECK_EXCEPTION("AndroidNativeWindow clazz", true);
-
-    awh->jfields.AWindow.clazz = (*env)->NewGlobalRef(env, clazz);
-    (*env)->DeleteLocalRef(env, clazz);
-
-    GET_METHOD(AWindow, getVideoSurface,
-               "getVideoSurface", "()Landroid/view/Surface;", true);
-    GET_METHOD(AWindow, getSubtitlesSurface,
-               "getSubtitlesSurface", "()Landroid/view/Surface;", true);
-    GET_METHOD(AWindow, registerNative,
-               "registerNative", "(J)I", true);
-    GET_METHOD(AWindow, unregisterNative,
-               "unregisterNative", "()V", true);
-    GET_METHOD(AWindow, setVideoLayout,
-               "setVideoLayout", "(IIIIII)V", true);
-
-    if ((*env)->RegisterNatives(env, awh->jfields.AWindow.clazz, jni_callbacks, 2) < 0)
+    if (jobj)
     {
-        msg_Err(p_obj, "RegisterNatives failed");
-        i_init_state = 0;
-        goto end;
+        clazz = (*env)->GetObjectClass(env, jobj);
+        CHECK_EXCEPTION("AndroidNativeWindow clazz", true);
+
+        awh->jfields.AWindow.clazz = (*env)->NewGlobalRef(env, clazz);
+        (*env)->DeleteLocalRef(env, clazz);
+
+        GET_METHOD(AWindow, getVideoSurface,
+                   "getVideoSurface", "()Landroid/view/Surface;", true);
+        GET_METHOD(AWindow, getSubtitlesSurface,
+                   "getSubtitlesSurface", "()Landroid/view/Surface;", true);
+        GET_METHOD(AWindow, registerNative,
+                   "registerNative", "(J)I", true);
+        GET_METHOD(AWindow, unregisterNative,
+                   "unregisterNative", "()V", true);
+        GET_METHOD(AWindow, setVideoLayout,
+                   "setVideoLayout", "(IIIIII)V", true);
+
+        if ((*env)->RegisterNatives(env, awh->jfields.AWindow.clazz, jni_callbacks, 2) < 0)
+        {
+            msg_Err(p_obj, "RegisterNatives failed");
+            i_init_state = 0;
+            goto end;
+        }
     }
 
     awh->jfields.SurfaceTexture.clazz = NULL;
@@ -820,7 +823,7 @@ AWindowHandler_new(vlc_object_t *obj, vout_window_t *wnd, awh_events_t *p_events
     JavaVM *p_jvm = var_InheritAddress(obj, "android-jvm");
     jobject jobj = var_InheritAddress(obj, "drawable-androidwindow");
 
-    if (!p_jvm || !jobj)
+    if (!p_jvm)
     {
         msg_Err(obj, "libvlc_media_player options not set");
         return NULL;
@@ -838,7 +841,7 @@ AWindowHandler_new(vlc_object_t *obj, vout_window_t *wnd, awh_events_t *p_events
         return NULL;
 
     p_awh->p_jvm = p_jvm;
-    p_awh->jobj = (*p_env)->NewGlobalRef(p_env, jobj);
+    p_awh->jobj = jobj ? (*p_env)->NewGlobalRef(p_env, jobj) : NULL;
 
     /* Zero the jfields structure before usage. */
     p_awh->jfields = (struct vlc_android_jfields) { .AWindow.clazz = NULL };
@@ -873,7 +876,8 @@ AWindowHandler_new(vlc_object_t *obj, vout_window_t *wnd, awh_events_t *p_events
         if ((flags & AWINDOW_REGISTER_FLAGS_SUCCESS) == 0)
         {
             msg_Err(obj, "AWindow already registered");
-            (*p_env)->DeleteGlobalRef(p_env, p_awh->jobj);
+            if (p_awh->jobj)
+                (*p_env)->DeleteGlobalRef(p_env, p_awh->jobj);
             (*p_env)->DeleteGlobalRef(p_env, p_awh->stex.jtransform_mtx_array);
             free(p_awh);
             return NULL;
@@ -933,10 +937,12 @@ AWindowHandler_destroy(AWindowHandler *p_awh)
         if (p_awh->jfields.Surface.clazz)
             (*p_env)->DeleteGlobalRef(p_env, p_awh->jfields.Surface.clazz);
 
-        JNI_ANWCALL(CallVoidMethod, unregisterNative);
+        if (p_awh->jobj)
+            JNI_ANWCALL(CallVoidMethod, unregisterNative);
         AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Video);
         AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Subtitles);
-        (*p_env)->DeleteGlobalRef(p_env, p_awh->jobj);
+        if (p_awh->jobj)
+            (*p_env)->DeleteGlobalRef(p_env, p_awh->jobj);
     }
 
     if (p_awh->p_anw_dl)
@@ -1181,9 +1187,13 @@ WindowHandler_NewSurfaceEnv(AWindowHandler *p_awh, JNIEnv *p_env,
     switch (id)
     {
         case AWindow_Video:
+            if (p_awh->wnd == NULL) return VLC_EGENERIC;
+            assert(p_awh->jfields.AWindow.getVideoSurface != NULL);
             jsurface = JNI_ANWCALL(CallObjectMethod, getVideoSurface);
             break;
         case AWindow_Subtitles:
+            if (p_awh->wnd == NULL) return VLC_EGENERIC;
+            assert(p_awh->jfields.AWindow.getSubtitlesSurface!= NULL);
             jsurface = JNI_ANWCALL(CallObjectMethod, getSubtitlesSurface);
             break;
         default:
@@ -1273,7 +1283,7 @@ AndroidNativeWindow_onWindowSize(JNIEnv* env, jobject clazz, jlong handle,
 bool
 AWindowHandler_canSetVideoLayout(AWindowHandler *p_awh)
 {
-    return p_awh->b_has_video_layout_listener;
+    return p_awh->b_has_video_layout_listener && p_awh->wnd != NULL;
 }
 
 int
