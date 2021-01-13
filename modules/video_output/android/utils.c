@@ -84,6 +84,33 @@ struct ASurfaceTextureAPI
     ptr_ANativeWindow_toSurface pf_anwToSurface;
 };
 
+static struct
+{
+    struct {
+        jclass clazz;
+        jmethodID getVideoSurface;
+        jmethodID getSubtitlesSurface;
+        jmethodID registerNative;
+        jmethodID unregisterNative;
+        jmethodID setVideoLayout;
+    } AWindow;
+    struct {
+          jclass clazz;
+          jmethodID init_i;
+          jmethodID init_iz;
+          jmethodID init_z;
+          jmethodID updateTexImage;
+          jmethodID releaseTexImage;
+          jmethodID getTransformMatrix;
+          jmethodID detachFromGLContext;
+          jmethodID attachToGLContext;
+    } SurfaceTexture;
+    struct {
+        jclass clazz;
+        jmethodID init_st;
+    } Surface;
+} jfields;
+
 struct AWindowHandler
 {
     JavaVM *p_jvm;
@@ -113,33 +140,6 @@ struct AWindowHandler
         jfloat *jtransform_mtx;
     } stex;
 };
-
-static struct
-{
-    struct {
-        jclass clazz;
-        jmethodID getVideoSurface;
-        jmethodID getSubtitlesSurface;
-        jmethodID registerNative;
-        jmethodID unregisterNative;
-        jmethodID setVideoLayout;
-    } AWindow;
-    struct {
-          jclass clazz;
-          jmethodID init_i;
-          jmethodID init_iz;
-          jmethodID init_z;
-          jmethodID updateTexImage;
-          jmethodID releaseTexImage;
-          jmethodID getTransformMatrix;
-          jmethodID detachFromGLContext;
-          jmethodID attachToGLContext;
-    } SurfaceTexture;
-    struct {
-        jclass clazz;
-        jmethodID init_st;
-    } Surface;
-} jfields;
 
 #define JNI_CALL(what, obj, method, ...) \
     (*p_env)->what(p_env, obj, jfields.method, ##__VA_ARGS__)
