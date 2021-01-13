@@ -698,7 +698,6 @@ CreateVideoContext(decoder_t *p_dec)
 
     android_video_context_t *avctx =
         vlc_video_context_GetPrivate(p_sys->video.ctx, VLC_VIDEO_CONTEXT_AWINDOW);
-    avctx->texture = p_sys->video.surfacetexture;
     avctx->dec_opaque = p_dec->p_sys;
     avctx->render = PictureContextRenderPic;
     avctx->render_ts = p_sys->api.release_out_ts ? PictureContextRenderPicTs : NULL;
@@ -1118,6 +1117,7 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             struct android_picture_ctx *apctx =
                 GetPictureContext(p_dec,p_out->buf.i_index);
             assert(apctx);
+            assert(apctx->s.vctx);
             vlc_video_context_Hold(apctx->s.vctx);
             p_pic->context = &apctx->s;
         } else {
