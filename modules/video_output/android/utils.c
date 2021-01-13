@@ -893,12 +893,6 @@ AWindowHandler_destroy(AWindowHandler *p_awh)
 
     if (p_env)
     {
-        if (jfields.SurfaceTexture.clazz)
-            (*p_env)->DeleteGlobalRef(p_env, jfields.SurfaceTexture.clazz);
-
-        if (jfields.Surface.clazz)
-            (*p_env)->DeleteGlobalRef(p_env, jfields.Surface.clazz);
-
         JNI_ANWCALL(CallVoidMethod, unregisterNative);
         AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Video);
         AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Subtitles);
