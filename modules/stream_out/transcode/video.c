@@ -316,10 +316,10 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
         filter_chain_AppendFromString( id->p_uf_chain, p_cfg->psz_filters );
         p_src = filter_chain_GetFmtOut( id->p_uf_chain );
         debug_format( p_stream, p_src );
-   }
+    }
 
     /* Update encoder so it matches filters output */
-    transcode_encoder_update_format_in( id->encoder, p_src );
+    transcode_encoder_update_format_in( id->encoder, p_src, id->p_enccfg );
 
     /* SPU Sources */
     if( p_cfg->video.psz_spu_sources )

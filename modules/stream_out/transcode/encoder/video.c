@@ -209,6 +209,21 @@ static void transcode_video_size_config_apply( vlc_object_t *p_obj,
     }
 }
 
+void transcode_encoder_video_set_src(encoder_t *p_encoder, const video_format_t *p_src,
+                                     const transcode_encoder_config_t *p_cfg)
+{
+    video_format_t *p_enc_in = &p_encoder->fmt_in.video;
+    if( p_cfg->video.fps.num )
+    {
+        p_enc_in->i_frame_rate = p_cfg->video.fps.num;
+        p_enc_in->i_frame_rate_base = __MAX(p_cfg->video.fps.den, 1);
+    }
+    p_enc_in->orientation = ORIENT_NORMAL;
+
+    /* Modify to requested sizes/scale */
+    transcode_video_size_config_apply( VLC_OBJECT(p_encoder), p_src, p_cfg, p_enc_in );
+}
+
 void transcode_encoder_video_configure( vlc_object_t *p_obj,
                                         const video_format_t *p_dec_out,
                                         const transcode_encoder_config_t *p_cfg,

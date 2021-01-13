@@ -65,7 +65,8 @@ void transcode_encoder_config_clean( transcode_encoder_config_t * );
 
 const es_format_t *transcode_encoder_format_in( const transcode_encoder_t * );
 const es_format_t *transcode_encoder_format_out( const transcode_encoder_t * );
-void transcode_encoder_update_format_in( transcode_encoder_t *, const es_format_t * );
+void transcode_encoder_update_format_in( transcode_encoder_t *, const es_format_t *,
+                                         const transcode_encoder_config_t * );
 void transcode_encoder_update_format_out( transcode_encoder_t *, const es_format_t * );
 
 block_t * transcode_encoder_encode( transcode_encoder_t *, void * );
@@ -90,6 +91,9 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
                                         const video_format_t *p_src,
                                         vlc_video_context *vctx_in,
                                         transcode_encoder_t *p_enc );
+
+void transcode_encoder_video_set_src( encoder_t *, const video_format_t *,
+                                      const transcode_encoder_config_t * );
 
 void transcode_video_framerate_apply( const video_format_t *p_src,
                                             video_format_t *p_dst );

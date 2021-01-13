@@ -124,10 +124,19 @@ const es_format_t *transcode_encoder_format_out( const transcode_encoder_t *p_en
     return &p_enc->p_encoder->fmt_out;
 }
 
-void transcode_encoder_update_format_in( transcode_encoder_t *p_enc, const es_format_t *fmt )
+void transcode_encoder_update_format_in( transcode_encoder_t *p_enc, const es_format_t *fmt,
+                                         const transcode_encoder_config_t *p_cfg )
 {
     es_format_Clean( &p_enc->p_encoder->fmt_in );
     es_format_Copy( &p_enc->p_encoder->fmt_in, fmt );
+    switch (fmt->i_cat)
+    {
+        case VIDEO_ES:
+            transcode_encoder_video_set_src(p_enc->p_encoder, &fmt->video, p_cfg);
+            break;
+        default:
+            break;
+    }
 }
 
 void transcode_encoder_update_format_out( transcode_encoder_t *p_enc, const es_format_t *fmt )
