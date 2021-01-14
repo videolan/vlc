@@ -67,16 +67,7 @@ void DASHManager::scheduleNextUpdate()
 {
     time_t now = time(nullptr);
 
-    mtime_t minbuffer = 0;
-    std::vector<AbstractStream *>::const_iterator it;
-    for(it=streams.begin(); it!=streams.end(); ++it)
-    {
-        const AbstractStream *st = *it;
-        const mtime_t m = st->getMinAheadTime();
-        if(m > 0 && (m < minbuffer || minbuffer == 0))
-            minbuffer = m;
-    }
-    minbuffer /= 2;
+    mtime_t minbuffer = getMinAheadTime() / 2;
 
     if(playlist->minUpdatePeriod.Get() > minbuffer)
         minbuffer = playlist->minUpdatePeriod.Get();

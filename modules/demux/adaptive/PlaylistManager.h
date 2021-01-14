@@ -81,6 +81,7 @@ namespace adaptive
 
             virtual mtime_t getFirstPlaybackTime() const;
             mtime_t getCurrentDemuxTime() const;
+            mtime_t getMinAheadTime() const;
 
             virtual bool reactivateStream(AbstractStream *);
             bool setupPeriod();
