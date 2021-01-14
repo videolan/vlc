@@ -2545,6 +2545,14 @@ bool vlc_input_decoder_HasFormatChanged( vlc_input_decoder_t *p_owner,
         return false;
 
     vlc_mutex_lock( &p_owner->lock );
+
+    if( p_owner->fmt.i_cat == UNKNOWN_ES )
+    {
+        /* The format changed but the output creation failed */
+        vlc_mutex_unlock( &p_owner->lock );
+        return false;
+    }
+
     if( p_fmt != NULL )
         es_format_Copy( p_fmt, &p_owner->fmt );
 
