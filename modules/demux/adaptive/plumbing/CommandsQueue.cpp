@@ -237,6 +237,7 @@ CommandsQueue::CommandsQueue( CommandsFactory *f )
     b_draining = false;
     b_eof = false;
     commandsFactory = f;
+    nextsequence = 0;
 }
 
 CommandsQueue::~CommandsQueue()
@@ -245,9 +246,27 @@ CommandsQueue::~CommandsQueue()
     delete commandsFactory;
 }
 
-static bool compareCommands( AbstractCommand *a, AbstractCommand *b )
+static bool compareCommands( const Queueentry &a, const Queueentry &b )
 {
-    return (a->getTime() < b->getTime() && a->getTime() != VLC_TS_INVALID);
+    if(a.second->getTime() == b.second->getTime())
+    {
+        /* Reorder the initial clock PCR setting PCR0 DTS0 PCR0 DTS1 PCR1
+           so it appears after the block, avoiding it not being output */
+        if(a.second->getType() == ES_OUT_SET_GROUP_PCR &&
+           b.second->getType() == ES_OUT_PRIVATE_COMMAND_SEND &&
+           a.first < b.first)
+            return false;
+
+        return a.first < b.first;
+    }
+    else if (a.second->getTime() == VLC_TS_INVALID || b.second->getTime() == VLC_TS_INVALID)
+    {
+        return a.first < b.first;
+    }
+    else
+    {
+        return a.second->getTime() < b.second->getTime();
+    }
 }
 
 void CommandsQueue::Schedule( AbstractCommand *command )
@@ -260,11 +279,11 @@ void CommandsQueue::Schedule( AbstractCommand *command )
     {
         bufferinglevel = command->getTime();
         LockedCommit();
-        commands.push_back( command );
+        commands.push_back( Queueentry(nextsequence++, command) );
     }
     else
     {
-        incoming.push_back( command );
+        incoming.push_back( Queueentry(nextsequence++, command) );
     }
 }
 
@@ -286,15 +305,16 @@ mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
        ex: for a target time of 2, you must dequeue <= 2 until >= PCR2
        A0,A1,A2,B0,PCR0,B1,B2,PCR2,B3,A3,PCR3
     */
-    std::list<AbstractCommand *> output;
-    std::list<AbstractCommand *> in;
+    std::list<Queueentry> output;
+    std::list<Queueentry> in;
 
 
     in.splice( in.end(), commands );
 
     while( !in.empty() )
     {
-        AbstractCommand *command = in.front();
+        Queueentry entry = in.front();
+        AbstractCommand *command = entry.second;
 
         if( command->getType() == ES_OUT_PRIVATE_COMMAND_DEL && b_datasent )
             break;
@@ -320,21 +340,21 @@ mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
                 /* ensure no more non dated for that ES is sent
                  * since we're sure that data is above barrier */
                 disabled_esids.insert( id );
-                commands.push_back( command );
+                commands.push_back( entry );
             }
             else if( command->getTime() == VLC_TS_INVALID )
             {
                 if( disabled_esids.find( id ) == disabled_esids.end() )
-                    output.push_back( command );
+                    output.push_back( entry );
                 else
-                    commands.push_back( command );
+                    commands.push_back( entry );
             }
             else /* Falls below barrier, send */
             {
-                output.push_back( command );
+                output.push_back( entry );
             }
         }
-        else output.push_back( command ); /* will discard below */
+        else output.push_back( entry ); /* will discard below */
     }
 
     /* push remaining ones if broke above */
@@ -346,7 +366,7 @@ mtime_t CommandsQueue::Process( es_out_t *out, mtime_t barrier )
     /* Now execute our selected commands */
     while( !output.empty() )
     {
-        AbstractCommand *command = output.front();
+        AbstractCommand *command = output.front().second;
         output.pop_front();
 
         if( command->getType() == ES_OUT_PRIVATE_COMMAND_SEND )
@@ -382,7 +402,7 @@ void CommandsQueue::Abort( bool b_reset )
     commands.splice( commands.end(), incoming );
     while( !commands.empty() )
     {
-        delete commands.front();
+        delete commands.front().second;
         commands.pop_front();
     }
 
@@ -451,12 +471,12 @@ mtime_t CommandsQueue::getBufferingLevel() const
 
 mtime_t CommandsQueue::getFirstDTS() const
 {
-    std::list<AbstractCommand *>::const_iterator it;
+    std::list<Queueentry>::const_iterator it;
     mtime_t i_firstdts = pcr;
     for( it = commands.begin(); it != commands.end(); ++it )
     {
-        const mtime_t i_dts = (*it)->getTime();
-        if( i_dts > VLC_TS_INVALID )
+        const mtime_t i_dts = (*it).second->getTime();
+        if( i_dts != VLC_TS_INVALID )
         {
             if( i_dts < i_firstdts || i_firstdts == VLC_TS_INVALID )
                 i_firstdts = i_dts;
