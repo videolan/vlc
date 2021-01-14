@@ -147,6 +147,8 @@ namespace adaptive
             virtual EsOutMetaCommand * createEsOutMetaCommand( int, const vlc_meta_t * ) const;
     };
 
+    using Queueentry = std::pair<uint64_t, AbstractCommand *>;
+
     /* Queuing for doing all the stuff in order */
     class CommandsQueue
     {
@@ -173,13 +175,14 @@ namespace adaptive
             CommandsFactory *commandsFactory;
             void LockedCommit();
             void LockedSetDraining();
-            std::list<AbstractCommand *> incoming;
-            std::list<AbstractCommand *> commands;
+            std::list<Queueentry> incoming;
+            std::list<Queueentry> commands;
             vlc_tick_t bufferinglevel;
             vlc_tick_t pcr;
             bool b_draining;
             bool b_drop;
             bool b_eof;
+            uint64_t nextsequence;
     };
 }
 
