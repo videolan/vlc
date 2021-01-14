@@ -301,22 +301,18 @@ int transcode_encoder_video_test( encoder_t *p_encoder,
     video_format_t *p_vfmt_out = &p_encoder->fmt_out.video;
 
     /* Requested output */
-    p_vfmt_out->i_width = p_cfg->video.i_width & ~1;
-    p_vfmt_out->i_height = p_cfg->video.i_height & ~1;
     p_encoder->fmt_out.i_bitrate = p_cfg->video.i_bitrate;
 
     /* The dimensions will be set properly later on.
      * Just put sensible values so we can test an encoder is available. */
     /* Input */
     p_vfmt_in->i_chroma = i_codec_in;
-    p_vfmt_in->i_width = FIRSTVALID( p_vfmt_out->i_width, p_dec_in->i_width, 16 ) & ~1;
-    p_vfmt_in->i_height = FIRSTVALID( p_vfmt_out->i_height, p_dec_in->i_height, 16 ) & ~1;
-    p_vfmt_in->i_visible_width = FIRSTVALID( p_vfmt_out->i_visible_width,
-                                             p_dec_in->i_visible_width, p_vfmt_in->i_width ) & ~1;
-    p_vfmt_in->i_visible_height = FIRSTVALID( p_vfmt_out->i_visible_height,
-                                              p_dec_in->i_visible_height, p_vfmt_in->i_height ) & ~1;
+    transcode_video_size_config_apply(VLC_OBJECT(p_encoder), p_dec_in, p_cfg, p_vfmt_in);
     p_vfmt_in->i_frame_rate = ENC_FRAMERATE;
     p_vfmt_in->i_frame_rate_base = ENC_FRAMERATE_BASE;
+
+    p_vfmt_out->i_width  = p_vfmt_in->i_width & ~1;
+    p_vfmt_out->i_height = p_vfmt_in->i_height & ~1;
 
     module_t *p_module = module_need( p_encoder, "encoder", p_cfg->psz_name, true );
     if( !p_module )
