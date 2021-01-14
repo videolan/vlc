@@ -74,6 +74,7 @@ namespace adaptive
             virtual int doControl(int, va_list);
             virtual int doDemux(int64_t);
 
+            void    setLivePause(bool);
             virtual bool    setPosition(mtime_t);
             mtime_t getResumeTime() const;
             mtime_t getFirstDTS() const;
@@ -140,6 +141,7 @@ namespace adaptive
             vlc_cond_t   waitcond;
             bool         b_buffering;
             bool         b_canceled;
+            mtime_t      pause_start;
     };
 
 }

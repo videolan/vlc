@@ -389,6 +389,16 @@ bool PlaylistManager::setPosition(mtime_t time)
     return ret;
 }
 
+void PlaylistManager::setLivePause(bool b)
+{
+    if(!started())
+        return;
+
+    for(AbstractStream* st : streams)
+        if(st->isValid() && !st->isDisabled())
+            st->setLivePause(b);
+}
+
 bool PlaylistManager::needsUpdate() const
 {
     return playlist->needsUpdates() &&
@@ -556,8 +566,30 @@ int PlaylistManager::doControl(int i_query, va_list args)
 
         case DEMUX_SET_PAUSE_STATE:
         {
-            vlc_mutex_locker locker(&cached.lock);
-            return cached.b_live ? VLC_EGENERIC : VLC_SUCCESS;
+            setBufferingRunState(false); /* /!\ always stop buffering process first */
+            bool b_pause = (bool)va_arg(args, int);
+            if(playlist->isLive())
+            {
+                mtime_t now = mdate();
+                demux.i_nzpcr = VLC_TS_INVALID;
+                cached.lastupdate = 0;
+                if(b_pause)
+                {
+                    setLivePause(true);
+                    pause_start = now;
+                    msg_Dbg(p_demux,"Buffering and playback paused. No timeshift support.");
+                }
+                else
+                {
+                    setLivePause(false);
+                    msg_Dbg(p_demux,"Resuming buffering/playback after %" PRId64 "ms",
+                            (now-pause_start) / 1000);
+                    es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
+                    setBufferingRunState(true);
+                }
+            }
+            else setBufferingRunState(true);
+            return VLC_SUCCESS;
         }
 
         case DEMUX_GET_TIME:
@@ -587,7 +619,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
 
         case DEMUX_SET_POSITION:
         {
-            setBufferingRunState(false); /* stop downloader first */
+            setBufferingRunState(false); /* /!\ always stop buffering process first */
             vlc_mutex_locker locker(&cached.lock);
 
             if(cached.playlistLength == 0)
