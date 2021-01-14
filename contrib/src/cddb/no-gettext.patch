@@ -1,0 +1,13 @@
+diff -urN cddb.bak/configure.ac cddb/configure.ac
+--- cddb.bak/configure.ac	2021-01-14 18:46:48.702409826 +0300
++++ cddb/configure.ac	2021-01-14 18:47:04.354533931 +0300
+@@ -19,9 +19,6 @@
+ LIBCDDB_VERSION_NUM=131
+ AC_SUBST(LIBCDDB_VERSION_NUM)
+ 
+-dnl iconv uses gettext macros (dependency on config.rpath)
+-AM_GNU_GETTEXT_VERSION(0.14.4)
+-
+ dnl Process custom command-line options
+ AC_ARG_ENABLE([loglevel],
+               AC_HELP_STRING([--enable-loglevel=LVL],
