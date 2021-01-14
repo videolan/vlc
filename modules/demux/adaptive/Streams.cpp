@@ -317,6 +317,16 @@ bool AbstractStream::isDisabled() const
     return disabled;
 }
 
+void AbstractStream::setLivePause(bool b)
+{
+    vlc_mutex_locker locker(&lock);
+    if(!b)
+    {
+        segmentTracker->setPosition(segmentTracker->getStartPosition(),
+                                    !demuxer || demuxer->needsRestartOnSeek());
+    }
+}
+
 bool AbstractStream::decodersDrained()
 {
     return fakeEsOut()->decodersDrained();

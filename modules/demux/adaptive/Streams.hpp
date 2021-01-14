@@ -69,6 +69,7 @@ namespace adaptive
         virtual bool reactivate(vlc_tick_t);
         bool isDisabled() const;
         bool isValid() const;
+        void setLivePause(bool);
         enum class Status {
             Eof = 0, /* prioritized */
             Discontinuity,
