@@ -83,6 +83,7 @@ namespace adaptive
 
             virtual vlc_tick_t getFirstPlaybackTime() const;
             vlc_tick_t getCurrentDemuxTime() const;
+            vlc_tick_t getMinAheadTime() const;
 
             virtual bool reactivateStream(AbstractStream *);
             bool setupPeriod();

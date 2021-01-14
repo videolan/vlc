@@ -405,6 +405,21 @@ vlc_tick_t PlaylistManager::getCurrentDemuxTime() const
     return demux.i_nzpcr;
 }
 
+vlc_tick_t PlaylistManager::getMinAheadTime() const
+{
+    vlc_tick_t minbuffer = 0;
+    std::for_each(streams.cbegin(), streams.cend(),
+        [&minbuffer](const AbstractStream *st) {
+            if(st->isValid() && !st->isDisabled() && st->isSelected())
+            {
+                const vlc_tick_t m = st->getMinAheadTime();
+                if(m > 0 && (m < minbuffer || minbuffer == 0))
+                    minbuffer = m;
+            }
+        });
+    return minbuffer;
+}
+
 bool PlaylistManager::reactivateStream(AbstractStream *stream)
 {
     return stream->reactivate(getResumeTime());
