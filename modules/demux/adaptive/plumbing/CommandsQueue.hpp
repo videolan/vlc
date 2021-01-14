@@ -57,8 +57,8 @@ namespace adaptive
         friend class CommandsFactory;
         public:
             virtual ~EsOutSendCommand();
-            virtual void Execute( es_out_t *out );
-            virtual vlc_tick_t getTime() const;
+            virtual void Execute( es_out_t *out ) override;
+            virtual vlc_tick_t getTime() const override;
             const void * esIdentifier() const;
 
         protected:
@@ -70,7 +70,7 @@ namespace adaptive
     {
         friend class CommandsFactory;
         public:
-            virtual void Execute( es_out_t *out );
+            virtual void Execute( es_out_t *out ) override;
 
         protected:
             EsOutDelCommand( FakeESOutID * );
@@ -81,7 +81,7 @@ namespace adaptive
         friend class CommandsFactory;
         public:
             virtual ~EsOutAddCommand();
-            virtual void Execute( es_out_t *out );
+            virtual void Execute( es_out_t *out ) override;
 
         protected:
             EsOutAddCommand( FakeESOutID * );
@@ -91,8 +91,8 @@ namespace adaptive
     {
         friend class CommandsFactory;
         public:
-            virtual void Execute( es_out_t *out );
-            virtual vlc_tick_t getTime() const;
+            virtual void Execute( es_out_t *out ) override;
+            virtual vlc_tick_t getTime() const override;
 
         protected:
             EsOutControlPCRCommand( int, vlc_tick_t );
@@ -104,7 +104,7 @@ namespace adaptive
     {
         friend class CommandsFactory;
         public:
-            virtual void Execute( es_out_t *out );
+            virtual void Execute( es_out_t *out ) override;
 
         protected:
             EsOutDestroyCommand();
@@ -114,7 +114,7 @@ namespace adaptive
     {
         friend class CommandsFactory;
         public:
-            virtual void Execute( es_out_t *out );
+            virtual void Execute( es_out_t *out ) override;
 
         protected:
             EsOutControlResetPCRCommand();
@@ -124,7 +124,7 @@ namespace adaptive
     {
         friend class CommandsFactory;
         public:
-            virtual void Execute( es_out_t *out );
+            virtual void Execute( es_out_t *out ) override;
 
         protected:
             EsOutMetaCommand( int, vlc_meta_t * );
