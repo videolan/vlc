@@ -427,8 +427,8 @@ AbstractStream::status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
 
     if(fakeEsOut()->commandsQueue()->isDraining())
     {
-        AdvDebug(vlc_tick_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR();
-                 vlc_tick_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstDTS();
+        AdvDebug(mtime_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR();
+                 mtime_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstDTS();
                  msg_Dbg(p_realdemux, "Stream %s pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " [DRAINING]",
                          description.c_str(), pcrvalue, dtsvalue, nz_deadline));
 
