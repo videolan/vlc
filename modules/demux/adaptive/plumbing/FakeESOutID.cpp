@@ -45,9 +45,9 @@ void FakeESOutID::setRealESID( es_out_id_t *real_es_id )
    p_real_es_id = real_es_id;
 }
 
-void FakeESOutID::notifyData()
+void FakeESOutID::sendData( block_t *p_block )
 {
-    fakeesout->gc();
+    fakeesout->sendData( this, p_block );
 }
 
 void FakeESOutID::create()

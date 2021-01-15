@@ -238,8 +238,9 @@ FakeESOutID * FakeESOut::createNewID( const es_format_t *p_fmt )
     return es_id;
 }
 
-void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
+void FakeESOut::createOrRecycleRealEsID( AbstractFakeESOutID *es_id_ )
 {
+    FakeESOutID *es_id = static_cast<FakeESOutID *>(es_id_);
     std::list<FakeESOutID *>::iterator it;
     es_out_id_t *realid = nullptr;
 
@@ -288,9 +289,27 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
     es_id->setRealESID( realid );
 }
 
-void FakeESOut::setPriority(int p)
+void FakeESOut::setPriority( int p )
 {
     priority = p;
+}
+
+void FakeESOut::sendData( AbstractFakeESOutID *id_, block_t *p_block )
+{
+    FakeESOutID *id = static_cast<FakeESOutID *>(id_);
+    /* Be sure to notify Data before Sending, because UI would still not pick new ES */
+    gc();
+    if( !id->realESID() ||
+        es_out_Send( real_es_out, id->realESID(), p_block ) != VLC_SUCCESS )
+    {
+        block_Release( p_block );
+    }
+    gc();
+}
+
+void FakeESOut::sendMeta( int group, const vlc_meta_t *p_meta )
+{
+    es_out_Control( real_es_out, ES_OUT_SET_GROUP_META, group, p_meta );
 }
 
 size_t FakeESOut::esCount() const
@@ -392,8 +411,9 @@ bool FakeESOut::restarting() const
     return b;
 }
 
-void FakeESOut::recycle( FakeESOutID *id )
+void FakeESOut::recycle( AbstractFakeESOutID *id_ )
 {
+    FakeESOutID *id = static_cast<FakeESOutID *>(id_);
     fakeesidlist.remove( id );
     recycle_candidates.push_back( id );
 }
@@ -549,7 +569,7 @@ int FakeESOut::esOutControl(int i_query, va_list args)
         {
             static_cast<void>(va_arg( args, int )); /* ignore group */
             const vlc_meta_t *p_meta = va_arg( args, const vlc_meta_t * );
-            AbstractCommand *command = commandsqueue->factory()->createEsOutMetaCommand( -1, p_meta );
+            AbstractCommand *command = commandsqueue->factory()->createEsOutMetaCommand( this,-1, p_meta );
             if( likely(command) )
             {
                 commandsqueue->Schedule( command );

@@ -33,6 +33,7 @@ namespace adaptive
     };
 
     class CommandsQueue;
+    class AbstractFakeESOutID;
     class FakeESOutID;
 
     class AbstractFakeEsOut
@@ -42,6 +43,12 @@ namespace adaptive
             AbstractFakeEsOut();
             virtual ~AbstractFakeEsOut();
             operator es_out_t*();
+            /* Used by FakeES ID */
+            virtual void recycle( AbstractFakeESOutID * ) = 0;
+            virtual void createOrRecycleRealEsID( AbstractFakeESOutID * ) = 0;
+            virtual void setPriority(int) = 0;
+            virtual void sendData( AbstractFakeESOutID *, block_t * ) = 0;
+            virtual void sendMeta( int, const vlc_meta_t * ) = 0;
 
         private:
             void *esoutpriv;
@@ -84,9 +91,11 @@ namespace adaptive
             void declareEs( const es_format_t * );
 
             /* Used by FakeES ID */
-            void recycle( FakeESOutID *id );
-            void createOrRecycleRealEsID( FakeESOutID * );
-            void setPriority(int);
+            virtual void recycle( AbstractFakeESOutID *id ) override;
+            virtual void createOrRecycleRealEsID( AbstractFakeESOutID * ) override;
+            virtual void setPriority(int) override;
+            virtual void sendData( AbstractFakeESOutID *, block_t * ) override;
+            virtual void sendMeta( int, const vlc_meta_t * ) override;
 
             /**/
             void schedulePCRReset();
