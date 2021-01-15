@@ -2573,7 +2573,7 @@ AM_CONDITIONAL([HAVE_AVCODEC_D3D11VA], [test "${have_avcodec_d3d11va}" = "yes"])
 dnl
 dnl DXGI debug
 dnl
-AC_CHECK_HEADERS(dxgidebug.h dxgi1_6.h)
+AC_CHECK_HEADERS(dxgidebug.h dxgi1_6.h d3d11_4.h)
 
 dnl
 dnl  avformat demuxer/muxer plugin
