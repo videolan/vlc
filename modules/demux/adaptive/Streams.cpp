@@ -436,7 +436,7 @@ AbstractStream::Status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
                  msg_Dbg(p_realdemux, "Stream %s pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " [DRAINING]",
                          description.c_str(), pcrvalue, dtsvalue, nz_deadline));
 
-        *pi_pcr = fakeEsOut()->commandsQueue()->Process(p_realdemux->out, VLC_TS_0 + nz_deadline);
+        *pi_pcr = fakeEsOut()->commandsQueue()->Process(VLC_TS_0 + nz_deadline);
         if(!fakeEsOut()->commandsQueue()->isEmpty())
             return Status::Demuxed;
 
@@ -462,7 +462,7 @@ AbstractStream::Status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
 
     if(nz_deadline + VLC_TS_0 <= bufferingLevel) /* demuxed */
     {
-        *pi_pcr = fakeEsOut()->commandsQueue()->Process( p_realdemux->out, VLC_TS_0 + nz_deadline );
+        *pi_pcr = fakeEsOut()->commandsQueue()->Process( VLC_TS_0 + nz_deadline );
         return Status::Demuxed;
     }
 
