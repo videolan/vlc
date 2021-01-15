@@ -1000,11 +1000,15 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev.d3dcontext,
                                                       sys->prepareWait, NULL, 0, 0))
         {
-            if (is_d3d11_opaque(picture->format.i_chroma))
-                d3d11_device_unlock( &sys->d3d_dev );
-            SleepEx(2, TRUE);
-            if (is_d3d11_opaque(picture->format.i_chroma))
-                d3d11_device_lock( &sys->d3d_dev );
+            mtime_t sleep_duration = (picture->date - mdate()) / 4;
+            if (sleep_duration <= 2 * CLOCK_FREQ / 1000)
+            {
+                // don't wait any longer, the display will likely be late
+                // we'll finish waiting during the Display call
+                break;
+            }
+            // wait a little until the rendering is done
+            SleepEx(sleep_duration * 1000 / CLOCK_FREQ, TRUE);
         }
     }
 
@@ -1025,6 +1029,22 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         /* TODO device lost */
         msg_Err(vd, "SwapChain Present failed. (hr=0x%lX)", hr);
     }
+
+    if (sys->prepareWait)
+    {
+        mtime_t start = 0;
+        while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev.d3dcontext,
+                                                      sys->prepareWait, NULL, 0, 0))
+        {
+            if (start == 0)
+                start = mdate();
+            SleepEx(2, TRUE);
+        }
+        if (start != 0 && var_InheritInteger(vd, "verbose") >= 4)
+            msg_Dbg(vd, "rendering wasn't finished, waited extra %lld ms",
+                        (mdate() - start) * 1000 / CLOCK_FREQ);
+    }
+
     d3d11_device_unlock( &sys->d3d_dev );
 
     picture_Release(picture);
