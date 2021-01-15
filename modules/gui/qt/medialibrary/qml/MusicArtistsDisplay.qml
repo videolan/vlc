@@ -237,7 +237,8 @@ Widgets.PageLoader {
                 id: view
 
                 anchors.fill: parent
-                focus: true
+                visible: artistModel.count > 0
+                focus: artistModel.count > 0
                 initialItem: mainInterface.gridView ? gridComponent : tableComponent
             }
 
@@ -255,6 +256,7 @@ Widgets.PageLoader {
             EmptyLabel {
                 anchors.fill: parent
                 visible: artistModel.count === 0
+                focus: artistModel.count === 0
                 text: i18n.qtr("No artists found\nPlease try adding sources, by going to the Network tab")
                 navigationParent: root
                 cover: VLCStyle.noArtArtistCover
