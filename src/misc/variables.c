@@ -350,6 +350,8 @@ int (var_Create)( vlc_object_t *p_this, const char *psz_name, int i_type )
             vlc_assert_unreachable ();
     }
 
+    vlc_cond_init(&p_var->wait);
+
     if (i_type & VLC_VAR_DOINHERIT)
         var_Inherit(p_this, psz_name, i_type, &p_var->val);
 
