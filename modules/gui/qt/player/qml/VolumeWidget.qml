@@ -56,6 +56,8 @@ FocusScope{
             iconText:
                 if( player.muted )
                     VLCIcons.volume_muted
+                else if ( player.volume == 0 )
+                    VLCIcons.volume_zero
                 else if ( player.volume < .33 )
                     VLCIcons.volume_low
                 else if( player.volume <= .66 )
