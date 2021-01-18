@@ -150,14 +150,16 @@ Item{
 
         ToolButton {
             id: playBtn
+
             width: VLCStyle.icon_medium
             height: width
 
             // TODO: Bind videoOverlays (set 'true' below) to player property which indicates if video is rendered over player controls
             property bool videoOverlays: !isMiniplayer && true
 
-            property color color: VLCStyle.colors.buttonText
-            property color colorDisabled: VLCStyle.colors.textInactive
+            property VLCColors colors: VLCStyle.colors
+            property color color: colors.buttonText
+            property color colorDisabled: colors.textInactive
 
             property bool acceptFocus: true
 
