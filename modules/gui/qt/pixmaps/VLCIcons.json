@@ -28,6 +28,7 @@
 		{"key":"atob_fg_ab", "path": "./toolbar/atob_fg_ab.svg"},
 		{"key":"atob_fg_a", "path": "./toolbar/atob_fg_a.svg"},
 		{"key":"atob_fg_b", "path": "./toolbar/atob_fg_b.svg"},
+		{"key":"volume_zero", "path": "./toolbar/volume-zero.svg"},
 		{"key":"volume_low", "path": "./toolbar/volume-low.svg"},
 		{"key":"dvd_prev", "path": "./toolbar/dvd_prev.svg"},
 		{"key":"volume_medium", "path": "./toolbar/volume-medium.svg"},
