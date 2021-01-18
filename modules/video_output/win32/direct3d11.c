@@ -1683,7 +1683,11 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
 
 #ifdef HAVE_D3D11_4_H
     hr = InitRenderFence(sys);
-    if (FAILED(hr))
+    if (SUCCEEDED(hr))
+    {
+        msg_Dbg(vd, "using GPU render fence");
+    }
+    else
 #endif
     {
         D3D11_QUERY_DESC query = { 0 };
