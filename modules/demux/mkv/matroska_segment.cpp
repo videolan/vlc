@@ -866,7 +866,8 @@ bool matroska_segment_c::Seek( demux_t &demuxer, vlc_tick_t i_absolute_mk_date, 
             trackit->second->i_skip_until_fpos = it->second.fpos;
         else
             trackit->second->i_skip_until_fpos = std::numeric_limits<uint64_t>::max();
-        trackit->second->i_last_dts        = it->second.pts + i_mk_time_offset;
+        if (it->second.pts != -1)
+            trackit->second->i_last_dts        = it->second.pts + i_mk_time_offset;
 
         msg_Dbg( &sys.demuxer, "seek: preroll{ track: %u, pts: %" PRId64 ", fpos: %" PRIu64 " skip: %" PRIu64 "} ",
           it->first, it->second.pts, it->second.fpos, trackit->second->i_skip_until_fpos );
