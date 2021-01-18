@@ -1,6 +1,6 @@
 dnl Autoconf settings for vlc
 
-AC_COPYRIGHT([Copyright 1999-2020 VLC authors and VideoLAN])
+AC_COPYRIGHT([Copyright 1999-2021 VLC authors and VideoLAN])
 
 AC_INIT([vlc], [4.0.0-dev])
 VERSION_MAJOR=4
@@ -14,7 +14,7 @@ AC_SUBST([PKGDIR])
 
 CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
 CODENAME="Otto Chriek"
-COPYRIGHT_YEARS="1996-2020"
+COPYRIGHT_YEARS="1996-2021"
 
 AC_CONFIG_SRCDIR([src/libvlc.c])
 AC_CONFIG_AUX_DIR([autotools])
