@@ -261,11 +261,11 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
     p_enc_out->i_width = p_enc_in->i_width;
     p_enc_out->i_visible_width = p_enc_in->i_visible_width;
     p_enc_out->i_height = p_enc_in->i_height;
-    p_enc_out->i_visible_height = p_enc_out->i_visible_height;
+    p_enc_out->i_visible_height = p_enc_in->i_visible_height;
 
-    transcode_video_sar_apply( p_src, p_enc_out );
-    p_enc_in->i_sar_num = p_enc_out->i_sar_num;
-    p_enc_in->i_sar_den = p_enc_out->i_sar_den;
+    transcode_video_sar_apply( p_src, p_enc_in );
+    p_enc_out->i_sar_num = p_enc_in->i_sar_num;
+    p_enc_out->i_sar_den = p_enc_in->i_sar_den;
     msg_Dbg( p_obj, "encoder aspect is %u:%u",
              p_enc_out->i_sar_num * p_enc_out->i_width,
              p_enc_out->i_sar_den * p_enc_out->i_height );
