@@ -32,8 +32,6 @@
 /** Stream output instance */
 struct sout_instance_t
 {
-    char *psz_sout;
-
     bool                b_wants_substreams;
     sout_stream_t       *p_stream;
 };
