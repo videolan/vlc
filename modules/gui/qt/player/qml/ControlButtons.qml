@@ -109,7 +109,7 @@ Item{
 
     Component{
         id: backBtnDelegate
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: backBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.exit
@@ -121,7 +121,7 @@ Item{
 
     Component{
         id: randomBtnDelegate
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: randomBtn
             size: VLCStyle.icon_medium
             checked: mainPlaylistController.random
@@ -134,7 +134,7 @@ Item{
 
     Component{
         id: prevBtnDelegate
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: prevBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.previous
@@ -352,7 +352,7 @@ Item{
 
     Component{
         id: nextBtnDelegate
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: nextBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.next
@@ -365,7 +365,7 @@ Item{
 
     Component{
         id: chapterPreviousBtnDelegate
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: chapterPreviousBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.dvd_prev
@@ -379,7 +379,7 @@ Item{
 
     Component{
         id: chapterNextBtnDelegate
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: chapterNextBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.dvd_next
@@ -393,7 +393,7 @@ Item{
 
     Component{
         id: repeatBtnDelegate
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: repeatBtn
             size: VLCStyle.icon_medium
             checked: mainPlaylistController.repeatMode !== PlaylistControllerModel.PLAYBACK_REPEAT_NONE
@@ -408,7 +408,7 @@ Item{
 
     Component{
         id: langBtnDelegate
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: langBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.audiosub
@@ -441,7 +441,7 @@ Item{
 
     Component{
         id:playlistBtnDelegate
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: playlistBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.playlist
@@ -459,7 +459,7 @@ Item{
 
     Component{
         id: menuBtnDelegate
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: menuBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.ellipsis
@@ -533,7 +533,7 @@ Item{
 
     Component{
         id: fullScreenBtnDelegate
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: fullScreenBtn
             size: VLCStyle.icon_medium
             enabled: player.hasVideoOutput
@@ -546,7 +546,7 @@ Item{
 
     Component{
         id: recordBtnDelegate
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: recordBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.record
@@ -560,7 +560,7 @@ Item{
 
     Component{
         id: toggleABloopstateDelegate
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: abBtn
             size: VLCStyle.icon_medium
             checked: player.ABloopState !== PlayerController.ABLOOP_STATE_NONE
@@ -584,7 +584,7 @@ Item{
 
     Component{
         id: snapshotBtnDelegate
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: snapshotBtn
             size: VLCStyle.icon_medium
             enabled: player.isPlaying
@@ -598,7 +598,7 @@ Item{
 
     Component{
         id: stopBtndelgate
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: stopBtn
             size: VLCStyle.icon_medium
             enabled: player.isPlaying
@@ -611,7 +611,7 @@ Item{
 
     Component{
         id: mediainfoBtnDelegate
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: infoBtn
             size: VLCStyle.icon_medium
             enabled: player.isPlaying
@@ -625,7 +625,7 @@ Item{
     Component{
         id: framebyframeDelegate
 
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: frameBtn
             size: VLCStyle.icon_medium
             enabled: player.isPlaying
@@ -639,7 +639,7 @@ Item{
     Component{
         id: fasterBtnDelegate
 
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: fasterBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.faster
@@ -652,7 +652,7 @@ Item{
     Component{
         id: slowerBtnDelegate
 
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: slowerBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.slower
@@ -664,7 +664,7 @@ Item{
 
     Component{
         id: openmediaBtnDelegate
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: openMediaBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.eject
@@ -676,7 +676,7 @@ Item{
 
     Component{
         id: extdSettingsBtnDelegate
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: extdSettingsBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.extended
@@ -688,7 +688,7 @@ Item{
 
     Component{
         id: stepFwdBtnDelegate
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: stepfwdBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.skip_for
@@ -700,7 +700,7 @@ Item{
 
     Component{
         id: stepBackBtnDelegate
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: stepBackBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.skip_back
@@ -712,7 +712,7 @@ Item{
 
     Component{
         id: quitBtnDelegate
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             id: quitBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.clear
@@ -751,7 +751,7 @@ Item{
     Component {
         id: playerSwitchBtnDelegate
 
-        Widgets.IconToolButton{
+        Widgets.IconControlButton{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.fullscreen
 
