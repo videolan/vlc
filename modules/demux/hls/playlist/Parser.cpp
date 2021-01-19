@@ -228,6 +228,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
     vlc_tick_t nzStartTime = 0;
     vlc_tick_t absReferenceTime = VLC_TICK_INVALID;
     uint64_t sequenceNumber = 0;
+    uint64_t discontinuitySequence = 0;
     bool discontinuity = false;
     std::size_t prevbyterangeoffset = 0;
     const SingleValueTag *ctx_byterange = nullptr;
@@ -301,12 +302,9 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                     segment->setByteRange(range.first, prevbyterangeoffset - 1);
                     ctx_byterange = nullptr;
                 }
-
-                if(discontinuity)
-                {
-                    segment->discontinuity = true;
-                    discontinuity = false;
-                }
+                segment->setDiscontinuitySequenceNumber(discontinuitySequence);
+                segment->discontinuity = discontinuity;
+                discontinuity = false;
 
                 if(encryption.method != CommonEncryption::Method::None)
                     segment->setEncryption(encryption);
@@ -373,8 +371,13 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
             }
             break;
 
+            case SingleValueTag::EXTXDISCONTINUITYSEQUENCE:
+                discontinuitySequence = static_cast<const SingleValueTag *>(tag)->getValue().decimal();
+                break;
+
             case Tag::EXTXDISCONTINUITY:
-                discontinuity  = true;
+                discontinuity = true;
+                discontinuitySequence++;
                 break;
 
             case Tag::EXTXENDLIST:
