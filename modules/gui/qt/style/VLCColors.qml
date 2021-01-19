@@ -83,6 +83,7 @@ Item {
 
     property color playerFg: text
     property color playerFgInactive: textInactive
+    property color playerControlBarFg: playerFg
     property color playerBg: bg
     property color playerBorder: buttonText
 
@@ -162,6 +163,8 @@ Item {
                 alert: "#ff0000";
                 separator: "#ededed";
 
+                playerControlBarFg: "#333333"
+
                 isThemeDark: false;
             }
         },
@@ -189,6 +192,8 @@ Item {
                 accent: "#ff950d"
                 alert: "#ff0000"
                 separator: "#2d2d2d"
+                playerControlBarFg: "#ffffff"
+
                 isThemeDark: true
             }
         },
@@ -221,6 +226,8 @@ Item {
                 bannerHover: systemPalette.highlight
 
                 separator: blendColors(bg, text, .95)
+
+                playerControlBarFg: systemPalette.text
 
                 isThemeDark: systemPalette.isDark
             }
