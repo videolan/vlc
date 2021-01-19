@@ -141,42 +141,6 @@ static void DestroySout( input_resource_t *p_resource )
     p_resource->p_sout = NULL;
 }
 
-static sout_instance_t *RequestSout( input_resource_t *p_resource,
-                                     sout_instance_t *p_sout, const char *psz_sout )
-{
-#ifdef ENABLE_SOUT
-    assert( !p_sout );
-
-    /* Check the validity of the sout */
-    if( p_resource->p_sout &&
-        strcmp( p_resource->p_sout->psz_sout, psz_sout ) )
-    {
-        msg_Dbg( p_resource->p_parent, "destroying unusable sout" );
-        DestroySout( p_resource );
-    }
-
-        if( p_resource->p_sout )
-        {
-            /* Reuse it */
-            msg_Dbg( p_resource->p_parent, "reusing sout" );
-            msg_Dbg( p_resource->p_parent, "you probably want to use gather stream_out" );
-        }
-        else
-        {
-            /* Create a new one */
-            p_resource->p_sout = sout_NewInstance( p_resource->p_parent, psz_sout );
-        }
-
-        p_sout = p_resource->p_sout;
-        p_resource->p_sout = NULL;
-
-        return p_sout;
-#else
-    VLC_UNUSED (p_resource); VLC_UNUSED (p_sout); VLC_UNUSED (psz_sout);
-    return NULL;
-#endif
-}
-
 /* */
 static void DestroyVout( input_resource_t *p_resource )
 {
@@ -609,12 +573,38 @@ void input_resource_StopFreeVout(input_resource_t *p_resource)
 /* */
 sout_instance_t *input_resource_RequestSout( input_resource_t *p_resource, const char *psz_sout )
 {
+    sout_instance_t *sout;
+
     assert(psz_sout != NULL);
     vlc_mutex_lock( &p_resource->lock );
-    sout_instance_t *p_ret = RequestSout( p_resource, NULL, psz_sout );
-    vlc_mutex_unlock( &p_resource->lock );
+#ifdef ENABLE_SOUT
+    /* Check the validity of the sout */
+    if (p_resource->p_sout != NULL
+     && strcmp(p_resource->p_sout->psz_sout, psz_sout) != 0)
+    {
+        msg_Dbg(p_resource->p_parent, "destroying unusable sout");
+        DestroySout(p_resource);
+    }
 
-    return p_ret;
+    sout = p_resource->p_sout;
+
+    if (sout != NULL)
+    {
+        /* Reuse it */
+        msg_Dbg(p_resource->p_parent, "reusing sout");
+        msg_Dbg(p_resource->p_parent, "you probably want to use gather stream_out");
+        p_resource->p_sout = NULL;
+    }
+    else
+    {
+        /* Create a new one */
+        sout = sout_NewInstance(p_resource->p_parent, psz_sout);
+    }
+#else
+    sout = NULL;
+#endif
+    vlc_mutex_unlock( &p_resource->lock );
+    return sout;
 }
 
 void input_resource_PutSout(input_resource_t *resource, sout_instance_t *sout)
