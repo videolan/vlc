@@ -126,7 +126,7 @@ FocusScope{
             Keys.onRightPressed: {
                 var right = widgetfscope.KeyNavigation.right
                 while (right && (!right.enabled || !right.visible)) {
-                    right = right.KeyNavigation ? right.KeyNavigation.left : undefined
+                    right = right.KeyNavigation ? right.KeyNavigation.right : undefined
                 }
                 if (right)
                     right.forceActiveFocus()
