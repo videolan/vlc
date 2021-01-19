@@ -806,7 +806,7 @@ static int InitSout( input_thread_t * p_input )
     }
     if( psz && strncasecmp( priv->p_item->psz_uri, "vlc:", 4 ) )
     {
-        priv->p_sout  = input_resource_RequestSout( priv->p_resource, NULL, psz );
+        priv->p_sout  = input_resource_RequestSout( priv->p_resource, psz );
         if( priv->p_sout == NULL )
         {
             input_ChangeState( p_input, ERROR_S, VLC_TICK_INVALID );

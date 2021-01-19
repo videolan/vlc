@@ -35,7 +35,7 @@ void input_resource_SetInput( input_resource_t *, input_thread_t * );
 /**
  * This function handles sout request.
  */
-sout_instance_t *input_resource_RequestSout( input_resource_t *, sout_instance_t *, const char *psz_sout );
+sout_instance_t *input_resource_RequestSout( input_resource_t *, const char * );
 void input_resource_PutSout(input_resource_t *, sout_instance_t *);
 
 vout_thread_t *input_resource_RequestVout(input_resource_t *, vlc_video_context *,
