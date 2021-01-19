@@ -1356,8 +1356,8 @@ error:
     if( input_priv(p_input)->p_resource )
     {
         if( input_priv(p_input)->p_sout )
-            input_resource_RequestSout( input_priv(p_input)->p_resource,
-                                         input_priv(p_input)->p_sout, NULL );
+            input_resource_PutSout( input_priv(p_input)->p_resource,
+                                    input_priv(p_input)->p_sout );
         input_resource_SetInput( input_priv(p_input)->p_resource, NULL );
         if( input_priv(p_input)->p_resource )
         {
@@ -1424,8 +1424,8 @@ static void End( input_thread_t * p_input )
     vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
 
     /* */
-    input_resource_RequestSout( input_priv(p_input)->p_resource,
-                                 input_priv(p_input)->p_sout, NULL );
+    input_resource_PutSout( input_priv(p_input)->p_resource,
+                            input_priv(p_input)->p_sout );
     input_resource_SetInput( input_priv(p_input)->p_resource, NULL );
     if( input_priv(p_input)->p_resource )
     {
@@ -1797,8 +1797,8 @@ static void ControlUpdateRenderer( input_thread_t *p_input, bool b_enable )
     }
     else
     {
-        input_resource_RequestSout( input_priv(p_input)->p_resource,
-                                    input_priv(p_input)->p_sout, NULL );
+        input_resource_PutSout( input_priv(p_input)->p_resource,
+                                input_priv(p_input)->p_sout );
         input_priv(p_input)->p_sout = NULL;
     }
 }
