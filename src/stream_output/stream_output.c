@@ -243,8 +243,6 @@ int sout_InputSendBuffer( sout_instance_t *p_sout,
                           sout_packetizer_input_t *p_input,
                           block_t *p_buffer )
 {
-    int                 i_ret;
-
     if( p_input->b_flushed )
     {
         p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
