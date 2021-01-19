@@ -107,17 +107,12 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
     msg_Dbg(p_parent, "creating stream output chain `%s'", psz_chain);
 
     /* *** init descriptor *** */
-    p_sout->b_wants_substreams = false;
-
     p_sout->p_stream = NULL;
 
     p_sout->p_stream = sout_StreamChainNew(p_parent, psz_chain, NULL);
     if( p_sout->p_stream )
     {
         free( psz_chain );
-        sout_StreamControl( p_sout->p_stream,
-                            SOUT_STREAM_WANTS_SUBSTREAMS,
-                            &p_sout->b_wants_substreams );
         return p_sout;
     }
 
