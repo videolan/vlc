@@ -621,6 +621,8 @@ struct sockaddr_in6
 static const struct in6_addr in6addr_any =
     { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
 
+# define INET6_ADDRSTRLEN   46
+
 # include <errno.h>
 # ifndef EPROTO
 #  define EPROTO (ELAST + 1)
