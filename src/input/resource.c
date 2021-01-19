@@ -629,7 +629,10 @@ sout_instance_t *input_resource_RequestSout( input_resource_t *p_resource, sout_
 
     return p_ret;
 }
+
 void input_resource_TerminateSout( input_resource_t *p_resource )
 {
-    input_resource_RequestSout( p_resource, NULL, NULL );
+    vlc_mutex_lock( &p_resource->lock );
+    DestroySout(p_resource);
+    vlc_mutex_unlock( &p_resource->lock );
 }
