@@ -42,6 +42,8 @@ Widgets.NavigableFocusScope {
     Keys.onPressed: defaultKeyAction(event, 0)
     onActionCancel: history.previous()
 
+    onActiveFocusChanged: if (activeFocus) trackPositionSlider.forceActiveFocus()
+
     implicitHeight: columnLayout.implicitHeight
 
     ColumnLayout {
