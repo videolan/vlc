@@ -145,13 +145,7 @@ static sout_instance_t *RequestSout( input_resource_t *p_resource,
                                      sout_instance_t *p_sout, const char *psz_sout )
 {
 #ifdef ENABLE_SOUT
-    if( !p_sout && !psz_sout )
-    {
-        DestroySout( p_resource );
-        return NULL;
-    }
-
-    assert( !p_sout || ( !p_resource->p_sout && !psz_sout ) );
+    assert( !p_sout );
 
     /* Check the validity of the sout */
     if( p_resource->p_sout &&
@@ -161,8 +155,6 @@ static sout_instance_t *RequestSout( input_resource_t *p_resource,
         DestroySout( p_resource );
     }
 
-    if( psz_sout )
-    {
         if( p_resource->p_sout )
         {
             /* Reuse it */
@@ -179,12 +171,6 @@ static sout_instance_t *RequestSout( input_resource_t *p_resource,
         p_resource->p_sout = NULL;
 
         return p_sout;
-    }
-    else
-    {
-        p_resource->p_sout = p_sout;
-        return NULL;
-    }
 #else
     VLC_UNUSED (p_resource); VLC_UNUSED (p_sout); VLC_UNUSED (psz_sout);
     return NULL;
