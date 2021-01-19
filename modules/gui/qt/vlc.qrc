@@ -247,6 +247,7 @@
         <file alias="CoverShadow.qml">widgets/qml/CoverShadow.qml</file>
         <file alias="ListCoverShadow.qml">widgets/qml/ListCoverShadow.qml</file>
         <file alias="OverlayMenu.qml">widgets/qml/OverlayMenu.qml</file>
+        <file alias="IconControlButton.qml">widgets/qml/IconControlButton.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>

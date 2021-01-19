@@ -718,6 +718,7 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/HorizontalResizeHandle.qml \
 	gui/qt/widgets/qml/IconLabel.qml \
 	gui/qt/widgets/qml/IconButton.qml \
+	gui/qt/widgets/qml/IconControlButton.qml \
 	gui/qt/widgets/qml/IconToolButton.qml \
 	gui/qt/widgets/qml/ImageToolButton.qml \
 	gui/qt/widgets/qml/KeyNavigableGridView.qml \
