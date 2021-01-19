@@ -48,6 +48,7 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     startTime.Set(0);
     duration.Set(0);
     sequence = 0;
+    discontinuitySequenceNumber = std::numeric_limits<uint64_t>::max();
     templated = false;
     discontinuity = false;
     displayTime = VLC_TS_INVALID;
@@ -137,6 +138,16 @@ uint64_t ISegment::getSequenceNumber() const
     return sequence;
 }
 
+void ISegment::setDiscontinuitySequenceNumber(uint64_t seq)
+{
+    discontinuitySequenceNumber = seq;
+}
+
+uint64_t ISegment::getDiscontinuitySequenceNumber() const
+{
+    return discontinuitySequenceNumber;
+}
+
 size_t ISegment::getOffset() const
 {
     return startByte;
@@ -153,6 +164,12 @@ void ISegment::debug(vlc_object_t *obj, int indent) const
     if(startTime.Get() > 0)
     	 ss << " stime " << startTime.Get();
     ss << " duration " << duration.Get();
+    if(discontinuity)
+    {
+        ss << " dty";
+        if(discontinuitySequenceNumber != std::numeric_limits<uint64_t>::max())
+            ss << "#" << discontinuitySequenceNumber;
+    }
     msg_Dbg(obj, "%s", ss.str().c_str());
 }
 

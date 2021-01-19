@@ -69,6 +69,8 @@ namespace adaptive
                 virtual void                            setByteRange    (size_t start, size_t end);
                 virtual void                            setSequenceNumber(uint64_t);
                 virtual uint64_t                        getSequenceNumber() const;
+                virtual void                            setDiscontinuitySequenceNumber(uint64_t);
+                virtual uint64_t                        getDiscontinuitySequenceNumber() const;
                 virtual bool                            isTemplate      () const;
                 virtual size_t                          getOffset       () const;
                 virtual void                            debug           (vlc_object_t *,int = 0) const;
@@ -91,7 +93,8 @@ namespace adaptive
                 std::string             debugName;
                 bool                    templated;
                 uint64_t                sequence;
-                mtime_t                displayTime;
+                uint64_t                discontinuitySequenceNumber;
+                mtime_t                 displayTime;
         };
 
         class Segment : public ISegment
