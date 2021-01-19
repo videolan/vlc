@@ -133,7 +133,10 @@ static void DestroySout( input_resource_t *p_resource )
 {
 #ifdef ENABLE_SOUT
     if( p_resource->p_sout )
+    {
+        msg_Dbg( p_resource->p_parent, "destroying stream output" );
         sout_DeleteInstance( p_resource->p_sout );
+    }
 #endif
     p_resource->p_sout = NULL;
 }
@@ -144,11 +147,7 @@ static sout_instance_t *RequestSout( input_resource_t *p_resource,
 #ifdef ENABLE_SOUT
     if( !p_sout && !psz_sout )
     {
-        if( p_resource->p_sout )
-        {
-            msg_Dbg( p_resource->p_parent, "destroying useless sout" );
-            DestroySout( p_resource );
-        }
+        DestroySout( p_resource );
         return NULL;
     }
 
