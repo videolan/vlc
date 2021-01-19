@@ -1911,6 +1911,9 @@ static void *Thread(void *object)
 
         wait = ThreadDisplayPicture(vout, &deadline) != VLC_SUCCESS;
 
+        if (atomic_load(&sys->control_is_terminated))
+            break;
+
         const bool picture_interlaced = sys->displayed.is_interlaced;
 
         vout_SetInterlacingState(&vout->obj, &sys->private, picture_interlaced);
