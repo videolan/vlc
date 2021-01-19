@@ -633,8 +633,15 @@ sout_instance_t *input_resource_RequestSout( input_resource_t *p_resource, const
 
 void input_resource_PutSout(input_resource_t *resource, sout_instance_t *sout)
 {
+    if (sout == NULL)
+    {
+        input_resource_TerminateSout(resource);
+        return;
+    }
+
     vlc_mutex_lock(&resource->lock);
-    RequestSout(resource, sout, NULL);
+    assert(resource->p_sout == NULL);
+    resource->p_sout = sout;
     vlc_mutex_unlock(&resource->lock);
 }
 
