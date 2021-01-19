@@ -107,7 +107,6 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
     msg_Dbg(p_parent, "creating stream output chain `%s'", psz_chain);
 
     /* *** init descriptor *** */
-    p_sout->psz_sout    = strdup( psz_dest );
     p_sout->b_wants_substreams = false;
 
     p_sout->p_stream = NULL;
@@ -124,9 +123,6 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
 
     msg_Err(p_parent, "failed to create stream output chain `%s'", psz_chain);
     free( psz_chain );
-
-    FREENULL( p_sout->psz_sout );
-
     free(p_sout);
     return NULL;
 }
@@ -138,9 +134,6 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
 {
     /* remove the stream out chain */
     sout_StreamChainDelete( p_sout->p_stream, NULL );
-
-    /* *** free all string *** */
-    FREENULL( p_sout->psz_sout );
 
     /* *** free structure *** */
     free(p_sout);
