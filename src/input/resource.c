@@ -67,6 +67,7 @@ struct input_resource_t
     input_thread_t *p_input;
 
     sout_instance_t *p_sout;
+    char *psz_sout;
     vout_thread_t   *p_vout_dummy;
     struct vout_resource *vout_rsc_free;
 
@@ -148,6 +149,7 @@ static void DestroySout( input_resource_t *p_resource )
     {
         msg_Dbg( p_resource->p_parent, "destroying stream output" );
         sout_DeleteInstance( p_resource->p_sout );
+        free(p_resource->psz_sout);
     }
 #endif
     p_resource->p_sout = NULL;
@@ -610,7 +612,7 @@ sout_instance_t *input_resource_RequestSout( input_resource_t *p_resource, const
 #ifdef ENABLE_SOUT
     /* Check the validity of the sout */
     if (p_resource->p_sout != NULL
-     && strcmp(p_resource->p_sout->psz_sout, psz_sout) != 0)
+     && strcmp(p_resource->psz_sout, psz_sout) != 0)
     {
         msg_Dbg(p_resource->p_parent, "destroying unusable sout");
         DestroySout(p_resource);
@@ -628,7 +630,10 @@ sout_instance_t *input_resource_RequestSout( input_resource_t *p_resource, const
     else
     {
         /* Create a new one */
-        sout = sout_NewInstance(p_resource->p_parent, psz_sout);
+        p_resource->psz_sout = strdup(psz_sout);
+
+        if (likely(p_resource->psz_sout != NULL))
+            sout = sout_NewInstance(p_resource->p_parent, psz_sout);
     }
 #else
     sout = NULL;
