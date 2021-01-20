@@ -119,7 +119,9 @@ Widgets.NavigableFocusScope {
 
             Row {
                 anchors.right: parent.right
+                anchors.rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xxsmall
                 focus: true
+                spacing: VLCStyle.margin_xxsmall
                 KeyNavigation.down: playlistpopup.state === "visible" ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
 
                 Widgets.IconToolButton {
