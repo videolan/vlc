@@ -129,6 +129,7 @@ static MRESULT EXPENTRY WndProc       ( HWND, ULONG, MPARAM, MPARAM );
 #define WM_VLC_MANAGE               ( WM_USER + 1 )
 #define WM_VLC_FULLSCREEN_CHANGE    ( WM_USER + 2 )
 #define WM_VLC_SIZE_CHANGE          ( WM_USER + 3 )
+#define WM_VLC_SET_POS              ( WM_USER + 4 )
 
 #define TID_HIDE_MOUSE  0x1010
 
@@ -352,6 +353,10 @@ static int Open ( vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_EGENERIC;
     }
 
+    /* Sometimes WinSetWindowPos() causes locking. To avoid this,
+     * post a message here */
+    WinPostMsg( sys->client, WM_VLC_SET_POS, 0, 0 );
+
     return VLC_SUCCESS;
 }
 
@@ -476,7 +481,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     bool b_hw_accel = 0;
     FOURCC i_kva_fourcc;
     int i_chroma_shift;
-    RECTL rcl;
     int w, h;
 
     msg_Dbg( vd, "render chroma = %4.4s", ( const char * )&fmt->i_chroma );
@@ -608,16 +612,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
         sys->client_rect.xRight  = sys->client_rect.xLeft   + w;
         sys->client_rect.yTop    = sys->client_rect.yBottom + h;
     }
-
-    rcl = sys->client_rect;
-
-    WinCalcFrameRect( sys->frame, &rcl, FALSE);
-
-    WinSetWindowPos( sys->frame, HWND_TOP,
-                     rcl.xLeft, rcl.yBottom,
-                     rcl.xRight - rcl.xLeft, rcl.yTop - rcl.yBottom,
-                     SWP_MOVE | SWP_SIZE | SWP_ZORDER | SWP_SHOW |
-                     SWP_ACTIVATE );
 
     return VLC_SUCCESS;
 }
@@ -1087,6 +1081,19 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             sys->client_rect.xRight  = sys->client_rect.xLeft   + swp.cx;
             sys->client_rect.yTop    = sys->client_rect.yBottom + swp.cy;
             WinCalcFrameRect( sys->frame, &sys->client_rect, TRUE );
+            break;
+
+        /* Set position */
+        case WM_VLC_SET_POS :
+            rcl = sys->client_rect;
+
+            WinCalcFrameRect( sys->frame, &rcl, FALSE);
+
+            WinSetWindowPos( sys->frame, HWND_TOP,
+                             rcl.xLeft, rcl.yBottom,
+                             rcl.xRight - rcl.xLeft, rcl.yTop - rcl.yBottom,
+                             SWP_MOVE | SWP_SIZE | SWP_ZORDER | SWP_SHOW |
+                             SWP_ACTIVATE );
             break;
 
         default :
