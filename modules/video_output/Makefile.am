@@ -212,8 +212,9 @@ endif
 
 
 ### OS/2 ###
+libdrawable_os2_plugin_la_SOURCES = video_output/drawable_os2.c
 if HAVE_OS2
-vout_LTLIBRARIES += libdrawable_plugin.la
+vout_LTLIBRARIES += libdrawable_os2_plugin.la
 endif
 
 libkva_plugin_la_SOURCES = video_output/kva.c
