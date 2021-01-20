@@ -64,6 +64,7 @@ namespace adaptive
                 SegmentChange,
                 BufferingStateUpdate,
                 BufferingLevelChange,
+                PositionChange,
             };
             TrackerEvent() = delete;
             virtual ~TrackerEvent() = 0;
@@ -137,6 +138,13 @@ namespace adaptive
             mtime_t minimum;
             mtime_t current;
             mtime_t target;
+    };
+
+    class PositionChangedEvent : public TrackerEvent
+    {
+        public:
+            PositionChangedEvent();
+            virtual ~PositionChangedEvent() = default;
     };
 
     class SegmentTrackerListenerInterface

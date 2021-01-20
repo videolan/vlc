@@ -97,6 +97,12 @@ BufferingLevelChangedEvent::BufferingLevelChangedEvent(const ID &id, mtime_t min
     this->target = target;
 }
 
+PositionChangedEvent::PositionChangedEvent()
+    : TrackerEvent(Type::PositionChange)
+{
+
+}
+
 SegmentTracker::SegmentTracker(SharedResources *res,
         AbstractAdaptationLogic *logic_,
         const AbstractBufferingLogic *bl,
