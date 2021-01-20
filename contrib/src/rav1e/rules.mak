@@ -1,6 +1,6 @@
 # rav1e
 
-RAV1E_VERSION := 0.3.4
+RAV1E_VERSION := 0.4.0
 RAV1E_URL := https://github.com/xiph/rav1e/archive/v$(RAV1E_VERSION).tar.gz
 
 ifdef BUILD_RUST
