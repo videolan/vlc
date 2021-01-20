@@ -217,6 +217,11 @@ if HAVE_OS2
 vout_LTLIBRARIES += libdrawable_os2_plugin.la
 endif
 
+libwindow_os2_plugin_la_SOURCES = video_output/window_os2.c
+if HAVE_OS2
+vout_LTLIBRARIES += libwindow_os2_plugin.la
+endif
+
 libkva_plugin_la_SOURCES = video_output/kva.c
 libkva_plugin_la_LIBADD = $(KVA_LIBS)
 if HAVE_KVA
