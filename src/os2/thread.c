@@ -475,10 +475,14 @@ int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
         *p_handle = th;
 
     if (priority)
-        DosSetPriority(PRTYS_THREAD,
-                       HIBYTE(priority),
-                       LOBYTE(priority),
-                       th->tid);
+    {
+        LONG delta = PRTYD_MAXIMUM;
+
+        if (priority != VLC_THREAD_PRIORITY_HIGHEST)
+            delta >>= 1;
+
+        DosSetPriority(PRTYS_THREAD, PRTYC_REGULAR, delta, th->tid );
+    }
 
     return 0;
 

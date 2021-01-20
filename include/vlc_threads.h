@@ -92,13 +92,11 @@ typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
 # define VLC_THREAD_PRIORITY_LOW      0
-# define VLC_THREAD_PRIORITY_INPUT \
-                                    MAKESHORT(PRTYD_MAXIMUM / 2, PRTYC_REGULAR)
-# define VLC_THREAD_PRIORITY_AUDIO    MAKESHORT(PRTYD_MAXIMUM, PRTYC_REGULAR)
+# define VLC_THREAD_PRIORITY_INPUT    1
+# define VLC_THREAD_PRIORITY_AUDIO    VLC_THREAD_PRIORITY_HIGHEST
 # define VLC_THREAD_PRIORITY_VIDEO    0
-# define VLC_THREAD_PRIORITY_OUTPUT \
-                                    MAKESHORT(PRTYD_MAXIMUM / 2, PRTYC_REGULAR)
-# define VLC_THREAD_PRIORITY_HIGHEST  MAKESHORT(0, PRTYC_TIMECRITICAL)
+# define VLC_THREAD_PRIORITY_OUTPUT   1
+# define VLC_THREAD_PRIORITY_HIGHEST  2
 
 # define pthread_sigmask  sigprocmask
 
