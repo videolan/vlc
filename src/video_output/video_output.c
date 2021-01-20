@@ -1485,6 +1485,14 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     }
 
     int ret = ThreadDisplayRenderPicture(vout, render_now);
+
+    if (first && ret == VLC_SUCCESS)
+    {
+        /* SEND EVENT */
+        msg_Info(&vout->obj, "First frame has been drawn");
+        vout_ReportFirstFrame(&vout->obj);
+    }
+
     return render_now ? VLC_EGENERIC : ret;
 }
 
