@@ -51,7 +51,8 @@ typedef struct {
 /**
  * Creates a video output.
  */
-vout_thread_t *vout_Create(vlc_object_t *obj) VLC_USED;
+vout_thread_t *vout_Create(vlc_object_t *obj, void *owner,
+                           struct vlc_video_output_callbacks *cbs) VLC_USED;
 
 vout_thread_t *vout_CreateDummy(vlc_object_t *obj) VLC_USED;
 

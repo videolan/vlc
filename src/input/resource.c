@@ -406,7 +406,7 @@ RequestVoutRsc(input_resource_t *p_resource)
          * pre-configured on this dummy vout. */
         vlc_object_t *parent = vlc_list_is_empty( &p_resource->vout_rscs ) ?
             VLC_OBJECT(p_resource->p_vout_dummy) : p_resource->p_parent;
-        vout_thread_t *vout = vout_Create(parent);
+        vout_thread_t *vout = vout_Create(parent, p_resource->p_vout_owner, p_resource->p_vout_cbs);
         if (vout == NULL)
             return NULL;
 

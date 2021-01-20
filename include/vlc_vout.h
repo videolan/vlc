@@ -29,6 +29,12 @@
 #include <vlc_picture.h>
 #include <vlc_subpicture.h>
 
+struct vlc_video_output_callbacks
+{
+    /* Event triggered when the first frame of the vout is being displayed. */
+    void (*first_frame_reported)(void *owner);
+};
+
 /**
  * \defgroup output Output
  * \ingroup vlc
@@ -53,6 +59,10 @@
  */
 struct vout_thread_t {
     struct vlc_object_t obj;
+
+    /* Feedback */
+    void *owner;
+    struct vlc_video_output_callbacks *cbs;
 };
 
 /* Alignment flags */
@@ -84,6 +94,14 @@ enum vlc_vout_order
      */
     VLC_VOUT_ORDER_SECONDARY,
 };
+
+static inline void
+vout_ReportFirstFrame(vout_thread_t *vout)
+{
+    assert(vout);
+    if (vout->cbs && vout->cbs->first_frame_reported)
+        vout->cbs->first_frame_reported(vout->owner);
+}
 
 /*****************************************************************************
  * Prototypes

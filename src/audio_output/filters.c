@@ -382,7 +382,7 @@ static int VisualizationCallback (vlc_object_t *obj, const char *var,
 
 vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
 {
-    vout_thread_t *vout = vout_Create(VLC_OBJECT(filter));
+    vout_thread_t *vout = vout_Create(VLC_OBJECT(filter), NULL, NULL);
     if (unlikely(vout == NULL))
         return NULL;
 
