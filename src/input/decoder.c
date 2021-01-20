@@ -2317,7 +2317,7 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
 
     vlc_fifo_Unlock( p_owner->p_fifo );
 
-    if ( p_owner->fmt.i_cat == VIDEO_ES )
+    if ( p_owner->dec.fmt_in.i_cat == VIDEO_ES )
     {
         /* Set the pool cancel state. This will unblock the module if it is
          * waiting for new pictures (likely). This state will be reset back
