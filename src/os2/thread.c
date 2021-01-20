@@ -39,6 +39,9 @@
 #include <errno.h>
 #include <time.h>
 
+#include <stdalign.h>
+#include <stdatomic.h>
+
 #include <sys/types.h>
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
@@ -51,6 +54,11 @@
 
 #include <sys/stat.h>
 
+/* Static mutex and condition variable */
+static vlc_mutex_t super_mutex;
+static vlc_cond_t  super_variable;
+
+/* Threads */
 static vlc_threadvar_t thread_key;
 
 struct vlc_thread
@@ -61,11 +69,17 @@ struct vlc_thread
     int            cancel_sock;
 
     bool           killable;
-    bool           killed;
+    atomic_bool    killed;
     vlc_cleanup_t *cleaners;
 
     void        *(*entry) (void *);
     void          *data;
+
+    struct
+    {
+        atomic_uint *addr;
+        HMTX        lock;
+    } wait;
 };
 
 static void vlc_cancel_self (PVOID dummy);
@@ -129,40 +143,6 @@ static ULONG vlc_Sleep (ULONG ulTimeout)
     return ( rc != ERROR_TIMEOUT ) ? rc : 0;
 }
 
-static vlc_mutex_t super_mutex;
-static vlc_cond_t  super_variable;
-
-int _CRT_init(void);
-void _CRT_term(void);
-
-unsigned long _System _DLL_InitTerm(unsigned long, unsigned long);
-
-unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
-{
-    VLC_UNUSED (hmod);
-
-    switch (flag)
-    {
-        case 0 :    /* Initialization */
-            if(_CRT_init() == -1)
-                return 0;
-
-            vlc_mutex_init (&super_mutex);
-            vlc_cond_init (&super_variable);
-            vlc_threadvar_create (&thread_key, NULL);
-
-            return 1;
-
-        case 1 :    /* Termination */
-            vlc_threadvar_delete (&thread_key);
-
-            _CRT_term();
-
-            return 1;
-    }
-
-    return 0;   /* Failed */
-}
 
 /*** Thread-specific variables (TLS) ***/
 struct vlc_threadvar
@@ -232,6 +212,197 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
     return ( void * )*key->id;
 }
 
+static struct wait_bucket
+{
+    HMTX lock;
+    HEV wait;
+    unsigned waiters;
+} wait_buckets[ 32 ];
+
+static void wait_bucket_init( void )
+{
+    for( size_t i = 0; i < ARRAY_SIZE( wait_buckets ); i++ )
+    {
+        struct wait_bucket *bucket = wait_buckets + i;
+
+        DosCreateMutexSem( NULL, &bucket->lock, 0L, FALSE );
+        DosCreateEventSem( NULL, &bucket->wait, 0L, FALSE );
+    }
+}
+
+static void wait_bucket_destroy( void )
+{
+    for( size_t i = 0; i < ARRAY_SIZE( wait_buckets ); i++ )
+    {
+        struct wait_bucket *bucket = wait_buckets + i;
+
+        DosCloseMutexSem( bucket->lock );
+        DosCloseEventSem( bucket->wait );
+    }
+}
+
+static struct wait_bucket *wait_bucket_get( atomic_uint *addr )
+{
+    uintptr_t u = ( uintptr_t )addr;
+    size_t idx = ( u / alignof ( *addr )) % ARRAY_SIZE( wait_buckets );
+
+    return &wait_buckets[ idx ];
+}
+
+static struct wait_bucket *wait_bucket_enter( atomic_uint *addr )
+{
+    struct wait_bucket *bucket = wait_bucket_get(addr);
+
+    DosRequestMutexSem( bucket->lock, SEM_INDEFINITE_WAIT );
+    bucket->waiters++;
+
+    return bucket;
+}
+
+static void wait_bucket_leave( void *data )
+{
+    struct wait_bucket *bucket = data;
+
+    bucket->waiters--;
+    DosReleaseMutexSem( bucket->lock );
+}
+
+void vlc_atomic_wait( void *addr, unsigned value )
+{
+    atomic_uint *futex = addr;
+    struct wait_bucket *bucket = wait_bucket_enter( futex );
+
+    vlc_cleanup_push( wait_bucket_leave, bucket );
+
+    if( value == atomic_load_explicit( futex, memory_order_relaxed ))
+    {
+        ULONG count;
+
+        DosReleaseMutexSem( bucket->lock );
+        vlc_WaitForSingleObject( bucket->wait, SEM_INDEFINITE_WAIT );
+        DosResetEventSem( bucket->wait, &count );
+        DosRequestMutexSem( bucket->lock, SEM_INDEFINITE_WAIT );
+    }
+    else
+        vlc_testcancel();
+
+    wait_bucket_leave( bucket );
+    vlc_cleanup_pop();
+}
+
+int vlc_atomic_timedwait(void *addr, unsigned value, vlc_tick_t deadline)
+{
+    atomic_uint *futex = addr;
+    struct wait_bucket *bucket = wait_bucket_enter( futex );
+
+    ULONG rc = 0;
+
+    vlc_cleanup_push( wait_bucket_leave, bucket );
+
+    if( value == atomic_load_explicit( futex, memory_order_relaxed ))
+    {
+        vlc_tick_t delay;
+
+        DosReleaseMutexSem( bucket->lock );
+
+        do
+        {
+            ULONG ms;
+            ULONG count;
+
+            delay = deadline - vlc_tick_now();
+
+            if( delay < 0 )
+                ms = 0;
+            else if( delay >= VLC_TICK_FROM_MS( LONG_MAX ))
+                ms = LONG_MAX;
+            else
+                ms = MS_FROM_VLC_TICK( delay );
+
+            rc = vlc_WaitForSingleObject( bucket->wait, ms );
+            if( rc == 0 )
+            {
+                DosResetEventSem( bucket->wait, &count );
+                break;
+            }
+        } while( delay > 0 );
+
+        DosRequestMutexSem( bucket->lock, SEM_INDEFINITE_WAIT );
+    }
+    else
+        vlc_testcancel();
+
+    wait_bucket_leave( bucket );
+    vlc_cleanup_pop();
+
+    return rc == 0 ? 0 : ETIMEDOUT;
+}
+
+int vlc_atomic_timedwait_daytime(void *addr, unsigned value, time_t deadline)
+{
+    atomic_uint *futex = addr;
+    struct wait_bucket *bucket = wait_bucket_enter( futex );
+
+    ULONG rc = 0;
+
+    vlc_cleanup_push( wait_bucket_leave, bucket );
+
+    if( value == atomic_load_explicit( futex, memory_order_relaxed ))
+    {
+        vlc_tick_t delay;
+
+        DosReleaseMutexSem( bucket->lock );
+
+        do
+        {
+            ULONG ms;
+            ULONG count;
+
+            delay = deadline - time( NULL );
+
+            if( delay < 0 )
+                ms = 0;
+            else if( delay >= ( LONG_MAX / 1000 ))
+                ms = LONG_MAX;
+            else
+                ms = delay * 1000;
+
+            rc = vlc_WaitForSingleObject( bucket->wait, ms );
+            if( rc == 0 )
+            {
+                DosResetEventSem( bucket->wait, &count );
+                break;
+            }
+        } while( delay > 0 );
+
+        DosRequestMutexSem( bucket->lock, SEM_INDEFINITE_WAIT );
+    }
+    else
+        vlc_testcancel();
+
+    wait_bucket_leave( bucket );
+    vlc_cleanup_pop();
+
+    return rc == 0 ? 0 : ETIMEDOUT;
+}
+
+void vlc_atomic_notify_one(void *addr)
+{
+    vlc_atomic_notify_all(addr);
+}
+
+void vlc_atomic_notify_all(void *addr)
+{
+    struct wait_bucket *bucket = wait_bucket_get(addr);
+
+    DosRequestMutexSem( bucket->lock, SEM_INDEFINITE_WAIT );
+
+    if( bucket->waiters > 0 )
+        DosPostEventSem( bucket->wait );
+
+    DosReleaseMutexSem( bucket->lock);
+}
+
 
 /*** Threads ***/
 void vlc_threads_setup (libvlc_int_t *p_libvlc)
@@ -280,8 +451,9 @@ int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
     th->entry = entry;
     th->data = data;
     th->killable = false; /* not until vlc_entry() ! */
-    th->killed = false;
+    atomic_init (&th->killed, false);
     th->cleaners = NULL;
+    th->wait.addr = NULL;
 
     if( DosCreateEventSem (NULL, &th->cancel_event, 0, FALSE))
         goto error;
@@ -290,6 +462,9 @@ int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
 
     th->cancel_sock = socket (AF_LOCAL, SOCK_STREAM, 0);
     if( th->cancel_sock < 0 )
+        goto error;
+
+    if( DosCreateMutexSem (NULL, &th->wait.lock, 0, FALSE))
         goto error;
 
     th->tid = _beginthread (vlc_entry, NULL, 1024 * 1024, th);
@@ -308,6 +483,7 @@ int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
     return 0;
 
 error:
+    DosCloseMutexSem (th->wait.lock);
     soclose (th->cancel_sock);
     DosCloseEventSem (th->cancel_event);
     DosCloseEventSem (th->done_event);
@@ -333,6 +509,8 @@ void vlc_join (vlc_thread_t th, void **result)
     DosCloseEventSem( th->done_event );
 
     soclose( th->cancel_sock );
+
+    DosCloseMutexSem( th->wait.lock );
 
     free( th );
 }
@@ -360,13 +538,23 @@ static void vlc_cancel_self (PVOID self)
     struct vlc_thread *th = self;
 
     if (likely(th != NULL))
-        th->killed = true;
+        atomic_store_explicit (&th->killed, true, memory_order_relaxed);
 }
 
-void vlc_cancel (vlc_thread_t thread_id)
+void vlc_cancel (vlc_thread_t th)
 {
-    DosPostEventSem( thread_id->cancel_event );
-    so_cancel( thread_id->cancel_sock );
+    atomic_store_explicit( &th->killed, true, memory_order_relaxed );
+
+    DosRequestMutexSem( th->wait.lock, SEM_INDEFINITE_WAIT );
+    if( th->wait.addr != NULL )
+    {
+        atomic_fetch_or_explicit( th->wait.addr, 1, memory_order_relaxed );
+        vlc_atomic_notify_all( th->wait.addr );
+    }
+    DosReleaseMutexSem( th->wait.lock );
+
+    DosPostEventSem( th->cancel_event );
+    so_cancel( th->cancel_sock );
 }
 
 int vlc_savecancel (void)
@@ -400,21 +588,26 @@ void vlc_testcancel (void)
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
+    if (!th->killable)
+        return;
+
     /* This check is needed for the case that vlc_cancel() is followed by
      * vlc_testcancel() without any cancellation point */
     if( DosWaitEventSem( th->cancel_event, 0 ) == NO_ERROR )
         vlc_cancel_self( th );
 
-    if (th->killable && th->killed)
-    {
-        for (vlc_cleanup_t *p = th->cleaners; p != NULL; p = p->next)
-             p->proc (p->data);
+    if( !atomic_load_explicit( &th->killed, memory_order_relaxed ))
+        return;
 
-        DosPostEventSem( th->done_event );
-        th->data = NULL; /* TODO: special value? */
-        vlc_thread_cleanup (th);
-        _endthread();
-    }
+    th->killable = true; /* Do not re-enter cancellation cleanup */
+
+    for (vlc_cleanup_t *p = th->cleaners; p != NULL; p = p->next)
+         p->proc (p->data);
+
+    DosPostEventSem( th->done_event );
+    th->data = NULL; /* TODO: special value? */
+    vlc_thread_cleanup (th);
+    _endthread();
 }
 
 void vlc_control_cancel (vlc_cleanup_t *cleaner)
@@ -437,6 +630,30 @@ void vlc_control_cancel (vlc_cleanup_t *cleaner)
     {
         th->cleaners = th->cleaners->next;
     }
+}
+
+void vlc_cancel_addr_set( atomic_uint *addr )
+{
+    struct vlc_thread *th = vlc_threadvar_get( thread_key );
+    if( th == NULL )
+        return; /* Main thread - cannot be cancelled anyway */
+
+    DosRequestMutexSem( th->wait.lock, SEM_INDEFINITE_WAIT );
+    assert( th->wait.addr == NULL );
+    th->wait.addr = addr;
+    DosReleaseMutexSem( th->wait.lock );
+}
+
+void vlc_cancel_addr_clear( atomic_uint *addr )
+{
+    struct vlc_thread *th = vlc_threadvar_get( thread_key );
+    if( th == NULL )
+        return; /* Main thread - cannot be cancelled anyway */
+
+    DosRequestMutexSem( th->wait.lock, SEM_INDEFINITE_WAIT );
+    assert( th->wait.addr == addr );
+    th->wait.addr = NULL;
+    DosReleaseMutexSem( th->wait.lock );
 }
 
 static int vlc_select( int nfds, fd_set *rdset, fd_set *wrset, fd_set *exset,
@@ -704,4 +921,40 @@ unsigned vlc_GetCPUCount (void)
                     &numprocs, sizeof(numprocs));
 
     return numprocs;
+}
+
+int _CRT_init(void);
+void _CRT_term(void);
+
+unsigned long _System _DLL_InitTerm(unsigned long, unsigned long);
+
+unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
+{
+    VLC_UNUSED (hmod);
+
+    switch (flag)
+    {
+        case 0 :    /* Initialization */
+            if(_CRT_init() == -1)
+                return 0;
+
+            wait_bucket_init();
+
+            vlc_mutex_init (&super_mutex);
+            vlc_cond_init (&super_variable);
+            vlc_threadvar_create (&thread_key, NULL);
+
+            return 1;
+
+        case 1 :    /* Termination */
+            vlc_threadvar_delete (&thread_key);
+
+            wait_bucket_destroy();
+
+            _CRT_term();
+
+            return 1;
+    }
+
+    return 0;   /* Failed */
 }
