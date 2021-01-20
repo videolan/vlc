@@ -135,4 +135,9 @@ vlc_gl_sampler_Load(const struct vlc_gl_sampler *sampler)
     sampler->ops->load(sampler);
 }
 
+void
+vlc_sampler_yuv2rgb_matrix(float conv_matrix_out[],
+                           video_color_space_t color_space,
+                           video_color_range_t color_range);
+
 #endif
