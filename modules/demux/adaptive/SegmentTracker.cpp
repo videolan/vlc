@@ -97,6 +97,12 @@ BufferingLevelChangedEvent::BufferingLevelChangedEvent(const ID &id, vlc_tick_t 
     this->target = target;
 }
 
+PositionChangedEvent::PositionChangedEvent()
+    : TrackerEvent(Type::PositionChange)
+{
+
+}
+
 SegmentTracker::SegmentTracker(SharedResources *res,
         AbstractAdaptationLogic *logic_,
         const AbstractBufferingLogic *bl,
