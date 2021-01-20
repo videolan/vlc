@@ -141,6 +141,37 @@ void AbstractStream::prepareRestart(bool b_discontinuity)
     }
 }
 
+bool AbstractStream::resetForNewPosition(vlc_tick_t seekMediaTime)
+{
+    // clear eof flag before restartDemux() to prevent readNextBlock() fail
+    eof = false;
+    demuxfirstchunk = true;
+    notfound_sequence = 0;
+    if(!demuxer || demuxer->needsRestartOnSeek()) /* needs (re)start */
+    {
+        delete currentChunk;
+        currentChunk = nullptr;
+        needrestart = false;
+
+        fakeEsOut()->resetTimestamps();
+
+        fakeEsOut()->setExpectedTimestamp(seekMediaTime);
+        if( !restartDemux() )
+        {
+            msg_Info(p_realdemux, "Restart demux failed");
+            eof = true;
+            valid = false;
+            return false;
+        }
+        else
+        {
+            fakeEsOut()->commandsQueue()->setEOF(false);
+        }
+    }
+    else fakeEsOut()->commandsQueue()->Abort( true );
+    return true;
+}
+
 void AbstractStream::setLanguage(const std::string &lang)
 {
     language = lang;
@@ -545,35 +576,6 @@ bool AbstractStream::setPosition(vlc_tick_t time, bool tryonly)
     bool ret = segmentTracker->setPositionByTime(time, b_needs_restart, tryonly);
     if(!tryonly && ret)
     {
-        // clear eof flag before restartDemux() to prevent readNextBlock() fail
-        eof = false;
-        demuxfirstchunk = true;
-        notfound_sequence = 0;
-        if(b_needs_restart)
-        {
-            if(currentChunk)
-                delete currentChunk;
-            currentChunk = nullptr;
-            needrestart = false;
-
-            fakeEsOut()->resetTimestamps();
-
-            vlc_tick_t seekMediaTime = segmentTracker->getPlaybackTime(true);
-            fakeEsOut()->setExpectedTimestamp(seekMediaTime);
-            if( !restartDemux() )
-            {
-                msg_Info(p_realdemux, "Restart demux failed");
-                eof = true;
-                valid = false;
-                ret = false;
-            }
-            else
-            {
-                fakeEsOut()->commandsQueue()->setEOF(false);
-            }
-        }
-        else fakeEsOut()->commandsQueue()->Abort( true );
-
 // in some cases, media time seek != sent dts
 //        es_out_Control(p_realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
 //                       VLC_TICK_0 + time);
@@ -690,6 +692,10 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
             {
                 needrestart = true;
             }
+            break;
+
+        case TrackerEvent::Type::PositionChange:
+            resetForNewPosition(segmentTracker->getPlaybackTime(true));
             break;
 
         default:
