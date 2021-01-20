@@ -98,7 +98,7 @@ namespace adaptive
 
         /**/
         virtual void fillExtraFMTInfo( es_format_t * ) const  override;
-        virtual void trackerEvent(const SegmentTrackerEvent &)  override;
+        virtual void trackerEvent(const TrackerEvent &)  override;
 
     protected:
         bool seekAble() const;

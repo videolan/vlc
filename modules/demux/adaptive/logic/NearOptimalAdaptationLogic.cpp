@@ -194,27 +194,31 @@ void NearOptimalAdaptationLogic::updateDownloadRate(const ID &id, size_t dlsize,
     vlc_mutex_unlock(&lock);
 }
 
-void NearOptimalAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
+void NearOptimalAdaptationLogic::trackerEvent(const TrackerEvent &ev)
 {
-    switch(event.type)
+    switch(ev.getType())
     {
-    case SegmentTrackerEvent::Type::RepresentationSwitch:
+    case TrackerEvent::Type::RepresentationSwitch:
         {
+            const RepresentationSwitchEvent &event =
+                    static_cast<const RepresentationSwitchEvent &>(ev);
             vlc_mutex_lock(&lock);
-            if(event.u.switching.prev)
-                usedBps -= event.u.switching.prev->getBandwidth();
-            if(event.u.switching.next)
-                usedBps += event.u.switching.next->getBandwidth();
+            if(event.prev)
+                usedBps -= event.prev->getBandwidth();
+            if(event.next)
+                usedBps += event.next->getBandwidth();
                  BwDebug(msg_Info(p_obj, "New total bandwidth usage %zu kBps", (usedBps / 8000)));
             vlc_mutex_unlock(&lock);
         }
         break;
 
-    case SegmentTrackerEvent::Type::BufferingStateUpdate:
+    case TrackerEvent::Type::BufferingStateUpdate:
         {
-            const ID &id = *event.u.buffering.id;
+            const BufferingStateUpdatedEvent &event =
+                    static_cast<const BufferingStateUpdatedEvent &>(ev);
+            const ID &id = *event.id;
             vlc_mutex_lock(&lock);
-            if(event.u.buffering.enabled)
+            if(event.enabled)
             {
                 if(streams.find(id) == streams.end())
                 {
@@ -230,17 +234,19 @@ void NearOptimalAdaptationLogic::trackerEvent(const SegmentTrackerEvent &event)
             }
             vlc_mutex_unlock(&lock);
             BwDebug(msg_Info(p_obj, "Stream %s is now known %sactive", id.str().c_str(),
-                         (event.u.buffering.enabled) ? "" : "in"));
+                         (event.enabled) ? "" : "in"));
         }
         break;
 
-    case SegmentTrackerEvent::Type::BufferingLevelChange:
+    case TrackerEvent::Type::BufferingLevelChange:
         {
-            const ID &id = *event.u.buffering.id;
+            const BufferingLevelChangedEvent &event =
+                    static_cast<const BufferingLevelChangedEvent &>(ev);
+            const ID &id = *event.id;
             vlc_mutex_lock(&lock);
             NearOptimalContext &ctx = streams[id];
-            ctx.buffering_level = event.u.buffering_level.current;
-            ctx.buffering_target = event.u.buffering_level.target;
+            ctx.buffering_level = event.current;
+            ctx.buffering_target = event.target;
             vlc_mutex_unlock(&lock);
         }
         break;

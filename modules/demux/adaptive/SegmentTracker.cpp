@@ -38,46 +38,63 @@ using namespace adaptive;
 using namespace adaptive::logic;
 using namespace adaptive::playlist;
 
-SegmentTrackerEvent::SegmentTrackerEvent(SegmentChunk *s)
+TrackerEvent::TrackerEvent(Type t)
 {
-    type = Type::Discontinuity;
-    u.discontinuity.sc = s;
+    type = t;
 }
 
-SegmentTrackerEvent::SegmentTrackerEvent(BaseRepresentation *prev, BaseRepresentation *next)
+TrackerEvent::~TrackerEvent()
 {
-    type = Type::RepresentationSwitch;
-    u.switching.prev = prev;
-    u.switching.next = next;
+
 }
 
-SegmentTrackerEvent::SegmentTrackerEvent(const StreamFormat *fmt)
+TrackerEvent::Type TrackerEvent::getType() const
 {
-    type = Type::FormatChange;
-    u.format.f = fmt;
+    return type;
 }
 
-SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, bool enabled)
+DiscontinuityEvent::DiscontinuityEvent()
+    : TrackerEvent(Type::Discontinuity)
 {
-    type = Type::BufferingStateUpdate;
-    u.buffering.enabled = enabled;
-    u.buffering.id = &id;
+
 }
 
-SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, vlc_tick_t min, vlc_tick_t current, vlc_tick_t target)
+RepresentationSwitchEvent::RepresentationSwitchEvent(BaseRepresentation *prev,
+                                                     BaseRepresentation *next)
+    : TrackerEvent(Type::RepresentationSwitch)
 {
-    type = Type::BufferingLevelChange;
-    u.buffering_level.minimum = min;
-    u.buffering_level.current = current;
-    u.buffering_level.target = target;
-    u.buffering.id = &id;
+    this->prev = prev;
+    this->next = next;
 }
 
-SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, vlc_tick_t duration)
+FormatChangedEvent::FormatChangedEvent(const StreamFormat *f)
+    : TrackerEvent(Type::FormatChange)
 {
-    type = Type::SegmentChange;
-    u.segment.duration = duration;
-    u.segment.id = &id;
+    this->format = f;
+}
+
+SegmentChangedEvent::SegmentChangedEvent(const ID &id, vlc_tick_t duration)
+    : TrackerEvent(Type::SegmentChange)
+{
+    this->id = &id;
+    this->duration = duration;
+}
+
+BufferingStateUpdatedEvent::BufferingStateUpdatedEvent(const ID &id, bool enabled)
+    : TrackerEvent(Type::BufferingStateUpdate)
+{
+    this->id = &id;
+    this->enabled = enabled;
+}
+
+BufferingLevelChangedEvent::BufferingLevelChangedEvent(const ID &id, vlc_tick_t minimum,
+                                                       vlc_tick_t current, vlc_tick_t target)
+    : TrackerEvent(Type::BufferingLevelChange)
+{
+    this->id = &id;
+    this->minimum = minimum;
+    this->current = current;
+    this->target = target;
 }
 
 SegmentTracker::SegmentTracker(SharedResources *res,
@@ -198,7 +215,7 @@ const Role & SegmentTracker::getStreamRole() const
 
 void SegmentTracker::reset()
 {
-    notify(SegmentTrackerEvent(current.rep, nullptr));
+    notify(RepresentationSwitchEvent(current.rep, nullptr));
     current = Position();
     next = Position();
     initializing = true;
@@ -257,7 +274,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
 
     if(b_switched)
     {
-        notify(SegmentTrackerEvent(current.rep, next.rep));
+        notify(RepresentationSwitchEvent(current.rep, next.rep));
         initializing = true;
         assert(!next.index_sent);
         assert(!next.init_sent);
@@ -276,7 +293,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
         else
         {
             format = current.rep->getStreamFormat();
-            notify(SegmentTrackerEvent(&format)); /* Notify new demux format */
+            notify(FormatChangedEvent(&format)); /* Notify new demux format */
             return nullptr; /* Force current demux to end */
         }
     }
@@ -284,7 +301,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     {
         /* Handle the corner case when only the demuxer can know the format and
          * demuxer starts after the format change (Probe != buffering) */
-        notify(SegmentTrackerEvent(&format)); /* Notify new demux format */
+        notify(FormatChangedEvent(&format)); /* Notify new demux format */
         return nullptr; /* Force current demux to end */
     }
 
@@ -334,7 +351,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     if(chunk)
     {
         const Timescale timescale = next.rep->inheritTimescale();
-        notify(SegmentTrackerEvent(next.rep->getAdaptationSet()->getID(),
+        notify(SegmentChangedEvent(next.rep->getAdaptationSet()->getID(),
                                    timescale.ToTime(segment->duration.Get())));
     }
 
@@ -342,13 +359,13 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     if(chunk && format != chunk->getStreamFormat())
     {
         format = chunk->getStreamFormat();
-        notify(SegmentTrackerEvent(&format));
+        notify(FormatChangedEvent(&format));
     }
 
     /* Handle both implicit and explicit discontinuities */
     if( (b_gap && next.number) || (chunk && chunk->discontinuity) )
     {
-        notify(SegmentTrackerEvent(chunk));
+        notify(DiscontinuityEvent());
     }
 
     if(chunk)
@@ -465,12 +482,12 @@ vlc_tick_t SegmentTracker::getMinAheadTime() const
 
 void SegmentTracker::notifyBufferingState(bool enabled) const
 {
-    notify(SegmentTrackerEvent(adaptationSet->getID(), enabled));
+    notify(BufferingStateUpdatedEvent(adaptationSet->getID(), enabled));
 }
 
 void SegmentTracker::notifyBufferingLevel(vlc_tick_t min, vlc_tick_t current, vlc_tick_t target) const
 {
-    notify(SegmentTrackerEvent(adaptationSet->getID(), min, current, target));
+    notify(BufferingLevelChangedEvent(adaptationSet->getID(), min, current, target));
 }
 
 void SegmentTracker::registerListener(SegmentTrackerListenerInterface *listener)
@@ -494,7 +511,7 @@ void SegmentTracker::updateSelected()
     }
 }
 
-void SegmentTracker::notify(const SegmentTrackerEvent &event) const
+void SegmentTracker::notify(const TrackerEvent &event) const
 {
     std::list<SegmentTrackerListenerInterface *>::const_iterator it;
     for(it=listeners.begin();it != listeners.end(); ++it)

@@ -49,7 +49,7 @@ namespace adaptive
 
                 virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) = 0;
                 virtual void                updateDownloadRate     (const ID &, size_t, vlc_tick_t);
-                virtual void                trackerEvent           (const SegmentTrackerEvent &) {}
+                virtual void                trackerEvent           (const TrackerEvent &) override {}
                 void                        setMaxDeviceResolution (int, int);
 
                 enum class LogicType

@@ -53,15 +53,9 @@ namespace adaptive
     using namespace logic;
     using namespace http;
 
-    class SegmentTrackerEvent
+    class TrackerEvent
     {
         public:
-            SegmentTrackerEvent(SegmentChunk *);
-            SegmentTrackerEvent(BaseRepresentation *, BaseRepresentation *);
-            SegmentTrackerEvent(const StreamFormat *);
-            SegmentTrackerEvent(const ID &, bool);
-            SegmentTrackerEvent(const ID &, vlc_tick_t, vlc_tick_t, vlc_tick_t);
-            SegmentTrackerEvent(const ID &, vlc_tick_t);
             enum class Type
             {
                 Discontinuity,
@@ -70,46 +64,85 @@ namespace adaptive
                 SegmentChange,
                 BufferingStateUpdate,
                 BufferingLevelChange,
-            } type;
-            union
-            {
-               struct
-               {
-                    SegmentChunk *sc;
-               } discontinuity;
-               struct
-               {
-                    BaseRepresentation *prev;
-                    BaseRepresentation *next;
-               } switching;
-               struct
-               {
-                    const StreamFormat *f;
-               } format;
-               struct
-               {
-                   const ID *id;
-                   bool enabled;
-               } buffering;
-               struct
-               {
-                   const ID *id;
-                   vlc_tick_t minimum;
-                   vlc_tick_t current;
-                   vlc_tick_t target;
-               } buffering_level;
-               struct
-               {
-                    const ID *id;
-                   vlc_tick_t duration;
-               } segment;
-            } u;
+            };
+            TrackerEvent() = delete;
+            virtual ~TrackerEvent() = 0;
+            Type getType() const;
+
+        protected:
+            TrackerEvent(Type t);
+
+        private:
+            Type type;
+    };
+
+    class DiscontinuityEvent : public TrackerEvent
+    {
+        public:
+            DiscontinuityEvent();
+            virtual ~DiscontinuityEvent()  = default;
+    };
+
+    class RepresentationSwitchEvent : public TrackerEvent
+    {
+        public:
+            RepresentationSwitchEvent() = delete;
+            RepresentationSwitchEvent(BaseRepresentation *, BaseRepresentation *);
+            virtual ~RepresentationSwitchEvent() = default;
+
+            BaseRepresentation *prev;
+            BaseRepresentation *next;
+    };
+
+    class FormatChangedEvent : public TrackerEvent
+    {
+        public:
+            FormatChangedEvent() = delete;
+            FormatChangedEvent(const StreamFormat *);
+            virtual ~FormatChangedEvent() = default;
+
+            const StreamFormat *format;
+    };
+
+    class SegmentChangedEvent : public TrackerEvent
+    {
+        public:
+            SegmentChangedEvent() = delete;
+            SegmentChangedEvent(const ID &, vlc_tick_t);
+            virtual ~SegmentChangedEvent() = default;
+
+            const ID *id;
+            vlc_tick_t duration;
+    };
+
+    class BufferingStateUpdatedEvent : public TrackerEvent
+    {
+        public:
+            BufferingStateUpdatedEvent() = delete;
+            BufferingStateUpdatedEvent(const ID &, bool);
+            virtual ~BufferingStateUpdatedEvent() = default;
+
+            const ID *id;
+            bool enabled;
+    };
+
+    class BufferingLevelChangedEvent : public TrackerEvent
+    {
+        public:
+            BufferingLevelChangedEvent() = delete;
+            BufferingLevelChangedEvent(const ID &, vlc_tick_t, vlc_tick_t, vlc_tick_t);
+            virtual ~BufferingLevelChangedEvent() = default;
+
+            const ID *id;
+            vlc_tick_t minimum;
+            vlc_tick_t current;
+            vlc_tick_t target;
     };
 
     class SegmentTrackerListenerInterface
     {
         public:
-            virtual void trackerEvent(const SegmentTrackerEvent &) = 0;
+            virtual void trackerEvent(const TrackerEvent &) = 0;
             virtual ~SegmentTrackerListenerInterface() = default;
     };
 
@@ -158,7 +191,7 @@ namespace adaptive
 
         private:
             void setAdaptationLogic(AbstractAdaptationLogic *);
-            void notify(const SegmentTrackerEvent &) const;
+            void notify(const TrackerEvent &) const;
             bool first;
             bool initializing;
             Position current;

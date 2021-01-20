@@ -639,45 +639,53 @@ AbstractDemuxer *AbstractStream::newDemux(vlc_object_t *p_obj, const StreamForma
     return ret;
 }
 
-void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
+void AbstractStream::trackerEvent(const TrackerEvent &ev)
 {
-    switch(event.type)
+    switch(ev.getType())
     {
-        case SegmentTrackerEvent::Type::Discontinuity:
+        case TrackerEvent::Type::Discontinuity:
             discontinuity = true;
             break;
 
-        case SegmentTrackerEvent::Type::FormatChange:
+        case TrackerEvent::Type::FormatChange:
+        {
+            const FormatChangedEvent &event =
+                    static_cast<const FormatChangedEvent &>(ev);
             /* Check if our current demux is still valid */
-            if(*event.u.format.f != format || format == StreamFormat(StreamFormat::UNKNOWN))
+            if(*event.format != format || format == StreamFormat(StreamFormat::UNKNOWN))
             {
                 /* Format has changed between segments, we need to drain and change demux */
                 msg_Info(p_realdemux, "Changing stream format %s -> %s",
-                         format.str().c_str(), event.u.format.f->str().c_str());
-                format = *event.u.format.f;
+                         format.str().c_str(), event.format->str().c_str());
+                format = *event.format;
 
                 /* This is an implict discontinuity */
                 discontinuity = true;
             }
+        }
             break;
 
-        case SegmentTrackerEvent::Type::RepresentationSwitch:
+        case TrackerEvent::Type::RepresentationSwitch:
+        {
+            const RepresentationSwitchEvent &event =
+                    static_cast<const RepresentationSwitchEvent &>(ev);
             if(demuxer && !inrestart)
             {
                 if(!demuxer->bitstreamSwitchCompatible() ||
-                   (event.u.switching.next &&
-                   !event.u.switching.next->getAdaptationSet()->isBitSwitchable()))
+                   (event.next &&
+                   !event.next->getAdaptationSet()->isBitSwitchable()))
                     needrestart = true;
             }
             AdvDebug(msg_Dbg(p_realdemux, "Stream %s switching %s %s to %s %s",
                     description.c_str(),
-                    event.u.switching.prev ? event.u.switching.prev->getID().str().c_str() : "",
-                    event.u.switching.prev ? event.u.switching.prev->getStreamFormat().str().c_str() : "",
-                    event.u.switching.next ? event.u.switching.next->getID().str().c_str() : "",
-                    event.u.switching.next ? event.u.switching.next->getStreamFormat().str().c_str() : ""));
+                    event.prev ? event.prev->getID().str().c_str() : "",
+                    event.prev ? event.prev->getStreamFormat().str().c_str() : "",
+                    event.next ? event.next->getID().str().c_str() : "",
+                    event.next ? event.next->getStreamFormat().str().c_str() : ""));
+        }
             break;
 
-        case SegmentTrackerEvent::Type::SegmentChange:
+        case TrackerEvent::Type::SegmentChange:
             if(demuxer && demuxer->needsRestartOnEachSegment() && !inrestart)
             {
                 needrestart = true;
