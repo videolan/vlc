@@ -276,6 +276,8 @@ static void DecoderUpdateFormatLocked( vlc_input_decoder_t *p_owner )
     es_format_Clean( &p_owner->fmt );
     es_format_Copy( &p_owner->fmt, &p_dec->fmt_out );
 
+    assert( p_owner->fmt.i_cat == p_dec->fmt_in.i_cat );
+
     /* Move p_description */
     if( p_dec->p_description != NULL )
     {
