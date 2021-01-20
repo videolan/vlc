@@ -350,3 +350,19 @@ int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
 
     return -1;
 }
+
+ssize_t vlc_send(int fd, const void *buf, size_t len, int flags)
+{
+    return send(fd, buf, len, flags);
+}
+
+ssize_t vlc_sendto(int fd, const void *buf, size_t len, int flags,
+                   const struct sockaddr *dst, socklen_t dstlen)
+{
+    return sendto(fd, buf, len, flags, dst, dstlen);
+}
+
+ssize_t vlc_sendmsg(int fd, const struct msghdr *msg, int flags)
+{
+    return sendmsg(fd, msg, flags);
+}
