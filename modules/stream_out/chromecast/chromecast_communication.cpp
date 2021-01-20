@@ -437,7 +437,7 @@ unsigned ChromecastCommunication::msgPlayerSetVolume( const std::string& destina
  */
 int ChromecastCommunication::sendMessage( const castchannel::CastMessage &msg )
 {
-    int i_size = msg.ByteSize();
+    size_t i_size = msg.ByteSizeLong();
     uint8_t *p_data = new(std::nothrow) uint8_t[PACKET_HEADER_LEN + i_size];
     if (p_data == NULL)
         return VLC_ENOMEM;
@@ -451,7 +451,7 @@ int ChromecastCommunication::sendMessage( const castchannel::CastMessage &msg )
 
     ssize_t i_ret = vlc_tls_Write(m_tls, p_data, PACKET_HEADER_LEN + i_size);
     delete[] p_data;
-    if (i_ret > 0 && i_ret == PACKET_HEADER_LEN + i_size)
+    if (i_ret > 0 && (size_t)i_ret == PACKET_HEADER_LEN + i_size)
         return VLC_SUCCESS;
 
     msg_Warn( m_module, "failed to send message %s (%s)", msg.payload_utf8().c_str(), strerror( errno ) );
