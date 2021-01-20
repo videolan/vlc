@@ -28,11 +28,13 @@
 /* */
 typedef struct {
     vlc_mutex_t lock;
+    vlc_cond_t  wait_request;
     vlc_cond_t  wait_available;
 
     /* */
     bool forced_awake;
-    bool is_held; // control FIFO held outside of the vout thread
+    bool is_waiting;
+    bool is_held;
     DECL_ARRAY(vlc_mouse_t) cmd;
 } vout_control_t;
 
