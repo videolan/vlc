@@ -416,6 +416,27 @@ void msg_print(intf_thread_t *intf, const char *fmt, ...)
     va_end(ap);
 }
 
+#ifdef __OS2__
+static char *os2_fgets(char *buffer, int n, FILE *stream)
+{
+    if( stream == stdin )
+    {
+        /* stdin ? Then wait for a stroke before entering into fgets() for
+         * cancellation. */
+        KBDKEYINFO key;
+
+        while( KbdPeek( &key, 0 ) || !( key.fbStatus & 0x40 ))
+            vlc_tick_sleep( INTF_IDLE_SLEEP );
+    }
+
+    vlc_testcancel();
+
+    return fgets(buffer, n, stream);
+}
+
+#define fgets(buffer, n, stream) os2_fgets(buffer, n, stream)
+#endif
+
 static void *cli_client_thread(void *data)
 {
     struct cli_client *cl = data;
