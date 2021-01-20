@@ -55,6 +55,8 @@
 static int  Create ( vlc_object_t * );
 static void Destroy( vlc_object_t * );
 
+#define TEXT_SSA_FONTSDIR   N_("Additional fonts directory")
+
 vlc_module_begin ()
     set_shortname( N_("Subtitles (advanced)"))
     set_description( N_("Subtitle renderers using libass") )
@@ -62,6 +64,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
     set_callbacks( Create, Destroy )
+    add_string("ssa-fontsdir", NULL, TEXT_SSA_FONTSDIR, NULL, false)
 vlc_module_end ()
 
 /*****************************************************************************
@@ -195,6 +198,13 @@ static int Create( vlc_object_t *p_this )
         vlc_input_attachment_Release( p_attach );
     }
     free( pp_attachments );
+
+    char *psz_fontsdir = var_InheritString( p_dec, "ssa-fontsdir" );
+    if( psz_fontsdir )
+    {
+        ass_set_fonts_dir( p_library, psz_fontsdir );
+        free( psz_fontsdir );
+    }
 
     ass_set_extract_fonts( p_library, true );
     ass_set_style_overrides( p_library, NULL );
