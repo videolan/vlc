@@ -413,6 +413,7 @@ void SegmentTracker::setPosition(const Position &pos, bool restarted)
         initializing = true;
     current = Position();
     next = pos;
+    notify(PositionChangedEvent());
 }
 
 SegmentTracker::Position SegmentTracker::getStartPosition()

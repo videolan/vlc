@@ -111,6 +111,7 @@ namespace adaptive
         virtual bool restartDemux();
 
         virtual void prepareRestart(bool = true);
+        bool resetForNewPosition(mtime_t);
 
         bool discontinuity;
         bool needrestart;
