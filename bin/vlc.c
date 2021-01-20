@@ -45,6 +45,7 @@
 
 # define pthread_t      int
 # define pthread_self() _gettid()
+# define pthread_sigmask(h, i, o) sigprocmask(h, i, o)
 
 static char *FromSystem(const void *str)
 {
