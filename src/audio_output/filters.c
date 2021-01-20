@@ -421,7 +421,7 @@ vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
     if (clock == NULL)
         return NULL;
 
-    vout_thread_t *vout = vout_Create(VLC_OBJECT(filter));
+    vout_thread_t *vout = vout_Create(VLC_OBJECT(filter), NULL, NULL);
     if (unlikely(vout == NULL))
     {
         vlc_clock_Delete(clock);

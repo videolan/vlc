@@ -1827,7 +1827,9 @@ void vout_Release(vout_thread_t *vout)
     vlc_object_delete(VLC_OBJECT(vout));
 }
 
-static vout_thread_sys_t *vout_CreateCommon(vlc_object_t *object)
+static vout_thread_sys_t *
+vout_CreateCommon(vlc_object_t *object, void *owner,
+                  struct vlc_video_output_callbacks *cbs)
 {
     /* Allocate descriptor */
     vout_thread_sys_t *vout = vlc_custom_create(object,
@@ -1835,6 +1837,9 @@ static vout_thread_sys_t *vout_CreateCommon(vlc_object_t *object)
                                             "video output");
     if (!vout)
         return NULL;
+
+    vout->obj.owner = owner;
+    vout->obj.cbs   = cbs;
 
     vout_CreateVars(&vout->obj);
 
@@ -1848,7 +1853,7 @@ static vout_thread_sys_t *vout_CreateCommon(vlc_object_t *object)
 
 vout_thread_t *vout_CreateDummy(vlc_object_t *object)
 {
-    vout_thread_sys_t *vout = vout_CreateCommon(object);
+    vout_thread_sys_t *vout = vout_CreateCommon(object, NULL, NULL);
     if (!vout)
         return NULL;
 
@@ -1857,9 +1862,10 @@ vout_thread_t *vout_CreateDummy(vlc_object_t *object)
     return &vout->obj;
 }
 
-vout_thread_t *vout_Create(vlc_object_t *object)
+vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
+                           struct vlc_video_output_callbacks *cbs)
 {
-    vout_thread_sys_t *p_vout = vout_CreateCommon(object);
+    vout_thread_sys_t *p_vout = vout_CreateCommon(object, owner, cbs);
     if (!p_vout)
         return NULL;
     vout_thread_t *vout = &p_vout->obj;
