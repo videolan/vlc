@@ -78,13 +78,13 @@ Widgets.NavigableFocusScope {
 
         SliderBar {
             id: progressBar
+
+            barHeight: VLCStyle.dp(3, VLCStyle.scale)
             value: player.position
             visible: progressBar.value >= 0.0 && progressBar.value <= 1.0
-
+            backgroundColor: colors.sliderBarMiniplayerBgColor
+            progressBarColor: colors.accent
             focus: true
-
-            isMiniplayer: true
-
             anchors {
                 left: parent.left
                 right: parent.right

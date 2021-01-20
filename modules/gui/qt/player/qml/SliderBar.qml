@@ -26,16 +26,15 @@ import "qrc:///style/"
 Slider {
     id: control
 
-    property int barHeight: isMiniplayer ? VLCStyle.dp(3, VLCStyle.scale) : VLCStyle.dp(5, VLCStyle.scale)
+    property int barHeight: VLCStyle.dp(5, VLCStyle.scale)
     property bool _isHold: false
     property bool _isSeekPointsShown: true
-    property bool isMiniplayer: false
 
     property alias parentWindow: timeTooltip.parentWindow
+    property alias backgroundColor: sliderRect.color
+    property alias progressBarColor: progressRect.color
 
     property VLCColors colors: VLCStyle.colors
-
-    anchors.margins: isMiniplayer ? 0 : VLCStyle.margin_xxsmall
 
     Keys.onRightPressed: player.jumpFwd()
     Keys.onLeftPressed: player.jumpBwd()
@@ -85,7 +84,7 @@ Slider {
         width: control.availableWidth
         implicitHeight: control.implicitHeight
         height: implicitHeight
-        color:  isMiniplayer ? (control.colors.sliderBarMiniplayerBgColor) : control.colors.setColorAlpha( control.colors.playerFg, 0.2 )
+        color: control.colors.setColorAlpha( control.colors.playerFg, 0.2 )
         radius: implicitHeight
 
         MouseArea {
@@ -125,7 +124,7 @@ Slider {
             id: progressRect
             width: control.visualPosition * parent.width
             height: control.barHeight
-            color: (control.activeFocus || control.isMiniplayer) ? control.colors.accent : control.colors.bgHover
+            color: control.activeFocus ? control.colors.accent : control.colors.bgHover
             radius: control.barHeight
         }
 
@@ -261,6 +260,6 @@ Slider {
             }
         ]
 
-        state: isMiniplayer ? ((control.hovered || control.activeFocus) ? "visible" : "hidden") : undefined
+        state: (control.hovered || control.activeFocus) ? "visible" : "hidden"
     }
 }
