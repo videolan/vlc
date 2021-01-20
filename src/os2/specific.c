@@ -140,7 +140,9 @@ void system_Init( void )
 {
     /* Set the default file-translation mode */
     _fmode_bin = 1;
-    setmode( fileno( stdin ), O_BINARY ); /* Needed for pipes */
+
+    if( !isatty( fileno( stdin )))
+        setmode( fileno( stdin ), O_BINARY ); /* Needed for pipes */
 }
 
 void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_argv[] )
