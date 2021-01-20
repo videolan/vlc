@@ -1936,7 +1936,8 @@ then
 
      AS_IF([test "${have_lua_lib}" != "yes"], [
        AC_CHECK_LIB( lua , luaL_newstate,
-         [LUA_LIBS="-llua"],
+         [LUA_LIBS="-llua"
+          have_lua_lib=yes],
          [ have_lua=no ], [-lm] ) ])
 
      dnl If we found any lib, check that we have the headers too
