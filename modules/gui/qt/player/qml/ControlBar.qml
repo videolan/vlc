@@ -85,6 +85,7 @@ Widgets.NavigableFocusScope {
 
             backgroundColor: Qt.lighter(colors.playerBg, 1.6180)
             progressBarColor: activeFocus ? colors.accent : colors.playerControlBarFg
+            barHeight: VLCStyle.heightBar_xxsmall
             Layout.alignment: Qt.AlignLeft | Qt.AlignTop
             Layout.fillWidth: true
             enabled: player.playingState == PlayerController.PLAYING_STATE_PLAYING || player.playingState == PlayerController.PLAYING_STATE_PAUSED
