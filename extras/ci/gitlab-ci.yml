@@ -48,10 +48,18 @@ variables:
         HOST_ARCH: aarch64
         TRIPLET: $HOST_ARCH-w64-mingw32
 
-.variables-macos: &variables-macos
+.variables-macos-x86_64: &variables-macos-x86_64
         VLC_PATH: /Users/videolanci/sandbox/bin
         VLC_FORCE_KERNELVERSION: 19
+        SHORTARCH: intel64
         HOST_ARCH: x86_64
+        TRIPLET: $HOST_ARCH-apple-darwin$VLC_FORCE_KERNELVERSION
+
+.variables-macos-arm64: &variables-macos-arm64
+        VLC_PATH: /Users/videolanci/sandbox/bin
+        VLC_FORCE_KERNELVERSION: 19
+        SHORTARCH: arm64
+        HOST_ARCH: aarch64
         TRIPLET: $HOST_ARCH-apple-darwin$VLC_FORCE_KERNELVERSION
 
 .variables-ios-arm64: &variables-ios-arm64
@@ -304,7 +312,7 @@ raspbian-arm:
 #
 # macOS
 #
-macos:
+.macos-common:
     extends: .base-template
     tags:
         - amd64
@@ -319,22 +327,37 @@ macos:
             EXTRA_BUILD_FLAGS="-c -p"
         fi
         mkdir build && cd build
-        ../extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS
-    variables: *variables-macos
+        ../extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS $NIGHTLY_EXTRA_BUILD_FLAGS -a $HOST_ARCH
 
-nightly-macos:
-    extends: macos
+macos-x86_64:
+    extends: .macos-common
+    variables: *variables-macos-x86_64
+
+macos-arm64:
+    extends: .macos-common
+    variables: *variables-macos-arm64
+
+.nightly-macos-common:
+    extends: .macos-common
     only:
         - schedules
     except:
     after_script:
         - mkdir nightlies
-        - mv build/vlc-*.dmg nightlies/$(basename build/vlc-*.dmg | sed "s/\.dmg/-${CI_COMMIT_SHORT_SHA}\.dmg/")
-        - mv build/vlc-*.tar.gz nightlies/$(basename build/vlc-*.tar.gz | sed "s/\.tar\.gz/-${CI_COMMIT_SHORT_SHA}\.tar\.gz/")
+        - mv build/vlc-*.dmg nightlies/$(basename build/vlc-*.dmg | sed "s/\.dmg/-${SHORTARCH}-${CI_COMMIT_SHORT_SHA}\.dmg/")
+        - mv build/vlc-*.tar.gz nightlies/$(basename build/vlc-*.tar.gz | sed "s/\.tar\.gz/-${SHORTARCH}-${CI_COMMIT_SHORT_SHA}\.tar\.gz/")
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
     artifacts:
         paths:
             - nightlies/*
+
+nightly-macos-x86_64:
+    extends: .nightly-macos-common
+    variables: *variables-macos-x86_64
+
+nightly-macos-arm64:
+    extends: .nightly-macos-common
+    variables: *variables-macos-arm64
 
 #
 # iOS
