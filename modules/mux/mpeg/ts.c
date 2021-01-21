@@ -812,7 +812,7 @@ static int ActiveKeyCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
-    int             i_res, use_odd = -1;
+    int             use_odd = -1;
 
     if( !strcmp(newval.psz_string, "odd" ) ||
         !strcmp(newval.psz_string, "first" ) ||
