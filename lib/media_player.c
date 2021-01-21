@@ -541,8 +541,9 @@ static void on_vout_first_frame_reported(vout_thread_t *vout, void *p_data)
     libvlc_media_player_t *mp = p_data;
 
     libvlc_event_t event;
-    event.type = event.libvlc_VideoOutputFrameDisplayed;
-    event.u.video_output_frame_displayed.video_output = vout;
+    event.type = libvlc_VideoOutputFrameDisplayed;
+    event.u.video_output_frame_displayed.video_output =
+        /* TODO: vout */ NULL;
     libvlc_event_send(&mp->event_manager, &event);
 }
 

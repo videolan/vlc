@@ -37,6 +37,7 @@ extern "C" {
 
 typedef struct libvlc_renderer_item_t libvlc_renderer_item_t;
 typedef struct libvlc_title_description_t libvlc_title_description_t;
+typedef struct libvlc_video_output_t libvlc_video_output_t;
 
 /**
  * \ingroup libvlc_event
@@ -236,6 +237,8 @@ enum libvlc_event_e {
      * The renderer item is no longer valid.
      */
     libvlc_RendererDiscovererItemDeleted,
+
+    libvlc_VideoOutputFrameDisplayed,
 };
 
 /**
