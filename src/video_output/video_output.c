@@ -181,6 +181,7 @@ typedef struct vout_thread_sys_t
 
     picture_fifo_t  *decoder_fifo;
     vout_chrono_t   render;           /**< picture render time estimator */
+    vout_chrono_t   static_filter;
 
     vlc_atomic_rc_t rc;
 
@@ -1095,7 +1096,8 @@ static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reus
                 else if (is_late_dropped && !decoded->b_force)
                 {
                     const vlc_tick_t prepare_decoded_duration = vout_chrono_GetHigh(&sys->render) +
-                                                                VOUT_MWAIT_TOLERANCE;
+                                                                VOUT_MWAIT_TOLERANCE +
+                                                                vout_chrono_GetHigh(&sys->static_filter);
                     vlc_tick_t late = system_now + prepare_decoded_duration - system_pts;
 
                     vlc_tick_t late_threshold;
@@ -1139,7 +1141,9 @@ static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reus
         sys->displayed.timestamp     = decoded->date;
         sys->displayed.is_interlaced = !decoded->b_progressive;
 
+        vout_chrono_Start(&sys->static_filter);
         picture = filter_chain_VideoFilter(sys->filter.chain_static, sys->displayed.decoded);
+        vout_chrono_Stop(&sys->static_filter);
     }
 
     vlc_mutex_unlock(&sys->filter.lock);
@@ -2021,6 +2025,7 @@ void vout_Close(vout_thread_t *vout)
     vout_IntfDeinit(VLC_OBJECT(vout));
     vout_snapshot_End(sys->snapshot);
     vout_chrono_Clean(&sys->render);
+    vout_chrono_Clean(&sys->static_filter);
 
     if (sys->spu)
         spu_Destroy(sys->spu);
@@ -2159,6 +2164,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
 
     /* Arbitrary initial time */
     vout_chrono_Init(&sys->render, 5, VLC_TICK_FROM_MS(10));
+    vout_chrono_Init(&sys->static_filter, 4, VLC_TICK_FROM_MS(0));
 
     if (var_InheritBool(vout, "video-wallpaper"))
         vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_BELOW);
