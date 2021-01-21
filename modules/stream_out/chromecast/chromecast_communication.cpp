@@ -449,9 +449,9 @@ int ChromecastCommunication::sendMessage( const castchannel::CastMessage &msg )
     SetDWBE(p_data, i_size);
     msg.SerializeWithCachedSizesToArray(p_data + PACKET_HEADER_LEN);
 
-    int i_ret = vlc_tls_Write(m_tls, p_data, PACKET_HEADER_LEN + i_size);
+    ssize_t i_ret = vlc_tls_Write(m_tls, p_data, PACKET_HEADER_LEN + i_size);
     delete[] p_data;
-    if (i_ret == PACKET_HEADER_LEN + i_size)
+    if (i_ret > 0 && i_ret == PACKET_HEADER_LEN + i_size)
         return VLC_SUCCESS;
 
     msg_Warn( m_module, "failed to send message %s (%s)", msg.payload_utf8().c_str(), strerror( errno ) );
