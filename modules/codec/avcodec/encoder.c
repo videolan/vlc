@@ -389,6 +389,7 @@ int InitVideoEnc( vlc_object_t *p_this )
     p_sys->i_samples_delay = 0;
     p_sys->p_codec = p_codec;
     p_sys->b_planar = false;
+    p_sys->i_last_pts = VLC_TICK_INVALID;
 
     p_sys->p_buffer = NULL;
     p_sys->p_interleave_buf = NULL;
