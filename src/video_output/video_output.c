@@ -1529,53 +1529,55 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 
         vlc_tick_t date_refresh = VLC_TICK_INVALID;
 
+        picture_t *next = NULL;
         if (!sys->displayed.current)
         {
-            assert(!sys->displayed.next);
-            sys->displayed.current =
+            next =
                 ThreadDisplayPreparePicture(vout, true, false, &paused);
-            if (!sys->displayed.current)
+            if (!next)
                 return VLC_EGENERIC; // wait with no known deadline
         }
-
-        if (!paused)
+        else if (!paused)
         {
-            if (!sys->displayed.next)
-            {
-                sys->displayed.next =
-                    ThreadDisplayPreparePicture(vout, false, false, &paused);
-            }
-        }
-
-        if (sys->displayed.date != VLC_TICK_INVALID) {
-            date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
-            refresh = date_refresh <= system_now;
-        }
-        render_now = refresh;
-
-        if (!paused && sys->displayed.next) {
             const vlc_tick_t next_system_pts =
                 vlc_clock_ConvertToSystem(sys->clock, system_now,
-                                        sys->displayed.next->date, sys->rate);
+                                          sys->displayed.current->date, sys->rate);
             if (likely(next_system_pts != INT64_MAX))
             {
                 vlc_tick_t date_next = next_system_pts - render_delay;
-                if (date_refresh == VLC_TICK_INVALID || date_next < date_refresh)
-                    date_refresh = date_next;
-
                 if (date_next <= system_now)
                 {
-                    // next frame will still need some waiting before display
-                    dropped_current_frame = true;
-                    render_now = false;
-
-                    if (likely(sys->displayed.current != NULL))
-                        picture_Release(sys->displayed.current);
-                    sys->displayed.current = sys->displayed.next;
-                    sys->displayed.next    = NULL;
+                    // the current frame will be late, look for the next not late one
+                    next =
+                        ThreadDisplayPreparePicture(vout, false, false, &paused);
                 }
             }
         }
+
+        if (next != NULL)
+        {
+            const vlc_tick_t swap_next_pts =
+                vlc_clock_ConvertToSystem(sys->clock, vlc_tick_now(),
+                                            next->date, sys->rate);
+            if (likely(swap_next_pts != INT64_MAX))
+                date_refresh = swap_next_pts - render_delay;
+
+            // next frame will still need some waiting before display
+            dropped_current_frame = true;
+            render_now = false;
+
+            if (likely(sys->displayed.current != NULL))
+                picture_Release(sys->displayed.current);
+            sys->displayed.current = next;
+        }
+        else if (likely(sys->displayed.date != VLC_TICK_INVALID))
+        {
+            // next date we need to display again the current picture
+            date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
+            refresh = date_refresh <= system_now;
+            render_now = refresh;
+        }
+
         if (date_refresh != VLC_TICK_INVALID)
             *deadline = date_refresh;
 
