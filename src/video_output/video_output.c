@@ -127,7 +127,6 @@ typedef struct vout_thread_sys_t
         bool        is_interlaced;
         picture_t   *decoded; // decoded picture before passed through chain_static
         picture_t   *current;
-        picture_t   *next;
     } displayed;
 
     struct {
@@ -932,12 +931,6 @@ static void ThreadFilterFlush(vout_thread_sys_t *sys, bool is_locked)
         sys->displayed.current = NULL;
     }
 
-    if (sys->displayed.next)
-    {
-        picture_Release( sys->displayed.next );
-        sys->displayed.next = NULL;
-    }
-
     if (!is_locked)
         vlc_mutex_lock(&sys->filter.lock);
     filter_chain_VideoFlush(sys->filter.chain_static);
@@ -1419,7 +1412,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
     if (!render_now)
     {
         const vlc_tick_t late = system_now - system_pts;
-        if (unlikely(late > 0)) 
+        if (unlikely(late > 0))
         {
             msg_Dbg(vd, "picture displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
             vout_statistic_AddLate(&sys->statistic, 1);
@@ -1485,17 +1478,8 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     if (frame_by_frame)
     {
         picture_t *next;
-        if (likely(!sys->displayed.next))
-        {
-            next =
-                ThreadDisplayPreparePicture(vout, !sys->displayed.current, true, &paused);
-        }
-        else
-        {
-            // remaining from normal playback
-            next = sys->displayed.next;
-            sys->displayed.next = NULL;
-        }
+        next =
+            ThreadDisplayPreparePicture(vout, !sys->displayed.current, true, &paused);
 
         if (next)
         {
@@ -1856,7 +1840,6 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     assert(sys->private.display_pool != NULL && sys->private.private_pool != NULL);
 
     sys->displayed.current       = NULL;
-    sys->displayed.next          = NULL;
     sys->displayed.decoded       = NULL;
     sys->displayed.date          = VLC_TICK_INVALID;
     sys->displayed.timestamp     = VLC_TICK_INVALID;
