@@ -131,6 +131,10 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
         vlc_tick_t dts_difference = VLC_TICK_INVALID;
         if( likely( id->previous_dts != VLC_TICK_INVALID ) )
             dts_difference = p_block->i_dts - id->previous_dts;
+
+        id->track_duration += p_block->i_length ? p_block->i_length : dts_difference;
+        id->previous_dts = p_block->i_dts;
+
         if( p_sys->output )
         {
             /* Write data in a form that it's easy to plot for example with gnuplot*/
@@ -139,12 +143,10 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
                   p_block->i_length, outputhash );
 
         } else {
-            msg_Dbg( p_stream, "%s: track:%d type:%s segment_number:%"PRIu64" dts_difference:%"PRId64" length:%"PRId64" md5:%16s",
+            msg_Dbg( p_stream, "%s: track:%d type:%s segment_number:%"PRIu64" dts_difference:%"PRId64" length:%"PRId64" current_duration:%"PRId64" md5:%16s",
                   p_sys->prefix, id->id, id->type, ++id->segment_number, dts_difference,
-                  p_block->i_length, outputhash );
+                  p_block->i_length, id->track_duration, outputhash );
         }
-        id->track_duration += p_block->i_length ? p_block->i_length : dts_difference;
-        id->previous_dts = p_block->i_dts;
         p_block = p_block->p_next;
     }
     return VLC_SUCCESS;
