@@ -1935,6 +1935,20 @@ vlc_player_Delete(vlc_player_t *player)
     vlc_object_delete(player);
 }
 
+static void PlayerVoutReportFirstFrame(vout_thread_t *vout, void *opaque)
+{
+    struct vlc_player_t *player = opaque;
+
+    vlc_player_Lock(player);
+    vlc_player_vout_listener_id *listener;
+    vlc_list_foreach(listener, &player->vout_listeners, node)
+    {
+        if (listener->cbs->on_first_frame_reported)
+            listener->cbs->on_first_frame_reported(vout, listener->cbs_data);
+    }
+    vlc_player_Unlock(player);
+}
+
 vlc_player_t *
 vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
                const struct vlc_player_media_provider *media_provider,
@@ -2017,8 +2031,13 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
         var_SetChecked(player, "http-cookies", VLC_VAR_ADDRESS, cookies);
     }
 #undef VAR_CREATE
+    static const struct vlc_video_output_callbacks vout_cbs =
+    {
+        .first_frame_reported = PlayerVoutReportFirstFrame,
+    };
 
-    player->resource = input_resource_New(VLC_OBJECT(player));
+    player->resource = input_resource_New(
+            VLC_OBJECT(player), &vout_cbs, player);
 
     if (!player->resource)
         goto error;

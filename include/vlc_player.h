@@ -2537,6 +2537,13 @@ struct vlc_player_vout_cbs
      */
     void (*on_wallpaper_mode_changed)(vout_thread_t *vout, bool enabled,
         void *data);
+
+    /**
+     * Called when the vout has its first frame drawn.
+     *
+     * @param vout the vout that reported its frame being drawn
+     */
+    void (*on_first_frame_reported)(vout_thread_t *vout, void *data);
 };
 
 

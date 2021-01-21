@@ -179,7 +179,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_sys->p_resource = input_resource_New( p_this );
+    p_sys->p_resource = input_resource_New( p_this, NULL, NULL );
     if( unlikely(p_sys->p_resource == NULL) )
     {
         free( p_sys );
