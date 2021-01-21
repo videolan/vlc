@@ -1471,9 +1471,6 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     }
     vlc_mutex_unlock(&sys->filter.lock);
 
-    if (deadline)
-        *deadline = VLC_TICK_INVALID;
-
     bool render_now;
     if (frame_by_frame)
     {
@@ -1519,7 +1516,10 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
             next =
                 ThreadDisplayPreparePicture(vout, true, false, &paused);
             if (!next)
+            {
+                *deadline = VLC_TICK_INVALID;
                 return VLC_EGENERIC; // wait with no known deadline
+            }
         }
         else if (!paused)
         {
