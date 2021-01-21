@@ -1108,9 +1108,6 @@ static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reus
                         picture_Release(decoded);
                         vout_statistic_AddLost(&sys->statistic, 1);
                         continue;
-                    } else if (late > 0) {
-                        msg_Dbg(&vout->obj, "picture might be displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
-                        vout_statistic_AddLate(&sys->statistic, 1);
                     }
                 }
                 vlc_video_context *pic_vctx = picture_GetVideoContext(decoded);
@@ -1416,8 +1413,12 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
     system_now = vlc_tick_now();
     if (!render_now)
     {
-        if (unlikely(system_now > system_pts))
+        const vlc_tick_t late = system_now - system_pts;
+        if (unlikely(late > 0)) 
         {
+            msg_Dbg(vd, "picture displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
+            vout_statistic_AddLate(&sys->statistic, 1);
+
             /* vd->prepare took too much time. Tell the clock that the pts was
              * rendered late. */
             system_pts = system_now;
