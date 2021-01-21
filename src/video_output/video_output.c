@@ -1484,25 +1484,25 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     bool render_now;
     if (frame_by_frame)
     {
-        if (!sys->displayed.current)
+        picture_t *next;
+        if (likely(!sys->displayed.next))
         {
-            assert(!sys->displayed.next);
-            sys->displayed.current =
-                ThreadDisplayPreparePicture(vout, true, true, &paused);
-            if (!sys->displayed.current)
-                return VLC_EGENERIC; // wait with no known deadline
+            next =
+                ThreadDisplayPreparePicture(vout, !sys->displayed.current, true, &paused);
+        }
+        else
+        {
+            // remaining from normal playback
+            next = sys->displayed.next;
+            sys->displayed.next = NULL;
         }
 
-        if (!sys->displayed.next)
+        if (next)
         {
-            sys->displayed.next =
-                ThreadDisplayPreparePicture(vout, false, true, &paused);
+            if (likely(sys->displayed.current != NULL))
+                picture_Release(sys->displayed.current);
+            sys->displayed.current = next;
         }
-
-        if (likely(sys->displayed.current != NULL))
-            picture_Release(sys->displayed.current);
-        sys->displayed.current = sys->displayed.next;
-        sys->displayed.next    = NULL;
 
         if (!sys->displayed.current)
             return VLC_EGENERIC;
