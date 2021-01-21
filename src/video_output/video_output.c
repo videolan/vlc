@@ -1075,7 +1075,7 @@ static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reus
 
     while (!picture) {
         picture_t *decoded;
-        if (reuse_decoded && sys->displayed.decoded) {
+        if (unlikely(reuse_decoded && sys->displayed.decoded)) {
             decoded = picture_Hold(sys->displayed.decoded);
         } else {
             decoded = picture_fifo_Pop(sys->decoder_fifo);
