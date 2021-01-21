@@ -2295,6 +2295,8 @@ void vlc_input_decoder_Drain( vlc_input_decoder_t *p_owner )
  */
 void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
 {
+    enum es_format_category_e cat = p_owner->dec.fmt_in.i_cat;
+
     vlc_fifo_Lock( p_owner->p_fifo );
 
     /* Empty the fifo */
@@ -2308,8 +2310,7 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
 
     /* Flush video/spu decoder when paused: increment frames_countdown in order
      * to display one frame/subtitle */
-    if( p_owner->paused
-     && ( p_owner->fmt.i_cat == VIDEO_ES || p_owner->fmt.i_cat == SPU_ES )
+    if( p_owner->paused && ( cat == VIDEO_ES || cat == SPU_ES )
      && p_owner->frames_countdown == 0 )
         p_owner->frames_countdown++;
 
@@ -2317,7 +2318,7 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
 
     vlc_fifo_Unlock( p_owner->p_fifo );
 
-    if ( p_owner->dec.fmt_in.i_cat == VIDEO_ES )
+    if ( cat == VIDEO_ES )
     {
         /* Set the pool cancel state. This will unblock the module if it is
          * waiting for new pictures (likely). This state will be reset back
@@ -2342,8 +2343,7 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
          * after being unstuck. */
 
         vlc_mutex_lock( &p_owner->lock );
-        if( p_owner->dec.fmt_out.i_cat == VIDEO_ES && p_owner->p_vout
-         && p_owner->vout_started )
+        if( cat == VIDEO_ES && p_owner->p_vout && p_owner->vout_started )
             vout_FlushAll( p_owner->p_vout );
         vlc_mutex_unlock( &p_owner->lock );
     }
@@ -2531,7 +2531,7 @@ void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner,
     vlc_fifo_Unlock( p_owner->p_fifo );
 
     vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->fmt.i_cat == VIDEO_ES )
+    if( p_owner->dec.fmt_in.i_cat == VIDEO_ES )
     {
         if( p_owner->p_vout )
             vout_NextPicture( p_owner->p_vout, pi_duration );
@@ -2548,7 +2548,7 @@ bool vlc_input_decoder_HasFormatChanged( vlc_input_decoder_t *p_owner,
 
     vlc_mutex_lock( &p_owner->lock );
 
-    if( p_owner->fmt.i_cat == UNKNOWN_ES )
+    if( p_owner->dec.fmt_in.i_cat == UNKNOWN_ES )
     {
         /* The format changed but the output creation failed */
         vlc_mutex_unlock( &p_owner->lock );
