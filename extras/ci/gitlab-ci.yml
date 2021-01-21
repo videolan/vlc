@@ -37,11 +37,20 @@ variables:
         HOST_ARCH: x86_64
         TRIPLET: $HOST_ARCH-w64-mingw32
 
-.variables-macos: &variables-macos
+.variables-macos-x86_64: &variables-macos-x86_64
         VLC_PATH: /Users/videolanci/sandbox/bin
         VLC_FORCE_KERNELVERSION: 18
         VLC_SDK_PATH: /Applications/Xcode9.2.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk
         HOST_ARCH: x86_64
+        SHORTARCH: intel64
+        TRIPLET: $HOST_ARCH-apple-darwin$VLC_FORCE_KERNELVERSION
+
+.variables-macos-arm64: &variables-macos-arm64
+        VLC_PATH: /Users/videolanci/sandbox/bin
+        VLC_FORCE_KERNELVERSION: 19
+        VLC_SDK_PATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+        HOST_ARCH: aarch64
+        SHORTARCH: arm64
         TRIPLET: $HOST_ARCH-apple-darwin$VLC_FORCE_KERNELVERSION
 
 .variables-android-arm: &variables-android-arm
@@ -229,10 +238,8 @@ nightly-snap:
 #
 # macOS
 #
-macos:
+.macos-common:
     extends: .base-template
-    tags:
-        - old-macmini
     script: |
         if [ "${CI_JOB_NAME:0:8}" = "nightly-" ]; then
             NIGHTLY_EXTRA_BUILD_FLAGS="-i n"
@@ -246,21 +253,46 @@ macos:
             EXTRA_BUILD_FLAGS="-c -p"
         fi
         mkdir build && cd build
-        ../extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS -k $VLC_SDK_PATH $NIGHTLY_EXTRA_BUILD_FLAGS
-    variables: *variables-macos
+        ../extras/package/macosx/build.sh $EXTRA_BUILD_FLAGS -a $HOST_ARCH -k $VLC_SDK_PATH $NIGHTLY_EXTRA_BUILD_FLAGS
 
-nightly-macos:
-    extends: macos
+macos-x86_64:
+    extends: .macos-common
+    tags:
+        - old-macmini
+    variables: *variables-macos-x86_64
+
+macos-arm64:
+    extends: .macos-common
+    tags:
+        - amd64
+        - catalina
+    variables: *variables-macos-arm64
+
+.nightly-macos-common:
+    extends: .macos-common
     only:
         - schedules
     except:
     after_script:
         - mkdir nightlies
-        - mv build/vlc-*.dmg nightlies/$(basename build/vlc-*.dmg | sed "s/\.dmg/-${CI_COMMIT_SHORT_SHA}\.dmg/")
+        - mv build/vlc-*.dmg nightlies/$(basename build/vlc-*.dmg | sed "s/\.dmg/-${SHORTARCH}-${CI_COMMIT_SHORT_SHA}\.dmg/")
         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
     artifacts:
         paths:
             - nightlies/*
+
+nightly-macos-x86_64:
+    extends: .nightly-macos-common
+    tags:
+        - old-macmini
+    variables: *variables-macos-x86_64
+
+nightly-macos-arm64:
+    extends: .nightly-macos-common
+    tags:
+        - amd64
+        - catalina
+    variables: *variables-macos-arm64
 
 #
 # Android
