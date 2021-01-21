@@ -824,7 +824,8 @@ static int GenericProbe( demux_t *p_demux, uint64_t *pi_offset,
 
     for( ;; )
     {
-        if( i_skip + i_check_size > i_peek )
+        /* i_peek > 0 so we can cast into size_t. */
+        if( i_skip + i_check_size > (size_t)i_peek )
         {
             if( !b_forced_demux )
                 return VLC_EGENERIC;
@@ -852,7 +853,7 @@ static int GenericProbe( demux_t *p_demux, uint64_t *pi_offset,
                     i_size = i_samples * 2 * 2;
                 }
 
-                if( i_skip + i_check_size + i_size <= i_peek )
+                if( i_skip + i_check_size + i_size <= (size_t)i_peek )
                 {
                     b_ok = pf_check( &p_peek[i_skip+i_size], NULL ) >= 0;
                     if( b_ok )
