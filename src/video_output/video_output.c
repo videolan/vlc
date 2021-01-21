@@ -1094,7 +1094,9 @@ static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reus
                 }
                 else if (is_late_dropped && !decoded->b_force)
                 {
-                    vlc_tick_t late = system_now - system_pts;
+                    const vlc_tick_t prepare_decoded_duration = vout_chrono_GetHigh(&sys->render) +
+                                                                VOUT_MWAIT_TOLERANCE;
+                    vlc_tick_t late = system_now + prepare_decoded_duration - system_pts;
 
                     vlc_tick_t late_threshold;
                     if (decoded->format.i_frame_rate && decoded->format.i_frame_rate_base) {
