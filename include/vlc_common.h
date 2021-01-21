@@ -431,7 +431,7 @@ typedef struct subpicture_region_t subpicture_region_t;
 typedef struct image_handler_t image_handler_t;
 
 /* Stream output */
-typedef struct sout_instance_t sout_instance_t;
+typedef struct sout_stream_t sout_instance_t;
 
 typedef struct sout_input_t sout_input_t;
 typedef struct sout_packetizer_input_t sout_packetizer_input_t;

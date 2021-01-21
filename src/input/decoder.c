@@ -952,7 +952,7 @@ static void DecoderThread_ProcessSout( vlc_input_decoder_t *p_owner, block_t *p_
             p_sout_block->p_next = NULL;
 
             if( p_dec->pf_get_cc
-             && sout_StreamControl( p_owner->p_sout->p_stream,
+             && sout_StreamControl( p_owner->p_sout,
                                     SOUT_STREAM_WANTS_SUBSTREAMS,
                                     &b_wants_substreams ) == VLC_SUCCESS
              && b_wants_substreams )
