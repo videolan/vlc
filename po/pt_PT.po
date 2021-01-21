@@ -30289,6 +30289,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Lista do gestor multimédia"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Decodificador de vídeo Crystal HD por hardware"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr ""

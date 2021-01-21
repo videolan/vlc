@@ -29581,6 +29581,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Lista gestionarului media"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Decodor video Crystal HD hardware"
+
 #, fuzzy
 #~ msgid "Capture region heigh"
 #~ msgstr "Înălţimea regiunii de captură"

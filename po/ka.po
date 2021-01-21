@@ -30841,6 +30841,10 @@ msgid "Media Manager List"
 msgstr "Meta-ინფორმაცია"
 
 #, fuzzy
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Theora ვიდეო დეკოდერი"
+
+#, fuzzy
 #~ msgid "Capture region heigh"
 #~ msgstr "ვიდეოს სიმაღლე"
 

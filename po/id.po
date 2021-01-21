@@ -29509,6 +29509,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Daftar Media Manager"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Dekoder perangkat keras video Crystal HD"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "File font suara dibutuhkan untuk sintesis perangkat lunak."

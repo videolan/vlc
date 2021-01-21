@@ -29665,6 +29665,10 @@ msgid "Media Manager List"
 msgstr "_Navigação"
 
 #, fuzzy
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "_Video"
+
+#, fuzzy
 #~ msgid "Capture region heigh"
 #~ msgstr "_Navigação"
 

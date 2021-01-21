@@ -29967,6 +29967,10 @@ msgid "Media Manager List"
 msgstr "Olukalala lwe Mpulizinganya Enfugga"
 
 #, fuzzy
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Ebikka ya vidiyo"
+
+#, fuzzy
 #~ msgid "Capture region heigh"
 #~ msgstr "Bwasikulini mubuwavu:"
 

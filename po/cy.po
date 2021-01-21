@@ -28783,6 +28783,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Rhestr Rheolwyr Cyfryngau"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Datgodiwr caledwedd fideo MU (HD) Crystal"
+
 #, fuzzy
 #~ msgid "Capture region heigh"
 #~ msgstr "Uchder Cipiad Fideo"

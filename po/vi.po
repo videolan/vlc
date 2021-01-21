@@ -30120,6 +30120,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Danh sách quản lý tập tin"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Trình giải mã video thuộc phần cứng Crystal HD"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr ""

@@ -28613,6 +28613,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr ""
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "CrystalHD-maskinvarevideodekodar"
+
 #~ msgid "Sound fonts"
 #~ msgstr "Lydtypar"
 

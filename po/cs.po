@@ -28749,6 +28749,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Seznam správců médií"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Hardwarový dekodér videa Cristal HD"
+
 #, fuzzy
 #~ msgid "Capture region heigh"
 #~ msgstr "Výška záznamu videa"

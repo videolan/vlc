@@ -29353,6 +29353,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Meediahalduri loend"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Crystal HD riistvaraline video dekooder"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "Helifondi fail on nõutud tarkvaraliseks sünteesiks."

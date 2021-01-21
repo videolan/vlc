@@ -28566,6 +28566,9 @@ msgstr "AAAA ; "
 msgid "Media Manager List"
 msgstr "Lista di u Ghjestiunariu di Media"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Discudificatore video materiale Crystal HD"
+
 #~ msgid "Sound fonts"
 #~ msgstr "Grafie di Sonu"
 

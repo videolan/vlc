@@ -30200,6 +30200,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Seznam upravljalnika predstavnih datotek"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Crystal HD strojni video dekoder"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "Zvoča pisava je obvezna zaradi sinteze programske opreme."

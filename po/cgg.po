@@ -29775,6 +29775,10 @@ msgid "Media Manager List"
 msgstr "Ekipimo ky'ekirazaana"
 
 #, fuzzy
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Akooma ka filimu"
+
+#, fuzzy
 #~ msgid "Capture region heigh"
 #~ msgstr "Obureingwa bw'ekicweeka kyorutimbe:"
 

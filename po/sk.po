@@ -30458,6 +30458,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Zoznam správcov médií"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Hardvérový video dekodér Crystal HD"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "Súbor so zvukovými fontami je potrebný pre softvérovú syntetizáciu."

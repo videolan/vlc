@@ -28494,6 +28494,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Upravljanje Listom Medija"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Kristalni HD hardverski video dekoder"
+
 #~ msgid "Sound fonts"
 #~ msgstr "Zvučni fontovi"
 

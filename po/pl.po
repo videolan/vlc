@@ -30208,6 +30208,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Lista menedżera mediów"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Sprzętowy dekoder wideo Crystal HD"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "Syntezator programowy wymaga plik Sound fonts."

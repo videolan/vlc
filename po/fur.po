@@ -30652,6 +30652,10 @@ msgid "Media Manager List"
 msgstr "Meta-informazions"
 
 #, fuzzy
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Filtris audio"
+
+#, fuzzy
 #~ msgid "Capture region heigh"
 #~ msgstr "Altece video"
 

@@ -29911,6 +29911,9 @@ msgstr "एएएए; "
 msgid "Media Manager List"
 msgstr "माध्यम व्यवस्थापक यादी"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "सुस्पष्ट एचडी हार्डवेअर ध्वनीचित्रफित विसंकेतक"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "सॉफ्टवेअर समन्वयासाठी ध्वनी टंक धारिका आवश्यक असते."

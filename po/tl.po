@@ -29665,6 +29665,10 @@ msgid "Media Manager List"
 msgstr "_Nabigit"
 
 #, fuzzy
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "_Makit-an"
+
+#, fuzzy
 #~ msgid "Capture region heigh"
 #~ msgstr "_Nabigit"
 

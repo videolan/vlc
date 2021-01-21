@@ -28412,6 +28412,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Listi fyrir miðlastjórnun"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Crystal HD vélbúnaðarafkóðari myndmerkis"
+
 #~ msgid "Sound fonts"
 #~ msgstr "Hljóðletur"
 

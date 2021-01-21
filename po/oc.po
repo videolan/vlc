@@ -30370,6 +30370,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Lista del gestionari de mèdias"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Desencodador vidèo material Crystal HD"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "Una banca de sons es necessària per la sintèsi logiciala."

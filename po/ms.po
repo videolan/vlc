@@ -30130,6 +30130,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Senarai Pengurus Media"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Penyahkod video perkakasan HD Crystal"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "Fail fon bunyi yang diperlukan untuk sintesis perisian."

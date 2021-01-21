@@ -30840,6 +30840,9 @@ msgstr "AAAA;"
 msgid "Media Manager List"
 msgstr "Λίστα διαχειριστή πολυμέσων"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Αποκωδικοποιητής βίντεο υλικού Crystal HD"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "Ένα αρχείο SoundFonts απαιτείται για τη σύνθεση λογισμικού."

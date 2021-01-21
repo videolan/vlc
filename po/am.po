@@ -29881,6 +29881,10 @@ msgid "Media Manager List"
 msgstr "የማህደረ መረጃ አስተዳዳሪ ዝርዝር "
 
 #, fuzzy
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "የቪድዮ ኮዴክ "
+
+#, fuzzy
 #~ msgid "Capture region heigh"
 #~ msgstr "ንዑስ ማያ ቁመት፡ "
 

@@ -29760,6 +29760,9 @@ msgstr ""
 msgid "Media Manager List"
 msgstr "Управление на списъка с медии"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "Хардуерен видео декодер Crystal HD"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "Файл с шрифтовете за звука се изискват за софтуерен синтез."

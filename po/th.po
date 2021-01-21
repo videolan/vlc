@@ -28450,6 +28450,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "รายการตัวจัดการสื่อ"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "ตัวอ่านรหัสวีดิทัศน์ HD ด้วยฮาร์ดแวร์ Crystal"
+
 #, fuzzy
 #~ msgid "Capture region heigh"
 #~ msgstr "ความสูงส่วนรับภาพถ่ายวีดิทัศน์"

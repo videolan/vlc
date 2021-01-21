@@ -29523,6 +29523,9 @@ msgstr "AAAA;"
 msgid "Media Manager List"
 msgstr "បញ្ជី​គ្រប់គ្រង​មេឌៀ"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "ឌិកូឌ័រ"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "បាន​ទាមទារ​ឯកសារ​ពុម្ពអក្សរ​សំឡេង​សម្រាប់​ការ​សំយោគ​កម្មវិធី ។"

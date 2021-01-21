@@ -30008,6 +30008,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "ക്രിസ്റ്റല്‍ എച്ച്ഡി ഹാര്‍ഡ്വെയര്‍ വീഡിയോ ഡീക്കോഡര്‍"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "സോഫ്റ്റ്വെയര്‍ സങ്കലനത്തിന് വേണ്ടി ഒരു ബലിഷ്ടമായ ഫോണ്ടുകളുടെ ഫയല്‍ അനിവാര്യമാണ്."

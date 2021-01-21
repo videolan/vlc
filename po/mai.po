@@ -29820,6 +29820,9 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "मीडिया प्रबंधन सूची"
 
+#~ msgid "Crystal HD hardware video decoder"
+#~ msgstr "क्रिस्टल HD हार्डवेयर वीडियो डिकोडर"
+
 #, fuzzy
 #~ msgid "The Sound Font file (SF2/DLS) to use for synthesis."
 #~ msgstr "साफ्टवेयर संश्लेषण क लेल ध्वनि फोंट फाइल क आवश्यकता अछि।"
