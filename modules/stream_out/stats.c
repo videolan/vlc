@@ -143,9 +143,9 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
                   p_block->i_length, outputhash );
 
         } else {
-            msg_Dbg( p_stream, "%s: track:%d type:%s segment_number:%"PRIu64" dts_difference:%"PRId64" length:%"PRId64" current_duration:%"PRId64" md5:%16s",
+            msg_Dbg( p_stream, "%s: track:%d type:%s segment_number:%"PRIu64" dts_difference:%"PRId64" length:%"PRId64" dts:%"PRId64" pts:%"PRId64" current_duration:%"PRId64" md5:%16s",
                   p_sys->prefix, id->id, id->type, ++id->segment_number, dts_difference,
-                  p_block->i_length, id->track_duration, outputhash );
+                  p_block->i_length, p_block->i_dts, p_block->i_pts, id->track_duration, outputhash );
         }
         p_block = p_block->p_next;
     }
