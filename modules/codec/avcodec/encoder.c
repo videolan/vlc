@@ -238,8 +238,12 @@ static void probe_video_frame_rate( encoder_t *p_enc, AVCodecContext *p_context,
     p_context->time_base.num = p_enc->fmt_in.video.i_frame_rate_base ? p_enc->fmt_in.video.i_frame_rate_base : 1;
 
     // MP4V doesn't like CLOCK_FREQ denominator in time_base, so use 1/25 as default for that
-    p_context->time_base.den = p_enc->fmt_in.video.i_frame_rate_base ? p_enc->fmt_in.video.i_frame_rate :
-                                  ( p_enc->fmt_out.i_codec == VLC_CODEC_MP4V ? 25 : CLOCK_FREQ );
+    if( p_enc->fmt_in.video.i_frame_rate_base )
+        p_context->time_base.den = p_enc->fmt_in.video.i_frame_rate;
+    else if( p_enc->fmt_out.i_codec == VLC_CODEC_MP4V )
+        p_context->time_base.den = 25;
+    else
+        p_context->time_base.den = CLOCK_FREQ;
 
     msg_Dbg( p_enc, "Time base for probing set to %d/%d", p_context->time_base.num, p_context->time_base.den );
     if( p_codec->supported_framerates )
