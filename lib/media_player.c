@@ -532,6 +532,22 @@ static const struct vlc_player_aout_cbs vlc_player_aout_cbs = {
     .on_device_changed = on_audio_device_changed,
 };
 
+static void on_vout_first_frame_reported(vout_thread_t *vout, void *p_data)
+{
+    (void)vout;
+    libvlc_media_player_t *mp = p_data;
+
+    libvlc_event_t event;
+    event.type = libvlc_VideoOutputFrameDisplayed;
+    event.u.video_output_frame_displayed.video_output =
+        /* TODO: vout */ NULL;
+    libvlc_event_send(&mp->event_manager, &event);
+}
+
+static const struct vlc_player_vout_cbs vlc_player_vout_cbs = {
+    .on_first_frame_reported = on_vout_first_frame_reported,
+};
+
 /**************************************************************************
  * Snapshot Taken Event.
  *
@@ -781,6 +797,11 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     if (unlikely(!mp->aout_listener))
         goto error3;
 
+    mp->vout_listener =
+        vlc_player_vout_AddListener(mp->player, &vlc_player_vout_cbs, mp);
+    if (unlikely(!mp->aout_listener))
+        goto error4;
+
     vlc_player_Unlock(mp->player);
 
     vlc_atomic_rc_init(&mp->rc);
@@ -800,6 +821,8 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     libvlc_retain(instance);
     return mp;
 
+error4:
+    vlc_player_aout_RemoveListener(mp->player, mp->aout_listener);
 error3:
     vlc_player_RemoveListener(mp->player, mp->listener);
 error2:
@@ -856,6 +879,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
                      "snapshot-file", snapshot_was_taken, p_mi );
 
     vlc_player_Lock(p_mi->player);
+    vlc_player_vout_RemoveListener(p_mi->player, p_mi->vout_listener);
     vlc_player_aout_RemoveListener(p_mi->player, p_mi->aout_listener);
     vlc_player_RemoveListener(p_mi->player, p_mi->listener);
     vlc_player_Unlock(p_mi->player);

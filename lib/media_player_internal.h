@@ -45,6 +45,7 @@ struct libvlc_media_player_t
     vlc_player_t *player;
     vlc_player_listener_id *listener;
     vlc_player_aout_listener_id *aout_listener;
+    vlc_player_vout_listener_id *vout_listener;
 
     struct libvlc_instance_t * p_libvlc_instance; /* Parent instance */
     libvlc_media_t * p_md; /* current media descriptor */
