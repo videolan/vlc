@@ -421,6 +421,10 @@ typedef struct libvlc_event_t
         {
             libvlc_renderer_item_t *item;
         } renderer_discoverer_item_deleted;
+        struct
+        {
+            libvlc_video_output_t *video_output;
+        } video_output_frame_displayed;
     } u; /**< Type-dependent event description */
 } libvlc_event_t;
 
