@@ -96,30 +96,14 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
     if(!psz_chain)
         return NULL;
 
-    /* *** Allocate descriptor *** */
-    p_sout = malloc(sizeof (*p_sout));
-    if( p_sout == NULL )
-    {
-        free( psz_chain );
-        return NULL;
-    }
-
     msg_Dbg(p_parent, "creating stream output chain `%s'", psz_chain);
 
-    /* *** init descriptor *** */
-    p_sout->p_stream = NULL;
-
-    p_sout->p_stream = sout_StreamChainNew(p_parent, psz_chain, NULL);
-    if( p_sout->p_stream )
-    {
-        free( psz_chain );
-        return p_sout;
-    }
-
-    msg_Err(p_parent, "failed to create stream output chain `%s'", psz_chain);
-    free( psz_chain );
-    free(p_sout);
-    return NULL;
+    p_sout = sout_StreamChainNew(p_parent, psz_chain, NULL);
+    if (p_sout == NULL)
+        msg_Err(p_parent, "failed to create stream output chain `%s'",
+                psz_chain);
+    free(psz_chain);
+    return p_sout;
 }
 
 /*****************************************************************************
@@ -127,16 +111,12 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
  *****************************************************************************/
 void sout_DeleteInstance( sout_instance_t * p_sout )
 {
-    /* remove the stream out chain */
-    sout_StreamChainDelete( p_sout->p_stream, NULL );
-
-    /* *** free structure *** */
-    free(p_sout);
+    sout_StreamChainDelete( p_sout, NULL );
 }
 
 bool sout_instance_ControlsPace( sout_instance_t *sout )
 {
-    return !sout_StreamIsSynchronous(sout->p_stream);
+    return !sout_StreamIsSynchronous(sout);
 }
 
 /*****************************************************************************
@@ -160,16 +140,15 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
 
     p_input->b_flushed = false;
 
-    msg_Dbg(p_sout->p_stream, "adding an output ES for `%4.4s` (%p)",
+    msg_Dbg(p_sout, "adding an output ES for `%4.4s` (%p)",
             (char *)&p_fmt->i_codec, (void *)p_input);
 
     /* *** add it to the stream chain */
-    p_input->id = sout_StreamIdAdd( p_sout->p_stream, p_fmt );
+    p_input->id = sout_StreamIdAdd( p_sout, p_fmt );
 
     if( p_input->id == NULL )
     {
-        msg_Warn(p_sout->p_stream, "failed to add output ES (%p)",
-                 (void *)p_input);
+        msg_Warn(p_sout, "failed to add output ES (%p)", (void *)p_input);
         free( p_input );
         p_input = NULL;
     }
@@ -184,9 +163,9 @@ int sout_InputDelete( sout_instance_t *p_sout,
                       sout_packetizer_input_t *p_input )
 {
 
-    msg_Dbg(p_sout->p_stream, "removing an output ES (%p)", (void *)p_input);
+    msg_Dbg(p_sout, "removing an output ES (%p)", (void *)p_input);
 
-    sout_StreamIdDel( p_sout->p_stream, p_input->id );
+    sout_StreamIdDel( p_sout, p_input->id );
     free( p_input );
 
     return( VLC_SUCCESS);
@@ -198,9 +177,8 @@ static int sout_InputControlVa( sout_instance_t *p_sout,
 {
     if( i_query == SOUT_INPUT_SET_SPU_HIGHLIGHT )
     {
-        return sout_StreamControl( p_sout->p_stream,
-                                        SOUT_STREAM_ID_SPU_HIGHLIGHT,
-                                        p_input->id, va_arg(args, void *) );
+        return sout_StreamControl( p_sout, SOUT_STREAM_ID_SPU_HIGHLIGHT,
+                                   p_input->id, va_arg(args, void *) );
     }
     return VLC_EGENERIC;
 }
@@ -220,7 +198,7 @@ int sout_InputControl( sout_instance_t *p_sout,
 void sout_InputFlush( sout_instance_t *p_sout,
                       sout_packetizer_input_t *p_input )
 {
-    sout_StreamFlush( p_sout->p_stream, p_input->id );
+    sout_StreamFlush( p_sout, p_input->id );
     p_input->b_flushed = true;
 }
 
@@ -236,7 +214,7 @@ int sout_InputSendBuffer( sout_instance_t *p_sout,
         p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         p_input->b_flushed = false;
     }
-    return sout_StreamIdSend( p_sout->p_stream, p_input->id, p_buffer );
+    return sout_StreamIdSend( p_sout, p_input->id, p_buffer );
 }
 
 #undef sout_AccessOutNew

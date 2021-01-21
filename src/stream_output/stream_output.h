@@ -30,11 +30,6 @@
 # include <vlc_network.h>
 
 /** Stream output instance */
-struct sout_instance_t
-{
-    sout_stream_t       *p_stream;
-};
-
 sout_instance_t *sout_NewInstance( vlc_object_t *, const char * );
 #define sout_NewInstance(a,b) sout_NewInstance(VLC_OBJECT(a),b)
 void sout_DeleteInstance( sout_instance_t * );
