@@ -1504,6 +1504,9 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         sys->displayed.current = sys->displayed.next;
         sys->displayed.next    = NULL;
 
+        if (!sys->displayed.current)
+            return VLC_EGENERIC;
+
         render_now = true;
     }
     else
@@ -1571,9 +1574,6 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
             return VLC_EGENERIC;
         }
     }
-
-    if (!sys->displayed.current)
-        return VLC_EGENERIC;
 
     /* display the picture immediately */
     render_now |= sys->displayed.current->b_force;
