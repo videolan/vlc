@@ -1481,18 +1481,18 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     if (deadline)
         *deadline = VLC_TICK_INVALID;
 
-    if (!sys->displayed.current)
-    {
-        assert(!sys->displayed.next);
-        sys->displayed.current =
-            ThreadDisplayPreparePicture(vout, true, frame_by_frame, &paused);
-        if (!sys->displayed.current)
-            return VLC_EGENERIC; // wait with no known deadline
-    }
-
     bool render_now;
     if (frame_by_frame)
     {
+        if (!sys->displayed.current)
+        {
+            assert(!sys->displayed.next);
+            sys->displayed.current =
+                ThreadDisplayPreparePicture(vout, true, true, &paused);
+            if (!sys->displayed.current)
+                return VLC_EGENERIC; // wait with no known deadline
+        }
+
         if (!sys->displayed.next)
         {
             sys->displayed.next =
@@ -1511,15 +1511,6 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     }
     else
     {
-        if (!paused)
-        {
-            if (!sys->displayed.next)
-            {
-                sys->displayed.next =
-                    ThreadDisplayPreparePicture(vout, false, false, &paused);
-            }
-        }
-
         const vlc_tick_t system_now = vlc_tick_now();
         const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->render) + VOUT_MWAIT_TOLERANCE;
 
@@ -1537,6 +1528,25 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         bool refresh = false;
 
         vlc_tick_t date_refresh = VLC_TICK_INVALID;
+
+        if (!sys->displayed.current)
+        {
+            assert(!sys->displayed.next);
+            sys->displayed.current =
+                ThreadDisplayPreparePicture(vout, true, false, &paused);
+            if (!sys->displayed.current)
+                return VLC_EGENERIC; // wait with no known deadline
+        }
+
+        if (!paused)
+        {
+            if (!sys->displayed.next)
+            {
+                sys->displayed.next =
+                    ThreadDisplayPreparePicture(vout, false, false, &paused);
+            }
+        }
+
         if (sys->displayed.date != VLC_TICK_INVALID) {
             date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
             refresh = date_refresh <= system_now;
