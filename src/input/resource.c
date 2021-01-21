@@ -70,6 +70,10 @@ struct input_resource_t
     vout_thread_t   *p_vout_dummy;
     struct vout_resource *vout_rsc_free;
 
+    /* Owner data and callback forwarded to the new video outputs */
+    const struct vlc_video_output_callbacks *p_vout_cbs;
+    void *p_vout_owner;
+
     /* This lock is used to protect vout resources access (for hold)
      * It is a special case because of embed video (possible deadlock
      * between vout window request and vout holds in some(qt) interface)
@@ -286,11 +290,15 @@ void input_resource_ResetAout( input_resource_t *p_resource )
 }
 
 /* Common */
-input_resource_t *input_resource_New( vlc_object_t *p_parent )
+input_resource_t *input_resource_New( vlc_object_t *p_parent,
+        const struct vlc_video_output_callbacks *cbs, void *owner )
 {
     input_resource_t *p_resource = calloc( 1, sizeof(*p_resource) );
     if( !p_resource )
         return NULL;
+
+    p_resource->p_vout_cbs = cbs;
+    p_resource->p_vout_owner = owner;
 
     p_resource->p_vout_dummy = vout_CreateDummy(p_parent);
     if( !p_resource->p_vout_dummy )

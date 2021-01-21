@@ -32,7 +32,7 @@
 struct vlc_video_output_callbacks
 {
     /* Event triggered when the first frame of the vout is being displayed. */
-    void (*first_frame_reported)(void *owner);
+    void (*first_frame_reported)(vout_thread_t *vout, void *owner);
 };
 
 /**
@@ -100,7 +100,7 @@ vout_ReportFirstFrame(vout_thread_t *vout)
 {
     assert(vout);
     if (vout->cbs && vout->cbs->first_frame_reported)
-        vout->cbs->first_frame_reported(vout->owner);
+        vout->cbs->first_frame_reported(vout, vout->owner);
 }
 
 /*****************************************************************************

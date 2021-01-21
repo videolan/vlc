@@ -381,7 +381,7 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     if( p_resource )
         priv->p_resource = input_resource_Hold( p_resource );
     else
-        priv->p_resource = input_resource_New( VLC_OBJECT( p_input ) );
+        priv->p_resource = input_resource_New( VLC_OBJECT( p_input), NULL, NULL );
     input_resource_SetInput( priv->p_resource, p_input );
 
     /* Init control buffer */

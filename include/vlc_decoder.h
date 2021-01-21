@@ -38,6 +38,8 @@ typedef struct vlc_input_decoder_t vlc_input_decoder_t;
  */
 typedef struct input_resource_t input_resource_t;
 
+struct vlc_video_output_callbacks;
+
 /* */
 VLC_API vlc_input_decoder_t *
 vlc_input_decoder_Create( vlc_object_t *, const es_format_t *, input_resource_t * ) VLC_USED;
@@ -53,7 +55,9 @@ VLC_API int  vlc_input_decoder_SetSpuHighlight( vlc_input_decoder_t *, const vlc
  * The given object MUST stay alive as long as the input_resource_t is
  * not deleted.
  */
-VLC_API input_resource_t * input_resource_New( vlc_object_t * ) VLC_USED;
+VLC_API input_resource_t * input_resource_New(vlc_object_t *,
+        const struct vlc_video_output_callbacks *cbs,
+        void *owner) VLC_USED;
 
 /**
  * It releases an input resource.
