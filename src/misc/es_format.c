@@ -553,4 +553,3 @@ bool es_format_IsSimilar( const es_format_t *p_fmt1, const es_format_t *p_fmt2 )
         return true;
     }
 }
-
