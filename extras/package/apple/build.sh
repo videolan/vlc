@@ -92,6 +92,7 @@ VLC_PREBUILT_CONTRIBS_URL=${VLC_PREBUILT_CONTRIBS_URL:-""}
 # The number of cores to compile on
 CORE_COUNT=$(sysctl -n machdep.cpu.core_count || nproc || echo 0)
 let VLC_USE_NUMBER_OF_CORES=$CORE_COUNT+1
+let VLC_REQUESTED_CORE_COUNT=0
 # whether to disable debug mode (the default) or not
 VLC_DISABLE_DEBUG=0
 # whether to compile with bitcode or not
@@ -448,7 +449,7 @@ do
             VLC_PREBUILT_CONTRIBS_URL="${1#VLC_PREBUILT_CONTRIBS_URL=}"
             ;;
         -j*)
-            VLC_USE_NUMBER_OF_CORES=${1#-j}
+            VLC_REQUESTED_CORE_COUNT=${1#-j}
             ;;
         *)
             echo >&2 "ERROR: Unrecognized option '$1'"
@@ -458,6 +459,11 @@ do
     esac
     shift
 done
+
+export MAKEFLAGS="-j${VLC_USE_NUMBER_OF_CORES} ${MAKEFLAGS}"
+if [ "${VLC_REQUESTED_CORE_COUNT}" != "0" ]; then
+    export MAKEFLAGS="${MAKEFLAGS} -j${VLC_REQUESTED_CORE_COUNT}"
+fi
 
 # Validate arguments
 if [ "$VLC_MAKE_PREBUILT_CONTRIBS" -gt "0" ] &&
@@ -552,9 +558,9 @@ echo "Building needed tools (if missing)"
 
 cd "$VLC_SRC_DIR/extras/tools" || abort_err "Failed cd to tools dir"
 ./bootstrap || abort_err "Bootstrapping tools failed"
-$MAKE -j$VLC_USE_NUMBER_OF_CORES || abort_err "Building tools failed"
+$MAKE || abort_err "Building tools failed"
 if [ $VLC_HOST_ARCH = "armv7" ]; then
-$MAKE -j$VLC_USE_NUMBER_OF_CORES .buildgas \
+$MAKE .buildgas \
     || abort_err "Building gas-preprocessor tool failed"
 fi
 echo ""
@@ -614,10 +620,10 @@ else
     $MAKE list
 
     # Download source packages
-    $MAKE fetch -j$VLC_USE_NUMBER_OF_CORES
+    $MAKE fetch
 
     # Build contribs
-    $MAKE -j$VLC_USE_NUMBER_OF_CORES || abort_err "Building contribs failed"
+    $MAKE || abort_err "Building contribs failed"
 
     # Make prebuilt contribs package
     if [ "$VLC_MAKE_PREBUILT_CONTRIBS" -gt "0" ]; then
@@ -678,7 +684,7 @@ hostenv ../../configure \
     "${VLC_CONFIG_OPTIONS[@]}" \
  || abort_err "Configuring VLC failed"
 
-$MAKE -j$VLC_USE_NUMBER_OF_CORES || abort_err "Building VLC failed"
+$MAKE || abort_err "Building VLC failed"
 
 $MAKE install || abort_err "Installing VLC failed"
 
