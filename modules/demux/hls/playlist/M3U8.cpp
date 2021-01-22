@@ -22,7 +22,7 @@
 #endif
 
 #include "M3U8.hpp"
-#include "Representation.hpp"
+#include "HLSRepresentation.hpp"
 #include "../../adaptive/playlist/BasePeriod.h"
 #include "../../adaptive/playlist/BaseAdaptationSet.h"
 
@@ -52,7 +52,7 @@ bool M3U8::isLive() const
             std::vector<BaseRepresentation *>::iterator itr;
             for(itr = adaptSet->getRepresentations().begin(); itr != adaptSet->getRepresentations().end(); ++itr)
             {
-                const Representation *rep = dynamic_cast<const Representation *>(*itr);
+                const HLSRepresentation *rep = dynamic_cast<const HLSRepresentation *>(*itr);
                 if(rep->initialized())
                 {
                     if(rep->isLive())

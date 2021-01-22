@@ -47,7 +47,7 @@
 #include "../hls/playlist/M3U8.hpp"
 #include "../smooth/SmoothManager.hpp"
 #include "../smooth/SmoothStream.hpp"
-#include "../smooth/playlist/Parser.hpp"
+#include "../smooth/playlist/SmoothParser.hpp"
 
 using namespace adaptive::http;
 using namespace adaptive::logic;

@@ -1,5 +1,5 @@
 /*
- * Representation.hpp
+ * HLSRepresentation.hpp
  *****************************************************************************
  * Copyright © 2015 - VideoLAN and VLC Authors
  *
@@ -34,13 +34,13 @@ namespace hls
         using namespace adaptive;
         using namespace adaptive::playlist;
 
-        class Representation : public BaseRepresentation
+        class HLSRepresentation : public BaseRepresentation
         {
             friend class M3U8Parser;
 
             public:
-                Representation( BaseAdaptationSet * );
-                virtual ~Representation ();
+                HLSRepresentation( BaseAdaptationSet * );
+                virtual ~HLSRepresentation ();
                 virtual StreamFormat getStreamFormat() const override;
 
                 void setPlaylistUrl(const std::string &);

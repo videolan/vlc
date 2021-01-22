@@ -21,7 +21,7 @@
 # include "config.h"
 #endif
 
-#include "Representation.hpp"
+#include "QualityLevel.hpp"
 #include "Manifest.hpp"
 #include "../../adaptive/playlist/SegmentTemplate.h"
 #include "../../adaptive/playlist/SegmentTimeline.h"
@@ -29,21 +29,21 @@
 
 using namespace smooth::playlist;
 
-Representation::Representation  ( BaseAdaptationSet *set ) :
+QualityLevel::QualityLevel  ( BaseAdaptationSet *set ) :
                 BaseRepresentation( set )
 {
 }
 
-Representation::~Representation ()
+QualityLevel::~QualityLevel ()
 {
 }
 
-StreamFormat Representation::getStreamFormat() const
+StreamFormat QualityLevel::getStreamFormat() const
 {
     return StreamFormat(StreamFormat::MP4);
 }
 
-InitSegment * Representation::getInitSegment() const
+InitSegment * QualityLevel::getInitSegment() const
 {
     if(initialisationSegment.Get())
         return initialisationSegment.Get();
@@ -51,7 +51,7 @@ InitSegment * Representation::getInitSegment() const
         return BaseRepresentation::getInitSegment();
 }
 
-std::string Representation::contextualize(size_t number, const std::string &component,
+std::string QualityLevel::contextualize(size_t number, const std::string &component,
                                           const SegmentTemplate *templ) const
 {
     std::string ret(component);

@@ -25,7 +25,7 @@
 
 #include "../../adaptive/playlist/BaseRepresentation.h"
 #include "../../adaptive/playlist/BasePlaylist.hpp"
-#include "../mp4/IndexReader.hpp"
+#include "../mp4/SmoothIndexReader.hpp"
 
 using namespace smooth::playlist;
 using namespace smooth::mp4;
@@ -48,8 +48,8 @@ void SmoothSegmentChunk::onDownload(block_t **pp_block)
     if(!rep || ((*pp_block)->i_flags & BLOCK_FLAG_HEADER) == 0)
         return;
 
-    IndexReader br(rep->getPlaylist()->getVLCObject());
-    br.parseIndex(*pp_block, rep);
+    SmoothIndexReader br(rep->getPlaylist()->getVLCObject());
+    br.parseIndex(*pp_block, rep, sequence);
 
     /* If timeshift depth is present, we use it for expiring segments
        as we never update playlist itself */

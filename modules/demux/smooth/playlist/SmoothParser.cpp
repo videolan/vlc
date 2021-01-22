@@ -1,5 +1,5 @@
 /*
- * Parser.cpp
+ * SmoothParser.cpp
  *****************************************************************************
  * Copyright © 2015 - VideoLAN and VLC Authors
  *
@@ -21,10 +21,10 @@
 # include "config.h"
 #endif
 
-#include "Parser.hpp"
+#include "SmoothParser.hpp"
 
 #include "Manifest.hpp"
-#include "Representation.hpp"
+#include "QualityLevel.hpp"
 #include "ForgedInitSegment.hpp"
 #include "SmoothSegment.hpp"
 #include "../../adaptive/playlist/BasePeriod.h"
@@ -146,7 +146,7 @@ static SegmentTimeline *createTimeline(Node *streamIndexNode)
 static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const std::string &type,
                               unsigned id, unsigned trackid, const Timescale &timescale)
 {
-    Representation *rep = new (std::nothrow) Representation(adaptSet);
+    QualityLevel *rep = new (std::nothrow) QualityLevel(adaptSet);
     if(rep)
     {
         rep->setID(ID(id));

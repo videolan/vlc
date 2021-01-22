@@ -28,7 +28,7 @@
 
 #include "../adaptive/SharedResources.hpp"
 #include "../adaptive/tools/Retrieve.hpp"
-#include "playlist/Parser.hpp"
+#include "playlist/SmoothParser.hpp"
 #include "../adaptive/xml/DOMParser.h"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
