@@ -624,7 +624,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     if (sys->d3dcontext4)
     {
         if (sys->renderFence == UINT64_MAX)
-            sys->renderFence;
+            sys->renderFence = 0;
         else
             sys->renderFence++;
 
