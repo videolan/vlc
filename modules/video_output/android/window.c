@@ -90,6 +90,11 @@ static const struct vout_window_operations ops = {
  */
 static int Open(vout_window_t *wnd)
 {
+    /* We cannot create a window without the associated AWindow instance. */
+    jobject jobj = var_InheritAddress(wnd, "drawable-androidwindow");
+    if (jobj == NULL)
+        return VLC_EGENERIC;
+
     AWindowHandler *p_awh = AWindowHandler_new(VLC_OBJECT(wnd), wnd,
         &(awh_events_t) { OnNewWindowSize, OnNewMouseCoords });
     if (p_awh == NULL)
