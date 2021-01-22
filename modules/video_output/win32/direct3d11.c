@@ -399,17 +399,17 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         /* use our internal swapchain callbacks */
 #ifdef HAVE_DCOMP_H
         if (cfg->window->type == VOUT_WINDOW_TYPE_DCOMP)
-            sys->outside_opaque      = CreateLocalSwapchainHandleDComp(VLC_OBJECT(vd), cfg->window->display.dcomp_device, cfg->window->handle.dcomp_visual, sys->d3d_dev);
+            sys->outside_opaque      = D3D11_CreateLocalSwapchainHandleDComp(VLC_OBJECT(vd), cfg->window->display.dcomp_device, cfg->window->handle.dcomp_visual, sys->d3d_dev);
         else
 #endif
-            sys->outside_opaque      = CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), sys->sys.hvideownd, sys->d3d_dev);
+            sys->outside_opaque      = D3D11_CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), sys->sys.hvideownd, sys->d3d_dev);
         if (unlikely(sys->outside_opaque == NULL))
             goto error;
-        sys->updateOutputCb      = LocalSwapchainUpdateOutput;
-        sys->swapCb              = LocalSwapchainSwap;
-        sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
-        sys->sendMetadataCb      = LocalSwapchainSetMetadata;
-        sys->selectPlaneCb       = LocalSwapchainSelectPlane;
+        sys->updateOutputCb      = D3D11_LocalSwapchainUpdateOutput;
+        sys->swapCb              = D3D11_LocalSwapchainSwap;
+        sys->startEndRenderingCb = D3D11_LocalSwapchainStartEndRendering;
+        sys->sendMetadataCb      = D3D11_LocalSwapchainSetMetadata;
+        sys->selectPlaneCb       = D3D11_LocalSwapchainSelectPlane;
     }
 
 #if !VLC_WINSTORE_APP
@@ -663,12 +663,12 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
     d3d11_device_lock( sys->d3d_dev );
 #if VLC_WINSTORE_APP
-    if ( sys->swapCb == LocalSwapchainSwap )
+    if ( sys->swapCb == D3D11_LocalSwapchainSwap )
     {
         /* legacy UWP mode, the width/height was set in GUID_SWAPCHAIN_WIDTH/HEIGHT */
         uint32_t i_width;
         uint32_t i_height;
-        if (LocalSwapchainWinstoreSize( sys->outside_opaque, &i_width, &i_height ))
+        if (D3D11_LocalSwapchainWinstoreSize( sys->outside_opaque, &i_width, &i_height ))
         {
             if (i_width != vd->cfg->display.width || i_height != vd->cfg->display.height)
                 vout_display_SetSize(vd, i_width, i_height);
@@ -794,8 +794,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
         }
         if (err != VLC_SUCCESS)
         {
-            if ( sys->swapCb == LocalSwapchainSwap )
-                LocalSwapchainCleanupDevice( sys->outside_opaque );
+            if ( sys->swapCb == D3D11_LocalSwapchainSwap )
+                D3D11_LocalSwapchainCleanupDevice( sys->outside_opaque );
             return err;
         }
     }
@@ -820,8 +820,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 
     if (Direct3D11CreateGenericResources(vd)) {
         msg_Err(vd, "Failed to allocate resources");
-        if ( sys->swapCb == LocalSwapchainSwap )
-            LocalSwapchainCleanupDevice( sys->outside_opaque );
+        if ( sys->swapCb == D3D11_LocalSwapchainSwap )
+            D3D11_LocalSwapchainCleanupDevice( sys->outside_opaque );
         return VLC_EGENERIC;
     }
 
@@ -963,8 +963,8 @@ static void Direct3D11Close(vout_display_t *vd)
 
     Direct3D11DestroyResources(vd);
 
-    if ( sys->swapCb == LocalSwapchainSwap )
-        LocalSwapchainCleanupDevice( sys->outside_opaque );
+    if ( sys->swapCb == D3D11_LocalSwapchainSwap )
+        D3D11_LocalSwapchainCleanupDevice( sys->outside_opaque );
 
     if (sys->d3d_dev && sys->d3d_dev == &sys->local_d3d_dev->d3d_dev)
         D3D11_ReleaseDevice( sys->local_d3d_dev );
