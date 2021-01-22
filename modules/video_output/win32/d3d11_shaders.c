@@ -194,17 +194,6 @@ VS_OUTPUT main( VS_INPUT In )\n\
 static ID3DBlob* D3D11_CompileShader(vlc_object_t *, const d3d11_shader_compiler_t *, const d3d11_device_t *,
                               const char *psz_shader, bool pixel);
 
-bool IsRGBShader(const d3d_format_t *cfg)
-{
-    return cfg->resourceFormat[0] != DXGI_FORMAT_R8_UNORM &&
-           cfg->resourceFormat[0] != DXGI_FORMAT_R16_UNORM &&
-           cfg->formatTexture != DXGI_FORMAT_YUY2 &&
-           cfg->formatTexture != DXGI_FORMAT_AYUV &&
-           cfg->formatTexture != DXGI_FORMAT_Y210 &&
-           cfg->formatTexture != DXGI_FORMAT_Y410 &&
-           cfg->formatTexture != DXGI_FORMAT_420_OPAQUE;
-}
-
 static HRESULT CompileTargetShader(vlc_object_t *o, const d3d11_shader_compiler_t *compiler,
                                    d3d11_device_t *d3d_dev,
                                    bool texture_array, size_t texture_count,
@@ -563,7 +552,7 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shader_compiler_
         if (src_full_range)
             range_adjust = -1; /* lower the source to studio range */
     }
-    if (!IsRGBShader(quad->textureFormat) && !src_full_range && IsRGBShader(display->pixelFormat))
+    if (!DxgiIsRGBFormat(quad->textureFormat) && !src_full_range && DxgiIsRGBFormat(display->pixelFormat))
         range_adjust--; /* the YUV->RGB conversion already output full range */
 
     if (range_adjust != 0)

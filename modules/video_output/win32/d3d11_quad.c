@@ -1004,7 +1004,7 @@ static void GetPrimariesTransform(FLOAT Primaries[4*4], video_color_primaries_t 
 int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format_t *fmt, d3d_quad_t *quad,
                     const display_info_t *displayFormat)
 {
-    const bool RGB_src_shader = IsRGBShader(quad->textureFormat);
+    const bool RGB_src_shader = DxgiIsRGBFormat(quad->textureFormat);
 
     quad->shaderConstants.LuminanceScale = (float)displayFormat->luminance_peak / GetFormatLuminance(o, fmt);
 
@@ -1093,7 +1093,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     memcpy(colorspace.WhitePoint, IDENTITY_4X4, sizeof(colorspace.WhitePoint));
 
     const FLOAT *ppColorspace;
-    if (RGB_src_shader == IsRGBShader(displayFormat->pixelFormat))
+    if (RGB_src_shader == DxgiIsRGBFormat(displayFormat->pixelFormat))
     {
         ppColorspace = IDENTITY_4X4;
     }

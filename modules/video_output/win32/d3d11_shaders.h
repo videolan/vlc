@@ -104,8 +104,6 @@ typedef struct
 
 #define D3D11_MAX_RENDER_TARGET    2
 
-bool IsRGBShader(const d3d_format_t *);
-
 int D3D11_InitShaders(vlc_object_t *, d3d11_shader_compiler_t *);
 void D3D11_ReleaseShaders(d3d11_shader_compiler_t *);
 

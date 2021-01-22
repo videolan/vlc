@@ -57,4 +57,6 @@ DXGI_FORMAT DxgiFourccFormat(vlc_fourcc_t fcc);
 const char *DxgiVendorStr(unsigned int gpu_vendor);
 UINT DxgiResourceCount(const d3d_format_t *);
 
+bool DxgiIsRGBFormat(const d3d_format_t *);
+
 #endif /* include-guard */

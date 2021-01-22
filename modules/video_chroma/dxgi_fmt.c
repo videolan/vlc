@@ -177,3 +177,14 @@ UINT DxgiResourceCount(const d3d_format_t *d3d_fmt)
     }
     return D3D11_MAX_SHADER_VIEW;
 }
+
+bool DxgiIsRGBFormat(const d3d_format_t *cfg)
+{
+    return cfg->resourceFormat[0] != DXGI_FORMAT_R8_UNORM &&
+           cfg->resourceFormat[0] != DXGI_FORMAT_R16_UNORM &&
+           cfg->formatTexture != DXGI_FORMAT_YUY2 &&
+           cfg->formatTexture != DXGI_FORMAT_AYUV &&
+           cfg->formatTexture != DXGI_FORMAT_Y210 &&
+           cfg->formatTexture != DXGI_FORMAT_Y410 &&
+           cfg->formatTexture != DXGI_FORMAT_420_OPAQUE;
+}
