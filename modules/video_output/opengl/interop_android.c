@@ -62,18 +62,17 @@ tc_anop_update(struct vlc_gl_interop *interop, GLuint *textures,
     assert(pic->context);
     assert(textures[0] != 0);
 
-    if (priv->current_picture)
-        picture_Release(priv->current_picture);
+    picture_t *previous_picture = priv->current_picture;
     priv->current_picture = picture_Hold(pic);
 
     struct vlc_video_context *vctx = pic->context->vctx;
     android_video_context_t *avctx =
         vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_AWINDOW);
     if (avctx == NULL)
-        return VLC_EGENERIC;
+        goto error;
 
     if (plane_offset != NULL)
-        return VLC_EGENERIC;
+        goto error;
 
     struct vlc_asurfacetexture *texture =
         avctx->get_texture(pic->context);
@@ -91,14 +90,14 @@ tc_anop_update(struct vlc_gl_interop *interop, GLuint *textures,
         }
 
         if (SurfaceTexture_attachToGLContext(texture, textures[0]) != 0)
-            return VLC_EGENERIC;
+            goto error;
 
         priv->stex_attached = true;
         priv->previous_texture = texture;
     }
 
     if (!avctx->render(pic->context))
-        return VLC_SUCCESS; /* already rendered */
+        goto success; /* already rendered */
 
     /* Release previous image */
     if (previous_texture && previous_texture != texture)
@@ -108,13 +107,21 @@ tc_anop_update(struct vlc_gl_interop *interop, GLuint *textures,
         != VLC_SUCCESS)
     {
         priv->transform_mtx = NULL;
-        return VLC_EGENERIC;
+        goto error;
     }
 
     interop->vt->ActiveTexture(GL_TEXTURE0);
     interop->vt->BindTexture(interop->tex_target, textures[0]);
 
+success:
+    if (previous_picture)
+        picture_Release(previous_picture);
     return VLC_SUCCESS;
+
+error:
+    if (previous_picture)
+        picture_Release(previous_picture);
+    return VLC_EGENERIC;
 }
 
 static const float *
