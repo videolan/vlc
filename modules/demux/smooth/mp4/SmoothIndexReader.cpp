@@ -1,5 +1,5 @@
 /*
- * IndexReader.cpp
+ * SmoothIndexReader.cpp
  *****************************************************************************
  * Copyright (C) 2015 - VideoLAN and VLC authors
  *
@@ -21,7 +21,7 @@
 # include "config.h"
 #endif
 
-#include "IndexReader.hpp"
+#include "SmoothIndexReader.hpp"
 #include "../../adaptive/playlist/BaseRepresentation.h"
 #include "../../adaptive/playlist/BaseAdaptationSet.h"
 #include "../../adaptive/playlist/SegmentTemplate.h"
@@ -31,12 +31,12 @@
 using namespace adaptive::mp4;
 using namespace smooth::mp4;
 
-IndexReader::IndexReader(vlc_object_t *obj)
+SmoothIndexReader::SmoothIndexReader(vlc_object_t *obj)
     : AtomsReader(obj)
 {
 }
 
-bool IndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep, uint64_t sequence)
+bool SmoothIndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep, uint64_t sequence)
 {
     if(!rep || !parseBlock(p_block))
         return false;

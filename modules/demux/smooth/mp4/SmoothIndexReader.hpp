@@ -1,5 +1,5 @@
 /*
- * IndexReader.hpp
+ * SmoothIndexReader.hpp
  *****************************************************************************
  * Copyright (C) 2015 - VideoLAN and VLC authors
  *
@@ -37,10 +37,10 @@ namespace smooth
         using namespace adaptive::mp4;
         using namespace adaptive::playlist;
 
-        class IndexReader : public AtomsReader
+        class SmoothIndexReader : public AtomsReader
         {
             public:
-                IndexReader(vlc_object_t *);
+                SmoothIndexReader(vlc_object_t *);
                 bool parseIndex(block_t *, BaseRepresentation *, uint64_t);
         };
     }

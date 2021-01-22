@@ -1,5 +1,5 @@
 /*
- * Representation.hpp
+ * QualityLevel.hpp
  *****************************************************************************
  * Copyright (C) 2015 - VideoLAN Authors
  *
@@ -17,8 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef SMOOTHREPRESENTATION_HPP
-#define SMOOTHREPRESENTATION_HPP
+#ifndef SMOOTHQUALITYLEVEL_HPP
+#define SMOOTHQUALITYLEVEL_HPP
 
 #include "../../adaptive/playlist/SegmentBaseType.hpp"
 #include "../../adaptive/playlist/BaseRepresentation.h"
@@ -38,12 +38,12 @@ namespace smooth
         using namespace adaptive;
         using namespace adaptive::playlist;
 
-        class Representation : public BaseRepresentation,
+        class QualityLevel : public BaseRepresentation,
                                public Initializable<InitSegment>
         {
             public:
-                Representation(BaseAdaptationSet *);
-                virtual ~Representation ();
+                QualityLevel(BaseAdaptationSet *);
+                virtual ~QualityLevel ();
 
                 virtual InitSegment * getInitSegment() const override;
                 virtual StreamFormat getStreamFormat() const override;
@@ -54,4 +54,4 @@ namespace smooth
         };
     }
 }
-#endif // SMOOTHREPRESENTATION_HPP
+#endif // SMOOTHQUALITYLEVEL_HPP

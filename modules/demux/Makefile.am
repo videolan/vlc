@@ -450,8 +450,8 @@ libadaptive_hls_SOURCES = \
     demux/hls/playlist/M3U8.cpp \
     demux/hls/playlist/Parser.hpp \
     demux/hls/playlist/Parser.cpp \
-    demux/hls/playlist/Representation.hpp \
-    demux/hls/playlist/Representation.cpp \
+    demux/hls/playlist/HLSRepresentation.hpp \
+    demux/hls/playlist/HLSRepresentation.cpp \
     demux/hls/playlist/HLSSegment.hpp \
     demux/hls/playlist/HLSSegment.cpp \
     demux/hls/playlist/Tags.hpp \
@@ -464,18 +464,18 @@ libadaptive_hls_SOURCES = \
 libadaptive_hls_SOURCES += meta_engine/ID3Meta.h
 
 libadaptive_smooth_SOURCES = \
-    demux/smooth/mp4/IndexReader.cpp \
-    demux/smooth/mp4/IndexReader.hpp \
+    demux/smooth/mp4/SmoothIndexReader.cpp \
+    demux/smooth/mp4/SmoothIndexReader.hpp \
     demux/smooth/playlist/ForgedInitSegment.hpp \
     demux/smooth/playlist/ForgedInitSegment.cpp \
     demux/smooth/playlist/Manifest.hpp \
     demux/smooth/playlist/Manifest.cpp \
     demux/smooth/playlist/MemoryChunk.hpp \
     demux/smooth/playlist/MemoryChunk.cpp \
-    demux/smooth/playlist/Parser.hpp \
-    demux/smooth/playlist/Parser.cpp \
-    demux/smooth/playlist/Representation.hpp \
-    demux/smooth/playlist/Representation.cpp \
+    demux/smooth/playlist/SmoothParser.hpp \
+    demux/smooth/playlist/SmoothParser.cpp \
+    demux/smooth/playlist/QualityLevel.cpp \
+    demux/smooth/playlist/QualityLevel.hpp \
     demux/smooth/playlist/SmoothSegment.hpp \
     demux/smooth/playlist/SmoothSegment.cpp \
     demux/smooth/SmoothManager.hpp \

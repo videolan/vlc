@@ -1,5 +1,5 @@
 /*
- * Representation.cpp
+ * HLSRepresentation.cpp
  *****************************************************************************
  * Copyright © 2015 - VideoLAN and VLC Authors
  *
@@ -24,7 +24,7 @@
 #include <vlc_fixups.h>
 #include <cinttypes>
 
-#include "Representation.hpp"
+#include "HLSRepresentation.hpp"
 #include "M3U8.hpp"
 #include "Parser.hpp"
 #include "HLSSegment.hpp"
@@ -39,7 +39,7 @@
 using namespace hls;
 using namespace hls::playlist;
 
-Representation::Representation  ( BaseAdaptationSet *set ) :
+HLSRepresentation::HLSRepresentation  ( BaseAdaptationSet *set ) :
                 BaseRepresentation( set )
 {
     b_live = true;
@@ -50,31 +50,31 @@ Representation::Representation  ( BaseAdaptationSet *set ) :
     streamFormat = StreamFormat::UNKNOWN;
 }
 
-Representation::~Representation ()
+HLSRepresentation::~HLSRepresentation ()
 {
 }
 
-StreamFormat Representation::getStreamFormat() const
+StreamFormat HLSRepresentation::getStreamFormat() const
 {
     return streamFormat;
 }
 
-bool Representation::isLive() const
+bool HLSRepresentation::isLive() const
 {
     return b_live;
 }
 
-bool Representation::initialized() const
+bool HLSRepresentation::initialized() const
 {
     return b_loaded;
 }
 
-void Representation::setPlaylistUrl(const std::string &uri)
+void HLSRepresentation::setPlaylistUrl(const std::string &uri)
 {
     playlistUrl = Url(uri);
 }
 
-Url Representation::getPlaylistUrl() const
+Url HLSRepresentation::getPlaylistUrl() const
 {
     if(playlistUrl.hasScheme())
     {
@@ -89,7 +89,7 @@ Url Representation::getPlaylistUrl() const
     }
 }
 
-void Representation::debug(vlc_object_t *obj, int indent) const
+void HLSRepresentation::debug(vlc_object_t *obj, int indent) const
 {
     BaseRepresentation::debug(obj, indent);
     if(!b_loaded)
@@ -101,7 +101,7 @@ void Representation::debug(vlc_object_t *obj, int indent) const
     }
 }
 
-void Representation::scheduleNextUpdate(uint64_t, bool b_updated)
+void HLSRepresentation::scheduleNextUpdate(uint64_t, bool b_updated)
 {
     if(!isLive())
         return;
@@ -125,7 +125,7 @@ void Representation::scheduleNextUpdate(uint64_t, bool b_updated)
     debug(playlist->getVLCObject(), 0);
 }
 
-bool Representation::needsUpdate(uint64_t number) const
+bool HLSRepresentation::needsUpdate(uint64_t number) const
 {
     if(b_failed)
         return false;
@@ -150,7 +150,7 @@ bool Representation::needsUpdate(uint64_t number) const
     return false;
 }
 
-bool Representation::runLocalUpdates(SharedResources *res)
+bool HLSRepresentation::runLocalUpdates(SharedResources *res)
 {
     BasePlaylist *playlist = getPlaylist();
     M3U8Parser parser(res);
@@ -161,7 +161,7 @@ bool Representation::runLocalUpdates(SharedResources *res)
     return true;
 }
 
-uint64_t Representation::translateSegmentNumber(uint64_t num, const BaseRepresentation *from) const
+uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepresentation *from) const
 {
     if(consistentSegmentNumber())
         return num;

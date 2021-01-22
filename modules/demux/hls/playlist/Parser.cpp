@@ -23,7 +23,7 @@
 
 #include "Parser.hpp"
 #include "HLSSegment.hpp"
-#include "Representation.hpp"
+#include "HLSRepresentation.hpp"
 #include "../../adaptive/SharedResources.hpp"
 #include "../../adaptive/playlist/BasePeriod.h"
 #include "../../adaptive/playlist/BaseAdaptationSet.h"
@@ -88,13 +88,13 @@ static void releaseTagsList(std::list<Tag *> &list)
     list.clear();
 }
 
-Representation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet, const AttributesTag * tag)
+HLSRepresentation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet, const AttributesTag * tag)
 {
     const Attribute *uriAttr = tag->getAttributeByName("URI");
     const Attribute *bwAttr = tag->getAttributeByName("BANDWIDTH");
     const Attribute *resAttr = tag->getAttributeByName("RESOLUTION");
 
-    Representation *rep = new (std::nothrow) Representation(adaptSet);
+    HLSRepresentation *rep = new (std::nothrow) HLSRepresentation(adaptSet);
     if(rep)
     {
         if(uriAttr)
@@ -142,7 +142,7 @@ void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptation
                                              const AttributesTag *tag,
                                              const std::list<Tag *> &tagslist)
 {
-    Representation *rep  = createRepresentation(adaptSet, tag);
+    HLSRepresentation *rep  = createRepresentation(adaptSet, tag);
     if(rep)
     {
         parseSegments(p_obj, rep, tagslist);
@@ -150,7 +150,7 @@ void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptation
     }
 }
 
-bool M3U8Parser::appendSegmentsFromPlaylistURI(vlc_object_t *p_obj, Representation *rep)
+bool M3U8Parser::appendSegmentsFromPlaylistURI(vlc_object_t *p_obj, HLSRepresentation *rep)
 {
     block_t *p_block = Retrieve::HTTP(resources, rep->getPlaylistUrl().toString());
     if(p_block)
@@ -206,7 +206,7 @@ static bool parseEncryption(const AttributesTag *keytag, const Url &playlistUrl,
     }
 }
 
-void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::list<Tag *> &tagslist)
+void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std::list<Tag *> &tagslist)
 {
     SegmentList *segmentList = new (std::nothrow) SegmentList(rep);
 
@@ -437,7 +437,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                     if(groupsmap.find(tag->getAttributeByName("URI")->value) == groupsmap.end())
                     {
                         /* not a group, belong to default adaptation set */
-                        Representation *rep  = createRepresentation(adaptSet, tag);
+                        HLSRepresentation *rep  = createRepresentation(adaptSet, tag);
                         if(rep)
                         {
                             adaptSet->addRepresentation(rep);
@@ -469,7 +469,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
             BaseAdaptationSet *altAdaptSet = new (std::nothrow) BaseAdaptationSet(period);
             if(altAdaptSet)
             {
-                Representation *rep  = createRepresentation(altAdaptSet, pair.second);
+                HLSRepresentation *rep  = createRepresentation(altAdaptSet, pair.second);
                 if(rep)
                 {
                     altAdaptSet->addRepresentation(rep);
