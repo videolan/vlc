@@ -47,32 +47,32 @@ typedef struct d3d_vertex_t {
 
 typedef bool (*d3d11_select_plane_t)(void *opaque, size_t plane_index);
 
-void D3D11_RenderQuad(d3d11_device_t *, d3d_quad_t *, d3d_vertex_shader_t *,
+void D3D11_RenderQuad(d3d11_device_t *, d3d11_quad_t *, d3d_vertex_shader_t *,
                       ID3D11ShaderResourceView *resourceViews[DXGI_MAX_SHADER_VIEW],
                       d3d11_select_plane_t selectPlane, void *selectOpaque);
 
-int D3D11_AllocateQuad(vlc_object_t *, d3d11_device_t *, video_projection_mode_t, d3d_quad_t *);
+int D3D11_AllocateQuad(vlc_object_t *, d3d11_device_t *, video_projection_mode_t, d3d11_quad_t *);
 #define D3D11_AllocateQuad(a,b,c,d)  D3D11_AllocateQuad(VLC_OBJECT(a),b,c,d)
 
-void D3D11_ReleaseQuad(d3d_quad_t *);
+void D3D11_ReleaseQuad(d3d11_quad_t *);
 
-int D3D11_SetupQuad(vlc_object_t *, d3d11_device_t *, const video_format_t *, d3d_quad_t *,
+int D3D11_SetupQuad(vlc_object_t *, d3d11_device_t *, const video_format_t *, d3d11_quad_t *,
                     const display_info_t *);
 #define D3D11_SetupQuad(a,b,c,d,e)  D3D11_SetupQuad(VLC_OBJECT(a),b,c,d,e)
 
-bool D3D11_UpdateQuadPosition( vlc_object_t *, d3d11_device_t *, d3d_quad_t *,
+bool D3D11_UpdateQuadPosition( vlc_object_t *, d3d11_device_t *, d3d11_quad_t *,
                                const RECT *output, video_orientation_t );
 #define D3D11_UpdateQuadPosition(a,b,c,d,e)  D3D11_UpdateQuadPosition(VLC_OBJECT(a),b,c,d,e)
 
-void D3D11_UpdateViewport(d3d_quad_t *, const RECT *, const d3d_format_t *display);
+void D3D11_UpdateViewport(d3d11_quad_t *, const RECT *, const d3d_format_t *display);
 
-void D3D11_UpdateQuadOpacity(vlc_object_t *, d3d11_device_t *, d3d_quad_t *, float opacity);
+void D3D11_UpdateQuadOpacity(vlc_object_t *, d3d11_device_t *, d3d11_quad_t *, float opacity);
 #define D3D11_UpdateQuadOpacity(a,b,c,d)  D3D11_UpdateQuadOpacity(VLC_OBJECT(a),b,c,d)
 
-void D3D11_UpdateQuadLuminanceScale(vlc_object_t *, d3d11_device_t *, d3d_quad_t *, float luminanceScale);
+void D3D11_UpdateQuadLuminanceScale(vlc_object_t *, d3d11_device_t *, d3d11_quad_t *, float luminanceScale);
 #define D3D11_UpdateQuadLuminanceScale(a,b,c,d)  D3D11_UpdateQuadLuminanceScale(VLC_OBJECT(a),b,c,d)
 
-void D3D11_UpdateViewpoint(vlc_object_t *, d3d11_device_t *, d3d_quad_t *, const vlc_viewpoint_t*, float sar);
+void D3D11_UpdateViewpoint(vlc_object_t *, d3d11_device_t *, d3d11_quad_t *, const vlc_viewpoint_t*, float sar);
 #define D3D11_UpdateViewpoint(a,b,c,d,e)  D3D11_UpdateViewpoint(VLC_OBJECT(a),b,c,d,e)
 
 #endif /* VLC_D3D11_QUAD_H */

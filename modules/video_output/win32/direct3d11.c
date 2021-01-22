@@ -101,7 +101,7 @@ struct vout_display_sys_t
     d3d11_device_t           *d3d_dev;
     d3d11_decoder_device_t   *local_d3d_dev; // when opened without a video context
     d3d11_shader_compiler_t  shaders;
-    d3d_quad_t               picQuad;
+    d3d11_quad_t               picQuad;
 
     ID3D11Asynchronous       *prepareWait;
 #ifdef HAVE_D3D11_4_H
@@ -123,7 +123,7 @@ struct vout_display_sys_t
 
     // SPU
     vlc_fourcc_t             pSubpictureChromas[2];
-    d3d_quad_t               regionQuad;
+    d3d11_quad_t               regionQuad;
     int                      d3dregion_count;
     picture_t                **d3dregions;
 
@@ -613,7 +613,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
         for (int i = 0; i < sys->d3dregion_count; ++i) {
             if (sys->d3dregions[i])
             {
-                d3d_quad_t *quad = (d3d_quad_t *) sys->d3dregions[i]->p_sys;
+                d3d11_quad_t *quad = (d3d11_quad_t *) sys->d3dregions[i]->p_sys;
                 D3D11_RenderQuad(sys->d3d_dev, quad, &sys->flatVShader,
                                  quad->picSys.renderSrc, SelectRenderPlane, sys);
             }
@@ -1268,7 +1268,7 @@ static void Direct3D11DeleteRegions(int count, picture_t **region)
 
 static void DestroyPictureQuad(picture_t *p_picture)
 {
-    D3D11_ReleaseQuad( (d3d_quad_t *) p_picture->p_sys );
+    D3D11_ReleaseQuad( (d3d11_quad_t *) p_picture->p_sys );
 }
 
 static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_count,
@@ -1299,8 +1299,8 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
         for (int j = 0; j < sys->d3dregion_count; j++) {
             picture_t *cache = sys->d3dregions[j];
-            if (cache != NULL && ((d3d_quad_t *) cache->p_sys)->picSys.texture[KNOWN_DXGI_INDEX]) {
-                ID3D11Texture2D_GetDesc( ((d3d_quad_t *) cache->p_sys)->picSys.texture[KNOWN_DXGI_INDEX], &texDesc );
+            if (cache != NULL && ((d3d11_quad_t *) cache->p_sys)->picSys.texture[KNOWN_DXGI_INDEX]) {
+                ID3D11Texture2D_GetDesc( ((d3d11_quad_t *) cache->p_sys)->picSys.texture[KNOWN_DXGI_INDEX], &texDesc );
                 if (texDesc.Format == sys->regionQuad.textureFormat->formatTexture &&
                     texDesc.Width  == r->p_picture->format.i_width &&
                     texDesc.Height == r->p_picture->format.i_height) {
@@ -1312,12 +1312,12 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         }
 
         picture_t *quad_picture = (*region)[i];
-        d3d_quad_t *quad;
+        d3d11_quad_t *quad;
         if (quad_picture != NULL)
             quad = quad_picture->p_sys;
         else
         {
-            d3d_quad_t *d3dquad = calloc(1, sizeof(*d3dquad));
+            d3d11_quad_t *d3dquad = calloc(1, sizeof(*d3dquad));
             if (unlikely(d3dquad==NULL)) {
                 continue;
             }
@@ -1383,12 +1383,12 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             }
         }
 
-        hr = ID3D11DeviceContext_Map(sys->d3d_dev->d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+        hr = ID3D11DeviceContext_Map(sys->d3d_dev->d3dcontext, ((d3d11_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
         if( SUCCEEDED(hr) ) {
             err = picture_UpdatePlanes(quad_picture, mappedResource.pData, mappedResource.RowPitch);
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to set the buffer on the SPU picture" );
-                ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0);
+                ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, ((d3d11_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0);
                 picture_Release(quad_picture);
                 if ((*region)[i] == quad_picture)
                     (*region)[i] = NULL;
@@ -1397,7 +1397,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
             picture_CopyPixels(quad_picture, r->p_picture);
 
-            ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0);
+            ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, ((d3d11_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0);
         } else {
             msg_Err(vd, "Failed to map the SPU texture (hr=0x%lX)", hr );
             picture_Release(quad_picture);

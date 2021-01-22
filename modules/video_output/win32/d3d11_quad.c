@@ -42,7 +42,7 @@
 #define nbLatBands SPHERE_SLICES
 #define nbLonBands SPHERE_SLICES
 
-void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad, d3d_vertex_shader_t *vsshader,
+void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d11_quad_t *quad, d3d_vertex_shader_t *vsshader,
                       ID3D11ShaderResourceView *resourceView[DXGI_MAX_SHADER_VIEW],
                       d3d11_select_plane_t selectPlane, void *selectOpaque)
 {
@@ -90,7 +90,7 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad, d3d_vertex_shad
     }
 }
 
-static bool AllocQuadVertices(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad, video_projection_mode_t projection)
+static bool AllocQuadVertices(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_quad_t *quad, video_projection_mode_t projection)
 {
     HRESULT hr;
 
@@ -157,7 +157,7 @@ fail:
     return false;
 }
 
-void D3D11_ReleaseQuad(d3d_quad_t *quad)
+void D3D11_ReleaseQuad(d3d11_quad_t *quad)
 {
     if (quad->pPixelShaderConstants[PS_CONST_LUMI_BOUNDS])
     {
@@ -267,7 +267,7 @@ static void orientationVertexOrder(video_orientation_t orientation, int vertex_o
 }
 
 static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
-                          const d3d_quad_t *quad,
+                          const d3d11_quad_t *quad,
                           WORD *triangle_pos, video_orientation_t orientation)
 {
     unsigned int src_width = quad->i_width;
@@ -411,7 +411,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
 }
 
 static void SetupQuadSphere(d3d_vertex_t *dst_data, const RECT *output,
-                            const d3d_quad_t *quad, WORD *triangle_pos)
+                            const d3d11_quad_t *quad, WORD *triangle_pos)
 {
     const float scaleX = (float)(RECTWidth(*output))  / quad->i_width;
     const float scaleY = (float)(RECTHeight(*output)) / quad->i_height;
@@ -461,7 +461,7 @@ static void SetupQuadSphere(d3d_vertex_t *dst_data, const RECT *output,
 
 
 static void SetupQuadCube(d3d_vertex_t *dst_data, const RECT *output,
-                          const d3d_quad_t *quad, WORD *triangle_pos)
+                          const d3d11_quad_t *quad, WORD *triangle_pos)
 {
 #define CUBEFACE(swap, value) \
     swap(value, -1.f,  1.f), \
@@ -550,7 +550,7 @@ static void SetupQuadCube(d3d_vertex_t *dst_data, const RECT *output,
 }
 
 #undef D3D11_UpdateQuadPosition
-bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad,
+bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_quad_t *quad,
                                 const RECT *output, video_orientation_t orientation )
 {
     bool result = true;
@@ -599,7 +599,7 @@ bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_qua
     return result;
 }
 
-static bool ShaderUpdateConstants(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad, int type, void *new_buf)
+static bool ShaderUpdateConstants(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_quad_t *quad, int type, void *new_buf)
 {
     ID3D11Resource *res;
     switch (type)
@@ -640,7 +640,7 @@ static bool ShaderUpdateConstants(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_
 }
 
 #undef D3D11_UpdateQuadOpacity
-void D3D11_UpdateQuadOpacity(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad, float opacity)
+void D3D11_UpdateQuadOpacity(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_quad_t *quad, float opacity)
 {
     if (quad->shaderConstants.Opacity == opacity)
         return;
@@ -652,7 +652,7 @@ void D3D11_UpdateQuadOpacity(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_
 }
 
 #undef D3D11_UpdateQuadLuminanceScale
-void D3D11_UpdateQuadLuminanceScale(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad, float luminanceScale)
+void D3D11_UpdateQuadLuminanceScale(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_quad_t *quad, float luminanceScale)
 {
     if (quad->shaderConstants.LuminanceScale == luminanceScale)
         return;
@@ -725,7 +725,7 @@ static float UpdateZ(float f_fovx, float f_fovy)
     return f_z;
 }
 
-void (D3D11_UpdateViewpoint)(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad,
+void (D3D11_UpdateViewpoint)(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_quad_t *quad,
                              const vlc_viewpoint_t *viewpoint, float f_sar)
 {
     if (!quad->viewpointShaderConstant)
@@ -749,7 +749,7 @@ void (D3D11_UpdateViewpoint)(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_
 
 #undef D3D11_AllocateQuad
 int D3D11_AllocateQuad(vlc_object_t *o, d3d11_device_t *d3d_dev,
-                       video_projection_mode_t projection, d3d_quad_t *quad)
+                       video_projection_mode_t projection, d3d11_quad_t *quad)
 {
     HRESULT hr;
     static_assert((sizeof(PS_CONSTANT_BUFFER)%16)==0,"Constant buffers require 16-byte alignment");
@@ -1001,7 +1001,7 @@ static void GetPrimariesTransform(FLOAT Primaries[4*4], video_color_primaries_t 
 }
 
 #undef D3D11_SetupQuad
-int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format_t *fmt, d3d_quad_t *quad,
+int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format_t *fmt, d3d11_quad_t *quad,
                     const display_info_t *displayFormat)
 {
     const bool RGB_src_shader = DxgiIsRGBFormat(quad->textureFormat);
@@ -1154,7 +1154,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     return VLC_SUCCESS;
 }
 
-void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect, const d3d_format_t *display)
+void D3D11_UpdateViewport(d3d11_quad_t *quad, const RECT *rect, const d3d_format_t *display)
 {
     LONG srcAreaWidth, srcAreaHeight;
 

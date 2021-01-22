@@ -100,7 +100,7 @@ typedef struct
 
     PS_CONSTANT_BUFFER        shaderConstants;
     VS_PROJECTION_CONST       vertexConstants;
-} d3d_quad_t;
+} d3d11_quad_t;
 
 #define D3D11_MAX_RENDER_TARGET    2
 
@@ -112,10 +112,10 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *, const d3d11_shader_compiler_t *
                                  const display_info_t *, bool sharp,
                                  video_transfer_func_t, video_color_primaries_t,
                                  bool src_full_range,
-                                 d3d_quad_t *);
+                                 d3d11_quad_t *);
 #define D3D11_CompilePixelShader(a,b,c,d,e,f,g,h,i,j,k) \
     D3D11_CompilePixelShader(VLC_OBJECT(a),b,c,d,e,f,g,h,i,j,k)
-void D3D11_ReleasePixelShader(d3d_quad_t *);
+void D3D11_ReleasePixelShader(d3d11_quad_t *);
 
 HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, const d3d11_shader_compiler_t *, d3d11_device_t *, d3d_vertex_shader_t *);
 #define D3D11_CompileFlatVertexShader(a,b,c,d) D3D11_CompileFlatVertexShader(VLC_OBJECT(a),b,c,d)

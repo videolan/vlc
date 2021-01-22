@@ -249,7 +249,7 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shader_compiler_
                                  const display_info_t *display, bool sharp,
                                  video_transfer_func_t transfer,
                                  video_color_primaries_t primaries, bool src_full_range,
-                                 d3d_quad_t *quad)
+                                 d3d11_quad_t *quad)
 {
     static const char *DEFAULT_NOOP = "return rgb";
     const char *psz_sampler[2] = {NULL, NULL};
@@ -635,7 +635,7 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shader_compiler_
     return hr;
 }
 
-void D3D11_ReleasePixelShader(d3d_quad_t *quad)
+void D3D11_ReleasePixelShader(d3d11_quad_t *quad)
 {
     for (size_t i=0; i<DXGI_MAX_SHADER_VIEW; i++)
     {
