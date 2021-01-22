@@ -1216,10 +1216,10 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
 
         /* If MediaCodec can handle the rotation, reset the orientation to
          * Normal in order to ask the vout not to rotate. */
+        p_dec->fmt_out.video.orientation = p_dec->fmt_in.video.orientation;
         if (p_sys->video.i_angle != 0)
         {
             assert(p_dec->fmt_out.i_codec == VLC_CODEC_ANDROID_OPAQUE);
-            p_dec->fmt_out.video.orientation = p_dec->fmt_in.video.orientation;
             video_format_TransformTo(&p_dec->fmt_out.video, ORIENT_NORMAL);
         }
 
