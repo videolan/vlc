@@ -375,7 +375,6 @@ error:
     NotifyArtFetchEnded(task, false);
     FetcherRemoveTask(fetcher, task);
     TaskDelete(task);
-    goto out;
 }
 
 static void RunSearchLocal(void *userdata)
