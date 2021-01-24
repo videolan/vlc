@@ -3,9 +3,6 @@ APACHE=http://mir2.ovh.net/ftp.apache.org/dist
 SF= http://downloads.sourceforge.net/project
 VIDEOLAN=http://downloads.videolan.org/pub/contrib
 
-YASM_VERSION=1.2.0
-YASM_URL=http://www.tortall.net/projects/yasm/releases/yasm-$(YASM_VERSION).tar.gz
-
 NASM_VERSION=2.14
 NASM_URL=http://www.nasm.us/pub/nasm/releasebuilds/$(NASM_VERSION)/nasm-$(NASM_VERSION).tar.gz
 

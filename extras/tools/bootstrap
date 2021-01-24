@@ -134,7 +134,6 @@ check m4 1.4.16
 check libtool 2.4
 check pkg-config
 check cmake 3.17.0
-check yasm
 check_tar
 check ragel
 check_sed

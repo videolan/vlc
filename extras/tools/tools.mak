@@ -53,22 +53,7 @@ MOVE = mv $(UNPACK_DIR) $@ && touch $@
 # package rules
 #
 
-# yasm
-
-yasm-$(YASM_VERSION).tar.gz:
-	$(call download_pkg,$(YASM_URL),yasm)
-
-yasm: yasm-$(YASM_VERSION).tar.gz
-	$(UNPACK)
-	$(MOVE)
-
-.buildyasm: yasm
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
-	touch $@
-
-CLEAN_FILE += .buildyasm
-CLEAN_PKG += yasm
-DISTCLEAN_PKG += yasm-$(YASM_VERSION).tar.gz
+# nasm
 
 nasm-$(NASM_VERSION).tar.gz:
 	$(call download_pkg,$(NASM_URL),nasm)
