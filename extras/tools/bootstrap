@@ -166,7 +166,6 @@ check m4 $MIN_M4
 check libtool $MIN_LIBTOOL
 check pkg-config
 check cmake $MIN_CMAKE
-check yasm
 check_tar
 check_sed
 check_majmin protoc $MIN_PROTOC
