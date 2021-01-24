@@ -246,9 +246,6 @@ nightly-snap:
         fi
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
-            mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
-            curl -f -L ${VLC_PREBUILT_CONTRIBS_URL} -o vlc-contrib-$TRIPLET-latest.tar.bz2
-            cd ../../
         else
             EXTRA_BUILD_FLAGS="-c -p"
         fi
