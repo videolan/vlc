@@ -837,7 +837,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
 
     d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate(vctx);
     if (vtcx_sys != NULL &&
-        DeviceSupportsFormat( vd->sys->d3d_dev->d3ddevice, vtcx_sys->format, D3D11_FORMAT_SUPPORT_SHADER_LOAD ))
+        D3D11_DeviceSupportsFormat( sys->d3d_dev, vtcx_sys->format, D3D11_FORMAT_SUPPORT_SHADER_LOAD ))
     {
         for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
             output_format->name != NULL; ++output_format)

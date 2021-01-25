@@ -441,14 +441,14 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
 
        // check if we can create render texture of that format
        // check the decoder can output to that format
-       if ( !DeviceSupportsFormat(sys->d3d_dev->d3ddevice, processorInput[idx]->formatTexture,
+       if ( !D3D11_DeviceSupportsFormat(sys->d3d_dev, processorInput[idx]->formatTexture,
                                   D3D11_FORMAT_SUPPORT_SHADER_LOAD) )
        {
 #ifndef ID3D11VideoContext_VideoProcessorBlt
            msg_Dbg(va, "Format %s needs a processor but is not supported",
                    DxgiFormatToStr(processorInput[idx]->formatTexture));
 #else
-           if ( !DeviceSupportsFormat(sys->d3d_dev->d3ddevice, processorInput[idx]->formatTexture,
+           if ( !D3D11_DeviceSupportsFormat(sys->d3d_dev, processorInput[idx]->formatTexture,
                                       D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_INPUT) )
            {
                msg_Dbg(va, "Format %s needs a processor but is not available",
@@ -541,7 +541,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     texDesc.BindFlags = D3D11_BIND_DECODER;
     texDesc.CPUAccessFlags = 0;
 
-    if (DeviceSupportsFormat(sys->d3d_dev->d3ddevice, texDesc.Format, D3D11_FORMAT_SUPPORT_SHADER_LOAD))
+    if (D3D11_DeviceSupportsFormat(sys->d3d_dev, texDesc.Format, D3D11_FORMAT_SUPPORT_SHADER_LOAD))
         texDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
     ID3D11Texture2D *p_texture;

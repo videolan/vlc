@@ -683,10 +683,10 @@ done:
     return result;
 }
 
-bool DeviceSupportsFormat(ID3D11Device *d3ddevice, DXGI_FORMAT format, UINT supportFlags)
+bool D3D11_DeviceSupportsFormat(d3d11_device_t *d3d_dev, DXGI_FORMAT format, UINT supportFlags)
 {
     UINT i_formatSupport;
-    return SUCCEEDED( ID3D11Device_CheckFormatSupport(d3ddevice, format,
+    return SUCCEEDED( ID3D11Device_CheckFormatSupport(d3d_dev->d3ddevice, format,
                                                       &i_formatSupport) )
             && ( i_formatSupport & supportFlags ) == supportFlags;
 }
@@ -727,7 +727,7 @@ const d3d_format_t *(FindD3D11Format)(vlc_object_t *o,
         else
             textureFormat = output_format->formatTexture;
 
-        if( DeviceSupportsFormat( d3d_dev->d3ddevice, textureFormat, supportFlags ) &&
+        if( D3D11_DeviceSupportsFormat( d3d_dev, textureFormat, supportFlags ) &&
             CanReallyUseFormat(o, d3d_dev, output_format->fourcc, output_format->formatTexture) )
             return output_format;
     }

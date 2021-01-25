@@ -149,7 +149,7 @@ IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev);
 int D3D11CheckDriverVersion(const d3d11_device_t *, UINT vendorId,
                             const struct wddm_version *min_ver);
 
-bool DeviceSupportsFormat(ID3D11Device *d3ddevice, DXGI_FORMAT format, UINT supportFlags);
+bool D3D11_DeviceSupportsFormat(d3d11_device_t*, DXGI_FORMAT, UINT supportFlags);
 
 const d3d_format_t *FindD3D11Format(vlc_object_t *,
                                     d3d11_device_t*,
