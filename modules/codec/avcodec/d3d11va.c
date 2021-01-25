@@ -366,7 +366,7 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
 
 static const d3d_format_t *D3D11_FindDXGIFormat(DXGI_FORMAT dxgi)
 {
-    for (const d3d_format_t *output_format = GetRenderFormatList();
+    for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
          output_format->name != NULL; ++output_format)
     {
         if (output_format->formatTexture == dxgi &&

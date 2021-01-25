@@ -703,7 +703,7 @@ const d3d_format_t *(FindD3D11Format)(vlc_object_t *o,
                                     UINT supportFlags)
 {
     supportFlags |= D3D11_FORMAT_SUPPORT_TEXTURE2D;
-    for (const d3d_format_t *output_format = GetRenderFormatList();
+    for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
          output_format->name != NULL; ++output_format)
     {
         if (i_src_chroma && i_src_chroma != output_format->fourcc)

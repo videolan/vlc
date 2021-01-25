@@ -130,7 +130,7 @@ DXGI_FORMAT DxgiFourccFormat(vlc_fourcc_t fcc)
     return DXGI_FORMAT_UNKNOWN;
 }
 
-const d3d_format_t *GetRenderFormatList(void)
+const d3d_format_t *DxgiGetRenderFormatList(void)
 {
     return d3d_formats;
 }

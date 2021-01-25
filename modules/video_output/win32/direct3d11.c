@@ -205,7 +205,7 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
 
     display_info_t new_display = { 0 };
 
-    for (const d3d_format_t *output_format = GetRenderFormatList();
+    for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
          output_format->name != NULL; ++output_format)
     {
         if (output_format->formatTexture == (DXGI_FORMAT)out.dxgi_format &&
@@ -839,7 +839,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
     if (vtcx_sys != NULL &&
         DeviceSupportsFormat( vd->sys->d3d_dev->d3ddevice, vtcx_sys->format, D3D11_FORMAT_SUPPORT_SHADER_LOAD ))
     {
-        for (const d3d_format_t *output_format = GetRenderFormatList();
+        for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
             output_format->name != NULL; ++output_format)
         {
             if (output_format->formatTexture == vtcx_sys->format &&

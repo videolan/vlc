@@ -106,7 +106,7 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc
         DXGI_SWAP_CHAIN_DESC1 scd;
         if (SUCCEEDED(IDXGISwapChain1_GetDesc1(dxgiswapChain, &scd)))
         {
-            for (const d3d_format_t *output_format = GetRenderFormatList();
+            for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
                  output_format->name != NULL; ++output_format)
             {
                 if (output_format->formatTexture == scd.Format &&

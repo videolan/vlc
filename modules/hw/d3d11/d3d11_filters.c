@@ -195,7 +195,7 @@ static picture_t *AllocPicture( filter_t *p_filter )
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate( p_filter->vctx_out );
 
     const d3d_format_t *cfg = NULL;
-    for (const d3d_format_t *output_format = GetRenderFormatList();
+    for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
             output_format->name != NULL; ++output_format)
     {
         if (output_format->formatTexture == vctx_sys->format &&

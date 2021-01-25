@@ -254,7 +254,7 @@ int D3D11OpenDeinterlace(filter_t *filter)
     d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext( filter->vctx_in );
     sys->d3d_dev = &dev_sys->d3d_dev;
 
-    for (const d3d_format_t *output_format = GetRenderFormatList();
+    for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
             output_format->name != NULL; ++output_format)
     {
         if (output_format->formatTexture == vctx_sys->format &&
