@@ -338,14 +338,6 @@ static void DXGI_CreateSwapchainDComp(struct dxgi_swapchain *display,
 
     DXGI_SWAP_CHAIN_DESC1 scd;
     FillSwapChainDesc(display, width, height, &scd);
-    ZeroMemory(&scd, sizeof(scd));
-    scd.BufferCount = 3;
-    scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    scd.SampleDesc.Count = 1;
-    scd.SampleDesc.Quality = 0;
-    scd.Width = width;
-    scd.Height = height;
-    scd.Format = display->pixelFormat->formatTexture;
     scd.Scaling = DXGI_SCALING_STRETCH;
     scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
     scd.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
