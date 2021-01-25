@@ -184,6 +184,7 @@ typedef enum video_orientation_t
     ORIENT_LEFT_BOTTOM, /**< Rotated 90 degrees anti-clockwise */
     ORIENT_RIGHT_TOP, /**< Rotated 90 degrees clockwise */
     ORIENT_RIGHT_BOTTOM, /**< Anti-transposed */
+#define ORIENT_MAX ((size_t)ORIENT_RIGHT_BOTTOM)
 
     ORIENT_NORMAL      = ORIENT_TOP_LEFT,
     ORIENT_TRANSPOSED  = ORIENT_LEFT_TOP,
