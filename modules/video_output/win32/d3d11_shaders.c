@@ -780,7 +780,7 @@ void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
 
 static HRESULT D3D11_CompileVertexShader(vlc_object_t *obj, const d3d11_shader_compiler_t *compiler,
                                          d3d11_device_t *d3d_dev, const char *psz_shader,
-                                         d3d_vertex_shader_t *output)
+                                         d3d11_vertex_shader_t *output)
 {
    HRESULT hr = E_FAIL;
    ID3DBlob *pVSBlob = D3D11_CompileShader(obj, compiler, d3d_dev, psz_shader, false);
@@ -815,7 +815,7 @@ error:
    return hr;
 }
 
-void D3D11_ReleaseVertexShader(d3d_vertex_shader_t *shader)
+void D3D11_ReleaseVertexShader(d3d11_vertex_shader_t *shader)
 {
     if (shader->layout)
     {
@@ -830,13 +830,13 @@ void D3D11_ReleaseVertexShader(d3d_vertex_shader_t *shader)
 }
 
 HRESULT (D3D11_CompileFlatVertexShader)(vlc_object_t *obj, const d3d11_shader_compiler_t *compiler,
-                                      d3d11_device_t *d3d_dev, d3d_vertex_shader_t *output)
+                                      d3d11_device_t *d3d_dev, d3d11_vertex_shader_t *output)
 {
     return D3D11_CompileVertexShader(obj, compiler, d3d_dev, globVertexShaderFlat, output);
 }
 
 HRESULT (D3D11_CompileProjectionVertexShader)(vlc_object_t *obj, const d3d11_shader_compiler_t *compiler,
-                                            d3d11_device_t *d3d_dev, d3d_vertex_shader_t *output)
+                                            d3d11_device_t *d3d_dev, d3d11_vertex_shader_t *output)
 {
     return D3D11_CompileVertexShader(obj, compiler, d3d_dev, globVertexShaderProjection, output);
 }

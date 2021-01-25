@@ -42,7 +42,7 @@
 #define nbLatBands SPHERE_SLICES
 #define nbLonBands SPHERE_SLICES
 
-void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d11_quad_t *quad, d3d_vertex_shader_t *vsshader,
+void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d11_quad_t *quad, d3d11_vertex_shader_t *vsshader,
                       ID3D11ShaderResourceView *resourceView[DXGI_MAX_SHADER_VIEW],
                       d3d11_select_plane_t selectPlane, void *selectOpaque)
 {

@@ -114,8 +114,8 @@ struct vout_display_sys_t
     picture_sys_d3d11_t      stagingSys;
     plane_t                  stagingPlanes[PICTURE_PLANE_MAX];
 
-    d3d_vertex_shader_t      projectionVShader;
-    d3d_vertex_shader_t      flatVShader;
+    d3d11_vertex_shader_t    projectionVShader;
+    d3d11_vertex_shader_t    flatVShader;
 
     /* copy from the decoder pool into picSquad before display
      * Uses a Texture2D with slices rather than a Texture2DArray for the decoder */
