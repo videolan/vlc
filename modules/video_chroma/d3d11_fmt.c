@@ -710,10 +710,10 @@ const d3d_format_t *(FindD3D11Format)(vlc_object_t *o,
             continue;
         if (bits_per_channel && bits_per_channel > output_format->bitsPerChannel)
             continue;
-        int cpu_gpu_fmt = is_d3d11_opaque(output_format->fourcc) ? D3D11_CHROMA_GPU : D3D11_CHROMA_CPU;
+        int cpu_gpu_fmt = is_d3d11_opaque(output_format->fourcc) ? DXGI_CHROMA_GPU : DXGI_CHROMA_CPU;
         if ((cpu_gpu & cpu_gpu_fmt)==0)
             continue;
-        int format = vlc_fourcc_IsYUV(output_format->fourcc) ? D3D11_YUV_FORMAT : D3D11_RGB_FORMAT;
+        int format = vlc_fourcc_IsYUV(output_format->fourcc) ? DXGI_YUV_FORMAT : DXGI_RGB_FORMAT;
         if ((rgb_yuv & format)==0)
             continue;
         if (widthDenominator && widthDenominator < output_format->widthDenominator)

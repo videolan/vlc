@@ -151,12 +151,6 @@ int D3D11CheckDriverVersion(const d3d11_device_t *, UINT vendorId,
 
 bool DeviceSupportsFormat(ID3D11Device *d3ddevice, DXGI_FORMAT format, UINT supportFlags);
 
-#define D3D11_RGB_FORMAT  1
-#define D3D11_YUV_FORMAT  2
-
-#define D3D11_CHROMA_CPU 1
-#define D3D11_CHROMA_GPU 2
-
 const d3d_format_t *FindD3D11Format(vlc_object_t *,
                                     d3d11_device_t*,
                                     vlc_fourcc_t i_src_chroma,

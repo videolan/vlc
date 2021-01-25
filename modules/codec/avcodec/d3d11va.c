@@ -403,18 +403,18 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     int idx = 0;
     const d3d_format_t *decoder_format;
     UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
-    decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
+    decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
                                       mode->bit_depth, mode->log2_chroma_h+1, mode->log2_chroma_w+1,
-                                      D3D11_CHROMA_GPU, supportFlags );
+                                      DXGI_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL)
-        decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
-                                        mode->bit_depth, 0, 0, D3D11_CHROMA_GPU, supportFlags );
+        decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
+                                        mode->bit_depth, 0, 0, DXGI_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL && mode->bit_depth > 10)
-        decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
-                                        10, 0, 0, D3D11_CHROMA_GPU, supportFlags );
+        decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
+                                        10, 0, 0, DXGI_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL)
-        decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
-                                        0, 0, 0, D3D11_CHROMA_GPU, supportFlags );
+        decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
+                                        0, 0, 0, DXGI_CHROMA_GPU, supportFlags );
     if (decoder_format != NULL)
     {
         msg_Dbg(va, "favor decoder format %s", decoder_format->name);

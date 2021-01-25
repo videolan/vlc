@@ -120,15 +120,15 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc
     }
 #else /* !VLC_WINSTORE_APP */
     /* favor RGB formats first */
-    newPixelFormat = FindD3D11Format( display->obj, display->d3d_dev, 0, D3D11_RGB_FORMAT,
+    newPixelFormat = FindD3D11Format( display->obj, display->d3d_dev, 0, DXGI_RGB_FORMAT,
                                       cfg->bitdepth > 8 ? 10 : 8,
                                       0, 0,
-                                      D3D11_CHROMA_CPU, D3D11_FORMAT_SUPPORT_DISPLAY );
+                                      DXGI_CHROMA_CPU, D3D11_FORMAT_SUPPORT_DISPLAY );
     if (unlikely(newPixelFormat == NULL))
-        newPixelFormat = FindD3D11Format( display->obj, display->d3d_dev, 0, D3D11_YUV_FORMAT,
+        newPixelFormat = FindD3D11Format( display->obj, display->d3d_dev, 0, DXGI_YUV_FORMAT,
                                           cfg->bitdepth > 8 ? 10 : 8,
                                           0, 0,
-                                          D3D11_CHROMA_CPU, D3D11_FORMAT_SUPPORT_DISPLAY );
+                                          DXGI_CHROMA_CPU, D3D11_FORMAT_SUPPORT_DISPLAY );
 #endif /* !VLC_WINSTORE_APP */
     if (unlikely(newPixelFormat == NULL)) {
         msg_Err(display->obj, "Could not get the SwapChain format.");
