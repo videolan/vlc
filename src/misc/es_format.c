@@ -374,16 +374,35 @@ bool video_format_IsSimilar( const video_format_t *f1,
     }
     return true;
 }
+
+static const char *orient_to_string[] =
+{
+    [ORIENT_NORMAL]             = "normal",
+    [ORIENT_TRANSPOSED]         = "transposed",
+    [ORIENT_ANTI_TRANSPOSED]    = "antitransposed",
+    [ORIENT_HFLIPPED]           = "hflip",
+    [ORIENT_VFLIPPED]           = "vflip",
+    [ORIENT_ROTATED_180]        = "80",
+    [ORIENT_ROTATED_270]        = "270",
+    [ORIENT_ROTATED_90]         = "90",
+};
+
 void video_format_Print( vlc_object_t *p_this,
                          const char *psz_text, const video_format_t *fmt )
 {
+    const char *orient;
+    if ( fmt->orientation >= 0 && fmt->orientation < ARRAY_SIZE(orient_to_string) )
+        orient = orient_to_string[fmt->orientation];
+    else orient = "error";
+
     msg_Dbg( p_this,
-             "%s sz %ux%u, of (%u,%u), vsz %ux%u, 4cc %4.4s, sar %u:%u, msk r0x%" PRIx32 " g0x%" PRIx32 " b0x%" PRIx32,
+             "%s sz %ux%u, of (%u,%u), vsz %ux%u, 4cc %4.4s, sar %u:%u, orient: %s, msk r0x%" PRIx32 " g0x%" PRIx32 " b0x%" PRIx32,
              psz_text,
              fmt->i_width, fmt->i_height, fmt->i_x_offset, fmt->i_y_offset,
              fmt->i_visible_width, fmt->i_visible_height,
              (char*)&fmt->i_chroma,
              fmt->i_sar_num, fmt->i_sar_den,
+             orient,
              fmt->i_rmask, fmt->i_gmask, fmt->i_bmask );
 }
 
