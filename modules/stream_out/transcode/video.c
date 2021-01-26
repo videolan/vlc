@@ -297,11 +297,19 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
         src_ctx = filter_chain_GetVideoCtxOut( id->p_f_chain );
     }
 
-    if( id->p_enccfg->video.fps.num > 0 )
+    if( id->p_enccfg->video.fps.num > 0 &&
+        id->p_enccfg->video.fps.den > 0 &&
+      ( id->p_enccfg->video.fps.num != p_src->video.i_frame_rate ||
+        id->p_enccfg->video.fps.den != p_src->video.i_frame_rate_base ) )
     {
-        filter_chain_AppendFilter( id->p_f_chain, "fps", NULL, p_src );
+        es_format_t dst;
+        es_format_Copy(&dst, p_src);
+        dst.video.i_frame_rate = id->p_enccfg->video.fps.num;
+        dst.video.i_frame_rate_base = id->p_enccfg->video.fps.den;
+        filter_chain_AppendFilter( id->p_f_chain, "fps", NULL, &dst );
         p_src = filter_chain_GetFmtOut( id->p_f_chain );
         src_ctx = filter_chain_GetVideoCtxOut( id->p_f_chain );
+        es_format_Clean(&dst);
     }
 
     /* User filters */
