@@ -169,8 +169,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->sys = sys;
     sys->gl = NULL;
 
-    var_Create(vlc_object_parent(vd), "ios-eaglcontext", VLC_VAR_ADDRESS);
-
     @autoreleasepool {
         /* setup the actual OpenGL ES view */
 
@@ -181,7 +179,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                                              waitUntilDone:YES];
         if (!sys->glESView) {
             msg_Err(vd, "Creating OpenGL ES 2 view failed");
-            var_Destroy(vlc_object_parent(vd), "ios-eaglcontext");
             return VLC_EGENERIC;
         }
 
@@ -255,7 +252,6 @@ static void Close(vout_display_t *vd)
 
         [sys->glESView cleanAndRelease:flushed];
     }
-    var_Destroy(vlc_object_parent(vd), "ios-eaglcontext");
 }
 
 /*****************************************************************************
@@ -395,9 +391,6 @@ static void GLESSwap(vlc_gl_t *gl)
         return nil;
     }
     [self releaseCurrent:previousEaglContext];
-
-    /* Set "ios-eaglcontext" to be used by cvpx fitlers/glconv */
-    var_SetAddress(vlc_object_parent(_voutDisplay), "ios-eaglcontext", _eaglContext);
 
     _layer = (CAEAGLLayer *)self.layer;
     _layer.drawableProperties = [NSDictionary dictionaryWithObject:kEAGLColorFormatRGBA8 forKey: kEAGLDrawablePropertyColorFormat];
