@@ -1078,11 +1078,14 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         vlc_mutex_lock(&p_sys->lock);
 
         /* Compute the PTS */
-#ifdef FF_API_PKT_PTS
-        int64_t av_pts = frame->pts == AV_NOPTS_VALUE ? frame->pkt_dts : frame->pts;
+#if LIBAVCODEC_VERSION_CHECK( 57, 24, 0, 61, 100 )
+        int64_t av_pts = frame->pts;
 #else
         int64_t av_pts = frame->pkt_pts;
 #endif
+        if( av_pts == AV_NOPTS_VALUE )
+            av_pts = frame->pkt_dts;
+
         vlc_tick_t i_pts;
         if( av_pts == AV_NOPTS_VALUE )
             i_pts = date_Get( &p_sys->pts );
