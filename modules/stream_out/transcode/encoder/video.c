@@ -250,9 +250,9 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
 
     p_enc_in->i_chroma = p_enc->p_encoder->fmt_in.i_codec;
 
-    transcode_video_framerate_apply( p_src, p_enc_out );
-    p_enc_in->i_frame_rate = p_enc_out->i_frame_rate;
-    p_enc_in->i_frame_rate_base = p_enc_out->i_frame_rate_base;
+    transcode_video_framerate_apply( p_src, p_enc_in );
+    p_enc_out->i_frame_rate = p_enc_in->i_frame_rate;
+    p_enc_out->i_frame_rate_base = p_enc_in->i_frame_rate_base;
     msg_Dbg( p_obj, "source fps %u/%u, destination %u/%u",
              p_dec_out->i_frame_rate, p_dec_out->i_frame_rate_base,
              p_enc_in->i_frame_rate, p_enc_in->i_frame_rate_base );
