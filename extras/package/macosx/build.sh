@@ -177,8 +177,14 @@ if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
     fi
 
 else
-if [ ! -e "../$TRIPLET" ]; then
-    make prebuilt > $out
+if [ ! -e "../$HOST_TRIPLET" ]; then
+    if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+        make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
+        make .luac
+    else
+        make prebuilt
+        make .luac
+    fi
 fi
 fi
 spopd
