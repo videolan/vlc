@@ -271,7 +271,6 @@ static inline bool transcode_video_filters_configured( const sout_stream_id_sys_
 
 static int transcode_video_filters_init( sout_stream_t *p_stream,
                                          const sout_filters_config_t *p_cfg,
-                                         bool b_master_sync,
                                          const es_format_t *p_src,
                                          vlc_video_context *src_ctx,
                                          const es_format_t *p_dst,
@@ -298,7 +297,7 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
         src_ctx = filter_chain_GetVideoCtxOut( id->p_f_chain );
     }
 
-    if( b_master_sync )
+    if( id->p_enccfg->video.fps.num > 0 )
     {
         filter_chain_AppendFilter( id->p_f_chain, "fps", NULL, p_src );
         p_src = filter_chain_GetFmtOut( id->p_f_chain );
@@ -495,7 +494,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             {
                 if( transcode_video_filters_init( p_stream,
                                                   id->p_filterscfg,
-                                                 (id->p_enccfg->video.fps.num > 0),
                                                  &id->decoder_out,
                                                  picture_GetVideoContext(p_pic),
                                                  transcode_encoder_format_in( id->encoder ),
