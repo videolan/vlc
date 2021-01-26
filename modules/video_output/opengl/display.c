@@ -97,6 +97,16 @@ static const struct vlc_display_operations ops = {
     Close, PictureRender, PictureDisplay, Control, NULL, SetViewpoint,
 };
 
+static void
+FlipVerticalAlign(vout_display_cfg_t *cfg)
+{
+    /* Reverse vertical alignment as the GL tex are Y inverted */
+    if (cfg->align.vertical == VLC_VIDEO_ALIGN_TOP)
+        cfg->align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+    else if (cfg->align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+        cfg->align.vertical = VLC_VIDEO_ALIGN_TOP;
+}
+
 /**
  * Allocates a surface and an OpenGL context for video output.
  */
@@ -143,7 +153,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (sys->gl == NULL)
         goto error;
 
-    vout_display_PlacePicture(&sys->place, vd->source, cfg);
+
+    vout_display_cfg_t flipped_cfg = *cfg;
+    FlipVerticalAlign(&flipped_cfg);
+    vout_display_PlacePicture(&sys->place, vd->source, &flipped_cfg);
     sys->place_changed = true;
     vlc_gl_Resize (sys->gl, cfg->display.width, cfg->display.height);
 
@@ -220,16 +233,6 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
         vout_display_opengl_Display(sys->vgl);
         vlc_gl_ReleaseCurrent (sys->gl);
     }
-}
-
-static void
-FlipVerticalAlign(vout_display_cfg_t *cfg)
-{
-    /* Reverse vertical alignment as the GL tex are Y inverted */
-    if (cfg->align.vertical == VLC_VIDEO_ALIGN_TOP)
-        cfg->align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-    else if (cfg->align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-        cfg->align.vertical = VLC_VIDEO_ALIGN_TOP;
 }
 
 static int Control (vout_display_t *vd, int query)
