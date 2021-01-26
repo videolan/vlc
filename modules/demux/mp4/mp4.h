@@ -124,7 +124,7 @@ typedef struct
     uint32_t        i_timescale;    /* time scale for this track only */
 
     /* elst */
-    int             i_elst;         /* current elst */
+    uint32_t        i_elst;         /* current elst */
     int64_t         i_elst_time;    /* current elst start time (in movie time scale)*/
     const MP4_Box_t *p_elst;        /* elst (could be NULL) */
 

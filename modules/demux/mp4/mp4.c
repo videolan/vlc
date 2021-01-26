@@ -4000,7 +4000,7 @@ static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track, uint32_t
         MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
         uint64_t i_mvt = MP4_rescale_qtime( MP4_TrackGetDTS( p_demux, p_track ),
                                             p_sys->i_timescale );
-        if( (unsigned int)p_track->i_elst < elst->i_entry_count &&
+        if( p_track->i_elst < elst->i_entry_count &&
             i_mvt >= p_track->i_elst_time +
                      elst->i_segment_duration[p_track->i_elst] )
         {
@@ -4016,7 +4016,7 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
                               vlc_tick_t i_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int         i_elst_last = tk->i_elst;
+    uint32_t i_elst_last = tk->i_elst;
 
     /* handle elst (find the correct one) */
     tk->i_elst      = 0;
@@ -4026,7 +4026,7 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
         MP4_Box_data_elst_t *elst = tk->BOXDATA(p_elst);
         int64_t i_mvt= MP4_rescale_qtime( i_time, p_sys->i_timescale );
 
-        for( tk->i_elst = 0; (unsigned int)tk->i_elst < elst->i_entry_count; tk->i_elst++ )
+        for( tk->i_elst = 0; tk->i_elst < elst->i_entry_count; tk->i_elst++ )
         {
             uint64_t i_dur = elst->i_segment_duration[tk->i_elst];
 
@@ -4038,7 +4038,7 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
             tk->i_elst_time += i_dur;
         }
 
-        if( (unsigned int)tk->i_elst >= elst->i_entry_count )
+        if( tk->i_elst >= elst->i_entry_count )
         {
             /* msg_Dbg( p_demux, "invalid number of entry in elst" ); */
             tk->i_elst = elst->i_entry_count - 1;
@@ -4053,7 +4053,7 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
     }
     if( i_elst_last != tk->i_elst )
     {
-        msg_Warn( p_demux, "elst old=%d new=%d", i_elst_last, tk->i_elst );
+        msg_Warn( p_demux, "elst old=%d new=%"PRIu32, i_elst_last, tk->i_elst );
         tk->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
     }
 }
