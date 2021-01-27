@@ -149,7 +149,6 @@ void SDFileSystemFactory::onDeviceMounted(const std::string& uuid,
         }
         device->addMountpoint(mountpoint);
     }
-    fprintf(stderr, "device mounted: %s %s\n", uuid.c_str(), mountpoint.c_str());
     m_callbacks->onDeviceMounted( *device, mountpoint );
 }
 
