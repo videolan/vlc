@@ -657,14 +657,6 @@ void libvlc_media_release( libvlc_media_t *p_md )
 
     input_item_Release( p_md->p_input_item );
 
-    /* Construct the event */
-    libvlc_event_t event;
-    event.type = libvlc_MediaFreed;
-    event.u.media_freed.md = p_md;
-
-    /* Send the event */
-    libvlc_event_send( &p_md->event_manager, &event );
-
     libvlc_event_manager_destroy( &p_md->event_manager );
     libvlc_release( p_md->p_libvlc_instance );
     free( p_md );

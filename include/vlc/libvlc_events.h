@@ -70,16 +70,15 @@ enum libvlc_event_e {
      *      libvlc_media_parse_stop()
      */
     libvlc_MediaParsedChanged,
-    /**
-     * A \link #libvlc_media_t media item\endlink was freed
-     */
-    libvlc_MediaFreed,
+
+    /* Removed: libvlc_MediaFreed, */
+
     /**
      * \link #libvlc_state_t State\endlink of the \link
      * #libvlc_media_t media item\endlink changed
      * \see libvlc_media_get_state()
      */
-    libvlc_MediaStateChanged,
+    libvlc_MediaStateChanged = libvlc_MediaParsedChanged + 2,
     /**
      * Subitem tree was added to a \link #libvlc_media_t media item\endlink
      */
@@ -262,10 +261,6 @@ typedef struct libvlc_event_t
         {
             int new_status; /**< see @ref libvlc_media_parsed_status_t */
         } media_parsed_changed;
-        struct
-        {
-            libvlc_media_t * md;
-        } media_freed;
         struct
         {
             int new_state; /**< see @ref libvlc_state_t */
