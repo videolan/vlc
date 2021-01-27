@@ -2544,6 +2544,12 @@ struct vlc_player_vout_cbs
      * @param vout the vout that reported its frame being drawn
      */
     void (*on_first_frame_reported)(vout_thread_t *vout, void *data);
+
+    /**
+     * Called when the vout has captions data to display
+     *
+     */
+    void (*on_captions_to_display)(const void *, size_t, void *data);
 };
 
 
