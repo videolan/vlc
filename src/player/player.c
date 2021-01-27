@@ -1917,6 +1917,20 @@ vlc_player_Delete(vlc_player_t *player)
     vlc_object_delete(player);
 }
 
+static void PlayerCaptionsToDisplay(const void *p_cc, size_t i_cc, void *opaque)
+{
+    struct vlc_player_t *player = opaque;
+
+    vlc_player_Lock(player);
+    vlc_player_vout_listener_id *listener;
+    vlc_list_foreach(listener, &player->vout_listeners, node)
+    {
+        if (listener->cbs->on_captions_to_display)
+            listener->cbs->on_captions_to_display(p_cc, i_cc, listener->cbs_data);
+    }
+    vlc_player_Unlock(player);
+}
+
 static void PlayerVoutReportFirstFrame(vout_thread_t *vout, void *opaque)
 {
     struct vlc_player_t *player = opaque;
@@ -2015,6 +2029,7 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     static const struct vlc_video_output_callbacks vout_cbs =
     {
         .first_frame_reported = PlayerVoutReportFirstFrame,
+        .captions_to_display = PlayerCaptionsToDisplay,
     };
 
     player->resource = input_resource_New(
