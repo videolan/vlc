@@ -367,6 +367,7 @@ int main(int i_argc, char *ppsz_argv[])
         test_media_preparsed (vlc, psz_test_path, psz_test_url,
                               libvlc_media_parse_network,
                               libvlc_media_parsed_status_done);
+        libvlc_release(vlc);
         return 0;
     }
 
