@@ -239,6 +239,8 @@ enum libvlc_event_e {
     libvlc_RendererDiscovererItemDeleted,
 
     libvlc_VideoOutputFrameDisplayed,
+
+    libvlc_CaptionsToDisplay,
 };
 
 /**
@@ -428,6 +430,11 @@ typedef struct libvlc_event_t
         {
             libvlc_video_output_t *video_output;
         } video_output_frame_displayed;
+        struct
+        {
+            const void *p_cc;
+            size_t i_cc;
+        } captions_to_display;
     } u; /**< Type-dependent event description */
 } libvlc_event_t;
 
