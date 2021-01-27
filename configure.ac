@@ -818,15 +818,14 @@ dnl Check for struct sockaddr_storage
 AH_TEMPLATE(sockaddr_storage, [Define to `sockaddr' if <sys/socket.h> does not define.]) dnl ` (fix VIM syntax highlight
 AH_TEMPLATE(ss_family, [Define to `sa_family' if <sys/socket.h> does not define.]) dnl ` (fix VIM syntax highlight
 AC_CACHE_CHECK([for struct sockaddr_storage], ac_cv_struct_sockaddr_storage,
-  [AC_TRY_COMPILE(
-    [#include <sys/types.h>
+  [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
      #if defined( _WIN32 )
      # include <winsock2.h>
      #else
      # include <sys/socket.h>
-     #endif], [struct sockaddr_storage addr;],
-     ac_cv_struct_sockaddr_storage=yes,
-     ac_cv_struct_sockaddr_storage=no)])
+     #endif]], [[struct sockaddr_storage addr;]])],
+     [ac_cv_struct_sockaddr_storage=yes],
+     [ac_cv_struct_sockaddr_storage=no])])
 AS_IF([test "${ac_cv_struct_sockaddr_storage}" = no], [
   AC_DEFINE(sockaddr_storage, sockaddr)
   AC_DEFINE(ss_family, sa_family)
@@ -984,8 +983,8 @@ AC_LANG_PUSH(C++)
 AC_CACHE_CHECK([if C++ headers define locale_t],
   [ac_cv_cxx_locale_t],
   [ac_cv_cxx_locale_t=no
-   AC_TRY_COMPILE([#include <locale>], [locale_t loc;],
-                    [ac_cv_cxx_locale_t=yes])])
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <locale>]], [[locale_t loc;]])],
+                        [ac_cv_cxx_locale_t=yes],[])])
 if test "${ac_cv_cxx_locale_t}" != "no"; then
   AC_DEFINE(HAVE_CXX_LOCALE_T, 1, Define to 1 if C++ headers define locale_t)
 fi
@@ -1283,7 +1282,7 @@ AS_IF([test "${enable_ssp}" != "no" -a "${enable_optimizations}" != "no"], [
   AS_IF([test "${SYS}" = "mingw32"], [
       LDFLAGS="${LDFLAGS} -lssp"
       AC_CACHE_CHECK([if linker supports stack protectors], [ac_cv_ld_ssp], [
-        AC_TRY_LINK([#include <stdio.h>],[char buf[100]; fgets(buf, sizeof(buf), stdin);], [
+        AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>]], [[char buf[100]; fgets(buf, sizeof(buf), stdin);]])],[
           ac_cv_ld_ssp="yes"
         ], [
           ac_cv_ld_ssp="no"
@@ -1302,7 +1301,7 @@ AS_IF([test "${SYS}" = "mingw32"], [
 VLC_SAVE_FLAGS
 LDFLAGS="${LDFLAGS} -Wl,-Bsymbolic"
 AC_CACHE_CHECK([if linker supports -Bsymbolic], [ac_cv_ld_bsymbolic], [
-  AC_TRY_LINK([],, [
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[
     ac_cv_ld_bsymbolic="-Wl,-Bsymbolic"
   ], [
     ac_cv_ld_bsymbolic=""
@@ -1315,7 +1314,7 @@ AC_SUBST([SYMBOLIC_LDFLAGS])
 VLC_SAVE_FLAGS
 LDFLAGS="${LDFLAGS} -Wl,-z,defs"
 AC_CACHE_CHECK([if linker supports -z,defs], [ac_cv_ld_z_defs], [
-  AC_TRY_LINK([],, [
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[
     ac_cv_ld_z_defs="yes"
   ], [
     ac_cv_ld_z_defs="no"
@@ -1327,8 +1326,9 @@ dnl Check for __attribute__((packed))
 AC_CACHE_CHECK([for __attribute__((packed))],
   [ac_cv_c_attribute_packed],
   [ac_cv_c_attribute_packed=no
-   AC_TRY_COMPILE(, [struct __attribute__((__packed__)) foo { int a; } b; (void)b;],
-                    [ac_cv_c_attribute_packed=yes])])
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]],
+                        [[struct __attribute__((__packed__)) foo { int a; } b; (void)b;]])],
+                     [ac_cv_c_attribute_packed=yes],[])])
 if test "${ac_cv_c_attribute_packed}" != "no"; then
   AC_DEFINE(HAVE_ATTRIBUTE_PACKED, 1, Support for __attribute__((packed)) for structs)
 fi
@@ -1811,10 +1811,14 @@ AS_IF([test "${enable_altivec}" = "yes"], [
   VLC_SAVE_FLAGS
   AC_CACHE_CHECK([if $CC groks AltiVec inline assembly],
     [ac_cv_altivec_inline],
-    [AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
-         ac_cv_altivec_inline="yes",
-         [CFLAGS="${CFLAGS} -Wa,-maltivec"
-          AC_TRY_COMPILE(,[asm volatile("vperm 0,1,2,3");],
+    [AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([[]],
+            [[asm volatile("vperm 0,1,2,3");]])],
+     [ac_cv_altivec_inline="yes"],
+     [CFLAGS="${CFLAGS} -Wa,-maltivec"
+      AC_COMPILE_IFELSE([
+         AC_LANG_PROGRAM([[]],
+            [[asm volatile("vperm 0,1,2,3");]])],
             [ac_cv_altivec_inline="-Wa,-maltivec"],
             ac_cv_altivec_inline=no)
          ])])
@@ -1856,7 +1860,7 @@ AS_IF([test "${enable_altivec}" = "yes"], [
   LDFLAGS="${LDFLAGS} -Wl,-framework,vecLib"
   AC_CACHE_CHECK([if linker needs -framework vecLib],
     [ac_cv_ld_altivec],
-    [AC_TRY_LINK([],,ac_cv_ld_altivec=yes,ac_cv_ld_altivec=no)])
+    [AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[ac_cv_ld_altivec=yes],[ac_cv_ld_altivec=no])])
   VLC_RESTORE_FLAGS
   AS_IF([test "${ac_cv_ld_altivec}" != "no"], [
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,vecLib])
