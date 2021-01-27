@@ -49,18 +49,21 @@ typedef struct {
     FLOAT LuminanceScale;
     FLOAT BoundaryX;
     FLOAT BoundaryY;
+    FLOAT padding[60]; // 256 bytes alignment
 } PS_CONSTANT_BUFFER;
 
 typedef struct {
     FLOAT WhitePoint[4*4];
     FLOAT Colorspace[4*4];
     FLOAT Primaries[4*4];
+    FLOAT padding[16]; // 256 bytes alignment
 } PS_COLOR_TRANSFORM;
 
 typedef struct {
     FLOAT View[4*4];
     FLOAT Zoom[4*4];
     FLOAT Projection[4*4];
+    FLOAT padding[16]; // 256 bytes alignment
 } VS_PROJECTION_CONST;
 
 typedef struct {
