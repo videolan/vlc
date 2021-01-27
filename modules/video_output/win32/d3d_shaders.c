@@ -268,14 +268,19 @@ static ID3DBlob* CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *c
             target = "vs_4_0_level_9_1";
     }
 
+    UINT compileFlags = 0;
 #if VLC_WINSTORE_APP
     VLC_UNUSED(compiler);
 #else
 # define D3DCompile(args...)    compiler->OurD3DCompile(args)
+# if !defined(NDEBUG)
+    if (IsDebuggerPresent())
+        compileFlags += D3DCOMPILE_DEBUG;
+# endif
 #endif
     HRESULT hr = D3DCompile(psz_shader, strlen(psz_shader),
                             NULL, NULL, NULL, "main", target,
-                            0, 0, &pShaderBlob, &pErrBlob);
+                            compileFlags, 0, &pShaderBlob, &pErrBlob);
 
     if (FAILED(hr)) {
         char *err = pErrBlob ? ID3D10Blob_GetBufferPointer(pErrBlob) : NULL;
