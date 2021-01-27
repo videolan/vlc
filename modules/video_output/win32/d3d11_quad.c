@@ -149,7 +149,7 @@ fail:
         ID3D11Buffer_Release(quad->pVertexBuffer);
         quad->pVertexBuffer = NULL;
     }
-    if (quad->pVertexBuffer)
+    if (quad->pIndexBuffer)
     {
         ID3D11Buffer_Release(quad->pIndexBuffer);
         quad->pIndexBuffer = NULL;
