@@ -163,6 +163,10 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
      */
     api->supports_multisample = version >= 3 && error == GL_NO_ERROR;
 
+    /* Drain the errors before continuing. */
+    while (error != GL_NO_ERROR)
+        error = api->vt.GetError();
+
 #ifdef USE_OPENGL_ES2
     api->is_gles = true;
     /* OpenGL ES 2 includes support for non-power of 2 textures by specification
