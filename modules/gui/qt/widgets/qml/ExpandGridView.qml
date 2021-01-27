@@ -48,6 +48,7 @@ NavigableFocusScope {
     property alias contentHeight: flickable.contentHeight
     property alias contentWidth: flickable.contentWidth
     property alias contentX: flickable.contentX
+    property alias gridScrollBar: flickableScrollBar
     property bool isAnimating: animateRetractItem.running || animateExpandItem.running
 
     property int _count: 0
@@ -336,7 +337,9 @@ NavigableFocusScope {
         clip: true
 
         flickableDirection: Flickable.VerticalFlick
-        ScrollBar.vertical: ScrollBar { }
+        ScrollBar.vertical: ScrollBar {
+            id: flickableScrollBar
+        }
 
         Loader {
             id: headerItemLoader

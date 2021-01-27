@@ -74,6 +74,7 @@ NavigableFocusScope {
     property alias fadeRectBottomHovered: fadeRectBottom.isHovered
     property alias fadeRectTopHovered: fadeRectTop.isHovered
 
+    property alias listScrollBar: scroll_id
     property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
 
     property bool keyNavigationWraps : false

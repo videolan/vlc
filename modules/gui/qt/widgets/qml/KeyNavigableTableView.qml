@@ -85,6 +85,8 @@ NavigableFocusScope {
     property alias displaced: view.displaced
     property Item dragItem
 
+    property alias listScrollBar: view.listScrollBar
+
     Accessible.role: Accessible.Table
 
     function positionViewAtIndex(index, mode) {
