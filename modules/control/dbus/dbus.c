@@ -153,6 +153,7 @@ static void player_aout_on_volume_changed(audio_output_t *, float, void *);
 static void player_aout_on_mute_changed(audio_output_t *, bool, void *);
 
 static void player_vout_on_fullscreen_changed(vout_thread_t *, bool, void *);
+static void player_on_captions_to_display(const void *p_cc, size_t i_cc, void *p_data);
 static void player_timer_on_discontinuity(vlc_tick_t system_dae, void *data);
 static void player_timer_on_update(const struct vlc_player_timer_point *, void *);
 
@@ -298,6 +299,7 @@ static int Open( vlc_object_t *p_this )
     static struct vlc_player_vout_cbs const player_vout_cbs =
     {
         .on_fullscreen_changed = player_vout_on_fullscreen_changed,
+        .on_captions_to_display = player_on_captions_to_display,
     };
     p_sys->player_vout_listener =
         vlc_player_vout_AddListener(player, &player_vout_cbs, p_intf);
@@ -1137,6 +1139,12 @@ player_vout_on_fullscreen_changed(vout_thread_t *vout, bool enabled,
 {
     add_event_signal(data, &(callback_info_t){ .signal = SIGNAL_FULLSCREEN });
     (void) vout; (void) enabled;
+}
+
+static void
+player_on_captions_to_display(const void *p_cc, size_t i_cc, void *p_data)
+{
+    printf("DBUS player_on_captions_to_display %ld", i_cc);
 }
 
 static void
