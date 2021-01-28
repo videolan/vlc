@@ -1268,7 +1268,6 @@ modules/video_output/caopengllayer.m
 modules/video_output/decklink.cpp
 modules/video_output/fb.c
 modules/video_output/glx.c
-modules/video_output/ios.m
 modules/video_output/kva.c
 modules/video_output/macosx.m
 modules/video_output/opengl/display.c
