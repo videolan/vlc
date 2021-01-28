@@ -38,6 +38,11 @@ struct vout_display_cfg;
  */
 typedef struct vlc_gl_t vlc_gl_t;
 
+enum vlc_gl_api_type {
+    VLC_OPENGL,
+    VLC_OPENGL_ES2,
+};
+
 struct vlc_gl_t
 {
     struct vlc_object_t obj;
@@ -77,11 +82,7 @@ struct vlc_gl_t
             const char *(*getExtensionsString)(vlc_gl_t *);
         } wgl;
     };
-};
 
-enum {
-    VLC_OPENGL,
-    VLC_OPENGL_ES2,
 };
 
 /**
