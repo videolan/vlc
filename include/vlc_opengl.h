@@ -83,6 +83,8 @@ struct vlc_gl_t
         } wgl;
     };
 
+    /* Defined by the core for libvlc_opengl API loading. */
+    enum vlc_gl_api_type api_type;
 };
 
 /**

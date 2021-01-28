@@ -39,6 +39,7 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
 #else
 #define GET_PROC_ADDR_CORE(name) GET_PROC_ADDR_EXT(name, true)
 #endif
+
 #define GET_PROC_ADDR_EXT(name, critical) do { \
     api->vt.name = vlc_gl_GetProcAddress(gl, "gl"#name); \
     if (api->vt.name == NULL && critical) { \
@@ -46,13 +47,19 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
         return VLC_EGENERIC; \
     } \
 } while(0)
-#if defined(USE_OPENGL_ES2)
-#define GET_PROC_ADDR(name) GET_PROC_ADDR_CORE(name)
-#define GET_PROC_ADDR_CORE_GL(name) GET_PROC_ADDR_EXT(name, false) /* optional for GLES */
-#else
-#define GET_PROC_ADDR(name) GET_PROC_ADDR_EXT(name, true)
-#define GET_PROC_ADDR_CORE_GL(name) GET_PROC_ADDR_CORE(name)
-#endif
+
+#define GET_PROC_ADDR(name) \
+    if (gl->api_type == VLC_OPENGL_ES2) \
+        GET_PROC_ADDR_CORE(name); \
+    else \
+        GET_PROC_ADDR_EXT(name, true)
+
+#define GET_PROC_ADDR_CORE_GL(name) \
+    if (gl->api_type == VLC_OPENGL_ES2) \
+        GET_PROC_ADDR_EXT(name, false); /* optional for GLES */ \
+    else \
+        GET_PROC_ADDR_CORE(name)
+
 #define GET_PROC_ADDR_OPTIONAL(name) GET_PROC_ADDR_EXT(name, false) /* GL 3 or more */
 
     GET_PROC_ADDR_CORE(BindTexture);
@@ -167,16 +174,19 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
     while (error != GL_NO_ERROR)
         error = api->vt.GetError();
 
-#ifdef USE_OPENGL_ES2
-    api->is_gles = true;
-    /* OpenGL ES 2 includes support for non-power of 2 textures by specification
-     * so checks for extensions are bound to fail. Check for OpenGL ES version instead. */
-    api->supports_npot = true;
-#else
-    api->is_gles = false;
-    api->supports_npot = vlc_gl_StrHasToken(api->extensions, "GL_ARB_texture_non_power_of_two") ||
-                         vlc_gl_StrHasToken(api->extensions, "GL_APPLE_texture_2D_limited_npot");
-#endif
+    if (gl->api_type == VLC_OPENGL_ES2)
+    {
+        api->is_gles = true;
+        /* OpenGL ES 2 includes support for non-power of 2 textures by specification
+         * so checks for extensions are bound to fail. Check for OpenGL ES version instead. */
+        api->supports_npot = true;
+    }
+    else
+    {
+        api->is_gles = false;
+        api->supports_npot = vlc_gl_StrHasToken(api->extensions, "GL_ARB_texture_non_power_of_two") ||
+                             vlc_gl_StrHasToken(api->extensions, "GL_APPLE_texture_2D_limited_npot");
+    }
 
     return VLC_SUCCESS;
 }

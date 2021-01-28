@@ -202,6 +202,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->gl->release_current = GLESReleaseCurrent;
         sys->gl->swap = GLESSwap;
         sys->gl->get_proc_address = OurGetProcAddress;
+        sys->gl->api_type = VLC_OPENGL_ES2;
 
         if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
             goto bailout;

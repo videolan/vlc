@@ -59,13 +59,17 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
     struct vlc_gl_priv_t *glpriv;
     const char *type;
 
+    enum vlc_gl_api_type api_type;
+
     switch (flags /*& VLC_OPENGL_API_MASK*/)
     {
         case VLC_OPENGL:
             type = "opengl";
+            api_type = VLC_OPENGL;
             break;
         case VLC_OPENGL_ES2:
             type = "opengl es2";
+            api_type = VLC_OPENGL_ES2;
             break;
         default:
             return NULL;
@@ -76,6 +80,7 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
         return NULL;
 
     vlc_gl_t *gl = &glpriv->gl;
+    gl->api_type = api_type;
     gl->surface = wnd;
     gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start, gl,
                                  cfg->display.width, cfg->display.height);

@@ -191,6 +191,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->gl->release_current = OpenglUnlock;
         sys->gl->swap = OpenglSwap;
         sys->gl->get_proc_address = OurGetProcAddress;
+        sys->gl->api_type = VLC_OPENGL;
 
         struct gl_sys *glsys = sys->gl->sys = malloc(sizeof(*glsys));
         if (!sys->gl->sys)
