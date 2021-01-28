@@ -35,16 +35,12 @@
 #include <vlc_queue.h>
 #include <vlc_rand.h>
 
-#ifdef __APPLE__
-# include <OpenGL/gl.h>
-#else
-# include <GL/gl.h>
-#endif
-
 #include <math.h>
 
 #include "visual/fft.h"
 #include "visual/window.h"
+
+#include "../video_output/opengl/gl_common.h"
 
 
 /*****************************************************************************
@@ -72,6 +68,57 @@ vlc_module_begin()
     set_callback(Open)
 vlc_module_end()
 
+/* Legacy glBegin()/glEnd() API */
+typedef void (APIENTRY *PFNGLMATRIXMODEPROC)(GLenum);
+typedef void (APIENTRY *PFNGLPUSHMATRIXPROC)(void);
+typedef void (APIENTRY *PFNGLPOPMATRIXPROC)(void);
+typedef void (APIENTRY *PFNGLFRUSTUMPROC)(GLdouble, GLdouble, GLdouble, GLdouble, GLdouble, GLdouble);
+typedef void (APIENTRY *PFNGLTRANSLATEFPROC)(float, float, float);
+typedef void (APIENTRY *PFNGLSCALEFPROC)(float, float, float);
+typedef void (APIENTRY *PFNGLROTATEFPROC)(float, float, float, float);
+typedef void (APIENTRY *PFNGLCOLORMATERIALPROC)(GLenum, GLenum);
+typedef void (APIENTRY *PFNGLCOLOR4FPROC)(float, float, float, float);
+typedef void (APIENTRY *PFNGLLIGHTFVPROC)(GLenum, GLenum, const float*);
+typedef void (APIENTRY *PFNGLSHADEMODELPROC)(GLenum);
+
+typedef void (APIENTRY *PFNGLVERTEXPOINTERPROC)(GLint, GLenum, GLsizei, const void *);
+typedef void (APIENTRY *PFNGLNORMALPOINTERPROC)(GLenum, GLsizei, const void *);
+typedef void (APIENTRY *PFNGLENABLECLIENTSTATEPROC)(GLenum);
+typedef void (APIENTRY *PFNGLDISABLECLIENTSTATEPROC)(GLenum);
+
+#define OPENGL_VTABLE_F(F) \
+    /* Usual functions */ \
+    F(PFNGLENABLEPROC              , Enable) \
+    F(PFNGLCLEARPROC               , Clear) \
+    F(PFNGLDRAWARRAYSPROC          , DrawArrays) \
+    F(PFNGLDEPTHMASKPROC           , DepthMask) \
+    F(PFNGLBLENDFUNCPROC           , BlendFunc) \
+    F(PFNGLVIEWPORTPROC            , Viewport) \
+    /* Legacy fixed pipeline functions */ \
+    F(PFNGLMATRIXMODEPROC          , MatrixMode ) \
+    F(PFNGLPUSHMATRIXPROC          , PushMatrix) \
+    F(PFNGLPOPMATRIXPROC           , PopMatrix) \
+    F(PFNGLFRUSTUMPROC             , Frustum) \
+    F(PFNGLTRANSLATEFPROC          , Translatef) \
+    F(PFNGLSCALEFPROC              , Scalef) \
+    F(PFNGLROTATEFPROC             , Rotatef) \
+    F(PFNGLCOLORMATERIALPROC       , ColorMaterial) \
+    F(PFNGLCOLOR4FPROC             , Color4f) \
+    F(PFNGLLIGHTFVPROC             , Lightfv) \
+    F(PFNGLSHADEMODELPROC          , ShadeModel) \
+    F(PFNGLVERTEXPOINTERPROC       , VertexPointer) \
+    F(PFNGLNORMALPOINTERPROC       , NormalPointer) \
+    F(PFNGLENABLECLIENTSTATEPROC   , EnableClientState) \
+    F(PFNGLDISABLECLIENTSTATEPROC  , DisableClientState)
+
+
+struct glspectrum_opengl_vtable
+{
+#define DECLARE_VTABLE(type, symbol) \
+    type symbol;
+OPENGL_VTABLE_F(DECLARE_VTABLE)
+};
+
 
 /*****************************************************************************
  * Local prototypes
@@ -89,6 +136,7 @@ typedef struct
 
     /* Opengl */
     vlc_gl_t *gl;
+    struct glspectrum_opengl_vtable vt;
 
     float f_rotationAngle;
     float f_rotationIncrement;
@@ -155,6 +203,24 @@ static int Open(vlc_object_t * p_this)
     if (p_sys->gl == NULL)
         return VLC_EGENERIC;
 
+    if (vlc_gl_MakeCurrent(p_sys->gl) != VLC_SUCCESS)
+    {
+        msg_Err(p_filter, "Can't attach gl context");
+        goto error;
+    }
+
+#define LOAD_SYMBOL(type, name) do { \
+    p_sys->vt.name = vlc_gl_GetProcAddress(p_sys->gl, "gl" #name); \
+    if (p_sys->vt.name == NULL) { \
+        vlc_gl_ReleaseCurrent(p_sys->gl); \
+        goto error; \
+    } \
+} while(0);
+
+    OPENGL_VTABLE_F(LOAD_SYMBOL);
+
+    vlc_gl_ReleaseCurrent(p_sys->gl);
+
     /* Create the thread */
     if (vlc_clone(&p_sys->thread, Thread, p_filter,
                   VLC_THREAD_PRIORITY_VIDEO)) {
@@ -167,6 +233,10 @@ static int Open(vlc_object_t * p_this)
     p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
+
+error:
+    vlc_gl_surface_Destroy(p_sys->gl);
+    return VLC_EGENERIC;
 }
 
 
@@ -205,40 +275,46 @@ static block_t *DoWork(filter_t *p_filter, block_t *p_in_buf)
 /**
   * Init the OpenGL scene.
   **/
-static void initOpenGLScene(void)
+static void initOpenGLScene(filter_t *p_filter)
 {
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
+    filter_sys_t *p_sys = p_filter->p_sys;
+    struct glspectrum_opengl_vtable *vt = &p_sys->vt;
 
-    glMatrixMode(GL_PROJECTION);
-    glFrustum(-1.0f, 1.0f, -1.0f, 1.0f, 0.5f, 10.0f);
+    vt->Enable(GL_CULL_FACE);
+    vt->Enable(GL_DEPTH_TEST);
+    vt->DepthMask(GL_TRUE);
 
-    glMatrixMode(GL_MODELVIEW);
-    glTranslatef(0.0, -2.0, -2.0);
+    vt->MatrixMode(GL_PROJECTION);
+    vt->Frustum(-1.0f, 1.0f, -1.0f, 1.0f, 0.5f, 10.0f);
+
+    vt->MatrixMode(GL_MODELVIEW);
+    vt->Translatef(0.0, -2.0, -2.0);
 
     // Init the light.
-    glEnable(GL_LIGHTING);
+    vt->Enable(GL_LIGHTING);
 
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-    glEnable(GL_COLOR_MATERIAL);
+    vt->ColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    vt->Enable(GL_COLOR_MATERIAL);
 
-    glEnable(GL_LIGHT0);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightZeroColor);
-    glLightfv(GL_LIGHT0, GL_POSITION, lightZeroPosition);
+    vt->Enable(GL_LIGHT0);
+    vt->Lightfv(GL_LIGHT0, GL_DIFFUSE, lightZeroColor);
+    vt->Lightfv(GL_LIGHT0, GL_POSITION, lightZeroPosition);
 
-    glShadeModel(GL_SMOOTH);
+    vt->ShadeModel(GL_SMOOTH);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    vt->Enable(GL_BLEND);
+    vt->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 
 /**
  * Draw one bar of the Spectrum.
  */
-static void drawBar(void)
+static void drawBar(filter_t *p_filter)
 {
+    filter_sys_t *p_sys = p_filter->p_sys;
+    struct glspectrum_opengl_vtable *vt = &p_sys->vt;
+
     const float w = SPECTRUM_WIDTH / NB_BANDS - 0.05f;
 
     const GLfloat vertexCoords[] = {
@@ -275,9 +351,9 @@ static void drawBar(void)
         0.f, 1.f, 0.f,   0.f, 1.f, 0.f,   0.f, 1.f, 0.f,
     };
 
-    glVertexPointer(3, GL_FLOAT, 0, vertexCoords);
-    glNormalPointer(GL_FLOAT, 0, normals);
-    glDrawArrays(GL_TRIANGLES, 0, 6 * 5);
+    vt->VertexPointer(3, GL_FLOAT, 0, vertexCoords);
+    vt->NormalPointer(GL_FLOAT, 0, normals);
+    vt->DrawArrays(GL_TRIANGLES, 0, 6 * 5);
 }
 
 
@@ -285,8 +361,11 @@ static void drawBar(void)
  * Set the color of one bar of the spectrum.
  * @param f_height the height of the bar.
  */
-static void setBarColor(float f_height)
+static void setBarColor(filter_t *p_filter, float f_height)
 {
+    filter_sys_t *p_sys = p_filter->p_sys;
+    struct glspectrum_opengl_vtable *vt = &p_sys->vt;
+
     float r, b;
 
 #define BAR_MAX_HEIGHT 4.2f
@@ -302,7 +381,7 @@ static void setBarColor(float f_height)
     b = b < 0.f ? 0.f : b;
 
     /* Set the bar color. */
-    glColor4f(r, 0.f, b, 1.f);
+    vt->Color4f(r, 0.f, b, 1.f);
 }
 
 
@@ -310,30 +389,33 @@ static void setBarColor(float f_height)
  * Draw all the bars of the spectrum.
  * @param heights the heights of all the bars.
  */
-static void drawBars(float heights[])
+static void drawBars(filter_t *p_filter, float heights[])
 {
-    glPushMatrix();
-    glTranslatef(-2.f, 0.f, 0.f);
+    filter_sys_t *p_sys = p_filter->p_sys;
+    struct glspectrum_opengl_vtable *vt = &p_sys->vt;
 
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
+    vt->PushMatrix();
+    vt->Translatef(-2.f, 0.f, 0.f);
+
+    vt->EnableClientState(GL_VERTEX_ARRAY);
+    vt->EnableClientState(GL_NORMAL_ARRAY);
 
     float w = SPECTRUM_WIDTH / NB_BANDS;
     for (unsigned i = 0; i < NB_BANDS; ++i)
     {
-        glPushMatrix();
-        glScalef(1.f, heights[i], 1.f);
-        setBarColor(heights[i]);
-        drawBar();
-        glPopMatrix();
+        vt->PushMatrix();
+        vt->Scalef(1.f, heights[i], 1.f);
+        setBarColor(p_filter, heights[i]);
+        drawBar(p_filter);
+        vt->PopMatrix();
 
-        glTranslatef(w, 0.f, 0.f);
+        vt->Translatef(w, 0.f, 0.f);
     }
 
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
+    vt->DisableClientState(GL_VERTEX_ARRAY);
+    vt->DisableClientState(GL_NORMAL_ARRAY);
 
-    glPopMatrix();
+    vt->PopMatrix();
 }
 
 
@@ -353,7 +435,10 @@ static void *Thread( void *p_data )
         msg_Err(p_filter, "Can't attach gl context");
         return NULL;
     }
-    initOpenGLScene();
+
+    struct glspectrum_opengl_vtable *vt = &p_sys->vt;
+
+    initOpenGLScene(p_filter);
     vlc_gl_ReleaseCurrent(gl);
 
     float height[NB_BANDS] = {0};
@@ -364,7 +449,7 @@ static void *Thread( void *p_data )
 
         vlc_gl_MakeCurrent(gl);
         if (vlc_gl_surface_CheckSize(gl, &win_width, &win_height))
-            glViewport(0, 0, win_width, win_height);
+            vt->Viewport(0, 0, win_width, win_height);
 
         /* Horizontal scale for 20-band equalizer */
         const unsigned xscale[] = {0,1,2,3,4,5,6,7,8,11,15,20,27,
@@ -474,12 +559,12 @@ static void *Thread( void *p_data )
             p_sys->f_rotationIncrement = -ROTATION_INCREMENT;
 
         /* Render the frame. */
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        vt->Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glPushMatrix();
-            glRotatef(p_sys->f_rotationAngle, 0, 1, 0);
-            drawBars(height);
-        glPopMatrix();
+        vt->PushMatrix();
+            vt->Rotatef(p_sys->f_rotationAngle, 0, 1, 0);
+            drawBars(p_filter, height);
+        vt->PopMatrix();
 
         /* Wait to swapp the frame on time. */
         vlc_tick_wait(block->i_pts + (block->i_length / 2));
