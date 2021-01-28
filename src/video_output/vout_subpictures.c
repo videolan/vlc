@@ -780,6 +780,11 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
     }
 
     sys->last_sort_date = render_subtitle_date;
+    if (*subpicture_count == 0)
+    {
+        free(subpicture_array);
+        subpicture_array = NULL;
+    }
     return subpicture_array;
 }
 
