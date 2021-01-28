@@ -56,7 +56,7 @@ libvout_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 
 libuiview_window_plugin_la_SOURCES = video_output/apple/VLCVideoUIView.m
 libuiview_window_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
-	-Wl,-framework,Foundation,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit
+	-Wl,-framework,Foundation,-framework,QuartzCore,-framework,UIKit
 libuiview_window_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 
 if HAVE_IOS
