@@ -55,7 +55,7 @@ endif
 ### OpenGL ###
 libgles2_plugin_la_SOURCES = video_output/opengl/display.c
 libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
-libgles2_plugin_la_LIBADD = $(GLES2_LIBS) libvlc_opengles.la
+libgles2_plugin_la_LIBADD = libvlc_opengles.la
 libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 if HAVE_GLES2
 vout_LTLIBRARIES += libgles2_plugin.la
@@ -64,10 +64,6 @@ endif
 libgl_plugin_la_SOURCES = video_output/opengl/display.c
 libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS) $(OPENGL_COMMONCFLAGS)
 libgl_plugin_la_LIBADD = libvlc_opengl.la
-if HAVE_WIN32
-libgl_plugin_la_CFLAGS += -DHAVE_GL_CORE_SYMBOLS
-libgl_plugin_la_LIBADD += $(GL_LIBS)
-endif
 
 if HAVE_GL
 vout_LTLIBRARIES += libgl_plugin.la
