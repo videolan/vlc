@@ -279,6 +279,9 @@ Open(vlc_object_t *obj)
 
 #if TARGET_OS_IPHONE
     interop->handle_texs_gen = true;
+
+    for (unsigned i = 0; i < interop->tex_count; ++i)
+        priv->last_cvtexs[i] = NULL;
 #endif
     interop->priv = priv;
     static const struct vlc_gl_interop_ops ops = {
