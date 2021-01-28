@@ -42,9 +42,9 @@ struct priv
     CVOpenGLESTextureCacheRef cache;
     CVOpenGLESTextureRef last_cvtexs[PICTURE_PLANE_MAX];
 #else
-    picture_t *last_pic;
     CGLContextObj gl_ctx;
 #endif
+    picture_t *last_pic;
 };
 
 #if TARGET_OS_IPHONE
@@ -67,6 +67,10 @@ tc_cvpx_update(const struct vlc_gl_interop *interop, GLuint *textures,
             priv->last_cvtexs[i] = NULL;
         }
     }
+
+    if (priv->last_pic != NULL)
+        picture_Release(priv->last_pic);
+    priv->last_pic = picture_Hold(pic);
 
     CVOpenGLESTextureCacheFlush(priv->cache, 0);
 
@@ -132,12 +136,9 @@ tc_cvpx_update(const struct vlc_gl_interop *interop, GLuint *textures,
         }
     }
 
-    if (priv->last_pic != pic)
-    {
-        if (priv->last_pic != NULL)
-            picture_Release(priv->last_pic);
-        priv->last_pic = picture_Hold(pic);
-    }
+    if (priv->last_pic != NULL)
+        picture_Release(priv->last_pic);
+    priv->last_pic = picture_Hold(pic);
 
     return VLC_SUCCESS;
 }
@@ -155,10 +156,9 @@ Close(struct vlc_gl_interop *interop)
             CFRelease(priv->last_cvtexs[i]);
     }
     CFRelease(priv->cache);
-#else
+#endif
     if (priv->last_pic != NULL)
         picture_Release(priv->last_pic);
-#endif
     free(priv);
 }
 
@@ -283,6 +283,8 @@ Open(vlc_object_t *obj)
     for (unsigned i = 0; i < interop->tex_count; ++i)
         priv->last_cvtexs[i] = NULL;
 #endif
+
+    priv->last_pic = NULL;
     interop->priv = priv;
     static const struct vlc_gl_interop_ops ops = {
         .update_textures = tc_cvpx_update,
