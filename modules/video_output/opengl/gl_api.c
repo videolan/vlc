@@ -34,7 +34,7 @@
 int
 vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
 {
-#if defined(USE_OPENGL_ES2) || defined(HAVE_GL_CORE_SYMBOLS)
+#if defined(HAVE_GL_CORE_SYMBOLS)
 #define GET_PROC_ADDR_CORE(name) api->vt.name = gl##name
 #else
 #define GET_PROC_ADDR_CORE(name) GET_PROC_ADDR_EXT(name, true)
