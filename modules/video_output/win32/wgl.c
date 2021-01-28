@@ -62,6 +62,7 @@ struct vout_display_sys_t
     HWND                  hvideownd;
     HDC                   hGLDC;
     HGLRC                 hGLRC;
+    HMODULE               hOpengl;
     vlc_gl_t              *gl;
     HDC                   affinityHDC; // DC for the selected GPU
 
@@ -173,6 +174,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 
     sys->hvideownd = wnd->handle.hwnd;
     sys->hGLDC = GetDC(sys->hvideownd);
+    sys->hOpengl = LoadLibraryA("opengl32.dll");
     if (sys->hGLDC == NULL)
     {
         msg_Err(gl, "Could not get the device context");
@@ -256,6 +258,8 @@ static void Close(vlc_gl_t *gl)
         wglDeleteContext(sys->hGLRC);
     if (sys->hGLDC)
         ReleaseDC(sys->hvideownd, sys->hGLDC);
+    if (sys->hOpengl)
+        FreeLibrary(sys->hOpengl);
 
     DestroyGPUAffinityDC(gl);
 
@@ -270,8 +274,16 @@ static void Swap(vlc_gl_t *gl)
 
 static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
 {
-    VLC_UNUSED(gl);
-    return wglGetProcAddress(name);
+    vout_display_sys_t *sys = gl->sys;
+
+    /* See https://www.khronos.org/opengl/wiki/Load_OpenGL_Functions */
+    void *f= (void *)wglGetProcAddress(name);
+    if(f == 0 || (f == (void*)0x1) || (f == (void*)0x2) ||
+      (f == (void*)0x3) || (f == (void*)-1) )
+    {
+        f = (void *)GetProcAddress(sys->hOpengl, name);
+    }
+    return f;
 }
 
 static int MakeCurrent(vlc_gl_t *gl)

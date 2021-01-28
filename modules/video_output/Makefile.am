@@ -160,7 +160,7 @@ libwgl_plugin_la_SOURCES = video_output/win32/wgl.c
 libglwin32_plugin_la_LIBADD = libchroma_copy.la -lopengl32 -lgdi32 $(LIBCOM) -luuid libvlc_opengl.la
 libwgl_plugin_la_LIBADD = -lopengl32 -lgdi32 libvlc_opengl.la
 
-libglwin32_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS) -DHAVE_GL_CORE_SYMBOLS
+libglwin32_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS)
 libwgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS)
 
 libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
