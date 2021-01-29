@@ -96,6 +96,9 @@ static picture_t *Filter(filter_t *filter, picture_t *input)
         filter->fmt_out.video.i_frame_rate;
     output->format.i_frame_rate_base =
         filter->fmt_out.video.i_frame_rate_base;
+
+    output->format.i_sar_num = filter->fmt_out.video.i_sar_num;
+    output->format.i_sar_den = filter->fmt_out.video.i_sar_den;
 end:
     vlc_gl_ReleaseCurrent(sys->gl);
 
