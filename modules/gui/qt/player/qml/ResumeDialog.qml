@@ -27,6 +27,8 @@ import "qrc:///widgets/" as Widgets
 Widgets.NavigableFocusScope {
     id: resumePanel
 
+    property VLCColors colors: VLCStyle.colors
+
     implicitWidth: layout.implicitWidth
     implicitHeight: layout.implicitHeight
 
@@ -84,7 +86,7 @@ Widgets.NavigableFocusScope {
 
     Rectangle {
         anchors.fill: parent
-        color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.playerBg, 0.8)
+        color: resumePanel.colors.setColorAlpha(resumePanel.colors.playerBg, 0.8)
 
         //drag and dbl click the titlebar in CSD mode
         Loader {
@@ -106,7 +108,7 @@ Widgets.NavigableFocusScope {
                 Layout.preferredHeight: implicitHeight
                 Layout.preferredWidth: implicitWidth
 
-                color: VLCStyle.colors.playerFg
+                color: resumePanel.colors.playerFg
                 font.pixelSize: VLCStyle.fontSize_normal
                 font.bold: true
 
@@ -119,7 +121,7 @@ Widgets.NavigableFocusScope {
                 Layout.preferredWidth: implicitWidth
                 text: i18n.qtr("Continue")
                 font.bold: true
-                color: VLCStyle.colors.playerFg
+                color: resumePanel.colors.playerFg
                 focus: true
                 onClicked: {
                     player.restorePlaybackPos()
@@ -135,7 +137,7 @@ Widgets.NavigableFocusScope {
                 Layout.preferredWidth: implicitWidth
                 text: i18n.qtr("Dismiss")
                 font.bold: true
-                color: VLCStyle.colors.playerFg
+                color: resumePanel.colors.playerFg
                 onClicked: hideResumePanel()
 
                 KeyNavigation.left: continueBtn
