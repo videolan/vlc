@@ -57,6 +57,9 @@ tc_cvpx_update(const struct vlc_gl_interop *interop, GLuint *textures,
     (void) plane_offset;
     struct priv *priv = interop->priv;
 
+    /* Sanity check, don't change format behind interop's back. */
+    assert(pic->format.i_chroma == interop->fmt_in.i_chroma);
+
     CVPixelBufferRef pixelBuffer = cvpxpic_get_ref(pic);
 
     for (unsigned i = 0; i < interop->tex_count; ++i)
