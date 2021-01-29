@@ -320,7 +320,7 @@ Widgets.NavigableFocusScope {
         }
 
         Item {
-            id: centralLayout
+            id: centerContent
 
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -372,6 +372,7 @@ Widgets.NavigableFocusScope {
                     Layout.preferredHeight: implicitHeight
                     Layout.topMargin: VLCStyle.margin_xxlarge
 
+                    visible: centerContent.height > (albumLabel.y + albumLabel.height)
                     text: mainPlaylistController.currentItem.album
                     font.pixelSize: VLCStyle.fontSize_xxlarge
                     horizontalAlignment: Text.AlignHCenter
@@ -386,6 +387,7 @@ Widgets.NavigableFocusScope {
                     Layout.preferredHeight: implicitHeight
                     Layout.topMargin: VLCStyle.margin_small
 
+                    visible: centerContent.height > (artistLabel.y + artistLabel.height)
                     text: mainPlaylistController.currentItem.artist
                     font.weight: Font.Light
                     horizontalAlignment: Text.AlignHCenter
@@ -400,7 +402,7 @@ Widgets.NavigableFocusScope {
                     Layout.preferredWidth: implicitWidth
                     Layout.topMargin: VLCStyle.margin_large
                     Layout.alignment: Qt.AlignHCenter
-                    visible: player.videoTracks.count === 0
+                    visible: player.videoTracks.count === 0 && centerContent.height > (audioControls.y + audioControls.height)
                     focus: visible
                     spacing: VLCStyle.margin_xxsmall
                     navigationParent: rootPlayer
