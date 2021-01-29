@@ -127,6 +127,9 @@ void GetDeinterlacingOutput( const struct deinterlace_ctx *p_context,
 picture_t *DoDeinterlacing( filter_t *p_filter,
                             struct deinterlace_ctx *p_context, picture_t *p_pic )
 {
+    if (p_pic == NULL)
+        return NULL;
+
     picture_t *p_dst[DEINTERLACE_DST_SIZE];
     int i_double_rate_alloc_end;
     /* Remember the frame offset that we should use for this frame.
