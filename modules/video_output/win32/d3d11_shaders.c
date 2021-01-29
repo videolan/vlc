@@ -207,7 +207,7 @@ static HRESULT CompileTargetShader(vlc_object_t *o, const d3d11_shader_compiler_
 {
     char *shader;
     int allocated = asprintf(&shader, globPixelShaderDefault, texture_array ? "Array" : "",
-                             texture_count * D3D11_MAX_SHADER_VIEW,
+                             texture_count * DXGI_MAX_SHADER_VIEW,
                              psz_src_to_linear, psz_linear_to_display,
                              psz_primaries_transform, psz_tone_mapping,
                              psz_adjust_range, psz_move_planes, psz_sampler);
@@ -637,7 +637,7 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shader_compiler_
 
 void D3D11_ReleasePixelShader(d3d_quad_t *quad)
 {
-    for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
+    for (size_t i=0; i<DXGI_MAX_SHADER_VIEW; i++)
     {
         if (quad->d3dpixelShader[i])
         {
@@ -719,7 +719,7 @@ HRESULT D3D11_CreateRenderTargets( d3d11_device_t *d3d_dev, ID3D11Resource *text
     renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     renderTargetViewDesc.Texture2D.MipSlice = 0;
 
-    for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
+    for (size_t i=0; i<DXGI_MAX_SHADER_VIEW; i++)
     {
         if (cfg->resourceFormat[i])
         {

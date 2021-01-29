@@ -55,13 +55,13 @@ typedef struct
 typedef struct
 {
     union {
-        ID3D11Texture2D           *texture[D3D11_MAX_SHADER_VIEW];
-        ID3D11Resource            *resource[D3D11_MAX_SHADER_VIEW];
+        ID3D11Texture2D           *texture[DXGI_MAX_SHADER_VIEW];
+        ID3D11Resource            *resource[DXGI_MAX_SHADER_VIEW];
     };
     unsigned                      slice_index;
     ID3D11VideoProcessorInputView  *processorInput;  /* when used as processor input */
     ID3D11VideoProcessorOutputView *processorOutput; /* when used as processor output */
-    ID3D11ShaderResourceView      *renderSrc[D3D11_MAX_SHADER_VIEW];
+    ID3D11ShaderResourceView      *renderSrc[DXGI_MAX_SHADER_VIEW];
 } picture_sys_d3d11_t;
 
 struct d3d11_pic_context
@@ -132,8 +132,8 @@ void ReleaseD3D11PictureSys(picture_sys_d3d11_t *p_sys);
 /* map texture planes to resource views */
 int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
                              const d3d_format_t *format,
-                             ID3D11Texture2D *p_texture[D3D11_MAX_SHADER_VIEW], UINT slice_index,
-                             ID3D11ShaderResourceView *output[D3D11_MAX_SHADER_VIEW]);
+                             ID3D11Texture2D *p_texture[DXGI_MAX_SHADER_VIEW], UINT slice_index,
+                             ID3D11ShaderResourceView *output[DXGI_MAX_SHADER_VIEW]);
 #define D3D11_AllocateResourceView(a,b,c,d,e,f)  D3D11_AllocateResourceView(VLC_OBJECT(a),b,c,d,e,f)
 
 d3d11_decoder_device_t *D3D11_CreateDevice(vlc_object_t *obj, IDXGIAdapter *,

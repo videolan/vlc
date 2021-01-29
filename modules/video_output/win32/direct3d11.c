@@ -320,7 +320,7 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
     if (!is_d3d11_opaque(fmt->i_chroma) || sys->legacy_shader)
     {
         /* we need a staging texture */
-        ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
+        ID3D11Texture2D *textures[DXGI_MAX_SHADER_VIEW] = {0};
         video_format_t texture_fmt = *vd->source;
         texture_fmt.i_width  = sys->picQuad.i_width;
         texture_fmt.i_height = sys->picQuad.i_height;
@@ -340,7 +340,7 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
             return VLC_EGENERIC;
         }
 
-        for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
+        for (unsigned plane = 0; plane < DXGI_MAX_SHADER_VIEW; plane++)
             sys->stagingSys.texture[plane] = textures[plane];
     }
 #endif
@@ -1325,7 +1325,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (AllocateTextures(vd, sys->d3d_dev, sys->regionQuad.textureFormat, &r->p_picture->format, d3dquad->picSys.texture, NULL)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
-                for (int j=0; j<D3D11_MAX_SHADER_VIEW; j++)
+                for (int j=0; j<DXGI_MAX_SHADER_VIEW; j++)
                     if (d3dquad->picSys.texture[j])
                         ID3D11Texture2D_Release(d3dquad->picSys.texture[j]);
                 free(d3dquad);
@@ -1372,7 +1372,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
             quad_picture = (*region)[i];
-            for (size_t j=0; j<D3D11_MAX_SHADER_VIEW; j++)
+            for (size_t j=0; j<DXGI_MAX_SHADER_VIEW; j++)
             {
                 /* TODO use something more accurate if we have different formats */
                 if (sys->regionQuad.d3dpixelShader[j])

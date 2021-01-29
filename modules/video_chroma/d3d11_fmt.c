@@ -57,7 +57,7 @@ picture_sys_d3d11_t *ActiveD3D11PictureSys(picture_t *pic)
 
 void AcquireD3D11PictureSys(picture_sys_d3d11_t *p_sys)
 {
-    for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
+    for (int i=0; i<DXGI_MAX_SHADER_VIEW; i++) {
         if (p_sys->renderSrc[i])
             ID3D11ShaderResourceView_AddRef(p_sys->renderSrc[i]);
         if (p_sys->texture[i])
@@ -71,7 +71,7 @@ void AcquireD3D11PictureSys(picture_sys_d3d11_t *p_sys)
 
 void ReleaseD3D11PictureSys(picture_sys_d3d11_t *p_sys)
 {
-    for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
+    for (int i=0; i<DXGI_MAX_SHADER_VIEW; i++) {
         if (p_sys->renderSrc[i])
             ID3D11ShaderResourceView_Release(p_sys->renderSrc[i]);
         if (p_sys->texture[i])
@@ -87,8 +87,8 @@ void ReleaseD3D11PictureSys(picture_sys_d3d11_t *p_sys)
 #undef D3D11_AllocateResourceView
 int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
                               const d3d_format_t *format,
-                              ID3D11Texture2D *p_texture[D3D11_MAX_SHADER_VIEW], UINT slice_index,
-                              ID3D11ShaderResourceView *renderSrc[D3D11_MAX_SHADER_VIEW])
+                              ID3D11Texture2D *p_texture[DXGI_MAX_SHADER_VIEW], UINT slice_index,
+                              ID3D11ShaderResourceView *renderSrc[DXGI_MAX_SHADER_VIEW])
 {
     HRESULT hr;
     int i;
@@ -110,7 +110,7 @@ int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
         resviewDesc.Texture2DArray.FirstArraySlice = slice_index;
         assert(slice_index < texDesc.ArraySize);
     }
-    for (i=0; i<D3D11_MAX_SHADER_VIEW; i++)
+    for (i=0; i<DXGI_MAX_SHADER_VIEW; i++)
     {
         resviewDesc.Format = format->resourceFormat[i];
         if (resviewDesc.Format == DXGI_FORMAT_UNKNOWN)
@@ -125,7 +125,7 @@ int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
         }
     }
 
-    if (i != D3D11_MAX_SHADER_VIEW)
+    if (i != DXGI_MAX_SHADER_VIEW)
     {
         while (--i >= 0)
         {
@@ -770,7 +770,7 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
             msg_Dbg(obj, "failed to get the pixel format planes for %4.4s", (char *)&fmt->i_chroma);
             return VLC_EGENERIC;
         }
-        assert(p_chroma_desc->plane_count <= D3D11_MAX_SHADER_VIEW);
+        assert(p_chroma_desc->plane_count <= DXGI_MAX_SHADER_VIEW);
         plane_count = p_chroma_desc->plane_count;
 
         texDesc.Format = cfg->resourceFormat[0];
@@ -820,7 +820,7 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
         {
             out_planes[plane] = planes[plane];
         }
-    for (; plane < D3D11_MAX_SHADER_VIEW; plane++) {
+    for (; plane < DXGI_MAX_SHADER_VIEW; plane++) {
         if (!cfg->resourceFormat[plane])
             textures[plane] = NULL;
         else

@@ -93,7 +93,7 @@ struct vlc_va_sys_t
     /* pool */
     va_pool_t                     *va_pool;
     ID3D11VideoDecoderOutputView  *hw_surface[MAX_SURFACE_COUNT];
-    ID3D11ShaderResourceView      *renderSrc[MAX_SURFACE_COUNT * D3D11_MAX_SHADER_VIEW];
+    ID3D11ShaderResourceView      *renderSrc[MAX_SURFACE_COUNT * DXGI_MAX_SHADER_VIEW];
 };
 
 /* */
@@ -135,7 +135,7 @@ static picture_context_t *d3d11va_pic_context_copy(picture_context_t *ctx)
     *pic_ctx = *src_ctx;
     vlc_video_context_Hold(pic_ctx->ctx.s.vctx);
     va_surface_AddRef(pic_ctx->va_surface);
-    for (int i=0;i<D3D11_MAX_SHADER_VIEW; i++)
+    for (int i=0;i<DXGI_MAX_SHADER_VIEW; i++)
     {
         pic_ctx->ctx.picsys.resource[i]  = src_ctx->ctx.picsys.resource[i];
         pic_ctx->ctx.picsys.renderSrc[i] = src_ctx->ctx.picsys.renderSrc[i];
@@ -146,7 +146,7 @@ static picture_context_t *d3d11va_pic_context_copy(picture_context_t *ctx)
 
 static struct d3d11va_pic_context *CreatePicContext(
                                                   UINT slice,
-                                                  ID3D11ShaderResourceView *renderSrc[D3D11_MAX_SHADER_VIEW],
+                                                  ID3D11ShaderResourceView *renderSrc[DXGI_MAX_SHADER_VIEW],
                                                   vlc_video_context *vctx)
 {
     struct d3d11va_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
@@ -164,7 +164,7 @@ static struct d3d11va_pic_context *CreatePicContext(
     ID3D11Texture2D_GetDesc((ID3D11Texture2D*)p_resource, &txDesc);
 
     pic_ctx->ctx.picsys.slice_index = slice;
-    for (int i=0;i<D3D11_MAX_SHADER_VIEW; i++)
+    for (int i=0;i<DXGI_MAX_SHADER_VIEW; i++)
     {
         pic_ctx->ctx.picsys.resource[i] = p_resource;
         pic_ctx->ctx.picsys.renderSrc[i] = renderSrc[i];
@@ -178,13 +178,13 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *v
 {
     vlc_va_sys_t *sys = va->sys;
     ID3D11VideoDecoderOutputView *surface = sys->hw_surface[va_surface_GetIndex(va_surface)];
-    ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW];
+    ID3D11ShaderResourceView *resourceView[DXGI_MAX_SHADER_VIEW];
 
     D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
     ID3D11VideoDecoderOutputView_GetDesc(surface, &viewDesc);
 
-    for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
-        resourceView[i] = sys->renderSrc[viewDesc.Texture2D.ArraySlice*D3D11_MAX_SHADER_VIEW + i];
+    for (size_t i=0; i<DXGI_MAX_SHADER_VIEW; i++)
+        resourceView[i] = sys->renderSrc[viewDesc.Texture2D.ArraySlice*DXGI_MAX_SHADER_VIEW + i];
 
     struct d3d11va_pic_context *pic_ctx = CreatePicContext(
                                                   viewDesc.Texture2D.ArraySlice,
@@ -567,9 +567,9 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 
         if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
         {
-            ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {p_texture, p_texture, p_texture};
+            ID3D11Texture2D *textures[DXGI_MAX_SHADER_VIEW] = {p_texture, p_texture, p_texture};
             D3D11_AllocateResourceView(va, sys->d3d_dev->d3ddevice, sys->render_fmt, textures, surface_idx,
-                                &sys->renderSrc[surface_idx * D3D11_MAX_SHADER_VIEW]);
+                                &sys->renderSrc[surface_idx * DXGI_MAX_SHADER_VIEW]);
         }
     }
     ID3D11Texture2D_Release(p_texture);
@@ -654,10 +654,10 @@ static void DxDestroySurfaces(void *opaque)
     if (sys->hw_surface[0]) {
         for (unsigned i = 0; i < sys->hw.surface_count; i++)
         {
-            for (int j = 0; j < D3D11_MAX_SHADER_VIEW; j++)
+            for (int j = 0; j < DXGI_MAX_SHADER_VIEW; j++)
             {
-                if (sys->renderSrc[i*D3D11_MAX_SHADER_VIEW + j])
-                    ID3D11ShaderResourceView_Release(sys->renderSrc[i*D3D11_MAX_SHADER_VIEW + j]);
+                if (sys->renderSrc[i*DXGI_MAX_SHADER_VIEW + j])
+                    ID3D11ShaderResourceView_Release(sys->renderSrc[i*DXGI_MAX_SHADER_VIEW + j]);
             }
             ID3D11VideoDecoderOutputView_Release( sys->hw_surface[i] );
         }

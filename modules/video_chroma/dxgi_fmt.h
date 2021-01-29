@@ -36,7 +36,7 @@
 #define GPU_MANUFACTURER_S3            0x5333
 #define GPU_MANUFACTURER_QUALCOMM  0x4D4F4351
 
-#define D3D11_MAX_SHADER_VIEW  4
+#define DXGI_MAX_SHADER_VIEW  4
 
 typedef struct
 {
@@ -46,7 +46,7 @@ typedef struct
     uint8_t      bitsPerChannel;
     uint8_t      widthDenominator;
     uint8_t      heightDenominator;
-    DXGI_FORMAT  resourceFormat[D3D11_MAX_SHADER_VIEW];
+    DXGI_FORMAT  resourceFormat[DXGI_MAX_SHADER_VIEW];
 } d3d_format_t;
 
 const char *DxgiFormatToStr(DXGI_FORMAT format);
