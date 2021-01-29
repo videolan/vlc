@@ -1072,6 +1072,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                               p_pmt->pcr.i_first_dts;
             stime_t i_last = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->i_last_dts );
             i_last += p_pmt->pcr.i_pcroffset;
+            if( i_start > i_last )
+            {
+                msg_Warn( p_demux, "Can't get stream duration. Edited ?" );
+                return VLC_EGENERIC;
+            }
             *va_arg( args, vlc_tick_t * ) = FROM_SCALE(i_last - i_start);
             return VLC_SUCCESS;
         }
