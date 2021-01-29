@@ -134,43 +134,17 @@ HRESULT D3D11_CreateRenderTargets( d3d11_device_t *d3d_dev, ID3D11Resource *text
 void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
                               ID3D11RenderTargetView *targets[DXGI_MAX_RENDER_TARGET])
 {
-    static const FLOAT blackY[1] = {0.0f};
-    static const FLOAT blackUV[2] = {0.5f, 0.5f};
-    static const FLOAT blackRGBA[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-    static const FLOAT blackYUY2[4] = {0.0f, 0.5f, 0.0f, 0.5f};
-    static const FLOAT blackVUYA[4] = {0.5f, 0.5f, 0.0f, 1.0f};
-    static const FLOAT blackY210[4] = {0.0f, 0.5f, 0.5f, 0.0f};
+    union DXGI_Color black[DXGI_MAX_RENDER_TARGET];
+    size_t colorCount[DXGI_MAX_RENDER_TARGET];
+    DXGI_GetBlackColor(cfg, black, colorCount);
 
-    static_assert(DXGI_MAX_RENDER_TARGET >= 2, "we need at least 2 RenderTargetView for NV12/P010");
-
-    switch (cfg->formatTexture)
+    if (colorCount[0])
     {
-    case DXGI_FORMAT_NV12:
-    case DXGI_FORMAT_P010:
-        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackY);
-        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[1], blackUV);
-        break;
-    case DXGI_FORMAT_R8G8B8A8_UNORM:
-    case DXGI_FORMAT_B8G8R8A8_UNORM:
-    case DXGI_FORMAT_B8G8R8X8_UNORM:
-    case DXGI_FORMAT_R10G10B10A2_UNORM:
-    case DXGI_FORMAT_B5G6R5_UNORM:
-        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackRGBA);
-        break;
-    case DXGI_FORMAT_YUY2:
-        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackYUY2);
-        break;
-    case DXGI_FORMAT_Y410:
-        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackVUYA);
-        break;
-    case DXGI_FORMAT_Y210:
-        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackY210);
-        break;
-    case DXGI_FORMAT_AYUV:
-        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackVUYA);
-        break;
-    default:
-        vlc_assert_unreachable();
+        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], black[0].array);
+    }
+    if (colorCount[1])
+    {
+        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[1], black[1].array);
     }
 }
 

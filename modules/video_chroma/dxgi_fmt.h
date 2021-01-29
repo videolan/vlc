@@ -66,4 +66,21 @@ bool DxgiIsRGBFormat(const d3d_format_t *);
 #define DXGI_CHROMA_CPU 1
 #define DXGI_CHROMA_GPU 2
 
+union DXGI_Color
+{
+    struct {
+        FLOAT r, g, b, a;
+    };
+    struct {
+        FLOAT y;
+    };
+    struct {
+        FLOAT u, v;
+    };
+    FLOAT array[4];
+};
+void DXGI_GetBlackColor( const d3d_format_t *,
+                         union DXGI_Color black[DXGI_MAX_RENDER_TARGET],
+                         size_t colors[DXGI_MAX_RENDER_TARGET] );
+
 #endif /* include-guard */

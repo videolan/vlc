@@ -28,6 +28,8 @@
 
 #include "dxgi_fmt.h"
 
+#include <assert.h>
+
 typedef struct
 {
     const char   *name;
@@ -187,4 +189,53 @@ bool DxgiIsRGBFormat(const d3d_format_t *cfg)
            cfg->formatTexture != DXGI_FORMAT_Y210 &&
            cfg->formatTexture != DXGI_FORMAT_Y410 &&
            cfg->formatTexture != DXGI_FORMAT_420_OPAQUE;
+}
+
+void DXGI_GetBlackColor( const d3d_format_t *pixelFormat,
+                         union DXGI_Color black[DXGI_MAX_RENDER_TARGET],
+                         size_t colors[DXGI_MAX_RENDER_TARGET] )
+{
+    static const union DXGI_Color blackY    = { .y = 0.0f };
+    static const union DXGI_Color blackUV   = { .u = 0.5f, .v = 0.5f };
+    static const union DXGI_Color blackRGBA = { .r = 0.0f, .g = 0.0f, .b = 0.0f, .a = 1.0f };
+    static const union DXGI_Color blackYUY2 = { .r = 0.0f, .g = 0.5f, .b = 0.0f, .a = 0.5f };
+    static const union DXGI_Color blackVUYA = { .r = 0.5f, .g = 0.5f, .b = 0.0f, .a = 1.0f };
+    static const union DXGI_Color blackY210 = { .r = 0.0f, .g = 0.5f, .b = 0.5f, .a = 0.0f };
+
+    static_assert(DXGI_MAX_RENDER_TARGET >= 2, "we need at least 2 RenderTargetView for NV12/P010");
+
+    switch (pixelFormat->formatTexture)
+    {
+    case DXGI_FORMAT_NV12:
+    case DXGI_FORMAT_P010:
+        colors[0] = 1; black[0] = blackY;
+        colors[1] = 2; black[1] = blackUV;
+        break;
+    case DXGI_FORMAT_R8G8B8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8X8_UNORM:
+    case DXGI_FORMAT_R10G10B10A2_UNORM:
+    case DXGI_FORMAT_B5G6R5_UNORM:
+        colors[0] = 4; black[0] = blackRGBA;
+        colors[1] = 0;
+        break;
+    case DXGI_FORMAT_YUY2:
+        colors[0] = 4; black[0] = blackYUY2;
+        colors[1] = 0;
+        break;
+    case DXGI_FORMAT_Y410:
+        colors[0] = 4; black[0] = blackVUYA;
+        colors[1] = 0;
+        break;
+    case DXGI_FORMAT_Y210:
+        colors[0] = 4; black[0] = blackY210;
+        colors[1] = 0;
+        break;
+    case DXGI_FORMAT_AYUV:
+        colors[0] = 4; black[0] = blackVUYA;
+        colors[1] = 0;
+        break;
+    default:
+        vlc_assert_unreachable();
+    }
 }
