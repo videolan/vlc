@@ -224,7 +224,12 @@ static int MuteSet(audio_output_t *aout, bool mute)
         return -1;
 
     SLresult r = SetMute(sys->volumeItf, mute);
-    return (r == SL_RESULT_SUCCESS) ? 0 : -1;
+    if (r == SL_RESULT_SUCCESS) {
+        aout_MuteReport(aout, mute);
+        return 0;
+    } else {
+        return -1;
+    }
 }
 
 static void Pause(audio_output_t *aout, bool pause, vlc_tick_t date)
