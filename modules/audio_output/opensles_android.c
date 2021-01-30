@@ -58,6 +58,8 @@ JNIEnv *android_getEnv(vlc_object_t *p_obj, const char *psz_thread_name);
         goto error; \
     }
 
+#define CHECK_NATIVE_SAMPLE_RATE (__ANDROID_API__ < 21)
+
 typedef SLresult (*slCreateEngine_t)(
         SLObjectItf*, SLuint32, const SLEngineOption*, SLuint32,
         const SLInterfaceID*, const SLboolean*);
@@ -356,6 +358,7 @@ static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext
     vlc_mutex_unlock(&sys->lock);
 }
 
+#if CHECK_NATIVE_SAMPLE_RATE
 static int aout_get_native_sample_rate(audio_output_t *aout)
 {
     JNIEnv *p_env;
@@ -376,6 +379,7 @@ static int aout_get_native_sample_rate(audio_output_t *aout)
     msg_Dbg(aout, "%s: %d", __func__, sample_rate);
     return sample_rate;
 }
+#endif
 
 /*****************************************************************************
  *
@@ -417,19 +421,20 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     const SLInterfaceID ids2[] = { sys->SL_IID_ANDROIDSIMPLEBUFFERQUEUE, sys->SL_IID_VOLUME };
     static const SLboolean req2[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 
-    if (aout_get_native_sample_rate(aout) >= (int)fmt->i_rate) {
-        result = CreateAudioPlayer(sys->engineEngine, &sys->playerObject, &audioSrc,
-                                    &audioSnk, sizeof(ids2) / sizeof(*ids2),
-                                    ids2, req2);
-    } else {
+#if CHECK_NATIVE_SAMPLE_RATE
+    if (aout_get_native_sample_rate(aout) < (int)fmt->i_rate) {
         // Don't try to play back a sample rate higher than the native one,
         // since OpenSL ES will try to use the fast path, which AudioFlinger
         // will reject (fast path can't do resampling), and will end up with
         // too small buffers for the resampling. See http://b.android.com/59453
-        // for details. This bug is still present in 4.4. If it is fixed later
-        // this workaround could be made conditional.
+        // for details. This bug is fixed in 5.0
         result = SL_RESULT_UNKNOWN_ERROR;
     }
+    else
+#endif
+        result = CreateAudioPlayer(sys->engineEngine, &sys->playerObject, &audioSrc,
+                                    &audioSnk, sizeof(ids2) / sizeof(*ids2),
+                                    ids2, req2);
     if (unlikely(result != SL_RESULT_SUCCESS)) {
         /* Try again with a more sensible samplerate */
         fmt->i_rate = 44100;
