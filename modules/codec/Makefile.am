@@ -460,9 +460,8 @@ libomxil_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libmediacodec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil
 libmediacodec_plugin_la_SOURCES = codec/omxil/mediacodec.c codec/omxil/mediacodec.h \
 	codec/omxil/mediacodec_jni.c codec/omxil/mediacodec_ndk.c codec/omxil/utils.c \
-	codec/omxil/omxil_utils.h codec/omxil/qcom.c codec/omxil/qcom.h \
-	video_output/android/utils.c video_output/android/utils.h
-libmediacodec_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la
+	codec/omxil/omxil_utils.h codec/omxil/qcom.c codec/omxil/qcom.h
+libmediacodec_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la libandroid_utils.la $(LIBDL)
 codec_LTLIBRARIES += $(LTLIBomxil)
 EXTRA_LTLIBRARIES += libomxil_plugin.la
 if HAVE_ANDROID
