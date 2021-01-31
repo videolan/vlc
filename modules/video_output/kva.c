@@ -99,7 +99,6 @@ struct vout_display_sys_t
     HWND               parent;
     unsigned           button_pressed;
     bool               is_mouse_hidden;
-    bool               is_on_top;
     ULONG              cursor_timeout;
 
     int                i_chroma_shift;
@@ -127,9 +126,8 @@ static MRESULT EXPENTRY WndProc       ( HWND, ULONG, MPARAM, MPARAM );
 #define COLOR_KEY 0x0F0F0F
 
 #define WM_VLC_MANAGE               ( WM_USER + 1 )
-#define WM_VLC_FULLSCREEN_CHANGE    ( WM_USER + 2 )
-#define WM_VLC_SIZE_CHANGE          ( WM_USER + 3 )
-#define WM_VLC_SET_POS              ( WM_USER + 4 )
+#define WM_VLC_SIZE_CHANGE          ( WM_USER + 2 )
+#define WM_VLC_SET_POS              ( WM_USER + 3 )
 
 #define TID_HIDE_MOUSE  0x1010
 
@@ -277,14 +275,8 @@ static void PMThread( void *arg )
     sys->i_result = VLC_SUCCESS;
     DosPostEventSem( sys->ack_event );
 
-    if( sys->b_fixt23 )
-        WinSetVisibleRegionNotify( sys->frame, TRUE );
-
     while( WinGetMsg( sys->hab, &qm, NULLHANDLE, 0, 0 ))
         WinDispatchMsg( sys->hab, &qm );
-
-    if( sys->b_fixt23 )
-        WinSetVisibleRegionNotify( sys->frame, FALSE );
 
     kvaEnableScreenSaver();
 
@@ -402,21 +394,6 @@ static int Control( vout_display_t *vd, int query )
 
     switch (query)
     {
-    case VOUT_DISPLAY_CHANGE_FULLSCREEN:
-    {
-        WinPostMsg( sys->client, WM_VLC_FULLSCREEN_CHANGE, MPFROMLONG(true), 0 );
-        return VLC_SUCCESS;
-    }
-
-    case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
-    {
-        WinSetWindowPos( sys->frame, HWND_TOP, 0, 0, 0, 0, SWP_ZORDER );
-
-        sys->is_on_top = true;
-
-        return VLC_SUCCESS;
-    }
-
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {
         WinPostMsg( sys->client, WM_VLC_SIZE_CHANGE,
@@ -836,12 +813,6 @@ static MRESULT EXPENTRY MyFrameWndProc( HWND hwnd, ULONG msg, MPARAM mp1,
 
             break;
         }
-
-        //case WM_VRNDISABLED :
-        case WM_VRNENABLED :
-            if( !vd->cfg->is_fullscreen && sys->is_on_top )
-                WinSetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_ZORDER );
-            break;
     }
 
     return sys->p_old_frame( hwnd, msg, mp1, mp2 );
@@ -1024,34 +995,6 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
         /* Process Manage() call */
         case WM_VLC_MANAGE :
-            break;
-
-        /* Fullscreen change */
-        case WM_VLC_FULLSCREEN_CHANGE :
-            if( LONGFROMMP( mp1 ))
-            {
-                WinQueryWindowPos( sys->frame, &swp );
-                sys->client_rect.xLeft   = swp.x;
-                sys->client_rect.yBottom = swp.y;
-                sys->client_rect.xRight  = sys->client_rect.xLeft   + swp.cx;
-                sys->client_rect.yTop    = sys->client_rect.yBottom + swp.cy;
-                WinCalcFrameRect( sys->frame, &sys->client_rect, TRUE );
-
-                rcl.xLeft   = 0;
-                rcl.yBottom = 0;
-                rcl.xRight  = sys->i_screen_width;
-                rcl.yTop    = sys->i_screen_height;
-            }
-            else
-                rcl = sys->client_rect;
-
-            WinCalcFrameRect( sys->frame, &rcl, FALSE );
-
-            WinSetWindowPos( sys->frame, HWND_TOP,
-                             rcl.xLeft, rcl.yBottom,
-                             rcl.xRight - rcl.xLeft, rcl.yTop - rcl.yBottom,
-                             SWP_MOVE | SWP_SIZE | SWP_ZORDER | SWP_SHOW |
-                             SWP_ACTIVATE );
             break;
 
         /* Size change */
