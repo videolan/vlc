@@ -44,7 +44,7 @@
  *****************************************************************************/
 static int  Open ( vout_display_t *, const vout_display_cfg_t *,
                    video_format_t *, vlc_video_context * );
-static void Close( vlc_object_t * );
+static void Close( vout_display_t * );
 
 #define KVA_FIXT23_TEXT N_( \
     "Enable a workaround for T23" )
@@ -164,7 +164,6 @@ static void PMThread( void *arg )
     struct open_init *init = ( struct open_init * )arg;
     vout_display_t *vd = init->vd;
     vout_display_sys_t * sys = vd->sys;
-    const vout_display_cfg_t * cfg = init->cfg;
     video_format_t *fmtp = init->fmtp;
     ULONG i_frame_flags;
     QMSG qm;
@@ -322,7 +321,6 @@ static int Open ( vout_display_t *vd, const vout_display_cfg_t *cfg,
     vout_display_sys_t *sys;
     struct open_init init = {
         .vd   = vd,
-        .cfg  = cfg,
         .fmtp = fmtp,
     };
     VLC_UNUSED(context);
@@ -365,9 +363,8 @@ static int Open ( vout_display_t *vd, const vout_display_cfg_t *cfg,
  *****************************************************************************
  * Terminate an output method created by Open
  *****************************************************************************/
-static void Close ( vlc_object_t *object )
+static void Close ( vout_display_t *vd )
 {
-    vout_display_t * vd = (vout_display_t *)object;
     vout_display_sys_t * sys = vd->sys;
 
     WinPostQueueMsg( sys->hmq, WM_QUIT, 0, 0 );
@@ -462,11 +459,6 @@ static int Control( vout_display_t *vd, int query )
 }
 
 /* following functions are local */
-
-static void DestroyPicture( picture_t *pic )
-{
-    free( pic->p_sys );
-}
 
 /*****************************************************************************
  * OpenDisplay: open and initialize KVA device
