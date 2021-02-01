@@ -133,3 +133,7 @@ noinst_LTLIBRARIES += $(noinst_PLUGINS)
 # Generate vlc_modules_list (local plugins + SUBDIRS)
 include modulelist.mk
 SUBDIRS += .
+
+# Extract plugins and convenience libraries from the libtool libraries
+# being built, excluding the ones using them.
+include static.mk
