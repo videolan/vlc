@@ -219,4 +219,3 @@ update-po:
 include extras/package/macosx/package.mak
 include extras/package/win32/package.mak
 include extras/package/win32/msi.mak
-
