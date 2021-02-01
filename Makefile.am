@@ -23,7 +23,7 @@ BUILT_SOURCES_distclean =
 
 BUILT_SOURCES = $(BUILT_SOURCES_distclean)
 
-SUFFIXES = 
+SUFFIXES =
 
 DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-fast-install \
@@ -220,4 +220,3 @@ update-po:
 include extras/package/macosx/package.mak
 include extras/package/win32/package.mak
 include extras/package/win32/msi.mak
-
