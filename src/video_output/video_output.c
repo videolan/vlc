@@ -1458,7 +1458,6 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     vout_thread_sys_t *sys = vout;
     bool frame_by_frame = !deadline;
     bool paused = sys->pause.is_on;
-    bool first = !sys->displayed.current;
 
     assert(sys->clock);
 
@@ -1471,7 +1470,7 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     }
     vlc_mutex_unlock(&sys->filter.lock);
 
-    bool render_now;
+    bool render_now = true;
     if (frame_by_frame)
     {
         picture_t *next;
@@ -1487,13 +1486,12 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 
         if (!sys->displayed.current)
             return VLC_EGENERIC;
-
-        render_now = true;
     }
     else
     {
         const vlc_tick_t system_now = vlc_tick_now();
         const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->render) + VOUT_MWAIT_TOLERANCE;
+        const bool first = !sys->displayed.current;
 
         bool dropped_current_frame = false;
 
@@ -1511,7 +1509,7 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         vlc_tick_t date_refresh = VLC_TICK_INVALID;
 
         picture_t *next = NULL;
-        if (!sys->displayed.current)
+        if (first)
         {
             next =
                 ThreadDisplayPreparePicture(vout, true, false, &paused);
@@ -1569,10 +1567,11 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
             // nothing changed, wait until the next deadline or a control
             return VLC_EGENERIC;
         }
+
+        /* display the picture immediately */
+        render_now |= sys->displayed.current->b_force;
     }
 
-    /* display the picture immediately */
-    render_now |= sys->displayed.current->b_force;
     int ret = ThreadDisplayRenderPicture(vout, render_now);
     return render_now ? VLC_EGENERIC : ret;
 }
