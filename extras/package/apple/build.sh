@@ -337,7 +337,7 @@ hostenv()
     CXX="${VLC_HOST_CXX}" \
     OBJC="${VLC_HOST_OBJC}" \
     LD="${VLC_HOST_LD}" \
-    AR="${VLC_HOST_AR}" \
+    AR="${VLC_BUILD_DIR}/build/ar.sh" \
     STRIP="${VLC_HOST_STRIP}" \
     RANLIB="${VLC_HOST_RANLIB}" \
     NM="${VLC_HOST_NM}" \
@@ -696,6 +696,14 @@ fi
 # Build
 mkdir -p "${VLC_BUILD_DIR}/build"
 cd "${VLC_BUILD_DIR}/build" || abort_err "Failed cd to VLC build dir"
+
+echo "#!/usr/bin/env sh" > ar.sh
+echo "export CFLAGS=\"${CFLAGS}\"" >> ar.sh
+echo "export LDFLAGS=\"${LDFLAGS}\"" >> ar.sh
+echo "export CC=\"${VLC_HOST_CC}\"" >> ar.sh
+echo "export AR=\"${VLC_HOST_AR}\"" >> ar.sh
+echo "${VLC_SCRIPT_DIR}/ar.sh \$@" >> ar.sh
+chmod +x ar.sh
 
 # Create VLC install dir if it does not already exist
 mkdir -p "$VLC_INSTALL_DIR"
