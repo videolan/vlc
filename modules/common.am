@@ -34,7 +34,7 @@ AM_LDFLAGS += \
 	-avoid-version -module \
 	-export-symbols-regex ^vlc_entry \
 	-shrext $(LIBEXT) \
-	-no-undefined \
+	-no-undefined -static \
 	$(top_builddir)/compat/libcompat.la $(LTLIBVLCCORE)
 if HAVE_WIN32
 AM_LDFLAGS += $(top_builddir)/modules/module.rc.lo -Wc,-static
