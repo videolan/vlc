@@ -75,10 +75,48 @@ endif
 		|| (rm $@ && exit 1); \
 	echo "" >> $@;
 
-
 if HAVE_PARTIAL_LINKING
+# Symbollist from original plugin .la file
+%_plugin.la.symbollist: %_plugin.la
+	$(AM_V_GEN)libpath=`grep old_library= "$<" | cut -d"'" -f 2`; \
+	entrypoint=`$(NM) ".libs/$${libpath}" | \
+	    awk '$$2 == "T" && $$3 ~ /^_?vlc_entry__[A-Za-z0-9_]+$$/ { s=$$3; sub(/^_/,"",s); print s; exit }'`; \
+	echo $${entrypoint} > $@
+
+# Symbollist from partial-linked .partial.la file (needed by manifest)
+# On macOS/Mach-O, objcopy -G applied during partial-linking can
+# localize the entry symbol but it remains the only vlc_entry__ name
+# defined in the archive.
+%_plugin.partial.la.symbollist: %_plugin.partial.la
+	$(AM_V_GEN)libpath=`grep old_library= "$<" | cut -d"'" -f 2`; \
+	entrypoint=`$(NM) ".libs/$${libpath}" | \
+	    awk 'tolower($$2) == "t" && $$3 ~ /^_?vlc_entry__[A-Za-z0-9_]+$$/ { s=$$3; sub(/^_/,"",s); print s; exit }'`; \
+	echo $${entrypoint} > $@
+
+# Generate a manifest file that allows linking against all the plugins
+# we've built, by providing an X-macro which reference each plugin.
+# It it particularily userful when building tests or binaries, but also
+# for downstream projects that might want to pick all those plugins.
+vlc_modules_manifest.h: $(PARTIAL_PLUGINS) $(PARTIAL_PLUGINS:=.symbollist) Makefile
+	## Collect paths of all static libraries needed (plugins and contribs)
+	$(AM_V_at)echo "#define VLC_MODULE_LIST(F) \\" > $@.tmp
+	## Note: $(NULL) here is to fix syntax interpretation of \\ in the string
+	$(AM_V_GEN)for ltlib in $(PARTIAL_PLUGINS); do \
+		module_name=`cat $${ltlib}.symbollist | sed s/.*vlc_entry__//`; \
+		if [ -z "$${module_name}" ]; then \
+			echo "Cannot parse $${ltlib} symbol"; \
+			exit 1; \
+		fi; \
+		echo "F($${module_name}) \\$(NULL)" >> $@.tmp; \
+	done
+	$(AM_V_at)echo "" >> $@.tmp
+	$(AM_V_at)mv $@.tmp $@
+
+BUILT_SOURCES += vlc_modules_manifest.h
 CLEANFILES += \
 	$(PLUGINS:=.symbollist) \
 	$(PARTIAL_PLUGINS) \
-	$(PARTIAL_PLUGINS:%.partial.la=.deps/%.partial.la.o)
+	$(PARTIAL_PLUGINS:%.partial.la=.deps/%.partial.la.o) \
+	$(PARTIAL_PLUGINS:=.symbollist) \
+	vlc_modules_manifest.h
 endif
