@@ -84,3 +84,44 @@ SUFFIXES += -client-protocol.h -protocol.c .xml
 .xml-protocol.c:
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code < "$^" > "$@.tmp"
 	$(AM_V_at)mv -f -- "$@.tmp" "$@"
+
+# Extract plugins and convenience libraries from the libtool libraries
+# being built, excluding the ones using them.
+PLUGINS = $(LTLIBRARIES:Mlib*_plugin.la:Nlibvlc_plugin.la)
+HELPERS = $(LTLIBRARIES:Nlib*_plugin.la:Nlibvlc_static.la)
+
+plugin.c: $(PLUGINS)
+	echo "Compile VLC static modules list object"
+	## Collect paths of all static libraries needed (plugins and contribs)
+	echo "#define VLC_MODULE_LIST(F) \\" > $@.tmp
+	## Note: $(NULL) here is to fix syntax interpretation of \\ in the string
+	for ltlib in $^; do \
+		set -x; \
+		module_name=`echo $${ltlib} | sed -rn "s/lib(.+)_plugin.la/\1/p"`; \
+		echo "F($${module_name}) \\$(NULL)" >> $@.tmp; \
+	done
+	echo "" >> $@.tmp
+	echo "#include \"plugin_static.c\"" >> $@.tmp
+	mv $@.tmp $@
+
+BUILT_SOURCES += plugin.c
+CLEANFILES += plugin.c
+
+libvlc_static_la_SOURCES = plugin.c
+libvlc_static_la_CFLAGS =
+libvlc_static_la_LDFLAGS =
+libvlc_static_la_LIBADD = $(PLUGINS) $(LTLIBVLCCORE)
+EXTRA_libvlc_static_la_DEPENDENCIES = plugin_static.c
+
+libvlc_plugin_la_SOURCES = plugin.c
+libvlc_plugin_la_CFLAGS =
+libvlc_plugin_la_LDFLAGS = \
+	-avoid-version -module \
+	-export-symbols-regex ^vlc_entry \
+	-shrext $(LIBEXT) \
+	-no-undefined \
+	$(top_builddir)/compat/libcompat.la $(LTLIBVLCCORE)
+libvlc_plugin_la_LIBADD = $(PLUGINS)
+EXTRA_libvlc_plugin_la_DEPENDENCIES = plugin_static.c
+
+pkglib_LTLIBRARIES += libvlc_plugin.la libvlc_static.la
