@@ -634,6 +634,15 @@ static inline int input_ControlPushEsHelper( input_thread_t *p_input, int i_type
 }
 
 /**
+ * Set the program id
+ *
+ * cf. ES_OUT_SET_GROUP
+ * This function can be called before start or while started.
+ * This function is not thread-safe, the caller should handle the locking.
+ */
+void input_SetProgramId(input_thread_t *input, int group_id);
+
+/**
  * Set the list of string ids to enable for a category
  *
  * cf. ES_OUT_SET_ES_CAT_IDS

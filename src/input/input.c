@@ -1814,6 +1814,23 @@ static void ControlInsertDemuxFilter( input_thread_t* p_input, const char* psz_d
         msg_Dbg(p_input, "Failed to create demux filter %s", psz_demux_chain);
 }
 
+void input_SetProgramId(input_thread_t *input, int group_id)
+
+{
+    input_thread_private_t *sys = input_priv(input);
+
+    if (!sys->is_running && !sys->is_stopped)
+    {
+        /* Not running, send the control synchronously since we are sure that
+         * it won't block */
+        es_out_Control(sys->p_es_out_display, ES_OUT_SET_GROUP, group_id);
+    }
+    else
+    {
+        input_ControlPushHelper(input, INPUT_CONTROL_SET_PROGRAM,
+                                &(vlc_value_t) { .i_int = group_id });
+    }
+}
 
 void input_SetEsCatIds(input_thread_t *input, enum es_format_category_e cat,
                        const char *str_ids)
