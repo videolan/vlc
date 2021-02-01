@@ -571,6 +571,8 @@ static void test_media_player_programs(const char** argv, int argc)
     res = libvlc_event_attach(em, libvlc_MediaPlayerProgramSelected, on_event, &ctx);
     assert(!res);
 
+    libvlc_media_player_select_program_id(mp, 2);
+
     libvlc_media_player_play (mp);
 
     /* check that all programs are added and that one is selected */
@@ -600,7 +602,7 @@ static void test_media_player_programs(const char** argv, int argc)
 
     /* Check that we can fetch the program 0 and that it is enabled */
     program = libvlc_media_player_get_selected_program(mp);
-    assert(program != NULL && program->i_group_id == 0 && program->b_selected);
+    assert(program != NULL && program->i_group_id == 2 && program->b_selected);
     libvlc_player_program_delete(program);
 
     /* Change the program selection, select the last program */
@@ -610,7 +612,7 @@ static void test_media_player_programs(const char** argv, int argc)
     {
         const struct libvlc_event_t *ev = even_ctx_wait_event(&ctx);
         assert(ev->type == libvlc_MediaPlayerProgramSelected);
-        assert(ev->u.media_player_program_selection_changed.i_unselected_id == 0);
+        assert(ev->u.media_player_program_selection_changed.i_unselected_id == 2);
         assert(ev->u.media_player_program_selection_changed.i_selected_id == 8);
         event_ctx_release(&ctx);
     }
