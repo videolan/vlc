@@ -295,15 +295,12 @@ vlc_player_SelectProgram(vlc_player_t *player, int id)
     if (!input)
         return;
 
+    input_SetProgramId(input->thread, id);
+
     const struct vlc_player_program *prgm =
         vlc_player_program_vector_FindById(&input->program_vector,
                                            id, NULL);
-    if (!prgm)
-        return;
-    int ret = input_ControlPushHelper(input->thread,
-                                      INPUT_CONTROL_SET_PROGRAM,
-                                      &(vlc_value_t) { .i_int = id });
-    if (ret == VLC_SUCCESS)
+    if (prgm != NULL)
         vlc_player_osd_Program(player, prgm->name);
 }
 

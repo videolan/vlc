@@ -1244,6 +1244,13 @@ vlc_player_GetProgram(vlc_player_t *player, int group_id);
 /**
  * Select a program from an ES group identifier
  *
+ * This function can be used to pre-select a program by its id before starting
+ * the player. It has only effect for the current media. It can also be used
+ * when the player is already started.
+ *
+ * @note Selecting a non-existing program will cause the player to no select
+ * any programs. Therefore, all tracks will be disabled.
+ *
  * @param player locked player instance
  * @param group_id a program ID (retrieved from
  * vlc_player_cbs.on_program_list_changed or vlc_player_GetProgramAt())
@@ -1519,7 +1526,7 @@ vlc_player_GetSelectedTrack(vlc_player_t *player, enum es_format_category_e cat)
 /**
  * Select tracks by their string identifier
  *
- * This function can be used pre-select a list of tracks before starting the
+ * This function can be used to pre-select a list of tracks before starting the
  * player. It has only effect for the current media. It can also be used when
  * the player is already started.
 
