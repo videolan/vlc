@@ -3285,6 +3285,8 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         int i = va_arg( args, int );
         es_out_pgrm_t *p_pgrm;
 
+        p_sys->i_group_id = i;
+
         vlc_list_foreach(p_pgrm, &p_sys->programs, node)
             if( p_pgrm->i_id == i )
             {
