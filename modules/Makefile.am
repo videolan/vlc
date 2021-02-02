@@ -87,8 +87,8 @@ SUFFIXES += -client-protocol.h -protocol.c .xml
 
 # Extract plugins and convenience libraries from the libtool libraries
 # being built, excluding the ones using them.
-PLUGINS = $(LTLIBRARIES:Mlib*_plugin.la:Nlibvlc_plugin.la)
-HELPERS = $(LTLIBRARIES:Nlib*_plugin.la:Nlibvlc_static.la)
+PLUGINS = $(filter-out libvlc_plugin.la,$(filter %_plugin.la,$(LTLIBRARIES)))
+HELPERS = $(filter-out libvlc_static.la,$(filter-out %_plugin.la,$(LTLIBRARIES)))
 
 plugin.c: $(PLUGINS)
 	echo "Compile VLC static modules list object"
