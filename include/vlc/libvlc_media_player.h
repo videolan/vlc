@@ -721,7 +721,7 @@ typedef void( *libvlc_video_output_set_resize_cb )( void *opaque,
  * entering call.
  *
  * The number of planes depend on the DXGI_FORMAT returned during the
- * \ref LIBVLC_VIDEO_UPDATE_OUTPUT call. It's usually one plane except for
+ * @a libvlc_video_update_output_cb() call. It's usually one plane except for
  * semi-planar formats like DXGI_FORMAT_NV12 or DXGI_FORMAT_P010.
  *
  * This callback is called between libvlc_video_makeCurrent_cb current/not-current
