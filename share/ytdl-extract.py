@@ -33,7 +33,7 @@ class logger(object):
 
 def url_extract(url):
     opts = {
-        'extract_flat': True,
+        'extract_flat': 'in_playlist',
         'logger': logger(),
         'youtube_include_dash_manifest': False,
     }
