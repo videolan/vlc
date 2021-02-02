@@ -265,7 +265,8 @@ enum vlc_config_subcat
 #  define DLL_SYMBOL
 # endif
 #else
-# define DLL_SYMBOL
+//# define DLL_SYMBOL
+#   define DLL_SYMBOL              __attribute__((visibility("default")))
 #endif
 
 struct vlc_param;
