@@ -474,6 +474,8 @@ static int Control(vout_display_t *vd, int query)
 static bool SelectRenderPlane(void *opaque, size_t plane)
 {
     vout_display_sys_t *sys = opaque;
+    if (!sys->selectPlaneCb)
+        return plane == 0; // we only support one packed RGBA plane by default
     return sys->selectPlaneCb(sys->outside_opaque, plane);
 }
 
