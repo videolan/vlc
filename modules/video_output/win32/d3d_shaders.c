@@ -143,7 +143,7 @@ static const char* globPixelShaderDefault = "\
 ";
 
 static const char* globVertexShaderFlat = "\
-struct VS_INPUT\n\
+struct d3d_vertex_t\n\
 {\n\
   float3 Position   : POSITION;\n\
   float2 uv         : TEXCOORD;\n\
@@ -155,7 +155,7 @@ struct PS_INPUT\n\
   float3 Texture    : TEXCOORD;\n\
 };\n\
 \n\
-PS_INPUT main( VS_INPUT In )\n\
+PS_INPUT main( d3d_vertex_t In )\n\
 {\n\
   PS_INPUT Output;\n\
   Output.Position = float4(In.Position, 1);\n\
@@ -171,7 +171,7 @@ cbuffer VS_PROJECTION_CONST : register(b0)\n\
    float4x4 Zoom;\n\
    float4x4 Projection;\n\
 };\n\
-struct VS_INPUT\n\
+struct d3d_vertex_t\n\
 {\n\
   float3 Position   : POSITION;\n\
   float2 uv         : TEXCOORD;\n\
@@ -183,7 +183,7 @@ struct PS_INPUT\n\
   float3 Texture    : TEXCOORD;\n\
 };\n\
 \n\
-PS_INPUT main( VS_INPUT In )\n\
+PS_INPUT main( d3d_vertex_t In )\n\
 {\n\
   PS_INPUT Output;\n\
   float4 pos = float4(In.Position, 1);\n\
