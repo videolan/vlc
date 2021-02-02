@@ -107,7 +107,9 @@ plugin.c: $(PLUGINS)
 	echo "#define VLC_MODULE_LIST(F) \\" > $@.tmp
 	## Note: $(NULL) here is to fix syntax interpretation of \\ in the string
 	for ltlib in $^; do \
-		module_name=`echo $${ltlib} | sed -rn "s/lib(.+)_plugin.la/\1/p"`; \
+		libpath=`grep old_library= "$${ltlib}" | cut -d"'" -f 2`; \
+		entrypoint=`$(NM) ".libs/$${libpath}" | grep vlc_entry__ | cut -d" " -f 3 | head -n1`; \
+		module_name=`echo $${entrypoint} | sed s/.*vlc_entry__//`; \
 		echo "F($${module_name}) \\$(NULL)" >> $@.tmp; \
 	done
 	echo "" >> $@.tmp
