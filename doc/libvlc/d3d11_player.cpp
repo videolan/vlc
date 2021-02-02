@@ -463,11 +463,14 @@ static bool StartRendering_cb( void *opaque, bool enter )
     return true;
 }
 
-static bool SelectPlane_cb( void *opaque, size_t plane )
+static bool SelectPlane_cb( void *opaque, size_t plane, void *out )
 {
+    ID3D11RenderTargetView **output = static_cast<ID3D11RenderTargetView**>( out );
     struct render_context *ctx = static_cast<struct render_context *>( opaque );
     if ( plane != 0 ) // we only support one packed RGBA plane (DXGI_FORMAT_R8G8B8A8_UNORM)
         return false;
+    // we don't really need to return it as we already do the OMSetRenderTargets().
+    *output = ctx->resized.textureRenderTarget;
     return true;
 }
 

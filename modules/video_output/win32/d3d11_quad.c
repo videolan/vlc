@@ -70,8 +70,12 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d11_quad_t *quad, d3d11_vertex_
         if (!quad->d3dpixelShader[i])
             break;
 
-        if (unlikely(!selectPlane(selectOpaque, i)))
+        ID3D11RenderTargetView *renderView = NULL;
+        if (unlikely(!selectPlane(selectOpaque, i, &renderView)))
             continue;
+
+        if (renderView != NULL)
+            ID3D11DeviceContext_OMSetRenderTargets(d3d_dev->d3dcontext, 1, &renderView, NULL);
 
         ID3D11DeviceContext_PSSetShader(d3d_dev->d3dcontext, quad->d3dpixelShader[i], NULL, 0);
 

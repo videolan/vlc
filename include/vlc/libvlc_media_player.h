@@ -710,14 +710,17 @@ typedef void( *libvlc_video_output_set_resize_cb )( void *opaque,
  *
  * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
  * \param plane number of the rendering plane to select
+ * \param output handle of the rendering output for the given plane
  * \return true on success
  * \version LibVLC 4.0.0 or later
  *
  * \note This is only used with \ref libvlc_video_engine_d3d11.
  *
- * The host should call OMSetRenderTargets for Direct3D11. If this callback is
- * not used (set to NULL in @a libvlc_video_set_output_callbacks()) OMSetRenderTargets
- * has to be set during the @a libvlc_video_makeCurrent_cb()
+ * The output parameter receives the ID3D11RenderTargetView* to use for rendering
+ * the plane.
+ *
+ * If this callback is not used (set to NULL in @a libvlc_video_set_output_callbacks())
+ * OMSetRenderTargets has to be set during the @a libvlc_video_makeCurrent_cb()
  * entering call.
  *
  * The number of planes depend on the DXGI_FORMAT returned during the
@@ -727,7 +730,7 @@ typedef void( *libvlc_video_output_set_resize_cb )( void *opaque,
  * This callback is called between libvlc_video_makeCurrent_cb current/not-current
  * calls.
  */
-typedef bool( *libvlc_video_output_select_plane_cb )( void *opaque, size_t plane );
+typedef bool( *libvlc_video_output_select_plane_cb )( void *opaque, size_t plane, void *output );
 
 /**
  * Set callbacks and data to render decoded video to a custom texture

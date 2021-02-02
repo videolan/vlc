@@ -471,12 +471,15 @@ static int Control(vout_display_t *vd, int query)
     return res;
 }
 
-static bool SelectRenderPlane(void *opaque, size_t plane)
+static bool SelectRenderPlane(void *opaque, size_t plane, ID3D11RenderTargetView **targetView)
 {
     vout_display_sys_t *sys = opaque;
     if (!sys->selectPlaneCb)
+    {
+        *targetView = NULL;
         return plane == 0; // we only support one packed RGBA plane by default
-    return sys->selectPlaneCb(sys->outside_opaque, plane);
+    }
+    return sys->selectPlaneCb(sys->outside_opaque, plane, (void*)targetView);
 }
 
 static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture,

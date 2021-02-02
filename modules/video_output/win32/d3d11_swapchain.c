@@ -236,13 +236,13 @@ bool D3D11_LocalSwapchainStartEndRendering( void *opaque, bool enter )
     return true;
 }
 
-bool D3D11_LocalSwapchainSelectPlane( void *opaque, size_t plane )
+bool D3D11_LocalSwapchainSelectPlane( void *opaque, size_t plane, void *out )
 {
     struct d3d11_local_swapchain *display = opaque;
     if (!display->swapchainTargetView[plane])
         return false;
-    ID3D11DeviceContext_OMSetRenderTargets(display->d3d_dev->d3dcontext, 1,
-                                            &display->swapchainTargetView[plane], NULL);
+    ID3D11RenderTargetView **output = out;
+    *output = display->swapchainTargetView[plane];
     return true;
 }
 
