@@ -134,6 +134,18 @@ libvlc_plugin_la_LDFLAGS = \
 	-no-undefined \
 	$(top_builddir)/compat/libcompat.la $(LTLIBVLCCORE)
 libvlc_plugin_la_LIBADD = $(PLUGINS)
+EXTRA_libvlc_plugin_la_DEPENDENCIES = vlc_modules_manifest.h
+
+if HAVE_IOS
+libvlc_plugin_la_LDFLAGS += \
+	-Wl,-framework,CoreFoundation,-framework,Foundation \
+	-Wl,-framework,CoreAudio,-framework,AudioToolbox \
+	-Wl,-framework,CoreVideo,-framework,QuartzCore \
+	-Wl,-framework,OpenGLES,-framework,UIKit \
+	-Wl,-framework,Security,-framework,AVFoundation \
+	-Wl,-framework,CoreImage
+endif
+
 EXTRA_libvlc_plugin_la_DEPENDENCIES = plugin_static.c
 
 pkglib_LTLIBRARIES += libvlc_plugin.la #libvlc_static.la
