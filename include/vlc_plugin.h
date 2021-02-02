@@ -240,7 +240,8 @@ enum vlc_module_properties
 #  define DLL_SYMBOL
 # endif
 #else
-# define DLL_SYMBOL
+//# define DLL_SYMBOL
+#   define DLL_SYMBOL              __attribute__((visibility("default")))
 #endif
 
 EXTERN_SYMBOL typedef int (*vlc_set_cb) (void *, void *, int, ...);
