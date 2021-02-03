@@ -210,6 +210,7 @@ Widgets.NavigableFocusScope {
             right: parent.right
         }
 
+        z: 1
         edge: Widgets.DrawerExt.Edges.Top
         property var autoHide: topcontrolView.contentItem.autoHide
 
@@ -240,7 +241,13 @@ Widgets.NavigableFocusScope {
 
                 navigationParent: rootPlayer
                 navigationDownItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
-                navigationRightItem: csdGroup
+
+                onTooglePlaylistVisibility: {
+                    if (mainInterface.playlistDocked)
+                        playlistpopup.showPlaylist = !playlistpopup.showPlaylist
+                    else
+                        mainInterface.playlistVisible = !mainInterface.playlistVisible
+                }
             }
 
             ResumeDialog {
@@ -486,7 +493,7 @@ Widgets.NavigableFocusScope {
 
                 colors: rootPlayer.colors
                 navigationParent: rootPlayer
-                navigationUpItem: csdGroup
+                navigationUpItem: topcontrolView
                 navigationDownItem: controlBarView
                 navigationLeft: closePlaylist
                 navigationCancel: closePlaylist
@@ -504,87 +511,6 @@ Widgets.NavigableFocusScope {
         onStateChanged: {
             if (state === "hidden")
                 toolbarAutoHide.restart()
-        }
-    }
-
-    Widgets.DrawerExt {
-        id: csdGroup
-
-        anchors.right: parent.right
-        anchors.top: parent.top
-        state: topcontrolView.state
-        edge: Widgets.DrawerExt.Edges.Top
-        width: contentItem.width
-        focus: true
-
-        component: Column {
-            spacing: VLCStyle.margin_xxsmall
-            focus: true
-
-            onActiveFocusChanged: if (activeFocus) menu_selector.forceActiveFocus()
-
-            Loader {
-                focus: false
-                anchors.right: parent.right
-                height: VLCStyle.icon_normal
-                active: mainInterface.clientSideDecoration
-                enabled: mainInterface.clientSideDecoration
-                visible: mainInterface.clientSideDecoration
-                source: "qrc:///widgets/CSDWindowButtonSet.qml"
-                onLoaded: {
-                    item.color = Qt.binding(function() { return rootPlayer.colors.playerFg })
-                    item.hoverColor = Qt.binding(function() { return rootPlayer.colors.windowCSDButtonDarkBg })
-                }
-            }
-
-            Row {
-                anchors.right: parent.right
-                anchors.rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xxsmall
-                focus: true
-                spacing: VLCStyle.margin_xxsmall
-                KeyNavigation.down: playlistpopup.state === "visible" ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
-
-                Widgets.IconToolButton {
-                    id: menu_selector
-
-                    focus: true
-                    size: VLCStyle.banner_icon_size
-                    iconText: VLCIcons.ellipsis
-                    text: i18n.qtr("Menu")
-                    color: rootPlayer.colors.playerFg
-                    property bool acceptFocus: true
-
-                    onClicked: contextMenu.popup(this.mapToGlobal(0, height))
-
-                    KeyNavigation.left: topcontrolView
-                    KeyNavigation.right: playlistBtn
-
-                    QmlGlobalMenu {
-                        id: contextMenu
-                        ctx: mainctx
-                    }
-                }
-
-                Widgets.IconToolButton {
-                    id: playlistBtn
-
-                    objectName: PlayerControlBarModel.PLAYLIST_BUTTON
-                    size: VLCStyle.banner_icon_size
-                    iconText: VLCIcons.playlist
-                    text: i18n.qtr("Playlist")
-                    color: rootPlayer.colors.playerFg
-                    focus: false
-                    onClicked:  {
-                        if (mainInterface.playlistDocked)
-                            playlistpopup.showPlaylist = !playlistpopup.showPlaylist
-                        else
-                            mainInterface.playlistVisible = !mainInterface.playlistVisible
-                    }
-                    property bool acceptFocus: true
-
-                    KeyNavigation.left: menu_selector
-                }
-            }
         }
     }
 

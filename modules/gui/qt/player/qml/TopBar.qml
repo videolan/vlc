@@ -41,6 +41,12 @@ Widgets.NavigableFocusScope{
     property alias title: titleText.text
     property VLCColors colors: VLCStyle.nightColors
 
+    signal tooglePlaylistVisibility()
+
+    function forceFocusOnPlaylistButton() {
+        playlistButton.forceActiveFocus()
+    }
+
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)
 
@@ -108,6 +114,7 @@ Widgets.NavigableFocusScope{
                                 history.previous()
                             }
                             focus: true
+                            KeyNavigation.right: menuSelector
                         }
 
                         Image {
@@ -135,7 +142,69 @@ Widgets.NavigableFocusScope{
                         textFormat: Text.PlainText
                         elide: Text.ElideRight
                     }
+                }
 
+                Column {
+                    spacing: VLCStyle.margin_xxsmall
+                    Layout.alignment: Qt.AlignRight | Qt.AlignTop
+
+                    Loader {
+                        focus: false
+                        anchors.right: parent.right
+                        height: VLCStyle.icon_normal
+                        active: mainInterface.clientSideDecoration
+                        enabled: mainInterface.clientSideDecoration
+                        visible: mainInterface.clientSideDecoration
+                        source: "qrc:///widgets/CSDWindowButtonSet.qml"
+                        onLoaded: {
+                            item.color = Qt.binding(function() { return topFocusScope.colors.playerFg })
+                            item.hoverColor = Qt.binding(function() { return topFocusScope.colors.windowCSDButtonDarkBg })
+                        }
+                    }
+
+                    Row {
+                        anchors.right: parent.right
+                        anchors.rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xxsmall
+                        focus: true
+                        spacing: VLCStyle.margin_xxsmall
+
+                        Widgets.IconToolButton {
+                            id: menuSelector
+
+                            focus: true
+                            size: VLCStyle.banner_icon_size
+                            iconText: VLCIcons.ellipsis
+                            text: i18n.qtr("Menu")
+                            color: rootPlayer.colors.playerFg
+                            property bool acceptFocus: true
+
+                            onClicked: contextMenu.popup(this.mapToGlobal(0, height))
+
+                            KeyNavigation.left: backBtn
+                            KeyNavigation.right: playlistButton
+
+                            QmlGlobalMenu {
+                                id: contextMenu
+                                ctx: mainctx
+                            }
+                        }
+
+                        Widgets.IconToolButton {
+                            id: playlistButton
+
+                            objectName: PlayerControlBarModel.PLAYLIST_BUTTON
+                            size: VLCStyle.banner_icon_size
+                            iconText: VLCIcons.playlist
+                            text: i18n.qtr("Playlist")
+                            color: rootPlayer.colors.playerFg
+                            focus: false
+
+                            property bool acceptFocus: true
+
+                            KeyNavigation.left: menuSelector
+                            onClicked: tooglePlaylistVisibility()
+                        }
+                    }
                 }
             }
         }
