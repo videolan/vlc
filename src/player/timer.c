@@ -279,7 +279,8 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
             player->timer.last_ts = VLC_TICK_INVALID;
             force_update = true;
         }
-        if (player->timer.input_length != point->length)
+        if (player->timer.input_length != point->length
+         && point->length >= VLC_TICK_0)
         {
             player->timer.input_length = point->length;
             player->timer.last_ts = VLC_TICK_INVALID;
