@@ -86,141 +86,87 @@ Widgets.NavigableFocusScope {
         source: rootPlayer.coverSource
     }
 
-    Widgets.DrawerExt {
-        id: csdGroup
+    VideoSurface {
+        id: videoSurface
 
-        z: 4
-        anchors.right: parent.right
-        anchors.top: parent.top
-        state: topcontrolView.state
-        edge: Widgets.DrawerExt.Edges.Top
-        width: contentItem.width
-        focus: true
+        ctx: mainctx
+        visible: rootPlayer.hasEmbededVideo
+        enabled: rootPlayer.hasEmbededVideo
+        anchors.fill: parent
 
-        component: Column {
-            spacing: VLCStyle.margin_xxsmall
-            focus: true
+        property point mousePosition: Qt.point(0,0)
 
-            onActiveFocusChanged: if (activeFocus) menu_selector.forceActiveFocus()
-
-            Loader {
-                focus: false
-                anchors.right: parent.right
-                height: VLCStyle.icon_normal
-                active: mainInterface.clientSideDecoration
-                enabled: mainInterface.clientSideDecoration
-                visible: mainInterface.clientSideDecoration
-                source: "qrc:///widgets/CSDWindowButtonSet.qml"
-                onLoaded: {
-                    item.color = Qt.binding(function() { return rootPlayer.colors.playerFg })
-                    item.hoverColor = Qt.binding(function() { return rootPlayer.colors.windowCSDButtonDarkBg })
-                }
-            }
-
-            Row {
-                anchors.right: parent.right
-                anchors.rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xxsmall
-                focus: true
-                spacing: VLCStyle.margin_xxsmall
-                KeyNavigation.down: playlistpopup.state === "visible" ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
-
-                Widgets.IconToolButton {
-                    id: menu_selector
-
-                    focus: true
-                    size: VLCStyle.banner_icon_size
-                    iconText: VLCIcons.ellipsis
-                    text: i18n.qtr("Menu")
-                    color: rootPlayer.colors.playerFg
-                    property bool acceptFocus: true
-
-                    onClicked: contextMenu.popup(this.mapToGlobal(0, height))
-
-                    KeyNavigation.left: topcontrolView
-                    KeyNavigation.right: playlistBtn
-
-                    QmlGlobalMenu {
-                        id: contextMenu
-                        ctx: mainctx
-                    }
-                }
-
-                Widgets.IconToolButton {
-                    id: playlistBtn
-
-                    objectName: PlayerControlBarModel.PLAYLIST_BUTTON
-                    size: VLCStyle.banner_icon_size
-                    iconText: VLCIcons.playlist
-                    text: i18n.qtr("Playlist")
-                    color: rootPlayer.colors.playerFg
-                    focus: false
-                    onClicked:  {
-                        if (mainInterface.playlistDocked)
-                            playlistpopup.showPlaylist = !playlistpopup.showPlaylist
-                        else
-                            mainInterface.playlistVisible = !mainInterface.playlistVisible
-                    }
-                    property bool acceptFocus: true
-
-                    KeyNavigation.left: menu_selector
-                }
-            }
+        onMouseMoved:{
+            //short interval for mouse events
+            toolbarAutoHide.setVisible(1000)
+            mousePosition = Qt.point(x, y)
         }
     }
 
-    Widgets.DrawerExt {
-        id: playlistpopup
-
-        property bool showPlaylist: false
-        property var previousFocus: undefined
-
-        z: 2
-        anchors {
-            top: parent.top
-            right: parent.right
-            bottom: parent.bottom
-            bottomMargin: parent.height - rootPlayer.positionSliderY
-        }
+    // background image
+    Rectangle {
+        visible: !rootPlayer.hasEmbededVideo
         focus: false
-        edge: Widgets.DrawerExt.Edges.Right
-        state: showPlaylist && mainInterface.playlistDocked ? "visible" : "hidden"
-        component: Rectangle {
-            color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.banner, 0.8)
-            width: rootPlayer.width/4
-            height: playlistpopup.height
+        color: rootPlayer.colors.bg
+        anchors.fill: parent
 
-            PL.PlaylistListView {
-                id: playlistView
-                focus: true
+        Item {
+            //destination aspect ration
+            readonly property real dar: parent.width / parent.height
+
+            anchors.centerIn: parent
+            width: (cover.sar < dar) ? parent.width :  parent.height * cover.sar
+            height: (cover.sar < dar) ? parent.width / cover.sar :  parent.height
+
+            GaussianBlur {
+                id: blur
+
                 anchors.fill: parent
-
-                colors: rootPlayer.colors
-                navigationParent: rootPlayer
-                navigationUpItem: csdGroup
-                navigationDownItem: controlBarView
-                navigationLeft: closePlaylist
-                navigationCancel: closePlaylist
-
-                function closePlaylist() {
-                    playlistpopup.showPlaylist = false
-                    controlBarView.forceActiveFocus()
-                    if (audioControls.visible)
-                        audioControls.forceActiveFocus()
-                    else
-                        controlBarView.forceActiveFocus()
-                }
+                source: cover
+                samples: 102
+                radius: 50
+                visible: false
             }
-        }
-        onStateChanged: {
-            if (state === "hidden")
-                toolbarAutoHide.restart()
+
+            Rectangle {
+                id: blurOverlay
+
+                color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.playerBg, .55)
+                anchors.fill: parent
+                visible: false
+            }
+
+            Blend {
+                id:screen
+
+                anchors.fill: parent
+                foregroundSource: blurOverlay
+                source: blur
+                mode: "screen"
+                visible: false
+            }
+
+            Blend {
+                anchors.fill: parent
+                source: screen
+                foregroundSource: blurOverlay
+                mode: "multiply"
+            }
+
+            Rectangle {
+                id: colorOverlay
+
+                anchors.fill: parent
+                visible: true
+                opacity: .4
+                color: rootPlayer.colors.setColorAlpha(Qt.tint(rootPlayer.colors.playerFg, rootPlayer.colors.playerBg), 1)
+            }
         }
     }
 
     /// Backgrounds of topControlbar and controlBar are drawn separately since they outgrow their content
     /* top control bar background */
     Widgets.DrawerExt {
-        z: 1
         edge: Widgets.DrawerExt.Edges.Top
         state: topcontrolView.state
         width: parent.width
@@ -238,7 +184,6 @@ Widgets.NavigableFocusScope {
 
     /* bottom control bar background */
     Widgets.DrawerExt {
-        z: 1
         anchors.bottom: parent.bottom
         width: parent.width
         visible: rootPlayer.hasEmbededVideo
@@ -259,7 +204,6 @@ Widgets.NavigableFocusScope {
     //property alias centralLayout: mainLayout.centralLayout
     ColumnLayout {
         id: mainLayout
-        z: 1
         anchors.fill: parent
 
         Widgets.DrawerExt{
@@ -516,90 +460,134 @@ Widgets.NavigableFocusScope {
                 }
             }
         }
-
     }
 
-    //center image
-    Rectangle {
-        visible: !rootPlayer.hasEmbededVideo
-        focus: false
-        color: rootPlayer.colors.bg
-        anchors.fill: parent
+    Widgets.DrawerExt {
+        id: playlistpopup
 
-        z: 0
+        property bool showPlaylist: false
+        property var previousFocus: undefined
 
-        Item {
-            //destination aspect ration
-            readonly property real dar: parent.width / parent.height
-
-            anchors.centerIn: parent
-            width: (cover.sar < dar) ? parent.width :  parent.height * cover.sar
-            height: (cover.sar < dar) ? parent.width / cover.sar :  parent.height
-
-            GaussianBlur {
-                id: blur
-
-                anchors.fill: parent
-                source: cover
-                samples: 102
-                radius: 50
-                visible: false
-            }
-
-            Rectangle {
-                id: blurOverlay
-
-                color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.playerBg, .55)
-                anchors.fill: parent
-                visible: false
-            }
-
-            Blend {
-                id:screen
-
-                anchors.fill: parent
-                foregroundSource: blurOverlay
-                source: blur
-                mode: "screen"
-                visible: false
-            }
-
-            Blend {
-                anchors.fill: parent
-                source: screen
-                foregroundSource: blurOverlay
-                mode: "multiply"
-            }
-
-            Rectangle {
-                id: colorOverlay
-
-                anchors.fill: parent
-                visible: true
-                opacity: .4
-                color: rootPlayer.colors.setColorAlpha(Qt.tint(rootPlayer.colors.playerFg, rootPlayer.colors.playerBg), 1)
-            }
-
+        anchors {
+            top: parent.top
+            right: parent.right
+            bottom: parent.bottom
+            bottomMargin: parent.height - rootPlayer.positionSliderY
         }
+        focus: false
+        edge: Widgets.DrawerExt.Edges.Right
+        state: showPlaylist && mainInterface.playlistDocked ? "visible" : "hidden"
+        component: Rectangle {
+            color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.banner, 0.8)
+            width: rootPlayer.width/4
+            height: playlistpopup.height
 
+            PL.PlaylistListView {
+                id: playlistView
+                focus: true
+                anchors.fill: parent
+
+                colors: rootPlayer.colors
+                navigationParent: rootPlayer
+                navigationUpItem: csdGroup
+                navigationDownItem: controlBarView
+                navigationLeft: closePlaylist
+                navigationCancel: closePlaylist
+
+                function closePlaylist() {
+                    playlistpopup.showPlaylist = false
+                    controlBarView.forceActiveFocus()
+                    if (audioControls.visible)
+                        audioControls.forceActiveFocus()
+                    else
+                        controlBarView.forceActiveFocus()
+                }
+            }
+        }
+        onStateChanged: {
+            if (state === "hidden")
+                toolbarAutoHide.restart()
+        }
     }
 
-    VideoSurface {
-        id: videoSurface
+    Widgets.DrawerExt {
+        id: csdGroup
 
-        z: 0
+        anchors.right: parent.right
+        anchors.top: parent.top
+        state: topcontrolView.state
+        edge: Widgets.DrawerExt.Edges.Top
+        width: contentItem.width
+        focus: true
 
-        ctx: mainctx
-        visible: rootPlayer.hasEmbededVideo
-        enabled: rootPlayer.hasEmbededVideo
-        anchors.fill: parent
+        component: Column {
+            spacing: VLCStyle.margin_xxsmall
+            focus: true
 
-        property point mousePosition: Qt.point(0,0)
+            onActiveFocusChanged: if (activeFocus) menu_selector.forceActiveFocus()
 
-        onMouseMoved:{
-            //short interval for mouse events
-            toolbarAutoHide.setVisible(1000)
-            mousePosition = Qt.point(x, y)
+            Loader {
+                focus: false
+                anchors.right: parent.right
+                height: VLCStyle.icon_normal
+                active: mainInterface.clientSideDecoration
+                enabled: mainInterface.clientSideDecoration
+                visible: mainInterface.clientSideDecoration
+                source: "qrc:///widgets/CSDWindowButtonSet.qml"
+                onLoaded: {
+                    item.color = Qt.binding(function() { return rootPlayer.colors.playerFg })
+                    item.hoverColor = Qt.binding(function() { return rootPlayer.colors.windowCSDButtonDarkBg })
+                }
+            }
+
+            Row {
+                anchors.right: parent.right
+                anchors.rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xxsmall
+                focus: true
+                spacing: VLCStyle.margin_xxsmall
+                KeyNavigation.down: playlistpopup.state === "visible" ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
+
+                Widgets.IconToolButton {
+                    id: menu_selector
+
+                    focus: true
+                    size: VLCStyle.banner_icon_size
+                    iconText: VLCIcons.ellipsis
+                    text: i18n.qtr("Menu")
+                    color: rootPlayer.colors.playerFg
+                    property bool acceptFocus: true
+
+                    onClicked: contextMenu.popup(this.mapToGlobal(0, height))
+
+                    KeyNavigation.left: topcontrolView
+                    KeyNavigation.right: playlistBtn
+
+                    QmlGlobalMenu {
+                        id: contextMenu
+                        ctx: mainctx
+                    }
+                }
+
+                Widgets.IconToolButton {
+                    id: playlistBtn
+
+                    objectName: PlayerControlBarModel.PLAYLIST_BUTTON
+                    size: VLCStyle.banner_icon_size
+                    iconText: VLCIcons.playlist
+                    text: i18n.qtr("Playlist")
+                    color: rootPlayer.colors.playerFg
+                    focus: false
+                    onClicked:  {
+                        if (mainInterface.playlistDocked)
+                            playlistpopup.showPlaylist = !playlistpopup.showPlaylist
+                        else
+                            mainInterface.playlistVisible = !mainInterface.playlistVisible
+                    }
+                    property bool acceptFocus: true
+
+                    KeyNavigation.left: menu_selector
+                }
+            }
         }
     }
 
