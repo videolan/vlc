@@ -1176,7 +1176,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
 
     if (sys->regionQuad.generic.textureFormat != NULL)
     {
-        hr = D3D11_CompilePixelShader(vd, &sys->shaders, sys->d3d_dev, !sys->legacy_shader,
+        hr = D3D11_CompilePixelShader(vd, &sys->shaders, sys->d3d_dev, false,
                                       &sys->display, true, TRANSFER_FUNC_SRGB, COLOR_PRIMARIES_SRGB, true,
                                       &sys->regionQuad);
         if (FAILED(hr))
