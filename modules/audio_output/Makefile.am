@@ -12,7 +12,7 @@ endif
 
 
 libopensles_android_plugin_la_SOURCES = audio_output/opensles_android.c
-libopensles_android_plugin_la_LIBADD = $(LIBDL) $(LIBM)
+libopensles_android_plugin_la_LIBADD = libandroid_utils.la $(LIBDL) $(LIBM)
 
 libandroid_audiotrack_plugin_la_SOURCES = audio_output/audiotrack.c
 libandroid_audiotrack_plugin_la_CFLAGS = $(AM_CFLAGS)
