@@ -317,7 +317,7 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
 #ifdef HAVE_ID3D11VIDEODECODER
-    if (!is_d3d11_opaque(fmt->i_chroma) || sys->legacy_shader)
+    if (sys->legacy_shader)
     {
         /* we need a staging texture */
         ID3D11Texture2D *textures[DXGI_MAX_SHADER_VIEW] = {0};
@@ -598,7 +598,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
 
     /* Render the quad */
     ID3D11ShaderResourceView **renderSrc;
-    if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader)
+    if (sys->legacy_shader)
         renderSrc = sys->stagingSys.renderSrc;
     else {
         picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(picture);
@@ -1033,7 +1033,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     HRESULT hr;
 
     sys->legacy_shader = sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd) ||
-            BogusZeroCopy(vd);
+            BogusZeroCopy(vd) || !is_d3d11_opaque(fmt->i_chroma);
 
     hr = D3D11_CompilePixelShader(vd, &sys->shaders, sys->d3d_dev, !sys->legacy_shader,
                                   &sys->display, false, fmt->transfer, fmt->primaries,
