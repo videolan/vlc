@@ -87,8 +87,21 @@ SUFFIXES += -client-protocol.h -protocol.c .xml
 
 # Extract plugins and convenience libraries from the libtool libraries
 # being built, excluding the ones using them.
-PLUGINS = $(filter-out libvlc_plugin.la,$(filter %_plugin.la,$(LTLIBRARIES)))
-HELPERS = $(filter-out libvlc_static.la,$(filter-out %_plugin.la,$(LTLIBRARIES)))
+
+# String substitution containing a macro expansion is undefined
+ALL_TARGETS_1 := $(LTLIBRARIES)
+# Remove the special targets
+ALL_TARGETS_2 := $(ALL_TARGETS_1:libvlc_static.la=)
+ALL_TARGETS := $(ALL_TARGETS_2:libvlc_plugin.la=)
+
+# Remove the non-plugins, it needs intermediate steps because
+# we can only replace and not match inverse. Instead we;
+#  1/ replace plugins .la targets by plugins names
+#  2/ remove every word which is a .la target (ie. non-plugins)
+#  3/ rename every plugin name back into the target name
+ALL_TARGETS_PLUGIN_RENAMED := $(ALL_TARGETS:%_plugin.la=%)
+PLUGINS_NAMES := $(ALL_TARGETS_PLUGIN_RENAMED:%.la=)
+PLUGINS := $(PLUGINS_NAMES:%=%_plugin.la)
 
 plugin.c: $(PLUGINS)
 	echo "Compile VLC static modules list object"
