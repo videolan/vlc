@@ -26,11 +26,6 @@
 #include "file.h"
 #include "util.h"
 
-#include <sys/stat.h>
-#include <algorithm>
-#include <assert.h>
-#include <vector>
-#include <system_error>
 #include <vlc_common.h>
 #include <vlc_url.h>
 #include <vlc_input_item.h>
@@ -38,7 +33,13 @@
 #include <vlc_input.h>
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
+
+#include <algorithm>
+#include <assert.h>
 #include <medialibrary/filesystem/Errors.h>
+#include <sys/stat.h>
+#include <system_error>
+#include <vector>
 
 using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
                                               input_item_Hold,
@@ -64,7 +65,7 @@ SDDirectory::mrl() const
 const std::vector<std::shared_ptr<IFile>> &
 SDDirectory::files() const
 {
-    if (!m_read_done)
+    if ( !m_read_done )
         read();
     return m_files;
 }
@@ -72,7 +73,7 @@ SDDirectory::files() const
 const std::vector<std::shared_ptr<IDirectory>> &
 SDDirectory::dirs() const
 {
-    if (!m_read_done)
+    if ( !m_read_done )
         read();
     return m_dirs;
 }
@@ -80,8 +81,8 @@ SDDirectory::dirs() const
 std::shared_ptr<IDevice>
 SDDirectory::device() const
 {
-    if (!m_device)
-        m_device = m_fs.createDeviceFromMrl(mrl());
+    if ( !m_device )
+        m_device = m_fs.createDeviceFromMrl( mrl() );
     return m_device;
 }
 
@@ -138,13 +139,13 @@ static void onParserSubtreeAdded( input_item_t *, input_item_node_t *subtree,
 {
     auto req = static_cast<vlc::medialibrary::metadata_request*>( data );
 
-    for (int i = 0; i < subtree->i_children; ++i)
+    for ( int i = 0; i < subtree->i_children; ++i )
     {
-        input_item_node_t *child = subtree->pp_children[i];
+        input_item_node_t* child = subtree->pp_children[i];
         /* this class assumes we always receive a flat list */
-       assert(child->i_children == 0);
-       input_item_t *media = child->p_item;
-       req->children->emplace_back( media );
+        assert( child->i_children == 0 );
+        input_item_t* media = child->p_item;
+        req->children->emplace_back( media );
     }
 }
 
@@ -168,21 +169,20 @@ static bool request_metadata_sync( libvlc_int_t *libvlc, input_item_t *media,
         onParserSubtreeAdded,
     };
 
-    auto inputParser = vlc::wrap_cptr(
-        input_item_Parse( media, VLC_OBJECT( libvlc ), &cbs, &req ),
-        &input_item_parser_id_Release );
+    auto inputParser = vlc::wrap_cptr( input_item_Parse( media, VLC_OBJECT( libvlc ), &cbs, &req ),
+                                       &input_item_parser_id_Release );
 
-    if ( inputParser== nullptr )
+    if ( inputParser == nullptr )
         return false;
 
     vlc::threads::mutex_locker lock( req.lock );
     while ( req.probe == false )
     {
         auto res = req.cond.timedwait( req.lock, deadline );
-        if (res != 0 )
+        if ( res != 0 )
         {
-            throw medialibrary::fs::errors::System( ETIMEDOUT,
-                "Failed to browse network directory: Network is too slow" );
+            throw medialibrary::fs::errors::System(
+                ETIMEDOUT, "Failed to browse network directory: Network is too slow" );
         }
     }
     return req.success;
@@ -191,9 +191,9 @@ static bool request_metadata_sync( libvlc_int_t *libvlc, input_item_t *media,
 void
 SDDirectory::read() const
 {
-    auto media = vlc::wrap_cptr( input_item_New(m_mrl.c_str(), m_mrl.c_str()),
-                                 &input_item_Release );
-    if (!media)
+    auto media =
+        vlc::wrap_cptr( input_item_New( m_mrl.c_str(), m_mrl.c_str() ), &input_item_Release );
+    if ( !media )
         throw std::bad_alloc();
 
     std::vector<InputItemPtr> children;
@@ -201,21 +201,21 @@ SDDirectory::read() const
     input_item_AddOption( media.get(), "show-hiddenfiles", VLC_INPUT_OPTION_TRUSTED );
     input_item_AddOption( media.get(), "ignore-filetypes=''", VLC_INPUT_OPTION_TRUSTED );
     input_item_AddOption( media.get(), "sub-autodetect-fuzzy=2", VLC_INPUT_OPTION_TRUSTED );
-    auto status = request_metadata_sync( m_fs.libvlc(), media.get(), &children);
+    auto status = request_metadata_sync( m_fs.libvlc(), media.get(), &children );
 
     if ( status == false )
-        throw medialibrary::fs::errors::System( EIO,
-            "Failed to browse network directory: Unknown error" );
+        throw medialibrary::fs::errors::System(
+            EIO, "Failed to browse network directory: Unknown error" );
 
-    for (const InputItemPtr &m : children)
+    for ( const InputItemPtr& m : children )
     {
-        const char *mrl = m.get()->psz_uri;
+        const char* mrl = m.get()->psz_uri;
         enum input_item_type_e type = m->i_type;
-        if (type == ITEM_TYPE_DIRECTORY)
+        if ( type == ITEM_TYPE_DIRECTORY )
         {
-            m_dirs.push_back(std::make_shared<SDDirectory>(mrl, m_fs));
+            m_dirs.push_back( std::make_shared<SDDirectory>( mrl, m_fs ) );
         }
-        else if (type == ITEM_TYPE_FILE)
+        else if ( type == ITEM_TYPE_FILE )
         {
             addFile( mrl, IFile::LinkedFileType::None, {} );
             for ( auto i = 0; i < m->i_slaves; ++i )
