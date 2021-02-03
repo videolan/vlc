@@ -135,4 +135,4 @@ libvlc_plugin_la_LDFLAGS = \
 libvlc_plugin_la_LIBADD = $(PLUGINS)
 EXTRA_libvlc_plugin_la_DEPENDENCIES = plugin_static.c
 
-pkglib_LTLIBRARIES += libvlc_plugin.la libvlc_static.la
+pkglib_LTLIBRARIES += libvlc_plugin.la #libvlc_static.la
