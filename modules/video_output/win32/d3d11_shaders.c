@@ -39,7 +39,7 @@
 #include "d3d11_shaders.h"
 HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
                                  d3d11_device_t *d3d_dev,
-                                 bool texture_array, size_t texture_count,
+                                 bool texture_array,
                                  const display_info_t *display, bool sharp,
                                  video_transfer_func_t transfer,
                                  video_color_primaries_t primaries, bool src_full_range,
@@ -73,7 +73,7 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t 
     }
 
     hr = D3D_CompilePixelShader(o, compiler, d3d_dev->feature_level, texture_array,
-                                texture_count, display, transfer, primaries,
+                                display, transfer, primaries,
                                 src_full_range, quad->generic.textureFormat, pPSBlob);
 
     if (SUCCEEDED(hr))

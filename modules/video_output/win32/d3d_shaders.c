@@ -62,7 +62,7 @@ static const char* globPixelShaderDefault = "\
     float4x4 Colorspace;\n\
     float4x4 Primaries;\n\
   };\n\
-  Texture2D%s shaderTexture[%d];\n\
+  Texture2D%s shaderTexture[4];\n\
   SamplerState normalSampler : register(s0);\n\
   SamplerState borderSampler : register(s1);\n\
   \n\
@@ -294,7 +294,7 @@ static ID3DBlob* CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *c
 
 static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
                                    D3D_FEATURE_LEVEL feature_level,
-                                   bool texture_array, size_t texture_count,
+                                   bool texture_array,
                                    const char *psz_sampler,
                                    const char *psz_src_to_linear,
                                    const char *psz_primaries_transform,
@@ -305,7 +305,6 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
 {
     char *shader;
     int allocated = asprintf(&shader, globPixelShaderDefault, texture_array ? "Array" : "",
-                             texture_count * DXGI_MAX_SHADER_VIEW,
                              psz_src_to_linear, psz_linear_to_display,
                              psz_primaries_transform, psz_tone_mapping,
                              psz_adjust_range, psz_move_planes, psz_sampler);
@@ -337,7 +336,7 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
 
 HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
                                  D3D_FEATURE_LEVEL feature_level,
-                                 bool texture_array, size_t texture_count,
+                                 bool texture_array,
                                  const display_info_t *display,
                                  video_transfer_func_t transfer,
                                  video_color_primaries_t primaries, bool src_full_range,
@@ -368,6 +367,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                     "sample.z = 0.0;\n"
                     "sample.a = 1;";
             psz_sampler[1] =
+                    // TODO should be shaderTexture[0] ?
                     "sample.xy  = shaderTexture[1].Sample(samplerState, coords).xy;\n"
                     "sample.z = 0.0;\n"
                     "sample.a = 1;";
@@ -688,8 +688,8 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     }
 
     HRESULT hr;
-    hr = CompilePixelShaderBlob(o, compiler, feature_level, texture_array, texture_count,
-                                   psz_sampler[0],
+    hr = CompilePixelShaderBlob(o, compiler, feature_level, texture_array,
+                                psz_sampler[0],
                                    psz_src_to_linear,
                                    psz_primaries_transform,
                                    psz_linear_to_display,
@@ -697,7 +697,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                    psz_adjust_range, psz_move_planes[0], &pPSBlob[0]);
     if (SUCCEEDED(hr) && psz_sampler[1])
     {
-        hr = CompilePixelShaderBlob(o, compiler, feature_level, texture_array, texture_count,
+        hr = CompilePixelShaderBlob(o, compiler, feature_level, texture_array,
                                     psz_sampler[1],
                                     psz_src_to_linear,
                                     psz_primaries_transform,
