@@ -182,7 +182,7 @@ static bool request_metadata_sync( libvlc_int_t *libvlc, input_item_t *media,
         if ( res != 0 )
         {
             throw medialibrary::fs::errors::System(
-                ETIMEDOUT, "Failed to browse network directory: Network is too slow" );
+                ETIMEDOUT, "Failed to browse directory: Operation timed out" );
         }
     }
     return req.success;
@@ -205,7 +205,7 @@ SDDirectory::read() const
 
     if ( status == false )
         throw medialibrary::fs::errors::System(
-            EIO, "Failed to browse network directory: Unknown error" );
+            EIO, "Failed to browse directory: Unknown error" );
 
     for ( const InputItemPtr& m : children )
     {
