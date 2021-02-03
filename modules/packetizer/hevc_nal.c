@@ -1654,6 +1654,12 @@ hevc_sei_pic_timing_t * hevc_decode_sei_pic_timing( bs_t *p_bs,
     return p_timing;
 }
 
+bool hevc_decode_sei_recovery_point( bs_t *p_bs, hevc_sei_recovery_point_t *p_reco )
+{
+    p_reco->i_frames = bs_read_se( p_bs );
+    return true;
+}
+
 bool hevc_frame_is_progressive( const hevc_sequence_parameter_set_t *p_sps,
                                 const hevc_sei_pic_timing_t *p_timing )
 {

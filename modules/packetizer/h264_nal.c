@@ -861,3 +861,12 @@ bool h264_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
 
     return true;
 }
+
+bool h264_decode_sei_recovery_point( bs_t *p_bs, h264_sei_recovery_point_t *p_reco )
+{
+    p_reco->i_frames = bs_read_ue( p_bs );
+    //bool b_exact_match = bs_read( p_bs, 1 );
+    //bool b_broken_link = bs_read( p_bs, 1 );
+    //int i_changing_slice_group = bs_read( p_bs, 2 );
+    return true;
+}

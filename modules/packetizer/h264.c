@@ -1228,9 +1228,13 @@ static bool ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
             /* Look for SEI recovery point */
         case HXXX_SEI_RECOVERY_POINT:
         {
-            if( !p_sys->b_recovered )
-                msg_Dbg( p_dec, "Seen SEI recovery point, %d recovery frames", p_sei_data->recovery.i_frames );
-            p_sys->i_recovery_frame_cnt = p_sei_data->recovery.i_frames;
+            h264_sei_recovery_point_t reco;
+            if( !p_sys->b_recovered &&
+                h264_decode_sei_recovery_point( p_sei_data->p_bs, &reco ) )
+            {
+                msg_Dbg( p_dec, "Seen SEI recovery point, %u recovery frames", reco.i_frames );
+                p_sys->i_recovery_frame_cnt = reco.i_frames;
+            }
         } break;
 
         default:

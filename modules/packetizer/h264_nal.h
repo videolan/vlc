@@ -22,6 +22,7 @@
 
 # include <vlc_common.h>
 # include <vlc_es.h>
+# include <vlc_bits.h>
 
 #define PROFILE_H264_BASELINE             66
 #define PROFILE_H264_MAIN                 77
@@ -197,5 +198,12 @@ bool h264_get_colorimetry( const h264_sequence_parameter_set_t *p_sps,
 /* Get level and Profile from DecoderConfigurationRecord */
 bool h264_get_profile_level(const es_format_t *p_fmt, uint8_t *pi_profile,
                             uint8_t *pi_level, uint8_t *p_nal_length_size);
+
+typedef struct
+{
+    unsigned i_frames;
+} h264_sei_recovery_point_t;
+
+bool h264_decode_sei_recovery_point( bs_t *, h264_sei_recovery_point_t * );
 
 #endif /* H264_NAL_H */

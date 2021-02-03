@@ -375,6 +375,13 @@ hevc_sei_pic_timing_t * hevc_decode_sei_pic_timing( bs_t *,
                                                     const hevc_sequence_parameter_set_t * );
 void hevc_release_sei_pic_timing( hevc_sei_pic_timing_t * );
 
+typedef struct
+{
+    int i_frames;
+} hevc_sei_recovery_point_t;
+
+bool hevc_decode_sei_recovery_point( bs_t *, hevc_sei_recovery_point_t * );
+
 uint8_t hevc_get_num_clock_ts( const hevc_sequence_parameter_set_t *,
                                const hevc_sei_pic_timing_t * /* can be NULL */ );
 bool hevc_frame_is_progressive( const hevc_sequence_parameter_set_t *,

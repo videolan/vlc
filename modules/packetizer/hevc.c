@@ -1063,9 +1063,11 @@ static bool ParseSEICallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
         } break;
         case HXXX_SEI_RECOVERY_POINT:
         {
-            if( !p_sys->b_recovery_point )
+            hevc_sei_recovery_point_t reco;
+            if( !p_sys->b_recovery_point &&
+                hevc_decode_sei_recovery_point( p_sei_data->p_bs, &reco ) )
             {
-                msg_Dbg( p_dec, "Seen SEI recovery point, %d recovery frames", p_sei_data->recovery.i_frames );
+                msg_Dbg( p_dec, "Seen SEI recovery point, %d recovery frames", reco.i_frames );
                 p_sys->b_recovery_point = true;
             }
         } break;

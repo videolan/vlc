@@ -168,10 +168,7 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
             /* Look for SEI recovery point */
             case HXXX_SEI_RECOVERY_POINT:
             {
-                sei_data.recovery.i_frames = bs_read_ue( &s );
-                //bool b_exact_match = bs_read( &s, 1 );
-                //bool b_broken_link = bs_read( &s, 1 );
-                //int i_changing_slice_group = bs_read( &s, 2 );
+                sei_data.p_bs = &s;
                 b_continue = pf_callback( &sei_data, cbdata );
             } break;
 

@@ -75,10 +75,6 @@ typedef struct
         } frame_packing;
         struct
         {
-            int i_frames;
-        } recovery;
-        struct
-        {
             uint16_t primaries[3*2]; /* G,B,R / x,y */
             uint16_t white_point[2]; /* x,y */
             uint32_t max_luminance;
