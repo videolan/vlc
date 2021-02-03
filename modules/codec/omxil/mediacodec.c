@@ -946,6 +946,11 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             }
 
         }
+        else
+        {
+            p_dec->fmt_out.video.i_width = p_dec->fmt_in.video.i_width;
+            p_dec->fmt_out.video.i_height = p_dec->fmt_in.video.i_height;
+        }
         p_sys->cat = VIDEO_ES;
     }
     else
