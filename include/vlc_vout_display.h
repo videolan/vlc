@@ -223,7 +223,7 @@ typedef int (*vout_display_open_cb)(vout_display_t *vd,
 #define set_callback_display(activate, priority) \
     { \
         vout_display_open_cb open__ = activate; \
-        (void) open__; \
+        VLC_UNUSED(open__); \
         set_callback(activate) \
     } \
     set_capability( "vout display", priority )
