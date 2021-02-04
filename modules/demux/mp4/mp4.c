@@ -2686,7 +2686,17 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
         int64_t i_cts_shift = 0;
         const MP4_Box_t *p_cslg = MP4_BoxGet( p_demux_track->p_stbl, "cslg" );
         if( p_cslg && BOXDATA(p_cslg) )
+        {
             i_cts_shift = BOXDATA(p_cslg)->ct_to_dts_shift;
+        }
+        else if( ctts->i_entry_count ) /* Compute for Quicktime */
+        {
+            for( uint32_t i = 0; i < ctts->i_entry_count; i++ )
+            {
+                if( ctts->pi_sample_offset[i] < 0 && ctts->pi_sample_offset[i] < -i_cts_shift )
+                    i_cts_shift = -ctts->pi_sample_offset[i];
+            }
+        }
 
         /* Create pts-dts table per chunk */
         uint32_t i_index = 0;
