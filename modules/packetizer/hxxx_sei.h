@@ -51,6 +51,8 @@ typedef struct
                 {
                     const uint8_t *p_data;
                     size_t i_data;
+                    const uint8_t *p_rawdata;
+                    size_t i_rawdata;
                 } cc;
             } u;
         } itu_t35;
