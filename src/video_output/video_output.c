@@ -147,6 +147,7 @@ typedef struct vout_thread_sys_t
     vout_display_cfg_t display_cfg;
     vout_display_t *display;
     vlc_mutex_t     display_lock;
+    vlc_mutex_t     render_lock;
 
     /* Video filter2 chain */
     struct {
@@ -665,9 +666,9 @@ void vout_ChangeDisplayRenderingEnabled(vout_thread_t *vout, bool enabled)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
-    vlc_mutex_lock(&sys->display_lock);
+    vlc_mutex_lock(&sys->render_lock);
     sys->rendering_enabled = enabled;
-    vlc_mutex_unlock(&sys->display_lock);
+    vlc_mutex_unlock(&sys->render_lock);
 }
 
 void vout_ControlChangeFilters(vout_thread_t *vout, const char *filters)
@@ -1164,6 +1165,8 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
     // hold it as the filter chain will release it or return it and we release it
     picture_Hold(sys->displayed.current);
 
+    vlc_mutex_lock(&sys->render_lock);
+
     vout_chrono_Start(&sys->render);
 
     vlc_mutex_lock(&sys->filter.lock);
@@ -1171,7 +1174,10 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
     vlc_mutex_unlock(&sys->filter.lock);
 
     if (!filtered)
+    {
+        vlc_mutex_unlock(&sys->render_lock);
         return VLC_EGENERIC;
+    }
 
     if (filtered->date != sys->displayed.current->date)
         msg_Warn(&vout->obj, "Unsupported timestamp modifications done by chain_interactive");
@@ -1323,6 +1329,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
     todisplay = vout_ConvertForDisplay(vd, todisplay);
     if (todisplay == NULL) {
         vlc_mutex_unlock(&sys->display_lock);
+        vlc_mutex_unlock(&sys->render_lock);
 
         if (subpic != NULL)
             subpicture_Delete(subpic);
@@ -1348,10 +1355,13 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
     const unsigned frame_rate = todisplay->format.i_frame_rate;
     const unsigned frame_rate_base = todisplay->format.i_frame_rate_base;
 
-    if (vd->ops->prepare != NULL)
-        vd->ops->prepare(vd, todisplay, do_dr_spu ? subpic : NULL, system_pts);
+    if (sys->rendering_enabled)
+    {
+        if (vd->ops->prepare != NULL)
+            vd->ops->prepare(vd, todisplay, do_dr_spu ? subpic : NULL, system_pts);
 
-    vout_chrono_Stop(&sys->render);
+        vout_chrono_Stop(&sys->render);
+    }
 #if 0
         {
         static int i = 0;
@@ -1400,8 +1410,10 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
                           frame_rate, frame_rate_base);
 
     /* Display the direct buffer returned by vout_RenderPicture */
-
-    vout_display_Display(vd, todisplay);
+    if (sys->rendering_enabled)
+        vout_display_Display(vd, todisplay);
+    else
+        picture_Release(todisplay);
 
     vlc_tick_t now_ts = vlc_tick_now();
     msg_Info( vd, "avstats: ts=%" PRId64 ", [RENDER][VIDEO], pts_per_vsync=%" PRId64 " pts=%" PRId64 " pcr=%" PRId64,
@@ -1411,6 +1423,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
               NS_FROM_VLC_TICK(system_now - clock_offset));
 
     vlc_mutex_unlock(&sys->display_lock);
+    vlc_mutex_unlock(&sys->render_lock);
 
     if (subpic)
         subpicture_Delete(subpic);
@@ -2106,6 +2119,7 @@ vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
     /* Display */
     sys->display = NULL;
     vlc_mutex_init(&sys->display_lock);
+    vlc_mutex_init(&sys->render_lock);
 
     /* Window */
     sys->window_width = sys->window_height = 0;
