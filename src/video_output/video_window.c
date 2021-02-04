@@ -240,6 +240,26 @@ static void vout_display_window_IccEvent(vlc_window_t *window,
     vout_ChangeIccProfile(vout, profile);
 }
 
+static void vout_display_window_VisibilityChanged(
+        vlc_window_t *window, enum vlc_window_visibility visibility)
+{
+    vout_display_window_t *state = window->owner.sys;
+    vout_thread_t *vout = state->vout;
+
+    switch (visibility)
+    {
+        case VLC_WINDOW_VISIBLE:
+            msg_Dbg(window, "enable rendering");
+            vout_ChangeDisplayRenderingEnabled(vout, true);
+            break;
+
+        case VLC_WINDOW_NOT_VISIBLE:
+            msg_Dbg(window, "disabling rendering");
+            vout_ChangeDisplayRenderingEnabled(vout, false);
+            break;
+    }
+}
+
 static const struct vlc_window_callbacks vout_display_window_cbs = {
     .resized = vout_display_window_ResizeNotify,
     .closed = vout_display_window_CloseNotify,
@@ -250,6 +270,7 @@ static const struct vlc_window_callbacks vout_display_window_cbs = {
     .keyboard_event = vout_display_window_KeyboardEvent,
     .output_event = vout_display_window_OutputEvent,
     .icc_event = vout_display_window_IccEvent,
+    .visibility_changed = vout_display_window_VisibilityChanged,
 };
 
 void vout_display_window_SetMouseHandler(vlc_window_t *window,
