@@ -354,12 +354,12 @@ VLC_METADATA_EXPORTS
         goto error;
 
 #define set_callback(activate) \
-    if (vlc_module_set(VLC_MODULE_CB_OPEN, #activate, (void *)(activate))) \
+    if (vlc_module_set(VLC_MODULE_CB_OPEN, MODULE_STRING "__" #activate, (void *)(activate))) \
         goto error;
 
 #define set_callbacks( activate, deactivate ) \
     set_callback(activate) \
-    if (vlc_module_set(VLC_MODULE_CB_CLOSE, #deactivate, \
+    if (vlc_module_set(VLC_MODULE_CB_CLOSE, MODULE_STRING "__" #deactivate, \
                        (void (*)(vlc_object_t *))( deactivate ))) \
         goto error;
 
