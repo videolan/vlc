@@ -157,6 +157,7 @@ void vout_ChangeDisplayFilled(vout_thread_t *, bool is_filled);
 void vout_ChangeZoom(vout_thread_t *, unsigned num, unsigned den);
 void vout_ChangeDisplayAspectRatio(vout_thread_t *, unsigned num, unsigned den);
 void vout_ChangeCrop(vout_thread_t *, const struct vout_crop *);
+void vout_ChangeDisplayRenderingEnabled(vout_thread_t *, bool);
 void vout_ControlChangeFilters(vout_thread_t *, const char *);
 void vout_ControlChangeInterlacing(vout_thread_t *, bool);
 void vout_ControlChangeSubSources(vout_thread_t *, const char *);
