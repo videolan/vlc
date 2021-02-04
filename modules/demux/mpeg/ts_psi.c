@@ -101,20 +101,21 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
         return;
     }
 
-    /* check versioning changes */
-    if( !p_pat->b_generated )
+    /* override hotfixes */
+    if( p_pat->b_generated )
     {
-        /* override hotfixes */
-        if( ( p_pat->i_version != -1 && p_dvbpsipat->i_version == p_pat->i_version ) ||
-            ( p_pat->i_ts_id != -1 && p_dvbpsipat->i_ts_id != p_pat->i_ts_id ) )
-        {
-            dvbpsi_pat_delete( p_dvbpsipat );
-            return;
-        }
-    }
-    else if( p_pat->i_version != -1 )
-    {
+        p_pat->b_generated = false;
+        p_pat->i_version = -1;
+        p_pat->i_ts_id = -1;
         msg_Warn( p_demux, "Replacing generated PAT with one received from stream" );
+    }
+
+    /* check versioning changes */
+    if( ( p_pat->i_version != -1 && p_dvbpsipat->i_version == p_pat->i_version ) ||
+        ( p_pat->i_ts_id != -1 && p_dvbpsipat->i_ts_id != p_pat->i_ts_id ) )
+    {
+        dvbpsi_pat_delete( p_dvbpsipat );
+        return;
     }
 
     /* check content */
@@ -208,7 +209,6 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
     }
     p_pat->i_version = p_dvbpsipat->i_version;
     p_pat->i_ts_id = p_dvbpsipat->i_ts_id;
-    p_pat->b_generated = false;
 
     for(int i=0; i<old_pmt_rm.i_size; i++)
     {
