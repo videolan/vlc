@@ -280,19 +280,14 @@ Widgets.NavigableFocusScope {
         }
 
         ColumnLayout {
-            anchors.fill: parent
+            anchors.centerIn: parent
             spacing: 0
             visible: !rootPlayer.hasEmbededVideo
 
             Item {
-                Layout.fillHeight: true
-            }
-
-            Item {
-                Layout.preferredHeight: Math.max(Math.min(parent.height, parent.width - VLCStyle.margin_small * 2), 0)
-                Layout.maximumHeight: rootPlayer.height / 2.7182
-                Layout.minimumHeight: 1
+                Layout.preferredHeight: rootPlayer.height / 2.7182
                 Layout.preferredWidth: height * cover.sar
+                Layout.maximumHeight: centerContent.height
                 Layout.alignment: Qt.AlignHCenter
 
                 Image {
@@ -319,8 +314,7 @@ Widgets.NavigableFocusScope {
             Widgets.SubtitleLabel {
                 id: albumLabel
 
-                Layout.fillWidth: true
-                Layout.preferredHeight: implicitHeight
+                Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: VLCStyle.margin_xxlarge
 
                 visible: centerContent.height > (albumLabel.y + albumLabel.height)
@@ -334,8 +328,7 @@ Widgets.NavigableFocusScope {
             Widgets.MenuLabel {
                 id: artistLabel
 
-                Layout.fillWidth: true
-                Layout.preferredHeight: implicitHeight
+                Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: VLCStyle.margin_small
 
                 visible: centerContent.height > (artistLabel.y + artistLabel.height)
@@ -349,10 +342,9 @@ Widgets.NavigableFocusScope {
             Widgets.NavigableRow {
                 id: audioControls
 
-                Layout.preferredHeight: implicitHeight
-                Layout.preferredWidth: implicitWidth
-                Layout.topMargin: VLCStyle.margin_large
                 Layout.alignment: Qt.AlignHCenter
+                Layout.topMargin: VLCStyle.margin_large
+
                 visible: player.videoTracks.count === 0 && centerContent.height > (audioControls.y + audioControls.height)
                 focus: visible
                 spacing: VLCStyle.margin_xxsmall
@@ -385,10 +377,6 @@ Widgets.NavigableFocusScope {
                         color: rootPlayer.colors.playerFg
                     }
                 }
-            }
-
-            Item {
-                Layout.fillHeight: true
             }
         }
     }
