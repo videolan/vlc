@@ -154,6 +154,7 @@ typedef struct
 #define DEMUX_TRACK_MAX_PRELOAD VLC_TICK_FROM_SEC(15) /* maximum preloading, to deal with interleaving */
 
 #define INVALID_PRELOAD  UINT_MAX
+#define UNKNOWN_DELTA    UINT32_MAX
 
 #define VLC_DEMUXER_EOS (VLC_DEMUXER_EGENERIC - 1)
 #define VLC_DEMUXER_FATAL (VLC_DEMUXER_EGENERIC - 2)
@@ -409,10 +410,7 @@ static void MP4_TrackTimeApplyELST( const mp4_track_t *p_track,
 static inline vlc_tick_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
 {
     VLC_UNUSED(p_demux);
-    const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
-
-    stime_t sdts = MP4_ChunkGetSampleDTS( p_chunk,
-                                          p_track->i_sample - p_chunk->i_sample_first );
+    stime_t sdts = p_track->i_next_dts;
 
     /* now handle elst */
     MP4_TrackTimeApplyELST( p_track, &sdts );
@@ -424,9 +422,8 @@ static inline bool MP4_TrackGetPTSDelta( demux_t *p_demux, const mp4_track_t *p_
                                          vlc_tick_t *pi_delta )
 {
     VLC_UNUSED( p_demux );
-    const mp4_chunk_t *ck = &p_track->chunk[p_track->i_chunk];
-    stime_t delta;
-    if( !MP4_ChunkGetSampleCTSDelta( ck, p_track->i_sample - ck->i_sample_first, &delta ) )
+    uint32_t delta = p_track->i_next_delta;
+    if( delta == UNKNOWN_DELTA )
         return false;
     *pi_delta = MP4_rescale_mtime( delta, p_track->i_timescale );
     return true;
@@ -3320,6 +3317,18 @@ static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
     return p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
+static void TrackUpdateSampleAndTimes( mp4_track_t *p_track )
+{
+    const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
+    uint32_t i_chunk_sample = p_track->i_sample - p_chunk->i_sample_first;
+    p_track->i_next_dts = MP4_ChunkGetSampleDTS( p_chunk, i_chunk_sample );
+    stime_t i_next_delta;
+    if( !MP4_ChunkGetSampleCTSDelta( p_chunk, i_chunk_sample, &i_next_delta ) )
+        p_track->i_next_delta = UNKNOWN_DELTA;
+    else
+        p_track->i_next_delta = i_next_delta;
+}
+
 /****************************************************************************
  * MP4_TrackSetup:
  ****************************************************************************
@@ -3510,6 +3519,8 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
         return; /* cannot create chunks index */
     }
 
+    p_track->i_next_dts = 0;
+    p_track->i_next_delta = UNKNOWN_DELTA;
     p_track->i_chunk  = 0;
     p_track->i_sample = 0;
 
@@ -3674,7 +3685,10 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
 
     p_track->b_selected = true;
     if( !TrackGotoChunkSample( p_demux, p_track, i_chunk, i_sample ) )
+    {
         p_track->b_selected = true;
+        TrackUpdateSampleAndTimes( p_track );
+    }
 
     return p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC;
 }
@@ -4005,6 +4019,8 @@ static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track, uint32_t
             return VLC_EGENERIC;
         }
     }
+
+    TrackUpdateSampleAndTimes( p_track );
 
     /* Have we changed elst */
     if( p_track->p_elst && p_track->BOXDATA(p_elst)->i_entry_count > 0 )
