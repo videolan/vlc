@@ -2707,6 +2707,14 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                     i_cts_shift = -ctts->pi_sample_offset[i];
             }
         }
+        else if( ctts->i_entry_count ) /* Compute for Quicktime */
+        {
+            for( uint32_t i = 0; i < ctts->i_entry_count; i++ )
+            {
+                if( ctts->pi_sample_offset[i] < 0 && ctts->pi_sample_offset[i] < -i_cts_shift )
+                    i_cts_shift = -ctts->pi_sample_offset[i];
+            }
+        }
 
         /* Create pts-dts table per chunk */
         uint32_t i_index = 0;
