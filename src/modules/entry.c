@@ -553,6 +553,7 @@ vlc_plugin_t *vlc_plugin_describe(vlc_plugin_cb entry)
 
 struct vlc_plugin_symbol
 {
+    const char *capability;
     const char *name;
     void *addr;
 };
@@ -561,51 +562,19 @@ static int vlc_plugin_symbol_compare(const void *a, const void *b)
 {
     const struct vlc_plugin_symbol *sa = a , *sb = b;
 
+    int ret = strcmp(sa->capability, sb->capability);
+    if (ret != 0)
+        return ret;
+
     return strcmp(sa->name, sb->name);
 }
 
-/**
- * Plug-in symbols callback.
- *
- * This callback generates a mapping of plugin symbol names to symbol
- * addresses.
- */
-static int vlc_plugin_gpa_cb(void *ctx, void *tgt, int propid, ...)
+static int RegisterSymbol(void *rootp, const char *capability,
+                          const char *name, void *addr)
 {
-    void **rootp = ctx;
-    const char *name;
-    void *addr;
-
-    (void) tgt;
-
-    switch (propid)
-    {
-        case VLC_MODULE_CB_OPEN:
-        {
-            va_list ap;
-
-            va_start(ap, propid);
-            name = va_arg(ap, const char *);
-            addr = va_arg(ap, void *);
-            va_end (ap);
-            break;
-        }
-        case VLC_MODULE_CB_CLOSE:
-        {
-            va_list ap;
-
-            va_start(ap, propid);
-            name = va_arg(ap, const char *);
-            addr = va_arg(ap, vlc_deactivate_cb);
-            va_end(ap);
-            break;
-        }
-        default:
-            return 0;
-    }
-
     struct vlc_plugin_symbol *sym = malloc(sizeof (*sym));
 
+    sym->capability = capability;
     sym->name = name;
     sym->addr = addr;
 
@@ -618,12 +587,103 @@ static int vlc_plugin_gpa_cb(void *ctx, void *tgt, int propid, ...)
 
     if (*symp != sym)
     {   /* Duplicate symbol */
+        struct vlc_plugin_symbol *symp_duplicate = *symp;
+        fprintf(stderr, "Duplicate symbol for name %s, taken by %s\n", name, symp_duplicate->name);
 #ifndef NDEBUG
         const struct vlc_plugin_symbol *oldsym = *symp;
         assert(oldsym->addr == sym->addr);
 #endif
         free(sym);
     }
+    else
+        fprintf(stderr, "Registering symbol with name %s\n", name);
+    return 0;
+}
+
+struct vlc_plugin_gpa_context {
+    void **rootp;
+    const char *capability;
+
+    struct {
+        const char *name;
+        void (*addr)();
+    } activate, deactivate;
+};
+
+
+/**
+ * Plug-in symbols callback.
+ *
+ * This callback generates a mapping of plugin symbol names to symbol
+ * addresses.
+ */
+static int vlc_plugin_gpa_cb(void *ctx, void *tgt, int propid, ...)
+{
+    struct vlc_plugin_gpa_context *context = ctx;
+    void **rootp = context->rootp;
+
+    (void) tgt;
+
+    switch (propid)
+    {
+        case VLC_MODULE_CAPABILITY:
+        {
+            va_list ap;
+
+            va_start(ap, propid);
+            context->capability = va_arg(ap, const char *);
+            va_end (ap);
+            break;
+        }
+        case VLC_MODULE_CB_OPEN:
+        {
+            va_list ap;
+
+            va_start(ap, propid);
+            context->activate.name = va_arg(ap, const char *);
+            context->activate.addr = va_arg(ap, void *);
+            va_end (ap);
+            break;
+        }
+        case VLC_MODULE_CB_CLOSE:
+        {
+            va_list ap;
+
+            va_start(ap, propid);
+            context->deactivate.name = va_arg(ap, const char *);
+            context->deactivate.addr = va_arg(ap, vlc_deactivate_cb);
+            va_end(ap);
+            break;
+        }
+        default:
+            return 0;
+    }
+
+    if (context->capability == NULL ||
+       (context->activate.addr == NULL && context->deactivate.addr == NULL))
+    {
+        /* Wait until we have both a capability and a function to register/ */
+        return 0;
+    }
+
+    if (context->activate.addr)
+    {
+        int ret = RegisterSymbol(rootp, context->capability,
+                                 context->activate.name,
+                                 context->activate.addr);
+        context->activate.addr = NULL;
+        if (ret != 0) return ret;
+    }
+
+    if (context->deactivate.addr)
+    {
+        int ret = RegisterSymbol(rootp, context->capability,
+                                 context->deactivate.name,
+                                 context->deactivate.addr);
+        context->deactivate.addr = NULL;
+        if (ret != 0) return ret;
+    }
+
     return 0;
 }
 
@@ -640,8 +700,17 @@ static int vlc_plugin_gpa_cb(void *ctx, void *tgt, int propid, ...)
 static void *vlc_plugin_get_symbols(vlc_plugin_cb entry)
 {
     void *root = NULL;
+    struct vlc_plugin_gpa_context context =
+    {
+        .rootp = &root,
+        .capability = NULL,
+        .activate.name = NULL,
+        .activate.addr = NULL,
+        .deactivate.name = NULL,
+        .deactivate.addr = NULL,
+    };
 
-    if (entry(vlc_plugin_gpa_cb, &root))
+    if (entry(vlc_plugin_gpa_cb, &context))
     {
         tdestroy(root, free);
         return NULL;
