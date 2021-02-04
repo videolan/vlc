@@ -109,12 +109,9 @@ Widgets.NavigableFocusScope {
         enabled: rootPlayer.hasEmbededVideo
         anchors.fill: parent
 
-        property point mousePosition: Qt.point(0,0)
-
-        onMouseMoved:{
+        onMouseMoved: {
             //short interval for mouse events
             toolbarAutoHide.setVisible(1000)
-            mousePosition = Qt.point(x, y)
         }
     }
 
@@ -260,7 +257,6 @@ Widgets.NavigableFocusScope {
 
         z: 1
         edge: Widgets.DrawerExt.Edges.Top
-
         state: "visible"
 
         component: FocusScope {
@@ -272,12 +268,10 @@ Widgets.NavigableFocusScope {
                 id: topbar
 
                 anchors.fill: parent
-
                 focus: true
                 visible: !resumeDialog.visible
                 title: mainPlaylistController.currentItem.title
                 colors: rootPlayer.colors
-
                 navigationParent: rootPlayer
                 navigationDownItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
 
@@ -474,7 +468,6 @@ Widgets.NavigableFocusScope {
         id: playlistpopup
 
         property bool showPlaylist: false
-        property var previousFocus: undefined
 
         anchors {
             top: parent.top
@@ -504,7 +497,6 @@ Widgets.NavigableFocusScope {
 
                 function closePlaylist() {
                     playlistpopup.showPlaylist = false
-                    controlBarView.forceActiveFocus()
                     if (audioControls.visible)
                         audioControls.forceActiveFocus()
                     else

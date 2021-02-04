@@ -29,18 +29,13 @@ import "qrc:///menus/" as Menus
 Widgets.NavigableFocusScope{
     id: topFocusScope
 
-    implicitHeight: topcontrolContent.implicitHeight
-
     property alias title: titleText.text
     property VLCColors colors: VLCStyle.nightColors
 
     signal tooglePlaylistVisibility()
     signal requestLockUnlockAutoHide(bool lock, var source)
 
-    function forceFocusOnPlaylistButton() {
-        playlistButton.forceActiveFocus()
-    }
-
+    implicitHeight: topcontrolContent.implicitHeight
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)
 

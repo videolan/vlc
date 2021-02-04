@@ -37,8 +37,6 @@ Widgets.NavigableFocusScope {
         LeftRightSlider
     }
 
-    signal showTrackBar()
-
     readonly property alias sliderY: row2.y
     property int textPosition: ControlBar.TimeTextPosition.AboveSlider
     property VLCColors colors: VLCStyle.nightColors
