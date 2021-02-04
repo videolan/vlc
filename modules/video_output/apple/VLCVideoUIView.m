@@ -90,6 +90,7 @@
 - (void)tapRecognized:(UITapGestureRecognizer *)tapRecognizer;
 - (void)enable;
 - (void)disable;
+- (void)applicationStateChanged:(NSNotification*)notification;
 @end
 
 /*****************************************************************************
@@ -120,6 +121,14 @@
     _tapRecognizer = [[UITapGestureRecognizer alloc]
         initWithTarget:self action:@selector(tapRecognized:)];
 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationStateChanged:)
+                                                 name:UIApplicationWillEnterForegroundNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationStateChanged:)
+                                                 name:UIApplicationWillResignActiveNotification
+                                               object:nil];
     CGSize size = _viewContainer.bounds.size;
     [self reportEvent:^{
         vout_window_ReportSize(_wnd, size.width, size.height);
@@ -322,6 +331,24 @@
 {
     [super updateConstraints];
     [self reshape];
+}
+
+- (void)applicationStateChanged:(NSNotification *)notification
+{
+    vlc_mutex_lock(&_mutex);
+
+    if (_wnd == NULL)
+    {
+        vlc_mutex_unlock(&_mutex);
+        return;
+    }
+
+    if ([[notification name] isEqualToString:UIApplicationWillEnterForegroundNotification])
+        vout_window_ReportVisibilityChanged(_wnd, VOUT_WINDOW_VISIBLE);
+    else if ([[notification name] isEqualToString:UIApplicationWillResignActiveNotification])
+        vout_window_ReportVisibilityChanged(_wnd, VOUT_WINDOW_NOT_VISIBLE);
+
+    vlc_mutex_unlock(&_mutex);
 }
 
 /* Subview are expected to fill the whole frame so tell the compositor
