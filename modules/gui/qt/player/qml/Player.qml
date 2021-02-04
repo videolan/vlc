@@ -164,7 +164,7 @@ Widgets.NavigableFocusScope {
         }
     }
 
-    /// Backgrounds of topControlbar and controlBar are drawn separately since they outgrow their content
+    /// Backgrounds of topControlbar and controlBar are drawn separately since they can outgrow their content
     /* top control bar background */
     Widgets.DrawerExt {
         edge: Widgets.DrawerExt.Edges.Top
@@ -184,19 +184,52 @@ Widgets.NavigableFocusScope {
 
     /* bottom control bar background */
     Widgets.DrawerExt {
-        anchors.bottom: parent.bottom
-        width: parent.width
-        visible: rootPlayer.hasEmbededVideo
+        anchors.bottom: controlBarView.bottom
+        anchors.left: controlBarView.left
+        anchors.right: controlBarView.right
+        height: contentItem.height
         edge: Widgets.DrawerExt.Edges.Bottom
-        state: topcontrolView.state
-        height: VLCStyle.dp(206, VLCStyle.scale)
-        component: Rectangle {
-            width: rootPlayer.width
-            height: VLCStyle.dp(206, VLCStyle.scale)
-            gradient: Gradient {
-                GradientStop { position: 0; color: "transparent" }
-                GradientStop { position: .64; color: Qt.rgba(0, 0, 0, .8) }
-                GradientStop { position: 1; color: "black" }
+        state: controlBarView.state
+        component: rootPlayer.hasEmbededVideo ? forVideoMedia : forMusicMedia
+
+        Component {
+            id: forVideoMedia
+
+            Rectangle {
+                width: rootPlayer.width
+                height: VLCStyle.dp(206, VLCStyle.scale)
+                gradient: Gradient {
+                    GradientStop { position: 0; color: "transparent" }
+                    GradientStop { position: .64; color: Qt.rgba(0, 0, 0, .8) }
+                    GradientStop { position: 1; color: "black" }
+                }
+            }
+        }
+
+        Component {
+            id: forMusicMedia
+
+            Item {
+                width: controlBarView.width
+                height: controlBarView.height - (rootPlayer.positionSliderY - controlBarView.y)
+
+                Rectangle {
+                    id: controlBarBackground
+
+                    anchors.fill: parent
+                    visible: false
+                    color: rootPlayer.colors.isThemeDark
+                           ? Qt.darker(rootPlayer.colors.playerBg, 1.2)
+                           : Qt.lighter(rootPlayer.colors.playerBg, 1.2)
+                }
+
+                GaussianBlur {
+                    anchors.fill: parent
+                    source: controlBarBackground
+                    radius: 22
+                    samples: 46
+                    opacity: .7
+                }
             }
         }
     }
@@ -401,30 +434,6 @@ Widgets.NavigableFocusScope {
             width: controlBarView.width
             height: controllerId.implicitHeight + controllerId.anchors.bottomMargin
             property alias autoHide: controllerId.autoHide
-
-            Item {
-                anchors.fill: parent
-                anchors.topMargin: rootPlayer.positionSliderY - controlBarView.y
-                visible: !rootPlayer.hasEmbededVideo
-
-                Rectangle {
-                    id: controlBarBackground
-
-                    anchors.fill: parent
-                    visible: false
-                    color: rootPlayer.colors.isThemeDark
-                           ? Qt.darker(rootPlayer.colors.playerBg, 1.2)
-                           : Qt.lighter(rootPlayer.colors.playerBg, 1.2)
-                }
-
-                GaussianBlur {
-                    anchors.fill: parent
-                    source: controlBarBackground
-                    radius: 22
-                    samples: 46
-                    opacity: .7
-                }
-            }
 
             MouseArea {
                 id: controllerMouseArea
