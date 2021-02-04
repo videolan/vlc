@@ -79,7 +79,7 @@
  *****************************************************************************/
 
 /* Maximum gap allowed between two CRs. */
-#define CR_MAX_GAP VLC_TICK_FROM_SEC(60)
+#define CR_MAX_GAP VLC_TICK_FROM_SEC(5)
 
 /* Latency introduced on DVDs with CR == 0 on chapter change - this is from
  * my dice --Meuuh */
@@ -116,6 +116,9 @@ struct input_clock_t
     /* Clock drift */
     vlc_tick_t i_next_drift_update;
     average_t drift;
+
+    average_t system_avg;
+    average_t stream_avg;
 
     /* Late statistics */
     struct
@@ -176,6 +179,8 @@ input_clock_t *input_clock_New( float rate )
 
     cl->i_next_drift_update = VLC_TICK_INVALID;
     AvgInit( &cl->drift, 10 );
+    AvgInit( &cl->system_avg, 10 );
+    AvgInit( &cl->stream_avg, 10 );
 
     cl->late.i_index = 0;
     for( int i = 0; i < INPUT_CLOCK_LATE_COUNT; i++ )
@@ -227,18 +232,35 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         /* */
         b_reset_reference= true;
     }
-    else if( cl->last.stream != VLC_TICK_INVALID &&
-             ( (cl->last.stream - i_ck_stream) > CR_MAX_GAP ||
-               (cl->last.stream - i_ck_stream) < -CR_MAX_GAP ) )
+    else if( cl->last.stream != VLC_TICK_INVALID )
     {
-        /* Stream discontinuity, for which we haven't received a
-         * warning from the stream control facilities (dd-edited
-         * stream ?). */
-        msg_Warn( p_log, "clock gap, unexpected stream discontinuity" );
+        const vlc_tick_t stream_diff = i_ck_stream - cl->last.stream;
+        const vlc_tick_t system_diff = i_ck_system - cl->last.system;
 
-        /* */
-        msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
-        b_reset_reference= true;
+        if (stream_diff > CR_MAX_GAP || stream_diff < - CR_MAX_GAP)
+        {
+            /* Possible unexpected stream discontinuity, do a finer calcul to
+             * detect it. The stream gap need to be comparated with the system
+             * gap (if system and stream gap are the same then it's not a
+             * discontinuity) */
+
+            const double system_gap = fabs(system_diff - AvgGet( &cl->system_avg));
+            const double stream_gap = fabs(stream_diff - AvgGet( &cl->stream_avg));
+            if (fabs(system_gap - stream_gap) > CR_MAX_GAP)
+            {
+                /* Stream discontinuity, for which we haven't received a
+                 * warning from the stream control facilities (dd-edited
+                 * stream ?). */
+                msg_Warn( p_log, "clock gap, unexpected stream discontinuity" );
+
+                /* */
+                msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
+                b_reset_reference= true;
+            }
+        }
+
+        AvgUpdate( &cl->stream_avg, stream_diff );
+        AvgUpdate( &cl->system_avg, system_diff );
     }
 
     /* */
@@ -246,6 +268,8 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
     {
         cl->i_next_drift_update = VLC_TICK_INVALID;
         AvgReset( &cl->drift );
+        AvgReset( &cl->system_avg );
+        AvgReset( &cl->stream_avg );
 
         /* Feed synchro with a new reference point. */
         cl->b_has_reference = true;
