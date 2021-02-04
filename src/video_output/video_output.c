@@ -149,6 +149,7 @@ typedef struct vout_thread_sys_t
     vlc_decoder_device *dec_device;
 
     /* Video output display */
+    bool            rendering_enabled;
     vout_display_cfg_t display_cfg;
     vout_display_t *display;
     vlc_queuedmutex_t display_lock;
@@ -578,6 +579,15 @@ void vout_ChangeCrop(vout_thread_t *vout,
     if (sys->display != NULL)
         vout_SetDisplayCrop(sys->display, crop);
     vlc_queuedmutex_unlock(&sys->display_lock);
+}
+
+void vout_ChangeDisplayRenderingEnabled(vout_thread_t *vout, bool enabled)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+    vlc_mutex_lock(&sys->display_lock);
+    sys->rendering_enabled = enabled;
+    vlc_mutex_unlock(&sys->display_lock);
 }
 
 void vout_ControlChangeFilters(vout_thread_t *vout, const char *filters)
@@ -1858,6 +1868,8 @@ vout_CreateCommon(vlc_object_t *object, void *owner,
 
     vlc_atomic_rc_init(&sys->rc);
     vlc_mouse_Init(&sys->mouse);
+    sys->rendering_enabled = true;
+
     return vout;
 }
 
