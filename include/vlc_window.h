@@ -81,6 +81,16 @@ enum vlc_window_state {
 };
 
 /**
+ * Window visibility state.
+ *
+ * See also \ref vlc_window_ReportVisibilityChanged.
+ */
+enum vlc_window_visibility {
+    VLC_WINDOW_VISIBLE,
+    VLC_WINDOW_NOT_VISIBLE
+};
+
+/**
  * Window mouse event types.
  *
  * This enumeration defines the possible event types
@@ -324,6 +334,24 @@ struct vlc_window_callbacks {
      *                indicate absence of an ICC profile
      */
     void (*icc_event)(struct vlc_window *, vlc_icc_profile_t *profile);
+
+    /*
+     * Callback for window visibility signalling.
+     *
+     * This callback function (if non-NULL) signals that the window is not
+     * visible anymore and should not be used for rendering after the end of
+     * this function until it is visible again. Typicaly use case of this event
+     * is when the application has been moved to the background and should not
+     * draw anything, or when the frames being sent to the display won't be
+     * used to display anyhting.
+     *
+     * \param visibility the new visibility state of the window
+     */
+    void (*visibility_changed)(struct vlc_window *,
+                               enum vlc_window_visibility visibility);
+
+    void (*vsync_reached)(struct vlc_window *,
+                          vlc_tick_t next_vsync);
 };
 
 /**
@@ -762,6 +790,14 @@ static inline void vlc_window_ReportICCProfile(vlc_window_t *window,
     } else {
         free(prof);
     }
+}
+
+static inline void
+vlc_window_ReportVisibilityChanged(vlc_window_t *window,
+                                   enum vlc_window_visibility visibility)
+{
+    if (window->owner.cbs->visibility_changed != NULL)
+        window->owner.cbs->visibility_changed(window, visibility);
 }
 
 /** @} */
