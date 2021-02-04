@@ -58,6 +58,7 @@
     CAEAGLLayer *_layer;
 
     vlc_mutex_t _mutex;
+    vlc_cond_t  _cond;
     vlc_cond_t  _gl_attached_wait;
     BOOL        _gl_attached;
 
@@ -181,6 +182,7 @@ static void Close(vlc_gl_t *gl)
 
     vlc_mutex_init(&_mutex);
     vlc_cond_init(&_gl_attached_wait);
+    vlc_cond_init(&_cond);
 
     /* The following creates a new OpenGL ES context with the API version we
      * need. If there is already an active context created by another OpenGL
@@ -213,14 +215,6 @@ static void Close(vlc_gl_t *gl)
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationStateChanged:)
                                                  name:UIApplicationWillEnterForegroundNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(applicationStateChanged:)
-                                                 name:UIApplicationDidEnterBackgroundNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(applicationStateChanged:)
-                                                 name:UIApplicationWillResignActiveNotification
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationStateChanged:)
@@ -357,14 +351,13 @@ static void Close(vlc_gl_t *gl)
 
 - (BOOL)makeCurrent
 {
+    assert(![NSThread isMainThread]);
+
     vlc_mutex_lock(&_mutex);
     assert(!_gl_attached);
 
-    if (unlikely(!_appActive))
-    {
-        vlc_mutex_unlock(&_mutex);
-        return NO;
-    }
+    while (unlikely(!_appActive))
+        vlc_cond_wait(&_cond, &_mutex);
 
     assert(_eaglEnabled);
     _previousEaglContext = [EAGLContext currentContext];
@@ -387,8 +380,6 @@ static void Close(vlc_gl_t *gl)
 
     _gl_attached = YES;
 
-    vlc_mutex_unlock(&_mutex);
-
     if (resetBuffers && ![self doResetBuffers:_gl])
     {
         [self releaseCurrent];
@@ -399,11 +390,13 @@ static void Close(vlc_gl_t *gl)
 
 - (void)releaseCurrent
 {
-    vlc_mutex_lock(&_mutex);
+    vlc_mutex_assert(&_mutex);
+
     assert(_gl_attached);
     _gl_attached = NO;
     [EAGLContext setCurrentContext:_previousEaglContext];
     _previousEaglContext = nil;
+
     vlc_mutex_unlock(&_mutex);
     vlc_cond_signal(&_gl_attached_wait);
 }
@@ -437,9 +430,7 @@ static void Close(vlc_gl_t *gl)
 {
     vlc_mutex_lock(&_mutex);
 
-    if ([[notification name] isEqualToString:UIApplicationWillResignActiveNotification])
-        _appActive = NO;
-    else if ([[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification])
+    if ([[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification])
     {
         _appActive = NO;
 
@@ -457,13 +448,12 @@ static void Close(vlc_gl_t *gl)
         }
     }
     else if ([[notification name] isEqualToString:UIApplicationWillEnterForegroundNotification])
-        _eaglEnabled = YES;
-    else
     {
-        assert([[notification name] isEqualToString:UIApplicationDidBecomeActiveNotification]);
+        _eaglEnabled = YES;
         _appActive = YES;
     }
 
+    vlc_cond_broadcast(&_cond);
     vlc_mutex_unlock(&_mutex);
 }
 
