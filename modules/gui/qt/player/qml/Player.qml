@@ -411,8 +411,10 @@ Widgets.NavigableFocusScope {
                     id: controlBarBackground
 
                     anchors.fill: parent
-                    color: rootPlayer.colors.playerBg
                     visible: false
+                    color: rootPlayer.colors.isThemeDark
+                           ? Qt.darker(rootPlayer.colors.playerBg, 1.2)
+                           : Qt.lighter(rootPlayer.colors.playerBg, 1.2)
                 }
 
                 GaussianBlur {
