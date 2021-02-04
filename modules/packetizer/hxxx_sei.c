@@ -125,6 +125,8 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
                                     sei_data.itu_t35.type = HXXX_ITU_T35_TYPE_CC;
                                     sei_data.itu_t35.u.cc.i_data = i_t35 - 8;
                                     sei_data.itu_t35.u.cc.p_data = &p_t35[8];
+                                    sei_data.itu_t35.u.cc.i_rawdata = i_t35 - 3;
+                                    sei_data.itu_t35.u.cc.p_rawdata = &p_t35[3];
                                     b_continue = pf_callback( &sei_data, cbdata );
                                 }
                                 break;
