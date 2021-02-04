@@ -2657,7 +2657,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
 
             /* allocate them */
             ck->p_sample_count_pts = calloc( ck->i_entries_pts, sizeof( uint32_t ) );
-            ck->p_sample_offset_pts = calloc( ck->i_entries_pts, sizeof( int32_t ) );
+            ck->p_sample_offset_pts = calloc( ck->i_entries_pts, sizeof( uint32_t ) );
             if( !ck->p_sample_count_pts || !ck->p_sample_offset_pts )
             {
                 free( ck->p_sample_count_pts );
@@ -2672,12 +2672,15 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
 
             for( uint32_t i = 0; i < ck->i_entries_pts; i++ )
             {
+                int64_t i_ctsdelta = ctts->pi_sample_offset[i_index] + i_cts_shift;
+                if( i_ctsdelta < 0 ) /* should not */
+                    i_ctsdelta = 0;
                 if ( i_current_index_samples_left )
                 {
                     if ( i_current_index_samples_left > i_sample_count )
                     {
                         ck->p_sample_count_pts[i] = i_sample_count;
-                        ck->p_sample_offset_pts[i] = ctts->pi_sample_offset[i_index] + i_cts_shift;
+                        ck->p_sample_offset_pts[i] = i_ctsdelta;
                         i_current_index_samples_left -= i_sample_count;
                         i_sample_count = 0;
                         assert( i == ck->i_entries_pts - 1 );
@@ -2686,7 +2689,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                     else
                     {
                         ck->p_sample_count_pts[i] = i_current_index_samples_left;
-                        ck->p_sample_offset_pts[i] = ctts->pi_sample_offset[i_index] + i_cts_shift;
+                        ck->p_sample_offset_pts[i] = i_ctsdelta;
                         i_sample_count -= i_current_index_samples_left;
                         i_current_index_samples_left = 0;
                         i_index++;
@@ -2697,7 +2700,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                     if ( ctts->pi_sample_count[i_index] > i_sample_count )
                     {
                         ck->p_sample_count_pts[i] = i_sample_count;
-                        ck->p_sample_offset_pts[i] = ctts->pi_sample_offset[i_index] + i_cts_shift;
+                        ck->p_sample_offset_pts[i] = i_ctsdelta;
                         i_current_index_samples_left = ctts->pi_sample_count[i_index] - i_sample_count;
                         i_sample_count = 0;
                         assert( i == ck->i_entries_pts - 1 );
@@ -2706,7 +2709,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                     else
                     {
                         ck->p_sample_count_pts[i] = ctts->pi_sample_count[i_index];
-                        ck->p_sample_offset_pts[i] = ctts->pi_sample_offset[i_index] + i_cts_shift;
+                        ck->p_sample_offset_pts[i] = i_ctsdelta;
                         i_sample_count -= ctts->pi_sample_count[i_index];
                         i_index++;
                     }
