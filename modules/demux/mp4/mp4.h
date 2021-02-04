@@ -37,7 +37,6 @@ typedef struct
     uint32_t     i_sample_description_index; /* index for SampleEntry to use */
     uint32_t     i_sample_count; /* how many samples in this chunk */
     uint32_t     i_sample_first; /* index of the first sample in this chunk */
-    uint32_t     i_sample; /* index of the next sample to read in this chunk */
     uint32_t     i_virtual_run_number; /* chunks interleaving sequence */
 
     /* now provide way to calculate pts, dts, and offset without too

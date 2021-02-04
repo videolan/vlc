@@ -3289,7 +3289,6 @@ static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
         return VLC_EGENERIC;
 
     p_track->i_chunk    = i_chunk;
-    p_track->chunk[i_chunk].i_sample = i_sample - p_track->chunk[i_chunk].i_sample_first;
     p_track->i_sample   = i_sample;
 
     return p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC;
