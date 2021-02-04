@@ -343,24 +343,18 @@ static es_out_id_t * MP4_CreateES( es_out_t *out, const es_format_t *p_fmt,
     return p_es;
 }
 
-/* Return time in microsecond of a track */
-static inline vlc_tick_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
+static stime_t MP4_ChunkGetSampleDTS( const mp4_chunk_t *p_chunk,
+                                      uint32_t i_sample )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-    const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
-
-    unsigned int i_index = 0;
-    unsigned int i_sample = p_track->i_sample - p_chunk->i_sample_first;
-    int64_t sdts = p_chunk->i_first_dts;
-
+    uint32_t i_index = 0;
+    stime_t sdts = p_chunk->i_first_dts;
     while( i_sample > 0 && i_index < p_chunk->i_entries_dts )
     {
         if( i_sample > p_chunk->p_sample_count_dts[i_index] )
         {
             sdts += p_chunk->p_sample_count_dts[i_index] *
                 p_chunk->p_sample_delta_dts[i_index];
-            i_sample -= p_chunk->p_sample_count_dts[i_index];
-            i_index++;
+            i_sample -= p_chunk->p_sample_count_dts[i_index++];
         }
         else
         {
@@ -368,55 +362,74 @@ static inline vlc_tick_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track
             break;
         }
     }
-
-    vlc_tick_t i_dts = MP4_rescale_mtime( sdts, p_track->i_timescale );
-
-    /* now handle elst */
-    if( p_track->p_elst && p_track->BOXDATA(p_elst)->i_entry_count )
-    {
-        MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
-
-        /* convert to offset */
-        if( ( elst->i_media_rate_integer[p_track->i_elst] > 0 ||
-              elst->i_media_rate_fraction[p_track->i_elst] > 0 ) &&
-            elst->i_media_time[p_track->i_elst] > 0 )
-        {
-            i_dts -= MP4_rescale_mtime( elst->i_media_time[p_track->i_elst], p_track->i_timescale );
-        }
-
-        /* add i_elst_time */
-        i_dts += MP4_rescale_mtime( p_track->i_elst_time, p_sys->i_timescale );
-
-        if( i_dts < 0 ) i_dts = 0;
-    }
-
-    return i_dts;
+    return sdts;
 }
 
-static inline bool MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_track,
+static bool MP4_ChunkGetSampleCTSDelta( const mp4_chunk_t *p_chunk,
+                                        uint32_t i_sample, stime_t *pi_delta )
+{
+    if( p_chunk->p_sample_count_pts && p_chunk->p_sample_offset_pts )
+    {
+        for( uint32_t i_index = 0; i_index < p_chunk->i_entries_pts ; i_index++ )
+        {
+            if( i_sample < p_chunk->p_sample_count_pts[i_index] )
+            {
+                *pi_delta = p_chunk->p_sample_offset_pts[i_index];
+                return true;
+            }
+            i_sample -= p_chunk->p_sample_count_pts[i_index];
+        }
+    }
+    return false;
+}
+
+static void MP4_TrackTimeApplyELST( const mp4_track_t *p_track,
+                                    stime_t *pi_dts )
+{
+    if( !p_track->p_elst || !p_track->BOXDATA(p_elst)->i_entry_count )
+        return;
+
+    const MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
+
+    /* convert to offset */
+    if( elst->i_media_time[p_track->i_elst] > 0 &&
+        ( elst->i_media_rate_integer[p_track->i_elst] > 0 ||
+          elst->i_media_rate_fraction[p_track->i_elst] > 0 ) )
+    {
+        *pi_dts -= elst->i_media_time[p_track->i_elst];
+    }
+
+    /* add i_elst_time */
+    *pi_dts += p_track->i_elst_time;
+
+    if( *pi_dts < 0 ) *pi_dts = 0;
+}
+
+/* Return time in microsecond of a track */
+static inline vlc_tick_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
+{
+    VLC_UNUSED(p_demux);
+    const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
+
+    stime_t sdts = MP4_ChunkGetSampleDTS( p_chunk,
+                                          p_track->i_sample - p_chunk->i_sample_first );
+
+    /* now handle elst */
+    MP4_TrackTimeApplyELST( p_track, &sdts );
+
+    return MP4_rescale_mtime( sdts, p_track->i_timescale );
+}
+
+static inline bool MP4_TrackGetPTSDelta( demux_t *p_demux, const mp4_track_t *p_track,
                                          vlc_tick_t *pi_delta )
 {
     VLC_UNUSED( p_demux );
-    mp4_chunk_t *ck = &p_track->chunk[p_track->i_chunk];
-
-    unsigned int i_index = 0;
-    unsigned int i_sample = p_track->i_sample - ck->i_sample_first;
-
-    if( ck->p_sample_count_pts == NULL || ck->p_sample_offset_pts == NULL )
+    const mp4_chunk_t *ck = &p_track->chunk[p_track->i_chunk];
+    stime_t delta;
+    if( !MP4_ChunkGetSampleCTSDelta( ck, p_track->i_sample - ck->i_sample_first, &delta ) )
         return false;
-
-    for( i_index = 0; i_index < ck->i_entries_pts ; i_index++ )
-    {
-        if( i_sample < ck->p_sample_count_pts[i_index] )
-        {
-            *pi_delta = MP4_rescale_mtime( ck->p_sample_offset_pts[i_index],
-                                           p_track->i_timescale );
-            return true;
-        }
-
-        i_sample -= ck->p_sample_count_pts[i_index];
-    }
-    return false;
+    *pi_delta = MP4_rescale_mtime( delta, p_track->i_timescale );
+    return true;
 }
 
 static inline vlc_tick_t MP4_GetSamplesDuration( demux_t *p_demux, mp4_track_t *p_track,
