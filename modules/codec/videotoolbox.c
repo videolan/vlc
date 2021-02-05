@@ -38,7 +38,6 @@
 #import "../packetizer/h264_slice.h"
 #import "../packetizer/hxxx_nal.h"
 #import "../packetizer/hxxx_sei.h"
-#import "../codec/cc.h"
 
 #import <VideoToolbox/VideoToolbox.h>
 #import <VideoToolbox/VTErrors.h>
@@ -94,7 +93,6 @@ struct frame_info_t
     bool b_top_field_first;
     uint8_t i_num_ts;
     unsigned i_length;
-    picture_captions_t captions;
     frame_info_t *p_next;
 };
 
@@ -229,14 +227,13 @@ struct sei_callback_h264_s
 {
     uint8_t i_pic_struct;
     const h264_sequence_parameter_set_t *p_sps;
-    picture_captions_t *pcaptions;
 };
 
 static bool ParseH264SEI(const hxxx_sei_data_t *p_sei_data, void *priv)
 {
-    struct sei_callback_h264_s *s = priv;
     if (p_sei_data->i_type == HXXX_SEI_PIC_TIMING)
     {
+        struct sei_callback_h264_s *s = priv;
         if (s->p_sps && s->p_sps->vui.b_valid)
         {
             if (s->p_sps->vui.b_hrd_parameters_present_flag)
@@ -248,17 +245,7 @@ static bool ParseH264SEI(const hxxx_sei_data_t *p_sei_data, void *priv)
             if (s->p_sps->vui.b_pic_struct_present_flag)
                 s->i_pic_struct = bs_read( p_sei_data->p_bs, 4);
         }
-    }
-    else if(p_sei_data->i_type == HXXX_SEI_USER_DATA_REGISTERED_ITU_T_T35 &&
-            p_sei_data->itu_t35.type == HXXX_ITU_T35_TYPE_CC /* GA94 */)
-    {
-        cc_data_t cc;
-        cc_Init( &cc );
-        cc_Extract( &cc, CC_PAYLOAD_GA94, true, p_sei_data->itu_t35.u.cc.p_data,
-                                                p_sei_data->itu_t35.u.cc.i_data );
-
-        s->pcaptions->size = __MIN(PICTURE_MAX_CAPTION_BYTES, cc.i_data);
-        memcpy(s->pcaptions->bytes, cc.p_data, s->pcaptions->size);
+        return false;
     }
 
     return true;
@@ -310,7 +297,6 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                 struct sei_callback_h264_s sei;
                 sei.p_sps = p_sps;
                 sei.i_pic_struct = UINT8_MAX;
-                sei.pcaptions = &p_info->captions;
 
                 for (size_t i = 0; i < i_sei_count; i++)
                     HxxxParseSEI(sei_array[i].p_nal, sei_array[i].i_nal, 1,
@@ -2240,7 +2226,6 @@ static void DecoderCallback(void *decompressionOutputRefCon,
 
         p_info->p_picture = p_pic;
 
-        p_pic->captions = p_info->captions;
         p_pic->date = pts.value;
         p_pic->b_force = p_info->b_eos;
         p_pic->b_still = p_info->b_eos;
