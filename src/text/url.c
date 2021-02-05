@@ -401,26 +401,6 @@ static bool vlc_uri_path_validate(const char *str)
     return vlc_uri_component_validate(str, "/@:");
 }
 
-static void vlc_uri_fixup_duplicated_separators(char *str)
-{
-    if (str == NULL)
-        return;
-    char *input = str, *output = str;
-    while (*input)
-    {
-        assert(input >= output);
-        if (*input == '/')
-        {
-            *output++ = *input;
-            while (*input == '/')
-                input++;
-        }
-        else
-            *output++ = *input++;
-    }
-    *output = 0;
-}
-
 static int vlc_UrlParseInner(vlc_url_t *restrict url, const char *str)
 {
     url->psz_protocol = NULL;
@@ -568,7 +548,6 @@ static int vlc_UrlParseInner(vlc_url_t *restrict url, const char *str)
     {
         url->psz_path = cur;
     }
-    vlc_uri_fixup_duplicated_separators(url->psz_path);
 
     return ret;
 }
