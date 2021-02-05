@@ -35,7 +35,7 @@ Widgets.NavigableFocusScope {
     property var _menu: undefined
 
     property bool hasEmbededVideo: mainInterface.hasEmbededVideo
-    readonly property int positionSliderY: controlBarView.y + VLCStyle.fontHeight_normal + VLCStyle.margin_small
+    readonly property int positionSliderY: controlBarView.y + controlBarView.sliderY
     readonly property string coverSource: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
                                           ? mainPlaylistController.currentItem.artwork
                                           : VLCStyle.noArtCover
@@ -419,6 +419,7 @@ Widgets.NavigableFocusScope {
         id: controlBarView
 
         property var autoHide: controlBarView.contentItem.autoHide
+        readonly property int sliderY: contentItem.sliderY
 
         anchors {
             bottom: parent.bottom
@@ -433,6 +434,7 @@ Widgets.NavigableFocusScope {
             id: controllerMouseArea
 
             property alias autoHide: controllerId.autoHide
+            readonly property alias sliderY: controllerId.sliderY
 
             height: controllerId.implicitHeight + controllerId.anchors.bottomMargin
             width: controlBarView.width

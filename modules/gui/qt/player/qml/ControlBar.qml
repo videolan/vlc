@@ -31,8 +31,16 @@ import "qrc:///playlist/" as PL
 Widgets.NavigableFocusScope {
     id: root
 
+    enum TimeTextPosition {
+        Hide,
+        AboveSlider,
+        LeftRightSlider
+    }
+
     signal showTrackBar()
 
+    readonly property alias sliderY: row2.y
+    property int textPosition: ControlBar.TimeTextPosition.AboveSlider
     property VLCColors colors: VLCStyle.nightColors
     property bool autoHide: _lockAutoHide === 0 && !lockAutoHide
     property bool lockAutoHide: false
@@ -46,54 +54,76 @@ Widgets.NavigableFocusScope {
 
     implicitHeight: columnLayout.implicitHeight
 
+    Component.onCompleted: {
+        // if initially textPosition = Hide, then _onTextPositionChanged isn't called
+        if (textPosition === ControlBar.TimeTextPosition.Hide)
+            _layout()
+    }
+
+    onTextPositionChanged: _layout()
+
+    function _layout() {
+        trackPositionSlider.visible = true
+        mediaTime.visible = true
+        mediaRemainingTime.visible = true
+        mediaTime.font.pixelSize = VLCStyle.fontSize_normal
+        mediaRemainingTime.font.pixelSize = VLCStyle.fontSize_normal
+        row2.Layout.leftMargin = 0
+        row2.Layout.rightMargin = 0
+
+        switch (textPosition) {
+        case ControlBar.TimeTextPosition.Hide:
+            row1.children = []
+            row2.children = [trackPositionSlider]
+            mediaTime.visible = false
+            mediaRemainingTime.visible = false
+            break;
+
+        case ControlBar.TimeTextPosition.AboveSlider:
+            var spacer = Qt.createQmlObject("import QtQuick 2.11; Item {}", row1, "ControlBar")
+            row1.children = [mediaTime, spacer, mediaRemainingTime]
+            spacer.Layout.fillWidth = true
+            row2.children = [trackPositionSlider]
+            break;
+
+        case ControlBar.TimeTextPosition.LeftRightSlider:
+            row1.children = []
+            row2.children = [mediaTime, trackPositionSlider, mediaRemainingTime]
+            row2.Layout.leftMargin = VLCStyle.margin_xsmall
+            row2.Layout.rightMargin = VLCStyle.margin_xsmall
+            mediaTime.font.pixelSize = VLCStyle.fontSize_small
+            mediaRemainingTime.font.pixelSize = VLCStyle.fontSize_small
+            trackPositionSlider.Layout.alignment = Qt.AlignVCenter
+            break;
+
+        default:
+            console.assert(false, "invalid text position")
+        }
+
+        trackPositionSlider.Layout.fillWidth = true
+        row1.visible = row1.children.length > 0
+        row2.visible = row2.children.length > 0
+    }
+
     ColumnLayout {
         id: columnLayout
         anchors.fill: parent
         spacing: VLCStyle.margin_small
 
         RowLayout {
+            id: row1
+
+            spacing: 0
+            Layout.fillWidth: true
             Layout.leftMargin: VLCStyle.margin_normal
             Layout.rightMargin: VLCStyle.margin_normal
-
-            Label {
-                text: player.time.toString()
-                color: root.colors.playerFg
-                font.pixelSize: VLCStyle.fontSize_normal
-                Layout.alignment: Qt.AlignLeft
-            }
-
-            Item {
-                Layout.fillWidth: true
-            }
-
-            Label {
-                text: (mainInterface.showRemainingTime && player.remainingTime.valid())
-                      ? "-" + player.remainingTime.toString()
-                      : player.length.toString()
-                color: root.colors.playerFg
-                font.pixelSize: VLCStyle.fontSize_normal
-                Layout.alignment: Qt.AlignRight
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: mainInterface.showRemainingTime = !mainInterface.showRemainingTime
-                }
-            }
-
         }
-        SliderBar {
-            id: trackPositionSlider
 
-            backgroundColor: Qt.lighter(colors.playerBg, 1.6180)
-            progressBarColor: activeFocus ? colors.accent : colors.playerControlBarFg
-            barHeight: VLCStyle.heightBar_xxsmall
-            Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+        RowLayout {
+            id: row2
+
+            spacing: VLCStyle.margin_xsmall
             Layout.fillWidth: true
-            enabled: player.playingState == PlayerController.PLAYING_STATE_PLAYING || player.playingState == PlayerController.PLAYING_STATE_PAUSED
-            Keys.onDownPressed: playerButtonsLayout.focus = true
-
-            parentWindow: g_root
-
-            colors: root.colors
         }
 
         Item {
@@ -122,6 +152,46 @@ Widgets.NavigableFocusScope {
             }
         }
     }
+
+    Label {
+        id: mediaTime
+
+        visible: false
+        text: player.time.toString()
+        color: root.colors.playerFg
+        font.pixelSize: VLCStyle.fontSize_normal
+    }
+
+    Label {
+        id: mediaRemainingTime
+
+        visible: false
+        text: (mainInterface.showRemainingTime && player.remainingTime.valid())
+              ? "-" + player.remainingTime.toString()
+              : player.length.toString()
+        color: root.colors.playerFg
+        font.pixelSize: VLCStyle.fontSize_normal
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: mainInterface.showRemainingTime = !mainInterface.showRemainingTime
+        }
+    }
+
+    SliderBar {
+        id: trackPositionSlider
+
+        visible: false
+        backgroundColor: Qt.lighter(colors.playerBg, 1.6180)
+        progressBarColor: activeFocus ? colors.accent : colors.playerControlBarFg
+        barHeight: VLCStyle.heightBar_xxsmall
+        enabled: player.playingState == PlayerController.PLAYING_STATE_PLAYING || player.playingState == PlayerController.PLAYING_STATE_PAUSED
+        parentWindow: g_root
+        colors: root.colors
+
+        Keys.onDownPressed: playerButtonsLayout.focus = true
+    }
+
 
     PlayerControlBarModel{
         id:playerControlBarModel_left
