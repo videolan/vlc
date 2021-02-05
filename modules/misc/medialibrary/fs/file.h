@@ -31,22 +31,26 @@ using namespace ::medialibrary::fs;
 class SDFile : public IFile
 {
 public:
-    explicit SDFile(const std::string &mrl);
+    explicit SDFile( std::string mrl );
+    SDFile( std::string mrl, LinkedFileType, std::string linkedFile );
+
     virtual ~SDFile() = default;
     const std::string& mrl() const override;
     const std::string& name() const override;
     const std::string& extension() const override;
-    time_t lastModificationDate() const override;
-    int64_t size() const override;
-    inline bool isNetwork() const override { return true; }
+    const std::string& linkedWith() const override;
     LinkedFileType linkedType() const override;
-    const std::string &linkedWith() const override;
+    bool isNetwork() const override;
+    int64_t size() const override;
+    time_t lastModificationDate() const override;
 
 private:
     std::string m_mrl;
     std::string m_name;
     std::string m_extension;
     std::string m_linkedFile;
+    LinkedFileType m_linkedType = LinkedFileType::None;
+    bool m_isNetwork;
 };
 
   } /* namespace medialibrary */

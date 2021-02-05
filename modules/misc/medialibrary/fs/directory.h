@@ -44,6 +44,7 @@ public:
 
 private:
     void read() const;
+    void addFile( std::string mrl, fs::IFile::LinkedFileType, std::string linkedWith ) const;
 
     std::string m_mrl;
     SDFileSystemFactory &m_fs;

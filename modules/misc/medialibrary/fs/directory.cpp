@@ -197,6 +197,7 @@ SDDirectory::read() const
 
     input_item_AddOption( media.get(), "show-hiddenfiles", VLC_INPUT_OPTION_TRUSTED );
     input_item_AddOption( media.get(), "ignore-filetypes=''", VLC_INPUT_OPTION_TRUSTED );
+    input_item_AddOption( media.get(), "sub-autodetect-fuzzy=2", VLC_INPUT_OPTION_TRUSTED );
     auto status = request_metadata_sync( m_fs.libvlc(), media.get(), &children);
 
     if ( status == false )
@@ -208,13 +209,39 @@ SDDirectory::read() const
         const char *mrl = m.get()->psz_uri;
         enum input_item_type_e type = m->i_type;
         if (type == ITEM_TYPE_DIRECTORY)
+        {
             m_dirs.push_back(std::make_shared<SDDirectory>(mrl, m_fs));
+        }
         else if (type == ITEM_TYPE_FILE)
-            m_files.push_back(std::make_shared<SDFile>(mrl));
+        {
+            addFile( mrl, IFile::LinkedFileType::None, {} );
+            for ( auto i = 0; i < m->i_slaves; ++i )
+            {
+                const auto* slave = m->pp_slaves[i];
+                const auto linked_type = slave->i_type == SLAVE_TYPE_AUDIO
+                                             ? IFile::LinkedFileType::SoundTrack
+                                             : IFile::LinkedFileType::Subtitles;
+
+                addFile( slave->psz_uri, linked_type, mrl );
+            }
+        }
     }
 
     m_read_done = true;
 }
 
+void
+SDDirectory::addFile(std::string mrl, IFile::LinkedFileType fType, std::string linkedFile) const
+{
+    if ( fType == IFile::LinkedFileType::None )
+    {
+        m_files.push_back( std::make_shared<SDFile>( std::move( mrl ) ) );
+    }
+    else
+    {
+        m_files.push_back(
+            std::make_shared<SDFile>( std::move( mrl ), fType, std::move( linkedFile ) ) );
+    }
+}
   } /* namespace medialibrary */
 } /* namespace vlc */
