@@ -714,6 +714,8 @@ typedef struct {
 #ifdef QT5_HAS_X11
     Display *dpy;
 #endif
+    bool orphaned;
+    QMutex lock;
 } vout_window_qt_t;
 
 static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
@@ -748,6 +750,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     vout_window_qt_t *sys = new vout_window_qt_t;
 
     sys->mi = p_intf->p_sys->p_mi;
+    sys->orphaned = false;
     p_wnd->sys = (vout_window_sys_t *)sys;
     msg_Dbg( p_wnd, "requesting video window..." );
 
@@ -785,6 +788,8 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 #ifdef QT5_HAS_X11
     if (QX11Info::isPlatformX11())
     {
+        QMutexLocker locker2(&sys->lock);
+
         XReparentWindow(sys->dpy, xid, p_wnd->handle.xid, 0, 0);
         XMapWindow(sys->dpy, xid);
         XSync(sys->dpy, True);
@@ -822,6 +827,26 @@ static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
         return VLC_EGENERIC;
     }
     return sys->mi->controlVideo(i_query, args);
+}
+
+void WindowReleased(vout_window_t *wnd)
+{
+    vout_window_qt_t *sys = (vout_window_qt_t *)wnd->sys;
+    QMutexLocker locker(&sys->lock);
+
+    msg_Warn(wnd, "orphaned video window");
+    sys->orphaned = true;
+#if defined (QT5_HAS_X11)
+    if (QX11Info::isPlatformX11())
+    {   /* In the unlikely event that WindowOpen() has not yet reparented the
+         * window, WindowOpen() will skip reparenting. Then this call will be
+         * a no-op.
+         */
+        XReparentWindow(sys->dpy, wnd->handle.xid,
+                        RootWindow(sys->dpy, DefaultScreen(sys->dpy)), 0, 0);
+        XSync(sys->dpy, True);
+    }
+#endif
 }
 
 static void WindowClose( vout_window_t *p_wnd )

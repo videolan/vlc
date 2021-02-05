@@ -229,6 +229,7 @@ QSize VideoWidget::physicalSize() const
 }
 
 void WindowResized(vout_window_t *, const QSize&);
+void WindowReleased(vout_window_t *);
 
 void VideoWidget::reportSize()
 {
@@ -378,6 +379,7 @@ void VideoWidget::release( void )
 
     if( stable )
     {
+        WindowReleased(p_window);
         layout->removeWidget( stable );
         stable->deleteLater();
         stable = NULL;
