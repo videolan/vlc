@@ -28,10 +28,10 @@
 namespace vlc {
   namespace medialibrary {
 
-SDFile::SDFile(const std::string &mrl)
-    : m_mrl(mrl)
-    , m_name(utils::fileName(mrl))
-    , m_extension(utils::extension(mrl))
+SDFile::SDFile( const std::string mrl )
+    : m_mrl( std::move( mrl ) )
+    , m_name( utils::fileName( m_mrl ) )
+    , m_extension( utils::extension( m_mrl ) )
 {
 }
 
