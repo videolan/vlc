@@ -326,12 +326,13 @@ Widgets.NavigableFocusScope {
                 Image {
                     id: cover
 
-                    source: rootPlayer.coverSource
-                    fillMode: Image.PreserveAspectFit
-
                     //source aspect ratio
                     readonly property real sar: cover.sourceSize.width / cover.sourceSize.height
+
                     anchors.fill: parent
+                    source: rootPlayer.coverSource
+                    fillMode: Image.PreserveAspectFit
+                    mipmap: height < sourceSize.height * .3
                 }
 
                 Widgets.CoverShadow {
