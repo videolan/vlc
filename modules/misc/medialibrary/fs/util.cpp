@@ -52,6 +52,14 @@ fileName(const std::string &filePath)
     return filePath.substr(pos + 1);
 }
 
+std::string
+directory(const std::string &filePath)
+{
+    auto pos = filePath.find_last_of(DIR_SEPARATORS);
+    if (pos == std::string::npos)
+        return filePath;
+    return filePath.substr(0, pos);
+}
     } /* namespace utils */
   } /* namespace medialibrary */
 } /* namespace vlc */

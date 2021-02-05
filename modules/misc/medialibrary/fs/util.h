@@ -29,6 +29,7 @@ namespace vlc {
 
 std::string fileName(const std::string& filePath);
 std::string extension(const std::string& fileName);
+std::string directory(const std::string& fileName);
 
     } /* namespace utils */
   } /* namespace medialibrary */
