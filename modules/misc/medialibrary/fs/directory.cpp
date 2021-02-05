@@ -26,12 +26,15 @@
 #include "file.h"
 #include "util.h"
 
+#include <sys/stat.h>
 #include <algorithm>
 #include <assert.h>
 #include <vector>
 #include <system_error>
 #include <vlc_common.h>
+#include <vlc_url.h>
 #include <vlc_input_item.h>
+#include <vlc_fs.h>
 #include <vlc_input.h>
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
@@ -233,14 +236,33 @@ SDDirectory::read() const
 void
 SDDirectory::addFile(std::string mrl, IFile::LinkedFileType fType, std::string linkedFile) const
 {
+    time_t lastModificationDate = 0;
+    int64_t fileSize = 0;
+
+    if ( m_fs.isNetworkFileSystem() == false )
+    {
+        const auto path = vlc::wrap_cptr( vlc_uri2path( mrl.c_str() ) );
+        struct stat stat;
+
+        if ( vlc_stat( path.get(), &stat ) != 0 )
+        {
+            if ( errno == EACCES )
+                return;
+            throw errors::System{ errno, "Failed to get file info" };
+        }
+        lastModificationDate = stat.st_mtime;
+        fileSize = stat.st_size;
+    }
+
     if ( fType == IFile::LinkedFileType::None )
     {
-        m_files.push_back( std::make_shared<SDFile>( std::move( mrl ) ) );
+        m_files.push_back(
+            std::make_shared<SDFile>( std::move( mrl ), fileSize, lastModificationDate ) );
     }
     else
     {
-        m_files.push_back(
-            std::make_shared<SDFile>( std::move( mrl ), fType, std::move( linkedFile ) ) );
+        m_files.push_back( std::make_shared<SDFile>(
+            std::move( mrl ), fType, std::move( linkedFile ), fileSize, lastModificationDate ) );
     }
 }
   } /* namespace medialibrary */

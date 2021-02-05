@@ -31,8 +31,8 @@ using namespace ::medialibrary::fs;
 class SDFile : public IFile
 {
 public:
-    explicit SDFile( std::string mrl );
-    SDFile( std::string mrl, LinkedFileType, std::string linkedFile );
+    SDFile( std::string mrl, int64_t, time_t );
+    SDFile( std::string mrl, LinkedFileType, std::string linkedFile, int64_t, time_t );
 
     virtual ~SDFile() = default;
     const std::string& mrl() const override;
@@ -51,6 +51,8 @@ private:
     std::string m_linkedFile;
     LinkedFileType m_linkedType = LinkedFileType::None;
     bool m_isNetwork;
+    int64_t m_size = 0;
+    time_t m_lastModificationTime = 0;
 };
 
   } /* namespace medialibrary */

@@ -150,6 +150,8 @@ typedef struct vlc_ml_label_list_t
 typedef struct vlc_ml_file_t
 {
     char* psz_mrl;
+    int64_t i_size;
+    time_t i_last_modification_date;
     vlc_ml_file_type_t i_type;
     bool b_external;
     bool b_removable;

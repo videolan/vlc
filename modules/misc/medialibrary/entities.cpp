@@ -296,6 +296,8 @@ bool Convert( const medialibrary::IFile* input, vlc_ml_file_t& output )
             vlc_assert_unreachable();
     }
 
+    output.i_size = input->size();
+    output.i_last_modification_date = input->lastModificationDate();
     output.b_removable = input->isRemovable();
     output.b_present = true;
     try
