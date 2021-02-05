@@ -57,13 +57,6 @@ typedef struct plane_t
  * Maximum number of plane for a picture
  */
 #define PICTURE_PLANE_MAX (VOUT_MAX_PLANES)
-#define PICTURE_MAX_CAPTION_BYTES (60)
-
-typedef struct
-{
-    unsigned char bytes[PICTURE_MAX_CAPTION_BYTES];
-    size_t size;
-} picture_captions_t;
 
 typedef struct picture_context_t
 {
@@ -140,7 +133,6 @@ struct picture_t
     vlc_tick_t      date;                                  /**< display date */
     bool            b_force;
     bool            b_still;
-    picture_captions_t captions;
     /**@}*/
 
     /** \name Picture dynamic properties

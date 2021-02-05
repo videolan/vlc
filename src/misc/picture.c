@@ -395,7 +395,6 @@ void picture_CopyProperties( picture_t *p_dst, const picture_t *p_src )
     p_dst->b_progressive = p_src->b_progressive;
     p_dst->i_nb_fields = p_src->i_nb_fields;
     p_dst->b_top_field_first = p_src->b_top_field_first;
-    p_dst->captions = p_src->captions;
 }
 
 void picture_CopyPixels( picture_t *p_dst, const picture_t *p_src )
