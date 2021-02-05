@@ -228,13 +228,15 @@ QSize VideoWidget::physicalSize() const
     return current_size;
 }
 
+void WindowResized(vout_window_t *, const QSize&);
+
 void VideoWidget::reportSize()
 {
     if( !p_window )
         return;
 
     QSize size = physicalSize();
-    vout_window_ReportSize( p_window, size.width(), size.height() );
+    WindowResized(p_window, size);
 }
 
 /* Set the Widget to the correct Size */

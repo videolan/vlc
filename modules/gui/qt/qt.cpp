@@ -361,6 +361,7 @@ static void Abort( void *obj )
 
 #if defined (QT5_HAS_X11)
 # include <vlc_xlib.h>
+# include <QX11Info>
 
 static void *ThreadXCB( void *data )
 {
@@ -710,6 +711,9 @@ static int WindowControl( vout_window_t *, int i_query, va_list );
 
 typedef struct {
     MainInterface *mi;
+#ifdef QT5_HAS_X11
+    Display *dpy;
+#endif
 } vout_window_qt_t;
 
 static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
@@ -744,18 +748,67 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     vout_window_qt_t *sys = new vout_window_qt_t;
 
     sys->mi = p_intf->p_sys->p_mi;
+    p_wnd->sys = (vout_window_sys_t *)sys;
     msg_Dbg( p_wnd, "requesting video window..." );
+
+#ifdef QT5_HAS_X11
+    Window xid;
+
+    if (QX11Info::isPlatformX11())
+    {
+        sys->dpy = XOpenDisplay(NULL);
+        if (unlikely(sys->dpy == NULL))
+        {
+            delete sys;
+            return VLC_EGENERIC;
+        }
+
+        int snum = DefaultScreen(sys->dpy);
+        unsigned long black = BlackPixel(sys->dpy, snum);
+
+        xid = XCreateSimpleWindow(sys->dpy, RootWindow(sys->dpy, snum),
+                                  0, 0, cfg->width, cfg->height,
+                                  0, black, black);
+    }
+#endif
 
     if (!sys->mi->getVideo(p_wnd, cfg->width, cfg->height, cfg->is_fullscreen))
     {
+#ifdef QT5_HAS_X11
+        if (QX11Info::isPlatformX11())
+            XCloseDisplay(sys->dpy);
+#endif
         delete sys;
         return VLC_EGENERIC;
     }
 
+#ifdef QT5_HAS_X11
+    if (QX11Info::isPlatformX11())
+    {
+        XReparentWindow(sys->dpy, xid, p_wnd->handle.xid, 0, 0);
+        XMapWindow(sys->dpy, xid);
+        XSync(sys->dpy, True);
+        p_wnd->handle.xid = xid;
+    }
+#endif
     p_wnd->info.has_double_click = true;
     p_wnd->control = WindowControl;
-    p_wnd->sys = (vout_window_sys_t *)sys;
     return VLC_SUCCESS;
+}
+
+void WindowResized(vout_window_t *wnd, const QSize& size)
+{
+#ifdef QT5_HAS_X11
+    vout_window_qt_t *sys = (vout_window_qt_t *)wnd->sys;
+
+    if (QX11Info::isPlatformX11())
+    {
+        XResizeWindow(sys->dpy, wnd->handle.xid, size.width(), size.height());
+        XClearWindow(sys->dpy, wnd->handle.xid);
+        XSync(sys->dpy, True);
+    }
+#endif
+    vout_window_ReportSize(wnd, size.width(), size.height());
 }
 
 static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
@@ -793,5 +846,9 @@ static void WindowClose( vout_window_t *p_wnd )
     else
         msg_Warn (p_wnd, "video already released");
 
+#if defined (QT5_HAS_X11)
+    if (QX11Info::isPlatformX11())
+        XCloseDisplay(sys->dpy);
+#endif
     delete sys;
 }
