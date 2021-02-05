@@ -160,12 +160,7 @@
 # define APIENTRY
 #endif
 
-/* FIXME: GL_ASSERT_NOERROR disabled for now because:
- * Proper GL error handling need to be implemented
- * glClear(GL_COLOR_BUFFER_BIT) throws a GL_INVALID_FRAMEBUFFER_OPERATION on macOS
- * assert fails on vout_display_opengl_Delete on iOS
- */
-#if 0
+#ifndef NDEBUG
 # define HAVE_GL_ASSERT_NOERROR
 #endif
 
