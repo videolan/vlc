@@ -452,7 +452,10 @@ exit:
 bool vout_ParseCrop(struct vout_crop *restrict cfg, const char *crop_str)
 {
     if (sscanf(crop_str, "%u:%u", &cfg->ratio.num, &cfg->ratio.den) == 2) {
-        cfg->mode = VOUT_CROP_RATIO;
+        if (cfg->ratio.num != 0 && cfg->ratio.den != 0)
+            cfg->mode = VOUT_CROP_RATIO;
+        else
+            cfg->mode = VOUT_CROP_NONE;
     } else if (sscanf(crop_str, "%ux%u+%u+%u",
                       &cfg->window.width, &cfg->window.height,
                       &cfg->window.x, &cfg->window.y) == 4) {
@@ -462,8 +465,7 @@ bool vout_ParseCrop(struct vout_crop *restrict cfg, const char *crop_str)
                       &cfg->border.right, &cfg->border.bottom) == 4) {
         cfg->mode = VOUT_CROP_BORDER;
     } else if (*crop_str == '\0') {
-        cfg->mode = VOUT_CROP_RATIO;
-        cfg->ratio.num = cfg->ratio.den = 0;
+        cfg->mode = VOUT_CROP_NONE;
     } else {
         return false;
     }

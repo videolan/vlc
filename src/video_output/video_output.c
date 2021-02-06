@@ -637,16 +637,6 @@ void vout_ChangeDisplayAspectRatio(vout_thread_t *vout,
     vlc_mutex_unlock(&sys->display_lock);
 }
 
-static void vout_SetCrop(vout_thread_sys_t *sys,
-                         const struct vout_crop *restrict crop)
-{
-    sys->source.crop = *crop;
-
-    if (crop->mode == VOUT_CROP_RATIO
-     && (crop->ratio.num == 0 || crop->ratio.den == 0))
-        sys->source.crop.mode = VOUT_CROP_NONE;
-}
-
 void vout_ChangeCrop(vout_thread_t *vout,
                      const struct vout_crop *restrict crop)
 {
@@ -654,7 +644,7 @@ void vout_ChangeCrop(vout_thread_t *vout,
     assert(!sys->dummy);
 
     vlc_mutex_lock(&sys->window_lock);
-    vout_SetCrop(sys, crop);
+    sys->source.crop = *crop;
     vout_UpdateWindowSizeLocked(sys);
 
     vlc_mutex_lock(&sys->display_lock);
@@ -2115,10 +2105,8 @@ static void vout_InitSource(vout_thread_sys_t *vout)
 
     char *psz_crop = var_InheritString(&vout->obj, "crop");
     if (psz_crop) {
-        struct vout_crop crop;
-
-        if (vout_ParseCrop(&crop, psz_crop))
-            vout_SetCrop(vout, &crop);
+        if (!vout_ParseCrop(&vout->source.crop, psz_crop))
+            vout->source.crop.mode = VOUT_CROP_NONE;
         free(psz_crop);
     }
 }
