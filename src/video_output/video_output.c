@@ -637,71 +637,14 @@ void vout_ChangeDisplayAspectRatio(vout_thread_t *vout,
     vlc_mutex_unlock(&sys->display_lock);
 }
 
-static void vout_SetCropRatio(vout_thread_sys_t *sys, unsigned num, unsigned den)
+static void vout_SetCrop(vout_thread_sys_t *sys,
+                         const struct vout_crop *restrict crop)
 {
-    if (num != 0 && den != 0) {
-        sys->source.crop.mode = VOUT_CROP_RATIO;
-        sys->source.crop.ratio.num = num;
-        sys->source.crop.ratio.den = den;
-    } else
+    sys->source.crop = *crop;
+
+    if (crop->mode == VOUT_CROP_RATIO
+     && (crop->ratio.num == 0 || crop->ratio.den == 0))
         sys->source.crop.mode = VOUT_CROP_NONE;
-}
-
-static void vout_SetCropWindow(vout_thread_sys_t *sys,
-                             int x, int y, int width, int height)
-{
-    if (x < 0)
-        x = 0;
-    if (y < 0)
-        y = 0;
-    if (width < 0)
-        width = 0;
-    if (height < 0)
-        height = 0;
-
-    sys->source.crop.mode = VOUT_CROP_WINDOW;
-    sys->source.crop.window.x = x;
-    sys->source.crop.window.y = y;
-    sys->source.crop.window.width = width;
-    sys->source.crop.window.height = height;
-}
-
-void vout_ChangeCropWindow(vout_thread_t *vout,
-                           int x, int y, int width, int height)
-{
-    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
-    assert(!sys->dummy);
-
-    vlc_mutex_lock(&sys->window_lock);
-    vout_SetCropWindow(sys, x, y, width, height);
-
-    vout_UpdateWindowSizeLocked(sys);
-
-    vlc_mutex_lock(&sys->display_lock);
-    vlc_mutex_unlock(&sys->window_lock);
-
-    if (sys->display != NULL)
-        vout_SetDisplayCrop(sys->display, 0, 0, x, y, width, height);
-    vlc_mutex_unlock(&sys->display_lock);
-}
-
-static void vout_SetCropBorder(vout_thread_sys_t *sys,
-                             int left, int top, int right, int bottom)
-{
-    if (left < 0)
-        left = 0;
-    if (top < 0)
-        top = 0;
-    if (right < 0)
-        right = 0;
-    if (bottom < 0)
-        bottom = 0;
-
-    sys->source.crop.mode = VOUT_CROP_BORDER;
-    sys->source.crop.border.left = left;
-    sys->source.crop.border.right = right;
-    sys->source.crop.border.top = top;
-    sys->source.crop.border.bottom = bottom;
 }
 
 void vout_ChangeCrop(vout_thread_t *vout,
@@ -711,23 +654,7 @@ void vout_ChangeCrop(vout_thread_t *vout,
     assert(!sys->dummy);
 
     vlc_mutex_lock(&sys->window_lock);
-    switch (crop->mode) {
-        case VOUT_CROP_NONE:
-            vout_SetCropRatio(sys, 0, 0);
-            break;
-        case VOUT_CROP_RATIO:
-            vout_SetCropRatio(sys, crop->ratio.num, crop->ratio.den);
-            break;
-        case VOUT_CROP_WINDOW:
-            vout_SetCropWindow(sys, crop->window.x, crop->window.y,
-                               crop->window.width, crop->window.height);
-            break;
-        case VOUT_CROP_BORDER:
-            vout_SetCropBorder(sys, crop->border.left, crop->border.top,
-                               crop->border.right, crop->border.bottom);
-            break;
-    }
-
+    vout_SetCrop(sys, crop);
     vout_UpdateWindowSizeLocked(sys);
 
     vlc_mutex_lock(&sys->display_lock);
@@ -750,7 +677,8 @@ void vout_ChangeCrop(vout_thread_t *vout,
             case VOUT_CROP_BORDER:
                 vout_SetDisplayCrop(sys->display, 0, 0,
                                     crop->border.left, crop->border.top,
-                                    -crop->border.right, -crop->border.bottom);
+                                    -(int)crop->border.right,
+                                    -(int)crop->border.bottom);
                 break;
         }
 
@@ -2232,24 +2160,7 @@ static void vout_InitSource(vout_thread_sys_t *vout)
         struct vout_crop crop;
 
         if (vout_ParseCrop(&crop, psz_crop))
-        {
-            switch (crop.mode)
-            {
-            case VOUT_CROP_RATIO:
-                vout_SetCropRatio(vout, crop.ratio.num, crop.ratio.den);
-                break;
-            case VOUT_CROP_WINDOW:
-                vout_SetCropWindow(vout, crop.window.x, crop.window.y,
-                                   crop.window.width, crop.window.height);
-                break;
-            case VOUT_CROP_BORDER:
-                vout_SetCropBorder(vout, crop.border.left, crop.border.top,
-                                   crop.border.right, crop.border.bottom);
-                break;
-            case VOUT_CROP_NONE:
-                break;
-            }
-        }
+            vout_SetCrop(vout, &crop);
         free(psz_crop);
     }
 }
