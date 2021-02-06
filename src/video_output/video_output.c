@@ -2214,24 +2214,22 @@ static void vout_InitSource(vout_thread_sys_t *vout)
 
     char *psz_crop = var_InheritString(&vout->obj, "crop");
     if (psz_crop) {
-        unsigned num, den;
-        unsigned y, x;
-        unsigned width, height;
-        enum vout_crop_mode mode;
+        struct vout_crop crop;
 
-        if (GetCropMode(psz_crop, &mode, &num, &den,
-                        &x, &y, &width, &height))
+        if (vout_ParseCrop(&crop, psz_crop))
         {
-            switch (mode)
+            switch (crop.mode)
             {
             case VOUT_CROP_RATIO:
-                vout_SetCropRatio(vout, num, den);
+                vout_SetCropRatio(vout, crop.ratio.num, crop.ratio.den);
                 break;
             case VOUT_CROP_WINDOW:
-                vout_SetCropWindow(vout, x, y, width, height);
+                vout_SetCropWindow(vout, crop.window.x, crop.window.y,
+                                   crop.window.width, crop.window.height);
                 break;
             case VOUT_CROP_BORDER:
-                vout_SetCropBorder(vout, x, y, width, height);
+                vout_SetCropBorder(vout, crop.border.left, crop.border.top,
+                                   crop.border.right, crop.border.bottom);
                 break;
             case VOUT_CROP_NONE:
                 break;

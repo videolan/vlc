@@ -126,10 +126,7 @@ struct vout_crop {
     };
 };
 
-bool GetCropMode(const char *crop_str, enum vout_crop_mode *mode,
-                        unsigned *num, unsigned *den,
-                        unsigned *x, unsigned *y,
-                        unsigned *width, unsigned *height );
+bool vout_ParseCrop(struct vout_crop *, const char *crop_str);
 bool GetAspectRatio(const char *ar_str, unsigned *num, unsigned *den);
 
 /* TODO to move them to vlc_vout.h */
