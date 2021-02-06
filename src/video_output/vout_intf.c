@@ -480,26 +480,11 @@ static int CropCallback( vlc_object_t *object, char const *cmd,
     VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(data);
     struct vout_crop crop;
 
-    if (vout_ParseCrop(&crop, newval.psz_string)) {
-        switch (crop.mode)
-        {
-            case VOUT_CROP_RATIO:
-                vout_ChangeCropRatio(vout, crop.ratio.num, crop.ratio.den);
-                break;
-            case VOUT_CROP_WINDOW:
-                vout_ChangeCropWindow(vout, crop.window.x, crop.window.y,
-                                      crop.window.width, crop.window.height);
-                break;
-            case VOUT_CROP_BORDER:
-                vout_ChangeCropBorder(vout, crop.border.left, crop.border.top,
-                                      crop.border.right, crop.border.bottom);
-                break;
-            case VOUT_CROP_NONE:
-                break;
-        }
-    } else {
+    if (vout_ParseCrop(&crop, newval.psz_string))
+        vout_ChangeCrop(vout, &crop);
+    else
         msg_Err(object, "Unknown crop format (%s)", newval.psz_string);
-    }
+
     return VLC_SUCCESS;
 }
 
