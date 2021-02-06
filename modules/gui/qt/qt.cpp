@@ -708,6 +708,10 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
  */
 static int WindowControl( vout_window_t *, int i_query, va_list );
 
+typedef struct {
+    MainInterface *mi;
+} vout_window_qt_t;
+
 static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 {
     if( cfg->is_standalone )
@@ -737,21 +741,26 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     if (unlikely(!active))
         return VLC_EGENERIC;
 
-    MainInterface *p_mi = p_intf->p_sys->p_mi;
+    vout_window_qt_t *sys = new vout_window_qt_t;
+
+    sys->mi = p_intf->p_sys->p_mi;
     msg_Dbg( p_wnd, "requesting video window..." );
 
-    if( !p_mi->getVideo( p_wnd, cfg->width, cfg->height, cfg->is_fullscreen ) )
+    if (!sys->mi->getVideo(p_wnd, cfg->width, cfg->height, cfg->is_fullscreen))
+    {
+        delete sys;
         return VLC_EGENERIC;
+    }
 
     p_wnd->info.has_double_click = true;
     p_wnd->control = WindowControl;
-    p_wnd->sys = (vout_window_sys_t*)p_mi;
+    p_wnd->sys = (vout_window_sys_t *)sys;
     return VLC_SUCCESS;
 }
 
 static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
 {
-    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
+    vout_window_qt_t *sys = (vout_window_qt_t *)p_wnd->sys;
     QMutexLocker locker (&lock);
 
     if (unlikely(!active))
@@ -759,12 +768,12 @@ static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
         msg_Warn (p_wnd, "video already released before control");
         return VLC_EGENERIC;
     }
-    return p_mi->controlVideo( i_query, args );
+    return sys->mi->controlVideo(i_query, args);
 }
 
 static void WindowClose( vout_window_t *p_wnd )
 {
-    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
+    vout_window_qt_t *sys = (vout_window_qt_t *)p_wnd->sys;
     QMutexLocker locker (&lock);
 
     /* Normally, the interface terminates after the video. In the contrary, the
@@ -776,11 +785,13 @@ static void WindowClose( vout_window_t *p_wnd )
      * That assumes the video output will behave sanely if it window is
      * destroyed asynchronously.
      * XCB and Xlib-XCB are fine with that. Plain Xlib wouldn't, */
-    if (unlikely(!active))
+    if (likely(active))
     {
-        msg_Warn (p_wnd, "video already released");
-        return;
+        msg_Dbg(p_wnd, "releasing video...");
+        sys->mi->releaseVideo();
     }
-    msg_Dbg (p_wnd, "releasing video...");
-    p_mi->releaseVideo();
+    else
+        msg_Warn (p_wnd, "video already released");
+
+    delete sys;
 }
