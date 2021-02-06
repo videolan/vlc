@@ -103,6 +103,29 @@ int vout_ChangeSource( vout_thread_t *p_vout, const video_format_t *fmt );
 enum vout_crop_mode {
     VOUT_CROP_NONE, VOUT_CROP_RATIO, VOUT_CROP_WINDOW, VOUT_CROP_BORDER,
 };
+
+struct vout_crop {
+    enum vout_crop_mode mode;
+    union {
+        struct {
+            unsigned num;
+            unsigned den;
+        } ratio;
+        struct {
+            unsigned x;
+            unsigned y;
+            unsigned width;
+            unsigned height;
+        } window;
+        struct {
+            unsigned left;
+            unsigned right;
+            unsigned top;
+            unsigned bottom;
+        } border;
+    };
+};
+
 bool GetCropMode(const char *crop_str, enum vout_crop_mode *mode,
                         unsigned *num, unsigned *den,
                         unsigned *x, unsigned *y,

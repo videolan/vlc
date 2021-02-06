@@ -82,27 +82,7 @@ typedef struct vout_thread_sys_t
     /* */
     struct {
         vlc_rational_t dar;
-        struct {
-            enum vout_crop_mode mode;
-            union {
-                struct {
-                    unsigned num;
-                    unsigned den;
-                } ratio;
-                struct {
-                    unsigned x;
-                    unsigned y;
-                    unsigned width;
-                    unsigned height;
-                } window;
-                struct {
-                    unsigned left;
-                    unsigned right;
-                    unsigned top;
-                    unsigned bottom;
-                } border;
-            };
-        } crop;
+        struct vout_crop crop;
     } source;
 
     /* Snapshot interface */
