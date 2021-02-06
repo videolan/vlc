@@ -495,15 +495,7 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
     video_format_Print(VLC_OBJECT(vd), "SOURCE ", &fmt);
     video_format_Print(VLC_OBJECT(vd), "CROPPED ", &osys->source);
 
-    int ret = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
-    osys->crop.left   = left - osys->source.i_x_offset;
-    osys->crop.top    = top  - osys->source.i_y_offset;
-    /* FIXME for right/bottom we should keep the 'type' border vs window */
-    osys->crop.right  = right -
-                        (osys->source.i_x_offset + osys->source.i_visible_width);
-    osys->crop.bottom = bottom -
-                        (osys->source.i_y_offset + osys->source.i_visible_height);
-    return ret;
+    return vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
 }
 
 static int vout_SetSourceAspect(vout_display_t *vd,
