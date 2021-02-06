@@ -635,6 +635,11 @@ AS_IF([test "${enable_shared}" = "no" -a "${enable_vlc}" != "no"], [
   AC_MSG_ERROR([VLC is based on plugins. Shared libraries cannot be disabled.])
 ])
 
+AC_ARG_ENABLE([merge-plugins],
+  AS_HELP_STRING([--enable-merge-plugins],
+                 [enable the merging of plugins (default disabled)]))
+AM_CONDITIONAL([HAVE_MERGE_PLUGINS], [test "${enable_merge_plugins}" = "yes"])
+
 dnl
 dnl Gettext stuff
 dnl
