@@ -126,6 +126,26 @@ struct vout_crop {
     };
 };
 
+static inline bool vout_CropEqual(const struct vout_crop *a,
+                                  const struct vout_crop *b)
+{
+    if (a->mode != b->mode)
+        return false;
+
+    switch (a->mode) {
+        case VOUT_CROP_NONE:
+            return true;
+        case VOUT_CROP_RATIO:
+            return a->ratio.num * b->ratio.den == b->ratio.num * a->ratio.den;
+        case VOUT_CROP_WINDOW:
+            return memcmp(&a->window, &b->window, sizeof (a->window)) == 0;
+        case VOUT_CROP_BORDER:
+            return memcmp(&a->border, &b->border, sizeof (a->border)) == 0;
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
 bool vout_ParseCrop(struct vout_crop *, const char *crop_str);
 bool GetAspectRatio(const char *ar_str, unsigned *num, unsigned *den);
 
