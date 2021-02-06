@@ -458,6 +458,30 @@ static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
     return ret;
 }
 
+/* Memory free callback. The block_t address is in front of the data. */
+static void data_free(void *data)
+{
+    block_t **pp = data, *block;
+
+    memcpy(&block, pp - 1, sizeof (block));
+    block_Release(block);
+}
+
+static void *data_convert(block_t **pp)
+{
+    block_t *block = *pp;
+    /* In most cases, there is enough head room, and this is really cheap: */
+    block = block_Realloc(block, sizeof (block), block->i_buffer);
+    *pp = block;
+    if (unlikely(block == NULL))
+        return NULL;
+
+    memcpy(block->p_buffer, &block, sizeof (block));
+    block->p_buffer += sizeof (block);
+    block->i_buffer -= sizeof (block);
+    return block->p_buffer;
+}
+
 /**
  * Queue one audio frame to the playback stream
  */
@@ -466,6 +490,11 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
 
+    const void *ptr = data_convert(&block);
+    if (unlikely(ptr == NULL))
+        return;
+
+    size_t len = block->i_buffer;
 
     /* Note: The core already holds the output FIFO lock at this point.
      * Therefore we must not under any circumstances (try to) acquire the
@@ -486,23 +515,11 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
         pa_operation_unref(pa_stream_flush(s, NULL, NULL));
     }
 #endif
-    while (block->i_buffer > 0)
-    {
-        void *ptr;
-        size_t len = block->i_buffer;
 
-        if (pa_stream_begin_write(s, &ptr, &len))
-            vlc_pa_error(aout, "cannot begin write", sys->context);
-
-        memcpy(ptr, block->p_buffer, len);
-        block->p_buffer += len;
-        block->i_buffer -= len;
-
-        if (pa_stream_write(s, ptr, len, NULL, 0, PA_SEEK_RELATIVE) < 0)
-            vlc_pa_error(aout, "cannot write", sys->context);
+    if (pa_stream_write(s, ptr, len, data_free, 0, PA_SEEK_RELATIVE) < 0) {
+        vlc_pa_error(aout, "cannot write", sys->context);
+        block_Release(block);
     }
-
-    block_Release(block);
 
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
