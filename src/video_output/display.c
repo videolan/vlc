@@ -457,8 +457,8 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     video_format_t fmt = osys->source;
-    unsigned crop_num = osys->crop.num;
-    unsigned crop_den = osys->crop.den;
+    const unsigned crop_num = osys->crop.num;
+    const unsigned crop_den = osys->crop.den;
 
     if (crop_num != 0 && crop_den != 0) {
         VoutDisplayCropRatio(&osys->crop.left,  &osys->crop.top,
@@ -503,8 +503,6 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
                         (osys->source.i_x_offset + osys->source.i_visible_width);
     osys->crop.bottom = bottom -
                         (osys->source.i_y_offset + osys->source.i_visible_height);
-    osys->crop.num    = crop_num;
-    osys->crop.den    = crop_den;
     return ret;
 }
 
