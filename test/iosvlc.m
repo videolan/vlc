@@ -92,7 +92,8 @@ static int Open(vlc_object_t *obj)
 {
     AppDelegate *d = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     assert(d != nil && d->window != nil);
-    var_SetAddress(vlc_object_instance(obj), "drawable-nsobject", d->window);
+    var_SetAddress(vlc_object_instance(obj), "drawable-nsobject",
+                   (__bridge void *)d->window);
 
     return VLC_SUCCESS;
 }

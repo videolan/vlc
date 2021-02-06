@@ -295,7 +295,7 @@ endif
 vlc_ios_SOURCES = iosvlc.m
 vlc_ios_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,Foundation,-framework,UIKit
 vlc_ios_LDFLAGS += -Xlinker -rpath -Xlinker "$(libdir)"
-vlc_ios_CFLAGS = -fobjc-arc
+vlc_ios_OBJCFLAGS = -fobjc-arc
 vlc_ios_LDADD = ../lib/libvlc.la ../src/libvlccore.la
 if HAVE_IOS
 noinst_PROGRAMS += vlc-ios
