@@ -42,6 +42,7 @@
 
 #include "display.h"
 #include "window.h"
+#include "vout_internal.h"
 
 /*****************************************************************************
  * FIXME/TODO see how to have direct rendering here (interact with vout.c)
@@ -628,10 +629,32 @@ void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_de
 }
 
 void vout_SetDisplayCrop(vout_display_t *vd,
-                         unsigned crop_num, unsigned crop_den,
-                         unsigned left, unsigned top, int right, int bottom)
+                         const struct vout_crop *restrict crop)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+    unsigned crop_num = 0, crop_den = 0, left = 0, top = 0;
+    int right = 0, bottom = 0;
+
+    switch (crop->mode) {
+        case VOUT_CROP_NONE:
+            break;
+        case VOUT_CROP_RATIO:
+            crop_num = crop->ratio.num;
+            crop_den = crop->ratio.den;
+            break;
+        case VOUT_CROP_WINDOW:
+            left = crop->window.x;
+            top = crop->window.y;
+            right = crop->window.width;
+            bottom = crop->window.height;
+            break;
+        case VOUT_CROP_BORDER:
+            left = crop->border.left;
+            top = crop->border.top;
+            right = -(int)crop->border.right;
+            bottom = -(int)crop->border.bottom;
+            break;
+    }
 
     if (osys->crop.left  != (int)left  || osys->crop.top != (int)top ||
         osys->crop.right != right || osys->crop.bottom != bottom ||

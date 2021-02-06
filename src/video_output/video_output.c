@@ -661,27 +661,7 @@ void vout_ChangeCrop(vout_thread_t *vout,
     vlc_mutex_unlock(&sys->window_lock);
 
     if (sys->display != NULL)
-        switch (crop->mode) {
-            case VOUT_CROP_NONE:
-                vout_SetDisplayCrop(sys->display, 0, 0, 0, 0, 0, 0);
-                break;
-            case VOUT_CROP_RATIO:
-                vout_SetDisplayCrop(sys->display, crop->ratio.num,
-                                    crop->ratio.den, 0, 0, 0, 0);
-                break;
-            case VOUT_CROP_WINDOW:
-                vout_SetDisplayCrop(sys->display, 0, 0,
-                                    crop->window.x, crop->window.y,
-                                    crop->window.width, crop->window.height);
-                break;
-            case VOUT_CROP_BORDER:
-                vout_SetDisplayCrop(sys->display, 0, 0,
-                                    crop->border.left, crop->border.top,
-                                    -(int)crop->border.right,
-                                    -(int)crop->border.bottom);
-                break;
-        }
-
+        vout_SetDisplayCrop(sys->display, crop);
     vlc_mutex_unlock(&sys->display_lock);
 }
 
@@ -1699,8 +1679,7 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     sys->filter.chain_interactive = filter_chain_NewVideo(&vout->obj, true, &owner);
 
     vout_display_cfg_t dcfg;
-    int x = 0, y = 0, w = 0, h = 0;
-    unsigned crop_num = 0, crop_den = 0;
+    struct vout_crop crop;
     unsigned num, den;
 
     vlc_mutex_lock(&sys->window_lock);
@@ -1715,28 +1694,7 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
 #endif
 
     dcfg = sys->display_cfg;
-
-    switch (sys->source.crop.mode) {
-        case VOUT_CROP_NONE:
-            break;
-        case VOUT_CROP_RATIO:
-            crop_num = sys->source.crop.ratio.num;
-            crop_den = sys->source.crop.ratio.den;
-            break;
-        case VOUT_CROP_WINDOW:
-            x = sys->source.crop.window.x;
-            y = sys->source.crop.window.y;
-            w = sys->source.crop.window.width;
-            h = sys->source.crop.window.height;
-            break;
-        case VOUT_CROP_BORDER:
-            x = sys->source.crop.border.left;
-            y = sys->source.crop.border.top;
-            w = -(int)sys->source.crop.border.right;
-            h = -(int)sys->source.crop.border.bottom;
-            break;
-    }
-
+    crop = sys->source.crop;
     num = sys->source.dar.num;
     den = sys->source.dar.den;
     vlc_mutex_lock(&sys->display_lock);
@@ -1753,7 +1711,7 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
         goto error;
     }
 
-    vout_SetDisplayCrop(sys->display, crop_num, crop_den, x, y, w, h);
+    vout_SetDisplayCrop(sys->display, &crop);
 
     if (num != 0 && den != 0)
         vout_SetDisplayAspect(sys->display, num, den);
