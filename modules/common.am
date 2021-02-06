@@ -20,10 +20,19 @@ MODULE_NAME = $$(p="$@"; p=$$(echo "$$p"|sed 's/lib//g'); p="$${p%_plugin*}"; p=
 MODULE_FULLNAME = $$(p="$@"; p="$${p\#lib}"; p="$${p%_plugin*}"; p=$$(echo "$$p"|sed 's/[-\/]/_/g'); p="$${p%.lo}"; echo "$$p")
 
 AM_CPPFLAGS = -DMODULE_STRING=\"$(MODULE_STRING)\"
-AM_LDFLAGS =
+AM_LDFLAGS = \
+	-avoid-version -module \
+	-export-symbols-regex ^vlc_entry \
+	-shrext $(LIBEXT) \
+	-no-undefined \
+	$(top_builddir)/compat/libcompat.la $(LTLIBVLCCORE)
 if HAVE_DYNAMIC_PLUGINS
-# AM_CPPFLAGS += -D__PLUGIN__
+if HAVE_MERGE_PLUGINS
 AM_CPPFLAGS += -DMODULE_NAME=$(MODULE_NAME)
+AM_LDFLAGS += -static
+else
+AM_CPPFLAGS += -D__PLUGIN__
+endif
 else
 AM_CPPFLAGS += -DMODULE_NAME=$(MODULE_FULLNAME)
 AM_LDFLAGS += -static
@@ -31,12 +40,6 @@ endif
 AM_CFLAGS =
 AM_CXXFLAGS =
 AM_OBJCFLAGS =
-AM_LDFLAGS += \
-	-avoid-version -module \
-	-export-symbols-regex ^vlc_entry \
-	-shrext $(LIBEXT) \
-	-no-undefined -static \
-	$(top_builddir)/compat/libcompat.la $(LTLIBVLCCORE)
 if HAVE_WIN32
 AM_LDFLAGS += $(top_builddir)/modules/module.rc.lo -Wc,-static
 endif

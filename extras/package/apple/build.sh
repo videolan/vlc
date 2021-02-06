@@ -337,11 +337,13 @@ hostenv()
     CXX="${VLC_HOST_CXX}" \
     OBJC="${VLC_HOST_OBJC}" \
     LD="${VLC_HOST_LD}" \
-    AR="${VLC_BUILD_DIR}/build/ar.sh" \
+    AR="${VLC_HOST_AR}" \
     STRIP="${VLC_HOST_STRIP}" \
     RANLIB="${VLC_HOST_RANLIB}" \
     NM="${VLC_HOST_NM}" \
     "$@"
+#VLC_BUILD_DIR}/build/ar.sh"
+
 }
 
 ac_var_to_export_ac_var()
