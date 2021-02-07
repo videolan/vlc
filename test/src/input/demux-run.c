@@ -67,8 +67,9 @@ struct es_out_id_t
 #endif
 };
 
-static es_out_id_t *EsOutAdd(es_out_t *out, const es_format_t *fmt)
+static es_out_id_t *EsOutAdd(es_out_t *out, input_source_t* in, const es_format_t *fmt)
 {
+    (void)in;
     struct test_es_out_t *ctx = (struct test_es_out_t *) out;
 
     if (fmt->i_group < 0)
@@ -146,8 +147,9 @@ static void EsOutDelete(es_out_t *out, es_out_id_t *id)
     IdDelete(id);
 }
 
-static int EsOutControl(es_out_t *out, int query, va_list args)
+static int EsOutControl(es_out_t *out, input_source_t* in, int query, va_list args)
 {
+    (void)in;
     struct test_es_out_t *ctx = (struct test_es_out_t *) out;
 
     switch (query)
