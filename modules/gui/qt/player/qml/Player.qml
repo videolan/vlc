@@ -432,7 +432,6 @@ Widgets.NavigableFocusScope {
     Widgets.DrawerExt {
         id: controlBarView
 
-        property var autoHide: controlBarView.contentItem.autoHide
         readonly property int sliderY: contentItem.sliderY
 
         anchors {
@@ -447,12 +446,13 @@ Widgets.NavigableFocusScope {
         component: MouseArea {
             id: controllerMouseArea
 
-            property alias autoHide: controllerId.autoHide
             readonly property alias sliderY: controllerId.sliderY
 
             height: controllerId.implicitHeight + controllerId.anchors.bottomMargin
             width: controlBarView.width
             hoverEnabled: true
+
+            onContainsMouseChanged: rootPlayer.lockUnlockAutoHide(containsMouse, topcontrolView)
 
             ControlBar {
                 id: controllerId
@@ -462,18 +462,10 @@ Widgets.NavigableFocusScope {
                 anchors.rightMargin: VLCStyle.applicationHorizontalMargin
                 anchors.bottomMargin: VLCStyle.applicationVerticalMargin
                 colors: rootPlayer.colors
-
-                lockAutoHide: playlistpopup.state === "visible"
-                    || !player.hasVideoOutput
-                    || !rootPlayer.hasEmbededVideo
-                    || controllerMouseArea.containsMouse
-                onAutoHideChanged: {
-                    if (autoHide)
-                        toolbarAutoHide.restart()
-                }
-
                 navigationParent: rootPlayer
                 navigationUpItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)
+
+                onRequestLockUnlockAutoHide: rootPlayer.lockUnlockAutoHide(lock, source)
             }
         }
     }
@@ -548,8 +540,6 @@ Widgets.NavigableFocusScope {
             else
             {
                 if (!rootPlayer._autoHide)
-                    return;
-                if (!controlBarView.autoHide)
                     return;
                 controlBarView.state = "hidden"
                 topcontrolView.state = "hidden"

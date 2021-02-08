@@ -42,9 +42,8 @@ Widgets.NavigableFocusScope {
     readonly property alias sliderY: row2.y
     property int textPosition: ControlBar.TimeTextPosition.AboveSlider
     property VLCColors colors: VLCStyle.nightColors
-    property bool autoHide: _lockAutoHide === 0 && !lockAutoHide
-    property bool lockAutoHide: false
-    property int  _lockAutoHide: 0 //count the number of element locking the autoHide
+
+    signal requestLockUnlockAutoHide(bool lock, var source)
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)
@@ -149,6 +148,8 @@ Widgets.NavigableFocusScope {
                 navigationUpItem: trackPositionSlider.enabled ? trackPositionSlider : root.navigationUpItem
 
                 colors: root.colors
+
+                onRequestLockUnlockAutoHide: root.requestLockUnlockAutoHide(lock, source)
             }
         }
     }

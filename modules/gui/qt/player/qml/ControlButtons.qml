@@ -33,6 +33,8 @@ Item{
     property bool isMiniplayer: false
     property var  parentWindow: undefined
 
+    signal requestLockUnlockAutoHide(bool lock, var source)
+
     property var buttonL: [
         { id:  PlayerControlBarModel.PLAY_BUTTON, label: VLCIcons.play, text: i18n.qtr("Play")},
         { id:  PlayerControlBarModel.STOP_BUTTON, label: VLCIcons.stop, text: i18n.qtr("Stop")},
@@ -432,10 +434,7 @@ Item{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.audiosub
 
-            onClicked: {
-                root._lockAutoHide += 1
-                langMenu.open()
-            }
+            onClicked: langMenu.open()
 
             text: i18n.qtr("Languages and tracks")
 
@@ -448,9 +447,13 @@ Item{
                 y: (!!rootPlayer) ? (rootPlayer.positionSliderY - height) : 0
                 z: 1
 
-                onOpened: rootPlayer._menu = langMenu
+                onOpened: {
+                    controlButtons.requestLockUnlockAutoHide(true, controlButtons)
+                    rootPlayer._menu = langMenu
+                }
+
                 onMenuClosed: {
-                    root._lockAutoHide -= 1
+                    controlButtons.requestLockUnlockAutoHide(false, controlButtons)
                     langBtn.forceActiveFocus()
                     rootPlayer._menu = undefined
                 }

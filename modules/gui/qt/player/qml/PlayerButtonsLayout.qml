@@ -43,6 +43,8 @@ Widgets.NavigableFocusScope {
     property real spacing: VLCStyle.margin_normal // spacing between controls
     property real layoutSpacing: VLCStyle.margin_xlarge // spacing between layouts (left, center, and right)
 
+    signal requestLockUnlockAutoHide(bool lock, var source)
+
     enum Alignment {
         Left = 0,
         Center = 1,
@@ -66,6 +68,8 @@ Widgets.NavigableFocusScope {
 
         isMiniplayer: false
         parentWindow: g_root
+
+        onRequestLockUnlockAutoHide: playerButtonsLayout.requestLockUnlockAutoHide(lock, source)
     }
 
     ButtonsLayout {
