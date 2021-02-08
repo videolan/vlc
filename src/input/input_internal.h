@@ -638,6 +638,7 @@ static inline int input_ControlPushEsHelper( input_thread_t *p_input, int i_type
  *
  * cf. ES_OUT_SET_ES_CAT_IDS
  * This function can be called before start or while started.
+ * This function is not thread-safe, the caller should handle the locking.
  */
 void input_SetEsCatIds(input_thread_t *, enum es_format_category_e cat,
                        const char *str_ids);
