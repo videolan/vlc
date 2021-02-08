@@ -344,6 +344,20 @@ static es_out_id_t * MP4_CreateES( es_out_t *out, const es_format_t *p_fmt,
     return p_es;
 }
 
+static const mp4_chunk_t * MP4_TrackChunkForSample( const mp4_track_t *p_track,
+                                                    uint32_t i_sample )
+{
+    if( i_sample >= p_track->i_sample_count )
+        return NULL;
+    for( uint32_t i=0; i<p_track->i_chunk_count; i++ )
+    {
+        if( i_sample >= p_track->chunk[i].i_sample_first &&
+            i_sample - p_track->chunk[i].i_sample_first < p_track->chunk[i].i_sample_count )
+            return &p_track->chunk[i];
+    }
+    return NULL;
+}
+
 static stime_t MP4_ChunkGetSampleDTS( const mp4_chunk_t *p_chunk,
                                       uint32_t i_sample )
 {
@@ -3325,6 +3339,40 @@ static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
     return p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
+static void TrackUpdateStarttimes( mp4_track_t *p_track )
+{
+    assert(p_track->i_chunk < p_track->i_chunk_count);
+
+    p_track->i_start_dts = p_track->i_next_dts;
+    p_track->i_start_delta = p_track->i_next_delta;
+
+    /* Probe the 16 first B frames */
+    const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
+    if( p_chunk->i_entries_pts )
+    {
+        for( uint32_t i=1; i<16; i++ )
+        {
+            uint32_t i_nextsample = p_track->i_sample + i;
+            const mp4_chunk_t *ck = MP4_TrackChunkForSample( p_track, i_nextsample );
+            if(!ck)
+                break;
+            stime_t pts;
+            stime_t dts = pts = MP4_ChunkGetSampleDTS( ck, i_nextsample - ck->i_sample_first );
+            stime_t delta = UNKNOWN_DELTA;
+            if( MP4_ChunkGetSampleCTSDelta( ck, i_nextsample - ck->i_sample_first, &delta ) )
+                pts += delta;
+            stime_t lowest = p_track->i_start_dts;
+            if( p_track->i_start_delta != UNKNOWN_DELTA )
+                lowest += p_track->i_start_delta;
+            if( pts < lowest )
+            {
+                p_track->i_start_dts = dts;
+                p_track->i_start_delta = delta;
+            }
+        }
+    }
+}
+
 static void TrackUpdateSampleAndTimes( mp4_track_t *p_track )
 {
     const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
@@ -3696,6 +3744,7 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
     {
         p_track->b_selected = true;
         TrackUpdateSampleAndTimes( p_track );
+        TrackUpdateStarttimes( p_track );
     }
 
     return p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC;

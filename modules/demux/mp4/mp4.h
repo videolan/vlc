@@ -128,7 +128,9 @@ typedef struct
     int64_t         i_elst_time;    /* current elst start time (in movie time scale)*/
     const MP4_Box_t *p_elst;        /* elst (could be NULL) */
 
+    uint32_t         i_start_delta;
     uint32_t         i_next_delta;
+    stime_t          i_start_dts;
     stime_t          i_next_dts;
     /* give the next sample to read, i_chunk is to find quickly where
       the sample is located */
