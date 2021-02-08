@@ -33,6 +33,10 @@ Widgets.NavigableFocusScope {
 
     //menu/overlay to dismiss
     property var _menu: undefined
+    property int _lockAutoHide: 0
+    readonly property bool _autoHide: _lockAutoHide == 0
+                                      && rootPlayer.hasEmbededVideo
+                                      && player.hasVideoOutput
 
     property bool hasEmbededVideo: mainInterface.hasEmbededVideo
     readonly property int positionSliderY: controlBarView.y + controlBarView.sliderY
@@ -41,11 +45,6 @@ Widgets.NavigableFocusScope {
                                           : VLCStyle.noArtCover
     readonly property VLCColors colors: (mainInterface.hasEmbededVideo || (coverLuminance.luminance < 140))
                                         ? VLCStyle.nightColors : VLCStyle.dayColors
-
-    function dismiss() {
-        if (_menu)
-            _menu.dismiss()
-    }
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: {
@@ -77,6 +76,21 @@ Widgets.NavigableFocusScope {
             }
             history.previous()
         }
+    }
+
+    on_AutoHideChanged: {
+        if (_autoHide)
+            toolbarAutoHide.restart()
+    }
+
+    function dismiss() {
+        if (_menu)
+            _menu.dismiss()
+    }
+
+    function lockUnlockAutoHide(lock, source /*unused*/) {
+        _lockAutoHide += lock ? 1 : -1;
+        console.assert(_lockAutoHide >= 0)
     }
 
     ImageLuminanceExtractor {
@@ -533,6 +547,8 @@ Widgets.NavigableFocusScope {
             }
             else
             {
+                if (!rootPlayer._autoHide)
+                    return;
                 if (!controlBarView.autoHide || !topcontrolView.autoHide)
                     return;
                 controlBarView.state = "hidden"
