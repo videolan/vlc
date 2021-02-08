@@ -748,6 +748,9 @@ typedef bool( *libvlc_video_output_select_plane_cb )( void *opaque, size_t plane
  * \param select_plane_cb callback to select different D3D11 rendering targets
  * \param opaque private pointer passed to callbacks
  *
+ * \note the \param setup_cb and \param cleanup_cb may be called more than once per
+ * playback.
+ *
  * \retval true engine selected and callbacks set
  * \retval false engine type unknown, callbacks not set
  * \version LibVLC 4.0.0 or later
