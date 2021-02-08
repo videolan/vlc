@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "उपयोक्ता अनुरोध अनुसार वीएलसी द्वारा कैमरा अभिगम इच्छित है।";
+"NSMicrophoneUsageDescription" = "उपयोक्ता अनुरोध अनुसार वीएलसी द्वारा माइक्रोफोन अभिगम इच्छित है।";
+"NSAppleEventsUsageDescription" = "वीएलसी द्वारा बाह्य मीडिया प्लेयर परिचालन इच्छित है।";
+"NSDesktopFolderUsageDescription" = "उपयोक्ता अनुरोध अनुसार वीएलसी द्वारा डेस्कटॉप फोल्डर अभिगम इच्छित है।";
+"NSDocumentsFolderUsageDescription" = "उपयोक्ता अनुरोध अनुसार वीएलसी द्वारा प्रलेख फोल्डर अभिगम इच्छित है।";
+"NSDownloadsFolderUsageDescription" = "उपयोक्ता अनुरोध अनुसार वीएलसी द्वारा डाउनलोड फोल्डर अभिगम इच्छित है।";
+"NSNetworkVolumesUsageDescription" = "उपयोक्ता अनुरोध अनुसार वीएलसी द्वारा नेटवर्क ध्वनि अभिगम इच्छित है।";
+"NSRemovableVolumesUsageDescription" = "उपयोक्ता अनुरोध अनुसार वीएलसी द्वारा हटने योग्य वॉल्यूम अभिगम इच्छित है।";
