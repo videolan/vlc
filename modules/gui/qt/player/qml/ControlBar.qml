@@ -42,6 +42,7 @@ Widgets.NavigableFocusScope {
     readonly property alias sliderY: row2.y
     property int textPosition: ControlBar.TimeTextPosition.AboveSlider
     property VLCColors colors: VLCStyle.nightColors
+    property var configs: ["MainPlayerToolbar-left", "MainPlayerToolbar-center", "MainPlayerToolbar-right"]
 
     signal requestLockUnlockAutoHide(bool lock, var source)
 
@@ -197,18 +198,18 @@ Widgets.NavigableFocusScope {
     PlayerControlBarModel{
         id:playerControlBarModel_left
         mainCtx: mainctx
-        configName: "MainPlayerToolbar-left"
+        configName: root.configs[0]
     }
 
     PlayerControlBarModel{
         id:playerControlBarModel_center
         mainCtx: mainctx
-        configName: "MainPlayerToolbar-center"
+        configName: root.configs[1]
     }
 
     PlayerControlBarModel{
         id:playerControlBarModel_right
         mainCtx: mainctx
-        configName: "MainPlayerToolbar-right"
+        configName: root.configs[2]
     }
 }
