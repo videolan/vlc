@@ -109,7 +109,10 @@ void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
                     p_t35[i_t35] = bs_read( &s, 8 );
 
                 if( bs_error( &s ) )
+                {
+                    free( p_t35 );
                     break;
+                }
 
                 /* TS 101 154 Auxiliary Data and H264/AVC video */
                 if( i_t35 > 4 && p_t35[0] == 0xb5 /* United States */ )
