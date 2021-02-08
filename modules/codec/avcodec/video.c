@@ -887,6 +887,12 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
     const AVFrameSideData *p_avcc = av_frame_get_side_data( frame, AV_FRAME_DATA_A53_CC );
     if( p_avcc )
     {
+        int ccpayloadsize = __MIN(PICTURE_MAX_CAPTION_BYTES - 7, p_avcc->size);
+        memcpy( p_pic->captions.bytes, "GA94\x03", 5 );
+        p_pic->captions.bytes[5] = 0x80 | 0x40 | ccpayloadsize/3;
+        p_pic->captions.bytes[6] = 0xFF;
+        memcpy( p_pic->captions.bytes + 7, p_avcc->data, ccpayloadsize );
+        p_pic->captions.size = 7 + ccpayloadsize;
         cc_Extract( &p_sys->cc, CC_PAYLOAD_RAW, true, p_avcc->data, p_avcc->size );
         if( p_sys->cc.b_reorder || p_sys->cc.i_data )
         {
