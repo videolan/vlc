@@ -37,6 +37,7 @@ Widgets.NavigableFocusScope {
     readonly property bool _autoHide: _lockAutoHide == 0
                                       && rootPlayer.hasEmbededVideo
                                       && player.hasVideoOutput
+                                      && playlistpopup.state !== "visible"
 
     property bool hasEmbededVideo: mainInterface.hasEmbededVideo
     readonly property int positionSliderY: controlBarView.y + controlBarView.sliderY
@@ -259,7 +260,6 @@ Widgets.NavigableFocusScope {
 
         z: 1
         edge: Widgets.DrawerExt.Edges.Top
-        property var autoHide: topcontrolView.contentItem.autoHide
 
         state: "visible"
 
@@ -267,7 +267,6 @@ Widgets.NavigableFocusScope {
             width: topcontrolView.width
             height: topbar.implicitHeight
             focus: true
-            property bool autoHide: topbar.autoHide && !resumeDialog.visible
 
             TopBar {
                 id: topbar
@@ -276,13 +275,6 @@ Widgets.NavigableFocusScope {
 
                 focus: true
                 visible: !resumeDialog.visible
-
-                onAutoHideChanged: {
-                    if (autoHide)
-                        toolbarAutoHide.restart()
-                }
-
-                lockAutoHide: playlistpopup.state === "visible"
                 title: mainPlaylistController.currentItem.title
                 colors: rootPlayer.colors
 
@@ -294,6 +286,10 @@ Widgets.NavigableFocusScope {
                         playlistpopup.showPlaylist = !playlistpopup.showPlaylist
                     else
                         mainInterface.playlistVisible = !mainInterface.playlistVisible
+                }
+
+                onRequestLockUnlockAutoHide: {
+                    rootPlayer.lockUnlockAutoHide(lock, source)
                 }
             }
 
@@ -309,6 +305,10 @@ Widgets.NavigableFocusScope {
                         topbar.focus = true
                         controlBarView.forceActiveFocus()
                     }
+                }
+
+                onVisibleChanged: {
+                    rootPlayer.lockUnlockAutoHide(visible, resumeDialog)
                 }
             }
         }
@@ -549,7 +549,7 @@ Widgets.NavigableFocusScope {
             {
                 if (!rootPlayer._autoHide)
                     return;
-                if (!controlBarView.autoHide || !topcontrolView.autoHide)
+                if (!controlBarView.autoHide)
                     return;
                 controlBarView.state = "hidden"
                 topcontrolView.state = "hidden"

@@ -31,17 +31,11 @@ Widgets.NavigableFocusScope{
 
     implicitHeight: topcontrolContent.implicitHeight
 
-    property bool autoHide: player.hasVideoOutput
-                            && rootPlayer.hasEmbededVideo
-                            && !topcontrollerMouseArea.containsMouse
-                            && !lockAutoHide
-
-    property bool lockAutoHide: false
-
     property alias title: titleText.text
     property VLCColors colors: VLCStyle.nightColors
 
     signal tooglePlaylistVisibility()
+    signal requestLockUnlockAutoHide(bool lock, var source)
 
     function forceFocusOnPlaylistButton() {
         playlistButton.forceActiveFocus()
@@ -64,6 +58,8 @@ Widgets.NavigableFocusScope{
             anchors.leftMargin: VLCStyle.applicationHorizontalMargin
             anchors.rightMargin: VLCStyle.applicationHorizontalMargin
             implicitHeight: rowLayout.implicitHeight
+
+            onContainsMouseChanged: topFocusScope.requestLockUnlockAutoHide(containsMouse, topFocusScope)
 
             //drag and dbl click the titlebar in CSD mode
             Loader {
