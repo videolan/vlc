@@ -533,7 +533,11 @@ void PlaylistControllerModel::explore(const PlaylistItem& pItem)
             if( !path )
                 return;
 
-            QUrl file = QUrl::fromLocalFile( QFileInfo(path).absolutePath() );
+            QString containingDir = QFileInfo( path ).absolutePath();
+            if( !QFileInfo( containingDir ).isDir() )
+                return;
+
+            QUrl file = QUrl::fromLocalFile( containingDir );
             free( path );
 
             if( !file.isLocalFile() )
