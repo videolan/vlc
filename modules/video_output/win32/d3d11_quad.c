@@ -63,6 +63,8 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d11_quad_t *quad, d3d11_vertex_
     ID3D11DeviceContext_PSSetConstantBuffers(d3d_dev->d3dcontext, 0, ARRAY_SIZE(quad->pPixelShaderConstants), quad->pPixelShaderConstants);
     assert(quad->resourceCount <= DXGI_MAX_SHADER_VIEW);
 
+    ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, resourceView);
+
     for (size_t i=0; i<ARRAY_SIZE(quad->d3dpixelShader); i++)
     {
         if (!quad->d3dpixelShader[i])
@@ -70,8 +72,6 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d11_quad_t *quad, d3d11_vertex_
 
         if (unlikely(!selectPlane(selectOpaque, i)))
             continue;
-
-        ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, resourceView);
 
         ID3D11DeviceContext_PSSetShader(d3d_dev->d3dcontext, quad->d3dpixelShader[i], NULL, 0);
 
