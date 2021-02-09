@@ -43,6 +43,9 @@ Widgets.NavigableFocusScope {
     property int textPosition: ControlBar.TimeTextPosition.AboveSlider
     property VLCColors colors: VLCStyle.nightColors
     property var configs: ["MainPlayerToolbar-left", "MainPlayerToolbar-center", "MainPlayerToolbar-right"]
+    property alias sliderHeight: trackPositionSlider.barHeight
+    property alias sliderBackgroundColor: trackPositionSlider.backgroundColor
+    property alias sliderProgressColor: trackPositionSlider.progressBarColor
 
     signal requestLockUnlockAutoHide(bool lock, var source)
 
