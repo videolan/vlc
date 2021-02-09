@@ -26,6 +26,9 @@ ifdef HAVE_LINUX
 LIVE_TARGET := linux
 LIVE_EXTRA_CFLAGS += -DXLOCALE_NOT_USED
 endif
+ifdef HAVE_ANDROID
+LIVE_EXTRA_CFLAGS += -DDISABLE_LOOPBACK_IP_ADDRESS_CHECK=1
+endif
 ifdef HAVE_WIN32
 LIVE_TARGET := mingw
 endif
@@ -83,6 +86,8 @@ endif
 	$(APPLY) $(SRC)/live555/mingw-static-libs.patch
 	# FormatMessageA is available on all Windows versions, even WinRT
 	$(APPLY) $(SRC)/live555/live555-formatmessage.patch
+        # Disable Multicast interface lookup option
+	$(APPLY) $(SRC)/live555/DISABLE_LOOPBACK_IP_ADDRESS_CHECK.patch
 ifdef HAVE_ANDROID
 	# Fix in_addr.s_addr field access
 	$(APPLY) $(SRC)/live555/in_addr-s_addr-field.patch
