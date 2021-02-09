@@ -46,7 +46,7 @@ namespace adaptive
                 void                                debug               (vlc_object_t *,int = 0) const;
 
                 virtual vlc_tick_t getPeriodStart() const override;
-                virtual vlc_tick_t getPeriodDuration() const;
+                virtual vlc_tick_t getPeriodDuration() const override;
                 virtual BasePlaylist *getPlaylist() const override;
 
                 Property<vlc_tick_t> duration;
