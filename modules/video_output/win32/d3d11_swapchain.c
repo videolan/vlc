@@ -59,7 +59,7 @@ struct d3d11_local_swapchain
     vlc_object_t           *obj;
     d3d11_device_t         *d3d_dev;
 
-    ID3D11RenderTargetView *swapchainTargetView[D3D11_MAX_RENDER_TARGET];
+    ID3D11RenderTargetView *swapchainTargetView[DXGI_MAX_RENDER_TARGET];
 };
 
 DEFINE_GUID(GUID_SWAPCHAIN_WIDTH,  0xf1b59347, 0x1643, 0x411a, 0xad, 0x6b, 0xc7, 0x80, 0x17, 0x7a, 0x06, 0xb6);

@@ -102,8 +102,6 @@ typedef struct
     VS_PROJECTION_CONST       vertexConstants;
 } d3d11_quad_t;
 
-#define D3D11_MAX_RENDER_TARGET    2
-
 int D3D11_InitShaders(vlc_object_t *, d3d11_shader_compiler_t *);
 void D3D11_ReleaseShaders(d3d11_shader_compiler_t *);
 
@@ -127,10 +125,10 @@ float GetFormatLuminance(vlc_object_t *, const video_format_t *);
 #define GetFormatLuminance(a,b)  GetFormatLuminance(VLC_OBJECT(a),b)
 
 HRESULT D3D11_CreateRenderTargets(d3d11_device_t *, ID3D11Resource *, const d3d_format_t *,
-                                  ID3D11RenderTargetView *output[D3D11_MAX_RENDER_TARGET]);
+                                  ID3D11RenderTargetView *output[DXGI_MAX_RENDER_TARGET]);
 
 void D3D11_ClearRenderTargets(d3d11_device_t *, const d3d_format_t *,
-                              ID3D11RenderTargetView *targets[D3D11_MAX_RENDER_TARGET]);
+                              ID3D11RenderTargetView *targets[DXGI_MAX_RENDER_TARGET]);
 
 void D3D11_ReleaseVertexShader(d3d11_vertex_shader_t *);
 
