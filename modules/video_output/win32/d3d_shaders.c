@@ -51,16 +51,13 @@ const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;\n"
 static const char* globPixelShaderDefault = "\
   cbuffer PS_CONSTANT_BUFFER : register(b0)\n\
   {\n\
+    float4x4 WhitePoint;\n\
+    float4x4 Colorspace;\n\
+    float4x4 Primaries;\n\
     float Opacity;\n\
     float LuminanceScale;\n\
     float BoundaryX;\n\
     float BoundaryY;\n\
-  };\n\
-  cbuffer PS_COLOR_TRANSFORM : register(b1)\n\
-  {\n\
-    float4x4 WhitePoint;\n\
-    float4x4 Colorspace;\n\
-    float4x4 Primaries;\n\
   };\n\
   Texture2D%s shaderTexture[4];\n\
   SamplerState normalSampler : register(s0);\n\
@@ -1057,7 +1054,7 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
                        0.f,              0.f,              0.f, 1.f,
     };
 
-    memcpy(quad->colorsConstants->WhitePoint, IDENTITY_4X4, sizeof(quad->colorsConstants->WhitePoint));
+    memcpy(quad->shaderConstants->WhitePoint, IDENTITY_4X4, sizeof(quad->shaderConstants->WhitePoint));
 
     const FLOAT *ppColorspace;
     if (RGB_src_shader == DxgiIsRGBFormat(displayFormat->pixelFormat))
@@ -1067,9 +1064,9 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
     else if (RGB_src_shader)
     {
         ppColorspace = COLORSPACE_FULL_RGBA_TO_BT601_YUV;
-        quad->colorsConstants->WhitePoint[0*4 + 3] = -itu_black_level;
-        quad->colorsConstants->WhitePoint[1*4 + 3] = itu_achromacy;
-        quad->colorsConstants->WhitePoint[2*4 + 3] = itu_achromacy;
+        quad->shaderConstants->WhitePoint[0*4 + 3] = -itu_black_level;
+        quad->shaderConstants->WhitePoint[1*4 + 3] = itu_achromacy;
+        quad->shaderConstants->WhitePoint[2*4 + 3] = itu_achromacy;
     }
     else
     {
@@ -1096,16 +1093,16 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
                 break;
         }
         /* all matrices work in studio range and output in full range */
-        quad->colorsConstants->WhitePoint[0*4 + 3] = -itu_black_level;
-        quad->colorsConstants->WhitePoint[1*4 + 3] = -itu_achromacy;
-        quad->colorsConstants->WhitePoint[2*4 + 3] = -itu_achromacy;
+        quad->shaderConstants->WhitePoint[0*4 + 3] = -itu_black_level;
+        quad->shaderConstants->WhitePoint[1*4 + 3] = -itu_achromacy;
+        quad->shaderConstants->WhitePoint[2*4 + 3] = -itu_achromacy;
     }
 
-    memcpy(quad->colorsConstants->Colorspace, ppColorspace, sizeof(quad->colorsConstants->Colorspace));
+    memcpy(quad->shaderConstants->Colorspace, ppColorspace, sizeof(quad->shaderConstants->Colorspace));
 
     if (fmt->primaries != displayFormat->primaries)
     {
-        GetPrimariesTransform(quad->colorsConstants->Primaries, fmt->primaries,
+        GetPrimariesTransform(quad->shaderConstants->Primaries, fmt->primaries,
                               displayFormat->primaries);
     }
 }

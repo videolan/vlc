@@ -27,8 +27,7 @@
 #include "d3d11_shaders.h"
 
 #define PS_CONST_LUMI_BOUNDS 0
-#define PS_CONST_COLORSPACE  1
-#define VS_CONST_VIEWPOINT   2
+#define VS_CONST_VIEWPOINT   1
 
 typedef bool (*d3d11_select_plane_t)(void *opaque, size_t plane_index);
 

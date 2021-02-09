@@ -60,7 +60,7 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d11_quad_t *quad, d3d11_vertex_
         ID3D11DeviceContext_PSSetSamplers(d3d_dev->d3dcontext, 0, 2, quad->SamplerStates);
 
     /* pixel shader */
-    ID3D11DeviceContext_PSSetConstantBuffers(d3d_dev->d3dcontext, 0, ARRAY_SIZE(quad->pPixelShaderConstants), quad->pPixelShaderConstants);
+    ID3D11DeviceContext_PSSetConstantBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pPixelShaderConstants);
     assert(quad->resourceCount <= DXGI_MAX_SHADER_VIEW);
 
     ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, resourceView);
@@ -137,15 +137,10 @@ fail:
 
 void D3D11_ReleaseQuad(d3d11_quad_t *quad)
 {
-    if (quad->pPixelShaderConstants[PS_CONST_LUMI_BOUNDS])
+    if (quad->pPixelShaderConstants)
     {
-        ID3D11Buffer_Release(quad->pPixelShaderConstants[PS_CONST_LUMI_BOUNDS]);
-        quad->pPixelShaderConstants[PS_CONST_LUMI_BOUNDS] = NULL;
-    }
-    if (quad->pPixelShaderConstants[PS_CONST_COLORSPACE])
-    {
-        ID3D11Buffer_Release(quad->pPixelShaderConstants[PS_CONST_COLORSPACE]);
-        quad->pPixelShaderConstants[PS_CONST_COLORSPACE] = NULL;
+        ID3D11Buffer_Release(quad->pPixelShaderConstants);
+        quad->pPixelShaderConstants = NULL;
     }
     if (quad->pVertexBuffer)
     {
@@ -216,10 +211,7 @@ static bool ShaderUpdateConstants(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d1
     switch (type)
     {
         case PS_CONST_LUMI_BOUNDS:
-            res = (ID3D11Resource *)quad->pPixelShaderConstants[PS_CONST_LUMI_BOUNDS];
-            break;
-        case PS_CONST_COLORSPACE:
-            res = (ID3D11Resource *)quad->pPixelShaderConstants[PS_CONST_COLORSPACE];
+            res = (ID3D11Resource *)quad->pPixelShaderConstants;
             break;
         case VS_CONST_VIEWPOINT:
             res = (ID3D11Resource *)quad->viewpointShaderConstant;
@@ -238,9 +230,6 @@ static bool ShaderUpdateConstants(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d1
     {
         case PS_CONST_LUMI_BOUNDS:
             memcpy(mappedResource.pData, new_buf, sizeof(PS_CONSTANT_BUFFER));
-            break;
-        case PS_CONST_COLORSPACE:
-            memcpy(mappedResource.pData, new_buf, sizeof(PS_COLOR_TRANSFORM));
             break;
         case VS_CONST_VIEWPOINT:
             memcpy(mappedResource.pData, new_buf, sizeof(VS_PROJECTION_CONST));
@@ -286,7 +275,6 @@ int D3D11_AllocateQuad(vlc_object_t *o, d3d11_device_t *d3d_dev,
                        video_projection_mode_t projection, d3d11_quad_t *quad)
 {
     quad->generic.vertexConstants = &quad->vConstants;
-    quad->generic.colorsConstants = &quad->cConstants;
     quad->generic.shaderConstants = &quad->pConstants;
 
     HRESULT hr;
@@ -297,17 +285,9 @@ int D3D11_AllocateQuad(vlc_object_t *o, d3d11_device_t *d3d_dev,
         .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
         .CPUAccessFlags = D3D11_CPU_ACCESS_WRITE,
     };
-    hr = ID3D11Device_CreateBuffer(d3d_dev->d3ddevice, &constantDesc, NULL, &quad->pPixelShaderConstants[PS_CONST_LUMI_BOUNDS]);
+    hr = ID3D11Device_CreateBuffer(d3d_dev->d3ddevice, &constantDesc, NULL, &quad->pPixelShaderConstants);
     if(FAILED(hr)) {
         msg_Err(o, "Could not create the pixel shader constant buffer. (hr=0x%lX)", hr);
-        goto error;
-    }
-
-    static_assert((sizeof(PS_COLOR_TRANSFORM)%16)==0,"Constant buffers require 16-byte alignment");
-    constantDesc.ByteWidth = sizeof(PS_COLOR_TRANSFORM);
-    hr = ID3D11Device_CreateBuffer(d3d_dev->d3ddevice, &constantDesc, NULL, &quad->pPixelShaderConstants[PS_CONST_COLORSPACE]);
-    if(FAILED(hr)) {
-        msg_Err(o, "Could not create the pixel shader colorspace buffer. (hr=0x%lX)", hr);
         goto error;
     }
 
@@ -339,7 +319,6 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     D3D_SetupQuad(o, fmt, &quad->generic, displayFormat);
 
     ShaderUpdateConstants(o, d3d_dev, quad, PS_CONST_LUMI_BOUNDS, quad->generic.shaderConstants);
-    ShaderUpdateConstants(o, d3d_dev, quad, PS_CONST_COLORSPACE, quad->generic.colorsConstants);
 
     for (size_t i=0; i<ARRAY_SIZE(quad->cropViewport); i++)
     {

@@ -42,14 +42,13 @@ typedef struct
     ID3D11Buffer              *pVertexBuffer;
     ID3D11Buffer              *pIndexBuffer;
     ID3D11Buffer              *viewpointShaderConstant;
-    ID3D11Buffer              *pPixelShaderConstants[2];
+    ID3D11Buffer              *pPixelShaderConstants;
     UINT                       PSConstantsCount;
     ID3D11PixelShader         *d3dpixelShader[DXGI_MAX_RENDER_TARGET];
     ID3D11SamplerState        *SamplerStates[2];
     D3D11_VIEWPORT            cropViewport[DXGI_MAX_RENDER_TARGET];
 
     PS_CONSTANT_BUFFER        pConstants;
-    PS_COLOR_TRANSFORM        cConstants;
     VS_PROJECTION_CONST       vConstants;
 } d3d11_quad_t;
 

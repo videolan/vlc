@@ -45,19 +45,15 @@ typedef struct {
 
 /* structures passed to the pixel shader */
 typedef struct {
+    FLOAT WhitePoint[4*4];
+    FLOAT Colorspace[4*4];
+    FLOAT Primaries[4*4];
     FLOAT Opacity;
     FLOAT LuminanceScale;
     FLOAT BoundaryX;
     FLOAT BoundaryY;
-    FLOAT padding[60]; // 256 bytes alignment
+    FLOAT padding[12]; // 256 bytes alignment
 } PS_CONSTANT_BUFFER;
-
-typedef struct {
-    FLOAT WhitePoint[4*4];
-    FLOAT Colorspace[4*4];
-    FLOAT Primaries[4*4];
-    FLOAT padding[16]; // 256 bytes alignment
-} PS_COLOR_TRANSFORM;
 
 typedef struct {
     FLOAT View[4*4];
@@ -100,7 +96,6 @@ typedef struct
     unsigned int              i_height;
 
     PS_CONSTANT_BUFFER        *shaderConstants;
-    PS_COLOR_TRANSFORM        *colorsConstants;
     VS_PROJECTION_CONST       *vertexConstants;
 
 } d3d_quad_t;
