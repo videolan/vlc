@@ -100,8 +100,8 @@ struct vout_display_sys_t
 
     d3d11_device_t           *d3d_dev;
     d3d11_decoder_device_t   *local_d3d_dev; // when opened without a video context
-    d3d11_shader_compiler_t  shaders;
-    d3d11_quad_t               picQuad;
+    d3d_shader_compiler_t    shaders;
+    d3d11_quad_t             picQuad;
 
     ID3D11Asynchronous       *prepareWait;
 #ifdef HAVE_D3D11_4_H

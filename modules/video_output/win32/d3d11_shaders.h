@@ -30,7 +30,7 @@ typedef struct
 {
     HINSTANCE                 compiler_dll; /* handle of the opened d3dcompiler dll */
     pD3DCompile               OurD3DCompile;
-} d3d11_shader_compiler_t;
+} d3d_shader_compiler_t;
 
 #include <vlc_es.h>
 
@@ -102,10 +102,10 @@ typedef struct
     VS_PROJECTION_CONST       vertexConstants;
 } d3d11_quad_t;
 
-int D3D11_InitShaders(vlc_object_t *, d3d11_shader_compiler_t *);
-void D3D11_ReleaseShaders(d3d11_shader_compiler_t *);
+int D3D11_InitShaders(vlc_object_t *, d3d_shader_compiler_t *);
+void D3D11_ReleaseShaders(d3d_shader_compiler_t *);
 
-HRESULT D3D11_CompilePixelShader(vlc_object_t *, const d3d11_shader_compiler_t *,
+HRESULT D3D11_CompilePixelShader(vlc_object_t *, const d3d_shader_compiler_t *,
                                  d3d11_device_t *, bool texture_array, size_t texture_count,
                                  const display_info_t *, bool sharp,
                                  video_transfer_func_t, video_color_primaries_t,
@@ -115,10 +115,10 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *, const d3d11_shader_compiler_t *
     D3D11_CompilePixelShader(VLC_OBJECT(a),b,c,d,e,f,g,h,i,j,k)
 void D3D11_ReleasePixelShader(d3d11_quad_t *);
 
-HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, const d3d11_shader_compiler_t *, d3d11_device_t *, d3d11_vertex_shader_t *);
+HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, const d3d_shader_compiler_t *, d3d11_device_t *, d3d11_vertex_shader_t *);
 #define D3D11_CompileFlatVertexShader(a,b,c,d) D3D11_CompileFlatVertexShader(VLC_OBJECT(a),b,c,d)
 
-HRESULT D3D11_CompileProjectionVertexShader(vlc_object_t *, const d3d11_shader_compiler_t *, d3d11_device_t *, d3d11_vertex_shader_t *);
+HRESULT D3D11_CompileProjectionVertexShader(vlc_object_t *, const d3d_shader_compiler_t *, d3d11_device_t *, d3d11_vertex_shader_t *);
 #define D3D11_CompileProjectionVertexShader(a,b,c,d) D3D11_CompileProjectionVertexShader(VLC_OBJECT(a),b,c,d)
 
 float GetFormatLuminance(vlc_object_t *, const video_format_t *);
