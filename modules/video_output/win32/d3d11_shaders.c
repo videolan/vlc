@@ -155,42 +155,35 @@ void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
     }
 }
 
-static HRESULT CompileVertexShader(vlc_object_t *obj, const d3d_shader_compiler_t *compiler,
-                                   d3d11_device_t *d3d_dev, bool flat,
-                                   d3d11_vertex_shader_t *output)
+HRESULT (D3D11_CreateVertexShader)(vlc_object_t *obj, d3d_shader_blob *pVSBlob,
+                                   d3d11_device_t *d3d_dev, d3d11_vertex_shader_t *output)
 {
-    d3d_shader_blob pVSBlob = { 0 };
     HRESULT hr;
-    hr = D3D_CompileVertexShader(obj, compiler, d3d_dev->feature_level, flat, &pVSBlob);
-    if (FAILED(hr))
-        return hr;
+    hr = ID3D11Device_CreateVertexShader(d3d_dev->d3ddevice, pVSBlob->buffer,
+                                         pVSBlob->buf_size, NULL, &output->shader);
 
-   hr = ID3D11Device_CreateVertexShader(d3d_dev->d3ddevice, pVSBlob.buffer,
-                                        pVSBlob.buf_size, NULL, &output->shader);
-
-   if(FAILED(hr)) {
-       msg_Err(obj, "Failed to create the flat vertex shader. (hr=0x%lX)", hr);
-       goto error;
-   }
+    if(FAILED(hr)) {
+        msg_Err(obj, "Failed to create the flat vertex shader. (hr=0x%lX)", hr);
+        goto error;
+    }
 
     // must match d3d_vertex_t
-   static D3D11_INPUT_ELEMENT_DESC layout[] = {
-   { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-   { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-   };
+    static D3D11_INPUT_ELEMENT_DESC layout[] = {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    };
 
-   hr = ID3D11Device_CreateInputLayout(d3d_dev->d3ddevice, layout, 2, pVSBlob.buffer,
-                                       pVSBlob.buf_size, &output->layout);
+    hr = ID3D11Device_CreateInputLayout(d3d_dev->d3ddevice, layout, 2, pVSBlob->buffer,
+                                    pVSBlob->buf_size, &output->layout);
 
-   if(FAILED(hr)) {
-       msg_Err(obj, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
-       goto error;
-   }
+    if(FAILED(hr)) {
+        msg_Err(obj, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
+        goto error;
+    }
 
-   return S_OK;
 error:
-   D3D_ShaderBlobRelease(&pVSBlob);
-   return hr;
+    D3D_ShaderBlobRelease(pVSBlob);
+    return hr;
 }
 
 void D3D11_ReleaseVertexShader(d3d11_vertex_shader_t *shader)
@@ -207,14 +200,8 @@ void D3D11_ReleaseVertexShader(d3d11_vertex_shader_t *shader)
     }
 }
 
-HRESULT (D3D11_CompileFlatVertexShader)(vlc_object_t *obj, const d3d_shader_compiler_t *compiler,
-                                      d3d11_device_t *d3d_dev, d3d11_vertex_shader_t *output)
+HRESULT D3D11_CompileVertexShaderBlob(vlc_object_t *obj, const d3d_shader_compiler_t *compiler,
+                                      d3d11_device_t *d3d_dev, bool flat, d3d_shader_blob *pVSBlob)
 {
-    return CompileVertexShader(obj, compiler, d3d_dev, true, output);
-}
-
-HRESULT (D3D11_CompileProjectionVertexShader)(vlc_object_t *obj, const d3d_shader_compiler_t *compiler,
-                                            d3d11_device_t *d3d_dev, d3d11_vertex_shader_t *output)
-{
-    return CompileVertexShader(obj, compiler, d3d_dev, false, output);
+    return D3D_CompileVertexShader(obj, compiler, d3d_dev->feature_level, flat, pVSBlob);
 }

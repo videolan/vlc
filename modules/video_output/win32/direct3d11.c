@@ -1202,13 +1202,25 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         }
     }
 
-    hr = D3D11_CompileFlatVertexShader(vd, &sys->shaders, sys->d3d_dev, &sys->flatVShader);
+    d3d_shader_blob VSBlob = { 0 };
+    hr = D3D11_CompileVertexShaderBlob(VLC_OBJECT(vd), &sys->shaders, sys->d3d_dev, true, &VSBlob);
+    if(FAILED(hr)) {
+      msg_Err(vd, "Failed to compile the flat vertex shader. (hr=0x%lX)", hr);
+      return VLC_EGENERIC;
+    }
+    hr = D3D11_CreateVertexShader(vd, &VSBlob, sys->d3d_dev, &sys->flatVShader);
     if(FAILED(hr)) {
       msg_Err(vd, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
 
-    hr = D3D11_CompileProjectionVertexShader(vd, &sys->shaders, sys->d3d_dev, &sys->projectionVShader);
+
+    hr = D3D11_CompileVertexShaderBlob(VLC_OBJECT(vd), &sys->shaders, sys->d3d_dev, false, &VSBlob);
+    if(FAILED(hr)) {
+      msg_Err(vd, "Failed to compile the 360 vertex shader. (hr=0x%lX)", hr);
+      return VLC_EGENERIC;
+    }
+    hr = D3D11_CreateVertexShader(vd, &VSBlob, sys->d3d_dev, &sys->projectionVShader);
     if(FAILED(hr)) {
       msg_Err(vd, "Failed to create the projection vertex shader. (hr=0x%lX)", hr);
       return VLC_EGENERIC;

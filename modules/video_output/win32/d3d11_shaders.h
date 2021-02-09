@@ -66,11 +66,11 @@ HRESULT D3D11_SetQuadPixelShader(vlc_object_t *, d3d11_device_t *,
                                  d3d11_quad_t *quad, d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET]);
 void D3D11_ReleaseQuadPixelShader(d3d11_quad_t *);
 
-HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, const d3d_shader_compiler_t *, d3d11_device_t *, d3d11_vertex_shader_t *);
-#define D3D11_CompileFlatVertexShader(a,b,c,d) D3D11_CompileFlatVertexShader(VLC_OBJECT(a),b,c,d)
+HRESULT D3D11_CompileVertexShaderBlob(vlc_object_t *, const d3d_shader_compiler_t *,
+                                      d3d11_device_t *, bool flat, d3d_shader_blob *);
 
-HRESULT D3D11_CompileProjectionVertexShader(vlc_object_t *, const d3d_shader_compiler_t *, d3d11_device_t *, d3d11_vertex_shader_t *);
-#define D3D11_CompileProjectionVertexShader(a,b,c,d) D3D11_CompileProjectionVertexShader(VLC_OBJECT(a),b,c,d)
+HRESULT D3D11_CreateVertexShader(vlc_object_t *, d3d_shader_blob *, d3d11_device_t *, d3d11_vertex_shader_t *);
+#define D3D11_CreateVertexShader(a,b,c,d) D3D11_CreateVertexShader(VLC_OBJECT(a),b,c,d)
 
 HRESULT D3D11_CreateRenderTargets(d3d11_device_t *, ID3D11Resource *, const d3d_format_t *,
                                   ID3D11RenderTargetView *output[DXGI_MAX_RENDER_TARGET]);
