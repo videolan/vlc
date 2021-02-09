@@ -26,24 +26,9 @@
 #include "../../video_chroma/d3d11_fmt.h"
 #include "d3d11_shaders.h"
 
-#define SPHERE_RADIUS 1.f
-
 #define PS_CONST_LUMI_BOUNDS 0
 #define PS_CONST_COLORSPACE  1
 #define VS_CONST_VIEWPOINT   2
-
-/* matches the D3D11_INPUT_ELEMENT_DESC we setup */
-typedef struct d3d_vertex_t {
-    struct {
-        FLOAT x;
-        FLOAT y;
-        FLOAT z;
-    } position;
-    struct {
-        FLOAT x;
-        FLOAT y;
-    } texture;
-} d3d_vertex_t;
 
 typedef bool (*d3d11_select_plane_t)(void *opaque, size_t plane_index);
 

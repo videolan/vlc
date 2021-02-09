@@ -1,7 +1,7 @@
 /*****************************************************************************
  * d3d11_shaders.h: Direct3D11 Shaders
  *****************************************************************************
- * Copyright (C) 2017 VLC authors and VideoLAN
+ * Copyright (C) 2017-2021 VLC authors and VideoLAN
  *
  * Authors: Steve Lhomme <robux4@gmail.com>
  *
@@ -23,48 +23,9 @@
 #ifndef VLC_D3D11_SHADERS_H
 #define VLC_D3D11_SHADERS_H
 
-#include "../../video_chroma/d3d11_fmt.h"
-
-#include <vlc_es.h>
-
 #include "d3d_shaders.h"
 
-#define DEFAULT_BRIGHTNESS         100
-#define DEFAULT_SRGB_BRIGHTNESS    100
-#define MAX_HLG_BRIGHTNESS        1000
-#define MAX_PQ_BRIGHTNESS        10000
-
-typedef struct {
-    video_color_primaries_t  primaries;
-    video_transfer_func_t    transfer;
-    video_color_space_t      color;
-    bool                     b_full_range;
-    unsigned                 luminance_peak;
-    const d3d_format_t       *pixelFormat;
-} display_info_t;
-
-/* structures passed to the pixel shader */
-typedef struct {
-    FLOAT Opacity;
-    FLOAT BoundaryX;
-    FLOAT BoundaryY;
-    FLOAT LuminanceScale;
-} PS_CONSTANT_BUFFER;
-
-typedef struct {
-    FLOAT WhitePoint[4*4];
-    FLOAT Colorspace[4*4];
-    FLOAT Primaries[4*4];
-} PS_COLOR_TRANSFORM;
-
-typedef struct {
-    FLOAT View[4*4];
-    FLOAT Zoom[4*4];
-    FLOAT Projection[4*4];
-} VS_PROJECTION_CONST;
-
-extern const char* globVertexShaderFlat;
-extern const char* globVertexShaderProjection;
+#include "../../video_chroma/d3d11_fmt.h"
 
 /* Vertex Shader compiled sructures */
 typedef struct {
@@ -76,25 +37,20 @@ typedef struct {
 typedef struct
 {
     picture_sys_d3d11_t       picSys;
-    const d3d_format_t        *textureFormat;
+    d3d_quad_t                generic;
     UINT                      resourceCount;
     ID3D11Buffer              *pVertexBuffer;
-    UINT                      vertexCount;
-    UINT                      vertexStride;
     ID3D11Buffer              *pIndexBuffer;
-    UINT                      indexCount;
     ID3D11Buffer              *viewpointShaderConstant;
     ID3D11Buffer              *pPixelShaderConstants[2];
     UINT                       PSConstantsCount;
     ID3D11PixelShader         *d3dpixelShader[DXGI_MAX_RENDER_TARGET];
     ID3D11SamplerState        *SamplerStates[2];
     D3D11_VIEWPORT            cropViewport[DXGI_MAX_RENDER_TARGET];
-    unsigned int              i_width;
-    unsigned int              i_height;
-    video_projection_mode_t   projection;
 
-    PS_CONSTANT_BUFFER        shaderConstants;
-    VS_PROJECTION_CONST       vertexConstants;
+    PS_CONSTANT_BUFFER        pConstants;
+    PS_COLOR_TRANSFORM        cConstants;
+    VS_PROJECTION_CONST       vConstants;
 } d3d11_quad_t;
 
 HRESULT D3D11_CompilePixelShader(vlc_object_t *, const d3d_shader_compiler_t *,
@@ -112,9 +68,6 @@ HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, const d3d_shader_compiler_
 
 HRESULT D3D11_CompileProjectionVertexShader(vlc_object_t *, const d3d_shader_compiler_t *, d3d11_device_t *, d3d11_vertex_shader_t *);
 #define D3D11_CompileProjectionVertexShader(a,b,c,d) D3D11_CompileProjectionVertexShader(VLC_OBJECT(a),b,c,d)
-
-float GetFormatLuminance(vlc_object_t *, const video_format_t *);
-#define GetFormatLuminance(a,b)  GetFormatLuminance(VLC_OBJECT(a),b)
 
 HRESULT D3D11_CreateRenderTargets(d3d11_device_t *, ID3D11Resource *, const d3d_format_t *,
                                   ID3D11RenderTargetView *output[DXGI_MAX_RENDER_TARGET]);

@@ -322,18 +322,18 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
         /* we need a staging texture */
         ID3D11Texture2D *textures[DXGI_MAX_SHADER_VIEW] = {0};
         video_format_t texture_fmt = *vd->source;
-        texture_fmt.i_width  = sys->picQuad.i_width;
-        texture_fmt.i_height = sys->picQuad.i_height;
+        texture_fmt.i_width  = sys->picQuad.generic.i_width;
+        texture_fmt.i_height = sys->picQuad.generic.i_height;
         if (!is_d3d11_opaque(fmt->i_chroma))
-            texture_fmt.i_chroma = sys->picQuad.textureFormat->fourcc;
+            texture_fmt.i_chroma = sys->picQuad.generic.textureFormat->fourcc;
 
-        if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.textureFormat, &texture_fmt, textures, sys->stagingPlanes))
+        if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.generic.textureFormat, &texture_fmt, textures, sys->stagingPlanes))
         {
             msg_Err(vd, "Failed to allocate the staging texture");
             return VLC_EGENERIC;
         }
 
-        if (D3D11_AllocateResourceView(vd, sys->d3d_dev->d3ddevice, sys->picQuad.textureFormat,
+        if (D3D11_AllocateResourceView(vd, sys->d3d_dev->d3ddevice, sys->picQuad.generic.textureFormat,
                                     textures, 0, sys->stagingSys.renderSrc))
         {
             msg_Err(vd, "Failed to allocate the staging shader view");
@@ -428,9 +428,9 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->info.can_scale_spu        = true;
 
     if (var_InheritBool(vd, "direct3d11-hw-blending") &&
-        sys->regionQuad.textureFormat != NULL)
+        sys->regionQuad.generic.textureFormat != NULL)
     {
-        sys->pSubpictureChromas[0] = sys->regionQuad.textureFormat->fourcc;
+        sys->pSubpictureChromas[0] = sys->regionQuad.generic.textureFormat->fourcc;
         sys->pSubpictureChromas[1] = 0;
         vd->info.subpicture_chromas = sys->pSubpictureChromas;
     }
@@ -482,7 +482,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->picQuad.textureFormat->formatTexture == DXGI_FORMAT_UNKNOWN)
+    if (sys->picQuad.generic.textureFormat->formatTexture == DXGI_FORMAT_UNKNOWN)
     {
         D3D11_MAPPED_SUBRESOURCE mappedResource;
         int i;
@@ -568,13 +568,13 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                  * display, do it preferrably when creating the texture */
                 assert(p_sys->renderSrc[0]!=NULL);
             }
-            if ( sys->picQuad.i_height != texDesc.Height ||
-                 sys->picQuad.i_width != texDesc.Width )
+            if ( sys->picQuad.generic.i_height != texDesc.Height ||
+                 sys->picQuad.generic.i_width  != texDesc.Width )
             {
                 /* the decoder produced different sizes than the vout, we need to
                  * adjust the vertex */
-                sys->picQuad.i_height = texDesc.Height;
-                sys->picQuad.i_width = texDesc.Width;
+                sys->picQuad.generic.i_height = texDesc.Height;
+                sys->picQuad.generic.i_width  = texDesc.Width;
 
                 CommonPlacePicture(vd, &sys->area);
                 UpdateSize(vd);
@@ -593,7 +593,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
 
     if (picture->format.mastering.max_luminance)
     {
-        D3D11_UpdateQuadLuminanceScale(vd, sys->d3d_dev, &sys->picQuad, (float)sys->display.luminance_peak / GetFormatLuminance(VLC_OBJECT(vd), &picture->format));
+        D3D11_UpdateQuadLuminanceScale(vd, sys->d3d_dev, &sys->picQuad, (float)sys->display.luminance_peak / D3D_GetFormatLuminance(VLC_OBJECT(vd), &picture->format));
     }
 
     /* Render the quad */
@@ -801,13 +801,13 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
     }
 
     /* adjust the decoder sizes to have proper padding */
-    sys->picQuad.i_width  = fmt.i_width;
-    sys->picQuad.i_height = fmt.i_height;
-    if ( sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
-         sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
+    sys->picQuad.generic.i_width  = fmt.i_width;
+    sys->picQuad.generic.i_height = fmt.i_height;
+    if ( sys->picQuad.generic.textureFormat->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
+         sys->picQuad.generic.textureFormat->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
     {
-        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
-        sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
+        sys->picQuad.generic.i_width  = (sys->picQuad.generic.i_width  + 0x01) & ~0x01;
+        sys->picQuad.generic.i_height = (sys->picQuad.generic.i_height + 0x01) & ~0x01;
     }
 
     CommonPlacePicture(vd, &sys->area);
@@ -845,19 +845,19 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
             if (output_format->formatTexture == vtcx_sys->format &&
                     is_d3d11_opaque(output_format->fourcc))
             {
-                sys->picQuad.textureFormat = output_format;
+                sys->picQuad.generic.textureFormat = output_format;
                 break;
             }
         }
     }
 
     // look for the requested pixel format first
-    if ( !sys->picQuad.textureFormat )
-        sys->picQuad.textureFormat = GetDirectRenderingFormat(vd, fmt->i_chroma);
+    if ( !sys->picQuad.generic.textureFormat )
+        sys->picQuad.generic.textureFormat = GetDirectRenderingFormat(vd, fmt->i_chroma);
 
     // look for any pixel format that we can handle with enough pixels per channel
     const d3d_format_t *decoder_format = NULL;
-    if ( !sys->picQuad.textureFormat )
+    if ( !sys->picQuad.generic.textureFormat )
     {
         uint8_t bits_per_channel;
         uint8_t widthDenominator, heightDenominator;
@@ -919,40 +919,40 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
         if ( is_d3d11_opaque(fmt->i_chroma) )
             decoder_format = GetDirectDecoderFormat(vd, fmt->i_chroma);
         else
-            decoder_format = sys->picQuad.textureFormat;
+            decoder_format = sys->picQuad.generic.textureFormat;
 
         bool is_rgb = !vlc_fourcc_IsYUV(fmt->i_chroma);
-        sys->picQuad.textureFormat = GetDisplayFormatByDepth(vd, bits_per_channel,
+        sys->picQuad.generic.textureFormat = GetDisplayFormatByDepth(vd, bits_per_channel,
                                                              widthDenominator, heightDenominator,
                                                              decoder_format!=NULL,
                                                              is_rgb ? D3D11_RGB_FORMAT : D3D11_YUV_FORMAT);
-        if (!sys->picQuad.textureFormat)
-            sys->picQuad.textureFormat = GetDisplayFormatByDepth(vd, bits_per_channel,
+        if (!sys->picQuad.generic.textureFormat)
+            sys->picQuad.generic.textureFormat = GetDisplayFormatByDepth(vd, bits_per_channel,
                                                                  widthDenominator, heightDenominator,
                                                                  decoder_format!=NULL,
                                                                  is_rgb ? D3D11_YUV_FORMAT : D3D11_RGB_FORMAT);
     }
 
     // look for any pixel format that we can handle
-    if ( !sys->picQuad.textureFormat )
-        sys->picQuad.textureFormat = GetDisplayFormatByDepth(vd, 0, 0, 0, false, false);
+    if ( !sys->picQuad.generic.textureFormat )
+        sys->picQuad.generic.textureFormat = GetDisplayFormatByDepth(vd, 0, 0, 0, false, false);
 
-    if ( !sys->picQuad.textureFormat )
+    if ( !sys->picQuad.generic.textureFormat )
     {
        msg_Err(vd, "Could not get a suitable texture pixel format");
        return VLC_EGENERIC;
     }
 
-    msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->picQuad.textureFormat->name,
+    msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->picQuad.generic.textureFormat->name,
                  (char *)&fmt->i_chroma );
 
-    fmt->i_chroma = decoder_format ? decoder_format->fourcc : sys->picQuad.textureFormat->fourcc;
-    DxgiFormatMask( sys->picQuad.textureFormat->formatTexture, fmt );
+    fmt->i_chroma = decoder_format ? decoder_format->fourcc : sys->picQuad.generic.textureFormat->fourcc;
+    DxgiFormatMask( sys->picQuad.generic.textureFormat->formatTexture, fmt );
 
     /* check the region pixel format */
-    sys->regionQuad.textureFormat = GetBlendableFormat(vd, VLC_CODEC_RGBA);
-    if (!sys->regionQuad.textureFormat)
-        sys->regionQuad.textureFormat = GetBlendableFormat(vd, VLC_CODEC_BGRA);
+    sys->regionQuad.generic.textureFormat = GetBlendableFormat(vd, VLC_CODEC_RGBA);
+    if (!sys->regionQuad.generic.textureFormat)
+        sys->regionQuad.generic.textureFormat = GetBlendableFormat(vd, VLC_CODEC_BGRA);
 
     return VLC_SUCCESS;
 }
@@ -1174,7 +1174,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
-    if (sys->regionQuad.textureFormat != NULL)
+    if (sys->regionQuad.generic.textureFormat != NULL)
     {
         hr = D3D11_CompilePixelShader(vd, &sys->shaders, sys->d3d_dev, !sys->legacy_shader, 1,
                                       &sys->display, true, TRANSFER_FUNC_SRGB, COLOR_PRIMARIES_SRGB, true,
@@ -1280,7 +1280,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
     HRESULT hr;
     int err;
 
-    if (sys->regionQuad.textureFormat == NULL)
+    if (sys->regionQuad.generic.textureFormat == NULL)
         return VLC_EGENERIC;
 
     int count = 0;
@@ -1301,7 +1301,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             picture_t *cache = sys->d3dregions[j];
             if (cache != NULL && ((d3d11_quad_t *) cache->p_sys)->picSys.texture[KNOWN_DXGI_INDEX]) {
                 ID3D11Texture2D_GetDesc( ((d3d11_quad_t *) cache->p_sys)->picSys.texture[KNOWN_DXGI_INDEX], &texDesc );
-                if (texDesc.Format == sys->regionQuad.textureFormat->formatTexture &&
+                if (texDesc.Format == sys->regionQuad.generic.textureFormat->formatTexture &&
                     texDesc.Width  == r->p_picture->format.i_width &&
                     texDesc.Height == r->p_picture->format.i_height) {
                     (*region)[i] = cache;
@@ -1322,7 +1322,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
             quad = d3dquad;
-            if (AllocateTextures(vd, sys->d3d_dev, sys->regionQuad.textureFormat, &r->p_picture->format, d3dquad->picSys.texture, NULL)) {
+            if (AllocateTextures(vd, sys->d3d_dev, sys->regionQuad.generic.textureFormat, &r->p_picture->format, d3dquad->picSys.texture, NULL)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 for (int j=0; j<DXGI_MAX_SHADER_VIEW; j++)
@@ -1332,7 +1332,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
 
-            if (D3D11_AllocateResourceView(vd, sys->d3d_dev->d3ddevice, sys->regionQuad.textureFormat,
+            if (D3D11_AllocateResourceView(vd, sys->d3d_dev->d3ddevice, sys->regionQuad.generic.textureFormat,
                                            d3dquad->picSys.texture, 0,
                                            d3dquad->picSys.renderSrc)) {
                 msg_Err(vd, "Failed to create %dx%d shader view for OSD",
@@ -1340,10 +1340,10 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 free(d3dquad);
                 continue;
             }
-            d3dquad->i_width    = r->fmt.i_width;
-            d3dquad->i_height   = r->fmt.i_height;
+            d3dquad->generic.i_width  = r->fmt.i_width;
+            d3dquad->generic.i_height = r->fmt.i_height;
 
-            d3dquad->textureFormat = sys->regionQuad.textureFormat;
+            d3dquad->generic.textureFormat = sys->regionQuad.generic.textureFormat;
             err = D3D11_AllocateQuad(vd, sys->d3d_dev, PROJECTION_MODE_RECTANGULAR, d3dquad);
             if (err != VLC_SUCCESS)
             {
