@@ -91,7 +91,9 @@ static void releaseTagsList(std::list<Tag *> &list)
 HLSRepresentation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet, const AttributesTag * tag)
 {
     const Attribute *uriAttr = tag->getAttributeByName("URI");
-    const Attribute *bwAttr = tag->getAttributeByName("BANDWIDTH");
+    const Attribute *bwAttr = tag->getAttributeByName("AVERAGE-BANDWIDTH");
+    if(!bwAttr)
+        bwAttr = tag->getAttributeByName("BANDWIDTH");
     const Attribute *resAttr = tag->getAttributeByName("RESOLUTION");
 
     HLSRepresentation *rep = new (std::nothrow) HLSRepresentation(adaptSet);
