@@ -100,7 +100,7 @@ namespace adaptive
                 virtual void setSourceUrl( const std::string &url );
                 virtual Url getUrlSegment() const override;
                 virtual const std::vector<Segment*> & subSegments() const;
-                virtual void debug(vlc_object_t *,int = 0) const;
+                virtual void debug(vlc_object_t *,int = 0) const override;
                 virtual void addSubSegment(SubSegment *);
 
             protected:
