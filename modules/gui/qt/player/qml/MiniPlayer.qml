@@ -63,7 +63,7 @@ Widgets.NavigableFocusScope {
     }
 
     Widgets.FrostedGlassEffect {
-        anchors.fill: column
+        anchors.fill: controlBar
 
         source: mainContent
         sourceRect: Qt.rect(root.x, root.y, root.width, root.height)
@@ -71,78 +71,26 @@ Widgets.NavigableFocusScope {
         tint: VLCStyle.colors.blendColors(VLCStyle.colors.bg, VLCStyle.colors.banner, 0.85)
     }
 
-    Column {
-        id: column
+    ControlBar {
+        id: controlBar
+
         anchors.left: parent.left
         anchors.right: parent.right
+        focus: true
+        colors: VLCStyle.colors
+        height: VLCStyle.miniPlayerHeight
+        textPosition: ControlBar.TimeTextPosition.Hide
+        sliderHeight: VLCStyle.dp(3, VLCStyle.scale)
+        sliderBackgroundColor: colors.sliderBarMiniplayerBgColor
+        sliderProgressColor: colors.accent
+        configs: ["MiniPlayerToolbar-left", "MiniPlayerToolbar-center", "MiniPlayerToolbar-right"]
+        navigationParent: root
 
-        SliderBar {
-            id: progressBar
-
-            barHeight: VLCStyle.dp(3, VLCStyle.scale)
-            value: player.position
-            visible: progressBar.value >= 0.0 && progressBar.value <= 1.0
-            backgroundColor: colors.sliderBarMiniplayerBgColor
-            progressBarColor: colors.accent
-            focus: true
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-
-            Keys.onDownPressed: buttonsLayout.focus = true
-            Keys.onUpPressed: root.navigationUpItem.focus = true
-        }
-
-        Item {
-            id: mainRect
-
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-
-            height: VLCStyle.miniPlayerHeight
-
-            PlayerButtonsLayout {
-                id: buttonsLayout
-
-                anchors {
-                    fill: parent
-                    leftMargin: VLCStyle.applicationHorizontalMargin
-                    rightMargin: VLCStyle.applicationHorizontalMargin
-                    bottomMargin: VLCStyle.applicationVerticalMargin
-                }
-
-                models: [miniPlayerModel_left, miniPlayerModel_center, miniPlayerModel_right]
-
-                navigationUpItem: progressBar.enabled ? progressBar : root.navigationUpItem
-            }
-
-            PlayerControlBarModel {
-                id: miniPlayerModel_left
-                mainCtx: mainctx
-                configName: "MiniPlayerToolbar-left"
-            }
-
-            PlayerControlBarModel {
-                id: miniPlayerModel_center
-                mainCtx: mainctx
-                configName: "MiniPlayerToolbar-center"
-            }
-
-            PlayerControlBarModel {
-                id: miniPlayerModel_right
-                mainCtx: mainctx
-                configName: "MiniPlayerToolbar-right"
-            }
-
-            Keys.onPressed: {
-                if (!event.accepted)
-                    defaultKeyAction(event, 0)
-                if (!event.accepted)
-                    mainInterface.sendHotkey(event.key, event.modifiers);
-            }
+        Keys.onPressed: {
+            if (!event.accepted)
+                defaultKeyAction(event, 0)
+            if (!event.accepted)
+                mainInterface.sendHotkey(event.key, event.modifiers);
         }
     }
 }
