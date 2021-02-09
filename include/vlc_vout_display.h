@@ -119,10 +119,7 @@ typedef struct vout_display_cfg {
     bool is_display_filled;
 
     /** Zoom ratio */
-    struct {
-        unsigned num;
-        unsigned den;
-    } zoom;
+    vlc_rational_t zoom;
 
     vlc_viewpoint_t viewpoint;
 } vout_display_cfg_t;
