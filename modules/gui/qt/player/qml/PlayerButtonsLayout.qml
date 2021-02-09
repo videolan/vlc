@@ -28,7 +28,6 @@ Widgets.NavigableFocusScope {
 
     implicitHeight: Math.max(buttonrow_left.implicitHeight, buttonrow_center.implicitHeight, buttonrow_right.implicitHeight)
 
-    property alias isMiniplayer: controlmodelbuttons.isMiniplayer
     property alias parentWindow: controlmodelbuttons.parentWindow
 
     property real marginLeft: VLCStyle.margin_normal
@@ -66,7 +65,6 @@ Widgets.NavigableFocusScope {
     ControlButtons {
         id: controlmodelbuttons
 
-        isMiniplayer: false
         parentWindow: g_root
 
         onRequestLockUnlockAutoHide: playerButtonsLayout.requestLockUnlockAutoHide(lock, source)

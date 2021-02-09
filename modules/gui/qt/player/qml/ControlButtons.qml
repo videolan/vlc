@@ -30,7 +30,6 @@ import "qrc:///util/KeyHelper.js" as KeyHelper
 Item{
     id: controlButtons
 
-    property bool isMiniplayer: false
     property var  parentWindow: undefined
 
     signal requestLockUnlockAutoHide(bool lock, var source)
@@ -156,7 +155,7 @@ Item{
             width: VLCStyle.icon_medium
             height: width
 
-            property bool isOpaque: !isMiniplayer
+            property bool isOpaque: history.current.view === "player"
 
             property VLCColors colors: VLCStyle.colors
             property color color: isOpaque ? colors.buttonText : "#303030"
@@ -778,12 +777,10 @@ Item{
             iconText: VLCIcons.fullscreen
 
             onClicked: {
-                if (isMiniplayer) {
-                    g_mainDisplay.showPlayer()
-                }
-                else {
+                if (history.current.view === "player")
                     history.previous()
-                }
+                else
+                    g_mainDisplay.showPlayer()
             }
 
             property bool acceptFocus: true

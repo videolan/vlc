@@ -117,8 +117,6 @@ Widgets.NavigableFocusScope {
                 models: [miniPlayerModel_left, miniPlayerModel_center, miniPlayerModel_right]
 
                 navigationUpItem: progressBar.enabled ? progressBar : root.navigationUpItem
-
-                isMiniplayer: true
             }
 
             PlayerControlBarModel {
