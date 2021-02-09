@@ -157,7 +157,20 @@ static void *Thread(void *data)
     //return NULL;
 }
 
-static void ReportSize(vout_window_t *wnd)
+static void ResizeAck(vout_window_t *wnd, void *data)
+{
+#ifdef XDG_SHELL
+    vout_window_sys_t *sys = wnd->sys;
+    uint32_t *serial = data;
+
+    if (serial != NULL)
+        xdg_surface_ack_configure(sys->surface, *serial);
+#else
+    (void) wnd; (void) data;
+#endif
+}
+
+static void ReportSize(vout_window_t *wnd, void *data)
 {
     vout_window_sys_t *sys = wnd->sys;
     /* Zero wm.width or zero wm.height means the client should choose.
@@ -165,7 +178,7 @@ static void ReportSize(vout_window_t *wnd)
     unsigned width = sys->wm.width ? sys->wm.width : sys->set.width;
     unsigned height = sys->wm.height ? sys->wm.height : sys->set.height;
 
-    vout_window_ReportSize(wnd, width, height);
+    wnd->owner.cbs->resized(wnd, width, height, ResizeAck, data);
     xdg_surface_set_window_geometry(sys->surface, 0, 0, width, height);
 }
 
@@ -184,7 +197,7 @@ static void Resize(vout_window_t *wnd, unsigned width, unsigned height)
     vlc_mutex_lock(&sys->lock);
     sys->set.width = width;
     sys->set.height = height;
-    ReportSize(wnd);
+    ReportSize(wnd, NULL);
     vlc_mutex_unlock(&sys->lock);
     wl_display_flush(wnd->display.wl);
 }
@@ -330,23 +343,22 @@ static void xdg_surface_configure_cb(void *data, struct xdg_surface *surface,
     vout_window_t *wnd = data;
     vout_window_sys_t *sys = wnd->sys;
 
-    vlc_mutex_lock(&sys->lock);
-    sys->wm.width = sys->wm.latch.width;
-    sys->wm.height = sys->wm.latch.height;
-    ReportSize(wnd);
-    vlc_mutex_unlock(&sys->lock);
-
     if (sys->wm.latch.fullscreen)
         vout_window_ReportFullscreen(wnd, NULL);
     else
         vout_window_ReportWindowed(wnd);
 
-    xdg_surface_ack_configure(surface, serial);
+    vlc_mutex_lock(&sys->lock);
+    sys->wm.width = sys->wm.latch.width;
+    sys->wm.height = sys->wm.latch.height;
+    ReportSize(wnd, &serial);
+    vlc_mutex_unlock(&sys->lock);
 
     vlc_mutex_lock(&sys->lock);
     sys->wm.configured = true;
     vlc_cond_signal(&sys->cond_configured);
     vlc_mutex_unlock(&sys->lock);
+    (void) surface;
 }
 
 static const struct xdg_surface_listener xdg_surface_cbs =
