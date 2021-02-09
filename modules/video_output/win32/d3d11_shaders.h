@@ -23,16 +23,11 @@
 #ifndef VLC_D3D11_SHADERS_H
 #define VLC_D3D11_SHADERS_H
 
-#include <d3dcompiler.h>
 #include "../../video_chroma/d3d11_fmt.h"
 
-typedef struct
-{
-    HINSTANCE                 compiler_dll; /* handle of the opened d3dcompiler dll */
-    pD3DCompile               OurD3DCompile;
-} d3d_shader_compiler_t;
-
 #include <vlc_es.h>
+
+#include "d3d_shaders.h"
 
 #define DEFAULT_BRIGHTNESS         100
 #define DEFAULT_SRGB_BRIGHTNESS    100
@@ -101,9 +96,6 @@ typedef struct
     PS_CONSTANT_BUFFER        shaderConstants;
     VS_PROJECTION_CONST       vertexConstants;
 } d3d11_quad_t;
-
-int D3D11_InitShaders(vlc_object_t *, d3d_shader_compiler_t *);
-void D3D11_ReleaseShaders(d3d_shader_compiler_t *);
 
 HRESULT D3D11_CompilePixelShader(vlc_object_t *, const d3d_shader_compiler_t *,
                                  d3d11_device_t *, bool texture_array, size_t texture_count,
