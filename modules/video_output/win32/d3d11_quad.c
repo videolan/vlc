@@ -157,15 +157,7 @@ void D3D11_ReleaseQuad(d3d11_quad_t *quad)
         ID3D11Buffer_Release(quad->viewpointShaderConstant);
         quad->viewpointShaderConstant = NULL;
     }
-    D3D11_ReleasePixelShader(quad);
-    for (size_t i=0; i<2; i++)
-    {
-        if (quad->SamplerStates[i])
-        {
-            ID3D11SamplerState_Release(quad->SamplerStates[i]);
-            quad->SamplerStates[i] = NULL;
-        }
-    }
+    D3D11_ReleaseQuadPixelShader(quad);
     ReleaseD3D11PictureSys(&quad->picSys);
 }
 

@@ -1035,13 +1035,21 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     sys->legacy_shader = sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd) ||
             BogusZeroCopy(vd) || !is_d3d11_opaque(fmt->i_chroma);
 
+    d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { 0 };
     hr = D3D11_CompilePixelShader(vd, &sys->shaders, sys->d3d_dev, !sys->legacy_shader,
-                                  &sys->display, false, fmt->transfer, fmt->primaries,
+                                  &sys->display, fmt->transfer, fmt->primaries,
                                   fmt->color_range == COLOR_RANGE_FULL,
-                                  &sys->picQuad);
+                                  &sys->picQuad, pPSBlob);
     if (FAILED(hr))
     {
-        msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
+        msg_Err(vd, "Failed to compile the pixel shader. (hr=0x%lX)", hr);
+        return VLC_EGENERIC;
+    }
+    hr = D3D11_SetQuadPixelShader(VLC_OBJECT(vd), sys->d3d_dev, false,
+                                  &sys->picQuad, pPSBlob);
+    if (FAILED(hr))
+    {
+        msg_Err(vd, "Failed to set the pixel shader. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
 
@@ -1176,12 +1184,19 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
 
     if (sys->regionQuad.generic.textureFormat != NULL)
     {
+        d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { 0 };
         hr = D3D11_CompilePixelShader(vd, &sys->shaders, sys->d3d_dev, false,
-                                      &sys->display, true, TRANSFER_FUNC_SRGB, COLOR_PRIMARIES_SRGB, true,
-                                      &sys->regionQuad);
+                                      &sys->display, TRANSFER_FUNC_SRGB, COLOR_PRIMARIES_SRGB, true,
+                                      &sys->regionQuad, pPSBlob);
         if (FAILED(hr))
         {
-            D3D11_ReleasePixelShader(&sys->picQuad);
+            msg_Err(vd, "Failed to create the SPU pixel shader. (hr=0x%lX)", hr);
+            return VLC_EGENERIC;
+        }
+        hr = D3D11_SetQuadPixelShader(VLC_OBJECT(vd), sys->d3d_dev, true,
+                                      &sys->regionQuad, pPSBlob);
+        if (FAILED(hr))
+        {
             msg_Err(vd, "Failed to create the SPU pixel shader. (hr=0x%lX)", hr);
             return VLC_EGENERIC;
         }

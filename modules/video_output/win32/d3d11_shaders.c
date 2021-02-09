@@ -40,15 +40,22 @@
 #include "d3d_dynamic_shader.h"
 
 HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
-                                 d3d11_device_t *d3d_dev,
-                                 bool texture_array,
-                                 const display_info_t *display, bool sharp,
-                                 video_transfer_func_t transfer,
-                                 video_color_primaries_t primaries, bool src_full_range,
-                                 d3d11_quad_t *quad)
+                                   d3d11_device_t *d3d_dev,
+                                   bool texture_array,
+                                   const display_info_t *display,
+                                   video_transfer_func_t transfer,
+                                   video_color_primaries_t primaries, bool src_full_range,
+                                   d3d11_quad_t *quad, d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET])
 {
-    d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { 0 };
+    return D3D_CompilePixelShader(o, compiler, d3d_dev->feature_level, texture_array,
+                                  display, transfer, primaries,
+                                  src_full_range, quad->generic.textureFormat, pPSBlob);
+}
 
+HRESULT D3D11_SetQuadPixelShader(vlc_object_t *o, d3d11_device_t *d3d_dev,
+                                bool sharp,
+                                d3d11_quad_t *quad, d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET])
+{
     D3D11_SAMPLER_DESC sampDesc;
     memset(&sampDesc, 0, sizeof(sampDesc));
     sampDesc.Filter = sharp ? D3D11_FILTER_MIN_MAG_MIP_POINT : D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
@@ -74,31 +81,24 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t 
         return hr;
     }
 
-    hr = D3D_CompilePixelShader(o, compiler, d3d_dev->feature_level, texture_array,
-                                display, transfer, primaries,
-                                src_full_range, quad->generic.textureFormat, pPSBlob);
+    hr = ID3D11Device_CreatePixelShader(d3d_dev->d3ddevice,
+                                        pPSBlob[0].buffer, pPSBlob[0].buf_size,
+                                        NULL, &quad->d3dpixelShader[0]);
 
-    if (SUCCEEDED(hr))
+    D3D_ShaderBlobRelease(&pPSBlob[0]);
+
+    if (pPSBlob[1].buffer)
     {
         hr = ID3D11Device_CreatePixelShader(d3d_dev->d3ddevice,
-                                            pPSBlob[0].buffer, pPSBlob[0].buf_size,
-                                            NULL, &quad->d3dpixelShader[0]);
+                                            pPSBlob[1].buffer, pPSBlob[1].buf_size,
+                                            NULL, &quad->d3dpixelShader[1]);
 
-        D3D_ShaderBlobRelease(&pPSBlob[0]);
-
-        if (pPSBlob[1].buffer)
-        {
-            hr = ID3D11Device_CreatePixelShader(d3d_dev->d3ddevice,
-                                                pPSBlob[1].buffer, pPSBlob[1].buf_size,
-                                                NULL, &quad->d3dpixelShader[1]);
-
-            D3D_ShaderBlobRelease(&pPSBlob[1]);
-        }
+        D3D_ShaderBlobRelease(&pPSBlob[1]);
     }
     return hr;
 }
 
-void D3D11_ReleasePixelShader(d3d11_quad_t *quad)
+void D3D11_ReleaseQuadPixelShader(d3d11_quad_t *quad)
 {
     for (size_t i=0; i<ARRAY_SIZE(quad->d3dpixelShader); i++)
     {
@@ -106,6 +106,11 @@ void D3D11_ReleasePixelShader(d3d11_quad_t *quad)
         {
             ID3D11PixelShader_Release(quad->d3dpixelShader[i]);
             quad->d3dpixelShader[i] = NULL;
+        }
+        if (quad->SamplerStates[i])
+        {
+            ID3D11SamplerState_Release(quad->SamplerStates[i]);
+            quad->SamplerStates[i] = NULL;
         }
     }
 }
