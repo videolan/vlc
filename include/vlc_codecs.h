@@ -191,7 +191,7 @@ ATTR_PACKED
 #define WAVE_FORMAT_IEEE_FLOAT          0x0003 /* Microsoft Corporation */
 #define WAVE_FORMAT_ALAW                0x0006 /* Microsoft Corporation */
 #define WAVE_FORMAT_MULAW               0x0007 /* Microsoft Corporation */
-#define WAVE_FORMAT_DTS_MS              0x0008 /* Microsoft Corporation */
+#define WAVE_FORMAT_DTS                 0x0008 /* Microsoft Corporation */
 #define WAVE_FORMAT_WMAS                0x000a /* WMA 9 Speech */
 #define WAVE_FORMAT_IMA_ADPCM           0x0011 /* Intel Corporation */
 #define WAVE_FORMAT_YAMAHA_ADPCM        0x0020 /* Yamaha */
@@ -200,11 +200,11 @@ ATTR_PACKED
 #define WAVE_FORMAT_MSNAUDIO            0x0032 /* Microsoft Corporation */
 #define WAVE_FORMAT_AMR_NB_2            0x0038 /* AMR NB rogue */
 #define WAVE_FORMAT_MSG723              0x0042 /* Microsoft G.723 [G723.1] */
-#define WAVE_FORMAT_G726                0x0045 /* ITU-T standard  */
+#define WAVE_FORMAT_SHARP_G726          0x0045 /* ITU-T standard  */
 #define WAVE_FORMAT_MPEG                0x0050 /* Microsoft Corporation */
 #define WAVE_FORMAT_MPEGLAYER3          0x0055 /* ISO/MPEG Layer3 Format Tag */
-#define WAVE_FORMAT_AMR_NB              0x0057 /* AMR NB */
-#define WAVE_FORMAT_AMR_WB              0x0058 /* AMR Wideband */
+#define WAVE_FORMAT_AMR_NARROWBAND      0x0057 /* AMR NB */
+#define WAVE_FORMAT_AMR_WIDEBAND        0x0058 /* AMR Wideband */
 #define WAVE_FORMAT_G726_ADPCM          0x0064 /* G.726 ADPCM  */
 #define WAVE_FORMAT_VOXWARE_RT29        0x0075 /* VoxWare MetaSound */
 #define WAVE_FORMAT_DOLBY_AC3_SPDIF     0x0092 /* Sonic Foundry */
@@ -240,9 +240,13 @@ ATTR_PACKED
 #define WAVE_FORMAT_HEAAC               0x1610
 
 #define WAVE_FORMAT_A52                 0x2000 /* a52 */
-#define WAVE_FORMAT_DTS                 0x2001 /* DTS */
+#define WAVE_FORMAT_DTSINC_DTS          0x2001 /* DTS */
 #define WAVE_FORMAT_AVCODEC_AAC         0x706D
 #define WAVE_FORMAT_DIVIO_AAC           0x4143 /* Divio's AAC */
+
+#define WAVE_FORMAT_AMR_NB              0x7361
+#define WAVE_FORMAT_AMR_WB              0x7362
+#define WAVE_FORMAT_AMR_WP              0x7363
 
 #define WAVE_FORMAT_GSM_AMR_FIXED       0x7A21 /* Fixed bitrate, no SID */
 #define WAVE_FORMAT_GSM_AMR             0x7A22 /* Variable bitrate, including SID */
@@ -330,15 +334,17 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_TRUESPEECH,       VLC_CODEC_TRUESPEECH,             "Truespeech" },
     { WAVE_FORMAT_GSM610,           VLC_CODEC_GSM_MS,                 "Microsoft WAV GSM" },
     { WAVE_FORMAT_MSNAUDIO,         VLC_CODEC_GSM_MS,                 "Microsoft MSN Audio" },
-    { WAVE_FORMAT_G726,             VLC_CODEC_ADPCM_G726,             "G.726 ADPCM" },
+    { WAVE_FORMAT_SHARP_G726,       VLC_CODEC_ADPCM_G726,             "G.726 ADPCM" },
     { WAVE_FORMAT_G726_ADPCM,       VLC_CODEC_ADPCM_G726,             "G.726 ADPCM" },
     { WAVE_FORMAT_G723_1,           VLC_CODEC_G723_1,                 "G.723.1" },
     { WAVE_FORMAT_MSG723,           VLC_CODEC_G723_1,                 "Microsoft G.723 [G723.1]" },
     { WAVE_FORMAT_VIVOG723,         VLC_CODEC_G723_1,                 "Vivo G.723.1" },
     { WAVE_FORMAT_MPEGLAYER3,       VLC_CODEC_MP3,                    "Mpeg Audio Layer 3" },
     { WAVE_FORMAT_MPEG,             VLC_CODEC_MPGA,                   "Mpeg Audio" },
+    { WAVE_FORMAT_AMR_NARROWBAND,   VLC_CODEC_AMR_NB,                 "AMR NB" },
     { WAVE_FORMAT_AMR_NB,           VLC_CODEC_AMR_NB,                 "AMR NB" },
     { WAVE_FORMAT_AMR_NB_2,         VLC_CODEC_AMR_NB,                 "AMR NB" },
+    { WAVE_FORMAT_AMR_WIDEBAND,     VLC_CODEC_AMR_WB,                 "AMR Wideband" },
     { WAVE_FORMAT_AMR_WB,           VLC_CODEC_AMR_WB,                 "AMR Wideband" },
     { WAVE_FORMAT_SIPRO,            VLC_CODEC_SIPR,                   "Sipr Audio" },
     { WAVE_FORMAT_A52,              VLC_CODEC_A52,                    "A/52" },
@@ -351,8 +357,8 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_SONY_ATRAC3,      VLC_CODEC_ATRAC3,                 "Sony Atrac3" },
     { WAVE_FORMAT_DK3,              VLC_CODEC_ADPCM_DK3,              "Duck DK3" },
     { WAVE_FORMAT_DK4,              VLC_CODEC_ADPCM_DK4,              "Duck DK4" },
+    { WAVE_FORMAT_DTSINC_DTS,       VLC_CODEC_DTS,                    "DTS Coherent Acoustics" },
     { WAVE_FORMAT_DTS,              VLC_CODEC_DTS,                    "DTS Coherent Acoustics" },
-    { WAVE_FORMAT_DTS_MS,           VLC_CODEC_DTS,                    "DTS Coherent Acoustics" },
     { WAVE_FORMAT_DIVIO_AAC,        VLC_CODEC_MP4A,                   "MPEG-4 Audio (Divio)" },
     { WAVE_FORMAT_AAC,              VLC_CODEC_MP4A,                   "MPEG-4 Audio" },
     { WAVE_FORMAT_QNAP_ADTS,        VLC_CODEC_MP4A,                   "MPEG-4 ADTS Audio" },

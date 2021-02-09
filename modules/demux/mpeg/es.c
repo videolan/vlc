@@ -1390,7 +1390,7 @@ static int DtsCheckSync( const uint8_t *p_peek, unsigned *pi_samples )
 static int DtsProbe( demux_t *p_demux, uint64_t *pi_offset )
 {
     const char *ppsz_name[] = { "dts", NULL };
-    const uint16_t rgi_twocc[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_DTS, WAVE_FORMAT_UNKNOWN };
+    const uint16_t rgi_twocc[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_DTSINC_DTS, WAVE_FORMAT_UNKNOWN };
 
     return GenericProbe( p_demux, pi_offset, ppsz_name, DtsCheckSync,
                          VLC_DTS_HEADER_SIZE,
