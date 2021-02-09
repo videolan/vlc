@@ -73,15 +73,6 @@ typedef struct {
     } texture;
 } d3d_vertex_t;
 
-typedef struct
-{
-    HINSTANCE                 compiler_dll; /* handle of the opened d3dcompiler dll */
-    pD3DCompile               OurD3DCompile;
-} d3d_shader_compiler_t;
-
-int D3D_InitShaders(vlc_object_t *, d3d_shader_compiler_t *);
-void D3D_ReleaseShaders(d3d_shader_compiler_t *);
-
 
 /* A Quad is texture that can be displayed in a rectangle */
 typedef struct
@@ -100,18 +91,19 @@ typedef struct
 
 } d3d_quad_t;
 
-HRESULT D3D_CompilePixelShader(vlc_object_t *, const d3d_shader_compiler_t *,
-                               D3D_FEATURE_LEVEL,
-                               bool texture_array,
-                               const display_info_t *,
-                               video_transfer_func_t,
-                               video_color_primaries_t, bool src_full_range,
-                               const d3d_format_t *dxgi_fmt,
-                               ID3DBlob *pPSBlob[DXGI_MAX_RENDER_TARGET]);
+typedef struct d3d_shader_blob
+{
+    void *opaque;
+    void (*pf_release)(struct d3d_shader_blob *);
+    SIZE_T buf_size;
+    void *buffer;
+} d3d_shader_blob;
 
-HRESULT D3D_CompileVertexShader(vlc_object_t *, const d3d_shader_compiler_t *,
-                                D3D_FEATURE_LEVEL, bool flat,
-                                ID3DBlob **);
+static inline void D3D_ShaderBlobRelease(d3d_shader_blob *blob)
+{
+    blob->pf_release(blob);
+    *blob = (d3d_shader_blob) { 0 };
+}
 
 float D3D_GetFormatLuminance(vlc_object_t *, const video_format_t *);
 #define D3D_GetFormatLuminance(a,b)  D3D_GetFormatLuminance(VLC_OBJECT(a),b)

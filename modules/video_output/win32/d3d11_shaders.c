@@ -37,6 +37,8 @@
 #include <d3d11.h>
 
 #include "d3d11_shaders.h"
+#include "d3d_dynamic_shader.h"
+
 HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
                                  d3d11_device_t *d3d_dev,
                                  bool texture_array,
@@ -45,7 +47,7 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t 
                                  video_color_primaries_t primaries, bool src_full_range,
                                  d3d11_quad_t *quad)
 {
-    ID3DBlob *pPSBlob[DXGI_MAX_RENDER_TARGET];
+    d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { 0 };
 
     D3D11_SAMPLER_DESC sampDesc;
     memset(&sampDesc, 0, sizeof(sampDesc));
@@ -79,18 +81,18 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t 
     if (SUCCEEDED(hr))
     {
         hr = ID3D11Device_CreatePixelShader(d3d_dev->d3ddevice,
-                                            (void *)ID3D10Blob_GetBufferPointer(pPSBlob[0]),
-                                            ID3D10Blob_GetBufferSize(pPSBlob[0]), NULL, &quad->d3dpixelShader[0]);
+                                            pPSBlob[0].buffer, pPSBlob[0].buf_size,
+                                            NULL, &quad->d3dpixelShader[0]);
 
-        ID3D10Blob_Release(pPSBlob[0]);
+        D3D_ShaderBlobRelease(&pPSBlob[0]);
 
-        if (pPSBlob[1])
+        if (pPSBlob[1].buffer)
         {
             hr = ID3D11Device_CreatePixelShader(d3d_dev->d3ddevice,
-                                                (void *)ID3D10Blob_GetBufferPointer(pPSBlob[1]),
-                                                ID3D10Blob_GetBufferSize(pPSBlob[1]), NULL, &quad->d3dpixelShader[1]);
+                                                pPSBlob[1].buffer, pPSBlob[1].buf_size,
+                                                NULL, &quad->d3dpixelShader[1]);
 
-            ID3D10Blob_Release(pPSBlob[1]);
+            D3D_ShaderBlobRelease(&pPSBlob[1]);
         }
     }
     return hr;
@@ -152,14 +154,14 @@ static HRESULT CompileVertexShader(vlc_object_t *obj, const d3d_shader_compiler_
                                    d3d11_device_t *d3d_dev, bool flat,
                                    d3d11_vertex_shader_t *output)
 {
-    ID3DBlob *pVSBlob;
+    d3d_shader_blob pVSBlob = { 0 };
     HRESULT hr;
     hr = D3D_CompileVertexShader(obj, compiler, d3d_dev->feature_level, flat, &pVSBlob);
     if (FAILED(hr))
         return hr;
 
-   hr = ID3D11Device_CreateVertexShader(d3d_dev->d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
-                                        ID3D10Blob_GetBufferSize(pVSBlob), NULL, &output->shader);
+   hr = ID3D11Device_CreateVertexShader(d3d_dev->d3ddevice, pVSBlob.buffer,
+                                        pVSBlob.buf_size, NULL, &output->shader);
 
    if(FAILED(hr)) {
        msg_Err(obj, "Failed to create the flat vertex shader. (hr=0x%lX)", hr);
@@ -172,8 +174,8 @@ static HRESULT CompileVertexShader(vlc_object_t *obj, const d3d_shader_compiler_
    { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
    };
 
-   hr = ID3D11Device_CreateInputLayout(d3d_dev->d3ddevice, layout, 2, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
-                                       ID3D10Blob_GetBufferSize(pVSBlob), &output->layout);
+   hr = ID3D11Device_CreateInputLayout(d3d_dev->d3ddevice, layout, 2, pVSBlob.buffer,
+                                       pVSBlob.buf_size, &output->layout);
 
    if(FAILED(hr)) {
        msg_Err(obj, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
@@ -182,7 +184,7 @@ static HRESULT CompileVertexShader(vlc_object_t *obj, const d3d_shader_compiler_
 
    return S_OK;
 error:
-   ID3D10Blob_Release(pVSBlob);
+   D3D_ShaderBlobRelease(&pVSBlob);
    return hr;
 }
 

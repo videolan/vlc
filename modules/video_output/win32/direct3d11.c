@@ -358,7 +358,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    int ret = D3D_InitShaders(VLC_OBJECT(vd), &sys->shaders);
+    int ret = D3D_InitShaderCompiler(VLC_OBJECT(vd), &sys->shaders);
     if (ret != VLC_SUCCESS)
         goto error;
 
@@ -450,7 +450,7 @@ error:
 
 static void Close(vout_display_t *vd)
 {
-    D3D_ReleaseShaders(&vd->sys->shaders);
+    D3D_ReleaseShaderCompiler(&vd->sys->shaders);
     Direct3D11Close(vd);
 #if !VLC_WINSTORE_APP
     UnhookWindowsSensors(vd->sys->p_sensors);

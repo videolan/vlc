@@ -24,6 +24,7 @@
 #define VLC_D3D11_SHADERS_H
 
 #include "d3d_shaders.h"
+#include "d3d_dynamic_shader.h"
 
 #include "../../video_chroma/d3d11_fmt.h"
 
