@@ -543,7 +543,8 @@ void vout_ChangeWindowState(vout_thread_t *vout, unsigned st)
 }
 
 void vout_ChangeDisplaySize(vout_thread_t *vout,
-                            unsigned width, unsigned height)
+                            unsigned width, unsigned height,
+                            void (*cb)(void *), void *opaque)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
 
@@ -557,6 +558,9 @@ void vout_ChangeDisplaySize(vout_thread_t *vout,
 
     if (sys->display != NULL)
         vout_display_SetSize(sys->display, width, height);
+
+    if (cb != NULL)
+        cb(opaque);
     vlc_mutex_unlock(&sys->display_lock);
 }
 

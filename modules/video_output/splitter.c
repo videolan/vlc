@@ -135,7 +135,8 @@ static void vlc_vidsplit_Close(vout_display_t *vd)
 }
 
 static void vlc_vidsplit_window_Resized(vout_window_t *wnd,
-                                        unsigned width, unsigned height)
+                                        unsigned width, unsigned height,
+                                        vout_window_ack_cb cb, void *opaque)
 {
     struct vlc_vidsplit_part *part = wnd->owner.sys;
 
@@ -145,6 +146,9 @@ static void vlc_vidsplit_window_Resized(vout_window_t *wnd,
 
     if (part->display != NULL)
         vout_display_SetSize(part->display, width, height);
+
+    if (cb != NULL)
+        cb(wnd, opaque);
     vlc_sem_post(&part->lock);
 }
 

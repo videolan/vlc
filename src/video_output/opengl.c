@@ -184,7 +184,8 @@ typedef struct vlc_gl_surface
 } vlc_gl_surface_t;
 
 static void vlc_gl_surface_ResizeNotify(vout_window_t *surface,
-                                        unsigned width, unsigned height)
+                                        unsigned width, unsigned height,
+                                        vout_window_ack_cb cb, void *opaque)
 {
     vlc_gl_surface_t *sys = surface->owner.sys;
 
@@ -193,6 +194,9 @@ static void vlc_gl_surface_ResizeNotify(vout_window_t *surface,
     vlc_mutex_lock(&sys->lock);
     sys->width = width;
     sys->height = height;
+
+    if (cb != NULL)
+        cb(surface, opaque);
     vlc_mutex_unlock(&sys->lock);
 }
 

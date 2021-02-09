@@ -150,7 +150,8 @@ bool GetAspectRatio(const char *ar_str, unsigned *num, unsigned *den);
 void vout_ChangeFullscreen(vout_thread_t *, const char *id);
 void vout_ChangeWindowed(vout_thread_t *);
 void vout_ChangeWindowState(vout_thread_t *, unsigned state);
-void vout_ChangeDisplaySize(vout_thread_t *, unsigned width, unsigned height);
+void vout_ChangeDisplaySize(vout_thread_t *, unsigned width, unsigned height,
+                            void (*ack_cb)(void *), void *opaque);
 void vout_ChangeDisplayFilled(vout_thread_t *, bool is_filled);
 void vout_ChangeZoom(vout_thread_t *, unsigned num, unsigned den);
 void vout_ChangeDisplayAspectRatio(vout_thread_t *, unsigned num, unsigned den);

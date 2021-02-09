@@ -174,6 +174,11 @@ typedef struct vout_window_cfg_t {
 } vout_window_cfg_t;
 
 /**
+ * Callback prototype for window event acknowledgement.
+ */
+typedef void (*vout_window_ack_cb)(struct vout_window_t *, void *);
+
+/**
  * Window event callbacks structure.
  *
  * This structure provided to vout_window_New() conveys callbacks to handle
@@ -199,8 +204,19 @@ struct vout_window_callbacks {
      * change is requested. It may also occur asynchronously as a consequence
      * of external events from the windowing system, or deferred processing of
      * a size change request.
+     *
+     * If a non-NULL acknowledgement callback is specified, it is called
+     * synchronously after the consumer of the window has been notified of the
+     * size change, and before any further processing by the consumer. In other
+     * words, the callback invocation is after all rendering operations using
+     * the previous old window size, and before all rendering operations using
+     * the new window size.
+     *
+     * \param cb optional acknowledgement callback function (NULL to ignore)
+     * \param opaque opaque data pointer for the acknowledgement callback
      */
-    void (*resized)(struct vout_window_t *, unsigned width, unsigned height);
+    void (*resized)(struct vout_window_t *, unsigned width, unsigned height,
+                    vout_window_ack_cb cb, void *opaque);
 
     /**
      * Callback for window closing.
@@ -543,7 +559,7 @@ void vout_window_Disable(vout_window_t *window);
 static inline void vout_window_ReportSize(vout_window_t *window,
                                           unsigned width, unsigned height)
 {
-    window->owner.cbs->resized(window, width, height);
+    window->owner.cbs->resized(window, width, height, NULL, NULL);
 }
 
 /**
