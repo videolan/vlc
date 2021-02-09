@@ -107,10 +107,7 @@ enum vout_crop_mode {
 struct vout_crop {
     enum vout_crop_mode mode;
     union {
-        struct {
-            unsigned num;
-            unsigned den;
-        } ratio;
+        vlc_rational_t ratio;
         struct {
             unsigned x;
             unsigned y;
