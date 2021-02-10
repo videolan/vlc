@@ -428,20 +428,12 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
             {
             case VLC_CODEC_I420_10L:
                 psz_sampler[0] =
-                       "float3 coords_2 = float3(coords.x/2, coords.y, coords.z);\n"
-                       "sample.x  = shaderTexture[0].Sample(samplerState, coords_2).x * 64;\n"
-                       "sample.y  = shaderTexture[1].Sample(samplerState, coords_2).x * 64;\n"
-                       "sample.z  = shaderTexture[2].Sample(samplerState, coords_2).x * 64;\n"
+                       "sample.x  = shaderTexture[0].Sample(samplerState, coords).x * 64;\n"
+                       "sample.y  = shaderTexture[1].Sample(samplerState, coords).x * 64;\n"
+                       "sample.z  = shaderTexture[2].Sample(samplerState, coords).x * 64;\n"
                        "sample.a  = 1;";
                 break;
             case VLC_CODEC_I444_16L:
-                psz_sampler[0] =
-                       "float3 coords_2 = float3(coords.x/2, coords.y, coords.z);\n"
-                       "sample.x  = shaderTexture[0].Sample(samplerState, coords_2).x;\n"
-                       "sample.y  = shaderTexture[1].Sample(samplerState, coords_2).x;\n"
-                       "sample.z  = shaderTexture[2].Sample(samplerState, coords_2).x;\n"
-                       "sample.a  = 1;";
-                break;
             case VLC_CODEC_I420:
                 psz_sampler[0] =
                        "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n"

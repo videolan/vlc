@@ -807,7 +807,7 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
             ID3D11Texture2D_AddRef(slicedTexture);
         } else {
             texDesc.Height = planes[plane].i_lines;
-            texDesc.Width  = planes[plane].i_pitch;
+            texDesc.Width  = planes[plane].i_pitch / p_chroma_desc->pixel_size;
             hr = ID3D11Device_CreateTexture2D( d3d_dev->d3ddevice, &texDesc, NULL, &textures[plane] );
             if (FAILED(hr)) {
                 msg_Err(obj, "CreateTexture2D failed for plane %d. (hr=0x%lX)", plane, hr);
