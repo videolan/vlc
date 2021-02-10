@@ -374,7 +374,7 @@ MediaLibrary* MediaLibrary::create( vlc_medialibrary_module_t* vlc_ml )
     auto mlDir = std::string{ userDir.get() } + "/ml/";
     auto dbPath = mlDir + "ml.db";
     auto mlFolderPath = mlDir + "mlstorage/";
-    auto ml = NewMediaLibrary( dbPath.c_str(), mlFolderPath.c_str(), false );
+    auto ml = NewMediaLibrary( dbPath.c_str(), mlFolderPath.c_str(), true );
     if ( !ml )
         return nullptr;
 
