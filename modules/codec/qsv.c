@@ -353,7 +353,6 @@ static uint64_t qsv_params_get_value(const char *const *text,
     if (unlikely(!sel))
         return list[0];
 
-    size /= sizeof(list[0]);
     for (size_t i = 0; i < size; i++)
         if (!strcmp(sel, text[i])) {
             result = i;
@@ -477,16 +476,16 @@ static int Open(vlc_object_t *this)
     sys->params.mfx.NumSlice    = var_InheritInteger(enc, SOUT_CFG_PREFIX "num-slice");
     sys->params.mfx.NumRefFrame = var_InheritInteger(enc, SOUT_CFG_PREFIX "num-ref-frame");
     sys->params.mfx.TargetUsage = qsv_params_get_value(target_usage_text,
-        target_usage_list, sizeof(target_usage_list),
+        target_usage_list, ARRAY_SIZE(target_usage_list),
         var_InheritString(enc, SOUT_CFG_PREFIX "target-usage"));
 
     if (enc->fmt_out.i_codec == VLC_CODEC_H264) {
         sys->params.mfx.CodecId = MFX_CODEC_AVC;
         sys->params.mfx.CodecProfile = qsv_params_get_value(profile_h264_text,
-            profile_h264_list, sizeof(profile_h264_list),
+            profile_h264_list, ARRAY_SIZE(profile_h264_list),
             var_InheritString(enc, SOUT_CFG_PREFIX "h264-profile"));
         sys->params.mfx.CodecLevel = qsv_params_get_value(level_h264_text,
-            level_h264_list, sizeof(level_h264_list),
+            level_h264_list, ARRAY_SIZE(level_h264_list),
             var_InheritString(enc, SOUT_CFG_PREFIX "h264-level"));
         msg_Dbg(enc, "Encoder in H264 mode, with profile %d and level %d",
             sys->params.mfx.CodecProfile, sys->params.mfx.CodecLevel);
@@ -494,10 +493,10 @@ static int Open(vlc_object_t *this)
     } else {
         sys->params.mfx.CodecId = MFX_CODEC_MPEG2;
         sys->params.mfx.CodecProfile = qsv_params_get_value(profile_mpeg2_text,
-            profile_mpeg2_list, sizeof(profile_mpeg2_list),
+            profile_mpeg2_list, ARRAY_SIZE(profile_mpeg2_list),
             var_InheritString(enc, SOUT_CFG_PREFIX "mpeg2-profile"));
         sys->params.mfx.CodecLevel = qsv_params_get_value(level_mpeg2_text,
-            level_mpeg2_list, sizeof(level_mpeg2_list),
+            level_mpeg2_list, ARRAY_SIZE(level_mpeg2_list),
             var_InheritString(enc, SOUT_CFG_PREFIX "mpeg2-level"));
         msg_Dbg(enc, "Encoder in MPEG2 mode, with profile %d and level %d",
             sys->params.mfx.CodecProfile, sys->params.mfx.CodecLevel);
@@ -507,7 +506,7 @@ static int Open(vlc_object_t *this)
     char *psz_rc = var_InheritString(enc, SOUT_CFG_PREFIX "rc-method");
     msg_Dbg(enc, "Encoder using '%s' Rate Control method", psz_rc );
     sys->params.mfx.RateControlMethod = qsv_params_get_value(rc_method_text,
-        rc_method_list, sizeof(rc_method_list), psz_rc );
+        rc_method_list, ARRAY_SIZE(rc_method_list), psz_rc );
 
     if (sys->params.mfx.RateControlMethod == MFX_RATECONTROL_CQP) {
         sys->params.mfx.QPI = sys->params.mfx.QPB = sys->params.mfx.QPP =
