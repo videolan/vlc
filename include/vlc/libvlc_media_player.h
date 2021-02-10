@@ -148,6 +148,14 @@ typedef enum libvlc_teletext_key_t {
 } libvlc_teletext_key_t;
 
 /**
+ * Enumeration of action to do when media player finished to play a media
+ */
+typedef enum libvlc_media_player_stopped_action_t {
+    libvlc_media_player_pause_on_stop,
+    libvlc_media_player_action_stop,
+} libvlc_media_player_stopped_action_t;
+
+/**
  * Opaque equalizer handle.
  *
  * Equalizer settings can be applied to a media player.
@@ -1648,6 +1656,18 @@ libvlc_media_player_get_program_from_id( libvlc_media_player_t *p_mi, int i_grou
 LIBVLC_API libvlc_player_programlist_t *
 libvlc_media_player_get_programlist( libvlc_media_player_t *p_mi );
 
+/**
+ * Change the media player's behaviour when a media is played.
+ *
+ * This function can be used when the last frame must be kept on the surface
+ * used for rendering.
+ *
+ * \param p_mi the media player
+ * \param action the action to execute at the end of a media
+ */
+LIBVLC_API void
+libvlc_media_player_set_stopped_action( libvlc_media_player_t *p_mi,
+                                        libvlc_media_player_stopped_action_t action );
 
 /** \defgroup libvlc_video LibVLC video controls
  * @{

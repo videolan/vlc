@@ -2426,6 +2426,26 @@ libvlc_media_player_time_point_get_next_date(const libvlc_media_player_time_poin
     return US_FROM_VLC_TICK(date);
 }
 
+void libvlc_media_player_set_stopped_action( libvlc_media_player_t *p_mi,
+                                             libvlc_media_player_stopped_action_t action )
+{
+    vlc_player_t *player = p_mi->player;
+    enum vlc_player_media_stopped_action player_action;
+    switch( action )
+    {
+        case libvlc_media_player_pause_on_stop:
+            player_action = VLC_PLAYER_MEDIA_STOPPED_PAUSE; break;
+        case libvlc_media_player_action_stop:
+            player_action = VLC_PLAYER_MEDIA_STOPPED_STOP; break;
+        default:
+            vlc_assert_unreachable();
+            return;
+    };
+    vlc_player_Lock(player);
+    vlc_player_SetMediaStoppedAction(player, player_action);
+    vlc_player_Unlock(player);
+}
+
 #include <vlc_vout_display.h>
 
 /* make sure surface structures from libvlc can be passed as such to vlc
