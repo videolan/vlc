@@ -1372,7 +1372,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
             quad_picture = (*region)[i];
-            for (size_t j=0; j<DXGI_MAX_SHADER_VIEW; j++)
+            for (size_t j=0; j<ARRAY_SIZE(sys->regionQuad.d3dpixelShader); j++)
             {
                 /* TODO use something more accurate if we have different formats */
                 if (sys->regionQuad.d3dpixelShader[j])

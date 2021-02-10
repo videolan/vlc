@@ -67,7 +67,7 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d11_quad_t *quad, d3d11_vertex_
     ID3D11DeviceContext_PSSetConstantBuffers(d3d_dev->d3dcontext, 0, ARRAY_SIZE(quad->pPixelShaderConstants), quad->pPixelShaderConstants);
     assert(quad->resourceCount <= DXGI_MAX_SHADER_VIEW);
 
-    for (size_t i=0; i<DXGI_MAX_SHADER_VIEW; i++)
+    for (size_t i=0; i<ARRAY_SIZE(quad->d3dpixelShader); i++)
     {
         if (!quad->d3dpixelShader[i])
             break;
@@ -1144,7 +1144,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
 
     ShaderUpdateConstants(o, d3d_dev, quad, PS_CONST_COLORSPACE, &colorspace);
 
-    for (size_t i=0; i<DXGI_MAX_SHADER_VIEW; i++)
+    for (size_t i=0; i<ARRAY_SIZE(quad->cropViewport); i++)
     {
         quad->cropViewport[i].MinDepth = 0.0f;
         quad->cropViewport[i].MaxDepth = 1.0f;
@@ -1201,8 +1201,7 @@ void D3D11_UpdateViewport(d3d11_quad_t *quad, const RECT *rect, const d3d_format
             if ( display->formatTexture != DXGI_FORMAT_NV12 &&
                  display->formatTexture != DXGI_FORMAT_P010 )
             {
-                quad->cropViewport[1] = quad->cropViewport[2] =
-                quad->cropViewport[3] = quad->cropViewport[0];
+                quad->cropViewport[1] = quad->cropViewport[0];
                 break;
             }
             /* fallthrough */
@@ -1212,7 +1211,6 @@ void D3D11_UpdateViewport(d3d11_quad_t *quad, const RECT *rect, const d3d_format
             quad->cropViewport[1].TopLeftY = quad->cropViewport[0].TopLeftY / 2;
             quad->cropViewport[1].Width    = quad->cropViewport[0].Width / 2;
             quad->cropViewport[1].Height   = quad->cropViewport[0].Height / 2;
-            quad->cropViewport[2] = quad->cropViewport[1];
             break;
         }
         break;

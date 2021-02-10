@@ -91,9 +91,9 @@ typedef struct
     ID3D11Buffer              *viewpointShaderConstant;
     ID3D11Buffer              *pPixelShaderConstants[2];
     UINT                       PSConstantsCount;
-    ID3D11PixelShader         *d3dpixelShader[DXGI_MAX_SHADER_VIEW];
+    ID3D11PixelShader         *d3dpixelShader[DXGI_MAX_RENDER_TARGET];
     ID3D11SamplerState        *SamplerStates[2];
-    D3D11_VIEWPORT            cropViewport[DXGI_MAX_SHADER_VIEW];
+    D3D11_VIEWPORT            cropViewport[DXGI_MAX_RENDER_TARGET];
     unsigned int              i_width;
     unsigned int              i_height;
     video_projection_mode_t   projection;
