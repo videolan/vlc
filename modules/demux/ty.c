@@ -995,8 +995,8 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 
     /* set PCR before we send (if PTS found) */
     if( p_block_in->i_pts != VLC_TICK_INVALID )
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR,
-                        p_block_in->i_pts );
+        es_out_SetPCR( p_demux->out, p_block_in->i_pts );
+
     /* Send data */
     es_out_Send( p_demux->out, p_sys->p_audio, p_block_in );
     return 0;
