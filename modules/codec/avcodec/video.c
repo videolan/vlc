@@ -70,7 +70,6 @@ typedef struct
 
     /* Closed captions for decoders */
     cc_data_t cc;
-    picture_captions_t captions;
 
     /* for frame skipping algo */
     bool b_hurry_up;
@@ -382,7 +381,6 @@ static int OpenVideoCodec( decoder_t *p_dec )
     p_sys->profile = -1;
     p_sys->level = -1;
     cc_Init( &p_sys->cc );
-    p_sys->captions.size = 0;
 
     set_video_color_settings( &p_dec->fmt_in.video, ctx );
     if( p_dec->fmt_in.video.i_frame_rate_base &&
@@ -622,7 +620,6 @@ static void Flush( decoder_t *p_dec )
     p_sys->i_late_frames = 0;
     p_sys->framedrop = FRAMEDROP_NONE;
     cc_Flush( &p_sys->cc );
-    p_sys->captions.size = 0;
 
     /* do not flush buffers if codec hasn't been opened (theora/vorbis/VC1) */
     if( avcodec_is_open( p_context ) )
@@ -869,8 +866,6 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
     const AVFrameSideData *p_avcc = av_frame_get_side_data( frame, AV_FRAME_DATA_A53_CC );
     if( p_avcc )
     {
-        p_sys->captions.size = __MIN(p_avcc->size, PICTURE_MAX_CAPTION_BYTES);
-        memcpy( p_sys->captions.bytes, p_avcc->data, p_sys->captions.size );
         cc_Extract( &p_sys->cc, CC_PAYLOAD_RAW, true, p_avcc->data, p_avcc->size );
         if( p_sys->cc.b_reorder || p_sys->cc.i_data )
         {
@@ -1224,12 +1219,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if (DecodeSidedata(p_dec, frame, p_pic))
             i_pts = VLC_TICK_INVALID;
 
-        if(p_sys->captions.size)
-        {
-            p_pic->captions = p_sys->captions;
-            p_sys->captions.size = 0;
-        }
-
         av_frame_free(&frame);
 
         /* Send decoded frame to vout */
@@ -1275,7 +1264,6 @@ static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
         vlc_mutex_unlock(&p_sys->lock);
 
         cc_Flush( &p_sys->cc );
-        p_sys->captions.size = 0;
 
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         {
