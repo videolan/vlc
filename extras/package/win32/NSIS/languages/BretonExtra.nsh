@@ -11,7 +11,7 @@ ${LangFileString} Name_SectionGroupAudio "Restroù Aodio"
 ${LangFileString} Name_SectionGroupVideo "Restroù Video"
 ${LangFileString} Name_SectionGroupOther "Traoù all"
 ${LangFileString} Name_Section07 "Lañserioù Kemperzhel"
-${LangFileString} Name_Section08 "Lemel an arventennoù hag ar c'hrubuilh"
+${LangFileString} Name_Section08 "Lemel ar gwellvezioù hag ar grubuilh"
 
 ${LangFileString} Desc_Section01 \
     "Al lenner media en e-unan"
@@ -30,15 +30,15 @@ ${LangFileString} Desc_Section06 \
 ${LangFileString} Desc_Section07 \
     "Ouzhpennañ elfennoù lañser kemperzhel ('Lenn gant VLC' ha 'Ouzhpennañ da roll-lenn VLC')"
 ${LangFileString} Desc_Section08 \
-    "Dilemel arventennoù VLC media player ha restroù krubuilh ar staliadurioù kent"
+    "Dilemel gwellvezioù VLC media player ha restroù krubuilh ar staliadurioù kent"
 
 ${LangFileString} Name_Section91 "Distaliañ"
-${LangFileString} Name_Section92 "Lemel an arventennoù hag ar c'hrubuilh"
+${LangFileString} Name_Section92 "Lemel ar gwellvezioù hag ar grubuilh"
 
 ${LangFileString} Desc_Section91 \
 "Distaliañ lenner media VLC hag e holl barzhioù"
 ${LangFileString} Desc_Section92 \
-"Lemel arventennoù al lenner media VLC ha restroù ar c'hrubuilh"
+"Lemel gwellvezioù al lenner media VLC ha restroù ar grubuilh"
 
 ${LangFileString} ShellAssociation_Play "Lenn"
 ${LangFileString} ContextMenuEntry_PlayWith "Lenn gant VLC media player"
