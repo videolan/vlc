@@ -344,7 +344,9 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
         const char *target;
         if (pixelShader)
         {
-            if (likely(feature_level >= D3D_FEATURE_LEVEL_10_0))
+            if (feature_level >= D3D_FEATURE_LEVEL_12_0)
+                target = "ps_5_0";
+            else if (likely(feature_level >= D3D_FEATURE_LEVEL_10_0))
                 target = "ps_4_0";
             else if (feature_level >= D3D_FEATURE_LEVEL_9_3)
                 target = "ps_4_0_level_9_3";
@@ -353,7 +355,9 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
         }
         else
         {
-            if (likely(feature_level >= D3D_FEATURE_LEVEL_10_0))
+            if (feature_level >= D3D_FEATURE_LEVEL_12_0)
+                target = "vs_5_0";
+            else if (likely(feature_level >= D3D_FEATURE_LEVEL_10_0))
                 target = "vs_4_0";
             else if (feature_level >= D3D_FEATURE_LEVEL_9_3)
                 target = "vs_4_0_level_9_3";
