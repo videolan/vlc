@@ -1,10 +1,10 @@
 /* Localized versions of Info.plist keys */
 
-"NSCameraUsageDescription" = "To VLC θέλει να αποκτήσει πρόσβαση στην κάμερα όπως ζητήθηκε από τον χρήστη.";
-"NSMicrophoneUsageDescription" = "To VLC θέλει να αποκτήσει πρόσβαση στο μικρόφωνο όπως ζητήθηκε από τον χρήστη.";
-"NSAppleEventsUsageDescription" = "Το VLC θέλει να θέσει σε παύση και να συνεχίσει εξωτερικά προγράμματα αναπαραγωγής πολυμέσων.";
-"NSDesktopFolderUsageDescription" = "To VLC θέλει να αποκτήσει πρόσβαση στο φάκελο της επιφάνειας εργασίας όπως ζητήθηκε από τον χρήστη.";
-"NSDocumentsFolderUsageDescription" = "To VLC θέλει να αποκτήσει πρόσβαση στον φάκελο έγγραφα όπως ζητήθηκε από τον χρήστη.";
-"NSDownloadsFolderUsageDescription" = "To VLC θέλει να αποκτήσει πρόσβαση στο φάκελο λήψεις όπως ζητήθηκε από τον χρήστη.";
-"NSNetworkVolumesUsageDescription" = "To VLC θέλει να αποκτήσει πρόσβαση σε έναν δικτυακό μέσο όπως ζητήθηκε από τον χρήστη.";
-"NSRemovableVolumesUsageDescription" = "To VLC θέλει να αποκτήσει πρόσβαση σε εξωτερικό μέσο όπως ζητήθηκε από τον χρήστη.";
+"NSCameraUsageDescription" = "Το VLC θέλει να αποκτήσει πρόσβαση στην κάμερα όπως ζητήθηκε από τον χρήστη.";
+"NSMicrophoneUsageDescription" = "Το VLC θέλει να αποκτήσει πρόσβαση στο μικρόφωνο όπως ζητήθηκε από τον χρήστη.";
+"NSAppleEventsUsageDescription" = "Το VLC θέλει να θέτει σε παύση και αναπαραγωγή εξωτερικά προγράμματα αναπαραγωγής πολυμέσων.";
+"NSDesktopFolderUsageDescription" = "Το VLC θέλει να αποκτήσει πρόσβαση στο φάκελο της επιφάνειας εργασίας όπως ζητήθηκε από τον χρήστη.";
+"NSDocumentsFolderUsageDescription" = "Το VLC θέλει να αποκτήσει πρόσβαση στο φάκελο έγγραφα όπως ζητήθηκε από τον χρήστη.";
+"NSDownloadsFolderUsageDescription" = "Το VLC θέλει να αποκτήσει πρόσβαση στο φάκελο λήψεις όπως ζητήθηκε από τον χρήστη.";
+"NSNetworkVolumesUsageDescription" = "Το VLC θέλει να αποκτήσει πρόσβαση σε έναν δικτυακό τόμο όπως ζητήθηκε από τον χρήστη.";
+"NSRemovableVolumesUsageDescription" = "Το VLC θέλει να αποκτήσει πρόσβαση σε εξωτερικό τόμο όπως ζητήθηκε από τον χρήστη.";
