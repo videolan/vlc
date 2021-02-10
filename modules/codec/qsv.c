@@ -504,7 +504,8 @@ static int Open(vlc_object_t *this)
     param_out.mfx.CodecId = sys->params.mfx.CodecId;
 
     char *psz_rc = var_InheritString(enc, SOUT_CFG_PREFIX "rc-method");
-    msg_Dbg(enc, "Encoder using '%s' Rate Control method", psz_rc );
+    msg_Dbg(enc, "Encoder using '%s' Rate Control method",
+            psz_rc ? psz_rc : rc_method_text[0]);
     sys->params.mfx.RateControlMethod = qsv_params_get_value(rc_method_text,
         rc_method_list, ARRAY_SIZE(rc_method_list), psz_rc );
 
