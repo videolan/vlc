@@ -113,24 +113,29 @@ void PlayerControlBarModel::reloadModel()
         parseAndAdd(config.toString());
     else
     {
-        QString alignment = configName.split("-").at(1);
-        if (configName.startsWith("MainPlayerToolbar"))
+        const auto configAndAlignment = configName.split("-");
+        if (configAndAlignment.size() == 2)
         {
-            if (alignment == "left")
-                parseDefault(MAIN_TB_DEFAULT[default_align::ALIGN_LEFT]);
-            else if (alignment == "center")
-                parseDefault(MAIN_TB_DEFAULT[default_align::ALIGN_CENTER]);
-            else if (alignment == "right")
-                parseDefault(MAIN_TB_DEFAULT[default_align::ALIGN_RIGHT]);
-        }
-        else
-        {
-            if (alignment == "left")
-                parseDefault(MINI_TB_DEFAULT[default_align::ALIGN_LEFT]);
-            else if (alignment == "center")
-                parseDefault(MINI_TB_DEFAULT[default_align::ALIGN_CENTER]);
-            else if (alignment == "right")
-                parseDefault(MINI_TB_DEFAULT[default_align::ALIGN_RIGHT]);
+            const auto alignment = configAndAlignment[1];
+            if (configAndAlignment[0] == QLatin1String("MainPlayerToolbar"))
+            {
+                if (alignment == "left")
+                    parseDefault(MAIN_TB_DEFAULT[default_align::ALIGN_LEFT]);
+                else if (alignment == "center")
+                    parseDefault(MAIN_TB_DEFAULT[default_align::ALIGN_CENTER]);
+                else if (alignment == "right")
+                    parseDefault(MAIN_TB_DEFAULT[default_align::ALIGN_RIGHT]);
+            }
+            else
+            {
+                if (alignment == "left")
+                    parseDefault(MINI_TB_DEFAULT[default_align::ALIGN_LEFT]);
+                else if (alignment == "center")
+                    parseDefault(MINI_TB_DEFAULT[default_align::ALIGN_CENTER]);
+                else if (alignment == "right")
+                    parseDefault(MINI_TB_DEFAULT[default_align::ALIGN_RIGHT]);
+
+            }
         }
     }
     endResetModel();
