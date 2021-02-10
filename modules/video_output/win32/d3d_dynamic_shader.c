@@ -53,7 +53,7 @@ static const char globPixelShaderDefault[] = "\
   struct PS_INPUT\n\
   {\n\
     float4 Position   : SV_POSITION;\n\
-    float3 Texture    : TEXCOORD;\n\
+    float2 uv         : TEXCOORD;\n\
   };\n\
   \n\
   /* see http://filmicworlds.com/blog/filmic-tonemapping-operators/ */\n\
@@ -104,8 +104,9 @@ const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;\n\
 %s;\n\
   }\n\
   \n\
-  inline float4 sampleTexture(SamplerState samplerState, float3 coords) {\n\
+  inline float4 sampleTexture(SamplerState samplerState, float2 uv) {\n\
       float4 sample;\n\
+      float3 coords = float3(uv, 0);\n\
 %s /* sampling routine in sample */\n\
       return sample;\n\
   }\n\
@@ -114,10 +115,10 @@ const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;\n\
   {\n\
     float4 sample;\n\
     \n\
-    if (In.Texture.x > BoundaryX || In.Texture.y > BoundaryY) \n\
-        sample = sampleTexture( borderSampler, In.Texture );\n\
+    if (In.uv.x > BoundaryX || In.uv.y > BoundaryY) \n\
+        sample = sampleTexture( borderSampler, In.uv );\n\
     else\n\
-        sample = sampleTexture( normalSampler, In.Texture );\n\
+        sample = sampleTexture( normalSampler, In.uv );\n\
     float4 rgba = max(mul(mul(sample, WhitePoint), Colorspace),0);\n\
     float opacity = rgba.a * Opacity;\n\
     float4 rgb = rgba; rgb.a = 0;\n\
@@ -141,14 +142,14 @@ struct d3d_vertex_t\n\
 struct PS_INPUT\n\
 {\n\
   float4 Position   : SV_POSITION;\n\
-  float3 Texture    : TEXCOORD;\n\
+  float2 uv         : TEXCOORD;\n\
 };\n\
 \n\
 PS_INPUT main( d3d_vertex_t In )\n\
 {\n\
   PS_INPUT Output;\n\
   Output.Position = float4(In.Position, 1);\n\
-  Output.Texture  = float3(In.uv, 0);\n\
+  Output.uv  = In.uv;\n\
   return Output;\n\
 }\n\
 ";
@@ -169,7 +170,7 @@ struct d3d_vertex_t\n\
 struct PS_INPUT\n\
 {\n\
   float4 Position   : SV_POSITION;\n\
-  float3 Texture    : TEXCOORD;\n\
+  float2 uv         : TEXCOORD;\n\
 };\n\
 \n\
 PS_INPUT main( d3d_vertex_t In )\n\
@@ -180,7 +181,7 @@ PS_INPUT main( d3d_vertex_t In )\n\
   pos = mul(Zoom, pos);\n\
   pos = mul(Projection, pos);\n\
   Output.Position = pos;\n\
-  Output.Texture = float3(In.uv, 0);\n\
+  Output.uv = In.uv;\n\
   return Output;\n\
 }\n\
 ";
