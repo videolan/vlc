@@ -196,7 +196,11 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
         QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
         if (wheelEvent->modifiers() == Qt::ControlModifier)
         {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+            emit incrementIntfUserScaleFactor(wheelEvent->angleDelta().y() > 0);
+#else
             emit incrementIntfUserScaleFactor(wheelEvent->delta() > 0);
+#endif
             wheelEvent->accept();
             return true;
         }

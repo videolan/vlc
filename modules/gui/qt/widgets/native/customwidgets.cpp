@@ -109,13 +109,13 @@ void VLCQDial::paintEvent( QPaintEvent *event )
 /***************************************************************************
  * Hotkeys converters
  ***************************************************************************/
-int qtKeyModifiersToVLC( QInputEvent* e )
+int qtKeyModifiersToVLC( const QInputEvent& e )
 {
     int i_keyModifiers = 0;
-    if( e->modifiers() & Qt::ShiftModifier ) i_keyModifiers |= KEY_MODIFIER_SHIFT;
-    if( e->modifiers() & Qt::AltModifier ) i_keyModifiers |= KEY_MODIFIER_ALT;
-    if( e->modifiers() & Qt::ControlModifier ) i_keyModifiers |= KEY_MODIFIER_CTRL;
-    if( e->modifiers() & Qt::MetaModifier ) i_keyModifiers |= KEY_MODIFIER_META;
+    if( e.modifiers() & Qt::ShiftModifier ) i_keyModifiers |= KEY_MODIFIER_SHIFT;
+    if( e.modifiers() & Qt::AltModifier ) i_keyModifiers |= KEY_MODIFIER_ALT;
+    if( e.modifiers() & Qt::ControlModifier ) i_keyModifiers |= KEY_MODIFIER_CTRL;
+    if( e.modifiers() & Qt::MetaModifier ) i_keyModifiers |= KEY_MODIFIER_META;
     return i_keyModifiers;
 }
 
@@ -290,19 +290,28 @@ int qtEventToVLCKey( QKeyEvent *e )
     }
 
     /* Handle modifiers */
-    i_vlck |= qtKeyModifiersToVLC( e );
+    i_vlck |= qtKeyModifiersToVLC( *e );
     return i_vlck;
 }
 
-int qtWheelEventToVLCKey( QWheelEvent *e )
+int qtWheelEventToVLCKey( const QWheelEvent& e )
 {
     int i_vlck = 0;
     /* Handle modifiers */
     i_vlck |= qtKeyModifiersToVLC( e );
-    if ( e->delta() > 0 )
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    if ( e.angleDelta().y() > 0 )
+#else
+    if ( e.delta() > 0 )
+#endif
+    {
         i_vlck |= KEY_MOUSEWHEELUP;
+    }
     else
+    {
         i_vlck |= KEY_MOUSEWHEELDOWN;
+    }
     return i_vlck;
 }
 

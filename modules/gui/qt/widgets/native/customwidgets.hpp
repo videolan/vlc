@@ -145,9 +145,9 @@ class QKeyEvent;
 class QWheelEvent;
 class QInputEvent;
 
-int qtKeyModifiersToVLC( QInputEvent* e );
+int qtKeyModifiersToVLC( const QInputEvent& e );
 int qtEventToVLCKey( QKeyEvent *e );
-int qtWheelEventToVLCKey( QWheelEvent *e );
+int qtWheelEventToVLCKey( const QWheelEvent& e );
 QString VLCKeyToString( unsigned val, bool );
 
 #endif

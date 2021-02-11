@@ -97,10 +97,9 @@ void VideoSurfaceProvider::onMouseMoved(float x, float y)
         vout_window_ReportMouseMoved(m_voutWindow, x, y);
 }
 
-void VideoSurfaceProvider::onMouseWheeled(const QPointF& pos, int delta, Qt::MouseButtons buttons,  Qt::KeyboardModifiers modifiers, Qt::Orientation orient)
+void VideoSurfaceProvider::onMouseWheeled(const QWheelEvent& event)
 {
-    QWheelEvent event(pos, delta, buttons, modifiers, orient);
-    int vlckey = qtWheelEventToVLCKey(&event);
+    int vlckey = qtWheelEventToVLCKey(event);
     QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
         vout_window_ReportKeyPress(m_voutWindow, vlckey);
@@ -242,7 +241,7 @@ void VideoSurface::geometryChanged(const QRectF& newGeometry, const QRectF& oldG
 #if QT_CONFIG(wheelevent)
 void VideoSurface::wheelEvent(QWheelEvent *event)
 {
-    emit mouseWheeled(event->posF(), event->delta(), event->buttons(), event->modifiers(), event->orientation());
+    emit mouseWheeled(*event);
     event->ignore();
 }
 #endif

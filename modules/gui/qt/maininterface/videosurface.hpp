@@ -52,7 +52,7 @@ public slots:
     void onMouseReleased( int vlcButton );
     void onMouseDoubleClick( int vlcButton );
     void onMouseMoved( float x, float y );
-    void onMouseWheeled(const QPointF &pos, int delta, Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers, Qt::Orientation orient);
+    void onMouseWheeled(const QWheelEvent& event);
     void onKeyPressed(int key, Qt::KeyboardModifiers modifiers);
     void onSurfaceSizeChanged(QSizeF size);
 
@@ -110,7 +110,7 @@ signals:
     void mouseDblClicked( int vlcButton );
     void mouseMoved( float x, float y );
     void keyPressed(int key, Qt::KeyboardModifiers modifier);
-    void mouseWheeled(const QPointF& pos, int delta, Qt::MouseButtons buttons,  Qt::KeyboardModifiers modifiers, Qt::Orientation orient);
+    void mouseWheeled(const QWheelEvent& event);
 
 protected slots:
     void onProviderVideoChanged(bool);

@@ -1481,7 +1481,7 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
 
 void KeyInputDialog::wheelEvent( QWheelEvent *e )
 {
-    int i_vlck = qtWheelEventToVLCKey( e );
+    int i_vlck = qtWheelEventToVLCKey( *e );
     selected->setText( qtr( "Key: " ) + VLCKeyToString( i_vlck, true ) );
     checkForConflicts( i_vlck, QString() );
     keyValue = i_vlck;
