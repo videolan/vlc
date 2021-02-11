@@ -39,6 +39,7 @@ Widgets.NavigableFocusScope {
                                       && player.hasVideoOutput
                                       && playlistpopup.state !== "visible"
 
+    property bool pinVideoControls: rootPlayer.hasEmbededVideo && mainInterface.pinVideoControls
     property bool hasEmbededVideo: mainInterface.hasEmbededVideo
     readonly property int positionSliderY: controlBarView.y + controlBarView.sliderY
     readonly property string coverSource: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
@@ -70,7 +71,7 @@ Widgets.NavigableFocusScope {
 
     navigationCancel: function() {
         if (rootPlayer.hasEmbededVideo && controlBarView.state === "visible") {
-            toolbarAutoHide._setVisibleControlBar(false)
+            toolbarAutoHide.setVisibleControlBar(false)
         } else {
             if (mainInterface.hasEmbededVideo && !mainInterface.canShowVideoPIP) {
                mainPlaylistController.stop()
@@ -82,6 +83,12 @@ Widgets.NavigableFocusScope {
     on_AutoHideChanged: {
         if (_autoHide)
             toolbarAutoHide.restart()
+    }
+
+    onPinVideoControlsChanged: {
+        lockUnlockAutoHide(pinVideoControls, "pinVideoControl")
+        if (pinVideoControls)
+            toolbarAutoHide.setVisibleControlBar(true)
     }
 
     function dismiss() {
@@ -108,6 +115,8 @@ Widgets.NavigableFocusScope {
         visible: rootPlayer.hasEmbededVideo
         enabled: rootPlayer.hasEmbededVideo
         anchors.fill: parent
+        anchors.topMargin: rootPlayer.pinVideoControls ? topcontrolView.height : 0
+        anchors.bottomMargin: rootPlayer.pinVideoControls ? controlBarView.height : 0
 
         onMouseMoved: {
             //short interval for mouse events
@@ -177,19 +186,38 @@ Widgets.NavigableFocusScope {
     }
 
     /// Backgrounds of topControlbar and controlBar are drawn separately since they can outgrow their content
+    Component {
+        id: backgroundForPinnedControls
+
+        Rectangle {
+            width: rootPlayer.width
+            color: rootPlayer.colors.playerBg
+        }
+    }
+
     /* top control bar background */
     Widgets.DrawerExt {
         edge: Widgets.DrawerExt.Edges.Top
         state: topcontrolView.state
         width: parent.width
-        visible: rootPlayer.hasEmbededVideo
-        height: VLCStyle.dp(206, VLCStyle.scale)
-        component: Rectangle {
-            width: rootPlayer.width
-            height: VLCStyle.dp(206, VLCStyle.scale)
-            gradient: Gradient {
-                GradientStop { position: 0; color: Qt.rgba(0, 0, 0, .8) }
-                GradientStop { position: 1; color: "transparent" }
+        visible: rootPlayer.hasEmbededVideo || rootPlayer.pinVideoControls
+        height: contentItem.height
+        component: rootPlayer.pinVideoControls ? backgroundForPinnedControls : topcontrolViewBackground
+        onContentItemChanged: {
+            if (rootPlayer.pinVideoControls)
+                contentItem.height = Qt.binding(function () { return topcontrolView.height; })
+        }
+
+        Component {
+            id: topcontrolViewBackground
+
+            Rectangle {
+                width: rootPlayer.width
+                height: VLCStyle.dp(206, VLCStyle.scale)
+                gradient: Gradient {
+                    GradientStop { position: 0; color: Qt.rgba(0, 0, 0, .8) }
+                    GradientStop { position: 1; color: "transparent" }
+                }
             }
         }
     }
@@ -202,7 +230,13 @@ Widgets.NavigableFocusScope {
         height: contentItem.height
         edge: Widgets.DrawerExt.Edges.Bottom
         state: controlBarView.state
-        component: rootPlayer.hasEmbededVideo ? forVideoMedia : forMusicMedia
+        component: rootPlayer.pinVideoControls
+                   ? backgroundForPinnedControls
+                   : (rootPlayer.hasEmbededVideo ? forVideoMedia : forMusicMedia)
+        onContentItemChanged: {
+            if (rootPlayer.pinVideoControls)
+                contentItem.height = Qt.binding(function () { return rootPlayer.height - rootPlayer.positionSliderY; })
+        }
 
         Component {
             id: forVideoMedia
@@ -272,6 +306,7 @@ Widgets.NavigableFocusScope {
                 visible: !resumeDialog.visible
                 title: mainPlaylistController.currentItem.title
                 colors: rootPlayer.colors
+                groupAlignment: rootPlayer.pinVideoControls ? TopBar.GroupAlignment.Horizontal : TopBar.GroupAlignment.Vertical
                 navigationParent: rootPlayer
                 navigationDownItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
 
@@ -426,7 +461,7 @@ Widgets.NavigableFocusScope {
     Widgets.DrawerExt {
         id: controlBarView
 
-        readonly property int sliderY: contentItem.sliderY
+        readonly property int sliderY: rootPlayer.pinVideoControls ? contentItem.sliderY - VLCStyle.margin_xxxsmall : contentItem.sliderY
 
         anchors {
             bottom: parent.bottom
@@ -456,6 +491,7 @@ Widgets.NavigableFocusScope {
                 anchors.rightMargin: VLCStyle.applicationHorizontalMargin
                 anchors.bottomMargin: VLCStyle.applicationVerticalMargin
                 colors: rootPlayer.colors
+                textPosition: rootPlayer.pinVideoControls ? ControlBar.TimeTextPosition.LeftRightSlider : ControlBar.TimeTextPosition.AboveSlider
                 navigationParent: rootPlayer
                 navigationUpItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)
 
@@ -516,10 +552,10 @@ Widgets.NavigableFocusScope {
         repeat: false
         interval: 3000
         onTriggered: {
-            _setVisibleControlBar(false)
+            setVisibleControlBar(false)
         }
 
-        function _setVisibleControlBar(visible) {
+        function setVisibleControlBar(visible) {
             if (visible)
             {
                 controlBarView.state = "visible"
@@ -541,13 +577,13 @@ Widgets.NavigableFocusScope {
         }
 
         function setVisible(duration) {
-            _setVisibleControlBar(true)
+            setVisibleControlBar(true)
             toolbarAutoHide.interval = duration
             toolbarAutoHide.restart()
         }
 
         function toggleForceVisible() {
-            _setVisibleControlBar(controlBarView.state !== "visible")
+            setVisibleControlBar(controlBarView.state !== "visible")
             toolbarAutoHide.stop()
         }
 
