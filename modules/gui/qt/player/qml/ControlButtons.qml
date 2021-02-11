@@ -154,18 +154,17 @@ Item{
             width: VLCStyle.icon_medium
             height: width
 
-            // TODO: Bind videoOverlays (set 'true' below) to player property which indicates if video is rendered over player controls
-            property bool videoOverlays: !isMiniplayer && true
+            property bool isOpaque: !isMiniplayer
 
             property VLCColors colors: VLCStyle.colors
-            property color color: colors.buttonText
-            property color colorDisabled: colors.textInactive
+            property color color: isOpaque ? colors.buttonText : "#303030"
+            property color colorDisabled: isOpaque ? colors.textInactive : "#7f8c8d"
 
             property bool acceptFocus: true
 
             property bool paintOnly: false
 
-            property bool realHovered: false
+            property bool isCursorInside: false
 
             Keys.onPressed: {
                 if (KeyHelper.matchOk(event) ) {
@@ -177,15 +176,52 @@ Item{
                     mainPlaylistController.togglePlayPause()
             }
 
+            states: [
+                State {
+                    name: "hovered"
+                    when: interactionIndicator
+
+                    PropertyChanges {
+                        target: contentLabel
+                        color: "#FF610A"
+                    }
+
+                    PropertyChanges {
+                        target: hoverShadow
+                        radius: VLCStyle.dp(24, VLCStyle.scale)
+                    }
+                },
+                State {
+                    name: "default"
+                    when: !interactionIndicator
+
+                    PropertyChanges {
+                        target: contentLabel
+                        color: enabled ? playBtn.color : playBtn.colorDisabled
+                    }
+
+                    PropertyChanges {
+                        target: hoverShadow
+                        radius: 0
+                    }
+                }
+            ]
+            readonly property bool interactionIndicator: (playBtn.activeFocus || playBtn.isCursorInside || playBtn.highlighted)
+
             contentItem: Label {
                 id: contentLabel
-                color: videoOverlays ? (playBtn.enabled ? playBtn.color : playBtn.colorDisabled)
-                                     : (playBtn.enabled ? "#303030" : "#7f8c8d")
 
                 text: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
                        && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
                       ? VLCIcons.pause
                       : VLCIcons.play
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: 75
+                        easing.type: Easing.InOutSine
+                    }
+                }
 
                 Behavior on text {
                     SequentialAnimation {
@@ -197,6 +233,8 @@ Item{
                             duration: 75
                         }
 
+                        // this blank PropertyAction triggers the
+                        // text (icon) change amidst the size animation
                         PropertyAction { }
 
                         NumberAnimation {
@@ -217,7 +255,6 @@ Item{
             }
 
             background: Item {
-
                 Gradient {
                     id: playBtnGradient
                     GradientStop { position: 0.0; color: "#f89a06" }
@@ -241,29 +278,52 @@ Item{
                     onPositionChanged: {
                         if (distance2D(playBtnMouseArea.mouseX, playBtnMouseArea.mouseY, playBtnMouseArea.width / 2, playBtnMouseArea.height / 2) < radius) {
                             // mouse is inside of the round button
-                            playBtn.realHovered = true
+                            playBtn.isCursorInside = true
                         }
                         else {
                             // mouse is outside
-                            playBtn.realHovered = false
+                            playBtn.isCursorInside = false
                         }
                     }
 
                     onHoveredChanged: {
                         if (!playBtnMouseArea.containsMouse)
-                            playBtn.realHovered = false
+                            playBtn.isCursorInside = false
                     }
 
                     onClicked: {
-                        if (playBtn.realHovered)
-                            mainPlaylistController.togglePlayPause()
+                        if (!playBtn.isCursorInside)
+                            return
+
+                        mainPlaylistController.togglePlayPause()
                     }
 
                     onPressAndHold: {
-                        if (playBtn.realHovered)
-                            mainPlaylistController.stop()
-                    }
+                        if (!playBtn.isCursorInside)
+                            return
 
+                        mainPlaylistController.stop()
+                    }
+                }
+
+                DropShadow {
+                    id: hoverShadow
+
+                    anchors.fill: parent
+
+                    visible: radius > 0
+                    samples: (radius * 2) + 1
+                    // opacity: 0.29 // it looks better without this
+                    color: "#FF610A"
+                    source: opacityMask
+                    antialiasing: true
+
+                    Behavior on radius {
+                        NumberAnimation {
+                            duration: 75
+                            easing.type: Easing.InOutSine
+                        }
+                    }
                 }
 
                 Rectangle {
@@ -272,57 +332,17 @@ Item{
                     anchors.margins: VLCStyle.dp(1, VLCStyle.scale)
 
                     color: VLCStyle.colors.white
-                    opacity: playBtn.videoOverlays ? 0.4 : 1.0
+                    opacity: playBtn.isOpaque ? 0.4 : 1.0
                 }
 
                 Rectangle {
                     id: outerRect
-                    radius: (width * 0.5)
                     anchors.fill: parent
 
+                    radius: (width * 0.5)
                     gradient: playBtnGradient
 
                     visible: false
-
-                    antialiasing: true
-                }
-
-                Rectangle {
-                    id: innerColorRect
-
-                    anchors.fill: parent
-                    radius: (width * 0.5)
-
-                    opacity: 0
-                    gradient: playBtnGradient
-
-                    state: "transparent"
-
-                    readonly property bool stateIndicator: (playBtn.activeFocus || playBtn.realHovered || playBtn.highlighted)
-                    states: [
-                        State {
-                            name: "opaque"
-                            when: innerColorRect.stateIndicator
-                            PropertyChanges {
-                                target: innerColorRect
-                                opacity: 1.0
-                            }
-                        },
-                        State {
-                            name: "transparent"
-                            when: !innerColorRect.stateIndicator
-                            PropertyChanges {
-                                target: innerColorRect
-                                opacity: 0
-                            }
-                        }
-                    ]
-
-                    transitions: Transition {
-                        NumberAnimation { properties: "opacity"; duration: 75; easing.type: Easing.InOutSine }
-                    }
-
-                    antialiasing: true
                 }
 
                 Rectangle {
@@ -342,7 +362,6 @@ Item{
 
                     source: outerRect
                     maskSource: innerRect
-
 
                     antialiasing: true
                 }
