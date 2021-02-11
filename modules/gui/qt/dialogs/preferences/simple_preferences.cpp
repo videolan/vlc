@@ -208,11 +208,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     CONNECT( mapper, mapped(int), this, switchPanel(int) );
 
     QPixmap scaled;
-#if HAS_QT56
     qreal dpr = devicePixelRatioF();
-#else
-    qreal dpr = devicePixelRatio();
-#endif
 
 #define ADD_CATEGORY( button, label, ltooltip, icon, numb )                 \
     QToolButton * button = new QToolButton( this );                         \

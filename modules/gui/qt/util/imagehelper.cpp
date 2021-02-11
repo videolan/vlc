@@ -34,13 +34,9 @@
 
 QPixmap ImageHelper::loadSvgToPixmap( const QString &path, qint32 i_width, qint32 i_height )
 {
-#if HAS_QT56
     qreal ratio = QApplication::primaryScreen()->devicePixelRatio();
-
     QPixmap pixmap( QSize( i_width, i_height ) * ratio );
-#else
-    QPixmap pixmap( QSize( i_width, i_height ) );
-#endif
+
 
     pixmap.fill( Qt::transparent );
 
@@ -51,9 +47,6 @@ QPixmap ImageHelper::loadSvgToPixmap( const QString &path, qint32 i_width, qint3
     renderer.render( &painter );
     painter.end();
 
-#if HAS_QT56
     pixmap.setDevicePixelRatio( ratio );
-#endif
-
     return pixmap;
 }

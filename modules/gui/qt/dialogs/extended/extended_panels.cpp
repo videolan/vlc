@@ -1135,12 +1135,8 @@ void Equalizer::build()
     for( i = 0 ; i < NB_PRESETS ; i ++ )
     {
         QGraphicsScene scene;
-#if HAS_QT56
         qreal f_ratio = QApplication::primaryScreen()->devicePixelRatio();
         QPixmap icon( 40 * f_ratio, 40 * f_ratio );
-#else
-        QPixmap icon( 40, 40 );
-#endif
         icon.fill( Qt::transparent );
         QPainter painter( &icon );
         for ( int j = 0; j < eqz_preset_10b[i].i_band; j++ )

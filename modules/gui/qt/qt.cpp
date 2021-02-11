@@ -90,9 +90,6 @@ extern "C" char **environ;
    Q_IMPORT_PLUGIN(QtQmlPlugin)
   #endif
 
-  #if !HAS_QT56
-   Q_IMPORT_PLUGIN(AccessibleFactory)
-  #endif
   #ifdef _WIN32
    Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin)
    Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
@@ -597,10 +594,8 @@ static void *Thread( void *obj )
 
     p_intf->p_sys->p_compositor = vlc::Compositor::createCompositor(p_intf);
 
-#if HAS_QT56
     QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
     QApplication::setAttribute( Qt::AA_UseHighDpiPixmaps );
-#endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
     QApplication::setHighDpiScaleFactorRoundingPolicy( Qt::HighDpiScaleFactorRoundingPolicy::RoundPreferFloor );

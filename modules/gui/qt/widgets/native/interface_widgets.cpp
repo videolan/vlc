@@ -220,13 +220,8 @@ QSize VideoWidget::physicalSize() const
 
     QSize current_size = size();
 
-#   if HAS_QT56
     /* Android-like scaling */
     current_size *= devicePixelRatioF();
-#   else
-    /* OSX-like scaling */
-    current_size *= devicePixelRatio();
-#   endif
 
     return current_size;
 }
@@ -361,11 +356,7 @@ void VideoWidget::mouseMoveEvent( QMouseEvent *event )
     {
         QPointF current_pos = event->localPos();
 
-#if HAS_QT56
         current_pos *= devicePixelRatioF();
-#else
-        current_pos *= devicePixelRatio();
-#endif
         vout_window_ReportMouseMoved( p_window, current_pos.x(), current_pos.y() );
         showCursor();
         event->accept();
