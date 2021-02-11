@@ -592,7 +592,14 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                      setEnabled( bool ) );
 
             char* psz = config_GetPsz( "audio-filter" );
-            qs_filter = qfu( psz ).split( ':', QString::SkipEmptyParts );
+            qs_filter = qfu( psz ).split( ':',
+                                          #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                                              Qt::SkipEmptyParts
+                                          #else
+                                              QString::SkipEmptyParts
+                                          #endif
+                                        );
+
             free( psz );
 
             bool b_enabled = ( qs_filter.contains( "normvol" ) );

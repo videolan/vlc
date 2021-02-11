@@ -146,9 +146,21 @@ void PlayerControlBarModel::parseDefault(const QVector<PlayerControlBarModel::Ic
 
 void PlayerControlBarModel::parseAndAdd(const QString &config)
 {
-    beginInsertRows(QModelIndex(),rowCount(),rowCount()+config.split(";", QString::SkipEmptyParts).length() - 1);
+    beginInsertRows(QModelIndex(),rowCount(),rowCount()+config.split(";",
+                                                                     #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                                                                         Qt::SkipEmptyParts
+                                                                     #else
+                                                                         QString::SkipEmptyParts
+                                                                     #endif
+                                                                     ).length() - 1);
 
-    for (const QString& iconPropertyTxt : config.split( ";", QString::SkipEmptyParts ) )
+    for (const QString& iconPropertyTxt : config.split( ";",
+                                                    #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                                                        Qt::SkipEmptyParts
+                                                    #else
+                                                        QString::SkipEmptyParts
+                                                    #endif
+                                                    ) )
     {
         QStringList list2 = iconPropertyTxt.trimmed().split( "-" );
 
