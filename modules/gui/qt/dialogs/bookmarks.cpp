@@ -242,7 +242,13 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
     }
     else if( column == 2 )
     {
-        fields = item->text( column ).split( ":", QString::SkipEmptyParts );
+        fields = item->text( column ).split( ":",
+                                      #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                                        Qt::SkipEmptyParts
+                                      #else
+                                        QString::SkipEmptyParts
+                                      #endif
+                                    );
         if( fields.count() == 1 )
             p_seekpoint->i_time_offset = 1000000 * ( fields[0].toFloat() );
         else if( fields.count() == 2 )

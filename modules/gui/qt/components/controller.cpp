@@ -114,7 +114,13 @@ void AbstractController::setupButton( QAbstractButton *aButton )
 void AbstractController::parseAndCreate( const QString& config,
                                          QBoxLayout *newControlLayout )
 {
-    QStringList list = config.split( ";", QString::SkipEmptyParts ) ;
+    QStringList list = config.split( ";",
+                                      #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+                                        Qt::SkipEmptyParts
+                                      #else
+                                        QString::SkipEmptyParts
+                                      #endif
+                                    );
     for( int i = 0; i < list.count(); i++ )
     {
         QStringList list2 = list.at( i ).split( "-" );
