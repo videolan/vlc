@@ -69,10 +69,6 @@
 #include <QFileInfo>
 #endif
 
-#if ! HAS_QT510 && defined(QT5_HAS_X11)
-# include <QX11Info>
-# include <X11/Xlib.h>
-#endif
 
 #include <QtGlobal>
 #include <QTimer>

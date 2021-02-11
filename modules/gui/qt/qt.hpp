@@ -47,7 +47,6 @@
 # error Update your Qt version to at least 5.11.0
 #endif
 
-#define HAS_QT510 ( QT_VERSION >= 0x051000 )
 
 enum {
     IMEventTypeOffset     = 0,
