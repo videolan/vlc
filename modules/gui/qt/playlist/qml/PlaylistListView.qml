@@ -360,7 +360,7 @@ Widgets.NavigableFocusScope {
                     property alias firstItemIndicatorVisible: firstItemIndicator.visible
 
                     function setDropIndicatorVisible(visible) {
-                        dropIndicator.visible = visible
+                        dropIndicator.visible = Qt.binding(function() { return (visible || dropArea.containsDragItem); })
                     }
 
                     MouseArea {
@@ -388,7 +388,7 @@ Widgets.NavigableFocusScope {
                         height: VLCStyle.dp(1)
                         anchors.top: parent.top
 
-                        visible: false
+                        visible: dropArea.containsDragItem
                         color: colors.accent
                     }
 
@@ -424,6 +424,8 @@ Widgets.NavigableFocusScope {
 
                         anchors.fill: parent
 
+                        property bool containsDragItem: false
+
                         onEntered: {
                             if(!root.isDropAcceptable(drag, root.model.count))
                                 return
@@ -431,13 +433,13 @@ Widgets.NavigableFocusScope {
                             if (root.model.count === 0)
                                 firstItemIndicator.visible = true
                             else
-                                dropIndicator.visible = true
+                                containsDragItem = true
                         }
                         onExited: {
                             if (root.model.count === 0)
                                 firstItemIndicator.visible = false
                             else
-                                dropIndicator.visible = false
+                                containsDragItem = false
                         }
                         onDropped: {
                             if(!root.isDropAcceptable(drop, root.model.count))
@@ -448,7 +450,7 @@ Widgets.NavigableFocusScope {
                             if (root.model.count === 0)
                                 firstItemIndicator.visible = false
                             else
-                                dropIndicator.visible = false
+                                containsDragItem = false
                         }
                     }
                 }
