@@ -755,12 +755,12 @@ input_thread_Events(input_thread_t *input_thread,
             bool changed = false;
             vlc_tick_t system_date = VLC_TICK_INVALID;
 
-            if (event->times.ms != VLC_TICK_INVALID
-             && (input->time != event->times.ms
-              || input->position != event->times.percentage))
+            if (event->times.time != VLC_TICK_INVALID
+             && (input->time != event->times.time
+              || input->position != event->times.position))
             {
-                input->time = event->times.ms;
-                input->position = event->times.percentage;
+                input->time = event->times.time;
+                input->position = event->times.position;
                 system_date = vlc_tick_now();
                 changed = true;
                 vlc_player_SendEvent(player, on_position_changed,
