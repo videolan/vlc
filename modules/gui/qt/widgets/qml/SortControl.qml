@@ -95,6 +95,7 @@ Widgets.NavigableFocusScope {
     Popup {
         id: popup
 
+        closePolicy: Popup.NoAutoClose
         y: (popupAlignment & Qt.AlignBottom) ? (root.height) : -(height)
         x: (popupAlignment & Qt.AlignRight) ? (button.width - width) : 0
 
