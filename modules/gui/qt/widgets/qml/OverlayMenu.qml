@@ -58,17 +58,16 @@ Item {
 
     property var backgroundItem: undefined
 
-    property bool _active: false
-    visible: _active
+    visible: false
 
     function open() {
         listView.currentModel = root.model
-        _active = true
+        visible = true
         listView.forceActiveFocus()
     }
 
     function close() {
-        _active = false
+        visible = false
         backgroundItem.forceActiveFocus()
     }
 
@@ -307,7 +306,7 @@ Item {
     states: [
         State {
             name: "visible"
-            when: _active
+            when: visible
 
             PropertyChanges {
                 target: parentItem
@@ -316,7 +315,7 @@ Item {
         },
         State {
             name: "hidden"
-            when: !_active
+            when: !visible
 
             PropertyChanges {
                 target: parentItem
@@ -327,7 +326,7 @@ Item {
 
     transitions: [
         Transition {
-            from: "hidden"
+            from: "*"
             to: "visible"
 
             NumberAnimation {
