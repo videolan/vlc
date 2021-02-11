@@ -136,7 +136,7 @@ NavigableFocusScope {
 
         clip: true
         ScrollBar.vertical: ScrollBar { id: scroll_id }
-        ScrollBar.horizontal: ScrollBar { }
+        ScrollBar.horizontal: ScrollBar { visible: view.contentWidth > view.width }
 
         highlightMoveDuration: 300 //ms
         highlightMoveVelocity: 1000 //px/s
