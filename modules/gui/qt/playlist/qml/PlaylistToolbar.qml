@@ -48,9 +48,6 @@ RowLayout {
             checked: mainPlaylistController.repeatMode !== PlaylistControllerModel.PLAYBACK_REPEAT_NONE
             onClicked: mainPlaylistController.toggleRepeatMode()
             focusPolicy: Qt.NoFocus
-
-            color: colors.buttonText
-            colorDisabled: colors.textInactive
         }
     }
 
@@ -69,9 +66,6 @@ RowLayout {
             iconText: VLCIcons.shuffle_on
             onClicked: mainPlaylistController.shuffle()
             focusPolicy: Qt.NoFocus
-
-            color: colors.buttonText
-            colorDisabled: colors.textInactive
         }
     }
 
@@ -135,9 +129,6 @@ RowLayout {
             iconText: VLCIcons.playlist_clear
             onClicked: mainPlaylistController.clear()
             focusPolicy: Qt.NoFocus
-
-            color: colors.buttonText
-            colorDisabled: colors.textInactive
         }
     }
 }
