@@ -43,8 +43,8 @@
 #include <QString>
 #include <QUrl>
 
-#if ( QT_VERSION < 0x050900 )
-# error Update your Qt version to at least 5.9.0
+#if ( QT_VERSION < QT_VERSION_CHECK(5, 11, 0) )
+# error Update your Qt version to at least 5.11.0
 #endif
 
 #define HAS_QT510 ( QT_VERSION >= 0x051000 )
