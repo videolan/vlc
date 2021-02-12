@@ -5,12 +5,12 @@
      pp->wDecodedPictureIndex    =
      pp->wDeblockedPictureIndex  = ff_dxva2_get_surface_index(avctx, ctx, current_picture->f);
 -    if (s->pict_type != AV_PICTURE_TYPE_I && !v->bi_type)
-+    if (s->pict_type != AV_PICTURE_TYPE_I && !v->bi_type && s->last_picture.f->data[0])
++    if (s->pict_type != AV_PICTURE_TYPE_I && !v->bi_type && s->last_picture.f->buf[0])
          pp->wForwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->last_picture.f);
      else
          pp->wForwardRefPictureIndex = 0xffff;
 -    if (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type)
-+    if (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type && s->next_picture.f->data[0])
++    if (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type && s->next_picture.f->buf[0])
          pp->wBackwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->next_picture.f);
      else
          pp->wBackwardRefPictureIndex = 0xffff;
@@ -21,12 +21,12 @@
      pp->wDecodedPictureIndex         = ff_dxva2_get_surface_index(avctx, ctx, current_picture->f);
      pp->wDeblockedPictureIndex       = 0;
 -    if (s->pict_type != AV_PICTURE_TYPE_I)
-+    if (s->pict_type != AV_PICTURE_TYPE_I && s->last_picture.f->data[0])
++    if (s->pict_type != AV_PICTURE_TYPE_I && s->last_picture.f->buf[0])
          pp->wForwardRefPictureIndex  = ff_dxva2_get_surface_index(avctx, ctx, s->last_picture.f);
      else
          pp->wForwardRefPictureIndex  = 0xffff;
 -    if (s->pict_type == AV_PICTURE_TYPE_B)
-+    if (s->pict_type == AV_PICTURE_TYPE_B && s->next_picture.f->data[0])
++    if (s->pict_type == AV_PICTURE_TYPE_B && s->next_picture.f->buf[0])
          pp->wBackwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->next_picture.f);
      else
          pp->wBackwardRefPictureIndex = 0xffff;
