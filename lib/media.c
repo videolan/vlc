@@ -432,7 +432,12 @@ static void input_item_preparse_ended(input_item_t *item,
             return;
     }
     send_parsed_changed( p_md, new_status );
-    libvlc_media_release( p_md );
+
+    vlc_mutex_lock(&p_md->parsed_lock);
+    assert(p_md->worker_count > 0);
+    p_md->worker_count--;
+    vlc_cond_signal(&p_md->idle_cond);
+    vlc_mutex_unlock(&p_md->parsed_lock);
 }
 
 /**
@@ -507,6 +512,9 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     vlc_cond_init(&p_md->parsed_cond);
     vlc_mutex_init(&p_md->parsed_lock);
     vlc_mutex_init(&p_md->subitems_lock);
+
+    vlc_cond_init(&p_md->idle_cond);
+    p_md->worker_count = 0;
 
     p_md->state = libvlc_NothingSpecial;
 
@@ -651,6 +659,12 @@ void libvlc_media_release( libvlc_media_t *p_md )
 
     /* Cancel asynchronous parsing (if any) */
     libvlc_MetadataCancel( p_md->p_libvlc_instance->p_libvlc_int, p_md );
+
+    /* Wait for all async tasks to stop. */
+    vlc_mutex_lock( &p_md->parsed_lock );
+    while( p_md->worker_count > 0 )
+        vlc_cond_wait( &p_md->idle_cond, &p_md->parsed_lock );
+    vlc_mutex_unlock( &p_md->parsed_lock );
 
     if( p_md->p_subitems )
         libvlc_media_list_release( p_md->p_subitems );
@@ -862,13 +876,22 @@ static int media_parse(libvlc_media_t *media, bool b_async,
         if (parse_flag & libvlc_media_do_interact)
             parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
 
-        libvlc_media_retain(media);
+        /* Note: we cannot keep parsed_lock when calling libvlc_MetadataRequest
+         * because it might also be used to submit the state synchronously
+         * which would result in recursive lock. */
+        vlc_mutex_lock(&media->parsed_lock);
+        media->worker_count++;
+        vlc_mutex_unlock(&media->parsed_lock);
+
         ret = libvlc_MetadataRequest(libvlc, item, parse_scope,
                                      &input_preparser_callbacks, media,
                                      timeout, media);
         if (ret != VLC_SUCCESS)
         {
-            libvlc_media_release(media);
+            vlc_mutex_lock(&media->parsed_lock);
+            assert(media->worker_count > 0);
+            media->worker_count--;
+            vlc_mutex_unlock(&media->parsed_lock);
             return ret;
         }
     }

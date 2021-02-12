@@ -48,6 +48,12 @@ struct libvlc_media_t
     vlc_mutex_t parsed_lock;
     vlc_mutex_t subitems_lock;
 
+    /* Idle protection to prevent the media from being released during
+     * preparsing. The preparse will be cancelled but the release will
+     * be blocking until no async code is using the media anymore. */
+    vlc_cond_t idle_cond;
+    size_t worker_count;
+
     libvlc_media_parsed_status_t parsed_status;
     bool is_parsed;
     bool has_asked_preparse;
