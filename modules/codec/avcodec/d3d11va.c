@@ -205,7 +205,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     if (unlikely(pic->context == NULL))
     {
         va_surface_Release(va_surface);
-        return VLC_ENOITEM;
+        return VLC_ENOMEM;
     }
     data[3] = (uint8_t*)sys->hw_surface[va_surface_GetIndex(va_surface)];
     return VLC_SUCCESS;
