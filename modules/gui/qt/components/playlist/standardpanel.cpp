@@ -322,8 +322,10 @@ void StandardPLPanel::popupAction( QAction *action )
         temp = model->getURI( index );
         if( ! temp.isEmpty() ) path = vlc_uri2path( temp.toLatin1().constData() );
         if( path == NULL ) return;
+        temp = QFileInfo( qfu( path ) ).absolutePath();
+        if( !QFileInfo( temp ).isDir() ) return;
         QDesktopServices::openUrl(
-                    QUrl::fromLocalFile( QFileInfo( qfu( path ) ).absolutePath() ) );
+                    QUrl::fromLocalFile( temp ) );
         free( path );
         break;
 
