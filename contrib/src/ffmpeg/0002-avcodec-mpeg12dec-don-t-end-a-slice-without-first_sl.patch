@@ -1,0 +1,49 @@
+From 3eb70589260b6eb0e37265933a15c737023dfd7e Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 12 Feb 2021 11:10:03 +0100
+Subject: [PATCH 2/2] avcodec/mpeg12dec: don't end a slice without first_slice
+
+If first_slice is set that means the first slice/field is not started yet. We
+should not end the slice. In particular calling hwaccel->end_frame may crash as
+we're ending a frame that was not started.
+
+We also need to reset first_slice once the slice_end is finished handling
+for this check to work.
+---
+ libavcodec/mpeg12dec.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/libavcodec/mpeg12dec.c b/libavcodec/mpeg12dec.c
+index 88d10e9236..fdf210fa1b 100644
+--- a/libavcodec/mpeg12dec.c
++++ b/libavcodec/mpeg12dec.c
+@@ -2477,13 +2477,19 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
+                         s2->er.error_count += s2->thread_context[i]->er.error_count;
+                 }
+ 
+-                ret = slice_end(avctx, picture);
+-                if (ret < 0)
+-                    return ret;
+-                else if (ret) {
+-                    // FIXME: merge with the stuff in mpeg_decode_slice
+-                    if (s2->last_picture_ptr || s2->low_delay)
+-                        *got_output = 1;
++                if (s->first_slice) // not started yet. don't end it
++                    ret = 0;
++                else {
++                    ret = slice_end(avctx, picture);
++                    if (ret < 0)
++                        return ret;
++                    else if (ret) {
++                        // FIXME: merge with the stuff in mpeg_decode_slice
++                        if (s2->last_picture_ptr || s2->low_delay)
++                            *got_output = 1;
++                    }
++                    // slice ended, don't end it again later
++                    s->first_slice = 1;
+                 }
+             }
+             s2->pict_type = 0;
+-- 
+2.27.0.windows.1
+
