@@ -310,7 +310,7 @@ static int Open( vlc_object_t *p_this )
         .on_discontinuity = player_timer_on_discontinuity,
     };
     p_sys->player_timer =
-        vlc_player_AddTimer(player, VLC_TICK_INVALID, &player_timer_cbs, p_intf);
+        vlc_player_AddTimer(player, VLC_TICK_FROM_SEC(1), &player_timer_cbs, p_intf);
     if (!p_sys->player_timer)
         goto player_timer_failure;
 
