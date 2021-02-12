@@ -309,7 +309,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     const char *psz_primaries_transform = DEFAULT_NOOP;
     const char *psz_tone_mapping      = "return rgb * LuminanceScale";
     const char *psz_adjust_range      = DEFAULT_NOOP;
-    const char *psz_move_planes[2]    = {DEFAULT_NOOP, DEFAULT_NOOP};
+    const char *psz_move_planes_1     = DEFAULT_NOOP;
     char *psz_range = NULL;
 
     if ( display->pixelFormat->formatTexture == DXGI_FORMAT_NV12 ||
@@ -340,11 +340,10 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
             /* Y */
             psz_sampler[0] =
                     "sample = shaderTexture[0].Sample(samplerState, coords);\n";
-            psz_move_planes[0] = "return rgb";
             /* UV */
             psz_sampler[1] =
                     "sample = shaderTexture[0].Sample(samplerState, coords);\n";
-            psz_move_planes[1] =
+            psz_move_planes_1 =
                     "rgb.x = rgb.y;\n"
                     "rgb.y = rgb.z;\n"
                     "rgb.z = 0;\n"
@@ -639,7 +638,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                 psz_primaries_transform,
                                 psz_linear_to_display,
                                 psz_tone_mapping,
-                                psz_adjust_range, psz_move_planes[0], &pPSBlob[0]);
+                                psz_adjust_range, DEFAULT_NOOP, &pPSBlob[0]);
     if (SUCCEEDED(hr) && psz_sampler[1])
     {
         hr = CompilePixelShaderBlob(o, compiler, feature_level, texture_array,
@@ -648,7 +647,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                     psz_primaries_transform,
                                     psz_linear_to_display,
                                     psz_tone_mapping,
-                                    psz_adjust_range, psz_move_planes[1], &pPSBlob[1]);
+                                    psz_adjust_range, psz_move_planes_1, &pPSBlob[1]);
         if (FAILED(hr))
             D3D_ShaderBlobRelease(&pPSBlob[0]);
     }
