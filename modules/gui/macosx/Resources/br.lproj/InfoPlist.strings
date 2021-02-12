@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC a fell dezhañ tizhout ar c'hamera diwar goulenn an implijader.";
+"NSMicrophoneUsageDescription" = "VLC a fell dezhañ tizhout ar mikrofon diwar goulenn an implijader.";
+"NSAppleEventsUsageDescription" = "VLC a fell dezhañ herzel war lennerioù diavaez hag adloc'hañ anezho.";
+"NSDesktopFolderUsageDescription" = "VLC a fell dezhañ tizhout teuliad ar burev diwar goulenn an implijader.";
+"NSDocumentsFolderUsageDescription" = "VLC a fell dezhañ tizhout teuliad an teuliadoù diwar goulenn an implijader.";
+"NSDownloadsFolderUsageDescription" = "VLC a fell dezhañ tizhout teuliad ar pellgargadennoù diwar goulenn an implijader.";
+"NSNetworkVolumesUsageDescription" = "VLC a fell dezhañ tizhout un ec'honenn eus ar genrouedad diwar goulenn an implijader.";
+"NSRemovableVolumesUsageDescription" = "VLC a fell dezhañ tizhout un ec'honenn lem-laka diwar goulenn an implijader.";
