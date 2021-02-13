@@ -57,6 +57,8 @@ ${LangFileString} Action_OnArrivalSVCDMovie "Esita SVCD film"
 ${LangFileString} Action_OnArrivalVideoFiles "Esita videofailid"
 ${LangFileString} Action_OnArrivalMusicFiles "Esita audiofailid"
 ${LangFileString} Action_OnArrivalDVDAudio "Esita audio DVD"
+${LangFileString} Action_OnArrivalBluray "Mängi Blu-ray"
+
 ${LangFileString} License_NextText "Sa oled nüüd teadlik oma õigustest. Vajuta Edasi, et jätkata"
 
 ${LangFileString} Detail_CheckProcesses "Kontrollin protsessi..."
