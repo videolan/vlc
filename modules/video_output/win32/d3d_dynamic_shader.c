@@ -46,7 +46,7 @@ static const char globPixelShaderDefault[] = "\
     float BoundaryX;\n\
     float BoundaryY;\n\
   };\n\
-  Texture2D%s shaderTexture[4];\n\
+  Texture2D shaderTexture[4];\n\
   SamplerState normalSampler : register(s0);\n\
   SamplerState borderSampler : register(s1);\n\
   \n\
@@ -104,9 +104,8 @@ const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;\n\
 %s;\n\
   }\n\
   \n\
-  inline float4 sampleTexture(SamplerState samplerState, float2 uv) {\n\
+  inline float4 sampleTexture(SamplerState samplerState, float2 coords) {\n\
       float4 sample;\n\
-      float3 coords = float3(uv, 0);\n\
 %s /* sampling routine in sample */\n\
       return sample;\n\
   }\n\
@@ -259,7 +258,6 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
 
 static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
                                    D3D_FEATURE_LEVEL feature_level,
-                                   bool texture_array,
                                    const char *psz_sampler,
                                    const char *psz_src_to_linear,
                                    const char *psz_primaries_transform,
@@ -269,7 +267,7 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
                                    d3d_shader_blob *pPSBlob)
 {
     char *shader;
-    int allocated = asprintf(&shader, globPixelShaderDefault, texture_array ? "Array" : "",
+    int allocated = asprintf(&shader, globPixelShaderDefault,
                              psz_src_to_linear, psz_linear_to_display,
                              psz_primaries_transform, psz_tone_mapping,
                              psz_adjust_range, psz_move_planes, psz_sampler);
@@ -299,7 +297,6 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
 
 HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
                                  D3D_FEATURE_LEVEL feature_level,
-                                 bool texture_array,
                                  const display_info_t *display,
                                  video_transfer_func_t transfer,
                                  video_color_primaries_t primaries, bool src_full_range,
@@ -636,7 +633,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     }
 
     HRESULT hr;
-    hr = CompilePixelShaderBlob(o, compiler, feature_level, texture_array,
+    hr = CompilePixelShaderBlob(o, compiler, feature_level,
                                 psz_sampler[0],
                                 psz_src_to_linear,
                                 psz_primaries_transform,
@@ -645,7 +642,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                 psz_adjust_range, DEFAULT_NOOP, &pPSBlob[0]);
     if (SUCCEEDED(hr) && psz_sampler[1])
     {
-        hr = CompilePixelShaderBlob(o, compiler, feature_level, texture_array,
+        hr = CompilePixelShaderBlob(o, compiler, feature_level,
                                     psz_sampler[1],
                                     psz_src_to_linear,
                                     psz_primaries_transform,

@@ -34,7 +34,6 @@ void D3D_ReleaseShaderCompiler(d3d_shader_compiler_t *);
 
 HRESULT D3D_CompilePixelShader(vlc_object_t *, const d3d_shader_compiler_t *,
                                D3D_FEATURE_LEVEL,
-                               bool texture_array,
                                const display_info_t *,
                                video_transfer_func_t,
                                video_color_primaries_t, bool src_full_range,

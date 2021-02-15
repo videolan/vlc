@@ -1036,7 +1036,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
             BogusZeroCopy(vd) || !is_d3d11_opaque(fmt->i_chroma);
 
     d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { 0 };
-    hr = D3D11_CompilePixelShader(vd, &sys->shaders, sys->d3d_dev, !sys->legacy_shader,
+    hr = D3D11_CompilePixelShaderBlob(vd, &sys->shaders, sys->d3d_dev,
                                   &sys->display, fmt->transfer, fmt->primaries,
                                   fmt->color_range == COLOR_RANGE_FULL,
                                   &sys->picQuad, pPSBlob);
@@ -1185,7 +1185,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     if (sys->regionQuad.generic.textureFormat != NULL)
     {
         d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { 0 };
-        hr = D3D11_CompilePixelShader(vd, &sys->shaders, sys->d3d_dev, false,
+        hr = D3D11_CompilePixelShaderBlob(vd, &sys->shaders, sys->d3d_dev,
                                       &sys->display, TRANSFER_FUNC_SRGB, COLOR_PRIMARIES_SRGB, true,
                                       &sys->regionQuad, pPSBlob);
         if (FAILED(hr))
