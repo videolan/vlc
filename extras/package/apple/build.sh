@@ -57,6 +57,7 @@ VLC_HOST_ARCH="x86_64"
 # Host platform information
 VLC_HOST_PLATFORM=
 VLC_HOST_TRIPLET=
+VLC_BUILD_TRIPLET=
 # Set to "1" when building for simulator
 VLC_HOST_PLATFORM_SIMULATOR=
 # The host OS name (without the simulator suffix)
@@ -230,6 +231,18 @@ set_host_triplet()
     # Therefore we construct a triplet here without a version number, which
     # will not match the autoconf "guessed" host machine triplet.
     VLC_HOST_TRIPLET="${triplet_arch}-apple-darwin"
+}
+
+# Set the VLC_BUILD_TRIPLET based on the architecture
+# that we run on.
+# Globals:
+#   VLC_BUILD_TRIPLET
+# Arguments:
+#   None
+set_build_triplet()
+{
+    local build_arch="$(uname -m | cut -d. -f1)"
+    VLC_BUILD_TRIPLET="$(cc -arch "${build_arch}" -dumpmachine)"
 }
 
 # Take SDK name, verify it exists and populate
@@ -490,6 +503,7 @@ validate_architecture "$VLC_HOST_ARCH"
 
 # Set triplet (needs to be called after validating the arch)
 set_host_triplet "$VLC_HOST_ARCH"
+set_build_triplet
 
 # Set pseudo-triplet
 # FIXME: This should match the actual clang triplet and should be used for compiler invocation too!
@@ -603,6 +617,7 @@ write_config_mak "-Werror=partial-availability"
 # Bootstrap contribs
 ../bootstrap \
     --host="$VLC_HOST_TRIPLET" \
+    --build="$VLC_BUILD_TRIPLET" \
     --prefix="$VLC_CONTRIB_INSTALL_DIR" \
     "${VLC_CONTRIB_OPTIONS[@]}" \
 || abort_err "Bootstrapping contribs failed"
@@ -680,6 +695,7 @@ mkdir -p "$VLC_INSTALL_DIR"
 hostenv ../../configure \
     --with-contrib="$VLC_CONTRIB_INSTALL_DIR" \
     --host="$VLC_HOST_TRIPLET" \
+    --build="$VLC_BUILD_TRIPLET" \
     --prefix="$VLC_INSTALL_DIR" \
     "${VLC_CONFIG_OPTIONS[@]}" \
  || abort_err "Configuring VLC failed"
