@@ -68,6 +68,7 @@
 
     GLuint _renderBuffer;
     GLuint _frameBuffer;
+    CGSize _size;
 
     struct vlc_gl_api _api;
 }
@@ -78,6 +79,7 @@
 - (void)presentRenderbuffer;
 - (void)didMoveToWindow;
 - (void)detachFromWindow;
+- (void)resize:(CGSize)size;
 @end
 
 static void vlc_dispatch_sync(void (^block_function)())
@@ -144,6 +146,8 @@ static void Resize(vlc_gl_t *gl, unsigned width, unsigned height)
     VLC_UNUSED(gl); VLC_UNUSED(width); VLC_UNUSED(height);
     /* Use the parent frame size for now, resize is smoother and called
      * automatically from the main thread queue. */
+    VLCOpenGLES2VideoView *view = (__bridge VLCOpenGLES2VideoView *)gl->sys;
+    [view resize:CGSizeMake(width, height)];
 }
 
 static void Close(vlc_gl_t *gl)
@@ -196,8 +200,6 @@ static void Close(vlc_gl_t *gl)
     _layer.opaque = YES;
 
     /* Resize is done accordingly to the parent frame directly. */
-    self.autoresizingMask = UIViewAutoresizingFlexibleWidth
-                          | UIViewAutoresizingFlexibleHeight;
     self.contentMode = UIViewContentModeScaleToFill;
 
     /* Connect to the parent UIView which will contain this surface.
@@ -220,6 +222,8 @@ static void Close(vlc_gl_t *gl)
                                              selector:@selector(applicationStateChanged:)
                                                  name:UIApplicationDidBecomeActiveNotification
                                                object:nil];
+    if (_appActive)
+        [self resize:CGSizeMake(frame.size.width, frame.size.height)];
 
     /* Setup the usual vlc_gl_t callbacks before loading the API since we need
      * the get_proc_address symbol and a current context. */
@@ -316,7 +320,7 @@ static void Close(vlc_gl_t *gl)
     vlc_mutex_unlock(&_mutex);
 }
 
-- (BOOL)doResetBuffers:(vlc_gl_t *)gl
+- (BOOL)doResetBuffers
 {
     if (_frameBuffer != 0)
     {
@@ -363,28 +367,10 @@ static void Close(vlc_gl_t *gl)
     _previousEaglContext = [EAGLContext currentContext];
 
     assert(_eaglContext);
-    if (![EAGLContext setCurrentContext:_eaglContext])
-    {
-        vlc_mutex_unlock(&_mutex);
-        return NO;
-    }
-
-    BOOL resetBuffers = NO;
-
-
-    if (unlikely(_bufferNeedReset))
-    {
-        _bufferNeedReset = NO;
-        resetBuffers = YES;
-    }
+    BOOL result = [EAGLContext setCurrentContext:_eaglContext];
+    assert(result == YES);
 
     _gl_attached = YES;
-
-    if (resetBuffers && ![self doResetBuffers:_gl])
-    {
-        [self releaseCurrent];
-        return NO;
-    }
     return YES;
 }
 
@@ -396,14 +382,39 @@ static void Close(vlc_gl_t *gl)
     _gl_attached = NO;
     [EAGLContext setCurrentContext:_previousEaglContext];
     _previousEaglContext = nil;
-
-    vlc_mutex_unlock(&_mutex);
     vlc_cond_signal(&_gl_attached_wait);
+    vlc_mutex_unlock(&_mutex);
 }
 
 - (void)presentRenderbuffer
 {
     [_eaglContext presentRenderbuffer:GL_RENDERBUFFER];
+}
+
+- (void)resize:(CGSize)size
+{
+    vlc_mutex_lock(&_mutex);
+    _size = size;
+
+    CGRect rect = self.bounds;
+    rect.size = size;
+    /* Bitmap size = view size * contentScaleFactor, so we need to divide the
+     * scale factor to get the real view size. */
+    rect.size.width /= self.contentScaleFactor;
+    rect.size.height /= self.contentScaleFactor;
+
+    self.bounds = rect;
+
+    /* If size is NULL, rendering must be disabled */
+    if (size.width != 0 && size.height != 0)
+    {
+        EAGLContext *previousContext = [EAGLContext currentContext];
+        [EAGLContext setCurrentContext:_eaglContext];
+        [self doResetBuffers];
+        [EAGLContext setCurrentContext:previousContext];
+    }
+
+    vlc_mutex_unlock(&_mutex);
 }
 
 - (void)layoutSubviews
@@ -450,6 +461,7 @@ static void Close(vlc_gl_t *gl)
     else if ([[notification name] isEqualToString:UIApplicationWillEnterForegroundNotification])
     {
         _eaglEnabled = YES;
+        [self resize:self.frame.size];
         _appActive = YES;
     }
 
