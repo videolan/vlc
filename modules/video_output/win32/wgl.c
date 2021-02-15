@@ -65,19 +65,12 @@ typedef struct vout_display_sys_t
     HMODULE               hOpengl;
     vlc_gl_t              *gl;
     HDC                   affinityHDC; // DC for the selected GPU
-
-    struct
-    {
-        PFNWGLGETEXTENSIONSSTRINGEXTPROC GetExtensionsStringEXT;
-        PFNWGLGETEXTENSIONSSTRINGARBPROC GetExtensionsStringARB;
-    } exts;
 } vout_display_sys_t;
 
 static void          Swap(vlc_gl_t *);
 static void          *OurGetProcAddress(vlc_gl_t *, const char *);
 static int           MakeCurrent(vlc_gl_t *gl);
 static void          ReleaseCurrent(vlc_gl_t *gl);
-static const char *  GetExtensionsString(vlc_gl_t *gl);
 
 #define VLC_PFD_INITIALIZER { \
     .nSize = sizeof(PIXELFORMATDESCRIPTOR), \
@@ -224,13 +217,6 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     }
 #endif
 
-#define LOAD_EXT(name, type) \
-    sys->exts.name = (type) wglGetProcAddress("wgl" #name )
-
-    LOAD_EXT(GetExtensionsStringEXT, PFNWGLGETEXTENSIONSSTRINGEXTPROC);
-    if (!sys->exts.GetExtensionsStringEXT)
-        LOAD_EXT(GetExtensionsStringARB, PFNWGLGETEXTENSIONSSTRINGARBPROC);
-
     wglMakeCurrent(sys->hGLDC, NULL);
 
     gl->ext = VLC_GL_EXT_WGL;
@@ -240,9 +226,6 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     gl->swap = Swap;
     gl->get_proc_address = OurGetProcAddress;
     gl->destroy = Close;
-
-    if (sys->exts.GetExtensionsStringEXT || sys->exts.GetExtensionsStringARB)
-        gl->wgl.getExtensionsString = GetExtensionsString;
 
     (void) width; (void) height;
     return VLC_SUCCESS;
@@ -318,12 +301,4 @@ static void ReleaseCurrent(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
     wglMakeCurrent(NULL, NULL);
-}
-
-static const char *GetExtensionsString(vlc_gl_t *gl)
-{
-    vout_display_sys_t *sys = gl->sys;
-    return sys->exts.GetExtensionsStringEXT ?
-            sys->exts.GetExtensionsStringEXT() :
-            sys->exts.GetExtensionsStringARB(sys->hGLDC);
 }
