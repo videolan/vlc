@@ -151,7 +151,7 @@ libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 libglinterop_dxva2_plugin_la_SOURCES = video_output/opengl/interop_dxva2.c \
 	video_output/opengl/interop.h
 libglinterop_dxva2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
-libglinterop_dxva2_plugin_la_LIBADD = libd3d9_common.la
+libglinterop_dxva2_plugin_la_LIBADD = libd3d9_common.la -lopengl32
 
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += $(LTLIBdirect3d9)

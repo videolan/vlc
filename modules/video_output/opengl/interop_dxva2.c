@@ -71,6 +71,8 @@ vlc_module_begin ()
 vlc_module_end ()
 
 struct wgl_vt {
+    PFNWGLGETEXTENSIONSSTRINGEXTPROC     GetExtensionsStringEXT;
+    PFNWGLGETEXTENSIONSSTRINGARBPROC     GetExtensionsStringARB;
     PFNWGLDXSETRESOURCESHAREHANDLENVPROC DXSetResourceShareHandleNV;
     PFNWGLDXOPENDEVICENVPROC             DXOpenDeviceNV;
     PFNWGLDXCLOSEDEVICENVPROC            DXCloseDeviceNV;
@@ -424,16 +426,12 @@ GLConvOpen(vlc_object_t *obj)
         msg_Warn(obj, "DX/GL interrop only working on d3d9x");
         return VLC_EGENERIC;
     }
-
-    if (interop->gl->ext != VLC_GL_EXT_WGL || !interop->gl->wgl.getExtensionsString)
-        return VLC_EGENERIC;
-
-    const char *wglExt = interop->gl->wgl.getExtensionsString(interop->gl);
-
-    if (wglExt == NULL || !vlc_gl_StrHasToken(wglExt, "WGL_NV_DX_interop"))
+    HGLRC hGLRC = wglGetCurrentContext();
+    if (hGLRC == NULL)
         return VLC_EGENERIC;
 
     struct wgl_vt vt;
+
 #define LOAD_EXT(name, type) do { \
     vt.name = (type) vlc_gl_GetProcAddress(interop->gl, "wgl" #name); \
     if (!vt.name) { \
@@ -442,6 +440,24 @@ GLConvOpen(vlc_object_t *obj)
     } \
 } while(0)
 
+    LOAD_EXT(GetExtensionsStringEXT, PFNWGLGETEXTENSIONSSTRINGEXTPROC);
+    LOAD_EXT(GetExtensionsStringARB, PFNWGLGETEXTENSIONSSTRINGARBPROC);
+
+    const char *wglExt = NULL;
+    if (vt.GetExtensionsStringEXT)
+    {
+        wglExt = vt.GetExtensionsStringEXT();
+    }
+    else if (vt.GetExtensionsStringARB)
+    {
+        HDC hGLDC = wglGetCurrentDC();
+        if (hGLDC == NULL)
+            return VLC_EGENERIC;
+        wglExt = vt.GetExtensionsStringARB(hGLDC);
+    }
+
+    if (wglExt == NULL || !vlc_gl_StrHasToken(wglExt, "WGL_NV_DX_interop"))
+        return VLC_EGENERIC;
     LOAD_EXT(DXSetResourceShareHandleNV, PFNWGLDXSETRESOURCESHAREHANDLENVPROC);
     LOAD_EXT(DXOpenDeviceNV, PFNWGLDXOPENDEVICENVPROC);
     LOAD_EXT(DXCloseDeviceNV, PFNWGLDXCLOSEDEVICENVPROC);
