@@ -577,10 +577,20 @@ static struct picture_context_t *PictureContextCopy(struct picture_context_t *ct
     return ctx;
 }
 
+static void AbortDecoderLocked(decoder_sys_t *p_dec);
 static void CleanFromVideoContext(void *priv)
 {
     android_video_context_t *avctx = priv;
     decoder_sys_t *p_sys = avctx->dec_opaque;
+
+    vlc_mutex_lock(&p_sys->lock);
+    /* Unblock output thread waiting in dequeue_out */
+    DecodeFlushLocked(p_sys);
+    /* Cancel the output thread */
+    AbortDecoderLocked(p_sys);
+    vlc_mutex_unlock(&p_sys->lock);
+
+    vlc_join(p_sys->out_thread, NULL);
 
     CleanDecoder(p_sys);
 }
@@ -1064,8 +1074,21 @@ static void CloseDecoder(vlc_object_t *p_this)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     vlc_mutex_lock(&p_sys->lock);
-    p_sys->b_closed = true;
+    p_sys->b_decoder_dead = true;
+    vlc_mutex_unlock(&p_sys->lock);
 
+    if (p_sys->video.ctx)
+    {
+        /* If we have a video context, we're using Surface with inflight
+         * pictures, which might already have been queued, and flushing
+         * them would make them invalid, breaking mechanism like waiting
+         * on OnFrameAvailableListener.*/
+        vlc_video_context_Release(p_sys->video.ctx);
+        CleanInputVideo(p_dec);
+        return;
+    }
+
+    vlc_mutex_lock(&p_sys->lock);
     /* Unblock output thread waiting in dequeue_out */
     DecodeFlushLocked(p_sys);
     /* Cancel the output thread */
@@ -1075,11 +1098,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     vlc_join(p_sys->out_thread, NULL);
 
     CleanInputVideo(p_dec);
-
-    if (p_sys->video.ctx)
-        vlc_video_context_Release(p_sys->video.ctx);
-    else
-        CleanDecoder(p_sys);
+    CleanDecoder(p_sys);
 }
 
 static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
