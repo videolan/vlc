@@ -1533,9 +1533,10 @@ libvlc_player_programlist_at( libvlc_player_programlist_t *list, size_t index );
 /**
  * Release a programlist
  *
+ * \note program structs from the list are also deleted.
+ *
  * \version LibVLC 4.0.0 and later.
  *
- * \see libvlc_media_get_programlist
  * \see libvlc_media_player_get_programlist
  *
  * \param list valid programlist
