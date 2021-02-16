@@ -101,7 +101,8 @@ typedef struct d3d_shader_blob
 
 static inline void D3D_ShaderBlobRelease(d3d_shader_blob *blob)
 {
-    blob->pf_release(blob);
+    if (blob->pf_release)
+        blob->pf_release(blob);
     *blob = (d3d_shader_blob) { 0 };
 }
 

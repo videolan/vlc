@@ -205,26 +205,7 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
                              const char *psz_shader, bool pixelShader,
                              d3d_shader_blob *blob)
 {
-    ID3D10Blob* pShaderBlob = NULL, *pErrBlob;
-    const char *target;
-    if (pixelShader)
-    {
-        if (likely(feature_level >= D3D_FEATURE_LEVEL_10_0))
-            target = "ps_4_0";
-        else if (feature_level >= D3D_FEATURE_LEVEL_9_3)
-            target = "ps_4_0_level_9_3";
-        else
-            target = "ps_4_0_level_9_1";
-    }
-    else
-    {
-        if (likely(feature_level >= D3D_FEATURE_LEVEL_10_0))
-            target = "vs_4_0";
-        else if (feature_level >= D3D_FEATURE_LEVEL_9_3)
-            target = "vs_4_0_level_9_3";
-        else
-            target = "vs_4_0_level_9_1";
-    }
+    ID3D10Blob* pShaderBlob = NULL, *pErrBlob = NULL;
 
     UINT compileFlags = 0;
 #if VLC_WINSTORE_APP
@@ -236,16 +217,39 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
         compileFlags += D3DCOMPILE_DEBUG;
 # endif
 #endif
-    HRESULT hr = D3DCompile(psz_shader, strlen(psz_shader),
+    HRESULT hr;
+    {
+        const char *target;
+        if (pixelShader)
+        {
+            if (likely(feature_level >= D3D_FEATURE_LEVEL_10_0))
+                target = "ps_4_0";
+            else if (feature_level >= D3D_FEATURE_LEVEL_9_3)
+                target = "ps_4_0_level_9_3";
+            else
+                target = "ps_4_0_level_9_1";
+        }
+        else
+        {
+            if (likely(feature_level >= D3D_FEATURE_LEVEL_10_0))
+                target = "vs_4_0";
+            else if (feature_level >= D3D_FEATURE_LEVEL_9_3)
+                target = "vs_4_0_level_9_3";
+            else
+                target = "vs_4_0_level_9_1";
+        }
+
+        hr = D3DCompile(psz_shader, strlen(psz_shader),
                             NULL, NULL, NULL, "main", target,
                             compileFlags, 0, &pShaderBlob, &pErrBlob);
+    }
 
     if (FAILED(hr)) {
-        char *err = pErrBlob ? ID3D10Blob_GetBufferPointer(pErrBlob) : NULL;
+        const char *err = pErrBlob ? ID3D10Blob_GetBufferPointer(pErrBlob) : NULL;
         msg_Err(obj, "invalid %s Shader (hr=0x%lX): %s", pixelShader?"Pixel":"Vertex", hr, err );
         if (pErrBlob)
             ID3D10Blob_Release(pErrBlob);
-        return E_FAIL;
+        return hr;
     }
     if (!pShaderBlob)
         return E_INVALIDARG;
@@ -514,7 +518,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                     {
                         /* HDR tone mapping */
                         psz_tone_mapping =
-                            "static const float4 HABLE_DIV = hable(11.2);\n"
+                            "const float4 HABLE_DIV = hable(11.2);\n"
                             "rgb = hable(rgb * LuminanceScale) / HABLE_DIV;\n"
                             "return rgb";
                     }
@@ -666,35 +670,25 @@ HRESULT D3D_CompileVertexShader(vlc_object_t *obj, const d3d_shader_compiler_t *
 }
 
 
-#if !VLC_WINSTORE_APP
-static HINSTANCE Direct3DLoadShaderLibrary(void)
-{
-    HINSTANCE instance = NULL;
-    /* d3dcompiler_47 is the latest on windows 8.1 */
-    for (int i = 47; i > 41; --i) {
-        WCHAR filename[19];
-        _snwprintf(filename, 19, TEXT("D3DCOMPILER_%d.dll"), i);
-        instance = LoadLibrary(filename);
-        if (instance) break;
-    }
-    return instance;
-}
-#endif // !VLC_WINSTORE_APP
-
 int D3D_InitShaderCompiler(vlc_object_t *obj, d3d_shader_compiler_t *compiler)
 {
 #if !VLC_WINSTORE_APP
-    compiler->compiler_dll = Direct3DLoadShaderLibrary();
-    if (!compiler->compiler_dll) {
-        msg_Err(obj, "cannot load d3dcompiler.dll, aborting");
-        return VLC_EGENERIC;
+    /* d3dcompiler_47 is the latest on windows 10 */
+    for (int i = 47; i > 41; --i)
+    {
+        WCHAR filename[19];
+        _snwprintf(filename, ARRAY_SIZE(filename), TEXT("D3DCOMPILER_%d.dll"), i);
+        compiler->compiler_dll = LoadLibrary(filename);
+        if (compiler->compiler_dll) break;
     }
-
-    compiler->OurD3DCompile = (void *)GetProcAddress(compiler->compiler_dll, "D3DCompile");
-    if (!compiler->OurD3DCompile) {
-        msg_Err(obj, "Cannot locate reference to D3DCompile in d3dcompiler DLL");
-        FreeLibrary(compiler->compiler_dll);
-        return VLC_EGENERIC;
+    if (compiler->compiler_dll)
+    {
+        compiler->OurD3DCompile = (void *)GetProcAddress(compiler->compiler_dll, "D3DCompile");
+        if (!compiler->OurD3DCompile) {
+            msg_Err(obj, "Cannot locate reference to D3DCompile in d3dcompiler DLL");
+            FreeLibrary(compiler->compiler_dll);
+            return VLC_EGENERIC;
+        }
     }
 #endif // !VLC_WINSTORE_APP
 
