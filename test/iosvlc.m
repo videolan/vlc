@@ -36,6 +36,7 @@
     @public
     libvlc_instance_t *_libvlc;
     UIWindow *window;
+    UIView *subview;
 }
 @end
 
@@ -69,6 +70,10 @@
     window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
     window.rootViewController = [UIViewController alloc];
     window.backgroundColor = [UIColor whiteColor];
+
+    subview = [[UIView alloc] initWithFrame:window.bounds];
+    subview.backgroundColor = [UIColor blueColor];
+    [window addSubview:subview];
     [window makeKeyAndVisible];
 
     /* Start glue interface, see code below */
@@ -91,9 +96,9 @@ int main(int argc, char * argv[]) {
 static int Open(vlc_object_t *obj)
 {
     AppDelegate *d = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    assert(d != nil && d->window != nil);
+    assert(d != nil && d->subview != nil);
     var_SetAddress(vlc_object_instance(obj), "drawable-nsobject",
-                   (__bridge void *)d->window);
+                   (__bridge void *)d->subview);
 
     return VLC_SUCCESS;
 }
