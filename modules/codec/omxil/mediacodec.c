@@ -115,6 +115,11 @@ typedef struct decoder_sys_t
     bool            b_aborted;
     bool            b_drained;
     bool            b_adaptive;
+
+    /* If true, the decoder_t object has been closed and decoder_* functions
+     * are now unavailable. */
+    bool            b_decoder_dead;
+
     int             i_decode_flags;
 
     enum es_format_category_e cat;
@@ -846,6 +851,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     p_sys->video.i_mpeg_dar_num = 0;
     p_sys->video.i_mpeg_dar_den = 0;
     p_sys->video.surfacetexture = NULL;
+    p_sys->b_decoder_dead = false;
 
     if (pf_init(&p_sys->api) != 0)
     {
@@ -1058,6 +1064,8 @@ static void CloseDecoder(vlc_object_t *p_this)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     vlc_mutex_lock(&p_sys->lock);
+    p_sys->b_closed = true;
+
     /* Unblock output thread waiting in dequeue_out */
     DecodeFlushLocked(p_sys);
     /* Cancel the output thread */
@@ -1415,8 +1423,9 @@ static void *OutThread(void *data)
 
         vlc_mutex_lock(&p_sys->lock);
 
-        /* Ignore dequeue_out errors caused by flush */
-        if (p_sys->b_flush_out)
+        /* Ignore dequeue_out errors caused by flush, or late picture being
+         * dequeued after close. */
+        if (p_sys->b_flush_out || p_sys->b_decoder_dead)
         {
             /* If i_index >= 0, Release it. There is no way to know if i_index
              * is owned by us, so don't check the error. */
