@@ -475,8 +475,10 @@ void vout_ChangeDisplaySize(vout_thread_t *vout,
     VoutRenderWakeUpUrgent(sys);
 
     /* DO NOT call this outside the vout window callbacks */
+    vlc_mutex_lock(&sys->render_lock);
     vlc_queuedmutex_lock(&sys->display_lock);
 
+    sys->rendering_enabled = width != 0 && height != 0;
     sys->window_width = width;
     sys->window_height = height;
 
@@ -486,6 +488,7 @@ void vout_ChangeDisplaySize(vout_thread_t *vout,
     if (cb != NULL)
         cb(opaque);
     vlc_queuedmutex_unlock(&sys->display_lock);
+    vlc_mutex_unlock(&sys->render_lock);
 }
 
 void vout_ChangeDisplayFitting(vout_thread_t *vout, enum vlc_video_fitting fit)
