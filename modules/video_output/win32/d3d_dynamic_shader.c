@@ -56,12 +56,49 @@ static const char globPixelShaderDefault[] = "\
     float2 uv         : TEXCOORD;\n\
   };\n\
   \n\
+#define TONE_MAP_HABLE       1\n\
+\n\
+#define SRC_TRANSFER_709     1\n\
+#define SRC_TRANSFER_PQ      2\n\
+#define SRC_TRANSFER_HLG     3\n\
+#define SRC_TRANSFER_SRGB    4\n\
+#define SRC_TRANSFER_470BG   5\n\
+\n\
+#define DST_TRANSFER_SRGB    1\n\
+#define DST_TRANSFER_PQ      2\n\
+\n\
+#define TRANSFORM_PRIMARIES  1\n\
+\n\
+#define SHIFT_YZ_TO_XY       1\n\
+\n\
+#define ADJUST_RANGE         1\n\
+\n\
+#define SAMPLE_NV12_TO_YUVA          1\n\
+#define SAMPLE_YUY2_TO_YUVA          2\n\
+#define SAMPLE_Y210_TO_YUVA          3\n\
+#define SAMPLE_Y410_TO_YUVA          4\n\
+#define SAMPLE_AYUV_TO_YUVA          5\n\
+#define SAMPLE_RGBA_TO_RGBA          6\n\
+#define SAMPLE_TRIPLANAR_TO_YUVA     7\n\
+#define SAMPLE_TRIPLANAR10_TO_YUVA   8\n\
+#define SAMPLE_PLANAR_YUVA_TO_YUVA   9\n\
+\n\
+#define SAMPLE_NV12_TO_NV_Y         10\n\
+#define SAMPLE_NV12_TO_NV_UV        11\n\
+#define SAMPLE_RGBA_TO_NV_R         12\n\
+#define SAMPLE_RGBA_TO_NV_GB        13\n\
+#define SAMPLE_PLANAR_YUVA_TO_NV_Y  14\n\
+#define SAMPLE_PLANAR_YUVA_TO_NV_UV 15\n\
+\n\
+#if (TONE_MAPPING==TONE_MAP_HABLE)\n\
   /* see http://filmicworlds.com/blog/filmic-tonemapping-operators/ */\n\
   inline float4 hable(float4 x) {\n\
       const float A = 0.15, B = 0.50, C = 0.10, D = 0.20, E = 0.02, F = 0.30;\n\
       return ((x * (A*x + (C*B))+(D*E))/(x * (A*x + B) + (D*F))) - E/F;\n\
   }\n\
+#endif\n\
   \n\
+#if (SRC_TO_LINEAR==SRC_TRANSFER_HLG)\n\
   /* https://en.wikipedia.org/wiki/Hybrid_Log-Gamma#Technical_details */\n\
   inline float inverse_HLG(float x){\n\
       const float B67_a = 0.17883277;\n\
@@ -74,40 +111,160 @@ static const char globPixelShaderDefault[] = "\
           x = exp((x - B67_c) / B67_a) + B67_b;\n\
       return x;\n\
   }\n\
+#endif\n\
   \n\
   inline float4 sourceToLinear(float4 rgb) {\n\
-const float ST2084_m1 = 2610.0 / (4096.0 * 4);\n\
-const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;\n\
-const float ST2084_c1 = 3424.0 / 4096.0;\n\
-const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;\n\
-const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;\n\
-%s;\n\
+#if (SRC_TO_LINEAR==SRC_TRANSFER_PQ)\n\
+    const float ST2084_m1 = 2610.0 / (4096.0 * 4);\n\
+    const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;\n\
+    const float ST2084_c1 = 3424.0 / 4096.0;\n\
+    const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;\n\
+    const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;\n\
+    rgb = pow(max(rgb, 0), 1.0/ST2084_m2);\n\
+    rgb = max(rgb - ST2084_c1, 0.0) / (ST2084_c2 - ST2084_c3 * rgb);\n\
+    rgb = pow(rgb, 1.0/ST2084_m1);\n\
+    return rgb * 10000;\n\
+#elif (SRC_TO_LINEAR==SRC_TRANSFER_HLG)\n\
+    const float alpha_gain = 2000; /* depends on the display output */\n\
+    /* TODO: in one call */\n\
+    rgb.r = inverse_HLG(rgb.r);\n\
+    rgb.g = inverse_HLG(rgb.g);\n\
+    rgb.b = inverse_HLG(rgb.b);\n\
+    float3 ootf_2020 = float3(0.2627, 0.6780, 0.0593);\n\
+    float ootf_ys = alpha_gain * dot(ootf_2020, rgb);\n\
+    return rgb * pow(ootf_ys, 0.200);\n\
+#elif (SRC_TO_LINEAR==SRC_TRANSFER_709)\n\
+    return pow(rgb, 1.0 / 0.45);\n\
+#elif (SRC_TO_LINEAR==SRC_TRANSFER_SRGB)\n\
+    return pow(rgb, 2.2);\n\
+#elif (SRC_TO_LINEAR==SRC_TRANSFER_470BG)\n\
+    return pow(rgb, 2.8);\n\
+#else\n\
+    return rgb;\n\
+#endif\n\
   }\n\
   \n\
   inline float4 linearToDisplay(float4 rgb) {\n\
-%s;\n\
+#if (LINEAR_TO_DST==DST_TRANSFER_SRGB)\n\
+    return pow(rgb, 1.0 / 2.2);\n\
+#elif (LINEAR_TO_DST==DST_TRANSFER_PQ)\n\
+    const float ST2084_m1 = 2610.0 / (4096.0 * 4);\n\
+    const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;\n\
+    const float ST2084_c1 = 3424.0 / 4096.0;\n\
+    const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;\n\
+    const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;\n\
+    rgb = pow(rgb / 10000, ST2084_m1);\n\
+    rgb = (ST2084_c1 + ST2084_c2 * rgb) / (1 + ST2084_c3 * rgb);\n\
+    return pow(rgb, ST2084_m2);\n\
+#else\n\
+    return rgb;\n\
+#endif\n\
   }\n\
   \n\
   inline float4 transformPrimaries(float4 rgb) {\n\
-%s;\n\
+#if (PRIMARIES_MODE==TRANSFORM_PRIMARIES)\n\
+    return max(mul(rgb, Primaries), 0);\n\
+#else\n\
+    return rgb;\n\
+#endif\n\
   }\n\
   \n\
   inline float4 toneMapping(float4 rgb) {\n\
-%s;\n\
+    rgb = rgb * LuminanceScale;\n\
+#if (TONE_MAPPING==TONE_MAP_HABLE)\n\
+    const float4 HABLE_DIV = hable(11.2);\n\
+    rgb = hable(rgb) / HABLE_DIV;\n\
+#endif\n\
+      return rgb;\n\
   }\n\
   \n\
   inline float4 adjustRange(float4 rgb) {\n\
-%s;\n\
+#if (RANGE_ADJUST==ADJUST_RANGE)\n\
+    return clamp((rgb + BLACK_LEVEL_SHIFT) * RANGE_FACTOR, MIN_BLACK_VALUE, MAX_BLACK_VALUE);\n\
+#else\n\
+    return rgb;\n\
+#endif\n\
   }\n\
   \n\
   inline float4 reorderPlanes(float4 rgb) {\n\
-%s;\n\
+#if (REORDER_PLANES==SHIFT_YZ_TO_XY)\n\
+    rgb.x = rgb.y;\n\
+    rgb.y = rgb.z;\n\
+    rgb.z = 0;\n\
+#endif\n\
+    return rgb;\n\
   }\n\
   \n\
   inline float4 sampleTexture(SamplerState samplerState, float2 coords) {\n\
-      float4 sample;\n\
-%s /* sampling routine in sample */\n\
-      return sample;\n\
+    float4 sample;\n\
+    /* sampling routine in sample */\n\
+#if (SAMPLE_TEXTURES==SAMPLE_NV12_TO_YUVA)\n\
+    sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
+    sample.yz = shaderTexture[1].Sample(samplerState, coords).xy;\n\
+    sample.a  = 1;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_YUY2_TO_YUVA)\n\
+    sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
+    sample.y  = shaderTexture[0].Sample(samplerState, coords).y;\n\
+    sample.z  = shaderTexture[0].Sample(samplerState, coords).a;\n\
+    sample.a  = 1;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_Y210_TO_YUVA)\n\
+    sample.x  = shaderTexture[0].Sample(samplerState, coords).r;\n\
+    sample.y  = shaderTexture[0].Sample(samplerState, coords).g;\n\
+    sample.z  = shaderTexture[0].Sample(samplerState, coords).a;\n\
+    sample.a  = 1;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_Y410_TO_YUVA)\n\
+    sample.x  = shaderTexture[0].Sample(samplerState, coords).g;\n\
+    sample.y  = shaderTexture[0].Sample(samplerState, coords).r;\n\
+    sample.z  = shaderTexture[0].Sample(samplerState, coords).b;\n\
+    sample.a  = 1;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_AYUV_TO_YUVA)\n\
+    sample.x  = shaderTexture[0].Sample(samplerState, coords).z;\n\
+    sample.y  = shaderTexture[0].Sample(samplerState, coords).y;\n\
+    sample.z  = shaderTexture[0].Sample(samplerState, coords).x;\n\
+    sample.a  = 1;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_RGBA_TO_RGBA)\n\
+    sample = shaderTexture[0].Sample(samplerState, coords);\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_TRIPLANAR_TO_YUVA)\n\
+    sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
+    sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\n\
+    sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\n\
+    sample.a  = 1;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_TRIPLANAR10_TO_YUVA)\n\
+    sample.x  = shaderTexture[0].Sample(samplerState, coords).x * 64;\n\
+    sample.y  = shaderTexture[1].Sample(samplerState, coords).x * 64;\n\
+    sample.z  = shaderTexture[2].Sample(samplerState, coords).x * 64;\n\
+    sample.a  = 1;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_PLANAR_YUVA_TO_YUVA)\n\
+    sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
+    sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\n\
+    sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\n\
+    sample.a  = shaderTexture[3].Sample(samplerState, coords).x;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_NV12_TO_NV_Y)\n\
+    sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
+    sample.y = 0.0;\n\
+    sample.z = 0.0;\n\
+    sample.a = 1;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_NV12_TO_NV_UV)\n\
+    // TODO should be shaderTexture[0] ?\n\
+    sample.xy  = shaderTexture[1].Sample(samplerState, coords).xy;\n\
+    sample.z = 0.0;\n\
+    sample.a = 1;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_RGBA_TO_NV_R)\n\
+    sample = shaderTexture[0].Sample(samplerState, coords);\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_RGBA_TO_NV_GB)\n\
+    sample = shaderTexture[0].Sample(samplerState, coords);\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_PLANAR_YUVA_TO_NV_Y)\n\
+    sample.x = shaderTexture[0].Sample(samplerState, coords).x;\n\
+    sample.y = 0.0;\n\
+    sample.z = 0.0;\n\
+    sample.a = shaderTexture[3].Sample(samplerState, coords).x;\n\
+#elif (SAMPLE_TEXTURES==SAMPLE_PLANAR_YUVA_TO_NV_UV)\n\
+    sample.x = shaderTexture[1].Sample(samplerState, coords).x;\n\
+    sample.y = shaderTexture[2].Sample(samplerState, coords).x;\n\
+    sample.z = 0.0;\n\
+    sample.a = shaderTexture[3].Sample(samplerState, coords).x;\n\
+#endif\n\
+    return sample;\n\
   }\n\
   \n\
   float4 main( PS_INPUT In ) : SV_TARGET\n\
@@ -131,35 +288,15 @@ const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;\n\
   }\n\
 ";
 
-static const char globVertexShaderFlat[] = "\
-struct d3d_vertex_t\n\
-{\n\
-  float3 Position   : POSITION;\n\
-  float2 uv         : TEXCOORD;\n\
-};\n\
-\n\
-struct PS_INPUT\n\
-{\n\
-  float4 Position   : SV_POSITION;\n\
-  float2 uv         : TEXCOORD;\n\
-};\n\
-\n\
-PS_INPUT main( d3d_vertex_t In )\n\
-{\n\
-  PS_INPUT Output;\n\
-  Output.Position = float4(In.Position, 1);\n\
-  Output.uv  = In.uv;\n\
-  return Output;\n\
-}\n\
-";
-
-static const char globVertexShaderProjection[] = "\n\
+static const char globVertexShader[] = "\n\
+#if HAS_PROJECTION\n\
 cbuffer VS_PROJECTION_CONST : register(b0)\n\
 {\n\
    float4x4 View;\n\
    float4x4 Zoom;\n\
    float4x4 Projection;\n\
 };\n\
+#endif\n\
 struct d3d_vertex_t\n\
 {\n\
   float3 Position   : POSITION;\n\
@@ -176,9 +313,11 @@ PS_INPUT main( d3d_vertex_t In )\n\
 {\n\
   PS_INPUT Output;\n\
   float4 pos = float4(In.Position, 1);\n\
-  pos = mul(View, pos);\n\
-  pos = mul(Zoom, pos);\n\
-  pos = mul(Projection, pos);\n\
+#if HAS_PROJECTION\n\
+    pos = mul(View, pos);\n\
+    pos = mul(Zoom, pos);\n\
+    pos = mul(Projection, pos);\n\
+#endif\n\
   Output.Position = pos;\n\
   Output.uv = In.uv;\n\
   return Output;\n\
@@ -202,6 +341,7 @@ static void ID3D10BlobtoBlob(ID3D10Blob *d3dblob, d3d_shader_blob *blob)
 static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *compiler,
                              D3D_FEATURE_LEVEL feature_level,
                              const char *psz_shader, bool pixelShader,
+                             const D3D_SHADER_MACRO *defines,
                              d3d_shader_blob *blob)
 {
     ID3D10Blob* pShaderBlob = NULL, *pErrBlob = NULL;
@@ -239,16 +379,17 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
         }
 
         hr = D3DCompile(psz_shader, strlen(psz_shader),
-                            NULL, NULL, NULL, "main", target,
-                            compileFlags, 0, &pShaderBlob, &pErrBlob);
+                        NULL, defines, NULL, "main", target,
+                        compileFlags, 0, &pShaderBlob, &pErrBlob);
     }
 
-    if (FAILED(hr)) {
+    if (FAILED(hr) || pErrBlob) {
         const char *err = pErrBlob ? ID3D10Blob_GetBufferPointer(pErrBlob) : NULL;
         msg_Err(obj, "invalid %s Shader (hr=0x%lX): %s", pixelShader?"Pixel":"Vertex", hr, err );
         if (pErrBlob)
             ID3D10Blob_Release(pErrBlob);
-        return hr;
+        if (FAILED(hr))
+            return hr;
     }
     if (!pShaderBlob)
         return E_INVALIDARG;
@@ -263,36 +404,42 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
                                    const char *psz_primaries_transform,
                                    const char *psz_linear_to_display,
                                    const char *psz_tone_mapping,
-                                   const char *psz_adjust_range, const char *psz_move_planes,
+                                   const char *psz_adjust_range,
+                                   const char *psz_black_level,
+                                   const char *psz_range_factor,
+                                   const char *psz_min_black,
+                                   const char *psz_max_white,
+                                   const char *psz_move_planes,
                                    d3d_shader_blob *pPSBlob)
 {
-    char *shader;
-    int allocated = asprintf(&shader, globPixelShaderDefault,
-                             psz_src_to_linear, psz_linear_to_display,
-                             psz_primaries_transform, psz_tone_mapping,
-                             psz_adjust_range, psz_move_planes, psz_sampler);
-    if (allocated <= 0)
-    {
-        msg_Err(o, "no room for the Pixel Shader");
-        return E_OUTOFMEMORY;
-    }
     if (var_InheritInteger(o, "verbose") >= 4)
-        msg_Dbg(o, "shader %s", shader);
+        msg_Dbg(o, "shader %s", globPixelShaderDefault);
+
+    D3D_SHADER_MACRO defines[] = {
+         { "TONE_MAPPING",      psz_tone_mapping },
+         { "SRC_TO_LINEAR",     psz_src_to_linear },
+         { "LINEAR_TO_DST",     psz_linear_to_display },
+         { "PRIMARIES_MODE",    psz_primaries_transform },
+         { "REORDER_PLANES",    psz_move_planes },
+         { "SAMPLE_TEXTURES",   psz_sampler },
+         { "RANGE_ADJUST",      psz_adjust_range },
+         { "BLACK_LEVEL_SHIFT", psz_black_level },
+         { "RANGE_FACTOR",      psz_range_factor },
+         { "MIN_BLACK_VALUE",   psz_min_black },
+         { "MAX_BLACK_VALUE",   psz_max_white },
+         { NULL, NULL },
+    };
 #ifndef NDEBUG
-    else {
-    msg_Dbg(o,"psz_src_to_linear %s", psz_src_to_linear);
-    msg_Dbg(o,"psz_primaries_transform %s", psz_primaries_transform);
-    msg_Dbg(o,"psz_tone_mapping %s", psz_tone_mapping);
-    msg_Dbg(o,"psz_linear_to_display %s", psz_linear_to_display);
-    msg_Dbg(o,"psz_adjust_range %s", psz_adjust_range);
-    msg_Dbg(o,"psz_sampler %s", psz_sampler);
-    msg_Dbg(o,"psz_move_planes %s", psz_move_planes);
+    size_t param=0;
+    while (defines[param].Name)
+    {
+        msg_Dbg(o,"%s = %s", defines[param].Name, defines[param].Definition);
+        param++;
     }
 #endif
 
-    HRESULT hr = CompileShader(o, compiler, feature_level, shader, true, pPSBlob);
-    free(shader);
-    return hr;
+    return CompileShader(o, compiler, feature_level, globPixelShaderDefault, true,
+                         defines, pPSBlob);
 }
 
 HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
@@ -303,15 +450,14 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                  const d3d_format_t *dxgi_fmt,
                                  d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET])
 {
-    static const char *DEFAULT_NOOP = "return rgb";
+    static const char *DEFAULT_NOOP = "0";
     const char *psz_sampler[DXGI_MAX_RENDER_TARGET] = {NULL, NULL};
     const char *psz_src_to_linear     = DEFAULT_NOOP;
     const char *psz_linear_to_display = DEFAULT_NOOP;
     const char *psz_primaries_transform = DEFAULT_NOOP;
-    const char *psz_tone_mapping      = "return rgb * LuminanceScale";
+    const char *psz_tone_mapping      = DEFAULT_NOOP;
     const char *psz_adjust_range      = DEFAULT_NOOP;
     const char *psz_move_planes_1     = DEFAULT_NOOP;
-    char *psz_range = NULL;
 
     if ( display->pixelFormat->formatTexture == DXGI_FORMAT_NV12 ||
          display->pixelFormat->formatTexture == DXGI_FORMAT_P010 )
@@ -321,16 +467,8 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         {
         case DXGI_FORMAT_NV12:
         case DXGI_FORMAT_P010:
-            psz_sampler[0] =
-                    "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n"
-                    "sample.y = 0.0;\n"
-                    "sample.z = 0.0;\n"
-                    "sample.a = 1;";
-            psz_sampler[1] =
-                    // TODO should be shaderTexture[0] ?
-                    "sample.xy  = shaderTexture[1].Sample(samplerState, coords).xy;\n"
-                    "sample.z = 0.0;\n"
-                    "sample.a = 1;";
+            psz_sampler[0] = "SAMPLE_NV12_TO_NV_Y";
+            psz_sampler[1] = "SAMPLE_NV12_TO_NV_UV";
             break;
         case DXGI_FORMAT_R8G8B8A8_UNORM:
         case DXGI_FORMAT_B8G8R8A8_UNORM:
@@ -339,33 +477,19 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         case DXGI_FORMAT_R16G16B16A16_UNORM:
         case DXGI_FORMAT_B5G6R5_UNORM:
             /* Y */
-            psz_sampler[0] =
-                    "sample = shaderTexture[0].Sample(samplerState, coords);\n";
+            psz_sampler[0] = "SAMPLE_RGBA_TO_NV_R";
             /* UV */
-            psz_sampler[1] =
-                    "sample = shaderTexture[0].Sample(samplerState, coords);\n";
-            psz_move_planes_1 =
-                    "rgb.x = rgb.y;\n"
-                    "rgb.y = rgb.z;\n"
-                    "rgb.z = 0;\n"
-                    "return rgb";
+            psz_sampler[1] = "SAMPLE_RGBA_TO_NV_GB";
+            psz_move_planes_1 = "SHIFT_YZ_TO_XY";
             break;
         case DXGI_FORMAT_UNKNOWN:
             switch (dxgi_fmt->fourcc)
             {
             case VLC_CODEC_YUVA:
                 /* Y */
-                psz_sampler[0] =
-                        "sample.x = shaderTexture[0].Sample(samplerState, coords).x;\n"
-                        "sample.y = 0.0;\n"
-                        "sample.z = 0.0;\n"
-                        "sample.a = shaderTexture[3].Sample(samplerState, coords).x;";
+                psz_sampler[0] = "SAMPLE_PLANAR_YUVA_TO_NV_Y";
                 /* UV */
-                psz_sampler[1] =
-                        "sample.x = shaderTexture[1].Sample(samplerState, coords).x;\n"
-                        "sample.y = shaderTexture[2].Sample(samplerState, coords).x;\n"
-                        "sample.z = 0.0;\n"
-                        "sample.a = shaderTexture[3].Sample(samplerState, coords).x;";
+                psz_sampler[1] = "SAMPLE_PLANAR_YUVA_TO_NV_UV";
                 break;
             default:
                 vlc_assert_unreachable();
@@ -381,38 +505,19 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         {
         case DXGI_FORMAT_NV12:
         case DXGI_FORMAT_P010:
-            psz_sampler[0] =
-                    "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n"
-                    "sample.yz = shaderTexture[1].Sample(samplerState, coords).xy;\n"
-                    "sample.a  = 1;";
+            psz_sampler[0] = "SAMPLE_NV12_TO_YUVA";
             break;
         case DXGI_FORMAT_YUY2:
-            psz_sampler[0] =
-                    "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n"
-                    "sample.y  = shaderTexture[0].Sample(samplerState, coords).y;\n"
-                    "sample.z  = shaderTexture[0].Sample(samplerState, coords).a;\n"
-                    "sample.a  = 1;";
+            psz_sampler[0] = "SAMPLE_YUY2_TO_YUVA";
             break;
         case DXGI_FORMAT_Y210:
-            psz_sampler[0] =
-                    "sample.x  = shaderTexture[0].Sample(samplerState, coords).r;\n"
-                    "sample.y  = shaderTexture[0].Sample(samplerState, coords).g;\n"
-                    "sample.z  = shaderTexture[0].Sample(samplerState, coords).a;\n"
-                    "sample.a  = 1;";
+            psz_sampler[0] = "SAMPLE_Y210_TO_YUVA";
             break;
         case DXGI_FORMAT_Y410:
-            psz_sampler[0] =
-                    "sample.x  = shaderTexture[0].Sample(samplerState, coords).g;\n"
-                    "sample.y  = shaderTexture[0].Sample(samplerState, coords).r;\n"
-                    "sample.z  = shaderTexture[0].Sample(samplerState, coords).b;\n"
-                    "sample.a  = 1;";
+            psz_sampler[0] = "SAMPLE_Y410_TO_YUVA";
             break;
         case DXGI_FORMAT_AYUV:
-            psz_sampler[0] =
-                    "sample.x  = shaderTexture[0].Sample(samplerState, coords).z;\n"
-                    "sample.y  = shaderTexture[0].Sample(samplerState, coords).y;\n"
-                    "sample.z  = shaderTexture[0].Sample(samplerState, coords).x;\n"
-                    "sample.a  = 1;";
+            psz_sampler[0] = "SAMPLE_AYUV_TO_YUVA";
             break;
         case DXGI_FORMAT_R8G8B8A8_UNORM:
         case DXGI_FORMAT_B8G8R8A8_UNORM:
@@ -420,33 +525,20 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         case DXGI_FORMAT_R10G10B10A2_UNORM:
         case DXGI_FORMAT_R16G16B16A16_UNORM:
         case DXGI_FORMAT_B5G6R5_UNORM:
-            psz_sampler[0] =
-                    "sample = shaderTexture[0].Sample(samplerState, coords);";
+            psz_sampler[0] = "SAMPLE_RGBA_TO_RGBA";
             break;
         case DXGI_FORMAT_UNKNOWN:
             switch (dxgi_fmt->fourcc)
             {
             case VLC_CODEC_I420_10L:
-                psz_sampler[0] =
-                       "sample.x  = shaderTexture[0].Sample(samplerState, coords).x * 64;\n"
-                       "sample.y  = shaderTexture[1].Sample(samplerState, coords).x * 64;\n"
-                       "sample.z  = shaderTexture[2].Sample(samplerState, coords).x * 64;\n"
-                       "sample.a  = 1;";
+                psz_sampler[0] = "SAMPLE_TRIPLANAR10_TO_YUVA";
                 break;
             case VLC_CODEC_I444_16L:
             case VLC_CODEC_I420:
-                psz_sampler[0] =
-                       "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n"
-                       "sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\n"
-                       "sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\n"
-                       "sample.a  = 1;";
+                psz_sampler[0] = "SAMPLE_TRIPLANAR_TO_YUVA";
                 break;
             case VLC_CODEC_YUVA:
-                psz_sampler[0] =
-                       "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n"
-                       "sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\n"
-                       "sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\n"
-                       "sample.a  = shaderTexture[3].Sample(samplerState, coords).x;";
+                psz_sampler[0] = "SAMPLE_PLANAR_YUVA_TO_YUVA";
                 break;
             default:
                 vlc_assert_unreachable();
@@ -466,35 +558,24 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         {
             case TRANSFER_FUNC_SMPTE_ST2084:
                 /* ST2084 to Linear */
-                psz_src_to_linear =
-                       "rgb = pow(max(rgb, 0), 1.0/ST2084_m2);\n"
-                       "rgb = max(rgb - ST2084_c1, 0.0) / (ST2084_c2 - ST2084_c3 * rgb);\n"
-                       "rgb = pow(rgb, 1.0/ST2084_m1);\n"
-                       "return rgb * 10000";
+                psz_src_to_linear = "SRC_TRANSFER_PQ";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             case TRANSFER_FUNC_HLG:
-                psz_src_to_linear = "const float alpha_gain = 2000; /* depends on the display output */\n"
-                                    "/* TODO: in one call */\n"
-                                    "rgb.r = inverse_HLG(rgb.r);\n"
-                                    "rgb.g = inverse_HLG(rgb.g);\n"
-                                    "rgb.b = inverse_HLG(rgb.b);\n"
-                                    "float3 ootf_2020 = float3(0.2627, 0.6780, 0.0593);\n"
-                                    "float ootf_ys = alpha_gain * dot(ootf_2020, rgb);\n"
-                                    "return rgb * pow(ootf_ys, 0.200)";
+                psz_src_to_linear = "SRC_TRANSFER_HLG";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             case TRANSFER_FUNC_BT709:
-                psz_src_to_linear = "return pow(rgb, 1.0 / 0.45)";
+                psz_src_to_linear = "SRC_TRANSFER_709";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             case TRANSFER_FUNC_BT470_M:
             case TRANSFER_FUNC_SRGB:
-                psz_src_to_linear = "return pow(rgb, 2.2)";
+                psz_src_to_linear = "SRC_TRANSFER_SRGB";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             case TRANSFER_FUNC_BT470_BG:
-                psz_src_to_linear = "return pow(rgb, 2.8)";
+                psz_src_to_linear = "SRC_TRANSFER_470BG";
                 src_transfer = TRANSFER_FUNC_LINEAR;
                 break;
             default:
@@ -509,15 +590,12 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                 if (src_transfer == TRANSFER_FUNC_LINEAR)
                 {
                     /* Linear to sRGB */
-                    psz_linear_to_display = "return pow(rgb, 1.0 / 2.2)";
+                    psz_linear_to_display = "DST_TRANSFER_SRGB";
 
                     if (transfer == TRANSFER_FUNC_SMPTE_ST2084 || transfer == TRANSFER_FUNC_HLG)
                     {
                         /* HDR tone mapping */
-                        psz_tone_mapping =
-                            "const float4 HABLE_DIV = hable(11.2);\n"
-                            "rgb = hable(rgb * LuminanceScale) / HABLE_DIV;\n"
-                            "return rgb";
+                        psz_tone_mapping = "TONE_MAP_HABLE";
                     }
                 }
                 else
@@ -528,11 +606,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                 if (src_transfer == TRANSFER_FUNC_LINEAR)
                 {
                     /* Linear to ST2084 */
-                    psz_linear_to_display =
-                           "rgb = pow(rgb / 10000, ST2084_m1);\n"
-                           "rgb = (ST2084_c1 + ST2084_c2 * rgb) / (1 + ST2084_c3 * rgb);\n"
-                           "rgb = pow(rgb, ST2084_m2);\n"
-                           "return rgb";
+                    psz_linear_to_display = "DST_TRANSFER_PQ";
                 }
                 else
                     msg_Warn(o, "don't know how to transfer from %d to SMPTE ST 2084", src_transfer);
@@ -553,7 +627,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         case COLOR_PRIMARIES_BT2020:
         case COLOR_PRIMARIES_DCI_P3:
         case COLOR_PRIMARIES_FCC1953:
-            psz_primaries_transform = "return max(mul(rgb, Primaries), 0)";
+            psz_primaries_transform = "TRANSFORM_PRIMARIES";
             break;
         default:
             /* see STANDARD_PRIMARIES */
@@ -572,11 +646,13 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     if (!DxgiIsRGBFormat(dxgi_fmt) && !src_full_range && DxgiIsRGBFormat(display->pixelFormat))
         range_adjust--; /* the YUV->RGB conversion already output full range */
 
+    FLOAT black_level = 0;
+    FLOAT range_factor = 1.0f;
+    FLOAT itu_black_level = 0.f;
+    FLOAT itu_white_level = 1.f;
     if (range_adjust != 0)
     {
-        FLOAT itu_black_level;
         FLOAT itu_range_factor;
-        FLOAT itu_white_level;
         switch (dxgi_fmt->bitsPerChannel)
         {
         case 8:
@@ -605,8 +681,6 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
             break;
         }
 
-        FLOAT black_level = 0;
-        FLOAT range_factor = 1.0f;
         if (range_adjust > 0)
         {
             /* expand the range from studio to full range */
@@ -615,8 +689,6 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                 black_level -= itu_black_level;
                 range_factor /= itu_range_factor;
             }
-            asprintf(&psz_range, "return clamp((rgb + %f) * %f, 0, 1)",
-                     black_level, range_factor);
         }
         else
         {
@@ -626,11 +698,17 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                 black_level += itu_black_level;
                 range_factor *= itu_range_factor;
             }
-            asprintf(&psz_range, "return clamp(rgb + %f * %f,%f,%f)",
-                     black_level, range_factor, itu_black_level, itu_white_level);
         }
-        psz_adjust_range = psz_range;
+        psz_adjust_range = "ADJUST_RANGE";
     }
+    char psz_black_level[20];
+    char psz_range_factor[20];
+    char psz_min_black[20];
+    char psz_max_white[20];
+    snprintf(psz_black_level, ARRAY_SIZE(psz_black_level), "%f", black_level);
+    snprintf(psz_range_factor, ARRAY_SIZE(psz_range_factor), "%f", range_factor);
+    snprintf(psz_min_black, ARRAY_SIZE(psz_min_black), "%f", itu_black_level);
+    snprintf(psz_max_white, ARRAY_SIZE(psz_max_white), "%f", itu_white_level);
 
     HRESULT hr;
     hr = CompilePixelShaderBlob(o, compiler, feature_level,
@@ -639,7 +717,8 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                 psz_primaries_transform,
                                 psz_linear_to_display,
                                 psz_tone_mapping,
-                                psz_adjust_range, DEFAULT_NOOP, &pPSBlob[0]);
+                                psz_adjust_range, psz_black_level, psz_range_factor, psz_min_black, psz_max_white,
+                                DEFAULT_NOOP, &pPSBlob[0]);
     if (SUCCEEDED(hr) && psz_sampler[1])
     {
         hr = CompilePixelShaderBlob(o, compiler, feature_level,
@@ -648,11 +727,11 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                     psz_primaries_transform,
                                     psz_linear_to_display,
                                     psz_tone_mapping,
-                                    psz_adjust_range, psz_move_planes_1, &pPSBlob[1]);
+                                    psz_adjust_range, psz_black_level, psz_range_factor, psz_min_black, psz_max_white,
+                                    psz_move_planes_1, &pPSBlob[1]);
         if (FAILED(hr))
             D3D_ShaderBlobRelease(&pPSBlob[0]);
     }
-    free(psz_range);
 
     return hr;
 }
@@ -661,9 +740,11 @@ HRESULT D3D_CompileVertexShader(vlc_object_t *obj, const d3d_shader_compiler_t *
                                 D3D_FEATURE_LEVEL feature_level, bool flat,
                                 d3d_shader_blob *blob)
 {
-    return CompileShader(obj, compiler, feature_level,
-                         flat ? globVertexShaderFlat : globVertexShaderProjection,
-                         false, blob);
+    D3D_SHADER_MACRO defines[] = {
+         { "HAS_PROJECTION", flat ? "0" : "1" },
+         { NULL, NULL },
+    };
+    return CompileShader(obj, compiler, feature_level, globVertexShader, false, defines, blob);
 }
 
 
