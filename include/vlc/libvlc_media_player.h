@@ -1552,9 +1552,9 @@ libvlc_player_programlist_delete( libvlc_player_programlist_t *list );
  * \version LibVLC 4.0.0 or later
  *
  * \param p_mi opaque media player handle
- * \param program_id
+ * \param i_group_id program id
  */
-LIBVLC_API void libvlc_media_player_select_program_id( libvlc_media_player_t *p_mi, int program_id);
+LIBVLC_API void libvlc_media_player_select_program_id( libvlc_media_player_t *p_mi, int i_group_id);
 
 /**
  * Get the selected program
@@ -1577,7 +1577,7 @@ libvlc_media_player_get_selected_program( libvlc_media_player_t *p_mi);
  * \param p_mi opaque media player handle
  * \param i_group_id program id
  *
- * \return a valid program struct or NULL if the group_id is not found. The
+ * \return a valid program struct or NULL if the i_group_id is not found. The
  * program need to be freed with libvlc_player_program_delete().
  */
 LIBVLC_API libvlc_player_program_t *
