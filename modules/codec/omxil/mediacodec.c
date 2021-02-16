@@ -62,7 +62,8 @@ typedef int (*dec_on_new_block_cb)(decoder_t *, block_t **);
 /**
  * Callback called when decoder is flushing.
  */
-typedef void (*dec_on_flush_cb)(decoder_t *);
+struct decoder_sys_t;
+typedef void (*dec_on_flush_cb)(struct decoder_sys_t *);
 
 /**
  * Callback called when DecodeBlock try to get an output buffer (pic or block).
@@ -78,7 +79,7 @@ struct android_picture_ctx
     atomic_int index;
 };
 
-typedef struct
+typedef struct decoder_sys_t
 {
     mc_api api;
 
@@ -156,17 +157,17 @@ static int Video_OnNewBlock(decoder_t *, block_t **);
 static int VideoHXXX_OnNewBlock(decoder_t *, block_t **);
 static int VideoMPEG2_OnNewBlock(decoder_t *, block_t **);
 static int VideoVC1_OnNewBlock(decoder_t *, block_t **);
-static void Video_OnFlush(decoder_t *);
+static void Video_OnFlush(decoder_sys_t *);
 static int Video_ProcessOutput(decoder_t *, mc_api_out *, picture_t **,
                                block_t **);
 static int DecodeBlock(decoder_t *, block_t *);
 
 static int Audio_OnNewBlock(decoder_t *, block_t **);
-static void Audio_OnFlush(decoder_t *);
+static void Audio_OnFlush(decoder_sys_t *);
 static int Audio_ProcessOutput(decoder_t *, mc_api_out *, picture_t **,
                                block_t **);
 
-static void DecodeFlushLocked(decoder_t *);
+static void DecodeFlushLocked(decoder_sys_t *);
 static void DecodeFlush(decoder_t *);
 static void StopMediaCodec(decoder_sys_t *);
 static void *OutThread(void *);
@@ -1026,10 +1027,8 @@ static int OpenDecoderJni(vlc_object_t *p_this)
     return OpenDecoder(p_this, MediaCodecJni_Init);
 }
 
-static void AbortDecoderLocked(decoder_t *p_dec)
+static void AbortDecoderLocked(decoder_sys_t *p_sys)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
     if (!p_sys->b_aborted)
     {
         p_sys->b_aborted = true;
@@ -1060,9 +1059,9 @@ static void CloseDecoder(vlc_object_t *p_this)
 
     vlc_mutex_lock(&p_sys->lock);
     /* Unblock output thread waiting in dequeue_out */
-    DecodeFlushLocked(p_dec);
+    DecodeFlushLocked(p_sys);
     /* Cancel the output thread */
-    AbortDecoderLocked(p_dec);
+    AbortDecoderLocked(p_sys);
     vlc_mutex_unlock(&p_sys->lock);
 
     vlc_join(p_sys->out_thread, NULL);
@@ -1350,9 +1349,8 @@ static int Audio_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
     }
 }
 
-static void DecodeFlushLocked(decoder_t *p_dec)
+static void DecodeFlushLocked(decoder_sys_t *p_sys)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     bool b_had_input = p_sys->b_input_dequeued;
 
     p_sys->b_input_dequeued = false;
@@ -1362,11 +1360,11 @@ static void DecodeFlushLocked(decoder_t *p_dec)
     /* Resend CODEC_CONFIG buffer after a flush */
     p_sys->i_csd_send = 0;
 
-    p_sys->pf_on_flush(p_dec);
+    p_sys->pf_on_flush(p_sys);
 
     if (b_had_input && p_sys->api.flush(&p_sys->api) != VLC_SUCCESS)
     {
-        AbortDecoderLocked(p_dec);
+        AbortDecoderLocked(p_sys);
         return;
     }
 
@@ -1381,7 +1379,7 @@ static void DecodeFlush(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     vlc_mutex_lock(&p_sys->lock);
-    DecodeFlushLocked(p_dec);
+    DecodeFlushLocked(p_dec->p_sys);
     vlc_mutex_unlock(&p_sys->lock);
 }
 
@@ -1576,7 +1574,7 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
         if (!p_sys->b_drained)
         {
             msg_Err(p_dec, "OutThread timed out");
-            AbortDecoderLocked(p_dec);
+            AbortDecoderLocked(p_sys);
         }
         p_sys->b_drained = false;
     }
@@ -1584,7 +1582,7 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
     return VLC_SUCCESS;
 
 error:
-    AbortDecoderLocked(p_dec);
+    AbortDecoderLocked(p_sys);
     return VLC_EGENERIC;
 }
 
@@ -1617,7 +1615,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
     {
         if (p_sys->b_output_ready)
             QueueBlockLocked(p_dec, NULL, true);
-        DecodeFlushLocked(p_dec);
+        DecodeFlushLocked(p_sys);
         if (p_sys->b_aborted)
             goto end;
         if (p_in_block->i_flags & BLOCK_FLAG_CORRUPTED)
@@ -1640,7 +1638,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
     {
         if (i_ret != 0)
         {
-            AbortDecoderLocked(p_dec);
+            AbortDecoderLocked(p_sys);
             msg_Err(p_dec, "pf_on_new_block failed");
         }
         goto end;
@@ -1654,7 +1652,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
         /* Drain and flush before restart to unblock OutThread */
         if (p_sys->b_output_ready)
             QueueBlockLocked(p_dec, NULL, true);
-        DecodeFlushLocked(p_dec);
+        DecodeFlushLocked(p_sys);
         if (p_sys->b_aborted)
             goto end;
 
@@ -1670,7 +1668,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
                 break;
             default:
                 msg_Err(p_dec, "StartMediaCodec failed");
-                AbortDecoderLocked(p_dec);
+                AbortDecoderLocked(p_sys);
                 goto end;
             }
         }
@@ -1806,10 +1804,8 @@ static int VideoVC1_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
     return Video_OnNewBlock(p_dec, pp_block);
 }
 
-static void Video_OnFlush(decoder_t *p_dec)
+static void Video_OnFlush(decoder_sys_t *p_sys)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
     timestamp_FifoEmpty(p_sys->video.timestamp_fifo);
     /* Invalidate all pictures that are currently in flight
      * since flushing make all previous indices returned by
@@ -1833,9 +1829,7 @@ static int Audio_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
     return 1;
 }
 
-static void Audio_OnFlush(decoder_t *p_dec)
+static void Audio_OnFlush(decoder_sys_t *p_sys)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
     date_Set(&p_sys->audio.i_end_date, VLC_TICK_INVALID);
 }
