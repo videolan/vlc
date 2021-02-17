@@ -218,9 +218,10 @@ inline float4 sampleTexture(SamplerState samplerState, float2 coords) {\n\
     sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\n\
     sample.a  = 1;\n\
 #elif (SAMPLE_TEXTURES==SAMPLE_TRIPLANAR10_TO_YUVA)\n\
-    sample.x  = shaderTexture[0].Sample(samplerState, coords).x * 64;\n\
-    sample.y  = shaderTexture[1].Sample(samplerState, coords).x * 64;\n\
-    sample.z  = shaderTexture[2].Sample(samplerState, coords).x * 64;\n\
+    sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
+    sample.y  = shaderTexture[1].Sample(samplerState, coords).x;\n\
+    sample.z  = shaderTexture[2].Sample(samplerState, coords).x;\n\
+    sample = sample * 64;\n\
     sample.a  = 1;\n\
 #elif (SAMPLE_TEXTURES==SAMPLE_PLANAR_YUVA_TO_YUVA)\n\
     sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n\
