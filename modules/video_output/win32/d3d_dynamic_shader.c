@@ -123,13 +123,12 @@ inline float4 sourceToLinear(float4 rgb) {\n\
     rgb = pow(rgb, 1.0/ST2084_m1);\n\
     return rgb * 10000;\n\
 #elif (SRC_TO_LINEAR==SRC_TRANSFER_HLG)\n\
-    const float alpha_gain = 2000; /* depends on the display output */\n\
     /* TODO: in one call */\n\
     rgb.r = inverse_HLG(rgb.r);\n\
     rgb.g = inverse_HLG(rgb.g);\n\
     rgb.b = inverse_HLG(rgb.b);\n\
     float3 ootf_2020 = float3(0.2627, 0.6780, 0.0593);\n\
-    float ootf_ys = alpha_gain * dot(ootf_2020, rgb);\n\
+    float ootf_ys = 1000 * dot(ootf_2020, rgb);\n\
     return rgb * pow(ootf_ys, 0.200);\n\
 #elif (SRC_TO_LINEAR==SRC_TRANSFER_709)\n\
     return pow(rgb, 1.0 / 0.45);\n\
