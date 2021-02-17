@@ -236,7 +236,7 @@ static void GetXYZ2RGBMatrix(const struct cie1931_primaries *primaries,
     Float3x3Inverse(out);
 }
 
-static void GetPrimariesTransform(FLOAT Primaries[4*4], video_color_primaries_t src,
+static void GetPrimariesTransform(FLOAT Primaries[4*3], video_color_primaries_t src,
                                   video_color_primaries_t dst)
 {
     const struct cie1931_primaries *p_src = &STANDARD_PRIMARIES[src];
@@ -261,8 +261,6 @@ static void GetPrimariesTransform(FLOAT Primaries[4*4], video_color_primaries_t 
             Primaries[j + i*4] = xyz2rgb[j + i*3];
         Primaries[3 + i*4] = 0;
     }
-    for (size_t j=0;j<4; ++j)
-        Primaries[j + 3*4] = j == 3;
 }
 
 bool D3D_UpdateQuadOpacity(d3d_quad_t *quad, float opacity)
@@ -283,7 +281,7 @@ bool D3D_UpdateQuadLuminanceScale(d3d_quad_t *quad, float luminanceScale)
     return true;
 }
 
-static void MultMat4(FLOAT dst[4*4], const FLOAT left[4*4], const FLOAT right[4*4])
+static void MultMat43(FLOAT dst[4*3], const FLOAT left[4*3], const FLOAT right[4*3])
 {
     // Cache the invariants in registers
     FLOAT x = left[0*4 + 0];
@@ -312,14 +310,14 @@ static void MultMat4(FLOAT dst[4*4], const FLOAT left[4*4], const FLOAT right[4*
     dst[2*4 + 1] = (right[0*4 + 1] * x) + (right[1*4 + 1] * y) + (right[2*4 + 1] * z) + (right[3*4 + 1] * w);
     dst[2*4 + 2] = (right[0*4 + 2] * x) + (right[1*4 + 2] * y) + (right[2*4 + 2] * z) + (right[3*4 + 2] * w);
     dst[2*4 + 3] = (right[0*4 + 3] * x) + (right[1*4 + 3] * y) + (right[2*4 + 3] * z) + (right[3*4 + 3] * w);
-    x = left[3*4 + 0];
-    y = left[3*4 + 1];
-    z = left[3*4 + 2];
-    w = left[3*4 + 3];
-    dst[3*4 + 0] = (right[0*4 + 0] * x) + (right[1*4 + 0] * y) + (right[2*4 + 0] * z) + (right[3*4 + 0] * w);
-    dst[3*4 + 1] = (right[0*4 + 1] * x) + (right[1*4 + 1] * y) + (right[2*4 + 1] * z) + (right[3*4 + 1] * w);
-    dst[3*4 + 2] = (right[0*4 + 2] * x) + (right[1*4 + 2] * y) + (right[2*4 + 2] * z) + (right[3*4 + 2] * w);
-    dst[3*4 + 3] = (right[0*4 + 3] * x) + (right[1*4 + 3] * y) + (right[2*4 + 3] * z) + (right[3*4 + 3] * w);
+    // x = left[3*4 + 0];
+    // y = left[3*4 + 1];
+    // z = left[3*4 + 2];
+    // w = left[3*4 + 3];
+    // dst[3*4 + 0] = (right[0*4 + 0] * x) + (right[1*4 + 0] * y) + (right[2*4 + 0] * z) + (right[3*4 + 0] * w);
+    // dst[3*4 + 1] = (right[0*4 + 1] * x) + (right[1*4 + 1] * y) + (right[2*4 + 1] * z) + (right[3*4 + 1] * w);
+    // dst[3*4 + 2] = (right[0*4 + 2] * x) + (right[1*4 + 2] * y) + (right[2*4 + 2] * z) + (right[3*4 + 2] * w);
+    // dst[3*4 + 3] = (right[0*4 + 3] * x) + (right[1*4 + 3] * y) + (right[2*4 + 3] * z) + (right[3*4 + 3] * w);
 }
 
 void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
@@ -369,51 +367,46 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
         }
     }
 
-    static const FLOAT IDENTITY_4X4[4 * 4] = {
+    static const FLOAT IDENTITY_4X3[4 * 3] = {
         1.f, 0.f, 0.f, 0.f,
         0.f, 1.f, 0.f, 0.f,
         0.f, 0.f, 1.f, 0.f,
-        0.f, 0.f, 0.f, 1.f,
     };
 
     /* matrices for studio range */
     /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.601_conversion, in studio range */
-    static const FLOAT COLORSPACE_BT601_YUV_TO_FULL_RGBA[4*4] = {
+    static const FLOAT COLORSPACE_BT601_YUV_TO_FULL_RGBA[4*3] = {
         1.164383561643836f,                 0.f,  1.596026785714286f, 0.f,
         1.164383561643836f, -0.391762290094914f, -0.812967647237771f, 0.f,
         1.164383561643836f,  2.017232142857142f,                 0.f, 0.f,
-                       0.f,                 0.f,                 0.f, 1.f,
     };
 
-    static const FLOAT COLORSPACE_FULL_RGBA_TO_BT601_YUV[4*4] = {
+    static const FLOAT COLORSPACE_FULL_RGBA_TO_BT601_YUV[4*3] = {
         0.299000f,  0.587000f,  0.114000f, 0.f,
        -0.168736f, -0.331264f,  0.500000f, 0.f,
         0.500000f, -0.418688f, -0.081312f, 0.f,
-              0.f,        0.f,        0.f, 1.f,
     };
 
     /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.709_conversion, in studio range */
-    static const FLOAT COLORSPACE_BT709_YUV_TO_FULL_RGBA[4*4] = {
+    static const FLOAT COLORSPACE_BT709_YUV_TO_FULL_RGBA[4*3] = {
         1.164383561643836f,                 0.f,  1.792741071428571f, 0.f,
         1.164383561643836f, -0.213248614273730f, -0.532909328559444f, 0.f,
         1.164383561643836f,  2.112401785714286f,                 0.f, 0.f,
-                       0.f,                 0.f,                 0.f, 1.f,
     };
     /* see https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.2020_conversion, in studio range */
-    static const FLOAT COLORSPACE_BT2020_YUV_TO_FULL_RGBA[4*4] = {
+    static const FLOAT COLORSPACE_BT2020_YUV_TO_FULL_RGBA[4*3] = {
         1.164383561643836f,  0.000000000000f,  1.678674107143f, 0.f,
         1.164383561643836f, -0.127007098661f, -0.440987687946f, 0.f,
         1.164383561643836f,  2.141772321429f,  0.000000000000f, 0.f,
-                       0.f,              0.f,              0.f, 1.f,
     };
 
-    FLOAT WhitePoint[4*4];
-    memcpy(WhitePoint, IDENTITY_4X4, sizeof(WhitePoint));
+    FLOAT WhitePoint[4*3];
+    memcpy(WhitePoint, IDENTITY_4X3, sizeof(WhitePoint));
 
     const FLOAT *ppColorspace;
     if (RGB_src_shader == DxgiIsRGBFormat(displayFormat->pixelFormat))
     {
-        ppColorspace = IDENTITY_4X4;
+        ppColorspace = IDENTITY_4X3;
     }
     else if (RGB_src_shader)
     {
@@ -453,7 +446,7 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
         WhitePoint[2*4 + 3] = -itu_achromacy;
     }
 
-    MultMat4(quad->shaderConstants->Colorspace, ppColorspace, WhitePoint);
+    MultMat43(quad->shaderConstants->Colorspace, ppColorspace, WhitePoint);
 
     if (fmt->primaries != displayFormat->primaries)
     {

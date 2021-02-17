@@ -38,8 +38,8 @@
 static const char globPixelShaderDefault[] = "\
 cbuffer PS_CONSTANT_BUFFER : register(b0)\n\
 {\n\
-    float4x4 Colorspace;\n\
-    float4x4 Primaries;\n\
+    float4x3 Colorspace;\n\
+    float4x3 Primaries;\n\
     float Opacity;\n\
     float LuminanceScale;\n\
     float2 Boundary;\n\
@@ -89,7 +89,7 @@ struct PS_INPUT\n\
 \n\
 #if (TONE_MAPPING==TONE_MAP_HABLE)\n\
 /* see http://filmicworlds.com/blog/filmic-tonemapping-operators/ */\n\
-inline float4 hable(float4 x) {\n\
+inline float3 hable(float3 x) {\n\
     const float A = 0.15, B = 0.50, C = 0.10, D = 0.20, E = 0.02, F = 0.30;\n\
     return ((x * (A*x + (C*B))+(D*E))/(x * (A*x + B) + (D*F))) - E/F;\n\
 }\n\
@@ -110,7 +110,7 @@ inline float inverse_HLG(float x){\n\
 }\n\
 #endif\n\
 \n\
-inline float4 sourceToLinear(float4 rgb) {\n\
+inline float3 sourceToLinear(float3 rgb) {\n\
 #if (SRC_TO_LINEAR==SRC_TRANSFER_PQ)\n\
     const float ST2084_m1 = 2610.0 / (4096.0 * 4);\n\
     const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;\n\
@@ -140,7 +140,7 @@ inline float4 sourceToLinear(float4 rgb) {\n\
 #endif\n\
 }\n\
 \n\
-inline float4 linearToDisplay(float4 rgb) {\n\
+inline float3 linearToDisplay(float3 rgb) {\n\
 #if (LINEAR_TO_DST==DST_TRANSFER_SRGB)\n\
     return pow(rgb, 1.0 / 2.2);\n\
 #elif (LINEAR_TO_DST==DST_TRANSFER_PQ)\n\
@@ -157,24 +157,24 @@ inline float4 linearToDisplay(float4 rgb) {\n\
 #endif\n\
 }\n\
 \n\
-inline float4 transformPrimaries(float4 rgb) {\n\
+inline float3 transformPrimaries(float4 rgb) {\n\
 #if (PRIMARIES_MODE==TRANSFORM_PRIMARIES)\n\
     return max(mul(rgb, Primaries), 0);\n\
 #else\n\
-    return rgb;\n\
+    return rgb.rgb;\n\
 #endif\n\
 }\n\
 \n\
-inline float4 toneMapping(float4 rgb) {\n\
+inline float3 toneMapping(float3 rgb) {\n\
     rgb = rgb * LuminanceScale;\n\
 #if (TONE_MAPPING==TONE_MAP_HABLE)\n\
-    const float4 HABLE_DIV = hable(11.2);\n\
+    const float3 HABLE_DIV = hable(11.2);\n\
     rgb = hable(rgb) / HABLE_DIV;\n\
 #endif\n\
     return rgb;\n\
 }\n\
 \n\
-inline float4 adjustRange(float4 rgb) {\n\
+inline float3 adjustRange(float3 rgb) {\n\
 #if (SRC_RANGE!=DST_RANGE)\n\
     return clamp((rgb + BLACK_LEVEL_SHIFT) * RANGE_FACTOR, MIN_BLACK_VALUE, MAX_BLACK_VALUE);\n\
 #else\n\
@@ -266,13 +266,13 @@ float4 main( PS_INPUT In ) : SV_TARGET\n\
         sample = sampleTexture( borderSampler, In.uv );\n\
     else\n\
         sample = sampleTexture( normalSampler, In.uv );\n\
-    float4 rgba = max(mul(sample, Colorspace),0);\n\
-    rgba = sourceToLinear(rgba);\n\
-    rgba = transformPrimaries(rgba);\n\
-    rgba = toneMapping(rgba);\n\
-    rgba = linearToDisplay(rgba);\n\
-    rgba = adjustRange(rgba);\n\
-    return float4(rgba.rgb, saturate(sample.a * Opacity));\n\
+    float3 rgb1 = max(mul(sample, Colorspace),0);\n\
+    float3 rgb = transformPrimaries(float4(rgb1, 0));\n\
+    rgb = sourceToLinear(rgb);\n\
+    rgb = toneMapping(rgb);\n\
+    rgb = linearToDisplay(rgb);\n\
+    rgb = adjustRange(rgb);\n\
+    return float4(rgb, saturate(sample.a * Opacity));\n\
 }\n\
 ";
 
