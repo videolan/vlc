@@ -69,8 +69,6 @@ static const char globPixelShaderDefault[] = "\
 \n\
 #define TRANSFORM_PRIMARIES  1\n\
 \n\
-#define SHIFT_YZ_TO_XY       1\n\
-\n\
 #define ADJUST_RANGE         1\n\
 \n\
 #define SAMPLE_NV12_TO_YUVA          1\n\
@@ -186,15 +184,6 @@ static const char globPixelShaderDefault[] = "\
 #endif\n\
   }\n\
   \n\
-  inline float4 reorderPlanes(float4 rgb) {\n\
-#if (REORDER_PLANES==SHIFT_YZ_TO_XY)\n\
-    rgb.x = rgb.y;\n\
-    rgb.y = rgb.z;\n\
-    rgb.z = 0;\n\
-#endif\n\
-    return rgb;\n\
-  }\n\
-  \n\
   inline float4 sampleTexture(SamplerState samplerState, float2 coords) {\n\
     float4 sample;\n\
     /* sampling routine in sample */\n\
@@ -252,7 +241,10 @@ static const char globPixelShaderDefault[] = "\
 #elif (SAMPLE_TEXTURES==SAMPLE_RGBA_TO_NV_R)\n\
     sample = shaderTexture[0].Sample(samplerState, coords);\n\
 #elif (SAMPLE_TEXTURES==SAMPLE_RGBA_TO_NV_GB)\n\
-    sample = shaderTexture[0].Sample(samplerState, coords);\n\
+    sample.x = shaderTexture[0].Sample(samplerState, coords).y;\n\
+    sample.y = shaderTexture[0].Sample(samplerState, coords).z;\n\
+    sample.z = 0;\n\
+    sample.a = 1;\n\
 #elif (SAMPLE_TEXTURES==SAMPLE_PLANAR_YUVA_TO_NV_Y)\n\
     sample.x = shaderTexture[0].Sample(samplerState, coords).x;\n\
     sample.y = 0.0;\n\
@@ -283,7 +275,6 @@ static const char globPixelShaderDefault[] = "\
     rgb = toneMapping(rgb);\n\
     rgb = linearToDisplay(rgb);\n\
     rgb = adjustRange(rgb);\n\
-    rgb = reorderPlanes(rgb);\n\
     return float4(rgb.rgb, saturate(opacity));\n\
   }\n\
 ";
@@ -409,7 +400,6 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
                                    const char *psz_range_factor,
                                    const char *psz_min_black,
                                    const char *psz_max_white,
-                                   const char *psz_move_planes,
                                    d3d_shader_blob *pPSBlob)
 {
     if (var_InheritInteger(o, "verbose") >= 4)
@@ -420,7 +410,6 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
          { "SRC_TO_LINEAR",     psz_src_to_linear },
          { "LINEAR_TO_DST",     psz_linear_to_display },
          { "PRIMARIES_MODE",    psz_primaries_transform },
-         { "REORDER_PLANES",    psz_move_planes },
          { "SAMPLE_TEXTURES",   psz_sampler },
          { "RANGE_ADJUST",      psz_adjust_range },
          { "BLACK_LEVEL_SHIFT", psz_black_level },
@@ -457,7 +446,6 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     const char *psz_primaries_transform = DEFAULT_NOOP;
     const char *psz_tone_mapping      = DEFAULT_NOOP;
     const char *psz_adjust_range      = DEFAULT_NOOP;
-    const char *psz_move_planes_1     = DEFAULT_NOOP;
 
     if ( display->pixelFormat->formatTexture == DXGI_FORMAT_NV12 ||
          display->pixelFormat->formatTexture == DXGI_FORMAT_P010 )
@@ -480,7 +468,6 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
             psz_sampler[0] = "SAMPLE_RGBA_TO_NV_R";
             /* UV */
             psz_sampler[1] = "SAMPLE_RGBA_TO_NV_GB";
-            psz_move_planes_1 = "SHIFT_YZ_TO_XY";
             break;
         case DXGI_FORMAT_UNKNOWN:
             switch (dxgi_fmt->fourcc)
@@ -718,7 +705,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                 psz_linear_to_display,
                                 psz_tone_mapping,
                                 psz_adjust_range, psz_black_level, psz_range_factor, psz_min_black, psz_max_white,
-                                DEFAULT_NOOP, &pPSBlob[0]);
+                                &pPSBlob[0]);
     if (SUCCEEDED(hr) && psz_sampler[1])
     {
         hr = CompilePixelShaderBlob(o, compiler, feature_level,
@@ -728,7 +715,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                     psz_linear_to_display,
                                     psz_tone_mapping,
                                     psz_adjust_range, psz_black_level, psz_range_factor, psz_min_black, psz_max_white,
-                                    psz_move_planes_1, &pPSBlob[1]);
+                                    &pPSBlob[1]);
         if (FAILED(hr))
             D3D_ShaderBlobRelease(&pPSBlob[0]);
     }
