@@ -43,8 +43,7 @@ cbuffer PS_CONSTANT_BUFFER : register(b0)\n\
     float4x4 Primaries;\n\
     float Opacity;\n\
     float LuminanceScale;\n\
-    float BoundaryX;\n\
-    float BoundaryY;\n\
+    float2 Boundary;\n\
 };\n\
 Texture2D shaderTexture[4];\n\
 SamplerState normalSampler : register(s0);\n\
@@ -263,7 +262,7 @@ float4 main( PS_INPUT In ) : SV_TARGET\n\
 {\n\
     float4 sample;\n\
     \n\
-    if (In.uv.x > BoundaryX || In.uv.y > BoundaryY) \n\
+    if (In.uv.x > Boundary.x || In.uv.y > Boundary.y) \n\
         sample = sampleTexture( borderSampler, In.uv );\n\
     else\n\
         sample = sampleTexture( normalSampler, In.uv );\n\
