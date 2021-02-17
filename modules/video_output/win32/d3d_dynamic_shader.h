@@ -36,7 +36,7 @@ HRESULT D3D_CompilePixelShader(vlc_object_t *, const d3d_shader_compiler_t *,
                                D3D_FEATURE_LEVEL,
                                const display_info_t *,
                                video_transfer_func_t,
-                               video_color_primaries_t, bool src_full_range,
+                               bool src_full_range,
                                const d3d_format_t *dxgi_fmt,
                                d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET]);
 

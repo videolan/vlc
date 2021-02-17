@@ -55,11 +55,11 @@ typedef struct
 
 HRESULT D3D11_CompilePixelShaderBlob(vlc_object_t *, const d3d_shader_compiler_t *,
                                  d3d11_device_t *, const display_info_t *,
-                                 video_transfer_func_t, video_color_primaries_t,
+                                 video_transfer_func_t,
                                  bool src_full_range,
-                                 d3d11_quad_t *, d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET]);
-#define D3D11_CompilePixelShaderBlob(a,b,c,d,e,f,g,h,i) \
-    D3D11_CompilePixelShaderBlob(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
+                                 const d3d11_quad_t *, d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET]);
+#define D3D11_CompilePixelShaderBlob(a,b,c,d,e,f,g,h) \
+    D3D11_CompilePixelShaderBlob(VLC_OBJECT(a),b,c,d,e,f,g,h)
 HRESULT D3D11_SetQuadPixelShader(vlc_object_t *, d3d11_device_t *,
                                  bool sharp,
                                  d3d11_quad_t *quad, d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET]);

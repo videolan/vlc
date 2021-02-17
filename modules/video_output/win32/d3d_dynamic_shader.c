@@ -39,7 +39,6 @@ static const char globPixelShaderDefault[] = "\
 cbuffer PS_CONSTANT_BUFFER : register(b0)\n\
 {\n\
     float4x3 Colorspace;\n\
-    float4x3 Primaries;\n\
     float Opacity;\n\
     float LuminanceScale;\n\
     float2 Boundary;\n\
@@ -64,8 +63,6 @@ struct PS_INPUT\n\
 \n\
 #define DST_TRANSFER_SRGB    1\n\
 #define DST_TRANSFER_PQ      2\n\
-\n\
-#define TRANSFORM_PRIMARIES  1\n\
 \n\
 #define FULL_RANGE           1\n\
 #define STUDIO_RANGE         2\n\
@@ -154,14 +151,6 @@ inline float3 linearToDisplay(float3 rgb) {\n\
     return pow(rgb, ST2084_m2);\n\
 #else\n\
     return rgb;\n\
-#endif\n\
-}\n\
-\n\
-inline float3 transformPrimaries(float4 rgb) {\n\
-#if (PRIMARIES_MODE==TRANSFORM_PRIMARIES)\n\
-    return max(mul(rgb, Primaries), 0);\n\
-#else\n\
-    return rgb.rgb;\n\
 #endif\n\
 }\n\
 \n\
@@ -266,8 +255,7 @@ float4 main( PS_INPUT In ) : SV_TARGET\n\
         sample = sampleTexture( borderSampler, In.uv );\n\
     else\n\
         sample = sampleTexture( normalSampler, In.uv );\n\
-    float3 rgb1 = max(mul(sample, Colorspace),0);\n\
-    float3 rgb = transformPrimaries(float4(rgb1, 0));\n\
+    float3 rgb = max(mul(sample, Colorspace),0);\n\
     rgb = sourceToLinear(rgb);\n\
     rgb = toneMapping(rgb);\n\
     rgb = linearToDisplay(rgb);\n\
@@ -389,7 +377,6 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
                                    D3D_FEATURE_LEVEL feature_level,
                                    const char *psz_sampler,
                                    const char *psz_src_to_linear,
-                                   const char *psz_primaries_transform,
                                    const char *psz_linear_to_display,
                                    const char *psz_tone_mapping,
                                    const char *psz_src_range, const char *psz_dst_range,
@@ -406,7 +393,6 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
          { "TONE_MAPPING",      psz_tone_mapping },
          { "SRC_TO_LINEAR",     psz_src_to_linear },
          { "LINEAR_TO_DST",     psz_linear_to_display },
-         { "PRIMARIES_MODE",    psz_primaries_transform },
          { "SAMPLE_TEXTURES",   psz_sampler },
          { "SRC_RANGE",         psz_src_range },
          { "DST_RANGE",         psz_dst_range },
@@ -433,7 +419,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                  D3D_FEATURE_LEVEL feature_level,
                                  const display_info_t *display,
                                  video_transfer_func_t transfer,
-                                 video_color_primaries_t primaries, bool src_full_range,
+                                 bool src_full_range,
                                  const d3d_format_t *dxgi_fmt,
                                  d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET])
 {
@@ -441,7 +427,6 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     const char *psz_sampler[DXGI_MAX_RENDER_TARGET] = {NULL, NULL};
     const char *psz_src_to_linear     = DEFAULT_NOOP;
     const char *psz_linear_to_display = DEFAULT_NOOP;
-    const char *psz_primaries_transform = DEFAULT_NOOP;
     const char *psz_tone_mapping      = DEFAULT_NOOP;
     const char *psz_src_range, *psz_dst_range;
 
@@ -602,24 +587,6 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         }
     }
 
-    if (display->primaries != primaries)
-    {
-        switch (primaries)
-        {
-        case COLOR_PRIMARIES_BT601_525:
-        case COLOR_PRIMARIES_BT601_625:
-        case COLOR_PRIMARIES_BT709:
-        case COLOR_PRIMARIES_BT2020:
-        case COLOR_PRIMARIES_DCI_P3:
-        case COLOR_PRIMARIES_FCC1953:
-            psz_primaries_transform = "TRANSFORM_PRIMARIES";
-            break;
-        default:
-            /* see STANDARD_PRIMARIES */
-            msg_Warn(o, "unhandled color primaries %d", primaries);
-        }
-    }
-
     bool dst_full_range = display->b_full_range;
     if (!DxgiIsRGBFormat(dxgi_fmt) && DxgiIsRGBFormat(display->pixelFormat))
     {
@@ -705,7 +672,6 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     hr = CompilePixelShaderBlob(o, compiler, feature_level,
                                 psz_sampler[0],
                                 psz_src_to_linear,
-                                psz_primaries_transform,
                                 psz_linear_to_display,
                                 psz_tone_mapping,
                                 psz_src_range, psz_dst_range,
@@ -716,7 +682,6 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         hr = CompilePixelShaderBlob(o, compiler, feature_level,
                                     psz_sampler[1],
                                     psz_src_to_linear,
-                                    psz_primaries_transform,
                                     psz_linear_to_display,
                                     psz_tone_mapping,
                                     psz_src_range, psz_dst_range,

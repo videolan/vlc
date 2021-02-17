@@ -450,8 +450,9 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
 
     if (fmt->primaries != displayFormat->primaries)
     {
-        GetPrimariesTransform(quad->shaderConstants->Primaries, fmt->primaries,
-                              displayFormat->primaries);
+        FLOAT Primaries[4*3];
+        GetPrimariesTransform(Primaries, fmt->primaries, displayFormat->primaries);
+        MultMat43(quad->shaderConstants->Colorspace, Primaries, quad->shaderConstants->Colorspace);
     }
 }
 

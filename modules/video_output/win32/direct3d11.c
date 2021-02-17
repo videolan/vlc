@@ -1037,7 +1037,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { 0 };
     hr = D3D11_CompilePixelShaderBlob(vd, &sys->shaders, sys->d3d_dev,
-                                  &sys->display, fmt->transfer, fmt->primaries,
+                                  &sys->display, fmt->transfer,
                                   fmt->color_range == COLOR_RANGE_FULL,
                                   &sys->picQuad, pPSBlob);
     if (FAILED(hr))
@@ -1186,7 +1186,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     {
         d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { 0 };
         hr = D3D11_CompilePixelShaderBlob(vd, &sys->shaders, sys->d3d_dev,
-                                      &sys->display, TRANSFER_FUNC_SRGB, COLOR_PRIMARIES_SRGB, true,
+                                      &sys->display, TRANSFER_FUNC_SRGB, true,
                                       &sys->regionQuad, pPSBlob);
         if (FAILED(hr))
         {

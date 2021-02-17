@@ -46,12 +46,11 @@ typedef struct {
 /* structures passed to the pixel shader */
 typedef struct {
     FLOAT Colorspace[4*3];
-    FLOAT Primaries[4*3];
     FLOAT Opacity;
     FLOAT LuminanceScale;
     FLOAT BoundaryX;
     FLOAT BoundaryY;
-    FLOAT padding[36]; // 256 bytes alignment
+    FLOAT padding[48]; // 256 bytes alignment
 } PS_CONSTANT_BUFFER;
 
 typedef struct {

@@ -43,11 +43,11 @@ HRESULT (D3D11_CompilePixelShaderBlob)(vlc_object_t *o, const d3d_shader_compile
                                    d3d11_device_t *d3d_dev,
                                    const display_info_t *display,
                                    video_transfer_func_t transfer,
-                                   video_color_primaries_t primaries, bool src_full_range,
-                                   d3d11_quad_t *quad, d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET])
+                                   bool src_full_range,
+                                   const d3d11_quad_t *quad, d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET])
 {
     return D3D_CompilePixelShader(o, compiler, d3d_dev->feature_level,
-                                  display, transfer, primaries,
+                                  display, transfer,
                                   src_full_range, quad->generic.textureFormat, pPSBlob);
 }
 
