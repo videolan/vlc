@@ -36,8 +36,8 @@
 #include "d3d_dynamic_shader.h"
 
 static const char globPixelShaderDefault[] = "\
-  cbuffer PS_CONSTANT_BUFFER : register(b0)\n\
-  {\n\
+cbuffer PS_CONSTANT_BUFFER : register(b0)\n\
+{\n\
     float4x4 WhitePoint;\n\
     float4x4 Colorspace;\n\
     float4x4 Primaries;\n\
@@ -45,17 +45,17 @@ static const char globPixelShaderDefault[] = "\
     float LuminanceScale;\n\
     float BoundaryX;\n\
     float BoundaryY;\n\
-  };\n\
-  Texture2D shaderTexture[4];\n\
-  SamplerState normalSampler : register(s0);\n\
-  SamplerState borderSampler : register(s1);\n\
-  \n\
-  struct PS_INPUT\n\
-  {\n\
+};\n\
+Texture2D shaderTexture[4];\n\
+SamplerState normalSampler : register(s0);\n\
+SamplerState borderSampler : register(s1);\n\
+\n\
+struct PS_INPUT\n\
+{\n\
     float4 Position   : SV_POSITION;\n\
     float2 uv         : TEXCOORD;\n\
-  };\n\
-  \n\
+};\n\
+\n\
 #define TONE_MAP_HABLE       1\n\
 \n\
 #define SRC_TRANSFER_709     1\n\
@@ -89,29 +89,29 @@ static const char globPixelShaderDefault[] = "\
 #define SAMPLE_PLANAR_YUVA_TO_NV_UV 15\n\
 \n\
 #if (TONE_MAPPING==TONE_MAP_HABLE)\n\
-  /* see http://filmicworlds.com/blog/filmic-tonemapping-operators/ */\n\
-  inline float4 hable(float4 x) {\n\
-      const float A = 0.15, B = 0.50, C = 0.10, D = 0.20, E = 0.02, F = 0.30;\n\
-      return ((x * (A*x + (C*B))+(D*E))/(x * (A*x + B) + (D*F))) - E/F;\n\
-  }\n\
+/* see http://filmicworlds.com/blog/filmic-tonemapping-operators/ */\n\
+inline float4 hable(float4 x) {\n\
+    const float A = 0.15, B = 0.50, C = 0.10, D = 0.20, E = 0.02, F = 0.30;\n\
+    return ((x * (A*x + (C*B))+(D*E))/(x * (A*x + B) + (D*F))) - E/F;\n\
+}\n\
 #endif\n\
-  \n\
+\n\
 #if (SRC_TO_LINEAR==SRC_TRANSFER_HLG)\n\
-  /* https://en.wikipedia.org/wiki/Hybrid_Log-Gamma#Technical_details */\n\
-  inline float inverse_HLG(float x){\n\
-      const float B67_a = 0.17883277;\n\
-      const float B67_b = 0.28466892;\n\
-      const float B67_c = 0.55991073;\n\
-      const float B67_inv_r2 = 4.0; /* 1/0.5² */\n\
-      if (x <= 0.5)\n\
-          x = x * x * B67_inv_r2;\n\
-      else\n\
-          x = exp((x - B67_c) / B67_a) + B67_b;\n\
-      return x;\n\
-  }\n\
+/* https://en.wikipedia.org/wiki/Hybrid_Log-Gamma#Technical_details */\n\
+inline float inverse_HLG(float x){\n\
+    const float B67_a = 0.17883277;\n\
+    const float B67_b = 0.28466892;\n\
+    const float B67_c = 0.55991073;\n\
+    const float B67_inv_r2 = 4.0; /* 1/0.5² */\n\
+    if (x <= 0.5)\n\
+        x = x * x * B67_inv_r2;\n\
+    else\n\
+        x = exp((x - B67_c) / B67_a) + B67_b;\n\
+    return x;\n\
+}\n\
 #endif\n\
-  \n\
-  inline float4 sourceToLinear(float4 rgb) {\n\
+\n\
+inline float4 sourceToLinear(float4 rgb) {\n\
 #if (SRC_TO_LINEAR==SRC_TRANSFER_PQ)\n\
     const float ST2084_m1 = 2610.0 / (4096.0 * 4);\n\
     const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;\n\
@@ -140,9 +140,9 @@ static const char globPixelShaderDefault[] = "\
 #else\n\
     return rgb;\n\
 #endif\n\
-  }\n\
-  \n\
-  inline float4 linearToDisplay(float4 rgb) {\n\
+}\n\
+\n\
+inline float4 linearToDisplay(float4 rgb) {\n\
 #if (LINEAR_TO_DST==DST_TRANSFER_SRGB)\n\
     return pow(rgb, 1.0 / 2.2);\n\
 #elif (LINEAR_TO_DST==DST_TRANSFER_PQ)\n\
@@ -157,34 +157,34 @@ static const char globPixelShaderDefault[] = "\
 #else\n\
     return rgb;\n\
 #endif\n\
-  }\n\
-  \n\
-  inline float4 transformPrimaries(float4 rgb) {\n\
+}\n\
+\n\
+inline float4 transformPrimaries(float4 rgb) {\n\
 #if (PRIMARIES_MODE==TRANSFORM_PRIMARIES)\n\
     return max(mul(rgb, Primaries), 0);\n\
 #else\n\
     return rgb;\n\
 #endif\n\
-  }\n\
-  \n\
-  inline float4 toneMapping(float4 rgb) {\n\
+}\n\
+\n\
+inline float4 toneMapping(float4 rgb) {\n\
     rgb = rgb * LuminanceScale;\n\
 #if (TONE_MAPPING==TONE_MAP_HABLE)\n\
     const float4 HABLE_DIV = hable(11.2);\n\
     rgb = hable(rgb) / HABLE_DIV;\n\
 #endif\n\
-      return rgb;\n\
-  }\n\
-  \n\
-  inline float4 adjustRange(float4 rgb) {\n\
+    return rgb;\n\
+}\n\
+\n\
+inline float4 adjustRange(float4 rgb) {\n\
 #if (RANGE_ADJUST==ADJUST_RANGE)\n\
     return clamp((rgb + BLACK_LEVEL_SHIFT) * RANGE_FACTOR, MIN_BLACK_VALUE, MAX_BLACK_VALUE);\n\
 #else\n\
     return rgb;\n\
 #endif\n\
-  }\n\
-  \n\
-  inline float4 sampleTexture(SamplerState samplerState, float2 coords) {\n\
+}\n\
+\n\
+inline float4 sampleTexture(SamplerState samplerState, float2 coords) {\n\
     float4 sample;\n\
     /* sampling routine in sample */\n\
 #if (SAMPLE_TEXTURES==SAMPLE_NV12_TO_YUVA)\n\
@@ -257,10 +257,10 @@ static const char globPixelShaderDefault[] = "\
     sample.a = shaderTexture[3].Sample(samplerState, coords).x;\n\
 #endif\n\
     return sample;\n\
-  }\n\
-  \n\
-  float4 main( PS_INPUT In ) : SV_TARGET\n\
-  {\n\
+}\n\
+\n\
+float4 main( PS_INPUT In ) : SV_TARGET\n\
+{\n\
     float4 sample;\n\
     \n\
     if (In.uv.x > BoundaryX || In.uv.y > BoundaryY) \n\
@@ -276,42 +276,42 @@ static const char globPixelShaderDefault[] = "\
     rgb = linearToDisplay(rgb);\n\
     rgb = adjustRange(rgb);\n\
     return float4(rgb.rgb, saturate(opacity));\n\
-  }\n\
+}\n\
 ";
 
 static const char globVertexShader[] = "\n\
 #if HAS_PROJECTION\n\
 cbuffer VS_PROJECTION_CONST : register(b0)\n\
 {\n\
-   float4x4 View;\n\
-   float4x4 Zoom;\n\
-   float4x4 Projection;\n\
+    float4x4 View;\n\
+    float4x4 Zoom;\n\
+    float4x4 Projection;\n\
 };\n\
 #endif\n\
 struct d3d_vertex_t\n\
 {\n\
-  float3 Position   : POSITION;\n\
-  float2 uv         : TEXCOORD;\n\
+    float3 Position   : POSITION;\n\
+    float2 uv         : TEXCOORD;\n\
 };\n\
 \n\
 struct PS_INPUT\n\
 {\n\
-  float4 Position   : SV_POSITION;\n\
-  float2 uv         : TEXCOORD;\n\
+    float4 Position   : SV_POSITION;\n\
+    float2 uv         : TEXCOORD;\n\
 };\n\
 \n\
 PS_INPUT main( d3d_vertex_t In )\n\
 {\n\
-  PS_INPUT Output;\n\
-  float4 pos = float4(In.Position, 1);\n\
+    PS_INPUT Output;\n\
+    float4 pos = float4(In.Position, 1);\n\
 #if HAS_PROJECTION\n\
     pos = mul(View, pos);\n\
     pos = mul(Zoom, pos);\n\
     pos = mul(Projection, pos);\n\
 #endif\n\
-  Output.Position = pos;\n\
-  Output.uv = In.uv;\n\
-  return Output;\n\
+    Output.Position = pos;\n\
+    Output.uv = In.uv;\n\
+    return Output;\n\
 }\n\
 ";
 
