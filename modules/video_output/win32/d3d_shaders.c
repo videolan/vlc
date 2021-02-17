@@ -283,6 +283,45 @@ bool D3D_UpdateQuadLuminanceScale(d3d_quad_t *quad, float luminanceScale)
     return true;
 }
 
+static void MultMat4(FLOAT dst[4*4], const FLOAT left[4*4], const FLOAT right[4*4])
+{
+    // Cache the invariants in registers
+    FLOAT x = left[0*4 + 0];
+    FLOAT y = left[0*4 + 1];
+    FLOAT z = left[0*4 + 2];
+    FLOAT w = left[0*4 + 3];
+    // Perform the operation on the first row
+    dst[0*4 + 0] = (right[0*4 + 0] * x) + (right[1*4 + 0] * y) + (right[2*4 + 0] * z) + (right[3*4 + 0] * w);
+    dst[0*4 + 1] = (right[0*4 + 1] * x) + (right[1*4 + 1] * y) + (right[2*4 + 1] * z) + (right[3*4 + 1] * w);
+    dst[0*4 + 2] = (right[0*4 + 2] * x) + (right[1*4 + 2] * y) + (right[2*4 + 2] * z) + (right[3*4 + 2] * w);
+    dst[0*4 + 3] = (right[0*4 + 3] * x) + (right[1*4 + 3] * y) + (right[2*4 + 3] * z) + (right[3*4 + 3] * w);
+    // Repeat for all the other rows
+    x = left[1*4 + 0];
+    y = left[1*4 + 1];
+    z = left[1*4 + 2];
+    w = left[1*4 + 3];
+    dst[1*4 + 0] = (right[0*4 + 0] * x) + (right[1*4 + 0] * y) + (right[2*4 + 0] * z) + (right[3*4 + 0] * w);
+    dst[1*4 + 1] = (right[0*4 + 1] * x) + (right[1*4 + 1] * y) + (right[2*4 + 1] * z) + (right[3*4 + 1] * w);
+    dst[1*4 + 2] = (right[0*4 + 2] * x) + (right[1*4 + 2] * y) + (right[2*4 + 2] * z) + (right[3*4 + 2] * w);
+    dst[1*4 + 3] = (right[0*4 + 3] * x) + (right[1*4 + 3] * y) + (right[2*4 + 3] * z) + (right[3*4 + 3] * w);
+    x = left[2*4 + 0];
+    y = left[2*4 + 1];
+    z = left[2*4 + 2];
+    w = left[2*4 + 3];
+    dst[2*4 + 0] = (right[0*4 + 0] * x) + (right[1*4 + 0] * y) + (right[2*4 + 0] * z) + (right[3*4 + 0] * w);
+    dst[2*4 + 1] = (right[0*4 + 1] * x) + (right[1*4 + 1] * y) + (right[2*4 + 1] * z) + (right[3*4 + 1] * w);
+    dst[2*4 + 2] = (right[0*4 + 2] * x) + (right[1*4 + 2] * y) + (right[2*4 + 2] * z) + (right[3*4 + 2] * w);
+    dst[2*4 + 3] = (right[0*4 + 3] * x) + (right[1*4 + 3] * y) + (right[2*4 + 3] * z) + (right[3*4 + 3] * w);
+    x = left[3*4 + 0];
+    y = left[3*4 + 1];
+    z = left[3*4 + 2];
+    w = left[3*4 + 3];
+    dst[3*4 + 0] = (right[0*4 + 0] * x) + (right[1*4 + 0] * y) + (right[2*4 + 0] * z) + (right[3*4 + 0] * w);
+    dst[3*4 + 1] = (right[0*4 + 1] * x) + (right[1*4 + 1] * y) + (right[2*4 + 1] * z) + (right[3*4 + 1] * w);
+    dst[3*4 + 2] = (right[0*4 + 2] * x) + (right[1*4 + 2] * y) + (right[2*4 + 2] * z) + (right[3*4 + 2] * w);
+    dst[3*4 + 3] = (right[0*4 + 3] * x) + (right[1*4 + 3] * y) + (right[2*4 + 3] * z) + (right[3*4 + 3] * w);
+}
+
 void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
                    const display_info_t *displayFormat)
 {
@@ -368,7 +407,8 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
                        0.f,              0.f,              0.f, 1.f,
     };
 
-    memcpy(quad->shaderConstants->WhitePoint, IDENTITY_4X4, sizeof(quad->shaderConstants->WhitePoint));
+    FLOAT WhitePoint[4*4];
+    memcpy(WhitePoint, IDENTITY_4X4, sizeof(WhitePoint));
 
     const FLOAT *ppColorspace;
     if (RGB_src_shader == DxgiIsRGBFormat(displayFormat->pixelFormat))
@@ -378,9 +418,9 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
     else if (RGB_src_shader)
     {
         ppColorspace = COLORSPACE_FULL_RGBA_TO_BT601_YUV;
-        quad->shaderConstants->WhitePoint[0*4 + 3] = -itu_black_level;
-        quad->shaderConstants->WhitePoint[1*4 + 3] = itu_achromacy;
-        quad->shaderConstants->WhitePoint[2*4 + 3] = itu_achromacy;
+        WhitePoint[0*4 + 3] = -itu_black_level;
+        WhitePoint[1*4 + 3] = itu_achromacy;
+        WhitePoint[2*4 + 3] = itu_achromacy;
     }
     else
     {
@@ -406,13 +446,14 @@ void D3D_SetupQuad(vlc_object_t *o, const video_format_t *fmt, d3d_quad_t *quad,
                 }
                 break;
         }
+
         /* all matrices work in studio range and output in full range */
-        quad->shaderConstants->WhitePoint[0*4 + 3] = -itu_black_level;
-        quad->shaderConstants->WhitePoint[1*4 + 3] = -itu_achromacy;
-        quad->shaderConstants->WhitePoint[2*4 + 3] = -itu_achromacy;
+        WhitePoint[0*4 + 3] = -itu_black_level;
+        WhitePoint[1*4 + 3] = -itu_achromacy;
+        WhitePoint[2*4 + 3] = -itu_achromacy;
     }
 
-    memcpy(quad->shaderConstants->Colorspace, ppColorspace, sizeof(quad->shaderConstants->Colorspace));
+    MultMat4(quad->shaderConstants->Colorspace, ppColorspace, WhitePoint);
 
     if (fmt->primaries != displayFormat->primaries)
     {

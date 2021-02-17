@@ -38,7 +38,6 @@
 static const char globPixelShaderDefault[] = "\
 cbuffer PS_CONSTANT_BUFFER : register(b0)\n\
 {\n\
-    float4x4 WhitePoint;\n\
     float4x4 Colorspace;\n\
     float4x4 Primaries;\n\
     float Opacity;\n\
@@ -267,7 +266,7 @@ float4 main( PS_INPUT In ) : SV_TARGET\n\
         sample = sampleTexture( borderSampler, In.uv );\n\
     else\n\
         sample = sampleTexture( normalSampler, In.uv );\n\
-    float4 rgba = max(mul(mul(sample, WhitePoint), Colorspace),0);\n\
+    float4 rgba = max(mul(sample, Colorspace),0);\n\
     float opacity = rgba.a * Opacity;\n\
     float4 rgb = rgba; rgb.a = 0;\n\
     rgb = sourceToLinear(rgb);\n\
