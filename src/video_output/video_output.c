@@ -174,6 +174,7 @@ typedef struct vout_thread_sys_t
         vout_chrono_t render;         /**< picture render time estimator */
     } chrono;
 
+    bool b_display_avstat;
     vlc_atomic_rc_t rc;
 
 } vout_thread_sys_t;
@@ -1400,11 +1401,12 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
         vout_display_Display(vd, todisplay);
 
     vlc_tick_t now_ts = vlc_tick_now();
-    msg_Info( vd, "avstats: ts=%" PRId64 ", [RENDER][VIDEO], pts_per_vsync=%" PRId64 " pts=%" PRId64 " pcr=%" PRId64,
-              NS_FROM_VLC_TICK(now_ts),
-              NS_FROM_VLC_TICK(pts),
-              NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts),
-              NS_FROM_VLC_TICK(system_now - clock_offset));
+    if (sys->b_display_avstat)
+        msg_Info( vd, "avstats: ts=%" PRId64 ", [RENDER][VIDEO], pts_per_vsync=%" PRId64 " pts=%" PRId64 " pcr=%" PRId64,
+                  NS_FROM_VLC_TICK(now_ts),
+                  NS_FROM_VLC_TICK(pts),
+                  NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts),
+                  NS_FROM_VLC_TICK(system_now - clock_offset));
 
     vlc_queuedmutex_unlock(&sys->display_lock);
     vlc_mutex_unlock(&sys->render_lock);
@@ -1900,6 +1902,7 @@ vout_CreateCommon(vlc_object_t *object, void *owner,
     vlc_atomic_rc_init(&sys->rc);
     vlc_mouse_Init(&sys->mouse);
     sys->rendering_enabled = true;
+    sys->b_display_avstat = var_InheritBool(object, "avstat");
 
     return vout;
 }

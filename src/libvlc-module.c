@@ -2823,7 +2823,8 @@ vlc_module_begin ()
     /* SK options */
     add_bool( "vsync", true, "", "" )
         change_volatile ()
-
+    add_bool( "avstat", true, "", "" )
+        change_volatile ()
 vlc_module_end ()
 
 /*****************************************************************************
