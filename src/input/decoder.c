@@ -160,6 +160,8 @@ struct vlc_input_decoder_t
     bool b_idle;
     bool aborting;
 
+    bool b_display_avstat;
+
     /* CC */
 #define MAX_CC_DECODERS 64 /* The es_out only creates one type of es */
     struct
@@ -1126,7 +1128,7 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
         p_dec->fmt_in.i_cat == AUDIO_ES ? "AUDIO" :
         NULL;
 
-    if( type != NULL )
+    if( type != NULL && p_owner->b_display_avstat)
     {
         msg_Info( p_dec, "avstats: ts=%" PRId64 ", [DEC][OUT][%s], pts=%" PRId64,
                   NS_FROM_VLC_TICK(vlc_tick_now()), type,
@@ -1340,7 +1342,7 @@ static void DecoderThread_DecodeBlock( vlc_input_decoder_t *p_owner, block_t *p_
         p_dec->fmt_in.i_cat == AUDIO_ES ? "AUDIO" :
         NULL;
 
-    if( type != NULL && p_block )
+    if( type != NULL && p_block && p_owner->b_display_avstat)
     {
         msg_Info( p_dec, "avstats: ts=%" PRId64 ", [DEC][IN][%s], dts=%" PRId64
                           ", pts=%" PRId64,
@@ -1864,6 +1866,7 @@ CreateDecoder( vlc_object_t *p_parent,
     p_owner->drained = false;
     atomic_init( &p_owner->reload, RELOAD_NO_REQUEST );
     p_owner->b_idle = false;
+    p_owner->b_display_avstat = var_InheritBool(p_parent, "avstat");
 
     p_owner->mouse_event = NULL;
     p_owner->mouse_opaque = NULL;

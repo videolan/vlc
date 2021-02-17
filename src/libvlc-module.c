@@ -199,7 +199,7 @@ static const char *const ppsz_stereo_mode_texts[] = { N_("Unset"),
 };
 
 #define MIX_MODE_TEXT N_("Audio mix mode")
-static const int pi_mix_mode_values[] = { 
+static const int pi_mix_mode_values[] = {
     AOUT_MIX_MODE_UNSET, AOUT_MIX_MODE_STEREO, AOUT_MIX_MODE_BINAURAL,
     AOUT_MIX_MODE_4_0, AOUT_MIX_MODE_5_1, AOUT_MIX_MODE_7_1,
 };
@@ -2817,6 +2817,8 @@ vlc_module_begin ()
     add_string( "config", NULL, CONFIG_TEXT, "", false )
         change_volatile ()
 
+    add_bool( "avstat", true, "", "", true )
+        change_volatile ()
 vlc_module_end ()
 
 /*****************************************************************************

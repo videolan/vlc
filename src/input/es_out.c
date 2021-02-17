@@ -228,6 +228,8 @@ typedef struct
     /* Used only to limit debugging output */
     int         i_prev_stream_level;
 
+    bool        b_display_avstat;
+
     es_out_t out;
 } es_out_sys_t;
 
@@ -541,6 +543,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
     p_sys->p_input = p_input;
     p_sys->main_source = main_source;
 
+    p_sys->b_display_avstat = var_InheritBool( p_input, "avstat" );
     p_sys->b_active = false;
     p_sys->i_mode   = ES_OUT_MODE_NONE;
 
@@ -2843,7 +2846,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         es->fmt.i_cat == AUDIO_ES ? "AUDIO" :
         NULL;
 
-    if( type != NULL )
+    if( type != NULL && p_sys->b_display_avstat )
     {
         msg_Info( p_input, "avstats: ts=%" PRId64 ", [DMX][OUT][%s], dts=%" PRId64 ", pts=%" PRId64,
                   NS_FROM_VLC_TICK(vlc_tick_now()), type,
@@ -3305,8 +3308,9 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
 
         p_pgrm->i_last_pcr = i_pcr;
 
-        msg_Info( p_sys->p_input, "avstats: ts=%" PRId64 ", [DMX][OUT][PCR], pcr=%" PRId64,
-                  NS_FROM_VLC_TICK(vlc_tick_now()), NS_FROM_VLC_TICK(i_pcr) );
+        if( p_sys->b_display_avstat )
+            msg_Info( p_sys->p_input, "avstats: ts=%" PRId64 ", [DMX][OUT][PCR], pcr=%" PRId64,
+                      NS_FROM_VLC_TICK(vlc_tick_now()), NS_FROM_VLC_TICK(i_pcr) );
 
         input_thread_private_t *priv = input_priv(p_sys->p_input);
 
