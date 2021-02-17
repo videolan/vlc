@@ -127,7 +127,10 @@ static int Open (vlc_object_t *p_this)
     {
         glob_t gl;
 
-        glob ("/usr/share/sounds/sf2/*.sf2", GLOB_NOESCAPE, NULL, &gl);
+        glob("/usr/share/sounds/sf2/*.sf2", GLOB_NOESCAPE, NULL, &gl);
+        glob("/usr/share/soundfonts/*.sf2", GLOB_NOESCAPE | GLOB_APPEND, NULL,
+             &gl);
+
         for (size_t i = 0; i < gl.gl_pathc; i++)
         {
             const char *path = gl.gl_pathv[i];
