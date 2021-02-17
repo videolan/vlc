@@ -69,7 +69,8 @@ struct PS_INPUT\n\
 \n\
 #define TRANSFORM_PRIMARIES  1\n\
 \n\
-#define ADJUST_RANGE         1\n\
+#define FULL_RANGE           1\n\
+#define STUDIO_RANGE         2\n\
 \n\
 #define SAMPLE_NV12_TO_YUVA          1\n\
 #define SAMPLE_YUY2_TO_YUVA          2\n\
@@ -176,7 +177,7 @@ inline float4 toneMapping(float4 rgb) {\n\
 }\n\
 \n\
 inline float4 adjustRange(float4 rgb) {\n\
-#if (RANGE_ADJUST==ADJUST_RANGE)\n\
+#if (SRC_RANGE!=DST_RANGE)\n\
     return clamp((rgb + BLACK_LEVEL_SHIFT) * RANGE_FACTOR, MIN_BLACK_VALUE, MAX_BLACK_VALUE);\n\
 #else\n\
     return rgb;\n\
@@ -394,7 +395,7 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
                                    const char *psz_primaries_transform,
                                    const char *psz_linear_to_display,
                                    const char *psz_tone_mapping,
-                                   const char *psz_adjust_range,
+                                   const char *psz_src_range, const char *psz_dst_range,
                                    const char *psz_black_level,
                                    const char *psz_range_factor,
                                    const char *psz_min_black,
@@ -410,7 +411,8 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
          { "LINEAR_TO_DST",     psz_linear_to_display },
          { "PRIMARIES_MODE",    psz_primaries_transform },
          { "SAMPLE_TEXTURES",   psz_sampler },
-         { "RANGE_ADJUST",      psz_adjust_range },
+         { "SRC_RANGE",         psz_src_range },
+         { "DST_RANGE",         psz_dst_range },
          { "BLACK_LEVEL_SHIFT", psz_black_level },
          { "RANGE_FACTOR",      psz_range_factor },
          { "MIN_BLACK_VALUE",   psz_min_black },
@@ -444,7 +446,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     const char *psz_linear_to_display = DEFAULT_NOOP;
     const char *psz_primaries_transform = DEFAULT_NOOP;
     const char *psz_tone_mapping      = DEFAULT_NOOP;
-    const char *psz_adjust_range      = DEFAULT_NOOP;
+    const char *psz_src_range, *psz_dst_range;
 
     if ( display->pixelFormat->formatTexture == DXGI_FORMAT_NV12 ||
          display->pixelFormat->formatTexture == DXGI_FORMAT_P010 )
@@ -621,16 +623,29 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         }
     }
 
+    bool dst_full_range = display->b_full_range;
+    if (!DxgiIsRGBFormat(dxgi_fmt) && DxgiIsRGBFormat(display->pixelFormat))
+    {
+        /* the YUV->RGB conversion already output full range */
+        if (!src_full_range)
+            src_full_range = true; // account for this conversion
+        else
+        {
+            if (!dst_full_range)
+                msg_Warn(o, "unsupported display full range YUV on studio range RGB");
+            dst_full_range = false; // force a conversion down
+        }
+    }
+
     int range_adjust = 0;
-    if (display->b_full_range) {
+    psz_src_range = src_full_range ? "FULL_RANGE" : "STUDIO_RANGE";
+    psz_dst_range = display->b_full_range ? "FULL_RANGE" : "STUDIO_RANGE";
+    if (dst_full_range != src_full_range) {
         if (!src_full_range)
             range_adjust = 1; /* raise the source to full range */
-    } else {
-        if (src_full_range)
+        else
             range_adjust = -1; /* lower the source to studio range */
     }
-    if (!DxgiIsRGBFormat(dxgi_fmt) && !src_full_range && DxgiIsRGBFormat(display->pixelFormat))
-        range_adjust--; /* the YUV->RGB conversion already output full range */
 
     FLOAT black_level = 0;
     FLOAT range_factor = 1.0f;
@@ -670,22 +685,15 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         if (range_adjust > 0)
         {
             /* expand the range from studio to full range */
-            while (range_adjust--)
-            {
-                black_level -= itu_black_level;
-                range_factor /= itu_range_factor;
-            }
+            black_level -= itu_black_level;
+            range_factor /= itu_range_factor;
         }
         else
         {
             /* shrink the range to studio range */
-            while (range_adjust++)
-            {
-                black_level += itu_black_level;
-                range_factor *= itu_range_factor;
-            }
+            black_level += itu_black_level;
+            range_factor *= itu_range_factor;
         }
-        psz_adjust_range = "ADJUST_RANGE";
     }
     char psz_black_level[20];
     char psz_range_factor[20];
@@ -703,7 +711,8 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                 psz_primaries_transform,
                                 psz_linear_to_display,
                                 psz_tone_mapping,
-                                psz_adjust_range, psz_black_level, psz_range_factor, psz_min_black, psz_max_white,
+                                psz_src_range, psz_dst_range,
+                                psz_black_level, psz_range_factor, psz_min_black, psz_max_white,
                                 &pPSBlob[0]);
     if (SUCCEEDED(hr) && psz_sampler[1])
     {
@@ -713,7 +722,8 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                     psz_primaries_transform,
                                     psz_linear_to_display,
                                     psz_tone_mapping,
-                                    psz_adjust_range, psz_black_level, psz_range_factor, psz_min_black, psz_max_white,
+                                    psz_src_range, psz_dst_range,
+                                    psz_black_level, psz_range_factor, psz_min_black, psz_max_white,
                                     &pPSBlob[1]);
         if (FAILED(hr))
             D3D_ShaderBlobRelease(&pPSBlob[0]);
