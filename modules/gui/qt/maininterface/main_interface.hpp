@@ -158,6 +158,7 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(bool clientSideDecoration READ useClientSideDecoration NOTIFY useClientSideDecorationChanged)
     Q_PROPERTY(bool hasToolbarMenu READ hasToolbarMenu NOTIFY hasToolbarMenuChanged)
     Q_PROPERTY(bool canShowVideoPIP READ canShowVideoPIP CONSTANT)
+    Q_PROPERTY(bool pinVideoControls READ pinVideoControls WRITE setPinVideoControls NOTIFY pinVideoControlsChanged)
 
 public:
     /* tors */
@@ -205,6 +206,7 @@ public:
     inline bool hasToolbarMenu() const { return m_hasToolbarMenu; }
     inline bool canShowVideoPIP() const { return m_canShowVideoPIP; }
     inline void setCanShowVideoPIP(bool canShowVideoPIP) { m_canShowVideoPIP = canShowVideoPIP; }
+    inline bool pinVideoControls() const { return m_pinVideoControls; }
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -276,6 +278,7 @@ protected:
     bool                 m_clientSideDecoration = false;
     bool                 m_hasToolbarMenu = false;
     bool                 m_canShowVideoPIP = false;
+    bool                 m_pinVideoControls = false;
 
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?
@@ -300,6 +303,7 @@ public slots:
     void setGridView( bool );
     void incrementIntfUserScaleFactor( bool increment);
     void setIntfUserScaleFactor( float );
+    void setPinVideoControls( bool );
 
     void emitBoss();
     void emitRaise();
@@ -350,6 +354,7 @@ signals:
     void requestInterfaceNormal();
 
     void intfScaleFactorChanged();
+    void pinVideoControlsChanged( bool );
 };
 
 #endif

@@ -150,6 +150,7 @@ MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::Windo
     m_gridView = getSettings()->value( "MainWindow/grid-view", true).toBool();
     QString currentColorScheme = getSettings()->value( "MainWindow/color-scheme", "system").toString();
     m_showRemainingTime = getSettings()->value( "MainWindow/ShowRemainingTime", false ).toBool();
+    m_pinVideoControls = getSettings()->value("MainWindow/pin-video-controls", false ).toBool();
 
     m_colorScheme = new ColorSchemeModel(this);
     m_colorScheme->setCurrent(currentColorScheme);
@@ -240,6 +241,7 @@ MainInterface::~MainInterface()
     settings->setValue( "pl-dock-status", b_playlistDocked );
     settings->setValue( "ShowRemainingTime", m_showRemainingTime );
     settings->setValue( "interface-scale", m_intfUserScaleFactor );
+    settings->setValue( "pin-video-controls", m_pinVideoControls );
 
     /* Save playlist state */
     settings->setValue( "playlist-visible", playlistVisible );
@@ -366,6 +368,15 @@ void MainInterface::setIntfUserScaleFactor(float newValue)
 {
     m_intfUserScaleFactor = std::max(std::min(newValue, getMaxIntfUserScaleFactor()), getMinIntfUserScaleFactor());
     updateIntfScaleFactor();
+}
+
+void MainInterface::setPinVideoControls(bool pinVideoControls)
+{
+    if (m_pinVideoControls == pinVideoControls)
+        return;
+
+    m_pinVideoControls = pinVideoControls;
+    emit pinVideoControlsChanged(m_pinVideoControls);
 }
 
 inline void MainInterface::initSystray()
