@@ -22,6 +22,7 @@
 
 #include "../../adaptive/playlist/SegmentBaseType.hpp"
 #include "../../adaptive/playlist/BaseRepresentation.h"
+#include "../../adaptive/playlist/CodecDescription.hpp"
 #include "CodecParameters.hpp"
 
 namespace adaptive
@@ -38,6 +39,13 @@ namespace smooth
     {
         using namespace adaptive;
         using namespace adaptive::playlist;
+
+        class SmoothCodecDescription : public CodecDescription
+        {
+            public:
+                SmoothCodecDescription(const CodecParameters &);
+                virtual ~SmoothCodecDescription();
+        };
 
         class QualityLevel : public BaseRepresentation,
                                public Initializable<InitSegment>
@@ -57,6 +65,7 @@ namespace smooth
                 const CodecParameters & getCodecParameters() const;
 
             protected:
+                virtual CodecDescription * makeCodecDescription(const std::string &) const override;
                 CodecParameters codecParameters;
         };
     }
