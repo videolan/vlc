@@ -79,6 +79,35 @@
 - (void)detachFromWindow;
 @end
 
+static void vlc_dispatch_sync(void (^block_function)())
+{
+    CFRunLoopRef runloop = CFRunLoopGetMain();
+
+    __block vlc_sem_t performed;
+    vlc_sem_init(&performed, 0);
+
+    CFStringRef modes_cfstrings[] = {
+        kCFRunLoopDefaultMode,
+        CFSTR("org.videolan.vlccore.window"),
+    };
+
+    CFArrayRef modes = CFArrayCreate(NULL, (const void **)modes_cfstrings,
+            ARRAY_SIZE(modes_cfstrings),
+            &kCFTypeArrayCallBacks);
+
+    /* NOTE: we're using CFRunLoopPerformBlock with a custom mode tag
+     * to avoid deadlocks between the window module (main thread) and the
+     * display module, which would happen when using dispatch_sycn here. */
+    CFRunLoopPerformBlock(runloop, modes, ^{
+        (block_function)();
+        vlc_sem_post(&performed);
+    });
+    CFRunLoopWakeUp(runloop);
+
+    vlc_sem_wait(&performed);
+    CFRelease(modes);
+}
+
 /*****************************************************************************
  * vlc_gl_t callbacks
  *****************************************************************************/
@@ -466,9 +495,11 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     if (wnd->type != VOUT_WINDOW_TYPE_NSOBJECT)
         return VLC_EGENERIC;
 
-   @autoreleasepool {
-        /* setup the actual OpenGL ES view */
-        dispatch_sync(dispatch_get_main_queue(), ^{
+    @autoreleasepool {
+        /* NOTE: we're using CFRunLoopPerformBlock with the "vlc_runloop" tag
+         * to avoid deadlocks between the window module (main thread) and the
+         * display module, which would happen when using dispatch_sycn here. */
+        vlc_dispatch_sync(^{
             gl->sys = (__bridge_retained void*)[[VLCOpenGLES2VideoView alloc]
                initWithFrame:CGRectMake(0.,0.,width,height) gl:gl];
         });
