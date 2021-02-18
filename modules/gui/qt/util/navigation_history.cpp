@@ -1,6 +1,7 @@
 #include "navigation_history.hpp"
 #include <cassert>
 #include "network/networkmediamodel.hpp"
+#include "medialibrary/mlqmltypes.hpp"
 
 NavigationHistory::NavigationHistory(QObject *parent)
     : QObject(parent)
@@ -54,7 +55,7 @@ static bool isNodeValid(QVariant& value)
         || value.canConvert(QVariant::UInt)
         || value.canConvert(QVariant::Int)
         || value.canConvert(QVariant::Bool)
-        )
+        || value.canConvert<MLItemId>())
     {
         return true;
     }
