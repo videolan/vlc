@@ -68,6 +68,8 @@
 #import <vlc_mouse.h>
 #import <vlc_window.h>
 
+#import <assert.h>
+
 @interface VLCVideoUIView : UIView {
     /* VLC window object, set to NULL under _mutex lock when closing. */
     vlc_window_t *_wnd;
@@ -88,8 +90,6 @@
 
     /* Window state */
     BOOL _enabled;
-    int _subviews;
-
     dispatch_queue_t _eventq;
 }
 
@@ -111,7 +111,6 @@
 {
     _wnd = wnd;
     _enabled = NO;
-    _subviews = 0;
     vlc_mutex_init(&_size_mutex);
     _requested_height = 0;
     _requested_width = 0;
@@ -135,6 +134,7 @@
     if (var_InheritBool( wnd, "mouse-events" ) == true) {
         _tapRecognizer = [[UITapGestureRecognizer alloc]
             initWithTarget:self action:@selector(tapRecognized:)];
+        _tapRecognizer.cancelsTouchesInView = NO;
     }
 
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -175,15 +175,7 @@
             return NO;
         }
 
-        /* We need to store the view container because we'll add our view
-         * only when a subview (hopefully able to handle the rendering) will
-         * get created. The main reason for this is that we cannot report
-         * events from the window until the display is opened, otherwise a
-         * race condition involving locking both the main thread and the lock
-         * in the core for the display are happening. */
         _viewContainer = viewContainer;
-
-        self.frame = viewContainer.bounds;
 
         return YES;
     } @catch (NSException *exception) {
@@ -258,37 +250,7 @@
 }
 
 /**
- * We track whether we currently have a child view, which will be able
- * to do the actual rendering. Depending on how many children view we had
- * and whether we are in enabled state or not, we add or remove the view
- * from/to the parent UIView.
- * This is needed because we cannot emit resize event from the main
- * thread as long as the display is not created, since the display will
- * need the main thread too. It would non-deterministically deadlock
- * otherwise.
- */
-
-- (void)didAddSubview:(UIView*)subview
-{
-    assert(_enabled);
-    _subviews++;
-    if (_subviews == 1)
-        [_viewContainer addSubview:self];
-
-    VLC_UNUSED(subview);
-}
-
-- (void)willRemoveSubview:(UIView*)subview
-{
-    _subviews--;
-    if (_enabled && _subviews == 0)
-        [self removeFromSuperview];
-
-    VLC_UNUSED(subview);
-}
-
-/**
- * Vout window operations implementation, which are expected to be run on
+ * Vout window operations implemention, which are expected to be run on
  * the main thread only. Core C wrappers below must typically use
  * dispatch_async with dispatch_get_main_queue() to call them.
  *
@@ -298,11 +260,11 @@
 
 - (void)enable
 {
-    if (_enabled)
-        return;
-
-    assert(_subviews == 0);
+    assert(!_enabled);
     _enabled = YES;
+    self.frame = _viewContainer.frame;
+    self.center = _viewContainer.center;
+    [_viewContainer addSubview:self];
 
     /**
      * Given -[UIView addGestureRecognizer:] can raise an exception if
@@ -313,16 +275,12 @@
     if (_tapRecognizer != nil) {
         [self addGestureRecognizer:_tapRecognizer];
     }
-    _tapRecognizer.cancelsTouchesInView = NO;
 }
 
 - (void)disable
 {
-    if (!_enabled)
-        return;
-
+    assert(_enabled);
     _enabled = NO;
-    assert(_subviews == 0);
     [self removeFromSuperview];
 
     [_tapRecognizer.view removeGestureRecognizer:_tapRecognizer];
