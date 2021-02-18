@@ -47,6 +47,7 @@ Widgets.NavigableFocusScope {
     Component.onCompleted: {
         loadView()
         if (medialib)
+            // asynchronous call
             medialib.reload()
     }
 

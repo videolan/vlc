@@ -225,7 +225,9 @@ void MediaLib::insertIntoPlaylist(const size_t index, const QVariantList &itemId
 
 void MediaLib::reload()
 {
-    vlc_ml_reload_folder( vlcMl(), nullptr );
+    m_threadPool.start([ml = m_ml] {
+        vlc_ml_reload_folder(ml, nullptr);
+    });
 }
 
 vlc_medialibrary_t* MediaLib::vlcMl()
