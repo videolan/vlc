@@ -470,8 +470,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
         /* setup the actual OpenGL ES view */
         dispatch_sync(dispatch_get_main_queue(), ^{
             gl->sys = (__bridge_retained void*)[[VLCOpenGLES2VideoView alloc]
-               // TODO better rect
-               initWithFrame:CGRectMake(0.,0.,320.,240.) gl:gl];
+               initWithFrame:CGRectMake(0.,0.,width,height) gl:gl];
         });
 
         if (gl->sys == NULL)
