@@ -33,7 +33,7 @@
 #include <vlc_block.h>
 
 #define MAX_TAGS 16
-#define MAX_TAG_SIZE (1<<17)
+#define MAX_TAG_SIZE (1<<21)
 
 struct skiptags_sys_t
 {
