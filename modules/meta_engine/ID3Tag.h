@@ -46,11 +46,33 @@ static size_t ID3TAG_Parse( const uint8_t *p_peek, size_t i_peek,
     if( i_peek > 10 && ID3TAG_IsTag( p_peek, false ) )
     {
         const uint8_t i_ID3major = p_peek[3];
+        const uint8_t i_ID3flags = p_peek[5];
         i_ID3size = ID3TAG_ReadSize( &p_peek[6], true );
         if( i_ID3size > i_peek - 10 )
             return 0;
         i_total_size = i_ID3size + 10;
+
         const uint8_t *p_frame = &p_peek[10];
+
+        if( i_ID3major >= 3 && i_ID3major <= 4 && (i_ID3flags & 0x40) ) /* ext header */
+        {
+            if( i_ID3size < 6 ) /* can't be less than 6 */
+                return 0;
+            uint32_t i_exthdr = ID3TAG_ReadSize( p_frame, true );
+            if( i_ID3major == 3 )
+            {
+                /* 6 or 10 bytes not including size storage */
+                if( i_exthdr != 6 && i_exthdr != 10 )
+                    return 0;
+                i_exthdr += 4;
+            }
+            if( i_ID3size < i_exthdr )
+                return 0;
+            p_frame += i_exthdr;
+            i_ID3size -= i_exthdr;
+        }
+
+        /* Tags */
         while( i_ID3size > 10 )
         {
             uint32_t i_tagname = VLC_FOURCC( p_frame[0], p_frame[1], p_frame[2], p_frame[3] );
