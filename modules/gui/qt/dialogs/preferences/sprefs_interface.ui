@@ -334,7 +334,17 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="0">
+             <item row="5" column="0" colspan="2">
+              <widget class="QCheckBox" name="pinVideoControlsCheckbox">
+               <property name="toolTip">
+                <string>Disables autohiding of controls when playing videos</string>
+               </property>
+               <property name="text">
+                <string>Pin video controls</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="2">
               <widget class="QCheckBox" name="titleBarCheckBox">
                <property name="text">
                 <string>Enable window titlebar</string>

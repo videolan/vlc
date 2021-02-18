@@ -810,6 +810,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_BOOL( "metadata-network-access", MetadataNetworkAccessMode );
             CONFIG_BOOL( "qt-menubar", menuBarCheck );
 
+            ui.pinVideoControlsCheckbox->setChecked( p_intf->p_sys->p_mi->pinVideoControls() );
+            QObject::connect( ui.pinVideoControlsCheckbox, &QCheckBox::stateChanged, p_intf->p_sys->p_mi, &MainInterface::setPinVideoControls );
+
             ui.colorSchemeComboBox->insertItems(0, p_intf->p_sys->p_mi->getColorScheme()->stringList());
             QObject::connect( ui.colorSchemeComboBox, &QComboBox::currentTextChanged, p_intf->p_sys->p_mi->getColorScheme(), &ColorSchemeModel::setCurrent );
 
