@@ -1904,6 +1904,16 @@ CreateDecoder( vlc_object_t *p_parent,
         }
     }
 
+    /* */
+    p_owner->cc.b_supported = ( p_sout == NULL );
+
+    p_owner->cc.desc.i_608_channels = 0;
+    p_owner->cc.desc.i_708_channels = 0;
+    for( unsigned i = 0; i < MAX_CC_DECODERS; i++ )
+        p_owner->cc.pp_decoder[i] = NULL;
+    p_owner->cc.p_sout_input = NULL;
+    p_owner->cc.b_sout_created = false;
+
     switch( fmt->i_cat )
     {
         case VIDEO_ES:
@@ -1946,16 +1956,6 @@ CreateDecoder( vlc_object_t *p_parent,
             }
         }
     }
-
-    /* */
-    p_owner->cc.b_supported = ( p_sout == NULL );
-
-    p_owner->cc.desc.i_608_channels = 0;
-    p_owner->cc.desc.i_708_channels = 0;
-    for( unsigned i = 0; i < MAX_CC_DECODERS; i++ )
-        p_owner->cc.pp_decoder[i] = NULL;
-    p_owner->cc.p_sout_input = NULL;
-    p_owner->cc.b_sout_created = false;
     return p_owner;
 }
 
