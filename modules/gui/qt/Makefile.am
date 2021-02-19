@@ -174,6 +174,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlplaylistlistmodel.hpp \
 	gui/qt/medialibrary/mlplaylistmedia.cpp \
 	gui/qt/medialibrary/mlplaylistmedia.hpp \
+	gui/qt/medialibrary/mlplaylistmodel.cpp \
+	gui/qt/medialibrary/mlplaylistmodel.hpp \
 	gui/qt/menus/custom_menus.cpp \
 	gui/qt/menus/custom_menus.hpp \
 	gui/qt/menus/qml_menu_wrapper.cpp \
@@ -337,6 +339,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlvideomodel.moc.cpp \
 	gui/qt/medialibrary/mlplaylist.moc.cpp \
 	gui/qt/medialibrary/mlplaylistlistmodel.moc.cpp \
+	gui/qt/medialibrary/mlplaylistmodel.moc.cpp \
 	gui/qt/menus/custom_menus.moc.cpp \
 	gui/qt/menus/qml_menu_wrapper.moc.cpp \
 	gui/qt/menus/menus.moc.cpp \

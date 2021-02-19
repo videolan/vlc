@@ -774,6 +774,8 @@ modules/gui/qt/medialibrary/mlplaylistlistmodel.cpp
 modules/gui/qt/medialibrary/mlplaylistlistmodel.hpp
 modules/gui/qt/medialibrary/mlplaylistmedia.cpp
 modules/gui/qt/medialibrary/mlplaylistmedia.hpp
+modules/gui/qt/medialibrary/mlplaylistmodel.cpp
+modules/gui/qt/medialibrary/mlplaylistmodel.hpp
 modules/gui/qt/menus/menus.cpp
 modules/gui/qt/menus/menus.hpp
 modules/gui/qt/qt.cpp
