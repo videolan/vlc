@@ -77,36 +77,46 @@ vlcSetBaseEnvironment() {
 }
 
 vlcSetSymbolEnvironment() {
-    echo "Setting symbol environment"
+    # If the command is called without argument, default to exporting
+    # all the ac_cv_* symbols to the environment. Else we'll pass the
+    # symbol values to the command in the first argument, after the
+    # command's arguments.
+    #
+    # It's typically made to work with cmd="configure" to write the
+    # configuration into the config.status script or cmd="echo" to
+    # write the variables into a config.mak file for the contribs.
+    local cmd="${1:-export}"; [ "$#" -ge 1 ] && shift
 
     # The following symbols do not exist on the minimal macOS / iOS, so they are disabled
     # here. This allows compilation also with newer macOS SDKs.
     # List assumes macOS 10.10 / iOS 8 at minimum.
 
-    # Added symbols in macOS 10.12 / iOS 10 / watchOS 3
-    export ac_cv_func_basename_r=no
-    export ac_cv_func_clock_getres=no
-    export ac_cv_func_clock_gettime=no
-    export ac_cv_func_clock_settime=no
-    export ac_cv_func_dirname_r=no
-    export ac_cv_func_getentropy=no
-    export ac_cv_func_mkostemp=no
-    export ac_cv_func_mkostemps=no
-    export ac_cv_func_timingsafe_bcmp=no
-
-    # Added symbols in macOS 10.13 / iOS 11 / watchOS 4 / tvOS 11
-    export ac_cv_func_open_wmemstream=no
-    export ac_cv_func_fmemopen=no
-    export ac_cv_func_open_memstream=no
-    export ac_cv_func_futimens=no
-    export ac_cv_func_utimensat=no
-
-    # Added symbol in macOS 10.14 / iOS 12 / tvOS 9
-    export ac_cv_func_thread_get_register_pointer_values=no
-
-    # Added symbols in macOS 10.15 / iOS 13 / tvOS 13
-    export ac_cv_func_aligned_alloc=no
-    export ac_cv_func_timespec_get=no
+    # - Added symbols in macOS 10.12 / iOS 10 / watchOS 3
+    # - Added symbols in macOS 10.13 / iOS 11 / watchOS 4 / tvOS 11
+    # - Added symbol in macOS 10.14 / iOS 12 / tvOS 9
+    # - Added symbols in macOS 10.15 / iOS 13 / tvOS 13
+    "${cmd}" "$@" \
+    \
+    ac_cv_func_basename_r=no \
+    ac_cv_func_clock_getres=no \
+    ac_cv_func_clock_gettime=no \
+    ac_cv_func_clock_settime=no \
+    ac_cv_func_dirname_r=no \
+    ac_cv_func_getentropy=no \
+    ac_cv_func_mkostemp=no \
+    ac_cv_func_mkostemps=no \
+    ac_cv_func_timingsafe_bcmp=no \
+    \
+    ac_cv_func_open_wmemstream=no \
+    ac_cv_func_fmemopen=no \
+    ac_cv_func_open_memstream=no \
+    ac_cv_func_futimens=no \
+    ac_cv_func_utimensat=no \
+    \
+    ac_cv_func_thread_get_register_pointer_values=no \
+    \
+    ac_cv_func_aligned_alloc=no \
+    ac_cv_func_timespec_get=no
 }
 
 vlcSetContribEnvironment() {
