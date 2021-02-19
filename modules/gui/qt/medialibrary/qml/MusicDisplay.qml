@@ -51,6 +51,10 @@ Widgets.PageLoader {
             displayText: i18n.qtr("Genres"),
             name: "genres" ,
             url: "qrc:///medialibrary/MusicGenresDisplay.qml"
+        }, {
+            displayText: i18n.qtr("Playlists"),
+            name: "playlists" ,
+            url: "qrc:///medialibrary/MusicPlaylistsDisplay.qml"
         }
     ]
 
