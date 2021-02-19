@@ -401,14 +401,14 @@ static void Close(vlc_gl_t *gl)
     _size = size;
 
     vlc_dispatch_sync(^{
-        CGRect rect = self.bounds;
+        CGRect rect = self.frame;
         rect.size = size;
         /* Bitmap size = view size * contentScaleFactor, so we need to divide the
          * scale factor to get the real view size. */
         rect.size.width /= self.contentScaleFactor;
         rect.size.height /= self.contentScaleFactor;
 
-        self.bounds = rect;
+        self.frame = rect;
     });
 
     /* If size is NULL, rendering must be disabled */
