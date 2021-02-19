@@ -91,6 +91,9 @@
     /* Window state */
     BOOL _enabled;
     dispatch_queue_t _eventq;
+
+    /* Constraints */
+    NSArray<NSLayoutConstraint*> *_constraints;
 }
 
 - (id)initWithWindow:(vlc_window_t *)wnd;
@@ -129,8 +132,7 @@
 
     /* The window is controlled by the host application through the UIView
      * sizing mechanisms. */
-    self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-
+    self.translatesAutoresizingMaskIntoConstraints = false;
 
     /* add tap gesture recognizer for DVD menus and stuff */
     if (var_InheritBool( wnd, "mouse-events" ) == true) {
@@ -156,6 +158,31 @@
     _viewContainer = superview;
 
     return self;
+}
+
+- (void)didMoveToSuperview
+{
+    if ([self superview] == nil)
+        return;
+
+    _constraints = @[
+        [self.centerXAnchor constraintEqualToAnchor:[[self superview] centerXAnchor]],
+        [self.centerYAnchor constraintEqualToAnchor:[[self superview] centerYAnchor]],
+        [self.widthAnchor constraintEqualToAnchor:[[self superview] widthAnchor]],
+        [self.heightAnchor constraintEqualToAnchor:[[self superview] heightAnchor]],
+    ];
+    [[self superview] addConstraints:_constraints];
+    [NSLayoutConstraint activateConstraints:_constraints];
+}
+
+- (void)willRemoveFromSuperview
+{
+    if ([self superview] == nil)
+        return;
+
+    [NSLayoutConstraint deactivateConstraints:_constraints];
+    [[self superview] removeConstraints:_constraints];
+    _constraints = nil;
 }
 
 - (UIView *)fetchViewContainer
@@ -263,9 +290,6 @@
 {
     assert(!_enabled);
     _enabled = YES;
-    self.frame = _viewContainer.frame;
-    self.center = _viewContainer.center;
-    [_viewContainer addSubview:self];
 
     /**
      * Given -[UIView addGestureRecognizer:] can raise an exception if
@@ -276,6 +300,7 @@
     if (_tapRecognizer != nil) {
         [self addGestureRecognizer:_tapRecognizer];
     }
+    [_viewContainer addSubview:self];
 }
 
 - (void)disable

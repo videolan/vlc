@@ -267,8 +267,6 @@ static void Close(vlc_gl_t *gl)
             return NO;
         }
 
-        /* Initial size setup */
-        self.frame = viewContainer.bounds;
 
         [viewContainer addSubview:self];
 
