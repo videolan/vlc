@@ -660,6 +660,7 @@ libqt_plugin_la_QML = \
 	gui/qt/medialibrary/qml/MusicDisplay.qml \
 	gui/qt/medialibrary/qml/MusicGenres.qml \
 	gui/qt/medialibrary/qml/MusicGenresDisplay.qml \
+	gui/qt/medialibrary/qml/MusicPlaylistsDisplay.qml \
 	gui/qt/medialibrary/qml/MusicTrackListDisplay.qml \
 	gui/qt/medialibrary/qml/MusicTracksDisplay.qml \
 	gui/qt/medialibrary/qml/UrlListDisplay.qml \
