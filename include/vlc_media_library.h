@@ -498,6 +498,11 @@ enum vlc_ml_control
     VLC_ML_MEDIA_REMOVE_BOOKMARK,           /**< arg1: media id; arg2: int64_t */
     VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS,      /**< arg1: media id */
     VLC_ML_MEDIA_UPDATE_BOOKMARK,           /**< arg1: media id; arg2: int64_t; arg3: const char*; arg4: const char* */
+
+    /* Playlist management */
+    VLC_ML_PLAYLIST_CREATE, /**< arg1: const char*; arg2(out): vlc_ml_playlist_t**; can fail */
+    VLC_ML_PLAYLIST_DELETE, /**< arg1: playlist id; can fail */
+    VLC_ML_PLAYLIST_APPEND  /**< arg1: playlist id; arg2: media id; can fail */
 };
 
 /**
@@ -1043,6 +1048,35 @@ vlc_ml_media_remove_all_bookmarks( vlc_medialibrary_t* p_ml, int64_t i_media_id 
 {
     assert( p_ml != NULL );
     return vlc_ml_control( p_ml, VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS, i_media_id );
+}
+
+static inline vlc_ml_playlist_t*
+vlc_ml_playlist_create( vlc_medialibrary_t * p_ml, const char * name)
+{
+    assert( p_ml != NULL );
+
+    vlc_ml_playlist_t* result;
+
+    if (vlc_ml_control( p_ml, VLC_ML_PLAYLIST_CREATE, name, &result ) != VLC_SUCCESS )
+        return NULL;
+
+    return result;
+}
+
+static inline int
+vlc_ml_playlist_delete( vlc_medialibrary_t * p_ml, int64_t i_playlist_id )
+{
+    assert( p_ml != NULL );
+
+    return vlc_ml_control( p_ml, VLC_ML_PLAYLIST_DELETE, i_playlist_id );
+}
+
+static inline int
+vlc_ml_playlist_append( vlc_medialibrary_t * p_ml, int64_t i_playlist_id, int64_t i_media_id )
+{
+    assert( p_ml != NULL );
+
+    return vlc_ml_control( p_ml, VLC_ML_PLAYLIST_APPEND, i_playlist_id, i_media_id );
 }
 
 static inline vlc_ml_media_t* vlc_ml_get_media( vlc_medialibrary_t* p_ml, int64_t i_media_id )

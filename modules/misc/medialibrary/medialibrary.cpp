@@ -623,6 +623,31 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS:
         case VLC_ML_MEDIA_UPDATE_BOOKMARK:
             return controlMedia( query, args );
+        case VLC_ML_PLAYLIST_CREATE:
+        {
+            auto name = va_arg( args, const char * );
+            auto playlist = m_ml->createPlaylist( name );
+            if ( playlist == nullptr )
+                return VLC_EGENERIC;
+            auto result = va_arg( args, vlc_ml_playlist_t** );
+            *result = CreateAndConvert<vlc_ml_playlist_t>( playlist.get() );
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_PLAYLIST_DELETE:
+        {
+            if ( m_ml->deletePlaylist( va_arg( args, int64_t ) ) == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_PLAYLIST_APPEND:
+        {
+            auto playlist = m_ml->playlist( va_arg( args, int64_t ) );
+            if ( playlist == nullptr )
+                return VLC_EGENERIC;
+            if ( playlist->append(va_arg( args, int64_t )) == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
         default:
             return VLC_EGENERIC;
     }
