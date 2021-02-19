@@ -1437,10 +1437,10 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                 date_refresh = swap_next_pts - render_delay;
 
             // next frame will still need some waiting before display
-            dropped_current_frame = true;
+            dropped_current_frame = sys->displayed.current != NULL;
             render_now = false;
 
-            if (likely(sys->displayed.current != NULL))
+            if (likely(dropped_current_frame))
                 picture_Release(sys->displayed.current);
             sys->displayed.current = next;
         }
