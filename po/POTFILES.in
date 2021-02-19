@@ -770,6 +770,8 @@ modules/gui/qt/medialibrary/mlbookmarkmodel.cpp
 modules/gui/qt/medialibrary/mlbookmarkmodel.hpp
 modules/gui/qt/medialibrary/mlfoldersmodel.cpp
 modules/gui/qt/medialibrary/mlfoldersmodel.hpp
+modules/gui/qt/medialibrary/mlplaylistlistmodel.cpp
+modules/gui/qt/medialibrary/mlplaylistlistmodel.hpp
 modules/gui/qt/menus/menus.cpp
 modules/gui/qt/menus/menus.hpp
 modules/gui/qt/qt.cpp
