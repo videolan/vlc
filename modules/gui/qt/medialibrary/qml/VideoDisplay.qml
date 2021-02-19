@@ -15,279 +15,75 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-import QtQuick 2.11
+
+import QtQuick          2.11
 import QtQuick.Controls 2.4
-import QtQuick.Layouts 1.3
-import QtQml.Models 2.2
+import QtQuick.Layouts  1.3
+import QtQml.Models     2.2
 
 import org.videolan.medialib 0.1
 
-import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
-import "qrc:///main/" as MainInterface
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+Widgets.PageLoader {
     id: root
-    readonly property var currentIndex: view.currentItem.currentIndex
-    property Item headerItem: view.currentItem.headerItem
-    //the index to "go to" when the view is loaded
-    property var initialIndex: 0
 
-    property alias contentModel: videoModel
-    property var sortModel: [
-        { text: i18n.qtr("Alphabetic"),  criteria: "title"},
-        { text: i18n.qtr("Duration"),    criteria: "duration_short" }
+    //---------------------------------------------------------------------------------------------
+    // Properties
+    //---------------------------------------------------------------------------------------------
+
+    property bool isViewMultiView: true
+
+    property var contentModel
+    property var sortModel
+
+    property var tabModel: ListModel {
+        Component.onCompleted: {
+            pageModel.forEach(function(e) {
+                append({
+                    name       : e.name,
+                    displayText: e.displayText
+                })
+            })
+        }
+    }
+
+    property Component localMenuDelegate: Widgets.LocalTabBar {
+        currentView: root.view
+
+        model: tabModel
+
+        onClicked: root.loadIndex(index)
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Settings
+    //---------------------------------------------------------------------------------------------
+
+    defaultPage: "all"
+
+    pageModel: [{
+            name: "all",
+            displayText: i18n.qtr("All"),
+            url: "qrc:///medialibrary/VideoAllDisplay.qml"
+        }
     ]
 
-    navigationCancel: function() {
-        if (view.currentItem.currentIndex <= 0) {
-            defaultNavigationCancel()
-        } else {
-            view.currentItem.currentIndex = 0;
-            view.currentItem.positionViewAtIndex(0, ItemView.Contain)
-        }
+    onCurrentItemChanged: {
+        isViewMultiView = (currentItem.isViewMultiView === undefined
+                           ||
+                           currentItem.isViewMultiView);
+
+        contentModel = currentItem.model;
+        sortModel    = currentItem.sortModel;
     }
 
-    onCurrentIndexChanged: {
-        history.update([ "mc", "video", {"initialIndex": currentIndex}])
-    }
+    //---------------------------------------------------------------------------------------------
+    // Functions
+    //---------------------------------------------------------------------------------------------
 
-    onInitialIndexChanged: resetFocus()
-    onContentModelChanged: resetFocus()
-
-    function resetFocus() {
-        if (videoModel.count === 0)
-            return
-        var initialIndex = root.initialIndex
-        if (initialIndex >= videoModel.count)
-            initialIndex = 0
-        selectionModel.select(videoModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        if (view.currentItem)
-            view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
-    }
-
-    function _actionAtIndex(index) {
-        g_mainDisplay.showPlayer()
-        medialib.addAndPlay( videoModel.getIdsForIndexes( selectionModel.selectedIndexes ) )
-    }
-
-    MLVideoModel {
-        id: videoModel
-        ml: medialib
-
-        onCountChanged: {
-            if (videoModel.count > 0 && !selectionModel.hasSelection) {
-                root.resetFocus()
-            }
-        }
-    }
-
-    Util.SelectableDelegateModel {
-        id: selectionModel
-        model: videoModel
-    }
-
-    VideoContextMenu {
-        id: contextMenu
-        model: videoModel
-    }
-
-    MLRecentsVideoModel {
-        id: recentVideoModel
-        ml: medialib
-    }
-
-    property Component header: Column {
-        id: videoHeader
-
-        width: root.width
-
-        property Item focusItem: recentVideosViewLoader.item.focusItem
-
-        topPadding: VLCStyle.margin_normal
-        spacing: VLCStyle.margin_normal
-
-        Loader {
-            id: recentVideosViewLoader
-            width: parent.width
-            height: item.implicitHeight
-            active: recentVideoModel.count > 0
-            visible: recentVideoModel.count > 0
-            focus: true
-
-            sourceComponent: VideoDisplayRecentVideos {
-                id: recentVideosView
-
-                width: parent.width
-
-                model: recentVideoModel
-                focus: true
-                navigationParent: root
-                navigationDown: function() {
-                    recentVideosView.focus = false
-                    view.currentItem.setCurrentItemFocus()
-                }
-            }
-        }
-
-        Widgets.SubtitleLabel {
-            id: videosLabel
-            leftPadding: VLCStyle.margin_xlarge
-            bottomPadding: VLCStyle.margin_xsmall
-            width: root.width
-            text: i18n.qtr("Videos")
-        }
-    }
-
-    Component {
-        id: gridComponent
-
-        MainInterface.MainGridView {
-            id: videosGV
-            property Item currentItem: Item{}
-
-            activeFocusOnTab:true
-            delegateModel: selectionModel
-            model: videoModel
-
-            headerDelegate: root.header
-
-            delegate: VideoGridItem {
-                id: videoGridItem
-
-                opacity: videosGV.expandIndex !== -1 && videosGV.expandIndex !== videoGridItem.index ? .7 : 1
-                dragItem: videoDragItem
-
-                onContextMenuButtonClicked: {
-                    videosGV.rightClickOnItem(index)
-                    contextMenu.popup(selectionModel.selectedIndexes, globalMousePos, {
-                        "information" : index
-                    } )
-                }
-
-                onItemClicked : videosGV.leftClickOnItem(modifier, index)
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: 100
-                    }
-                }
-            }
-
-            expandDelegate: VideoInfoExpandPanel {
-                onRetract: videosGV.retract()
-
-                x: 0
-                width: videosGV.width
-                navigationParent: videosGV
-                navigationCancel:  function() {  videosGV.retract() }
-                navigationUp: function() {  videosGV.retract() }
-                navigationDown: function() { videosGV.retract() }
-            }
-
-            navigationParent: root
-            navigationUpItem: headerItem.focusItem
-
-            /*
-             *define the intial position/selection
-             * This is done on activeFocus rather than Component.onCompleted because selectionModel.
-             * selectedGroup update itself after this event
-             */
-            onActiveFocusChanged: {
-                if (activeFocus && videoModel.count > 0 && !selectionModel.hasSelection) {
-                    selectionModel.select(videoModel.index(0,0), ItemSelectionModel.ClearAndSelect)
-                }
-            }
-
-            cellWidth: VLCStyle.gridItem_video_width
-            cellHeight: VLCStyle.gridItem_video_height
-
-            onSelectAll:selectionModel.selectAll()
-            onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: _actionAtIndex( index )
-
-            Connections {
-                target: contextMenu
-                onShowMediaInformation: videosGV.switchExpandItem(index)
-            }
-        }
-
-    }
-
-    Component {
-        id: listComponent
-        VideoListDisplay {
-            height: view.height
-            width: view.width
-            model: videoModel
-            dragItem: videoDragItem
-            navigationParent: root
-            navigationUpItem: headerItem.focusItem
-
-            header: root.header
-            headerTopPadding: VLCStyle.margin_normal
-            headerPositioning: ListView.InlineHeader
-
-            selectionDelegateModel: selectionModel
-
-            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0) )
-
-            onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos )
-
-            function setCurrentItemFocus() {
-                currentItem.forceActiveFocus()
-            }
-        }
-    }
-
-
-    Widgets.DragItem {
-        id: videoDragItem
-
-        function updateComponents(maxCovers) {
-          var items = selectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
-            return videoModel.getDataAt(x.row)
-          })
-          var title = items.map(function (item){ return item.title}).join(", ")
-          var covers = items.map(function (item) { return {artwork: item.thumbnail || VLCStyle.noArtCover}})
-          return {
-            covers: covers,
-            title: title,
-            count: selectionModel.selectedIndexes.length
-          }
-        }
-
-        function insertIntoPlaylist(index) {
-            medialib.insertIntoPlaylist(index, videoModel.getIdsForIndexes(selectionModel.selectedIndexes))
-        }
-    }
-
-    Widgets.StackViewExt {
-        id: view
-        anchors.fill:parent
-        clip: true
-        focus: videoModel.count !== 0
-        initialItem: mainInterface.gridView ? gridComponent : listComponent
-        Connections {
-            target: mainInterface
-            onGridViewChanged: {
-                if (mainInterface.gridView)
-                    view.replace(gridComponent)
-                else
-                    view.replace(listComponent)
-            }
-        }
-    }
-
-    EmptyLabel {
-        anchors.fill: parent
-        visible: videoModel.count === 0
-        focus: visible
-        text: i18n.qtr("No video found\nPlease try adding sources, by going to the Network tab")
-        navigationParent: root
-        cover: VLCStyle.noArtVideoCover
-        coverWidth: VLCStyle.dp(182, VLCStyle.scale)
-        coverHeight: VLCStyle.dp(114, VLCStyle.scale)
+    function loadIndex(index) {
+        history.push(["mc", "video", root.pageModel[index].name]);
     }
 }
