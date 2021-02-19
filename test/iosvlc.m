@@ -116,7 +116,7 @@
     window.backgroundColor = [UIColor whiteColor];
 
     subview = [[UIView alloc] initWithFrame:window.bounds];
-    subview.backgroundColor = [UIColor blueColor];
+    subview.backgroundColor = [[UIColor blueColor] colorWithAlphaComponent:0.5f];
     [window addSubview:subview];
     [window makeKeyAndVisible];
 
