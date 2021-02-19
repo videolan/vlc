@@ -20,6 +20,8 @@
 #include "util/qml_main_context.hpp"
 #include "medialibrary/medialib.hpp"
 #include "medialibrary/mlvideomodel.hpp"
+#include "medialibrary/mlplaylistlistmodel.hpp"
+#include "medialibrary/mlplaylistmodel.hpp"
 #include "medialibrary/mlalbummodel.hpp"
 #include "medialibrary/mlartistmodel.hpp"
 #include "medialibrary/mlgenremodel.hpp"
@@ -259,6 +261,11 @@ void BaseMedialibMenu::medialibAudioContextMenu(MediaLib* ml, const QVariantList
         ml->addToPlaylist(mlId);
     });
 
+    action = m_menu->addAction( qtr("Add to playlist") );
+    connect(action, &QAction::triggered, [mlId]( ) {
+        DialogsProvider::getInstance()->playlistsDialog(mlId);
+    });
+
     if (options.contains("information") && options["information"].type() == QVariant::Int) {
 
         action = m_menu->addAction( qtr("Information") );
@@ -359,6 +366,11 @@ void VideoContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVaria
         ml->addToPlaylist(itemIdList);
     });
 
+    action = m_menu->addAction( qtr("Add to playlist") );
+    connect(action, &QAction::triggered, [itemIdList]( ) {
+        DialogsProvider::getInstance()->playlistsDialog(itemIdList);
+    });
+
     action = m_menu->addAction( qtr("Play as audio") );
     connect(action, &QAction::triggered, [ml, itemIdList]( ) {
         QStringList options({":no-video"});
@@ -379,6 +391,135 @@ void VideoContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVaria
 
     m_menu->popup(pos);
 }
+
+//=================================================================================================
+// PlaylistListContextMenu
+//=================================================================================================
+
+PlaylistListContextMenu::PlaylistListContextMenu(QObject * parent)
+    : QObject(parent)
+{}
+
+PlaylistListContextMenu::~PlaylistListContextMenu() /* override */
+{
+    if (m_menu)
+        delete m_menu;
+}
+
+void PlaylistListContextMenu::popup(const QModelIndexList & selected, QPoint pos, QVariantMap)
+{
+    if (!m_model)
+        return;
+
+    if (m_menu)
+        delete m_menu;
+
+    QVariantList ids;
+
+    for (const QModelIndex & modelIndex : selected)
+        ids.push_back(m_model->data(modelIndex, MLPlaylistListModel::PLAYLIST_ID));
+
+    m_menu = new QMenu();
+
+    MediaLib * ml = m_model->ml();
+
+    QAction * action = m_menu->addAction(qtr("Add and play"));
+
+    connect(action, &QAction::triggered, [ml, ids]() {
+        ml->addAndPlay(ids);
+    });
+
+    action = m_menu->addAction(qtr("Enqueue"));
+
+    connect(action, &QAction::triggered, [ml, ids]() {
+        ml->addToPlaylist(ids);
+    });
+
+    action = m_menu->addAction(qtr("Delete"));
+
+    connect(action, &QAction::triggered, [this, ids]() {
+        m_model->deletePlaylists(ids);
+    });
+
+    m_menu->popup(pos);
+}
+
+//=================================================================================================
+// PlaylistMediaContextMenu
+//=================================================================================================
+
+PlaylistMediaContextMenu::PlaylistMediaContextMenu(QObject * parent) : QObject(parent) {}
+
+PlaylistMediaContextMenu::~PlaylistMediaContextMenu() /* override */
+{
+    if (m_menu)
+        delete m_menu;
+}
+
+void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint pos,
+                                     QVariantMap options)
+{
+    if (!m_model)
+        return;
+
+    if (m_menu)
+        delete m_menu;
+
+    QVariantList ids;
+
+    for (const QModelIndex& modelIndex : selected)
+        ids.push_back(m_model->data(modelIndex, MLPlaylistModel::MEDIA_ID));
+
+    m_menu = new QMenu();
+
+    MediaLib * ml = m_model->ml();
+
+    QAction * action = m_menu->addAction(qtr("Add and play"));
+
+    connect(action, &QAction::triggered, [ml, ids]() {
+        ml->addAndPlay(ids);
+    });
+
+    action = m_menu->addAction(qtr("Enqueue"));
+
+    connect(action, &QAction::triggered, [ml, ids]() {
+        ml->addToPlaylist(ids);
+    });
+
+    action = m_menu->addAction(qtr("Add to playlist"));
+
+    connect(action, &QAction::triggered, [ml, ids]() {
+        DialogsProvider::getInstance()->playlistsDialog(ids);
+    });
+
+    action = m_menu->addAction(qtr("Play as audio"));
+
+    connect(action, &QAction::triggered, [ml, ids]() {
+        QStringList options({":no-video"});
+        ml->addAndPlay(ids, &options);
+    });
+
+    if (options.contains("information") && options["information"].type() == QVariant::Int) {
+        action = m_menu->addAction(qtr("Information"));
+
+        QSignalMapper * mapper = new QSignalMapper(m_menu);
+
+        connect(action, &QAction::triggered, mapper, QOverload<>::of(&QSignalMapper::map));
+
+        mapper->setMapping(action, options["information"].toInt());
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+        connect(mapper, &QSignalMapper::mappedInt, this,
+                &PlaylistMediaContextMenu::showMediaInformation);
+#else
+        connect(mapper, QOverload<int>::of(&QSignalMapper::mapped), this,
+                &PlaylistMediaContextMenu::showMediaInformation);
+#endif
+    }
+
+    m_menu->popup(pos);
+}
+
+//=================================================================================================
 
 NetworkMediaContextMenu::NetworkMediaContextMenu(QObject* parent)
     : QObject(parent)

@@ -196,6 +196,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<AlbumTrackContextMenu>( "org.videolan.medialib", 0, 1, "AlbumTrackContextMenu" );
         qmlRegisterType<URLContextMenu>( "org.videolan.medialib", 0, 1, "URLContextMenu" );
         qmlRegisterType<VideoContextMenu>( "org.videolan.medialib", 0, 1, "VideoContextMenu" );
+        qmlRegisterType<PlaylistListContextMenu>( "org.videolan.medialib", 0, 1, "PlaylistListContextMenu" );
         qmlRegisterType<PlaylistMediaContextMenu>( "org.videolan.medialib", 0, 1, "PlaylistMediaContextMenu" );
     }
 

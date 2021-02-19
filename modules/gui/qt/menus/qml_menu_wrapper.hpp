@@ -32,6 +32,8 @@ class MLArtistModel;
 class MLAlbumTrackModel;
 class MLUrlModel;
 class MLVideoModel;
+class MLPlaylistListModel;
+class MLPlaylistModel;
 class NetworkDeviceModel;
 class NetworkMediaModel;
 class QmlMainContext;
@@ -208,6 +210,34 @@ public:
 
 public slots:
     void popup(const QModelIndexList& selected, QPoint pos, QVariantMap options = {} );
+signals:
+    void showMediaInformation(int index);
+private:
+    QMenu* m_menu = nullptr;
+};
+
+class PlaylistListContextMenu : public QObject {
+    Q_OBJECT
+    SIMPLE_MENU_PROPERTY(MLPlaylistListModel *, model, nullptr)
+public:
+    PlaylistListContextMenu(QObject * parent = nullptr);
+    ~PlaylistListContextMenu() /* override */;
+
+public slots:
+    void popup(const QModelIndexList & selected, QPoint pos, QVariantMap options = {});
+private:
+    QMenu* m_menu = nullptr;
+};
+
+class PlaylistMediaContextMenu : public QObject {
+    Q_OBJECT
+    SIMPLE_MENU_PROPERTY(MLPlaylistModel *, model, nullptr)
+public:
+    PlaylistMediaContextMenu(QObject * parent = nullptr);
+    ~PlaylistMediaContextMenu() /* override */;
+
+public slots:
+    void popup(const QModelIndexList & selected, QPoint pos, QVariantMap options = {});
 signals:
     void showMediaInformation(int index);
 private:
