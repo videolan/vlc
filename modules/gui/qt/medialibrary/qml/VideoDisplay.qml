@@ -67,6 +67,10 @@ Widgets.PageLoader {
             name: "all",
             displayText: i18n.qtr("All"),
             url: "qrc:///medialibrary/VideoAllDisplay.qml"
+        }, {
+            name: "playlists",
+            displayText: i18n.qtr("Playlists"),
+            url: "qrc:///medialibrary/VideoPlaylistsDisplay.qml"
         }
     ]
 
