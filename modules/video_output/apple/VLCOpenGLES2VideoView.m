@@ -222,8 +222,14 @@ static void Close(vlc_gl_t *gl)
                                              selector:@selector(applicationStateChanged:)
                                                  name:UIApplicationDidBecomeActiveNotification
                                                object:nil];
-    if (_appActive)
-        [self resize:CGSizeMake(frame.size.width, frame.size.height)];
+    /* If size is NULL, rendering must be disabled */
+    if (_appActive && self.bounds.size.width != 0 && self.bounds.size.height != 0)
+    {
+        EAGLContext *previousContext = [EAGLContext currentContext];
+        [EAGLContext setCurrentContext:_eaglContext];
+        [self doResetBuffers];
+        [EAGLContext setCurrentContext:previousContext];
+    }
 
     /* Setup the usual vlc_gl_t callbacks before loading the API since we need
      * the get_proc_address symbol and a current context. */
