@@ -172,6 +172,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlplaylist.hpp \
 	gui/qt/medialibrary/mlplaylistlistmodel.cpp \
 	gui/qt/medialibrary/mlplaylistlistmodel.hpp \
+	gui/qt/medialibrary/mlplaylistmedia.cpp \
+	gui/qt/medialibrary/mlplaylistmedia.hpp \
 	gui/qt/menus/custom_menus.cpp \
 	gui/qt/menus/custom_menus.hpp \
 	gui/qt/menus/qml_menu_wrapper.cpp \
