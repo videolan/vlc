@@ -13,6 +13,9 @@
 #include "medialibrary/mlrecentsmodel.hpp"
 #include "medialibrary/mlrecentsvideomodel.hpp"
 #include "medialibrary/mlfoldersmodel.hpp"
+#include "medialibrary/mlplaylistlistmodel.hpp"
+#include "medialibrary/mlplaylistmodel.hpp"
+#include "medialibrary/mlplaylist.hpp"
 
 #include "player/player_controller.hpp"
 #include "player/playercontrolbarmodel.hpp"
@@ -169,6 +172,8 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<MLUrlModel>( "org.videolan.medialib", 0, 1, "MLUrlModel" );
         qmlRegisterType<MLVideoModel>( "org.videolan.medialib", 0, 1, "MLVideoModel" );
         qmlRegisterType<MLRecentsVideoModel>( "org.videolan.medialib", 0, 1, "MLRecentsVideoModel" );
+        qmlRegisterType<MLPlaylistListModel>( "org.videolan.medialib", 0, 1, "MLPlaylistListModel" );
+        qmlRegisterType<MLPlaylistModel>( "org.videolan.medialib", 0, 1, "MLPlaylistModel" );
 
         qRegisterMetaType<NetworkTreeItem>();
         qmlRegisterType<NetworkMediaModel>( "org.videolan.medialib", 0, 1, "NetworkMediaModel");
@@ -183,6 +188,7 @@ void MainUI::registerQMLTypes()
         registerAnonymousType<MLArtist>("org.videolan.medialib", 1);
         registerAnonymousType<MLAlbumTrack>("org.videolan.medialib", 1);
         registerAnonymousType<MLGenre>("org.videolan.medialib", 1);
+        registerAnonymousType<MLPlaylist>("org.videolan.medialib", 1);
 
         qmlRegisterType<AlbumContextMenu>( "org.videolan.medialib", 0, 1, "AlbumContextMenu" );
         qmlRegisterType<ArtistContextMenu>( "org.videolan.medialib", 0, 1, "ArtistContextMenu" );
@@ -190,6 +196,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<AlbumTrackContextMenu>( "org.videolan.medialib", 0, 1, "AlbumTrackContextMenu" );
         qmlRegisterType<URLContextMenu>( "org.videolan.medialib", 0, 1, "URLContextMenu" );
         qmlRegisterType<VideoContextMenu>( "org.videolan.medialib", 0, 1, "VideoContextMenu" );
+        qmlRegisterType<PlaylistMediaContextMenu>( "org.videolan.medialib", 0, 1, "PlaylistMediaContextMenu" );
     }
 
     qRegisterMetaType<NetworkTreeItem>();
