@@ -829,6 +829,7 @@ modules/gui/qt/medialibrary/qml/VideoListDisplay.qml
 modules/gui/qt/medialibrary/qml/VideoAll.qml
 modules/gui/qt/medialibrary/qml/VideoAllDisplay.qml
 modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml
+modules/gui/qt/medialibrary/qml/PlaylistMedia.qml
 modules/gui/qt/menus/qml/Menubar.qml
 modules/gui/qt/network/qml/DiscoverDisplay.qml
 modules/gui/qt/network/qml/DiscoverUrlDisplay.qml
