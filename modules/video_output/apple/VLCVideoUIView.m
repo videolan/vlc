@@ -83,6 +83,9 @@
 
     /* Window state */
     BOOL _enabled;
+
+    /* Constraints */
+    NSArray<NSLayoutConstraint*> *_constraints;
 }
 
 - (id)initWithWindow:(vout_window_t *)wnd;
@@ -116,8 +119,7 @@
 
     /* The window is controlled by the host application through the UIView
      * sizing mechanisms. */
-    self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-
+    self.translatesAutoresizingMaskIntoConstraints = false;
 
     /* add tap gesture recognizer for DVD menus and stuff */
     _tapRecognizer = [[UITapGestureRecognizer alloc]
@@ -139,6 +141,25 @@
     _viewContainer = superview;
 
     return self;
+}
+
+- (void)didMoveToSuperview
+{
+    _constraints = @[
+        [self.centerXAnchor constraintEqualToAnchor:[[self superview] centerXAnchor]],
+        [self.centerYAnchor constraintEqualToAnchor:[[self superview] centerYAnchor]],
+        [self.widthAnchor constraintEqualToAnchor:[[self superview] widthAnchor]],
+        [self.heightAnchor constraintEqualToAnchor:[[self superview] heightAnchor]],
+    ];
+    [[self superview] addConstraints:_constraints];
+    [NSLayoutConstraint activateConstraints:_constraints];
+}
+
+- (void)willRemoveFromSuperview
+{
+    [NSLayoutConstraint deactivateConstraints:_constraints];
+    [[self superview] removeConstraints:_constraints];
+    _constraints = nil;
 }
 
 - (UIView *)fetchViewContainer
@@ -209,12 +230,10 @@
 {
     assert(!_enabled);
     _enabled = YES;
-    self.frame = _viewContainer.frame;
-    self.center = _viewContainer.center;
-    [_viewContainer addSubview:self];
 
     /* Bind tapRecognizer. */
     [self addGestureRecognizer:_tapRecognizer];
+    [_viewContainer addSubview:self];
 }
 
 - (void)disable
