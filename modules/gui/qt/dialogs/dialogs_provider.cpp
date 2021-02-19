@@ -54,6 +54,7 @@
 #include "dialogs/plugins/plugins.hpp"
 #include "dialogs/epg/epg.hpp"
 #include "dialogs/errors/errors.hpp"
+#include "dialogs/playlists/playlists.hpp"
 
 #include <QEvent>
 #include <QApplication>
@@ -90,6 +91,7 @@ DialogsProvider::~DialogsProvider()
 #endif
     PluginDialog::killInstance();
     EpgDialog::killInstance();
+    PlaylistsDialog::killInstance();
 
     delete popupMenu;
     delete videoPopupMenu;
@@ -141,6 +143,8 @@ void DialogsProvider::customEvent( QEvent *event )
             //FIXME
             //playlistDialog(); break;
             break;
+        case INTF_DIALOG_PLAYLISTS:
+            playlistsDialog(); break;
         case INTF_DIALOG_MESSAGES:
             messagesDialog(); break;
         case INTF_DIALOG_FILEINFO:
@@ -312,6 +316,23 @@ void DialogsProvider::mediaCodecDialog()
         dialog->showTab( MediaInfoDialog::INFO_PANEL );
     else
         dialog->hide();
+}
+
+void DialogsProvider::playlistsDialog()
+{
+    PlaylistsDialog::getInstance( p_intf )->toggleVisible();
+}
+
+void DialogsProvider::playlistsDialog( const QVariantList & medias )
+{
+    PlaylistsDialog * dialog = PlaylistsDialog::getInstance( p_intf );
+
+    dialog->setMedias(medias);
+
+    dialog->show();
+
+    // FIXME: We shouldn't have to call this on here.
+    dialog->getInstance( p_intf )->activateWindow();
 }
 
 void DialogsProvider::bookmarksDialog()

@@ -123,6 +123,8 @@ private:
     void openDialog( int );
 
 public slots:
+    void playlistsDialog();
+    void playlistsDialog( const QVariantList & listMedia );
     void bookmarksDialog();
     void mediaInfoDialog( void );
     void mediaInfoDialog( const PlaylistItem& pItem );
