@@ -149,13 +149,15 @@
                                              selector:@selector(applicationStateChanged:)
                                                  name:UIApplicationWillResignActiveNotification
                                                object:nil];
-    CGSize size = _viewContainer.bounds.size;
+    _viewContainer = superview;
+
+    CGSize size = superview.bounds.size;
     _width = size.width;
     _height = size.height;
+
     [self reportEvent:^{
         vlc_window_ReportSize(_wnd, size.width, size.height);
     }];
-    _viewContainer = superview;
 
     return self;
 }
