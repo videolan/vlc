@@ -137,6 +137,9 @@ else
 VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) -miphoneos-version-min=8.4
 endif
 endif
+ifdef HAVE_MACOSX
+VPX_LDFLAGS := -L$(MACOSX_SDK)/usr/lib -isysroot $(MACOSX_SDK) -mmacosx-version-min=10.7
+endif
 VPX_LDFLAGS += -arch $(PLATFORM_SHORT_ARCH)
 endif
 
