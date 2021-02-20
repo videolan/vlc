@@ -588,9 +588,6 @@ else
     echo "Building contribs for $VLC_HOST_ARCH"
 fi
 
-# Set symbol blacklist for autoconf
-vlcSetSymbolEnvironment > /dev/null
-
 # Combine settings from config file
 VLC_CONTRIB_OPTIONS=( "${VLC_CONTRIB_OPTIONS_BASE[@]}" )
 
@@ -625,8 +622,10 @@ write_config_mak "-Werror=partial-availability"
 if [ "$VLC_USE_PREBUILT_CONTRIBS" -gt "0" ]; then
     # Fetch prebuilt contribs
     if [ -z "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+        vlcSetSymbolEnvironment \
         $MAKE prebuilt || abort_err "Fetching prebuilt contribs failed"
     else
+        vlcSetSymbolEnvironment \
         $MAKE prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" \
             || abort_err "Fetching prebuilt contribs from ${VLC_PREBUILT_CONTRIBS_URL} failed"
     fi
@@ -638,10 +637,12 @@ else
     $MAKE fetch
 
     # Build contribs
+    vlcSetSymbolEnvironment \
     $MAKE || abort_err "Building contribs failed"
 
     # Make prebuilt contribs package
     if [ "$VLC_MAKE_PREBUILT_CONTRIBS" -gt "0" ]; then
+        vlcSetSymbolEnvironment \
         $MAKE package || abort_err "Creating prebuilt contribs package failed"
     fi
 fi
@@ -692,6 +693,7 @@ cd "${VLC_BUILD_DIR}/build" || abort_err "Failed cd to VLC build dir"
 # Create VLC install dir if it does not already exist
 mkdir -p "$VLC_INSTALL_DIR"
 
+vlcSetSymbolEnvironment \
 hostenv ../../configure \
     --with-contrib="$VLC_CONTRIB_INSTALL_DIR" \
     --host="$VLC_HOST_TRIPLET" \
