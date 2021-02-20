@@ -120,6 +120,11 @@
     _tapRecognizer = [[UITapGestureRecognizer alloc]
         initWithTarget:self action:@selector(tapRecognized:)];
 
+    CGSize size = _viewContainer.bounds.size;
+    [self reportEvent:^{
+        vout_window_ReportSize(_wnd, size.width, size.height);
+    }];
+
     return self;
 }
 
