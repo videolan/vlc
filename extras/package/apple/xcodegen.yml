@@ -1,0 +1,30 @@
+name: VLC
+options:
+  bundleIdPrefix: org.videolan.vlc
+  deploymentTarget:
+    iOS: 9.0
+targets:
+  VLCAutomake:
+    type: ""
+    platform: iOS
+    legacy:
+      toolPath: /usr/bin/make
+      passSettings: true
+      attributes: $(ACTIONS)
+      workingDirectory: ${VLC_BUILD_DIR}
+  vlccoreios:
+    type: "application"
+    platform: iOS
+    dependencies:
+      - target: VLCAutomake
+    info:
+      path: vlccoreios/Info.plist
+      properties:
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationLandscape]
+    sources:
+      - path: ${VLC_BUILD_DIR}/test/vlccoreios
+        type: file
+        optional: true
+        buildPhase:
+          copyFiles:
+            destination: executables
