@@ -134,11 +134,12 @@
                                              selector:@selector(applicationStateChanged:)
                                                  name:UIApplicationWillResignActiveNotification
                                                object:nil];
-    CGSize size = _viewContainer.bounds.size;
+    _viewContainer = superview;
+
+    CGSize size = superview.bounds.size;
     [self reportEvent:^{
         vout_window_ReportSize(_wnd, size.width, size.height);
     }];
-    _viewContainer = superview;
 
     return self;
 }
