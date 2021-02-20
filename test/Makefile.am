@@ -300,3 +300,7 @@ vlccoreios_LDADD = ../lib/libvlc.la ../src/libvlccore.la
 if HAVE_IOS
 noinst_PROGRAMS += vlccoreios
 endif
+
+if HAVE_TVOS
+noinst_PROGRAMS += vlccoreios
+endif
