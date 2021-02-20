@@ -146,6 +146,9 @@
 
 - (void)didMoveToSuperview
 {
+    if ([self superview] == nil)
+        return;
+
     _constraints = @[
         [self.centerXAnchor constraintEqualToAnchor:[[self superview] centerXAnchor]],
         [self.centerYAnchor constraintEqualToAnchor:[[self superview] centerYAnchor]],
@@ -158,6 +161,9 @@
 
 - (void)willRemoveFromSuperview
 {
+    if ([self superview] == nil)
+        return;
+
     [NSLayoutConstraint deactivateConstraints:_constraints];
     [[self superview] removeConstraints:_constraints];
     _constraints = nil;
