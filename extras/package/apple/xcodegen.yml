@@ -6,7 +6,7 @@ options:
 targets:
   VLCAutomake:
     type: ""
-    platform: iOS
+    platform: ${VLC_PLATFORM}
     legacy:
       toolPath: /usr/bin/make
       passSettings: true
@@ -14,13 +14,13 @@ targets:
       workingDirectory: ${VLC_BUILD_DIR}
   vlccoreios:
     type: "application"
-    platform: iOS
+    platform: ${VLC_PLATFORM}
     dependencies:
       - target: VLCAutomake
     info:
       path: vlccoreios/Info.plist
       properties:
-        UISupportedInterfaceOrientations: [UIInterfaceOrientationLandscape]
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
     sources:
       - path: ${VLC_BUILD_DIR}/test/vlccoreios
         type: file
