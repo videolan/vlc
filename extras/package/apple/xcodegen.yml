@@ -12,15 +12,20 @@ targets:
       passSettings: true
       attributes: $(ACTIONS)
       workingDirectory: ${VLC_BUILD_DIR}
+    sources:
+      - path: "${VLC_SRC_DIR}/src"
+        excludes: "**/Makefile.in"
+      - path: "${VLC_SRC_DIR}/include"
+        excludes: "**/Makefile.in"
+      - path: "${VLC_SRC_DIR}/modules"
+        excludes: "**/Makefile.in"
   vlccoreios:
     type: "application"
     platform: ${VLC_PLATFORM}
     dependencies:
       - target: VLCAutomake
     info:
-      path: vlccoreios/Info.plist
-      properties:
-        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+      path: "vlccoreios/Info.plist"
     sources:
       - path: ${VLC_BUILD_DIR}/test/vlccoreios
         type: file
