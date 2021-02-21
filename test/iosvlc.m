@@ -32,12 +32,17 @@
 #include <vlc_variables.h>
 #include <vlc_plugin.h>
 
+#include <TargetConditionals.h>
+
 @interface AppDelegate : UIResponder <UIApplicationDelegate> {
     @public
     libvlc_instance_t *_libvlc;
     UIWindow *window;
     UIView *subview;
+
+#if TARGET_OS_IOS
     UIPinchGestureRecognizer *_pinchRecognizer;
+#endif
 
     CGRect _pinchRect;
     CGPoint _pinchOrigin;
@@ -47,6 +52,7 @@
 
 
 @implementation AppDelegate
+#if TARGET_OS_IOS
 - (void)pinchRecognized:(UIPinchGestureRecognizer *)pinchRecognizer
 {
     UIGestureRecognizerState state = [pinchRecognizer state];
@@ -78,6 +84,8 @@
             _pinchPreviousCenter.x + newPosition.x - _pinchOrigin.x,
             _pinchPreviousCenter.y + newPosition.y - _pinchOrigin.y);
 }
+#endif
+
 /* Called after application launch */
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -112,9 +120,11 @@
     [window addSubview:subview];
     [window makeKeyAndVisible];
 
+#if TARGET_OS_IOS
     _pinchRecognizer = [[UIPinchGestureRecognizer alloc]
         initWithTarget:self action:@selector(pinchRecognized:)];
     [window addGestureRecognizer:_pinchRecognizer];
+#endif
 
     /* Start glue interface, see code below */
     libvlc_add_intf(_libvlc, "ios_interface,none");
