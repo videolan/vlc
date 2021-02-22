@@ -430,12 +430,6 @@ static picture_t *FilterChainVideoFilter( chained_filter_t *f, picture_t *p_pic 
         p_pic = p_filter->ops->filter_video( p_filter, p_pic );
         if( !p_pic )
             break;
-
-        {
-            msg_Warn( p_filter, "dropping pictures" );
-            FilterDeletePictures( &f->pending );
-        }
-        f->pending = picture_GetAndResetChain( p_pic );
         p_pic->p_next = NULL;
     }
     return p_pic;
