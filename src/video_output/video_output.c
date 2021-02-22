@@ -1954,9 +1954,7 @@ void vout_StopDisplay(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
 
-    bool terminated = atomic_exchange(&sys->control_is_terminated, true);
-    if (terminated)
-        return;
+    atomic_store(&sys->control_is_terminated, true);
     // wake up so it goes back to the loop that will detect the terminated state
     vout_control_Wake(&sys->control);
     vlc_join(sys->thread, NULL);
