@@ -186,6 +186,8 @@ int transcode_encoder_audio_test( encoder_t *p_encoder,
 
     p_encoder->fmt_in.audio.i_format = p_encoder->fmt_in.i_codec;
 
+    aout_FormatPrepare(&p_encoder->fmt_in.audio);
+
     /* copy our requested format */
     es_format_Copy( p_enc_wanted_in, &p_encoder->fmt_in );
 
