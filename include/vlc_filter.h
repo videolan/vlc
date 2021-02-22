@@ -231,7 +231,7 @@ struct filter_t
     /* Name of the "video filter" shortcut that is requested, can be NULL */
     const char *        psz_name;
     /* Filter configuration */
-    config_chain_t *    p_cfg;
+    const config_chain_t *p_cfg;
 
     /* Implementation of filter API */
     const struct vlc_filter_operations *ops;
@@ -529,7 +529,7 @@ VLC_API void filter_chain_Clear(filter_chain_t *);
  * \return a pointer to the filter or NULL on error
  */
 VLC_API filter_t *filter_chain_AppendFilter(filter_chain_t *chain,
-    const char *name, config_chain_t *cfg,
+    const char *name, const config_chain_t *cfg,
     const es_format_t *fmt_out);
 
 /**

@@ -204,7 +204,7 @@ void filter_chain_Reset( filter_chain_t *p_chain,
 }
 
 static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
-    const char *name, const char *capability, config_chain_t *cfg,
+    const char *name, const char *capability, const config_chain_t *cfg,
     const es_format_t *fmt_out )
 {
     chained_filter_t *chained =
@@ -293,7 +293,7 @@ error:
 }
 
 filter_t *filter_chain_AppendFilter( filter_chain_t *chain,
-    const char *name, config_chain_t *cfg,
+    const char *name, const config_chain_t *cfg,
     const es_format_t *fmt_out )
 {
     return filter_chain_AppendInner( chain, name, chain->filter_cap, cfg,
