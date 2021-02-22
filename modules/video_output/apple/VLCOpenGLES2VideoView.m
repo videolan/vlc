@@ -223,7 +223,7 @@ static void Close(vlc_gl_t *gl)
                                                  name:UIApplicationDidBecomeActiveNotification
                                                object:nil];
     /* If size is NULL, rendering must be disabled */
-    if (_appActive && self.bounds.size.width != 0 && self.bounds.size.height != 0)
+    if (_appActive && self.bounds.size.width <= 1 && self.bounds.size.height <= 1)
     {
         EAGLContext *previousContext = [EAGLContext currentContext];
         [EAGLContext setCurrentContext:_eaglContext];
