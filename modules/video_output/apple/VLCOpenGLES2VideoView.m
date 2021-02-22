@@ -409,16 +409,16 @@ static void Close(vlc_gl_t *gl)
         rect.size.height /= self.contentScaleFactor;
 
         self.frame = rect;
-    });
 
-    /* If size is NULL, rendering must be disabled */
-    if (size.width != 0 && size.height != 0)
-    {
-        EAGLContext *previousContext = [EAGLContext currentContext];
-        [EAGLContext setCurrentContext:_eaglContext];
-        [self doResetBuffers];
-        [EAGLContext setCurrentContext:previousContext];
-    }
+        /* If size is NULL, rendering must be disabled */
+        if (size.width != 0 && size.height != 0)
+        {
+            EAGLContext *previousContext = [EAGLContext currentContext];
+            [EAGLContext setCurrentContext:_eaglContext];
+            [self doResetBuffers];
+            [EAGLContext setCurrentContext:previousContext];
+        }
+    });
 
     vlc_mutex_unlock(&_mutex);
 }
