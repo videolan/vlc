@@ -346,6 +346,7 @@ static void Close(vlc_gl_t *gl)
     glGenRenderbuffers(1, &_renderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, _renderBuffer);
 
+    msg_Info(_gl, "Size: %fx%f", self.bounds.size.width, self.bounds.size.height);
     [_eaglContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:_layer];
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _renderBuffer);
