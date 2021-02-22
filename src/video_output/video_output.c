@@ -911,13 +911,11 @@ static void ThreadChangeFilters(vout_thread_sys_t *vout)
             filter_t *filter = filter_chain_AppendFilter(chain, e->name, e->cfg,
                                NULL);
             if (!filter)
-            {
                 msg_Err(&vout->obj, "Failed to add filter '%s'", e->name);
-                config_ChainDestroy(e->cfg);
-            }
             else if (a == 1) /* Add callbacks for interactive filters */
                 filter_AddProxyCallbacks(&vout->obj, filter, FilterRestartCallback);
 
+            config_ChainDestroy(e->cfg);
             free(e->name);
             free(e);
         }
