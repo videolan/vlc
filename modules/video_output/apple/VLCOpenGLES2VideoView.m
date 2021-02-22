@@ -423,13 +423,6 @@ static void Close(vlc_gl_t *gl)
     vlc_mutex_unlock(&_mutex);
 }
 
-- (void)layoutSubviews
-{
-    vlc_mutex_lock(&_mutex);
-    _bufferNeedReset = YES;
-    vlc_mutex_unlock(&_mutex);
-}
-
 - (void)flushEAGLLocked
 {
     assert(_eaglEnabled);
