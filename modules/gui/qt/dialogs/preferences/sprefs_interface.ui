@@ -304,6 +304,36 @@
                </property>
               </widget>
              </item>
+             <item row="14" column="0">
+              <widget class="QLabel" name="scaleFactorLabel">
+               <property name="text">
+                <string>Interface scale factor:</string>
+               </property>
+               <property name="buddy">
+                <cstring>intfScaleFactorSlider</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="14" column="2">
+              <widget class="QSlider" name="intfScaleFactorSlider">
+               <property name="tracking">
+                <bool>false</bool>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="14" column="3">
+              <widget class="QSpinBox" name="intfScaleFactorSpinBox">
+               <property name="suffix">
+                <string> %</string>
+               </property>
+               <property name="singleStep">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
              <item row="5" column="0">
               <widget class="QCheckBox" name="titleBarCheckBox">
                <property name="text">

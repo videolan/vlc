@@ -812,6 +812,34 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.colorSchemeComboBox->insertItems(0, p_intf->p_sys->p_mi->getColorScheme()->stringList());
             QObject::connect( ui.colorSchemeComboBox, &QComboBox::currentTextChanged, p_intf->p_sys->p_mi->getColorScheme(), &ColorSchemeModel::setCurrent );
 
+            const float intfScaleFloatFactor = 100.f;
+            const auto updateIntfUserScaleFactorFromControls =
+                    [this, slider = ui.intfScaleFactorSlider, spinBox = ui.intfScaleFactorSpinBox, intfScaleFloatFactor](const int value)
+            {
+                if (slider->value() != value)
+                {
+                    QSignalBlocker s( slider );
+                    slider->setValue( value );
+                }
+                if (spinBox->value() != value)
+                {
+                    QSignalBlocker s( spinBox );
+                    spinBox->setValue( value );
+                }
+                p_intf->p_sys->p_mi->setIntfUserScaleFactor( value / intfScaleFloatFactor );
+            };
+
+            ui.intfScaleFactorSlider->setRange( p_intf->p_sys->p_mi->getMinIntfUserScaleFactor() * intfScaleFloatFactor
+                                                 , p_intf->p_sys->p_mi->getMaxIntfUserScaleFactor() * intfScaleFloatFactor);
+            ui.intfScaleFactorSpinBox->setRange( p_intf->p_sys->p_mi->getMinIntfUserScaleFactor() * intfScaleFloatFactor
+                                                 , p_intf->p_sys->p_mi->getMaxIntfUserScaleFactor() * intfScaleFloatFactor);
+
+            updateIntfUserScaleFactorFromControls( p_intf->p_sys->p_mi->getIntfUserScaleFactor() * intfScaleFloatFactor );
+            QObject::connect( ui.intfScaleFactorSlider, QOverload<int>::of(&QSlider::valueChanged)
+                              , p_intf->p_sys->p_mi , updateIntfUserScaleFactorFromControls );
+            QObject::connect( ui.intfScaleFactorSpinBox, QOverload<int>::of(&QSpinBox::valueChanged)
+                              , p_intf->p_sys->p_mi , updateIntfUserScaleFactorFromControls );
+
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
             CONFIG_BOOL( "qt-titlebar", titleBarCheckBox );
 #else
