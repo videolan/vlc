@@ -76,16 +76,11 @@ Widgets.NavigableFocusScope{
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignTop | Qt.AlignLeft
 
-                    spacing: VLCStyle.margin_large
-
                     Menus.Menubar {
                         id: menubar
 
                         width: parent.width
                         height: VLCStyle.icon_normal
-
-                        Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-
                         visible: mainInterface.hasToolbarMenu
                         textColor: topFocusScope.colors.text
                         highlightedBgColor: topFocusScope.colors.bgHover
@@ -132,7 +127,7 @@ Widgets.NavigableFocusScope{
                         anchors.left: parent.left
                         anchors.leftMargin: logo.x
                         width: rowLayout.width - anchors.leftMargin
-
+                        topPadding: VLCStyle.margin_large
                         horizontalAlignment: Text.AlignLeft
                         color: topFocusScope.colors.playerFg
                         font.pixelSize: VLCStyle.dp(18, VLCStyle.scale)
