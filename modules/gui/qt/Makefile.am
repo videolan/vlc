@@ -222,6 +222,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/qmleventfilter.hpp \
 	gui/qt/util/qt_dirs.cpp gui/qt/util/qt_dirs.hpp \
 	gui/qt/util/qvlcapp.hpp \
+	gui/qt/util/proxycolumnmodel.hpp \
 	gui/qt/util/registry.cpp gui/qt/util/registry.hpp \
 	gui/qt/util/renderer_manager.cpp gui/qt/util/renderer_manager.hpp \
 	gui/qt/util/selectable_list_model.cpp \
