@@ -19,23 +19,23 @@
 #include "mlfoldersmodel.hpp"
 #include <cassert>
 
-MlFoldersModel::MlFoldersModel( QObject *parent )
+MLFoldersBaseModel::MLFoldersBaseModel( QObject *parent )
     : QAbstractListModel( parent )
     , m_ml_event_handle( nullptr , [this](vlc_ml_event_callback_t* cb ) {
         if ( m_ml )
             vlc_ml_event_unregister_callback( m_ml , cb );
     })
 {
-    connect( this , &MlFoldersModel::onMLEntryPointModified , this , &MlFoldersModel::update );
+    connect( this , &MLFoldersBaseModel::onMLEntryPointModified , this , &MLFoldersBaseModel::update );
 }
 
-MlFoldersModel::EntryPoint::EntryPoint( const vlc_ml_entry_point_t& entryPoint)
+MLFoldersBaseModel::EntryPoint::EntryPoint( const vlc_ml_entry_point_t& entryPoint)
     : mrl(entryPoint.psz_mrl)
     , banned(entryPoint.b_banned)
 {
 }
 
-void MlFoldersModel::setCtx(QmlMainContext *ctx)
+void MLFoldersBaseModel::setCtx(QmlMainContext *ctx)
 {
     if (ctx)
     {
@@ -50,7 +50,7 @@ void MlFoldersModel::setCtx(QmlMainContext *ctx)
     emit ctxChanged();
 }
 
-void MlFoldersModel::setMl(vlc_medialibrary_t *ml)
+void MLFoldersBaseModel::setMl(vlc_medialibrary_t *ml)
 {
     if (ml)
         m_ml_event_handle.reset( vlc_ml_event_register_callback( ml , onMlEvent , this ) );
@@ -60,31 +60,23 @@ void MlFoldersModel::setMl(vlc_medialibrary_t *ml)
     update();
 }
 
-int MlFoldersModel::rowCount( QModelIndex const & ) const
+int MLFoldersBaseModel::rowCount( QModelIndex const & ) const
 {
     return static_cast<int>(m_mrls.size());
 }
 
-int MlFoldersModel::columnCount( QModelIndex const & ) const
-{
-    return 3;
-}
-
-QVariant MlFoldersModel::data( const QModelIndex &index ,
+QVariant MLFoldersBaseModel::data( const QModelIndex &index ,
                               int role) const {
-    if ( index.isValid() )
+    if ( !index.isValid() )
+        return {};
+
+    switch ( role )
     {
-        switch ( role )
-        {
-        case Qt::DisplayRole :
-        {
-            if ( index.column() != 1 )
-                return {};
-            QUrl url = QUrl::fromUserInput(m_mrls[index.row()].mrl);
-            if (!url.isValid())
-                return {};
-            return QVariant::fromValue( url.toDisplayString( QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments ) );
-        }
+        case Banned:
+            return m_mrls[index.row()].banned;
+        case MRL:
+            return m_mrls[index.row()].mrl;
+        case Qt::DisplayRole:
         case DisplayUrl:
         {
             QUrl url = QUrl::fromUserInput(m_mrls[index.row()].mrl);
@@ -92,52 +84,12 @@ QVariant MlFoldersModel::data( const QModelIndex &index ,
                 return {};
             return QVariant::fromValue( url.toDisplayString( QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments ) );
         }
-        case Banned:
-            return m_mrls[index.row()].banned;
         default :
             return {};
-        }
     }
-    return {};
 }
 
-void MlFoldersModel::removeAt( int index )
-{
-    assert(index  < static_cast<int>(m_mrls.size()));
-    vlc_ml_remove_folder( m_ml , qtu( m_mrls[index].mrl ) );
-}
-
-void MlFoldersModel::add( QUrl mrl )
-{
-    vlc_ml_add_folder( m_ml , qtu( mrl.toString( QUrl::None ) ) );
-}
-
-void MlFoldersModel::update()
-{
-    beginResetModel();
-
-    m_mrls.clear();
-
-    vlc_ml_entry_point_list_t * entrypoints;
-    vlc_ml_list_folder( m_ml , &entrypoints ); //TODO: get list of banned folders as well
-
-    for ( unsigned int i=0 ; i<entrypoints->i_nb_items ; i++ )
-        m_mrls.emplace_back( entrypoints->p_items[i] );
-
-    vlc_ml_release(entrypoints);
-
-    endResetModel();
-}
-
-Qt::ItemFlags MlFoldersModel::flags ( const QModelIndex & index ) const {
-    Qt::ItemFlags defaultFlags = QAbstractListModel::flags( index );
-    if ( index.isValid() ){
-        return defaultFlags;
-    }
-    return defaultFlags;
-}
-
-QHash<int, QByteArray> MlFoldersModel::roleNames() const
+QHash<int, QByteArray> MLFoldersBaseModel::roleNames() const
 {
     return {
         {DisplayUrl, "display_url"},
@@ -145,25 +97,16 @@ QHash<int, QByteArray> MlFoldersModel::roleNames() const
     };
 }
 
-bool MlFoldersModel::setData( const QModelIndex &index ,
-                                const QVariant &value , int role){
-    if( !index.isValid() )
-        return false;
-
-    else if( role == Banned ){
-        if( !value.toBool() ){
-            vlc_ml_unban_folder(m_ml, qtu( m_mrls[index.row()].mrl ) );
-        }
-        else{
-            vlc_ml_ban_folder( m_ml , qtu( m_mrls[index.row()].mrl ) );
-        }
-    }
-
-    return true;
-}
-void MlFoldersModel::onMlEvent( void* data , const vlc_ml_event_t* event )
+void MLFoldersBaseModel::update()
 {
-    auto self = static_cast<MlFoldersModel*>( data );
+    beginResetModel();
+    m_mrls = entryPoints();
+    endResetModel();
+}
+
+void MLFoldersBaseModel::onMlEvent( void* data , const vlc_ml_event_t* event )
+{
+    auto self = static_cast<MLFoldersBaseModel *>( data );
     if ( event->i_type == VLC_ML_EVENT_ENTRY_POINT_ADDED || event->i_type == VLC_ML_EVENT_ENTRY_POINT_REMOVED ||
          event->i_type == VLC_ML_EVENT_ENTRY_POINT_UNBANNED || event->i_type == VLC_ML_EVENT_ENTRY_POINT_BANNED  )
     {
@@ -171,22 +114,28 @@ void MlFoldersModel::onMlEvent( void* data , const vlc_ml_event_t* event )
     }
 }
 
- QVariant MlFoldersModel::headerData( int section , Qt::Orientation orientation , int /*role*/) const
- {
-     if ( orientation == Qt::Horizontal ) {
-         switch ( section ) {
-             case 0:
-                 return qtr("Banned");
+std::vector<MLFoldersBaseModel::EntryPoint> MLFoldersModel::entryPoints() const
+{
+    std::vector<MLFoldersBaseModel::EntryPoint> r;
 
-             case 1:
-                 return qtr("Path");
+    vlc_ml_entry_point_list_t * entrypoints = nullptr;
+    vlc_ml_list_folder( ml() , &entrypoints );
+    for ( unsigned int i=0 ; i<entrypoints->i_nb_items ; i++ )
+        r.emplace_back( entrypoints->p_items[i] );
+    vlc_ml_release(entrypoints);
 
-             case 2:
-                 return qtr("Remove");
+    return r;
+}
 
-             default:
-                 return qtr("Unknown");
-         }
-     }
-     return QVariant();
- }
+void MLFoldersModel::removeAt( int index )
+{
+    assert(index < rowCount());
+    const QModelIndex idx = this->index( index, 0 );
+    if (idx.isValid())
+        vlc_ml_remove_folder( ml() , qtu( data( idx, MLFoldersBaseModel::MRL ).value<QString>() ) );
+}
+
+void MLFoldersModel::add(const QUrl &mrl )
+{
+    vlc_ml_add_folder( ml() , qtu( mrl.toString( QUrl::None ) ) );
+}

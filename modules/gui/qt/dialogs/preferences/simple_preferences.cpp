@@ -30,6 +30,7 @@
 #include "preferences_widgets.hpp"
 #include "maininterface/main_interface.hpp"
 #include "util/color_scheme_model.hpp"
+#include "util/proxycolumnmodel.hpp"
 
 #include <vlc_config_cat.h>
 #include <vlc_configuration.h>
@@ -976,7 +977,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
                 if ( vlc_ml_instance_get( p_intf ) != NULL )
                 {
-                    mlModel = new MlFoldersModel( this );
+                    mlModel = new ProxyColumnModel<MLFoldersModel>(1, {{0, qtr("Path")}, {1, qtr("Remove")}}, this );
                     mlModel->setMl( vlc_ml_instance_get( p_intf ) );
 
                     mlTableView = ui.entryPointsTV;
@@ -1564,28 +1565,8 @@ void SPrefsPanel::MLaddNewEntryPoint( ){
         mlModel->add( newEntryPoints );
 }
 
-QWidget *SPrefsPanel::MLgenerateWidget( QModelIndex index , MlFoldersModel *mlf , QWidget *parent){
-    if ( index.column() == 0 ){
-
-        QWidget *wid = new QWidget( parent );
-
-        QBoxLayout* layout = new QBoxLayout( QBoxLayout::LeftToRight , wid );
-
-        QCheckBox*cb = new QCheckBox( wid );
-        cb->setFixedSize( 16 , 16 );
-
-        //cb->setChecked(mlf->data(index, MlFoldersModel::CustomCheckBoxRole).toBool()); //TODO: disable banning till un-banning works
-        cb->setEnabled( false );
-
-        layout->addWidget( cb , Qt::AlignCenter );
-        wid->setLayout( layout );
-
-        connect( cb , &QPushButton::clicked, [=]( ) {
-            mlf->setData( index , cb->isChecked() , MlFoldersModel::Banned);
-        } );
-        return wid;
-    }
-    else if ( index.column( ) == 2 ){
+QWidget *SPrefsPanel::MLgenerateWidget( QModelIndex index , MLFoldersModel *mlf , QWidget *parent){
+    if ( index.column( ) == 1 ){
         QWidget *wid = new QWidget( parent );
 
         QBoxLayout* layout = new QBoxLayout( QBoxLayout::LeftToRight , wid );
@@ -1608,17 +1589,21 @@ QWidget *SPrefsPanel::MLgenerateWidget( QModelIndex index , MlFoldersModel *mlf 
 }
 
 void SPrefsPanel::MLdrawControls( ) {
-  for ( int col = 0 ; col < mlModel->columnCount( ) ; col++ )
-    for (int row = 0 ; row < mlModel->rowCount() ; row++ )
-      {
-    QModelIndex index = mlModel->index ( row , col );
-    mlTableView->setIndexWidget ( index, MLgenerateWidget ( index, mlModel,
-                               mlTableView ) );
-      }
+
+    const auto model = mlTableView->model();
+    for ( int col = 0 ; col < model->columnCount( model->index(0, 0) ) ; col++ )
+    {
+        for (int row = 0 ; row < model->rowCount() ; row++ )
+        {
+            QModelIndex index = model->index ( row , col );
+            mlTableView->setIndexWidget ( index, MLgenerateWidget ( index, mlModel,
+                                       mlTableView ) );
+        }
+    }
 
   mlTableView->resizeColumnsToContents( );
   mlTableView->horizontalHeader()->setMinimumSectionSize( 100 );
-  mlTableView->horizontalHeader()->setSectionResizeMode( 1 , QHeaderView::Stretch );
+  mlTableView->horizontalHeader()->setSectionResizeMode( 0 , QHeaderView::Stretch );
 
   mlTableView->horizontalHeader()->setFixedHeight( 24 );
 }

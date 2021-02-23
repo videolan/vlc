@@ -116,7 +116,7 @@ private:
 
     char *lang;
 
-    MlFoldersModel *mlModel;
+    MLFoldersModel *mlModel;
     QTableView * mlTableView;
 
 #ifdef _WIN32
@@ -137,7 +137,7 @@ private slots:
     void saveAsso();
 #endif
     void MLaddNewEntryPoint( );
-    QWidget * MLgenerateWidget( QModelIndex index , MlFoldersModel *mlf , QWidget *parent );
+    QWidget * MLgenerateWidget( QModelIndex index , MLFoldersModel *mlf , QWidget *parent );
     void MLdrawControls( );
 
     void configML();

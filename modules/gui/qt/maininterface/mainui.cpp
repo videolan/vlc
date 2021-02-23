@@ -180,7 +180,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<NetworkDeviceModel>( "org.videolan.medialib", 0, 1, "NetworkDeviceModel");
         qmlRegisterType<NetworkSourcesModel>( "org.videolan.medialib", 0, 1, "NetworkSourcesModel");
         qmlRegisterType<ServicesDiscoveryModel>( "org.videolan.medialib", 0, 1, "ServicesDiscoveryModel");
-        qmlRegisterType<MlFoldersModel>( "org.videolan.medialib", 0, 1, "MLFolderModel");
+        qmlRegisterType<MLFoldersModel>( "org.videolan.medialib", 0, 1, "MLFolderModel");
         qmlRegisterType<MLRecentsModel>( "org.videolan.medialib", 0, 1, "MLRecentModel" );
 
         //expose base object, they aren't instanciable from QML side
@@ -205,7 +205,7 @@ void MainUI::registerQMLTypes()
     qmlRegisterType<NetworkDeviceModel>( "org.videolan.vlc", 0, 1, "NetworkDeviceModel");
     qmlRegisterType<NetworkSourcesModel>( "org.videolan.vlc", 0, 1, "NetworkSourcesModel");
     qmlRegisterType<ServicesDiscoveryModel>( "org.videolan.vlc", 0, 1, "ServicesDiscoveryModel");
-    qmlRegisterType<MlFoldersModel>( "org.videolan.vlc", 0, 1, "MLFolderModel");
+    qmlRegisterType<MLFoldersModel>( "org.videolan.vlc", 0, 1, "MLFolderModel");
     qmlRegisterType<ImageLuminanceExtractor>( "org.videolan.vlc", 0, 1, "ImageLuminanceExtractor");
 
     qmlRegisterUncreatableType<NavigationHistory>("org.videolan.vlc", 0, 1, "History", "Type of global variable history" );
