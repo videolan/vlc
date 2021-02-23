@@ -284,6 +284,19 @@
              <item row="11" column="2" colspan="2">
               <widget class="QComboBox" name="autoRaiseComboBox"/>
              </item>
+             <item row="12" column="0">
+              <widget class="QLabel" name="colorSchemeLabel">
+               <property name="text">
+                <string>Color Scheme:</string>
+               </property>
+               <property name="buddy">
+                <cstring>colorSchemeComboBox</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="2" colspan="2">
+              <widget class="QComboBox" name="colorSchemeComboBox"/>
+             </item>
             </layout>
            </widget>
           </item>

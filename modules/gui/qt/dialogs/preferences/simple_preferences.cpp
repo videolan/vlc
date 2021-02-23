@@ -28,6 +28,8 @@
 
 #include "simple_preferences.hpp"
 #include "preferences_widgets.hpp"
+#include "maininterface/main_interface.hpp"
+#include "util/color_scheme_model.hpp"
 
 #include <vlc_config_cat.h>
 #include <vlc_configuration.h>
@@ -805,6 +807,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                                  ui.fileSkin, ui.skinBrowse );
 
             CONFIG_BOOL( "metadata-network-access", MetadataNetworkAccessMode );
+
+            ui.colorSchemeComboBox->insertItems(0, p_intf->p_sys->p_mi->getColorScheme()->stringList());
+            QObject::connect( ui.colorSchemeComboBox, &QComboBox::currentTextChanged, p_intf->p_sys->p_mi->getColorScheme(), &ColorSchemeModel::setCurrent );
 
             /* UPDATE options */
 #ifdef UPDATE_CHECK
