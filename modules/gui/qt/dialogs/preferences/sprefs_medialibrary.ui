@@ -26,8 +26,21 @@
      <property name="title">
       <string>Folders</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_5">
-      <item row="0" column="2">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="1" colspan="2">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>627</width>
+          <height>17</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="3">
        <widget class="QPushButton" name="addButton">
         <property name="maximumSize">
          <size>
@@ -40,8 +53,48 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="3">
-       <widget class="QTableView" name="entryPointsTV">
+      <item row="3" column="3">
+       <widget class="QPushButton" name="banButton">
+        <property name="maximumSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>+</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Folders scanned by the Media Library:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" rowspan="2">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="2" column="0" rowspan="2">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Banned Folders:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="4">
+       <widget class="QTableView" name="bannedEntryPoints">
         <property name="editTriggers">
          <set>QAbstractItemView::AllEditTriggers</set>
         </property>
@@ -59,24 +112,23 @@
         </attribute>
        </widget>
       </item>
-      <item row="0" column="1">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="1" column="0" colspan="4">
+       <widget class="QTableView" name="entryPoints">
+        <property name="editTriggers">
+         <set>QAbstractItemView::AllEditTriggers</set>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>627</width>
-          <height>17</height>
-         </size>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
         </property>
-       </spacer>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Folders scanned by the Media Library:</string>
+        <property name="showGrid">
+         <bool>false</bool>
         </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
        </widget>
       </item>
      </layout>

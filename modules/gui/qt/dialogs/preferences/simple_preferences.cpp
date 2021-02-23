@@ -977,18 +977,21 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
                 if ( vlc_ml_instance_get( p_intf ) != NULL )
                 {
-                    mlModel = new ProxyColumnModel<MLFoldersModel>(1, {{0, qtr("Path")}, {1, qtr("Remove")}}, this );
-                    mlModel->setMl( vlc_ml_instance_get( p_intf ) );
+                    mlFoldersModel = new ProxyColumnModel<MLFoldersModel>(1, {{0, qtr("Path")}, {1, qtr("Remove")}}, this );
+                    mlFoldersModel->setMl( vlc_ml_instance_get( p_intf ) );
+                    ui.entryPoints->setModel( mlFoldersModel );
+                    connect( mlFoldersModel , &QAbstractItemModel::modelReset , this, [this, view = ui.entryPoints]() { MLdrawControls( view ); } );
 
-                    mlTableView = ui.entryPointsTV;
+                    mlBannedFoldersModel = new ProxyColumnModel<MLBannedFoldersModel>(1, {{0, qtr("Path")}, {1, qtr("Remove")}}, this );
+                    mlBannedFoldersModel->setMl( vlc_ml_instance_get( p_intf ));
+                    ui.bannedEntryPoints->setModel( mlBannedFoldersModel );
+                    connect( mlBannedFoldersModel , &QAbstractItemModel::modelReset , this, [this, view = ui.bannedEntryPoints]() { MLdrawControls( view ); } );
 
-                    mlTableView->setModel( mlModel );
+                    BUTTONACT( ui.addButton , MLaddNewFolder() );
+                    BUTTONACT( ui.banButton , MLBanFolder() );
 
-                    connect( mlModel , &QAbstractItemModel::modelReset , this , &SPrefsPanel::MLdrawControls );
-
-                    BUTTONACT( ui.addButton , MLaddNewEntryPoint() );
-
-                    MLdrawControls( );
+                    MLdrawControls( ui.entryPoints );
+                    MLdrawControls( ui.bannedEntryPoints );
                 }
                 else
                 {
@@ -1557,15 +1560,23 @@ void SPrefsPanel::saveAsso()
 
 #endif /* _WIN32 */
 
-void SPrefsPanel::MLaddNewEntryPoint( ){
+void SPrefsPanel::MLaddNewFolder() {
     QUrl newEntryPoints = QFileDialog::getExistingDirectoryUrl( this , qtr("Please choose an entry point folder") ,
                                              QUrl( QDir::homePath( ) ) );
 
     if(! newEntryPoints.isEmpty() )
-        mlModel->add( newEntryPoints );
+        mlFoldersModel->add( newEntryPoints );
 }
 
-QWidget *SPrefsPanel::MLgenerateWidget( QModelIndex index , MLFoldersModel *mlf , QWidget *parent){
+void SPrefsPanel::MLBanFolder( ) {
+    QUrl newEntryPoints = QFileDialog::getExistingDirectoryUrl( this , qtr("Please choose an entry point folder") ,
+                                             QUrl( QDir::homePath( ) ) );
+
+    if(! newEntryPoints.isEmpty() )
+        mlBannedFoldersModel->add( newEntryPoints );
+}
+
+QWidget *SPrefsPanel::MLgenerateWidget( QModelIndex index , MLFoldersBaseModel *mlf , QWidget *parent){
     if ( index.column( ) == 1 ){
         QWidget *wid = new QWidget( parent );
 
@@ -1588,15 +1599,14 @@ QWidget *SPrefsPanel::MLgenerateWidget( QModelIndex index , MLFoldersModel *mlf 
     return nullptr;
 }
 
-void SPrefsPanel::MLdrawControls( ) {
-
+void SPrefsPanel::MLdrawControls(QTableView *mlTableView) {
     const auto model = mlTableView->model();
     for ( int col = 0 ; col < model->columnCount( model->index(0, 0) ) ; col++ )
     {
         for (int row = 0 ; row < model->rowCount() ; row++ )
         {
             QModelIndex index = model->index ( row , col );
-            mlTableView->setIndexWidget ( index, MLgenerateWidget ( index, mlModel,
+            mlTableView->setIndexWidget( index, MLgenerateWidget ( index, qobject_cast<MLFoldersBaseModel *>(model),
                                        mlTableView ) );
         }
     }

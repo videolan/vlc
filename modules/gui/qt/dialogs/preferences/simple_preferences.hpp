@@ -115,9 +115,8 @@ private:
     QButtonGroup *radioGroup;
 
     char *lang;
-
-    MLFoldersModel *mlModel;
-    QTableView * mlTableView;
+    MLFoldersModel *mlFoldersModel;
+    MLBannedFoldersModel *mlBannedFoldersModel;
 
 #ifdef _WIN32
     QList<QTreeWidgetItem *> listAsso;
@@ -136,9 +135,10 @@ private slots:
     void updateCheckBoxes( QTreeWidgetItem*, int );
     void saveAsso();
 #endif
-    void MLaddNewEntryPoint( );
-    QWidget * MLgenerateWidget( QModelIndex index , MLFoldersModel *mlf , QWidget *parent );
-    void MLdrawControls( );
+    void MLaddNewFolder( );
+    void MLBanFolder( );
+    QWidget * MLgenerateWidget(QModelIndex index , MLFoldersBaseModel *mlf , QWidget *parent );
+    void MLdrawControls( QTableView *mlView );
 
     void configML();
     void changeStyle( QString );
