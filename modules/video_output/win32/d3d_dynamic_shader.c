@@ -165,7 +165,7 @@ inline float3 toneMapping(float3 rgb) {\n\
 \n\
 inline float3 adjustRange(float3 rgb) {\n\
 #if (SRC_RANGE!=DST_RANGE)\n\
-    return clamp((rgb + BLACK_LEVEL_SHIFT) * RANGE_FACTOR, MIN_BLACK_VALUE, MAX_BLACK_VALUE);\n\
+    return clamp((rgb + BLACK_LEVEL_SHIFT) * RANGE_FACTOR, MIN_BLACK_VALUE, MAX_WHITE_VALUE);\n\
 #else\n\
     return rgb;\n\
 #endif\n\
@@ -399,7 +399,7 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
          { "BLACK_LEVEL_SHIFT", psz_black_level },
          { "RANGE_FACTOR",      psz_range_factor },
          { "MIN_BLACK_VALUE",   psz_min_black },
-         { "MAX_BLACK_VALUE",   psz_max_white },
+         { "MAX_WHITE_VALUE",   psz_max_white },
          { NULL, NULL },
     };
 #ifndef NDEBUG
