@@ -215,6 +215,7 @@ protected:
     void dragMoveEvent( QDragMoveEvent * ) Q_DECL_OVERRIDE;
     void dragLeaveEvent( QDragLeaveEvent * ) Q_DECL_OVERRIDE;
     void closeEvent( QCloseEvent *) Q_DECL_OVERRIDE;
+    virtual void updateClientSideDecorations();
 
 protected:
     /* Systray */

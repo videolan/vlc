@@ -434,6 +434,15 @@ void MainInterfaceWin32::reloadPrefs()
     MainInterface::reloadPrefs();
 }
 
+void MainInterfaceWin32::updateClientSideDecorations()
+{
+    HWND winId = WinId(windowHandle());
+    SetWindowPos(winId, NULL, 0, 0, 0, 0,
+        SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOCOPYBITS |
+        SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOREPOSITION |
+        SWP_NOSENDCHANGING | SWP_NOSIZE | SWP_NOZORDER);
+}
+
 
 void InterfaceWindowHandlerWin32::toggleWindowVisiblity()
 {

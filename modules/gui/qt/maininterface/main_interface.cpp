@@ -299,6 +299,15 @@ void MainInterface::reloadPrefs()
         m_hasToolbarMenu = !m_hasToolbarMenu;
         emit hasToolbarMenuChanged();
     }
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+    if (m_clientSideDecoration != (! var_InheritBool( p_intf, "qt-titlebar" )))
+    {
+        m_clientSideDecoration = !m_clientSideDecoration;
+        emit useClientSideDecorationChanged();
+        updateClientSideDecorations();
+    }
+#endif
 }
 
 
@@ -690,6 +699,13 @@ void MainInterface::closeEvent( QCloseEvent *e )
         /* Accept session quit. Otherwise we break the desktop mamager. */
         e->accept();
     }
+}
+
+void MainInterface::updateClientSideDecorations()
+{
+    hide(); // some window managers don't like to change frame window hint on visible window
+    setWindowFlag(Qt::FramelessWindowHint, useClientSideDecoration());
+    show();
 }
 
 void MainInterface::setInterfaceFullScreen( bool fs )

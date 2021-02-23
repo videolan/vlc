@@ -68,6 +68,8 @@ private:
 public slots:
     virtual void reloadPrefs() override;
 
+protected:
+    void updateClientSideDecorations() Q_DECL_OVERRIDE;
 };
 
 class InterfaceWindowHandlerWin32 : public InterfaceWindowHandler
