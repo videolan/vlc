@@ -357,9 +357,14 @@ void MainInterface::updateIntfScaleFactor()
 void MainInterface::incrementIntfUserScaleFactor(bool increment)
 {
     if (increment)
-        m_intfUserScaleFactor = std::min(m_intfUserScaleFactor + 0.1, 3.0);
+        setIntfUserScaleFactor(m_intfScaleFactor + .1f);
     else
-        m_intfUserScaleFactor = std::max(m_intfUserScaleFactor - 0.1, 0.3);
+        setIntfUserScaleFactor(m_intfScaleFactor - .1f);
+}
+
+void MainInterface::setIntfUserScaleFactor(float newValue)
+{
+    m_intfUserScaleFactor = std::max(std::min(newValue, getMaxIntfUserScaleFactor()), getMinIntfUserScaleFactor());
     updateIntfScaleFactor();
 }
 

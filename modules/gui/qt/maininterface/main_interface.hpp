@@ -165,6 +165,8 @@ public:
     virtual ~MainInterface();
 
     static const QEvent::Type ToolbarsNeedRebuild;
+    static constexpr float MIN_INTF_USER_SCALE_FACTOR = .3f;
+    static constexpr float MAX_INTF_USER_SCALE_FACTOR = 3.f;
 
 public:
     /* Getters */
@@ -191,6 +193,9 @@ public:
     inline bool isHideAfterCreation() const { return b_hideAfterCreation; }
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
     inline float getIntfScaleFactor() const { return m_intfScaleFactor; }
+    inline float getIntfUserScaleFactor() const { return m_intfUserScaleFactor; }
+    inline float getMinIntfUserScaleFactor() const { return MIN_INTF_USER_SCALE_FACTOR; }
+    inline float getMaxIntfUserScaleFactor() const { return MAX_INTF_USER_SCALE_FACTOR; }
     inline bool hasMediaLibrary() const { return b_hasMedialibrary; }
     inline MediaLib* getMediaLibrary() const { return m_medialib; }
     inline bool hasGridView() const { return m_gridView; }
@@ -294,6 +299,7 @@ public slots:
     void setShowRemainingTime( bool );
     void setGridView( bool );
     void incrementIntfUserScaleFactor( bool increment);
+    void setIntfUserScaleFactor( float );
 
     void emitBoss();
     void emitRaise();
