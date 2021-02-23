@@ -87,6 +87,9 @@ Widgets.NavigableFocusScope{
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
 
                         visible: mainInterface.hasToolbarMenu
+                        textColor: topFocusScope.colors.text
+                        highlightedBgColor: topFocusScope.colors.bgHover
+                        highlightedTextColor: topFocusScope.colors.bgHoverText
                     }
 
                     RowLayout {
