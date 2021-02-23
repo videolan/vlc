@@ -160,9 +160,6 @@ static struct d3d11va_pic_context *CreatePicContext(
     ID3D11Resource *p_resource;
     ID3D11ShaderResourceView_GetResource(renderSrc[0], &p_resource);
 
-    D3D11_TEXTURE2D_DESC txDesc;
-    ID3D11Texture2D_GetDesc((ID3D11Texture2D*)p_resource, &txDesc);
-
     pic_ctx->ctx.picsys.slice_index = slice;
     for (int i=0;i<DXGI_MAX_SHADER_VIEW; i++)
     {
