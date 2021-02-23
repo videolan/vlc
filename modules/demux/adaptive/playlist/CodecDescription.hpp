@@ -20,6 +20,7 @@
 #ifndef CODECDESCRIPTION_HPP
 #define CODECDESCRIPTION_HPP
 
+#include "../tools/Properties.hpp"
 #include <vlc_es.h>
 #include <string>
 #include <list>
@@ -39,6 +40,9 @@ namespace adaptive
                 const es_format_t *getFmt() const;
                 void setDescription(const std::string &);
                 void setLanguage(const std::string &);
+                void setAspectRatio(const AspectRatio &);
+                void setFrameRate(const Rate &);
+                void setSampleRate(const Rate &);
 
             protected:
                 es_format_t fmt;

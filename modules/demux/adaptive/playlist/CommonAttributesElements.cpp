@@ -73,3 +73,33 @@ void    CommonAttributesElements::setHeight( int height )
     if ( height > 0 )
         this->height = height;
 }
+
+void CommonAttributesElements::setAspectRatio(const AspectRatio &r)
+{
+    aspectRatio = r;
+}
+
+const AspectRatio & CommonAttributesElements::getAspectRatio() const
+{
+    return aspectRatio;
+}
+
+const Rate & CommonAttributesElements::getFrameRate() const
+{
+    return frameRate;
+}
+
+void CommonAttributesElements::setFrameRate(const Rate &r)
+{
+    frameRate = r;
+}
+
+const Rate & CommonAttributesElements::getSampleRate() const
+{
+    return sampleRate;
+}
+
+void CommonAttributesElements::setSampleRate(const Rate &r)
+{
+    sampleRate = r;
+}
