@@ -807,6 +807,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                                  ui.fileSkin, ui.skinBrowse );
 
             CONFIG_BOOL( "metadata-network-access", MetadataNetworkAccessMode );
+            CONFIG_BOOL( "qt-menubar", menuBarCheck );
 
             ui.colorSchemeComboBox->insertItems(0, p_intf->p_sys->p_mi->getColorScheme()->stringList());
             QObject::connect( ui.colorSchemeComboBox, &QComboBox::currentTextChanged, p_intf->p_sys->p_mi->getColorScheme(), &ColorSchemeModel::setCurrent );

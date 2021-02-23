@@ -297,6 +297,13 @@
              <item row="12" column="2" colspan="2">
               <widget class="QComboBox" name="colorSchemeComboBox"/>
              </item>
+             <item row="4" column="2">
+              <widget class="QCheckBox" name="menuBarCheck">
+               <property name="text">
+                <string>Show the menu bar</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>

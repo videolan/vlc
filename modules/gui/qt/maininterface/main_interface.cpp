@@ -293,6 +293,12 @@ void MainInterface::computeMinimumSize()
 void MainInterface::reloadPrefs()
 {
     i_notificationSetting = var_InheritInteger( p_intf, "qt-notification" );
+    
+    if ( m_hasToolbarMenu != var_InheritBool( p_intf, "qt-menubar" ) )
+    {
+        m_hasToolbarMenu = !m_hasToolbarMenu;
+        emit hasToolbarMenuChanged();
+    }
 }
 
 
