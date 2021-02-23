@@ -13,6 +13,7 @@ messages/ui_messages_panel.h
 preferences/ui_sprefs_audio.h
 preferences/ui_sprefs_input.h
 preferences/ui_sprefs_interface.h
+preferences/ui_sprefs_medialibrary.h
 preferences/ui_sprefs_subtitles.h
 preferences/ui_sprefs_video.h
 sout/ui_profiles.h

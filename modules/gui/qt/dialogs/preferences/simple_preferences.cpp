@@ -243,6 +243,8 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
                   cone_input_64, 4 );
     ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), qtr("Configure Hotkeys"),
                   cone_hotkeys_64, 5 );
+    ADD_CATEGORY( SPrefsMediaLibrary, qtr("Media Library"), qtr("Configure Media Library"),
+                  cone_medialibrary_64, 6 );
 
 #undef ADD_CATEGORY
 
@@ -735,25 +737,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     + qtr( "VLC skins website" )+ QString( "</a>." ) );
             ui.skinsLabel->setFont( italicFont );
 
-            if ( vlc_ml_instance_get( p_intf ) != NULL )
-            {
-                mlModel = new MlFoldersModel( this );
-                mlModel->setMl( vlc_ml_instance_get( p_intf ) );
-
-                mlTableView = ui.entryPointsTV;
-
-                mlTableView->setModel( mlModel );
-
-                connect( mlModel , &QAbstractItemModel::modelReset , this , &SPrefsPanel::MLdrawControls );
-
-                BUTTONACT( ui.addButton , MLaddNewEntryPoint() );
-
-                MLdrawControls( );
-
-            }else {
-                ui.mlGroupBox->hide( );
-            }
-
 #ifdef _WIN32
             BUTTONACT( ui.assoButton, assoDialog() );
 #else
@@ -946,9 +929,32 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             control->insertIntoExistingGrid( gLayout, line );
             controls.append( control );
 #endif
-
             break;
         }
+
+            START_SPREFS_CAT( MediaLibrary , qtr("Media Library Settings") );
+
+                if ( vlc_ml_instance_get( p_intf ) != NULL )
+                {
+                    mlModel = new MlFoldersModel( this );
+                    mlModel->setMl( vlc_ml_instance_get( p_intf ) );
+
+                    mlTableView = ui.entryPointsTV;
+
+                    mlTableView->setModel( mlModel );
+
+                    connect( mlModel , &QAbstractItemModel::modelReset , this , &SPrefsPanel::MLdrawControls );
+
+                    BUTTONACT( ui.addButton , MLaddNewEntryPoint() );
+
+                    MLdrawControls( );
+                }
+                else
+                {
+                    ui.mlGroupBox->hide( );
+                }
+
+            END_SPREFS_CAT;
     }
 
     panel_layout->addWidget( panel_label );
