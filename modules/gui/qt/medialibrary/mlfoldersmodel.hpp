@@ -100,4 +100,16 @@ private:
     std::vector<EntryPoint> entryPoints() const final;
 };
 
+class MLBannedFoldersModel : public MLFoldersBaseModel
+{
+public:
+    using MLFoldersBaseModel::MLFoldersBaseModel;
+
+    void removeAt( int index ) override;
+    void add( const QUrl &mrl ) override;
+
+private:
+    std::vector<EntryPoint> entryPoints() const final;
+};
+
 #endif // ML_FOLDERS_MODEL_HPP

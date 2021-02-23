@@ -139,3 +139,31 @@ void MLFoldersModel::add(const QUrl &mrl )
 {
     vlc_ml_add_folder( ml() , qtu( mrl.toString( QUrl::None ) ) );
 }
+
+void MLBannedFoldersModel::removeAt(int index)
+{
+    assert(index < rowCount());
+    const QModelIndex idx = this->index( index, 0 );
+    if (idx.isValid())
+    {
+        vlc_ml_unban_folder( ml() , qtu( data( idx, MLFoldersBaseModel::MRL ).value<QString>() ) );
+    }
+}
+
+void MLBannedFoldersModel::add(const QUrl &mrl)
+{
+    vlc_ml_ban_folder( ml() , qtu( mrl.toString( QUrl::None ) ) );
+}
+
+std::vector<MLFoldersBaseModel::EntryPoint> MLBannedFoldersModel::entryPoints() const
+{
+    std::vector<MLFoldersBaseModel::EntryPoint> r;
+
+    vlc_ml_entry_point_list_t * entrypoints = nullptr;
+    vlc_ml_list_banned_folder( ml() , &entrypoints );
+    for ( unsigned int i=0 ; i<entrypoints->i_nb_items ; i++ )
+        r.emplace_back( entrypoints->p_items[i] );
+    vlc_ml_release(entrypoints);
+
+    return r;
+}
