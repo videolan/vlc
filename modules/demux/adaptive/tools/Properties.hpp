@@ -57,4 +57,23 @@ template <typename T> class Undef
         T val;
 };
 
+template <typename T> class Ratio
+{
+    public:
+        Ratio() { m_den = m_num = 0; }
+        Ratio(T n, T d) { m_den = d, m_num = n; }
+        bool isValid() const { return m_num && m_den; }
+        T num() const { return m_num; }
+        T den() const { return m_den; }
+        T width() const { return m_num; }
+        T height() const { return m_den; }
+
+    protected:
+        T m_num;
+        T m_den;
+};
+
+using AspectRatio = Ratio<unsigned int>;
+using Rate = Ratio<unsigned int>;
+
 #endif // PROPERTIES_HPP
