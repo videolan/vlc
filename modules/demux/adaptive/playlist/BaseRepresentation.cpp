@@ -43,6 +43,7 @@ using namespace adaptive;
 using namespace adaptive::playlist;
 
 BaseRepresentation::BaseRepresentation( BaseAdaptationSet *set ) :
+                CommonAttributesElements( set ),
                 SegmentInformation( set ),
                 adaptationSet   ( set ),
                 bandwidth       (0)

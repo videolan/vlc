@@ -34,7 +34,7 @@ namespace adaptive
         class CommonAttributesElements
         {
             public:
-                CommonAttributesElements();
+                CommonAttributesElements(CommonAttributesElements * = nullptr);
                 virtual ~CommonAttributesElements();
                 virtual const std::string&      getMimeType() const;
                 void                            setMimeType( const std::string &mimeType );
@@ -56,6 +56,9 @@ namespace adaptive
                 AspectRatio                         aspectRatio;
                 Rate                                frameRate;
                 Rate                                sampleRate;
+
+            private:
+                CommonAttributesElements           *parentCommonAttributes;
         };
     }
 }

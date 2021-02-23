@@ -47,10 +47,7 @@ Representation::~Representation ()
 
 StreamFormat Representation::getStreamFormat() const
 {
-    if(getMimeType().empty())
-        return StreamFormat(adaptationSet->getMimeType());
-    else
-        return StreamFormat(getMimeType());
+    return StreamFormat(getMimeType());
 }
 
 std::string Representation::contextualize(size_t number, const std::string &component,
