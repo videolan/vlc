@@ -548,8 +548,11 @@ int MediaLibrary::Control( int query, va_list args )
             break;
         }
         case VLC_ML_LIST_FOLDERS:
+        case VLC_ML_LIST_BANNED_FOLDERS:
         {
-            auto entryPoints = m_ml->entryPoints()->all();
+            auto entryPoints = ( query == VLC_ML_LIST_FOLDERS )
+                    ? m_ml->entryPoints()->all()
+                    : m_ml->bannedEntryPoints()->all();
             auto res = ml_convert_list<vlc_ml_entry_point_list_t,
                                          vlc_ml_entry_point_t>( entryPoints );
             *(va_arg( args, vlc_ml_entry_point_list_t**) ) = res;
