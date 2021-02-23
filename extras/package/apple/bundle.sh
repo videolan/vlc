@@ -4,9 +4,10 @@ set -eu
 
 readonly SCRIPT_DIR="$(cd "${BASH_SOURCE%/*}"; pwd)"
 readonly BUILD_DIR="$(cd "$1"; pwd)"
-
-APP="Payload/vlccore.app"
-IPA="vlccore_unsigned.ipa"
+readonly APP_NAME="$2"
+readonly APP_EXECUTABLE="${3:-${APP_NAME}}"
+readonly APP="Payload/${APP_NAME}.app"
+readonly IPA="${APP_NAME}_unsigned.ipa"
 
 # CONVERT_PLIST <input file> <output file>
 # Convert a plist file into binary1 format in order to put it
@@ -35,8 +36,8 @@ if [ -z "$INSTALL_NAME_TOOL" ]; then
 fi
 
 # VLC core test binary compiled for iOS
-cp "${BUILD_DIR}/test/.libs/vlc-ios" "$APP/vlccore"
-${INSTALL_NAME_TOOL} "$APP/vlccore" -add_rpath "@executable_path/Frameworks"
+cp "${BUILD_DIR}/test/${APP_EXECUTABLE}" "${APP}/${APP_NAME}"
+${INSTALL_NAME_TOOL} "${APP}/${APP_NAME}" -add_rpath "@executable_path/Frameworks"
 
 # Convert Info.plist from XML to binary
 CONVERT_PLIST "${SCRIPT_DIR}/Info.plist" "Payload/vlccore.app/Info.plist"
