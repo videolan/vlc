@@ -50,9 +50,11 @@ echo "APPL????" > "$APP/PkgInfo"
 # Frameworks/ directory, but since it is only designed for development usage
 # we can just put them there without further processing.
 mkdir -p "$APP/Frameworks"
+if [ -f "${BUILD_DIR}/lib/.libs/libvlc.dylib" ]; then
 cp "${BUILD_DIR}/lib/.libs/libvlc.dylib" "$APP/Frameworks"
 cp "${BUILD_DIR}/src/.libs/libvlccore.dylib" "$APP/Frameworks"
 find "${BUILD_DIR}/modules/.libs/" -name "*.dylib" -exec cp {} "$APP/Frameworks" \;
+fi
 
 # Archive the bundle into a .ipa file.
 zip -r "$IPA" Payload
