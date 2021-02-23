@@ -812,6 +812,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.colorSchemeComboBox->insertItems(0, p_intf->p_sys->p_mi->getColorScheme()->stringList());
             QObject::connect( ui.colorSchemeComboBox, &QComboBox::currentTextChanged, p_intf->p_sys->p_mi->getColorScheme(), &ColorSchemeModel::setCurrent );
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+            CONFIG_BOOL( "qt-titlebar", titleBarCheckBox );
+#else
+            ui.titleBarCheckBox->hide();
+#endif
+
             /* UPDATE options */
 #ifdef UPDATE_CHECK
             CONFIG_BOOL( "qt-updates-notif", updatesBox );
