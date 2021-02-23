@@ -167,6 +167,8 @@ static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const
         if(qualNode->hasAttribute("FourCC"))
             rep->addCodecs(qualNode->getAttributeValue("FourCC"));
 
+        adaptSet->addRepresentation(rep);
+
         ForgedInitSegment *initSegment = new (std::nothrow)
                 ForgedInitSegment(rep, type,
                                   timescale,
@@ -208,8 +210,6 @@ static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const
             initSegment->setSourceUrl("forged://");
 
             rep->initialisationSegment.Set(initSegment);
-
-            adaptSet->addRepresentation(rep);
         }
     }
 }
