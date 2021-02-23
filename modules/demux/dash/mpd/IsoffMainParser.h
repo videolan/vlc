@@ -43,6 +43,7 @@ namespace adaptive
         class SegmentInformation;
         class SegmentTemplate;
         class BasePeriod;
+        class CommonAttributesElements;
     }
     namespace xml
     {
@@ -88,6 +89,7 @@ namespace dash
                 void    parseMultipleSegmentBaseType(MPD *mpd, xml::Node *node,
                                              AbstractMultipleSegmentBaseType *base,
                                              SegmentInformation *parent);
+                void    parseCommonAttributesElements(xml::Node *, CommonAttributesElements *);
 
                 xml::Node       *root;
                 vlc_object_t    *p_object;

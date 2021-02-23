@@ -294,8 +294,8 @@ void    IsoffMainParser::parseAdaptationSets  (MPD *mpd, Node *periodNode, BaseP
         AdaptationSet *adaptationSet = new AdaptationSet(period);
         if(!adaptationSet)
             continue;
-        if((*it)->hasAttribute("mimeType"))
-            adaptationSet->setMimeType((*it)->getAttributeValue("mimeType"));
+
+        parseCommonAttributesElements(*it, adaptationSet);
 
         if((*it)->hasAttribute("lang"))
             adaptationSet->setLang((*it)->getAttributeValue("lang"));
@@ -353,6 +353,20 @@ void    IsoffMainParser::parseAdaptationSets  (MPD *mpd, Node *periodNode, BaseP
             delete adaptationSet;
     }
 }
+
+void IsoffMainParser::parseCommonAttributesElements(Node *node,
+                                                    CommonAttributesElements *commonAttrElements)
+{
+    if(node->hasAttribute("width"))
+        commonAttrElements->setWidth(atoi(node->getAttributeValue("width").c_str()));
+
+    if(node->hasAttribute("height"))
+        commonAttrElements->setHeight(atoi(node->getAttributeValue("height").c_str()));
+
+    if(node->hasAttribute("mimeType"))
+        commonAttrElements->setMimeType(node->getAttributeValue("mimeType"));
+}
+
 void    IsoffMainParser::parseRepresentations (MPD *mpd, Node *adaptationSetNode, AdaptationSet *adaptationSet)
 {
     std::vector<Node *> representations = DOMHelper::getElementByTagName(adaptationSetNode, "Representation", false);
@@ -373,17 +387,10 @@ void    IsoffMainParser::parseRepresentations (MPD *mpd, Node *adaptationSetNode
         if(repNode->hasAttribute("id"))
             currentRepresentation->setID(ID(repNode->getAttributeValue("id")));
 
-        if(repNode->hasAttribute("width"))
-            currentRepresentation->setWidth(atoi(repNode->getAttributeValue("width").c_str()));
-
-        if(repNode->hasAttribute("height"))
-            currentRepresentation->setHeight(atoi(repNode->getAttributeValue("height").c_str()));
+        parseCommonAttributesElements(repNode, currentRepresentation);
 
         if(repNode->hasAttribute("bandwidth"))
             currentRepresentation->setBandwidth(atoi(repNode->getAttributeValue("bandwidth").c_str()));
-
-        if(repNode->hasAttribute("mimeType"))
-            currentRepresentation->setMimeType(repNode->getAttributeValue("mimeType"));
 
         if(repNode->hasAttribute("codecs"))
             currentRepresentation->addCodecs(repNode->getAttributeValue("codecs"));
