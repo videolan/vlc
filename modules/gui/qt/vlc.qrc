@@ -123,6 +123,7 @@
         <file alias="cone_hotkeys_64.png">pixmaps/prefs/spref_cone_Hotkeys_64.png</file>
         <file alias="cone_input_64.png">pixmaps/prefs/spref_cone_Input_64.png</file>
         <file alias="cone_interface_64.png">pixmaps/prefs/spref_cone_Interface_64.png</file>
+        <file alias="cone_medialibrary_64.png">pixmaps/prefs/spref_cone_Medialibrary_64.png</file>
         <file alias="cone_subtitles_64.png">pixmaps/prefs/spref_cone_Subtitles_64.png</file>
         <file alias="cone_video_64.png">pixmaps/prefs/spref_cone_Video_64.png</file>
         <file alias="sample_complete.png">pixmaps/sample_complete.png</file>
