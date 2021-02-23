@@ -31,8 +31,10 @@ Item {
     implicitHeight: menubarLayout.implicitHeight
     implicitWidth: menubarLayout.implicitWidth
 
+    property color bgColor: "transparent"
     property color textColor: VLCStyle.colors.text
-    property color bgColor:   VLCStyle.colors.bgHover
+    property color highlightedBgColor: VLCStyle.colors.bgHover
+    property color highlightedTextColor: VLCStyle.colors.bgHoverText
 
     Action{ id: mediaMenu;    text: i18n.qtr("&Media")    ; onTriggered: menubar.popupMediaMenu(source);   }
     Action{ id: playbackMenu; text: i18n.qtr("&Playback") ; onTriggered: menubar.popupPlaybackMenu(source);}
@@ -104,12 +106,12 @@ Item {
                     text: control.text
                     font: control.font
                     opacity: enabled ? 1.0 : 0.3
-                    color: root.textColor
+                    color: (control.hovered || index === root._menuIndex) ? root.highlightedTextColor : root.textColor
                 }
 
                 background: Rectangle {
-                    color: (control.hovered || index === root._menuIndex) ? root.bgColor
-                                                                          :  "transparent"
+                    color: (control.hovered || index === root._menuIndex) ? root.highlightedBgColor
+                                                                          : root.bgColor
                 }
             }
         }
