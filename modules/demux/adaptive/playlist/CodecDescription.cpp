@@ -62,6 +62,29 @@ void CodecDescription::setLanguage(const std::string &l)
     fmt.psz_language = ::strdup(l.c_str());
 }
 
+void CodecDescription::setAspectRatio(const AspectRatio &r)
+{
+    if(fmt.i_cat != VIDEO_ES || !r.isValid())
+        return;
+    fmt.video.i_sar_num = r.num();
+    fmt.video.i_sar_den = r.den();
+}
+
+void CodecDescription::setFrameRate(const Rate &r)
+{
+    if(fmt.i_cat != VIDEO_ES || !r.isValid())
+        return;
+    fmt.video.i_frame_rate = r.num();
+    fmt.video.i_frame_rate_base = r.den();
+}
+
+void CodecDescription::setSampleRate(const Rate &r)
+{
+    if(fmt.i_cat != AUDIO_ES || !r.isValid())
+        return;
+    fmt.audio.i_rate = r.num();
+}
+
 CodecDescriptionList::CodecDescriptionList()
 {
 
