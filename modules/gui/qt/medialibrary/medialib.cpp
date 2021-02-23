@@ -225,9 +225,18 @@ void MediaLib::insertIntoPlaylist(const size_t index, const QVariantList &itemId
 
 void MediaLib::reload()
 {
-    m_threadPool.start([ml = m_ml] {
-        vlc_ml_reload_folder(ml, nullptr);
-    });
+    /* m_threadPool.start(lambda) is only supported since Qt 5.15 */
+    struct Task : QRunnable {
+        vlc_medialibrary_t *m_ml;
+
+        Task(vlc_medialibrary_t *ml) : m_ml(ml) {}
+        void run() override
+        {
+            vlc_ml_reload_folder(m_ml, nullptr);
+        }
+    };
+
+    m_threadPool.start(new Task(m_ml));
 }
 
 vlc_medialibrary_t* MediaLib::vlcMl()
