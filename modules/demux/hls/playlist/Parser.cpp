@@ -135,6 +135,14 @@ HLSRepresentation * M3U8Parser::createRepresentation(BaseAdaptationSet *adaptSet
                 rep->setHeight(res.second);
             }
         }
+
+        const Attribute *rateAttr = tag->getAttributeByName("FRAME-RATE");
+        if(rateAttr)
+        {
+            unsigned num, den;
+            vlc_ureduce(&num, &den, rateAttr->floatingPoint() * 1000, 1000, 0);
+            rep->setFrameRate(Rate(num, den));
+        }
     }
 
     return rep;
