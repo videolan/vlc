@@ -1,18 +1,18 @@
 # Ukrainian translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Eugene Kutia <fossugn@gmail.com>, 2013
 # Oleksandr Natalenko <oleksandr@natalenko.name>, 2009-2012
-# Андрій Бандура <andriykopanytsia@gmail.com>, 2013-2020
+# Андрій Бандура <andriykopanytsia@gmail.com>, 2013-2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-03-25 12:56+0100\n"
-"Last-Translator: Андрій Бандура <andriykopanytsia@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-24 22:19+0100\n"
+"Last-Translator: Андрій Бандура <andriykopanytsia@gmail.com>, 2021\n"
 "Language-Team: Ukrainian (https://www.transifex.com/yaron/teams/16553/uk/)\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -12017,9 +12017,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "Пакетувальник тексту субтитрів Kate"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "Параметри перекодування"
+msgstr "Тека додаткових шрифтів"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -15234,17 +15233,16 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "Бажана ширина смуги для неадаптивних потоків"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "Затримка DTS (мс)"
+msgstr "Затримка відтворення наживо (мс)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "Компроміс між стійкістю та дійсним часом"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "Макс. буферизація (мс)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15264,9 +15262,8 @@ msgid "Low latency"
 msgstr "Низька затримка"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "Призначити параметри з вищим пріоритетом"
+msgstr "Переписує параметри низької затримки"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15293,9 +15290,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "Найвища ширина смуги/якість"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "Примусово використовувати жирний шрифт"
+msgstr "Примусово"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -28956,11 +28952,14 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
+"VLC може відображати QR-код, що посилається на мобільну версію веб-"
+"інтерфейсу; веб-адреса веб-інтерфейсу вашого екземпляра медіаплеєра VLC буде "
+"передана через Інтернет до веб-служби Google Image Charts для створення "
+"цього QR-коду."
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "Ви хочете це завантажити?"
+msgstr "Ви хочете продовжити це?"
 
 #: share/lua/http/index.html:290
 msgid ""
