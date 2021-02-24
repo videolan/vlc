@@ -748,6 +748,7 @@ EXTRA_DIST += \
 	gui/macosx/Resources/be.lproj/InfoPlist.strings \
 	gui/macosx/Resources/bg.lproj/InfoPlist.strings \
 	gui/macosx/Resources/bn-IN.lproj/InfoPlist.strings \
+	gui/macosx/Resources/br.lproj/InfoPlist.strings \
 	gui/macosx/Resources/brx.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ca.lproj/InfoPlist.strings \
 	gui/macosx/Resources/co.lproj/InfoPlist.strings \
@@ -780,11 +781,13 @@ EXTRA_DIST += \
 	gui/macosx/Resources/km.lproj/InfoPlist.strings \
 	gui/macosx/Resources/kn.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ko.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ku.lproj/InfoPlist.strings \
 	gui/macosx/Resources/lt.lproj/InfoPlist.strings \
 	gui/macosx/Resources/lv.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ml.lproj/InfoPlist.strings \
 	gui/macosx/Resources/mr.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ms.lproj/InfoPlist.strings \
+	gui/macosx/Resources/my.lproj/InfoPlist.strings \
 	gui/macosx/Resources/nb.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ne.lproj/InfoPlist.strings \
 	gui/macosx/Resources/nl.lproj/InfoPlist.strings \
@@ -796,10 +799,12 @@ EXTRA_DIST += \
 	gui/macosx/Resources/pt-PT.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ro.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ru.lproj/InfoPlist.strings \
+	gui/macosx/Resources/sat.lproj/InfoPlist.strings \
 	gui/macosx/Resources/sc.lproj/InfoPlist.strings \
 	gui/macosx/Resources/si.lproj/InfoPlist.strings \
 	gui/macosx/Resources/sk.lproj/InfoPlist.strings \
 	gui/macosx/Resources/sl.lproj/InfoPlist.strings \
+	gui/macosx/Resources/sq.lproj/InfoPlist.strings \
 	gui/macosx/Resources/sr.lproj/InfoPlist.strings \
 	gui/macosx/Resources/sv.lproj/InfoPlist.strings \
 	gui/macosx/Resources/th.lproj/InfoPlist.strings \
