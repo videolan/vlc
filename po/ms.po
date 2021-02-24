@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-09-11 01:36+0200\n"
-"Last-Translator: abuyop <abuyop@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-24 19:21+0100\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2021\n"
 "Language-Team: Malay (https://www.transifex.com/yaron/teams/16553/ms/)\n"
 "Language: ms\n"
 "MIME-Version: 1.0\n"
@@ -251,11 +251,11 @@ msgstr "Tetapan untuk penyahkod dan pengekod audio-sahaja"
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
-msgstr "Kodeks sarikata"
+msgstr "Kodek sari kata"
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
-msgstr "Tetapan untuk sarikata, teleteks dan penyahkod dan pengekod CC."
+msgstr "Tetapan untuk sari kata, teleteks dan penyahkod dan pengekod CC."
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
@@ -1264,7 +1264,7 @@ msgstr "Takat Putih"
 
 #: src/input/es_out.c:3354 modules/access/imem.c:64
 msgid "Subtitle"
-msgstr "Sarikata"
+msgstr "Sari kata"
 
 #: src/input/input.c:1821 modules/control/hotkeys.c:1512
 #, c-format
@@ -2111,7 +2111,7 @@ msgstr "Tunjuk tajuk media pada video"
 
 #: src/libvlc-module.c:326
 msgid "Display the title of the video on top of the movie."
-msgstr "Paparkan judul video pada atas movie."
+msgstr "Papar tajukl video di bahagian atas filem."
 
 #: src/libvlc-module.c:328
 msgid "Show video title for x milliseconds"
@@ -2310,12 +2310,12 @@ msgid ""
 "y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
-"Ini akan memaksa nisbah bidang sumber. Sebagai contoh, terdapat DVD yang "
-"mendakwa sebagai 16:9 tetapi yang sebenarnya adalah 4:3. Ini boleh juga "
-"dijadikan pembayang untuk VLC apebila cereka tidak punya maklumat nisbah "
+"Tindakan ini akan memaksa nisbah bidang sumber. Sebagai contoh, terdapat DVD "
+"yang mendakwa sebagai 16:9 tetapi yang sebenarnya adalah 4:3. Ia boleh juga "
+"dijadikan pembayang untuk VLC apabila filem tidak punya maklumat nisbah "
 "bidang. Format yang diterima adalah x:y (4:3, 16:9, dll.) mengungkap bidang "
-"imej sejagat , atau nilai apung (1.25, 1.3333, dll.) mengungkap kepetakan "
-"piksel."
+"imej sejagat , atau satu nilai apung (1.25, 1.3333, dll.) mengungkap bentuk "
+"petak piksel."
 
 #: src/libvlc-module.c:436
 msgid "Video Auto Scaling"
@@ -2451,8 +2451,8 @@ msgid ""
 "as the DVD or VCD device, the network interface settings or the subtitle "
 "channel."
 msgstr ""
-"Pilihan ini membolehkan anda ubahsuai kelakuan subsistem input, umpamanya "
-"DVD atau peranti VCD, tetapan antaramuka rangkaian atau saluran sarikata."
+"Pilihan ini membolehkan anda ubah suai kelakuan subsistem input, umpamanya "
+"DVD atau peranti VCD, tetapan antara muka rangkaian atau saluran sari kata."
 
 #: src/libvlc-module.c:501
 msgid "File caching (ms)"
@@ -2643,7 +2643,7 @@ msgstr "Trek sarikata"
 
 #: src/libvlc-module.c:585
 msgid "Stream number of the subtitle track to use (from 0 to n)."
-msgstr "Bilangan strim trek sarikata untuk guna (dari 0 hingga n)."
+msgstr "Bilangan strim trek sari kata untuk guna (dari 0 hingga n)."
 
 #: src/libvlc-module.c:588 modules/stream_out/transcode/transcode.c:97
 msgid "Audio language"
@@ -2693,11 +2693,11 @@ msgstr "ID Strim trek audio untuk diguna."
 
 #: src/libvlc-module.c:608
 msgid "Subtitle track ID"
-msgstr "ID trek sarikata"
+msgstr "ID trek sari kata"
 
 #: src/libvlc-module.c:610
 msgid "Stream ID of the subtitle track to use."
-msgstr "ID Strim trek sarikata untuk diguna."
+msgstr "ID Strim trek sari kata yang digunakan."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
@@ -2911,8 +2911,8 @@ msgid ""
 "You can use this option to place the subtitles under the movie, instead of "
 "over the movie. Try several positions."
 msgstr ""
-"Anda boleh guna pilihan ini untuk tempatkan sarikata dibawah cereka, selain "
-"dari di atas cereka. Cuba lain-lain kedudukan."
+"Anda boleh guna pilihan ini untuk letak sari kata di bahagian bawah filem, "
+"selain di bahagian atas filem. Cuba lain-lain kedudukan."
 
 #: src/libvlc-module.c:710
 msgid "Subtitles text scaling factor"
@@ -2988,8 +2988,8 @@ msgid ""
 "Automatically detect a subtitle file, if no subtitle filename is specified "
 "(based on the filename of the movie)."
 msgstr ""
-"Kesan-sendiri fail sarikata, jika tiada nama fail sarikata dinyatakankan "
-"(berdasarkan pada nama fail cereka)."
+"Kesan-sendiri fail sari kata, jika tiada nama fail sari kata dinyatakan "
+"(berdasarkan pada nama fail filem)."
 
 #: src/libvlc-module.c:741
 msgid "Subtitle autodetection fuzziness"
@@ -3005,13 +3005,13 @@ msgid ""
 "3 = subtitle file matching the movie name with additional chars\n"
 "4 = subtitle file matching the movie name exactly"
 msgstr ""
-"Ini menentukan bagaimana sarikata kabur dan nama fail cereka akan "
+"Ini menentukan bagaimana kekaburan sari kata dan nama fail filem akan "
 "dipadankan. Pilihan adalah:\n"
-"0 = tiada sarikata dikesan-sendiri\n"
-"1 = sebarang fail sarikata\n"
-"2 = sebarang fail sarikata yang mengandungi nama cereka\n"
-"3 = fail sarikata sepadan dengan nama cereka dengan aksara tambahan\n"
-"4 = fail sarikata sepadan dengan nama cereka secara tepat"
+"0 = tiada sari kata dikesan-sendiri\n"
+"1 = sebarang fail sari kata\n"
+"2 = sebarang fail sari kata yang mengandungi nama cereka\n"
+"3 = fail sari kata sepadan nama filem dengan aksara tambahan\n"
+"4 = fail sari kata sepadan dengan nama cereka secara tepat"
 
 #: src/libvlc-module.c:751
 msgid "Subtitle autodetection paths"
@@ -3022,8 +3022,8 @@ msgid ""
 "Look for a subtitle file in those paths too, if your subtitle file was not "
 "found in the current directory."
 msgstr ""
-"Cari fail sarikata dalam laluan tersebut juga, jika fail sarikata anda tidak "
-"ditemui dalam direktori semasa."
+"Cari fail sari kata dalam laluan tersebut juga, jika fail sari kata anda "
+"tidak ditemui dalam direktori semasa."
 
 #: src/libvlc-module.c:756
 msgid "Use subtitle file"
@@ -3240,67 +3240,67 @@ msgstr "Kata laluan diguna untuk sambungan kepada proksi SOCKS."
 
 #: src/libvlc-module.c:870
 msgid "Title metadata"
-msgstr "Data meta tajuk"
+msgstr "Metadata tajuk"
 
 #: src/libvlc-module.c:872
 msgid "Allows you to specify a \"title\" metadata for an input."
-msgstr "Benarkan anda menentukan data meta \"tajuk\" untuk input."
+msgstr "Benarkan anda menentukan satu metadata \"tajuk\" untuk satu input."
 
 #: src/libvlc-module.c:874
 msgid "Author metadata"
-msgstr "Data meta pengarang"
+msgstr "Metadata pengarang"
 
 #: src/libvlc-module.c:876
 msgid "Allows you to specify an \"author\" metadata for an input."
-msgstr "Benarkan anda menentukan data meta \"pengarang\" untuk input."
+msgstr "Benarkan anda menentukan satu metadata \"pengarang\" untuk satu input."
 
 #: src/libvlc-module.c:878
 msgid "Artist metadata"
-msgstr "Data meta artis"
+msgstr "Metadata artis"
 
 #: src/libvlc-module.c:880
 msgid "Allows you to specify an \"artist\" metadata for an input."
-msgstr "Benarkan anda menentukan data meta \"artis\" untuk input."
+msgstr "Benarkan anda menentukan satu metadata \"artis\" untuk satu input."
 
 #: src/libvlc-module.c:882
 msgid "Genre metadata"
-msgstr "Data meta genre"
+msgstr "Metadata genre"
 
 #: src/libvlc-module.c:884
 msgid "Allows you to specify a \"genre\" metadata for an input."
-msgstr "Benarkan anda menentukan data meta \"genre\" untuk input."
+msgstr "Benarkan anda menentukan satu metadata \"genre\" untuk satu input."
 
 #: src/libvlc-module.c:886
 msgid "Copyright metadata"
-msgstr "Data meta hakcipta"
+msgstr "Metadata hak cipta"
 
 #: src/libvlc-module.c:888
 msgid "Allows you to specify a \"copyright\" metadata for an input."
-msgstr "Benarkan anda menentukan data meta \"hakcipta\" untuk input."
+msgstr "Benarkan anda menentukan satu metadata \"hak cipta\" untuk satu input."
 
 #: src/libvlc-module.c:890
 msgid "Description metadata"
-msgstr "Data meta keterangan"
+msgstr "Metadata keterangan"
 
 #: src/libvlc-module.c:892
 msgid "Allows you to specify a \"description\" metadata for an input."
-msgstr "Benarkan anda menentukan data meta \"keterangan\" untuk input."
+msgstr "Benarkan anda menentukan metadata \"keterangan\" untuk satu input."
 
 #: src/libvlc-module.c:894
 msgid "Date metadata"
-msgstr "Data meta tarikh"
+msgstr "Metadata tarikh"
 
 #: src/libvlc-module.c:896
 msgid "Allows you to specify a \"date\" metadata for an input."
-msgstr "Benarkan anda menentukan data meta \"tarikh\" untuk input."
+msgstr "Benarkan anda menentukan satu metadata \"tarikh\" untuk satu input."
 
 #: src/libvlc-module.c:898
 msgid "URL metadata"
-msgstr "Data meta URL"
+msgstr "Metadata URL"
 
 #: src/libvlc-module.c:900
 msgid "Allows you to specify a \"url\" metadata for an input."
-msgstr "Benarkan anda menentukan data meta \"url\" untuk input."
+msgstr "Benarkan anda menentukan satu metadata \"url\" untuk satu input."
 
 #: src/libvlc-module.c:904
 msgid ""
@@ -3739,8 +3739,8 @@ msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
 msgstr ""
-"Pra hurai item ditambah kepada senarai main secara automatik (untuk dapatkan "
-"sedikit data meta)."
+"Pra hurai item ditambah ke dalam senarai main secara automatik (untuk "
+"dapatkan beberapa metadata)."
 
 #: src/libvlc-module.c:1122
 msgid "Preparsing timeout"
@@ -3755,7 +3755,7 @@ msgstr ""
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:564
 msgid "Allow metadata network access"
-msgstr "Benarkan capaian rangkaian data meta"
+msgstr "Benarkan capaian rangkaian metadata"
 
 #: src/libvlc-module.c:1131
 msgid "Collapse"
@@ -4348,11 +4348,11 @@ msgstr "Lengah sarikata naik"
 
 #: src/libvlc-module.c:1322
 msgid "Select the key to increase the subtitle delay."
-msgstr "Pilih kekunci untuk tingkatkan lengah sarikata."
+msgstr "Pilih kekunci untuk tingkatkan lengah sari kata."
 
 #: src/libvlc-module.c:1323
 msgid "Subtitle delay down"
-msgstr "Lengah sarikata turun"
+msgstr "Lengah sari kata turun"
 
 #: src/libvlc-module.c:1324
 msgid "Select the key to decrease the subtitle delay."
@@ -4360,7 +4360,7 @@ msgstr "Pilih kekunci untuk kurangkan lengah sarikata."
 
 #: src/libvlc-module.c:1325
 msgid "Reset subtitles text scale"
-msgstr "Tetap semula skala teks sarikata"
+msgstr "Tetap semula skala teks sari kata"
 
 #: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
@@ -4368,7 +4368,7 @@ msgstr "Tambah skala teks sarikata"
 
 #: src/libvlc-module.c:1327
 msgid "Scale down subtitles text"
-msgstr "Kurangkan skala teks sarikata"
+msgstr "Kurangkan skala teks sari kata"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
@@ -4381,7 +4381,7 @@ msgstr "Setem masa audio tanda buku / segerak sarikata"
 #: src/libvlc-module.c:1330
 msgid "Select the key to bookmark audio timestamp when syncing subtitles."
 msgstr ""
-"Pilih kunci untuk tanda buku audio tanda buku bila menyegerak sarikata."
+"Pilih kunci untuk tanda buku audio tanda buku bila menyegerak sari kata."
 
 #: src/libvlc-module.c:1331
 msgid "Subtitle sync / bookmark subtitle timestamp"
@@ -4393,12 +4393,12 @@ msgstr "Pilih kunci untuk menanda buku setem masa bila menyegerak sarikata."
 
 #: src/libvlc-module.c:1333
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
-msgstr "Setem masa sarikata & audio segerak sarikata"
+msgstr "Setem masa sari kata & audio segerak sari kata"
 
 #: src/libvlc-module.c:1334
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
 msgstr ""
-"Pilih kunci untuk segerakkan setem masa sarikata & audio bertanda buku."
+"Pilih kunci untuk segerakkan setem masa sari kata & audio bertanda buku."
 
 #: src/libvlc-module.c:1335
 msgid "Subtitle sync / reset audio & subtitle synchronization"
@@ -4411,15 +4411,15 @@ msgstr ""
 
 #: src/libvlc-module.c:1337
 msgid "Subtitle position up"
-msgstr "Posisi sarikata naik"
+msgstr "Kedudukan sari kata naik"
 
 #: src/libvlc-module.c:1338
 msgid "Select the key to move subtitles higher."
-msgstr "Pilih kunci untuk alih sarikata lebih tinggi."
+msgstr "Pilih kunci untuk alih sari kata lebih tinggi."
 
 #: src/libvlc-module.c:1339
 msgid "Subtitle position down"
-msgstr "Posisi sarikata turun"
+msgstr "Kedudukan sari kata turun"
 
 #: src/libvlc-module.c:1340
 msgid "Select the key to move subtitles lower."
@@ -4592,7 +4592,7 @@ msgstr "Kitar trek(bahasa) audio yang tersedia."
 
 #: src/libvlc-module.c:1391
 msgid "Cycle subtitle track in reverse order"
-msgstr "Kitrar trek sarikata dalam tertib songsang"
+msgstr "Kitar trek sari kata dalam tertib songsang"
 
 #: src/libvlc-module.c:1392
 msgid "Cycle through the available subtitle tracks in reverse order."
@@ -4608,7 +4608,7 @@ msgstr "Kitar trek sarikata yang tersedia."
 
 #: src/libvlc-module.c:1395
 msgid "Toggle subtitles"
-msgstr "Togol sarikata"
+msgstr "Togol sari kata"
 
 #: src/libvlc-module.c:1396
 msgid "Toggle subtitle track visibility."
@@ -4849,7 +4849,7 @@ msgstr "Proksi Socks"
 
 #: src/libvlc-module.c:1836 modules/demux/xiph_metadata.h:55
 msgid "Metadata"
-msgstr "Data meta"
+msgstr "Metadata"
 
 #: src/libvlc-module.c:1937
 msgid "Decoders"
@@ -5369,7 +5369,7 @@ msgstr "Pasang"
 
 #: src/misc/update.c:727
 msgid "Update VLC media player"
-msgstr "Kemaskini pemain media VLC"
+msgstr "Kemas kini pemain media VLC"
 
 #: src/playlist/engine.c:247 src/playlist/loadsave.c:159 lib/media_list.c:237
 #: modules/gui/macosx/VLCMainWindow.m:323
@@ -6220,7 +6220,7 @@ msgstr "Menu Blu-ray"
 
 #: modules/access/bluray.c:73
 msgid "Use Blu-ray menus. If disabled, the movie will start directly"
-msgstr "Guna menu Blu-ray. Jika dilumpuhkan, cereka akan bermula secara terus"
+msgstr "Guna menu Blu-ray. Jika dilumpuhkan, filem akan terus dimainkan"
 
 #: modules/access/bluray.c:75
 msgid "Region code"
@@ -7689,7 +7689,7 @@ msgstr "Lebar"
 
 #: modules/access/imem.c:84
 msgid "Width of video or subtitle elementary streams"
-msgstr "Lebar video atau sarikata strim elementary"
+msgstr "Lebar video atau sari kata strim elementary"
 
 #: modules/access/imem.c:86 modules/access/v4l2/v4l2.c:66
 #: modules/demux/rawvid.c:51
@@ -10756,8 +10756,8 @@ msgid ""
 msgstr ""
 "Pemampatan julat dinamik membuatkan bunyi kuat lebih lembut, dan bunyi "
 "lembut lebih kuat, jadi anda boleh mudah mendengar kepada strim dalam "
-"persekitaran bising tanpa ganguan sesiapa. Jika lumpuhkan pemampatan julat "
-"dinamik mainbalik akan lebih disesuaikan kepada teater wayang atau bilik "
+"persekitaran bising tanpa gangguan sesiapa. Jika lumpuhkan pemampatan julat "
+"dinamik mainbalik akan lebih disesuaikan kepada wayang filem atau bilik "
 "mendengar."
 
 #: modules/codec/a52.c:80
@@ -11381,11 +11381,11 @@ msgstr "Penyahkod video perkakasan HD Crystal"
 
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
-msgstr "Dekoder sarikata CVD"
+msgstr "Penyahkod sari kata CVD"
 
 #: modules/codec/cvdsub.c:55
 msgid "Chaoji VCD subtitle packetizer"
-msgstr "Pempaket sarikata VCD Chaoji"
+msgstr "Pempaket sari kata VCD Chaoji"
 
 #: modules/codec/daala.c:109 modules/codec/speex.c:63
 #: modules/codec/theora.c:105 modules/codec/twolame.c:54
@@ -11514,11 +11514,11 @@ msgstr "Dekoder sarikata DVB"
 #: modules/codec/dvbsub.c:122 modules/demux/mpeg/ts_psi.c:772
 #: modules/demux/mpeg/ts_psi.c:821
 msgid "DVB subtitles"
-msgstr "Sarikata DVB"
+msgstr "Sari kata DVB"
 
 #: modules/codec/dvbsub.c:136
 msgid "DVB subtitles encoder"
-msgstr "Enkoder sarikata DVB"
+msgstr "Pengekod sari kata DVB"
 
 #: modules/codec/edummy.c:40
 msgid "Dummy encoder"
@@ -11723,7 +11723,7 @@ msgstr "Pengekod imej JPEG"
 
 #: modules/codec/kate.c:191 modules/codec/subsusf.c:44
 msgid "Formatted Subtitles"
-msgstr "Sarikata berformat"
+msgstr "Sari kata berformat"
 
 #: modules/codec/kate.c:192
 msgid ""
@@ -11980,7 +11980,7 @@ msgstr "Direktori petikan video (atau nama fail)"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
-msgstr "Sarikata (lanjutan)"
+msgstr "Sari kata (lanjutan)"
 
 #: modules/codec/libass.c:63
 msgid "Subtitle renderers using libass"
@@ -12839,7 +12839,7 @@ msgstr "Pengenkod audio Speex"
 
 #: modules/codec/spudec/spudec.c:45
 msgid "Disable DVD subtitle transparency"
-msgstr "Lumpuhkan kelutsinaran sarikata DVD"
+msgstr "Lumpuhkan kelutsinaran sari kata DVD"
 
 #: modules/codec/spudec/spudec.c:46
 msgid "Removes all transparency effects used in DVD subtitles."
@@ -12851,7 +12851,7 @@ msgstr "Penyahkod sarikata  DVD"
 
 #: modules/codec/spudec/spudec.c:51
 msgid "DVD subtitles"
-msgstr "Sarikata  DVD"
+msgstr "Sari kata  DVD"
 
 #: modules/codec/spudec/spudec.c:60
 msgid "DVD subtitles packetizer"
@@ -13039,7 +13039,7 @@ msgstr "Vietnamese (Windows-1258)"
 
 #: modules/codec/subsdec.c:170
 msgid "Subtitle text encoding"
-msgstr "Pengekodan teks sarikata"
+msgstr "Pengekodan teks sari kata"
 
 #: modules/codec/subsdec.c:171
 msgid "Set the encoding used in text subtitles"
@@ -13047,7 +13047,7 @@ msgstr "Tetapkan mengkod diguna dalam sarikata teks"
 
 #: modules/codec/subsdec.c:172 modules/codec/ttml/ttml.c:36
 msgid "Subtitle justification"
-msgstr "Pewajaran sarikata"
+msgstr "Pewajaran sari kata"
 
 #: modules/codec/subsdec.c:173 modules/codec/ttml/ttml.c:37
 msgid "Set the justification of subtitles"
@@ -13101,15 +13101,15 @@ msgstr "Dekoder sarikata USF"
 
 #: modules/codec/substx3g.c:40
 msgid "tx3g subtitles decoder"
-msgstr "Penyahkod sarikata tx3g"
+msgstr "Penyahkod sari kata tx3g"
 
 #: modules/codec/substx3g.c:41
 msgid "tx3g subtitles"
-msgstr "Sarikata tx3g"
+msgstr "Sari kata tx3g"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
-msgstr "Dekoder Philips OGT (sarikata SVCD)"
+msgstr "Penyahkod OGT Philips (sari kata SVCD)"
 
 #: modules/codec/svcdsub.c:48
 msgid "SVCD subtitles"
@@ -13117,7 +13117,7 @@ msgstr "Sarikata SVCD"
 
 #: modules/codec/svcdsub.c:57
 msgid "Philips OGT (SVCD subtitle) packetizer"
-msgstr "Pempaket Philips OGT (sarikata SVCD)"
+msgstr "Pempaket OGT Philips (sari kata SVCD)"
 
 #: modules/codec/svg.c:50 modules/video_filter/scene.c:62
 msgid "Image width"
@@ -13225,7 +13225,7 @@ msgstr "Penyahkod TTML"
 
 #: modules/codec/ttml/ttml.c:46
 msgid "TTML subtitles decoder"
-msgstr "Penyahkod sarikata TTML"
+msgstr "Penyahkod sari kata TTML"
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
@@ -14527,7 +14527,7 @@ msgstr "Trek audio: %s"
 #: modules/control/hotkeys.c:811 modules/control/hotkeys.c:847
 #, c-format
 msgid "Subtitle track: %s"
-msgstr "Trek sarikata: %s"
+msgstr "Trek sari kata: %s"
 
 #: modules/control/hotkeys.c:772 modules/control/hotkeys.c:812
 #: modules/control/hotkeys.c:866
@@ -14576,7 +14576,7 @@ msgstr "Nyahjalin hidup"
 
 #: modules/control/hotkeys.c:1319
 msgid "Subtitle position: no active subtitle"
-msgstr "Kedudukan sarikata: tiada sarikata aktif"
+msgstr "Kedudukan sari kata: tiada sari kata aktif"
 
 #: modules/control/hotkeys.c:1331
 #, c-format
@@ -14994,7 +14994,7 @@ msgstr "| snapshot . . . . . . . . . . . . ambil snapshot video"
 
 #: modules/control/oldrc.c:834
 msgid "| strack [X] . . . . . . . . .  set/get subtitle track"
-msgstr "| strack [X] . . . . . . . . .  set/dapatkan trek sarikata"
+msgstr "| strack [X] . . . . . . . . .  set/dapatkan trek sari kata"
 
 #: modules/control/oldrc.c:835
 msgid "| key [hotkey name] . . . . . .  simulate hotkey press"
@@ -15957,7 +15957,7 @@ msgstr "Bersihkan audio untuk cacat pendengaran"
 
 #: modules/demux/mpeg/ts_psi.c:425
 msgid "Spoken subtitles for the visually impaired"
-msgstr "Sarikat bersuara untuk cacat penglihatan"
+msgstr "Sari kata bersuara untuk cacat penglihatan"
 
 #: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:465
 #: modules/gui/qt/dialogs/toolbar.cpp:541
@@ -15966,7 +15966,7 @@ msgstr "Teleteks"
 
 #: modules/demux/mpeg/ts_psi.c:608
 msgid "Teletext subtitles"
-msgstr "Sarikata teleteks"
+msgstr "Sari kata teleteks"
 
 #: modules/demux/mpeg/ts_psi.c:609
 msgid "Teletext: additional information"
@@ -15978,7 +15978,7 @@ msgstr "Teleteks: jadual program"
 
 #: modules/demux/mpeg/ts_psi.c:611
 msgid "Teletext subtitles: hearing impaired"
-msgstr "Sarikata teleteks: cacat pendengaran"
+msgstr "Sari kata teleteks: cacat pendengaran"
 
 #: modules/demux/mpeg/ts_psi.c:828
 msgid "DVB subtitles: hearing impaired"
@@ -16918,7 +16918,7 @@ msgstr "Kekalkan trek audio asal"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:179
 #: modules/gui/qt/ui/profiles.h:763
 msgid "Overlay subtitles on the video"
-msgstr "Tindanan sarikata di atas video"
+msgstr "Tindanan sari kata di atas video"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:183
 msgid "Stream Destination"
@@ -17820,11 +17820,11 @@ msgstr "Pilih podcast yang anda mahu nyahlanggankan:"
 
 #: modules/gui/macosx/VLCMainWindow.m:254
 msgid "Check for album art and metadata?"
-msgstr "Semak seni album dan data meta?"
+msgstr "Semak seni album dan metadata?"
 
 #: modules/gui/macosx/VLCMainWindow.m:254
 msgid "Enable Metadata Retrieval"
-msgstr "Benarkan Dapatan Semula Data Meta"
+msgstr "Benarkan Dapatan Semula Metadata"
 
 #: modules/gui/macosx/VLCMainWindow.m:254
 msgid "No, Thanks"
@@ -17837,11 +17837,11 @@ msgid ""
 "provide this functionality, VLC will send information about your contents to "
 "trusted services in an anonymized form."
 msgstr ""
-"VLC boleh menyemak seni album dan data meta secara atas-talian untuk "
+"VLC boleh menyemak seni album dan metadata secara dalam-talian untuk "
 "meriahkan lagi pengalaman main balik anda, cth. dengan menyediakan maklumat "
 "trek bila memainkan CD Audio. Untuk menyediakan kefungsian ini, VLC akan "
 "menghantar maklumat mengenai kandungan anda ke perkhidmatan yang dipercayai "
-"dalam bentuk awanama."
+"secara awanama."
 
 #: modules/gui/macosx/VLCMainWindow.m:320
 msgid "LIBRARY"
@@ -18081,7 +18081,7 @@ msgstr "Persediaan perincian main balik sarikata"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Select a subtitle file"
-msgstr "Pilih satu fail sarikata"
+msgstr "Pilih satu fail sari kata"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:353
 msgid "Override parameters"
@@ -18093,7 +18093,7 @@ msgstr "FPS"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:358
 msgid "Subtitle encoding"
-msgstr "Pengekodan sarikata"
+msgstr "Pengekodan sari kata"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:360
 #: modules/gui/macosx/VLCSimplePrefsController.m:347
@@ -18103,7 +18103,7 @@ msgstr "Saiz Font"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:362
 msgid "Subtitle alignment"
-msgstr "Jajaran sarikata"
+msgstr "Jajaran sari kata"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:365
 msgid "Dismiss the subtitle setup dialog"
@@ -18314,7 +18314,7 @@ msgstr "Tetapan Video"
 #: modules/gui/qt/components/simple_preferences.cpp:245
 #: modules/gui/qt/components/simple_preferences.cpp:860
 msgid "Subtitle & On Screen Display Settings"
-msgstr "Tetapan Sarikata & Paparan Atas Skrin"
+msgstr "Tetapan Sari kata & Paparan Atas Skrin"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:241
 msgid "Input & Codec Settings"
@@ -18729,12 +18729,12 @@ msgstr "Penyegerakan trek sarikata:"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:57
 msgid "A positive value means that the subtitles are ahead of the video"
-msgstr "Nilai positif bermaksud sarikata mendahului video"
+msgstr "Satu nilai positif bermaksud sari kata mendahului video"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:58
 #: modules/gui/qt/components/extended_panels.cpp:1435
 msgid "Subtitle speed:"
-msgstr "Kelajuan sarikata:"
+msgstr "Kelajuan sari kata:"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:60
 #: modules/gui/qt/components/extended_panels.cpp:1449
@@ -19112,7 +19112,7 @@ msgstr " i                      Tunjuk/Sembunyi kotak info"
 
 #: modules/gui/ncurses.c:863
 msgid " M                      Show/Hide metadata box"
-msgstr "M Tunjuk/Sembunyi kotak data meta"
+msgstr "M Tunjuk/Sembunyi kotak metadata"
 
 #: modules/gui/ncurses.c:864
 msgid " L                      Show/Hide messages box"
@@ -19697,7 +19697,7 @@ msgstr "(Dilengah)"
 
 #: modules/gui/qt/components/extended_panels.cpp:1477
 msgid "Force update of this dialog's values"
-msgstr "Paksa kemaskini bagi nilai dialog ini"
+msgstr "Paksa kemas kini bagi nilai dialog ini"
 
 #: modules/gui/qt/components/info_panels.cpp:132
 msgid "&Fingerprint"
@@ -19713,7 +19713,7 @@ msgstr "Komen"
 
 #: modules/gui/qt/components/info_panels.cpp:376
 msgid "Extra metadata and other information are shown in this panel.\n"
-msgstr "Data meta ekstra dan lain-lain maklumat ditunjuk dalam panel ini.\n"
+msgstr "Metadata ekstra dan lain-lain maklumat ditunjuk dalam panel ini.\n"
 
 #: modules/gui/qt/components/info_panels.cpp:473
 msgid ""
@@ -19721,7 +19721,7 @@ msgid ""
 "Muxer, Audio and Video Codecs, Subtitles are shown."
 msgstr ""
 "Maklumat mengenai apakah media atau strim diperbuat.\n"
-"Muxer, Kodeks Audio dan Video, Sarikata ditunjukkan."
+"Muxer, Kodeks Audio dan Video, Sari kata ditunjukkan."
 
 #: modules/gui/qt/components/info_panels.cpp:548
 msgid "Current media / stream statistics"
@@ -20439,7 +20439,7 @@ msgstr "Panduan Program"
 #: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:288
 #: modules/gui/qt/ui/about.h:289
 msgid "Update"
-msgstr "Kemaskini"
+msgstr "Kemas kini"
 
 #: modules/gui/qt/dialogs/epg.cpp:161
 msgid " (%1+ rated)"
@@ -20517,7 +20517,7 @@ msgstr "Polisi Capaian Rangkaian"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:100
 msgid "Regularly check for VLC updates"
-msgstr "Semak kemaskini VLC secara tetap"
+msgstr "Semak kemas kini VLC secara kerap"
 
 #: modules/gui/qt/dialogs/gototime.cpp:42
 msgid "Go to Time"
@@ -20582,7 +20582,7 @@ msgstr "Anda memiliki versi pemain media VLC terkini."
 
 #: modules/gui/qt/dialogs/help.cpp:326
 msgid "An error occurred while checking for updates..."
-msgstr "Ralat berlaku semasa memeriksa kemaskini..."
+msgstr "Satu ralat telah berlaku ketika memeriksa kemas kini..."
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:52
 msgid "Current Media Information"
@@ -20594,7 +20594,7 @@ msgstr "&Umum"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:66
 msgid "&Metadata"
-msgstr "Data &Meta"
+msgstr "&Metadata"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:68
 msgid "Co&dec"
@@ -20606,7 +20606,7 @@ msgstr "S&tatistik"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:78
 msgid "&Save Metadata"
-msgstr "&Simpan Data Meta"
+msgstr "&Simpan Metadata"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:83
 msgid "Location:"
@@ -20644,7 +20644,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/messages.cpp:334
 msgid "Update the tree"
-msgstr "Kemaskini pepohon"
+msgstr "Kemas kini pepohon"
 
 #: modules/gui/qt/dialogs/messages.cpp:335
 msgid "Clear the messages"
@@ -21140,7 +21140,7 @@ msgstr "Simpan senarai main sebagai..."
 
 #: modules/gui/qt/dialogs_provider.cpp:820
 msgid "Open subtitles..."
-msgstr "Buka sarikata..."
+msgstr "Buka sari kata..."
 
 #: modules/gui/qt/dialogs_provider.hpp:40
 msgid "Media Files"
@@ -21148,7 +21148,7 @@ msgstr "Fail Media"
 
 #: modules/gui/qt/dialogs_provider.hpp:44
 msgid "Subtitle Files"
-msgstr "Fail Sarikata"
+msgstr "Fail Sari kata"
 
 #: modules/gui/qt/dialogs_provider.hpp:45
 msgid "All Files"
@@ -21419,7 +21419,7 @@ msgstr "&Urus..."
 
 #: modules/gui/qt/menus.cpp:790
 msgid "Check for &Updates..."
-msgstr "Periksa &Kemaskini..."
+msgstr "Periksa &Kemas kini..."
 
 #: modules/gui/qt/menus.cpp:837
 msgid "&Stop"
@@ -24326,7 +24326,7 @@ msgid ""
 "Number of milliseconds between string updates. This is mainly useful when "
 "using meta data or time format string sequences."
 msgstr ""
-"Bilangan milisaat diantara kemaskini rentetan. Ia berguna bila menggunakan "
+"Bilangan milisaat antara kemas kini rentetan. Ia berguna bila menggunakan "
 "jujukan rentetan format  masa atau data meta."
 
 #: modules/spu/marq.c:109
@@ -24588,7 +24588,7 @@ msgstr "Sela tinjauan VNC"
 #: modules/spu/remoteosd.c:85
 msgid "In this interval an update from VNC is requested, default every 300 ms."
 msgstr ""
-"Dalam sela ini satu kemaskini dari VNC telah dipinta, lalai bagi setiap 300 "
+"Dalam sela ini satu kemas kini dari VNC telah dipinta, lalai bagi setiap 300 "
 "ms."
 
 #: modules/spu/remoteosd.c:87
@@ -24786,8 +24786,8 @@ msgid ""
 "Alpha value of the earliest subtitle, where 0 is fully transparent and 255 "
 "is fully opaque."
 msgstr ""
-"Nilai alfa bagi sarikata terawal, yang mana 0 adalah sepenuhnya lutsinar dan "
-"255 adalah sepenuhnya legap."
+"Nilai alfa bagi sari kata terawal, yang mana 0 adalah sepenuhnya lutsinar "
+"dan 255 adalah sepenuhnya legap."
 
 #: modules/spu/subsdelay.c:64
 msgid "Interval between two disappearances"
@@ -24827,9 +24827,9 @@ msgid ""
 "subtitle has appeared (earlier subtitle delay will be shortened to avoid the "
 "overlap)."
 msgstr ""
-"Masa minimum (dalam milisaat) yang mana sarikata kekal selepas sarikata yang "
-"lebih baharu muncul (lengah sarikata lebih baharu akan dipendekkan untuk "
-"menghindari pertindihan)."
+"Masa minimum (dalam milisaat) yang mana sari kata kekal selepas sari kata "
+"yang lebih baharu muncul (lengah sari kata lebih baharu akan dipendekkan "
+"untuk menghindari pertindihan)."
 
 #: modules/spu/subsdelay.c:80
 msgid "Absolute delay"
@@ -25878,7 +25878,7 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:108
 msgid "Subtitle encoder"
-msgstr "Pengekod sarikata"
+msgstr "Pengekod sari kata"
 
 #: modules/stream_out/transcode/transcode.c:110
 msgid ""
@@ -25890,7 +25890,7 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:112
 msgid "Destination subtitle codec"
-msgstr "Kodeks sarikata destinasi"
+msgstr "Kodeks sari kata destinasi"
 
 #: modules/stream_out/transcode/transcode.c:114
 msgid "This is the subtitle codec that will be used."
@@ -25947,7 +25947,7 @@ msgstr "Output strim transkod"
 
 #: modules/stream_out/transcode/transcode.c:201
 msgid "Overlays/Subtitles"
-msgstr "Lappisan/Sarikata"
+msgstr "Tindanan/Sari Kata"
 
 #: modules/text_renderer/freetype/fonts/fontconfig.c:79
 msgid ""
@@ -27040,11 +27040,11 @@ msgstr "Penapis video kesan pergerakan"
 
 #: modules/video_filter/oldmovie.c:179
 msgid "Old movie effect video filter"
-msgstr "Penapis video kesan cereka lama"
+msgstr "Penapis video kesan filem lama"
 
 #: modules/video_filter/oldmovie.c:180
 msgid "Old movie"
-msgstr "Cereka lama"
+msgstr "Filem lama"
 
 #: modules/video_filter/opencv_example.cpp:72
 msgid "OpenCV face detection example filter"
@@ -27478,11 +27478,11 @@ msgstr "Putar atau kalih video"
 
 #: modules/video_filter/vhs.c:105
 msgid "VHS movie effect video filter"
-msgstr "Penapis video kesan cereka VHS"
+msgstr "Penapis video kesan filem VHS"
 
 #: modules/video_filter/vhs.c:106
 msgid "VHS movie"
-msgstr "Cereka VHS"
+msgstr "Filem VHS"
 
 #: modules/video_filter/wave.c:53
 msgid "Wave video filter"
@@ -27720,8 +27720,8 @@ msgid ""
 "Enable this option if the diagonal stripes are displayed when the window "
 "size is equal to or smaller than the movie size."
 msgstr ""
-"Benarkan pilihan ini jika jalur penjuru dipapar bila saiz tetingkap adalah "
-"sama atau lebih kecil berbanding saiz cakera."
+"Benarkan pilihan ini jika jalur penjuru dipapar ketika saiz tetingkap adalah "
+"sama atau lebih kecil berbanding saiz filem."
 
 #: modules/video_output/kva.c:55 modules/gui/qt/ui/sprefs_video.h:324
 msgid "Video mode"
@@ -28718,7 +28718,7 @@ msgstr "Keluaran"
 
 #: share/lua/http/dialogs/create_stream.html:193
 msgid "Subtitle codec"
-msgstr "Kodek sarikata"
+msgstr "Kodeks sari kata"
 
 #: share/lua/http/dialogs/create_stream.html:200
 msgid "Output\tmethod"
@@ -29066,7 +29066,7 @@ msgstr "Posisi Permulaan"
 
 #: modules/gui/qt/ui/open_disk.h:310
 msgid "Audio and Subtitles"
-msgstr "Audio dan Sarikata"
+msgstr "Audio dan Sari kata"
 
 #: modules/gui/qt/ui/open_file.h:143
 msgid "Use a sub&title file"
@@ -29074,7 +29074,7 @@ msgstr "Guna fail sarika&ta"
 
 #: modules/gui/qt/ui/open_file.h:145
 msgid "Select the subtitle file"
-msgstr "Pilih fail sarikata"
+msgstr "Pilih fail sari kata"
 
 #: modules/gui/qt/ui/open_file.h:149
 msgid "Choose one or more media file to open"
@@ -29506,11 +29506,11 @@ msgstr "Tunjuk tajuk media pada permulaan video"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:293
 msgid "Enable subtitles"
-msgstr "Bolehkan sarikata"
+msgstr "Benarkan sari kata"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
 msgid "Subtitle Language"
-msgstr "Bahasa Sarikata"
+msgstr "Bahasa Sari kata"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:296
 msgid "Default encoding"
@@ -29518,7 +29518,7 @@ msgstr "Pengenkodan lalai"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Subtitle effects"
-msgstr "Kesan sarikata"
+msgstr "Kesan sari kata"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:303
 msgid "Add a shadow"
@@ -29618,7 +29618,7 @@ msgstr "Lapangkan Senarai"
 
 #: modules/gui/qt/ui/update.h:147
 msgid "Check for VLC updates"
-msgstr "Periksa kemakini VLC"
+msgstr "Periksa kemas kini VLC"
 
 #: modules/gui/qt/ui/update.h:148
 msgid "Launching an update request..."
