@@ -295,27 +295,6 @@ AbstractStream::Status PlaylistManager::dequeue(vlc_tick_t i_floor, vlc_tick_t *
     return i_return;
 }
 
-void PlaylistManager::drain()
-{
-    for(;;)
-    {
-        bool b_drained = true;
-        for(AbstractStream *st : streams)
-        {
-            if (!st->isValid() || st->isDisabled())
-                continue;
-
-            b_drained &= st->decodersDrained();
-        }
-
-        if(b_drained)
-            break;
-
-        vlc_tick_sleep(VLC_TICK_FROM_MS(20)); /* ugly, but we have no way to get feedback */
-    }
-    es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
-}
-
 vlc_tick_t PlaylistManager::getResumeTime() const
 {
     vlc_mutex_locker locker(&demux.lock);

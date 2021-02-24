@@ -61,7 +61,6 @@ namespace adaptive
 
             AbstractStream::BufferingStatus bufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t);
             AbstractStream::Status dequeue(vlc_tick_t, vlc_tick_t *);
-            void drain();
 
             virtual bool needsUpdate() const;
             virtual bool updatePlaylist();
