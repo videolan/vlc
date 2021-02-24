@@ -46,9 +46,10 @@ HRESULT (D3D11_CompilePixelShaderBlob)(vlc_object_t *o, const d3d_shader_compile
                                    bool src_full_range,
                                    const d3d11_quad_t *quad, d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET])
 {
+    size_t shader_views[DXGI_MAX_RENDER_TARGET];
     return D3D_CompilePixelShader(o, compiler, d3d_dev->feature_level,
                                   display, transfer,
-                                  src_full_range, quad->generic.textureFormat, pPSBlob);
+                                  src_full_range, quad->generic.textureFormat, pPSBlob, shader_views);
 }
 
 HRESULT D3D11_SetQuadPixelShader(vlc_object_t *o, d3d11_device_t *d3d_dev,

@@ -43,7 +43,7 @@ cbuffer PS_CONSTANT_BUFFER : register(b0)\n\
     float LuminanceScale;\n\
     float2 Boundary;\n\
 };\n\
-Texture2D shaderTexture[4];\n\
+Texture2D shaderTexture[TEXTURE_RESOURCES];\n\
 SamplerState normalSampler : register(s0);\n\
 SamplerState borderSampler : register(s1);\n\
 \n\
@@ -376,6 +376,7 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
 static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
                                    D3D_FEATURE_LEVEL feature_level,
                                    const char *psz_sampler,
+                                   const char *psz_shader_resource_views,
                                    const char *psz_src_to_linear,
                                    const char *psz_linear_to_display,
                                    const char *psz_tone_mapping,
@@ -390,6 +391,7 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
         msg_Dbg(o, "shader %s", globPixelShaderDefault);
 
     D3D_SHADER_MACRO defines[] = {
+         { "TEXTURE_RESOURCES", psz_shader_resource_views },
          { "TONE_MAPPING",      psz_tone_mapping },
          { "SRC_TO_LINEAR",     psz_src_to_linear },
          { "LINEAR_TO_DST",     psz_linear_to_display },
@@ -421,14 +423,17 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                  video_transfer_func_t transfer,
                                  bool src_full_range,
                                  const d3d_format_t *dxgi_fmt,
-                                 d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET])
+                                 d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET],
+                                 size_t shader_views[DXGI_MAX_RENDER_TARGET])
 {
     static const char *DEFAULT_NOOP = "0";
     const char *psz_sampler[DXGI_MAX_RENDER_TARGET] = {NULL, NULL};
+    const char *psz_shader_resource_views[DXGI_MAX_RENDER_TARGET] = { NULL, NULL };
     const char *psz_src_to_linear     = DEFAULT_NOOP;
     const char *psz_linear_to_display = DEFAULT_NOOP;
     const char *psz_tone_mapping      = DEFAULT_NOOP;
     const char *psz_src_range, *psz_dst_range;
+    shader_views[1] = 0;
 
     if ( display->pixelFormat->formatTexture == DXGI_FORMAT_NV12 ||
          display->pixelFormat->formatTexture == DXGI_FORMAT_P010 )
@@ -439,7 +444,9 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         case DXGI_FORMAT_NV12:
         case DXGI_FORMAT_P010:
             psz_sampler[0] = "SAMPLE_NV12_TO_NV_Y";
+            psz_shader_resource_views[0] = "1"; shader_views[0] = 1;
             psz_sampler[1] = "SAMPLE_NV12_TO_NV_UV";
+            psz_shader_resource_views[1] = "2"; shader_views[1] = 2; // TODO should be 1 ?
             break;
         case DXGI_FORMAT_R8G8B8A8_UNORM:
         case DXGI_FORMAT_B8G8R8A8_UNORM:
@@ -449,8 +456,10 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         case DXGI_FORMAT_B5G6R5_UNORM:
             /* Y */
             psz_sampler[0] = "SAMPLE_RGBA_TO_NV_R";
+            psz_shader_resource_views[0] = "1"; shader_views[0] = 1;
             /* UV */
             psz_sampler[1] = "SAMPLE_RGBA_TO_NV_GB";
+            psz_shader_resource_views[1] = "1"; shader_views[1] = 1;
             break;
         case DXGI_FORMAT_UNKNOWN:
             switch (dxgi_fmt->fourcc)
@@ -458,8 +467,10 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
             case VLC_CODEC_YUVA:
                 /* Y */
                 psz_sampler[0] = "SAMPLE_PLANAR_YUVA_TO_NV_Y";
+                psz_shader_resource_views[0] = "4"; shader_views[0] = 4;
                 /* UV */
                 psz_sampler[1] = "SAMPLE_PLANAR_YUVA_TO_NV_UV";
+                psz_shader_resource_views[1] = "4"; shader_views[1] = 4;
                 break;
             default:
                 vlc_assert_unreachable();
@@ -476,18 +487,23 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         case DXGI_FORMAT_NV12:
         case DXGI_FORMAT_P010:
             psz_sampler[0] = "SAMPLE_NV12_TO_YUVA";
+            psz_shader_resource_views[0] = "2"; shader_views[0] = 2;
             break;
         case DXGI_FORMAT_YUY2:
             psz_sampler[0] = "SAMPLE_YUY2_TO_YUVA";
+            psz_shader_resource_views[0] = "1"; shader_views[0] = 1;
             break;
         case DXGI_FORMAT_Y210:
             psz_sampler[0] = "SAMPLE_Y210_TO_YUVA";
+            psz_shader_resource_views[0] = "1"; shader_views[0] = 1;
             break;
         case DXGI_FORMAT_Y410:
             psz_sampler[0] = "SAMPLE_Y410_TO_YUVA";
+            psz_shader_resource_views[0] = "1"; shader_views[0] = 1;
             break;
         case DXGI_FORMAT_AYUV:
             psz_sampler[0] = "SAMPLE_AYUV_TO_YUVA";
+            psz_shader_resource_views[0] = "1"; shader_views[0] = 1;
             break;
         case DXGI_FORMAT_R8G8B8A8_UNORM:
         case DXGI_FORMAT_B8G8R8A8_UNORM:
@@ -496,19 +512,23 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
         case DXGI_FORMAT_R16G16B16A16_UNORM:
         case DXGI_FORMAT_B5G6R5_UNORM:
             psz_sampler[0] = "SAMPLE_RGBA_TO_RGBA";
+            psz_shader_resource_views[0] = "1"; shader_views[0] = 1;
             break;
         case DXGI_FORMAT_UNKNOWN:
             switch (dxgi_fmt->fourcc)
             {
             case VLC_CODEC_I420_10L:
                 psz_sampler[0] = "SAMPLE_TRIPLANAR10_TO_YUVA";
+                psz_shader_resource_views[0] = "3"; shader_views[0] = 3;
                 break;
             case VLC_CODEC_I444_16L:
             case VLC_CODEC_I420:
                 psz_sampler[0] = "SAMPLE_TRIPLANAR_TO_YUVA";
+                psz_shader_resource_views[0] = "3"; shader_views[0] = 3;
                 break;
             case VLC_CODEC_YUVA:
                 psz_sampler[0] = "SAMPLE_PLANAR_YUVA_TO_YUVA";
+                psz_shader_resource_views[0] = "4"; shader_views[0] = 4;
                 break;
             default:
                 vlc_assert_unreachable();
@@ -670,7 +690,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
 
     HRESULT hr;
     hr = CompilePixelShaderBlob(o, compiler, feature_level,
-                                psz_sampler[0],
+                                psz_sampler[0], psz_shader_resource_views[0],
                                 psz_src_to_linear,
                                 psz_linear_to_display,
                                 psz_tone_mapping,
@@ -680,7 +700,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     if (SUCCEEDED(hr) && psz_sampler[1])
     {
         hr = CompilePixelShaderBlob(o, compiler, feature_level,
-                                    psz_sampler[1],
+                                    psz_sampler[1],  psz_shader_resource_views[1],
                                     psz_src_to_linear,
                                     psz_linear_to_display,
                                     psz_tone_mapping,

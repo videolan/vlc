@@ -38,7 +38,8 @@ HRESULT D3D_CompilePixelShader(vlc_object_t *, const d3d_shader_compiler_t *,
                                video_transfer_func_t,
                                bool src_full_range,
                                const d3d_format_t *dxgi_fmt,
-                               d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET]);
+                               d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET],
+                               size_t shader_views[DXGI_MAX_RENDER_TARGET]);
 
 HRESULT D3D_CompileVertexShader(vlc_object_t *, const d3d_shader_compiler_t *,
                                 D3D_FEATURE_LEVEL, bool flat,
