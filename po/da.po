@@ -33,8 +33,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-09-23 18:29+0200\n"
-"Last-Translator: scootergrisen <scootergrisen@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-24 19:21+0100\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2021\n"
 "Language-Team: Danish (https://www.transifex.com/yaron/teams/16553/da/)\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -6396,7 +6396,7 @@ msgstr ""
 
 #: modules/access/concat.c:308
 msgid "Concatenation"
-msgstr ""
+msgstr "Sammenkædning"
 
 #: modules/access/concat.c:309
 msgid "Concatenated inputs"
@@ -15102,6 +15102,7 @@ msgstr ""
 #: modules/demux/adaptive/adaptive.cpp:83
 msgid "Connect using HTTP access instead of custom HTTP code"
 msgstr ""
+"Opret forbindelse ved hjælp af HTTP-adgang i stedet for tilpasset HTTP-kode"
 
 #: modules/demux/adaptive/adaptive.cpp:85
 #: modules/gui/qt/components/simple_preferences.cpp:694
@@ -17992,7 +17993,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:213
 msgid "Subscreen Height"
-msgstr ""
+msgstr "Underskærms højde"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:215
 msgid "Capture Audio"
@@ -22020,7 +22021,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:49
 msgid "After first unlock, on this device only"
-msgstr ""
+msgstr "Efter første oplåsning, kun på denne enhed"
 
 #: modules/keystore/keychain.m:51
 msgid "When passcode set, on this device only"
@@ -22032,7 +22033,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked"
-msgstr ""
+msgstr "Når den er låst op"
 
 #: modules/keystore/keychain.m:54
 msgid "When unlocked, on this device only"
@@ -27490,7 +27491,7 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:246
 msgid "DeckLink Video Output module"
-msgstr ""
+msgstr "DeckLink Video Output-modul"
 
 #: modules/video_output/decklink.cpp:251
 msgid "DeckLink Video Options"
