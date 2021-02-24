@@ -334,3 +334,6 @@ vout_PLUGINS += \
 	libwextern_plugin.la \
 	libvgl_plugin.la \
 	libyuv_plugin.la
+
+libsk_videooutput_plugin_la_SOURCES = video_output/sk.c
+vout_PLUGINS += libsk_videooutput_plugin.la

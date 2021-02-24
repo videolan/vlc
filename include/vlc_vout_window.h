@@ -64,6 +64,7 @@ enum vout_window_type {
     VOUT_WINDOW_TYPE_ANDROID_NATIVE /**< Android native window */,
     VOUT_WINDOW_TYPE_WAYLAND /**< Wayland surface */,
     VOUT_WINDOW_TYPE_DCOMP /**< Win32 DirectComposition */,
+    VOUT_WINDOW_TYPE_SK,
 };
 
 /**
@@ -405,6 +406,7 @@ typedef struct vout_window_t {
         void     *anativewindow; /**< Android native window */
         struct wl_surface *wl;   /**< Wayland surface (client pointer) */
         void     *dcomp_visual;  /**<  Win32 direct composition visual */
+        void     *sk;
     } handle;
 
     /** Display server (mandatory)
