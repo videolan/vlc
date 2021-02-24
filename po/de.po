@@ -1,28 +1,30 @@
 # German translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Christoph Miebach <christoph.miebach@web.de>, 2013-2016
 # Daniel Winzen <d@winzen4.de>, 2013
+# ePirat <epirat07@gmail.com>, 2017
 # Felix Paul Kühne <fkuehne@gmail.com>, 2003-2015
+# Freddy Koschinsky <schollator@burning.name>, 2021
 # Jens Seidel <jensseidel _at_ users.sf.net>, 2005
 # Kai Hermann <kai.uwe.hermann@gmail.com>, 2009
 # Lars Gaudian <lgaudian@me.com>, 2013
 # Mario Siegmann <mario_siegmann@web.de>, 2014-2020
 # Martin Böh <martin-boeh@outlook.com>, 2013
 # Mathias C. Berens | welcome-soft <berens at welcome-soft.de>, 2006
-# Michał Trzebiatowski <michtrz@gmail.com>, 2009-2020
+# Michał Trzebiatowski <michtrz@gmail.com>, 2009-2021
 # Philipp Weissenbacher <philippweissenbacher _at_ aon.at>, 2004
 # Thomas Graf <tgr at reeler.org>, 2002
 # Tobias Bannert <tobannert@gmail.com>, 2014-2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-10-06 23:10+0200\n"
-"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-24 22:18+0100\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2021\n"
 "Language-Team: German (https://www.transifex.com/yaron/teams/16553/de/)\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -288,7 +290,7 @@ msgid ""
 "Sout streams modules allow advanced stream processing (transcoding, "
 "duplicating...)."
 msgstr ""
-"Die Stream-Output Einstellungen werden benutzt, wenn VLC als Streamingserver "
+"Die Streamausgabe-Einstellungen werden benutzt, wenn VLC als Streamingserver "
 "agiert oder wenn eingehende Streams gespeichert werden.\n"
 "Streams durchlaufen zuerst einen Muxer und werden danach durch ein \"Access-"
 "Output\"-Modul geschickt, das den Stream entweder in einer Datei speichert "
@@ -370,7 +372,7 @@ msgstr "VOD"
 
 #: include/vlc_config_cat.h:169
 msgid "VLC's implementation of Video On Demand"
-msgstr "VLC's Implementierung von Video-On-Demand"
+msgstr "VLCs Implementierung von Video-On-Demand"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2070
 #: src/playlist/engine.c:243 modules/demux/playlist/playlist.c:64
@@ -559,19 +561,19 @@ msgstr "Zur Wiedergabeliste hinzufügen"
 
 #: include/vlc_intf_strings.h:85 modules/gui/macosx/VLCPlaylist.m:230
 msgid "Add File..."
-msgstr "Datei hinzufügen..."
+msgstr "Datei hinzufügen ..."
 
 #: include/vlc_intf_strings.h:86
 msgid "Add Directory..."
-msgstr "Verzeichnis hinzufügen..."
+msgstr "Verzeichnis hinzufügen ..."
 
 #: include/vlc_intf_strings.h:87
 msgid "Add Folder..."
-msgstr "Ordner hinzufügen..."
+msgstr "Ordner hinzufügen ..."
 
 #: include/vlc_intf_strings.h:89
 msgid "Save Playlist to &File..."
-msgstr "Wiedergabeliste in &Datei speichern..."
+msgstr "Wiedergabeliste in &Datei speichern ..."
 
 #: include/vlc_intf_strings.h:91 modules/gui/macosx/VLCMainWindow.m:191
 #: modules/gui/qt/components/preferences_widgets.cpp:1138
@@ -962,7 +964,7 @@ msgstr "Streaming/Transkodierung fehlgeschlagen"
 #: src/input/decoder.c:1918
 #, c-format
 msgid "VLC could not open the %s module."
-msgstr "VLC konnte das %s Modul nicht öffnen."
+msgstr "VLC konnte das Modul %s nicht öffnen."
 
 #: src/input/decoder.c:2201
 msgid "VLC could not open the decoder module."
@@ -1599,8 +1601,8 @@ msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
-"Dies aktiviert farbige Meldungen die zur Konsole gesendet werden. Ihr "
-"Terminal benötigt die Linux Farbunterstützung damit dies funktionieren kann."
+"Dies aktiviert farbige Meldungen, die zur Konsole gesendet werden. Ihr "
+"Terminal benötigt die Linux-Farbunterstützung damit dies funktionieren kann."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1730,8 +1732,8 @@ msgstr "Die Lautstärke behalten"
 msgid ""
 "The volume can be recorded and automatically restored next time VLC is used."
 msgstr ""
-"Die Lautstärke kann vermerkt werden und beim nächsten Start von VLC "
-"automatisch wiederhergestellt werden."
+"Die Lautstärke kann gemerkt und beim nächsten Start von VLC automatisch "
+"wiederhergestellt werden."
 
 #: src/libvlc-module.c:161
 msgid "Audio desynchronization compensation"
@@ -1908,7 +1910,7 @@ msgid ""
 msgstr ""
 "Diese Optionen erlauben es Ihnen, das Verhalten des Videoausgabeuntersystems "
 "zu verändern. Sie können beispielsweise Videofilter (Deinterlace, "
-"Bildausrichtung, ...) aktivieren. Diese Filter hier aktivieren und im der "
+"Bildausrichtung, ...) aktivieren. Diese Filter hier aktivieren und im "
 "„Videofiltermodul“ konfigurieren. Sie können auch diverse Videooptionen "
 "einstellen."
 
@@ -1951,7 +1953,7 @@ msgid ""
 "characteristics."
 msgstr ""
 "Sie können die Videobreite erzwingen. Standardmäßig (-1) wird VLC die "
-"Eigenschaften des Films übernehmen."
+"Filmeigenschaften übernehmen."
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
@@ -2131,8 +2133,7 @@ msgstr "Hintergrundbild Modus aktivieren"
 msgid ""
 "The wallpaper mode allows you to display the video as the desktop background."
 msgstr ""
-"Der Wallpapermodus erlaubt es Ihnen, die Anzeige des Videos als "
-"Desktophintergrund."
+"Der Wallpapermodus ermöglicht die Anzeige des Videos als Desktophintergrund."
 
 #: src/libvlc-module.c:324
 msgid "Show media title on video"
@@ -2159,7 +2160,7 @@ msgstr "Position des Videotitels"
 #: src/libvlc-module.c:334
 msgid "Place on video where to display the title (default bottom center)."
 msgstr ""
-"Die Stelle im Bild an der der Titel eingeblendet wird (standardmäßig unten-"
+"Die Stelle im Bild, an der der Titel eingeblendet wird (standardmäßig unten-"
 "mitte)."
 
 #: src/libvlc-module.c:336
@@ -2423,7 +2424,7 @@ msgid ""
 "order to keep proportions."
 msgstr ""
 "Erzwingt ein bestimmtes Seitenverhältnis. Die meisten Monitore haben "
-"quadratische Pixel (1:1). Wenn Sie einen 16:9 Bildschirm haben, müssen Sie "
+"quadratische Pixel (1:1). Wenn Sie einen 16:9-Bildschirm haben, müssen Sie "
 "dies eventuell auf 4:3 ändern, um die Proportionen zu erhalten."
 
 #: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:307
@@ -2452,7 +2453,7 @@ msgstr ""
 
 #: src/libvlc-module.c:478
 msgid "Quiet synchro"
-msgstr "Stilles synchronisieren"
+msgstr "Stilles Synchronisieren"
 
 #: src/libvlc-module.c:480
 msgid ""
@@ -2487,7 +2488,7 @@ msgid ""
 "channel."
 msgstr ""
 "Diese Optionen erlauben es Ihnen, das Verhalten des Input-Untersystems "
-"verändern, wie das DVD- oder VCD-Gerät, die Netzwerkinterface-Einstellungen "
+"verändern, also das DVD- oder VCD-Gerät, die Netzwerkinterface-Einstellungen "
 "oder den Untertitelkanal."
 
 #: src/libvlc-module.c:501
@@ -2653,7 +2654,7 @@ msgid ""
 "Choose the program to select by giving its Service ID. Only use this option "
 "if you want to read a multi-program stream (like DVB streams for example)."
 msgstr ""
-"Wählen Sie das Programm indem Sie dessen Service-ID angeben. Benutzen Sie "
+"Wählen Sie Programme aus, indem Sie deren Prozess-IDs angeben. Benutzen Sie "
 "diese Option nur, wenn Sie Streams mit mehreren Programmen (wie "
 "beispielsweise DVB-Streams) lesen möchten."
 
@@ -2663,10 +2664,9 @@ msgid ""
 "IDs (SIDs). Only use this option if you want to read a multi-program stream "
 "(like DVB streams for example)."
 msgstr ""
-"Wählen Sie die ausgesuchten Programme, indem Sie eine durch Kommata "
-"getrennte Liste von SIDs angeben. Benutzen Sie diese Option nur, wenn Sie "
-"Streams mit mehreren Programmen (wie beispielsweise DVB-Streams) lesen "
-"möchten."
+"Wählen Sie Programme aus, indem Sie eine komma-getrennte Liste mit deren "
+"Service-IDs (SID) angeben. Benutzen Sie diese Option nur, wenn Sie Streams "
+"mit mehreren Programmen (wie beispielsweise DVB-Streams) lesen möchten."
 
 #: src/libvlc-module.c:578 modules/gui/qt/ui/open_disk.h:311
 msgid "Audio track"
@@ -3106,7 +3106,7 @@ msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
-"Dies ist das standardmäßig genutzte DVD Laufwerk (oder eine Datei). Den "
+"Dies ist das standardmäßig genutzte DVD-Laufwerk (oder eine Datei). Den "
 "Doppelpunkt am Ende des Laufwerksbuchstabens nicht vergessen (z.B. D:)."
 
 #: src/libvlc-module.c:771
@@ -3114,7 +3114,7 @@ msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
-"Dies ist das standardmäßig genutzte VCD Laufwerk (oder eine Datei). Den "
+"Dies ist das standardmäßig genutzte VCD-Laufwerk (oder eine Datei). Den "
 "Doppelpunkt am Ende des Laufwerksbuchstabens nicht vergessen (z.B. D:)."
 
 #: src/libvlc-module.c:774 modules/access/cdda.c:711
@@ -3122,7 +3122,7 @@ msgid ""
 "This is the default Audio CD drive (or file) to use. Don't forget the colon "
 "after the drive letter (e.g. D:)"
 msgstr ""
-"Dies ist das standardmäßig genutzte Audio-CD Laufwerk (oder eine Datei). Den "
+"Dies ist das standardmäßig genutzte Audio-CD-Laufwerk (oder eine Datei). Den "
 "Doppelpunkt am Ende des Laufwerksbuchstabens nicht vergessen (z.B. D:)."
 
 #: src/libvlc-module.c:781
@@ -3172,7 +3172,7 @@ msgid ""
 "127.0.0.1) or a host name (e.g. localhost) to restrict them to a specific "
 "network interface."
 msgstr ""
-"Dies definiert die verwendete Adresse des RTSP-Servers, zusammen mit dem "
+"Dies definiert die verwendete Adresse des RTSP-Servers zusammen mit dem "
 "Basis-Pfad der RTSP-VOD-Medien. Die Syntax lautet Adresse/Pfad. "
 "Standardmäßig wird der Server sämtliche lokalen IP-Adressen verwenden. Geben "
 "Sie eine IP-Adresse (z.B.: 127.0.0.1 oder ::1) oder einen Hostnamen (z.B. "
@@ -3685,7 +3685,7 @@ msgid ""
 "Scan plugin directories for new plugins at startup. This increases the "
 "startup time of VLC."
 msgstr ""
-"Beim starten den Plugin-Verzeichnis nach neuen Plugins durchsuchen. Dies "
+"Beim Starten das Plugin-Verzeichnis nach neuen Plugins durchsuchen. Dies "
 "kann die Startgeschwindigkeit von VLC erhöhen."
 
 #: src/libvlc-module.c:1058
@@ -3694,7 +3694,7 @@ msgstr "Bevorzugte Schlüsselspeicher-Liste"
 
 #: src/libvlc-module.c:1060
 msgid "List of keystores that VLC will use in priority."
-msgstr "Liste der Schlüsselspeicher, welche VLC nach Priorität nutzen wird."
+msgstr "Liste der Schlüsselspeicher, die VLC nach Priorität nutzen wird."
 
 #: src/libvlc-module.c:1062
 msgid "Locally collect statistics"
@@ -3796,7 +3796,7 @@ msgstr "Mediaplayer über D-Bus exponieren"
 #: src/libvlc-module.c:1105
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
 msgstr ""
-"Erlaubt anderen Anwendungen VLC über das D-Bus MPRIS Protokoll zu steuern."
+"Erlaubt anderen Anwendungen VLC über das D-Bus MPRIS-Protokoll zu steuern."
 
 #: src/libvlc-module.c:1114
 msgid ""
@@ -4195,7 +4195,7 @@ msgstr "Kurzer Sprung zurück"
 
 #: src/libvlc-module.c:1260
 msgid "Select the hotkey to make a short backwards jump."
-msgstr "Wählen Sie den Hotkey, um kurz rückwärts zu Springen."
+msgstr "Wählen Sie den Hotkey, um kurz rückwärts zu springen."
 
 #: src/libvlc-module.c:1261
 msgid "Medium backwards jump"
@@ -6159,7 +6159,7 @@ msgid ""
 "Pass alsa:// to open the default ALSA capture device, or alsa://SOURCE to "
 "open a specific device named SOURCE."
 msgstr ""
-"Benutzen Sie alsa:// um das Standard Alsa Aufnahmegerät zu öffnen oder "
+"Benutzen Sie alsa:// um das Standard-Alsa-Aufnahmegerät zu öffnen oder "
 "alsa://QUELLE, um ein bestimmtes Gerät namens QUELLE zu öffnen."
 
 #: modules/access/alsa.c:49
@@ -6313,7 +6313,7 @@ msgstr "Ausgabe des libavformat AVIO-Zugriffs"
 
 #: modules/access/bluray.c:72
 msgid "Blu-ray menus"
-msgstr "Blu-ray Menüs"
+msgstr "Blu-ray-Menüs"
 
 #: modules/access/bluray.c:73
 msgid "Use Blu-ray menus. If disabled, the movie will start directly"
@@ -6329,7 +6329,7 @@ msgid ""
 "Blu-Ray player region code. Some discs can be played only with a correct "
 "region code."
 msgstr ""
-"Blu-Ray Player Regionalcode. Einige Disks können nur mit korrektem "
+"Blu-Ray-Player-Regionalcode. Einige Disks können nur mit korrektem "
 "Regionalcode abgespielt werden."
 
 #: modules/access/bluray.c:103 modules/services_discovery/udev.c:603
@@ -6886,7 +6886,7 @@ msgstr "Audiobits pro Sample"
 #: modules/access/dshow/dshow.cpp:207
 msgid "Select audio input format with the given bits/sample (if non 0)"
 msgstr ""
-"Audio Input Format mit den vorgegebenen Bits/Muster wählen (wenn nicht 0)"
+"Audio-Input-Format mit den vorgegebenen Bits/Muster wählen (wenn nicht 0)"
 
 #: modules/access/dshow/dshow.cpp:219
 msgid "DirectShow"
@@ -8314,7 +8314,7 @@ msgid ""
 "RTP packets will be discarded if they are too far behind (i.e. in the past) "
 "by this many packets from the last received packet."
 msgstr ""
-"RTP Pakete werden abgelehnt, wenn um sie um so viele Pakete seit dem letzten "
+"RTP-Pakete werden abgelehnt, wenn um sie um so viele Pakete seit dem letzten "
 "erhaltenen Paket im Rückstand sind (d.h. in der Vergangenheit)."
 
 #: modules/access/rtp/rtp.c:78
@@ -9107,11 +9107,11 @@ msgid ""
 "audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
 "(-vv) or use the v4l2-ctl application."
 msgstr ""
-"Setze die v4l2 Treibersteuerung auf die angegebenen Werte in Form einer "
-"durch Komma getrennten Liste, optional eingeschlossen von geschweiften "
-"Klammern (z.B.: {video_bitrate=6000000,audio_crc=0,stream_type=3} ). Erhöhen "
-"Sie den Grad der Ausführlichkeit der VLC-Meldungen (-vv) um verfügbare "
-"Kontrollen anzuzeigen, oder benutzen Sie das v4l2-ctl Programm."
+"v4l2-Treibersteuerung auf die angegebenen Werte in Form einer durch Komma "
+"getrennten Liste setzen, optional eingeschlossen von geschweiften Klammern "
+"(z.B.: {video_bitrate=6000000,audio_crc=0,stream_type=3} ). Erhöhen Sie den "
+"Grad der Ausführlichkeit der VLC-Meldungen (-vv) um verfügbare Kontrollen "
+"anzuzeigen, oder benutzen Sie das v4l2-ctl Programm."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:429
@@ -9219,7 +9219,7 @@ msgstr ""
 
 #: modules/access/vdr.c:80
 msgid "Default frame rate for chapter import."
-msgstr "Standard-Bildwiederholrate für den Kapitel Import."
+msgstr "Standard-Bildwiederholrate für den Kapitelimport."
 
 #: modules/access/vdr.c:84
 msgid "VDR"
@@ -10258,7 +10258,7 @@ msgstr ""
 
 #: modules/audio_filter/normvol.c:71
 msgid "Maximal volume level"
-msgstr "Maximales Lautstärke Level"
+msgstr "Maximales Lautstärkelevel"
 
 #: modules/audio_filter/normvol.c:72
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:255
@@ -10694,7 +10694,7 @@ msgstr ""
 
 #: modules/audio_output/directsound.c:70 modules/audio_output/mmdevice.c:1470
 msgid "Audio volume in hundredths of decibels (dB)."
-msgstr "Tonlautstärke in Hunderten Dezibel (dB)."
+msgstr "Tonlautstärke in Hundertstel Dezibel (dB)."
 
 #: modules/audio_output/directsound.c:73
 msgid "DirectX audio output"
@@ -12136,9 +12136,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "Kate-Textuntertitel Paketisierer"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "Umkodierungsoptionen"
+msgstr "Zusätzliches Schriftartenverzeichnis"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -13742,7 +13741,7 @@ msgstr ""
 "Level werden nicht erzwungen; es ist Sache des Benutzers ein Level zu "
 "wählen, das kompatibel mit dem Rest der Encoding-Optionen ist. Intervall von "
 "1 bis 5.1 (10 bis 51 ist auch erlaubt). Auf 0 setzen, damit x264 den Level "
-"eingestellt."
+"einstellt."
 
 #: modules/codec/x264.c:157
 msgid "H.264 profile"
@@ -14392,7 +14391,7 @@ msgstr "x264 fortgeschrittene Optionen"
 
 #: modules/codec/x264.c:416
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
-msgstr "Erweiterte x264 Optionen in Form {option=wert,option2=wert2}."
+msgstr "Erweiterte x264-Optionen in Form {option=wert,option2=wert2}."
 
 #: modules/codec/x264.c:421
 msgid "dia"
@@ -15326,17 +15325,16 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "Bevorzugte Bandbreite für nicht adaptive Streams"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "DTS-Verzögerung (ms)"
+msgstr "Live-Wiedergabe-Verzögerung (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "Kompromiss zwischen Stabilität und Echtzeit"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "Maximale Pufferung (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15358,9 +15356,8 @@ msgid "Low latency"
 msgstr "Niedrige Latenz"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "Parameter überschreiben"
+msgstr "Überschreibt Parameter mit niedriger Latenz"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15387,9 +15384,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "Höchste Bandbreite/Qualität"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "Fett erzwingen"
+msgstr "Erzwingen"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -17398,7 +17394,7 @@ msgid ""
 "By default, VLC will control its own volume with the Apple Remote. However, "
 "you can choose to control the global system volume instead."
 msgstr ""
-"Standardmäßig können Sie in VLC mit der Apple Fernbedienung die Lautstärke "
+"Standardmäßig können Sie in VLC mit der Apple-Fernbedienung die Lautstärke "
 "ändern. Allerdings können Sie wählen, ob Sie stattdessen die globale "
 "Systemlautstärke ändern wollen."
 
@@ -17667,7 +17663,7 @@ msgstr "Größer"
 
 #: modules/gui/macosx/VLCMainMenu.m:341
 msgid "Check for Update..."
-msgstr "Nach Aktualisierungen suchen …"
+msgstr "Nach Aktualisierungen suchen…"
 
 #: modules/gui/macosx/VLCMainMenu.m:342
 msgid "Preferences..."
@@ -21744,7 +21740,7 @@ msgstr "<Lokal>"
 
 #: modules/gui/qt/menus.cpp:1646
 msgid "Scanning..."
-msgstr "Durchsuchen..."
+msgstr "Durchsuche..."
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -22736,7 +22732,7 @@ msgstr "Albumbilddateiname"
 
 #: modules/meta_engine/folder.c:73
 msgid "Filename to look for album art in current directory"
-msgstr "Albumbilddateiname nachdem im aktuellen Verzeichnis gesucht wird"
+msgstr "Albumbilddateiname nach dem im aktuellen Verzeichnis gesucht wird"
 
 #: modules/meta_engine/ID3Genres.h:33
 msgid "Blues"
@@ -29232,11 +29228,14 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
+"VLC kann einen QR-Code anzeigen, der auf die mobile Version des "
+"Webinterfaces leitet. Die Webadresse der VLC Media Player-Instanz, wird an "
+"den Webdienst von Google Image Charts übertragen, um diesen QR-Code zu "
+"generieren."
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "Möchten Sie es herunterladen?"
+msgstr "Sie sie damit einverstanden?"
 
 #: share/lua/http/index.html:290
 msgid ""
@@ -29695,7 +29694,7 @@ msgstr "Verstärkungsmodus:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
 msgid "Normalize volume to:"
-msgstr "Normalisiere die Lautstärke auf:"
+msgstr "Lautstärke normalisieren auf:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:424
 msgid "Tracks"
@@ -29723,7 +29722,7 @@ msgstr "Codecs"
 
 #: modules/gui/qt/ui/sprefs_input.h:357
 msgid "x264 profile and level selection"
-msgstr "x264 Profile- und Level-Auswahl"
+msgstr "x264-Profil- und Level-Auswahl"
 
 #: modules/gui/qt/ui/sprefs_input.h:358
 msgid "Hardware-accelerated decoding"
@@ -29739,7 +29738,7 @@ msgstr "H.264 Einsprungfilter (Deblocking-Filter) überspringen"
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "x264 preset and tuning selection"
-msgstr "x264-Voreingestellung und Abstimmungsauswahl"
+msgstr "x264-Voreinstellung und Abstimmungsauswahl"
 
 #: modules/gui/qt/ui/sprefs_input.h:363
 msgid "Optical drive"
