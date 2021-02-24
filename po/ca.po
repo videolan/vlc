@@ -21,8 +21,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-11-02 18:54+0100\n"
-"Last-Translator: Òscar Herran <oscarhm03@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-24 19:21+0100\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2021\n"
 "Language-Team: Catalan (https://www.transifex.com/yaron/teams/16553/ca/)\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -17177,11 +17177,11 @@ msgstr "Cerca endavant"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:93
 msgid "Playback position"
-msgstr ""
+msgstr "Posició de reproducció"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:113
 msgid "Playback time"
-msgstr ""
+msgstr "Temps de reproducció"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:194
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
@@ -17502,14 +17502,14 @@ msgstr "Ajustar el volum"
 
 #: modules/gui/macosx/VLCFSPanelController.m:132
 msgid "Adjust the current playback position"
-msgstr ""
+msgstr "Ajustar la posició de reproducció"
 
 #: modules/gui/macosx/VLCFSPanelController.m:317
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:78
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:503
 #, c-format
 msgid "Volume: %i %%"
-msgstr ""
+msgstr "Volum: %i %%"
 
 #: modules/gui/macosx/macosx.m:51
 msgid "Video device"
@@ -17769,17 +17769,19 @@ msgstr "Pausa iTunes / Spotify"
 
 #: modules/gui/macosx/macosx.m:133
 msgid "Pause and resume iTunes / Spotify"
-msgstr ""
+msgstr "Pausa i reprèn iTunes / Spotify"
 
 #: modules/gui/macosx/macosx.m:136
 msgid "Continue playback where you left off"
-msgstr ""
+msgstr "Continua la reproducció on ho vas deixar"
 
 #: modules/gui/macosx/macosx.m:137
 msgid ""
 "VLC will store playback positions of the last 30 items you played. If you re-"
 "open one of those, playback will continue."
 msgstr ""
+"El VLC guardarà les posicions de reproducció dels 30 últims elements "
+"reproduïts. Si en tornes a obrir un la reproducció continuarà."
 
 #: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:206
 msgid "Ask"
@@ -17994,7 +17996,7 @@ msgstr "Pas enrere"
 #: modules/gui/macosx/VLCMainMenu.m:404
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:53
 msgid "Jump to Time"
-msgstr ""
+msgstr "Saltar al minut"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
@@ -18185,6 +18187,8 @@ msgstr "Cerca a la llista de reproducció"
 #: modules/gui/macosx/VLCMainWindow.m:192
 msgid "Search the playlist. Results will be selected in the table."
 msgstr ""
+"Introduïu un terme per cercar a la llista de reproducció. El resultats se "
+"seleccionaran a la taula."
 
 #: modules/gui/macosx/VLCMainWindow.m:213
 msgid "Open a dialog to select the media to play"
@@ -20879,7 +20883,7 @@ msgstr "Ajustaments i efectes"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
 msgid "Stereo Widener"
-msgstr ""
+msgstr "Mode estèreo"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -22154,7 +22158,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:192
 msgid "Fullscreen controller mouse sensitivity"
-msgstr ""
+msgstr "Sensibilitat del ratolí al menú de pantalla completa"
 
 #: modules/gui/qt/qt.cpp:200
 msgid "When minimized"
@@ -22354,17 +22358,21 @@ msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
-msgstr ""
+msgstr "Ajust de filtre Direct3D9"
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr ""
+"Descodificar fotogrames directament en el VideoCore RPI i no a la memòria "
+"del hoste."
 
 #: modules/hw/mmal/codec.c:52
 msgid ""
 "Decode frames directly into RPI VideoCore instead of host memory. This "
 "option must only be used with the MMAL video output plugin."
 msgstr ""
+"Descodificar fotogrames directament en el VideoCore RPI i no a la memòria "
+"del host. Aquesta opció només s'usa amb el plugin de sortida de vídeo MMAL."
 
 #: modules/hw/mmal/codec.c:58
 msgid "MMAL decoder"
@@ -22372,7 +22380,7 @@ msgstr "Descodificador MMAL"
 
 #: modules/hw/mmal/codec.c:59
 msgid "MMAL-based decoder plugin for Raspberry Pi"
-msgstr ""
+msgstr "Connector per a Raspberry Pi basat en MMAL"
 
 #: modules/hw/mmal/deinterlace.c:45
 msgid "Use QPUs for advanced HD deinterlacing."
@@ -22403,7 +22411,7 @@ msgstr ""
 
 #: modules/hw/mmal/vout.c:54
 msgid "Blank screen below video."
-msgstr ""
+msgstr "Pantalla negre darrere el vídeo."
 
 #: modules/hw/mmal/vout.c:55
 msgid "Render blank screen below video. Increases VideoCore load."
@@ -22411,7 +22419,7 @@ msgstr ""
 
 #: modules/hw/mmal/vout.c:59 modules/hw/mmal/vout.c:60
 msgid "Adjust HDMI refresh rate to the video."
-msgstr ""
+msgstr "Ajusta la freqüència de refresc del HDMI. "
 
 #: modules/hw/mmal/vout.c:63
 msgid "Force interlaced video mode."
@@ -28888,11 +28896,11 @@ msgstr "Mur d'imatges"
 
 #: modules/visualization/glspectrum.c:56
 msgid "The width of the visualization window, in pixels."
-msgstr ""
+msgstr "Amplada de la finestra de vídeo, en píxels."
 
 #: modules/visualization/glspectrum.c:59
 msgid "The height of the visualization window, in pixels."
-msgstr ""
+msgstr "Alçada de visualització de la finestra, en píxels. "
 
 #: modules/visualization/glspectrum.c:62
 msgid "glSpectrum"
