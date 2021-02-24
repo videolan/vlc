@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2021-02-24 19:21+0100\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2021\n"
 "Language-Team: Croatian (https://www.transifex.com/yaron/teams/16553/hr/)\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
@@ -111,7 +111,7 @@ msgstr "Filtri zvuka se koriste za obradu strujanja zvuka."
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
-msgstr ""
+msgstr "Modul preuzorkovanja zvuka"
 
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:260
 #: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:425
@@ -129,7 +129,7 @@ msgstr "Izlazni moduli"
 
 #: include/vlc_config_cat.h:67
 msgid "General settings for audio output modules."
-msgstr "Opće postavke modula za razdvajanja zvuka."
+msgstr "Opće postavke za module izlaza zvuka."
 
 #: include/vlc_config_cat.h:69 src/libvlc-module.c:2027
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:196
@@ -168,7 +168,7 @@ msgstr "Opće postavke video slike"
 
 #: include/vlc_config_cat.h:79
 msgid "General settings for video output modules."
-msgstr ""
+msgstr "Opće postavke za module izlaza video zapisa."
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
@@ -187,15 +187,15 @@ msgstr ""
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
-msgstr ""
+msgstr "Razdjelnici"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr ""
+msgstr "Video razdjelnici odvajaju zapis u više videozapisa."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
-msgstr "Ulaz / Kôdeki"
+msgstr "Ulaz / Kodeki"
 
 #: include/vlc_config_cat.h:98
 msgid "Settings for input, demultiplexing, decoding and encoding"
@@ -238,7 +238,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:115
 msgid "Video codecs"
-msgstr "Kôdeki video zapisa"
+msgstr "Kodeki video zapisa"
 
 #: include/vlc_config_cat.h:116
 msgid "Settings for the video, images or video+audio decoders and encoders."
@@ -246,7 +246,7 @@ msgstr "Postavke za video, slike ili video+zvuk dekôdera i kôdera."
 
 #: include/vlc_config_cat.h:118
 msgid "Audio codecs"
-msgstr "Kôdeki zvuka"
+msgstr "Kodeki zvuka"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
@@ -661,7 +661,7 @@ msgstr "Spektar"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "VU metar"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -683,7 +683,7 @@ msgstr "Mono"
 
 #: src/audio_output/output.c:425
 msgid "Original"
-msgstr ""
+msgstr "Izvorno"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
