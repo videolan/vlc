@@ -22,7 +22,6 @@ QHash<QByteArray, vlc_ml_sorting_criteria_t> MLVideoModel::M_names_to_criteria =
     {"id", VLC_ML_SORTING_DEFAULT},
     {"title", VLC_ML_SORTING_ALPHA},
     {"duration", VLC_ML_SORTING_DURATION},
-    {"duration_short", VLC_ML_SORTING_DURATION},
     {"playcount", VLC_ML_SORTING_PLAYCOUNT},
 };
 
@@ -46,8 +45,6 @@ QVariant MLVideoModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue( video->getThumbnail() );
         case VIDEO_DURATION:
             return QVariant::fromValue( video->getDuration() );
-        case VIDEO_DURATION_SHORT:
-            return QVariant::fromValue( video->getDurationShort() );
         case VIDEO_PROGRESS:
             return QVariant::fromValue( video->getProgress() );
         case VIDEO_PLAYCOUNT:
@@ -79,7 +76,6 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
         { VIDEO_TITLE, "title" },
         { VIDEO_THUMBNAIL, "thumbnail" },
         { VIDEO_DURATION, "duration" },
-        { VIDEO_DURATION_SHORT, "duration_short" },
         { VIDEO_PROGRESS, "progress" },
         { VIDEO_PLAYCOUNT, "playcount" },
         { VIDEO_RESOLUTION, "resolution_name" },
@@ -99,7 +95,6 @@ vlc_ml_sorting_criteria_t MLVideoModel::roleToCriteria(int role) const
         case VIDEO_TITLE:
             return VLC_ML_SORTING_ALPHA;
         case VIDEO_DURATION:
-        case VIDEO_DURATION_SHORT:
             return VLC_ML_SORTING_DURATION;
         case VIDEO_PLAYCOUNT:
             return VLC_ML_SORTING_PLAYCOUNT;

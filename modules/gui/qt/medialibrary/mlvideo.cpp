@@ -77,6 +77,7 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data)
     , m_ml( ml )
     , m_title( QString::fromUtf8( data->psz_title ) )
     , m_thumbnail( QString::fromUtf8( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
+    , m_duration( data->i_duration )
     , m_progress( data->f_progress )
     , m_playCount( data->i_playcount )
     , m_thumbnailStatus( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status )
@@ -86,8 +87,6 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data)
     })
 {
     assert( data->i_type == VLC_ML_MEDIA_TYPE_VIDEO || data->i_type == VLC_ML_MEDIA_TYPE_UNKNOWN );
-
-    m_duration = data->i_duration;
 
     for( const vlc_ml_file_t& file: ml_range_iterate<vlc_ml_file_t>( data->p_files ) )
         if( file.i_type == VLC_ML_FILE_TYPE_MAIN )
@@ -179,14 +178,9 @@ QString MLVideo::getThumbnail()
     return m_thumbnail;
 }
 
-QString MLVideo::getDuration() const
+int64_t MLVideo::getDuration() const
 {
-    return MsToString( m_duration );
-}
-
-QString MLVideo::getDurationShort() const
-{
-    return MsToString( m_duration, true );
+    return m_duration;
 }
 
 QString MLVideo::getMRL() const

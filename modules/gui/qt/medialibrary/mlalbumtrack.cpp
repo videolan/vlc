@@ -25,32 +25,11 @@ MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data,
     , MLItem       ( MLItemId( _data->i_id, VLC_ML_PARENT_UNKNOWN ) )
     , m_title      ( QString::fromUtf8( _data->psz_title ) )
     , m_trackNumber( _data->album_track.i_track_nb )
-    , m_discNumber( _data->album_track.i_disc_nb )
+    , m_discNumber ( _data->album_track.i_disc_nb )
+    , m_duration   ( _data->i_duration )
 {
     assert( _data );
     assert( _data->i_type == VLC_ML_MEDIA_TYPE_AUDIO );
-
-    int t_sec = _data->i_duration / 1000;
-    int sec = t_sec % 60;
-    int min = (t_sec / 60) % 60;
-    int hour = t_sec / 3600;
-    if (hour == 0)
-    {
-        m_duration = QString("%1:%2")
-                .arg(min, 2, 10, QChar('0'))
-                .arg(sec, 2, 10, QChar('0'));
-        m_durationShort = m_duration;
-    }
-    else
-    {
-        m_duration = QString("%1:%2:%3")
-                .arg(hour, 2, 10, QChar('0'))
-                .arg(min, 2, 10, QChar('0'))
-                .arg(sec, 2, 10, QChar('0'));
-        m_durationShort = QString("%1h%2")
-                .arg(hour)
-                .arg(min, 2, 10, QChar('0'));
-    }
 
     for( const vlc_ml_file_t& file: ml_range_iterate<vlc_ml_file_t>( _data->p_files ) )
         if( file.i_type == VLC_ML_FILE_TYPE_MAIN )
@@ -112,14 +91,9 @@ unsigned int MLAlbumTrack::getDiscNumber() const
     return m_discNumber;
 }
 
-QString MLAlbumTrack::getDuration() const
+int64_t MLAlbumTrack::getDuration() const
 {
     return m_duration;
-}
-
-QString MLAlbumTrack::getDurationShort() const
-{
-    return m_durationShort;
 }
 
 QString MLAlbumTrack::getMRL() const

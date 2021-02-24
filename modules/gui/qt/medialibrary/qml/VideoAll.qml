@@ -46,7 +46,7 @@ Widgets.NavigableFocusScope {
 
     property var sortModel: [
         { text: i18n.qtr("Alphabetic"), criteria: "title"          },
-        { text: i18n.qtr("Duration"),   criteria: "duration_short" }
+        { text: i18n.qtr("Duration"),   criteria: "duration" }
     ]
 
     //---------------------------------------------------------------------------------------------

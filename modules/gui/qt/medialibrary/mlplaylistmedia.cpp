@@ -131,14 +131,9 @@ QString MLPlaylistMedia::getThumbnail()
 
 //-------------------------------------------------------------------------------------------------
 
-QString MLPlaylistMedia::getDuration() const
+int64_t MLPlaylistMedia::getDuration() const
 {
-    return MsToString(m_duration);
-}
-
-QString MLPlaylistMedia::getDurationShort() const
-{
-    return MsToString(m_duration, true);
+    return m_duration;
 }
 
 //-------------------------------------------------------------------------------------------------

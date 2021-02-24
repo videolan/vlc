@@ -24,6 +24,7 @@ import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/KeyHelper.js" as KeyHelper
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
@@ -169,7 +170,7 @@ Widgets.NavigableFocusScope {
                 }
 
                 Widgets.CaptionLabel {
-                    text: model.duration
+                    text: Helpers.msToString(model.duration)
                     color: VLCStyle.colors.text
                     width: parent.width
                 }

@@ -24,8 +24,7 @@ QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumModel::M_names_to_criteria =
     {"release_year", VLC_ML_SORTING_RELEASEDATE},
     {"main_artist", VLC_ML_SORTING_ARTIST},
     //{"nb_tracks"},
-    {"duration", VLC_ML_SORTING_DURATION},
-    {"duration_short", VLC_ML_SORTING_DURATION}
+    {"duration", VLC_ML_SORTING_DURATION}
 };
 
 MLAlbumModel::MLAlbumModel(QObject *parent)
@@ -60,8 +59,6 @@ QVariant MLAlbumModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue( ml_item->getNbTracks() );
     case ALBUM_DURATION:
         return QVariant::fromValue( ml_item->getDuration() );
-    case ALBUM_DURATION_SHORT:
-        return QVariant::fromValue( ml_item->getDurationShort() );
     case ALBUM_TITLE_FIRST_SYMBOL:
         return QVariant::fromValue( getFirstSymbol( ml_item->getTitle() ) );
     case ALBUM_MAIN_ARTIST_FIRST_SYMBOL:
@@ -82,7 +79,6 @@ QHash<int, QByteArray> MLAlbumModel::roleNames() const
         {ALBUM_MAIN_ARTIST, "main_artist"},
         {ALBUM_NB_TRACKS, "nb_tracks"},
         {ALBUM_DURATION, "duration"},
-        {ALBUM_DURATION_SHORT, "duration_short"},
         {ALBUM_TITLE_FIRST_SYMBOL, "title_first_symbol"},
         {ALBUM_MAIN_ARTIST_FIRST_SYMBOL, "main_artist_first_symbol"}
     };
@@ -139,7 +135,6 @@ vlc_ml_sorting_criteria_t MLAlbumModel::roleToCriteria(int role) const
     case ALBUM_MAIN_ARTIST :
         return VLC_ML_SORTING_ARTIST;
     case ALBUM_DURATION:
-    case ALBUM_DURATION_SHORT:
         return VLC_ML_SORTING_DURATION;
     default:
         return VLC_ML_SORTING_DEFAULT;

@@ -40,7 +40,6 @@ public:
         TRACK_NUMBER,
         TRACK_DISC_NUMBER,
         TRACK_DURATION,
-        TRACK_DURATION_SHORT,
         TRACK_ALBUM,
         TRACK_ARTIST,
 

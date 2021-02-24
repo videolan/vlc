@@ -20,6 +20,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.4
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 Item {
@@ -108,7 +109,7 @@ Item {
             width: timeTextMetric.width
             height: parent.height
             horizontalAlignment: Text.AlignHCenter
-            text: !rowModel ? "" : rowModel[model.criteria] || ""
+            text: !rowModel || !rowModel[model.criteria] ? "" : Helpers.msToString(rowModel[model.criteria], true)
             color: foregroundColor
         }
     }

@@ -44,8 +44,7 @@ public:
     QString getCover() const;
     unsigned int getTrackNumber() const;
     unsigned int getDiscNumber() const;
-    QString getDuration() const;
-    QString getDurationShort() const;
+    int64_t getDuration() const;
     QString getMRL() const;
 
 private:
@@ -55,8 +54,7 @@ private:
     QString m_cover;
     unsigned int m_trackNumber;
     unsigned int m_discNumber;
-    QString m_duration;
-    QString m_durationShort;
+    int64_t m_duration;
     QString m_mrl;
 
    ml_unique_ptr<vlc_ml_media_t> m_data;

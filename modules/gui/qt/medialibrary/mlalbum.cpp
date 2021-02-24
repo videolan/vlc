@@ -28,31 +28,10 @@ MLAlbum::MLAlbum(vlc_medialibrary_t* _ml, const vlc_ml_album_t *_data, QObject *
     , m_cover       ( QString::fromUtf8( _data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
     , m_mainArtist  ( QString::fromUtf8( _data->psz_artist ) )
     , m_nbTracks    ( _data->i_nb_tracks )
+    , m_duration    ( _data->i_duration )
 {
     assert( _data );
     assert( _ml );
-
-    int t_sec = _data->i_duration / 1000;
-    int sec = t_sec % 60;
-    int min = (t_sec / 60) % 60;
-    int hour = t_sec / 3600;
-    if (hour == 0)
-    {
-        m_duration = QString("%1:%2")
-                .arg(min, 2, 10, QChar('0'))
-                .arg(sec, 2, 10, QChar('0'));
-        m_durationShort = m_duration;
-    }
-    else
-    {
-        m_duration = QString("%1:%2:%3")
-                .arg(hour, 2, 10, QChar('0'))
-                .arg(min, 2, 10, QChar('0'))
-                .arg(sec, 2, 10, QChar('0'));
-        m_durationShort = QString("%1h%2")
-                .arg(hour)
-                .arg(min, 2, 10, QChar('0'));
-    }
 }
 
 QString MLAlbum::getTitle() const
@@ -86,14 +65,9 @@ unsigned int MLAlbum::getNbTracks() const
     return m_nbTracks;
 }
 
-QString MLAlbum::getDuration() const
+int64_t MLAlbum::getDuration() const
 {
     return m_duration;
-}
-
-QString MLAlbum::getDurationShort() const
-{
-    return m_durationShort;
 }
 
 QString MLAlbum::getPresName() const

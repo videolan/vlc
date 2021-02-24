@@ -25,8 +25,7 @@ QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumTrackModel::M_names_to_crite
     {"track_number", VLC_ML_SORTING_TRACKNUMBER},
     {"release_year", VLC_ML_SORTING_RELEASEDATE},
     {"main_artist", VLC_ML_SORTING_ARTIST},
-    {"duration", VLC_ML_SORTING_DURATION},
-    {"duration_short", VLC_ML_SORTING_DURATION}
+    {"duration", VLC_ML_SORTING_DURATION}
 };
 
 MLAlbumTrackModel::MLAlbumTrackModel(QObject *parent)
@@ -58,8 +57,6 @@ QVariant MLAlbumTrackModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue( ml_track->getDiscNumber() );
     case TRACK_DURATION :
         return QVariant::fromValue( ml_track->getDuration() );
-    case TRACK_DURATION_SHORT :
-        return QVariant::fromValue( ml_track->getDurationShort() );
     case TRACK_ALBUM:
         return QVariant::fromValue( ml_track->getAlbumTitle() );
     case TRACK_ARTIST:
@@ -84,7 +81,6 @@ QHash<int, QByteArray> MLAlbumTrackModel::roleNames() const
         { TRACK_NUMBER, "track_number" },
         { TRACK_DISC_NUMBER, "disc_number" },
         { TRACK_DURATION, "duration" },
-        { TRACK_DURATION_SHORT, "duration_short" },
         { TRACK_ALBUM, "album_title"},
         { TRACK_ARTIST, "main_artist"},
         { TRACK_TITLE_FIRST_SYMBOL, "title_first_symbol"},
@@ -101,7 +97,6 @@ vlc_ml_sorting_criteria_t MLAlbumTrackModel::roleToCriteria(int role) const
     case TRACK_NUMBER :
         return VLC_ML_SORTING_TRACKNUMBER;
     case TRACK_DURATION :
-    case TRACK_DURATION_SHORT :
         return VLC_ML_SORTING_DURATION;
     default:
         return VLC_ML_SORTING_DEFAULT;

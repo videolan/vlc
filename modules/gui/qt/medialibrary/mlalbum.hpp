@@ -44,8 +44,7 @@ public:
     QString getCover() const;
     QString getArtist() const;
     unsigned int getNbTracks() const;
-    QString getDuration() const;
-    QString getDurationShort() const;
+    int64_t getDuration() const;
 
     Q_INVOKABLE QString getPresName() const;
     Q_INVOKABLE QString getPresImage() const;
@@ -61,6 +60,5 @@ private:
     QString m_mainArtist;
     QList<QString> m_otherArtists;
     unsigned int m_nbTracks;
-    QString m_duration;
-    QString m_durationShort;
+    int64_t m_duration;
 };

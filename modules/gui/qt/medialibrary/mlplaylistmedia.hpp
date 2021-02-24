@@ -43,8 +43,7 @@ public: // Interface
 
     QString getThumbnail();
 
-    QString getDuration     () const;
-    QString getDurationShort() const;
+    int64_t getDuration() const;
 
     QString getResolutionName() const;
 

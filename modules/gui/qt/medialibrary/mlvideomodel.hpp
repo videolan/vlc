@@ -41,7 +41,6 @@ public:
         VIDEO_TITLE,
         VIDEO_THUMBNAIL,
         VIDEO_DURATION,
-        VIDEO_DURATION_SHORT,
         VIDEO_PROGRESS,
         VIDEO_PLAYCOUNT,
         VIDEO_RESOLUTION,

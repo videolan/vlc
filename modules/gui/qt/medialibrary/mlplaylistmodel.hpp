@@ -33,7 +33,6 @@ public:
         MEDIA_TITLE,
         MEDIA_THUMBNAIL,
         MEDIA_DURATION,
-        MEDIA_DURATION_SHORT,
         MEDIA_PROGRESS,
         MEDIA_PLAYCOUNT,
         MEDIA_RESOLUTION,

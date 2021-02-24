@@ -70,7 +70,7 @@ MainInterface.MainTableView {
 
         text: i18n.qtr("Title")
     }, {
-        criteria: "duration_short",
+        criteria: "duration",
 
         width: VLCStyle.colWidth(1),
 

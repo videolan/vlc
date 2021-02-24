@@ -23,6 +23,7 @@ import QtQml.Models 2.11
 import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
@@ -177,7 +178,7 @@ Widgets.NavigableFocusScope {
                 text: i18n.qtr("%1 - %2 - %3")
                     .arg(model.main_artist || i18n.qtr("Unknown artist"))
                     .arg(model.release_year || "")
-                    .arg(model.duration || "")
+                    .arg(Helpers.msToString(model.duration) || "")
 
                 Layout.fillWidth: true
                 Layout.preferredHeight: implicitHeight
@@ -240,7 +241,7 @@ Widgets.NavigableFocusScope {
 
                 sortModel: [
                     { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(Math.max(expand_track_id._nbCols - 1, 1)), visible: true, text: i18n.qtr("Title"), showSection: "", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
-                    { criteria: "duration_short",          width: VLCStyle.colWidth(1), visible: true, showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
+                    { criteria: "duration",               width: VLCStyle.colWidth(1), visible: true, showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
                 ]
 
                 navigationParent: root

@@ -23,6 +23,7 @@ import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/" as Util
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
@@ -101,7 +102,7 @@ Widgets.NavigableFocusScope {
 
                 image: model.thumbnail || VLCStyle.noArtCover
                 title: model.title || i18n.qtr("Unknown title")
-                subtitle: model.duration || ""
+                subtitle: Helpers.msToString(model.duration) || ""
                 labels: [
                     model.resolution_name || "",
                     model.channel || ""
