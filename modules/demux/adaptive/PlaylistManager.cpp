@@ -302,30 +302,6 @@ AbstractStream::Status PlaylistManager::dequeue(mtime_t i_floor, mtime_t *pi_nzb
     return i_return;
 }
 
-void PlaylistManager::drain()
-{
-    for(;;)
-    {
-        bool b_drained = true;
-        std::vector<AbstractStream *>::iterator it;
-        for(it=streams.begin(); it!=streams.end(); ++it)
-        {
-            AbstractStream *st = *it;
-
-            if (!st->isValid() || st->isDisabled())
-                continue;
-
-            b_drained &= st->decodersDrained();
-        }
-
-        if(b_drained)
-            break;
-
-        msleep(20*1000); /* ugly, but we have no way to get feedback */
-    }
-    es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
-}
-
 mtime_t PlaylistManager::getResumeTime() const
 {
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&demux.lock));

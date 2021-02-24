@@ -59,7 +59,6 @@ namespace adaptive
 
             AbstractStream::BufferingStatus bufferize(mtime_t, mtime_t, mtime_t);
             AbstractStream::Status dequeue(mtime_t, mtime_t *);
-            void drain();
 
             virtual bool needsUpdate() const;
             virtual bool updatePlaylist();
