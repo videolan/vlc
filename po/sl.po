@@ -1,10 +1,10 @@
 # Slovenian translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Aljoša Žagar <anthon.manix@gmail.com>, 2013
-# Arnold Marko <arnold.marko@gmail.com>, 2020
+# Arnold Marko <arnold.marko@gmail.com>, 2020-2021
 # Damir Jerovšek <jierro@windowslive.com>, 2014
 # Martin Srebotnjak <miles@filmsi.net>, 2013-2018
 # Matej Urbančič <mateju@svn.gnome.org>, 2005-2010, 2014-2018
@@ -12,11 +12,11 @@
 # Rok Žerdin <zerdin.rok1@gmail.com>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-11-30 21:47+0100\n"
-"Last-Translator: Arnold Marko <arnold.marko@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-25 21:39+0100\n"
+"Last-Translator: Arnold Marko <arnold.marko@gmail.com>, 2021\n"
 "Language-Team: Slovenian (https://www.transifex.com/yaron/teams/16553/sl/)\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -968,7 +968,7 @@ msgstr "Ni mogoče odpreti modula odkodirnika."
 #: src/input/es_out.c:968 src/input/es_out.c:973 src/libvlc-module.c:239
 #: modules/gui/qt/components/open_panels.cpp:547
 msgid "Track"
-msgstr "Sled"
+msgstr "Vsebine"
 
 #: src/input/es_out.c:1190
 #, c-format
@@ -1215,7 +1215,7 @@ msgstr "Na sredi spodaj"
 
 #: src/input/es_out.c:3270
 msgid "Chroma location"
-msgstr ""
+msgstr "Lokacija barve"
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
@@ -1236,17 +1236,17 @@ msgstr "Projekcija"
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Zasuk"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Nagib"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "Zvitek"
 
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
@@ -1329,7 +1329,7 @@ msgstr "Album"
 
 #: src/input/meta.c:60
 msgid "Track number"
-msgstr "Številka sledi"
+msgstr "Številka steze"
 
 #: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
@@ -1366,7 +1366,7 @@ msgstr "Povezava do grafične vsebine"
 
 #: src/input/meta.c:72
 msgid "Track ID"
-msgstr "ID Sledi"
+msgstr "ID vsebine"
 
 #: src/input/meta.c:73
 msgid "Number of Tracks"
@@ -1419,12 +1419,12 @@ msgstr "Poglavje"
 #: src/input/var.c:188 modules/gui/macosx/VLCMainMenu.m:435
 #: modules/gui/macosx/VLCMainMenu.m:436
 msgid "Video Track"
-msgstr "Slikovna sled"
+msgstr "Video steza"
 
 #: src/input/var.c:194 modules/gui/macosx/VLCMainMenu.m:418
 #: modules/gui/macosx/VLCMainMenu.m:419
 msgid "Audio Track"
-msgstr "Zvokovna sled"
+msgstr "Zvok"
 
 #: src/input/var.c:200
 msgid "Subtitle Track"
@@ -2658,11 +2658,11 @@ msgstr ""
 
 #: src/libvlc-module.c:578 modules/gui/qt/ui/open_disk.h:311
 msgid "Audio track"
-msgstr "Zvokovna sled"
+msgstr "Zvočna steza"
 
 #: src/libvlc-module.c:580
 msgid "Stream number of the audio track to use (from 0 to n)."
-msgstr "Vrednost določa zaporedno številko pretoka zvokovne sledi (od 0 do n)"
+msgstr "Številka zvočne steze, ki naj bo uporabljena (od 0 do n)"
 
 #: src/libvlc-module.c:583 modules/gui/qt/ui/open_disk.h:312
 msgid "Subtitle track"
@@ -2670,7 +2670,7 @@ msgstr "Podnapisi"
 
 #: src/libvlc-module.c:585
 msgid "Stream number of the subtitle track to use (from 0 to n)."
-msgstr "Vrednost določa zaporedno številko sledi podnapisa (od 0 do n)"
+msgstr "Številka zvočne steze, ki naj bo uporabljena (od 0 do n)"
 
 #: src/libvlc-module.c:588 modules/stream_out/transcode/transcode.c:97
 msgid "Audio language"
@@ -2694,8 +2694,8 @@ msgid ""
 "Language of the subtitle track you want to use (comma separated, two or "
 "three letters country code, you may use 'any' as a fallback)."
 msgstr ""
-"Jezik sledi podnapisov, ki naj bo uporabljen (to so z vejico ločene "
-"vrednosti, kode držav z dvema ali tremi črkami oziroma »prazno« za privzeto)."
+"Jezik podnapisov, ki naj bo uporabljen (to so z vejico ločene vrednosti, "
+"kode držav z dvema ali tremi črkami oziroma »prazno« za privzeto)."
 
 #: src/libvlc-module.c:598
 msgid "Menu language"
@@ -2712,11 +2712,11 @@ msgstr ""
 
 #: src/libvlc-module.c:604
 msgid "Audio track ID"
-msgstr "ID zvokovne sledi"
+msgstr "ID zvočne steze"
 
 #: src/libvlc-module.c:606
 msgid "Stream ID of the audio track to use."
-msgstr "Vrednost ID pretoka zvokovne sledi, ki naj bo uporabljen."
+msgstr "ID pretoka zvočne steze, ki naj se uporabi."
 
 #: src/libvlc-module.c:608
 msgid "Subtitle track ID"
@@ -2724,7 +2724,7 @@ msgstr "ID podnapisov"
 
 #: src/libvlc-module.c:610
 msgid "Stream ID of the subtitle track to use."
-msgstr "Vrednost ID sledi podnapisa, ki naj bo uporabljen."
+msgstr "ID pretoka steze podnapisa, ki naj bo uporabljena."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
@@ -3736,16 +3736,16 @@ msgstr ""
 
 #: src/libvlc-module.c:1099 modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Enqueue items into playlist in one instance mode"
-msgstr "Novi predmeti se dodajo na trenutni seznam predvajanja"
+msgstr ""
+"Novi predmeti se dodajo na trenutni seznam predvajanja v načinu ene instance"
 
 #: src/libvlc-module.c:1101
 msgid ""
 "When using the one instance only option, enqueue items to playlist and keep "
 "playing current item."
 msgstr ""
-"Ob uporabi le enega sočasnega zagona predvajalnika, uvrsti na novo izbrane "
-"predmete na konec seznam predvajanja, medtem ko se nadaljuje predvaje "
-"trenutnega predmeta."
+"Ob uporabi možnosti ene instance, uvrsti predmete v čakalno vrsto in "
+"nadaljuje s predvajanjem trenutnega predmeta."
 
 #: src/libvlc-module.c:1104
 msgid "Expose media player via D-Bus"
@@ -4629,11 +4629,11 @@ msgstr "Možnost dovoli, da nastavite zaznamke seznama predvajanja."
 
 #: src/libvlc-module.c:1389
 msgid "Cycle audio track"
-msgstr "Kroži med sledmi zvoka"
+msgstr "Kroži med zvočnimi stezami"
 
 #: src/libvlc-module.c:1390
 msgid "Cycle through the available audio tracks(languages)."
-msgstr "Kroži med sledmi zvoka (različni jeziki), ki so na voljo."
+msgstr "Kroži med zvočnimi stezami (jeziki), ki so na voljo."
 
 #: src/libvlc-module.c:1391
 msgid "Cycle subtitle track in reverse order"
@@ -4657,7 +4657,7 @@ msgstr "Preklop podnapisov"
 
 #: src/libvlc-module.c:1396
 msgid "Toggle subtitle track visibility."
-msgstr "Preklapljanje vidnosti sledi podnapisov."
+msgstr "Preklapljanje vidnosti podnapisov."
 
 #: src/libvlc-module.c:1397
 msgid "Cycle next program Service ID"
@@ -4878,7 +4878,7 @@ msgstr "Prekrivanje"
 
 #: src/libvlc-module.c:1713
 msgid "Track settings"
-msgstr "Nastavitve sledi"
+msgstr "Nastavitve stez"
 
 #: src/libvlc-module.c:1753 modules/gui/macosx/VLCSimplePrefsController.m:322
 msgid "Playback control"
@@ -5126,7 +5126,7 @@ msgstr "Zorni kot vsebine"
 
 #: src/misc/actions.c:83
 msgid "Media Audio Track"
-msgstr "Zvočna steza vsebine"
+msgstr "Zvok vsebine"
 
 #: src/misc/actions.c:84
 msgid "Media Forward"
@@ -5142,7 +5142,7 @@ msgstr "Naslednja sličica vsebine"
 
 #: src/misc/actions.c:87
 msgid "Media Next Track"
-msgstr "Naslednja steza vsebine"
+msgstr "Naslednja vsebina"
 
 #: src/misc/actions.c:88
 msgid "Media Play Pause"
@@ -5154,7 +5154,7 @@ msgstr "Predhodna sličica vsebine"
 
 #: src/misc/actions.c:90
 msgid "Media Prev Track"
-msgstr "Predhodna steza vsebine"
+msgstr "Prejšnja vsebina"
 
 #: src/misc/actions.c:91
 msgid "Media Record"
@@ -6199,9 +6199,8 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/disc_helper.h:56
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "Podrobnosti o težavi in sistemskih nastavitvah"
+msgstr "Težava pri dostopu do sistemskega vira"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
@@ -6212,14 +6211,12 @@ msgstr ""
 "dostop do mikrofona."
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "Zajemanje videa z AVFoundation"
+msgstr "AVFoundation zajem zvoka"
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "Modul za zajemanje videa z AVFoundation."
+msgstr "AVFoundation modul za zajemanje zvoka."
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6391,7 +6388,7 @@ msgstr "Prvo predvajanje"
 #: modules/access/cdda.c:487
 #, c-format
 msgid "Audio CD - Track %02i"
-msgstr "Zvokovni CD – Sled %02i"
+msgstr "Zvočni CD – Posnetek %02i"
 
 #: modules/access/cdda.c:727 modules/gui/macosx/VLCOpenWindowController.m:169
 #: modules/gui/qt/ui/open_disk.h:299
@@ -6404,7 +6401,7 @@ msgstr "Zvokovni CD dovod"
 
 #: modules/access/cdda.c:737
 msgid "[cdda:][device][@[track]]"
-msgstr "[cdda:][naprava][@[sled]]"
+msgstr "[cdda:][device][@[track]]"
 
 #: modules/access/cdda.c:746
 msgid "CDDB Server"
@@ -8586,7 +8583,7 @@ msgstr "Velikost dela SRT (v bajtih)"
 
 #: modules/access/srt.c:394 modules/access_output/srt.c:444
 msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
-msgstr ""
+msgstr "Vrni poizvedbo po čakanju v milisekundah (-1 = neskončno)"
 
 #: modules/access/srt.c:395 modules/access_output/srt.c:445
 msgid "SRT latency (ms)"
@@ -9541,7 +9538,7 @@ msgstr "Odvod IceCAST"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Dolžina šifrirnega ključa v bajtih"
 
 #: modules/access_output/srt.c:57
 msgid "16 bytes"
@@ -9921,7 +9918,7 @@ msgstr "Povprečje korena kvadrata/največja jakost"
 
 #: modules/audio_filter/compressor.c:156
 msgid "Set the RMS/peak."
-msgstr ""
+msgstr "Določi RMS/vrh"
 
 #: modules/audio_filter/compressor.c:158
 msgid "Attack time"
@@ -10944,7 +10941,7 @@ msgstr "Pokaži okvarjene sličice"
 
 #: modules/codec/avcodec/avcodec.h:60
 msgid "Prefer visual artifacts instead of missing frames"
-msgstr ""
+msgstr "Prikaži vizualno napako namesto manjkajočih sličic"
 
 #: modules/codec/avcodec/avcodec.h:62
 msgid "Error resilience"
@@ -12026,9 +12023,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "Paketnik podnapisov Kate"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "Možnosti pretvarjanja"
+msgstr "Dodatne mape s pisavami"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -12775,7 +12771,7 @@ msgstr "SCTE-18"
 
 #: modules/codec/scte18.h:24
 msgid "Emergency Alert Messaging for Cable"
-msgstr ""
+msgstr "Obveščanje v primeru nesreč za kabelski priključek."
 
 #: modules/codec/scte27.c:42
 msgid "SCTE-27 decoder"
@@ -14581,13 +14577,13 @@ msgstr "Zamik zvoka %i ms"
 #: modules/control/hotkeys.c:751
 #, c-format
 msgid "Audio track: %s"
-msgstr "Zvokovna sled: %s"
+msgstr "&Zvok: %s"
 
 #: modules/control/hotkeys.c:771 modules/control/hotkeys.c:797
 #: modules/control/hotkeys.c:811 modules/control/hotkeys.c:847
 #, c-format
 msgid "Subtitle track: %s"
-msgstr "Sled podnapisov: %s"
+msgstr "Podnapisi: %s"
 
 #: modules/control/hotkeys.c:772 modules/control/hotkeys.c:812
 #: modules/control/hotkeys.c:866
@@ -14879,8 +14875,7 @@ msgstr "| add XYZ . . . . . . . . . . . . dodaj XYZ na seznam predvajanja"
 
 #: modules/control/oldrc.c:788
 msgid "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
-msgstr ""
-"| enqueue XYZ . . . . . . . . . postavi XYZ v vrsto na seznam predvajanja"
+msgstr "| uvrsti XYZ . . . . . . . . . uvrsti XYZ na seznam predvajanja"
 
 #: modules/control/oldrc.c:789
 msgid "| playlist . . . . .  show items currently in playlist"
@@ -15034,11 +15029,11 @@ msgstr "| achan [X]. . . . . . . . . . nastavi/izpiši kanale zvoka"
 
 #: modules/control/oldrc.c:828
 msgid "| atrack [X] . . . . . . . . . . . set/get audio track"
-msgstr "| atrack [X] . . . . . . . . . . . nastavi/izpiši zvokovno sled"
+msgstr "| atrack [X] . . . . . . . . . . . nastavi/dobi zvočno sled"
 
 #: modules/control/oldrc.c:829
 msgid "| vtrack [X] . . . . . . . . . . . set/get video track"
-msgstr "| vtrack [X] . . . . . . . . . . . nastavi/izpiši slikovno sled"
+msgstr "| vtrack [X] . . . . . . . . . . . nastavi/dobi video sled"
 
 #: modules/control/oldrc.c:830
 msgid "| vratio [X]  . . . . . . . set/get video aspect ratio"
@@ -15058,7 +15053,7 @@ msgstr "| snapshot . . . . . . . . . . . . zajem slike posnetka"
 
 #: modules/control/oldrc.c:834
 msgid "| strack [X] . . . . . . . . .  set/get subtitle track"
-msgstr "| strack [X] . . . . . . . . . nastavi/dobi sled podnapisov"
+msgstr "| strack [X] . . . . . . . . . nastavi/dobi stezo s podnapisi"
 
 #: modules/control/oldrc.c:835
 msgid "| key [hotkey name] . . . . . .  simulate hotkey press"
@@ -15200,17 +15195,16 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "Prednostna pasovna širina za neprilagodljive pretoke"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "Zamik DTS (milisekunde)"
+msgstr "Zamik predvajanja v živo (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "Kompromis med stabilnostjo in odzivnostjo"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "Maksimalni vmesni pomnilnik (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15230,9 +15224,8 @@ msgid "Low latency"
 msgstr "Nizka zakasnitev"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "Preglasi parametre"
+msgstr "Prepiše parametre za majhno latenco"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15259,9 +15252,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "Najvišja širokopasovna širina/kakovost"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "Vsili krepko pisavo"
+msgstr "Prisiljeno"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -15818,7 +15810,7 @@ msgstr "Ključne besede"
 
 #: modules/demux/mp4/meta.c:423
 msgid "Explicit"
-msgstr ""
+msgstr "Kočljivo"
 
 #: modules/demux/mp4/meta.c:426
 msgid "Clean"
@@ -16354,7 +16346,7 @@ msgstr ""
 
 #: modules/demux/subtitle.c:60
 msgid "Override the default track description."
-msgstr "Preglasi privzeti opis sledi."
+msgstr "Prepiši privzeti opis sledi."
 
 #: modules/demux/subtitle.c:72
 msgid "Text subtitle parser"
@@ -16594,7 +16586,7 @@ msgstr "Preobleke"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Uporabi profil ob naslednjem zagonu"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:133
@@ -16960,7 +16952,7 @@ msgstr "Zvokovni kodek"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:161
 #: modules/gui/qt/ui/profiles.h:726
 msgid "Keep original video track"
-msgstr "Ohrani izvorno video sled"
+msgstr "Obdrži izvorno video stezo"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:165
 #: modules/gui/qt/ui/profiles.h:748
@@ -16984,7 +16976,7 @@ msgstr "Merilo"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:172
 #: modules/gui/qt/ui/profiles.h:752
 msgid "Keep original audio track"
-msgstr "Ohrani izvorno zvokovno sled"
+msgstr "Obdrži izvorno zvočno stezo"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:179
 #: modules/gui/qt/ui/profiles.h:763
@@ -17637,7 +17629,7 @@ msgstr "Hitrost predvajanja"
 #: modules/gui/macosx/VLCMainMenu.m:394
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:48
 msgid "Track Synchronization"
-msgstr "Usklajevanje sledi"
+msgstr "Usklajevanje stez"
 
 #: modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/qt/components/controller.hpp:110
@@ -18209,7 +18201,7 @@ msgstr "Odpri datoteko"
 #: modules/gui/macosx/VLCOpenWindowController.m:767
 #, c-format
 msgid "%i tracks"
-msgstr "%i sledi"
+msgstr "%i posnetkov"
 
 #: modules/gui/macosx/VLCOutput.m:61
 msgid "Streaming and Transcoding Options"
@@ -18782,7 +18774,7 @@ msgstr "Zvok / Video"
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:51
 #: modules/gui/qt/components/extended_panels.cpp:1416
 msgid "Audio track synchronization:"
-msgstr "Časovni zamik posnetka zvoka:"
+msgstr "Usklajevanje zvoka:"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:53
 msgid "A positive value means that the audio is ahead of the video"
@@ -18796,7 +18788,7 @@ msgstr "Podnapisi / Video"
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:55
 #: modules/gui/qt/components/extended_panels.cpp:1428
 msgid "Subtitle track synchronization:"
-msgstr "Časovni zamik podnapisov:"
+msgstr "Usklajevanje podnapisov:"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:57
 msgid "A positive value means that the subtitles are ahead of the video"
@@ -19234,15 +19226,15 @@ msgstr " f                      preklopi celozaslonski način"
 
 #: modules/gui/ncurses.c:880
 msgid " c                      Cycle through audio tracks"
-msgstr "c Preklop kroženja zvočnih sledi"
+msgstr "c Kroženje skozi zvočne steze"
 
 #: modules/gui/ncurses.c:881
 msgid " v                      Cycle through subtitles tracks"
-msgstr "v Preklop kroženja sledi podnapisov"
+msgstr "v Kroženje po podnapisih"
 
 #: modules/gui/ncurses.c:882
 msgid " b                      Cycle through video tracks"
-msgstr "b Preklop kroženja slikovnih sledi"
+msgstr "b Kroženje skozi video steze"
 
 #: modules/gui/ncurses.c:883
 msgid " n, p                   Next/Previous playlist item"
@@ -21346,7 +21338,7 @@ msgstr "&Učinki in filtri"
 
 #: modules/gui/qt/menus.cpp:418
 msgid "&Track Synchronization"
-msgstr "Usklajevanje &sledi"
+msgstr "Usklajevanje s&tez"
 
 #: modules/gui/qt/menus.cpp:437
 msgid "Plu&gins and extensions"
@@ -21422,7 +21414,7 @@ msgstr "&Zvočna naprava"
 
 #: modules/gui/qt/menus.cpp:622
 msgid "Audio &Track"
-msgstr "&Zvokovna sled"
+msgstr "&Zvok"
 
 #: modules/gui/qt/menus.cpp:624
 msgid "&Stereo Mode"
@@ -21438,11 +21430,11 @@ msgstr "Dodaj &podnapise ..."
 
 #: modules/gui/qt/menus.cpp:655
 msgid "Sub &Track"
-msgstr "&Sled podnapisov"
+msgstr "Steza s podnapisi"
 
 #: modules/gui/qt/menus.cpp:677
 msgid "Video &Track"
-msgstr "&Slikovna sled"
+msgstr "&Video"
 
 #: modules/gui/qt/menus.cpp:681
 msgid "&Fullscreen"
@@ -21620,7 +21612,7 @@ msgstr "Prikaže naslov skladbe ali posnetka v nazivni vrstici okna."
 
 #: modules/gui/qt/qt.cpp:105
 msgid "Show notification popup on track change"
-msgstr "Pokaži opozorilna pojavna okna ob zamenjavi sledi"
+msgstr "Ob zamenjavi steze prikaži obvestilo"
 
 #: modules/gui/qt/qt.cpp:107
 msgid ""
@@ -21771,7 +21763,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:168
 msgid "Expanding background cone or art"
-msgstr ""
+msgstr "Povečanje stožca ali slike v ozadja"
 
 #: modules/gui/qt/qt.cpp:169
 msgid "Background art fits window's size."
@@ -22035,7 +22027,7 @@ msgstr "Razpletanje MMAL"
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
-msgstr ""
+msgstr "Vtičnik za rezpletanje z uporabo MMAL"
 
 #: modules/hw/mmal/vout.c:50
 msgid "VideoCore layer where the video is displayed."
@@ -22070,7 +22062,7 @@ msgstr "Vsili način razpletanja videa."
 msgid ""
 "Force the HDMI output into an interlaced video mode for interlaced video "
 "content."
-msgstr ""
+msgstr "Vsili prepletanje na HDMI izhodu, kadar je video vsebina prepletena."
 
 #: modules/hw/mmal/vout.c:75
 msgid "MMAL vout"
@@ -22371,11 +22363,11 @@ msgstr "Obravnava istovetnosti v sistemskem dnevniku."
 
 #: modules/logger/syslog.c:147
 msgid "Facility"
-msgstr ""
+msgstr "Objekt"
 
 #: modules/logger/syslog.c:148
 msgid "System logging facility."
-msgstr ""
+msgstr "Sistemsko beleženje dnevnika."
 
 #: modules/logger/syslog.c:151
 msgid "syslog"
@@ -23113,7 +23105,7 @@ msgstr "Iskalnik razširitev prek addons.videolan.org"
 
 #: modules/misc/addons/vorepository.c:70
 msgid "Videolan.org's single archive addons finder"
-msgstr ""
+msgstr "Videolan.org iskalnik dodatkov v enem arhivu"
 
 #: modules/misc/addons/vorepository.c:72
 msgid "single .vlp archive addons finder"
@@ -23182,6 +23174,8 @@ msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
 msgstr ""
+"Vendar predloženi varnostni certifikat strežnika ni znan in ga ni bilo "
+"mogoče overiti s strani zaupanja vrednega overitelja certifikatov."
 
 #: modules/misc/gnutls.c:491
 msgid ""
@@ -23189,6 +23183,8 @@ msgid ""
 "previous visit and was not authenticated by any trusted Certificate "
 "Authority."
 msgstr ""
+"Vendar je bil varnostni certifikat strežnika od zadnjega obiska spremenjen "
+"in ni bil overjen s strani zaupanja vrednega overitelja certifikatov."
 
 #: modules/misc/gnutls.c:502 modules/misc/gnutls.c:523
 #: modules/misc/securetransport.c:346
@@ -23213,6 +23209,11 @@ msgid ""
 "\n"
 "If in doubt, abort now.\n"
 msgstr ""
+"Želeli ste dostopiti do %s. %s\n"
+"Ta težava lahko izhaja iz poskusa ogrožanja varnosti, ogrožanja zasebnosti "
+"ali napake v nastavitvah.\n"
+"\n"
+"V primeru dvoma, prekinite dejanje.\n"
 
 #: modules/misc/gnutls.c:523
 msgid "Accept 24 hours"
@@ -23237,7 +23238,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:756
 msgid "Use system trust database"
-msgstr ""
+msgstr "Uporabi sistemsko bazo zaupanja"
 
 #: modules/misc/gnutls.c:758
 msgid ""
@@ -23249,13 +23250,15 @@ msgstr ""
 
 #: modules/misc/gnutls.c:761
 msgid "Trust directory"
-msgstr ""
+msgstr "Imenik zaupanja"
 
 #: modules/misc/gnutls.c:763
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "specified directory to authenticate TLS sessions."
 msgstr ""
+"Zaupaj korenskim certifikatom overiteljev certifikatov, ki so shranjeni v "
+"določenem imeniku, za overitev TLS sej."
 
 #: modules/misc/gnutls.c:766
 msgid "TLS cipher priorities"
@@ -23520,7 +23523,7 @@ msgstr "Zvijalnik MP4/MOV"
 
 #: modules/mux/mp4/mp4.c:77
 msgid "Fragmented and streamable MP4 muxer"
-msgstr ""
+msgstr "Fragmentiran in pretočni MP4 zvijalnik"
 
 #: modules/mux/mpeg/ps.c:48 modules/mux/mpeg/ts.c:162
 msgid "DTS delay (ms)"
@@ -23842,7 +23845,7 @@ msgstr "Paketnik avparser"
 
 #: modules/packetizer/av1.c:557
 msgid "AV1 video packetizer"
-msgstr ""
+msgstr "AV1 paketirnik vicea"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -25002,7 +25005,7 @@ msgstr "Notranje snemanje pretoka"
 
 #: modules/stream_filter/skiptags.c:243
 msgid "APE/ID3 tags-skipping filter"
-msgstr ""
+msgstr "Filter za izpuščanje APE/ID3 oznak"
 
 #: modules/stream_out/autodel.c:46
 msgid "Autodel"
@@ -25077,6 +25080,10 @@ msgid ""
 "configure a place holder stream when the real source breaks. Source and "
 "placeholder streams should have the same format."
 msgstr ""
+"Če je izbrano, bo most opustil dovod vseh elementarnih pretokov, razen v "
+"primeru, da ne dobiva podatkov še iz enega vhodnega mosta. To je mogoče "
+"uporabiti za določitev rezervacije pretoka, za primer, ko se glavni vir "
+"pokvari. Viri in rezervacije naj imajo enak format."
 
 #: modules/stream_out/bridge.c:72
 msgid "Placeholder delay"
@@ -25119,7 +25126,7 @@ msgstr "Premoščanje dovoda"
 
 #: modules/stream_out/chromaprint.c:57
 msgid "Duration of the fingerprinting"
-msgstr ""
+msgstr "Trajanje jemanja prstnega odtisa"
 
 #: modules/stream_out/chromaprint.c:58
 msgid "Default: 90sec"
@@ -25127,7 +25134,7 @@ msgstr "Privzeto: 90sec"
 
 #: modules/stream_out/chromaprint.c:61
 msgid "Chromaprint stream output"
-msgstr ""
+msgstr "Izhod Chromaprint pretoka"
 
 #: modules/stream_out/chromecast/cast.cpp:189
 msgid "HTTP port"
@@ -25148,7 +25155,7 @@ msgstr "Opozorilo delovanja"
 
 #: modules/stream_out/chromecast/cast.cpp:193
 msgid "Display a performance warning when transcoding"
-msgstr ""
+msgstr "Ob pretvorbi prikaži opozorilo o porabi"
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Enable Audio passthrough"
@@ -25211,6 +25218,8 @@ msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"Predvajanje tega videa zahteva pretvorbo. Ta pretvorba lahko uporabi vso "
+"energijo, ki je na voljo in hitro izprazni baterijo."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:511
 msgid "Chromecast demux wrapper"
@@ -25218,11 +25227,11 @@ msgstr "Ovijalnik Chromecast"
 
 #: modules/stream_out/cycle.c:326
 msgid "cycle"
-msgstr ""
+msgstr "cikel"
 
 #: modules/stream_out/cycle.c:327
 msgid "Cyclic stream output"
-msgstr ""
+msgstr "Ciklični odvod pretoka"
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
@@ -26120,7 +26129,7 @@ msgstr "Smer besedila"
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
-msgstr ""
+msgstr "Osnovna smer odstavka za dvosmerni Unicode algoritem."
 
 #: modules/text_renderer/freetype/freetype.c:125
 msgid "Use YUVP renderer"
@@ -26191,11 +26200,11 @@ msgstr "Pretvarjanje iz"
 
 #: modules/video_chroma/i420_10_p010.c:131
 msgid "YUV 10-bits planar to semiplanar 10-bits conversions"
-msgstr ""
+msgstr "Pretvorba iz ravninskega 10 bitnega YUV v semi-ravninsko 10 bitnega"
 
 #: modules/video_chroma/i420_nv12.c:237
 msgid "YUV planar to semiplanar conversions"
-msgstr ""
+msgstr "Pretvorba iz ravninskega YUV v semi-ravninski"
 
 #: modules/video_chroma/i420_rgb.c:79
 msgid "SSE2 I420,IYUV,YV12 to RV15,RV16,RV24,RV32 conversions"
@@ -27588,7 +27597,7 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor value"
-msgstr ""
+msgstr "Vrednos za Active Format Descriptor"
 
 #: modules/video_output/decklink.cpp:81
 msgid "Aspect Ratio of the source picture."
@@ -27596,11 +27605,11 @@ msgstr "Razmerje stranic izvorne slike."
 
 #: modules/video_output/decklink.cpp:83
 msgid "Active Format Descriptor line"
-msgstr ""
+msgstr "Vrstica Active Format Descriptor"
 
 #: modules/video_output/decklink.cpp:84
 msgid "VBI line on which to output Active Format Descriptor."
-msgstr ""
+msgstr "Vrstica VBI za prikaz Active Format Descriptor."
 
 #: modules/video_output/decklink.cpp:86
 msgid "Picture to display on input signal loss"
@@ -28082,7 +28091,7 @@ msgstr "WL SHM"
 
 #: modules/video_output/wayland/shm.c:509
 msgid "Wayland shared memory video output"
-msgstr ""
+msgstr "Wayland video izhod z deljenim pomnilnikom"
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -28743,7 +28752,7 @@ msgstr "Hann"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Flat Top"
-msgstr ""
+msgstr "Flat Top"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Blackman-Harris"
@@ -28880,7 +28889,7 @@ msgstr "Upravljanje pretokov"
 
 #: share/lua/http/index.html:237
 msgid "Track Synchronisation"
-msgstr "Sledi usklajevanju"
+msgstr "Usklajevanje stez"
 
 #: share/lua/http/index.html:239
 msgid "VLM Batch Commands"
@@ -28921,11 +28930,13 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
+"VLC zna prikazati QR kodo, ki vodi do mobilne različice spletnega vmesnika; "
+"spletni naslov spletnega vmesnika VLC predvajalnika bo preko spleta "
+"posredovana spletni storitvi Google Image Charts, ki ustvari to QR kodo."
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "Ali ga želite prenesti?"
+msgstr "Ali želite s tem nadaljevati?"
 
 #: share/lua/http/index.html:290
 msgid ""
@@ -29384,7 +29395,7 @@ msgstr "Izenači glasnost na:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:424
 msgid "Tracks"
-msgstr "Sledi"
+msgstr "Steze"
 
 #: modules/gui/qt/ui/sprefs_audio.h:425
 msgid "Preferred audio language:"
@@ -29424,7 +29435,7 @@ msgstr "Preskoči in-loop deblocking filter pri H.264"
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "x264 preset and tuning selection"
-msgstr ""
+msgstr "izbira x264 prednastavitev in prilagoditev"
 
 #: modules/gui/qt/ui/sprefs_input.h:363
 msgid "Optical drive"
