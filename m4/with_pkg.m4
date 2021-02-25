@@ -71,8 +71,10 @@ AC_DEFUN([PKG_HAVE_WITH_MODULES],
 [
 PKG_WITH_MODULES([$1],[$2],,,[$3],[$4])
 
+m4_pushdef([with_arg], m4_tolower([$1]))
 AM_CONDITIONAL([HAVE_][$1],
-               [test "$AS_TR_SH([with_]m4_tolower([$1]))" = "yes"])
+               [test "$AS_TR_SH([enable_]with_arg)" = "yes"])
+m4_popdef([with_arg])
 ])
 
 dnl PKG_ENABLE_MODULES_VLC(VARIABLE-PREFIX,
