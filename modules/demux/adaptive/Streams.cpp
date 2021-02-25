@@ -717,7 +717,11 @@ void AbstractStream::declaredCodecs()
     CodecDescriptionList descs;
     segmentTracker->getCodecsDesc(&descs);
     for(auto it = descs.cbegin(); it != descs.cend(); ++it)
-        fakeEsOut()->declareEs((*it)->getFmt());
+    {
+        const es_format_t *fmt = (*it)->getFmt();
+        if(fmt->i_cat != UNKNOWN_ES)
+            fakeEsOut()->declareEs(fmt);
+    }
 }
 
 FakeESOut::LockedFakeEsOut AbstractStream::fakeEsOut()
