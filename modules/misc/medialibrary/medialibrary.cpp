@@ -1007,6 +1007,63 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
             *( va_arg( args, size_t* ) ) = query ? query->count() : 0;
             break;
         }
+        case VLC_ML_LIST_SUBFOLDERS:
+        {
+            const auto parent = m_ml->folder( va_arg( args, int64_t ) );
+            if ( parent == nullptr )
+                return VLC_EGENERIC;
+            const auto query = parent->subfolders();
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            auto* res = ml_convert_list<vlc_ml_folder_list_t, vlc_ml_folder_t>( query->all() );
+            *( va_arg( args, vlc_ml_folder_list_t** ) ) = res;
+            break;
+        }
+        case VLC_ML_COUNT_SUBFOLDERS:
+        {
+            const auto parent = m_ml->folder( va_arg( args, int64_t ) );
+            if ( parent == nullptr )
+                return VLC_EGENERIC;
+            const auto query = parent->subfolders();
+            *( va_arg( args, size_t* ) ) = query == nullptr ? 0 : query->count();
+            break;
+        }
+        case VLC_ML_LIST_FOLDERS:
+        {
+            const auto query = m_ml->folders( medialibrary::IMedia::Type::Unknown, paramsPtr );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            auto* res = ml_convert_list<vlc_ml_folder_list_t, vlc_ml_folder_t>( query->all() );
+            *( va_arg( args, vlc_ml_folder_list_t** ) ) = res;
+            break;
+        }
+        case VLC_ML_COUNT_FOLDERS:
+        {
+            const auto query = m_ml->folders( medialibrary::IMedia::Type::Unknown, paramsPtr );
+            *( va_arg( args, size_t* ) ) = query == nullptr ? 0 : query->count();
+            break;
+        }
+        case VLC_ML_LIST_FOLDER_MEDIAS:
+        {
+            const auto folder = m_ml->folder( va_arg( args, int64_t ) );
+            if ( folder == nullptr )
+                return VLC_EGENERIC;
+            const auto query = folder->media( medialibrary::IMedia::Type::Unknown, paramsPtr );
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            auto* res = ml_convert_list<vlc_ml_media_list_t, vlc_ml_media_t>( query->all() );
+            *( va_arg( args, vlc_ml_media_list_t** ) ) = res;
+            break;
+        }
+        case VLC_ML_COUNT_FOLDER_MEDIAS:
+        {
+            const auto folder = m_ml->folder( va_arg( args, int64_t ) );
+            if ( folder == nullptr )
+                return VLC_EGENERIC;
+            const auto query = folder->media( medialibrary::IMedia::Type::Unknown, paramsPtr );
+            *( va_arg( args, size_t* ) ) = query == nullptr ? 0 : query->count();
+            break;
+        }
     }
     return VLC_SUCCESS;
 }
@@ -1065,6 +1122,12 @@ void* MediaLibrary::Get( int query, va_list args )
             auto id = va_arg( args, int64_t );
             auto playlist = m_ml->playlist( id );
             return CreateAndConvert<vlc_ml_playlist_t>( playlist.get() );
+        }
+        case VLC_ML_GET_FOLDER:
+        {
+            auto id = va_arg( args, int64_t );
+            auto folder = m_ml->folder( id );
+            return CreateAndConvert<vlc_ml_folder_t>( folder.get() );
         }
         case VLC_ML_GET_MEDIA_BY_MRL:
         {

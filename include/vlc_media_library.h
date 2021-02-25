@@ -398,16 +398,17 @@ struct vlc_ml_query_params_t
 
 enum vlc_ml_get_queries
 {
-    VLC_ML_GET_MEDIA,           /**< arg1: Media    ID; ret: vlc_ml_media_t*    */
-    VLC_ML_GET_MEDIA_BY_MRL,    /**< arg1: Media   MRL; ret: vlc_ml_media_t*    */
-    VLC_ML_GET_INPUT_ITEM,      /**< arg1: Media    ID; ret: input_item_t*      */
-    VLC_ML_GET_INPUT_ITEM_BY_MRL,/**< arg1: Media  MRL; ret: input_item_t*      */
-    VLC_ML_GET_ALBUM,           /**< arg1: Album    ID; ret: vlc_ml_album_t*    */
-    VLC_ML_GET_ARTIST,          /**< arg1: Artist   ID; ret: vlc_ml_artist_t*   */
-    VLC_ML_GET_GENRE,           /**< arg1: Genre    ID; ret: vlc_ml_genre_t*    */
-    VLC_ML_GET_SHOW,            /**< arg1: Show     ID; ret: vlc_ml_show_t*     */
-    VLC_ML_GET_GROUP,           /**< arg1: Group    ID; ret: vlc_ml_group_t*    */
-    VLC_ML_GET_PLAYLIST,        /**< arg1: Playlist ID; ret: vlc_ml_playlist_t* */
+    VLC_ML_GET_MEDIA,             /**< arg1: Media    ID; ret: vlc_ml_media_t*    */
+    VLC_ML_GET_MEDIA_BY_MRL,      /**< arg1: Media   MRL; ret: vlc_ml_media_t*    */
+    VLC_ML_GET_INPUT_ITEM,        /**< arg1: Media    ID; ret: input_item_t*      */
+    VLC_ML_GET_INPUT_ITEM_BY_MRL, /**< arg1: Media  MRL; ret: input_item_t*       */
+    VLC_ML_GET_ALBUM,             /**< arg1: Album    ID; ret: vlc_ml_album_t*    */
+    VLC_ML_GET_ARTIST,            /**< arg1: Artist   ID; ret: vlc_ml_artist_t*   */
+    VLC_ML_GET_GENRE,             /**< arg1: Genre    ID; ret: vlc_ml_genre_t*    */
+    VLC_ML_GET_SHOW,              /**< arg1: Show     ID; ret: vlc_ml_show_t*     */
+    VLC_ML_GET_PLAYLIST,          /**< arg1: Playlist ID; ret: vlc_ml_playlist_t* */
+    VLC_ML_GET_GROUP,             /**< arg1: Group    ID; ret: vlc_ml_group_t*    */
+    VLC_ML_GET_FOLDER,            /**< arg1: folder ID; ret: vlc_ml_folder_t*     */
 };
 
 enum vlc_ml_list_queries
@@ -438,6 +439,8 @@ enum vlc_ml_list_queries
     VLC_ML_COUNT_STREAM_HISTORY,  /**< arg1 (out): size_t*                                                              */
     VLC_ML_LIST_ENTRY_POINTS,     /**< arg1 bool: list_banned; arg2 (out): vlc_ml_folder_list_t**                       */
     VLC_ML_COUNT_ENTRY_POINTS,    /**< arg1 bool: list_banned; arg2 (out): size_t*                                      */
+    VLC_ML_LIST_FOLDERS,          /**< arg1 (out): vlc_ml_folder_list_t**                                               */
+    VLC_ML_COUNT_FOLDERS,         /**< arg1 (out): size_t*                                                              */
 
     /* Album specific listings */
     VLC_ML_LIST_ALBUM_TRACKS,     /**< arg1: The album id. arg2 (out): vlc_ml_media_list_t**                            */
@@ -475,6 +478,12 @@ enum vlc_ml_list_queries
     /* Playlist specific listings */
     VLC_ML_LIST_PLAYLIST_MEDIA,   /**< arg1: playlist id; arg2 (out): vlc_ml_media_list_t**                             */
     VLC_ML_COUNT_PLAYLIST_MEDIA,  /**< arg1: playlist id; arg2 (out): size_t*                                           */
+
+    /* Folder specific listings */
+    VLC_ML_LIST_SUBFOLDERS,       /**< arg1: parent id; arg2 (out): vlc_ml_folder_list_t**                              */
+    VLC_ML_COUNT_SUBFOLDERS,      /**< arg1: parent id; arg2 (out): size_t*                                             */
+    VLC_ML_LIST_FOLDER_MEDIAS,    /**< arg1: folder id; arg2 (out): vlc_ml_media_list_t**                               */
+    VLC_ML_COUNT_FOLDER_MEDIAS,   /**< arg1: folder id; arg2 (out): size_t*                                             */
 
     /* Children entities listing */
     VLC_ML_LIST_MEDIA_OF,         /**< arg1: parent entity type; arg2: parent entity id; arg3(out): ml_media_list_t**   */
