@@ -448,6 +448,8 @@ bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )
 
 bool Convert( const medialibrary::IFolder* input, vlc_ml_folder_t& output )
 {
+    output.i_id = input->id();
+    output.b_banned = input->isBanned();
     try
     {
         if ( strdup_helper( input->mrl(), output.psz_mrl ) == false )
@@ -459,7 +461,6 @@ bool Convert( const medialibrary::IFolder* input, vlc_ml_folder_t& output )
         output.psz_mrl = nullptr;
         output.b_present = false;
     }
-    output.b_banned = input->isBanned();
     return true;
 }
 

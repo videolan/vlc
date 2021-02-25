@@ -332,6 +332,7 @@ typedef struct vlc_ml_playlist_list_t
 
 typedef struct vlc_ml_folder_t
 {
+    int64_t i_id; /**< This folder's MRL. Will be NULL if b_present is false */
     char* psz_mrl; /**< This folder's MRL. Will be NULL if b_present is false */
     bool b_present; /**< The presence state for this folder. */
     bool b_banned; /**< Will be true if the user required this folder to be excluded */
