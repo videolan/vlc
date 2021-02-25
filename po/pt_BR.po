@@ -1,17 +1,17 @@
 # Brazilian Portuguese translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # André de Barros Martins Ribeiro  <andrerib at ajato.com dot br>, 2003
-# Sidney Doria <ssdoria@gmail.com>, 2008-2020
+# Sidney Doria <ssdoria@gmail.com>, 2008-2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-03-25 11:29+0100\n"
-"Last-Translator: Sidney Doria <ssdoria@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-25 11:36+0100\n"
+"Last-Translator: Sidney Doria <ssdoria@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/yaron/"
 "teams/16553/pt_BR/)\n"
 "Language: pt_BR\n"
@@ -12062,9 +12062,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "Empacotador de textos de legenda Kate"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "Opções de transcodificação"
+msgstr "Pasta de fontes adicionais"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -15269,17 +15268,16 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "Largura de banda preferida para fluxos não adaptativos"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "Atraso (ms) do DTS"
+msgstr "Atraso (ms) de Reprodução Ao Vivo"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "Equilíbrio entre estabilidade e ação de tempo real"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "Memória máxima (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15299,9 +15297,8 @@ msgid "Low latency"
 msgstr "Baixa latência"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "Sobrepor parâmetros"
+msgstr "Sobrepõe parâmetros de baixa latência"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15328,9 +15325,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "Maior Largura de Banda/Qualidade"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "Impor negrito"
+msgstr "Impor"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -29064,11 +29060,14 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
+"O VLC pode exibir um código QR associado à versão móvel da interface web; o "
+"endereço web da interface web da sua instância de reprodutor de mídias VLC "
+"será transmitido pela Internet para o serviço web de Galeria de Imagens do "
+"Google, para gerar este código QR."
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "Deseja baixar?"
+msgstr "Deseja prosseguir com isso?"
 
 #: share/lua/http/index.html:290
 msgid ""
