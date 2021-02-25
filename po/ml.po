@@ -1,22 +1,22 @@
 # Malayalam translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# akkuvijay <akkuvijay@aol.com>, 2014
-# Dilip Re <dilip_meet@rediffmail.com>, 2020
+# akkuvijay <akkuvijay@aol.com>, 2014, 2020
+# Dilip Re <dilip_meet@rediffmail.com>, 2020-2021
 # Hrishikesh <hrishi.kb@gmail.com>, 2018
 # Kiran Sivadas <kiransivadas@protonmail.com>, 2020
 # Mujeeb Rahman <mujeebcpy@gmail.com>, 2018
 # Sajeer P <sajeerforyou@gmail.com>, 2016
-# Sreejith <sreejithpro@gmail.com>, 2009,2019
+# Sreejith P <sreejithpro@gmail.com>, 2009, 2019
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-03-28 03:23+0100\n"
-"Last-Translator: Dilip Re <dilip_meet@rediffmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-25 14:11+0100\n"
+"Last-Translator: Dilip Re <dilip_meet@rediffmail.com>, 2021\n"
 "Language-Team: Malayalam (https://www.transifex.com/yaron/teams/16553/ml/)\n"
 "Language: ml\n"
 "MIME-Version: 1.0\n"
@@ -11909,9 +11909,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "കേറ്റ് ടെക്സ്റ്റ് ഉപശീര്‍ഷകങ്ങളുടെ പാക്കറ്റൈസര്‍"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "ട്രാന്‍സ്കോഡിംഗ് താല്പര്യങ്ങള്‍"
+msgstr "അധികമുള്ള കയ്യക്ഷര പെട്ടി"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -15056,17 +15055,16 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "അഡാപ്റ്റീവ് അല്ലാത്ത സ്ട്രീമുകൾക്കായി തിരഞ്ഞെടുത്ത ബാൻഡ്‌വിഡ്ത്ത്"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "DTS താമസ്സം (ms)"
+msgstr "തത്സമയ പ്ലേബാക്ക് കാലതാമസം (എം‌എസ്)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "സ്ഥിരതയും തത്സമയവും തമ്മിലുള്ള താത്പര്യം"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "പരമാവധി ബഫറിംഗ് (എം‌എസ്)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15086,9 +15084,8 @@ msgid "Low latency"
 msgstr "കുറഞ്ഞ ലാറ്റന്‍സി"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "ഓവര്‍റൈഡ് പരാമീറ്ററുകള്‍"
+msgstr "കുറഞ്ഞ ലേറ്റൻസിയുള്ള പാരാമീറ്ററുകൾ അസാധുവാക്കുന്നു"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15115,9 +15112,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "ഏറ്റവും ഉയർന്ന ബാൻഡ്‌വിഡ്ത്ത് / ഗുണമേന്മ"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "ഫോഴ്സ് ബോള്‍ഡ്"
+msgstr "നിർബന്ധിക്കുക"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -28735,11 +28731,14 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
+"വെബ് ഇന്റർഫേസിന്റെ മൊബൈൽ പതിപ്പിലേക്ക് ലിങ്കുചെയ്യുന്ന ഒരു ക്യുആർ കോഡ് വി‌എൽ‌സിക്ക് "
+"പ്രദർശിപ്പിക്കാൻ കഴിയും; ഈ ക്യുആർ കോഡ് ജനറേറ്റ് ചെയ്യുന്നതിന് നിങ്ങളുടെ വി‌എൽ‌സി മീഡിയ പ്ലെയർ "
+"ഇൻസ്റ്റൻസിന്റെ വെബ് ഇന്റർഫേസിന്റെ വെബ് വിലാസം ഇൻറർനെറ്റിലൂടെ ഗൂഗിൾ ഇമേജ് ചാർട്ടുകളുടെ വെബ് "
+"സേവനത്തിലേക്ക് കൈമാറും."
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "താങ്കള്‍ക്ക് ഇത് ഡൗണ്‍ലോഡ് ചെയ്യേണമോ?"
+msgstr "ഇത് തുടരണോ ?"
 
 #: share/lua/http/index.html:290
 msgid ""
