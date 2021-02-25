@@ -1,5 +1,5 @@
 # Simplified Chinese translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -12,11 +12,11 @@
 # zhangmin <zm1990s@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-03-30 16:55+0200\n"
-"Last-Translator: Dian Li <xslidian@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-25 02:45+0100\n"
+"Last-Translator: spice2wolf, 2021\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/yaron/teams/16553/"
 "zh_CN/)\n"
 "Language: zh_CN\n"
@@ -11497,9 +11497,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "Kate 文本字幕封包器"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "转码选项"
+msgstr "附加字体目录"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -14558,17 +14557,16 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "非自适应性流的偏好带宽"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "DTS 延迟 (毫秒)"
+msgstr "实时回放延迟 (毫秒)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "稳定性和实时性之间的折衷"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "最大缓冲 (毫秒)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -14588,9 +14586,8 @@ msgid "Low latency"
 msgstr "低延迟"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "覆盖参数"
+msgstr "覆盖低延迟参数"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -14617,9 +14614,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "最高带宽/最高质量"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "强制加粗"
+msgstr "强制"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -27875,11 +27871,12 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
+"VLC 可以显示链接到手机版网页界面的二维码；你的 VLC 媒体播放器实例的网页界面的"
+"网址将会透过互联网传送到谷歌图像图表网页服务以生成此二维码"
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "是否希望下载它?"
+msgstr "你想继续吗? "
 
 #: share/lua/http/index.html:290
 msgid ""
