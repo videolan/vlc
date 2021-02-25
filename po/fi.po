@@ -1,13 +1,14 @@
 # Finnish translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Ahto Simakuutio <simakuutio@gmail.com>, 2016
 # Joni Maatta <maatta.joni1@gmail.com>, 2014
-# Juha Jeronen <juha.jeronen@jyu.fi>, 2011,2012
+# Juha Jeronen <juha.jeronen@jyu.fi>, 2011-2012
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2020
 # Kasvain <kasvain@gmail.com>, 2014-2015
-# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2020
+# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2020-2021
 # Marko <marko.sahakangas@gmail.com>, 2015
 # mrJalostaja <pauli.nykanen@yahoo.com>, 2014
 # Otto Kekäläinen, 2008-2010
@@ -19,11 +20,11 @@
 # Tomi Toivio <tomi@sange.fi>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-12-22 20:46+0100\n"
-"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-25 21:53+0100\n"
+"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2021\n"
 "Language-Team: Finnish (https://www.transifex.com/yaron/teams/16553/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -255,7 +256,7 @@ msgstr "Videokoodekit"
 #: include/vlc_config_cat.h:116
 msgid "Settings for the video, images or video+audio decoders and encoders."
 msgstr ""
-"Videon, kuvien, ja videon+äänen koodekkien eli pakkauksenhallinnan asetukset."
+"Videon, kuvien ja videon+äänen koodekkien, sekä purkukooderin asetukset."
 
 #: include/vlc_config_cat.h:118
 msgid "Audio codecs"
@@ -263,7 +264,7 @@ msgstr "Äänikoodekit"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
-msgstr "Äänten koodekit eli pakkauksenhallinnat."
+msgstr "Äänen koodekkien, sekä purkukooderin asetukset."
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
@@ -271,9 +272,7 @@ msgstr "Tekstityskoodekit"
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
-msgstr ""
-"Tekstityksen, teksti-TV:n ja CC:n (Closed Captions) pakkauksenhallinnan "
-"asetukset."
+msgstr "Tekstityksen, teksti-TV ja CC koodekien ja purkukooderin asetukset."
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
@@ -342,7 +341,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:154
 msgid "Packetizers"
-msgstr "Paketoijat"
+msgstr "Pakkaajat"
 
 #: include/vlc_config_cat.h:156
 msgid ""
@@ -351,10 +350,10 @@ msgid ""
 "not do that.\n"
 "You can also set default parameters for each packetizer."
 msgstr ""
-"Paketoijia käytetään alkeisvirtojen (videon, äänen, ...) esikäsittelyyn "
-"ennen kanavointia. Tämän asetuksen avulla on mahdollista pakottaa VLC "
-"käyttämään aina samaa, valitsemaasi paketoijaa. Tämä ei ole suositeltavaa.\n"
-"Voit myös määrätä jokaisen paketoijan oletusasetukset täällä."
+"Pakkaajia käytetään \"alkeisvirtojen\" videon ja äänen, esikäsittelyyn ennen "
+"kanavointia. Tämän asetuksen avulla on mahdollista pakottaa VLC käyttämään "
+"aina samaa, valitsemaasi pakkaajaa. Tämä ei ole suositeltavaa.\n"
+"Voit myös määrätä jokaisen pakkaajan oletusasetukset täällä."
 
 #: include/vlc_config_cat.h:162
 msgid "Sout stream"
@@ -877,7 +876,7 @@ msgstr "Huomio:"
 
 #: src/config/help.c:651
 msgid "add --advanced to your command line to see advanced options."
-msgstr "lisää \"--advanced\" komentoriviisi nähdäksesi edistyneet asetukset."
+msgstr "lisää \"--advanced\" komentoriviisi nähdäksesi lisäasetukset."
 
 #: src/config/help.c:656
 #, c-format
@@ -886,9 +885,7 @@ msgid_plural ""
 "%u modules were not displayed because they only have advanced options.\n"
 msgstr[0] ""
 "%u moduulia ei näytetty koska sillä on vain edistyksellisiä ominaisuuksia.\n"
-msgstr[1] ""
-"%u moduuleja ei näytetty koska niillä on vain edistyksellisiä "
-"ominaisuuksia.\n"
+msgstr[1] "%u moduuleja ei näytetty koska ne ovat vain lisäasetuksia.\n"
 
 #: src/config/help.c:663
 msgid ""
@@ -962,11 +959,11 @@ msgstr "VLC ei voinut tunnistaa ääni- tai videokoodekkia"
 
 #: src/input/decoder.c:1909
 msgid "packetizer"
-msgstr "paketoija"
+msgstr "pakkaaja"
 
 #: src/input/decoder.c:1909
 msgid "decoder"
-msgstr "pakkauksenpurku"
+msgstr "purkukooderi"
 
 #: src/input/decoder.c:1917 src/input/decoder.c:2200
 #: modules/codec/avcodec/encoder.c:371 modules/codec/avcodec/encoder.c:905
@@ -981,7 +978,7 @@ msgstr "VLC ei voinut avata moduulia %s."
 
 #: src/input/decoder.c:2201
 msgid "VLC could not open the decoder module."
-msgstr "VLC ei voinut avata pakkauksenpurkumoduulia."
+msgstr "VLC ei voinut avata purkukooderin moduulia."
 
 #: src/input/es_out.c:968 src/input/es_out.c:973 src/libvlc-module.c:239
 #: modules/gui/qt/components/open_panels.cpp:547
@@ -1185,7 +1182,7 @@ msgstr "Lineaarinen"
 
 #: src/input/es_out.c:3236
 msgid "Hybrid Log-Gamma"
-msgstr ""
+msgstr "Hybridi Log-Gamma"
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
@@ -2772,7 +2769,7 @@ msgstr "Käytettävän tekstitysraidan tunniste (ID)."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
-msgstr "Ensisijainen suljetun tekstityksen purkaja"
+msgstr "Ensisijainen suljetun tekstityksen purkukooderi"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -3396,7 +3393,7 @@ msgstr ""
 
 #: src/libvlc-module.c:908
 msgid "Preferred decoders list"
-msgstr "Pakkauksenpurkajien luettelo suositusjärjestyksessä"
+msgstr "Ensisijaisten purkukooderien lista"
 
 #: src/libvlc-module.c:910
 msgid ""
@@ -3521,13 +3518,12 @@ msgstr ""
 
 #: src/libvlc-module.c:969
 msgid "Preferred packetizer list"
-msgstr "Paketoijien luettelo suositusjärjestyksessä"
+msgstr "Pakkaajien ensisijainen luettelo"
 
 #: src/libvlc-module.c:971
 msgid ""
 "This allows you to select the order in which VLC will choose its packetizers."
-msgstr ""
-"Tästä voi valita, missä järjestyksessä VLC valitsee paketoijat (packetizers)."
+msgstr "Tästä voi valita, missä järjestyksessä VLC valitsee pakkaajat."
 
 #: src/libvlc-module.c:974
 msgid "Mux module"
@@ -4858,19 +4854,19 @@ msgstr "Väljennä rajausta yhdellä pikselillä videon oikeasta reunasta"
 
 #: src/libvlc-module.c:1459
 msgid "Shrink the viewpoint field of view (360°)"
-msgstr ""
+msgstr "Kutista näkökulmaan (360 °)"
 
 #: src/libvlc-module.c:1460
 msgid "Expand the viewpoint field of view (360°)"
-msgstr ""
+msgstr "Laajenna näkökulmaan (360 °)"
 
 #: src/libvlc-module.c:1461
 msgid "Roll the viewpoint clockwise (360°)"
-msgstr ""
+msgstr "Käännä näkökulmaa myötäpäivään (360 °)"
 
 #: src/libvlc-module.c:1462
 msgid "Roll the viewpoint anti-clockwise (360°)"
-msgstr ""
+msgstr "Käännä näkökulmaa vastapäivään (360 °)"
 
 #: src/libvlc-module.c:1464
 msgid "Toggle wallpaper mode in video output"
@@ -4886,7 +4882,7 @@ msgstr "Vaihda lähtevän äänen laitteiden välillä"
 
 #: src/libvlc-module.c:1469
 msgid "Cycle through available audio devices"
-msgstr ""
+msgstr "Selaa käytettävissä olevia äänilaitteita"
 
 #: src/libvlc-module.c:1598 src/video_output/vout_intf.c:274
 #: modules/gui/macosx/VLCMainMenu.m:434 modules/gui/macosx/VLCMainMenu.m:512
@@ -4944,7 +4940,7 @@ msgstr "Metatiedot"
 
 #: src/libvlc-module.c:1937
 msgid "Decoders"
-msgstr "Pakkauksen purkajat"
+msgstr "Purkukooderit"
 
 #: src/libvlc-module.c:1944 modules/access/avio.h:40
 #: modules/access/v4l2/v4l2.c:59 modules/gui/macosx/VLCPlaylistInfo.m:80
@@ -6485,7 +6481,7 @@ msgstr "KDM-tiedosto"
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
-msgstr ""
+msgstr "Polku Key Delivery Message XML-tiedostoon"
 
 #: modules/access/dcp/dcp.cpp:77
 msgid "DCP"
@@ -6637,6 +6633,9 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"Mahdollisesti macOS estää pääsyn levyllesi. Avaa \"Järjestelmän asetukset\" -"
+"> \"Turvallisuus ja yksityisyys\" ja anna lupa VLC:n käyttää ulkoista "
+"tietovälinettä \"Tiedostot ja kansiot\" osiossa."
 
 #: modules/access/dshow/dshow.cpp:92
 msgid "Cable"
@@ -6686,6 +6685,8 @@ msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
+"DirectShow-liitännäisen käyttämän äänilaitteen nimi. Jos tämä kohta jätetään "
+"tyhjäksi, käytetään oletuslaitetta."
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:798
@@ -6845,6 +6846,8 @@ msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
+"AM-viritintila. Voi olla oletus (0), TV (1), AM Radio (2), FM Radio (3) tai "
+"DSS (4)."
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
@@ -6913,15 +6916,15 @@ msgstr "Windows-verkot"
 
 #: modules/access/dsm/access.c:74
 msgid "libdsm's SMB (Windows network shares) input and browser"
-msgstr ""
+msgstr "libdsm SMB (Windows lähiverkon jako) sisääntulo ja verkkoselain"
 
 #: modules/access/dsm/access.c:78
 msgid "libdsm SMB input"
-msgstr ""
+msgstr "libdsm SMB sisääntulo"
 
 #: modules/access/dsm/access.c:98
 msgid "libdsm NETBIOS discovery module"
-msgstr ""
+msgstr "libdsm NETBIOS -etsintämoduuli"
 
 #: modules/access/dtv/access.c:38
 msgid "DVB adapter"
@@ -7143,7 +7146,7 @@ msgstr "Layer C -aikalomitus"
 
 #: modules/access/dtv/access.c:156
 msgid "Stream identifier"
-msgstr ""
+msgstr "Striimin tunniste"
 
 #: modules/access/dtv/access.c:158
 msgid "Pilot"
@@ -7231,6 +7234,9 @@ msgid ""
 "the satellite transmission frequency. The intermediate frequency (IF) on the "
 "RF cable is the result."
 msgstr ""
+"Alamuuntaja downconverter (LNB) vähentää paikallisen oskillaattorin "
+"taajuuden satelliitin lähetystaajuudesta. Tulos on RF-kaapelin välitaajuus "
+"(IF)."
 
 #: modules/access/dtv/access.c:191
 msgid "Universal LNB switch frequency (kHz)"
@@ -7280,7 +7286,7 @@ msgstr "Määräämätön"
 
 #: modules/access/dtv/access.c:213
 msgid "Uncommitted DiSEqC LNB number"
-msgstr ""
+msgstr "Sitoutumaton DiSEqC LNB -numero"
 
 #: modules/access/dtv/access.c:215
 msgid ""
@@ -7290,6 +7296,11 @@ msgid ""
 "selected (1 to 4). If there is no uncommitted switch, this parameter should "
 "be 0."
 msgstr ""
+"Jos satelliittivastaanotin on kytketty useaan matalahäiriöiseen lohkon "
+"alamuuntimeen (LNB) kaskadin kautta, joka on muodostettu sitoutumattomasta "
+"DiSEqC 1.1 -kytkimestä ja sitoutuneesta DiSEqC 1.0 -kytkimestä, voidaan "
+"valita oikea sitoutumaton LNB (1-4). Jos ei ole sitoutumatonta kytkintä, "
+"tämän parametrin tulisi olla 0."
 
 #: modules/access/dtv/access.c:222
 msgid "Network identifier"
@@ -7402,33 +7413,35 @@ msgstr "DV"
 
 #: modules/access/dvb/access.c:66
 msgid "Probe DVB card for capabilities"
-msgstr ""
+msgstr "Testaa DVB-kortin ominaisuudet"
 
 #: modules/access/dvb/access.c:67
 msgid ""
 "Some DVB cards do not like to be probed for their capabilities, you can "
 "disable this feature if you experience some trouble."
 msgstr ""
+"Jotkin DVB-kortit eivät halua, että niiden ominaisuuksia tutkitaan. Voit "
+"poistaa tämän ominaisuuden käytöstä, jos sinulla on ongelmia."
 
 #: modules/access/dvb/access.c:70
 msgid "Satellite scanning config"
-msgstr ""
+msgstr "Satelliittien hakemisen määritykset"
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
-msgstr ""
+msgstr "Määritys eli config -tiedosto polussa share/dvb/dvb-s."
 
 #: modules/access/dvb/access.c:73
 msgid "Scan tuning list"
-msgstr ""
+msgstr "Hae viritysluettelo"
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
-msgstr ""
+msgstr "Tiedostonimi, joka sisältää alustavan viritysluettelon."
 
 #: modules/access/dvb/access.c:76
 msgid "Use NIT for scanning services"
-msgstr ""
+msgstr "Käytä NIT-palvelua hakemiseen"
 
 #: modules/access/dvb/access.c:79
 msgid "DVB"
@@ -7444,10 +7457,12 @@ msgid ""
 "%.1f MHz (%d services)\n"
 "~%s remaining"
 msgstr ""
+"%.1f MHz (%d palvelua)\n"
+"~%s jäljellä"
 
 #: modules/access/dvb/scan.c:827
 msgid "Scanning DVB"
-msgstr ""
+msgstr "Haetaan DVB"
 
 #: modules/access/dvdnav.c:73 modules/access/dvdread.c:76
 msgid "DVD angle"
@@ -7479,7 +7494,7 @@ msgstr "DVDnav-lähde"
 
 #: modules/access/dvdnav.c:106
 msgid "DVDnav demuxer"
-msgstr ""
+msgstr "DVDnav-kanavoinninpurkaja"
 
 #: modules/access/dvdnav.c:284 modules/access/dvdread.c:227
 #: modules/access/dvdread.c:243 modules/access/dvdread.c:502
@@ -7509,7 +7524,7 @@ msgstr "DVDRead ei voinut avata levyä \"%s\"."
 
 #: modules/access/dvdread.c:244
 msgid "Cannot play a non-UDF mastered DVD."
-msgstr ""
+msgstr "Ei voi toistaa non-UDF -masteroitua DVD-levyä."
 
 #: modules/access/dvdread.c:503
 #, c-format
@@ -7544,11 +7559,11 @@ msgstr "Hakemisto"
 
 #: modules/access/fs.c:53
 msgid "List special files"
-msgstr ""
+msgstr "Listaa erikoistiedostot"
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
-msgstr ""
+msgstr "Sisällytä laitteet ja linjat hakemistoja listatessa"
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:84
 #: modules/access/rdp.c:65 modules/access/sftp.c:55
@@ -7567,6 +7582,8 @@ msgid ""
 "Username that will be used for the connection, if no username is set in the "
 "URL."
 msgstr ""
+"Yhteydelle käytettävä tunnus, jos verkko-osoitteessa ei ole määritetty "
+"käyttäjätunnusta."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:87
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
@@ -7587,6 +7604,8 @@ msgid ""
 "Password that will be used for the connection, if no username or password "
 "are set in URL."
 msgstr ""
+"Salasana, jota käytetään yhteyden muodostamiseen, jos verkko-osoitteessa ei "
+"ole tunnusta tai salasanaa."
 
 #: modules/access/ftp.c:74
 msgid "FTP account"
@@ -7603,7 +7622,7 @@ msgstr "FTP-todentaminen"
 #: modules/access/ftp.c:79
 #, c-format
 msgid "Please enter a valid login and password for the ftp connexion to %s"
-msgstr ""
+msgstr "Anna kelvollinen tunnus ja salasana ftp-yhteyteen %s"
 
 #: modules/access/ftp.c:84
 msgid "FTP input"
@@ -7659,7 +7678,7 @@ msgstr "Syötä käyttäjätunnus ja salasana alueeseen %s."
 
 #: modules/access/http/access.c:288
 msgid "HTTPS input"
-msgstr ""
+msgstr "HTTPS sisääntulo"
 
 #: modules/access/http/access.c:289
 msgid "HTTPS"
@@ -7671,27 +7690,27 @@ msgstr "Jatkuva tietovirta"
 
 #: modules/access/http/access.c:297
 msgid "Keep reading a resource that keeps being updated."
-msgstr ""
+msgstr "Jatka päivitettävän resurssin lukemista."
 
 #: modules/access/http/access.c:299
 msgid "Cookies forwarding"
-msgstr ""
+msgstr "Evästeiden edelleenlähetys"
 
 #: modules/access/http/access.c:300
 msgid "Forward cookies across HTTP redirections."
-msgstr ""
+msgstr "Välitä evästeet HTTP-uudelleenohjauksen kautta."
 
 #: modules/access/http/access.c:301
 msgid "Referrer"
-msgstr ""
+msgstr "Lähettävä"
 
 #: modules/access/http/access.c:302
 msgid "Provide the referral URL, i.e. HTTP \"Referer\" (sic)."
-msgstr ""
+msgstr "Anna lähettävä URL-osoite eli HTTP \"Referer\" (sic)."
 
 #: modules/access/http/access.c:306
 msgid "User agent"
-msgstr ""
+msgstr "Ohjelma"
 
 #: modules/access/http/access.c:307
 msgid ""
@@ -7699,6 +7718,9 @@ msgid ""
 "server, i.e. the HTTP \"User-Agent\". Name and version must be separated by "
 "a forward slash, e.g. \"FooBar/1.2.3\"."
 msgstr ""
+"Ohita HTTP-palvelimelle annettu ohjelman nimi ja versio eli HTTP \"sovellus"
+"\". Nimi ja versio on erotettava toisistaan vinoviivalla, esimerkki "
+"\"FooBar/1.2.3\"."
 
 #: modules/access/idummy.c:41 modules/access_output/dummy.c:44
 #: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
@@ -7852,11 +7874,11 @@ msgstr "Muistilähde"
 
 #: modules/access/imem-access.c:159
 msgid "Memory stream"
-msgstr ""
+msgstr "Muistivirta"
 
 #: modules/access/imem-access.c:160
 msgid "In-memory stream input"
-msgstr ""
+msgstr "Muistivirran sisääntulo"
 
 #: modules/access/jack.c:59
 msgid "Pace"
@@ -8008,6 +8030,8 @@ msgid ""
 "RTSP start frame buffer size of the video track, can be increased in case of "
 "broken pictures due to too small buffer."
 msgstr ""
+"RTSP:n ikkunoinnin puskurin koko. Videoraitaa voidaan suurentaa, mutta kuvat "
+"voivat rikkoutua liian pienen puskurin vuoksi."
 
 #: modules/access/live555.cpp:97
 msgid "RTP/RTSP/SDP demuxer (using Live555)"
@@ -8119,13 +8143,15 @@ msgstr "VLC ei voinut lukea tiedostoa: %s"
 
 #: modules/access/nfs.c:49
 msgid "Set NFS uid/guid automatically"
-msgstr ""
+msgstr "Aseta NFS uid/guid automaattisesti"
 
 #: modules/access/nfs.c:50
 msgid ""
 "If uid/gid are not specified in the url, VLC will automatically set a uid/"
 "gid."
 msgstr ""
+"Jos verkko-osoitteessa ei ole määritetty uid/gid-arvoa, VLC asettaa uid/gid-"
+"arvon automaattisesti."
 
 #: modules/access/nfs.c:57
 msgid "NFS"
@@ -8133,11 +8159,11 @@ msgstr "NFS"
 
 #: modules/access/nfs.c:58
 msgid "NFS input"
-msgstr ""
+msgstr "NFS sisääntulo"
 
 #: modules/access/nfs.c:114
 msgid "NFS operation failed"
-msgstr ""
+msgstr "NFS-toiminto epäonnistui"
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -8217,6 +8243,8 @@ msgid ""
 "RTP packets will be authenticated and deciphered with this Secure RTP master "
 "shared secret key. This must be a 32-character-long hexadecimal string."
 msgstr ""
+"RTP-paketit todennetaan ja tulkitaan tällä suojatulla RTP-pääavaimella. "
+"Tämän on oltava 32 merkiä pitkä heksadesimaalinen merkkijono."
 
 #: modules/access/rtp/rtp.c:55 modules/stream_out/rtp.c:150
 msgid "SRTP salt (hexadecimal)"
@@ -8227,6 +8255,8 @@ msgid ""
 "Secure RTP requires a (non-secret) master salt value. This must be a 28-"
 "character-long hexadecimal string."
 msgstr ""
+"Suojattu RTP vaatii (salaamattoman) arvon. Tämän on oltava 28 merkkiä pitkä "
+"heksadesimaalinen merkkijono."
 
 #: modules/access/rtp/rtp.c:60
 msgid "Maximum RTP sources"
@@ -8336,11 +8366,11 @@ msgstr "UDP-vastaanottopuskurin koko (tavuina)"
 
 #: modules/access/satip.c:63
 msgid "Request multicast stream"
-msgstr ""
+msgstr "Pyydä suoratoistoa ryhmälähetyksenä"
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
-msgstr ""
+msgstr "Pyydä palvelinta lähettämään suoratoistoa ryhmälähetyksenä"
 
 #: modules/access/satip.c:66 modules/lua/vlc.c:62
 #: share/lua/http/dialogs/stream_config_window.html:28
@@ -8350,7 +8380,7 @@ msgstr "Isäntä"
 
 #: modules/access/satip.c:70
 msgid "SAT>IP Receiver Plugin"
-msgstr ""
+msgstr "SAT>IP-vastaanottimen laajennus"
 
 #: modules/access/screen/screen.c:45
 #: modules/gui/qt/components/open_panels.cpp:1109
@@ -8384,7 +8414,7 @@ msgstr "Alueen vasen sarake"
 
 #: modules/access/screen/screen.c:61 modules/access/screen/xcb.c:45
 msgid "Abscissa of the capture region in pixels."
-msgstr ""
+msgstr "Kaapattavan alueen X-koordinaatti pikseleinä."
 
 #: modules/access/screen/screen.c:63 modules/access/screen/xcb.c:51
 msgid "Capture region width"
@@ -8420,7 +8450,7 @@ msgstr "Näyttö-ID"
 
 #: modules/access/screen/screen.c:82
 msgid "Display ID. If not specified, main display ID is used."
-msgstr ""
+msgstr "Näytön tunnus. Jos sitä ei määritetä, käytetään päänäytön tunnusta."
 
 #: modules/access/screen/screen.c:83
 msgid "Screen index"
@@ -8596,6 +8626,8 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+"Tietokone (%s), johon yrität muodostaa yhteyden, vaatii todennuksen. Anna "
+"käyttäjätunnus (mieluiten muodossa DOMAIN;username) ja salasana."
 
 #: modules/access/srt.c:386 modules/access_output/srt.c:436
 msgid "SRT"
@@ -8603,19 +8635,19 @@ msgstr "SRT"
 
 #: modules/access/srt.c:387
 msgid "SRT input"
-msgstr ""
+msgstr "SRT sisääntulo"
 
 #: modules/access/srt.c:392 modules/access_output/srt.c:442
 msgid "SRT chunk size (bytes)"
-msgstr ""
+msgstr "SRT-lohkon koko (tavuina)"
 
 #: modules/access/srt.c:394 modules/access_output/srt.c:444
 msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
-msgstr ""
+msgstr "Palaa kyselyyn, odotettua aikakatkaisua millisekunteina (-1 = ääretön)"
 
 #: modules/access/srt.c:395 modules/access_output/srt.c:445
 msgid "SRT latency (ms)"
-msgstr ""
+msgstr "SRT-viive (ms)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -8631,11 +8663,11 @@ msgstr "Aikakoodi"
 
 #: modules/access/timecode.c:43
 msgid "Time code subpicture elementary stream generator"
-msgstr ""
+msgstr "Aikakoodi tekstitysalueen virtauksen tuottoon"
 
 #: modules/access/udp.c:61
 msgid "UDP Source timeout (sec)"
-msgstr ""
+msgstr "UDP-lähteen aikakatkaisu (s)"
 
 #: modules/access/udp.c:64
 msgid "UDP"
@@ -8664,6 +8696,8 @@ msgstr "VBI-kaappauslaite"
 #: modules/access/v4l2/v4l2.c:48
 msgid "The device node where VBI data can be read (for closed captions)."
 msgstr ""
+"Laitteen solmukohta jossa VBI-dataa voidaan lukea (suljetuille "
+"tekstityksille)."
 
 #: modules/access/v4l2/v4l2.c:50 modules/stream_out/standard.c:92
 msgid "Standard"
@@ -8680,6 +8714,10 @@ msgid ""
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
 "I420, I411, I410, MJPG"
 msgstr ""
+"Pakota videolaite Video4Linux2 käyttämään tietyä väriformaattia (esim. I420 "
+"tai I422 raakakuville, MJPG pakatuun M-JPEG-sisääntuloon). Täydellinen "
+"lista: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
+"I420, I411, I410, MJPG"
 
 #: modules/access/v4l2/v4l2.c:61
 msgid "Input of the card to use (see debug)."
@@ -8719,7 +8757,7 @@ msgstr "Taajuus"
 
 #: modules/access/v4l2/v4l2.c:77
 msgid "Tuner frequency in Hz or kHz (see debug output)."
-msgstr ""
+msgstr "Virittimen taajuus, Hz tai kHz (ks. debug-viestit)."
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
@@ -9051,6 +9089,10 @@ msgid ""
 "audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
 "(-vv) or use the v4l2-ctl application."
 msgstr ""
+"Aseta v4l2-ajurin ohjaimet määritettyihin arvoihin. Arvot annetaan pilkuilla "
+"erotettuna listana, jonka saa valinnaisesti ympäröidä aaltosuluilla (esim. "
+"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). Luettelo käytettävissä "
+"olevista ohjausobjekteista, lisää (-vv) tai käytä v4l2-ctl-sovellusta."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:429
@@ -9190,7 +9232,7 @@ msgstr "X.509-varmenteiden myöntäjä"
 
 #: modules/access/vnc.c:49
 msgid "Certificate of the Authority to verify server's against"
-msgstr ""
+msgstr "Viranomaisen varmenne palvelimen todentamiseksi"
 
 #: modules/access/vnc.c:50
 msgid "X.509 Certificate Revocation List"
@@ -9214,7 +9256,7 @@ msgstr "X.509-asiakkaan private key"
 
 #: modules/access/vnc.c:55
 msgid "Private key for authentication by certificate"
-msgstr ""
+msgstr "Henkilökohtainen avain varmenteen todentamiseen"
 
 #: modules/access/vnc.c:58
 msgid "RGB chroma (RV32, RV24, RV16, RGB2)"
@@ -9226,7 +9268,7 @@ msgstr "Pakkauksen taso"
 
 #: modules/access/vnc.c:62
 msgid "Transfer compression level from 0 (none) to 9 (max)"
-msgstr ""
+msgstr "Muunna pakkaustasoon 0 (ei mitään) 9 (maksimi)"
 
 #: modules/access/vnc.c:63
 msgid "Image quality"
@@ -9246,11 +9288,11 @@ msgstr "VNC-asiakasohjelman yhteys"
 
 #: modules/access/wasapi.c:485
 msgid "Loopback mode"
-msgstr ""
+msgstr "Silmukka"
 
 #: modules/access/wasapi.c:486
 msgid "Record an audio rendering endpoint."
-msgstr ""
+msgstr "Tallenna äänen renderöinti loppuun asti."
 
 #: modules/access/wasapi.c:489
 msgid "WASAPI"
@@ -9277,6 +9319,8 @@ msgid ""
 "The output file already exists. If recording continues, the file will be "
 "overridden and its content will be lost."
 msgstr ""
+"Tiedosto on jo olemassa. Jos tallennus jatkuu, tiedosto ylikirjoitetaan ja "
+"sen sisältö menetetään."
 
 #: modules/access_output/file.c:374
 msgid "Overwrite existing file"
@@ -9318,7 +9362,7 @@ msgstr "Tiedostokäyttölähtö"
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
 msgid "Username that will be requested to access the stream."
-msgstr ""
+msgstr "Käyttäjätunnus, jota pyydetään striimin käyttämiseen."
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -9384,6 +9428,8 @@ msgstr "Salli välimuisti"
 #: modules/access_output/livehttp.c:78
 msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
 msgstr ""
+"Lisää EXT-X-ALLOW-CACHE:NO toimintaohjeeksi soittolistan tiedostoon, jos "
+"tämä ei ole käytössä"
 
 #: modules/access_output/livehttp.c:80
 msgid "Index file"
@@ -9429,7 +9475,7 @@ msgstr "Tiedosto joka sisältää 16-bittisen salausavaimen"
 
 #: modules/access_output/livehttp.c:97
 msgid "File where vlc reads key-uri and keyfile-location"
-msgstr ""
+msgstr "Tiedosto, josta vlc lukee key-uri ja keyfile sijainnin"
 
 #: modules/access_output/livehttp.c:98
 msgid ""
@@ -9437,14 +9483,18 @@ msgid ""
 "\\nkey-file. File is read on the segment opening and values are used on that "
 "segment."
 msgstr ""
+"Tiedosto luetaan kun segmentti alkaa ja sen oletetaan olevan muodossa: key-"
+"uri key-file.\n"
+"Tiedosto luetaan segmentin avauksessa ja arvoja käytetään kyseisessä "
+"segmentissä."
 
 #: modules/access_output/livehttp.c:102
 msgid "Use randomized IV for encryption"
-msgstr ""
+msgstr "Käytä satunnaista IV-salausta"
 
 #: modules/access_output/livehttp.c:103
 msgid "Generate IV instead using segment-number as IV"
-msgstr ""
+msgstr "Tuota IV vaihtoehtoisesti käyttäen segmentin numeroa IV:nä"
 
 #: modules/access_output/livehttp.c:105
 msgid "Number of first segment"
@@ -9452,7 +9502,7 @@ msgstr "Ensimmäisen segmentin numero"
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
-msgstr ""
+msgstr "Ensimmäisen segmentin numero luotu"
 
 #: modules/access_output/livehttp.c:109
 msgid "HTTP Live streaming output"
@@ -9504,7 +9554,7 @@ msgstr "Tyylilaji"
 
 #: modules/access_output/shout.c:83
 msgid "Genre of the content."
-msgstr ""
+msgstr "Sisällön musiikin tyylilaji."
 
 #: modules/access_output/shout.c:85
 msgid "URL description"
@@ -9513,14 +9563,15 @@ msgstr "Kuvaus-URL"
 #: modules/access_output/shout.c:86
 msgid "URL with information about the stream or your channel."
 msgstr ""
+"Verkko-osoite, josta löytyy tietoa tästä suoratoistostasi tai kanavastasi. "
 
 #: modules/access_output/shout.c:93
 msgid "Bitrate information of the transcoded stream."
-msgstr ""
+msgstr "Transkoodatun suoratoiston bittinopeuden tiedot. "
 
 #: modules/access_output/shout.c:96
 msgid "Samplerate information of the transcoded stream."
-msgstr ""
+msgstr "Transkoodatun suoratoiston näytteenottotaajuuden tiedot. "
 
 #: modules/access_output/shout.c:98
 msgid "Number of channels"
@@ -9528,7 +9579,7 @@ msgstr "Kanavien määrä"
 
 #: modules/access_output/shout.c:99
 msgid "Number of channels information of the transcoded stream."
-msgstr ""
+msgstr "Transkoodatun suoratoiston tiedot kanavien määrästä."
 
 #: modules/access_output/shout.c:101
 msgid "Ogg Vorbis Quality"
@@ -9536,7 +9587,7 @@ msgstr "Ogg Vorbiksen laatu"
 
 #: modules/access_output/shout.c:102
 msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr ""
+msgstr "Transkoodatun suoratoiston tiedot Ogg Vorbis -laadusta."
 
 #: modules/access_output/shout.c:104
 msgid "Stream public"
@@ -9558,7 +9609,7 @@ msgstr "IceCAST-lähtö"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Salausavaimen pituus tavuina"
 
 #: modules/access_output/srt.c:57
 msgid "16 bytes"
@@ -9625,7 +9676,7 @@ msgstr "ARM NEON video chroma YUV->RGBA"
 
 #: modules/audio_filter/audiobargraph_a.c:39
 msgid "Defines if BarGraph information should be sent"
-msgstr ""
+msgstr "Määrittää, lähetetäänkö pylväsdiagrammin tiedot"
 
 #: modules/audio_filter/audiobargraph_a.c:40
 msgid ""
@@ -9636,7 +9687,7 @@ msgstr ""
 
 #: modules/audio_filter/audiobargraph_a.c:42
 msgid "Sends the barGraph information every n audio packets"
-msgstr ""
+msgstr "Lähettää pylväsdiagrammin tiedot joka äänipaketin välein"
 
 #: modules/audio_filter/audiobargraph_a.c:43
 msgid ""
@@ -9648,7 +9699,7 @@ msgstr ""
 
 #: modules/audio_filter/audiobargraph_a.c:45
 msgid "Defines if silence alarm information should be sent"
-msgstr ""
+msgstr "Määrittää, lähetetäänkö hälytystieto hiljaisuudesta"
 
 #: modules/audio_filter/audiobargraph_a.c:46
 msgid ""
@@ -9706,11 +9757,11 @@ msgstr "Audio Bar Graph Audio"
 
 #: modules/audio_filter/channel_mixer/dolby.c:50
 msgid "Simple decoder for Dolby Surround encoded streams"
-msgstr "Yksinkertainen purkaja Dolby Surround -signaalille"
+msgstr "Yksinkertainen purkukooderi Dolby Surround singnaalille"
 
 #: modules/audio_filter/channel_mixer/dolby.c:51
 msgid "Dolby Surround decoder"
-msgstr "Dolby Surround -purkaja"
+msgstr "Dolby Surround purkukooderi"
 
 #: modules/audio_filter/channel_mixer/headphone.c:53
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:247
@@ -9788,7 +9839,7 @@ msgstr "Valitse pidettävä kanava"
 
 #: modules/audio_filter/channel_mixer/mono.c:84
 msgid "This option silences all other channels except the selected channel."
-msgstr ""
+msgstr "Tämä asetus hiljentää kaikki muut kanavat paitsi valitun kanavan."
 
 #: modules/audio_filter/channel_mixer/mono.c:90
 #: modules/audio_filter/channel_mixer/remap.c:62
@@ -9834,27 +9885,28 @@ msgstr "Äänisuodin: yksinkertainen kanavamikseri"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:50
 msgid "HRTF file for the binauralization"
-msgstr ""
+msgstr "HRTF-tiedosto annalta kuulemista binauralisointia varten"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:51
 msgid "Custom HRTF (Head-related transfer function) file in the SOFA format."
 msgstr ""
+"Mukautettu HRTF (Head-related transfer function) tiedosto SOFA-muodossa."
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:54
 msgid "Headphones mode (binaural)"
-msgstr ""
+msgstr "Kuulokkeiden tila (tilaääni)"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
-msgstr ""
+msgstr "Jos lähtö on stereo, tee Ambisonic tilaääni purkukooderilla."
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:65
 msgid "Ambisonics renderer and binauralizer"
-msgstr ""
+msgstr "Ambisonics renderöinti ja tilaääni"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:77
 msgid "Binauralizer"
-msgstr ""
+msgstr "Tilaääni"
 
 #: modules/audio_filter/channel_mixer/trivial.c:42
 msgid "Audio filter for trivial channel mixing"
@@ -9909,7 +9961,7 @@ msgstr ""
 #: modules/audio_filter/stereo_widen.c:60
 #: modules/gui/qt/components/extended_panels.cpp:1338
 msgid "Feedback gain"
-msgstr ""
+msgstr "Palautteen saaminen"
 
 #: modules/audio_filter/chorus_flanger.c:89
 msgid "Gain on Feedback loop"
@@ -9939,7 +9991,7 @@ msgstr "RMS/huippu"
 
 #: modules/audio_filter/compressor.c:156
 msgid "Set the RMS/peak."
-msgstr ""
+msgstr "Aseta RMS/huippu."
 
 #: modules/audio_filter/compressor.c:158
 msgid "Attack time"
@@ -9947,7 +9999,7 @@ msgstr "Attack-aika"
 
 #: modules/audio_filter/compressor.c:159
 msgid "Set the attack time in milliseconds."
-msgstr ""
+msgstr "Aseta iskuaika millisekuntiksi."
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
@@ -9955,7 +10007,7 @@ msgstr "Release-aika"
 
 #: modules/audio_filter/compressor.c:162
 msgid "Set the release time in milliseconds."
-msgstr ""
+msgstr "Aseta vapautusaika millisekuntiksi."
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
@@ -9963,7 +10015,7 @@ msgstr "Kynnystaso"
 
 #: modules/audio_filter/compressor.c:165
 msgid "Set the threshold level in dB."
-msgstr ""
+msgstr "Aseta kynnystaso desibeleinä."
 
 #: modules/audio_filter/compressor.c:167
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
@@ -9973,21 +10025,21 @@ msgstr "Suhdeluku"
 
 #: modules/audio_filter/compressor.c:168
 msgid "Set the ratio (n:1)."
-msgstr ""
+msgstr "Aseta suhde (n:1)."
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:230
 msgid "Knee radius"
-msgstr ""
+msgstr "Knee säde"
 
 #: modules/audio_filter/compressor.c:171
 msgid "Set the knee radius in dB."
-msgstr ""
+msgstr "Aseta knee säde desibeleinä."
 
 #: modules/audio_filter/compressor.c:173
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:231
 msgid "Makeup gain"
-msgstr ""
+msgstr "Tason vahvistus"
 
 #: modules/audio_filter/compressor.c:174
 msgid "Set the makeup gain in dB (0 ... 24)."
@@ -10009,7 +10061,7 @@ msgstr "PCM-muunnoksen äänisuodin"
 
 #: modules/audio_filter/converter/tospdif.c:49
 msgid "Audio filter for A/52/DTS->S/PDIF encapsulation"
-msgstr ""
+msgstr "Äänisuodatin A/52/DTS->S/PDIF-kapselointiin"
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
@@ -10155,7 +10207,7 @@ msgstr "Gain-kerroin"
 
 #: modules/audio_filter/gain.c:59
 msgid "Increase or decrease the gain (default 1.0)"
-msgstr ""
+msgstr "Lisää tai vähennä vahvistusta (oletus 1.0)"
 
 #: modules/audio_filter/gain.c:63
 msgid "Gain control filter"
@@ -10273,11 +10325,11 @@ msgstr "Uudelleennäytteistyksen laatu"
 #: modules/audio_filter/resampler/soxr.c:41
 #: modules/audio_filter/resampler/speex.c:35
 msgid "Resampling quality, from worst to best"
-msgstr ""
+msgstr "Samplerin laatu pahimmasta parhaaseen"
 
 #: modules/audio_filter/resampler/soxr.c:67
 msgid "SoX Resampler"
-msgstr ""
+msgstr "SoX sampleri"
 
 #: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
@@ -10293,22 +10345,24 @@ msgid ""
 "Different resampling algorithms are supported. The best one is slower, while "
 "the fast one exhibits low quality."
 msgstr ""
+"Erilaisia sampleri-algoritmeja tuetaan. Paras on hitaampi, kun taas nopealla "
+"heikko laatu."
 
 #: modules/audio_filter/resampler/src.c:49
 msgid "Sinc function (best quality)"
-msgstr ""
+msgstr "Sinc-toiminto (paras laatu)"
 
 #: modules/audio_filter/resampler/src.c:49
 msgid "Sinc function (medium quality)"
-msgstr ""
+msgstr "Sinc-toiminto (laatu keskitaso)"
 
 #: modules/audio_filter/resampler/src.c:50
 msgid "Sinc function (fast)"
-msgstr ""
+msgstr "Sinc-toiminto (nopea)"
 
 #: modules/audio_filter/resampler/src.c:50
 msgid "Zero Order Hold (fastest)"
-msgstr ""
+msgstr "Nollataso (nopein)"
 
 #: modules/audio_filter/resampler/src.c:50
 msgid "Linear (fastest)"
@@ -10328,11 +10382,11 @@ msgstr "Lähin naapuri -uudelleennäytteistäjä (huono laatu)"
 
 #: modules/audio_filter/scaletempo.c:52
 msgid "Pitch Shifter"
-msgstr ""
+msgstr "Sävelkorkeuden vaihto"
 
 #: modules/audio_filter/scaletempo.c:53
 msgid "Audio pitch changer"
-msgstr ""
+msgstr "Sävelkorkeuden vaihtaja"
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:263
@@ -10371,11 +10425,11 @@ msgstr ""
 
 #: modules/audio_filter/scaletempo.c:74
 msgid "Pitch Shift"
-msgstr ""
+msgstr "Sävelkorkeuden muutos"
 
 #: modules/audio_filter/scaletempo.c:74
 msgid "Pitch shift in semitones."
-msgstr ""
+msgstr "Sävelkorkeuden muutos puolisävelet."
 
 #: modules/audio_filter/spatializer/spatializer.cpp:54
 msgid "Room size"
@@ -10430,10 +10484,14 @@ msgid ""
 "both channels) and by delaying the signal of left into right and vice versa, "
 "thereby widening the stereo effect."
 msgstr ""
+"Tämä suodatin parantaa stereovaikutusta vaimentamalla monoa (molemmille "
+"kanaville yhteinen signaali) ja viivästyttämällä vasenta signaalia oikealle "
+"ja päinvastoin, mikä laajentaa stereovaikutusta."
 
 #: modules/audio_filter/stereo_widen.c:58
 msgid "Time in ms of the delay of left signal into right and vice versa."
 msgstr ""
+"Aika millisekunteina vasemman signaalin viiveestä oikealle ja päinvastoin."
 
 #: modules/audio_filter/stereo_widen.c:61
 msgid ""
@@ -10441,11 +10499,14 @@ msgid ""
 "delay effect of left signal in right output and vice versa which gives "
 "widening effect."
 msgstr ""
+"Viivästetty vasemman signaalin vahvistuksen määrä oikealle ja päinvastoin. "
+"Antaa viiveen vasemman signaalin oikeassa ulostulossa ja päinvastoin, mikä "
+"antaa laajentavan vaikutuksen. "
 
 #: modules/audio_filter/stereo_widen.c:64
 #: modules/gui/qt/components/extended_panels.cpp:1339
 msgid "Crossfeed"
-msgstr ""
+msgstr "Ristisyöttö"
 
 #: modules/audio_filter/stereo_widen.c:65
 msgid ""
@@ -10453,6 +10514,9 @@ msgid ""
 "the mono. If the value is 1 it will cancel all the signal common to both "
 "channels."
 msgstr ""
+"Ristisyöttö vasemmalta oikealle käänteisvaiheella. Tämä auttaa vähentämään "
+"monoääntä. Jos arvo on 1, se peruuttaa kaikki yhteiset signaalit molemmille "
+"kanaville."
 
 #: modules/audio_filter/stereo_widen.c:68
 #: modules/gui/qt/components/extended_panels.cpp:1340
@@ -10474,11 +10538,11 @@ msgstr "Yksinkertainen stereon laajennusefekti"
 
 #: modules/audio_mixer/float.c:49
 msgid "Single precision audio volume"
-msgstr ""
+msgstr "Yksi tarkka äänenvoimakkuus"
 
 #: modules/audio_mixer/integer.c:38
 msgid "Integer audio volume"
-msgstr ""
+msgstr "Kokonaisluku äänenvoimakkuutta"
 
 #: modules/audio_output/adummy.c:37
 msgid "Dummy audio output"
@@ -10502,6 +10566,9 @@ msgid ""
 "output, it will be down-mixed. This parameter is ignored when digital pass-"
 "through is active."
 msgstr ""
+"Äänen ulostuloa varten käytettävissä olevat kanavat. Jos sisääntulossa on "
+"enemmän kanavia kuin ulostulossa, se sekoitetaan alaspäin. Tätä parametria "
+"ei oteta huomioon, kun digitaalinen läpivienti on aktiivinen."
 
 #: modules/audio_output/alsa.c:76
 msgid "Surround 4.0"
@@ -10578,6 +10645,9 @@ msgid ""
 "You should configure your speaker layout with \"Audio Midi Setup\" in /"
 "Applications/Utilities. VLC will output Stereo only."
 msgstr ""
+"Sinun tulisi määrittää kaiuttimien asettelu \"Ääni Midi Asennus\" -"
+"toiminnolla kohdassa / Apuohjelmat / Työkalut. VLC tuottaa vain stereot "
+"ulostuloa."
 
 #: modules/audio_output/auhal.c:1186
 msgid ""
@@ -10643,7 +10713,7 @@ msgstr "Kohdetiedosto"
 
 #: modules/audio_output/file.c:109
 msgid "File to which the audio samples will be written to (\"-\" for stdout)."
-msgstr ""
+msgstr "Tiedosto, johon ääninäytteet kirjoitetaan. (\"-\" = vakiona)"
 
 #: modules/audio_output/file.c:112
 msgid "File audio output"
@@ -10675,7 +10745,7 @@ msgstr ""
 
 #: modules/audio_output/jack.c:94
 msgid "JACK client name"
-msgstr ""
+msgstr "JACK ohjelman nimi"
 
 #: modules/audio_output/jack.c:101
 msgid "JACK audio output"
@@ -10707,13 +10777,15 @@ msgstr "K Audio Interface -äänilähtö"
 
 #: modules/audio_output/mmdevice.c:1452 modules/gui/qt/ui/sprefs_audio.h:418
 msgid "HDMI/SPDIF audio passthrough"
-msgstr ""
+msgstr "HDMI/SPDIF-äänen läpivienti"
 
 #: modules/audio_output/mmdevice.c:1454
 msgid ""
 "Change this value if you have issue with HD codecs when using a HDMI "
 "receiver."
 msgstr ""
+"Muuta tätä arvoa, jos sinulla on ongelmia HDMI:tä käytettäessä HD-koodekkien "
+"kanssa."
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Disabled"
@@ -10721,7 +10793,7 @@ msgstr "Poistettu käytöstä"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Käytössä (vain AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1463
 msgid "Enabled"
@@ -10729,15 +10801,15 @@ msgstr "Käytössä"
 
 #: modules/audio_output/mmdevice.c:1474
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "Windowsin multimedialaitteen ulostulo"
 
 #: modules/audio_output/mmdevice.c:1480
 msgid "Output back-end"
-msgstr ""
+msgstr "Ulostulon taustaohjelma"
 
 #: modules/audio_output/mmdevice.c:1480
 msgid "Audio output back-end interface."
-msgstr ""
+msgstr "Äänen ulostulon taustaohjelman liittymä"
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -10818,27 +10890,27 @@ msgstr ""
 
 #: modules/codec/a52.c:80
 msgid "ATSC A/52 (AC-3) audio decoder"
-msgstr "ATSC A/52 (AC-3) -äänenpurkaja"
+msgstr "ATSC A/52 (AC-3) purkukooderi"
 
 #: modules/codec/adpcm.c:48
 msgid "ADPCM audio decoder"
-msgstr "ADPCM-äänen purkaja"
+msgstr "ADPCM-äänen purkukooderi"
 
 #: modules/codec/aes3.c:47
 msgid "AES3/SMPTE 302M audio decoder"
-msgstr "AES3/SMPTE 302M -äänen purkaja"
+msgstr "AES3/SMPTE 302M-äänen purkukooderi"
 
 #: modules/codec/aes3.c:52
 msgid "AES3/SMPTE 302M audio packetizer"
-msgstr "AES3/SMPTE 302M -äänen paketoija"
+msgstr "AES3/SMPTE 302M -äänen pakkaaja"
 
 #: modules/codec/aom.c:52
 msgid "AOM video decoder"
-msgstr ""
+msgstr "AOM-videon purkukooderi"
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
-msgstr "Raw/Log-äänen purkaja"
+msgstr "Raw/Log-äänen purkukooderi"
 
 #: modules/codec/araw.c:60
 msgid "Raw audio encoder"
@@ -10846,44 +10918,44 @@ msgstr "Raakaäänen pakkaaja"
 
 #: modules/codec/audiotoolbox_midi.c:47 modules/codec/fluidsynth.c:47
 msgid "SoundFont file"
-msgstr ""
+msgstr "SoundFont-tiedosto"
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
 msgid "SoundFont file to use for software synthesis."
-msgstr ""
+msgstr "SoundFont-tiedosto, ohjelmallista syntetisointia varten."
 
 #: modules/codec/audiotoolbox_midi.c:57
 msgid "AudioToolbox MIDI synthesizer"
-msgstr ""
+msgstr "AudioToolbox MIDI-syntetisaattori"
 
 #: modules/codec/audiotoolbox_midi.c:59
 msgid "AUMIDI"
-msgstr ""
+msgstr "AUMIDI"
 
 #: modules/codec/arib/aribsub.c:46
 msgid "Ignore ruby (furigana)"
-msgstr ""
+msgstr "Ohita ruby (furigana)"
 
 #: modules/codec/arib/aribsub.c:47
 msgid "Ignore ruby (furigana) in the subtitle."
-msgstr ""
+msgstr "Ohita ruby (furigana) tekstityksessä."
 
 #: modules/codec/arib/aribsub.c:48
 msgid "Use Core Text renderer"
-msgstr ""
+msgstr "Käytä prosessoria tekstin renderöintiin"
 
 #: modules/codec/arib/aribsub.c:49
 msgid "Use Core Text renderer in the subtitle."
-msgstr ""
+msgstr "Käytä prosessoria tekstityksen renderöintiin."
 
 #: modules/codec/arib/aribsub.c:53
 msgid "ARIB subtitles decoder"
-msgstr ""
+msgstr "ARIB-tekstityksen purkukooderi"
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
 #: modules/demux/mpeg/ts_psi.c:1092
 msgid "ARIB subtitles"
-msgstr ""
+msgstr "ARIB tekstitys"
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-ref"
@@ -10921,7 +10993,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:80
 msgid "FFmpeg audio/video decoder"
-msgstr "FFmpeg ääni- ja videopurkaja"
+msgstr "FFmpeg ääni/video purkukooderi"
 
 #: modules/codec/avcodec/avcodec.c:82 modules/codec/gstreamer/gstdecode.c:96
 #: modules/codec/omxil/mediacodec.c:185 modules/codec/omxil/omxil.c:148
@@ -10940,15 +11012,15 @@ msgstr "FFmpeg ääni- ja videopakkaaja"
 
 #: modules/codec/avcodec/avcodec.h:56
 msgid "Direct rendering"
-msgstr "Suorarenderöinti (direct rendering)"
+msgstr "Suorapiirto"
 
 #: modules/codec/avcodec/avcodec.h:59
 msgid "Show corrupted frames"
-msgstr ""
+msgstr "Näytä vioittuneet kuvat"
 
 #: modules/codec/avcodec/avcodec.h:60
 msgid "Prefer visual artifacts instead of missing frames"
-msgstr ""
+msgstr "Suosi visuaalisia esineitä puuttuvien kuvien sijaan"
 
 #: modules/codec/avcodec/avcodec.h:62
 msgid "Error resilience"
@@ -11000,8 +11072,8 @@ msgid ""
 "The decoder can partially decode or skip frame(s) when there is not enough "
 "time. It's useful with low CPU power but it can produce distorted pictures."
 msgstr ""
-"Kun aika ei riitä, purkaja voi purkaa ruutuja vain osittain tai ohittaa "
-"niitä. Tämä on hyödyllistä, jos suorittimen laskentateho ei muuten riitä, "
+"Kun aika ei riitä, purkukooderi voi purkaa ruutuja vain osittain tai ohittaa "
+"niitä. Tästä on apua, jos suorittimen laskentateho ei muuten riittäisi, "
 "mutta voi aiheuttaa virheitä videokuvaan."
 
 #: modules/codec/avcodec/avcodec.h:88
@@ -11069,11 +11141,11 @@ msgstr ""
 #: modules/codec/avcodec/avcodec.h:113
 #: modules/gui/macosx/VLCSimplePrefsController.m:303
 msgid "Hardware decoding"
-msgstr "Laitteistopurku"
+msgstr "Laitepohjainen purku"
 
 #: modules/codec/avcodec/avcodec.h:114
 msgid "This allows hardware decoding when available."
-msgstr "Tämä sallii laitteistopurun, jos käytettävissä."
+msgstr "Tämä sallii laitepohjaisen purkamisen, jos saatavilla."
 
 #: modules/codec/avcodec/avcodec.h:116
 msgid "Threads"
@@ -11194,7 +11266,7 @@ msgid ""
 msgstr ""
 "Käytä MPEG4-kvantisointimatriisia MPEG2-pakkaukseen. Tämä yleensä antaa "
 "paremman näköisen kuvan, säilyttäen samalla yhteensopivuuden standardien "
-"MPEG2-purkajien kanssa."
+"MPEG2-purkukooderin kanssa."
 
 #: modules/codec/avcodec/avcodec.h:172 modules/codec/jpeg.c:51
 msgid "Quality level"
@@ -11385,7 +11457,7 @@ msgstr "VLC ei voinut avata %4.4s %s pakkausohjelmaa."
 
 #: modules/codec/avcodec/vaapi.c:352
 msgid "VA-API video decoder via DRM"
-msgstr "VA-API-videodekooderi DRM:n kautta"
+msgstr "VA-API videon purkukooderi DRM:n kautta"
 
 #: modules/codec/avcodec/vaapi.c:357
 msgid "VA-API video decoder"
@@ -11403,7 +11475,7 @@ msgstr "Läpinäkyvyys"
 
 #: modules/codec/cc.c:52 modules/codec/zvbi.c:66
 msgid "Setting to true makes the text to be boxed and maybe easier to read."
-msgstr ""
+msgstr "Asetuksella tosi, teksti on kehystetty ja ehkä helpompi lukea."
 
 #: modules/codec/cc.c:56
 msgid "CC 608/708"
@@ -11411,23 +11483,23 @@ msgstr "CC 608/708"
 
 #: modules/codec/cc.c:57
 msgid "Closed Captions decoder"
-msgstr "Closed Captions -purkaja"
+msgstr "Closed Captions purkukooderi"
 
 #: modules/codec/cdg.c:88
 msgid "CDG video decoder"
-msgstr "CDG-videopurkaja"
+msgstr "CDG videon purkukooderi"
 
 #: modules/codec/crystalhd.c:90
 msgid "Crystal HD hardware video decoder"
-msgstr "Crystal HD -rautapurku videolle"
+msgstr "Crystal HD laitepohjainen purkukooderi videolle"
 
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
-msgstr "CVD-tekstityksen purkaja"
+msgstr "CVD-tekstityksen purkukooderi"
 
 #: modules/codec/cvdsub.c:55
 msgid "Chaoji VCD subtitle packetizer"
-msgstr "Chaoji VCD -tekstityspaketoija"
+msgstr "Chaoji VCD tekstityksen pakkaaja"
 
 #: modules/codec/daala.c:109 modules/codec/speex.c:63
 #: modules/codec/theora.c:105 modules/codec/twolame.c:54
@@ -11437,15 +11509,15 @@ msgstr "Pakkauksen laatu"
 
 #: modules/codec/daala.c:111
 msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
-msgstr ""
+msgstr "Pakota laatu välillä 0 (häviötön) - 511 (huonoin)."
 
 #: modules/codec/daala.c:112
 msgid "Keyframe interval"
-msgstr ""
+msgstr "Avainkehyksen vaihtoväli"
 
 #: modules/codec/daala.c:114
 msgid "Enforce a keyframe interval between 1 and 1000."
-msgstr ""
+msgstr "Pakota avainkehyksen vaihtoväli välille 1–1000."
 
 #: modules/codec/daala.c:120
 msgid "Daala video decoder"
@@ -11453,11 +11525,11 @@ msgstr "Daala videon purkukooderi"
 
 #: modules/codec/daala.c:125
 msgid "Daala video packetizer"
-msgstr ""
+msgstr "Daala videon pakkaaja"
 
 #: modules/codec/daala.c:132
 msgid "Daala video encoder"
-msgstr ""
+msgstr "Daala videon kooderi"
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11475,7 +11547,7 @@ msgstr "DTS-dynamiikkakompressori"
 
 #: modules/codec/dca.c:73
 msgid "DTS Coherent Acoustics audio decoder"
-msgstr "DTS Coherent Acoustics -äänenpurkaja"
+msgstr "DTS Coherent Acoustics äänen purkukooderi"
 
 #: modules/codec/ddummy.c:36
 msgid "Save raw codec data"
@@ -11486,7 +11558,7 @@ msgid ""
 "Save the raw codec data if you have selected/forced the dummy decoder in the "
 "main options."
 msgstr ""
-"Tallenna raakakoodekkidata, jos olet valinnut tai pakottanut lumepurkajan "
+"Tallenna raw datana, jos olet valinnut tai pakottanut lumepurkajan "
 "pääasetuksissa."
 
 #: modules/codec/ddummy.c:47
@@ -11499,7 +11571,7 @@ msgstr "Vedospurkaja"
 
 #: modules/codec/dmo/dmo.c:91
 msgid "DirectMedia Object decoder"
-msgstr "DirectMedia Object -purkaja"
+msgstr "DirectMedia Object purkukooderi"
 
 #: modules/codec/dmo/dmo.c:105
 msgid "DirectMedia Object encoder"
@@ -11553,7 +11625,7 @@ msgstr "Pakatun tekstityksen Y-koordinaatti"
 
 #: modules/codec/dvbsub.c:121
 msgid "DVB subtitles decoder"
-msgstr "DVB-tekstityksen purkaja"
+msgstr "DVB-tekstityksen purkukooderi"
 
 #: modules/codec/dvbsub.c:122 modules/demux/mpeg/ts_psi.c:772
 #: modules/demux/mpeg/ts_psi.c:821
@@ -11570,7 +11642,7 @@ msgstr "Lumepakkaaja"
 
 #: modules/codec/faad.c:54
 msgid "AAC audio decoder (using libfaad2)"
-msgstr "AAC-äänen purkaja (käyttää libfaad2:ta)"
+msgstr "AAC-äänen purkukooderi (käyttää libfaad2:ta)"
 
 #: modules/codec/faad.c:434
 msgid "AAC extension"
@@ -11582,7 +11654,7 @@ msgstr "Enkooderin profiili"
 
 #: modules/codec/fdkaac.c:68
 msgid "Encoder Algorithm to use."
-msgstr ""
+msgstr "Käytettävä kooderin algoritmi."
 
 #: modules/codec/fdkaac.c:70
 msgid "Enable spectral band replication"
@@ -11590,7 +11662,7 @@ msgstr ""
 
 #: modules/codec/fdkaac.c:71
 msgid "This is an optional feature only for the AAC-ELD profile."
-msgstr ""
+msgstr "Tämä on valinnainen ominaisuus vain AAC-ELD-profiilille. "
 
 #: modules/codec/fdkaac.c:73
 msgid "VBR Quality"
@@ -11599,7 +11671,7 @@ msgstr "VBR:n laatu"
 #: modules/codec/fdkaac.c:74
 msgid ""
 "Quality of the VBR Encoding (0=cbr, 1-5 constant vbr quality, 5 is the best)."
-msgstr ""
+msgstr "Laatu VBR-koodaukseen (0=cbr, 1-5 jatkuva vbr-laatu, 5 on paras)."
 
 #: modules/codec/fdkaac.c:76
 msgid "Enable afterburner library"
@@ -11651,7 +11723,7 @@ msgstr "FDK-AAC Audio-enkooderi"
 
 #: modules/codec/flac.c:164
 msgid "Flac audio decoder"
-msgstr "Flac-äänenpurkaja"
+msgstr "Flac-äänen purkukooderi"
 
 #: modules/codec/flac.c:171
 msgid "Flac audio encoder"
@@ -11711,7 +11783,7 @@ msgstr ""
 
 #: modules/codec/g711.c:46
 msgid "G.711 decoder"
-msgstr "G.711-dekooderi"
+msgstr "G.711 purkukooderi"
 
 #: modules/codec/g711.c:54
 msgid "G.711 encoder"
@@ -11736,7 +11808,7 @@ msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:93
 msgid "GStreamer Based Decoder"
-msgstr "GStreamer-pohjainen dekooderi"
+msgstr "GStreamer-pohjainen purkukooderi"
 
 #: modules/codec/jpeg.c:52
 msgid ""
@@ -11745,7 +11817,7 @@ msgstr ""
 
 #: modules/codec/jpeg.c:111
 msgid "JPEG image decoder"
-msgstr "JPEG-kuvien dekooderi"
+msgstr "JPEG-kuvan purkukooderi"
 
 #: modules/codec/jpeg.c:120
 msgid "JPEG image encoder"
@@ -11993,7 +12065,7 @@ msgstr "Kate-koodekki"
 
 #: modules/codec/kate.c:269
 msgid "Kate overlay decoder"
-msgstr "Kate-ylipiirron purkaja"
+msgstr "Kate peittokuvan purkukooderi"
 
 #: modules/codec/kate.c:288
 msgid "Tiger rendering defaults"
@@ -12001,12 +12073,11 @@ msgstr "Tiger-renderöintioletukset"
 
 #: modules/codec/kate.c:323
 msgid "Kate text subtitles packetizer"
-msgstr "Kate-koodekin tekstityksen paketoija"
+msgstr "Kate tekstityksen pakkaaja"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "Transkoodauksen asetukset"
+msgstr ""
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -12031,15 +12102,15 @@ msgstr ""
 
 #: modules/codec/libmpeg2.c:137
 msgid "MPEG I/II video decoder (using libmpeg2)"
-msgstr "MPEG I/II -videopurkaja (käyttäen libmpeg2:ta)"
+msgstr "MPEG I/II videon purkukooderi (käyttää libmpeg2:ta)"
 
 #: modules/codec/lpcm.c:60
 msgid "Linear PCM audio decoder"
-msgstr "Raa'an PCM-äänen purkaja"
+msgstr "Raa'an PCM-äänen purkukooderi"
 
 #: modules/codec/lpcm.c:65
 msgid "Linear PCM audio packetizer"
-msgstr "Raa'an PCM-äänen paketoija"
+msgstr "Raa'an PCM-äänen pakkaaja"
 
 #: modules/codec/lpcm.c:71
 msgid "Linear PCM audio encoder"
@@ -12047,35 +12118,35 @@ msgstr "Raa'an PCM-äänen pakkaaja"
 
 #: modules/codec/mad.c:78
 msgid "MPEG audio layer I/II/III decoder"
-msgstr "MPEG-ääni layer I/II/III -purkaja"
+msgstr "MPEG audio layer I/II/III purkukooderi"
 
 #: modules/codec/mft.c:62
 msgid "Media Foundation Transform decoder"
-msgstr ""
+msgstr "Media Foundation Transform purkukooderi"
 
 #: modules/codec/mpg123.c:67
 msgid "MPEG audio decoder using mpg123"
-msgstr ""
+msgstr "MPEG äänen purkukooderi, käyttää mpg123:ta"
 
 #: modules/codec/oggspots.c:86
 msgid "OggSpots video decoder"
-msgstr ""
+msgstr "OggSpots videon purkukooderi"
 
 #: modules/codec/oggspots.c:92
 msgid "OggSpots video packetizer"
-msgstr ""
+msgstr "OggSpots videon pakkaaja"
 
 #: modules/codec/omxil/omxil.c:139
 msgid "OMX direct rendering"
-msgstr ""
+msgstr "OMX suorapiirto"
 
 #: modules/codec/omxil/omxil.c:141
 msgid "Enable OMX direct rendering."
-msgstr ""
+msgstr "Käytä OMX suorapiirtoa"
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
-msgstr "Ääni-/videopurkaja (käyttäen OpenMAX IL:ää)"
+msgstr "Ääni-/video purkukooderi (käyttää OpenMAX IL:ää)"
 
 #: modules/codec/omxil/omxil.c:172
 msgid "Video encoder (using OpenMAX IL)"
@@ -12087,7 +12158,7 @@ msgstr "OpenMAX IL -videoulostulo"
 
 #: modules/codec/opus.c:62
 msgid "Opus audio decoder"
-msgstr "Opus-audiodekooderi"
+msgstr "Opus audio purkukooderi"
 
 #: modules/codec/opus.c:64 modules/codec/opus.c:71
 msgid "Opus"
@@ -12099,7 +12170,7 @@ msgstr "Opus-audioenkooderi"
 
 #: modules/codec/png.c:91
 msgid "PNG video decoder"
-msgstr "PNG-videopurkaja"
+msgstr "PNG videon purkukooderi"
 
 #: modules/codec/png.c:100
 msgid "PNG video encoder"
@@ -12114,6 +12185,8 @@ msgid ""
 "Allow the use of the Intel Media SDK software implementation of the codecs "
 "if no QuickSync Video hardware acceleration is present on the system."
 msgstr ""
+"Salli Intel Media SDK -ohjelmiston koodekkien käyttöönotto, jos "
+"järjestelmässä ei ole QuickSync Videon laitteistokiihdytystä."
 
 #: modules/codec/qsv.c:61
 msgid "Codec Profile"
@@ -12184,13 +12257,15 @@ msgstr ""
 
 #: modules/codec/qsv.c:100
 msgid "Rate Control Method"
-msgstr ""
+msgstr "Nopeuden säätömenetelmä"
 
 #: modules/codec/qsv.c:102
 msgid ""
 "The rate control method to use when encoding. Can be one of 'cbr', 'vbr', "
 "'qp', 'avbr'. 'qp' mode isn't supported for mpeg2."
 msgstr ""
+"Nopeuden säätömenetelmä, jota käytetään purkukoodauksessa. Voi olla jokin "
+"seuraavista: \"cbr\", \"vbr\", \"qp\", \"avbr\". Ei tueta qp-tilaa mpeg2:lle."
 
 #: modules/codec/qsv.c:105
 msgid "Quantization parameter"
@@ -12202,6 +12277,9 @@ msgid ""
 "qpp and qpb. It has less precedence than the forementionned parameters. Used "
 "only if rc_method is 'qp'."
 msgstr ""
+"Kvantisointiparametri kaiken tyyppisille frames -ruuduille. Tämä parametri "
+"asettaa qpi, qpp ja qpb:n. Sillä on vähemmän painoarvoa kuin edellä "
+"mainituilla parametreilla. Käytetään vain, jos rc_method on \"qp\". "
 
 #: modules/codec/qsv.c:110
 msgid "Quantization parameter for I-frames"
@@ -12212,6 +12290,8 @@ msgid ""
 "Quantization parameter for I-frames. This parameter overrides any qp set "
 "globally. Used only if rc_method is 'qp'."
 msgstr ""
+"Kvantisointiparametri I-frames -ruuduille. Tämä parametri ohittaa kaikki qp-"
+"asetukset globaalisti. Käytetään vain, jos rc_method on \"qp\". "
 
 #: modules/codec/qsv.c:114
 msgid "Quantization parameter for P-frames"
@@ -12222,6 +12302,8 @@ msgid ""
 "Quantization parameter for P-frames. This parameter overrides any qp set "
 "globally. Used only if rc_method is 'qp'."
 msgstr ""
+"Kvantointiparametri P-frames -ruuduille. Tämä parametri ohittaa kaikki qp-"
+"asetukset globaalisti. Käytetään vain, jos rc_method on \"qp\". "
 
 #: modules/codec/qsv.c:118
 msgid "Quantization parameter for B-frames"
@@ -12232,6 +12314,8 @@ msgid ""
 "Quantization parameter for B-frames. This parameter overrides any qp set "
 "globally. Used only if rc_method is 'qp'."
 msgstr ""
+"Kvantisointiparametri B-frames -ruuduille. Tämä parametri ohittaa kaikki qp-"
+"asetukset globaalisti. Käytetään vain, jos rc_method on \"qp\". "
 
 #: modules/codec/qsv.c:122
 msgid "Maximum Bitrate"
@@ -12243,6 +12327,9 @@ msgid ""
 "method. If not set, this parameter is computed from other sources such as "
 "bitrate, profile, level, etc."
 msgstr ""
+"Määrittää suurimman bittinopeuden kbps (1000 bittiä/s) VBR-taajuuden "
+"säätömenetelmälle. Jos parametria ei ole asetettu, tämä lasketaan muista "
+"lähteistä, kuten bitrate, profile, level jne."
 
 #: modules/codec/qsv.c:127
 msgid "Accuracy of RateControl"
@@ -12255,10 +12342,14 @@ msgid ""
 "880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
 "certained  convergence period. See the convergence parameter"
 msgstr ""
+"Toleranssi prosentteina 'avbr' (Average Variable BitRate) -menetelmästä. "
+"(esim. 10 nopeudella 800 kbps tarkoittaa, että purkukooderi yrittää olla "
+"ylittämättä 880 kbps ja alittamasta 730 kbps. Värien kohdistus saavutetaan "
+"vasta tietyn jakson jälkeen. Katso värien kohdistus parametrit"
 
 #: modules/codec/qsv.c:134
 msgid "Convergence time of 'avbr' RateControl"
-msgstr ""
+msgstr "Värien kohdistus aika \"avbr\" RateControl"
 
 #: modules/codec/qsv.c:135
 msgid ""
@@ -12291,6 +12382,9 @@ msgid ""
 "result. Higher numbers may result on better throughput depending on "
 "hardware. MPEG2 needs at least 1 here."
 msgstr ""
+"Määrittää rinnakkaisten purkukoodausten määrän ennen kuin synkronoimme "
+"tuloksen. Suurempi numero saattaa johtaa parempaan suoritustehoon "
+"laitteistosta riippuen. Tässä 1 tarvitaan ainakin MPEG2 kanssa."
 
 #: modules/codec/qsv.c:193
 msgid "Intel QuickSync Video encoder for MPEG4-Part10/MPEG2 (aka H.264/H.262)"
@@ -12298,15 +12392,15 @@ msgstr ""
 
 #: modules/codec/rawvideo.c:64
 msgid "Pseudo raw video decoder"
-msgstr "Pseudoraa'an videon purkaja"
+msgstr "Pseudo raw-videon purkukooderi"
 
 #: modules/codec/rawvideo.c:71
 msgid "Pseudo raw video packetizer"
-msgstr "Pseudoraa'an videon paketoija"
+msgstr "Pseudo raw-videon pakkaaja"
 
 #: modules/codec/rtpvideo.c:45
 msgid "Raw video encoder for RTP"
-msgstr ""
+msgstr "Raw-videon pakkaaja RTP:lle"
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -12434,7 +12528,7 @@ msgstr "GOP:n pituus"
 msgid ""
 "Number of pictures between successive sequence headers i.e. length of the "
 "group of pictures"
-msgstr ""
+msgstr "Kuvien määrä peräkkäisten jaksojen välillä eli kuvaryhmän pituus"
 
 #: modules/codec/schroedinger.c:134
 msgid "Prefilter"
@@ -12687,7 +12781,7 @@ msgstr "Main-profiili"
 
 #: modules/codec/schroedinger.c:363
 msgid "Dirac video decoder using libschroedinger"
-msgstr "Dirac-videopurkaja käyttäen libschroedinger-kirjastoa"
+msgstr "Dirac videon purkukooderi, käyttää libschroedinger-kirjastoa"
 
 #: modules/codec/schroedinger.c:371
 msgid "Dirac video encoder using libschroedinger"
@@ -12695,7 +12789,7 @@ msgstr "Dirac-videopakkaaja käyttäen libschroedinger-kirjastoa"
 
 #: modules/codec/scte18.c:41
 msgid "SCTE-18 decoder"
-msgstr ""
+msgstr "SCTE-18 purkukooderi"
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
@@ -12703,11 +12797,11 @@ msgstr "SCTE-18"
 
 #: modules/codec/scte18.h:24
 msgid "Emergency Alert Messaging for Cable"
-msgstr ""
+msgstr "Hätäilmoitus kaapeliverkossa"
 
 #: modules/codec/scte27.c:42
 msgid "SCTE-27 decoder"
-msgstr ""
+msgstr "SCTE-27 purkukooderi"
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
@@ -12715,11 +12809,11 @@ msgstr "SCTE-27"
 
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
-msgstr "SDL-kuvapurkaja"
+msgstr "SDL-kuvan purkukooderi"
 
 #: modules/codec/sdl_image.c:61
 msgid "SDL_image video decoder"
-msgstr "SDL_image -videopurkaja"
+msgstr "SDL_image videon purkukooderi"
 
 #: modules/codec/shine.c:64
 msgid "MP3 fixed point audio encoder"
@@ -12727,7 +12821,7 @@ msgstr "MP3-kiintopisteäänen pakkaaja"
 
 #: modules/codec/spdif.c:36
 msgid "S/PDIF pass-through decoder"
-msgstr ""
+msgstr "S/PDIF läpikulun purkukooderi"
 
 #: modules/codec/speex.c:59 modules/codec/speex.c:907
 #: modules/gui/macosx/VLCOpenWindowController.m:195
@@ -12807,7 +12901,7 @@ msgstr "Ultralaajakaista (32kHz)"
 
 #: modules/codec/speex.c:98
 msgid "Speex audio decoder"
-msgstr "Speex-äänipurkaja"
+msgstr "Speex-äänen purkukooderi"
 
 #: modules/codec/speex.c:100
 msgid "Speex"
@@ -12815,7 +12909,7 @@ msgstr "Speex"
 
 #: modules/codec/speex.c:104
 msgid "Speex audio packetizer"
-msgstr "Speex-äänipaketoija"
+msgstr "Speex-äänen pakkaaja"
 
 #: modules/codec/speex.c:110
 msgid "Speex audio encoder"
@@ -12833,7 +12927,7 @@ msgstr ""
 
 #: modules/codec/spudec/spudec.c:50
 msgid "DVD subtitles decoder"
-msgstr "DVD-tekstityksen purkaja"
+msgstr "DVD-tekstityksen purkukooderi"
 
 #: modules/codec/spudec/spudec.c:51
 msgid "DVD subtitles"
@@ -12841,11 +12935,11 @@ msgstr "DVD-tekstitys"
 
 #: modules/codec/spudec/spudec.c:60
 msgid "DVD subtitles packetizer"
-msgstr "DVD-tekstityksen paketoija"
+msgstr "DVD-tekstityksen pakkaaja"
 
 #: modules/codec/stl.c:47
 msgid "EBU STL subtitles decoder"
-msgstr "EBU STL -tekstityspurkaja"
+msgstr "EBU STL tekstityksen purkukooderi"
 
 #. xgettext:
 #. The character encoding name in parenthesis corresponds to that used for
@@ -13050,7 +13144,7 @@ msgstr "Salli automaattitunnistus UTF-8 tekstityksille."
 
 #: modules/codec/subsdec.c:183
 msgid "Text subtitle decoder"
-msgstr "Tekstityksen purkaja"
+msgstr "Tekstityksen purkukooderi"
 
 #. xgettext:
 #. The Windows ANSI code page most commonly used for this language.
@@ -13081,11 +13175,11 @@ msgstr "USFSubs"
 
 #: modules/codec/subsusf.c:51
 msgid "USF subtitles decoder"
-msgstr "USF-tekstityspurkaja"
+msgstr "USF tekstityksen purkukooderi"
 
 #: modules/codec/substx3g.c:40
 msgid "tx3g subtitles decoder"
-msgstr "tx3g-tekstitysten purku"
+msgstr "tx3g tekstityksen purkukooderi"
 
 #: modules/codec/substx3g.c:41
 msgid "tx3g subtitles"
@@ -13093,7 +13187,7 @@ msgstr "tx3g-tekstitykset"
 
 #: modules/codec/svcdsub.c:47
 msgid "Philips OGT (SVCD subtitle) decoder"
-msgstr "Philips OGT SVCD-tekstityksen purkaja"
+msgstr "Philips OGT (SVCD tekstityksen) purkukooderi"
 
 #: modules/codec/svcdsub.c:48
 msgid "SVCD subtitles"
@@ -13101,7 +13195,7 @@ msgstr "SVCD-tekstitys"
 
 #: modules/codec/svcdsub.c:57
 msgid "Philips OGT (SVCD subtitle) packetizer"
-msgstr "Philips OGT SVCD-tekstityksen paketoija"
+msgstr "Philips OGT (SVCD tekstityksen) pakkaaja"
 
 #: modules/codec/svg.c:50 modules/video_filter/scene.c:62
 msgid "Image width"
@@ -13109,7 +13203,7 @@ msgstr "Kuvan leveys"
 
 #: modules/codec/svg.c:51
 msgid "Specify the width to decode the image too"
-msgstr ""
+msgstr "Määritä myös leveys purkamaan kuvaa"
 
 #: modules/codec/svg.c:52 modules/video_filter/scene.c:67
 msgid "Image height"
@@ -13117,7 +13211,7 @@ msgstr "Kuvan korkeus"
 
 #: modules/codec/svg.c:53
 msgid "Specify the height to decode the image too"
-msgstr ""
+msgstr "Määritä myös korkeus purkamaan kuvaa"
 
 #: modules/codec/svg.c:54
 msgid "Scale factor"
@@ -13125,11 +13219,11 @@ msgstr "Skaalauskerroin"
 
 #: modules/codec/svg.c:55
 msgid "Scale factor to apply to image"
-msgstr ""
+msgstr "Kuvaan sovellettava skaalaamiskerroin"
 
 #: modules/codec/svg.c:63
 msgid "SVG video decoder"
-msgstr ""
+msgstr "SVG videon purkukooderi"
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
@@ -13175,11 +13269,11 @@ msgstr ""
 
 #: modules/codec/telx.c:71
 msgid "Teletext subtitles decoder"
-msgstr "Teksti-TV-tekstityksen purkaja"
+msgstr "Teksti-TV tekstityksen purkukooderi"
 
 #: modules/codec/textst.c:49
 msgid "HDMV TextST subtitles decoder"
-msgstr ""
+msgstr "HDMV TextST tekstityksen purkukooderi"
 
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
@@ -13195,11 +13289,11 @@ msgstr "Jälkikäsittelyn laatu"
 
 #: modules/codec/theora.c:116
 msgid "Theora video decoder"
-msgstr "Theora-videopurkaja"
+msgstr "Theora videon purkukooderi"
 
 #: modules/codec/theora.c:124
 msgid "Theora video packetizer"
-msgstr "Theora-videopaketoija"
+msgstr "Theora videon pakkaaja"
 
 #: modules/codec/theora.c:131
 msgid "Theora video encoder"
@@ -13207,19 +13301,19 @@ msgstr "Theora-videopakkaaja"
 
 #: modules/codec/ttml/ttml.c:45
 msgid "TTML decoder"
-msgstr ""
+msgstr "TTML purkukooderi"
 
 #: modules/codec/ttml/ttml.c:46
 msgid "TTML subtitles decoder"
-msgstr ""
+msgstr "TTML tekstityksen purkukooderi"
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
-msgstr ""
+msgstr "TTML"
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
-msgstr ""
+msgstr "TTML-demuxer"
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -13265,15 +13359,15 @@ msgstr "Libtwolame-äänenpakkaaja"
 
 #: modules/codec/uleaddvaudio.c:41
 msgid "Ulead DV audio decoder"
-msgstr "Ulead DV-audiopurku"
+msgstr "Ulead DV-äänen purkukooderi"
 
 #: modules/codec/videotoolbox.m:82
 msgid "Use Hardware decoders only"
-msgstr ""
+msgstr "Käytä vain laitepohjaista purkua"
 
 #: modules/codec/videotoolbox.m:90
 msgid "VideoToolbox video decoder"
-msgstr ""
+msgstr "VideoToolbox videon purkukooderi"
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -13303,11 +13397,11 @@ msgstr "Käytä vakiobittinopeuspakkausta (constant bit rate; CBR)."
 
 #: modules/codec/vorbis.c:189
 msgid "Vorbis audio decoder"
-msgstr "Vorbis-äänenpurkaja"
+msgstr "Vorbis-äänen purkukooderi"
 
 #: modules/codec/vorbis.c:200
 msgid "Vorbis audio packetizer"
-msgstr "Vorbis-äänenpaketoija"
+msgstr "Vorbis-äänen pakkaaja"
 
 #: modules/codec/vorbis.c:207
 msgid "Vorbis audio encoder"
@@ -13315,7 +13409,7 @@ msgstr "Vorbis-äänenpakkaaja"
 
 #: modules/codec/vpx.c:53
 msgid "Quality mode"
-msgstr ""
+msgstr "Laatutila"
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -13324,22 +13418,26 @@ msgid ""
 " - 1: Realtime\n"
 " - 2: Best quality"
 msgstr ""
+"Laadun asetukset, määrittää kooderin enimmäisajan.\n"
+" - 0: Hyvä laatu\n"
+"- 1: Reaaliaikainen\n"
+"- 2: Paras laatu"
 
 #: modules/codec/vpx.c:66
 msgid "WebM video decoder"
-msgstr "WebM-videopurku"
+msgstr "WebM videon purkukooderi"
 
 #: modules/codec/vpx.c:75
 msgid "WebM video encoder"
-msgstr ""
+msgstr "WebM videon kooderi"
 
 #: modules/codec/webvtt/webvtt.c:40
 msgid "WEBVTT decoder"
-msgstr ""
+msgstr "WEBVTT purkukooderi"
 
 #: modules/codec/webvtt/webvtt.c:41
 msgid "WEBVTT subtitles decoder"
-msgstr ""
+msgstr "WEBVTT tekstityksen purkukooderi"
 
 #: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
 msgid "WEBVTT subtitles parser"
@@ -13347,7 +13445,7 @@ msgstr ""
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
-msgstr "WMA v1/v2 -kiintopisteäänipurkaja"
+msgstr "WMA v1/v2-äänen purkukooderi"
 
 #: modules/codec/x264.c:71
 msgid "Maximum GOP size"
@@ -14176,11 +14274,11 @@ msgstr "Oletuksena oleva esiasetus käytössä"
 
 #: modules/codec/x264.c:415
 msgid "x264 advanced options"
-msgstr ""
+msgstr "x264 lisäasetukset"
 
 #: modules/codec/x264.c:416
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
-msgstr ""
+msgstr "x264 lisäasetukset, muodossa {opt=val,op2=val2} ."
 
 #: modules/codec/x264.c:421
 msgid "dia"
@@ -14233,11 +14331,11 @@ msgstr "ruudukko"
 
 #: modules/codec/x264.c:439
 msgid "column alternation"
-msgstr ""
+msgstr "sarakkeen vaihto"
 
 #: modules/codec/x264.c:439
 msgid "row alternation"
-msgstr ""
+msgstr "rivin vaihto"
 
 #: modules/codec/x264.c:439
 msgid "side by side"
@@ -14249,7 +14347,7 @@ msgstr "ylhäällä alhaalla"
 
 #: modules/codec/x264.c:439
 msgid "frame alternation"
-msgstr ""
+msgstr "ruudun vaihto"
 
 #: modules/codec/x264.c:439
 msgid "2D"
@@ -14273,7 +14371,7 @@ msgstr "H.265/HEVC-enkooderi (x265)"
 
 #: modules/codec/xwd.c:36
 msgid "XWD image decoder"
-msgstr "XWD-kuvapurku"
+msgstr "XWD-kuvan purkukooderi"
 
 #: modules/codec/zvbi.c:61
 msgid "Teletext page"
@@ -14327,7 +14425,7 @@ msgstr "3.5"
 
 #: modules/codec/zvbi.c:95
 msgid "VBI and Teletext decoder"
-msgstr "VBI- ja teksti-TV-purkaja"
+msgstr "VBI- ja teksti-TV purkukooderi"
 
 #: modules/codec/zvbi.c:96
 msgid "VBI & Teletext"
@@ -14510,7 +14608,7 @@ msgstr "Ei saatavilla"
 #: modules/control/hotkeys.c:865 modules/control/hotkeys.c:897
 #, c-format
 msgid "Program Service ID: %s"
-msgstr ""
+msgstr "Palvelun ID: %s"
 
 #: modules/control/hotkeys.c:1040
 #, c-format
@@ -14559,7 +14657,7 @@ msgstr "Tekstityksen sijainti %d pikseliä"
 #: modules/control/hotkeys.c:1356
 #, c-format
 msgid "Subtitle text scale %d%%"
-msgstr ""
+msgstr "Tekstityksen skaalaus %d%%"
 
 #: modules/control/hotkeys.c:1517
 #, c-format
@@ -15091,32 +15189,31 @@ msgstr "| puskureita hukattu           : %5<PRIi64>"
 
 #: modules/control/win_msg.c:192
 msgid "WinMsg"
-msgstr ""
+msgstr "WinMsg"
 
 #: modules/control/win_msg.c:193
 msgid "Windows messages interface"
-msgstr ""
+msgstr "Ilmoitukset ikkuna"
 
 #: modules/demux/adaptive/adaptive.cpp:69
 msgid "Maximum device width"
-msgstr ""
+msgstr "Laitteen suurin leveys"
 
 #: modules/demux/adaptive/adaptive.cpp:70
 msgid "Maximum device height"
-msgstr ""
+msgstr "Laitteen suurin korkeus"
 
 #: modules/demux/adaptive/adaptive.cpp:72
 msgid "Fixed Bandwidth in KiB/s"
-msgstr ""
+msgstr "Kiinteä kaistanleveys KiB/s"
 
 #: modules/demux/adaptive/adaptive.cpp:73
 msgid "Preferred bandwidth for non adaptive streams"
-msgstr ""
+msgstr "Ensisijainen kaistanleveys striimiin, joka ei mukaudu"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "DTS-aikaleimaviive (ms)"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
@@ -15128,15 +15225,15 @@ msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
-msgstr ""
+msgstr "Mukautuva logiikka"
 
 #: modules/demux/adaptive/adaptive.cpp:82
 msgid "Use regular HTTP modules"
-msgstr ""
+msgstr "Käytä tavallisia HTTP-moduuleja"
 
 #: modules/demux/adaptive/adaptive.cpp:83
 msgid "Connect using HTTP access instead of custom HTTP code"
-msgstr ""
+msgstr "Muodosta HTTP-yhteys, oman mukautetun HTTP-koodin sijaan"
 
 #: modules/demux/adaptive/adaptive.cpp:85
 #: modules/gui/qt/components/simple_preferences.cpp:694
@@ -15144,46 +15241,44 @@ msgid "Low latency"
 msgstr "Alhainen latenssi"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "Yliaja parametrit"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
-msgstr ""
+msgstr "Ennakoiva"
 
 #: modules/demux/adaptive/adaptive.cpp:108
 msgid "Near Optimal"
-msgstr ""
+msgstr "Lähes optimaalinen"
 
 #: modules/demux/adaptive/adaptive.cpp:109
 msgid "Bandwidth Adaptive"
-msgstr ""
+msgstr "Mukautuva kaistanleveys"
 
 #: modules/demux/adaptive/adaptive.cpp:110
 msgid "Fixed Bandwidth"
-msgstr ""
+msgstr "Kiinteä kaistanleveys"
 
 #: modules/demux/adaptive/adaptive.cpp:111
 msgid "Lowest Bandwidth/Quality"
-msgstr ""
+msgstr "Pienin kaistanleveys/laatu"
 
 #: modules/demux/adaptive/adaptive.cpp:112
 msgid "Highest Bandwidth/Quality"
-msgstr ""
+msgstr "Korkein kaistanleveys/laatu"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "Pakota lihavointi"
+msgstr "Pakota"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
-msgstr ""
+msgstr "Mukautuva"
 
 #: modules/demux/adaptive/adaptive.cpp:128
 msgid "Unified adaptive streaming for DASH/HLS"
-msgstr ""
+msgstr "Yhdistetty mukautuva suoratoisto DASH/HLS:lle"
 
 #: modules/demux/aiff.c:50
 msgid "AIFF demuxer"
@@ -15286,6 +15381,11 @@ msgid ""
 "This step might take a long time on a large file.\n"
 "What do you want to do?"
 msgstr ""
+"Koska tämä tiedoston indexi on viallinen tai puuttuu, haku ei toimi oikein.\n"
+"VLC ei voi korjata tiedostoa, mutta voi ohittaa ongelman väliaikaisesti "
+"rakentamalla indexin muistiin.\n"
+"Tämä voi kestää kauan suuressa tiedostossa.\n"
+"Mitä haluat tehdä? "
 
 #: modules/demux/avi/avi.c:884
 msgid "Do not play"
@@ -15301,7 +15401,7 @@ msgstr "Toista tällaisenaan"
 
 #: modules/demux/avi/avi.c:887 modules/demux/mp4/mp4.c:4266
 msgid "Broken or missing Index"
-msgstr ""
+msgstr "Viallinen tai puuttuva indeksi"
 
 #: modules/demux/avi/avi.c:2774
 msgid "Broken or missing AVI Index"
@@ -15321,7 +15421,7 @@ msgstr "CDG-kanavoinninpurkaja"
 
 #: modules/demux/demuxdump.c:32
 msgid "Dump module"
-msgstr ""
+msgstr "Dump-moduuli"
 
 #: modules/demux/demuxdump.c:33
 msgid "Dump filename"
@@ -15353,11 +15453,11 @@ msgstr "Dirac-videon kanavoinninpurkaja"
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
-msgstr ""
+msgstr "Hakemiston tuonti"
 
 #: modules/demux/filter/noseek.c:79
 msgid "Seek prevention demux filter"
-msgstr ""
+msgstr "Haun ehkäisevä demux-suodatin"
 
 #: modules/demux/flac.c:51
 msgid "FLAC demuxer"
@@ -15496,12 +15596,14 @@ msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:80
 msgid "Preload clusters"
-msgstr ""
+msgstr "Esilataa klusterit"
 
 #: modules/demux/mkv/mkv.cpp:81
 msgid ""
 "Find all cluster positions by jumping cluster-to-cluster before playback"
 msgstr ""
+"Löydä klusterien kaikki sijainnit siirtymällä klusterista-klusteriin ennen "
+"toistoa"
 
 #: modules/demux/mod.c:55
 msgid "Enable noise reduction algorithm."
@@ -15517,7 +15619,7 @@ msgstr "Kaiun taso (väliltä 0 ja 100, oletus on 0)."
 
 #: modules/demux/mod.c:59
 msgid "Reverberation delay, in ms. Usual values are from 40 to 200ms."
-msgstr ""
+msgstr "Kaiun viive millisekunteina. Tavalliset arvot ovat väliltä 40-200 ms."
 
 #: modules/demux/mod.c:61
 msgid "Enable megabass mode"
@@ -15671,11 +15773,11 @@ msgstr "Järjestäjä"
 
 #: modules/demux/mp4/meta.c:90
 msgid "Art Director"
-msgstr ""
+msgstr "Visuaalisuus"
 
 #: modules/demux/mp4/meta.c:91
 msgid "Copyright Acknowledgement"
-msgstr ""
+msgstr "Tekijänoikeudet"
 
 #: modules/demux/mp4/meta.c:92
 msgid "Conductor"
@@ -15687,11 +15789,11 @@ msgstr "Kappaleen kuvaus"
 
 #: modules/demux/mp4/meta.c:94
 msgid "Liner Notes"
-msgstr ""
+msgstr "Kansien kirjoituksia"
 
 #: modules/demux/mp4/meta.c:95
 msgid "Phonogram Rights"
-msgstr ""
+msgstr "Äänitteiden oikeudet"
 
 #: modules/demux/mp4/meta.c:97
 msgid "Sound Engineer"
@@ -15707,19 +15809,19 @@ msgstr "Kiitokset"
 
 #: modules/demux/mp4/meta.c:100
 msgid "Executive Producer"
-msgstr ""
+msgstr "Vastaava tuottaja"
 
 #: modules/demux/mp4/meta.c:102
 msgid "Encoding Params"
-msgstr ""
+msgstr "Purkukoodin parametrit"
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
-msgstr ""
+msgstr "Valmistaja"
 
 #: modules/demux/mp4/meta.c:104
 msgid "Catalog Number"
-msgstr ""
+msgstr "Luettelon numero"
 
 #: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
 msgid "Keywords"
@@ -15727,19 +15829,19 @@ msgstr "Avainsanat"
 
 #: modules/demux/mp4/meta.c:423
 msgid "Explicit"
-msgstr ""
+msgstr "Selkeä"
 
 #: modules/demux/mp4/meta.c:426
 msgid "Clean"
-msgstr ""
+msgstr "Puhdas"
 
 #: modules/demux/mp4/mp4.c:50
 msgid "M4A audio only"
-msgstr ""
+msgstr "Vain M4A-ääni"
 
 #: modules/demux/mp4/mp4.c:51
 msgid "Ignore non audio tracks from iTunes audio files"
-msgstr ""
+msgstr "Ohita muut ääniraidat iTunes-äänitiedostoissa "
 
 #: modules/demux/mp4/mp4.c:56
 msgid "MP4 stream demuxer"
@@ -15751,11 +15853,11 @@ msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:4263
 msgid "Do not seek"
-msgstr ""
+msgstr "Älä hae"
 
 #: modules/demux/mp4/mp4.c:4264
 msgid "Build index"
-msgstr ""
+msgstr "Rakenna indexi"
 
 #: modules/demux/mpc.c:63
 msgid "MusePack demuxer"
@@ -15894,21 +15996,23 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:122
 msgid "Trust in-stream PCR"
-msgstr ""
+msgstr "Luota in-stream-PCR"
 
 #: modules/demux/mpeg/ts.c:123
 msgid "Use the stream PCR as a reference."
-msgstr ""
+msgstr "Käytä suoratoistossa lähtökohtana PCR"
 
 #: modules/demux/mpeg/ts.c:130 modules/mux/mpeg/ts.c:100
 msgid "Digital TV Standard"
-msgstr ""
+msgstr "Digi TV Standardi"
 
 #: modules/demux/mpeg/ts.c:131
 msgid ""
 "Selects mode for digital TV standard. This feature affects EPG information "
 "and subtitles."
 msgstr ""
+"Valitsee digitaalisen TV:n standardin tilan. Tämä vaikuttaa EPG-tietoihin ja "
+"tekstityksiin."
 
 #: modules/demux/mpeg/ts.c:135
 msgid "MPEG Transport Stream demuxer"
@@ -15920,15 +16024,15 @@ msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:423
 msgid "Audio description for the visually impaired"
-msgstr ""
+msgstr "Äänikuvaus näkövammaisille"
 
 #: modules/demux/mpeg/ts_psi.c:424
 msgid "Clean audio for the hearing impaired"
-msgstr ""
+msgstr "Puhdas ääni kuulovammaisille"
 
 #: modules/demux/mpeg/ts_psi.c:425
 msgid "Spoken subtitles for the visually impaired"
-msgstr ""
+msgstr "Puhutut tekstitykset näkövammaisille"
 
 #: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:465
 #: modules/gui/qt/dialogs/toolbar.cpp:541
@@ -16132,7 +16236,7 @@ msgstr "Lataa"
 
 #: modules/demux/playlist/wpl.c:99
 msgid "Total duration"
-msgstr ""
+msgstr "Kokonaiskesto"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -16427,7 +16531,7 @@ msgstr "Palvelujen u"
 #: modules/gui/qt/dialogs/plugins.cpp:390
 #: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
-msgstr ""
+msgstr "Käyttöliittymät"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:111
 #: modules/gui/qt/dialogs/plugins.cpp:393
@@ -16723,7 +16827,7 @@ msgstr "Taaksepäin"
 #: modules/gui/macosx/VLCControlsBarCommon.m:183
 #: modules/gui/macosx/VLCFSPanelController.m:123
 msgid "Seek backward"
-msgstr ""
+msgstr "Hae taaksepäin"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:88
 #: modules/gui/macosx/VLCControlsBarCommon.m:185
@@ -16735,26 +16839,26 @@ msgstr "Eteenpäin"
 #: modules/gui/macosx/VLCControlsBarCommon.m:186
 #: modules/gui/macosx/VLCFSPanelController.m:120
 msgid "Seek forward"
-msgstr ""
+msgstr "Hae eteenpäin"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:93
 msgid "Playback position"
-msgstr ""
+msgstr "Toiston sijainti"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:113
 msgid "Playback time"
-msgstr ""
+msgstr "Toiston nopeus"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:194
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
 msgid "Go to previous item"
-msgstr ""
+msgstr "Siirry edelliseen kohtaan"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:197
 #: modules/gui/macosx/VLCFSPanelController.m:114
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
 msgid "Go to next item"
-msgstr ""
+msgstr "Siirry seuraavaan kohtaan"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
@@ -16814,7 +16918,7 @@ msgstr "Virtautuksen asennutus..."
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:147
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:404
 msgid "Select Streaming Method"
-msgstr ""
+msgstr "Valitse suoratoiston lähetystapa"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
@@ -16893,7 +16997,7 @@ msgstr "Virtautuksen kohde"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:184
 msgid "Stream Announcement"
-msgstr ""
+msgstr "Suoratoiston ilmoitus"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:186
 #: modules/gui/macosx/VLCOpenWindowController.m:197
@@ -17065,7 +17169,7 @@ msgstr ""
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:503
 #, c-format
 msgid "Volume: %i %%"
-msgstr ""
+msgstr "Voimakkuus: %i %%"
 
 #: modules/gui/macosx/macosx.m:51
 msgid "Video device"
@@ -17292,7 +17396,7 @@ msgstr "Hallitse ulkoisia musiikkisoittimia"
 
 #: modules/gui/macosx/macosx.m:126
 msgid "VLC will pause and resume supported music players on playback."
-msgstr ""
+msgstr "VLC voi pysäyttää ja jatkaa muita musiikkisoittimia toiston aikana."
 
 #: modules/gui/macosx/macosx.m:128
 msgid "Use large text for list views"
@@ -17319,6 +17423,8 @@ msgid ""
 "VLC will store playback positions of the last 30 items you played. If you re-"
 "open one of those, playback will continue."
 msgstr ""
+"VLC voi tallentaa 30 viimeisimmän kohteen soitetut toistopaikat. Jos avaat "
+"jonkin näistä, toisto jatkuu."
 
 #: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:206
 msgid "Ask"
@@ -17373,7 +17479,7 @@ msgstr "Siirrä roskakoriin ja käynnistä VLC uudelleen"
 #: modules/gui/macosx/VLCMainMenu.m:249
 #, c-format
 msgid "Level %i"
-msgstr ""
+msgstr "Taso %i"
 
 #: modules/gui/macosx/VLCMainMenu.m:288
 #: modules/text_renderer/freetype/freetype.c:124
@@ -17486,7 +17592,7 @@ msgstr "Valitse kaikki"
 
 #: modules/gui/macosx/VLCMainMenu.m:372
 msgid "Find"
-msgstr ""
+msgstr "Etsi"
 
 #: modules/gui/macosx/VLCMainMenu.m:374
 msgid "View"
@@ -17498,7 +17604,7 @@ msgstr "Näytä sivupalkki"
 
 #: modules/gui/macosx/VLCMainMenu.m:382
 msgid "Playlist Table Columns"
-msgstr ""
+msgstr "Soittolistan sarakkeet"
 
 #: modules/gui/macosx/VLCMainMenu.m:384
 msgid "Playback"
@@ -17723,11 +17829,11 @@ msgstr "Hae soittolistasta"
 
 #: modules/gui/macosx/VLCMainWindow.m:192
 msgid "Search the playlist. Results will be selected in the table."
-msgstr ""
+msgstr "Hae soittolistasta. Tulokset valittavissa taulukosta."
 
 #: modules/gui/macosx/VLCMainWindow.m:213
 msgid "Open a dialog to select the media to play"
-msgstr ""
+msgstr "Avaa ikkuna, jossa voit valita median toiston"
 
 #: modules/gui/macosx/VLCMainWindow.m:217
 #: modules/gui/macosx/VLCMainWindow.m:223
@@ -17778,6 +17884,10 @@ msgid ""
 "provide this functionality, VLC will send information about your contents to "
 "trusted services in an anonymized form."
 msgstr ""
+"VLC voi tarkistaa verkosta levyn kansikuvan ja metadatan rikastamaan "
+"soittokokemustasi, tarjoamalla kappaleiden tiedot CD-levyjä toistettaessa. "
+"Tämän tarjoamiseksi VLC lähettää tietoja sisällöstäsi luotettaville "
+"palveluille nimettömässä muodossa."
 
 #: modules/gui/macosx/VLCMainWindow.m:320
 msgid "LIBRARY"
@@ -17810,7 +17920,7 @@ msgstr "Toista"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:72
 msgid "Change repeat mode. Modes: repeat one, repeat all and no repeat."
-msgstr ""
+msgstr "Toista uudelleen tilat: toista kerran, toista kaikki ja ei uusintaa."
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:75
 #: share/lua/http/index.html:258
@@ -17823,7 +17933,7 @@ msgstr "Täysi äänenvoimakkuus"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:89
 msgid "Open Audio Effects window"
-msgstr ""
+msgstr "Avaa äänitehosteet-ikkuna"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -17845,7 +17955,7 @@ msgstr "Avaa"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:136
 msgid "Stream output:"
-msgstr ""
+msgstr "Suoratoiston ulostulo:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
@@ -17853,7 +17963,7 @@ msgstr "Asetukset..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
 msgid "Choose media input type"
-msgstr ""
+msgstr "Valitse median sisääntulon tyyppi"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:141
 msgid "Disc"
@@ -17877,7 +17987,7 @@ msgstr "Valitse tiedosto"
 #: modules/gui/macosx/VLCOpenWindowController.m:148
 #: modules/gui/macosx/VLCOpenWindowController.m:350
 msgid "Select a file for playback"
-msgstr ""
+msgstr "Valitse toistettava tiedosto"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:149
 msgid "Treat as a pipe rather than as a file"
@@ -17897,6 +18007,8 @@ msgstr "Valitse..."
 #: modules/gui/macosx/VLCOpenWindowController.m:153
 msgid "Select another file to play in sync with the previously selected file"
 msgstr ""
+"Valitse toinen tiedosto, jota haluat toistaa yhtäaikaa aiemmin valitun "
+"tiedoston kanssa"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:158
 msgid "Custom playback"
@@ -17954,6 +18066,8 @@ msgid ""
 "Enter a stream URL here. To open RTP or UDP streams, use the respective "
 "button below."
 msgstr ""
+"Kirjoita suoratoiston osoite tähän. Avaa RTP- tai UDP-toisto käyttämällä "
+"vastaavaa painiketta alla. "
 
 #: modules/gui/macosx/VLCOpenWindowController.m:194
 msgid "Open RTP/UDP Stream"
@@ -18388,11 +18502,11 @@ msgstr "Tarkista päivitykset automaattisesti"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:338
 msgid "HTTP web interface"
-msgstr ""
+msgstr "HTTP-käyttöliittymä"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:339
 msgid "Enable HTTP web interface"
-msgstr ""
+msgstr "Käytä HTTP-käyttöliittymää"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:343
 msgid "Default Encoding"
@@ -18503,6 +18617,8 @@ msgstr "Asetukset"
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
 msgstr ""
+"Mediatiedostoja ei voi jatkaa, koska aikaisemman median säilyttäminen on "
+"poistettu käytöstä."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:580
 msgid "Last check on: %@"
@@ -18514,19 +18630,19 @@ msgstr "Ei ole vielä tarkistettu."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:699
 msgid "Lowest Latency"
-msgstr ""
+msgstr "Pienin viive"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:701
 msgid "Low Latency"
-msgstr ""
+msgstr "Pieni viive"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:705
 msgid "Higher Latency"
-msgstr ""
+msgstr "Suurempi viive"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:707
 msgid "Highest Latency"
-msgstr ""
+msgstr "Suurin viive"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:827
 #: modules/gui/qt/dialogs/preferences.cpp:336
@@ -21820,11 +21936,11 @@ msgstr ""
 
 #: modules/hw/mmal/codec.c:58
 msgid "MMAL decoder"
-msgstr "MMAL-dekooderi"
+msgstr "MMAL purkukooderi"
 
 #: modules/hw/mmal/codec.c:59
 msgid "MMAL-based decoder plugin for Raspberry Pi"
-msgstr "MMAL-pohjainen dekookeriliitännäinen Raspberry Pi:lle"
+msgstr "MMAL-pohjainen purkukooderin lisäosa Raspberry Pi:lle"
 
 #: modules/hw/mmal/deinterlace.c:45
 msgid "Use QPUs for advanced HD deinterlacing."
@@ -21897,7 +22013,7 @@ msgstr "VDPAU-videosuotimen säätö"
 
 #: modules/hw/vdpau/avcodec.c:220
 msgid "VDPAU video decoder"
-msgstr "VDPAU-videodekooderi"
+msgstr "VDPAU videon purkukooderi"
 
 #: modules/hw/vdpau/chroma.c:883
 msgid "Temporal-spatial"
@@ -23200,7 +23316,7 @@ msgstr "Tilastotietojen purkaja"
 
 #: modules/misc/stats.c:223 modules/misc/stats.c:229 modules/misc/stats.c:235
 msgid "Stats decoder function"
-msgstr "Tilastotietojen purkajatoiminto"
+msgstr "Tilastotietojen purkutoiminto"
 
 #: modules/misc/stats.c:240
 msgid "Stats demux"
@@ -23318,7 +23434,7 @@ msgid ""
 msgstr ""
 "Viivästä DTS- (dekoodaus) ja PTS- (esitys; presentation) -aikaleimoja "
 "tietovirrassa, SCR:iin verrattuna. Tämä mahdollistaa jonkin verran "
-"puskurointia asiakaspurkuohjelman sisällä."
+"puskurointia ohjelman purkukoodauksen sisällä."
 
 #: modules/mux/mpeg/ps.c:54
 msgid "PES maximum size"
@@ -23509,7 +23625,7 @@ msgid ""
 msgstr ""
 "Viivästä DTS- (dekoodaus) ja PTS- (esitys; presentation) -aikaleimoja "
 "tietovirrassa, PCR:iin verrattuna. Tämä mahdollistaa jonkin verran "
-"puskurointia asiakaspurkuohjelman sisällä."
+"puskurointia ohjelman purkukoodauksen sisällä."
 
 #: modules/mux/mpeg/ts.c:168
 msgid "Crypt audio"
@@ -23618,39 +23734,39 @@ msgstr "LibNotify-ilmoitusalueliitännäinen"
 
 #: modules/packetizer/a52.c:51
 msgid "A/52 audio packetizer"
-msgstr "A/52-äänen paketoija"
+msgstr "A/52-äänen pakkaaja"
 
 #: modules/packetizer/avparser.h:49
 msgid "avparser packetizer"
-msgstr ""
+msgstr "avparser pakkaaja"
 
 #: modules/packetizer/av1.c:557
 msgid "AV1 video packetizer"
-msgstr ""
+msgstr "AV1 videon pakkaaja"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
-msgstr "Kopioiva paketoija"
+msgstr "Kopioiva pakkaaja"
 
 #: modules/packetizer/dirac.c:87
 msgid "Dirac packetizer"
-msgstr "Dirac-paketoija"
+msgstr "Dirac pakkaaja"
 
 #: modules/packetizer/dts.c:47
 msgid "DTS audio packetizer"
-msgstr "DTS-äänen paketoija"
+msgstr "DTS-äänen pakkaaja"
 
 #: modules/packetizer/flac.c:49
 msgid "Flac audio packetizer"
-msgstr "Flac-äänenpaketoija"
+msgstr "Flac-äänen pakkaaja"
 
 #: modules/packetizer/h264.c:62
 msgid "H.264 video packetizer"
-msgstr "H.264-videopaketoija"
+msgstr "H.264 videon pakkaaja"
 
 #: modules/packetizer/hevc.c:57
 msgid "HEVC/H.265 video packetizer"
-msgstr "HEVC/H.265 videopaketoija"
+msgstr "HEVC/H.265 videon pakkaaja"
 
 #: modules/packetizer/mlp.c:50
 msgid "MLP/TrueHD parser"
@@ -23658,15 +23774,15 @@ msgstr "MLP/TrueHD -jäsennin"
 
 #: modules/packetizer/mpeg4audio.c:194
 msgid "MPEG4 audio packetizer"
-msgstr "MPEG4 -äänenpaketoija"
+msgstr "MPEG4-äänen pakkaaja"
 
 #: modules/packetizer/mpeg4video.c:55
 msgid "MPEG4 video packetizer"
-msgstr "MPEG4 -videopaketoija"
+msgstr "MPEG4 videon pakkaaja"
 
 #: modules/packetizer/mpegaudio.c:88
 msgid "MPEG audio layer I/II/III packetizer"
-msgstr "MPEG-ääni layer I/II/III -paketoija"
+msgstr "MPEG audio layer I/II/III pakkaaja"
 
 #: modules/packetizer/mpegvideo.c:60
 msgid "Sync on Intra Frame"
@@ -23677,13 +23793,12 @@ msgid ""
 "Normally the packetizer would sync on the next full frame. This flags "
 "instructs the packetizer to sync on the first Intra Frame found."
 msgstr ""
-"Normaalisti paketoija synkronoi seuraavan täyden ruudun kohdalla. Tämä "
-"määrää paketoijan synkronoimaan ensimmäisen löydetyn intraruudun (Intra "
-"Frame) kohdalla."
+"Normaalisti pakkaaja synkronoi seuraavan täyden ruudun kohdalla. Tämä määrää "
+"pakkaajan synkronoimaan ensimmäisen löydetyn intraruudun kohdalla."
 
 #: modules/packetizer/mpegvideo.c:74
 msgid "MPEG-I/II video packetizer"
-msgstr "MPEG-I/II -videopaketoija"
+msgstr "MPEG-I/II videon pakkaaja"
 
 #: modules/packetizer/mpegvideo.c:75
 msgid "MPEG Video"
@@ -23691,7 +23806,7 @@ msgstr "MPEG-video"
 
 #: modules/packetizer/vc1.c:54
 msgid "VC-1 packetizer"
-msgstr "VC-1 -paketoija"
+msgstr "VC-1 pakkaaja"
 
 #: modules/services_discovery/avahi.c:55 modules/services_discovery/avahi.c:484
 msgid "Zeroconf network services"
@@ -23702,9 +23817,8 @@ msgid "Zeroconf services"
 msgstr ""
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "Palvelujen u"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
@@ -25763,6 +25877,8 @@ msgid ""
 "Defines how many pictures we allow to be in pool between decoder/encoder "
 "threads when threads > 0"
 msgstr ""
+"Määrittää, kuinka monta kuvaa sallimme purkukooderin/pakkaajan säikeiden "
+"välillä, kun säikeet ovat > 0"
 
 #: modules/stream_out/transcode/transcode.c:146
 msgid "Transcode"
@@ -26378,7 +26494,7 @@ msgstr ""
 
 #: modules/video_filter/ci_filters.m:763
 msgid "Mac OS X hardware video filters"
-msgstr ""
+msgstr "Mac OS X laitteiden videosuodattimet"
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -27604,12 +27720,12 @@ msgstr "Työpöytätila mahdollistaa videon näyttämisen työpöydällä."
 #: modules/video_output/win32/direct3d9.c:79
 #: modules/video_output/win32/direct3d11.c:68
 msgid "Use hardware blending support"
-msgstr "Käytä rautasekoitusta (blending)"
+msgstr "Käytä laitepohjaista blending-tukea"
 
 #: modules/video_output/win32/direct3d9.c:81
 #: modules/video_output/win32/direct3d11.c:70
 msgid "Try to use hardware acceleration for subtitle/OSD blending."
-msgstr ""
+msgstr "Yritä käyttää laitteistokiihdytystä OSD-/tekstityksen yhdistämiseen."
 
 #: modules/video_output/win32/direct3d9.c:83
 msgid "Pixel Shader"
@@ -27650,15 +27766,15 @@ msgstr ""
 #: modules/video_output/win32/directdraw.c:65
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "Use hardware YUV->RGB conversions"
-msgstr "Käytä laitteiston YUV->RGB -muunnosta"
+msgstr "Käytä laitepohjaista YUV->RGB muunnosta"
 
 #: modules/video_output/win32/directdraw.c:67
 msgid ""
 "Try to use hardware acceleration for YUV->RGB conversions. This option "
 "doesn't have any effect when using overlays."
 msgstr ""
-"Yritä käyttää laitteistokiihdytystä YUV->RGB -väriavaruusmuunnoksiin. Tämä "
-"asetus ei vaikuta, jos käytetään ylipiirtoja."
+"Yritä käyttää laitteistokiihdytystä YUV->RGB väriavaruuden muunnoksiin. Tämä "
+"asetus ei vaikuta, jos käytetään peittokuvaa."
 
 #: modules/video_output/win32/directdraw.c:70
 msgid "Overlay video output"
@@ -27687,7 +27803,7 @@ msgstr ""
 "Luo videopuskurit järjestelmän keskusmuistiin näyttökortin muistin sijaan. "
 "Tätä ei suositella, koska yleensä näyttökortin muistin käyttäminen "
 "mahdollistaa laitteistokiihdytyksen (esim. skaalaukseen ja YUV->RGB-"
-"muunnoksiin). Tämä asetus ei vaikuta, jos käytetään ylipiirtoja."
+"muunnoksiin). Tämä asetus ei vaikuta, jos käytetään peittokuvaa."
 
 #: modules/video_output/win32/directdraw.c:82
 msgid "Use triple buffering for overlays"
@@ -28686,9 +28802,8 @@ msgid ""
 msgstr ""
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "Haluatko ladata sen?"
+msgstr ""
 
 #: share/lua/http/index.html:290
 msgid ""
@@ -28855,7 +28970,7 @@ msgstr "Optiot"
 
 #: modules/gui/qt/ui/open_capture.h:103
 msgid "Access advanced options to tweak the device"
-msgstr "Käytä laitteen hienosäädön lisäasetuksia"
+msgstr "Käytä lisäasetuksia laitteen säätämiseen "
 
 #: modules/gui/qt/ui/open_capture.h:105
 msgid "Advanced options..."
@@ -29171,7 +29286,7 @@ msgstr "x264-profiilin ja tason valinta"
 
 #: modules/gui/qt/ui/sprefs_input.h:358
 msgid "Hardware-accelerated decoding"
-msgstr "Laitteistokiihdytetty dekoodaus"
+msgstr "Laitteistokiihdytetty purkukoodaus"
 
 #: modules/gui/qt/ui/sprefs_input.h:359
 msgid "Video quality post-processing level"
