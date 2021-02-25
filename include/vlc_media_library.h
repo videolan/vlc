@@ -876,6 +876,7 @@ VLC_API void vlc_ml_media_release( vlc_ml_media_t* p_media );
 VLC_API void vlc_ml_album_release( vlc_ml_album_t* p_album );
 VLC_API void vlc_ml_group_release( vlc_ml_group_t* p_group );
 VLC_API void vlc_ml_playlist_release( vlc_ml_playlist_t* p_playlist );
+VLC_API void vlc_ml_folder_release( vlc_ml_folder_t* p_folder );
 
 VLC_API void vlc_ml_label_list_release( vlc_ml_label_list_t* p_list );
 VLC_API void vlc_ml_file_list_release( vlc_ml_file_list_t* p_list );
@@ -1660,6 +1661,7 @@ static inline size_t vlc_ml_count_playlist_media( vlc_medialibrary_t* p_ml, cons
     vlc_ml_genre_t*: vlc_ml_genre_release, \
     vlc_ml_media_t*: vlc_ml_media_release, \
     vlc_ml_group_t*: vlc_ml_group_release, \
+    vlc_ml_folder_t*: vlc_ml_folder_release, \
     vlc_ml_playlist_t*: vlc_ml_playlist_release, \
     vlc_ml_label_list_t*: vlc_ml_label_list_release, \
     vlc_ml_file_list_t*: vlc_ml_file_list_release, \
@@ -1682,6 +1684,7 @@ static inline void vlc_ml_release( vlc_ml_album_t* album ) { vlc_ml_album_releas
 static inline void vlc_ml_release( vlc_ml_genre_t* genre ) { vlc_ml_genre_release( genre ); }
 static inline void vlc_ml_release( vlc_ml_media_t* media ) { vlc_ml_media_release( media ); }
 static inline void vlc_ml_release( vlc_ml_group_t* group ) { vlc_ml_group_release( group ); }
+static inline void vlc_ml_release( vlc_ml_folder_t* folder ) { vlc_ml_folder_release( folder ); }
 static inline void vlc_ml_release( vlc_ml_playlist_t* playlist ) { vlc_ml_playlist_release( playlist ); }
 static inline void vlc_ml_release( vlc_ml_label_list_t* list ) { vlc_ml_label_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_file_list_t* list ) { vlc_ml_file_list_release( list ); }

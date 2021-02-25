@@ -264,7 +264,6 @@ void vlc_ml_playlist_release( vlc_ml_playlist_t* p_playlist )
     free( p_playlist );
 }
 
-/* Lists release */
 
 void vlc_ml_media_release( vlc_ml_media_t* p_media )
 {
@@ -273,6 +272,16 @@ void vlc_ml_media_release( vlc_ml_media_t* p_media )
     vlc_ml_media_release_inner( p_media );
     free( p_media );
 }
+
+void vlc_ml_folder_release( vlc_ml_folder_t* p_folder )
+{
+    if ( p_folder == NULL )
+        return;
+    free( p_folder->psz_mrl );
+    free( p_folder );
+}
+
+/* Lists release */
 
 void vlc_ml_label_list_release( vlc_ml_label_list_t* p_list )
 {
