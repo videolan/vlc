@@ -364,9 +364,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (NSArray<VLCMediaLibraryEntryPoint *> *)listOfMonitoredFolders
 {
-    vlc_ml_folder_list_t *pp_entrypoints;
-    int ret = vlc_ml_list_entry_points(_p_mediaLibrary, &pp_entrypoints);
-    if (ret != VLC_SUCCESS) {
+    vlc_ml_folder_list_t *pp_entrypoints = vlc_ml_list_entry_points(_p_mediaLibrary, NULL);
+    if (pp_entrypoints == NULL) {
         msg_Err(getIntf(), "failed to retrieve list of monitored library folders");
         return @[];
     }
