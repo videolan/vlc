@@ -292,11 +292,11 @@ if HAVE_LIBFUZZER
 noinst_PROGRAMS += vlc-demux-libfuzzer vlc-demux-dec-libfuzzer vlc-demux-run vlc-demux-dec-run
 endif
 
-vlc_ios_SOURCES = iosvlc.m
-vlc_ios_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,Foundation,-framework,UIKit
-vlc_ios_LDFLAGS += -Xlinker -rpath -Xlinker "$(libdir)"
-vlc_ios_OBJCFLAGS = -fobjc-arc
-vlc_ios_LDADD = ../lib/libvlc.la ../src/libvlccore.la
+vlccoreios_SOURCES = iosvlc.m
+vlccoreios_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,Foundation,-framework,UIKit
+vlccoreios_LDFLAGS += -Xlinker -rpath -Xlinker "$(libdir)"
+vlccoreios_OBJCFLAGS = -fobjc-arc
+vlccoreios_LDADD = ../lib/libvlc.la ../src/libvlccore.la
 if HAVE_IOS
-noinst_PROGRAMS += vlc-ios
+noinst_PROGRAMS += vlccoreios
 endif
