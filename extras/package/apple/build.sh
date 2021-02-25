@@ -344,6 +344,13 @@ hostenv()
     "$@"
 }
 
+ac_var_to_export_ac_var()
+{
+    for ac_var in "$@"; do
+        echo "export $ac_var"
+    done
+}
+
 # Write config.mak for contribs
 # Globals:
 #   VLC_DEPLOYMENT_TARGET_CFLAG
@@ -385,6 +392,10 @@ write_config_mak()
     printf '%s := %s\n' "STRIP" "${VLC_HOST_STRIP}" >&3
     printf '%s := %s\n' "RANLIB" "${VLC_HOST_RANLIB}" >&3
     printf '%s := %s\n' "NM" "${VLC_HOST_NM}" >&3
+
+    # Add the ac_cv_ var exports in the config.mak for the contribs
+    echo "Appending ac_cv_ vars to config.mak"
+    vlcSetSymbolEnvironment ac_var_to_export_ac_var >&3
 }
 
 # Generate the source file with the needed array for
@@ -622,10 +633,8 @@ write_config_mak "-Werror=partial-availability"
 if [ "$VLC_USE_PREBUILT_CONTRIBS" -gt "0" ]; then
     # Fetch prebuilt contribs
     if [ -z "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-        vlcSetSymbolEnvironment \
         $MAKE prebuilt || abort_err "Fetching prebuilt contribs failed"
     else
-        vlcSetSymbolEnvironment \
         $MAKE prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" \
             || abort_err "Fetching prebuilt contribs from ${VLC_PREBUILT_CONTRIBS_URL} failed"
     fi
@@ -637,12 +646,10 @@ else
     $MAKE fetch
 
     # Build contribs
-    vlcSetSymbolEnvironment \
     $MAKE || abort_err "Building contribs failed"
 
     # Make prebuilt contribs package
     if [ "$VLC_MAKE_PREBUILT_CONTRIBS" -gt "0" ]; then
-        vlcSetSymbolEnvironment \
         $MAKE package || abort_err "Creating prebuilt contribs package failed"
     fi
 fi
