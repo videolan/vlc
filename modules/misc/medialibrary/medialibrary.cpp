@@ -41,6 +41,7 @@
 #include <medialibrary/IMediaGroup.h>
 #include <medialibrary/IPlaylist.h>
 #include <medialibrary/IBookmark.h>
+#include <medialibrary/IFolder.h>
 
 #include <sstream>
 #include <initializer_list>
@@ -556,9 +557,9 @@ int MediaLibrary::Control( int query, va_list args )
             auto entryPoints = ( query == VLC_ML_LIST_FOLDERS )
                     ? m_ml->entryPoints()->all()
                     : m_ml->bannedEntryPoints()->all();
-            auto res = ml_convert_list<vlc_ml_entry_point_list_t,
-                                         vlc_ml_entry_point_t>( entryPoints );
-            *(va_arg( args, vlc_ml_entry_point_list_t**) ) = res;
+            auto res = ml_convert_list<vlc_ml_folder_list_t,
+                                         vlc_ml_folder_t>( entryPoints );
+            *(va_arg( args, vlc_ml_folder_list_t**) ) = res;
             break;
         }
         case VLC_ML_IS_INDEXED:

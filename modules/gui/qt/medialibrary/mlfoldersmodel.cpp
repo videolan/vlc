@@ -29,7 +29,7 @@ MLFoldersBaseModel::MLFoldersBaseModel( QObject *parent )
     connect( this , &MLFoldersBaseModel::onMLEntryPointModified , this , &MLFoldersBaseModel::update );
 }
 
-MLFoldersBaseModel::EntryPoint::EntryPoint( const vlc_ml_entry_point_t& entryPoint)
+MLFoldersBaseModel::EntryPoint::EntryPoint( const vlc_ml_folder_t& entryPoint)
     : mrl(entryPoint.psz_mrl)
     , banned(entryPoint.b_banned)
 {
@@ -118,11 +118,11 @@ std::vector<MLFoldersBaseModel::EntryPoint> MLFoldersModel::entryPoints() const
 {
     std::vector<MLFoldersBaseModel::EntryPoint> r;
 
-    vlc_ml_entry_point_list_t * entrypoints = nullptr;
+    vlc_ml_folder_list_t * entrypoints = nullptr;
     vlc_ml_list_folder( ml() , &entrypoints );
     for ( unsigned int i=0 ; i<entrypoints->i_nb_items ; i++ )
         r.emplace_back( entrypoints->p_items[i] );
-    vlc_ml_release(entrypoints);
+    vlc_ml_release( entrypoints );
 
     return r;
 }
@@ -159,11 +159,11 @@ std::vector<MLFoldersBaseModel::EntryPoint> MLBannedFoldersModel::entryPoints() 
 {
     std::vector<MLFoldersBaseModel::EntryPoint> r;
 
-    vlc_ml_entry_point_list_t * entrypoints = nullptr;
+    vlc_ml_folder_list_t * entrypoints = nullptr;
     vlc_ml_list_banned_folder( ml() , &entrypoints );
     for ( unsigned int i=0 ; i<entrypoints->i_nb_items ; i++ )
         r.emplace_back( entrypoints->p_items[i] );
-    vlc_ml_release(entrypoints);
+    vlc_ml_release( entrypoints );
 
     return r;
 }

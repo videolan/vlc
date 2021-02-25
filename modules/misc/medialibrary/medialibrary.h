@@ -228,7 +228,7 @@ bool Convert( const medialibrary::IShow* input, vlc_ml_show_t& output );
 bool Convert( const medialibrary::ILabel* input, vlc_ml_label_t& output );
 bool Convert( const medialibrary::IMediaGroup* input, vlc_ml_group_t& output );
 bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output );
-bool Convert( const medialibrary::IFolder* input, vlc_ml_entry_point_t& output );
+bool Convert( const medialibrary::IFolder* input, vlc_ml_folder_t& output );
 bool Convert( const medialibrary::IBookmark* input, vlc_ml_bookmark_t& output );
 input_item_t* MediaToInputItem( const medialibrary::IMedia* media );
 

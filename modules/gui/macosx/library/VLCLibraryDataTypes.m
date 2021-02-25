@@ -763,7 +763,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 @implementation VLCMediaLibraryEntryPoint
 
-- (instancetype)initWithEntryPoint:(struct vlc_ml_entry_point_t *)p_entryPoint
+- (instancetype)initWithEntryPoint:(struct vlc_ml_folder_t *)p_entryPoint
 {
     self = [super init];
     if (self && p_entryPoint != NULL) {

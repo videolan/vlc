@@ -356,7 +356,7 @@ void vlc_ml_playlist_list_release( vlc_ml_playlist_list_t* p_list )
     free( p_list );
 }
 
-void vlc_ml_entry_point_list_release( vlc_ml_entry_point_list_t* p_list )
+void vlc_ml_folder_list_release( vlc_ml_folder_list_t* p_list )
 {
     if ( p_list == NULL )
         return;

@@ -207,7 +207,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @interface VLCMediaLibraryEntryPoint : NSObject
 
-- (instancetype)initWithEntryPoint:(struct vlc_ml_entry_point_t *)p_entryPoint;
+- (instancetype)initWithEntryPoint:(struct vlc_ml_folder_t *)p_entryPoint;
 
 @property (readonly) NSString *MRL;
 @property (readonly) NSString *decodedMRL;

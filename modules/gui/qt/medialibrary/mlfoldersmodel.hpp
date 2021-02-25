@@ -69,7 +69,7 @@ signals:
 protected:
     struct EntryPoint
     {
-        EntryPoint(const vlc_ml_entry_point_t &entryPoint );
+        EntryPoint(const vlc_ml_folder_t &entryPoint );
         QString mrl;
         bool banned;
     };

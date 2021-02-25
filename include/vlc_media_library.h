@@ -330,18 +330,18 @@ typedef struct vlc_ml_playlist_list_t
     vlc_ml_playlist_t p_items[];
 } vlc_ml_playlist_list_t;
 
-typedef struct vlc_ml_entry_point_t
+typedef struct vlc_ml_folder_t
 {
-    char* psz_mrl; /**< This entrypoint's MRL. Will be NULL if b_present is false */
-    bool b_present; /**< The presence state for this entrypoint. */
-    bool b_banned; /**< Will be true if the user required this entrypoint to be excluded */
-} vlc_ml_entry_point_t;
+    char* psz_mrl; /**< This folder's MRL. Will be NULL if b_present is false */
+    bool b_present; /**< The presence state for this folder. */
+    bool b_banned; /**< Will be true if the user required this folder to be excluded */
+} vlc_ml_folder_t;
 
-typedef struct vlc_ml_entry_point_list_t
+typedef struct vlc_ml_folder_list_t
 {
     size_t i_nb_items;
-    vlc_ml_entry_point_t p_items[];
-} vlc_ml_entry_point_list_t;
+    vlc_ml_folder_t p_items[];
+} vlc_ml_folder_list_t;
 
 typedef struct vlc_ml_bookmark_t
 {
@@ -500,8 +500,8 @@ enum vlc_ml_control
     VLC_ML_REMOVE_FOLDER,           /**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_BAN_FOLDER,              /**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_UNBAN_FOLDER,            /**< arg1: mrl (const char*)  res: can't fail */
-    VLC_ML_LIST_FOLDERS,            /**< arg1: entrypoints (vlc_ml_entry_point_list_t**); res: can fail */
-    VLC_ML_LIST_BANNED_FOLDERS,     /**< arg1: entrypoints (vlc_ml_entry_point_list_t**); res: can fail */
+    VLC_ML_LIST_FOLDERS,            /**< arg1: entrypoints (vlc_ml_folder_list_t**); res: can fail */
+    VLC_ML_LIST_BANNED_FOLDERS,     /**< arg1: entrypoints (vlc_ml_folder_list_t**); res: can fail */
     VLC_ML_IS_INDEXED,              /**< arg1: mrl (const char*) arg2 (out): bool*;       res: can fail */
     /**
      * Reload a specific folder, or all.
@@ -886,7 +886,7 @@ VLC_API void vlc_ml_show_list_release( vlc_ml_show_list_t* p_list );
 VLC_API void vlc_ml_genre_list_release( vlc_ml_genre_list_t* p_list );
 VLC_API void vlc_ml_group_list_release( vlc_ml_group_list_t* p_list );
 VLC_API void vlc_ml_playlist_list_release( vlc_ml_playlist_list_t* p_list );
-VLC_API void vlc_ml_entry_point_list_release( vlc_ml_entry_point_list_t* p_list );
+VLC_API void vlc_ml_folder_list_release( vlc_ml_folder_list_t* p_list );
 VLC_API void vlc_ml_playback_states_all_release( vlc_ml_playback_states_all* prefs );
 VLC_API void vlc_ml_bookmark_release( vlc_ml_bookmark_t* p_bookmark );
 VLC_API void vlc_ml_bookmark_list_release( vlc_ml_bookmark_list_t* p_list );
@@ -923,13 +923,13 @@ static inline int vlc_ml_unban_folder( vlc_medialibrary_t* p_ml, const char* psz
 }
 
 static inline int vlc_ml_list_folder( vlc_medialibrary_t* p_ml,
-                                      vlc_ml_entry_point_list_t** pp_entrypoints )
+                                      vlc_ml_folder_list_t** pp_entrypoints )
 {
     return vlc_ml_control( p_ml, VLC_ML_LIST_FOLDERS, pp_entrypoints );
 }
 
 static inline int vlc_ml_list_banned_folder( vlc_medialibrary_t* p_ml,
-                                             vlc_ml_entry_point_list_t** pp_entrypoints )
+                                             vlc_ml_folder_list_t** pp_entrypoints )
 {
     return vlc_ml_control( p_ml, VLC_ML_LIST_BANNED_FOLDERS, pp_entrypoints );
 }
@@ -1670,7 +1670,7 @@ static inline size_t vlc_ml_count_playlist_media( vlc_medialibrary_t* p_ml, cons
     vlc_ml_genre_list_t*: vlc_ml_genre_list_release, \
     vlc_ml_group_list_t*: vlc_ml_group_list_release, \
     vlc_ml_playlist_list_t*: vlc_ml_playlist_list_release, \
-    vlc_ml_entry_point_list_t*: vlc_ml_entry_point_list_release, \
+    vlc_ml_folder_list_t*: vlc_ml_folder_list_release, \
     vlc_ml_playback_states_all*: vlc_ml_playback_states_all_release, \
     vlc_ml_bookmark_t*: vlc_ml_bookmark_release, \
     vlc_ml_bookmark_list_t*: vlc_ml_bookmark_list_release \
@@ -1692,7 +1692,7 @@ static inline void vlc_ml_release( vlc_ml_show_list_t* list ) { vlc_ml_show_list
 static inline void vlc_ml_release( vlc_ml_genre_list_t* list ) { vlc_ml_genre_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_group_list_t* list ) { vlc_ml_group_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_playlist_list_t* list ) { vlc_ml_playlist_list_release( list ); }
-static inline void vlc_ml_release( vlc_ml_entry_point_list_t* list ) { vlc_ml_entry_point_list_release( list ); }
+static inline void vlc_ml_release( vlc_ml_folder_list_t* list ) { vlc_ml_folder_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_playback_states_all* prefs ) { vlc_ml_playback_states_all_release( prefs ); }
 static inline void vlc_ml_release( vlc_ml_bookmark_t* bookmark ) { vlc_ml_bookmark_release( bookmark ); }
 static inline void vlc_ml_release( vlc_ml_bookmark_list_t* list ) { vlc_ml_bookmark_list_release( list ); }

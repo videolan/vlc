@@ -446,7 +446,7 @@ bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )
     return true;
 }
 
-bool Convert( const medialibrary::IFolder* input, vlc_ml_entry_point_t& output )
+bool Convert( const medialibrary::IFolder* input, vlc_ml_folder_t& output )
 {
     try
     {
