@@ -104,9 +104,16 @@ namespace adaptive
             std::vector<AbstractStream *>        streams;
             BasePeriod                          *currentPeriod;
 
+            enum class TimestampSynchronizationPoint
+            {
+                RandomAccess,
+                Discontinuity,
+            };
+
             /* shared with demux/buffering */
             struct
             {
+                TimestampSynchronizationPoint pcr_syncpoint;
                 mtime_t     i_nzpcr;
                 mtime_t     i_firstpcr;
                 vlc_mutex_t lock;

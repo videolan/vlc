@@ -70,6 +70,7 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
     nextPlaylistupdate = 0;
     demux.i_nzpcr = VLC_TS_INVALID;
     demux.i_firstpcr = VLC_TS_INVALID;
+    demux.pcr_syncpoint = TimestampSynchronizationPoint::RandomAccess;
     vlc_mutex_init(&demux.lock);
     vlc_cond_init(&demux.cond);
     vlc_mutex_init(&lock);
@@ -271,7 +272,10 @@ AbstractStream::BufferingStatus PlaylistManager::bufferize(mtime_t i_nzdeadline,
 
     vlc_mutex_lock(&demux.lock);
     if(demux.i_nzpcr == VLC_TS_INVALID &&
-       i_return != AbstractStream::BufferingStatus::Lessthanmin /* prevents starting before buffering is reached */ )
+        /* don't wait minbuffer on simple discontinuity or restart */
+       (demux.pcr_syncpoint == TimestampSynchronizationPoint::Discontinuity ||
+        /* prevents starting before buffering is reached */
+        i_return != AbstractStream::BufferingStatus::Lessthanmin ))
     {
         demux.i_nzpcr = getFirstDTS();
     }
@@ -498,6 +502,7 @@ int PlaylistManager::doDemux(int64_t increment)
         vlc_mutex_lock(&demux.lock);
         demux.i_nzpcr = VLC_TS_INVALID;
         demux.i_firstpcr = VLC_TS_INVALID;
+        demux.pcr_syncpoint = TimestampSynchronizationPoint::Discontinuity;
         es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
         vlc_mutex_unlock(&demux.lock);
         break;
@@ -616,6 +621,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
                 return VLC_EGENERIC;
             }
 
+            demux.pcr_syncpoint = TimestampSynchronizationPoint::RandomAccess;
             demux.i_nzpcr = VLC_TS_INVALID;
             cached.lastupdate = 0;
             setBufferingRunState(true);
@@ -634,6 +640,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
             }
 
             vlc_mutex_locker locker(&cached.lock);
+            demux.pcr_syncpoint = TimestampSynchronizationPoint::RandomAccess;
             demux.i_nzpcr = VLC_TS_INVALID;
             cached.lastupdate = 0;
             setBufferingRunState(true);
