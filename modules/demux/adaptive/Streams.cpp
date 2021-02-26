@@ -665,15 +665,13 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
             const FormatChangedEvent &event =
                     static_cast<const FormatChangedEvent &>(ev);
             /* Check if our current demux is still valid */
-            if(*event.format != format || format == StreamFormat(StreamFormat::UNKNOWN))
+            if(*event.format != format)
             {
                 /* Format has changed between segments, we need to drain and change demux */
                 msg_Info(p_realdemux, "Changing stream format %s -> %s",
                          format.str().c_str(), event.format->str().c_str());
                 format = *event.format;
-
-                /* This is an implict discontinuity */
-                discontinuity = true;
+                needrestart = true;
             }
         }
             break;
@@ -682,9 +680,11 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
         {
             const RepresentationSwitchEvent &event =
                     static_cast<const RepresentationSwitchEvent &>(ev);
-            if(demuxer && !inrestart)
+            if(demuxer && !inrestart && event.prev)
             {
                 if(!demuxer->bitstreamSwitchCompatible() ||
+                   /* HLS variants can move from TS to Raw AAC */
+                   format == StreamFormat(StreamFormat::UNKNOWN) ||
                    (event.next &&
                    !event.next->getAdaptationSet()->isBitSwitchable()))
                     needrestart = true;
