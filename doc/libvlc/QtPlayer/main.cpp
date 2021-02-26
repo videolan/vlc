@@ -12,6 +12,11 @@
     #include <X11/Xlib.h>
 #endif
 
+#ifdef QT_STATIC
+# include <QtPlugin>
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+#endif
+
 int main(int argc, char *argv[]) {
 #ifdef Q_WS_X11
     XInitThreads();
