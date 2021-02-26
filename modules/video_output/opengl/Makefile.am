@@ -65,6 +65,26 @@ libgl_plugin_la_SOURCES = video_output/opengl/display.c
 libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS) $(OPENGL_COMMONCFLAGS)
 libgl_plugin_la_LIBADD = libvlc_opengl.la
 
+libglfilter_mock_plugin_la_SOURCES = video_output/opengl/filter_mock.c
+libglfilter_mock_plugin_la_LIBADD = $(LIBM)
+libglfilter_mock_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+if HAVE_GL
+libglfilter_mock_plugin_la_LIBADD += libvlc_opengl.la $(GL_LIBS)
+noinst_LTLIBRARIES += libglfilter_mock_plugin.la
+endif
+
+if HAVE_IOS
+libglfilter_mock_plugin_la_LIBADD += libvlc_opengles.la $(GLES2_LIBS)
+libglfilter_mock_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
+noinst_LTLIBRARIES += libglfilter_mock_plugin.la
+endif
+
+if HAVE_ANDROID
+libglfilter_mock_plugin_la_LIBADD += libvlc_opengles.la $(GLES2_LIBS)
+libglfilter_mock_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
+noinst_LTLIBRARIES += libglfilter_mock_plugin.la
+endif
+
 if HAVE_GL
 vout_LTLIBRARIES += libgl_plugin.la
 endif # HAVE_GL
