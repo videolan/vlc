@@ -1,12 +1,12 @@
 # Arabic translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Abdulrahman Alothaim <ar.alothaim@gmail.com>, 2013
 # Ahmed Salah <kimoa196@gmail.com>, 2016
 # Albatul hamad <Suprgirl96@gmail.com>, 2014
-# Ammar Salem <amar_s1414@hotmail.com>, 2016, 2020
+# Ammar Salem <amar_s1414@hotmail.com>, 2016, 2020, 2021
 # Bourai Fouzia <bouraifouzia@hotmail.com>, 2006
 # Faissal Chamekh <chamfay@gmail.com>, 2014
 # Islam Ouahouda <iouahouda@gmail.com>, 2014
@@ -18,16 +18,17 @@
 # Osama Khalid <osamak.wfm@gmail.com>, 2009
 # Rajaa Jalil <rajaa@hilltx.com>, 2013
 # (المعتز) <sickdemonid@gmail.com>, 2014
-# محيي الدين <tx99h4@hotmail.com>, 2014-2015
+# محيي الدين <tx99h4@hotmail.com>, 2014-2015, 2021
 # وجدي أبو سلطان, 2018
 # صفا الفليج <safaalfulaij@hotmail.com>, 2018
+# خليل مراطلة <meratkha@gmail.com>, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-12-06 09:13+0100\n"
-"Last-Translator: Ammar Salem <amar_s1414@hotmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-26 07:25+0100\n"
+"Last-Translator: خليل مراطلة <meratkha@gmail.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/yaron/teams/16553/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -122,11 +123,11 @@ msgstr "المرشّحات"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio filters are used to process the audio stream."
-msgstr "تُستخدم مرشّحات الصوت لمعالجة تدفقات الصوت."
+msgstr "تُستخدم مرشّحات الصوت لمعالجة دفق الصوت."
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
-msgstr "أداة إعادة إعداد الصوت"
+msgstr "جهاز إعادة أخذ عينات الصوت"
 
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:260
 #: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:425
@@ -201,7 +202,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
-msgstr ""
+msgstr "المُجَزِّئات"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
@@ -262,7 +263,7 @@ msgstr "مرمازات الصوت"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
-msgstr ""
+msgstr "إعدادات أجهزة فك الترميز والترميز الخاصة بالصوت فقط."
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
@@ -291,11 +292,11 @@ msgid ""
 "Sout streams modules allow advanced stream processing (transcoding, "
 "duplicating...)."
 msgstr ""
-"تستخدم إعدادات إخراج الدفق عند العمل كخادوم تدفق أو عند حفظ التدفقات "
+"تستخدم إعدادات إخراج الدفق عند العمل كخادم تدفق أو عند حفظ التدفقات "
 "الواردة.\n"
-"تُضاعف الدفقات أولا ثم تُرسل عبر وحدة ”وصول الإخراج“ التي تستطيع إما حفظ "
-"المخرجات أو بثها (UDP،‏ HTTP،‏ RTP/RTSP).\n"
-"وحدات دفقات sout تتيح معالجة متقدمة للدفقات (تحويل الترميز، التكرار، ...)."
+"تُضاعف الدفقات أولا ثم تُرسل عبر وحدة ”مَخرج الوصول“ التي تستطيع إما حفظ الدفق "
+"أو دفقه (UDP،‏ HTTP،‏ RTP/RTSP).\n"
+"وحدات دفق الصوت تتيح معالجة متقدمة للدفقات (تحويل الترميز، التكرار...)."
 
 #: include/vlc_config_cat.h:137
 msgid "General stream output settings"
@@ -319,7 +320,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:147
 msgid "Access output"
-msgstr "وصول الإخراج"
+msgstr "مَخرج الوصول"
 
 #: include/vlc_config_cat.h:149
 msgid ""
@@ -328,9 +329,9 @@ msgid ""
 "should probably not do that.\n"
 "You can also set default parameters for each access output."
 msgstr ""
-"تتحكم وحدات الوصول للمخرجات في الطرق التي يُرسل بها البث المضمّم. يتيح لك هذا "
-"الإعداد فرض طريقة وصول محددة للمخرجات. لا يستحسن أن تفعل هذا.\n"
-"يمكنك أيضا تحديد المعاملات المبدئية لكل وحدة وصول للمخرجات."
+"تتحكم وحدات مَخرج الوصول في طرق إرسال التدفقات المختلطة. يتيح لك هذا الإعداد "
+"فرض طريقة مَخرج وصول محددة. لا يستحسن أن تفعل ذلك.\n"
+"يمكنك أيضًا تعيين المعلمات الافتراضية لكل مخرج وصول."
 
 #: include/vlc_config_cat.h:154
 msgid "Packetizers"
@@ -1162,7 +1163,7 @@ msgstr "هجين سجل-جاما"
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
-msgstr ""
+msgstr "وظيفة نقل اللون"
 
 #: src/input/es_out.c:3253
 msgid "Color space"
@@ -1210,63 +1211,63 @@ msgstr "موقع الكروما"
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
-msgstr ""
+msgstr "مستطيلي"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
-msgstr ""
+msgstr "متساوي المستطيلات"
 
 #: src/input/es_out.c:3285
 msgid "Cubemap"
-msgstr ""
+msgstr "خريطة المكعبات"
 
 #: src/input/es_out.c:3291
 msgid "Projection"
-msgstr ""
+msgstr "عرض"
 
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "انحراف"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "طبقة"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "لفافة"
 
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "مجال الرؤية"
 
 #: src/input/es_out.c:3305
 msgid "Max. luminance"
-msgstr ""
+msgstr "الإنارة الأعلى"
 
 #: src/input/es_out.c:3310
 msgid "Min. luminance"
-msgstr ""
+msgstr "الإنارة الأدنى"
 
 #: src/input/es_out.c:3318
 msgid "Primary R"
-msgstr ""
+msgstr "R الابتدائية "
 
 #: src/input/es_out.c:3325
 msgid "Primary G"
-msgstr ""
+msgstr "G الابتدائية"
 
 #: src/input/es_out.c:3332
 msgid "Primary B"
-msgstr ""
+msgstr "B الابتدائية"
 
 #: src/input/es_out.c:3339
 msgid "White point"
-msgstr ""
+msgstr "نقطة بيضاء"
 
 #: src/input/es_out.c:3354 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1430,11 +1431,11 @@ msgstr "العنوان السابق"
 
 #: src/input/var.c:278
 msgid "Menu title"
-msgstr ""
+msgstr "عنوان القائمة"
 
 #: src/input/var.c:285
 msgid "Menu popup"
-msgstr ""
+msgstr "القائمة المنبثقة"
 
 #: src/input/var.c:319
 #, c-format
@@ -1582,6 +1583,8 @@ msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
+"يتيح ذلك تلوين الرسائل المرسلة إلى وحدة التحكم. تحتاج طرَفيتُك إلى دعم ألوان "
+"لينكس حتى يعمل هذا."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1629,11 +1632,11 @@ msgstr ""
 
 #: src/libvlc-module.c:129
 msgid "Media role"
-msgstr ""
+msgstr "دور الوسائط"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
-msgstr ""
+msgstr "دور الوسائط (المشغل) لسياسة نظام التشغيل."
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:273
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:409
@@ -1650,11 +1653,11 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "الموسيقى"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
-msgstr ""
+msgstr "التواصل"
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
@@ -1662,23 +1665,23 @@ msgstr "اللعبة "
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "الإشعارات"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
-msgstr ""
+msgstr "حركة"
 
 #: src/libvlc-module.c:143
 msgid "Production"
-msgstr ""
+msgstr "اﻹنتاج"
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
-msgstr ""
+msgstr "اﻹتاحة"
 
 #: src/libvlc-module.c:144
 msgid "Test"
-msgstr ""
+msgstr "تجربة"
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
@@ -1726,16 +1729,19 @@ msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
+"يضبط وضع قنوات مَخرج الصوت الذي سيتم استخدامه بشكل افتراضي إذا كان جهازك وبث "
+"الصوت متوافقين."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
-msgstr ""
+msgstr "فرض دعم S/PDIF"
 
 #: src/libvlc-module.c:176
 msgid ""
 "This option should be used when the audio output can't negotiate S/PDIF "
 "support."
 msgstr ""
+"يجب استخدام هذا الخيار عندما يتعذر على مَخرج الصوت التفاوض بشأن دعم S/PDIF."
 
 #: src/libvlc-module.c:178
 msgid "Force detection of Dolby Surround"
@@ -1802,7 +1808,7 @@ msgstr "وضع إعادة تشغيل الكسب"
 
 #: src/libvlc-module.c:214
 msgid "Select the replay gain mode"
-msgstr ""
+msgstr "حدد وضع كسب إعادة التشغيل"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
@@ -1813,6 +1819,8 @@ msgid ""
 "This allows you to change the default target level (89 dB) for stream with "
 "replay gain information"
 msgstr ""
+"يتيح لك هذا تغيير مستوى الهدف الافتراضي (89 ديسيبل) للدفق باستخدام معلومات "
+"كسب إعادة التشغيل"
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
@@ -1820,7 +1828,7 @@ msgstr "إعادة تشغيل الكسب الافتراضي"
 
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
-msgstr ""
+msgstr "هذا هو الكسب المستخدم للدفق بدون معلومات كسب إعادة التشغيل"
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
@@ -1828,7 +1836,7 @@ msgstr "حماية الذروة"
 
 #: src/libvlc-module.c:227
 msgid "Protect against sound clipping"
-msgstr ""
+msgstr "حماية ضد قصّ الصوت"
 
 #: src/libvlc-module.c:230
 msgid "Enable time stretching audio"
@@ -1838,7 +1846,7 @@ msgstr "تمكين تمديد وقت الصوت"
 msgid ""
 "This allows playing audio at lower or higher speed without affecting the "
 "audio pitch"
-msgstr ""
+msgstr "يتيح ذلك تشغيل الصوت بسرعة أقل أو أعلى دون التأثير على طبقة الصوت"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1131
 #: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:109
@@ -2184,7 +2192,7 @@ msgstr "وحدة تجزئة الڤديو"
 
 #: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
-msgstr ""
+msgstr "هذا يضيف مقاطع فيديو مثل الاستنساخ أو الحائط"
 
 #: src/libvlc-module.c:383
 msgid "Video filter module"
@@ -2216,7 +2224,7 @@ msgstr "نسق لقطة الڤديو"
 
 #: src/libvlc-module.c:399
 msgid "Image format which will be used to store the video snapshots"
-msgstr ""
+msgstr "تنسيق الصورة الذي سيتم استخدامه لتخزين لقطات الفيديو"
 
 #: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
@@ -2232,7 +2240,7 @@ msgstr "إستعمل ترقيم متسلسل في مكان التاريخ و ا�
 
 #: src/libvlc-module.c:407
 msgid "Use sequential numbers instead of timestamps for snapshot numbering"
-msgstr ""
+msgstr "استخدم الأرقام المتسلسلة بدلاً من الطوابع الزمنية لترقيم اللقطة"
 
 #: src/libvlc-module.c:409
 msgid "Video snapshot width"
@@ -2243,6 +2251,8 @@ msgid ""
 "You can enforce the width of the video snapshot. By default it will keep the "
 "original width (-1). Using 0 will scale the width to keep the aspect ratio."
 msgstr ""
+"يمكنك فرض عرض لقطة الفيديو. بشكل افتراضي سيحتفظ بالعرض الأصلي (-1). سيؤدي "
+"استخدام 0 إلى قياس العرض للحفاظ على النسبة الباعية."
 
 #: src/libvlc-module.c:415
 msgid "Video snapshot height"
@@ -2254,6 +2264,8 @@ msgid ""
 "the original height (-1). Using 0 will scale the height to keep the aspect "
 "ratio."
 msgstr ""
+"يمكنك فرض ارتفاع لقطة الفيديو. بشكل افتراضي، ستحتفظ بالارتفاع الأصلي (-1). "
+"سيؤدي استخدام 0 إلى قياس الارتفاع للحفاظ على النسبة الباعية."
 
 #: src/libvlc-module.c:421
 msgid "Video cropping"
@@ -2303,6 +2315,8 @@ msgid ""
 "Scaling factor used when Auto Scaling is disabled.\n"
 "Default value is 1.0 (original video size)."
 msgstr ""
+"يتم استخدام عامل القياس عند تعطيل القياس التلقائي.\n"
+"القيمة الافتراضية هي 1.0 (حجم الفيديو الأصلي)."
 
 #: src/libvlc-module.c:445
 msgid "Custom crop ratios list"
@@ -2313,6 +2327,8 @@ msgid ""
 "Comma separated list of crop ratios which will be added in the interface's "
 "crop ratios list."
 msgstr ""
+"قائمة نسب الاقتصاص مفصولة بفواصل والتي ستتم إضافتها إلى قائمة نسب اقتصاص "
+"الواجهة."
 
 #: src/libvlc-module.c:450
 msgid "Custom aspect ratios list"
@@ -2323,6 +2339,8 @@ msgid ""
 "Comma separated list of aspect ratios which will be added in the interface's "
 "aspect ratio list."
 msgstr ""
+"قائمة النسب الباعية مفصولة بفواصل والتي ستتم إضافتها إلى قائمة النسبة "
+"الباعية للواجهة."
 
 #: src/libvlc-module.c:455
 msgid "Fix HDTV height"
@@ -2334,6 +2352,9 @@ msgid ""
 "incorrectly sets height to 1088 lines. You should only disable this option "
 "if your video has a non-standard format requiring all 1088 lines."
 msgstr ""
+"يسمح ذلك بالتعامل الصحيح مع تنسيق فيديو HDTV-1080 حتى إذا كان برنامج الترميز "
+"المعطل يضبط الارتفاع بشكل غير صحيح على 1088 سطر.  يجب فقط تعطيل هذا الخيار "
+"إذا كان الفيديو الخاص بك يحتوي على تنسيق غير قياسي يتطلب 1088 سطرًا."
 
 #: src/libvlc-module.c:462
 msgid "Monitor pixel aspect ratio"
@@ -2357,6 +2378,8 @@ msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr ""
+"لتمكين الإسقاط في الإطارات على دفق MPEG2.  يحدث الإسقاط في الإطارات عندما لا "
+"يكون حاسوبك قويًا بما يكفي"
 
 #: src/libvlc-module.c:473
 msgid "Drop late frames"
@@ -2378,6 +2401,7 @@ msgid ""
 "This avoids flooding the message log with debug output from the video output "
 "synchronization mechanism."
 msgstr ""
+"هذا يتجنب إغراق سجل الرسائل بإخراج التنقيح من آلية مزامنة إخراج الفيديو."
 
 #: src/libvlc-module.c:483
 msgid "Key press events"
@@ -2401,6 +2425,8 @@ msgid ""
 "as the DVD or VCD device, the network interface settings or the subtitle "
 "channel."
 msgstr ""
+"تتيح لك هذه الخيارات تعديل سلوك نظام الإدخال الفرعي، مثل جهازي DVD أو  VCD، "
+"أو إعدادات واجهة الشبكة أو قناة الترجمة."
 
 #: src/libvlc-module.c:501
 msgid "File caching (ms)"
@@ -2645,7 +2671,7 @@ msgstr "معرّف دفق مسار الترجمة لاستخدامه."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
-msgstr ""
+msgstr "يفضل جهاز فك ترميز التعليقات المغلقة"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -2692,7 +2718,7 @@ msgstr "تكرار المدخلات"
 
 #: src/libvlc-module.c:632
 msgid "Number of time the same input will be repeated"
-msgstr ""
+msgstr "عدد مرات تكرار نفس المدخلات"
 
 #: src/libvlc-module.c:634 modules/gui/macosx/VLCOpenWindowController.m:159
 msgid "Start time"
@@ -2724,7 +2750,7 @@ msgstr "الطلب السريع"
 
 #: src/libvlc-module.c:648
 msgid "Favor speed over precision while seeking"
-msgstr ""
+msgstr "تفضل السرعة على الدقة أثناء البحث"
 
 #: src/libvlc-module.c:650
 msgid "Playback speed"
@@ -2767,14 +2793,16 @@ msgid ""
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
 "{...}\""
 msgstr ""
+"يمكنك يدويًا تقديم قائمة بالعلامات المرجعية لدفق في النموذج \"{name=bookmark-"
+"name,time=optional-time-offset,bytes=optional-byte-offset},{...}\""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
-msgstr ""
+msgstr "دليل التسجيل"
 
 #: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
-msgstr ""
+msgstr "الدليل حيث سيتم تخزين التسجيلات"
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
@@ -2784,7 +2812,7 @@ msgstr "يفضل تسجيل الدفق الأصلي"
 msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
-msgstr ""
+msgstr "عند الإمكان ، سيتم تسجيل دفق الإدخال بدلاً من استخدام وحدة إخراج الدفق"
 
 #: src/libvlc-module.c:680
 msgid "Timeshift directory"
@@ -2991,12 +3019,16 @@ msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
+"هذا هو محرك الأقراص VCD الافتراضي (أو الملف) المطلوب استخدامه.  لا تنس "
+"النقطتين بعد حرف محرك الأقراص (مثل D :)"
 
 #: src/libvlc-module.c:774 modules/access/cdda.c:711
 msgid ""
 "This is the default Audio CD drive (or file) to use. Don't forget the colon "
 "after the drive letter (e.g. D:)"
 msgstr ""
+"هذا هو محرك الأقراص المضغوطة الصوتي الافتراضي (أو الملف) المطلوب استخدامه.  "
+"لا تنس النقطتين بعد حرف محرك الأقراص (مثل D :)"
 
 #: src/libvlc-module.c:781
 msgid "This is the default DVD device to use."
@@ -3016,7 +3048,7 @@ msgstr "TCP زمن إنتهاء"
 
 #: src/libvlc-module.c:801
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr ""
+msgstr "المهلة الافتراضية لاتصال TCP (بالمللي ثانية)."
 
 #: src/libvlc-module.c:803
 msgid "HTTP server address"
@@ -3119,6 +3151,8 @@ msgid ""
 "HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
 "myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
+"وكيل HTTP المراد استخدامه يجب أن يكون بالشكل http://[user@]myproxy.mydomain:"
+"myport/ ؛  إذا كانت فارغة، فستتم تجربة متغير البيئة http_proxy."
 
 #: src/libvlc-module.c:853
 msgid "HTTP proxy password"
@@ -3137,6 +3171,8 @@ msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
 msgstr ""
+"خادم وكيل SOCKS للاستخدام. يجب أن يكون بالشكل عنوان:المنفذ.  سيتم استخدامه "
+"لجميع اتصالات TCP"
 
 #: src/libvlc-module.c:862
 msgid "SOCKS user name"
@@ -3276,11 +3312,11 @@ msgstr "فعّل النشر لكل التدفقات الأوليّة"
 
 #: src/libvlc-module.c:937
 msgid "Stream all elementary streams (video, audio and subtitles)"
-msgstr ""
+msgstr "دفق جميع التدفقات الأولية (الفيديو والصوت والترجمات)"
 
 #: src/libvlc-module.c:939
 msgid "Display while streaming"
-msgstr ""
+msgstr "العرض أثناء البث"
 
 #: src/libvlc-module.c:941
 msgid "Play locally the stream while streaming it."
@@ -3332,6 +3368,8 @@ msgid ""
 "playlist item (automatically insert the gather stream output if not "
 "specified)"
 msgstr ""
+"يسمح لك هذا بالاحتفاظ بمثيل إخراج دفق فريد عبر عناصر قائمة تشغيل متعددة "
+"(إدراج ناتج دفق التجميع تلقائيًا إذا لم يتم تحديده)"
 
 #: src/libvlc-module.c:964
 msgid "Stream output muxer caching (ms)"
@@ -3360,15 +3398,15 @@ msgstr "وحدة الإتصال المتعدد"
 
 #: src/libvlc-module.c:976
 msgid "This is a legacy entry to let you configure mux modules"
-msgstr ""
+msgstr "هذا إدخال قديم للسماح لك بتكوين وحدات mux"
 
 #: src/libvlc-module.c:978
 msgid "Access output module"
-msgstr "وحدة الخرْج"
+msgstr "وحدة مَخرج الوصول"
 
 #: src/libvlc-module.c:980
 msgid "This is a legacy entry to let you configure access output modules"
-msgstr ""
+msgstr "هذا إدخال قديم للسماح لك بتكوين وحدات مَخرج الوصول"
 
 #: src/libvlc-module.c:983
 msgid ""
@@ -3416,11 +3454,11 @@ msgstr "وحدة مرشح الدفق"
 
 #: src/libvlc-module.c:1009
 msgid "Stream filters are used to modify the stream that is being read."
-msgstr ""
+msgstr "تُستخدم عوامل تصفية الدفق لتعديل الدفق الذي تتم قراءته."
 
 #: src/libvlc-module.c:1011
 msgid "Demux filter module"
-msgstr ""
+msgstr "وحدة تصفية Demux"
 
 #: src/libvlc-module.c:1013
 msgid "Demux filters are used to modify/control the stream that is being read."
@@ -3450,6 +3488,8 @@ msgid ""
 "You can select which VoD server module you want to use. Set this to "
 "'vod_rtsp' to switch back to the old, legacy module."
 msgstr ""
+"يمكنك تحديد وحدة خادم VoD التي تريد استخدامها. اضبط هذا على \"vod_rtsp\" "
+"للعودة إلى الوحدة القديمة الموروثة."
 
 #: src/libvlc-module.c:1027
 msgid "Allow real-time priority"
@@ -5995,14 +6035,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "التقاط الصوت"
+msgstr ""
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "وحدة خرج الصوت"
+msgstr ""
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6044,7 +6082,7 @@ msgstr ""
 
 #: modules/access/avio.h:44
 msgid "libavformat AVIO access output"
-msgstr ""
+msgstr "مَخرج وصول libavformat AVIO"
 
 #: modules/access/bluray.c:72
 msgid "Blu-ray menus"
@@ -11488,9 +11526,8 @@ msgid "Kate text subtitles packetizer"
 msgstr ""
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "خيارات عبر الترميز"
+msgstr ""
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -14528,9 +14565,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "أجبر الخرْج السمعي"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -16036,7 +16072,7 @@ msgstr ""
 #: modules/gui/macosx/VLCControlsBarCommon.m:182
 #: modules/gui/macosx/VLCFSPanelController.m:122
 msgid "Backward"
-msgstr ""
+msgstr "إلى الخلف"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:85
 #: modules/gui/macosx/VLCControlsBarCommon.m:183
@@ -19057,16 +19093,16 @@ msgstr "اختر ملفًا أو أكثر"
 
 #: modules/gui/qt/components/open_panels.cpp:160
 msgid "File names:"
-msgstr ""
+msgstr "أسماء الملف:"
 
 #: modules/gui/qt/components/open_panels.cpp:162
 #: modules/gui/qt/ui/sprefs_interface.h:560
 msgid "Filter:"
-msgstr ""
+msgstr "مُرشّح:"
 
 #: modules/gui/qt/components/open_panels.cpp:367
 msgid "Eject the disc"
-msgstr ""
+msgstr "أخرج القرص"
 
 #: modules/gui/qt/components/open_panels.cpp:534
 msgid "Entry"
@@ -19074,7 +19110,7 @@ msgstr "مدخلة"
 
 #: modules/gui/qt/components/open_panels.cpp:878
 msgid "Channels:"
-msgstr ""
+msgstr "القنوات:"
 
 #: modules/gui/qt/components/open_panels.cpp:889
 msgid "Selected ports:"
@@ -19082,23 +19118,23 @@ msgstr "المنافذة المُختارة:"
 
 #: modules/gui/qt/components/open_panels.cpp:892
 msgid ".*"
-msgstr ""
+msgstr ".*"
 
 #: modules/gui/qt/components/open_panels.cpp:899
 msgid "Use VLC pace"
-msgstr ""
+msgstr "استخدام سرعة VLC"
 
 #: modules/gui/qt/components/open_panels.cpp:919
 msgid "TV - digital"
-msgstr ""
+msgstr "تلفاز - رقمي"
 
 #: modules/gui/qt/components/open_panels.cpp:922
 msgid "Tuner card"
-msgstr ""
+msgstr "بطاقة المستقبل"
 
 #: modules/gui/qt/components/open_panels.cpp:923
 msgid "Delivery system"
-msgstr ""
+msgstr "نظام التوصيل"
 
 #: modules/gui/qt/components/open_panels.cpp:953
 msgid "Transponder/multiplex frequency"
@@ -19110,11 +19146,11 @@ msgstr ""
 
 #: modules/gui/qt/components/open_panels.cpp:996
 msgid "Bandwidth"
-msgstr ""
+msgstr "عرض النطاق"
 
 #: modules/gui/qt/components/open_panels.cpp:1040
 msgid "TV - analog"
-msgstr ""
+msgstr "تلفاز - تناظرية"
 
 #: modules/gui/qt/components/open_panels.cpp:1043
 msgid "Device name"
@@ -19122,12 +19158,12 @@ msgstr "إسم الجهاز"
 
 #: modules/gui/qt/components/open_panels.cpp:1103
 msgid "Your display will be opened and played in order to stream or save it."
-msgstr ""
+msgstr "سيتم فتح شاشتك وتشغيلها لدفقها أو حفظها."
 
 #. xgettext: frames per second
 #: modules/gui/qt/components/open_panels.cpp:1117
 msgid " f/s"
-msgstr ""
+msgstr "إطار/ث"
 
 #: modules/gui/qt/components/open_panels.cpp:1332
 msgid "Advanced Options"
@@ -19139,11 +19175,11 @@ msgstr "انقر مزدوجًا لتحصل على معلومات الوسيط"
 
 #: modules/gui/qt/components/playlist/playlist.cpp:113
 msgid "Change playlistview"
-msgstr ""
+msgstr "تغيير عرض قائمة التشغيل"
 
 #: modules/gui/qt/components/playlist/playlist.cpp:123
 msgid "Search the playlist"
-msgstr ""
+msgstr "ابحث في قائمة التشغيل"
 
 #: modules/gui/qt/components/playlist/selector.cpp:243
 msgid "My Computer"
@@ -19163,7 +19199,7 @@ msgstr "الشابكة"
 
 #: modules/gui/qt/components/playlist/selector.cpp:443
 msgid "Remove this podcast subscription"
-msgstr ""
+msgstr "قم بإزالة اشتراك البودكاست هذا"
 
 #: modules/gui/qt/components/playlist/selector.cpp:594
 msgid "Do you really want to unsubscribe from %1?"
@@ -24185,27 +24221,27 @@ msgstr "مضاعفة مخرج التيار"
 
 #: modules/stream_out/es.c:42 modules/stream_out/standard.c:42
 msgid "Output access method"
-msgstr "طريقة وصول المخرج"
+msgstr "طريقة الوصول إلى المخرج"
 
 #: modules/stream_out/es.c:44
 msgid "This is the default output access method that will be used."
-msgstr "وهذا التقصير ناتج طريقة الحصول التي ستستخدم."
+msgstr "هذه هي الطريقة الافتراضية للوصول إلى المخرج التي سيتم استخدامها."
 
 #: modules/stream_out/es.c:46
 msgid "Audio output access method"
-msgstr "طريقة الوصول لمخرجات الصوت"
+msgstr "طريقة الوصول إلى مخرج الصوت"
 
 #: modules/stream_out/es.c:48
 msgid "This is the output access method that will be used for audio."
-msgstr "هذه هي طريقة وصول الانتاج التي ستستخدم السمعيه."
+msgstr "هذه هي طريقة الوصول إلى المَخرج التي سيتم استخدامها للصوت."
 
 #: modules/stream_out/es.c:49
 msgid "Video output access method"
-msgstr "طريقة الوصول لخرج الڤديو"
+msgstr "طريقة الوصول إلى مَخرج الفيديو"
 
 #: modules/stream_out/es.c:51
 msgid "This is the output access method that will be used for video."
-msgstr "هذه هي طريقة وصول الانتاج التي يجب أن تستخدم للفيديو."
+msgstr "هذه هي طريقة الوصول إلى المَخرج التي سيتم استخدامها للفيديو."
 
 #: modules/stream_out/es.c:53 modules/stream_out/standard.c:45
 msgid "Output muxer"
@@ -24262,7 +24298,7 @@ msgstr "الجدول الناتج الابتداءيه"
 #: modules/stream_out/es.c:350 modules/stream_out/es.c:363
 #, c-format
 msgid "There is no suitable stream-output access module for \"%s/%s://%s\"."
-msgstr "هناك تيار مناسبة للحصول على وحدة الانتاج  \"%s/%s://%s\"."
+msgstr "لا توجد وحدة وصول إلى مَخرج دفق مناسبة لـ \"%s/%s://%s\"."
 
 #: modules/stream_out/gather.c:45
 msgid "Gathering stream output"
@@ -26791,7 +26827,7 @@ msgstr ""
 
 #: modules/video_output/vmem.c:48
 msgid "Pitch"
-msgstr ""
+msgstr "طبقة"
 
 #: modules/video_output/vmem.c:49
 msgid "Video memory buffer pitch in bytes."
@@ -27663,9 +27699,8 @@ msgid ""
 msgstr ""
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "أتريد تنزيله؟"
+msgstr ""
 
 #: share/lua/http/index.html:290
 msgid ""
