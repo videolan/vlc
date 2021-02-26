@@ -149,8 +149,7 @@ vlc_gl_filter_draw_Open(struct vlc_gl_filter *filter,
     sys->program_id = program_id;
 
     sys->loc.vertex_pos = vt->GetAttribLocation(program_id, "vertex_pos");
-    if (sys->loc.vertex_pos == -1)
-        goto error;
+    assert(sys->loc.vertex_pos != -1);
 
     vt->GenBuffers(1, &sys->vbo);
 
