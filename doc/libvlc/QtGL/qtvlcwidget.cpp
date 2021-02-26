@@ -339,15 +339,16 @@ void QtVLCWidget::initializeGL()
 
 void QtVLCWidget::paintGL()
 {
+    QOpenGLFunctions *GL = context()->functions();
     QOpenGLFramebufferObject *fbo = mVLC->getVideoFrame();
-    if (fbo != NULL)
+    if (fbo != NULL && GL != NULL)
     {
         m_program->bind();
 
-        glClearColor(1.0, 0.5, 0.0, 1.0);
+        GL->glClearColor(1.0, 0.5, 0.0, 1.0);
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, fbo->takeTexture());
+        GL->glActiveTexture(GL_TEXTURE0);
+        GL->glBindTexture(GL_TEXTURE_2D, fbo->takeTexture());
 
         vertexBuffer.bind();
         m_program->setAttributeArray("position", (const QVector2D *)nullptr, sizeof(GLfloat)*2);
@@ -356,7 +357,7 @@ void QtVLCWidget::paintGL()
         m_program->enableAttributeArray("position");
 
         vertexIndexBuffer.bind();
-        glDrawElements(
+        GL->glDrawElements(
             GL_TRIANGLE_STRIP,  /* mode */
             4,                  /* count */
             GL_UNSIGNED_SHORT,  /* type */
