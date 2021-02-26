@@ -124,6 +124,35 @@ libci_filters_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
 video_filter_LTLIBRARIES += libci_filters_plugin.la
 endif
 
+libopengl_filter_plugin_la_SOURCES = video_filter/opengl.c
+
+if HAVE_LINUX
+if HAVE_ANDROID
+libopengl_filter_plugin_la_LIBADD = libvlc_opengles.la
+libopengl_filter_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
+else
+libopengl_filter_plugin_la_LIBADD = libvlc_opengl.la
+endif
+video_filter_LTLIBRARIES += libopengl_filter_plugin.la
+endif
+
+if HAVE_IOS
+libopengl_filter_plugin_la_LIBADD = libvlc_opengles.la
+libopengl_filter_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
+video_filter_LTLIBRARIES += libopengl_filter_plugin.la
+endif
+
+if HAVE_TVOS
+libopengl_filter_plugin_la_LIBADD = libvlc_opengles.la
+libopengl_filter_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
+video_filter_LTLIBRARIES += libopengl_filter_plugin.la
+endif
+
+if HAVE_OSX
+libopengl_filter_plugin_la_LIBADD = libvlc_opengl.la
+video_filter_LTLIBRARIES += libopengl_filter_plugin.la
+endif
+
 libdeinterlace_common_la_SOURCES = video_filter/deinterlace/common.c video_filter/deinterlace/common.h
 libdeinterlace_common_la_LDFLAGS = -static
 noinst_LTLIBRARIES += libdeinterlace_common.la
