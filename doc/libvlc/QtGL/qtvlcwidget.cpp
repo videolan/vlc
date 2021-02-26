@@ -7,9 +7,8 @@
 #include <QOffscreenSurface>
 #include <QThread>
 #include <QSemaphore>
+#include <QMutex>
 #include <cmath>
-
-#include <mutex>
 
 #include <vlc/vlc.h>
 
@@ -58,7 +57,7 @@ public:
     /// return the texture to be displayed
     QOpenGLFramebufferObject *getVideoFrame()
     {
-        std::lock_guard<std::mutex> lock(m_text_lock);
+        QMutexLocker locker(&m_text_lock);
         if (m_updated) {
             std::swap(m_idx_swap, m_idx_display);
             m_updated = false;
@@ -134,7 +133,7 @@ public:
     static void swap(void* data)
     {
         VLCVideo* that = static_cast<VLCVideo*>(data);
-        std::lock_guard<std::mutex> lock(that->m_text_lock);
+        QMutexLocker locker(&that->m_text_lock);
         that->m_updated = true;
         that->mWidget->update();
         std::swap(that->m_idx_swap, that->m_idx_render);
@@ -176,7 +175,7 @@ private:
     //FBO data
     unsigned m_width = 0;
     unsigned m_height = 0;
-    std::mutex m_text_lock;
+    QMutex m_text_lock;
     QOpenGLFramebufferObject *mBuffers[3];
     GLuint m_tex[3];
     GLuint m_fbo[3];
