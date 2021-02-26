@@ -35,6 +35,8 @@
 #include "gl_common.h"
 #include "gl_util.h"
 
+static const char *const filter_options[] = { "vflip", NULL };
+
 struct sys {
     GLuint program_id;
 
@@ -87,7 +89,6 @@ vlc_gl_filter_draw_Open(struct vlc_gl_filter *filter,
                         const config_chain_t *config,
                         struct vlc_gl_tex_size *size_out)
 {
-    (void) config;
     (void) size_out;
 
     struct sys *sys = filter->sys = malloc(sizeof(*sys));
@@ -114,6 +115,16 @@ vlc_gl_filter_draw_Open(struct vlc_gl_filter *filter,
         "                    (vertex_pos.y + 1.0) / 2.0);\n"
         "}\n";
 
+    static const char *const VERTEX_SHADER_VFLIP =
+        SHADER_VERSION
+        "attribute vec2 vertex_pos;\n"
+        "varying vec2 tex_coords;\n"
+        "void main() {\n"
+        "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
+        "  tex_coords = vec2((vertex_pos.x + 1.0) / 2.0,\n"
+        "                    (-vertex_pos.y + 1.0) / 2.0);\n"
+        "}\n";
+
     static const char *const FRAGMENT_SHADER_TEMPLATE =
         SHADER_VERSION
         "%s\n" /* extensions */
@@ -135,9 +146,13 @@ vlc_gl_filter_draw_Open(struct vlc_gl_filter *filter,
 
     const opengl_vtable_t *vt = &filter->api->vt;
 
+    config_ChainParse(filter, DRAW_CFG_PREFIX, filter_options, config);
+    bool vflip = var_InheritBool(filter, DRAW_CFG_PREFIX "vflip");
+
+    const char *vertex_shader = vflip ? VERTEX_SHADER_VFLIP : VERTEX_SHADER;
     GLuint program_id =
         vlc_gl_BuildProgram(VLC_OBJECT(filter), vt,
-                            1, (const char **) &VERTEX_SHADER,
+                            1, &vertex_shader,
                             1, (const char **) &fragment_shader);
 
     free(fragment_shader);

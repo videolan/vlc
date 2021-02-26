@@ -24,12 +24,20 @@
 
 #include "filter.h"
 
+#define DRAW_VFLIP_SHORTTEXT "VFlip the video"
+#define DRAW_VFLIP_LONGTEXT \
+    "Apply a vertical flip to the video"
+
+#define DRAW_CFG_PREFIX "draw-"
+
 #define add_opengl_submodule_draw() \
     add_submodule() \
     add_shortcut("draw") \
     set_shortname("draw") \
     set_capability("opengl filter", 0) \
-    set_callback(vlc_gl_filter_draw_Open)
+    set_callback(vlc_gl_filter_draw_Open) \
+    add_bool(DRAW_CFG_PREFIX "vflip", false, \
+             DRAW_VFLIP_SHORTTEXT, DRAW_VFLIP_LONGTEXT, false)
 
 vlc_gl_filter_open_fn vlc_gl_filter_draw_Open;
 
