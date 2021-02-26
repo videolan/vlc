@@ -313,11 +313,14 @@ error:      wordfree(&we);
     for (size_t i = 0; i < we.we_wordc; i++)
         args[i] = we.we_wordv[i];
 #else
+    char *cmd_dup = strdup(cmd);
+    if (unlikely(cmd_dup == NULL))
+        return VLC_ENOMEM;
     /* Split psz_cmd at the first space and make sure that
      * psz_arg is valid */
-    const char *args[] = { cmd, NULL };
+    const char *args[] = { cmd_dup, NULL };
     size_t count = 1;
-    char *arg = strchr(cmd, ' ');
+    char *arg = strchr(cmd_dup, ' ');
 
     if (arg != NULL)
     {
@@ -325,7 +328,7 @@ error:      wordfree(&we);
         arg += strspn(arg, " ");
 
         if (*arg)
-            count++;
+            args[count++] = arg;
     }
 #endif
 
@@ -350,6 +353,8 @@ error:      wordfree(&we);
 #ifdef HAVE_WORDEXP
     free(args);
     wordfree(&we);
+#else
+    free(cmd_dup);
 #endif
     return ret;
 }
