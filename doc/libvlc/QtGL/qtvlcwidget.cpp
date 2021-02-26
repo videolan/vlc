@@ -177,8 +177,6 @@ private:
     unsigned m_height = 0;
     QMutex m_text_lock;
     QOpenGLFramebufferObject *mBuffers[3];
-    GLuint m_tex[3];
-    GLuint m_fbo[3];
     size_t m_idx_render = 0;
     size_t m_idx_swap = 1;
     size_t m_idx_display = 2;
