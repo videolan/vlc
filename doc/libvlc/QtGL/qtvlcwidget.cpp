@@ -287,6 +287,8 @@ static const char *vertexShaderSource =
     "}\n";
 
 static const char *fragmentShaderSource =
+    "precision highp float;\n"
+    "\n"
     "uniform sampler2D texture;\n"
     "\n"
     "varying vec2 texcoord;\n"
