@@ -814,6 +814,40 @@ static void FreeStylesArray( text_style_t **pp_styles, size_t i_styles )
     free( pp_styles );
 }
 
+#ifdef __OS2__
+static void *ToUCS4( const char *in, size_t *outsize )
+{
+    uint16_t *psz_ucs2;
+    uint32_t *psz_ucs4;
+    size_t i_bytes;
+
+    psz_ucs2 = ToCharset("UCS-2LE", in, &i_bytes );
+    if( unlikely( !psz_ucs2 ) )
+        return NULL;
+
+    i_bytes <<= 1;
+    /* Realloc including NULL-terminator */
+    psz_ucs4 = realloc( psz_ucs2, i_bytes + sizeof( *psz_ucs4 ));
+    if( unlikely( !psz_ucs4 ) )
+    {
+        free( psz_ucs2 );
+
+        return NULL;
+    }
+
+    psz_ucs2 = ( uint16_t * )psz_ucs4;
+    /* Copy including NULL-terminator */
+    for( int i = i_bytes / sizeof( *psz_ucs4 ); i >= 0; --i )
+        psz_ucs4[ i ] = psz_ucs2[ i ];
+
+    *outsize = i_bytes;
+
+    return psz_ucs4;
+}
+#else
+# define ToUCS4( in, outsize ) ToCharset( FREETYPE_TO_UCS, ( in ), ( outsize ))
+#endif
+
 static size_t AddTextAndStyles( filter_sys_t *p_sys,
                                 const char *psz_text, const char *psz_rt,
                                 const text_style_t *p_style,
@@ -821,7 +855,7 @@ static size_t AddTextAndStyles( filter_sys_t *p_sys,
 {
     /* Convert chars to unicode */
     size_t i_bytes;
-    uni_char_t *p_ucs4 = ToCharset( FREETYPE_TO_UCS, psz_text, &i_bytes );
+    uni_char_t *p_ucs4 = ToUCS4( psz_text, &i_bytes );
     if( !p_ucs4 )
         return 0;
 
@@ -877,7 +911,7 @@ static size_t AddTextAndStyles( filter_sys_t *p_sys,
     ruby_block_t *p_rubyblock = NULL;
     if( psz_rt )
     {
-        p_ucs4 = ToCharset( FREETYPE_TO_UCS, psz_rt, &i_bytes );
+        p_ucs4 = ToUCS4( psz_rt, &i_bytes );
         if( !p_ucs4 )
             return 0;
         p_rubyblock = malloc(sizeof(ruby_block_t));
