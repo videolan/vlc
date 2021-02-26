@@ -695,6 +695,7 @@ vlc_queue_Enqueue
 vlc_queue_Dequeue
 vlc_queue_DequeueAll
 vlc_gl_Create
+vlc_gl_CreateOffscreen
 vlc_gl_Release
 vlc_gl_Hold
 vlc_gl_surface_Create

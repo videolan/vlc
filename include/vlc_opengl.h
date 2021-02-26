@@ -37,6 +37,8 @@ struct vout_display_cfg;
  * A VLC GL context (and its underlying surface)
  */
 typedef struct vlc_gl_t vlc_gl_t;
+struct vlc_decoder_device;
+struct vlc_video_context;
 
 enum vlc_gl_api_type {
     VLC_OPENGL,
@@ -47,14 +49,24 @@ struct vlc_gl_t
 {
     struct vlc_object_t obj;
 
+    struct vlc_decoder_device *device;
     struct vout_window_t *surface;
     module_t *module;
     void *sys;
 
+    vlc_fourcc_t offscreen_chroma_out;
+    struct vlc_video_context *offscreen_vctx_out;
+    /* Flag to indicate if the OpenGL implementation produces upside-down
+     * pictures */
+    bool offscreen_vflip;
+
     int  (*make_current)(vlc_gl_t *);
     void (*release_current)(vlc_gl_t *);
     void (*resize)(vlc_gl_t *, unsigned, unsigned);
-    void (*swap)(vlc_gl_t *);
+    union {
+        void (*swap)(vlc_gl_t *);
+        picture_t *(*swap_offscreen)(vlc_gl_t *);
+    };
     void*(*get_proc_address)(vlc_gl_t *, const char *);
     void (*destroy)(vlc_gl_t *);
 
@@ -99,6 +111,11 @@ struct vlc_gl_t
  */
 VLC_API vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *cfg,
                                 unsigned flags, const char *name) VLC_USED;
+VLC_API vlc_gl_t *vlc_gl_CreateOffscreen(vlc_object_t *parent,
+                                         struct vlc_decoder_device *device,
+                                         unsigned width, unsigned height,
+                                         unsigned flags, const char *name);
+
 VLC_API void vlc_gl_Release(vlc_gl_t *);
 VLC_API void vlc_gl_Hold(vlc_gl_t *);
 
@@ -121,6 +138,11 @@ static inline void vlc_gl_Resize(vlc_gl_t *gl, unsigned w, unsigned h)
 static inline void vlc_gl_Swap(vlc_gl_t *gl)
 {
     gl->swap(gl);
+}
+
+static inline picture_t *vlc_gl_SwapOffscreen(vlc_gl_t *gl)
+{
+    return gl->swap_offscreen(gl);
 }
 
 static inline void *vlc_gl_GetProcAddress(vlc_gl_t *gl, const char *name)
