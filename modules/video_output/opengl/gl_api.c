@@ -138,10 +138,13 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
     GET_PROC_ADDR_OPTIONAL(FramebufferRenderbuffer);
     GET_PROC_ADDR_OPTIONAL(BlitFramebuffer);
 
+    GET_PROC_ADDR_OPTIONAL(ReadPixels);
+
     GET_PROC_ADDR_OPTIONAL(BufferSubData);
     GET_PROC_ADDR_OPTIONAL(BufferStorage);
     GET_PROC_ADDR_OPTIONAL(MapBufferRange);
     GET_PROC_ADDR_OPTIONAL(FlushMappedBufferRange);
+    GET_PROC_ADDR_OPTIONAL(MapBuffer);
     GET_PROC_ADDR_OPTIONAL(UnmapBuffer);
     GET_PROC_ADDR_OPTIONAL(FenceSync);
     GET_PROC_ADDR_OPTIONAL(DeleteSync);

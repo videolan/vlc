@@ -68,3 +68,13 @@ libgl_plugin_la_LIBADD = libvlc_opengl.la
 if HAVE_GL
 vout_LTLIBRARIES += libgl_plugin.la
 endif # HAVE_GL
+
+libegl_pbuffer_filter_plugin_la_SOURCES = video_filter/egl_pbuffer.c
+libegl_pbuffer_filter_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_FLAGS)
+libegl_pbuffer_filter_plugin_la_LIBADD = $(LIBM) $(EGL_LIBS)
+
+if HAVE_ANDROID
+libegl_pbuffer_filter_plugin_la_LIBADD += libvlc_opengles.la $(GLES2_LIBS)
+libegl_pbuffer_filter_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2=1
+vout_LTLIBRARIES += libegl_pbuffer_filter_plugin.la
+endif

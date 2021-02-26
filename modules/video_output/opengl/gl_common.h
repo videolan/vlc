@@ -156,6 +156,18 @@
 # define GL_COLOR_ATTACHMENT7 0x8CE7
 #endif
 
+#if !defined(GL_PIXEL_PACK_BUFFER)
+# define GL_PIXEL_PACK_BUFFER 0x88EB
+#endif
+
+#if !defined(GL_PACK_ROW_LENGTH)
+# define GL_PACK_ROW_LENGTH 0x0D02
+#endif
+
+#if !defined(GL_STREAM_READ)
+# define GL_STREAM_READ 0x88E1
+#endif
+
 #ifndef APIENTRY
 # define APIENTRY
 #endif
@@ -220,6 +232,7 @@ typedef void (APIENTRY *PFNGLFRAMEBUFFERRENDERBUFFERPROC) (GLenum target, GLenum
 typedef void (APIENTRY *PFNGLBLITFRAMEBUFFERPROC) (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
                                                    GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
                                                    GLbitfield mask, GLenum filter);
+typedef void (APIENTRY *PFNGLREADPIXELSPROC) (GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, void *);
 
 /* The following are defined in glext.h but not for GLES2 or on Apple systems */
 #if defined(USE_OPENGL_ES2) || defined(__APPLE__)
@@ -275,6 +288,7 @@ typedef GLboolean (APIENTRY *PFNGLUNMAPBUFFERPROC) (GLenum target);
 typedef GLsync (APIENTRY *PFNGLFENCESYNCPROC) (GLenum condition, GLbitfield flags);
 typedef void (APIENTRY *PFNGLDELETESYNCPROC) (GLsync sync);
 typedef GLenum (APIENTRY *PFNGLCLIENTWAITSYNCPROC) (GLsync sync, GLbitfield flags, GLuint64 timeout);
+typedef void *(APIENTRY *PFNGLMAPBUFFERPROC)(GLenum, GLbitfield);
 #endif
 
 /**
@@ -372,11 +386,14 @@ typedef struct {
     PFNGLFRAMEBUFFERRENDERBUFFERPROC FramebufferRenderbuffer;
     PFNGLBLITFRAMEBUFFERPROC        BlitFramebuffer;
 
+    PFNGLREADPIXELSPROC             ReadPixels;
+
     /* Commands used for PBO and/or Persistent mapping */
     PFNGLBUFFERSUBDATAPROC          BufferSubData; /* can be NULL */
     PFNGLBUFFERSTORAGEPROC          BufferStorage; /* can be NULL */
     PFNGLMAPBUFFERRANGEPROC         MapBufferRange; /* can be NULL */
     PFNGLFLUSHMAPPEDBUFFERRANGEPROC FlushMappedBufferRange; /* can be NULL */
+    PFNGLMAPBUFFERPROC              MapBuffer;
     PFNGLUNMAPBUFFERPROC            UnmapBuffer; /* can be NULL */
     PFNGLFENCESYNCPROC              FenceSync; /* can be NULL */
     PFNGLDELETESYNCPROC             DeleteSync; /* can be NULL */
