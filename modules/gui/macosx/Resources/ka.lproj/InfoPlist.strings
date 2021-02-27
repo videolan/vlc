@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC ითხოვს წვდომას კამერასთან, მომხმარებლის სურვილით.";
+"NSMicrophoneUsageDescription" = "VLC ითხოვს წვდომას მიკროფონთან, მომხმარებლის სურვილით.";
+"NSAppleEventsUsageDescription" = "VLC ითხოვს შეჩერებისა და გაშვების მართვის შესაძლებლობას, გარეშე დამკვრელებზე.";
+"NSDesktopFolderUsageDescription" = "VLC ითხოვს წვდომას სამუშაო ეკრანის საქაღალდესთან, მომხმარებლის სურვილით.";
+"NSDocumentsFolderUsageDescription" = "VLC ითხოვს წვდომას დოკუმენტების საქაღალდესთან, მომხმარებლის სურვილით.";
+"NSDownloadsFolderUsageDescription" = "VLC ითხოვს წვდომას ჩამოტვირთვების საქაღალდესთან, მომხმარებლის სურვილით.";
+"NSNetworkVolumesUsageDescription" = "VLC ითხოვს წვდომას ქსელურ დანაყოფთან, მომხმარებლის სურვილით.";
+"NSRemovableVolumesUsageDescription" = "VLC ითხოვს წვდომას მოსახსნელ დანაყოფთან, მომხმარებლის სურვილით.";
