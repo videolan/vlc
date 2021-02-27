@@ -32,12 +32,13 @@
 using namespace adaptive;
 using namespace adaptive::http;
 
-block_t * Retrieve::HTTP(SharedResources *resources, const std::string &uri)
+block_t * Retrieve::HTTP(SharedResources *resources, ChunkType type,
+                         const std::string &uri)
 {
     HTTPChunk *datachunk;
     try
     {
-        datachunk = new HTTPChunk(uri, resources->getConnManager(), ID(), true);
+        datachunk = new HTTPChunk(uri, resources->getConnManager(), ID(), type, true);
     } catch (...) {
         return nullptr;
     }

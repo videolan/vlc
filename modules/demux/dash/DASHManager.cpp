@@ -97,7 +97,7 @@ bool DASHManager::updatePlaylist()
         url.append("://");
         url.append(p_demux->psz_location);
 
-        block_t *p_block = Retrieve::HTTP(resources, url);
+        block_t *p_block = Retrieve::HTTP(resources, ChunkType::Playlist, url);
         if(!p_block)
             return false;
 

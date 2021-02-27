@@ -59,7 +59,7 @@ Manifest * SmoothManager::fetchManifest()
     playlisturl.append("://");
     playlisturl.append(p_demux->psz_location);
 
-    block_t *p_block = Retrieve::HTTP(resources, playlisturl);
+    block_t *p_block = Retrieve::HTTP(resources, ChunkType::Playlist, playlisturl);
     if(!p_block)
         return nullptr;
 

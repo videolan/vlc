@@ -26,11 +26,15 @@
 namespace adaptive
 {
     class SharedResources;
+    namespace http
+    {
+        enum class ChunkType;
+    };
 
     class Retrieve
     {
         public:
-            static block_t * HTTP(SharedResources *, const std::string &uri);
+            static block_t * HTTP(SharedResources *, http::ChunkType, const std::string &uri);
     };
 }
 
