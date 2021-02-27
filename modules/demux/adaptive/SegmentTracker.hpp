@@ -132,11 +132,13 @@ namespace adaptive
     {
         public:
             BufferingLevelChangedEvent() = delete;
-            BufferingLevelChangedEvent(const ID &, vlc_tick_t, vlc_tick_t, vlc_tick_t);
+            BufferingLevelChangedEvent(const ID &,
+                                       vlc_tick_t, vlc_tick_t, vlc_tick_t, vlc_tick_t);
             virtual ~BufferingLevelChangedEvent() = default;
 
             const ID *id;
             vlc_tick_t minimum;
+            vlc_tick_t maximum;
             vlc_tick_t current;
             vlc_tick_t target;
     };
@@ -191,7 +193,7 @@ namespace adaptive
             bool getMediaPlaybackRange(vlc_tick_t *, vlc_tick_t *, vlc_tick_t *) const;
             vlc_tick_t getMinAheadTime() const;
             void notifyBufferingState(bool) const;
-            void notifyBufferingLevel(vlc_tick_t, vlc_tick_t, vlc_tick_t) const;
+            void notifyBufferingLevel(vlc_tick_t, vlc_tick_t, vlc_tick_t, vlc_tick_t) const;
             void registerListener(SegmentTrackerListenerInterface *);
             void updateSelected();
             bool bufferingAvailable() const;

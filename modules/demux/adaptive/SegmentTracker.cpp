@@ -87,12 +87,14 @@ BufferingStateUpdatedEvent::BufferingStateUpdatedEvent(const ID &id, bool enable
     this->enabled = enabled;
 }
 
-BufferingLevelChangedEvent::BufferingLevelChangedEvent(const ID &id, vlc_tick_t minimum,
+BufferingLevelChangedEvent::BufferingLevelChangedEvent(const ID &id,
+                                                       vlc_tick_t minimum, vlc_tick_t maximum,
                                                        vlc_tick_t current, vlc_tick_t target)
     : TrackerEvent(Type::BufferingLevelChange)
 {
     this->id = &id;
     this->minimum = minimum;
+    this->maximum = maximum;
     this->current = current;
     this->target = target;
 }
@@ -481,9 +483,10 @@ void SegmentTracker::notifyBufferingState(bool enabled) const
     notify(BufferingStateUpdatedEvent(adaptationSet->getID(), enabled));
 }
 
-void SegmentTracker::notifyBufferingLevel(vlc_tick_t min, vlc_tick_t current, vlc_tick_t target) const
+void SegmentTracker::notifyBufferingLevel(vlc_tick_t min, vlc_tick_t max,
+                                          vlc_tick_t current, vlc_tick_t target) const
 {
-    notify(BufferingLevelChangedEvent(adaptationSet->getID(), min, current, target));
+    notify(BufferingLevelChangedEvent(adaptationSet->getID(), min, max, current, target));
 }
 
 void SegmentTracker::registerListener(SegmentTrackerListenerInterface *listener)

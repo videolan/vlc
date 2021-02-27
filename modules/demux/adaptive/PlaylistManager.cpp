@@ -215,7 +215,9 @@ static bool streamCompare(const PrioritizedAbstractStream &a,  const Prioritized
 }
 
 AbstractStream::BufferingStatus PlaylistManager::bufferize(vlc_tick_t i_nzdeadline,
-                                                            vlc_tick_t i_min_buffering, vlc_tick_t i_extra_buffering)
+                                                           vlc_tick_t i_min_buffering,
+                                                           vlc_tick_t i_max_buffering,
+                                                           vlc_tick_t i_target_buffering)
 {
     AbstractStream::BufferingStatus i_return = AbstractStream::BufferingStatus::End;
 
@@ -252,7 +254,8 @@ AbstractStream::BufferingStatus PlaylistManager::bufferize(vlc_tick_t i_nzdeadli
 
         AbstractStream::BufferingStatus i_ret = st->bufferize(i_nzdeadline,
                                                                i_min_buffering,
-                                                               i_extra_buffering,
+                                                               i_max_buffering,
+                                                               i_target_buffering,
                                                                getActiveStreamsCount() <= 1);
         if(i_return != AbstractStream::BufferingStatus::Ongoing) /* Buffering streams need to keep going */
         {
@@ -655,7 +658,8 @@ void PlaylistManager::Run()
 {
     mutex_locker locker {lock};
     const vlc_tick_t i_min_buffering = bufferingLogic->getMinBuffering(playlist);
-    const vlc_tick_t i_extra_buffering = bufferingLogic->getMaxBuffering(playlist) - i_min_buffering;
+    const vlc_tick_t i_max_buffering = bufferingLogic->getMaxBuffering(playlist);
+    const vlc_tick_t i_target_buffering = bufferingLogic->getStableBuffering(playlist);
     while(1)
     {
         while(!b_buffering && !b_canceled)
@@ -675,7 +679,8 @@ void PlaylistManager::Run()
         vlc_tick_t i_nzpcr = demux.i_nzpcr;
         vlc_mutex_unlock(&demux.lock);
 
-        AbstractStream::BufferingStatus i_return = bufferize(i_nzpcr, i_min_buffering, i_extra_buffering);
+        AbstractStream::BufferingStatus i_return = bufferize(i_nzpcr, i_min_buffering,
+                                                             i_max_buffering, i_target_buffering);
 
         if(i_return != AbstractStream::BufferingStatus::Lessthanmin)
         {

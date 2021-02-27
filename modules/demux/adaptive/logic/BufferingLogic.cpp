@@ -129,6 +129,17 @@ vlc_tick_t DefaultBufferingLogic::getLiveDelay(const BasePlaylist *p) const
     return std::max(delay, getMinBuffering(p));
 }
 
+vlc_tick_t DefaultBufferingLogic::getStableBuffering(const BasePlaylist *p) const
+{
+    vlc_tick_t min = getMinBuffering(p);
+    if(isLowLatency(p))
+        return min;
+    if(p->isLive())
+        return std::max(min, getLiveDelay(p) * 6/10);
+    vlc_tick_t max = getMaxBuffering(p);
+    return std::min(getMinBuffering(p) * 2, max);
+}
+
 uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *rep) const
 {
     BasePlaylist *playlist = rep->getPlaylist();
