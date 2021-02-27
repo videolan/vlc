@@ -87,12 +87,14 @@ BufferingStateUpdatedEvent::BufferingStateUpdatedEvent(const ID &id, bool enable
     this->enabled = enabled;
 }
 
-BufferingLevelChangedEvent::BufferingLevelChangedEvent(const ID &id, mtime_t minimum,
+BufferingLevelChangedEvent::BufferingLevelChangedEvent(const ID &id,
+                                                       mtime_t minimum, mtime_t maximum,
                                                        mtime_t current, mtime_t target)
     : TrackerEvent(Type::BufferingLevelChange)
 {
     this->id = &id;
     this->minimum = minimum;
+    this->maximum = maximum;
     this->current = current;
     this->target = target;
 }
@@ -481,9 +483,10 @@ void SegmentTracker::notifyBufferingState(bool enabled) const
     notify(BufferingStateUpdatedEvent(adaptationSet->getID(), enabled));
 }
 
-void SegmentTracker::notifyBufferingLevel(mtime_t min, mtime_t current, mtime_t target) const
+void SegmentTracker::notifyBufferingLevel(mtime_t min, mtime_t max,
+                                          mtime_t current, mtime_t target) const
 {
-    notify(BufferingLevelChangedEvent(adaptationSet->getID(), min, current, target));
+    notify(BufferingLevelChangedEvent(adaptationSet->getID(), min, max, current, target));
 }
 
 void SegmentTracker::registerListener(SegmentTrackerListenerInterface *listener)

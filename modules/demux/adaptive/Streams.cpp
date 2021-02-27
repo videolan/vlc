@@ -346,15 +346,18 @@ mtime_t AbstractStream::getDemuxedAmount(mtime_t from) const
 AbstractStream::BufferingStatus AbstractStream::bufferize(mtime_t nz_deadline,
                                                            mtime_t i_min_buffering,
                                                            mtime_t i_extra_buffering,
+                                                           mtime_t i_target_buffering,
                                                            bool b_keep_alive)
 {
-    last_buffer_status = doBufferize(nz_deadline, i_min_buffering, i_extra_buffering, b_keep_alive);
+    last_buffer_status = doBufferize(nz_deadline, i_min_buffering, i_extra_buffering,
+                                     i_target_buffering, b_keep_alive);
     return last_buffer_status;
 }
 
 AbstractStream::BufferingStatus AbstractStream::doBufferize(mtime_t nz_deadline,
                                                              mtime_t i_min_buffering,
-                                                             mtime_t i_extra_buffering,
+                                                             mtime_t i_max_buffering,
+                                                             mtime_t i_target_buffering,
                                                              bool b_keep_alive)
 {
     vlc_mutex_lock(&lock);
@@ -415,14 +418,12 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(mtime_t nz_deadline,
         }
     }
 
-    const int64_t i_total_buffering = i_min_buffering + i_extra_buffering;
-
     mtime_t i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(nz_deadline);
-    segmentTracker->notifyBufferingLevel(i_min_buffering, i_demuxed, i_total_buffering);
-    if(i_demuxed < i_total_buffering) /* not already demuxed */
+    segmentTracker->notifyBufferingLevel(i_min_buffering, i_max_buffering, i_demuxed, i_target_buffering);
+    if(i_demuxed < i_max_buffering) /* not already demuxed */
     {
         mtime_t nz_extdeadline = fakeEsOut()->commandsQueue()->getBufferingLevel() +
-                                    (i_total_buffering - i_demuxed) / 4;
+                                    (i_max_buffering - i_demuxed) / 4;
         nz_deadline = std::max(nz_deadline, nz_extdeadline);
 
         /* need to read, demuxer still buffering, ... */
@@ -450,11 +451,11 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(mtime_t nz_deadline,
             return BufferingStatus::End;
         }
         i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(nz_deadline);
-        segmentTracker->notifyBufferingLevel(i_min_buffering, i_demuxed, i_total_buffering);
+        segmentTracker->notifyBufferingLevel(i_min_buffering, i_max_buffering, i_demuxed, i_target_buffering);
     }
     vlc_mutex_unlock(&lock);
 
-    if(i_demuxed < i_total_buffering) /* need to read more */
+    if(i_demuxed < i_max_buffering) /* need to read more */
     {
         if(i_demuxed < i_min_buffering)
             return BufferingStatus::Lessthanmin; /* high prio */

@@ -132,11 +132,13 @@ namespace adaptive
     {
         public:
             BufferingLevelChangedEvent() = delete;
-            BufferingLevelChangedEvent(const ID &, mtime_t, mtime_t, mtime_t);
+            BufferingLevelChangedEvent(const ID &,
+                                       mtime_t, mtime_t, mtime_t, mtime_t);
             virtual ~BufferingLevelChangedEvent() = default;
 
             const ID *id;
             mtime_t minimum;
+            mtime_t maximum;
             mtime_t current;
             mtime_t target;
     };
@@ -191,7 +193,7 @@ namespace adaptive
             bool getMediaPlaybackRange(mtime_t *, mtime_t *, mtime_t *) const;
             mtime_t getMinAheadTime() const;
             void notifyBufferingState(bool) const;
-            void notifyBufferingLevel(mtime_t, mtime_t, mtime_t) const;
+            void notifyBufferingLevel(mtime_t, mtime_t, mtime_t, mtime_t) const;
             void registerListener(SegmentTrackerListenerInterface *);
             void updateSelected();
             bool bufferingAvailable() const;

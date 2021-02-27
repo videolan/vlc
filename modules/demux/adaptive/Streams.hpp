@@ -83,7 +83,8 @@ namespace adaptive
             Ongoing,
             Lessthanmin,
         };
-        BufferingStatus bufferize(mtime_t, mtime_t, mtime_t, bool = false);
+        BufferingStatus bufferize(mtime_t, mtime_t, mtime_t,
+                                  mtime_t, bool = false);
         BufferingStatus getLastBufferStatus() const;
         mtime_t getDemuxedAmount(mtime_t) const;
         Status dequeue(mtime_t, mtime_t *);
@@ -139,7 +140,8 @@ namespace adaptive
 
     private:
         void declaredCodecs();
-        BufferingStatus doBufferize(mtime_t, mtime_t, mtime_t, bool);
+        BufferingStatus doBufferize(mtime_t, mtime_t, mtime_t,
+                                    mtime_t, bool);
         BufferingStatus last_buffer_status;
         bool valid;
         bool disabled;

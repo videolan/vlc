@@ -217,7 +217,9 @@ static bool streamCompare(const PrioritizedAbstractStream &a,  const Prioritized
 }
 
 AbstractStream::BufferingStatus PlaylistManager::bufferize(mtime_t i_nzdeadline,
-                                                            mtime_t i_min_buffering, mtime_t i_extra_buffering)
+                                                           mtime_t i_min_buffering,
+                                                           mtime_t i_max_buffering,
+                                                           mtime_t i_target_buffering)
 {
     AbstractStream::BufferingStatus i_return = AbstractStream::BufferingStatus::End;
 
@@ -255,7 +257,8 @@ AbstractStream::BufferingStatus PlaylistManager::bufferize(mtime_t i_nzdeadline,
 
         AbstractStream::BufferingStatus i_ret = st->bufferize(i_nzdeadline,
                                                                i_min_buffering,
-                                                               i_extra_buffering,
+                                                               i_max_buffering,
+                                                               i_target_buffering,
                                                                getActiveStreamsCount() <= 1);
         if(i_return != AbstractStream::BufferingStatus::Ongoing) /* Buffering streams need to keep going */
         {
@@ -667,7 +670,8 @@ void PlaylistManager::Run()
 {
     vlc_mutex_lock(&lock);
     const mtime_t i_min_buffering = bufferingLogic->getMinBuffering(playlist);
-    const mtime_t i_extra_buffering = bufferingLogic->getMaxBuffering(playlist) - i_min_buffering;
+    const mtime_t i_max_buffering = bufferingLogic->getMaxBuffering(playlist);
+    const mtime_t i_target_buffering = bufferingLogic->getStableBuffering(playlist);
     while(1)
     {
         while(!b_buffering && !b_canceled)
@@ -690,7 +694,8 @@ void PlaylistManager::Run()
         vlc_mutex_unlock(&demux.lock);
 
         int canc = vlc_savecancel();
-        AbstractStream::BufferingStatus i_return = bufferize(i_nzpcr, i_min_buffering, i_extra_buffering);
+        AbstractStream::BufferingStatus i_return = bufferize(i_nzpcr, i_min_buffering,
+                                                             i_max_buffering, i_target_buffering);
         vlc_restorecancel( canc );
 
         if(i_return != AbstractStream::BufferingStatus::Lessthanmin)

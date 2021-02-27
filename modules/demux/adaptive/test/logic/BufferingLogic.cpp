@@ -107,6 +107,8 @@ int BufferingLogic_test()
         Expect(bufferinglogic.getStartSegmentNumber(rep) == number);
         Expect(bufferinglogic.getMinBuffering(playlist) == DefaultBufferingLogic::DEFAULT_MIN_BUFFERING);
         Expect(bufferinglogic.getMaxBuffering(playlist) == DefaultBufferingLogic::DEFAULT_MAX_BUFFERING);
+        Expect(bufferinglogic.getStableBuffering(playlist) <= bufferinglogic.getMaxBuffering(playlist));
+        Expect(bufferinglogic.getStableBuffering(playlist) >= bufferinglogic.getMinBuffering(playlist));
 
         bufferinglogic.setUserMinBuffering(DefaultBufferingLogic::DEFAULT_MIN_BUFFERING / 2);
         Expect(bufferinglogic.getMinBuffering(playlist) == std::max(DefaultBufferingLogic::DEFAULT_MIN_BUFFERING / 2,

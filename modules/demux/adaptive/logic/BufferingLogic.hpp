@@ -46,6 +46,7 @@ namespace adaptive
                 virtual mtime_t getMinBuffering(const BasePlaylist *) const = 0;
                 virtual mtime_t getMaxBuffering(const BasePlaylist *) const = 0;
                 virtual mtime_t getLiveDelay(const BasePlaylist *) const = 0;
+                virtual mtime_t getStableBuffering(const BasePlaylist *) const = 0;
                 void setUserMinBuffering(mtime_t);
                 void setUserMaxBuffering(mtime_t);
                 void setUserLiveDelay(mtime_t);
@@ -71,6 +72,7 @@ namespace adaptive
                 virtual mtime_t getMinBuffering(const BasePlaylist *) const override;
                 virtual mtime_t getMaxBuffering(const BasePlaylist *) const override;
                 virtual mtime_t getLiveDelay(const BasePlaylist *) const override;
+                virtual mtime_t getStableBuffering(const BasePlaylist *) const override;
                 static const unsigned SAFETY_BUFFERING_EDGE_OFFSET;
                 static const unsigned SAFETY_EXPURGING_OFFSET;
 
