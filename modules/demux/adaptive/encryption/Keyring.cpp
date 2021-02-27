@@ -24,6 +24,7 @@
 
 #include "Keyring.hpp"
 #include "../tools/Retrieve.hpp"
+#include "../http/Chunk.h"
 
 #include <vlc_block.h>
 
@@ -51,7 +52,7 @@ KeyringKey Keyring::getKey(SharedResources *resources, const std::string &uri)
     {
         /* Pretty bad inside the lock */
         msg_Dbg(obj, "Retrieving AES key %s", uri.c_str());
-        block_t *p_block = Retrieve::HTTP(resources, uri);
+        block_t *p_block = Retrieve::HTTP(resources, http::ChunkType::Key, uri);
         if(p_block)
         {
             if(p_block->i_buffer == 16)

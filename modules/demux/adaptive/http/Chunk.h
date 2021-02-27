@@ -43,6 +43,15 @@ namespace adaptive
         class AbstractConnectionManager;
         class AbstractChunk;
 
+        enum class ChunkType
+        {
+            Segment,
+            Init,
+            Index,
+            Playlist,
+            Key,
+        };
+
         class AbstractChunkSource
         {
             public:
@@ -91,7 +100,7 @@ namespace adaptive
         {
             public:
                 HTTPChunkSource(const std::string &url, AbstractConnectionManager *,
-                                const ID &, bool = false);
+                                const ID &, ChunkType, bool = false);
                 virtual ~HTTPChunkSource();
 
                 virtual block_t *   readBlock       ()  override;
@@ -110,6 +119,7 @@ namespace adaptive
                 bool                prepared;
                 bool                eof;
                 ID                  sourceid;
+                ChunkType           type;
 
             private:
                 bool init(const std::string &);
@@ -122,7 +132,7 @@ namespace adaptive
 
             public:
                 HTTPChunkBufferedSource(const std::string &url, AbstractConnectionManager *,
-                                        const ID &, bool = false);
+                                        const ID &, ChunkType, bool = false);
                 virtual ~HTTPChunkBufferedSource();
                 virtual block_t *  readBlock       ()  override;
                 virtual block_t *  read            (size_t)  override;
@@ -150,7 +160,7 @@ namespace adaptive
         {
             public:
                 HTTPChunk(const std::string &url, AbstractConnectionManager *,
-                          const ID &, bool = false);
+                          const ID &, ChunkType, bool = false);
                 virtual ~HTTPChunk();
 
             protected:
