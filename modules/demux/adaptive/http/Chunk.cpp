@@ -225,7 +225,7 @@ block_t * HTTPChunkSource::read(size_t readsize)
         consumed += p_block->i_buffer;
         if((size_t)ret < readsize)
             eof = true;
-        if(ret && time)
+        if(ret && time && type == ChunkType::Segment)
             connManager->updateDownloadRate(sourceid, p_block->i_buffer, time);
     }
 
@@ -402,7 +402,7 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
         }
     }
 
-    if(rate.size && rate.time)
+    if(rate.size && rate.time && type == ChunkType::Segment)
     {
         connManager->updateDownloadRate(sourceid, rate.size, rate.time);
     }
