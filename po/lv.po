@@ -1,23 +1,23 @@
 # Latvian translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Andrejs Pavars <andrejs.pavars@gmail.com>, 2017
 # Anita Reitere <nitalynx@gmail.com>, 2015
 # Baiba Bērziņa <baibabeerzinnaa@gmail.com>, 2015
-# Ingmārs Dīriņš <melhiors14@gmail.com>, 2016-2020
+# Ingmārs Dīriņš <melhiors14@gmail.com>, 2016-2021
 # Jānis-Marks Gailis <jeanmarc.gailis@gmail.com>, 2013-2014
 # Kristaps Ancāns <kristaps.ancans@gmail.com>, 2013
 # Ojārs Spriņķis <ojars.sprinkis@inbox.lv>, 2014
 # Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-07-23 18:04+0200\n"
-"Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-28 10:07+0100\n"
+"Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2021\n"
 "Language-Team: Latvian (https://www.transifex.com/yaron/teams/16553/lv/)\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
@@ -310,7 +310,7 @@ msgid ""
 msgstr ""
 "Multipleksori izveido iekapsulēšanas formātus, kuri tiek lietoti, lai "
 "saliktu kopā visas elementārās straumes (video, audio, ...). Šis iestatījums "
-"atļauj jums vienmēr piespiest specifisku multipleksoru. Jums, iespējams, "
+"atļauj jums vienmēr uzspiest specifisku multipleksoru. Jums, iespējams, "
 "nevajadzētu to darīt.\n"
 "Jūs varat arī iestatīt noklusējuma parametrus katram multipleksoram."
 
@@ -12013,9 +12013,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "Kate teksta subtitru paketizētājs"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "Pārkodēšanas opcijas"
+msgstr "Papildu fontu datņu katalogs"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -15199,9 +15198,8 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "Vēlamais joslas platums neadaptīvajām straumēm"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "DTS aizture (ms)"
+msgstr "Dzīvās atskaņošanas aizture (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
@@ -15209,7 +15207,7 @@ msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "Maksimālā buferizācija (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15229,9 +15227,8 @@ msgid "Low latency"
 msgstr "Zems latentums"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "Pārrakstīt parametrus"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15258,9 +15255,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "Augstākais joslas platums/kvalitāte"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "Piespiest treknrakstu"
+msgstr "Uzspiest"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -27767,7 +27763,7 @@ msgstr "Kadru buferis lieto aparatūras paātrinājumu"
 
 #: modules/video_output/fb.c:71
 msgid "Disable for double buffering in software."
-msgstr "Izslēgt priekš divkāršās buferizācijas programmatūrā."
+msgstr "Izslēgt divkāršajai buferizācijai programmatūrā."
 
 #: modules/video_output/fb.c:73
 msgid "Image format (default RGB)"
@@ -28216,7 +28212,7 @@ msgstr "Lietotā krāsainība"
 
 #: modules/video_output/yuv.c:46
 msgid "Force use of a specific chroma for output."
-msgstr "Piespiest specifiskas krāsainības lietošanu izvadei."
+msgstr "Uzspiest specifiskas krāsainības lietošanu izvadei."
 
 #: modules/video_output/yuv.c:48
 msgid "Add a YUV4MPEG2 header"
@@ -28951,9 +28947,8 @@ msgid ""
 msgstr ""
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "Vai jūs vēlaties to lejupielādēt?"
+msgstr ""
 
 #: share/lua/http/index.html:290
 msgid ""
@@ -29527,7 +29522,7 @@ msgstr "Sākt minimālā skatījuma režīmā"
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
 msgid "Force window style:"
-msgstr "Piespiest loga stilu:"
+msgstr "Uzspiest loga stilu:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
 msgid "Integrate video in interface"
@@ -29651,7 +29646,7 @@ msgstr "Rindpārleces novēršana"
 
 #: modules/gui/qt/ui/sprefs_video.h:328
 msgid "Force Aspect Ratio"
-msgstr "Piespiest malu attiecības"
+msgstr "Uzspiest malu attiecības"
 
 #: modules/gui/qt/ui/sprefs_video.h:333
 msgid "vlc-snap"
