@@ -57,6 +57,8 @@ ${LangFileString} Action_OnArrivalSVCDMovie "Cluich film SVCD"
 ${LangFileString} Action_OnArrivalVideoFiles "Cluich faidhlichean video"
 ${LangFileString} Action_OnArrivalMusicFiles "Cluich faidhlichean fuaime"
 ${LangFileString} Action_OnArrivalDVDAudio "Cluich DVD fuaime"
+${LangFileString} Action_OnArrivalBluray "Cluich Blu-ray"
+
 ${LangFileString} License_NextText "Tha thu eòlach air do chòraichean a-nis. Briog air $\"Air adhart$\" airson leantainn air adhart."
 
 ${LangFileString} Detail_CheckProcesses "A' sgrùdadh an adhartais..."
