@@ -1,23 +1,23 @@
 # Basque translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Alexander Gabilondo <alexgabi@disroot.org>, 2016,2020
+# Alexander Gabilondo <alexgabi@disroot.org>, 2016, 2020-2021
 # Gorka Azkarate Zubiaur <gorkaazkarate@gmail.com>, 2013
 # Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>, 2011
 # Ixiar Iza <i.iza@elhuyar.com>, 2015
-# julen <julenx@gmail.com>, 2012-2014,2018
+# julen <julenx@gmail.com>, 2012-2014, 2018
 # LEIRE LÓPEZ GOIBURU <leirerentzat@gmail.com>, 2015
 # Osoitz <oelkoro@gmail.com>, 2020
-# Txopi <txopi@ikusimakusi.eus>, 2018-2019
+# Txopi <txopi@ikusimakusi.eus>, 2018-2020
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-05-03 22:42+0200\n"
-"Last-Translator: Alexander Gabilondo <alexgabi@disroot.org>, 2020\n"
+"PO-Revision-Date: 2021-02-28 16:29+0100\n"
+"Last-Translator: Alexander Gabilondo <alexgabi@disroot.org>, 2021\n"
 "Language-Team: Basque (https://www.transifex.com/yaron/teams/16553/eu/)\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
@@ -12190,9 +12190,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "Kate testuzko azpitituluen paketatzailea"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "Transkodeketa-aukerak"
+msgstr "Letra mota gehigarrien direktorioa"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -15415,17 +15414,16 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "Hobetsitako banda-zabalera transmisio jarraitu ez-moldakorrentzat"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "DTS atzerapena (ms)"
+msgstr "Zuzeneko erreprodukzioaren atzerapena (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "Egonkortasunaren eta denbora errealaren arteko konpentsazioa"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "Gehienezko bufferra (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15445,9 +15443,8 @@ msgid "Low latency"
 msgstr "Latentzia txikia"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "Gainidatzi parametroak"
+msgstr "Latentzia txikiko parametroak gainidazten ditu"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15474,9 +15471,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "Banda-zabalera/kalitate altuena"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "Behartu lodia"
+msgstr "Behartu"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -29297,11 +29293,14 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
+"VLC-k web interfazearen bertsio mugikorrarekin lotzen duen QR kodea bistara "
+"dezake; zure VLC multimedia erreproduzitzailearen instantziaren web "
+"interfazearen web helbidea Internet bidez Google Image Charts web zerbitzura "
+"igorriko da QR kode hau sortzeko."
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "Deskargatu egin nahi duzu?"
+msgstr "Honekin aurrera egin nahi al duzu?"
 
 #: share/lua/http/index.html:290
 msgid ""
