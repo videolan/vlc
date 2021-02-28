@@ -1,17 +1,17 @@
 # Hebrew translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Amir Aharoni <amir.aharoni@mail.huji.ac.il>, 2016
-# Yaron Shahrabani <sh.yaron@gmail.com>, 2014-2020
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2014-2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-12-18 09:32+0100\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-02-28 06:17+0100\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2021\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/16553/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -1807,6 +1807,8 @@ msgid ""
 "This allows you to change the default target level (89 dB) for stream with "
 "replay gain information"
 msgstr ""
+"מאפשר לך לשנות את דרגת היעד כבררת מחדל (89 דציבלים) עם פרטים על איזון עצמת "
+"השמע"
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
@@ -2761,6 +2763,8 @@ msgid ""
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
 "{...}\""
 msgstr ""
+"ניתן לספק רשימת סימניות ידנית לתזרים בצורה „‎{name=bookmark-name,"
+"time=optional-time-offset,bytes=optional-byte-offset},{...}‎”"
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
@@ -3272,7 +3276,7 @@ msgstr ""
 
 #: src/libvlc-module.c:937
 msgid "Stream all elementary streams (video, audio and subtitles)"
-msgstr ""
+msgstr "להזרים את כל התזרימים הבסיסיים (וידאו, שמע וכתוביות)"
 
 #: src/libvlc-module.c:939
 msgid "Display while streaming"
@@ -3382,6 +3386,8 @@ msgid ""
 "These options allow you to select default modules. Leave these alone unless "
 "you really know what you are doing."
 msgstr ""
+"אפשרויות אלו מאפשרות לך לבחור את מודולי בררת המחדל. עדיף לא לגעת בזה אם לא "
+"ברור לך לחלוטין מה המשמעות של זה."
 
 #: src/libvlc-module.c:1001
 msgid "Access module"
@@ -3433,6 +3439,8 @@ msgid ""
 "You can select which VoD server module you want to use. Set this to "
 "'vod_rtsp' to switch back to the old, legacy module."
 msgstr ""
+"ניתן לבחור באיזה מודול שרת VoD ברצונך להשתמש. יש להגדיר זאת ל־‚vod_rtsp’ כדי "
+"להחליף למודול הישן."
 
 #: src/libvlc-module.c:1027
 msgid "Allow real-time priority"
@@ -4481,11 +4489,11 @@ msgstr "החלפה בין רשימה מוגדרת מראש של יחסי תצו�
 
 #: src/libvlc-module.c:1403
 msgid "Cycle video crop"
-msgstr ""
+msgstr "החלפת חיתוכי וידאו"
 
 #: src/libvlc-module.c:1404
 msgid "Cycle through a predefined list of crop formats."
-msgstr ""
+msgstr "החלפה מחזורית מתוך רשימה של תצורות חיתוך מוגדרות מראש."
 
 #: src/libvlc-module.c:1405
 msgid "Toggle autoscaling"
@@ -4835,7 +4843,7 @@ msgstr "עצירה בדפדפן"
 #: modules/gui/qt/ui/podcast_configuration.h:103
 #: modules/gui/qt/ui/streampanel.h:171
 msgid "Delete"
-msgstr "מחק"
+msgstr "מחיקה"
 
 #: src/misc/actions.c:63
 msgid "Down"
@@ -5158,7 +5166,7 @@ msgid ""
 "It was not possible to download a cryptographic signature for the downloaded "
 "file \"%s\". Thus, it was deleted."
 msgstr ""
-"לא ניתן להוריד את החתימה המוצפנת עבור הקובץ „%s“ שהתקבל. לכן, הוא נמחק."
+"לא ניתן להוריד את החתימה המוצפנת עבור הקובץ שהתקבל בשם „%s”. לכן, הוא נמחק."
 
 #: src/misc/update.c:661 src/misc/update.c:673
 msgid "Invalid signature"
@@ -5170,7 +5178,7 @@ msgid ""
 "The cryptographic signature for the downloaded file \"%s\" was invalid and "
 "could not be used to securely verify it. Thus, the file was deleted."
 msgstr ""
-"החתימה המוצפנת של הקובץ „%s“ שהתקבלה הייתה שגויה ולא ניתן להשתמש בה כדי לאמת "
+"החתימה המוצפנת של הקובץ „%s” שהתקבל הייתה שגויה ולא ניתן להשתמש בה כדי לאמת "
 "את מהימנות הקובץ בבטחה. לכן, הקובץ נמחק."
 
 #: src/misc/update.c:686
@@ -5182,7 +5190,7 @@ msgstr "הקובץ לא ניתן לאימות"
 msgid ""
 "It was not possible to securely verify the downloaded file \"%s\". Thus, it "
 "was deleted."
-msgstr "לא ניתן לאמת בבטחה את הקובץ „%s“ שהתקבל. לכן, הקובץ נמחק."
+msgstr "לא ניתן לאמת בבטחה את הקובץ שהתקבל בשם „%s”. לכן, הקובץ נמחק."
 
 #: src/misc/update.c:698 src/misc/update.c:710
 msgid "File corrupted"
@@ -5191,7 +5199,7 @@ msgstr "הקובץ פגום"
 #: src/misc/update.c:699 src/misc/update.c:711
 #, c-format
 msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
-msgstr "הקובץ „%s“ שהתקבל אינו תקין. לכן הוא נמחק."
+msgstr "הקובץ שהתקבל בשם „%s“ אינו תקין. לכן, הוא נמחק."
 
 #: src/misc/update.c:723
 msgid ""
@@ -5876,7 +5884,7 @@ msgstr "זולו"
 
 #: src/video_output/vout_intf.c:169
 msgid "Autoscale video"
-msgstr ""
+msgstr "שינוי גודל וידאו אוטומטית"
 
 #: src/video_output/vout_intf.c:203 modules/gui/macosx/VLCMainMenu.m:439
 #: modules/gui/macosx/VLCMainMenu.m:440
@@ -6241,7 +6249,7 @@ msgstr ""
 
 #: modules/access/decklink.cpp:54
 msgid "Desired input video mode. Leave empty for autodetection."
-msgstr ""
+msgstr "מצב קלט הווידאו הרצוי. יש להשאיר ריק לזיהוי אוטומטי."
 
 #: modules/access/decklink.cpp:56
 msgid ""
@@ -6461,7 +6469,7 @@ msgstr "מאפייני הטיונר"
 
 #: modules/access/dshow/dshow.cpp:161
 msgid "Show the tuner properties [channel selection] page."
-msgstr ""
+msgstr "להציג את עמוד מאפייני הטיונר [בחירת ערוץ]."
 
 #: modules/access/dshow/dshow.cpp:162
 msgid "Tuner TV Channel"
@@ -7429,7 +7437,7 @@ msgstr "שפת התזרים היסודי כפי שמתואר ב־ISO639"
 
 #: modules/access/imem.c:77
 msgid "Sample rate of an audio elementary stream"
-msgstr ""
+msgstr "קצב דגימה של תזרים שמע בסיסי"
 
 #: modules/access/imem.c:79 modules/audio_output/amem.c:51
 msgid "Channels count"
@@ -7451,7 +7459,7 @@ msgstr "רוחב"
 
 #: modules/access/imem.c:84
 msgid "Width of video or subtitle elementary streams"
-msgstr ""
+msgstr "רוחב הווידאו או הכתוביות של תזרימים בסיסיים"
 
 #: modules/access/imem.c:86 modules/access/v4l2/v4l2.c:66
 #: modules/demux/rawvid.c:51
@@ -7464,7 +7472,7 @@ msgstr "גוה"
 
 #: modules/access/imem.c:87
 msgid "Height of video or subtitle elementary streams"
-msgstr ""
+msgstr "גובה הווידאו או הכתוביות של תזרימים בסיסיים"
 
 #: modules/access/imem.c:89
 msgid "Display aspect ratio"
@@ -7566,7 +7574,7 @@ msgstr "מס׳ הקישור"
 msgid ""
 "Allows you to set the desired link of the board for the capture (starting at "
 "0)."
-msgstr ""
+msgstr "מאפשר לך להגדיר את קישור הלוח הרצוי ללכידה (מתחיל ב־0)."
 
 #: modules/access/linsys/linsys_hdsdi.c:75
 #: modules/access/linsys/linsys_sdi.c:71
@@ -8314,7 +8322,7 @@ msgstr "סטנדרטי"
 
 #: modules/access/v4l2/v4l2.c:52
 msgid "Video standard (Default, SECAM, PAL, or NTSC)."
-msgstr ""
+msgstr "תקן הווידאו (אוטומטי, SECAM,‏ NTSC או PAL הנהוגה בישראל)."
 
 #: modules/access/v4l2/v4l2.c:55
 msgid ""
@@ -8587,7 +8595,7 @@ msgstr ""
 msgid ""
 "Enable the color killer, i.e. switch to black & white picture whenever the "
 "signal is weak."
-msgstr ""
+msgstr "להפעיל את משבית הצבעים, כלומר הסבה לתמונה בשחור לבן כשהאות חלש."
 
 #: modules/access/v4l2/v4l2.c:156
 msgid "Color effect"
@@ -8705,7 +8713,7 @@ msgstr "הכול"
 
 #: modules/access/v4l2/v4l2.c:246
 msgid "Multichannel television sound (MTS)"
-msgstr ""
+msgstr "שמע טלוויזיה רב־ערוצי (MTS)"
 
 #: modules/access/v4l2/v4l2.c:247
 msgid "525 lines / 60 Hz"
@@ -9069,6 +9077,8 @@ msgid ""
 "\\nkey-file. File is read on the segment opening and values are used on that "
 "segment."
 msgstr ""
+"קובץ נקרא עם תחילת מקטע שכנראה מוגדר כך: key-uri\\nkey-file. הקובץ נקרא עם "
+"פתיחת המקטע והערכים חלים על המקטע הזה."
 
 #: modules/access_output/livehttp.c:102
 msgid "Use randomized IV for encryption"
@@ -10170,11 +10180,13 @@ msgid ""
 "You should configure your speaker layout with \"Audio Midi Setup\" in /"
 "Applications/Utilities. VLC will output Stereo only."
 msgstr ""
+"עליך להגדיר את פריסת הרמקולים שלך דרך „הגדרת שמע MIDI” תחת /יישומים/כלי "
+"מערכת. VLC יוציא פלט סטריאו בלבד."
 
 #: modules/audio_output/auhal.c:1186
 msgid ""
 "The selected audio output device is exclusively in use by another program."
-msgstr ""
+msgstr "התקן פלט השמע הנבחר נמצא בשימושה הבלעדי של תכנית אחרת."
 
 #: modules/audio_output/directsound.c:62 modules/audio_output/mmdevice.c:1466
 msgid "Output device"
@@ -11527,9 +11539,8 @@ msgid "Kate text subtitles packetizer"
 msgstr ""
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "אפשרויות ההתמרה"
+msgstr ""
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -11596,7 +11607,7 @@ msgstr ""
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
-msgstr ""
+msgstr "מפענח שמע/וידאו (באמצעות OpenMAX IL)"
 
 #: modules/codec/omxil/omxil.c:172
 msgid "Video encoder (using OpenMAX IL)"
@@ -11983,7 +11994,7 @@ msgstr ""
 
 #: modules/codec/schroedinger.c:150
 msgid "Add Noise"
-msgstr ""
+msgstr "הוספת רעש"
 
 #: modules/codec/schroedinger.c:151
 msgid "Gaussian Adaptive Low Pass Filter"
@@ -12202,11 +12213,11 @@ msgstr "פרופיל ראשי"
 
 #: modules/codec/schroedinger.c:363
 msgid "Dirac video decoder using libschroedinger"
-msgstr ""
+msgstr "מפענח הווידאו Dirac בשימוש עם libschroedinger"
 
 #: modules/codec/schroedinger.c:371
 msgid "Dirac video encoder using libschroedinger"
-msgstr ""
+msgstr "מפענח הווידאו Dirac בשימוש עם libschroedinger"
 
 #: modules/codec/scte18.c:41
 msgid "SCTE-18 decoder"
@@ -12637,7 +12648,7 @@ msgstr "מקדם יחס להחיל על התמונה"
 
 #: modules/codec/svg.c:63
 msgid "SVG video decoder"
-msgstr ""
+msgstr "מפענח וידאו SVG"
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
@@ -12817,11 +12828,11 @@ msgstr ""
 
 #: modules/codec/vpx.c:66
 msgid "WebM video decoder"
-msgstr ""
+msgstr "מפענח וידאו WebM"
 
 #: modules/codec/vpx.c:75
 msgid "WebM video encoder"
-msgstr ""
+msgstr "מצפין וידאו WebM"
 
 #: modules/codec/webvtt/webvtt.c:40
 msgid "WEBVTT decoder"
@@ -13737,6 +13748,9 @@ msgid ""
 "the quiet mode will not bring this command box but can also be pretty "
 "annoying when you want to stop VLC and no video window is open."
 msgstr ""
+"כבררת מחדל יתחיל תוסף מנשק הדמה תיבת פקודות של DOS. הפעלת המצב השקט לא תציג "
+"את תיבת הפקודות הזאת אך זה עשוי להיות די מעצבן לנסות לעצור את VLC כשאין אף "
+"חלון וידאו פתוח."
 
 #: modules/control/dummy.c:50
 msgid "Dummy interface"
@@ -13971,6 +13985,8 @@ msgstr ""
 msgid ""
 "Use HDAPS, AMS, APPLESMC or UNIMOTION motion sensors to rotate the video"
 msgstr ""
+"להשתמש בחיישני תנועה מסוג HDAPS,‏ AMS,‏ APPLESMC או UNIMOTION כדי להטות את "
+"הווידאו"
 
 #: modules/control/netsync.c:56
 msgid "Network master clock"
@@ -14114,6 +14130,9 @@ msgid ""
 "the quiet mode will not bring this command box but can also be pretty "
 "annoying when you want to stop VLC and no video window is open."
 msgstr ""
+"כבררת מחדל יתחיל תוסף מנשק השליטה מרחוק (rc) תיבת פקודות של DOS. הפעלת המצב "
+"השקט לא תציג את תיבת הפקודות הזאת אך זה עשוי להיות די מעצבן לנסות לעצור את "
+"VLC כשאין אף חלון וידאו פתוח."
 
 #: modules/control/oldrc.c:187
 msgid "RC"
@@ -14488,9 +14507,8 @@ msgid "Low latency"
 msgstr "עיכוב נמוך"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "דריסת משתנים"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -14517,9 +14535,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "אילוץ הדגשה"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -15090,7 +15107,7 @@ msgstr "מפלג MusePack"
 msgid ""
 "This is the frame rate used as a fallback when playing MPEG video elementary "
 "streams."
-msgstr ""
+msgstr "זה קצב התמוניות שמשמש כבררת מחדל בניגון תזרימי MPEG בסיסיים"
 
 #: modules/demux/mpeg/es.c:60
 msgid "MPEG-I/II/4 / A52 / DTS / MLP audio"
@@ -16186,7 +16203,7 @@ msgid ""
 "You just need to fill one of the three following parameters, VLC will "
 "autodetect the other using the original aspect ratio"
 msgstr ""
-"עליך למלא אחד מתוך שלוש הפרמטרים הבאים, VLC יזהה את השאר אוטומטית בעזרת יחס "
+"עליך למלא אחד מתוך שלושת המשתנים הבאים, VLC יזהה את השאר אוטומטית בעזרת יחס "
 "התצוגה המקורי."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:169
@@ -16735,7 +16752,7 @@ msgstr "הסתרת אחרים"
 #: modules/gui/macosx/VLCMainMenu.m:351
 #: modules/gui/macosx/VLCSimplePrefsController.m:383
 msgid "Show All"
-msgstr "הצגת הכול"
+msgstr "להציג הכול"
 
 #: modules/gui/macosx/VLCMainMenu.m:352
 msgid "Quit VLC"
@@ -17217,7 +17234,7 @@ msgstr "נא לבחור קובץ נוסף לנגנן בסנכרון עם הקו�
 
 #: modules/gui/macosx/VLCOpenWindowController.m:158
 msgid "Custom playback"
-msgstr ""
+msgstr "נגינה בהתאמה אישית"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:166
 msgid "Open VIDEO_TS / BDMV folder"
@@ -17225,7 +17242,7 @@ msgstr "פתיחת תיקיית VIDEO_TS / BDMV"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:167
 msgid "Insert Disc"
-msgstr ""
+msgstr "נא להכניס תקליטור"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:173
 msgid "Disable DVD menus"
@@ -17246,6 +17263,9 @@ msgid ""
 "enter the URL in the field above. If you want to open a RTP or UDP stream, "
 "press the button below."
 msgstr ""
+"כדי לפתוח תזרימי רשת נפוצים (HTTP,‏ RTSP,‏ RTMP,‏ MMS,‏ FTP ועוד), עליך פשוט "
+"למלא את הכתובת בשדה שלהלן. כדי לפתוח תזרים RTP או UDP, יש ללחוץ על הכפתור "
+"שלהלן."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:190
 msgid ""
@@ -17256,12 +17276,20 @@ msgid ""
 "To open a stream using a different protocol, just press Cancel to close this "
 "sheet."
 msgstr ""
+"כדי לפתוח תזרים בהפצה (multicast), יש למלא את כתובת ה־IP המתאימה שסופקה על "
+"ידי ספק התזרים. במצב שידור ישיר (unicast), ישתמש VLC בכתובת ה־IP של המכונה "
+"שלך אוטומטית.\n"
+"\n"
+"כדי לפתוח תזרים באמצעות פרוטוקול אחר, עליך ללחוץ על ביטול כדי לסגור את "
+"הגיליון הזה."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:191
 msgid ""
 "Enter a stream URL here. To open RTP or UDP streams, use the respective "
 "button below."
 msgstr ""
+"יש למלא כאן כתובת תזרים. כדי לפתוח תזרימי RTP או UDP, יש להשתמש בכפתור "
+"המתאים להלן."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:194
 msgid "Open RTP/UDP Stream"
@@ -17799,7 +17827,7 @@ msgstr "מספור רציף"
 #: modules/gui/macosx/VLCSimplePrefsController.m:385
 #: modules/gui/macosx/prefs.m:190
 msgid "Reset All"
-msgstr "איפוס הכול"
+msgstr "לאפס הכול"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:387
 #: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
@@ -18784,6 +18812,10 @@ msgid ""
 "\n"
 "Controls will automatically appear here."
 msgstr ""
+"לא נמצא עותק של v4l2.\n"
+"נא לבדוק שההתקן נפתח עם VLC ושהוא מתנגן.\n"
+"\n"
+"הפקדים יופיעו כאן אוטומטית."
 
 #: modules/gui/qt/components/extended_panels.cpp:1107
 #: modules/gui/qt/components/extended_panels.cpp:1108
@@ -19976,6 +20008,7 @@ msgstr "מחזיר מידע נוסף ואת התמונה הייצוגית של �
 msgid ""
 "Extensions brings various enhancements. Check descriptions for more details"
 msgstr ""
+"הרחבות מביאות עמן מגוון של שיפורים. ניתן לעיין בתיאורים לקבלת פרטים נוספים"
 
 #: modules/gui/qt/dialogs/plugins.cpp:418
 msgid "Only installed"
@@ -20101,6 +20134,9 @@ msgid ""
 "This is automatically generated when you change the above settings,\n"
 "but you can change it manually."
 msgstr ""
+"מחרוזת פלט תזרים.\n"
+"נוצרת אוטומטית עם שינוי ההגדרות שלעיל,\n"
+"ניתן לשנות אותה גם ידנית."
 
 #: modules/gui/qt/dialogs/sout.cpp:91
 msgid "Back"
@@ -20715,7 +20751,7 @@ msgstr "הפעלת VLC עם סמל בשורת המשימות בלבד"
 
 #: modules/gui/qt/qt.cpp:92
 msgid "VLC will start with just an icon in your taskbar."
-msgstr ""
+msgstr "VLC יופעל רק עם סמל בסרגל המשימות שלך."
 
 #: modules/gui/qt/qt.cpp:101
 msgid "Show playing item name in window title"
@@ -20739,7 +20775,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:110
 msgid "Windows opacity between 0.1 and 1"
-msgstr ""
+msgstr "אטימות החלונות בין 0.1 ל־1"
 
 #: modules/gui/qt/qt.cpp:111
 msgid ""
@@ -20871,7 +20907,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:169
 msgid "Background art fits window's size."
-msgstr ""
+msgstr "אומנות הרקע תואמת את גודל החלון."
 
 #: modules/gui/qt/qt.cpp:171
 msgid "Ignore keyboard volume buttons."
@@ -20891,13 +20927,13 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:188
 msgid "When to raise the interface"
-msgstr ""
+msgstr "מתי להרים את המנשק"
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
 "This option allows the interface to be raised automatically when a video/"
 "audio playback starts, or never."
-msgstr ""
+msgstr "אפשרות זו מאפשרת למנשק לקום כאשר מתחילה נגינה של שמע/וידאו או אף פעם."
 
 #: modules/gui/qt/qt.cpp:192
 msgid "Fullscreen controller mouse sensitivity"
@@ -21031,6 +21067,8 @@ msgid ""
 "When this mode is enabled, pixels will be shown as black or white. The "
 "threshold value will be the brightness defined below."
 msgstr ""
+"כאשר המצב הזה מופעל, פיקסלים יופיעו בשחור או בלבן. ערך הסף יהיה הבהירות "
+"שמוגדרת להלן."
 
 #: modules/hw/d3d11/d3d11_filters.c:90 modules/hw/d3d9/d3d9_filters.c:72
 #: modules/video_filter/adjust.c:65
@@ -21040,7 +21078,7 @@ msgstr "ניגודיות התמונה (0-2)"
 #: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:73
 #: modules/video_filter/adjust.c:66
 msgid "Set the image contrast, between 0 and 2. Defaults to 1."
-msgstr ""
+msgstr "הגדרת ניגודיות התמונה, בין 0 ל־2. בררת המחדל היא 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:74
 msgid "Image hue (0-360)"
@@ -21048,7 +21086,7 @@ msgstr "גוון התמונה (0-360)"
 
 #: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:75
 msgid "Set the image hue, between 0 and 360. Defaults to 0."
-msgstr ""
+msgstr "הגדרת גוון התמונה, בין 0 ל־360. בררת המחדל היא 0."
 
 #: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:76
 #: modules/video_filter/adjust.c:69
@@ -21058,7 +21096,7 @@ msgstr "רווית התמונה"
 #: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:77
 #: modules/video_filter/adjust.c:70
 msgid "Set the image saturation, between 0 and 3. Defaults to 1."
-msgstr ""
+msgstr "הגדרת רוויית התמונה, בין 0 ל־3. בררת המחדל היא 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:78
 #: modules/video_filter/adjust.c:71
@@ -21068,7 +21106,7 @@ msgstr "בהירות התמונה (0-2)"
 #: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:79
 #: modules/video_filter/adjust.c:72
 msgid "Set the image brightness, between 0 and 2. Defaults to 1."
-msgstr ""
+msgstr "הגדרת בהירות התמונה, בין 0 ל־2. בררת המחדל היא 1."
 
 #: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:80
 #: modules/video_filter/adjust.c:73
@@ -21082,7 +21120,7 @@ msgstr "הגדרת גוון התמונה, בין 0.01 ל־10. בררת המחד�
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
-msgstr ""
+msgstr "מסנן כוונון Direct3D9"
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -21099,11 +21137,11 @@ msgstr ""
 
 #: modules/hw/mmal/codec.c:58
 msgid "MMAL decoder"
-msgstr ""
+msgstr "מפענח MMAL"
 
 #: modules/hw/mmal/codec.c:59
 msgid "MMAL-based decoder plugin for Raspberry Pi"
-msgstr ""
+msgstr "תוסף מפענח מבוסס MMAL עבור Raspberry Pi"
 
 #: modules/hw/mmal/deinterlace.c:45
 msgid "Use QPUs for advanced HD deinterlacing."
@@ -21139,7 +21177,7 @@ msgstr ""
 
 #: modules/hw/mmal/vout.c:54
 msgid "Blank screen below video."
-msgstr ""
+msgstr "חלון ריק מעל לווידאו."
 
 #: modules/hw/mmal/vout.c:55
 msgid "Render blank screen below video. Increases VideoCore load."
@@ -21147,11 +21185,11 @@ msgstr ""
 
 #: modules/hw/mmal/vout.c:59 modules/hw/mmal/vout.c:60
 msgid "Adjust HDMI refresh rate to the video."
-msgstr ""
+msgstr "התאמת קצב רענון ה־HDMI לווידאו."
 
 #: modules/hw/mmal/vout.c:63
 msgid "Force interlaced video mode."
-msgstr ""
+msgstr "לאכוף מצב וידאו שזור."
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
@@ -21161,19 +21199,19 @@ msgstr ""
 
 #: modules/hw/mmal/vout.c:75
 msgid "MMAL vout"
-msgstr ""
+msgstr "MMAL vout"
 
 #: modules/hw/mmal/vout.c:76
 msgid "MMAL-based vout plugin for Raspberry Pi"
-msgstr ""
+msgstr "תוסף vout מבוסס MMAL עבור Raspberry Pi"
 
 #: modules/hw/vaapi/filters.c:1185
 msgid "VAAPI filters"
-msgstr ""
+msgstr "מסנני VAAPI"
 
 #: modules/hw/vaapi/filters.c:1186
 msgid "Video Accelerated API filters"
-msgstr ""
+msgstr "מסנני API מואץ וידאו"
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -21213,7 +21251,7 @@ msgstr "האם ביטול שזירה זמני חל על תאורה (luma) בלב
 
 #: modules/hw/vdpau/chroma.c:904
 msgid "Noise reduction level"
-msgstr ""
+msgstr "רמת הפחתת רעשים"
 
 #: modules/hw/vdpau/chroma.c:906
 msgid "Scaling quality"
@@ -21249,7 +21287,7 @@ msgstr ""
 
 #: modules/keystore/file.c:66
 msgid "Secrets are stored encrypted on a file"
-msgstr ""
+msgstr "הסודות מאוחסנים מוצפנים בקובץ"
 
 #: modules/keystore/keychain.m:41
 msgid "No"
@@ -21265,7 +21303,7 @@ msgstr "בררת המחדל של המערכת"
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock"
-msgstr ""
+msgstr "לאחר השחרור הראשון"
 
 #: modules/keystore/keychain.m:49
 msgid "After first unlock, on this device only"
@@ -21289,20 +21327,22 @@ msgstr ""
 
 #: modules/keystore/keychain.m:57
 msgid "Synchronize stored items"
-msgstr ""
+msgstr "סנכרון פריטים מאוחסנים"
 
 #: modules/keystore/keychain.m:58
 msgid ""
 "Synchronizes stored items via iCloud Keychain if enabled in the user domain."
 msgstr ""
+"מסנכרן את הפריטים המאוחסנים דרך מחזיק המפתחות של iCloud אם הוא מופעל בתחום "
+"של המשתמש."
 
 #: modules/keystore/keychain.m:60
 msgid "Accessibility type for all future passwords saved to the Keychain"
-msgstr ""
+msgstr "סוג נגישות לכל הססמאות העתידיות שנשמרו למחזיק המפתחות"
 
 #: modules/keystore/keychain.m:62
 msgid "Keychain access group"
-msgstr ""
+msgstr "קבוצה גישה למפתחות"
 
 #: modules/keystore/keychain.m:63
 msgid "Keychain access group as defined by the app entitlements."
@@ -21310,19 +21350,19 @@ msgstr ""
 
 #: modules/keystore/keychain.m:109
 msgid "Keychain keystore"
-msgstr ""
+msgstr "אחסון מפתחות למחזיקי מפתחות"
 
 #: modules/keystore/keychain.m:110
 msgid "Keystore for iOS, Mac OS X and tvOS"
-msgstr ""
+msgstr "אחסון מפתחות ל־iOS,‏ Mac OS X ו־tvOS"
 
 #: modules/keystore/kwallet.c:48
 msgid "KWallet keystore"
-msgstr ""
+msgstr "אחסון מפתחות ב־KWallet"
 
 #: modules/keystore/kwallet.c:49
 msgid "Secrets are stored via KWallet"
-msgstr ""
+msgstr "הסודות מאוחסנים דרך KWallet"
 
 #: modules/keystore/memory.c:41
 msgid "Memory keystore"
@@ -21504,7 +21544,7 @@ msgstr ""
 
 #: modules/lua/vlc.c:55 modules/lua/vlc.c:71
 msgid "A single password restricts access to this interface."
-msgstr ""
+msgstr "ססמה אחידה מגבילה את הגישה למנשק זה."
 
 #: modules/lua/vlc.c:57 modules/lua/vlc.c:58
 msgid "Source directory"
@@ -21535,7 +21575,7 @@ msgstr "זו פתחת ה־TCP שבה יאזין המנשק הזה. בררת המ
 
 #: modules/lua/vlc.c:76
 msgid "CLI input"
-msgstr ""
+msgstr "קלט שורת פקודה"
 
 #: modules/lua/vlc.c:77
 msgid ""
@@ -21549,7 +21589,7 @@ msgstr ""
 
 #: modules/lua/vlc.c:85
 msgid "Lua"
-msgstr ""
+msgstr "Lua"
 
 #: modules/lua/vlc.c:86
 msgid "Lua interpreter"
@@ -21557,19 +21597,19 @@ msgstr "מפענח Lua"
 
 #: modules/lua/vlc.c:97 modules/lua/vlc.c:104
 msgid "Lua HTTP"
-msgstr ""
+msgstr "Lua HTTP"
 
 #: modules/lua/vlc.c:107
 msgid "Lua CLI"
-msgstr ""
+msgstr "Lua שורת פקודה"
 
 #: modules/lua/vlc.c:111
 msgid "Command-line interface"
-msgstr ""
+msgstr "מנשק שורת פקודה"
 
 #: modules/lua/vlc.c:120 modules/lua/vlc.c:131
 msgid "Lua Telnet"
-msgstr ""
+msgstr "Lua Telnet"
 
 #: modules/lua/vlc.c:135
 msgid "Lua Meta Fetcher"
@@ -22193,11 +22233,11 @@ msgstr ""
 
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
-msgstr ""
+msgstr "שם המשתמש של החשבון שלך ב־last.fm"
 
 #: modules/misc/audioscrobbler.c:117
 msgid "The password of your last.fm account"
-msgstr ""
+msgstr "הססמה של החשבון שלך ב־last.fm"
 
 #: modules/misc/audioscrobbler.c:118
 msgid "Scrobbler URL"
@@ -22217,13 +22257,15 @@ msgstr "הגשת השירים שהתנגנו ל־last.fm"
 
 #: modules/misc/audioscrobbler.c:566
 msgid "last.fm: Authentication failed"
-msgstr ""
+msgstr "last.fm: האימות נכשל"
 
 #: modules/misc/audioscrobbler.c:567
 msgid ""
 "last.fm username or password is incorrect. Please verify your settings and "
 "relaunch VLC."
 msgstr ""
+"שם המשתמש או הססמה ב־last.fm שגויים. נא לאמת את ההגדרות שלך ולטעון את VLC "
+"מחדש."
 
 #: modules/misc/audioscrobbler.c:713
 msgid "Last.fm username not set"
@@ -22459,7 +22501,7 @@ msgstr ""
 
 #: modules/misc/securetransport.c:347
 msgid "Accept certificate temporarily"
-msgstr ""
+msgstr "לקבל את האישור זמנית"
 
 #: modules/misc/stats.c:214 modules/stream_out/stats.c:51
 msgid "Stats"
@@ -22467,39 +22509,39 @@ msgstr "סטטיסטיקה"
 
 #: modules/misc/stats.c:216
 msgid "Stats encoder function"
-msgstr ""
+msgstr "פונקציית קידוד סטטיסטיקה"
 
 #: modules/misc/stats.c:222 modules/misc/stats.c:228 modules/misc/stats.c:234
 msgid "Stats decoder"
-msgstr ""
+msgstr "מפענח סטטיסטיקה"
 
 #: modules/misc/stats.c:223 modules/misc/stats.c:229 modules/misc/stats.c:235
 msgid "Stats decoder function"
-msgstr ""
+msgstr "פונקציית פענוח סטטיסטיקה"
 
 #: modules/misc/stats.c:240
 msgid "Stats demux"
-msgstr ""
+msgstr "מפלג סטטיסטטיקה"
 
 #: modules/misc/stats.c:241
 msgid "Stats demux function"
-msgstr ""
+msgstr "פונקציית פילוג סטטיסטיקה"
 
 #: modules/misc/xml/libxml.c:49
 msgid "XML Parser (using libxml2)"
-msgstr ""
+msgstr "מפענח XML (באמצעות libxml2)"
 
 #: modules/mux/asf.c:57
 msgid "Title to put in ASF comments."
-msgstr ""
+msgstr "כותרת להוספה להערות ב־ASF."
 
 #: modules/mux/asf.c:59
 msgid "Author to put in ASF comments."
-msgstr ""
+msgstr "יוצר להוספה להערות ב־ASF."
 
 #: modules/mux/asf.c:61
 msgid "Copyright string to put in ASF comments."
-msgstr ""
+msgstr "מחרוזת זכויות יוצרים להוספה להערות ב־ASF."
 
 #: modules/mux/asf.c:62 modules/mux/avi.c:53
 msgid "Comment"
@@ -22507,11 +22549,11 @@ msgstr "הערה"
 
 #: modules/mux/asf.c:63
 msgid "Comment to put in ASF comments."
-msgstr ""
+msgstr "הערה להוספה להערות ב־ASF."
 
 #: modules/mux/asf.c:65
 msgid "\"Rating\" to put in ASF comments."
-msgstr ""
+msgstr "„דירוג” להוספה להערות ב־ASF."
 
 #: modules/mux/asf.c:66
 msgid "Packet Size"
@@ -22519,11 +22561,11 @@ msgstr "גודל החבילה"
 
 #: modules/mux/asf.c:67
 msgid "ASF packet size -- default is 4096 bytes"
-msgstr ""
+msgstr "גודל מנת ה־ASD -- בררת המחדל היא 4096 בתים"
 
 #: modules/mux/asf.c:68
 msgid "Bitrate override"
-msgstr ""
+msgstr "דריסת קצב סיביות"
 
 #: modules/mux/asf.c:69
 msgid ""
@@ -22531,10 +22573,13 @@ msgid ""
 "Windows Media Player will cache streamed content. Set to audio+video bitrate "
 "in bytes"
 msgstr ""
+"לא לנסות לנחש את קצב הסיביות של ה־ASF. ההגדרה הזאת מאפשרת לך לשלוט כיצד נגן "
+"המדיה של Windows יאחסן זמנית תוכן מוזרם. יש להגדיר לקצב סיביות שמע+וידאו "
+"בבתים"
 
 #: modules/mux/asf.c:73
 msgid "ASF muxer"
-msgstr ""
+msgstr "מרבב ASF"
 
 #: modules/mux/asf.c:563
 msgid "Unknown Video"
@@ -22550,15 +22595,15 @@ msgstr "מצפין"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
-msgstr ""
+msgstr "מרבב AVI"
 
 #: modules/mux/dummy.c:45
 msgid "Dummy/Raw muxer"
-msgstr ""
+msgstr "מרבב דמה/גולמי"
 
 #: modules/mux/mp4/mp4.c:50
 msgid "Create \"Fast Start\" files"
-msgstr ""
+msgstr "יצירת קובצי „התחלה מהירה”"
 
 #: modules/mux/mp4/mp4.c:52
 msgid ""
@@ -22566,18 +22611,20 @@ msgid ""
 "downloads and allow the user to start previewing the file while it is "
 "downloading."
 msgstr ""
+"יצירת קובצי „התחלה מהירה”. קובצי „התחלה מהירה” הם קבצים שהותאמו להורדות "
+"ומאפשרים למשתמש להתחיל תצוגה מקדימה של הקובץ בזמן הורדתו."
 
 #: modules/mux/mp4/mp4.c:64
 msgid "MP4/MOV muxer"
-msgstr ""
+msgstr "מרבב MP4/MOV"
 
 #: modules/mux/mp4/mp4.c:77
 msgid "Fragmented and streamable MP4 muxer"
-msgstr ""
+msgstr "מרבב MP4 מקוטע ומוכן להזרמה"
 
 #: modules/mux/mpeg/ps.c:48 modules/mux/mpeg/ts.c:162
 msgid "DTS delay (ms)"
-msgstr ""
+msgstr "השהיית DTS (מילישניות)"
 
 #: modules/mux/mpeg/ps.c:49
 msgid ""
@@ -22585,6 +22632,9 @@ msgid ""
 "the data in the stream, compared to the SCRs. This allows for some buffering "
 "inside the client decoder."
 msgstr ""
+"להשהות את ה־DTS (חותמות זמן פענוח) ואת ה־PTS (חותמות זמן הצגה) של הנתונים "
+"בתזרים בהשוואה לייחוסי שעון המערכת (SCRs). מאפשר לבצע אגירה בזיכרון בתור "
+"מפענח הלקוח."
 
 #: modules/mux/mpeg/ps.c:54
 msgid "PES maximum size"
@@ -23329,7 +23379,7 @@ msgstr "שכבת לוגו"
 
 #: modules/spu/logo.c:112
 msgid "Logo video filter"
-msgstr ""
+msgstr "מסנן לוגו על וידאו"
 
 #: modules/spu/marq.c:90
 msgid ""
@@ -24156,7 +24206,7 @@ msgstr ""
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
-msgstr ""
+msgstr "מזהה תזרים בסיסי"
 
 #: modules/stream_out/delay.c:41 modules/stream_out/setid.c:43
 msgid "Specify an identifier integer for this elementary stream"
@@ -24278,7 +24328,7 @@ msgstr "זו כתובת הפלט המלאה שתשמש לווידאו."
 
 #: modules/stream_out/es.c:80
 msgid "Elementary stream output"
-msgstr ""
+msgstr "פלט תזרים בסיסי"
 
 #: modules/stream_out/es.c:350 modules/stream_out/es.c:363
 #, c-format
@@ -24318,7 +24368,7 @@ msgstr "מסנן וידאו"
 
 #: modules/stream_out/mosaic_bridge.c:117
 msgid "Video filters will be applied to the video stream."
-msgstr ""
+msgstr "אפשר להחיל מסנני וידאו על תזרים הווידאו."
 
 #: modules/stream_out/mosaic_bridge.c:119
 msgid "Image chroma"
@@ -24531,7 +24581,7 @@ msgstr ""
 
 #: modules/stream_out/setid.c:51
 msgid "Specify an ISO-639 code (three characters) for this elementary stream"
-msgstr ""
+msgstr "נא לציין קוד ISO-639 (שלוש אותיות) לתזרים בסיסי זה"
 
 #: modules/stream_out/setid.c:61
 msgid "Set ID"
@@ -24627,11 +24677,11 @@ msgstr ""
 
 #: modules/stream_out/smem.c:96
 msgid "Smem"
-msgstr ""
+msgstr "Smem"
 
 #: modules/stream_out/smem.c:97
 msgid "Stream output to memory buffer"
-msgstr ""
+msgstr "הזרמת הפלט לחוצץ הזיכרון"
 
 #: modules/stream_out/stats.c:42
 msgid "Writes stats to file instead of stdout"
@@ -24639,11 +24689,11 @@ msgstr "כותב סטטסיטיקה לקובץ במקום ל־stdout."
 
 #: modules/stream_out/stats.c:43
 msgid "Prefix to show on output line"
-msgstr ""
+msgstr "קידומת להצגה על קו הפלט"
 
 #: modules/stream_out/stats.c:52
 msgid "Writes statistic info about stream"
-msgstr ""
+msgstr "כותב פרטי סטטיסטיקה על התזרים"
 
 #: modules/stream_out/standard.c:44
 msgid "Output method to use for the stream."
@@ -27256,6 +27306,8 @@ msgid ""
 "This allows you to set the resolution of the Goom display (bigger resolution "
 "will be prettier but more CPU intensive)."
 msgstr ""
+"מאפשר לך להגדיר את הרזולוציה של התצוגה של Goom (רזולוציה גדולה יותר תהיה יפה "
+"יותר אך תאמץ את המעבד יותר)."
 
 #: modules/visualization/goom.c:51
 msgid "Goom animation speed"
@@ -27526,7 +27578,7 @@ msgstr "מרבב"
 
 #: share/lua/http/dialogs/create_stream.html:266
 msgid "Video FPS"
-msgstr ""
+msgstr "תמוניות לשנייה של וידאו"
 
 #: share/lua/http/dialogs/create_stream.html:297
 msgid "MUX options"
@@ -27660,9 +27712,8 @@ msgid ""
 msgstr ""
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "האם להוריד אותו?"
+msgstr ""
 
 #: share/lua/http/index.html:290
 msgid ""
@@ -28069,7 +28120,7 @@ msgstr "אפשרויות שונות"
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Stream all elementary streams"
-msgstr ""
+msgstr "להזרים את הכל התזרימים הבסיסיים"
 
 #: modules/gui/qt/ui/sout.h:218
 msgid "Generated stream output string"
