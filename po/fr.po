@@ -1,5 +1,5 @@
 # French translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -9,25 +9,26 @@
 # Christophe Lherieau <skimpax@gmail.com>, 2013
 # Damien Erambert <damien.erambert@me.com>, 2013
 # Emmanuel Simond <emmanuel.simond@gmail.com>, 2013
-# Éric Lassauge <lassauge@users.sourceforge.net>, 2013-2015,2018
+# Éric Lassauge <lassauge@users.sourceforge.net>, 2013-2015, 2018
 # Freddydelanuit Dec <fred.dec@free.fr>, 2014
 # Hugo Beauzée-Luyssen <hugo@beauzee.fr>, 2015
 # Irriep Nala Novram <allannkorh@yahoo.fr>, 2018
-# JeanDeLaMouche <urgau@numericable.fr>, 2020
+# Jean de la Mouche <urgau@numericable.fr>, 2020
 # Lionel Hannequin <lionel.hannequin@free.fr>, 2018
 # Mortimer <doug.mortimer@netcourrier.com>, 2017
 # Paul Caranton <caranton.paul@gmail.com>, 2015
 # Pierre Ynard <linkfanel@yahoo.fr>, 2018-2019
 # Rafaël Carré <funman@videolan.org>, 2014
-# Romain Constantin <romzer2330@gmail.com>, 2018
+# Romain Constantin <romzer2330@gmail.com>, 2018-2019
+# Wallon Wallon <franckjl@hotmail.com>, 2021
 # Yann Ricquebourg <yann.ricquebourg@gmail.com>, 2015-2020
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-06-11 00:50+0200\n"
-"Last-Translator: Yann Ricquebourg <yann.ricquebourg@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-03-01 12:11+0100\n"
+"Last-Translator: Wallon Wallon <franckjl@hotmail.com>, 2021\n"
 "Language-Team: French (https://www.transifex.com/yaron/teams/16553/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -12135,9 +12136,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "Empaqueteur de sous-titres Kate"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "Options de transcodage"
+msgstr "Répertoire des polices supplémentaires"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -15327,17 +15327,16 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "Bande passante préférée pour les flux non adaptatifs"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "Retard DTS (ms)"
+msgstr "Délai de lecture en direct (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "Compromis entre la stabilité et le temps réel"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "Mise en mémoire tampon max (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15357,9 +15356,8 @@ msgid "Low latency"
 msgstr "Latence faible"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "Outrepasser les paramètres"
+msgstr "Remplace les paramètres de faible latence"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15386,9 +15384,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "Bande passante max. / Haute qualité"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "Forcer en gras"
+msgstr "Forcer"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -29133,11 +29130,14 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
+"VLC peut afficher un code QR lié à la version mobile de l'interface web ; "
+"l'adresse web de l'interface web de votre instance du lecteur multimédia VLC "
+"sera transmise au service web Google Image Charts par internet pour générer "
+"ce code QR."
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "Voulez-vous la télécharger ?"
+msgstr "Voulez-vous continuer avec cela ?"
 
 #: share/lua/http/index.html:290
 msgid ""
