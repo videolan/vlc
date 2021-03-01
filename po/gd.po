@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-02-28 17:12+0100\n"
+"PO-Revision-Date: 2021-03-01 16:11+0100\n"
 "Last-Translator: GunChleoc, 2021\n"
 "Language-Team: Gaelic, Scottish (https://www.transifex.com/yaron/teams/16553/"
 "gd/)\n"
@@ -1068,11 +1068,11 @@ msgstr "%.2f dB"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr "Dùmhlachd-bhreacaidh a’ video"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
-msgstr ""
+msgstr "Meud a’ bhufair"
 
 #: src/input/es_out.c:3183 src/input/es_out.c:3186 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1218,22 +1218,22 @@ msgstr ""
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Geò"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Pids"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "Roladh"
 
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "Raon-seallaidh"
 
 #: src/input/es_out.c:3305
 msgid "Max. luminance"
@@ -1377,11 +1377,11 @@ msgstr "Actairean"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 msgid "Album Artist"
-msgstr ""
+msgstr "Neach-ealain an albaim"
 
 #: src/input/meta.c:80
 msgid "Disc number"
-msgstr ""
+msgstr "Àireamh an diosga"
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1423,11 +1423,11 @@ msgstr "An tiotal roimhe"
 
 #: src/input/var.c:278
 msgid "Menu title"
-msgstr ""
+msgstr "Tiotal a’ chlàir-thaice"
 
 #: src/input/var.c:285
 msgid "Menu popup"
-msgstr ""
+msgstr "Priob-uinneag clàir-thaice"
 
 #: src/input/var.c:319
 #, c-format
@@ -16975,7 +16975,7 @@ msgid ""
 "sheet."
 msgstr ""
 "Ma tha thu airson sruth ioma-chraolaidh fhosgladh, cuir a-steach an seòladh "
-"IP a gheibh thu o sholaraiche an t-srutha. Sa mhodh aon-chraoladh, "
+"IP a gheibh thu o sholaraiche an t-srutha. Sa mhodh aon-chraolaidh, "
 "cleachdaidh VLC IP an inneil agad gu fèin-obrachail.\n"
 "\n"
 "Gus sruth fhosgladh le pròtacal eile, briog air “Sguir dheth” gus an siota "
@@ -17001,13 +17001,13 @@ msgstr "Pròtacal"
 #: modules/gui/macosx/VLCOpenWindowController.m:1016
 #: modules/gui/macosx/VLCOpenWindowController.m:1065
 msgid "Unicast"
-msgstr "Unicast"
+msgstr "Aon-chraoladh"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:200
 #: modules/gui/macosx/VLCOpenWindowController.m:1029
 #: modules/gui/macosx/VLCOpenWindowController.m:1078
 msgid "Multicast"
-msgstr "Multicast"
+msgstr "Ioma-chraoladh"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:206
 #: modules/gui/macosx/VLCOpenWindowController.m:506
@@ -19894,7 +19894,7 @@ msgstr "Bàr-inneal an ama"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:129
 msgid "Advanced Widget"
-msgstr ""
+msgstr "Widget adhartach"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
@@ -19914,7 +19914,7 @@ msgstr "Tagh pròifil:"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:187
 msgid "Preview"
-msgstr ""
+msgstr "Ro-sheall"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:196
 msgid "Cl&ose"
@@ -19954,7 +19954,7 @@ msgstr "Clàir-thaice DVD"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:533
 msgid "Teletext transparency"
-msgstr ""
+msgstr "Trìd-shoilleireachd a’ teletext"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:548
 msgid "Advanced Buttons"
@@ -19966,11 +19966,11 @@ msgstr "Putain cluich"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:565
 msgid "Aspect ratio selector"
-msgstr ""
+msgstr "Roghnaichear co-mheas an deilbh"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:569
 msgid "Speed selector"
-msgstr ""
+msgstr "Roghnaichear astair"
 
 #: modules/gui/qt/dialogs/vlm.cpp:73
 msgid "Broadcast"
@@ -20074,7 +20074,7 @@ msgstr "Faidhlichean meadhain"
 
 #: modules/gui/qt/dialogs_provider.hpp:44
 msgid "Subtitle Files"
-msgstr ""
+msgstr "Faidhlichean fho-tiotalan"
 
 #: modules/gui/qt/dialogs_provider.hpp:45
 msgid "All Files"
@@ -20084,11 +20084,11 @@ msgstr "A h-uile faidhle"
 #: modules/gui/qt/extensions_manager.cpp:191
 #: modules/gui/qt/util/qmenuview.cpp:70
 msgid "Empty"
-msgstr ""
+msgstr "Falamh"
 
 #: modules/gui/qt/extensions_manager.cpp:197
 msgid "Deactivate"
-msgstr ""
+msgstr "Cuir à gnìomh"
 
 #: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
@@ -20128,7 +20128,7 @@ msgstr "&Fo-thiotal"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
 msgid "Tool&s"
-msgstr ""
+msgstr "I&nnealan"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -20224,7 +20224,7 @@ msgstr "Liosta-chluich dhocaichte"
 
 #: modules/gui/qt/menus.cpp:501
 msgid "Always on &top"
-msgstr ""
+msgstr "&Air uachdar an-còmhnaidh"
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
@@ -20252,11 +20252,11 @@ msgstr "Taghadair nam fear-clis"
 
 #: modules/gui/qt/menus.cpp:596
 msgid "&Increase Volume"
-msgstr "Cu&ir an àirde an fhuaim"
+msgstr "Meuda&ich àirde na fuaime"
 
 #: modules/gui/qt/menus.cpp:599
 msgid "D&ecrease Volume"
-msgstr ""
+msgstr "Lùghdaich àird&e na fuaime"
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -20384,7 +20384,7 @@ msgstr "Geàrr leu&m air ais"
 
 #: modules/gui/qt/menus.cpp:926
 msgid "Ctrl+T"
-msgstr ""
+msgstr "Ctrl+T"
 
 #: modules/gui/qt/menus.cpp:941
 msgid "Open &Network..."
@@ -20400,15 +20400,15 @@ msgstr "&Cluich"
 
 #: modules/gui/qt/menus.cpp:1174
 msgid "&Hide VLC media player in taskbar"
-msgstr ""
+msgstr "Falaic&h cluicheadair mheadhanan VLC o bhàr nan saothair"
 
 #: modules/gui/qt/menus.cpp:1180
 msgid "Sho&w VLC media player"
-msgstr ""
+msgstr "&Seall cluicheadair mheadhanan VLC"
 
 #: modules/gui/qt/menus.cpp:1191
 msgid "&Open Media"
-msgstr ""
+msgstr "F&osgail meadhanan"
 
 #: modules/gui/qt/menus.cpp:1621
 msgid "&Clear"
@@ -20416,15 +20416,15 @@ msgstr "&Falamhaich"
 
 #: modules/gui/qt/menus.cpp:1629
 msgid "&Renderer"
-msgstr ""
+msgstr "&Reandaraiche"
 
 #: modules/gui/qt/menus.cpp:1633
 msgid "<Local>"
-msgstr ""
+msgstr "<Ionadail>"
 
 #: modules/gui/qt/menus.cpp:1646
 msgid "Scanning..."
-msgstr ""
+msgstr "’Ga sganadh…"
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -20435,6 +20435,8 @@ msgid ""
 "Show advanced preferences and not simple preferences when opening the "
 "preferences dialog."
 msgstr ""
+"Seall na roghainnean adhartach seach an fheadhainn shìmplidh nuair a "
+"dh’fhosglas tu còmhradh nan roghainnean."
 
 #: modules/gui/qt/qt.cpp:86 modules/gui/skins2/src/skin_main.cpp:499
 msgid "Systray icon"
@@ -20445,6 +20447,8 @@ msgid ""
 "Show an icon in the systray allowing you to control VLC media player for "
 "basic actions."
 msgstr ""
+"Seall ìomhaigheag air treidhe an t-siostaim a leigeas leat gnìomhan bunasach "
+"VLC a stiùireadh."
 
 #: modules/gui/qt/qt.cpp:91
 msgid "Start VLC with only a systray icon"
@@ -20452,7 +20456,7 @@ msgstr "Cuir gu dol VLC le ìomhaigheag ann an treidhe an t-siostaim a-mhàin"
 
 #: modules/gui/qt/qt.cpp:92
 msgid "VLC will start with just an icon in your taskbar."
-msgstr ""
+msgstr "Tòisichidh VLC ’na ìomhaigheag air bàr nan saothair agad."
 
 #: modules/gui/qt/qt.cpp:101
 msgid "Show playing item name in window title"
@@ -20460,7 +20464,7 @@ msgstr "Seall ainm an rud a tha ’ga chluich ann an tiotal na h-uinneige"
 
 #: modules/gui/qt/qt.cpp:102
 msgid "Show the name of the song or video in the controller window title."
-msgstr ""
+msgstr "Seall ainm an òrain no video air tiotal uinneag an uidheim-smachd."
 
 #: modules/gui/qt/qt.cpp:105
 msgid "Show notification popup on track change"
@@ -20643,12 +20647,12 @@ msgstr "rabhaidhean"
 
 #: modules/gui/qt/util/customwidgets.cpp:83
 msgid "debug"
-msgstr ""
+msgstr "dì-bhugachadh"
 
 #: modules/gui/qt/util/searchlineedit.cpp:49
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr ""
+msgstr "Falamhaich"
 
 #: modules/gui/skins2/src/dialogs.cpp:212
 msgid "Open a skin file"
@@ -20660,11 +20664,11 @@ msgstr "Faidhlichean craicinn |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
-msgstr ""
+msgstr "Faidhlichean liosta-chluich |"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
-msgstr ""
+msgstr "|Na h-uile faidhle |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -20677,6 +20681,7 @@ msgstr "Sàbhail an liosta-chluich"
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
 msgstr ""
+"Liosta-chluich XSPF |*.xspf|Faidhle M3U |*.m3u|Liosta-chluich HTML |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
@@ -21258,7 +21263,7 @@ msgstr ""
 
 #: modules/lua/vlc.c:85
 msgid "Lua"
-msgstr ""
+msgstr "Lua"
 
 #: modules/lua/vlc.c:86
 msgid "Lua interpreter"
@@ -21338,7 +21343,7 @@ msgstr "Blues"
 
 #: modules/meta_engine/ID3Genres.h:34
 msgid "Classic Rock"
-msgstr ""
+msgstr "Ròc clasaigeach"
 
 #: modules/meta_engine/ID3Genres.h:35
 msgid "Country"
@@ -21398,7 +21403,7 @@ msgstr "Alternative"
 
 #: modules/meta_engine/ID3Genres.h:55
 msgid "Death Metal"
-msgstr ""
+msgstr "Death Metal"
 
 #: modules/meta_engine/ID3Genres.h:56
 msgid "Pranks"
@@ -21450,7 +21455,7 @@ msgstr "House"
 
 #: modules/meta_engine/ID3Genres.h:70
 msgid "Sound Clip"
-msgstr ""
+msgstr "Cliop fuaime"
 
 #: modules/meta_engine/ID3Genres.h:71
 msgid "Gospel"
@@ -21462,7 +21467,7 @@ msgstr "Faram"
 
 #: modules/meta_engine/ID3Genres.h:73
 msgid "Alternative Rock"
-msgstr ""
+msgstr "Alternative Rock"
 
 #: modules/meta_engine/ID3Genres.h:74
 msgid "Bass"
@@ -21482,11 +21487,11 @@ msgstr "Meòmhrachail"
 
 #: modules/meta_engine/ID3Genres.h:79
 msgid "Instrumental Pop"
-msgstr ""
+msgstr "Pop ionnsramaideach"
 
 #: modules/meta_engine/ID3Genres.h:80
 msgid "Instrumental Rock"
-msgstr ""
+msgstr "Roc ionnsramaideach"
 
 #: modules/meta_engine/ID3Genres.h:81
 msgid "Ethnic"
@@ -21522,7 +21527,7 @@ msgstr "Dream"
 
 #: modules/meta_engine/ID3Genres.h:89
 msgid "Southern Rock"
-msgstr ""
+msgstr "Roc deasach"
 
 #: modules/meta_engine/ID3Genres.h:90
 msgid "Comedy"
@@ -21542,11 +21547,11 @@ msgstr "Na 40 as fheàrr"
 
 #: modules/meta_engine/ID3Genres.h:94
 msgid "Christian Rap"
-msgstr ""
+msgstr "Rap Chrìostaidh"
 
 #: modules/meta_engine/ID3Genres.h:95
 msgid "Pop/Funk"
-msgstr ""
+msgstr "Pop/Funk"
 
 #: modules/meta_engine/ID3Genres.h:96
 msgid "Jungle"
@@ -21562,7 +21567,7 @@ msgstr "Cabaret"
 
 #: modules/meta_engine/ID3Genres.h:99
 msgid "New Wave"
-msgstr ""
+msgstr "New Wave"
 
 #: modules/meta_engine/ID3Genres.h:101
 msgid "Rave"
@@ -21586,11 +21591,11 @@ msgstr "Tribal"
 
 #: modules/meta_engine/ID3Genres.h:106
 msgid "Acid Punk"
-msgstr ""
+msgstr "Acid Punk"
 
 #: modules/meta_engine/ID3Genres.h:107
 msgid "Acid Jazz"
-msgstr ""
+msgstr "Acid Jazz"
 
 #: modules/meta_engine/ID3Genres.h:108
 msgid "Polka"
@@ -21606,87 +21611,87 @@ msgstr "Musical"
 
 #: modules/meta_engine/ID3Genres.h:111
 msgid "Rock & Roll"
-msgstr ""
+msgstr "Rock & Roll"
 
 #: modules/meta_engine/ID3Genres.h:112
 msgid "Hard Rock"
-msgstr ""
+msgstr "Hard Rock"
 
 #: modules/meta_engine/ID3Genres.h:113
 msgid "Folk"
-msgstr ""
+msgstr "Folk"
 
 #: modules/meta_engine/ID3Genres.h:114
 msgid "Folk-Rock"
-msgstr ""
+msgstr "Folk-Rock"
 
 #: modules/meta_engine/ID3Genres.h:115
 msgid "National Folk"
-msgstr ""
+msgstr "Folk nàiseanta"
 
 #: modules/meta_engine/ID3Genres.h:116
 msgid "Swing"
-msgstr ""
+msgstr "Swing"
 
 #: modules/meta_engine/ID3Genres.h:117
 msgid "Fast Fusion"
-msgstr ""
+msgstr "Fast Fusion"
 
 #: modules/meta_engine/ID3Genres.h:118
 msgid "Bebob"
-msgstr ""
+msgstr "Bebob"
 
 #: modules/meta_engine/ID3Genres.h:120
 msgid "Revival"
-msgstr ""
+msgstr "Revival"
 
 #: modules/meta_engine/ID3Genres.h:121
 msgid "Celtic"
-msgstr ""
+msgstr "Ceilteach"
 
 #: modules/meta_engine/ID3Genres.h:122
 msgid "Bluegrass"
-msgstr ""
+msgstr "Bluegrass"
 
 #: modules/meta_engine/ID3Genres.h:123
 msgid "Avantgarde"
-msgstr ""
+msgstr "Avantgarde"
 
 #: modules/meta_engine/ID3Genres.h:124
 msgid "Gothic Rock"
-msgstr ""
+msgstr "Gothic Rock"
 
 #: modules/meta_engine/ID3Genres.h:125
 msgid "Progressive Rock"
-msgstr ""
+msgstr "Progressive Rock"
 
 #: modules/meta_engine/ID3Genres.h:126
 msgid "Psychedelic Rock"
-msgstr ""
+msgstr "Psychedelic Rock"
 
 #: modules/meta_engine/ID3Genres.h:127
 msgid "Symphonic Rock"
-msgstr ""
+msgstr "Symphonic Rock"
 
 #: modules/meta_engine/ID3Genres.h:128
 msgid "Slow Rock"
-msgstr ""
+msgstr "Roc slaodach"
 
 #: modules/meta_engine/ID3Genres.h:129
 msgid "Big Band"
-msgstr ""
+msgstr "Big Band"
 
 #: modules/meta_engine/ID3Genres.h:131
 msgid "Easy Listening"
-msgstr ""
+msgstr "Ceòl aotrom"
 
 #: modules/meta_engine/ID3Genres.h:132
 msgid "Acoustic"
-msgstr ""
+msgstr "Acoustic"
 
 #: modules/meta_engine/ID3Genres.h:133
 msgid "Humour"
-msgstr ""
+msgstr "Àbhachdas"
 
 #: modules/meta_engine/ID3Genres.h:134
 msgid "Speech"
@@ -21694,11 +21699,11 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:135
 msgid "Chanson"
-msgstr ""
+msgstr "Chanson"
 
 #: modules/meta_engine/ID3Genres.h:136
 msgid "Opera"
-msgstr ""
+msgstr "Opara"
 
 #: modules/meta_engine/ID3Genres.h:137
 msgid "Chamber Music"
