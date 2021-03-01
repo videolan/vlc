@@ -58,18 +58,14 @@ QHash<int, QByteArray> MLUrlModel::roleNames() const
 
 void MLUrlModel::addAndPlay( const QString &url )
 {
-    QMetaObject::invokeMethod(  this
-                              , [this, url]() {
-        ml_unique_ptr<vlc_ml_media_t> s{vlc_ml_get_media_by_mrl( m_ml, qtu( url ))};
-        if (!s) {
-            s.reset(vlc_ml_new_stream( m_ml, qtu( url ) ));
-        }
-        if (!s)
-            return;
-        MLItemId itemId( s->i_id, VLC_ML_PARENT_UNKNOWN );
-        m_mediaLib->addAndPlay(itemId);
-        emit resetRequested();
-    });
+    ml_unique_ptr<vlc_ml_media_t> s{vlc_ml_get_media_by_mrl( m_ml, qtu( url ))};
+    if (!s)
+        s.reset(vlc_ml_new_stream( m_ml, qtu( url ) ));
+    if (!s)
+        return;
+    MLItemId itemId( s->i_id, VLC_ML_PARENT_UNKNOWN );
+    m_mediaLib->addAndPlay(itemId);
+    emit resetRequested();
 }
 
 vlc_ml_sorting_criteria_t MLUrlModel::roleToCriteria(int role) const
