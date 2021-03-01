@@ -130,6 +130,12 @@ void MLBaseModel::onVlcMlEvent(const MLEvent &event)
             break;
         }
     }
+
+    if (m_mediaLib && m_mediaLib->idle() && m_need_reset)
+    {
+        emit resetRequested();
+        m_need_reset = false;
+    }
 }
 
 QString MLBaseModel::getFirstSymbol(QString str)
