@@ -247,8 +247,9 @@ struct vlc_display_operations
      * or upload the picture to video memory. If supported, this can also
      * queue the picture to be shown asynchronously at the given date.
      *
-     * If prepare is not \c NULL, there is an implicit guarantee that display
-     * will be invoked with the exact same picture afterwards:
+     *
+     * If prepare and display are not \c NULL, there is an implicit guarantee
+     * that display will be invoked with the exact same picture afterwards:
      * prepare 1st picture, display 1st picture, prepare 2nd picture, display
      * 2nd picture, and so on.
      *
@@ -268,6 +269,9 @@ struct vlc_display_operations
      *
      * This callback is invoked at the time when the picture should be shown.
      * The picture must be displayed as soon as possible.
+     *
+     * If NULL, prepare must be valid. In that case, the plugin can handle
+     * asynchronous display at the time given by the prepare call.
      *
      * \note The picture buffers may have multiple references.
      * Therefore the pixel content of the picture or of the subpicture
