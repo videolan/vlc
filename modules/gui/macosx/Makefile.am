@@ -770,12 +770,14 @@ EXTRA_DIST += \
 	gui/macosx/Resources/gl.lproj/InfoPlist.strings \
 	gui/macosx/Resources/gu-IN.lproj/InfoPlist.strings \
 	gui/macosx/Resources/he.lproj/InfoPlist.strings \
+	gui/macosx/Resources/hi.lproj/InfoPlist.strings \
 	gui/macosx/Resources/hr.lproj/InfoPlist.strings \
 	gui/macosx/Resources/hu.lproj/InfoPlist.strings \
 	gui/macosx/Resources/id.lproj/InfoPlist.strings \
 	gui/macosx/Resources/is.lproj/InfoPlist.strings \
 	gui/macosx/Resources/it.lproj/InfoPlist.strings \
 	gui/macosx/Resources/ja.lproj/InfoPlist.strings \
+	gui/macosx/Resources/ka.lproj/InfoPlist.strings \
 	gui/macosx/Resources/kab.lproj/InfoPlist.strings \
 	gui/macosx/Resources/kk.lproj/InfoPlist.strings \
 	gui/macosx/Resources/km.lproj/InfoPlist.strings \
