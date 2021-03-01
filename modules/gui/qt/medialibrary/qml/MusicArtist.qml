@@ -366,6 +366,7 @@ Widgets.NavigableFocusScope {
                     tableView_id.currentIndex = 0;
             }
 
+            onItemDoubleClicked: medialib.addAndPlay(model.id)
             onContextMenuButtonClicked: trackContextMenu.popup(trackSelectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
             onRightClick: trackContextMenu.popup(trackSelectionModel.selectedIndexes, globalMousePos)
             dragItem: Widgets.DragItem {

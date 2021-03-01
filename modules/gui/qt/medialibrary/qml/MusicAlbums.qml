@@ -230,6 +230,7 @@ Widgets.NavigableFocusScope {
 
             onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes,  menuParent.mapToGlobal(0,0))
             onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            onItemDoubleClicked: medialib.addAndPlay( model.id )
 
             Widgets.TableColumns {
                 id: tableColumns

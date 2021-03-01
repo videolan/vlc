@@ -122,9 +122,8 @@ Rectangle {
         }
 
         onDoubleClicked: {
-            actionForSelection(selectionDelegateModel.selectedIndexes);
-
-            root.itemDoubleClicked(root.model);
+            if (mouse.button === Qt.LeftButton)
+                root.itemDoubleClicked(delegate._index, rowModel)
         }
 
         drag.onActiveChanged: {

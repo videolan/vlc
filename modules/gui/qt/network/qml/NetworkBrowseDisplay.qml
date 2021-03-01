@@ -305,6 +305,7 @@ Widgets.NavigableFocusScope {
             ]
 
             onActionForSelection: _actionAtIndex(selection[0].row)
+            onItemDoubleClicked: _actionAtIndex(index)
             onContextMenuButtonClicked: contextMenu.popup(filterModel.mapIndexesToSource(selectionModel.selectedIndexes), menuParent.mapToGlobal(0,0))
             onRightClick: contextMenu.popup(filterModel.mapIndexesToSource(selectionModel.selectedIndexes), globalMousePos)
         }

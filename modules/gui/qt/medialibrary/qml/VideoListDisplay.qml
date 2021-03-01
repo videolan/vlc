@@ -44,6 +44,7 @@ MainInterface.MainTableView {
     headerColor: VLCStyle.colors.bg
 
     onActionForSelection: medialib.addAndPlay(model.getIdsForIndexes( selection ))
+    onItemDoubleClicked: medialib.addAndPlay(model.id)
 
     Widgets.TableColumns {
         id: tableColumns

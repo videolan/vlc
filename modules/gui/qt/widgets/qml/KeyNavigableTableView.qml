@@ -32,7 +32,7 @@ NavigableFocusScope {
     signal actionForSelection( var selection )
     signal contextMenuButtonClicked(Item menuParent, var menuModel)
     signal rightClick(Item menuParent, var menuModel, var globalMousePos)
-    signal itemDoubleClicked(var model)
+    signal itemDoubleClicked(var index, var model)
 
     property var sortModel: []
     property Component colDelegate: Widgets.ListLabel {
