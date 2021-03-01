@@ -52,7 +52,9 @@ Widgets.NavigableFocusScope {
                 height: VLCStyle.dp(32, VLCStyle.scale)
                 width: VLCStyle.colWidth(Math.max(VLCStyle.gridColumnsForWidth(root.width * .6), 2))
                 placeholderText: i18n.qtr("Paste or write the URL here")
-                color: VLCStyle.colors.text
+                palette.text: VLCStyle.colors.text
+                palette.highlight: VLCStyle.colors.bgHover
+                palette.highlightedText: VLCStyle.colors.bgHoverText
                 font.pixelSize: VLCStyle.fontSize_large
                 background: Rectangle {
                     color: VLCStyle.colors.bg
