@@ -63,7 +63,10 @@ Widgets.NavigableFocusScope {
                 }
 
                 onAccepted: {
-                    mainPlaylistController.append([text], true)
+                    if (urlListDisplay.status == Loader.Ready)
+                        urlListDisplay.item.model.addAndPlay(text)
+                    else
+                        mainPlaylistController.append([text], true)
                 }
 
                 Keys.priority: Keys.AfterItem
