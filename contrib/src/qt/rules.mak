@@ -129,4 +129,9 @@ endif
 	sed -i -e "s#\$\$QT_MODULE_INCLUDE_BASE#$(PREFIX)/lib/qt5/include#g" $(PREFIX)/lib/qt5/mkspecs/modules/qt_lib_bootstrap_private.pri
 	# Install a qmake with correct paths set
 	cd $< && $(MAKE) sub-qmake-qmake-aux-pro-install_subtargets install_mkspecs
+ifdef HAVE_WIN32
+	# Install libqtmain for potentially other targets, eg. docs/ samples
+	$(MAKE) -C "$</src/winmain" all
+	$(MAKE) -C "$</src/winmain" install
+endif
 	touch $@
