@@ -1,19 +1,19 @@
 # Galician translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Gonçalo Cordeiro <gzcordeiro@gmail.com>, 2013,2014,2018
+# antiparvos  <marcoslansgarza@gmail.com>, 2018-2019, 2021
+# Gonçalo Cordeiro <gzcordeiro@gmail.com>, 2013-2014, 2018
 # Iván Seoane Pardo <ivam.sp@gmail.com>, 2008
 # Paula Iglesias <localizacion@tagenata.com>, 2009
-# antiparvos  <marcoslansgarza@gmail.com>, 2018-2019
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2019-08-13 02:02+0200\n"
-"Last-Translator: antiparvos <marcoslansgarza@gmail.com>, 2019\n"
+"PO-Revision-Date: 2021-03-01 19:10+0100\n"
+"Last-Translator: antiparvos <marcoslansgarza@gmail.com>, 2021\n"
 "Language-Team: Galician (https://www.transifex.com/yaron/teams/16553/gl/)\n"
 "Language: gl\n"
 "MIME-Version: 1.0\n"
@@ -6229,15 +6229,16 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/disc_helper.h:56
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "Información sobre o problema e configuración do sistema"
+msgstr "Produciuse un problema accedendo ao recurso do sistema"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"Abra «Preferencias do sistema» -> «Seguranza e privacidade» e permita ao VLC "
+"acceder ao micrófono."
 
 #: modules/access/avaudiocapture.m:341
 #, fuzzy
@@ -6282,6 +6283,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"Abra «Preferencias do sistema» -> «Seguranza e privacidade» e permita ao VLC "
+"acceder á cámara."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -9290,7 +9293,7 @@ msgstr "Modo bucle"
 
 #: modules/access/wasapi.c:486
 msgid "Record an audio rendering endpoint."
-msgstr ""
+msgstr "Gravar un punto final para a renderización do son."
 
 #: modules/access/wasapi.c:489
 msgid "WASAPI"
@@ -9887,7 +9890,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:54
 msgid "Headphones mode (binaural)"
-msgstr ""
+msgstr "Modo auriculares (binaural)"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
@@ -12122,9 +12125,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "Empaquetador de subtítulos con texto Kate"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "Opcións de transcodificación adicionais"
+msgstr "Cartafol de tipos de letra adicionais"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -15353,13 +15355,12 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "Largura de banda de elección para fluxos no adaptativos"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "Atraso dos fotogramas (ms)"
+msgstr "Retraso na reprodución en vivo (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "Compensación entre estabilidade e tempo real"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
@@ -15383,9 +15384,8 @@ msgid "Low latency"
 msgstr "Latencia baixa"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "Ignorar os parámetros"
+msgstr "Anula os parámetros de baixa latencia"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15412,9 +15412,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "Largura de banda/Calidade máis alta"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "Forzar letras grosas"
+msgstr "Forzar"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -20744,6 +20743,17 @@ msgid ""
 "express consent for the media player to access the Internet automatically.</"
 "p>\n"
 msgstr ""
+"<p>Para protexer a súa privacidade, o <i>VLC media player</i><b>non</b> "
+"recolle datos persoais nin llos transmite, nin sequera nunha forma anónima, "
+"a ninguén.</p>\n"
+"<p>Porén, o <i>VLC</i> é quen de obter información automaticamente sobre os "
+"medios presentes na súa lista de reprodución a partir de servizos de "
+"terceiros baseados na Internet. Isto inclúe as portadas, nomes das pistas, "
+"autoría e outros metadatos.</p>\n"
+"<p>Iso podería implicar a identificación dalgúns dos seus ficheiros "
+"multimedia para entidades de terceiros. Polo tanto, os desenvolvedores do "
+"<i>VLC</i> requiren o seu consentimento expreso para que o reprodutor "
+"multimedia acceda á Internet de modo automático.</p>\n"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:88
 msgid "Network Access Policy"
@@ -22319,7 +22329,7 @@ msgstr "Ficheiro do repositorio de chaves (texto plano)"
 
 #: modules/keystore/file.c:55
 msgid "Secrets are stored on a file without any encryption"
-msgstr ""
+msgstr "Os secretos gárdanse nun ficheiro sen cifrado"
 
 #: modules/keystore/file.c:65
 msgid "Crypt keystore"
@@ -22327,7 +22337,7 @@ msgstr "Cifrar o repositorio de chaves"
 
 #: modules/keystore/file.c:66
 msgid "Secrets are stored encrypted on a file"
-msgstr ""
+msgstr "Os secretos almacénanse cifrados nun ficheiro"
 
 #: modules/keystore/keychain.m:41
 msgid "No"
@@ -22382,15 +22392,17 @@ msgstr "Tipo de accesibilidade dos futuros contrasinais gardados no Keychain"
 
 #: modules/keystore/keychain.m:62
 msgid "Keychain access group"
-msgstr ""
+msgstr "Grupo de acceso ao anel de chaves"
 
 #: modules/keystore/keychain.m:63
 msgid "Keychain access group as defined by the app entitlements."
 msgstr ""
+"Grupo de acceso ao anel de chaves tal como se define nos dereitos da "
+"aplicación."
 
 #: modules/keystore/keychain.m:109
 msgid "Keychain keystore"
-msgstr ""
+msgstr "Tenda de aneis de chaves"
 
 #: modules/keystore/keychain.m:110
 msgid "Keystore for iOS, Mac OS X and tvOS"
@@ -22402,7 +22414,7 @@ msgstr "Repositorio de chaves KWallet"
 
 #: modules/keystore/kwallet.c:49
 msgid "Secrets are stored via KWallet"
-msgstr ""
+msgstr "Os secretos almacénanse mediante KWallet"
 
 #: modules/keystore/memory.c:41
 msgid "Memory keystore"
@@ -22410,7 +22422,7 @@ msgstr ""
 
 #: modules/keystore/memory.c:42
 msgid "Secrets are stored in memory"
-msgstr ""
+msgstr "Os secretos almacénanse na memoria"
 
 #: modules/keystore/secret.c:39
 msgid "libsecret keystore"
@@ -25305,7 +25317,7 @@ msgstr "Ponte de entrada"
 
 #: modules/stream_out/chromaprint.c:57
 msgid "Duration of the fingerprinting"
-msgstr ""
+msgstr "Duración das pegadas dixitais"
 
 #: modules/stream_out/chromaprint.c:58
 msgid "Default: 90sec"
@@ -25338,7 +25350,7 @@ msgstr "Mostra un aviso do rendemento durante a transcodificación"
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Enable Audio passthrough"
-msgstr ""
+msgstr "Activar Audio Passthrough"
 
 #: modules/stream_out/chromecast/cast.cpp:195
 msgid "Disable if your receiver does not support Dolby®."
@@ -28274,7 +28286,7 @@ msgstr "Memoria de vídeo"
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
 msgid "Wayland display"
-msgstr ""
+msgstr "Pantalla de Wayland"
 
 #: modules/video_output/wayland/shell.c:407
 #: modules/video_output/wayland/xdg-shell.c:376
@@ -29170,9 +29182,8 @@ msgid ""
 msgstr ""
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "Quere descargala?"
+msgstr "Quere continuar con isto?"
 
 #: share/lua/http/index.html:290
 msgid ""
