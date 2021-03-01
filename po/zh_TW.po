@@ -1,26 +1,26 @@
 # Traditional Chinese translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Aefgh Threenine <aefgh3962@gmail.com>, 2020
+# Aefgh Threenine <aefgh3962@gmail.com>, 2020-2021
 # Cheng-Chia Tseng <pswo10680@gmail.com>, 2017
 # Chen Wang <iwangce@gmail.com>, 2013
 # Ethan Chan <yunsangc207@gmail.com>, 2015
-# Frank Chao <frank0624@gmail.com>, 2013,2015,2017-2018
-# Hsiu-Ming Chang <cges30901@gmail.com>, 2016,2019
+# Frank Chao <frank0624@gmail.com>, 2013-2018
+# Hsiu-Ming Chang <cges30901@gmail.com>, 2016, 2019
 # Jeff Huang <s8321414@gmail.com>, 2014
 # Taijuin Lee <taijuin@gmail.com>, 2013
 # Timo Liu <timoliu@gmail.com>, 2016
-# 盧瑞元（ryuanlu） <rueiyuan.lu@gmail.com>, 2012,2017
+# 盧瑞元（ryuanlu） <rueiyuan.lu@gmail.com>, 2012, 2017
 # 洪嘉鴻 <jerry9030@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-11-04 13:59+0100\n"
-"Last-Translator: Aefgh Threenine <aefgh3962@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-03-01 13:14+0100\n"
+"Last-Translator: Aefgh Threenine <aefgh3962@gmail.com>, 2021\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/yaron/teams/16553/"
 "zh_TW/)\n"
 "Language: zh_TW\n"
@@ -3511,6 +3511,9 @@ msgid ""
 "render the whole system unresponsive which might require a reboot of your "
 "machine."
 msgstr ""
+"增加處理程序的優先級非常有可能提升您的播放體驗。這麼做讓 VLC 不會被其他耗費過"
+"多處理器時間的應用程式打擾。但請注意，某些情況（臭蟲）下，VLC 可能會耗盡所有"
+"處理器時間，最終導致系統失去回應，需要重新啟動機器才能恢復。"
 
 #: src/libvlc-module.c:1099 modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Enqueue items into playlist in one instance mode"
@@ -3553,7 +3556,7 @@ msgstr "剖析逾時"
 
 #: src/libvlc-module.c:1124
 msgid "Maximum time allowed to preparse an item, in milliseconds"
-msgstr ""
+msgstr "預先解析項目的允許最長時間（毫秒）"
 
 #: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:334
 #: modules/gui/qt/dialogs/firstrun.cpp:95
@@ -3580,6 +3583,10 @@ msgid ""
 "collapse: subdirectories appear but are expanded on first play.\n"
 "expand: all subdirectories are expanded.\n"
 msgstr ""
+"選擇子目錄是否必須得展開。\n"
+"none：子目錄不會在播放清單出現。\n"
+"collapse：會顯示子目錄，但第一次播放時才展開。\n"
+"expand：展開所有子目錄。\n"
 
 #: src/libvlc-module.c:1140
 msgid "Ignored extensions"
@@ -3592,6 +3599,8 @@ msgid ""
 "This is useful if you add directories that contain playlist files for "
 "instance. Use a comma-separated list of extensions."
 msgstr ""
+"使用這些副檔名的檔案不會在開啟目錄時加入至播放清單。\n"
+"這適合用於某些情況，例如加入包含播放清單檔的目錄。多個副檔名請以逗號隔開。"
 
 #: src/libvlc-module.c:1147
 msgid "Show hidden files"
@@ -3665,7 +3674,7 @@ msgstr "開始時暫停"
 
 #: src/libvlc-module.c:1182
 msgid "Pause each item in the playlist on the first frame."
-msgstr ""
+msgstr "播放至視訊的第一個畫面時暫停"
 
 #: src/libvlc-module.c:1184
 msgid "Auto start"
@@ -3677,13 +3686,13 @@ msgstr "載入播放清單以後自動開始播放。"
 
 #: src/libvlc-module.c:1188
 msgid "Pause on audio communication"
-msgstr ""
+msgstr "在音訊通訊時暫停"
 
 #: src/libvlc-module.c:1190
 msgid ""
 "If pending audio communication is detected, playback will be paused "
 "automatically."
-msgstr ""
+msgstr "偵測到擱置的音訊通訊時，將自動暫停播放。"
 
 #: src/libvlc-module.c:1193
 msgid "Use media library"
@@ -4140,39 +4149,39 @@ msgstr "縮小字幕文字"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
-msgstr ""
+msgstr "選擇變更字幕文字比例的按鍵。"
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
-msgstr ""
+msgstr "字幕同步 / 將音訊時間戳加入書籤"
 
 #: src/libvlc-module.c:1330
 msgid "Select the key to bookmark audio timestamp when syncing subtitles."
-msgstr ""
+msgstr "選擇同步字幕時，將音訊時間戳加入書籤的按鍵。"
 
 #: src/libvlc-module.c:1331
 msgid "Subtitle sync / bookmark subtitle timestamp"
-msgstr ""
+msgstr "字幕同步 / 將字幕時間戳加入書籤"
 
 #: src/libvlc-module.c:1332
 msgid "Select the key to bookmark subtitle timestamp when syncing subtitles."
-msgstr ""
+msgstr "選擇同步字幕時，將字幕時間戳加入書籤的按鍵。"
 
 #: src/libvlc-module.c:1333
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
-msgstr ""
+msgstr "字幕同步 / 同步音訊和字幕的時間戳"
 
 #: src/libvlc-module.c:1334
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
-msgstr ""
+msgstr "選擇同步已加入書籤之音訊及字幕時間戳的按鍵。"
 
 #: src/libvlc-module.c:1335
 msgid "Subtitle sync / reset audio & subtitle synchronization"
-msgstr ""
+msgstr "字幕同步 / 重設音訊和字幕的同步設定"
 
 #: src/libvlc-module.c:1336
 msgid "Select the key to reset synchronization of audio & subtitle timestamps."
-msgstr ""
+msgstr "選擇重設音訊和字幕時間戳同步設定的按鍵。"
 
 #: src/libvlc-module.c:1337
 msgid "Subtitle position up"
@@ -4180,7 +4189,7 @@ msgstr "字幕位置上移"
 
 #: src/libvlc-module.c:1338
 msgid "Select the key to move subtitles higher."
-msgstr ""
+msgstr "選擇提高字幕的按鍵。"
 
 #: src/libvlc-module.c:1339
 msgid "Subtitle position down"
@@ -4188,7 +4197,7 @@ msgstr "字幕位置下移"
 
 #: src/libvlc-module.c:1340
 msgid "Select the key to move subtitles lower."
-msgstr ""
+msgstr "選擇拉低字幕的按鍵。"
 
 #: src/libvlc-module.c:1341
 msgid "Audio delay up"
@@ -4196,7 +4205,7 @@ msgstr "增加音訊延遲"
 
 #: src/libvlc-module.c:1342
 msgid "Select the key to increase the audio delay."
-msgstr ""
+msgstr "選擇增加音訊延遲的按鍵。"
 
 #: src/libvlc-module.c:1343
 msgid "Audio delay down"
@@ -4204,7 +4213,7 @@ msgstr "減少音訊延遲"
 
 #: src/libvlc-module.c:1344
 msgid "Select the key to decrease the audio delay."
-msgstr ""
+msgstr "選擇減少音訊延遲的按鍵。"
 
 #: src/libvlc-module.c:1351
 msgid "Play playlist bookmark 1"
@@ -4381,19 +4390,19 @@ msgstr "切換字幕軌可見度。"
 
 #: src/libvlc-module.c:1397
 msgid "Cycle next program Service ID"
-msgstr ""
+msgstr "循環下一個節目服務 ID"
 
 #: src/libvlc-module.c:1398
 msgid "Cycle through the available next program Service IDs (SIDs)."
-msgstr ""
+msgstr "循環切換可用的下一個節目服務 ID (SID)。"
 
 #: src/libvlc-module.c:1399
 msgid "Cycle previous program Service ID"
-msgstr ""
+msgstr "循環上一個節目服務 ID"
 
 #: src/libvlc-module.c:1400
 msgid "Cycle through the available previous program Service IDs (SIDs)."
-msgstr ""
+msgstr "循環切換可用的上一個節目服務 ID (SID)。"
 
 #: src/libvlc-module.c:1401
 msgid "Cycle source aspect ratio"
@@ -4461,7 +4470,7 @@ msgstr "右鍵選單"
 
 #: src/libvlc-module.c:1419
 msgid "Show the contextual popup menu."
-msgstr ""
+msgstr "顯示情境彈出選單。"
 
 #: src/libvlc-module.c:1420
 msgid "Take video snapshot"
@@ -4532,19 +4541,19 @@ msgstr "從視訊右端還原一個像素"
 
 #: src/libvlc-module.c:1459
 msgid "Shrink the viewpoint field of view (360°)"
-msgstr ""
+msgstr "縮小檢視的視點區域 (360°)"
 
 #: src/libvlc-module.c:1460
 msgid "Expand the viewpoint field of view (360°)"
-msgstr ""
+msgstr "擴大檢視的視點區域 (360°)"
 
 #: src/libvlc-module.c:1461
 msgid "Roll the viewpoint clockwise (360°)"
-msgstr ""
+msgstr "將視點順時針轉動 (360°)"
 
 #: src/libvlc-module.c:1462
 msgid "Roll the viewpoint anti-clockwise (360°)"
-msgstr ""
+msgstr "將視點逆時針轉動 (360°)"
 
 #: src/libvlc-module.c:1464
 msgid "Toggle wallpaper mode in video output"
@@ -4643,7 +4652,7 @@ msgstr "效能選項"
 
 #: src/libvlc-module.c:2061
 msgid "Clock source"
-msgstr ""
+msgstr "時脈來源"
 
 #: src/libvlc-module.c:2179
 msgid "Hot keys"
@@ -4659,13 +4668,14 @@ msgstr "印出 VLC 的說明訊息(可與 --advanced 和 --help-verbose 合併�
 
 #: src/libvlc-module.c:2756
 msgid "Exhaustive help for VLC and its modules"
-msgstr ""
+msgstr "VLC 及其模組的詳盡說明"
 
 #: src/libvlc-module.c:2758
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
 msgstr ""
+"輸出 VLC 及其所有模組的說明訊息（可與 --advanced 和 --help-verbose 合併使用）"
 
 #: src/libvlc-module.c:2761
 msgid "ask for extra verbosity when displaying help"
@@ -4684,18 +4694,20 @@ msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strict matches."
 msgstr ""
+"印出特定模組的說明訊息 (可與 --advanced 和 --help-verbose 合併使用)。在模組名"
+"稱前面加上 = 以監視相符項目。"
 
 #: src/libvlc-module.c:2771
 msgid "no configuration option will be loaded nor saved to config file"
-msgstr ""
+msgstr "不會載入設定選項，亦不會將設定選項存至設定檔"
 
 #: src/libvlc-module.c:2773
 msgid "reset the current config to the default values"
-msgstr ""
+msgstr "將目前的設定值重設至預設值"
 
 #: src/libvlc-module.c:2775
 msgid "use alternate config file"
-msgstr ""
+msgstr "使用替代的設定檔"
 
 #: src/libvlc-module.c:2777
 msgid "resets the current plugins cache"
@@ -5076,7 +5088,7 @@ msgstr "檔案無法驗證"
 msgid ""
 "It was not possible to download a cryptographic signature for the downloaded "
 "file \"%s\". Thus, it was deleted."
-msgstr ""
+msgstr "無法下載這個下載檔案「%s」的加密簽章。因此，檔案已被刪除。"
 
 #: src/misc/update.c:661 src/misc/update.c:673
 msgid "Invalid signature"
@@ -5088,6 +5100,8 @@ msgid ""
 "The cryptographic signature for the downloaded file \"%s\" was invalid and "
 "could not be used to securely verify it. Thus, the file was deleted."
 msgstr ""
+"下載檔案「%s」的加密簽章無效，或是不能用來進行安全性驗證。因此，檔案已被刪"
+"除。"
 
 #: src/misc/update.c:686
 msgid "File not verifiable"
@@ -5098,7 +5112,7 @@ msgstr "無法驗證檔案"
 msgid ""
 "It was not possible to securely verify the downloaded file \"%s\". Thus, it "
 "was deleted."
-msgstr ""
+msgstr "無法安全驗證這個下載檔案「%s」。因此，檔案已被刪除。"
 
 #: src/misc/update.c:698 src/misc/update.c:710
 msgid "File corrupted"
@@ -5814,6 +5828,8 @@ msgid ""
 "Pass alsa:// to open the default ALSA capture device, or alsa://SOURCE to "
 "open a specific device named SOURCE."
 msgstr ""
+"傳入 alsa:// 以開啟預設的 ALSA 擷取裝置，或是 alsa://SOURCE 開啟名為 SOURCE "
+"的特定裝置。"
 
 #: modules/access/alsa.c:49
 msgid "192000 Hz"
@@ -6001,19 +6017,19 @@ msgstr "沒有 AACS 設定檔案!"
 
 #: modules/access/bluray.c:874
 msgid "No valid processing key found in AACS config file."
-msgstr ""
+msgstr "未在 AACS 設定檔找到有效的處理鍵。"
 
 #: modules/access/bluray.c:876
 msgid "No valid host certificate found in AACS config file."
-msgstr ""
+msgstr "未在 AACS 設定檔找到有效的主機憑證。"
 
 #: modules/access/bluray.c:878
 msgid "AACS Host certificate revoked."
-msgstr ""
+msgstr "已撤回 AACS 主機憑證。"
 
 #: modules/access/bluray.c:880
 msgid "AACS MMC failed."
-msgstr ""
+msgstr "AACS MMC 失敗。"
 
 #: modules/access/bluray.c:890
 msgid ""
@@ -6023,7 +6039,7 @@ msgstr "這片藍光光碟需要 BD+ 解碼的函式庫，但是您的系統並�
 
 #: modules/access/bluray.c:893
 msgid "Your system BD+ decoding library does not work. Missing configuration?"
-msgstr ""
+msgstr "您系統的 BD+ 解碼函式庫似乎無法運作。或許是尚未設定？"
 
 #: modules/access/bluray.c:926
 msgid "Java required"
@@ -6035,6 +6051,8 @@ msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
 "The disc will be played without menus."
 msgstr ""
+"這片藍光光碟需要 Java 才有選單支援。%s\n"
+"光碟將繼續播放，但不會有選單。"
 
 #: modules/access/bluray.c:928
 msgid "Java was not found on your system."
@@ -6042,7 +6060,7 @@ msgstr "在系統中找不到 Java。"
 
 #: modules/access/bluray.c:951
 msgid "Failed to start bluray playback. Please try without menu support."
-msgstr ""
+msgstr "無法啟動藍光播放功能。請試試看「無選單支援」。"
 
 #: modules/access/bluray.c:992 modules/access/bluray.c:2825
 #: modules/access/bluray.c:2830
@@ -6055,7 +6073,7 @@ msgstr "上層功能表"
 
 #: modules/access/bluray.c:2118
 msgid "First Play"
-msgstr ""
+msgstr "首次播放"
 
 #: modules/access/cdda.c:487
 #, c-format
@@ -6097,15 +6115,15 @@ msgstr "輸入清單"
 
 #: modules/access/concat.c:305
 msgid "Comma-separated list of input URLs to concatenate."
-msgstr ""
+msgstr "要合併的輸入 URL 列表，以逗號分隔。"
 
 #: modules/access/concat.c:308
 msgid "Concatenation"
-msgstr ""
+msgstr "合併"
 
 #: modules/access/concat.c:309
 msgid "Concatenated inputs"
-msgstr ""
+msgstr "已合併輸入"
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6113,7 +6131,7 @@ msgstr "DC1394"
 
 #: modules/access/dc1394.c:52
 msgid "IIDC Digital Camera (FireWire) input"
-msgstr ""
+msgstr "IIDC 數位相機 (FireWire) 輸入"
 
 #: modules/access/dcp/dcp.cpp:43
 msgid "KDM file"
@@ -6121,7 +6139,7 @@ msgstr "KDM 檔案"
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
-msgstr ""
+msgstr "金鑰傳遞訊息 XML 檔案的路徑"
 
 #: modules/access/dcp/dcp.cpp:77
 msgid "DCP"
@@ -6129,11 +6147,11 @@ msgstr "DCP"
 
 #: modules/access/dcp/dcp.cpp:80
 msgid "Digital Cinema Package module"
-msgstr ""
+msgstr "Digital Cinema Package 模組"
 
 #: modules/access/decklink.cpp:49
 msgid "Input card to use"
-msgstr ""
+msgstr "要使用的輸入卡片"
 
 #: modules/access/decklink.cpp:51
 msgid ""
@@ -6143,7 +6161,7 @@ msgstr ""
 
 #: modules/access/decklink.cpp:54
 msgid "Desired input video mode. Leave empty for autodetection."
-msgstr ""
+msgstr "所需的輸入視訊模式。若要自動偵測，請勿設定。"
 
 #: modules/access/decklink.cpp:56
 msgid ""
@@ -6202,7 +6220,7 @@ msgstr "HDMI"
 
 #: modules/access/decklink.cpp:87
 msgid "Optical SDI"
-msgstr ""
+msgstr "光學 SDI"
 
 #: modules/access/decklink.cpp:87
 msgid "Component"
@@ -6210,11 +6228,11 @@ msgstr "色差端子"
 
 #: modules/access/decklink.cpp:87
 msgid "Composite"
-msgstr ""
+msgstr "複合"
 
 #: modules/access/decklink.cpp:87
 msgid "S-Video"
-msgstr ""
+msgstr "S 端子"
 
 #: modules/access/decklink.cpp:94
 msgid "Embedded"
@@ -6234,11 +6252,11 @@ msgstr "長寬比例(4:3，16:9)。預設情況下假設為方形像素。"
 
 #: modules/access/decklink.cpp:102
 msgid "DeckLink"
-msgstr ""
+msgstr "DeckLink"
 
 #: modules/access/decklink.cpp:103
 msgid "Blackmagic DeckLink SDI input"
-msgstr ""
+msgstr "Blackmagic DeckLink SDI 輸入"
 
 #: modules/access/decklink.cpp:123 modules/video_output/decklink.cpp:119
 msgid "10 bits"
@@ -6358,7 +6376,7 @@ msgstr "調諧器屬性"
 
 #: modules/access/dshow/dshow.cpp:161
 msgid "Show the tuner properties [channel selection] page."
-msgstr ""
+msgstr "選擇調諧器內容 [頻道選擇] 頁面。"
 
 #: modules/access/dshow/dshow.cpp:162
 msgid "Tuner TV Channel"
@@ -6374,7 +6392,7 @@ msgstr "調諧器頻率"
 
 #: modules/access/dshow/dshow.cpp:167
 msgid "This overrides the channel. Measured in Hz."
-msgstr ""
+msgstr "這將覆寫頻道，以 Hz 為單位。"
 
 #: modules/access/dshow/dshow.cpp:168
 #: modules/gui/qt/components/open_panels.cpp:851
