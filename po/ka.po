@@ -1,16 +1,17 @@
 # Georgian translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Alexander Didebulidze <didebuli@in.tum.de>, 2005,2006,2008
+# Alexander Didebulidze <didebuli@in.tum.de>, 2005-2008
+# Georgianization, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2021-03-01 12:08+0100\n"
+"Last-Translator: Georgianization, 2021\n"
 "Language-Team: Georgian (https://www.transifex.com/yaron/teams/16553/ka/)\n"
 "Language: ka\n"
 "MIME-Version: 1.0\n"
@@ -25,6 +26,10 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
+"პროგრამა ვრცელდება ᲕᲐᲚᲓᲔᲑᲣᲚᲔᲑᲔᲑᲘᲡ ᲒᲐᲠᲔᲨᲔ, გარდა კანონით გათვალისწინებულისა.\n"
+"ხელახლა გავრცელება შეგიძლიათ GNU-ს ზოგადი საჯარო ლიცენზიით;\n"
+"ვრცლად, გაეცანით ფაილში დასახელებით COPYING.\n"
+"დაწერილი VideoLAN-ის გუნდის მიერ; იხილეთ ფაილი AUTHORS.\n"
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
@@ -47,7 +52,7 @@ msgstr "VLC ინტერფეისის პარამეტრები"
 
 #: include/vlc_config_cat.h:41
 msgid "Main interfaces settings"
-msgstr ""
+msgstr "მთავარი იერსახის პარამეტრები"
 
 #: include/vlc_config_cat.h:43
 msgid "Main interfaces"
@@ -371,19 +376,19 @@ msgstr "დამატებითი პარამეტრები"
 
 #: include/vlc_intf_strings.h:46
 msgid "&Open File..."
-msgstr ""
+msgstr "ფაილის &გახსნა..."
 
 #: include/vlc_intf_strings.h:47
 msgid "&Advanced Open..."
-msgstr ""
+msgstr "&გაფართოებული გახსნა..."
 
 #: include/vlc_intf_strings.h:48
 msgid "Open D&irectory..."
-msgstr ""
+msgstr "საქა&ღალდის გახსნა..."
 
 #: include/vlc_intf_strings.h:49
 msgid "Open &Folder..."
-msgstr ""
+msgstr "სა&ქაღალდის გახსნა..."
 
 #: include/vlc_intf_strings.h:50
 msgid "Select one or more files to open"
@@ -395,7 +400,7 @@ msgstr "საქაღალდის არჩევა"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Folder"
-msgstr ""
+msgstr "საქაღალდის არჩევა"
 
 #: include/vlc_intf_strings.h:55
 msgid "Media &Information"
@@ -448,45 +453,45 @@ msgstr ""
 
 #: include/vlc_intf_strings.h:68
 msgid "Create Directory..."
-msgstr ""
+msgstr "საქაღალდის შექმნა..."
 
 #: include/vlc_intf_strings.h:69
 msgid "Create Folder..."
-msgstr ""
+msgstr "საქაღალდის შექმნა..."
 
 #: include/vlc_intf_strings.h:70
 msgid "Rename Directory..."
-msgstr ""
+msgstr "საქაღალდის გადარქმევა..."
 
 #: include/vlc_intf_strings.h:71
 msgid "Rename Folder..."
-msgstr ""
+msgstr "საქაღალდის გადარქმევა..."
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
-msgstr ""
+msgstr "შემცველი საქაღალდის ჩვენება..."
 
 #: include/vlc_intf_strings.h:73
 msgid "Show Containing Folder..."
-msgstr ""
+msgstr "შემცველი საქაღალდის ჩვენება..."
 
 #: include/vlc_intf_strings.h:74
 msgid "Stream..."
-msgstr ""
+msgstr "ნაკადი..."
 
 #: include/vlc_intf_strings.h:75
 msgid "Save..."
-msgstr ""
+msgstr "შენახვა..."
 
 #: include/vlc_intf_strings.h:79 modules/gui/macosx/VLCCoreInteraction.m:447
 #: modules/gui/macosx/VLCMainMenu.m:399
 msgid "Repeat All"
-msgstr ""
+msgstr "ყველას გამეორება"
 
 #: include/vlc_intf_strings.h:80 modules/gui/macosx/VLCCoreInteraction.m:467
 #: modules/gui/macosx/VLCMainMenu.m:398
 msgid "Repeat One"
-msgstr ""
+msgstr "ერთის გამეორება"
 
 #: include/vlc_intf_strings.h:81 src/libvlc-module.c:1429
 #: modules/gui/macosx/VLCMainMenu.m:397
@@ -505,19 +510,19 @@ msgstr "დასაკვრელ სიაში დამატება"
 
 #: include/vlc_intf_strings.h:85 modules/gui/macosx/VLCPlaylist.m:230
 msgid "Add File..."
-msgstr ""
+msgstr "ფაილის დამატება..."
 
 #: include/vlc_intf_strings.h:86
 msgid "Add Directory..."
-msgstr ""
+msgstr "საქაღალდის დამატება..."
 
 #: include/vlc_intf_strings.h:87
 msgid "Add Folder..."
-msgstr ""
+msgstr "საქაღალდის დამატება..."
 
 #: include/vlc_intf_strings.h:89
 msgid "Save Playlist to &File..."
-msgstr ""
+msgstr "დასაკრავი სიის შენახვა &ფაილში..."
 
 #: include/vlc_intf_strings.h:91 modules/gui/macosx/VLCMainWindow.m:191
 #: modules/gui/qt/components/preferences_widgets.cpp:1138
@@ -602,7 +607,7 @@ msgstr ""
 #: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:420
 #: modules/gui/macosx/VLCMainMenu.m:421
 msgid "Stereo audio mode"
-msgstr ""
+msgstr "სტერეო ხმის რეჟიმი"
 
 #: src/audio_output/output.c:419 modules/access/v4l2/v4l2.c:267
 #: modules/audio_output/alsa.c:76
@@ -611,7 +616,7 @@ msgstr "მონო"
 
 #: src/audio_output/output.c:425
 msgid "Original"
-msgstr ""
+msgstr "თავდაპირველი"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -676,7 +681,7 @@ msgstr "ავტომატური"
 
 #: src/config/file.c:452
 msgid "boolean"
-msgstr ""
+msgstr "მუნჯი ცვლადი"
 
 #: src/config/file.c:452 src/config/help.c:426
 msgid "integer"
@@ -733,19 +738,20 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr ""
+msgstr " (ნაგულისხმევად ჩართული)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr ""
+msgstr " (ნაგულისხმევად გამორთული)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
-msgstr ""
+msgstr "შენიშვნა:"
 
 #: src/config/help.c:651
 msgid "add --advanced to your command line to see advanced options."
 msgstr ""
+"დაამატეთ --advanced ბრძანებათა ველში, გაფართოებული პარამეტრების სანახავად."
 
 #: src/config/help.c:656
 #, c-format
@@ -764,7 +770,7 @@ msgstr ""
 #: src/config/help.c:721
 #, c-format
 msgid "VLC version %s (%s)\n"
-msgstr ""
+msgstr "VLC გამოშვება %s (%s)\n"
 
 #: src/config/help.c:722
 #, c-format
@@ -791,7 +797,7 @@ msgstr ""
 
 #: src/darwin/error.c:37
 msgid "Unknown error"
-msgstr ""
+msgstr "უცნობი შეცდომა"
 
 #: src/input/control.c:204
 #, c-format
@@ -800,24 +806,24 @@ msgstr "სანიშნე %i"
 
 #: src/input/decoder.c:1890
 msgid "No description for this codec"
-msgstr ""
+msgstr "ამ დამშიფრავს აღწერა არ აქვს"
 
 #: src/input/decoder.c:1892
 msgid "Codec not supported"
-msgstr ""
+msgstr "დამშიფრავი მხარდაუჭერელია"
 
 #: src/input/decoder.c:1893
 #, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr ""
+msgstr "VLC ვერ ახერხებს გაშიფროს სახეობა \"%4.4s\" (%s)"
 
 #: src/input/decoder.c:1897
 msgid "Unidentified codec"
-msgstr ""
+msgstr "დაუდგენელი დამშიფრავი"
 
 #: src/input/decoder.c:1898
 msgid "VLC could not identify the audio or video codec"
-msgstr ""
+msgstr "VLC ვერ ახერხებს დაადგინოს ხმის ან ვიდეოს დამშიფრავი"
 
 #: src/input/decoder.c:1909
 msgid "packetizer"
@@ -825,22 +831,22 @@ msgstr ""
 
 #: src/input/decoder.c:1909
 msgid "decoder"
-msgstr ""
+msgstr "გამშიფრავი"
 
 #: src/input/decoder.c:1917 src/input/decoder.c:2200
 #: modules/codec/avcodec/encoder.c:371 modules/codec/avcodec/encoder.c:905
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
-msgstr ""
+msgstr "ნაკადის გაშვება / გადაშიფვრა ვერ მოხერხდა"
 
 #: src/input/decoder.c:1918
 #, c-format
 msgid "VLC could not open the %s module."
-msgstr ""
+msgstr "VLC ვერ ახერხებს %s მოდულის გახსნას."
 
 #: src/input/decoder.c:2201
 msgid "VLC could not open the decoder module."
-msgstr ""
+msgstr "VLC ვერ ახერხებს გამშიფრავი მოდულის გახსნას."
 
 #: src/input/es_out.c:968 src/input/es_out.c:973 src/libvlc-module.c:239
 #: modules/gui/qt/components/open_panels.cpp:547
@@ -850,7 +856,7 @@ msgstr "კვალი"
 #: src/input/es_out.c:1190
 #, c-format
 msgid "%s [%s %d]"
-msgstr ""
+msgstr "%s [%s %d]"
 
 #: src/input/es_out.c:1191 src/input/es_out.c:1196 src/input/es_out.c:1211
 #: src/input/var.c:160 src/libvlc-module.c:564
@@ -963,7 +969,7 @@ msgstr ""
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr "ვიდეოს გაფართოება"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
@@ -981,39 +987,39 @@ msgstr "კადრი წამში"
 
 #: src/input/es_out.c:3194
 msgid "Decoded format"
-msgstr ""
+msgstr "გაშიფრული სახეობა"
 
 #: src/input/es_out.c:3199
 msgid "Top left"
-msgstr ""
+msgstr "ზედა მარცხენა"
 
 #: src/input/es_out.c:3199
 msgid "Left top"
-msgstr ""
+msgstr "მარცხენა ზედა"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr ""
+msgstr "მარჯვენა ქვედა"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
-msgstr ""
+msgstr "ზედა მარჯვენა"
 
 #: src/input/es_out.c:3201
 msgid "Bottom left"
-msgstr ""
+msgstr "ქვედა მარცხენა"
 
 #: src/input/es_out.c:3201
 msgid "Bottom right"
-msgstr ""
+msgstr "ქვედა მარჯვენა"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
-msgstr ""
+msgstr "მარცხენა ქვედა"
 
 #: src/input/es_out.c:3202
 msgid "Right top"
-msgstr ""
+msgstr "მარჯვენა ზედა"
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
@@ -1052,7 +1058,7 @@ msgstr ""
 
 #: src/input/es_out.c:3253
 msgid "Color space"
-msgstr ""
+msgstr "ფერთა სივრცე"
 
 #: src/input/es_out.c:3253
 #, c-format
@@ -1246,7 +1252,7 @@ msgstr ""
 
 #: src/input/meta.c:73
 msgid "Number of Tracks"
-msgstr ""
+msgstr "ჩანაწერების რაოდენობა"
 
 #: src/input/meta.c:74
 msgid "Director"
@@ -1254,27 +1260,27 @@ msgstr ""
 
 #: src/input/meta.c:75
 msgid "Season"
-msgstr ""
+msgstr "სეზონი"
 
 #: src/input/meta.c:76
 msgid "Episode"
-msgstr ""
+msgstr "ეპიზოდი"
 
 #: src/input/meta.c:77
 msgid "Show Name"
-msgstr ""
+msgstr "გადაცემის სახელი"
 
 #: src/input/meta.c:78
 msgid "Actors"
-msgstr ""
+msgstr "მსახიობები"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 msgid "Album Artist"
-msgstr ""
+msgstr "ალბომის შემსრულებელი"
 
 #: src/input/meta.c:80
 msgid "Disc number"
-msgstr ""
+msgstr "დისკის ნომერი"
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1364,7 +1370,7 @@ msgstr ""
 
 #: src/interface/interface.c:99
 msgid "Mouse Gestures"
-msgstr ""
+msgstr "თაგვის ჟესტები"
 
 #: src/interface/interface.c:222
 msgid ""
@@ -1518,11 +1524,11 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "მუსიკა"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
-msgstr ""
+msgstr "ურთიერთობა"
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
@@ -1530,23 +1536,23 @@ msgstr "თამაში"
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "შეტყობინება"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
-msgstr ""
+msgstr "ანიმაცია"
 
 #: src/libvlc-module.c:143
 msgid "Production"
-msgstr ""
+msgstr "ნაწარმოები"
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
-msgstr ""
+msgstr "ხელმისაწვდომობა"
 
 #: src/libvlc-module.c:144
 msgid "Test"
-msgstr ""
+msgstr "შემოწმება"
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
@@ -1896,7 +1902,7 @@ msgstr ""
 
 #: src/libvlc-module.c:307
 msgid "Embedded video"
-msgstr ""
+msgstr "ჩაშენებული ვიდეო"
 
 #: src/libvlc-module.c:309
 msgid "Embed the video output in the main interface."
@@ -2470,27 +2476,27 @@ msgstr ""
 
 #: src/libvlc-module.c:624
 msgid "Best available"
-msgstr ""
+msgstr "შესაძლო საუკეთესო"
 
 #: src/libvlc-module.c:624
 msgid "Full HD (1080p)"
-msgstr ""
+msgstr "სრული (1080p)"
 
 #: src/libvlc-module.c:624
 msgid "HD (720p)"
-msgstr ""
+msgstr "მაღალი (720p)"
 
 #: src/libvlc-module.c:625
 msgid "Standard Definition (576 or 480 lines)"
-msgstr ""
+msgstr "საშუალო (576 ან 480 ხაზი )"
 
 #: src/libvlc-module.c:626
 msgid "Low Definition (360 lines)"
-msgstr ""
+msgstr "დაბალი (360 ხაზი)"
 
 #: src/libvlc-module.c:627
 msgid "Very Low Definition (240 lines)"
-msgstr ""
+msgstr "მეტად დაბალი (240 ხაზი)"
 
 #: src/libvlc-module.c:630
 msgid "Input repetitions"
@@ -2534,11 +2540,11 @@ msgstr ""
 
 #: src/libvlc-module.c:650
 msgid "Playback speed"
-msgstr ""
+msgstr "დაკვრის სიჩქარე"
 
 #: src/libvlc-module.c:652
 msgid "This defines the playback speed (nominal speed is 1.0)."
-msgstr ""
+msgstr "განსაზღვრავს დაკვრის სიჩქარეს (პირობითი სიჩქარეა 1.0)."
 
 #: src/libvlc-module.c:654
 msgid "Input list"
@@ -6829,7 +6835,7 @@ msgstr ""
 #: modules/access/dvdread.c:243 modules/access/dvdread.c:502
 #: modules/access/dvdread.c:567
 msgid "Playback failure"
-msgstr ""
+msgstr "გაშვება ვერ მოხერხდა"
 
 #: modules/access/dvdnav.c:285
 msgid ""
@@ -16329,7 +16335,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:390
 msgid "Playback Speed"
-msgstr ""
+msgstr "დაკვრის სიჩქარე"
 
 #: modules/gui/macosx/VLCMainMenu.m:394
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:48
@@ -16343,7 +16349,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:401
 msgid "Quit after Playback"
-msgstr ""
+msgstr "გამოსვლა დაკვრის შემდგომ"
 
 #: modules/gui/macosx/VLCMainMenu.m:402
 msgid "Step Forward"
@@ -16700,7 +16706,7 @@ msgstr ""
 #: modules/gui/macosx/VLCOpenWindowController.m:148
 #: modules/gui/macosx/VLCOpenWindowController.m:350
 msgid "Select a file for playback"
-msgstr ""
+msgstr "ფაილის შერჩევა გასაშვებად"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:149
 msgid "Treat as a pipe rather than as a file"
@@ -16723,7 +16729,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:158
 msgid "Custom playback"
-msgstr ""
+msgstr "მორგებული გაშვება"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:166
 msgid "Open VIDEO_TS / BDMV folder"
@@ -17016,7 +17022,7 @@ msgstr ""
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:194
 #: modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Continue playback?"
-msgstr ""
+msgstr "გაგრძელდეს დაკვრა?"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
 #: modules/gui/macosx/VLCSimplePrefsController.m:828
@@ -17026,16 +17032,16 @@ msgstr "გაგრძელება"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
 msgid "Always continue media playback"
-msgstr ""
+msgstr "ყოველთვის გაგრძელდეს დაკვრა"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
 msgid "Restart playback"
-msgstr ""
+msgstr "ხელახლა გაშვება"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:69
 msgid "Playback of \"%@\" will continue at %@"
-msgstr ""
+msgstr "„%@“ ფაილის დაკვრის გაგრძელება %@"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:233
 #: modules/gui/qt/components/simple_preferences.cpp:239
@@ -17179,7 +17185,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:323
 msgid "Continue playback"
-msgstr ""
+msgstr "დაკვრის გაგრძელება"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:329
 msgid "Playback behaviour"
@@ -17401,7 +17407,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
 msgid "Toggle random order playback"
-msgstr ""
+msgstr "შემთხვევითობით გაშვების გადართვა"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
 msgid "Show Main Window"
@@ -18151,7 +18157,7 @@ msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:116
 msgid "Stop playback"
-msgstr ""
+msgstr "დაკვრის შეწყვეტა"
 
 #: modules/gui/qt/components/controller.hpp:116
 msgid "Open a medium"
@@ -18230,7 +18236,7 @@ msgstr ""
 
 #: modules/gui/qt/components/controller_widget.cpp:234
 msgid "Pause the playback"
-msgstr ""
+msgstr "დაკვრის შეჩერება"
 
 #: modules/gui/qt/components/controller_widget.cpp:243
 msgid ""
@@ -18503,6 +18509,8 @@ msgid ""
 "Current playback speed: %1\n"
 "Click to adjust"
 msgstr ""
+"ამჟამად, დაკვრის სიჩქარეა: %1\n"
+"დაწკაპეთ მოსარგებად"
 
 #: modules/gui/qt/components/interface_widgets.cpp:719
 msgid "Revert to normal play speed"
@@ -19518,7 +19526,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/preferences.cpp:169
 msgid "Only show modules related to current playback"
-msgstr ""
+msgstr "მხოლოდ ამჟამად გაშვებულთან დაკავშირებული მოდულების ჩვენება "
 
 #: modules/gui/qt/dialogs/preferences.cpp:206
 msgid "Advanced Preferences"
@@ -19681,7 +19689,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/toolbar.cpp:561
 msgid "Playback Buttons"
-msgstr ""
+msgstr "დაკვრის ღილაკები"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:565
 msgid "Aspect ratio selector"
@@ -19811,7 +19819,7 @@ msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
-msgstr ""
+msgstr "გსურთ დაკვრა იქიდან განაგრძოთ, სადაც გაჩერდა?"
 
 #: modules/gui/qt/main_interface.cpp:379
 msgid "&Continue"
@@ -20115,7 +20123,7 @@ msgstr ""
 
 #: modules/gui/qt/menus.cpp:1069
 msgid "&Playback"
-msgstr ""
+msgstr "&გაშვება"
 
 #: modules/gui/qt/menus.cpp:1174
 msgid "&Hide VLC media player in taskbar"
@@ -26951,7 +26959,7 @@ msgstr ""
 
 #: share/lua/http/dialogs/offset_window.html:68
 msgid "Playback Rate"
-msgstr ""
+msgstr "დაკვრის სიხშირე"
 
 #: share/lua/http/dialogs/offset_window.html:72
 msgid "Audio Delay"
@@ -27577,7 +27585,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:539
 msgid "Pause playback when minimized"
-msgstr ""
+msgstr "გაშვების შეჩერება ჩაკეცვისას"
 
 #: modules/gui/qt/ui/sprefs_interface.h:540
 msgid "Show media change popup:"
