@@ -167,11 +167,11 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
     {
         pid->probed.i_cat = AUDIO_ES;
         if( p_data[0] == 0xFF && (p_data[1] & 0xE0) == 0xE0 &&
-           (p_data[1] & 0x0C) != 0x04 && (p_data[1] & 0x03) == 0x00 )
+           (p_data[1] & 0x18) != 0x08 && (p_data[1] & 0x06) != 0x00 )
         {
             pid->probed.i_fourcc = VLC_CODEC_MPGA;
         }
-        else if( p_data[0] == 0xFF && (p_data[1] & 0xF2) == 0xF0 )
+        else if( p_data[0] == 0xFF && (p_data[1] & 0xF6) == 0xF0 )
         {
             pid->probed.i_fourcc = VLC_CODEC_MP4A; /* ADTS */
             pid->probed.i_original_fourcc = VLC_FOURCC('A','D','T','S');
