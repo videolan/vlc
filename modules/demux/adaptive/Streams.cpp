@@ -536,7 +536,9 @@ block_t * AbstractStream::readNextBlock()
 
     if(discontinuity || needrestart)
     {
-        msg_Info(p_realdemux, "Encountered discontinuity");
+        msg_Info(p_realdemux, "Ending demuxer stream. %s%s",
+                 discontinuity ? "[discontinuity]" : "",
+                 needrestart ? "[needrestart]" : "");
         /* Force stream/demuxer to end for this call */
         return nullptr;
     }
