@@ -119,11 +119,9 @@ bool PlaylistManager::setupPeriod()
     if(!bufferingLogic && !(bufferingLogic = createBufferingLogic()))
         return false;
 
-    std::vector<BaseAdaptationSet*> sets = currentPeriod->getAdaptationSets();
-    std::vector<BaseAdaptationSet*>::iterator it;
-    for(it=sets.begin();it!=sets.end();++it)
+    const std::vector<BaseAdaptationSet*> &sets = currentPeriod->getAdaptationSets();
+    for(BaseAdaptationSet *set : sets)
     {
-        BaseAdaptationSet *set = *it;
         if(set && streamFactory)
         {
             SegmentTracker *tracker = new SegmentTracker(resources, logic,
