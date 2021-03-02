@@ -162,12 +162,21 @@ vlc_smb2_mainloop(stream_t *access, bool teardown)
     sys->res_done = false;
     while (sys->error_status == 0 && !sys->res_done)
     {
-        struct pollfd p_fds[1];
-        int ret;
-        p_fds[0].fd = smb2_get_fd(sys->smb2);
-        p_fds[0].events = smb2_which_events(sys->smb2);
+        int ret, smb2_timeout;
+        size_t fd_count;
+        const t_socket *fds = smb2_get_fds(sys->smb2, &fd_count, &smb2_timeout);
+        int events = smb2_which_events(sys->smb2);
 
-        if (p_fds[0].fd == -1 || (ret = poll_func(p_fds, 1, timeout)) < 0)
+        struct pollfd p_fds[fd_count];
+        for (size_t i = 0; i < fd_count; ++i)
+        {
+            p_fds[i].events = events;
+            p_fds[i].fd = fds[i];
+        }
+        if (smb2_timeout != -1)
+            timeout = smb2_timeout;
+
+        if (fds == NULL || (ret = poll_func(p_fds, fd_count, timeout)) < 0)
         {
             if (errno == EINTR)
             {
@@ -190,10 +199,21 @@ vlc_smb2_mainloop(stream_t *access, bool teardown)
             }
         }
         else if (ret == 0)
-            sys->error_status = -ETIMEDOUT;
-        else if (ret > 0 && p_fds[0].revents
-             && smb2_service(sys->smb2, p_fds[0].revents) < 0)
-            VLC_SMB2_SET_ERROR(access, "smb2_service", 1);
+        {
+            if (teardown)
+                sys->error_status = -ETIMEDOUT;
+            else if (smb2_service_fd(sys->smb2, -1, 0) < 0)
+                VLC_SMB2_SET_ERROR(access, "smb2_service", 1);
+        }
+        else
+        {
+            for (size_t i = 0; i < fd_count; ++i)
+            {
+                if (p_fds[i].revents
+                 && smb2_service_fd(sys->smb2, p_fds[i].fd, p_fds[i].revents) < 0)
+                    VLC_SMB2_SET_ERROR(access, "smb2_service", 1);
+            }
+        }
     }
 
     int ret = sys->error_status == 0 ? 0 : -1;
