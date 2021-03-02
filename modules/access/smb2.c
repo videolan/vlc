@@ -51,10 +51,10 @@
 #ifdef HAVE_DSM
 # include <bdsm/netbios_ns.h>
 # include <bdsm/netbios_defs.h>
+#endif
 
-# ifdef HAVE_ARPA_INET_H
-#  include <arpa/inet.h>
-# endif
+#ifdef HAVE_ARPA_INET_H
+# include <arpa/inet.h>
 #endif
 
 #include "smb_common.h"
