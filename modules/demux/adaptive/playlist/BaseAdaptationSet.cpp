@@ -66,10 +66,9 @@ const std::vector<BaseRepresentation*>& BaseAdaptationSet::getRepresentations() 
     return representations;
 }
 
-BaseRepresentation * BaseAdaptationSet::getRepresentationByID(const ID &id)
+BaseRepresentation * BaseAdaptationSet::getRepresentationByID(const ID &id) const
 {
-    std::vector<BaseRepresentation *>::const_iterator it;
-    for(it = representations.begin(); it != representations.end(); ++it)
+    for(auto it = representations.cbegin(); it != representations.cend(); ++it)
     {
         if((*it)->getID() == id)
             return *it;

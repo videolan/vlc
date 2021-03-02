@@ -75,10 +75,9 @@ void BasePeriod::addAdaptationSet(BaseAdaptationSet *adaptationSet)
     }
 }
 
-BaseAdaptationSet *BasePeriod::getAdaptationSetByID(const adaptive::ID &id)
+BaseAdaptationSet *BasePeriod::getAdaptationSetByID(const adaptive::ID &id) const
 {
-    std::vector<BaseAdaptationSet*>::const_iterator it;
-    for(it = adaptationSets.begin(); it!= adaptationSets.end(); ++it)
+    for(auto it = adaptationSets.cbegin(); it!= adaptationSets.cend(); ++it)
     {
         if( (*it)->getID() == id )
             return *it;

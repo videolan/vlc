@@ -51,7 +51,7 @@ namespace adaptive
 
                 virtual StreamFormat            getStreamFormat() const; /*reimpl*/
                 const std::vector<BaseRepresentation *>&  getRepresentations() const;
-                BaseRepresentation *            getRepresentationByID(const ID &);
+                BaseRepresentation *            getRepresentationByID(const ID &) const;
                 void                            setSegmentAligned(bool);
                 bool                            isSegmentAligned() const;
                 void                            setBitswitchAble(bool);
