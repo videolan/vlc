@@ -789,6 +789,9 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     /* variables for signalling creation of new files */
     var_Create(mp, "record-file", VLC_VAR_STRING);
 
+    /* Video */
+    var_Create (mp, "sk-keep-last-frame", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+
     mp->timer.id = NULL;
     mp->p_md = NULL;
     mp->p_libvlc_instance = instance;

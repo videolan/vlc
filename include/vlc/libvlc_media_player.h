@@ -2230,6 +2230,9 @@ LIBVLC_API float libvlc_video_get_adjust_float( libvlc_media_player_t *p_mi,
 LIBVLC_API void libvlc_video_set_adjust_float( libvlc_media_player_t *p_mi,
                                                    unsigned option, float value );
 
+LIBVLC_API void libvlc_video_set_keep_last_frame( libvlc_media_player_t *p_mi,
+                                                  bool keep_last_frame );
+
 /** @} video */
 
 /** \defgroup libvlc_audio LibVLC audio controls

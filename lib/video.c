@@ -933,3 +933,9 @@ float libvlc_video_get_adjust_float( libvlc_media_player_t *p_mi,
 {
     return get_float( p_mi, "adjust", adjust_option_bynumber(option) );
 }
+
+void libvlc_video_set_keep_last_frame( libvlc_media_player_t *p_mi,
+                                       bool keep_last_frame )
+{
+    var_SetBool( p_mi, "sk-keep-last-frame", keep_last_frame );
+}
