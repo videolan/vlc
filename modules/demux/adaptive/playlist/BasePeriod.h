@@ -41,7 +41,7 @@ namespace adaptive
                 virtual ~BasePeriod ();
 
                 const std::vector<BaseAdaptationSet *>& getAdaptationSets   () const;
-                BaseAdaptationSet *                 getAdaptationSetByID(const ID &);
+                BaseAdaptationSet *                 getAdaptationSetByID(const ID &) const;
                 void                                addAdaptationSet    (BaseAdaptationSet *AdaptationSet);
                 void                                debug               (vlc_object_t *,int = 0) const;
 
