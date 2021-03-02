@@ -775,6 +775,9 @@ libvlc_media_player_new_with_logger( libvlc_instance_t *instance,
     var_Create (mp, "equalizer-vlcfreqs", VLC_VAR_BOOL);
     var_Create (mp, "equalizer-bands", VLC_VAR_STRING);
 
+    /* Video */
+    var_Create (mp, "sk-keep-last-frame", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+
     mp->p_md = NULL;
     mp->p_libvlc_instance = instance;
     /* use a reentrant lock to allow calling libvlc functions from callbacks */
