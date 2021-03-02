@@ -74,11 +74,11 @@ NavigableFocusScope {
     property var selectionDelegateModel
     property real rowHeight: VLCStyle.tableRow_height
     readonly property int _contextButtonHorizontalSpace: VLCStyle.icon_normal + VLCStyle.margin_xxsmall * 2
-    readonly property real availableRowWidth: width
-                                              - ( !!section.property ? VLCStyle.table_section_width * 2 : 0 )
-                                              - _contextButtonHorizontalSpace
     property alias spacing: view.spacing
     property int horizontalSpacing: VLCStyle.column_margin_width
+
+    property real availableRowWidth: 0
+    property real _availabeRowWidthLastUpdateTime: Date.now()
 
     property alias fadeColor:             view.fadeColor
     property alias fadeRectBottomHovered: view.fadeRectBottomHovered
@@ -94,6 +94,45 @@ NavigableFocusScope {
 
     function positionViewAtIndex(index, mode) {
         view.positionViewAtIndex(index, mode)
+    }
+
+    Timer {
+        id: availableRowWidthUpdater
+
+        interval: 100
+        triggeredOnStart: false
+        repeat: false
+        onTriggered: {
+            _update()
+        }
+
+        function _update() {
+            root.availableRowWidth = root.width
+                    - ( !!section.property ? VLCStyle.table_section_width * 2 : 0 )
+                    - _contextButtonHorizontalSpace
+            root._availabeRowWidthLastUpdateTime = Date.now()
+        }
+
+        function enqueueUpdate() {
+            // updating availableRowWidth is expensive because of property bindings in sortModel
+            // and availableRowWidth is dependent on root.width which can update in a burst
+            // so try to maintain a minimum time gap between subsequent availableRowWidth updates
+            var sinceLastUpdate = Date.now() - root._availabeRowWidthLastUpdateTime
+            if ((root.availableRowWidth === 0) || (sinceLastUpdate > 128 && !availableRowWidthUpdater.running)) {
+                _update()
+            } else if (!availableRowWidthUpdater.running) {
+                availableRowWidthUpdater.interval = Math.max(128 - sinceLastUpdate, 32)
+                availableRowWidthUpdater.start()
+            }
+        }
+    }
+
+    onWidthChanged: {
+        availableRowWidthUpdater.enqueueUpdate()
+    }
+
+    onSectionChanged: {
+        availableRowWidthUpdater.enqueueUpdate()
     }
 
     KeyNavigableListView {
