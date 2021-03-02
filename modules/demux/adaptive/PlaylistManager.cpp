@@ -116,7 +116,7 @@ bool PlaylistManager::setupPeriod()
     if(!bufferingLogic && !(bufferingLogic = createBufferingLogic()))
         return false;
 
-    std::vector<BaseAdaptationSet*> sets = currentPeriod->getAdaptationSets();
+    const std::vector<BaseAdaptationSet*> &sets = currentPeriod->getAdaptationSets();
     for(BaseAdaptationSet *set : sets)
     {
         if(set && streamFactory)

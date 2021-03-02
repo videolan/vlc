@@ -45,8 +45,8 @@ bool M3U8::isLive() const
     for(itp = periods.begin(); itp != periods.end(); ++itp)
     {
         const BasePeriod *period = *itp;
-        std::vector<BaseAdaptationSet *>::const_iterator ita;
-        for(ita = period->getAdaptationSets().begin(); ita != period->getAdaptationSets().end(); ++ita)
+        const std::vector<BaseAdaptationSet *> &sets = period->getAdaptationSets();
+        for(auto ita = sets.cbegin(); ita != sets.cend(); ++ita)
         {
             BaseAdaptationSet *adaptSet = *ita;
             const std::vector<BaseRepresentation *> &reps = adaptSet->getRepresentations();
