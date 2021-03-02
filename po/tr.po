@@ -8,7 +8,7 @@
 # Can Berkol <can.berkol@biberltd.com>, 2013
 # Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Hasan Yıldız <hasanyildiz0@yaani.com>, 2021
-# Kaya Zeren <kayazeren@gmail.com>, 2014-2020
+# Kaya Zeren <kayazeren@gmail.com>, 2014-2021
 # Mehmet Ertekin <byscul@gmail.com>, 2013
 # Ozancan Karataş <ozancankaratas96@outlook.com>, 2015-2017
 # Özgür Turanlı, 2013
@@ -20,8 +20,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-02-28 11:38+0100\n"
-"Last-Translator: Hasan Yıldız <hasanyildiz0@yaani.com>, 2021\n"
+"PO-Revision-Date: 2021-03-02 08:28+0100\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2021\n"
 "Language-Team: Turkish (https://www.transifex.com/yaron/teams/16553/tr/)\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -12090,7 +12090,7 @@ msgstr "Kate Metin Alt Yazı Paketleyicisi"
 
 #: modules/codec/libass.c:59
 msgid "Additional fonts directory"
-msgstr "Ek yazı tipleri dizini"
+msgstr "Ek yazı türleri klasörü"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -15291,11 +15291,11 @@ msgstr "Canlı oynatma gecikmesi (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr "İstikrar ve gerçek zamanlı arasındaki uzlaşma"
+msgstr "Kararlılık ve gerçek zamanlılık dengesi"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr "Maksimum tamponlama (ms)"
+msgstr "En fazla ara bellek (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15316,7 +15316,7 @@ msgstr "Düşük gecikme"
 
 #: modules/demux/adaptive/adaptive.cpp:86
 msgid "Overrides low latency parameters"
-msgstr "Düşük gecikme süresi parametrelerini geçersiz kılar"
+msgstr "Düşük gecikme parametrelerini değiştirir"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15344,7 +15344,7 @@ msgstr "En Yüksek Bant Genişliği/Kalite"
 
 #: modules/demux/adaptive/adaptive.cpp:123
 msgid "Force"
-msgstr "Güç"
+msgstr "Dayat"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -29064,14 +29064,13 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
-"VLC, web arayüzünün mobil sürümüne bağlanan bir QR kodu görüntüleyebilir; "
-"VLC media player örneğinizin web arayüzünün web adresi, bu QR kodunu "
-"oluşturmak için internet üzerinden Google Image Charts web servisine "
-"iletilecektir."
+"VLC, web arayüzünün mobil sürümüne bağlanan bir QR kodu görüntüleyebilir. Bu "
+"QR kodunu oluşturmak için, VLC ortam oynatıcısı kopyanızın web arayüzü "
+"adresi, İnternet üzerinden Google Image Charts web hizmetine iletilecektir."
 
 #: share/lua/http/index.html:285
 msgid "Do you want to go ahead with this?"
-msgstr "Böyle devam etmek istiyor musunuz?"
+msgstr "Bu işlemin yapılmasını istiyor musunuz?"
 
 #: share/lua/http/index.html:290
 msgid ""
