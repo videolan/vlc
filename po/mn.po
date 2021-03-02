@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2021-03-02 08:58+0100\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2021\n"
 "Language-Team: Mongolian (https://www.transifex.com/yaron/teams/16553/mn/)\n"
 "Language: mn\n"
 "MIME-Version: 1.0\n"
@@ -182,7 +182,7 @@ msgstr "OSD, бичвэр болон \"дэд зураг\"-ийн бусад т�
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
-msgstr ""
+msgstr "Зааглагчууд"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
@@ -651,7 +651,7 @@ msgstr "Өрөөсөн"
 
 #: src/audio_output/output.c:425
 msgid "Original"
-msgstr ""
+msgstr "Жинхэнэ"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -703,7 +703,7 @@ msgstr "Эсрэг стерео"
 #: src/audio_output/output.c:460 src/libvlc-module.c:198
 #: modules/audio_filter/equalizer_presets.h:55
 msgid "Headphones"
-msgstr ""
+msgstr "Чихэвч"
 
 #: src/config/core.c:370 modules/access/dtv/access.c:93
 #: modules/access/dtv/access.c:108 modules/access/dtv/access.c:117
@@ -831,7 +831,7 @@ msgstr ""
 
 #: src/darwin/error.c:37
 msgid "Unknown error"
-msgstr ""
+msgstr "Тодорхойгүй алдаа"
 
 #: src/input/control.c:204
 #, c-format
@@ -844,7 +844,7 @@ msgstr ""
 
 #: src/input/decoder.c:1892
 msgid "Codec not supported"
-msgstr ""
+msgstr "Кодчилол дэмжигдээгүй"
 
 #: src/input/decoder.c:1893
 #, c-format
@@ -932,7 +932,7 @@ msgstr "Жинхэнэ дугаар"
 #: modules/gui/qt/ui/profiles.h:727 modules/gui/qt/ui/profiles.h:753
 #: modules/gui/qt/ui/profiles.h:762
 msgid "Codec"
-msgstr ""
+msgstr "Кодчилол"
 
 #: src/input/es_out.c:3111 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:98
@@ -986,7 +986,7 @@ msgstr ""
 #: src/input/es_out.c:3143
 #, c-format
 msgid "%u kb/s"
-msgstr ""
+msgstr "%u кб/с"
 
 #: src/input/es_out.c:3155
 msgid "Track replay gain"
@@ -999,7 +999,7 @@ msgstr ""
 #: src/input/es_out.c:3158
 #, c-format
 msgid "%.2f dB"
-msgstr ""
+msgstr "%.2f дБ"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
@@ -1025,39 +1025,39 @@ msgstr ""
 
 #: src/input/es_out.c:3199
 msgid "Top left"
-msgstr ""
+msgstr "Дээд зүүн"
 
 #: src/input/es_out.c:3199
 msgid "Left top"
-msgstr ""
+msgstr "Зүүн дээд"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr ""
+msgstr "Баруун доод"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
-msgstr ""
+msgstr "Дээд баруун"
 
 #: src/input/es_out.c:3201
 msgid "Bottom left"
-msgstr ""
+msgstr "Доод зүүн"
 
 #: src/input/es_out.c:3201
 msgid "Bottom right"
-msgstr ""
+msgstr "Доод баруун"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
-msgstr ""
+msgstr "Зүүн доод"
 
 #: src/input/es_out.c:3202
 msgid "Right top"
-msgstr ""
+msgstr "Баруун дээд"
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
-msgstr ""
+msgstr "Чиглэл"
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
@@ -1101,7 +1101,7 @@ msgstr ""
 
 #: src/input/es_out.c:3255
 msgid "Full"
-msgstr ""
+msgstr "Бүтэн"
 
 #: src/input/es_out.c:3262 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1116,7 +1116,7 @@ msgstr "Төв"
 
 #: src/input/es_out.c:3263
 msgid "Top Left"
-msgstr ""
+msgstr "Дээд Зүүн"
 
 #: src/input/es_out.c:3264
 msgid "Top Center"
@@ -1136,7 +1136,7 @@ msgstr ""
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
-msgstr ""
+msgstr "Дөрвөлжин"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
@@ -1314,7 +1314,7 @@ msgstr ""
 
 #: src/input/meta.c:80
 msgid "Disc number"
-msgstr ""
+msgstr "Дискийн дугаар"
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1560,11 +1560,11 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "Хөгжим"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
-msgstr ""
+msgstr "Холболт"
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
@@ -1572,7 +1572,7 @@ msgstr "Тоглоом"
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "Мэдэгдэл"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
@@ -1588,7 +1588,7 @@ msgstr ""
 
 #: src/libvlc-module.c:144
 msgid "Test"
-msgstr ""
+msgstr "Туршилт"
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
@@ -2516,7 +2516,7 @@ msgstr ""
 
 #: src/libvlc-module.c:624
 msgid "Full HD (1080p)"
-msgstr ""
+msgstr "Бүтэн HD (1080p)"
 
 #: src/libvlc-module.c:624
 msgid "HD (720p)"
@@ -2666,7 +2666,7 @@ msgstr ""
 
 #: src/libvlc-module.c:695
 msgid "Disable all lua plugins"
-msgstr ""
+msgstr "Бүх lua нэмэлтүүдийг хаах"
 
 #: src/libvlc-module.c:699
 msgid ""
@@ -2795,11 +2795,11 @@ msgstr "ДиВиДи төхөөрөмж"
 
 #: src/libvlc-module.c:763
 msgid "VCD device"
-msgstr ""
+msgstr "VCD төхөөрөмж"
 
 #: src/libvlc-module.c:764 modules/access/cdda.c:708
 msgid "Audio CD device"
-msgstr ""
+msgstr "Дууны CD төхөөрөмж"
 
 #: src/libvlc-module.c:768
 msgid ""
@@ -2841,7 +2841,7 @@ msgstr ""
 
 #: src/libvlc-module.c:803
 msgid "HTTP server address"
-msgstr ""
+msgstr "HTTP сервэрийн хаяг"
 
 #: src/libvlc-module.c:805
 msgid ""
@@ -3404,11 +3404,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1131
 msgid "Collapse"
-msgstr ""
+msgstr "Хураах"
 
 #: src/libvlc-module.c:1131
 msgid "Expand"
-msgstr ""
+msgstr "Задлах"
 
 #: src/libvlc-module.c:1133
 msgid "Subdirectory behavior"
@@ -3556,11 +3556,11 @@ msgstr "Алгасах"
 
 #: src/libvlc-module.c:1214
 msgid "Volume control"
-msgstr ""
+msgstr "Дуу удирдлага"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
-msgstr ""
+msgstr "Байрлалын удирдлага"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
@@ -4298,7 +4298,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1418
 msgid "Context menu"
-msgstr ""
+msgstr "Хамааралтай цэс"
 
 #: src/libvlc-module.c:1419
 msgid "Show the contextual popup menu."
@@ -4603,15 +4603,15 @@ msgstr "Доош"
 
 #: src/misc/actions.c:64 modules/control/oldrc.c:72
 msgid "End"
-msgstr ""
+msgstr "End"
 
 #: src/misc/actions.c:65
 msgid "Enter"
-msgstr ""
+msgstr "Enter"
 
 #: src/misc/actions.c:66
 msgid "Esc"
-msgstr ""
+msgstr "Esc"
 
 #: src/misc/actions.c:67
 msgid "F1"
@@ -5105,7 +5105,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:73
 msgid "English"
-msgstr ""
+msgstr "Англи"
 
 #: src/text/iso-639_def.h:74
 msgid "Esperanto"
@@ -6405,7 +6405,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:58
 msgid "Frequency (Hz)"
-msgstr ""
+msgstr "Давтамж (Гц)"
 
 #: modules/access/dtv/access.c:60
 msgid ""
@@ -6490,11 +6490,11 @@ msgstr ""
 
 #: modules/access/dtv/access.c:121
 msgid "Bandwidth (MHz)"
-msgstr ""
+msgstr "Зурвасын өргөн (МГц)"
 
 #: modules/access/dtv/access.c:126
 msgid "10 MHz"
-msgstr ""
+msgstr "10 МГц"
 
 #: modules/access/dtv/access.c:126
 msgid "8 MHz"
@@ -6510,11 +6510,11 @@ msgstr "6 МГц"
 
 #: modules/access/dtv/access.c:127
 msgid "5 MHz"
-msgstr ""
+msgstr "5 МГц"
 
 #: modules/access/dtv/access.c:127
 msgid "1.712 MHz"
-msgstr ""
+msgstr "1.712 МГц"
 
 #: modules/access/dtv/access.c:130
 msgid "Guard interval"
@@ -6570,7 +6570,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:165
 msgid "0.20"
-msgstr ""
+msgstr "0.20"
 
 #: modules/access/dtv/access.c:165
 msgid "0.25"
@@ -7271,7 +7271,7 @@ msgstr ""
 #: modules/access/linsys/linsys_hdsdi.c:72
 #: modules/access/linsys/linsys_sdi.c:68
 msgid "Link #"
-msgstr ""
+msgstr "Холбоос №"
 
 #: modules/access/linsys/linsys_hdsdi.c:74
 #: modules/access/linsys/linsys_sdi.c:70
@@ -7658,7 +7658,7 @@ msgstr ""
 
 #: modules/access/rtsp/access.c:87
 msgid "Connection failed"
-msgstr ""
+msgstr "Холболт бүтэлгүйтэв"
 
 #: modules/access/rtsp/access.c:88
 #, c-format
@@ -7667,7 +7667,7 @@ msgstr ""
 
 #: modules/access/rtsp/access.c:225
 msgid "Session failed"
-msgstr ""
+msgstr "Суулт бүтэлгүйтэв"
 
 #: modules/access/rtsp/access.c:226
 msgid "The requested RTSP session could not be established."
@@ -7880,11 +7880,11 @@ msgstr ""
 
 #: modules/access/shm.c:76 modules/access/vnc.c:68
 msgid "8 bits"
-msgstr ""
+msgstr "8 бт"
 
 #: modules/access/shm.c:76
 msgid "15 bits"
-msgstr ""
+msgstr "15 бит"
 
 #: modules/access/shm.c:76 modules/access/vnc.c:68
 msgid "16 bits"
@@ -8042,7 +8042,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:73
 msgid "Radio device"
-msgstr ""
+msgstr "Радио төхөөрөмж"
 
 #: modules/access/v4l2/v4l2.c:74
 msgid "Radio tuner device node."
@@ -8335,7 +8335,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:172
 msgid "Audio balance"
-msgstr ""
+msgstr "Дууны тэнцэл"
 
 #: modules/access/v4l2/v4l2.c:174
 msgid "Balance of the audio input."
@@ -8511,7 +8511,7 @@ msgstr ""
 
 #: modules/access/vdr.c:886
 msgid "Start"
-msgstr ""
+msgstr "Эхлэх"
 
 #: modules/access/vnc.c:48
 msgid "X.509 Certificate Authority"
@@ -8567,7 +8567,7 @@ msgstr ""
 
 #: modules/access/vnc.c:78
 msgid "VNC"
-msgstr ""
+msgstr "VNC"
 
 #: modules/access/vnc.c:82
 msgid "VNC client access"
@@ -8595,11 +8595,11 @@ msgstr ""
 
 #: modules/access_output/file.c:314
 msgid "Keep existing file"
-msgstr ""
+msgstr "Байгаа файлыг үлдээх"
 
 #: modules/access_output/file.c:315
 msgid "Overwrite"
-msgstr ""
+msgstr "Дарах"
 
 #: modules/access_output/file.c:316
 msgid ""
@@ -8871,15 +8871,15 @@ msgstr ""
 
 #: modules/access_output/srt.c:57
 msgid "16 bytes"
-msgstr ""
+msgstr "16 байт"
 
 #: modules/access_output/srt.c:57
 msgid "24 bytes"
-msgstr ""
+msgstr "24 байт"
 
 #: modules/access_output/srt.c:57
 msgid "32 bytes"
-msgstr ""
+msgstr "32 байт"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
@@ -13614,7 +13614,7 @@ msgstr ""
 
 #: modules/control/netsync.c:71
 msgid "Network synchronization"
-msgstr ""
+msgstr "Сүлжээний давхцуулалт"
 
 #: modules/control/ntservice.c:46
 msgid "Install Windows Service"
@@ -13676,7 +13676,7 @@ msgstr ""
 
 #: modules/control/oldrc.c:73 modules/logger/file.c:203
 msgid "Error"
-msgstr ""
+msgstr "Алдаа"
 
 #: modules/control/oldrc.c:159
 msgid "Show stream position"
@@ -14296,7 +14296,7 @@ msgstr ""
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
-msgstr ""
+msgstr "Хавтас оруулах"
 
 #: modules/demux/filter/noseek.c:79
 msgid "Seek prevention demux filter"
@@ -14358,7 +14358,7 @@ msgstr ""
 
 #: modules/demux/image.c:77
 msgid "Image"
-msgstr ""
+msgstr "Зураг"
 
 #: modules/demux/mjpeg.c:46 modules/demux/mpeg/es.c:53
 #: modules/demux/mpeg/h26x.c:46 modules/demux/rawvid.c:43
@@ -14530,11 +14530,11 @@ msgstr ""
 
 #: modules/demux/mp4/meta.c:73
 msgid "Requirements"
-msgstr ""
+msgstr "Шаардлагууд"
 
 #: modules/demux/mp4/meta.c:74
 msgid "Original Format"
-msgstr ""
+msgstr "Жинхэнэ тогтнол"
 
 #: modules/demux/mp4/meta.c:75
 msgid "Display Source As"
@@ -14579,7 +14579,7 @@ msgstr ""
 
 #: modules/demux/mp4/meta.c:85
 msgid "Product"
-msgstr ""
+msgstr "Бүтээгдэхүүн"
 
 #: modules/demux/mp4/meta.c:86
 msgid "Grouping"
@@ -14826,7 +14826,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:422
 msgid "Main audio"
-msgstr ""
+msgstr "Үндсэн дуу"
 
 #: modules/demux/mpeg/ts_psi.c:423
 msgid "Audio description for the visually impaired"
@@ -15318,7 +15318,7 @@ msgstr ""
 #: modules/gui/qt/dialogs/plugins.cpp:390
 #: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
-msgstr ""
+msgstr "Харагдах байдлууд"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:111
 #: modules/gui/qt/dialogs/plugins.cpp:393
@@ -15352,7 +15352,7 @@ msgstr "Нэмэлтүүдийг зохицуулагч"
 #: modules/gui/qt/dialogs/plugins.cpp:1166
 #: modules/gui/qt/dialogs/plugins.cpp:1179
 msgid "Installed"
-msgstr ""
+msgstr "Суугдсан"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:131
 #: modules/gui/macosx/VLCBookmarksWindowController.m:87
@@ -15704,7 +15704,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
-msgstr ""
+msgstr "Өөр файлд хадгалах"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:149
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:392
@@ -15716,7 +15716,7 @@ msgstr "Урсгал"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:152
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:181
 msgid "Apply"
-msgstr ""
+msgstr "Хэрэгжүүлэх"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:154
 msgid "Save as new Profile..."
@@ -16352,7 +16352,7 @@ msgstr "Бүгдийг сонгох"
 
 #: modules/gui/macosx/VLCMainMenu.m:372
 msgid "Find"
-msgstr ""
+msgstr "Хайх"
 
 #: modules/gui/macosx/VLCMainMenu.m:374
 msgid "View"
@@ -16463,11 +16463,11 @@ msgstr "Бичвэрийн мөр"
 
 #: modules/gui/macosx/VLCMainMenu.m:454
 msgid "Text Size"
-msgstr ""
+msgstr "Бичвэрийн Хэмжээ"
 
 #: modules/gui/macosx/VLCMainMenu.m:455
 msgid "Text Color"
-msgstr ""
+msgstr "Бичвэрийн Өнгө"
 
 #: modules/gui/macosx/VLCMainMenu.m:456
 msgid "Outline Thickness"
@@ -16503,7 +16503,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:477
 msgid "Main Window..."
-msgstr ""
+msgstr "Үндсэн цонх..."
 
 #: modules/gui/macosx/VLCMainMenu.m:478
 msgid "Audio Effects..."
@@ -17799,23 +17799,23 @@ msgstr ""
 
 #: modules/gui/macosx/misc.m:301
 msgid "B"
-msgstr ""
+msgstr "Б"
 
 #: modules/gui/macosx/misc.m:308
 msgid "KB"
-msgstr ""
+msgstr "КБ"
 
 #: modules/gui/macosx/misc.m:315
 msgid "MB"
-msgstr ""
+msgstr "МБ"
 
 #: modules/gui/macosx/misc.m:323
 msgid "GB"
-msgstr ""
+msgstr "ГБ"
 
 #: modules/gui/macosx/misc.m:328
 msgid "TB"
-msgstr ""
+msgstr "ТБ"
 
 #: modules/gui/macosx/prefs.m:191
 msgid "Show Basic"
@@ -17854,7 +17854,7 @@ msgstr ""
 #: modules/gui/ncurses.c:771
 #, c-format
 msgid "  [%s]"
-msgstr ""
+msgstr "  [%s]"
 
 #: modules/gui/ncurses.c:775
 #, c-format
@@ -18303,7 +18303,7 @@ msgstr ""
 #: modules/gui/qt/components/extended_panels.cpp:380
 #: modules/gui/qt/components/extended_panels.cpp:393
 msgid "Image Files"
-msgstr ""
+msgstr "Дууны Файлууд"
 
 #: modules/gui/qt/components/extended_panels.cpp:382 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -18347,7 +18347,7 @@ msgstr ""
 #: modules/gui/qt/components/extended_panels.cpp:1300
 #: modules/gui/qt/components/extended_panels.cpp:1301
 msgid "dB"
-msgstr ""
+msgstr "дБ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1108
 msgid "170 Hz"
@@ -19852,7 +19852,7 @@ msgstr "Бүх файлууд"
 #: modules/gui/qt/extensions_manager.cpp:191
 #: modules/gui/qt/util/qmenuview.cpp:70
 msgid "Empty"
-msgstr ""
+msgstr "Хоосон"
 
 #: modules/gui/qt/extensions_manager.cpp:197
 msgid "Deactivate"
@@ -20405,11 +20405,11 @@ msgstr "Qt харагдах байдал"
 
 #: modules/gui/qt/util/customwidgets.cpp:81
 msgid "errors"
-msgstr ""
+msgstr "алдаанууд"
 
 #: modules/gui/qt/util/customwidgets.cpp:82
 msgid "warnings"
-msgstr ""
+msgstr "анхааруулгууд"
 
 #: modules/gui/qt/util/customwidgets.cpp:83
 msgid "debug"
@@ -21468,7 +21468,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:136
 msgid "Opera"
-msgstr ""
+msgstr "Дуурь"
 
 #: modules/meta_engine/ID3Genres.h:137
 msgid "Chamber Music"
@@ -24839,7 +24839,7 @@ msgstr "Хөх дэлгэц"
 
 #: modules/video_filter/canvas.c:83
 msgid "Output width"
-msgstr ""
+msgstr "Гаргах өргөн"
 
 #: modules/video_filter/canvas.c:85
 msgid "Output (canvas) image width"
@@ -24847,7 +24847,7 @@ msgstr ""
 
 #: modules/video_filter/canvas.c:86
 msgid "Output height"
-msgstr ""
+msgstr "Гаргах өндөр"
 
 #: modules/video_filter/canvas.c:88
 msgid "Output (canvas) image height"
@@ -26923,7 +26923,7 @@ msgstr ""
 #: share/lua/http/dialogs/browse_window.html:41
 #: share/lua/http/mobile_browse.html:49
 msgid "Play List"
-msgstr ""
+msgstr "ТоглохЖагсаалт"
 
 #: share/lua/http/dialogs/create_stream.html:156
 #: modules/gui/qt/ui/sprefs_audio.h:413
@@ -26969,7 +26969,7 @@ msgstr ""
 
 #: share/lua/http/dialogs/create_stream.html:367
 msgid "Error:"
-msgstr ""
+msgstr "Алдаа:"
 
 #: share/lua/http/dialogs/create_stream.html:367
 msgid "Sample ui-state-error style."
@@ -26977,7 +26977,7 @@ msgstr ""
 
 #: share/lua/http/dialogs/create_stream.html:390
 msgid "File name"
-msgstr ""
+msgstr "Файлын нэр"
 
 #: share/lua/http/dialogs/equalizer_window.html:49
 #: share/lua/http/mobile_equalizer.html:63
@@ -27014,7 +27014,7 @@ msgstr ""
 
 #: share/lua/http/dialogs/stream_window.html:65
 msgid "Time:"
-msgstr ""
+msgstr "Цаг:"
 
 #: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
 #: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile_view.html:25
@@ -27143,7 +27143,7 @@ msgstr "Зэхмэл"
 
 #: modules/gui/qt/ui/equalizer.h:136
 msgid "0.00 dB"
-msgstr ""
+msgstr "0.00 дБ"
 
 #: modules/gui/qt/ui/messages_panel.h:138
 msgid "&Verbosity:"
@@ -27846,7 +27846,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1255
 msgid "Colors"
-msgstr ""
+msgstr "Өнгөнүүд"
 
 #: modules/gui/qt/ui/video_effects.h:1256
 msgid "Interactive Zoom"
@@ -27883,7 +27883,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1289
 msgid "Mirror"
-msgstr ""
+msgstr "Толь"
 
 #: modules/gui/qt/ui/video_effects.h:1293
 msgid "Motion detect"
