@@ -1,5 +1,5 @@
 # Icelandic translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -7,14 +7,14 @@
 # Freyr Gunnar Ólafsson <gnarlin@gmail.com>, 2010
 # Hotellook, 2014
 # Magnus Magnusson <maggiymir@gmail.com>, 2013
-# Sveinn í Felli <sv1@fellsnet.is>, 2013-2019
+# Sveinn í Felli <sv1@fellsnet.is>, 2013-2019, 2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2019-12-04 10:56+0100\n"
-"Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2019\n"
+"PO-Revision-Date: 2021-03-02 09:27+0100\n"
+"Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2021\n"
 "Language-Team: Icelandic (https://www.transifex.com/yaron/teams/16553/is/)\n"
 "Language: is\n"
 "MIME-Version: 1.0\n"
@@ -6759,7 +6759,7 @@ msgstr "Hringlaga rangsælis (18V)"
 
 #: modules/access/dtv/access.c:179
 msgid "High LNB voltage"
-msgstr ""
+msgstr "Há LNB-spenna"
 
 #: modules/access/dtv/access.c:181
 msgid ""
@@ -6954,7 +6954,7 @@ msgstr ""
 
 #: modules/access/dvb/access.c:70
 msgid "Satellite scanning config"
-msgstr ""
+msgstr "Stillingar fyrir leit að gervitunglum"
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
@@ -6962,7 +6962,7 @@ msgstr "Skráarheiti stillingaskrár í share/dvb/dvb-s."
 
 #: modules/access/dvb/access.c:73
 msgid "Scan tuning list"
-msgstr ""
+msgstr "Skanna lista yfir tíðnir"
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
@@ -7388,7 +7388,7 @@ msgstr "Stærð streymis í bætum"
 
 #: modules/access/imem.c:118 modules/access/imem.c:119
 msgid "Memory input"
-msgstr ""
+msgstr "Minnisinntak"
 
 #: modules/access/imem-access.c:159
 msgid "Memory stream"
@@ -12539,7 +12539,7 @@ msgstr ""
 
 #: modules/codec/twolame.c:70
 msgid "Joint stereo"
-msgstr ""
+msgstr "Samtengt víðóma"
 
 #: modules/codec/twolame.c:75
 msgid "Libtwolame audio encoder"
@@ -21791,7 +21791,7 @@ msgstr "Hrynsálar"
 
 #: modules/meta_engine/ID3Genres.h:152
 msgid "Freestyle"
-msgstr ""
+msgstr "Freestyle"
 
 #: modules/meta_engine/ID3Genres.h:153
 msgid "Duet"
@@ -21815,11 +21815,11 @@ msgstr "Evró-hústónlist"
 
 #: modules/meta_engine/ID3Genres.h:158
 msgid "Dance Hall"
-msgstr ""
+msgstr "Danssalur"
 
 #: modules/meta_engine/ID3Genres.h:159
 msgid "Goa"
-msgstr ""
+msgstr "Goa"
 
 #: modules/meta_engine/ID3Genres.h:160
 msgid "Drum & Bass"
@@ -21907,11 +21907,11 @@ msgstr "Synthapopp"
 
 #: modules/misc/addons/fsstorage.c:83
 msgid "addons local storage"
-msgstr ""
+msgstr "staðvær geymsla viðbóta"
 
 #: modules/misc/addons/fsstorage.c:85
 msgid "Addons local storage installer"
-msgstr ""
+msgstr "uppsetningarforrit fyrir staðværa geymsla viðbóta"
 
 #: modules/misc/addons/fsstorage.c:93
 msgid "Addons local storage lister"
@@ -21991,6 +21991,9 @@ msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
 msgstr ""
+"Hinsvegar er öryggiskilríkið sem þjónnin bauð óþekkt og er ekki "
+"auðkennanlegt af neinni treystanlegri vottunarstöð (trusted Certificate "
+"Authority)."
 
 #: modules/misc/gnutls.c:491
 msgid ""
@@ -21998,6 +22001,9 @@ msgid ""
 "previous visit and was not authenticated by any trusted Certificate "
 "Authority."
 msgstr ""
+"Hinsvegar hefur öryggiskilríkið sem þjónnin bauð breyst síðan í fyrri "
+"heimsókn og er ekki auðkennanlegt af neinni treystanlegri vottunarstöð "
+"(trusted Certificate Authority)."
 
 #: modules/misc/gnutls.c:502 modules/misc/gnutls.c:523
 #: modules/misc/securetransport.c:346
@@ -22056,7 +22062,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:761
 msgid "Trust directory"
-msgstr ""
+msgstr "Treysta möppu"
 
 #: modules/misc/gnutls.c:763
 msgid ""
@@ -22174,11 +22180,11 @@ msgstr ""
 
 #: modules/misc/securetransport.c:55
 msgid "TLS support for OS X and iOS"
-msgstr ""
+msgstr "TLS stuðningur við OS X og iOS"
 
 #: modules/misc/securetransport.c:68
 msgid "TLS server support for OS X"
-msgstr ""
+msgstr "Stuðningur TLS á þjóni fyrir OS X"
 
 #: modules/misc/securetransport.c:338
 #, c-format
@@ -22201,7 +22207,7 @@ msgstr "Tölfræði"
 
 #: modules/misc/stats.c:216
 msgid "Stats encoder function"
-msgstr ""
+msgstr "Tölfræði aðgerða kóðara"
 
 #: modules/misc/stats.c:222 modules/misc/stats.c:228 modules/misc/stats.c:234
 msgid "Stats decoder"
@@ -22253,7 +22259,7 @@ msgstr "Pakkastærð"
 
 #: modules/mux/asf.c:67
 msgid "ASF packet size -- default is 4096 bytes"
-msgstr ""
+msgstr "ASF-pakkastærð -- sjálfgefið er 4096 bæti"
 
 #: modules/mux/asf.c:68
 msgid "Bitrate override"
@@ -22560,7 +22566,7 @@ msgstr "OS X tilkynningaviðbót"
 
 #: modules/notify/osx_notifications.m:303
 msgid "New input playing"
-msgstr ""
+msgstr "Nýtt inntak spilandi"
 
 #: modules/notify/osx_notifications.m:377
 msgid "Now playing"
@@ -22576,7 +22582,7 @@ msgstr "Tímamörk (msek)"
 
 #: modules/notify/notify.c:56
 msgid "How long the notification will be displayed."
-msgstr ""
+msgstr "Hve lengi tilkynningin verður birt."
 
 #: modules/notify/notify.c:61
 msgid "Notify"
@@ -22596,7 +22602,7 @@ msgstr "avparser bitari"
 
 #: modules/packetizer/av1.c:557
 msgid "AV1 video packetizer"
-msgstr ""
+msgstr "AV1 myndmerkisbitari"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -22662,16 +22668,15 @@ msgstr "VC-1 bitari"
 
 #: modules/services_discovery/avahi.c:55 modules/services_discovery/avahi.c:484
 msgid "Zeroconf network services"
-msgstr ""
+msgstr "Zeroconf netkerfisþjónustur"
 
 #: modules/services_discovery/avahi.c:60
 msgid "Zeroconf services"
 msgstr "Zeroconf þjónustur"
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "mDNS myndgerðarleit"
+msgstr "Avahi myndgerðarleit"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
@@ -22741,16 +22746,16 @@ msgstr "Diskar"
 #: modules/services_discovery/podcast.c:62
 #: modules/services_discovery/podcast.c:146
 msgid "Podcasts"
-msgstr "Pod sendingar"
+msgstr "Hlaðvörp (podcasts)"
 
 #: modules/services_discovery/podcast.c:56
 #: modules/gui/qt/ui/podcast_configuration.h:100
 msgid "Podcast URLs list"
-msgstr "URL-listi fyrir Pod-sendingar"
+msgstr "URL-slóðalisti fyrir hlaðvörp"
 
 #: modules/services_discovery/podcast.c:57
 msgid "Enter the list of podcasts to retrieve, separated by '|' (pipe)."
-msgstr ""
+msgstr "Settu inn lista yfir hlaðvörp sem á að sækja, aðgreind með '|' (pípu)."
 
 #: modules/services_discovery/pulse.c:41 modules/services_discovery/pulse.c:44
 #: modules/services_discovery/pulse.c:84 modules/services_discovery/udev.c:67
@@ -22861,11 +22866,11 @@ msgstr "Óþekkt tegund"
 
 #: modules/services_discovery/upnp.cpp:72
 msgid "SAT>IP channel list"
-msgstr ""
+msgstr "SAT>IP rásalisti"
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
-msgstr ""
+msgstr "Slóð á sérsniðinn SAT>IP rásalista"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Master List"
@@ -22895,7 +22900,7 @@ msgstr "Upptaka af skjá"
 
 #: modules/services_discovery/xcb_apps.c:154
 msgid "Your window manager does not provide a list of applications."
-msgstr ""
+msgstr "Gluggastýringin þín gefur ekki upp neinn lista yfir forrit."
 
 #: modules/services_discovery/xcb_apps.c:167
 msgid "Applications"
@@ -26197,7 +26202,7 @@ msgstr "Teiknanlegt"
 
 #: modules/video_output/drawable.c:47 modules/video_output/xcb/window.c:729
 msgid "Embedded window video"
-msgstr ""
+msgstr "Innbyggður myndmerkisgluggi"
 
 #: modules/video_output/fb.c:56
 msgid "Framebuffer device"
@@ -26459,7 +26464,7 @@ msgstr "Bakgrunnsmynd"
 
 #: modules/video_output/win32/glwin32.c:52
 msgid "OpenGL video output for Windows"
-msgstr ""
+msgstr "OpenGL myndmerkisúttak fyrir Windows"
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -27367,9 +27372,8 @@ msgid ""
 msgstr ""
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "Viltu ná í þetta ?"
+msgstr "Viltu halda áfram með þetta?"
 
 #: share/lua/http/index.html:290
 msgid ""
