@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-02-28 06:17+0100\n"
+"PO-Revision-Date: 2021-03-02 08:43+0100\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2021\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/16553/he/)\n"
 "Language: he\n"
@@ -7230,7 +7230,7 @@ msgstr "הצגת קבצים מיוחדים"
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
-msgstr ""
+msgstr "לכלול התקנים וצינוריות בעת הצגת תיקיות"
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:84
 #: modules/access/rdp.c:65 modules/access/sftp.c:55
@@ -7248,7 +7248,7 @@ msgstr "שם משתמש"
 msgid ""
 "Username that will be used for the connection, if no username is set in the "
 "URL."
-msgstr ""
+msgstr "שם משתמש שישמש לחיבור, אם לא מוגדר שם משתמש בכתובת."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:87
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
@@ -7335,7 +7335,7 @@ msgstr "אימות HTTP"
 #: modules/access/http.c:304 modules/access/http/access.c:215
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
-msgstr ""
+msgstr "נא למלא שם משתמש וססמה תקפים למתחם %s."
 
 #: modules/access/http/access.c:288
 msgid "HTTPS input"
@@ -7351,7 +7351,7 @@ msgstr "זרם מתמשך"
 
 #: modules/access/http/access.c:297
 msgid "Keep reading a resource that keeps being updated."
-msgstr ""
+msgstr "להמשיך לקרוא משאב שמוסיף להתעדכן."
 
 #: modules/access/http/access.c:299
 msgid "Cookies forwarding"
@@ -7819,6 +7819,7 @@ msgid ""
 "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100, "
 "48000)"
 msgstr ""
+"קצב הדגימה של תזרים השמע שנלכד, בהרץ (למשל: 11025, 22050, 44100, 48000)"
 
 #: modules/access/oss.c:76
 msgid "OSS"
@@ -7850,7 +7851,7 @@ msgstr "חיבור מוצפן"
 
 #: modules/access/rdp.c:74
 msgid "Acquisition rate (in fps)"
-msgstr ""
+msgstr "קצב לכידה (בתמוניות לשנייה)"
 
 #: modules/access/rdp.c:85
 msgid "RDP"
@@ -8589,7 +8590,7 @@ msgstr "זווית הטיית התמונה (במעלות)."
 
 #: modules/access/v4l2/v4l2.c:152
 msgid "Color killer"
-msgstr ""
+msgstr "מחיקון"
 
 #: modules/access/v4l2/v4l2.c:154
 msgid ""
@@ -10160,7 +10161,7 @@ msgstr "התקן השמע האחרון"
 
 #: modules/audio_output/auhal.c:53
 msgid "HAL AudioUnit output"
-msgstr ""
+msgstr "פלט AudioUnit של HAL"
 
 #: modules/audio_output/auhal.c:463
 msgid "System Sound Output Device"
@@ -10370,7 +10371,7 @@ msgstr "ההגברה הקווית תוחל דרך התכנה."
 
 #: modules/audio_output/wasapi.c:652
 msgid "Windows Audio Session API output"
-msgstr ""
+msgstr "פלט API של Windows Audio Session"
 
 #: modules/audio_output/waveout.c:135
 msgid "Select Audio Device"
@@ -10381,6 +10382,8 @@ msgid ""
 "Select special Audio device, or let windows decide (default), change needs "
 "VLC restart to apply."
 msgstr ""
+"נא לבחור התקן שמע מיוחד של Windows או לאפשר ל־Windows להחליט (בררת המחדל), "
+"שינוי של הערך דורש הפעלה של VLC מחדש."
 
 #: modules/audio_output/waveout.c:149
 msgid "WaveOut audio output"
@@ -10589,6 +10592,8 @@ msgid ""
 "The decoder can partially decode or skip frame(s) when there is not enough "
 "time. It's useful with low CPU power but it can produce distorted pictures."
 msgstr ""
+"המפענח יכול לפענח חלקית או לדלג על תמוניות אם אין מספיק זמן. שימושי כשהמעבד "
+"חלש אבל יכולים להיות עיוותים בתמונה."
 
 #: modules/codec/avcodec/avcodec.h:88
 msgid "Allow speed tricks"
@@ -10707,11 +10712,11 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:143
 msgid "Pre-motion estimation"
-msgstr ""
+msgstr "הערכת טרום תנועה"
 
 #: modules/codec/avcodec/avcodec.h:144
 msgid "Enable the pre-motion estimation algorithm."
-msgstr ""
+msgstr "הפעלת אלגוריתם הערכת טרום תנועה."
 
 #: modules/codec/avcodec/avcodec.h:147
 msgid "Rate control buffer size"
@@ -15722,7 +15727,7 @@ msgstr "יוצרים"
 #: modules/gui/macosx/VLCAboutWindowController.m:103
 msgid ""
 "VLC media player and VideoLAN are trademarks of the VideoLAN Association."
-msgstr "נגן הווידאו של VLC ו־VideoLAN הם סימני מסחר של התאגדות VideoLAN."
+msgstr "נגן הווידאו VLC ו־VideoLAN הם סימני מסחר של התאגדות VideoLAN."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:128
 msgid ""
@@ -20710,7 +20715,7 @@ msgstr "&פתיחת מדיה"
 
 #: modules/gui/qt/menus.cpp:1621
 msgid "&Clear"
-msgstr "&ניקוי"
+msgstr "&פינוי"
 
 #: modules/gui/qt/menus.cpp:1629
 msgid "&Renderer"
@@ -28452,7 +28457,7 @@ msgstr "עריכת קלט"
 
 #: modules/gui/qt/ui/streampanel.h:184
 msgid "Clear List"
-msgstr "ניקוי הרשימה"
+msgstr "פינוי הרשימה"
 
 #: modules/gui/qt/ui/update.h:147
 msgid "Check for VLC updates"
