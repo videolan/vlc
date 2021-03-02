@@ -50,7 +50,7 @@ namespace adaptive
         protected:
             int maxwidth;
             int maxheight;
-            BaseRepresentation * select(std::vector<BaseRepresentation *>&reps,
+            BaseRepresentation * select(const std::vector<BaseRepresentation *>&reps,
                                         uint64_t minbitrate, uint64_t maxbitrate) const;
         };
 

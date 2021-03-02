@@ -79,13 +79,12 @@ int M3U8MasterPlaylist_test()
         Expect(m3u->getFirstPeriod()->getAdaptationSets().size() == 1);
         Expect(m3u->getFirstPeriod()->getAdaptationSets().front()->getRepresentations().size() == 4);
         BaseAdaptationSet *set = m3u->getFirstPeriod()->getAdaptationSets().front();
-        std::vector<BaseRepresentation *> &reps = set->getRepresentations();
-        std::vector<BaseRepresentation *>::iterator it;
-        it = std::find_if(reps.begin(), reps.end(),
+        const std::vector<BaseRepresentation *> &reps = set->getRepresentations();
+        auto it = std::find_if(reps.cbegin(), reps.cend(),
                           [](BaseRepresentation *r) { return r->getBandwidth() == 1280000; });
         Expect(it != reps.end());
         Expect(static_cast<HLSRepresentation *>(*it)->getPlaylistUrl().toString() == "http://example.com/low.m3u8");
-        it = std::find_if(reps.begin(), reps.end(),
+        it = std::find_if(reps.cbegin(), reps.cend(),
                       [](BaseRepresentation *r) { return r->getBandwidth() == 65000; });
         Expect(it != reps.end());
         Expect(static_cast<HLSRepresentation *>(*it)->getPlaylistUrl().toString() == "http://example.com/audio-only.m3u8");

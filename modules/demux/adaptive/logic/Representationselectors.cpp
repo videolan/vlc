@@ -42,16 +42,15 @@ RepresentationSelector::~RepresentationSelector()
 
 BaseRepresentation * RepresentationSelector::lowest(BaseAdaptationSet *adaptSet) const
 {
-    std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
+    const std::vector<BaseRepresentation *> &reps = adaptSet->getRepresentations();
     return (reps.empty()) ? nullptr : *(reps.begin());
 }
 
 BaseRepresentation * RepresentationSelector::highest(BaseAdaptationSet *adaptSet) const
 {
-    std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
+    const std::vector<BaseRepresentation *> &reps = adaptSet->getRepresentations();
 
-    std::vector<BaseRepresentation *>::const_reverse_iterator it;
-    for(it=reps.rbegin(); it!=reps.rend(); ++it)
+    for(auto it=reps.crbegin(); it!=reps.crend(); ++it)
     {
         if( (*it)->getWidth() <= maxwidth && (*it)->getHeight() <= maxheight )
             return *it;
@@ -61,9 +60,8 @@ BaseRepresentation * RepresentationSelector::highest(BaseAdaptationSet *adaptSet
 
 BaseRepresentation * RepresentationSelector::higher(BaseAdaptationSet *adaptSet, BaseRepresentation *rep) const
 {
-    std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
-    std::vector<BaseRepresentation *>::iterator it = std::upper_bound(reps.begin(), reps.end(), rep,
-                                                                      BaseRepresentation::bwCompare);
+    const std::vector<BaseRepresentation *> &reps = adaptSet->getRepresentations();
+    auto it = std::upper_bound(reps.cbegin(), reps.cend(), rep, BaseRepresentation::bwCompare);
     BaseRepresentation *upperRep = (it == reps.end()) ? rep : *it;
     if( upperRep->getWidth() > maxwidth || upperRep->getHeight() > maxheight )
         upperRep = rep;
@@ -72,10 +70,9 @@ BaseRepresentation * RepresentationSelector::higher(BaseAdaptationSet *adaptSet,
 
 BaseRepresentation * RepresentationSelector::lower(BaseAdaptationSet *adaptSet, BaseRepresentation *rep) const
 {
-    std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
-    std::vector<BaseRepresentation *>::iterator it = std::lower_bound(reps.begin(), reps.end(), rep,
-                                                                      BaseRepresentation::bwCompare);
-    return (it > reps.begin()) ? *(--it) : rep;
+    const std::vector<BaseRepresentation *> &reps = adaptSet->getRepresentations();
+    auto it = std::lower_bound(reps.cbegin(), reps.cend(), rep, BaseRepresentation::bwCompare);
+    return (it > reps.cbegin()) ? *(--it) : rep;
 }
 
 BaseRepresentation * RepresentationSelector::select(BaseAdaptationSet *adaptSet) const
@@ -87,11 +84,11 @@ BaseRepresentation * RepresentationSelector::select(BaseAdaptationSet *adaptSet,
     if (adaptSet == nullptr)
         return nullptr;
 
-    std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
+    const std::vector<BaseRepresentation *> &reps = adaptSet->getRepresentations();
     return select(reps, 0, bitrate);
 }
 
-BaseRepresentation * RepresentationSelector::select(std::vector<BaseRepresentation *>& reps,
+BaseRepresentation * RepresentationSelector::select(const std::vector<BaseRepresentation *>& reps,
                                                 uint64_t minbitrate, uint64_t maxbitrate) const
 {
     BaseRepresentation  *candidate = nullptr, *lowest = nullptr;

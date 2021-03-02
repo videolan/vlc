@@ -49,8 +49,8 @@ bool M3U8::isLive() const
         for(ita = period->getAdaptationSets().begin(); ita != period->getAdaptationSets().end(); ++ita)
         {
             BaseAdaptationSet *adaptSet = *ita;
-            std::vector<BaseRepresentation *>::iterator itr;
-            for(itr = adaptSet->getRepresentations().begin(); itr != adaptSet->getRepresentations().end(); ++itr)
+            const std::vector<BaseRepresentation *> &reps = adaptSet->getRepresentations();
+            for(auto itr = reps.cbegin(); itr != reps.cend(); ++itr)
             {
                 const HLSRepresentation *rep = dynamic_cast<const HLSRepresentation *>(*itr);
                 if(rep->initialized())
