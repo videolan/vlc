@@ -1,5 +1,5 @@
 # Nepali translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -15,21 +15,20 @@
 # Pratik <prt.bluestrngvibration@gmail.com>, 2014
 # Sandip Rai <scotrai8@gmail.com>, 2018
 # Sanjog <sigsandy02@gmail.com>, 2014
-# suraj bohara <surajbohara65@gmail.com>, 2017
-# Saroj Dhakal <lotusnagarkot@gmail.com>, 2015,2017
+# Suraj Bohara <surajbohara65@gmail.com>, 2017
+# Saroj Dhakal <lotusnagarkot@gmail.com>, 2015, 2017
 # Suyogya <suyogya.tamrakar@gmail.com>, 2014
 # Surit Aryal <surit_people@hotmail.com>, 2018
 # Umesh Chakradhar <umeshchakradhar11@gmail.com>, 2018
 # Yoses Gurung <trustjoses1@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
-"Language-Team: Nepali (Nepal) (https://www.transifex.com/yaron/teams/16553/"
-"ne_NP/)\n"
+"PO-Revision-Date: 2021-03-02 08:42+0100\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2021\n"
+"Language-Team: Nepali (https://www.transifex.com/yaron/teams/16553/ne/)\n"
 "Language: ne\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1270,7 +1269,7 @@ msgstr "उपशीर्षक"
 #: src/input/input.c:1821 modules/control/hotkeys.c:1512
 #, c-format
 msgid "Volume %ld%%"
-msgstr ""
+msgstr "भोल्युम %ld%%"
 
 #: src/input/input.c:2725
 msgid "Your input can't be opened"
@@ -2698,7 +2697,7 @@ msgstr "HD (७२०  p )"
 
 #: src/libvlc-module.c:625
 msgid "Standard Definition (576 or 480 lines)"
-msgstr ""
+msgstr "स्ट्यान्डर्ड डेफिनिसन (576 or 480 lines)"
 
 #: src/libvlc-module.c:626
 msgid "Low Definition (360 lines)"
