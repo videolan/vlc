@@ -205,9 +205,12 @@ static int WindowOpen(struct vlc_window *wnd)
     struct vlc_window_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof *sys);
     sys->embed_gl = NULL;
     sys->enabled = false;
+    wnd->sys = sys;
 
     var_Create(wnd, "skwrapper-output", VLC_VAR_BOOL);
     var_SetBool(wnd, "skwrapper-output", true);
+
+    sys->embed_window = NULL;
 
     static const struct vlc_window_operations vlc_window_ops =
     {
@@ -223,6 +226,7 @@ static int WindowOpen(struct vlc_window *wnd)
 
 error:
     var_Destroy(wnd, "skwrapper-output");
+    wnd->sys = NULL;
     return VLC_EGENERIC;
 }
 
