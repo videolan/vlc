@@ -664,7 +664,6 @@ Open(vlc_object_t *p_obj)
 
     char *resolved_host = vlc_smb2_resolve(access, sys->encoded_url.psz_host,
                                            sys->encoded_url.i_port);
-    const char *host;
 
     /* smb2_* functions need a decoded url. Re compose the url from the
      * modified sys->encoded_url (with the resolved host). */
@@ -674,12 +673,10 @@ Open(vlc_object_t *p_obj)
         vlc_url_t resolved_url = sys->encoded_url;
         resolved_url.psz_host = resolved_host;
         url = vlc_uri_compose(&resolved_url);
-        host = resolved_host;
     }
     else
     {
         url = vlc_uri_compose(&sys->encoded_url);
-        host = sys->encoded_url.psz_host;
     }
     if (!vlc_uri_decode(url))
     {
@@ -704,7 +701,7 @@ Open(vlc_object_t *p_obj)
         && (!sys->error_status || VLC_SMB2_STATUS_DENIED(sys->error_status))
         && vlc_credential_get(&credential, access, "smb-user", "smb-pwd",
                               SMB_LOGIN_DIALOG_TITLE, SMB_LOGIN_DIALOG_TEXT,
-                              host))
+                              sys->encoded_url.psz_host))
     {
         sys->error_status = 0;
         ret = vlc_smb2_open_share(access, url, &credential);
