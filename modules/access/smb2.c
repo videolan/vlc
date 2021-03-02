@@ -613,7 +613,7 @@ vlc_smb2_resolve(stream_t *access, const char *host, unsigned port)
     uint32_t ip4_addr;
     if (netbios_ns_resolve(ns, host, NETBIOS_FILESERVER, &ip4_addr) == 0)
     {
-        char ip[] = "xxx.xxx.xxx.xxx";
+        char ip[INET_ADDRSTRLEN];
         if (inet_ntop(AF_INET, &ip4_addr, ip, sizeof(ip)))
             out_host = strdup(ip);
     }
