@@ -1,5 +1,5 @@
 # SMB2
-SMB2_VERSION := 4a842524407b0c0b87b1f62fe792d569d92cd34d
+SMB2_VERSION := 940627754382a70cc1a422858989534ab29e4524
 SMB2_URL := https://github.com/sahlberg/libsmb2/archive/$(SMB2_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
