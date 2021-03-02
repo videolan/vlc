@@ -503,6 +503,38 @@ smb2_share_enum_cb(struct smb2_context *smb2, int status, void *data,
     sys->share_enum = data;
 }
 
+static void
+vlc_smb2_print_addr(stream_t *access)
+{
+    struct access_sys *sys = access->p_sys;
+
+    struct sockaddr_storage addr;
+    if (getsockname(smb2_get_fd(sys->smb2), (struct sockaddr *)&addr,
+                    &(socklen_t){ sizeof(addr) }) != 0)
+        return;
+
+    void *sin_addr;
+    switch (addr.ss_family)
+    {
+        case AF_INET6:
+            sin_addr = &((struct sockaddr_in6 *)&addr)->sin6_addr;
+            break;
+        case AF_INET:
+            sin_addr = &((struct sockaddr_in *)&addr)->sin_addr;
+            break;
+        default:
+            return;
+    }
+    char ip[INET6_ADDRSTRLEN];
+    if (inet_ntop(addr.ss_family, sin_addr, ip, sizeof(ip)) == NULL)
+        return;
+
+    if (strcmp(ip, sys->encoded_url.psz_host) == 0)
+        return;
+
+    msg_Dbg(access, "%s: connected from %s\n", sys->encoded_url.psz_host, ip);
+}
+
 static int
 vlc_smb2_open_share(stream_t *access, const char *url,
                     const vlc_credential *credential)
@@ -551,6 +583,8 @@ vlc_smb2_open_share(stream_t *access, const char *url,
     if (vlc_smb2_mainloop(access, false) != 0)
         goto error;
     sys->smb2_connected = true;
+
+    vlc_smb2_print_addr(access);
 
     int ret;
     if (do_enum)
