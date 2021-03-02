@@ -61,7 +61,7 @@ StreamFormat BaseAdaptationSet::getStreamFormat() const
         return StreamFormat();
 }
 
-std::vector<BaseRepresentation*>& BaseAdaptationSet::getRepresentations()
+const std::vector<BaseRepresentation*>& BaseAdaptationSet::getRepresentations() const
 {
     return representations;
 }
