@@ -91,13 +91,35 @@ static int WindowEnable(struct vout_window_t *wnd,
 {
     struct vout_window_sys_t *sys = wnd->sys;
     if (!sys->enabled)
-        return vout_window_Enable(sys->embed_window, cfg);
+    {
+        msg_Info(wnd, "Enabling SK window");
+        int ret = vout_window_Enable(sys->embed_window, cfg);
+        sys->enabled = ret == VLC_SUCCESS;
+        return ret;
+    }
     vout_window_SetSize(wnd, cfg->width, cfg->height);
+    sys->enabled = true;
     return VLC_SUCCESS;
 }
 
 static void WindowDisable(struct vout_window_t *wnd)
-    { /* Nothing to do for now */ }
+{
+    struct vout_window_sys_t *sys = wnd->sys;
+
+    if (var_InheritBool(wnd, "sk-keep-last-frame"))
+        return;
+
+    msg_Info(wnd, "Disabling SK window");
+
+    if (sys->embed_gl != NULL)
+    {
+        vlc_gl_Release(sys->embed_gl);
+        sys->embed_gl = NULL;
+    }
+
+    vout_window_Disable(sys->embed_window);
+    sys->enabled = false;
+}
 
 static void WindowClose(struct vout_window_t *wnd)
 {
@@ -202,8 +224,15 @@ static void *OpenGLGetProcAddress(vlc_gl_t *gl, const char *name)
 
 static void OpenGLDestroy(vlc_gl_t *gl)
 {
-    (void)gl;
-    return; // NOTHING TO DO HERE
+    struct vout_window_sys_t *sys = gl->sys;
+    if (var_InheritBool(gl, "sk-keep-last-frame"))
+        return;
+
+    if (sys->embed_gl != NULL)
+    {
+        vlc_gl_Release(sys->embed_gl);
+        sys->embed_gl = NULL;
+    }
 }
 
 static int OpenGLOpen(vlc_gl_t *gl, unsigned width, unsigned height)
@@ -244,6 +273,9 @@ vlc_module_begin()
     set_description (N_("SK specific video modules"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
+
+    add_bool( "sk-keep-last-frame", false, "Keep last frame",
+              "Keep the OpenGL surface and the window between media", true)
 
     add_submodule()
         set_capability ("opengl es2", 1000)
