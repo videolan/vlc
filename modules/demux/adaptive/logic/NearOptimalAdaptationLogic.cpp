@@ -183,7 +183,8 @@ unsigned NearOptimalAdaptationLogic::getMaxCurrentBw() const
     return i_max_bitrate;
 }
 
-void NearOptimalAdaptationLogic::updateDownloadRate(const ID &id, size_t dlsize, mtime_t time)
+void NearOptimalAdaptationLogic::updateDownloadRate(const ID &id, size_t dlsize,
+                                                    mtime_t time, mtime_t)
 {
     vlc_mutex_lock(&lock);
     std::map<ID, NearOptimalContext>::iterator it = streams.find(id);

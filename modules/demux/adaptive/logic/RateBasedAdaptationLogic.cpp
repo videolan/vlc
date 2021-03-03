@@ -77,7 +77,8 @@ BaseRepresentation *RateBasedAdaptationLogic::getNextRepresentation(BaseAdaptati
     return rep;
 }
 
-void RateBasedAdaptationLogic::updateDownloadRate(const ID &, size_t size, mtime_t time)
+void RateBasedAdaptationLogic::updateDownloadRate(const ID &, size_t size,
+                                                  mtime_t time, mtime_t)
 {
     if(unlikely(time == 0))
         return;

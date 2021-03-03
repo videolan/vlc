@@ -52,7 +52,8 @@ namespace adaptive
 
                 virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *,
                                                                   BaseRepresentation *) override;
-                virtual void                updateDownloadRate     (const ID &, size_t, mtime_t) override;
+                virtual void                updateDownloadRate     (const ID &, size_t,
+                                                                    mtime_t, mtime_t) override;
                 virtual void                trackerEvent           (const TrackerEvent &) override;
 
             private:
