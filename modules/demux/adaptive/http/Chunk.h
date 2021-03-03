@@ -120,6 +120,9 @@ namespace adaptive
                 bool                eof;
                 ID                  sourceid;
                 ChunkType           type;
+                vlc_tick_t          requestStartTime;
+                vlc_tick_t          responseTime;
+                vlc_tick_t          downloadEndTime;
 
             private:
                 bool init(const std::string &);
@@ -151,7 +154,6 @@ namespace adaptive
                 size_t              buffered; /* read cache size */
                 bool                done;
                 bool                eof;
-                vlc_tick_t          downloadstart;
                 vlc::threads::condition_variable avail;
                 bool                held;
         };
