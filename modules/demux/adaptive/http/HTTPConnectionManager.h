@@ -53,7 +53,8 @@ namespace adaptive
                 virtual void start(AbstractChunkSource *) = 0;
                 virtual void cancel(AbstractChunkSource *) = 0;
 
-                virtual void updateDownloadRate(const ID &, size_t, vlc_tick_t) override;
+                virtual void updateDownloadRate(const ID &, size_t,
+                                                vlc_tick_t, vlc_tick_t) override;
                 void setDownloadRateObserver(IDownloadRateObserver *);
 
             protected:

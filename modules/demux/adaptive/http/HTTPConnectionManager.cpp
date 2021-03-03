@@ -30,6 +30,7 @@
 #include "ConnectionParams.hpp"
 #include "Transport.hpp"
 #include "Downloader.hpp"
+#include "tools/Debug.hpp"
 #include <vlc_url.h>
 #include <vlc_http.h>
 
@@ -47,10 +48,17 @@ AbstractConnectionManager::~AbstractConnectionManager()
 
 }
 
-void AbstractConnectionManager::updateDownloadRate(const adaptive::ID &sourceid, size_t size, vlc_tick_t time)
+void AbstractConnectionManager::updateDownloadRate(const adaptive::ID &sourceid, size_t size,
+                                                   vlc_tick_t time, vlc_tick_t latency)
 {
     if(rateObserver)
-        rateObserver->updateDownloadRate(sourceid, size, time);
+    {
+        BwDebug(msg_Dbg(p_object,
+                "%" PRId64 "Kbps downloaded %zuKBytes in %" PRId64 "ms latency %" PRId64 "ms [%s]",
+                1000 * size * 8 / (time ? time : 1), size / 1024, MS_FROM_VLC_TICK(time),
+                latency / 1000, sourceid.str().c_str()));
+        rateObserver->updateDownloadRate(sourceid, size, time, latency);
+    }
 }
 
 void AbstractConnectionManager::setDownloadRateObserver(IDownloadRateObserver *obs)

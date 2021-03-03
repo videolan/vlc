@@ -41,7 +41,8 @@ namespace adaptive
 
                 BaseRepresentation *getNextRepresentation(BaseAdaptationSet *,
                                                           BaseRepresentation *) override;
-                virtual void updateDownloadRate(const ID &, size_t, vlc_tick_t) override;
+                virtual void updateDownloadRate(const ID &, size_t,
+                                                vlc_tick_t, vlc_tick_t) override;
                 virtual void trackerEvent(const TrackerEvent &) override;
 
             private:

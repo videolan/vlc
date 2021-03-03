@@ -231,7 +231,8 @@ block_t * HTTPChunkSource::read(size_t readsize)
            downloadEndTime > requestStartTime && type == ChunkType::Segment)
         {
             connManager->updateDownloadRate(sourceid, p_block->i_buffer,
-                                            downloadEndTime - requestStartTime);
+                                            downloadEndTime - requestStartTime,
+                                            downloadEndTime - responseTime);
         }
     }
 
@@ -415,7 +416,8 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
 
     if(rate.size && rate.time && type == ChunkType::Segment)
     {
-        connManager->updateDownloadRate(sourceid, rate.size, rate.time);
+        connManager->updateDownloadRate(sourceid, rate.size,
+                                        rate.time, rate.latency);
     }
 
     avail.signal();

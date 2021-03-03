@@ -48,7 +48,8 @@ namespace adaptive
                 virtual ~AbstractAdaptationLogic    ();
 
                 virtual BaseRepresentation* getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *) = 0;
-                virtual void                updateDownloadRate     (const ID &, size_t, vlc_tick_t) override;
+                virtual void                updateDownloadRate     (const ID &, size_t,
+                                                                    vlc_tick_t, vlc_tick_t) override;
                 virtual void                trackerEvent           (const TrackerEvent &) override {}
                 void                        setMaxDeviceResolution (int, int);
 
