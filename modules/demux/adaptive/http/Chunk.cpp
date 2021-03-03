@@ -211,23 +211,29 @@ block_t * HTTPChunkSource::read(size_t readsize)
         return nullptr;
     }
 
-    mtime_t time = mdate();
     ssize_t ret = connection->read(p_block->p_buffer, readsize);
-    time = mdate() - time;
     if(ret < 0)
     {
         block_Release(p_block);
         p_block = nullptr;
         eof = true;
+        downloadEndTime = mdate();
     }
     else
     {
         p_block->i_buffer = (size_t) ret;
         consumed += p_block->i_buffer;
         if((size_t)ret < readsize)
+        {
             eof = true;
-        if(ret && time && type == ChunkType::Segment)
-            connManager->updateDownloadRate(sourceid, p_block->i_buffer, time);
+            downloadEndTime = mdate();
+        }
+        if(ret && p_block->i_buffer &&
+           downloadEndTime > requestStartTime && type == ChunkType::Segment)
+        {
+            connManager->updateDownloadRate(sourceid, p_block->i_buffer,
+                                            downloadEndTime - requestStartTime);
+        }
     }
 
     return p_block;
@@ -251,6 +257,8 @@ bool HTTPChunkSource::prepare()
         return false;
 
     ConnectionParams connparams = params; /* can be changed on 301 */
+
+    requestStartTime = mdate();
 
     unsigned int i_redirects = 0;
     while(i_redirects++ < HTTPConnection::MAX_REDIRECTS)
@@ -282,6 +290,7 @@ bool HTTPChunkSource::prepare()
                from content length */
         contentLength = connection->getContentLength();
         prepared = true;
+        responseTime = mdate();
         return true;
     }
 
@@ -305,7 +314,6 @@ HTTPChunkBufferedSource::HTTPChunkBufferedSource(const std::string& url, Abstrac
     done = false;
     eof = false;
     held = false;
-    downloadstart = 0;
 }
 
 HTTPChunkBufferedSource::~HTTPChunkBufferedSource()
@@ -380,7 +388,8 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
     {
         size_t size;
         mtime_t time;
-    } rate = {0,0};
+        mtime_t latency;
+    } rate = {0,0,0};
 
     ssize_t ret = connection->read(p_block->p_buffer, readsize);
     if(ret <= 0)
@@ -389,9 +398,10 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
         p_block = nullptr;
         vlc_mutex_locker locker( &lock );
         done = true;
+        downloadEndTime = mdate();
         rate.size = buffered + consumed;
-        rate.time = mdate() - downloadstart;
-        downloadstart = 0;
+        rate.time = downloadEndTime - requestStartTime;
+        rate.latency = responseTime - requestStartTime;
     }
     else
     {
@@ -402,9 +412,10 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
         if((size_t) ret < readsize)
         {
             done = true;
+            downloadEndTime = mdate();
             rate.size = buffered + consumed;
-            rate.time = mdate() - downloadstart;
-            downloadstart = 0;
+            rate.time = downloadEndTime - requestStartTime;
+            rate.latency = responseTime - requestStartTime;
         }
     }
 
@@ -419,10 +430,7 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
 bool HTTPChunkBufferedSource::prepare()
 {
     if(!prepared)
-    {
-        downloadstart = mdate();
         return HTTPChunkSource::prepare();
-    }
     return true;
 }
 

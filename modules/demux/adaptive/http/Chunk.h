@@ -119,6 +119,9 @@ namespace adaptive
                 bool                eof;
                 ID                  sourceid;
                 ChunkType           type;
+                mtime_t             requestStartTime;
+                mtime_t             responseTime;
+                mtime_t             downloadEndTime;
 
             private:
                 bool init(const std::string &);
@@ -150,7 +153,6 @@ namespace adaptive
                 size_t              buffered; /* read cache size */
                 bool                done;
                 bool                eof;
-                mtime_t             downloadstart;
                 vlc_cond_t          avail;
                 bool                held;
         };
