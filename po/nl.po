@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-02-24 23:16+0100\n"
+"PO-Revision-Date: 2021-03-04 12:48+0100\n"
 "Last-Translator: Thomas De Rocker <thomasderocker at outlook dot com>, 2021\n"
 "Language-Team: Dutch (https://www.transifex.com/yaron/teams/16553/nl/)\n"
 "Language: nl\n"
@@ -28,12 +28,11 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
-"Dit programma wordt verspreid ZONDER ENIGE GARANTIE, voor zover dit door de "
-"wet is toegestaan.\n"
-"Het programma mag verspreid worden onder de voorwaarden van de GNU General "
-"Public License;\n"
-"zie het bestand COPYING voor details.\n"
-"Geschreven door het VideoLAN-team; zie het bestand AUTHORS.\n"
+"Dit programma wordt geleverd ZONDER GARANTIE, voor zover toegestaan door de "
+"wet.\n"
+"U mag het verder verspreiden onder de voorwaarden van de GNU General Public "
+"License; zie het bestand COPYING voor details.\n"
+"Geschreven door het VideoLAN team; zie het bestand AUTHORS.\n"
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
@@ -41,7 +40,7 @@ msgstr "VLC voorkeuren"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
-msgstr "Selecteer \"Geavanceerde opties\" om alle opties weer te geven."
+msgstr "Selecteer \"geavanceerde opties\" om alle opties weer te geven."
 
 #: include/vlc_config_cat.h:38
 #: modules/gui/macosx/VLCSimplePrefsController.m:233
@@ -52,15 +51,15 @@ msgstr "Interface"
 
 #: include/vlc_config_cat.h:39
 msgid "Settings for VLC's interfaces"
-msgstr "Instellingen voor VLC-interfaces"
+msgstr "Instellingen voor de interfaces van VLC"
 
 #: include/vlc_config_cat.h:41
 msgid "Main interfaces settings"
-msgstr "Algemene interface-instellingen"
+msgstr "Instellingen hoofdinterfaces"
 
 #: include/vlc_config_cat.h:43
 msgid "Main interfaces"
-msgstr "Hoofdinterface"
+msgstr "Hoofdinterfaces"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for the main interface"
@@ -72,7 +71,7 @@ msgstr "Bedieningsinterfaces"
 
 #: include/vlc_config_cat.h:47
 msgid "Settings for VLC's control interfaces"
-msgstr "Instellingen voor VLC's bedieningsinterfaces"
+msgstr "Instellingen voor de bedieningsinterfaces van VLC"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
 #: modules/gui/macosx/VLCSimplePrefsController.m:243
@@ -109,7 +108,7 @@ msgstr "Filters"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio filters are used to process the audio stream."
-msgstr "Audiofilters worden gebruikt om het geluid te verwerken."
+msgstr "Audiofilters worden gebruikt om de audiostream te verwerken."
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
@@ -118,7 +117,7 @@ msgstr "Audio-resampler"
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:260
 #: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:425
 msgid "Visualizations"
-msgstr "Visuele effecten"
+msgstr "Visualisaties"
 
 #: include/vlc_config_cat.h:64 src/audio_output/output.c:321
 #: src/libvlc-module.c:206
@@ -141,7 +140,7 @@ msgstr "Overige"
 
 #: include/vlc_config_cat.h:70
 msgid "Miscellaneous audio settings and modules."
-msgstr "Overige audio-instellingen en modules."
+msgstr "Diverse audio-instellingen en modules."
 
 #: include/vlc_config_cat.h:73 src/input/es_out.c:3164 src/libvlc-module.c:142
 #: src/libvlc-module.c:1551 modules/access/imem.c:64
@@ -174,7 +173,7 @@ msgstr "Algemene instellingen voor video-uitvoermodules."
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
-msgstr "Videofilters worden gebruikt om de video te verwerken."
+msgstr "Videofilters worden gebruikt om de videostream te verwerken."
 
 #: include/vlc_config_cat.h:84
 msgid "Subtitles / OSD"
@@ -184,8 +183,8 @@ msgstr "Ondertitels / OSD"
 msgid ""
 "Settings related to On-Screen-Display, subtitles and \"overlay subpictures\""
 msgstr ""
-"Instellingen van On-Screen-Display, ondertitels en \"overlay subafbeeldingen"
-"\""
+"Instellingen van On-Screen-Display, ondertitels en \"overlays en "
+"subafbeeldingen\""
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
@@ -213,8 +212,8 @@ msgid ""
 "to alter are HTTP proxy or caching settings."
 msgstr ""
 "Instellingen met betrekking tot de verschillende toegangsmethoden. Veel "
-"voorkomende instellingen die u wellicht wilt aanpassen, zoals HTTP-proxy en "
-"bufferinstellingen, vallen hieronder."
+"voorkomende instellingen die u wellicht wilt wijzigen zijn de instellingen "
+"voor HTTP proxy of buffering."
 
 #: include/vlc_config_cat.h:107
 msgid "Stream filters"
@@ -225,8 +224,8 @@ msgid ""
 "Stream filters are special modules that allow advanced operations on the "
 "input side of VLC. Use with care..."
 msgstr ""
-"Streamfilters zijn speciale modules voor geavanceerde handelingen aan de "
-"invoerzijde van VLC. Wees voorzichtig..."
+"Streamfilters zijn speciale modules die geavanceerde bewerkingen aan de "
+"invoerzijde van VLC mogelijk maken. Wees voorzichtig..."
 
 #: include/vlc_config_cat.h:112
 msgid "Demuxers"
@@ -235,7 +234,7 @@ msgstr "Demuxers"
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
 msgstr ""
-"Demuxers worden gebruikt om audio- en videosporen van elkaar te scheiden."
+"Demuxers worden gebruikt om audio- en videostreams van elkaar te scheiden."
 
 #: include/vlc_config_cat.h:115
 msgid "Video codecs"
@@ -261,7 +260,8 @@ msgstr "Ondertitelcodecs"
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
-msgstr "Instellingen voor ondertitels, teletekst en CC-decoders en -encoders."
+msgstr ""
+"Instellingen voor decoders en encoders van ondertitels, teletekst en CC."
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
@@ -283,12 +283,12 @@ msgid ""
 "duplicating...)."
 msgstr ""
 "Streamuitvoerinstellingen worden gebruikt wanneer VLC als streamingserver "
-"werkt of bij bewaren van inkomende streams.\n"
+"werkt of bij opslaan van inkomende streams.\n"
 "Streams worden eerst gemuxt en dan door een \"toegangsuitvoer\"module "
-"gestuurd, die ze kan opslaan in een bestand of streamen (UDP, HTTP, RTP/"
-"RTSP).\n"
-"Sout streammodules zorgen voor geavanceerde streamverwerkingen "
-"(transcoderen, dupliceren...)."
+"gestuurd, die de stream ofwel in een bestand kan opslaan, ofwel kan streamen "
+"(UDP, HTTP, RTP/RTSP).\n"
+"Sout-streammodules zorgen voor geavanceerde streamverwerking (transcoderen, "
+"dupliceren...)."
 
 #: include/vlc_config_cat.h:137
 msgid "General stream output settings"
@@ -1522,8 +1522,8 @@ msgid ""
 "select the main interface, additional interface modules, and define various "
 "related options."
 msgstr ""
-"Via deze instellingen kunnen de interfaces van VLC geconfigureerd worden. U "
-"kunt de hoofdinterface en aanvullende interfacemodules selecteren en diverse "
+"Met deze opties kunt u de door VLC gebruikte interfaces configureren. U kunt "
+"de hoofdinterface en bijkomende interfacemodules selecteren en verschillende "
 "gerelateerde opties definiëren."
 
 #: src/libvlc-module.c:68
@@ -4993,7 +4993,7 @@ msgstr "alternatief configuratiebestand gebruiken"
 
 #: src/libvlc-module.c:2777
 msgid "resets the current plugins cache"
-msgstr "de huidige pluginscache herstellen"
+msgstr "de huidige pluginbuffer herstellen"
 
 #: src/libvlc-module.c:2779
 msgid "print version information"
@@ -9388,7 +9388,7 @@ msgstr "Aantal segmenten op te nemen in index"
 
 #: modules/access_output/livehttp.c:77
 msgid "Allow cache"
-msgstr "Cache toestaan"
+msgstr "Buffer toestaan"
 
 #: modules/access_output/livehttp.c:78
 msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
@@ -18448,7 +18448,7 @@ msgstr "Afspelen van \"%@\" zal hervat worden op %@"
 #: modules/gui/qt/components/simple_preferences.cpp:719
 #: modules/gui/qt/dialogs/plugins.cpp:376
 msgid "Interface Settings"
-msgstr "Instellingen gebruikersinterface"
+msgstr "Interface-instellingen"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:235
 #: modules/gui/qt/components/simple_preferences.cpp:241
@@ -24715,7 +24715,7 @@ msgid ""
 msgstr ""
 "Afbeeldingen afkomstig van de mozaïek-elementen zullen evenredig met deze "
 "waarde (in milliseconden) vertraagd worden. Voor hoge waarden moet de "
-"caching aan de input vergroot worden."
+"buffering aan de input vergroot worden."
 
 #: modules/spu/mosaic.c:166
 msgid "auto"
@@ -25048,11 +25048,11 @@ msgstr "ARIB STD-B25 Cam-module"
 
 #: modules/stream_filter/cache_block.c:498
 msgid "Block stream cache"
-msgstr "Blok-stream cache"
+msgstr "Blok-stream buffer"
 
 #: modules/stream_filter/cache_read.c:570
 msgid "Byte stream cache"
-msgstr "Byte-stream cache"
+msgstr "Byte-stream buffer"
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
