@@ -72,6 +72,9 @@ struct vlc_gl_sampler_priv {
     GLsizei tex_widths[PICTURE_PLANE_MAX];
     GLsizei tex_heights[PICTURE_PLANE_MAX];
 
+    GLsizei visible_widths[PICTURE_PLANE_MAX];
+    GLsizei visible_heights[PICTURE_PLANE_MAX];
+
     GLuint textures[PICTURE_PLANE_MAX];
 
     struct {
@@ -1011,6 +1014,8 @@ vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop)
                         / interop->texs[j].w.den;
         const GLsizei h = interop->fmt_out.i_visible_height * interop->texs[j].h.num
                         / interop->texs[j].h.den;
+        priv->visible_widths[j] = w;
+        priv->visible_heights[j] = h;
         if (interop->api->supports_npot) {
             priv->tex_widths[j]  = w;
             priv->tex_heights[j] = h;
@@ -1220,8 +1225,8 @@ vlc_gl_sampler_UpdatePicture(struct vlc_gl_sampler *sampler, picture_t *picture)
 
     /* Update the texture */
     return interop->ops->update_textures(interop, priv->textures,
-                                         priv->tex_widths, priv->tex_heights,
-                                         picture, NULL);
+                                         priv->visible_widths,
+                                         priv->visible_heights, picture, NULL);
 }
 
 int

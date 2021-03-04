@@ -284,8 +284,11 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr, subpicture_t *subpic
             /* Use the visible pitch of the region */
             r->p_picture->p[0].i_visible_pitch = r->fmt.i_visible_width
                                                * r->p_picture->p[0].i_pixel_pitch;
+
+            GLsizei width = r->fmt.i_visible_width;
+            GLsizei height = r->fmt.i_visible_height;
             int ret = interop->ops->update_textures(interop, &glr->texture,
-                                                    &glr->width, &glr->height,
+                                                    &width, &height,
                                                     r->p_picture, &pixels_offset);
             if (ret != VLC_SUCCESS)
                 break;
