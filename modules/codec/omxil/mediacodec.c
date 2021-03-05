@@ -1457,6 +1457,12 @@ static void *OutThread(void *data)
                 continue;
         }
 
+        if (i_index == MC_API_ERROR)
+        {
+            msg_Warn(p_dec, "Failure in MediaCodec.dequeueOutputBuffer");
+            break;
+        }
+
         /* Process output returned by dequeue_out */
         if (i_index >= 0 || i_index == MC_API_INFO_OUTPUT_FORMAT_CHANGED
          || i_index == MC_API_INFO_OUTPUT_BUFFERS_CHANGED)
@@ -1495,7 +1501,8 @@ static void *OutThread(void *data)
         else
             break;
     }
-    msg_Warn(p_dec, "OutThread stopped");
+    if (!p_sys->b_decoder_dead)
+        msg_Warn(p_dec, "OutThread stopped");
 
     /* Signal DecoderFlush that the output thread aborted */
     p_sys->b_aborted = true;

@@ -875,10 +875,8 @@ static int DequeueOutput(mc_api *api, vlc_tick_t i_timeout)
                                     jfields.dequeue_output_buffer,
                                     p_sys->buffer_info, i_timeout);
     if (CHECK_EXCEPTION())
-    {
-        msg_Warn(api->p_obj, "Exception in MediaCodec.dequeueOutputBuffer");
         return MC_API_ERROR;
-    }
+
     if (i_index >= 0)
         return i_index;
     else if (i_index == INFO_OUTPUT_FORMAT_CHANGED)

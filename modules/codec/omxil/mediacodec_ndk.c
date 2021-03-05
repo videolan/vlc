@@ -501,10 +501,7 @@ static int DequeueOutput(mc_api *api, vlc_tick_t i_timeout)
     else if (i_index == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED)
         return MC_API_INFO_OUTPUT_FORMAT_CHANGED;
     else
-    {
-        msg_Warn(api->p_obj, "AMediaCodec.dequeueOutputBuffer failed");
         return MC_API_ERROR;
-    }
 }
 
 /*****************************************************************************
