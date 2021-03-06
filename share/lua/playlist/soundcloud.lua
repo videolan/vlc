@@ -45,18 +45,18 @@ function extract_magic( url )
         return nil
     end
 
-    while true do
-        local line = s:readline()
-        if not line then break end
+    local line = s:read( 4096*1024 )
+    if not line then
+        return nil
+    end
 
-        -- The API magic appears under a similar form several times
-        -- in one of the javascript assets
-        -- {client_id:"z21TN9SfM0GjGteSzk4ViM1KEwMRNWZF"}
-        local client_id = string.match( line, '[{,]client_id:"(%w+)"[},]' )
-        if client_id then
-            vlc.msg.dbg( "Found soundcloud API magic" )
-            return client_id
-        end
+    -- The API magic appears under a similar form several times
+    -- in one of the javascript assets
+    -- {client_id:"z21TN9SfM0GjGteSzk4ViM1KEwMRNWZF"}
+    local client_id = string.match( line, '[{,]client_id:"(%w+)"[},]' )
+    if client_id then
+        vlc.msg.dbg( "Found soundcloud API magic" )
+        return client_id
     end
     return nil
 end
