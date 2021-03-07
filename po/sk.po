@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-02-25 23:51+0100\n"
+"PO-Revision-Date: 2021-03-07 20:12+0100\n"
 "Last-Translator: Marián Hikaník <podnety@mojepreklady.net>, 2021\n"
 "Language-Team: Slovak (https://www.transifex.com/yaron/teams/16553/sk/)\n"
 "Language: sk\n"
@@ -2251,31 +2251,31 @@ msgstr ""
 
 #: src/libvlc-module.c:389
 msgid "Video snapshot directory (or filename)"
-msgstr "Priečinok (alebo názov súboru) so snímkami z videa"
+msgstr "Priečinok (alebo názov súboru) s momentkami z videa"
 
 #: src/libvlc-module.c:391
 msgid "Directory where the video snapshots will be stored."
-msgstr "Priečinok, do ktorého budú uložené snímky z videa."
+msgstr "Priečinok, do ktorého sa uložia momentky z videa."
 
 #: src/libvlc-module.c:393 src/libvlc-module.c:395
 msgid "Video snapshot file prefix"
-msgstr "Predpona súboru so snímkou z videa"
+msgstr "Predpona súboru s momentkou z videa"
 
 #: src/libvlc-module.c:397
 msgid "Video snapshot format"
-msgstr "Formát snímky z videa"
+msgstr "Formát momentky z videa"
 
 #: src/libvlc-module.c:399
 msgid "Image format which will be used to store the video snapshots"
-msgstr "Formát obrázkov, ktorý sa použije pri ukladaní snímok z videa"
+msgstr "Formát obrázka používaný pri ukladaní momentiek z videa"
 
 #: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
-msgstr "Zobraziť náhľad snímky z videa"
+msgstr "Zobraziť náhľad momentky z videa"
 
 #: src/libvlc-module.c:403
 msgid "Display the snapshot preview in the screen's top-left corner."
-msgstr "Zobraziť náhľad snímky z videa v ľavom hornom rohu obrazovky."
+msgstr "Zobraziť náhľad momentky z videa v ľavom hornom rohu obrazovky."
 
 #: src/libvlc-module.c:405
 msgid "Use sequential numbers instead of timestamps"
@@ -2283,26 +2283,24 @@ msgstr "Použiť sekvenčné číslovanie namiesto časových pečiatok"
 
 #: src/libvlc-module.c:407
 msgid "Use sequential numbers instead of timestamps for snapshot numbering"
-msgstr ""
-"Na číslovanie snímok z videa použiť sekvenčné číslovanie namiesto časových "
-"pečiatok"
+msgstr "Na číslovanie momentiek použiť číslovanie namiesto časových pečiatok"
 
 #: src/libvlc-module.c:409
 msgid "Video snapshot width"
-msgstr "Šírka snímky z videa"
+msgstr "Šírka momentky z videa"
 
 #: src/libvlc-module.c:411
 msgid ""
 "You can enforce the width of the video snapshot. By default it will keep the "
 "original width (-1). Using 0 will scale the width to keep the aspect ratio."
 msgstr ""
-"Môžete si vynútiť určitú šírku snímky z videa. Pri predvolenom nastavení sa "
-"zachová pôvodná šírka (-1). Hodnota 0 znamená zmenu mierky šírky tak, aby sa "
-"zachoval pomer strán."
+"Môžete si vynútiť určitú šírku momentky z videa. Predvolene sa zachová "
+"pôvodná šírka (-1). Hodnota 0 znamená zmenu šírky tak, aby sa zachoval pomer "
+"strán."
 
 #: src/libvlc-module.c:415
 msgid "Video snapshot height"
-msgstr "Výška snímky z videa"
+msgstr "Výška momentky z videa"
 
 #: src/libvlc-module.c:417
 msgid ""
@@ -2310,9 +2308,9 @@ msgid ""
 "the original height (-1). Using 0 will scale the height to keep the aspect "
 "ratio."
 msgstr ""
-"Môžete si vynútiť určitú výšku snímky z videa. Pri predvolenom nastavení sa "
-"zachová pôvodná výška (-1). Hodnota 0 znamená, zmenu mierky výšky tak, aby "
-"sa zachoval pomer strán."
+"Môžete si vynútiť určitú výšku momentky z videa. Predvolenesa zachová "
+"pôvodná výška (-1). Hodnota 0 znamená zmenu výšky tak, aby sa zachoval pomer "
+"strán."
 
 #: src/libvlc-module.c:421
 msgid "Video cropping"
@@ -2554,7 +2552,7 @@ msgid ""
 "This defines the maximum input delay jitter that the synchronization "
 "algorithms should try to compensate (in milliseconds)."
 msgstr ""
-"Táto hodnota maximálne oneskorenie vstupu, ktoré majú synchronizačné "
+"Táto hodnota určuje maximálne oneskorenie vstupu, ktoré majú synchronizačné "
 "algoritmy kompenzovať (udáva sa v milisekundách)."
 
 #: src/libvlc-module.c:533
@@ -2608,8 +2606,8 @@ msgid ""
 "This is the maximum application-layer packet size that can be transmitted "
 "over the network (in bytes)."
 msgstr ""
-"Tu je udaná maximálna veľkosť paketu aplikačnej vrstvy, ktorú možno preniesť "
-"cez sieť (v bajtoch)."
+"Toto je maximálna veľkosť paketu aplikačnej vrstvy, ktorú možno preniesť cez "
+"sieť (v bajtoch)."
 
 #: src/libvlc-module.c:549 modules/stream_out/rtp.c:124
 msgid "Hop limit (TTL)"
@@ -2911,8 +2909,8 @@ msgid ""
 "This is the maximum size in bytes of the temporary files that will be used "
 "to store the timeshifted streams."
 msgstr ""
-"Toto je maximálna veľkosť dočasných súborov, do ktorých sa budú ukladať "
-"časovo posunuté streamy."
+"Toto je maximálna veľkosť dočasných súborov na ukladanie časovo posunutých "
+"streamov."
 
 #: src/libvlc-module.c:689
 msgid "Change title according to current media"
@@ -3115,8 +3113,8 @@ msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
-"Toto je predvolená jednotka (alebo súbor) VCD, ktorý sa bude používať. "
-"Nezabudnite na dvojbodku za písmenom jednotky (napríklad D:)"
+"Toto je predvolená jednotka (alebo súbor) VCD, ktorý sa použije. Nezabudnite "
+"na dvojbodku za písmenom jednotky (napríklad D:)"
 
 #: src/libvlc-module.c:774 modules/access/cdda.c:711
 msgid ""
@@ -3128,15 +3126,15 @@ msgstr ""
 
 #: src/libvlc-module.c:781
 msgid "This is the default DVD device to use."
-msgstr "Toto je predvolená mechanika pre prehrávanie DVD."
+msgstr "Toto je predvolená DVD mechanika, ktorá sa použije."
 
 #: src/libvlc-module.c:783
 msgid "This is the default VCD device to use."
-msgstr "Toto je predvolená mechanika, používaná pri prehrávaní VCD."
+msgstr "Toto je predvolená VCD mechanika, ktorá sa použije."
 
 #: src/libvlc-module.c:785 modules/access/cdda.c:716
 msgid "This is the default Audio CD device to use."
-msgstr "Toto je predvolená jednotka, ktorá sa používa pri čítaní Audio CD."
+msgstr "Toto je predvolená Audio CD mechanika, ktorá sa použije."
 
 #: src/libvlc-module.c:799
 msgid "TCP connection timeout"
@@ -3156,9 +3154,9 @@ msgid ""
 "address (e.g. ::1 or 127.0.0.1) or a host name (e.g. localhost) to restrict "
 "them to a specific network interface."
 msgstr ""
-"V predvolenom nastavení bude server počúvať na ľubovoľnej lokálnej IP-"
-"adrese. Špecifikujte IP-adresu (napr. ::1 alebo 127.0.0.1) alebo názov "
-"hostiteľa (napr. localhost) pre obmedzenie na špecifické sieťové rozhranie."
+"Predvolene bude server počúvať na ľubovoľnej lokálnej IP adrese. "
+"Špecifikujte IP adresu (napr. ::1 alebo 127.0.0.1) alebo názov hostiteľa "
+"(napr. localhost) pre obmedzenie na špecifické sieťové rozhranie."
 
 #: src/libvlc-module.c:809
 msgid "RTSP server address"
@@ -3807,7 +3805,7 @@ msgstr "Časový limit na predbežné spracovanie"
 
 #: src/libvlc-module.c:1124
 msgid "Maximum time allowed to preparse an item, in milliseconds"
-msgstr "Maximálny čas na predbežné spracovanie položky, v milisekundách"
+msgstr "Maximálny čas na predbežnú analýzu položky, v milisekundách"
 
 #: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:334
 #: modules/gui/qt/dialogs/firstrun.cpp:95
@@ -4762,11 +4760,11 @@ msgstr "Zobraziť kontextové vyskakovacie menu."
 
 #: src/libvlc-module.c:1420
 msgid "Take video snapshot"
-msgstr "Vytvoriť snímku z videa"
+msgstr "Vytvoriť momentku z videa"
 
 #: src/libvlc-module.c:1421
 msgid "Takes a video snapshot and writes it to disk."
-msgstr "Z prehrávaného videa sa vytvorí snímka a uloží sa na disk."
+msgstr "Z prehrávaného videa sa vytvorí momentka a uloží sa na disk."
 
 #: src/libvlc-module.c:1423 modules/gui/macosx/VLCMainMenu.m:387
 #: modules/gui/qt/components/controller.hpp:110
@@ -4863,7 +4861,7 @@ msgstr "Cyklicky prechádzať po dostupných zvukových zariadeniach"
 #: modules/gui/macosx/VLCMainMenu.m:434 modules/gui/macosx/VLCMainMenu.m:512
 #: modules/gui/qt/components/controller.hpp:109
 msgid "Snapshot"
-msgstr "Snímka"
+msgstr "Momentka"
 
 #: src/libvlc-module.c:1615
 msgid "Window properties"
@@ -8833,8 +8831,8 @@ msgid ""
 "White balance temperature as a color temperation in Kelvin (2800 is minimum "
 "incandescence, 6500 is maximum daylight)."
 msgstr ""
-"Teplota vyváženia bielej farby - vyjadrená ako teplota farby v stupňoch "
-"Kelvina (2800 = minimálne vyžarovanie, 6500 = maximum denného svetla)."
+"Teplota vyváženia bielej farby - vyjadrená ako teplota farby v Kelvinoch "
+"(2800 = minimálne vyžarovanie, 6500 = maximum denného svetla)."
 
 #: modules/access/v4l2/v4l2.c:102
 msgid "Automatic white balance"
@@ -9936,8 +9934,8 @@ msgid ""
 "Time in milliseconds of the maximum sweep depth. Thus, the sweep range will "
 "be delay-time +/- sweep-depth."
 msgstr ""
-"Čas v milisekundách pre maximálnu hĺbku funkcie sweep. Rozsah funkcie sweep "
-"sa určuje ako čas oneskorenia +/- hĺbka funkcie sweep."
+"Čas v milisekundách pre maximálnu hĺbku skúmania. Rozsah skúmania sa určuje "
+"ako čas oneskorenia +/- hĺbka skúmania."
 
 #: modules/audio_filter/chorus_flanger.c:85
 msgid "Sweep Rate"
@@ -13435,9 +13433,7 @@ msgstr "Maximálny dátový tok pri kódovaní"
 
 #: modules/codec/vorbis.c:179
 msgid "Maximum bitrate in kbps. This is useful for streaming applications."
-msgstr ""
-"Maximálny dátový tok v kb/s. Toto nastavenie je užitočné najmä v "
-"streamovacích programoch."
+msgstr "Maximálny dátový tok v kbps. Užitočné najmä pre streamovacie programy."
 
 #: modules/codec/vorbis.c:180
 msgid "Minimum encoding bitrate"
@@ -13837,7 +13833,7 @@ msgstr "Maximálna hodnota kvantizácie"
 
 #: modules/codec/x264.c:205
 msgid "Maximum quantizer parameter."
-msgstr "Maximálna hodnota kvantizácie."
+msgstr "Maximálny parameter kvantizácie."
 
 #: modules/codec/x264.c:207
 msgid "Max QP step"
@@ -13861,7 +13857,7 @@ msgstr "Max. lokálny dátový tok"
 
 #: modules/codec/x264.c:215
 msgid "Sets a maximum local bitrate (in kbits/s)."
-msgstr "Tu môžete nastaviť maximálny lokálny dátový tok v kb/s."
+msgstr "Tu môžete nastaviť maximálny lokálny dátový tok (v kbit/s)."
 
 #: modules/codec/x264.c:217
 msgid "VBV buffer"
@@ -13869,9 +13865,7 @@ msgstr "Vyrovnávacia pamäť VBV"
 
 #: modules/codec/x264.c:218
 msgid "Averaging period for the maximum local bitrate (in kbits)."
-msgstr ""
-"Priemerná perióda, počas ktorej sa používa maximálny dátový tok (v "
-"kilobitoch)."
+msgstr "Priemerná perióda pre maximálny lokálny dátový tok (v kbits)."
 
 #: modules/codec/x264.c:221
 msgid "Initial VBV buffer occupancy"
@@ -14087,7 +14081,7 @@ msgstr ""
 
 #: modules/codec/x264.c:302
 msgid "Maximum motion vector search range"
-msgstr "Maximálny rozsah pre hľadanie pohybových vektorov"
+msgstr "Maximálny rozsah pre hľadanie pohybového vektora"
 
 #: modules/codec/x264.c:303
 msgid ""
@@ -14095,11 +14089,10 @@ msgid ""
 "position(s). Default of 16 is good for most footage, high motion sequences "
 "may benefit from settings between 24 and 32. Range 0 to 64."
 msgstr ""
-"Maximálna vzdialenosť snímkov používaných pre odhadovanie pohybu. "
-"Vzdialenosť sa meria od predpovedaných pozícií. Predvolená hodnota je 16. "
-"Táto hodnota je vhodná pri väčšine metráží, v sekvenciách s veľkým výskytom "
-"pohybu odporúčame nastaviť hodnotu z rozsahu od 24-32. Celkový možný rozsah "
-"je 0-64."
+"Maximálna vzdialenosť používaná pre odhadovanie pohybu. Vzdialenosť sa meria "
+"od predpovedaných pozícií. Predvolená hodnota je 16. Táto hodnota je vhodná "
+"pri väčšine použití, v sekvenciách s intenzívnym pohybom odporúčame nastaviť "
+"hodnotu  24 až 32. Možný je rozsah je 0 až 64."
 
 #: modules/codec/x264.c:308
 msgid "Maximum motion vector length"
@@ -14108,7 +14101,9 @@ msgstr "Maximálna dĺžka vektora pohybu"
 #: modules/codec/x264.c:309
 msgid ""
 "Maximum motion vector length in pixels. -1 is automatic, based on level."
-msgstr "Minimálna dĺžka vektora pohybu v pixeloch: Hodnota -1 = automaticky."
+msgstr ""
+"Maximálna dĺžka vektora pohybu v pixloch: -1 = automaticky, založené na "
+"úrovni."
 
 #: modules/codec/x264.c:312
 msgid "Minimum buffer space between threads"
@@ -15170,7 +15165,7 @@ msgstr "| vzoom [X] . . . . . . . .  nastavit/detegovat priblizenie videa"
 
 #: modules/control/oldrc.c:833
 msgid "| snapshot . . . . . . . . . . . . take video snapshot"
-msgstr "| snapshot . . . . . . . . .  zaznamenat snimku z videa"
+msgstr "| snapshot . . . . . . . . .  zaznamenat momentku z videa"
 
 #: modules/control/oldrc.c:834
 msgid "| strack [X] . . . . . . . . .  set/get subtitle track"
@@ -15738,9 +15733,8 @@ msgid ""
 "Megabass mode cutoff frequency, in Hz. This is the maximum frequency for "
 "which the megabass effect applies. Valid values are from 10 to 100 Hz."
 msgstr ""
-"Hraničná frekvencia pri použití efektu Megabass, v Hz. Toto je maximálna "
-"možná frekvencia, pri ktorej sa ešte aplikuje efekt. Platné hodnoty môžu byť "
-"v rozmedzí 10 až 100 Hz."
+"Frekvencia orezania pri použití efektu Megabass, v Hz. Toto je maximálna "
+"frekvencia, pri ktorej sa aplikuje efekt. Platné sú hodnoty od 10 do 100 Hz."
 
 #: modules/demux/mod.c:67
 msgid "Surround effect level (from 0 to 100, default value is 0)."
@@ -17590,7 +17584,7 @@ msgstr "Nikdy"
 
 #: modules/gui/macosx/macosx.m:145 modules/gui/qt/qt.cpp:186
 msgid "Maximum Volume displayed"
-msgstr "Zobrazená max. hlasitosť"
+msgstr "Maximálna zobrazená hlasitosť"
 
 #: modules/gui/macosx/macosx.m:149
 msgid "Mac OS X interface"
@@ -18714,11 +18708,11 @@ msgstr "Zobraziť"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:361
 msgid "Show video within the main window"
-msgstr "Zobraziť video v rámci okna"
+msgstr "Zobraziť video v hlavnom okne"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:366
 msgid "Fullscreen settings"
-msgstr "Nastavenia režimu zobrazenia na celej obrazovke"
+msgstr "Nastavenia zobrazenia na celej obrazovke"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:367
 msgid "Start in fullscreen"
@@ -18731,7 +18725,7 @@ msgstr "Čierne obrazovky pri režime zobrazenia na celú obrazovku"
 #: modules/gui/macosx/VLCSimplePrefsController.m:372
 #: modules/gui/qt/ui/sprefs_video.h:329
 msgid "Video snapshots"
-msgstr "Snímky z videa"
+msgstr "Momentky z videa"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:374
 #: modules/meta_engine/folder.c:70
@@ -18746,7 +18740,7 @@ msgstr "Formát"
 #: modules/gui/macosx/VLCSimplePrefsController.m:376
 #: modules/gui/qt/ui/sprefs_video.h:332
 msgid "Prefix"
-msgstr "Koncovka"
+msgstr "Predpona"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:377
 #: modules/gui/qt/ui/sprefs_video.h:334
@@ -18756,7 +18750,7 @@ msgstr "Sekvenčné číslovanie"
 #: modules/gui/macosx/VLCSimplePrefsController.m:385
 #: modules/gui/macosx/prefs.m:190
 msgid "Reset All"
-msgstr "Obnoviť všetko"
+msgstr "Resetovať všetko"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:387
 #: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
@@ -18767,8 +18761,8 @@ msgstr "Nastavenia"
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
 msgstr ""
-"V súboroch s médiami nie je možné pokračovať, pretože posledné mediálne "
-"položky sú vypnuté."
+"V súboroch s médiami nie je možné pokračovať, pretože zachovanie posledný "
+"mediálnych položiek je vypnuté."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:580
 msgid "Last check on: %@"
@@ -18776,7 +18770,7 @@ msgstr "Posledná kontrola: %@"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:582
 msgid "No check was performed yet."
-msgstr "Zatiaľ ešte nebola vykonaná žiadna kontrola."
+msgstr "Zatiaľ bez kontroly."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:699
 msgid "Lowest Latency"
@@ -18797,7 +18791,7 @@ msgstr "Najvyššia latencia"
 #: modules/gui/macosx/VLCSimplePrefsController.m:827
 #: modules/gui/qt/dialogs/preferences.cpp:336
 msgid "Reset Preferences"
-msgstr "Obnoviť nastavenia"
+msgstr "Reset nastavení"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:830
 msgid ""
@@ -18811,14 +18805,13 @@ msgid ""
 "\n"
 "Are you sure you want to continue?"
 msgstr ""
-"Touto voľbou resetujete súčasné a obnovíte základné nastavenia programu VLC "
-"media player.\n"
+"Touto voľbou resetujete nastavenia programu VLC media player.\n"
 "\n"
-"Pamätajte na to, že program VLC sa počas tohto procesu reštartuje, takže váš "
-"aktuálny playlist sa vyprázdni a prípadné prehrávanie, streamovanie, alebo "
-"prekódovanie sa okamžite zastaví.\n"
+"Pamätajte na to, že VLC sa počas tohto procesu reštartuje, takže váš "
+"aktuálny playlist sa vyprázdni a prípadné prehrávanie, streamovanie, či "
+"prekódovanie sa preruší.\n"
 "\n"
-"Knižnice médii sa tento úkon netýka.\n"
+"Knižnice médii sa tento úkon nedotkne.\n"
 "\n"
 "Naozaj chcete pokračovať?"
 
@@ -18831,7 +18824,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1169
 msgid "Choose the folder to save your video snapshots to."
-msgstr "Tu si vyberte priečinok, do ktorého sa uložia snímky z videa."
+msgstr "Tu si vyberte priečinok, do ktorého sa uložia momentky z videa."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1171
 #: modules/gui/macosx/VLCSimplePrefsController.m:1270
@@ -18840,14 +18833,14 @@ msgstr "Vybrať"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1268
 msgid "Choose the directory or filename where the records will be stored."
-msgstr "Vyberte priečinok alebo názov súboru, do ktorého sa uložia nahrávky."
+msgstr "Vyberte priečinok či názov súboru, do ktorého sa uložia nahrávky."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1381
 msgid ""
 "Press new keys for\n"
 "\"%@\""
 msgstr ""
-"Stlačte novú klávesovú skratku pre\n"
+"Stlačte novú klávesy pre\n"
 "\"%@\""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1454
@@ -18856,8 +18849,7 @@ msgstr "Neplatná kombinácia"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1455
 msgid "Regrettably, these keys cannot be assigned as hotkey shortcuts."
-msgstr ""
-"Prepáčte, tieto klávesy nemožno použiť na vytvorenie klávesovej skratky."
+msgstr "Prepáčte, tieto klávesy nemožno prideliť klávesovej skratke."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:1465
 #: modules/gui/macosx/VLCSimplePrefsController.m:1469
@@ -18870,7 +18862,7 @@ msgstr "Prepnúť prehrávanie/pozastavenie"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
 msgid "Toggle random order playback"
-msgstr "Prepnúť prehrávanie v náhodnom poradí"
+msgstr "Prepnúť náhodné prehrávanie"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
 msgid "Show Main Window"
@@ -18879,7 +18871,7 @@ msgstr "Zobraziť hlavné okno"
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
 msgid "Path/URL Action"
-msgstr "Cesta/akcia URL"
+msgstr "Cesta/URL pre akciu"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
 msgid "Nothing playing"
@@ -19666,7 +19658,7 @@ msgstr "Prepnúť playlist"
 
 #: modules/gui/qt/components/controller.hpp:121
 msgid "Take a snapshot"
-msgstr "Vytvoriť snímku"
+msgstr "Vytvoriť momentku"
 
 #: modules/gui/qt/components/controller.hpp:122
 msgid "Loop from point A to point B continuously."
@@ -21609,7 +21601,7 @@ msgstr "Režim o&dstránenia prekladania"
 
 #: modules/gui/qt/menus.cpp:698
 msgid "Take &Snapshot"
-msgstr "Vytvoriť &snímku"
+msgstr "Vytvoriť m&omentku"
 
 #: modules/gui/qt/menus.cpp:717
 msgid "T&itle"
@@ -23504,8 +23496,8 @@ msgid ""
 "This limits the maximum number of clients that can connect to the RTSP VOD. "
 "0 means no limit."
 msgstr ""
-"Touto voľbou môžete obmedziť maximálny počet klientov, ktorí sa môžu "
-"pripojiť na RTSP VOD. Hodnota 0 = žiaden limit."
+"Touto voľbou obmedzíte max. počet klientov, ktorí sa môžu pripojiť na RTSP "
+"VOD. Hodnota 0 = bez limitu."
 
 #: modules/misc/rtsp.c:67
 msgid "MUX for RAW RTSP transport"
@@ -23707,7 +23699,7 @@ msgstr "Maximálna veľkosť PES"
 #: modules/mux/mpeg/ps.c:55
 msgid "Set the maximum allowed PES size when producing the MPEG PS streams."
 msgstr ""
-"Zadajte maximálnu povolenú hodnotu parametra PES, ktorý sa používa pri "
+"Určuje maximálnu povolenú hodnotu parametra PES, ktorý sa používa pri "
 "vytváraní MPEG PS streamov."
 
 #: modules/mux/mpeg/ps.c:64
@@ -23884,7 +23876,7 @@ msgstr "Toto nastavenie je veľmi diskutabilné a preto sa už prestáva použí
 
 #: modules/mux/mpeg/ts.c:159
 msgid "Maximum B (deprecated)"
-msgstr "Maximum B (odporúčame: nenastavovať)"
+msgstr "Maximum B (zastaralé)"
 
 #: modules/mux/mpeg/ts.c:163
 msgid ""
@@ -24912,7 +24904,7 @@ msgstr "Maximálna dĺžka"
 
 #: modules/spu/rss.c:132
 msgid "Maximum number of characters displayed on the screen."
-msgstr "Maximálny počet písmen, zobrazených na obrazovke."
+msgstr "Maximálny počet znakov na obrazovke."
 
 #: modules/spu/rss.c:134
 msgid "Refresh time"
@@ -25024,7 +25016,7 @@ msgstr ""
 
 #: modules/spu/subsdelay.c:57
 msgid "Maximum overlapping subtitles"
-msgstr "Maximum prekrývajúcich sa titulkov"
+msgstr "Maximálny počet prekrývajúcich sa titulkov"
 
 #: modules/spu/subsdelay.c:58
 msgid "Maximum number of subtitles allowed at the same time."
