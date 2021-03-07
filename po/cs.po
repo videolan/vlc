@@ -22,7 +22,8 @@
 # Tomáš Chvátal <tomas.chvatal@gmail.com>, 2014-2018
 # Tomáš Souček <soucek.gns@gmail.com>, 2014
 # Václav Pavlíček <v.pavlicek@centrum.cz>, 2012
-# Vít Pelčák <vit@pelcak.org>, 2012,2015,2016,2018
+# Vít Pelčák <vit@pelcak.org>, 2012-2018
+# Vladim Štér <vladim.ster94@gmail.com>, 2021
 # Vojtěch Smejkal <smejkalv@gmail.com>, 2009
 # Zuzana Wolfová <painteddreaming@gmail.com>, 2014
 msgid ""
@@ -30,8 +31,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-12-25 01:27+0100\n"
-"Last-Translator: Michal Várady <miko.vaji@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-03-07 22:38+0100\n"
+"Last-Translator: Vladim Štér <vladim.ster94@gmail.com>, 2021\n"
 "Language-Team: Czech (https://www.transifex.com/yaron/teams/16553/cs/)\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -2850,6 +2851,8 @@ msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
 msgstr ""
+"Pokud to bude možné, bude vstupní proud nahrán namísto použití výstupního "
+"modulu proudu"
 
 #: src/libvlc-module.c:680
 msgid "Timeshift directory"
@@ -3242,7 +3245,7 @@ msgstr "Metadata autorských práv"
 
 #: src/libvlc-module.c:888
 msgid "Allows you to specify a \"copyright\" metadata for an input."
-msgstr ""
+msgstr "Umožňuje vám zadat metadata \"copyright\" vstupu."
 
 #: src/libvlc-module.c:890
 msgid "Description metadata"
@@ -3250,7 +3253,7 @@ msgstr "Metadata popisu"
 
 #: src/libvlc-module.c:892
 msgid "Allows you to specify a \"description\" metadata for an input."
-msgstr ""
+msgstr "Umožňuje vám zadat metadata \"popis\" vstupu."
 
 #: src/libvlc-module.c:894
 msgid "Date metadata"
@@ -3258,7 +3261,7 @@ msgstr "Metadata data"
 
 #: src/libvlc-module.c:896
 msgid "Allows you to specify a \"date\" metadata for an input."
-msgstr ""
+msgstr "Umožňuje vám zadat metadata \"datum\" vstupu."
 
 #: src/libvlc-module.c:898
 msgid "URL metadata"
@@ -3274,6 +3277,9 @@ msgid ""
 "(decompression methods). Only advanced users should alter this option as it "
 "can break playback of all your streams."
 msgstr ""
+"Změna této možnosti změní způsob, jímž VLC vybírá své kodeky (dekompresní "
+"metody). Tuto možnost by měli měnit pouze pokročilí uživatelé, protože může "
+"rozbít přehrávání všech vašich proudů."
 
 #: src/libvlc-module.c:908
 msgid "Preferred decoders list"
@@ -3285,6 +3291,10 @@ msgid ""
 "try the dummy and a52 codecs before trying the other ones. Only advanced "
 "users should alter this option as it can break playback of all your streams."
 msgstr ""
+"Seznam kodeků, které VLC použije v daném pořadí. Například, 'dummy,a52' "
+"vyzkouší dummy a a52 kodeky předtím, než vyzkouší ostatní. Tuto možnost by "
+"měli měnit pouze pokročilí uživatelé, protože může rozbít přehrávání všech "
+"vašich proudů."
 
 #: src/libvlc-module.c:915
 msgid "Preferred encoders list"
@@ -3596,7 +3606,7 @@ msgstr "Multimediální přehrávač VLC je spuštěn pomocí asociace s přípo
 
 #: src/libvlc-module.c:1084
 msgid "Tell VLC that it is being launched due to a file association in the OS"
-msgstr ""
+msgstr "Říct VLC, že je spouštěné kvůli asociaci se souborem v OS"
 
 #: src/libvlc-module.c:1087 modules/gui/qt/ui/sprefs_interface.h:549
 msgid "Use only one instance when started from file manager"
@@ -10166,7 +10176,7 @@ msgstr ""
 
 #: modules/audio_output/amem.c:37
 msgid "Audio memory output"
-msgstr ""
+msgstr "Paměťový audio výstup"
 
 #: modules/audio_output/amem.c:44
 msgid "Sample format"
@@ -15707,6 +15717,8 @@ msgstr "Autoři"
 msgid ""
 "VLC media player and VideoLAN are trademarks of the VideoLAN Association."
 msgstr ""
+"VLC media player a VideoLAN jsou obchodní známky společnosti VideoLAN "
+"Association."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:128
 msgid ""
@@ -15719,6 +15731,15 @@ msgid ""
 "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
+"<p>Multimediální přehrávač VLC je svobodný přehrávač médií, enkodér a "
+"streamer, který je zdarma. Byl vytvořen dobrovolníky z komunity <a href="
+"\"https://www.videolan.org/\"><span style=\" text-decoration: underline; "
+"color:#0057ae;\">VideoLAN</span></a>.</p> <p>VLC používá vlastní kodeky, je "
+"dostupný na prakticky všech populárních platformách a umí přečíst téměř "
+"všechny soubory, CD, DVD, síťové proudy, zařízení pro záznam a jiné mediální "
+"formáty!</p> <p><a href=\"https://www.videolan.org/contribute/\"><span style="
+"\" text-decoration: underline; color:#0057ae;\">Pomozte a přidejte se k nám!"
+"</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
@@ -15761,7 +15782,7 @@ msgstr "Zobrazit pouze nainstalované"
 #: modules/gui/macosx/VLCAddonsWindowController.m:118
 #: modules/gui/qt/dialogs/plugins.cpp:424
 msgid "Find more addons online"
-msgstr ""
+msgstr "Najít další doplňky online"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:128
 #: modules/gui/macosx/VLCMainMenu.m:345 modules/gui/qt/dialogs/plugins.cpp:86
@@ -18391,7 +18412,7 @@ msgstr " <vlevo>,<vpravo>         Přejít -/+ 1%%"
 
 #: modules/gui/ncurses.c:888
 msgid " a, z                   Volume Up/Down"
-msgstr ""
+msgstr " a, z                   Hlasitost  Nahoru/Dolů"
 
 #: modules/gui/ncurses.c:889
 msgid " m                      Mute"
@@ -18438,15 +18459,15 @@ msgstr ""
 
 #: modules/gui/ncurses.c:906
 msgid " g                      Go to the current playing item"
-msgstr ""
+msgstr "g                       Přejít na právě přehrávanou položku"
 
 #: modules/gui/ncurses.c:907
 msgid " /                      Look for an item"
-msgstr ""
+msgstr "/                        Hledat položku"
 
 #: modules/gui/ncurses.c:908
 msgid " ;                      Look for the next item"
-msgstr ""
+msgstr ";                        Hledat následující položku"
 
 #: modules/gui/ncurses.c:909
 msgid " A                      Add an entry"
@@ -18459,7 +18480,7 @@ msgstr ""
 
 #: modules/gui/ncurses.c:912
 msgid " e                      Eject (if stopped)"
-msgstr ""
+msgstr "e                       Vysunout (pokud je zastaveno)"
 
 #: modules/gui/ncurses.c:916
 msgid "[Filebrowser]"
@@ -18489,11 +18510,11 @@ msgstr " <nahoru>,<dolu>            Přejít +/-5%%"
 
 #: modules/gui/ncurses.c:1046
 msgid "[Repeat]"
-msgstr ""
+msgstr "[Opakovat]"
 
 #: modules/gui/ncurses.c:1047
 msgid "[Random]"
-msgstr ""
+msgstr "[Náhodně]"
 
 #: modules/gui/ncurses.c:1048
 msgid "[Loop]"
@@ -18511,12 +18532,12 @@ msgstr " Pozice : %s/%s"
 
 #: modules/gui/ncurses.c:1095
 msgid " Volume   : Mute"
-msgstr ""
+msgstr "Hlasitost : Ztišit"
 
 #: modules/gui/ncurses.c:1096
 #, c-format
 msgid " Volume   : %3ld%%"
-msgstr ""
+msgstr "Hlasitost : %3ld%%"
 
 #: modules/gui/ncurses.c:1096
 msgid " Volume   : ----"
@@ -19301,11 +19322,11 @@ msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1414
 msgid "Hotkey change"
-msgstr ""
+msgstr "Změna klávesových zkratek"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1418
 msgid "Press the new key or combination for "
-msgstr ""
+msgstr "Stiskněte novou klávesu či nějakou kombinaci pro"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1427
 msgid "Assign"
@@ -19313,7 +19334,7 @@ msgstr "Přiřadit"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1462
 msgid "Warning: this key or combination is already assigned to "
-msgstr ""
+msgstr "Pozor: Tato klávesa či kombinace je již použita u"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1474
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
@@ -19441,7 +19462,7 @@ msgstr ""
 
 #: modules/gui/qt/components/sout/profile_selector.cpp:787
 msgid " Profile Name Missing"
-msgstr ""
+msgstr "Chybějící název profilu"
 
 #: modules/gui/qt/components/sout/profile_selector.cpp:788
 msgid "You must set a name for the profile."
@@ -19514,7 +19535,7 @@ msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:375
 msgid "Base port"
-msgstr ""
+msgstr "Základní port"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:423
 msgid "This module outputs the transcoded stream to an Icecast server."
@@ -19832,7 +19853,7 @@ msgstr "Aktualizovat strom"
 
 #: modules/gui/qt/dialogs/messages.cpp:335
 msgid "Clear the messages"
-msgstr ""
+msgstr "Vyčistit zprávy"
 
 #: modules/gui/qt/dialogs/open.cpp:78 modules/gui/qt/menus.cpp:934
 #: modules/gui/qt/menus.cpp:1131
@@ -19963,35 +19984,35 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:418
 msgid "Only installed"
-msgstr ""
+msgstr "Pouze instalováno"
 
 #: modules/gui/qt/dialogs/plugins.cpp:524
 msgid "Retrieving addons..."
-msgstr ""
+msgstr "Získávání doplňků..."
 
 #: modules/gui/qt/dialogs/plugins.cpp:535
 msgid "No addons found"
-msgstr ""
+msgstr "Nebyly nalezeny žádné doplňky"
 
 #: modules/gui/qt/dialogs/plugins.cpp:814
 msgid "This addon has been installed manually. VLC can't manage it by itself."
-msgstr ""
+msgstr "Tento doplněk byl nainstalován ručně. VLC jej samo nemůže spravovat."
 
 #: modules/gui/qt/dialogs/plugins.cpp:1197
 msgid "Version %1"
-msgstr ""
+msgstr "Verze %1"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1225
 msgid "%1 downloads"
-msgstr ""
+msgstr "%1 stahování"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1294
 msgid "&Uninstall"
-msgstr ""
+msgstr "&Odinstalovat"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1297
 msgid "&Install"
-msgstr ""
+msgstr "&Instalovat"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1392
 #: modules/gui/qt/dialogs/plugins.cpp:1495
@@ -20766,7 +20787,7 @@ msgstr "Počet dní mezi dvěma kontrolami aktualizací"
 
 #: modules/gui/qt/qt.cpp:130
 msgid "Ask for network policy at start"
-msgstr ""
+msgstr "Na začátku vyžádat zásady sítě"
 
 #: modules/gui/qt/qt.cpp:132
 msgid "Save the recently played items in the menu"
@@ -21077,11 +21098,11 @@ msgstr ""
 
 #: modules/hw/mmal/codec.c:58
 msgid "MMAL decoder"
-msgstr ""
+msgstr "MMAL dekodér"
 
 #: modules/hw/mmal/codec.c:59
 msgid "MMAL-based decoder plugin for Raspberry Pi"
-msgstr ""
+msgstr "MMAL-základní dekódovací plugin pro Raspberry Pi"
 
 #: modules/hw/mmal/deinterlace.c:45
 msgid "Use QPUs for advanced HD deinterlacing."
@@ -21230,35 +21251,35 @@ msgstr "Ne"
 
 #: modules/keystore/keychain.m:41
 msgid "Any"
-msgstr ""
+msgstr "Žádný"
 
 #: modules/keystore/keychain.m:47
 msgid "System default"
-msgstr ""
+msgstr "Výchozí nastavení systému"
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock"
-msgstr ""
+msgstr "Po prvním odemknutí"
 
 #: modules/keystore/keychain.m:49
 msgid "After first unlock, on this device only"
-msgstr ""
+msgstr "Po prvním odemknutí, pouze na tomto zařízení"
 
 #: modules/keystore/keychain.m:51
 msgid "When passcode set, on this device only"
-msgstr ""
+msgstr "Když je nastaven přístupový kód, pouze na tomto zařízení"
 
 #: modules/keystore/keychain.m:52
 msgid "Always, on this device only"
-msgstr ""
+msgstr "Vždy, pouze na tomto zařízení"
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked"
-msgstr ""
+msgstr "Když je odemknut"
 
 #: modules/keystore/keychain.m:54
 msgid "When unlocked, on this device only"
-msgstr ""
+msgstr "Když je odemknut, pouze na tomto zařízení"
 
 #: modules/keystore/keychain.m:57
 msgid "Synchronize stored items"
@@ -21339,11 +21360,11 @@ msgstr ""
 
 #: modules/logger/file.c:193
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: modules/logger/file.c:203
 msgid "Info"
-msgstr ""
+msgstr "Informace"
 
 #: modules/logger/file.c:203
 msgid "Debug"
@@ -21479,7 +21500,7 @@ msgstr ""
 
 #: modules/lua/vlc.c:55 modules/lua/vlc.c:71
 msgid "A single password restricts access to this interface."
-msgstr ""
+msgstr "Jediné heslo omezuje přístup k tomuto rozhraní."
 
 #: modules/lua/vlc.c:57 modules/lua/vlc.c:58
 msgid "Source directory"
@@ -21487,11 +21508,11 @@ msgstr "Zdrojový adresář"
 
 #: modules/lua/vlc.c:59
 msgid "Directory index"
-msgstr ""
+msgstr "Index adresáře"
 
 #: modules/lua/vlc.c:60
 msgid "Allow to build directory index"
-msgstr ""
+msgstr "Povolit tvorbu indexu adresáře"
 
 #: modules/lua/vlc.c:63
 msgid ""
@@ -21591,7 +21612,7 @@ msgstr ""
 
 #: modules/meta_engine/folder.c:73
 msgid "Filename to look for album art in current directory"
-msgstr ""
+msgstr "Název souboru k hledání obalu alba v aktuálním adresáři"
 
 #: modules/meta_engine/ID3Genres.h:33
 msgid "Blues"
@@ -22135,31 +22156,31 @@ msgstr "Synthpop"
 
 #: modules/misc/addons/fsstorage.c:83
 msgid "addons local storage"
-msgstr ""
+msgstr "místní úložiště doplňků"
 
 #: modules/misc/addons/fsstorage.c:85
 msgid "Addons local storage installer"
-msgstr ""
+msgstr "Instalátor místního úložiště doplňků"
 
 #: modules/misc/addons/fsstorage.c:93
 msgid "Addons local storage lister"
-msgstr ""
+msgstr "Vyčítač místního úložiště doplňků"
 
 #: modules/misc/addons/vorepository.c:62
 msgid "Videolan.org's addons finder"
-msgstr ""
+msgstr "Vyhledávač doplňků Videolan.org"
 
 #: modules/misc/addons/vorepository.c:64
 msgid "addons.videolan.org addons finder"
-msgstr ""
+msgstr "vyhledávač doplňků addons.videolan.org"
 
 #: modules/misc/addons/vorepository.c:70
 msgid "Videolan.org's single archive addons finder"
-msgstr ""
+msgstr "vyhledávač jednoarchivových doplňků Videolan.org"
 
 #: modules/misc/addons/vorepository.c:72
 msgid "single .vlp archive addons finder"
-msgstr ""
+msgstr "vyhledávač jednoarchivových doplňků .vlp"
 
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
@@ -22258,11 +22279,11 @@ msgstr ""
 
 #: modules/misc/gnutls.c:523
 msgid "Accept 24 hours"
-msgstr ""
+msgstr "Povolit na 24 hodin"
 
 #: modules/misc/gnutls.c:523
 msgid "Accept permanently"
-msgstr ""
+msgstr "Trvale povolit"
 
 #: modules/misc/gnutls.c:525
 #, c-format
@@ -22325,11 +22346,11 @@ msgstr "Server GNU TLS"
 
 #: modules/misc/inhibit/dbus.c:129
 msgid "Playing some media."
-msgstr ""
+msgstr "Přehrávání některých médií."
 
 #: modules/misc/inhibit/dbus.c:232
 msgid "D-Bus screensaver"
-msgstr ""
+msgstr "S-Bus spořič obrazovky"
 
 #: modules/misc/inhibit/dbus.c:233
 msgid "D-Bus screen saver inhibition"
@@ -22403,11 +22424,11 @@ msgstr "Původní server RTSP VoD"
 
 #: modules/misc/securetransport.c:55
 msgid "TLS support for OS X and iOS"
-msgstr ""
+msgstr "TLS podporuje OS X a iOS"
 
 #: modules/misc/securetransport.c:68
 msgid "TLS server support for OS X"
-msgstr ""
+msgstr "TLS server podporuje OS X"
 
 #: modules/misc/securetransport.c:338
 #, c-format
@@ -22551,11 +22572,12 @@ msgstr ""
 
 #: modules/mux/mpeg/ps.c:54
 msgid "PES maximum size"
-msgstr ""
+msgstr "PES maximální velikost"
 
 #: modules/mux/mpeg/ps.c:55
 msgid "Set the maximum allowed PES size when producing the MPEG PS streams."
 msgstr ""
+"Nastavit maximální povolenou velikost PES, při vytváření MPEG PS streamů."
 
 #: modules/mux/mpeg/ps.c:64
 msgid "PS muxer"
@@ -22581,7 +22603,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:107
 msgid "SPU PID"
-msgstr ""
+msgstr "SPU PID"
 
 #: modules/mux/mpeg/ts.c:108
 msgid "Assign a fixed PID to the SPU."
@@ -22597,7 +22619,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:111
 msgid "TS ID"
-msgstr ""
+msgstr "TS ID"
 
 #: modules/mux/mpeg/ts.c:112
 msgid "Assign a fixed Transport Stream ID."
@@ -22605,7 +22627,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:113
 msgid "NET ID"
-msgstr ""
+msgstr "NET ID"
 
 #: modules/mux/mpeg/ts.c:114
 msgid "Assign a fixed Network ID (for SDT table)"
@@ -22687,7 +22709,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:151
 msgid "PCR interval (ms)"
-msgstr ""
+msgstr "PCR intervaly (v milisekundách)"
 
 #: modules/mux/mpeg/ts.c:152
 msgid ""
@@ -22797,7 +22819,7 @@ msgstr "Nyní přehrávám"
 
 #: modules/notify/osx_notifications.m:402
 msgid "Skip"
-msgstr ""
+msgstr "Přeskočit"
 
 #: modules/notify/notify.c:55
 msgid "Timeout (ms)"
@@ -22883,7 +22905,7 @@ msgstr ""
 
 #: modules/packetizer/mpegvideo.c:75
 msgid "MPEG Video"
-msgstr ""
+msgstr "MPEG Video"
 
 #: modules/packetizer/vc1.c:54
 msgid "VC-1 packetizer"
@@ -23091,11 +23113,11 @@ msgstr "Neznámý typ"
 
 #: modules/services_discovery/upnp.cpp:72
 msgid "SAT>IP channel list"
-msgstr ""
+msgstr "SAT>IP seznam kanálů"
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
-msgstr ""
+msgstr "Uživatelský SAT>IP seznam kanálů URL"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Master List"
@@ -23103,11 +23125,11 @@ msgstr "Hlavní seznam"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Server List"
-msgstr ""
+msgstr "Seznam serverů"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Custom List"
-msgstr ""
+msgstr "Uživatelský seznam"
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -23125,7 +23147,7 @@ msgstr "Snímek obrazovky"
 
 #: modules/services_discovery/xcb_apps.c:154
 msgid "Your window manager does not provide a list of applications."
-msgstr ""
+msgstr "Váš manažer oken neposkytuje seznam aplikací."
 
 #: modules/services_discovery/xcb_apps.c:167
 msgid "Applications"
@@ -23364,6 +23386,8 @@ msgstr "Velikost písma, pixely"
 #: modules/spu/marq.c:112 modules/spu/rss.c:149
 msgid "Font size, in pixels. Default is 0 (use default font size)."
 msgstr ""
+"Velikost písma, v pixelech. Výchozí stav je 0 (použít výchozí velikost "
+"písma)."
 
 #: modules/spu/marq.c:116 modules/spu/rss.c:153
 msgid ""
@@ -23372,6 +23396,10 @@ msgid ""
 "then blue. #000000 = black, #FF0000 = red, #00FF00 = green, #FFFF00 = yellow "
 "(red + green), #FFFFFF = white"
 msgstr ""
+"Barva textu bude viditelná na videu. Musí se zapsat v hexadecimální soustavě "
+"(jako barvy v HTML). První dva znaky jsou pro červenou, poté zelenou a "
+"nakonec modrou. #000000 = černá, #FF0000 = červená, #00FF00 = zelená, "
+"#FFFF00 = žlutá (červená + zelená), #FFFFFF = bílá"
 
 #: modules/spu/marq.c:121
 msgid "Marquee position"
@@ -23416,7 +23444,7 @@ msgstr ""
 
 #: modules/spu/mosaic.c:97
 msgid "Top left corner X coordinate"
-msgstr ""
+msgstr "Horní levý roh X koordinát"
 
 #: modules/spu/mosaic.c:99
 msgid "X Coordinate of the top-left corner of the mosaic."
@@ -23424,7 +23452,7 @@ msgstr ""
 
 #: modules/spu/mosaic.c:100
 msgid "Top left corner Y coordinate"
-msgstr ""
+msgstr "Horní levý roh Y koordinát"
 
 #: modules/spu/mosaic.c:102
 msgid "Y Coordinate of the top-left corner of the mosaic."
@@ -23545,7 +23573,7 @@ msgstr "fixní"
 
 #: modules/spu/mosaic.c:166
 msgid "offsets"
-msgstr ""
+msgstr "offsety"
 
 #: modules/spu/mosaic.c:176
 msgid "Mosaic video sub source"
@@ -23723,7 +23751,7 @@ msgstr ""
 
 #: modules/spu/subsdelay.c:45
 msgid "Change subtitle delay"
-msgstr ""
+msgstr "Změna zpoždění titulků"
 
 #: modules/spu/subsdelay.c:47
 msgid "Delay calculation mode"
@@ -23747,15 +23775,15 @@ msgstr ""
 
 #: modules/spu/subsdelay.c:57
 msgid "Maximum overlapping subtitles"
-msgstr ""
+msgstr "Maximum překrývajících se titulků"
 
 #: modules/spu/subsdelay.c:58
 msgid "Maximum number of subtitles allowed at the same time."
-msgstr ""
+msgstr "Maximální počet titulků povolených najednou."
 
 #: modules/spu/subsdelay.c:60
 msgid "Minimum alpha value"
-msgstr ""
+msgstr "Minimální alfa hodnota"
 
 #: modules/spu/subsdelay.c:62
 msgid ""
@@ -23854,7 +23882,7 @@ msgstr ""
 
 #: modules/stream_filter/hds/hds.c:208
 msgid "HTTP Dynamic Streaming"
-msgstr ""
+msgstr "HTTP Dynamické streamování"
 
 #: modules/stream_filter/inflate.c:201
 msgid "Zlib decompression filter"
@@ -24001,7 +24029,7 @@ msgstr ""
 
 #: modules/stream_out/chromaprint.c:58
 msgid "Default: 90sec"
-msgstr ""
+msgstr "Výchozí: 90 vteřin"
 
 #: modules/stream_out/chromaprint.c:61
 msgid "Chromaprint stream output"
@@ -24009,7 +24037,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:189
 msgid "HTTP port"
-msgstr ""
+msgstr "HTTP port"
 
 #: modules/stream_out/chromecast/cast.cpp:190
 msgid ""
@@ -24032,7 +24060,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:195
 msgid "Disable if your receiver does not support Dolby®."
-msgstr ""
+msgstr "Zakázat, jestliže Váš přijímač nepodporuje Dolby®."
 
 #: modules/stream_out/chromecast/cast.cpp:217
 msgid "High (high quality and high bandwidth)"
@@ -24052,31 +24080,31 @@ msgstr "Pomalé CPU (nízká kvalita, ale velká šířka pásma)"
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Conversion quality"
-msgstr ""
+msgstr "Kvalita konverze"
 
 #: modules/stream_out/chromecast/cast.cpp:224
 msgid "Change this option to increase conversion speed or quality."
-msgstr ""
+msgstr "Změňte tuto možnost pro zvýšení rychlosti konverze nebo kvality."
 
 #: modules/stream_out/chromecast/cast.cpp:227
 msgid "IP Address of the Chromecast."
-msgstr ""
+msgstr "IP adresa Chromecastu."
 
 #: modules/stream_out/chromecast/cast.cpp:228
 msgid "Chromecast port"
-msgstr ""
+msgstr "Port Chromecastu"
 
 #: modules/stream_out/chromecast/cast.cpp:229
 msgid "The port used to talk to the Chromecast."
-msgstr ""
+msgstr "Port použitý ke komunikaci s Chromecastem."
 
 #: modules/stream_out/chromecast/cast.cpp:239
 msgid "Chromecast"
-msgstr ""
+msgstr "Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:240
 msgid "Chromecast stream output"
-msgstr ""
+msgstr "Streamovací výstup Chromecastu"
 
 #: modules/stream_out/chromecast/cast.cpp:1197
 msgid "Ok, Don't warn me again"
@@ -24128,11 +24156,11 @@ msgstr ""
 
 #: modules/stream_out/display.c:41
 msgid "Enable/disable audio rendering."
-msgstr ""
+msgstr "Povolit/zakázat vykreslování audia."
 
 #: modules/stream_out/display.c:43
 msgid "Enable/disable video rendering."
-msgstr ""
+msgstr "Povolit/zakázat vykreslování videa."
 
 #: modules/stream_out/display.c:44
 msgid "Delay (ms)"
@@ -24148,31 +24176,31 @@ msgstr ""
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
-msgstr ""
+msgstr "Duplicitní výstup streamu"
 
 #: modules/stream_out/es.c:42 modules/stream_out/standard.c:42
 msgid "Output access method"
-msgstr ""
+msgstr "Výstupní přístupová metoda"
 
 #: modules/stream_out/es.c:44
 msgid "This is the default output access method that will be used."
-msgstr ""
+msgstr "Toto je výchozí přístupová metoda, která bude použita."
 
 #: modules/stream_out/es.c:46
 msgid "Audio output access method"
-msgstr ""
+msgstr "Přístupová metoda audio výstupu"
 
 #: modules/stream_out/es.c:48
 msgid "This is the output access method that will be used for audio."
-msgstr ""
+msgstr "Toto je výstupní přístupová metoda, která bude použita pro audio."
 
 #: modules/stream_out/es.c:49
 msgid "Video output access method"
-msgstr ""
+msgstr "Přístupová metoda video výstupu"
 
 #: modules/stream_out/es.c:51
 msgid "This is the output access method that will be used for video."
-msgstr ""
+msgstr "Toto je výstupní přístupová metoda, která bude použita pro video."
 
 #: modules/stream_out/es.c:53 modules/stream_out/standard.c:45
 msgid "Output muxer"
@@ -24204,23 +24232,23 @@ msgstr "Výstupní URL"
 
 #: modules/stream_out/es.c:65
 msgid "This is the default output URI."
-msgstr ""
+msgstr "Toto je výchozí URI výstup."
 
 #: modules/stream_out/es.c:66
 msgid "Audio output URL"
-msgstr ""
+msgstr "URL audio výstup"
 
 #: modules/stream_out/es.c:68
 msgid "This is the output URI that will be used for audio."
-msgstr ""
+msgstr "Toto je URI výstup, který bude použit pro audio."
 
 #: modules/stream_out/es.c:69
 msgid "Video output URL"
-msgstr ""
+msgstr "URL video výstup"
 
 #: modules/stream_out/es.c:71
 msgid "This is the output URI that will be used for video."
-msgstr ""
+msgstr "Toto je URI výstup, který bude použit pro video."
 
 #: modules/stream_out/es.c:80
 msgid "Elementary stream output"
@@ -24306,11 +24334,11 @@ msgstr ""
 
 #: modules/stream_out/record.c:57
 msgid "Record stream output"
-msgstr ""
+msgstr "Nahrávací streamový výstup"
 
 #: modules/stream_out/rtp.c:78
 msgid "This is the output URL that will be used."
-msgstr ""
+msgstr "Toto je URL výstup, který bude použit."
 
 #: modules/stream_out/rtp.c:81
 msgid ""
@@ -24388,6 +24416,7 @@ msgstr ""
 #: modules/stream_out/rtp.c:116
 msgid "This allows you to specify the base port for the RTP streaming."
 msgstr ""
+"Toto Vás opravňuje k specifikování základního portu pro RTP steamování."
 
 #: modules/stream_out/rtp.c:117
 msgid "Audio port"
@@ -24397,6 +24426,7 @@ msgstr "Port zvuku"
 msgid ""
 "This allows you to specify the default audio port for the RTP streaming."
 msgstr ""
+"Toto Vás opravňuje k specifikování výchozího audio portu pro RTP steamování."
 
 #: modules/stream_out/rtp.c:120
 msgid "Video port"
@@ -24406,10 +24436,11 @@ msgstr "Port videa"
 msgid ""
 "This allows you to specify the default video port for the RTP streaming."
 msgstr ""
+"Toto Vás opravňuje k specifikování výchozího video portu pro RTP steamování."
 
 #: modules/stream_out/rtp.c:130
 msgid "RTP/RTCP multiplexing"
-msgstr ""
+msgstr "RTP/RTCP multiplexing"
 
 #: modules/stream_out/rtp.c:132
 msgid ""
@@ -24425,11 +24456,11 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:140
 msgid "Transport protocol"
-msgstr ""
+msgstr "Transportní protokol"
 
 #: modules/stream_out/rtp.c:142
 msgid "This selects which transport protocol to use for RTP."
-msgstr ""
+msgstr "Tyto výběry který použijí transportní protokol pro RTP"
 
 #: modules/stream_out/rtp.c:146
 msgid ""
@@ -24459,7 +24490,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
-msgstr ""
+msgstr "RTP streamovací výstup"
 
 #: modules/stream_out/rtp.c:245
 msgid "RTSP VoD server"
@@ -24467,7 +24498,7 @@ msgstr "Server RTSP VoD"
 
 #: modules/stream_out/setid.c:45
 msgid "New ES ID"
-msgstr ""
+msgstr "Nové ES ID"
 
 #: modules/stream_out/setid.c:47
 msgid "Specify an new identifier integer for this elementary stream"
@@ -24483,7 +24514,7 @@ msgstr "Nastavit ID"
 
 #: modules/stream_out/setid.c:62
 msgid "Set ES id"
-msgstr ""
+msgstr "Nastavit ES id"
 
 #: modules/stream_out/setid.c:63
 msgid "Change the id of an elementary stream"
@@ -24995,7 +25026,7 @@ msgstr ""
 #: modules/video_chroma/i422_i420.c:57 modules/video_chroma/i422_yuy2.c:71
 #: modules/video_chroma/yuy2_i420.c:57 modules/video_chroma/yuy2_i422.c:56
 msgid "Conversions from "
-msgstr ""
+msgstr "Konverze z"
 
 #: modules/video_chroma/i420_10_p010.c:131
 msgid "YUV 10-bits planar to semiplanar 10-bits conversions"
@@ -25019,19 +25050,19 @@ msgstr ""
 
 #: modules/video_chroma/i420_yuy2.c:90 modules/video_chroma/i422_yuy2.c:76
 msgid "MMX conversions from "
-msgstr ""
+msgstr "MMX konverze z"
 
 #: modules/video_chroma/i420_yuy2.c:94 modules/video_chroma/i422_yuy2.c:81
 msgid "SSE2 conversions from "
-msgstr ""
+msgstr "SSE2 konverze z"
 
 #: modules/video_chroma/i420_yuy2.c:99
 msgid "AltiVec conversions from "
-msgstr ""
+msgstr "AltiVec konverze z"
 
 #: modules/video_chroma/omxdl.c:36
 msgid "OpenMAX DL image processing"
-msgstr ""
+msgstr "OpenMAX DL procesování obrazu"
 
 #: modules/video_chroma/rv32.c:46
 msgid "RV32 conversion filter"
@@ -25099,7 +25130,7 @@ msgstr ""
 
 #: modules/video_chroma/yuvp.c:48
 msgid "YUVP converter"
-msgstr ""
+msgstr "YUVP konvertor"
 
 #: modules/video_filter/adjust.c:67
 msgid "Image hue (-180..180)"
@@ -25159,7 +25190,7 @@ msgstr "Počet snímků (0 až 100)"
 
 #: modules/video_filter/antiflicker.c:54
 msgid "Softening value"
-msgstr ""
+msgstr "Hodnota vyhlazování"
 
 #: modules/video_filter/antiflicker.c:55
 msgid "Number of frames consider for smoothening (0 to 30)"
@@ -25179,7 +25210,7 @@ msgstr ""
 
 #: modules/video_filter/ball.c:100
 msgid "Edge visible"
-msgstr ""
+msgstr "Viditelnost okrajů"
 
 #: modules/video_filter/ball.c:101
 msgid "Set edge visibility."
@@ -25283,7 +25314,7 @@ msgstr ""
 
 #: modules/video_filter/blendbench.c:87
 msgid "Base image"
-msgstr ""
+msgstr "Základní obraz"
 
 #: modules/video_filter/blendbench.c:93
 msgid "Blend image"
@@ -25343,11 +25374,11 @@ msgstr ""
 
 #: modules/video_filter/bluescreen.c:78
 msgid "Bluescreen video filter"
-msgstr ""
+msgstr "Video filtr modré obrazovky"
 
 #: modules/video_filter/bluescreen.c:79
 msgid "Bluescreen"
-msgstr ""
+msgstr "Modrá obrazovka"
 
 #: modules/video_filter/canvas.c:83
 msgid "Output width"
@@ -25405,10 +25436,11 @@ msgstr ""
 msgid ""
 "Example: 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'"
 msgstr ""
+"Příklad: 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'"
 
 #: modules/video_filter/ci_filters.m:763
 msgid "Mac OS X hardware video filters"
-msgstr ""
+msgstr "MAC OS X hardware video filtry"
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -25420,7 +25452,7 @@ msgstr ""
 
 #: modules/video_filter/colorthres.c:60
 msgid "Select one color in the video"
-msgstr ""
+msgstr "Vyberte jednu barvu ve videu"
 
 #: modules/video_filter/colorthres.c:70
 msgid "Color threshold filter"
@@ -25629,11 +25661,11 @@ msgstr ""
 
 #: modules/video_filter/fps.c:45
 msgid "FPS conversion video filter"
-msgstr ""
+msgstr "FPS konverzní video filtr"
 
 #: modules/video_filter/fps.c:46
 msgid "FPS Converter"
-msgstr ""
+msgstr "Konvertor FPS"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
@@ -25781,7 +25813,7 @@ msgstr ""
 
 #: modules/video_filter/invert.c:50
 msgid "Invert video filter"
-msgstr ""
+msgstr "Invertní video filtr"
 
 #: modules/video_filter/invert.c:51
 msgid "Color inversion"
@@ -25797,7 +25829,7 @@ msgstr "Zvětšit"
 
 #: modules/video_filter/mirror.c:64
 msgid "Mirror orientation"
-msgstr ""
+msgstr "Zdraclová orientace"
 
 #: modules/video_filter/mirror.c:65
 msgid ""
@@ -25838,7 +25870,7 @@ msgstr "Zrcadlit video"
 
 #: modules/video_filter/mirror.c:82
 msgid "Splits video in two same parts, like in a mirror"
-msgstr ""
+msgstr "Rozdělit video na dvě stejné části, jako v zrcadle"
 
 #: modules/video_filter/motionblur.c:54
 msgid "Blur factor (1-127)"
@@ -26210,11 +26242,11 @@ msgstr ""
 
 #: modules/video_filter/scene.c:91
 msgid "Send your video to picture files"
-msgstr ""
+msgstr "Poslat vaše video do složek obrázků"
 
 #: modules/video_filter/scene.c:95
 msgid "Scene filter"
-msgstr ""
+msgstr "Filtr scén"
 
 #: modules/video_filter/scene.c:96
 msgid "Scene video filter"
@@ -26278,11 +26310,11 @@ msgstr "Otočit nebo převrátit obraz"
 
 #: modules/video_filter/vhs.c:105
 msgid "VHS movie effect video filter"
-msgstr ""
+msgstr "VHS efekt filmu - video filtr"
 
 #: modules/video_filter/vhs.c:106
 msgid "VHS movie"
-msgstr ""
+msgstr "VHS film"
 
 #: modules/video_filter/wave.c:53
 msgid "Wave video filter"
@@ -26489,7 +26521,7 @@ msgstr "GLX"
 
 #: modules/video_output/glx.c:272
 msgid "GLX extension for OpenGL"
-msgstr ""
+msgstr "GLX rozšíření pro OpenGL"
 
 #: modules/video_output/kva.c:50 modules/gui/qt/ui/sprefs_video.h:323
 msgid "Enable a workaround for T23"
@@ -26503,7 +26535,7 @@ msgstr ""
 
 #: modules/video_output/kva.c:55 modules/gui/qt/ui/sprefs_video.h:324
 msgid "Video mode"
-msgstr ""
+msgstr "Video mód"
 
 #: modules/video_output/kva.c:57
 msgid "Select a proper video mode to be used by KVA."
@@ -26531,7 +26563,7 @@ msgstr ""
 
 #: modules/video_output/macosx.m:75
 msgid "Mac OS X OpenGL video output"
-msgstr ""
+msgstr "Mac OS X OpenGL video výstup"
 
 #: modules/video_output/opengl/display.c:40
 msgid "OpenGL extension"
@@ -26567,7 +26599,7 @@ msgstr "EGL"
 
 #: modules/video_output/opengl/egl.c:442
 msgid "EGL extension for OpenGL"
-msgstr ""
+msgstr "EGL rozšíření pro OpelGL"
 
 #: modules/video_output/win32/direct3d9.c:77
 msgid "The desktop mode allows you to display the video on the desktop."
@@ -26695,7 +26727,7 @@ msgstr "Tapeta"
 
 #: modules/video_output/win32/glwin32.c:52
 msgid "OpenGL video output for Windows"
-msgstr ""
+msgstr "OpenGL video výstup pro Windows"
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -26754,11 +26786,11 @@ msgstr ""
 
 #: modules/video_output/vmem.c:59
 msgid "Video memory output"
-msgstr ""
+msgstr "Paměťový video výstup"
 
 #: modules/video_output/vmem.c:60
 msgid "Video memory"
-msgstr ""
+msgstr "Paměťové video"
 
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
@@ -27458,15 +27490,15 @@ msgstr "Výstup"
 
 #: share/lua/http/dialogs/create_stream.html:193
 msgid "Subtitle codec"
-msgstr ""
+msgstr "Kodek titulků"
 
 #: share/lua/http/dialogs/create_stream.html:200
 msgid "Output\tmethod"
-msgstr ""
+msgstr "Výstup\tmetoda"
 
 #: share/lua/http/dialogs/create_stream.html:249
 msgid "Multiplexer"
-msgstr ""
+msgstr "Multiplexer"
 
 #: share/lua/http/dialogs/create_stream.html:266
 msgid "Video FPS"
@@ -27474,7 +27506,7 @@ msgstr "FPS videa"
 
 #: share/lua/http/dialogs/create_stream.html:297
 msgid "MUX options"
-msgstr ""
+msgstr "Možnosti MUXu"
 
 #: share/lua/http/dialogs/create_stream.html:303
 msgid "Video scale"
@@ -27487,11 +27519,11 @@ msgstr "Port výstupu"
 
 #: share/lua/http/dialogs/create_stream.html:338
 msgid "Output\tfile"
-msgstr ""
+msgstr "Výstup\tsoubor"
 
 #: share/lua/http/dialogs/create_stream.html:355
 msgid "Input media"
-msgstr ""
+msgstr "Vstupní média"
 
 #: share/lua/http/dialogs/create_stream.html:367
 msgid "Error:"
@@ -27553,15 +27585,15 @@ msgstr "Skrýt/zobrazit knihovnu"
 
 #: share/lua/http/index.html:235
 msgid "Hide / Show Viewer"
-msgstr ""
+msgstr "Skrýt / zobrazit prohlížeč"
 
 #: share/lua/http/index.html:236
 msgid "Manage Streams"
-msgstr ""
+msgstr "Správa proudů"
 
 #: share/lua/http/index.html:237
 msgid "Track Synchronisation"
-msgstr ""
+msgstr "Synchronizace stop"
 
 #: share/lua/http/index.html:239
 msgid "VLM Batch Commands"
@@ -27577,7 +27609,7 @@ msgstr "Prázdný seznam skladeb"
 
 #: share/lua/http/index.html:262
 msgid "Queue Selected"
-msgstr ""
+msgstr "Zařadit výběr do fronty"
 
 #: share/lua/http/index.html:263
 msgid "Play Selected"
@@ -27613,6 +27645,8 @@ msgid ""
 "By creating a stream, the <i>Main Controls</i> will operate the stream "
 "instead of the main interface."
 msgstr ""
+"Po vytvoření proudu bude proud řízen <i>Hlavním ovládáním</i>namísto "
+"normálního rozhraní."
 
 #: share/lua/http/index.html:291
 msgid ""
@@ -27630,7 +27664,7 @@ msgstr ""
 #: share/lua/http/index.html:296
 msgid ""
 "Volume will be controlled by the player, and not the <i>Main Controls</i>."
-msgstr ""
+msgstr "Hlasitost bude řízena přehrávačem a nikoli <i>Hlavním ovládáním</i>."
 
 #: share/lua/http/index.html:299
 msgid ""
@@ -27638,12 +27672,16 @@ msgid ""
 "item, the first selected item from the <i>Library</i> will be the subject of "
 "the stream."
 msgstr ""
+"Právě přehrávaná položka bude streamována. Pokud se právě žádná položka "
+"nepřehrává, bude se streamovat první vybraná položka z <i>Knihovny</i>."
 
 #: share/lua/http/index.html:302
 msgid ""
 "To stop the stream and resume normal controls, click the <i>Open Stream</i> "
 "button again."
 msgstr ""
+"Pro zastavení proudu a návrat k normálnímu ovládání, klikněte znovu na "
+"tlačítko <i>Otevřít proud</i>"
 
 #: share/lua/http/index.html:305
 msgid "Are you sure you wish to create the stream?"
@@ -27713,7 +27751,7 @@ msgstr "Čas zahájení"
 
 #: modules/gui/qt/ui/open.h:272
 msgid "Stop Time"
-msgstr ""
+msgstr "Čas zastavení"
 
 #: modules/gui/qt/ui/open.h:273
 msgid "Edit Options"
@@ -27733,7 +27771,7 @@ msgstr "Vyberte soubor"
 
 #: modules/gui/qt/ui/open.h:283
 msgid "Change the start time for the media"
-msgstr ""
+msgstr "Změnit čas počátku pro média"
 
 #: modules/gui/qt/ui/open.h:285 modules/gui/qt/ui/open.h:289
 msgid "HH'H':mm'm':ss's'.zzz"
@@ -27741,7 +27779,7 @@ msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:287
 msgid "Change the stop time for the media"
-msgstr ""
+msgstr "Změnit čas zastavení pro média"
 
 #: modules/gui/qt/ui/open.h:290
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27838,11 +27876,11 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:701
 msgid "FLAC"
-msgstr ""
+msgstr "FLAC"
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "MP&4/MOV"
-msgstr ""
+msgstr "MP&4/MOV"
 
 #: modules/gui/qt/ui/profiles.h:703
 msgid "Ogg/Ogm"
@@ -27850,11 +27888,11 @@ msgstr "Ogg/Ogm"
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "M&KV"
-msgstr ""
+msgstr "M&KV"
 
 #: modules/gui/qt/ui/profiles.h:705
 msgid "M&JPEG"
-msgstr ""
+msgstr "M&JPEG"
 
 #: modules/gui/qt/ui/profiles.h:706
 msgid "MPEG-PS"
@@ -27862,7 +27900,7 @@ msgstr "MPEG-PS"
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "F&LV"
-msgstr ""
+msgstr "F&LV"
 
 #: modules/gui/qt/ui/profiles.h:708
 msgid "&MPEG-TS"
@@ -27962,7 +28000,7 @@ msgstr "&Název profilu"
 
 #: modules/gui/qt/ui/sout.h:202
 msgid "Set up media sources to stream"
-msgstr ""
+msgstr "Vybrat zdroj média pro streamování"
 
 #: modules/gui/qt/ui/sout.h:204
 msgid "Destination Setup"
@@ -27970,7 +28008,7 @@ msgstr "Nastavení cíle"
 
 #: modules/gui/qt/ui/sout.h:205
 msgid "Select destinations to stream to"
-msgstr ""
+msgstr "Vybrat cíle, kam se bude streamovat"
 
 #: modules/gui/qt/ui/sout.h:206
 msgid ""
