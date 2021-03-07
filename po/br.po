@@ -1,5 +1,5 @@
 # Breton translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -9,7 +9,7 @@
 # Irriep Nala Novram <allannkorh@yahoo.fr>, 2016-2020
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
 "PO-Revision-Date: 2020-03-13 09:47+0100\n"
