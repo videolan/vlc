@@ -1,10 +1,11 @@
 # Hindi translation
-# Copyright (C) 2020 VideoLAN
+# Copyright (C) 2021 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Avinash Kumar Dasoundhi <avi.avinash3008@gmail.com>, 2013
 # AnandVivek, 2015
+# Bashishtha Narayan Singh <bashishtha.singh@gmail.com>, 2021
 # Chandan kumar <chandankumar.093047@gmail.com>, 2012
 # DheerendraRathor <dheeru.rathor14@gmail.com>, 2015
 # Gaurav Kumar <aavrug@gmail.com>, 2012
@@ -17,11 +18,12 @@
 # Tarsem singh <tarsemsinghtarsemsingh@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.9\n"
+"Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2021-03-07 08:35+0100\n"
+"Last-Translator: Bashishtha Narayan Singh <bashishtha.singh@gmail.com>, "
+"2021\n"
 "Language-Team: Hindi (https://www.transifex.com/yaron/teams/16553/hi/)\n"
 "Language: hi\n"
 "MIME-Version: 1.0\n"
@@ -36,10 +38,10 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
-"यह प्रोग्राम किसी प्रकार की वारंटी  के साथ नहीं आता है, कानून द्वारा अनुमत सीमा तक।\n"
+"यह प्रोग्राम कानून द्वारा अनुमत सीमा तक, किसी प्रकार की वारंटी  के साथ नहीं आता है.\n"
 "आप इसे GNU जनरल पब्लिक लाइसेंस की शर्तों के अंतर्गत पुनर्वितरित कर सकते हैं;\n"
-"विवरण के लिए COPYING नाम का फ़ाइल देखें।\n"
-"VideoLAN टीम द्वारा लिखित, AUTHORS फ़ाइल देखें।\n"
+"विवरण के लिए COPYING नाम का फ़ाइल देखें.\n"
+"VideoLAN टीम द्वारा लिखित, AUTHORS फ़ाइल देखें.\n"
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
@@ -47,7 +49,7 @@ msgstr "VLC वरीयताएँ"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
-msgstr "सभी विकल्पों को देखने के लिए \"उन्नत विकल्प\" का चयन करें।"
+msgstr "सभी विकल्पों को देखने के लिए \"उन्नत विकल्प\" का चयन करें."
 
 #: include/vlc_config_cat.h:38
 #: modules/gui/macosx/VLCSimplePrefsController.m:233
@@ -115,7 +117,7 @@ msgstr "फ़िल्टर्स"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio filters are used to process the audio stream."
-msgstr "ऑडियो स्ट्रीम को संसाधित करने के लिए ऑडियो फिल्टर का उपयोग किया जाता है।"
+msgstr "ऑडियो स्ट्रीम को संसाधित करने के लिए ऑडियो फिल्टर का उपयोग किया जाता है."
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
@@ -137,17 +139,17 @@ msgstr "आउटपुट मॉड्यूल"
 
 #: include/vlc_config_cat.h:67
 msgid "General settings for audio output modules."
-msgstr "ऑडियो आउटपुट मॉड्यूल के लिए सामान्य सेटिंग्से।"
+msgstr "ऑडियो आउटपुट मॉड्यूल के लिए सामान्य सेटिंग्स."
 
 #: include/vlc_config_cat.h:69 src/libvlc-module.c:2027
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:196
 #: modules/stream_out/transcode/transcode.c:211
 msgid "Miscellaneous"
-msgstr "प्रकीर्ण"
+msgstr "विविध"
 
 #: include/vlc_config_cat.h:70
 msgid "Miscellaneous audio settings and modules."
-msgstr "प्रकीर्ण ऑडियो सेटिंग्स और मॉड्यूल।"
+msgstr "विविध ऑडियो सेटिंग्स और मॉड्यूल."
 
 #: include/vlc_config_cat.h:73 src/input/es_out.c:3164 src/libvlc-module.c:142
 #: src/libvlc-module.c:1551 modules/access/imem.c:64
@@ -176,11 +178,11 @@ msgstr "सामान्य वीडियो सेटिंग्स"
 
 #: include/vlc_config_cat.h:79
 msgid "General settings for video output modules."
-msgstr ""
+msgstr "वीडियो आउटपुट मॉड्यूल के लिए सामान्य सेटिंग्स."
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
-msgstr "वीडियो स्ट्रीम को संसाधित करने के लिए वीडियो फ़िल्टर्स का उपयोग किया जाता है।"
+msgstr "वीडियो स्ट्रीम को संसाधित करने के लिए वीडियो फ़िल्टर्स का उपयोग किया जाता है."
 
 #: include/vlc_config_cat.h:84
 msgid "Subtitles / OSD"
@@ -193,11 +195,11 @@ msgstr "ऑन-स्क्रीन-प्रदर्शन, उपशीर�
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
-msgstr ""
+msgstr "स्प्लीटर्स"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr ""
+msgstr "वीडियो स्प्लिटर्स स्ट्रीम को कई वीडियो में अलग करता है."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
@@ -216,12 +218,12 @@ msgid ""
 "Settings related to the various access methods. Common settings you may want "
 "to alter are HTTP proxy or caching settings."
 msgstr ""
-" विभिन्न एक्सेस उपयोग के तरीकों से संबंधित सेटिंग्स।सामान्य सेटिंग्स जो आप परिवर्तन करना "
-"चाहते हो HTTP प्रॉक्सी या कैशिंग सेटिंग्स हैं।"
+" विभिन्न प्रवेश के तरीकों से संबंधित सेटिंग्स. सामान्य सेटिंग्स जो आप परिवर्तन करना चाहते हो "
+"वे HTTP प्रॉक्सी या कैशिंग सेटिंग्स हैं."
 
 #: include/vlc_config_cat.h:107
 msgid "Stream filters"
-msgstr "प्रवाह फ़िल्टर्स"
+msgstr "स्ट्रीम फ़िल्टर्स"
 
 #: include/vlc_config_cat.h:109
 msgid ""
@@ -394,13 +396,13 @@ msgstr "सेवाओं की खोज"
 msgid ""
 "Services discovery modules are facilities that automatically add items to "
 "playlist."
-msgstr "सेवाओं की खोज का भाग वो सुविधा हैं जो अपने आप से चीज़ों को गीत-सूची में जोड़ देता है!"
+msgstr "सेवा अन्वेषक मोड्यूल वो सुविधा हैं जो स्वत: चीज़ों को गीत-सूची में जोड़ देता है."
 
 #: include/vlc_config_cat.h:184 src/libvlc-module.c:1862
 #: modules/gui/qt/dialogs/extended.cpp:93
 #: modules/gui/qt/ui/video_effects.h:1307
 msgid "Advanced"
-msgstr "विस्तृत"
+msgstr "उन्नत"
 
 #: include/vlc_config_cat.h:185
 msgid "Advanced settings. Use with care..."
@@ -412,11 +414,11 @@ msgstr "विस्तृत सेटिंग"
 
 #: include/vlc_intf_strings.h:46
 msgid "&Open File..."
-msgstr ""
+msgstr "फ़ाइल खोलें ... (&O)"
 
 #: include/vlc_intf_strings.h:47
 msgid "&Advanced Open..."
-msgstr "&उन्नत खुला..."
+msgstr "&उन्नत खोलें...(&A)"
 
 #: include/vlc_intf_strings.h:48
 msgid "Open D&irectory..."
@@ -456,15 +458,15 @@ msgstr "विशिष्ट समय के लिए कूदें"
 
 #: include/vlc_intf_strings.h:59
 msgid "Custom &Bookmarks"
-msgstr ""
+msgstr "कस्टम बुकमार्क्स"
 
 #: include/vlc_intf_strings.h:60
 msgid "&VLM Configuration"
-msgstr "& VLM विन्यास"
+msgstr "&VLM विन्यास"
 
 #: include/vlc_intf_strings.h:62
 msgid "&About"
-msgstr "& के बारे में"
+msgstr " परिचय (&A)"
 
 #: include/vlc_intf_strings.h:65 modules/control/oldrc.c:70
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
@@ -501,7 +503,7 @@ msgstr "पुनर्नामित निर्देशिका..."
 
 #: include/vlc_intf_strings.h:71
 msgid "Rename Folder..."
-msgstr ""
+msgstr "फ़ोल्डर नाम बदलें..."
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
@@ -599,6 +601,29 @@ msgid ""
 "code. You can also give funds and material to help us. And of course, you "
 "can <b>promote</b> VLC media player.</p></body></html>"
 msgstr ""
+"<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
+"charset=utf-8\" /></head><body><h2>VLC मीडिया प्लेयर  की मदद</h2><h3> प्रलेखन</"
+"h3> में आपका स्वागत है. <p>आप VideoLAN की <a href=\"http://wiki.videolan.org"
+"\">विकी</a> वेबसाइट पर VLC प्रलेखन पा सकते हैं. यदि आप VLC मीडिया प्लेयर के लिए एक "
+"नवागंतुक हैं, तो कृपया <br><a href=\"http://wiki.videolan.org/Documentation:"
+"VLC_for_dummies\"><em>VLC मीडिया प्लेयर के लिए प्रस्तावना</em></a><p><p> पढ़ें. आपको "
+"प्लेअर को <br><a href=\"http://wiki.videolan.org/Documentation:Play_HowTo"
+"\"><em>\"VLC मीडिया प्लेयर में फाइलों को कैसे चलाएं\"</em></a> प्रलेखन में उपयोग करने के "
+"लिए कुछ जानकारी मिलेगी.</p><p> सभी सेविंग, कन्वर्सेशन, ट्रांसकोडिंग, एन्कोडिंग, मक्सिंग और "
+"स्ट्रीमिंग टास्क के लिए, आपको <a href=\"http://wiki.videolan.org/Documentation:"
+"Streaming_HowTo\">स्ट्रीमिंग डॉक्यूमेंटेशन</a> में उपयोगी जानकारी मिलनी चाहिए. </"
+"p><p>यदि आप शब्दावली के बारे में अनिश्चित हैं, तो कृपया <a href=\"http://wiki."
+"videolan.org/Knowledge_Base\">नॉलेज बेस</a> से परामर्श लें.</p><p> मुख्य कीबोर्ड "
+"शॉर्टकट को समझने के लिए, <a href=\"http://wiki.videolan.org/Hotkeys\">शॉर्टकट</"
+"a> पेज पढ़ें. <h3>मदद</h3> कोई प्रश्न पूछने से पहले, कृपया  <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a> में संदर्भ लें. <p><p>आप <a href=\"http://"
+"forum.videolan.org\">फ़ोरम</a>, <a href=\"http://www.videolan.org/vlc/lists."
+"html\">मेलिंग-सूचियों</a>  हमारे IRC चैनल (<em>#videolan</em> या irc.freenode."
+"net ) पर सहायता प्राप्त कर सकते हैं (और दे सकते हैं). </p><h3>परियोजना में सहयोग करें </"
+"h3>आप वीडियोलैन परियोजना को समुदाय को मदद करने, खाल डिजाइन करने, प्रलेखन का अनुवाद "
+"करने, परीक्षण करने और कोड करने के लिए अपना कुछ समय दे सकते हैं. आप हमारी सहायता के लिए "
+"धन और सामग्री भी दे सकते हैं. और हां, आप वीएलसी मीडिया प्लेयर को <b>बढ़ावा</b> दे सकते "
+"हैं.<p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -630,7 +655,7 @@ msgstr "स्पेक्ट्रम"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "VU मीटर"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -648,11 +673,11 @@ msgstr "स्टीरियो ऑडियो मोड"
 #: src/audio_output/output.c:419 modules/access/v4l2/v4l2.c:267
 #: modules/audio_output/alsa.c:76
 msgid "Mono"
-msgstr ""
+msgstr "मोनो"
 
 #: src/audio_output/output.c:425
 msgid "Original"
-msgstr ""
+msgstr "मौलिक"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -704,7 +729,7 @@ msgstr "रिवर्स स्टेरीयो"
 #: src/audio_output/output.c:460 src/libvlc-module.c:198
 #: modules/audio_filter/equalizer_presets.h:55
 msgid "Headphones"
-msgstr ""
+msgstr "हेडफ़ोन्स"
 
 #: src/config/core.c:370 modules/access/dtv/access.c:93
 #: modules/access/dtv/access.c:108 modules/access/dtv/access.c:117
@@ -771,14 +796,44 @@ msgid ""
 "  vlc://quit                     Special item to quit VLC\n"
 "\n"
 msgstr ""
+"उपयोग: %s [विकल्प] [स्ट्रीम] ...\n"
+"आप कमांडलाइन पर कई स्ट्रीम निर्दिष्ट कर सकते हैं.\n"
+"उन्हें प्लेलिस्ट में क्रमश: जोड़ा जाएगा.\n"
+"निर्दिष्ट पहला आइटम पहले बजाया जाएगा.\n"
+"\n"
+"विकल्प-शैली: \n"
+"  --विकल्प  एक वैश्विक विकल्प जो कार्यक्रम की अवधि के लिए निर्धारित है.\n"
+"   -विकल्प  एक वैश्विक --विकल्प का एक अक्षरीय संस्करण\n"
+"   :विकल्प एक विकल्प जो केवल स्ट्रीम से पहले सीधे लागू होता है\n"
+"              और जो पिछली सेटिंग्स को ओवरराइड करता है.\n"
+" स्ट्रीम MRL सिंटैक्स:\n"
+"  [[access][/demux]://]URL[#[title][:chapter][-[title][:chapter]]]\n"
+"   [:विकल्प=मूल्य ...]\n"
+"\n"
+"  कई वैश्विक --विकल्प को भी एमआरएल विशिष्ट :विकल्प के रूप में इस्तेमाल किया जा सकता है.\n"
+"  अनेक :विकल्प=मूल्य जोड़े निर्दिष्ट किए जा सकते हैं.\n"
+"URL सिंटैक्स:\n"
+" file:///path/file            सादा मीडिया फ़ाइल\n"
+" http://host[:port]/file     HTTP URL\n"
+" ftp://host[:port]/file       FTP URL\n"
+" mms://host[:port]/file       MMS URL\n"
+" स्क्रीन://                         स्क्रीन कैप्चर\n"
+" डीवीडी://[device]               डीवीडी डिवाइस\n"
+" vcd://[device]                    VCD डिवाइस\n"
+" सीडीडीए://[device]            ऑडियो सीडी डिवाइस\n"
+" udp://[[<source address>]@[<bind address>][:<bind port>]]\n"
+"                                  स्ट्रीमिंग सर्वर द्वारा भेजा गया UDP स्ट्रीम \n"
+" vlc://pause: <seconds>              एक निश्चित समय के लिए प्लेलिस्ट को रोकें \n"
+" vlc://quit                       वीएलसी छोड़ने के लिए विशेष आइटम \n"
+"\n"
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr ""
+msgstr "(आरंभिक सक्षम)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr ""
+msgstr "(आरंभिक अक्षम)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -793,8 +848,8 @@ msgstr "उन्नत विकल्प देखने के लिए अ�
 msgid "%u module was not displayed because it only has advanced options.\n"
 msgid_plural ""
 "%u modules were not displayed because they only have advanced options.\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%uमॉड्यूल प्रदर्शित नहीं किया गया क्योंकि इसके पास केवल उन्नत विकल्प हैं.\n"
+msgstr[1] "%uमॉड्यूल प्रदर्शित नहीं किए गए क्योंकि उनके पास केवल उन्नत विकल्प हैं.\n"
 
 #: src/config/help.c:663
 msgid ""
@@ -825,6 +880,8 @@ msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
+"\n"
+"vlc-help.txt फ़ाइल में डाली गई सामग्री.\n"
 
 #: src/config/help.c:768
 msgid ""
@@ -849,20 +906,20 @@ msgstr "इस कोडेक के लिए कोई विवरण नह
 
 #: src/input/decoder.c:1892
 msgid "Codec not supported"
-msgstr ""
+msgstr "कोडेक समर्थित नहीं है"
 
 #: src/input/decoder.c:1893
 #, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr ""
+msgstr "VLC  \"%4.4s\" (%s) प्रारूप को डिकोड नहीं कर सका"
 
 #: src/input/decoder.c:1897
 msgid "Unidentified codec"
-msgstr ""
+msgstr "अज्ञात कोडेक"
 
 #: src/input/decoder.c:1898
 msgid "VLC could not identify the audio or video codec"
-msgstr ""
+msgstr "VLC ऑडियो या वीडियो कोडेक की पहचान नहीं कर सका"
 
 #: src/input/decoder.c:1909
 msgid "packetizer"
@@ -920,7 +977,7 @@ msgstr "हाँ"
 #: src/input/es_out.c:2141
 #, c-format
 msgid "DTVCC Closed captions %u"
-msgstr ""
+msgstr "DTVCC तालाबंद उपशीर्षक %u"
 
 #: src/input/es_out.c:2143
 #, c-format
@@ -1008,11 +1065,11 @@ msgstr "%.2f डेसिबेल"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr "वीडियो रिज़ोल्यूशन"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
-msgstr ""
+msgstr "बफर आयाम"
 
 #: src/input/es_out.c:3183 src/input/es_out.c:3186 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1030,83 +1087,83 @@ msgstr "डीकोड प्रारूप"
 
 #: src/input/es_out.c:3199
 msgid "Top left"
-msgstr ""
+msgstr "ऊपर बाएं "
 
 #: src/input/es_out.c:3199
 msgid "Left top"
-msgstr ""
+msgstr "बाएँ ऊपर"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr ""
+msgstr "बाएँ नीचे"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
-msgstr ""
+msgstr "ऊपर दाएँ"
 
 #: src/input/es_out.c:3201
 msgid "Bottom left"
-msgstr ""
+msgstr "नीचे बाएँ"
 
 #: src/input/es_out.c:3201
 msgid "Bottom right"
-msgstr ""
+msgstr "नीचे दाएँ"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
-msgstr ""
+msgstr "बाएँ नीचे"
 
 #: src/input/es_out.c:3202
 msgid "Right top"
-msgstr ""
+msgstr "दाएँ ऊपर"
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
-msgstr ""
+msgstr "अभिमुखता"
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
 #: modules/access/dtv/access.c:77 modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
-msgstr ""
+msgstr "अपरिभाषित"
 
 #: src/input/es_out.c:3212
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 लकीरें, 60 Hz)"
 
 #: src/input/es_out.c:3214
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 लकीरें, 50 Hz)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
-msgstr ""
+msgstr "प्राथमिक रंग"
 
 #: src/input/es_out.c:3229 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Linear"
-msgstr ""
+msgstr "रैखिक"
 
 #: src/input/es_out.c:3236
 msgid "Hybrid Log-Gamma"
-msgstr ""
+msgstr "हाइब्रिड लॉग-गामा"
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
-msgstr ""
+msgstr "रंग हस्तांतरण फ़क्शन"
 
 #: src/input/es_out.c:3253
 msgid "Color space"
-msgstr ""
+msgstr "रंग प्रसार"
 
 #: src/input/es_out.c:3253
 #, c-format
 msgid "%s Range"
-msgstr ""
+msgstr "%s सीमा"
 
 #: src/input/es_out.c:3255
 msgid "Full"
-msgstr ""
+msgstr "पूरा"
 
 #: src/input/es_out.c:3262 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1121,83 +1178,83 @@ msgstr "मध्य"
 
 #: src/input/es_out.c:3263
 msgid "Top Left"
-msgstr ""
+msgstr "ऊपरी बाएं"
 
 #: src/input/es_out.c:3264
 msgid "Top Center"
-msgstr ""
+msgstr "ऊपरी मध्य"
 
 #: src/input/es_out.c:3265
 msgid "Bottom Left"
-msgstr ""
+msgstr "निचला बाएं"
 
 #: src/input/es_out.c:3266
 msgid "Bottom Center"
-msgstr ""
+msgstr "निचला मध्य"
 
 #: src/input/es_out.c:3270
 msgid "Chroma location"
-msgstr ""
+msgstr "क्रोमा स्थान"
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
-msgstr ""
+msgstr "आयताकार"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
-msgstr ""
+msgstr "समआयताकार"
 
 #: src/input/es_out.c:3285
 msgid "Cubemap"
-msgstr ""
+msgstr "क्यूबमैप"
 
 #: src/input/es_out.c:3291
 msgid "Projection"
-msgstr ""
+msgstr "प्रक्षेपण"
 
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "विचलन (Yaw)"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "स्वरमान"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "रॉल"
 
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "दृश्य क्षेत्र"
 
 #: src/input/es_out.c:3305
 msgid "Max. luminance"
-msgstr ""
+msgstr "अधिकतम चमक"
 
 #: src/input/es_out.c:3310
 msgid "Min. luminance"
-msgstr ""
+msgstr "न्यूनतम चमक"
 
 #: src/input/es_out.c:3318
 msgid "Primary R"
-msgstr ""
+msgstr "प्राथमिक R"
 
 #: src/input/es_out.c:3325
 msgid "Primary G"
-msgstr ""
+msgstr "प्राथमिक G"
 
 #: src/input/es_out.c:3332
 msgid "Primary B"
-msgstr ""
+msgstr "प्राथमिक B"
 
 #: src/input/es_out.c:3339
 msgid "White point"
-msgstr ""
+msgstr "श्वेत बिंदु"
 
 #: src/input/es_out.c:3354 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1206,7 +1263,7 @@ msgstr "उपशीर्षक"
 #: src/input/input.c:1821 modules/control/hotkeys.c:1512
 #, c-format
 msgid "Volume %ld%%"
-msgstr ""
+msgstr "वॉल्यूम %ld%%"
 
 #: src/input/input.c:2725
 msgid "Your input can't be opened"
@@ -1299,7 +1356,7 @@ msgstr "निर्देशक "
 
 #: src/input/meta.c:75
 msgid "Season"
-msgstr ""
+msgstr "सत्र"
 
 #: src/input/meta.c:76
 msgid "Episode"
@@ -1315,11 +1372,11 @@ msgstr "अभिनेता"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 msgid "Album Artist"
-msgstr ""
+msgstr "ऐल्बम कलाकार"
 
 #: src/input/meta.c:80
 msgid "Disc number"
-msgstr ""
+msgstr "डिस्क क्रमांक"
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1361,11 +1418,11 @@ msgstr "पिछला शीर्षक"
 
 #: src/input/var.c:278
 msgid "Menu title"
-msgstr ""
+msgstr "मेनू शीर्षक"
 
 #: src/input/var.c:285
 msgid "Menu popup"
-msgstr ""
+msgstr "मेनू पॉपअप"
 
 #: src/input/var.c:319
 #, c-format
@@ -1478,6 +1535,9 @@ msgid ""
 "list of interface modules. (common values are \"rc\" (remote control), \"http"
 "\", \"gestures\" ...)"
 msgstr ""
+"आप वीएलसी के लिए \"अतिरिक्त इंटरफेस\" का चयन कर सकते हैं। उन्हें डिफ़ॉल्ट इंटरफ़ेस के अलावा "
+"पृष्ठभूमि में लॉन्च किया जाएगा। इंटरफ़ेस मॉड्यूल की विसर्ग से पृथक सूची का उपयोग करें। "
+"(सामान्य मूल्य \"आरसी\" (रिमोट कंट्रोल), \"http\", \"इशारे\" ...) "
 
 #: src/libvlc-module.c:83
 msgid "You can select control interfaces for VLC."
@@ -2611,7 +2671,7 @@ msgstr ""
 
 #: src/libvlc-module.c:646 modules/gui/qt/ui/sprefs_input.h:362
 msgid "Fast seek"
-msgstr ""
+msgstr "तेज ढूँढ़ना"
 
 #: src/libvlc-module.c:648
 msgid "Favor speed over precision while seeking"
@@ -4468,7 +4528,7 @@ msgstr ""
 #: modules/gui/qt/ui/profiles.h:717 modules/gui/qt/ui/profiles.h:761
 #: modules/gui/qt/ui/profiles.h:764
 msgid "Subtitles"
-msgstr ""
+msgstr "उपशीर्षक"
 
 #: src/libvlc-module.c:1703 modules/stream_out/transcode/transcode.c:116
 msgid "Overlays"
@@ -5789,9 +5849,8 @@ msgid "AVFoundation Audio Capture"
 msgstr ""
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "ऑडियो आउटपुट मॉड्यूल"
+msgstr ""
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6986,7 +7045,7 @@ msgstr ""
 #: modules/gui/qt/dialogs/external.cpp:203 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
 msgid "Username"
-msgstr ""
+msgstr "प्रयोक्ता नाम"
 
 #: modules/access/ftp.c:69 modules/access/rdp.c:66 modules/access/sftp.c:56
 #: modules/access/smb_common.h:22
@@ -10007,7 +10066,7 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Disabled"
-msgstr ""
+msgstr "अक्षम"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled (AC3/DTS only)"
@@ -12190,7 +12249,7 @@ msgstr ""
 
 #: modules/codec/subsdec.c:170
 msgid "Subtitle text encoding"
-msgstr ""
+msgstr "उपशीर्षक टेक्सट एन्कोडिंग"
 
 #: modules/codec/subsdec.c:171
 msgid "Set the encoding used in text subtitles"
@@ -14103,9 +14162,8 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "फ़्रेम विलंब (एमएस)"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
@@ -14161,9 +14219,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "शक्ति मोटा"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -15591,7 +15648,7 @@ msgstr "मिटायें "
 #: modules/gui/macosx/VLCBookmarksWindowController.m:77
 #: modules/gui/macosx/VLCMainMenu.m:366
 msgid "Edit"
-msgstr ""
+msgstr "संपादन"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:82
 #: modules/gui/macosx/VLCBookmarksWindowController.m:88
@@ -22437,9 +22494,8 @@ msgid "Zeroconf services"
 msgstr ""
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "सेवाओं की खोज"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
