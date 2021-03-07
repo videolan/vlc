@@ -45,31 +45,31 @@ msgstr "ניתן לבחור ב„אפשרויות מתקדמות“ כדי לר�
 #: modules/gui/qt/components/simple_preferences.cpp:222
 #: modules/gui/qt/menus.cpp:1090
 msgid "Interface"
-msgstr "מנשק"
+msgstr "ממשק"
 
 #: include/vlc_config_cat.h:39
 msgid "Settings for VLC's interfaces"
-msgstr "הגדרות המנשקים של VLC"
+msgstr "הגדרות הממשקים של VLC"
 
 #: include/vlc_config_cat.h:41
 msgid "Main interfaces settings"
-msgstr "הגדרות המנשקים הראשיים"
+msgstr "הגדרות הממשקים הראשיים"
 
 #: include/vlc_config_cat.h:43
 msgid "Main interfaces"
-msgstr "מנשקים ראשיים"
+msgstr "ממשקים ראשיים"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for the main interface"
-msgstr "הגדרות למנשק הראשי"
+msgstr "הגדרות לממשק הראשי"
 
 #: include/vlc_config_cat.h:46 src/libvlc-module.c:81
 msgid "Control interfaces"
-msgstr "מנשקי שליטה"
+msgstr "ממשקי שליטה"
 
 #: include/vlc_config_cat.h:47
 msgid "Settings for VLC's control interfaces"
-msgstr "הגדרות למנשקי השליטה של VLC"
+msgstr "הגדרות לממשקי השליטה של VLC"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
 #: modules/gui/macosx/VLCSimplePrefsController.m:230
@@ -1464,7 +1464,7 @@ msgstr "מדיה: %s"
 #: src/interface/interface.c:82 modules/gui/macosx/VLCMainMenu.m:337
 #: modules/gui/macosx/VLCMainMenu.m:338
 msgid "Add Interface"
-msgstr "הוספת מנשק"
+msgstr "הוספת ממשק"
 
 #: src/interface/interface.c:89
 msgid "Console"
@@ -1527,25 +1527,25 @@ msgid ""
 "select the main interface, additional interface modules, and define various "
 "related options."
 msgstr ""
-"האפשרויות הללו מאפשרות לך להגדיר את מנשקי המשתמש בהם נעשה שימוש על ידי VLC. "
-"ניתן לבחור את המנשק הראשי, מודלים של מנשקים נוספים, ולהגדיר מגוון אפשרויות "
+"האפשרויות הללו מאפשרות לך להגדיר את ממשקי המשתמש בהם נעשה שימוש על ידי VLC. "
+"ניתן לבחור את הממשק הראשי, מודלים של ממשקים נוספים, ולהגדיר מגוון אפשרויות "
 "שונות."
 
 #: src/libvlc-module.c:68
 msgid "Interface module"
-msgstr "מודול מנשק"
+msgstr "מודול ממשק"
 
 #: src/libvlc-module.c:70
 msgid ""
 "This is the main interface used by VLC. The default behavior is to "
 "automatically select the best module available."
 msgstr ""
-"זהו מנשק המשתמש הראשי בו נעשה שימוש ע״י VLC. ההתנהגות הטבעית היא לבחור באופן "
+"זהו ממשק המשתמש הראשי בו נעשה שימוש ע״י VLC. ההתנהגות הטבעית היא לבחור באופן "
 "אוטומטי את המודול הטוב ביותר הזמין."
 
 #: src/libvlc-module.c:74 modules/control/ntservice.c:59
 msgid "Extra interface modules"
-msgstr "מודלי מנשק נוספים"
+msgstr "מודלי ממשק נוספים"
 
 #: src/libvlc-module.c:76
 msgid ""
@@ -1557,7 +1557,7 @@ msgstr ""
 
 #: src/libvlc-module.c:83
 msgid "You can select control interfaces for VLC."
-msgstr "ניתן לבחור מנשקי שליטה ל־VLC"
+msgstr "ניתן לבחור ממשקי שליטה ל־VLC"
 
 #: src/libvlc-module.c:85
 msgid "Verbosity (0,1,2)"
@@ -1601,19 +1601,19 @@ msgid ""
 "When this is enabled, the preferences and/or interfaces will show all "
 "available options, including those that most users should never touch."
 msgstr ""
-"כאשר אפשרות זא פעילה, ההעדפות ו/או המנשקים יציגו את כל האפשרויות הזמינות, "
+"כאשר אפשרות זא פעילה, ההעדפות ו/או הממשקים יציגו את כל האפשרויות הזמינות, "
 "לרבות אלה שרוב המשתמשים לא נוגעים בהן בדרך כלל."
 
 #: src/libvlc-module.c:105
 msgid "Interface interaction"
-msgstr "אינטראקציה עם המנשק"
+msgstr "אינטראקציה עם הממשק"
 
 #: src/libvlc-module.c:107
 msgid ""
 "When this is enabled, the interface will show a dialog box each time some "
 "user input is required."
 msgstr ""
-"כאשר אפשרות זאת פעילה, המנשק יציג תיבת דו־שיח בכל פעם שנדרש קלט מהמשתמש."
+"כאשר אפשרות זאת פעילה, הממשק יציג תיבת דו־שיח בכל פעם שנדרש קלט מהמשתמש."
 
 #: src/libvlc-module.c:117
 msgid ""
@@ -1956,7 +1956,7 @@ msgid ""
 "Custom title for the video window (in case the video is not embedded in the "
 "interface)."
 msgstr ""
-"כותרת בהתאמה אישית של חלון הווידאו (במידה שהווידאו לא מוטמע בתוך המנשק)."
+"כותרת בהתאמה אישית של חלון הווידאו (במידה שהווידאו לא מוטמע בתוך הממשק)."
 
 #: src/libvlc-module.c:288
 msgid "Video alignment"
@@ -2055,7 +2055,7 @@ msgstr "וידאו מוטמע"
 
 #: src/libvlc-module.c:309
 msgid "Embed the video output in the main interface."
-msgstr "הטמעת קטע וידאו זה במנשק הראשי."
+msgstr "הטמעת קטע וידאו זה בממשק הראשי."
 
 #: src/libvlc-module.c:311
 msgid "Fullscreen video output"
@@ -2327,7 +2327,7 @@ msgid ""
 "Comma separated list of crop ratios which will be added in the interface's "
 "crop ratios list."
 msgstr ""
-"רשימה מופרדת בפסיקים של יחסי חיתוך שיתווספו לרשימת יחסי החיתוך של המנשק."
+"רשימה מופרדת בפסיקים של יחסי חיתוך שיתווספו לרשימת יחסי החיתוך של הממשק."
 
 #: src/libvlc-module.c:454
 msgid "Custom aspect ratios list"
@@ -2338,7 +2338,7 @@ msgid ""
 "Comma separated list of aspect ratios which will be added in the interface's "
 "aspect ratio list."
 msgstr ""
-"רשימה מופרדת בפסיקים של יחסי תצוגה שיתווספו לרשימת יחסי החיתוך של המנשק."
+"רשימה מופרדת בפסיקים של יחסי תצוגה שיתווספו לרשימת יחסי החיתוך של הממשק."
 
 #: src/libvlc-module.c:459
 msgid "Fix HDTV height"
@@ -2420,7 +2420,7 @@ msgid ""
 "channel."
 msgstr ""
 "אפשרויות אלה מאפשרות לך לשנות את ההתנהגות של תת־מערכת הקלט, כגון התקני ה־DVD "
-"או ה־VCD, הגדרות מנשק הרשת או ערוץ הכתוביות."
+"או ה־VCD, הגדרות ממשק הרשת או ערוץ הכתוביות."
 
 #: src/libvlc-module.c:505
 msgid "File caching (ms)"
@@ -4505,7 +4505,7 @@ msgstr "מקש בוס"
 
 #: src/libvlc-module.c:1411
 msgid "Hide the interface and pause playback."
-msgstr "הסתרת המנשק והשהיית הנגינה."
+msgstr "הסתרת הממשק והשהיית הנגינה."
 
 #: src/libvlc-module.c:1412
 msgid "Context menu"
@@ -9893,7 +9893,7 @@ msgstr ""
 #: modules/audio_filter/scaletempo.c:52
 #, fuzzy
 msgid "Pitch Shifter"
-msgstr "מנשק Qt"
+msgstr "ממשק Qt"
 
 #: modules/audio_filter/scaletempo.c:53
 #, fuzzy
@@ -13652,7 +13652,7 @@ msgstr "DBus"
 
 #: modules/control/dbus/dbus.c:138
 msgid "D-Bus control interface"
-msgstr "מנשק שליטת D-Bus"
+msgstr "ממשק שליטת D-Bus"
 
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
 #: modules/gui/macosx/VLCMainWindow.m:669
@@ -13687,7 +13687,7 @@ msgstr ""
 
 #: modules/control/dummy.c:53
 msgid "Dummy interface"
-msgstr "מנשק דמה"
+msgstr "ממשק דמה"
 
 #: modules/control/gestures.c:73
 msgid "Motion threshold (10-100)"
@@ -13715,7 +13715,7 @@ msgstr "מחוות"
 
 #: modules/control/gestures.c:96
 msgid "Mouse gestures control interface"
-msgstr "מנשק שליטה באמצעות העכבר"
+msgstr "ממשק שליטה באמצעות העכבר"
 
 #: modules/control/globalhotkeys/win32.c:47
 #: modules/control/globalhotkeys/xcb.c:50
@@ -13726,7 +13726,7 @@ msgstr "מקשי קיצור גלובליים"
 #: modules/control/globalhotkeys/win32.c:50
 #: modules/control/globalhotkeys/xcb.c:53
 msgid "Global Hotkeys interface"
-msgstr "מנשק מקשי קיצור גלובליים"
+msgstr "ממשק מקשי קיצור גלובליים"
 
 #: modules/control/hotkeys.c:100
 #: modules/gui/macosx/VLCSimplePrefsController.m:230
@@ -13737,7 +13737,7 @@ msgstr "קיצורי מקלדת"
 
 #: modules/control/hotkeys.c:101
 msgid "Hotkeys management interface"
-msgstr "מנשק ניהול קיצורי מקלדת"
+msgstr "ממשק ניהול קיצורי מקלדת"
 
 #: modules/control/hotkeys.c:390
 msgid "One"
@@ -13888,7 +13888,7 @@ msgid ""
 "go to the directory where you installed VLC and run \"vlc -I qt\"\n"
 msgstr ""
 "\n"
-"אזהרה: אם אין לך גישה עוד למנשק הגרפי, עליך לפתוח חלון שורת פקודה, לגשת "
+"אזהרה: אם אין לך גישה עוד לממשק הגרפי, עליך לפתוח חלון שורת פקודה, לגשת "
 "לתיקייה בה התקנת את VLC ולהריץ את הפקודה \"vlc -I qt\"\n"
 
 #: modules/control/lirc.c:47
@@ -13909,7 +13909,7 @@ msgstr "אינפרא אדום"
 
 #: modules/control/lirc.c:62
 msgid "Infrared remote control interface"
-msgstr "מנשק שליטה בשלט רחוק"
+msgstr "ממשק שליטה בשלט רחוק"
 
 #: modules/control/motion.c:67
 msgid "motion"
@@ -14008,7 +14008,7 @@ msgstr "שירות NT"
 
 #: modules/control/ntservice.c:68
 msgid "Windows Service interface"
-msgstr "מנשק שירות Windows"
+msgstr "ממשק שירות Windows"
 
 #: modules/control/oldrc.c:69
 msgid "Initializing"
@@ -14070,7 +14070,7 @@ msgstr ""
 
 #: modules/control/oldrc.c:191
 msgid "Remote control interface"
-msgstr "מנשק לשליטה מרחוק"
+msgstr "ממשק לשליטה מרחוק"
 
 #: modules/control/oldrc.c:356
 msgid "Remote control interface initialized. Type `help' for help."
@@ -14407,7 +14407,7 @@ msgstr ""
 #: modules/control/win_msg.c:193
 #, fuzzy
 msgid "Windows messages interface"
-msgstr "מנשק שירות Windows"
+msgstr "ממשק שירות Windows"
 
 #: modules/demux/adaptive/adaptive.cpp:68
 #, fuzzy
@@ -15709,7 +15709,7 @@ msgstr ""
 #: modules/gui/qt/managers/addons_manager.cpp:92
 #, fuzzy
 msgid "Interfaces"
-msgstr "מנשק"
+msgstr "ממשק"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
@@ -16459,7 +16459,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:92
 msgid "Run VLC with dark interface style"
-msgstr "הפעלת VLC עם סגנון מנשק כהה"
+msgstr "הפעלת VLC עם סגנון ממשק כהה"
 
 #: modules/gui/macosx/macosx.m:93
 msgid ""
@@ -16483,7 +16483,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:98 modules/gui/qt/qt.cpp:95
 msgid "Resize interface to the native video size"
-msgstr "שינוי גודל המנשק לגודל הטבעי של הווידאו"
+msgstr "שינוי גודל הממשק לגודל הטבעי של הווידאו"
 
 #: modules/gui/macosx/macosx.m:99 modules/gui/qt/qt.cpp:96
 msgid ""
@@ -16493,9 +16493,9 @@ msgid ""
 " By default, interface resize to the native video size."
 msgstr ""
 "עומדות בפניך שתי אפשרויות:\n"
-" - גודל המנשק ישתנה בהתאם לגודל הטבעי של הווידאו\n"
-" - הווידאו יתאים את עצמו לגודל המנשק\n"
-"כבררת מחדל, המנשק יתאים עצמו לגודל הווידאו הטבעי."
+" - גודל הממשק ישתנה בהתאם לגודל הטבעי של הווידאו\n"
+" - הווידאו יתאים את עצמו לגודל הממשק\n"
+"כבררת מחדל, הממשק יתאים עצמו לגודל הווידאו הטבעי."
 
 #: modules/gui/macosx/macosx.m:104
 #: modules/gui/macosx/VLCSimplePrefsController.m:349 modules/gui/qt/qt.cpp:178
@@ -16620,7 +16620,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:152
 msgid "Mac OS X interface"
-msgstr "מנשק Mac OS X"
+msgstr "ממשק Mac OS X"
 
 #: modules/gui/macosx/macosx.m:159
 msgid "Appearance"
@@ -17537,7 +17537,7 @@ msgstr ""
 #: modules/gui/qt/components/simple_preferences.cpp:669
 #: modules/gui/qt/dialogs/plugins.cpp:375
 msgid "Interface Settings"
-msgstr "הגדרות מנשק"
+msgstr "הגדרות ממשק"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:222
 #: modules/gui/qt/components/simple_preferences.cpp:224
@@ -17663,7 +17663,7 @@ msgstr "הגדרות שמע כלליות"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Interface style"
-msgstr "סגנון המנשק"
+msgstr "סגנון הממשק"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:306
 msgid "Dark"
@@ -17699,12 +17699,12 @@ msgstr "בדיקת עדכונים אוטומטית"
 #: modules/gui/macosx/VLCSimplePrefsController.m:325
 #, fuzzy
 msgid "HTTP web interface"
-msgstr "מנשק"
+msgstr "ממשק"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:326
 #, fuzzy
 msgid "Enable HTTP web interface"
-msgstr "מנשק הניתן לעיצוב"
+msgstr "ממשק הניתן לעיצוב"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:330
 msgid "Default Encoding"
@@ -18313,7 +18313,7 @@ msgstr "בחירה"
 
 #: modules/gui/minimal_macosx/macosx.c:57
 msgid "Minimal Mac OS X interface"
-msgstr "מנשק מזערי ל־Mac OS X"
+msgstr "ממשק מזערי ל־Mac OS X"
 
 #: modules/gui/ncurses.c:71
 msgid "Filebrowser starting point"
@@ -18328,7 +18328,7 @@ msgstr ""
 
 #: modules/gui/ncurses.c:78
 msgid "Ncurses interface"
-msgstr "מנשק Ncurses"
+msgstr "ממשק Ncurses"
 
 #: modules/gui/ncurses.c:771
 #, c-format
@@ -19432,7 +19432,7 @@ msgstr ""
 
 #: modules/gui/qt/components/simple_preferences.cpp:695
 msgid "This is VLC's skinnable interface. You can download other skins at"
-msgstr "זהו מנשק ה־VLC הניתן לעיצוב. ניתן להוריד ערכות עיצוב אחרות ב"
+msgstr "זהו ממשק ה־VLC הניתן לעיצוב. ניתן להוריד ערכות עיצוב אחרות ב"
 
 #: modules/gui/qt/components/simple_preferences.cpp:697
 msgid "VLC skins website"
@@ -20514,7 +20514,7 @@ msgstr "תמיד עליון"
 
 #: modules/gui/qt/menus.cpp:507
 msgid "Mi&nimal Interface"
-msgstr "מנשק מ&זערי"
+msgstr "ממשק מ&זערי"
 
 #: modules/gui/qt/menus.cpp:508
 msgid "Ctrl+H"
@@ -20920,7 +20920,7 @@ msgstr ""
 #: modules/gui/qt/qt.cpp:188
 #, fuzzy
 msgid "When to raise the interface"
-msgstr "הגדרות למנשק הראשי"
+msgstr "הגדרות לממשק הראשי"
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
@@ -20938,7 +20938,7 @@ msgstr "כשהתכנית ממוזערת"
 
 #: modules/gui/qt/qt.cpp:218
 msgid "Qt interface"
-msgstr "מנשק Qt"
+msgstr "ממשק Qt"
 
 #: modules/gui/qt/util/customwidgets.cpp:81
 msgid "errors"
@@ -21042,7 +21042,7 @@ msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:526
 msgid "Skinnable Interface"
-msgstr "מנשק הניתן לעיצוב"
+msgstr "ממשק הניתן לעיצוב"
 
 #: modules/gui/skins2/src/theme_repository.cpp:58
 msgid "Select skin"
@@ -21541,7 +21541,7 @@ msgstr ""
 
 #: modules/lua/vlc.c:49
 msgid "Lua interface"
-msgstr "מנשק Lua"
+msgstr "ממשק Lua"
 
 #: modules/lua/vlc.c:50
 msgid "Lua interface module to load"
@@ -26755,7 +26755,7 @@ msgstr ""
 msgid ""
 "Recommended video output for Windows XP. Incompatible with Vista's Aero "
 "interface"
-msgstr "פלט הווידאו המומלץ ל־Windows XP. אינו תואם למנשק ה־Aero של Vista."
+msgstr "פלט הווידאו המומלץ ל־Windows XP. אינו תואם לממשק ה־Aero של Vista."
 
 #: modules/video_output/win32/directdraw.c:103
 msgid "DirectX (DirectDraw) video output"
@@ -27625,7 +27625,7 @@ msgstr "זמן:"
 #: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
 #: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile_view.html:25
 msgid "VLC media player - Web Interface"
-msgstr "נגן המדיה VLC - מנשק דפדפן"
+msgstr "נגן המדיה VLC - ממשק דפדפן"
 
 #: share/lua/http/index.html:215
 msgid "Hide / Show Library"
@@ -28221,7 +28221,7 @@ msgstr "שימוש במעטפת מותאמת אישית"
 
 #: modules/gui/qt/ui/sprefs_interface.h:534
 msgid "This is VLC's default interface, with a native look and feel."
-msgstr "זהו מנשק בררת המחדל של VLC, בעל מראה ותחושה מקוריים."
+msgstr "זהו ממשק בררת המחדל של VLC, בעל מראה ותחושה מקוריים."
 
 #: modules/gui/qt/ui/sprefs_interface.h:536
 msgid "Use native style"
@@ -28229,7 +28229,7 @@ msgstr "שימוש בסגנון הטבעי"
 
 #: modules/gui/qt/ui/sprefs_interface.h:537
 msgid "Resize interface to video size"
-msgstr "שינוי גודל המנשק כדי שיתאים לגודל הווידאו"
+msgstr "שינוי גודל הממשק כדי שיתאים לגודל הווידאו"
 
 #: modules/gui/qt/ui/sprefs_interface.h:538
 msgid "Show controls in full screen mode"
@@ -28253,7 +28253,7 @@ msgstr "אילוץ סגנון חלון:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
 msgid "Integrate video in interface"
-msgstr "הטמעת הווידאו במנשק"
+msgstr "הטמעת הווידאו בממשק"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Show systray icon"
@@ -28263,7 +28263,7 @@ msgstr "הצגת סמל בשורת המשימות"
 #, fuzzy
 msgid "Auto raising the interface:"
 msgstr ""
-"המנשק בו נעשה שימוש הוא Qt4.\n"
+"הממשק בו נעשה שימוש הוא Qt4.\n"
 "\n"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
@@ -29203,7 +29203,7 @@ msgstr "רשימת מנהל המדיה"
 #~ "You can manually select a language for the interface. The system language "
 #~ "is auto-detected if \"auto\" is specified here."
 #~ msgstr ""
-#~ "ניתן לבחור את שפת המנשק באופן ידני. שפת המערכת תזוהה באופן אוטומטי אם "
+#~ "ניתן לבחור את שפת הממשק באופן ידני. שפת המערכת תזוהה באופן אוטומטי אם "
 #~ "בחירתך תהיה „אוטומטי“"
 
 #~ msgid ""
@@ -30799,7 +30799,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "Show interface"
-#~ msgstr "מנשק Qt"
+#~ msgstr "ממשק Qt"
 
 #, fuzzy
 #~ msgid "Do not display OSD menu on video output"
@@ -31533,7 +31533,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "Telnet Interface"
-#~ msgstr "מנשק"
+#~ msgstr "ממשק"
 
 #, fuzzy
 #~ msgid "Audio output saved volume"
@@ -31649,15 +31649,15 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "HTTP remote control interface"
-#~ msgstr "מנשק לשליטה מרחוק"
+#~ msgstr "ממשק לשליטה מרחוק"
 
 #, fuzzy
 #~ msgid "POSIX signals handling interface"
-#~ msgstr "הגדרות למנשק הראשי"
+#~ msgstr "הגדרות לממשק הראשי"
 
 #, fuzzy
 #~ msgid "VLM remote control interface"
-#~ msgstr "מנשק לשליטה מרחוק"
+#~ msgstr "ממשק לשליטה מרחוק"
 
 #, fuzzy
 #~ msgid "AVI Index"
@@ -31745,7 +31745,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "Interface Settings not saved"
-#~ msgstr "הגדרות מנשק"
+#~ msgstr "הגדרות ממשק"
 
 #, fuzzy
 #~ msgid "An error occured while saving your settings via SimplePrefs (%i)."
@@ -31829,7 +31829,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "Dummy interface function"
-#~ msgstr "מנשק דמה"
+#~ msgstr "ממשק דמה"
 
 #, fuzzy
 #~ msgid "Stats video output function"
@@ -31845,11 +31845,11 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "Lua Interface Module"
-#~ msgstr "מודול מנשק"
+#~ msgstr "מודול ממשק"
 
 #, fuzzy
 #~ msgid "Lua Interface Module (shortcuts)"
-#~ msgstr "מודול מנשק"
+#~ msgstr "מודול ממשק"
 
 #, fuzzy
 #~ msgid "HD1000 video output"
@@ -31897,7 +31897,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "Embed video in interface"
-#~ msgstr "הטמעת הווידאו במנשק"
+#~ msgstr "הטמעת הווידאו בממשק"
 
 #, fuzzy
 #~ msgid "Refresh"
@@ -31957,7 +31957,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "Show interface with mouse"
-#~ msgstr "מודול מנשק"
+#~ msgstr "מודול ממשק"
 
 #, fuzzy
 #~ msgid "Fullscreen-only"
@@ -32009,7 +32009,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "BeOS standard API interface"
-#~ msgstr "הוספת מנשק"
+#~ msgstr "הוספת ממשק"
 
 #, fuzzy
 #~ msgid "Prev Title"
@@ -32081,7 +32081,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "PDA Linux Gtk2+ interface"
-#~ msgstr "מנשק Lua"
+#~ msgstr "ממשק Lua"
 
 #, fuzzy
 #~ msgid "Permissions"
@@ -32248,7 +32248,7 @@ msgstr "רשימת מנהל המדיה"
 #~ "\n"
 #~ "(WinCE interface)\n"
 #~ "\n"
-#~ msgstr "מנשקים ראשיים"
+#~ msgstr "ממשקים ראשיים"
 
 #, fuzzy
 #~ msgid "Compiled by "
@@ -32264,7 +32264,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "WinCE interface"
-#~ msgstr "מנשקים ראשיים"
+#~ msgstr "ממשקים ראשיים"
 
 #, fuzzy
 #~ msgid "Old playlist export"
@@ -32388,7 +32388,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "General interface settings"
-#~ msgstr "הגדרות המנשקים הראשיים"
+#~ msgstr "הגדרות הממשקים הראשיים"
 
 #, fuzzy
 #~ msgid "Other advanced settings"
@@ -32544,7 +32544,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "WinCE interface module"
-#~ msgstr "מודלי מנשק נוספים"
+#~ msgstr "מודלי ממשק נוספים"
 
 #, fuzzy
 #~ msgid "RRD output file"
@@ -32612,7 +32612,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "Undock from Interface"
-#~ msgstr "הוספת מנשק"
+#~ msgstr "הוספת ממשק"
 
 #, fuzzy
 #~ msgid "Ctrl+U"
@@ -32620,7 +32620,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "Add Interfaces"
-#~ msgstr "הוספת מנשק"
+#~ msgstr "הוספת ממשק"
 
 #, fuzzy
 #~ msgid "Get Stream Information"
@@ -32916,7 +32916,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "Show/Hide Interface"
-#~ msgstr "הוספת מנשק"
+#~ msgstr "הוספת ממשק"
 
 #, fuzzy
 #~ msgid "Media &Info..."
@@ -33088,7 +33088,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "General interface setttings"
-#~ msgstr "הגדרות המנשקים הראשיים"
+#~ msgstr "הגדרות הממשקים הראשיים"
 
 #, fuzzy
 #~ msgid "CDDB Extended Data"
@@ -33124,7 +33124,7 @@ msgstr "רשימת מנהל המדיה"
 
 #, fuzzy
 #~ msgid "Control interface settings"
-#~ msgstr "מנשקי שליטה"
+#~ msgstr "ממשקי שליטה"
 
 #, fuzzy
 #~ msgid "&Shuffle Playlist"
@@ -33216,8 +33216,8 @@ msgstr "רשימת מנהל המדיה"
 #~ "You can select the main interface, additional interface modules, and "
 #~ "define various related options."
 #~ msgstr ""
-#~ "האפשרויות הללו מאפשרות לך להגדיר את מנשקי המשתמש בהם נעשה שימוש על ידי "
-#~ "VLC. ניתן לבחור את המנשק הראשי, מודלים של מנשקים נוספים, ולהגדיר מגוון "
+#~ "האפשרויות הללו מאפשרות לך להגדיר את ממשקי המשתמש בהם נעשה שימוש על ידי "
+#~ "VLC. ניתן לבחור את הממשק הראשי, מודלים של ממשקים נוספים, ולהגדיר מגוון "
 #~ "אפשרויות שונות."
 
 #, fuzzy
