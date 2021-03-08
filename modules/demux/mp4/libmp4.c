@@ -2827,7 +2827,7 @@ static int MP4_ReadBox_stsd( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_READBOX_EXIT( 0 );
 
     MP4_GETVERSIONFLAGS( p_box->data.p_lcont );
-    if( p_box->data.p_lcont->i_version != 0 )
+    if( p_box->data.p_lcont->i_version > 1 )
         MP4_READBOX_EXIT( 0 );
     MP4_GET4BYTES( p_box->data.p_lcont->i_entry_count );
 
