@@ -2618,6 +2618,14 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
     if( p_box->data.p_sample_soun->i_qt_version == 1 && i_read >= 16 )
     {
         /* SoundDescriptionV1 */
+
+        if( p_box->data.p_sample_soun->i_sampleratehi == 0x1 && //65536
+            p_box->data.p_sample_soun->i_sampleratelo == 0x0 )  //remainder
+        {
+            /* ISOBMFF sets to 1 << 16, qtff does not */
+            p_box->data.p_sample_soun->i_sampleratehi = 0;
+        }
+
         MP4_GET4BYTES( p_box->data.p_sample_soun->i_sample_per_packet );
         MP4_GET4BYTES( p_box->data.p_sample_soun->i_bytes_per_packet );
         MP4_GET4BYTES( p_box->data.p_sample_soun->i_bytes_per_frame );
