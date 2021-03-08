@@ -439,15 +439,12 @@ static void *Thread( void *p_data )
     struct glspectrum_opengl_vtable *vt = &p_sys->vt;
 
     initOpenGLScene(p_filter);
-    vlc_gl_ReleaseCurrent(gl);
-
     float height[NB_BANDS] = {0};
 
     while ((block = vlc_queue_DequeueKillable(&p_sys->queue, &p_sys->dead)))
     {
         unsigned win_width, win_height;
 
-        vlc_gl_MakeCurrent(gl);
         if (vlc_gl_surface_CheckSize(gl, &win_width, &win_height))
             vt->Viewport(0, 0, win_width, win_height);
 
@@ -573,9 +570,9 @@ static void *Thread( void *p_data )
 release:
         window_close(&wind_ctx);
         fft_close(p_state);
-        vlc_gl_ReleaseCurrent(gl);
         block_Release(block);
     }
+    vlc_gl_ReleaseCurrent(gl);
 
     return NULL;
 }
