@@ -1505,14 +1505,22 @@ static int MP4_ReadBox_urn( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
-static int MP4_ReadBox_LtdContainer( stream_t *p_stream, MP4_Box_t *p_box )
+static int MP4_ReadBox_LtdContainer( stream_t *p_stream, MP4_Box_t *p_box,
+                                     const uint8_t versions[2], size_t i_versions )
 {
     MP4_READBOX_ENTER_PARTIAL( MP4_Box_data_lcont_t, 16, NULL );
     if( i_read < 8 )
         MP4_READBOX_EXIT( 0 );
 
     MP4_GETVERSIONFLAGS( p_box->data.p_lcont );
-    if( p_box->data.p_lcont->i_version != 0 )
+    bool b_version_ok = true;
+    for( size_t i=0; i<i_versions; i++ )
+    {
+        b_version_ok = (p_box->data.p_lcont->i_version == versions[i]);
+        if( b_version_ok )
+            break;
+    }
+    if( !b_version_ok )
         MP4_READBOX_EXIT( 0 );
     MP4_GET4BYTES( p_box->data.p_lcont->i_entry_count );
 
@@ -1545,6 +1553,18 @@ static int MP4_ReadBox_LtdContainer( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_READBOX_EXIT( 0 );
 
     MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_stsd( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    const uint8_t versions[] = {0, 1};
+    return MP4_ReadBox_LtdContainer( p_stream, p_box, versions, 2 );
+}
+
+static int MP4_ReadBox_dref( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    const uint8_t versions[] = {0};
+    return MP4_ReadBox_LtdContainer( p_stream, p_box, versions, 1 );
 }
 
 static void MP4_FreeBox_stts( MP4_Box_t *p_box )
@@ -4493,11 +4513,11 @@ static const struct
     { ATOM_alis,    MP4_ReadBoxSkip,          ATOM_dref },
     { ATOM_url,     MP4_ReadBox_url,          0 },
     { ATOM_urn,     MP4_ReadBox_urn,          0 },
-    { ATOM_dref,    MP4_ReadBox_LtdContainer, 0 },
+    { ATOM_dref,    MP4_ReadBox_dref,         0 },
     { ATOM_stts,    MP4_ReadBox_stts,         ATOM_stbl },
     { ATOM_ctts,    MP4_ReadBox_ctts,         ATOM_stbl },
     { ATOM_cslg,    MP4_ReadBox_cslg,         ATOM_stbl },
-    { ATOM_stsd,    MP4_ReadBox_LtdContainer, ATOM_stbl },
+    { ATOM_stsd,    MP4_ReadBox_stsd,         ATOM_stbl },
     { ATOM_stsz,    MP4_ReadBox_stsz,         ATOM_stbl },
     { ATOM_stsc,    MP4_ReadBox_stsc,         ATOM_stbl },
     { ATOM_stco,    MP4_ReadBox_stco_co64,    ATOM_stbl },
