@@ -439,7 +439,7 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
 
     if (var_InheritURational(obj, &min_it.denominator, &min_it.numerator,
                              CFG_PREFIX"fps") == VLC_SUCCESS)
-        msg_Dbg (obj, " requested frame internal: %"PRIu32"/%"PRIu32,
+        msg_Dbg (obj, " requested frame interval: %"PRIu32"/%"PRIu32,
                  min_it.numerator, min_it.denominator);
     else
         min_it = zero;
