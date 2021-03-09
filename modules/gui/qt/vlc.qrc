@@ -332,6 +332,7 @@
         <file alias="PlayerMenuItem.qml">player/qml/PlayerMenuItem.qml</file>
         <file alias="LanguageMenu.qml">player/qml/LanguageMenu.qml</file>
         <file alias="ButtonsLayout.qml">player/qml/ButtonsLayout.qml</file>
+        <file alias="PlaybackSpeed.qml">player/qml/PlaybackSpeed.qml</file>
     </qresource>
     <qresource prefix="/about">
         <file alias="About.qml">dialogs/help/qml/About.qml</file>

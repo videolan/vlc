@@ -64,6 +64,7 @@ public:
         BUTTON_MAX,
         PLAYER_SWITCH_BUTTON,
         ARTWORK_INFO,
+        PLAYBACK_SPEED_BUTTON,
 
         SPLITTER = 0x20,
         VOLUME,

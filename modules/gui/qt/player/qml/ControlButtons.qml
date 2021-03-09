@@ -26,6 +26,7 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 import "qrc:///util/KeyHelper.js" as KeyHelper
+import "qrc:///util/Helpers.js" as Helpers
 
 Item{
     id: controlButtons
@@ -66,7 +67,8 @@ Item{
         { id:  ControlListModel.WIDGET_SPACER, label: VLCIcons.space, text: i18n.qtr("Spacer")},
         { id:  ControlListModel.WIDGET_SPACER_EXTEND, label: VLCIcons.space, text: i18n.qtr("Expanding Spacer")},
         { id:  ControlListModel.PLAYER_SWITCH_BUTTON, label: VLCIcons.fullscreen, text: i18n.qtr("Switch Player")},
-        { id:  ControlListModel.ARTWORK_INFO, label: VLCIcons.info, text: i18n.qtr("Artwork Info")}
+        { id:  ControlListModel.ARTWORK_INFO, label: VLCIcons.info, text: i18n.qtr("Artwork Info")},
+        { id:  ControlListModel.PLAYBACK_SPEED_BUTTON, label: "1x", text: i18n.qtr("Playback Speed")}
     ]
 
     function returnbuttondelegate(inpID){
@@ -103,6 +105,7 @@ Item{
         case ControlListModel.TELETEXT_BUTTONS: return teletextdelegate
         case ControlListModel.PLAYER_SWITCH_BUTTON: return playerSwitchBtnDelegate
         case ControlListModel.ARTWORK_INFO: return artworkInfoDelegate
+        case ControlListModel.PLAYBACK_SPEED_BUTTON: return playbackSpeedButtonDelegate
         }
         console.log("button delegate id " + inpID +  " doesn't exists")
         return spacerDelegate
@@ -882,8 +885,8 @@ Item{
                         text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
                         visible: (titleLabel.implicitWidth > titleLabel.width || artistLabel.implicitWidth > titleLabel.width)
                                  && (artworkInfoMouseArea.containsMouse || artworkInfoItem.active)
-                        delay: 500 
-                         
+                        delay: 500
+
                         contentItem: Text {
                                   text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
                                   color: colors.tooltipTextColor
@@ -936,6 +939,71 @@ Item{
                         color: colors.menuCaption
                     }
                 }
+            }
+        }
+    }
+
+    Component {
+        id: playbackSpeedButtonDelegate
+
+        Widgets.IconControlButton {
+            id: playbackSpeedButton
+
+            size: VLCStyle.icon_medium
+            text: i18n.qtr("Playback Speed")
+            color: playbackSpeedPopup.visible ? colors.accent : colors.playerControlBarFg
+
+            onClicked: playbackSpeedPopup.open()
+
+            PlaybackSpeed {
+                id: playbackSpeedPopup
+
+                z: 1
+                colors: playbackSpeedButton.colors
+                focus: true
+                parent: playbackSpeedButton.paintOnly
+                        ? playbackSpeedButton // button is not part of main display (ToolbarEditorDialog)
+                        : (history.current.view === "player") ? rootPlayer : g_mainDisplay
+
+                onOpened: {
+                    // update popup coordinates
+                    //
+                    // mapFromItem is affected by various properties of source and target objects
+                    // which can't be represented in a binding expression so a initial setting in
+                    // object defination (x: clamp(...)) doesn't work, so we set x and y on initial open
+                    x = Qt.binding(function () {
+                        // coords are mapped through playbackSpeedButton.parent so that binding is generated based on playbackSpeedButton.x
+                        var mappedParentCoordinates = parent.mapFromItem(playbackSpeedButton.parent, playbackSpeedButton.x, 0)
+                        return Helpers.clamp(mappedParentCoordinates.x  - ((width - playbackSpeedButton.width) / 2),
+                                             VLCStyle.margin_xxsmall + VLCStyle.applicationHorizontalMargin,
+                                             parent.width - VLCStyle.applicationHorizontalMargin - VLCStyle.margin_xxsmall - width)
+                    })
+
+                    y = Qt.binding(function () {
+                        // coords are mapped through playbackSpeedButton.parent so that binding is generated based on playbackSpeedButton.y
+                        var mappedParentCoordinates = parent.mapFromItem(playbackSpeedButton.parent, 0, playbackSpeedButton.y)
+                        return mappedParentCoordinates.y - playbackSpeedPopup.height - VLCStyle.margin_xxsmall
+                    })
+
+                    // player related --
+                    controlButtons.requestLockUnlockAutoHide(true, controlButtons)
+                    if (!!rootPlayer)
+                        rootPlayer.menu = playbackSpeedPopup
+                }
+
+                onClosed: {
+                    controlButtons.requestLockUnlockAutoHide(false, controlButtons)
+                    playbackSpeedButton.forceActiveFocus()
+                    if (!!rootPlayer)
+                        rootPlayer.menu = undefined
+                }
+            }
+
+            Label {
+                anchors.centerIn: parent
+                font.pixelSize: VLCStyle.fontSize_normal
+                text: !playbackSpeedButton.paintOnly ? i18n.qtr("%1x").arg(+player.rate.toFixed(2)) : i18n.qtr("1x")
+                color: playbackSpeedButton.background.foregroundColor // IconToolButton.background is a FocusBackground
             }
         }
     }

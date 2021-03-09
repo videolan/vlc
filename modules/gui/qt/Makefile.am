@@ -709,6 +709,7 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/ControlBar.qml \
 	gui/qt/player/qml/ControlButtons.qml \
 	gui/qt/player/qml/LanguageMenu.qml \
+	gui/qt/player/qml/PlaybackSpeed.qml \
 	gui/qt/player/qml/MiniPlayer.qml \
 	gui/qt/player/qml/PIPPlayer.qml \
 	gui/qt/player/qml/Player.qml \
