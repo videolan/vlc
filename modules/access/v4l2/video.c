@@ -314,7 +314,7 @@ static const struct v4l2_fract zero = { 0, 1 };
  * Finds the highest frame rate up to a specific limit possible with a certain
  * V4L2 format.
  * @param fmt V4L2 capture format [IN]
- * @param min_it minimum frame internal [IN]
+ * @param min_it minimum frame interval [IN]
  * @param it V4L2 frame interval [OUT]
  * @return 0 on success, -1 on error.
  */
