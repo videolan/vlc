@@ -78,7 +78,6 @@ parts:
           --host=$TRIPLET \
           --enable-libdsm \
           --enable-dvdcss \
-          --disable-upnp \
           --disable-chromaprint
       if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
           make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
@@ -139,7 +138,6 @@ parts:
       - librsvg2-dev
       - libsecret-1-dev
       - libudev-dev
-      - libupnp-dev
       - libv4l-dev
       - libva-dev
       - libvdpau-dev
@@ -215,7 +213,6 @@ parts:
       - libgtk-3-0
       - liblua5.2-0
       - libmtp9
-      - libupnp6
       - libzvbi0
       - libnotify4
       - libvulkan1
