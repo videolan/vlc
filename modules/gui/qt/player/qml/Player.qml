@@ -205,7 +205,7 @@ Widgets.NavigableFocusScope {
         component: rootPlayer.pinVideoControls ? backgroundForPinnedControls : topcontrolViewBackground
         onContentItemChanged: {
             if (rootPlayer.pinVideoControls)
-                contentItem.height = Qt.binding(function () { return topcontrolView.height; })
+                contentItem.height = Qt.binding(function () { return topcontrolView.height + topcontrolView.anchors.topMargin; })
         }
 
         Component {
@@ -287,6 +287,9 @@ Widgets.NavigableFocusScope {
             top: parent.top
             left: parent.left
             right: parent.right
+            topMargin: VLCStyle.applicationVerticalMargin
+            leftMargin: VLCStyle.applicationHorizontalMargin
+            rightMargin: VLCStyle.applicationHorizontalMargin
         }
 
         z: 1

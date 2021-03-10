@@ -97,11 +97,9 @@ Widgets.NavigableFocusScope {
 
         RowLayout {
             id: layout
-            anchors.fill: parent
-            anchors.topMargin: VLCStyle.applicationVerticalMargin
-            anchors.leftMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_small
-            anchors.rightMargin: VLCStyle.applicationHorizontalMargin
 
+            anchors.fill: parent
+            anchors.leftMargin: VLCStyle.margin_small
             spacing: VLCStyle.margin_small
 
             Text {

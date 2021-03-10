@@ -84,10 +84,7 @@ Widgets.NavigableFocusScope{
 
         hoverEnabled: true
         anchors.fill: parent
-        anchors.topMargin: VLCStyle.applicationVerticalMargin
-        anchors.leftMargin: VLCStyle.applicationHorizontalMargin
-        anchors.rightMargin: VLCStyle.applicationHorizontalMargin
-        implicitHeight: rowLayout.implicitHeight + anchors.topMargin
+        implicitHeight: rowLayout.implicitHeight
 
         onContainsMouseChanged: topFocusScope.requestLockUnlockAutoHide(containsMouse, topFocusScope)
 
