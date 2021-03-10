@@ -1,9 +1,20 @@
-diff -urN upnp-orig/upnp/src/inc/inet_pton.h upnp/upnp/src/inc/inet_pton.h
---- upnp-orig/upnp/src/inc/inet_pton.h	2010-12-23 22:24:06.000000000 +0200
-+++ upnp/upnp/src/inc/inet_pton.h	2018-02-24 23:44:22.359676036 +0200
+From a66d4779723f9aef75622157c76f5dc1ed1a33a3 Mon Sep 17 00:00:00 2001
+From: Alaric Senat <dev.asenat@posteo.net>
+Date: Wed, 10 Mar 2021 15:59:43 +0100
+Subject: windows version inet
+
+---
+ upnp/src/inc/inet_pton.h | 6 ++++++
+ upnp/src/inet_pton.c     | 5 +++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/upnp/src/inc/inet_pton.h b/upnp/src/inc/inet_pton.h
+index f3e08a5..e6233b5 100644
+--- a/upnp/src/inc/inet_pton.h
++++ b/upnp/src/inc/inet_pton.h
 @@ -3,6 +3,8 @@
  
- #ifdef WIN32
+ #ifdef _WIN32
  
 +#include "autoconfig.h"
 +
@@ -19,31 +30,36 @@ diff -urN upnp-orig/upnp/src/inc/inet_pton.h upnp/upnp/src/inc/inet_pton.h
  /*!
   * \file
   *
-@@ -45,6 +49,8 @@
+@@ -45,6 +49,8 @@ extern const char *inet_ntop(int af, const void *src, char *dst,
   */
  extern int inet_pton(int af, const char *src, void *dst);
  
 +#endif /* _WIN32_WINNT < 0x600 */
 +
- #endif /* WIN32 */
+ #endif /* _WIN32 */
  
  #endif /* INET_PTON */
-diff -urN upnp-orig/upnp/src/inet_pton.c upnp/upnp/src/inet_pton.c
---- upnp-orig/upnp/src/inet_pton.c	2010-12-23 22:24:06.000000000 +0200
-+++ upnp/upnp/src/inet_pton.c	2018-02-24 23:44:16.771807657 +0200
-@@ -24,6 +24,8 @@
+diff --git a/upnp/src/inet_pton.c b/upnp/src/inet_pton.c
+index e2a243b..73c0a16 100644
+--- a/upnp/src/inet_pton.c
++++ b/upnp/src/inet_pton.c
+@@ -24,6 +24,9 @@
  
- #include "inet_pton.h"
+ 	#include "inet_pton.h"
  
 +#if _WIN32_WINNT < 0x600
++
 +
  /*!
   * \brief format an IPv4 address
   *
-@@ -320,4 +322,6 @@
+@@ -324,4 +327,6 @@ int inet_pton(int af, const char *src, void *dst)
  	/* NOTREACHED */
  }
  
 +#endif /* _WIN32_WINNT < 0x600 */
 +
- #endif /* WIN32 */
+ #endif /* _WIN32 */
+-- 
+2.29.2
+
