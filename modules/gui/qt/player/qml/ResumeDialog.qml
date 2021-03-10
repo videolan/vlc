@@ -144,6 +144,21 @@ Widgets.NavigableFocusScope {
             Item {
                 Layout.fillWidth: true
             }
+
+            Loader {
+                id: csdDecorations
+
+                focus: false
+                height: VLCStyle.icon_normal
+                active: mainInterface.clientSideDecoration
+                enabled: mainInterface.clientSideDecoration
+                visible: mainInterface.clientSideDecoration
+                source: "qrc:///widgets/CSDWindowButtonSet.qml"
+                onLoaded: {
+                    item.color = Qt.binding(function() { return resumePanel.colors.playerFg })
+                    item.hoverColor = Qt.binding(function() { return resumePanel.colors.windowCSDButtonDarkBg })
+                }
+            }
         }
     }
 }
