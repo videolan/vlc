@@ -1,17 +1,31 @@
---- upnp/upnp/src/api/upnpapi.c.orig	2013-04-08 00:23:46.000000000 +0200
-+++ upnp/upnp/src/api/upnpapi.c	2013-04-08 00:25:49.000000000 +0200
-@@ -358,13 +358,13 @@
+From e238e20db9153d4a066cbcce1fdb5f95ada45fbf Mon Sep 17 00:00:00 2001
+From: Alaric Senat <dev.asenat@posteo.net>
+Date: Wed, 10 Mar 2021 12:01:18 +0100
+Subject: miniserver
+
+---
+ upnp/src/api/upnpapi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/upnp/src/api/upnpapi.c b/upnp/src/api/upnpapi.c
+index 3ad4658..b0ee7db 100644
+--- a/upnp/src/api/upnpapi.c
++++ b/upnp/src/api/upnpapi.c
+@@ -387,13 +387,13 @@ static int UpnpInitPreamble(void)
  		return retVal;
  	}
  
 +#ifdef INTERNAL_WEB_SERVER
  #ifdef INCLUDE_DEVICE_APIS
- #if EXCLUDE_SOAP == 0
+ 	#if EXCLUDE_SOAP == 0
  	SetSoapCallback(soap_device_callback);
- #endif
+ 	#endif
  #endif /* INCLUDE_DEVICE_APIS */
  
 -#ifdef INTERNAL_WEB_SERVER
- #if EXCLUDE_GENA == 0
+ 	#if EXCLUDE_GENA == 0
  	SetGenaCallback(genaCallback);
- #endif
+ 	#endif
+-- 
+2.29.2
+
