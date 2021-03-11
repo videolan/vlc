@@ -129,6 +129,10 @@ Widgets.NavigableFocusScope {
         parentId: initialId
 
         onCountChanged: {
+            // NOTE: We need to cancel the Drag item manually when resetting. Should this be called
+            //       from 'onModelReset' only ?
+            dragItem.Drag.cancel();
+
             if (count === 0 || modelSelect.hasSelection) return;
 
             resetFocus();
