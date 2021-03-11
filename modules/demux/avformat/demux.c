@@ -1290,9 +1290,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int IORead( void *opaque, uint8_t *buf, int buf_size )
 {
     demux_t *p_demux = opaque;
-    if( buf_size < 0 ) return -1;
+    if( buf_size < 0 ) return AVERROR_EOF;
     int i_ret = vlc_stream_Read( p_demux->s, buf, buf_size );
-    return i_ret >= 0 ? i_ret : -1;
+    return i_ret > 0 ? i_ret : AVERROR_EOF;
 }
 
 static int64_t IOSeek( void *opaque, int64_t offset, int whence )
