@@ -30,6 +30,7 @@
 #include "util/systempalette.hpp"
 #include "util/sortfilterproxymodel.hpp"
 #include "util/navigation_history.hpp"
+#include "util/qmlinputitem.hpp"
 
 #include "dialogs/help/aboutmodel.hpp"
 #include "dialogs/dialogs_provider.hpp"
@@ -159,6 +160,8 @@ void MainUI::registerQMLTypes()
 {
     qRegisterMetaType<VLCTick>();
     qmlRegisterUncreatableType<VLCTick>("org.videolan.vlc", 0, 1, "VLCTick", "");
+
+    qRegisterMetaType<QmlInputItem>();
 
     qmlRegisterType<VideoSurface>("org.videolan.vlc", 0, 1, "VideoSurface");
 
