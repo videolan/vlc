@@ -750,6 +750,7 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/KeyNavigableGridView.qml \
 	gui/qt/widgets/qml/KeyNavigableListView.qml \
 	gui/qt/widgets/qml/KeyNavigableTableView.qml \
+	gui/qt/widgets/qml/TableViewDelegate.qml \
 	gui/qt/widgets/qml/LabelSeparator.qml \
 	gui/qt/widgets/qml/ListCoverShadow.qml \
 	gui/qt/widgets/qml/ListItem.qml \
