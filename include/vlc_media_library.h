@@ -503,7 +503,10 @@ enum vlc_ml_control
     /* Playlist management */
     VLC_ML_PLAYLIST_CREATE, /**< arg1: const char*; arg2(out): vlc_ml_playlist_t**; can fail */
     VLC_ML_PLAYLIST_DELETE, /**< arg1: playlist id; can fail */
-    VLC_ML_PLAYLIST_APPEND  /**< arg1: playlist id; arg2: media id; can fail */
+    VLC_ML_PLAYLIST_APPEND, /**< arg1: playlist id; arg2: media id; can fail */
+    VLC_ML_PLAYLIST_INSERT, /**< arg1: playlist id; arg2: media id; arg3: position; can fail */
+    VLC_ML_PLAYLIST_MOVE,   /**< arg1: playlist id; arg2: from; arg3: to; can fail */
+    VLC_ML_PLAYLIST_REMOVE  /**< arg1: playlist id; arg2: position; can fail */
 };
 
 /**
@@ -1084,6 +1087,32 @@ vlc_ml_playlist_append( vlc_medialibrary_t * p_ml, int64_t i_playlist_id, int64_
     assert( p_ml != NULL );
 
     return vlc_ml_control( p_ml, VLC_ML_PLAYLIST_APPEND, i_playlist_id, i_media_id );
+}
+
+static inline int
+vlc_ml_playlist_insert( vlc_medialibrary_t * p_ml, int64_t i_playlist_id, int64_t i_media_id,
+                        uint32_t i_position )
+{
+    assert( p_ml != NULL );
+
+    return vlc_ml_control( p_ml, VLC_ML_PLAYLIST_INSERT, i_playlist_id, i_media_id, i_position );
+}
+
+static inline int
+vlc_ml_playlist_move( vlc_medialibrary_t * p_ml,
+                      int64_t i_playlist_id, uint32_t i_from, uint32_t i_to )
+{
+    assert( p_ml != NULL );
+
+    return vlc_ml_control( p_ml, VLC_ML_PLAYLIST_MOVE, i_playlist_id, i_from, i_to );
+}
+
+static inline int
+vlc_ml_playlist_remove( vlc_medialibrary_t * p_ml, int64_t i_playlist_id, uint32_t i_position )
+{
+    assert( p_ml != NULL );
+
+    return vlc_ml_control( p_ml, VLC_ML_PLAYLIST_REMOVE, i_playlist_id, i_position );
 }
 
 static inline vlc_ml_media_t* vlc_ml_get_media( vlc_medialibrary_t* p_ml, int64_t i_media_id )

@@ -651,6 +651,38 @@ int MediaLibrary::Control( int query, va_list args )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
+        case VLC_ML_PLAYLIST_INSERT:
+        {
+            auto playlist = m_ml->playlist( va_arg( args, int64_t ) );
+            if ( playlist == nullptr )
+                return VLC_EGENERIC;
+            int64_t  mediaId  = va_arg( args, int64_t );
+            uint32_t position = va_arg( args, uint32_t );
+            if ( playlist->add(mediaId, position) == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_PLAYLIST_MOVE:
+        {
+            auto playlist = m_ml->playlist( va_arg( args, int64_t ) );
+            if ( playlist == nullptr )
+                return VLC_EGENERIC;
+            uint32_t from = va_arg( args, uint32_t );
+            uint32_t to   = va_arg( args, uint32_t );
+            if ( playlist->move(from, to) == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_PLAYLIST_REMOVE:
+        {
+            auto playlist = m_ml->playlist( va_arg( args, int64_t ) );
+            if ( playlist == nullptr )
+                return VLC_EGENERIC;
+            uint32_t position = va_arg( args, uint32_t );
+            if ( playlist->remove(position) == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
         default:
             return VLC_EGENERIC;
     }
