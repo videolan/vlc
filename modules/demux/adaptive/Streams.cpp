@@ -474,8 +474,11 @@ AbstractStream::Status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
     {
         AdvDebug(mtime_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR();
                  mtime_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstDTS();
-                 msg_Dbg(p_realdemux, "Stream %s pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " [DRAINING]",
-                         description.c_str(), pcrvalue, dtsvalue, nz_deadline));
+                 mtime_t bufferingLevel = fakeEsOut()->commandsQueue()->getBufferingLevel();
+                 msg_Dbg(p_realdemux, "Stream pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " buflevel %" PRId64 "(+%" PRId64 ") [DRAINING] :%s",
+                         pcrvalue, dtsvalue, nz_deadline, bufferingLevel,
+                         pcrvalue ? bufferingLevel - pcrvalue : 0,
+                         description.c_str()));
 
         *pi_pcr = fakeEsOut()->commandsQueue()->Process(VLC_TS_0 + nz_deadline);
         if(!fakeEsOut()->commandsQueue()->isEmpty())
@@ -498,8 +501,10 @@ AbstractStream::Status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
 
     AdvDebug(mtime_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR();
              mtime_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstDTS();
-             msg_Dbg(p_realdemux, "Stream %s pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " buflevel %" PRId64,
-                     description.c_str(), pcrvalue, dtsvalue, nz_deadline, bufferingLevel));
+             msg_Dbg(p_realdemux, "Stream pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " buflevel %" PRId64 "(+%" PRId64 "): %s",
+                     pcrvalue, dtsvalue, nz_deadline, bufferingLevel,
+                     pcrvalue ? bufferingLevel - pcrvalue : 0,
+                     description.c_str()));
 
     if(nz_deadline + VLC_TS_0 <= bufferingLevel) /* demuxed */
     {
