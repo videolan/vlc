@@ -49,6 +49,9 @@ NavigableFocusScope {
 
     property alias model: view.model
 
+    property alias delegate: view.delegate
+
+    property alias contentY     : view.contentY
     property alias contentHeight: view.contentHeight
 
     property alias interactive: view.interactive
