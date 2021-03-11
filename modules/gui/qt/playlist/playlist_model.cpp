@@ -24,6 +24,7 @@
 #include "playlist_model_p.hpp"
 #include <algorithm>
 #include <assert.h>
+#include "util/qmlinputitem.hpp"
 
 namespace vlc {
 namespace playlist {
@@ -420,6 +421,36 @@ int PlaylistListModel::getCurrentIndex() const
 {
     Q_D(const PlaylistListModel);
     return d->m_current;
+}
+
+/* Q_INVOKABLE */
+QVariantList PlaylistListModel::getItemsForIndexes(const QList<int> & indexes) const
+{
+    Q_D(const PlaylistListModel);
+
+    QVariantList items;
+
+    for (int index : indexes)
+    {
+        if (index < 0 || index >= d->m_items.count())
+            continue;
+
+        vlc_playlist_item_t * item = d->m_items[index].raw();
+
+        if (item == nullptr)
+            continue;
+
+        input_item_t * media = vlc_playlist_item_GetMedia(item);
+
+        if (media == nullptr)
+            continue;
+
+        QmlInputItem input(media, true);
+
+        items.append(QVariant::fromValue(input));
+    }
+
+    return items;
 }
 
 PlaylistPtr PlaylistListModel::getPlaylistId() const

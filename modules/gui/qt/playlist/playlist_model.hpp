@@ -73,6 +73,8 @@ public:
 
     int getCurrentIndex() const;
 
+    Q_INVOKABLE QVariantList getItemsForIndexes(const QList<int> & indexes) const;
+
 protected:
     bool isRowSelected(int row) const override;
     void setRowSelected(int row, bool selected) override;
