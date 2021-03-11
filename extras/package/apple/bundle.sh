@@ -28,16 +28,8 @@ rm -f "$IPA"
 rm -rf "Payload/"
 mkdir -p "$APP"
 
-# Find install_name tool in order to set rpath on executable
-INSTALL_NAME_TOOL=$(which install_name_tool || echo "")
-if [ -z "$INSTALL_NAME_TOOL" ]; then
-    echo "install_name_tool not found, aborting..."
-    exit 1
-fi
-
 # VLC core test binary compiled for iOS
 cp "${BUILD_DIR}/test/${APP_EXECUTABLE}" "${APP}/${APP_NAME}"
-${INSTALL_NAME_TOOL} "${APP}/${APP_NAME}" -add_rpath "@executable_path/Frameworks"
 
 # Convert Info.plist from XML to binary
 CONVERT_PLIST "${SCRIPT_DIR}/Info.plist" "Payload/vlccore.app/Info.plist"
