@@ -48,6 +48,13 @@ public:
 public:
     explicit MLPlaylistModel(QObject * parent = nullptr);
 
+public: // Interface
+    Q_INVOKABLE void insert(const QVariantList & items, int at);
+
+    Q_INVOKABLE void move(const QModelIndexList & indexes, int to);
+
+    Q_INVOKABLE void remove(const QModelIndexList & indexes);
+
 public: // QAbstractItemModel implementation
     QHash<int, QByteArray> roleNames() const override;
 
@@ -61,6 +68,9 @@ protected: // MLBaseModel implementation
     QByteArray criteriaToName(vlc_ml_sorting_criteria_t criteria) const override;
 
     ListCacheLoader<std::unique_ptr<MLItem>> * createLoader() const override;
+
+private: // Functions
+    QList<int> getRows(const QModelIndexList & indexes) const;
 
 private: // MLBaseModel implementation
     void onVlcMlEvent(const MLEvent & event) override;
