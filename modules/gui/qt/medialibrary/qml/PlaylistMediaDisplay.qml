@@ -109,6 +109,19 @@ Widgets.NavigableFocusScope {
     }
 
     //---------------------------------------------------------------------------------------------
+    // Events
+
+    function onDelete()
+    {
+        var indexes = modelSelect.selectedIndexes;
+
+        if (indexes.length === 0)
+            return;
+
+        model.remove(indexes);
+    }
+
+    //---------------------------------------------------------------------------------------------
     // Private
 
     function _actionAtIndex(index) {
@@ -232,6 +245,8 @@ Widgets.NavigableFocusScope {
                                                       menuParent.mapToGlobal(0,0))
 
         onRightClick: contextMenu.popup(modelSelect.selectedIndexes, globalMousePos)
+
+        Keys.onDeletePressed: onDelete()
     }
 
     EmptyLabel {
