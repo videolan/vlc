@@ -516,6 +516,16 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
 #endif
     }
 
+    m_menu->addSeparator();
+
+    action = m_menu->addAction(qtr("Remove Selected"));
+
+    action->setIcon(QIcon(":/buttons/playlist/playlist_remove.svg"));
+
+    connect(action, &QAction::triggered, [this, selected]() {
+        m_model->remove(selected);
+    });
+
     m_menu->popup(pos);
 }
 
