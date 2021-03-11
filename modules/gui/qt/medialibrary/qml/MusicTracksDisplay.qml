@@ -46,8 +46,8 @@ Widgets.NavigableFocusScope {
           }
         }
 
-        function insertIntoPlaylist(index) {
-            medialib.insertIntoPlaylist(index, model.getIdsForIndexes(selectionModel.selectedIndexes))
+        function getSelectedInputItem() {
+            return model.getItemsForIndexes(selectionModel.selectedIndexes);
         }
     }
 

@@ -86,8 +86,8 @@ Widgets.NavigableFocusScope {
           }
         }
 
-        function insertIntoPlaylist(index) {
-            providerModel.insertIntoPlaylist(filterModel.mapIndexesToSource(selectionModel.selectedIndexes), index)
+        function getSelectedInputItem() {
+            return providerModel.getItemsForIndexes(selectionModel.selectedIndexes);
         }
 
         Component {

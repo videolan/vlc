@@ -54,26 +54,34 @@ Widgets.NavigableFocusScope {
 
     function isDropAcceptable(drop, index) {
         return drop.hasUrls || // external drop (i.e. from filesystem)
-                (isValidInstanceOf(drop.source, Widgets.DragItem) && drop.source.canInsertIntoPlaylist(index)) // internal drop (inter-view or intra-playlist)
+                (isValidInstanceOf(drop.source, Widgets.DragItem)) // internal drop (inter-view or intra-playlist)
     }
 
     function acceptDrop(index, drop) {
-        if (isValidInstanceOf(drop.source, Widgets.DragItem)) {
-            // dropping Medialib view content into playlist or intra-playlist dragging:
-            drop.source.insertIntoPlaylist(index)
-        } else if (drop.hasUrls) {
-            // dropping an external item (i.e. filesystem drag) into playlist:
-            // force conversion to an actual list
-            var urlList = []
-            for ( var url in drop.urls)
-                urlList.push(drop.urls[url])
-            mainPlaylistController.insert(index, urlList, false)
+        var item = drop.source;
 
-            // This is required otherwise backend may handle the drop as well yielding double addition
-            drop.accept(Qt.IgnoreAction)
+        // NOTE: Move implementation.
+        if (dragItem == item) {
+            model.moveItemsPre(model.getSelection(), index);
+
+        // NOTE: Dropping medialibrary content into the queue.
+        } else if (isValidInstanceOf(item, Widgets.DragItem)) {
+            mainPlaylistController.insert(index, item.getSelectedInputItem());
+
+        // NOTE: Dropping an external item (i.e. filesystem) into the queue.
+        } else if (drop.hasUrls) {
+            var urlList = [];
+
+            for (var url in drop.urls)
+                urlList.push(drop.urls[url]);
+
+            mainPlaylistController.insert(index, urlList, false);
+
+            // NOTE This is required otherwise backend may handle the drop as well yielding double addition.
+            drop.accept(Qt.IgnoreAction);
         }
 
-        listView.forceActiveFocus()
+        listView.forceActiveFocus();
     }
 
     PlaylistOverlayMenu {
@@ -118,16 +126,8 @@ Widgets.NavigableFocusScope {
                 return ({covers: covers, title: title, count: root.model.selectedCount})
             }
 
-            function insertIntoPlaylist(index) {
-                root.model.moveItemsPre(root.model.getSelection(), index)
-            }
-
-            function canInsertIntoPlaylist(index) {
-                var diff = dragItem.index - index
-                if (diff === 0 || diff === -1)
-                    return false
-                else
-                    return true
+            function getSelectedInputItem(index) {
+                return model.getItemsForIndexes(model.getSelection())
             }
 
             property point _pos: null

@@ -173,9 +173,8 @@ Widgets.NavigableFocusScope {
             }
         }
 
-        function insertIntoPlaylist(index) {
-            medialib.insertIntoPlaylist(index,
-                                        model.getIdsForIndexes(modelSelect.selectedIndexes));
+        function getSelectedInputItem() {
+            return model.getItemsForIndexes(modelSelect.selectedIndexes);
         }
     }
 
@@ -195,7 +194,7 @@ Widgets.NavigableFocusScope {
     {
         id: view
 
-        //-------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------
         // Settings
 
         anchors.left  : parent.left
@@ -222,7 +221,7 @@ Widgets.NavigableFocusScope {
         navigationParent: root
         navigationUpItem: (headerItem) ? headerItem.focus : undefined
 
-        //-------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------
         // Events
 
         onContextMenuButtonClicked: contextMenu.popup(modelSelect.selectedIndexes,

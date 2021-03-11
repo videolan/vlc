@@ -15,50 +15,101 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-import QtQuick 2.11
+
+import QtQuick          2.11
 import QtQuick.Controls 2.4
-import QtQml.Models 2.2
-import "qrc:///style/"
-import "qrc:///playlist/" as Playlist
+import QtQml.Models     2.2
 
 import QtGraphicalEffects 1.0
 
-Playlist.PlaylistDroppable {
+import "qrc:///style/"
+import "qrc:///playlist/" as Playlist
+
+Item {
     id: dragItem
+
+    //---------------------------------------------------------------------------------------------
+    // Properties
+    //---------------------------------------------------------------------------------------------
+
+    readonly property int coverSize: VLCStyle.icon_normal
 
     property VLCColors colors: VLCStyle.colors
 
-    readonly property int coverSize: VLCStyle.icon_normal
-    readonly property int _maxCovers: 3
-    readonly property int _displayedCoversCount: Math.min(_model.count, _maxCovers + 1)
+    //---------------------------------------------------------------------------------------------
+    // Private
 
     property var _model: {"covers": [], "title": "", "count": 0}
+
+    readonly property int _maxCovers: 3
+
+    readonly property int _displayedCoversCount: Math.min(_model.count, _maxCovers + 1)
+
+    //---------------------------------------------------------------------------------------------
+    // Settings
+    //---------------------------------------------------------------------------------------------
+
+    parent: g_mainDisplay
+
+    width: VLCStyle.colWidth(2)
+
+    height: coverSize + VLCStyle.margin_small * 2
+
+    opacity: visible ? 0.90 : 0
+
+    visible: Drag.active
+
+    //---------------------------------------------------------------------------------------------
+    // Events
+    //---------------------------------------------------------------------------------------------
+
+    Drag.onActiveChanged: {
+        if (Drag.active) {
+            _model = updateComponents(_maxCovers);
+            mainInterface.setCursor(Qt.DragMoveCursor);
+        } else {
+            mainInterface.restoreCursor();
+        }
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Functions
+    //---------------------------------------------------------------------------------------------
+
+    function coversXPos(index) {
+        return VLCStyle.margin_small + (coverSize / 3) * index;
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Pure virtual
 
     // return {covers: [{artwork: <string> or cover: <component>},..maxCovers]
     //         , title: <string>, *subtitle: <string>, count: <int> /*all selected*/}
     // * - optional
     function updateComponents(maxCovers) {
-        console.assert(false, "parent should reimplement this function")
+        console.assert(false, "updateComponents is not implemented.");
     }
 
-    Drag.onActiveChanged: {
-        if (Drag.active) {
-            _model = updateComponents(_maxCovers)
-            mainInterface.setCursor(Qt.DragMoveCursor)
-        } else {
-            mainInterface.restoreCursor()
+    function getSelectedInputItem() {
+        console.assert(false, "getSelectedInputItem is not implemented.");
+
+        return undefined;
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Animations
+    //---------------------------------------------------------------------------------------------
+
+    Behavior on opacity {
+        NumberAnimation {
+            easing.type: Easing.InOutSine
+            duration: 128
         }
     }
 
-    function coversXPos(index) {
-        return VLCStyle.margin_small + (coverSize / 3) * index
-    }
-
-    parent: g_mainDisplay
-    width: VLCStyle.colWidth(2)
-    height: coverSize + VLCStyle.margin_small * 2
-    opacity: visible ? 0.90 : 0
-    visible: Drag.active
+    //---------------------------------------------------------------------------------------------
+    // Childs
+    //---------------------------------------------------------------------------------------------
 
     Rectangle {
         /* background */
@@ -67,13 +118,6 @@ Playlist.PlaylistDroppable {
         border.color: colors.buttonBorder
         border.width: VLCStyle.dp(1, VLCStyle.scale)
         radius: VLCStyle.dp(6, VLCStyle.scale)
-    }
-
-    Behavior on opacity {
-        NumberAnimation {
-            easing.type: Easing.InOutSine
-            duration: 128
-        }
     }
 
     RectangularGlow {

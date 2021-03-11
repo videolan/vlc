@@ -715,7 +715,6 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/VolumeWidget.qml \
 	gui/qt/player/qml/ButtonsLayout.qml \
 	gui/qt/playlist/qml/PlaylistDelegate.qml \
-	gui/qt/playlist/qml/PlaylistDroppable.qml \
 	gui/qt/playlist/qml/PlaylistListView.qml \
 	gui/qt/playlist/qml/PlaylistOverlayMenu.qml \
 	gui/qt/playlist/qml/PlaylistToolbar.qml \

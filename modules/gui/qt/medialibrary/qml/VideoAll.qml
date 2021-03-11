@@ -179,9 +179,8 @@ Widgets.NavigableFocusScope {
             }
         }
 
-        function insertIntoPlaylist(index) {
-            medialib.insertIntoPlaylist(index,
-                                        model.getIdsForIndexes(modelSelect.selectedIndexes));
+        function getSelectedInputItem() {
+            return model.getItemsForIndexes(modelSelect.selectedIndexes);
         }
     }
 

@@ -123,8 +123,8 @@ Widgets.PageLoader {
                   }
                 }
 
-                function insertIntoPlaylist(index) {
-                    medialib.insertIntoPlaylist(index, artistModel.getIdsForIndexes(selectionModel.selectedIndexes))
+                function getSelectedInputItem() {
+                    return artistModel.getItemsForIndexes(selectionModel.selectedIndexes);
                 }
             }
 

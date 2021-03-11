@@ -174,6 +174,9 @@ Widgets.NavigableFocusScope {
     Widgets.DragItem {
         id: dragItemPlaylist
 
+        //---------------------------------------------------------------------------------------------
+        // DragItem implementation
+
         function updateComponents(maxCovers) {
             var items = modelSelect.selectedIndexes.slice(0, maxCovers).map(function (x){
                 return model.getDataAt(x.row);
@@ -194,9 +197,8 @@ Widgets.NavigableFocusScope {
             };
         }
 
-        function insertIntoPlaylist(index) {
-            medialib.insertIntoPlaylist(index,
-                                        model.getIdsForIndexes(modelSelect.selectedIndexes));
+        function getSelectedInputItem() {
+            return model.getItemsForIndexes(modelSelect.selectedIndexes);
         }
     }
 
