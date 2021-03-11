@@ -112,6 +112,8 @@ public:
     void move(const QVector<PlaylistItem> &, size_t target, ssize_t indexHint);
     void remove(const QVector<PlaylistItem> &, ssize_t indexHint);
 
+    Q_INVOKABLE void insert(int index, const QVariantList & items /* QList<QmlInputItem> */);
+
     Q_INVOKABLE void shuffle();
     void sort(const QVector<vlc_playlist_sort_criterion> &);
 

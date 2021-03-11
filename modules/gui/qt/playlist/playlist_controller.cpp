@@ -24,6 +24,7 @@
 #include "playlist_controller_p.hpp"
 #include "vlc_player.h"
 #include "vlc_url.h"
+#include "util/qmlinputitem.hpp"
 #include <algorithm>
 #include <QVariant>
 #include <QDesktopServices>
@@ -439,6 +440,24 @@ PlaylistControllerModel::remove(const QVector<PlaylistItem> &items, ssize_t inde
                                          rawItems.size(), indexHint);
     if (ret != VLC_SUCCESS)
         throw std::bad_alloc();
+}
+
+void
+PlaylistControllerModel::insert(int index, const QVariantList & items)
+{
+    QVector<vlc::playlist::Media> medias;
+
+    for (const QVariant & variant : items)
+    {
+        if (variant.canConvert<QmlInputItem>() == false)
+            continue;
+
+        const QmlInputItem & item = variant.value<QmlInputItem>();
+
+        medias.push_back(vlc::playlist::Media(item.item.get()));
+    }
+
+    insert(index, medias, false);
 }
 
 void
