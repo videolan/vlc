@@ -18,6 +18,7 @@
 
 import QtQuick 2.11
 import QtQuick.Layouts 1.3
+import QtQuick.Controls 2.4
 
 import org.videolan.vlc 0.1
 
@@ -102,7 +103,7 @@ Widgets.NavigableFocusScope {
             anchors.leftMargin: VLCStyle.margin_small
             spacing: VLCStyle.margin_small
 
-            Text {
+            Label {
                 Layout.preferredHeight: implicitHeight
                 Layout.preferredWidth: implicitWidth
 
