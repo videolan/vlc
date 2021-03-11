@@ -483,12 +483,14 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         p_owner->vout_started = true;
         vlc_mutex_unlock( &p_owner->lock );
 
-        vlc_fifo_Lock( p_owner->p_fifo );
-        p_owner->reset_out_state = true;
-        vlc_fifo_Unlock( p_owner->p_fifo );
-
         if (has_started)
+        {
+            vlc_fifo_Lock( p_owner->p_fifo );
+            p_owner->reset_out_state = true;
+            vlc_fifo_Unlock( p_owner->p_fifo );
+
             decoder_Notify(p_owner, on_vout_started, p_vout, p_owner->vout_order);
+        }
         return 0;
     }
 
