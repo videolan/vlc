@@ -45,23 +45,34 @@ class MLBaseModel : public QAbstractListModel
 {
     Q_OBJECT
 
+    Q_PROPERTY(MLItemId parentId READ parentId WRITE setParentId NOTIFY parentIdChanged
+               RESET unsetParentId)
+
+    Q_PROPERTY(MediaLib * ml READ ml WRITE setMl)
+
+    Q_PROPERTY(QString searchPattern READ searchPattern WRITE setSearchPattern)
+
+    Q_PROPERTY(Qt::SortOrder sortOrder READ getSortOrder WRITE setSortOder NOTIFY sortOrderChanged)
+
+    Q_PROPERTY(QString sortCriteria READ getSortCriteria WRITE setSortCriteria
+               NOTIFY sortCriteriaChanged RESET unsetSortCriteria)
+
+    Q_PROPERTY(unsigned int count READ getCount NOTIFY countChanged)
+
 public:
     explicit MLBaseModel(QObject *parent = nullptr);
+
     virtual ~MLBaseModel();
 
+public: // Interface
     Q_INVOKABLE void sortByColumn(QByteArray name, Qt::SortOrder order);
 
-    Q_PROPERTY( MLItemId parentId READ parentId WRITE setParentId NOTIFY parentIdChanged RESET unsetParentId )
-    Q_PROPERTY( MediaLib* ml READ ml WRITE setMl )
-    Q_PROPERTY( QString searchPattern READ searchPattern WRITE setSearchPattern )
+    Q_INVOKABLE virtual QVariant getIdForIndex(QVariant index) const;
 
-    Q_PROPERTY( Qt::SortOrder sortOrder READ getSortOrder WRITE setSortOder NOTIFY sortOrderChanged )
-    Q_PROPERTY( QString sortCriteria READ getSortCriteria WRITE setSortCriteria NOTIFY sortCriteriaChanged RESET unsetSortCriteria )
-    Q_PROPERTY( unsigned int count READ getCount NOTIFY countChanged )
+    Q_INVOKABLE virtual QVariantList getIdsForIndexes(const QVariantList    & indexes) const;
+    Q_INVOKABLE virtual QVariantList getIdsForIndexes(const QModelIndexList & indexes) const;
 
-    Q_INVOKABLE virtual QVariant getIdForIndex( QVariant index) const;
-    Q_INVOKABLE virtual QVariantList getIdsForIndexes( QVariantList indexes ) const;
-    Q_INVOKABLE virtual QVariantList getIdsForIndexes( QModelIndexList indexes ) const;
+    Q_INVOKABLE virtual QVariantList getItemsForIndexes(const QModelIndexList & indexes) const;
 
     Q_INVOKABLE QMap<QString, QVariant> getDataAt(int index);
 

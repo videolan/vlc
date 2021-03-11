@@ -17,10 +17,15 @@
  *****************************************************************************/
 
 #include <cassert>
-#include "mlbasemodel.hpp"
 #include "medialib.hpp"
 #include <vlc_cxx_helpers.hpp>
+
 #include "util/listcache.hpp"
+#include "util/qmlinputitem.hpp"
+
+// MediaLibrary includes
+#include "mlbasemodel.hpp"
+#include "mlhelper.hpp"
 
 static constexpr ssize_t COUNT_UNINITIALIZED =
     ListCache<std::unique_ptr<MLItem>>::COUNT_UNINITIALIZED;
@@ -265,8 +270,7 @@ QVariant MLBaseModel::getIdForIndex(QVariant index) const
     return QVariant::fromValue(obj->getId());
 }
 
-
-QVariantList MLBaseModel::getIdsForIndexes(QModelIndexList indexes) const
+QVariantList MLBaseModel::getIdsForIndexes(const QModelIndexList & indexes) const
 {
     QVariantList idList;
     idList.reserve(indexes.length());
@@ -279,7 +283,7 @@ QVariantList MLBaseModel::getIdsForIndexes(QModelIndexList indexes) const
     return idList;
 }
 
-QVariantList MLBaseModel::getIdsForIndexes(QVariantList indexes) const
+QVariantList MLBaseModel::getIdsForIndexes(const QVariantList & indexes) const
 {
     QVariantList idList;
 
@@ -299,6 +303,58 @@ QVariantList MLBaseModel::getIdsForIndexes(QVariantList indexes) const
     });
     return idList;
 }
+
+//-------------------------------------------------------------------------------------------------
+
+/* Q_INVOKABLE virtual */
+QVariantList MLBaseModel::getItemsForIndexes(const QModelIndexList & indexes) const
+{
+    assert(m_ml);
+
+    QVariantList items;
+
+    vlc_ml_query_params_t query;
+
+    memset(&query, 0, sizeof(vlc_ml_query_params_t));
+
+    for (const QModelIndex & index : indexes)
+    {
+        MLItem * item = this->item(index.row());
+
+        if (item == nullptr)
+            continue;
+
+        const MLItemId & itemId = item->getId();
+
+        // NOTE: When we have a parent it's a collection of media(s).
+        if (itemId.type == VLC_ML_PARENT_UNKNOWN)
+        {
+            QmlInputItem input(vlc_ml_get_input_item(m_ml, itemId.id), false);
+
+            items.append(QVariant::fromValue(input));
+        }
+        else
+        {
+            ml_unique_ptr<vlc_ml_media_list_t> list;
+
+            list.reset(vlc_ml_list_media_of(m_ml, &query, itemId.type, itemId.id));
+
+            if (list == nullptr)
+                continue;
+
+            for (const vlc_ml_media_t & media : ml_range_iterate<vlc_ml_media_t>(list))
+            {
+                QmlInputItem input(vlc_ml_get_input_item(m_ml, media.i_id), false);
+
+                items.append(QVariant::fromValue(input));
+            }
+        }
+    }
+
+    return items;
+}
+
+//-------------------------------------------------------------------------------------------------
 
 unsigned MLBaseModel::getCount() const
 {
