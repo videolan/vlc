@@ -180,6 +180,8 @@ public:
     Q_INVOKABLE bool addAndPlay(const QVariantList& itemIdList);
     Q_INVOKABLE bool addAndPlay(const QModelIndexList& itemIdList);
 
+    Q_INVOKABLE QVariantList getItemsForIndexes(const QModelIndexList & indexes) const;
+
 signals:
     void nameChanged();
     void urlChanged();

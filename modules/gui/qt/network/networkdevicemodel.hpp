@@ -108,6 +108,8 @@ public:
 
     Q_INVOKABLE QMap<QString, QVariant> getDataAt(int index);
 
+    Q_INVOKABLE QVariantList getItemsForIndexes(const QModelIndexList & indexes) const;
+
 signals:
     void ctxChanged();
     void sdSourceChanged();

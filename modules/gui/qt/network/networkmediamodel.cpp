@@ -22,6 +22,7 @@
 
 #include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"
+#include "util/qmlinputitem.hpp"
 
 NetworkMediaModel::NetworkMediaModel( QObject* parent )
     : QAbstractListModel( parent )
@@ -296,6 +297,29 @@ bool NetworkMediaModel::addAndPlay(const QModelIndexList& itemIdList)
     return ret;
 }
 
+/* Q_INVOKABLE */
+QVariantList NetworkMediaModel::getItemsForIndexes(const QModelIndexList & indexes) const
+{
+    assert(m_ml);
+
+    QVariantList items;
+
+    for (const QModelIndex & modelIndex : indexes)
+    {
+        int index = modelIndex.row();
+
+        if (index < 0 || (size_t) index >= m_items.size())
+            continue;
+
+        const NetworkTreeItem & tree = m_items[index].tree;
+
+        QmlInputItem input(tree.media.get(), true);
+
+        items.append(QVariant::fromValue(input));
+    }
+
+    return items;
+}
 
 bool NetworkMediaModel::initializeMediaSources()
 {

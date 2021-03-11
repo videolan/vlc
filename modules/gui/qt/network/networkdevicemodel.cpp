@@ -18,9 +18,9 @@
 
 #include "networkdevicemodel.hpp"
 #include "networkmediamodel.hpp"
-
 #include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"
+#include "util/qmlinputitem.hpp"
 
 NetworkDeviceModel::NetworkDeviceModel( QObject* parent )
     : QAbstractListModel( parent )
@@ -228,6 +228,28 @@ QMap<QString, QVariant> NetworkDeviceModel::getDataAt(int idx)
         dataDict[roles[role]] = data(index(idx), role);
     }
     return dataDict;
+}
+
+/* Q_INVOKABLE */
+QVariantList NetworkDeviceModel::getItemsForIndexes(const QModelIndexList & indexes) const
+{
+    assert(m_ml);
+
+    QVariantList items;
+
+    for (const QModelIndex & modelIndex : indexes)
+    {
+        int index = modelIndex.row();
+
+        if (index < 0 || (size_t) index >= m_items.size())
+            continue;
+
+        QmlInputItem input(m_items[index].inputItem.get(), true);
+
+        items.append(QVariant::fromValue(input));
+    }
+
+    return items;
 }
 
 bool NetworkDeviceModel::initializeMediaSources()
