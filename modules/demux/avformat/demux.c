@@ -810,14 +810,14 @@ static int Demux( demux_t *p_demux )
     {
         /* Avoid EOF if av_read_frame returns AVERROR(EAGAIN) */
         if( i_av_ret == AVERROR(EAGAIN) )
-            return 1;
+            return VLC_DEMUXER_SUCCESS;
 
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
     if( pkt.stream_index < 0 || (unsigned) pkt.stream_index >= p_sys->i_tracks )
     {
         av_packet_unref( &pkt );
-        return 1;
+        return VLC_DEMUXER_SUCCESS;
     }
     struct avformat_track_s *p_track = &p_sys->tracks[pkt.stream_index];
     const AVStream *p_stream = p_sys->ic->streams[pkt.stream_index];
@@ -825,7 +825,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Warn( p_demux, "Invalid time base for the stream %d", pkt.stream_index );
         av_packet_unref( &pkt );
-        return 1;
+        return VLC_DEMUXER_SUCCESS;
     }
 
     // handle extra data change, this can happen for FLV
@@ -853,7 +853,7 @@ static int Demux( demux_t *p_demux )
                 FREENULL( p_track->es_format.p_extra );
                 p_track->es_format.i_extra = 0;
                 av_packet_unref( &pkt );
-                return 0;
+                return VLC_DEMUXER_EOF;
             }
         }
     }
@@ -864,7 +864,7 @@ static int Demux( demux_t *p_demux )
         if( !p_frame )
         {
             av_packet_unref( &pkt );
-            return 1;
+            return VLC_DEMUXER_SUCCESS;
         }
     }
     else if( p_stream->codecpar->codec_id == AV_CODEC_ID_DVB_SUBTITLE )
@@ -872,7 +872,7 @@ static int Demux( demux_t *p_demux )
         if( ( p_frame = block_Alloc( pkt.size + 3 ) ) == NULL )
         {
             av_packet_unref( &pkt );
-            return 0;
+            return VLC_DEMUXER_EOF;
         }
         p_frame->p_buffer[0] = 0x20;
         p_frame->p_buffer[1] = 0x00;
@@ -884,7 +884,7 @@ static int Demux( demux_t *p_demux )
         if( ( p_frame = block_Alloc( pkt.size ) ) == NULL )
         {
             av_packet_unref( &pkt );
-            return 0;
+            return VLC_DEMUXER_EOF;
         }
         memcpy( p_frame->p_buffer, pkt.data, pkt.size );
     }
@@ -973,7 +973,7 @@ static int Demux( demux_t *p_demux )
         block_Release( p_frame );
 
     av_packet_unref( &pkt );
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 static void UpdateSeekPoint( demux_t *p_demux, vlc_tick_t i_time )
