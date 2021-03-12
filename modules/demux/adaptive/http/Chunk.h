@@ -55,6 +55,7 @@ namespace adaptive
         class ChunkInterface
         {
             public:
+                virtual ~ChunkInterface() {}
                 virtual std::string getContentType  () const = 0;
                 virtual RequestStatus getRequestStatus() const = 0;
 
@@ -177,6 +178,27 @@ namespace adaptive
 
             protected:
                 virtual void        onDownload      (block_t **)  override {}
+        };
+
+        class ProbeableChunk : public ChunkInterface
+        {
+            public:
+                ProbeableChunk(ChunkInterface *);
+                virtual ~ProbeableChunk();
+
+                virtual std::string getContentType  () const override;
+                virtual RequestStatus getRequestStatus() const override;
+
+                virtual block_t *   readBlock       () override;
+                virtual block_t *   read            (size_t) override;
+                virtual bool        hasMoreData     () const override;
+                virtual size_t      getBytesRead    () const override;
+
+                size_t peek(const uint8_t **);
+
+            private:
+                ChunkInterface *source;
+                block_t *peekblock;
         };
     }
 }

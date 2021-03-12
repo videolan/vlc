@@ -530,3 +530,90 @@ HTTPChunk::~HTTPChunk()
 {
 
 }
+
+ProbeableChunk::ProbeableChunk(ChunkInterface *source)
+{
+    this->source = source;
+    peekblock = nullptr;
+}
+
+ProbeableChunk::~ProbeableChunk()
+{
+    if(peekblock)
+        block_Release(peekblock);
+    delete source;
+}
+
+std::string ProbeableChunk::getContentType() const
+{
+    return source->getContentType();
+}
+
+RequestStatus ProbeableChunk::getRequestStatus() const
+{
+    return source->getRequestStatus();
+}
+
+block_t * ProbeableChunk::readBlock()
+{
+    if(peekblock == nullptr)
+        return source->readBlock();
+    block_t *b = peekblock;
+    peekblock = nullptr;
+    return b;
+}
+
+block_t * ProbeableChunk::read(size_t sz)
+{
+    if(peekblock == nullptr)
+        return source->read(sz);
+    if(sz < peekblock->i_buffer)
+    {
+        block_t *b = block_Alloc(sz);
+        if(b)
+        {
+            memcpy(b->p_buffer, peekblock->p_buffer, sz);
+            b->i_flags = peekblock->i_flags;
+            peekblock->i_flags = 0;
+            peekblock->p_buffer += sz;
+            peekblock->i_buffer -= sz;
+        }
+        return b;
+    }
+    else
+    {
+        block_t *append = sz > peekblock->i_buffer ? source->read(sz - peekblock->i_buffer)
+                                                   : nullptr;
+        if(append)
+        {
+            peekblock = block_Realloc(peekblock, 0, sz);
+            if(peekblock)
+                memcpy(&peekblock->p_buffer[peekblock->i_buffer - append->i_buffer],
+                       append->p_buffer, append->i_buffer);
+            block_Release(append);
+        }
+        block_t *b = peekblock;
+        peekblock = nullptr;
+        return b;
+    }
+}
+
+bool ProbeableChunk::hasMoreData() const
+{
+    return (peekblock || source->hasMoreData());
+}
+
+size_t ProbeableChunk::getBytesRead() const
+{
+    return source->getBytesRead() - (peekblock ? peekblock->i_buffer : 0);
+}
+
+size_t ProbeableChunk::peek(const uint8_t **pp)
+{
+    if(!peekblock)
+        peekblock = source->readBlock();
+    if(!peekblock)
+        return 0;
+    *pp = peekblock->p_buffer;
+    return peekblock->i_buffer;
+}
