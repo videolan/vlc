@@ -93,7 +93,7 @@ VLC_PREBUILT_CONTRIBS_URL=${VLC_PREBUILT_CONTRIBS_URL:-""}
 # The number of cores to compile on
 CORE_COUNT=$(sysctl -n machdep.cpu.core_count || nproc || echo 0)
 let VLC_USE_NUMBER_OF_CORES=$CORE_COUNT+1
-let VLC_REQUESTED_CORE_COUNT=0
+VLC_REQUESTED_CORE_COUNT=0
 # whether to disable debug mode (the default) or not
 VLC_DISABLE_DEBUG=0
 # whether to compile with bitcode or not
