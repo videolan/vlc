@@ -39,6 +39,7 @@ namespace adaptive
     namespace http
     {
         class AbstractConnectionManager;
+        class ChunkInterface;
     }
 
     namespace playlist
@@ -126,7 +127,7 @@ namespace adaptive
         AbstractConnectionManager *connManager; /* not owned */
         SegmentTracker *segmentTracker;
 
-        SegmentChunk *currentChunk;
+        ChunkInterface *currentChunk;
         bool eof;
         std::string language;
         std::string description;

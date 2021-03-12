@@ -52,18 +52,27 @@ namespace adaptive
             Key,
         };
 
-        class AbstractChunkSource
+        class ChunkInterface
+        {
+            public:
+                virtual std::string getContentType  () const = 0;
+                virtual RequestStatus getRequestStatus() const = 0;
+
+                virtual block_t *   readBlock       () = 0;
+                virtual block_t *   read            (size_t) = 0;
+                virtual bool        hasMoreData     () const = 0;
+                virtual size_t      getBytesRead    () const = 0;
+        };
+
+        class AbstractChunkSource : public ChunkInterface
         {
             public:
                 AbstractChunkSource();
                 virtual ~AbstractChunkSource();
-                virtual block_t *   readBlock       () = 0;
-                virtual block_t *   read            (size_t) = 0;
-                virtual bool        hasMoreData     () const = 0;
                 void                setBytesRange   (const BytesRange &);
                 const BytesRange &  getBytesRange   () const;
-                virtual std::string getContentType  () const;
-                RequestStatus       getRequestStatus() const;
+                virtual std::string getContentType  () const override;
+                virtual RequestStatus getRequestStatus() const override;
 
             protected:
                 RequestStatus       requeststatus;
@@ -71,19 +80,19 @@ namespace adaptive
                 BytesRange          bytesRange;
         };
 
-        class AbstractChunk
+        class AbstractChunk : public ChunkInterface
         {
             public:
                 virtual ~AbstractChunk();
 
-                std::string         getContentType          ();
-                RequestStatus       getRequestStatus        () const;
-                size_t              getBytesRead            () const;
-                uint64_t            getStartByteInFile      () const;
-                bool                isEmpty                 () const;
+                virtual std::string   getContentType        () const override;
+                virtual RequestStatus getRequestStatus      () const override;
+                virtual size_t        getBytesRead          () const override;
+                virtual bool          hasMoreData           () const override;
+                uint64_t              getStartByteInFile    () const;
 
-                virtual block_t *   readBlock       ();
-                virtual block_t *   read            (size_t);
+                virtual block_t *   readBlock       () override;
+                virtual block_t *   read            (size_t) override;
 
             protected:
                 AbstractChunk(AbstractChunkSource *);
@@ -106,6 +115,7 @@ namespace adaptive
                 virtual block_t *   readBlock       ()  override;
                 virtual block_t *   read            (size_t)  override;
                 virtual bool        hasMoreData     () const  override;
+                virtual size_t      getBytesRead    () const  override;
                 virtual std::string getContentType  () const  override;
 
                 static const size_t CHUNK_SIZE = 32768;

@@ -45,6 +45,11 @@ bool MemoryChunkSource::hasMoreData() const
     return i_read > contentLength;
 }
 
+size_t MemoryChunkSource::getBytesRead() const
+{
+    return i_read;
+}
+
 block_t * MemoryChunkSource::readBlock()
 {
     block_t *p_block = nullptr;

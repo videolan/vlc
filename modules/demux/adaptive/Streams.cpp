@@ -573,7 +573,7 @@ block_t * AbstractStream::readNextBlock()
 
     demuxfirstchunk = false;
 
-    if (currentChunk->isEmpty())
+    if (!currentChunk->hasMoreData())
     {
         delete currentChunk;
         currentChunk = nullptr;

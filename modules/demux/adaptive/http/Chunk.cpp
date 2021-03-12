@@ -82,7 +82,7 @@ AbstractChunk::~AbstractChunk()
     delete source;
 }
 
-std::string AbstractChunk::getContentType()
+std::string AbstractChunk::getContentType() const
 {
     return source->getContentType();
 }
@@ -123,9 +123,9 @@ block_t * AbstractChunk::doRead(size_t size, bool b_block)
     return block;
 }
 
-bool AbstractChunk::isEmpty() const
+bool AbstractChunk::hasMoreData() const
 {
-    return !source->hasMoreData();
+    return source->hasMoreData();
 }
 
 block_t * AbstractChunk::readBlock()
@@ -183,6 +183,11 @@ bool HTTPChunkSource::hasMoreData() const
     else if(contentLength)
         return consumed < contentLength;
     else return true;
+}
+
+size_t HTTPChunkSource::getBytesRead() const
+{
+    return consumed;
 }
 
 block_t * HTTPChunkSource::read(size_t readsize)
