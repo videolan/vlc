@@ -6,6 +6,7 @@
 # Anh Phan <vietnamesel10n@gmail.com>, 2009-2010,2013-2014
 # bachien <bachien@ejnu.net>, 2018
 # brad freedom <brad.freedom@gmail.com>, 2020
+# bruh <quangtrung02hn16@gmail.com>, 2021
 # Sortale <sortale.zerok@gmail.com>, 2014
 # Pham Kieu Thanh <thanhpk@live.com>, 2013
 msgid ""
@@ -13,8 +14,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-12-09 14:08+0100\n"
-"Last-Translator: brad freedom <brad.freedom@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-03-13 08:24+0100\n"
+"Last-Translator: bruh <quangtrung02hn16@gmail.com>, 2021\n"
 "Language-Team: Vietnamese (https://www.transifex.com/yaron/teams/16553/vi/)\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
@@ -38,11 +39,11 @@ msgstr ""
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
-msgstr "Tùy biến"
+msgstr "Cài đặt VLC"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
-msgstr "Chọn\"Tùy chọn nâng cao\" để có thêm các lựa chọn khác."
+msgstr "Chọn \"Tùy chọn nâng cao\" để xem tất cả tuỳ chọn."
 
 #: include/vlc_config_cat.h:38
 #: modules/gui/macosx/VLCSimplePrefsController.m:233
@@ -53,11 +54,11 @@ msgstr "Giao diện"
 
 #: include/vlc_config_cat.h:39
 msgid "Settings for VLC's interfaces"
-msgstr "Thiết lập giao diện"
+msgstr "Cài đặt cho giao diện của VLC"
 
 #: include/vlc_config_cat.h:41
 msgid "Main interfaces settings"
-msgstr "Thiết lập giao diện chính"
+msgstr "Cài đặt giao diện chính"
 
 #: include/vlc_config_cat.h:43
 msgid "Main interfaces"
@@ -93,11 +94,11 @@ msgstr "Thiết lập phím tắt"
 #: share/lua/http/dialogs/create_stream.html:150
 #: modules/gui/qt/ui/profiles.h:720 modules/gui/qt/ui/profiles.h:751
 msgid "Audio"
-msgstr "Audio"
+msgstr "Âm thanh"
 
 #: include/vlc_config_cat.h:54
 msgid "Audio settings"
-msgstr "Thiết lập Audio"
+msgstr "Thiết lập âm thanh"
 
 #: include/vlc_config_cat.h:56
 msgid "General audio settings"
@@ -249,7 +250,7 @@ msgstr "Thiết lập dành cho video, hình ảnh hoặc nén và giải mã au
 
 #: include/vlc_config_cat.h:118
 msgid "Audio codecs"
-msgstr "Audio codecs"
+msgstr "Bộ biên giải mã âm thanh"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
@@ -506,7 +507,7 @@ msgstr "Tạo thư mục..."
 
 #: include/vlc_intf_strings.h:70
 msgid "Rename Directory..."
-msgstr "Đổi tên ổ đĩa..."
+msgstr "Đổi tên thư mục..."
 
 #: include/vlc_intf_strings.h:71
 msgid "Rename Folder..."
@@ -899,15 +900,15 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr "(Mặc định bật)"
+msgstr "(mặc định bật)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr "(Mặc định tắt)"
+msgstr "(mặc định tắt)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
-msgstr "Ghi chú:"
+msgstr "Lưu ý:"
 
 #: src/config/help.c:651
 msgid "add --advanced to your command line to see advanced options."
@@ -1162,23 +1163,23 @@ msgstr "Trên cùng bên trái"
 
 #: src/input/es_out.c:3199
 msgid "Left top"
-msgstr ""
+msgstr "Góc trên bên trái"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr ""
+msgstr "Góc dưới bên phải"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
-msgstr ""
+msgstr "Góc trên bên phải"
 
 #: src/input/es_out.c:3201
 msgid "Bottom left"
-msgstr ""
+msgstr "Góc dưới bên trái"
 
 #: src/input/es_out.c:3201
 msgid "Bottom right"
-msgstr ""
+msgstr "Góc dưới bên phải"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
@@ -1190,7 +1191,7 @@ msgstr ""
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
-msgstr ""
+msgstr "Hướng xoay"
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
@@ -1200,11 +1201,11 @@ msgstr "Chưa xác định"
 
 #: src/input/es_out.c:3212
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 dòng, 60 Hz)"
 
 #: src/input/es_out.c:3214
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 dòng, 50 Hz)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
@@ -1225,7 +1226,7 @@ msgstr ""
 
 #: src/input/es_out.c:3253
 msgid "Color space"
-msgstr ""
+msgstr "Không gian màu"
 
 #: src/input/es_out.c:3253
 #, c-format
@@ -1269,7 +1270,7 @@ msgstr ""
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
-msgstr ""
+msgstr "Hình chữ nhật"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
@@ -1281,7 +1282,7 @@ msgstr ""
 
 #: src/input/es_out.c:3291
 msgid "Projection"
-msgstr ""
+msgstr "Hình chiếu"
 
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
@@ -1291,7 +1292,7 @@ msgstr ""
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Cao độ"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
@@ -1388,11 +1389,11 @@ msgstr "Xếp hạng"
 
 #: src/input/meta.c:63 modules/gui/macosx/VLCPlaylist.m:97 modules/mux/avi.c:50
 msgid "Date"
-msgstr "Ngày Tháng"
+msgstr "Ngày"
 
 #: src/input/meta.c:64
 msgid "Setting"
-msgstr "Thiết lập"
+msgstr "Cài đặt"
 
 #: src/input/meta.c:65 modules/gui/macosx/VLCOpenWindowController.m:188
 #: modules/gui/qt/ui/podcast_configuration.h:101
@@ -1405,7 +1406,7 @@ msgstr "Đang phát"
 
 #: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
-msgstr "Nhà Phát Hành"
+msgstr "Nhà xuất bản"
 
 #: src/input/meta.c:70
 msgid "Encoded by"
@@ -1429,7 +1430,7 @@ msgstr "Đạo diễn"
 
 #: src/input/meta.c:75
 msgid "Season"
-msgstr "Phần"
+msgstr "Mùa"
 
 #: src/input/meta.c:76
 msgid "Episode"
@@ -1491,7 +1492,7 @@ msgstr "Tựa đề trước đó"
 
 #: src/input/var.c:278
 msgid "Menu title"
-msgstr ""
+msgstr "Tiêu đề menu"
 
 #: src/input/var.c:285
 msgid "Menu popup"
@@ -1569,7 +1570,7 @@ msgstr "1:2 Phân nửa"
 
 #: src/libvlc.h:169 src/libvlc-module.c:1348 src/video_output/vout_intf.c:89
 msgid "1:1 Original"
-msgstr "1:1 Ban Đầu"
+msgstr "1:1 Ban đầu"
 
 #: src/libvlc.h:170 src/libvlc-module.c:1349 src/video_output/vout_intf.c:90
 msgid "2:1 Double"
@@ -1722,11 +1723,11 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "Nhạc"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
-msgstr ""
+msgstr "Giao tiếp"
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
@@ -1734,7 +1735,7 @@ msgstr "Game"
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "Thông báo"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
@@ -2158,7 +2159,7 @@ msgstr "Xuất video toàn màn hình"
 
 #: src/libvlc-module.c:313
 msgid "Start video in fullscreen mode"
-msgstr "Xem video ở chế độ toàn màn hình"
+msgstr "Bắt đầu video ở chế độ toàn màn hình"
 
 #: src/libvlc-module.c:315 src/video_output/vout_intf.c:253
 msgid "Always on top"
@@ -2170,7 +2171,7 @@ msgstr "Luôn hiển thị cửa sổ video lên trên mọi cửa số khác."
 
 #: src/libvlc-module.c:319
 msgid "Enable wallpaper mode"
-msgstr ""
+msgstr "Bật chế độ màn hình nền"
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2844,15 +2845,15 @@ msgstr "HD (720p)"
 
 #: src/libvlc-module.c:625
 msgid "Standard Definition (576 or 480 lines)"
-msgstr "Định dạng chuẩn (576 hoặc 480 line)"
+msgstr "Độ phân giải tiêu chuẩn (576 hoặc 480 dòng)"
 
 #: src/libvlc-module.c:626
 msgid "Low Definition (360 lines)"
-msgstr "Định dạng thấp (360 line)"
+msgstr "Độ phân giải thấp (360 dòng)"
 
 #: src/libvlc-module.c:627
 msgid "Very Low Definition (240 lines)"
-msgstr "Định dạng siêu thấp (240 line)"
+msgstr "Độ phân giải rất thấp (240 dòng)"
 
 #: src/libvlc-module.c:630
 msgid "Input repetitions"
@@ -2897,7 +2898,7 @@ msgstr "Tốc độ lướt mà bạn muốn"
 
 #: src/libvlc-module.c:650
 msgid "Playback speed"
-msgstr "Tốc độ phát lại"
+msgstr "Tốc độ phát"
 
 #: src/libvlc-module.c:652
 msgid "This defines the playback speed (nominal speed is 1.0)."
@@ -6445,7 +6446,7 @@ msgstr ""
 
 #: modules/access/bluray.c:928
 msgid "Java was not found on your system."
-msgstr ""
+msgstr "Không tìm thấy Java trên hệ thống của bạn."
 
 #: modules/access/bluray.c:951
 msgid "Failed to start bluray playback. Please try without menu support."
@@ -13409,7 +13410,7 @@ msgstr ""
 
 #: modules/codec/videotoolbox.m:90
 msgid "VideoToolbox video decoder"
-msgstr ""
+msgstr "Bộ giải mã VideoToolbox"
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -17687,11 +17688,11 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
-msgstr ""
+msgstr "Trình kết xuất"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
-msgstr ""
+msgstr "Không có trình kết xuất"
 
 #: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
@@ -21274,7 +21275,7 @@ msgstr "Phụ đ&ề"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
 msgid "Tool&s"
-msgstr ""
+msgstr "&Công cụ"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -21370,7 +21371,7 @@ msgstr "Hiển thị danh sách"
 
 #: modules/gui/qt/menus.cpp:501
 msgid "Always on &top"
-msgstr ""
+msgstr "Luôn luôn đặt &trên cùng"
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
@@ -21562,7 +21563,7 @@ msgstr "Xóa"
 
 #: modules/gui/qt/menus.cpp:1629
 msgid "&Renderer"
-msgstr ""
+msgstr "Trình &kết xuất"
 
 #: modules/gui/qt/menus.cpp:1633
 msgid "<Local>"
@@ -25932,7 +25933,7 @@ msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
-msgstr "Trình render văn bản"
+msgstr "Trình kết xuất văn bản"
 
 #: modules/text_renderer/freetype/freetype.c:157
 msgid "Freetype2 font renderer"
@@ -29168,7 +29169,7 @@ msgstr "Chính sách đối với bộ nhớ đệm theo mặc định"
 
 #: modules/gui/qt/ui/sprefs_interface.h:530
 msgid "Menus language:"
-msgstr ""
+msgstr "Ngôn ngữ trình đơn"
 
 #: modules/gui/qt/ui/sprefs_interface.h:531
 msgid "Look and feel"
