@@ -16,22 +16,22 @@ $(TARBALLS)/pupnp-release-$(UPNP_VERSION).tar.gz:
 
 UPNP_CFLAGS := $(CFLAGS) -DUPNP_STATIC_LIB
 UPNP_CXXFLAGS := $(CXXFLAGS) -DUPNP_STATIC_LIB
-CONFIGURE_ARGS := --disable-samples --without-documentation
+UPNP_CONF := --disable-samples --without-documentation
 
 ifdef HAVE_WIN32
 DEPS_upnp += pthreads $(DEPS_pthreads)
 endif
 ifdef HAVE_WINSTORE
-CONFIGURE_ARGS += --disable-ipv6 --enable-unspecified_server
+UPNP_CONF += --disable-ipv6 --enable-unspecified_server
 else
 ifdef HAVE_IOS
-CONFIGURE_ARGS += --disable-ipv6 --enable-unspecified_server
+UPNP_CONF += --disable-ipv6 --enable-unspecified_server
 else
-CONFIGURE_ARGS += --enable-ipv6
+UPNP_CONF += --enable-ipv6
 endif
 endif
 ifndef WITH_OPTIMIZATION
-CONFIGURE_ARGS += --enable-debug
+UPNP_CONF += --enable-debug
 endif
 
 upnp: pupnp-release-$(UPNP_VERSION).tar.gz .sum-upnp
@@ -58,6 +58,6 @@ endif
 
 .upnp: upnp
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(UPNP_CFLAGS)" CXXFLAGS="$(UPNP_CXXFLAGS)" ./configure $(CONFIGURE_ARGS) $(HOSTCONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(UPNP_CFLAGS)" CXXFLAGS="$(UPNP_CXXFLAGS)" ./configure $(UPNP_CONF) $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
