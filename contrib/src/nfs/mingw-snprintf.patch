@@ -1,0 +1,11 @@
+--- nfs/include/win32/win32_compat.h.orig	2021-03-15 10:40:08.534061716 +0200
++++ nfs/include/win32/win32_compat.h	2021-03-15 10:40:54.088974157 +0200
+@@ -133,7 +133,7 @@
+ 
+ /* Wrapper macros to call misc. functions win32 is missing */
+ #define poll(x, y, z)        win32_poll(x, y, z)
+-#define snprintf             sprintf_s
++//#define snprintf             sprintf_s
+ #define inet_pton(x,y,z)     win32_inet_pton(x,y,z)
+ #define open(x, y, z)        _open(x, y, z)
+ #ifndef lseek
