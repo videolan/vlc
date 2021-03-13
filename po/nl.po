@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-03-04 12:48+0100\n"
+"PO-Revision-Date: 2021-03-13 10:36+0100\n"
 "Last-Translator: Thomas De Rocker <thomasderocker at outlook dot com>, 2021\n"
 "Language-Team: Dutch (https://www.transifex.com/yaron/teams/16553/nl/)\n"
 "Language: nl\n"
@@ -305,10 +305,11 @@ msgid ""
 "always force a specific muxer. You should probably not do that.\n"
 "You can also set default parameters for each muxer."
 msgstr ""
-"Muxers maken de inkapselformaten die gebruikt worden om alle elementaire "
-"streams (video, audio, ...) te bundelen. Met deze instelling kunt u een "
-"bepaalde muxer forceren. U kunt dit waarschijnlijk beter niet doen.\n"
-"U kunt ook standaardparameters voor elke muxer instellen."
+"Muxers maken de inkapselingsformaten die worden gebruikt om alle elementaire "
+"streams (video, audio,...) samen te voegen. Met deze instelling kunt u "
+"altijd een specifieke muxer forceren. U kunt dat waarschijnlijk beter niet "
+"doen.\n"
+"U kunt ook standaardparameters instellen voor elke muxer."
 
 #: include/vlc_config_cat.h:147
 msgid "Access output"
@@ -337,10 +338,10 @@ msgid ""
 "not do that.\n"
 "You can also set default parameters for each packetizer."
 msgstr ""
-"Packetizers worden gebruikt voor het voorverwerken van elementaire streams "
-"voor ze te muxen. Met deze instelling kunt u een bepaalde packetizer "
-"forceren. U kunt dit beter niet doen.\n"
-"U kunt ook standaardparameters voor iedere packetizer instellen."
+"Packetizers worden gebruikt om de elementaire streams \"voor te verwerken\" "
+"voor het muxen. Deze instelling maakt het mogelijk om altijd een packetizer "
+"te forceren. U kunt dit beter niet doen.\n"
+"U kunt ook standaardparameters instellen voor elke packetizer."
 
 #: include/vlc_config_cat.h:162
 msgid "Sout stream"
@@ -352,9 +353,9 @@ msgid ""
 "the Streaming Howto for more information. You can configure default options "
 "for each sout stream module here."
 msgstr ""
-"Sout-streammodules zorgen voor het bouwen van sout-verwerkingsketens. Lees "
-"de Streaming Howto voor meer informatie. U kunt hier de standaardwaarden "
-"voor de opties van iedere sout-streammodule aanpassen."
+"Sout-streammodules maken het mogelijk om een sout-verwerkingsketen te "
+"bouwen. Lees de Streaming Howto voor meer informatie. U kunt hier "
+"standaardopties configureren voor elke sout-streammodule."
 
 #: include/vlc_config_cat.h:168
 msgid "VOD"
@@ -362,7 +363,7 @@ msgstr "VOD"
 
 #: include/vlc_config_cat.h:169
 msgid "VLC's implementation of Video On Demand"
-msgstr "VLC's Video On Demand-implementatie"
+msgstr "VLC's implementatie van Video On Demand"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2070
 #: src/playlist/engine.c:243 modules/demux/playlist/playlist.c:64
@@ -381,9 +382,9 @@ msgid ""
 "Settings related to playlist behaviour (e.g. playback mode) and to modules "
 "that automatically add items to the playlist (\"service discovery\" modules)."
 msgstr ""
-"Instellingen gerelateerd aan afspeellijstgedrag (bijv. afspeelmodus) en aan "
-"modules die automatisch items aan de afspeellijst toevoegen "
-"(\"dienstontdekking\"modules)."
+"Instellingen in verband met afspeellijstgedrag (bijvoorbeeld afspeelmodus) "
+"en met modules die automatisch items aan de afspeellijst toevoegen "
+"(\"dienstontdekking\"-modules)."
 
 #: include/vlc_config_cat.h:178
 msgid "General playlist behaviour"
@@ -398,7 +399,7 @@ msgid ""
 "Services discovery modules are facilities that automatically add items to "
 "playlist."
 msgstr ""
-"Dienstontdekkingmodules zijn faciliteiten die automatisch items aan een "
+"Dienstontdekkingmodules zijn voorzieningen die automatisch items aan een "
 "afspeellijst toevoegen."
 
 #: include/vlc_config_cat.h:184 src/libvlc-module.c:1862
@@ -413,7 +414,7 @@ msgstr "Geavanceerde instellingen. Wees voorzichtig..."
 
 #: include/vlc_config_cat.h:187
 msgid "Advanced settings"
-msgstr "Geavanceerde opties"
+msgstr "Geavanceerde instellingen"
 
 #: include/vlc_intf_strings.h:46
 msgid "&Open File..."
@@ -433,7 +434,7 @@ msgstr "&Map openen..."
 
 #: include/vlc_intf_strings.h:50
 msgid "Select one or more files to open"
-msgstr "Selecteer een of meerdere bestanden om te openen"
+msgstr "Een of meerdere bestanden selecteren om te openen"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Directory"
@@ -449,7 +450,7 @@ msgstr "Media-&informatie"
 
 #: include/vlc_intf_strings.h:56
 msgid "&Codec Information"
-msgstr "&Codecinformatie"
+msgstr "&Codec-informatie"
 
 #: include/vlc_intf_strings.h:57
 msgid "&Messages"
@@ -486,7 +487,7 @@ msgstr "Afspelen"
 
 #: include/vlc_intf_strings.h:66
 msgid "Remove Selected"
-msgstr "Selectie verwijderen"
+msgstr "Geselecteerde verwijderen"
 
 #: include/vlc_intf_strings.h:67
 msgid "Information..."
@@ -21371,7 +21372,7 @@ msgstr "&Help"
 
 #: modules/gui/qt/menus.cpp:357
 msgid "Open &File..."
-msgstr "Bestand openen..."
+msgstr "&Bestand openen..."
 
 #: modules/gui/qt/menus.cpp:359
 msgid "&Open Multiple Files..."
