@@ -3768,10 +3768,6 @@ if test "${enable_mmal}" != "no"; then
   AC_CHECK_HEADERS([interface/mmal/mmal.h],
     [ AC_CHECK_LIB([bcm_host], [vc_tv_unregister_callback_full], [
         have_mmal="yes"
-        VLC_ADD_PLUGIN([mmal])
-        VLC_ADD_LDFLAGS([mmal],[ -L/opt/vc/lib ])
-        VLC_ADD_CFLAGS([mmal],[ -isystem /opt/vc/include -isystem /opt/vc/include/interface/vcos/pthreads -isystem /opt/vc/include/interface/vmcs_host/linux ])
-        VLC_ADD_LIBS([mmal],[ -lbcm_host -lmmal -lmmal_core -lmmal_components -lmmal_util -lvchostif -lvcsm -lvchiq_arm ])
         MMAL_CFLAGS="-isystem /opt/vc/include -isystem /opt/vc/include/interface/vcos/pthreads -isystem /opt/vc/include/interface/vmcs_host/linux"
         MMAL_LIBS="-L/opt/vc/lib -lbcm_host -lmmal -lmmal_core -lmmal_components -lmmal_util -lvchostif -lvcsm -lvchiq_arm"
         ],[
