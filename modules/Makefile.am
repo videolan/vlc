@@ -6,15 +6,8 @@ check_PROGRAMS =
 pkglibexec_PROGRAMS =
 EXTRA_DIST =
 
-EXTRA_SUBDIRS = \
-	hw/mmal
 
 SUBDIRS = .
-DIST_SUBDIRS = . $(EXTRA_SUBDIRS)
-if HAVE_MMAL
-SUBDIRS += hw/mmal
-endif
-
 TESTS =
 
 dist_noinst_SCRIPTS = module.rc.in
@@ -37,6 +30,7 @@ include hw/d3d9/Makefile.am
 include hw/d3d11/Makefile.am
 include hw/vaapi/Makefile.am
 include hw/vdpau/Makefile.am
+include hw/mmal/Makefile.am
 include keystore/Makefile.am
 include logger/Makefile.am
 include lua/Makefile.am

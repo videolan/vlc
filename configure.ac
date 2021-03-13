@@ -4645,7 +4645,6 @@ AC_CONFIG_FILES([
   lib/Makefile
   bin/Makefile
   test/Makefile
-  modules/hw/mmal/Makefile
   share/vlc.appdata.xml.in
 ])
 
