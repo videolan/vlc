@@ -323,7 +323,7 @@ void SegmentTracker::resetChunksSequence()
     }
 }
 
-SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
+ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed,
                                             AbstractConnectionManager *connManager)
 {
     if(!adaptationSet || !next.isValid())
@@ -345,7 +345,8 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
 
     /* here next == wanted chunk pos */
     bool b_gap = (next.number != chunk.pos.number);
-    bool b_switched = (next.rep != chunk.pos.rep);
+    const bool b_switched = (next.rep != chunk.pos.rep);
+    const bool b_discontinuity = chunk.chunk->discontinuity;
 
     if(b_switched)
     {
@@ -356,32 +357,35 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     /* advance or don't trigger duplicate events */
     next = current = chunk.pos;
 
-    if(chunk.pos.rep->getStreamFormat() != format)
+    /* From this point chunk must be returned */
+    ChunkInterface *returnedChunk;
+    StreamFormat chunkformat = chunk.chunk->getStreamFormat();
+
+    /* Wrap and probe format */
+    if(chunkformat == StreamFormat(StreamFormat::UNKNOWN))
     {
-        /* Initial format ? */
-        if(format == StreamFormat(StreamFormat::UNKNOWN))
-        {
-            format = chunk.pos.rep->getStreamFormat();
-        }
-        else
-        {
-            format = chunk.pos.rep->getStreamFormat();
-            notify(FormatChangedEvent(&format)); /* Notify new demux format */
-            return nullptr; /* Force current demux to end */
-        }
+        ProbeableChunk *wrappedck = new ProbeableChunk(chunk.chunk);
+        const uint8_t *p_peek;
+        size_t i_peek = wrappedck->peek(&p_peek);
+        chunkformat = StreamFormat(p_peek, i_peek);
+        /* fallback on Mime type */
+        if(chunkformat == StreamFormat(StreamFormat::UNKNOWN))
+            format = StreamFormat(chunk.chunk->getContentType());
+        chunk.chunk->setStreamFormat(chunkformat);
+        returnedChunk = wrappedck;
     }
-    else if(format == StreamFormat(StreamFormat::UNKNOWN) && b_switched)
+    else returnedChunk = chunk.chunk;
+
+    if(chunkformat != format &&
+       chunkformat != StreamFormat(StreamFormat::UNKNOWN))
     {
-        /* Handle the corner case when only the demuxer can know the format and
-         * demuxer starts after the format change (Probe != buffering) */
-        notify(FormatChangedEvent(&format)); /* Notify new demux format */
-        return nullptr; /* Force current demux to end */
+        format = chunkformat;
+        notify(FormatChangedEvent(&format));
     }
 
-    if(format == StreamFormat(StreamFormat::UNSUPPORTED))
-    {
-        return nullptr; /* Can't return chunk because no demux will be created */
-    }
+    /* pop position and return our chunk */
+    chunkssequence.pop_front();
+    chunk.chunk = nullptr;
 
     if(initializing)
     {
@@ -394,25 +398,14 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     if(chunk.pos.init_sent && chunk.pos.index_sent)
         notify(SegmentChangedEvent(adaptationSet->getID(), chunk.duration));
 
-    /* We need to check segment/chunk format changes, as we can't rely on representation's (HLS)*/
-    if(format != chunk.pos.rep->getStreamFormat())
-    {
-        format = chunk.pos.rep->getStreamFormat();
-        notify(FormatChangedEvent(&format));
-    }
-
     /* Handle both implicit and explicit discontinuities */
-    if(b_gap || chunk.chunk->discontinuity)
+    if(b_gap || b_discontinuity)
         notify(DiscontinuityEvent());
 
     if(!b_gap)
         ++next;
 
-    /* pop position and return our chunk */
-    chunkssequence.pop_front();
-    SegmentChunk *segmentChunk = chunk.chunk;
-    chunk.chunk = nullptr;
-    return segmentChunk;
+    return returnedChunk;
 }
 
 bool SegmentTracker::setPositionByTime(vlc_tick_t time, bool restarted, bool tryonly)

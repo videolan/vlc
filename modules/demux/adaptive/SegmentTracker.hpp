@@ -35,6 +35,7 @@ namespace adaptive
     namespace http
     {
         class AbstractConnectionManager;
+        class ChunkInterface;
     }
 
     namespace logic
@@ -184,7 +185,7 @@ namespace adaptive
             void getCodecsDesc(CodecDescriptionList *) const;
             const Role & getStreamRole() const;
             void reset();
-            SegmentChunk* getNextChunk(bool, AbstractConnectionManager *);
+            ChunkInterface* getNextChunk(bool, AbstractConnectionManager *);
             bool setPositionByTime(vlc_tick_t, bool, bool);
             void setPosition(const Position &, bool);
             bool setStartPosition();

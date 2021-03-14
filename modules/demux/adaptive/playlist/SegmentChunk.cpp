@@ -69,10 +69,12 @@ void SegmentChunk::onDownload(block_t **pp_block)
 
 StreamFormat SegmentChunk::getStreamFormat() const
 {
-    if(rep)
-        return rep->getStreamFormat();
-    else
-        return StreamFormat();
+    return (format == StreamFormat() && rep) ? rep->getStreamFormat() : format;
+}
+
+void SegmentChunk::setStreamFormat(const StreamFormat &f)
+{
+    format = f;
 }
 
 void SegmentChunk::setEncryptionSession(CommonEncryptionSession *s)

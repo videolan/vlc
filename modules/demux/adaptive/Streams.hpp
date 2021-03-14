@@ -127,6 +127,7 @@ namespace adaptive
         AbstractConnectionManager *connManager; /* not owned */
         SegmentTracker *segmentTracker;
 
+        ChunkInterface * getNextChunk() const;
         ChunkInterface *currentChunk;
         bool eof;
         std::string language;
