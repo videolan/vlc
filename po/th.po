@@ -17,8 +17,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-12-15 11:25+0100\n"
-"Last-Translator: Nattee Niparnan <nattee@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-03-14 07:02+0100\n"
+"Last-Translator: Aefgh Threenine <aefgh3962@gmail.com>, 2021\n"
 "Language-Team: Thai (https://www.transifex.com/yaron/teams/16553/th/)\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
@@ -5985,13 +5985,15 @@ msgstr "ส่วนนำเข้าแฟ้มแนบ"
 
 #: modules/access/avaudiocapture.m:212
 msgid "No Audio Input device found"
-msgstr ""
+msgstr "ไม่พบอุปกรณ์นำเข้าเสียง"
 
 #: modules/access/avaudiocapture.m:213
 msgid ""
 "Your Mac does not seem to be equipped with a suitable audio input device."
 "Please check your connectors and drivers."
 msgstr ""
+"ดูเหมือนว่า Mac ของคุณจะไม่ได้มาพร้อมกับอุปกรณ์นำเข้าเสียงที่เหมาะสม "
+"โปรดตรวจสอบขั้วต่อและไดรเวอร์ของคุณ"
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/disc_helper.h:56
