@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-02-28 10:07+0100\n"
+"PO-Revision-Date: 2021-03-14 09:52+0100\n"
 "Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2021\n"
 "Language-Team: Latvian (https://www.transifex.com/yaron/teams/16553/lv/)\n"
 "Language: lv\n"
@@ -15203,7 +15203,7 @@ msgstr "Dzīvās atskaņošanas aizture (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "Kompromiss starp stabilitāti un reāllaiku"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
