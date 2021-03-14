@@ -262,6 +262,12 @@ bool AbstractStream::startDemux()
     if(demuxer)
         return false;
 
+    if(!currentChunk)
+    {
+        currentChunk = getNextChunk();
+        needrestart = false;
+    }
+
     demuxersource->Reset();
     demuxer = createDemux(format);
     if(!demuxer && format != StreamFormat())
@@ -398,7 +404,6 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(mtime_t nz_deadline,
 
     if(!demuxer)
     {
-        format = segmentTracker->getCurrentFormat();
         if(!startDemux())
         {
             /* If demux fails because of probing failure / wrong format*/
@@ -515,13 +520,16 @@ AbstractStream::Status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_
     return Status::Buffering;
 }
 
+ChunkInterface * AbstractStream::getNextChunk() const
+{
+    const bool b_restarting = fakeEsOut()->restarting();
+    return segmentTracker->getNextChunk(!b_restarting, connManager);
+}
+
 std::string AbstractStream::getContentType()
 {
     if (currentChunk == nullptr && !eof)
-    {
-        const bool b_restarting = fakeEsOut()->restarting();
-        currentChunk = segmentTracker->getNextChunk(!b_restarting, connManager);
-    }
+        currentChunk = getNextChunk();
     if(currentChunk)
         return currentChunk->getContentType();
     else
@@ -531,10 +539,7 @@ std::string AbstractStream::getContentType()
 block_t * AbstractStream::readNextBlock()
 {
     if (currentChunk == nullptr && !eof)
-    {
-        const bool b_restarting = fakeEsOut()->restarting();
-        currentChunk = segmentTracker->getNextChunk(!b_restarting, connManager);
-    }
+        currentChunk = getNextChunk();
 
     if(discontinuity && demuxfirstchunk)
     {
