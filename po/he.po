@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-03-02 08:43+0100\n"
+"PO-Revision-Date: 2021-03-14 12:13+0100\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2021\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/16553/he/)\n"
 "Language: he\n"
@@ -11448,25 +11448,26 @@ msgstr ""
 
 #: modules/codec/kate.c:221
 msgid "Default font effect"
-msgstr ""
+msgstr "אפקט גופן כבררת מחדל"
 
 #: modules/codec/kate.c:222
 msgid ""
 "Add a font effect to text to improve readability against different "
 "backgrounds."
 msgstr ""
+"הוספת אפקט לגופן כדי לשפר את היכולת לקרוא אותו כנגד סוגים שונים של רקע."
 
 #: modules/codec/kate.c:226
 msgid "Default font effect strength"
-msgstr ""
+msgstr "עצמת אפקט הגופן כבררת מחדל"
 
 #: modules/codec/kate.c:227
 msgid "How pronounced to make the chosen font effect (effect dependent)."
-msgstr ""
+msgstr "כמה מודגש אמור להיות אפקט הגופן הנבחר (תלוי אפקט)."
 
 #: modules/codec/kate.c:231
 msgid "Default font description"
-msgstr ""
+msgstr "תיאור גופן כבררת מחדל"
 
 #: modules/codec/kate.c:232
 msgid ""
@@ -23345,11 +23346,11 @@ msgstr ""
 
 #: modules/spu/logo.c:60
 msgid "X coordinate of the logo. You can move the logo by left-clicking it."
-msgstr ""
+msgstr "נקודת ציון של הלוגו בציר X. ניתן להזיז את הלוגו בלחיצה שמאלית עליו."
 
 #: modules/spu/logo.c:63
 msgid "Y coordinate of the logo. You can move the logo by left-clicking it."
-msgstr ""
+msgstr "נקודת ציון של הלוגו בציר Y. ניתן להזיז את הלוגו בלחיצה שמאלית עליו."
 
 #: modules/spu/logo.c:65
 msgid "Opacity of the logo"
@@ -23369,6 +23370,8 @@ msgid ""
 "Enforce the logo position on the video (0=center, 1=left, 2=right, 4=top, "
 "8=bottom, you can also use combinations of these values, eg 6 = top-right)."
 msgstr ""
+"לקבע את מיקום הלוגו על הווידאו (0=מרכז, 1=שמאל, 2=ימין, 4=למעלה, 8=למטה, "
+"ניתן להשתמש בשילוב של הערכים האלה, למשל 6 = למעלה מימין)."
 
 #: modules/spu/logo.c:74
 msgid "Use a local picture as logo on the video"
@@ -23391,6 +23394,8 @@ msgid ""
 "Marquee text to display. (Available format strings: %Y = year, %m = month, "
 "%d = day, %H = hour, %M = minute, %S = second, ...)"
 msgstr ""
+"טקסט נגלל להצגה. (מחרוזות תבנית זמינות: ‎%Y = שנה, ‎%m = חודש, ‎%d = יום, ‎%H = "
+"שעה, ‎%M = דקה, ‎%S = שנייה…)"
 
 #: modules/spu/marq.c:94
 msgid "Text file"
@@ -23398,7 +23403,7 @@ msgstr "קובץ טקסט"
 
 #: modules/spu/marq.c:95
 msgid "File to read the marquee text from."
-msgstr ""
+msgstr "קובץ ממנו לקרוא את הטקסט הנגלל."
 
 #: modules/spu/marq.c:96 modules/spu/rss.c:140
 #: modules/stream_out/mosaic_bridge.c:128
@@ -23429,6 +23434,8 @@ msgid ""
 "Number of milliseconds the marquee must remain displayed. Default value is 0 "
 "(remains forever)."
 msgstr ""
+"מס׳ המילישניות שבהן הכתובית הנגללת חייבת להישאר בתצוגה. ערך בררת המחדל הוא 0 "
+"(נשארת לעד)."
 
 #: modules/spu/marq.c:104
 msgid "Refresh period in ms"
@@ -23439,12 +23446,14 @@ msgid ""
 "Number of milliseconds between string updates. This is mainly useful when "
 "using meta data or time format string sequences."
 msgstr ""
+"מס׳ המילישניות בין עדכוני המחרוזת. שימושי בעיקר בעת שימוש בנתוני על או "
+"מחרוזות רצפים בתבנית של זמן."
 
 #: modules/spu/marq.c:109
 msgid ""
 "Opacity (inverse of transparency) of overlayed text. 0 = transparent, 255 = "
 "totally opaque."
-msgstr ""
+msgstr "אטימות (ההפך משקיפות) של הטקסט הצף. 0 = שקוף, 255 = אטום לחלוטין."
 
 #: modules/spu/marq.c:111 modules/spu/rss.c:148
 msgid "Font size, pixels"
