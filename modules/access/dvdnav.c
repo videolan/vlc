@@ -422,8 +422,7 @@ static int AccessDemuxOpen ( vlc_object_t *p_this )
     /* Open dvdnav */
     psz_path = ToLocale( psz_file );
 #if DVDNAV_VERSION >= 60100
-    dvdnav_logger_cb cbs;
-    cbs.pf_log = DvdNavLog;
+    dvdnav_logger_cb cbs = { .pf_log = DvdNavLog };
     if( dvdnav_open2( &p_dvdnav, p_demux, &cbs, psz_path  ) != DVDNAV_STATUS_OK )
 #else
     if( dvdnav_open( &p_dvdnav, psz_path  ) != DVDNAV_STATUS_OK )
