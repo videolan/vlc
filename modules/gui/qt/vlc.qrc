@@ -26,6 +26,7 @@
         <file alias="wait4.svg">pixmaps/util/wait4.svg</file>
         <file alias="SelectableDelegateModel.qml">util/qml/SelectableDelegateModel.qml</file>
         <file alias="KeyHelper.js">util/qml/KeyHelper.js</file>
+        <file alias="Helpers.js">util/qml/Helpers.js</file>
     </qresource>
     <qresource prefix="/toolbar">
         <file alias="faster.svg">pixmaps/faster.svg</file>

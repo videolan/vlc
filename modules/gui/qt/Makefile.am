@@ -731,6 +731,7 @@ libqt_plugin_la_QML = \
 	gui/qt/style/VLCIcons.qml \
 	gui/qt/style/VLCStyle.qml \
 	gui/qt/style/qmldir \
+	gui/qt/util/qml/Helpers.js \
 	gui/qt/util/qml/KeyHelper.js \
 	gui/qt/util/qml/SelectableDelegateModel.qml \
 	gui/qt/widgets/qml/BannerTabButton.qml \
