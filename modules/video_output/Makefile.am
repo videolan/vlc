@@ -39,6 +39,8 @@ libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.m \
 libglinterop_cvpx_plugin_la_SOURCES += codec/vt_utils.c codec/vt_utils.h
 libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,Foundation,-framework,CoreVideo
+libglinterop_cvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -fobjc-arc
+
 
 if HAVE_OSX
 libvout_macosx_plugin_la_SOURCES = video_output/macosx.m
@@ -58,7 +60,7 @@ vout_PLUGINS += libvout_macosx_plugin.la libcaopengllayer_plugin.la \
 	libglinterop_cvpx_plugin.la
 endif
 if HAVE_IOS
-libglinterop_cvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
+libglinterop_cvpx_plugin_la_CFLAGS += -DUSE_OPENGL_ES2
 libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface,-framework,OpenGLES
 endif
 
