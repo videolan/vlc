@@ -58,6 +58,7 @@ typedef struct
     es_out_id_t *es;
     vlc_v4l2_ctrl_t *controls;
     vlc_tick_t start;
+    vlc_tick_t interval;
 
 #ifdef ZVBI_COMPILED
     vlc_v4l2_vbi_t *vbi;
@@ -405,6 +406,10 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
     es_fmt.video.i_frame_rate = parm.parm.capture.timeperframe.denominator;
     es_fmt.video.i_frame_rate_base = parm.parm.capture.timeperframe.numerator;
     GetAR (fd, &es_fmt.video.i_sar_num, &es_fmt.video.i_sar_den);
+
+    sys->interval = vlc_tick_from_samples(
+        parm.parm.capture.timeperframe.numerator,
+        parm.parm.capture.timeperframe.denominator);
 
     msg_Dbg (demux, "color primaries: %u", fmt.fmt.pix.colorspace);
     switch (fmt.fmt.pix.colorspace)
@@ -848,9 +853,14 @@ static int DemuxControl( demux_t *demux, int query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
-            *va_arg(args,vlc_tick_t *) = VLC_TICK_FROM_MS(
-                var_InheritInteger( demux, "live-caching" ) );
+        {
+            vlc_tick_t *pd = va_arg(args, vlc_tick_t *);
+
+            *pd = VLC_TICK_FROM_MS(var_InheritInteger(demux, "live-caching"));
+            if (*pd > sys->interval)
+                *pd = sys->interval; /* cap at one frame, more than enough */
             return VLC_SUCCESS;
+        }
 
         case DEMUX_GET_TIME:
             *va_arg (args, vlc_tick_t *) = vlc_tick_now() - sys->start;
