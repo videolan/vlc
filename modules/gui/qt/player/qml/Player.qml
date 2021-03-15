@@ -32,7 +32,7 @@ Widgets.NavigableFocusScope {
     id: rootPlayer
 
     //menu/overlay to dismiss
-    property var _menu: undefined
+    property var menu: undefined
     property int _lockAutoHide: 0
     readonly property bool _autoHide: _lockAutoHide == 0
                                       && rootPlayer.hasEmbededVideo
@@ -92,8 +92,12 @@ Widgets.NavigableFocusScope {
     }
 
     function dismiss() {
-        if (_menu)
-            _menu.dismiss()
+        if ((typeof menu === undefined) || !menu)
+            return
+        if (menu.hasOwnProperty("dismiss"))
+            menu.dismiss()
+        else if (menu.hasOwnProperty("close"))
+            menu.close()
     }
 
     function lockUnlockAutoHide(lock, source /*unused*/) {

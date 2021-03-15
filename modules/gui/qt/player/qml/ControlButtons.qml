@@ -448,13 +448,13 @@ Item{
 
                 onOpened: {
                     controlButtons.requestLockUnlockAutoHide(true, controlButtons)
-                    rootPlayer._menu = langMenu
+                    rootPlayer.menu = langMenu
                 }
 
                 onMenuClosed: {
                     controlButtons.requestLockUnlockAutoHide(false, controlButtons)
                     langBtn.forceActiveFocus()
-                    rootPlayer._menu = undefined
+                    rootPlayer.menu = undefined
                 }
             }
         }
