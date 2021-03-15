@@ -49,7 +49,6 @@ namespace adaptive
         protected:
             virtual ssize_t Read(uint8_t *, size_t) = 0;
             virtual int     Seek(uint64_t) = 0;
-            virtual std::string getContentType() = 0;
             bool b_eof;
             vlc_object_t *p_obj;
             AbstractSource *source;
@@ -72,7 +71,6 @@ namespace adaptive
             virtual ssize_t Read(uint8_t *, size_t) override;
             virtual int     Seek(uint64_t) override;
             virtual size_t  Peek(const uint8_t **, size_t) override;
-            virtual std::string getContentType() override;
 
         private:
             block_t *p_block;
@@ -89,7 +87,6 @@ namespace adaptive
             virtual ssize_t Read(uint8_t *, size_t) override;
             virtual int     Seek(uint64_t) override;
             virtual size_t  Peek(const uint8_t **, size_t) override;
-            virtual std::string getContentType() override;
 
         private:
             ssize_t doRead(uint8_t *, size_t);
