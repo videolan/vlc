@@ -59,25 +59,6 @@ namespace adaptive
             bool b_candetectswitches;
     };
 
-    class MimeDemuxer : public AbstractDemuxer
-    {
-        public:
-            MimeDemuxer(vlc_object_t *, const DemuxerFactoryInterface *,
-                        es_out_t *, AbstractSourceStream *);
-            virtual ~MimeDemuxer();
-            virtual Status demux(vlc_tick_t) override;
-            virtual void drain() override;
-            virtual bool create() override;
-            virtual void destroy() override;
-
-        protected:
-            AbstractSourceStream *sourcestream;
-            vlc_object_t *p_obj;
-            AbstractDemuxer *demuxer;
-            const DemuxerFactoryInterface *factory;
-            es_out_t *p_es_out;
-    };
-
     class Demuxer : public AbstractDemuxer
     {
         public:

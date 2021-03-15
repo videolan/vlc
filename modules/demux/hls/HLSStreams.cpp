@@ -153,11 +153,8 @@ AbstractDemuxer *HLSStream::newDemux(vlc_object_t *p_obj, const StreamFormat &fo
             break;
 */
 
-        case StreamFormat::UNKNOWN:
-            ret = new MimeDemuxer(p_obj, this, out, source);
-            break;
-
         default:
+        case StreamFormat::UNKNOWN:
         case StreamFormat::UNSUPPORTED:
             break;
     }
