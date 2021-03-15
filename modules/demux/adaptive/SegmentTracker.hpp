@@ -188,7 +188,7 @@ namespace adaptive
             bool setPositionByTime(vlc_tick_t, bool, bool);
             void setPosition(const Position &, bool);
             bool setStartPosition();
-            Position getStartPosition();
+            Position getStartPosition() const;
             vlc_tick_t getPlaybackTime(bool = false) const; /* Current segment start time if selected */
             bool getMediaPlaybackRange(vlc_tick_t *, vlc_tick_t *, vlc_tick_t *) const;
             vlc_tick_t getMinAheadTime() const;
@@ -199,6 +199,20 @@ namespace adaptive
             bool bufferingAvailable() const;
 
         private:
+            class ChunkEntry
+            {
+                public:
+                    ChunkEntry();
+                    ChunkEntry(SegmentChunk *c, Position p, vlc_tick_t d);
+                    bool isValid() const;
+                    SegmentChunk *chunk;
+                    Position pos;
+                    vlc_tick_t duration;
+            };
+            std::list<ChunkEntry> chunkssequence;
+            ChunkEntry prepareChunk(bool switch_allowed, Position pos,
+                                    AbstractConnectionManager *connManager) const;
+            void resetChunksSequence();
             void setAdaptationLogic(AbstractAdaptationLogic *);
             void notify(const TrackerEvent &) const;
             bool first;
