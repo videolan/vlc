@@ -205,8 +205,7 @@ static int Open( vlc_object_t *p_this )
     /* Open dvdread */
     const char *psz_path = ToLocale( psz_file );
 #if DVDREAD_VERSION >= DVDREAD_VERSION_CODE(6, 1, 0)
-    dvd_logger_cb cbs;
-    cbs.pf_log = DvdReadLog;
+    dvd_logger_cb cbs = { .pf_log = DvdReadLog };
     dvd_reader_t *p_dvdread = DVDOpen2( p_demux, &cbs, psz_path );
 #else
     dvd_reader_t *p_dvdread = DVDOpen( psz_path );
