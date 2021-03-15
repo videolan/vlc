@@ -96,7 +96,6 @@ namespace adaptive
         void runUpdates();
 
         /* Used by demuxers fake streams */
-        virtual std::string getContentType() override;
         virtual block_t *readNextBlock() override;
 
         /**/

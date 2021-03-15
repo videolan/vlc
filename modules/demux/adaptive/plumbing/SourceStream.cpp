@@ -59,9 +59,8 @@ int AbstractChunksSourceStream::seek_Callback(stream_t *s, uint64_t i_pos)
     return me->Seek(i_pos);
 }
 
-int AbstractChunksSourceStream::control_Callback(stream_t *s, int i_query, va_list args)
+int AbstractChunksSourceStream::control_Callback(stream_t *, int i_query, va_list args)
 {
-    AbstractChunksSourceStream *me = reinterpret_cast<AbstractChunksSourceStream *>(s->p_sys);
     switch( i_query )
     {
         case STREAM_GET_SIZE:
@@ -74,17 +73,6 @@ int AbstractChunksSourceStream::control_Callback(stream_t *s, int i_query, va_li
         case STREAM_CAN_CONTROL_PACE:
             *va_arg( args, bool * ) = false;
             return VLC_SUCCESS;
-
-        case STREAM_GET_CONTENT_TYPE:
-        {
-            std::string type = me->getContentType();
-            if(!type.empty())
-            {
-                *va_arg( args, char ** ) = strdup(type.c_str());
-                return VLC_SUCCESS;
-            }
-        }
-        break;
 
         case STREAM_GET_PTS_DELAY:
             *(va_arg( args, vlc_tick_t * )) = DEFAULT_PTS_DELAY;
@@ -132,16 +120,6 @@ void ChunksSourceStream::Reset()
         block_Release(p_block);
     p_block = nullptr;
     AbstractChunksSourceStream::Reset();
-}
-
-std::string ChunksSourceStream::getContentType()
-{
-    if(!b_eof && !p_block)
-    {
-        p_block = source->readNextBlock();
-        b_eof = !p_block;
-    }
-    return source->getContentType();
 }
 
 size_t ChunksSourceStream::Peek(const uint8_t **pp, size_t sz)
@@ -303,13 +281,6 @@ size_t BufferedChunksSourceStream::Peek(const uint8_t **pp, size_t sz)
     }
     *pp = p_peekdata->p_buffer;
     return i_read;
-}
-
-std::string BufferedChunksSourceStream::getContentType()
-{
-    if(block_BytestreamRemaining(&bs) == 0)
-        fillByteStream(1);
-    return source->getContentType();
 }
 
 void BufferedChunksSourceStream::fillByteStream(size_t level)

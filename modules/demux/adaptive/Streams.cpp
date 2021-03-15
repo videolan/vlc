@@ -524,16 +524,6 @@ ChunkInterface * AbstractStream::getNextChunk() const
     return segmentTracker->getNextChunk(!b_restarting, connManager);
 }
 
-std::string AbstractStream::getContentType()
-{
-    if (currentChunk == nullptr && !eof)
-        currentChunk = getNextChunk();
-    if(currentChunk)
-        return currentChunk->getContentType();
-    else
-        return std::string();
-}
-
 block_t * AbstractStream::readNextBlock()
 {
     if (currentChunk == nullptr && !eof)
