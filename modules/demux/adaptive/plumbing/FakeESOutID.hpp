@@ -30,6 +30,7 @@ namespace adaptive
     class AbstractFakeESOutID
     {
         public:
+            virtual ~AbstractFakeESOutID() = default;
             virtual es_out_id_t * realESID() = 0;
             virtual void create() = 0;
             virtual void release() = 0;
