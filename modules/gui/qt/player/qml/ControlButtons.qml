@@ -451,13 +451,15 @@ Item{
 
                 onOpened: {
                     controlButtons.requestLockUnlockAutoHide(true, controlButtons)
-                    rootPlayer.menu = langMenu
+                    if (!!rootPlayer)
+                        rootPlayer.menu = langMenu
                 }
 
-                onMenuClosed: {
+                onClosed: {
                     controlButtons.requestLockUnlockAutoHide(false, controlButtons)
                     langBtn.forceActiveFocus()
-                    rootPlayer.menu = undefined
+                    if (!!rootPlayer)
+                        rootPlayer.menu = undefined
                 }
             }
         }

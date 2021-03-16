@@ -29,34 +29,17 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///util/" as Util
 import "qrc:///util/KeyHelper.js" as KeyHelper
 
-T.Menu {
+T.Popup {
     id: control
 
-    property var parentMenu: undefined
-    property bool _emitMenuClose: true
-    signal menuClosed
-
-    modal: true
-    cascade: false
-    closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
     height: VLCStyle.dp(296, VLCStyle.scale)
     width: (!!rootPlayer) ? rootPlayer.width : 0
 
-    onOpened: {
-        control._emitMenuClose = true
-
-        for (var i = 0; i < control.count; i++) {
-            if (control.itemAt(i).enabled) {
-                control.currentIndex = i
-                break
-            }
-        }
-    }
-
-    onClosed: {
-        if (control._emitMenuClose) {
-            menuClosed()
-        }
+    // Popup.CloseOnPressOutside doesn't work with non-model Popup on Qt < 5.15
+    closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
+    modal: true
+    T.Overlay.modal: Rectangle {
+        color: "transparent"
     }
 
     contentItem: StackView {
@@ -105,10 +88,6 @@ T.Menu {
     background: Rectangle {
         color: "#212121"
         opacity: .8
-    }
-
-    T.Overlay.modal: Rectangle {
-        color: "transparent"
     }
 
     function _updateWidth(isFirstPage) {
