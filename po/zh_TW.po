@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-03-01 13:14+0100\n"
+"PO-Revision-Date: 2021-03-17 15:04+0100\n"
 "Last-Translator: Aefgh Threenine <aefgh3962@gmail.com>, 2021\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/yaron/teams/16553/"
 "zh_TW/)\n"
@@ -4012,7 +4012,7 @@ msgstr "導覽往上"
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
-msgstr ""
+msgstr "選擇用於將 DVD 選單中的選擇器 / 將視點 (繞 X 軸旋轉) 向上移的按鍵。"
 
 #: src/libvlc-module.c:1297
 msgid "Navigate down"
@@ -4022,7 +4022,7 @@ msgstr "導覽往下"
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
-msgstr ""
+msgstr "選擇用於將 DVD 選單中的選擇器 / 將視點 (繞 X 軸旋轉) 向下移的按鍵。"
 
 #: src/libvlc-module.c:1299
 msgid "Navigate left"
@@ -4032,7 +4032,7 @@ msgstr "導覽往左"
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
-msgstr ""
+msgstr "選擇用於將 DVD 選單中的選擇器 / 將視點 (繞 Y 軸旋轉) 向左移的按鍵。"
 
 #: src/libvlc-module.c:1301
 msgid "Navigate right"
@@ -4042,7 +4042,7 @@ msgstr "導覽往右"
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
-msgstr ""
+msgstr "選擇用於將 DVD 選單中的選擇器 / 將視點 (繞 Y 軸旋轉) 向左移的按鍵。"
 
 #: src/libvlc-module.c:1303
 msgid "Activate"
@@ -4679,7 +4679,7 @@ msgstr ""
 
 #: src/libvlc-module.c:2761
 msgid "ask for extra verbosity when displaying help"
-msgstr ""
+msgstr "顯示說明時尋求額外詳細資訊"
 
 #: src/libvlc-module.c:2763
 msgid "print a list of available modules"
@@ -6158,6 +6158,8 @@ msgid ""
 "DeckLink capture card to use, if multiple exist. The cards are numbered from "
 "0."
 msgstr ""
+"如果多個 DeckLink 擷取卡存在，請選擇要使用的 DeckLink 擷取卡。DeckLink 擷取卡"
+"的號碼會從 0 開始。"
 
 #: modules/access/decklink.cpp:54
 msgid "Desired input video mode. Leave empty for autodetection."
@@ -6168,6 +6170,8 @@ msgid ""
 "Desired input video mode for DeckLink captures. This value should be a "
 "FOURCC code in textual form, e.g. \"ntsc\"."
 msgstr ""
+"DeckLink 擷取卡的所需的輸入視訊模式。這個值應該是文字格式的 FOURCC 代碼 (例"
+"如 \"ntsc\")。"
 
 #: modules/access/decklink.cpp:60 modules/video_output/decklink.cpp:100
 msgid "Audio connection"
@@ -6178,6 +6182,8 @@ msgid ""
 "Audio connection to use for DeckLink captures. Valid choices: embedded, "
 "aesebu, analog. Leave blank for card default."
 msgstr ""
+"DeckLink 擷取的要使用的音訊連線。有效的選項:  embedded、aesebu、analog。若要"
+"使用預設值，請保留空白。"
 
 #: modules/access/decklink.cpp:66 modules/demux/rawaud.c:43
 #: modules/video_output/decklink.cpp:105
@@ -6187,7 +6193,7 @@ msgstr "音訊取樣率(Hz)"
 #: modules/access/decklink.cpp:68
 msgid ""
 "Audio sampling rate (in hertz) for DeckLink captures. 0 disables audio input."
-msgstr ""
+msgstr "DeckLink 擷取的音訊取樣率 (赫茲)。0 會停用音訊輸入。"
 
 #: modules/access/decklink.cpp:71 modules/access/dshow/dshow.cpp:197
 #: modules/video_output/decklink.cpp:110
@@ -6199,6 +6205,7 @@ msgid ""
 "Number of input audio channels for DeckLink captures. Must be 2, 8 or 16. 0 "
 "disables audio input."
 msgstr ""
+"DeckLink 擷取的輸入音訊通道數目。必須是 2、8、或 16。0 會停用音訊輸入。"
 
 #: modules/access/decklink.cpp:76 modules/video_output/decklink.cpp:115
 msgid "Video connection"
@@ -6209,6 +6216,8 @@ msgid ""
 "Video connection to use for DeckLink captures. Valid choices: sdi, hdmi, "
 "opticalsdi, component, composite, svideo. Leave blank for card default."
 msgstr ""
+"DeckLink 擷取的要使用的視訊連線。有效的選項:  sdi、hdmi、opticalsdi、"
+"component、composite、svideo。若要使用預設值，請保留空白。"
 
 #: modules/access/decklink.cpp:87 modules/access/linsys/linsys_sdi.c:94
 msgid "SDI"
@@ -6272,6 +6281,8 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"macOS 可能封鎖光碟的存取。請開啟「系統偏好設定」->「安全性與隱私權」並在「檔"
+"案和資料夾」區段允許 VLC 存取外部媒體。"
 
 #: modules/access/dshow/dshow.cpp:92
 msgid "Cable"
@@ -6307,6 +6318,8 @@ msgid ""
 "Name of the video device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
+"將被 DirectShow 外掛使用的視訊裝置的名稱。如果您不指定任何名稱，會使用預設裝"
+"置。"
 
 #: modules/access/dshow/dshow.cpp:135
 #: modules/gui/qt/components/open_panels.cpp:831
@@ -6319,6 +6332,8 @@ msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
+"將被 DirectShow 外掛使用的音訊裝置的名稱。如果您不指定任何名稱，會使用預設裝"
+"置。"
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:798
@@ -6331,6 +6346,8 @@ msgid ""
 "don't specify anything the default size for your device will be used. You "
 "can specify a standard size (cif, d1, ...) or <width>x<height>."
 msgstr ""
+"將被 DirectShow 外掛顯示的視訊的大小。如果您不指定任何大小，會使用您的裝置的"
+"預設大小。您可以指定標準大小 (cif、d1 等) 或 <width>x<height>。"
 
 #: modules/access/dshow/dshow.cpp:145 modules/access/v4l2/v4l2.c:196
 msgid "Picture aspect-ratio n:m"
@@ -6360,6 +6377,8 @@ msgid ""
 "Force the DirectShow video input to use a specific frame rate (eg. 0 means "
 "default, 25, 29.97, 50, 59.94, etc.)"
 msgstr ""
+"強制 DirectShow 視訊輸入使用指定的畫面速率 (例如 0 表示預設值、25、29.97、"
+"50、59.94 等)"
 
 #: modules/access/dshow/dshow.cpp:155
 msgid "Device properties"
@@ -6384,7 +6403,7 @@ msgstr "調諧器電視頻道"
 
 #: modules/access/dshow/dshow.cpp:164
 msgid "Set the TV channel the tuner will set to (0 means default)."
-msgstr ""
+msgstr "選擇調諧器會設定的電視頻道 (0 是預設值)。"
 
 #: modules/access/dshow/dshow.cpp:166
 msgid "Tuner Frequency"
@@ -6408,7 +6427,7 @@ msgstr "調諧器國家碼"
 msgid ""
 "Set the tuner country code that establishes the current channel-to-frequency "
 "mapping (0 means default)."
-msgstr ""
+msgstr "選擇用於建立介於頻道和頻率之間對應的調諧器國碼 (0 是預設值)。"
 
 #: modules/access/dshow/dshow.cpp:173
 msgid "Tuner input type"
@@ -6416,11 +6435,11 @@ msgstr "調諧器輸入類型"
 
 #: modules/access/dshow/dshow.cpp:175
 msgid "Select the tuner input type (Cable/Antenna)."
-msgstr ""
+msgstr "選擇調諧器輸入類型 (纜線/天線)。"
 
 #: modules/access/dshow/dshow.cpp:176
 msgid "Video input pin"
-msgstr ""
+msgstr "視訊輸入連接"
 
 #: modules/access/dshow/dshow.cpp:178
 msgid ""
@@ -6432,42 +6451,44 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:182
 msgid "Audio input pin"
-msgstr ""
+msgstr "音訊輸入連接"
 
 #: modules/access/dshow/dshow.cpp:184
 msgid "Select the audio input source. See the \"video input\" option."
-msgstr ""
+msgstr "選擇音訊輸入訊號源。請參閱「視訊輸入」選項。"
 
 #: modules/access/dshow/dshow.cpp:185
 msgid "Video output pin"
-msgstr ""
+msgstr "視訊輸出連接"
 
 #: modules/access/dshow/dshow.cpp:187
 msgid "Select the video output type. See the \"video input\" option."
-msgstr ""
+msgstr "選擇視訊輸出訊號源。請參閱「視訊輸入」選項。"
 
 #: modules/access/dshow/dshow.cpp:188
 msgid "Audio output pin"
-msgstr ""
+msgstr "音訊輸出連接"
 
 #: modules/access/dshow/dshow.cpp:190
 msgid "Select the audio output type. See the \"video input\" option."
-msgstr ""
+msgstr "選擇音訊輸出類型。請參閱「視訊輸入」選項。"
 
 #: modules/access/dshow/dshow.cpp:192
 msgid "AM Tuner mode"
-msgstr ""
+msgstr "AM 調諧器模式"
 
 #: modules/access/dshow/dshow.cpp:194
 msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
+"AM 調諧器模式。可以選擇預設值 (0)、電視 (1)、AM 收音機 (2)、FM 收音機 (3)、"
+"或 DSS (4)。"
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
 "Select audio input format with the given number of audio channels (if non 0)"
-msgstr ""
+msgstr "同時選擇音訊輸入格式與指定的音訊通道數目 (如果是 0 以外)"
 
 #: modules/access/dshow/dshow.cpp:201
 #: modules/stream_out/transcode/transcode.c:94
@@ -6477,15 +6498,15 @@ msgstr "音訊取樣率"
 
 #: modules/access/dshow/dshow.cpp:203
 msgid "Select audio input format with the given sample rate (if non 0)"
-msgstr ""
+msgstr "同時選擇音訊輸入格式與指定的取樣率 (如果是 0 以外)"
 
 #: modules/access/dshow/dshow.cpp:205
 msgid "Audio bits per sample"
-msgstr ""
+msgstr "音訊取樣位元數"
 
 #: modules/access/dshow/dshow.cpp:207
 msgid "Select audio input format with the given bits/sample (if non 0)"
-msgstr ""
+msgstr "同時選擇音訊輸入格式與指定的位元數/取樣率 (如果是 0 以外)"
 
 #: modules/access/dshow/dshow.cpp:219
 msgid "DirectShow"
@@ -6511,12 +6532,12 @@ msgstr "VLC 無法開啟任何擷取裝置。詳細資訊請閱讀記錄檔。"
 #: modules/access/dshow/dshow.cpp:1055
 msgid ""
 "The device you selected cannot be used, because its type is not supported."
-msgstr ""
+msgstr "無法使用您選擇的裝置，因為不支援它的類型。"
 
 #: modules/access/dshow/dshow.cpp:1126
 #, c-format
 msgid "The capture device \"%s\" does not support the required parameters."
-msgstr ""
+msgstr "擷取裝置 \"%s\" 不支援所需的參數。"
 
 #: modules/access/dsm/access.c:72 modules/access/dsm/sd.c:138
 msgid "Windows networks"
@@ -6524,15 +6545,15 @@ msgstr "Windows 網路"
 
 #: modules/access/dsm/access.c:74
 msgid "libdsm's SMB (Windows network shares) input and browser"
-msgstr ""
+msgstr "libdsm SMB (Windows 網路分享) 輸入及瀏覽器"
 
 #: modules/access/dsm/access.c:78
 msgid "libdsm SMB input"
-msgstr ""
+msgstr "libdsm SMB 輸入"
 
 #: modules/access/dsm/access.c:98
 msgid "libdsm NETBIOS discovery module"
-msgstr ""
+msgstr "libdsm NETBIOS 探索模組"
 
 #: modules/access/dtv/access.c:38
 msgid "DVB adapter"
@@ -6542,7 +6563,7 @@ msgstr "DVB 介面卡"
 msgid ""
 "If there is more than one digital broadcasting adapter, the adapter number "
 "must be selected. Numbering starts from zero."
-msgstr ""
+msgstr "如果有多個數位廣播介面卡，必須選擇介面卡數目。數目將會從 0 開始。"
 
 #: modules/access/dtv/access.c:43
 msgid "DVB device"
@@ -6553,6 +6574,7 @@ msgid ""
 "If the adapter provides multiple independent tuner devices, the device "
 "number must be selected. Numbering starts from zero."
 msgstr ""
+"如果介面卡提供多個獨立調諧器裝置，必須選擇裝置數目。數目將會從 0 開始。"
 
 #: modules/access/dtv/access.c:47
 msgid "Do not demultiplex"
@@ -6570,7 +6592,7 @@ msgstr "網路名稱"
 
 #: modules/access/dtv/access.c:53
 msgid "Unique network name in the System Tuning Spaces"
-msgstr ""
+msgstr "系統調整空間中的唯一網路名稱"
 
 #: modules/access/dtv/access.c:55
 msgid "Network name to create"
@@ -6578,7 +6600,7 @@ msgstr "要建立的網路名稱"
 
 #: modules/access/dtv/access.c:56
 msgid "Create unique name in the System Tuning Spaces"
-msgstr ""
+msgstr "在系統調整空間中建立唯一名稱"
 
 #: modules/access/dtv/access.c:58
 msgid "Frequency (Hz)"
@@ -6589,22 +6611,24 @@ msgid ""
 "TV channels are grouped by transponder (a.k.a. multiplex) on a given "
 "frequency. This is required to tune the receiver."
 msgstr ""
+"電視頻道已在特定的頻率上根轉頻器 (也稱為「多工器」) 分組。需要此動作才能調諧"
+"接收器。"
 
 #: modules/access/dtv/access.c:63 modules/gui/qt/components/open_panels.cpp:972
 msgid "Modulation / Constellation"
-msgstr ""
+msgstr "調變 / 星座圖"
 
 #: modules/access/dtv/access.c:64
 msgid "Layer A modulation"
-msgstr ""
+msgstr "訊號層 A 調變"
 
 #: modules/access/dtv/access.c:65
 msgid "Layer B modulation"
-msgstr ""
+msgstr "訊號層 B 調變"
 
 #: modules/access/dtv/access.c:66
 msgid "Layer C modulation"
-msgstr ""
+msgstr "訊號層 C 調變"
 
 #: modules/access/dtv/access.c:68
 msgid ""
@@ -6635,27 +6659,27 @@ msgstr ""
 
 #: modules/access/dtv/access.c:96
 msgid "FEC code rate"
-msgstr ""
+msgstr "FEC 編碼率"
 
 #: modules/access/dtv/access.c:97
 msgid "High-priority code rate"
-msgstr ""
+msgstr "高優先編碼率"
 
 #: modules/access/dtv/access.c:98
 msgid "Low-priority code rate"
-msgstr ""
+msgstr "低優先編碼率"
 
 #: modules/access/dtv/access.c:99
 msgid "Layer A code rate"
-msgstr ""
+msgstr "訊號層 A 編碼率"
 
 #: modules/access/dtv/access.c:100
 msgid "Layer B code rate"
-msgstr ""
+msgstr "訊號層 B 編碼率"
 
 #: modules/access/dtv/access.c:101
 msgid "Layer C code rate"
-msgstr ""
+msgstr "訊號層 C 編碼率"
 
 #: modules/access/dtv/access.c:103
 msgid "The code rate for Forward Error Correction can be specified."
@@ -6707,27 +6731,27 @@ msgstr ""
 
 #: modules/access/dtv/access.c:148
 msgid "Layer A segments count"
-msgstr ""
+msgstr "訊號層 A 區段計數"
 
 #: modules/access/dtv/access.c:149
 msgid "Layer B segments count"
-msgstr ""
+msgstr "訊號層 B 區段計數"
 
 #: modules/access/dtv/access.c:150
 msgid "Layer C segments count"
-msgstr ""
+msgstr "訊號層 C 區段計數"
 
 #: modules/access/dtv/access.c:152
 msgid "Layer A time interleaving"
-msgstr ""
+msgstr "訊號層 A 時序交錯"
 
 #: modules/access/dtv/access.c:153
 msgid "Layer B time interleaving"
-msgstr ""
+msgstr "訊號層 B 時序交錯"
 
 #: modules/access/dtv/access.c:154
 msgid "Layer C time interleaving"
-msgstr ""
+msgstr "訊號層 C 時序交錯"
 
 #: modules/access/dtv/access.c:156
 msgid "Stream identifier"
