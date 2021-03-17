@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-03-07 08:35+0100\n"
+"PO-Revision-Date: 2021-03-17 13:31+0100\n"
 "Last-Translator: Bashishtha Narayan Singh <bashishtha.singh@gmail.com>, "
 "2021\n"
 "Language-Team: Hindi (https://www.transifex.com/yaron/teams/16553/hi/)\n"
@@ -442,7 +442,7 @@ msgstr "फ़ोल्डर का चयन करें"
 
 #: include/vlc_intf_strings.h:55
 msgid "Media &Information"
-msgstr "मीडिया जानकारी के &"
+msgstr "मीडिया जानकारी (&I)"
 
 #: include/vlc_intf_strings.h:56
 msgid "&Codec Information"
@@ -622,7 +622,7 @@ msgstr ""
 "net ) पर सहायता प्राप्त कर सकते हैं (और दे सकते हैं). </p><h3>परियोजना में सहयोग करें </"
 "h3>आप वीडियोलैन परियोजना को समुदाय को मदद करने, खाल डिजाइन करने, प्रलेखन का अनुवाद "
 "करने, परीक्षण करने और कोड करने के लिए अपना कुछ समय दे सकते हैं. आप हमारी सहायता के लिए "
-"धन और सामग्री भी दे सकते हैं. और हां, आप वीएलसी मीडिया प्लेयर को <b>बढ़ावा</b> दे सकते "
+"धन और सामग्री भी दे सकते हैं. और हां, आप वीएलसी मीडिया प्लेयर का <b>प्रचार</b> कर सकते "
 "हैं.<p></body></html>"
 
 #: src/audio_output/filters.c:267
@@ -1551,7 +1551,7 @@ msgstr "शब्दाडंबर (0,1,2)"
 msgid ""
 "This is the verbosity level (0=only errors and standard messages, "
 "1=warnings, 2=debug)."
-msgstr ""
+msgstr "यह शब्दाडंबर स्तर है (0 = केवल त्रुटियां और मानक संदेश, 1 = चेतावनी, 2 = डिबग)."
 
 #: src/libvlc-module.c:90
 msgid "Default stream"
@@ -1570,6 +1570,8 @@ msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
+"यह कंसोल को भेजे गए संदेशों के रंगीकरण को सक्षम करता है. आपके टर्मिनल को काम करने के लिए "
+"लिनक्स रंग समर्थन की आवश्यकता है."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1620,11 +1622,11 @@ msgstr ""
 
 #: src/libvlc-module.c:129
 msgid "Media role"
-msgstr ""
+msgstr "मीडिया की भूमिका"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
-msgstr ""
+msgstr "ऑपरेटिंग सिस्टम नीति के लिए मीडिया (प्लेअर) की भूमिका."
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:273
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:409
@@ -1641,35 +1643,35 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "संगीत"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
-msgstr ""
+msgstr "संचार"
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
-msgstr ""
+msgstr "गेम"
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "अधिसूचना"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
-msgstr ""
+msgstr "एनीमेशन"
 
 #: src/libvlc-module.c:143
 msgid "Production"
-msgstr ""
+msgstr "उत्पादन"
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
-msgstr ""
+msgstr "अभिगम्यता"
 
 #: src/libvlc-module.c:144
 msgid "Test"
-msgstr ""
+msgstr "परीक्षा"
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
@@ -1677,7 +1679,7 @@ msgstr "ऑडियो लाभ"
 
 #: src/libvlc-module.c:149
 msgid "This linear gain will be applied to outputted audio."
-msgstr ""
+msgstr "यह रैखिक गेन आउटपुट ऑडियो पर लागू होगा."
 
 #: src/libvlc-module.c:151
 msgid "Audio output volume step"
@@ -1700,7 +1702,7 @@ msgstr ""
 
 #: src/libvlc-module.c:161
 msgid "Audio desynchronization compensation"
-msgstr ""
+msgstr "ऑडियो डिसिन्क्रोनाइजेशन क्षतिपूर्ति"
 
 #: src/libvlc-module.c:163
 msgid ""
@@ -1712,27 +1714,31 @@ msgstr ""
 
 #: src/libvlc-module.c:168
 msgid "This selects which plugin to use for audio resampling."
-msgstr ""
+msgstr "यह चुनता है कि ऑडियो रिसैम्पलिंग के लिए किस प्लगइन का उपयोग करना है."
 
 #: src/libvlc-module.c:171
 msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
+"यदि आपके हार्डवेयर और ऑडियो स्ट्रीम संगतयोग्य हैं, तो ऑडियो आउटपुट चैनल मोड को डिफ़ॉल्ट "
+"रूप से उपयोग किया जाएगा. "
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
-msgstr ""
+msgstr "S/PDIF समर्थन "
 
 #: src/libvlc-module.c:176
 msgid ""
 "This option should be used when the audio output can't negotiate S/PDIF "
 "support."
 msgstr ""
+"जब ऑडियो आउटपुट S/PDIF समर्थन पर बातचीत नहीं कर सकता, तो इस विकल्प का उपयोग किया "
+"जाना चाहिए।"
 
 #: src/libvlc-module.c:178
 msgid "Force detection of Dolby Surround"
-msgstr ""
+msgstr "डॉल्बी सराउंड की पहचान आवश्यक"
 
 #: src/libvlc-module.c:180
 msgid ""
@@ -1788,19 +1794,19 @@ msgstr "इस ध्वनि प्रतिपादन संशोधित
 
 #: src/libvlc-module.c:208
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
-msgstr ""
+msgstr "यह दृश्यसंबंधित मॉड्यूल (स्पेक्ट्रम विश्लेषक, आदि.) जोड़ता है."
 
 #: src/libvlc-module.c:212
 msgid "Replay gain mode"
-msgstr ""
+msgstr "रीप्ले गेन मोड"
 
 #: src/libvlc-module.c:214
 msgid "Select the replay gain mode"
-msgstr ""
+msgstr "रीप्ले गेन मोड चुनें"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
-msgstr ""
+msgstr "रीप्ले प्रिऐम्प"
 
 #: src/libvlc-module.c:218
 msgid ""
@@ -1812,7 +1818,7 @@ msgstr ""
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
-msgstr ""
+msgstr "डिफ़ॉल्ट रीप्ले गेन"
 
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
@@ -1820,7 +1826,7 @@ msgstr "यह फिर से खेलना लाभ जानकारी 
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
-msgstr ""
+msgstr "पीक संरक्षण"
 
 #: src/libvlc-module.c:227
 msgid "Protect against sound clipping"
@@ -1828,7 +1834,7 @@ msgstr "ध्वनि क्लिपिंग के खिलाफ की �
 
 #: src/libvlc-module.c:230
 msgid "Enable time stretching audio"
-msgstr ""
+msgstr "टाइम स्ट्रेचिंग ऑडियो सक्षम करें"
 
 #: src/libvlc-module.c:232
 msgid ""
@@ -1881,7 +1887,7 @@ msgstr ""
 #: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:359
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:313
 msgid "Enable video"
-msgstr ""
+msgstr "वीडियो सक्षम करें"
 
 #: src/libvlc-module.c:260
 msgid ""
@@ -1918,10 +1924,12 @@ msgid ""
 "You can enforce the video height. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
+"आप वीडियो ऊंचाई को लागू कर सकते हैं. डिफ़ॉल्ट (-1) रूप से  VLC वीडियो विशेषताओं के अनुकूल "
+"होगा. "
 
 #: src/libvlc-module.c:273
 msgid "Video X coordinate"
-msgstr ""
+msgstr "वीडियो X निर्देशांक"
 
 #: src/libvlc-module.c:275
 msgid ""
@@ -1931,7 +1939,7 @@ msgstr "आप वीडियो विंडो के ऊपरी बाए�
 
 #: src/libvlc-module.c:278
 msgid "Video Y coordinate"
-msgstr ""
+msgstr "वीडियो Y निर्देशांक"
 
 #: src/libvlc-module.c:280
 msgid ""
@@ -1951,7 +1959,7 @@ msgstr "वीडियो विंडो के लिए कस्टम श�
 
 #: src/libvlc-module.c:288
 msgid "Video alignment"
-msgstr ""
+msgstr "वीडियो संरेखण"
 
 #: src/libvlc-module.c:290
 msgid ""
@@ -1959,6 +1967,9 @@ msgid ""
 "centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can also use "
 "combinations of these values, like 6=4+2 meaning top-right)."
 msgstr ""
+" वीडियो के संरेखण को उसके विंडो में लागू करें. डिफ़ॉल्ट (0) रूप से यह केंद्र में होगा (0 = केंद्र, "
+"1 = बाएँ, 2 = दाएँ, 4 = शीर्ष, 8 = नीचे, आप इन मूल्यों के संयोजनों का भी उपयोग कर सकते "
+"हैं, जैसे 6=4+2 का अर्थ शीर्ष-दाएँ) । "
 
 #: src/libvlc-module.c:295 src/libvlc-module.c:368 modules/codec/dvbsub.c:102
 #: modules/codec/zvbi.c:83
@@ -2030,17 +2041,19 @@ msgstr "आप निर्दिष्ट कारक द्वारा व�
 
 #: src/libvlc-module.c:302
 msgid "Grayscale video output"
-msgstr ""
+msgstr "ग्रेस्केल वीडियो आउटपुट"
 
 #: src/libvlc-module.c:304
 msgid ""
 "Output video in grayscale. As the color information aren't decoded, this can "
 "save some processing power."
 msgstr ""
+"वीडियो ग्रेस्केल में आउटपुट करें. चूंकि रंग की जानकारी डिकोड नहीं की गई है, इसलिए यह कुछ "
+"प्रोसेसिंग पावर बचा सकता है. "
 
 #: src/libvlc-module.c:307
 msgid "Embedded video"
-msgstr ""
+msgstr "एंबेडेड वीडियो"
 
 #: src/libvlc-module.c:309
 msgid "Embed the video output in the main interface."
@@ -2064,7 +2077,7 @@ msgstr "हमेशा अन्य विंडोज़ के शीर्�
 
 #: src/libvlc-module.c:319
 msgid "Enable wallpaper mode"
-msgstr ""
+msgstr "वॉलपेपर मोड सक्षम करें"
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2082,15 +2095,15 @@ msgstr "फिल्म के शीर्ष पर वीडियो का 
 
 #: src/libvlc-module.c:328
 msgid "Show video title for x milliseconds"
-msgstr ""
+msgstr " x मिलीसेकंड के लिए वीडियो शीर्षक दिखाएं"
 
 #: src/libvlc-module.c:330
 msgid "Show the video title for n milliseconds, default is 5000 ms (5 sec.)"
-msgstr ""
+msgstr "n मिलीसेकंड के लिए वीडियो शीर्षक दिखाएं, डिफ़ॉल्ट 5000 ms (5 सेकंड) है."
 
 #: src/libvlc-module.c:332
 msgid "Position of video title"
-msgstr ""
+msgstr "वीडियो शीर्षक की स्थिति"
 
 #: src/libvlc-module.c:334
 msgid "Place on video where to display the title (default bottom center)."
@@ -2112,67 +2125,69 @@ msgstr "माउस कर्सर और n मिसे के बाद फ�
 #: modules/video_filter/deinterlace/deinterlace.c:300
 #: share/lua/http/dialogs/create_stream.html:346
 msgid "Deinterlace"
-msgstr ""
+msgstr "डीइंटरलेस"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
 #: modules/gui/macosx/VLCMainMenu.m:445 modules/gui/macosx/VLCMainMenu.m:446
 #: modules/gui/macosx/VLCSimplePrefsController.m:379
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
-msgstr ""
+msgstr "डीइंटरलेस मोड"
 
 #: src/libvlc-module.c:354
 msgid "Deinterlace method to use for video processing."
-msgstr ""
+msgstr "वीडियो प्रोसेसिंग के लिए डीइंटरलेस पद्धति"
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Discard"
-msgstr ""
+msgstr "रद्द करें"
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/algo_phosphor.h:47
 #: modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Blend"
-msgstr ""
+msgstr "ब्लेन्ड"
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Mean"
-msgstr ""
+msgstr "मध्य"
 
 #: src/libvlc-module.c:361 modules/hw/vdpau/chroma.c:883
 #: modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Bob"
-msgstr ""
+msgstr "बॉब"
 
 #: src/libvlc-module.c:362 modules/video_filter/deinterlace/deinterlace.h:59
 msgid "Phosphor"
-msgstr ""
+msgstr "फ़ॉसफर"
 
 #: src/libvlc-module.c:363 modules/video_filter/deinterlace/deinterlace.h:59
 msgid "Film NTSC (IVTC)"
-msgstr ""
+msgstr "फिल्म NTSC (IVTC)"
 
 #: src/libvlc-module.c:371
 msgid "Disable screensaver"
-msgstr ""
+msgstr "स्क्रीनसेवर को अक्षम करें"
 
 #: src/libvlc-module.c:372
 msgid "Disable the screensaver during video playback."
-msgstr ""
+msgstr "वीडियो प्लेबैक होते समय स्क्रीनसेवर को अक्षम करें."
 
 #: src/libvlc-module.c:374 modules/gui/macosx/VLCSimplePrefsController.m:364
 #: modules/gui/qt/ui/sprefs_video.h:316
 msgid "Window decorations"
-msgstr ""
+msgstr "विंडो सजावट"
 
 #: src/libvlc-module.c:376
 msgid ""
 "VLC can avoid creating window caption, frames, etc... around the video, "
 "giving a \"minimal\" window."
 msgstr ""
+"VLC वीडियो के इर्द-गिर्द अल्पतम विंडो दिखाने के लिए विंडो शीर्षक, फ्रेम आदि... बनाना "
+"छोड़ सकता है."
 
 #: src/libvlc-module.c:379
 msgid "Video splitter module"
-msgstr ""
+msgstr "वीडियो स्प्लिटर मॉड्यूल"
 
 #: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
@@ -2180,33 +2195,35 @@ msgstr "यह क्लोन या दीवार की तरह वीड
 
 #: src/libvlc-module.c:383
 msgid "Video filter module"
-msgstr ""
+msgstr "वीडियो फिल्टर मॉड्यूल"
 
 #: src/libvlc-module.c:385
 msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or distort the video."
 msgstr ""
+"यह चित्र की गुणवत्ता बढ़ाने के लिए पोस्ट-प्रोसेसिंग फ़िल्टर जोड़ता है, उदाहरण के लिए, "
+"वीडियो को असंग्रथित (डिइंटरलेसिंग) करने या विकृत करने के लिए."
 
 #: src/libvlc-module.c:389
 msgid "Video snapshot directory (or filename)"
-msgstr ""
+msgstr "वीडियो स्नैपशॉट डायरेक्टरी (या फ़ाइल नाम)"
 
 #: src/libvlc-module.c:391
 msgid "Directory where the video snapshots will be stored."
-msgstr ""
+msgstr "डायरेक्टरी जहां वीडियो स्नैपशॉट संग्रहीत किया जाएगा."
 
 #: src/libvlc-module.c:393 src/libvlc-module.c:395
 msgid "Video snapshot file prefix"
-msgstr ""
+msgstr "वीडियो स्नैपशॉट फ़ाइल उपसर्ग"
 
 #: src/libvlc-module.c:397
 msgid "Video snapshot format"
-msgstr ""
+msgstr "वीडियो स्नैपशॉट प्रारूप"
 
 #: src/libvlc-module.c:399
 msgid "Image format which will be used to store the video snapshots"
-msgstr ""
+msgstr "छवि प्रारूप जो वीडियो स्नैपशॉट को संग्रहीत करने के लिए उपयोग किया जाएगा"
 
 #: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
@@ -5280,7 +5297,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:92
 msgid "Hindi"
-msgstr ""
+msgstr "हिन्दी"
 
 #: src/text/iso-639_def.h:93
 msgid "Hiri Motu"
@@ -15371,7 +15388,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAboutWindowController.m:97
 #: modules/gui/qt/dialogs/help.cpp:125
 msgid "Credits"
-msgstr ""
+msgstr "श्रेयसूची"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:490 modules/gui/qt/dialogs/help.cpp:119
@@ -15673,16 +15690,16 @@ msgstr ""
 #: modules/gui/qt/components/open_panels.cpp:1365
 #: modules/stream_out/chromecast/cast.cpp:1197
 msgid "OK"
-msgstr ""
+msgstr "ठीक"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:128
 #: modules/gui/macosx/VLCMainMenu.m:1154
 msgid "Untitled"
-msgstr ""
+msgstr "बिना शीर्षक"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:209
 msgid "No input"
-msgstr ""
+msgstr "कोई इनपुट नहीं"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:209
 msgid ""
