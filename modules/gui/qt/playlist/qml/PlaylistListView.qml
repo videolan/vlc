@@ -25,6 +25,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/KeyHelper.js" as KeyHelper
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
@@ -48,13 +49,9 @@ Widgets.NavigableFocusScope {
         Move // Keyboard item move mode, activated through PlaylistOverlayMenu
     }
 
-    function isValidInstanceOf(object, type) {
-        return (!!object && (object instanceof type))
-    }
-
     function isDropAcceptable(drop, index) {
         return drop.hasUrls || // external drop (i.e. from filesystem)
-                (isValidInstanceOf(drop.source, Widgets.DragItem)) // internal drop (inter-view or intra-playlist)
+                (Helpers.isValidInstanceOf(drop.source, Widgets.DragItem)) // internal drop (inter-view or intra-playlist)
     }
 
     function acceptDrop(index, drop) {
@@ -65,7 +62,7 @@ Widgets.NavigableFocusScope {
             model.moveItemsPre(model.getSelection(), index);
 
         // NOTE: Dropping medialibrary content into the queue.
-        } else if (isValidInstanceOf(item, Widgets.DragItem)) {
+        } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
             mainPlaylistController.insert(index, item.getSelectedInputItem());
 
         // NOTE: Dropping an external item (i.e. filesystem) into the queue.

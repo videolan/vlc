@@ -24,6 +24,7 @@ import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/"    as MainInterface
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 MainInterface.MainTableView {
@@ -101,14 +102,9 @@ MainInterface.MainTableView {
     //---------------------------------------------------------------------------------------------
     // Drop interface
 
-    // FIXME: Maybe this could be a global function ?
-    function isValidInstanceOf(object, type) {
-        return (!!object && (object instanceof type));
-    }
-
     function isDroppable(drop, index) {
         // NOTE: Internal drop (intra-playlist).
-        return isValidInstanceOf(drop.source, Widgets.DragItem);
+        return Helpers.isValidInstanceOf(drop.source, Widgets.DragItem);
     }
 
     function applyDrop(drop, index) {
@@ -119,7 +115,7 @@ MainInterface.MainTableView {
             model.move(modelSelect.selectedIndexes, index);
 
         // NOTE: Dropping medialibrary content into the playlist.
-        } else if (isValidInstanceOf(item, Widgets.DragItem)) {
+        } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
             model.insert(item.getSelectedInputItem(), index);
         }
 

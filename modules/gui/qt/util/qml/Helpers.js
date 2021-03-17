@@ -40,3 +40,7 @@ function msToString(time, short) {
 function clamp(num, min, max) {
   return num <= min ? min : num >= max ? max : num;
 }
+
+function isValidInstanceOf(object, type) {
+    return (!!object && (object instanceof type))
+}
