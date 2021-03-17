@@ -406,16 +406,6 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(mtime_t nz_deadline,
     {
         if(!startDemux())
         {
-            /* If demux fails because of probing failure / wrong format*/
-            if(discontinuity)
-            {
-                msg_Dbg( p_realdemux, "Draining on format change" );
-                prepareRestart();
-                discontinuity = false;
-                fakeEsOut()->commandsQueue()->setDraining();
-                vlc_mutex_unlock(&lock);
-                return BufferingStatus::Ongoing;
-            }
             valid = false; /* Prevent further retries */
             fakeEsOut()->commandsQueue()->setEOF(true);
             vlc_mutex_unlock(&lock);
