@@ -36,3 +36,7 @@ function msToString(time, short) {
         return "%1h%2".arg(hour.toFixed()).arg(prefixZero(min))
     return "%1:%2:%3".arg(prefixZero(hour)).arg(prefixZero(min)).arg(prefixZero(sec))
 }
+
+function clamp(num, min, max) {
+  return num <= min ? min : num >= max ? max : num;
+}

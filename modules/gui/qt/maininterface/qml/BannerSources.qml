@@ -27,6 +27,7 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///menus/" as Menus
 import "qrc:///util/KeyHelper.js" as KeyHelper
+import "qrc:///util/Helpers.js" as Helpers
 
 Widgets.NavigableFocusScope {
     id: root
@@ -325,14 +326,10 @@ Widgets.NavigableFocusScope {
                         enabled: status === Loader.Ready
                         y: (VLCStyle.localToolbar_height - item.height) / 2
                         width: !!item
-                               ? clamp(localMenuView.availableWidth
-                                       , localMenuGroup.item.minimumWidth || localMenuGroup.item.implicitWidth
-                                       , localMenuGroup.item.maximumWidth || localMenuGroup.item.implicitWidth)
+                               ? Helpers.clamp(localMenuView.availableWidth,
+                                               localMenuGroup.item.minimumWidth || localMenuGroup.item.implicitWidth,
+                                               localMenuGroup.item.maximumWidth || localMenuGroup.item.implicitWidth)
                                : 0
-
-                        function clamp(num, min, max) {
-                          return num <= min ? min : num >= max ? max : num;
-                        }
 
                         onVisibleChanged: {
                             //reset the focus on the global group when the local group is hidden,

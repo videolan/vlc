@@ -23,6 +23,7 @@ import QtQuick.Layouts 1.3
 import org.videolan.medialib 0.1
 
 import "qrc:///util/" as Util
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/" as MainInterface
 import "qrc:///style/"
@@ -107,14 +108,14 @@ Widgets.NavigableFocusScope {
         Widgets.KeyNavigableListView {
             id: artistList
 
-            z: 1
-            width: resizeHandle.clamp(root.width / resizeHandle.widthFactor,
-                                      VLCStyle.colWidth(1) + VLCStyle.column_margin_width,
-                                      root.width * .5)
-            height: parent.height
             spacing: 4
             model: artistModel
             currentIndex: -1
+            z: 1
+            height: parent.height
+            width: Helpers.clamp(root.width / resizeHandle.widthFactor,
+                                 VLCStyle.colWidth(1) + VLCStyle.column_margin_width,
+                                 root.width * .5)
 
             focus: true
             footer: MainInterface.MiniPlayerBottomMargin {

@@ -24,7 +24,7 @@ import "qrc:///style/"
 // HorizontalResizeHandle actually doesn't resizes target
 // you have to assign target's width manually using widthFactor property
 // the idea behind using widthFactor is to maintain scale ratio when source itself resizes
-// e.g target.width: resizeHandle.clamp(sourceWidth / resizeHandle.widthFactor, minimumWidth, maximumWidth)
+// e.g target.width: Helpers.clamp(sourceWidth / resizeHandle.widthFactor, minimumWidth, maximumWidth)
 MouseArea {
     id: root
 
@@ -57,7 +57,4 @@ MouseArea {
         root.widthFactor = root.sourceWidth / (root.targetWidth + (delta * - f))
     }
 
-    function clamp(num, min, max) {
-      return num <= min ? min : num >= max ? max : num;
-    }
 }
