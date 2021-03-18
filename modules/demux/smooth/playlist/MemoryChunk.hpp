@@ -31,7 +31,7 @@ namespace smooth
         class MemoryChunkSource : public AbstractChunkSource
         {
             public:
-                MemoryChunkSource(block_t *);
+                MemoryChunkSource(ChunkType, block_t *);
                 virtual ~MemoryChunkSource();
 
                 virtual block_t * readBlock() override;
