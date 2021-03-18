@@ -34,6 +34,7 @@
 #include <medialibrary/IAlbumTrack.h>
 #include <medialibrary/IGenre.h>
 #include <medialibrary/ILabel.h>
+#include <medialibrary/IMediaGroup.h>
 #include <medialibrary/IPlaylist.h>
 #include <medialibrary/IAudioTrack.h>
 #include <medialibrary/IVideoTrack.h>
@@ -404,6 +405,22 @@ bool Convert( const medialibrary::ILabel* input, vlc_ml_label_t& output )
 {
     assert( input->name().empty() == false );
     return strdup_helper( input->name(), output.psz_name );
+}
+
+bool Convert( const medialibrary::IMediaGroup* input, vlc_ml_group_t& output )
+{
+    output.i_id = input->id();
+
+    output.i_nb_total_media = input->nbTotalMedia();
+
+    output.i_duration = input->duration();
+
+    output.i_creation_date = input->creationDate();
+
+    if( strdup_helper( input->name(), output.psz_name ) == false )
+        return false;
+
+    return true;
 }
 
 bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )

@@ -38,6 +38,7 @@
 #include <medialibrary/IGenre.h>
 #include <medialibrary/IMetadata.h>
 #include <medialibrary/IShow.h>
+#include <medialibrary/IMediaGroup.h>
 #include <medialibrary/IPlaylist.h>
 #include <medialibrary/IBookmark.h>
 
@@ -82,6 +83,7 @@ void assignToEvent( vlc_ml_event_t* ev, vlc_ml_media_t* m )    { ev->creation.p_
 void assignToEvent( vlc_ml_event_t* ev, vlc_ml_artist_t* a )   { ev->creation.p_artist   = a; }
 void assignToEvent( vlc_ml_event_t* ev, vlc_ml_album_t* a )    { ev->creation.p_album    = a; }
 void assignToEvent( vlc_ml_event_t* ev, vlc_ml_genre_t* g )    { ev->creation.p_genre    = g; }
+void assignToEvent( vlc_ml_event_t* ev, vlc_ml_group_t* g )    { ev->creation.p_group    = g; }
 void assignToEvent( vlc_ml_event_t* ev, vlc_ml_playlist_t* p ) { ev->creation.p_playlist = p; }
 void assignToEvent( vlc_ml_event_t* ev, vlc_ml_bookmark_t* b ) { ev->creation.p_bookmark = b; }
 
@@ -177,6 +179,26 @@ void MediaLibrary::onAlbumsDeleted( std::set<int64_t> albumIds )
     wrapEntityDeletedEventCallback( m_vlc_ml, albumIds, VLC_ML_EVENT_ALBUM_DELETED );
 }
 
+//-------------------------------------------------------------------------------------------------
+// Groups
+
+void MediaLibrary::onMediaGroupsAdded( std::vector<medialibrary::MediaGroupPtr> groups )
+{
+    wrapEntityCreatedEventCallback<vlc_ml_group_t>( m_vlc_ml, groups, VLC_ML_EVENT_GROUP_ADDED );
+}
+
+void MediaLibrary::onMediaGroupsModified( std::set<int64_t> groupIds )
+{
+    wrapEntityModifiedEventCallback( m_vlc_ml, groupIds, VLC_ML_EVENT_GROUP_UPDATED );
+}
+
+void MediaLibrary::onMediaGroupsDeleted( std::set<int64_t> groupIds )
+{
+    wrapEntityDeletedEventCallback( m_vlc_ml, groupIds, VLC_ML_EVENT_GROUP_DELETED );
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void MediaLibrary::onPlaylistsAdded( std::vector<medialibrary::PlaylistPtr> playlists )
 {
     wrapEntityCreatedEventCallback<vlc_ml_playlist_t>( m_vlc_ml, playlists, VLC_ML_EVENT_PLAYLIST_ADDED );
@@ -205,18 +227,6 @@ void MediaLibrary::onGenresModified( std::set<int64_t> genreIds )
 void MediaLibrary::onGenresDeleted( std::set<int64_t> genreIds )
 {
     wrapEntityDeletedEventCallback( m_vlc_ml, genreIds, VLC_ML_EVENT_GENRE_DELETED );
-}
-
-void MediaLibrary::onMediaGroupsAdded( std::vector<medialibrary::MediaGroupPtr> )
-{
-}
-
-void MediaLibrary::onMediaGroupsModified( std::set<int64_t> )
-{
-}
-
-void MediaLibrary::onMediaGroupsDeleted( std::set<int64_t> )
-{
 }
 
 void MediaLibrary::onBookmarksAdded( std::vector<medialibrary::BookmarkPtr> bookmarks )
@@ -935,6 +945,11 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
                     vlc_assert_unreachable();
             }
         }
+        case VLC_ML_LIST_GROUPS:
+        case VLC_ML_COUNT_GROUPS:
+        case VLC_ML_LIST_GROUP_MEDIA:
+        case VLC_ML_COUNT_GROUP_MEDIA:
+            return listGroup( listQuery, paramsPtr, psz_pattern, nbItems, offset, args );
         case VLC_ML_LIST_PLAYLIST_MEDIA:
         case VLC_ML_COUNT_PLAYLIST_MEDIA:
         case VLC_ML_LIST_PLAYLISTS:
@@ -1038,6 +1053,12 @@ void* MediaLibrary::Get( int query, va_list args )
             auto id = va_arg( args, int64_t );
             auto show = m_ml->show( id );
             return CreateAndConvert<vlc_ml_show_t>( show.get() );
+        }
+        case VLC_ML_GET_GROUP:
+        {
+            auto id = va_arg( args, int64_t );
+            auto group = m_ml->mediaGroup( id );
+            return CreateAndConvert<vlc_ml_group_t>( group.get() );
         }
         case VLC_ML_GET_PLAYLIST:
         {
@@ -1392,6 +1413,8 @@ int MediaLibrary::filterListChildrenQuery( int query, int parentType )
                     return VLC_ML_LIST_SHOW_EPISODES;
                 case VLC_ML_PARENT_GENRE:
                     return VLC_ML_LIST_GENRE_TRACKS;
+                case VLC_ML_PARENT_GROUP:
+                    return VLC_ML_LIST_GROUP_MEDIA;
                 case VLC_ML_PARENT_PLAYLIST:
                     return VLC_ML_LIST_PLAYLIST_MEDIA;
                 default:
@@ -1408,6 +1431,8 @@ int MediaLibrary::filterListChildrenQuery( int query, int parentType )
                     return VLC_ML_COUNT_SHOW_EPISODES;
                 case VLC_ML_PARENT_GENRE:
                     return VLC_ML_COUNT_GENRE_TRACKS;
+                case VLC_ML_PARENT_GROUP:
+                    return VLC_ML_COUNT_GROUP_MEDIA;
                 case VLC_ML_PARENT_PLAYLIST:
                     return VLC_ML_COUNT_PLAYLIST_MEDIA;
                 default:
@@ -1658,6 +1683,82 @@ int MediaLibrary::listGenre( int listQuery, const medialibrary::QueryParameters*
                     vlc_assert_unreachable();
             }
         }
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
+int MediaLibrary::listGroup( int listQuery, const medialibrary::QueryParameters* paramsPtr,
+                             const char* pattern, uint32_t nbItems, uint32_t offset, va_list args )
+{
+    switch( listQuery )
+    {
+        case VLC_ML_LIST_GROUPS:
+        case VLC_ML_COUNT_GROUPS:
+        {
+            medialibrary::Query<medialibrary::IMediaGroup> query;
+
+            if ( pattern )
+                query = m_ml->searchMediaGroups( pattern, paramsPtr );
+            else
+                query = m_ml->mediaGroups( medialibrary::IMedia::Type::Unknown, paramsPtr );
+
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+
+            switch ( listQuery )
+            {
+                case VLC_ML_LIST_GROUPS:
+                    *va_arg( args, vlc_ml_group_list_t** ) =
+                            ml_convert_list<vlc_ml_group_list_t, vlc_ml_group_t>(
+                                query->items( nbItems, offset ) );
+                    return VLC_SUCCESS;
+
+                case VLC_ML_COUNT_GROUPS:
+                    *va_arg( args, size_t* ) = query->count();
+                    return VLC_SUCCESS;
+
+                default:
+                    vlc_assert_unreachable();
+            }
+        }
+
+        case VLC_ML_LIST_GROUP_MEDIA:
+        case VLC_ML_COUNT_GROUP_MEDIA:
+        {
+            auto group = m_ml->mediaGroup( va_arg( args, int64_t ) );
+
+            if ( group == nullptr )
+                return VLC_EGENERIC;
+
+            medialibrary::Query<medialibrary::IMedia> query;
+
+            if ( pattern )
+                query = group->searchMedia( pattern, medialibrary::IMedia::Type::Unknown,
+                                            paramsPtr );
+            else
+                query = group->media( medialibrary::IMedia::Type::Unknown, paramsPtr );
+
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+
+            switch ( listQuery )
+            {
+                case VLC_ML_LIST_GROUP_MEDIA:
+                    *va_arg( args, vlc_ml_media_list_t**) =
+                            ml_convert_list<vlc_ml_media_list_t, vlc_ml_media_t>(
+                                query->items( nbItems, offset ) );
+                    return VLC_SUCCESS;
+
+                case VLC_ML_COUNT_GROUP_MEDIA:
+                    *va_arg( args, size_t* ) = query->count();
+                    return VLC_SUCCESS;
+
+                default:
+                    vlc_assert_unreachable();
+            }
+        }
+
         default:
             vlc_assert_unreachable();
     }

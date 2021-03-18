@@ -582,6 +582,7 @@ vlc_ml_artist_release
 vlc_ml_genre_release
 vlc_ml_media_release
 vlc_ml_album_release
+vlc_ml_group_release
 vlc_ml_playlist_release
 vlc_ml_label_list_release
 vlc_ml_file_list_release
@@ -590,6 +591,7 @@ vlc_ml_media_list_release
 vlc_ml_album_list_release
 vlc_ml_show_list_release
 vlc_ml_genre_list_release
+vlc_ml_group_list_release
 vlc_ml_playlist_list_release
 vlc_ml_entry_point_list_release
 vlc_ml_bookmark_release

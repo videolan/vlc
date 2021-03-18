@@ -154,6 +154,8 @@ private:
                     const char* pattern, uint32_t nbItems, uint32_t offset, va_list args );
     int listGenre( int listQuery, const medialibrary::QueryParameters* paramsPtr,
                    const char* pattern, uint32_t nbItems, uint32_t offset, va_list args );
+    int listGroup( int listQuery, const medialibrary::QueryParameters* paramsPtr,
+                   const char* pattern, uint32_t nbItems, uint32_t offset, va_list args );
     int listPlaylist( int listQuery, const medialibrary::QueryParameters* paramsPtr,
                       const char* pattern, uint32_t nbItems, uint32_t offset, va_list args );
     int listMedia( int listQuery, const medialibrary::QueryParameters* paramsPtr,
@@ -223,6 +225,7 @@ bool Convert( const medialibrary::IArtist* input, vlc_ml_artist_t& output );
 bool Convert( const medialibrary::IGenre* input, vlc_ml_genre_t& output );
 bool Convert( const medialibrary::IShow* input, vlc_ml_show_t& output );
 bool Convert( const medialibrary::ILabel* input, vlc_ml_label_t& output );
+bool Convert( const medialibrary::IMediaGroup* input, vlc_ml_group_t& output );
 bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output );
 bool Convert( const medialibrary::IFolder* input, vlc_ml_entry_point_t& output );
 bool Convert( const medialibrary::IBookmark* input, vlc_ml_bookmark_t& output );

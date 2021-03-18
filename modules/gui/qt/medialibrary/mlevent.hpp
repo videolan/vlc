@@ -71,6 +71,9 @@ struct MLEvent
             case VLC_ML_EVENT_ALBUM_ADDED:
                 creation.i_entity_id = event->creation.p_album->i_id;
                 break;
+            case VLC_ML_EVENT_GROUP_ADDED:
+                creation.i_entity_id = event->creation.p_group->i_id;
+                break;
             case VLC_ML_EVENT_PLAYLIST_ADDED:
                 creation.i_entity_id = event->creation.p_playlist->i_id;
                 break;
@@ -83,6 +86,7 @@ struct MLEvent
             case VLC_ML_EVENT_MEDIA_UPDATED:
             case VLC_ML_EVENT_ARTIST_UPDATED:
             case VLC_ML_EVENT_ALBUM_UPDATED:
+            case VLC_ML_EVENT_GROUP_UPDATED:
             case VLC_ML_EVENT_PLAYLIST_UPDATED:
             case VLC_ML_EVENT_GENRE_UPDATED:
             case VLC_ML_EVENT_BOOKMARKS_UPDATED:
@@ -91,6 +95,7 @@ struct MLEvent
             case VLC_ML_EVENT_MEDIA_DELETED:
             case VLC_ML_EVENT_ARTIST_DELETED:
             case VLC_ML_EVENT_ALBUM_DELETED:
+            case VLC_ML_EVENT_GROUP_DELETED:
             case VLC_ML_EVENT_PLAYLIST_DELETED:
             case VLC_ML_EVENT_GENRE_DELETED:
             case VLC_ML_EVENT_BOOKMARKS_DELETED:

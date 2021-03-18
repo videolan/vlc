@@ -231,6 +231,24 @@ void vlc_ml_genre_release( vlc_ml_genre_t* p_genre )
     free( p_genre );
 }
 
+//-------------------------------------------------------------------------------------------------
+// Group
+
+static void vlc_ml_group_release_inner( vlc_ml_group_t* p_group )
+{
+    free( p_group->psz_name );
+}
+
+void vlc_ml_group_release( vlc_ml_group_t* p_group )
+{
+    if ( p_group == NULL )
+        return;
+    vlc_ml_group_release_inner( p_group );
+    free( p_group );
+}
+
+//-------------------------------------------------------------------------------------------------
+
 static void vlc_ml_playlist_release_inner( vlc_ml_playlist_t* p_playlist )
 {
     free( p_playlist->psz_name );
@@ -317,6 +335,15 @@ void vlc_ml_genre_list_release( vlc_ml_genre_list_t* p_list )
         return;
     for ( size_t i = 0; i < p_list->i_nb_items; ++i )
         free( p_list->p_items[i].psz_name );
+    free( p_list );
+}
+
+void vlc_ml_group_list_release( vlc_ml_group_list_t* p_list )
+{
+    if ( p_list == NULL )
+        return;
+    for ( size_t i = 0; i < p_list->i_nb_items; ++i )
+        vlc_ml_group_release_inner( &p_list->p_items[i] );
     free( p_list );
 }
 

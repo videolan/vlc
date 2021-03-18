@@ -226,6 +226,19 @@ typedef struct vlc_ml_media_t
     };
 } vlc_ml_media_t;
 
+typedef struct vlc_ml_group_t
+{
+    int64_t i_id;
+
+    char* psz_name;
+
+    unsigned int i_nb_total_media;
+
+    unsigned int i_duration;
+
+    uint32_t i_creation_date;
+} vlc_ml_group_t;
+
 typedef struct vlc_ml_playlist_t
 {
     int64_t i_id;
@@ -302,6 +315,12 @@ typedef struct vlc_ml_genre_list_t
     size_t i_nb_items;
     vlc_ml_genre_t p_items[];
 } vlc_ml_genre_list_t;
+
+typedef struct vlc_ml_group_list_t
+{
+    size_t i_nb_items;
+    vlc_ml_group_t p_items[];
+} vlc_ml_group_list_t;
 
 typedef struct vlc_ml_playlist_list_t
 {
@@ -384,6 +403,7 @@ enum vlc_ml_get_queries
     VLC_ML_GET_ARTIST,          /**< arg1: Artist   ID; ret: vlc_ml_artist_t*   */
     VLC_ML_GET_GENRE,           /**< arg1: Genre    ID; ret: vlc_ml_genre_t*    */
     VLC_ML_GET_SHOW,            /**< arg1: Show     ID; ret: vlc_ml_show_t*     */
+    VLC_ML_GET_GROUP,           /**< arg1: Group    ID; ret: vlc_ml_group_t*    */
     VLC_ML_GET_PLAYLIST,        /**< arg1: Playlist ID; ret: vlc_ml_playlist_t* */
 };
 
@@ -403,6 +423,8 @@ enum vlc_ml_list_queries
     VLC_ML_COUNT_ARTISTS,         /**< arg1 bool: includeAll; arg2 (out): size_t*                   */
     VLC_ML_LIST_SHOWS,            /**< arg1 (out): vlc_ml_show_list_t**                             */
     VLC_ML_COUNT_SHOWS,           /**< arg1 (out): size_t*                                          */
+    VLC_ML_LIST_GROUPS,           /**< arg1 (out): vlc_ml_group_list_t**                            */
+    VLC_ML_COUNT_GROUPS,          /**< arg1 (out): size_t*                                          */
     VLC_ML_LIST_PLAYLISTS,        /**< arg1 (out): vlc_ml_playlist_list_t**                         */
     VLC_ML_COUNT_PLAYLISTS,       /**< arg1 (out): size_t*                                          */
     VLC_ML_LIST_HISTORY,          /**< arg1 (out): vlc_ml_media_list_t**                            */
@@ -441,6 +463,10 @@ enum vlc_ml_list_queries
     VLC_ML_COUNT_MEDIA_LABELS,    /**< arg1: media id;  arg2 (out): size_t*              */
     VLC_ML_LIST_MEDIA_BOOKMARKS,  /**< arg1: media id;  arg2 (out): vlc_ml_bookmark_list_t** */
 
+    /* Groups specific listings */
+    VLC_ML_LIST_GROUP_MEDIA,   /**< arg1: playlist id; arg2 (out): vlc_ml_media_list_t** */
+    VLC_ML_COUNT_GROUP_MEDIA,  /**< arg1: playlist id; arg2 (out): size_t* */
+
     /* Playlist specific listings */
     VLC_ML_LIST_PLAYLIST_MEDIA,   /**< arg1: playlist id; arg2 (out): vlc_ml_media_list_t** */
     VLC_ML_COUNT_PLAYLIST_MEDIA,  /**< arg1: playlist id; arg2 (out): size_t* */
@@ -461,6 +487,7 @@ enum vlc_ml_parent_type
     VLC_ML_PARENT_ARTIST,
     VLC_ML_PARENT_SHOW,
     VLC_ML_PARENT_GENRE,
+    VLC_ML_PARENT_GROUP,
     VLC_ML_PARENT_PLAYLIST,
 };
 
@@ -582,6 +609,9 @@ enum vlc_ml_event_type
     VLC_ML_EVENT_ALBUM_ADDED,
     VLC_ML_EVENT_ALBUM_UPDATED,
     VLC_ML_EVENT_ALBUM_DELETED,
+    VLC_ML_EVENT_GROUP_ADDED,
+    VLC_ML_EVENT_GROUP_UPDATED,
+    VLC_ML_EVENT_GROUP_DELETED,
     VLC_ML_EVENT_PLAYLIST_ADDED,
     VLC_ML_EVENT_PLAYLIST_UPDATED,
     VLC_ML_EVENT_PLAYLIST_DELETED,
@@ -752,6 +782,7 @@ typedef struct vlc_ml_event_t
             const vlc_ml_media_t* p_media;
             const vlc_ml_artist_t* p_artist;
             const vlc_ml_album_t* p_album;
+            const vlc_ml_group_t* p_group;
             const vlc_ml_playlist_t* p_playlist;
             const vlc_ml_genre_t* p_genre;
             const vlc_ml_bookmark_t* p_bookmark;
@@ -866,6 +897,7 @@ VLC_API void vlc_ml_artist_release( vlc_ml_artist_t* p_artist );
 VLC_API void vlc_ml_genre_release( vlc_ml_genre_t* p_genre );
 VLC_API void vlc_ml_media_release( vlc_ml_media_t* p_media );
 VLC_API void vlc_ml_album_release( vlc_ml_album_t* p_album );
+VLC_API void vlc_ml_group_release( vlc_ml_group_t* p_group );
 VLC_API void vlc_ml_playlist_release( vlc_ml_playlist_t* p_playlist );
 
 VLC_API void vlc_ml_label_list_release( vlc_ml_label_list_t* p_list );
@@ -875,6 +907,7 @@ VLC_API void vlc_ml_media_list_release( vlc_ml_media_list_t* p_list );
 VLC_API void vlc_ml_album_list_release( vlc_ml_album_list_t* p_list );
 VLC_API void vlc_ml_show_list_release( vlc_ml_show_list_t* p_list );
 VLC_API void vlc_ml_genre_list_release( vlc_ml_genre_list_t* p_list );
+VLC_API void vlc_ml_group_list_release( vlc_ml_group_list_t* p_list );
 VLC_API void vlc_ml_playlist_list_release( vlc_ml_playlist_list_t* p_list );
 VLC_API void vlc_ml_entry_point_list_release( vlc_ml_entry_point_list_t* p_list );
 VLC_API void vlc_ml_playback_states_all_release( vlc_ml_playback_states_all* prefs );
@@ -1162,6 +1195,11 @@ static inline vlc_ml_genre_t* vlc_ml_get_genre( vlc_medialibrary_t* p_ml, int64_
 static inline vlc_ml_show_t* vlc_ml_get_show( vlc_medialibrary_t* p_ml, int64_t i_show_id )
 {
     return (vlc_ml_show_t*)vlc_ml_get( p_ml, VLC_ML_GET_SHOW, i_show_id );
+}
+
+static inline vlc_ml_group_t* vlc_ml_get_group( vlc_medialibrary_t* p_ml, int64_t i_group_id )
+{
+    return (vlc_ml_group_t*)vlc_ml_get( p_ml, VLC_ML_GET_GROUP, i_group_id );
 }
 
 static inline vlc_ml_playlist_t* vlc_ml_get_playlist( vlc_medialibrary_t* p_ml, int64_t i_playlist_id )
@@ -1556,6 +1594,47 @@ static inline size_t vlc_ml_count_stream_history( vlc_medialibrary_t* p_ml, cons
     return count;
 }
 
+//-------------------------------------------------------------------------------------------------
+// Groups
+
+static inline vlc_ml_group_list_t* vlc_ml_list_groups( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    vlc_ml_group_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_GROUPS, params, &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_groups( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_GROUPS, params, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
+}
+
+static inline vlc_ml_media_list_t* vlc_ml_list_group_media( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params, int64_t i_group_id )
+{
+    vlc_assert( p_ml != NULL );
+    vlc_ml_media_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_GROUP_MEDIA, params, i_group_id, &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_group_media( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params, int64_t i_group_id )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_GROUP_MEDIA, params, i_group_id, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 static inline vlc_ml_playlist_list_t* vlc_ml_list_playlists( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
 {
     vlc_assert( p_ml != NULL );
@@ -1603,6 +1682,7 @@ static inline size_t vlc_ml_count_playlist_media( vlc_medialibrary_t* p_ml, cons
     vlc_ml_album_t*: vlc_ml_album_release, \
     vlc_ml_genre_t*: vlc_ml_genre_release, \
     vlc_ml_media_t*: vlc_ml_media_release, \
+    vlc_ml_group_t*: vlc_ml_group_release, \
     vlc_ml_playlist_t*: vlc_ml_playlist_release, \
     vlc_ml_label_list_t*: vlc_ml_label_list_release, \
     vlc_ml_file_list_t*: vlc_ml_file_list_release, \
@@ -1611,6 +1691,7 @@ static inline size_t vlc_ml_count_playlist_media( vlc_medialibrary_t* p_ml, cons
     vlc_ml_album_list_t*: vlc_ml_album_list_release, \
     vlc_ml_show_list_t*: vlc_ml_show_list_release, \
     vlc_ml_genre_list_t*: vlc_ml_genre_list_release, \
+    vlc_ml_group_list_t*: vlc_ml_group_list_release, \
     vlc_ml_playlist_list_t*: vlc_ml_playlist_list_release, \
     vlc_ml_entry_point_list_t*: vlc_ml_entry_point_list_release, \
     vlc_ml_playback_states_all*: vlc_ml_playback_states_all_release, \
@@ -1623,6 +1704,7 @@ static inline void vlc_ml_release( vlc_ml_artist_t* artist ) { vlc_ml_artist_rel
 static inline void vlc_ml_release( vlc_ml_album_t* album ) { vlc_ml_album_release( album ); }
 static inline void vlc_ml_release( vlc_ml_genre_t* genre ) { vlc_ml_genre_release( genre ); }
 static inline void vlc_ml_release( vlc_ml_media_t* media ) { vlc_ml_media_release( media ); }
+static inline void vlc_ml_release( vlc_ml_group_t* group ) { vlc_ml_group_release( group ); }
 static inline void vlc_ml_release( vlc_ml_playlist_t* playlist ) { vlc_ml_playlist_release( playlist ); }
 static inline void vlc_ml_release( vlc_ml_label_list_t* list ) { vlc_ml_label_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_file_list_t* list ) { vlc_ml_file_list_release( list ); }
@@ -1631,6 +1713,7 @@ static inline void vlc_ml_release( vlc_ml_media_list_t* list ) { vlc_ml_media_li
 static inline void vlc_ml_release( vlc_ml_album_list_t* list ) { vlc_ml_album_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_show_list_t* list ) { vlc_ml_show_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_genre_list_t* list ) { vlc_ml_genre_list_release( list ); }
+static inline void vlc_ml_release( vlc_ml_group_list_t* list ) { vlc_ml_group_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_playlist_list_t* list ) { vlc_ml_playlist_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_entry_point_list_t* list ) { vlc_ml_entry_point_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_playback_states_all* prefs ) { vlc_ml_playback_states_all_release( prefs ); }
