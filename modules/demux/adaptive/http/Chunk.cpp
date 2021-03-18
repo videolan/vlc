@@ -523,9 +523,8 @@ block_t * HTTPChunkBufferedSource::read(size_t readsize)
 }
 
 HTTPChunk::HTTPChunk(const std::string &url, AbstractConnectionManager *manager,
-                     const adaptive::ID &id, ChunkType type, const BytesRange &range,
-                     bool access):
-    AbstractChunk(new HTTPChunkSource(url, manager, id, type, range, access))
+                     const adaptive::ID &id, ChunkType type, const BytesRange &range):
+    AbstractChunk(manager->makeSource(url, id, type, range))
 {
 }
 

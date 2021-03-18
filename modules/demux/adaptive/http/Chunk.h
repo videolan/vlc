@@ -109,10 +109,9 @@ namespace adaptive
         class HTTPChunkSource : public AbstractChunkSource,
                                 public BackendPrefInterface
         {
+            friend class HTTPConnectionManager;
+
             public:
-                HTTPChunkSource(const std::string &url, AbstractConnectionManager *,
-                                const ID &, ChunkType, const BytesRange &,
-                                bool = false);
                 virtual ~HTTPChunkSource();
 
                 virtual block_t *   readBlock       ()  override;
@@ -124,6 +123,10 @@ namespace adaptive
                 static const size_t CHUNK_SIZE = 32768;
 
             protected:
+                HTTPChunkSource(const std::string &url, AbstractConnectionManager *,
+                                const ID &, ChunkType, const BytesRange &,
+                                bool = false);
+
                 virtual bool        prepare();
                 AbstractConnection    *connection;
                 AbstractConnectionManager *connManager;
@@ -143,23 +146,24 @@ namespace adaptive
 
         class HTTPChunkBufferedSource : public HTTPChunkSource
         {
+            friend class HTTPConnectionManager;
             friend class Downloader;
 
             public:
-                HTTPChunkBufferedSource(const std::string &url, AbstractConnectionManager *,
-                                        const ID &, ChunkType, const BytesRange &,
-                                        bool = false);
                 virtual ~HTTPChunkBufferedSource();
                 virtual block_t *  readBlock       ()  override;
                 virtual block_t *  read            (size_t)  override;
                 virtual bool       hasMoreData     () const  override;
-                void               hold();
-                void               release();
 
             protected:
+                HTTPChunkBufferedSource(const std::string &url, AbstractConnectionManager *,
+                                        const ID &, ChunkType, const BytesRange &,
+                                        bool = false);
                 virtual bool       prepare()  override;
                 void               bufferize(size_t);
                 bool               isDone() const;
+                void               hold();
+                void               release();
 
             private:
                 block_t            *p_head; /* read cache buffer */
@@ -175,8 +179,7 @@ namespace adaptive
         {
             public:
                 HTTPChunk(const std::string &url, AbstractConnectionManager *,
-                          const ID &, ChunkType, const BytesRange &,
-                          bool = false);
+                          const ID &, ChunkType, const BytesRange &);
                 virtual ~HTTPChunk();
 
             protected:

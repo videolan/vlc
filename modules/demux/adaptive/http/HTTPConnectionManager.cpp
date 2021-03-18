@@ -152,6 +152,23 @@ AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &para
     return conn;
 }
 
+AbstractChunkSource *HTTPConnectionManager::makeSource(const std::string &url,
+                                                       const ID &id, ChunkType type,
+                                                       const BytesRange &range)
+{
+    switch(type)
+    {
+        case ChunkType::Init:
+        case ChunkType::Index:
+        case ChunkType::Segment:
+            return new HTTPChunkBufferedSource(url, this, id, type, range);
+        case ChunkType::Key:
+        case ChunkType::Playlist:
+        default:
+            return new HTTPChunkSource(url, this, id, type, range, true);
+    }
+}
+
 void HTTPConnectionManager::start(AbstractChunkSource *source)
 {
     HTTPChunkBufferedSource *src = dynamic_cast<HTTPChunkBufferedSource *>(source);
