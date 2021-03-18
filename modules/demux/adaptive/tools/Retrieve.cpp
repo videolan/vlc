@@ -38,7 +38,8 @@ block_t * Retrieve::HTTP(SharedResources *resources, ChunkType type,
     HTTPChunk *datachunk;
     try
     {
-        datachunk = new HTTPChunk(uri, resources->getConnManager(), ID(), type, true);
+        datachunk = new HTTPChunk(uri, resources->getConnManager(),
+                                  ID(), type, BytesRange(), true);
     } catch (...) {
         return nullptr;
     }
