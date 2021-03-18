@@ -27,12 +27,106 @@ import "qrc:///style/"
 
 Item {
     id: root
-    signal restoreFocus();
+
+    //---------------------------------------------------------------------------------------------
+    // Properties
+    //---------------------------------------------------------------------------------------------
+
     property var bgContent: undefined
+
+    //---------------------------------------------------------------------------------------------
+    // Private
+
+    property var _model: dialogModel.model
+
+    //---------------------------------------------------------------------------------------------
+    // Signal
+    //---------------------------------------------------------------------------------------------
+
+    signal restoreFocus();
+
+    //---------------------------------------------------------------------------------------------
+    // Events
+    //---------------------------------------------------------------------------------------------
+
+    Component.onCompleted: if (_model.count) errorPopup.state = "visible"
+
+    Component.onDestruction: {
+        if (questionDialog.dialogId !== undefined) {
+            dialogModel.dismiss(questionDialog.dialogId)
+            questionDialog.dialogId = undefined
+        } if (loginDialog.dialogId !== undefined) {
+            dialogModel.dismiss(loginDialog.dialogId)
+            loginDialog.dialogId = undefined
+        }
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Functions
+    //---------------------------------------------------------------------------------------------
 
     function ask(text, acceptCb, rejectCb, buttons) {
         customDialog.ask(text, acceptCb, rejectCb, buttons)
     }
+
+    //---------------------------------------------------------------------------------------------
+    // Connections
+    //---------------------------------------------------------------------------------------------
+
+    Connections
+    {
+        target: dialogModel
+
+        onLogin: {
+            loginDialog.dialogId = dialogId
+            loginDialog.title = title
+            loginDialog.defaultUsername = defaultUsername
+            loginDialog.open()
+        }
+
+        onQuestion: {
+            questionDialog.dialogId = dialogId
+            questionDialog.title = title
+            questionDialog.text = text
+            questionDialog.cancelTxt = cancel
+            questionDialog.action1Txt = action1
+            questionDialog.action2Txt = action2
+            questionDialog.open()
+        }
+
+        onProgress: {
+            console.warn("onProgressUpdated is not implemented")
+        }
+
+        onProgressUpdated: {
+            console.warn("onProgressUpdated is not implemented")
+        }
+
+        onCancelled: {
+            if (questionDialog.dialogId === dialogId) {
+                questionDialog.close()
+                questionDialog.dialogId = undefined
+                dialogModel.dismiss(dialogId)
+            } else if (loginDialog.dialogId === dialogId)  {
+                loginDialog.close()
+                loginDialog.dialogId = undefined
+                dialogModel.dismiss(dialogId)
+            } else {
+                dialogModel.dismiss(dialogId)
+            }
+        }
+    }
+
+    Connections
+    {
+        target: _model
+
+        onCountChanged: errorPopup.state = "visible"
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Childs
+    //---------------------------------------------------------------------------------------------
 
     Widgets.DrawerExt {
         id: errorPopup
@@ -43,11 +137,6 @@ Item {
         edge: Widgets.DrawerExt.Edges.Bottom
         width: parent.width * 0.8
         z: 10
-
-        property alias messageModel: messages
-        ListModel {
-            id: messages
-        }
 
         component: Rectangle {
             color: "gray"
@@ -60,13 +149,13 @@ Item {
                 anchors.fill: parent
                 anchors.margins: VLCStyle.fontHeight_normal / 2
                 ScrollBar.vertical: ScrollBar{}
-                contentY: VLCStyle.fontHeight_normal * ((messages.count * 2) - 4)
+                contentY: VLCStyle.fontHeight_normal * ((_model.count * 2) - 4)
                 clip: true
 
                 ListView {
                     width: parent.width
-                    height: VLCStyle.fontHeight_normal * messages.count * 2
-                    model: messages
+                    height: VLCStyle.fontHeight_normal * _model.count * 2
+                    model: _model
                     delegate: Column {
                         Text {
                             text: model.title
@@ -282,63 +371,5 @@ Item {
         id: customDialog
         rootWindow: root.bgContent
         onAboutToHide: restoreFocus()
-    }
-
-    DialogModel {
-        id: dialogModel
-        mainCtx: mainctx
-        onLoginDisplayed: {
-            loginDialog.dialogId = dialogId
-            loginDialog.title = title
-            loginDialog.defaultUsername = defaultUsername
-            loginDialog.open()
-        }
-
-        onErrorDisplayed: {
-            errorPopup.messageModel.append({title: title, text: text })
-            errorPopup.state = "visible"
-        }
-
-        onProgressDisplayed: {
-            console.warn("onProgressUpdated is not implemented")
-        }
-
-        onProgressUpdated: {
-            console.warn("onProgressUpdated is not implemented")
-        }
-
-        onQuestionDisplayed: {
-            questionDialog.dialogId = dialogId
-            questionDialog.title = title
-            questionDialog.text = text
-            questionDialog.cancelTxt = cancel
-            questionDialog.action1Txt = action1
-            questionDialog.action2Txt = action2
-            questionDialog.open()
-        }
-
-        onCancelled: {
-            if (questionDialog.dialogId === dialogId) {
-                questionDialog.close()
-                questionDialog.dialogId = undefined
-                dialogModel.dismiss(dialogId)
-            } else if (loginDialog.dialogId === dialogId)  {
-                loginDialog.close()
-                loginDialog.dialogId = undefined
-                dialogModel.dismiss(dialogId)
-            } else {
-                dialogModel.dismiss(dialogId)
-            }
-        }
-
-        Component.onDestruction: {
-            if (questionDialog.dialogId !== undefined) {
-                dialogModel.dismiss(questionDialog.dialogId)
-                questionDialog.dialogId = undefined
-            } if (loginDialog.dialogId !== undefined) {
-                dialogModel.dismiss(loginDialog.dialogId)
-                loginDialog.dialogId = undefined
-            }
-        }
     }
 }
