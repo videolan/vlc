@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2019-06-10 00:59+0200\n"
-"Last-Translator: A S Alam <alam.yellow@gmail.com>, 2019\n"
+"PO-Revision-Date: 2021-03-18 04:55+0100\n"
+"Last-Translator: A S Alam <alam.yellow@gmail.com>, 2021\n"
 "Language-Team: Panjabi (Punjabi) (https://www.transifex.com/yaron/"
 "teams/16553/pa/)\n"
 "Language: pa\n"
@@ -1632,7 +1632,7 @@ msgstr ""
 
 #: src/libvlc-module.c:178
 msgid "Force detection of Dolby Surround"
-msgstr "ਡੁਲਬੀ ਸਰਾਊਂਡਿੰਗ ਦੀ ਖੋਜ ਲਈ ਮਜਬੂਰ"
+msgstr "Dolby Surround ਦੀ ਖੋਜ ਲਈ ਮਜਬੂਰ"
 
 #: src/libvlc-module.c:180
 msgid ""
