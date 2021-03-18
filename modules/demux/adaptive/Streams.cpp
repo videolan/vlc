@@ -70,38 +70,32 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, 
     if(demuxersource)
     {
         CommandsFactory *factory = new (std::nothrow) CommandsFactory();
-        if(factory)
+        CommandsQueue *commandsqueue = new (std::nothrow) CommandsQueue();
+        if(factory && commandsqueue)
         {
-            CommandsQueue *commandsqueue = new (std::nothrow) CommandsQueue(factory);
-            if(commandsqueue)
+            fakeesout = new (std::nothrow) FakeESOut(p_realdemux->out,
+                                                     commandsqueue, factory);
+            if(fakeesout)
             {
-                fakeesout = new (std::nothrow) FakeESOut(p_realdemux->out, commandsqueue);
-                if(fakeesout)
-                {
-                    /* All successfull */
-                    fakeesout->setExtraInfoProvider( this );
-                    const Role & streamRole = tracker->getStreamRole();
-                    if(streamRole.isDefault() && streamRole.autoSelectable())
-                        fakeesout->setPriority(ES_PRIORITY_MIN + 10);
-                    else if(!streamRole.autoSelectable())
-                        fakeesout->setPriority(ES_PRIORITY_NOT_DEFAULTABLE);
-                    format = format_;
-                    segmentTracker = tracker;
-                    segmentTracker->registerListener(this);
-                    segmentTracker->notifyBufferingState(true);
-                    connManager = conn;
-                    fakeesout->setExpectedTimestamp(segmentTracker->getPlaybackTime());
-                    declaredCodecs();
-                    return true;
-                }
-                delete commandsqueue;
-                commandsqueue = nullptr;
-            }
-            else
-            {
-                delete factory;
+                /* All successfull */
+                fakeesout->setExtraInfoProvider( this );
+                const Role & streamRole = tracker->getStreamRole();
+                if(streamRole.isDefault() && streamRole.autoSelectable())
+                    fakeesout->setPriority(ES_PRIORITY_MIN + 10);
+                else if(!streamRole.autoSelectable())
+                    fakeesout->setPriority(ES_PRIORITY_NOT_DEFAULTABLE);
+                format = format_;
+                segmentTracker = tracker;
+                segmentTracker->registerListener(this);
+                segmentTracker->notifyBufferingState(true);
+                connManager = conn;
+                fakeesout->setExpectedTimestamp(segmentTracker->getPlaybackTime());
+                declaredCodecs();
+                return true;
             }
         }
+        delete factory;
+        delete commandsqueue;
         delete demuxersource;
     }
 

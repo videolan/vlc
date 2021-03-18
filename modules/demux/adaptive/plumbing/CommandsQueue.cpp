@@ -228,21 +228,30 @@ EsOutMetaCommand * CommandsFactory::createEsOutMetaCommand( AbstractFakeEsOut *o
 /*
  * Commands Queue management
  */
-CommandsQueue::CommandsQueue( CommandsFactory *f )
+#if 0
+/* For queue printing/debugging */
+std::ostream& operator<<(std::ostream& ostr, const std::list<AbstractCommand *>& list)
+{
+    for (auto &i : list) {
+        ostr << "[" << i->getType() << "]" << (i->getTime() / CLOCK_FREQ) << " ";
+    }
+    return ostr;
+}
+#endif
+
+CommandsQueue::CommandsQueue()
 {
     bufferinglevel = VLC_TS_INVALID;
     pcr = VLC_TS_INVALID;
     b_drop = false;
     b_draining = false;
     b_eof = false;
-    commandsFactory = f;
     nextsequence = 0;
 }
 
 CommandsQueue::~CommandsQueue()
 {
     Abort( false );
-    delete commandsFactory;
 }
 
 static bool compareCommands( const Queueentry &a, const Queueentry &b )
@@ -284,11 +293,6 @@ void CommandsQueue::Schedule( AbstractCommand *command )
     {
         incoming.push_back( Queueentry(nextsequence++, command) );
     }
-}
-
-const CommandsFactory * CommandsQueue::factory() const
-{
-    return commandsFactory;
 }
 
 mtime_t CommandsQueue::Process( mtime_t barrier )

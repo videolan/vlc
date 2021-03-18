@@ -154,9 +154,8 @@ namespace adaptive
     class CommandsQueue
     {
         public:
-            CommandsQueue( CommandsFactory * );
+            CommandsQueue();
             ~CommandsQueue();
-            const CommandsFactory * factory() const;
             void Schedule( AbstractCommand * );
             mtime_t Process( mtime_t );
             void Abort( bool b_reset );
@@ -173,7 +172,6 @@ namespace adaptive
             mtime_t getPCR() const;
 
         private:
-            CommandsFactory *commandsFactory;
             void LockedCommit();
             void LockedSetDraining();
             std::list<Queueentry> incoming;
