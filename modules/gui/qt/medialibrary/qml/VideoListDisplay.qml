@@ -100,6 +100,22 @@ MainInterface.MainTableView {
     }
 
     //---------------------------------------------------------------------------------------------
+    // Functions
+    //---------------------------------------------------------------------------------------------
+    // Events
+
+    function onLabels(model)
+    {
+        if (model === null)
+            return [];
+
+        return [
+            model.resolution_name || "",
+            model.channel         || ""
+        ].filter(function(a) { return a !== "" });
+    }
+
+    //---------------------------------------------------------------------------------------------
     // Childs
     //---------------------------------------------------------------------------------------------
 
@@ -112,9 +128,7 @@ MainInterface.MainTableView {
         titleCover_radius: VLCStyle.listAlbumCover_radius
 
         function titlecoverLabels(model) {
-            return [!model ? "" : model.resolution_name
-                    , model ? "" : model.channel
-                    ].filter(function(a) { return a !== "" })
+            return listView_id.onLabels(model);
         }
     }
 }
