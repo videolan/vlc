@@ -13,6 +13,7 @@
 #include "medialibrary/mlrecentsmodel.hpp"
 #include "medialibrary/mlrecentsvideomodel.hpp"
 #include "medialibrary/mlfoldersmodel.hpp"
+#include "medialibrary/mlgrouplistmodel.hpp"
 #include "medialibrary/mlplaylistlistmodel.hpp"
 #include "medialibrary/mlplaylistmodel.hpp"
 #include "medialibrary/mlplaylist.hpp"
@@ -180,6 +181,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<MLUrlModel>( "org.videolan.medialib", 0, 1, "MLUrlModel" );
         qmlRegisterType<MLVideoModel>( "org.videolan.medialib", 0, 1, "MLVideoModel" );
         qmlRegisterType<MLRecentsVideoModel>( "org.videolan.medialib", 0, 1, "MLRecentsVideoModel" );
+        qmlRegisterType<MLGroupListModel>( "org.videolan.medialib", 0, 1, "MLGroupListModel" );
         qmlRegisterType<MLPlaylistListModel>( "org.videolan.medialib", 0, 1, "MLPlaylistListModel" );
         qmlRegisterType<MLPlaylistModel>( "org.videolan.medialib", 0, 1, "MLPlaylistModel" );
 
@@ -204,6 +206,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<AlbumTrackContextMenu>( "org.videolan.medialib", 0, 1, "AlbumTrackContextMenu" );
         qmlRegisterType<URLContextMenu>( "org.videolan.medialib", 0, 1, "URLContextMenu" );
         qmlRegisterType<VideoContextMenu>( "org.videolan.medialib", 0, 1, "VideoContextMenu" );
+        qmlRegisterType<GroupListContextMenu>( "org.videolan.medialib", 0, 1, "GroupListContextMenu" );
         qmlRegisterType<PlaylistListContextMenu>( "org.videolan.medialib", 0, 1, "PlaylistListContextMenu" );
         qmlRegisterType<PlaylistMediaContextMenu>( "org.videolan.medialib", 0, 1, "PlaylistMediaContextMenu" );
     }
