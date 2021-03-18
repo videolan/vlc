@@ -81,12 +81,11 @@ SegmentChunk* ISegment::toChunk(SharedResources *res, AbstractConnectionManager 
     BytesRange range;
     if(startByte != endByte)
         range = BytesRange(startByte, endByte);
-    HTTPChunkBufferedSource *source =
-            new (std::nothrow) HTTPChunkBufferedSource(url, connManager,
-                                                       rep->getAdaptationSet()->getID(),
-                                                       ChunkType::Segment,
-                                                       range);
-    if( source )
+    AbstractChunkSource *source = connManager->makeSource(url,
+                                                          rep->getAdaptationSet()->getID(),
+                                                          ChunkType::Segment,
+                                                          range);
+    if(source)
     {
         SegmentChunk *chunk = createChunk(source, rep);
         if(chunk)

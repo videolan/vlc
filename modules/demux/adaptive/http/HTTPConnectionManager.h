@@ -26,6 +26,7 @@
 #define HTTPCONNECTIONMANAGER_H_
 
 #include "../logic/IDownloadRateObserver.h"
+#include "BytesRange.hpp"
 
 #include <vlc_common.h>
 
@@ -42,6 +43,7 @@ namespace adaptive
         class AbstractConnection;
         class Downloader;
         class AbstractChunkSource;
+        enum class ChunkType;
 
         class AbstractConnectionManager : public IDownloadRateObserver
         {
@@ -50,6 +52,10 @@ namespace adaptive
                 ~AbstractConnectionManager();
                 virtual void    closeAllConnections () = 0;
                 virtual AbstractConnection * getConnection(ConnectionParams &) = 0;
+                virtual AbstractChunkSource *makeSource(const std::string &,
+                                                        const ID &, ChunkType,
+                                                        const BytesRange &) = 0;
+
                 virtual void start(AbstractChunkSource *) = 0;
                 virtual void cancel(AbstractChunkSource *) = 0;
 
@@ -72,6 +78,9 @@ namespace adaptive
 
                 virtual void    closeAllConnections ()  override;
                 virtual AbstractConnection * getConnection(ConnectionParams &)  override;
+                virtual AbstractChunkSource *makeSource(const std::string &,
+                                                        const ID &, ChunkType,
+                                                        const BytesRange &) override;
 
                 virtual void start(AbstractChunkSource *)  override;
                 virtual void cancel(AbstractChunkSource *)  override;
