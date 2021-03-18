@@ -1,5 +1,7 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2021 VLC authors and VideoLAN
+ *
+ * Authors: Benjamin Arnaud <bunjee@omega.gg>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifndef DIALOGMODEL_HPP
 #define DIALOGMODEL_HPP
 
@@ -22,79 +25,169 @@
 # include "config.h"
 #endif
 
+// VLC includes
 #include <vlc_common.h>
 #include <vlc_dialog.h>
 
-#include <QObject>
+// Qt includes
+#include <QAbstractListModel>
 
-#include "util/qml_main_context.hpp"
+// Forward declarations
+class DialogModel;
 
+//-------------------------------------------------------------------------------------------------
+// DialogId
+//-------------------------------------------------------------------------------------------------
 
-class DialogId {
+class DialogId
+{
     Q_GADGET
-public:
-    DialogId(vlc_dialog_id * id = nullptr)
-        : m_id(id)
-    {}
 
-    bool operator ==(const DialogId& other) const {
+public:
+    DialogId(vlc_dialog_id * id = nullptr) : m_id(id) {}
+
+public: // Operators
+    bool operator ==(const DialogId & other) const
+    {
         return m_id == other.m_id;
     }
-    vlc_dialog_id *m_id;
+
+public: // Variables
+    vlc_dialog_id * m_id;
 };
 
 Q_DECLARE_METATYPE(DialogId)
+
+//-------------------------------------------------------------------------------------------------
+// DialogErrorModel
+//-------------------------------------------------------------------------------------------------
+
+class DialogErrorModel : public QAbstractListModel
+{
+    Q_OBJECT
+
+    Q_ENUMS(DialogRoles)
+
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+
+public: // Enums
+    enum DialogRoles
+    {
+        DIALOG_TITLE = Qt::UserRole + 1,
+        DIALOG_TEXT
+    };
+
+private:
+    struct DialogError
+    {
+        QString title;
+        QString text;
+    };
+
+public:
+    explicit DialogErrorModel(QObject * parent = nullptr);
+
+public: // QAbstractItemModel implementation
+    QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
+
+    int rowCount(const QModelIndex & parent = QModelIndex()) const override;
+
+public: // QAbstractItemModel reimplementation
+    QHash<int, QByteArray> roleNames() const override;
+
+private: // Functions
+    void pushError(const DialogError & error);
+
+signals:
+    void modelChanged();
+
+    void countChanged();
+
+public: // Properties
+    int count() const;
+
+private: // Variables
+    QList<DialogError> m_data;
+
+private:
+    friend class DialogModel;
+};
+
+//-------------------------------------------------------------------------------------------------
+// DialogModel
+//-------------------------------------------------------------------------------------------------
 
 class DialogModel : public QObject
 {
     Q_OBJECT
 
-public:
-    Q_PROPERTY(QmlMainContext* mainCtx READ getMainCtx WRITE setMainCtx NOTIFY mainCtxChanged)
+    Q_ENUMS(QuestionType)
 
-    enum QuestionType {
-        QUESTION_NORMAL,
-        QUESTION_WARNING,
-        QUESTION_CRITICAL
-    };
-    Q_ENUM(QuestionType)
+    Q_PROPERTY(DialogErrorModel * model READ model CONSTANT)
+
+public: // Enums
+    // NOTE: Is it really useful to have this declared here ?
+    enum QuestionType { QUESTION_NORMAL, QUESTION_WARNING, QUESTION_CRITICAL };
 
 public:
-    explicit DialogModel(QObject *parent = nullptr);
-    ~DialogModel();
+    explicit DialogModel(intf_thread_t * intf, QObject * parent = nullptr);
 
-    inline QmlMainContext* getMainCtx() const { return m_mainCtx; }
-    void setMainCtx(QmlMainContext*);
+public: // Interface
+    Q_INVOKABLE void post_login(DialogId dialogId, const QString & username,
+                                const QString & password, bool store = false);
 
-signals:
-    void errorDisplayed(const QString &title, const QString &text);
-    void loginDisplayed(DialogId dialogId, const QString &title,
-                        const QString &text, const QString &defaultUsername,
+    Q_INVOKABLE void post_action1(DialogId dialogId);
+    Q_INVOKABLE void post_action2(DialogId dialogId);
+
+    Q_INVOKABLE void dismiss(DialogId dialogId);
+
+private: // Static functions
+    static void onError(void * p_data, const char * psz_title, const char * psz_text);
+
+    static void onLogin(void * p_data, vlc_dialog_id * dialogId, const char * psz_title,
+                        const char * psz_text, const char * psz_default_username,
                         bool b_ask_store);
 
-    void questionDisplayed(DialogId dialogId, const QString &title,
-                           const QString &text, int type,
-                           const QString &cancel, const QString &action1,
-                           const QString &action2);
+    static void onQuestion(void * p_data, vlc_dialog_id * dialogId, const char * psz_title,
+                           const char * psz_text, vlc_dialog_question_type i_type,
+                           const char * psz_cancel, const char * psz_action1,
+                           const char * psz_action2);
 
-    void progressDisplayed(DialogId dialogId, const QString &title,
-                           const QString &text, bool b_indeterminate,
-                           float f_position, const QString &cancel);
+    static void onProgress(void * p_data, vlc_dialog_id * dialogId, const char * psz_title,
+                           const char * psz_text, bool b_indeterminate, float f_position,
+                           const char *psz_cancel);
+
+    static void onProgressUpdated(void * p_data, vlc_dialog_id * dialogId, float f_value,
+                                  const char * psz_text);
+
+    static void onCancelled(void * p_data, vlc_dialog_id * dialogId);
+
+
+signals:
+    void errorBegin();
+    void errorEnd  ();
+
+    void login(DialogId dialogId, const QString & title,
+               const QString & text, const QString & defaultUsername,
+               bool b_ask_store);
+
+    void question(DialogId dialogId, const QString & title, const QString & text, int type,
+                  const QString & cancel, const QString & action1, const QString & action2);
+
+    void progress(DialogId dialogId, const QString & title, const QString & text,
+                  bool b_indeterminate, float f_position, const QString & cancel);
+
+    void progressUpdated(DialogId dialogId, float f_value, const QString & text);
 
     void cancelled(DialogId dialogId);
 
-    void progressUpdated(DialogId dialogId, float f_value, const QString &text);
+public: // Properties
+    DialogErrorModel * model() const;
 
-    void mainCtxChanged();
+private: // Variables
+    DialogErrorModel * m_model;
 
-public slots:
-    void dismiss(DialogId dialogId);
-    void post_login(DialogId dialogId, const QString& username, const QString& password, bool store = false);
-    void post_action1(DialogId dialogId);
-    void post_action2(DialogId dialogId);
-
-private:
-    QmlMainContext* m_mainCtx;
+    intf_thread_t * m_intf;
 };
 
 #endif // DIALOGMODEL_HPP

@@ -1,5 +1,7 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2021 VLC authors and VideoLAN
+ *
+ * Authors: Benjamin Arnaud <bunjee@omega.gg>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,99 +17,195 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #include "dialogmodel.hpp"
 
-static void displayErrorCb(void *p_data, const char *psz_title, const char *psz_text)
+// VLC includes
+#include <vlc_dialog.h>
+#include <qt.hpp>
+
+//=================================================================================================
+// DialogErrorModel
+//=================================================================================================
+
+/* explicit */ DialogErrorModel::DialogErrorModel(QObject * parent) : QAbstractListModel(parent) {}
+
+//-------------------------------------------------------------------------------------------------
+// QAbstractItemModel implementation
+//-------------------------------------------------------------------------------------------------
+
+QVariant DialogErrorModel::data(const QModelIndex & index, int role) const /* override */
 {
-    DialogModel* that = static_cast<DialogModel*>(p_data);
-    emit that->errorDisplayed(psz_title, psz_text);
+    int row = index.row();
+
+    if (row < 0 || row >= m_data.count())
+        return QVariant();
+
+    switch (role)
+    {
+        case DIALOG_TITLE:
+            return QVariant::fromValue(m_data.at(row).title);
+        case DIALOG_TEXT:
+            return QVariant::fromValue(m_data.at(row).text);
+        default:
+            return QVariant();
+    }
 }
 
-static void displayLoginCb(void *p_data, vlc_dialog_id *dialogId,
-                        const char *psz_title, const char *psz_text,
-                        const char *psz_default_username,
-                        bool b_ask_store)
+int DialogErrorModel::rowCount(const QModelIndex &) const /* override */
 {
-    DialogModel* that = static_cast<DialogModel*>(p_data);
-    emit that->loginDisplayed( dialogId, psz_title, psz_text, psz_default_username, b_ask_store );
+    return count();
 }
 
-static void displayQuestionCb(void *p_data, vlc_dialog_id *dialogId,
-                       const char *psz_title, const char *psz_text,
-                       vlc_dialog_question_type i_type,
-                       const char *psz_cancel, const char *psz_action1,
-                       const char *psz_action2)
+//-------------------------------------------------------------------------------------------------
+// QAbstractItemModel reimplementation
+//-------------------------------------------------------------------------------------------------
+
+QHash<int, QByteArray> DialogErrorModel::roleNames() const /* override */
 {
-    DialogModel* that = static_cast<DialogModel*>(p_data);
-    emit that->questionDisplayed( dialogId, psz_title, psz_text, static_cast<int>(i_type), psz_cancel, psz_action1, psz_action2 );
+    return
+    {
+        { DialogErrorModel::DIALOG_TITLE, "title" },
+        { DialogErrorModel::DIALOG_TEXT,  "text"  }
+    };
 }
 
-static void displayProgressCb(void *p_data, vlc_dialog_id *dialogId,
-                            const char *psz_title, const char *psz_text,
-                            bool b_indeterminate, float f_position,
-                            const char *psz_cancel)
+//-------------------------------------------------------------------------------------------------
+// Private functions
+//-------------------------------------------------------------------------------------------------
+
+void DialogErrorModel::pushError(const DialogError & error)
 {
-    DialogModel* that = static_cast<DialogModel*>(p_data);
-    emit that->progressDisplayed( dialogId, psz_title, psz_text, b_indeterminate, f_position, psz_cancel);
+    int row = m_data.count();
+
+    beginInsertRows(QModelIndex(), row, row);
+
+    m_data.append(error);
+
+    endInsertRows();
+
+    emit countChanged();
 }
 
-static void cancelCb(void *p_data, vlc_dialog_id *dialogId)
+//-------------------------------------------------------------------------------------------------
+// Properties
+//-------------------------------------------------------------------------------------------------
+
+int DialogErrorModel::count() const
 {
-    DialogModel* that = static_cast<DialogModel*>(p_data);
-    emit that->cancelled(dialogId);
+    return m_data.count();
 }
 
-static void updateProgressCb(void *p_data, vlc_dialog_id *dialogId, float f_value, const char *psz_text)
+//=================================================================================================
+// DialogModel
+//=================================================================================================
+
+/* explicit */ DialogModel::DialogModel(intf_thread_t * intf, QObject * parent)
+    : QObject(parent), m_intf(intf)
 {
-    DialogModel* that = static_cast<DialogModel*>(p_data);
-    emit that->progressUpdated( dialogId, f_value, psz_text );
+    m_model = new DialogErrorModel(this);
+
+    const vlc_dialog_cbs cbs =
+    {
+        onError, onLogin, onQuestion, onProgress, onCancelled, onProgressUpdated
+    };
+
+    vlc_dialog_provider_set_callbacks(intf, &cbs, this);
 }
 
-const vlc_dialog_cbs cbs = {
-    displayErrorCb,
-    displayLoginCb,
-    displayQuestionCb,
-    displayProgressCb,
-    cancelCb,
-    updateProgressCb
-};
+//-------------------------------------------------------------------------------------------------
+// Interface
+//-------------------------------------------------------------------------------------------------
 
-DialogModel::DialogModel(QObject *parent)
-    : QObject(parent)
-{
-}
-
-DialogModel::~DialogModel()
-{
-    if (m_mainCtx)
-        vlc_dialog_provider_set_callbacks(m_mainCtx->getIntf(), nullptr, nullptr);
-}
-
-void DialogModel::dismiss(DialogId dialogId)
-{
-    vlc_dialog_id_dismiss(dialogId.m_id);
-}
-
-void DialogModel::post_login(DialogId dialogId, const QString& username, const QString& password, bool store)
+/* Q_INVOKABLE */ void DialogModel::post_login(DialogId dialogId, const QString & username,
+                                               const QString & password, bool store)
 {
     vlc_dialog_id_post_login(dialogId.m_id, qtu(username), qtu(password), store);
 }
 
-void DialogModel::post_action1(DialogId dialogId)
+/* Q_INVOKABLE */ void DialogModel::post_action1(DialogId dialogId)
 {
     vlc_dialog_id_post_action(dialogId.m_id, 1);
 }
 
-void DialogModel::post_action2(DialogId dialogId)
+/* Q_INVOKABLE */ void DialogModel::post_action2(DialogId dialogId)
 {
     vlc_dialog_id_post_action(dialogId.m_id, 2);
 }
 
-void DialogModel::setMainCtx(QmlMainContext* ctx)
+/* Q_INVOKABLE */ void DialogModel::dismiss(DialogId dialogId)
 {
-    if (ctx)
-        vlc_dialog_provider_set_callbacks(ctx->getIntf(), &cbs, this);
-    else if (m_mainCtx)
-        vlc_dialog_provider_set_callbacks(m_mainCtx->getIntf(), nullptr, nullptr);
-    m_mainCtx = ctx;
+    vlc_dialog_id_dismiss(dialogId.m_id);
+}
+
+//-------------------------------------------------------------------------------------------------
+// Private static functions
+//-------------------------------------------------------------------------------------------------
+
+/* static */ void DialogModel::onError(void * p_data,
+                                       const char * psz_title, const char * psz_text)
+{
+    DialogModel * model = static_cast<DialogModel *>(p_data);
+
+    DialogErrorModel::DialogError error { psz_title, psz_text };
+
+    QMetaObject::invokeMethod(model, [model, error = std::move(error)]()
+    {
+        model->m_model->pushError(error);
+    });
+}
+
+/* static */ void DialogModel::onLogin(void * p_data, vlc_dialog_id * dialogId,
+                                       const char * psz_title, const char * psz_text,
+                                       const char * psz_default_username, bool b_ask_store)
+{
+    DialogModel * model = static_cast<DialogModel *>(p_data);
+
+    emit model->login(dialogId, psz_title, psz_text, psz_default_username, b_ask_store);
+}
+
+/* static */ void DialogModel::onQuestion(void * p_data, vlc_dialog_id * dialogId,
+                                          const char * psz_title, const char * psz_text,
+                                          vlc_dialog_question_type i_type,
+                                          const char * psz_cancel, const char * psz_action1,
+                                          const char * psz_action2)
+{
+    DialogModel * model = static_cast<DialogModel *>(p_data);
+
+    emit model->question(dialogId, psz_title, psz_text, static_cast<int>(i_type), psz_cancel,
+                         psz_action1, psz_action2);
+}
+
+/* static */ void DialogModel::onProgress(void * p_data, vlc_dialog_id * dialogId,
+                                          const char * psz_title, const char * psz_text,
+                                          bool b_indeterminate, float f_position,
+                                          const char * psz_cancel)
+{
+    DialogModel * model = static_cast<DialogModel *>(p_data);
+
+    emit model->progress(dialogId, psz_title, psz_text, b_indeterminate, f_position, psz_cancel);
+}
+
+/* static */ void DialogModel::onProgressUpdated(void * p_data, vlc_dialog_id * dialogId,
+                                                 float f_value, const char * psz_text)
+{
+    DialogModel * model = static_cast<DialogModel *>(p_data);
+
+    emit model->progressUpdated(dialogId, f_value, psz_text);
+}
+
+/* static */ void DialogModel::onCancelled(void * p_data, vlc_dialog_id * dialogId)
+{
+    DialogModel * model = static_cast<DialogModel *>(p_data);
+
+    emit model->cancelled(dialogId);
+}
+
+//-------------------------------------------------------------------------------------------------
+// Properties
+//-------------------------------------------------------------------------------------------------
+
+DialogErrorModel * DialogModel::model() const
+{
+    return m_model;
 }

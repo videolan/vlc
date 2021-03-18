@@ -103,6 +103,7 @@ bool MainUI::setup(QQmlEngine* engine)
     rootCtx->setContextProperty( "topWindow", m_interfaceWindow);
     rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
     rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));
+    rootCtx->setContextProperty( "dialogModel", new DialogModel(m_intf, this));
 
     if (m_mainInterface->hasMediaLibrary())
         rootCtx->setContextProperty( "medialib", m_mainInterface->getMediaLibrary() );
@@ -227,8 +228,10 @@ void MainUI::registerQMLTypes()
     qmlRegisterType<PlaylistControllerModel>( "org.videolan.vlc", 0, 1, "PlaylistControllerModel" );
 
     qmlRegisterType<AboutModel>( "org.videolan.vlc", 0, 1, "AboutModel" );
+
+    qmlRegisterUncreatableType<DialogModel>("org.videolan.vlc", 0, 1, "DialogModel", "");
+    qmlRegisterUncreatableType<DialogErrorModel>( "org.videolan.vlc", 0, 1, "DialogErrorModel", "");
     qRegisterMetaType<DialogId>();
-    qmlRegisterType<DialogModel>("org.videolan.vlc", 0, 1, "DialogModel");
 
     qmlRegisterType<QmlEventFilter>( "org.videolan.vlc", 0, 1, "EventFilter" );
 
