@@ -30,8 +30,22 @@ Widgets.NavigableFocusScope {
 
     property alias model: buttonsRepeater.model
 
-    property real _minimumWidth: 0 // minimumWidth without spacing (minimumWidth of all controls inside)
-    property real minimumWidth: _minimumWidth + ((buttonsRepeater.count - 1) * buttonrow.spacing) // minimumWidth with spacing
+    readonly property real minimumWidth: {
+        var minimumWidth = 0
+
+        for (var i = 0; i < buttonsRepeater.count; ++i) {
+            var item = buttonsRepeater.itemAt(i).item
+
+            if (item.minimumWidth !== undefined)
+                minimumWidth += item.minimumWidth
+            else
+                minimumWidth += item.width
+        }
+
+        minimumWidth += ((buttonsRepeater.count - 1) * buttonrow.spacing)
+
+        return minimumWidth
+    }
     property real extraWidth: undefined
     property int expandableCount: 0 // widget count that can expand when extra width is available
 
@@ -64,11 +78,6 @@ Widgets.NavigableFocusScope {
 
                 if (item.item.extraWidth !== undefined)
                     buttonsLayout.expandableCount--
-
-                if (item.item.minimumWidth !== undefined)
-                    buttonsLayout._minimumWidth -= item.item.minimumWidth
-                else
-                    buttonsLayout._minimumWidth -= item.item.width
             }
 
             delegate: Loader {
@@ -109,11 +118,6 @@ Widgets.NavigableFocusScope {
 
                     if (buttonloader.item.navigationLeft !== undefined)
                         buttonloader.item.navigationLeft = buttonsLayout.navigationLeft
-
-                    if (buttonloader.item.minimumWidth !== undefined)
-                        buttonsLayout._minimumWidth += buttonloader.item.minimumWidth
-                    else
-                        buttonsLayout._minimumWidth += buttonloader.item.width
 
                     if (buttonloader.item.extraWidth !== undefined && buttonsLayout.extraWidth !== undefined) {
                         buttonsLayout.expandableCount++
