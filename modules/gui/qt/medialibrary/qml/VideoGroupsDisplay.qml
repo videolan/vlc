@@ -1,5 +1,7 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2021 VLC authors and VideoLAN
+ *
+ * Authors: Benjamin Arnaud <bunjee@omega.gg>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,32 +32,13 @@ Widgets.PageLoader {
     id: root
 
     //---------------------------------------------------------------------------------------------
-    // Properties
+    // Aliases
     //---------------------------------------------------------------------------------------------
 
     property bool isViewMultiView: true
 
-    property var contentModel
-    property var sortModel
-
-    property var tabModel: ListModel {
-        Component.onCompleted: {
-            pageModel.forEach(function(e) {
-                append({
-                    name       : e.name,
-                    displayText: e.displayText
-                })
-            })
-        }
-    }
-
-    property Component localMenuDelegate: Widgets.LocalTabBar {
-        currentView: root.view
-
-        model: tabModel
-
-        onClicked: root.loadIndex(index)
-    }
+    property variant model
+    property variant sortModel
 
     //---------------------------------------------------------------------------------------------
     // Settings
@@ -64,34 +47,71 @@ Widgets.PageLoader {
     defaultPage: "all"
 
     pageModel: [{
-            name: "all",
-            displayText: i18n.qtr("All"),
-            url: "qrc:///medialibrary/VideoAllDisplay.qml"
-        },{
-            name: "groups",
-            displayText: i18n.qtr("Groups"),
-            url: "qrc:///medialibrary/VideoGroupsDisplay.qml"
-        },{
-            name: "playlists",
-            displayText: i18n.qtr("Playlists"),
-            url: "qrc:///medialibrary/VideoPlaylistsDisplay.qml"
-        }
-    ]
+        name: "all",
+        component: componentAll
+    }, {
+        name: "list",
+        component: componentList
+    }]
+
+    //---------------------------------------------------------------------------------------------
+    // Events
+    //---------------------------------------------------------------------------------------------
 
     onCurrentItemChanged: {
+        model     = currentItem.model;
+        sortModel = currentItem.sortModel;
+
         isViewMultiView = (currentItem.isViewMultiView === undefined
                            ||
                            currentItem.isViewMultiView);
-
-        contentModel = currentItem.model;
-        sortModel    = currentItem.sortModel;
     }
 
     //---------------------------------------------------------------------------------------------
     // Functions
     //---------------------------------------------------------------------------------------------
+    // Private
 
-    function loadIndex(index) {
-        history.push(["mc", "video", root.pageModel[index].name]);
+    function _updateHistoryAll(index) {
+        history.update(["mc", "video", "groups", "all", { "initialIndex": index }]);
+    }
+
+    function _updateHistoryList(list) {
+        history.update(["mc", "video", "groups", "list", {
+                            "initialIndex": list.currentIndex,
+                            "initialId"   : list.parentId,
+                            "initialName" : list.name
+                        }]);
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Childs
+    //---------------------------------------------------------------------------------------------
+
+    Component {
+        id: componentAll
+
+        MediaGroupList {
+            anchors.fill: parent
+
+            onCurrentIndexChanged: _updateHistoryAll(currentIndex)
+
+            onShowList: history.push(["mc", "video", "groups", "list",
+                                      { parentId: model.id, name: model.name }])
+        }
+    }
+
+    Component {
+        id: componentList
+
+        MediaGroupDisplay {
+            id: list
+
+            anchors.fill: parent
+
+            onCurrentIndexChanged: _updateHistoryList(list)
+            onParentIdChanged    : _updateHistoryList(list)
+            onNameChanged        : _updateHistoryList(list)
+        }
     }
 }

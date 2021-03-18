@@ -689,6 +689,7 @@ libqt_plugin_la_QML = \
 	gui/qt/medialibrary/qml/VideoDisplay.qml \
 	gui/qt/medialibrary/qml/VideoAll.qml \
 	gui/qt/medialibrary/qml/VideoAllDisplay.qml \
+	gui/qt/medialibrary/qml/VideoGroupsDisplay.qml \
 	gui/qt/medialibrary/qml/PlaylistMediaList.qml \
 	gui/qt/medialibrary/qml/PlaylistMedia.qml \
 	gui/qt/medialibrary/qml/PlaylistMediaDelegate.qml \

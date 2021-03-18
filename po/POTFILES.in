@@ -840,6 +840,7 @@ modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml
 modules/gui/qt/medialibrary/qml/VideoListDisplay.qml
 modules/gui/qt/medialibrary/qml/VideoAll.qml
 modules/gui/qt/medialibrary/qml/VideoAllDisplay.qml
+modules/gui/qt/medialibrary/qml/VideoGroupsDisplay.qml
 modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml
 modules/gui/qt/medialibrary/qml/PlaylistMedia.qml
 modules/gui/qt/medialibrary/qml/PlaylistMediaDelegate.qml

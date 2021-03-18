@@ -279,6 +279,7 @@
         <file alias="VideoDisplay.qml">medialibrary/qml/VideoDisplay.qml</file>
         <file alias="VideoAll.qml">medialibrary/qml/VideoAll.qml</file>
         <file alias="VideoAllDisplay.qml">medialibrary/qml/VideoAllDisplay.qml</file>
+        <file alias="VideoGroupsDisplay.qml">medialibrary/qml/VideoGroupsDisplay.qml</file>
         <file alias="PlaylistMediaList.qml">medialibrary/qml/PlaylistMediaList.qml</file>
         <file alias="PlaylistMedia.qml">medialibrary/qml/PlaylistMedia.qml</file>
         <file alias="PlaylistMediaDelegate.qml">medialibrary/qml/PlaylistMediaDelegate.qml</file>
