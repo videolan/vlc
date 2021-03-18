@@ -164,8 +164,10 @@ NavigableFocusScope {
                 leftPadding: VLCStyle.table_section_text_margin
                 text: view.currentSection
                 color: VLCStyle.colors.accent
-                visible: text !== "" && view.contentY > (row.height - col.height - row.topPadding)
                 verticalAlignment: Text.AlignTop
+                visible: view.headerPositioning === ListView.OverlayHeader
+                         && text !== ""
+                         && view.contentY > (row.height - col.height - row.topPadding)
             }
 
             Column {
