@@ -801,8 +801,8 @@ Item{
             readonly property real minimumWidth: cover.width
             property real extraWidth: 0
 
-            implicitWidth: paintOnly ? playingItemInfoRow.width : (minimumWidth + extraWidth)
-
+            width: playingItemInfoRow.width
+            implicitWidth: playingItemInfoRow.implicitWidth
             implicitHeight: playingItemInfoRow.implicitHeight
 
             Keys.onPressed: {
@@ -812,7 +812,7 @@ Item{
             }
             Keys.onReleased: {
                 if (!event.accepted && KeyHelper.matchOk(event))
-		    g_mainDisplay.showPlayer()
+                    g_mainDisplay.showPlayer()
             }
 
             MouseArea {
@@ -825,7 +825,9 @@ Item{
 
             Row {
                 id: playingItemInfoRow
-                width: (coverItem.width + infoColumn.width)
+                width: (coverItem.width + infoColumn.width + spacing)
+
+                spacing: VLCStyle.margin_xsmall
 
                 Item {
                     id: coverItem
@@ -869,11 +871,12 @@ Item{
                 Column {
                     id: infoColumn
                     anchors.verticalCenter: parent.verticalCenter
-                    leftPadding: VLCStyle.margin_xsmall
 
-                    width: (paintOnly ? Math.max(titleLabel.width, artistLabel.width, progressIndicator.width) : implicitWidth) + VLCStyle.margin_xsmall
+                    readonly property real preferredWidth: Math.max(titleLabel.implicitWidth, artistLabel.implicitWidth, progressIndicator.implicitWidth)
+                    width: ((artworkInfoItem.extraWidth > preferredWidth) || (paintOnly)) ? preferredWidth
+                                                                                          : artworkInfoItem.extraWidth
 
-                    visible: paintOnly || artworkInfoItem.extraWidth > 0
+                    visible: width > 0
 
                     ToolTip {
                         text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
@@ -894,10 +897,7 @@ Item{
                     Widgets.MenuLabel {
                         id: titleLabel
 
-                        width: {
-                            if (!paintOnly)
-                                artworkInfoItem.implicitWidth - titleLabel.mapToItem(artworkInfoItem, titleLabel.x, titleLabel.y).x
-                        }
+                        width: parent.width
 
                         text: {
                             if (paintOnly)
@@ -905,39 +905,34 @@ Item{
                             else
                                 mainPlaylistController.currentItem.title
                         }
-                        visible: text !== ""
                         color: colors.text
                     }
 
                     Widgets.MenuCaption {
                         id: artistLabel
-                        width: {
-                            if (!paintOnly)
-                                artworkInfoItem.implicitWidth - artistLabel.mapToItem(artworkInfoItem, artistLabel.x, artistLabel.y).x
-                        }
+
+                        width: parent.width
+
                         text: {
                             if (paintOnly)
                                 i18n.qtr("Artist")
                             else
                                 mainPlaylistController.currentItem.artist
                         }
-                        visible: text !== ""
                         color: colors.menuCaption
                     }
 
                     Widgets.MenuCaption {
                         id: progressIndicator
-                        width: {
-                            if (!paintOnly)
-                                artworkInfoItem.implicitWidth - progressIndicator.mapToItem(artworkInfoItem, progressIndicator.x, progressIndicator.y).x
-                        }
+
+                        width: parent.width
+
                         text: {
                             if (paintOnly)
                                 " -- / -- "
                             else
                                 player.time.toString() + " / " + player.length.toString()
                         }
-                        visible: text !== ""
                         color: colors.menuCaption
                     }
                 }
