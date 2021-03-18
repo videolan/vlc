@@ -27,7 +27,8 @@
 
 using namespace smooth::http;
 
-MemoryChunkSource::MemoryChunkSource(block_t *block)
+MemoryChunkSource::MemoryChunkSource(ChunkType t, block_t *block)
+    : AbstractChunkSource(t)
 {
     data = block;
     i_read = 0;

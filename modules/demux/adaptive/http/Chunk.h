@@ -68,14 +68,16 @@ namespace adaptive
         class AbstractChunkSource : public ChunkInterface
         {
             public:
-                AbstractChunkSource();
+                AbstractChunkSource(ChunkType);
                 virtual ~AbstractChunkSource();
                 void                setBytesRange   (const BytesRange &);
                 const BytesRange &  getBytesRange   () const;
+                ChunkType           getChunkType    () const;
                 virtual std::string getContentType  () const override;
                 virtual RequestStatus getRequestStatus() const override;
 
             protected:
+                ChunkType           type;
                 RequestStatus       requeststatus;
                 size_t              contentLength;
                 BytesRange          bytesRange;
@@ -130,7 +132,6 @@ namespace adaptive
                 bool                prepared;
                 bool                eof;
                 ID                  sourceid;
-                ChunkType           type;
                 vlc_tick_t          requestStartTime;
                 vlc_tick_t          responseTime;
                 vlc_tick_t          downloadEndTime;

@@ -144,7 +144,7 @@ SegmentChunk* ForgedInitSegment::toChunk(SharedResources *, AbstractConnectionMa
     block_t *moov = buildMoovBox(lvl->getCodecParameters());
     if(moov)
     {
-        MemoryChunkSource *source = new (std::nothrow) MemoryChunkSource(moov);
+        MemoryChunkSource *source = new (std::nothrow) MemoryChunkSource(ChunkType::Init, moov);
         if( source )
         {
             SegmentChunk *chunk = new (std::nothrow) SegmentChunk(source, rep);

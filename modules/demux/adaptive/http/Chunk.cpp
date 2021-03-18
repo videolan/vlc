@@ -38,8 +38,9 @@
 using namespace adaptive::http;
 using vlc::threads::mutex_locker;
 
-AbstractChunkSource::AbstractChunkSource()
+AbstractChunkSource::AbstractChunkSource(ChunkType t)
 {
+    type = t;
     contentLength = 0;
     requeststatus = RequestStatus::Success;
 }
@@ -69,6 +70,11 @@ std::string AbstractChunkSource::getContentType() const
 RequestStatus AbstractChunkSource::getRequestStatus() const
 {
     return requeststatus;
+}
+
+ChunkType AbstractChunkSource::getChunkType() const
+{
+    return type;
 }
 
 AbstractChunk::AbstractChunk(AbstractChunkSource *source_)
@@ -140,7 +146,7 @@ block_t * AbstractChunk::read(size_t size)
 
 HTTPChunkSource::HTTPChunkSource(const std::string& url, AbstractConnectionManager *manager,
                                  const adaptive::ID &id, ChunkType t, bool access) :
-    AbstractChunkSource(),
+    AbstractChunkSource(t),
     connection   (nullptr),
     connManager  (manager),
     consumed     (0)
@@ -148,7 +154,6 @@ HTTPChunkSource::HTTPChunkSource(const std::string& url, AbstractConnectionManag
     prepared = false;
     eof = false;
     sourceid = id;
-    type = t;
     setUseAccess(access);
     if(!init(url))
         eof = true;
