@@ -37,23 +37,19 @@
 
 using namespace adaptive::http;
 
-AbstractChunkSource::AbstractChunkSource(ChunkType t)
+AbstractChunkSource::AbstractChunkSource(ChunkType t, const BytesRange &range)
 {
     type = t;
     contentLength = 0;
     requeststatus = RequestStatus::Success;
+    bytesRange = range;
+    if(bytesRange.isValid() && bytesRange.getEndByte())
+        contentLength = bytesRange.getEndByte() - bytesRange.getStartByte();
 }
 
 AbstractChunkSource::~AbstractChunkSource()
 {
 
-}
-
-void AbstractChunkSource::setBytesRange(const BytesRange &range)
-{
-    bytesRange = range;
-    if(bytesRange.isValid() && bytesRange.getEndByte())
-        contentLength = bytesRange.getEndByte() - bytesRange.getStartByte();
 }
 
 const BytesRange & AbstractChunkSource::getBytesRange() const
@@ -144,8 +140,9 @@ block_t * AbstractChunk::read(size_t size)
 }
 
 HTTPChunkSource::HTTPChunkSource(const std::string& url, AbstractConnectionManager *manager,
-                                 const adaptive::ID &id, ChunkType t, bool access) :
-    AbstractChunkSource(t),
+                                 const adaptive::ID &id, ChunkType t, const BytesRange &range,
+                                 bool access) :
+    AbstractChunkSource(t, range),
     connection   (nullptr),
     connManager  (manager),
     consumed     (0)
@@ -315,8 +312,9 @@ block_t * HTTPChunkSource::readBlock()
 
 HTTPChunkBufferedSource::HTTPChunkBufferedSource(const std::string& url, AbstractConnectionManager *manager,
                                                  const adaptive::ID &sourceid,
-                                                 ChunkType type, bool access) :
-    HTTPChunkSource(url, manager, sourceid, type, access),
+                                                 ChunkType type, const BytesRange &range,
+                                                 bool access) :
+    HTTPChunkSource(url, manager, sourceid, type, range, access),
     p_head     (nullptr),
     pp_tail    (&p_head),
     buffered     (0)
@@ -531,10 +529,10 @@ block_t * HTTPChunkBufferedSource::read(size_t readsize)
 }
 
 HTTPChunk::HTTPChunk(const std::string &url, AbstractConnectionManager *manager,
-                     const adaptive::ID &id, ChunkType type, bool access):
-    AbstractChunk(new HTTPChunkSource(url, manager, id, type, access))
+                     const adaptive::ID &id, ChunkType type, const BytesRange &range,
+                     bool access):
+    AbstractChunk(new HTTPChunkSource(url, manager, id, type, range, access))
 {
-
 }
 
 HTTPChunk::~HTTPChunk()

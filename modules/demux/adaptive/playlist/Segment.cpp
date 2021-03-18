@@ -78,14 +78,16 @@ SegmentChunk* ISegment::toChunk(SharedResources *res, AbstractConnectionManager 
                                 size_t index, BaseRepresentation *rep)
 {
     const std::string url = getUrlSegment().toString(index, rep);
-    HTTPChunkBufferedSource *source = new (std::nothrow) HTTPChunkBufferedSource(url, connManager,
-                                                                                 rep->getAdaptationSet()->getID(),
-                                                                                 ChunkType::Segment);
+    BytesRange range;
+    if(startByte != endByte)
+        range = BytesRange(startByte, endByte);
+    HTTPChunkBufferedSource *source =
+            new (std::nothrow) HTTPChunkBufferedSource(url, connManager,
+                                                       rep->getAdaptationSet()->getID(),
+                                                       ChunkType::Segment,
+                                                       range);
     if( source )
     {
-        if(startByte != endByte)
-            source->setBytesRange(BytesRange(startByte, endByte));
-
         SegmentChunk *chunk = createChunk(source, rep);
         if(chunk)
         {
