@@ -57,7 +57,7 @@ static void EmbedMouseEvent(struct vout_window_t *wnd,
 {
     vout_window_t *parent = wnd->owner.sys;
     if (parent->owner.cbs->mouse_event != NULL)
-        parent->owner.cbs->mouse_event(wnd, mouse);
+        parent->owner.cbs->mouse_event(parent, mouse);
 }
 
 static void EmbedKeyboardEvent(struct vout_window_t *wnd,
@@ -65,21 +65,21 @@ static void EmbedKeyboardEvent(struct vout_window_t *wnd,
 {
     vout_window_t *parent = wnd->owner.sys;
     if (parent->owner.cbs->keyboard_event != NULL)
-        parent->owner.cbs->keyboard_event(wnd, key);
+        parent->owner.cbs->keyboard_event(parent, key);
 }
 
 static void EmbedOutputEvent(struct vout_window_t *wnd,
                              const char *id, const char *desc)
 {
     vout_window_t *parent = wnd->owner.sys;
-    vout_window_ReportOutputDevice(wnd, id, desc);
+    vout_window_ReportOutputDevice(parent, id, desc);
 }
 
 static void EmbedVisibilityChanged(struct vout_window_t *wnd,
                                    enum vout_window_visibility visibility)
 {
     vout_window_t *parent = wnd->owner.sys;
-    vout_window_ReportVisibilityChanged(wnd, visibility);
+    vout_window_ReportVisibilityChanged(parent, visibility);
 }
 
 /**
@@ -97,7 +97,7 @@ static int WindowEnable(struct vout_window_t *wnd,
         sys->enabled = ret == VLC_SUCCESS;
         return ret;
     }
-    vout_window_SetSize(wnd, cfg->width, cfg->height);
+    vout_window_SetSize(sys->embed_window, cfg->width, cfg->height);
     sys->enabled = true;
     return VLC_SUCCESS;
 }
