@@ -33,6 +33,7 @@ namespace adaptive
     };
 
     class CommandsQueue;
+    class CommandsFactory;
     class AbstractFakeESOutID;
     class FakeESOutID;
 
@@ -74,10 +75,11 @@ namespace adaptive
                     FakeESOut *p;
                     LockedFakeEsOut(FakeESOut &q);
             };
-            FakeESOut( es_out_t *, CommandsQueue * );
+            FakeESOut( es_out_t *, CommandsQueue *, CommandsFactory * );
             virtual ~FakeESOut();
             LockedFakeEsOut WithLock();
             CommandsQueue * commandsQueue();
+            CommandsFactory *commandsFactory() const;
             void setAssociatedTimestamp( vlc_tick_t );
             void setExpectedTimestamp( vlc_tick_t );
             void resetTimestamps();
@@ -115,6 +117,7 @@ namespace adaptive
             FakeESOutID * createNewID( const es_format_t * );
             ExtraFMTInfoInterface *extrainfo;
             CommandsQueue *commandsqueue;
+            CommandsFactory *commandsfactory;
             struct
             {
                 vlc_tick_t timestamp;

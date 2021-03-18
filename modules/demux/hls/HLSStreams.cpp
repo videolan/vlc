@@ -116,7 +116,7 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
     if( b_meta_updated )
     {
         b_meta_updated = false;
-        AbstractCommand *command = fakeEsOut()->commandsQueue()->factory()->createEsOutMetaCommand( fakeesout, -1, p_meta );
+        AbstractCommand *command = fakeEsOut()->commandsFactory()->createEsOutMetaCommand( fakeesout, -1, p_meta );
         if( command )
             fakeEsOut()->commandsQueue()->Schedule( command );
     }

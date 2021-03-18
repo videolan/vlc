@@ -239,21 +239,19 @@ std::ostream& operator<<(std::ostream& ostr, const std::list<AbstractCommand *>&
 }
 #endif
 
-CommandsQueue::CommandsQueue( CommandsFactory *f )
+CommandsQueue::CommandsQueue()
 {
     bufferinglevel = VLC_TICK_INVALID;
     pcr = VLC_TICK_INVALID;
     b_drop = false;
     b_draining = false;
     b_eof = false;
-    commandsFactory = f;
     nextsequence = 0;
 }
 
 CommandsQueue::~CommandsQueue()
 {
     Abort( false );
-    delete commandsFactory;
 }
 
 static bool compareCommands( const Queueentry &a, const Queueentry &b )
@@ -295,11 +293,6 @@ void CommandsQueue::Schedule( AbstractCommand *command )
     {
         incoming.push_back( Queueentry(nextsequence++, command) );
     }
-}
-
-const CommandsFactory * CommandsQueue::factory() const
-{
-    return commandsFactory;
 }
 
 vlc_tick_t CommandsQueue::Process( vlc_tick_t barrier )

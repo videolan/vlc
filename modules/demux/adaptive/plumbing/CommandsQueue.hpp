@@ -154,9 +154,8 @@ namespace adaptive
     class CommandsQueue
     {
         public:
-            CommandsQueue( CommandsFactory * );
+            CommandsQueue();
             ~CommandsQueue();
-            const CommandsFactory * factory() const;
             void Schedule( AbstractCommand * );
             vlc_tick_t Process( vlc_tick_t );
             void Abort( bool b_reset );
@@ -173,7 +172,6 @@ namespace adaptive
             vlc_tick_t getPCR() const;
 
         private:
-            CommandsFactory *commandsFactory;
             void LockedCommit();
             void LockedSetDraining();
             std::list<Queueentry> incoming;

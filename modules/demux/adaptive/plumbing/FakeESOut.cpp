@@ -135,11 +135,13 @@ FakeESOut * FakeESOut::LockedFakeEsOut::operator ->()
     return p;
 }
 
-FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
+FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue,
+                      CommandsFactory *cf )
     : AbstractFakeEsOut()
     , real_es_out( es )
     , extrainfo( nullptr )
     , commandsqueue( queue )
+    , commandsfactory( cf )
     , timestamps_offset( 0 )
 {
     associated.b_timestamp_set = false;
@@ -160,12 +162,18 @@ CommandsQueue * FakeESOut::commandsQueue()
     return commandsqueue;
 }
 
+CommandsFactory * FakeESOut::commandsFactory() const
+{
+    return commandsfactory;
+}
+
 FakeESOut::~FakeESOut()
 {
     recycleAll();
     gc();
 
     delete commandsqueue;
+    delete commandsfactory;
 }
 
 void FakeESOut::resetTimestamps()
@@ -327,7 +335,7 @@ size_t FakeESOut::esCount() const
 
 void FakeESOut::schedulePCRReset()
 {
-    AbstractCommand *command = commandsqueue->factory()->creatEsOutControlResetPCRCommand();
+    AbstractCommand *command = commandsfactory->creatEsOutControlResetPCRCommand();
     if( likely(command) )
         commandsqueue->Schedule( command );
 }
@@ -340,7 +348,7 @@ void FakeESOut::scheduleAllForDeletion()
         FakeESOutID *es_id = *it;
         if(!es_id->scheduledForDeletion())
         {
-            AbstractCommand *command = commandsqueue->factory()->createEsOutDelCommand( es_id );
+            AbstractCommand *command = commandsfactory->createEsOutDelCommand( es_id );
             if( likely(command) )
             {
                 commandsqueue->Schedule( command );
@@ -493,7 +501,7 @@ es_out_id_t * FakeESOut::esOutAdd(const es_format_t *p_fmt)
     if( likely(es_id) )
     {
         assert(!es_id->scheduledForDeletion());
-        AbstractCommand *command = commandsqueue->factory()->createEsOutAddCommand( es_id );
+        AbstractCommand *command = commandsfactory->createEsOutAddCommand( es_id );
         if( likely(command) )
         {
             fakeesidlist.push_back(es_id);
@@ -518,7 +526,7 @@ int FakeESOut::esOutSend(es_out_id_t *p_es, block_t *p_block)
     p_block->i_dts = fixTimestamp( p_block->i_dts );
     p_block->i_pts = fixTimestamp( p_block->i_pts );
 
-    AbstractCommand *command = commandsqueue->factory()->createEsOutSendCommand( es_id, p_block );
+    AbstractCommand *command = commandsfactory->createEsOutSendCommand( es_id, p_block );
     if( likely(command) )
     {
         commandsqueue->Schedule( command );
@@ -532,7 +540,7 @@ void FakeESOut::esOutDel(es_out_id_t *p_es)
     vlc_mutex_locker locker(&lock);
 
     FakeESOutID *es_id = reinterpret_cast<FakeESOutID *>( p_es );
-    AbstractCommand *command = commandsqueue->factory()->createEsOutDelCommand( es_id );
+    AbstractCommand *command = commandsfactory->createEsOutDelCommand( es_id );
     if( likely(command) )
     {
         es_id->setScheduledForDeletion();
@@ -556,7 +564,7 @@ int FakeESOut::esOutControl(int i_query, va_list args)
                 i_group = 0;
             vlc_tick_t  pcr = va_arg( args, vlc_tick_t );
             pcr = fixTimestamp( pcr );
-            AbstractCommand *command = commandsqueue->factory()->createEsOutControlPCRCommand( i_group, pcr );
+            AbstractCommand *command = commandsfactory->createEsOutControlPCRCommand( i_group, pcr );
             if( likely(command) )
             {
                 commandsqueue->Schedule( command );
@@ -569,7 +577,7 @@ int FakeESOut::esOutControl(int i_query, va_list args)
         {
             static_cast<void>(va_arg( args, int )); /* ignore group */
             const vlc_meta_t *p_meta = va_arg( args, const vlc_meta_t * );
-            AbstractCommand *command = commandsqueue->factory()->createEsOutMetaCommand( this,-1, p_meta );
+            AbstractCommand *command = commandsfactory->createEsOutMetaCommand( this,-1, p_meta );
             if( likely(command) )
             {
                 commandsqueue->Schedule( command );
@@ -600,7 +608,7 @@ void FakeESOut::esOutDestroy()
 {
     vlc_mutex_locker locker(&lock);
 
-    AbstractCommand *command = commandsqueue->factory()->createEsOutDestroyCommand();
+    AbstractCommand *command = commandsfactory->createEsOutDestroyCommand();
     if( likely(command) )
         commandsqueue->Schedule( command );
 }
