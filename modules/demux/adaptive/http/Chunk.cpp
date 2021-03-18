@@ -68,6 +68,11 @@ RequestStatus AbstractChunkSource::getRequestStatus() const
     return requeststatus;
 }
 
+const StorageID & AbstractChunkSource::getStorageID() const
+{
+    return storeid;
+}
+
 ChunkType AbstractChunkSource::getChunkType() const
 {
     return type;
@@ -152,6 +157,7 @@ HTTPChunkSource::HTTPChunkSource(const std::string& url, AbstractConnectionManag
     eof = false;
     sourceid = id;
     setUseAccess(access);
+    setIdentifier(url, range);
     if(!init(url))
         eof = true;
 }
@@ -252,6 +258,11 @@ void HTTPChunkSource::recycle()
     connManager->recycleSource(this);
 }
 
+StorageID HTTPChunkSource::makeStorageID(const std::string &s, const BytesRange &r)
+{
+    return std::to_string(r.getStartByte())+ std::to_string(r.getEndByte()) + '@' + s;
+}
+
 std::string HTTPChunkSource::getContentType() const
 {
     mutex_locker locker {lock};
@@ -259,6 +270,11 @@ std::string HTTPChunkSource::getContentType() const
         return connection->getContentType();
     else
         return std::string();
+}
+
+void HTTPChunkSource::setIdentifier(const std::string &s, const BytesRange &r)
+{
+    storeid =  makeStorageID(s, r);
 }
 
 bool HTTPChunkSource::prepare()
