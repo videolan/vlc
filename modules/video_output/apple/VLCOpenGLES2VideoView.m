@@ -68,7 +68,6 @@
 
     GLuint _renderBuffer;
     GLuint _frameBuffer;
-    CGSize _size;
 
     struct vlc_gl_api _api;
 }
@@ -402,29 +401,31 @@ static void Close(vlc_gl_t *gl)
 - (void)resize:(CGSize)size
 {
     vlc_mutex_lock(&_mutex);
-    _size = size;
-
     vlc_dispatch_sync(^{
-        CGRect rect = self.frame;
-        rect.size = size;
-        /* Bitmap size = view size * contentScaleFactor, so we need to divide the
-         * scale factor to get the real view size. */
-        rect.size.width /= self.contentScaleFactor;
-        rect.size.height /= self.contentScaleFactor;
-
-        self.frame = rect;
-
-        /* If size is NULL, rendering must be disabled */
-        if (size.width != 0 && size.height != 0)
-        {
-            EAGLContext *previousContext = [EAGLContext currentContext];
-            [EAGLContext setCurrentContext:_eaglContext];
-            [self doResetBuffers];
-            [EAGLContext setCurrentContext:previousContext];
-        }
+        [self resizeLocked:size];
     });
-
     vlc_mutex_unlock(&_mutex);
+}
+
+- (void)resizeLocked:(CGSize)size
+{
+    CGRect rect = self.frame;
+    rect.size = size;
+    /* Bitmap size = view size * contentScaleFactor, so we need to divide the
+     * scale factor to get the real view size. */
+    rect.size.width /= self.contentScaleFactor;
+    rect.size.height /= self.contentScaleFactor;
+
+    self.frame = rect;
+
+    /* If size is NULL, rendering must be disabled */
+    if (size.width != 0 && size.height != 0)
+    {
+        EAGLContext *previousContext = [EAGLContext currentContext];
+        [EAGLContext setCurrentContext:_eaglContext];
+        [self doResetBuffers];
+        [EAGLContext setCurrentContext:previousContext];
+    }
 }
 
 - (void)flushEAGLLocked
@@ -464,7 +465,7 @@ static void Close(vlc_gl_t *gl)
     else if ([[notification name] isEqualToString:UIApplicationWillEnterForegroundNotification])
     {
         _eaglEnabled = YES;
-        [self resize:self.frame.size];
+        [self resizeLocked:self.frame.size];
         _appActive = YES;
     }
 
