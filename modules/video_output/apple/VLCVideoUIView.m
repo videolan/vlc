@@ -83,9 +83,13 @@
 
     /* Window state */
     BOOL _enabled;
+    BOOL _avstatEnabled;
 
     /* Constraints */
     NSArray<NSLayoutConstraint*> *_constraints;
+
+    /* Other */
+    CADisplayLink *_displayLink;
 }
 
 - (id)initWithWindow:(vout_window_t *)wnd;
@@ -95,6 +99,7 @@
 - (void)enable;
 - (void)disable;
 - (void)applicationStateChanged:(NSNotification*)notification;
+- (void)displayLinkUpdate:(CADisplayLink *)sender;
 @end
 
 /*****************************************************************************
@@ -106,6 +111,7 @@
 {
     _wnd = wnd;
     _enabled = NO;
+    _avstatEnabled = var_InheritBool(wnd, "avstat");
 
     UIView *superview = [self fetchViewContainer];
     if (superview == nil)
@@ -141,6 +147,9 @@
         vout_window_ReportSize(_wnd, size.width, size.height);
     }];
 
+    _displayLink = [CADisplayLink displayLinkWithTarget:self
+                                               selector:@selector(displayLinkUpdate:)];
+
     return self;
 }
 
@@ -157,6 +166,7 @@
     ];
     [[self superview] addConstraints:_constraints];
     [NSLayoutConstraint activateConstraints:_constraints];
+    [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
 - (void)willRemoveFromSuperview
@@ -164,6 +174,7 @@
     if ([self superview] == nil)
         return;
 
+    [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
     [NSLayoutConstraint deactivateConstraints:_constraints];
     [[self superview] removeConstraints:_constraints];
     _constraints = nil;
@@ -194,6 +205,29 @@
         msg_Err(_wnd, "Handling the view container failed due to an Obj-C exception (%s, %s", [exception.name UTF8String], [exception.reason UTF8String]);
         return nil;
     }
+}
+
+- (void)displayLinkUpdate:(CADisplayLink *)sender
+{
+    vlc_mutex_lock(&_mutex);
+    if (_wnd == NULL)
+    {
+        vlc_mutex_unlock(&_mutex);
+        return;
+    }
+    vlc_tick_t now = vlc_tick_now();
+    CFTimeInterval current_ts = [sender timestamp];
+    CFTimeInterval target_ts = 0.;
+    if (@available(iOS 10, *))
+        target_ts = [sender targetTimestamp];
+    if (_avstatEnabled)
+        msg_Info(_wnd, "avstat: ts: %" PRId64 ", [RENDER][CADISPLAYLINK], "
+                 "prev_ts=%" PRId64 " target_ts=%" PRId64,
+                 NS_FROM_VLC_TICK(now),
+                 NS_FROM_VLC_TICK(vlc_tick_from_sec(current_ts)),
+                 NS_FROM_VLC_TICK(vlc_tick_from_sec(target_ts)));
+
+    vlc_mutex_unlock(&_mutex);
 }
 
 - (void)reportEvent:(void(^)())eventBlock
