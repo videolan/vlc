@@ -4,6 +4,7 @@
 #
 # Translators:
 # Ahto Simakuutio <simakuutio@gmail.com>, 2016
+# Elias Meyer <elektrovirus@protonmail.com>, 2021
 # Joni Maatta <maatta.joni1@gmail.com>, 2014
 # Juha Jeronen <juha.jeronen@jyu.fi>, 2011-2012
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2020
@@ -23,8 +24,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-03-04 10:00+0100\n"
-"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2021\n"
+"PO-Revision-Date: 2021-03-19 15:27+0100\n"
+"Last-Translator: Elias Meyer <elektrovirus@protonmail.com>, 2021\n"
 "Language-Team: Finnish (https://www.transifex.com/yaron/teams/16553/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -47,7 +48,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
-msgstr "VLC:n asetukset"
+msgstr "VLC asetukset"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
@@ -62,7 +63,7 @@ msgstr "Käyttöliittymä"
 
 #: include/vlc_config_cat.h:39
 msgid "Settings for VLC's interfaces"
-msgstr "VLC:n käyttöliittymien asetukset"
+msgstr "VLC käyttöliittymien asetukset"
 
 #: include/vlc_config_cat.h:41
 msgid "Main interfaces settings"
@@ -82,7 +83,7 @@ msgstr "Hallitse käyttöliittymiä"
 
 #: include/vlc_config_cat.h:47
 msgid "Settings for VLC's control interfaces"
-msgstr "VLC:n säädinkäyttöliittymien asetukset"
+msgstr "VLC säätimien asetukset"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
 #: modules/gui/macosx/VLCSimplePrefsController.m:243
@@ -106,11 +107,11 @@ msgstr "Ääni"
 
 #: include/vlc_config_cat.h:54
 msgid "Audio settings"
-msgstr "Ääniasetukset"
+msgstr "Äänen asetukset"
 
 #: include/vlc_config_cat.h:56
 msgid "General audio settings"
-msgstr "Yleiset ääniasetukset"
+msgstr "Yleiset äänen asetukset"
 
 #: include/vlc_config_cat.h:58 include/vlc_config_cat.h:81
 #: modules/gui/qt/ui/profiles.h:749 modules/gui/qt/ui/profiles.h:759
@@ -119,11 +120,11 @@ msgstr "Suodattimet"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio filters are used to process the audio stream."
-msgstr "Äänisuodattimia käytetään äänivirran käsittelyyn."
+msgstr "Äänen suodattimia käytetään äänivirran käsittelyyn."
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
-msgstr "Äänen uudelleennäytteistäjä"
+msgstr "Äänen sampleri"
 
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:260
 #: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:425
@@ -151,7 +152,7 @@ msgstr "Muut"
 
 #: include/vlc_config_cat.h:70
 msgid "Miscellaneous audio settings and modules."
-msgstr "Muut ääniasetukset ja -moduulit."
+msgstr "Muut äänen asetukset ja moduulit."
 
 #: include/vlc_config_cat.h:73 src/input/es_out.c:3164 src/libvlc-module.c:142
 #: src/libvlc-module.c:1551 modules/access/imem.c:64
@@ -172,11 +173,11 @@ msgstr "Video"
 
 #: include/vlc_config_cat.h:74
 msgid "Video settings"
-msgstr "Videoasetukset"
+msgstr "Videon asetukset"
 
 #: include/vlc_config_cat.h:76
 msgid "General video settings"
-msgstr "Yleiset videoasetukset"
+msgstr "Yleiset videon asetukset"
 
 #: include/vlc_config_cat.h:79
 msgid "General settings for video output modules."
@@ -184,7 +185,7 @@ msgstr "Videon ulostulon moduulien yleiset asetukset."
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
-msgstr "Videosuodattimia käytetään videovirran käsittelyyn."
+msgstr "Videon suodattimia käytetään videovirran käsittelyyn."
 
 #: include/vlc_config_cat.h:84
 msgid "Subtitles / OSD"
@@ -194,7 +195,7 @@ msgstr "Tekstitykset / OSD"
 msgid ""
 "Settings related to On-Screen-Display, subtitles and \"overlay subpictures\""
 msgstr ""
-"OSD:n (On-Screen-Display), tekstityksen ja \"ylipiirtoalikuvien\" asetukset"
+"Tekstitykseen ja \"peittokuviin\" On-Screen-Display liittyvät asetukset"
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
@@ -202,15 +203,15 @@ msgstr "Jakajat"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr "Videonjakajat erottavat virtauksen useisiin videoihin."
+msgstr "Videon jakajat erottavat virtauksen useisiin videoihin."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
-msgstr "Lähteet ja koodekit"
+msgstr "Tulo ja koodekit"
 
 #: include/vlc_config_cat.h:98
 msgid "Settings for input, demultiplexing, decoding and encoding"
-msgstr "Sisääntulon, demux kanavoinnin purun ja pakkauksen asetukset"
+msgstr "Sisääntulon, pukukoodauksen ja pakkauksen asetukset"
 
 #: include/vlc_config_cat.h:101
 msgid "Access modules"
@@ -229,7 +230,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:107
 msgid "Stream filters"
-msgstr "Tietovirtasuotimet"
+msgstr "Suoratoiston suodattimet"
 
 #: include/vlc_config_cat.h:109
 msgid ""
@@ -241,15 +242,15 @@ msgstr ""
 
 #: include/vlc_config_cat.h:112
 msgid "Demuxers"
-msgstr "Kanavoinnin purku"
+msgstr "Demultiplekserit"
 
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
-msgstr "Kanavoinninpurkutoiminnolla erotetaan ääni- ja videovirtoja."
+msgstr "Demultiplekseriä käytetään äänen ja videon erottamiseen."
 
 #: include/vlc_config_cat.h:115
 msgid "Video codecs"
-msgstr "Videokoodekit"
+msgstr "Videon koodekit"
 
 #: include/vlc_config_cat.h:116
 msgid "Settings for the video, images or video+audio decoders and encoders."
@@ -258,7 +259,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:118
 msgid "Audio codecs"
-msgstr "Äänikoodekit"
+msgstr "Äänen koodekit"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
@@ -266,7 +267,7 @@ msgstr "Äänen koodekkien, sekä purkukooderin asetukset."
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
-msgstr "Tekstityskoodekit"
+msgstr "Tekstityksen koodekit"
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
@@ -274,7 +275,7 @@ msgstr "Tekstityksen, teksti-TV ja CC koodekien ja purkukooderin asetukset."
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
-msgstr "Yleiset tuloasetukset. Käytä varoen..."
+msgstr "Yleiset tulon asetukset. Käytä varoen..."
 
 #: include/vlc_config_cat.h:127 src/libvlc-module.c:1962
 #: modules/access/avio.h:50
@@ -307,7 +308,7 @@ msgstr "Suoratoiston yleiset ulostulon asetukset"
 
 #: include/vlc_config_cat.h:139
 msgid "Muxers"
-msgstr "Kanavoijat"
+msgstr "Multiplekserit"
 
 #: include/vlc_config_cat.h:141
 msgid ""
@@ -316,10 +317,10 @@ msgid ""
 "always force a specific muxer. You should probably not do that.\n"
 "You can also set default parameters for each muxer."
 msgstr ""
-"Kanavoijat (muxers) luovat kehysformaatin, jossa alkeisvirrat (video, "
-"ääni, ...) yhdistyvät. Tämän asetuksen avulla on mahdollista pakottaa VLC "
-"käyttämään aina samaa, valitsemaasi kanavoijaa. Tämä ei ole suositeltavaa.\n"
-"Voit myös määrätä jokaisen kanavoijan oletusasetukset täällä."
+"Multiplekserit luovat formaatin, jossa kanavanippu (video, ääni, ...) "
+"yhdistyvät. Tämän asetuksen avulla on mahdollista pakottaa VLC käyttämään "
+"aina samaa, valitsemaasi multiplekseriä. Tämä ei ole suositeltavaa.\n"
+"Voit myös määrätä multiplekserin oletusasetukset täällä."
 
 #: include/vlc_config_cat.h:147
 msgid "Access output"
@@ -332,10 +333,10 @@ msgid ""
 "should probably not do that.\n"
 "You can also set default parameters for each access output."
 msgstr ""
-"Käyttölähtömoduulit hallitsevat tapoja, joilla kanavoidut virrat lähetetään. "
-"Tämän asetuksen avulla on mahdollista pakottaa VLC käyttämään aina samaa, "
-"valitsemaasi käyttölähtöä. Tämä ei ole suositeltavaa.\n"
-"Voit myös määrätä jokaisen käyttölähdön oletusasetukset täällä."
+"Lähdön moduulit ohjaavat sekoitettujen virtojen lähetystapoja. Tämän "
+"asetuksen avulla voit pakottaa aina tietyn ulostulon pääsytavan. Tämä ei ole "
+"suositeltavaa.\n"
+"Voit myös asettaa oletusparametrit kullekin ulostulolle."
 
 #: include/vlc_config_cat.h:154
 msgid "Packetizers"
@@ -348,9 +349,9 @@ msgid ""
 "not do that.\n"
 "You can also set default parameters for each packetizer."
 msgstr ""
-"Pakkaajia käytetään \"alkeisvirtojen\" videon ja äänen, esikäsittelyyn ennen "
-"kanavointia. Tämän asetuksen avulla on mahdollista pakottaa VLC käyttämään "
-"aina samaa, valitsemaasi pakkaajaa. Tämä ei ole suositeltavaa.\n"
+"Pakkaajia käytetään videon ja äänen, \"esikäsittelyyn\" ennen kanavointia. "
+"Tämän asetuksen avulla on mahdollista pakottaa VLC käyttämään aina samaa, "
+"valitsemaasi pakkaajaa. Tämä ei ole suositeltavaa.\n"
 "Voit myös määrätä jokaisen pakkaajan oletusasetukset täällä."
 
 #: include/vlc_config_cat.h:162
@@ -374,7 +375,7 @@ msgstr "VOD"
 
 #: include/vlc_config_cat.h:169
 msgid "VLC's implementation of Video On Demand"
-msgstr "VLC:n toteutus Video On Demand -palveluille"
+msgstr "VLC Video On Demand palvelun käyttöönotto"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2070
 #: src/playlist/engine.c:243 modules/demux/playlist/playlist.c:64
@@ -449,7 +450,7 @@ msgstr "Valitse yksi tai useampi avattava tiedosto"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Directory"
-msgstr "Valitse kansio"
+msgstr "Valitse hakemisto"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Folder"
@@ -1757,7 +1758,7 @@ msgstr ""
 
 #: src/libvlc-module.c:168
 msgid "This selects which plugin to use for audio resampling."
-msgstr "Valitsee liitännäisen jota käytetään äänen uudelleennäytteistämiseen."
+msgstr "Tämä valitsee äänelle laajennuksen, jota käytetään samperissa."
 
 #: src/libvlc-module.c:171
 msgid ""
@@ -3504,7 +3505,7 @@ msgstr ""
 
 #: src/libvlc-module.c:964
 msgid "Stream output muxer caching (ms)"
-msgstr "Suoratoiston ulostulon kanavoijan puskurointi (ms)"
+msgstr "Suoratoiston multipleksin ulostulon puskurointi (ms)"
 
 #: src/libvlc-module.c:966
 msgid ""
@@ -3611,10 +3612,10 @@ msgid ""
 "automatically detected. You should not set this as a global option unless "
 "you really know what you are doing."
 msgstr ""
-"Kanavoinnin purkajia (demuxers) käytetään erottelemaan alkeisvirrat, kuten "
-"äänen ja videon. Voit käyttää tätä asetusta, jos oikea kanavoinnin purkaja "
-"ei tunnistu automaattisesti. Ei ole suositeltavaa asettaa tätä globaalina "
-"asetuksena, paitsi jos todella tiedät, mitä teet."
+"Demultipleksit (demuxers) käytetään erottamaan kanavanipusta äänen ja "
+"videon. Voit käyttää tätä asetusta, jos oikeaa demultiplekseriä ei tunnistu "
+"automaattisesti. Ei ole suositeltavaa asettaa tätä oletuksena, paitsi jos "
+"todella tiedät, mitä teet."
 
 #: src/libvlc-module.c:1022
 msgid "VoD server module"
@@ -5270,7 +5271,7 @@ msgstr "Tulosta"
 
 #: src/misc/actions.c:110 modules/meta_engine/ID3Genres.h:77
 msgid "Space"
-msgstr "Avaruus"
+msgstr "Välilyönti"
 
 #: src/misc/actions.c:111
 msgid "Tab"
@@ -7493,7 +7494,7 @@ msgstr "DVDnav-lähde"
 
 #: modules/access/dvdnav.c:106
 msgid "DVDnav demuxer"
-msgstr "DVDnav-kanavoinninpurkaja"
+msgstr "DVDnav demultiplekseri"
 
 #: modules/access/dvdnav.c:284 modules/access/dvdread.c:227
 #: modules/access/dvdread.c:243 modules/access/dvdread.c:502
@@ -8034,7 +8035,7 @@ msgstr ""
 
 #: modules/access/live555.cpp:97
 msgid "RTP/RTSP/SDP demuxer (using Live555)"
-msgstr "RTP/RTSP/SDP-kanavoinninpurkaja (käyttäen Live555:ttä)"
+msgstr "RTP/RTSP/SDP demultiplekseri (käyttää Live555)"
 
 #: modules/access/live555.cpp:106
 msgid "RTSP/RTP access and demux"
@@ -9456,7 +9457,7 @@ msgstr "Poista vanhat segmentit, joita ei enää tarvita"
 
 #: modules/access_output/livehttp.c:90
 msgid "Use muxers rate control mechanism"
-msgstr "Käytä kanavoijan nopeudensäätömekanismia (rate control)"
+msgstr "Käytä multipleksin nopeudensäätö mekanismia"
 
 #: modules/access_output/livehttp.c:92
 msgid "AES key URI to place in playlist"
@@ -10312,12 +10313,12 @@ msgstr "Taaj. 3 Q-arvo (leveys)"
 
 #: modules/audio_filter/resampler/bandlimited.c:89
 msgid "Audio filter for band-limited interpolation resampling"
-msgstr "Kaistarajoitetun interpoloivan uudelleennäytteistyksen äänisuodin"
+msgstr "Kaistarajoitettu interpoloivan samplerin äänen suodatin"
 
 #: modules/audio_filter/resampler/soxr.c:40
 #: modules/audio_filter/resampler/speex.c:34
 msgid "Resampling quality"
-msgstr "Uudelleennäytteistyksen laatu"
+msgstr "Samplerin laatu"
 
 #: modules/audio_filter/resampler/soxr.c:41
 #: modules/audio_filter/resampler/speex.c:35
@@ -10331,7 +10332,7 @@ msgstr "SoX sampleri"
 #: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
 msgid "Speex resampler"
-msgstr "Speex-uudelleennäytteistäjä"
+msgstr "Speex sampleri"
 
 #: modules/audio_filter/resampler/src.c:40
 msgid "Sample rate converter type"
@@ -10367,15 +10368,15 @@ msgstr "Lineaarinen (nopein)"
 
 #: modules/audio_filter/resampler/src.c:58
 msgid "SRC resampler"
-msgstr "SRC-uudelleennäytteistäjä"
+msgstr "SRC sampleri"
 
 #: modules/audio_filter/resampler/src.c:59
 msgid "Secret Rabbit Code (libsamplerate) resampler"
-msgstr "Secret Rabbit Code (libsamplerate) -uudelleennäytteistäjä"
+msgstr "Secret Rabbit Code (libsamplerate) sampleri"
 
 #: modules/audio_filter/resampler/ugly.c:49
 msgid "Nearest-neighbor audio resampler"
-msgstr "Lähin naapuri -uudelleennäytteistäjä (huono laatu)"
+msgstr "Nearest-neighbor äänen sampleri"
 
 #: modules/audio_filter/scaletempo.c:52
 msgid "Pitch Shifter"
@@ -13363,7 +13364,7 @@ msgstr "TTML"
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
-msgstr "TTML-demuxer"
+msgstr "TTML demultiplekseri"
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -14347,8 +14348,8 @@ msgid ""
 "issues on unmuxable output, like rtsp-output without ts-mux"
 msgstr ""
 "Montako ruutua käytetään ruututyyppien ennaltalukuun. Nykyinen oletusarvo "
-"voi aiheuttaa synkkaongelmia tietovirroissa, joita ei voida kanavoida, esim. "
-"RTSP-lähtö ilman TS-kanavoijaa."
+"voi aiheuttaa synkronointiongelmia tietovirrassa, jota ei voi kanavoida, "
+"esim. RTSP-ulostulo ilman TS-multipleksiä."
 
 #: modules/codec/x264.c:411
 msgid "HRD-timing information"
@@ -15374,11 +15375,11 @@ msgstr "Yhdistetty mukautuva suoratoisto DASH/HLS:lle"
 
 #: modules/demux/aiff.c:50
 msgid "AIFF demuxer"
-msgstr "AIFF-kanavoinninpurkaja"
+msgstr "AIFF demultiplekseri"
 
 #: modules/demux/asf/asf.c:62
 msgid "ASF/WMV demuxer"
-msgstr "ASF/WMV-kanavoinninpurkaja"
+msgstr "ASF/WMV demultiplekseri"
 
 #: modules/demux/asf/asf.c:277 modules/demux/asf/asf.c:834
 msgid "Could not demux ASF stream"
@@ -15390,11 +15391,11 @@ msgstr "VLC ei voinut ladata ASF-otsaketta."
 
 #: modules/demux/au.c:51
 msgid "AU demuxer"
-msgstr "AU-kanavoinninpurkaja"
+msgstr "AU demultiplekseri"
 
 #: modules/demux/avformat/avformat.c:41
 msgid "Avformat demuxer"
-msgstr "Avformat-kanavoinninpurkaja"
+msgstr "Avformat demultiplekseri"
 
 #: modules/demux/avformat/avformat.c:42
 msgid "Avformat"
@@ -15402,15 +15403,15 @@ msgstr "Avformat"
 
 #: modules/demux/avformat/avformat.c:45
 msgid "Demuxer"
-msgstr "Kanavoinninpurkaja"
+msgstr "Demultiplekseri"
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
-msgstr "Avformat-kanavoija"
+msgstr "Avformat multiplekseri"
 
 #: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
 msgid "Muxer"
-msgstr "Kanavoija"
+msgstr "Multiplekseri"
 
 #: modules/demux/avformat/avformat.h:35
 msgid "Avformat mux"
@@ -15418,7 +15419,7 @@ msgstr "Avformat-kanavointi"
 
 #: modules/demux/avformat/avformat.h:36
 msgid "Force use of a specific avformat muxer."
-msgstr "Pakota käyttämään tiettyä avformat-kanavoijaa."
+msgstr "Pakota käyttämään tiettyä avformat-multipleksiä."
 
 #: modules/demux/avformat/avformat.h:37
 msgid "Format name"
@@ -15462,7 +15463,7 @@ msgstr "Korjaa tarvittaessa"
 
 #: modules/demux/avi/avi.c:73
 msgid "AVI demuxer"
-msgstr "AVI-kanavoinninpurkaja"
+msgstr "AVI demultiplekseri"
 
 #: modules/demux/avi/avi.c:876 modules/demux/mp4/mp4.c:4255
 msgid ""
@@ -15505,11 +15506,11 @@ msgstr "Korjataan AVI-indeksiä..."
 
 #: modules/demux/caf.c:53
 msgid "CAF demuxer"
-msgstr "CAF-kanavoinninpurkaja"
+msgstr "CAF demultiplekseri"
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
-msgstr "CDG-kanavoinninpurkaja"
+msgstr "CDG demultiplekseri"
 
 #: modules/demux/demuxdump.c:32
 msgid "Dump module"
@@ -15541,7 +15542,7 @@ msgstr "DTS-aikaleiman säädön määrä"
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr "Dirac-videon kanavoinninpurkaja"
+msgstr "Dirac-videon demultiplekseri"
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -15553,7 +15554,7 @@ msgstr "Haun ehkäisevä demux-suodatin"
 
 #: modules/demux/flac.c:51
 msgid "FLAC demuxer"
-msgstr "FLAC-kanavoinninpurkaja"
+msgstr "FLAC demultiplekseri"
 
 #: modules/demux/image.c:44
 msgid "ES ID"
@@ -15565,7 +15566,7 @@ msgstr "Pura"
 
 #: modules/demux/image.c:54
 msgid "Decode at the demuxer stage"
-msgstr "Pura kuva kanavoinninpurkuvaiheessa"
+msgstr "Pura kuvaa demultiplekser-vaiheessa"
 
 #: modules/demux/image.c:56
 msgid "Forced chroma"
@@ -15609,7 +15610,7 @@ msgstr ""
 
 #: modules/demux/image.c:76
 msgid "Image demuxer"
-msgstr "Kuvatiedosto-kanavoinninpurkaja"
+msgstr "Image demultiplekseri"
 
 #: modules/demux/image.c:77
 msgid "Image"
@@ -15633,11 +15634,11 @@ msgstr ""
 
 #: modules/demux/mjpeg.c:53
 msgid "M-JPEG camera demuxer"
-msgstr "M-JPEG-kameran kanavoinninpurkaja"
+msgstr "M-JPEG-kameran demultiplekseri"
 
 #: modules/demux/mkv/mkv.cpp:53
 msgid "Matroska stream demuxer"
-msgstr "Matroska-virran kanavoinninpurkaja"
+msgstr "Matroska suoratoiston demultiplekseri"
 
 #: modules/demux/mkv/mkv.cpp:60
 msgid "Respect ordered chapters"
@@ -15742,7 +15743,7 @@ msgstr ""
 
 #: modules/demux/mod.c:74
 msgid "MOD demuxer (libmodplug)"
-msgstr "MOD-kanavoinninpurkaja (libmodplug)"
+msgstr "MOD demultiplekseri (libmodplug)"
 
 #: modules/demux/mod.c:85
 msgid "Reverberation level"
@@ -15937,7 +15938,7 @@ msgstr "Ohita muut ääniraidat iTunes-äänitiedostoissa "
 
 #: modules/demux/mp4/mp4.c:56
 msgid "MP4 stream demuxer"
-msgstr "MP4-virran kanavoinninpurkaja"
+msgstr "MP4 suoratoiston demultiplekseri"
 
 #: modules/demux/mp4/mp4.c:57
 msgid "MP4"
@@ -15953,7 +15954,7 @@ msgstr "Rakenna indexi"
 
 #: modules/demux/mpc.c:63
 msgid "MusePack demuxer"
-msgstr "MusePack-kanavoinninpurkaja"
+msgstr "MusePack demultiplekseri"
 
 #: modules/demux/mpeg/es.c:54
 msgid ""
@@ -15981,15 +15982,15 @@ msgstr "Haluttu kuvanopeus virralle."
 
 #: modules/demux/mpeg/h26x.c:53 modules/demux/mpeg/h26x.c:55
 msgid "H264 video demuxer"
-msgstr "H264-videon kanavoinninpurkaja"
+msgstr "H264-videon demultiplekseri"
 
 #: modules/demux/mpeg/h26x.c:64 modules/demux/mpeg/h26x.c:66
 msgid "HEVC/H.265 video demuxer"
-msgstr "HEVC/H.265-videon kanavoinninpurkaja"
+msgstr "HEVC/H.265-videon demultiplekseri"
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
-msgstr "MPEG-I/II -videon kanavoinninpurkaja"
+msgstr "MPEG-I/II -videon demultiplekseri"
 
 #: modules/demux/mpeg/ps.c:44
 msgid "Trust MPEG timestamps"
@@ -16007,7 +16008,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ps.c:62 modules/demux/mpeg/ps.c:75
 msgid "MPEG-PS demuxer"
-msgstr "MPEG-PS-kanavoinninpurkaja"
+msgstr "MPEG-PS demultiplekseri"
 
 #: modules/demux/mpeg/ps.c:63
 msgid "PS"
@@ -16112,7 +16113,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:135
 msgid "MPEG Transport Stream demuxer"
-msgstr "MPEG Transport Stream -kanavoinninpurkaja"
+msgstr "MPEG Transport Stream demultiplekseri"
 
 #: modules/demux/mpeg/ts_psi.c:422
 msgid "Main audio"
@@ -16173,15 +16174,15 @@ msgstr "Windows Media NSC -metakanavoinninpurkaja"
 
 #: modules/demux/nsv.c:49
 msgid "NullSoft demuxer"
-msgstr "NullSoft-kanavoinninpurkaja"
+msgstr "NullSoft demultiplekseri"
 
 #: modules/demux/nuv.c:50
 msgid "Nuv demuxer"
-msgstr "Nuv-kanavoinninpurkaja"
+msgstr "Nuv demultiplekseri"
 
 #: modules/demux/ogg.c:57
 msgid "OGG demuxer"
-msgstr "OGG-kanavoinninpurkaja"
+msgstr "OGG demultiplekseri"
 
 #: modules/demux/playlist/playlist.c:46
 msgid "Show shoutcast adult content"
@@ -16336,7 +16337,7 @@ msgstr "Kokonaiskesto"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
-msgstr "PVA-kanavoinninpurkaja"
+msgstr "PVA demultiplekseri"
 
 #: modules/demux/rawaud.c:44
 msgid "Audio sample rate in Hertz. Default is 48000 Hz."
@@ -16373,18 +16374,18 @@ msgstr ""
 
 #: modules/demux/rawaud.c:64
 msgid "Raw audio demuxer"
-msgstr "Raa'an äänen kanavoinninpurkaja"
+msgstr "Raw Audio demultiplekseri"
 
 #: modules/demux/rawdv.c:43
 msgid ""
 "The demuxer will advance timestamps if the input can't keep up with the rate."
 msgstr ""
-"Kanavoinninpurkaja siirtyy aikaleimoissa eteenpäin, jos lähde ei pysy "
-"tahdissa mukana."
+"Demultiplekseri siirtyy aikaleimoissa eteenpäin, jos lähde ei pysy tahdissa "
+"mukana."
 
 #: modules/demux/rawdv.c:51
 msgid "DV (Digital Video) demuxer"
-msgstr "DV (Digital Video) -kanavoinninpurkaja"
+msgstr "DV (Digitaalinen Video) demultiplekseri"
 
 #: modules/demux/rawvid.c:44
 msgid ""
@@ -16413,19 +16414,19 @@ msgstr ""
 
 #: modules/demux/rawvid.c:64
 msgid "Raw video demuxer"
-msgstr "Raa'an videon kanavoinninpurkaja"
+msgstr "Raw Video demultiplekseri"
 
 #: modules/demux/real.c:71
 msgid "Real demuxer"
-msgstr "Real-kanavoinninpurkaja"
+msgstr "Real demultiplekseri"
 
 #: modules/demux/sid.cpp:53
 msgid "C64 sid demuxer"
-msgstr "C64 sid -kanavoinninpurkaja"
+msgstr "C64 sid demultiplekseri"
 
 #: modules/demux/smf.c:725
 msgid "SMF demuxer"
-msgstr "SMF-kanavoinninpurkaja"
+msgstr "SMF demultiplekseri"
 
 #: modules/demux/stl.c:43
 msgid "EBU STL subtitles parser"
@@ -16475,7 +16476,7 @@ msgstr "Tekstityksen kuvaus"
 
 #: modules/demux/tta.c:46
 msgid "TTA demuxer"
-msgstr "TTA-kanavoinninpurkaja"
+msgstr "TTA demultiplekseri"
 
 #: modules/demux/ty.c:59
 msgid "TY"
@@ -16503,7 +16504,7 @@ msgstr "VC1-tietovirran haluttu kuvanopeus."
 
 #: modules/demux/vc1.c:50
 msgid "VC1 video demuxer"
-msgstr "VC1 -videon kanavoinninpurkaja"
+msgstr "VC1-videon demultiplekseri"
 
 #: modules/demux/vobsub.c:51
 msgid "Vobsub subtitles parser"
@@ -16511,15 +16512,15 @@ msgstr "Vobsub-tekstitysjäsennin"
 
 #: modules/demux/voc.c:43
 msgid "VOC demuxer"
-msgstr "VOC-kanavoinninpurkaja"
+msgstr "VOC demultiplekseri"
 
 #: modules/demux/wav.c:52
 msgid "WAV demuxer"
-msgstr "WAV-kanavoinninpurkaja"
+msgstr "WAV demultiplekseri"
 
 #: modules/demux/xa.c:44
 msgid "XA demuxer"
-msgstr "XA-kanavoinninpurkaja"
+msgstr "XA demultiplekseri"
 
 #: modules/demux/xiph_metadata.c:588
 msgid "Unknown category"
@@ -18562,7 +18563,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:301
 msgid "Codecs / Muxers"
-msgstr "Koodekit / kanavoinninpurkajat"
+msgstr "Koodekit / Multipleksit"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:304
 msgid "Post-Processing Quality"
@@ -19882,8 +19883,8 @@ msgid ""
 "Information about what your media or stream is made of.\n"
 "Muxer, Audio and Video Codecs, Subtitles are shown."
 msgstr ""
-"Tietoja median tai tietovirran sisällöstä.\n"
-"Kanavointi, ääni- ja videokoodekit sekä tekstitys luetellaan."
+"Tiedot siitä, mistä mediasi tai suoratoistosi koostuu.\n"
+"Multiplekesi, ääni- ja videokoodekit sekä tekstitys näytetään."
 
 #: modules/gui/qt/components/info_panels.cpp:548
 msgid "Current media / stream statistics"
@@ -20403,11 +20404,11 @@ msgstr "Luo"
 
 #: modules/gui/qt/components/sout/profile_selector.cpp:635
 msgid "This muxer is not provided directly by VLC: It could be missing."
-msgstr "VLC ei tarjoa tätä muxeria suoraan: Se voi puuttua."
+msgstr "VLC ei toimita tätä multipleksiä suoraan: Se voi puuttua."
 
 #: modules/gui/qt/components/sout/profile_selector.cpp:642
 msgid "This muxer is missing. Using this profile will fail"
-msgstr "Tämä muxeri on poissa. Tämän profiilin käyttäminen epäonnistuu"
+msgstr "Tämä multipleksi puuttuu. Tämän profiilin käyttäminen epäonnistuu"
 
 #: modules/gui/qt/components/sout/profile_selector.cpp:787
 msgid " Profile Name Missing"
@@ -23580,7 +23581,7 @@ msgstr ""
 
 #: modules/mux/asf.c:73
 msgid "ASF muxer"
-msgstr "ASF-kanavoija"
+msgstr "ASF multipleksi"
 
 #: modules/mux/asf.c:563
 msgid "Unknown Video"
@@ -23596,11 +23597,11 @@ msgstr "Enkooderi"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
-msgstr "AVI-kanavoija"
+msgstr "AVI multipleksi"
 
 #: modules/mux/dummy.c:45
 msgid "Dummy/Raw muxer"
-msgstr "Lume- ja raakakanavoija"
+msgstr "Dummy/Raw multipleksi"
 
 #: modules/mux/mp4/mp4.c:50
 msgid "Create \"Fast Start\" files"
@@ -23618,11 +23619,11 @@ msgstr ""
 
 #: modules/mux/mp4/mp4.c:64
 msgid "MP4/MOV muxer"
-msgstr "MP4/MOV-kanavoija"
+msgstr "MP4/MOV multipleksi"
 
 #: modules/mux/mp4/mp4.c:77
 msgid "Fragmented and streamable MP4 muxer"
-msgstr "Hajautettu ja suoratoistettava MP4-muxer"
+msgstr "Hajautettu ja suoratoistettava MP4 multipleksi"
 
 #: modules/mux/mpeg/ps.c:48 modules/mux/mpeg/ts.c:162
 msgid "DTS delay (ms)"
@@ -23648,7 +23649,7 @@ msgstr "Aseta suurin sallittu PES:n koko, kun tuotetaan MPEG PS -tietovirtoja."
 
 #: modules/mux/mpeg/ps.c:64
 msgid "PS muxer"
-msgstr "PS-kanavoija"
+msgstr "PS multipleksi"
 
 #: modules/mux/mpeg/ts.c:102
 msgid "Video PID"
@@ -23790,11 +23791,11 @@ msgid ""
 "enhances the efficiency of the shaping algorithm, since I frames are usually "
 "the biggest frames in the stream."
 msgstr ""
-"Jos tämä on päällä, ja muotoilu on käytössä, TS-kanavoija asettaa rajat I-"
-"kuvien loppuihin. Siinä tapauksessa käyttäjän antama muotoiluviive on "
-"pahimman tapauksen arvio, jota käytetään kun referenssiruutua ei ole "
-"saatavissa. Tämä parantaa muotoilualgoritmin tehokkuutta, koska I-ruudut "
-"ovat yleensä videovirran suurimpia ruutuja."
+"Jos käytössä ja muotoilu on määritetty, TS multipleksi asettaa rajat I-"
+"kuvien loppuun. Tällöin käyttäjän antama muotoilun viive on pahimman "
+"tapauksen arvio, jota käytetään kun referenssiruutua ei ole saatavilla. Tämä "
+"parantaa muotoilualgoritmin tehokkuutta, koska I-ruudut ovat yleensä videon "
+"suurimpia ruutuja."
 
 #: modules/mux/mpeg/ts.c:151
 msgid "PCR interval (ms)"
@@ -23873,11 +23874,11 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:200
 msgid "TS muxer (libdvbpsi)"
-msgstr "TS-kanavoija (libdvbpsi)"
+msgstr "TS multipleksi (libdvbpsi)"
 
 #: modules/mux/mpjpeg.c:47
 msgid "Multipart JPEG muxer"
-msgstr "Multipart JPEG -kanavoija"
+msgstr "Multipart JPEG multipleksi"
 
 #: modules/mux/ogg.c:47
 msgid "Index interval"
@@ -23902,11 +23903,11 @@ msgstr ""
 
 #: modules/mux/ogg.c:60
 msgid "Ogg/OGM muxer"
-msgstr "Ogg/OGM-kanavoija"
+msgstr "Ogg/OGM multipleksi"
 
 #: modules/mux/wav.c:46
 msgid "WAV muxer"
-msgstr "WAV-kanavoija"
+msgstr "WAV multipleksi"
 
 #: modules/notify/osx_notifications.m:126
 msgid "OS X Notification Plugin"
@@ -25416,27 +25417,27 @@ msgstr "Tämä on ulostulon käyttömenetelmä, jota käytetään videoihin. "
 
 #: modules/stream_out/es.c:53 modules/stream_out/standard.c:45
 msgid "Output muxer"
-msgstr "Ulostulon muxer"
+msgstr "Ulostulon multipleksi"
 
 #: modules/stream_out/es.c:55
 msgid "This is the default muxer method that will be used."
-msgstr "Tämä on oletuskanavointitapa, jota käytetään lähdössä."
+msgstr "Tämä on oletuksena käytetty multipleksin tapa."
 
 #: modules/stream_out/es.c:56
 msgid "Audio output muxer"
-msgstr "Äänen ulostulon muxer"
+msgstr "Äänen ulostulon multipleksi"
 
 #: modules/stream_out/es.c:58
 msgid "This is the muxer that will be used for audio."
-msgstr "Tätä kanavoijaa käytetään äänelle."
+msgstr "Tätä multipleksiä käytetään äänelle."
 
 #: modules/stream_out/es.c:59
 msgid "Video output muxer"
-msgstr "Videon ulostulon muxer"
+msgstr "Videon ulostulon multipleksi"
 
 #: modules/stream_out/es.c:61
 msgid "This is the muxer that will be used for video."
-msgstr "Tätä kanavoijaa käytetään videolle."
+msgstr "Tätä multipleksiä käytetään videolle."
 
 #: modules/stream_out/es.c:63
 msgid "Output URL"
@@ -25579,8 +25580,8 @@ msgid ""
 "This allows you to specify the muxer used for the streaming output. Default "
 "is to use no muxer (standard RTP stream)."
 msgstr ""
-"Tämän avulla voit määrittää muxerin käyttämän suoratoiston ulostulon. "
-"Oletuksena ei käytetä muxeria (tavallisesti RTP-striimiä)."
+"Tämän avulla voit määrittää multipleksin suoratoiston käyttämän ulostulon. "
+"Oletuksena ei käytetä multipleksiä (tavallisesti RTP suoratoistoa)."
 
 #: modules/stream_out/rtp.c:92 modules/stream_out/standard.c:59
 msgid "Session name"
@@ -25872,7 +25873,7 @@ msgstr "Striimissä käytettävä lähtömetodi."
 
 #: modules/stream_out/standard.c:47
 msgid "Muxer to use for the stream."
-msgstr "Virralle käytettävä kanavoija (muxer)."
+msgstr "Suoratoistolle käytettävä multiplekseri."
 
 #: modules/stream_out/standard.c:48
 #: share/lua/http/dialogs/create_stream.html:334
@@ -26132,7 +26133,7 @@ msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:81
 msgid "Monospace Font"
-msgstr "Tasalevyinen fontti"
+msgstr "Tasalevyinen kirjasin"
 
 #: modules/text_renderer/freetype/freetype.c:83
 msgid "Font family for the font you want to use"
@@ -26941,7 +26942,7 @@ msgstr "Havaitsee kehyksen reunat ja korostaa ne valkoisina."
 #: modules/video_filter/erase.c:56
 msgid "Image mask. Pixels with an alpha value greater than 50% will be erased."
 msgstr ""
-"Kuvamaski. Kuvapisteet, joiden alfa-arvo on suurempi kuin 50%, poistetaan."
+"Kuvamaski. Kuvapisteet, joiden alfa-arvo on suurempi kuin 50% poistetaan."
 
 #: modules/video_filter/erase.c:59
 msgid "X coordinate of the mask."
@@ -26957,11 +26958,11 @@ msgstr "Poista osia videosta käyttäen kuvaa maskina"
 
 #: modules/video_filter/erase.c:68
 msgid "Erase video filter"
-msgstr "Videon poistosuodin"
+msgstr "Videon poistosuodatin"
 
 #: modules/video_filter/erase.c:69
 msgid "Erase"
-msgstr "Erase"
+msgstr "Poisto"
 
 #: modules/video_filter/extract.c:55
 msgid "RGB component to extract"
@@ -28919,7 +28920,7 @@ msgstr "Ulostulon\tmenetelmä"
 
 #: share/lua/http/dialogs/create_stream.html:249
 msgid "Multiplexer"
-msgstr "Kanavoija"
+msgstr "Multiplekseri"
 
 #: share/lua/http/dialogs/create_stream.html:266
 msgid "Video FPS"
@@ -29950,7 +29951,7 @@ msgstr "Kanavoinnin hallinta"
 
 #: modules/gui/qt/ui/vlm.h:295
 msgid "Muxer:"
-msgstr "Kanavoija"
+msgstr "Multiplekseri:"
 
 #: modules/gui/qt/ui/vlm.h:296
 msgid "AAAA; "
