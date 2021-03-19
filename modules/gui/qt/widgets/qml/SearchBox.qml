@@ -125,7 +125,9 @@ Widgets.NavigableFocusScope {
 
                 font.pixelSize: VLCStyle.fontSize_normal
 
-                color: VLCStyle.colors.buttonText
+                palette.text: VLCStyle.colors.buttonText
+                palette.highlight: VLCStyle.colors.bgHover
+                palette.highlightedText: VLCStyle.colors.bgHoverText
 
                 selectByMouse: true
 
