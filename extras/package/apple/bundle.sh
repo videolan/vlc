@@ -47,6 +47,9 @@ cp "${BUILD_DIR}/lib/.libs/libvlc.dylib" "$APP/Frameworks"
 cp "${BUILD_DIR}/src/.libs/libvlccore.dylib" "$APP/Frameworks"
 find "${BUILD_DIR}/modules/.libs/" -name "*.dylib" -exec cp {} "$APP/Frameworks" \;
 fi
+if [ -n "$EXTRA_FILE" ]; then
+    cp "${EXTRA_FILE}" ${APP}/
+fi
 
 # Archive the bundle into a .ipa file.
 zip -r "$IPA" Payload
