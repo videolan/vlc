@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-03-02 13:18+0100\n"
+"PO-Revision-Date: 2021-03-19 20:44+0100\n"
 "Last-Translator: Angelos Chraniotis <chraniotis@gmail.com>, 2021\n"
 "Language-Team: Greek (https://www.transifex.com/yaron/teams/16553/el/)\n"
 "Language: el\n"
@@ -10189,11 +10189,11 @@ msgstr "Φίλτρο ήχου για ενθυλάκωση A/52/DTS->S/PDIF"
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
-msgstr "Προκαθορισμένη ισοστάθμιση"
+msgstr "Προρύθμιση ισοστάθμισης"
 
 #: modules/audio_filter/equalizer.c:59
 msgid "Preset to use for the equalizer."
-msgstr "Προκαθορισμένη ισοστάθμιση που θα χρησιμοποιηθεί από τον ισοσταθμιστή."
+msgstr "Προρύθμιση που θα χρησιμοποιηθεί από τον ισοσταθμιστή."
 
 #: modules/audio_filter/equalizer.c:61
 msgid "Bands gain"
@@ -10205,8 +10205,8 @@ msgid ""
 "values between -20dB and 20dB, separated by spaces, e.g. \"0 2 4 2 0 -2 -4 "
 "-2 0 2\"."
 msgstr ""
-"Μη χρησιμοποιείτε τις προκαθορισμένες ισοσταθμίσεις, αλλά τις χειροκίνητα "
-"καθορισμένες ζώνες. Πρέπει να παράσχετε 10 τιμές μεταξύ -20 και 20 dB, "
+"Μη χρησιμοποιείτε τις προρυθμισμένες ισοσταθμίσεις, αλλά τις χειροκίνητα "
+"καθορισμένες ζώνες. Πρέπει να δώσετε 10 τιμές μεταξύ -20 και 20 dB, "
 "χωρισμένες με κόμμα, π.χ. \"0 2 4 2 0 -2 -4 -2 0 2\"."
 
 #: modules/audio_filter/equalizer.c:67
@@ -14557,7 +14557,7 @@ msgstr "Προεπιλεγμένη ρύθμιση συντονισμού που 
 
 #: modules/codec/x264.c:413
 msgid "Default preset setting used"
-msgstr "Προεπιλεγμένη ρύθμιση προκαθορισμού που χρησιμοποιήθηκε"
+msgstr "Προκαθορισμένη προρύθμιση ισοστάθμισης σε χρήση"
 
 #: modules/codec/x264.c:415
 msgid "x264 advanced options"
@@ -17041,13 +17041,13 @@ msgstr "Δεν επιτρέπονται πολλαπλά προφίλ με το 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:897
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:857
 msgid "Remove a preset"
-msgstr "Αφαίρεση προεπιλογής"
+msgstr "Αφαίρεση μιας προρύθμισης"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:569
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:898
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:858
 msgid "Select the preset you would like to remove:"
-msgstr "Επιλέξτε την προεπιλογή που θέλετε να αφαιρέσετε:"
+msgstr "Επιλέξτε την προρύθμιση που θέλετε να αφαιρέσετε:"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:570
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:899
@@ -17060,19 +17060,19 @@ msgstr "Αφαίρεση"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:647
 msgid "Add new Preset..."
-msgstr "Προσθήκη νέας προεπιλογής…"
+msgstr "Προσθήκη νέας προρύθμισης…"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:652
 msgid "Organize Presets..."
-msgstr "Οργάνωση προεπιλογών…"
+msgstr "Οργάνωση προρυθμίσεων…"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:852
 msgid "Save current selection as new preset"
-msgstr "Αποθήκευση της υπάρχουσας επιλογής ως νέα προεπιλογή…"
+msgstr "Αποθήκευση της υπάρχουσας επιλογής ως νέα προρύθμιση…"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:853
 msgid "Enter a name for the new preset:"
-msgstr "Εισάγετε ένα όνομα για τη νέα προεπιλογή:"
+msgstr "Εισάγετε ένα όνομα για τη νέα προρύθμιση:"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:74
 msgid "Bookmarks"
@@ -30007,7 +30007,7 @@ msgstr "Παράλειψη φίλτρου απεμπλοκής H.264 σε βρό
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "x264 preset and tuning selection"
-msgstr "Προκαθορισμός x264 και επιλογή συντονισμού"
+msgstr "Προρύθμιση x264 και επιλογή συντονισμού"
 
 #: modules/gui/qt/ui/sprefs_input.h:363
 msgid "Optical drive"
