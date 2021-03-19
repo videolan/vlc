@@ -9,6 +9,8 @@ readonly APP_EXECUTABLE="${3:-${APP_NAME}}"
 readonly APP="Payload/${APP_NAME}.app"
 readonly IPA="${APP_NAME}_unsigned.ipa"
 
+: ${EXTRA_FILE:=}
+
 # CONVERT_PLIST <input file> <output file>
 # Convert a plist file into binary1 format in order to put it
 # into an Apple bundle.
@@ -46,6 +48,9 @@ if [ -f "${BUILD_DIR}/lib/.libs/libvlc.dylib" ]; then
 cp "${BUILD_DIR}/lib/.libs/libvlc.dylib" "$APP/Frameworks"
 cp "${BUILD_DIR}/src/.libs/libvlccore.dylib" "$APP/Frameworks"
 find "${BUILD_DIR}/modules/.libs/" -name "*.dylib" -exec cp {} "$APP/Frameworks" \;
+fi
+if [ -n "$EXTRA_FILE" ]; then
+    cp "${EXTRA_FILE}" ${APP}/
 fi
 
 # Archive the bundle into a .ipa file.
