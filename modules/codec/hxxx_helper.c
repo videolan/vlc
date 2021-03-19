@@ -556,13 +556,23 @@ helper_process_block_hevc_annexb(struct hxxx_helper *hh, block_t *p_block,
 }
 
 static block_t *
-helper_process_block_xvcc2annexb(struct hxxx_helper *hh, block_t *p_block,
+helper_process_block_h264_xvcc2annexb(struct hxxx_helper *hh, block_t *p_block,
                                  bool *p_config_changed)
 {
     assert(helper_nal_length_valid(hh));
     h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
                        hh->i_nal_length_size);
     return helper_process_block_h264_annexb(hh, p_block, p_config_changed);
+}
+
+static block_t *
+helper_process_block_hevc_xvcc2annexb(struct hxxx_helper *hh, block_t *p_block,
+                                 bool *p_config_changed)
+{
+    assert(helper_nal_length_valid(hh));
+    h264_AVC_to_AnnexB(p_block->p_buffer, p_block->i_buffer,
+                       hh->i_nal_length_size);
+    return helper_process_block_hevc_annexb(hh, p_block, p_config_changed);
 }
 
 static block_t *
@@ -646,7 +656,7 @@ hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                 if (hh->b_need_xvcC)
                     hh->pf_process_block = helper_process_block_h264_avcc;
                 else
-                    hh->pf_process_block = helper_process_block_xvcc2annexb;
+                    hh->pf_process_block = helper_process_block_h264_xvcc2annexb;
             }
             else /* AnnexB */
             {
@@ -662,7 +672,7 @@ hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                 if (hh->b_need_xvcC)
                     hh->pf_process_block = helper_process_block_hevc_hvcc;
                 else
-                    hh->pf_process_block = helper_process_block_xvcc2annexb;
+                    hh->pf_process_block = helper_process_block_hevc_xvcc2annexb;
             }
             else /* AnnexB */
             {
