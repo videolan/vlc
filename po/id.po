@@ -4,17 +4,19 @@
 #
 # Translators:
 # Aulia Firdaus Simbolon <dausbajing@hotmail.co.id>, 2013
+# Kevin Putra Satrianto <kevin.negated@gmail.com>, 2021
 # La Ode Muh. Fadlun Akbar <fadlun.net@gmail.com>, 2014
 # Luqman Hakim <ovdl@rocketmail.com>, 2008,2010,2019
 # Nasip Purnomo <madara.code@gmail.com>, 2014
-# zk <zamani.karmana@gmail.com>, 2015
+# Syahmin Sukhairi <syahmin@gmail.com>, 2021
+# Zamani Karmana <zamani.karmana@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2019-03-18 21:13+0100\n"
-"Last-Translator: Luqman Hakim <ovdl@rocketmail.com>, 2019\n"
+"PO-Revision-Date: 2021-03-21 14:21+0100\n"
+"Last-Translator: Syahmin Sukhairi <syahmin@gmail.com>, 2021\n"
 "Language-Team: Indonesian (https://www.transifex.com/yaron/teams/16553/id/)\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -1099,11 +1101,11 @@ msgstr "Kiri atas"
 
 #: src/input/es_out.c:3199
 msgid "Left top"
-msgstr ""
+msgstr "Kiri atas"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr ""
+msgstr "Kanan bawah"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
@@ -1119,11 +1121,11 @@ msgstr "Kanan bawah"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
-msgstr ""
+msgstr "Kiri bawah"
 
 #: src/input/es_out.c:3202
 msgid "Right top"
-msgstr ""
+msgstr "Kanan atas"
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
@@ -1167,7 +1169,7 @@ msgstr ""
 #: src/input/es_out.c:3253
 #, c-format
 msgid "%s Range"
-msgstr ""
+msgstr "%s Rentang"
 
 #: src/input/es_out.c:3255
 msgid "Full"
@@ -3092,6 +3094,9 @@ msgid ""
 "address (e.g. ::1 or 127.0.0.1) or a host name (e.g. localhost) to restrict "
 "them to a specific network interface."
 msgstr ""
+"Secara bawaan, peladen akan mendengarkan semua alamat IP lokal. "
+"Spesifikasikan satu alamat IP (misalnya ::1 atau 127.0.0.1) atau nama host "
+"(misalnya: localhost) untuk membatasi hanya pada satu antarmuka jaringan."
 
 #: src/libvlc-module.c:809
 msgid "RTSP server address"
@@ -3116,6 +3121,9 @@ msgid ""
 "is 80. However allocation of port numbers below 1025 is usually restricted "
 "by the operating system."
 msgstr ""
+"Peladen HTTP akan mencari pada saluran TCP ini. Standar saluran HTTP adalah "
+"80. Bagaimanapun alokasi saluran di bawah 1025 biasanya akan dibatasi oleh "
+"sistem operasi."
 
 #: src/libvlc-module.c:824
 msgid "HTTPS server port"
@@ -3826,11 +3834,11 @@ msgstr "Keluar bila tidak ada lagi item dalam playlist."
 
 #: src/libvlc-module.c:1176
 msgid "Play and pause"
-msgstr ""
+msgstr "Putar dan jeda"
 
 #: src/libvlc-module.c:1178
 msgid "Pause each item in the playlist on the last frame."
-msgstr ""
+msgstr "Jeda setiap item di playlist pada frame terakhir"
 
 #: src/libvlc-module.c:1180
 msgid "Start paused"
@@ -4314,11 +4322,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
-msgstr ""
+msgstr "Besarkan ukuran teks subtitle"
 
 #: src/libvlc-module.c:1327
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "Kecilkan ukuran teks subtitle"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
@@ -5334,7 +5342,7 @@ msgstr "Pustaka Media"
 
 #: src/text/iso-639_def.h:40
 msgid "Afar"
-msgstr ""
+msgstr "Afar"
 
 #: src/text/iso-639_def.h:41
 msgid "Abkhazian"
@@ -6268,11 +6276,11 @@ msgstr "Kesalahan Blu-ray"
 
 #: modules/access/bluray.c:2115
 msgid "Top Menu"
-msgstr ""
+msgstr "Menu Atas"
 
 #: modules/access/bluray.c:2118
 msgid "First Play"
-msgstr ""
+msgstr "Pertama dimainkan"
 
 #: modules/access/cdda.c:487
 #, c-format
@@ -6435,7 +6443,7 @@ msgstr "S-Video"
 
 #: modules/access/decklink.cpp:94
 msgid "Embedded"
-msgstr ""
+msgstr "Tertanam"
 
 #: modules/access/decklink.cpp:94
 msgid "AES/EBU"
@@ -8756,19 +8764,19 @@ msgstr "Warna Negatif"
 
 #: modules/access/v4l2/v4l2.c:165
 msgid "Emboss"
-msgstr ""
+msgstr "Timbul"
 
 #: modules/access/v4l2/v4l2.c:165
 msgid "Sketch"
-msgstr ""
+msgstr "Sketsa"
 
 #: modules/access/v4l2/v4l2.c:165
 msgid "Sky blue"
-msgstr ""
+msgstr "Biru langit"
 
 #: modules/access/v4l2/v4l2.c:166
 msgid "Grass green"
-msgstr ""
+msgstr "Hijau rumput"
 
 #: modules/access/v4l2/v4l2.c:166
 msgid "Skin whiten"
@@ -8798,7 +8806,7 @@ msgstr "Keseimbangan input audio."
 
 #: modules/access/v4l2/v4l2.c:175
 msgid "Bass level"
-msgstr ""
+msgstr "Tingkat bass"
 
 #: modules/access/v4l2/v4l2.c:177
 msgid "Bass adjustment of the audio input."
