@@ -92,7 +92,7 @@ endif # HAVE_GL
 libegl_display_generic_plugin_la_SOURCES = video_output/opengl/egl_display_generic.c
 libegl_display_generic_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_FLAGS)
 libegl_display_generic_plugin_la_LIBADD = $(EGL_LIBS)
-if HAVE_ANDROID
+if HAVE_EGL
 vout_LTLIBRARIES += libegl_display_generic_plugin.la
 endif
 
