@@ -231,6 +231,10 @@ RequestExecutionLevel admin
   !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "AsturianExtra.nsh" ${VLC_LANGFILE_FALLBACK}
   !insertmacro MUI_LANGUAGE "Corsican"
   !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "CorsicanExtra.nsh" ${VLC_LANGFILE_FALLBACK}
+  !insertmacro MUI_LANGUAGE "Hindi"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "HindiExtra.nsh" ${VLC_LANGFILE_FALLBACK}
+  !insertmacro MUI_LANGUAGE "Vietnamese"
+  !insertmacro LANGFILE_INCLUDE_WITHDEFAULT "VietnameseExtra.nsh" ${VLC_LANGFILE_FALLBACK}
 
 ; Reserve files for solid compression
   !insertmacro MUI_RESERVEFILE_LANGDLL
