@@ -33,3 +33,17 @@ targets:
         buildPhase:
           copyFiles:
             destination: executables
+  vlccoreiostuner:
+      type: "application"
+      platform: ${VLC_PLATFORM}
+      dependencies:
+        - target: VLCAutomake
+      info:
+        path: "vlccoreiostuner/Info.plist"
+      sources:
+        - path: ${VLC_BUILD_DIR}/test/vlccoreiostuner
+          type: file
+          optional: true
+          buildPhase:
+            copyFiles:
+              destination: executables

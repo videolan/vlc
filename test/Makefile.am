@@ -300,10 +300,30 @@ vlccoreios_OBJCFLAGS += -DHAVE_MERGE_PLUGINS
 endif
 endif
 
+vlccoreiostuner_SOURCES = iosvlctuner.m
+vlccoreiostuner_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,Foundation,-framework,UIKit
+vlccoreiostuner_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/Frameworks/"
+vlccoreiostuner_OBJCFLAGS = -fobjc-arc -I$(builddir)/../modules/
+vlccoreiostuner_LDADD = ../compat/libcompat.la ../lib/libvlc.la ../src/libvlccore.la
+
+if HAVE_MERGE_PLUGINS
+if !HAVE_DYNAMIC_PLUGINS
+vlccoreiostuner_LDADD += ../modules/libvlc_static.la
+vlccoreiostuner_LDFLAGS += \
+	-Wl,-framework,CoreFoundation,-framework,Foundation \
+	-Wl,-framework,CoreAudio,-framework,AudioToolbox \
+	-Wl,-framework,CoreVideo,-framework,QuartzCore \
+	-Wl,-framework,OpenGLES,-framework,UIKit \
+	-Wl,-framework,Security,-framework,AVFoundation \
+	-Wl,-framework,CoreImage
+vlccoreiostuner_OBJCFLAGS += -DHAVE_MERGE_PLUGINS
+endif
+endif
+
 if HAVE_IOS
-noinst_PROGRAMS += vlccoreios
+noinst_PROGRAMS += vlccoreios vlccoreiostuner
 endif
 
 if HAVE_TVOS
-noinst_PROGRAMS += vlccoreios
+noinst_PROGRAMS += vlccoreios vlccoreiostuner
 endif
