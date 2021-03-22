@@ -34,6 +34,7 @@
 #include "../video_output/opengl/gl_api.h"
 #include "../video_output/opengl/gl_common.h"
 #include "../video_output/opengl/interop.h"
+#include "../video_output/opengl/egl_display.h"
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
@@ -63,6 +64,8 @@ struct vlc_gl_pbuffer
     GLuint                  framebuffers[BUFFER_COUNT];
     GLuint                  textures[BUFFER_COUNT];
     struct pbo_picture_context     picture_contexts[BUFFER_COUNT];
+
+    struct vlc_egl_display *vlc_display;
 
     EGLDisplay display;
     EGLSurface surface;
@@ -131,14 +134,20 @@ static int InitEGL(vlc_gl_t *gl, unsigned width, unsigned height)
 {
     struct vlc_gl_pbuffer *sys = gl->sys;
 
-    sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    if (sys->display == EGL_NO_DISPLAY)
+    sys->vlc_display = vlc_egl_display_New(VLC_OBJECT(gl), NULL);
+    if (!sys->vlc_display)
         return VLC_EGENERIC;
+
+    sys->display = sys->vlc_display->display;
+    assert(sys->display != EGL_NO_DISPLAY);
 
     /* Initialize EGL display */
     EGLint major, minor;
     if (eglInitialize(sys->display, &major, &minor) != EGL_TRUE)
+    {
+        vlc_egl_display_Delete(sys->display);
         return VLC_EGENERIC;
+    }
     msg_Dbg(gl, "EGL version %s by %s, API %s",
             eglQueryString(sys->display, EGL_VERSION),
             eglQueryString(sys->display, EGL_VENDOR),
@@ -224,6 +233,7 @@ static int InitEGL(vlc_gl_t *gl, unsigned width, unsigned height)
     return VLC_SUCCESS;
 error:
     eglTerminate(sys->display);
+    vlc_egl_display_Delete(sys->display);
     return VLC_EGENERIC;
 }
 
@@ -355,6 +365,7 @@ static void Close( vlc_gl_t *gl )
     vlc_gl_ReleaseCurrent(sys->gl);
 
     eglTerminate(sys->display);
+    vlc_egl_display_Delete(sys->vlc_display);
 }
 
 static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
@@ -450,6 +461,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 
 error2:
     eglTerminate(sys->display);
+    vlc_egl_display_Delete(sys->vlc_display);
 error1:
     vlc_obj_free(&gl->obj, sys);
 

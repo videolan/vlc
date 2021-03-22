@@ -89,7 +89,15 @@ if HAVE_GL
 vout_LTLIBRARIES += libgl_plugin.la
 endif # HAVE_GL
 
-libegl_pbuffer_filter_plugin_la_SOURCES = video_filter/egl_pbuffer.c
+libegl_display_generic_plugin_la_SOURCES = video_output/opengl/egl_display_generic.c
+libegl_display_generic_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_FLAGS)
+libegl_display_generic_plugin_la_LIBADD = $(EGL_LIBS)
+if HAVE_ANDROID
+vout_LTLIBRARIES += libegl_display_generic_plugin.la
+endif
+
+libegl_pbuffer_filter_plugin_la_SOURCES = video_filter/egl_pbuffer.c \
+    video_output/opengl/egl_display.c
 libegl_pbuffer_filter_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_FLAGS)
 libegl_pbuffer_filter_plugin_la_LIBADD = $(EGL_LIBS)
 
