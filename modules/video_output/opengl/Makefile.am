@@ -96,6 +96,15 @@ if HAVE_EGL
 vout_LTLIBRARIES += libegl_display_generic_plugin.la
 endif
 
+libegl_display_gbm_plugin_la_SOURCES = video_output/opengl/egl_display_gbm.c
+libegl_display_gbm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_FLAGS) $(GBM_CFLAGS)
+libegl_display_gbm_plugin_la_LIBADD = $(EGL_LIBS) $(GBM_LIBS)
+if HAVE_EGL
+if HAVE_GBM
+vout_LTLIBRARIES += libegl_display_gbm_plugin.la
+endif
+endif
+
 libegl_pbuffer_filter_plugin_la_SOURCES = video_filter/egl_pbuffer.c \
     video_output/opengl/egl_display.c
 libegl_pbuffer_filter_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_FLAGS)

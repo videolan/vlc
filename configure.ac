@@ -4468,6 +4468,24 @@ AS_IF([test "${enable_osx_notifications}" != "no"], [
 ])
 
 dnl
+dnl Check for GBM
+dnl
+AC_ARG_ENABLE([gbm],
+  AS_HELP_STRING([--enable-gbm],
+    [Use GBM for egl_pbuffer (default enabled)]))
+have_gbm="no"
+AS_IF([test "${enable_gbm}" != "no"], [
+  PKG_CHECK_MODULES([GBM], [gbm], [have_gbm="yes"], [
+    AS_IF([test -n "${enable_gbm}"], [
+      AC_MSG_ERROR([${GBM_PKG_ERRORS}.])
+    ], [
+      AC_MSG_WARN([${GBM_PKG_ERRORS}.])
+    ])
+  ])
+])
+AM_CONDITIONAL([HAVE_GBM], [test "${have_gbm}" = "yes"])
+
+dnl
 dnl Libnotify notification plugin
 dnl
 PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify], [libnotify notification], [auto])
