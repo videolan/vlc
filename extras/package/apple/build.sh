@@ -96,6 +96,7 @@ let VLC_USE_NUMBER_OF_CORES=$CORE_COUNT+1
 VLC_REQUESTED_CORE_COUNT=0
 # whether to disable debug mode (the default) or not
 VLC_DISABLE_DEBUG=0
+VLC_MERGE_PLUGINS=0
 # whether to compile with bitcode or not
 VLC_USE_BITCODE=0
 VLC_BITCODE_FLAG="-fembed-bitcode"
@@ -126,6 +127,7 @@ usage()
     echo " --sdk=SDK        Name of the SDK to build with (see 'xcodebuild -showsdks')"
     echo " --enable-bitcode        Enable bitcode for compilation, same as with =full"
     echo " --enable-bitcode=marker Enable bitcode marker for compilation"
+    echo " --enable-merge-plugins Enable the merging of plugins into a single archive"
     echo " --disable-debug  Disable libvlc debug mode (for release)"
     echo " --verbose        Print verbose output and disable multi-core use"
     echo " --help           Print this help"
@@ -463,6 +465,9 @@ do
             VLC_USE_BITCODE=1
             VLC_BITCODE_FLAG="-fembed-bitcode-marker"
             ;;
+        --enable-merge-plugins)
+            VLC_MERGE_PLUGINS=1
+            ;;
         --arch=*)
             VLC_HOST_ARCH="${1#--arch=}"
             ;;
@@ -685,6 +690,10 @@ if [ "$VLC_BUILD_DYNAMIC" -gt "0" ]; then
     VLC_CONFIG_OPTIONS+=( "--enable-shared" )
 else
     VLC_CONFIG_OPTIONS+=( "--disable-shared" "--enable-static" )
+fi
+
+if [ "$VLC_MERGE_PLUGINS" -gt "0" ]; then
+    VLC_CONFIG_OPTIONS+=( "--enable-merge-plugins" )
 fi
 
 # Bootstrap VLC
