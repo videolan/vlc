@@ -158,7 +158,11 @@ static int InitEGL(vlc_gl_t *gl, unsigned width, unsigned height)
 #endif
             );
 
-    const EGLint conf_attr[] = {
+    const char *extensions = eglQueryString(sys->display, EGL_EXTENSIONS);
+    bool need_surface =
+        !vlc_gl_StrHasToken(extensions, "EGL_KHR_surfaceless_context");
+
+    static const EGLint conf_attr_surface[] = {
         EGL_RED_SIZE, 8,
         EGL_GREEN_SIZE, 8,
         EGL_BLUE_SIZE, 8,
@@ -170,6 +174,19 @@ static int InitEGL(vlc_gl_t *gl, unsigned width, unsigned height)
         EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
         EGL_NONE,
     };
+
+    static const EGLint conf_attr_surfaceless[] = {
+#ifdef USE_OPENGL_ES2
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+#else
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+#endif
+        EGL_NONE,
+    };
+
+    const EGLint *conf_attr = need_surface ? conf_attr_surface
+                                           : conf_attr_surfaceless;
+
     EGLConfig cfgv[1];
     EGLint cfgc;
 
@@ -187,14 +204,20 @@ static int InitEGL(vlc_gl_t *gl, unsigned width, unsigned height)
         goto error;
     }
 
-    /* Create a drawing surface */
-    sys->surface = eglCreatePbufferSurface(sys->display, cfgv[0], surface_attr);
-    if (sys->surface == EGL_NO_SURFACE)
+    if (need_surface)
     {
-        msg_Err (gl, "cannot create EGL window surface");
-        assert(false);
-        goto error;
+        /* Create a drawing surface */
+        sys->surface = eglCreatePbufferSurface(sys->display, cfgv[0],
+                                               surface_attr);
+        if (sys->surface == EGL_NO_SURFACE)
+        {
+            msg_Err (gl, "cannot create EGL window surface");
+            assert(false);
+            goto error;
+        }
     }
+    else
+        sys->surface = EGL_NO_SURFACE;
 
 #ifdef USE_OPENGL_ES2
     if (eglBindAPI (EGL_OPENGL_ES_API) != EGL_TRUE)
