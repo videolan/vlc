@@ -1126,9 +1126,8 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
     vlc_mutex_lock(&sys->display_lock);
 
     /*
-     * Get the subpicture to be displayed
+     * Get the rendering date for the current subpicture to be displayed.
      */
-    const bool do_snapshot = vout_snapshot_IsRequested(sys->snapshot);
     vlc_tick_t system_now = vlc_tick_now();
     vlc_tick_t render_subtitle_date;
     if (sys->pause.is_on)
@@ -1150,8 +1149,11 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
     }
 
     /*
-     * Get the subpicture to be displayed
+     * Check whether we let the display draw the subpicture itself (when
+     * do_dr_spu=true), and if we can fallback to blending the subpicture
+     * ourselves (do_early_spu=true).
      */
+    const bool do_snapshot = vout_snapshot_IsRequested(sys->snapshot);
     const bool do_dr_spu = !do_snapshot &&
                            vd->info.subpicture_chromas &&
                            *vd->info.subpicture_chromas != 0;
@@ -1203,6 +1205,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
         }
     }
 
+    /* Get the subpicture to be displayed. */
     video_format_t fmt_spu_rot;
     video_format_ApplyRotation(&fmt_spu_rot, &fmt_spu);
     subpicture_t *subpic = !sys->spu ? NULL :
