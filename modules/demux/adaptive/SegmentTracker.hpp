@@ -111,10 +111,12 @@ namespace adaptive
     {
         public:
             SegmentChangedEvent() = delete;
-            SegmentChangedEvent(const ID &, vlc_tick_t);
+            SegmentChangedEvent(const ID &, vlc_tick_t, vlc_tick_t, vlc_tick_t = VLC_TICK_INVALID);
             virtual ~SegmentChangedEvent() = default;
 
             const ID *id;
+            vlc_tick_t displaytime;
+            vlc_tick_t starttime;
             vlc_tick_t duration;
     };
 
@@ -204,10 +206,12 @@ namespace adaptive
             {
                 public:
                     ChunkEntry();
-                    ChunkEntry(SegmentChunk *c, Position p, vlc_tick_t d);
+                    ChunkEntry(SegmentChunk *c, Position p, vlc_tick_t s, vlc_tick_t d, vlc_tick_t dt);
                     bool isValid() const;
                     SegmentChunk *chunk;
                     Position pos;
+                    vlc_tick_t displaytime;
+                    vlc_tick_t starttime;
                     vlc_tick_t duration;
             };
             std::list<ChunkEntry> chunkssequence;
