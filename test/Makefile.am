@@ -334,14 +334,6 @@ vlccoreios_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/Frameworks/"
 vlccoreios_OBJCFLAGS = -fobjc-arc -I$(builddir)/../modules/
 vlccoreios_LDADD = ../compat/libcompat.la ../lib/libvlc.la ../src/libvlccore.la
 
-if HAVE_IOS
-noinst_PROGRAMS += vlccoreios
-endif
-
-if HAVE_TVOS
-noinst_PROGRAMS += vlccoreios
-endif
-
 vlc_window_SOURCES = vlc-window.c
 vlc_window_CPPFLAGS = $(AM_CPPFLAGS) -I../include/ \
 	-DTOP_BUILDDIR=\"$$(cd "$(top_builddir)"; pwd)\" \
@@ -365,4 +357,12 @@ vlccoreios_LDFLAGS += \
 	-Wl,-framework,CoreImage
 vlccoreios_OBJCFLAGS += -DHAVE_MERGE_PLUGINS
 endif
+endif
+
+if HAVE_IOS
+noinst_PROGRAMS += vlccoreios
+endif
+
+if HAVE_TVOS
+noinst_PROGRAMS += vlccoreios
 endif
