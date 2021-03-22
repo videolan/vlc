@@ -138,7 +138,7 @@ static int InitEGL(vlc_gl_t *gl, unsigned width, unsigned height)
     /* Initialize EGL display */
     EGLint major, minor;
     if (eglInitialize(sys->display, &major, &minor) != EGL_TRUE)
-        goto error;
+        return VLC_EGENERIC;
     msg_Dbg(gl, "EGL version %s by %s, API %s",
             eglQueryString(sys->display, EGL_VERSION),
             eglQueryString(sys->display, EGL_VENDOR),
@@ -223,6 +223,7 @@ static int InitEGL(vlc_gl_t *gl, unsigned width, unsigned height)
 
     return VLC_SUCCESS;
 error:
+    eglTerminate(sys->display);
     return VLC_EGENERIC;
 }
 
@@ -352,6 +353,8 @@ static void Close( vlc_gl_t *gl )
     vt->DeleteFramebuffers(BUFFER_COUNT, sys->framebuffers);
     vt->DeleteTextures(BUFFER_COUNT, sys->textures);
     vlc_gl_ReleaseCurrent(sys->gl);
+
+    eglTerminate(sys->display);
 }
 
 static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
@@ -446,7 +449,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     return VLC_SUCCESS;
 
 error2:
-    vlc_object_delete(sys->gl);
+    eglTerminate(sys->display);
 error1:
     vlc_obj_free(&gl->obj, sys);
 
