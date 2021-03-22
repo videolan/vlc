@@ -471,6 +471,9 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
             right = -(int)osys->crop.border.right;
             bottom = -(int)osys->crop.border.bottom;
             break;
+        default:
+            /* left/top/right/bottom must be initialized */
+            vlc_assert_unreachable();
     }
 
     const int right_max  = osys->source.i_x_offset
