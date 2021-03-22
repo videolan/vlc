@@ -91,7 +91,7 @@ endif # HAVE_GL
 
 libegl_pbuffer_filter_plugin_la_SOURCES = video_filter/egl_pbuffer.c
 libegl_pbuffer_filter_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_FLAGS)
-libegl_pbuffer_filter_plugin_la_LIBADD = $(LIBM) $(EGL_LIBS)
+libegl_pbuffer_filter_plugin_la_LIBADD = $(EGL_LIBS)
 
 if HAVE_ANDROID
 libegl_pbuffer_filter_plugin_la_LIBADD += libvlc_opengles.la $(GLES2_LIBS)
