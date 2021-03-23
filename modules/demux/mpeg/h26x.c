@@ -78,7 +78,8 @@ typedef struct
 {
     es_out_id_t *p_es;
 
-    date_t      dts;
+    date_t      feed_dts;
+    date_t      output_dts;
     unsigned    frame_rate_num;
     unsigned    frame_rate_den;
 
@@ -346,19 +347,20 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
     {
         if ( f_fps < 0.001f ) f_fps = 0.001f;
         p_sys->frame_rate_den = 1000;
-        p_sys->frame_rate_num = 1000 * f_fps;
-        date_Init( &p_sys->dts, p_sys->frame_rate_num, p_sys->frame_rate_den );
+        p_sys->frame_rate_num = 2000 * f_fps;
+        date_Init( &p_sys->feed_dts, p_sys->frame_rate_num, p_sys->frame_rate_den );
     }
     else
-        date_Init( &p_sys->dts, 25000, 1000 );
-    date_Set( &p_sys->dts, VLC_TICK_0 );
+        date_Init( &p_sys->feed_dts, 25000, 1000 );
+    date_Set( &p_sys->feed_dts, VLC_TICK_0 );
+    p_sys->output_dts = p_sys->feed_dts;
 
     /* Load the mpegvideo packetizer */
     es_format_Init( &fmt, VIDEO_ES, i_codec );
     if( f_fps )
     {
-        fmt.video.i_frame_rate = p_sys->dts.i_divider_num;
-        fmt.video.i_frame_rate_base = p_sys->dts.i_divider_den;
+        fmt.video.i_frame_rate = p_sys->feed_dts.i_divider_num;
+        fmt.video.i_frame_rate_base = p_sys->feed_dts.i_divider_den;
     }
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, psz_module );
     if( !p_sys->p_packetizer )
@@ -423,7 +425,7 @@ static int Demux( demux_t *p_demux)
     }
     else
     {
-        p_block_in->i_dts = date_Get( &p_sys->dts );
+        p_block_in->i_dts = date_Get( &p_sys->feed_dts );
     }
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer,
@@ -432,12 +434,35 @@ static int Demux( demux_t *p_demux)
         while( p_block_out )
         {
             block_t *p_next = p_block_out->p_next;
-
             p_block_out->p_next = NULL;
+
+            if( p_sys->p_packetizer->fmt_out.video.i_frame_rate_base &&
+                p_sys->p_packetizer->fmt_out.video.i_frame_rate_base != p_sys->frame_rate_den &&
+                p_sys->p_packetizer->fmt_out.video.i_frame_rate &&
+                p_sys->p_packetizer->fmt_out.video.i_frame_rate_base != p_sys->frame_rate_num )
+            {
+                p_sys->frame_rate_num = p_sys->p_packetizer->fmt_out.video.i_frame_rate;
+                p_sys->frame_rate_den = p_sys->p_packetizer->fmt_out.video.i_frame_rate_base;
+                date_Change( &p_sys->feed_dts, 2 * p_sys->frame_rate_num, p_sys->frame_rate_den );
+                date_Change( &p_sys->output_dts, 2 * p_sys->frame_rate_num, p_sys->frame_rate_den );
+                msg_Dbg( p_demux, "using %.2f fps", (double) p_sys->frame_rate_num / p_sys->frame_rate_den );
+            }
+
+            /* we only want to use the pts-dts offset and length from packetizer */
+            vlc_tick_t dtsdiff = p_block_out->i_pts > p_block_out->i_dts
+                               ? p_block_out->i_pts - p_block_out->i_dts
+                               : 0;
+            /* Always start frame N=1 so we get PCR on N=0 */
+            date_t dtsdate = p_sys->output_dts;
+            vlc_tick_t dts = date_Increment( &dtsdate, 2 );
+
+            p_block_out->i_dts = dts;
+            if( p_block_out->i_pts != VLC_TICK_INVALID )
+                p_block_out->i_pts = dts + dtsdiff;
 
             if( p_block_in )
             {
-                p_block_in->i_dts = date_Get( &p_sys->dts );
+                p_block_in->i_dts = date_Get( &p_sys->feed_dts );
                 p_block_in->i_pts = VLC_TICK_INVALID;
             }
 
@@ -455,23 +480,18 @@ static int Demux( demux_t *p_demux)
 
             /* h264 packetizer does merge multiple NAL into AU, but slice flag persists */
             bool frame = p_block_out->i_flags & BLOCK_FLAG_TYPE_MASK;
-            const vlc_tick_t i_frame_dts = p_block_out->i_dts;
             const vlc_tick_t i_frame_length = p_block_out->i_length;
+
+            /* first output */
+            if( date_Get( &p_sys->output_dts ) == VLC_TICK_0 )
+                es_out_SetPCR( p_demux->out, date_Get( &p_sys->output_dts ) );
+
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
+
+            vlc_tick_t pcr = b_eof ? dts : date_Get( &p_sys->output_dts );
+
             if( frame )
             {
-                if( p_sys->p_packetizer->fmt_out.video.i_frame_rate_base &&
-                    p_sys->p_packetizer->fmt_out.video.i_frame_rate_base != p_sys->frame_rate_den &&
-                    p_sys->p_packetizer->fmt_out.video.i_frame_rate &&
-                    p_sys->p_packetizer->fmt_out.video.i_frame_rate_base != p_sys->frame_rate_num )
-                {
-                    p_sys->frame_rate_num = p_sys->p_packetizer->fmt_out.video.i_frame_rate;
-                    p_sys->frame_rate_den = p_sys->p_packetizer->fmt_out.video.i_frame_rate_base;
-                    date_Change( &p_sys->dts, 2 * p_sys->frame_rate_num, p_sys->frame_rate_den );
-                    msg_Dbg( p_demux, "using %.2f fps", (double) p_sys->frame_rate_num / p_sys->frame_rate_den );
-                }
-
-                es_out_SetPCR( p_demux->out, date_Get( &p_sys->dts ) );
                 unsigned i_nb_fields;
                 if( i_frame_length > 0 )
                 {
@@ -480,10 +500,12 @@ static int Demux( demux_t *p_demux)
                 }
                 else i_nb_fields = 2;
                 if( i_nb_fields <= 6 ) /* in the legit range */
-                    date_Increment( &p_sys->dts, i_nb_fields );
-                else /* Somehow some discontinuity */
-                    date_Set( &p_sys->dts, i_frame_dts );
+                {
+                    date_Increment( &p_sys->output_dts, i_nb_fields );
+                }
             }
+
+            es_out_SetPCR( p_demux->out, pcr );
 
             p_block_out = p_next;
         }
