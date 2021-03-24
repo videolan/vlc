@@ -1782,8 +1782,8 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_nzstart, mtime_t i_nzstop
 
     if( p_spu )
     {
-        p_spu->i_start = i_nzstart;
-        p_spu->i_stop = i_nzstop;
+        p_spu->i_start = VLC_TS_0 + i_nzstart;
+        p_spu->i_stop = VLC_TS_0 + i_nzstop;
         p_spu->b_ephemer  = true; /* !important */
         p_spu->b_absolute = false; /* can't be absolute as snap to lines can overlap ! */
 
