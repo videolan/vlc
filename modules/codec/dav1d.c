@@ -412,6 +412,9 @@ static int OpenDecoder(vlc_object_t *p_this)
             sequence_hdr = AV1_OBU_parse_sequence_header(obu_start, obu_size);
     }
 
+    dec->fmt_out.video.i_frame_rate = dec->fmt_in.video.i_frame_rate;
+    dec->fmt_out.video.i_frame_rate_base = dec->fmt_in.video.i_frame_rate_base;
+
     if (!sequence_hdr)
     {
         dec->fmt_out.i_codec = VLC_CODEC_I420;
