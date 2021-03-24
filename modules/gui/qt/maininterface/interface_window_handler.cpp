@@ -75,6 +75,11 @@ InterfaceWindowHandler::InterfaceWindowHandler(intf_thread_t *_p_intf, MainInter
     connect(this, &InterfaceWindowHandler::incrementIntfUserScaleFactor,
             m_mainInterface, &MainInterface::incrementIntfUserScaleFactor);
 
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
+    connect( m_mainInterface, &MainInterface::useClientSideDecorationChanged,
+             this, &InterfaceWindowHandler::updateCSDWindowSettings );
+#endif
+
     m_window->installEventFilter(this);
 }
 
@@ -85,7 +90,7 @@ InterfaceWindowHandler::~InterfaceWindowHandler()
     WindowStateHolder::holdFullscreen( m_window,  WindowStateHolder::INTERFACE, false );
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
 bool InterfaceWindowHandler::CSDSetCursor(QMouseEvent* mouseEvent)
 {
     if (!m_mainInterface->useClientSideDecoration())
@@ -136,6 +141,13 @@ bool InterfaceWindowHandler::CSDHandleClick(QMouseEvent* mouseEvent)
         return true;
     }
     return false;
+}
+
+void InterfaceWindowHandler::updateCSDWindowSettings()
+{
+    m_window->hide(); // some window managers don't like to change frame window hint on visible window
+    m_window->setFlag(Qt::FramelessWindowHint, m_mainInterface->useClientSideDecoration());
+    m_window->show();
 }
 #endif
 
@@ -206,7 +218,7 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
         }
         break;
     }
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     //Handle CSD edge behaviors
     case QEvent::MouseMove:
     {

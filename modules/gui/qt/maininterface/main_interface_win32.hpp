@@ -67,9 +67,6 @@ private:
 
 public slots:
     virtual void reloadPrefs() override;
-
-protected:
-    void updateClientSideDecorations() Q_DECL_OVERRIDE;
 };
 
 class InterfaceWindowHandlerWin32 : public InterfaceWindowHandler
@@ -81,6 +78,12 @@ public:
     virtual void toggleWindowVisiblity() override;
 
     virtual bool eventFilter(QObject*, QEvent* event) override;
+
+private:
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
+    void updateCSDWindowSettings() override;
+    QObject *m_CSDWindowEventHandler {};
+#endif
 };
 
 #endif // MAIN_INTERFACE_WIN32_HPP

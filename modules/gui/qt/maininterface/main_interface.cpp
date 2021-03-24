@@ -163,7 +163,7 @@ MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::Windo
     /* Should the UI stays on top of other windows */
     b_interfaceOnTop = var_InheritBool( p_intf, "video-on-top" );
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     m_clientSideDecoration = ! var_InheritBool( p_intf, "qt-titlebar" );
 #endif
     m_hasToolbarMenu = var_InheritBool( p_intf, "qt-menubar" );
@@ -305,12 +305,11 @@ void MainInterface::reloadPrefs()
         emit hasToolbarMenuChanged();
     }
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     if (m_clientSideDecoration != (! var_InheritBool( p_intf, "qt-titlebar" )))
     {
         m_clientSideDecoration = !m_clientSideDecoration;
         emit useClientSideDecorationChanged();
-        updateClientSideDecorations();
     }
 #endif
 }
@@ -718,13 +717,6 @@ void MainInterface::closeEvent( QCloseEvent *e )
         /* Accept session quit. Otherwise we break the desktop mamager. */
         e->accept();
     }
-}
-
-void MainInterface::updateClientSideDecorations()
-{
-    hide(); // some window managers don't like to change frame window hint on visible window
-    setWindowFlag(Qt::FramelessWindowHint, useClientSideDecoration());
-    show();
 }
 
 void MainInterface::setInterfaceFullScreen( bool fs )

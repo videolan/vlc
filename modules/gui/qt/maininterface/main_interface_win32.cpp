@@ -27,6 +27,7 @@
 
 #include "main_interface_win32.hpp"
 
+#include "maininterface/compositor.hpp"
 #include "player/player_controller.hpp"
 #include "playlist/playlist_controller.hpp"
 #include "dialogs/dialogs_provider.hpp"
@@ -92,6 +93,77 @@ HWND WinId( QWindow *windowHandle )
     else
         return 0;
 }
+
+class CSDWin32EventHandler : public QObject, public QAbstractNativeEventFilter
+{
+public:
+    CSDWin32EventHandler(const bool useClientSideDecoration, const bool isWin7Compositor, QWindow *window, QObject *parent)
+        : QObject {parent}
+        , m_useClientSideDecoration {useClientSideDecoration}
+        , m_window {window}
+        , m_isWin7Compositor {isWin7Compositor}
+    {
+        QApplication::instance()->installNativeEventFilter(this);
+        updateCSDSettings();
+    }
+
+    bool nativeEventFilter(const QByteArray &, void *message, long *result) override
+    {
+        MSG* msg = static_cast<MSG*>( message );
+
+        if ( (msg->message == WM_NCCALCSIZE) && (msg->hwnd == WinId(m_window)) )
+        {
+            /* This is used to remove the decoration instead of using FramelessWindowHint because
+             * frameless window don't support areo snapping
+             */
+            if (m_useClientSideDecoration) {
+                *result = WVR_REDRAW;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void setUseClientSideDecoration(bool useClientSideDecoration)
+    {
+        m_useClientSideDecoration = useClientSideDecoration;
+
+        updateCSDSettings();
+    }
+
+private:
+    void updateCSDSettings()
+    {
+        HWND winId = WinId(m_window);
+
+        if (m_isWin7Compositor)
+        {
+            // special case for win7 compositor
+            // removing CSD borders with win7 compositor works with Qt::FramelessWindowHint
+            // but with that the shadows don't work, so manually remove WS_CAPTION style
+            DWORD style = m_nonCSDGwlStyle == 0 ? GetWindowLong(winId, GWL_STYLE) : m_nonCSDGwlStyle;
+            if (m_nonCSDGwlStyle == 0)
+                m_nonCSDGwlStyle = style;
+            if (m_useClientSideDecoration)
+            {
+                style &= ~WS_CAPTION;
+                style |= (WS_MAXIMIZEBOX | WS_THICKFRAME);
+            }
+            SetWindowLong (winId, GWL_STYLE, style);
+        }
+
+        SetWindowPos(winId, NULL, 0, 0, 0, 0,
+            SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOCOPYBITS |
+            SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOREPOSITION |
+            SWP_NOSENDCHANGING | SWP_NOSIZE | SWP_NOZORDER);
+    }
+
+    DWORD m_nonCSDGwlStyle = 0;
+    bool m_useClientSideDecoration;
+    QWindow *m_window;
+    const bool m_isWin7Compositor;
+};
 
 }
 
@@ -340,19 +412,6 @@ bool MainInterfaceWin32::nativeEvent(const QByteArray &eventType, void *message,
     short cmd;
     switch( msg->message )
     {
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
-        case WM_NCCALCSIZE:
-        {
-            /* This is used to remove the decoration instead of using FramelessWindowHint because
-             * frameless window don't support areo snapping
-             */
-            if (useClientSideDecoration()) {
-                *result = 0;
-                return true;
-            }
-            break;
-        }
-#endif
         case WM_APPCOMMAND:
             cmd = GET_APPCOMMAND_LPARAM(msg->lParam);
 
@@ -425,6 +484,13 @@ bool MainInterfaceWin32::nativeEvent(const QByteArray &eventType, void *message,
 
 InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(intf_thread_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent)
     : InterfaceWindowHandler(_p_intf, mainInterface, window, parent)
+
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
+    , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainInterface->useClientSideDecoration(),
+                                                       _p_intf->p_sys->p_compositor->type() == vlc::Compositor::Win7Compositor,
+                                                       window, window))
+#endif
+
 {
 }
 
@@ -432,15 +498,6 @@ void MainInterfaceWin32::reloadPrefs()
 {
     p_intf->p_sys->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
     MainInterface::reloadPrefs();
-}
-
-void MainInterfaceWin32::updateClientSideDecorations()
-{
-    HWND winId = WinId(windowHandle());
-    SetWindowPos(winId, NULL, 0, 0, 0, 0,
-        SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOCOPYBITS |
-        SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOREPOSITION |
-        SWP_NOSENDCHANGING | SWP_NOSIZE | SWP_NOZORDER);
 }
 
 
@@ -530,3 +587,10 @@ bool InterfaceWindowHandlerWin32::eventFilter(QObject* obj, QEvent* ev)
 
     return ret;
 }
+
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
+void InterfaceWindowHandlerWin32::updateCSDWindowSettings()
+{
+    static_cast<CSDWin32EventHandler *>(m_CSDWindowEventHandler)->setUseClientSideDecoration(m_mainInterface->useClientSideDecoration());
+}
+#endif

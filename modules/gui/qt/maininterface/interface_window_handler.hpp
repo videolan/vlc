@@ -55,9 +55,10 @@ signals:
     void incrementIntfUserScaleFactor(bool increment);
 
 private:
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     bool CSDSetCursor(QMouseEvent* mouseEvent);
     bool CSDHandleClick(QMouseEvent* mouseEvent);
+    virtual void updateCSDWindowSettings();
 #endif
 
 protected:

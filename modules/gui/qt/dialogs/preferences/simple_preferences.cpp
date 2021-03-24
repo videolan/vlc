@@ -844,7 +844,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             QObject::connect( ui.intfScaleFactorSpinBox, QOverload<int>::of(&QSpinBox::valueChanged)
                               , p_intf->p_sys->p_mi , updateIntfUserScaleFactorFromControls );
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
             CONFIG_BOOL( "qt-titlebar", titleBarCheckBox );
 #else
             ui.titleBarCheckBox->hide();

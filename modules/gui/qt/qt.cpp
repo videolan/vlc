@@ -333,7 +333,7 @@ vlc_module_begin ()
               false                                /* advanced mode only */)
 #endif
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     add_bool( "qt-titlebar",
 #ifdef _WIN32
               false                              /* use CSD by default on windows */,
