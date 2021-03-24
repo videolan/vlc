@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-02-25 11:36+0100\n"
+"PO-Revision-Date: 2021-03-24 04:43+0100\n"
 "Last-Translator: Sidney Doria <ssdoria@gmail.com>, 2021\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/yaron/"
 "teams/16553/pt_BR/)\n"
@@ -106,7 +106,7 @@ msgstr "Filtros"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio filters are used to process the audio stream."
-msgstr "Filtros de áudio são usados para processar o fluxo de áudio."
+msgstr "Filtros de áudio são usados para processar o transmissão de áudio."
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
@@ -171,7 +171,7 @@ msgstr "Configurações gerais para os módulos de saída de vídeo."
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
-msgstr "Filtros de vídeo são usados para processar o fluxo de vídeo."
+msgstr "Filtros de vídeo são usados para processar o transmissão de vídeo."
 
 #: include/vlc_config_cat.h:84
 msgid "Subtitles / OSD"
@@ -190,7 +190,7 @@ msgstr "Divisores"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr "Os divisores separam o fluxo em múltiplos vídeos."
+msgstr "Os divisores separam o transmissão em múltiplos vídeos."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
@@ -214,15 +214,15 @@ msgstr ""
 
 #: include/vlc_config_cat.h:107
 msgid "Stream filters"
-msgstr "Filtros de fluxo"
+msgstr "Filtros de transmissão"
 
 #: include/vlc_config_cat.h:109
 msgid ""
 "Stream filters are special modules that allow advanced operations on the "
 "input side of VLC. Use with care..."
 msgstr ""
-"Filtros de fluxos são módulos especiais que permitem operações avançadas na "
-"entrada do VLC. Use com cautela..."
+"Filtros de transmissões são módulos especiais que permitem operações "
+"avançadas na entrada do VLC. Use com cautela..."
 
 #: include/vlc_config_cat.h:112
 msgid "Demuxers"
@@ -230,7 +230,7 @@ msgstr "Descombinadores"
 
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
-msgstr "Descombinadores são usados para separar fluxos de áudio e vídeo."
+msgstr "Descombinadores são usados para separar transmissões de áudio e vídeo."
 
 #: include/vlc_config_cat.h:115
 msgid "Video codecs"
@@ -267,7 +267,7 @@ msgstr "Configurações gerais de entrada. Use com cautela..."
 #: include/vlc_config_cat.h:127 src/libvlc-module.c:1962
 #: modules/access/avio.h:50
 msgid "Stream output"
-msgstr "Saída de fluxo"
+msgstr "Saída de transmissão"
 
 #: include/vlc_config_cat.h:129
 msgid ""
@@ -279,17 +279,17 @@ msgid ""
 "Sout streams modules allow advanced stream processing (transcoding, "
 "duplicating...)."
 msgstr ""
-"As configurações de saída de fluxo são usadas quando em modo de transmissão "
-"de fluxo ou salvando entrada de fluxos.\n"
-"Primeiro os fluxos são combinados e então enviados através de um módulo de "
-"\"acesso de saída\" que pode salvar o fluxo em um arquivo ou transmití-lo "
-"(UDP, HTTP, RTP/RTSP).\n"
-"Módulos de saída de fluxo permitem processamento avançado do fluxo "
-"(transcodificação, duplicação...)."
+"As configurações de saída de transmissão são usadas quando em modo de "
+"transmissão de transmissão ou salvando entrada de transmissões.\n"
+"Primeiro as transmissões são combinados e então enviados através de um "
+"módulo de \"acesso de saída\" que pode salvar o transmissão em um arquivo ou "
+"transmití-lo (UDP, HTTP, RTP/RTSP).\n"
+"Módulos de saída de transmissão permitem processamento avançado do "
+"transmissão (transcodificação, duplicação...)."
 
 #: include/vlc_config_cat.h:137
 msgid "General stream output settings"
-msgstr "Configurações gerais de saída de fluxo"
+msgstr "Configurações gerais de saída de transmissão"
 
 #: include/vlc_config_cat.h:139
 msgid "Muxers"
@@ -302,9 +302,10 @@ msgid ""
 "always force a specific muxer. You should probably not do that.\n"
 "You can also set default parameters for each muxer."
 msgstr ""
-"Combinadores criam formatos de encapsulamento que são usados para unir os "
-"fluxos primários (vídeos, áudio, etc.). Esta configuração permite escolher "
-"um combinador específico. Você provavelmente não precisará desta opção.\n"
+"Combinadores criam formatos de encapsulamento que são usados para unir as "
+"transmissões primários (vídeos, áudio, etc.). Esta configuração permite "
+"escolher um combinador específico. Você provavelmente não precisará desta "
+"opção.\n"
 "Você também pode redefinir as configurações padrão para cada combinador."
 
 #: include/vlc_config_cat.h:147
@@ -318,7 +319,7 @@ msgid ""
 "should probably not do that.\n"
 "You can also set default parameters for each access output."
 msgstr ""
-"Módulos de saída de acesso controlam por onde os fluxos combinados são "
+"Módulos de saída de acesso controlam por onde as transmissões combinados são "
 "enviados. Esta configuração permite escolher um método de saída de acesso "
 "específico."
 
@@ -333,14 +334,14 @@ msgid ""
 "not do that.\n"
 "You can also set default parameters for each packetizer."
 msgstr ""
-"Empacotadores são usados para \"pré processar\" os fluxos primários antes de "
-"combiná-los. Esta configuração permite escolher um empacotador específico. "
-"Você provavelmente não precisará desta opção.\n"
+"Empacotadores são usados para \"pré processar\" as transmissões primários "
+"antes de combiná-los. Esta configuração permite escolher um empacotador "
+"específico. Você provavelmente não precisará desta opção.\n"
 "Você também pode redefinir as configurações padrão para cada empacotador."
 
 #: include/vlc_config_cat.h:162
 msgid "Sout stream"
-msgstr "Fluxo Sout"
+msgstr "Transmissão Sout"
 
 #: include/vlc_config_cat.h:163
 msgid ""
@@ -348,9 +349,10 @@ msgid ""
 "the Streaming Howto for more information. You can configure default options "
 "for each sout stream module here."
 msgstr ""
-"Módulos de fluxo Sout permitem fazer processamento de saída de fluxos em "
-"conjunto. Por favor verifique o guia sobre fluxos para maiores informações. "
-"Você também pode configurar opções padrão para cada módulo de fluxo Sout."
+"Módulos de transmissão Sout permitem fazer processamento de saída de "
+"transmissões em conjunto. Por favor verifique o guia sobre transmissões para "
+"maiores informações. Você também pode configurar opções padrão para cada "
+"módulo de transmissão Sout."
 
 #: include/vlc_config_cat.h:168
 msgid "VOD"
@@ -514,7 +516,7 @@ msgstr "Exibir o Conteúdo da Pasta..."
 
 #: include/vlc_intf_strings.h:74
 msgid "Stream..."
-msgstr "Fluxo..."
+msgstr "Transmissão..."
 
 #: include/vlc_intf_strings.h:75
 msgid "Save..."
@@ -610,23 +612,23 @@ msgstr ""
 "como usar o reprodutor no documento <br>\"<a href=\"http://wiki.videolan.org/"
 "Documentation:Play_HowTo\"><em>Como reproduzir arquivos com o reprodutor de "
 "mídias VLC</em></a>\".</p><p>Para todas as tarefas de salvar, converter, "
-"transcodificar, codificar, combinar e criar fluxos, você deve encontrar "
-"informações úteis na <a href=\"http://wiki.videolan.org/Documentation:"
-"Streaming_HowTo\">Documentação sobre fluxos</a>.</p><p>Se você não está "
-"fluente na terminologia, por favor consulte a <a href=\"http://wiki.videolan."
-"org/Knowledge_Base\">base de conhecimento</a>.</p><p>Para conhecer as "
-"principais teclas de atalho, leia a página <a href=\"http://wiki.videolan."
-"org/Hotkeys\">atalhos</a>.</p><h3>Ajuda</h3><p>Antes de fazer uma pergunta, "
-"por favor verifique as <a href=\"http://www.videolan.org/support/faq.html"
-"\">Perguntas Freqüentes</a>.</p><p>Você poderá encontrar (e fornecer) ajuda "
-"nos <a href=\"http://forum.videolan.org\">Fóruns</a>, nas <a href=\"http://"
-"www.videolan.org/vlc/lists.html\">listas de discussão</a> ou em nosso canal "
-"IRC (<em>#videolan</em> em irc.freenode.net).</p><h3>Contribua no projeto</"
-"h3><p>Você pode ajudar o projeto VideoLAN doando seu tempo para ajudar a "
-"comunidade, para desenhar capas, para traduzir a documentação, para testar e "
-"para programar. Você pode também doar dinheiro e material para nos ajudar. "
-"E, claro, você pode <b>promover</b> o reprodutor de mídias VLC.</p></body></"
-"html>"
+"transcodificar, codificar, combinar e criar transmissões, você deve "
+"encontrar informações úteis na <a href=\"http://wiki.videolan.org/"
+"Documentation:Streaming_HowTo\">Documentação sobre transmissões</a>.</"
+"p><p>Se você não está fluente na terminologia, por favor consulte a <a href="
+"\"http://wiki.videolan.org/Knowledge_Base\">base de conhecimento</a>.</"
+"p><p>Para conhecer as principais teclas de atalho, leia a página <a href="
+"\"http://wiki.videolan.org/Hotkeys\">atalhos</a>.</p><h3>Ajuda</h3><p>Antes "
+"de fazer uma pergunta, por favor verifique as <a href=\"http://www.videolan."
+"org/support/faq.html\">Perguntas Freqüentes</a>.</p><p>Você poderá encontrar "
+"(e fornecer) ajuda nos <a href=\"http://forum.videolan.org\">Fóruns</a>, nas "
+"<a href=\"http://www.videolan.org/vlc/lists.html\">listas de discussão</a> "
+"ou em nosso canal IRC (<em>#videolan</em> em irc.freenode.net).</"
+"p><h3>Contribua no projeto</h3><p>Você pode ajudar o projeto VideoLAN doando "
+"seu tempo para ajudar a comunidade, para desenhar capas, para traduzir a "
+"documentação, para testar e para programar. Você pode também doar dinheiro e "
+"material para nos ajudar. E, claro, você pode <b>promover</b> o reprodutor "
+"de mídias VLC.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -799,18 +801,18 @@ msgid ""
 "  vlc://quit                     Special item to quit VLC\n"
 "\n"
 msgstr ""
-"Uso: %s [opções] [fluxo] ...\n"
-"Você pode especificar vários fluxos na linha de comando.\n"
+"Uso: %s [opções] [transmissão] ...\n"
+"Você pode especificar vários transmissões na linha de comando.\n"
 "Eles serão enfileirados na lista de reprodução.\n"
 "O primeiro item especificado será reproduzido primeiro.\n"
 "\n"
 "Estilos de opções:\n"
 "  --opção  Uma opção global que é definida durante a duração do programa.\n"
 "   -opção  Uma versão de uma única letra de uma versão global --opção.\n"
-"   :opção  Uma opção que só se aplica ao fluxo diretamente antes dele\n"
+"   :opção  Uma opção que só se aplica ao transmissão diretamente antes dele\n"
 "            e que sobrepõe as configurações anteriores.\n"
 "\n"
-"Sintaxe do fluxo MRL:\n"
+"Sintaxe do transmissão MRL:\n"
 "  [[access][/demux]://]URL[@[título][:capítulo][-[título][:capítulo]]] [:"
 "opção=valor ...]\n"
 "\n"
@@ -829,8 +831,8 @@ msgstr ""
 "  cdda://[dispositivo]              Leitor de CD de áudio\n"
 "  udp://[[<endereço de origem>]@[<endereço do serviço>][:<porta do "
 "serviço>]]\n"
-"                                 fluxo UDP enviado por um servidor de "
-"fluxos\n"
+"                                 transmissão UDP enviado por um servidor de "
+"transmissões\n"
 "  vlc://pause:<segundos>          Pausa a lista de reprodução por um certo "
 "tempo\n"
 "  vlc://quit                     Item especial para encerrar o VLC\n"
@@ -942,7 +944,7 @@ msgstr "decodificador"
 #: modules/codec/avcodec/encoder.c:371 modules/codec/avcodec/encoder.c:905
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
-msgstr "Fluxo / Transcodificação falhou"
+msgstr "Transmissão / Transcodificação falhou"
 
 #: src/input/decoder.c:1918
 #, c-format
@@ -972,7 +974,7 @@ msgstr "Programa"
 #: src/input/es_out.c:1221
 #, c-format
 msgid "Stream %d"
-msgstr "Fluxo %d"
+msgstr "Transmissão %d"
 
 #: src/input/es_out.c:1474 src/input/es_out.c:1476
 msgid "Scrambled"
@@ -1566,11 +1568,11 @@ msgstr ""
 
 #: src/libvlc-module.c:90
 msgid "Default stream"
-msgstr "Fluxo padrão"
+msgstr "Transmissão padrão"
 
 #: src/libvlc-module.c:92
 msgid "This stream will always be opened at VLC startup."
-msgstr "Este fluxo sempre estará aberto quando o VLC iniciar."
+msgstr "Este transmissão sempre estará aberto quando o VLC iniciar."
 
 #: src/libvlc-module.c:94
 msgid "Color messages"
@@ -1736,7 +1738,7 @@ msgid ""
 "hardware and the audio stream are compatible."
 msgstr ""
 "Define o modo dos canais de saída que será usado por padrão se o seu "
-"dispositivo e o fluxo de áudio forem compatíveis."
+"dispositivo e o transmissão de áudio forem compatíveis."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -1761,10 +1763,10 @@ msgid ""
 "actually encoded with Dolby Surround, turning on this option might enhance "
 "your experience, especially when combined with the Headphone Channel Mixer."
 msgstr ""
-"Use esta opção quando estiver certo que o fluxo está (ou não está) "
+"Use esta opção quando estiver certo que o transmissão está (ou não está) "
 "codificado com a tecnologia Dolby Surround, mas sua detecção não está "
 "funcionando corretamente.\n"
-"Mesmo que o fluxo não esteja codificado de fato com Dolby Surround, "
+"Mesmo que o transmissão não esteja codificado de fato com Dolby Surround, "
 "habilitar esta opção deve melhorar o som, especialmente quando combinado com "
 "o misturador de canais de fone de ouvido."
 
@@ -1831,8 +1833,8 @@ msgid ""
 "This allows you to change the default target level (89 dB) for stream with "
 "replay gain information"
 msgstr ""
-"Permite alterar a meta padrão do nível (89 dB) para um fluxo com informação "
-"de ganho de repetição"
+"Permite alterar a meta padrão do nível (89 dB) para um transmissão com "
+"informação de ganho de repetição"
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
@@ -1840,7 +1842,7 @@ msgstr "Ganho de reprodução padrão"
 
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
-msgstr "Ganho usado por fluxos sem informação de ganho de repetição"
+msgstr "Ganho usado por transmissões sem informação de ganho de repetição"
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
@@ -2412,8 +2414,8 @@ msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr ""
-"Habilita o descarte de quadros em fluxos MPEG2. O descarte ocorre quando seu "
-"computador não possui capacidade de processamento suficiente"
+"Habilita o descarte de quadros em transmissões MPEG2. O descarte ocorre "
+"quando seu computador não possui capacidade de processamento suficiente"
 
 #: src/libvlc-module.c:473
 msgid "Drop late frames"
@@ -2520,7 +2522,7 @@ msgid ""
 msgstr ""
 "É possível desabilitar a sincronização da entrada para fontes que funcionam "
 "em tempo real. Use esta opção se estiver percebendo uma reprodução irregular "
-"de fluxos em rede."
+"de transmissões em rede."
 
 #: src/libvlc-module.c:528
 msgid "Clock jitter"
@@ -2598,8 +2600,8 @@ msgid ""
 "in default)."
 msgstr ""
 "Este é o limite de saltos (também conhecido como \"Tempo Limite\" ou TTL) "
-"dos pacotes multicast enviados para a saída de fluxo (-1 = usar o padrão do "
-"sistema operacional)."
+"dos pacotes multicast enviados para a saída de transmissão (-1 = usar o "
+"padrão do sistema operacional)."
 
 #: src/libvlc-module.c:555
 msgid "Multicast output interface"
@@ -2619,9 +2621,9 @@ msgid ""
 "Differentiated Services Code Point for outgoing UDP streams (or IPv4 Type Of "
 "Service, or IPv6 Traffic Class). This is used for network Quality of Service."
 msgstr ""
-"Este é o campo Differentiated Services Code Point para saídas de fluxo UDP "
-"(ou Tipo de Serviço no IPv4, ou ainda Classe de Tráfego no IPv6). É usado "
-"para qualidade de serviço em rede."
+"Este é o campo Differentiated Services Code Point para saídas de transmissão "
+"UDP (ou Tipo de Serviço no IPv4, ou ainda Classe de Tráfego no IPv6). É "
+"usado para qualidade de serviço em rede."
 
 #: src/libvlc-module.c:566
 msgid ""
@@ -2629,8 +2631,8 @@ msgid ""
 "if you want to read a multi-program stream (like DVB streams for example)."
 msgstr ""
 "Escolha o programa a ser selecionado por seu identificador de serviço. Só "
-"use esta opção se quiser ler um fluxo de vários programas (como fluxos DVB, "
-"por exemplo)."
+"use esta opção se quiser ler um transmissão de vários programas (como "
+"transmissões DVB, por exemplo)."
 
 #: src/libvlc-module.c:572
 msgid ""
@@ -2640,7 +2642,8 @@ msgid ""
 msgstr ""
 "Escolha os programas a serem selecionados fornecendo uma lista de "
 "identificadores de serviço, separada por vírgulas. Só use esta opção se "
-"quiser ler um fluxo de vários programas (como fluxos DVB, por exemplo)."
+"quiser ler um transmissão de vários programas (como transmissões DVB, por "
+"exemplo)."
 
 #: src/libvlc-module.c:578 modules/gui/qt/ui/open_disk.h:311
 msgid "Audio track"
@@ -2648,7 +2651,7 @@ msgstr "Trilha de áudio"
 
 #: src/libvlc-module.c:580
 msgid "Stream number of the audio track to use (from 0 to n)."
-msgstr "Número do fluxo da trilha de áudio a ser usada (de 0 a n)."
+msgstr "Número do transmissão da trilha de áudio a ser usada (de 0 a n)."
 
 #: src/libvlc-module.c:583 modules/gui/qt/ui/open_disk.h:312
 msgid "Subtitle track"
@@ -2656,7 +2659,7 @@ msgstr "Trilha de legenda"
 
 #: src/libvlc-module.c:585
 msgid "Stream number of the subtitle track to use (from 0 to n)."
-msgstr "Número do fluxo de legenda a ser usado (de 0 a n)."
+msgstr "Número do transmissão de legenda a ser usado (de 0 a n)."
 
 #: src/libvlc-module.c:588 modules/stream_out/transcode/transcode.c:97
 msgid "Audio language"
@@ -2703,7 +2706,7 @@ msgstr "Código da trilha de áudio"
 
 #: src/libvlc-module.c:606
 msgid "Stream ID of the audio track to use."
-msgstr "Código do fluxo da trilha de áudio a ser usada."
+msgstr "Código do transmissão da trilha de áudio a ser usada."
 
 #: src/libvlc-module.c:608
 msgid "Subtitle track ID"
@@ -2711,7 +2714,7 @@ msgstr "ID da trilha de legenda"
 
 #: src/libvlc-module.c:610
 msgid "Stream ID of the subtitle track to use."
-msgstr "Código do fluxo da trilha da legenda a ser usada."
+msgstr "Código do transmissão da trilha da legenda a ser usada."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
@@ -2771,7 +2774,7 @@ msgstr "Momento de início"
 
 #: src/libvlc-module.c:636
 msgid "The stream will start at this position (in seconds)."
-msgstr "Este fluxo iniciará nesta posição (em segundos)."
+msgstr "Este transmissão iniciará nesta posição (em segundos)."
 
 #: src/libvlc-module.c:638 modules/gui/macosx/VLCOpenWindowController.m:161
 msgid "Stop time"
@@ -2779,7 +2782,7 @@ msgstr "Momento de parada"
 
 #: src/libvlc-module.c:640
 msgid "The stream will stop at this position (in seconds)."
-msgstr "O fluxo vai parar nesta posição (em segundos)."
+msgstr "O transmissão vai parar nesta posição (em segundos)."
 
 #: src/libvlc-module.c:642
 msgid "Run time"
@@ -2787,7 +2790,7 @@ msgstr "Momento de reprodução"
 
 #: src/libvlc-module.c:644
 msgid "The stream will run this duration (in seconds)."
-msgstr "O fluxo será reproduzido por esta duração (em segundos)."
+msgstr "O transmissão será reproduzido por esta duração (em segundos)."
 
 #: src/libvlc-module.c:646 modules/gui/qt/ui/sprefs_input.h:362
 msgid "Fast seek"
@@ -2833,7 +2836,7 @@ msgstr ""
 
 #: src/libvlc-module.c:665
 msgid "Bookmarks list for a stream"
-msgstr "Lista de favoritos para um fluxo"
+msgstr "Lista de favoritos para um transmissão"
 
 #: src/libvlc-module.c:667
 msgid ""
@@ -2841,8 +2844,8 @@ msgid ""
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
 "{...}\""
 msgstr ""
-"É possível entregar manualmente uma lista de preferidos a um fluxo na forma "
-"\"{nome=nome-do-preferido,instante=deslocamento-de-tempo-opcional,"
+"É possível entregar manualmente uma lista de preferidos a um transmissão na "
+"forma \"{nome=nome-do-preferido,instante=deslocamento-de-tempo-opcional,"
 "bytes=deslocamento-opcional-de-bytes},{...}\""
 
 #: src/libvlc-module.c:671
@@ -2855,15 +2858,15 @@ msgstr "A pasta onde as gravações serão armazenadas"
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
-msgstr "Preferir gravação em fluxo nativo"
+msgstr "Preferir gravação em transmissão nativo"
 
 #: src/libvlc-module.c:677
 msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
 msgstr ""
-"Quando é possível, o fluxo de entrada será gravado em vez de usar o módulo "
-"do fluxo de saída"
+"Quando é possível, o transmissão de entrada será gravado em vez de usar o "
+"módulo do transmissão de saída"
 
 #: src/libvlc-module.c:680
 msgid "Timeshift directory"
@@ -2884,7 +2887,7 @@ msgid ""
 "to store the timeshifted streams."
 msgstr ""
 "Tamanho máximo, em bytes, dos arquivos temporários que serão usados para "
-"armazenar os fluxos com deslocamento de tempo."
+"armazenar as transmissões com deslocamento de tempo."
 
 #: src/libvlc-module.c:689
 msgid "Change title according to current media"
@@ -3334,7 +3337,7 @@ msgstr ""
 "Esta opção pode ser usada para alterar o modo como o VLC seleciona seus "
 "codificadores (métodos de descompressão). Somente usuários avançados devem "
 "alterar esta opção, pois ela pode prejudicar a reprodução de todos os seus "
-"fluxos."
+"transmissões."
 
 #: src/libvlc-module.c:908
 msgid "Preferred decoders list"
@@ -3349,7 +3352,7 @@ msgstr ""
 "Lista de codificadores que o VLC usará de forma prioritária. Por exemplo, "
 "'dummy,a52' indica o uso dos codecs simplificados e a52 antes de tentar "
 "quaisquer outros. Esta opção só deve ser alterada por usuários experientes, "
-"já que pode prejudicar a reprodução de todos os fluxos."
+"já que pode prejudicar a reprodução de todos as transmissões."
 
 #: src/libvlc-module.c:915
 msgid "Preferred encoders list"
@@ -3368,11 +3371,11 @@ msgid ""
 "subsystem."
 msgstr ""
 "Estas opções permitem configurar opções globais para o subsistema de saída "
-"de fluxo."
+"de transmissão."
 
 #: src/libvlc-module.c:929
 msgid "Default stream output chain"
-msgstr "Agrupamento padrão de saída de fluxo"
+msgstr "Agrupamento padrão de saída de transmissão"
 
 #: src/libvlc-module.c:931
 msgid ""
@@ -3380,17 +3383,17 @@ msgid ""
 "to learn how to build such chains. Warning: this chain will be enabled for "
 "all streams."
 msgstr ""
-"Você pode preencher um agrupamento padrão de saída de fluxo. Veja a "
+"Você pode preencher um agrupamento padrão de saída de transmissão. Veja a "
 "documentação para aprender como criar tais agrupamentos. Aviso: este "
-"agrupamento será habilitado para todos os fluxos."
+"agrupamento será habilitado para todos as transmissões."
 
 #: src/libvlc-module.c:935
 msgid "Enable streaming of all ES"
-msgstr "Habilitar fluxo de todos os fluxos primários"
+msgstr "Habilitar transmissão de todos as transmissões primários"
 
 #: src/libvlc-module.c:937
 msgid "Stream all elementary streams (video, audio and subtitles)"
-msgstr "Transmitir todos os fluxos primários (vídeo, áudio e legenda)"
+msgstr "Transmitir todos as transmissões primários (vídeo, áudio e legenda)"
 
 #: src/libvlc-module.c:939
 msgid "Display while streaming"
@@ -3398,47 +3401,47 @@ msgstr "Exibir enquanto transmite"
 
 #: src/libvlc-module.c:941
 msgid "Play locally the stream while streaming it."
-msgstr "Reproduz localmente o fluxo enquanto o transmite."
+msgstr "Reproduz localmente o transmissão enquanto o transmite."
 
 #: src/libvlc-module.c:943
 msgid "Enable video stream output"
-msgstr "Habilitar saída de fluxo de vídeo"
+msgstr "Habilitar saída de transmissão de vídeo"
 
 #: src/libvlc-module.c:945
 msgid ""
 "Choose whether the video stream should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"Escolha se o fluxo de vídeo deve ser redirecionado para a saída de fluxos,  "
-"quando esta estiver habilitada."
+"Escolha se o transmissão de vídeo deve ser redirecionado para a saída de "
+"transmissões,  quando esta estiver habilitada."
 
 #: src/libvlc-module.c:948
 msgid "Enable audio stream output"
-msgstr "Habilitar fluxo de saída de áudio"
+msgstr "Habilitar transmissão de saída de áudio"
 
 #: src/libvlc-module.c:950
 msgid ""
 "Choose whether the audio stream should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"Escolha se o fluxo de áudio deve ser redirecionado para a saída de fluxos,  "
-"quando esta estiver habilitada."
+"Escolha se o transmissão de áudio deve ser redirecionado para a saída de "
+"transmissões,  quando esta estiver habilitada."
 
 #: src/libvlc-module.c:953
 msgid "Enable SPU stream output"
-msgstr "Habilitar fluxo de saída SPU"
+msgstr "Habilitar transmissão de saída SPU"
 
 #: src/libvlc-module.c:955
 msgid ""
 "Choose whether the SPU streams should be redirected to the stream output "
 "facility when this last one is enabled."
 msgstr ""
-"Escolha se os fluxos SPU devem ser redirecionado para a saída de fluxos,  "
-"quando esta estiver habilitada."
+"Escolha se as transmissões SPU devem ser redirecionado para a saída de "
+"transmissões,  quando esta estiver habilitada."
 
 #: src/libvlc-module.c:958
 msgid "Keep stream output open"
-msgstr "Manter a saída de fluxo aberta"
+msgstr "Manter a saída de transmissão aberta"
 
 #: src/libvlc-module.c:960
 msgid ""
@@ -3446,13 +3449,13 @@ msgid ""
 "playlist item (automatically insert the gather stream output if not "
 "specified)"
 msgstr ""
-"Permite manter uma saída de fluxo exclusiva para múltiplos itens da lista de "
-"reprodução (insere automaticamente o coletor de saída de fluxo se não for "
-"especificado um)."
+"Permite manter uma saída de transmissão exclusiva para múltiplos itens da "
+"lista de reprodução (insere automaticamente o coletor de saída de "
+"transmissão se não for especificado um)."
 
 #: src/libvlc-module.c:964
 msgid "Stream output muxer caching (ms)"
-msgstr "Cache (ms) do combinador de saída de fluxo."
+msgstr "Cache (ms) do combinador de saída de transmissão."
 
 #: src/libvlc-module.c:966
 msgid ""
@@ -3460,7 +3463,7 @@ msgid ""
 "muxer. This value should be set in milliseconds."
 msgstr ""
 "Permite que você configure a quantidade inicial de cache para o misturador "
-"de saída de fluxo. Este valor deve ser preenchido em milisegundos."
+"de saída de transmissão. Este valor deve ser preenchido em milisegundos."
 
 #: src/libvlc-module.c:969
 msgid "Preferred packetizer list"
@@ -3533,12 +3536,13 @@ msgstr ""
 
 #: src/libvlc-module.c:1007
 msgid "Stream filter module"
-msgstr "Módulo de filtragem de fluxo"
+msgstr "Módulo de filtragem de transmissão"
 
 #: src/libvlc-module.c:1009
 msgid "Stream filters are used to modify the stream that is being read."
 msgstr ""
-"Filtros de fluxo são usados para modificar o fluxo que está sendo lido."
+"Filtros de transmissão são usados para modificar o transmissão que está "
+"sendo lido."
 
 #: src/libvlc-module.c:1011
 msgid "Demux filter module"
@@ -3547,8 +3551,8 @@ msgstr "Módulo de filtro de descombinação"
 #: src/libvlc-module.c:1013
 msgid "Demux filters are used to modify/control the stream that is being read."
 msgstr ""
-"Filtros de descombinação são usados para modificar/controlar o fluxo que "
-"está sendo lido."
+"Filtros de descombinação são usados para modificar/controlar o transmissão "
+"que está sendo lido."
 
 #: src/libvlc-module.c:1015
 msgid "Demux module"
@@ -3561,10 +3565,10 @@ msgid ""
 "automatically detected. You should not set this as a global option unless "
 "you really know what you are doing."
 msgstr ""
-"Descombinadores são usados para separar os fluxos \"primários\" (como os "
-"fluxos de áudio e vídeo). Você pode usar usar esta opção se o descombinador "
-"correto não for identificado automaticamente. Não configure esta opção como "
-"uma opção global, a não ser que saiba o que está fazendo."
+"Descombinadores são usados para separar as transmissões \"primários\" (como "
+"as transmissões de áudio e vídeo). Você pode usar usar esta opção se o "
+"descombinador correto não for identificado automaticamente. Não configure "
+"esta opção como uma opção global, a não ser que saiba o que está fazendo."
 
 #: src/libvlc-module.c:1022
 msgid "VoD server module"
@@ -3590,9 +3594,9 @@ msgid ""
 "only activate this if you know what you're doing."
 msgstr ""
 "Executar o VLC em prioridade de tempo real permite um escalonamento muito "
-"mais preciso e resultados melhores, especialmente com conteúdos em fluxo. "
-"Entretanto, esta opção pode travar seu computador ou torná-lo muito lento."
-"Você só deve habilitar esta opção se souber o que está fazendo."
+"mais preciso e resultados melhores, especialmente com conteúdos em "
+"transmissão. Entretanto, esta opção pode travar seu computador ou torná-lo "
+"muito lento.Você só deve habilitar esta opção se souber o que está fazendo."
 
 #: src/libvlc-module.c:1035
 msgid "Adjust VLC priority"
@@ -3612,7 +3616,8 @@ msgstr ""
 msgid ""
 "This option is useful if you want to lower the latency when reading a stream"
 msgstr ""
-"Esta opção é útil se você quiser reduzir a latência de leitura de um fluxo"
+"Esta opção é útil se você quiser reduzir a latência de leitura de um "
+"transmissão"
 
 #: src/libvlc-module.c:1045
 msgid "VLM configuration file"
@@ -6690,7 +6695,7 @@ msgid ""
 "Show the properties dialog of the selected device before starting the stream."
 msgstr ""
 "Exibe a janela de propriedades do dispositivo selecionado, antes de iniciar "
-"o fluxo."
+"o transmissão."
 
 #: modules/access/dshow/dshow.cpp:159
 msgid "Tuner properties"
@@ -7091,7 +7096,7 @@ msgstr "Intervalo de tempo da camada C"
 
 #: modules/access/dtv/access.c:156
 msgid "Stream identifier"
-msgstr "Identificador do fluxo"
+msgstr "Identificador do transmissão"
 
 #: modules/access/dtv/access.c:158
 msgid "Pilot"
@@ -7115,7 +7120,7 @@ msgstr "0.25"
 
 #: modules/access/dtv/access.c:168
 msgid "Transport stream ID"
-msgstr "ID do transporte do fluxo"
+msgstr "ID do transporte do transmissão"
 
 #: modules/access/dtv/access.c:170
 msgid "Polarization (Voltage)"
@@ -7602,7 +7607,8 @@ msgstr "Reconectar automaticamente"
 #: modules/access/http.c:61
 msgid ""
 "Automatically try to reconnect to the stream in case of a sudden disconnect."
-msgstr "Tentar se reconectar ao fluxo automaticamente em caso de desconexão."
+msgstr ""
+"Tentar se reconectar ao transmissão automaticamente em caso de desconexão."
 
 #: modules/access/http.c:65
 msgid "HTTP input"
@@ -7632,7 +7638,7 @@ msgstr "HTTPS"
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
-msgstr "Fluxo contínuo"
+msgstr "Transmissão contínuo"
 
 #: modules/access/http/access.c:297
 msgid "Keep reading a resource that keeps being updated."
@@ -7686,7 +7692,7 @@ msgstr "ID"
 
 #: modules/access/imem.c:51 modules/demux/image.c:46
 msgid "Set the ID of the elementary stream"
-msgstr "Definir o identificador do fluxo primário"
+msgstr "Definir o identificador do transmissão primário"
 
 #: modules/access/imem.c:53 modules/demux/image.c:48
 msgid "Group"
@@ -7694,7 +7700,7 @@ msgstr "Grupo"
 
 #: modules/access/imem.c:55 modules/demux/image.c:50
 msgid "Set the group of the elementary stream"
-msgstr "Definir o grupo do fluxo primário"
+msgstr "Definir o grupo do transmissão primário"
 
 #: modules/access/imem.c:57
 msgid "Category"
@@ -7702,7 +7708,7 @@ msgstr "Categoria"
 
 #: modules/access/imem.c:59
 msgid "Set the category of the elementary stream"
-msgstr "Definir a categoria do fluxo primário"
+msgstr "Definir a categoria do transmissão primário"
 
 #: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:363
 #: modules/gui/qt/managers/addons_manager.cpp:98
@@ -7715,15 +7721,15 @@ msgstr "Dados"
 
 #: modules/access/imem.c:69
 msgid "Set the codec of the elementary stream"
-msgstr "Definir o codificador do fluxo primário"
+msgstr "Definir o codificador do transmissão primário"
 
 #: modules/access/imem.c:73
 msgid "Language of the elementary stream as described by ISO639"
-msgstr "Idioma do fluxo primário, conforme descrito pela ISO639"
+msgstr "Idioma do transmissão primário, conforme descrito pela ISO639"
 
 #: modules/access/imem.c:77
 msgid "Sample rate of an audio elementary stream"
-msgstr "Taxa de amostragem de um fluxo primário de áudio"
+msgstr "Taxa de amostragem de um transmissão primário de áudio"
 
 #: modules/access/imem.c:79 modules/audio_output/amem.c:51
 msgid "Channels count"
@@ -7731,7 +7737,7 @@ msgstr "Contagem de canais"
 
 #: modules/access/imem.c:81
 msgid "Channels count of an audio elementary stream"
-msgstr "Contagem de canais de um fluxo de áudio primário"
+msgstr "Contagem de canais de um transmissão de áudio primário"
 
 #: modules/access/imem.c:83 modules/access/v4l2/v4l2.c:65
 #: modules/demux/rawvid.c:47
@@ -7745,7 +7751,7 @@ msgstr "Largura"
 
 #: modules/access/imem.c:84
 msgid "Width of video or subtitle elementary streams"
-msgstr "Largura dos fluxos primários de vídeo ou legenda"
+msgstr "Largura dos transmissões primários de vídeo ou legenda"
 
 #: modules/access/imem.c:86 modules/access/v4l2/v4l2.c:66
 #: modules/demux/rawvid.c:51
@@ -7758,7 +7764,7 @@ msgstr "Altura"
 
 #: modules/access/imem.c:87
 msgid "Height of video or subtitle elementary streams"
-msgstr "Altura dos fluxos primários de vídeo ou legenda"
+msgstr "Altura dos transmissões primários de vídeo ou legenda"
 
 #: modules/access/imem.c:89
 msgid "Display aspect ratio"
@@ -7766,11 +7772,11 @@ msgstr "Proporção da tela"
 
 #: modules/access/imem.c:91
 msgid "Display aspect ratio of a video elementary stream"
-msgstr "Exibir proporção de fluxos primários de vídeo"
+msgstr "Exibir proporção de transmissões primários de vídeo"
 
 #: modules/access/imem.c:95
 msgid "Frame rate of a video elementary stream"
-msgstr "Taxa de quadros de um fluxo primário de vídeo"
+msgstr "Taxa de quadros de um transmissão primário de vídeo"
 
 #: modules/access/imem.c:97
 msgid "Callback cookie string"
@@ -7812,7 +7818,7 @@ msgstr "Tamanho"
 
 #: modules/access/imem.c:115
 msgid "Size of stream in bytes"
-msgstr "Tamanho do fluxo em bytes"
+msgstr "Tamanho do transmissão em bytes"
 
 #: modules/access/imem.c:118 modules/access/imem.c:119
 msgid "Memory input"
@@ -7820,11 +7826,11 @@ msgstr "Entrada de memória"
 
 #: modules/access/imem-access.c:159
 msgid "Memory stream"
-msgstr "Fluxo em memória"
+msgstr "Transmissão em memória"
 
 #: modules/access/imem-access.c:160
 msgid "In-memory stream input"
-msgstr "Entrada de fluxo em memória"
+msgstr "Entrada de transmissão em memória"
 
 #: modules/access/jack.c:59
 msgid "Pace"
@@ -7832,7 +7838,7 @@ msgstr "Pace"
 
 #: modules/access/jack.c:61
 msgid "Read the audio stream at VLC pace rather than Jack pace."
-msgstr "Lê o fluxo de áudio no pace do VLC em vez de no pace Jack."
+msgstr "Lê o transmissão de áudio no pace do VLC em vez de no pace Jack."
 
 #: modules/access/jack.c:62 modules/gui/qt/components/open_panels.cpp:903
 msgid "Auto connection"
@@ -8029,19 +8035,19 @@ msgstr "A conexão RTSP falhou"
 
 #: modules/access/live555.cpp:699
 msgid "Access to the stream is denied by the server configuration."
-msgstr "O acesso ao fluxo foi negado pela configuração do servidor."
+msgstr "O acesso ao transmissão foi negado pela configuração do servidor."
 
 #: modules/access/mms/mms.c:49
 msgid "Force selection of all streams"
-msgstr "Impor seleção de todos os fluxos"
+msgstr "Impor seleção de todos as transmissões"
 
 #: modules/access/mms/mms.c:51
 msgid ""
 "MMS streams can contain several elementary streams, with different bitrates. "
 "You can choose to select all of them."
 msgstr ""
-"Fluxos MMS pode conter vários fluxos primários, com taxas de bits "
-"diferentes. Você pode escolher selecionar todos eles."
+"transmissões MMS pode conter vários transmissões primários, com taxas de "
+"bits diferentes. Você pode escolher selecionar todos eles."
 
 #: modules/access/mms/mms.c:54
 msgid "Maximum bitrate"
@@ -8049,7 +8055,7 @@ msgstr "Taxa máxima de bits"
 
 #: modules/access/mms/mms.c:56
 msgid "Select the stream with the maximum bitrate under that limit."
-msgstr "Seleciona o fluxo com a taxa de bits máxima dentro do limite."
+msgstr "Seleciona o transmissão com a taxa de bits máxima dentro do limite."
 
 #: modules/access/mms/mms.c:58
 msgid "TCP/UDP timeout (ms)"
@@ -8110,7 +8116,7 @@ msgstr "Falha na operação do NFS"
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
-msgstr "Capturar o fluxo de áudio em estéreo."
+msgstr "Capturar o transmissão de áudio em estéreo."
 
 #: modules/access/oss.c:67 modules/access_output/shout.c:95
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
@@ -8122,8 +8128,8 @@ msgid ""
 "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100, "
 "48000)"
 msgstr ""
-"Taxa de amostragem da captura do fluxo de áudio, em Hz(e.g., 11025, 22050, "
-"44100, 48000)"
+"Taxa de amostragem da captura do transmissão de áudio, em Hz(e.g., 11025, "
+"22050, 44100, 48000)"
 
 #: modules/access/oss.c:76
 msgid "OSS"
@@ -8275,9 +8281,9 @@ msgid ""
 "A description in SDP format is required to receive the RTP stream. Note that "
 "rtp:// URIs cannot work with dynamic RTP payload format (%<PRIu8>)."
 msgstr ""
-"Uma descrição em formato SDP é requerida para receber um fluxo RTP. Atente "
-"que URLs rtp:// não podem funcionar com conteúdos de pacote RTP de formato "
-"dinâmico  (%<PRIu8>)."
+"Uma descrição em formato SDP é requerida para receber um transmissão RTP. "
+"Atente que URLs rtp:// não podem funcionar com conteúdos de pacote RTP de "
+"formato dinâmico  (%<PRIu8>)."
 
 #: modules/access/rtsp/access.c:48 modules/access/rtsp/access.c:49
 msgid "Real RTSP"
@@ -8310,11 +8316,11 @@ msgstr "Tamano (bytes) da memória de recepção do UDP"
 
 #: modules/access/satip.c:63
 msgid "Request multicast stream"
-msgstr "Solicitar um fluxo multicast"
+msgstr "Solicitar um transmissão multicast"
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
-msgstr "Solicitar ao servidor para enviar o fluxo como multicast"
+msgstr "Solicitar ao servidor para enviar o transmissão como multicast"
 
 #: modules/access/satip.c:66 modules/lua/vlc.c:62
 #: share/lua/http/dialogs/stream_config_window.html:28
@@ -8608,7 +8614,7 @@ msgstr "Código de tempo"
 
 #: modules/access/timecode.c:43
 msgid "Time code subpicture elementary stream generator"
-msgstr "Gerador de subtela de código de tempo para fluxo primário"
+msgstr "Gerador de subtela de código de tempo para transmissão primário"
 
 #: modules/access/udp.c:61
 msgid "UDP Source timeout (sec)"
@@ -9249,7 +9255,7 @@ msgstr "Entrada da API da Sessão de Áudio do Windows"
 
 #: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
 msgid "Dummy stream output"
-msgstr "Saída de fluxo simplificada"
+msgstr "Saída de transmissão simplificada"
 
 #: modules/access_output/file.c:314
 msgid "Keep existing file"
@@ -9301,15 +9307,15 @@ msgstr "Abre o arquivo com gravação síncrona."
 
 #: modules/access_output/file.c:387
 msgid "File stream output"
-msgstr "Saída de fluxo em arquivo"
+msgstr "Saída de transmissão em arquivo"
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
 msgid "Username that will be requested to access the stream."
-msgstr "Nome do usuário que será solicitado para acessar o fluxo."
+msgstr "Nome do usuário que será solicitado para acessar o transmissão."
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
-msgstr "Senha que será solicitada para acessar o fluxo."
+msgstr "Senha que será solicitada para acessar o transmissão."
 
 #: modules/access_output/http.c:58 modules/demux/playlist/qtl.c:242
 #: modules/demux/playlist/shoutcast.c:326
@@ -9330,12 +9336,12 @@ msgstr "Meta cubo"
 msgid ""
 "Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
 msgstr ""
-"Usa o protocolo Metacube. Necessário para criar o fluxo para o espelhador "
-"Cubemap."
+"Usa o protocolo Metacube. Necessário para criar o transmissão para o "
+"espelhador Cubemap."
 
 #: modules/access_output/http.c:67
 msgid "HTTP stream output"
-msgstr "Saída de fluxo HTTP"
+msgstr "Saída de transmissão HTTP"
 
 #: modules/access_output/livehttp.c:67
 msgid "Segment length"
@@ -9343,7 +9349,7 @@ msgstr "Comprimento do segmento"
 
 #: modules/access_output/livehttp.c:68
 msgid "Length of TS stream segments"
-msgstr "Comprimento dos segmentos do fluxo TS"
+msgstr "Comprimento dos segmentos do transmissão TS"
 
 #: modules/access_output/livehttp.c:70
 msgid "Split segments anywhere"
@@ -9449,7 +9455,7 @@ msgstr "Número do primeiro segmento gerado"
 
 #: modules/access_output/livehttp.c:109
 msgid "HTTP Live streaming output"
-msgstr "Saída de fluxo de transmissão HTTP ao vivo"
+msgstr "Saída de transmissão de transmissão HTTP ao vivo"
 
 #: modules/access_output/livehttp.c:110
 msgid "LiveHTTP"
@@ -9459,23 +9465,23 @@ msgstr "LiveHTTP"
 #: modules/gui/qt/components/sout/sout_widgets.cpp:385
 #: share/lua/http/dialogs/create_stream.html:139
 msgid "Stream name"
-msgstr "Nome do fluxo"
+msgstr "Nome do transmissão"
 
 #: modules/access_output/shout.c:65
 msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr "Nome deste fluxo/canal no servidor shoutcast/icecast."
+msgstr "Nome deste transmissão/canal no servidor shoutcast/icecast."
 
 #: modules/access_output/shout.c:68
 msgid "Stream description"
-msgstr "Descrição do fluxo"
+msgstr "Descrição do transmissão"
 
 #: modules/access_output/shout.c:69
 msgid "Description of the stream content or information about your channel."
-msgstr "Descrição do conteúdo do fluxo ou informações sobre o canal."
+msgstr "Descrição do conteúdo do transmissão ou informações sobre o canal."
 
 #: modules/access_output/shout.c:72
 msgid "Stream MP3"
-msgstr "Fluxo MP3"
+msgstr "Transmissão MP3"
 
 #: modules/access_output/shout.c:73
 msgid ""
@@ -9483,9 +9489,9 @@ msgid ""
 "possible to stream MP3 instead, so you can forward MP3 streams to the "
 "shoutcast/icecast server."
 msgstr ""
-"Você normalmente deve alimentar o módulo shoutcast com fluxos Ogg. É "
-"possível também usar fluxos MP3, portanto você pode repassar fluxos MP3 para "
-"o servidor shoutcast/icecast."
+"Você normalmente deve alimentar o módulo shoutcast com transmissões Ogg. É "
+"possível também usar transmissões MP3, portanto você pode repassar "
+"transmissões MP3 para o servidor shoutcast/icecast."
 
 #: modules/access_output/shout.c:82
 msgid "Genre description"
@@ -9501,15 +9507,15 @@ msgstr "Descrição da URL"
 
 #: modules/access_output/shout.c:86
 msgid "URL with information about the stream or your channel."
-msgstr "URL com informações sobre o fluxo ou seu canal."
+msgstr "URL com informações sobre o transmissão ou seu canal."
 
 #: modules/access_output/shout.c:93
 msgid "Bitrate information of the transcoded stream."
-msgstr "Informação de taxa de bits do fluxo transcodificado."
+msgstr "Informação de taxa de bits do transmissão transcodificado."
 
 #: modules/access_output/shout.c:96
 msgid "Samplerate information of the transcoded stream."
-msgstr "Informações da amostragem do fluxo transcodificado."
+msgstr "Informações da amostragem do transmissão transcodificado."
 
 #: modules/access_output/shout.c:98
 msgid "Number of channels"
@@ -9517,7 +9523,7 @@ msgstr "Número de canais"
 
 #: modules/access_output/shout.c:99
 msgid "Number of channels information of the transcoded stream."
-msgstr "Informação do número de canais do fluxo transcodificado."
+msgstr "Informação do número de canais do transmissão transcodificado."
 
 #: modules/access_output/shout.c:101
 msgid "Ogg Vorbis Quality"
@@ -9525,11 +9531,11 @@ msgstr "Qualidade do Ogg Vorbis"
 
 #: modules/access_output/shout.c:102
 msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "Qualidade da informação do Ogg Vorbis no fluxo transcodificado."
+msgstr "Qualidade da informação do Ogg Vorbis no transmissão transcodificado."
 
 #: modules/access_output/shout.c:104
 msgid "Stream public"
-msgstr "Fluxo público"
+msgstr "Transmissão público"
 
 #: modules/access_output/shout.c:105
 msgid ""
@@ -9538,8 +9544,9 @@ msgid ""
 "information specified for shoutcast. Requires Ogg streaming for icecast."
 msgstr ""
 "Torna o servidor disponível publicamente nas \"Páginas Amarelas\" (lista de "
-"diretório de fluxos) no site icecast/shoutcast. Requer informações de taxa "
-"de bits específicas para shoutcast. Requer fluxos Ogg para icecast."
+"diretório de transmissões) no site icecast/shoutcast. Requer informações de "
+"taxa de bits específicas para shoutcast. Requer transmissões Ogg para "
+"icecast."
 
 #: modules/access_output/shout.c:111
 msgid "IceCAST output"
@@ -9563,11 +9570,11 @@ msgstr "32 bytes"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
-msgstr "Saída de fluxo SRT"
+msgstr "Saída de transmissão SRT"
 
 #: modules/access_output/srt.c:446
 msgid "Password for stream encryption"
-msgstr "Senha para criptografia do fluxo"
+msgstr "Senha para criptografia do transmissão"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9578,7 +9585,7 @@ msgid ""
 "Default caching value for outbound UDP streams. This value should be set in "
 "milliseconds."
 msgstr ""
-"Valor padrão de cache para saída de fluxos UDP. Este valor deve ser "
+"Valor padrão de cache para saída de transmissões UDP. Este valor deve ser "
 "preenchido em milissegundos."
 
 #: modules/access_output/udp.c:67
@@ -9597,7 +9604,7 @@ msgstr ""
 
 #: modules/access_output/udp.c:75
 msgid "UDP stream output"
-msgstr "Saída de fluxo UDP"
+msgstr "Saída de transmissão UDP"
 
 #: modules/arm_neon/chroma_yuv.c:35
 msgid "ARM NEON video chroma conversions"
@@ -9696,7 +9703,8 @@ msgstr "Gráfico Audiobar"
 
 #: modules/audio_filter/channel_mixer/dolby.c:50
 msgid "Simple decoder for Dolby Surround encoded streams"
-msgstr "Decodificador simplificado para fluxos codificados com Dolby Surround"
+msgstr ""
+"Decodificador simplificado para transmissões codificados com Dolby Surround"
 
 #: modules/audio_filter/channel_mixer/dolby.c:51
 msgid "Dolby Surround decoder"
@@ -9748,8 +9756,8 @@ msgid ""
 "Dolby Surround encoded streams won't be decoded before being processed by "
 "this filter. Enabling this setting is not recommended."
 msgstr ""
-"Os fluxos codificados com Dolby Surround não serão decodificados antes de "
-"serem processados por este filtro. A habilitação desta opção não é "
+"Os transmissões codificados com Dolby Surround não serão decodificados antes "
+"de serem processados por este filtro. A habilitação desta opção não é "
 "recomendada."
 
 #: modules/audio_filter/channel_mixer/headphone.c:76
@@ -10831,7 +10839,7 @@ msgid ""
 msgstr ""
 "A compressão dinâmica de faixa torna mais suaves os sons mais incisivos e "
 "ressalta mais os sons suaves. Portanto, é possível ouvir com mais clareza um "
-"fluxo em um ambiente barulhento sem incomodar ninguém. Se a compressão "
+"transmissão em um ambiente barulhento sem incomodar ninguém. Se a compressão "
 "dinâmica de faixa estiver desabilitada, a reprodução estará mais adequada a "
 "salas de cinema em casa ou salas de leitura."
 
@@ -11090,8 +11098,8 @@ msgid ""
 "on quality. However it provides a big speedup for high definition streams."
 msgstr ""
 "Ignorar o filtro de laços (desbloqueio) geralmente tem um efeito ruim na "
-"qualidade. Entretanto, provê um grande aumento de velocidade para fluxos em "
-"definições mais altas."
+"qualidade. Entretanto, provê um grande aumento de velocidade para "
+"transmissões em definições mais altas."
 
 #: modules/codec/avcodec/avcodec.h:113
 #: modules/gui/macosx/VLCSimplePrefsController.m:303
@@ -11173,7 +11181,7 @@ msgid ""
 "rate control, but will cause a delay in the stream."
 msgstr ""
 "Tamanho da memória (buffer) de controle de taxa (em KB). Mais memória "
-"permitirá um controle de taxa melhor, mas causará atraso no fluxo."
+"permitirá um controle de taxa melhor, mas causará atraso no transmissão."
 
 #: modules/codec/avcodec/avcodec.h:152
 msgid "Rate control buffer aggressiveness"
@@ -11786,9 +11794,9 @@ msgid ""
 msgstr ""
 "DecodeBin é um elemento contêiner que pode adicionar e gerenciar múltiplos "
 "elementos. Além de adicionar os decodificadores, decodebin também pode "
-"adicionar leitores de fluxos primários que podem prover muita informação, "
-"como o perfil do codificador, o nível e outros atributos, no formato de "
-"GstCaps (Funcionalidades de Fluxos) para o decodificador."
+"adicionar leitores de transmissões primários que podem prover muita "
+"informação, como o perfil do codificador, o nível e outros atributos, no "
+"formato de GstCaps (Funcionalidades de transmissões) para o decodificador."
 
 #: modules/codec/gstreamer/gstdecode.c:93
 msgid "GStreamer Based Decoder"
@@ -11819,9 +11827,10 @@ msgid ""
 "can choose to disable all formatting. Note that this has no effect is "
 "rendering via Tiger is enabled."
 msgstr ""
-"Permitir formatação de texto em fluxos Kate. O VLC implementa parcialmente "
-"essa funcionalidade, mas é possível desabilitar todas as formatações. Note "
-"que isso não tem efeito quando a reprodução via Tiger estiver habilitada."
+"Permitir formatação de texto em transmissões Kate. O VLC implementa "
+"parcialmente essa funcionalidade, mas é possível desabilitar todas as "
+"formatações. Note que isso não tem efeito quando a reprodução via Tiger "
+"estiver habilitada."
 
 #: modules/codec/kate.c:199
 msgid "Shadow"
@@ -11932,8 +11941,9 @@ msgid ""
 "Kate streams can be rendered using the Tiger library. Disabling this will "
 "only render static text and bitmap based streams."
 msgstr ""
-"Fluxos Kate podem ser exibidos usando a biblioteca Tiger. Desabilitando esta "
-"opção, só serão exibidos textos estáticos e fluxos com base em mapa de bits."
+"transmissões Kate podem ser exibidos usando a biblioteca Tiger. "
+"Desabilitando esta opção, só serão exibidos textos estáticos e transmissões "
+"com base em mapa de bits."
 
 #: modules/codec/kate.c:216
 msgid "Rendering quality"
@@ -11977,7 +11987,7 @@ msgid ""
 "font parameters (name, size, etc) to use. A blank name will let Tiger choose "
 "font parameters where appropriate."
 msgstr ""
-"Que descrição de fonte deve ser usada se o fluxo Kate não especificar "
+"Que descrição de fonte deve ser usada se o transmissão Kate não especificar "
 "parâmetros particulares de fonte (nome, tamanho, etc.). Um nome em branco "
 "leva Tiger a escolher os parâmetros apropriados de fonte."
 
@@ -11990,8 +12000,8 @@ msgid ""
 "Default font color to use if the Kate stream does not specify a particular "
 "font color to use."
 msgstr ""
-"Cor padrão de fonte a ser usada se fluxos Kate não especificarem uma cor de "
-"fonte padrão."
+"Cor padrão de fonte a ser usada se transmissões Kate não especificarem uma "
+"cor de fonte padrão."
 
 #: modules/codec/kate.c:242
 msgid "Default font alpha"
@@ -12002,8 +12012,8 @@ msgid ""
 "Transparency of the default font color if the Kate stream does not specify a "
 "particular font color to use."
 msgstr ""
-"Transparência da cor padrão de fonte se fluxos Kate não especificarem uma "
-"cor de fonte padrão a ser usada."
+"Transparência da cor padrão de fonte se transmissões Kate não especificarem "
+"uma cor de fonte padrão a ser usada."
 
 #: modules/codec/kate.c:247
 msgid "Default background color"
@@ -12014,8 +12024,8 @@ msgid ""
 "Default background color if the Kate stream does not specify a background "
 "color to use."
 msgstr ""
-"Cor de fundo padrão, se um fluxo Kate não especificar uma cor de fundo a ser "
-"usada."
+"Cor de fundo padrão, se um transmissão Kate não especificar uma cor de fundo "
+"a ser usada."
 
 #: modules/codec/kate.c:252
 msgid "Default background alpha"
@@ -12026,8 +12036,8 @@ msgid ""
 "Transparency of the default background color if the Kate stream does not "
 "specify a particular background color to use."
 msgstr ""
-"A transparência padrão de fundo, se um fluxo Kate não especificar uma cor de "
-"fundo a ser usada."
+"A transparência padrão de fundo, se um transmissão Kate não especificar uma "
+"cor de fundo a ser usada."
 
 #: modules/codec/kate.c:259
 msgid ""
@@ -12039,11 +12049,11 @@ msgid ""
 "played. This will hopefully be fixed soon."
 msgstr ""
 "Kate é um codificador para texto e imagem baseado em sobreposições.\n"
-"A biblioteca de exibição Tiger é necessária para exibir os fluxos Kate mais "
-"complexos, mas o VLC ainda pode exibir textos estáticos e imagens baseadas "
-"em legendas, se não estiver disponível.\n"
+"A biblioteca de exibição Tiger é necessária para exibir as transmissões Kate "
+"mais complexos, mas o VLC ainda pode exibir textos estáticos e imagens "
+"baseadas em legendas, se não estiver disponível.\n"
 "Note que a mudança dessas configurações não terá efeito até que um novo "
-"fluxo seja reproduzido. Isso será corrigido em breve."
+"transmissão seja reproduzido. Isso será corrigido em breve."
 
 #: modules/codec/kate.c:268
 msgid "Kate"
@@ -12258,7 +12268,7 @@ msgstr ""
 "IdrInterval=1, então cada outro quadro-I é um quadro-IDR, etc. Para MPEG2, "
 "IdrInterval define o cabeçalho de sequência antes do N-ésimo quadro-I. Se "
 "IdrInterval=0 (padrão), o SDK insere o cabeçalho de sequência uma vez no "
-"início do fluxo."
+"início do transmissão."
 
 #: modules/codec/qsv.c:100
 msgid "Rate Control Method"
@@ -13301,7 +13311,7 @@ msgid ""
 "particular bitrate. This will produce a VBR stream."
 msgstr ""
 "Defina uma qualidade entre 1 (baixa) e 10 (alta), em vez de especificar uma "
-"taxa de bits específica. Este opção produzirá um fluxo VBR."
+"taxa de bits específica. Este opção produzirá um transmissão VBR."
 
 #: modules/codec/theora.c:110 modules/video_filter/postproc.c:69
 msgid "Post processing quality"
@@ -13341,7 +13351,7 @@ msgid ""
 "of specifying a particular bitrate. This will produce a VBR stream."
 msgstr ""
 "Defina uma qualidade específica entre 0.0 (alta) e 50.0 (baixa), em vez de "
-"especificar uma taxa de bits específica. Isso produzirá um fluxo VBR."
+"especificar uma taxa de bits específica. Isso produzirá um transmissão VBR."
 
 #: modules/codec/twolame.c:59
 msgid "Stereo mode"
@@ -13349,7 +13359,7 @@ msgstr "Modo estéreo"
 
 #: modules/codec/twolame.c:60
 msgid "Handling mode for stereo streams"
-msgstr "Modo de manipulação para fluxos estereofônicos"
+msgstr "Modo de manipulação para transmissões estereofônicos"
 
 #: modules/codec/twolame.c:61
 msgid "VBR mode"
@@ -13394,7 +13404,7 @@ msgstr "Taxa de bits máxima para codificação"
 
 #: modules/codec/vorbis.c:179
 msgid "Maximum bitrate in kbps. This is useful for streaming applications."
-msgstr "Taxa máxima de bits em kbps. Util para aplicaões de fluxo."
+msgstr "Taxa máxima de bits em kbps. Util para aplicaões de transmissão."
 
 #: modules/codec/vorbis.c:180
 msgid "Minimum encoding bitrate"
@@ -14283,7 +14293,7 @@ msgid ""
 "settings."
 msgstr ""
 "Define números de identificação do SPS e do PPS, para permitir a "
-"concatenação de fluxos com configurações diferentes."
+"concatenação de transmissões com configurações diferentes."
 
 #: modules/codec/x264.c:404
 msgid "Access unit delimiters"
@@ -14866,12 +14876,12 @@ msgstr "Erro"
 
 #: modules/control/oldrc.c:159
 msgid "Show stream position"
-msgstr "Exibir a posição do fluxo"
+msgstr "Exibir a posição do transmissão"
 
 #: modules/control/oldrc.c:160
 msgid ""
 "Show the current position in seconds within the stream from time to time."
-msgstr "Exibe de vez em quando a posição do fluxo, em segundos."
+msgstr "Exibe de vez em quando a posição do transmissão, em segundos."
 
 #: modules/control/oldrc.c:163
 msgid "Fake TTY"
@@ -14949,11 +14959,11 @@ msgstr "| lista de reprodução . . . . . exibe itens na lista de reprodução"
 
 #: modules/control/oldrc.c:790
 msgid "| play . . . . . . . . . . . . . . . . . . play stream"
-msgstr "| reproduzir . . . . . . . . . . . . . . . . . . reproduz fluxo"
+msgstr "| reproduzir . . . . . . . . . . . . . . . . . . reproduz transmissão"
 
 #: modules/control/oldrc.c:791
 msgid "| stop . . . . . . . . . . . . . . . . . . stop stream"
-msgstr "| parar . . . . . . . . . . . . . . . . . . pára o fluxo"
+msgstr "| parar . . . . . . . . . . . . . . . . . . pára o transmissão"
 
 #: modules/control/oldrc.c:792
 msgid "| next . . . . . . . . . . . . . .  next playlist item"
@@ -15035,15 +15045,15 @@ msgstr "| rewind  . . . . . . . . . . . .  ajusta para a taxa mínima"
 
 #: modules/control/oldrc.c:811
 msgid "| faster . . . . . . . . . .  faster playing of stream"
-msgstr "| faster . . . . . . . . . .  reprodução mais rápida do fluxo"
+msgstr "| faster . . . . . . . . . .  reprodução mais rápida do transmissão"
 
 #: modules/control/oldrc.c:812
 msgid "| slower . . . . . . . . . .  slower playing of stream"
-msgstr "| slower . . . . . . . . . .  reprodução mais lenta do fluxo"
+msgstr "| slower . . . . . . . . . .  reprodução mais lenta do transmissão"
 
 #: modules/control/oldrc.c:813
 msgid "| normal . . . . . . . . . .  normal playing of stream"
-msgstr "| normal . . . . . . . . . .  reprodução normal do fluxo"
+msgstr "| normal . . . . . . . . . .  reprodução normal do transmissão"
 
 #: modules/control/oldrc.c:814
 msgid "| frame. . . . . . . . . .  play frame by frame"
@@ -15055,7 +15065,7 @@ msgstr "| f [on|off] . . . . . . . . . . . . alterna a Tela Inteira"
 
 #: modules/control/oldrc.c:816
 msgid "| info . . . . .  information about the current stream"
-msgstr "| info . . . . .  informações sobre o fluxo atual"
+msgstr "| info . . . . .  informações sobre o transmissão atual"
 
 #: modules/control/oldrc.c:817
 msgid "| stats  . . . . . . . .  show statistical information"
@@ -15063,21 +15073,21 @@ msgstr "| stats  . . . . . . . .  exibe informações estatísticas"
 
 #: modules/control/oldrc.c:818
 msgid "| get_time . . seconds elapsed since stream's beginning"
-msgstr "| get_time . . segundos decorridos desde o início do fluxo"
+msgstr "| get_time . . segundos decorridos desde o início do transmissão"
 
 #: modules/control/oldrc.c:819
 msgid "| is_playing . . . .  1 if a stream plays, 0 otherwise"
 msgstr ""
-"| is_playing . . . .  1 se houver um fluxo sendo reproduzido ou 0 se não "
-"houver"
+"| is_playing . . . .  1 se houver um transmissão sendo reproduzido ou 0 se "
+"não houver"
 
 #: modules/control/oldrc.c:820
 msgid "| get_title . . . . .  the title of the current stream"
-msgstr "| get_title . . . . .  o título do fluxo atual"
+msgstr "| get_title . . . . .  o título do transmissão atual"
 
 #: modules/control/oldrc.c:821
 msgid "| get_length . . . .  the length of the current stream"
-msgstr "| get_length . . . .  o tamanho do fluxo atual"
+msgstr "| get_length . . . .  o tamanho do transmissão atual"
 
 #: modules/control/oldrc.c:823
 msgid "| volume [X] . . . . . . . . . .  set/get audio volume"
@@ -15265,7 +15275,7 @@ msgstr "Largura de Banda Fixa em KiB/s"
 
 #: modules/demux/adaptive/adaptive.cpp:73
 msgid "Preferred bandwidth for non adaptive streams"
-msgstr "Largura de banda preferida para fluxos não adaptativos"
+msgstr "Largura de banda preferida para transmissões não adaptativos"
 
 #: modules/demux/adaptive/adaptive.cpp:75
 msgid "Live Playback delay (ms)"
@@ -15334,7 +15344,7 @@ msgstr "Adaptativo"
 
 #: modules/demux/adaptive/adaptive.cpp:128
 msgid "Unified adaptive streaming for DASH/HLS"
-msgstr "Fluxo unificado adaptativo para DASH/HLS"
+msgstr "Transmissão unificado adaptativo para DASH/HLS"
 
 #: modules/demux/aiff.c:50
 msgid "AIFF demuxer"
@@ -15346,7 +15356,7 @@ msgstr "Descombinador ASF/WMV"
 
 #: modules/demux/asf/asf.c:277 modules/demux/asf/asf.c:834
 msgid "Could not demux ASF stream"
-msgstr "Não foi possível descombinar o fluxo ASF"
+msgstr "Não foi possível descombinar o transmissão ASF"
 
 #: modules/demux/asf/asf.c:278
 msgid "VLC failed to load the ASF header."
@@ -15486,7 +15496,8 @@ msgstr "Descarregar nome do arquivo"
 
 #: modules/demux/demuxdump.c:35
 msgid "Name of the file to which the raw stream will be dumped."
-msgstr "Nome do arquivo para o qual será remetido o fluxo a ser descarregado."
+msgstr ""
+"Nome do arquivo para o qual será remetido o transmissão a ser descarregado."
 
 #: modules/demux/demuxdump.c:36
 msgid "Append to existing file"
@@ -15558,7 +15569,7 @@ msgstr ""
 
 #: modules/demux/image.c:68
 msgid "Frame rate of the elementary stream produced."
-msgstr "Taxa de quadros de um fluxo primário produzido."
+msgstr "Taxa de quadros de um transmissão primário produzido."
 
 #: modules/demux/image.c:70
 msgid "Real-time"
@@ -15593,7 +15604,7 @@ msgid ""
 "is the default value) for a live stream (from a camera)."
 msgstr ""
 "Taxa de quadros desejada durante a reprodução de um MJPEG de um arquivo. Use "
-"0 (valor padrão) para um fluxo em tempo real (de uma câmera)."
+"0 (valor padrão) para um transmissão em tempo real (de uma câmera)."
 
 #: modules/demux/mjpeg.c:53
 msgid "M-JPEG camera demuxer"
@@ -15601,7 +15612,7 @@ msgstr "Descombinador de câmera M-JPEG"
 
 #: modules/demux/mkv/mkv.cpp:53
 msgid "Matroska stream demuxer"
-msgstr "Descombinador de fluxo Matroska"
+msgstr "Descombinador de transmissão Matroska"
 
 #: modules/demux/mkv/mkv.cpp:60
 msgid "Respect ordered chapters"
@@ -15900,7 +15911,7 @@ msgstr ""
 
 #: modules/demux/mp4/mp4.c:56
 msgid "MP4 stream demuxer"
-msgstr "Descombinador de fluxo MP4"
+msgstr "Descombinador de transmissão MP4"
 
 #: modules/demux/mp4/mp4.c:57
 msgid "MP4"
@@ -15923,7 +15934,8 @@ msgid ""
 "This is the frame rate used as a fallback when playing MPEG video elementary "
 "streams."
 msgstr ""
-"Taxa de quadros desejada para a reprodução de fluxos primários de vídeo MPEG."
+"Taxa de quadros desejada para a reprodução de transmissões primários de "
+"vídeo MPEG."
 
 #: modules/demux/mpeg/es.c:60
 msgid "MPEG-I/II/4 / A52 / DTS / MLP audio"
@@ -15939,7 +15951,7 @@ msgstr "Vídeo MPEG-4"
 
 #: modules/demux/mpeg/h26x.c:47
 msgid "Desired frame rate for the stream."
-msgstr "Taxa de quadros desejada para o fluxo."
+msgstr "Taxa de quadros desejada para o transmissão."
 
 #: modules/demux/mpeg/h26x.c:53 modules/demux/mpeg/h26x.c:55
 msgid "H264 video demuxer"
@@ -15994,9 +16006,9 @@ msgid ""
 "value as the PID in the TS stream, instead of 1, 2, 3, etc. Useful to do "
 "'#duplicate{..., select=\"es=<pid>\"}'."
 msgstr ""
-"Define o ID interno de cada fluxo primário manipulado pelo VLC para o mesmo "
-"valor do PIDO no fluxo TS, em vez de 1, 2, 3, etc. Útil para fazer "
-"'#duplicate{..., select=\"es=<pid>\"}'."
+"Define o ID interno de cada transmissão primário manipulado pelo VLC para o "
+"mesmo valor do PIDO no transmissão TS, em vez de 1, 2, 3, etc. Útil para "
+"fazer '#duplicate{..., select=\"es=<pid>\"}'."
 
 #: modules/demux/mpeg/ts.c:90 modules/mux/mpeg/ts.c:173
 msgid "CSA Key"
@@ -16035,7 +16047,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:104
 msgid "Separate sub-streams"
-msgstr "Separar sub-fluxos"
+msgstr "Separar sub-transmissões"
 
 #: modules/demux/mpeg/ts.c:106
 msgid ""
@@ -16043,7 +16055,7 @@ msgid ""
 "off this option when using stream output."
 msgstr ""
 "Separa páginas de teletexto/dvbs em ES independentes. Pode ser útil "
-"desabilitar essa opção quando estiver usando fluxos de saída."
+"desabilitar essa opção quando estiver usando transmissões de saída."
 
 #: modules/demux/mpeg/ts.c:111
 msgid ""
@@ -16056,11 +16068,11 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:122
 msgid "Trust in-stream PCR"
-msgstr "Confiar no fluxo PCR entrante"
+msgstr "Confiar no transmissão PCR entrante"
 
 #: modules/demux/mpeg/ts.c:123
 msgid "Use the stream PCR as a reference."
-msgstr "Usa o fluxo PCR como referência."
+msgstr "Usa o transmissão PCR como referência."
 
 #: modules/demux/mpeg/ts.c:130 modules/mux/mpeg/ts.c:100
 msgid "Digital TV Standard"
@@ -16076,7 +16088,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:135
 msgid "MPEG Transport Stream demuxer"
-msgstr "Descombinador de fluxo de transporte MPEG"
+msgstr "Descombinador de transmissão de transporte MPEG"
 
 #: modules/demux/mpeg/ts_psi.c:422
 msgid "Main audio"
@@ -16154,7 +16166,7 @@ msgstr "Exibir conteúdo adulto em shoutcast"
 #: modules/demux/playlist/playlist.c:47
 msgid "Show NC17 rated video streams when using shoutcast video playlists."
 msgstr ""
-"Exibe fluxos de vídeo moderados pela NC17 com em listas de reprodução "
+"Exibe transmissões de vídeo moderados pela NC17 com em listas de reprodução "
 "shoutcast."
 
 #: modules/demux/playlist/playlist.c:50
@@ -16314,7 +16326,8 @@ msgstr "Canais de áudio"
 
 #: modules/demux/rawaud.c:47
 msgid "Audio channels in input stream. Numeric value >0. Default is 2."
-msgstr "Canais de áudio no fluxo de entrada. Valor numérico > 0. O padrão é 2."
+msgstr ""
+"Canais de áudio no transmissão de entrada. Valor numérico > 0. O padrão é 2."
 
 #: modules/demux/rawaud.c:49
 msgid "FOURCC code of raw input format"
@@ -16356,16 +16369,16 @@ msgid ""
 "This is the desired frame rate when playing raw video streams. In the form "
 "30000/1001 or 29.97"
 msgstr ""
-"Taxa de quadros desejada para a reprodução de fluxos de vídeo bruto. Na "
-"forma 30000/1001 ou 29.97"
+"Taxa de quadros desejada para a reprodução de transmissões de vídeo bruto. "
+"Na forma 30000/1001 ou 29.97"
 
 #: modules/demux/rawvid.c:48
 msgid "This specifies the width in pixels of the raw video stream."
-msgstr "Especifica a largura em pixels de fluxos de vídeo bruto."
+msgstr "Especifica a largura em pixels de transmissões de vídeo bruto."
 
 #: modules/demux/rawvid.c:52
 msgid "This specifies the height in pixels of the raw video stream."
-msgstr "Especifica a altura em pixels do fluxo de vídeo bruto."
+msgstr "Especifica a altura em pixels do transmissão de vídeo bruto."
 
 #: modules/demux/rawvid.c:55
 msgid "Force chroma (Use carefully)"
@@ -16446,7 +16459,7 @@ msgstr "TY"
 
 #: modules/demux/ty.c:60
 msgid "TY Stream audio/video demux"
-msgstr "Descombinador de fluxo de áudio/vídeo TY"
+msgstr "Descombinador de transmissão de áudio/vídeo TY"
 
 #: modules/demux/ty.c:770
 msgid "Closed captions 2"
@@ -16462,7 +16475,7 @@ msgstr "Closed captions 4"
 
 #: modules/demux/vc1.c:44
 msgid "Desired frame rate for the VC-1 stream."
-msgstr "Taxa de quadros desejada para o fluxo VC-1."
+msgstr "Taxa de quadros desejada para o transmissão VC-1."
 
 #: modules/demux/vc1.c:50
 msgid "VC1 video demuxer"
@@ -16569,14 +16582,15 @@ msgid ""
 "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>O Reprodutor de Mídias VLC é um reprodutor, codificador gerador de fluxos "
-"livre, feito por voluntários da comunidade <a href=\"https://www.videolan."
-"org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
-"span></a>.</p><p>O VLC usa codificadores próprios, trabalha com plataformas "
-"populares e pode ler quase todos os arquivos, CDs, DVDs, fluxos de rede, "
-"placas de captura e outros formatos de mídia!</p><p><a href=\"https://www."
-"videolan.org/contribute/\"><span style=\" text-decoration: underline; color:"
-"#0057ae;\">Junte-se a nós e Contribua!</span></a>"
+"<p>O Reprodutor de Mídias VLC é um reprodutor, codificador gerador de "
+"transmissões livre, feito por voluntários da comunidade <a href=\"https://"
+"www.videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">VideoLAN</span></a>.</p><p>O VLC usa codificadores próprios, trabalha com "
+"plataformas populares e pode ler quase todos os arquivos, CDs, DVDs, "
+"transmissões de rede, placas de captura e outros formatos de mídia!</p><p><a "
+"href=\"https://www.videolan.org/contribute/\"><span style=\" text-"
+"decoration: underline; color:#0057ae;\">Junte-se a nós e Contribua!</span></"
+"a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
@@ -16866,8 +16880,8 @@ msgstr "Nenhuma entrada"
 msgid ""
 "No input found. A stream must be playing or paused for bookmarks to work."
 msgstr ""
-"Nenhuma entrada foi encontrada. Um fluxo deve estar sendo reproduzido ou "
-"pausado para que os favoritos funcionem."
+"Nenhuma entrada foi encontrada. Um transmissão deve estar sendo reproduzido "
+"ou pausado para que os favoritos funcionem."
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:213
 msgid "Input has changed"
@@ -16927,7 +16941,7 @@ msgstr "Ir ao próximo item"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
-msgstr "Converter & Criar Fluxo"
+msgstr "Converter & Criar Transmissão"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:137
 msgid "Go!"
@@ -16978,12 +16992,12 @@ msgstr "Procurar..."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:146
 msgid "Setup Streaming..."
-msgstr "Configurar Fluxo..."
+msgstr "Configurar Transmissão..."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:147
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:404
 msgid "Select Streaming Method"
-msgstr "Selecione um Método de Fluxo"
+msgstr "Selecione um Método de Transmissão"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
@@ -16994,7 +17008,7 @@ msgstr "Salvar como Arquivo"
 #: modules/gui/macosx/VLCOutput.m:65 modules/gui/macosx/VLCOutput.m:194
 #: modules/gui/macosx/VLCOutput.m:313 modules/gui/qt/dialogs/sout.cpp:94
 msgid "Stream"
-msgstr "Fluxo"
+msgstr "Transmissão"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:152
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:181
@@ -17058,11 +17072,11 @@ msgstr "Sobrepor legendas ao vídeo"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:183
 msgid "Stream Destination"
-msgstr "Destino do Fluxo"
+msgstr "Destino do Transmissão"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:184
 msgid "Stream Announcement"
-msgstr "Anúncio de Fluxo"
+msgstr "Anúncio de Transmissão"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:186
 #: modules/gui/macosx/VLCOpenWindowController.m:197
@@ -17125,15 +17139,15 @@ msgstr " URL SDP"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:270
 msgid "Invalid container format for HTTP streaming"
-msgstr "Formato do contêiner inválido para fluxo HTTP"
+msgstr "Formato do contêiner inválido para transmissão HTTP"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:272
 msgid ""
 "Media encapsulated as %@ cannot be streamed through the HTTP protocol for "
 "technical reasons."
 msgstr ""
-"Mídia encapsulada como %@ não pode ser transmitida por fluxo através do "
-"protocolo HTTP por razões técnicas."
+"Mídia encapsulada como %@ não pode ser transmitida por transmissão através "
+"do protocolo HTTP por razões técnicas."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:336
 msgid "Remove a profile"
@@ -17149,7 +17163,7 @@ msgstr "Salvar como novo perfil"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:535
 msgid "%@ stream to %@:%@"
-msgstr "%@ em fluxo para %@:%@"
+msgstr "%@ em transmissão para %@:%@"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:544
 msgid "No Address given"
@@ -17157,7 +17171,7 @@ msgstr "Nenhum Endereço informado"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:546
 msgid "In order to stream, a valid destination address is required."
-msgstr "Para criar um fluxo, um endereço de destino válido é necessário."
+msgstr "Para criar um transmissão, um endereço de destino válido é necessário."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:551
 msgid "No Channel Name given"
@@ -17167,8 +17181,8 @@ msgstr "Nenhum Nome de Canal informado"
 msgid ""
 "SAP stream announcement is enabled. However, no channel name is provided."
 msgstr ""
-"O anúncio de fluxo SAP está habilitado. Entretanto, nenhum nome de canal foi "
-"informado."
+"O anúncio de transmissão SAP está habilitado. Entretanto, nenhum nome de "
+"canal foi informado."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:558
 msgid "No SDP URL given"
@@ -17652,7 +17666,7 @@ msgstr "Fechar Janela"
 
 #: modules/gui/macosx/VLCMainMenu.m:362
 msgid "Convert / Stream..."
-msgstr "Converter / Criar Fluxo..."
+msgstr "Converter / Criar Transmissão..."
 
 #: modules/gui/macosx/VLCMainMenu.m:363
 msgid "Save Playlist..."
@@ -18046,7 +18060,7 @@ msgstr "Abrir"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:136
 msgid "Stream output:"
-msgstr "Saída de fluxo:"
+msgstr "Saída de transmissão:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
@@ -18132,9 +18146,9 @@ msgid ""
 "enter the URL in the field above. If you want to open a RTP or UDP stream, "
 "press the button below."
 msgstr ""
-"Para abrir um fluxo de rede comum  (HTTP, RTSP, RTMP, MMS, FTP, etc.), "
-"digite a URL no campo acima. Se desejar abrir um fluxo RTP ou UDP, pressione "
-"o botão abaixo."
+"Para abrir um transmissão de rede comum  (HTTP, RTSP, RTMP, MMS, FTP, etc.), "
+"digite a URL no campo acima. Se desejar abrir um transmissão RTP ou UDP, "
+"pressione o botão abaixo."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:190
 msgid ""
@@ -18145,24 +18159,24 @@ msgid ""
 "To open a stream using a different protocol, just press Cancel to close this "
 "sheet."
 msgstr ""
-"Para abrir um fluxo multicast, digite o respectivo endereço IP dado pelo "
-"provedor do fluxo. No modo unicast, o VLC usará o IP da sua máquina "
-"automaticamente.\n"
+"Para abrir um transmissão multicast, digite o respectivo endereço IP dado "
+"pelo provedor do transmissão. No modo unicast, o VLC usará o IP da sua "
+"máquina automaticamente.\n"
 "\n"
-"Para abrir um fluxo usando um protocolo diferente, pressione Cancelar para "
-"fechar esta janela."
+"Para abrir um transmissão usando um protocolo diferente, pressione Cancelar "
+"para fechar esta janela."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:191
 msgid ""
 "Enter a stream URL here. To open RTP or UDP streams, use the respective "
 "button below."
 msgstr ""
-"Preencha uma URL para abrir o fluxo. Para abrir fluxos UDP ou RTP., clique "
-"no botão respectivo abaixo."
+"Preencha uma URL para abrir o transmissão. Para abrir transmissões UDP ou "
+"RTP., clique no botão respectivo abaixo."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:194
 msgid "Open RTP/UDP Stream"
-msgstr "Abrir Fluxo RTP/UDP"
+msgstr "Abrir Transmissão RTP/UDP"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:196
 #: share/lua/http/dialogs/stream_config_window.html:24
@@ -18279,11 +18293,11 @@ msgstr "%i trilhas"
 
 #: modules/gui/macosx/VLCOutput.m:61
 msgid "Streaming and Transcoding Options"
-msgstr "Opções de Fluxo e Transcodificação"
+msgstr "Opções de Transmissão e Transcodificação"
 
 #: modules/gui/macosx/VLCOutput.m:63
 msgid "Display the stream locally"
-msgstr "Exibir o fluxo localmente"
+msgstr "Exibir o transmissão localmente"
 
 #: modules/gui/macosx/VLCOutput.m:66 modules/gui/qt/dialogs/convert.cpp:107
 msgid "Dump raw input"
@@ -18303,7 +18317,7 @@ msgstr "Taxa de Bits (KB/s)"
 
 #: modules/gui/macosx/VLCOutput.m:102
 msgid "Stream Announcing"
-msgstr "Anúncio de Fluxo"
+msgstr "Anúncio de Transmissão"
 
 #: modules/gui/macosx/VLCOutput.m:413
 #: modules/gui/qt/components/preferences_widgets.cpp:302
@@ -18373,7 +18387,7 @@ msgstr "Descombinado"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:84
 msgid "Stream bitrate"
-msgstr "Taxa de bits do fluxo"
+msgstr "Taxa de bits do transmissão"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:87
 #: modules/gui/macosx/VLCPlaylistInfo.m:92
@@ -18548,7 +18562,7 @@ msgstr "Editar as configurações padrão do aplicativo para protocolos de rede"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
 msgid "Open network streams using the following protocols"
-msgstr "Abrir fluxos de rede usando os seguintes protocolos"
+msgstr "Abrir transmissões de rede usando os seguintes protocolos"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:311
 msgid "Note that these are system-wide settings."
@@ -18756,8 +18770,8 @@ msgstr ""
 "Restaura as preferências do reprodutor de mídias VLC.\n"
 "\n"
 "Observe que o VLC será reiniciado durante o processo, esvaziando a sua lista "
-"de reprodução atual e paralisando imediatamente possível reprodução, fluxo "
-"ou transcodificação em andamento.\n"
+"de reprodução atual e paralisando imediatamente possível reprodução, "
+"transmissão ou transcodificação em andamento.\n"
 "\n"
 "A Biblioteca de Mídias não será afetada.\n"
 "\n"
@@ -19862,12 +19876,12 @@ msgid ""
 "Information about what your media or stream is made of.\n"
 "Muxer, Audio and Video Codecs, Subtitles are shown."
 msgstr ""
-"Informações sobre sua mídia ou fluxo.\n"
+"Informações sobre sua mídia ou transmissão.\n"
 "São exibidos Combinadores, Codificadores de Áudio e Vídeo e Legendas."
 
 #: modules/gui/qt/components/info_panels.cpp:548
 msgid "Current media / stream statistics"
-msgstr "Mídia atual / estatísticas de fluxo"
+msgstr "Mídia atual / estatísticas de transmissão"
 
 #: modules/gui/qt/components/info_panels.cpp:574
 msgid "Input/Read"
@@ -20066,7 +20080,8 @@ msgstr "Nome do dispositivo"
 #: modules/gui/qt/components/open_panels.cpp:1103
 msgid "Your display will be opened and played in order to stream or save it."
 msgstr ""
-"A tela será aberta e reproduzida em ordem para o fluxo ou para a gravação."
+"A tela será aberta e reproduzida em ordem para o transmissão ou para a "
+"gravação."
 
 #. xgettext: frames per second
 #: modules/gui/qt/components/open_panels.cpp:1117
@@ -20425,7 +20440,7 @@ msgstr "Tipo:"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:127
 msgid "This module writes the transcoded stream to a file."
-msgstr "Este módulo grava o fluxo transcodificado para um arquivo."
+msgstr "Este módulo grava o transmissão transcodificado para um arquivo."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:129
 msgid "Filename"
@@ -20445,7 +20460,8 @@ msgstr ""
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:184
 msgid "This module outputs the transcoded stream to a network via HTTP."
-msgstr "Este módulo reproduz o fluxo transcodificado para uma rede via HTTP."
+msgstr ""
+"Este módulo reproduz o transmissão transcodificado para uma rede via HTTP."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:186
 #: modules/gui/qt/components/sout/sout_widgets.cpp:282
@@ -20456,20 +20472,23 @@ msgstr "Caminho"
 msgid ""
 "This module outputs the transcoded stream to a network via the mms protocol."
 msgstr ""
-"Este módulo encaminha o fluxo transcodificado para uma rede, através do "
-"protocolo mms."
+"Este módulo encaminha o transmissão transcodificado para uma rede, através "
+"do protocolo mms."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:280
 msgid "This module outputs the transcoded stream to a network via RTSP."
-msgstr "Este módulo reproduz o fluxo transcodificado para uma rede via RTSP."
+msgstr ""
+"Este módulo reproduz o transmissão transcodificado para uma rede via RTSP."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:326
 msgid "This module outputs the transcoded stream to a network via UDP."
-msgstr "Este módulo reproduz o fluxo transcodificado para uma rede via UDP."
+msgstr ""
+"Este módulo reproduz o transmissão transcodificado para uma rede via UDP."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:368
 msgid "This module outputs the transcoded stream to a network via RTP."
-msgstr "Este módulo reproduz o fluxo transcodificado para uma rede via RTP."
+msgstr ""
+"Este módulo reproduz o transmissão transcodificado para uma rede via RTP."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:375
 msgid "Base port"
@@ -20477,7 +20496,8 @@ msgstr "Porta base"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:423
 msgid "This module outputs the transcoded stream to an Icecast server."
-msgstr "Este módulo reproduz o fluxo transcodificado para um servidor Icecast."
+msgstr ""
+"Este módulo reproduz o transmissão transcodificado para um servidor Icecast."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:442
 msgid "Mount Point"
@@ -20691,14 +20711,14 @@ msgid ""
 "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>O Reprodutor de Mídias VLC é um reprodutor, codificador gerador de fluxos "
-"livre, feito por voluntários da comunidade <a href=\"http://www.videolan.org/"
-"\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
-"span></a>.</p><p>O VLC usa codificadores próprios, trabalha com plataformas "
-"populares e pode ler quase todos os arquivos, CDs, DVDs, fluxos de rede, "
-"placas de captura e outros formatos de mídia!</p><p><a href=\"http://www."
-"videolan.org/contribute/\"><span style=\" text-decoration: underline; color:"
-"#0057ae;\">Junte-se a nós e Contribua!</span></a>"
+"<p>O Reprodutor de Mídias VLC é um reprodutor, codificador gerador de "
+"transmissões livre, feito por voluntários da comunidade <a href=\"http://www."
+"videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">VideoLAN</span></a>.</p><p>O VLC usa codificadores próprios, trabalha com "
+"plataformas populares e pode ler quase todos os arquivos, CDs, DVDs, "
+"transmissões de rede, placas de captura e outros formatos de mídia!</p><p><a "
+"href=\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
+"underline; color:#0057ae;\">Junte-se a nós e Contribua!</span></a>"
 
 #: modules/gui/qt/dialogs/help.cpp:214
 msgid "&Recheck version"
@@ -20831,7 +20851,7 @@ msgstr "&Reproduzir"
 
 #: modules/gui/qt/dialogs/open.cpp:119 modules/gui/qt/dialogs/open.cpp:204
 msgid "&Stream"
-msgstr "Flu&xo"
+msgstr "&Transmissão"
 
 #: modules/gui/qt/dialogs/open.cpp:121
 msgid "C&onvert"
@@ -20908,7 +20928,7 @@ msgid ""
 "meta data."
 msgstr ""
 "Leitores de lista de reprodução adicionam novas funcionalidades de leitura "
-"de fluxos da Internet ou extraem dados de mídias."
+"de transmissões da Internet ou extraem dados de mídias."
 
 #: modules/gui/qt/dialogs/plugins.cpp:387
 msgid ""
@@ -21035,7 +21055,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:200
 msgid "Stream Output"
-msgstr "Saída de Fluxo"
+msgstr "Saída de Transmissão"
 
 #: modules/gui/qt/dialogs/sout.cpp:51
 msgid ""
@@ -21044,8 +21064,8 @@ msgid ""
 "You should start by checking that source matches what you want your input to "
 "be and then press the \"Next\" button to continue.\n"
 msgstr ""
-"Este assistente permite criar um fluxo ou converter sua mídia para usar "
-"localmente, na sua rede privada ou na Internet.\n"
+"Este assistente permite criar um transmissão ou converter sua mídia para "
+"usar localmente, na sua rede privada ou na Internet.\n"
 "Verifique se a fonte corresponde ao que você quer que sua entrada se torne e "
 "então pressione o botão \"Avançar\" para continuar.\n"
 
@@ -21055,7 +21075,7 @@ msgid ""
 "This is automatically generated when you change the above settings,\n"
 "but you can change it manually."
 msgstr ""
-"Linha de saída de fluxo.\n"
+"Linha de saída de transmissão.\n"
 "Isto é gerado automaticamente quando você modifica as configurações acima,\n"
 "mas você pode mudá-las manualmente."
 
@@ -21371,7 +21391,7 @@ msgstr "Abrir &Disco..."
 
 #: modules/gui/qt/menus.cpp:365
 msgid "Open &Network Stream..."
-msgstr "Abrir &Fluxo de Rede"
+msgstr "Abrir &Transmissão de Rede"
 
 #: modules/gui/qt/menus.cpp:367 modules/gui/qt/menus.cpp:943
 msgid "Open &Capture Device..."
@@ -21391,7 +21411,7 @@ msgstr "Conve&rter / Salvar..."
 
 #: modules/gui/qt/menus.cpp:389
 msgid "&Stream..."
-msgstr "&Fluxo..."
+msgstr "&Transmitir..."
 
 #: modules/gui/qt/menus.cpp:394
 msgid "Quit at the end of playlist"
@@ -23565,8 +23585,8 @@ msgid ""
 "in bytes"
 msgstr ""
 "Não tenta adivinhar a taxa de bits do ASF. Definindo isso, permite controlar "
-"como o Windows Media Player fará cache do conteúdo em fluxo. Defina a taxa "
-"de bits do áudio + vídeo em bytes"
+"como o Windows Media Player fará cache do conteúdo em transmissão. Defina a "
+"taxa de bits do áudio + vídeo em bytes"
 
 #: modules/mux/asf.c:73
 msgid "ASF muxer"
@@ -23625,7 +23645,7 @@ msgid ""
 "inside the client decoder."
 msgstr ""
 "Atrasa o DTS (decodificador de marcas de tempo) e o PTS (marcas de "
-"apresentação) dos dados no fluxo, comparados ao SCR. Permite algumas "
+"apresentação) dos dados no transmissão, comparados ao SCR. Permite algumas "
 "memórias dentro do cliente codificador."
 
 #: modules/mux/mpeg/ps.c:54
@@ -23635,8 +23655,8 @@ msgstr "Tamanho máximo do PES"
 #: modules/mux/mpeg/ps.c:55
 msgid "Set the maximum allowed PES size when producing the MPEG PS streams."
 msgstr ""
-"Ajusta o tamanho máximo permitido do PES enquanto estiver produzindo fluxos "
-"MPEG PS."
+"Ajusta o tamanho máximo permitido do PES enquanto estiver produzindo "
+"transmissões MPEG PS."
 
 #: modules/mux/mpeg/ps.c:64
 msgid "PS muxer"
@@ -23651,8 +23671,8 @@ msgid ""
 "Assign a fixed PID to the video stream. The PCR PID will automatically be "
 "the video."
 msgstr ""
-"Define um PID fixo para o fluxo de vídeo. O PID do PCR será automaticamente "
-"o do vídeo."
+"Define um PID fixo para o transmissão de vídeo. O PID do PCR será "
+"automaticamente o do vídeo."
 
 #: modules/mux/mpeg/ts.c:105
 msgid "Audio PID"
@@ -23660,7 +23680,7 @@ msgstr "PID do áudio"
 
 #: modules/mux/mpeg/ts.c:106
 msgid "Assign a fixed PID to the audio stream."
-msgstr "Define um PID fixo para o fluxo de áudio."
+msgstr "Define um PID fixo para o transmissão de áudio."
 
 #: modules/mux/mpeg/ts.c:107
 msgid "SPU PID"
@@ -23684,7 +23704,7 @@ msgstr "ID do TS"
 
 #: modules/mux/mpeg/ts.c:112
 msgid "Assign a fixed Transport Stream ID."
-msgstr "Define um ID fixo para o transporte do fluxo."
+msgstr "Define um ID fixo para o transporte do transmissão."
 
 #: modules/mux/mpeg/ts.c:113
 msgid "NET ID"
@@ -23740,7 +23760,7 @@ msgid ""
 "and allows having the same PIDs in the input and output streams."
 msgstr ""
 "Define o PID para o ID se entrar um ES. Deve ser usado com --ts-es-id-pid, e "
-"permite ter os mesmos PID nos fluxos de entrada e saída."
+"permite ter os mesmos PID nos transmissões de entrada e saída."
 
 #: modules/mux/mpeg/ts.c:133
 msgid "Data alignment"
@@ -23765,9 +23785,9 @@ msgid ""
 "bitrate between the two boundaries. This avoids having huge bitrate peaks, "
 "especially for reference frames."
 msgstr ""
-"Corta o fluxo em fatias de dada duração, e garante uma taxa constate de bits "
-"entre os dois limites. Evita grandes picos de taxas de bits, especialmente "
-"para quadros de referência."
+"Corta o transmissão em fatias de dada duração, e garante uma taxa constate "
+"de bits entre os dois limites. Evita grandes picos de taxas de bits, "
+"especialmente para quadros de referência."
 
 #: modules/mux/mpeg/ts.c:143
 msgid "Use keyframes"
@@ -23785,7 +23805,7 @@ msgstr ""
 "dispor os limites no final das figuras I. Nesse caso, a duração da modelagem "
 "dada pelo usuário é o pior caso usado quando nenhum quadro de referência "
 "estiver disponível.  Melhora a eficiência do algoritmo de modelagem, já que "
-"os quadros I geralmente são os maiores quadros do fluxo."
+"os quadros I geralmente são os maiores quadros do transmissão."
 
 #: modules/mux/mpeg/ts.c:151
 msgid "PCR interval (ms)"
@@ -23819,8 +23839,8 @@ msgid ""
 "inside the client decoder."
 msgstr ""
 "Atrasar o DTS (decodificador de marcadores de tempo) e o PTS (marcas de "
-"tempo de apresentação) dos dados do fluxo, comparados com o PCR. Permite "
-"alguma memória dentro do cliente decodificador."
+"tempo de apresentação) dos dados do transmissão, comparados com o PCR. "
+"Permite alguma memória dentro do cliente decodificador."
 
 #: modules/mux/mpeg/ts.c:168
 msgid "Crypt audio"
@@ -24164,7 +24184,7 @@ msgstr ""
 #: modules/services_discovery/sap.c:106 modules/services_discovery/sap.c:110
 #: modules/services_discovery/sap.c:304
 msgid "Network streams (SAP)"
-msgstr "Fluxos de rede (SAP)"
+msgstr "transmissões de rede (SAP)"
 
 #: modules/services_discovery/sap.c:109
 msgid "SAP"
@@ -25031,15 +25051,15 @@ msgstr "Correção de sobreposição"
 
 #: modules/stream_extractor/archive.c:54
 msgid "libarchive based stream directory"
-msgstr "Pasta de fluxos baseados em libarchive"
+msgstr "Pasta de transmissões baseados em libarchive"
 
 #: modules/stream_extractor/archive.c:58
 msgid "libarchive based stream extractor"
-msgstr "Extrator de fluxos baseados em libarchive"
+msgstr "Extrator de transmissões baseados em libarchive"
 
 #: modules/stream_filter/adf.c:42
 msgid "ADF stream filter"
-msgstr "Filtro de fluxo ADF"
+msgstr "Filtro de transmissão ADF"
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
@@ -25047,11 +25067,11 @@ msgstr "Módulo de Câmera ARIB STD-B25"
 
 #: modules/stream_filter/cache_block.c:498
 msgid "Block stream cache"
-msgstr "Memória do fluxo de blocos"
+msgstr "Memória do transmissão de blocos"
 
 #: modules/stream_filter/cache_read.c:570
 msgid "Byte stream cache"
-msgstr "Memória do fluxo em bytes"
+msgstr "Memória do transmissão em bytes"
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
@@ -25067,7 +25087,7 @@ msgstr "Descompressão gzip"
 
 #: modules/stream_filter/hds/hds.c:208
 msgid "HTTP Dynamic Streaming"
-msgstr "Fluxo Dinâmico HTTP"
+msgstr "Transmissão Dinâmico HTTP"
 
 #: modules/stream_filter/inflate.c:201
 msgid "Zlib decompression filter"
@@ -25075,7 +25095,7 @@ msgstr "Filtro de descompressão Zlib"
 
 #: modules/stream_filter/prefetch.c:531
 msgid "Stream prefetch filter"
-msgstr "Filtro de pré recepção de fluxo"
+msgstr "Filtro de pré recepção de transmissão"
 
 #: modules/stream_filter/prefetch.c:534
 msgid "Buffer size"
@@ -25104,7 +25124,7 @@ msgstr "Limiar (em bytes) da pré busca"
 
 #: modules/stream_filter/record.c:49
 msgid "Internal stream record"
-msgstr "Gravação de fluxo interno"
+msgstr "Gravação de transmissão interno"
 
 #: modules/stream_filter/skiptags.c:243
 msgid "APE/ID3 tags-skipping filter"
@@ -25116,15 +25136,15 @@ msgstr "Exclusão automática"
 
 #: modules/stream_out/autodel.c:47
 msgid "Automatically add/delete input streams"
-msgstr "Adiciona/Exclui automaticamente entradas de fluxo"
+msgstr "Adiciona/Exclui automaticamente entradas de transmissão"
 
 #: modules/stream_out/bridge.c:43
 msgid ""
 "Integer identifier for this elementary stream. This will be used to \"find\" "
 "this stream later."
 msgstr ""
-"Identificador inteiro para o fluxo primário. Será usado para \"encontrar\" "
-"este fluxo mais tarde."
+"Identificador inteiro para o transmissão primário. Será usado para "
+"\"encontrar\" este transmissão mais tarde."
 
 #: modules/stream_out/bridge.c:46
 msgid "Destination bridge-in name"
@@ -25157,8 +25177,8 @@ msgid ""
 "Offset to add to the stream IDs specified in bridge_out to obtain the stream "
 "IDs bridge_in will register."
 msgstr ""
-"Deslocamento a ser adicionado no ID do fluxo especificados em bridge_out "
-"para obter os IDs do fluxo será registrado."
+"Deslocamento a ser adicionado no ID do transmissão especificados em "
+"bridge_out para obter os IDs do transmissão será registrado."
 
 #: modules/stream_out/bridge.c:60
 msgid "Name of current instance"
@@ -25174,7 +25194,7 @@ msgstr ""
 
 #: modules/stream_out/bridge.c:65
 msgid "Fallback to placeholder stream when out of data"
-msgstr "Redução do controlador de fluxo quando estiver sem dados"
+msgstr "Redução do controlador de transmissão quando estiver sem dados"
 
 #: modules/stream_out/bridge.c:67
 msgid ""
@@ -25183,10 +25203,10 @@ msgid ""
 "configure a place holder stream when the real source breaks. Source and "
 "placeholder streams should have the same format."
 msgstr ""
-"Se habilitada, a ponte descartará todas as entradas de fluxo primário, "
+"Se habilitada, a ponte descartará todas as entradas de transmissão primário, "
 "exceto se não receber dados de outra ponte de conexão. Pode ser usado para "
-"configurar um controlador de fluxo quando a fonte real falhar. Fonte e "
-"controlador de fluxos devem ter o mesmo formato."
+"configurar um controlador de transmissão quando a fonte real falhar. Fonte e "
+"controlador de transmissões devem ter o mesmo formato."
 
 #: modules/stream_out/bridge.c:72
 msgid "Placeholder delay"
@@ -25207,9 +25227,10 @@ msgid ""
 "the expense of a slightly longer delay, depending on the frequence of I "
 "frames in the streams."
 msgstr ""
-"Se atvada, a comutação entre o controlador e o fluxo normal só ocorrerá após "
-"quadros I. Esta opção remove artifícios da comutação de fluxo ao custo de um "
-"atraso um pouco maior, dependendo da freqüência de quadros I nos fluxos."
+"Se atvada, a comutação entre o controlador e o transmissão normal só "
+"ocorrerá após quadros I. Esta opção remove artifícios da comutação de "
+"transmissão ao custo de um atraso um pouco maior, dependendo da freqüência "
+"de quadros I nos transmissões."
 
 #: modules/stream_out/bridge.c:92
 msgid "Bridge"
@@ -25217,7 +25238,7 @@ msgstr "Ponte"
 
 #: modules/stream_out/bridge.c:93
 msgid "Bridge stream output"
-msgstr "Saída de fluxo em ponte"
+msgstr "Saída de transmissão em ponte"
 
 #: modules/stream_out/bridge.c:95
 msgid "Bridge out"
@@ -25237,7 +25258,7 @@ msgstr "Padrão: 90 s"
 
 #: modules/stream_out/chromaprint.c:61
 msgid "Chromaprint stream output"
-msgstr "Saída de fluxo Chromaprint"
+msgstr "Saída de transmissão Chromaprint"
 
 #: modules/stream_out/chromecast/cast.cpp:189
 msgid "HTTP port"
@@ -25248,8 +25269,8 @@ msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr ""
-"Define a porta HTTP do servidor local a ser usado para criar fluxo da mídia "
-"para o Chromecast."
+"Define a porta HTTP do servidor local a ser usado para criar transmissão da "
+"mídia para o Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:192
 #: modules/stream_out/chromecast/cast.cpp:1198
@@ -25311,7 +25332,7 @@ msgstr "Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:240
 msgid "Chromecast stream output"
-msgstr "Saída de fluxo do Chromecast"
+msgstr "Saída de transmissão do Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:1197
 msgid "Ok, Don't warn me again"
@@ -25335,15 +25356,15 @@ msgstr "alternar"
 
 #: modules/stream_out/cycle.c:327
 msgid "Cyclic stream output"
-msgstr "Alterna a saída do fluxo"
+msgstr "Alterna a saída do transmissão"
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
-msgstr "ID do Fluxo Primário"
+msgstr "ID do Transmissão Primário"
 
 #: modules/stream_out/delay.c:41 modules/stream_out/setid.c:43
 msgid "Specify an identifier integer for this elementary stream"
-msgstr "Especifique um identificador inteiro para o fluxo primário"
+msgstr "Especifique um identificador inteiro para o transmissão primário"
 
 #: modules/stream_out/delay.c:43
 msgid "Delay of the ES (ms)"
@@ -25359,11 +25380,11 @@ msgstr ""
 
 #: modules/stream_out/delay.c:55
 msgid "Delay a stream"
-msgstr "Atrasar um fluxo"
+msgstr "Atrasar um transmissão"
 
 #: modules/stream_out/description.c:54
 msgid "Description stream output"
-msgstr "Saída de fluxo de descrição"
+msgstr "Saída de transmissão de descrição"
 
 #: modules/stream_out/display.c:41
 msgid "Enable/disable audio rendering."
@@ -25379,15 +25400,15 @@ msgstr "Atraso (ms)"
 
 #: modules/stream_out/display.c:45
 msgid "Introduces a delay in the display of the stream."
-msgstr "Insere um atraso na exibição do fluxo."
+msgstr "Insere um atraso na exibição do transmissão."
 
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
-msgstr "Saída de fluxo de exibição"
+msgstr "Saída de transmissão de exibição"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
-msgstr "Saída de fluxo duplicado"
+msgstr "Saída de transmissão duplicado"
 
 #: modules/stream_out/es.c:42 modules/stream_out/standard.c:42
 msgid "Output access method"
@@ -25463,18 +25484,18 @@ msgstr "Saída URI que será usada para vídeo."
 
 #: modules/stream_out/es.c:80
 msgid "Elementary stream output"
-msgstr "Saída primária de fluxo"
+msgstr "Saída primária de transmissão"
 
 #: modules/stream_out/es.c:350 modules/stream_out/es.c:363
 #, c-format
 msgid "There is no suitable stream-output access module for \"%s/%s://%s\"."
 msgstr ""
-"Não há um módulo de acesso compatível com a saída de fluxo para \"%s/%s://%s"
-"\"."
+"Não há um módulo de acesso compatível com a saída de transmissão para \"%s/"
+"%s://%s\"."
 
 #: modules/stream_out/gather.c:45
 msgid "Gathering stream output"
-msgstr "Saída de fluxo de coleta"
+msgstr "Saída de transmissão de coleta"
 
 #: modules/stream_out/mosaic_bridge.c:103
 msgid "Specify an identifier string for this subpicture"
@@ -25505,7 +25526,7 @@ msgstr "Filtro de Vìdeo"
 
 #: modules/stream_out/mosaic_bridge.c:117
 msgid "Video filters will be applied to the video stream."
-msgstr "Filtros de vídeo a serem usados no fluxo de vídeo."
+msgstr "Filtros de vídeo a serem usados no transmissão de vídeo."
 
 #: modules/stream_out/mosaic_bridge.c:119
 msgid "Image chroma"
@@ -25539,7 +25560,7 @@ msgstr "Ponte de mosaico"
 
 #: modules/stream_out/mosaic_bridge.c:140
 msgid "Mosaic bridge stream output"
-msgstr "Saída de ponte do fluxo do mosaico"
+msgstr "Saída de ponte do transmissão do mosaico"
 
 #: modules/stream_out/record.c:50
 msgid "Destination prefix"
@@ -25551,7 +25572,7 @@ msgstr "Prefixo do arquivo destino, gerado automaticamente"
 
 #: modules/stream_out/record.c:57
 msgid "Record stream output"
-msgstr "Gravar a saída de fluxo"
+msgstr "Gravar a saída de transmissão"
 
 #: modules/stream_out/rtp.c:78
 msgid "This is the output URL that will be used."
@@ -25582,8 +25603,8 @@ msgid ""
 "This allows you to specify the muxer used for the streaming output. Default "
 "is to use no muxer (standard RTP stream)."
 msgstr ""
-"Permite especificar o combinador usado para a saída do fluxo. O padrão é não "
-"usar combinador (Fluxo RTP padrão)."
+"Permite especificar o combinador usado para a saída do transmissão. O padrão "
+"é não usar combinador (Transmissão RTP padrão)."
 
 #: modules/stream_out/rtp.c:92 modules/stream_out/standard.c:59
 msgid "Session name"
@@ -25616,8 +25637,8 @@ msgid ""
 "This allows you to give a short description with details about the stream, "
 "that will be announced in the SDP (Session Descriptor)."
 msgstr ""
-"Permite informar uma descrição sucinta com informações sobre o fluxo que "
-"será anunciado pelo SDP (Descritor de Sessão)."
+"Permite informar uma descrição sucinta com informações sobre o transmissão "
+"que será anunciado pelo SDP (Descritor de Sessão)."
 
 #: modules/stream_out/rtp.c:104 modules/stream_out/standard.c:67
 msgid "Session URL"
@@ -25629,8 +25650,9 @@ msgid ""
 "website of the streaming organization), that will be announced in the SDP "
 "(Session Descriptor)."
 msgstr ""
-"Permite informar uma URL com mais detalhes sobre o fluxo (geralmente o sítio "
-"da empresa do fluxo), que será anunciado no SDP (Descritor de Sessão)."
+"Permite informar uma URL com mais detalhes sobre o transmissão (geralmente o "
+"sítio da empresa do transmissão), que será anunciado no SDP (Descritor de "
+"Sessão)."
 
 #: modules/stream_out/rtp.c:109 modules/stream_out/standard.c:72
 msgid "Session email"
@@ -25646,7 +25668,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:116
 msgid "This allows you to specify the base port for the RTP streaming."
-msgstr "Especifica a porta base para o fluxo RTP."
+msgstr "Especifica a porta base para o transmissão RTP."
 
 #: modules/stream_out/rtp.c:117
 msgid "Audio port"
@@ -25655,7 +25677,7 @@ msgstr "Porta de áudio"
 #: modules/stream_out/rtp.c:119
 msgid ""
 "This allows you to specify the default audio port for the RTP streaming."
-msgstr "Especifica a porta padrão de áudio para o fluxo RTP."
+msgstr "Especifica a porta padrão de áudio para o transmissão RTP."
 
 #: modules/stream_out/rtp.c:120
 msgid "Video port"
@@ -25664,7 +25686,7 @@ msgstr "Porta de vídeo"
 #: modules/stream_out/rtp.c:122
 msgid ""
 "This allows you to specify the default video port for the RTP streaming."
-msgstr "Especifica a porta padrão de vídeo para o fluxo RTP."
+msgstr "Especifica a porta padrão de vídeo para o transmissão RTP."
 
 #: modules/stream_out/rtp.c:130
 msgid "RTP/RTCP multiplexing"
@@ -25683,7 +25705,7 @@ msgid ""
 "Default caching value for outbound RTP streams. This value should be set in "
 "milliseconds."
 msgstr ""
-"Valor padrão de cache para saída de fluxos RTP. Este valor deve ser "
+"Valor padrão de cache para saída de transmissões RTP. Este valor deve ser "
 "preenchido em milissegundos."
 
 #: modules/stream_out/rtp.c:140
@@ -25709,7 +25731,7 @@ msgstr "MP4A LATM"
 
 #: modules/stream_out/rtp.c:165
 msgid "This allows you to stream MPEG4 LATM audio streams (see RFC3016)."
-msgstr "Permite iniciar fluxos de áudio MPEG4 LATM (veja RFC3016)."
+msgstr "Permite iniciar transmissões de áudio MPEG4 LATM (veja RFC3016)."
 
 #: modules/stream_out/rtp.c:167
 msgid "RTSP session timeout (s)"
@@ -25727,7 +25749,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:188
 msgid "RTP stream output"
-msgstr "Saída do fluxo RTP"
+msgstr "Saída do transmissão RTP"
 
 #: modules/stream_out/rtp.c:245
 msgid "RTSP VoD server"
@@ -25739,12 +25761,13 @@ msgstr "Novo Identificador ES"
 
 #: modules/stream_out/setid.c:47
 msgid "Specify an new identifier integer for this elementary stream"
-msgstr "Especifique um novo identificador para este fluxo primário"
+msgstr "Especifique um novo identificador para este transmissão primário"
 
 #: modules/stream_out/setid.c:51
 msgid "Specify an ISO-639 code (three characters) for this elementary stream"
 msgstr ""
-"Especifique um código ISO-639 (três caracteres) para este fluxo primário"
+"Especifique um código ISO-639 (três caracteres) para este transmissão "
+"primário"
 
 #: modules/stream_out/setid.c:61
 msgid "Set ID"
@@ -25756,7 +25779,7 @@ msgstr "Definir identificador ES"
 
 #: modules/stream_out/setid.c:63
 msgid "Change the id of an elementary stream"
-msgstr "Modifique o identificador do fluxo primário"
+msgstr "Modifique o identificador do transmissão primário"
 
 #: modules/stream_out/setid.c:74
 msgid "Set ES Lang"
@@ -25768,7 +25791,7 @@ msgstr "Definir Idioma"
 
 #: modules/stream_out/setid.c:76
 msgid "Change the language of an elementary stream"
-msgstr "Modifique o idioma do fluxo primário"
+msgstr "Modifique o idioma do transmissão primário"
 
 #: modules/stream_out/smem.c:61
 msgid "Video prerender callback"
@@ -25843,8 +25866,8 @@ msgid ""
 "Time Synchronisation option for output. If true, stream will render as "
 "usual, else it will be rendered as fast as possible."
 msgstr ""
-"Opção de sincronização de tempo para saída. Se habilitado, o fluxo será "
-"exibido como de costume. Senão, será exibido o mais rápido possível."
+"Opção de sincronização de tempo para saída. Se habilitado, o transmissão "
+"será exibido como de costume. Senão, será exibido o mais rápido possível."
 
 #: modules/stream_out/smem.c:96
 msgid "Smem"
@@ -25852,7 +25875,7 @@ msgstr "Smem"
 
 #: modules/stream_out/smem.c:97
 msgid "Stream output to memory buffer"
-msgstr "Saída de fluxo para a memória"
+msgstr "Saída de transmissão para a memória"
 
 #: modules/stream_out/stats.c:42
 msgid "Writes stats to file instead of stdout"
@@ -25864,11 +25887,11 @@ msgstr "Prefixo para exibir em uma linha de saída"
 
 #: modules/stream_out/stats.c:52
 msgid "Writes statistic info about stream"
-msgstr "Escreve informações estatísticas sobre o fluxo"
+msgstr "Escreve informações estatísticas sobre o transmissão"
 
 #: modules/stream_out/standard.c:44
 msgid "Output method to use for the stream."
-msgstr "Método de saída a ser usado para o fluxo."
+msgstr "Método de saída a ser usado para o transmissão."
 
 #: modules/stream_out/standard.c:47
 msgid "Muxer to use for the stream."
@@ -25884,8 +25907,8 @@ msgstr "Destino de saída"
 msgid ""
 "Destination (URL) to use for the stream. Overrides path and bind parameters"
 msgstr ""
-"Destino (URL) a ser usado pelo fluxo. Sobrepõe as configurações de caminho e "
-"conexão"
+"Destino (URL) a ser usado pelo transmissão. Sobrepõe as configurações de "
+"caminho e conexão"
 
 #: modules/stream_out/standard.c:51
 msgid "Address to bind to (helper setting for dst)"
@@ -25897,12 +25920,13 @@ msgid ""
 "dst, dst=bind+'/'+path. dst-parameter overrides this."
 msgstr ""
 "endereço:porta de ligação para o VLC aguardar auxiliares de conexão de "
-"fluxos de entrada para dst. dst=ligação+'/'+caminho. O parâmetro dst "
+"transmissões de entrada para dst. dst=ligação+'/'+caminho. O parâmetro dst "
 "sobrepõe este."
 
 #: modules/stream_out/standard.c:55
 msgid "Filename for stream (helper setting for dst)"
-msgstr "Nome de arquivo para o fluxo (configuração do auxiliar para o dst)"
+msgstr ""
+"Nome de arquivo para o transmissão (configuração do auxiliar para o dst)"
 
 #: modules/stream_out/standard.c:57
 msgid ""
@@ -25914,7 +25938,7 @@ msgstr ""
 
 #: modules/stream_out/standard.c:93
 msgid "Standard stream output"
-msgstr "Saída padrão do fluxo"
+msgstr "Saída padrão do transmissão"
 
 #: modules/stream_out/transcode/transcode.c:45
 msgid "Video encoder"
@@ -25942,7 +25966,7 @@ msgstr "Taxa de bits do vídeo"
 
 #: modules/stream_out/transcode/transcode.c:54
 msgid "Target bitrate of the transcoded video stream."
-msgstr "Taxa de bits desejada para a transcodificação do fluxo de vídeo."
+msgstr "Taxa de bits desejada para a transcodificação do transmissão de vídeo."
 
 #: modules/stream_out/transcode/transcode.c:55
 msgid "Video scaling"
@@ -25960,7 +25984,7 @@ msgstr "Taxa de quadros do vídeo"
 
 #: modules/stream_out/transcode/transcode.c:60
 msgid "Target output frame rate for the video stream."
-msgstr "Taxa de quadros de saída desejada para o fluxo de vídeo."
+msgstr "Taxa de quadros de saída desejada para o transmissão de vídeo."
 
 #: modules/stream_out/transcode/transcode.c:61
 msgid "Deinterlace video"
@@ -25999,9 +26023,9 @@ msgid ""
 "Video filters will be applied to the video streams (after overlays are "
 "applied). You can enter a colon-separated list of filters."
 msgstr ""
-"Filtros de vídeo serão aplicados aos fluxos de vídeo (após as sobreposições "
-"serem aplicadas). É possível informar uma lista de filtros separados por "
-"dois-pontos."
+"Filtros de vídeo serão aplicados aos transmissões de vídeo (após as "
+"sobreposições serem aplicadas). É possível informar uma lista de filtros "
+"separados por dois-pontos."
 
 #: modules/stream_out/transcode/transcode.c:84
 msgid "Audio encoder"
@@ -26028,22 +26052,22 @@ msgstr "Taxa de bits de áudio"
 
 #: modules/stream_out/transcode/transcode.c:93
 msgid "Target bitrate of the transcoded audio stream."
-msgstr "Taxa de bits desejada para o fluxo de áudio transcodificado."
+msgstr "Taxa de bits desejada para o transmissão de áudio transcodificado."
 
 #: modules/stream_out/transcode/transcode.c:96
 msgid ""
 "Sample rate of the transcoded audio stream (11250, 22500, 44100 or 48000)."
 msgstr ""
-"Taxa de amostragem do fluxo de áudio transcodificado (11250, 22500, 44100 or "
-"48000)."
+"Taxa de amostragem do transmissão de áudio transcodificado (11250, 22500, "
+"44100 or 48000)."
 
 #: modules/stream_out/transcode/transcode.c:99
 msgid "This is the language of the audio stream."
-msgstr "A linguagem do fluxo de áudio."
+msgstr "A linguagem do transmissão de áudio."
 
 #: modules/stream_out/transcode/transcode.c:102
 msgid "Number of audio channels in the transcoded streams."
-msgstr "Número de canais de áudio no fluxo transcodificado."
+msgstr "Número de canais de áudio no transmissão transcodificado."
 
 #: modules/stream_out/transcode/transcode.c:103
 msgid "Audio filter"
@@ -26054,7 +26078,7 @@ msgid ""
 "Audio filters will be applied to the audio streams (after conversion filters "
 "are applied). You can enter a colon-separated list of filters."
 msgstr ""
-"Filtros de áudio que serão aplicados aos fluxos de áudio (depois de "
+"Filtros de áudio que serão aplicados aos transmissões de áudio (depois de "
 "aplicados os filtros de conversão). É possível preencher uma lista de "
 "filtros separados por dois-pontos."
 
@@ -26085,9 +26109,9 @@ msgid ""
 "subpicture modules."
 msgstr ""
 "Permite adicionar sobreposições (também conhecidas como \"sub telas\") no "
-"fluxo de vídeo transcodificado. As sub telas produzidas pelos filtros serão "
-"sobrepostas diretamente ao vídeo. Você pode especificar uma lista de módulos "
-"de sub tela separados por dois-pontos."
+"transmissão de vídeo transcodificado. As sub telas produzidas pelos filtros "
+"serão sobrepostas diretamente ao vídeo. Você pode especificar uma lista de "
+"módulos de sub tela separados por dois-pontos."
 
 #: modules/stream_out/transcode/transcode.c:123
 msgid "Number of threads"
@@ -26126,7 +26150,7 @@ msgstr "Transcodificar"
 
 #: modules/stream_out/transcode/transcode.c:147
 msgid "Transcode stream output"
-msgstr "Saída do transcodificador de fluxo"
+msgstr "Saída do transcodificador de transmissão"
 
 #: modules/stream_out/transcode/transcode.c:201
 msgid "Overlays/Subtitles"
@@ -26872,11 +26896,11 @@ msgstr "Alto"
 
 #: modules/video_filter/deinterlace/deinterlace.c:258
 msgid "Streaming deinterlace mode"
-msgstr "Modo de desentrelaçamento em fluxos"
+msgstr "Modo de desentrelaçamento em transmissões"
 
 #: modules/video_filter/deinterlace/deinterlace.c:259
 msgid "Deinterlace method to use for streaming."
-msgstr "Método de desentrelaçamento para uso em fluxos."
+msgstr "Método de desentrelaçamento para uso em transmissões."
 
 #: modules/video_filter/deinterlace/deinterlace.c:268
 msgid "Phosphor chroma mode for 4:2:0 input"
@@ -29015,7 +29039,7 @@ msgstr "Ocultar / Exibir o Visualizador"
 
 #: share/lua/http/index.html:236
 msgid "Manage Streams"
-msgstr "Gerenciar Fluxos"
+msgstr "Gerenciar transmissões"
 
 #: share/lua/http/index.html:237
 msgid "Track Synchronisation"
@@ -29074,8 +29098,8 @@ msgid ""
 "By creating a stream, the <i>Main Controls</i> will operate the stream "
 "instead of the main interface."
 msgstr ""
-"Ao criar um fluxo, os <i>Controles Principais</i> vão operar o fluxo em vez "
-"da interface principal."
+"Ao criar um transmissão, os <i>Controles Principais</i> vão operar o "
+"transmissão em vez da interface principal."
 
 #: share/lua/http/index.html:291
 msgid ""
@@ -29083,17 +29107,17 @@ msgid ""
 "configuration, or to modify the default settings, select the button to the "
 "right: <i>Manage Streams</i>"
 msgstr ""
-"O fluxo será criado usando as configurações padrão. Para configurações "
+"O transmissão será criado usando as configurações padrão. Para configurações "
 "avançadas ou para modificar as configurações padrão, selecione o botão a "
-"direita: <i>Gerenciar Fluxos</i>"
+"direita: <i>Gerenciar transmissões</i>"
 
 #: share/lua/http/index.html:295
 msgid ""
 "Once the stream is created, the <i>Media Viewer</i> window will display the "
 "stream."
 msgstr ""
-"Quando o fluxo é criado, a janela de <i>Exibição de Mídia</i> exibirá o "
-"fluxo."
+"Quando o transmissão é criado, a janela de <i>Exibição de Mídia</i> exibirá "
+"o transmissão."
 
 #: share/lua/http/index.html:296
 msgid ""
@@ -29108,21 +29132,21 @@ msgid ""
 "item, the first selected item from the <i>Library</i> will be the subject of "
 "the stream."
 msgstr ""
-"O item sendo reproduzido atualmente será enviado para o fluxo. Se não houver "
-"um item sendo reproduzido, o primeiro item selecionado da <i>Biblioteca</i> "
-"será enviado ao fluxo."
+"O item sendo reproduzido atualmente será enviado para o transmissão. Se não "
+"houver um item sendo reproduzido, o primeiro item selecionado da "
+"<i>Biblioteca</i> será enviado ao transmissão."
 
 #: share/lua/http/index.html:302
 msgid ""
 "To stop the stream and resume normal controls, click the <i>Open Stream</i> "
 "button again."
 msgstr ""
-"Para parar o fluxo e reestabelecer os controles normais, clique no botão "
-"<i>Abrir Fluxo</i> novamente."
+"Para parar o transmissão e reestabelecer os controles normais, clique no "
+"botão <i>Abrir Transmissão</i> novamente."
 
 #: share/lua/http/index.html:305
 msgid "Are you sure you wish to create the stream?"
-msgstr "Tem certeza de que deseja criar o fluxo?"
+msgstr "Tem certeza de que deseja criar o transmissão?"
 
 #: modules/gui/qt/ui/about.h:287 modules/gui/qt/ui/open.h:259
 #: modules/gui/qt/ui/podcast_configuration.h:99
@@ -29377,7 +29401,7 @@ msgstr "Características"
 
 #: modules/gui/qt/ui/profiles.h:718
 msgid "Streamable"
-msgstr "Transmissível por fluxo"
+msgstr "Transmissível por transmissão"
 
 #: modules/gui/qt/ui/profiles.h:719
 msgid "Chapters"
@@ -29437,7 +29461,7 @@ msgstr "&Nome do Perfil"
 
 #: modules/gui/qt/ui/sout.h:202
 msgid "Set up media sources to stream"
-msgstr "Configure fontes de mídia para criar um fluxo"
+msgstr "Configure fontes de mídia para criar um transmissão"
 
 #: modules/gui/qt/ui/sout.h:204
 msgid "Destination Setup"
@@ -29445,15 +29469,16 @@ msgstr "Configuração do Destino"
 
 #: modules/gui/qt/ui/sout.h:205
 msgid "Select destinations to stream to"
-msgstr "Selecione destinos para enviar o fluxo"
+msgstr "Selecione destinos para enviar o transmissão"
 
 #: modules/gui/qt/ui/sout.h:206
 msgid ""
 "Add destinations following the streaming methods you need. Be sure to check "
 "with transcoding that the format is compatible with the method used."
 msgstr ""
-"Todos os destinos seguem o método de fluxo que você precisa. Assegure-se de "
-"verificar na transcodificação que o formato é compatível com o método usado."
+"Todos os destinos seguem o método de transmissão que você precisa. Assegure-"
+"se de verificar na transcodificação que o formato é compatível com o método "
+"usado."
 
 #: modules/gui/qt/ui/sout.h:207
 msgid "New destination"
@@ -29481,7 +29506,7 @@ msgstr "Configuração de Opções"
 
 #: modules/gui/qt/ui/sout.h:215
 msgid "Set up any additional options for streaming"
-msgstr "Configure opções adicionais para criar um fluxo"
+msgstr "Configure opções adicionais para criar um transmissão"
 
 #: modules/gui/qt/ui/sout.h:216
 msgid "Miscellaneous Options"
@@ -29489,11 +29514,11 @@ msgstr "Outras Opções"
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Stream all elementary streams"
-msgstr "Reproduzir todos os fluxos primários"
+msgstr "Reproduzir todos as transmissões primários"
 
 #: modules/gui/qt/ui/sout.h:218
 msgid "Generated stream output string"
-msgstr "Linha para a saída do fluxo gerado"
+msgstr "Linha para a saída do transmissão gerado"
 
 #: modules/gui/qt/ui/sprefs_audio.h:411
 msgid " %"
@@ -29597,7 +29622,7 @@ msgstr "RTP sobre RTSP (TCP)"
 
 #: modules/gui/qt/ui/sprefs_input.h:374
 msgid "Live555 stream transport"
-msgstr "Transporte de fluxo Live555"
+msgstr "Transporte de transmissão Live555"
 
 #: modules/gui/qt/ui/sprefs_input.h:375
 msgid "Default caching policy"
