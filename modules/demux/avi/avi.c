@@ -550,9 +550,11 @@ static int Open( vlc_object_t * p_this )
                     tk->i_samplesize = tk->i_blocksize;
                 }
 
-                if( tk->fmt.i_codec == VLC_CODEC_VORBIS )
+                /* fix VBR decoding */
+                if( tk->fmt.i_codec == VLC_CODEC_VORBIS ||
+                    tk->fmt.i_codec == VLC_CODEC_FLAC )
                 {
-                    tk->i_blocksize = 0; /* fix vorbis VBR decoding */
+                    tk->i_blocksize = 0;
                 }
 
                 if ( tk->fmt.i_codec == VLC_CODEC_MP4A )
