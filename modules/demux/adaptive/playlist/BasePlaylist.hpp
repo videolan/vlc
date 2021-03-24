@@ -73,6 +73,7 @@ namespace adaptive
                 Property<mtime_t>                   maxSegmentDuration;
                 Property<mtime_t>                   timeShiftBufferDepth;
                 Property<mtime_t>                   suggestedPresentationDelay;
+                Property<mtime_t>                   presentationStartOffset;
 
             protected:
                 vlc_object_t                       *p_object;
