@@ -73,6 +73,7 @@ namespace adaptive
                 Property<vlc_tick_t>                   maxSegmentDuration;
                 Property<vlc_tick_t>                   timeShiftBufferDepth;
                 Property<vlc_tick_t>                   suggestedPresentationDelay;
+                Property<vlc_tick_t>                   presentationStartOffset;
 
             protected:
                 vlc_object_t                       *p_object;

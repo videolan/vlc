@@ -47,6 +47,7 @@ BasePlaylist::BasePlaylist (vlc_object_t *p_object_) :
     maxBufferTime = 0;
     timeShiftBufferDepth.Set( 0 );
     suggestedPresentationDelay.Set( 0 );
+    presentationStartOffset.Set( 0 );
     b_needsUpdates = true;
 }
 

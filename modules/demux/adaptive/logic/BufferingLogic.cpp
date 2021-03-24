@@ -87,7 +87,17 @@ uint64_t DefaultBufferingLogic::getStartSegmentNumber(BaseRepresentation *rep) c
         return getLiveStartSegmentNumber(rep);
 
     const AbstractSegmentBaseType *profile = rep->inheritSegmentProfile();
-    return profile ? profile->getStartSegmentNumber() : 0;
+    if(!profile)
+        return 0;
+    uint64_t num = profile->getStartSegmentNumber();
+    vlc_tick_t offset = rep->getPlaylist()->presentationStartOffset.Get();
+    if(offset > 0)
+    {
+        vlc_tick_t startTime, duration;
+        if(profile->getPlaybackTimeDurationBySegmentNumber(num, &startTime, &duration))
+            profile->getSegmentNumberByTime(startTime + offset, &num);
+    }
+    return num;
 }
 
 vlc_tick_t DefaultBufferingLogic::getMinBuffering(const BasePlaylist *p) const
@@ -124,6 +134,8 @@ vlc_tick_t DefaultBufferingLogic::getLiveDelay(const BasePlaylist *p) const
                                      : DEFAULT_LIVE_BUFFERING;
     if(p->suggestedPresentationDelay.Get())
         delay = p->suggestedPresentationDelay.Get();
+    else if(p->presentationStartOffset.Get())
+        delay = p->presentationStartOffset.Get();
     if(p->timeShiftBufferDepth.Get())
         delay = std::min(delay, p->timeShiftBufferDepth.Get());
     return std::max(delay, getMinBuffering(p));
