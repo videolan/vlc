@@ -322,6 +322,12 @@ void D3D11_ReleaseDevice(d3d11_decoder_device_t *dev_sys)
 static HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *d3d11ctx,
                                    bool hw_decoding, d3d11_device_t *out)
 {
+    if (unlikely(d3d11ctx == NULL))
+    {
+        msg_Err(obj, "missing external ID3D11DeviceContext");
+        return S_FALSE;
+    }
+
     HRESULT hr;
     ID3D11DeviceContext_GetDevice( d3d11ctx, &out->d3ddevice );
 
