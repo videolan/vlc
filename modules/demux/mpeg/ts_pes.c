@@ -97,7 +97,8 @@ static uint8_t *FindNextPESHeader( uint8_t *p_buf, size_t i_buffer )
 }
 
 static bool ts_pes_Push( ts_pes_parse_callback *cb,
-                  ts_stream_t *p_pes, block_t *p_pkt, bool b_unit_start )
+                  ts_stream_t *p_pes, block_t *p_pkt,
+                  bool b_unit_start, stime_t i_append_pcr )
 {
     bool b_ret = false;
 
@@ -109,9 +110,12 @@ static bool ts_pes_Push( ts_pes_parse_callback *cb,
         p_pes->gather.i_data_size = 0;
         p_pes->gather.i_gathered = 0;
         p_pes->gather.pp_last = &p_pes->gather.p_data;
-        cb->pf_parse( cb->p_obj, cb->priv, p_datachain );
+        cb->pf_parse( cb->p_obj, cb->priv, p_datachain, p_pes->gather.i_append_pcr );
         b_ret = true;
     }
+
+    if( b_unit_start )
+        p_pes->gather.i_append_pcr = i_append_pcr;
 
     if( p_pkt == NULL )
         return b_ret;
@@ -137,7 +141,7 @@ static bool ts_pes_Push( ts_pes_parse_callback *cb,
     {
         /* re-enter in Flush above */
         assert(p_pes->gather.p_data);
-        return ts_pes_Push( cb, p_pes, NULL, true );
+        return ts_pes_Push( cb, p_pes, NULL, true, i_append_pcr );
     }
 
     return b_ret;
@@ -145,12 +149,13 @@ static bool ts_pes_Push( ts_pes_parse_callback *cb,
 
 bool ts_pes_Drain( ts_pes_parse_callback *cb, ts_stream_t *p_pes )
 {
-    return ts_pes_Push( cb, p_pes, NULL, true );
+    return ts_pes_Push( cb, p_pes, NULL, true, VLC_TICK_INVALID );
 }
 
 bool ts_pes_Gather( ts_pes_parse_callback *cb,
                     ts_stream_t *p_pes, block_t *p_pkt,
-                    bool b_unit_start, bool b_valid_scrambling )
+                    bool b_unit_start, bool b_valid_scrambling,
+                    stime_t i_append_pcr )
 {
     bool b_ret = false;
     bool b_single_payload = b_unit_start; /* Single payload in case of unit start */
@@ -169,7 +174,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
     if( (p_pkt->i_flags & BLOCK_FLAG_SCRAMBLED) && b_valid_scrambling )
     {
         block_Release( p_pkt );
-        return ts_pes_Push( cb, p_pes, NULL, true );
+        return ts_pes_Push( cb, p_pes, NULL, true, i_append_pcr );
     }
 
     /* Seek discontinuity, we need to drop or output currently
@@ -178,7 +183,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
     {
         p_pes->gather.i_saved = 0;
         /* Flush/output current */
-        b_ret |= ts_pes_Push( cb, p_pes, NULL, true );
+        b_ret |= ts_pes_Push( cb, p_pes, NULL, true, i_append_pcr );
         /* Propagate to output block to notify packetizers/decoders */
         if( p_pes->p_es )
             p_pes->p_es->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
@@ -260,7 +265,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
                 /* Append whole block */
                 if( likely(p_pkt->i_buffer <= i_remain) )
                 {
-                    b_ret |= ts_pes_Push( cb, p_pes, p_pkt, p_pes->gather.p_data == NULL );
+                    b_ret |= ts_pes_Push( cb, p_pes, p_pkt, p_pes->gather.p_data == NULL, i_append_pcr );
                     p_pkt = NULL;
                 }
                 else /* p_pkt->i_buffer > i_remain */
@@ -271,7 +276,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
                         block_Release( p_pkt );
                         return false;
                     }
-                    b_ret |= ts_pes_Push( cb, p_pes, p_pkt, p_pes->gather.p_data == NULL );
+                    b_ret |= ts_pes_Push( cb, p_pes, p_pkt, p_pes->gather.p_data == NULL, i_append_pcr );
                     p_pkt = p_split;
                     b_first_sync_done = false;
                 }
@@ -280,7 +285,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
             {
                 if( likely(b_aligned_ts_payload) && b_unit_start )
                 {
-                    b_ret |= ts_pes_Push( cb, p_pes, NULL, true );
+                    b_ret |= ts_pes_Push( cb, p_pes, NULL, true, i_append_pcr );
                     /* now points to PES header */
                     if( p_pkt->i_buffer >= 6 )
                     {
@@ -290,7 +295,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
                     }
                 }
                 /* Append or finish current/start new PES depending on unit_start */
-                b_ret |= ts_pes_Push( cb, p_pes, p_pkt, b_unit_start );
+                b_ret |= ts_pes_Push( cb, p_pes, p_pkt, b_unit_start, i_append_pcr );
                 p_pkt = NULL;
             }
         }

@@ -1532,7 +1532,8 @@ static void SendDataChain( demux_t *p_demux, ts_es_t *p_es, block_t *p_chain )
 /****************************************************************************
  * gathering stuff
  ****************************************************************************/
-static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
+static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
+                               stime_t i_append_pcr )
 {
     uint8_t header[34];
     unsigned i_pes_size = 0;
@@ -1698,19 +1699,20 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                 }
 
                 /* Compute PCR/DTS offset if any */
+                stime_t i_pcrref = SETANDVALID(i_append_pcr) ? i_append_pcr : p_pmt->pcr.i_first;
                 if( p_pmt->pcr.i_pcroffset == -1 && p_block->i_dts != VLC_TICK_INVALID &&
-                    SETANDVALID(p_pmt->pcr.i_current) &&
+                    SETANDVALID(i_pcrref) &&
                    (p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES) )
                 {
                     stime_t i_dts27 = TO_SCALE(p_block->i_dts);
-                    i_dts27 = TimeStampWrapAround( p_pmt->pcr.i_first, i_dts27 );
-                    stime_t i_pcr = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
-                    if( i_dts27 < i_pcr )
+                    i_dts27 = TimeStampWrapAround( i_pcrref, i_dts27 );
+                    i_pcrref = TimeStampWrapAround( p_pmt->pcr.i_first, i_pcrref );
+                    if( i_dts27 + (CLOCK_FREQ/90000) < i_pcrref )
                     {
-                        p_pmt->pcr.i_pcroffset = i_pcr - i_dts27 + TO_SCALE_NZ(VLC_TICK_FROM_MS(80));
+                        p_pmt->pcr.i_pcroffset = i_pcrref - i_dts27 + TO_SCALE_NZ(VLC_TICK_FROM_MS(80));
                         msg_Warn( p_demux, "Broken stream: pid %d sends packets with dts %"PRId64
                                            "us later than pcr, applying delay",
-                                  pid->i_pid, FROM_SCALE_NZ(p_pmt->pcr.i_pcroffset) );
+                                  pid->i_pid, FROM_SCALE_NZ(i_pcrref - i_dts27) );
                     }
                     else p_pmt->pcr.i_pcroffset = 0;
                 }
@@ -1762,9 +1764,9 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     }
 }
 
-static void PESDataChainHandle( vlc_object_t *p_obj, void *priv, block_t *p_data )
+static void PESDataChainHandle( vlc_object_t *p_obj, void *priv, block_t *p_data, stime_t i_appendpcr )
 {
-    ParsePESDataChain( (demux_t *)p_obj, (ts_pid_t *) priv, p_data );
+    ParsePESDataChain( (demux_t *)p_obj, (ts_pid_t *) priv, p_data, i_appendpcr );
 }
 
 static block_t* ReadTSPacket( demux_t *p_demux )
@@ -2640,9 +2642,15 @@ static bool GatherPESData( demux_t *p_demux, ts_pid_t *p_pid, block_t *p_pkt, si
     const bool b_unit_start = p_pkt->p_buffer[1]&0x40;
     p_pkt->p_buffer += i_skip; /* point to PES */
     p_pkt->i_buffer -= i_skip;
+
+    const ts_es_t *p_es = p_pid->u.p_stream->p_es;
+    stime_t i_append_pcr = ( p_es && p_es->p_program )
+                         ? p_es->p_program->pcr.i_current : TS_TICK_UNKNOWN;
+
     return ts_pes_Gather( &cb, p_pid->u.p_stream,
                           p_pkt, b_unit_start,
-                          p_sys->b_valid_scrambling );
+                          p_sys->b_valid_scrambling,
+                          i_append_pcr );
 }
 
 static bool GatherSectionsData( demux_t *p_demux, ts_pid_t *p_pid, block_t *p_pkt, size_t i_skip )

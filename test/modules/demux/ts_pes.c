@@ -31,9 +31,10 @@
 
 #include "../../libvlc/test.h"
 
-static void Parse(vlc_object_t *obj, void *priv, block_t *data)
+static void Parse(vlc_object_t *obj, void *priv, block_t *data, stime_t t)
 {
     VLC_UNUSED(obj);
+    VLC_UNUSED(t);
     block_t **pp_append = (block_t **) priv;
     fprintf(stderr, "recv: ");
     data = block_ChainGather(data);
@@ -95,7 +96,7 @@ int main()
         0x00, 0x00, 0x01, 0xe0, 0x00, 0x03, 0x80, 0x00, 0x00,
     };
     PKT_FROM(aligned0);
-    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
@@ -104,13 +105,13 @@ int main()
     RESET;
     /* no output if not unit start */
     PKT_FROM(aligned0);
-    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, false, true));
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, false, true, 0));
     ASSERT(!output);
     RESET;
     /* no output if not unit start */
     PKT_FROM(aligned0);
     pkt->i_buffer = 1;
-    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, false, true));
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, false, true, 0));
     ASSERT(!output);
     RESET;
 
@@ -120,7 +121,7 @@ int main()
         0xAA, 0xBB, 0xAA, 0xBB, 0xAA, 0xBB,
     };
     PKT_FROM(aligned1);
-    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
@@ -129,25 +130,25 @@ int main()
     RESET;
     /* no output if not unit start */
     PKT_FROM(aligned1);
-    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, false, true));
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, false, true, 0));
     ASSERT(!output);
     RESET;
 
     /* payload == 30, uncomplete */
     PKT_FROM(aligned1);
     SetWBE(&pkt->p_buffer[4], 30);
-    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(!output);
     RESET;
 
     /* packets assembly, payload > 188 - 6 - 4 */
     PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 250);
-    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(!output);
     ASSERT(pes.gather.i_data_size == 256);
     PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
-    ASSERT(ts_pes_Gather(&cb, &pes, pkt, false, true));
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, false, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
@@ -157,11 +158,11 @@ int main()
     /* no packets assembly from unit start */
     PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 250);
-    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(!output);
     ASSERT(pes.gather.i_data_size == 256);
     PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
-    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 2);
@@ -170,12 +171,12 @@ int main()
     /* packets assembly, payload undef, use next sync code from another payload undef */
     PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 0);
-    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(!output);
     ASSERT(pes.gather.i_data_size == 0);
     PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 0);
-    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
@@ -185,11 +186,11 @@ int main()
     /* packets assembly, payload undef, use next sync code from fixed size */
     PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 0);
-    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(!output);
     ASSERT(pes.gather.i_data_size == 0);
     PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
-    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 2); /* secondary */
@@ -198,17 +199,17 @@ int main()
     /* packets assembly, payload undef, use next sync code from fixed size but uncomplete */
     PKT_FROMSZ(aligned1, 188-sizeof(aligned1));
     SetWBE(&pkt->p_buffer[4], 0);
-    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(!ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(!output);
     ASSERT(pes.gather.i_data_size == 0);
     PKT_FROM(aligned1);
     pkt->i_buffer = 6;
-    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1); /* can't output */
     PKT_FROM(aligned1);
-    ASSERT(ts_pes_Gather(&cb, &pes, pkt, false, true)); /* add data for last output */
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, false, true, 0)); /* add data for last output */
     ASSERT(output); /* output */
     RESET;
 
@@ -225,7 +226,7 @@ int main()
     /* If the payload_unit_start_indicator is set to '1', then one and only one
      * PES packet starts in this transport stream packet. */
     PKT_FROM(aligned2);
-    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 1);
@@ -234,7 +235,7 @@ int main()
     /* Broken PUSI tests */
     pes.b_broken_PUSI_conformance = true;
     PKT_FROM(aligned2);
-    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 3);
@@ -243,7 +244,7 @@ int main()
     pes.b_broken_PUSI_conformance = true;
     PKT_FROM(aligned2);
     pkt->p_buffer[0] = 0xFF;
-    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true));
+    ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
     ASSERT(output);
     block_ChainProperties(output, &outputcount, &outputsize, NULL);
     ASSERT(outputcount == 2);
@@ -254,13 +255,13 @@ int main()
         pes.b_broken_PUSI_conformance = true;
         PKT_FROM(aligned2);
         pkt->i_buffer = split;
-        ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true));
+        ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
         ASSERT(output);
 
         PKT_FROM(aligned2);
         pkt->p_buffer += split;
         pkt->i_buffer -= split;
-        ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true));
+        ASSERT(ts_pes_Gather(&cb, &pes, pkt, true, true, 0));
         ASSERT(output);
 
         RESET;

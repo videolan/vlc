@@ -126,6 +126,7 @@ struct ts_stream_t
         block_t     **pp_last;
         uint8_t     saved[5];
         size_t      i_saved;
+        stime_t     i_append_pcr;
     } gather;
 
     bool        b_always_receive;
