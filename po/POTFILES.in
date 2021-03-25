@@ -818,6 +818,7 @@ modules/gui/qt/maininterface/qml/MainInterface.qml
 modules/gui/qt/maininterface/qml/NoMedialibHome.qml
 modules/gui/qt/medialibrary/qml/ArtistTopBanner.qml
 modules/gui/qt/medialibrary/qml/AudioGridItem.qml
+modules/gui/qt/medialibrary/qml/MediaGroupDisplay.qml
 modules/gui/qt/medialibrary/qml/MediaGroupList.qml
 modules/gui/qt/medialibrary/qml/MusicAlbums.qml
 modules/gui/qt/medialibrary/qml/MusicAlbumsDisplay.qml
