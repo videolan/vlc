@@ -40,12 +40,6 @@ Widgets.GridItem {
     playCoverBorder.width: VLCStyle.gridCover_video_border
     titleMargin: VLCStyle.margin_xxsmall
     showNewIndicator: true
-    onItemDoubleClicked: {
-        if ( model.id !== undefined ) {
-            g_mainDisplay.showPlayer()
-            medialib.addAndPlay( model.id )
-        }
-    }
     onPlayClicked: {
         if ( model.id !== undefined ) {
             g_mainDisplay.showPlayer()

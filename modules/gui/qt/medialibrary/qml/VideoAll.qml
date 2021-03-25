@@ -44,6 +44,8 @@ Widgets.NavigableFocusScope {
 
     property int initialIndex: 0
 
+    property var model: MLVideoModel { ml: medialib }
+
     property var sortModel: [
         { text: i18n.qtr("Alphabetic"), criteria: "title"          },
         { text: i18n.qtr("Duration"),   criteria: "duration" }
@@ -52,11 +54,6 @@ Widgets.NavigableFocusScope {
     //---------------------------------------------------------------------------------------------
     // Aliases
     //---------------------------------------------------------------------------------------------
-
-    // NOTE: This is used to determine which media(s) shall be displayed.
-    property alias parentId: model.parentId
-
-    property alias model: model
 
     property alias currentItem: view.currentItem
 
@@ -99,6 +96,16 @@ Widgets.NavigableFocusScope {
         }
     }
 
+    Connections {
+        target: model
+
+        onCountChanged: {
+            if (count === 0 || modelSelect.hasSelection) return;
+
+            resetFocus();
+        }
+    }
+
     //---------------------------------------------------------------------------------------------
     // Functions
     //---------------------------------------------------------------------------------------------
@@ -122,7 +129,7 @@ Widgets.NavigableFocusScope {
     //---------------------------------------------------------------------------------------------
     // Private
 
-    function _actionAtIndex(index) {
+    function _actionAtIndex() {
         g_mainDisplay.showPlayer();
 
         medialib.addAndPlay(model.getIdsForIndexes(modelSelect.selectedIndexes));
@@ -131,18 +138,6 @@ Widgets.NavigableFocusScope {
     //---------------------------------------------------------------------------------------------
     // Childs
     //---------------------------------------------------------------------------------------------
-
-    MLVideoModel {
-        id: model
-
-        ml: medialib
-
-        onCountChanged: {
-            if (count === 0 || modelSelect.hasSelection) return;
-
-            resetFocus();
-        }
-    }
 
     Widgets.StackViewExt {
         id: view
@@ -267,6 +262,12 @@ Widgets.NavigableFocusScope {
 
                 onItemClicked: gridView.leftClickOnItem(modifier, index)
 
+                onItemDoubleClicked: {
+                    g_mainDisplay.showPlayer();
+
+                    medialib.addAndPlay(model.id);
+                }
+
                 onContextMenuButtonClicked: {
                     gridView.rightClickOnItem(index);
 
@@ -296,7 +297,7 @@ Widgets.NavigableFocusScope {
 
             onSelectionUpdated: modelSelect.updateSelection(keyModifiers, oldIndex, newIndex)
 
-            onActionAtIndex: _actionAtIndex(index)
+            onActionAtIndex: _actionAtIndex()
 
             //-------------------------------------------------------------------------------------
             // Connections
@@ -336,6 +337,8 @@ Widgets.NavigableFocusScope {
 
             //-------------------------------------------------------------------------------------
             // Events
+
+            onActionForSelection: medialib.addAndPlay(model.getIdsForIndexes(selection))
 
             onContextMenuButtonClicked: contextMenu.popup(modelSelect.selectedIndexes,
                                                           menuParent.mapToGlobal(0,0))
