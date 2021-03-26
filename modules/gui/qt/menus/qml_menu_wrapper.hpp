@@ -32,6 +32,8 @@ class MLArtistModel;
 class MLAlbumTrackModel;
 class MLUrlModel;
 class MLVideoModel;
+class MLGroupListModel;
+class MLGroupModel;
 class MLPlaylistListModel;
 class MLPlaylistModel;
 class NetworkDeviceModel;
@@ -215,6 +217,25 @@ signals:
 private:
     QMenu* m_menu = nullptr;
 };
+
+//-------------------------------------------------------------------------------------------------
+// Groups
+//-------------------------------------------------------------------------------------------------
+
+class GroupListContextMenu : public QObject {
+    Q_OBJECT
+    SIMPLE_MENU_PROPERTY(MLGroupListModel *, model, nullptr)
+public:
+    GroupListContextMenu(QObject * parent = nullptr);
+    ~GroupListContextMenu() /* override */;
+
+public slots:
+    void popup(const QModelIndexList & selected, QPoint pos, QVariantMap options = {});
+private:
+    QMenu* m_menu = nullptr;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 class PlaylistListContextMenu : public QObject {
     Q_OBJECT

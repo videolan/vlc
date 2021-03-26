@@ -20,6 +20,7 @@
 #include "util/qml_main_context.hpp"
 #include "medialibrary/medialib.hpp"
 #include "medialibrary/mlvideomodel.hpp"
+#include "medialibrary/mlgrouplistmodel.hpp"
 #include "medialibrary/mlplaylistlistmodel.hpp"
 #include "medialibrary/mlplaylistmodel.hpp"
 #include "medialibrary/mlalbummodel.hpp"
@@ -388,6 +389,50 @@ void VideoContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVaria
         connect(sigmapper, QOverload<int>::of(&QSignalMapper::mapped), this, &VideoContextMenu::showMediaInformation);
 #endif
     }
+
+    m_menu->popup(pos);
+}
+
+//=================================================================================================
+// GroupListContextMenu
+//=================================================================================================
+
+GroupListContextMenu::GroupListContextMenu(QObject * parent) : QObject(parent) {}
+
+GroupListContextMenu::~GroupListContextMenu() /* override */
+{
+    if (m_menu)
+        delete m_menu;
+}
+
+void GroupListContextMenu::popup(const QModelIndexList & selected, QPoint pos, QVariantMap)
+{
+    if (m_model == nullptr)
+        return;
+
+    if (m_menu)
+        delete m_menu;
+
+    QVariantList ids;
+
+    for (const QModelIndex & modelIndex : selected)
+        ids.push_back(m_model->data(modelIndex, MLGroupListModel::GROUP_ID));
+
+    m_menu = new QMenu();
+
+    MediaLib * ml = m_model->ml();
+
+    QAction * action = m_menu->addAction(qtr("Add and play"));
+
+    connect(action, &QAction::triggered, [ml, ids]() {
+        ml->addAndPlay(ids);
+    });
+
+    action = m_menu->addAction(qtr("Enqueue"));
+
+    connect(action, &QAction::triggered, [ml, ids]() {
+        ml->addToPlaylist(ids);
+    });
 
     m_menu->popup(pos);
 }
