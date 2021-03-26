@@ -5,22 +5,23 @@
 # Translators:
 # alexdimitrov <kvikmen@gmail.com>, 2013
 # Atanas Beloborodov <arrtedone@gmail.com>, 2013, 2015
-# Kiril Kirilov <cybercop_montana@abv.bg>, 2013
-# Yordanka Peteva <danie.peteva@gmail.com>, 2014
+# Симеон Цветков <sicvetkov@uni-sofia.bg>, 2021
 # Evgeni Danailov <genidanailov@gmail.com>, 2015
 # Ivo Ivanov <bestran@mail.bg>, 2008,2010,2013
 # Kaloyan Nikolov <kotipuka01@gmail.com>, 2016
-# Tihomir Hristov <killera124@gmail.com>, 2014-2015
+# Kiril Kirilov <cybercop_montana@abv.bg>, 2013
 # Lachezar Yotov <yotov.ls@gmail.com>, 2015
-# Niksana Nanev <niki4etooo@gmail.com>, 2016
 # Марин Минчев <marin.minchev@gmail.com>, 2016
+# Niksana Nanev <niki4etooo@gmail.com>, 2016
+# Tihomir Hristov <killera124@gmail.com>, 2014-2015
+# Yordanka Peteva <danie.peteva@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2021-03-26 19:45+0100\n"
+"Last-Translator: Симеон Цветков <sicvetkov@uni-sofia.bg>, 2021\n"
 "Language-Team: Bulgarian (https://www.transifex.com/yaron/teams/16553/bg/)\n"
 "Language: bg\n"
 "MIME-Version: 1.0\n"
@@ -1047,7 +1048,7 @@ msgstr "%.2f децибела"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr "Резолюция на видеото"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
@@ -1101,7 +1102,7 @@ msgstr ""
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
-msgstr ""
+msgstr "Ориентация"
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
@@ -1111,11 +1112,11 @@ msgstr "Неопределено"
 
 #: src/input/es_out.c:3212
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 реда, 60 Хц)"
 
 #: src/input/es_out.c:3214
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 реда, 50 Хц)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
@@ -1630,7 +1631,7 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "Музика"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
@@ -1654,7 +1655,7 @@ msgstr ""
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
-msgstr ""
+msgstr "Достъпност"
 
 #: src/libvlc-module.c:144
 msgid "Test"
@@ -11156,7 +11157,7 @@ msgstr ""
 #: modules/codec/avcodec/encoder.c:906
 #, c-format
 msgid "VLC could not open the %4.4s %s encoder."
-msgstr ""
+msgstr "VLC не може да отвори %4.4s %s енкодера."
 
 #: modules/codec/avcodec/vaapi.c:352
 msgid "VA-API video decoder via DRM"
@@ -11477,11 +11478,11 @@ msgstr ""
 
 #: modules/codec/g711.c:46
 msgid "G.711 decoder"
-msgstr ""
+msgstr "G.711 декодер"
 
 #: modules/codec/g711.c:54
 msgid "G.711 encoder"
-msgstr ""
+msgstr "G.711 енкодер"
 
 #: modules/codec/gstreamer/gstdecode.c:76
 msgid "Uses GStreamer framework's plugins to decode the media codecs"
