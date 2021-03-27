@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Alexander Lakhin <exclusion@gmail.com>, 2014-2020
+# Alexander Lakhin <exclusion@gmail.com>, 2014-2021
 # Andrey Brilevskiy <andrey-brilevskiy@yandex.ru>, 2005
 # Andrey Wolk (Lorni) <andywolk@gmail.com>, 2009
 # Konstantin Pavlov <thresh@videolan.org>, 2011
@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-03-28 18:29+0100\n"
-"Last-Translator: Alexander Lakhin <exclusion@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-03-27 08:12+0100\n"
+"Last-Translator: Alexander Lakhin <exclusion@gmail.com>, 2021\n"
 "Language-Team: Russian (https://www.transifex.com/yaron/teams/16553/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -4100,7 +4100,7 @@ msgstr "Назначьте клавишу для переключения к п�
 #: modules/gui/qt/components/controller.hpp:107
 #: modules/gui/qt/dialogs/vlm.cpp:544 modules/gui/qt/ui/streampanel.h:179
 msgid "Stop"
-msgstr "Останов"
+msgstr "Стоп"
 
 #: src/libvlc-module.c:1251
 msgid "Select the hotkey to stop playback."
