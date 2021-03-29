@@ -312,8 +312,8 @@ static bool aout_replaygain_changed( const audio_replay_gain_t *a,
     {
         if( a->pb_gain[i] != b->pb_gain[i] ||
             a->pb_peak[i] != b->pb_peak[i] ||
-            a->pb_gain[i] != b->pb_gain[i] ||
-            a->pb_peak[i] != b->pb_peak[i] )
+            (a->pb_gain[i] && a->pf_gain[i] != b->pf_gain[i]) ||
+            (a->pb_peak[i] && a->pf_peak[i] != b->pf_peak[i]) )
             return true;
     }
     return false;
