@@ -13,8 +13,8 @@
 @interface PXSourceListDelegateDataSourceProxy : NSProxy <NSOutlineViewDelegate, NSOutlineViewDataSource, PXSourceListDelegate, PXSourceListDataSource>
 
 @property (weak, nonatomic) PXSourceList *sourceList;
-@property (unsafe_unretained, nonatomic) id <PXSourceListDelegate> delegate;
-@property (unsafe_unretained, nonatomic) id <PXSourceListDataSource> dataSource;
+@property (weak, nonatomic) id <PXSourceListDelegate> delegate;
+@property (weak, nonatomic) id <PXSourceListDataSource> dataSource;
 
 - (id)initWithSourceList:(PXSourceList *)sourceList;
 

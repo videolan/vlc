@@ -136,6 +136,8 @@ static const float f_min_window_height = 307.;
 
 - (void)dealloc
 {
+    msg_Dbg(getIntf(), "Deinitializing VLCMainWindow object");
+
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     if (@available(macOS 10_14, *)) {
         [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
