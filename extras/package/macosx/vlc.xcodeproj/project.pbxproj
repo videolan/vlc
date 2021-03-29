@@ -142,6 +142,7 @@
 		1CD040462554A13A00CFF59C /* PXSourceListItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PXSourceListItem.m; path = PXSourceList/PXSourceListItem.m; sourceTree = "<group>"; };
 		1CD366791B7A242E0054E39F /* VLCTimeSelectionPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCTimeSelectionPanelController.h; sourceTree = "<group>"; };
 		1CD3667A1B7A242E0054E39F /* VLCTimeSelectionPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCTimeSelectionPanelController.m; sourceTree = "<group>"; };
+		1CDFF2AB2610E019002FFE04 /* Internal */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Internal; path = PXSourceList/Internal; sourceTree = "<group>"; };
 		1CF50B08255490D000A3C298 /* VLCSourceListBadgeButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCSourceListBadgeButton.h; sourceTree = "<group>"; };
 		1CF50B09255490D000A3C298 /* VLCSourceListBadgeButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCSourceListBadgeButton.m; sourceTree = "<group>"; };
 		1CF50B0A255490D100A3C298 /* VLCSourceListTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCSourceListTableCellView.m; sourceTree = "<group>"; };
@@ -1587,6 +1588,7 @@
 		CC0CD0E413DE0EB500B0D90D /* PXSourceList */ = {
 			isa = PBXGroup;
 			children = (
+				1CDFF2AB2610E019002FFE04 /* Internal */,
 				1CD040402554A13900CFF59C /* PXSourceList.h */,
 				1CD040422554A13900CFF59C /* PXSourceList.m */,
 				1CD0403C2554A13800CFF59C /* PXSourceListBadgeCell.h */,
