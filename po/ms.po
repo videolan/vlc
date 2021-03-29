@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-02-24 19:21+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2021\n"
+"PO-Revision-Date: 2021-03-30 01:52+0200\n"
+"Last-Translator: abuyop <abuyop@gmail.com>, 2021\n"
 "Language-Team: Malay (https://www.transifex.com/yaron/teams/16553/ms/)\n"
 "Language: ms\n"
 "MIME-Version: 1.0\n"
@@ -834,7 +834,7 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr "(lalai dibenarkan)"
+msgstr "(lalai didayakan)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
@@ -1579,7 +1579,7 @@ msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
-"Ini membolehkan pewarnaan mesej yang dihantar kepada konsol. Terminal anda "
+"Ini mendayakan pewarnaan mesej yang dihantar kepada konsol. Terminal anda "
 "memerlukan sokongan warna Linux untuk melakukannya."
 
 #: src/libvlc-module.c:99
@@ -1591,7 +1591,7 @@ msgid ""
 "When this is enabled, the preferences and/or interfaces will show all "
 "available options, including those that most users should never touch."
 msgstr ""
-"Bila dibenarkan, keutamaan dan/atau antaramuka akan tunjukkan semua pilihan "
+"Bila didayakan, keutamaan dan/atau antara muka akan tunjukkan semua pilihan "
 "yang ada, termasuk yang tidak sepatutnya disentuh oleh kebanyakan pengguna."
 
 #: src/libvlc-module.c:105
@@ -1603,7 +1603,7 @@ msgid ""
 "When this is enabled, the interface will show a dialog box each time some "
 "user input is required."
 msgstr ""
-"Bila dibenarkan, antaramuka akan menunjukkan kotak dialog setiap kali input "
+"Bila didayakan, antara muka akan menunjukkan kotak dialog setiap kali input "
 "pengguna diperlukan."
 
 #: src/libvlc-module.c:117
@@ -1613,10 +1613,10 @@ msgid ""
 "(spectrum analyzer, etc.). Enable these filters here, and configure them in "
 "the \"audio filters\" modules section."
 msgstr ""
-"Pilihan ini membenarkan anda mengubahsuai kelakuan subsistem audio, dan "
+"Pilihan ini membolehkan anda mengubah suai kelakuan subsistem audio, dan "
 "menambah penapis audio yang mana akan digunakan untuk pasca pemprosesan atau "
-"kesan visual (penganalisis spektrum, dll.) Benarkan penapis di sini, dan "
-"konfigur dalan seksyen modul \"penapis audio\"."
+"kesan visual (penganalisis spektrum, dll.) Dayakan penapis di sini, dan "
+"konfigur dalam seksyen modul \"penapis audio\"."
 
 #: src/libvlc-module.c:123
 msgid "Audio output module"
@@ -1641,7 +1641,7 @@ msgstr "Peranan (pemain) media untuk polisi sistem pengoperasian."
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:273
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:409
 msgid "Enable audio"
-msgstr "Benarkan audio"
+msgstr "Dayakan audio"
 
 #: src/libvlc-module.c:134
 msgid ""
@@ -1849,7 +1849,7 @@ msgstr "Lindungi terhadap pengklipan bunyi"
 
 #: src/libvlc-module.c:230
 msgid "Enable time stretching audio"
-msgstr "Benarkan audio masa memanjang"
+msgstr "Dayakan audio masa memanjang"
 
 #: src/libvlc-module.c:232
 msgid ""
@@ -1883,8 +1883,8 @@ msgid ""
 "\"video filters\" modules section. You can also set many miscellaneous video "
 "options."
 msgstr ""
-"Pilihan ini membenarkan anda mengubahsuai kelakuan subsistem output video. "
-"Anda boleh, sebagai contoh bolehkan penapis video (mengurai, melaras imej, "
+"Pilihan ini membenarkan anda mengubah suai kelakuan subsistem output video. "
+"Anda boleh, sebagai contoh dayakan penapis video (mengurai, melaras imej, "
 "dll.). Bolehkan penapis di sini dan konfigurnya dalam seksyen modul "
 "\"penapis video\". Anda juga boleh banyak lain-lain tetapkan pilihan video."
 
@@ -1903,7 +1903,7 @@ msgstr ""
 #: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:359
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:313
 msgid "Enable video"
-msgstr "Benarkan video"
+msgstr "Dayakan video"
 
 #: src/libvlc-module.c:260
 msgid ""
@@ -2097,7 +2097,7 @@ msgstr "Sentiasa letak tetingkap video di atas tetingkap lain."
 
 #: src/libvlc-module.c:319
 msgid "Enable wallpaper mode"
-msgstr "Benarkan mod kertas dinding"
+msgstr "Dayakan mod kertas dinding"
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2401,7 +2401,7 @@ msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr ""
-"Benarkan penjatuhan bingkai pada strim MPEG2. Penjatuhan bingkai berlaku "
+"Dayakan penjatuhan bingkai pada strim MPEG2. Penjatuhan bingkai berlaku "
 "apabila komputer anda tidak cukup kuasa"
 
 #: src/libvlc-module.c:473
@@ -2435,7 +2435,7 @@ msgstr "Acara menekan kekunci"
 #: src/libvlc-module.c:485
 msgid "This enables VLC hotkeys from the (non-embedded) video window."
 msgstr ""
-"Ini membenarkan kekunci panas VLC dari tetingkap video (tidak-terbenam)."
+"Ini mendayakan kekunci panas VLC dari tetingkap video (tidak-terbenam)."
 
 #: src/libvlc-module.c:487 modules/spu/remoteosd.c:91
 msgid "Mouse events"
@@ -2443,7 +2443,7 @@ msgstr "Peristiwa tetikus"
 
 #: src/libvlc-module.c:489
 msgid "This enables handling of mouse clicks on the video."
-msgstr "Ini membenarkan pengendalian klik tetikus pada video."
+msgstr "Ini mendayakan pengendalian klik tetikus pada video."
 
 #: src/libvlc-module.c:497
 msgid ""
@@ -2562,7 +2562,7 @@ msgstr "Lalai"
 #: modules/gui/qt/components/extended_panels.cpp:949
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/vlm.h:288
 msgid "Enable"
-msgstr "Benarkan"
+msgstr "Dayakan"
 
 #: src/libvlc-module.c:542
 msgid "MTU of the network interface"
@@ -2897,10 +2897,10 @@ msgid ""
 "filters here and configure them in the \"subsources filters\" modules "
 "section. You can also set many miscellaneous subpictures options."
 msgstr ""
-"Pilihan ini membenarkan anda mengubahsuai kelakuan subgambar subsistem. Anda "
-"boleh sebagai contoh bolehkan penapis subgambar (logo, dll.). Bolehkan "
+"Pilihan ini membolehkan anda mengubah suai kelakuan subgambar subsistem. "
+"Anda boleh sebagai contoh dayakan penapis subgambar (logo, dll.). Bolehkan "
 "tetapan ini di sini dan konfigurnya dalam seksyen modul \"penapis subgambar"
-"\". Anda boleh juga tetapkan perlbagai pilihan subgambar."
+"\". Anda boleh juga tetapkan pelbagai pilihan subgambar."
 
 #: src/libvlc-module.c:705 modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Force subtitle position"
@@ -2924,7 +2924,7 @@ msgstr "Ubah saiz sarikata jika boleh"
 
 #: src/libvlc-module.c:713
 msgid "Enable sub-pictures"
-msgstr "Benarkan sub-gambar"
+msgstr "Dayakan sub-gambar"
 
 #: src/libvlc-module.c:715
 msgid "You can completely disable the sub-picture processing."
@@ -3358,11 +3358,11 @@ msgid ""
 msgstr ""
 "Anda boleh masukkan rantaian output lalai di sini. Rujuk dokumentasi untuk "
 "ketahui bagaimana untuk membina rantaian sebegitu. Amaran: rantaian ini akan "
-"dibolehkan untuk semua strim. "
+"didayakan untuk semua strim. "
 
 #: src/libvlc-module.c:935
 msgid "Enable streaming of all ES"
-msgstr "Benarkan penstriman untuk semua ES"
+msgstr "Dayakan penstriman untuk semua ES"
 
 #: src/libvlc-module.c:937
 msgid "Stream all elementary streams (video, audio and subtitles)"
@@ -3378,7 +3378,7 @@ msgstr "Mainkan strim secara setempat ketika menstrimnya."
 
 #: src/libvlc-module.c:943
 msgid "Enable video stream output"
-msgstr "Benarkan output strim video"
+msgstr "Dayakan output strim video"
 
 #: src/libvlc-module.c:945
 msgid ""
@@ -3386,11 +3386,11 @@ msgid ""
 "facility when this last one is enabled."
 msgstr ""
 "Pilih sama ada strim video perlu diarahkan kepada kemudahan output strim "
-"apabila yang akhir ini dibolehkan."
+"apabila yang akhir ini didayakan."
 
 #: src/libvlc-module.c:948
 msgid "Enable audio stream output"
-msgstr "Benarkan output strim audio"
+msgstr "Dayakan output strim audio"
 
 #: src/libvlc-module.c:950
 msgid ""
@@ -3398,11 +3398,11 @@ msgid ""
 "facility when this last one is enabled."
 msgstr ""
 "Pilih sama ada strim audio perlu diarah semula ke kemudahan output strim "
-"bila yang terakhir ini dibolehkan."
+"bila yang terakhir ini didayakan."
 
 #: src/libvlc-module.c:953
 msgid "Enable SPU stream output"
-msgstr "Benarkan output strim SPU"
+msgstr "Dayakan output strim SPU"
 
 #: src/libvlc-module.c:955
 msgid ""
@@ -3410,7 +3410,7 @@ msgid ""
 "facility when this last one is enabled."
 msgstr ""
 "Pilih sama ada strim SPU perlu diarah semula ke kemudahan output strim bila "
-"yang terakhir ini dibolehkan."
+"yang terakhir ini didayakan."
 
 #: src/libvlc-module.c:958
 msgid "Keep stream output open"
@@ -3471,7 +3471,7 @@ msgid ""
 "If this option is enabled, the flow on the SAP multicast address will be "
 "controlled. This is needed if you want to make announcements on the MBone."
 msgstr ""
-"Jika pilihan ini dibolehkan, aliran pada alamat multikas SAP akan dikawal. "
+"Jika pilihan ini didayakan, aliran pada alamat multikas SAP akan dikawal. "
 "Ini diperlukan jika anda ingin buat pengumuman pada MBone."
 
 #: src/libvlc-module.c:987
@@ -8867,7 +8867,7 @@ msgid ""
 "Enable the color killer, i.e. switch to black & white picture whenever the "
 "signal is weak."
 msgstr ""
-"Bolehkan pembunuh warna, cth. pertukaran kepada gambar hitam & putih apabila "
+"Dayakan pembunuh warna, cth. pertukaran kepada gambar hitam & putih apabila "
 "signal lemah."
 
 #: modules/access/v4l2/v4l2.c:156
@@ -10599,7 +10599,7 @@ msgid ""
 "If enabled, this option will automatically connect sound output to the first "
 "writable JACK clients found."
 msgstr ""
-"Jika dibenarkan, pilihan ini akan sambung output bunyi secara automatik ke "
+"Jika didayakan, pilihan ini akan sambung output bunyi secara automatik ke "
 "klien JACK boleh tulis pertama yang ditemui."
 
 #: modules/audio_output/jack.c:89
@@ -10611,8 +10611,8 @@ msgid ""
 "If automatic connection is enabled, only JACK clients whose names match this "
 "regular expression will be considered for connection."
 msgstr ""
-"Jika sambungan automatik dibenarkan, hanya klien JACK yang namanya sepadan "
-"dengan ungkapan nalar ini akan diambilkira untuk sambungan."
+"Jika sambungan automatik didayakan, hanya klien JACK yang namanya sepadan "
+"dengan ungkapan nalar ini akan diambil kira untuk sambungan."
 
 #: modules/audio_output/jack.c:94
 msgid "JACK client name"
@@ -10639,8 +10639,7 @@ msgid ""
 "Enable this option if you want your audio not to be interrupted by the other "
 "audio."
 msgstr ""
-"Benarkan pilihan ini jika anda mahu audio anda tidak disampuk oleh audio "
-"lain."
+"Dayakan pilihan ini jika anda mahu audio anda tidak disampuk oleh audio lain."
 
 #: modules/audio_output/kai.c:110
 msgid "K Audio Interface audio output"
@@ -10664,11 +10663,11 @@ msgstr "Dilumpuhkan"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled (AC3/DTS only)"
-msgstr "Dibenarkan (AC3/DTS sahaja)"
+msgstr "Dayakan (AC3/DTS sahaja)"
 
 #: modules/audio_output/mmdevice.c:1463
 msgid "Enabled"
-msgstr "Dibenarkan"
+msgstr "Didayakan"
 
 #: modules/audio_output/mmdevice.c:1474
 msgid "Windows Multimedia Device output"
@@ -10739,9 +10738,9 @@ msgid ""
 "The option allows you to enable or disable the high-quality float32 audio "
 "output mode (which is not well supported by some soundcards)."
 msgstr ""
-"Pilihan ini benarkan anda untuk benarkan atau lumpuhkan mod output audio "
-"float32 berkualiti-tinggi (yang mana tidak begitu disokong oleh sebahagian "
-"kad bunyi)."
+"Pilihan ini benarkan anda untuk daya atau lumpuhkan mod output audio float32 "
+"berkualiti-tinggi (yang mana tidak begitu disokong oleh sebahagian kad "
+"bunyi)."
 
 #: modules/codec/a52.c:70
 msgid "A/52 dynamic range compression"
@@ -11065,7 +11064,7 @@ msgstr "Pengenkodan urai"
 
 #: modules/codec/avcodec/avcodec.h:136
 msgid "Enable dedicated algorithms for interlaced frames."
-msgstr "Bolehkan algoritma didedikasikan untuk bingkai urai."
+msgstr "Dayakan algoritma didedikasikan untuk bingkai urai."
 
 #: modules/codec/avcodec/avcodec.h:139
 msgid "Interlaced motion estimation"
@@ -11073,7 +11072,7 @@ msgstr "Anggaran gerak urai"
 
 #: modules/codec/avcodec/avcodec.h:140
 msgid "Enable interlaced motion estimation algorithms. This requires more CPU."
-msgstr "Bolehkan algoritma penganggar gerak urai. Memerlukan lebih CPU."
+msgstr "Dayakan algoritma penganggar gerak urai. Memerlukan lebih CPU."
 
 #: modules/codec/avcodec/avcodec.h:143
 msgid "Pre-motion estimation"
@@ -11081,7 +11080,7 @@ msgstr "Aggaran pra-gerak"
 
 #: modules/codec/avcodec/avcodec.h:144
 msgid "Enable the pre-motion estimation algorithm."
-msgstr "Bolehhkan algoritma anggaran pra-gerak."
+msgstr "Dayakan algoritma anggaran pra-gerak."
 
 #: modules/codec/avcodec/avcodec.h:147
 msgid "Rate control buffer size"
@@ -11125,7 +11124,7 @@ msgid ""
 "Enable a simple noise reduction algorithm to lower the encoding length and "
 "bitrate, at the expense of lower quality frames."
 msgstr ""
-"Bolehkan algoritma pengurangan hingar mudah untuk merendahkan panjang dan "
+"Dayakan algoritma pengurangan hingar mudah untuk merendahkan panjang dan "
 "kadar bit mengkod, walaupun menggunakan bingkai kualiti rendah."
 
 #: modules/codec/avcodec/avcodec.h:166
@@ -11188,7 +11187,7 @@ msgstr "Pengkuantitian Trellis"
 
 #: modules/codec/avcodec/avcodec.h:193
 msgid "Enable trellis quantization (rate distortion for block coefficients)."
-msgstr "Bolehkan pengkuantitian trellis (kadar herotan untuk pekali blok)."
+msgstr "Dayakan pengkuantitian trellis (kadar herotan untuk pekali blok)."
 
 #: modules/codec/avcodec/avcodec.h:196
 msgid "Fixed quantizer scale"
@@ -11289,7 +11288,7 @@ msgstr ""
 "Nyatakan profil audio AAC yang digunakan untuk mengekod strim bit audio. Ia "
 "menggunakan pilihan berikut: main, low, ssr (tidak disokong),ltp, hev1, hev2 "
 "(lalai: rendah). hev1 dan hev2 kini hanya disokong dengan libfdk-aac "
-"dibenarkan dengan libavcodec"
+"didayakan dengan libavcodec"
 
 #: modules/codec/avcodec/d3d11va.c:63
 msgid "Direct3D11 Video Acceleration"
@@ -11542,7 +11541,7 @@ msgstr "Algoritma pengekod yang digunakan."
 
 #: modules/codec/fdkaac.c:70
 msgid "Enable spectral band replication"
-msgstr "Benarkan replikasi jalur spektral"
+msgstr "Dayakan replikasi jalur spektral"
 
 #: modules/codec/fdkaac.c:71
 msgid "This is an optional feature only for the AAC-ELD profile."
@@ -11560,7 +11559,7 @@ msgstr ""
 
 #: modules/codec/fdkaac.c:76
 msgid "Enable afterburner library"
-msgstr "Benarkan pustaka afterburner"
+msgstr "Dayakan pustaka afterburner"
 
 #: modules/codec/fdkaac.c:77
 msgid ""
@@ -11568,7 +11567,7 @@ msgid ""
 "CPU usage (default is enabled)."
 msgstr ""
 "Pustaka ini menghasilkan audio berkualiti lebih tinggi tetapi menggunakan "
-"kuasa CPU tambahan (lalai dibenarkan)."
+"kuasa CPU tambahan (lalai didayakan)."
 
 #: modules/codec/fdkaac.c:79
 msgid "Signaling mode of the extension AOT"
@@ -11733,7 +11732,7 @@ msgid ""
 msgstr ""
 "Strim Kate membolehkan pemformatan teks. VLC sebahagiannya melaksanakannya, "
 "tetapi anda boleh pilih untuk lumpuhkan semua pemformatan. Perhatian, ia "
-"tidak memberi kesan jika pengemasgabungan melalui Tiger dibenarkan."
+"tidak memberi kesan jika pengemasgabungan melalui Tiger didayakan."
 
 #: modules/codec/kate.c:199
 msgid "Shadow"
@@ -11974,9 +11973,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "Pempaket sarikata teks Kate"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "Direktori petikan video (atau nama fail)"
+msgstr "Direktori fon tambahan"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -12041,7 +12039,7 @@ msgstr "Pengemas gabung terus OMX"
 
 #: modules/codec/omxil/omxil.c:141
 msgid "Enable OMX direct rendering."
-msgstr "Benarkan pengemas gabung terus OMX."
+msgstr "Dayakan pengemas gabung terus OMX."
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
@@ -12077,7 +12075,7 @@ msgstr "Pengekod video PNG"
 
 #: modules/codec/qsv.c:56
 msgid "Enable software mode"
-msgstr "Benarkan mod perisian"
+msgstr "Dayakan mod perisian"
 
 #: modules/codec/qsv.c:57
 msgid ""
@@ -12465,7 +12463,7 @@ msgstr "Pra tapisan"
 
 #: modules/codec/schroedinger.c:135
 msgid "Enable adaptive prefiltering"
-msgstr "Bolehkan pra-penapisan adaptif"
+msgstr "Dayakan pra-penapisan adaptif"
 
 #: modules/codec/schroedinger.c:147
 msgid "No pre-filtering"
@@ -12594,11 +12592,11 @@ msgstr "Juga dikenali sebagai aras DWT"
 
 #: modules/codec/schroedinger.c:250
 msgid "Enable multiple quantizers"
-msgstr "Benarkan pengkuantiti berbilang"
+msgstr "Dayakan pengkuantiti berbilang"
 
 #: modules/codec/schroedinger.c:251
 msgid "Enable multiple quantizers per subband (one per codeblock)"
-msgstr "Benarkan pengkuantiti berbilang per sub-jalur (satu per blok-kod)"
+msgstr "Dayakan pengkuantiti berbilang per sub-jalur (satu per blok-kod)"
 
 #: modules/codec/schroedinger.c:255
 msgid "Disable arithmetic coding"
@@ -12660,7 +12658,7 @@ msgstr "penuh - Satu blok kod per sub-jalur"
 
 #: modules/codec/schroedinger.c:306
 msgid "Enable hierarchical Motion Estimation"
-msgstr "Benarkan Anggaran Gerakan berhieraki"
+msgstr "Dayakan Anggaran Gerakan berhieraki"
 
 #: modules/codec/schroedinger.c:310
 msgid "Number of levels of downsampling"
@@ -12672,15 +12670,15 @@ msgstr "Bilangan aras persampelan-turun dalam mod anggaran gerakan berhieraki"
 
 #: modules/codec/schroedinger.c:315
 msgid "Enable Global Motion Estimation"
-msgstr "Benarkan Anggaran Gerakan Sejagat"
+msgstr "Dayakan Anggaran Gerakan Sejagat"
 
 #: modules/codec/schroedinger.c:319
 msgid "Enable Phase Correlation Estimation"
-msgstr "Benarkan Anggaran Korelasi Fasa"
+msgstr "Dayakan Anggaran Korelasi Fasa"
 
 #: modules/codec/schroedinger.c:323
 msgid "Enable Scene Change Detection"
-msgstr "Benarkan Pengesanan Ubah Adegan"
+msgstr "Dayakan Pengesanan Ubah Adegan"
 
 #: modules/codec/schroedinger.c:327
 msgid "Force Profile"
@@ -12798,7 +12796,7 @@ msgid ""
 "Enable voice activity detection (VAD). It is automatically activated in VBR "
 "mode."
 msgstr ""
-"Benarkan pengesanan aktiviti suara (VAD). Ia diaktifkan secara automatik "
+"Dayakan pengesanan aktiviti suara (VAD). Ia diaktifkan secara automatik "
 "dalam mod VBR."
 
 #: modules/codec/speex.c:85
@@ -15132,17 +15130,16 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "Jalur lebar digemari untuk strim tidak-boleh-suai"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "Lengahan DTS (ms)"
+msgstr "Lengah Main Balik langsung (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "Keseimbangan antara kestabilan dengan masa nyata"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "Penimbalan maks. (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15162,9 +15159,8 @@ msgid "Low latency"
 msgstr "Kependaman rendah"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "Batalkan parameter"
+msgstr "Batalkan parameter kependaman rendah"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15191,9 +15187,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "Kualiti/Jalur Lebar Tertinggi"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "Paksa tebal gelap"
+msgstr "Paksa"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -28862,11 +28857,14 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
+"VLC boleh memaparkan satu kod QR yang dipaut dengan versi mudah alih antara "
+"muka sesawang; alamat sesawang bagi antara muka sesawang untuk kejadian "
+"pemain media VLC anda akan dipindahkan menerusi internet ke perkhidmatan "
+"sesawang Carta Imej Google supaya dapat menjana kod QR ini."
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "Anda ingin memuat turunnya?"
+msgstr "Anda pasti mahu teruskannya?"
 
 #: share/lua/http/index.html:290
 msgid ""
