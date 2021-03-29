@@ -1,7 +1,7 @@
-diff -ruw libvpx-1.9.0.orig/build/make/configure.sh libvpx-1.9.0/build/make/configure.sh
---- libvpx-1.9.0.orig/build/make/configure.sh	2020-07-30 15:59:15.000000000 -0400
-+++ libvpx-1.9.0/build/make/configure.sh	2020-09-01 09:32:08.722717206 -0400
-@@ -832,96 +832,6 @@
+diff -ruw libvpx-1.10.0/build/make/configure.sh libvpx-1.10.0-new/build/make/configure.sh
+--- libvpx-1.10.0/build/make/configure.sh	2021-03-18 15:59:46.000000000 -0400
++++ libvpx-1.10.0-new/build/make/configure.sh	2021-03-29 15:17:36.125564531 -0400
+@@ -839,100 +839,6 @@
    # PIC is probably what we want when building shared libs
    enabled shared && soft_enable pic
  
@@ -18,7 +18,7 @@ diff -ruw libvpx-1.9.0.orig/build/make/configure.sh libvpx-1.9.0/build/make/conf
 -  # Handle darwin variants. Newer SDKs allow targeting older
 -  # platforms, so use the newest one available.
 -  case ${toolchain} in
--    arm*-darwin*)
+-    arm*-darwin-*)
 -      add_cflags "-miphoneos-version-min=${IOS_VERSION_MIN}"
 -      iphoneos_sdk_dir="$(show_darwin_sdk_path iphoneos)"
 -      if [ -d "${iphoneos_sdk_dir}" ]; then
@@ -26,7 +26,7 @@ diff -ruw libvpx-1.9.0.orig/build/make/configure.sh libvpx-1.9.0/build/make/conf
 -        add_ldflags "-isysroot ${iphoneos_sdk_dir}"
 -      fi
 -      ;;
--    x86*-darwin*)
+-    *-darwin*)
 -      osx_sdk_dir="$(show_darwin_sdk_path macosx)"
 -      if [ -d "${osx_sdk_dir}" ]; then
 -        add_cflags  "-isysroot ${osx_sdk_dir}"
@@ -84,6 +84,10 @@ diff -ruw libvpx-1.9.0.orig/build/make/configure.sh libvpx-1.9.0/build/make/conf
 -      add_cflags  "-mmacosx-version-min=10.15"
 -      add_ldflags "-mmacosx-version-min=10.15"
 -      ;;
+-    *-darwin20-*)
+-      add_cflags  "-mmacosx-version-min=10.16 -arch ${toolchain%%-*}"
+-      add_ldflags "-mmacosx-version-min=10.16 -arch ${toolchain%%-*}"
+-      ;;
 -    *-iphonesimulator-*)
 -      add_cflags  "-miphoneos-version-min=${IOS_VERSION_MIN}"
 -      add_ldflags "-miphoneos-version-min=${IOS_VERSION_MIN}"
@@ -98,7 +102,7 @@ diff -ruw libvpx-1.9.0.orig/build/make/configure.sh libvpx-1.9.0/build/make/conf
    # Handle Solaris variants. Solaris 10 needs -lposix4
    case ${toolchain} in
      sparc-solaris-*)
-@@ -1110,12 +1020,6 @@
+@@ -1121,12 +1027,6 @@
                add_cflags -isysroot ${alt_libc}
              fi
  
