@@ -540,12 +540,13 @@ int PlaylistManager::doControl(int i_query, va_list args)
 
         case DEMUX_SET_PAUSE_STATE:
         {
-            vlc_mutex_locker locker(&cached.lock);
+            setBufferingRunState(false); /* /!\ always stop buffering process first */
             bool b_pause = (bool)va_arg(args, int);
             if(playlist->isLive())
             {
-                setBufferingRunState(false); /* stop downloader first */
                 vlc_tick_t now = vlc_tick_now();
+                demux.i_nzpcr = VLC_TICK_INVALID;
+                cached.lastupdate = 0;
                 if(b_pause)
                 {
                     setLivePause(true);
@@ -558,11 +559,10 @@ int PlaylistManager::doControl(int i_query, va_list args)
                     msg_Dbg(p_demux,"Resuming buffering/playback after %" PRId64 "ms",
                             MS_FROM_VLC_TICK(now-pause_start));
                     es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
+                    setBufferingRunState(true);
                 }
-                setBufferingRunState(true);
-                demux.i_nzpcr = VLC_TICK_INVALID;
-                cached.lastupdate = 0;
             }
+            else setBufferingRunState(true);
             return VLC_SUCCESS;
         }
 
@@ -593,7 +593,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
 
         case DEMUX_SET_POSITION:
         {
-            setBufferingRunState(false); /* stop downloader first */
+            setBufferingRunState(false); /* /!\ always stop buffering process first */
             vlc_mutex_locker locker(&cached.lock);
 
             if(cached.playlistLength == 0)
