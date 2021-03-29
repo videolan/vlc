@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-02-28 16:29+0100\n"
-"Last-Translator: Alexander Gabilondo <alexgabi@disroot.org>, 2021\n"
+"PO-Revision-Date: 2021-03-29 10:31+0200\n"
+"Last-Translator: Txopi <txopi@ikusimakusi.eus>, 2021\n"
 "Language-Team: Basque (https://www.transifex.com/yaron/teams/16553/eu/)\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
@@ -16927,7 +16927,7 @@ msgstr "Sartu izen bakar bat profil berriarentzat."
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:535
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:814
 msgid "Multiple profiles with the same name are not allowed."
-msgstr "Ez dira onartzen izen bera duen profil bat baino gehiago"
+msgstr "Ez da onartzen izen bera duen profil bat baino gehiagorik."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:568
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:897
