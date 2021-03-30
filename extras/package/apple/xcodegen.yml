@@ -46,6 +46,8 @@ targets:
       - path: ${VLC_BUILD_DIR}/test/vlccoreiostuner
         type: file
         optional: true
+        attributes:
+          - CodeSignOnCopy
         buildPhase:
           copyFiles:
             destination: executables
