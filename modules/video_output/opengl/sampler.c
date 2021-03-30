@@ -715,6 +715,28 @@ InitOrientationMatrix(GLfloat matrix[static 4*4],
     }
 }
 
+static void
+GetNames(GLenum tex_target, const char **glsl_sampler, const char **texture)
+{
+    switch (tex_target)
+    {
+        case GL_TEXTURE_EXTERNAL_OES:
+            *glsl_sampler = "samplerExternalOES";
+            *texture = "texture2D";
+            break;
+        case GL_TEXTURE_2D:
+            *glsl_sampler = "sampler2D";
+            *texture = "texture2D";
+            break;
+        case GL_TEXTURE_RECTANGLE:
+            *glsl_sampler = "sampler2DRect";
+            *texture = "texture2DRect";
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
 static int
 opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
                             const video_format_t *fmt)
@@ -754,23 +776,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     }
 
     const char *glsl_sampler, *lookup;
-    switch (tex_target)
-    {
-        case GL_TEXTURE_EXTERNAL_OES:
-            glsl_sampler = "samplerExternalOES";
-            lookup = "texture2D";
-            break;
-        case GL_TEXTURE_2D:
-            glsl_sampler = "sampler2D";
-            lookup  = "texture2D";
-            break;
-        case GL_TEXTURE_RECTANGLE:
-            glsl_sampler = "sampler2DRect";
-            lookup  = "texture2DRect";
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
+    GetNames(tex_target, &glsl_sampler, &lookup);
 
     struct vlc_memstream ms;
     if (vlc_memstream_open(&ms) != 0)
