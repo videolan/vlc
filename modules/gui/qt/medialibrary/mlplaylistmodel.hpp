@@ -68,11 +68,13 @@ protected: // MLBaseModel implementation
 
     ListCacheLoader<std::unique_ptr<MLItem>> * createLoader() const override;
 
+protected: // MLBaseModel reimplementation
+    void onVlcMlEvent(const MLEvent & event) override;
+
+    void thumbnailUpdated(int idx) override;
+
 private: // Functions
     QList<int> getRows(const QModelIndexList & indexes) const;
-
-private: // MLBaseModel implementation
-    void onVlcMlEvent(const MLEvent & event) override;
 
 private:
     struct Loader : public MLBaseModel::BaseLoader

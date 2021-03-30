@@ -265,22 +265,7 @@ ListCacheLoader<std::unique_ptr<MLItem>> * MLPlaylistModel::createLoader() const
 }
 
 //-------------------------------------------------------------------------------------------------
-// Private functions
-
-QList<int> MLPlaylistModel::getRows(const QModelIndexList & indexes) const
-{
-    QList<int> rows;
-
-    for (const QModelIndex & index : indexes)
-    {
-        rows.append(index.row());
-    }
-
-    return rows;
-}
-
-//-------------------------------------------------------------------------------------------------
-// Private MLBaseModel reimplementation
+// Protected MLBaseModel reimplementation
 //-------------------------------------------------------------------------------------------------
 
 void MLPlaylistModel::onVlcMlEvent(const MLEvent & event) /* override */
@@ -294,6 +279,27 @@ void MLPlaylistModel::onVlcMlEvent(const MLEvent & event) /* override */
     }
 
     MLBaseModel::onVlcMlEvent(event);
+}
+
+void MLPlaylistModel::thumbnailUpdated(int idx) /* override */
+{
+    emit dataChanged(index(idx), index(idx), { MEDIA_THUMBNAIL });
+}
+
+//-------------------------------------------------------------------------------------------------
+// Private functions
+//-------------------------------------------------------------------------------------------------
+
+QList<int> MLPlaylistModel::getRows(const QModelIndexList & indexes) const
+{
+    QList<int> rows;
+
+    for (const QModelIndex & index : indexes)
+    {
+        rows.append(index.row());
+    }
+
+    return rows;
 }
 
 //=================================================================================================
