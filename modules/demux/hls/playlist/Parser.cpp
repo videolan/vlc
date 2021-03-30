@@ -224,6 +224,8 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
     CommonEncryption encryption;
     const ValuesListTag *ctx_extinf = nullptr;
 
+    std::list<HLSSegment *> segmentstoappend;
+
     std::list<Tag *>::const_iterator it;
     for(it = tagslist.begin(); it != tagslist.end(); ++it)
     {
@@ -278,7 +280,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                     absReferenceTime += nzDuration;
                 }
 
-                segmentList->addSegment(segment);
+                segmentstoappend.push_back(segment);
 
                 if(ctx_byterange)
                 {
@@ -317,6 +319,20 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                 rep->b_consistent = false;
                 absReferenceTime = VLC_TS_0 +
                         UTCTime(static_cast<const SingleValueTag *>(tag)->getValue().value).mtime();
+                /* Reverse apply UTC timespec from first discont */
+                if(segmentstoappend.size() && segmentstoappend.back()->utcTime == VLC_TS_INVALID)
+                {
+                    mtime_t tempTime = absReferenceTime;
+                    for(auto it = segmentstoappend.crbegin(); it != segmentstoappend.crend(); ++it)
+                    {
+                        mtime_t duration = timescale.ToTime((*it)->duration.Get());
+                        if( duration < tempTime - VLC_TS_0 )
+                            tempTime -= duration;
+                        else
+                            tempTime = VLC_TS_0;
+                        (*it)->utcTime = tempTime;
+                    }
+                }
                 break;
 
             case AttributesTag::EXTXKEY:
@@ -356,6 +372,10 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                 break;
         }
     }
+
+    for(HLSSegment *seg : segmentstoappend)
+        segmentList->addSegment(seg);
+    segmentstoappend.clear();
 
     if(rep->isLive())
     {
