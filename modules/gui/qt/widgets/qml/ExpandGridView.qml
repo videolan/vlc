@@ -227,54 +227,57 @@ NavigableFocusScope {
         return [firstId, lastId]
     }
 
+    function _repositionItem(id, x, y) {
+        var item = _idChildrenMap[id]
+        if (item === undefined)
+            throw "wrong child: " + id
+
+        //theses properties are always defined in Item
+        item.focus = (id === root.currentIndex) && (root.expandIndex === -1)
+        item.x = x
+        item.y = y
+    }
+
+    function _recycleItem(id, x, y) {
+        var item = _unusedItemList.pop()
+        if (item === undefined)
+            throw "wrong toRecycle child " + id + ", len " + toUse.length
+
+        item.index = id
+        item.model = model.getDataAt(id)
+
+        item.focus = (id === root.currentIndex) && (root.expandIndex === -1)
+        item.x = x
+        item.y = y
+        item.visible = true
+
+        _idChildrenMap[id] = item
+    }
+
+    function _createItem(id, x, y) {
+        var item = root.delegate.createObject( flickable.contentItem, {
+                        index: id,
+                        model: model.getDataAt(id),
+                        focus: (id === root.currentIndex) && (root.expandIndex === -1),
+                        x: x,
+                        y: y,
+                        visible: true
+                    });
+        if (item === undefined)
+            throw "wrong unable to instantiate child " + id
+        _idChildrenMap[id] = item
+    }
+
     function _setupChild(id, ydelta) {
-        var item
         var pos = root.getItemPos(id)
 
         if (id in _idChildrenMap) {
-            // re-position
-
-            item = _idChildrenMap[id]
-            if (item === undefined)
-                throw "wrong child: " + id
-            //theses properties are always defined in Item
-            item.focus = (id === root.currentIndex) && (root.expandIndex === -1)
-            item.x = pos[0]
-            item.y = pos[1] + ydelta
-
+            _repositionItem(id, pos[0], pos[1] + ydelta)
         }  else if (_unusedItemList.length > 0) {
-            //recyle
-
-            item = _unusedItemList.pop()
-            if (item === undefined)
-                throw "wrong toRecycle child " + id + ", len " + toUse.length
-
-            item.index = id
-            item.model = model.getDataAt(id)
-
-            item.focus = (id === root.currentIndex) && (root.expandIndex === -1)
-            item.x = pos[0]
-            item.y = pos[1] + ydelta
-            item.visible = true
-
-            _idChildrenMap[id] = item
-
+            _recycleItem(id, pos[0], pos[1] + ydelta)
         } else {
-            //instanciate a new item
-
-            item = root.delegate.createObject( flickable.contentItem, {
-                            index: id,
-                            model: model.getDataAt(id),
-                            focus: (id === root.currentIndex) && (root.expandIndex === -1),
-                            x: pos[0],
-                            y: pos[1] + ydelta,
-                            visible: true
-                        });
-            if (item === undefined)
-                throw "wrong unable to instantiate child " + id
-            _idChildrenMap[id] = item
+            _createItem(id, pos[0], pos[1] + ydelta)
         }
-        return item
     }
 
     function _refreshData( iMin, iMax ) {
@@ -411,6 +414,30 @@ NavigableFocusScope {
             return ret
         }
 
+        function _setupIndexes(force, range, yDelta) {
+            for (var i = range[0]; i < range[1]; i++) {
+                if (!force && i in _idChildrenMap)
+                    continue
+                _setupChild(i, yDelta)
+            }
+        }
+
+        function _updateChildrenMap(first, last) {
+            var toKeep = {}
+
+            for (var id in _idChildrenMap) {
+                var val = _idChildrenMap[id]
+
+                if (id >= first && id < last) {
+                    toKeep[id] = val
+                } else {
+                    _unusedItemList.push(val)
+                    val.visible = false
+                }
+            }
+            _idChildrenMap = toKeep
+        }
+
         function layout(forceRelayout) {
             if (flickable.width === 0 || flickable.height === 0)
                 return
@@ -429,30 +456,12 @@ NavigableFocusScope {
 
             var topGridEndId = Math.max(Math.min(expandItemGridId, lastId), firstId)
 
-            // Clean the no longer used ids
-            var toKeep = {}
-
-            for (var id in _idChildrenMap) {
-                var val = _idChildrenMap[id]
-
-                if (id >= firstId && id < lastId) {
-                    toKeep[id] = val
-                } else {
-                    _unusedItemList.push(val)
-                    val.visible = false
-                }
-            }
-            _idChildrenMap = toKeep
-
+            _updateChildrenMap(firstId, lastId)
 
             var item
             var pos
             // Place the delegates before the expandItem
-            for (i = firstId; i < topGridEndId; ++i) {
-                if (!forceRelayout && i in _idChildrenMap)
-                    continue
-                _setupChild(i,  0)
-            }
+            _setupIndexes(forceRelayout, [firstId, topGridEndId], 0)
 
             if (root.expandIndex !== -1) {
                 var expandItemPos = root.getItemPos(expandItemGridId)
@@ -460,11 +469,7 @@ NavigableFocusScope {
             }
 
             // Place the delegates after the expandItem
-            for (i = topGridEndId; i < lastId; ++i) {
-                if (!forceRelayout && i in _idChildrenMap)
-                    continue
-                 _setupChild(i, _expandItemVerticalSpace)
-            }
+            _setupIndexes(forceRelayout, [topGridEndId, lastId], _expandItemVerticalSpace)
 
             // Calculate and set the contentHeight
             var newContentHeight = root.getItemPos(_count - 1)[1] + root._effectiveCellHeight + _expandItemVerticalSpace
