@@ -136,12 +136,12 @@ Widgets.NavigableFocusScope {
     //---------------------------------------------------------------------------------------------
     // Private
 
-    function _actionAtIndex(index) {
+    function _actionAtIndex() {
         if (modelSelect.selectedIndexes.length > 1) {
             medialib.addAndPlay(model.getIdsForIndexes(modelSelect.selectedIndexes));
         } else if (modelSelect.selectedIndexes.length === 1) {
-            var indexes = modelSelect.selectedIndexes[0];
-            showList(model.getDataAt(indexes));
+            var index = modelSelect.selectedIndexes[0];
+            showList(model.getDataAt(index));
         }
     }
 
@@ -244,7 +244,7 @@ Widgets.NavigableFocusScope {
 
             onSelectionUpdated: modelSelect.updateSelection(keyModifiers, oldIndex, newIndex)
 
-            onActionAtIndex: _actionAtIndex(index)
+            onActionAtIndex: _actionAtIndex()
 
             //-------------------------------------------------------------------------------------
             // Childs
@@ -384,7 +384,7 @@ Widgets.NavigableFocusScope {
             //-------------------------------------------------------------------------------------
             // Events
 
-            onActionForSelection: _actionAtIndex(selection)
+            onActionForSelection: _actionAtIndex()
 
             onItemDoubleClicked: showList(model)
 
