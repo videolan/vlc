@@ -30,6 +30,8 @@ targets:
       - path: ${VLC_BUILD_DIR}/test/vlccoreios
         type: file
         optional: true
+        attributes:
+          - CodeSignOnCopy
         buildPhase:
           copyFiles:
             destination: executables
