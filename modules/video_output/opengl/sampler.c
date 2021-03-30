@@ -958,8 +958,10 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     return VLC_SUCCESS;
 }
 
-struct vlc_gl_sampler *
-vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop)
+static struct vlc_gl_sampler *
+CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
+              const struct vlc_gl_api *api, const video_format_t *fmt,
+              unsigned tex_target)
 {
     struct vlc_gl_sampler_priv *priv = calloc(1, sizeof(*priv));
     if (!priv)
@@ -973,22 +975,22 @@ vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop)
     priv->pl_sh_res = NULL;
 
     priv->interop = interop;
-    priv->gl = interop->gl;
-    priv->api = interop->api;
-    priv->vt = &priv->api->vt;
+    priv->gl = gl;
+    priv->api = api;
+    priv->vt = &api->vt;
 
     /* Formats with palette are not supported. This also allows to copy
      * video_format_t without possibility of failure. */
     assert(!sampler->fmt.p_palette);
 
-    sampler->fmt = interop->fmt_out;
+    sampler->fmt = *fmt;
 
     sampler->shader.extensions = NULL;
     sampler->shader.body = NULL;
 
 #ifdef HAVE_LIBPLACEBO
     // Create the main libplacebo context
-    priv->pl_ctx = vlc_placebo_Create(VLC_OBJECT(interop->gl));
+    priv->pl_ctx = vlc_placebo_Create(VLC_OBJECT(gl));
     if (priv->pl_ctx) {
 #   if PL_API_VER >= 20
         priv->pl_sh = pl_shader_alloc(priv->pl_ctx, &(struct pl_shader_params) {
@@ -1009,43 +1011,52 @@ vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop)
     }
 #endif
 
-    int ret =
-        opengl_fragment_shader_init(sampler, interop->tex_target,
-                                    &interop->fmt_out);
+    int ret = opengl_fragment_shader_init(sampler, tex_target, fmt);
     if (ret != VLC_SUCCESS)
     {
         free(sampler);
         return NULL;
     }
 
-    assert(interop->tex_count == priv->tex_count);
+    unsigned tex_count = priv->tex_count;
+    assert(!interop || interop->tex_count == tex_count);
 
-    /* Texture size */
-    for (unsigned j = 0; j < interop->tex_count; j++) {
-        const GLsizei w = interop->fmt_out.i_visible_width  * interop->texs[j].w.num
-                        / interop->texs[j].w.den;
-        const GLsizei h = interop->fmt_out.i_visible_height * interop->texs[j].h.num
-                        / interop->texs[j].h.den;
-        priv->visible_widths[j] = w;
-        priv->visible_heights[j] = h;
-        if (interop->api->supports_npot) {
-            priv->tex_widths[j]  = w;
-            priv->tex_heights[j] = h;
-        } else {
-            priv->tex_widths[j]  = vlc_align_pot(w);
-            priv->tex_heights[j] = vlc_align_pot(h);
-        }
+    for (unsigned i = 0; i < tex_count; ++i)
+    {
+        /* This might be updated in UpdatePicture for non-direct samplers */
+        memcpy(&priv->var.TexCoordsMaps[i], MATRIX3_IDENTITY,
+               sizeof(MATRIX3_IDENTITY));
     }
 
-    if (!interop->handle_texs_gen)
+    if (interop)
     {
-        ret = vlc_gl_interop_GenerateTextures(interop, priv->tex_widths,
-                                              priv->tex_heights,
-                                              priv->textures);
-        if (ret != VLC_SUCCESS)
+        /* Texture size */
+        for (unsigned j = 0; j < interop->tex_count; j++) {
+            const GLsizei w = interop->fmt_out.i_visible_width  * interop->texs[j].w.num
+                            / interop->texs[j].w.den;
+            const GLsizei h = interop->fmt_out.i_visible_height * interop->texs[j].h.num
+                            / interop->texs[j].h.den;
+            priv->visible_widths[j] = w;
+            priv->visible_heights[j] = h;
+            if (interop->api->supports_npot) {
+                priv->tex_widths[j]  = w;
+                priv->tex_heights[j] = h;
+            } else {
+                priv->tex_widths[j]  = vlc_align_pot(w);
+                priv->tex_heights[j] = vlc_align_pot(h);
+            }
+        }
+
+        if (!interop->handle_texs_gen)
         {
-            free(sampler);
-            return NULL;
+            ret = vlc_gl_interop_GenerateTextures(interop, priv->tex_widths,
+                                                  priv->tex_heights,
+                                                  priv->textures);
+            if (ret != VLC_SUCCESS)
+            {
+                free(sampler);
+                return NULL;
+            }
         }
     }
 
@@ -1053,40 +1064,18 @@ vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop)
 }
 
 struct vlc_gl_sampler *
+vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop)
+{
+    return CreateSampler(interop, interop->gl, interop->api, &interop->fmt_out,
+                         interop->tex_target);
+}
+
+struct vlc_gl_sampler *
 vlc_gl_sampler_NewFromTexture2D(struct vlc_gl_t *gl,
                                 const struct vlc_gl_api *api,
                                 const video_format_t *fmt)
 {
-    struct vlc_gl_sampler_priv *priv = calloc(1, sizeof(*priv));
-    if (!priv)
-        return NULL;
-
-    struct vlc_gl_sampler *sampler = &priv->sampler;
-
-    priv->interop = NULL;
-    priv->gl = gl;
-    priv->api = api;
-    priv->vt = &api->vt;
-
-    sampler->fmt = *fmt;
-    /* this is the only allocated field, and we don't need it */
-    sampler->fmt.p_palette = NULL;
-
-    sampler->shader.extensions = NULL;
-    sampler->shader.body = NULL;
-
-    int ret =
-        opengl_fragment_shader_init(sampler, GL_TEXTURE_2D, &priv->direct_fmt);
-    if (ret != VLC_SUCCESS)
-    {
-        free(sampler);
-        return NULL;
-    }
-
-    memcpy(&priv->var.TexCoordsMaps[0], MATRIX3_IDENTITY,
-           sizeof(MATRIX3_IDENTITY));
-
-    return sampler;
+    return CreateSampler(NULL, gl, api, fmt, GL_TEXTURE_2D);
 }
 
 void
