@@ -984,8 +984,17 @@ static void GetVarSlaves( input_thread_t *p_input,
         if( uri == NULL )
             continue;
 
+        enum slave_type i_type;
+        if ( !input_item_slave_GetType(uri, &i_type) )
+        {
+            msg_Warn( p_input,
+                     "Can't deduce slave type of `%s\" with file extension.",
+                     uri );
+            i_type = SLAVE_TYPE_AUDIO;
+        }
         input_item_slave_t *p_slave =
-            input_item_slave_New( uri, SLAVE_TYPE_AUDIO, SLAVE_PRIORITY_USER );
+            input_item_slave_New( uri, i_type, SLAVE_PRIORITY_USER );
+
         free( uri );
 
         if( unlikely( p_slave == NULL ) )
