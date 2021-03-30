@@ -74,7 +74,8 @@ public: // Interface
 
     Q_INVOKABLE virtual QVariantList getItemsForIndexes(const QModelIndexList & indexes) const;
 
-    Q_INVOKABLE QMap<QString, QVariant> getDataAt(int index);
+    Q_INVOKABLE QMap<QString, QVariant> getDataAt(const QModelIndex & index);
+    Q_INVOKABLE QMap<QString, QVariant> getDataAt(int idx);
 
 signals:
     void parentIdChanged();

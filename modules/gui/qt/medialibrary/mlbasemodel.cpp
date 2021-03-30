@@ -52,15 +52,28 @@ void MLBaseModel::sortByColumn(QByteArray name, Qt::SortOrder order)
     endResetModel();
 }
 
-QMap<QString, QVariant> MLBaseModel::getDataAt(int idx)
+//-------------------------------------------------------------------------------------------------
+
+/* Q_INVOKABLE */ QMap<QString, QVariant> MLBaseModel::getDataAt(const QModelIndex & index)
 {
     QMap<QString, QVariant> dataDict;
-    QHash<int,QByteArray> roles = roleNames();
-    for (auto role: roles.keys()) {
-        dataDict[roles[role]] = data(index(idx), role);
+
+    QHash<int, QByteArray> roles = roleNames();
+
+    for (int role: roles.keys())
+    {
+        dataDict[roles[role]] = data(index, role);
     }
+
     return dataDict;
 }
+
+/* Q_INVOKABLE */ QMap<QString, QVariant> MLBaseModel::getDataAt(int idx)
+{
+    return getDataAt(index(idx));
+}
+
+//-------------------------------------------------------------------------------------------------
 
 void MLBaseModel::onResetRequested()
 {
