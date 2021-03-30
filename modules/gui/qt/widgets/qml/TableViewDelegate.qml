@@ -99,7 +99,7 @@ Rectangle {
 
                 selectionDelegateModel.updateSelection(mouse.modifiers, view.currentIndex, index);
 
-                view.currentIndex = rowModel.index;
+                view.currentIndex = index;
 
                 delegate.forceActiveFocus();
             }
@@ -215,7 +215,7 @@ Rectangle {
 
             visible: hoverArea.containsMouse
 
-            onClicked: root.contextMenuButtonClicked(this,  delegate.rowModel)
+            onClicked: root.contextMenuButtonClicked(this, delegate.rowModel)
         }
     }
 }
