@@ -117,6 +117,7 @@ HAVE_WIN64="0"
 HAVE_IOS="0"
 HAVE_OSX="0"
 HAVE_TVOS="0"
+VLC_DARWIN_TARGET=""
 
 dnl  Set x86 asm flags and defines
 X86ASMFLAGS=""
@@ -218,7 +219,8 @@ int foo() { return my_array[0]; }
              yes
              #endif],
              [HAVE_IOS="1"
-             ac_cv_func_wordexp=no],
+             ac_cv_func_wordexp=no
+             VLC_DARWIN_TARGET="iOS"],
              [HAVE_OSX="1"])
 
     AC_EGREP_CPP(yes,
@@ -230,9 +232,12 @@ int foo() { return my_array[0]; }
              HAVE_IOS="0"
              HAVE_OSX="0"
              ac_cv_func_fork=no
+             VLC_DARWIN_TARGET="tvOS"
              ],)
 
-    AS_IF([test "${HAVE_OSX}" = "1"],[VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreServices])])
+    AS_IF([test "${HAVE_OSX}" = "1"],[
+      VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreServices])
+      VLC_DARWIN_TARGET="macosx"])
 
     dnl
     dnl  Handle Mac OS X SDK flags
@@ -471,7 +476,7 @@ AS_IF([ test "${SYS}" = "darwin" ],[
   AC_ARG_VAR([XCODEGEN],[xcode project generator])
   AC_PATH_PROG([XCODEGEN],[xcodegen],[no])
   AS_IF([ test "x${XCODEGEN}" != "xno" ], [
-    VLC_BUILD_DIR="." VLC_SRC_DIR="${srcdir}" VLC_PLATFORM=tvOS \
+    VLC_BUILD_DIR="$(pwd)" VLC_SRC_DIR="$(cd ${srcdir} && pwd)" VLC_PLATFORM="${VLC_DARWIN_TARGET}" \
     ${XCODEGEN} generate --project . --spec "${srcdir}/extras/package/apple/xcodegen.yml" --project-root . --use-cache
   ])
 ])
