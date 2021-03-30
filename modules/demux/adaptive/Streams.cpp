@@ -405,7 +405,7 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(mtime_t nz_deadline,
     {
         mtime_t nz_extdeadline = fakeEsOut()->commandsQueue()->getBufferingLevel() +
                                     (i_max_buffering - i_demuxed) / 4;
-        nz_deadline = std::max(nz_deadline, nz_extdeadline);
+        nz_deadline = std::min(nz_extdeadline, nz_deadline + CLOCK_FREQ);
 
         /* need to read, demuxer still buffering, ... */
         vlc_mutex_unlock(&lock);
