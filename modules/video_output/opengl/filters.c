@@ -478,10 +478,11 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
         if (previous)
         {
             /* Read from the output of the previous filter */
-            int ret = vlc_gl_sampler_UpdateTexture(priv->sampler,
-                                                   previous->texture_out,
-                                                   previous->size_out.width,
-                                                   previous->size_out.height);
+            GLuint tex = previous->texture_out;
+            GLsizei width = previous->size_out.width;
+            GLsizei height = previous->size_out.height;
+            int ret = vlc_gl_sampler_UpdateTextures(priv->sampler, &tex, &width,
+                                                    &height);
             if (ret != VLC_SUCCESS)
             {
                 msg_Err(filters->gl, "Could not update sampler texture");
