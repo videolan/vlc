@@ -24,6 +24,7 @@
 
 #include <vlc_common.h>
 #include <vlc_list.h>
+#include <vlc_picture.h>
 
 #include "filter.h"
 #include "sampler.h"
@@ -38,9 +39,14 @@ struct vlc_gl_filter_priv {
     /* Only meaningful for non-blend filters { */
     struct vlc_gl_sampler *sampler; /* owned */
 
-    bool has_framebuffer_out;
-    GLuint framebuffer_out; /* owned (this filter must delete it) */
-    GLuint texture_out; /* owned (attached to framebuffer_out) */
+    /* owned (this filter must delete it) */
+    GLuint framebuffers_out[PICTURE_PLANE_MAX];
+
+    /* owned (each attached to framebuffers_out[i]) */
+    GLuint textures_out[PICTURE_PLANE_MAX];
+    GLsizei tex_widths[PICTURE_PLANE_MAX];
+    GLsizei tex_heights[PICTURE_PLANE_MAX];
+    unsigned tex_count;
 
     /* For multisampling, if msaa_level != 0 */
     GLuint framebuffer_msaa; /* owned */

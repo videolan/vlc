@@ -35,6 +35,7 @@ struct vlc_gl_tex_size {
 
 struct vlc_gl_input_meta {
     vlc_tick_t pts;
+    unsigned plane;
 };
 
 typedef int
@@ -63,6 +64,9 @@ struct vlc_gl_filter_owner_ops {
      * Successive calls to this function for the same filter is guaranteed to
      * always return the same sampler.
      *
+     * Important: filter->config must be initialized *before* getting the
+     * sampler, since the sampler behavior may depend on it.
+     *
      * \param filter the filter
      * \return sampler the sampler, NULL on error
      */
@@ -81,7 +85,19 @@ struct vlc_gl_filter {
 
     struct {
         /**
+         * An OpenGL filter may either operate on the input RGBA picture, or on
+         * individual input planes (without chroma conversion) separately.
+         *
+         * In practice, this is useful for deinterlace filters.
+         *
+         * This flag must be set by the filter module (default is false).
+         */
+        bool filter_planes;
+
+        /**
          * A blend filter draws over the input picture (without reading it).
+         *
+         * Meaningless if filter_planes is true.
          *
          * This flag must be set by the filter module (default is false).
          */
@@ -92,6 +108,8 @@ struct vlc_gl_filter {
          *
          * This value must be set by the filter module (default is 0, which
          * means disabled).
+         *
+         * Meaningless if filter_planes is true.
          *
          * The actual MSAA level may be overwritten to 0 if multisampling is
          * not supported, or to a higher value if another filter rendering on
