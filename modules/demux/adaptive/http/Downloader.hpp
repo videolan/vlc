@@ -49,6 +49,7 @@ namespace adaptive
                 vlc_cond_t   updatedcond;
                 bool         thread_handle_valid;
                 bool         killed;
+                bool         cancel_current;
                 std::list<HTTPChunkBufferedSource *> chunks;
                 HTTPChunkBufferedSource *current;
         };

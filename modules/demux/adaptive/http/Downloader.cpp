@@ -36,6 +36,7 @@ Downloader::Downloader()
     killed = false;
     thread_handle_valid = false;
     current = nullptr;
+    cancel_current = false;
 }
 
 bool Downloader::start()
@@ -75,7 +76,10 @@ void Downloader::cancel(HTTPChunkBufferedSource *source)
 {
     vlc_mutex_lock(&lock);
     while (current == source)
+    {
+        cancel_current = true;
         vlc_cond_wait(&updatedcond, &lock);
+    }
 
     if(!source->isDone())
     {
@@ -107,11 +111,12 @@ void Downloader::Run()
         vlc_mutex_unlock(&lock);
         current->bufferize(HTTPChunkSource::CHUNK_SIZE);
         vlc_mutex_lock(&lock);
-        if(current->isDone())
+        if(current->isDone() || cancel_current)
         {
             chunks.pop_front();
             current->release();
         }
+        cancel_current = false;
         current = nullptr;
         vlc_cond_signal(&updatedcond);
     }
