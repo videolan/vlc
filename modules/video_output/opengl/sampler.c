@@ -44,7 +44,8 @@ struct vlc_gl_sampler_priv {
     struct vlc_gl_sampler sampler;
 
     struct vlc_gl_t *gl;
-    const opengl_vtable_t *vt;
+    const struct vlc_gl_api *api;
+    const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
 
     struct {
         GLfloat OrientationMatrix[4*4];
@@ -495,13 +496,15 @@ xyz12_shader_init(struct vlc_gl_sampler *sampler)
 }
 
 static int
-opengl_init_swizzle(const struct vlc_gl_interop *interop,
+opengl_init_swizzle(struct vlc_gl_sampler *sampler,
                     const char *swizzle_per_tex[],
                     vlc_fourcc_t chroma,
                     const vlc_chroma_description_t *desc)
 {
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+
     GLint oneplane_texfmt;
-    if (vlc_gl_StrHasToken(interop->api->extensions, "GL_ARB_texture_rg"))
+    if (vlc_gl_StrHasToken(priv->api->extensions, "GL_ARB_texture_rg"))
         oneplane_texfmt = GL_RED;
     else
         oneplane_texfmt = GL_LUMINANCE;
@@ -737,7 +740,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         ret = sampler_yuv_base_init(sampler, chroma, desc, yuv_space);
         if (ret != VLC_SUCCESS)
             return ret;
-        ret = opengl_init_swizzle(interop, swizzle_per_tex, chroma, desc);
+        ret = opengl_init_swizzle(sampler, swizzle_per_tex, chroma, desc);
         if (ret != VLC_SUCCESS)
             return ret;
     }
@@ -963,7 +966,8 @@ vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop)
 
     priv->interop = interop;
     priv->gl = interop->gl;
-    priv->vt = interop->vt;
+    priv->api = interop->api;
+    priv->vt = &priv->api->vt;
 
     /* Formats with palette are not supported. This also allows to copy
      * video_format_t without possibility of failure. */
@@ -1078,6 +1082,7 @@ vlc_gl_sampler_NewFromTexture2D(struct vlc_gl_t *gl,
 
     priv->interop = NULL;
     priv->gl = gl;
+    priv->api = api;
     priv->vt = &api->vt;
 
     sampler->fmt = *fmt;
