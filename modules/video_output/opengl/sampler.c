@@ -1052,31 +1052,6 @@ vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop)
     return sampler;
 }
 
-
-static void
-sampler_direct_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
-{
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
-    const opengl_vtable_t *vt = priv->vt;
-
-    priv->uloc.Textures[0] =
-        vt->GetUniformLocation(program, "vlc_input_texture");
-    assert(priv->uloc.Textures[0] != -1);
-}
-
-static void
-sampler_direct_load(const struct vlc_gl_sampler *sampler)
-{
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
-    const opengl_vtable_t *vt = priv->vt;
-
-    GLuint texture = priv->textures[0];
-
-    vt->ActiveTexture(GL_TEXTURE0);
-    vt->BindTexture(GL_TEXTURE_2D, texture);
-    vt->Uniform1i(priv->uloc.Textures[0], 0);
-}
-
 struct vlc_gl_sampler *
 vlc_gl_sampler_NewFromTexture2D(struct vlc_gl_t *gl,
                                 const struct vlc_gl_api *api,
@@ -1097,27 +1072,19 @@ vlc_gl_sampler_NewFromTexture2D(struct vlc_gl_t *gl,
     /* this is the only allocated field, and we don't need it */
     sampler->fmt.p_palette = NULL;
 
-    static const char *const SHADER_BODY =
-        "uniform sampler2D vlc_input_texture;\n"
-        "vec4 vlc_texture(vec2 pic_coords) {\n"
-        "  return texture2D(vlc_input_texture, pic_coords);\n"
-        "}\n";
+    sampler->shader.extensions = NULL;
+    sampler->shader.body = NULL;
 
-    sampler->shader.body = strdup(SHADER_BODY);
-    if (!sampler->shader.body)
+    int ret =
+        opengl_fragment_shader_init(sampler, GL_TEXTURE_2D, &priv->direct_fmt);
+    if (ret != VLC_SUCCESS)
     {
-        free(priv);
+        free(sampler);
         return NULL;
     }
 
-    /* No extension required */
-    sampler->shader.extensions = NULL;
-
-    static const struct vlc_gl_sampler_ops ops = {
-        .fetch_locations = sampler_direct_fetch_locations,
-        .load = sampler_direct_load,
-    };
-    sampler->ops = &ops;
+    memcpy(&priv->var.TexCoordsMaps[0], MATRIX3_IDENTITY,
+           sizeof(MATRIX3_IDENTITY));
 
     return sampler;
 }
