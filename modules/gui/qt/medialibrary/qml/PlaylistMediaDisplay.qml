@@ -122,15 +122,6 @@ Widgets.NavigableFocusScope {
     }
 
     //---------------------------------------------------------------------------------------------
-    // Private
-
-    function _actionAtIndex(index) {
-        g_mainDisplay.showPlayer();
-
-        medialib.addAndPlay(model.getIdsForIndexes(modelSelect.selectedIndexes));
-    }
-
-    //---------------------------------------------------------------------------------------------
     // Childs
     //---------------------------------------------------------------------------------------------
 
