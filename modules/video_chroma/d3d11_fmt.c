@@ -366,6 +366,13 @@ static HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext
     hr = ID3D11DeviceContext_GetPrivateData(d3d11ctx, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
     if (SUCCEEDED(hr))
         out->context_mutex = context_lock;
+    else if (hw_decoding)
+    {
+        out->mutex_owner = true;
+        out->context_mutex = CreateMutexEx( NULL, NULL, 0, SYNCHRONIZE );
+        ID3D11DeviceContext_SetPrivateData( out->d3dcontext, &GUID_CONTEXT_MUTEX,
+                                            sizeof( out->context_mutex ), &out->context_mutex );
+    }
     else
         out->context_mutex = INVALID_HANDLE_VALUE;
 
