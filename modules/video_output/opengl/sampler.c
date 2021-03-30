@@ -78,6 +78,9 @@ struct vlc_gl_sampler_priv {
 
     GLuint textures[PICTURE_PLANE_MAX];
 
+    unsigned tex_count;
+    GLenum tex_target;
+
     struct {
         unsigned int i_x_offset;
         unsigned int i_y_offset;
@@ -270,7 +273,6 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
-    struct vlc_gl_interop *interop = priv->interop;
     const opengl_vtable_t *vt = priv->vt;
 
     if (priv->yuv_color)
@@ -287,8 +289,8 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         vt->GetUniformLocation(program, "OrientationMatrix");
     assert(priv->uloc.OrientationMatrix != -1);
 
-    assert(interop->tex_count < 10); /* to guarantee variable names length */
-    for (unsigned int i = 0; i < interop->tex_count; ++i)
+    assert(priv->tex_count < 10); /* to guarantee variable names length */
+    for (unsigned int i = 0; i < priv->tex_count; ++i)
     {
         char name[sizeof("TexCoordsMapX")];
 
@@ -300,7 +302,7 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         priv->uloc.TexCoordsMaps[i] = vt->GetUniformLocation(program, name);
         assert(priv->uloc.TexCoordsMaps[i] != -1);
 
-        if (interop->tex_target == GL_TEXTURE_RECTANGLE)
+        if (priv->tex_target == GL_TEXTURE_RECTANGLE)
         {
             snprintf(name, sizeof(name), "TexSize%1u", i);
             priv->uloc.TexSizes[i] = vt->GetUniformLocation(program, name);
@@ -321,7 +323,7 @@ static const GLfloat *
 GetTransformMatrix(const struct vlc_gl_interop *interop)
 {
     const GLfloat *tm = NULL;
-    if (interop->ops && interop->ops->get_transform_matrix)
+    if (interop && interop->ops && interop->ops->get_transform_matrix)
         tm = interop->ops->get_transform_matrix(interop);
     if (!tm)
         tm = MATRIX4_IDENTITY;
@@ -333,34 +335,34 @@ sampler_base_load(const struct vlc_gl_sampler *sampler)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
-    const struct vlc_gl_interop *interop = priv->interop;
     const opengl_vtable_t *vt = priv->vt;
 
     if (priv->yuv_color)
         vt->UniformMatrix4fv(priv->uloc.ConvMatrix, 1, GL_FALSE,
                              priv->conv_matrix);
 
-    for (unsigned i = 0; i < interop->tex_count; ++i)
+    for (unsigned i = 0; i < priv->tex_count; ++i)
     {
         vt->Uniform1i(priv->uloc.Textures[i], i);
 
         assert(priv->textures[i] != 0);
         vt->ActiveTexture(GL_TEXTURE0 + i);
-        vt->BindTexture(interop->tex_target, priv->textures[i]);
+        vt->BindTexture(priv->tex_target, priv->textures[i]);
 
         vt->UniformMatrix3fv(priv->uloc.TexCoordsMaps[i], 1, GL_FALSE,
                              priv->var.TexCoordsMaps[i]);
     }
 
-    const GLfloat *tm = GetTransformMatrix(interop);
+    /* Return the expected transform matrix if interop == NULL */
+    const GLfloat *tm = GetTransformMatrix(priv->interop);
     vt->UniformMatrix4fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
 
     vt->UniformMatrix4fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
                          priv->var.OrientationMatrix);
 
-    if (interop->tex_target == GL_TEXTURE_RECTANGLE)
+    if (priv->tex_target == GL_TEXTURE_RECTANGLE)
     {
-        for (unsigned i = 0; i < interop->tex_count; ++i)
+        for (unsigned i = 0; i < priv->tex_count; ++i)
             vt->Uniform2f(priv->uloc.TexSizes[i], priv->tex_widths[i],
                           priv->tex_heights[i]);
     }
@@ -425,19 +427,19 @@ static void
 sampler_xyz12_load(const struct vlc_gl_sampler *sampler)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
-    const struct vlc_gl_interop *interop = priv->interop;
     const opengl_vtable_t *vt = priv->vt;
 
     vt->Uniform1i(priv->uloc.Textures[0], 0);
 
     assert(priv->textures[0] != 0);
     vt->ActiveTexture(GL_TEXTURE0);
-    vt->BindTexture(interop->tex_target, priv->textures[0]);
+    vt->BindTexture(priv->tex_target, priv->textures[0]);
 
     vt->UniformMatrix3fv(priv->uloc.TexCoordsMaps[0], 1, GL_FALSE,
                          priv->var.TexCoordsMaps[0]);
 
-    const GLfloat *tm = GetTransformMatrix(interop);
+    /* Return the expected transform matrix if interop == NULL */
+    const GLfloat *tm = GetTransformMatrix(priv->interop);
     vt->UniformMatrix4fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
 
     vt->UniformMatrix4fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
@@ -715,12 +717,15 @@ InitOrientationMatrix(GLfloat matrix[static 4*4],
 
 static int
 opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
-                            vlc_fourcc_t chroma, video_color_space_t yuv_space,
-                            video_orientation_t orientation)
+                            const video_format_t *fmt)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
-    struct vlc_gl_interop *interop = priv->interop;
+    priv->tex_target = tex_target;
+
+    vlc_fourcc_t chroma = fmt->i_chroma;
+    video_color_space_t yuv_space = fmt->space;
+    video_orientation_t orientation = fmt->orientation;
 
     const char *swizzle_per_tex[PICTURE_PLANE_MAX] = { NULL, };
     const bool is_yuv = vlc_fourcc_IsYUV(chroma);
@@ -729,6 +734,9 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(chroma);
     if (desc == NULL)
         return VLC_EGENERIC;
+
+    unsigned tex_count = desc->plane_count;
+    priv->tex_count = tex_count;
 
     InitOrientationMatrix(priv->var.OrientationMatrix, orientation);
 
@@ -773,7 +781,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 
     ADD("uniform mat4 TransformMatrix;\n"
         "uniform mat4 OrientationMatrix;\n");
-    for (unsigned i = 0; i < interop->tex_count; ++i)
+    for (unsigned i = 0; i < tex_count; ++i)
         ADDF("uniform %s Texture%u;\n"
              "uniform mat3 TexCoordsMap%u;\n", glsl_sampler, i, i);
 
@@ -798,7 +806,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         dst_space.transfer = var_InheritInteger(priv->gl, "target-trc");
 
         pl_shader_color_map(sh, &color_params,
-                vlc_placebo_ColorSpace(&interop->fmt_out),
+                vlc_placebo_ColorSpace(fmt),
                 dst_space, NULL, false);
 
         struct pl_shader_obj *dither_state = NULL;
@@ -849,8 +857,8 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         ADD(res->glsl);
     }
 #else
-    if (interop->fmt_out.transfer == TRANSFER_FUNC_SMPTE_ST2084 ||
-        interop->fmt_out.primaries == COLOR_PRIMARIES_BT2020)
+    if (fmt->transfer == TRANSFER_FUNC_SMPTE_ST2084 ||
+        fmt->primaries == COLOR_PRIMARIES_BT2020)
     {
         // no warning for HLG because it's more or less backwards-compatible
         msg_Warn(priv->gl, "VLC needs to be built with support for libplacebo "
@@ -860,7 +868,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
-        for (unsigned i = 0; i < interop->tex_count; ++i)
+        for (unsigned i = 0; i < tex_count; ++i)
             ADDF("uniform vec2 TexSize%u;\n", i);
     }
 
@@ -877,7 +885,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         ADD(" vec4 texel;\n"
             " vec4 pixel = vec4(0.0, 0.0, 0.0, 1.0);\n");
         unsigned color_idx = 0;
-        for (unsigned i = 0; i < interop->tex_count; ++i)
+        for (unsigned i = 0; i < tex_count; ++i)
         {
             const char *swizzle = swizzle_per_tex[i];
             assert(swizzle);
@@ -1003,14 +1011,14 @@ vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop)
 
     int ret =
         opengl_fragment_shader_init(sampler, interop->tex_target,
-                                    interop->fmt_out.i_chroma,
-                                    interop->fmt_out.space,
-                                    interop->fmt_out.orientation);
+                                    &interop->fmt_out);
     if (ret != VLC_SUCCESS)
     {
         free(sampler);
         return NULL;
     }
+
+    assert(interop->tex_count == priv->tex_count);
 
     /* Texture size */
     for (unsigned j = 0; j < interop->tex_count; j++) {
