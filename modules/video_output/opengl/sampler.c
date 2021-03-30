@@ -97,6 +97,11 @@ struct vlc_gl_sampler_priv {
 
     /* Only used for "direct" sampler (when interop == NULL) */
     video_format_t direct_fmt;
+
+    /* If set, vlc_texture() exposes a single plane (without chroma
+     * conversion), selected by vlc_gl_sampler_SetCurrentPlane(). */
+    bool expose_planes;
+    unsigned plane;
 };
 
 #define PRIV(sampler) container_of(sampler, struct vlc_gl_sampler_priv, sampler)
@@ -752,13 +757,138 @@ InitShaderExtensions(struct vlc_gl_sampler *sampler, GLenum tex_target)
     return VLC_SUCCESS;
 }
 
+static void
+sampler_planes_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
+{
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+
+    const opengl_vtable_t *vt = priv->vt;
+
+    priv->uloc.TransformMatrix =
+        vt->GetUniformLocation(program, "TransformMatrix");
+    assert(priv->uloc.TransformMatrix != -1);
+
+    priv->uloc.OrientationMatrix =
+        vt->GetUniformLocation(program, "OrientationMatrix");
+    assert(priv->uloc.OrientationMatrix != -1);
+
+    priv->uloc.Textures[0] = vt->GetUniformLocation(program, "Texture");
+    assert(priv->uloc.Textures[0] != -1);
+
+    priv->uloc.TexCoordsMaps[0] =
+        vt->GetUniformLocation(program, "TexCoordsMap");
+    assert(priv->uloc.TexCoordsMaps[0] != -1);
+
+    if (priv->tex_target == GL_TEXTURE_RECTANGLE)
+    {
+        priv->uloc.TexSizes[0] = vt->GetUniformLocation(program, "TexSize");
+        assert(priv->uloc.TexSizes[0] != -1);
+    }
+}
+
+static void
+sampler_planes_load(const struct vlc_gl_sampler *sampler)
+{
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    unsigned plane = priv->plane;
+
+    const opengl_vtable_t *vt = priv->vt;
+
+    vt->Uniform1i(priv->uloc.Textures[0], 0);
+
+    assert(priv->textures[plane] != 0);
+    vt->ActiveTexture(GL_TEXTURE0);
+    vt->BindTexture(priv->tex_target, priv->textures[plane]);
+
+    vt->UniformMatrix3fv(priv->uloc.TexCoordsMaps[0], 1, GL_FALSE,
+                         priv->var.TexCoordsMaps[0]);
+
+    /* Return the expected transform matrix if interop == NULL */
+    const GLfloat *tm = GetTransformMatrix(priv->interop);
+    vt->UniformMatrix4fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
+
+    vt->UniformMatrix4fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
+                         priv->var.OrientationMatrix);
+
+    if (priv->tex_target == GL_TEXTURE_RECTANGLE)
+    {
+        vt->Uniform2f(priv->uloc.TexSizes[0], priv->tex_widths[plane],
+                      priv->tex_heights[plane]);
+    }
+}
+
+static int
+sampler_planes_init(struct vlc_gl_sampler *sampler)
+{
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    GLenum tex_target = priv->tex_target;
+
+    struct vlc_memstream ms;
+    if (vlc_memstream_open(&ms))
+        return VLC_EGENERIC;
+
+#define ADD(x) vlc_memstream_puts(&ms, x)
+#define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
+
+    const char *sampler_type;
+    const char *texture_fn;
+    GetNames(tex_target, &sampler_type, &texture_fn);
+
+    ADDF("uniform %s Texture;\n", sampler_type);
+    ADD("uniform mat3 TexCoordsMap;\n"
+        "uniform mat4 TransformMatrix;\n"
+        "uniform mat4 OrientationMatrix;\n");
+
+    if (tex_target == GL_TEXTURE_RECTANGLE)
+        ADD("uniform vec2 TexSize;\n");
+
+    ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
+        /* Homogeneous (oriented) coordinates */
+        "  vec3 pic_hcoords = vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).st, 1.0);\n"
+        "  vec2 tex_coords = (TexCoordsMap * pic_hcoords).st;\n");
+
+    if (tex_target == GL_TEXTURE_RECTANGLE)
+    {
+        /* The coordinates are in texels values, not normalized */
+        ADD(" tex_coords = vec2(tex_coords.x * TexSize.x,\n"
+            "                   tex_coords.y * TexSize.y);\n");
+    }
+
+    ADDF("  return %s(Texture, tex_coords);\n", texture_fn);
+    ADD("}\n");
+
+#undef ADD
+#undef ADDF
+
+    if (vlc_memstream_close(&ms) != 0)
+        return VLC_EGENERIC;
+
+    int ret = InitShaderExtensions(sampler, tex_target);
+    if (ret != VLC_SUCCESS)
+    {
+        free(ms.ptr);
+        return VLC_EGENERIC;
+    }
+    sampler->shader.body = ms.ptr;
+
+    static const struct vlc_gl_sampler_ops ops = {
+        .fetch_locations = sampler_planes_fetch_locations,
+        .load = sampler_planes_load,
+    };
+    sampler->ops = &ops;
+
+    return VLC_SUCCESS;
+}
+
 static int
 opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
-                            const video_format_t *fmt)
+                            const video_format_t *fmt, bool expose_planes)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
     priv->tex_target = tex_target;
+    priv->expose_planes = expose_planes;
+    priv->plane = 0;
 
     vlc_fourcc_t chroma = fmt->i_chroma;
     video_color_space_t yuv_space = fmt->space;
@@ -776,6 +906,9 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     sampler->tex_count = tex_count;
 
     InitOrientationMatrix(priv->var.OrientationMatrix, orientation);
+
+    if (expose_planes)
+        return sampler_planes_init(sampler);
 
     if (chroma == VLC_CODEC_XYZ12)
         return xyz12_shader_init(sampler);
@@ -974,7 +1107,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 static struct vlc_gl_sampler *
 CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
               const struct vlc_gl_api *api, const video_format_t *fmt,
-              unsigned tex_target)
+              unsigned tex_target, bool expose_planes)
 {
     struct vlc_gl_sampler_priv *priv = calloc(1, sizeof(*priv));
     if (!priv)
@@ -1028,7 +1161,8 @@ CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
     }
 #endif
 
-    int ret = opengl_fragment_shader_init(sampler, tex_target, fmt);
+    int ret = opengl_fragment_shader_init(sampler, tex_target, fmt,
+                                          expose_planes);
     if (ret != VLC_SUCCESS)
     {
         free(sampler);
@@ -1081,18 +1215,19 @@ CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
 }
 
 struct vlc_gl_sampler *
-vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop)
+vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop,
+                              bool expose_planes)
 {
     return CreateSampler(interop, interop->gl, interop->api, &interop->fmt_out,
-                         interop->tex_target);
+                         interop->tex_target, expose_planes);
 }
 
 struct vlc_gl_sampler *
 vlc_gl_sampler_NewFromTexture2D(struct vlc_gl_t *gl,
                                 const struct vlc_gl_api *api,
-                                const video_format_t *fmt)
+                                const video_format_t *fmt, bool expose_planes)
 {
-    return CreateSampler(NULL, gl, api, fmt, GL_TEXTURE_2D);
+    return CreateSampler(NULL, gl, api, fmt, GL_TEXTURE_2D, expose_planes);
 }
 
 void
@@ -1227,4 +1362,11 @@ vlc_gl_sampler_UpdateTexture(struct vlc_gl_sampler *sampler, GLuint texture,
     priv->tex_heights[0] = tex_height;
 
     return VLC_SUCCESS;
+}
+
+void
+vlc_gl_sampler_SelectPlane(struct vlc_gl_sampler *sampler, unsigned plane)
+{
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    priv->plane = plane;
 }

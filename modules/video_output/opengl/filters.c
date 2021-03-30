@@ -243,7 +243,7 @@ GetSampler(struct vlc_gl_filter *filter)
 
     struct vlc_gl_sampler *sampler;
     if (!priv->prev_filter)
-        sampler = vlc_gl_sampler_NewFromInterop(filters->interop);
+        sampler = vlc_gl_sampler_NewFromInterop(filters->interop, false);
     else
     {
         video_format_t fmt;
@@ -251,8 +251,8 @@ GetSampler(struct vlc_gl_filter *filter)
         fmt.i_width = fmt.i_visible_width = prev_filter->size_out.width;
         fmt.i_height = fmt.i_visible_height = prev_filter->size_out.height;
 
-        sampler =
-            vlc_gl_sampler_NewFromTexture2D(filters->gl, filters->api, &fmt);
+        sampler = vlc_gl_sampler_NewFromTexture2D(filters->gl, filters->api,
+                                                  &fmt, false);
     }
 
     priv->sampler = sampler;
