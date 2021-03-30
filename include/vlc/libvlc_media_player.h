@@ -533,11 +533,11 @@ typedef struct libvlc_video_setup_device_info_t
  * \version LibVLC 4.0.0 or later
  *
  * For \ref libvlc_video_engine_d3d9 the output must be a IDirect3D9*.
- * A reference to this object is held until the \ref LIBVLC_VIDEO_DEVICE_CLEANUP is called.
+ * A reference to this object is held until the \ref libvlc_video_output_cleanup_cb is called.
  * the device must be created with D3DPRESENT_PARAMETERS.hDeviceWindow set to 0.
  *
  * For \ref libvlc_video_engine_d3d11 the output must be a ID3D11DeviceContext*.
- * A reference to this object is held until the \ref LIBVLC_VIDEO_DEVICE_CLEANUP is called.
+ * A reference to this object is held until the \ref libvlc_video_output_cleanup_cb is called.
  * The ID3D11Device used to create ID3D11DeviceContext must have multithreading enabled.
  *
  * If the ID3D11DeviceContext is used outside of the callbacks called by libvlc, the host
