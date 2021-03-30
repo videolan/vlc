@@ -320,7 +320,8 @@ void D3D11_ReleaseDevice(d3d11_decoder_device_t *dev_sys)
 }
 
 static HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *d3d11ctx,
-                                   bool hw_decoding, d3d11_device_t *out)
+                                          HANDLE context_lock, bool hw_decoding,
+                                          d3d11_device_t *out)
 {
     if (unlikely(d3d11ctx == NULL))
     {
@@ -361,20 +362,13 @@ static HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext
     out->mutex_owner = false;
     out->feature_level = ID3D11Device_GetFeatureLevel(out->d3ddevice );
 
-    HANDLE context_lock = INVALID_HANDLE_VALUE;
-    UINT dataSize = sizeof(context_lock);
-    hr = ID3D11DeviceContext_GetPrivateData(d3d11ctx, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
-    if (SUCCEEDED(hr))
-        out->context_mutex = context_lock;
-    else if (hw_decoding)
+    out->context_mutex = context_lock;
+    if (hw_decoding && (context_lock == NULL || context_lock == INVALID_HANDLE_VALUE))
     {
+        msg_Warn(obj, "external ID3D11DeviceContext mutex not provided, using internal one");
         out->mutex_owner = true;
         out->context_mutex = CreateMutexEx( NULL, NULL, 0, SYNCHRONIZE );
-        ID3D11DeviceContext_SetPrivateData( out->d3dcontext, &GUID_CONTEXT_MUTEX,
-                                            sizeof( out->context_mutex ), &out->context_mutex );
     }
-    else
-        out->context_mutex = INVALID_HANDLE_VALUE;
 
     D3D11_GetDriverVersion(obj, out);
     return S_OK;
@@ -464,12 +458,7 @@ static HRESULT CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
 
     if (hw_decoding && SUCCEEDED(hr))
     {
-#if defined(HAVE_ID3D11VIDEODECODER)
         out->context_mutex = CreateMutexEx( NULL, NULL, 0, SYNCHRONIZE );
-        ID3D11DeviceContext_SetPrivateData( out->d3dcontext, &GUID_CONTEXT_MUTEX,
-                                            sizeof( out->context_mutex ), &out->context_mutex );
-#endif
-
         out->mutex_owner = true;
     }
     else
@@ -500,7 +489,13 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
     ID3D11DeviceContext *d3dcontext = (ID3D11DeviceContext*)(uintptr_t) var_InheritInteger(obj, "winrt-d3dcontext");
     if ( likely(d3dcontext != NULL) )
     {
-        hr = D3D11_CreateDeviceExternal(obj, d3dcontext, true, &sys->dec_device.d3d_dev);
+        HANDLE context_lock;
+        UINT dataSize = sizeof(context_lock);
+        HRESULT hr = ID3D11DeviceContext_GetPrivateData(d3dcontext, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
+        if (FAILED(hr))
+            context_lock = NULL;
+
+        hr = D3D11_CreateDeviceExternal(obj, d3dcontext, context_lock, true, &sys->dec_device.d3d_dev);
     }
     else
 #endif
@@ -524,7 +519,8 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
                     sys->external.cleanupDeviceCb( sys->external.opaque );
                 goto error;
             }
-            hr = D3D11_CreateDeviceExternal(obj, out.d3d11.device_context, true, &sys->dec_device.d3d_dev);
+            hr = D3D11_CreateDeviceExternal(obj, out.d3d11.device_context, out.d3d11.context_mutex,
+                                            true, &sys->dec_device.d3d_dev);
         }
         else if ( engineType == libvlc_video_engine_disable ||
                   engineType == libvlc_video_engine_d3d11 )

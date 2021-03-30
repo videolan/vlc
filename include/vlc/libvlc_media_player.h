@@ -510,6 +510,7 @@ typedef struct libvlc_video_setup_device_info_t
     union {
         struct {
             void *device_context; /** ID3D11DeviceContext* */
+            void *context_mutex; /** Windows Mutex HANDLE to protect ID3D11DeviceContext usage */
         } d3d11;
         struct {
             void *device;         /** IDirect3D9* */
@@ -538,6 +539,11 @@ typedef struct libvlc_video_setup_device_info_t
  * For \ref libvlc_video_engine_d3d11 the output must be a ID3D11DeviceContext*.
  * A reference to this object is held until the \ref LIBVLC_VIDEO_DEVICE_CLEANUP is called.
  * The ID3D11Device used to create ID3D11DeviceContext must have multithreading enabled.
+ *
+ * If the ID3D11DeviceContext is used outside of the callbacks called by libvlc, the host
+ * MUST use a mutex to protect the access to the ID3D11DeviceContext of libvlc. This mutex
+ * value is set on d3d11.context_mutex. If the ID3D11DeviceContext is not used outside of
+ * the callbacks, the mutex d3d11.context_mutex may be NULL.
  */
 typedef bool (*libvlc_video_output_setup_cb)(void **opaque,
                                       const libvlc_video_setup_device_cfg_t *cfg,
