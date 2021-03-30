@@ -49,8 +49,12 @@
  * Several instances may be combined:
  *
  *     ./vlc file.mkv --video-filter='opengl{filter="mock{mask,speed=1}:mock{angle=180,speed=-1}"}'
+ *
+ * It can also be used to filter planes separately, drawing each one with a
+ * small offset:
+ *
+ *     ./vlc file.mkv --video-filter='opengl{filter=mock{plane}}'
  */
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -80,7 +84,7 @@
 #define MOCK_CFG_PREFIX "mock-"
 
 static const char *const filter_options[] = {
-    "angle", "mask", "msaa", "speed", NULL
+    "angle", "mask", "msaa", "plane", "speed", NULL
 };
 
 struct sys {
@@ -92,6 +96,7 @@ struct sys {
         GLint vertex_pos;
         GLint rotation_matrix;
         GLint vertex_color; // blend (non-mask) only
+        GLint plane;
     } loc;
 
     float theta0;
@@ -193,6 +198,31 @@ DrawMask(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
     return VLC_SUCCESS;
 }
 
+static int
+DrawPlane(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
+{
+    struct sys *sys = filter->sys;
+
+    const opengl_vtable_t *vt = &filter->api->vt;
+
+    vt->UseProgram(sys->program_id);
+
+    struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+    vlc_gl_sampler_Load(sampler);
+
+    vt->Uniform1i(sys->loc.plane, (int) meta->plane);
+
+    vt->BindBuffer(GL_ARRAY_BUFFER, sys->vbo);
+    vt->EnableVertexAttribArray(sys->loc.vertex_pos);
+    vt->VertexAttribPointer(sys->loc.vertex_pos, 2, GL_FLOAT, GL_FALSE, 0,
+                            (const void *) 0);
+
+    vt->Clear(GL_COLOR_BUFFER_BIT);
+    vt->DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    return VLC_SUCCESS;
+}
+
 static void
 Close(struct vlc_gl_filter *filter)
 {
@@ -249,6 +279,10 @@ InitBlend(struct vlc_gl_filter *filter)
 
     sys->loc.vertex_color = vt->GetAttribLocation(program_id, "vertex_color");
     assert(sys->loc.vertex_color != -1);
+
+    sys->loc.rotation_matrix = vt->GetUniformLocation(sys->program_id,
+                                                      "rotation_matrix");
+    assert(sys->loc.rotation_matrix != -1);
 
     vt->GenBuffers(1, &sys->vbo);
 
@@ -356,6 +390,88 @@ InitMask(struct vlc_gl_filter *filter)
     return VLC_SUCCESS;
 }
 
+static int
+InitPlane(struct vlc_gl_filter *filter)
+{
+    struct sys *sys = filter->sys;
+    const opengl_vtable_t *vt = &filter->api->vt;
+
+    /* Must be initialized before calling vlc_gl_filter_GetSampler() */
+    filter->config.filter_planes = true;
+
+    struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+
+    static const char *const VERTEX_SHADER =
+        SHADER_VERSION
+        "attribute vec2 vertex_pos;\n"
+        "varying vec2 tex_coords;\n"
+        "void main() {\n"
+        "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
+        "  tex_coords = vec2((vertex_pos.x + 1.0) / 2.0,\n"
+        "                    (vertex_pos.y + 1.0) / 2.0);\n"
+        "}\n";
+
+    static const char *const FRAGMENT_SHADER_TEMPLATE =
+        SHADER_VERSION
+        "%s\n" /* extensions */
+        FRAGMENT_SHADER_PRECISION
+        "%s\n" /* vlc_texture definition */
+        "varying vec2 tex_coords;\n"
+        "uniform int plane;\n"
+        "void main() {\n"
+        "  vec2 offset = vec2(float(plane) * 0.02);\n"
+        "  gl_FragColor = vlc_texture(fract(tex_coords + offset));\n"
+        "}\n";
+
+    const char *extensions = sampler->shader.extensions
+                           ? sampler->shader.extensions : "";
+
+    char *fragment_shader;
+    int ret = asprintf(&fragment_shader, FRAGMENT_SHADER_TEMPLATE, extensions,
+                       sampler->shader.body);
+    if (ret < 0)
+        return VLC_EGENERIC;
+
+    GLuint program_id =
+        vlc_gl_BuildProgram(VLC_OBJECT(filter), vt,
+                            1, (const char **) &VERTEX_SHADER,
+                            1, (const char **) &fragment_shader);
+    free(fragment_shader);
+    if (!program_id)
+        return VLC_EGENERIC;
+
+    sys->program_id = program_id;
+
+    vlc_gl_sampler_FetchLocations(sampler, program_id);
+
+    sys->loc.vertex_pos = vt->GetAttribLocation(sys->program_id, "vertex_pos");
+    assert(sys->loc.vertex_pos != -1);
+
+    sys->loc.plane = vt->GetUniformLocation(program_id, "plane");
+    assert(sys->loc.plane != -1);
+
+    static const GLfloat vertex_pos[] = {
+        -1,  1,
+        -1, -1,
+         1,  1,
+         1, -1,
+    };
+
+    vt->BindBuffer(GL_ARRAY_BUFFER, sys->vbo);
+    vt->BufferData(GL_ARRAY_BUFFER, sizeof(vertex_pos), vertex_pos,
+                   GL_STATIC_DRAW);
+
+    vt->BindBuffer(GL_ARRAY_BUFFER, 0);
+
+    static const struct vlc_gl_filter_ops ops = {
+        .draw = DrawPlane,
+        .close = Close,
+    };
+    filter->ops = &ops;
+
+    return VLC_SUCCESS;
+}
+
 static vlc_gl_filter_open_fn Open;
 static int
 Open(struct vlc_gl_filter *filter, const config_chain_t *config,
@@ -366,6 +482,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     config_ChainParse(filter, MOCK_CFG_PREFIX, filter_options, config);
 
     bool mask = var_InheritBool(filter, MOCK_CFG_PREFIX "mask");
+    bool plane = var_InheritBool(filter, MOCK_CFG_PREFIX "plane");
     float angle = var_InheritFloat(filter, MOCK_CFG_PREFIX "angle");
     float speed = var_InheritFloat(filter, MOCK_CFG_PREFIX "speed");
     int msaa = var_InheritInteger(filter, MOCK_CFG_PREFIX "msaa");
@@ -375,7 +492,9 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         return VLC_EGENERIC;
 
     int ret;
-    if (mask)
+    if (plane)
+        ret = InitPlane(filter);
+    else if (mask)
         ret = InitMask(filter);
     else
         ret = InitBlend(filter);
@@ -387,7 +506,8 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     sys->theta0 = angle * M_PI / 180; /* angle in degrees, theta0 in radians */
     sys->speed = speed;
 
-    filter->config.msaa_level = msaa;
+    /* MSAA is not supported for plane filters */
+    filter->config.msaa_level = plane ? 0 : msaa;
 
     return VLC_SUCCESS;
 
@@ -407,5 +527,6 @@ vlc_module_begin()
     add_float(MOCK_CFG_PREFIX "angle", 0.f, NULL, NULL, false) /* in degrees */
     add_float(MOCK_CFG_PREFIX "speed", 0.f, NULL, NULL, false) /* in rotations per minute */
     add_bool(MOCK_CFG_PREFIX "mask", false, NULL, NULL, false)
+    add_bool(MOCK_CFG_PREFIX "plane", false, NULL, NULL, false)
     add_integer(MOCK_CFG_PREFIX "msaa", 4, NULL, NULL, false);
 vlc_module_end()
