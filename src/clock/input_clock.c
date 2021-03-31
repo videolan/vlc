@@ -104,6 +104,8 @@
 /* */
 struct input_clock_t
 {
+    vlc_clock_t *clock_listener;
+
     /* Last point
      * It is used to detect unexpected stream discontinuities */
     clock_point_t last;
@@ -142,14 +144,32 @@ static vlc_tick_t ClockSystemToStream( input_clock_t *, vlc_tick_t i_system );
 
 static vlc_tick_t ClockGetTsOffset( input_clock_t * );
 
+static void UpdateListener( input_clock_t *cl )
+{
+    if( cl->clock_listener )
+    {
+        const vlc_tick_t system_expected =
+            ClockStreamToSystem( cl, cl->last.stream + AvgGet( &cl->drift ) ) +
+            cl->i_pts_delay + ClockGetTsOffset( cl );
+
+        vlc_clock_Update( cl->clock_listener, system_expected, cl->last.stream, cl->rate );
+    }
+}
+
 /*****************************************************************************
  * input_clock_New: create a new clock
  *****************************************************************************/
-input_clock_t *input_clock_New( float rate )
+input_clock_t *input_clock_New( vlc_clock_t *clock_listener, float rate )
 {
     input_clock_t *cl = malloc( sizeof(*cl) );
     if( !cl )
+    {
+        if( cl->clock_listener )
+            vlc_clock_Delete( cl->clock_listener );
         return NULL;
+    }
+
+    cl->clock_listener = clock_listener;
 
     cl->b_has_reference = false;
     cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
@@ -180,6 +200,8 @@ input_clock_t *input_clock_New( float rate )
 void input_clock_Delete( input_clock_t *cl )
 {
     AvgClean( &cl->drift );
+    if( cl->clock_listener )
+        vlc_clock_Delete( cl->clock_listener );
     free( cl );
 }
 
@@ -271,6 +293,8 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         cl->late.i_index = ( cl->late.i_index + 1 ) % INPUT_CLOCK_LATE_COUNT;
     }
 
+    UpdateListener( cl );
+
     return i_late;
 }
 
@@ -282,6 +306,9 @@ void input_clock_Reset( input_clock_t *cl )
     cl->b_has_reference = false;
     cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
     cl->b_has_external_clock = false;
+
+    if( cl->clock_listener )
+        vlc_clock_Reset( cl->clock_listener );
 }
 
 /*****************************************************************************
@@ -296,6 +323,8 @@ void input_clock_ChangeRate( input_clock_t *cl, float rate )
         cl->ref.system = cl->last.system - (vlc_tick_t) ((cl->last.system - cl->ref.system) / rate * cl->rate);
     }
     cl->rate = rate;
+
+    UpdateListener( cl );
 }
 
 /*****************************************************************************
@@ -313,6 +342,8 @@ void input_clock_ChangePause( input_clock_t *cl, bool b_paused, vlc_tick_t i_dat
         {
             cl->ref.system += i_duration;
             cl->last.system += i_duration;
+
+            UpdateListener( cl );
         }
     }
     cl->i_pause_date = i_date;
@@ -377,6 +408,8 @@ void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, vlc_tic
 
     cl->ref.system += i_offset;
     cl->last.system += i_offset;
+
+    UpdateListener( cl );
 }
 
 void input_clock_GetSystemOrigin( input_clock_t *cl, vlc_tick_t *pi_system, vlc_tick_t *pi_delay )

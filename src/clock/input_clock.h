@@ -26,6 +26,7 @@
 
 #include <vlc_common.h>
 #include <vlc_input.h> /* FIXME Needed for input_clock_t */
+#include "clock.h"
 
 /** @struct input_clock_t
  * This structure is used to manage clock drift and reception jitters
@@ -36,9 +37,13 @@ typedef struct input_clock_t input_clock_t;
 
 /**
  * This function creates a new input_clock_t.
+ *
+ * \param clock_listener clock created with vlc_clock_main_CreateMaster(). If
+ * valid, the input_clock_t will take ownership of this clock and drive the
+ * main clock.
  * You must use input_clock_Delete to delete it once unused.
  */
-input_clock_t *input_clock_New( float rate );
+input_clock_t *input_clock_New( vlc_clock_t *clock_listener, float rate );
 
 /**
  * This function destroys a input_clock_t created by input_clock_New.

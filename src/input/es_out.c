@@ -1411,7 +1411,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
     p_pgrm->p_meta = NULL;
 
     p_pgrm->p_master_clock = NULL;
-    p_pgrm->p_input_clock = input_clock_New( p_sys->rate );
+    p_pgrm->p_input_clock = input_clock_New( NULL, p_sys->rate );
     p_pgrm->p_main_clock = vlc_clock_main_New();
     if( !p_pgrm->p_input_clock || !p_pgrm->p_main_clock )
     {
