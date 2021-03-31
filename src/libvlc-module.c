@@ -538,9 +538,8 @@ static const char *const screensaver_texts[] = {
 
 #define CLOCK_MASTER_TEXT N_("Clock master source")
 
-static const int pi_clock_master_values[] = {
-    VLC_CLOCK_MASTER_AUDIO,
-    VLC_CLOCK_MASTER_MONOTONIC,
+static const char *const ppsz_clock_master_values[] = {
+    "audio", "monotonic",
 };
 static const char *const ppsz_clock_master_descriptions[] = {
     N_("Audio"),
@@ -1977,9 +1976,9 @@ vlc_module_begin ()
     add_integer( "clock-jitter", 5000, CLOCK_JITTER_TEXT,
               CLOCK_JITTER_LONGTEXT, true )
         change_safe()
-    add_integer( "clock-master", VLC_CLOCK_MASTER_DEFAULT,
+    add_string( "clock-master", "audio",
                  CLOCK_MASTER_TEXT, NULL, true )
-        change_integer_list( pi_clock_master_values, ppsz_clock_master_descriptions )
+        change_string_list( ppsz_clock_master_values, ppsz_clock_master_descriptions )
 
     add_directory("input-record-path", NULL,
                   INPUT_RECORD_PATH_TEXT, INPUT_RECORD_PATH_LONGTEXT)

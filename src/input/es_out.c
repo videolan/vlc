@@ -264,6 +264,46 @@ static int LanguageArrayIndex( char **ppsz_langs, const char *psz_lang );
 static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm );
 static char *EsInfoCategoryName( es_out_id_t* es );
 
+struct clock_source_mapping
+{
+    char key[sizeof("monotonic")];
+    enum vlc_clock_master_source val;
+};
+
+static int clock_source_mapping_cmp(const void *key, const void *val)
+{
+    const struct clock_source_mapping *entry = val;
+    return strcasecmp( key, entry->key );
+}
+
+static enum vlc_clock_master_source
+clock_source_Inherit(vlc_object_t *obj)
+{
+    static const struct clock_source_mapping clock_source_list[] =
+    {
+        { "0", VLC_CLOCK_MASTER_AUDIO }, /* legacy option */
+        { "1", VLC_CLOCK_MASTER_MONOTONIC }, /* legacy option */
+        { "audio", VLC_CLOCK_MASTER_AUDIO },
+        { "monotonic", VLC_CLOCK_MASTER_MONOTONIC },
+    };
+
+    char *master_source_str = var_InheritString(obj, "clock-master");
+    if (master_source_str == NULL)
+        goto default_val;
+
+    const struct clock_source_mapping *entry =
+        bsearch(master_source_str, clock_source_list, ARRAY_SIZE(clock_source_list),
+                sizeof (*clock_source_list), clock_source_mapping_cmp);
+    free(master_source_str);
+    if (entry == NULL)
+        goto default_val;
+
+    return entry->val;
+
+default_val:
+    return VLC_CLOCK_MASTER_DEFAULT;
+}
+
 static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
 {
     int i_channel;
@@ -517,7 +557,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
     p_sys->i_group_id = var_GetInteger( p_input, "program" );
 
     enum vlc_clock_master_source master_source =
-        var_InheritInteger( p_input, "clock-master" );
+        clock_source_Inherit( VLC_OBJECT(p_input) );
     switch( master_source )
     {
         case VLC_CLOCK_MASTER_AUDIO:
