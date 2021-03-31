@@ -85,6 +85,18 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     /* Inject correct background view depending on OS support */
     if (OSX_YOSEMITE_AND_HIGHER) {
         [self injectVisualEffectView];
+
+        // Large panel configuration (only for modern macOS versions)
+        if (var_InheritBool(getIntf(), "macosx-large-text")) {
+            NSFont *textFont = [NSFont systemFontOfSize:16.];
+
+            self.mediaTitle.font = textFont;
+            self.elapsedTime.font = textFont;
+            self.remainingOrTotalTime.font = textFont;
+
+            [_heightMaxConstraint setConstant:42. + 8.];
+        }
+
     } else {
         [self injectBackgroundView];
     }
@@ -542,10 +554,9 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [self.window setContentView:view];
     [self.window.contentView addSubview:_controlsView];
 
-    /* Disable adjusting height to workaround autolayout problems */
-    [_heightMaxConstraint setConstant:42.0];
-    [self.window setMaxSize:NSMakeSize(4068, 80)];
-    [self.window setMinSize:NSMakeSize(480, 80)];
+    // Needed on old OS to allow correct resizing of window
+    [self.window setMaxSize:NSMakeSize(4068, 84.)];
+    [self.window setMinSize:NSMakeSize(480, 84.)];
 }
 
 - (void)dealloc
