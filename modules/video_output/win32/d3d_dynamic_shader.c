@@ -361,7 +361,10 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
 
     if (FAILED(hr) || pErrBlob) {
         const char *err = pErrBlob ? ID3D10Blob_GetBufferPointer(pErrBlob) : NULL;
-        msg_Err(obj, "invalid %s Shader (hr=0x%lX): %s", pixelShader?"Pixel":"Vertex", hr, err );
+        if (SUCCEEDED(hr))
+            msg_Dbg(obj, "%s Shader: %s", pixelShader?"Pixel":"Vertex", err );
+        else
+            msg_Err(obj, "invalid %s Shader (hr=0x%lX): %s", pixelShader?"Pixel":"Vertex", hr, err );
         if (pErrBlob)
             ID3D10Blob_Release(pErrBlob);
         if (FAILED(hr))
