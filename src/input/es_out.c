@@ -182,7 +182,7 @@ typedef struct
     struct vlc_list programs;
     es_out_pgrm_t *p_pgrm;  /* Master program */
 
-    enum es_format_category_e i_master_source_cat;
+    enum vlc_clock_master_source clock_source;
 
     /* all es */
     int         i_id;
@@ -556,18 +556,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
 
     p_sys->i_group_id = var_GetInteger( p_input, "program" );
 
-    enum vlc_clock_master_source master_source =
-        clock_source_Inherit( VLC_OBJECT(p_input) );
-    switch( master_source )
-    {
-        case VLC_CLOCK_MASTER_AUDIO:
-            p_sys->i_master_source_cat = AUDIO_ES;
-            break;
-        case VLC_CLOCK_MASTER_MONOTONIC:
-        default:
-            p_sys->i_master_source_cat = UNKNOWN_ES;
-            break;
-    }
+    p_sys->clock_source = clock_source_Inherit( VLC_OBJECT(p_input) );
 
     p_sys->i_pause_date = -1;
 
@@ -2204,8 +2193,21 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
 
     assert( p_es->p_pgrm );
 
+    enum es_format_category_e clock_source_cat;
+    switch( p_sys->clock_source )
+    {
+        case VLC_CLOCK_MASTER_AUDIO:
+            clock_source_cat = AUDIO_ES;
+            break;
+        case VLC_CLOCK_MASTER_MONOTONIC:
+            clock_source_cat = UNKNOWN_ES;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
     if( p_es->fmt.i_cat != UNKNOWN_ES
-     && p_es->fmt.i_cat == p_sys->i_master_source_cat
+     && p_es->fmt.i_cat == clock_source_cat
      && p_es->p_pgrm->p_master_clock == NULL )
     {
         p_es->master = true;
