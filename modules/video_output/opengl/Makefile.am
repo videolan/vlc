@@ -106,7 +106,7 @@ endif
 endif
 
 libegl_pbuffer_filter_plugin_la_SOURCES = video_filter/egl_pbuffer.c \
-    video_output/opengl/egl_display.c
+    video_output/opengl/egl_display.c video_output/opengl/egl_display.h
 libegl_pbuffer_filter_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_FLAGS)
 libegl_pbuffer_filter_plugin_la_LIBADD = $(EGL_LIBS)
 
