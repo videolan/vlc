@@ -1122,15 +1122,8 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     else if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Input Devices")]) {
         [_captureTabView selectTabViewItemAtIndex:0];
 
-        [self qtkChanged:nil];
-        [self qtkAudioChanged:nil];
-
         [self setMRL: @""];
-
-        if ([_qtkVideoCheckbox state] && _avCurrentDeviceUID)
-            [self setMRL:[NSString stringWithFormat:@"avcapture://%@", _avCurrentDeviceUID]];
-        else if ([_qtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
-            [self setMRL:[NSString stringWithFormat:@"avaudiocapture://%@", _avCurrentAudioDeviceUID]];
+        [self qtkToggleUIElements: nil];
     }
 }
 
@@ -1166,6 +1159,17 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 }
 
 // QTKit Recording actions
+
+- (void)updateInputDevicesUrl
+{
+    if ([_qtkVideoCheckbox state] && _avCurrentDeviceUID)
+        [self setMRL:[NSString stringWithFormat:@"avcapture://%@", _avCurrentDeviceUID]];
+    else if ([_qtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
+        [self setMRL:[NSString stringWithFormat:@"avaudiocapture://%@", _avCurrentAudioDeviceUID]];
+    else
+        [self setMRL:@""];
+}
+
 - (IBAction)qtkChanged:(id)sender
 {
     NSInteger selectedDevice = [_qtkVideoDevicePopup indexOfSelectedItem];
@@ -1173,6 +1177,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
         return;
 
     _avCurrentDeviceUID = [[(AVCaptureDevice *)[_avvideoDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    [self updateInputDevicesUrl];
 }
 
 - (IBAction)qtkAudioChanged:(id)sender
@@ -1182,16 +1187,16 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
         return;
 
     _avCurrentAudioDeviceUID = [[(AVCaptureDevice *)[_avaudioDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    [self updateInputDevicesUrl];
 }
 
 - (IBAction)qtkToggleUIElements:(id)sender
 {
     [_qtkAudioDevicePopup setEnabled:[_qtkAudioCheckbox state]];
-    BOOL b_state = [_qtkVideoCheckbox state];
-    [_qtkVideoDevicePopup setEnabled:b_state];
+    [_qtkVideoDevicePopup setEnabled:[_qtkVideoCheckbox state]];
+
     [self qtkAudioChanged:sender];
     [self qtkChanged:sender];
-    [self openCaptureModeChanged:sender];
 }
 
 #pragma mark -
