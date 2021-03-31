@@ -77,7 +77,7 @@ typedef struct
     /* Clock for this program */
     input_clock_t    *p_input_clock;
     vlc_clock_main_t *p_main_clock;
-    vlc_clock_t      *p_master_clock;
+    const vlc_clock_t *p_master_clock;
 
     vlc_tick_t i_last_pcr;
 
