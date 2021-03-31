@@ -1411,15 +1411,22 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
     p_pgrm->p_meta = NULL;
 
     p_pgrm->p_master_clock = NULL;
-    p_pgrm->p_input_clock = input_clock_New( NULL, p_sys->rate );
+
     p_pgrm->p_main_clock = vlc_clock_main_New();
-    if( !p_pgrm->p_input_clock || !p_pgrm->p_main_clock )
+    if( !p_pgrm->p_main_clock )
     {
-        if( p_pgrm->p_input_clock )
-            input_clock_Delete( p_pgrm->p_input_clock );
         free( p_pgrm );
         return NULL;
     }
+
+    p_pgrm->p_input_clock = input_clock_New( NULL, p_sys->rate );
+    if( !p_pgrm->p_input_clock )
+    {
+        vlc_clock_main_Delete( p_pgrm->p_main_clock );
+        free( p_pgrm );
+        return NULL;
+    }
+
     if( p_sys->b_paused )
         input_clock_ChangePause( p_pgrm->p_input_clock, p_sys->b_paused, p_sys->i_pause_date );
     const vlc_tick_t pts_delay = p_sys->i_pts_delay + p_sys->i_pts_jitter
