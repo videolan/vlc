@@ -24,6 +24,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///player/" as Player
 import "qrc:///style/"
+import "qrc:///widgets/" as Widgets
 
 Rectangle{
     id: root
@@ -320,11 +321,9 @@ Rectangle{
             ColumnLayout{
                 anchors.fill: parent
 
-                Text {
+                Widgets.MenuCaption {
                     Layout.margins: VLCStyle.margin_xxsmall
                     text: i18n.qtr("Drag items below to add them above: ")
-                    font.pointSize: VLCStyle.fontHeight_xsmall
-                    color: VLCStyle.colors.buttonText
                 }
 
                 ToolbarEditorButtonList {

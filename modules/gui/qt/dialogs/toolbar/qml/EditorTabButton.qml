@@ -19,6 +19,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 import "qrc:///style/"
+import "qrc:///widgets/" as Widgets
 
 TabButton {
     id: mainPlayerControl
@@ -28,11 +29,9 @@ TabButton {
 
     implicitWidth: VLCStyle.button_width_large
 
-    contentItem: Text {
+    contentItem: Widgets.ListLabel {
         text: mainPlayerControl.text
-        color: VLCStyle.colors.buttonText
         horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
     }
 
     background: Rectangle {

@@ -23,6 +23,7 @@ import QtQuick.Layouts 1.3
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
+import "qrc:///widgets/" as Widgets
 
 GridView{
     id: allButtonsView
@@ -146,15 +147,15 @@ GridView{
                 Layout.alignment: Qt.AlignHCenter
                 text: controlButtons.buttonL[model.index].label
             }
-            Text {
+
+            Widgets.ListSubtitleLabel {
                 id: buttonName
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+
+                elide: Text.ElideNone
                 text: controlButtons.buttonL[model.index].text
-                font.pointSize: VLCStyle.fontHeight_xsmall
-                color: VLCStyle.colors.buttonText
                 wrapMode: Text.WordWrap
-                verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
             }
         }
