@@ -339,6 +339,7 @@
         <file alias="CustomDialog.qml">dialogs/dialogs/qml/CustomDialog.qml</file>
         <file alias="Dialogs.qml">dialogs/dialogs/qml/Dialogs.qml</file>
         <file alias="ModalDialog.qml">dialogs/dialogs/qml/ModalDialog.qml</file>
+        <file alias="WindowDialog.qml">dialogs/dialogs/qml/WindowDialog.qml</file>
         <file alias="EditorDummyButton.qml">dialogs/toolbar/qml/EditorDummyButton.qml</file>
         <file alias="EditorDNDDelegate.qml">dialogs/toolbar/qml/EditorDNDDelegate.qml</file>
         <file alias="ToolbarEditorButtonList.qml">dialogs/toolbar/qml/ToolbarEditorButtonList.qml</file>

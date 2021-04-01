@@ -646,6 +646,7 @@ libqt_plugin_la_QML = \
 	gui/qt/dialogs/dialogs/qml/CustomDialog.qml \
 	gui/qt/dialogs/dialogs/qml/Dialogs.qml \
 	gui/qt/dialogs/dialogs/qml/ModalDialog.qml \
+	gui/qt/dialogs/dialogs/qml/WindowDialog.qml \
 	gui/qt/dialogs/help/qml/About.qml \
 	gui/qt/dialogs/toolbar/qml/EditorDNDDelegate.qml \
 	gui/qt/dialogs/toolbar/qml/EditorDNDView.qml\
