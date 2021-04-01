@@ -18,7 +18,34 @@
 
 #include "player_controlbar_model.hpp"
 
+#include <QMetaEnum>
+#include <QJSEngine>
+
 #include "control_list_model.hpp"
+
+QJSValue PlayerControlbarModel::getPlaylistIdentifierListModel(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine)
+
+    static const QMetaEnum metaEnum = QMetaEnum::fromType<PlayerIdentifier>();
+
+    QJSValue array = scriptEngine->newArray();
+
+    for (int i = 0; i < metaEnum.keyCount(); ++i)
+    {
+       QJSValue obj = scriptEngine->newObject();
+
+       obj.setProperty("identifier", metaEnum.value(i));
+       obj.setProperty("name", metaEnum.key(i));
+
+       array.setProperty(i, obj);
+    }
+
+    QJSValue value = scriptEngine->newObject();
+    value.setProperty("model", array);
+
+    return value;
+}
 
 PlayerControlbarModel::PlayerControlbarModel(QObject *parent) : QObject(parent)
 {

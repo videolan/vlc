@@ -20,6 +20,7 @@
 #define PLAYERCONTROLBARMODEL_HPP
 
 #include <QObject>
+#include <QJSValue>
 #include <array>
 
 class ControlListModel;
@@ -44,6 +45,15 @@ public:
         Miniplayer
     };
     Q_ENUM(PlayerIdentifier)
+    // This enum is iterated through QMetaEnum, and
+    // a model out of this enum is generated
+    // and used in the configuration editor.
+    // Thanks to MOC, adding an entry to this enum
+    // is enough for the editor to consider the
+    // added entry without any other modification.
+
+    static QJSValue getPlaylistIdentifierListModel(class QQmlEngine *engine,
+                                                   class QJSEngine *scriptEngine);
 
     explicit PlayerControlbarModel(QObject *parent = nullptr);
     ~PlayerControlbarModel();
