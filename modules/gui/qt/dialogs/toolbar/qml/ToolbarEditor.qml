@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
-import QtQuick.Layouts 1.3
+import QtQuick.Layouts 1.11
 import QtQml.Models 2.11
 
 import org.videolan.vlc 0.1
@@ -115,7 +115,7 @@ Rectangle{
                         Layout.fillHeight: true
 
                         Layout.fillWidth: count > 0 || (playerBtnDND_left.count === 0 && playerBtnDND_center.count === 0 && playerBtnDND_right.count === 0)
-                        Layout.minimumWidth: centerMetric.width
+                        Layout.minimumWidth: centerMetric.width * 1.25
                         Layout.leftMargin: VLCStyle.margin_xsmall
                         Layout.rightMargin: VLCStyle.margin_xsmall
 
@@ -149,7 +149,7 @@ Rectangle{
                         Layout.fillHeight: true
 
                         Layout.fillWidth: count > 0 || (playerBtnDND_left.count === 0 && playerBtnDND_center.count === 0 && playerBtnDND_right.count === 0)
-                        Layout.minimumWidth: centerMetric.width
+                        Layout.minimumWidth: centerMetric.width * 1.25
                         Layout.leftMargin: VLCStyle.margin_xsmall
                         Layout.rightMargin: VLCStyle.margin_xsmall
 
@@ -183,7 +183,7 @@ Rectangle{
                         Layout.fillHeight: true
 
                         Layout.fillWidth: count > 0 || (playerBtnDND_left.count === 0 && playerBtnDND_center.count === 0 && playerBtnDND_right.count === 0)
-                        Layout.minimumWidth: centerMetric.width
+                        Layout.minimumWidth: centerMetric.width * 1.25
                         Layout.leftMargin: VLCStyle.margin_xsmall
                         Layout.rightMargin: VLCStyle.margin_xsmall
 
