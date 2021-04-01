@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2020-03-27 09:43+0100\n"
-"Last-Translator: Fumio Nakayama <fumio.n6a@gmail.com>, 2020\n"
+"PO-Revision-Date: 2021-04-01 08:09+0200\n"
+"Last-Translator: Hayase.Osberg.Ichimonji, 2021\n"
 "Language-Team: Japanese (https://www.transifex.com/yaron/teams/16553/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -11921,9 +11921,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "Kateテキスト字幕のパケッタイザー"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "トランスコーディングオプション"
+msgstr "追加のフォントディレクトリ"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -15072,17 +15071,16 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "アダプティブストリーム以外で使用される帯域幅"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "DTS遅延(ミリ秒)"
+msgstr "現在の再生遅延(ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "安定性とリアルタイムをトレードオフ"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "最大バッファリング(ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15102,9 +15100,8 @@ msgid "Low latency"
 msgstr "小さな遅延"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "パラメーターの上書き"
+msgstr "低レイテンシパラメーターの上書き"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15131,9 +15128,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "最高帯域幅/品質"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "ボールドを強制使用"
+msgstr "強制する"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -28765,11 +28761,19 @@ msgid ""
 "instance will be transmitted over the internet to the Google Image Charts "
 "web service to generate this QR code."
 msgstr ""
+"VLCはモバイル版のウェブインターフェイスにリンクするQRコードを表示することがで"
+"きます。お使いのVLCメディアプレーヤーインスタンスのウェブインターフェイスの"
+"ウェブアドレスは、このQRコードを生成するためにインターネット経由でGoogle "
+"Image Chartsウェブサービスに送信されます。\n"
+"\n"
+"VLC can display a QR code linking to the mobile version of the web "
+"interface; the web address of the web interface of your VLC media player "
+"instance will be transmitted over the internet to the Google Image Charts "
+"web service to generate this QR code."
 
 #: share/lua/http/index.html:285
-#, fuzzy
 msgid "Do you want to go ahead with this?"
-msgstr "ダウンロードしますか?"
+msgstr "これより先に進みますか？"
 
 #: share/lua/http/index.html:290
 msgid ""
