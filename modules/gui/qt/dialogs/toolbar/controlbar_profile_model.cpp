@@ -36,9 +36,7 @@ decltype (ControlbarProfileModel::m_defaults)
     ControlbarProfileModel::m_defaults =
         {
             {
-                {
-                    "Minimalist Style"
-                },
+                N_("Minimalist Style"),
                 {
                     {
                         {
@@ -94,9 +92,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 }
             },
             {
-                {
-                    "One-liner Style"
-                },
+                N_("One-liner Style"),
                 {
                     {
                         {
@@ -156,9 +152,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 }
             },
             {
-                {
-                    "Simplest Style"
-                },
+                N_("Simplest Style"),
                 {
                     {
                         {
@@ -241,7 +235,7 @@ void ControlbarProfileModel::insertDefaults()
     // Add default profiles:
     for (const auto& i : m_defaults)
     {
-        const auto ptrNewProfile = newProfile(i.name);
+        const auto ptrNewProfile = newProfile(qtr(i.name));
         if (!ptrNewProfile)
             continue;
 

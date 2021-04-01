@@ -92,7 +92,7 @@ private:
     int m_selectedProfile = -1;
 
     struct Profile {
-        QString name;
+        const char* name;
         QVector<ControlbarProfile::Configuration> modelData;
     };
 
