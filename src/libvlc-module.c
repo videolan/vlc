@@ -1978,7 +1978,7 @@ vlc_module_begin ()
     add_integer( "clock-jitter", 5000, CLOCK_JITTER_TEXT,
               CLOCK_JITTER_LONGTEXT, true )
         change_safe()
-    add_string( "clock-master", "audio",
+    add_string( "clock-master", "auto",
                  CLOCK_MASTER_TEXT, NULL, true )
         change_string_list( ppsz_clock_master_values, ppsz_clock_master_descriptions )
 
