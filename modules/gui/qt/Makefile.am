@@ -653,6 +653,7 @@ libqt_plugin_la_QML = \
 	gui/qt/dialogs/toolbar/qml/EditorDummyButton.qml \
 	gui/qt/dialogs/toolbar/qml/EditorTabButton.qml \
 	gui/qt/dialogs/toolbar/qml/ToolbarEditor.qml \
+	gui/qt/dialogs/toolbar/qml/ToolbarEditorDialog.qml \
 	gui/qt/dialogs/toolbar/qml/ToolbarEditorButtonList.qml \
 	gui/qt/maininterface/qml/BannerSources.qml \
 	gui/qt/maininterface/qml/MainInterface.qml \

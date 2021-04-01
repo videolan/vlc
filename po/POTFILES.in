@@ -804,6 +804,7 @@ modules/gui/qt/dialogs/dialogs/qml/Dialogs.qml
 modules/gui/qt/dialogs/dialogs/qml/WindowDialog.qml
 modules/gui/qt/dialogs/help/qml/About.qml
 modules/gui/qt/dialogs/toolbar/qml/ToolbarEditor.qml
+modules/gui/qt/dialogs/toolbar/qml/ToolbarEditorDialog.qml
 modules/gui/qt/maininterface/qml/BannerSources.qml
 modules/gui/qt/maininterface/qml/MainDisplay.qml
 modules/gui/qt/maininterface/qml/MainInterface.qml

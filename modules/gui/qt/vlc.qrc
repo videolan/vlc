@@ -344,6 +344,7 @@
         <file alias="EditorDNDDelegate.qml">dialogs/toolbar/qml/EditorDNDDelegate.qml</file>
         <file alias="ToolbarEditorButtonList.qml">dialogs/toolbar/qml/ToolbarEditorButtonList.qml</file>
         <file alias="ToolbarEditor.qml">dialogs/toolbar/qml/ToolbarEditor.qml</file>
+        <file alias="ToolbarEditorDialog.qml">dialogs/toolbar/qml/ToolbarEditorDialog.qml</file>
         <file alias="EditorDNDView.qml">dialogs/toolbar/qml/EditorDNDView.qml</file>
         <file alias="EditorTabButton.qml">dialogs/toolbar/qml/EditorTabButton.qml</file>
     </qresource>
