@@ -52,7 +52,7 @@ Rectangle{
 
             z: 1
 
-            spacing: VLCStyle.dp(1) // this causes binding loop warning in Qt 5.11.3 probably due to a bug
+            background: Item { }
 
             EditorTabButton {
                 id: mainPlayerTab
