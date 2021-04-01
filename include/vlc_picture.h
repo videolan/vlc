@@ -63,7 +63,7 @@ typedef struct plane_t
  * Maximum number of plane for a picture
  */
 #define PICTURE_PLANE_MAX (VOUT_MAX_PLANES)
-#define PICTURE_MAX_CAPTION_BYTES (60 + 15)
+#define PICTURE_MAX_CAPTION_BYTES (128 + 15)
 
 typedef struct
 {
