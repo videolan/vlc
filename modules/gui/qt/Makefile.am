@@ -112,7 +112,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/sout/sout.cpp gui/qt/dialogs/sout/sout.hpp \
 	gui/qt/dialogs/sout/sout_widgets.cpp \
 	gui/qt/dialogs/sout/sout_widgets.hpp \
-	gui/qt/dialogs/toolbar/toolbareditor.cpp gui/qt/dialogs/toolbar/toolbareditor.hpp \
 	gui/qt/dialogs/vlm/vlm.cpp gui/qt/dialogs/vlm/vlm.hpp \
 	gui/qt/dialogs/playlists/playlists.cpp gui/qt/dialogs/playlists/playlists.hpp \
 	gui/qt/maininterface/compositor.hpp \
@@ -316,7 +315,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/sout/profile_selector.moc.cpp \
 	gui/qt/dialogs/sout/sout.moc.cpp \
 	gui/qt/dialogs/sout/sout_widgets.moc.cpp \
-	gui/qt/dialogs/toolbar/toolbareditor.moc.cpp \
 	gui/qt/dialogs/playlists/playlists.moc.cpp \
 	gui/qt/maininterface/compositor_dummy.moc.cpp \
 	gui/qt/maininterface/interface_window_handler.moc.cpp \
