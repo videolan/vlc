@@ -29,7 +29,16 @@ TabButton {
     implicitWidth: VLCStyle.button_width_large
 
     contentItem: Widgets.ListLabel {
-        text: mainPlayerControl.text
+        text: {
+            var text = mainPlayerControl.text
+
+            if (!!mainInterface.controlbarProfileModel.currentModel &&
+                    mainInterface.controlbarProfileModel.currentModel.getModel(mainPlayerControl.identifier).dirty)
+                return _markDirty(text)
+            else
+                return text
+        }
+
         horizontalAlignment: Text.AlignHCenter
     }
 
