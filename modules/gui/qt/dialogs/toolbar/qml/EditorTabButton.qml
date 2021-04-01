@@ -24,7 +24,6 @@ import "qrc:///widgets/" as Widgets
 TabButton {
     id: mainPlayerControl
 
-    property int index: 0
     property bool active: index == bar.currentIndex
 
     implicitWidth: VLCStyle.button_width_large
