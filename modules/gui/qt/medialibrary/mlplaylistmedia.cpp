@@ -31,6 +31,7 @@ MLPlaylistMedia::MLPlaylistMedia(vlc_medialibrary_t * ml, const vlc_ml_media_t *
     , m_type(data->i_type)
     , m_title(qfu(data->psz_title))
     , m_thumbnail(qfu(data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl))
+    , m_thumbnailStatus(data->thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status)
     , m_duration(data->i_duration)
     , m_progress(data->f_progress)
     , m_playCount(data->i_playcount)
