@@ -38,6 +38,9 @@ ToolButton {
 
     enabled: !paintOnly
 
+    ToolTip.text: control.text
+    ToolTip.delay: 500
+
     onActiveFocusChanged: {
         if (!enabled) {
             var keyNavigationLeft = control.KeyNavigation.left
