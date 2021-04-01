@@ -186,6 +186,8 @@ Rectangle{
                                         onContainsDragChanged: {
                                             if (containsDrag)
                                                 _viewThatContainsDrag = this
+                                            else if (_viewThatContainsDrag === this)
+                                                _viewThatContainsDrag = null
                                         }
 
                                         Text {
@@ -252,57 +254,63 @@ Rectangle{
         }
 
         onXChanged: {
-            handleScroll(this)
+            if (buttonDragItem.Drag.active)
+                handleScroll(this)
         }
     }
-
-    property int _scrollingDirection: 0
 
     function handleScroll(dragItem) {
         var view = _viewThatContainsDrag
 
-        if (view === undefined) {
-            upAnimation.target = null
-            downAnimation.target = null
-
-            _scrollingDirection = 0
-            return
+        if (view === undefined || view === null) {
+            if (!!scrollAnimation.target)
+                view = scrollAnimation.target
+            else
+                return
         }
 
-        upAnimation.target = view
-        downAnimation.target = view
+        var dragItemX = dragItem.x
+        var viewX     = view.mapToItem(root, view.x, view.y).x
 
-        downAnimation.to = Qt.binding(function() { return view.contentWidth - view.width; })
+        var leftMark  = (viewX + VLCStyle.dp(20, VLCStyle.scale))
+        var rightMark = (viewX + view.width - VLCStyle.dp(20, VLCStyle.scale))
 
-        var dragItemX = root.mapToGlobal(dragItem.x, dragItem.y).x
-        var viewX     = view.mapToGlobal(view.x, view.y).x
+        scrollAnimation.target = view
+        scrollAnimation.dragItem = dragItem
 
-        var leftDiff  = (viewX + VLCStyle.dp(20, VLCStyle.scale)) - dragItemX
-        var rightDiff = dragItemX - (viewX + view.width - VLCStyle.dp(20, VLCStyle.scale))
-
-        if (!view.atXBeginning && leftDiff > 0) {
-            _scrollingDirection = -1
-        } else if (!view.atXEnd && rightDiff > 0) {
-            _scrollingDirection = 1
+        if (!view.atXBeginning && dragItemX <= leftMark) {
+            scrollAnimation.direction = -1
+        } else if (!view.atXEnd && dragItemX >= rightMark) {
+            scrollAnimation.direction = 1
         } else {
-            _scrollingDirection = 0
+            scrollAnimation.direction = 0
         }
     }
 
     SmoothedAnimation {
-        id: upAnimation
+        id: scrollAnimation
+
+        property var dragItem
+        property int direction: 0 // -1: left, 0: stop, 1: right
+
+        to: {
+            if (direction === -1)
+                0
+            else if (direction === 1 && !!target)
+                target.contentWidth - target.width
+            else
+                0
+        }
+
+        running: {
+            if (!!dragItem && (direction === -1 || direction === 1))
+                dragItem.Drag.active
+            else
+                false
+        }
+
         property: "contentX"
-        to: 0
-        running: root._scrollingDirection === -1 && target !== null
-
         velocity: VLCStyle.dp(150, VLCStyle.scale)
-    }
-
-    SmoothedAnimation {
-        id: downAnimation
-        property: "contentX"
-        running: root._scrollingDirection === 1 && target !== null
-
-        velocity: VLCStyle.dp(150, VLCStyle.scale)
+        reversingMode: SmoothedAnimation.Immediate
     }
 }

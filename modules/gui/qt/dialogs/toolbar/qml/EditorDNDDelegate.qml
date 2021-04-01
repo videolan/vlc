@@ -135,7 +135,8 @@ MouseArea {
         }
 
         onXChanged: {
-            root.handleScroll(this)
+            if (content.Drag.active)
+                root.handleScroll(this)
         }
     }
 
