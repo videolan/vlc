@@ -186,6 +186,7 @@ public slots:
 
 signals:
     void releaseMouseEvents();
+    void showToolbarEditorDialog();
 };
 
 class DialogEvent : public QEvent
