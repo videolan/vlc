@@ -60,6 +60,7 @@
 #include <QSignalMapper>
 #include <QFileDialog>
 #include <QUrl>
+#include <QInputDialog>
 
 #define I_OP_DIR_WINTITLE I_DIR_OR_FOLDER( N_("Open Directory"), \
                                            N_("Open Folder") )
@@ -109,6 +110,36 @@ QString DialogsProvider::getSaveFileName( QWidget *parent,
 {
     const QStringList schemes = QStringList(QStringLiteral("file"));
     return QFileDialog::getSaveFileUrl( parent, caption, dir, filter, selectedFilter, QFileDialog::Options(), schemes).toLocalFile();
+}
+
+QVariant DialogsProvider::getTextDialog(QWidget *parent,
+                                        const QString &title,
+                                        const QString &label,
+                                        const QString &placeholder,
+                                        bool *ok)
+{
+    bool _ok = false;
+    QString ret = QInputDialog::getText(parent,
+                                        title,
+                                        label,
+                                        QLineEdit::Normal,
+                                        placeholder,
+                                        ok ? ok : &_ok);
+
+    if (!ok)
+    {
+        // When this function is called from the QML side, instead of setting `ok` parameter
+        // a QVariantMap with key `ok` and `text` is returned instead
+
+        QVariantMap map;
+        map["text"] = ret;
+        map["ok"] = _ok;
+        return map;
+    }
+    else
+    {
+        return ret;
+    }
 }
 
 void DialogsProvider::quit()

@@ -100,6 +100,11 @@ public:
                                     const QString &filter = QString(),
                                     QString *selectedFilter = NULL );
 
+    Q_INVOKABLE static QVariant getTextDialog(QWidget *parent, const QString& title,
+                                              const QString& label,
+                                              const QString& placeholder,
+                                              bool* ok = nullptr);
+
 protected:
     void customEvent( QEvent *);
 
