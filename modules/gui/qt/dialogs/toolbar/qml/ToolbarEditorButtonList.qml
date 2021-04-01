@@ -37,6 +37,9 @@ GridView{
 
     highlightMoveDuration: 0 //ms
 
+    cellWidth: VLCStyle.cover_small
+    cellHeight: cellWidth
+
     property alias removeInfoRectVisible: removeInfoRect.visible
 
     DropArea {
@@ -106,8 +109,8 @@ GridView{
         id:dragArea
         objectName: "buttonsList"
         hoverEnabled: true
-        width: VLCStyle.cover_small
-        height: width
+        width: cellWidth
+        height: cellHeight
 
         property bool held: false
         property int mIndex: controlButtons.buttonL[model.index].id
