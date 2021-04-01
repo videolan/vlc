@@ -386,8 +386,6 @@ Widgets.NavigableFocusScope {
 
             onActionForSelection: _actionAtIndex()
 
-            onItemDoubleClicked: showList(model)
-
             onContextMenuButtonClicked: contextMenu.popup(modelSelect.selectedIndexes,
                                                           menuParent.mapToGlobal(0,0))
 
