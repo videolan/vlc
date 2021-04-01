@@ -21,7 +21,14 @@
 #include <QMetaEnum>
 #include <QJSEngine>
 
+#include "qt.hpp"
 #include "control_list_model.hpp"
+
+decltype (PlayerControlbarModel::playerIdentifierDictionary)
+    PlayerControlbarModel::playerIdentifierDictionary {
+        {Mainplayer, N_("Mainplayer")},
+        {Miniplayer, N_("Miniplayer")}
+    };
 
 QJSValue PlayerControlbarModel::getPlaylistIdentifierListModel(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
@@ -35,8 +42,20 @@ QJSValue PlayerControlbarModel::getPlaylistIdentifierListModel(QQmlEngine *engin
     {
        QJSValue obj = scriptEngine->newObject();
 
-       obj.setProperty("identifier", metaEnum.value(i));
-       obj.setProperty("name", metaEnum.key(i));
+       const int val = metaEnum.value(i);
+       obj.setProperty("identifier", val);
+
+       QString key;
+       if ( playerIdentifierDictionary.contains(static_cast<PlayerControlbarModel::PlayerIdentifier>(i)) )
+       {
+           key = qtr( playerIdentifierDictionary[static_cast<PlayerControlbarModel::PlayerIdentifier>(i)] );
+       }
+       else
+       {
+           key = metaEnum.key(i);
+       }
+
+       obj.setProperty("name", key);
 
        array.setProperty(i, obj);
     }

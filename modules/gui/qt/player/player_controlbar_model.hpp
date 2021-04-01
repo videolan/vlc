@@ -21,6 +21,8 @@
 
 #include <QObject>
 #include <QJSValue>
+#include <QMap>
+
 #include <array>
 
 class ControlListModel;
@@ -40,6 +42,9 @@ public:
     // add its identifier in this enum and set QML buttons layout
     // identifier to it. Such as `property int identifier =
     // PlayerControlbarModel.Mainplayer`.
+    // To make it translatable, add a corresponding entry to
+    // the static member playerIdentifierDictionary which is
+    // initalized in the source file.
     enum PlayerIdentifier {
         Mainplayer = 0,
         Miniplayer
@@ -51,6 +56,9 @@ public:
     // Thanks to MOC, adding an entry to this enum
     // is enough for the editor to consider the
     // added entry without any other modification.
+    // (except for the translation)
+
+    static const QMap<PlayerIdentifier, const char*> playerIdentifierDictionary;
 
     static QJSValue getPlaylistIdentifierListModel(class QQmlEngine *engine,
                                                    class QJSEngine *scriptEngine);

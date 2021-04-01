@@ -799,6 +799,8 @@ modules/gui/qt/widgets/native/searchlineedit.hpp
 modules/gui/qt/util/singleton.hpp
 modules/gui/qt/util/validators.cpp
 modules/gui/qt/util/validators.hpp
+modules/gui/qt/player/player_controlbar_model.cpp
+modules/gui/qt/player/player_controlbar_model.hpp
 modules/gui/qt/dialogs/dialogs/qml/CustomDialog.qml
 modules/gui/qt/dialogs/dialogs/qml/Dialogs.qml
 modules/gui/qt/dialogs/dialogs/qml/WindowDialog.qml
