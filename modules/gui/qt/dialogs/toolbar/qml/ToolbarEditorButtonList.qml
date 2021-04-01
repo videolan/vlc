@@ -32,7 +32,7 @@ GridView{
     highlight: Rectangle{
         color: VLCStyle.colors.bgHover
     }
-    ScrollBar.vertical: ScrollBar {}
+    ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
     model: controlButtons.buttonL.length
 
     highlightMoveDuration: 0 //ms
