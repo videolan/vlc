@@ -372,4 +372,27 @@ Item {
         rootWindow: root.bgContent
         onAboutToHide: restoreFocus()
     }
+
+    Loader {
+        id: toolbarEditorDialogLoader
+        active: false
+        source: "qrc:///dialogs/ToolbarEditorDialog.qml"
+
+        Connections {
+            target: toolbarEditorDialogLoader.item
+
+            onUnload: {
+                toolbarEditorDialogLoader.active = false
+            }
+        }
+
+        Connections {
+            target: dialogProvider
+
+            onShowToolbarEditorDialog: {
+                toolbarEditorDialogLoader.active = true
+                toolbarEditorDialogLoader.item.open()
+            }
+        }
+    }
 }
