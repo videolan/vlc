@@ -50,7 +50,6 @@
 #include "dialogs/help/help.hpp"
 #include "dialogs/gototime/gototime.hpp"
 #include "dialogs/podcast/podcast_configuration.hpp"
-#include "dialogs/toolbar/toolbareditor.hpp"
 #include "dialogs/plugins/plugins.hpp"
 #include "dialogs/epg/epg.hpp"
 #include "dialogs/errors/errors.hpp"
@@ -343,14 +342,6 @@ void DialogsProvider::bookmarksDialog()
 void DialogsProvider::podcastConfigureDialog()
 {
     PodcastConfigDialog::getInstance( p_intf )->toggleVisible();
-}
-
-void DialogsProvider::toolbarDialog()
-{
-    ToolbarEditorDialog *toolbarEditor = new ToolbarEditorDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf);
-    if( toolbarEditor->exec() == QDialog::Accepted )
-        emit toolBarConfUpdated();
-    delete toolbarEditor;
 }
 
 void DialogsProvider::pluginDialog()

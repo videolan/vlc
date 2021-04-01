@@ -144,7 +144,6 @@ public slots:
     void aboutDialog();
     void gotoTimeDialog();
     void podcastConfigureDialog();
-    void toolbarDialog();
     void pluginDialog();
     void epgDialog();
     void setPopupMenu();
