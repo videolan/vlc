@@ -505,15 +505,4 @@ Rectangle{
 
         velocity: VLCStyle.dp(150, VLCStyle.scale)
     }
-
-    /*
-      Match the QML theme to
-      native part. Using Qt Style Sheet to
-      set the theme.
-    */
-    Component.onCompleted: toolbareditor.setStyleSheet(
-                               "background-color:"+VLCStyle.colors.bg+
-                               ";color:"+VLCStyle.colors.buttonText+
-                               ";selection-background-color:"+
-                               VLCStyle.colors.bgHover);
 }
