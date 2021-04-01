@@ -293,9 +293,12 @@ QMenu *VLCMenuBar::ToolsMenu( intf_thread_t *p_intf, QMenu *menu )
         "", &DialogsProvider::pluginDialog );
     menu->addSeparator();
 
+    // this entry is going to be reenabled after the new editor dialog is done
+#if 0
     if( !p_intf->p_sys->b_isDialogProvider )
         addDPStaticEntry( menu, qtr( "Customi&ze Interface..." ),
-            ":/menu/preferences.svg", &DialogsProvider::toolbarDialog);
+           ":/menu/preferences.svg", &DialogsProvider::toolbarDialog);
+#endif
 
     addDPStaticEntry( menu, qtr( "&Preferences" ),
         ":/menu/preferences.svg", &DialogsProvider::prefsDialog, "Ctrl+P", QAction::PreferencesRole );
