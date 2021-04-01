@@ -284,6 +284,7 @@ clock_source_Inherit(vlc_object_t *obj)
         { "0", VLC_CLOCK_MASTER_AUDIO }, /* legacy option */
         { "1", VLC_CLOCK_MASTER_MONOTONIC }, /* legacy option */
         { "audio", VLC_CLOCK_MASTER_AUDIO },
+        { "auto", VLC_CLOCK_MASTER_AUTO },
         { "input", VLC_CLOCK_MASTER_INPUT },
         { "monotonic", VLC_CLOCK_MASTER_MONOTONIC },
     };
@@ -302,7 +303,7 @@ clock_source_Inherit(vlc_object_t *obj)
     return entry->val;
 
 default_val:
-    return VLC_CLOCK_MASTER_DEFAULT;
+    return VLC_CLOCK_MASTER_AUTO;
 }
 
 static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
@@ -1424,6 +1425,12 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
     vlc_clock_t *p_master_clock = NULL;
     switch( p_sys->clock_source )
     {
+        case VLC_CLOCK_MASTER_AUTO:
+            if (priv->b_can_pace_control)
+                break;
+            msg_Dbg( p_input, "The input can't pace, selecting the input (PCR) as the "
+                     "clock source" );
+            /* Fall-through */
         case VLC_CLOCK_MASTER_INPUT:
             p_pgrm->p_master_clock = p_master_clock =
                 vlc_clock_main_CreateMaster( p_pgrm->p_main_clock, NULL, NULL );
@@ -2216,6 +2223,7 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     enum es_format_category_e clock_source_cat;
     switch( p_sys->clock_source )
     {
+        case VLC_CLOCK_MASTER_AUTO:
         case VLC_CLOCK_MASTER_AUDIO:
             clock_source_cat = AUDIO_ES;
             break;

@@ -22,10 +22,10 @@
 
 enum vlc_clock_master_source
 {
-    VLC_CLOCK_MASTER_AUDIO = 0,
+    VLC_CLOCK_MASTER_AUTO= 0,
+    VLC_CLOCK_MASTER_AUDIO,
     VLC_CLOCK_MASTER_INPUT,
     VLC_CLOCK_MASTER_MONOTONIC,
-    VLC_CLOCK_MASTER_DEFAULT = VLC_CLOCK_MASTER_AUDIO,
 };
 
 typedef struct vlc_clock_main_t vlc_clock_main_t;
