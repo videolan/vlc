@@ -180,7 +180,6 @@ public slots:
     void quit();
 
 signals:
-    void  toolBarConfUpdated();
     void releaseMouseEvents();
 };
 

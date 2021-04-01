@@ -341,7 +341,6 @@ signals:
     void interfaceAlwaysOnTopChanged(bool);
     void interfaceFullScreenChanged(bool);
     void hasEmbededVideoChanged(bool);
-    void toolBarConfUpdated();
     void showRemainingTimeChanged(bool);
     void gridViewChanged( bool );
     void colorSchemeChanged( QString );
