@@ -29,13 +29,10 @@ GridView{
     id: allButtonsView
     clip: true
 
-    highlight: Rectangle{
-        color: VLCStyle.colors.bgHover
-    }
     ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
     model: controlButtons.buttonL.length
 
-    highlightMoveDuration: 0 //ms
+    highlightFollowsCurrentItem: false
 
     cellWidth: VLCStyle.cover_small
     cellHeight: cellWidth
@@ -138,6 +135,15 @@ GridView{
         }
 
         onEntered: allButtonsView.currentIndex = index
+
+        Loader {
+            active: allButtonsView.currentIndex === index
+            anchors.fill: parent
+
+            sourceComponent: Rectangle {
+                color: VLCStyle.colors.bgHover
+            }
+        }
 
         ColumnLayout{
             id: listelemlayout

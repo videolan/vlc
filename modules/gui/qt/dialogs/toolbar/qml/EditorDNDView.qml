@@ -29,6 +29,8 @@ ListView {
     orientation: Qt.Horizontal
     clip: true
 
+    highlightFollowsCurrentItem: false
+
     property bool containsDrag: footerItem.dropVisible
 
     property alias scrollBar: scrollBar
