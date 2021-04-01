@@ -244,6 +244,7 @@ void MainUI::registerQMLTypes()
     qmlRegisterUncreatableType<ControlbarProfile>("org.videolan.vlc", 0, 1, "ControlbarProfile", "");
     qmlRegisterUncreatableType<PlayerControlbarModel>("org.videolan.vlc", 0, 1, "PlayerControlbarModel", "");
     qmlRegisterUncreatableType<ControlListModel>( "org.videolan.vlc", 0, 1, "ControlListModel", "" );
+    qmlRegisterSingletonType("org.videolan.vlc", 0, 1, "PlayerListModel", PlayerControlbarModel::getPlaylistIdentifierListModel);
 
     qRegisterMetaType<QmlMainContext*>();
     qmlRegisterType<QmlGlobalMenu>( "org.videolan.vlc", 0, 1, "QmlGlobalMenu" );
