@@ -284,6 +284,7 @@ clock_source_Inherit(vlc_object_t *obj)
         { "0", VLC_CLOCK_MASTER_AUDIO }, /* legacy option */
         { "1", VLC_CLOCK_MASTER_MONOTONIC }, /* legacy option */
         { "audio", VLC_CLOCK_MASTER_AUDIO },
+        { "input", VLC_CLOCK_MASTER_INPUT },
         { "monotonic", VLC_CLOCK_MASTER_MONOTONIC },
     };
 
@@ -1391,6 +1392,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
+    input_thread_private_t *priv = input_priv(p_input);
 
     /* Sticky groups will be attached to any existing programs, no need to
      * create one. */
@@ -1419,7 +1421,18 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
         return NULL;
     }
 
-    p_pgrm->p_input_clock = input_clock_New( NULL, p_sys->rate );
+    vlc_clock_t *p_master_clock = NULL;
+    switch( p_sys->clock_source )
+    {
+        case VLC_CLOCK_MASTER_INPUT:
+            p_pgrm->p_master_clock = p_master_clock =
+                vlc_clock_main_CreateMaster( p_pgrm->p_main_clock, NULL, NULL );
+            break;
+        default:
+            break;
+    }
+
+    p_pgrm->p_input_clock = input_clock_New( p_master_clock, p_sys->rate );
     if( !p_pgrm->p_input_clock )
     {
         vlc_clock_main_Delete( p_pgrm->p_main_clock );
@@ -2207,6 +2220,7 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
             clock_source_cat = AUDIO_ES;
             break;
         case VLC_CLOCK_MASTER_MONOTONIC:
+        case VLC_CLOCK_MASTER_INPUT:
             clock_source_cat = UNKNOWN_ES;
             break;
         default:

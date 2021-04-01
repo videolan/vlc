@@ -539,9 +539,10 @@ static const char *const screensaver_texts[] = {
 #define CLOCK_MASTER_TEXT N_("Clock master source")
 
 static const char *const ppsz_clock_master_values[] = {
-    "audio", "monotonic",
+    "input", "audio", "monotonic",
 };
 static const char *const ppsz_clock_master_descriptions[] = {
+    N_("Input (PCR)"),
     N_("Audio"),
     N_("Monotonic")
 };
