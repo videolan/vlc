@@ -269,7 +269,7 @@ Widgets.NavigableFocusScope{
         Widgets.IconToolButton {
             id: playlistButton
 
-            objectName: PlayerControlBarModel.PLAYLIST_BUTTON
+            objectName: ControlListModel.PLAYLIST_BUTTON
             size: VLCStyle.banner_icon_size
             iconText: VLCIcons.playlist
             text: i18n.qtr("Playlist")

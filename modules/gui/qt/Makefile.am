@@ -112,6 +112,10 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/sout/sout.cpp gui/qt/dialogs/sout/sout.hpp \
 	gui/qt/dialogs/sout/sout_widgets.cpp \
 	gui/qt/dialogs/sout/sout_widgets.hpp \
+	gui/qt/dialogs/toolbar/controlbar_profile.hpp \
+	gui/qt/dialogs/toolbar/controlbar_profile.cpp \
+	gui/qt/dialogs/toolbar/controlbar_profile_model.cpp \
+	gui/qt/dialogs/toolbar/controlbar_profile_model.hpp \
 	gui/qt/dialogs/vlm/vlm.cpp gui/qt/dialogs/vlm/vlm.hpp \
 	gui/qt/dialogs/playlists/playlists.cpp gui/qt/dialogs/playlists/playlists.hpp \
 	gui/qt/maininterface/compositor.hpp \
@@ -193,7 +197,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/network/servicesdiscoverymodel.hpp \
 	gui/qt/player/input_models.cpp gui/qt/player/input_models.hpp \
 	gui/qt/player/player_controller.cpp gui/qt/player/player_controller.hpp gui/qt/player/player_controller_p.hpp \
-	gui/qt/player/playercontrolbarmodel.cpp gui/qt/player/playercontrolbarmodel.hpp \
+	gui/qt/player/player_controlbar_model.cpp gui/qt/player/player_controlbar_model.hpp \
+	gui/qt/player/control_list_model.cpp gui/qt/player/control_list_model.hpp \
 	gui/qt/playlist/media.hpp \
 	gui/qt/playlist/playlist_common.cpp \
 	gui/qt/playlist/playlist_common.hpp \
@@ -315,6 +320,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/sout/profile_selector.moc.cpp \
 	gui/qt/dialogs/sout/sout.moc.cpp \
 	gui/qt/dialogs/sout/sout_widgets.moc.cpp \
+	gui/qt/dialogs/toolbar/controlbar_profile.moc.cpp \
+	gui/qt/dialogs/toolbar/controlbar_profile_model.moc.cpp \
 	gui/qt/dialogs/playlists/playlists.moc.cpp \
 	gui/qt/maininterface/compositor_dummy.moc.cpp \
 	gui/qt/maininterface/interface_window_handler.moc.cpp \
@@ -351,7 +358,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/network/servicesdiscoverymodel.moc.cpp \
 	gui/qt/player/input_models.moc.cpp \
 	gui/qt/player/player_controller.moc.cpp \
-	gui/qt/player/playercontrolbarmodel.moc.cpp \
+	gui/qt/player/player_controlbar_model.moc.cpp \
+	gui/qt/player/control_list_model.moc.cpp \
 	gui/qt/playlist/playlist_common.moc.cpp \
 	gui/qt/playlist/playlist_controller.moc.cpp \
 	gui/qt/playlist/playlist_item.moc.cpp \

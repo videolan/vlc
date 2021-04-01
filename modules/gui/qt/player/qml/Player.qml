@@ -499,6 +499,8 @@ Widgets.NavigableFocusScope {
                 navigationUpItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)
 
                 onRequestLockUnlockAutoHide: rootPlayer.lockUnlockAutoHide(lock, source)
+
+                identifier: "MainPlayer"
             }
         }
     }

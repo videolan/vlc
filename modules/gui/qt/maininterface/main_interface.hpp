@@ -59,6 +59,7 @@ class QTimer;
 class StandardPLPanel;
 struct vout_window_t;
 class VideoSurfaceProvider;
+class ControlbarProfileModel;
 
 class WindowStateHolder : public QObject
 {
@@ -159,6 +160,8 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(bool hasToolbarMenu READ hasToolbarMenu NOTIFY hasToolbarMenuChanged)
     Q_PROPERTY(bool canShowVideoPIP READ canShowVideoPIP CONSTANT)
     Q_PROPERTY(bool pinVideoControls READ pinVideoControls WRITE setPinVideoControls NOTIFY pinVideoControlsChanged)
+    Q_PROPERTY(ControlbarProfileModel* controlbarProfileModel READ controlbarProfileModel CONSTANT)
+
 
 public:
     /* tors */
@@ -207,6 +210,7 @@ public:
     inline bool canShowVideoPIP() const { return m_canShowVideoPIP; }
     inline void setCanShowVideoPIP(bool canShowVideoPIP) { m_canShowVideoPIP = canShowVideoPIP; }
     inline bool pinVideoControls() const { return m_pinVideoControls; }
+    inline ControlbarProfileModel* controlbarProfileModel() const { return m_controlbarProfileModel; }
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -289,6 +293,8 @@ protected:
     int i_kc_offset;
 
     VLCVarChoiceModel* m_extraInterfaces;
+
+    ControlbarProfileModel* m_controlbarProfileModel;
 
 public slots:
     void toggleUpdateSystrayMenu();

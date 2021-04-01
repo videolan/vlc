@@ -50,6 +50,8 @@
 
 #include "vlc_media_library.h"
 
+#include "dialogs/toolbar/controlbar_profile_model.hpp"
+
 #include <QCloseEvent>
 #include <QKeyEvent>
 
@@ -154,6 +156,9 @@ MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::Windo
 
     m_colorScheme = new ColorSchemeModel(this);
     m_colorScheme->setCurrent(currentColorScheme);
+
+    /* Controlbar Profile Model Creation */
+    m_controlbarProfileModel = new ControlbarProfileModel(p_intf, this);
 
     /* Should the UI stays on top of other windows */
     b_interfaceOnTop = var_InheritBool( p_intf, "video-on-top" );

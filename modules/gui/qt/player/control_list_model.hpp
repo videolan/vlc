@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2021 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,32 +16,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef CONTROLLERMODEL_H
-#define CONTROLLERMODEL_H
+#ifndef CONTROLLISTMODEL_HPP
+#define CONTROLLISTMODEL_HPP
 
 #include <QAbstractListModel>
 #include <QVector>
 
-#include "util/qml_main_context.hpp"
-
-class PlayerControlBarModel : public QAbstractListModel
+class ControlListModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QmlMainContext* mainCtx READ getMainCtx WRITE setMainCtx NOTIFY ctxChanged)
-    Q_PROPERTY(QString configName READ getConfigName WRITE setConfigName NOTIFY configNameChanged)
     Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
 
-
 public:
-    explicit PlayerControlBarModel(QObject *_parent = nullptr);
-    struct IconToolButton
-    {
-        int id;
+    explicit ControlListModel(QObject *parent = nullptr);
+
+    enum Roles {
+        ID_ROLE = Qt::UserRole
     };
-    enum{
-        ID_ROLE
-    };
-    enum ButtonType_e
+
+    enum ControlType
     {
         PLAY_BUTTON,
         STOP_BUTTON,
@@ -82,7 +75,7 @@ public:
         WIDGET_SPACER_EXTEND,
         WIDGET_MAX
     };
-    Q_ENUM(ButtonType_e)
+    Q_ENUM(ControlType)
 
     // Basic functionality:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -97,43 +90,21 @@ public:
 
     virtual QHash<int, QByteArray> roleNames() const override;
 
-    inline QmlMainContext* getMainCtx() const { return m_mainCtx; }
-    void setMainCtx(QmlMainContext*);
-
-    inline QString getConfigName() { return configName; }
-    void setConfigName(QString name);
-
-    static QString getSerializedDefaultStyle();
+    QVector<int> getControls() const;
+    void setControls(const QVector<int>& list);
 
 signals:
-    void ctxChanged(QmlMainContext*);
-    void configNameChanged(QString);
     void countChanged();
 
-protected:
-    intf_thread_t       *p_intf  = nullptr;
-
 private:
-    QVector<IconToolButton> mButtons;
-    QString configName;
-
-    void parseAndAdd(const QString& config);
-    void parseDefault(const QVector<IconToolButton>& config);
-
-    bool setButtonAt(int index, const IconToolButton &button);
-    void addProfiles();
-    void loadConfig();
-
-    QmlMainContext* m_mainCtx = nullptr;
+    QVector<ControlType> m_controls;
+    bool setButtonAt(int index, const ControlType &button);
 
 public slots:
     Q_INVOKABLE void insert(int index, QVariantMap bdata);
     Q_INVOKABLE void move(int src,int dest);
     Q_INVOKABLE void remove(int index);
-    Q_INVOKABLE void reloadConfig(QString config);
-    Q_INVOKABLE void saveConfig();
-    Q_INVOKABLE QString getConfig();
-    Q_INVOKABLE void reloadModel();
+    Q_INVOKABLE void clear();
 };
 
-#endif // CONTROLLERMODEL_H
+#endif // CONTROLLISTMODEL_HPP

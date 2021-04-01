@@ -18,7 +18,11 @@
 #include "medialibrary/mlplaylist.hpp"
 
 #include "player/player_controller.hpp"
-#include "player/playercontrolbarmodel.hpp"
+#include "player/player_controlbar_model.hpp"
+#include "player/control_list_model.hpp"
+
+#include "dialogs/toolbar/controlbar_profile_model.hpp"
+#include "dialogs/toolbar/controlbar_profile.hpp"
 
 #include "playlist/playlist_model.hpp"
 #include "playlist/playlist_controller.hpp"
@@ -235,7 +239,11 @@ void MainUI::registerQMLTypes()
 
     qmlRegisterType<QmlEventFilter>( "org.videolan.vlc", 0, 1, "EventFilter" );
 
-    qmlRegisterType<PlayerControlBarModel>( "org.videolan.vlc", 0, 1, "PlayerControlBarModel");
+    qRegisterMetaType<ControlbarProfile*>();
+    qRegisterMetaType<ControlbarProfileModel*>();
+    qmlRegisterUncreatableType<ControlbarProfile>("org.videolan.vlc", 0, 1, "ControlbarProfile", "");
+    qmlRegisterUncreatableType<PlayerControlbarModel>("org.videolan.vlc", 0, 1, "PlayerControlbarModel", "");
+    qmlRegisterUncreatableType<ControlListModel>( "org.videolan.vlc", 0, 1, "ControlListModel", "" );
 
     qRegisterMetaType<QmlMainContext*>();
     qmlRegisterType<QmlGlobalMenu>( "org.videolan.vlc", 0, 1, "QmlGlobalMenu" );

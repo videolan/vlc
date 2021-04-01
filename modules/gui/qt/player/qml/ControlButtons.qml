@@ -35,74 +35,74 @@ Item{
     signal requestLockUnlockAutoHide(bool lock, var source)
 
     property var buttonL: [
-        { id:  PlayerControlBarModel.PLAY_BUTTON, label: VLCIcons.play, text: i18n.qtr("Play")},
-        { id:  PlayerControlBarModel.STOP_BUTTON, label: VLCIcons.stop, text: i18n.qtr("Stop")},
-        { id:  PlayerControlBarModel.OPEN_BUTTON, label: VLCIcons.eject, text: i18n.qtr("Open")},
-        { id:  PlayerControlBarModel.PREVIOUS_BUTTON, label: VLCIcons.previous, text: i18n.qtr("Previous")},
-        { id:  PlayerControlBarModel.NEXT_BUTTON, label: VLCIcons.next, text: i18n.qtr("Next")},
-        { id:  PlayerControlBarModel.SLOWER_BUTTON, label: VLCIcons.slower, text: i18n.qtr("Slower")},
-        { id:  PlayerControlBarModel.FASTER_BUTTON, label: VLCIcons.faster, text: i18n.qtr("Faster")},
-        { id:  PlayerControlBarModel.FULLSCREEN_BUTTON, label: VLCIcons.fullscreen, text: i18n.qtr("Fullscreen")},
-        { id:  PlayerControlBarModel.EXTENDED_BUTTON, label: VLCIcons.extended, text: i18n.qtr("Extended panel")},
-        { id:  PlayerControlBarModel.PLAYLIST_BUTTON, label: VLCIcons.playlist, text: i18n.qtr("Playlist")},
-        { id:  PlayerControlBarModel.SNAPSHOT_BUTTON, label: VLCIcons.snapshot, text: i18n.qtr("Snapshot")},
-        { id:  PlayerControlBarModel.RECORD_BUTTON, label: VLCIcons.record, text: i18n.qtr("Record")},
-        { id:  PlayerControlBarModel.ATOB_BUTTON, label: VLCIcons.atob, text: i18n.qtr("A-B Loop")},
-        { id:  PlayerControlBarModel.FRAME_BUTTON, label: VLCIcons.frame_by_frame, text: i18n.qtr("Frame By Frame")},
-        { id:  PlayerControlBarModel.SKIP_BACK_BUTTON, label: VLCIcons.skip_back, text: i18n.qtr("Step backward")},
-        { id:  PlayerControlBarModel.SKIP_FW_BUTTON, label: VLCIcons.skip_for, text: i18n.qtr("Step forward")},
-        { id:  PlayerControlBarModel.QUIT_BUTTON, label: VLCIcons.clear, text: i18n.qtr("Quit")},
-        { id:  PlayerControlBarModel.RANDOM_BUTTON, label: VLCIcons.shuffle_on, text: i18n.qtr("Random")},
-        { id:  PlayerControlBarModel.LOOP_BUTTON, label: VLCIcons.repeat_all, text: i18n.qtr("Loop")},
-        { id:  PlayerControlBarModel.INFO_BUTTON, label: VLCIcons.info, text: i18n.qtr("Information")},
-        { id:  PlayerControlBarModel.LANG_BUTTON, label: VLCIcons.audiosub, text: i18n.qtr("Open subtitles")},
-        { id:  PlayerControlBarModel.MENU_BUTTON, label: VLCIcons.menu, text: i18n.qtr("Menu Button")},
-        { id:  PlayerControlBarModel.BACK_BUTTON, label: VLCIcons.exit, text: i18n.qtr("Back Button")},
-        { id:  PlayerControlBarModel.CHAPTER_PREVIOUS_BUTTON, label: VLCIcons.dvd_prev, text: i18n.qtr("Previous chapter")},
-        { id:  PlayerControlBarModel.CHAPTER_NEXT_BUTTON, label: VLCIcons.dvd_next, text: i18n.qtr("Next chapter")},
-        { id:  PlayerControlBarModel.VOLUME, label: VLCIcons.volume_high, text: i18n.qtr("Volume Widget")},
-        { id:  PlayerControlBarModel.TELETEXT_BUTTONS, label: VLCIcons.tvtelx, text: i18n.qtr("Teletext")},
-        { id:  PlayerControlBarModel.ASPECT_RATIO_COMBOBOX, label: VLCIcons.aspect_ratio, text: i18n.qtr("Aspect Ratio")},
-        { id:  PlayerControlBarModel.WIDGET_SPACER, label: VLCIcons.space, text: i18n.qtr("Spacer")},
-        { id:  PlayerControlBarModel.WIDGET_SPACER_EXTEND, label: VLCIcons.space, text: i18n.qtr("Expanding Spacer")},
-        { id:  PlayerControlBarModel.PLAYER_SWITCH_BUTTON, label: VLCIcons.fullscreen, text: i18n.qtr("Switch Player")},
-        { id:  PlayerControlBarModel.ARTWORK_INFO, label: VLCIcons.info, text: i18n.qtr("Artwork Info")}
+        { id:  ControlListModel.PLAY_BUTTON, label: VLCIcons.play, text: i18n.qtr("Play")},
+        { id:  ControlListModel.STOP_BUTTON, label: VLCIcons.stop, text: i18n.qtr("Stop")},
+        { id:  ControlListModel.OPEN_BUTTON, label: VLCIcons.eject, text: i18n.qtr("Open")},
+        { id:  ControlListModel.PREVIOUS_BUTTON, label: VLCIcons.previous, text: i18n.qtr("Previous")},
+        { id:  ControlListModel.NEXT_BUTTON, label: VLCIcons.next, text: i18n.qtr("Next")},
+        { id:  ControlListModel.SLOWER_BUTTON, label: VLCIcons.slower, text: i18n.qtr("Slower")},
+        { id:  ControlListModel.FASTER_BUTTON, label: VLCIcons.faster, text: i18n.qtr("Faster")},
+        { id:  ControlListModel.FULLSCREEN_BUTTON, label: VLCIcons.fullscreen, text: i18n.qtr("Fullscreen")},
+        { id:  ControlListModel.EXTENDED_BUTTON, label: VLCIcons.extended, text: i18n.qtr("Extended panel")},
+        { id:  ControlListModel.PLAYLIST_BUTTON, label: VLCIcons.playlist, text: i18n.qtr("Playlist")},
+        { id:  ControlListModel.SNAPSHOT_BUTTON, label: VLCIcons.snapshot, text: i18n.qtr("Snapshot")},
+        { id:  ControlListModel.RECORD_BUTTON, label: VLCIcons.record, text: i18n.qtr("Record")},
+        { id:  ControlListModel.ATOB_BUTTON, label: VLCIcons.atob, text: i18n.qtr("A-B Loop")},
+        { id:  ControlListModel.FRAME_BUTTON, label: VLCIcons.frame_by_frame, text: i18n.qtr("Frame By Frame")},
+        { id:  ControlListModel.SKIP_BACK_BUTTON, label: VLCIcons.skip_back, text: i18n.qtr("Step backward")},
+        { id:  ControlListModel.SKIP_FW_BUTTON, label: VLCIcons.skip_for, text: i18n.qtr("Step forward")},
+        { id:  ControlListModel.QUIT_BUTTON, label: VLCIcons.clear, text: i18n.qtr("Quit")},
+        { id:  ControlListModel.RANDOM_BUTTON, label: VLCIcons.shuffle_on, text: i18n.qtr("Random")},
+        { id:  ControlListModel.LOOP_BUTTON, label: VLCIcons.repeat_all, text: i18n.qtr("Loop")},
+        { id:  ControlListModel.INFO_BUTTON, label: VLCIcons.info, text: i18n.qtr("Information")},
+        { id:  ControlListModel.LANG_BUTTON, label: VLCIcons.audiosub, text: i18n.qtr("Open subtitles")},
+        { id:  ControlListModel.MENU_BUTTON, label: VLCIcons.menu, text: i18n.qtr("Menu Button")},
+        { id:  ControlListModel.BACK_BUTTON, label: VLCIcons.exit, text: i18n.qtr("Back Button")},
+        { id:  ControlListModel.CHAPTER_PREVIOUS_BUTTON, label: VLCIcons.dvd_prev, text: i18n.qtr("Previous chapter")},
+        { id:  ControlListModel.CHAPTER_NEXT_BUTTON, label: VLCIcons.dvd_next, text: i18n.qtr("Next chapter")},
+        { id:  ControlListModel.VOLUME, label: VLCIcons.volume_high, text: i18n.qtr("Volume Widget")},
+        { id:  ControlListModel.TELETEXT_BUTTONS, label: VLCIcons.tvtelx, text: i18n.qtr("Teletext")},
+        { id:  ControlListModel.ASPECT_RATIO_COMBOBOX, label: VLCIcons.aspect_ratio, text: i18n.qtr("Aspect Ratio")},
+        { id:  ControlListModel.WIDGET_SPACER, label: VLCIcons.space, text: i18n.qtr("Spacer")},
+        { id:  ControlListModel.WIDGET_SPACER_EXTEND, label: VLCIcons.space, text: i18n.qtr("Expanding Spacer")},
+        { id:  ControlListModel.PLAYER_SWITCH_BUTTON, label: VLCIcons.fullscreen, text: i18n.qtr("Switch Player")},
+        { id:  ControlListModel.ARTWORK_INFO, label: VLCIcons.info, text: i18n.qtr("Artwork Info")}
     ]
 
     function returnbuttondelegate(inpID){
         switch (inpID){
-        case PlayerControlBarModel.RANDOM_BUTTON: return randomBtnDelegate
-        case PlayerControlBarModel.PREVIOUS_BUTTON: return prevBtnDelegate
-        case PlayerControlBarModel.PLAY_BUTTON: return playBtnDelegate
-        case PlayerControlBarModel.NEXT_BUTTON: return nextBtnDelegate
-        case PlayerControlBarModel.LOOP_BUTTON: return repeatBtnDelegate
-        case PlayerControlBarModel.LANG_BUTTON: return langBtnDelegate
-        case PlayerControlBarModel.PLAYLIST_BUTTON:return playlistBtnDelegate
-        case PlayerControlBarModel.MENU_BUTTON:return  menuBtnDelegate
-        case PlayerControlBarModel.CHAPTER_PREVIOUS_BUTTON:return  chapterPreviousBtnDelegate
-        case PlayerControlBarModel.CHAPTER_NEXT_BUTTON:return  chapterNextBtnDelegate
-        case PlayerControlBarModel.BACK_BUTTON:return  backBtnDelegate
-        case PlayerControlBarModel.WIDGET_SPACER:return  spacerDelegate
-        case PlayerControlBarModel.WIDGET_SPACER_EXTEND:return  extendiblespacerDelegate
-        case PlayerControlBarModel.RECORD_BUTTON: return recordBtnDelegate
-        case PlayerControlBarModel.FULLSCREEN_BUTTON: return fullScreenBtnDelegate
-        case PlayerControlBarModel.ATOB_BUTTON: return toggleABloopstateDelegate
-        case PlayerControlBarModel.SNAPSHOT_BUTTON: return snapshotBtnDelegate
-        case PlayerControlBarModel.STOP_BUTTON: return stopBtndelgate
-        case PlayerControlBarModel.INFO_BUTTON: return mediainfoBtnDelegate
-        case PlayerControlBarModel.FRAME_BUTTON: return framebyframeDelegate
-        case PlayerControlBarModel.FASTER_BUTTON: return fasterBtnDelegate
-        case PlayerControlBarModel.SLOWER_BUTTON: return slowerBtnDelegate
-        case PlayerControlBarModel.OPEN_BUTTON: return openmediaBtnDelegate
-        case PlayerControlBarModel.EXTENDED_BUTTON: return extdSettingsBtnDelegate
-        case PlayerControlBarModel.SKIP_FW_BUTTON: return stepFwdBtnDelegate
-        case PlayerControlBarModel.SKIP_BACK_BUTTON: return stepBackBtnDelegate
-        case PlayerControlBarModel.QUIT_BUTTON: return quitBtnDelegate
-        case PlayerControlBarModel.VOLUME: return volumeBtnDelegate
-        case PlayerControlBarModel.ASPECT_RATIO_COMBOBOX: return aspectRatioDelegate
-        case PlayerControlBarModel.TELETEXT_BUTTONS: return teletextdelegate
-        case PlayerControlBarModel.PLAYER_SWITCH_BUTTON: return playerSwitchBtnDelegate
-        case PlayerControlBarModel.ARTWORK_INFO: return artworkInfoDelegate
+        case ControlListModel.RANDOM_BUTTON: return randomBtnDelegate
+        case ControlListModel.PREVIOUS_BUTTON: return prevBtnDelegate
+        case ControlListModel.PLAY_BUTTON: return playBtnDelegate
+        case ControlListModel.NEXT_BUTTON: return nextBtnDelegate
+        case ControlListModel.LOOP_BUTTON: return repeatBtnDelegate
+        case ControlListModel.LANG_BUTTON: return langBtnDelegate
+        case ControlListModel.PLAYLIST_BUTTON:return playlistBtnDelegate
+        case ControlListModel.MENU_BUTTON:return  menuBtnDelegate
+        case ControlListModel.CHAPTER_PREVIOUS_BUTTON:return  chapterPreviousBtnDelegate
+        case ControlListModel.CHAPTER_NEXT_BUTTON:return  chapterNextBtnDelegate
+        case ControlListModel.BACK_BUTTON:return  backBtnDelegate
+        case ControlListModel.WIDGET_SPACER:return  spacerDelegate
+        case ControlListModel.WIDGET_SPACER_EXTEND:return  extendiblespacerDelegate
+        case ControlListModel.RECORD_BUTTON: return recordBtnDelegate
+        case ControlListModel.FULLSCREEN_BUTTON: return fullScreenBtnDelegate
+        case ControlListModel.ATOB_BUTTON: return toggleABloopstateDelegate
+        case ControlListModel.SNAPSHOT_BUTTON: return snapshotBtnDelegate
+        case ControlListModel.STOP_BUTTON: return stopBtndelgate
+        case ControlListModel.INFO_BUTTON: return mediainfoBtnDelegate
+        case ControlListModel.FRAME_BUTTON: return framebyframeDelegate
+        case ControlListModel.FASTER_BUTTON: return fasterBtnDelegate
+        case ControlListModel.SLOWER_BUTTON: return slowerBtnDelegate
+        case ControlListModel.OPEN_BUTTON: return openmediaBtnDelegate
+        case ControlListModel.EXTENDED_BUTTON: return extdSettingsBtnDelegate
+        case ControlListModel.SKIP_FW_BUTTON: return stepFwdBtnDelegate
+        case ControlListModel.SKIP_BACK_BUTTON: return stepBackBtnDelegate
+        case ControlListModel.QUIT_BUTTON: return quitBtnDelegate
+        case ControlListModel.VOLUME: return volumeBtnDelegate
+        case ControlListModel.ASPECT_RATIO_COMBOBOX: return aspectRatioDelegate
+        case ControlListModel.TELETEXT_BUTTONS: return teletextdelegate
+        case ControlListModel.PLAYER_SWITCH_BUTTON: return playerSwitchBtnDelegate
+        case ControlListModel.ARTWORK_INFO: return artworkInfoDelegate
         }
         console.log("button delegate id " + inpID +  " doesn't exists")
         return spacerDelegate

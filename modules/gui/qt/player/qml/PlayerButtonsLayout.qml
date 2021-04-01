@@ -42,24 +42,20 @@ Widgets.NavigableFocusScope {
     property real spacing: VLCStyle.margin_normal // spacing between controls
     property real layoutSpacing: VLCStyle.margin_xlarge // spacing between layouts (left, center, and right)
 
-    signal requestLockUnlockAutoHide(bool lock, var source)
-
-    enum Alignment {
-        Left = 0,
-        Center = 1,
-        Right = 2
+    property string identifier
+    readonly property var model: {
+        if (!!mainInterface.controlbarProfileModel.currentModel)
+            mainInterface.controlbarProfileModel.currentModel.getModel(identifier)
+        else
+            undefined
     }
 
-    property var models: []
+    signal requestLockUnlockAutoHide(bool lock, var source)
 
-    Connections {
-        target: mainInterface
 
-        onToolBarConfUpdated: {
-            models[PlayerButtonsLayout.Alignment.Left].reloadModel()
-            models[PlayerButtonsLayout.Alignment.Center].reloadModel()
-            models[PlayerButtonsLayout.Alignment.Right].reloadModel()
-        }
+    Component.onCompleted: {
+        console.assert(!!identifier)
+        console.assert(identifier.length > 0)
     }
 
     ControlButtons {
@@ -70,12 +66,8 @@ Widgets.NavigableFocusScope {
         onRequestLockUnlockAutoHide: playerButtonsLayout.requestLockUnlockAutoHide(lock, source)
     }
 
-    ButtonsLayout {
+    Loader {
         id: buttonrow_left
-
-        model: models[PlayerButtonsLayout.Alignment.Left]
-
-        extraWidth: (buttonrow_center.x - buttonrow_left.x - minimumWidth - layoutSpacing)
 
         anchors {
             left: parent.left
@@ -86,19 +78,25 @@ Widgets.NavigableFocusScope {
             bottomMargin: marginBottom
             rightMargin: layoutSpacing
         }
-        
-        visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
 
-        navigationParent: playerButtonsLayout
-        navigationRightItem: buttonrow_center
+        active: !!playerButtonsLayout.model && !!playerButtonsLayout.model.left
 
-        focus: true
+        sourceComponent: ButtonsLayout {
+            model: playerButtonsLayout.model.left
+
+            extraWidth: (buttonrow_center.x - buttonrow_left.x - minimumWidth - layoutSpacing)
+
+            visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
+
+            navigationParent: playerButtonsLayout
+            navigationRightItem: buttonrow_center
+
+            focus: true
+        }
     }
 
-    ButtonsLayout {
+    Loader {
         id: buttonrow_center
-
-        model: models[PlayerButtonsLayout.Alignment.Center]
 
         anchors {
             centerIn: parent
@@ -107,17 +105,19 @@ Widgets.NavigableFocusScope {
             bottomMargin: playerButtonsLayout.marginBottom
         }
 
-        navigationParent: playerButtonsLayout
-        navigationLeftItem: buttonrow_left
-        navigationRightItem: buttonrow_right
+        active: !!playerButtonsLayout.model && !!playerButtonsLayout.model.center
+
+        sourceComponent: ButtonsLayout {
+            model: playerButtonsLayout.model.center
+
+            navigationParent: playerButtonsLayout
+            navigationLeftItem: buttonrow_left
+            navigationRightItem: buttonrow_right
+        }
     }
 
-    ButtonsLayout {
+    Loader {
         id: buttonrow_right
-
-        model: models[PlayerButtonsLayout.Alignment.Right]
-
-        extraWidth: (playerButtonsLayout.width - (buttonrow_center.x + buttonrow_center.width) - minimumWidth - (2 * layoutSpacing))
 
         anchors {
             right: parent.right
@@ -129,9 +129,19 @@ Widgets.NavigableFocusScope {
             leftMargin: layoutSpacing
         }
 
-        visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
+        active: !!playerButtonsLayout.model && !!playerButtonsLayout.model.right
 
-        navigationParent: playerButtonsLayout
-        navigationLeftItem: buttonrow_center
+        sourceComponent: ButtonsLayout {
+
+
+            model: playerButtonsLayout.model.right
+
+            extraWidth: (playerButtonsLayout.width - (buttonrow_center.x + buttonrow_center.width) - minimumWidth - (2 * layoutSpacing))
+
+            visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
+
+            navigationParent: playerButtonsLayout
+            navigationLeftItem: buttonrow_center
+        }
     }
 }

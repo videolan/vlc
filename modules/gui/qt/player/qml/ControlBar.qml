@@ -40,7 +40,7 @@ Widgets.NavigableFocusScope {
     readonly property alias sliderY: row2.y
     property int textPosition: ControlBar.TimeTextPosition.AboveSlider
     property VLCColors colors: VLCStyle.nightColors
-    property var configs: ["MainPlayerToolbar-left", "MainPlayerToolbar-center", "MainPlayerToolbar-right"]
+    property alias identifier: playerButtonsLayout.identifier
     property alias sliderHeight: trackPositionSlider.barHeight
     property alias sliderBackgroundColor: trackPositionSlider.backgroundColor
     property alias sliderProgressColor: trackPositionSlider.progressBarColor
@@ -145,8 +145,6 @@ Widgets.NavigableFocusScope {
                     bottomMargin: VLCStyle.applicationVerticalMargin
                 }
 
-                models: [playerControlBarModel_left, playerControlBarModel_center, playerControlBarModel_right]
-
                 navigationUpItem: trackPositionSlider.enabled ? trackPositionSlider : root.navigationUpItem
 
                 colors: root.colors
@@ -193,24 +191,5 @@ Widgets.NavigableFocusScope {
         colors: root.colors
 
         Keys.onDownPressed: playerButtonsLayout.focus = true
-    }
-
-
-    PlayerControlBarModel{
-        id:playerControlBarModel_left
-        mainCtx: mainctx
-        configName: root.configs[0]
-    }
-
-    PlayerControlBarModel{
-        id:playerControlBarModel_center
-        mainCtx: mainctx
-        configName: root.configs[1]
-    }
-
-    PlayerControlBarModel{
-        id:playerControlBarModel_right
-        mainCtx: mainctx
-        configName: root.configs[2]
     }
 }
