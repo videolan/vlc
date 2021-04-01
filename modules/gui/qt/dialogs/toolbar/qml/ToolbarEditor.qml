@@ -68,13 +68,33 @@ Rectangle{
         }
 
         Rectangle{
+            id: parentRectangle
+
             Layout.preferredHeight: VLCStyle.heightBar_large * 1.25
             Layout.fillWidth: true
 
-            color: VLCStyle.colors.bgAlt
+            color: "transparent"
 
             border.color: VLCStyle.colors.accent
             border.width: VLCStyle.dp(1, VLCStyle.scale)
+
+            TextMetrics {
+                id: leftMetric
+                text: i18n.qtr("L   E   F   T")
+                font.pixelSize: VLCStyle.fontSize_xxlarge
+            }
+
+            TextMetrics {
+                id: centerMetric
+                text: i18n.qtr("C   E   N   T   E   R")
+                font.pixelSize: VLCStyle.fontSize_xxlarge
+            }
+
+            TextMetrics {
+                id: rightMetric
+                text: i18n.qtr("R   I   G   H   T")
+                font.pixelSize: VLCStyle.fontSize_xxlarge
+            }
 
             StackLayout{
                 anchors.fill: parent
@@ -94,156 +114,90 @@ Rectangle{
                                 return undefined
                         }
 
-                        TextMetrics {
-                            id: leftMetric
-                            text: i18n.qtr("L   E   F   T")
-                            font.pixelSize: VLCStyle.fontSize_xxlarge
-                        }
+                        spacing: VLCStyle.margin_small
 
-                        TextMetrics {
-                            id: centerMetric
-                            text: i18n.qtr("C   E   N   T   E   R")
-                            font.pixelSize: VLCStyle.fontSize_xxlarge
-                        }
+                        Repeater {
+                            id: repeater
 
-                        TextMetrics {
-                            id: rightMetric
-                            text: i18n.qtr("R   I   G   H   T")
-                            font.pixelSize: VLCStyle.fontSize_xxlarge
-                        }
+                            model: 3 // left, center, and right
 
-                        Loader {
-                            id : playerBtnDND_left
-                            active: !!layout.model && !!layout.model.left
-
-                            Layout.fillHeight: true
-                            Layout.fillWidth: count > 0 || (playerBtnDND_left.count === 0 && playerBtnDND_center.count === 0 && playerBtnDND_right.count === 0)
-                            Layout.minimumWidth: centerMetric.width * 1.25
-                            Layout.leftMargin: VLCStyle.margin_xsmall
-                            Layout.rightMargin: VLCStyle.margin_xsmall
-
-                            readonly property int count: {
-                                if (status === Loader.Ready)
-                                    return item.count
-                                else
-                                    return 0
-                            }
-
-                            sourceComponent: EditorDNDView {
-                                model: layout.model.left
-
-                                onContainsDragChanged: {
-                                    if (containsDrag)
-                                        _viewThatContainsDrag = this
-                                }
-
-                                Text {
-                                    anchors.fill: parent
-
-                                    text: leftMetric.text
-                                    verticalAlignment: Text.AlignVCenter
-                                    font.pixelSize: VLCStyle.fontSize_xxlarge
-                                    color: VLCStyle.colors.menuCaption
-                                    horizontalAlignment: Text.AlignHCenter
-                                    visible: (parent.count === 0)
+                            function getModel(index) {
+                                if (!!layout.model) {
+                                    switch (index) {
+                                    case 0:
+                                        return layout.model.left
+                                    case 1:
+                                        return layout.model.center
+                                    case 2:
+                                        return layout.model.right
+                                    default:
+                                        return undefined
+                                    }
+                                } else {
+                                    return undefined
                                 }
                             }
-                        }
 
-                        Rectangle {
-                            Layout.preferredWidth: VLCStyle.margin_small
-
-                            Layout.fillHeight: true
-                            Layout.topMargin: VLCStyle.dp(1, VLCStyle.scale)
-                            Layout.bottomMargin: VLCStyle.dp(1, VLCStyle.scale)
-                            Layout.alignment: Qt.AlignVCenter
-
-                            color: VLCStyle.colors.bg
-                        }
-
-                        Loader {
-                            id : playerBtnDND_center
-                            active: !!layout.model && !!layout.model.center
-
-                            Layout.fillHeight: true
-                            Layout.fillWidth: count > 0 || (playerBtnDND_left.count === 0 && playerBtnDND_center.count === 0 && playerBtnDND_right.count === 0)
-                            Layout.minimumWidth: centerMetric.width * 1.25
-                            Layout.leftMargin: VLCStyle.margin_xsmall
-                            Layout.rightMargin: VLCStyle.margin_xsmall
-
-                            readonly property int count: {
-                                if (status === Loader.Ready)
-                                    return item.count
-                                else
-                                    return 0
-                            }
-
-                            sourceComponent: EditorDNDView {
-                                model: layout.model.center
-
-                                onContainsDragChanged: {
-                                    if (containsDrag)
-                                        _viewThatContainsDrag = this
-                                }
-
-                                Text {
-                                    anchors.fill: parent
-
-                                    text: centerMetric.text
-                                    verticalAlignment: Text.AlignVCenter
-                                    font.pixelSize: VLCStyle.fontSize_xxlarge
-                                    color: VLCStyle.colors.menuCaption
-                                    horizontalAlignment: Text.AlignHCenter
-                                    visible: (parent.count === 0)
+                            function getMetric(index) {
+                                switch (index) {
+                                case 0:
+                                    return leftMetric
+                                case 1:
+                                    return centerMetric
+                                case 2:
+                                    return rightMetric
                                 }
                             }
-                        }
 
-                        Rectangle {
-                            Layout.preferredWidth: VLCStyle.margin_small
+                            Loader {
+                                id : playerBtnDND
+                                active: !!repeater.getModel(index)
 
-                            Layout.fillHeight: true
-                            Layout.topMargin: VLCStyle.dp(1, VLCStyle.scale)
-                            Layout.bottomMargin: VLCStyle.dp(1, VLCStyle.scale)
-                            Layout.alignment: Qt.AlignVCenter
+                                Layout.fillHeight: true
+                                Layout.fillWidth: count > 0 ||
+                                                  (repeater.itemAt(0).count === 0 &&
+                                                   repeater.itemAt(1).count === 0 &&
+                                                   repeater.itemAt(2).count === 0)
 
-                            color: VLCStyle.colors.bg
-                        }
+                                Layout.minimumWidth: Math.max(leftMetric.width,
+                                                              centerMetric.width,
+                                                              rightMetric.width) * 1.25
+                                Layout.margins: parentRectangle.border.width
 
-                        Loader {
-                            id : playerBtnDND_right
-                            active: !!layout.model && !!layout.model.right
-
-                            Layout.fillHeight: true
-                            Layout.fillWidth: count > 0 || (playerBtnDND_left.count === 0 && playerBtnDND_center.count === 0 && playerBtnDND_right.count === 0)
-                            Layout.minimumWidth: centerMetric.width * 1.25
-                            Layout.leftMargin: VLCStyle.margin_xsmall
-                            Layout.rightMargin: VLCStyle.margin_xsmall
-
-                            readonly property int count: {
-                                if (status === Loader.Ready)
-                                    return item.count
-                                else
-                                    return 0
-                            }
-
-                            sourceComponent: EditorDNDView {
-                                model: layout.model.right
-
-                                onContainsDragChanged: {
-                                    if (containsDrag)
-                                        _viewThatContainsDrag = this
+                                readonly property int count: {
+                                    if (status === Loader.Ready)
+                                        return item.count
+                                    else
+                                        return 0
                                 }
 
-                                Text {
-                                    anchors.fill: parent
+                                sourceComponent: Rectangle {
+                                    color: VLCStyle.colors.bgAlt
 
-                                    text: rightMetric.text
-                                    verticalAlignment: Text.AlignVCenter
-                                    font.pixelSize: VLCStyle.fontSize_xxlarge
-                                    color: VLCStyle.colors.menuCaption
-                                    horizontalAlignment: Text.AlignHCenter
-                                    visible: (parent.count === 0)
+                                    property alias count: dndView.count
+
+                                    EditorDNDView {
+                                        id: dndView
+                                        anchors.fill: parent
+
+                                        model: repeater.getModel(index)
+
+                                        onContainsDragChanged: {
+                                            if (containsDrag)
+                                                _viewThatContainsDrag = this
+                                        }
+
+                                        Text {
+                                            anchors.fill: parent
+
+                                            text: repeater.getMetric(index).text
+                                            verticalAlignment: Text.AlignVCenter
+                                            font.pixelSize: VLCStyle.fontSize_xxlarge
+                                            color: VLCStyle.colors.menuCaption
+                                            horizontalAlignment: Text.AlignHCenter
+                                            visible: (playerBtnDND.count === 0)
+                                        }
+                                    }
                                 }
                             }
                         }
