@@ -89,6 +89,8 @@ Rectangle{
                 currentIndex: bar.currentIndex
 
                 RowLayout {
+                    id: mainPlayerLayout
+
                     Layout.preferredHeight: VLCStyle.heightBar_large * 1.25
                     Layout.fillWidth: true
 
@@ -110,6 +112,9 @@ Rectangle{
                         font.pixelSize: VLCStyle.fontSize_xxlarge
                     }
 
+                    readonly property string identifier: "MainPlayer"
+                    property var model: mainInterface.controlbarProfileModel.currentModel.getModel(identifier)
+
                     EditorDNDView {
                         id : playerBtnDND_left
                         Layout.fillHeight: true
@@ -119,7 +124,7 @@ Rectangle{
                         Layout.leftMargin: VLCStyle.margin_xsmall
                         Layout.rightMargin: VLCStyle.margin_xsmall
 
-                        model: playerControlBarModel_left
+                        model: mainPlayerLayout.model.left
 
                         Text {
                             anchors.fill: parent
@@ -153,7 +158,7 @@ Rectangle{
                         Layout.leftMargin: VLCStyle.margin_xsmall
                         Layout.rightMargin: VLCStyle.margin_xsmall
 
-                        model: playerControlBarModel_center
+                        model: mainPlayerLayout.model.center
 
                         Text {
                             anchors.fill: parent
@@ -187,7 +192,7 @@ Rectangle{
                         Layout.leftMargin: VLCStyle.margin_xsmall
                         Layout.rightMargin: VLCStyle.margin_xsmall
 
-                        model: playerControlBarModel_right
+                        model: mainPlayerLayout.model.right
 
                         Text {
                             anchors.fill: parent
@@ -203,8 +208,13 @@ Rectangle{
                 }
 
                 RowLayout {
+                    id: miniPlayerLayout
+
                     Layout.preferredHeight: VLCStyle.heightBar_large * 1.25
                     Layout.fillWidth: true
+
+                    readonly property string identifier: "MiniPlayer"
+                    property var model: mainInterface.controlbarProfileModel.currentModel.getModel(identifier)
 
                     EditorDNDView {
                         id : miniPlayerBtnDND_left
@@ -215,7 +225,7 @@ Rectangle{
                         Layout.leftMargin: VLCStyle.margin_xsmall
                         Layout.rightMargin: VLCStyle.margin_xsmall
 
-                        model: miniPlayerModel_left
+                        model: miniPlayerLayout.model.left
 
                         Text {
                             anchors.fill: parent
@@ -249,7 +259,7 @@ Rectangle{
                         Layout.leftMargin: VLCStyle.margin_xsmall
                         Layout.rightMargin: VLCStyle.margin_xsmall
 
-                        model: miniPlayerModel_center
+                        model: miniPlayerLayout.model.center
 
                         Text {
                             anchors.fill: parent
@@ -283,7 +293,7 @@ Rectangle{
                         Layout.leftMargin: VLCStyle.margin_xsmall
                         Layout.rightMargin: VLCStyle.margin_xsmall
 
-                        model: miniPlayerModel_right
+                        model: miniPlayerLayout.model.right
 
                         Text {
                             anchors.fill: parent
@@ -328,94 +338,8 @@ Rectangle{
         }
     }
 
-    function getProfileConfig(){
-        return "%1#%2#%3 | %4#%5#%6".arg(playerControlBarModel_left.getConfig())
-                                    .arg(playerControlBarModel_center.getConfig())
-                                    .arg(playerControlBarModel_right.getConfig())
-                                    .arg(miniPlayerModel_left.getConfig())
-                                    .arg(miniPlayerModel_center.getConfig())
-                                    .arg(miniPlayerModel_right.getConfig())
-    }
-
-    Connections{
-        target: toolbareditor
-        onUpdatePlayerModel: {
-            playerBtnDND_left.currentIndex = -1
-            playerBtnDND_center.currentIndex = -1
-            playerBtnDND_right.currentIndex = -1
-
-            miniPlayerBtnDND_left.currentIndex = -1
-            miniPlayerBtnDND_center.currentIndex = -1
-            miniPlayerBtnDND_right.currentIndex = -1
-
-            if (toolbarName == "MainPlayerToolbar-left")
-                playerControlBarModel_left.reloadConfig(config)
-            else if (toolbarName == "MainPlayerToolbar-center")
-                playerControlBarModel_center.reloadConfig(config)
-            else if (toolbarName == "MainPlayerToolbar-right")
-                playerControlBarModel_right.reloadConfig(config)
-            else if (toolbarName == "MiniPlayerToolbar-left")
-                miniPlayerModel_left.reloadConfig(config)
-            else if (toolbarName == "MiniPlayerToolbar-center")
-                miniPlayerModel_center.reloadConfig(config)
-            else if (toolbarName == "MiniPlayerToolbar-right")
-                miniPlayerModel_right.reloadConfig(config)
-        }
-
-        onSaveConfig: {
-            miniPlayerModel_left.saveConfig()
-            miniPlayerModel_center.saveConfig()
-            miniPlayerModel_right.saveConfig()
-
-            playerControlBarModel_left.saveConfig()
-            playerControlBarModel_center.saveConfig()
-            playerControlBarModel_right.saveConfig()
-        }
-    }
-
-    PlayerControlBarModel {
-        id: playerControlBarModel_left
-        mainCtx: mainctx
-        configName: "MainPlayerToolbar-left"
-    }
-
-    PlayerControlBarModel {
-        id: playerControlBarModel_center
-        mainCtx: mainctx
-        configName: "MainPlayerToolbar-center"
-    }
-
-    PlayerControlBarModel {
-        id: playerControlBarModel_right
-        mainCtx: mainctx
-        configName: "MainPlayerToolbar-right"
-    }
-
-    PlayerControlBarModel {
-        id: miniPlayerModel_left
-        mainCtx: mainctx
-        configName: "MiniPlayerToolbar-left"
-    }
-
-    PlayerControlBarModel {
-        id: miniPlayerModel_center
-        mainCtx: mainctx
-        configName: "MiniPlayerToolbar-center"
-    }
-
-    PlayerControlBarModel {
-        id: miniPlayerModel_right
-        mainCtx: mainctx
-        configName: "MiniPlayerToolbar-right"
-    }
-
     Player.ControlButtons{
         id: controlButtons
-    }
-
-    PlaylistControllerModel {
-        id: mainPlaylistController
-        playlistPtr: mainctx.playlist
     }
 
     EditorDummyButton{
