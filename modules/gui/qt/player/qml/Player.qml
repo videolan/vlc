@@ -500,7 +500,7 @@ Widgets.NavigableFocusScope {
 
                 onRequestLockUnlockAutoHide: rootPlayer.lockUnlockAutoHide(lock, source)
 
-                identifier: "MainPlayer"
+                identifier: PlayerControlbarModel.Mainplayer
             }
         }
     }

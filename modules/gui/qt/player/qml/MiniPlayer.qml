@@ -83,7 +83,7 @@ Widgets.NavigableFocusScope {
         sliderHeight: VLCStyle.dp(3, VLCStyle.scale)
         sliderBackgroundColor: colors.sliderBarMiniplayerBgColor
         sliderProgressColor: colors.accent
-        identifier: "MiniPlayer"
+        identifier: PlayerControlbarModel.Miniplayer
         navigationParent: root
 
         Keys.onPressed: {

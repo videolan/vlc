@@ -42,7 +42,7 @@ Widgets.NavigableFocusScope {
     property real spacing: VLCStyle.margin_normal // spacing between controls
     property real layoutSpacing: VLCStyle.margin_xlarge // spacing between layouts (left, center, and right)
 
-    property string identifier
+    property int identifier: -1
     readonly property var model: {
         if (!!mainInterface.controlbarProfileModel.currentModel)
             mainInterface.controlbarProfileModel.currentModel.getModel(identifier)
@@ -52,10 +52,8 @@ Widgets.NavigableFocusScope {
 
     signal requestLockUnlockAutoHide(bool lock, var source)
 
-
     Component.onCompleted: {
-        console.assert(!!identifier)
-        console.assert(identifier.length > 0)
+        console.assert(identifier >= 0)
     }
 
     ControlButtons {

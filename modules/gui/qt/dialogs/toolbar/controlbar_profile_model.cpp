@@ -22,6 +22,7 @@
 #include "qt.hpp"
 #include "controlbar_profile.hpp"
 #include "player/control_list_model.hpp"
+#include "player/player_controlbar_model.hpp"
 
 #define SETTINGS_KEY_SELECTEDPROFILE "SelectedProfile"
 #define SETTINGS_ARRAYNAME_PROFILES "Profiles"
@@ -39,9 +40,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 N_("Minimalist Style"),
                 {
                     {
-                        {
-                            "MainPlayer"
-                        },
+                        PlayerControlbarModel::Mainplayer,
                         {
                             {
                                 {
@@ -69,9 +68,7 @@ decltype (ControlbarProfileModel::m_defaults)
                         }
                     },
                     {
-                        {
-                            "MiniPlayer"
-                        },
+                        PlayerControlbarModel::Miniplayer,
                         {
                             {
                                 {
@@ -95,9 +92,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 N_("One-liner Style"),
                 {
                     {
-                        {
-                            "MainPlayer"
-                        },
+                        PlayerControlbarModel::Mainplayer,
                         {
                             {
                                 {
@@ -127,9 +122,7 @@ decltype (ControlbarProfileModel::m_defaults)
                         }
                     },
                     {
-                        {
-                            "MiniPlayer"
-                        },
+                        PlayerControlbarModel::Miniplayer,
                         {
                             {
                                 {
@@ -155,9 +148,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 N_("Simplest Style"),
                 {
                     {
-                        {
-                            "MainPlayer"
-                        },
+                        PlayerControlbarModel::Mainplayer,
                         {
                             {
                                 {
@@ -175,9 +166,7 @@ decltype (ControlbarProfileModel::m_defaults)
                         }
                     },
                     {
-                        {
-                            "MiniPlayer"
-                        },
+                        PlayerControlbarModel::Miniplayer,
                         {
                             {
                                 {
@@ -421,7 +410,7 @@ void ControlbarProfileModel::save(bool clearDirty) const
         QString val;
         for (auto it = ptrModelMap.constBegin(); it != ptrModelMap.end(); ++it)
         {
-            const QString identifier = it.key();
+            const int identifier = it.key();
 
             const auto serializedModels = m_profiles.at(i)->getModelData(identifier);
 
@@ -443,7 +432,7 @@ void ControlbarProfileModel::save(bool clearDirty) const
                            SETTINGS_CONFIGURATION_SEPARATOR
                            "%3"
                            SETTINGS_CONFIGURATION_SEPARATOR
-                           "%4").arg(identifier,
+                           "%4").arg(QString::number(identifier),
                                      join(serializedModels[0]),
                                      join(serializedModels[1]),
                                      join(serializedModels[2]));
@@ -511,7 +500,9 @@ bool ControlbarProfileModel::reload()
             if (alignments.length() != 4)
                 continue;
 
-            if (alignments[0].toString().isEmpty())
+            bool ok = false;
+            int identifier = alignments[0].toInt(&ok);
+            if (!ok || identifier < 0)
                 continue;
 
             static const auto split = [](auto ref) {
@@ -535,7 +526,7 @@ bool ControlbarProfileModel::reload()
                                                      split(alignments[2]),
                                                      split(alignments[3]) };
 
-            ptrNewProfile->setModelData(alignments[0].toString(), data);
+            ptrNewProfile->setModelData(identifier, data);
             ptrNewProfile->resetDirty(); // Newly loaded model can not be dirty
         }
 

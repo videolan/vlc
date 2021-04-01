@@ -37,13 +37,13 @@ class ControlbarProfile : public QObject
 public:
     explicit ControlbarProfile(QObject *parent = nullptr);
 
-    PlayerControlbarModel* newModel(const QString& identifier);
-    Q_INVOKABLE PlayerControlbarModel* getModel(const QString& identifier) const;
+    PlayerControlbarModel* newModel(int identifier);
+    Q_INVOKABLE PlayerControlbarModel* getModel(int identifier) const;
 
-    void setModelData(const QString& identifier, const std::array<QVector<int>, 3>& data);
-    std::array<QVector<int>, 3> getModelData(const QString& identifier) const;
+    void setModelData(int identifier, const std::array<QVector<int>, 3>& data);
+    std::array<QVector<int>, 3> getModelData(int identifier) const;
 
-    void deleteModel(const QString& identifier);
+    void deleteModel(int identifier);
 
     Q_INVOKABLE void injectDefaults(bool resetDirty = true);
 
@@ -67,10 +67,10 @@ private:
     // QHash when item count is less than 32.
     // Assuming model (player) count to stay below that,
     // QMap is used here.
-    QMap<QString, PlayerControlbarModel *> m_models;
+    QMap<int, PlayerControlbarModel *> m_models;
 
     struct Configuration {
-        QString identifier;
+        int identifier;
         std::array<QVector<int>, 3> data;
     };
     static const QVector<Configuration> m_defaults;

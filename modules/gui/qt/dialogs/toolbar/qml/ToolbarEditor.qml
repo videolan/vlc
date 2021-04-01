@@ -113,7 +113,7 @@ Rectangle{
                         font.pixelSize: VLCStyle.fontSize_xxlarge
                     }
 
-                    readonly property string identifier: "MainPlayer"
+                    readonly property int identifier: PlayerControlbarModel.MainPlayer
                     property var model: mainInterface.controlbarProfileModel.currentModel.getModel(identifier)
 
                     EditorDNDView {
@@ -214,7 +214,7 @@ Rectangle{
                     Layout.preferredHeight: VLCStyle.heightBar_large * 1.25
                     Layout.fillWidth: true
 
-                    readonly property string identifier: "MiniPlayer"
+                    readonly property int identifier: PlayerControlbarModel.MiniPlayer
                     property var model: mainInterface.controlbarProfileModel.currentModel.getModel(identifier)
 
                     EditorDNDView {

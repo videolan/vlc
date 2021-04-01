@@ -35,6 +35,16 @@ class PlayerControlbarModel : public QObject
     Q_PROPERTY(ControlListModel* right READ right CONSTANT)
 
 public:
+    // When there is a need to add a new Player, just
+    // add its identifier in this enum and set QML buttons layout
+    // identifier to it. Such as `property int identifier =
+    // PlayerControlbarModel.Mainplayer`.
+    enum PlayerIdentifier {
+        Mainplayer = 0,
+        Miniplayer
+    };
+    Q_ENUM(PlayerIdentifier)
+
     explicit PlayerControlbarModel(QObject *parent = nullptr);
     ~PlayerControlbarModel();
 

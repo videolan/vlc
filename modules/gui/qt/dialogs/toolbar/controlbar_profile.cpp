@@ -25,9 +25,7 @@ decltype(ControlbarProfile::m_defaults)
     ControlbarProfile::m_defaults =
         {
             {
-                {
-                    "MainPlayer"
-                },
+                PlayerControlbarModel::Mainplayer,
                 {
                     {
                         {
@@ -49,9 +47,7 @@ decltype(ControlbarProfile::m_defaults)
                 }
             },
             {
-                {
-                    "MiniPlayer"
-                },
+                PlayerControlbarModel::Miniplayer,
                 {
                     {
                         {
@@ -79,11 +75,8 @@ ControlbarProfile::ControlbarProfile(QObject *parent) : QObject(parent)
     injectDefaults();
 }
 
-PlayerControlbarModel *ControlbarProfile::newModel(const QString &identifier)
+PlayerControlbarModel *ControlbarProfile::newModel(int identifier)
 {
-    if (identifier.isEmpty())
-        return nullptr;
-
     if (m_models.contains(identifier))
         return nullptr; // can not allow the same identifier
 
@@ -105,7 +98,7 @@ PlayerControlbarModel *ControlbarProfile::newModel(const QString &identifier)
     return model;
 }
 
-PlayerControlbarModel *ControlbarProfile::getModel(const QString &identifier) const
+PlayerControlbarModel *ControlbarProfile::getModel(int identifier) const
 {
     if (m_models.contains(identifier))
     {
@@ -117,7 +110,7 @@ PlayerControlbarModel *ControlbarProfile::getModel(const QString &identifier) co
     }
 }
 
-void ControlbarProfile::setModelData(const QString &identifier, const std::array<QVector<int>, 3> &data)
+void ControlbarProfile::setModelData(int identifier, const std::array<QVector<int>, 3> &data)
 {
     auto ptrModel = getModel(identifier);
 
@@ -138,7 +131,7 @@ void ControlbarProfile::setModelData(const QString &identifier, const std::array
     ptrModel->setDirty(true);
 }
 
-std::array<QVector<int>, 3> ControlbarProfile::getModelData(const QString &identifier) const
+std::array<QVector<int>, 3> ControlbarProfile::getModelData(int identifier) const
 {
     const auto ptrModel = getModel(identifier);
 
@@ -148,7 +141,7 @@ std::array<QVector<int>, 3> ControlbarProfile::getModelData(const QString &ident
     return ptrModel->serializeModels();
 }
 
-void ControlbarProfile::deleteModel(const QString &identifier)
+void ControlbarProfile::deleteModel(int identifier)
 {
     if (m_models.contains(identifier))
     {
