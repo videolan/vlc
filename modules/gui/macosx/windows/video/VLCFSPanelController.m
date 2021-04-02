@@ -105,6 +105,17 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     /* Inject correct background view depending on OS support */
     [self injectVisualEffectView];
 
+    // Large panel configuration
+       if (var_InheritBool(getIntf(), "macosx-large-text")) {
+           NSFont *textFont = [NSFont systemFontOfSize:16.];
+
+           self.mediaTitle.font = textFont;
+           self.elapsedTime.font = textFont;
+           self.remainingOrTotalTime.font = textFont;
+
+           [_heightMaxConstraint setConstant:42. + 8.];
+       }
+
     [self setupControls];
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
