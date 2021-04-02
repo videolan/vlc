@@ -146,10 +146,8 @@
     [_sidebarView setDropItem:playlistItem dropChildIndex:NSOutlineViewDropOnItemIndex];
     [_sidebarView registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, @"VLCPlaylistItemPboardType", nil]];
 
-    [_sidebarView setAutosaveName:@"mainwindow-sidebar"];
     [_sidebarView setDataSource:self];
     [_sidebarView setDelegate:self];
-    [_sidebarView setAutosaveExpandedItems:YES];
 
     [_sidebarView expandItem:libraryItem expandChildren:YES];
 

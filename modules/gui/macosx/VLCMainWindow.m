@@ -177,6 +177,9 @@ static const float f_min_window_height = 307.;
     self.sidebarDataSource.sidebarView = self.sidebarView;
 
     [self.sidebarDataSource reloadSidebar];
+    [_sidebarView setAutosaveName:@"mainwindow-sidebar"];
+    [_sidebarView setAutosaveExpandedItems:YES];
+
     [_sidebarView selectRowIndexes:[NSIndexSet indexSetWithIndex:1] byExtendingSelection:NO];
 
     /*
