@@ -37,6 +37,7 @@
 
 @class VLCDetachedVideoWindow;
 @class VLCMainWindowControlsBar;
+@class VLCSidebarDataSource;
 @class VLCVoutView;
 @class PXSourceList;
 
@@ -95,6 +96,9 @@ typedef enum {
 
 @property (readonly) VLCFSPanelController* fspanel;
 
+@property (readwrite, strong) VLCSidebarDataSource *sidebarDataSource;
+
+
 - (void)changePlaylistState:(VLCPlaylistStateEvent)event;
 
 - (IBAction)dropzoneButtonAction:(id)sender;
@@ -109,7 +113,6 @@ typedef enum {
 
 - (void)windowResizedOrMoved:(NSNotification *)notification;
 
-- (void)reloadSidebar;
 
 - (void)toggleLeftSubSplitView;
 - (void)showDropZone;
@@ -125,6 +128,8 @@ typedef enum {
 
 - (void)videoplayWillBeStarted;
 - (void)setVideoplayEnabled;
+
+- (void)sourceListSelectionDidChange:(NSNotification *)notification;
 
 @end
 

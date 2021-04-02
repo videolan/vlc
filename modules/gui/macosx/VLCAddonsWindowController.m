@@ -24,7 +24,7 @@
 
 #import "VLCAddonsWindowController.h"
 #import "VLCMain.h"
-#import "VLCMainWindow.h"
+#import "VLCSidebarDataSource.h"
 #import "VLCAddonListItem.h"
 #import "CompatibilityFixes.h"
 
@@ -265,7 +265,7 @@ static void addonChangedCallback( addons_manager_t *manager,
 {
     [self _refactorDataModel];
     if (_shouldRefreshSideBarOnAddonChange) {
-        [[[VLCMain sharedInstance] mainWindow] performSelector:@selector(reloadSidebar) withObject:nil afterDelay:0.5];
+        [[[[VLCMain sharedInstance] mainWindow] sidebarDataSource] performSelector:@selector(reloadSidebar) withObject:nil afterDelay:0.5];
         _shouldRefreshSideBarOnAddonChange = NO;
     }
 }
