@@ -1058,8 +1058,18 @@ static void GetVarSlaves( input_thread_t *p_input,
         if( uri == NULL )
             continue;
 
+        vlc_url_t parsed_uri;
+        if ( vlc_UrlParse( &parsed_uri, uri ) != VLC_SUCCESS )
+        {
+            msg_Err( p_input,
+                    "Invalid url passed to the \"input-slave\" option" );
+            vlc_UrlClean( &parsed_uri );
+            free( uri );
+            continue;
+        }
+
         enum slave_type i_type;
-        if ( !input_item_slave_GetType(uri, &i_type) )
+        if ( !input_item_slave_GetType( parsed_uri.psz_path, &i_type ) )
         {
             msg_Warn( p_input,
                      "Can't deduce slave type of `%s\" with file extension.",
@@ -1069,6 +1079,7 @@ static void GetVarSlaves( input_thread_t *p_input,
         input_item_slave_t *p_slave =
             input_item_slave_New( uri, i_type, SLAVE_PRIORITY_USER );
 
+        vlc_UrlClean( &parsed_uri );
         free( uri );
 
         if( unlikely( p_slave == NULL ) )
