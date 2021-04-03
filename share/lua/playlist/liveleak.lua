@@ -23,8 +23,10 @@
 
 -- Probe function.
 function probe()
-    return ( vlc.access == "http" or vlc.access == "https" )
-        and string.match( vlc.path, "^www%.liveleak%.com/view" )
+    return ( vlc.access == "http" or vlc.access == "https" ) and (
+               string.match( vlc.path, "^www%.liveleak%.com/v%?" )
+            or string.match( vlc.path, "^www%.liveleak%.com/view%?" )
+           )
 end
 
 -- Util function
