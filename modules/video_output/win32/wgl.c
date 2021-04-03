@@ -289,10 +289,22 @@ static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
 static int MakeCurrent(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
-    bool success = wglMakeCurrent(sys->hGLDC, sys->hGLRC);
+
+    /* After painting with a common DC, the ReleaseDC function must be called
+     * to release the DC. Class and private DCs do not have to be released.
+     * ReleaseDC must be called from the same thread that called GetDC. The
+     * number of DCs is limited only by available memory. */
+
+    HDC winDC = GetDC(sys->hvideownd);
+    assert(winDC != NULL);
+
+    bool success = wglMakeCurrent(winDC, sys->hGLRC);
+    ReleaseDC(sys->hvideownd, winDC);
 
     if (likely(success))
         return VLC_SUCCESS;
+
+    /* vlc_gl_MakeCurrent should never fail. */
 
     DWORD dw = GetLastError();
     msg_Err(gl, "Cannot make wgl current, error %lx", dw);
@@ -303,7 +315,7 @@ static int MakeCurrent(vlc_gl_t *gl)
 static void ReleaseCurrent(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
-    wglMakeCurrent (sys->hGLDC, NULL);
+    wglMakeCurrent(NULL, NULL);
 }
 
 static const char *GetExtensionsString(vlc_gl_t *gl)
