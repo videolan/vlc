@@ -712,6 +712,8 @@ unsigned vlc_GetCPUCount(void)
         count = sysconf (_SC_NPROCESSORS_ONLN);
     free (cpulist);
     return count ? count : 1;
+#elif defined(_SC_NPROCESSORS_ONLN)
+    return sysconf(_SC_NPROCESSORS_ONLN);
 #elif defined(_SC_NPROCESSORS_CONF)
     return sysconf(_SC_NPROCESSORS_CONF);
 #else
