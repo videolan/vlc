@@ -303,8 +303,8 @@ end
 
 -- Probe function.
 function probe()
-    return ( ( vlc.access == "http" or vlc.access == "https" )
-             and (
+    return ( ( vlc.access == "http" or vlc.access == "https" ) and (
+            ((
                string.match( vlc.path, "^www%.youtube%.com/" )
             or string.match( vlc.path, "^music%.youtube%.com/" )
             or string.match( vlc.path, "^gaming%.youtube%.com/" ) -- out of use
@@ -315,14 +315,27 @@ function probe()
             or string.match( vlc.path, "/get_video_info%?" ) -- info API
             or string.match( vlc.path, "/v/" ) -- video in swf player
             or string.match( vlc.path, "/embed/" ) -- embedded player iframe
-             ) )
+             )) or
+               string.match( vlc.path, "^consent%.youtube%.com/" )
+         ) )
 end
 
 -- Parse function.
 function parse()
-    if not string.match( vlc.path, "^www%.youtube%.com/" ) then
+    if string.match( vlc.path, "^consent%.youtube%.com/" ) then
+        -- Cookie consent redirection
+        -- Location: https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DXXXXXXXXXXX&gl=FR&m=0&pc=yt&uxe=23983172&hl=fr&src=1
+        -- Set-Cookie: CONSENT=PENDING+355; expires=Fri, 01-Jan-2038 00:00:00 GMT; path=/; domain=.youtube.com
+        local url = get_url_param( vlc.path, "continue" )
+        if not url then
+            vlc.msg.err( "Couldn't handle YouTube cookie consent redirection, please check for updates to this script or try disabling HTTP cookie forwarding" )
+            return { }
+        end
+        return { { path = vlc.strings.decode_uri( url ), options = { ":no-http-forward-cookies" } } }
+    elseif not string.match( vlc.path, "^www%.youtube%.com/" ) then
         -- Skin subdomain
         return { { path = vlc.access.."://"..string.gsub( vlc.path, "^([^/]*)/", "www.youtube.com/" ) } }
+
     elseif string.match( vlc.path, "/watch%?" )
         or string.match( vlc.path, "/live$" )
         or string.match( vlc.path, "/live%?" )
