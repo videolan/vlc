@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2012, 2017 VideoLAN and AUTHORS
+ Copyright © 2012, 2017, 2021 VideoLAN and AUTHORS
 
  Authors: Ludovic Fauvet <etix@videolan.org>
           Pierre Ynard
@@ -29,12 +29,6 @@ function probe()
            )
 end
 
--- Util function
-function find( haystack, needle )
-    local _,_,r = string.find( haystack, needle )
-    return r
-end
-
 -- Parse function.
 function parse()
     local p = {}
@@ -47,9 +41,16 @@ function parse()
         if not line then break end
 
         -- Try to find the title
-        if string.match( line, '<span class="section_title"' ) then
-            title = find( line, '<span class="section_title"[^>]*>(.-)<' )
-            title = vlc.strings.resolve_xml_special_chars( title )
+        if not title then
+            title = string.match( line, "shareTitle: *'(.-[^\\])'" )
+            if title then
+                if string.match( title, "^'" ) then
+                    title = nil
+                else
+                    -- FIXME: do this properly (see #24958)
+                    title = string.gsub( title, "\\'", "'" )
+                end
+            end
         end
 
         -- Try to find the art
