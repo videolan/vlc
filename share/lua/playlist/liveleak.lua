@@ -59,18 +59,27 @@ function parse()
         end
 
         -- Try to find the video
-        if not video and string.match( line, '<source ' ) then
+        if not video and string.match( line, '<video ' ) then
+            while not string.match( line, '</video>') do
+                local more = vlc.readline()
+                if not more then break end
+                line = line..more
+            end
+
             -- Apparently the two formats are listed HD first, SD second
             local prefres = vlc.var.inherit( nil, 'preferred-resolution' )
-            for src in string.gmatch( line, '<source src="([^"]+)"' ) do
-                video = src
+            for source in string.gmatch( line, '<source( .-)>' ) do
+                local src = string.match( source, ' src="([^"]+)"' )
+                if src then
+                    video = vlc.strings.resolve_xml_special_chars( src )
 
-                if prefres < 0 then
-                    break
-                end
-                local height = tonumber( string.match( src, '_(%d+)p%.mp4' ) )
-                if ( not height ) or height <= prefres then
-                    break
+                    if prefres < 0 then
+                        break
+                    end
+                    local height = tonumber( string.match( source, ' label="(%d+).-"' ) )
+                    if ( not height ) or height <= prefres then
+                        break
+                    end
                 end
             end
         end
