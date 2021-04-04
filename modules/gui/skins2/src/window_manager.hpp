@@ -31,6 +31,7 @@
 #include <map>
 #include <set>
 #include <utility>
+#include <memory>
 
 
 class GenericFont;
@@ -219,7 +220,7 @@ private:
     /// Rect of the last maximized window
     SkinsRect m_maximizeRect;
     /// Tooltip
-    Tooltip *m_pTooltip;
+    std::unique_ptr<Tooltip> m_pTooltip;
     /// Active popup, if any
     Popup *m_pPopup;
 

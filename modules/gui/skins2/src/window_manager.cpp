@@ -33,7 +33,7 @@
 WindowManager::WindowManager( intf_thread_t *pIntf ):
     SkinObject( pIntf ), m_magnet( 0 ), m_alpha( 255 ), m_moveAlpha( 255 ),
     m_opacityEnabled( false ), m_opacity( 255 ), m_direction( kNone ),
-    m_maximizeRect(0, 0, 50, 50), m_pTooltip( NULL ), m_pPopup( NULL )
+    m_maximizeRect(0, 0, 50, 50), m_pPopup( NULL )
 {
     // Create and register a variable for the "on top" status
     VarManager *pVarManager = VarManager::instance( getIntf() );
@@ -47,12 +47,7 @@ WindowManager::WindowManager( intf_thread_t *pIntf ):
     m_opacity = 255 * var_InheritFloat( getIntf(), "qt-opacity" );
 }
 
-
-WindowManager::~WindowManager()
-{
-    delete m_pTooltip;
-}
-
+WindowManager::~WindowManager() = default;
 
 void WindowManager::registerWindow( TopWindow &rWindow )
 {
@@ -597,7 +592,7 @@ void WindowManager::createTooltip( const GenericFont &rTipFont )
     // Create the tooltip window
     if( !m_pTooltip )
     {
-        m_pTooltip = new Tooltip( getIntf(), rTipFont, 500 );
+        m_pTooltip = std::make_unique<Tooltip>( getIntf(), rTipFont, 500 );
     }
     else
     {
