@@ -632,4 +632,3 @@ void WindowManager::setActiveLayout( TopWindow &rWindow,
     // Rebuild the dependencies
     stopMove();
 }
-
