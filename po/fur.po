@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
+# Fabio Tomat <f.t.public@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2021-04-05 13:13+0200\n"
+"Last-Translator: Fabio Tomat <f.t.public@gmail.com>, 2021\n"
 "Language-Team: Friulian (https://www.transifex.com/yaron/teams/16553/fur/)\n"
 "Language: fur\n"
 "MIME-Version: 1.0\n"
@@ -43,31 +44,31 @@ msgstr "Sielç \"Opzions avanzadis\" par viodi dutis lis opzions."
 #: modules/gui/qt/components/simple_preferences.cpp:239
 #: modules/gui/qt/menus.cpp:1093
 msgid "Interface"
-msgstr ""
+msgstr "Interface"
 
 #: include/vlc_config_cat.h:39
 msgid "Settings for VLC's interfaces"
-msgstr ""
+msgstr "Impostazions pes interfacis di VLC"
 
 #: include/vlc_config_cat.h:41
 msgid "Main interfaces settings"
-msgstr ""
+msgstr "Impostazions des interfacis principâls"
 
 #: include/vlc_config_cat.h:43
 msgid "Main interfaces"
-msgstr ""
+msgstr "Interfacis principâls"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for the main interface"
-msgstr ""
+msgstr "Impostazions pe interface principâl"
 
 #: include/vlc_config_cat.h:46 src/libvlc-module.c:81
 msgid "Control interfaces"
-msgstr ""
+msgstr "Interfacis di control"
 
 #: include/vlc_config_cat.h:47
 msgid "Settings for VLC's control interfaces"
-msgstr ""
+msgstr "Impostazions pes interfacis di control di VLC"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
 #: modules/gui/macosx/VLCSimplePrefsController.m:243
@@ -104,11 +105,11 @@ msgstr "Filtris"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio filters are used to process the audio stream."
-msgstr ""
+msgstr "I filtris audio a vegnin doprâts par elaborâ il flus audio."
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
-msgstr ""
+msgstr "Ricampionadôr audio"
 
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:260
 #: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:425
@@ -122,11 +123,11 @@ msgstr "Viodudis pal audio"
 
 #: include/vlc_config_cat.h:66 include/vlc_config_cat.h:78
 msgid "Output modules"
-msgstr "Modui in jessude"
+msgstr "Modui di jessude"
 
 #: include/vlc_config_cat.h:67
 msgid "General settings for audio output modules."
-msgstr ""
+msgstr "Impostazions gjenerâls pai modui di jessude dal audio."
 
 #: include/vlc_config_cat.h:69 src/libvlc-module.c:2027
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:196
@@ -165,64 +166,70 @@ msgstr "Impostazions gjenerâls pal video"
 
 #: include/vlc_config_cat.h:79
 msgid "General settings for video output modules."
-msgstr ""
+msgstr "Impostazions gjenerâls pali modui di jessude dal video."
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
-msgstr ""
+msgstr "I filtris video a vegnin doprâts par elaborâ il flus video."
 
 #: include/vlc_config_cat.h:84
 msgid "Subtitles / OSD"
-msgstr ""
+msgstr "Sottitui / OSD"
 
 #: include/vlc_config_cat.h:85
 msgid ""
 "Settings related to On-Screen-Display, subtitles and \"overlay subpictures\""
 msgstr ""
+"Impostazions relativis a On-Screen-Display, sottitui e \"soreposizion di "
+"imagjins secondariis\""
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
-msgstr ""
+msgstr "Separadôrs"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr ""
+msgstr "I separadôrs video a separin il flus in plui videos."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
-msgstr ""
+msgstr "In jentrade / Codecs"
 
 #: include/vlc_config_cat.h:98
 msgid "Settings for input, demultiplexing, decoding and encoding"
-msgstr ""
+msgstr "Impostazions pe jentrade, demultiplazion, decodifiche e codifiche"
 
 #: include/vlc_config_cat.h:101
 msgid "Access modules"
-msgstr ""
+msgstr "Modui di acès"
 
 #: include/vlc_config_cat.h:103
 msgid ""
 "Settings related to the various access methods. Common settings you may want "
 "to alter are HTTP proxy or caching settings."
 msgstr ""
+"Impostazions relativis a varis metodis di acès. Di solit lis impostazions "
+"plui comuns che si alterin a son il proxy HTTP o lis impostazions pe cache."
 
 #: include/vlc_config_cat.h:107
 msgid "Stream filters"
-msgstr ""
+msgstr "Filtris dal flus"
 
 #: include/vlc_config_cat.h:109
 msgid ""
 "Stream filters are special modules that allow advanced operations on the "
 "input side of VLC. Use with care..."
 msgstr ""
+"I filtris dal flus a son modui speciâi che a permetin operazion avanzadis su "
+"la bande de jentrade di VLC. Doprâ cun cautele..."
 
 #: include/vlc_config_cat.h:112
 msgid "Demuxers"
-msgstr ""
+msgstr "Demultipladôrs"
 
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
-msgstr ""
+msgstr "I demultipladôrs a vegnin doprâts par separâ i flus audio e video."
 
 #: include/vlc_config_cat.h:115
 msgid "Video codecs"
@@ -231,6 +238,8 @@ msgstr "Codecs video"
 #: include/vlc_config_cat.h:116
 msgid "Settings for the video, images or video+audio decoders and encoders."
 msgstr ""
+"Impostazions pai decodificadôrs e codificadôrs di video, imagjins o video"
+"+audio."
 
 #: include/vlc_config_cat.h:118
 msgid "Audio codecs"
@@ -238,24 +247,25 @@ msgstr "Codecs audio"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
-msgstr ""
+msgstr "Impostazions dai decodificadôrs e codificadôrs dome pal audio."
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
-msgstr ""
+msgstr "Codecs dai sottitui"
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
 msgstr ""
+"Impostazions pai decodificadôrs e codificadôrs di sottitui, teletext e CC."
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
-msgstr ""
+msgstr "Impostazions gjenerâls pe jentrade. Doprâ cun cautele..."
 
 #: include/vlc_config_cat.h:127 src/libvlc-module.c:1962
 #: modules/access/avio.h:50
 msgid "Stream output"
-msgstr ""
+msgstr "Jessude dal flus"
 
 #: include/vlc_config_cat.h:129
 msgid ""
@@ -267,14 +277,21 @@ msgid ""
 "Sout streams modules allow advanced stream processing (transcoding, "
 "duplicating...)."
 msgstr ""
+"Lis impostazions de jessude dal flus a vegnin dopradis cuant che si fâs di "
+"servidôr di flus o cuant che si salve i flus in jentrade.\n"
+"I flus a vegnin prime multiplâts e dopo mandâts a mieç di un modul di "
+"\"jessude di acès\" che al pues o salvâ il flus suntun file o tornâ a "
+"trasmetilu vie flus (UDP, HTTP, RTP/RTSP).\n"
+"I modui dai flus Sout a permetin elaborazions avanzadis dai flus "
+"(transcodifichis, duplicazions...)"
 
 #: include/vlc_config_cat.h:137
 msgid "General stream output settings"
-msgstr ""
+msgstr "Impostazions gjenerâls de jessude dal flus"
 
 #: include/vlc_config_cat.h:139
 msgid "Muxers"
-msgstr ""
+msgstr "Multipladôrs"
 
 #: include/vlc_config_cat.h:141
 msgid ""
@@ -283,10 +300,15 @@ msgid ""
 "always force a specific muxer. You should probably not do that.\n"
 "You can also set default parameters for each muxer."
 msgstr ""
+"I multipladôrs a crein i formâts di incapsulazion che a vegnin doprâts par "
+"meti adun ducj i elements dal flus (video, audio, ...). Cheste impostazion "
+"ti permet di sfuarçâ simpri l'ûs di un multipladôr specific. No tu varessis "
+"di fâlu.\n"
+"Tu puedis ancje stabilî i parametris predefinîts par ogni multipladôr."
 
 #: include/vlc_config_cat.h:147
 msgid "Access output"
-msgstr ""
+msgstr "Jessude di acès"
 
 #: include/vlc_config_cat.h:149
 msgid ""
@@ -295,10 +317,14 @@ msgid ""
 "should probably not do that.\n"
 "You can also set default parameters for each access output."
 msgstr ""
+"I modui de jessude di acès a controli lis manieris che i flus multiplâts a "
+"vegnin inviâts. Cheste impostazion ti permet di sfuarçâ simpri un metodi "
+"specific pe jessude di acès. No tu varessis di fâlu.\n"
+"Tu puedis ancje stabilî i parametris predefinîts par ogni jessude di acès."
 
 #: include/vlc_config_cat.h:154
 msgid "Packetizers"
-msgstr ""
+msgstr "Impachetadôrs"
 
 #: include/vlc_config_cat.h:156
 msgid ""
@@ -307,10 +333,14 @@ msgid ""
 "not do that.\n"
 "You can also set default parameters for each packetizer."
 msgstr ""
+"I impachetadôrs a vegnin doprâts par \"pre-elaborâ\" i flus elementârs prime "
+"de multiplazion. Cheste impostazion ti permet di sfuarçâ simpri un "
+"impachetadôr. No tu varessis di fâlu.\n"
+"Tu puedis anche stabilî i parametris predefinîts par ogni impachetadôr."
 
 #: include/vlc_config_cat.h:162
 msgid "Sout stream"
-msgstr ""
+msgstr "Flus sout"
 
 #: include/vlc_config_cat.h:163
 msgid ""
@@ -318,14 +348,17 @@ msgid ""
 "the Streaming Howto for more information. You can configure default options "
 "for each sout stream module here."
 msgstr ""
+"I modui dal flus sout a permeti di fâ sù une cjadene di elaborazion sout. "
+"Fâs riferiment al Streaming Howto par vê plui informazions. Chi tu puedis "
+"configurâ lis opzions predefinidis par ogni modul di flus sout."
 
 #: include/vlc_config_cat.h:168
 msgid "VOD"
-msgstr "VSR"
+msgstr "VSR (VOD - video su richieste)"
 
 #: include/vlc_config_cat.h:169
 msgid "VLC's implementation of Video On Demand"
-msgstr "La implementazion dal VLC pal Video Su Richieste"
+msgstr "La implementazion di VLC pal Video Su Richieste"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2070
 #: src/playlist/engine.c:243 modules/demux/playlist/playlist.c:64
@@ -337,27 +370,32 @@ msgstr "La implementazion dal VLC pal Video Su Richieste"
 #: modules/gui/qt/components/playlist/selector.cpp:227
 #: modules/gui/qt/dialogs/playlist.cpp:39 modules/gui/qt/menus.cpp:1120
 msgid "Playlist"
-msgstr "Liste di scolte"
+msgstr "Liste di riproduzion"
 
 #: include/vlc_config_cat.h:174
 msgid ""
 "Settings related to playlist behaviour (e.g. playback mode) and to modules "
 "that automatically add items to the playlist (\"service discovery\" modules)."
 msgstr ""
+"Lis impostazions relativis al compuartament de liste di riproduzion (p.e. "
+"modalitât di riproduzion) e ai modui che a zontin in automatic i elements ae "
+"liste (modui pal \"rilevament servizis\")."
 
 #: include/vlc_config_cat.h:178
 msgid "General playlist behaviour"
-msgstr "Compuartament gjenerâl des listis di scolte"
+msgstr "Compuartament gjenerâl des listis di riproduzion"
 
 #: include/vlc_config_cat.h:179
 msgid "Services discovery"
-msgstr ""
+msgstr "Rilevament servizis"
 
 #: include/vlc_config_cat.h:180
 msgid ""
 "Services discovery modules are facilities that automatically add items to "
 "playlist."
 msgstr ""
+"I modui dal rilevament servizis a son struturis che a zontin in automatic i "
+"elements ae liste di riproduzion."
 
 #: include/vlc_config_cat.h:184 src/libvlc-module.c:1862
 #: modules/gui/qt/dialogs/extended.cpp:93
@@ -367,7 +405,7 @@ msgstr "Avanzadis"
 
 #: include/vlc_config_cat.h:185
 msgid "Advanced settings. Use with care..."
-msgstr ""
+msgstr "Impostazions avanzadis. Doprâ cun cautele..."
 
 #: include/vlc_config_cat.h:187
 msgid "Advanced settings"
@@ -375,59 +413,59 @@ msgstr "Impostazions avanzadis"
 
 #: include/vlc_intf_strings.h:46
 msgid "&Open File..."
-msgstr ""
+msgstr "&Vierç un file..."
 
 #: include/vlc_intf_strings.h:47
 msgid "&Advanced Open..."
-msgstr ""
+msgstr "Viertidure &avanzade..."
 
 #: include/vlc_intf_strings.h:48
 msgid "Open D&irectory..."
-msgstr ""
+msgstr "Vierç une c&artele..."
 
 #: include/vlc_intf_strings.h:49
 msgid "Open &Folder..."
-msgstr ""
+msgstr "Vierç une ca&rtele..."
 
 #: include/vlc_intf_strings.h:50
 msgid "Select one or more files to open"
-msgstr ""
+msgstr "Selezione un o plui files di vierzi"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Directory"
-msgstr ""
+msgstr "Selezione la cartele"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Folder"
-msgstr ""
+msgstr "Selezione la cartele"
 
 #: include/vlc_intf_strings.h:55
 msgid "Media &Information"
-msgstr ""
+msgstr "&Informazions multimediâls"
 
 #: include/vlc_intf_strings.h:56
 msgid "&Codec Information"
-msgstr ""
+msgstr "Informazions &codec"
 
 #: include/vlc_intf_strings.h:57
 msgid "&Messages"
-msgstr ""
+msgstr "&Messaçs"
 
 #: include/vlc_intf_strings.h:58
 msgid "Jump to Specific &Time"
-msgstr ""
+msgstr "Salte al pont &temporâl specificât"
 
 #: include/vlc_intf_strings.h:59
 msgid "Custom &Bookmarks"
-msgstr ""
+msgstr "Segneli&bris personalizâts"
 
 #: include/vlc_intf_strings.h:60
 msgid "&VLM Configuration"
-msgstr ""
+msgstr "Configurazion &VLM"
 
 #: include/vlc_intf_strings.h:62
 msgid "&About"
-msgstr ""
+msgstr "Inform&azions"
 
 #: include/vlc_intf_strings.h:65 modules/control/oldrc.c:70
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
@@ -444,53 +482,53 @@ msgstr "Riprodûs"
 
 #: include/vlc_intf_strings.h:66
 msgid "Remove Selected"
-msgstr ""
+msgstr "Gjave i selezionâts"
 
 #: include/vlc_intf_strings.h:67
 msgid "Information..."
-msgstr ""
+msgstr "Informazions..."
 
 #: include/vlc_intf_strings.h:68
 msgid "Create Directory..."
-msgstr ""
+msgstr "Cree une cartele..."
 
 #: include/vlc_intf_strings.h:69
 msgid "Create Folder..."
-msgstr ""
+msgstr "Cree une cartele..."
 
 #: include/vlc_intf_strings.h:70
 msgid "Rename Directory..."
-msgstr ""
+msgstr "Cambie non ae cartele..."
 
 #: include/vlc_intf_strings.h:71
 msgid "Rename Folder..."
-msgstr ""
+msgstr "Cambie non ae cartele..."
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
-msgstr ""
+msgstr "Mostre la cartele che lu conten..."
 
 #: include/vlc_intf_strings.h:73
 msgid "Show Containing Folder..."
-msgstr ""
+msgstr "Mostre cartele che lu conten..."
 
 #: include/vlc_intf_strings.h:74
 msgid "Stream..."
-msgstr ""
+msgstr "Flus..."
 
 #: include/vlc_intf_strings.h:75
 msgid "Save..."
-msgstr ""
+msgstr "Salve..."
 
 #: include/vlc_intf_strings.h:79 modules/gui/macosx/VLCCoreInteraction.m:447
 #: modules/gui/macosx/VLCMainMenu.m:399
 msgid "Repeat All"
-msgstr ""
+msgstr "Ripet dut"
 
 #: include/vlc_intf_strings.h:80 modules/gui/macosx/VLCCoreInteraction.m:467
 #: modules/gui/macosx/VLCMainMenu.m:398
 msgid "Repeat One"
-msgstr "Torne a riprodûsi une volte"
+msgstr "Ripet un"
 
 #: include/vlc_intf_strings.h:81 src/libvlc-module.c:1429
 #: modules/gui/macosx/VLCMainMenu.m:397
@@ -501,7 +539,7 @@ msgstr "Casuâl"
 
 #: include/vlc_intf_strings.h:82 modules/gui/macosx/VLCCoreInteraction.m:425
 msgid "Random Off"
-msgstr ""
+msgstr "Casuâl disativât"
 
 #: include/vlc_intf_strings.h:83
 msgid "Add to Playlist"
@@ -509,19 +547,19 @@ msgstr "Zonte ae liste di riproduzion"
 
 #: include/vlc_intf_strings.h:85 modules/gui/macosx/VLCPlaylist.m:230
 msgid "Add File..."
-msgstr ""
+msgstr "Zonte un file..."
 
 #: include/vlc_intf_strings.h:86
 msgid "Add Directory..."
-msgstr ""
+msgstr "Zonte une cartele..."
 
 #: include/vlc_intf_strings.h:87
 msgid "Add Folder..."
-msgstr ""
+msgstr "Zonte une cartele..."
 
 #: include/vlc_intf_strings.h:89
 msgid "Save Playlist to &File..."
-msgstr ""
+msgstr "Salve liste di riproduzion su &file..."
 
 #: include/vlc_intf_strings.h:91 modules/gui/macosx/VLCMainWindow.m:191
 #: modules/gui/qt/components/preferences_widgets.cpp:1138
@@ -532,7 +570,7 @@ msgstr "Cîr"
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:282
 #: modules/gui/qt/ui/video_effects.h:1291
 msgid "Waves"
-msgstr ""
+msgstr "Ondis"
 
 #: include/vlc_intf_strings.h:100
 msgid ""
@@ -562,15 +600,42 @@ msgid ""
 "code. You can also give funds and material to help us. And of course, you "
 "can <b>promote</b> VLC media player.</p></body></html>"
 msgstr ""
+"<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
+"charset=utf-8\" /></head><body><h2>Benvignûts sul jutori dal riprodutôr "
+"multimediâl VLC</h2><h3>Documentazion</h3><p>O podês cjatâ la documentazion "
+"di VLC sul sît web dal <a href=\"http://wiki.videolan.org\">wiki</a> di  "
+"VideoLAN.</p><p>Se no cognossês il riprodutôr multimediâl VLC, leiêt "
+"la<br><a href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies"
+"\"><em>Introduzion al riprodutôr multimediâl VLC</em></a>.</p><p>O cjatarês "
+"plui informazions su cemût doprâ il riprodutôr tal document <br>\"<a href="
+"\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>Cemût riprodusi i "
+"files cul riprodutôr multimediâl VLC</em></a>\".</p><p>Par dutis lis "
+"ativitâts di salvament, conversion, transcodifiche, codifiche, multiplazion "
+"e trasmission dai flus, o cjatarês informazions utilis te <a href=\"http://"
+"wiki.videolan.org/Documentation:Streaming_HowTo\">Documentazion di "
+"trasmission</a>.</p><p>Se no sês sigûrs de terminologjie, consultait la <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">base di cognossince</a>.</"
+"p><p>Par capî lis scurtis di tastiere principâls, leiêt la pagjine <a href="
+"\"http://wiki.videolan.org/Hotkeys\">scurtis</a> .</p><h3>Jutori</"
+"h3><p>Prime di fâ domandis, fasêt riferiment aes <a href=\"http://www."
+"videolan.org/support/faq.html\">FAQ</a>.</p><p>O podaressis vê (e otignî) "
+"jutori sui <a href=\"http://forum.videolan.org\">Forums</a>, lis <a href="
+"\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> o i nestris "
+"canâi IRC (<em>#videolan</em> su irc.freenode.net).</p><h3>Contribuît al "
+"progjet</h3><p>O podês judâ il progjet VideoLAN dant un pôc dal vuestri timp "
+"par judâ la comunitât, par dissegnâ skins (piels), par voltâ la "
+"documentazion, par provâ e butâ jù codiç. O podês ancje donâ bêçs o materiâi "
+"par judânus. E clâr, o podês  <b>promovi</b> il riprodutôr multimediâl VLC.</"
+"p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
-msgstr ""
+msgstr "Filtrament audio falît"
 
 #: src/audio_output/filters.c:268
 #, c-format
 msgid "The maximum number of filters (%u) was reached."
-msgstr ""
+msgstr "Si è rivâts al massim numar di filtris (%u)"
 
 #: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:948
 #: src/libvlc-module.c:540 modules/demux/adaptive/adaptive.cpp:124
@@ -581,11 +646,11 @@ msgstr "Disative"
 
 #: src/audio_output/output.c:266 modules/visualization/visual/visual.c:142
 msgid "Spectrometer"
-msgstr ""
+msgstr "Spetrimetri"
 
 #: src/audio_output/output.c:269
 msgid "Scope"
-msgstr ""
+msgstr "Ossiloscopi"
 
 #: src/audio_output/output.c:272
 msgid "Spectrum"
@@ -593,7 +658,7 @@ msgstr "Spetri"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "VU meter"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -601,21 +666,21 @@ msgstr "Filtris audio"
 
 #: src/audio_output/output.c:327
 msgid "Replay gain"
-msgstr ""
+msgstr "Normalizazion ReplayGain"
 
 #: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:420
 #: modules/gui/macosx/VLCMainMenu.m:421
 msgid "Stereo audio mode"
-msgstr ""
+msgstr "Modalitât audio stereo"
 
 #: src/audio_output/output.c:419 modules/access/v4l2/v4l2.c:267
 #: modules/audio_output/alsa.c:76
 msgid "Mono"
-msgstr ""
+msgstr "Mono"
 
 #: src/audio_output/output.c:425
 msgid "Original"
-msgstr ""
+msgstr "Origjinâl"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -667,7 +732,7 @@ msgstr "Stereo invertît"
 #: src/audio_output/output.c:460 src/libvlc-module.c:198
 #: modules/audio_filter/equalizer_presets.h:55
 msgid "Headphones"
-msgstr ""
+msgstr "Scufis"
 
 #: src/config/core.c:370 modules/access/dtv/access.c:93
 #: modules/access/dtv/access.c:108 modules/access/dtv/access.c:117
@@ -680,23 +745,23 @@ msgstr "Automatic"
 
 #: src/config/file.c:452
 msgid "boolean"
-msgstr "bulean"
+msgstr "boolean"
 
 #: src/config/file.c:452 src/config/help.c:426
 msgid "integer"
-msgstr ""
+msgstr "intîr"
 
 #: src/config/file.c:460 src/config/help.c:476
 msgid "float"
-msgstr ""
+msgstr "virgule mobile"
 
 #: src/config/file.c:473 src/config/help.c:383
 msgid "string"
-msgstr ""
+msgstr "stringhe"
 
 #: src/config/help.c:164
 msgid "To get exhaustive help, use '-H'."
-msgstr ""
+msgstr "Par otignî un jutori esaustîf, dopre '-H'."
 
 #: src/config/help.c:168
 #, c-format
@@ -734,22 +799,58 @@ msgid ""
 "  vlc://quit                     Special item to quit VLC\n"
 "\n"
 msgstr ""
+"Ûs: %s [opzions] [flus] ...\n"
+"Tu puedis specificâ plui flus te rie di comant.\n"
+"A vignaran metûts in code te liste di riproduzion.\n"
+"Il prin element specificât al vignarà riprodot par prime.\n"
+"\n"
+"Stîi des opzions:\n"
+"  --opzion  Une opzion globâl che e ven stabilide pe durade dal program.\n"
+"   -opzion  Une version a singule letare di une --opzion globâl.\n"
+"   :opzion  Une opzion che si apliche in mût diret dome al flus che i sta "
+"denant\n"
+"            e che al passe parsore des impostazions precedentis.\n"
+"\n"
+"Sintassi MRL dal flus:\n"
+"  [[acès][/demultipladôr]://]URL[#[titul][:cjapitul][-[titul][:cjapitul]]]\n"
+"  [:opzion=valôr ...]\n"
+"\n"
+"  Tantis des --opzions globâls si puedin ancje doprâ come :options "
+"specifichis MRL.\n"
+"  Si puedin specificâ multiplis cubiis :opzion=valôr.\n"
+"\n"
+"Sintassi URL:\n"
+"  file:///percors/file              Sempliç file multimediâl\n"
+"  http://host[:puarte]/file        URL HTTP\n"
+"  ftp://host[:puarte]/file         URL FTP\n"
+"  mms://host[:puarte]/file         URL MMS\n"
+"  screen://                      Cature di schermi\n"
+"  dvd://[dispositîf]                 Dispositîf DVD\n"
+"  vcd://[dispositîf]                 Dispositîf VCD\n"
+"  cdda://[dispositîf]                Dispositîf CD Audio\n"
+"  udp://[[<source address>]@[<bind address>][:<bind port>]]\n"
+"                                 flus UDP inviât di un servidôr di "
+"trasmission di flus\n"
+"  vlc://pause:<seconds>          Met in pause la liste di riproduzion par un "
+"ciert timp\n"
+"  vlc://quit                     Element speciâl par jessi di VLC\n"
+"\n"
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr ""
+msgstr "(predefinît abilitât)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr ""
+msgstr "(predefinît disabilitât)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
-msgstr ""
+msgstr "Note:"
 
 #: src/config/help.c:651
 msgid "add --advanced to your command line to see advanced options."
-msgstr ""
+msgstr "zonte --advanced ae rie di comant par viodi opzions avanzadis."
 
 #: src/config/help.c:656
 #, c-format
@@ -757,28 +858,32 @@ msgid "%u module was not displayed because it only has advanced options.\n"
 msgid_plural ""
 "%u modules were not displayed because they only have advanced options.\n"
 msgstr[0] ""
+"Nol è stât visualizât %u modul parcè che al veve dome opzions avanzadis.\n"
 msgstr[1] ""
+"No son stâts visualizât %u modui parcè che a vevin dome opzions avanzadis.\n"
 
 #: src/config/help.c:663
 msgid ""
 "No matching module found. Use --list or --list-verbose to list available "
 "modules."
 msgstr ""
+"Nissun modul corispondent cjatât. Dopre --list o --list-verbose par listâ i "
+"modui disponibii."
 
 #: src/config/help.c:721
 #, c-format
 msgid "VLC version %s (%s)\n"
-msgstr ""
+msgstr "VLC version %s (%s)\n"
 
 #: src/config/help.c:722
 #, c-format
 msgid "Compiled by %s on %s (%s)\n"
-msgstr ""
+msgstr "Compilât di %s su %s (%s)\n"
 
 #: src/config/help.c:724
 #, c-format
 msgid "Compiler: %s\n"
-msgstr "Compilatôr: %s\n"
+msgstr "Compiladôr: %s\n"
 
 #: src/config/help.c:753
 #, c-format
@@ -787,7 +892,7 @@ msgid ""
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 "\n"
-"Salvât il contignût tal file vlc-help.txt\n"
+"Contignût tirât jù tal file vlc-help.txt\n"
 
 #: src/config/help.c:768
 msgid ""
@@ -795,11 +900,11 @@ msgid ""
 "Press the RETURN key to continue...\n"
 msgstr ""
 "\n"
-"Frache il boton INVIO par lâ indevant...\n"
+"Frache il boton INVIE par continuâ...\n"
 
 #: src/darwin/error.c:37
 msgid "Unknown error"
-msgstr ""
+msgstr "Erôr no cognossût"
 
 #: src/input/control.c:204
 #, c-format
@@ -808,57 +913,57 @@ msgstr "Segnelibri %i"
 
 #: src/input/decoder.c:1890
 msgid "No description for this codec"
-msgstr ""
+msgstr "Nissune descrizion par chest codec"
 
 #: src/input/decoder.c:1892
 msgid "Codec not supported"
-msgstr ""
+msgstr "Codec no supuartât"
 
 #: src/input/decoder.c:1893
 #, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr ""
+msgstr "VLC nol à podût decodificâ il formât \"%4.4s\" (%s)"
 
 #: src/input/decoder.c:1897
 msgid "Unidentified codec"
-msgstr ""
+msgstr "Codec no identificât"
 
 #: src/input/decoder.c:1898
 msgid "VLC could not identify the audio or video codec"
-msgstr ""
+msgstr "VLC nol à podût identificâ il codec audio o video"
 
 #: src/input/decoder.c:1909
 msgid "packetizer"
-msgstr ""
+msgstr "impachetadôr"
 
 #: src/input/decoder.c:1909
 msgid "decoder"
-msgstr ""
+msgstr "decodificadôr"
 
 #: src/input/decoder.c:1917 src/input/decoder.c:2200
 #: modules/codec/avcodec/encoder.c:371 modules/codec/avcodec/encoder.c:905
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
-msgstr ""
+msgstr "Trasmission / transcodifiche falide"
 
 #: src/input/decoder.c:1918
 #, c-format
 msgid "VLC could not open the %s module."
-msgstr ""
+msgstr "VLC nol à podût vierzi il modul %s."
 
 #: src/input/decoder.c:2201
 msgid "VLC could not open the decoder module."
-msgstr ""
+msgstr "VLC nol à podût vierzi il modul di decodifiche."
 
 #: src/input/es_out.c:968 src/input/es_out.c:973 src/libvlc-module.c:239
 #: modules/gui/qt/components/open_panels.cpp:547
 msgid "Track"
-msgstr "Trace"
+msgstr "Linie"
 
 #: src/input/es_out.c:1190
 #, c-format
 msgid "%s [%s %d]"
-msgstr ""
+msgstr "%s [%s %d]"
 
 #: src/input/es_out.c:1191 src/input/es_out.c:1196 src/input/es_out.c:1211
 #: src/input/var.c:160 src/libvlc-module.c:564
@@ -873,7 +978,7 @@ msgstr "Flus %d"
 
 #: src/input/es_out.c:1474 src/input/es_out.c:1476
 msgid "Scrambled"
-msgstr ""
+msgstr "Criptât"
 
 #: src/input/es_out.c:1474 modules/keystore/keychain.m:41
 #: modules/lua/extension.c:1193
@@ -883,16 +988,16 @@ msgstr "Sì"
 #: src/input/es_out.c:2141
 #, c-format
 msgid "DTVCC Closed captions %u"
-msgstr ""
+msgstr "Sottitui sierâts DTVCC %u"
 
 #: src/input/es_out.c:2143
 #, c-format
 msgid "Closed captions %u"
-msgstr ""
+msgstr "Sottitui %u"
 
 #: src/input/es_out.c:3096
 msgid "Original ID"
-msgstr ""
+msgstr "ID origjinâl"
 
 #: src/input/es_out.c:3104 src/input/es_out.c:3107 modules/access/imem.c:67
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:162
@@ -921,7 +1026,7 @@ msgstr "Descrizion"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:185
 #: modules/gui/macosx/VLCOutput.m:75 modules/gui/qt/dialogs/plugins.cpp:1488
 msgid "Type"
-msgstr "Tip"
+msgstr "Gjenar"
 
 #: src/input/es_out.c:3123
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:175
@@ -932,16 +1037,16 @@ msgstr "Canâi"
 #: src/input/es_out.c:3128 modules/access/alsa.c:39 modules/access/imem.c:75
 #: modules/audio_output/amem.c:47 modules/codec/fluidsynth.c:64
 msgid "Sample rate"
-msgstr ""
+msgstr "Frecuence di campionament"
 
 #: src/input/es_out.c:3128
 #, c-format
 msgid "%u Hz"
-msgstr ""
+msgstr "%u Hz"
 
 #: src/input/es_out.c:3138
 msgid "Bits per sample"
-msgstr ""
+msgstr "Bits par campion"
 
 #: src/input/es_out.c:3143 modules/access_output/shout.c:92
 #: modules/demux/playlist/shoutcast.c:327
@@ -949,33 +1054,33 @@ msgstr ""
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:174
 #: modules/gui/qt/ui/profiles.h:728 modules/gui/qt/ui/profiles.h:754
 msgid "Bitrate"
-msgstr ""
+msgstr "Tas di bits"
 
 #: src/input/es_out.c:3143
 #, c-format
 msgid "%u kb/s"
-msgstr ""
+msgstr "%u kb/s"
 
 #: src/input/es_out.c:3155
 msgid "Track replay gain"
-msgstr ""
+msgstr "Normalizazion ReplayGain pe linie"
 
 #: src/input/es_out.c:3157
 msgid "Album replay gain"
-msgstr ""
+msgstr "Normalizazion ReplayGain pal album"
 
 #: src/input/es_out.c:3158
 #, c-format
 msgid "%.2f dB"
-msgstr ""
+msgstr "%.2f dB"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr "Risoluzion video"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
-msgstr ""
+msgstr "Dimension memorie tampon"
 
 #: src/input/es_out.c:3183 src/input/es_out.c:3186 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -985,47 +1090,47 @@ msgstr ""
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:164
 #: modules/video_filter/fps.c:42
 msgid "Frame rate"
-msgstr "Frecuence fotograms"
+msgstr "Frecuence dai fotograms"
 
 #: src/input/es_out.c:3194
 msgid "Decoded format"
-msgstr ""
+msgstr "Formât decodificât"
 
 #: src/input/es_out.c:3199
 msgid "Top left"
-msgstr ""
+msgstr "Adalt a çampe"
 
 #: src/input/es_out.c:3199
 msgid "Left top"
-msgstr ""
+msgstr "A çampe adalt"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr ""
+msgstr "A diestre in bas"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
-msgstr ""
+msgstr "Adalt a diestre"
 
 #: src/input/es_out.c:3201
 msgid "Bottom left"
-msgstr ""
+msgstr "In bas a çampe"
 
 #: src/input/es_out.c:3201
 msgid "Bottom right"
-msgstr ""
+msgstr "In bas a diestre"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
-msgstr ""
+msgstr "A çampe in bas"
 
 #: src/input/es_out.c:3202
 msgid "Right top"
-msgstr ""
+msgstr "A diestre adalt"
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
-msgstr ""
+msgstr "Orientazion"
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
@@ -1035,41 +1140,41 @@ msgstr "No definît"
 
 #: src/input/es_out.c:3212
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 riis, 60 Hz)"
 
 #: src/input/es_out.c:3214
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 riis, 50 Hz)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
-msgstr ""
+msgstr "Colôrs primaris"
 
 #: src/input/es_out.c:3229 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Linear"
-msgstr ""
+msgstr "Lineâr"
 
 #: src/input/es_out.c:3236
 msgid "Hybrid Log-Gamma"
-msgstr ""
+msgstr "Log-Gamma ibrit"
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
-msgstr ""
+msgstr "Funzion di trasferiment dal colôr"
 
 #: src/input/es_out.c:3253
 msgid "Color space"
-msgstr ""
+msgstr "Spazi dai colôrs"
 
 #: src/input/es_out.c:3253
 #, c-format
 msgid "%s Range"
-msgstr ""
+msgstr "Interval %s"
 
 #: src/input/es_out.c:3255
 msgid "Full"
-msgstr ""
+msgstr "Complet"
 
 #: src/input/es_out.c:3262 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1080,105 +1185,105 @@ msgstr ""
 #: modules/spu/audiobargraph_v.c:65 modules/spu/logo.c:80
 #: modules/spu/marq.c:129 modules/spu/mosaic.c:170 modules/spu/rss.c:171
 msgid "Center"
-msgstr "Centre"
+msgstr "Centri"
 
 #: src/input/es_out.c:3263
 msgid "Top Left"
-msgstr ""
+msgstr "Adalt a çampe"
 
 #: src/input/es_out.c:3264
 msgid "Top Center"
-msgstr ""
+msgstr "Adalt tal mieç"
 
 #: src/input/es_out.c:3265
 msgid "Bottom Left"
-msgstr ""
+msgstr "In bas a çampe"
 
 #: src/input/es_out.c:3266
 msgid "Bottom Center"
-msgstr ""
+msgstr "In bas tal mieç"
 
 #: src/input/es_out.c:3270
 msgid "Chroma location"
-msgstr ""
+msgstr "Posizion di crominance"
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
-msgstr ""
+msgstr "Retangolâr"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
-msgstr ""
+msgstr "Ecuiretangolâr"
 
 #: src/input/es_out.c:3285
 msgid "Cubemap"
-msgstr ""
+msgstr "Cubemap"
 
 #: src/input/es_out.c:3291
 msgid "Projection"
-msgstr ""
+msgstr "Proiezion"
 
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Imbardade"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Impupade"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "Rulament"
 
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "Cjamp di viodude"
 
 #: src/input/es_out.c:3305
 msgid "Max. luminance"
-msgstr ""
+msgstr "Luminance massime"
 
 #: src/input/es_out.c:3310
 msgid "Min. luminance"
-msgstr ""
+msgstr "Luminance minime"
 
 #: src/input/es_out.c:3318
 msgid "Primary R"
-msgstr ""
+msgstr "R primari"
 
 #: src/input/es_out.c:3325
 msgid "Primary G"
-msgstr ""
+msgstr "G primari"
 
 #: src/input/es_out.c:3332
 msgid "Primary B"
-msgstr ""
+msgstr "B primari"
 
 #: src/input/es_out.c:3339
 msgid "White point"
-msgstr ""
+msgstr "Pont di blanc"
 
 #: src/input/es_out.c:3354 modules/access/imem.c:64
 msgid "Subtitle"
-msgstr "Sot titul"
+msgstr "Sottitul"
 
 #: src/input/input.c:1821 modules/control/hotkeys.c:1512
 #, c-format
 msgid "Volume %ld%%"
-msgstr ""
+msgstr "Volum %ld%%"
 
 #: src/input/input.c:2725
 msgid "Your input can't be opened"
-msgstr ""
+msgstr "No si pues vierzi la jentrade multimediâl"
 
 #: src/input/input.c:2726
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
-msgstr ""
+msgstr "VLC nol rive a vierzi il MRL '%s'. Controle il regjistri pai detais."
 
 #: src/input/meta.c:55 src/input/var.c:170 modules/gui/macosx/VLCMainMenu.m:409
 #: modules/gui/macosx/VLCMainMenu.m:410
@@ -1209,15 +1314,15 @@ msgstr "Copyright"
 #: src/input/meta.c:59 src/libvlc-module.c:239
 #: modules/gui/macosx/VLCPlaylist.m:95
 msgid "Album"
-msgstr ""
+msgstr "Album"
 
 #: src/input/meta.c:60
 msgid "Track number"
-msgstr ""
+msgstr "Numar de linie"
 
 #: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
-msgstr "Judizi"
+msgstr "Valutazion"
 
 #: src/input/meta.c:63 modules/gui/macosx/VLCPlaylist.m:97 modules/mux/avi.c:50
 msgid "Date"
@@ -1225,7 +1330,7 @@ msgstr "Date"
 
 #: src/input/meta.c:64
 msgid "Setting"
-msgstr ""
+msgstr "Impostazion"
 
 #: src/input/meta.c:65 modules/gui/macosx/VLCOpenWindowController.m:188
 #: modules/gui/qt/ui/podcast_configuration.h:101
@@ -1238,51 +1343,51 @@ msgstr "Cumò in esecuzion"
 
 #: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
-msgstr "Publicadôr"
+msgstr "Editôr"
 
 #: src/input/meta.c:70
 msgid "Encoded by"
-msgstr ""
+msgstr "Codificât di"
 
 #: src/input/meta.c:71
 msgid "Artwork URL"
-msgstr ""
+msgstr "URL de cuvierte"
 
 #: src/input/meta.c:72
 msgid "Track ID"
-msgstr ""
+msgstr "ID de linie"
 
 #: src/input/meta.c:73
 msgid "Number of Tracks"
-msgstr ""
+msgstr "Numar di liniis"
 
 #: src/input/meta.c:74
 msgid "Director"
-msgstr ""
+msgstr "Regjist"
 
 #: src/input/meta.c:75
 msgid "Season"
-msgstr ""
+msgstr "Stagjon"
 
 #: src/input/meta.c:76
 msgid "Episode"
-msgstr ""
+msgstr "Episodi"
 
 #: src/input/meta.c:77
 msgid "Show Name"
-msgstr ""
+msgstr "Non dal event"
 
 #: src/input/meta.c:78
 msgid "Actors"
-msgstr ""
+msgstr "Atôrs"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 msgid "Album Artist"
-msgstr ""
+msgstr "Artist dal ablum"
 
 #: src/input/meta.c:80
 msgid "Disc number"
-msgstr ""
+msgstr "Numar dal disc"
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1303,16 +1408,16 @@ msgstr "Cjapitul"
 #: src/input/var.c:188 modules/gui/macosx/VLCMainMenu.m:435
 #: modules/gui/macosx/VLCMainMenu.m:436
 msgid "Video Track"
-msgstr "Trace video"
+msgstr "Linie video"
 
 #: src/input/var.c:194 modules/gui/macosx/VLCMainMenu.m:418
 #: modules/gui/macosx/VLCMainMenu.m:419
 msgid "Audio Track"
-msgstr "Trace audio"
+msgstr "Linie audio"
 
 #: src/input/var.c:200
 msgid "Subtitle Track"
-msgstr ""
+msgstr "Linie dai sottitui"
 
 #: src/input/var.c:264
 msgid "Next title"
@@ -1324,16 +1429,16 @@ msgstr "Titul precedent"
 
 #: src/input/var.c:278
 msgid "Menu title"
-msgstr ""
+msgstr "Titul dal menù"
 
 #: src/input/var.c:285
 msgid "Menu popup"
-msgstr ""
+msgstr "Menù a comparse"
 
 #: src/input/var.c:319
 #, c-format
 msgid "Title %i%s"
-msgstr ""
+msgstr "Titul %i%s"
 
 #: src/input/var.c:344 src/input/var.c:401
 #, c-format
@@ -1351,34 +1456,36 @@ msgstr "Cjapitul precedent"
 #: src/input/vlm.c:641 src/input/vlm.c:1020
 #, c-format
 msgid "Media: %s"
-msgstr ""
+msgstr "Multimedia: %s"
 
 #: src/interface/interface.c:82 modules/gui/macosx/VLCMainMenu.m:346
 #: modules/gui/macosx/VLCMainMenu.m:347
 msgid "Add Interface"
-msgstr ""
+msgstr "Zonte interface"
 
 #: src/interface/interface.c:89
 msgid "Console"
-msgstr ""
+msgstr "Console"
 
 #: src/interface/interface.c:93
 msgid "Telnet"
-msgstr ""
+msgstr "Telnet"
 
 #: src/interface/interface.c:96
 msgid "Web"
-msgstr ""
+msgstr "Web"
 
 #: src/interface/interface.c:99
 msgid "Mouse Gestures"
-msgstr ""
+msgstr "Mossis di mouse"
 
 #: src/interface/interface.c:222
 msgid ""
 "Running vlc with the default interface. Use 'cvlc' to use vlc without "
 "interface."
 msgstr ""
+"Esecuzion di vlc cu la interface predefinide. Dopre 'cvlc' par doprâ vlc "
+"cence interface."
 
 #. xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
 #: src/libvlc.c:174
@@ -1388,7 +1495,7 @@ msgstr "fur"
 #: src/libvlc.h:166 src/libvlc-module.c:1432 src/libvlc-module.c:1433
 #: src/video_output/vout_intf.c:176 modules/gui/macosx/VLCMainMenu.m:475
 msgid "Zoom"
-msgstr ""
+msgstr "Ingrandiment"
 
 #: src/libvlc.h:167 src/libvlc-module.c:1346 src/video_output/vout_intf.c:87
 msgid "1:4 Quarter"
@@ -1412,20 +1519,25 @@ msgid ""
 "select the main interface, additional interface modules, and define various "
 "related options."
 msgstr ""
+"Chestis opzions ti permetin di configurâ lis interfacis dopradis di VLC. Tu "
+"puedis selezionâ la interface principâl, modui di interface adizionâi e "
+"definî variis opzions relativis."
 
 #: src/libvlc-module.c:68
 msgid "Interface module"
-msgstr ""
+msgstr "Modul di interface"
 
 #: src/libvlc-module.c:70
 msgid ""
 "This is the main interface used by VLC. The default behavior is to "
 "automatically select the best module available."
 msgstr ""
+"Cheste e je la interface principâl doprade di VLC. Il compuartament "
+"predefinît al è chel di selezionâ in automatic il miôr modul disponibil."
 
 #: src/libvlc-module.c:74 modules/control/ntservice.c:60
 msgid "Extra interface modules"
-msgstr ""
+msgstr "Modui di interface suplementârs"
 
 #: src/libvlc-module.c:76
 msgid ""
@@ -1434,24 +1546,30 @@ msgid ""
 "list of interface modules. (common values are \"rc\" (remote control), \"http"
 "\", \"gestures\" ...)"
 msgstr ""
+"Tu puedis selezionâ \"interfacis adizionâls\" par VLC. A vignaran inviadis "
+"in sotfont in zonte a chê predefinide. Dopre une liste separade di doi ponts "
+"fate di modui di interface. (i valôrs plui comuns a son \"rc\" (control di "
+"lontan), \"http\", \"gesture\" ...)"
 
 #: src/libvlc-module.c:83
 msgid "You can select control interfaces for VLC."
-msgstr ""
+msgstr "Tu puedis selezionâ lis interfacis di control par VLC."
 
 #: src/libvlc-module.c:85
 msgid "Verbosity (0,1,2)"
-msgstr ""
+msgstr "Verbositât (0,1,2)"
 
 #: src/libvlc-module.c:87
 msgid ""
 "This is the verbosity level (0=only errors and standard messages, "
 "1=warnings, 2=debug)."
 msgstr ""
+"Chest al è il nivel di prolissitât (0=nome i erôrs e i messaçs standard, "
+"1=avertiments, 2=debug)."
 
 #: src/libvlc-module.c:90
 msgid "Default stream"
-msgstr "Flus predeterminât"
+msgstr "Flus predefinît"
 
 #: src/libvlc-module.c:92
 msgid "This stream will always be opened at VLC startup."
@@ -1466,6 +1584,8 @@ msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
+"Chest al ative la colorazion dai messaçs inviâts ae console. Par che chest "
+"al funzioni il to terminâl al à bisugne dal supuart colôrs di Linux."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1476,16 +1596,21 @@ msgid ""
 "When this is enabled, the preferences and/or interfaces will show all "
 "available options, including those that most users should never touch."
 msgstr ""
+"Cuant che chest al è abilitât, lis preferencis e/o interfacis a mostraran "
+"dutis lis opzions disponibilis, includudis chês che la plui part dai utents "
+"no varessin di tocjâ mai."
 
 #: src/libvlc-module.c:105
 msgid "Interface interaction"
-msgstr ""
+msgstr "Interazion de interface"
 
 #: src/libvlc-module.c:107
 msgid ""
 "When this is enabled, the interface will show a dialog box each time some "
 "user input is required."
 msgstr ""
+"Cuant che chest al è abilitât, la interface e mostrarà un barconut di dialic "
+"ogni volte che e ven domandade une cualchi imission/comant dal utent."
 
 #: src/libvlc-module.c:117
 msgid ""
@@ -1494,24 +1619,30 @@ msgid ""
 "(spectrum analyzer, etc.). Enable these filters here, and configure them in "
 "the \"audio filters\" modules section."
 msgstr ""
+"Chestis opzions ti permetin di modificâ il compuartament dal sot-sisteme "
+"audio e par zontâ filtris audio che a puedin vignî doprât pe elaborazion a "
+"posteriôrs o par efiets visîfs (analizadôrs di spetri e v.i.). Ative chescj "
+"filtris achì e configuriju inte sezion dai modui \"filtris audio\"."
 
 #: src/libvlc-module.c:123
 msgid "Audio output module"
-msgstr ""
+msgstr "Modul di jessude audio"
 
 #: src/libvlc-module.c:125
 msgid ""
 "This is the audio output method used by VLC. The default behavior is to "
 "automatically select the best method available."
 msgstr ""
+"Chest al è il metodi di jessude dal audio doprât di VLC. Il compuartament "
+"predefinît al è chel di selezionâ in automatic il miôr metodi disponibil."
 
 #: src/libvlc-module.c:129
 msgid "Media role"
-msgstr ""
+msgstr "Rûl multimediâl"
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
-msgstr ""
+msgstr "Rûl (letôr) multimediâl pe politiche dal sisteme operatîf."
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:273
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:409
@@ -1523,14 +1654,16 @@ msgid ""
 "You can completely disable the audio output. The audio decoding stage will "
 "not take place, thus saving some processing power."
 msgstr ""
+"Tu puedis disativâ dal dut la jessude audio. In chest câs la part de "
+"decodifiche audio no vignarà fate, sparagnant cussì potence di elaborazion."
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "Musiche"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
-msgstr ""
+msgstr "Comunicazion"
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
@@ -1538,78 +1671,88 @@ msgstr "Zûc"
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "Notifiche"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
-msgstr ""
+msgstr "Animazion"
 
 #: src/libvlc-module.c:143
 msgid "Production"
-msgstr ""
+msgstr "Produzion"
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
-msgstr ""
+msgstr "Acessibilitât"
 
 #: src/libvlc-module.c:144
 msgid "Test"
-msgstr ""
+msgstr "Prove"
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
-msgstr ""
+msgstr "Vuadagn audio"
 
 #: src/libvlc-module.c:149
 msgid "This linear gain will be applied to outputted audio."
-msgstr ""
+msgstr "Chest vuadagn lineâr al vignarà aplicât al audio in jessude."
 
 #: src/libvlc-module.c:151
 msgid "Audio output volume step"
-msgstr ""
+msgstr "Pas dal volum di jessude dal audio"
 
 #: src/libvlc-module.c:153
 msgid "The step size of the volume is adjustable using this option."
 msgstr ""
+"Al è pussibil justâ la dimension dal pas dal volum, doprant cheste opzion."
 
 #: src/libvlc-module.c:156
 msgid "Remember the audio volume"
-msgstr ""
+msgstr "Visâsi dal volum audio"
 
 #: src/libvlc-module.c:158
 msgid ""
 "The volume can be recorded and automatically restored next time VLC is used."
 msgstr ""
+"Al è pussibil regjistrâ il volum e ripristinâlu in automatic pe volte "
+"sucessive che si doprarà VLC."
 
 #: src/libvlc-module.c:161
 msgid "Audio desynchronization compensation"
-msgstr ""
+msgstr "Compensazion di de-sincronizazion audio"
 
 #: src/libvlc-module.c:163
 msgid ""
 "This delays the audio output. The delay must be given in milliseconds. This "
 "can be handy if you notice a lag between the video and the audio."
 msgstr ""
+"Chest al intarde la jessude dal audio. Si scugne indicâ il ritart in "
+"miliseconts. Chest al pues jessi comut se tu notis un ritart tra il video e "
+"l'audio."
 
 #: src/libvlc-module.c:168
 msgid "This selects which plugin to use for audio resampling."
-msgstr ""
+msgstr "Chest al selezione cuâl plugin doprâ par tornâ a campionâ l'audio."
 
 #: src/libvlc-module.c:171
 msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
+"Al stabilìs la modalitât di jessude dai canâi audio che e vignarà doprade in "
+"maniere predefinide se il to hardware e il flus audio a son compatibii."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
-msgstr ""
+msgstr "Sfuarce il supuart S/PDIF"
 
 #: src/libvlc-module.c:176
 msgid ""
 "This option should be used when the audio output can't negotiate S/PDIF "
 "support."
 msgstr ""
+"Si varès di doprâ cheste opzion cuant che la jessude audio no pues negoziâ "
+"il supuart S/PDIF. "
 
 #: src/libvlc-module.c:178
 msgid "Force detection of Dolby Surround"
@@ -1622,6 +1765,11 @@ msgid ""
 "actually encoded with Dolby Surround, turning on this option might enhance "
 "your experience, especially when combined with the Headphone Channel Mixer."
 msgstr ""
+"Dopre chest cuant che tu sâs che il to flus al è (o nol è) codificât cul "
+"Dolby Surround ma nol rive a fâsi identificâ in chê maniere. Ancje se il "
+"flus nol è di fat codificât cul Dolby Surround, ativant cheste opzion si "
+"podarès miorâ la esperience di scolte, in particolâr se cumbinade cul mixer "
+"dal canâl des scufis."
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:957
 #: modules/audio_output/kai.c:106 modules/codec/subsdec.c:167
@@ -1651,65 +1799,73 @@ msgstr "Distudât"
 
 #: src/libvlc-module.c:189
 msgid "Stereo audio output mode"
-msgstr ""
+msgstr "Modalitât di jessude dal audio stereo"
 
 #: src/libvlc-module.c:195 src/misc/actions.c:112
 #: modules/gui/qt/components/preferences_widgets.cpp:1429
 #: modules/gui/qt/util/customwidgets.cpp:314
 msgid "Unset"
-msgstr ""
+msgstr "No sta stabilî"
 
 #: src/libvlc-module.c:203
 msgid "This adds audio post processing filters, to modify the sound rendering."
 msgstr ""
+"Chest al zonte i filtris di elaborazion sucessive dal audio, par modificâ la "
+"rese dal sun."
 
 #: src/libvlc-module.c:208
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
 msgstr ""
+"Chest al zonte i modui di visualizazion (analizadôr di spetri, e v.i.)."
 
 #: src/libvlc-module.c:212
 msgid "Replay gain mode"
-msgstr ""
+msgstr "Modalitât ReplayGain"
 
 #: src/libvlc-module.c:214
 msgid "Select the replay gain mode"
-msgstr ""
+msgstr "Selezione la modalitât ReplayGain"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
-msgstr ""
+msgstr "Preamplificazion Replay"
 
 #: src/libvlc-module.c:218
 msgid ""
 "This allows you to change the default target level (89 dB) for stream with "
 "replay gain information"
 msgstr ""
+"Chest ti permet di cambiâ il nivel di destinazion predefinît (89 dB) pal "
+"flus cu la informazion ReplayGain"
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
-msgstr ""
+msgstr "ReplayGain predefinît"
 
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
 msgstr ""
+"Chest al è il vuadagn doprât pal flus cente lis informazions ReplayGain"
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
-msgstr ""
+msgstr "Protezion di pic"
 
 #: src/libvlc-module.c:227
 msgid "Protect against sound clipping"
-msgstr ""
+msgstr "Protezion cuintri il tai dai pics di sun (clipping)"
 
 #: src/libvlc-module.c:230
 msgid "Enable time stretching audio"
-msgstr ""
+msgstr "Abilite il slungjament temporâl dal audio"
 
 #: src/libvlc-module.c:232
 msgid ""
 "This allows playing audio at lower or higher speed without affecting the "
 "audio pitch"
 msgstr ""
+"Chest al permet la riproduzion audio a velocitâts plui bassis o plui altis "
+"cence lâ a tocjâ la tonalitât sonore"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1131
 #: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:109
@@ -1725,7 +1881,7 @@ msgstr ""
 #: modules/visualization/visual/window_presets.h:34
 #: share/lua/http/dialogs/create_stream.html:196
 msgid "None"
-msgstr ""
+msgstr "Nissun"
 
 #: src/libvlc-module.c:247
 msgid ""
@@ -1735,16 +1891,23 @@ msgid ""
 "\"video filters\" modules section. You can also set many miscellaneous video "
 "options."
 msgstr ""
+"Chestis opzions ti permetin di modificâ il compuartament dal sot-sisteme di "
+"jessude video. Tu puedis par esempli abilitâ i filtris video "
+"(deinterlaçament, justament de imagjin, e v.i.). Abilite chescj filtris achì "
+"e configuriju inte sezion dai modui \"filtris video\". Tu puedis ancje "
+"stabilî tantis variis opzions video."
 
 #: src/libvlc-module.c:253
 msgid "Video output module"
-msgstr ""
+msgstr "Modul di jessude video"
 
 #: src/libvlc-module.c:255
 msgid ""
 "This is the the video output method used by VLC. The default behavior is to "
 "automatically select the best method available."
 msgstr ""
+"Chest al è il metodi di jessude video doprât di VLC. Il compuartament "
+"predefinît al è chel di selezionâ in automatic il miôr metodi disponibil."
 
 #: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:359
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:313
@@ -1756,6 +1919,8 @@ msgid ""
 "You can completely disable the video output. The video decoding stage will "
 "not take place, thus saving some processing power."
 msgstr ""
+"Tu puedis disativâ dal dut la jessude video. In chest câs la part di "
+"decodifiche video no vignarà fate, sparagnant cussì potence di elaborazion."
 
 #: src/libvlc-module.c:263 modules/stream_out/mosaic_bridge.c:105
 #: modules/stream_out/transcode/transcode.c:67
@@ -1769,6 +1934,8 @@ msgid ""
 "You can enforce the video width. By default (-1) VLC will adapt to the video "
 "characteristics."
 msgstr ""
+"Tu puedis sfuarçâ la largjece dal video. Cul predefinît (-1) VLC al adatarà "
+"aes carateristichis dal video."
 
 #: src/libvlc-module.c:268 modules/stream_out/mosaic_bridge.c:108
 #: modules/stream_out/transcode/transcode.c:70
@@ -1782,40 +1949,48 @@ msgid ""
 "You can enforce the video height. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
+"Tu puedis sfuarçâ la altece dal video. Cul predefinît (-1) VLC al adatarà "
+"aes carateristichis dal video."
 
 #: src/libvlc-module.c:273
 msgid "Video X coordinate"
-msgstr ""
+msgstr "Coordenade X dal video"
 
 #: src/libvlc-module.c:275
 msgid ""
 "You can enforce the position of the top left corner of the video window (X "
 "coordinate)."
 msgstr ""
+"Tu puedis sfuarçâ la posizion dal cjanton in alt a çampe dal barcon dal "
+"video (coordenade X)."
 
 #: src/libvlc-module.c:278
 msgid "Video Y coordinate"
-msgstr ""
+msgstr "Coordenade Y dal video"
 
 #: src/libvlc-module.c:280
 msgid ""
 "You can enforce the position of the top left corner of the video window (Y "
 "coordinate)."
 msgstr ""
+"Tu puedis sfuarçâ la posizion dal cjanton in alt a çampe dal barcon dal "
+"video (coordenade Y)."
 
 #: src/libvlc-module.c:283
 msgid "Video title"
-msgstr ""
+msgstr "Titul dal video"
 
 #: src/libvlc-module.c:285
 msgid ""
 "Custom title for the video window (in case the video is not embedded in the "
 "interface)."
 msgstr ""
+"Titul personalizât pal barcon dal video (tal câs che il video nol sedi "
+"incorporât te interface)."
 
 #: src/libvlc-module.c:288
 msgid "Video alignment"
-msgstr "Inliniament video"
+msgstr "Inlineament video"
 
 #: src/libvlc-module.c:290
 msgid ""
@@ -1823,9 +1998,10 @@ msgid ""
 "centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can also use "
 "combinations of these values, like 6=4+2 meaning top-right)."
 msgstr ""
-"Sfuarce l'inliniament dal video intal so barcon. Il valôr predeterminât al è "
-"(0), centrât (0=centre, 1=çampe, 2=diestre, 4=in alt, 8=in somp, tu puedis "
-"ancje combinâ chescj valôrs, 6=4+2 al vûl dî in alt a diestre)."
+"Sfuarce l'inlineament dal video intal so barcon. Cul valôr predefinît (0) al "
+"vignarà centrât (0=centre, 1=çampe, 2=diestre, 4=in alt, 8=in bas, tu puedis "
+"ancje cumbinâ chescj valôrs, come par esempli 6=4+2, che al vûl dî in alt a "
+"diestre)."
 
 #: src/libvlc-module.c:295 src/libvlc-module.c:368 modules/codec/dvbsub.c:102
 #: modules/codec/zvbi.c:83
@@ -1849,7 +2025,7 @@ msgstr "In alt"
 #: modules/spu/marq.c:129 modules/spu/mosaic.c:170 modules/spu/rss.c:171
 #: modules/gui/qt/ui/video_effects.h:1232
 msgid "Bottom"
-msgstr "In somp"
+msgstr "In bas"
 
 #: src/libvlc-module.c:296 src/libvlc-module.c:369 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:84
@@ -1876,7 +2052,7 @@ msgstr "In alt a diestre"
 #: modules/spu/audiobargraph_v.c:66 modules/spu/logo.c:81
 #: modules/spu/marq.c:130 modules/spu/mosaic.c:171 modules/spu/rss.c:172
 msgid "Bottom-Left"
-msgstr "In somp a çampe"
+msgstr "In bas a çampe"
 
 #: src/libvlc-module.c:296 src/libvlc-module.c:369 modules/codec/dvbsub.c:103
 #: modules/codec/zvbi.c:84
@@ -1885,45 +2061,47 @@ msgstr "In somp a çampe"
 #: modules/spu/audiobargraph_v.c:66 modules/spu/logo.c:81
 #: modules/spu/marq.c:130 modules/spu/mosaic.c:171 modules/spu/rss.c:172
 msgid "Bottom-Right"
-msgstr "In somp a diestre"
+msgstr "In bas a diestre"
 
 #: src/libvlc-module.c:298
 msgid "Zoom video"
-msgstr ""
+msgstr "Ingrandiment video"
 
 #: src/libvlc-module.c:300
 msgid "You can zoom the video by the specified factor."
-msgstr ""
+msgstr "Tu puedis ingrandî il video cuntun specific fatôr."
 
 #: src/libvlc-module.c:302
 msgid "Grayscale video output"
-msgstr ""
+msgstr "Jessude video in scjale di grîs"
 
 #: src/libvlc-module.c:304
 msgid ""
 "Output video in grayscale. As the color information aren't decoded, this can "
 "save some processing power."
 msgstr ""
+"Mande fûr il video in scjale di grîs. Viodût che lis informazions sul colôr "
+"no son decodificadis, chest al pues sparagnâ potence di elaborazion."
 
 #: src/libvlc-module.c:307
 msgid "Embedded video"
-msgstr ""
+msgstr "Video incorporât"
 
 #: src/libvlc-module.c:309
 msgid "Embed the video output in the main interface."
-msgstr ""
+msgstr "Incorpore la jessude video te interface principâl."
 
 #: src/libvlc-module.c:311
 msgid "Fullscreen video output"
-msgstr "Jessude video su dit il visôr"
+msgstr "Jessude video a plen visôr"
 
 #: src/libvlc-module.c:313
 msgid "Start video in fullscreen mode"
-msgstr "Invie il video te modalitât su dut il visôr"
+msgstr "Fâs partî il video in modalitât plen visôr"
 
 #: src/libvlc-module.c:315 src/video_output/vout_intf.c:253
 msgid "Always on top"
-msgstr "Simpri in prin plan"
+msgstr "Simpri denant"
 
 #: src/libvlc-module.c:317
 msgid "Always place the video window on top of other windows."
@@ -1931,44 +2109,52 @@ msgstr "Met simpri il barcon dal video parsore di chei altris barcons."
 
 #: src/libvlc-module.c:319
 msgid "Enable wallpaper mode"
-msgstr ""
+msgstr "Abilite la modalitât fondâl"
 
 #: src/libvlc-module.c:321
 msgid ""
 "The wallpaper mode allows you to display the video as the desktop background."
 msgstr ""
+"La modalitât fondâl ti permet di visualizâ il video tant che fonts dal "
+"scritori."
 
 #: src/libvlc-module.c:324
 msgid "Show media title on video"
-msgstr ""
+msgstr "Mostre il titul dal media sul video"
 
 #: src/libvlc-module.c:326
 msgid "Display the title of the video on top of the movie."
-msgstr ""
+msgstr "Visualize il titul dal video parsore dal filmât."
 
 #: src/libvlc-module.c:328
 msgid "Show video title for x milliseconds"
-msgstr ""
+msgstr "Mostre il titul dal video par x miliseconts"
 
 #: src/libvlc-module.c:330
 msgid "Show the video title for n milliseconds, default is 5000 ms (5 sec.)"
 msgstr ""
+"Mostre il titul dal video par n miliseconts, il valôr predefinît al è 5000 "
+"ms (5 sec.)"
 
 #: src/libvlc-module.c:332
 msgid "Position of video title"
-msgstr ""
+msgstr "Posizion dal titul dal video"
 
 #: src/libvlc-module.c:334
 msgid "Place on video where to display the title (default bottom center)."
 msgstr ""
+"Decît dulà plaçâ sul video il titul di visualizâ (valôr predefinît in bas "
+"tal mieç)."
 
 #: src/libvlc-module.c:336
 msgid "Hide cursor and fullscreen controller after x milliseconds"
-msgstr ""
+msgstr "Plate il cursôr e i controi a plen visôr dopo x miliseconts"
 
 #: src/libvlc-module.c:339
 msgid "Hide mouse cursor and fullscreen controller after n milliseconds."
 msgstr ""
+"Plate il cursôr dal mouse e i controi de modalitât a plen visôr dopo n "
+"miliseconts."
 
 #: src/libvlc-module.c:342 src/libvlc-module.c:344
 #: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:443
@@ -1978,52 +2164,52 @@ msgstr ""
 #: modules/video_filter/deinterlace/deinterlace.c:300
 #: share/lua/http/dialogs/create_stream.html:346
 msgid "Deinterlace"
-msgstr ""
+msgstr "Disinterlace"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
 #: modules/gui/macosx/VLCMainMenu.m:445 modules/gui/macosx/VLCMainMenu.m:446
 #: modules/gui/macosx/VLCSimplePrefsController.m:379
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
-msgstr ""
+msgstr "Modalitât disinterlaçade"
 
 #: src/libvlc-module.c:354
 msgid "Deinterlace method to use for video processing."
-msgstr ""
+msgstr "Metodi dal disinterlaçament di doprâ pe elaborazion video."
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Discard"
-msgstr ""
+msgstr "Scarte"
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/algo_phosphor.h:47
 #: modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Blend"
-msgstr ""
+msgstr "Misture"
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Mean"
-msgstr ""
+msgstr "Medi"
 
 #: src/libvlc-module.c:361 modules/hw/vdpau/chroma.c:883
 #: modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Bob"
-msgstr ""
+msgstr "Bob"
 
 #: src/libvlc-module.c:362 modules/video_filter/deinterlace/deinterlace.h:59
 msgid "Phosphor"
-msgstr ""
+msgstr "Fosfar"
 
 #: src/libvlc-module.c:363 modules/video_filter/deinterlace/deinterlace.h:59
 msgid "Film NTSC (IVTC)"
-msgstr ""
+msgstr "Film NTSC (IVTC)"
 
 #: src/libvlc-module.c:371
 msgid "Disable screensaver"
-msgstr "Disative il salve-visôr"
+msgstr "Disative il salve-schermi"
 
 #: src/libvlc-module.c:372
 msgid "Disable the screensaver during video playback."
-msgstr "Disative il salve-visôr dilunc la riproduzion video."
+msgstr "Disative il salve-schermi dilunc la riproduzion video."
 
 #: src/libvlc-module.c:374 modules/gui/macosx/VLCSimplePrefsController.m:364
 #: modules/gui/qt/ui/sprefs_video.h:316
@@ -2035,28 +2221,32 @@ msgid ""
 "VLC can avoid creating window caption, frames, etc... around the video, "
 "giving a \"minimal\" window."
 msgstr ""
+"VLC al pues evitât di creâ titui dai barcons, ricuardis e v.i.... tor ator "
+"dal video, dantji un barcon “minimâl”."
 
 #: src/libvlc-module.c:379
 msgid "Video splitter module"
-msgstr ""
+msgstr "Modul di separazion video"
 
 #: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
-msgstr ""
+msgstr "Chest al zonte i separadôrs video come clone o mûr"
 
 #: src/libvlc-module.c:383
 msgid "Video filter module"
-msgstr ""
+msgstr "Modul di filtri video"
 
 #: src/libvlc-module.c:385
 msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or distort the video."
 msgstr ""
+"Chest al zonte filtris di elaborazion sucessive par miorâ la cualitât des "
+"imagjins, par esempli il disinterlaçament o la distorsion video."
 
 #: src/libvlc-module.c:389
 msgid "Video snapshot directory (or filename)"
-msgstr ""
+msgstr "Cartele des istantaniis video (o non dal file)"
 
 #: src/libvlc-module.c:391
 msgid "Directory where the video snapshots will be stored."
@@ -2064,48 +2254,53 @@ msgstr "La cartele dulà salvâ lis istantaniis dai videos."
 
 #: src/libvlc-module.c:393 src/libvlc-module.c:395
 msgid "Video snapshot file prefix"
-msgstr ""
+msgstr "Prefìs dal file de instantanie dal video"
 
 #: src/libvlc-module.c:397
 msgid "Video snapshot format"
-msgstr "Formât istantaniis videos"
+msgstr "Formât des istantaniis dai videos"
 
 #: src/libvlc-module.c:399
 msgid "Image format which will be used to store the video snapshots"
 msgstr ""
-"Il formât des figuris che al vignarà doprât par salvâ lis istantaniis dai "
+"Il formât des imagjins che al vignarà doprât par salvâ lis istantaniis dai "
 "videos."
 
 #: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
-msgstr "Mostre anteprime des istantaniis dai videos."
+msgstr "Mostre anteprime des istantaniis dai videos"
 
 #: src/libvlc-module.c:403
 msgid "Display the snapshot preview in the screen's top-left corner."
 msgstr ""
-"Mostre une anteprime de istantanie intal cjanton in alt a çampe dal barcon."
+"Mostre la anteprime de istantanie intal cjanton in alt a çampe dal schermi."
 
 #: src/libvlc-module.c:405
 msgid "Use sequential numbers instead of timestamps"
-msgstr ""
+msgstr "Dopre numars secuenziâi invezit che datis e oris"
 
 #: src/libvlc-module.c:407
 msgid "Use sequential numbers instead of timestamps for snapshot numbering"
 msgstr ""
+"Pe numerazion des istantaniis dopre numars secuenziâi al puest di datis e "
+"oris"
 
 #: src/libvlc-module.c:409
 msgid "Video snapshot width"
-msgstr ""
+msgstr "Largjece des istantaniis dai videos"
 
 #: src/libvlc-module.c:411
 msgid ""
 "You can enforce the width of the video snapshot. By default it will keep the "
 "original width (-1). Using 0 will scale the width to keep the aspect ratio."
 msgstr ""
+"Tu puedis sfuarçâ la largjece de istantanie dal video. Come valôr predefinît "
+"al tignarà la largjece origjinâl (-1). Doprant 0 al scjalarà la largjece in "
+"mût di mantignî lis proporzions."
 
 #: src/libvlc-module.c:415
 msgid "Video snapshot height"
-msgstr ""
+msgstr "Altece des istantaniis dai videos"
 
 #: src/libvlc-module.c:417
 msgid ""
@@ -2113,20 +2308,25 @@ msgid ""
 "the original height (-1). Using 0 will scale the height to keep the aspect "
 "ratio."
 msgstr ""
+"Tu puedis sfuarçâ la altece de istantanie dal video. Come valôr predefinît "
+"al tignarà la altece origjinâl (-1). Doprant 0 al scjalarà la altece in mût "
+"di mantignî lis proporzions."
 
 #: src/libvlc-module.c:421
 msgid "Video cropping"
-msgstr "Tai dal video"
+msgstr "Ritai dal video"
 
 #: src/libvlc-module.c:423
 msgid ""
 "This forces the cropping of the source video. Accepted formats are x:y (4:3, "
 "16:9, etc.) expressing the global image aspect."
 msgstr ""
+"Chest al sfuarce il ritai dal video sorzint. I formâts acetâts a son x:y "
+"(4:3, 16:9 e v.i.) che a rapresentin l'aspiet de imagjin globâl."
 
 #: src/libvlc-module.c:427
 msgid "Source aspect ratio"
-msgstr ""
+msgstr "Proporzions de imagjin sorzint"
 
 #: src/libvlc-module.c:429
 msgid ""
@@ -2136,6 +2336,12 @@ msgid ""
 "y (4:3, 16:9, etc.) expressing the global image aspect, or a float value "
 "(1.25, 1.3333, etc.) expressing pixel squareness."
 msgstr ""
+"Chest al sfuarce lis proporzions di aspiet de imagjin sorzint. Par esempli, "
+"cualchi DVD al dîs di sei 16:9 ma di fat al è 4:3. Chest si pues doprâ ancje "
+"tant che sugjeriment par VLC cuant che un filmât nol à informazions su lis "
+"sôs proporzions di aspiet de imagjin. I formâts acetâts a son (4:3, 16:9 e v."
+"i.) che a rapresentin l'aspiet de imagjin globâl, opûr un valôr in virgule "
+"mobile (1.25, 1.3333 e v.i.) che a rapresentin la cuadradure dai pixels."
 
 #: src/libvlc-module.c:436
 msgid "Video Auto Scaling"
