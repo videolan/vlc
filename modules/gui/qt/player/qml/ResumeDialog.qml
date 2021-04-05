@@ -149,6 +149,8 @@ Widgets.NavigableFocusScope {
             Loader {
                 id: csdDecorations
 
+                Layout.alignment: Qt.AlignTop | Qt.AlignRight
+
                 focus: false
                 height: VLCStyle.icon_normal
                 active: mainInterface.clientSideDecoration
