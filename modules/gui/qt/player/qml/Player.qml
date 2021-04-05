@@ -204,9 +204,18 @@ Widgets.NavigableFocusScope {
         edge: Widgets.DrawerExt.Edges.Top
         state: topcontrolView.state
         width: parent.width
-        visible: rootPlayer.hasEmbededVideo || rootPlayer.pinVideoControls
+        visible: rootPlayer.hasEmbededVideo || rootPlayer.pinVideoControls || topcontrolView.contentItem.isResumeDialogVisible
         height: contentItem.height
-        component: rootPlayer.pinVideoControls ? backgroundForPinnedControls : topcontrolViewBackground
+
+        component: {
+            if (rootPlayer.pinVideoControls)
+                return backgroundForPinnedControls
+            else if (topcontrolView.contentItem.isResumeDialogVisible)
+                return topcontrolViewResumeBg
+            else
+                return topcontrolViewBackground
+        }
+
         onContentItemChanged: {
             if (rootPlayer.pinVideoControls)
                 contentItem.height = Qt.binding(function () { return topcontrolView.height + topcontrolView.anchors.topMargin; })
@@ -222,6 +231,17 @@ Widgets.NavigableFocusScope {
                     GradientStop { position: 0; color: Qt.rgba(0, 0, 0, .8) }
                     GradientStop { position: 1; color: "transparent" }
                 }
+            }
+        }
+
+        Component {
+            id: topcontrolViewResumeBg
+
+            Rectangle {
+                width: rootPlayer.width
+                height: topcontrolView.height + topcontrolView.anchors.topMargin * 2
+                color: rootPlayer.colors.playerBg
+                opacity: .8
             }
         }
     }
@@ -301,6 +321,8 @@ Widgets.NavigableFocusScope {
         state: "visible"
 
         component: FocusScope {
+            readonly property bool isResumeDialogVisible: resumeDialog.visible
+
             width: topcontrolView.width
             height: topbar.implicitHeight
             focus: true
