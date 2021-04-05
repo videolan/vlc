@@ -41,8 +41,8 @@ NavigableFocusScope {
     readonly property int _effectiveCellWidth: cellWidth + horizontalSpacing
     readonly property int _effectiveCellHeight: cellHeight + verticalSpacing
 
-    property variant delegateModel
-    property variant model
+    property var delegateModel
+    property var model
 
     property int currentIndex: 0
     property alias contentHeight: flickable.contentHeight
@@ -84,8 +84,8 @@ NavigableFocusScope {
     signal selectAll()
     signal actionAtIndex(int index)
 
-    property variant _idChildrenMap: ({})
-    property variant _unusedItemList: []
+    property var _idChildrenMap: ({})
+    property var _unusedItemList: []
 
     Accessible.role: Accessible.Table
 
