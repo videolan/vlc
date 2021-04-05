@@ -38,6 +38,10 @@ CHANGELOGS = \
 	ChangeLog-2015 \
 	ChangeLog-2016 \
 	ChangeLog-2017 \
+	ChangeLog-2018 \
+	ChangeLog-2019 \
+	ChangeLog-2020 \
+	ChangeLog-2021 \
 	$(NULL)
 
 man1_MANS = \
@@ -83,7 +87,7 @@ $(CHANGELOGS): Makefile.am
 	fi
 
 # This one needs to be rebuilt all the time :)
-.PHONY: ChangeLog-2017 changelogs doc
+.PHONY: ChangeLog-2021 changelogs doc
 
 changelogs: $(CHANGELOGS)
 
