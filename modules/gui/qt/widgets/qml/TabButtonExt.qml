@@ -38,7 +38,7 @@ T.TabButton {
     property string iconTxt: ""
     property int iconSize: VLCStyle.icon_normal
     property bool selected: false
-    property color color: focusBackground.foregroundColor
+    property alias color: focusBackground.defaultForeground
     property bool busy: false
 
     font.pixelSize: VLCStyle.fontSize_normal
@@ -93,7 +93,7 @@ T.TabButton {
 
             Widgets.ListLabel {
                 text: control.text
-                color: control.color
+                color: focusBackground.foregroundColor
             }
         }
 
