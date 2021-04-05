@@ -52,7 +52,7 @@ AUTOMAKE_OPTIONS = \
 ChangeLog: Makefile.am
 	rm -f -- "$@"
 	cd doc && $(MAKE) $(AM_MAKEFLAGS) changelogs
-	$(LN_S) -f doc/ChangeLog-2015 "$@"
+	$(LN_S) -f doc/ChangeLog-2021 "$@"
 
 
 ###############################################################################
