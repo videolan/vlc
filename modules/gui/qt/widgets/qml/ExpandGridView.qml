@@ -317,7 +317,6 @@ NavigableFocusScope {
             var iMax = bottomRight.row
             var f_l = _getFirstAndLastInstanciatedItemIds()
             if (iMin <= f_l[1] && f_l[0] <= iMax) {
-                flickable.layout(true)
                 _refreshData(iMin, iMax)
             }
         }
