@@ -30,8 +30,8 @@
 
 @interface VLCTimeField ()
 {
-    NSString *o_remaining_identifier;
-    BOOL b_time_remaining;
+    NSString *_identifier;
+    BOOL _isTimeRemaining;
 
     NSString *_cachedTime;
     NSString *_remainingTime;
@@ -51,10 +51,10 @@
 }
 
 
-- (void)setRemainingIdentifier:(NSString *)o_string
+- (void)setRemainingIdentifier:(NSString *)identifier
 {
-    o_remaining_identifier = o_string;
-    b_time_remaining = [[NSUserDefaults standardUserDefaults] boolForKey:o_remaining_identifier];
+    _identifier = identifier;
+    _isTimeRemaining = [[NSUserDefaults standardUserDefaults] boolForKey:_identifier];
 }
 
 - (void)mouseDown: (NSEvent *)ourEvent
@@ -63,12 +63,12 @@
         [[[VLCMain sharedInstance] mainMenu] goToSpecificTime: nil];
     else
     {
-        if (o_remaining_identifier) {
-            b_time_remaining = [[NSUserDefaults standardUserDefaults] boolForKey:o_remaining_identifier];
-            b_time_remaining = !b_time_remaining;
-            [[NSUserDefaults standardUserDefaults] setObject:(b_time_remaining ? @"YES" : @"NO") forKey:o_remaining_identifier];
+        if (_identifier) {
+            _isTimeRemaining = [[NSUserDefaults standardUserDefaults] boolForKey:_identifier];
+            _isTimeRemaining = !_isTimeRemaining;
+            [[NSUserDefaults standardUserDefaults] setObject:(_isTimeRemaining ? @"YES" : @"NO") forKey:_identifier];
         } else {
-            b_time_remaining = !b_time_remaining;
+            _isTimeRemaining = !_isTimeRemaining;
         }
 
         [self updateTimeValue];
@@ -107,10 +107,10 @@
 
 - (BOOL)timeRemaining
 {
-    if (o_remaining_identifier)
-        return [[NSUserDefaults standardUserDefaults] boolForKey:o_remaining_identifier];
+    if (_identifier)
+        return [[NSUserDefaults standardUserDefaults] boolForKey:_identifier];
     else
-        return b_time_remaining;
+        return _isTimeRemaining;
 }
 
 @end

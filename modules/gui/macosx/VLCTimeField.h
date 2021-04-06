@@ -33,7 +33,7 @@
 
 @interface VLCTimeField : NSTextField
 
-- (void)setRemainingIdentifier:(NSString *)o_string;
+- (void)setRemainingIdentifier:(NSString *)identifier;
 - (void)setTime:(NSString *)time withRemainingTime:(NSString *)remainingTime;
 
 @end
