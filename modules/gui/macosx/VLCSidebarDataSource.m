@@ -32,6 +32,8 @@
 #import "PXSourceList/PXSourceList.h"
 #import "PXSourceList/PXSourceListDataSource.h"
 
+#import "CompatibilityFixes.h"
+
 #import "VLCMain.h"
 #import "VLCPlaylist.h"
 #import "VLCMainWindow.h"
