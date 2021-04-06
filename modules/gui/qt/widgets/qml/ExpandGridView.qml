@@ -288,11 +288,8 @@ NavigableFocusScope {
         if (!iMax || iMax > f_l[1])
             iMax= f_l[1]
 
-        for (var id  = iMin; id <= iMax; id++) {
+        for (var id  = iMin; id < iMax; id++) {
             var item = _idChildrenMap[id]
-            if (!item) {
-                continue
-            }
             item.model = model.getDataAt(id)
         }
     }
@@ -315,9 +312,9 @@ NavigableFocusScope {
         target: model
         onDataChanged: {
             var iMin = topLeft.row
-            var iMax = bottomRight.row
+            var iMax = bottomRight.row + 1 // [] => [)
             var f_l = root._currentRange
-            if (iMin <= f_l[1] && f_l[0] <= iMax) {
+            if (iMin < f_l[1] && f_l[0] < iMax) {
                 _refreshData(iMin, iMax)
             }
         }
