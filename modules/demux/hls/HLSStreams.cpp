@@ -99,18 +99,17 @@ int HLSStream::ID3TAG_Parse_Handler(uint32_t i_tag, const uint8_t *p_payload, si
 
 block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
 {
-    if(b_first && p_block &&
-       p_block->i_buffer >= 10 && ID3TAG_IsTag(p_block->p_buffer, false))
+    if(b_first && p_block)
     {
-        while( p_block->i_buffer )
+        while(p_block->i_buffer >= 10 && ID3TAG_IsTag(p_block->p_buffer, false))
         {
             size_t i_size = ID3TAG_Parse( p_block->p_buffer, p_block->i_buffer,
                                           ID3TAG_Parse_Handler, static_cast<void *>(this) );
+            if(i_size >= p_block->i_buffer || i_size == 0)
+                break;
             /* Skip ID3 for demuxer */
             p_block->p_buffer += i_size;
             p_block->i_buffer -= i_size;
-            if( i_size == 0 )
-                break;
         }
     }
 
