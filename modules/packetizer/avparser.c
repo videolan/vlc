@@ -182,20 +182,35 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
     if( unlikely( i_outlen <= 0 || !p_outdata ) )
         goto out;
 
-    block_t * p_ret = block_Alloc( i_outlen );
+    block_t * p_ret;
+    if( (size_t)i_outlen < p_block->i_buffer )
+    {
+        p_ret = block_Alloc( i_outlen );
+        if( unlikely ( !p_ret ) )
+            goto out;
+    }
+    else /* just pass block as-is */
+    {
+        p_ret = p_block;
+    }
 
-    if( unlikely ( !p_ret ) )
-        goto out;
+    if( p_ret != p_block )
+    {
+        p_ret->i_flags = p_block->i_flags;
 
-    p_ret->i_flags = p_block->i_flags;
+        if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+            p_block->i_flags &= ~BLOCK_FLAG_DISCONTINUITY;
 
-    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-        p_block->i_flags &= ~BLOCK_FLAG_DISCONTINUITY;
-
-    memcpy( p_ret->p_buffer, p_outdata, i_outlen );
-    p_ret->i_pts = p_block->i_pts;
-    p_ret->i_dts = p_block->i_dts;
-    p_block->i_pts = p_block->i_dts = VLC_TS_INVALID;
+        memcpy( p_ret->p_buffer, p_outdata, i_outlen );
+        p_ret->i_pts = p_block->i_pts;
+        p_ret->i_dts = p_block->i_dts;
+        p_block->i_pts = p_block->i_dts = VLC_TS_INVALID;
+    }
+    else /* as-is block is now used */
+    {
+        p_sys->i_offset = 0;
+        *pp_block = NULL;
+    }
 
     if( p_dec->fmt_in.i_cat == VIDEO_ES )
     {
