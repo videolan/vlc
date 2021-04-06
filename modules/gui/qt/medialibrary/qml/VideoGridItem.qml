@@ -24,9 +24,6 @@ import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 Widgets.GridItem {
-    property var model: ({})
-    property int index: -1
-
     image: model.thumbnail || VLCStyle.noArtCover
     title: model.title || i18n.qtr("Unknown title")
     subtitle: Helpers.msToString(model.duration) || ""
@@ -40,6 +37,7 @@ Widgets.GridItem {
     playCoverBorder.width: VLCStyle.gridCover_video_border
     titleMargin: VLCStyle.margin_xxsmall
     showNewIndicator: true
+
     onPlayClicked: {
         if ( model.id !== undefined ) {
             g_mainDisplay.showPlayer()

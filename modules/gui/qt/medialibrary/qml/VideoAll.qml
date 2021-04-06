@@ -247,6 +247,12 @@ Widgets.NavigableFocusScope {
                 id: gridItem
 
                 //---------------------------------------------------------------------------------
+                // properties required by ExpandGridView
+
+                property var model: ({})
+                property int index: -1
+
+                //---------------------------------------------------------------------------------
                 // Settings
 
                 opacity: (gridView.expandIndex !== -1

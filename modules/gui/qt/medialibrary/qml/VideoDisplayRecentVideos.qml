@@ -93,37 +93,19 @@ Widgets.NavigableFocusScope {
                 width: VLCStyle.margin_xlarge
             }
 
-            delegate: Widgets.GridItem {
+            delegate: VideoGridItem {
                 id: recentVideoGridItem
 
                 focus: true
                 x: selectedBorderWidth
                 y: selectedBorderWidth
-
-                image: model.thumbnail || VLCStyle.noArtCover
-                title: model.title || i18n.qtr("Unknown title")
-                subtitle: Helpers.msToString(model.duration) || ""
-                labels: [
-                    model.resolution_name || "",
-                    model.channel || ""
-                ].filter(function(a) { return a !== "" } )
-                progress: model.progress > 0 ? model.progress : 0
                 pictureWidth: VLCStyle.gridCover_video_width_large
                 pictureHeight: VLCStyle.gridCover_video_height_large
-                playCoverBorder.width: VLCStyle.gridCover_video_border
-                titleMargin: VLCStyle.margin_xxsmall
                 showNewIndicator: true
                 unselectedUnderlay: shadows.unselected
                 selectedUnderlay: shadows.selected
-                
-                onItemDoubleClicked: {
-                    if ( model.id !== undefined ) {
-                        g_mainDisplay.showPlayer()
-                        medialib.addAndPlay( model.id )
-                    }
-                }
 
-                onPlayClicked: {
+                onItemDoubleClicked: {
                     if ( model.id !== undefined ) {
                         g_mainDisplay.showPlayer()
                         medialib.addAndPlay( model.id )
