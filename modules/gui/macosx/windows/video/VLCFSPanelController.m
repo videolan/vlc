@@ -335,8 +335,11 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     /* Update total duration (right field) */
     NSString *timeString = [NSString stringWithDuration:duration
                                             currentTime:time
-                                               negative:_remainingOrTotalTime.timeRemaining];
-    [_remainingOrTotalTime setStringValue:timeString];
+                                               negative:NO];
+    NSString *remainingTime = [NSString stringWithDuration:duration
+                                            currentTime:time
+                                               negative:YES];
+    [_remainingOrTotalTime setTime:timeString withRemainingTime:remainingTime];
     [_remainingOrTotalTime setNeedsDisplay:YES];
     [_remainingOrTotalTime setHidden:duration <= 0];
 

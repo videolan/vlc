@@ -295,10 +295,13 @@
         [self.timeSlider setEnabled:_playerController.seekable];
     }
 
-    NSString *time = [NSString stringWithDuration:duration
-                                      currentTime:_playerController.time
-                                         negative:self.timeField.timeRemaining];
-    [self.timeField setStringValue:time];
+    NSString *timeString = [NSString stringWithDuration:duration
+                                            currentTime:_playerController.time
+                                               negative:NO];
+    NSString *remainingTime = [NSString stringWithDuration:duration
+                                               currentTime:_playerController.time
+                                                  negative:YES];
+    [self.timeField setTime:timeString withRemainingTime:remainingTime];
     [self.timeField setNeedsDisplay:YES];
 }
 
