@@ -118,10 +118,10 @@ StreamFormat::StreamFormat(const void *data_, size_t sz)
     else /* Check Packet Audio formats */
     {
         /* It MUST have ID3 header, but HLS spec is an oxymoron */
-        if(sz > 10 && ID3TAG_IsTag(data, false))
+        while(sz > 10 && ID3TAG_IsTag(data, false))
         {
             size_t tagsize = ID3TAG_Parse(data, sz, ID3Callback, this);
-            if(tagsize >= sz)
+            if(tagsize >= sz || tagsize == 0)
                 return; /* not enough peek */
             data += tagsize;
             sz -= tagsize;
