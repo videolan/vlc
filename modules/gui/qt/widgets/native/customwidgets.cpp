@@ -30,6 +30,7 @@
 #include "customwidgets.hpp"
 #include "qt.hpp"               /* needed for qtr,  but not necessary */
 
+#include <QtMath>  // for wheel deadzone calculation
 #include <QPainter>
 #include <QRect>
 #include <QKeyEvent>
@@ -296,22 +297,28 @@ int qtEventToVLCKey( QKeyEvent *e )
 
 int qtWheelEventToVLCKey( const QWheelEvent& e )
 {
-    int i_vlck = 0;
-    /* Handle modifiers */
-    i_vlck |= qtKeyModifiersToVLC( e );
+    const qreal v_cos_deadzone = 0.45; // ~63 degrees
+    const qreal h_cos_deadzone = 0.95; // ~15 degrees
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-    if ( e.angleDelta().y() > 0 )
-#else
-    if ( e.delta() > 0 )
-#endif
+    int i_vlck = qtKeyModifiersToVLC(e);  // Handle modifiers
+
+    QPoint p = e.angleDelta();
+    if (!p.isNull())
     {
-        i_vlck |= KEY_MOUSEWHEELUP;
+        qreal cos = qFabs(p.x())/qSqrt(qPow(p.x(), 2) + qPow(p.y(), 2));
+
+        if (cos < v_cos_deadzone)
+        {
+            if (p.y() > 0) i_vlck |= KEY_MOUSEWHEELUP;
+            else           i_vlck |= KEY_MOUSEWHEELDOWN;
+        }
+        else if (cos > h_cos_deadzone)
+        {
+            if (p.x() > 0) i_vlck |= KEY_MOUSEWHEELLEFT;
+            else           i_vlck |= KEY_MOUSEWHEELRIGHT;
+        }
     }
-    else
-    {
-        i_vlck |= KEY_MOUSEWHEELDOWN;
-    }
+
     return i_vlck;
 }
 
