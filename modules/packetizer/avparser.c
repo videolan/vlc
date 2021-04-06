@@ -195,10 +195,28 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
     memcpy( p_ret->p_buffer, p_outdata, i_outlen );
     p_ret->i_pts = p_block->i_pts;
     p_ret->i_dts = p_block->i_dts;
+    p_block->i_pts = p_block->i_dts = VLC_TS_INVALID;
+
+    if( p_dec->fmt_in.i_cat == VIDEO_ES )
+    {
+        switch ( p_sys->p_parser_ctx->pict_type )
+        {
+        case AV_PICTURE_TYPE_I:
+            p_ret->i_flags |= BLOCK_FLAG_TYPE_I;
+            break;
+        case AV_PICTURE_TYPE_P:
+            p_ret->i_flags |= BLOCK_FLAG_TYPE_P;
+            break;
+        case AV_PICTURE_TYPE_B:
+            p_ret->i_flags |= BLOCK_FLAG_TYPE_B;
+            break;
+        default:
+            break;
+        }
+    }
+
     if( p_sys->p_parser_ctx->key_frame == 1 )
         p_ret->i_flags |= BLOCK_FLAG_TYPE_I;
-
-    p_block->i_pts = p_block->i_dts = VLC_TS_INVALID;
 
     return p_ret;
 
