@@ -256,16 +256,10 @@ MarshalCanGoNext( intf_thread_t *p_intf, DBusMessageIter *container )
 {
     vlc_playlist_t *playlist = p_intf->p_sys->playlist;
     vlc_playlist_Lock(playlist);
-    size_t count = vlc_playlist_Count(playlist);
-    ssize_t index = vlc_playlist_GetCurrentIndex(playlist);
-    enum vlc_playlist_playback_repeat repeat_mode =
-        vlc_playlist_GetPlaybackRepeat(playlist);
+    bool has_next = vlc_playlist_HasNext(playlist);
     vlc_playlist_Unlock(playlist);
 
-    dbus_bool_t b_can_go_next =
-        count != 0 &&
-        ((index != -1 && (size_t)index < count - 1) ||
-         repeat_mode != VLC_PLAYLIST_PLAYBACK_REPEAT_NONE);
+    dbus_bool_t b_can_go_next = has_next;
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
                                          &b_can_go_next ) )
@@ -279,15 +273,10 @@ MarshalCanGoPrevious( intf_thread_t *p_intf, DBusMessageIter *container )
 {
     vlc_playlist_t *playlist = p_intf->p_sys->playlist;
     vlc_playlist_Lock(playlist);
-    size_t count = vlc_playlist_Count(playlist);
-    ssize_t index = vlc_playlist_GetCurrentIndex(playlist);
-    enum vlc_playlist_playback_repeat repeat_mode =
-        vlc_playlist_GetPlaybackRepeat(playlist);
+    bool has_prev = vlc_playlist_HasPrev(playlist);
     vlc_playlist_Unlock(playlist);
 
-    dbus_bool_t b_can_go_previous =
-        count != 0 &&
-        (index > 0 || repeat_mode != VLC_PLAYLIST_PLAYBACK_REPEAT_NONE);
+    dbus_bool_t b_can_go_previous = has_prev;
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
                                          &b_can_go_previous ) )
