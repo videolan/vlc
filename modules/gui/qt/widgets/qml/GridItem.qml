@@ -43,7 +43,6 @@ FocusScope {
 
     property alias progress: picture.progress
     property alias labels: picture.labels
-    property bool showNewIndicator: false
     property real pictureWidth: VLCStyle.colWidth(1)
     property real pictureHeight: pictureWidth
     property int titleMargin: VLCStyle.margin_xsmall
@@ -67,7 +66,6 @@ FocusScope {
 
     readonly property int selectedBorderWidth: VLCStyle.gridItemSelectedBorder
 
-    property int _newIndicatorMedian: VLCStyle.margin_xsmall
     property int _modifiersOnLastPress: Qt.NoModifier
 
     state: highlighted ? "selected" : "unselected"
@@ -92,11 +90,6 @@ FocusScope {
                 playCoverOpacity: 0
                 playCoverVisible: false
             }
-
-            PropertyChanges {
-                target: root
-                _newIndicatorMedian: VLCStyle.margin_xsmall
-            }
         },
         State {
             name: "selected"
@@ -118,11 +111,6 @@ FocusScope {
                 playCoverOpacity: 1
                 playCoverVisible: true
             }
-
-            PropertyChanges {
-                target: root
-                _newIndicatorMedian: VLCStyle.margin_small
-            }
         }
     ]
 
@@ -138,19 +126,10 @@ FocusScope {
                     properties: "playCoverVisible,visible"
                 }
 
-                ParallelAnimation {
-                    NumberAnimation {
-                        properties: "opacity,playCoverOpacity"
-                        duration: 240
-                        easing.type: Easing.InSine
-                    }
-
-                    SmoothedAnimation {
-                        target: root
-                        property: "_newIndicatorMedian"
-                        duration: 240
-                        easing.type: Easing.InSine
-                    }
+                NumberAnimation {
+                    properties: "opacity,playCoverOpacity"
+                    duration: 240
+                    easing.type: Easing.InSine
                 }
 
                 PropertyAction {
@@ -170,19 +149,10 @@ FocusScope {
                     property: "visible"
                 }
 
-                ParallelAnimation {
-                    NumberAnimation {
-                        properties: "opacity,playCoverOpacity"
-                        duration: 200
-                        easing.type: Easing.OutSine
-                    }
-
-                    SmoothedAnimation {
-                        target: root
-                        duration: 200
-                        property: "_newIndicatorMedian"
-                        easing.type: Easing.OutSine
-                    }
+                NumberAnimation {
+                    properties: "opacity,playCoverOpacity"
+                    duration: 200
+                    easing.type: Easing.OutSine
                 }
 
                 PropertyAction {
@@ -277,22 +247,6 @@ FocusScope {
                 onPlayIconClicked: root.playClicked()
                 clip: true
                 radius: VLCStyle.gridCover_radius
-
-                /* new indicator (triangle at top-left of cover)*/
-                Rectangle {
-                    id: newIndicator
-
-                    // consider this Rectangle as a triangle, then following property is its median length
-                    property alias median: root._newIndicatorMedian
-
-                    x: parent.width - median
-                    y: - median
-                    width: 2 * median
-                    height: 2 * median
-                    color: VLCStyle.colors.accent
-                    rotation: 45
-                    visible: root.showNewIndicator && root.progress === 0
-                }
             }
 
             Widgets.ScrollingText {

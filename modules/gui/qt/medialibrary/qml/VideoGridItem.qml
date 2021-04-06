@@ -24,6 +24,11 @@ import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 Widgets.GridItem {
+    id: root
+
+    property bool showNewIndicator: true
+    property int newIndicatorMedian: root.highlighted ? VLCStyle.icon_small : VLCStyle.icon_xsmall
+
     image: model.thumbnail || VLCStyle.noArtCover
     title: model.title || i18n.qtr("Unknown title")
     subtitle: Helpers.msToString(model.duration) || ""
@@ -36,12 +41,36 @@ Widgets.GridItem {
     pictureHeight: VLCStyle.gridCover_video_height
     playCoverBorder.width: VLCStyle.gridCover_video_border
     titleMargin: VLCStyle.margin_xxsmall
-    showNewIndicator: true
 
     onPlayClicked: {
         if ( model.id !== undefined ) {
             g_mainDisplay.showPlayer()
             medialib.addAndPlay( model.id )
+        }
+    }
+    
+    Behavior on newIndicatorMedian {
+        NumberAnimation {
+            duration: 200
+            easing.type: Easing.InOutSine
+        }
+    }
+
+    Item {
+        clip: true
+        x: parent.width - width
+        y: 0
+        width: 2 * root.newIndicatorMedian
+        height: 2 * root.newIndicatorMedian
+        visible: root.showNewIndicator && model.progress <= 0
+
+        Rectangle {
+            x: parent.width - root.newIndicatorMedian
+            y: - root.newIndicatorMedian
+            width: 2 * root.newIndicatorMedian
+            height: 2 * root.newIndicatorMedian
+            color: VLCStyle.colors.accent
+            rotation: 45
         }
     }
 }

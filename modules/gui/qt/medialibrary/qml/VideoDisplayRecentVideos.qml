@@ -101,7 +101,6 @@ Widgets.NavigableFocusScope {
                 y: selectedBorderWidth
                 pictureWidth: VLCStyle.gridCover_video_width_large
                 pictureHeight: VLCStyle.gridCover_video_height_large
-                showNewIndicator: true
                 unselectedUnderlay: shadows.unselected
                 selectedUnderlay: shadows.selected
 
