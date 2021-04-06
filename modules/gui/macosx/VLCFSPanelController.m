@@ -285,17 +285,13 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     } else {
         [_remainingOrTotalTime setHidden:NO];
 
-        NSString *totalTime;
+        mtime_t remaining = 0;
+        if (dur > t)
+            remaining = dur - t;
+        NSString *remainingTime = [NSString stringWithFormat:@"-%s", secstotimestr(psz_time, (remaining / 1000000))];
+        NSString *totalTime = toNSStr(secstotimestr(psz_time, (dur / 1000000)));
 
-        if ([_remainingOrTotalTime timeRemaining]) {
-            mtime_t remaining = 0;
-            if (dur > t)
-                remaining = dur - t;
-            totalTime = [NSString stringWithFormat:@"-%s", secstotimestr(psz_time, (remaining / 1000000))];
-        } else {
-            totalTime = toNSStr(secstotimestr(psz_time, (dur / 1000000)));
-        }
-        [_remainingOrTotalTime setStringValue:totalTime];
+        [_remainingOrTotalTime setTime:totalTime withRemainingTime:remainingTime];
     }
 
     /* Update current position (left field) */

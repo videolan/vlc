@@ -319,14 +319,14 @@
     p_input = pl_CurrentInput(getIntf());
     if (p_input != NULL) {
         vlc_value_t pos;
-        NSString * o_time;
 
         pos.f_float = f_updated / 10000.;
         var_Set(p_input, "position", pos);
         [self.timeSlider setFloatValue: f_updated];
 
-        o_time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString: p_input negative:[self.timeField timeRemaining]];
-        [self.timeField setStringValue: o_time];
+        NSString *time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString:p_input negative:NO];
+        NSString *remainingTime = [[VLCStringUtility sharedInstance] getCurrentTimeAsString:p_input negative:YES];
+        [self.timeField setTime:time withRemainingTime:remainingTime];
         vlc_object_release(p_input);
     }
 }
@@ -372,9 +372,9 @@
         [self.timeSlider setIndefinite:buffering];
     }
 
-    NSString *time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString:p_input
-                                                                      negative:[self.timeField timeRemaining]];
-    [self.timeField setStringValue:time];
+    NSString *time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString:p_input negative:NO];
+    NSString *remainingTime = [[VLCStringUtility sharedInstance] getCurrentTimeAsString:p_input negative:YES];
+    [self.timeField setTime:time withRemainingTime:remainingTime];
     [self.timeField setNeedsDisplay:YES];
 
     vlc_object_release(p_input);

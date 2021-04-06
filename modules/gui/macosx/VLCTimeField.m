@@ -32,6 +32,9 @@
 {
     NSString *o_remaining_identifier;
     BOOL b_time_remaining;
+
+    NSString *_cachedTime;
+    NSString *_remainingTime;
 }
 @end
 
@@ -67,9 +70,39 @@
         } else {
             b_time_remaining = !b_time_remaining;
         }
+
+        [self updateTimeValue];
     }
 
     [[self nextResponder] mouseDown:ourEvent];
+}
+
+- (void)setTime:(NSString *)time withRemainingTime:(NSString *)remainingTime
+{
+    _cachedTime = time;
+    _remainingTime = remainingTime;
+
+    [self updateTimeValue];
+}
+
+- (void)updateTimeValue
+{
+    if (!_cachedTime || !_remainingTime)
+        return;
+
+    if ([self timeRemaining]) {
+        [super setStringValue:_remainingTime];
+    } else {
+        [super setStringValue:_cachedTime];
+    }
+}
+
+- (void)setStringValue:(NSString *)stringValue
+{
+    [super setStringValue:stringValue];
+
+    _cachedTime = nil;
+    _remainingTime = nil;
 }
 
 - (BOOL)timeRemaining
