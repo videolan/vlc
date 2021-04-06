@@ -187,6 +187,11 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
     if( unlikely ( !p_ret ) )
         goto out;
 
+    p_ret->i_flags = p_block->i_flags;
+
+    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+        p_block->i_flags &= ~BLOCK_FLAG_DISCONTINUITY;
+
     memcpy( p_ret->p_buffer, p_outdata, i_outlen );
     p_ret->i_pts = p_block->i_pts;
     p_ret->i_dts = p_block->i_dts;
