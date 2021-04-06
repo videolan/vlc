@@ -139,6 +139,10 @@ static void playlist_on_playback_order_changed(vlc_playlist_t *,
                                                void *);
 static void playlist_on_current_index_changed(vlc_playlist_t *,
                                               ssize_t, void *);
+static void playlist_on_has_prev_changed(vlc_playlist_t *playlist,
+                                         bool has_prev, void *data);
+static void playlist_on_has_next_changed(vlc_playlist_t *playlist,
+                                         bool has_next, void *data);
 
 static void player_on_state_changed(vlc_player_t *,
                                     enum vlc_player_state, void *);
@@ -265,6 +269,8 @@ static int Open( vlc_object_t *p_this )
         .on_playback_repeat_changed = playlist_on_playback_repeat_changed,
         .on_playback_order_changed = playlist_on_playback_order_changed,
         .on_current_index_changed = playlist_on_current_index_changed,
+        .on_has_prev_changed = playlist_on_has_prev_changed,
+        .on_has_next_changed = playlist_on_has_next_changed,
     };
     p_sys->playlist_listener =
         vlc_playlist_AddListener(playlist, &playlist_cbs, p_intf, false);
@@ -679,6 +685,12 @@ static void ProcessEvents( intf_thread_t *p_intf,
         case SIGNAL_SEEK:
             SeekedEmit( p_intf );
             break;
+        case SIGNAL_CAN_GO_PREVIOUS:
+            vlc_dictionary_insert( &player_properties, "CanGoPrevious", NULL );
+            break;
+        case SIGNAL_CAN_GO_NEXT:
+            vlc_dictionary_insert( &player_properties, "CanGoNext", NULL );
+            break;
         default:
             vlc_assert_unreachable();
         }
@@ -1029,6 +1041,24 @@ playlist_on_current_index_changed(vlc_playlist_t *playlist,
     add_event_signal(data,
             &(callback_info_t){ .signal = SIGNAL_ITEM_CURRENT });
     (void) playlist; (void) index;
+}
+
+static void
+playlist_on_has_prev_changed(vlc_playlist_t *playlist, bool has_prev,
+                             void *data)
+{
+    add_event_signal(data,
+            &(callback_info_t){ .signal = SIGNAL_CAN_GO_PREVIOUS });
+    (void) playlist; (void) has_prev;
+}
+
+static void
+playlist_on_has_next_changed(vlc_playlist_t *playlist, bool has_next,
+                             void *data)
+{
+    add_event_signal(data,
+            &(callback_info_t){ .signal = SIGNAL_CAN_GO_NEXT });
+    (void) playlist; (void) has_next;
 }
 
 static void

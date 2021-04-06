@@ -837,6 +837,8 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
         PROPERTY_ENTRY( CanSeek,        "b"     )
         PROPERTY_ENTRY( CanPlay,        "b"     )
         PROPERTY_ENTRY( CanPause,       "b"     )
+        PROPERTY_ENTRY( CanGoPrevious,  "b"     )
+        PROPERTY_ENTRY( CanGoNext,      "b"     )
         PROPERTY_MAPPING_END
 
         free( ppsz_properties[i] );
