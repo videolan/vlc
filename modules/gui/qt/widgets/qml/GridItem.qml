@@ -63,14 +63,14 @@ FocusScope {
     implicitWidth: mouseArea.implicitWidth
     implicitHeight: mouseArea.implicitHeight
 
-    readonly property bool _highlighted: mouseArea.containsMouse || root.activeFocus
+    readonly property bool highlighted: mouseArea.containsMouse || root.activeFocus
 
     readonly property int selectedBorderWidth: VLCStyle.gridItemSelectedBorder
 
     property int _newIndicatorMedian: VLCStyle.margin_xsmall
     property int _modifiersOnLastPress: Qt.NoModifier
 
-    state: _highlighted ? "selected" : "unselected"
+    state: highlighted ? "selected" : "unselected"
     states: [
         State {
             name: "unselected"
@@ -248,7 +248,7 @@ FocusScope {
             width: root.width + ( root.selectedBorderWidth * 2 )
             height:  root.height + ( root.selectedBorderWidth * 2 )
             color: VLCStyle.colors.bgHover
-            visible: root.selected || root._highlighted
+            visible: root.selected || root.highlighted
         }
 
         Loader {
@@ -273,7 +273,7 @@ FocusScope {
 
                 width: pictureWidth
                 height: pictureHeight
-                playCoverVisible: root._highlighted
+                playCoverVisible: root.highlighted
                 onPlayIconClicked: root.playClicked()
                 clip: true
                 radius: VLCStyle.gridCover_radius
@@ -299,7 +299,7 @@ FocusScope {
                 id: titleTextRect
 
                 label: titleLabel
-                scroll: _highlighted
+                scroll: highlighted
                 height: titleLabel.height
                 width: titleLabel.width
                 visible: root.title !== ""
