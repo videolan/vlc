@@ -36,11 +36,28 @@ Widgets.GridItem {
         model.resolution_name || "",
         model.channel || ""
     ].filter(function(a) { return a !== "" } )
-    progress: model.progress > 0 ? model.progress : 0
     pictureWidth: VLCStyle.gridCover_video_width
     pictureHeight: VLCStyle.gridCover_video_height
     playCoverBorder.width: VLCStyle.gridCover_video_border
     titleMargin: VLCStyle.margin_xxsmall
+
+    pictureOverlay: Item {
+        width: root.pictureWidth
+        height: root.pictureHeight
+
+        Widgets.VideoProgressBar {
+            id: progressBar
+
+            visible: !root.highlighted && value > 0
+            value: model.progress > 0 ? model.progress : 0
+            anchors {
+                bottom: parent.bottom
+                left: parent.left
+                right: parent.right
+                rightMargin: root.pictureRadius
+            }
+        }
+    }
 
     onPlayClicked: {
         if ( model.id !== undefined ) {

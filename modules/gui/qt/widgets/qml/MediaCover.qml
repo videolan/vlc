@@ -27,7 +27,6 @@ Widgets.RoundImage {
     id: root
 
     property var labels: []
-    property alias progress: progressBar.value
     property alias playCoverOpacity: playCover.opacity
     property alias playCoverVisible: playCover.visible
     property alias playCoverOnlyBorders: playCover.onlyBorders
@@ -68,17 +67,6 @@ Widgets.RoundImage {
 
         Item {
             Layout.fillWidth: true
-        }
-    }
-
-    Widgets.VideoProgressBar {
-        id: progressBar
-
-        visible: !playCover.visible && value > 0
-        anchors {
-            bottom: parent.bottom
-            left: parent.left
-            right: parent.right
         }
     }
 

@@ -41,7 +41,6 @@ FocusScope {
     property alias unselectedUnderlay: unselectedUnderlayLoader.sourceComponent
     property alias selectedUnderlay: selectedUnderlayLoader.sourceComponent
 
-    property alias progress: picture.progress
     property alias labels: picture.labels
     property real pictureWidth: VLCStyle.colWidth(1)
     property real pictureHeight: pictureWidth
