@@ -317,7 +317,7 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"%@: name: %@, number of children %li", NSStringFromClass([self class]), [self name], [self numberOfChildren]];
+    return [NSString stringWithFormat:@"%@: name: %@, number of children %i", NSStringFromClass([self class]), [self name], [self numberOfChildren]];
 }
 
 - (VLCTreeItem *)childAtIndex:(NSInteger)i_index
