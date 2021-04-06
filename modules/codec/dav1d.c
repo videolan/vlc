@@ -285,7 +285,10 @@ static int OpenDecoder(vlc_object_t *p_this)
     dav1d_default_settings(&p_sys->s);
     p_sys->s.n_tile_threads = var_InheritInteger(p_this, "dav1d-thread-tiles");
     if (p_sys->s.n_tile_threads == 0)
-        p_sys->s.n_tile_threads = VLC_CLIP(vlc_GetCPUCount(), 1, 4);
+        p_sys->s.n_tile_threads =
+            (i_core_count > 4) ? 4 :
+            (i_core_count > 1) ? i_core_count :
+            1;
     p_sys->s.n_frame_threads = var_InheritInteger(p_this, "dav1d-thread-frames");
     if (p_sys->s.n_frame_threads == 0)
         p_sys->s.n_frame_threads = (i_core_count < 16) ? i_core_count : 16;
