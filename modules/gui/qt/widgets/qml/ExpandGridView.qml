@@ -86,6 +86,7 @@ NavigableFocusScope {
 
     property var _idChildrenMap: ({})
     property var _unusedItemList: []
+    property var _currentRange: [0,0]
 
     Accessible.role: Accessible.Table
 
@@ -200,7 +201,7 @@ NavigableFocusScope {
         root._isInitialised = true;
     }
 
-    function _getFirstAndLastInstanciatedItemIds() {
+    function _calculateCurrentRange() {
         var myContentY = flickable.contentY - root.headerHeight - topMargin
 
         var contentYWithoutExpand = myContentY
@@ -281,7 +282,7 @@ NavigableFocusScope {
     }
 
     function _refreshData( iMin, iMax ) {
-        var f_l = _getFirstAndLastInstanciatedItemIds()
+        var f_l = root._currentRange
         if (!iMin || iMin < f_l[0])
             iMin = f_l[0]
         if (!iMax || iMax > f_l[1])
@@ -315,7 +316,7 @@ NavigableFocusScope {
         onDataChanged: {
             var iMin = topLeft.row
             var iMax = bottomRight.row
-            var f_l = _getFirstAndLastInstanciatedItemIds()
+            var f_l = root._currentRange
             if (iMin <= f_l[1] && f_l[0] <= iMax) {
                 _refreshData(iMin, iMax)
             }
@@ -448,14 +449,18 @@ NavigableFocusScope {
             var i
             var expandItemGridId = getExpandItemGridId()
 
-            var f_l = _getFirstAndLastInstanciatedItemIds()
+            var f_l = _calculateCurrentRange()
             var nbItems = f_l[1] - f_l[0]
             var firstId = f_l[0]
             var lastId = f_l[1]
 
             var topGridEndId = Math.max(Math.min(expandItemGridId, lastId), firstId)
 
+            if (!forceRelayout && root._currentRange[0] === firstId && root._currentRange[1] === lastId)
+                return;
+
             _updateChildrenMap(firstId, lastId)
+            root._currentRange = [firstId, lastId]
 
             var item
             var pos
