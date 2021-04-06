@@ -183,13 +183,6 @@ NavigableFocusScope {
         }
     }
 
-    function _updateSelected() {
-        for (var id in _idChildrenMap) {
-            var item = _idChildrenMap[id]
-            item.selected = delegateModel.isSelected(model.index(id, 0))
-        }
-    }
-
     function _initialize() {
         if (root._isInitialised)
             return;
@@ -237,6 +230,7 @@ NavigableFocusScope {
         item.focus = (id === root.currentIndex) && (root.expandIndex === -1)
         item.x = x
         item.y = y
+        item.selected = delegateModel.isSelected(model.index(id, 0))
     }
 
     function _recycleItem(id, x, y) {
@@ -246,7 +240,7 @@ NavigableFocusScope {
 
         item.index = id
         item.model = model.getDataAt(id)
-
+        item.selected = delegateModel.isSelected(model.index(id, 0))
         item.focus = (id === root.currentIndex) && (root.expandIndex === -1)
         item.x = x
         item.y = y
@@ -257,6 +251,7 @@ NavigableFocusScope {
 
     function _createItem(id, x, y) {
         var item = root.delegate.createObject( flickable.contentItem, {
+                        selected: delegateModel.isSelected(model.index(id, 0)),
                         index: id,
                         model: model.getDataAt(id),
                         focus: (id === root.currentIndex) && (root.expandIndex === -1),
@@ -321,6 +316,35 @@ NavigableFocusScope {
         onRowsInserted: _onModelCountChanged()
         onRowsRemoved: _onModelCountChanged()
         onModelReset: _onModelCountChanged()
+    }
+
+    Connections {
+        target: delegateModel
+
+        onSelectionChanged: {
+            var i
+            for (i = 0; i < selected.length; ++i) {
+                _updateSelectedRange(selected[i].topLeft, selected[i].bottomRight, true)
+            }
+
+            for (i = 0; i < deselected.length; ++i) {
+                _updateSelectedRange(deselected[i].topLeft, deselected[i].bottomRight, false)
+            }
+        }
+
+        function _updateSelectedRange(topLeft, bottomRight, select) {
+            var iMin = topLeft.row
+            var iMax = bottomRight.row + 1 // [] => [)
+            if (iMin < root._currentRange[1] && root._currentRange[0] < iMax) {
+                iMin = Math.max(iMin, root._currentRange[0])
+                iMax = Math.min(iMax, root._currentRange[1])
+                for (var j = iMin; j < iMax; j++) {
+                    var item = root._idChildrenMap[j]
+                    console.assert(item)
+                    item.selected = select
+                }
+            }
+        }
     }
 
     onModelChanged: _onModelCountChanged()
@@ -477,8 +501,6 @@ NavigableFocusScope {
             contentHeight = newContentHeight + root.bottomMargin // topMargin is included from root.getItemPos
             contentHeight += footerItemLoader.item ? footerItemLoader.item.height : 0
             contentWidth = root._effectiveCellWidth * root.getNbItemsPerRow() - root.horizontalSpacing
-
-            _updateSelected()
         }
 
         Connections {
@@ -579,7 +601,6 @@ NavigableFocusScope {
         if (expandIndex !== -1)
             retract()
         flickable.setCurrentItemFocus()
-        _updateSelected()
         positionViewAtIndex(root.currentIndex, ItemView.Contain)
     }
 
@@ -621,8 +642,6 @@ NavigableFocusScope {
 
         if (!event.accepted)
             defaultKeyAction(event, currentIndex)
-
-        _updateSelected()
     }
 
     Keys.onReleased: {
@@ -633,7 +652,5 @@ NavigableFocusScope {
             event.accepted = true
             root.actionAtIndex(currentIndex)
         }
-
-        _updateSelected()
     }
 }
