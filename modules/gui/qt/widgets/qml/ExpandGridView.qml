@@ -287,6 +287,10 @@ NavigableFocusScope {
             var item = _idChildrenMap[id]
             item.model = model.getDataAt(id)
         }
+
+        if (root.expandIndex >= iMin && root.expandIndex < iMax) {
+            expandItem.model = model.getDataAt(root.expandIndex)
+        }
     }
 
     function _onModelCountChanged() {
