@@ -639,8 +639,9 @@ static void AccessGetMeta(stream_t *access, vlc_meta_t *meta)
         {
             char yearbuf[5];
 
-            snprintf(yearbuf, sizeof (yearbuf), "%u", year);
-            vlc_meta_SetDate(meta, yearbuf);
+            int ret = snprintf(yearbuf, sizeof (yearbuf), "%u", year);
+            if (ret >= 0 && (size_t) ret < sizeof (yearbuf))
+                vlc_meta_SetDate(meta, yearbuf);
         }
 
         /* Set artist only if identical across tracks */
