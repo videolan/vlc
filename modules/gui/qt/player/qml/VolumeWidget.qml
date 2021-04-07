@@ -218,7 +218,7 @@ FocusScope{
                         }
 
                         if(pressed)
-                            volControl.value = volControl.maxvolpos * event.x / (volControl.width)
+                            volControl.value = volControl.maxvolpos * event.x / sliderMouseArea.width
                     }
 
                     onWheel: {
