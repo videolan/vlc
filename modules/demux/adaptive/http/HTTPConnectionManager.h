@@ -55,6 +55,7 @@ namespace adaptive
                 virtual AbstractChunkSource *makeSource(const std::string &,
                                                         const ID &, ChunkType,
                                                         const BytesRange &) = 0;
+                virtual void recycleSource(AbstractChunkSource *) = 0;
 
                 virtual void start(AbstractChunkSource *) = 0;
                 virtual void cancel(AbstractChunkSource *) = 0;
@@ -64,6 +65,7 @@ namespace adaptive
                 void setDownloadRateObserver(IDownloadRateObserver *);
 
             protected:
+                void deleteSource(AbstractChunkSource *);
                 vlc_object_t                                       *p_object;
 
             private:
@@ -81,6 +83,7 @@ namespace adaptive
                 virtual AbstractChunkSource *makeSource(const std::string &,
                                                         const ID &, ChunkType,
                                                         const BytesRange &) override;
+                virtual void recycleSource(AbstractChunkSource *) override;
 
                 virtual void start(AbstractChunkSource *)  override;
                 virtual void cancel(AbstractChunkSource *)  override;
