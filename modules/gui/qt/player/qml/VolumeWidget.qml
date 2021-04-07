@@ -205,14 +205,15 @@ FocusScope{
 
                     onPositionChanged: function (event) {
                         if (sliderMouseArea.pressedButtons === Qt.RightButton) {
-                            if (sliderMouseArea.mouseX < sliderMouseArea.width * volControl.fullvolpos / 4)
+                            var pos = sliderMouseArea.mouseX * volControl.maxvolpos / sliderMouseArea.width
+                            if (pos < 0.25)
                                 volControl.value = 0
-                            else if (sliderMouseArea.mouseX < sliderMouseArea.width * volControl.fullvolpos * 3 / 4)
+                            else if (pos < 0.75)
                                 volControl.value = 0.5
-                            else if (sliderMouseArea.mouseX >= sliderMouseArea.width)
-                                volControl.value = 1.25
-                            else
+                            else if (pos < 1.125)
                                 volControl.value = 1
+                            else
+                                volControl.value = 1.25
                             return
                         }
 
