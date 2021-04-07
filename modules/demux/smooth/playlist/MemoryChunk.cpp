@@ -51,6 +51,11 @@ size_t MemoryChunkSource::getBytesRead() const
     return i_read;
 }
 
+void MemoryChunkSource::recycle()
+{
+    delete this;
+}
+
 block_t * MemoryChunkSource::readBlock()
 {
     block_t *p_block = nullptr;

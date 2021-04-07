@@ -38,6 +38,7 @@ namespace smooth
                 virtual block_t * read(size_t) override;
                 virtual bool      hasMoreData() const override;
                 virtual size_t    getBytesRead() const  override;
+                virtual void      recycle() override;
 
             private:
                 block_t *data;

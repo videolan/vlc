@@ -81,7 +81,7 @@ AbstractChunk::AbstractChunk(AbstractChunkSource *source_)
 
 AbstractChunk::~AbstractChunk()
 {
-    delete source;
+    source->recycle();
 }
 
 std::string AbstractChunk::getContentType() const
@@ -245,6 +245,11 @@ block_t * HTTPChunkSource::read(size_t readsize)
     }
 
     return p_block;
+}
+
+void HTTPChunkSource::recycle()
+{
+    connManager->recycleSource(this);
 }
 
 std::string HTTPChunkSource::getContentType() const

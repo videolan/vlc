@@ -65,6 +65,10 @@ void AbstractConnectionManager::setDownloadRateObserver(IDownloadRateObserver *o
     rateObserver = obs;
 }
 
+void AbstractConnectionManager::deleteSource(AbstractChunkSource *source)
+{
+    delete source;
+}
 
 HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *p_object_)
     : AbstractConnectionManager( p_object_ ),
@@ -166,6 +170,11 @@ AbstractChunkSource *HTTPConnectionManager::makeSource(const std::string &url,
         default:
             return new HTTPChunkSource(url, this, id, type, range, true);
     }
+}
+
+void HTTPConnectionManager::recycleSource(AbstractChunkSource *source)
+{
+    deleteSource(source);
 }
 
 void HTTPConnectionManager::start(AbstractChunkSource *source)

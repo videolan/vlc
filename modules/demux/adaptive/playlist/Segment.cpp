@@ -110,7 +110,7 @@ SegmentChunk* ISegment::toChunk(SharedResources *res, AbstractConnectionManager 
         }
         else
         {
-            delete source;
+            connManager->recycleSource(source);
         }
     }
     return nullptr;
