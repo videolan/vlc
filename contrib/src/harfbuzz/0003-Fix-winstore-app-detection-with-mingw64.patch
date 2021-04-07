@@ -51,7 +51,7 @@ index e7f8b1c4..f48d6b29 100644
  typedef CRITICAL_SECTION hb_mutex_impl_t;
  #define HB_MUTEX_IMPL_INIT	{0}
 -#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY==WINAPI_FAMILY_PC_APP || WINAPI_FAMILY==WINAPI_FAMILY_PHONE_APP)
-+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
++#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
  #define hb_mutex_impl_init(M)	InitializeCriticalSectionEx (M, 0, 0)
  #else
  #define hb_mutex_impl_init(M)	InitializeCriticalSection (M)
