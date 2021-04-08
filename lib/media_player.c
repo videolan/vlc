@@ -1364,7 +1364,7 @@ int libvlc_media_player_get_chapter_count_for_title(
         goto end;
 
     size_t titles_count = vlc_player_title_list_GetCount(titles);
-    if (idx < titles_count)
+    if (idx >= titles_count)
        goto end;
 
     const struct vlc_player_title *title =
@@ -1489,7 +1489,7 @@ int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_player_t *p_
         goto end;
 
     size_t titles_count = vlc_player_title_list_GetCount(titles);
-    if (i_chapters_of_title < (int) titles_count)
+    if (i_chapters_of_title >= (int) titles_count)
        goto end;
 
     const struct vlc_player_title *title =
