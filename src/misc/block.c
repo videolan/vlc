@@ -107,7 +107,7 @@ static void BlockMetaCopy( block_t *restrict out, const block_t *in )
 
 block_t *block_Alloc (size_t size)
 {
-    if (unlikely(size >> 27))
+    if (unlikely(size >> 28))
     {
         errno = ENOBUFS;
         return NULL;
