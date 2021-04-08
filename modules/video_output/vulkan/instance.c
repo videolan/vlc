@@ -31,6 +31,17 @@
 
 #include "instance.h"
 
+static int vlc_vk_start(void *func, bool forced, va_list ap)
+{
+    int (*activate)(vlc_vk_t *vk) = func;
+    vlc_vk_t *vk = va_arg(ap, vlc_vk_t *);
+
+    int ret = activate(vk);
+    /* TODO: vlc_objres_clear, which is not in the public API. */
+    (void)forced;
+    return ret;
+}
+
 /**
  * Creates a Vulkan surface (and its underlying instance).
  *
@@ -51,9 +62,16 @@ vlc_vk_t *vlc_vk_Create(struct vout_window_t *wnd, const char *name)
     vk->instance = NULL;
     vk->surface = (VkSurfaceKHR) NULL;
     vk->platform_ext = NULL;
+    vk->ops = NULL;
 
     vk->window = wnd;
-    vk->module = module_need(vk, "vulkan", name, true);
+
+    vk->module = vlc_module_load(wnd, "vulkan platform", name, false,
+                                 vlc_vk_start, vk);
+
+    if (vk->module == NULL)
+        vk->module = module_need(vk, "vulkan", name, true);
+
     if (vk->module == NULL)
     {
         vlc_object_delete(vk);
@@ -73,6 +91,13 @@ void vlc_vk_Release(vlc_vk_t *vk)
 {
     if (!vlc_atomic_rc_dec(&vk->ref_count))
         return;
-    module_unneed(vk, vk->module);
+
+    if (vk->ops)
+        vk->ops->close(vk);
+
+    if (module_provides(vk->module, "vulkan"))
+        module_unneed(vk, vk->module);
+
+    /* TODO: use vlc_objres_clear */
     vlc_object_delete(vk);
 }

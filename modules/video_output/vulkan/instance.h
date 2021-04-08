@@ -31,6 +31,14 @@
 struct vout_window_t;
 struct vout_window_cfg_t;
 
+struct vlc_vk_t;
+struct vlc_vk_operations
+{
+    void (*close)(struct vlc_vk_t *);
+    int (*create_surface)(struct vlc_vk_t *, VkInstance);
+};
+
+
 // Shared struct for vulkan instance / surface / device state
 typedef struct vlc_vk_t
 {
@@ -48,6 +56,8 @@ typedef struct vlc_vk_t
     const struct pl_swapchain *swapchain;
     VkSurfaceKHR surface;
     struct vout_window_t *window;
+
+    const struct vlc_vk_operations *ops;
 } vlc_vk_t;
 
 vlc_vk_t *vlc_vk_Create(struct vout_window_t *, const char *) VLC_USED;
