@@ -177,6 +177,8 @@ namespace adaptive
             private:
                 block_t            *p_head; /* read cache buffer */
                 block_t           **pp_tail;
+                const block_t      *p_read;
+                size_t              inblockreadoffset;
                 size_t              buffered; /* read cache size */
                 bool                done;
                 bool                eof;
