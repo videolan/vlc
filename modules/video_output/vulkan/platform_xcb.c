@@ -20,15 +20,31 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+#include <vlc_common.h>
+#include <vlc_plugin.h>
+
 #include "platform.h"
 
-int vlc_vk_InitPlatform(vlc_vk_t *vk)
+static void ClosePlatform(vlc_vk_t *vk);
+static int CreateSurface(vlc_vk_t *vk, VkInstance instance);
+
+static const struct vlc_vk_operations platform_ops =
+{
+    .close = ClosePlatform,
+    .create_surface = CreateSurface,
+};
+
+static int InitPlatform(vlc_vk_t *vk)
 {
     if (vk->window->type != VOUT_WINDOW_TYPE_XID)
         return VLC_EGENERIC;
 
     const char *display = vk->window->display.x11;
-    xcb_connection_t *conn = vk->platform_sys = xcb_connect(display, NULL);
+    xcb_connection_t *conn = xcb_connect(display, NULL);
     if (xcb_connection_has_error(conn))
     {
         msg_Err(vk, "Failed connecting to X server (%s)",
@@ -37,19 +53,20 @@ int vlc_vk_InitPlatform(vlc_vk_t *vk)
         return VLC_EGENERIC;
     }
 
+    vk->platform_sys = conn;
+    vk->platform_ext = VK_KHR_XCB_SURFACE_EXTENSION_NAME;
+    vk->ops = &platform_ops;
+
     return VLC_SUCCESS;
 }
 
-void vlc_vk_ClosePlatform(vlc_vk_t *vk)
+static void ClosePlatform(vlc_vk_t *vk)
 {
     xcb_connection_t *conn = vk->platform_sys;
-
     xcb_disconnect(conn);
 }
 
-const char * const vlc_vk_PlatformExt = VK_KHR_XCB_SURFACE_EXTENSION_NAME;
-
-int vlc_vk_CreateSurface(vlc_vk_t *vk, VkInstance vkinst)
+static int CreateSurface(vlc_vk_t *vk, VkInstance vkinst)
 {
     xcb_connection_t *conn = vk->platform_sys;
 
@@ -67,3 +84,13 @@ int vlc_vk_CreateSurface(vlc_vk_t *vk, VkInstance vkinst)
 
     return VLC_SUCCESS;
 }
+
+vlc_module_begin()
+    set_shortname("Vulkan XCB")
+    set_description(N_("XCB/X11 platform support for Vulkan"))
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    set_capability("vulkan platform", 50)
+    set_callback(InitPlatform)
+    add_shortcut("vk_x11")
+vlc_module_end()

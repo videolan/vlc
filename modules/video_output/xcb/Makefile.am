@@ -33,7 +33,6 @@ libxcb_window_plugin_la_LIBADD = $(XPROTO_LIBS) $(XCB_LIBS) \
 	$(XCB_XKB_LIBS) $(XKBCOMMON_X11_LIBS)
 
 libvk_x11_plugin_la_SOURCES = $(VULKAN_COMMONSOURCES) \
-	video_output/vulkan/surface.c \
 	video_output/vulkan/platform_xcb.c
 libvk_x11_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(VULKAN_COMMONCFLAGS) \
