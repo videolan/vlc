@@ -75,13 +75,16 @@ HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *p_object_)
       localAllowed(false)
 {
     vlc_mutex_init(&lock);
-    downloader = new (std::nothrow) Downloader();
+    downloader = new Downloader();
+    downloaderhp = new Downloader();
     downloader->start();
+    downloaderhp->start();
 }
 
 HTTPConnectionManager::~HTTPConnectionManager   ()
 {
     delete downloader;
+    delete downloaderhp;
     this->closeAllConnections();
     while(!factories.empty())
     {
@@ -119,7 +122,7 @@ AbstractConnection * HTTPConnectionManager::reuseConnection(ConnectionParams &pa
 
 AbstractConnection * HTTPConnectionManager::getConnection(ConnectionParams &params)
 {
-    if(unlikely(factories.empty() || !downloader))
+    if(unlikely(factories.empty() || !downloader || !downloaderhp))
         return nullptr;
 
     if(params.isLocal())
@@ -164,11 +167,11 @@ AbstractChunkSource *HTTPConnectionManager::makeSource(const std::string &url,
         case ChunkType::Init:
         case ChunkType::Index:
         case ChunkType::Segment:
-            return new HTTPChunkBufferedSource(url, this, id, type, range);
+
         case ChunkType::Key:
         case ChunkType::Playlist:
         default:
-            return new HTTPChunkSource(url, this, id, type, range, true);
+            return new HTTPChunkBufferedSource(url, this, id, type, range);
     }
 }
 
@@ -177,18 +180,33 @@ void HTTPConnectionManager::recycleSource(AbstractChunkSource *source)
     deleteSource(source);
 }
 
+Downloader * HTTPConnectionManager::getDownloadQueue(const AbstractChunkSource *source) const
+{
+    switch(source->getChunkType())
+    {
+        case ChunkType::Init:
+        case ChunkType::Index:
+        case ChunkType::Segment:
+            return downloader;
+        case ChunkType::Key:
+        case ChunkType::Playlist:
+        default:
+            return downloaderhp;
+    }
+}
+
 void HTTPConnectionManager::start(AbstractChunkSource *source)
 {
     HTTPChunkBufferedSource *src = dynamic_cast<HTTPChunkBufferedSource *>(source);
-    if(src)
-        downloader->schedule(src);
+    if(src && !src->isDone())
+        getDownloadQueue(src)->schedule(src);
 }
 
 void HTTPConnectionManager::cancel(AbstractChunkSource *source)
 {
     HTTPChunkBufferedSource *src = dynamic_cast<HTTPChunkBufferedSource *>(source);
     if(src)
-        downloader->cancel(src);
+        getDownloadQueue(src)->cancel(src);
 }
 
 void HTTPConnectionManager::setLocalConnectionsAllowed()
