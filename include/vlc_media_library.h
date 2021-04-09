@@ -229,9 +229,16 @@ typedef struct vlc_ml_media_t
 typedef struct vlc_ml_playlist_t
 {
     int64_t i_id;
+
     char* psz_name;
-    uint32_t i_creation_date;
+
+    char* psz_mrl;
+
     char* psz_artwork_mrl;
+
+    uint32_t i_creation_date;
+
+    bool b_is_read_only;
 } vlc_ml_playlist_t;
 
 typedef struct vlc_ml_artist_t

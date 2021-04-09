@@ -233,8 +233,9 @@ void vlc_ml_genre_release( vlc_ml_genre_t* p_genre )
 
 static void vlc_ml_playlist_release_inner( vlc_ml_playlist_t* p_playlist )
 {
-    free( p_playlist->psz_artwork_mrl );
     free( p_playlist->psz_name );
+    free( p_playlist->psz_mrl );
+    free( p_playlist->psz_artwork_mrl );
 }
 
 void vlc_ml_playlist_release( vlc_ml_playlist_t* p_playlist )
