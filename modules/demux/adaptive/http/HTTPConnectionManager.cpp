@@ -79,6 +79,8 @@ HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *p_object_)
     downloaderhp = new Downloader();
     downloader->start();
     downloaderhp->start();
+    cache_total = 0;
+    cache_max = 1 << 19;
 }
 
 HTTPConnectionManager::~HTTPConnectionManager   ()
@@ -163,12 +165,24 @@ AbstractChunkSource *HTTPConnectionManager::makeSource(const std::string &url,
                                                        const ID &id, ChunkType type,
                                                        const BytesRange &range)
 {
+    StorageID storageid = HTTPChunkSource::makeStorageID(url, range);
     switch(type)
     {
         case ChunkType::Init:
         case ChunkType::Index:
+            for(HTTPChunkBufferedSource *s : cache)
+            {
+                if(s->getStorageID() == storageid)
+                {
+                    cache.remove(s);
+                    cache_total -= s->contentLength;
+                    CacheDebug(msg_Dbg(p_object, "Cache GET '%s' usage %u bytes",
+                                       storageid.c_str(), cache_total));
+                    return s;
+                }
+            }
+            // fallthrough
         case ChunkType::Segment:
-
         case ChunkType::Key:
         case ChunkType::Playlist:
         default:
@@ -178,7 +192,41 @@ AbstractChunkSource *HTTPConnectionManager::makeSource(const std::string &url,
 
 void HTTPConnectionManager::recycleSource(AbstractChunkSource *source)
 {
-    deleteSource(source);
+    bool b_cacheable;
+    switch(source->getChunkType())
+    {
+        case ChunkType::Index:
+        case ChunkType::Init:
+            b_cacheable = true;
+            break;
+        case ChunkType::Key:
+        case ChunkType::Playlist:
+        case ChunkType::Segment:
+        default:
+            b_cacheable = false;
+            break;
+    }
+
+    HTTPChunkBufferedSource *buf = dynamic_cast<HTTPChunkBufferedSource *>(source);
+    if(buf && b_cacheable && !buf->getStorageID().empty() &&
+       buf->contentLength < cache_max)
+    {
+        while(cache_max < cache_total + buf->contentLength)
+        {
+            HTTPChunkBufferedSource *purged = cache.back();
+            cache.pop_back();
+            cache_total -= purged->contentLength;
+            CacheDebug(msg_Dbg(p_object, "Cache DEL '%s' usage %u bytes",
+                               purged->getStorageID().c_str(), cache_total));
+            deleteSource(purged);
+        }
+        cache.push_front(buf);
+        cache_total += buf->contentLength;
+        CacheDebug(msg_Dbg(p_object, "Cache PUT '%s' usage %u bytes",
+                           buf->getStorageID().c_str(), cache_total));
+    }
+    else
+        deleteSource(source);
 }
 
 Downloader * HTTPConnectionManager::getDownloadQueue(const AbstractChunkSource *source) const

@@ -471,6 +471,14 @@ bool HTTPChunkBufferedSource::hasMoreData() const
     return !eof;
 }
 
+void HTTPChunkBufferedSource::recycle()
+{
+    p_read = p_head;
+    inblockreadoffset = 0;
+    consumed = 0;
+    HTTPChunkSource::recycle();
+}
+
 block_t * HTTPChunkBufferedSource::readBlock()
 {
     block_t *p_block = nullptr;
@@ -503,18 +511,18 @@ block_t * HTTPChunkBufferedSource::read(size_t readsize)
 {
     vlc_mutex_locker locker(&lock);
 
-    while(readsize > buffered && !done)
+    while(readsize > (buffered - consumed) && !done)
         vlc_cond_wait(&avail, &lock);
 
     block_t *p_block = nullptr;
-    if(!readsize || !buffered || !(p_block = block_Alloc(readsize)) )
+    if(!readsize || (buffered == consumed) || !(p_block = block_Alloc(readsize)) )
     {
         eof = true;
         return nullptr;
     }
 
     size_t copied = 0;
-    while(buffered && readsize)
+    while(buffered && readsize && p_read)
     {
         const size_t toconsume = std::min(p_read->i_buffer - inblockreadoffset, readsize);
         memcpy(&p_block->p_buffer[copied], &p_read->p_buffer[inblockreadoffset], toconsume);
