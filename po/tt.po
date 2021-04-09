@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Names <rezonans.89@mail.ru>, 2017
 # Булат Ибраһим <bulat_ibrahim@mail.ru>, 2017
+# Names <rezonans.89@mail.ru>, 2017
+# Timur Seber <seber.tatsoft@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2021-04-09 21:01+0200\n"
+"Last-Translator: Timur Seber <seber.tatsoft@gmail.com>, 2021\n"
 "Language-Team: Tatar (https://www.transifex.com/yaron/teams/16553/tt/)\n"
 "Language: tt\n"
 "MIME-Version: 1.0\n"
@@ -652,7 +653,7 @@ msgstr "Спектр"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "VU-метр"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -670,11 +671,11 @@ msgstr "Стерео режимы"
 #: src/audio_output/output.c:419 modules/access/v4l2/v4l2.c:267
 #: modules/audio_output/alsa.c:76
 msgid "Mono"
-msgstr ""
+msgstr "Моно"
 
 #: src/audio_output/output.c:425
 msgid "Original"
-msgstr ""
+msgstr "Оригинал"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -831,11 +832,11 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr ""
+msgstr " (гадәттә кабызылган)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr ""
+msgstr " (гадәттә сүндерелгән)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -1088,7 +1089,7 @@ msgstr "Декодланган формат"
 
 #: src/input/es_out.c:3199
 msgid "Top left"
-msgstr ""
+msgstr "Өстә сул якта"
 
 #: src/input/es_out.c:3199
 msgid "Left top"
@@ -1100,15 +1101,15 @@ msgstr ""
 
 #: src/input/es_out.c:3200
 msgid "Top right"
-msgstr ""
+msgstr "Өстә уң якта"
 
 #: src/input/es_out.c:3201
 msgid "Bottom left"
-msgstr ""
+msgstr "Аста сул якта"
 
 #: src/input/es_out.c:3201
 msgid "Bottom right"
-msgstr ""
+msgstr "Аста уң якта"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
@@ -15627,7 +15628,7 @@ msgstr ""
 #: modules/gui/macosx/VLCSimplePrefsController.m:288
 #: modules/gui/qt/dialogs/bookmarks.cpp:53 modules/gui/qt/ui/vlm.h:299
 msgid "Clear"
-msgstr "Чистартырга"
+msgstr "Чистарту"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:77
 #: modules/gui/macosx/VLCMainMenu.m:366
@@ -19443,7 +19444,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/messages.cpp:335
 msgid "Clear the messages"
-msgstr "Хәбәрләрне чистартырга"
+msgstr "Хәбәрләрне чистарту"
 
 #: modules/gui/qt/dialogs/open.cpp:78 modules/gui/qt/menus.cpp:934
 #: modules/gui/qt/menus.cpp:1131
@@ -20260,7 +20261,7 @@ msgstr ""
 
 #: modules/gui/qt/menus.cpp:1621
 msgid "&Clear"
-msgstr "&Чистартырга"
+msgstr "&Чистарту"
 
 #: modules/gui/qt/menus.cpp:1629
 msgid "&Renderer"
@@ -20496,7 +20497,7 @@ msgstr ""
 #: modules/gui/qt/util/searchlineedit.cpp:49
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr ""
+msgstr "Чистарту"
 
 #: modules/gui/skins2/src/dialogs.cpp:212
 msgid "Open a skin file"
@@ -27894,7 +27895,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:184
 msgid "Clear List"
-msgstr "Исемлекне чистартырга"
+msgstr "Исемлекне чистарту"
 
 #: modules/gui/qt/ui/update.h:147
 msgid "Check for VLC updates"
