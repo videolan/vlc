@@ -84,7 +84,7 @@ NavigableFocusScope {
     signal selectAll()
     signal actionAtIndex(int index)
 
-    property var _idChildrenMap: ({})
+    property var _idChildrenList: []
     property var _unusedItemList: []
     property var _currentRange: [0,0]
 
@@ -221,8 +221,23 @@ NavigableFocusScope {
         return [firstId, lastId]
     }
 
+    function _getItem(id) {
+        var i = id - root._currentRange[0]
+        return root._idChildrenList[i]
+    }
+
+    function _setItem(id, item) {
+        var i = id - root._currentRange[0]
+        root._idChildrenList[i] = item
+    }
+
+    function _containsItem(id) {
+        var i = id - root._currentRange[0]
+        return i >= 0 && i < root._idChildrenList.length && typeof root._idChildrenList[i] !== "undefined"
+    }
+
     function _repositionItem(id, x, y) {
-        var item = _idChildrenMap[id]
+        var item = root._getItem(id)
         if (item === undefined)
             throw "wrong child: " + id
 
@@ -246,7 +261,7 @@ NavigableFocusScope {
         item.y = y
         item.visible = true
 
-        _idChildrenMap[id] = item
+        root._setItem(id, item)
     }
 
     function _createItem(id, x, y) {
@@ -261,13 +276,13 @@ NavigableFocusScope {
                     });
         if (item === undefined)
             throw "wrong unable to instantiate child " + id
-        _idChildrenMap[id] = item
+        root._setItem(id, item)
     }
 
     function _setupChild(id, ydelta) {
         var pos = root.getItemPos(id)
 
-        if (id in _idChildrenMap) {
+        if (root._containsItem(id)) {
             _repositionItem(id, pos[0], pos[1] + ydelta)
         }  else if (_unusedItemList.length > 0) {
             _recycleItem(id, pos[0], pos[1] + ydelta)
@@ -284,7 +299,7 @@ NavigableFocusScope {
             iMax= f_l[1]
 
         for (var id  = iMin; id < iMax; id++) {
-            var item = _idChildrenMap[id]
+            var item = root._getItem(id)
             item.model = model.getDataAt(id)
         }
 
@@ -343,7 +358,7 @@ NavigableFocusScope {
                 iMin = Math.max(iMin, root._currentRange[0])
                 iMax = Math.min(iMax, root._currentRange[1])
                 for (var j = iMin; j < iMax; j++) {
-                    var item = root._idChildrenMap[j]
+                    var item = root._getItem(j)
                     console.assert(item)
                     item.selected = select
                 }
@@ -441,26 +456,48 @@ NavigableFocusScope {
 
         function _setupIndexes(force, range, yDelta) {
             for (var i = range[0]; i < range[1]; i++) {
-                if (!force && i in _idChildrenMap)
+                if (!force && root._containsItem(i))
                     continue
                 _setupChild(i, yDelta)
             }
         }
 
+        function _overlappedInterval(i1, i2) {
+            if (i1[0] > i2[0]) return _overlappedInterval(i2, i1)
+            if (i1[1] > i2[0]) return [i2[0], Math.min(i1[1], i2[1])]
+            return [0, 0]
+        }
+
         function _updateChildrenMap(first, last) {
-            var toKeep = {}
+            if (first >= last) {
+                root._idChildrenList.forEach(function(item) { item.visible = false; })
+                root._unusedItemList = root._idChildrenList
+                root._idChildrenList = []
+                root._currentRange = [0, 0]
+                return
+            }
 
-            for (var id in _idChildrenMap) {
-                var val = _idChildrenMap[id]
+            var overlapped = _overlappedInterval([first, last], root._currentRange)
 
-                if (id >= first && id < last) {
-                    toKeep[id] = val
-                } else {
-                    _unusedItemList.push(val)
-                    val.visible = false
+            var i
+            var newList = new Array(last - first)
+
+            for (i = overlapped[0]; i < overlapped[1]; ++i) {
+                newList[i - first] = root._getItem(i)
+                root._setItem(i, undefined)
+            }
+
+            for (i = _currentRange[0]; i < _currentRange[1]; ++i) {
+                var item = root._getItem(i)
+                if (typeof item !== "undefined") {
+                    item.visible = false
+                    _unusedItemList.push(item)
+                    //  root._setItem(i, undefined) // not needed the list will be reset following this loop
                 }
             }
-            _idChildrenMap = toKeep
+
+            _idChildrenList = newList
+            root._currentRange = [first, last]
         }
 
         function layout(forceRelayout) {
@@ -485,7 +522,6 @@ NavigableFocusScope {
                 return;
 
             _updateChildrenMap(firstId, lastId)
-            root._currentRange = [firstId, lastId]
 
             var item
             var pos
@@ -581,8 +617,8 @@ NavigableFocusScope {
             if (expandIndex !== -1)
                 return
             var child
-            if (currentIndex in _idChildrenMap)
-                child = _idChildrenMap[currentIndex]
+            if (root._containsItem(currentIndex))
+                child = root._getItem(currentIndex)
             if (child !== undefined)
                 child.focus = true
         }
