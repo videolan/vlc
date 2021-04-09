@@ -164,6 +164,7 @@ namespace adaptive
                 virtual block_t *  readBlock       ()  override;
                 virtual block_t *  read            (size_t)  override;
                 virtual bool       hasMoreData     () const  override;
+                virtual void        recycle() override;
 
             protected:
                 HTTPChunkBufferedSource(const std::string &url, AbstractConnectionManager *,

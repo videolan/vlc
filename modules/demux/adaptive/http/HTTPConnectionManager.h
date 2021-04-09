@@ -43,6 +43,7 @@ namespace adaptive
         class AbstractConnection;
         class Downloader;
         class AbstractChunkSource;
+        class HTTPChunkBufferedSource;
         enum class ChunkType;
 
         class AbstractConnectionManager : public IDownloadRateObserver
@@ -100,6 +101,9 @@ namespace adaptive
                 bool                                                localAllowed;
                 AbstractConnection * reuseConnection(ConnectionParams &);
                 Downloader * getDownloadQueue(const AbstractChunkSource *) const;
+                std::list<HTTPChunkBufferedSource *> cache;
+                unsigned cache_total;
+                unsigned cache_max;
         };
     }
 }
