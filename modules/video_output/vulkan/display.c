@@ -490,7 +490,7 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_callback_display(Open, 0)
     add_shortcut ("vulkan", "vk")
-    add_module ("vk", "vulkan", NULL, VK_TEXT, PROVIDER_LONGTEXT)
+    add_module ("vk", "", NULL, VK_TEXT, PROVIDER_LONGTEXT)
 
     set_section("Scaling", NULL)
     add_integer("upscaler-preset", SCALE_BUILTIN,
