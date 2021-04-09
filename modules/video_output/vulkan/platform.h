@@ -31,6 +31,9 @@ void vlc_vk_ClosePlatform(vlc_vk_t *);
 extern const char * const vlc_vk_PlatformExt;
 
 // Create a vulkan surface to vk->surface
-int vlc_vk_CreateSurface(vlc_vk_t *, VkInstance);
+inline int vlc_vk_CreateSurface(vlc_vk_t * vk, VkInstance instance, VkSurfaceKHR *surface_out)
+{
+    return vk->ops->create_surface(vk, instance, surface_out);
+}
 
 #endif // VLC_VULKAN_PLATFORM_H

@@ -58,10 +58,8 @@ vlc_vk_t *vlc_vk_Create(struct vout_window_t *wnd, const char *name)
     if (unlikely(vk == NULL))
         return NULL;
 
-    vk->surface = (VkSurfaceKHR) NULL;
     vk->platform_ext = NULL;
     vk->ops = NULL;
-
     vk->window = wnd;
 
     vk->module = vlc_module_load(wnd, "vulkan platform", name, false,

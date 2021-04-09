@@ -50,6 +50,8 @@ struct vout_display_sys_t
     const struct pl_swapchain *swapchain;
     struct pl_renderer *renderer;
 
+    VkSurfaceKHR surface;
+
     // Pool of textures for the subpictures
     struct pl_overlay *overlays;
     const struct pl_tex **overlay_tex;
@@ -122,15 +124,14 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
 
     // Create the platform-specific surface object
-    if (sys->vk->ops->create_surface(sys->vk, sys->instance->instance)
-            != VLC_SUCCESS)
+    if (vlc_vk_CreateSurface(sys->vk, sys->instance->instance, &sys->surface) != VLC_SUCCESS)
         goto error;
 
     // Create vulkan device
     char *device_name = var_InheritString(sys->vk, "vk-device");
     sys->vulkan = pl_vulkan_create(sys->ctx, &(struct pl_vulkan_params) {
         .instance = sys->instance->instance,
-        .surface = sys->vk->surface,
+        .surface = sys->surface,
         .device_name = device_name,
         .allow_software = var_InheritBool(vd, "allow-sw"),
         .async_transfer = var_InheritBool(vd, "async-xfer"),
@@ -143,7 +144,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     // Create swapchain for this surface
     struct pl_vulkan_swapchain_params swap_params = {
-        .surface = sys->vk->surface,
+        .surface = sys->surface,
         .present_mode = var_InheritInteger(vd, "present-mode"),
         .swapchain_depth = var_InheritInteger(vd, "queue-depth"),
     };

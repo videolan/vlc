@@ -30,7 +30,7 @@
 #include "platform.h"
 
 static void ClosePlatform(vlc_vk_t *vk);
-static int CreateSurface(vlc_vk_t *vk, VkInstance instance);
+static int CreateSurface(vlc_vk_t *vk, VkInstance instance, VkSurfaceKHR *surface_out);
 
 static const struct vlc_vk_operations platform_ops =
 {
@@ -66,7 +66,7 @@ static void ClosePlatform(vlc_vk_t *vk)
     xcb_disconnect(conn);
 }
 
-static int CreateSurface(vlc_vk_t *vk, VkInstance vkinst)
+static int CreateSurface(vlc_vk_t *vk, VkInstance vkinst, VkSurfaceKHR *surface_out)
 {
     xcb_connection_t *conn = vk->platform_sys;
 
@@ -76,7 +76,7 @@ static int CreateSurface(vlc_vk_t *vk, VkInstance vkinst)
          .connection = conn,
     };
 
-    VkResult res = vkCreateXcbSurfaceKHR(vkinst, &xinfo, NULL, &vk->surface);
+    VkResult res = vkCreateXcbSurfaceKHR(vkinst, &xinfo, NULL, surface_out);
     if (res != VK_SUCCESS) {
         msg_Err(vk, "Failed creating XCB surface");
         return VLC_EGENERIC;

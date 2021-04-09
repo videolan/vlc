@@ -35,7 +35,7 @@ struct vlc_vk_t;
 struct vlc_vk_operations
 {
     void (*close)(struct vlc_vk_t *);
-    int (*create_surface)(struct vlc_vk_t *, VkInstance);
+    int (*create_surface)(struct vlc_vk_t *, VkInstance, VkSurfaceKHR *);
 };
 
 
@@ -49,7 +49,6 @@ typedef struct vlc_vk_t
     void *platform_sys;
     const char *platform_ext;
 
-    VkSurfaceKHR surface;
     struct vout_window_t *window;
 
     const struct vlc_vk_operations *ops;
