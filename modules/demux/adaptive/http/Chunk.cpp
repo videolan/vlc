@@ -529,6 +529,7 @@ HTTPChunk::HTTPChunk(const std::string &url, AbstractConnectionManager *manager,
                      const adaptive::ID &id, ChunkType type, const BytesRange &range):
     AbstractChunk(manager->makeSource(url, id, type, range))
 {
+    manager->start(source);
 }
 
 HTTPChunk::~HTTPChunk()

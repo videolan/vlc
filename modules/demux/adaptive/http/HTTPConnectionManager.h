@@ -93,11 +93,13 @@ namespace adaptive
             private:
                 void    releaseAllConnections ();
                 Downloader                                         *downloader;
+                Downloader                                         *downloaderhp;
                 vlc_mutex_t                                         lock;
                 std::vector<AbstractConnection *>                   connectionPool;
                 std::list<AbstractConnectionFactory *>              factories;
                 bool                                                localAllowed;
                 AbstractConnection * reuseConnection(ConnectionParams &);
+                Downloader * getDownloadQueue(const AbstractChunkSource *) const;
         };
     }
 }
