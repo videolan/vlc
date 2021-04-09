@@ -23,7 +23,7 @@ libvk_win32_plugin_la_CFLAGS = $(AM_CFLAGS) $(VULKAN_COMMONCFLAGS) \
 			       -DVK_USE_PLATFORM_WIN32_KHR -DPLATFORM_NAME=Win32
 libvk_win32_plugin_la_LIBADD = $(VULKAN_COMMONLIBS)
 
-libvk_android_plugin_la_SOURCES = $(VULKAN_COMMONSOURCES) video_output/vulkan/surface.c \
+libvk_android_plugin_la_SOURCES = $(VULKAN_COMMONSOURCES) \
 				video_output/vulkan/platform_android.c
 libvk_android_plugin_la_CFLAGS = $(AM_CFLAGS) $(VULKAN_COMMONCFLAGS) \
 			       -DVK_USE_PLATFORM_ANDROID_KHR -DPLATFORM_NAME=Android
