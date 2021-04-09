@@ -17,7 +17,7 @@ libvk_plugin_la_SOURCES = $(VULKAN_COMMONSOURCES) video_output/vulkan/display.c
 libvk_plugin_la_CFLAGS = $(AM_CFLAGS) $(VULKAN_COMMONCFLAGS)
 libvk_plugin_la_LIBADD = $(VULKAN_COMMONLIBS)
 
-libvk_win32_plugin_la_SOURCES = $(VULKAN_COMMONSOURCES) video_output/vulkan/surface.c \
+libvk_win32_plugin_la_SOURCES = $(VULKAN_COMMONSOURCES) \
 				video_output/vulkan/platform_win32.c
 libvk_win32_plugin_la_CFLAGS = $(AM_CFLAGS) $(VULKAN_COMMONCFLAGS) \
 			       -DVK_USE_PLATFORM_WIN32_KHR -DPLATFORM_NAME=Win32

@@ -24,24 +24,34 @@
 # include "config.h"
 #endif
 
+#include <vlc_common.h>
+#include <vlc_plugin.h>
 #include "platform.h"
 
-int vlc_vk_InitPlatform(vlc_vk_t *vk)
+static void ClosePlatform(vlc_vk_t *vk);
+static int CreateSurface(vlc_vk_t *vk);
+static const struct vlc_vk_operations platform_ops =
+{
+    .close = ClosePlatform,
+    .create_surface = CreateSurface,
+};
+
+static int InitPlatform(vlc_vk_t *vk)
 {
     if (vk->window->type != VOUT_WINDOW_TYPE_HWND)
         return VLC_EGENERIC;
 
+    vk->platform_ext = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
+    vk->platform_ops = &platform_ops;
     return VLC_SUCCESS;
 }
 
-void vlc_vk_ClosePlatform(vlc_vk_t *vk)
+static void ClosePlatform(vlc_vk_t *vk)
 {
     VLC_UNUSED(vk);
 }
 
-const char * const vlc_vk_PlatformExt = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
-
-int vlc_vk_CreateSurface(vlc_vk_t *vk, VkInstance vkinst)
+static int CreateSurface(vlc_vk_t *vk, VkInstance vkinst)
 {
     // Get current win32 HINSTANCE
     HINSTANCE hInst = GetModuleHandle(NULL);
@@ -60,3 +70,13 @@ int vlc_vk_CreateSurface(vlc_vk_t *vk, VkInstance vkinst)
 
     return VLC_SUCCESS;
 }
+
+vlc_module_begin()
+    set_shortname("Vulkan Win32")
+    set_description(N_("Win32 platform support for Vulkan"))
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    set_capability("vulkan platform", 50)
+    set_callback(InitPlatform)
+    add_shortcut("vk_win32")
+vlc_module_end()
