@@ -105,6 +105,46 @@ macOS:
 
 appleOS:
  * Improved proxy configuration handling
+Changes between 3.0.12.1 and 3.0.13:
+----------------------------------
+
+Demux:
+ * Adaptive: fix artefacts in HLS streams with wrong profiles/levels
+ * Fix regression on some MP4 files for the audio track
+ * Fix MPGA and ADTS probing in TS files
+ * Fix Flac inside AVI files
+ * Fix VP9/Webm artefacts when seeking
+
+Codec:
+ * Support SSA text scaling
+ * Fix rotation on Android rotation
+ * Fix WebVTT subtitles that start at 00:00
+
+Access:
+ * Update libnfs to support NFSv4
+ * Improve SMB2 integration
+ * Fix Blu-ray files using Unicode names on Windows
+ * Disable mcast lookups on Android for RTSP playback
+
+Video Output:
+ * Rework the D3D11 rendering wait, to fix choppiness on display
+
+Interfaces:
+ * Fix VLC getting stuck on close on X11 (#21875)
+ * Improve RTL on preferences on macOS
+ * Add mousewheel horizontal axis control
+ * Fix crash on exit on macOS
+ * Fix sizing of the fullscreen controls on macOS
+
+Windows:
+ * Fix subtitles/OSD under Windows XP
+
+Misc:
+ * Update translations
+ * Improve MIDI fonts search on Linux
+ * Update Soundcloud, Youtube, liveleak
+ * Fix compilation with GCC11
+ * Fix input-slave option for subtitles
 
 
 Changes between 3.0.12 and 3.0.12.1:
@@ -113,6 +153,7 @@ Changes between 3.0.12 and 3.0.12.1:
 macOS:
  * 3.0.12.1 is the first release for Apple Silicon macs
  * Version bump to allow an automatic upgrade path
+
 
 Changes between 3.0.11.1 and 3.0.12:
 ----------------------------------
@@ -177,6 +218,7 @@ Contribs:
  * Updated libebml to 1.4.0
  * Updated libmatroska to 1.6.0
  * Updated mpg123 to 1.26.2
+
 
 Changes between 3.0.10 and 3.0.11:
 ----------------------------------
