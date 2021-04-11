@@ -34,7 +34,7 @@ RowLayout {
 
     Item {
         Layout.fillWidth: true
-        implicitHeight: childrenRect.height
+        implicitHeight: loop.height
 
         Widgets.IconToolButton {
             id: loop
@@ -54,7 +54,7 @@ RowLayout {
 
     Item {
         Layout.fillWidth: true
-        implicitHeight: childrenRect.height
+        implicitHeight: shuffle.height
 
         Widgets.IconToolButton {
             id: shuffle
@@ -71,7 +71,7 @@ RowLayout {
 
     Item {
         Layout.fillWidth: true
-        implicitHeight: childrenRect.height
+        implicitHeight: sort.height
 
         Widgets.SortControl {
             id: sort
@@ -117,7 +117,7 @@ RowLayout {
 
     Item {
         Layout.fillWidth: true
-        implicitHeight: childrenRect.height
+        implicitHeight: clear.height
 
         Widgets.IconToolButton {
             id: clear
