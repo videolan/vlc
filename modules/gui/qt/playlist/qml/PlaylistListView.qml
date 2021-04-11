@@ -127,7 +127,7 @@ Widgets.NavigableFocusScope {
                 return model.getItemsForIndexes(model.getSelection())
             }
 
-            property point _pos: null
+            property point _pos
             property int _scrollingDirection: 0
 
             function updatePos(pos) {
