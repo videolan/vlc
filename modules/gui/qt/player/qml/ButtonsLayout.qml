@@ -46,7 +46,7 @@ Widgets.NavigableFocusScope {
 
         return minimumWidth
     }
-    property real extraWidth: undefined
+    property real extraWidth: 0
     property int expandableCount: 0 // widget count that can expand when extra width is available
 
     implicitWidth: buttonrow.implicitWidth
