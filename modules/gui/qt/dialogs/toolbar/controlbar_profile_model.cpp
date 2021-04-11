@@ -237,14 +237,50 @@ void ControlbarProfileModel::insertDefaults()
 
 QString ControlbarProfileModel::generateUniqueName(const QString &name)
 {
-    const auto sameNameCount = std::count_if(m_profiles.begin(),
-                                             m_profiles.end(),
-                                             [name](const ControlbarProfile* i) {
-                                                 return i->name() == name;
-                                             });
+    static const auto targetNameGenerator = [](const auto& name, long count) {
+        return QString("%1 (%2)").arg(name).arg(count);
+    };
 
-    if (sameNameCount > 0)
-        return QString("%1 (%2)").arg(name).arg(sameNameCount + 1);
+    // Actually, the profile model inherently does not allow two
+    // profiles to have the same name so it could be sufficent
+    // to check only for name existence but for cases when the
+    // config file is edited explicitly, using count_if might
+    // be helpful.
+    static const auto sameNameCount = [this](const auto& name) {
+        return std::count_if(m_profiles.begin(),
+                             m_profiles.end(),
+                             [name](const ControlbarProfile* i) {
+                                 return i->name() == name;
+                                 });
+        };
+
+    auto count = sameNameCount(name);
+
+    if (count > 0)
+    {
+        // suppose the existing profiles with these names:
+        // Profile, Profile (1), Profile (2)
+        // when the user adds a new profile with name 'Profile',
+        // its name will be replaced with 'Profile (3)'.
+        // However, the same will not happen if the user adds a
+        // new profile with name 'Profile (1)' or 'Profile (2)'.
+        // In that case, the new names will be 'Profile (1) (1)',
+        // and 'Profile (2) (1)', respectively. This behavior is
+        // intended because otherwise profile name assignment
+        // would be restrictive.
+
+        auto targetName = targetNameGenerator(name, count);
+
+        // if targetName also exists, increase the count by one
+        // and try again:
+        while (sameNameCount(targetName) >= 1)
+        {
+            ++count;
+            targetName = targetNameGenerator(name, count);
+        }
+
+        return targetName;
+    }
     else
         return name;
 }
@@ -649,7 +685,12 @@ void ControlbarProfileModel::cloneSelectedProfile(const QString &newProfileName)
     if (!ptrNewModel)
         return;
 
-    ptrNewModel->setName(generateUniqueName(newProfileName));
+    // if the newProfileName is empty or equal to the cloned profile's name
+    // don't bother changing its name since cloneProfile() will first
+    // set the new profile's name unique by assigning its name as
+    // 'clonedProfileName (n)'
+    if (!newProfileName.isEmpty() && newProfileName != ptrModel->name())
+        ptrNewModel->setName(generateUniqueName(newProfileName));
 }
 
 void ControlbarProfileModel::deleteSelectedProfile()
