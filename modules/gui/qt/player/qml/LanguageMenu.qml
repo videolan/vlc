@@ -33,7 +33,7 @@ T.Popup {
     id: control
 
     height: VLCStyle.dp(296, VLCStyle.scale)
-    width: (!!rootPlayer) ? rootPlayer.width : 0
+    width: rootPlayer.width
 
     // Popup.CloseOnPressOutside doesn't work with non-model Popup on Qt < 5.15
     closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape

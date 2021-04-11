@@ -436,30 +436,37 @@ Item{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.audiosub
 
-            onClicked: langMenu.open()
+            enabled: langMenuLoader.status === Loader.Ready
+            onClicked: langMenuLoader.item.open()
 
             text: i18n.qtr("Languages and tracks")
 
-            LanguageMenu {
-                id: langMenu
+            Loader {
+                id: langMenuLoader
 
-                parent: rootPlayer
-                focus: true
-                x: 0
-                y: (!!rootPlayer) ? (rootPlayer.positionSliderY - height) : 0
-                z: 1
+                active: (typeof rootPlayer !== 'undefined') && (rootPlayer !== null)
 
-                onOpened: {
-                    controlButtons.requestLockUnlockAutoHide(true, controlButtons)
-                    if (!!rootPlayer)
-                        rootPlayer.menu = langMenu
-                }
+                sourceComponent: LanguageMenu {
+                    id: langMenu
 
-                onClosed: {
-                    controlButtons.requestLockUnlockAutoHide(false, controlButtons)
-                    langBtn.forceActiveFocus()
-                    if (!!rootPlayer)
-                        rootPlayer.menu = undefined
+                    parent: rootPlayer
+                    focus: true
+                    x: 0
+                    y: (rootPlayer.positionSliderY - height)
+                    z: 1
+
+                    onOpened: {
+                        controlButtons.requestLockUnlockAutoHide(true, controlButtons)
+                        if (!!rootPlayer)
+                            rootPlayer.menu = langMenu
+                    }
+
+                    onClosed: {
+                        controlButtons.requestLockUnlockAutoHide(false, controlButtons)
+                        langBtn.forceActiveFocus()
+                        if (!!rootPlayer)
+                            rootPlayer.menu = undefined
+                    }
                 }
             }
         }
