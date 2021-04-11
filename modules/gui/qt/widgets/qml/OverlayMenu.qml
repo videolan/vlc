@@ -279,18 +279,22 @@ Item {
                         color: colors.text
                     }
 
-                    ListLabel {
-                        visible: modelData.marking.length >= 1
+                    Loader {
+                        active: (button.yieldsAnotherModel ||
+                                 ( (!!modelData.marking) && (modelData.marking.length >= 1) ))
 
-                        Layout.alignment: Qt.AlignHCenter
+                        sourceComponent: ListLabel {
+                            Layout.alignment: Qt.AlignHCenter
 
-                        text: {
-                            if (button.yieldsAnotherModel)
-                                "⮕"
-                            else if (!!modelData.marking)
-                                modelData.marking
+                            text: {
+                                if (button.yieldsAnotherModel)
+                                    "⮕"
+                                else if (!!modelData.marking)
+                                    modelData.marking
+                            }
+
+                            color: colors.text
                         }
-                        color: colors.text
                     }
                 }
 
