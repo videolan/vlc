@@ -112,7 +112,7 @@ Rectangle {
 
         hoverEnabled: true
 
-        acceptedButtons: acceptedButtons | Qt.RightButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onContainsMouseChanged: {
             if (containsMouse) {
