@@ -50,6 +50,7 @@ vlc_vk_t *vlc_vk_Create(struct vout_window_t *wnd, const char *name)
     vk->ctx = NULL;
     vk->instance = NULL;
     vk->surface = (VkSurfaceKHR) NULL;
+    vk->platform_ext = NULL;
 
     vk->window = wnd;
     vk->module = module_need(vk, "vulkan", name, true);

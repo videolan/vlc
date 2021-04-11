@@ -42,6 +42,8 @@ static int Open (vlc_object_t *obj)
     if (vlc_vk_InitPlatform(vk) != VLC_SUCCESS)
         goto error;
 
+    vk->platform_ext = vlc_vk_PlatformExt;
+
     // Initialize Vulkan instance
     vk->ctx = vlc_placebo_Create(VLC_OBJECT(vk));
     if (!vk->ctx)
@@ -51,7 +53,7 @@ static int Open (vlc_object_t *obj)
         .debug = var_InheritBool(vk, "vk-debug"),
         .extensions = (const char *[]) {
             VK_KHR_SURFACE_EXTENSION_NAME,
-            vlc_vk_PlatformExt,
+            vk->platform_ext,
         },
         .num_extensions = 2,
     });

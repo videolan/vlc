@@ -39,6 +39,7 @@ typedef struct vlc_vk_t
     module_t *module;
     vlc_atomic_rc_t ref_count;
     void *platform_sys;
+    const char *platform_ext;
 
     // these should be initialized by the surface module (i.e. surface.c)
     struct pl_context *ctx;
