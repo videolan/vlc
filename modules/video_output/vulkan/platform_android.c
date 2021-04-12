@@ -39,10 +39,8 @@ void vlc_vk_ClosePlatform(vlc_vk_t *vk)
 
 const char * const vlc_vk_PlatformExt = VK_KHR_ANDROID_SURFACE_EXTENSION_NAME;
 
-int vlc_vk_CreateSurface(vlc_vk_t *vk)
+int vlc_vk_CreateSurface(vlc_vk_t *vk, VkInstance vkinst)
 {
-    VkInstance vkinst = vk->instance->instance;
-
     ANativeWindow *anw =
         AWindowHandler_getANativeWindow(vk->window->handle.anativewindow,
                                         AWindow_Video);

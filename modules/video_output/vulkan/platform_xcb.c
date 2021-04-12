@@ -49,9 +49,8 @@ void vlc_vk_ClosePlatform(vlc_vk_t *vk)
 
 const char * const vlc_vk_PlatformExt = VK_KHR_XCB_SURFACE_EXTENSION_NAME;
 
-int vlc_vk_CreateSurface(vlc_vk_t *vk)
+int vlc_vk_CreateSurface(vlc_vk_t *vk, VkInstance vkinst)
 {
-    VkInstance vkinst = vk->instance->instance;
     xcb_connection_t *conn = vk->platform_sys;
 
     VkXcbSurfaceCreateInfoKHR xinfo = {

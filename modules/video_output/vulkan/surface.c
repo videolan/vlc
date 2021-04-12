@@ -61,7 +61,7 @@ static int Open (vlc_object_t *obj)
         goto error;
 
     // Create the platform-specific surface object
-    if (vlc_vk_CreateSurface(vk) != VLC_SUCCESS)
+    if (vlc_vk_CreateSurface(vk, vk->instance->instance) != VLC_SUCCESS)
         goto error;
 
     // Create vulkan device
