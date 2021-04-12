@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-03-23 07:29+0100\n"
+"PO-Revision-Date: 2021-04-12 11:19+0200\n"
 "Last-Translator: Bashishtha Narayan Singh <bashishtha.singh@gmail.com>, "
 "2021\n"
 "Language-Team: Hindi (https://www.transifex.com/yaron/teams/16553/hi/)\n"
@@ -2341,7 +2341,7 @@ msgstr ""
 
 #: src/libvlc-module.c:455
 msgid "Fix HDTV height"
-msgstr ""
+msgstr "HDTV ऊँचाई तय करें"
 
 #: src/libvlc-module.c:457
 msgid ""
@@ -2349,6 +2349,9 @@ msgid ""
 "incorrectly sets height to 1088 lines. You should only disable this option "
 "if your video has a non-standard format requiring all 1088 lines."
 msgstr ""
+"यह HDTV-1080 वीडियो प्रारूप के समुचित पालन की अनुमति देता है, भले ही बिगड़े एनकोडर गलत "
+"तरीके से 1088 लकीरों की ऊँचाई निर्धारित करते हैं. यदि आपके वीडियो में सभी 1088 लकीरों की "
+"आवश्यकता वाले गैर-मानक प्रारूप हैं,  केवल तभी आपको इस विकल्प को अक्षम करना चाहिए. "
 
 #: src/libvlc-module.c:462
 msgid "Monitor pixel aspect ratio"
@@ -2366,49 +2369,55 @@ msgstr ""
 
 #: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:307
 msgid "Skip frames"
-msgstr ""
+msgstr "फ्रेम छूटने दें"
 
 #: src/libvlc-module.c:470
 msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr ""
+"MPEG2 प्रवाह पर फ्रेम-छूटना सक्षम करता है. जब आपका कंप्यूटर पर्याप्त शक्तिशाली नहीं है, तो "
+"फ्रेम छूटना सामान्य है."
 
 #: src/libvlc-module.c:473
 msgid "Drop late frames"
-msgstr ""
+msgstr "विलंबित फ्रेम छोड़ते जाएं"
 
 #: src/libvlc-module.c:475
 msgid ""
 "This drops frames that are late (arrive to the video output after their "
 "intended display date)."
 msgstr ""
+"यह विलंबित फ़्रेमों को छोड़ देता है (जो अपनी इच्छित प्रदर्शन पल के बाद वीडियो आउटपुट पर "
+"पहुँचते हैं)."
 
 #: src/libvlc-module.c:478
 msgid "Quiet synchro"
-msgstr ""
+msgstr "मौन सिन्क्रो"
 
 #: src/libvlc-module.c:480
 msgid ""
 "This avoids flooding the message log with debug output from the video output "
 "synchronization mechanism."
 msgstr ""
+"यह वीडियो आउटपुट सिंक्रनाइज़ेशन तंत्र से आने वाले डिबग आउटपुट के संदेशो लॉग को अधिकता से "
+"बचाता है. "
 
 #: src/libvlc-module.c:483
 msgid "Key press events"
-msgstr ""
+msgstr "कुंजी दाब घटनाएं"
 
 #: src/libvlc-module.c:485
 msgid "This enables VLC hotkeys from the (non-embedded) video window."
-msgstr ""
+msgstr "यह (अनिहित) वीडियो विंडो से VLC सक्रिय-कुंजिओं को सक्षम करता है."
 
 #: src/libvlc-module.c:487 modules/spu/remoteosd.c:91
 msgid "Mouse events"
-msgstr ""
+msgstr "माउस घटनाएं"
 
 #: src/libvlc-module.c:489
 msgid "This enables handling of mouse clicks on the video."
-msgstr ""
+msgstr "यह वीडियो पर माउस क्लिक से निपटने में सक्षम बनाता है."
 
 #: src/libvlc-module.c:497
 msgid ""
@@ -2416,78 +2425,88 @@ msgid ""
 "as the DVD or VCD device, the network interface settings or the subtitle "
 "channel."
 msgstr ""
+"ये विकल्प आपको इनपुट सबसिस्टम के व्यवहार को संशोधित करने की अनुमति देते हैं, जैसे कि DVD या "
+"VCD डिवाइस, नेटवर्क इंटरफ़ेस सेटिंग्स या उपशीर्षक चैनल."
 
 #: src/libvlc-module.c:501
 msgid "File caching (ms)"
-msgstr ""
+msgstr "फ़ाइल कैशिंग (ms)"
 
 #: src/libvlc-module.c:503
 msgid "Caching value for local files, in milliseconds."
-msgstr ""
+msgstr "मिलीसेकंड में, स्थानीय फ़ाइलों के लिए कैशिंग मूल्य."
 
 #: src/libvlc-module.c:505
 msgid "Live capture caching (ms)"
-msgstr ""
+msgstr "लाइव कैप्चर कैशिंग (ms)"
 
 #: src/libvlc-module.c:507
 msgid "Caching value for cameras and microphones, in milliseconds."
-msgstr ""
+msgstr "कैमरों और माइक्रोफोन के लिए कैशिंग मूल्य, मिलीसेकंड में. "
 
 #: src/libvlc-module.c:509
 msgid "Disc caching (ms)"
-msgstr ""
+msgstr "डिस्क कैशिंग (ms)"
 
 #: src/libvlc-module.c:511
 msgid "Caching value for optical media, in milliseconds."
-msgstr ""
+msgstr "मिलीसेकंड में, ऑप्टिकल मीडिया के लिए कैशिंग मूल्य."
 
 #: src/libvlc-module.c:513
 msgid "Network caching (ms)"
-msgstr ""
+msgstr "नेटवर्क कैशिंग (ms)"
 
 #: src/libvlc-module.c:515
 msgid "Caching value for network resources, in milliseconds."
-msgstr ""
+msgstr "मिलीसेकंड में, नेटवर्क संसाधनों के लिए कैशिंग मूल्य."
 
 #: src/libvlc-module.c:517
 msgid "Clock reference average counter"
-msgstr ""
+msgstr "घड़ी संदर्भ औसत काउंटर"
 
 #: src/libvlc-module.c:519
 msgid ""
 "When using the PVR input (or a very irregular source), you should set this "
 "to 10000."
 msgstr ""
+"PVR इनपुट (या बहुत अनियमित स्रोत) का उपयोग करते समय, आपको इसे 10000 पर सेट करना "
+"चाहिए."
 
 #: src/libvlc-module.c:522
 msgid "Clock synchronisation"
-msgstr ""
+msgstr "घड़ी सिन्क्रोनाइजेशन"
 
 #: src/libvlc-module.c:524
 msgid ""
 "It is possible to disable the input clock synchronisation for real-time "
 "sources. Use this if you experience jerky playback of network streams."
 msgstr ""
+"रीयल-टाइम स्रोतों के लिए इनपुट घड़ी सिंक्रनाइज़ेशन को अक्षम करना संभव है. यदि आप नेटवर्क "
+"स्ट्रीम के झटकेदार प्लेबैक का अनुभव करते हैं तो इसका उपयोग करें."
 
 #: src/libvlc-module.c:528
 msgid "Clock jitter"
-msgstr ""
+msgstr "घड़ी ज़िटर"
 
 #: src/libvlc-module.c:530
 msgid ""
 "This defines the maximum input delay jitter that the synchronization "
 "algorithms should try to compensate (in milliseconds)."
 msgstr ""
+"यह अधिकतम इनपुट विलंब की गड़बड़ी को परिभाषित करता है जिसे सिंक्रनाइज़ेशन एल्गोरिदम को "
+"क्षतिपूर्ति करने की कोशिश करनी चाहिए (मिलीसेकंड में)."
 
 #: src/libvlc-module.c:533
 msgid "Network synchronisation"
-msgstr ""
+msgstr "नेटवर्क सिंक्रनाइज़ेशन"
 
 #: src/libvlc-module.c:534
 msgid ""
 "This allows you to remotely synchronise clocks for server and client. The "
 "detailed settings are available in Advanced / Network Sync."
 msgstr ""
+"यह आपको सर्वर और क्लाइंट के लिए दूरस्थ रूप से घड़ियों को सिंक्रनाइज़ करने की अनुमति देता है. "
+"विस्तृत सेटिंग्स उन्नत / नेटवर्क सिंक में उपलब्ध हैं. "
 
 #: src/libvlc-module.c:540 src/video_output/vout_intf.c:98
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
@@ -2508,7 +2527,7 @@ msgstr ""
 #: modules/logger/file.c:203 modules/spu/marq.c:61 modules/spu/rss.c:69
 #: modules/spu/rss.c:182 modules/video_output/win32/directdraw.c:1492
 msgid "Default"
-msgstr ""
+msgstr "आरंभिक"
 
 #: src/libvlc-module.c:540
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:215
@@ -2520,17 +2539,18 @@ msgstr "सक्षम"
 
 #: src/libvlc-module.c:542
 msgid "MTU of the network interface"
-msgstr ""
+msgstr "नेटवर्क इंटरफ़ेस का MTU"
 
 #: src/libvlc-module.c:544
 msgid ""
 "This is the maximum application-layer packet size that can be transmitted "
 "over the network (in bytes)."
 msgstr ""
+"यह अधिकतम एप्लिकेशन-लेयर पैकेट आकार है जिसे नेटवर्क पर (बाइट्स में) प्रेषित किया जा सकता है."
 
 #: src/libvlc-module.c:549 modules/stream_out/rtp.c:124
 msgid "Hop limit (TTL)"
-msgstr ""
+msgstr "हॉप सीमा (TTL)"
 
 #: src/libvlc-module.c:551 modules/stream_out/rtp.c:126
 msgid ""
@@ -2538,30 +2558,36 @@ msgid ""
 "multicast packets sent by the stream output (-1 = use operating system built-"
 "in default)."
 msgstr ""
+"यह स्ट्रीम आउटपुट (-1 = ऑपरेटिंग सिस्टम अंतर्निहित डिफ़ॉल्ट प्रयोग करें ) द्वारा भेजे गए "
+"मल्टीकास्ट पैकेटों की हॉप सीमा (\"टाइम-टू-लाइव\" या TTL के रूप में भी जाना जाता है)."
 
 #: src/libvlc-module.c:555
 msgid "Multicast output interface"
-msgstr ""
+msgstr "मल्टीकास्ट आउटपुट इंटरफ़ेस"
 
 #: src/libvlc-module.c:557
 msgid "Default multicast interface. This overrides the routing table."
-msgstr ""
+msgstr "डिफ़ॉल्ट मल्टीकास्ट इंटरफ़ेस. यह रूटिंग टेबल को ओवरराइड करता है. "
 
 #: src/libvlc-module.c:559
 msgid "DiffServ Code Point"
-msgstr ""
+msgstr "DiffServ कोड पॉइंट"
 
 #: src/libvlc-module.c:560
 msgid ""
 "Differentiated Services Code Point for outgoing UDP streams (or IPv4 Type Of "
 "Service, or IPv6 Traffic Class). This is used for network Quality of Service."
 msgstr ""
+"आउटगोइंग UDP स्ट्रीम (या IPv4 प्रकार की सेवा, या IPv6 ट्रैफ़िक क्लास) के लिए विभेदित "
+"सेवा कोड बिंदु. इसका उपयोग नेटवर्क क्वालिटी ऑफ़ सर्विस के लिए किया जाता है."
 
 #: src/libvlc-module.c:566
 msgid ""
 "Choose the program to select by giving its Service ID. Only use this option "
 "if you want to read a multi-program stream (like DVB streams for example)."
 msgstr ""
+"अपनी सेवा आईडी देकर चयन करने के लिए कार्यक्रम चुनें. इस विकल्प का केवल तभी उपयोग करें, "
+"यदि आप एक मल्टी-प्रोग्राम स्ट्रीम (उदाहरण के लिए DVB स्ट्रीम) पढ़ना चाहते हैं."
 
 #: src/libvlc-module.c:572
 msgid ""
@@ -2569,10 +2595,13 @@ msgid ""
 "IDs (SIDs). Only use this option if you want to read a multi-program stream "
 "(like DVB streams for example)."
 msgstr ""
+"सेवा IDs (SIDs) की अल्पविराम से विच्छेदित सूची देकर प्रोग्राम चुनें. यदि आप एक मल्टी-"
+"प्रोग्राम स्ट्रीम (उदाहरण के लिए DVB स्ट्रीम) पढ़ना चाहते हैं, तो केवल इस विकल्प का उपयोग "
+"करें."
 
 #: src/libvlc-module.c:578 modules/gui/qt/ui/open_disk.h:311
 msgid "Audio track"
-msgstr ""
+msgstr "ऑडियो ट्रैक"
 
 #: src/libvlc-module.c:580
 msgid "Stream number of the audio track to use (from 0 to n)."
