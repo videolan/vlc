@@ -113,6 +113,9 @@ Widgets.NavigableFocusScope {
                 playCoverBorder.width: VLCStyle.gridCover_video_border
                 titleMargin: VLCStyle.margin_xxsmall
                 showNewIndicator: true
+                unselectedUnderlay: shadows.unselected
+                selectedUnderlay: shadows.selected
+                
                 onItemDoubleClicked: {
                     if ( model.id !== undefined ) {
                         g_mainDisplay.showPlayer()
@@ -154,6 +157,13 @@ Widgets.NavigableFocusScope {
             onActionAtIndex: {
                 g_mainDisplay.showPlayer()
                 medialib.addAndPlay( model.getIdsForIndexes( recentVideoSelection.selectedIndexes ) )
+            }
+
+            Widgets.GridShadows {
+                id: shadows
+
+                coverWidth: VLCStyle.gridCover_video_width_large
+                coverHeight: VLCStyle.gridCover_video_height_large
             }
         }
     }

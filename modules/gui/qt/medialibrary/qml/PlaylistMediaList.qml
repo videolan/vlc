@@ -272,6 +272,9 @@ Widgets.NavigableFocusScope {
 
                 dragItem: dragItemPlaylist
 
+                unselectedUnderlay: shadows.unselected
+                selectedUnderlay: shadows.selected
+
                 pictureOverlay: Item {
                     Column {
                         anchors.centerIn: parent
@@ -322,6 +325,13 @@ Widgets.NavigableFocusScope {
 
                     contextMenu.popup(modelSelect.selectedIndexes, globalMousePos);
                 }
+            }
+
+            Widgets.GridShadows {
+                id: shadows
+
+                coverWidth: root._width
+                coverHeight: root._height
             }
         }
     }

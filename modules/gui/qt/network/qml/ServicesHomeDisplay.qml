@@ -305,6 +305,8 @@ Widgets.PageLoader {
                 playCoverBorder.width: VLCStyle.gridCover_network_border
                 playCoverOnlyBorders: true
                 pictureOverlay: overlay
+                unselectedUnderlay: shadows.unselected
+                selectedUnderlay: shadows.selected
 
                 onItemDoubleClicked: {
                     if (is_dummy)
@@ -407,6 +409,13 @@ Widgets.PageLoader {
 
                 sourceModel: sourcesModel
                 searchRole: "name"
+            }
+
+            Widgets.GridShadows {
+                id: shadows
+
+                coverWidth: VLCStyle.gridCover_network_width
+                coverHeight: VLCStyle.gridCover_network_height
             }
         }
     }

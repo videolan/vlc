@@ -190,6 +190,8 @@ Widgets.NavigableFocusScope {
                 subtitle: ""
                 height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
                 dragItem: networkDragItem
+                unselectedUnderlay: shadows.unselected
+                selectedUnderlay: shadows.selected
 
                 onPlayClicked: playAt(index)
                 onItemClicked : gridView.leftClickOnItem(modifier, index)
@@ -215,6 +217,13 @@ Widgets.NavigableFocusScope {
             navigationUpItem: gridView.headerItem
             navigationCancel: function() {
                 history.previous()
+            }
+
+            Widgets.GridShadows {
+                id: shadows
+
+                coverWidth: VLCStyle.gridCover_network_width
+                coverHeight: VLCStyle.gridCover_network_height
             }
         }
     }

@@ -160,6 +160,15 @@ Widgets.PageLoader {
                         }
                     }
 
+                    Widgets.GridShadows {
+                        id: shadows
+
+                        leftPadding: (VLCStyle.colWidth(1) - shadows.coverWidth) / 2 // GridItem's rect is horizontally centered
+                        coverWidth: VLCStyle.artistGridCover_radius
+                        coverHeight: VLCStyle.artistGridCover_radius
+                        coverRadius: VLCStyle.artistGridCover_radius
+                    }
+
                     delegate: AudioGridItem {
                         id: gridItem
 
@@ -174,6 +183,9 @@ Widgets.PageLoader {
                         textHorizontalAlignment: Text.AlignHCenter
                         width: VLCStyle.colWidth(1)
                         dragItem: artistsDragItem
+                        unselectedUnderlay: shadows.unselected
+                        selectedUnderlay: shadows.selected
+
 
                         onItemClicked: artistGrid.leftClickOnItem(modifier, index)
 

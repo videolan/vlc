@@ -66,6 +66,13 @@ Widgets.NavigableFocusScope {
         model: deviceModel
     }
 
+    Widgets.GridShadows {
+        id: shadows
+
+        coverWidth: VLCStyle.gridCover_network_width
+        coverHeight: VLCStyle.gridCover_network_height
+    }
+
     Widgets.KeyNavigableListView {
         id: deviceListView
 
@@ -87,6 +94,8 @@ Widgets.NavigableFocusScope {
             focus: true
             x: selectedBorderWidth
             y: selectedBorderWidth
+            unselectedUnderlay: shadows.unselected
+            selectedUnderlay: shadows.selected
 
             onItemClicked : {
                 deviceSelection.updateSelection( modifier ,  deviceSelection.currentIndex, index)

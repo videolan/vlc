@@ -149,7 +149,15 @@ Widgets.NavigableFocusScope {
             model: genreModel
             topMargin: VLCStyle.margin_large
 
-            delegate: Widgets.GridItem {
+            Widgets.GridShadows {
+                id: shadows
+
+                leftPadding: 0
+                coverWidth: VLCStyle.colWidth(2)
+                coverHeight: shadows.coverWidth / 2
+            }
+
+           delegate: Widgets.GridItem {
                 id: item
 
                 property var model: ({})
@@ -162,6 +170,8 @@ Widgets.NavigableFocusScope {
                 image: model.cover || VLCStyle.noArtAlbum
                 playCoverBorder.width: VLCStyle.dp(3, VLCStyle.scale)
                 dragItem: genreDragItem
+                unselectedUnderlay: shadows.unselected
+                selectedUnderlay: shadows.selected
 
                 onItemDoubleClicked: root.showAlbumView(model)
                 onItemClicked: gridView_id.leftClickOnItem(modifier, item.index)

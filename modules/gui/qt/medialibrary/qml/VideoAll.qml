@@ -238,6 +238,16 @@ Widgets.NavigableFocusScope {
                 onRetract: gridView.retract()
             }
 
+            //---------------------------------------------------------------------------------
+            // Shadows
+
+            Widgets.GridShadows {
+                id: shadows
+
+                coverWidth: VLCStyle.gridCover_video_width
+                coverHeight: VLCStyle.gridCover_video_height
+            }
+
             delegate: VideoGridItem {
                 id: gridItem
 
@@ -249,6 +259,8 @@ Widgets.NavigableFocusScope {
                           gridView.expandIndex !== gridItem.index) ? 0.7 : 1
 
                 dragItem: root.dragItem
+                unselectedUnderlay: shadows.unselected
+                selectedUnderlay: shadows.selected
 
                 //---------------------------------------------------------------------------------
                 // Events
