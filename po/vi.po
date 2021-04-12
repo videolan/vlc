@@ -8,14 +8,15 @@
 # brad freedom <brad.freedom@gmail.com>, 2020
 # bruh <quangtrung02hn16@gmail.com>, 2021
 # Sortale <sortale.zerok@gmail.com>, 2014
+# Phạm Gia Hưng <hungpg7@gmail.com>, 2021
 # Pham Kieu Thanh <thanhpk@live.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-03-13 08:24+0100\n"
-"Last-Translator: bruh <quangtrung02hn16@gmail.com>, 2021\n"
+"PO-Revision-Date: 2021-04-12 14:31+0200\n"
+"Last-Translator: Phạm Gia Hưng <hungpg7@gmail.com>, 2021\n"
 "Language-Team: Vietnamese (https://www.transifex.com/yaron/teams/16553/vi/)\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
@@ -39,7 +40,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
-msgstr "Cài đặt VLC"
+msgstr "Giao diện VLC"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
