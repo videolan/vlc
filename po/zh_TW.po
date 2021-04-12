@@ -16,7 +16,7 @@
 # 洪嘉鴻 <jerry9030@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.12\n"
+"Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
 "PO-Revision-Date: 2021-03-17 15:04+0100\n"

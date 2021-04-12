@@ -7,7 +7,7 @@
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2014-2021
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.12\n"
+"Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
 "PO-Revision-Date: 2021-04-01 14:34+0200\n"

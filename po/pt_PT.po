@@ -26,7 +26,7 @@
 # Waldo Luís Ribeiro, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.12\n"
+"Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
 "PO-Revision-Date: 2020-06-28 18:50+0200\n"
