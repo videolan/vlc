@@ -49,11 +49,6 @@ typedef struct vlc_vk_t
     void *platform_sys;
     const char *platform_ext;
 
-    // these should be initialized by the surface module (i.e. surface.c)
-    struct pl_context *ctx;
-    const struct pl_vk_inst *instance;
-    const struct pl_vulkan *vulkan;
-    const struct pl_swapchain *swapchain;
     VkSurfaceKHR surface;
     struct vout_window_t *window;
 
