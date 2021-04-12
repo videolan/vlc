@@ -791,6 +791,8 @@ modules/gui/qt/widgets/native/animators.cpp
 modules/gui/qt/widgets/native/animators.hpp
 modules/gui/qt/widgets/native/customwidgets.cpp
 modules/gui/qt/widgets/native/customwidgets.hpp
+modules/gui/qt/util/covergenerator.cpp
+modules/gui/qt/util/covergenerator.hpp
 modules/gui/qt/util/imagehelper.cpp
 modules/gui/qt/util/imagehelper.hpp
 modules/gui/qt/util/qt_dirs.cpp
