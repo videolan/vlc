@@ -158,11 +158,11 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
 
     // Attempt using the input format as the display format
-    if (vlc_placebo_FormatSupported(gpu, vd->source->i_chroma)) {
-        fmt->i_chroma = vd->source->i_chroma;
+    if (vlc_placebo_FormatSupported(gpu, vd->fmt->i_chroma)) {
+        fmt->i_chroma = vd->fmt->i_chroma;
     } else {
         const vlc_fourcc_t *fcc;
-        for (fcc = vlc_fourcc_GetFallback(vd->source->i_chroma); *fcc; fcc++) {
+        for (fcc = vlc_fourcc_GetFallback(vd->fmt->i_chroma); *fcc; fcc++) {
             if (vlc_placebo_FormatSupported(gpu, *fcc)) {
                 fmt->i_chroma = *fcc;
                 break;
@@ -249,8 +249,8 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         .num_planes = pic->i_planes,
         .width      = pic->format.i_visible_width,
         .height     = pic->format.i_visible_height,
-        .color      = vlc_placebo_ColorSpace(vd->source),
-        .repr       = vlc_placebo_ColorRepr(vd->source),
+        .color      = vlc_placebo_ColorSpace(vd->fmt),
+        .repr       = vlc_placebo_ColorRepr(vd->fmt),
         .src_rect = {
             .x0 = pic->format.i_x_offset,
             .y0 = pic->format.i_y_offset,
@@ -401,7 +401,7 @@ static int Control(vout_display_t *vd, int query)
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_ZOOM: {
-        vout_display_PlacePicture(&sys->place, vd->source, vd->cfg);
+        vout_display_PlacePicture(&sys->place, vd->fmt, vd->cfg);
 
         /* The following resize should be automatic on most platforms but can
          * trigger bugs on some platform with some drivers, that have been seen
