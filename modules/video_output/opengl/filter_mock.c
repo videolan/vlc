@@ -73,14 +73,6 @@
 #include "gl_common.h"
 #include "gl_util.h"
 
-#ifdef USE_OPENGL_ES2
-# define SHADER_VERSION "#version 100\n"
-# define FRAGMENT_SHADER_PRECISION "precision mediump float;\n"
-#else
-# define SHADER_VERSION "#version 120\n"
-# define FRAGMENT_SHADER_PRECISION
-#endif
-
 #define MOCK_CFG_PREFIX "mock-"
 
 static const char *const filter_options[] = {
@@ -241,8 +233,7 @@ InitBlend(struct vlc_gl_filter *filter)
     struct sys *sys = filter->sys;
     const opengl_vtable_t *vt = &filter->api->vt;
 
-    static const char *const VERTEX_SHADER =
-        SHADER_VERSION
+    static const char *const VERTEX_SHADER_BODY =
         "attribute vec2 vertex_pos;\n"
         "attribute vec3 vertex_color;\n"
         "uniform mat4 rotation_matrix;\n"
@@ -252,18 +243,39 @@ InitBlend(struct vlc_gl_filter *filter)
         "  color = vertex_color;\n"
         "}\n";
 
-    static const char *const FRAGMENT_SHADER =
-        SHADER_VERSION
-        FRAGMENT_SHADER_PRECISION
+    static const char *const FRAGMENT_SHADER_BODY =
         "varying vec3 color;\n"
         "void main() {\n"
         "  gl_FragColor = vec4(color, 0.5);\n"
         "}\n";
 
+    const char *shader_version;
+    const char *shader_precision;
+    if (filter->api->is_gles)
+    {
+        shader_version = "#version 100\n";
+        shader_precision = "precision highp float;\n";
+    }
+    else
+    {
+        shader_version = "#version 120\n";
+        shader_precision = "";
+    }
+
+    const char *vertex_shader[] = {
+        shader_version,
+        VERTEX_SHADER_BODY,
+    };
+    const char *fragment_shader[] = {
+        shader_version,
+        shader_precision,
+        FRAGMENT_SHADER_BODY,
+    };
+
     GLuint program_id =
         vlc_gl_BuildProgram(VLC_OBJECT(filter), vt,
-                            1, (const char **) &VERTEX_SHADER,
-                            1, (const char **) &FRAGMENT_SHADER);
+                            ARRAY_SIZE(vertex_shader), vertex_shader,
+                            ARRAY_SIZE(fragment_shader), fragment_shader);
 
     if (!program_id)
         return VLC_EGENERIC;
@@ -316,8 +328,7 @@ InitMask(struct vlc_gl_filter *filter)
 
     struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
 
-    static const char *const VERTEX_SHADER =
-        SHADER_VERSION
+    static const char *const VERTEX_SHADER_BODY =
         "attribute vec2 vertex_pos;\n"
         "uniform mat4 rotation_matrix;\n"
         "varying vec2 tex_coords;\n"
@@ -328,11 +339,7 @@ InitMask(struct vlc_gl_filter *filter)
         "  gl_Position = pos\n;"
         "}\n";
 
-    static const char *const FRAGMENT_SHADER_TEMPLATE =
-        SHADER_VERSION
-        "%s\n" /* extensions */
-        FRAGMENT_SHADER_PRECISION
-        "%s\n" /* vlc_texture definition */
+    static const char *const FRAGMENT_SHADER_BODY =
         "varying vec2 tex_coords;\n"
         "void main() {\n"
         "  gl_FragColor = vlc_texture(tex_coords);\n"
@@ -341,17 +348,35 @@ InitMask(struct vlc_gl_filter *filter)
     const char *extensions = sampler->shader.extensions
                            ? sampler->shader.extensions : "";
 
-    char *fragment_shader;
-    int ret = asprintf(&fragment_shader, FRAGMENT_SHADER_TEMPLATE, extensions,
-                       sampler->shader.body);
-    if (ret < 0)
-        return VLC_EGENERIC;
+    const char *shader_version;
+    const char *shader_precision;
+    if (filter->api->is_gles)
+    {
+        shader_version = "#version 100\n";
+        shader_precision = "precision highp float;\n";
+    }
+    else
+    {
+        shader_version = "#version 120\n";
+        shader_precision = "";
+    }
+
+    const char *vertex_shader[] = {
+        shader_version,
+        VERTEX_SHADER_BODY,
+    };
+    const char *fragment_shader[] = {
+        shader_version,
+        extensions,
+        shader_precision,
+        sampler->shader.body,
+        FRAGMENT_SHADER_BODY,
+    };
 
     GLuint program_id =
         vlc_gl_BuildProgram(VLC_OBJECT(filter), vt,
-                            1, (const char **) &VERTEX_SHADER,
-                            1, (const char **) &fragment_shader);
-    free(fragment_shader);
+                            ARRAY_SIZE(vertex_shader), vertex_shader,
+                            ARRAY_SIZE(fragment_shader), fragment_shader);
     if (!program_id)
         return VLC_EGENERIC;
 
@@ -401,8 +426,7 @@ InitPlane(struct vlc_gl_filter *filter)
 
     struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
 
-    static const char *const VERTEX_SHADER =
-        SHADER_VERSION
+    static const char *const VERTEX_SHADER_BODY =
         "attribute vec2 vertex_pos;\n"
         "varying vec2 tex_coords;\n"
         "void main() {\n"
@@ -411,11 +435,7 @@ InitPlane(struct vlc_gl_filter *filter)
         "                    (vertex_pos.y + 1.0) / 2.0);\n"
         "}\n";
 
-    static const char *const FRAGMENT_SHADER_TEMPLATE =
-        SHADER_VERSION
-        "%s\n" /* extensions */
-        FRAGMENT_SHADER_PRECISION
-        "%s\n" /* vlc_texture definition */
+    static const char *const FRAGMENT_SHADER_BODY =
         "varying vec2 tex_coords;\n"
         "uniform int plane;\n"
         "void main() {\n"
@@ -426,17 +446,35 @@ InitPlane(struct vlc_gl_filter *filter)
     const char *extensions = sampler->shader.extensions
                            ? sampler->shader.extensions : "";
 
-    char *fragment_shader;
-    int ret = asprintf(&fragment_shader, FRAGMENT_SHADER_TEMPLATE, extensions,
-                       sampler->shader.body);
-    if (ret < 0)
-        return VLC_EGENERIC;
+    const char *shader_version;
+    const char *shader_precision;
+    if (filter->api->is_gles)
+    {
+        shader_version = "#version 100\n";
+        shader_precision = "precision highp float;\n";
+    }
+    else
+    {
+        shader_version = "#version 120\n";
+        shader_precision = "";
+    }
+
+    const char *vertex_shader[] = {
+        shader_version,
+        VERTEX_SHADER_BODY,
+    };
+    const char *fragment_shader[] = {
+        shader_version,
+        extensions,
+        shader_precision,
+        sampler->shader.body,
+        FRAGMENT_SHADER_BODY,
+    };
 
     GLuint program_id =
         vlc_gl_BuildProgram(VLC_OBJECT(filter), vt,
-                            1, (const char **) &VERTEX_SHADER,
-                            1, (const char **) &fragment_shader);
-    free(fragment_shader);
+                            ARRAY_SIZE(vertex_shader), vertex_shader,
+                            ARRAY_SIZE(fragment_shader), fragment_shader);
     if (!program_id)
         return VLC_EGENERIC;
 

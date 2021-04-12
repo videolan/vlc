@@ -170,25 +170,14 @@ InitStereoMatrix(GLfloat matrix_out[static 3*3],
 #undef ROW
 }
 
-/* https://en.wikipedia.org/wiki/OpenGL_Shading_Language#Versions */
-#ifdef USE_OPENGL_ES2
-# define SHADER_VERSION "#version 100\n"
-  /* In OpenGL ES, the fragment language has no default precision qualifier for
-   * floating point types. */
-# define FRAGMENT_SHADER_PRECISION "precision highp float;\n"
-#else
-# define SHADER_VERSION "#version 120\n"
-# define FRAGMENT_SHADER_PRECISION
-#endif
-
-static char *
-BuildVertexShader(struct vlc_gl_filter *filter)
+static int
+opengl_link_program(struct vlc_gl_filter *filter)
 {
     struct vlc_gl_renderer *renderer = filter->sys;
+    struct vlc_gl_sampler *sampler = renderer->sampler;
+    const opengl_vtable_t *vt = renderer->vt;
 
-    /* Basic vertex shader */
-    static const char *template =
-        SHADER_VERSION
+    static const char *const VERTEX_SHADER_BODY =
         "attribute vec2 PicCoordsIn;\n"
         "varying vec2 PicCoords;\n"
         "attribute vec3 VertexPosition;\n"
@@ -200,29 +189,9 @@ BuildVertexShader(struct vlc_gl_filter *filter)
         " PicCoords = (StereoMatrix * vec3(PicCoordsIn, 1.0)).st;\n"
         " gl_Position = ProjectionMatrix * ZoomMatrix * ViewMatrix\n"
         "               * vec4(VertexPosition, 1.0);\n"
-        "}";
+        "}\n";
 
-    char *code = strdup(template);
-    if (!code)
-        return NULL;
-
-    if (renderer->dump_shaders)
-        msg_Dbg(filter, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
-                (const char *) &renderer->sampler->fmt.i_chroma, code);
-    return code;
-}
-
-static char *
-BuildFragmentShader(struct vlc_gl_filter *filter)
-{
-    struct vlc_gl_renderer *renderer = filter->sys;
-    struct vlc_gl_sampler *sampler = renderer->sampler;
-
-    static const char *template =
-        SHADER_VERSION
-        "%s" /* extensions */
-        FRAGMENT_SHADER_PRECISION
-        "%s" /* vlc_texture definition */
+    static const char *const FRAGMENT_SHADER_BODY =
         "varying vec2 PicCoords;\n"
         "void main() {\n"
         " gl_FragColor = vlc_texture(PicCoords);\n"
@@ -231,35 +200,44 @@ BuildFragmentShader(struct vlc_gl_filter *filter)
     const char *extensions = sampler->shader.extensions
                            ? sampler->shader.extensions : "";
 
-    char *code;
-    int ret = asprintf(&code, template, extensions, sampler->shader.body);
-    if (ret < 0)
-        return NULL;
+    const char *shader_version;
+    const char *shader_precision;
+    if (filter->api->is_gles)
+    {
+        shader_version = "#version 100\n";
+        shader_precision = "precision highp float;\n";
+    }
+    else
+    {
+        shader_version = "#version 120\n";
+        shader_precision = "";
+    }
+
+    const char *vertex_shader[] = {
+        shader_version,
+        VERTEX_SHADER_BODY,
+    };
+    const char *fragment_shader[] = {
+        shader_version,
+        extensions,
+        shader_precision,
+        sampler->shader.body,
+        FRAGMENT_SHADER_BODY,
+    };
 
     if (renderer->dump_shaders)
-        msg_Dbg(filter, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n",
-                        (const char *) &sampler->fmt.i_chroma,
-                        sampler->fmt.space, code);
-
-    return code;
-}
-
-static int
-opengl_link_program(struct vlc_gl_filter *filter)
-{
-    struct vlc_gl_renderer *renderer = filter->sys;
-    struct vlc_gl_sampler *sampler = renderer->sampler;
-    const opengl_vtable_t *vt = renderer->vt;
-
-    char *vertex_shader = BuildVertexShader(filter);
-    if (!vertex_shader)
-        return VLC_EGENERIC;
-
-    char *fragment_shader = BuildFragmentShader(filter);
-    if (!fragment_shader)
     {
-        free(vertex_shader);
-        return VLC_EGENERIC;
+        msg_Dbg(filter, "\n=== Vertex shader for fourcc: %4.4s ===\n",
+                (const char *) &renderer->sampler->fmt.i_chroma);
+        for (unsigned i = 0; i < ARRAY_SIZE(vertex_shader); ++i)
+            msg_Dbg(filter, "[%u] %s", i, vertex_shader[i]);
+
+        msg_Dbg(filter,
+                "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n",
+                (const char *) &renderer->sampler->fmt.i_chroma,
+                sampler->fmt.space);
+        for (unsigned i = 0; i < ARRAY_SIZE(fragment_shader); ++i)
+            msg_Dbg(filter, "[%u] %s", i, fragment_shader[i]);
     }
 
     assert(sampler->ops &&
@@ -268,10 +246,8 @@ opengl_link_program(struct vlc_gl_filter *filter)
 
     GLuint program_id =
         vlc_gl_BuildProgram(VLC_OBJECT(filter), vt,
-                            1, (const char **) &vertex_shader,
-                            1, (const char **) &fragment_shader);
-    free(vertex_shader);
-    free(fragment_shader);
+                            ARRAY_SIZE(vertex_shader), vertex_shader,
+                            ARRAY_SIZE(fragment_shader), fragment_shader);
     if (!program_id)
         return VLC_EGENERIC;
 
