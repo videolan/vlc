@@ -26,7 +26,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include "platform.h"
+#include "instance.h"
 
 static void ClosePlatform(vlc_vk_t *vk);
 static int CreateSurface(vlc_vk_t *vk);

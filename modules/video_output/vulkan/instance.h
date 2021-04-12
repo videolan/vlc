@@ -58,4 +58,10 @@ vlc_vk_t *vlc_vk_Create(struct vout_window_t *, const char *) VLC_USED;
 void vlc_vk_Release(vlc_vk_t *);
 void vlc_vk_Hold(vlc_vk_t *);
 
+// Create a vulkan surface to vk->surface
+static inline int vlc_vk_CreateSurface(vlc_vk_t * vk, VkInstance instance, VkSurfaceKHR *surface_out)
+{
+    return vk->ops->create_surface(vk, instance, surface_out);
+}
+
 #endif // VLC_VULKAN_INSTANCE_H

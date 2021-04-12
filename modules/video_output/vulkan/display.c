@@ -33,7 +33,6 @@
 
 #include "../placebo_utils.h"
 #include "instance.h"
-#include "platform.h"
 
 #include <libplacebo/renderer.h>
 #include <libplacebo/utils/upload.h>
