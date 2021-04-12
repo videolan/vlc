@@ -21,8 +21,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.12\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2021-02-24 00:06+0100\n"
-"PO-Revision-Date: 2021-02-24 19:21+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2021\n"
+"PO-Revision-Date: 2021-04-12 18:04+0200\n"
+"Last-Translator: Joan Monguillot <jmonguillot@gmail.com>, 2021\n"
 "Language-Team: Catalan (https://www.transifex.com/yaron/teams/16553/ca/)\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -1234,7 +1234,7 @@ msgstr "Equirectangular"
 
 #: src/input/es_out.c:3285
 msgid "Cubemap"
-msgstr "Mapa del cub"
+msgstr "Cubemap"
 
 #: src/input/es_out.c:3291
 msgid "Projection"
@@ -1243,7 +1243,7 @@ msgstr "Projecció"
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Rotació"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
@@ -1817,7 +1817,7 @@ msgstr "Inactiu"
 
 #: src/libvlc-module.c:189
 msgid "Stereo audio output mode"
-msgstr "Mode de sortida de l'àudio estère"
+msgstr "Mode de sortida de l'àudio estèreo"
 
 #: src/libvlc-module.c:195 src/misc/actions.c:112
 #: modules/gui/qt/components/preferences_widgets.cpp:1429
@@ -4262,7 +4262,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1261
 msgid "Medium backwards jump"
-msgstr "Vés una mica més enrere"
+msgstr "Vés un poc més enrere"
 
 #: src/libvlc-module.c:1263
 msgid "Select the hotkey to make a medium backwards jump."
@@ -9553,6 +9553,8 @@ msgstr "Metacub"
 msgid ""
 "Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
 msgstr ""
+"Utilitza el protocol Metacube. Necessari per transmetre cap al reflector "
+"Cubemap."
 
 #: modules/access_output/http.c:67
 msgid "HTTP stream output"
@@ -10063,11 +10065,12 @@ msgstr "Mode d'auriculars (binaural)"
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
 msgstr ""
-"Si la sortida és stereo, representa ambisonicsamb el descodificador binaural."
+"Si la sortida és estèreo, representa ambisonics amb el descodificador "
+"binaural."
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:65
 msgid "Ambisonics renderer and binauralizer"
-msgstr ""
+msgstr "Renderitzador Ambisonics i binauralitzador"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:77
 msgid "Binauralizer"
@@ -10975,7 +10978,7 @@ msgstr "Sortida del dispositiu multimèdia de Windows"
 
 #: modules/audio_output/mmdevice.c:1480
 msgid "Output back-end"
-msgstr ""
+msgstr "Sortida de fons"
 
 #: modules/audio_output/mmdevice.c:1480
 msgid "Audio output back-end interface."
@@ -12302,9 +12305,8 @@ msgid "Kate text subtitles packetizer"
 msgstr "Empaquetador dels subtítols de text Kate"
 
 #: modules/codec/libass.c:59
-#, fuzzy
 msgid "Additional fonts directory"
-msgstr "Directori de les instantànies del vídeo (o nom del fitxer)"
+msgstr "Directori de tipus de lletra addicionals"
 
 #: modules/codec/libass.c:62
 msgid "Subtitles (advanced)"
@@ -13576,7 +13578,7 @@ msgstr "TTML"
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
-msgstr "Desmútiplexació TTML"
+msgstr "Desmultiplexor TTML"
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -13706,7 +13708,7 @@ msgstr "Descodificador de subtítols WEBVTT"
 
 #: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
 msgid "WEBVTT subtitles parser"
-msgstr ""
+msgstr "Analitzador de subtítols WEBVTT"
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -15525,17 +15527,16 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr "Amplada de banda preferida per als streams no ajustables"
 
 #: modules/demux/adaptive/adaptive.cpp:75
-#, fuzzy
 msgid "Live Playback delay (ms)"
-msgstr "Retard DTS (ms)"
+msgstr "Retard de la reproducció en directe (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Tradeoff between stability and real time"
-msgstr ""
+msgstr "Compromís entre estabilitat i temps real"
 
 #: modules/demux/adaptive/adaptive.cpp:78
 msgid "Max buffering (ms)"
-msgstr ""
+msgstr "Memòria intermèdia màxima (ms)"
 
 #: modules/demux/adaptive/adaptive.cpp:80
 msgid "Adaptive Logic"
@@ -15555,9 +15556,8 @@ msgid "Low latency"
 msgstr "Latència baixa"
 
 #: modules/demux/adaptive/adaptive.cpp:86
-#, fuzzy
 msgid "Overrides low latency parameters"
-msgstr "Substitueix els paràmetres"
+msgstr "Substitueix els paràmetres de latència baixa"
 
 #: modules/demux/adaptive/adaptive.cpp:107
 msgid "Predictive"
@@ -15584,9 +15584,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr "Amplada de banda/qualitat més altes"
 
 #: modules/demux/adaptive/adaptive.cpp:123
-#, fuzzy
 msgid "Force"
-msgstr "Força la negreta"
+msgstr "Força"
 
 #: modules/demux/adaptive/adaptive.cpp:127
 msgid "Adaptive"
@@ -16207,7 +16206,7 @@ msgstr "Desmultiplexor de vídeo H264"
 
 #: modules/demux/mpeg/h26x.c:64 modules/demux/mpeg/h26x.c:66
 msgid "HEVC/H.265 video demuxer"
-msgstr "Demuxador de vídeo HEVC/H.265"
+msgstr "Desmultiplexor de vídeo HEVC/H.265"
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
@@ -16317,7 +16316,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:122
 msgid "Trust in-stream PCR"
-msgstr "Confianza en el PCR en streaming"
+msgstr "Confia en el PCR en streaming"
 
 #: modules/demux/mpeg/ts.c:123
 msgid "Use the stream PCR as a reference."
@@ -17612,6 +17611,8 @@ msgid ""
 "By default, VLC will show the statusbar icon menu. However, you can choose "
 "to disable it (restart required)."
 msgstr ""
+"Per defecte, el VLC mostrarà el menú d'icones de la barra d'estat. Tot i "
+"així, podeu triar desactivar-lo (cal reiniciar)."
 
 #: modules/gui/macosx/macosx.m:85
 msgid "Control playlist items with the Apple Remote"
@@ -17712,6 +17713,7 @@ msgstr "Bloqueja la relació d'aspecte"
 #: modules/gui/macosx/macosx.m:113
 msgid "Dim keyboard backlight during fullscreen playback"
 msgstr ""
+"Atenua el contrallum del teclat durant la reproducció a pantalla completa"
 
 #: modules/gui/macosx/macosx.m:114
 msgid ""
@@ -17719,6 +17721,9 @@ msgid ""
 "fullscreen. Automatic brightness adjustment should be disabled in System "
 "Preferences."
 msgstr ""
+"Apaga el contrallum del teclat del MacBook mentre el vídeo es reprodueix a "
+"pantalla completa. Caldria desactivar l'ajust automàtic de brillantor a les "
+"Preferències del sistema."
 
 #: modules/gui/macosx/macosx.m:116 modules/gui/macosx/VLCMainMenu.m:375
 msgid "Show Previous & Next Buttons"
@@ -18192,7 +18197,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:213
 msgid "Open a dialog to select the media to play"
-msgstr ""
+msgstr "Obre el diàleg per seleccionar el suport de reproducció"
 
 #: modules/gui/macosx/VLCMainWindow.m:217
 #: modules/gui/macosx/VLCMainWindow.m:223
@@ -18281,6 +18286,8 @@ msgstr "Repeteix"
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:72
 msgid "Change repeat mode. Modes: repeat one, repeat all and no repeat."
 msgstr ""
+"Canvia el mode de repetició. Modes: repeteix una, repeteix-ho tot i "
+"desactivat."
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:75
 #: share/lua/http/index.html:258
@@ -18315,7 +18322,7 @@ msgstr "Obre"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:136
 msgid "Stream output:"
-msgstr ""
+msgstr "Sortida de flux:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
@@ -18323,7 +18330,7 @@ msgstr "Paràmetres..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
 msgid "Choose media input type"
-msgstr ""
+msgstr "Trieu el tipus d'entrada del suport"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:141
 msgid "Disc"
@@ -18347,7 +18354,7 @@ msgstr "Tria un fitxer"
 #: modules/gui/macosx/VLCOpenWindowController.m:148
 #: modules/gui/macosx/VLCOpenWindowController.m:350
 msgid "Select a file for playback"
-msgstr ""
+msgstr "Seleccioneu un fitxer per reproduir"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:149
 msgid "Treat as a pipe rather than as a file"
@@ -18367,6 +18374,8 @@ msgstr "Tria..."
 #: modules/gui/macosx/VLCOpenWindowController.m:153
 msgid "Select another file to play in sync with the previously selected file"
 msgstr ""
+"Seleccioneu un altre fitxer per reproduir en sincronització amb el fitxer "
+"seleccionat prèviament"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:158
 msgid "Custom playback"
@@ -18374,7 +18383,7 @@ msgstr "Reproducció personalitzada"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:166
 msgid "Open VIDEO_TS / BDMV folder"
-msgstr ""
+msgstr "Obre la carpeta VIDEO_TS / BDMV"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:167
 msgid "Insert Disc"
@@ -18464,11 +18473,11 @@ msgstr "Subpantalla superior"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:212
 msgid "Subscreen Width"
-msgstr ""
+msgstr "Amplada de la subpantalla"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:213
 msgid "Subscreen Height"
-msgstr ""
+msgstr "Alçada de la subpantalla"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:215
 msgid "Capture Audio"
@@ -18480,7 +18489,7 @@ msgstr "Afegeix un fitxer de subtítols:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:349
 msgid "Setup subtitle playback details"
-msgstr ""
+msgstr "Configura els detalls de la reproducció del subtítol."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Select a subtitle file"
@@ -18683,7 +18692,7 @@ msgstr "Continua"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
 msgid "Always continue media playback"
-msgstr ""
+msgstr "Continua sempre la reproducció multimèdia"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
@@ -18692,7 +18701,7 @@ msgstr "Reinicia la reproducció"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:69
 msgid "Playback of \"%@\" will continue at %@"
-msgstr ""
+msgstr "La reproducció de \"%@\" continuarà a %@"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:233
 #: modules/gui/qt/components/simple_preferences.cpp:239
@@ -18843,11 +18852,12 @@ msgstr "Continua la reproducció"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:329
 msgid "Playback behaviour"
-msgstr ""
+msgstr "Comportament de reproducció"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:330
 msgid "Enable notifications on playlist item change"
 msgstr ""
+"Habilita les notificacions quan canviï un element de la llista de reproducció"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:333
 #: modules/gui/qt/ui/sprefs_interface.h:555
@@ -18860,11 +18870,11 @@ msgstr "Comprova si hi ha actualitzacions automàticament"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:338
 msgid "HTTP web interface"
-msgstr ""
+msgstr "Interfície web HTTP"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:339
 msgid "Enable HTTP web interface"
-msgstr ""
+msgstr "Habilita la interfície web HTTP"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:343
 msgid "Default Encoding"
@@ -18975,6 +18985,8 @@ msgstr "Preferències"
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
 msgstr ""
+"No es poden reprendre els fitxers multimèdia perquè l'opció de mantenir-los "
+"està inhabilitada."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:580
 msgid "Last check on: %@"
@@ -19074,7 +19086,7 @@ msgstr "Reprodueix/Posa en pausa"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
 msgid "Toggle random order playback"
-msgstr ""
+msgstr "Commuta la reproducció en ordre aleatori"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
 msgid "Show Main Window"
@@ -19083,7 +19095,7 @@ msgstr "Mostra la finestra principal"
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
 msgid "Path/URL Action"
-msgstr ""
+msgstr "Acció del camí/URL"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
 msgid "Nothing playing"
@@ -19952,7 +19964,7 @@ msgstr "Relació d'aspecte"
 
 #: modules/gui/qt/components/epg/EPGWidget.cpp:65
 msgid "No EPG Data Available"
-msgstr ""
+msgstr "Sense dades EPG disponibles"
 
 #: modules/gui/qt/components/extended_panels.cpp:380
 #: modules/gui/qt/components/extended_panels.cpp:393
@@ -20483,6 +20495,8 @@ msgid ""
 "Select or double click an action to change the associated hotkey. Use delete "
 "key to remove hotkeys."
 msgstr ""
+"Seleccioneu una acció per a canviar la drecera associada. Useu la tecla "
+"Suprimir per eliminar dreceres."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "in"
@@ -20520,7 +20534,7 @@ msgid ""
 "Delete key to remove."
 msgstr ""
 "Feu doble clic per a canviar.\n"
-"La tecla Suprimeix per eliminar."
+"La tecla Suprimir per eliminar."
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1414
 msgid "Hotkey change"
@@ -20528,7 +20542,7 @@ msgstr "Canvi de la tecla de drecera"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1418
 msgid "Press the new key or combination for "
-msgstr "Premeu la tecla nova o una combinació per a"
+msgstr "Premeu la tecla nova o una combinació per a "
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1427
 msgid "Assign"
@@ -20661,7 +20675,7 @@ msgstr ""
 
 #: modules/gui/qt/components/sout/profile_selector.cpp:642
 msgid "This muxer is missing. Using this profile will fail"
-msgstr ""
+msgstr "Manca aquest multiplexor. Fallarà amb aquest perfil"
 
 #: modules/gui/qt/components/sout/profile_selector.cpp:787
 msgid " Profile Name Missing"
@@ -20825,11 +20839,11 @@ msgstr "S'ha fet una selecció múltiple d'arxius."
 
 #: modules/gui/qt/dialogs/convert.cpp:92
 msgid "Files will be placed in the same directory with the same name."
-msgstr ""
+msgstr "Els fitxers s'ubicaran al mateix directori amb el mateix nom."
 
 #: modules/gui/qt/dialogs/convert.cpp:95
 msgid "Append '-converted' to filename"
-msgstr ""
+msgstr "Afegeix '-converted' al nom del fitxer"
 
 #: modules/gui/qt/dialogs/convert.cpp:103
 msgid "Settings"
@@ -20863,7 +20877,7 @@ msgstr "Actualitza"
 
 #: modules/gui/qt/dialogs/epg.cpp:161
 msgid " (%1+ rated)"
-msgstr ""
+msgstr " (classificació %1+)"
 
 #: modules/gui/qt/dialogs/errors.cpp:40
 msgid "Errors"
@@ -22148,13 +22162,15 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:188
 msgid "When to raise the interface"
-msgstr ""
+msgstr "Quan s'activa la interfície"
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
 "This option allows the interface to be raised automatically when a video/"
 "audio playback starts, or never."
 msgstr ""
+"Aquesta opció permet activar la interfície automàticament quan comença una "
+"reproducció de vídeo/àudio, o mai."
 
 #: modules/gui/qt/qt.cpp:192
 msgid "Fullscreen controller mouse sensitivity"
@@ -22364,7 +22380,7 @@ msgstr "Ajust de filtre Direct3D9"
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr ""
 "Descodificar fotogrames directament en el VideoCore RPI i no a la memòria "
-"del hoste."
+"del host."
 
 #: modules/hw/mmal/codec.c:52
 msgid ""
@@ -22384,38 +22400,44 @@ msgstr "Connector per a Raspberry Pi basat en MMAL"
 
 #: modules/hw/mmal/deinterlace.c:45
 msgid "Use QPUs for advanced HD deinterlacing."
-msgstr ""
+msgstr "Utilitza QPUs per al desentrallaçat HD avançat."
 
 #: modules/hw/mmal/deinterlace.c:46
 msgid ""
 "Make use of the QPUs to allow higher quality deinterlacing of HD content."
 msgstr ""
+"Utilitzar les QPUs per aconseguir un desentrallaçat de contingut HD amb "
+"qualitat superior."
 
 #: modules/hw/mmal/deinterlace.c:52
 msgid "MMAL deinterlace"
-msgstr ""
+msgstr "Desentrellaçat MMAL"
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
-msgstr ""
+msgstr "Filtre connector per desentrallaçar basat en MMAL"
 
 #: modules/hw/mmal/vout.c:50
 msgid "VideoCore layer where the video is displayed."
-msgstr ""
+msgstr "Capa VideoCore on es mostra el vídeo."
 
 #: modules/hw/mmal/vout.c:51
 msgid ""
 "VideoCore layer where the video is displayed. Subpictures are displayed "
 "directly above and a black background directly below."
 msgstr ""
+"Capa VideoCore on es mostra el vídeo. Les subimatges es mostren directament "
+"a dalt i un fons negre directament a baix."
 
 #: modules/hw/mmal/vout.c:54
 msgid "Blank screen below video."
-msgstr "Pantalla negre darrere el vídeo."
+msgstr "Pantalla en blanc sota el vídeo."
 
 #: modules/hw/mmal/vout.c:55
 msgid "Render blank screen below video. Increases VideoCore load."
 msgstr ""
+"Renderitza la pantalla en blanc sota el vídeo. Incrementa la càrrega del "
+"VideoCore."
 
 #: modules/hw/mmal/vout.c:59 modules/hw/mmal/vout.c:60
 msgid "Adjust HDMI refresh rate to the video."
@@ -22430,14 +22452,16 @@ msgid ""
 "Force the HDMI output into an interlaced video mode for interlaced video "
 "content."
 msgstr ""
+"Força la sortida HDMI a un mode de vídeo entrellaçat per a contingut de "
+"vídeo entrellaçat."
 
 #: modules/hw/mmal/vout.c:75
 msgid "MMAL vout"
-msgstr ""
+msgstr "Sortida de vídeo MMAL"
 
 #: modules/hw/mmal/vout.c:76
 msgid "MMAL-based vout plugin for Raspberry Pi"
-msgstr ""
+msgstr "Connector de sortida de vídeo basat en MMAL per a Raspberry Pi"
 
 #: modules/hw/vaapi/filters.c:1185
 msgid "VAAPI filters"
@@ -22445,31 +22469,31 @@ msgstr "Filtres VAAPI"
 
 #: modules/hw/vaapi/filters.c:1186
 msgid "Video Accelerated API filters"
-msgstr ""
+msgstr "Filtres API de vídeo accelerat"
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
-msgstr ""
+msgstr "Filtre d'ajust de vídeo VDPAU"
 
 #: modules/hw/vdpau/avcodec.c:220
 msgid "VDPAU video decoder"
-msgstr ""
+msgstr "Descodificador de vídeo VDPAU"
 
 #: modules/hw/vdpau/chroma.c:883
 msgid "Temporal-spatial"
-msgstr ""
+msgstr "Temporal-espacial"
 
 #: modules/hw/vdpau/chroma.c:887 modules/hw/vdpau/display.c:45
 msgid "VDPAU"
-msgstr ""
+msgstr "VDPAU"
 
 #: modules/hw/vdpau/chroma.c:888
 msgid "VDPAU surface conversions"
-msgstr ""
+msgstr "Conversions de superfície VDPAU"
 
 #: modules/hw/vdpau/chroma.c:896
 msgid "Deinterlacing algorithm"
-msgstr ""
+msgstr "Algoritme de desentrellaçat"
 
 #: modules/hw/vdpau/chroma.c:899
 msgid "Inverse telecine"
@@ -22485,43 +22509,43 @@ msgstr ""
 
 #: modules/hw/vdpau/chroma.c:904
 msgid "Noise reduction level"
-msgstr ""
+msgstr "Nivell de reducció del soroll"
 
 #: modules/hw/vdpau/chroma.c:906
 msgid "Scaling quality"
-msgstr ""
+msgstr "Qualitat de l'escalat"
 
 #: modules/hw/vdpau/chroma.c:906
 msgid "High quality scaling level"
-msgstr ""
+msgstr "Nivell d'escalat d'alta qualitat"
 
 #: modules/hw/vdpau/deinterlace.c:134
 msgid "VDPAU deinterlacing filter"
-msgstr ""
+msgstr "Filtre de desentrellaçat VDPAU"
 
 #: modules/hw/vdpau/display.c:46
 msgid "VDPAU output"
-msgstr ""
+msgstr "Sortida VDPAU"
 
 #: modules/hw/vdpau/sharpen.c:143
 msgid "VDPAU sharpen video filter"
-msgstr ""
+msgstr "Filtre de nitidesa de vídeo VDPAU"
 
 #: modules/keystore/file.c:54
 msgid "File keystore (plaintext)"
-msgstr ""
+msgstr "Clauer de fitxers (text pla)"
 
 #: modules/keystore/file.c:55
 msgid "Secrets are stored on a file without any encryption"
-msgstr ""
+msgstr "Els secrets s'emmagatzemen en un fitxer sense encriptar"
 
 #: modules/keystore/file.c:65
 msgid "Crypt keystore"
-msgstr ""
+msgstr "Clauer d'encriptació"
 
 #: modules/keystore/file.c:66
 msgid "Secrets are stored encrypted on a file"
-msgstr ""
+msgstr "Els secrets s'emmagatzemen encriptats en un fitxer"
 
 #: modules/keystore/keychain.m:41
 msgid "No"
@@ -22537,36 +22561,38 @@ msgstr "Predeterminat del sistema"
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock"
-msgstr ""
+msgstr "Després del primer desbloqueig"
 
 #: modules/keystore/keychain.m:49
 msgid "After first unlock, on this device only"
-msgstr ""
+msgstr "Després del primer desbloqueig, només en aquest dispositiu"
 
 #: modules/keystore/keychain.m:51
 msgid "When passcode set, on this device only"
-msgstr ""
+msgstr "Un cop informada la contrasenya, només en aquest dispositiu"
 
 #: modules/keystore/keychain.m:52
 msgid "Always, on this device only"
-msgstr ""
+msgstr "Sempre, només en aquest dispositiu"
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked"
-msgstr ""
+msgstr "Quan estigui desbloquejat"
 
 #: modules/keystore/keychain.m:54
 msgid "When unlocked, on this device only"
-msgstr ""
+msgstr "Quan estigui desbloquejat, només en aquest dispositiu"
 
 #: modules/keystore/keychain.m:57
 msgid "Synchronize stored items"
-msgstr ""
+msgstr "Sincronitza elements emmagatzemats"
 
 #: modules/keystore/keychain.m:58
 msgid ""
 "Synchronizes stored items via iCloud Keychain if enabled in the user domain."
 msgstr ""
+"Sincronitza elements emmagatzemats mitjançant iCloud Keychain sempre que "
+"estigui habilitat al domini de l'usuari."
 
 #: modules/keystore/keychain.m:60
 msgid "Accessibility type for all future passwords saved to the Keychain"
@@ -22632,7 +22658,7 @@ msgstr "Apaga tots els missatges a la consola."
 
 #: modules/logger/console.c:118
 msgid "Console log"
-msgstr ""
+msgstr "Registre de la consola"
 
 #: modules/logger/console.c:119
 msgid "Console logger"
@@ -22702,11 +22728,11 @@ msgstr "Registre SystemD journal"
 
 #: modules/logger/syslog.c:138
 msgid "System log (syslog)"
-msgstr ""
+msgstr "Registre del sistema (syslog)"
 
 #: modules/logger/syslog.c:139
 msgid "Emit log messages through the POSIX system log."
-msgstr ""
+msgstr "Emet missatges de registre a través del registre de sistema POSIX."
 
 #: modules/logger/syslog.c:141
 msgid "Debug messages"
@@ -22714,7 +22740,7 @@ msgstr "Missatges de depuració"
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
-msgstr ""
+msgstr "Inclou missatges de depuració al registre del sistema."
 
 #: modules/logger/syslog.c:144
 msgid "Identity"
@@ -22722,7 +22748,7 @@ msgstr "Identitat"
 
 #: modules/logger/syslog.c:145
 msgid "Process identity in system log."
-msgstr ""
+msgstr "Identitat del procés al registre del sistema."
 
 #: modules/logger/syslog.c:147
 msgid "Facility"
@@ -22730,7 +22756,7 @@ msgstr "Funcionalitat"
 
 #: modules/logger/syslog.c:148
 msgid "System logging facility."
-msgstr ""
+msgstr "Servei de registre del sistema."
 
 #: modules/logger/syslog.c:151
 msgid "syslog"
@@ -22738,11 +22764,11 @@ msgstr "Syslog"
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
-msgstr "Registre del sistema (syslog)"
+msgstr "Registrador del sistema (syslog)"
 
 #: modules/lua/extension.c:1194
 msgid "Extension not responding!"
-msgstr ""
+msgstr "L'extensió no respon"
 
 #: modules/lua/extension.c:1195
 #, c-format
@@ -22750,6 +22776,8 @@ msgid ""
 "Extension '%s' does not respond.\n"
 "Do you want to kill it now? "
 msgstr ""
+"L'extensió '%s' no respon.\n"
+"Voleu aturar-la? "
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -23447,31 +23475,31 @@ msgstr "v"
 
 #: modules/misc/addons/fsstorage.c:83
 msgid "addons local storage"
-msgstr ""
+msgstr "Complements del magatzem local"
 
 #: modules/misc/addons/fsstorage.c:85
 msgid "Addons local storage installer"
-msgstr ""
+msgstr "Complements de l'instal·lador del magatzem local"
 
 #: modules/misc/addons/fsstorage.c:93
 msgid "Addons local storage lister"
-msgstr ""
+msgstr "Complements per llistar el magatzem local"
 
 #: modules/misc/addons/vorepository.c:62
 msgid "Videolan.org's addons finder"
-msgstr ""
+msgstr "Cercador de complements de Videolan.org"
 
 #: modules/misc/addons/vorepository.c:64
 msgid "addons.videolan.org addons finder"
-msgstr ""
+msgstr "Cercador de complements addons.videolan.org"
 
 #: modules/misc/addons/vorepository.c:70
 msgid "Videolan.org's single archive addons finder"
-msgstr ""
+msgstr "Cercador de complements d'arxiu únic de Videolan.org"
 
 #: modules/misc/addons/vorepository.c:72
 msgid "single .vlp archive addons finder"
-msgstr ""
+msgstr "Cercador de complements d'arxiu únic .vlp"
 
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
@@ -23536,6 +23564,9 @@ msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
 msgstr ""
+"Tot i així, el certificat de seguretat que ha presentat el servidor és "
+"desconegut i podria no estar autenticat per cap entitat de certificació de "
+"confiança."
 
 #: modules/misc/gnutls.c:491
 msgid ""
@@ -23543,6 +23574,9 @@ msgid ""
 "previous visit and was not authenticated by any trusted Certificate "
 "Authority."
 msgstr ""
+"Tot i així, el certificat de seguretat que ha presentat el servidor ha "
+"canviat des de la visita anterior i no està autenticat per cap entitat de "
+"certificació de confiança."
 
 #: modules/misc/gnutls.c:502 modules/misc/gnutls.c:523
 #: modules/misc/securetransport.c:346
@@ -23591,23 +23625,27 @@ msgstr ""
 
 #: modules/misc/gnutls.c:756
 msgid "Use system trust database"
-msgstr ""
+msgstr "Utilitza la base de dades de confiança del sistema"
 
 #: modules/misc/gnutls.c:758
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "operating system trust database to authenticate TLS sessions."
 msgstr ""
+"Confia en els certificats arrel de les entitats de certificació, desats a la "
+"base de dades de confiança del sistema, per autenticar les sessions TLS."
 
 #: modules/misc/gnutls.c:761
 msgid "Trust directory"
-msgstr ""
+msgstr "Directori de confiança"
 
 #: modules/misc/gnutls.c:763
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "specified directory to authenticate TLS sessions."
 msgstr ""
+"Confia en els certificats arrel de les entitats de certificació, desats en "
+"el directori especificat, per autenticar les sessions TLS."
 
 #: modules/misc/gnutls.c:766
 msgid "TLS cipher priorities"
@@ -23648,7 +23686,7 @@ msgstr "S'estan reproduint alguns elements multimèdia."
 
 #: modules/misc/inhibit/dbus.c:232
 msgid "D-Bus screensaver"
-msgstr ""
+msgstr "Estalvi de pantalla D-Bus"
 
 #: modules/misc/inhibit/dbus.c:233
 msgid "D-Bus screen saver inhibition"
@@ -23728,11 +23766,11 @@ msgstr ""
 
 #: modules/misc/securetransport.c:55
 msgid "TLS support for OS X and iOS"
-msgstr ""
+msgstr "Suport TLS per a OS X i iOS"
 
 #: modules/misc/securetransport.c:68
 msgid "TLS server support for OS X"
-msgstr ""
+msgstr "Suport de servidor TLS per a OS X"
 
 #: modules/misc/securetransport.c:338
 #, c-format
@@ -23754,7 +23792,7 @@ msgstr ""
 
 #: modules/misc/securetransport.c:347
 msgid "Accept certificate temporarily"
-msgstr ""
+msgstr "Accepta el certificat temporalment"
 
 #: modules/misc/stats.c:214 modules/stream_out/stats.c:51
 msgid "Stats"
@@ -24142,11 +24180,13 @@ msgstr ""
 
 #: modules/mux/ogg.c:50
 msgid "Index size ratio"
-msgstr ""
+msgstr "Relació del tamany d'índex"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
 msgstr ""
+"Establir la relació del tamany d'índex. Modifica el defecte (contingut de "
+"60min) o tamany estimat."
 
 #: modules/mux/ogg.c:60
 msgid "Ogg/OGM muxer"
@@ -24158,7 +24198,7 @@ msgstr "Multiplexor WAV"
 
 #: modules/notify/osx_notifications.m:126
 msgid "OS X Notification Plugin"
-msgstr ""
+msgstr "Connector de les notificacions OS X"
 
 #: modules/notify/osx_notifications.m:303
 msgid "New input playing"
@@ -24178,7 +24218,7 @@ msgstr "Temps d'espera (ms)"
 
 #: modules/notify/notify.c:56
 msgid "How long the notification will be displayed."
-msgstr ""
+msgstr "Quant temps es mostrarà la notificació."
 
 #: modules/notify/notify.c:61
 msgid "Notify"
@@ -24194,11 +24234,11 @@ msgstr "Empaquetador d'àudio A/52"
 
 #: modules/packetizer/avparser.h:49
 msgid "avparser packetizer"
-msgstr ""
+msgstr "empaquetador avparser"
 
 #: modules/packetizer/av1.c:557
 msgid "AV1 video packetizer"
-msgstr ""
+msgstr "Empaquetador de vídeo AV1"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -24222,7 +24262,7 @@ msgstr "Empaquetador de vídeo H.264"
 
 #: modules/packetizer/hevc.c:57
 msgid "HEVC/H.265 video packetizer"
-msgstr ""
+msgstr "Empaquetador de vídeo HEVC/H.265"
 
 #: modules/packetizer/mlp.c:50
 msgid "MLP/TrueHD parser"
@@ -24267,25 +24307,25 @@ msgstr "Empaquetador VC-1"
 
 #: modules/services_discovery/avahi.c:55 modules/services_discovery/avahi.c:484
 msgid "Zeroconf network services"
-msgstr ""
+msgstr "Serveis de xarxa Zeroconf"
 
 #: modules/services_discovery/avahi.c:60
 msgid "Zeroconf services"
-msgstr ""
+msgstr "Serveis Zeroconf"
 
 #: modules/services_discovery/avahi.c:69
 msgid "Avahi Renderer Discovery"
-msgstr ""
+msgstr "Descobriment del renderitzador Avahi"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
 #: modules/services_discovery/bonjour.m:398
 msgid "Bonjour Network Discovery"
-msgstr ""
+msgstr "Descobriment de la xarxa Bonjour"
 
 #: modules/services_discovery/bonjour.m:70
 msgid "Bonjour Renderer Discovery"
-msgstr ""
+msgstr "Descobriment del renderitzador Bonjour"
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -24313,11 +24353,11 @@ msgstr "Les meves imatges"
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:646
 msgid "mDNS Network Discovery"
-msgstr ""
+msgstr "Descobriment de la xarxa mDNS"
 
 #: modules/services_discovery/microdns.c:65
 msgid "mDNS Renderer Discovery"
-msgstr ""
+msgstr "Descobriment del renderitzador mDNS"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24474,15 +24514,15 @@ msgstr "Tipus de fitxer desconegut"
 
 #: modules/services_discovery/upnp.cpp:72
 msgid "SAT>IP channel list"
-msgstr ""
+msgstr "Llista de canals SAT>IP"
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
-msgstr ""
+msgstr "URL de la llista de canals SAT>IP personalitzada"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Master List"
-msgstr ""
+msgstr "Llista principal"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Server List"
@@ -24490,7 +24530,7 @@ msgstr "Llista de servidors"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Custom List"
-msgstr ""
+msgstr "Llista personalitzada"
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -24565,19 +24605,19 @@ msgstr ""
 
 #: modules/spu/audiobargraph_v.c:56
 msgid "Bar width in pixel"
-msgstr ""
+msgstr "Amplada de la barra, en píxels"
 
 #: modules/spu/audiobargraph_v.c:57
 msgid "Width in pixel of each bar in the BarGraph to be displayed."
-msgstr ""
+msgstr "Amplada en píxels de la gràfica de barres que es mostrarà."
 
 #: modules/spu/audiobargraph_v.c:58
 msgid "Bar Height in pixel"
-msgstr ""
+msgstr "Alçada de la barra, en píxels"
 
 #: modules/spu/audiobargraph_v.c:59
 msgid "Height in pixel of BarGraph to be displayed."
-msgstr ""
+msgstr "Alçada en píxels de la gràfica de barres que es mostrarà."
 
 #: modules/spu/audiobargraph_v.c:79 modules/spu/audiobargraph_v.c:98
 msgid "Audio Bar Graph Video sub source"
@@ -24764,6 +24804,8 @@ msgstr "Mida del tipus de lletra, píxels"
 #: modules/spu/marq.c:112 modules/spu/rss.c:149
 msgid "Font size, in pixels. Default is 0 (use default font size)."
 msgstr ""
+"Mida del tipus de lletra, en píxels. El valor per defecte és 0 (utilitza la "
+"mida de la lletra per defecte)."
 
 #: modules/spu/marq.c:116 modules/spu/rss.c:153
 msgid ""
@@ -25286,19 +25328,19 @@ msgstr ""
 
 #: modules/stream_filter/adf.c:42
 msgid "ADF stream filter"
-msgstr ""
+msgstr "Filtre del flux de dades ADF"
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
-msgstr ""
+msgstr "Mòdul de càmera ARIB STD-B25"
 
 #: modules/stream_filter/cache_block.c:498
 msgid "Block stream cache"
-msgstr ""
+msgstr "Bloqueja la memòria cau del flux"
 
 #: modules/stream_filter/cache_read.c:570
 msgid "Byte stream cache"
-msgstr ""
+msgstr "Memòria cau del flux byte"
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
@@ -25314,7 +25356,7 @@ msgstr "Descompressió gzip"
 
 #: modules/stream_filter/hds/hds.c:208
 msgid "HTTP Dynamic Streaming"
-msgstr ""
+msgstr "Flux dinàmic HTTP"
 
 #: modules/stream_filter/inflate.c:201
 msgid "Zlib decompression filter"
@@ -25322,7 +25364,7 @@ msgstr ""
 
 #: modules/stream_filter/prefetch.c:531
 msgid "Stream prefetch filter"
-msgstr "Filtres del stream de dades"
+msgstr "Filtre prefetch del flux de dades"
 
 #: modules/stream_filter/prefetch.c:534
 msgid "Buffer size"
@@ -25338,7 +25380,7 @@ msgstr "Mida de la lectura"
 
 #: modules/stream_filter/prefetch.c:538
 msgid "Prefetch background read size (bytes)"
-msgstr ""
+msgstr "Tamany de lectura (bytes) del prefetch enrere"
 
 #: modules/stream_filter/prefetch.c:540
 msgid "Seek threshold"
@@ -25346,7 +25388,7 @@ msgstr ""
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
-msgstr ""
+msgstr "Llindar (bytes) del prefetch endavant"
 
 #: modules/stream_filter/record.c:49
 msgid "Internal stream record"
@@ -25492,15 +25534,17 @@ msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr ""
+"Això configura el port HTTP del servidor local utilitzat per enviar el flux "
+"multimèdia al Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:192
 #: modules/stream_out/chromecast/cast.cpp:1198
 msgid "Performance warning"
-msgstr ""
+msgstr "Avís de rendiment"
 
 #: modules/stream_out/chromecast/cast.cpp:193
 msgid "Display a performance warning when transcoding"
-msgstr ""
+msgstr "Mostra un avís de rendiment durant la transcodificació"
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Enable Audio passthrough"
@@ -25508,7 +25552,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:195
 msgid "Disable if your receiver does not support Dolby®."
-msgstr ""
+msgstr "Inhabilita si el vostre receptor no és compatible amb Dolby®."
 
 #: modules/stream_out/chromecast/cast.cpp:217
 msgid "High (high quality and high bandwidth)"
@@ -25528,7 +25572,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Conversion quality"
-msgstr ""
+msgstr "Qualitat de la conversió"
 
 #: modules/stream_out/chromecast/cast.cpp:224
 msgid "Change this option to increase conversion speed or quality."
@@ -25536,23 +25580,23 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:227
 msgid "IP Address of the Chromecast."
-msgstr ""
+msgstr "Adreça IP del Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:228
 msgid "Chromecast port"
-msgstr ""
+msgstr "Port del Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:229
 msgid "The port used to talk to the Chromecast."
-msgstr ""
+msgstr "El port utilitzat per parlar amb el Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:239
 msgid "Chromecast"
-msgstr ""
+msgstr "Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:240
 msgid "Chromecast stream output"
-msgstr ""
+msgstr "Sortida de flux Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:1197
 msgid "Ok, Don't warn me again"
@@ -25566,7 +25610,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:511
 msgid "Chromecast demux wrapper"
-msgstr ""
+msgstr "Embolcall del desmultiplexor Chromecast"
 
 #: modules/stream_out/cycle.c:326
 msgid "cycle"
@@ -28036,23 +28080,23 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:241
 msgid "DeckLink General Options"
-msgstr ""
+msgstr "Opcions generals del DeckLink"
 
 #: modules/video_output/decklink.cpp:246
 msgid "DeckLink Video Output module"
-msgstr ""
+msgstr "Mòdul de sortida de vídeo del DeckLink"
 
 #: modules/video_output/decklink.cpp:251
 msgid "DeckLink Video Options"
-msgstr ""
+msgstr "Opcions de vídeo del DeckLink"
 
 #: modules/video_output/decklink.cpp:274
 msgid "DeckLink Audio Output module"
-msgstr ""
+msgstr "Mòdul de sortida d'àudio del DeckLink"
 
 #: modules/video_output/decklink.cpp:279
 msgid "DeckLink Audio Options"
-msgstr ""
+msgstr "Opcions d'àudio del DeckLink"
 
 #: modules/video_output/drawable.c:34
 msgid "Window handle (HWND)"
@@ -28115,7 +28159,7 @@ msgstr "La memòria intermèdia gràfica utilitza l'acceleració del maquinari"
 
 #: modules/video_output/fb.c:71
 msgid "Disable for double buffering in software."
-msgstr ""
+msgstr "Deshabilitar per a doble memòria intermèdia en el programari."
 
 #: modules/video_output/fb.c:73
 msgid "Image format (default RGB)"
@@ -28446,15 +28490,15 @@ msgstr ""
 
 #: modules/video_output/wayland/shell.c:411
 msgid "WL shell"
-msgstr ""
+msgstr "Shell WL"
 
 #: modules/video_output/wayland/shell.c:412
 msgid "Wayland shell surface"
-msgstr ""
+msgstr "Superfície shell de Wayland"
 
 #: modules/video_output/wayland/shm.c:508
 msgid "WL SHM"
-msgstr ""
+msgstr "WL SHM"
 
 #: modules/video_output/wayland/shm.c:509
 msgid "Wayland shared memory video output"
@@ -28462,11 +28506,11 @@ msgstr ""
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
-msgstr ""
+msgstr "Shell XDG"
 
 #: modules/video_output/wayland/xdg-shell.c:381
 msgid "XDG shell surface"
-msgstr ""
+msgstr "Superfície shell de XDG"
 
 #. xgettext: This is a plain ASCII spelling of "VLC media player"
 #. for the ICCCM window name. This must be pure ASCII.
@@ -28573,13 +28617,15 @@ msgstr ""
 
 #: modules/video_output/yuv.c:48
 msgid "Add a YUV4MPEG2 header"
-msgstr ""
+msgstr "Afegeix una capçalera YUV4MPEG2"
 
 #: modules/video_output/yuv.c:49
 msgid ""
 "The YUV4MPEG2 header is compatible with mplayer yuv video output and "
 "requires YV12/I420 fourcc."
 msgstr ""
+"La capçalera YUV4MPEG2 és compatible amb la sortida de vídeo mplayer yuv i "
+"requereix YV12/I420 fourcc."
 
 #: modules/video_output/yuv.c:58
 msgid "YUV output"
@@ -29049,13 +29095,15 @@ msgstr "Tipus de finestra per a mostrar la visualització de l'espectre FFT."
 
 #: modules/visualization/visual/visual.c:65
 msgid "Kaiser window parameter"
-msgstr ""
+msgstr "Paràmetre de finestra Kaiser"
 
 #: modules/visualization/visual/visual.c:67
 msgid ""
 "The parameter alpha for the Kaiser window. Increasing alpha increases the "
 "main-lobe width and decreases the side-lobe amplitude."
 msgstr ""
+"El paràmetre alfa de la finestra Kaiser. Augmentant l'alfa augmenta "
+"l'amplada del lòbul principal i disminueix l'amplitud del lòbul costat."
 
 #: modules/visualization/visual/visual.c:70
 msgid "Show 80 bands instead of 20"
@@ -29164,7 +29212,7 @@ msgstr "Blackman-Harris"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Kaiser"
-msgstr ""
+msgstr "Kaiser"
 
 #: modules/visualization/vsxu.cpp:59 modules/visualization/vsxu.cpp:60
 msgid "vsxu"
