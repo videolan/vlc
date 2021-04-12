@@ -38,6 +38,8 @@ FocusScope {
     property alias pictureRadius: picture.radius
     property alias pictureOverlay: picture.imageOverlay
     property bool selected: false
+    property alias unselectedUnderlay: unselectedUnderlayLoader.sourceComponent
+    property alias selectedUnderlay: selectedUnderlayLoader.sourceComponent
 
     property alias progress: picture.progress
     property alias labels: picture.labels
@@ -74,13 +76,13 @@ FocusScope {
             name: "unselected"
 
             PropertyChanges {
-                target: selectedShadow
+                target: selectedUnderlayLoader
                 opacity: 0
                 visible: false
             }
 
             PropertyChanges {
-                target: unselectedShadow
+                target: unselectedUnderlayLoader
                 opacity: 1
                 visible: true
             }
@@ -100,13 +102,13 @@ FocusScope {
             name: "selected"
 
             PropertyChanges {
-                target: selectedShadow
+                target: selectedUnderlayLoader
                 opacity: 1
                 visible: true
             }
 
             PropertyChanges {
-                target: unselectedShadow
+                target: unselectedUnderlayLoader
                 opacity: 0
                 visible: false
             }
@@ -132,7 +134,7 @@ FocusScope {
 
             SequentialAnimation {
                 PropertyAction {
-                    targets: [picture, selectedShadow]
+                    targets: [picture, selectedUnderlayLoader]
                     properties: "playCoverVisible,visible"
                 }
 
@@ -152,7 +154,7 @@ FocusScope {
                 }
 
                 PropertyAction {
-                    target: unselectedShadow
+                    target: unselectedUnderlayLoader
                     property: "visible"
                 }
             }
@@ -164,7 +166,7 @@ FocusScope {
 
             SequentialAnimation {
                 PropertyAction {
-                    target: unselectedShadow
+                    target: unselectedUnderlayLoader
                     property: "visible"
                 }
 
@@ -184,7 +186,7 @@ FocusScope {
                 }
 
                 PropertyAction {
-                    targets: [picture, selectedShadow]
+                    targets: [picture, selectedUnderlayLoader]
                     properties: "playCoverVisible,visible"
                 }
             }
@@ -249,48 +251,16 @@ FocusScope {
             visible: root.selected || root._highlighted
         }
 
-        Rectangle {
-            id: baseRect
+        Loader {
+            id: unselectedUnderlayLoader
 
-            x: layout.x + 1 // this rect is set such that it hides behind picture component
-            y: layout.y + 1
-            width: pictureWidth - 2
-            height: pictureHeight - 2
-            radius: picture.radius
-            color: VLCStyle.colors.bg
+            asynchronous: true
         }
 
-        // animating shadows properties are expensive and not smooth
-        // thus we use two different shadows for states "selected" and "unselected"
-        // and animate their opacity on state changes to get better animation
-        CoverShadow {
-            id: unselectedShadow
+        Loader {
+            id: selectedUnderlayLoader
 
-            anchors.fill: baseRect
-            source: baseRect
-            cached: true
-            visible: false
-            secondaryVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
-            secondaryRadius: VLCStyle.dp(2, VLCStyle.scale)
-            secondarySamples: 1 + VLCStyle.dp(2, VLCStyle.scale) * 2
-            primaryVerticalOffset: VLCStyle.dp(4, VLCStyle.scale)
-            primaryRadius: VLCStyle.dp(9, VLCStyle.scale)
-            primarySamples: 1 + VLCStyle.dp(9, VLCStyle.scale) * 2
-        }
-
-        CoverShadow {
-            id: selectedShadow
-
-            anchors.fill: baseRect
-            source: baseRect
-            cached: true
-            visible: false
-            secondaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-            secondaryRadius: VLCStyle.dp(18, VLCStyle.scale)
-            secondarySamples: 1 + VLCStyle.dp(18, VLCStyle.scale) * 2
-            primaryVerticalOffset: VLCStyle.dp(32, VLCStyle.scale)
-            primaryRadius: VLCStyle.dp(72, VLCStyle.scale)
-            primarySamples: 1 + VLCStyle.dp(72, VLCStyle.scale) * 2
+            asynchronous: true
         }
 
         Column {
