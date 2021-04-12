@@ -55,6 +55,8 @@ static inline block_t * AV1_Unpack_Sample_ExpandSize(block_t *p_block)
         if(AV1_OBUHasSizeField(p_obu))
             continue;
         const uint8_t i_header = 1 + AV1_OBUHasExtensionField(p_obu);
+        if(i_header > i_obu)
+            break;
         const uint8_t i_sizelen = leb128_expected(i_obu - i_header);
         const size_t i_obu_offset = p_obu - p_block->p_buffer;
 
