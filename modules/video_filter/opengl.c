@@ -171,13 +171,8 @@ static int Open( vlc_object_t *obj )
     if (sys == NULL)
         return VLC_ENOMEM;
 
-    unsigned width
-        = filter->fmt_out.video.i_visible_width
-        = filter->fmt_in.video.i_visible_width;
-
-    unsigned height
-        = filter->fmt_out.video.i_visible_height
-        = filter->fmt_in.video.i_visible_height;
+    unsigned width = filter->fmt_out.video.i_visible_width;
+    unsigned height = filter->fmt_out.video.i_visible_height;
 
     // TODO: other than BGRA format ?
 #ifdef USE_OPENGL_ES2
