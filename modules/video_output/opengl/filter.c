@@ -49,6 +49,7 @@ vlc_gl_filter_New(vlc_object_t *parent, const struct vlc_gl_api *api)
 
     struct vlc_gl_filter *filter = &priv->filter;
     filter->api = api;
+    filter->config.filter_planes = false;
     filter->config.blend = false;
     filter->config.msaa_level = 0;
     filter->ops = NULL;
