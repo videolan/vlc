@@ -68,9 +68,6 @@ vlc_vk_t *vlc_vk_Create(struct vout_window_t *wnd, const char *name)
                                  vlc_vk_start, vk);
 
     if (vk->module == NULL)
-        vk->module = module_need(vk, "vulkan", name, true);
-
-    if (vk->module == NULL)
     {
         vlc_object_delete(vk);
         return NULL;
@@ -92,9 +89,6 @@ void vlc_vk_Release(vlc_vk_t *vk)
 
     if (vk->ops)
         vk->ops->close(vk);
-
-    if (module_provides(vk->module, "vulkan"))
-        module_unneed(vk, vk->module);
 
     /* TODO: use vlc_objres_clear */
     vlc_object_delete(vk);
