@@ -232,6 +232,7 @@ static int Open( vlc_object_t *obj )
     if (!sys->filters)
     {
         msg_Err(obj, "Could not create filters");
+        free(glfilters_config);
         goto filters_new_failure;
     }
 
@@ -242,7 +243,7 @@ static int Open( vlc_object_t *obj )
     {
         msg_Err(obj, "Could not load filters: %s", glfilters_config);
         free(glfilters_config);
-        goto filter_config_failure;
+        goto filters_load_failure;
     }
     free(glfilters_config);
 
@@ -290,9 +291,10 @@ static int Open( vlc_object_t *obj )
     return VLC_SUCCESS;
 
 init_framebuffer_failure:
-filters_new_failure:
+filters_load_failure:
     vlc_gl_filters_Delete(sys->filters);
 
+filters_new_failure:
 filter_config_failure:
     vlc_gl_interop_Delete(sys->interop);
 
