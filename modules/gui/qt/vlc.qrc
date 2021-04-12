@@ -252,6 +252,7 @@
         <file alias="OverlayMenu.qml">widgets/qml/OverlayMenu.qml</file>
         <file alias="IconControlButton.qml">widgets/qml/IconControlButton.qml</file>
         <file alias="ShadowCoverGenerator.qml">widgets/qml/ShadowCoverGenerator.qml</file>
+        <file alias="GridShadows.qml">widgets/qml/GridShadows.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>

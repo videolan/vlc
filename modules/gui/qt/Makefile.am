@@ -751,6 +751,7 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/ExpandGridView.qml \
 	gui/qt/widgets/qml/FocusBackground.qml \
 	gui/qt/widgets/qml/GridItem.qml \
+	gui/qt/widgets/qml/GridShadows.qml \
 	gui/qt/widgets/qml/HorizontalResizeHandle.qml \
 	gui/qt/widgets/qml/IconLabel.qml \
 	gui/qt/widgets/qml/IconButton.qml \
