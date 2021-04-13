@@ -14,6 +14,7 @@ $Id$
  * access_output_file: File access_output module
  * access_output_http: HTTP Network access module
  * access_output_livehttp: Live HTTP stream output
+ * access_output_rist: RIST (Reliable Internet Stream Transport) access_output module
  * access_output_shout: Shoutcast access output
  * access_output_srt: SRT (Secure Reliable Transport) access_output module
  * access_output_udp: UDP Network access_output module
@@ -61,7 +62,6 @@ $Id$
  * avcodec: libavcodec audio/video decoder
  * avformat: libavformat demuxer
  * avi: AVI file stream demuxer
- * av1: AV1 packetizer
  * avio: Access and Stream output module using libavformat network
  * ball: Augmented reality ball video filter module
  * bandlimited_resampler: Bandlimited interpolation audio resampler
@@ -94,6 +94,7 @@ $Id$
  * cvpx: filter to copy from OS X accelerated surfaces to CPU
  * d3d11va: Direct3D11 hardware-accelerated decoding
  * daala: a daala video decoder/packetizer using libdaala
+ * dav1d: Dav1d decoder (AV1)
  * dbus: D-Bus control interface
  * dbus_screensaver: preventing the computer from suspending
  * dc1394: IIDC (DCAM) FireWire input module
@@ -290,6 +291,7 @@ $Id$
  * oss: audio output module using the OSS /dev/dsp interface
  * osx_notifications: announce currently playing stream to OS X/Growl
  * packetizer_a52: A/52 basic parser/packetizer
+ * packetizer_av1: AV1 packetizer
  * packetizer_avparser: libavcodec packetizer
  * packetizer_copy: Simple copy packetizer
  * packetizer_dirac: Dirac video packetizer
@@ -331,6 +333,7 @@ $Id$
  * remap: audio channel remapping filter
  * remoteosd: Remote-OSD over VNC
  * ripple: Ripple video effect
+ * rist: RIST (Reliable Internet Stream Transport) access module
  * rotate: Video rotation filter
  * rss: Display a RSS feed on the video output
  * rtp: rtp demux module
@@ -362,8 +365,8 @@ $Id$
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation
  * skiptags: APE & ID3 tags-skipping stream filter
- * smb: SMB shares access module
  * smb2: SMB2/3 access module
+ * smb: SMB shares access module
  * smf: Standard MIDI file demuxer
  * sndio: OpenBSD sndio audio output
  * soxr: SoX Resampler library audio filter
