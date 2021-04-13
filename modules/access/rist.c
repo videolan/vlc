@@ -1144,11 +1144,11 @@ vlc_module_begin ()
     add_integer( "nack-type", NACK_FMT_RANGE,
             N_("RIST nack type, 0 = range, 1 = bitmask. Default is range"), NULL, true )
         change_integer_list( nack_type, nack_type_names )
-    add_bool( "disable-nacks", false, "Disable NACK output packets",
-        "Use this to disable packet recovery", true )
-    add_bool( "mcast-blind-nacks", false, "Do not check for a valid rtcp message from the encoder",
-        "Send nack messages even when we have not confirmed that the encoder is on our local " \
-        "network.", true )
+    add_bool( "disable-nacks", false, N_("Disable NACK output packets"),
+        N_("Use this to disable packet recovery"), true )
+    add_bool( "mcast-blind-nacks", false, N_("Do not check for a valid rtcp message from the encoder"),
+        N_("Send nack messages even when we have not confirmed that the encoder is on our local " \
+        "network."), true )
 
     set_capability( "access", 0 )
     add_shortcut( "rist", "tr06" )
