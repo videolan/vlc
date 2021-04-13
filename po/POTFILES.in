@@ -205,6 +205,7 @@ modules/access/nfs.c
 modules/access/oss.c
 modules/access/pulse.c
 modules/access/rdp.c
+modules/access/rist.c
 modules/access/rtp/rtp.c
 modules/access/rtsp/access.c
 modules/access/satip.c
@@ -229,6 +230,7 @@ modules/access_output/dummy.c
 modules/access_output/file.c
 modules/access_output/http.c
 modules/access_output/livehttp.c
+modules/access_output/rist.c
 modules/access_output/shout.c
 modules/access_output/srt.c
 modules/access_output/udp.c
