@@ -21,17 +21,16 @@
 #include "mlgroup.hpp"
 
 // VLC includes
-#include <vlc_media_library.h>
 #include "qt.hpp"
 
 //-------------------------------------------------------------------------------------------------
 // Ctor / dtor
 //-------------------------------------------------------------------------------------------------
 
-MLGroup::MLGroup(vlc_medialibrary_t * ml, const vlc_ml_group_t * data, QObject * parent)
-    : QObject(parent)
-    , MLItem(MLItemId(data->i_id, VLC_ML_PARENT_GROUP))
+MLGroup::MLGroup(vlc_medialibrary_t * ml, const vlc_ml_group_t * data)
+    : MLItem(MLItemId(data->i_id, VLC_ML_PARENT_GROUP))
     , m_ml(ml)
+    , m_generator(nullptr)
     , m_name(qfu(data->psz_name))
     , m_duration(data->i_duration)
     , m_date(data->i_creation_date)
@@ -44,15 +43,36 @@ MLGroup::MLGroup(vlc_medialibrary_t * ml, const vlc_ml_group_t * data, QObject *
 // Interface
 //-------------------------------------------------------------------------------------------------
 
+bool MLGroup::hasGenerator() const
+{
+    return m_generator.get();
+}
+
+void MLGroup::setGenerator(CoverGenerator * generator)
+{
+    m_generator.reset(generator);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 QString MLGroup::getName() const
 {
     return m_name;
 }
 
-QString MLGroup::getThumbnail()
+//-------------------------------------------------------------------------------------------------
+
+QString MLGroup::getCover() const
 {
-    return QString();
+    return m_cover;
 }
+
+void MLGroup::setCover(const QString & fileName)
+{
+    m_cover = fileName;
+}
+
+//-------------------------------------------------------------------------------------------------
 
 int64_t MLGroup::getDuration() const
 {

@@ -347,7 +347,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlfoldersmodel.moc.cpp \
 	gui/qt/medialibrary/mlgenre.moc.cpp \
 	gui/qt/medialibrary/mlgenremodel.moc.cpp \
-	gui/qt/medialibrary/mlgroup.moc.cpp \
 	gui/qt/medialibrary/mlgrouplistmodel.moc.cpp \
 	gui/qt/medialibrary/mlqmltypes.moc.cpp \
 	gui/qt/medialibrary/mlrecentsmodel.moc.cpp \
