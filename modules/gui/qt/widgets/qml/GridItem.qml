@@ -229,6 +229,12 @@ FocusScope {
             id: selectedUnderlayLoader
 
             asynchronous: true
+            active: false
+            visible: false
+            onVisibleChanged: {
+                if (visible && !active)
+                    active = true
+            }
         }
 
         Column {
