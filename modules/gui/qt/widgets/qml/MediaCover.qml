@@ -18,7 +18,6 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
-import QtQuick.Layouts 1.11
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -26,7 +25,6 @@ import "qrc:///style/"
 Widgets.RoundImage {
     id: root
 
-    property var labels: []
     property alias playCoverOpacity: playCover.opacity
     property alias playCoverVisible: playCover.visible
     property alias playCoverOnlyBorders: playCover.onlyBorders
@@ -42,32 +40,6 @@ Widgets.RoundImage {
         id: overlay
 
         anchors.fill: parent
-    }
-
-    RowLayout {
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-            topMargin: VLCStyle.margin_xxsmall
-            leftMargin: VLCStyle.margin_xxsmall
-            rightMargin: VLCStyle.margin_xxsmall
-        }
-
-        spacing: VLCStyle.margin_xxsmall
-
-        Repeater {
-            model: labels
-            VideoQualityLabel {
-                Layout.preferredWidth: implicitWidth
-                Layout.preferredHeight: implicitHeight
-                text: modelData
-            }
-        }
-
-        Item {
-            Layout.fillWidth: true
-        }
     }
 
     Widgets.PlayCover {

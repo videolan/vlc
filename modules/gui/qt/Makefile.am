@@ -802,7 +802,7 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/TextToolButton.qml \
 	gui/qt/widgets/qml/ToolTipArea.qml \
 	gui/qt/widgets/qml/VideoProgressBar.qml \
-	gui/qt/widgets/qml/VideoQualityLabel.qml \
+	gui/qt/widgets/qml/VideoQualityLabels.qml \
 	gui/qt/widgets/qml/ListSubtitleLabel.qml \
 	gui/qt/widgets/qml/PointingTooltip.qml \
 	gui/qt/widgets/qml/FrostedGlassEffect.qml \

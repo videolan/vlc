@@ -28,14 +28,15 @@ Widgets.GridItem {
 
     property bool showNewIndicator: true
     property int newIndicatorMedian: root.highlighted ? VLCStyle.icon_small : VLCStyle.icon_xsmall
+    
+    property var labels: [
+        model.resolution_name || "",
+        model.channel || ""
+    ].filter(function(a) { return a !== "" })
 
     image: model.thumbnail || VLCStyle.noArtCover
     title: model.title || i18n.qtr("Unknown title")
     subtitle: Helpers.msToString(model.duration) || ""
-    labels: [
-        model.resolution_name || "",
-        model.channel || ""
-    ].filter(function(a) { return a !== "" } )
     pictureWidth: VLCStyle.gridCover_video_width
     pictureHeight: VLCStyle.gridCover_video_height
     playCoverBorder.width: VLCStyle.gridCover_video_border
@@ -44,6 +45,18 @@ Widgets.GridItem {
     pictureOverlay: Item {
         width: root.pictureWidth
         height: root.pictureHeight
+
+        Widgets.VideoQualityLabels {
+            anchors {
+                top: parent.top
+                right: parent.right
+                topMargin: VLCStyle.margin_xxsmall
+                leftMargin: VLCStyle.margin_xxsmall
+                rightMargin: VLCStyle.margin_xxsmall
+            }
+
+            labels: root.labels
+        }
 
         Widgets.VideoProgressBar {
             id: progressBar

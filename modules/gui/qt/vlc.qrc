@@ -224,7 +224,7 @@
         <file alias="LabelSeparator.qml">widgets/qml/LabelSeparator.qml</file>
         <file alias="ContextButton.qml">widgets/qml/ContextButton.qml</file>
         <file alias="RoundImage.qml">widgets/qml/RoundImage.qml</file>
-        <file alias="VideoQualityLabel.qml">widgets/qml/VideoQualityLabel.qml</file>
+        <file alias="VideoQualityLabels.qml">widgets/qml/VideoQualityLabels.qml</file>
         <file alias="VideoProgressBar.qml">widgets/qml/VideoProgressBar.qml</file>
         <file alias="NavigableCol.qml">widgets/qml/NavigableCol.qml</file>
         <file alias="NavigableRow.qml">widgets/qml/NavigableRow.qml</file>

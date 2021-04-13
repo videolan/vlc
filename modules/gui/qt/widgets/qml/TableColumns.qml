@@ -64,7 +64,23 @@ Item {
                 playIconSize: VLCStyle.play_cover_small
                 onPlayIconClicked: medialib.addAndPlay( rowModel.id )
                 radius: root.titleCover_radius
-                labels: root.titlecoverLabels(rowModel)
+
+                imageOverlay: Item {
+                    width: cover.width
+                    height: cover.height
+
+                    Widgets.VideoQualityLabels {
+                        anchors {
+                            top: parent.top
+                            right: parent.right
+                            topMargin: VLCStyle.margin_xxsmall
+                            leftMargin: VLCStyle.margin_xxsmall
+                            rightMargin: VLCStyle.margin_xxsmall
+                        }
+
+                        labels: root.titlecoverLabels(rowModel)
+                    }
+                }
             }
         }
 

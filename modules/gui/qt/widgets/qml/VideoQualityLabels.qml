@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2021 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,19 +20,32 @@ import QtQuick.Controls 2.4
 
 import "qrc:///style/"
 
-Label {
-    id: label
-    color: "white"
-    bottomPadding: VLCStyle.margin_xxxsmall
-    topPadding: VLCStyle.margin_xxxsmall
-    leftPadding: VLCStyle.margin_xxxsmall
-    rightPadding: VLCStyle.margin_xxxsmall
-    font.pixelSize: VLCStyle.fontSize_normal
-    background: Rectangle {
-        anchors.fill: label
-        color: "black"
-        opacity: 0.5
-        radius: 3
+Row {
+    property alias labels: repeater.model
+
+    spacing: VLCStyle.margin_xxsmall
+
+    Repeater {
+        id: repeater
+
+        delegate: Label {
+            id: label
+
+            text: modelData
+            color: "white"
+            bottomPadding: VLCStyle.margin_xxxsmall
+            topPadding: VLCStyle.margin_xxxsmall
+            leftPadding: VLCStyle.margin_xxxsmall
+            rightPadding: VLCStyle.margin_xxxsmall
+            font.pixelSize: VLCStyle.fontSize_normal
+            background: Rectangle {
+                anchors.fill: label
+                color: "black"
+                opacity: 0.5
+                radius: 3
+            }
+
+            Accessible.ignored: true
+        }
     }
-    Accessible.ignored: true
 }
