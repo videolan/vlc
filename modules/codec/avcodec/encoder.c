@@ -227,10 +227,6 @@ static const uint16_t mpeg4_default_non_intra_matrix[64] = {
 
 static const int DEFAULT_ALIGN = 0;
 
-
-/*****************************************************************************
- * InitVideoEnc: probe the encoder
- *****************************************************************************/
 static void probe_video_frame_rate( encoder_t *p_enc, AVCodecContext *p_context, AVCodec *p_codec )
 {
     /* if we don't have i_frame_rate_base, we are probing and just checking if we can find codec
@@ -292,6 +288,9 @@ static void add_av_option_float( encoder_t *p_enc, AVDictionary** pp_dict, const
         msg_Warn( p_enc, "Failed to set encoder option %s", psz_name );
 }
 
+/*****************************************************************************
+ * InitVideoEnc: probe the encoder
+ *****************************************************************************/
 int InitVideoEnc( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
