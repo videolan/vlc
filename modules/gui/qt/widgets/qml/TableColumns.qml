@@ -59,7 +59,6 @@ Item {
 
                 anchors.fill: parent
                 source: (rowModel ? (root.showTitleText ? rowModel.cover : rowModel[model.criteria]) : VLCStyle.noArtCover) || VLCStyle.noArtCover
-                mipmap: true // this widget can down scale the source a lot, so for better visuals we use mipmap
                 playCoverVisible: currentlyFocused || containsMouse
                 playIconSize: VLCStyle.play_cover_small
                 onPlayIconClicked: medialib.addAndPlay( rowModel.id )

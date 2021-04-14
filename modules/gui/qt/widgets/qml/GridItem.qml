@@ -249,7 +249,6 @@ FocusScope {
                 height: pictureHeight
                 playCoverVisible: root.highlighted
                 onPlayIconClicked: root.playClicked()
-                clip: true
                 radius: VLCStyle.gridCover_radius
             }
 

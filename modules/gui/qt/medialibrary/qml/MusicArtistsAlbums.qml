@@ -21,6 +21,7 @@ import QtQml.Models 2.2
 import QtQuick.Layouts 1.3
 
 import org.videolan.medialib 0.1
+import org.videolan.controls 0.1
 
 import "qrc:///util/" as Util
 import "qrc:///util/Helpers.js" as Helpers
@@ -161,12 +162,11 @@ Widgets.NavigableFocusScope {
                         bottomMargin: VLCStyle.margin_xsmall
                     }
 
-                    Widgets.RoundImage {
+                    RoundImage {
                         source: model.cover || VLCStyle.noArtArtistSmall
                         height: VLCStyle.play_cover_small
                         width: VLCStyle.play_cover_small
                         radius: VLCStyle.play_cover_small
-                        mipmap: true
 
                         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
 

@@ -50,6 +50,8 @@
 
 #include "menus/qml_menu_wrapper.hpp"
 
+#include "widgets/native/roundimage.hpp"
+
 #include "videosurface.hpp"
 
 #include <QQuickWindow>
@@ -256,6 +258,9 @@ void MainUI::registerQMLTypes()
     qmlRegisterType<NetworkDeviceContextMenu>( "org.videolan.vlc", 0, 1, "NetworkDeviceContextMenu" );
     qmlRegisterType<PlaylistContextMenu>( "org.videolan.vlc", 0, 1, "PlaylistContextMenu" );
     qmlRegisterType<SortFilterProxyModel>( "org.videolan.vlc", 0, 1, "SortFilterProxyModel" );
+
+    // Custom controls
+    qmlRegisterType<RoundImage>( "org.videolan.controls", 0, 1, "RoundImage" );
 
     qRegisterMetaType<QList<QQmlError>>("QList<QQmlError>");
 }

@@ -254,6 +254,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/widgets/native/interface_widgets.hpp \
 	gui/qt/widgets/native/qvlcframe.cpp \
 	gui/qt/widgets/native/qvlcframe.hpp \
+	gui/qt/widgets/native/roundimage.cpp gui/qt/widgets/native/roundimage.hpp \
 	gui/qt/widgets/native/searchlineedit.cpp gui/qt/widgets/native/searchlineedit.hpp
 if HAVE_WIN32
 libqt_plugin_la_SOURCES += \
@@ -392,6 +393,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/widgets/native/animators.moc.cpp \
 	gui/qt/widgets/native/customwidgets.moc.cpp \
 	gui/qt/widgets/native/interface_widgets.moc.cpp \
+	gui/qt/widgets/native/roundimage.moc.cpp \
 	gui/qt/widgets/native/searchlineedit.moc.cpp
 
 if HAVE_WIN32
@@ -787,7 +789,6 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/NavigableRow.qml \
 	gui/qt/widgets/qml/PlayCover.qml \
 	gui/qt/widgets/qml/RoundButton.qml \
-	gui/qt/widgets/qml/RoundImage.qml \
 	gui/qt/widgets/qml/ScanProgressBar.qml \
 	gui/qt/widgets/qml/ScrollingText.qml \
 	gui/qt/widgets/qml/SearchBox.qml \

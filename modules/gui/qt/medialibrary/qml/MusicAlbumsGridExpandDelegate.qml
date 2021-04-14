@@ -21,6 +21,7 @@ import QtQuick.Layouts 1.3
 import QtQml.Models 2.11
 
 import org.videolan.medialib 0.1
+import org.videolan.controls 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/Helpers.js" as Helpers
@@ -89,9 +90,9 @@ Widgets.NavigableFocusScope {
                     height: VLCStyle.expandCover_music_height
                     width: VLCStyle.expandCover_music_width
 
-                    Widgets.RoundImage {
+                    RoundImage {
                         id: expand_cover_id
-                        asynchronous: true
+
                         height: VLCStyle.expandCover_music_height
                         width: VLCStyle.expandCover_music_width
                         radius: VLCStyle.expandCover_music_radius

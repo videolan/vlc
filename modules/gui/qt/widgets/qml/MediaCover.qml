@@ -22,7 +22,9 @@ import QtQuick.Controls 2.4
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Widgets.RoundImage {
+import org.videolan.controls 0.1
+
+RoundImage {
     id: root
 
     property alias playCoverOpacity: playCoverLoader.opacity
@@ -35,6 +37,7 @@ Widgets.RoundImage {
 
     height: VLCStyle.listAlbumCover_height
     width: VLCStyle.listAlbumCover_width
+    sourceSize: Qt.size(width, height)
 
     Loader {
         id: overlay

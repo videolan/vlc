@@ -22,6 +22,7 @@ import QtQml.Models 2.11
 import QtGraphicalEffects 1.0
 
 import org.videolan.medialib 0.1
+import org.videolan.controls 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -73,12 +74,11 @@ Widgets.NavigableFocusScope {
             Layout.preferredHeight: VLCStyle.cover_normal
             Layout.preferredWidth: VLCStyle.cover_normal
 
-            Widgets.RoundImage {
+            RoundImage {
                 source: artist.cover || VLCStyle.noArtArtist
                 height: VLCStyle.cover_normal
                 width: VLCStyle.cover_normal
                 radius: VLCStyle.cover_normal
-
             }
 
             Rectangle {

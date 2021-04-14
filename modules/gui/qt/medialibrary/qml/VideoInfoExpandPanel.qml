@@ -21,6 +21,7 @@ import QtQml.Models 2.11
 import QtQuick.Layouts 1.3
 
 import org.videolan.medialib 0.1
+import org.videolan.controls 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/KeyHelper.js" as KeyHelper
@@ -94,14 +95,12 @@ Widgets.NavigableFocusScope {
                         width: VLCStyle.gridCover_video_width
 
                         /* A bigger cover for the album */
-                        Widgets.RoundImage {
+                        RoundImage {
                             id: expand_cover_id
 
                             anchors.fill: parent
-                            asynchronous: true
                             source: model.thumbnail || VLCStyle.noArtCover
                             sourceSize: Qt.size(width, height)
-                            fillMode: Image.PreserveAspectFit
                             radius: VLCStyle.gridCover_radius
                         }
 
