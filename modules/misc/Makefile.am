@@ -52,6 +52,17 @@ libiokit_inhibit_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation
 misc_LTLIBRARIES += libiokit_inhibit_plugin.la
 endif
 
+libuikit_inhibit_plugin_la_SOURCES = misc/inhibit/uikit-inhibit.m
+libuikit_inhibit_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,UIKit,-framework,Foundation
+libuikit_inhibit_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
+if HAVE_IOS
+misc_LTLIBRARIES += libuikit_inhibit_plugin.la
+endif
+
+if HAVE_TVOS
+misc_LTLIBRARIES += libuikit_inhibit_plugin.la
+endif
+
 libxdg_screensaver_plugin_la_SOURCES = misc/inhibit/xdg.c
 if HAVE_XCB
 if !HAVE_WIN32
@@ -129,4 +140,3 @@ libmedialibrary_plugin_la_LIBADD = $(MEDIALIBRARY_LIBS)
 libmedialibrary_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(miscdir)'
 EXTRA_LTLIBRARIES += libmedialibrary_plugin.la
 misc_LTLIBRARIES += $(LTLIBmedialibrary)
-
