@@ -250,6 +250,31 @@ libglyadif_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
 video_filter_LTLIBRARIES += libglyadif_plugin.la
 endif
 
+libglbwdif_plugin_la_SOURCES = video_filter/deinterlace/glbwdif.c
+libglbwdif_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
+if HAVE_GL
+libglbwdif_plugin_la_LIBADD = libvlc_opengl.la $(GL_LIBS)
+video_filter_LTLIBRARIES += libglbwdif_plugin.la
+endif
+
+if HAVE_IOS
+libglbwdif_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
+libglbwdif_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
+video_filter_LTLIBRARIES += libglbwdif_plugin.la
+endif
+
+if HAVE_TVOS
+libglbwdif_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
+libglbwdif_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
+video_filter_LTLIBRARIES += libglbwdif_plugin.la
+endif
+
+if HAVE_ANDROID
+libglbwdif_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
+libglbwdif_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
+video_filter_LTLIBRARIES += libglbwdif_plugin.la
+endif
+
 libopencv_wrapper_plugin_la_SOURCES = video_filter/opencv_wrapper.c
 libopencv_wrapper_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
 libopencv_wrapper_plugin_la_LIBADD = $(OPENCV_LIBS)

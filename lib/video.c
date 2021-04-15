@@ -551,8 +551,9 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int deinterlace,
      && strcmp (psz_mode, "mean")     && strcmp (psz_mode, "x")
      && strcmp (psz_mode, "yadif")    && strcmp (psz_mode, "yadif2x")
      && strcmp (psz_mode, "phosphor") && strcmp (psz_mode, "ivtc")
-     && strcmp (psz_mode, "auto")     && strcmp (psz_mode, "gl_yadif")
-     && strcmp (psz_mode, "gl_yadif2x"))
+     && strcmp (psz_mode, "gl_yadif") && strcmp (psz_mode, "gl_yadif2x")
+     && strcmp (psz_mode, "gl_bwdif") && strcmp (psz_mode, "gl_bwdif2x")
+     && strcmp (psz_mode, "auto"))
         return;
 
     if (psz_mode && deinterlace != 0)
