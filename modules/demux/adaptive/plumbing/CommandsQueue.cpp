@@ -450,12 +450,15 @@ bool CommandsQueue::isEOF() const
 
 mtime_t CommandsQueue::getDemuxedAmount(mtime_t from) const
 {
-    if( bufferinglevel == VLC_TS_INVALID || from > bufferinglevel )
+    mtime_t bufferingstart = getFirstDTS();
+    if( bufferinglevel == VLC_TS_INVALID ||
+        bufferingstart == VLC_TS_INVALID ||
+        from > bufferinglevel )
         return 0;
-    if( from > getFirstDTS() )
+    if( from > bufferingstart )
         return bufferinglevel - from;
     else
-        return bufferinglevel - getFirstDTS();
+        return bufferinglevel - bufferingstart;
 }
 
 mtime_t CommandsQueue::getBufferingLevel() const
