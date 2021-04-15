@@ -302,7 +302,7 @@ Widgets.PageLoader {
                 pictureWidth: VLCStyle.colWidth(1)
                 pictureHeight: VLCStyle.gridCover_network_height
                 height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
-                playCoverBorder.width: VLCStyle.gridCover_network_border
+                playCoverBorderWidth: VLCStyle.gridCover_network_border
                 playCoverOnlyBorders: true
                 pictureOverlay: overlay
                 unselectedUnderlay: shadows.unselected

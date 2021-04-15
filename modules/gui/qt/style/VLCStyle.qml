@@ -95,6 +95,7 @@ Item {
     property int icon_checkedDelegate: dp(40, scale)
 
     property int play_cover_small: dp(24, scale)
+    property int play_cover_normal: dp(48, scale)
 
     property int cover_xxsmall: dp(32, scale);
     property int cover_xsmall: dp(64, scale);

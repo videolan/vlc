@@ -116,7 +116,7 @@ Widgets.NavigableFocusScope {
                             y: selectedBorderWidth
                             pictureWidth: VLCStyle.gridCover_music_width
                             pictureHeight: VLCStyle.gridCover_music_height
-                            playCoverBorder.width: VLCStyle.gridCover_music_border
+                            playCoverBorderWidth: VLCStyle.gridCover_music_border
                             dragItem: albumDragItem
                             unselectedUnderlay: shadows.unselected
                             selectedUnderlay: shadows.selected

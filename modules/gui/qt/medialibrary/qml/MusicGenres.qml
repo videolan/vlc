@@ -168,7 +168,7 @@ Widgets.NavigableFocusScope {
                 pictureWidth: width
                 pictureHeight: height
                 image: model.cover || VLCStyle.noArtAlbum
-                playCoverBorder.width: VLCStyle.dp(3, VLCStyle.scale)
+                playCoverBorderWidth: VLCStyle.dp(3, VLCStyle.scale)
                 dragItem: genreDragItem
                 unselectedUnderlay: shadows.unselected
                 selectedUnderlay: shadows.selected

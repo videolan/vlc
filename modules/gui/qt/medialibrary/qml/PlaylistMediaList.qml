@@ -309,7 +309,7 @@ Widgets.NavigableFocusScope {
                     }
                 }
 
-                playCoverBorder.width: VLCStyle.dp(3, VLCStyle.scale)
+                playCoverBorderWidth: VLCStyle.dp(3, VLCStyle.scale)
 
                 //---------------------------------------------------------------------------------
                 // Events

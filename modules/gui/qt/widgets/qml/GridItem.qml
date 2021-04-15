@@ -32,7 +32,7 @@ FocusScope {
     property alias title: titleLabel.text
     property alias subtitle: subtitleTxt.text
     property alias textHorizontalAlignment: subtitleTxt.horizontalAlignment
-    property alias playCoverBorder: picture.playCoverBorder
+    property alias playCoverBorderWidth: picture.playCoverBorderWidth
     property alias playCoverOnlyBorders: picture.playCoverOnlyBorders
     property alias playIconSize: picture.playIconSize
     property alias pictureRadius: picture.radius

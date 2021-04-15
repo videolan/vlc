@@ -25,11 +25,11 @@ import "qrc:///style/"
 Widgets.RoundImage {
     id: root
 
-    property alias playCoverOpacity: playCover.opacity
-    property alias playCoverVisible: playCover.visible
-    property alias playCoverOnlyBorders: playCover.onlyBorders
-    property alias playIconSize: playCover.iconSize
-    property alias playCoverBorder: playCover.border
+    property alias playCoverOpacity: playCoverLoader.opacity
+    property alias playCoverVisible: playCoverLoader.visible
+    property bool playCoverOnlyBorders: false
+    property real playIconSize: VLCStyle.play_cover_normal
+    property real playCoverBorderWidth: VLCStyle.table_cover_border
     property alias imageOverlay: overlay.sourceComponent
     signal playIconClicked
 
@@ -42,13 +42,24 @@ Widgets.RoundImage {
         anchors.fill: parent
     }
 
-    Widgets.PlayCover {
-        id: playCover
+    Loader {
+        id: playCoverLoader
 
         anchors.fill: parent
-        iconSize: VLCStyle.play_root_small
-        radius: root.radius
+        visible: false
+        active: false
+        sourceComponent: Widgets.PlayCover {
+            onlyBorders: root.playCoverOnlyBorders
+            iconSize: root.playIconSize
+            border.width: root.playCoverBorderWidth
+            radius: root.radius
 
-        onIconClicked: root.playIconClicked()
+            onIconClicked: root.playIconClicked()
+        }
+
+        onVisibleChanged: {
+            if (visible && !active)
+                active = true
+        }
     }
 }
