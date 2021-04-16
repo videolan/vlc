@@ -416,8 +416,7 @@ void CommandsQueue::Abort( bool b_reset )
 
 bool CommandsQueue::isEmpty() const
 {
-    bool b_empty = commands.empty() && incoming.empty();
-    return b_empty;
+    return commands.empty() && incoming.empty();
 }
 
 void CommandsQueue::setDrop( bool b )
@@ -432,8 +431,7 @@ void CommandsQueue::setDraining()
 
 bool CommandsQueue::isDraining() const
 {
-    bool b = b_draining;
-    return b;
+    return b_draining;
 }
 
 void CommandsQueue::setEOF( bool b )
@@ -447,8 +445,7 @@ void CommandsQueue::setEOF( bool b )
 
 bool CommandsQueue::isEOF() const
 {
-    bool b = b_eof;
-    return b;
+    return b_eof;
 }
 
 mtime_t CommandsQueue::getDemuxedAmount(mtime_t from) const
@@ -463,9 +460,7 @@ mtime_t CommandsQueue::getDemuxedAmount(mtime_t from) const
 
 mtime_t CommandsQueue::getBufferingLevel() const
 {
-    mtime_t i_buffer;
-    i_buffer = bufferinglevel;
-    return i_buffer;
+    return bufferinglevel;
 }
 
 mtime_t CommandsQueue::getFirstDTS() const
@@ -493,6 +488,5 @@ void CommandsQueue::LockedSetDraining()
 
 mtime_t CommandsQueue::getPCR() const
 {
-    mtime_t i_pcr = pcr;
-    return i_pcr;
+    return pcr;
 }
