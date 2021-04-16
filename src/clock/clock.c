@@ -101,7 +101,6 @@ static void vlc_clock_main_reset(vlc_clock_main_t *main_clock)
     main_clock->wait_sync_ref_priority = UINT_MAX;
     main_clock->wait_sync_ref =
         main_clock->last = clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
-    vlc_cond_broadcast(&main_clock->cond);
 }
 
 static inline void vlc_clock_on_update(vlc_clock_t *clock,
@@ -213,6 +212,7 @@ static void vlc_clock_master_reset(vlc_clock_t *clock)
 
     vlc_mutex_lock(&main_clock->lock);
     vlc_clock_main_reset(main_clock);
+    vlc_cond_broadcast(&main_clock->cond);
 
     assert(main_clock->delay <= 0);
     assert(clock->delay >= 0);
@@ -471,6 +471,7 @@ void vlc_clock_main_Reset(vlc_clock_main_t *main_clock)
 {
     vlc_mutex_lock(&main_clock->lock);
     vlc_clock_main_reset(main_clock);
+    vlc_cond_broadcast(&main_clock->cond);
     main_clock->first_pcr =
         clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
     vlc_mutex_unlock(&main_clock->lock);
@@ -717,7 +718,10 @@ void vlc_clock_Delete(vlc_clock_t *clock)
         /* Don't reset the main clock if the master has been overridden by the
          * input master */
         if (main_clock->input_master != NULL)
+        {
             vlc_clock_main_reset(main_clock);
+            vlc_cond_broadcast(&main_clock->cond);
+        }
         main_clock->master = NULL;
     }
     main_clock->rc--;
