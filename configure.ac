@@ -4278,8 +4278,7 @@ AM_CONDITIONAL([HAVE_LIRC], [test "${have_lirc}" = "yes"])
 dnl
 dnl  Bitstream
 dnl
-PKG_CHECK_MODULES([BITSTREAM], [bitstream > 1.4],[have_bitstream="yes"], [have_bitstream="no"])
-AM_CONDITIONAL([HAVE_BITSTREAM], [test "${have_bitstream}" = "yes"])
+PKG_HAVE_WITH_MODULES([BITSTREAM], [bitstream > 1.4])
 
 dnl
 dnl  SRT plugin
