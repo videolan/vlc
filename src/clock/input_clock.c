@@ -147,7 +147,7 @@ static vlc_tick_t ClockSystemToStream( input_clock_t *, vlc_tick_t i_system );
 
 static vlc_tick_t ClockGetTsOffset( input_clock_t * );
 
-static void UpdateListener( input_clock_t *cl )
+static void UpdateListener( input_clock_t *cl, bool discontinuity )
 {
     if( cl->clock_listener )
     {
@@ -155,7 +155,8 @@ static void UpdateListener( input_clock_t *cl )
             ClockStreamToSystem( cl, cl->last.stream + AvgGet( &cl->drift ) ) +
             cl->i_pts_delay + ClockGetTsOffset( cl );
 
-        vlc_clock_Update( cl->clock_listener, system_expected, cl->last.stream, cl->rate );
+        vlc_clock_UpdateInput( cl->clock_listener, system_expected, cl->last.stream,
+                               cl->rate, discontinuity );
     }
 }
 
@@ -224,6 +225,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
                          vlc_tick_t i_ck_stream, vlc_tick_t i_ck_system )
 {
     bool b_reset_reference = false;
+    bool b_discontinuity = false;
 
     assert( i_ck_stream != VLC_TICK_INVALID && i_ck_system != VLC_TICK_INVALID );
 
@@ -256,6 +258,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
                 /* */
                 msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
                 b_reset_reference= true;
+                b_discontinuity = true;
             }
         }
 
@@ -320,7 +323,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         cl->late.i_index = ( cl->late.i_index + 1 ) % INPUT_CLOCK_LATE_COUNT;
     }
 
-    UpdateListener( cl );
+    UpdateListener( cl, b_discontinuity );
 
     return i_late;
 }
@@ -351,7 +354,7 @@ void input_clock_ChangeRate( input_clock_t *cl, float rate )
     }
     cl->rate = rate;
 
-    UpdateListener( cl );
+    UpdateListener( cl, false );
 }
 
 /*****************************************************************************
@@ -370,7 +373,7 @@ void input_clock_ChangePause( input_clock_t *cl, bool b_paused, vlc_tick_t i_dat
             cl->ref.system += i_duration;
             cl->last.system += i_duration;
 
-            UpdateListener( cl );
+            UpdateListener( cl, false );
         }
     }
     cl->i_pause_date = i_date;
@@ -436,7 +439,7 @@ void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, vlc_tic
     cl->ref.system += i_offset;
     cl->last.system += i_offset;
 
-    UpdateListener( cl );
+    UpdateListener( cl, false );
 }
 
 void input_clock_GetSystemOrigin( input_clock_t *cl, vlc_tick_t *pi_system, vlc_tick_t *pi_delay )
