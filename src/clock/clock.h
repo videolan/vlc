@@ -147,6 +147,9 @@ void vlc_clock_Delete(vlc_clock_t *clock);
 vlc_tick_t vlc_clock_Update(vlc_clock_t *clock, vlc_tick_t system_now,
                             vlc_tick_t ts, double rate);
 
+vlc_tick_t vlc_clock_UpdateInput(vlc_clock_t *clock, vlc_tick_t system_now,
+                                 vlc_tick_t ts, double rate, bool discontinuity);
+
 /**
  * This function will update the video clock drift and returns the drift
  *
