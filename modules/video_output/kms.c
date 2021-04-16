@@ -525,12 +525,14 @@ static int OpenDisplay(vout_display_t *vd)
         free(psz_device);
         return VLC_EGENERIC;
     }
-    free(psz_device);
 
     drmSetClientCap(sys->drm_fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1);
 
     if (!ChromaNegotiation(vd))
+    {
+        free(psz_device);
         goto err_out;
+    }
 
     msg_Dbg(vd, "Using VLC chroma '%.4s', DRM chroma '%.4s'",
             (char*)&sys->vlc_fourcc, (char*)&sys->drm_fourcc);
@@ -538,8 +540,10 @@ static int OpenDisplay(vout_display_t *vd)
     ret = drmGetCap(sys->drm_fd, DRM_CAP_DUMB_BUFFER, &dumbRet);
     if (ret < 0 || !dumbRet) {
         msg_Err(vd, "Device '%s' does not support dumb buffers", psz_device);
+        free(psz_device);
         goto err_out;
     }
+    free(psz_device);
 
     modeRes = drmModeGetResources(sys->drm_fd);
     if (modeRes == NULL) {
