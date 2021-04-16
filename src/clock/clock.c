@@ -28,6 +28,23 @@
 #include "clock.h"
 #include "clock_internal.h"
 
+struct vlc_clock_context
+{
+    /**
+     * Linear function
+     * system = ts * coeff / rate + offset
+     */
+    clock_point_t last;
+    average_t coeff_avg; /* Moving average to smooth out the instant coeff */
+    vlc_tick_t offset;
+
+    double rate;
+    double coeff;
+
+    unsigned wait_sync_ref_priority;
+    clock_point_t wait_sync_ref; /* When the master */
+};
+
 struct vlc_clock_main_t
 {
     vlc_mutex_t lock;
@@ -38,21 +55,12 @@ struct vlc_clock_main_t
 
     unsigned rc;
 
-    /**
-     * Linear function
-     * system = ts * coeff / rate + offset
-     */
-    clock_point_t last;
-    average_t coeff_avg; /* Moving average to smooth out the instant coeff */
-    double rate;
-    double coeff;
-    vlc_tick_t offset;
+    struct vlc_clock_context context;
+
     vlc_tick_t delay;
 
     vlc_tick_t pause_date;
 
-    unsigned wait_sync_ref_priority;
-    clock_point_t wait_sync_ref; /* When the master */
     clock_point_t first_pcr;
     vlc_tick_t output_dejitter; /* Delay used to absorb the output clock jitter */
     vlc_tick_t input_dejitter; /* Delay used to absorb the input jitter */
@@ -77,25 +85,31 @@ struct vlc_clock_t
     void *cbs_data;
 };
 
-static vlc_tick_t main_stream_to_system(vlc_clock_main_t *main_clock,
-                                        vlc_tick_t ts)
+static vlc_tick_t vlc_clock_context_stream_to_system(struct vlc_clock_context *context,
+                                                     vlc_tick_t ts)
 {
-    if (main_clock->offset == VLC_TICK_INVALID)
+    if (context->offset == VLC_TICK_INVALID)
         return VLC_TICK_INVALID;
     return (vlc_tick_t)
-        (ts * main_clock->coeff / main_clock->rate + main_clock->offset);
+        (ts * context->coeff / context->rate + context->offset);
 }
 
-static void vlc_clock_main_reset(vlc_clock_main_t *main_clock)
+static void vlc_clock_context_reset(struct vlc_clock_context *context)
 {
-    AvgReset(&main_clock->coeff_avg);
-    main_clock->coeff = 1.0f;
-    main_clock->rate = 1.0f;
-    main_clock->offset = VLC_TICK_INVALID;
+    AvgReset(&context->coeff_avg);
+    context->coeff = 1.0f;
+    context->rate = 1.0f;
+    context->offset = VLC_TICK_INVALID;
 
-    main_clock->wait_sync_ref_priority = UINT_MAX;
-    main_clock->wait_sync_ref =
-        main_clock->last = clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
+    context->wait_sync_ref_priority = UINT_MAX;
+    context->wait_sync_ref = context->last =
+        clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
+}
+
+static void vlc_clock_context_init(struct vlc_clock_context *context)
+{
+    AvgInit(&context->coeff_avg, 10);
+    vlc_clock_context_reset(context);
 }
 
 static inline void vlc_clock_on_update(vlc_clock_t *clock,
@@ -125,35 +139,37 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
 
     vlc_mutex_lock(&main_clock->lock);
 
+    struct vlc_clock_context *context = &main_clock->context;
+
     /* If system_now is INT64_MAX, the update is forced, don't modify anything
      * but only notify the new clock point. */
     if (system_now != INT64_MAX)
     {
-        if (main_clock->offset != VLC_TICK_INVALID
-         && ts != main_clock->last.stream)
+        if (context->offset != VLC_TICK_INVALID
+         && ts != context->last.stream)
         {
-            if (rate == main_clock->rate)
+            if (rate == context->rate)
             {
                 /* We have a reference so we can update coeff */
-                double instant_coeff = (system_now - main_clock->last.system)
-                                     / (double)(ts - main_clock->last.stream)
+                double instant_coeff = (system_now - context->last.system)
+                                     / (double)(ts - context->last.stream)
                                      * rate;
-                AvgUpdate(&main_clock->coeff_avg, instant_coeff);
-                main_clock->coeff = AvgGet(&main_clock->coeff_avg);
+                AvgUpdate(&context->coeff_avg, instant_coeff);
+                context->coeff = AvgGet(&context->coeff_avg);
             }
         }
         else
         {
-            main_clock->wait_sync_ref_priority = UINT_MAX;
-            main_clock->wait_sync_ref =
+            context->wait_sync_ref_priority = UINT_MAX;
+            context->wait_sync_ref =
                 clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
         }
 
-        main_clock->offset = system_now - ts * main_clock->coeff / rate;
+        context->offset = system_now - ts * context->coeff / rate;
 
-        main_clock->last = clock_point_Create(system_now, ts);
+        context->last = clock_point_Create(system_now, ts);
 
-        main_clock->rate = rate;
+        context->rate = rate;
         vlc_cond_broadcast(&main_clock->cond);
     }
 
@@ -169,7 +185,9 @@ static void vlc_clock_master_reset(vlc_clock_t *clock)
     vlc_clock_main_t *main_clock = clock->owner;
 
     vlc_mutex_lock(&main_clock->lock);
-    vlc_clock_main_reset(main_clock);
+    struct vlc_clock_context *context = &main_clock->context;
+
+    vlc_clock_context_reset(context);
     vlc_cond_broadcast(&main_clock->cond);
 
     assert(main_clock->delay <= 0);
@@ -223,12 +241,12 @@ static vlc_tick_t vlc_clock_master_set_delay(vlc_clock_t *clock, vlc_tick_t dela
 }
 
 static vlc_tick_t
-vlc_clock_monotonic_to_system_locked(vlc_clock_t *clock, vlc_tick_t now,
-                                     vlc_tick_t ts, double rate)
+vlc_clock_monotonic_to_system_locked(vlc_clock_t *clock, struct vlc_clock_context *context,
+                                     vlc_tick_t now, vlc_tick_t ts, double rate)
 {
     vlc_clock_main_t *main_clock = clock->owner;
 
-    if (clock->priority < main_clock->wait_sync_ref_priority)
+    if (clock->priority < context->wait_sync_ref_priority)
     {
         /* XXX: This input_delay calculation is needed until we (finally) get
          * ride of the input clock. This code is adapted from input_clock.c and
@@ -244,11 +262,11 @@ vlc_clock_monotonic_to_system_locked(vlc_clock_t *clock, vlc_tick_t now,
         const vlc_tick_t delay =
             __MAX(input_delay, main_clock->output_dejitter);
 
-        main_clock->wait_sync_ref_priority = clock->priority;
-        main_clock->wait_sync_ref = clock_point_Create(now + delay, ts);
+        context->wait_sync_ref_priority = clock->priority;
+        context->wait_sync_ref = clock_point_Create(now + delay, ts);
     }
-    return (ts - main_clock->wait_sync_ref.stream) / rate
-        + main_clock->wait_sync_ref.system;
+    return (ts - context->wait_sync_ref.stream) / rate
+        + context->wait_sync_ref.system;
 }
 
 static vlc_tick_t vlc_clock_slave_to_system_locked(vlc_clock_t *clock,
@@ -259,12 +277,14 @@ static vlc_tick_t vlc_clock_slave_to_system_locked(vlc_clock_t *clock,
     if (main_clock->pause_date != VLC_TICK_INVALID)
         return INT64_MAX;
 
-    vlc_tick_t system = main_stream_to_system(main_clock, ts);
+    struct vlc_clock_context *context = &main_clock->context;
+
+    vlc_tick_t system = vlc_clock_context_stream_to_system(context, ts);
     if (system == VLC_TICK_INVALID)
     {
         /* We don't have a master sync point, let's fallback to a monotonic ref
          * point */
-        system = vlc_clock_monotonic_to_system_locked(clock, now, ts, rate);
+        system = vlc_clock_monotonic_to_system_locked(clock, context, now, ts, rate);
     }
 
     return system + (clock->delay - main_clock->delay) * rate;
@@ -275,12 +295,14 @@ static vlc_tick_t vlc_clock_master_to_system_locked(vlc_clock_t *clock,
                                                     vlc_tick_t ts, double rate)
 {
     vlc_clock_main_t *main_clock = clock->owner;
-    vlc_tick_t system = main_stream_to_system(main_clock, ts);
+    struct vlc_clock_context *context = &main_clock->context;
+
+    vlc_tick_t system = vlc_clock_context_stream_to_system(context, ts);
     if (system == VLC_TICK_INVALID)
     {
         /* We don't have a master sync point, let's fallback to a monotonic ref
          * point */
-        system = vlc_clock_monotonic_to_system_locked(clock, now, ts, rate);
+        system = vlc_clock_monotonic_to_system_locked(clock, context, now, ts, rate);
     }
 
     return system + clock->delay * rate;
@@ -316,8 +338,11 @@ static void vlc_clock_slave_reset(vlc_clock_t *clock)
 {
     vlc_clock_main_t *main_clock = clock->owner;
     vlc_mutex_lock(&main_clock->lock);
-    main_clock->wait_sync_ref_priority = UINT_MAX;
-    main_clock->wait_sync_ref =
+
+    struct vlc_clock_context *context = &main_clock->context;
+
+    context->wait_sync_ref_priority = UINT_MAX;
+    context->wait_sync_ref =
         clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
 
     vlc_mutex_unlock(&main_clock->lock);
@@ -359,6 +384,8 @@ void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
     vlc_mutex_unlock(&main_clock->lock);
 }
 
+
+
 vlc_clock_main_t *vlc_clock_main_New(void)
 {
     vlc_clock_main_t *main_clock = malloc(sizeof(vlc_clock_main_t));
@@ -371,23 +398,16 @@ vlc_clock_main_t *vlc_clock_main_New(void)
     main_clock->input_master = main_clock->master = NULL;
     main_clock->rc = 1;
 
-    main_clock->coeff = 1.0f;
-    main_clock->rate = 1.0f;
-    main_clock->offset = VLC_TICK_INVALID;
+    vlc_clock_context_init(&main_clock->context);
     main_clock->delay = 0;
 
     main_clock->first_pcr =
-        clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
-    main_clock->wait_sync_ref_priority = UINT_MAX;
-    main_clock->wait_sync_ref = main_clock->last =
         clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
 
     main_clock->pause_date = VLC_TICK_INVALID;
     main_clock->input_dejitter = DEFAULT_PTS_DELAY;
     main_clock->output_dejitter = AOUT_MAX_PTS_ADVANCE * 2;
     main_clock->abort = false;
-
-    AvgInit(&main_clock->coeff_avg, 10);
 
     return main_clock;
 }
@@ -404,7 +424,9 @@ void vlc_clock_main_Abort(vlc_clock_main_t *main_clock)
 void vlc_clock_main_Reset(vlc_clock_main_t *main_clock)
 {
     vlc_mutex_lock(&main_clock->lock);
-    vlc_clock_main_reset(main_clock);
+    struct vlc_clock_context *context = &main_clock->context;
+
+    vlc_clock_context_reset(context);
     vlc_cond_broadcast(&main_clock->cond);
     main_clock->first_pcr =
         clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
@@ -415,11 +437,14 @@ void vlc_clock_main_SetFirstPcr(vlc_clock_main_t *main_clock,
                                 vlc_tick_t system_now, vlc_tick_t ts)
 {
     vlc_mutex_lock(&main_clock->lock);
+
+    struct vlc_clock_context *context = &main_clock->context;
+
     if (main_clock->first_pcr.system == VLC_TICK_INVALID)
     {
         main_clock->first_pcr = clock_point_Create(system_now, ts);
-        main_clock->wait_sync_ref_priority = UINT_MAX;
-        main_clock->wait_sync_ref =
+        context->wait_sync_ref_priority = UINT_MAX;
+        context->wait_sync_ref =
             clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
     }
     vlc_mutex_unlock(&main_clock->lock);
@@ -447,6 +472,8 @@ void vlc_clock_main_ChangePause(vlc_clock_main_t *main_clock, vlc_tick_t now,
     vlc_mutex_lock(&main_clock->lock);
     assert(paused == (main_clock->pause_date == VLC_TICK_INVALID));
 
+    struct vlc_clock_context *context = &main_clock->context;
+
     if (paused)
         main_clock->pause_date = now;
     else
@@ -456,15 +483,15 @@ void vlc_clock_main_ChangePause(vlc_clock_main_t *main_clock, vlc_tick_t now,
          * messing up the timings if the stream was paused then seeked
          */
         const vlc_tick_t delay = now - main_clock->pause_date;
-        if (main_clock->offset != VLC_TICK_INVALID)
+        if (context->offset != VLC_TICK_INVALID)
         {
-            main_clock->last.system += delay;
-            main_clock->offset += delay;
+            context->last.system += delay;
+            context->offset += delay;
         }
         if (main_clock->first_pcr.system != VLC_TICK_INVALID)
             main_clock->first_pcr.system += delay;
-        if (main_clock->wait_sync_ref.system != VLC_TICK_INVALID)
-            main_clock->wait_sync_ref.system += delay;
+        if (context->wait_sync_ref.system != VLC_TICK_INVALID)
+            context->wait_sync_ref.system += delay;
         main_clock->pause_date = VLC_TICK_INVALID;
         vlc_cond_broadcast(&main_clock->cond);
     }
@@ -591,9 +618,12 @@ vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock)
     vlc_mutex_lock(&main_clock->lock);
     assert(main_clock->input_master == NULL);
 
+#ifndef NDEBUG
+    struct vlc_clock_context *context = &main_clock->context;
     /* Even if the master ES clock has already been created, it should not
      * have updated any points */
-    assert(main_clock->offset == VLC_TICK_INVALID);
+    assert(context->offset == VLC_TICK_INVALID);
+#endif
 
     /* Override the master ES clock if it exists */
     if (main_clock->master != NULL)
@@ -659,13 +689,12 @@ void vlc_clock_Delete(vlc_clock_t *clock)
     }
     else if (clock == main_clock->master)
     {
+        struct vlc_clock_context *context = &main_clock->context;
+
         /* Don't reset the main clock if the master has been overridden by the
          * input master */
         if (main_clock->input_master != NULL)
-        {
-            vlc_clock_main_reset(main_clock);
-            vlc_cond_broadcast(&main_clock->cond);
-        }
+            vlc_clock_context_reset(context);
         main_clock->master = NULL;
     }
     main_clock->rc--;
