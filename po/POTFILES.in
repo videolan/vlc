@@ -1300,6 +1300,7 @@ modules/video_output/fb.c
 modules/video_output/glx.c
 modules/video_output/kva.c
 modules/video_output/libplacebo/display.c
+modules/video_output/libplacebo/instance_opengl.c
 modules/video_output/libplacebo/instance_vulkan.c
 modules/video_output/macosx.m
 modules/video_output/opengl/display.c
