@@ -301,6 +301,11 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
                 .repr  = vlc_placebo_ColorRepr(&r->fmt),
             };
 
+            if (frame.flipped) {
+                overlay->rect.y0 = frame.fbo->params.h - overlay->rect.y0;
+                overlay->rect.y1 = frame.fbo->params.h - overlay->rect.y1;
+            }
+
             if (!pl_upload_plane(gpu, &overlay->plane, &sys->overlay_tex[i], &subdata)) {
                 msg_Err(vd, "Failed uploading subpicture region!");
                 num_regions = i; // stop here
