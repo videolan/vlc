@@ -31,7 +31,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 
-#include "../placebo_utils.h"
+#include "../libplacebo/utils.h"
 #include "instance.h"
 
 #include <libplacebo/renderer.h>

@@ -3,6 +3,12 @@ vout_LTLIBRARIES =
 
 EXTRA_DIST += video_output/README
 
+### libplacebo ###
+if HAVE_LIBPLACEBO
+include video_output/libplacebo/Makefile.am
+endif
+
+### OpenGL ###
 include video_output/opengl/Makefile.am
 
 if HAVE_DECKLINK

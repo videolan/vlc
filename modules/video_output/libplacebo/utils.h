@@ -1,5 +1,5 @@
 /*****************************************************************************
- * placebo_utils.h: Definition of various libplacebo helpers
+ * utils.h: Definition of various libplacebo helpers
  *****************************************************************************
  * Copyright (C) 2018 Niklas Haas
  *

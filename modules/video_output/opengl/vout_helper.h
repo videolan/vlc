@@ -32,7 +32,7 @@
 #include "gl_common.h"
 
 #ifdef HAVE_LIBPLACEBO
-#include "../placebo_utils.h"
+#include "../libplacebo/utils.h"
 
 
 #if PL_API_VER >= 10

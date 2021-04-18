@@ -23,12 +23,13 @@ OPENGL_COMMONSOURCES = video_output/opengl/vout_helper.c \
        video_output/opengl/sampler_priv.h \
        video_output/opengl/sub_renderer.c \
        video_output/opengl/sub_renderer.h
-if HAVE_LIBPLACEBO
-OPENGL_COMMONSOURCES += video_output/placebo_utils.c video_output/placebo_utils.h
-endif
 
 OPENGL_COMMONCFLAGS = $(LIBPLACEBO_CFLAGS)
 OPENGL_COMMONLIBS = $(LIBPLACEBO_LIBS)
+
+if HAVE_LIBPLACEBO
+OPENGL_COMMONLIBS += libplacebo_utils.la
+endif
 
 # Convenience library for OpenGL components -- OpenGL only
 libvlc_opengl_la_SOURCES = $(OPENGL_COMMONSOURCES)

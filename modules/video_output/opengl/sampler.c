@@ -31,7 +31,7 @@
 #ifdef HAVE_LIBPLACEBO
 #include <libplacebo/shaders.h>
 #include <libplacebo/shaders/colorspace.h>
-#include "../placebo_utils.h"
+#include "../libplacebo/utils.h"
 #endif
 
 #include "gl_api.h"
