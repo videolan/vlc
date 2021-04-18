@@ -1,0 +1,196 @@
+/**
+ * @file instance_vulkan.c
+ * @brief Vulkan specific libplacebo GPU wrapper
+ */
+/*****************************************************************************
+ * Copyright © 2021 Niklas Haas
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+#include <vlc_common.h>
+#include <vlc_plugin.h>
+
+#include <libplacebo/vulkan.h>
+
+#include "../vulkan/instance.h"
+#include "instance.h"
+#include "utils.h"
+
+struct vlc_placebo_system_t {
+    vlc_vk_t *vk;
+    const struct pl_vk_inst *instance;
+    const struct pl_vulkan *vulkan;
+};
+
+static void CloseInstance(vlc_placebo_t *pl);
+static const struct vlc_placebo_operations instance_opts =
+{
+    .close = CloseInstance,
+};
+
+static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
+{
+    vlc_placebo_system_t *sys = pl->sys =
+        vlc_obj_calloc(VLC_OBJECT(pl), 1, sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    char *platform_name = var_InheritString(pl, "vk-platform");
+    sys->vk = vlc_vk_Create(cfg->window, platform_name);
+    free(platform_name);
+    if (!sys->vk)
+        goto error;
+
+    sys->instance = pl_vk_inst_create(pl->ctx, &(struct pl_vk_inst_params) {
+        .debug = var_InheritBool(pl, "vk-debug"),
+        .extensions = (const char *[]) {
+            VK_KHR_SURFACE_EXTENSION_NAME,
+            sys->vk->platform_ext,
+        },
+        .num_extensions = 2,
+    });
+    if (!sys->instance)
+        goto error;
+
+    // Create the platform-specific surface object
+    VkSurfaceKHR surface;
+    if (vlc_vk_CreateSurface(sys->vk, sys->instance->instance, &surface) != VLC_SUCCESS)
+        goto error;
+
+    // Create vulkan device
+    char *device_name = var_InheritString(pl, "vk-device");
+    sys->vulkan = pl_vulkan_create(pl->ctx, &(struct pl_vulkan_params) {
+        .instance = sys->instance->instance,
+        .surface = surface,
+        .device_name = device_name,
+        .allow_software = var_InheritBool(pl, "vk-allow-sw"),
+        .async_transfer = var_InheritBool(pl, "vk-async-xfer"),
+        .async_compute = var_InheritBool(pl, "vk-async-comp"),
+        .queue_count = var_InheritInteger(pl, "vk-queue-count"),
+    });
+    free(device_name);
+    if (!sys->vulkan)
+        goto error;
+
+    // Create swapchain for this surface
+    struct pl_vulkan_swapchain_params swap_params = {
+        .surface = surface,
+        .present_mode = var_InheritInteger(pl, "vk-present-mode"),
+        .swapchain_depth = var_InheritInteger(pl, "vk-queue-depth"),
+    };
+
+    pl->swapchain = pl_vulkan_create_swapchain(sys->vulkan, &swap_params);
+    if (!pl->swapchain)
+        goto error;
+
+    pl->gpu = sys->vulkan->gpu;
+    pl->ops = &instance_opts;
+    return VLC_SUCCESS;
+
+error:
+    CloseInstance(pl);
+    return VLC_EGENERIC;
+}
+
+static void CloseInstance(vlc_placebo_t *pl)
+{
+    vlc_placebo_system_t *sys = pl->sys;
+
+    pl_vulkan_destroy(&sys->vulkan);
+    pl_vk_inst_destroy(&sys->instance);
+
+    if (sys->vk != NULL)
+        vlc_vk_Release(sys->vk);
+
+    vlc_obj_free(VLC_OBJECT(pl), sys);
+    pl->sys = NULL;
+}
+
+#define PROVIDER_TEXT N_("Vulkan platform module")
+#define PROVIDER_LONGTEXT N_( \
+    "Which platform-specific Vulkan surface module to load.")
+
+#define DEBUG_TEXT "Enable API debugging"
+#define DEBUG_LONGTEXT "This loads the vulkan standard validation layers, which can help catch API usage errors. Comes at a small performance penalty."
+
+#define DEVICE_TEXT "Device name override"
+#define DEVICE_LONGTEXT "If set to something non-empty, only a device with this exact name will be used. To see a list of devices and their names, run vlc -v with this module active."
+
+#define ALLOWSW_TEXT "Allow software devices"
+#define ALLOWSW_LONGTEXT "If enabled, allow the use of software emulation devices, which are not real devices and therefore typically very slow. (This option has no effect if forcing a specific device name)"
+
+#define ASYNC_XFER_TEXT "Allow asynchronous transfer"
+#define ASYNC_XFER_LONGTEXT "Allows the use of an asynchronous transfer queue if the device has one. Typically this maps to a DMA engine, which can perform texture uploads/downloads without blocking the GPU's compute units. Highly recommended for 4K and above."
+
+#define ASYNC_COMP_TEXT "Allow asynchronous compute"
+#define ASYNC_COMP_LONGTEXT "Allows the use of dedicated compute queue families if the device has one. Sometimes these will schedule concurrent compute work better than the main graphics queue. Turn this off if you have any issues."
+
+#define QUEUE_COUNT_TEXT "Queue count"
+#define QUEUE_COUNT_LONGTEXT "How many queues to use on the device. Increasing this might improve rendering throughput for GPUs capable of concurrent scheduling. Increasing this past the driver's limit has no effect."
+
+#define QUEUE_DEPTH_TEXT "Maximum frame latency"
+#define QUEUE_DEPTH_LONGTEXT "Affects how many frames to render/present in advance. Increasing this can improve performance at the cost of latency, by allowing better pipelining between frames. May have no effect, depending on the VLC clock settings."
+
+static const int present_values[] = {
+    VK_PRESENT_MODE_IMMEDIATE_KHR,
+    VK_PRESENT_MODE_MAILBOX_KHR,
+    VK_PRESENT_MODE_FIFO_KHR,
+    VK_PRESENT_MODE_FIFO_RELAXED_KHR,
+};
+
+static const char * const present_text[] = {
+    "Immediate (non-blocking, tearing)",
+    "Mailbox (non-blocking, non-tearing)",
+    "FIFO (blocking, non-tearing)",
+    "Relaxed FIFO (blocking, tearing)",
+};
+
+#define PRESENT_MODE_TEXT "Preferred present mode"
+#define PRESENT_MODE_LONGTEXT "Which present mode to use when creating the swapchain. If the chosen mode is not supported, VLC will fall back to using FIFO."
+
+vlc_module_begin()
+    set_shortname("libplacebo Vulkan")
+    set_description(N_("Vulkan-based GPU instance"))
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    set_capability("libplacebo gpu", 50)
+    set_callback(InitInstance)
+    add_shortcut("pl_vulkan")
+    add_module ("vk-platform", "vulkan platform", NULL, PROVIDER_TEXT, PROVIDER_LONGTEXT)
+
+    set_section("Device selection", NULL)
+    add_bool("vk-debug", false, DEBUG_TEXT, DEBUG_LONGTEXT, false)
+    add_string("vk-device", "", DEVICE_TEXT, DEVICE_LONGTEXT, false)
+    add_bool("vk-allow-sw", pl_vulkan_default_params.allow_software,
+            ALLOWSW_TEXT, ALLOWSW_LONGTEXT, false)
+
+    set_section("Performance tuning", NULL)
+    add_bool("vk-async-xfer", pl_vulkan_default_params.async_transfer,
+            ASYNC_XFER_TEXT, ASYNC_XFER_LONGTEXT, false)
+    add_bool("vk-async-comp", pl_vulkan_default_params.async_compute,
+            ASYNC_COMP_TEXT, ASYNC_COMP_LONGTEXT, false)
+    add_integer_with_range("vk-queue-count", pl_vulkan_default_params.queue_count,
+            1, 8, QUEUE_COUNT_TEXT, QUEUE_COUNT_LONGTEXT, false)
+    add_integer_with_range("vk-queue-depth", 3,
+            1, 8, QUEUE_DEPTH_TEXT, QUEUE_DEPTH_LONGTEXT, false)
+    add_integer("vk-present-mode", VK_PRESENT_MODE_FIFO_KHR,
+            PRESENT_MODE_TEXT, PRESENT_MODE_LONGTEXT, false)
+            change_integer_list(present_values, present_text)
+vlc_module_end()

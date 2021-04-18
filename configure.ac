@@ -3290,6 +3290,7 @@ AC_ARG_ENABLE([libplacebo],
 AS_IF([test "$enable_libplacebo" != "no"], [
   PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 1.7], [
     AC_DEFINE([HAVE_LIBPLACEBO], [1], [Define to 1 if libplacebo is enabled.])
+    AC_CHECK_HEADER([libplacebo/vulkan.h], [VLC_ADD_PLUGIN([placebo_vk])])
   ], [
     AS_IF([test -n "${enable_libplacebo}"], [
       AC_MSG_ERROR([${LIBPLACEBO_PKG_ERRORS}.])
