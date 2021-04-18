@@ -26,7 +26,6 @@
 #include <vlc_vout_window.h>
 
 #include <vulkan/vulkan.h>
-#include <libplacebo/vulkan.h>
 
 struct vout_window_t;
 struct vout_window_cfg_t;
