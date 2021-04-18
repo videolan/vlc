@@ -2,19 +2,13 @@
 ### Vulkan ###
 
 VULKAN_COMMONSOURCES = video_output/vulkan/instance.c \
-	video_output/vulkan/instance.h \
-	video_output/libplacebo/utils.c \
-	video_output/libplacebo/utils.h
+	video_output/vulkan/instance.h
 
 # Trigger the c++ linker because of glslang dependency of libplacebo
 VULKAN_COMMONSOURCES += dummy.cpp
 
 VULKAN_COMMONCFLAGS = $(VULKAN_CFLAGS) $(LIBPLACEBO_CFLAGS)
 VULKAN_COMMONLIBS = $(VULKAN_LIBS) $(LIBPLACEBO_LIBS)
-
-libvk_plugin_la_SOURCES = $(VULKAN_COMMONSOURCES) video_output/vulkan/display.c
-libvk_plugin_la_CFLAGS = $(AM_CFLAGS) $(VULKAN_COMMONCFLAGS)
-libvk_plugin_la_LIBADD = $(VULKAN_COMMONLIBS)
 
 libvk_win32_plugin_la_SOURCES = $(VULKAN_COMMONSOURCES) \
 				video_output/vulkan/platform_win32.c
@@ -29,8 +23,6 @@ libvk_android_plugin_la_CFLAGS = $(AM_CFLAGS) $(VULKAN_COMMONCFLAGS) \
 libvk_android_plugin_la_LIBADD = $(VULKAN_COMMONLIBS)
 
 if HAVE_VULKAN
-vout_LTLIBRARIES += libvk_plugin.la
-
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libvk_win32_plugin.la
 endif

@@ -1,9 +1,9 @@
 /**
  * @file display.c
- * @brief Vulkan video output module
+ * @brief libplacebo video output module
  */
 /*****************************************************************************
- * Copyright © 2018 Niklas Haas
+ * Copyright © 2021 Niklas Haas
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -31,25 +31,18 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 
-#include "../libplacebo/utils.h"
+#include "utils.h"
 #include "instance.h"
 
 #include <libplacebo/renderer.h>
 #include <libplacebo/utils/upload.h>
 #include <libplacebo/swapchain.h>
-#include <libplacebo/vulkan.h>
 
 struct vout_display_sys_t
 {
-    vlc_vk_t *vk;
+    vlc_placebo_t *pl;
     const struct pl_tex *plane_tex[4];
-    struct pl_context *ctx;
-    const struct pl_vk_inst *instance;
-    const struct pl_vulkan *vulkan;
-    const struct pl_swapchain *swapchain;
     struct pl_renderer *renderer;
-
-    VkSurfaceKHR surface;
 
     // Pool of textures for the subpictures
     struct pl_overlay *overlays;
@@ -87,7 +80,6 @@ static const struct vlc_display_operations ops = {
     Close, PictureRender, PictureDisplay, Control, NULL, NULL,
 };
 
-// Allocates a Vulkan surface and instance for video output.
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmt, vlc_video_context *context)
 {
@@ -96,64 +88,20 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    vout_window_t *window = vd->cfg->window;
-    if (window == NULL)
+    if (vd->cfg->window == NULL)
     {
         msg_Err(vd, "parent window not available");
         goto error;
     }
 
-    sys->vk = vlc_vk_Create(window, NULL);
-    if (sys->vk == NULL)
+    char *name = var_InheritString(vd, "pl-gpu");
+    sys->pl = vlc_placebo_Create(cfg, name);
+    free(name);
+    if (sys->pl == NULL)
         goto error;
 
-    sys->ctx = vlc_placebo_CreateContext(VLC_OBJECT(sys->vk));
-    if (!sys->ctx)
-        goto error;
-
-    sys->instance = pl_vk_inst_create(sys->ctx, &(struct pl_vk_inst_params) {
-        .debug = var_InheritBool(sys->vk, "vk-debug"),
-        .extensions = (const char *[]) {
-            VK_KHR_SURFACE_EXTENSION_NAME,
-            sys->vk->platform_ext,
-        },
-        .num_extensions = 2,
-    });
-    if (!sys->instance)
-        goto error;
-
-    // Create the platform-specific surface object
-    if (vlc_vk_CreateSurface(sys->vk, sys->instance->instance, &sys->surface) != VLC_SUCCESS)
-        goto error;
-
-    // Create vulkan device
-    char *device_name = var_InheritString(sys->vk, "vk-device");
-    sys->vulkan = pl_vulkan_create(sys->ctx, &(struct pl_vulkan_params) {
-        .instance = sys->instance->instance,
-        .surface = sys->surface,
-        .device_name = device_name,
-        .allow_software = var_InheritBool(vd, "allow-sw"),
-        .async_transfer = var_InheritBool(vd, "async-xfer"),
-        .async_compute = var_InheritBool(vd, "async-comp"),
-        .queue_count = var_InheritInteger(vd, "queue-count"),
-    });
-    free(device_name);
-    if (!sys->vulkan)
-        goto error;
-
-    // Create swapchain for this surface
-    struct pl_vulkan_swapchain_params swap_params = {
-        .surface = sys->surface,
-        .present_mode = var_InheritInteger(vd, "present-mode"),
-        .swapchain_depth = var_InheritInteger(vd, "queue-depth"),
-    };
-
-    sys->swapchain = pl_vulkan_create_swapchain(sys->vulkan, &swap_params);
-    if (!sys->swapchain)
-        goto error;
-
-    const struct pl_gpu *gpu = sys->vulkan->gpu;
-    sys->renderer = pl_renderer_create(sys->ctx, gpu);
+    const struct pl_gpu *gpu = sys->pl->gpu;
+    sys->renderer = pl_renderer_create(sys->pl->ctx, gpu);
     if (!sys->renderer)
         goto error;
 
@@ -202,20 +150,15 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
 error:
     pl_renderer_destroy(&sys->renderer);
-    pl_swapchain_destroy(&sys->swapchain);
-    pl_vulkan_destroy(&sys->vulkan);
-    pl_vk_inst_destroy(&sys->instance);
-    pl_context_destroy(&sys->ctx);
-
-    if (sys->vk != NULL)
-        vlc_vk_Release(sys->vk);
+    if (sys->pl != NULL)
+        vlc_placebo_Release(sys->pl);
     return VLC_EGENERIC;
 }
 
 static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    const struct pl_gpu *gpu = sys->vulkan->gpu;
+    const struct pl_gpu *gpu = sys->pl->gpu;
 
     for (int i = 0; i < 4; i++)
         pl_tex_destroy(gpu, &sys->plane_tex[i]);
@@ -228,8 +171,7 @@ static void Close(vout_display_t *vd)
     }
 
     pl_renderer_destroy(&sys->renderer);
-
-    vlc_vk_Release(sys->vk);
+    vlc_placebo_Release(sys->pl);
 }
 
 static void PictureRender(vout_display_t *vd, picture_t *pic,
@@ -237,11 +179,11 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 {
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
-    const struct pl_gpu *gpu = sys->vulkan->gpu;
+    const struct pl_gpu *gpu = sys->pl->gpu;
     bool failed = false;
 
     struct pl_swapchain_frame frame;
-    if (!pl_swapchain_start_frame(sys->swapchain, &frame))
+    if (!pl_swapchain_start_frame(sys->pl->swapchain, &frame))
         return; // Probably benign error, ignore it
 
     struct pl_image img = {
@@ -377,7 +319,7 @@ done:
     if (failed)
         pl_tex_clear(gpu, frame.fbo, (float[4]){ 1.0, 0.0, 0.0, 1.0 });
 
-    if (!pl_swapchain_submit_frame(sys->swapchain)) {
+    if (!pl_swapchain_submit_frame(sys->pl->swapchain)) {
         msg_Err(vd, "Failed rendering frame!");
         return;
     }
@@ -387,7 +329,7 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic)
 {
     VLC_UNUSED(pic);
     vout_display_sys_t *sys = vd->sys;
-    pl_swapchain_swap_buffers(sys->swapchain);
+    pl_swapchain_swap_buffers(sys->pl->swapchain);
 }
 
 static int Control(vout_display_t *vd, int query)
@@ -415,7 +357,7 @@ static int Control(vout_display_t *vd, int query)
         {
             int width = (int) vd->cfg->display.width;
             int height = (int) vd->cfg->display.height;
-            pl_swapchain_resize(sys->swapchain, &width, &height);
+            pl_swapchain_resize(sys->pl->swapchain, &width, &height);
 
             /* NOTE: We currently ignore resizing failures that are transient
              * on X11. Maybe improving resizing might fix that, but we don't
@@ -438,59 +380,18 @@ static int Control(vout_display_t *vd, int query)
 
 // Options
 
-#define VK_TEXT N_("Vulkan surface extension")
+#define PROVIDER_TEXT N_("GPU instance provider")
 #define PROVIDER_LONGTEXT N_( \
-    "Extension which provides the Vulkan surface to use.")
-
-#define DISABLE_DR_TEXT "Disable direct rendering / zero-copy upload"
-#define DISABLE_DR_LONGTEXT "Direct rendering is a technique where image data is uploaded via a mapped buffer instead of via memcpy. On some platforms this might be very slow (due to poor readback performance from mapped memory), in which cases this flag would help."
-
-#define DEBUG_TEXT "Enable API debugging"
-#define DEBUG_LONGTEXT "This loads the vulkan standard validation layers, which can help catch API usage errors. Comes at a small performance penalty."
-
-#define DEVICE_TEXT "Device name override"
-#define DEVICE_LONGTEXT "If set to something non-empty, only a device with this exact name will be used. To see a list of devices and their names, run vlc -v with this module active."
-
-#define ALLOWSW_TEXT "Allow software devices"
-#define ALLOWSW_LONGTEXT "If enabled, allow the use of software emulation devices, which are not real devices and therefore typically very slow. (This option has no effect if forcing a specific device name)"
-
-#define ASYNC_XFER_TEXT "Allow asynchronous transfer"
-#define ASYNC_XFER_LONGTEXT "Allows the use of an asynchronous transfer queue if the device has one. Typically this maps to a DMA engine, which can perform texture uploads/downloads without blocking the GPU's compute units. Highly recommended for 4K and above."
-
-#define ASYNC_COMP_TEXT "Allow asynchronous compute"
-#define ASYNC_COMP_LONGTEXT "Allows the use of dedicated compute queue families if the device has one. Sometimes these will schedule concurrent compute work better than the main graphics queue. Turn this off if you have any issues."
-
-#define QUEUE_COUNT_TEXT "Queue count"
-#define QUEUE_COUNT_LONGTEXT "How many queues to use on the device. Increasing this might improve rendering throughput for GPUs capable of concurrent scheduling. Increasing this past the driver's limit has no effect."
-
-#define QUEUE_DEPTH_TEXT "Maximum frame latency"
-#define QUEUE_DEPTH_LONGTEXT "Affects how many frames to render/present in advance. Increasing this can improve performance at the cost of latency, by allowing better pipelining between frames. May have no effect, depending on the VLC clock settings."
-
-static const int present_values[] = {
-    VK_PRESENT_MODE_IMMEDIATE_KHR,
-    VK_PRESENT_MODE_MAILBOX_KHR,
-    VK_PRESENT_MODE_FIFO_KHR,
-    VK_PRESENT_MODE_FIFO_RELAXED_KHR,
-};
-
-static const char * const present_text[] = {
-    "Immediate (non-blocking, tearing)",
-    "Mailbox (non-blocking, non-tearing)",
-    "FIFO (blocking, non-tearing)",
-    "Relaxed FIFO (blocking, tearing)",
-};
-
-#define PRESENT_MODE_TEXT "Preferred present mode"
-#define PRESENT_MODE_LONGTEXT "Which present mode to use when creating the swapchain. If the chosen mode is not supported, VLC will fall back to using FIFO."
+    "Extension which provides the GPU instance to use.")
 
 vlc_module_begin ()
-    set_shortname ("Vulkan")
-    set_description (N_("Vulkan video output"))
+    set_shortname ("libplacebo")
+    set_description (N_("libplacebo video output"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_callback_display(Open, 0)
-    add_shortcut ("vulkan", "vk")
-    add_module ("vk", "", NULL, VK_TEXT, PROVIDER_LONGTEXT)
+    add_shortcut ("libplacebo", "pl")
+    add_module ("pl-gpu", "libplacebo gpu", NULL, PROVIDER_TEXT, PROVIDER_LONGTEXT)
 
     set_section("Scaling", NULL)
     add_integer("upscaler-preset", SCALE_BUILTIN,
@@ -625,24 +526,6 @@ vlc_module_begin ()
     add_bool("delayed-peak", false, DELAYED_PEAK_TEXT, DELAYED_PEAK_LONGTEXT, false)
 #endif
 
-    set_section("Device selection", NULL)
-    add_bool("vk-debug", false, DEBUG_TEXT, DEBUG_LONGTEXT, false)
-    add_string("vk-device", "", DEVICE_TEXT, DEVICE_LONGTEXT, false)
-    add_bool("allow-sw", pl_vulkan_default_params.allow_software,
-            ALLOWSW_TEXT, ALLOWSW_LONGTEXT, false)
-
-    set_section("Performance tuning", NULL)
-    add_bool("async-xfer", pl_vulkan_default_params.async_transfer,
-            ASYNC_XFER_TEXT, ASYNC_XFER_LONGTEXT, false)
-    add_bool("async-comp", pl_vulkan_default_params.async_compute,
-            ASYNC_COMP_TEXT, ASYNC_COMP_LONGTEXT, false)
-    add_integer_with_range("queue-count", pl_vulkan_default_params.queue_count,
-            1, 8, QUEUE_COUNT_TEXT, QUEUE_COUNT_LONGTEXT, false)
-    add_integer_with_range("queue-depth", 3,
-            1, 8, QUEUE_DEPTH_TEXT, QUEUE_DEPTH_LONGTEXT, false)
-    add_integer("present-mode", VK_PRESENT_MODE_FIFO_KHR,
-            PRESENT_MODE_TEXT, PRESENT_MODE_LONGTEXT, false)
-            change_integer_list(present_values, present_text)
 vlc_module_end ()
 
 // Update the renderer settings based on the current configuration.

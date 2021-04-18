@@ -13,3 +13,11 @@ libplacebo_utils_la_LIBADD = $(LIBPLACEBO_LIBS)
 libplacebo_utils_la_LDFLAGS = -static -undefined
 
 noinst_LTLIBRARIES += libplacebo_utils.la
+
+libplacebo_plugin_la_SOURCES = $(LIBPLACEBO_COMMONSOURCES) \
+			  video_output/libplacebo/instance.c \
+			  video_output/libplacebo/display.c
+libplacebo_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBPLACEBO_CFLAGS)
+libplacebo_plugin_la_LIBADD = $(LIBPLACEBO_LIBS) libplacebo_utils.la
+
+vout_LTLIBRARIES += libplacebo_plugin.la
