@@ -80,3 +80,17 @@ void vlc_placebo_Release(vlc_placebo_t *pl)
     /* TODO: use vlc_objres_clear */
     vlc_object_delete(pl);
 }
+
+int vlc_placebo_MakeCurrent(vlc_placebo_t * pl)
+{
+    if (pl->ops->make_current)
+        return pl->ops->make_current(pl);
+
+    return VLC_SUCCESS;
+}
+
+void vlc_placebo_ReleaseCurrent(vlc_placebo_t *pl)
+{
+    if (pl->ops->release_current)
+        pl->ops->release_current(pl);
+}

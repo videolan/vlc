@@ -100,10 +100,15 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (sys->pl == NULL)
         goto error;
 
+    if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
+        goto error;
+
     const struct pl_gpu *gpu = sys->pl->gpu;
     sys->renderer = pl_renderer_create(sys->pl->ctx, gpu);
     if (!sys->renderer)
         goto error;
+
+    vlc_placebo_ReleaseCurrent(sys->pl);
 
     // Attempt using the input format as the display format
     if (vlc_placebo_FormatSupported(gpu, vd->fmt->i_chroma)) {
@@ -160,17 +165,20 @@ static void Close(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
     const struct pl_gpu *gpu = sys->pl->gpu;
 
-    for (int i = 0; i < 4; i++)
-        pl_tex_destroy(gpu, &sys->plane_tex[i]);
-    for (int i = 0; i < sys->num_overlays; i++)
-        pl_tex_destroy(gpu, &sys->overlay_tex[i]);
+    if (vlc_placebo_MakeCurrent(sys->pl) == VLC_SUCCESS) {
+        for (int i = 0; i < 4; i++)
+            pl_tex_destroy(gpu, &sys->plane_tex[i]);
+        for (int i = 0; i < sys->num_overlays; i++)
+            pl_tex_destroy(gpu, &sys->overlay_tex[i]);
+        pl_renderer_destroy(&sys->renderer);
+        vlc_placebo_ReleaseCurrent(sys->pl);
+    }
 
     if (sys->overlays) {
         free(sys->overlays);
         free(sys->overlay_tex);
     }
 
-    pl_renderer_destroy(&sys->renderer);
     vlc_placebo_Release(sys->pl);
 }
 
@@ -182,9 +190,14 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     const struct pl_gpu *gpu = sys->pl->gpu;
     bool failed = false;
 
+    if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
+        return;
+
     struct pl_swapchain_frame frame;
-    if (!pl_swapchain_start_frame(sys->pl->swapchain, &frame))
+    if (!pl_swapchain_start_frame(sys->pl->swapchain, &frame)) {
+        vlc_placebo_ReleaseCurrent(sys->pl);
         return; // Probably benign error, ignore it
+    }
 
     struct pl_image img = {
         .signature  = sys->counter++,
@@ -319,17 +332,20 @@ done:
     if (failed)
         pl_tex_clear(gpu, frame.fbo, (float[4]){ 1.0, 0.0, 0.0, 1.0 });
 
-    if (!pl_swapchain_submit_frame(sys->pl->swapchain)) {
+    if (!pl_swapchain_submit_frame(sys->pl->swapchain))
         msg_Err(vd, "Failed rendering frame!");
-        return;
-    }
+
+    vlc_placebo_ReleaseCurrent(sys->pl);
 }
 
 static void PictureDisplay(vout_display_t *vd, picture_t *pic)
 {
     VLC_UNUSED(pic);
     vout_display_sys_t *sys = vd->sys;
-    pl_swapchain_swap_buffers(sys->pl->swapchain);
+    if (vlc_placebo_MakeCurrent(sys->pl) == VLC_SUCCESS) {
+        pl_swapchain_swap_buffers(sys->pl->swapchain);
+        vlc_placebo_ReleaseCurrent(sys->pl);
+    }
 }
 
 static int Control(vout_display_t *vd, int query)
@@ -357,7 +373,11 @@ static int Control(vout_display_t *vd, int query)
         {
             int width = (int) vd->cfg->display.width;
             int height = (int) vd->cfg->display.height;
+            if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
+                return VLC_SUCCESS; // ignore errors
+
             pl_swapchain_resize(sys->pl->swapchain, &width, &height);
+            vlc_placebo_ReleaseCurrent(sys->pl);
 
             /* NOTE: We currently ignore resizing failures that are transient
              * on X11. Maybe improving resizing might fix that, but we don't
