@@ -107,7 +107,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (sys->vk == NULL)
         goto error;
 
-    sys->ctx = vlc_placebo_Create(VLC_OBJECT(sys->vk));
+    sys->ctx = vlc_placebo_CreateContext(VLC_OBJECT(sys->vk));
     if (!sys->ctx)
         goto error;
 

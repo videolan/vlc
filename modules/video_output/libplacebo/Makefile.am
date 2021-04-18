@@ -1,6 +1,7 @@
 ### libplacebo ###
 
-LIBPLACEBO_COMMONSOURCES = video_output/libplacebo/utils.h
+LIBPLACEBO_COMMONSOURCES = video_output/libplacebo/utils.h \
+	video_output/libplacebo/instance.h
 
 # Trigger the c++ linker because of glslang dependency of libplacebo
 LIBPLACEBO_COMMONSOURCES += dummy.cpp

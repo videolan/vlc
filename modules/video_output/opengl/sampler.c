@@ -1140,7 +1140,7 @@ CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
 
 #ifdef HAVE_LIBPLACEBO
     // Create the main libplacebo context
-    priv->pl_ctx = vlc_placebo_Create(VLC_OBJECT(gl));
+    priv->pl_ctx = vlc_placebo_CreateContext(VLC_OBJECT(gl));
     if (priv->pl_ctx) {
 #   if PL_API_VER >= 20
         priv->pl_sh = pl_shader_alloc(priv->pl_ctx, &(struct pl_shader_params) {
