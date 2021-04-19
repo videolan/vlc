@@ -125,6 +125,8 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(APPLY) $(TOOLS)/libtool-2.5.4-clang-libs.patch
 	$(APPLY) $(TOOLS)/libtool-2.4.7-lpthread.patch
 	$(APPLY) $(TOOLS)/libtool-2.5.4-embed-bitcode.patch
+
+	$(APPLY) $(TOOLS)/libtool-2.5.4-unarchive-old-libraries.patch
 	$(MOVE)
 
 .buildlibtool: libtool .automake .help2man
