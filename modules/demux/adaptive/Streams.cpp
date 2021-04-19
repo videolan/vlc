@@ -413,7 +413,7 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(vlc_tick_t nz_deadli
         {
             if(discontinuity || needrestart)
             {
-                msg_Dbg(p_realdemux, "Restarting demuxer");
+                msg_Dbg(p_realdemux, "Restarting demuxer %d %d", needrestart, discontinuity);
                 prepareRestart(discontinuity);
                 if(discontinuity)
                 {
