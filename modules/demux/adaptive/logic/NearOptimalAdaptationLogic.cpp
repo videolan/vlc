@@ -94,6 +94,9 @@ BaseRepresentation *NearOptimalAdaptationLogic::getNextRepresentation(BaseAdapta
     if(lowest == nullptr || highest == nullptr)
         return nullptr;
 
+    if(lowest == highest)
+        return lowest;
+
     const float umin = getUtility(lowest);
     const float umax = getUtility(highest);
 
