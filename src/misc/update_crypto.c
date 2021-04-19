@@ -63,7 +63,7 @@ static inline uint32_t scalar_number( const uint8_t *p, int header_len )
     else if( header_len == 2 )
         return( (p[0] << 8) + p[1] );
     else if( header_len == 4 )
-        return( (p[0] << 24) + (p[1] << 16) + (p[2] << 8) + p[3] );
+        return( ((uint32_t)p[0] << 24) + (p[1] << 16) + (p[2] << 8) + p[3] );
     else
         abort();
 }
