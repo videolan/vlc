@@ -415,7 +415,7 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(mtime_t nz_deadline,
         {
             if(discontinuity || needrestart)
             {
-                msg_Dbg(p_realdemux, "Restarting demuxer");
+                msg_Dbg(p_realdemux, "Restarting demuxer %d %d", needrestart, discontinuity);
                 prepareRestart(discontinuity);
                 if(discontinuity)
                 {
