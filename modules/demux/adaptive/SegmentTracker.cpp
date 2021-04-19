@@ -363,6 +363,9 @@ ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed,
     /* advance or don't trigger duplicate events */
     next = current = chunk.pos;
 
+    if(format == StreamFormat(StreamFormat::UNSUPPORTED))
+        return nullptr; /* Can't return chunk because no demux will be created */
+
     /* From this point chunk must be returned */
     ChunkInterface *returnedChunk;
     StreamFormat chunkformat = chunk.chunk->getStreamFormat();
