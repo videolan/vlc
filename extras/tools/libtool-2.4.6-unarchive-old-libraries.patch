@@ -1,0 +1,116 @@
+From ajanni@videolabs.io Tue Apr  6 10:22:32 2021
+Return-Path: <ajanni@videolabs.io>
+Delivered-To: ajanni@videolabs.io
+Received: from spool.mail.gandi.net (spool2.mail.gandi.net [217.70.178.211])
+	by nmboxes142.sd4.0x35.net (Postfix) with ESMTPS id 9D6AC617F6
+	for <ajanni@videolabs.io>; Tue,  6 Apr 2021 08:22:32 +0000 (UTC)
+Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [217.70.178.232])
+	by spool.mail.gandi.net (Postfix) with ESMTPS id 7CC9974039E
+	for <ajanni@videolabs.io>; Tue,  6 Apr 2021 08:22:32 +0000 (UTC)
+Received: from bulbizarre.home (lfbn-lyo-1-1938-20.w90-66.abo.wanadoo.fr [90.66.113.20])
+	(Authenticated sender: ajanni@videolabs.io)
+	by relay12.mail.gandi.net (Postfix) with ESMTPSA id ED3F7200007;
+	Tue,  6 Apr 2021 08:22:31 +0000 (UTC)
+From: Alexandre Janniaux <ajanni@videolabs.io>
+To: libtool-patches@gnu.org
+Cc: Alexandre Janniaux <ajanni@videolabs.io>
+Subject: [PATCH 1/2] ltmain.in: ensure old libraries are not archived
+Date: Tue,  6 Apr 2021 10:22:14 +0200
+Message-Id: <20210406082215.110003-1-ajanni@videolabs.io>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Status: LEGIT
+Received-SPF: pass (spool2: domain of videolabs.io designates 217.70.178.232 as permitted sender) client-ip=217.70.178.232; envelope-from=ajanni@videolabs.io; helo=relay12.mail.gandi.net;
+X-TUID: h5eS9uVhVo2x
+Status: O
+Content-Length: 2784
+
+Previously, adding a static archive library, aka. old library, as a
+dependency of a new libtool library compiled as a static archive (be it
+a convenience library or an installed static library) resulted in the
+dependency archive being added into the target archive as-is.
+
+However, linkers are usually not able to use nested archive as-is. It
+results in errors like these on Linux and Darwin at least:
+
+    /usr/bin/ld: ./.libs/libfoo.a: member ./.libs/libfoo.a(libbar.a) in
+    archive is not an object
+
+or
+
+    /usr/bin/nm: libbar.a: file format not recognized
+
+With libfoo.a being the static libtool target and libbar.a being the
+nested/linked static library.
+
+Libtool has a quite close behaviour with convenience libraries, where
+the content (objects) of the convenience library are extracted and added
+back into the new target, but that´s mostly a libtool creation.
+
+The static dependencies should not be "linked" into other static
+libraries as there should not be linking involved, and we don´t want to
+potentially duplicate symbols like done for the convenience libraries.
+
+Instead, keep them in the dependency_libs of the new libtool archive
+created and forward them until we link a shared library or an
+executable.
+---
+ build-aux/ltmain.in | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+index 96b37003..d172deae 100644
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -5508,7 +5508,6 @@ func_mode_link ()
+       *.$libext)
+ 	# An archive.
+ 	func_append deplibs " $arg"
+-	func_append old_deplibs " $arg"
+ 	continue
+ 	;;
+ 
+@@ -5867,6 +5866,8 @@ func_mode_link ()
+ 	  if test conv = "$pass"; then
+ 	    deplibs="$deplib $deplibs"
+ 	    continue
++	  else
++	    func_append old_deplibs " $deplib"
+ 	  fi
+ 	  case $linkmode in
+ 	  lib)
+@@ -6817,7 +6818,6 @@ func_mode_link ()
+       # Now set the variables for building old libraries.
+       build_libtool_libs=no
+       oldlibs=$output
+-      func_append objs "$old_deplibs"
+       ;;
+ 
+     lib)
+@@ -8697,7 +8697,11 @@ EOF
+ 	  build_libtool_libs=no
+           ;;
+ 	*)
+-	  oldobjs="$old_deplibs $non_pic_objects"
++	  oldobjs="$non_pic_objects"
++	  # This is not correct to add old_deplibs creating an archive
++	  # so append them only when creating an executable or a shared
++	  # library.
++	  test yes != "$build_old_libs" && oldobjs="$oldobjs $old_deplibs"
+ 	  $preload && test -f "$symfileobj" \
+ 	    && func_append oldobjs " $symfileobj"
+ 	  addlibs=$old_convenience
+@@ -8958,6 +8962,7 @@ EOF
+ 	    done
+ 	    dlprefiles=$newdlprefiles
+ 	  fi
++	  func_append dependency_libs " $old_deplibs"
+ 	  $RM $output
+ 	  # place dlname in correct position for cygwin
+ 	  # In fact, it would be nice if we could use this code for all target
+-- 
+2.31.1
+
+
