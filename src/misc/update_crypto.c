@@ -53,7 +53,7 @@
 #define packet_header_len( c ) ( ( c & 0x03 ) + 1 ) /* number of bytes in a packet header */
 
 
-static inline int scalar_number( const uint8_t *p, int header_len )
+static inline uint32_t scalar_number( const uint8_t *p, int header_len )
 {
     assert( header_len == 1 || header_len == 2 || header_len == 4 );
 
@@ -69,7 +69,7 @@ static inline int scalar_number( const uint8_t *p, int header_len )
 
 
 /* number of data bytes in a MPI */
-static int mpi_len(const uint8_t *mpi)
+static uint32_t mpi_len(const uint8_t *mpi)
 {
     return (scalar_number(mpi, 2) + 7) / 8;
 }
@@ -481,15 +481,15 @@ static int verify_signature_rsa( signature_packet_t *sign, public_key_packet_t *
     gcry_sexp_t key_sexp, hash_sexp, sig_sexp;
     key_sexp = hash_sexp = sig_sexp = NULL;
 
-    int i_n_len = mpi_len( p_key->sig.rsa.n );
-    int i_e_len = mpi_len( p_key->sig.rsa.e );
+    size_t i_e_len = mpi_len( p_key->sig.rsa.e );
+    size_t i_n_len = mpi_len( p_key->sig.rsa.n );
     if( gcry_mpi_scan( &n, GCRYMPI_FMT_USG, p_key->sig.rsa.n + 2, i_n_len, NULL ) ||
         gcry_mpi_scan( &e, GCRYMPI_FMT_USG, p_key->sig.rsa.e + 2, i_e_len, NULL ) ||
         gcry_sexp_build( &key_sexp, &erroff, key_sexp_s, n, e ) )
         goto out;
 
     uint8_t *p_s = sign->algo_specific.rsa.s;
-    int i_s_len = mpi_len( p_s );
+    size_t i_s_len = mpi_len( p_s );
     if( gcry_mpi_scan( &s, GCRYMPI_FMT_USG, p_s + 2, i_s_len, NULL ) ||
         gcry_sexp_build( &sig_sexp, &erroff, sig_sexp_s, s ) )
         goto out;
@@ -535,10 +535,10 @@ static int verify_signature_dsa( signature_packet_t *sign, public_key_packet_t *
     gcry_sexp_t key_sexp, hash_sexp, sig_sexp;
     key_sexp = hash_sexp = sig_sexp = NULL;
 
-    int i_p_len = mpi_len( p_key->sig.dsa.p );
-    int i_q_len = mpi_len( p_key->sig.dsa.q );
-    int i_g_len = mpi_len( p_key->sig.dsa.g );
-    int i_y_len = mpi_len( p_key->sig.dsa.y );
+    size_t i_p_len = mpi_len( p_key->sig.dsa.p );
+    size_t i_q_len = mpi_len( p_key->sig.dsa.q );
+    size_t i_g_len = mpi_len( p_key->sig.dsa.g );
+    size_t i_y_len = mpi_len( p_key->sig.dsa.y );
     if( gcry_mpi_scan( &p, GCRYMPI_FMT_USG, p_key->sig.dsa.p + 2, i_p_len, NULL ) ||
         gcry_mpi_scan( &q, GCRYMPI_FMT_USG, p_key->sig.dsa.q + 2, i_q_len, NULL ) ||
         gcry_mpi_scan( &g, GCRYMPI_FMT_USG, p_key->sig.dsa.g + 2, i_g_len, NULL ) ||
@@ -548,14 +548,14 @@ static int verify_signature_dsa( signature_packet_t *sign, public_key_packet_t *
 
     uint8_t *p_r = sign->algo_specific.dsa.r;
     uint8_t *p_s = sign->algo_specific.dsa.s;
-    int i_r_len = mpi_len( p_r );
-    int i_s_len = mpi_len( p_s );
+    size_t i_r_len = mpi_len( p_r );
+    size_t i_s_len = mpi_len( p_s );
     if( gcry_mpi_scan( &r, GCRYMPI_FMT_USG, p_r + 2, i_r_len, NULL ) ||
         gcry_mpi_scan( &s, GCRYMPI_FMT_USG, p_s + 2, i_s_len, NULL ) ||
         gcry_sexp_build( &sig_sexp, &erroff, sig_sexp_s, r, s ) )
         goto out;
 
-    int i_hash_len = gcry_md_get_algo_dlen (sign->digest_algo);
+    unsigned int i_hash_len = gcry_md_get_algo_dlen (sign->digest_algo);
     if (i_hash_len > i_q_len)
         i_hash_len = i_q_len;
     if( gcry_mpi_scan( &hash, GCRYMPI_FMT_USG, p_hash, i_hash_len, NULL ) ||
@@ -647,7 +647,7 @@ int parse_public_key( const uint8_t *p_key_data, size_t i_key_len,
             ( i_header_len != 1 && i_header_len != 2 && i_header_len != 4 ) )
             goto error;
 
-        int i_packet_len = scalar_number( pos, i_header_len );
+        size_t i_packet_len = scalar_number( pos, i_header_len );
         pos += i_header_len;
 
         if( pos + i_packet_len > max_pos )
