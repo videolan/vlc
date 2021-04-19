@@ -1,0 +1,128 @@
+From 0c845d7b9039050d5794f6493ea405e2f83afb70 Mon Sep 17 00:00:00 2001
+From: Alexandre Janniaux <ajanni@videolabs.io>
+Date: Tue, 6 Apr 2021 10:22:14 +0200
+Subject: [PATCH 1/3] ltmain.in: ensure old libraries are not archived
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Previously, adding a static archive library, aka. old library, as a
+dependency of a new libtool library compiled as a static archive (be it
+a convenience library or an installed static library) resulted in the
+dependency archive being added into the target archive as-is.
+
+However, linkers are usually not able to use nested archive as-is. It
+results in errors like these on Linux and Darwin at least:
+
+    /usr/bin/ld: ./.libs/libfoo.a: member ./.libs/libfoo.a(libbar.a) in
+    archive is not an object
+
+or
+
+    /usr/bin/nm: libbar.a: file format not recognized
+
+With libfoo.a being the static libtool target and libbar.a being the
+nested/linked static library.
+
+Libtool has a quite close behaviour with convenience libraries, where
+the content (objects) of the convenience library are extracted and added
+back into the new target, but that´s mostly a libtool creation.
+
+The static dependencies should not be "linked" into other static
+libraries as there should not be linking involved, and we don´t want to
+potentially duplicate symbols like done for the convenience libraries.
+
+Instead, keep them in the dependency_libs of the new libtool archive
+created and forward them until we link a shared library or an
+executable.
+
+The test was marked XFAIL since 2010 because the fix for the
+nested-archive bug was incomplete. Now that ltmain.in properly
+forwards old library dependencies instead of archiving them,
+the test passes: remove the AT_XFAIL_IF and correct the
+foo.$OBJEXT assertion (objects from the dependency must NOT
+appear in the target archive).
+---
+ build-aux/ltmain.in         | 11 ++++++++---
+ tests/archive-in-archive.at |  8 ++++----
+ 2 files changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+index 70d0e111..b32478c9 100644
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -5816,7 +5816,6 @@ func_mode_link ()
+       *.$libext|*.so)
+ 	# An archive or an explicit shared library.
+ 	func_append deplibs " $arg"
+-	func_append old_deplibs " $arg"
+ 	continue
+ 	;;
+ 
+@@ -6215,6 +6214,8 @@ func_mode_link ()
+ 	  if test conv = "$pass"; then
+ 	    deplibs="$deplib $deplibs"
+ 	    continue
++	  else
++	    func_append old_deplibs " $deplib"
+ 	  fi
+ 	  case $linkmode in
+ 	  lib)
+@@ -7184,7 +7185,6 @@ func_mode_link ()
+       # Now set the variables for building old libraries.
+       build_libtool_libs=no
+       oldlibs=$output
+-      func_append objs "$old_deplibs"
+       ;;
+ 
+     lib)
+@@ -8952,7 +8952,11 @@ func_mode_link ()
+ 	  build_libtool_libs=no
+           ;;
+ 	*)
+-	  oldobjs="$old_deplibs $non_pic_objects"
++	  oldobjs="$non_pic_objects"
++	  # This is not correct to add old_deplibs creating an archive
++	  # so append them only when creating an executable or a shared
++	  # library.
++	  test yes != "$build_old_libs" && oldobjs="$oldobjs $old_deplibs"
+ 	  $preload && test -f "$symfileobj" \
+ 	    && func_append oldobjs " $symfileobj"
+ 	  addlibs=$old_convenience
+@@ -9213,6 +9217,7 @@ func_mode_link ()
+ 	    done
+ 	    dlprefiles=$newdlprefiles
+ 	  fi
++	  func_append dependency_libs " $old_deplibs"
+ 	  $RM $output
+ 	  # place dlname in correct position for cygwin
+ 	  # In fact, it would be nice if we could use this code for all target
+diff --git a/tests/archive-in-archive.at b/tests/archive-in-archive.at
+index d081f57d..b48579ae 100644
+--- a/tests/archive-in-archive.at
++++ b/tests/archive-in-archive.at
+@@ -24,9 +24,6 @@
+ AT_SETUP([static library contains static library])
+ AT_KEYWORDS([libtool])
+ 
+-# This test passes with MS lib.
+-AT_XFAIL_IF([case $AR in ar-lib\ * | *[[/\\]]ar-lib\ *) false;; *) :;; esac])
+-
+ AT_DATA([foo.c],
+ [
+ int foo() { return 1;}
+@@ -51,7 +48,10 @@ AT_CHECK([$LIBTOOL --mode=link --tag=CC --tag=disable-shared $CC $CFLAGS $LDFLAG
+ AT_CHECK([$LIBTOOL --mode=install cp libbar.la $thisdir], [], [ignore], [ignore])
+ eval `$EGREP '^(old_library)=' < libbar.la`
+ libbar=$old_library
++# The old library (libfoo.a) must NOT be nested inside libbar.a.
+ AT_CHECK([$AR -t $libbar | $GREP $libfoo],[1],[ignore],[ignore])
+-AT_CHECK([$AR -t $libbar | $GREP foo.$OBJEXT],[],[ignore],[ignore])
++# Objects from libfoo must NOT be extracted into libbar.a either.
++AT_CHECK([$AR -t $libbar | $GREP foo.$OBJEXT],[1],[ignore],[ignore])
++# bar's own object must still be present.
+ AT_CHECK([$AR -t $libbar | $GREP bar.$OBJEXT],[],[ignore],[ignore])
+ AT_CLEANUP
+-- 
+2.53.0
+
