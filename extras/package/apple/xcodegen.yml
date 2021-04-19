@@ -54,7 +54,7 @@ targets:
           copyFiles:
             destination: executables
 
-  libvlc_static:
+  vlc_static:
     type: "library.static"
     platform: ${VLC_PLATFORM}
     dependencies:
@@ -62,14 +62,30 @@ targets:
     sources:
       - path: ${VLC_BUILD_DIR}/modules/.libs/libvlc_static.a
         optional: true
+        buildPhase:
+          copyFiles:
+            destination: productsDirectory
 
   vlc:
-    type: "framework"
+    type: "library.static"
     platform: ${VLC_PLATFORM}
     dependencies:
       - target: VLCAutomake
     sources:
-      - path: ${VLC_BUILD_DIR}/lib/.libs/libvlc.dylib
+      - path: ${VLC_BUILD_DIR}/lib/.libs/libvlc.a
         optional: true
-      - path: ${VLC_BUILD_DIR}/src/.libs/libvlccore.dylib
+        buildPhase:
+          copyFiles:
+            destination: productsDirectory
+
+  vlccore:
+    type: "library.static"
+    platform: ${VLC_PLATFORM}
+    dependencies:
+      - target: VLCAutomake
+    sources:
+      - path: ${VLC_BUILD_DIR}/src/.libs/libvlccore.a
         optional: true
+        buildPhase:
+          copyFiles:
+            destination: productsDirectory
