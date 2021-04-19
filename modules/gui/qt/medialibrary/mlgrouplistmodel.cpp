@@ -27,6 +27,9 @@
 // VLC includes
 #include <vlc_media_library.h>
 
+// Util includes
+#include "util/covergenerator.hpp"
+
 // MediaLibrary includes
 #include "mlhelper.hpp"
 #include "mlgroup.hpp"
@@ -34,6 +37,10 @@
 
 //-------------------------------------------------------------------------------------------------
 // Static variables
+
+// NOTE: We multiply by 2 to cover most dpi settings.
+static const int MLGROUPLISTMODEL_COVER_WIDTH  = 512 * 2; // 16 / 10 ratio
+static const int MLGROUPLISTMODEL_COVER_HEIGHT = 320 * 2;
 
 static const QHash<QByteArray, vlc_ml_sorting_criteria_t> criterias =
 {
@@ -85,8 +92,9 @@ QHash<int, QByteArray> MLGroupListModel::roleNames() const /* override */
 
 QVariant MLGroupListModel::data(const QModelIndex & index, int role) const /* override */
 {
+    int row = index.row();
 
-    MLItem * item = this->item(index.row());
+    MLItem * item = this->item(row);
 
     if (item == nullptr)
         return QVariant();
@@ -109,7 +117,7 @@ QVariant MLGroupListModel::data(const QModelIndex & index, int role) const /* ov
             case GROUP_NAME:
                 return QVariant::fromValue(group->getName());
             case GROUP_THUMBNAIL:
-                return QVariant::fromValue(group->getThumbnail());
+                return getCover(group, row);
             case GROUP_DURATION:
                 return QVariant::fromValue(group->getDuration());
             case GROUP_DATE:
@@ -208,6 +216,35 @@ ListCacheLoader<std::unique_ptr<MLItem>> * MLGroupListModel::createLoader() cons
 }
 
 //-------------------------------------------------------------------------------------------------
+// Private functions
+//-------------------------------------------------------------------------------------------------
+
+QString MLGroupListModel::getCover(MLGroup * group, int index) const
+{
+    QString cover = group->getCover();
+
+    // NOTE: Making sure we're not already generating a cover.
+    if (cover.isNull() == false || group->hasGenerator())
+        return cover;
+
+    CoverGenerator * generator = new CoverGenerator(m_ml, group->getId(), index);
+
+    generator->setSize(QSize(MLGROUPLISTMODEL_COVER_WIDTH,
+                             MLGROUPLISTMODEL_COVER_HEIGHT));
+
+    generator->setDefaultThumbnail(":/noart_videoCover.svg");
+
+    // NOTE: We'll apply the new thumbnail once it's loaded.
+    connect(generator, &CoverGenerator::result, this, &MLGroupListModel::onCover);
+
+    generator->start(*QThreadPool::globalInstance());
+
+    group->setGenerator(generator);
+
+    return cover;
+}
+
+//-------------------------------------------------------------------------------------------------
 // Private MLBaseModel reimplementation
 //-------------------------------------------------------------------------------------------------
 
@@ -230,7 +267,41 @@ void MLGroupListModel::onVlcMlEvent(const MLEvent & event) /* override */
 
 void MLGroupListModel::thumbnailUpdated(int idx) /* override */
 {
-    emit dataChanged(index(idx), index(idx), { GROUP_THUMBNAIL });
+    QModelIndex index = this->index(idx);
+
+    emit dataChanged(index, index, { GROUP_THUMBNAIL });
+}
+
+//-------------------------------------------------------------------------------------------------
+// Private slots
+//-------------------------------------------------------------------------------------------------
+
+void MLGroupListModel::onCover()
+{
+    CoverGenerator * generator = static_cast<CoverGenerator *> (sender());
+
+    int index = generator->getIndex();
+
+    // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
+    MLItem * item = this->itemCache(index);
+
+    // NOTE: When the item is no longer cached or has been moved we return right away.
+    if (item == nullptr || item->getId() != generator->getId())
+    {
+        generator->deleteLater();
+
+        return;
+    }
+
+    MLGroup * group = static_cast<MLGroup *> (item);
+
+    QString fileName = QUrl::fromLocalFile(generator->takeResult()).toString();
+
+    group->setCover(fileName);
+
+    group->setGenerator(nullptr);
+
+    thumbnailUpdated(index);
 }
 
 //=================================================================================================

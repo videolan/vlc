@@ -26,6 +26,7 @@
 
 // Forward declarations
 class vlc_medialibrary_t;
+class MLGroup;
 
 class MLGroupListModel : public MLBaseModel
 {
@@ -72,10 +73,16 @@ protected: // MLBaseModel implementation
 
     ListCacheLoader<std::unique_ptr<MLItem>> * createLoader() const override;
 
+private: // Functions
+    QString getCover(MLGroup * group, int index) const;
+
 private: // MLBaseModel implementation
     void onVlcMlEvent(const MLEvent & event) override;
 
     void thumbnailUpdated(int idx) override;
+
+private slots:
+    void onCover();
 
 private:
     struct Loader : public MLBaseModel::BaseLoader
