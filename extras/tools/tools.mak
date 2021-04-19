@@ -117,6 +117,7 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(APPLY) $(TOOLS)/libtool-2.4.7-response-files.patch
 	$(APPLY) $(TOOLS)/libtool-2.4.7-lpthread.patch
 	$(APPLY) $(TOOLS)/libtool-2.4.7-embed-bitcode.patch
+	$(APPLY) $(TOOLS)/libtool-2.4.6-unarchive-old-libraries.patch
 	$(MOVE)
 
 .buildlibtool: libtool .automake .help2man
