@@ -375,8 +375,8 @@ InitFramebufferTexture(const opengl_vtable_t *vt, GLuint framebuffer,
                        GLuint texture, GLsizei width, GLsizei height)
 {
     vt->BindTexture(GL_TEXTURE_2D, texture);
-    vt->TexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0,
-                   GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);
+    vt->TexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                   GL_UNSIGNED_BYTE, NULL);
     vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
