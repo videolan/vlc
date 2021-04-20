@@ -278,14 +278,6 @@ static int Open( vlc_object_t *obj )
         = filter->fmt_out.i_codec
         = sys->gl->offscreen_chroma_out;
 
-    filter->fmt_out.video.i_frame_rate =
-        filter->fmt_in.video.i_frame_rate;
-
-    filter->fmt_out.video.i_frame_rate_base =
-        filter->fmt_in.video.i_frame_rate_base;
-
-    assert(filter->fmt_out.video.i_frame_rate_base != 0);
-
     filter->vctx_out = sys->gl->offscreen_vctx_out;
 
     return VLC_SUCCESS;
