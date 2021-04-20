@@ -50,6 +50,16 @@ void FakeESOutID::sendData( block_t *p_block )
     fakeesout->sendData( this, p_block );
 }
 
+EsType FakeESOutID::esType() const
+{
+    if(fmt.i_cat == VIDEO_ES)
+        return EsType::Video;
+    else if(fmt.i_cat == AUDIO_ES)
+        return EsType::Audio;
+    else
+        return EsType::Other;
+}
+
 void FakeESOutID::create()
 {
     fakeesout->createOrRecycleRealEsID( this );

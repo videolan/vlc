@@ -81,6 +81,7 @@ class TestEsOutID : public AbstractFakeESOutID
         {
             out->sendData(this, b);
         }
+        virtual EsType esType() const override { return EsType::Other; }
 
     private:
         TestEsOut *out;
