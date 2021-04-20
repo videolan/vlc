@@ -150,26 +150,48 @@ namespace adaptive
 
     using Queueentry = std::pair<uint64_t, AbstractCommand *>;
 
-    /* Queuing for doing all the stuff in order */
-    class CommandsQueue
+    class AbstractCommandsQueue
     {
         public:
-            CommandsQueue();
-            ~CommandsQueue();
-            void Schedule( AbstractCommand * );
-            vlc_tick_t Process( vlc_tick_t );
-            void Abort( bool b_reset );
-            void Commit();
-            bool isEmpty() const;
+            AbstractCommandsQueue();
+            virtual ~AbstractCommandsQueue() = default;
+            virtual void Schedule( AbstractCommand * ) = 0;
+            virtual vlc_tick_t Process( vlc_tick_t )  = 0;
+            virtual void Abort( bool b_reset )  = 0;
+            virtual void Commit()  = 0;
+            virtual bool isEmpty() const = 0;
             void setDrop( bool );
-            void setDraining();
+            virtual void setDraining();
             void setEOF( bool );
             bool isDraining() const;
             bool isEOF() const;
-            vlc_tick_t getDemuxedAmount(vlc_tick_t) const;
-            vlc_tick_t getBufferingLevel() const;
-            vlc_tick_t getFirstDTS() const;
-            vlc_tick_t getPCR() const;
+            virtual vlc_tick_t getDemuxedAmount(vlc_tick_t) const  = 0;
+            virtual vlc_tick_t getBufferingLevel() const  = 0;
+            virtual vlc_tick_t getFirstDTS() const  = 0;
+            virtual vlc_tick_t getPCR() const = 0;
+
+        protected:
+            bool b_draining;
+            bool b_drop;
+            bool b_eof;
+    };
+
+    /* Queuing for doing all the stuff in order */
+    class CommandsQueue : public AbstractCommandsQueue
+    {
+        public:
+            CommandsQueue();
+            virtual ~CommandsQueue();
+            virtual void Schedule( AbstractCommand * ) override;
+            virtual vlc_tick_t Process( vlc_tick_t ) override;
+            virtual void Abort( bool b_reset ) override;
+            virtual void Commit() override;
+            virtual bool isEmpty() const override;
+            virtual void setDraining() override;
+            virtual vlc_tick_t getDemuxedAmount(vlc_tick_t) const override;
+            virtual vlc_tick_t getBufferingLevel() const override;
+            virtual vlc_tick_t getFirstDTS() const override;
+            virtual vlc_tick_t getPCR() const override;
 
         private:
             void LockedCommit();
@@ -178,9 +200,6 @@ namespace adaptive
             std::list<Queueentry> commands;
             vlc_tick_t bufferinglevel;
             vlc_tick_t pcr;
-            bool b_draining;
-            bool b_drop;
-            bool b_eof;
             uint64_t nextsequence;
     };
 }

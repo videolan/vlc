@@ -135,7 +135,7 @@ FakeESOut * FakeESOut::LockedFakeEsOut::operator ->()
     return p;
 }
 
-FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue,
+FakeESOut::FakeESOut( es_out_t *es, AbstractCommandsQueue *queue,
                       CommandsFactory *cf )
     : AbstractFakeEsOut()
     , real_es_out( es )
@@ -157,7 +157,7 @@ FakeESOut::LockedFakeEsOut FakeESOut::WithLock()
     return LockedFakeEsOut(*this);
 }
 
-CommandsQueue * FakeESOut::commandsQueue()
+AbstractCommandsQueue * FakeESOut::commandsQueue()
 {
     return commandsqueue;
 }
