@@ -595,6 +595,7 @@ if [ $VLC_HOST_ARCH = "armv7" ]; then
 $MAKE .buildgas \
     || abort_err "Building gas-preprocessor tool failed"
 fi
+$MAKE .buildlibtool
 echo ""
 
 ##########################################################
