@@ -1,11 +1,11 @@
 # sqlite
 
-SQLITE_VERSION := 3290000
-SQLITE_URL := https://www.sqlite.org/2019/sqlite-autoconf-$(SQLITE_VERSION).tar.gz
+SQLITE_VERSION := 3340100
+SQLITE_URL := https://www.sqlite.org/2021/sqlite-autoconf-$(SQLITE_VERSION).tar.gz
 
 PKGS += sqlite
 
-ifeq ($(call need_pkg,"sqlite3 >= 3.25.0"),)
+ifeq ($(call need_pkg,"sqlite3 >= 3.33.0"),)
 PKGS_FOUND += sqlite
 endif
 
