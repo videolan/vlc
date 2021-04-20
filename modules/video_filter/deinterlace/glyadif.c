@@ -1043,7 +1043,7 @@ Open(vlc_object_t *obj, const char *name)
 
     /* The input picture is uploaded upside-down, so we must add an additional
      * vflip if and only if the offscreen does not adds its own vflip */
-    bool must_vflip = sys->gl->offscreen_vflip;
+    bool must_vflip = !sys->gl->offscreen_vflip;
     ret = CreateProgramDraw(filter, filter->fmt_in.video.space, must_vflip);
     if (ret != VLC_SUCCESS)
         goto create_program_draw_failure;
