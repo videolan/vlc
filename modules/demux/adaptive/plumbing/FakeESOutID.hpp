@@ -27,6 +27,13 @@ namespace adaptive
 {
     class FakeESOut;
 
+    enum class EsType
+    {
+        Video,
+        Audio,
+        Other,
+    };
+
     class AbstractFakeESOutID
     {
         public:
@@ -35,6 +42,7 @@ namespace adaptive
             virtual void create() = 0;
             virtual void release() = 0;
             virtual void sendData(block_t *) = 0;
+            virtual EsType esType() const = 0;
     };
 
     class FakeESOutID : public AbstractFakeESOutID
@@ -48,6 +56,7 @@ namespace adaptive
             virtual void create() override;
             virtual void release() override;
             virtual void sendData(block_t *) override;
+            virtual EsType esType() const override;
             bool isCompatible( const FakeESOutID * ) const;
             /* Ensure we won't issue delete command twice */
             void setScheduledForDeletion();
