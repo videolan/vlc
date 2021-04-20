@@ -70,7 +70,7 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, 
     if(demuxersource)
     {
         CommandsFactory *factory = new (std::nothrow) CommandsFactory();
-        CommandsQueue *commandsqueue = new (std::nothrow) CommandsQueue();
+        AbstractCommandsQueue *commandsqueue = new (std::nothrow) CommandsQueue();
         if(factory && commandsqueue)
         {
             fakeesout = new (std::nothrow) FakeESOut(p_realdemux->out,
