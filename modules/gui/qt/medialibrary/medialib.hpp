@@ -70,8 +70,6 @@ public:
     QThreadPool &threadPool() { return m_threadPool; }
 
 signals:
-    void reloadStarted();
-    void reloadCompleted();
     void discoveryStarted();
     void discoveryCompleted();
     void parsingProgressChanged( quint32 percent );

@@ -285,24 +285,6 @@ void MediaLib::onMediaLibraryEvent( void* data, const vlc_ml_event_t* event )
             });
             break;
         }
-        case VLC_ML_EVENT_RELOAD_STARTED:
-        {
-            QMetaObject::invokeMethod(self, [self]() {
-                self->m_discoveryPending = true;
-                self->emit discoveryPendingChanged(self->m_discoveryPending);
-                self->emit reloadStarted();
-            });
-            break;
-        }
-        case VLC_ML_EVENT_RELOAD_COMPLETED:
-        {
-            QMetaObject::invokeMethod(self, [self]() {
-                self->m_discoveryPending = false;
-                self->emit discoveryPendingChanged(self->m_discoveryPending);
-                self->emit reloadCompleted();
-            });
-            break;
-        }
         case VLC_ML_EVENT_BACKGROUND_IDLE_CHANGED:
         {
             bool idle = event->background_idle_changed.b_idle;

@@ -97,6 +97,15 @@ std::shared_ptr<IFile> SDDirectory::file(const std::string& mrl) const
     return *it;
 }
 
+bool SDDirectory::contains(const std::string& fileName) const
+{
+    auto fs = files();
+    return std::find_if( cbegin( fs ), cend( fs ),
+                         [&fileName]( const std::shared_ptr<fs::IFile> f ) {
+                             return f->name() == fileName;
+                         }) != cend( fs );
+}
+
 struct metadata_request {
     vlc::threads::mutex lock;
     vlc::threads::condition_variable cond;

@@ -645,22 +645,6 @@ enum vlc_ml_event_type
      */
     VLC_ML_EVENT_DISCOVERY_COMPLETED,
     /**
-     * An entry point reload operation started.
-     * For all the entry points being reloaded, N VLC_EVENT_DISCOVERY_PROGRESS
-     * and 1 VLC_EVENT_RELOAD_COMPLETED event will be sent.
-     * The entry point being reloaded is stored in
-     * vlc_ml_event_t::reload_started::psz_entry_point.
-     */
-    VLC_ML_EVENT_RELOAD_STARTED,
-    /**
-     * Sent when an entry point reload is completed.
-     * The entry point that was being reloaded is stored in
-     * vlc_ml_event_t::reload_completed::psz_entry_point.
-     * The success or failure state is stored in
-     * vlc_ml_event_t::reload_completed::b_success
-     */
-    VLC_ML_EVENT_RELOAD_COMPLETED,
-    /**
      * Sent when a new entry point gets added to the database.
      * The entry point that was added is stored in
      * vlc::ml_event_t::entry_point_added::psz_entry_point, and the success or failure
@@ -744,15 +728,6 @@ typedef struct vlc_ml_event_t
             const char* psz_entry_point;
             bool b_success;
         } discovery_completed;
-        struct
-        {
-            const char* psz_entry_point;
-        } reload_started;
-        struct
-        {
-            const char* psz_entry_point;
-            bool b_success;
-        } reload_completed;
         struct
         {
             const char* psz_entry_point;

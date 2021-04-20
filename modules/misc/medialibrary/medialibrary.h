@@ -134,7 +134,8 @@ private:
 class MediaLibrary : public medialibrary::IMediaLibraryCb
 {
 public:
-    MediaLibrary( vlc_medialibrary_module_t* ml );
+    static MediaLibrary* create( vlc_medialibrary_module_t* ml );
+
     bool Init();
     bool Start();
     int Control( int query, va_list args );
@@ -165,6 +166,8 @@ private:
     static medialibrary::SortingCriteria sortingCriteria( int sort );
 
 private:
+    MediaLibrary( vlc_medialibrary_module_t* vlc_ml, medialibrary::IMediaLibrary* ml );
+
     vlc_medialibrary_module_t* m_vlc_ml;
     std::unique_ptr<Logger> m_logger;
     std::unique_ptr<medialibrary::IMediaLibrary> m_ml;
@@ -200,8 +203,6 @@ public:
     virtual void onDiscoveryStarted(const std::string& entryPoint) override;
     virtual void onDiscoveryProgress(const std::string& entryPoint) override;
     virtual void onDiscoveryCompleted(const std::string& entryPoint, bool success) override;
-    virtual void onReloadStarted(const std::string& entryPoint) override;
-    virtual void onReloadCompleted(const std::string& entryPoint, bool success) override;
     virtual void onEntryPointAdded(const std::string& entryPoint, bool success) override;
     virtual void onEntryPointRemoved(const std::string& entryPoint, bool success) override;
     virtual void onEntryPointBanned(const std::string& entryPoint, bool success) override;
