@@ -62,7 +62,6 @@ namespace adaptive
 
         void setLanguage(const std::string &);
         void setDescription(const std::string &);
-        vlc_tick_t getPCR() const;
         vlc_tick_t getMinAheadTime() const;
         vlc_tick_t getFirstDTS() const;
         int esCount() const;
