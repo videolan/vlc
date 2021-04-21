@@ -62,7 +62,6 @@ namespace adaptive
 
         void setLanguage(const std::string &);
         void setDescription(const std::string &);
-        mtime_t getPCR() const;
         mtime_t getMinAheadTime() const;
         mtime_t getFirstDTS() const;
         int esCount() const;

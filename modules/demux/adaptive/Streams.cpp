@@ -177,14 +177,6 @@ void AbstractStream::setDescription(const std::string &desc)
     description = desc;
 }
 
-mtime_t AbstractStream::getPCR() const
-{
-    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&lock));
-    if(!valid || disabled)
-        return VLC_TS_INVALID;
-    return fakeEsOut()->commandsQueue()->getPCR();
-}
-
 mtime_t AbstractStream::getMinAheadTime() const
 {
     if(!segmentTracker)
