@@ -88,7 +88,7 @@ struct aout_sys_common
 int ca_Open(audio_output_t *p_aout);
 
 void ca_Render(audio_output_t *p_aout, uint32_t i_nb_samples, uint64_t i_host_time,
-               uint8_t *p_output, size_t i_requested);
+               uint8_t *p_output, size_t i_requested, bool *is_silence);
 
 int  ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay);
 

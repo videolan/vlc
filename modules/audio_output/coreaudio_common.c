@@ -140,7 +140,7 @@ ca_Open(audio_output_t *p_aout)
 /* Called from render callbacks. No lock, wait, and IO here */
 void
 ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
-          uint8_t *p_output, size_t i_requested)
+          uint8_t *p_output, size_t i_requested, bool *is_silence)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
@@ -238,11 +238,15 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
         memset(p_output, 0, i_requested);
     }
 
+    if (is_silence != NULL)
+        *is_silence = p_sys->b_muted;
     lock_unlock(p_sys);
     return;
 
 drop:
     memset(p_output, 0, i_requested);
+    if (is_silence != NULL)
+        *is_silence = true;
     lock_unlock(p_sys);
 }
 
@@ -547,8 +551,11 @@ RenderCallback(void *p_data, AudioUnitRenderActionFlags *ioActionFlags,
     uint64_t i_host_time = (inTimeStamp->mFlags & kAudioTimeStampHostTimeValid)
                          ? inTimeStamp->mHostTime : 0;
 
+    bool is_silence;
     ca_Render(p_data, inNumberFrames, i_host_time, ioData->mBuffers[0].mData,
-              ioData->mBuffers[0].mDataByteSize);
+              ioData->mBuffers[0].mDataByteSize, &is_silence);
+    if (is_silence)
+        *ioActionFlags |= kAudioUnitRenderAction_OutputIsSilence;
 
     return noErr;
 }
