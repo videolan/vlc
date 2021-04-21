@@ -255,15 +255,6 @@ index b8bf1288..2197ed41 100644
  			/* Avoid infinity wait.
  			 * Note: If there is no data in the pipe, ReadFile()
  			 * called in read() never returns and so we won't
-@@ -437,7 +439,7 @@ __archive_read_program(struct archive_read_filter *self, const char *cmd)
- 		    cmd);
- 		return (ARCHIVE_FATAL);
- 	}
--#if defined(_WIN32) && !defined(__CYGWIN__)
-+#if defined(_WIN32) && !defined(__CYGWIN__) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
- 	state->child = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, child);
- 	if (state->child == NULL) {
- 		child_stop(self, state);
 @@ -516,3 +518,5 @@ program_filter_close(struct archive_read_filter *self)
  
  	return (e);
@@ -514,30 +505,27 @@ index 47b7cb8e..9743f310 100644
  #define WEXITSTATUS(sts)	(sts & 0x0FF)
 diff --git a/libarchive/filter_fork_windows.c b/libarchive/filter_fork_windows.c
 index ad271fe6..0414d6f4 100644
---- a/libarchive/filter_fork_windows.c
-+++ b/libarchive/filter_fork_windows.c
+--- a/libarchive/filter_fork_windows.c.orig	2020-12-26 02:29:38.000000000 +0100
++++ b/libarchive/filter_fork_windows.c	2021-04-21 17:17:42.651099766 +0200
 @@ -31,6 +31,13 @@
  
  #include "filter_fork.h"
  
 +#if !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
-+pid_t
-+__archive_create_child(const char *cmd, int *child_stdin, int *child_stdout)
++int
++__archive_create_child(const char *cmd, int *child_stdin, int *child_stdout, HANDLE *out_child)
 +{
-+	return (-1);
++	return ARCHIVE_FAILED;
 +}
 +#else /* WINAPI_PARTITION_DESKTOP */
- pid_t
- __archive_create_child(const char *cmd, int *child_stdin, int *child_stdout)
- {
-@@ -178,6 +185,7 @@ fail:
+ int
+ __archive_create_child(const char *cmd, int *child_stdin, int *child_stdout,
+ 		HANDLE *out_child)
+@@ -187,6 +194,7 @@
  	__archive_cmdline_free(acmd);
- 	return (-1);
+ 	return ARCHIVE_FAILED;
  }
 +#endif /* WINAPI_PARTITION_DESKTOP */
  
  void
  __archive_check_child(int in, int out)
--- 
-2.26.0.windows.1
-
