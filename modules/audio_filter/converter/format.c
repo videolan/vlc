@@ -415,6 +415,7 @@ static block_t *Fl64toFl32(filter_t *filter, block_t *b)
     float  *dst = (float *)src;
     for (size_t i = b->i_buffer / 8; i--;)
         *(dst++) = *(src++);
+    b->i_buffer /= 2;
 
     VLC_UNUSED(filter);
     return b;
@@ -435,6 +436,7 @@ static block_t *Fl64toS32(filter_t *filter, block_t *b)
         else
             *(dst++) = lround(s);
     }
+    b->i_buffer /= 2;
     VLC_UNUSED(filter);
     return b;
 }
