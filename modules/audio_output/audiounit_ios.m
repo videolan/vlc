@@ -408,15 +408,8 @@ Pause (audio_output_t *p_aout, bool pause, vlc_tick_t date)
 static int
 MuteSet(audio_output_t *p_aout, bool mute)
 {
-    aout_sys_t * p_sys = p_aout->sys;
-
-    p_sys->b_muted = mute;
-    if (p_sys->au_unit != NULL)
-    {
-        Pause(p_aout, mute, 0);
-        if (mute)
-            ca_Flush(p_aout);
-    }
+    ca_MuteSet(p_aout, mute);
+    aout_MuteReport(p_aout, mute);
 
     return VLC_SUCCESS;
 }
