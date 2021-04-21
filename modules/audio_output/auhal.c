@@ -119,7 +119,6 @@ typedef struct
     vlc_mutex_t                 selected_device_lock;
 
     float                       f_volume;
-    bool                        b_mute;
 
     bool                        b_ignore_streams_changed_callback;
 } aout_sys_t;
@@ -900,7 +899,7 @@ static int
 VolumeSet(audio_output_t * p_aout, float volume)
 {
     aout_sys_t *p_sys = p_aout->sys;
-    OSStatus err = noErr;
+    OSStatus err;
 
     if (p_sys->b_digital)
         return VLC_EGENERIC;
@@ -909,15 +908,12 @@ VolumeSet(audio_output_t * p_aout, float volume)
     aout_VolumeReport(p_aout, volume);
 
     /* Set volume for output unit */
-    if (!p_sys->b_mute)
-    {
-        err = AudioUnitSetParameter(p_sys->au_unit,
-                                        kHALOutputParam_Volume,
-                                        kAudioUnitScope_Global,
-                                        0,
-                                        volume * volume * volume,
-                                        0);
-    }
+    err = AudioUnitSetParameter(p_sys->au_unit,
+                                kHALOutputParam_Volume,
+                                kAudioUnitScope_Global,
+                                0,
+                                volume * volume * volume,
+                                0);
 
     if (var_InheritBool(p_aout, "volume-save"))
         config_PutInt("auhal-volume", lroundf(volume * AOUT_VOLUME_DEFAULT));
@@ -928,24 +924,10 @@ VolumeSet(audio_output_t * p_aout, float volume)
 static int
 MuteSet(audio_output_t * p_aout, bool mute)
 {
-    aout_sys_t *p_sys = p_aout->sys;
-
-    if (p_sys->b_digital)
-        return VLC_EGENERIC;
-
-    p_sys->b_mute = mute;
+    ca_MuteSet(p_aout, mute);
     aout_MuteReport(p_aout, mute);
 
-    float volume = .0;
-    if (!mute)
-        volume = p_sys->f_volume;
-
-    OSStatus err =
-        AudioUnitSetParameter(p_sys->au_unit, kHALOutputParam_Volume,
-                              kAudioUnitScope_Global, 0,
-                              volume * volume * volume, 0);
-
-    return (err == noErr) ? VLC_SUCCESS : VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 #pragma mark -
@@ -1121,7 +1103,6 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
 
     /* Set volume for output unit */
     VolumeSet(p_aout, p_sys->f_volume);
-    MuteSet(p_aout, p_sys->b_mute);
 
     free(layout);
 
@@ -1764,8 +1745,7 @@ static int Open(vlc_object_t *obj)
     p_sys->f_volume = var_InheritInteger(p_aout, "auhal-volume")
                     / (float)AOUT_VOLUME_DEFAULT;
     aout_VolumeReport(p_aout, p_sys->f_volume);
-    p_sys->b_mute = var_InheritBool(p_aout, "mute");
-    aout_MuteReport(p_aout, p_sys->b_mute);
+    MuteSet(p_aout, var_InheritBool(p_aout, "mute"));
 
     return VLC_SUCCESS;
 }

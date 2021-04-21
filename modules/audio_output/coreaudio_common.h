@@ -117,3 +117,5 @@ int  au_Initialize(audio_output_t *p_aout, AudioUnit au,
                    bool *warn_configuration);
 
 void au_Uninitialize(audio_output_t *p_aout, AudioUnit au);
+
+void au_VolumeSet(audio_output_t *p_aout);
