@@ -355,6 +355,15 @@ ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
          * mach_absolute_time() */
         const vlc_tick_t first_render_delay = date - vlc_tick_now()
                                             - ca_GetLatencyLocked(p_aout);
+
+        if (first_render_delay > VLC_TICK_FROM_SEC(10))
+        {
+            block_Release(p_block);
+            lock_unlock(p_sys);
+            msg_Warn(p_aout, "WARNING, dropped audio block with pts: %"PRId64 " (converted ts: %"PRId64 ")",
+                     p_block->i_pts, date);
+            return;
+        }
         p_sys->i_first_render_host_time
             = mach_absolute_time() + TickToHostTime(p_sys, first_render_delay);
     }
