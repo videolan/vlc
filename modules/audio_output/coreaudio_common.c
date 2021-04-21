@@ -203,7 +203,10 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
     while (p_block != NULL && i_requested != 0)
     {
         size_t i_tocopy = __MIN(i_requested, p_block->i_buffer);
-        memcpy(p_output, p_block->p_buffer, i_tocopy);
+        if (unlikely(p_sys->b_muted))
+            memset(p_output, 0, i_tocopy);
+        else
+            memcpy(p_output, p_block->p_buffer, i_tocopy);
         i_requested -= i_tocopy;
         i_copied += i_tocopy;
         p_output += i_tocopy;
@@ -314,6 +317,16 @@ ca_Pause(audio_output_t * p_aout, bool pause, vlc_tick_t date)
 }
 
 void
+ca_MuteSet(audio_output_t * p_aout, bool muted)
+{
+    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
+
+    lock_lock(p_sys);
+    p_sys->b_muted = muted;
+    lock_unlock(p_sys);
+}
+
+void
 ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
@@ -415,6 +428,7 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 
     p_sys->i_underrun_size = 0;
     p_sys->b_paused = false;
+    p_sys->b_muted = false;
     p_sys->i_render_host_time = p_sys->i_first_render_host_time = 0;
     p_sys->i_render_frames = 0;
 

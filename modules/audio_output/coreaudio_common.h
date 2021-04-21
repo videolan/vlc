@@ -53,6 +53,7 @@ struct aout_sys_common
 
     size_t              i_underrun_size;
     bool                b_paused;
+    bool                b_muted;
     bool                b_do_flush;
 
     size_t              i_out_max_size;
@@ -94,6 +95,8 @@ int  ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay);
 void ca_Flush(audio_output_t *p_aout);
 
 void ca_Pause(audio_output_t * p_aout, bool pause, vlc_tick_t date);
+
+void ca_MuteSet(audio_output_t * p_aout, bool mute);
 
 void ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date);
 
