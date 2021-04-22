@@ -23,10 +23,11 @@
 
 #import <Cocoa/Cocoa.h>
 #import <IOKit/hidsystem/ev_keymap.h>
+#import <IOKit/hidsystem/IOLLEvent.h>
 
 // http://overooped.com/post/2593597587/mediakeys
 
-#define SPSystemDefinedEventMediaKeys 8
+#define SPSystemDefinedEventMediaKeys NX_SUBTYPE_AUX_CONTROL_BUTTONS
 
 @interface SPMediaKeyTap : NSObject
 
