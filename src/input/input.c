@@ -1148,6 +1148,9 @@ static void LoadSlaves( input_thread_t *p_input )
         free( psz_autopath );
     }
 
+    /* Add slaves from the "input-slave" option */
+    GetVarSlaves( p_input, &pp_slaves, &i_slaves );
+
     /* Add slaves found by the directory demuxer or via libvlc */
     input_item_t *p_item = input_priv(p_input)->p_item;
     vlc_mutex_lock( &p_item->lock );
@@ -1164,9 +1167,6 @@ static void LoadSlaves( input_thread_t *p_input )
     /* Slaves that are successfully loaded will be added back to the item */
     TAB_CLEAN( p_item->i_slaves, p_item->pp_slaves );
     vlc_mutex_unlock( &p_item->lock );
-
-    /* Add slaves from the "input-slave" option */
-    GetVarSlaves( p_input, &pp_slaves, &i_slaves );
 
     if( i_slaves > 0 )
         qsort( pp_slaves, i_slaves, sizeof (input_item_slave_t*),
