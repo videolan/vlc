@@ -32,7 +32,6 @@ NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
 @interface SPMediaKeyTap () {
     CFMachPortRef _eventPort;
     CFRunLoopSourceRef _eventPortSource;
-    BOOL _shouldInterceptMediaKeyEvents;
     id _delegate;
     // The app that is frontmost in this list owns media keys
     NSMutableArray<NSRunningApplication *> *_mediaKeyAppList;
@@ -198,12 +197,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
 - (void)setShouldInterceptMediaKeyEvents:(BOOL)newSetting
 {
-    BOOL oldSetting = _shouldInterceptMediaKeyEvents;
-    _shouldInterceptMediaKeyEvents = newSetting;
-
     if (_eventPort == NULL)
-        return;
-    if (oldSetting == newSetting)
         return;
 
     CGEventTapEnable(_eventPort, newSetting);
@@ -244,9 +238,6 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
         int keyCode = (([nsEvent data1] & 0xFFFF0000) >> 16);
         if (keyCode != NX_KEYTYPE_PLAY && keyCode != NX_KEYTYPE_FAST && keyCode != NX_KEYTYPE_REWIND && keyCode != NX_KEYTYPE_PREVIOUS && keyCode != NX_KEYTYPE_NEXT)
-            return event;
-
-        if (!self->_shouldInterceptMediaKeyEvents)
             return event;
 
         [self performSelectorOnMainThread:@selector(handleAndReleaseMediaKeyEvent:) withObject:nsEvent waitUntilDone:NO];
