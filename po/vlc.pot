@@ -15232,8 +15232,8 @@ msgstr ""
 
 #: modules/demux/subtitle.c:58
 msgid ""
-"Force the subtiles format. Selecting \"auto\" means autodetection and should "
-"always work."
+"Force the subtitles format. Selecting \"auto\" means autodetection and "
+"should always work."
 msgstr ""
 
 #: modules/demux/subtitle.c:60

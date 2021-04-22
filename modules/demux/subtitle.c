@@ -55,7 +55,7 @@ static void Close( vlc_object_t *p_this );
     N_("Override the normal frames per second settings. " \
     "This will only work with MicroDVD and SubRIP (SRT) subtitles.")
 #define SUB_TYPE_LONGTEXT \
-    N_("Force the subtiles format. Selecting \"auto\" means autodetection and should always work.")
+    N_("Force the subtitles format. Selecting \"auto\" means autodetection and should always work.")
 #define SUB_DESCRIPTION_LONGTEXT \
     N_("Override the default track description.")
 
