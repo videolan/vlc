@@ -218,7 +218,7 @@ static CGEventRef tapEventCallback2(CGEventTapProxy proxy, CGEventType type, CGE
     SPMediaKeyTap *self = (__bridge SPMediaKeyTap *)refcon;
 
     if(type == kCGEventTapDisabledByTimeout) {
-        NSLog(@"Media key event tap was disabled by timeout");
+        NSLog(@"VLC SPMediaKeyTap: Media key event tap was disabled by timeout");
         CGEventTapEnable(self->_eventPort, TRUE);
         return event;
     } else if(type == kCGEventTapDisabledByUserInput) {
@@ -230,7 +230,7 @@ static CGEventRef tapEventCallback2(CGEventTapProxy proxy, CGEventType type, CGE
         nsEvent = [NSEvent eventWithCGEvent:event];
     }
     @catch (NSException * e) {
-        NSLog(@"Strange CGEventType: %d: %@", type, e);
+        NSLog(@"VLC SPMediaKeyTap: Strange CGEventType: %d: %@", type, e);
         assert(0);
         return event;
     }
