@@ -213,48 +213,42 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 #pragma mark -
 #pragma mark Event tap callbacks
 
-static CGEventRef tapEventCallback2(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)
-{
-    SPMediaKeyTap *self = (__bridge SPMediaKeyTap *)refcon;
-
-    if(type == kCGEventTapDisabledByTimeout) {
-        NSLog(@"VLC SPMediaKeyTap: Media key event tap was disabled by timeout");
-        CGEventTapEnable(self->_eventPort, TRUE);
-        return event;
-    } else if(type == kCGEventTapDisabledByUserInput) {
-        // Was disabled manually by -setShouldInterceptMediaKeyEvents:
-        return event;
-    }
-    NSEvent *nsEvent = nil;
-    @try {
-        nsEvent = [NSEvent eventWithCGEvent:event];
-    }
-    @catch (NSException * e) {
-        NSLog(@"VLC SPMediaKeyTap: Strange CGEventType: %d: %@", type, e);
-        assert(0);
-        return event;
-    }
-
-    if (type != NX_SYSDEFINED || [nsEvent subtype] != SPSystemDefinedEventMediaKeys)
-        return event;
-
-    int keyCode = (([nsEvent data1] & 0xFFFF0000) >> 16);
-    if (keyCode != NX_KEYTYPE_PLAY && keyCode != NX_KEYTYPE_FAST && keyCode != NX_KEYTYPE_REWIND && keyCode != NX_KEYTYPE_PREVIOUS && keyCode != NX_KEYTYPE_NEXT)
-        return event;
-
-    if (!self->_shouldInterceptMediaKeyEvents)
-        return event;
-
-    [self performSelectorOnMainThread:@selector(handleAndReleaseMediaKeyEvent:) withObject:nsEvent waitUntilDone:NO];
-
-    return NULL;
-}
-
 static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)
 {
     @autoreleasepool {
-        CGEventRef ret = tapEventCallback2(proxy, type, event, refcon);
-        return ret;
+        SPMediaKeyTap *self = (__bridge SPMediaKeyTap *)refcon;
+
+        if(type == kCGEventTapDisabledByTimeout) {
+            NSLog(@"VLC SPMediaKeyTap: Media key event tap was disabled by timeout");
+            CGEventTapEnable(self->_eventPort, TRUE);
+            return event;
+        } else if(type == kCGEventTapDisabledByUserInput) {
+            // Was disabled manually by -setShouldInterceptMediaKeyEvents:
+            return event;
+        }
+        NSEvent *nsEvent = nil;
+        @try {
+            nsEvent = [NSEvent eventWithCGEvent:event];
+        }
+        @catch (NSException * e) {
+            NSLog(@"VLC SPMediaKeyTap: Strange CGEventType: %d: %@", type, e);
+            assert(0);
+            return event;
+        }
+
+        if (type != NX_SYSDEFINED || [nsEvent subtype] != SPSystemDefinedEventMediaKeys)
+            return event;
+
+        int keyCode = (([nsEvent data1] & 0xFFFF0000) >> 16);
+        if (keyCode != NX_KEYTYPE_PLAY && keyCode != NX_KEYTYPE_FAST && keyCode != NX_KEYTYPE_REWIND && keyCode != NX_KEYTYPE_PREVIOUS && keyCode != NX_KEYTYPE_NEXT)
+            return event;
+
+        if (!self->_shouldInterceptMediaKeyEvents)
+            return event;
+
+        [self performSelectorOnMainThread:@selector(handleAndReleaseMediaKeyEvent:) withObject:nsEvent waitUntilDone:NO];
+
+        return NULL;
     }
 }
 
