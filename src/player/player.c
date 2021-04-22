@@ -1089,11 +1089,11 @@ vlc_player_AddAssociatedMedia(vlc_player_t *player,
         {
             case SLAVE_TYPE_GENERIC:
                 vlc_player_osd_Message(player, "%s",
-                                       vlc_gettext("track added"));
+                                       vlc_gettext("Slave added"));
                 break;
             case SLAVE_TYPE_SPU:
                 vlc_player_osd_Message(player, "%s",
-                                       vlc_gettext("Subtitle track added"));
+                                       vlc_gettext("Subtitle slave added"));
                 break;
         }
     }
