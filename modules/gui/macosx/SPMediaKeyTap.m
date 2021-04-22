@@ -94,6 +94,9 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
 - (BOOL)startWatchingMediaKeys
 {
+    NSAssert([NSThread isMainThread],
+        @"startWatchingMediaKeys must be called on the main thread!");
+
     // Prevent having multiple mediaKeys threads
     [self stopWatchingMediaKeys];
 
@@ -124,6 +127,9 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
 - (void)stopWatchingMediaKeys
 {
+    NSAssert([NSThread isMainThread],
+        @"stopWatchingMediaKeys must be called on the main thread!");
+
     // Remove runloop source
     if(_eventPortSource){
         CFRunLoopRemoveSource(CFRunLoopGetCurrent(), _eventPortSource, kCFRunLoopCommonModes);
@@ -263,6 +269,9 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
 - (void)mediaKeyAppListChanged
 {
+    NSAssert([NSThread isMainThread],
+        @"mediaKeyAppListChanged must be called on the main thread!");
+
     #ifdef DEBUG_SPMEDIAKEY_APPLIST
     [self debugPrintAppList];
     #endif
