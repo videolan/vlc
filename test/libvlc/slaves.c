@@ -136,7 +136,7 @@ main (void)
     };
 
     libvlc_media_slave_t p_expected_slaves[] = {
-        { NULL, libvlc_media_slave_type_audio, 3 /* all */ },
+        { NULL, libvlc_media_slave_type_generic, 3 /* all */ },
         { NULL, libvlc_media_slave_type_subtitle, 2 /* right */ },
         { NULL, libvlc_media_slave_type_subtitle, 1 /* left */ },
         { NULL, libvlc_media_slave_type_subtitle, 0 /* none */ },

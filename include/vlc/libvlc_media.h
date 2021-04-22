@@ -196,7 +196,8 @@ typedef enum libvlc_media_parsed_status_t
 typedef enum libvlc_media_slave_type_t
 {
     libvlc_media_slave_type_subtitle,
-    libvlc_media_slave_type_audio,
+    libvlc_media_slave_type_generic,
+    libvlc_media_slave_type_audio = libvlc_media_slave_type_generic,
 } libvlc_media_slave_type_t;
 
 /**
