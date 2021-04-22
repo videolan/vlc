@@ -879,7 +879,7 @@ vlc_player_ToggleRecording(vlc_player_t *player)
  * Add an associated (or external) media to the current media
  *
  * @param player locked player instance
- * @param cat AUDIO_ES or SPU_ES
+ * @param cat SPU_ES or UNKNOWN_ES
  * @param uri absolute uri of the external media
  * @param select true to select the track of this external media
  * @param notify true to notify the OSD

@@ -1060,14 +1060,12 @@ vlc_player_AddAssociatedMedia(vlc_player_t *player,
     enum slave_type type;
     switch (cat)
     {
-        case AUDIO_ES:
-            type = SLAVE_TYPE_GENERIC;
-            break;
         case SPU_ES:
             type = SLAVE_TYPE_SPU;
             break;
         default:
-            return VLC_EGENERIC;
+            type = SLAVE_TYPE_GENERIC;
+            break;
     }
 
     if (check_ext && type == SLAVE_TYPE_SPU && !subtitles_Filter(uri))
