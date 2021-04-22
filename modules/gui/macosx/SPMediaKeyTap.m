@@ -130,19 +130,19 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
         @"stopWatchingMediaKeys must be called on the main thread!");
 
     // Remove runloop source
-    if(_eventPortSource){
+    if (_eventPortSource) {
         CFRunLoopRemoveSource(CFRunLoopGetCurrent(), _eventPortSource, kCFRunLoopCommonModes);
     }
 
     // Remove tap port
-    if(_eventPort){
+    if (_eventPort) {
         CFMachPortInvalidate(_eventPort);
         CFRelease(_eventPort);
         _eventPort = nil;
     }
 
     // Remove tap source
-    if(_eventPortSource){
+    if (_eventPortSource) {
         CFRelease(_eventPortSource);
         _eventPortSource = nil;
     }
@@ -212,17 +212,18 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     @autoreleasepool {
         SPMediaKeyTap *self = (__bridge SPMediaKeyTap *)refcon;
 
-        if(type == kCGEventTapDisabledByTimeout) {
+        if (type == kCGEventTapDisabledByTimeout) {
             NSLog(@"VLC SPMediaKeyTap: Media key event tap was disabled by timeout");
             CGEventTapEnable(self->_eventPort, TRUE);
             return event;
-        } else if(type == kCGEventTapDisabledByUserInput) {
+        } else if (type == kCGEventTapDisabledByUserInput) {
             // Was disabled manually by -setShouldInterceptMediaKeyEvents:
             return event;
-        } else if(type != NX_SYSDEFINED) {
+        } else if (type != NX_SYSDEFINED) {
             // If not a system defined event, do nothing.
             return event;
         }
+
         NSEvent *nsEvent = nil;
         @try {
             nsEvent = [NSEvent eventWithCGEvent:event];
@@ -237,7 +238,11 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
             return event;
 
         int keyCode = (([nsEvent data1] & 0xFFFF0000) >> 16);
-        if (keyCode != NX_KEYTYPE_PLAY && keyCode != NX_KEYTYPE_FAST && keyCode != NX_KEYTYPE_REWIND && keyCode != NX_KEYTYPE_PREVIOUS && keyCode != NX_KEYTYPE_NEXT)
+        if (keyCode != NX_KEYTYPE_PLAY &&
+            keyCode != NX_KEYTYPE_FAST &&
+            keyCode != NX_KEYTYPE_REWIND &&
+            keyCode != NX_KEYTYPE_PREVIOUS &&
+            keyCode != NX_KEYTYPE_NEXT)
             return event;
 
         [self performSelectorOnMainThread:@selector(handleAndReleaseMediaKeyEvent:) withObject:nsEvent waitUntilDone:NO];
@@ -264,7 +269,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     [self debugPrintAppList];
     #endif
 
-    if([_mediaKeyAppList count] == 0)
+    if ([_mediaKeyAppList count] == 0)
         return;
 
     NSRunningApplication *thisApp = [NSRunningApplication currentApplication];
