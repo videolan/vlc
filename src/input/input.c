@@ -1153,7 +1153,7 @@ static void LoadSlaves( input_thread_t *p_input )
 
         /* Force the first subtitle with the highest priority or with the
          * forced flag */
-        if ( p_slave->b_forced || p_slave->i_priority == SLAVE_PRIORITY_USER )
+        if ( p_slave->b_forced || p_slave->i_priority >= SLAVE_PRIORITY_MATCH_ALL )
             i_flags |= SLAVE_ADD_FORCED;
 
         if( input_SlaveSourceAdd( p_input, p_slave->i_type, p_slave->psz_uri,
