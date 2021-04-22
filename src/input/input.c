@@ -1043,7 +1043,7 @@ static void GetVarSlaves( input_thread_t *p_input,
             msg_Warn( p_input,
                      "Can't deduce slave type of `%s\" with file extension.",
                      uri );
-            i_type = SLAVE_TYPE_AUDIO;
+            i_type = SLAVE_TYPE_GENERIC;
         }
         input_item_slave_t *p_slave =
             input_item_slave_New( uri, i_type, SLAVE_PRIORITY_USER );
@@ -1143,7 +1143,7 @@ static void LoadSlaves( input_thread_t *p_input )
 
     /* add all detected slaves */
     bool p_forced[2] = { false, false };
-    static_assert( SLAVE_TYPE_AUDIO <= 1 && SLAVE_TYPE_SPU <= 1,
+    static_assert( SLAVE_TYPE_GENERIC <= 1 && SLAVE_TYPE_SPU <= 1,
                    "slave type size mismatch");
     for( int i = 0; i < i_slaves && pp_slaves[i] != NULL; i++ )
     {
@@ -3412,7 +3412,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
     case SLAVE_TYPE_SPU:
         psz_forced_demux = "subtitle";
         break;
-    case SLAVE_TYPE_AUDIO:
+    case SLAVE_TYPE_GENERIC:
         psz_forced_demux = NULL;
         break;
     default:
@@ -3442,7 +3442,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
         return VLC_EGENERIC;
     }
 
-    if( i_type == SLAVE_TYPE_AUDIO )
+    if( i_type == SLAVE_TYPE_GENERIC )
     {
         if( b_set_time )
         {

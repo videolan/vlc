@@ -1139,7 +1139,7 @@ bool MediaServer::addItem( IXML_Element* itemElement )
             }
             else
                 holder.addSlave(xml_getChildElementValue( p_resource, "res" ),
-                                SLAVE_TYPE_AUDIO);
+                                SLAVE_TYPE_GENERIC);
         }
     }
     ixmlNodeList_free( p_resource_list );

@@ -221,7 +221,7 @@ SDDirectory::read() const
             for ( auto i = 0; i < m->i_slaves; ++i )
             {
                 const auto* slave = m->pp_slaves[i];
-                const auto linked_type = slave->i_type == SLAVE_TYPE_AUDIO
+                const auto linked_type = slave->i_type == SLAVE_TYPE_GENERIC
                                              ? IFile::LinkedFileType::SoundTrack
                                              : IFile::LinkedFileType::Subtitles;
 

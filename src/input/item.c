@@ -612,7 +612,7 @@ bool input_item_slave_GetType(const char *psz_filename,
         size_t nmemb;
     } p_slave_list[] = {
         { SLAVE_TYPE_SPU, ppsz_sub_exts, ARRAY_SIZE(ppsz_sub_exts) },
-        { SLAVE_TYPE_AUDIO, ppsz_audio_exts, ARRAY_SIZE(ppsz_audio_exts) },
+        { SLAVE_TYPE_GENERIC, ppsz_audio_exts, ARRAY_SIZE(ppsz_audio_exts) },
     };
 
     const char *psz_ext = strrchr(psz_filename, '.');

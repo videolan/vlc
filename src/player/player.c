@@ -1061,7 +1061,7 @@ vlc_player_AddAssociatedMedia(vlc_player_t *player,
     switch (cat)
     {
         case AUDIO_ES:
-            type = SLAVE_TYPE_AUDIO;
+            type = SLAVE_TYPE_GENERIC;
             break;
         case SPU_ES:
             type = SLAVE_TYPE_SPU;
@@ -1089,9 +1089,9 @@ vlc_player_AddAssociatedMedia(vlc_player_t *player,
     {
         switch( type )
         {
-            case SLAVE_TYPE_AUDIO:
+            case SLAVE_TYPE_GENERIC:
                 vlc_player_osd_Message(player, "%s",
-                                       vlc_gettext("Audio track added"));
+                                       vlc_gettext("track added"));
                 break;
             case SLAVE_TYPE_SPU:
                 vlc_player_osd_Message(player, "%s",

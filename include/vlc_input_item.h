@@ -142,7 +142,7 @@ enum input_item_net_type
 enum slave_type
 {
     SLAVE_TYPE_SPU,
-    SLAVE_TYPE_AUDIO,
+    SLAVE_TYPE_GENERIC, /* audio, video or subtitle not matched in SLAVE_SPU_EXTENSIONS */
 };
 
 enum slave_priority
