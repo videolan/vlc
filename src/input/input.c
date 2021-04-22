@@ -3406,24 +3406,21 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
     const bool b_can_fail = i_flags & SLAVE_ADD_CANFAIL;
     const bool b_forced = i_flags & SLAVE_ADD_FORCED;
     const bool b_set_time = i_flags & SLAVE_ADD_SET_TIME;
-    enum es_format_category_e i_cat;
 
     switch( i_type )
     {
     case SLAVE_TYPE_SPU:
         psz_forced_demux = "subtitle";
-        i_cat = SPU_ES;
         break;
     case SLAVE_TYPE_AUDIO:
         psz_forced_demux = NULL;
-        i_cat = AUDIO_ES;
         break;
     default:
         vlc_assert_unreachable();
     }
 
     msg_Dbg( p_input, "loading %s slave: %s (forced: %d)",
-             i_cat == SPU_ES ? "spu" : "audio", psz_uri, b_forced );
+             i_type == SLAVE_TYPE_SPU ? "spu" : "generic", psz_uri, b_forced );
 
     input_source_t *p_source = InputSourceNew( psz_uri );
     if( !p_source )
