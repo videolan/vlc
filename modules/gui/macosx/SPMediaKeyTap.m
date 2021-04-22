@@ -155,19 +155,6 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 #pragma mark -
 #pragma mark Accessors
 
-+ (BOOL)usesGlobalMediaKeyTap
-{
-#ifdef _DEBUG
-    // breaking in gdb with a key tap inserted sometimes locks up all mouse and keyboard input forever, forcing reboot
-    return NO;
-#else
-    // XXX(nevyn): MediaKey event tap doesn't work on 10.4, feel free to figure out why if you have the energy.
-    return
-        ![[NSUserDefaults standardUserDefaults] boolForKey:kIgnoreMediaKeysDefaultsKey]
-        && floor(NSAppKitVersionNumber) >= 949/*NSAppKitVersionNumber10_5*/;
-#endif
-}
-
 + (NSArray*)mediaKeyUserBundleIdentifiers
 {
     static NSArray *bundleIdentifiers;
