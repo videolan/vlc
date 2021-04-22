@@ -4200,8 +4200,11 @@ AS_IF([test "${enable_osx_notifications}" != "no"], [
       VLC_ADD_PLUGIN([osx_notifications])
       VLC_ADD_LIBS([osx_notifications], [-Wl,-framework,Growl,-framework,Foundation])
       VLC_ADD_OBJCFLAGS([osx_notifications], [-fobjc-exceptions] )
+  else
+      enable_osx_notifications="no"
   fi
 ])
+AM_CONDITIONAL(HAVE_OSX_NOTIFICATIONS, [test "$enable_osx_notifications" != "no"])
 
 dnl
 dnl Libnotify notification plugin

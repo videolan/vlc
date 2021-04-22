@@ -24,7 +24,9 @@ VLC.app: install
 	xcrun plutil -convert binary1 $@/Contents/Info.plist
 	## Create Frameworks dir and copy required ones
 	mkdir -p $@/Contents/Frameworks
+if HAVE_OSX_NOTIFICATIONS
 	cp -R $(CONTRIB_DIR)/Frameworks/Growl.framework $@/Contents/Frameworks
+endif
 if HAVE_SPARKLE
 	cp -R $(CONTRIB_DIR)/Frameworks/Sparkle.framework $@/Contents/Frameworks
 endif
