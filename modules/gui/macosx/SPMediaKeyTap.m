@@ -32,19 +32,15 @@ NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
 @interface SPMediaKeyTap () {
     CFMachPortRef _eventPort;
     CFRunLoopSourceRef _eventPortSource;
-    CFRunLoopRef _tapThreadRL;
-    NSThread *_tapThread;
     BOOL _shouldInterceptMediaKeyEvents;
     id _delegate;
     // The app that is frontmost in this list owns media keys
     NSMutableArray<NSRunningApplication *> *_mediaKeyAppList;
 }
 
-- (BOOL)shouldInterceptMediaKeyEvents;
 - (void)setShouldInterceptMediaKeyEvents:(BOOL)newSetting;
 - (void)startWatchingAppSwitching;
 - (void)stopWatchingAppSwitching;
-- (void)eventTapThread;
 @end
 
 static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon);
@@ -121,21 +117,16 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     if (_eventPortSource == NULL)
         return NO;
 
-    // Let's do this in a separate thread so that a slow app doesn't lag the event tap
-    _tapThread = [[NSThread alloc] initWithTarget:self
-                                         selector:@selector(eventTapThread)
-                                           object:nil];
-    [_tapThread start];
+    CFRunLoopAddSource(CFRunLoopGetCurrent(), _eventPortSource, kCFRunLoopCommonModes);
 
     return YES;
 }
 
 - (void)stopWatchingMediaKeys
 {
-    // Shut down tap thread
-    if(_tapThreadRL){
-        CFRunLoopStop(_tapThreadRL);
-        _tapThreadRL = nil;
+    // Remove runloop source
+    if(_eventPortSource){
+        CFRunLoopRemoveSource(CFRunLoopGetCurrent(), _eventPortSource, kCFRunLoopCommonModes);
     }
 
     // Remove tap port
@@ -199,42 +190,22 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     return bundleIdentifiers;
 }
 
-
-- (BOOL)shouldInterceptMediaKeyEvents
-{
-    BOOL shouldIntercept = NO;
-    @synchronized(self) {
-        shouldIntercept = _shouldInterceptMediaKeyEvents;
-    }
-    return shouldIntercept;
-}
-
-- (void)pauseTapOnTapThread:(NSNumber *)yeahno
-{
-    CGEventTapEnable(self->_eventPort, [yeahno boolValue]);
-}
-
 - (void)setShouldInterceptMediaKeyEvents:(BOOL)newSetting
 {
-    BOOL oldSetting;
-    @synchronized(self) {
-        oldSetting = _shouldInterceptMediaKeyEvents;
-        _shouldInterceptMediaKeyEvents = newSetting;
-    }
-    if(_tapThreadRL && oldSetting != newSetting) {
-        [self performSelector:@selector(pauseTapOnTapThread:)
-                     onThread:_tapThread
-                   withObject:@(newSetting)
-                waitUntilDone:NO];
+    BOOL oldSetting = _shouldInterceptMediaKeyEvents;
+    _shouldInterceptMediaKeyEvents = newSetting;
 
-    }
+    if (_eventPort == NULL)
+        return;
+    if (oldSetting == newSetting)
+        return;
+
+    CGEventTapEnable(_eventPort, newSetting);
 }
 
 
 #pragma mark -
 #pragma mark Event tap callbacks
-
-// Note: method called on background thread
 
 static CGEventRef tapEventCallback2(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)
 {
@@ -245,7 +216,7 @@ static CGEventRef tapEventCallback2(CGEventTapProxy proxy, CGEventType type, CGE
         CGEventTapEnable(self->_eventPort, TRUE);
         return event;
     } else if(type == kCGEventTapDisabledByUserInput) {
-        // Was disabled manually by -[pauseTapOnTapThread]
+        // Was disabled manually by -setShouldInterceptMediaKeyEvents:
         return event;
     }
     NSEvent *nsEvent = nil;
@@ -265,7 +236,7 @@ static CGEventRef tapEventCallback2(CGEventTapProxy proxy, CGEventType type, CGE
     if (keyCode != NX_KEYTYPE_PLAY && keyCode != NX_KEYTYPE_FAST && keyCode != NX_KEYTYPE_REWIND && keyCode != NX_KEYTYPE_PREVIOUS && keyCode != NX_KEYTYPE_NEXT)
         return event;
 
-    if (![self shouldInterceptMediaKeyEvents])
+    if (!self->_shouldInterceptMediaKeyEvents)
         return event;
 
     [self performSelectorOnMainThread:@selector(handleAndReleaseMediaKeyEvent:) withObject:nsEvent waitUntilDone:NO];
@@ -284,13 +255,6 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 - (void)handleAndReleaseMediaKeyEvent:(NSEvent *)event
 {
     [_delegate mediaKeyTap:self receivedMediaKeyEvent:event];
-}
-
-- (void)eventTapThread
-{
-    _tapThreadRL = CFRunLoopGetCurrent();
-    CFRunLoopAddSource(_tapThreadRL, _eventPortSource, kCFRunLoopCommonModes);
-    CFRunLoopRun();
 }
 
 
