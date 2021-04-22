@@ -225,6 +225,9 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
         } else if(type == kCGEventTapDisabledByUserInput) {
             // Was disabled manually by -setShouldInterceptMediaKeyEvents:
             return event;
+        } else if(type != NX_SYSDEFINED) {
+            // If not a system defined event, do nothing.
+            return event;
         }
         NSEvent *nsEvent = nil;
         @try {
@@ -236,7 +239,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
             return event;
         }
 
-        if (type != NX_SYSDEFINED || [nsEvent subtype] != SPSystemDefinedEventMediaKeys)
+        if ([nsEvent subtype] != SPSystemDefinedEventMediaKeys)
             return event;
 
         int keyCode = (([nsEvent data1] & 0xFFFF0000) >> 16);
