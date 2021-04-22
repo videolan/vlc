@@ -2579,7 +2579,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
     }
 
     bool b_auto_selected = p_esprops->b_autoselect
-        || input_source_IsCatAutoselected( es->id.source, es->fmt.i_cat );
+        || input_source_IsAutoSelected( es->id.source );
     bool b_auto_unselect = p_sys->i_mode == ES_OUT_MODE_AUTO &&
                            policy == ES_OUT_ES_POLICY_EXCLUSIVE &&
                            p_esprops->p_main_es && p_esprops->p_main_es != es;

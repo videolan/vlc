@@ -2870,10 +2870,9 @@ int input_source_GetNewAutoId( input_source_t *in )
     return in->auto_id++;
 }
 
-bool input_source_IsCatAutoselected( input_source_t *in,
-                                     enum es_format_category_e cat )
+bool input_source_IsAutoSelected( input_source_t *in )
 {
-    return in->autoselect_cats[cat];
+    return in->autoselected;
 }
 
 /*****************************************************************************
@@ -3431,7 +3430,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
         return VLC_EGENERIC;
 
     if( b_forced )
-        p_source->autoselect_cats[i_cat] = true;
+        p_source->autoselected = true;
 
     int ret = InputSourceInit( p_source, p_input, psz_uri,
                                psz_forced_demux,
