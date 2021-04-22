@@ -27,8 +27,6 @@
 // Define to enable app list debug output
 // #define DEBUG_SPMEDIAKEY_APPLIST 1
 
-NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
-
 @interface SPMediaKeyTap () {
     CFMachPortRef _eventPort;
     CFRunLoopSourceRef _eventPortSource;
@@ -40,6 +38,7 @@ NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
 - (void)setShouldInterceptMediaKeyEvents:(BOOL)newSetting;
 - (void)startWatchingAppSwitching;
 - (void)stopWatchingAppSwitching;
+- (void)handleAndReleaseMediaKeyEvent:(NSEvent *)event;
 @end
 
 static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon);
