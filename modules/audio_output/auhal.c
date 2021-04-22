@@ -1112,6 +1112,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     return VLC_SUCCESS;
 error:
     AudioComponentInstanceDispose(p_sys->au_unit);
+    p_sys->au_unit = NULL;
     free(layout);
     return VLC_EGENERIC;
 }
@@ -1398,6 +1399,7 @@ Stop(audio_output_t *p_aout)
         AudioOutputUnitStop(p_sys->au_unit);
         au_Uninitialize(p_aout, p_sys->au_unit);
         AudioComponentInstanceDispose(p_sys->au_unit);
+        p_sys->au_unit = NULL;
     }
     else
     {
@@ -1485,8 +1487,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         return VLC_EGENERIC;
 
     p_sys = p_aout->sys;
-    p_sys->b_digital = false;
-    p_sys->au_unit = NULL;
     p_sys->i_stream_index = -1;
     p_sys->b_revert = false;
     p_sys->b_changed_mixing = false;
@@ -1681,6 +1681,7 @@ static int Open(vlc_object_t *obj)
     vlc_mutex_init(&p_sys->device_list_lock);
     vlc_mutex_init(&p_sys->selected_device_lock);
     p_sys->b_digital = false;
+    p_sys->au_unit = NULL;
     p_sys->b_ignore_streams_changed_callback = false;
     p_sys->b_selected_dev_is_default = false;
     memset(&p_sys->sfmt_revert, 0, sizeof(p_sys->sfmt_revert));
