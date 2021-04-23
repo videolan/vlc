@@ -31,13 +31,24 @@ Widgets.NavigableFocusScope {
     id: root
 
     property var artist: ({})
-    readonly property var currentIndex: headerItem.albumsListView.currentIndex || view.currentItem.currentIndex
-    property Item headerItem: view.currentItem.headerItem
+
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
 
+    property Item headerItem: view.currentItem ? view.currentItem.headerItem : null
+
+    // current index of album model
+    readonly property int currentIndex: {
+        if (!view.currentItem)
+           return -1
+        else if (mainInterface.gridView)
+           return view.currentItem.currentIndex
+        else
+           return headerItem.albumsListView.currentIndex
+    }
+
     property Component header: FocusScope {
-        property Item albumsListView: albumsLoader.item.albumsListView
+        property Item albumsListView: albumsLoader.status === Loader.Ready ? albumsLoader.item.albumsListView: null
         property Item focusItem: albumsLoader.active ? albumsLoader.item.albumsListView : artistBanner
 
         focus: true
