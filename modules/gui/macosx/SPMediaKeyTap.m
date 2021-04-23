@@ -30,7 +30,7 @@
 @interface SPMediaKeyTap () {
     CFMachPortRef _eventPort;
     CFRunLoopSourceRef _eventPortSource;
-    id _delegate;
+    __weak id<SPMediaKeyTapDelegate> _delegate;
     // The app that is frontmost in this list owns media keys
     NSMutableArray<NSRunningApplication *> *_mediaKeyAppList;
 }
@@ -51,10 +51,12 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 #pragma mark -
 #pragma mark Setup and teardown
 
-- (id)initWithDelegate:(id)delegate
+- (id)initWithDelegate:(id<SPMediaKeyTapDelegate>)delegate
 {
     self = [super init];
     if (self) {
+        NSAssert([delegate conformsToProtocol:@protocol(SPMediaKeyTapDelegate)],
+            @"SPMediaKeyTap delegate must conform to the SPMediaKeyTapDelegate protocol!");
         _delegate = delegate;
         [self startWatchingAppSwitching];
         _mediaKeyAppList = [NSMutableArray new];
@@ -233,7 +235,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
             return event;
         }
 
-        if ([nsEvent subtype] != SPSystemDefinedEventMediaKeys)
+        if ([nsEvent subtype] != NX_SUBTYPE_AUX_CONTROL_BUTTONS)
             return event;
 
         int keyCode = (([nsEvent data1] & 0xFFFF0000) >> 16);
@@ -252,7 +254,18 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
 - (void)handleAndReleaseMediaKeyEvent:(NSEvent *)event
 {
-    [_delegate mediaKeyTap:self receivedMediaKeyEvent:event];
+    uint32_t eventData  = [event data1];
+
+    SPKeyCode keyCode   = ((eventData & 0xFFFF0000) >> 16);
+    uint16_t eventFlags = ((eventData & 0x0000FFFF));
+
+    SPKeyState keyState = ((eventFlags & 0xFF00) >> 8);
+    BOOL keyRepeat      =  (eventFlags & 0x1);
+
+    [_delegate mediaKeyTap:self
+          receivedMediaKey:keyCode
+                     state:keyState
+                    repeat:keyRepeat];
 }
 
 

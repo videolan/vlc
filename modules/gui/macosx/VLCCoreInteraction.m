@@ -56,7 +56,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     }
 }
 
-@interface VLCCoreInteraction ()
+@interface VLCCoreInteraction () <SPMediaKeyTapDelegate>
 {
     int i_currentPlaybackRate;
     mtime_t timeA, timeB;
@@ -896,41 +896,35 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     }
 }
 
--(void)mediaKeyTap:(SPMediaKeyTap*)keyTap receivedMediaKeyEvent:(NSEvent*)event
+- (void)mediaKeyTap:(SPMediaKeyTap *)keyTap
+   receivedMediaKey:(SPKeyCode)keyCode
+              state:(SPKeyState)keyState
+             repeat:(BOOL)isRepeat
 {
-    if (b_mediaKeySupport) {
-        assert([event type] == NSSystemDefined && [event subtype] == SPSystemDefinedEventMediaKeys);
-
-        int keyCode = (([event data1] & 0xFFFF0000) >> 16);
-        int keyFlags = ([event data1] & 0x0000FFFF);
-        int keyState = (((keyFlags & 0xFF00) >> 8)) == 0xA;
-        int keyRepeat = (keyFlags & 0x1);
-
-        if (keyCode == NX_KEYTYPE_PLAY && keyState == 0)
+    if (keyCode == SPKeyCodePlay && keyState == SPKeyStateUp)
             [self playOrPause];
 
-        if ((keyCode == NX_KEYTYPE_FAST || keyCode == NX_KEYTYPE_NEXT) && !b_mediakeyJustJumped) {
-            if (keyState == 0 && keyRepeat == 0)
-                [self next];
-            else if (keyRepeat == 1) {
-                [self forwardShort];
-                b_mediakeyJustJumped = YES;
-                [self performSelector:@selector(resetMediaKeyJump)
-                           withObject: NULL
-                           afterDelay:0.25];
-            }
+    if ((keyCode == SPKeyCodeFastForward || keyCode == SPKeyCodeNext) && !b_mediakeyJustJumped) {
+        if (keyState == SPKeyStateUp && !isRepeat)
+            [self next];
+        else if (isRepeat) {
+            [self forwardShort];
+            b_mediakeyJustJumped = YES;
+            [self performSelector:@selector(resetMediaKeyJump)
+                       withObject: NULL
+                       afterDelay:0.25];
         }
+    }
 
-        if ((keyCode == NX_KEYTYPE_REWIND || keyCode == NX_KEYTYPE_PREVIOUS) && !b_mediakeyJustJumped) {
-            if (keyState == 0 && keyRepeat == 0)
-                [self previous];
-            else if (keyRepeat == 1) {
-                [self backwardShort];
-                b_mediakeyJustJumped = YES;
-                [self performSelector:@selector(resetMediaKeyJump)
-                           withObject: NULL
-                           afterDelay:0.25];
-            }
+    if ((keyCode == SPKeyCodeRewind || keyCode == SPKeyCodePrevious) && !b_mediakeyJustJumped) {
+        if (keyState == SPKeyStateUp && !isRepeat)
+            [self previous];
+        else if (isRepeat) {
+            [self backwardShort];
+            b_mediakeyJustJumped = YES;
+            [self performSelector:@selector(resetMediaKeyJump)
+                       withObject: NULL
+                       afterDelay:0.25];
         }
     }
 }

@@ -25,18 +25,31 @@
 #import <IOKit/hidsystem/ev_keymap.h>
 #import <IOKit/hidsystem/IOLLEvent.h>
 
-// http://overooped.com/post/2593597587/mediakeys
+typedef NS_ENUM(uint8_t, SPKeyCode) {
+    SPKeyCodePlay           = NX_KEYTYPE_PLAY,
+    SPKeyCodeNext           = NX_KEYTYPE_NEXT,
+    SPKeyCodePrevious       = NX_KEYTYPE_PREVIOUS,
+    SPKeyCodeFastForward    = NX_KEYTYPE_FAST,
+    SPKeyCodeRewind         = NX_KEYTYPE_REWIND
+};
 
-#define SPSystemDefinedEventMediaKeys NX_SUBTYPE_AUX_CONTROL_BUTTONS
+typedef NS_ENUM(uint8_t, SPKeyState) {
+    SPKeyStateDown  = NX_KEYDOWN,
+    SPKeyStateUp    = NX_KEYUP
+};
+
+@class SPMediaKeyTap;
+
+@protocol SPMediaKeyTapDelegate <NSObject>
+- (void)mediaKeyTap:(SPMediaKeyTap *)keyTap
+   receivedMediaKey:(SPKeyCode)keyCode
+              state:(SPKeyState)keyState
+             repeat:(BOOL)isRepeat;
+@end
 
 @interface SPMediaKeyTap : NSObject
-
-- (id)initWithDelegate:(id)delegate;
+- (id)initWithDelegate:(id<SPMediaKeyTapDelegate>)delegate;
 
 - (BOOL)startWatchingMediaKeys;
 - (void)stopWatchingMediaKeys;
-@end
-
-@interface NSObject (SPMediaKeyTapDelegate)
-- (void)mediaKeyTap:(SPMediaKeyTap*)keyTap receivedMediaKeyEvent:(NSEvent*)event;
 @end
