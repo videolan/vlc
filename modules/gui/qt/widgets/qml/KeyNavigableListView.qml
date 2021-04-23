@@ -160,7 +160,7 @@ NavigableFocusScope {
                     currentIndex = newIndex
                     selectionUpdated(0, oldIndex, newIndex)
                 } else {
-                    root.navigationDown(currentIndex)
+                    listview_id.navigationDown(currentIndex)
                 }
             }
             onActionUp: {
@@ -173,7 +173,7 @@ NavigableFocusScope {
                     currentIndex = newIndex
                     selectionUpdated(0, oldIndex, newIndex)
                 } else {
-                    root.navigationUp(currentIndex)
+                    listview_id.navigationUp(currentIndex)
                 }
             }
         }
