@@ -75,6 +75,8 @@ namespace adaptive
                 virtual bool                            contains        (size_t byte) const;
                 virtual int                             compare         (ISegment *) const;
                 void                                    setEncryption   (CommonEncryption &);
+                void                                    setDisplayTime  (vlc_tick_t);
+                vlc_tick_t                              getDisplayTime  () const;
                 Property<stime_t>       startTime;
                 Property<stime_t>       duration;
                 bool                    discontinuity;
@@ -89,6 +91,7 @@ namespace adaptive
                 std::string             debugName;
                 bool                    templated;
                 uint64_t                sequence;
+                vlc_tick_t              displayTime;
         };
 
         class Segment : public ISegment
