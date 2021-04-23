@@ -408,19 +408,23 @@ void MLBaseModel::invalidateCache()
     m_cache.reset();
 }
 
+//-------------------------------------------------------------------------------------------------
+
 MLItem *MLBaseModel::item(int signedidx) const
 {
     validateCache();
 
     ssize_t count = m_cache->count();
-    if (count == COUNT_UNINITIALIZED || signedidx < 0
-            || signedidx >= count)
+
+    if (count == COUNT_UNINITIALIZED || signedidx < 0 || signedidx >= count)
         return nullptr;
 
     unsigned int idx = static_cast<unsigned int>(signedidx);
+
     m_cache->refer(idx);
 
     const std::unique_ptr<MLItem> *item = m_cache->get(idx);
+
     if (!item)
         /* Not in cache */
         return nullptr;
@@ -428,6 +432,22 @@ MLItem *MLBaseModel::item(int signedidx) const
     /* Return raw pointer */
     return item->get();
 }
+
+MLItem *MLBaseModel::itemCache(int signedidx) const
+{
+    unsigned int idx = static_cast<unsigned int>(signedidx);
+
+    const std::unique_ptr<MLItem> *item = m_cache->get(idx);
+
+    if (!item)
+        /* Not in cache */
+        return nullptr;
+
+    /* Return raw pointer */
+    return item->get();
+}
+
+//-------------------------------------------------------------------------------------------------
 
 MLBaseModel::BaseLoader::BaseLoader(vlc_medialibrary_t *ml, MLItemId parent, QString searchPattern,
                                     vlc_ml_sorting_criteria_t sort, bool sort_desc)

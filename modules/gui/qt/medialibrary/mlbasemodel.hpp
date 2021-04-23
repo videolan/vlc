@@ -107,7 +107,12 @@ protected:
 
     void validateCache() const;
     void invalidateCache();
-    MLItem* item(int signedidx) const;
+
+    MLItem *item(int signedidx) const;
+
+    // NOTE: This is faster because it only returns items available in cache.
+    MLItem *itemCache(int signedidx) const;
+
     virtual void onVlcMlEvent( const MLEvent &event );
 
     virtual ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const = 0;
