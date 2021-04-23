@@ -50,6 +50,7 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     sequence = 0;
     templated = false;
     discontinuity = false;
+    displayTime = VLC_TS_INVALID;
 }
 
 ISegment::~ISegment()
@@ -182,6 +183,16 @@ int ISegment::compare(ISegment *other) const
 void ISegment::setEncryption(CommonEncryption &e)
 {
     encryption = e;
+}
+
+void ISegment::setDisplayTime(mtime_t t)
+{
+    displayTime = t;
+}
+
+mtime_t ISegment::getDisplayTime() const
+{
+    return displayTime;
 }
 
 Segment::Segment(ICanonicalUrl *parent) :
