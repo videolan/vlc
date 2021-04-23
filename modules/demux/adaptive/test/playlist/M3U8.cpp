@@ -321,15 +321,15 @@ int M3U8Playlist_test()
         /* date set and incremented */
         seg = rep->getMediaSegment(10);
         Expect(seg);
-        Expect(static_cast<HLSSegment *>(seg)->getUTCTime() == VLC_TICK_0 + vlc_tick_from_sec(10));
+        Expect(static_cast<HLSSegment *>(seg)->getDisplayTime() == VLC_TICK_0 + vlc_tick_from_sec(10));
         seg = rep->getMediaSegment(11);
         Expect(seg);
-        Expect(static_cast<HLSSegment *>(seg)->getUTCTime() == VLC_TICK_0 + vlc_tick_from_sec(10 + 8));
+        Expect(static_cast<HLSSegment *>(seg)->getDisplayTime() == VLC_TICK_0 + vlc_tick_from_sec(10 + 8));
 
         /* date change after discontinuity */
         seg = rep->getMediaSegment(20);
         Expect(seg);
-        Expect(static_cast<HLSSegment *>(seg)->getUTCTime() == VLC_TICK_0 + vlc_tick_from_sec(7200));
+        Expect(static_cast<HLSSegment *>(seg)->getDisplayTime() == VLC_TICK_0 + vlc_tick_from_sec(7200));
 
         vlc_tick_t begin, end, duration;
         Expect(rep->getMediaPlaybackRange(&begin, &end, &duration));

@@ -171,7 +171,7 @@ uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepre
         return 1;
 
     const Timescale timescale = inheritTimescale();
-    const vlc_tick_t utcTime = fromHlsSeg->getUTCTime() +
+    const vlc_tick_t utcTime = fromHlsSeg->getDisplayTime() +
                                timescale.ToTime(fromHlsSeg->duration.Get()) / 2;
 
     const std::vector<Segment *> &list = inheritSegmentList()->getSegments();
@@ -181,7 +181,7 @@ uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepre
         const HLSSegment *hlsSeg = dynamic_cast<HLSSegment *>(*it);
         if(hlsSeg)
         {
-            if (hlsSeg->getUTCTime() <= utcTime || it == list.begin())
+            if (hlsSeg->getDisplayTime() <= utcTime || it == list.begin())
                 num = hlsSeg->getSequenceNumber();
             else
                 return num;
