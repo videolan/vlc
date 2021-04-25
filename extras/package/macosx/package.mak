@@ -100,7 +100,7 @@ package-macosx-zip: VLC.app
 	rm -f "$(top_builddir)/vlc-$(VERSION).zip"
 	mkdir -p $(top_builddir)/vlc-$(VERSION)/Goodies/
 	cp -Rp $(top_builddir)/VLC.app $(top_builddir)/vlc-$(VERSION)/VLC.app
-	cd $(srcdir); cp -R AUTHORS COPYING README THANKS NEWS $(abs_top_builddir)/vlc-$(VERSION)/Goodies/
+	cd $(srcdir); cp -R AUTHORS COPYING README.md THANKS NEWS $(abs_top_builddir)/vlc-$(VERSION)/Goodies/
 	zip -r -y -9 $(top_builddir)/vlc-$(VERSION).zip $(top_builddir)/vlc-$(VERSION)
 	rm -rf "$(top_builddir)/vlc-$(VERSION)"
 

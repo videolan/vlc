@@ -54,7 +54,7 @@ endif
 	for file in AUTHORS THANKS ; \
 		do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(win32_destdir)/$${file}.txt"; \
 	done
-	for file in NEWS COPYING README; \
+	for file in NEWS COPYING README.md; \
 		do cp "$(srcdir)/$$file" "$(win32_destdir)/$${file}.txt"; \
 	done
 
