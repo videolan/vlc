@@ -527,7 +527,7 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
     fileTypes.chop(2); //remove trailling ";;"
 
     QList<QUrl> urls = QFileDialog::getOpenFileUrls( NULL,
-        help.isEmpty() ? qtr(I_OP_SEL_FILES ) : help,
+        help.isEmpty() ? qfut(I_OP_SEL_FILES ) : help,
         path.isEmpty() ? p_intf->p_sys->filepath : path,
         fileTypes );
 
@@ -600,7 +600,7 @@ QString DialogsProvider::getDirectoryDialog( intf_thread_t *p_intf )
 {
     const QStringList schemes = QStringList(QStringLiteral("file"));
     QUrl dirurl = QFileDialog::getExistingDirectoryUrl( NULL,
-            qtr( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath,
+            qfut( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath,
             QFileDialog::ShowDirsOnly, schemes );
 
     if( dirurl.isEmpty() ) return QString();
@@ -659,7 +659,7 @@ void DialogsProvider::savePlayingToPlaylist()
 
     for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++ )
     {
-        QString tmp = qfu( vlc_gettext( types[i].filter_name ) ) + " (*." + types[i].filter_patterns + ")";
+        QString tmp = qfut( types[i].filter_name ) + " (*." + types[i].filter_patterns + ")";
         if( ext == qfu( types[i].filter_patterns ) )
             filters.insert( 0, tmp );
         else
@@ -693,7 +693,7 @@ void DialogsProvider::savePlayingToPlaylist()
     {
         for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++)
         {
-            if ( selected.startsWith( qfu( vlc_gettext( types[i].filter_name ) ) ) )
+            if ( selected.startsWith( qfut( types[i].filter_name ) ) )
             {
                 psz_selected_module = types[i].module;
                 psz_last_playlist_ext = types[i].filter_patterns;

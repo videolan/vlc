@@ -48,7 +48,7 @@ QJSValue PlayerControlbarModel::getPlaylistIdentifierListModel(QQmlEngine *engin
        QString key;
        if ( playerIdentifierDictionary.contains(static_cast<PlayerControlbarModel::PlayerIdentifier>(i)) )
        {
-           key = qtr( playerIdentifierDictionary[static_cast<PlayerControlbarModel::PlayerIdentifier>(i)] );
+           key = qfut( playerIdentifierDictionary[static_cast<PlayerControlbarModel::PlayerIdentifier>(i)] );
        }
        else
        {

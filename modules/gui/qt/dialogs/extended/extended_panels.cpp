@@ -411,7 +411,7 @@ void ExtVideo::initComboBoxItems( QObject *widget )
         ssize_t count = config_GetIntChoices( qtu( option ), &values, &texts );
         for( ssize_t i = 0; i < count; i++ )
         {
-            combobox->addItem( qtr( texts[i] ), qlonglong(values[i]) );
+            combobox->addItem( qfut( texts[i] ), qlonglong(values[i]) );
             free( texts[i] );
         }
         free( texts );
@@ -424,7 +424,7 @@ void ExtVideo::initComboBoxItems( QObject *widget )
         ssize_t count = config_GetPszChoices( qtu( option ), &values, &texts );
         for( ssize_t i = 0; i < count; i++ )
         {
-            combobox->addItem( qtr( texts[i] ), qfu(values[i]) );
+            combobox->addItem( qfut( texts[i] ), qfu(values[i]) );
             free( texts[i] );
             free( values[i] );
         }
@@ -660,7 +660,7 @@ void ExtV4l2::Refresh( void )
 
             if( !var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &vartext ) )
             {
-                name = qtr(vartext);
+                name = qfut(vartext);
                 free(vartext);
             }
             else
@@ -1176,7 +1176,7 @@ void Equalizer::build()
                        palette().color( QPalette::WindowText ) );
         scene.setSceneRect( 0.0, 0.0, eqz_preset_10b[i].i_band , 40.0 );
         scene.render( &painter, icon.rect(), scene.sceneRect(), Qt::IgnoreAspectRatio );
-        ui.presetsCombo->addItem( icon, qtr( preset_list_text[i] ),
+        ui.presetsCombo->addItem( icon, qfut( preset_list_text[i] ),
                                      QVariant( preset_list[i] ) );
     }
     CONNECT( ui.presetsCombo, activated(int), this, setCorePreset(int) );

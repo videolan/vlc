@@ -256,12 +256,12 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent,
         PrefsItemData *module_data = new PrefsItemData( this );
         module_data->i_type = PrefsItemData::TYPE_MODULE;
         module_data->psz_shortcut = strdup( module_get_object( p_module ) );
-        module_data->name = qtr( module_get_name( p_module, false ) );
+        module_data->name = qfut( module_get_name( p_module, false ) );
         module_data->help.clear();
         module_data->p_module = p_module;
         const char *psz_help = module_get_help( p_module );
         if ( psz_help )
-            module_data->help = qtr( psz_help );
+            module_data->help = qfut( psz_help );
 
         QTreeWidgetItem *module_item = new QTreeWidgetItem();
         module_item->setText( 0, module_data->name );
@@ -535,7 +535,7 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
     }
     else
     {
-        head = QString( qtr( module_GetLongName( p_module ) ) );
+        head = QString( qfut( module_GetLongName( p_module ) ) );
     }
 
     if (name.contains( text, cs ) || head.contains( text, cs ) || help.contains( text, cs ))
@@ -557,7 +557,7 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
 
         if( p_item->b_internal ) continue;
 
-        if ( p_item->psz_text && qtr( p_item->psz_text ).contains( text, cs ) )
+        if ( p_item->psz_text && qfut( p_item->psz_text ).contains( text, cs ) )
         {
             module_config_free( p_config );
             return true;
@@ -637,7 +637,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
     else
     {
-        head = QString( qtr( module_GetLongName( p_module ) ) );
+        head = QString( qfut( module_GetLongName( p_module ) ) );
     }
 
     QLabel *titleLabel = new QLabel( head );
@@ -689,7 +689,7 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 i_line++;
             }
             i_boxline = 0;
-            box = new QGroupBox( qtr( p_item->psz_text ), this );
+            box = new QGroupBox( qfut( p_item->psz_text ), this );
             box->hide();
             boxlayout = new QGridLayout();
         }

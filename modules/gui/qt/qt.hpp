@@ -120,8 +120,11 @@ struct vlc_player_locker {
 
 #define qfu( i ) QString::fromUtf8( i )
 #define qfue( i ) QString::fromUtf8( i ).replace( "&", "&&" ) /* for actions/buttons */
-#define qtr( i ) QString::fromUtf8( vlc_gettext(i) )
+#define qfut( i ) QString::fromUtf8( vlc_gettext(i) )
 #define qtu( i ) ((i).toUtf8().constData())
+
+/* For marking translatable static strings (like `_()`) */
+#define qtr( i ) qfut( i )
 
 #define CONNECT( a, b, c, d ) \
         connect( a, SIGNAL(b), c, SLOT(d) )

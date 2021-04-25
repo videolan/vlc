@@ -68,7 +68,7 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     ui.setupUi( this );
     ui.saveButton->hide();
 
-#define ADDMEDIATYPES( str, type ) ui.mediaType->addItem( qtr( str ), QVariant( type ) );
+#define ADDMEDIATYPES( str, type ) ui.mediaType->addItem( qfut( str ), QVariant( type ) );
     ADDMEDIATYPES( N_("Broadcast"), QVLM_Broadcast );
     ADDMEDIATYPES( N_("Schedule"), QVLM_Schedule );
 #undef ADDMEDIATYPES

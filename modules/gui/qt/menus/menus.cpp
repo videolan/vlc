@@ -87,7 +87,7 @@ QAction *addDPStaticEntry( QMenu *menu,
     {
         if( !EMPTY_STR( shortcut ) )
             action = menu->addAction( QIcon( icon ), text, THEDP,
-                                      member, qtr( shortcut ) );
+                                      member, qfut( shortcut ) );
         else
             action = menu->addAction( QIcon( icon ), text, THEDP, member );
     }
@@ -95,7 +95,7 @@ QAction *addDPStaticEntry( QMenu *menu,
 #endif
     {
         if( !EMPTY_STR( shortcut ) )
-            action = menu->addAction( text, THEDP, member, qtr( shortcut ) );
+            action = menu->addAction( text, THEDP, member, qfut( shortcut ) );
         else
             action = menu->addAction( text, THEDP, member );
     }
@@ -209,7 +209,7 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QMenu *menu, MainInterface *
         ":/type/file-asym.svg", []() { THEDP->simpleOpenDialog(); } , "Ctrl+O" );
     addDPStaticEntry( menu, qtr( "&Open Multiple Files..." ),
         ":/type/file-asym.svg", &DialogsProvider::openFileDialog, "Ctrl+Shift+O" );
-    addDPStaticEntry( menu, qtr( I_OP_OPDIR ),
+    addDPStaticEntry( menu, qfut( I_OP_OPDIR ),
         ":/type/folder-grey.svg", &DialogsProvider::PLOpenDir, "Ctrl+F" );
     addDPStaticEntry( menu, qtr( "Open &Disc..." ),
         ":/type/disc.svg", &DialogsProvider::openDiscDialog, "Ctrl+D" );
@@ -234,7 +234,7 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QMenu *menu, MainInterface *
 
     menu->addSeparator();
 
-    addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", &DialogsProvider::savePlayingToPlaylist,
+    addDPStaticEntry( menu, qfut( I_PL_SAVE ), "", &DialogsProvider::savePlayingToPlaylist,
         "Ctrl+Y" );
 
 #ifdef ENABLE_SOUT
@@ -272,21 +272,21 @@ QMenu *VLCMenuBar::ToolsMenu( intf_thread_t *p_intf, QMenu *menu )
     addDPStaticEntry( menu, qtr( "&Track Synchronization"), ":/menu/setting.svgs",
             &DialogsProvider::synchroDialog, "" );
 
-    addDPStaticEntry( menu, qtr( I_MENU_INFO ) , ":/menu/info.svg",
+    addDPStaticEntry( menu, qfut( I_MENU_INFO ) , ":/menu/info.svg",
         QOverload<>::of(&DialogsProvider::mediaInfoDialog), "Ctrl+I" );
 
-    addDPStaticEntry( menu, qtr( I_MENU_CODECINFO ) ,
+    addDPStaticEntry( menu, qfut( I_MENU_CODECINFO ) ,
         ":/menu/info.svg", &DialogsProvider::mediaCodecDialog, "Ctrl+J" );
 
 #ifdef ENABLE_VLM
-    addDPStaticEntry( menu, qtr( I_MENU_VLM ), "", &DialogsProvider::vlmDialog,
+    addDPStaticEntry( menu, qfut( I_MENU_VLM ), "", &DialogsProvider::vlmDialog,
         "Ctrl+Shift+W" );
 #endif
 
     addDPStaticEntry( menu, qtr( "Program Guide" ), "", &DialogsProvider::epgDialog,
         "" );
 
-    addDPStaticEntry( menu, qtr( I_MENU_MSG ),
+    addDPStaticEntry( menu, qfut( I_MENU_MSG ),
         ":/menu/messages.svg", &DialogsProvider::messagesDialog, "Ctrl+M" );
 
     addDPStaticEntry( menu, qtr( "Plu&gins and extensions" ),
@@ -532,7 +532,7 @@ QMenu *VLCMenuBar::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 
     if (p_intf->p_sys->p_mi && p_intf->p_sys->p_mi->hasMediaLibrary() )
     {
-        submenu = new QMenu( qtr( I_MENU_BOOKMARK ), menu );
+        submenu = new QMenu( qfut( I_MENU_BOOKMARK ), menu );
         submenu->setTearOffEnabled( true );
         addDPStaticEntry( submenu, qtr( "&Manage" ), "",
                           &DialogsProvider::bookmarksDialog, "Ctrl+B" );
@@ -589,7 +589,7 @@ QMenu *VLCMenuBar::HelpMenu( QMenu *menu )
                       &DialogsProvider::updateDialog);
 #endif
     menu->addSeparator();
-    addDPStaticEntry( menu, qtr( I_MENU_ABOUT ), ":/menu/info.svg",
+    addDPStaticEntry( menu, qfut( I_MENU_ABOUT ), ":/menu/info.svg",
             &DialogsProvider::aboutDialog, "Shift+F1", QAction::AboutRole );
     return menu;
 }
@@ -707,7 +707,7 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
     action->setIcon( QIcon( ":/toolbar/skip_back.svg") );
 #endif
 
-    action = menu->addAction( qtr( I_MENU_GOTOTIME ), THEDP, &DialogsProvider::gotoTimeDialog, qtr( "Ctrl+T" ) );
+    action = menu->addAction( qfut( I_MENU_GOTOTIME ), THEDP, &DialogsProvider::gotoTimeDialog, qtr( "Ctrl+T" ) );
 
     menu->addSeparator();
 }
@@ -715,9 +715,9 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
 void VLCMenuBar::PopupMenuStaticEntries( QMenu *menu )
 {
     QMenu *openmenu = new QMenu( qtr( "Open Media" ), menu );
-    addDPStaticEntry( openmenu, qtr( I_OP_OPF ),
+    addDPStaticEntry( openmenu, qfut( I_OP_OPF ),
         ":/type/file-asym.svg", &DialogsProvider::openFileDialog);
-    addDPStaticEntry( openmenu, qtr( I_OP_OPDIR ),
+    addDPStaticEntry( openmenu, qfut( I_OP_OPDIR ),
         ":/type/folder-grey.svg", &DialogsProvider::PLOpenDir);
     addDPStaticEntry( openmenu, qtr( "Open &Disc..." ),
         ":/type/disc.svg", &DialogsProvider::openDiscDialog);

@@ -349,8 +349,8 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* State to avoid overwritting the users changes with the configuration */
     m_discType = None;
 
-    ui.browseDiscButton->setToolTip( qtr( I_DEVICE_TOOLTIP ));
-    ui.deviceCombo->setToolTip( qtr(I_DEVICE_TOOLTIP) );
+    ui.browseDiscButton->setToolTip( qfut( I_DEVICE_TOOLTIP ));
+    ui.deviceCombo->setToolTip( qfut( I_DEVICE_TOOLTIP ) );
     ui.deviceCombo->setInsertPolicy( QComboBox::InsertAtTop );
 
 #if !defined( _WIN32 ) && !defined( __OS2__ )
@@ -649,7 +649,7 @@ void DiscOpenPanel::browseDevice()
 {
     const QStringList schemes = QStringList(QStringLiteral("file"));
     QString dir = QFileDialog::getExistingDirectoryUrl( this,
-            qtr( I_DEVICE_TOOLTIP ), p_intf->p_sys->filepath,
+            qfut( I_DEVICE_TOOLTIP ), p_intf->p_sys->filepath,
             QFileDialog::ShowDirsOnly, schemes ).toLocalFile();
     if( !dir.isEmpty() )
     {
@@ -786,7 +786,7 @@ void CaptureOpenPanel::initialize()
     layout * name ## PropLayout = new layout;               \
     name ## DevPage->setLayout( name ## DevLayout );                  \
     name ## PropPage->setLayout( name ## PropLayout );                \
-    ui.deviceCombo->addItem( qtr( label ), QVariant( number ) );
+    ui.deviceCombo->addItem( qfut( label ), QVariant( number ) );
 
 #define CuMRL( widget, slot ) CONNECT( widget , slot , this, updateMRL() );
 

@@ -58,7 +58,7 @@ HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
     QTextBrowser *helpBrowser = new QTextBrowser( this );
     helpBrowser->setOpenExternalLinks( true );
-    helpBrowser->setHtml( qtr(I_LONGHELP) );
+    helpBrowser->setHtml( qfut(I_LONGHELP) );
 
     QDialogButtonBox *closeButtonBox = new QDialogButtonBox( this );
     closeButtonBox->addButton(

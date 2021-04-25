@@ -240,9 +240,9 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
                   cone_audio_64, 1 );
     ADD_CATEGORY( SPrefsVideo, qtr("Video"), qtr("Video Settings"),
                   cone_video_64, 2 );
-    ADD_CATEGORY( SPrefsSubtitles, qtr(SUBPIC_TITLE), qtr("Subtitle & On Screen Display Settings"),
+    ADD_CATEGORY( SPrefsSubtitles, qfut(SUBPIC_TITLE), qtr("Subtitle & On Screen Display Settings"),
                   cone_subtitles_64, 3 );
-    ADD_CATEGORY( SPrefsInputAndCodecs, qtr(INPUT_TITLE), qtr("Input & Codecs Settings"),
+    ADD_CATEGORY( SPrefsInputAndCodecs, qfut(INPUT_TITLE), qtr("Input & Codecs Settings"),
                   cone_input_64, 4 );
     ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), qtr("Configure Hotkeys"),
                   cone_hotkeys_64, 5 );
@@ -681,7 +681,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             /* Caching */
             /* Add the things to the ComboBox */
             #define addToCachingBox( str, cachingNumber ) \
-                ui.cachingCombo->addItem( qtr(str), QVariant( cachingNumber ) );
+                ui.cachingCombo->addItem( qfut(str), QVariant( cachingNumber ) );
             addToCachingBox( N_("Custom"), CachingCustom );
             addToCachingBox( N_("Lowest latency"), CachingLowest );
             addToCachingBox( N_("Low latency"), CachingLow );
@@ -737,7 +737,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.skinsLabel->setText(
                     qtr( "This is VLC's skinnable interface. You can download other skins at" )
                     + QString( " <a href=\"http://www.videolan.org/vlc/skins.php\">" )
-                    + qtr( "VLC skins website" )+ QString( "</a>." ) );
+                    + qtr( "VLC skins website" ) + QString( "</a>." ) );
             ui.skinsLabel->setFont( italicFont );
 
 #ifdef _WIN32

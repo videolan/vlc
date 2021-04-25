@@ -224,7 +224,7 @@ void ControlbarProfileModel::insertDefaults()
     // Add default profiles:
     for (const auto& i : m_defaults)
     {
-        const auto ptrNewProfile = newProfile(qtr(i.name));
+        const auto ptrNewProfile = newProfile(qfut(i.name));
         if (!ptrNewProfile)
             continue;
 

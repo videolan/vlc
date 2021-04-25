@@ -95,7 +95,7 @@ void SoutInputBox::setMRL( const QString& mrl )
             toNativeSeparators(uri.toDisplayString(
                 QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments
             )));
-        if ( type.isEmpty() ) type = qtr( I_FILE_SLASH_DIR );
+        if ( type.isEmpty() ) type = qfut( I_FILE_SLASH_DIR );
         sourceValueLabel->setText( type );
     }
 }
