@@ -303,6 +303,9 @@ gl_create_failure:
     return VLC_EGENERIC;
 }
 
+#define FILTER_LIST_TEXT N_( "OpenGL filter" )
+#define FILTER_LIST_LONGTEXT N_( "List of OpenGL filters to execute" )
+
 vlc_module_begin()
     set_shortname( N_("opengl") )
     set_description( N_("Opengl filter executor") )
@@ -311,5 +314,5 @@ vlc_module_begin()
     add_shortcut( "opengl" )
     set_callback( Open )
     add_module_list( "opengl-filter", "opengl filter", NULL,
-                     "opengl filter", "List of OpenGL filters to execute" )
+                     FILTER_LIST_TEXT, FILTER_LIST_LONGTEXT )
 vlc_module_end()
