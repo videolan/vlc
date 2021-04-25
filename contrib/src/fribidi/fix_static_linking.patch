@@ -1,0 +1,28 @@
+From 05e42a4d782ce14e648fd4c489e65eaff4609de2 Mon Sep 17 00:00:00 2001
+From: Christopher Degawa <ccom@randomderp.com>
+Date: Mon, 6 Jul 2020 20:55:11 +0000
+Subject: [PATCH] meson: add fribidi_static_cargs to extra_cflags
+
+meson seemingly doesn't have a section for cflags.private, so the flags will have to go to the regular cflags for now
+it can be replaced by manual sed or similar to append that line if wanted
+
+Fixes https://github.com/m-ab-s/media-autobuild_suite/issues/1735
+
+Signed-off-by: Christopher Degawa <ccom@randomderp.com>
+---
+ meson.build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 6c69ed9..9ba9dab 100644
+--- a/meson.build
++++ b/meson.build
+@@ -103,6 +103,7 @@ pkg = import('pkgconfig')
+ pkg.generate(name: 'GNU FriBidi',
+   filebase: 'fribidi',
+   description: 'Unicode Bidirectional Algorithm Library',
+-  libraries: libfribidi, 
++  libraries: libfribidi,
++  extra_cflags: fribidi_static_cargs,
+   subdirs: 'fribidi',
+   version: meson.project_version())

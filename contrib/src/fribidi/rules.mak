@@ -1,5 +1,5 @@
 # FRIBIDI
-FRIBIDI_VERSION := 1.0.9
+FRIBIDI_VERSION := 1.0.10
 FRIBIDI_URL := https://github.com/fribidi/fribidi/releases/download/v$(FRIBIDI_VERSION)/fribidi-$(FRIBIDI_VERSION).tar.xz
 
 PKGS += fribidi
@@ -14,7 +14,7 @@ $(TARBALLS)/fribidi-$(FRIBIDI_VERSION).tar.xz:
 
 fribidi: fribidi-$(FRIBIDI_VERSION).tar.xz .sum-fribidi
 	$(UNPACK)
-	$(APPLY) $(SRC)/fribidi/meson_no_bins.patch
+	$(APPLY) $(SRC)/fribidi/fix_static_linking.patch
 	$(MOVE)
 
 # FIXME: DEPS_fribidi = iconv $(DEPS_iconv)
