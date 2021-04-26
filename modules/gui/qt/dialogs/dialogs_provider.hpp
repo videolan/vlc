@@ -42,6 +42,7 @@
 #define TITLE_EXTENSIONS_MEDIA qtr( "Media Files" )
 #define TITLE_EXTENSIONS_VIDEO qtr( "Video Files" )
 #define TITLE_EXTENSIONS_AUDIO qtr( "Audio Files" )
+#define TITLE_EXTENSIONS_IMAGE qtr( "Image Files" )
 #define TITLE_EXTENSIONS_PLAYLIST qtr( "Playlist Files" )
 #define TITLE_EXTENSIONS_SUBTITLE qtr( "Subtitle Files" )
 #define TITLE_EXTENSIONS_ALL qtr( "All Files" )
