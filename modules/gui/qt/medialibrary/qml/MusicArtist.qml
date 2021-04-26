@@ -123,7 +123,7 @@ Widgets.NavigableFocusScope {
                             image: model.cover || VLCStyle.noArtAlbum
                             title: model.title || i18n.qtr("Unknown title")
                             subtitle: model.release_year || ""
-                            textHorizontalAlignment: Text.AlignHCenter
+                            textAlignHCenter: true
                             x: selectedBorderWidth
                             y: selectedBorderWidth
                             pictureWidth: VLCStyle.gridCover_music_width

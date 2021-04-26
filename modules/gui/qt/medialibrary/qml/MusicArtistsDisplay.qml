@@ -180,7 +180,7 @@ Widgets.PageLoader {
                         playCoverBorderWidth: VLCStyle.dp(3, VLCStyle.scale)
                         titleMargin: VLCStyle.margin_xlarge
                         playIconSize: VLCStyle.play_cover_small
-                        textHorizontalAlignment: Text.AlignHCenter
+                        textAlignHCenter: true
                         width: VLCStyle.colWidth(1)
                         dragItem: artistsDragItem
                         unselectedUnderlay: shadows.unselected

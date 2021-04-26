@@ -31,13 +31,11 @@ FocusScope {
     property alias image: picture.source
     property alias title: titleLabel.text
     property alias subtitle: subtitleTxt.text
-    property alias textHorizontalAlignment: subtitleTxt.horizontalAlignment
     property alias playCoverBorderWidth: picture.playCoverBorderWidth
     property alias playCoverOnlyBorders: picture.playCoverOnlyBorders
     property alias playIconSize: picture.playIconSize
     property alias pictureRadius: picture.radius
     property alias pictureOverlay: picture.imageOverlay
-    property bool selected: false
     property alias unselectedUnderlay: unselectedUnderlayLoader.sourceComponent
     property alias selectedUnderlay: selectedUnderlayLoader.sourceComponent
 
@@ -45,6 +43,12 @@ FocusScope {
     property real pictureHeight: pictureWidth
     property int titleMargin: VLCStyle.margin_xsmall
     property Item dragItem
+
+    // if true, texts are horizontally centered, provided it can fit in pictureWidth
+    property bool textAlignHCenter: false
+
+    // if the item is selected
+    property bool selected: false
 
     signal playClicked
     signal addToPlaylistClicked
@@ -266,7 +270,7 @@ FocusScope {
 
                     elide: Text.ElideNone
                     width: pictureWidth
-                    horizontalAlignment: root.textHorizontalAlignment
+                    horizontalAlignment: root.textAlignHCenter && titleLabel.contentWidth <= titleLabel.width ? Text.AlignHCenter : Text.AlignLeft
                     topPadding: root.titleMargin
                     color: selectionRect.visible ? VLCStyle.colors.bgHoverText : VLCStyle.colors.text
                 }
@@ -278,7 +282,8 @@ FocusScope {
                 visible: text !== ""
                 text: root.subtitle
                 width: pictureWidth
-                topPadding: VLCStyle.margin_xsmall
+                topPadding: VLCStyle.margin_xsmall              
+                horizontalAlignment: root.textAlignHCenter && subtitleTxt.contentWidth <= subtitleTxt.width ? Text.AlignHCenter : Text.AlignLeft
                 color: selectionRect.visible
                        ? VLCStyle.colors.setColorAlpha(VLCStyle.colors.bgHoverText, .6)
                        : VLCStyle.colors.menuCaption
