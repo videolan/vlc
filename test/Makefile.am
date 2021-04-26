@@ -20,6 +20,7 @@ check_PROGRAMS = \
 	test_libvlc_media_list \
 	test_libvlc_media_player \
 	test_libvlc_media_discoverer \
+	test_libvlc_meta \
 	test_libvlc_renderer_discoverer \
 	test_libvlc_slaves \
 	test_src_config_chain \
@@ -54,10 +55,8 @@ check_SCRIPTS = \
 	modules/lua/telnet.sh \
 	check_POTFILES.sh
 
-# Disabled test:
-# meta: No suitable test file
+# Disabled tests:
 EXTRA_PROGRAMS = \
-	test_libvlc_meta \
 	test_libvlc_media_list_player \
 	test_src_input_stream_net \
 	$(NULL)
