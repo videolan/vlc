@@ -268,7 +268,7 @@ FocusScope {
                 Widgets.ListLabel {
                     id: titleLabel
 
-                    elide: Text.ElideNone
+                    elide: titleTextRect.scroll ?  Text.ElideNone : Text.ElideRight
                     width: pictureWidth
                     horizontalAlignment: root.textAlignHCenter && titleLabel.contentWidth <= titleLabel.width ? Text.AlignHCenter : Text.AlignLeft
                     topPadding: root.titleMargin
@@ -283,6 +283,7 @@ FocusScope {
                 text: root.subtitle
                 width: pictureWidth
                 topPadding: VLCStyle.margin_xsmall              
+                elide: Text.ElideRight
                 horizontalAlignment: root.textAlignHCenter && subtitleTxt.contentWidth <= subtitleTxt.width ? Text.AlignHCenter : Text.AlignLeft
                 color: selectionRect.visible
                        ? VLCStyle.colors.setColorAlpha(VLCStyle.colors.bgHoverText, .6)
