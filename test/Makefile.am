@@ -62,11 +62,11 @@ EXTRA_PROGRAMS = \
 	test_src_input_stream_net \
 	$(NULL)
 
-#check_DATA = samples/meta.sample
 EXTRA_DIST = \
 	samples/certs/certkey.pem \
 	samples/empty.voc \
 	samples/image.jpg \
+	samples/meta.sample \
 	samples/subitems \
 	samples/slaves \
 	$(check_SCRIPTS)
@@ -74,15 +74,6 @@ EXTRA_DIST = \
 check_HEADERS = libvlc/test.h libvlc/libvlc_additions.h
 
 TESTS = $(check_PROGRAMS) check_POTFILES.sh
-
-DISTCLEANFILES = samples/meta.sample
-
-# Samples server
-SAMPLES_SERVER=http://streams.videolan.org/streams-videolan/reference
-
-samples/meta.sample:
-	mkdir -p `dirname $@`
-	curl $(SAMPLES_SERVER)/metadata/id3tag/Wesh-Bonneville.mp3 > $@
 
 AM_CFLAGS = -DSRCDIR=\"$(srcdir)\"
 AM_LDFLAGS = -no-install
