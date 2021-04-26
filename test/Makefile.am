@@ -62,7 +62,7 @@ EXTRA_PROGRAMS = \
 	test_src_input_stream_net \
 	$(NULL)
 
-#check_DATA = samples/test.sample samples/meta.sample
+#check_DATA = samples/meta.sample
 EXTRA_DIST = \
 	samples/certs/certkey.pem \
 	samples/empty.voc \
@@ -75,14 +75,10 @@ check_HEADERS = libvlc/test.h libvlc/libvlc_additions.h
 
 TESTS = $(check_PROGRAMS) check_POTFILES.sh
 
-DISTCLEANFILES = samples/test.sample samples/meta.sample
+DISTCLEANFILES = samples/meta.sample
 
 # Samples server
 SAMPLES_SERVER=http://streams.videolan.org/streams-videolan/reference
-
-samples/test.sample:
-	mkdir -p `dirname $@`
-	curl $(SAMPLES_SERVER)/avi/Hero-Div3.avi > $@
 
 samples/meta.sample:
 	mkdir -p `dirname $@`
