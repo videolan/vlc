@@ -328,6 +328,18 @@ if HAVE_LIBFUZZER
 noinst_PROGRAMS += vlc-demux-libfuzzer vlc-demux-dec-libfuzzer vlc-demux-run vlc-demux-dec-run
 endif
 
+# iOS part
+
+common_ios_frameworks = \
+	-Wl,-framework,CoreFoundation,-framework,Foundation \
+	-Wl,-framework,CoreAudio,-framework,AudioToolbox \
+	-Wl,-framework,CoreVideo,-framework,QuartzCore \
+	-Wl,-framework,OpenGLES,-framework,UIKit \
+	-Wl,-framework,Security,-framework,AVFoundation \
+	-Wl,-framework,CoreImage,-framework,CoreText \
+	-Wl,-framework,CoreMedia,-framework,VideoToolbox \
+	-Wl,-framework,CoreGraphics
+
 vlccoreios_SOURCES = iosvlc.m
 vlccoreios_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,Foundation,-framework,UIKit
 vlccoreios_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/Frameworks/"
@@ -348,13 +360,7 @@ endif
 if HAVE_MERGE_PLUGINS
 if !HAVE_DYNAMIC_PLUGINS
 vlccoreios_LDADD += ../modules/libvlc_static.la
-vlccoreios_LDFLAGS += \
-	-Wl,-framework,CoreFoundation,-framework,Foundation \
-	-Wl,-framework,CoreAudio,-framework,AudioToolbox \
-	-Wl,-framework,CoreVideo,-framework,QuartzCore \
-	-Wl,-framework,OpenGLES,-framework,UIKit \
-	-Wl,-framework,Security,-framework,AVFoundation \
-	-Wl,-framework,CoreImage
+vlccoreios_LDFLAGS += $(common_ios_frameworks)
 vlccoreios_OBJCFLAGS += -DHAVE_MERGE_PLUGINS
 endif
 endif
@@ -368,13 +374,7 @@ vlccoreiostuner_LDADD = ../compat/libcompat.la ../lib/libvlc.la ../src/libvlccor
 if HAVE_MERGE_PLUGINS
 if !HAVE_DYNAMIC_PLUGINS
 vlccoreiostuner_LDADD += ../modules/libvlc_static.la
-vlccoreiostuner_LDFLAGS += \
-	-Wl,-framework,CoreFoundation,-framework,Foundation \
-	-Wl,-framework,CoreAudio,-framework,AudioToolbox \
-	-Wl,-framework,CoreVideo,-framework,QuartzCore \
-	-Wl,-framework,OpenGLES,-framework,UIKit \
-	-Wl,-framework,Security,-framework,AVFoundation \
-	-Wl,-framework,CoreImage
+vlccoreiostuner_LDFLAGS += $(common_ios_frameworks)
 vlccoreiostuner_OBJCFLAGS += -DHAVE_MERGE_PLUGINS
 endif
 endif
