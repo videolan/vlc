@@ -65,7 +65,7 @@ EXTRA_DIST = \
 	samples/certs/certkey.pem \
 	samples/empty.voc \
 	samples/image.jpg \
-	samples/meta.sample \
+	samples/meta.mp3 \
 	samples/subitems \
 	samples/slaves \
 	$(check_SCRIPTS)
