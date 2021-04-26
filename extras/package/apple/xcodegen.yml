@@ -54,13 +54,13 @@ targets:
           copyFiles:
             destination: executables
 
-  vlc_static:
+  vlc_static_modules:
     type: "library.static"
     platform: ${VLC_PLATFORM}
     dependencies:
       - target: VLCAutomake
     sources:
-      - path: ${VLC_BUILD_DIR}/modules/.libs/libvlc_static.a
+      - path: ${VLC_BUILD_DIR}/modules/.libs/libvlc_static_modules.a
         optional: true
         buildPhase:
           copyFiles:
