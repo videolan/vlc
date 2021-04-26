@@ -1183,14 +1183,6 @@ AS_VAR_IF(with_sanitizer, no, [], [
        AX_APPEND_COMPILE_FLAGS([-fsanitize-address-use-after-scope -fno-omit-frame-pointer -fsanitize=pointer-compare -fsanitize=pointer-subtract])
        AX_APPEND_COMPILE_FLAGS([-fsanitize-address-use-after-scope -fno-omit-frame-pointer -fsanitize=pointer-compare -fsanitize=pointer-subtract], [CXXFLAGS])
     ])
-    AS_IF([test -z "${with_sanitizer##*memory*}" ], [
-        AX_APPEND_COMPILE_FLAGS([-fPIE -pie])
-        AX_APPEND_COMPILE_FLAGS([-fPIE -pie], [CXXFLAGS])
-    ])
-    AS_IF([test -z "${with_sanitizer##*thread*}" ], [
-        AX_APPEND_COMPILE_FLAGS([-fPIE -pie])
-        AX_APPEND_COMPILE_FLAGS([-fPIE -pie], [CXXFLAGS])
-    ])
 ])
 
 dnl
