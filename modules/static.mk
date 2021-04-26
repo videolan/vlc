@@ -2,9 +2,8 @@
 # being built, excluding the ones using them.
 
 # Remove the special targets
-ALL_TARGETS_2 := $(LTLIBRARIES:libvlc_static.la=)
-ALL_TARGETS_3 := $(ALL_TARGETS_2:libvlc_static_bundled.la=)
-ALL_TARGETS := $(ALL_TARGETS_3:libvlc_plugin.la=)
+ALL_TARGETS_2 := $(LTLIBRARIES:libvlc_static_modules.la=)
+ALL_TARGETS := $(ALL_TARGETS_2:libvlc_plugin.la=)
 
 # Remove the non-plugins, it needs intermediate steps because
 # we can only replace and not match inverse. Instead we;
@@ -85,14 +84,19 @@ libvlc_plugin_frameworks = \
 	-Wl,-framework,VideoToolbox,-framework,Security \
 	-Wl,-framework,CoreMedia,-framework,CoreText
 
-libvlc_static_la_SOURCES = plugin_static.c
-libvlc_static_la_CFLAGS =
-libvlc_static_la_LDFLAGS = \
+libvlc_static_modules_la_SOURCES = plugin_static.c
+libvlc_static_modules_la_CFLAGS =
+libvlc_static_modules_la_LDFLAGS = \
 	-static -export-symbols-regex ^vlc_entry \
 	$(top_builddir)/compat/libcompat.la $(LTLIBVLCCORE)
-libvlc_static_la_LIBADD = $(PARTIAL_PLUGINS)
-libvlc_static_la_LDFLAGS += $(libvlc_plugin_frameworks)
-EXTRA_libvlc_static_la_DEPENDENCIES = vlc_modules_manifest.h
+libvlc_static_modules_la_LIBADD = $(PARTIAL_PLUGINS)
+if HAVE_IOS
+libvlc_static_modules_la_LDFLAGS += $(libvlc_plugin_frameworks)
+endif
+if HAVE_TVOS
+libvlc_static_modules_la_LDFLAGS += $(libvlc_plugin_frameworks)
+endif
+EXTRA_libvlc_static_modules_la_DEPENDENCIES = vlc_modules_manifest.h
 
 EXTRA_libvlc_plugin_la_SOURCES = dummy.cpp
 libvlc_plugin_la_SOURCES = plugin_static.c
@@ -133,6 +137,6 @@ if HAVE_MERGE_PLUGINS
 if HAVE_DYNAMIC_PLUGINS
 pkglib_LTLIBRARIES += libvlc_plugin.la
 else
-pkglib_LTLIBRARIES += libvlc_static.la
+pkglib_LTLIBRARIES += libvlc_static_modules.la
 endif
 endif
