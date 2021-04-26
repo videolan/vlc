@@ -46,21 +46,7 @@ Item {
             target: label
             property: "x"
             from: 0
-            to: (label.horizontalAlignment == Text.AlignHCenter) ? (label.width - label.contentWidth) / 2 : label.width - label.contentWidth
-
-            maximumEasingTime: 0
-            velocity: 20
-        }
-
-        PauseAnimation {
-            duration: 1000
-        }
-
-        SmoothedAnimation {
-            target: label
-            property: "x"
-            to: (label.horizontalAlignment == Text.AlignHCenter) ? (label.contentWidth - label.width) / 2 : label.width - label.contentWidth
-            duration: (label.horizontalAlignment == Text.AlignHCenter) ? -1 : 1
+            to: label.width - label.contentWidth
 
             maximumEasingTime: 0
             velocity: 20
