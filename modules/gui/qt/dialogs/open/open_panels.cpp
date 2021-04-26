@@ -834,7 +834,7 @@ void CaptureOpenPanel::initialize()
         "video*"
     };
     if( module_exists( "v4l2" ) ){
-    addModuleAndLayouts( V4L2_DEVICE, v4l2, "Video camera", QGridLayout );
+    addModuleAndLayouts( V4L2_DEVICE, v4l2, N_("Video camera"), QGridLayout );
 
     /* V4L2 main panel */
     QLabel *v4l2VideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
@@ -887,7 +887,7 @@ void CaptureOpenPanel::initialize()
      * JACK *
      *******/
     if( module_exists( "jack" ) ){
-    addModuleAndLayouts( JACK_DEVICE, jack, "JACK Audio Connection Kit",
+    addModuleAndLayouts( JACK_DEVICE, jack, N_("JACK Audio Connection Kit"),
                          QGridLayout);
 
     /* Jack Main panel */
@@ -1116,7 +1116,7 @@ void CaptureOpenPanel::initialize()
     /**********
      * Screen *
      **********/
-    addModuleAndLayouts( SCREEN_DEVICE, screen, "Desktop", QGridLayout );
+    addModuleAndLayouts( SCREEN_DEVICE, screen, N_("Desktop"), QGridLayout );
     QLabel *screenLabel = new QLabel( qtr( "Your display will be "
             "opened and played in order to stream or save it." ) );
     screenLabel->setWordWrap( true );
