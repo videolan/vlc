@@ -336,7 +336,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 {
     /* main menu */
     [_about setTitle: _NS("About VLC media player...")];
-    [_checkForUpdate setTitle: _NS("Check for Update...")];
+    [_checkForUpdate setTitle: _NS("Check for Updates...")];
     [_prefs setTitle: _NS("Preferences...")];
     [_extensions setTitle: _NS("Extensions")];
     [_extensionsMenu setTitle: _NS("Extensions")];

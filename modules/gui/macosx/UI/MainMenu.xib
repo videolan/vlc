@@ -199,7 +199,7 @@
                                     <action selector="showAbout:" target="-2" id="nAj-Kc-NFC"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Check For Update..." id="2457"/>
+                            <menuItem title="Check for Updates..." id="2457"/>
                             <menuItem isSeparatorItem="YES" id="2402">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
