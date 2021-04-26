@@ -250,7 +250,7 @@ ca_GetLatencyLocked(audio_output_t *p_aout)
 
     const int64_t i_out_frames = BytesToFrames(p_sys, p_sys->i_out_size);
     return FramesToTicks(p_sys, i_out_frames + p_sys->i_render_frames)
-           + p_sys->i_dev_latency_us;
+           + p_sys->i_dev_latency_ticks;
 }
 
 int
@@ -408,7 +408,7 @@ ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
 
 int
 ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
-              vlc_tick_t i_dev_latency_us)
+              vlc_tick_t i_dev_latency_ticks)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
@@ -422,7 +422,7 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     p_sys->i_frame_length = fmt->i_frame_length;
     p_sys->chans_to_reorder = 0;
 
-    p_sys->i_dev_latency_us = i_dev_latency_us;
+    p_sys->i_dev_latency_ticks = i_dev_latency_ticks;
 
     /* setup circular buffer */
     size_t i_audiobuffer_size = fmt->i_rate * fmt->i_bytes_per_frame
@@ -476,12 +476,12 @@ ca_SetAliveState(audio_output_t *p_aout, bool alive)
         vlc_sem_post(&p_sys->flush_sem);
 }
 
-void ca_SetDeviceLatency(audio_output_t *p_aout, vlc_tick_t i_dev_latency_us)
+void ca_SetDeviceLatency(audio_output_t *p_aout, vlc_tick_t i_dev_latency_ticks)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
     lock_lock(p_sys);
-    p_sys->i_dev_latency_us = i_dev_latency_us;
+    p_sys->i_dev_latency_ticks = i_dev_latency_ticks;
     lock_unlock(p_sys);
 }
 
@@ -857,7 +857,7 @@ SetupInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 
 int
 au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
-              const AudioChannelLayout *outlayout, vlc_tick_t i_dev_latency_us,
+              const AudioChannelLayout *outlayout, vlc_tick_t i_dev_latency_ticks,
               bool *warn_configuration)
 {
     int ret;
@@ -965,7 +965,7 @@ au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
         return VLC_EGENERIC;
     }
 
-    ret = ca_Initialize(p_aout, fmt, i_dev_latency_us);
+    ret = ca_Initialize(p_aout, fmt, i_dev_latency_ticks);
     if (ret != VLC_SUCCESS)
     {
         AudioUnitUninitialize(au);
