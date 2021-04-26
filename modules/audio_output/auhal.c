@@ -893,8 +893,6 @@ SwitchAudioDevice(audio_output_t *p_aout, const char *name)
 
     p_sys->i_new_selected_dev = (name) ? atoi(name) : 0;
 
-    p_sys->i_new_selected_dev = p_sys->i_new_selected_dev;
-
     aout_DeviceReport(p_aout, name);
     aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
 
