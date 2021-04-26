@@ -58,8 +58,9 @@ Widgets.NavigableFocusScope {
         Column {
             id: col
 
-            height: childrenRect.height + VLCStyle.margin_normal
+            height: implicitHeight
             width: root.width
+            bottomPadding: VLCStyle.margin_normal
 
             ArtistTopBanner {
                 id: artistBanner
@@ -88,7 +89,7 @@ Widgets.NavigableFocusScope {
                     property alias albumsListView: albumsList
 
                     width: root.width
-                    height: childrenRect.height
+                    height: implicitHeight
 
                     Widgets.SubtitleLabel {
                         id: albumsText
