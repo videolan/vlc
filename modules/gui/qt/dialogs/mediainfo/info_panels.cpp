@@ -150,7 +150,7 @@ MetaPanel::MetaPanel( QWidget *parent,
 
     ADD_META( VLC_META_ENCODED_BY, encodedby_text, 0, 7 ); line++;
 
-    label = new QLabel( qtr( N_("Comments") ) ); label->setFont( smallFont );
+    label = new QLabel( qtr( "Comments" ) ); label->setFont( smallFont );
     label->setContentsMargins( 3, 2, 0, 0 );
     metaLayout->addWidget( label, line++, 0, 1, 7 );
     description_text = new QTextEdit;
