@@ -260,12 +260,6 @@ Widgets.NavigableFocusScope {
 
         ml: medialib
         parentId: albumModel.parentId
-
-        onCountChanged: {
-            if (trackModel.count > 0) {
-                root.resetFocus()
-            }
-        }
     }
 
     AlbumContextMenu {
