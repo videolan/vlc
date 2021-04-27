@@ -546,7 +546,7 @@ static int ControlLockedGetWakeup( es_out_t *p_out, vlc_tick_t *pi_wakeup )
 
     if( p_sys->b_delayed )
     {
-        assert( !input_priv(p_sys->p_input)->b_can_pace_control );
+        assert( !input_CanPaceControl( p_sys->p_input ) );
         *pi_wakeup = 0;
     }
     else
@@ -579,7 +579,7 @@ static int ControlLockedSetPauseState( es_out_t *p_out, bool b_source_paused, bo
     else
     {
         i_ret = VLC_EGENERIC;
-        if( !input_priv(p_sys->p_input)->b_can_pace_control )
+        if( !input_CanPaceControl( p_sys->p_input ) )
         {
             if( !p_sys->b_delayed )
                 TsStart( p_out );
@@ -614,7 +614,7 @@ static int ControlLockedSetRate( es_out_t *p_out, float src_rate, float rate )
     else
     {
         i_ret = VLC_EGENERIC;
-        if( !input_priv(p_sys->p_input)->b_can_pace_control )
+        if( !input_CanPaceControl( p_sys->p_input ) )
         {
             if( !p_sys->b_delayed )
                 TsStart( p_out );

@@ -703,9 +703,9 @@ static vlc_tick_t EsOutGetWakeup( es_out_t *out )
     /* We do not have a wake up date if the input cannot have its speed
      * controlled or sout is imposing its own or while buffering
      *
-     * FIXME for !input_priv(p_input)->b_can_pace_control a wake-up time is still needed
+     * FIXME for !input_CanPaceControl() a wake-up time is still needed
      * to avoid too heavy buffering */
-    if( !input_priv(p_input)->b_can_pace_control ||
+    if( !input_CanPaceControl(p_input) ||
         input_priv(p_input)->b_out_pace_control ||
         p_sys->b_buffering )
         return 0;
@@ -1278,14 +1278,13 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t *p_input = p_sys->p_input;
-    input_thread_private_t *priv = input_priv(p_input);
 
-    /* XXX: The clock source selection depends on priv->b_can_pace_control but
+    /* XXX: The clock source selection depends on input_CanPaceControl() but
      * this variable is only initialized from the input_thread_t after the
      * demux is opened. Programs and ES tracks can be created from the demux
      * open callback or midstream (from the demux callback). Therefore, we
      * can't handle the clock source selection after the program is created
-     * since priv->b_can_pace_control might not be initialized. To fix this
+     * since input_CanPaceControl() might not be initialized. To fix this
      * issue, handle clock source selection when the first PCR is sent (from
      * ES_OUT_SET_PCR). */
     assert( p_sys->b_active );
@@ -1293,7 +1292,7 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
     switch( p_sys->clock_source )
     {
         case VLC_CLOCK_MASTER_AUTO:
-            if (priv->b_can_pace_control)
+            if (input_CanPaceControl(p_input))
             {
                 p_pgrm->active_clock_source = VLC_CLOCK_MASTER_AUDIO;
                 break;
@@ -3300,7 +3299,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         bool b_extra_buffering_allowed = !b_low_delay && EsOutIsExtraBufferingAllowed( out );
         vlc_tick_t i_late = input_clock_Update(
                             p_pgrm->p_input_clock, VLC_OBJECT(p_sys->p_input),
-                            priv->b_can_pace_control || p_sys->b_buffering,
+                            input_CanPaceControl(p_sys->p_input) || p_sys->b_buffering,
                             b_extra_buffering_allowed,
                             i_pcr, vlc_tick_now() );
 
