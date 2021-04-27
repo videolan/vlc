@@ -55,6 +55,59 @@ class Timescale
         uint64_t scale;
 };
 
+class SegmentTimes
+{
+    public:
+        SegmentTimes()
+        {
+            demux = VLC_TS_INVALID;
+            media = VLC_TS_INVALID;
+            display = VLC_TS_INVALID;
+        }
+        SegmentTimes(mtime_t a, mtime_t b, mtime_t c = VLC_TS_INVALID)
+        {
+            demux = a;
+            media = b;
+            display = c;
+        }
+        void offsetBy(mtime_t v)
+        {
+            if(v == 0)
+                return;
+            if(demux != VLC_TS_INVALID)
+                demux += v;
+            if(media != VLC_TS_INVALID)
+                media += v;
+            if(display != VLC_TS_INVALID)
+                display += v;
+        }
+        mtime_t demux;
+        mtime_t media;
+        mtime_t display;
+};
+
+class Times
+{
+    public:
+        Times()
+        {
+            continuous = VLC_TS_INVALID;
+        }
+        Times(const SegmentTimes &s, mtime_t a)
+        {
+            segment = s;
+            continuous = a;
+        }
+        void offsetBy(mtime_t v)
+        {
+            if(continuous != VLC_TS_INVALID)
+                continuous += v;
+            segment.offsetBy(v);
+        }
+        mtime_t continuous;
+        SegmentTimes segment;
+};
+
 }
 
 #endif // TIME_HPP
