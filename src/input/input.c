@@ -3550,3 +3550,9 @@ input_attachment_t *input_GetAttachment(input_thread_t *input, const char *name)
     vlc_mutex_unlock( &priv->p_item->lock );
     return NULL;
 }
+
+bool input_CanPaceControl(input_thread_t *input)
+{
+    input_thread_private_t *priv = input_priv(input);
+    return priv->b_can_pace_control;
+}

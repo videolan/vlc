@@ -658,6 +658,8 @@ int input_GetAttachments(input_thread_t *input, input_attachment_t ***attachment
 
 input_attachment_t *input_GetAttachment(input_thread_t *input, const char *name);
 
+bool input_CanPaceControl(input_thread_t *input);
+
 /**
  * Hold the input_source_t
  */
