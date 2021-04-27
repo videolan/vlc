@@ -67,6 +67,11 @@ AbstractFakeEsCommand::AbstractFakeEsCommand( int type, AbstractFakeESOutID *p_e
     p_fakeid = p_es;
 }
 
+const void * AbstractFakeEsCommand::esIdentifier() const
+{
+    return static_cast<const void *>(p_fakeid);
+}
+
 EsOutSendCommand::EsOutSendCommand( AbstractFakeESOutID *p_es, block_t *p_block_ ) :
     AbstractFakeEsCommand( ES_OUT_PRIVATE_COMMAND_SEND, p_es )
 {
@@ -91,11 +96,6 @@ vlc_tick_t EsOutSendCommand::getTime() const
         return p_block->i_dts;
     else
         return AbstractCommand::getTime();
-}
-
-const void * EsOutSendCommand::esIdentifier() const
-{
-    return static_cast<const void *>(p_fakeid);
 }
 
 EsOutDelCommand::EsOutDelCommand( AbstractFakeESOutID *p_es ) :

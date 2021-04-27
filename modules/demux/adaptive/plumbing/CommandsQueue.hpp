@@ -48,6 +48,9 @@ namespace adaptive
 
     class AbstractFakeEsCommand : public AbstractCommand
     {
+        public:
+            const void * esIdentifier() const;
+
         protected:
             AbstractFakeEsCommand( int, AbstractFakeESOutID * );
             AbstractFakeESOutID *p_fakeid;
@@ -60,7 +63,6 @@ namespace adaptive
             virtual ~EsOutSendCommand();
             virtual void Execute( ) override;
             virtual vlc_tick_t getTime() const override;
-            const void * esIdentifier() const;
 
         protected:
             EsOutSendCommand( AbstractFakeESOutID *, block_t * );
