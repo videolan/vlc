@@ -286,6 +286,9 @@ Widgets.NavigableFocusScope {
 
                 dragItem: root.dragItem
 
+                selectedUnderlay  : shadows.selected
+                unselectedUnderlay: shadows.unselected
+
                 //---------------------------------------------------------------------------------
                 // Events
 
@@ -331,6 +334,16 @@ Widgets.NavigableFocusScope {
                 target: contextMenu
 
                 onShowMediaInformation: gridView.switchExpandItem(index)
+            }
+
+            //-------------------------------------------------------------------------------------
+            // Childs
+
+            Widgets.GridShadows {
+                id: shadows
+
+                coverWidth : VLCStyle.gridCover_video_width
+                coverHeight: VLCStyle.gridCover_video_height
             }
         }
     }
