@@ -444,6 +444,19 @@ libvlccore_la_SOURCES += \
 	posix/timer.c
 endif
 
+if HAVE_EMSCRIPTEN
+libvlccore_la_SOURCES += \
+	posix/thread.c \
+	posix/getaddrinfo.c \
+	posix/error.c \
+	posix/dirs.c \
+	posix/filesystem.c \
+	posix/specific.c \
+	posix/timer.c \
+	emscripten/netconf.c \
+	emscripten/thread.c
+endif
+
 if HAVE_DARWIN
 libvlccore_la_SOURCES += \
 	darwin/error.c \
@@ -487,8 +500,10 @@ if !HAVE_LINUX
 libvlccore_la_SOURCES += posix/wait.c
 endif
 if !HAVE_ANDROID
+if !HAVE_EMSCRIPTEN
+libvlccore_la_SOURCES += posix/sort.c
+endif
 libvlccore_la_SOURCES += \
-	posix/sort.c \
 	posix/thread.c
 if !HAVE_DARWIN
 libvlccore_la_SOURCES += \
