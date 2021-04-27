@@ -63,9 +63,9 @@ static const char shader_convert601to709_source[] =
 
     "float4 yuv709_to_rgb(float4 YUV)\n"
     "{\n"
-    "    float Kr = 0.2125;\n"
-    "    float Kg = 0.7154;\n"
-    "    float Kb = 0.0721;\n"
+    "    float Kr = 0.2126;\n"
+    "    float Kg = 0.7152;\n"
+    "    float Kb = 0.0722;\n"
     "    float Y = YUV.x;\n"
     "    float U = YUV.y;\n"
     "    float V = YUV.z;\n"
