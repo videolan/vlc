@@ -311,7 +311,7 @@ static bool compareCommands( const Queueentry &a, const Queueentry &b )
     }
 }
 
-void CommandsQueue::Schedule( AbstractCommand *command )
+void CommandsQueue::Schedule( AbstractCommand *command, EsType )
 {
     if( b_drop )
     {

@@ -20,6 +20,8 @@
 #ifndef COMMANDSQUEUE_HPP_
 #define COMMANDSQUEUE_HPP_
 
+#include "FakeESOutID.hpp"
+
 #include <vlc_common.h>
 #include <vlc_es.h>
 
@@ -29,7 +31,6 @@
 namespace adaptive
 {
     class AbstractFakeEsOut;
-    class AbstractFakeESOutID;
 
     class AbstractCommand
     {
@@ -155,7 +156,7 @@ namespace adaptive
         public:
             AbstractCommandsQueue();
             virtual ~AbstractCommandsQueue() = default;
-            virtual void Schedule( AbstractCommand * ) = 0;
+            virtual void Schedule( AbstractCommand *, EsType = EsType::Other ) = 0;
             virtual vlc_tick_t Process( vlc_tick_t )  = 0;
             virtual void Abort( bool b_reset )  = 0;
             virtual void Commit()  = 0;
@@ -182,7 +183,7 @@ namespace adaptive
         public:
             CommandsQueue();
             virtual ~CommandsQueue();
-            virtual void Schedule( AbstractCommand * ) override;
+            virtual void Schedule( AbstractCommand *, EsType = EsType::Other ) override;
             virtual vlc_tick_t Process( vlc_tick_t ) override;
             virtual void Abort( bool b_reset ) override;
             virtual void Commit() override;
