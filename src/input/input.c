@@ -304,7 +304,6 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     priv->events_data = events_data;
     priv->b_preparsing = option == INPUT_CREATE_OPTION_PREPARSING;
     priv->b_thumbnailing = option == INPUT_CREATE_OPTION_THUMBNAILING;
-    priv->b_can_pace_control = true;
     priv->i_start = 0;
     priv->i_stop  = 0;
     priv->i_title_offset = input_priv(p_input)->i_seekpoint_offset = 0;
@@ -466,7 +465,7 @@ static void *Run( void *data )
 
     if( !Init( p_input ) )
     {
-        if( priv->b_can_pace_control && priv->b_out_pace_control )
+        if( priv->master->b_can_pace_control && priv->b_out_pace_control )
         {
             /* We don't want a high input priority here or we'll
              * end-up sucking up all the CPU time */
@@ -704,7 +703,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             }
             /* Pause after eof only if the input is pausable.
              * This way we won't trigger timeshifting for nothing */
-            else if( b_pause_after_eof && input_priv(p_input)->b_can_pause )
+            else if( b_pause_after_eof && input_priv(p_input)->master->b_can_pause )
             {
                 if( b_paused_at_eof )
                     break;
@@ -837,11 +836,6 @@ static void InitTitle( input_thread_t * p_input, bool had_titles )
     vlc_mutex_lock( &priv->p_item->lock );
     priv->i_title_offset = p_master->i_title_offset;
     priv->i_seekpoint_offset = p_master->i_seekpoint_offset;
-
-    /* Global flag */
-    priv->b_can_pace_control = p_master->b_can_pace_control;
-    priv->b_can_pause        = p_master->b_can_pause;
-    priv->b_can_rate_control = p_master->b_can_rate_control;
     vlc_mutex_unlock( &priv->p_item->lock );
 
     /* Send event only if the count is valid or if titles are gone */
@@ -1646,7 +1640,7 @@ static void ControlPause( input_thread_t *p_input, vlc_tick_t i_control_date )
 {
     int i_state = PAUSE_S;
 
-    if( input_priv(p_input)->b_can_pause )
+    if( input_priv(p_input)->master->b_can_pause )
     {
         demux_t *p_demux = input_priv(p_input)->master->p_demux;
 
@@ -1658,7 +1652,8 @@ static void ControlPause( input_thread_t *p_input, vlc_tick_t i_control_date )
     }
 
     /* */
-    if( es_out_SetPauseState( input_priv(p_input)->p_es_out, input_priv(p_input)->b_can_pause,
+    if( es_out_SetPauseState( input_priv(p_input)->p_es_out,
+                              input_priv(p_input)->master->b_can_pause,
                               true, i_control_date ) )
     {
         msg_Warn( p_input, "cannot set pause state at es_out level" );
@@ -1671,7 +1666,7 @@ static void ControlPause( input_thread_t *p_input, vlc_tick_t i_control_date )
 
 static void ControlUnpause( input_thread_t *p_input, vlc_tick_t i_control_date )
 {
-    if( input_priv(p_input)->b_can_pause )
+    if( input_priv(p_input)->master->b_can_pause )
     {
         demux_t *p_demux = input_priv(p_input)->master->p_demux;
 
@@ -2073,14 +2068,14 @@ static bool Control( input_thread_t *p_input,
             }
 
             if( rate != 1.f &&
-                ( ( !priv->b_can_rate_control && !priv->master->b_rescale_ts ) ||
+                ( ( !priv->master->b_can_rate_control && !priv->master->b_rescale_ts ) ||
                   ( priv->p_sout && !priv->b_out_pace_control ) ) )
             {
                 msg_Dbg( p_input, "cannot change rate" );
                 rate = 1.f;
             }
             if( rate != priv->rate &&
-                !priv->b_can_pace_control && priv->b_can_rate_control )
+                !priv->master->b_can_pace_control && priv->master->b_can_rate_control )
             {
                 if( !priv->master->b_rescale_ts )
                     es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
@@ -2101,7 +2096,8 @@ static bool Control( input_thread_t *p_input,
 
                 if( priv->master->b_rescale_ts )
                 {
-                    const float rate_source = (priv->b_can_pace_control || priv->b_can_rate_control ) ? rate : 1.f;
+                    const float rate_source = (priv->master->b_can_pace_control ||
+                        priv->master->b_can_rate_control ) ? rate : 1.f;
                     es_out_SetRate( priv->p_es_out, rate_source, rate );
                 }
 
@@ -3554,5 +3550,5 @@ input_attachment_t *input_GetAttachment(input_thread_t *input, const char *name)
 bool input_CanPaceControl(input_thread_t *input)
 {
     input_thread_private_t *priv = input_priv(input);
-    return priv->b_can_pace_control;
+    return priv->master->b_can_pace_control;
 }
