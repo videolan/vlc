@@ -22,6 +22,7 @@
 
 #include <vlc_common.h>
 #include <list>
+#include "../Time.hpp"
 
 namespace adaptive
 {
@@ -104,6 +105,8 @@ namespace adaptive
 
             /**/
             void scheduleNecessaryMilestone();
+            bool hasSegmentStartTimes() const;
+            void setSegmentStartTimes(const SegmentTimes &);
             void schedulePCRReset();
             void scheduleAllForDeletion(); /* Queue Del commands for non Del issued ones */
             void recycleAll(); /* Cancels all commands and send fakees for recycling */
@@ -135,6 +138,7 @@ namespace adaptive
             std::list<FakeESOutID *> fakeesidlist;
             std::list<FakeESOutID *> recycle_candidates;
             std::list<FakeESOutID *> declared;
+            SegmentTimes startTimes;
     };
 
 }

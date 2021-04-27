@@ -30,6 +30,8 @@
 #include "plumbing/SourceStream.hpp"
 #include "plumbing/FakeESOut.hpp"
 
+#include "Time.hpp"
+
 #include <string>
 
 namespace adaptive
@@ -63,7 +65,7 @@ namespace adaptive
         void setLanguage(const std::string &);
         void setDescription(const std::string &);
         mtime_t getMinAheadTime() const;
-        mtime_t getFirstDTS() const;
+        Times getFirstTimes() const;
         int esCount() const;
         bool isSelected() const;
         virtual bool reactivate(mtime_t);
@@ -87,7 +89,7 @@ namespace adaptive
                                   mtime_t, bool = false);
         BufferingStatus getLastBufferStatus() const;
         mtime_t getDemuxedAmount(mtime_t) const;
-        Status dequeue(mtime_t, mtime_t *);
+        Status dequeue(Times, Times *);
         bool decodersDrained();
         virtual bool setPosition(mtime_t, bool);
         bool getMediaPlaybackTimes(mtime_t *, mtime_t *, mtime_t *,
@@ -137,6 +139,8 @@ namespace adaptive
         FakeESOut::LockedFakeEsOut fakeEsOut() const;
         FakeESOut *fakeesout; /* to intercept/proxy what is sent from demuxstream */
         vlc_mutex_t lock; /* lock for everything accessed by dequeuing */
+
+        SegmentTimes startTimeContext;
 
     private:
         void declaredCodecs();

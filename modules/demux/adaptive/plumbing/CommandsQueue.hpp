@@ -21,6 +21,7 @@
 #define COMMANDSQUEUE_HPP_
 
 #include "FakeESOutID.hpp"
+#include "../Time.hpp"
 
 #include <vlc_common.h>
 #include <vlc_es.h>
@@ -38,11 +39,12 @@ namespace adaptive
         public:
             virtual ~AbstractCommand();
             virtual void Execute( ) = 0;
-            virtual mtime_t getTime() const;
+            virtual const Times & getTimes() const;
             int getType() const;
 
         protected:
             AbstractCommand( int );
+            Times times;
             int type;
     };
 
@@ -62,10 +64,9 @@ namespace adaptive
         public:
             virtual ~EsOutSendCommand();
             virtual void Execute( ) override;
-            virtual mtime_t getTime() const override;
 
         protected:
-            EsOutSendCommand( AbstractFakeESOutID *, block_t * );
+            EsOutSendCommand( AbstractFakeESOutID *, const SegmentTimes &, block_t * );
             block_t *p_block;
     };
 
@@ -95,12 +96,10 @@ namespace adaptive
         friend class CommandsFactory;
         public:
             virtual void Execute() override;
-            virtual mtime_t getTime() const override;
 
         protected:
-            EsOutControlPCRCommand( int, mtime_t );
+            EsOutControlPCRCommand( int, const SegmentTimes &, mtime_t );
             int group;
-            mtime_t pcr;
     };
 
     class EsOutDestroyCommand : public AbstractCommand
@@ -153,10 +152,14 @@ namespace adaptive
     {
         public:
             virtual ~CommandsFactory() {}
-            virtual EsOutSendCommand * createEsOutSendCommand( AbstractFakeESOutID *, block_t * ) const;
+            virtual EsOutSendCommand * createEsOutSendCommand( AbstractFakeESOutID *,
+                                                               const SegmentTimes &,
+                                                               block_t * ) const;
             virtual EsOutDelCommand * createEsOutDelCommand( AbstractFakeESOutID * ) const;
             virtual EsOutAddCommand * createEsOutAddCommand( AbstractFakeESOutID * ) const;
-            virtual EsOutControlPCRCommand * createEsOutControlPCRCommand( int, mtime_t ) const;
+            virtual EsOutControlPCRCommand * createEsOutControlPCRCommand( int,
+                                                                           const SegmentTimes &,
+                                                                           mtime_t ) const;
             virtual EsOutControlResetPCRCommand * creatEsOutControlResetPCRCommand() const;
             virtual EsOutDestroyCommand * createEsOutDestroyCommand() const;
             virtual EsOutMetaCommand * createEsOutMetaCommand( AbstractFakeEsOut *, int, const vlc_meta_t * ) const;
@@ -171,7 +174,7 @@ namespace adaptive
             AbstractCommandsQueue();
             virtual ~AbstractCommandsQueue() = default;
             virtual void Schedule( AbstractCommand *, EsType = EsType::Other ) = 0;
-            virtual mtime_t Process( mtime_t )  = 0;
+            virtual Times Process( Times )  = 0;
             virtual void Abort( bool b_reset )  = 0;
             virtual void Commit()  = 0;
             virtual bool isEmpty() const = 0;
@@ -182,8 +185,8 @@ namespace adaptive
             bool isEOF() const;
             virtual mtime_t getDemuxedAmount(mtime_t) const  = 0;
             virtual mtime_t getBufferingLevel() const  = 0;
-            virtual mtime_t getFirstDTS() const  = 0;
-            virtual mtime_t getPCR() const = 0;
+            virtual Times getFirstTimes() const  = 0;
+            virtual Times getPCR() const = 0;
 
         protected:
             bool b_draining;
@@ -198,15 +201,15 @@ namespace adaptive
             CommandsQueue();
             virtual ~CommandsQueue();
             virtual void Schedule( AbstractCommand *, EsType = EsType::Other ) override;
-            virtual mtime_t Process( mtime_t ) override;
+            virtual Times Process( Times ) override;
             virtual void Abort( bool b_reset ) override;
             virtual void Commit() override;
             virtual bool isEmpty() const override;
             virtual void setDraining() override;
             virtual mtime_t getDemuxedAmount(mtime_t) const override;
             virtual mtime_t getBufferingLevel() const override;
-            virtual mtime_t getFirstDTS() const override;
-            virtual mtime_t getPCR() const override;
+            virtual Times getFirstTimes() const override;
+            virtual Times getPCR() const override;
 
         private:
             void LockedCommit();
@@ -214,7 +217,7 @@ namespace adaptive
             std::list<Queueentry> incoming;
             std::list<Queueentry> commands;
             mtime_t bufferinglevel;
-            mtime_t pcr;
+            Times pcr;
             uint64_t nextsequence;
     };
 }

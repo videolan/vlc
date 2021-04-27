@@ -108,24 +108,24 @@ int CommandsQueue_test()
         Expect(queue.isEmpty() == true);
         Expect(queue.getDemuxedAmount(VLC_TS_0) == 0);
         Expect(queue.getBufferingLevel() == VLC_TS_INVALID);
-        Expect(queue.getFirstDTS() == VLC_TS_INVALID);
-        Expect(queue.getPCR() == VLC_TS_INVALID);
+        Expect(queue.getFirstTimes().continuous == VLC_TS_INVALID);
+        Expect(queue.getPCR().continuous == VLC_TS_INVALID);
         cmd = factory.createEsOutAddCommand(id0);
         queue.Schedule(cmd);
         cmd = factory.createEsOutDelCommand(id0);
         queue.Schedule(cmd);
         for(size_t i=0; i<3; i++) /* Add / Del will return in between */
-            queue.Process(std::numeric_limits<mtime_t>::max());
+            queue.Process(Times(SegmentTimes(), std::numeric_limits<mtime_t>::max()));
         Expect(queue.isEmpty() == false); /* no PCR issued nor commit */
         queue.Commit();
         for(size_t i=0; i<3; i++)
-            queue.Process(std::numeric_limits<mtime_t>::max());
+            queue.Process(Times(SegmentTimes(), std::numeric_limits<mtime_t>::max()));
         Expect(queue.isEOF() == false);
         Expect(queue.isDraining() == false);
         Expect(queue.isEmpty() == true);
         Expect(queue.getDemuxedAmount(VLC_TS_0) == 0);
         Expect(queue.getBufferingLevel() == VLC_TS_INVALID);
-        Expect(queue.getPCR() == std::numeric_limits<mtime_t>::max());
+        Expect(queue.getPCR().continuous == std::numeric_limits<mtime_t>::max());
 
         queue.Abort(true);
         esout.cleanup();
@@ -136,31 +136,31 @@ int CommandsQueue_test()
             block_t *data = block_Alloc(0);
             Expect(data);
             data->i_dts = VLC_TS_0 + vlc_tick_from_sec(i);
-            cmd = factory.createEsOutSendCommand(id0, data);
+            cmd = factory.createEsOutSendCommand(id0, SegmentTimes(), data);
             queue.Schedule(cmd);
         }
-        Expect(queue.getPCR() == VLC_TS_INVALID);
-        Expect(queue.getFirstDTS() == VLC_TS_INVALID);
+        Expect(queue.getPCR().continuous == VLC_TS_INVALID);
+        Expect(queue.getFirstTimes().continuous == VLC_TS_INVALID);
         Expect(queue.getDemuxedAmount(VLC_TS_0) == 0);
         Expect(queue.getBufferingLevel() == VLC_TS_INVALID);
         /* commit some */
-        cmd = factory.createEsOutControlPCRCommand(0, VLC_TS_0 + vlc_tick_from_sec(8));
+        cmd = factory.createEsOutControlPCRCommand(0, SegmentTimes(), VLC_TS_0 + vlc_tick_from_sec(8));
         queue.Schedule(cmd);
         Expect(queue.getDemuxedAmount(VLC_TS_0) == vlc_tick_from_sec(8)); /* PCR committed data up to 8s */
         Expect(queue.getBufferingLevel() == VLC_TS_0 + vlc_tick_from_sec(8));
         Expect(queue.getDemuxedAmount(VLC_TS_0 + vlc_tick_from_sec(8)) == 0);
         Expect(queue.getDemuxedAmount(VLC_TS_0 + vlc_tick_from_sec(7)) == vlc_tick_from_sec(1));
-        Expect(queue.getPCR() == VLC_TS_INVALID);
+        Expect(queue.getPCR().continuous == VLC_TS_INVALID);
         /* extend through PCR */
-        cmd = factory.createEsOutControlPCRCommand(0, VLC_TS_0 + vlc_tick_from_sec(10));
+        cmd = factory.createEsOutControlPCRCommand(0, SegmentTimes(), VLC_TS_0 + vlc_tick_from_sec(10));
         queue.Schedule(cmd);
         Expect(queue.getBufferingLevel() == VLC_TS_0 + vlc_tick_from_sec(10));
         Expect(queue.getDemuxedAmount(VLC_TS_0) == vlc_tick_from_sec(10));
 
         /* dequeue */
-        queue.Process(VLC_TS_0 + vlc_tick_from_sec(3));
-        Expect(queue.getPCR() == VLC_TS_0 + vlc_tick_from_sec(3));
-        Expect(queue.getFirstDTS() == VLC_TS_0 + vlc_tick_from_sec(3));
+        queue.Process(Times(SegmentTimes(), VLC_TS_0 + vlc_tick_from_sec(3)));
+        Expect(queue.getPCR().continuous == VLC_TS_0 + vlc_tick_from_sec(3));
+        Expect(queue.getFirstTimes().continuous == VLC_TS_0 + vlc_tick_from_sec(3));
         Expect(queue.getDemuxedAmount(VLC_TS_0 + vlc_tick_from_sec(3)) == vlc_tick_from_sec(7));
         Expect(queue.getDemuxedAmount(VLC_TS_0 + vlc_tick_from_sec(4)) == vlc_tick_from_sec(6));
 
@@ -171,20 +171,20 @@ int CommandsQueue_test()
             block_t *data = block_Alloc(0);
             Expect(data);
             data->i_dts = VLC_TS_0 + vlc_tick_from_sec(11);
-            cmd = factory.createEsOutSendCommand(id0, data);
+            cmd = factory.createEsOutSendCommand(id0, SegmentTimes(), data);
             queue.Schedule(cmd);
         } while(0);
-        cmd = factory.createEsOutControlPCRCommand(0, VLC_TS_0 + vlc_tick_from_sec(11));
+        cmd = factory.createEsOutControlPCRCommand(0, SegmentTimes(), VLC_TS_0 + vlc_tick_from_sec(11));
         queue.Schedule(cmd);
-        Expect(queue.getPCR() == VLC_TS_0 + vlc_tick_from_sec(3)); /* should be unchanged */
+        Expect(queue.getPCR().continuous == VLC_TS_0 + vlc_tick_from_sec(3)); /* should be unchanged */
         Expect(queue.getDemuxedAmount(VLC_TS_0 + vlc_tick_from_sec(3)) == vlc_tick_from_sec(7));
         queue.setDrop(false);
 
         /* empty */
-        Expect(queue.getPCR() == VLC_TS_0 + vlc_tick_from_sec(3));
-        queue.Process(VLC_TS_0 + vlc_tick_from_sec(13));
+        Expect(queue.getPCR().continuous == VLC_TS_0 + vlc_tick_from_sec(3));
+        queue.Process(Times(SegmentTimes(), VLC_TS_0 + vlc_tick_from_sec(13)));
         Expect(queue.isEmpty());
-        Expect(queue.getPCR() == VLC_TS_0 + vlc_tick_from_sec(9));
+        Expect(queue.getPCR().continuous == VLC_TS_0 + vlc_tick_from_sec(9));
 
         queue.Abort(true);
         esout.cleanup();
@@ -200,17 +200,18 @@ int CommandsQueue_test()
                 block_t *data = block_Alloc(0);
                 Expect(data);
                 data->i_dts = VLC_TS_0 + OFFSET + vlc_tick_from_sec(i);
-                cmd = factory.createEsOutSendCommand(id, data);
+                cmd = factory.createEsOutSendCommand(id, SegmentTimes(), data);
                 queue.Schedule(cmd);
             }
         }
 
-        cmd = factory.createEsOutControlPCRCommand(0, VLC_TS_0 + OFFSET + vlc_tick_from_sec(10));
+        cmd = factory.createEsOutControlPCRCommand(0, SegmentTimes(),
+                                                   VLC_TS_0 + OFFSET + vlc_tick_from_sec(10));
         queue.Schedule(cmd);
         Expect(esout.output.empty());
-        queue.Process(VLC_TS_0 + OFFSET - 1);
+        queue.Process(Times(SegmentTimes(), VLC_TS_0 + OFFSET - 1));
         Expect(esout.output.empty());
-        queue.Process(VLC_TS_0 + OFFSET + vlc_tick_from_sec(10));
+        queue.Process(Times(SegmentTimes(), VLC_TS_0 + OFFSET + vlc_tick_from_sec(10)));
         Expect(esout.output.size() == 10);
         for(size_t i=0; i<5; i++)
         {
@@ -240,15 +241,15 @@ int CommandsQueue_test()
                     block_t *data = block_Alloc(0);
                     Expect(data);
                     data->i_dts = VLC_TS_0 + OFFSET + vlc_tick_from_sec(k * 2 + i);
-                    cmd = factory.createEsOutSendCommand(id, data);
+                    cmd = factory.createEsOutSendCommand(id, SegmentTimes(), data);
                     queue.Schedule(cmd);
                 }
             }
-            cmd = factory.createEsOutControlPCRCommand(0,
+            cmd = factory.createEsOutControlPCRCommand(0, SegmentTimes(),
                     VLC_TS_0 + OFFSET + vlc_tick_from_sec( (k*2)+1 ));
             queue.Schedule(cmd);
         }
-        queue.Process(std::numeric_limits<mtime_t>::max());
+        queue.Process(Times(SegmentTimes(), std::numeric_limits<mtime_t>::max()));
         Expect(esout.output.size() == 12);
         for(size_t i=0; i<12; i++)
         {
@@ -275,15 +276,15 @@ int CommandsQueue_test()
                     Expect(data);
                     if(i==0)
                         data->i_dts = VLC_TS_0 + OFFSET + vlc_tick_from_sec(k);
-                    cmd = factory.createEsOutSendCommand(id, data);
+                    cmd = factory.createEsOutSendCommand(id, SegmentTimes(), data);
                     queue.Schedule(cmd);
                 }
             }
-            cmd = factory.createEsOutControlPCRCommand(0,
+            cmd = factory.createEsOutControlPCRCommand(0, SegmentTimes(),
                     VLC_TS_0 + OFFSET + vlc_tick_from_sec(k));
             queue.Schedule(cmd);
         }
-        queue.Process(std::numeric_limits<mtime_t>::max());
+        queue.Process(Times(SegmentTimes(), std::numeric_limits<mtime_t>::max()));
         Expect(esout.output.size() == 12);
         for(size_t i=0; i<6; i++)
         {
@@ -307,15 +308,15 @@ int CommandsQueue_test()
         for(size_t i=0; i<2; i++)
         {
             const mtime_t now = VLC_TS_0 + OFFSET + vlc_tick_from_sec(i);
-            cmd = factory.createEsOutControlPCRCommand(0, now);
+            cmd = factory.createEsOutControlPCRCommand(0, SegmentTimes(), now);
             queue.Schedule(cmd);
             block_t *data = block_Alloc(0);
             Expect(data);
             data->i_dts = now;
-            cmd = factory.createEsOutSendCommand(id0, data);
+            cmd = factory.createEsOutSendCommand(id0, SegmentTimes(), data);
             queue.Schedule(cmd);
         }
-        queue.Process(VLC_TS_0 + OFFSET + vlc_tick_from_sec(0));
+        queue.Process(Times(SegmentTimes(), VLC_TS_0 + OFFSET + vlc_tick_from_sec(0)));
         Expect(esout.output.size() == 1);
 
     } catch(...) {

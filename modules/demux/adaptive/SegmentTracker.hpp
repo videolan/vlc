@@ -21,6 +21,7 @@
 #define SEGMENTTRACKER_HPP
 
 #include "StreamFormat.hpp"
+#include "Time.hpp"
 #include "playlist/CodecDescription.hpp"
 #include "playlist/Role.hpp"
 
