@@ -61,7 +61,7 @@ namespace adaptive
 
             AbstractStream::BufferingStatus bufferize(vlc_tick_t, vlc_tick_t,
                                                       vlc_tick_t, vlc_tick_t);
-            AbstractStream::Status dequeue(vlc_tick_t, vlc_tick_t *);
+            AbstractStream::Status dequeue(Times, Times *);
 
             virtual bool needsUpdate() const;
             virtual bool updatePlaylist();
@@ -79,10 +79,10 @@ namespace adaptive
             void    setLivePause(bool);
             virtual bool    setPosition(vlc_tick_t);
             vlc_tick_t getResumeTime() const;
-            vlc_tick_t getFirstDTS() const;
+            Times getFirstTimes() const;
             unsigned getActiveStreamsCount() const;
 
-            vlc_tick_t getCurrentDemuxTime() const;
+            Times getCurrentTimes() const;
             vlc_tick_t getMinAheadTime() const;
 
             virtual bool reactivateStream(AbstractStream *);
@@ -116,8 +116,7 @@ namespace adaptive
             struct
             {
                 TimestampSynchronizationPoint pcr_syncpoint;
-                vlc_tick_t  i_nzpcr;
-                vlc_tick_t  i_firstpcr;
+                Times times, firsttimes;
                 mutable vlc_mutex_t lock;
                 vlc_cond_t  cond;
             } demux;

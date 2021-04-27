@@ -148,7 +148,6 @@ FakeESOut::FakeESOut( es_out_t *es, AbstractCommandsQueue *queue,
     expected.b_timestamp_set = false;
     timestamp_first = 0;
     priority = ES_PRIORITY_SELECTABLE_MIN;
-
     vlc_mutex_init(&lock);
 }
 
@@ -180,6 +179,7 @@ void FakeESOut::resetTimestamps()
 {
     setExpectedTimestamp(-1);
     setAssociatedTimestamp(-1);
+    startTimes = SegmentTimes();
 }
 
 bool FakeESOut::getStartTimestamps( vlc_tick_t *pi_mediats, vlc_tick_t *pi_demuxts )
@@ -331,6 +331,16 @@ size_t FakeESOut::esCount() const
         if( (*it)->realESID() )
             i_count++;
     return i_count;
+}
+
+bool FakeESOut::hasSegmentStartTimes() const
+{
+    return startTimes.media != VLC_TICK_INVALID;
+}
+
+void FakeESOut::setSegmentStartTimes(const SegmentTimes &t)
+{
+    startTimes = t;
 }
 
 void FakeESOut::schedulePCRReset()
@@ -542,10 +552,20 @@ int FakeESOut::esOutSend(es_out_id_t *p_es, block_t *p_block)
     FakeESOutID *es_id = reinterpret_cast<FakeESOutID *>( p_es );
     assert(!es_id->scheduledForDeletion());
 
+    if(startTimes.demux == VLC_TICK_INVALID &&
+       p_block->i_dts != VLC_TICK_INVALID)
+    {
+        startTimes.demux = p_block->i_dts;
+    };
+
+    vlc_tick_t elapsed = p_block->i_dts - startTimes.demux;
+    SegmentTimes times = startTimes;
+    times.offsetBy(elapsed);
+
     p_block->i_dts = fixTimestamp( p_block->i_dts );
     p_block->i_pts = fixTimestamp( p_block->i_pts );
 
-    AbstractCommand *command = commandsfactory->createEsOutSendCommand( es_id, p_block );
+   AbstractCommand *command = commandsfactory->createEsOutSendCommand( es_id, times, p_block );
     if( likely(command) )
     {
         commandsqueue->Schedule( command );
@@ -585,8 +605,12 @@ int FakeESOut::esOutControl(int i_query, va_list args)
             else
                 i_group = 0;
             vlc_tick_t  pcr = va_arg( args, vlc_tick_t );
+
+            SegmentTimes times = startTimes;
+            if(startTimes.demux != VLC_TICK_INVALID)
+                times.offsetBy(pcr - startTimes.demux);
             pcr = fixTimestamp( pcr );
-            AbstractCommand *command = commandsfactory->createEsOutControlPCRCommand( i_group, pcr );
+            AbstractCommand *command = commandsfactory->createEsOutControlPCRCommand( i_group, times, pcr );
             if( likely(command) )
             {
                 commandsqueue->Schedule( command );

@@ -148,6 +148,9 @@ bool AbstractStream::resetForNewPosition(vlc_tick_t seekMediaTime)
 
         fakeEsOut()->resetTimestamps();
 
+        fakeEsOut()->commandsQueue()->Abort( true );
+        startTimeContext = SegmentTimes();
+        currentChunk = getNextChunk();
         fakeEsOut()->setExpectedTimestamp(seekMediaTime);
         if( !restartDemux() )
         {
@@ -182,17 +185,17 @@ vlc_tick_t AbstractStream::getMinAheadTime() const
     return segmentTracker->getMinAheadTime();
 }
 
-vlc_tick_t AbstractStream::getFirstDTS() const
+Times AbstractStream::getFirstTimes() const
 {
     vlc_mutex_locker locker(&lock);
 
     if(!valid || disabled)
-        return VLC_TICK_INVALID;
+        return Times();
 
-    vlc_tick_t dts = fakeEsOut()->commandsQueue()->getFirstDTS();
-    if(dts == VLC_TICK_INVALID)
-        dts = fakeEsOut()->commandsQueue()->getPCR();
-    return dts;
+    Times times = fakeEsOut()->commandsQueue()->getFirstTimes();
+    if(times.continuous == VLC_TICK_INVALID)
+        times = fakeEsOut()->commandsQueue()->getPCR();
+    return times;
 }
 
 int AbstractStream::esCount() const
@@ -252,6 +255,9 @@ bool AbstractStream::startDemux()
         needrestart = false;
         discontinuity = false;
     }
+
+    if(!fakeEsOut()->hasSegmentStartTimes())
+        fakeEsOut()->setSegmentStartTimes(startTimeContext);
 
     demuxersource->Reset();
     demuxfirstchunk = true;
@@ -445,23 +451,21 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(vlc_tick_t nz_deadli
     return BufferingStatus::Full;
 }
 
-AbstractStream::Status AbstractStream::dequeue(vlc_tick_t nz_deadline, vlc_tick_t *pi_pcr)
+AbstractStream::Status AbstractStream::dequeue(Times deadline, Times *times)
 {
     vlc_mutex_locker locker(&lock);
 
-    *pi_pcr = nz_deadline;
-
     if(fakeEsOut()->commandsQueue()->isDraining())
     {
-        AdvDebug(vlc_tick_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR();
-                 vlc_tick_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstDTS();
+        AdvDebug(vlc_tick_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR().continuous;
+                 vlc_tick_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstTimes().continuous;
                  vlc_tick_t bufferingLevel = fakeEsOut()->commandsQueue()->getBufferingLevel();
                  msg_Dbg(p_realdemux, "Stream pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " buflevel %" PRId64 "(+%" PRId64 ") [DRAINING] :%s",
-                         pcrvalue, dtsvalue, nz_deadline, bufferingLevel,
+                         pcrvalue, dtsvalue, deadline.continuous, bufferingLevel,
                          pcrvalue ? bufferingLevel - pcrvalue : 0,
                          description.c_str()));
 
-        *pi_pcr = fakeEsOut()->commandsQueue()->Process(VLC_TICK_0 + nz_deadline);
+        *times = fakeEsOut()->commandsQueue()->Process(deadline);
         if(!fakeEsOut()->commandsQueue()->isEmpty())
             return Status::Demuxed;
 
@@ -474,22 +478,22 @@ AbstractStream::Status AbstractStream::dequeue(vlc_tick_t nz_deadline, vlc_tick_
 
     if(!valid || disabled || fakeEsOut()->commandsQueue()->isEOF())
     {
-        *pi_pcr = nz_deadline;
+        *times = deadline;
         return Status::Eof;
     }
 
     vlc_tick_t bufferingLevel = fakeEsOut()->commandsQueue()->getBufferingLevel();
 
-    AdvDebug(vlc_tick_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR();
-             vlc_tick_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstDTS();
+    AdvDebug(vlc_tick_t pcrvalue = fakeEsOut()->commandsQueue()->getPCR().continuous;
+             vlc_tick_t dtsvalue = fakeEsOut()->commandsQueue()->getFirstTimes().continuous;
              msg_Dbg(p_realdemux, "Stream pcr %" PRId64 " dts %" PRId64 " deadline %" PRId64 " buflevel %" PRId64 "(+%" PRId64 "): %s",
-                     pcrvalue, dtsvalue, nz_deadline, bufferingLevel,
+                     pcrvalue, dtsvalue, deadline.continuous, bufferingLevel,
                      pcrvalue ? bufferingLevel - pcrvalue : 0,
                      description.c_str()));
 
-    if(nz_deadline + VLC_TICK_0 <= bufferingLevel) /* demuxed */
+    if(deadline.continuous <= bufferingLevel) /* demuxed */
     {
-        *pi_pcr = fakeEsOut()->commandsQueue()->Process( VLC_TICK_0 + nz_deadline );
+        *times = fakeEsOut()->commandsQueue()->Process(deadline);
         return Status::Demuxed;
     }
 
@@ -499,7 +503,10 @@ AbstractStream::Status AbstractStream::dequeue(vlc_tick_t nz_deadline, vlc_tick_
 ChunkInterface * AbstractStream::getNextChunk() const
 {
     const bool b_restarting = fakeEsOut()->restarting();
-    return segmentTracker->getNextChunk(!b_restarting, connManager);
+    ChunkInterface *ck = segmentTracker->getNextChunk(!b_restarting, connManager);
+    if(ck && !fakeEsOut()->hasSegmentStartTimes())
+        fakeEsOut()->setSegmentStartTimes(startTimeContext);
+    return ck;
 }
 
 block_t * AbstractStream::readNextBlock()
@@ -678,10 +685,19 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
             break;
 
         case TrackerEvent::Type::SegmentChange:
+        {
+            const SegmentChangedEvent &event =
+                    static_cast<const SegmentChangedEvent &>(ev);
             if(demuxer && demuxer->needsRestartOnEachSegment() && !inrestart)
             {
                 needrestart = true;
             }
+            if(startTimeContext.media == VLC_TICK_INVALID)
+            {
+                startTimeContext.media = event.starttime;
+                startTimeContext.display = event.displaytime;
+            }
+        }
             break;
 
         case TrackerEvent::Type::PositionChange:
