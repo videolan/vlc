@@ -825,6 +825,55 @@ static int InitSout( input_thread_t * p_input )
 }
 #endif
 
+static void InitProperties( input_thread_t *input )
+{
+    input_thread_private_t *priv = input_priv(input);
+    input_source_t *master = priv->master;
+    assert(master);
+
+    int capabilites = 0;
+    bool b_can_seek;
+
+    if( demux_Control( master->p_demux, DEMUX_CAN_SEEK, &b_can_seek ) )
+        b_can_seek = false;
+    if( b_can_seek )
+        capabilites |= VLC_INPUT_CAPABILITIES_SEEKABLE;
+
+    if( master->b_can_pause || !master->b_can_pace_control )
+        capabilites |= VLC_INPUT_CAPABILITIES_PAUSEABLE;
+    if( !master->b_can_pace_control || master->b_can_rate_control )
+        capabilites |= VLC_INPUT_CAPABILITIES_CHANGE_RATE;
+    if( !master->b_rescale_ts && !master->b_can_pace_control && master->b_can_rate_control )
+        capabilites |= VLC_INPUT_CAPABILITIES_REWINDABLE;
+
+#ifdef ENABLE_SOUT
+    capabilites |= VLC_INPUT_CAPABILITIES_RECORDABLE;
+#else
+    if( master->b_can_stream_record )
+        capabilites |= VLC_INPUT_CAPABILITIES_RECORDABLE;
+#endif
+
+    input_SendEventCapabilities( input, capabilites );
+
+    int i_attachment;
+    input_attachment_t **attachment;
+    if( !demux_Control( master->p_demux, DEMUX_GET_ATTACHMENTS,
+                        &attachment, &i_attachment ) )
+    {
+        vlc_mutex_lock( &priv->p_item->lock );
+        AppendAttachment( input, i_attachment, attachment );
+        vlc_mutex_unlock( &priv->p_item->lock );
+    }
+
+    int input_type;
+    if( !demux_Control( master->p_demux, DEMUX_GET_TYPE, &input_type ) )
+    {
+        vlc_mutex_lock( &priv->p_item->lock );
+        priv->p_item->i_type = input_type;
+        vlc_mutex_unlock( &priv->p_item->lock );
+    }
+}
+
 static void InitTitle( input_thread_t * p_input, bool had_titles )
 {
     input_thread_private_t *priv = input_priv(p_input);
@@ -1295,6 +1344,8 @@ static int Init( input_thread_t * p_input )
         InputSourceDestroy( master );
         goto error;
     }
+
+    InitProperties( p_input );
 
     InitTitle( p_input, false );
 
@@ -2729,13 +2780,6 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
     }
 
     /* Get infos from (access_)demux */
-    int capabilites = 0;
-    bool b_can_seek;
-    if( demux_Control( in->p_demux, DEMUX_CAN_SEEK, &b_can_seek ) )
-        b_can_seek = false;
-    if( b_can_seek )
-        capabilites |= VLC_INPUT_CAPABILITIES_SEEKABLE;
-
     if( demux_Control( in->p_demux, DEMUX_CAN_CONTROL_PACE,
                        &in->b_can_pace_control ) )
         in->b_can_pace_control = false;
@@ -2760,28 +2804,15 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
         in->b_rescale_ts = true;
     }
 
-    demux_Control( in->p_demux, DEMUX_CAN_PAUSE, &in->b_can_pause );
-
-    if( in->b_can_pause || !in->b_can_pace_control )
-        capabilites |= VLC_INPUT_CAPABILITIES_PAUSEABLE;
-    if( !in->b_can_pace_control || in->b_can_rate_control )
-        capabilites |= VLC_INPUT_CAPABILITIES_CHANGE_RATE;
-    if( !in->b_rescale_ts && !in->b_can_pace_control && in->b_can_rate_control )
-        capabilites |= VLC_INPUT_CAPABILITIES_REWINDABLE;
-
     /* Set record capabilities */
     if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_stream_record ) )
         in->b_can_stream_record = false;
 #ifdef ENABLE_SOUT
     if( !var_GetBool( p_input, "input-record-native" ) )
         in->b_can_stream_record = false;
-    capabilites |= VLC_INPUT_CAPABILITIES_RECORDABLE;
-#else
-    if( in->b_can_stream_record )
-        capabilites |= VLC_INPUT_CAPABILITIES_RECORDABLE;
 #endif
 
-    input_SendEventCapabilities( p_input, capabilites );
+    demux_Control( in->p_demux, DEMUX_CAN_PAUSE, &in->b_can_pause );
 
     /* get attachment
      * FIXME improve for b_preparsing: move it after GET_META and check psz_arturl */
@@ -2805,26 +2836,8 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
             in->i_pts_delay = 0;
     }
 
-    int i_attachment;
-    input_attachment_t **attachment;
-    if( !demux_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
-                         &attachment, &i_attachment ) )
-    {
-        vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
-        AppendAttachment( p_input, i_attachment, attachment );
-        vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
-    }
-
     if( demux_Control( in->p_demux, DEMUX_GET_FPS, &in->f_fps ) )
         in->f_fps = 0.f;
-
-    int input_type;
-    if( !demux_Control( in->p_demux, DEMUX_GET_TYPE, &input_type ) )
-    {
-        vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
-        input_priv(p_input)->p_item->i_type = input_type;
-        vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
-    }
 
     if( var_GetInteger( p_input, "clock-synchro" ) != -1 )
         in->b_can_pace_control = !var_GetInteger( p_input, "clock-synchro" );
