@@ -230,7 +230,7 @@ Widgets.NavigableFocusScope {
                                 topMargin: VLCStyle.dp(10, VLCStyle.scale)
                                 bottomMargin: VLCStyle.dp(10, VLCStyle.scale)
                             }
-                            active: !!medialib
+                            active: !!medialib && !medialib.idle
                             source: "qrc:///widgets/ScanProgressBar.qml"
                         }
                     }

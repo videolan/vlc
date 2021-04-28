@@ -89,6 +89,7 @@ T.ProgressBar {
                     id: loadingAnim
 
                     loops: Animation.Infinite
+                    running: control.indeterminate
 
                     NumberAnimation {
                         from: - 1
