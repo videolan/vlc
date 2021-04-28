@@ -611,6 +611,11 @@ AC_ARG_ENABLE([merge-plugins],
                  [enable the merging of plugins (default disabled)]))
 AM_CONDITIONAL([HAVE_MERGE_PLUGINS], [test "${enable_merge_plugins}" = "yes"])
 
+AC_ARG_ENABLE([static-libvlc],
+  AS_HELP_STRING([--enable-static-libvlc],
+                 [enable the generation of static libvlc and plugins(default disabled)]))
+AM_CONDITIONAL([HAVE_STATIC_LIBVLC], [test "${enable_static_libvlc}" = "yes"])
+
 dnl
 dnl Gettext stuff
 dnl

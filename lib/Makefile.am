@@ -65,6 +65,9 @@ libvlc_la_LDFLAGS = \
 	-no-undefined \
 	-version-info 12:0:0 \
 	-export-symbols $(srcdir)/libvlc.sym
+if HAVE_STATIC_LIBVLC
+libvlc_la_LDFLAGS += -static
+endif
 libvlc_la_DEPENDENCIES = libvlc.sym
 if HAVE_WIN32
 libvlc_la_DEPENDENCIES += ../src/libvlc_win32_rc.$(OBJEXT)

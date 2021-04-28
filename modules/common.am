@@ -27,12 +27,19 @@ AM_LDFLAGS = \
 	-no-undefined \
 	$(top_builddir)/compat/libcompat.la $(LTLIBVLCCORE)
 if HAVE_DYNAMIC_PLUGINS
+
 if HAVE_MERGE_PLUGINS
+AM_CPPFLAGS += -DMODULE_NAME=$(MODULE_NAME)
+AM_LDFLAGS += -static
+else
+if HAVE_STATIC_LIBVLC
 AM_CPPFLAGS += -DMODULE_NAME=$(MODULE_NAME)
 AM_LDFLAGS += -static
 else
 AM_CPPFLAGS += -D__PLUGIN__
 endif
+endif
+
 else
 AM_CPPFLAGS += -DMODULE_NAME=$(MODULE_FULLNAME)
 AM_LDFLAGS += -static
