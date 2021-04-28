@@ -20,6 +20,7 @@ variables:
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20210730131708
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-focal:20210611174203
     VLC_RASPBIAN_IMAGE: registry.videolan.org/vlc-debian-raspbian:20200213203125
+    VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20210601090557
 
 .variables-debian: &variables-debian
         HOST_ARCH: x86_64
@@ -101,6 +102,11 @@ variables:
 .variables-android-x86_64: &variables-android-x86_64
         ANDROID_ARCH: x86_64
         TRIPLET: x86_64-linux-android
+
+.variables-emscripten-wasm32: &variables-emscripten-wasm32
+        HOST_ARCH: wasm32
+        TRIPLET: $HOST_ARCH-unknown-emscripten
+        EMSDK_VERSION: 2.0.23
 
 # Common rules
 .base-template:
@@ -456,6 +462,24 @@ android-x86:
 android-x86_64:
     extends: .android-common
     variables: *variables-android-x86_64
+
+#
+# Webassembly
+#
+
+wasm32-emscripten-build :
+    extends: .docker-template
+    variables: *variables-emscripten-wasm32
+    image:
+        name: $VLC_WASM_EMSCRIPTEN
+    script:
+        - source $EMSCRIPTEN_SDK/emsdk_env.sh
+        - |
+            if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+                ./extras/package/wasm-emscripten/build.sh --with-prebuilt-contribs
+            else
+                ./extras/package/wasm-emscripten/build.sh --gen-contrib-archive
+            fi
 
 #
 # VLC Documentation
