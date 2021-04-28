@@ -187,6 +187,18 @@ Widgets.NavigableFocusScope {
                 }
 
                 pictureOverlay: Item {
+                    Rectangle
+                    {
+                        anchors.fill: parent
+
+                        radius: VLCStyle.gridCover_radius
+
+                        gradient: Gradient {
+                            GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.3) }
+                            GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.7) }
+                        }
+                    }
+
                     Column {
                         anchors.centerIn: parent
 
