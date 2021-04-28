@@ -687,11 +687,12 @@ if [ "$VLC_DISABLE_DEBUG" -gt "0" ]; then
     VLC_CONFIG_OPTIONS+=( "--disable-debug" )
 fi
 
-if [ "$VLC_BUILD_DYNAMIC" -gt "0" ]; then
-    VLC_CONFIG_OPTIONS+=( "--enable-shared" )
-else
-    VLC_CONFIG_OPTIONS+=( "--disable-shared" "--enable-static" )
-fi
+#if [ "$VLC_BUILD_DYNAMIC" -gt "0" ]; then
+#    VLC_CONFIG_OPTIONS+=( "--enable-shared" )
+#else
+#    VLC_CONFIG_OPTIONS+=( "--disable-shared" "--enable-static" )
+#fi
+VLC_CONFIG_OPTIONS+=( "--enable-static-libvlc" )
 
 if [ "$VLC_MERGE_PLUGINS" -gt "0" ]; then
     VLC_CONFIG_OPTIONS+=( "--enable-merge-plugins" )
