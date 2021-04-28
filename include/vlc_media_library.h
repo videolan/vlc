@@ -501,8 +501,8 @@ enum vlc_ml_control
     VLC_ML_REMOVE_FOLDER,           /**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_BAN_FOLDER,              /**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_UNBAN_FOLDER,            /**< arg1: mrl (const char*)  res: can't fail */
-    VLC_ML_LIST_FOLDERS,            /**< arg1: entrypoints (vlc_ml_folder_list_t**); res: can fail */
-    VLC_ML_LIST_BANNED_FOLDERS,     /**< arg1: entrypoints (vlc_ml_folder_list_t**); res: can fail */
+    VLC_ML_LIST_ENTRY_POINTS,       /**< arg1: mrl (const char*)  res: can't fail */
+    VLC_ML_LIST_BANNED_ENTRY_POINTS,/**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_IS_INDEXED,              /**< arg1: mrl (const char*) arg2 (out): bool*;       res: can fail */
     /**
      * Reload a specific folder, or all.
@@ -924,16 +924,16 @@ static inline int vlc_ml_unban_folder( vlc_medialibrary_t* p_ml, const char* psz
     return vlc_ml_control( p_ml, VLC_ML_UNBAN_FOLDER, psz_folder );
 }
 
-static inline int vlc_ml_list_folder( vlc_medialibrary_t* p_ml,
-                                      vlc_ml_folder_list_t** pp_entrypoints )
+static inline int vlc_ml_list_entry_points( vlc_medialibrary_t* p_ml,
+                                            vlc_ml_folder_list_t** pp_entrypoints )
 {
-    return vlc_ml_control( p_ml, VLC_ML_LIST_FOLDERS, pp_entrypoints );
+    return vlc_ml_control( p_ml, VLC_ML_LIST_ENTRY_POINTS, pp_entrypoints );
 }
 
-static inline int vlc_ml_list_banned_folder( vlc_medialibrary_t* p_ml,
-                                             vlc_ml_folder_list_t** pp_entrypoints )
+static inline int vlc_ml_list_banned_entry_points( vlc_medialibrary_t* p_ml,
+                                                   vlc_ml_folder_list_t** pp_entrypoints )
 {
-    return vlc_ml_control( p_ml, VLC_ML_LIST_BANNED_FOLDERS, pp_entrypoints );
+    return vlc_ml_control( p_ml, VLC_ML_LIST_BANNED_ENTRY_POINTS, pp_entrypoints );
 }
 
 static inline int vlc_ml_is_indexed( vlc_medialibrary_t* p_ml,
