@@ -60,15 +60,21 @@ private:
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
 
+    QString getCover(MLGenre * genre, int index) const;
 
-    static QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
+private slots:
+    void onCover();
 
+private:
     struct Loader : public BaseLoader
     {
         Loader(const MLGenreModel &model) : BaseLoader(model) {}
         size_t count() const override;
         std::vector<std::unique_ptr<MLItem>> load(size_t index, size_t count) const override;
     };
+
+private: // Variables
+    static QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
 };
 
 
