@@ -199,7 +199,6 @@ void MainUI::registerQMLTypes()
         registerAnonymousType<MLAlbum>("org.videolan.medialib", 1);
         registerAnonymousType<MLArtist>("org.videolan.medialib", 1);
         registerAnonymousType<MLAlbumTrack>("org.videolan.medialib", 1);
-        registerAnonymousType<MLGenre>("org.videolan.medialib", 1);
         registerAnonymousType<MLPlaylist>("org.videolan.medialib", 1);
 
         qmlRegisterType<AlbumContextMenu>( "org.videolan.medialib", 0, 1, "AlbumContextMenu" );

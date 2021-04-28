@@ -22,33 +22,26 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include "vlc_common.h"
 
-#include <memory>
-#include <QObject>
-#include <QString>
-#include <QList>
-#include <QRunnable>
-#include <vlc_media_library.h>
-#include "mlhelper.hpp"
+// Util includes
+#include "util/covergenerator.hpp"
+
+// MediaLibrary includes
 #include "mlqmltypes.hpp"
 
-class MLGenre : public QObject, public MLItem
+class MLGenre : public MLItem
 {
-    Q_OBJECT
-
 public:
-    MLGenre( vlc_medialibrary_t* _ml, const vlc_ml_genre_t *_data, QObject *_parent = nullptr);
-    ~MLGenre();
+    MLGenre( vlc_medialibrary_t* _ml, const vlc_ml_genre_t *_data );
+
+    bool hasGenerator() const;
+    void setGenerator(CoverGenerator * generator);
 
     QString getName() const;
     unsigned int getNbTracks() const;
+
     QString getCover() const;
-
-    void setCover(QString cover);
-
-signals:
-    void askGenerateCover( QPrivateSignal ) const;
+    void    setCover(const QString & fileName);
 
 private slots:
     void generateThumbnail();
@@ -56,9 +49,11 @@ private slots:
 private:
     vlc_medialibrary_t* m_ml;
 
+    TaskHandle<CoverGenerator> m_generator;
+
     QString m_name;
     QString m_cover;
-    QRunnable* m_coverTask = nullptr;
+
     unsigned int m_nbTracks;
 };
 
