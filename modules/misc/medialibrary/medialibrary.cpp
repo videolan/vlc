@@ -552,14 +552,18 @@ int MediaLibrary::Control( int query, va_list args )
             break;
         }
         case VLC_ML_LIST_ENTRY_POINTS:
-        case VLC_ML_LIST_BANNED_ENTRY_POINTS:
         {
-            auto entryPoints = ( query == VLC_ML_LIST_ENTRY_POINTS )
-                    ? m_ml->entryPoints()->all()
-                    : m_ml->bannedEntryPoints()->all();
-            auto res = ml_convert_list<vlc_ml_folder_list_t,
-                                         vlc_ml_folder_t>( entryPoints );
-            *(va_arg( args, vlc_ml_folder_list_t**) ) = res;
+            const bool banned = va_arg( args, int ) != 0;
+            auto entrypoints_query =
+                ( banned ) ? m_ml->bannedEntryPoints() : m_ml->entryPoints();
+
+            vlc_ml_folder_list_t *res = nullptr;
+            if ( entrypoints_query != nullptr )
+            {
+                res = ml_convert_list<vlc_ml_folder_list_t, vlc_ml_folder_t>(
+                    entrypoints_query->all() );
+            }
+            *( va_arg( args, vlc_ml_folder_list_t ** ) ) = res;
             break;
         }
         case VLC_ML_IS_INDEXED:
