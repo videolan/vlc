@@ -21,7 +21,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined( MODULE_NAME_IS_i420_yuy2_sse2 )
+#if defined( PLUGIN_SSE2 )
 
 #if defined(CAN_COMPILE_SSE2)
 

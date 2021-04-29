@@ -31,7 +31,7 @@
 #include <vlc_cpu.h>
 
 #include "i420_rgb.h"
-#ifdef SSE2
+#ifdef PLUGIN_SSE2
 # include "i420_rgb_sse2.h"
 # define VLC_TARGET VLC_SSE
 #endif
@@ -158,7 +158,7 @@ void I420_R5G5B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
                     (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) :
                     (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);
 
-#ifdef SSE2
+#ifdef PLUGIN_SSE2
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 15;
 
@@ -342,7 +342,7 @@ void I420_R5G6B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
                     (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) :
                     (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);
 
-#ifdef SSE2
+#ifdef PLUGIN_SSE2
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 15;
 
@@ -526,7 +526,7 @@ void I420_A8R8G8B8( filter_t *p_filter, picture_t *p_src,
                     (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) :
                     (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);
 
-#ifdef SSE2
+#ifdef PLUGIN_SSE2
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 15;
 
@@ -709,7 +709,7 @@ void I420_R8G8B8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
                     (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) :
                     (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);
 
-#ifdef SSE2
+#ifdef PLUGIN_SSE2
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 15;
 
@@ -892,7 +892,7 @@ void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
                     (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) :
                     (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);
 
-#ifdef SSE2
+#ifdef PLUGIN_SSE2
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 15;
 
@@ -1075,7 +1075,7 @@ void I420_A8B8G8R8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
                     (p_filter->fmt_out.video.i_y_offset + p_filter->fmt_out.video.i_visible_height) :
                     (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height);
 
-#ifdef SSE2
+#ifdef PLUGIN_SSE2
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 15;
 

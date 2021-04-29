@@ -38,7 +38,7 @@
 #include "i422_yuy2.h"
 
 #define SRC_FOURCC  "I422"
-#if defined (MODULE_NAME_IS_i422_yuy2)
+#if defined (PLUGIN_PLAIN)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,Y211"
 #else
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV"
@@ -53,12 +53,12 @@ static int  Activate ( filter_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
-#if defined (MODULE_NAME_IS_i422_yuy2)
+#if defined (PLUGIN_PLAIN)
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     set_callback_video_converter( Activate, 80 )
 # define vlc_CPU_capable() (true)
 # define VLC_TARGET
-#elif defined (MODULE_NAME_IS_i422_yuy2_sse2)
+#elif defined (PLUGIN_SSE2)
     set_description( N_("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     set_callback_video_converter( Activate, 120 )
 # define vlc_CPU_capable() vlc_CPU_SSE2()
@@ -71,7 +71,7 @@ VIDEO_FILTER_WRAPPER( I422_YUY2 )
 VIDEO_FILTER_WRAPPER( I422_YVYU )
 VIDEO_FILTER_WRAPPER( I422_UYVY )
 VIDEO_FILTER_WRAPPER( I422_IUYV )
-#if defined (MODULE_NAME_IS_i422_yuy2)
+#if defined (PLUGIN_PLAIN)
 VIDEO_FILTER_WRAPPER( I422_Y211 )
 #endif
 
@@ -93,7 +93,7 @@ GetFilterOperations(filter_t *filter)
         case VLC_FOURCC('I','U','Y','V'):
             return &I422_IUYV_ops;
 
-#if defined (MODULE_NAME_IS_i422_yuy2)
+#if defined (PLUGIN_PLAIN)
         case VLC_CODEC_Y211:
             return &I422_Y211_ops;
 #endif
@@ -162,7 +162,7 @@ static void I422_YUY2( filter_t *p_filter, picture_t *p_source,
                                - p_dest->p->i_visible_pitch
                                - ( p_filter->fmt_out.video.i_x_offset * 2 );
 
-#if defined (MODULE_NAME_IS_i422_yuy2_sse2)
+#if defined (PLUGIN_SSE2)
 
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
         ((intptr_t)p_line|(intptr_t)p_y))) )
@@ -252,7 +252,7 @@ static void I422_YVYU( filter_t *p_filter, picture_t *p_source,
                                - p_dest->p->i_visible_pitch
                                - ( p_filter->fmt_out.video.i_x_offset * 2 );
 
-#if defined (MODULE_NAME_IS_i422_yuy2_sse2)
+#if defined (PLUGIN_SSE2)
 
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
         ((intptr_t)p_line|(intptr_t)p_y))) )
@@ -342,7 +342,7 @@ static void I422_UYVY( filter_t *p_filter, picture_t *p_source,
                                - p_dest->p->i_visible_pitch
                                - ( p_filter->fmt_out.video.i_x_offset * 2 );
 
-#if defined (MODULE_NAME_IS_i422_yuy2_sse2)
+#if defined (PLUGIN_SSE2)
 
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
         ((intptr_t)p_line|(intptr_t)p_y))) )
@@ -422,7 +422,7 @@ static void I422_IUYV( filter_t *p_filter, picture_t *p_source,
 /*****************************************************************************
  * I422_Y211: planar YUV 4:2:2 to packed YUYV 2:1:1
  *****************************************************************************/
-#if defined (MODULE_NAME_IS_i422_yuy2)
+#if defined (PLUGIN_PLAIN)
 static void I422_Y211( filter_t *p_filter, picture_t *p_source,
                                            picture_t *p_dest )
 {

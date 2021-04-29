@@ -21,8 +21,8 @@
  *****************************************************************************/
 #include <limits.h>
 
-#if !defined (SSE2)
-# define PLAIN
+#if !defined (PLUGIN_SSE2)
+# define PLUGIN_PLAIN
 #endif
 
 /** Number of entries in RGB palette/colormap */
@@ -41,7 +41,7 @@ typedef struct
     uint8_t   i_bytespp;
     int *p_offset;
 
-#ifdef PLAIN
+#ifdef PLUGIN_PLAIN
     /**< Pre-calculated conversion tables */
     void *p_base;                      /**< base for all conversion tables */
     uint8_t   *p_rgb8;                 /**< RGB 8 bits table */
@@ -80,7 +80,7 @@ static inline int AllocateOrGrow( uint8_t **pp_buffer, size_t *pi_buffer,
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifdef PLAIN
+#ifdef PLUGIN_PLAIN
 void I420_RGB8         ( filter_t *, picture_t *, picture_t * );
 void I420_RGB16        ( filter_t *, picture_t *, picture_t * );
 void I420_RGB32        ( filter_t *, picture_t *, picture_t * );

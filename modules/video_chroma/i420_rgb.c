@@ -36,7 +36,7 @@
 #include <vlc_cpu.h>
 
 #include "i420_rgb.h"
-#ifdef PLAIN
+#ifdef PLUGIN_PLAIN
 # include "i420_rgb_c.h"
 
 static void SetYUV( filter_t *, const video_format_t * );
@@ -58,7 +58,7 @@ static int  Activate   ( filter_t * );
 static void Deactivate ( filter_t * );
 
 vlc_module_begin ()
-#if defined (SSE2)
+#if defined (PLUGIN_SSE2)
     set_description( N_( "SSE2 I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") )
     set_callback_video_converter( Activate, 120 )
@@ -71,7 +71,7 @@ vlc_module_begin ()
 #endif
 vlc_module_end ()
 
-#ifndef PLAIN
+#ifndef PLUGIN_PLAIN
 VIDEO_FILTER_WRAPPER_CLOSE_EXT( I420_R5G5B5, Deactivate )
 VIDEO_FILTER_WRAPPER_CLOSE_EXT( I420_R5G6B5, Deactivate )
 VIDEO_FILTER_WRAPPER_CLOSE_EXT( I420_A8R8G8B8, Deactivate )
@@ -91,7 +91,7 @@ VIDEO_FILTER_WRAPPER_CLOSE_EXT( I420_RGB32, Deactivate )
  *****************************************************************************/
 static int Activate( filter_t *p_filter )
 {
-#ifdef PLAIN
+#ifdef PLUGIN_PLAIN
     size_t i_tables_size;
 #endif
 
@@ -114,7 +114,7 @@ static int Activate( filter_t *p_filter )
         case VLC_CODEC_I420:
             switch( p_filter->fmt_out.video.i_chroma )
             {
-#ifndef PLAIN
+#ifndef PLUGIN_PLAIN
                 case VLC_CODEC_RGB15:
                 case VLC_CODEC_RGB16:
                     /* If we don't have support for the bitmasks, bail out */
@@ -204,7 +204,7 @@ static int Activate( filter_t *p_filter )
     p_sys->p_buffer = NULL;
     switch( p_filter->fmt_out.video.i_chroma )
     {
-#ifdef PLAIN
+#ifdef PLUGIN_PLAIN
         case VLC_CODEC_RGB8:
             p_sys->i_bytespp = 1;
             break;
@@ -232,7 +232,7 @@ static int Activate( filter_t *p_filter )
         return VLC_EGENERIC;
     }
 
-#ifdef PLAIN
+#ifdef PLUGIN_PLAIN
     switch( p_filter->fmt_out.video.i_chroma )
     {
     case VLC_CODEC_RGB8:
@@ -277,7 +277,7 @@ static void Deactivate( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-#ifdef PLAIN
+#ifdef PLUGIN_PLAIN
     free( p_sys->p_base );
 #endif
     free( p_sys->p_offset );
@@ -285,7 +285,7 @@ static void Deactivate( filter_t *p_filter )
     free( p_sys );
 }
 
-#ifdef PLAIN
+#ifdef PLUGIN_PLAIN
 /*****************************************************************************
  * SetYUV: compute tables and set function pointers
  *****************************************************************************/
