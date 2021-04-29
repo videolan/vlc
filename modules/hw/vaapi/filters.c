@@ -492,6 +492,7 @@ Adjust_UpdateVAFilterParams(void * p_data, void * va_params)
 static picture_t *
 Adjust(filter_t * filter, picture_t * src)
 {
+    if (src == NULL) return NULL;
     picture_t *const    dest =
         Filter(filter, src, Adjust_UpdateVAFilterParams, NULL, NULL);
     picture_Release(src);
@@ -633,6 +634,7 @@ BasicFilter_UpdateVAFilterParams(void * p_data, void * va_params)
 static picture_t *
 BasicFilter(filter_t * filter, picture_t * src)
 {
+    if (src == NULL) return NULL;
     picture_t *const    dest =
         Filter(filter, src, BasicFilter_UpdateVAFilterParams, NULL, NULL);
     picture_Release(src);
@@ -820,6 +822,7 @@ Deinterlace_UpdatePipelineParams
 static picture_t *
 Deinterlace(filter_t * filter, picture_t * src)
 {
+    if (src == NULL) return NULL;
     filter_sys_t *const         filter_sys = filter->p_sys;
     struct deint_data *const    p_deint_data = filter_sys->p_data;
 
@@ -842,6 +845,7 @@ Deinterlace(filter_t * filter, picture_t * src)
 static picture_t *
 DeinterlaceX2(filter_t * filter, picture_t * src)
 {
+    if (src == NULL) return NULL;
     filter_sys_t *const         filter_sys = filter->p_sys;
     struct deint_data *const    p_deint_data = filter_sys->p_data;
     const video_format_t *      fmt = &filter->fmt_out.video;
