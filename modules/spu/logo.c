@@ -148,7 +148,6 @@ typedef struct
     int i_pos;
     int i_pos_x;
     int i_pos_y;
-    bool b_absolute;
 
     /* On the fly control variable */
     bool b_spu_update;
@@ -272,7 +271,6 @@ static int OpenCommon( filter_t *p_filter, bool b_sub )
     p_sys->i_pos = var_CreateGetIntegerCommand( p_filter, "logo-position" );
     p_sys->i_pos_x = var_CreateGetIntegerCommand( p_filter, "logo-x" );
     p_sys->i_pos_y = var_CreateGetIntegerCommand( p_filter, "logo-y" );
-    p_sys->b_absolute = (p_sys->i_pos < 0);
 
     /* Ignore aligment if a position is given for video filter */
     if( !b_sub && p_sys->i_pos_x >= 0 && p_sys->i_pos_y >= 0 )
@@ -352,7 +350,6 @@ static subpicture_t *FilterSub( filter_t *p_filter, vlc_tick_t date )
     if( !p_spu )
         goto exit;
 
-    p_spu->b_absolute = p_sys->b_absolute;
     p_spu->i_start = date;
     p_spu->i_stop = 0;
     p_spu->b_ephemer = true;

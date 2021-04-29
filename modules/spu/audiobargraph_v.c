@@ -118,7 +118,6 @@ typedef struct
     int i_pos;
     int i_pos_x;
     int i_pos_y;
-    bool b_absolute;
 
     /* On the fly control variable */
     bool b_spu_update;
@@ -365,7 +364,6 @@ static subpicture_t *FilterSub(filter_t *p_filter, vlc_tick_t date)
     if (!p_spu)
         goto exit;
 
-    p_spu->b_absolute = p_sys->b_absolute;
     p_spu->i_start = date;
     p_spu->i_stop = 0;
     p_spu->b_ephemer = true;
