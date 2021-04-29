@@ -439,7 +439,7 @@ static picture_t *FilterVideo(filter_t *p_filter, picture_t *p_src)
     const int i_dst_w = p_filter->fmt_out.video.i_visible_width;
     const int i_dst_h = p_filter->fmt_out.video.i_visible_height;
 
-    if (p_sys->i_pos) {
+    if (p_sys->i_pos >= 0) {
         if (p_sys->i_pos & SUBPICTURE_ALIGN_BOTTOM)
             p_sys->i_pos_y = i_dst_h - p_fmt->i_visible_height;
         else if (!(p_sys->i_pos & SUBPICTURE_ALIGN_TOP))
@@ -528,7 +528,7 @@ static int OpenCommon(filter_t *p_filter, bool b_sub)
 
     /* Ignore aligment if a position is given for video filter */
     if (!b_sub && p_sys->i_pos_x >= 0 && p_sys->i_pos_y >= 0)
-        p_sys->i_pos = 0;
+        p_sys->i_pos = -1;
 
     vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(p_filter));
 

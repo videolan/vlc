@@ -274,7 +274,7 @@ static int OpenCommon( filter_t *p_filter, bool b_sub )
 
     /* Ignore aligment if a position is given for video filter */
     if( !b_sub && p_sys->i_pos_x >= 0 && p_sys->i_pos_y >= 0 )
-        p_sys->i_pos = 0;
+        p_sys->i_pos = -1;
 
     vlc_mutex_init( &p_sys->lock );
     LogoListLoad( VLC_OBJECT(p_filter), p_list, psz_filename );
@@ -444,7 +444,7 @@ static picture_t *FilterVideo( filter_t *p_filter, picture_t *p_src )
         const int i_dst_w = p_filter->fmt_out.video.i_visible_width;
         const int i_dst_h = p_filter->fmt_out.video.i_visible_height;
 
-        if( p_sys->i_pos )
+        if( p_sys->i_pos >= 0 )
         {
             if( p_sys->i_pos & SUBPICTURE_ALIGN_BOTTOM )
             {
