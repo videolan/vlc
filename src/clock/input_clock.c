@@ -159,17 +159,12 @@ static void UpdateListener( input_clock_t *cl )
 /*****************************************************************************
  * input_clock_New: create a new clock
  *****************************************************************************/
-input_clock_t *input_clock_New( vlc_clock_t *clock_listener, float rate )
+input_clock_t *input_clock_New( float rate )
 {
     input_clock_t *cl = malloc( sizeof(*cl) );
     if( !cl )
-    {
-        if( cl->clock_listener )
-            vlc_clock_Delete( cl->clock_listener );
         return NULL;
-    }
-
-    cl->clock_listener = clock_listener;
+    cl->clock_listener = NULL;
 
     cl->b_has_reference = false;
     cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
@@ -203,6 +198,14 @@ void input_clock_Delete( input_clock_t *cl )
     if( cl->clock_listener )
         vlc_clock_Delete( cl->clock_listener );
     free( cl );
+}
+
+void input_clock_AttachListener( input_clock_t *cl, vlc_clock_t *clock_listener )
+{
+    assert( clock_listener && cl->clock_listener == NULL );
+    assert( !cl->b_has_reference );
+
+    cl->clock_listener = clock_listener;
 }
 
 /*****************************************************************************

@@ -38,12 +38,21 @@ typedef struct input_clock_t input_clock_t;
 /**
  * This function creates a new input_clock_t.
  *
- * \param clock_listener clock created with vlc_clock_main_CreateMaster(). If
- * valid, the input_clock_t will take ownership of this clock and drive the
- * main clock.
  * You must use input_clock_Delete to delete it once unused.
  */
-input_clock_t *input_clock_New( vlc_clock_t *clock_listener, float rate );
+input_clock_t *input_clock_New( float rate );
+
+/**
+ * This function attach a clock listener to the input clock
+ *
+ * It can be called only one time, with a valid clock, before the first update
+ * (input_clock_Update()).
+ *
+ * \param clock_listener clock created with vlc_clock_main_CreateInputMaster().
+ * The input_clock_t will take ownership of this clock and drive the main
+ * clock.
+ */
+void input_clock_AttachListener( input_clock_t *, vlc_clock_t *clock_listener );
 
 /**
  * This function destroys a input_clock_t created by input_clock_New.

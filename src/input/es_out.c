@@ -1439,13 +1439,15 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
             break;
     }
 
-    p_pgrm->p_input_clock = input_clock_New( p_master_clock, p_sys->rate );
+    p_pgrm->p_input_clock = input_clock_New( p_sys->rate );
     if( !p_pgrm->p_input_clock )
     {
         vlc_clock_main_Delete( p_pgrm->p_main_clock );
         free( p_pgrm );
         return NULL;
     }
+    if( p_master_clock != NULL )
+        input_clock_AttachListener( p_pgrm->p_input_clock, p_master_clock );
 
     if( p_sys->b_paused )
         input_clock_ChangePause( p_pgrm->p_input_clock, p_sys->b_paused, p_sys->i_pause_date );
