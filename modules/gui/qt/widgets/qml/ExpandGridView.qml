@@ -440,7 +440,17 @@ NavigableFocusScope {
         anchors.fill: parent
         onWidthChanged: { layout(true) }
         onHeightChanged: { layout(false) }
-        onContentYChanged: { layout(false) }
+        onContentYChanged: { scrollLayoutTimer.start() }
+
+        Timer {
+            id: scrollLayoutTimer
+
+            interval: 1
+            running: false
+            repeat: false
+            triggeredOnStart: false
+            onTriggered: flickable.layout(false)
+        }
 
         function getExpandItemGridId() {
             var ret
