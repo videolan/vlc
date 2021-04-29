@@ -77,7 +77,7 @@ typedef struct
     /* Clock for this program */
     input_clock_t    *p_input_clock;
     vlc_clock_main_t *p_main_clock;
-    const vlc_clock_t *p_master_clock;
+    enum vlc_clock_master_source active_clock_source;
 
     vlc_tick_t i_last_pcr;
 
@@ -1280,11 +1280,24 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
     input_thread_t *p_input = p_sys->p_input;
     input_thread_private_t *priv = input_priv(p_input);
 
+    /* XXX: The clock source selection depends on priv->b_can_pace_control but
+     * this variable is only initialized from the input_thread_t after the
+     * demux is opened. Programs and ES tracks can be created from the demux
+     * open callback or midstream (from the demux callback). Therefore, we
+     * can't handle the clock source selection after the program is created
+     * since priv->b_can_pace_control might not be initialized. To fix this
+     * issue, handle clock source selection when the first PCR is sent (from
+     * ES_OUT_SET_PCR). */
+    assert( p_sys->b_active );
+
     switch( p_sys->clock_source )
     {
         case VLC_CLOCK_MASTER_AUTO:
             if (priv->b_can_pace_control)
+            {
+                p_pgrm->active_clock_source = VLC_CLOCK_MASTER_AUDIO;
                 break;
+            }
             msg_Dbg( p_input, "The input can't pace, selecting the input (PCR) as the "
                      "clock source" );
             /* Fall-through */
@@ -1292,13 +1305,14 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
         {
             vlc_clock_t *p_master_clock =
                 vlc_clock_main_CreateInputMaster( p_pgrm->p_main_clock );
-            p_pgrm->p_master_clock = p_master_clock;
 
             if( p_master_clock != NULL )
                 input_clock_AttachListener( p_pgrm->p_input_clock, p_master_clock );
+            p_pgrm->active_clock_source = VLC_CLOCK_MASTER_INPUT;
             break;
         }
         default:
+            p_pgrm->active_clock_source = p_sys->clock_source;
             break;
     }
 }
@@ -1440,8 +1454,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
     p_pgrm->b_scrambled = false;
     p_pgrm->i_last_pcr = VLC_TICK_INVALID;
     p_pgrm->p_meta = NULL;
-
-    p_pgrm->p_master_clock = NULL;
+    p_pgrm->active_clock_source = VLC_CLOCK_MASTER_AUTO;
 
     p_pgrm->p_main_clock = vlc_clock_main_New();
     if( !p_pgrm->p_main_clock )
@@ -1457,8 +1470,6 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
         free( p_pgrm );
         return NULL;
     }
-
-    EsOutProgramHandleClockSource( out, p_pgrm );
 
     if( p_sys->b_paused )
         input_clock_ChangePause( p_pgrm->p_input_clock, p_sys->b_paused, p_sys->i_pause_date );
@@ -2249,11 +2260,10 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     }
 
     if( p_es->fmt.i_cat != UNKNOWN_ES
-     && p_es->fmt.i_cat == clock_source_cat
-     && p_es->p_pgrm->p_master_clock == NULL )
+     && p_es->fmt.i_cat == clock_source_cat )
     {
         p_es->master = true;
-        p_es->p_pgrm->p_master_clock = p_es->p_clock =
+        p_es->p_clock =
             vlc_clock_main_CreateMaster( p_es->p_pgrm->p_main_clock,
                                          &clock_cbs, p_es );
     }
@@ -2316,8 +2326,6 @@ static void EsOutDestroyDecoder( es_out_t *out, es_out_id_t *p_es )
 
     vlc_input_decoder_Delete( p_es->p_dec );
     p_es->p_dec = NULL;
-    if( p_es->p_pgrm->p_master_clock == p_es->p_clock )
-        p_es->p_pgrm->p_master_clock = NULL;
     vlc_clock_Delete( p_es->p_clock );
     p_es->p_clock = NULL;
 
@@ -3269,6 +3277,12 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         }
         if( !p_pgrm )
             return VLC_EGENERIC;
+
+        if( p_pgrm->active_clock_source == VLC_CLOCK_MASTER_AUTO )
+        {
+            EsOutProgramHandleClockSource( out, p_pgrm );
+            assert( p_pgrm->active_clock_source != VLC_CLOCK_MASTER_AUTO );
+        }
 
         i_pcr = va_arg( args, vlc_tick_t );
         if( i_pcr == VLC_TICK_INVALID )
