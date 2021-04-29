@@ -1274,6 +1274,35 @@ static void EsOutSendEsEvent(es_out_t *out, es_out_id_t *es, int action,
     });
 }
 
+static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm )
+{
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    input_thread_t *p_input = p_sys->p_input;
+    input_thread_private_t *priv = input_priv(p_input);
+
+    switch( p_sys->clock_source )
+    {
+        case VLC_CLOCK_MASTER_AUTO:
+            if (priv->b_can_pace_control)
+                break;
+            msg_Dbg( p_input, "The input can't pace, selecting the input (PCR) as the "
+                     "clock source" );
+            /* Fall-through */
+        case VLC_CLOCK_MASTER_INPUT:
+        {
+            vlc_clock_t *p_master_clock =
+                vlc_clock_main_CreateInputMaster( p_pgrm->p_main_clock );
+            p_pgrm->p_master_clock = p_master_clock;
+
+            if( p_master_clock != NULL )
+                input_clock_AttachListener( p_pgrm->p_input_clock, p_master_clock );
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 /* EsOutIsGroupSticky
  *
  * A sticky group can be attached to any other programs. This is the case for
@@ -1393,7 +1422,6 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
-    input_thread_private_t *priv = input_priv(p_input);
 
     /* Sticky groups will be attached to any existing programs, no need to
      * create one. */
@@ -1422,23 +1450,6 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
         return NULL;
     }
 
-    vlc_clock_t *p_master_clock = NULL;
-    switch( p_sys->clock_source )
-    {
-        case VLC_CLOCK_MASTER_AUTO:
-            if (priv->b_can_pace_control)
-                break;
-            msg_Dbg( p_input, "The input can't pace, selecting the input (PCR) as the "
-                     "clock source" );
-            /* Fall-through */
-        case VLC_CLOCK_MASTER_INPUT:
-            p_pgrm->p_master_clock = p_master_clock =
-                vlc_clock_main_CreateInputMaster( p_pgrm->p_main_clock );
-            break;
-        default:
-            break;
-    }
-
     p_pgrm->p_input_clock = input_clock_New( p_sys->rate );
     if( !p_pgrm->p_input_clock )
     {
@@ -1446,8 +1457,8 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
         free( p_pgrm );
         return NULL;
     }
-    if( p_master_clock != NULL )
-        input_clock_AttachListener( p_pgrm->p_input_clock, p_master_clock );
+
+    EsOutProgramHandleClockSource( out, p_pgrm );
 
     if( p_sys->b_paused )
         input_clock_ChangePause( p_pgrm->p_input_clock, p_sys->b_paused, p_sys->i_pause_date );
