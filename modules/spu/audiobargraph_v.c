@@ -440,19 +440,19 @@ static picture_t *FilterVideo(filter_t *p_filter, picture_t *p_src)
     const int i_dst_h = p_filter->fmt_out.video.i_visible_height;
 
     if (p_sys->i_pos >= 0) {
-        if (p_sys->i_pos & SUBPICTURE_ALIGN_BOTTOM)
-            p_sys->i_pos_y = i_dst_h - p_fmt->i_visible_height;
-        else if (!(p_sys->i_pos & SUBPICTURE_ALIGN_TOP))
-            p_sys->i_pos_y = (i_dst_h - p_fmt->i_visible_height) / 2;
-        else
+        if (p_sys->i_pos & SUBPICTURE_ALIGN_TOP)
             p_sys->i_pos_y = 0;
-
-        if (p_sys->i_pos & SUBPICTURE_ALIGN_RIGHT)
-            p_sys->i_pos_x = i_dst_w - p_fmt->i_visible_width;
-        else if (!(p_sys->i_pos & SUBPICTURE_ALIGN_LEFT))
-            p_sys->i_pos_x = (i_dst_w - p_fmt->i_visible_width) / 2;
+        else if (p_sys->i_pos & SUBPICTURE_ALIGN_BOTTOM)
+            p_sys->i_pos_y = i_dst_h - p_fmt->i_visible_height;
         else
+            p_sys->i_pos_y = (i_dst_h - p_fmt->i_visible_height) / 2;
+
+        if (p_sys->i_pos & SUBPICTURE_ALIGN_LEFT)
             p_sys->i_pos_x = 0;
+        else if (p_sys->i_pos & SUBPICTURE_ALIGN_RIGHT)
+            p_sys->i_pos_x = i_dst_w - p_fmt->i_visible_width;
+        else
+            p_sys->i_pos_x = (i_dst_w - p_fmt->i_visible_width) / 2;
     }
 
     /* */
