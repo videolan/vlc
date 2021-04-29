@@ -455,6 +455,16 @@ static picture_t *FilterVideo(filter_t *p_filter, picture_t *p_src)
             p_sys->i_pos_x = (i_dst_w - p_fmt->i_visible_width) / 2;
     }
 
+    if( p_sys->i_pos_x < 0 || p_sys->i_pos_y < 0 )
+    {
+        msg_Warn( p_filter,
+            "bargraph(%ix%i) doesn't fit into video(%ix%i)",
+            p_fmt->i_visible_width, p_fmt->i_visible_height,
+            i_dst_w,i_dst_h );
+        p_sys->i_pos_x = (p_sys->i_pos_x > 0) ? p_sys->i_pos_x : 0;
+        p_sys->i_pos_y = (p_sys->i_pos_y > 0) ? p_sys->i_pos_y : 0;
+    }
+
     /* */
     const int i_alpha = p_BarGraph->i_alpha;
     if (filter_ConfigureBlend(p_sys->p_blend, i_dst_w, i_dst_h, p_fmt) ||
