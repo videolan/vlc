@@ -43,8 +43,6 @@
  * Module descriptor
  *****************************************************************************/
 
-#define TRANS_TEXT N_("Transparency")
-#define TRANS_LONGTEXT N_("Transparency (from 0 for full transparency to 255 for full opacity).")
 #define BARWIDTH_TEXT N_("Bar width in pixel")
 #define BARWIDTH_LONGTEXT N_("Width in pixel of each bar in the BarGraph to be displayed." )
 #define BARHEIGHT_TEXT N_("Bar Height in pixel")
@@ -69,8 +67,9 @@ vlc_module_begin ()
     add_obsolete_string(CFG_PREFIX "i_values")
     add_integer(CFG_PREFIX "x", 0, POSX_TEXT, POSX_LONGTEXT, true)
     add_integer(CFG_PREFIX "y", 0, POSY_TEXT, POSY_LONGTEXT, true)
-    add_integer_with_range(CFG_PREFIX "transparency", 255, 0, 255,
-        TRANS_TEXT, TRANS_LONGTEXT, false)
+    add_obsolete_integer(CFG_PREFIX "transparency") /* since 4.0.0 */
+    add_integer_with_range(CFG_PREFIX "opacity", 255, 0, 255,
+        OPACITY_TEXT, OPACITY_LONGTEXT, false)
     add_integer(CFG_PREFIX "position", -1, POS_TEXT, POS_LONGTEXT, false)
         change_integer_list(pi_pos_values, ppsz_pos_descriptions)
     add_obsolete_integer(CFG_PREFIX "alarm")
@@ -126,13 +125,13 @@ typedef struct
 } filter_sys_t;
 
 static const char *const ppsz_filter_options[] = {
-    "x", "y", "transparency", "position", "barWidth", "barHeight", NULL
+    "x", "y", "opacity", "position", "barWidth", "barHeight", NULL
 };
 
 static const char *const ppsz_filter_callbacks[] = {
     "audiobargraph_v-x",
     "audiobargraph_v-y",
-    "audiobargraph_v-transparency",
+    "audiobargraph_v-opacity",
     "audiobargraph_v-position",
     "audiobargraph_v-barWidth",
     "audiobargraph_v-barHeight",
@@ -317,7 +316,7 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
         p_sys->i_pos_y = newval.i_int;
     else if (!strcmp(psz_var, CFG_PREFIX "position"))
         p_sys->i_pos = newval.i_int;
-    else if (!strcmp(psz_var, CFG_PREFIX "transparency"))
+    else if (!strcmp(psz_var, CFG_PREFIX "opacity"))
         p_BarGraph->i_alpha = VLC_CLIP(newval.i_int, 0, 255);
     else if (!strcmp(psz_var, CFG_PREFIX "i_values")) {
         if (newval.psz_string)
@@ -520,7 +519,7 @@ static int OpenCommon(filter_t *p_filter, bool b_sub)
     p_sys->i_pos_y = var_CreateGetInteger(p_filter, CFG_PREFIX "y");
     BarGraph_t *p_BarGraph = &p_sys->p_BarGraph;
     p_BarGraph->p_pic = NULL;
-    p_BarGraph->i_alpha = var_CreateGetInteger(p_filter, CFG_PREFIX "transparency");
+    p_BarGraph->i_alpha = var_CreateGetInteger(p_filter, CFG_PREFIX "opacity");
     p_BarGraph->i_alpha = VLC_CLIP(p_BarGraph->i_alpha, 0, 255);
     p_BarGraph->i_values = NULL;
     parse_i_values(p_BarGraph, &(char){ 0 });
