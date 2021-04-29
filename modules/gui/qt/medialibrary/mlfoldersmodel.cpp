@@ -120,9 +120,12 @@ std::vector<MLFoldersBaseModel::EntryPoint> MLFoldersModel::entryPoints() const
 
     vlc_ml_folder_list_t* entrypoints = nullptr;
     vlc_ml_list_entry_points( ml(), &entrypoints );
-    for ( unsigned int i = 0; entrypoints && i < entrypoints->i_nb_items; i++ )
-        r.emplace_back( entrypoints->p_items[i] );
-    vlc_ml_release( entrypoints );
+    if ( entrypoints != nullptr )
+    {
+        for ( unsigned int i = 0; entrypoints && i < entrypoints->i_nb_items; i++ )
+            r.emplace_back( entrypoints->p_items[i] );
+        vlc_ml_release( entrypoints );
+    }
 
     return r;
 }
@@ -161,9 +164,12 @@ std::vector<MLFoldersBaseModel::EntryPoint> MLBannedFoldersModel::entryPoints() 
 
     vlc_ml_folder_list_t* entrypoints = nullptr;
     vlc_ml_list_banned_entry_points( ml(), &entrypoints );
-    for ( unsigned int i = 0; entrypoints && i < entrypoints->i_nb_items; i++ )
-        r.emplace_back( entrypoints->p_items[i] );
-    vlc_ml_release( entrypoints );
+    if ( entrypoints != nullptr )
+    {
+        for ( unsigned int i = 0; entrypoints && i < entrypoints->i_nb_items; i++ )
+            r.emplace_back( entrypoints->p_items[i] );
+        vlc_ml_release( entrypoints );
+    }
 
     return r;
 }
