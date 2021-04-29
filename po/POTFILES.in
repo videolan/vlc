@@ -1176,6 +1176,7 @@ modules/services_discovery/upnp.cpp
 modules/services_discovery/windrive.c
 modules/services_discovery/xcb_apps.c
 modules/spu/audiobargraph_v.c
+modules/spu/common.h
 modules/spu/dynamicoverlay/dynamicoverlay.c
 modules/spu/logo.c
 modules/spu/marq.c

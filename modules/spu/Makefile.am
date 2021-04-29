@@ -1,5 +1,7 @@
 spudir = $(pluginsdir)/spu
 
+noinst_HEADERS += spu/common.h
+
 # sub filters
 libsubsdelay_plugin_la_SOURCES = spu/subsdelay.c
 spu_LTLIBRARIES = libsubsdelay_plugin.la

@@ -32,6 +32,8 @@
 
 #include <errno.h>
 
+#include "common.h"
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
@@ -93,10 +95,6 @@ typedef struct
     "%M = minute, %S = second, ...)" )
 #define FILE_TEXT N_("Text file")
 #define FILE_LONGTEXT N_("File to read the marquee text from.")
-#define POSX_TEXT N_("X offset")
-#define POSX_LONGTEXT N_("X offset, from top-left, or from relative position." )
-#define POSY_TEXT N_("Y offset")
-#define POSY_LONGTEXT N_("Y offset, from top-left, or from relative position." )
 #define TIMEOUT_TEXT N_("Timeout")
 #define TIMEOUT_LONGTEXT N_("Number of milliseconds the marquee must remain " \
                             "displayed. Default value is " \
@@ -105,9 +103,6 @@ typedef struct
 #define REFRESH_LONGTEXT N_("Number of milliseconds between string updates. " \
                             "This is mainly useful when using meta data " \
                             "or time format string sequences.")
-#define OPACITY_TEXT N_("Opacity")
-#define OPACITY_LONGTEXT N_("Opacity (inverse of transparency), " \
-  "from 0 for fully transparent to 255 for fully opaque." )
 #define SIZE_TEXT N_("Font size, pixels")
 #define SIZE_LONGTEXT N_("Font size, in pixels. Default is 0 (use default " \
     "font size)." )
@@ -117,18 +112,6 @@ typedef struct
     "the video. This must be an hexadecimal (like HTML colors). The first two "\
     "chars are for red, then green, then blue. #000000 = black, #FF0000 = red,"\
     " #00FF00 = green, #FFFF00 = yellow (red + green), #FFFFFF = white" )
-
-#define POS_TEXT N_("Position")
-#define POS_LONGTEXT N_( \
-  "Set the position on the video " \
-  "(-1=absolute, 0=center, 1=left, 2=right, 4=top, 8=bottom; you can " \
-  "also use combinations of these values, e.g. 6 = top-right).")
-
-static const int pi_pos_values[] = { -1, 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static const char *const ppsz_pos_descriptions[] =
-{ N_("Absolute"),
-  N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
-  N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
 #define CFG_PREFIX "marq-"
 

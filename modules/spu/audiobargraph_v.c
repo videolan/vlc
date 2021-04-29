@@ -31,6 +31,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "common.h"
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
@@ -41,29 +43,14 @@
  * Module descriptor
  *****************************************************************************/
 
-#define POSX_TEXT N_("X offset")
-#define POSX_LONGTEXT N_("X offset, from top-left, or from relative position." )
-#define POSY_TEXT N_("Y offset")
-#define POSY_LONGTEXT N_("Y offset, from top-left, or from relative position." )
 #define TRANS_TEXT N_("Transparency")
 #define TRANS_LONGTEXT N_("Transparency (from 0 for full transparency to 255 for full opacity).")
-#define POS_TEXT N_("Position")
-#define POS_LONGTEXT N_(\
-  "Set the position on the video " \
-  "(-1=absolute, 0=center, 1=left, 2=right, 4=top, 8=bottom; you can " \
-  "also use combinations of these values, e.g. 6 = top-right).")
 #define BARWIDTH_TEXT N_("Bar width in pixel")
 #define BARWIDTH_LONGTEXT N_("Width in pixel of each bar in the BarGraph to be displayed." )
 #define BARHEIGHT_TEXT N_("Bar Height in pixel")
 #define BARHEIGHT_LONGTEXT N_("Height in pixel of BarGraph to be displayed." )
 
 #define CFG_PREFIX "audiobargraph_v-"
-
-static const int pi_pos_values[] = { -1, 0, 1, 2, 4, 8, 5, 6, 9, 10 };
-static const char *const ppsz_pos_descriptions[] =
-{ N_("Absolute"),
-  N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
-  N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
 static int  OpenSub  (filter_t *);
 static int  OpenVideo(filter_t *);
