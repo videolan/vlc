@@ -378,8 +378,10 @@ NavigableFocusScope {
         id: flickable
 
         clip: true
-
         flickableDirection: Flickable.VerticalFlick
+        boundsBehavior: Flickable.StopAtBounds
+        boundsMovement :Flickable.StopAtBounds
+
         ScrollBar.vertical: ScrollBar {
             id: flickableScrollBar
         }
