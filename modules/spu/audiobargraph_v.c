@@ -65,8 +65,8 @@ vlc_module_begin ()
     add_shortcut("audiobargraph_v")
 
     add_obsolete_string(CFG_PREFIX "i_values")
-    add_integer(CFG_PREFIX "x", 0, POSX_TEXT, POSX_LONGTEXT, true)
-    add_integer(CFG_PREFIX "y", 0, POSY_TEXT, POSY_LONGTEXT, true)
+    add_integer(CFG_PREFIX "x", -1, POSX_TEXT, POSX_LONGTEXT, true)
+    add_integer(CFG_PREFIX "y", -1, POSY_TEXT, POSY_LONGTEXT, true)
     add_obsolete_integer(CFG_PREFIX "transparency") /* since 4.0.0 */
     add_integer_with_range(CFG_PREFIX "opacity", 255, 0, 255,
         OPACITY_TEXT, OPACITY_LONGTEXT, false)
@@ -398,8 +398,8 @@ static subpicture_t *FilterSub(filter_t *p_filter, vlc_tick_t date)
         p_spu->b_absolute = false;
     }
 
-    p_region->i_x = p_sys->i_pos_x;
-    p_region->i_y = p_sys->i_pos_y;
+    p_region->i_x = p_sys->i_pos_x > 0 ? p_sys->i_pos_x : 0;
+    p_region->i_y = p_sys->i_pos_y > 0 ? p_sys->i_pos_y : 0;
 
     p_spu->p_region = p_region;
 
