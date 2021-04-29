@@ -393,7 +393,7 @@ static subpicture_t *FilterSub(filter_t *p_filter, vlc_tick_t date)
 
     /*  where to locate the bar graph: */
     if (p_sys->i_pos < 0) {   /*  set to an absolute xy */
-        p_region->i_align = SUBPICTURE_ALIGN_RIGHT | SUBPICTURE_ALIGN_TOP;
+        p_region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
         p_spu->b_absolute = true;
     } else {   /* set to one of the 9 relative locations */
         p_region->i_align = p_sys->i_pos;
