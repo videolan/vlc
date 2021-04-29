@@ -1433,7 +1433,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
             /* Fall-through */
         case VLC_CLOCK_MASTER_INPUT:
             p_pgrm->p_master_clock = p_master_clock =
-                vlc_clock_main_CreateMaster( p_pgrm->p_main_clock, NULL, NULL );
+                vlc_clock_main_CreateInputMaster( p_pgrm->p_main_clock );
             break;
         default:
             break;
