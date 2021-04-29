@@ -34,6 +34,7 @@ struct vlc_clock_main_t
     vlc_cond_t cond;
 
     vlc_clock_t *master;
+    vlc_clock_t *input_master;
 
     unsigned rc;
 
@@ -367,7 +368,7 @@ vlc_clock_main_t *vlc_clock_main_New(void)
 
     vlc_mutex_init(&main_clock->lock);
     vlc_cond_init(&main_clock->cond);
-    main_clock->master = NULL;
+    main_clock->input_master = main_clock->master = NULL;
     main_clock->rc = 1;
 
     main_clock->coeff = 1.0f;
@@ -567,8 +568,38 @@ vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
     vlc_mutex_lock(&main_clock->lock);
     assert(main_clock->master == NULL);
 
-    vlc_clock_set_master_callbacks(clock);
+    if (main_clock->input_master == NULL)
+        vlc_clock_set_master_callbacks(clock);
+    else
+        vlc_clock_set_slave_callbacks(clock);
+
     main_clock->master = clock;
+    main_clock->rc++;
+    vlc_mutex_unlock(&main_clock->lock);
+
+    return clock;
+}
+
+vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock)
+{
+    /* The master has always the 0 priority */
+    vlc_clock_t *clock = vlc_clock_main_Create(main_clock, 0, NULL, NULL);
+    if (!clock)
+        return NULL;
+
+    vlc_mutex_lock(&main_clock->lock);
+    assert(main_clock->input_master == NULL);
+
+    /* Even if the master ES clock has already been created, it should not
+     * have updated any points */
+    assert(main_clock->offset == VLC_TICK_INVALID);
+
+    /* Override the master ES clock if it exists */
+    if (main_clock->master != NULL)
+        vlc_clock_set_slave_callbacks(main_clock->master);
+
+    vlc_clock_set_master_callbacks(clock);
+    main_clock->input_master = clock;
     main_clock->rc++;
     vlc_mutex_unlock(&main_clock->lock);
 
@@ -620,9 +651,17 @@ void vlc_clock_Delete(vlc_clock_t *clock)
 {
     vlc_clock_main_t *main_clock = clock->owner;
     vlc_mutex_lock(&main_clock->lock);
-    if (clock == main_clock->master)
+    if (clock == main_clock->input_master)
     {
-        vlc_clock_main_reset(main_clock);
+        /* The input master must be the last clock to be deleted */
+        assert(main_clock->rc == 2);
+    }
+    else if (clock == main_clock->master)
+    {
+        /* Don't reset the main clock if the master has been overridden by the
+         * input master */
+        if (main_clock->input_master != NULL)
+            vlc_clock_main_reset(main_clock);
         main_clock->master = NULL;
     }
     main_clock->rc--;

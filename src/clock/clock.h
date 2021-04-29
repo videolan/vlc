@@ -106,6 +106,18 @@ vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
                                          void *cbs_data);
 
 /**
+ * This function creates a new input master vlc_clock_t interface
+ *
+ * Once the input master is created, the current or future master clock created
+ * from vlc_clock_main_CreateMaster() will be demoted as slave.
+ *
+ * @warning There can be only one input master at a given time.
+ *
+ * You must use vlc_clock_Delete to free it.
+ */
+vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock);
+
+/**
  * This function creates a new slave vlc_clock_t interface
  *
  * You must use vlc_clock_Delete to free it.
