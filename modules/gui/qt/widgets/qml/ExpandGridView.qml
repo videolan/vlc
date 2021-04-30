@@ -173,7 +173,13 @@ NavigableFocusScope {
 
     function leftClickOnItem(modifier, index) {
         delegateModel.updateSelection( modifier , currentIndex, index)
-        currentIndex = index
+        if (delegateModel.isSelected(model.index(index, 0)))
+            currentIndex = index
+        else if (currentIndex === index) {
+            if (root._containsItem(currentIndex))
+                root._getItem(currentIndex).focus = false
+            currentIndex = -1
+        }
         root.forceActiveFocus()
     }
 
