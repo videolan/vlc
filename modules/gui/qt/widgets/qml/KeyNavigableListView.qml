@@ -145,6 +145,9 @@ NavigableFocusScope {
         section.criteria: ViewSection.FullString
         section.delegate: sectionHeading
 
+        boundsBehavior: Flickable.StopAtBounds
+        boundsMovement :Flickable.StopAtBounds
+
         Connections {
             target: view.currentItem
             ignoreUnknownSignals: true
