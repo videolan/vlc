@@ -42,6 +42,7 @@
 #include "media_player_internal.h"
 #include "renderer_discoverer_internal.h"
 #include "logger_internal.h"
+#include <vlc_player.h>
 
 #define ES_INIT (-2) /* -1 is reserved for ES deselect */
 
@@ -775,8 +776,9 @@ libvlc_media_player_new_with_logger( libvlc_instance_t *instance,
     var_Create (mp, "equalizer-vlcfreqs", VLC_VAR_BOOL);
     var_Create (mp, "equalizer-bands", VLC_VAR_STRING);
 
-    /* Video */
+    /* SK options */
     var_Create (mp, "sk-keep-last-frame", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    var_Create (mp, "clock-recovery", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
     mp->p_md = NULL;
     mp->p_libvlc_instance = instance;
@@ -2284,6 +2286,16 @@ int libvlc_media_player_record( libvlc_media_player_t *p_mi,
     vlc_player_Unlock(player);
 
     return VLC_SUCCESS;
+}
+
+int libvlc_media_player_enable_clock_recovery(
+        libvlc_media_player_t *p_mi,
+        bool enable)
+{
+    vlc_object_t *player = (vlc_object_t*)p_mi->player;
+    var_SetBool(player, "clock-recovery", enable);
+    // TODO
+    return true;
 }
 
 void libvlc_media_player_set_stopped_action( libvlc_media_player_t *p_mi,

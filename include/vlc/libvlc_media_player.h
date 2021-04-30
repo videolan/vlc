@@ -2681,6 +2681,10 @@ LIBVLC_API int libvlc_media_player_record(libvlc_media_player_t *p_mi,
 
 /** @} audio */
 
+LIBVLC_API int libvlc_media_player_enable_clock_recovery(
+        libvlc_media_player_t *p_mi,
+        bool enable);
+
 /** @} media_player */
 
 # ifdef __cplusplus

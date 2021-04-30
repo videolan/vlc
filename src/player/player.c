@@ -2017,6 +2017,9 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     VAR_CREATE("start-paused", VLC_VAR_BOOL);
     VAR_CREATE("play-and-pause", VLC_VAR_BOOL);
 
+    /* SK options */
+    VAR_CREATE("clock-recovery", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+
     /* Initialize the shared HTTP cookie jar */
     vlc_value_t cookies;
     cookies.p_address = vlc_http_cookies_new();

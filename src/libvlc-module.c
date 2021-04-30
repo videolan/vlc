@@ -2818,8 +2818,12 @@ vlc_module_begin ()
     add_string( "config", NULL, CONFIG_TEXT, "", false )
         change_volatile ()
 
+    /* SK options */
     add_bool( "avstat", true, "", "", true )
         change_volatile ()
+    add_bool( "clock-recovery", true, "", "", true )
+        change_volatile ()
+
 vlc_module_end ()
 
 /*****************************************************************************
