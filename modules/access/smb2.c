@@ -133,6 +133,34 @@ smb2_set_error(stream_t *access, const char *psz_func, int err)
 
 #define VLC_SMB2_STATUS_DENIED(x) (x == -ECONNREFUSED || x == -EACCES)
 
+#if defined (__ELF__) || defined (__MACH__) /* weak support */
+/* There is no way to know if libsmb2 has these new symbols and we don't want
+ * to increase the version requirement on VLC 3.0, therefore implement a weak
+ * compat version. */
+const t_socket *
+smb2_get_fds(struct smb2_context *smb2, size_t *fd_count, int *timeout);
+int
+smb2_service_fd(struct smb2_context *smb2, int fd, int revents);
+
+__attribute__((weak)) const t_socket *
+smb2_get_fds(struct smb2_context *smb2, size_t *fd_count, int *timeout)
+{
+    (void) timeout;
+    static thread_local t_socket fd;
+
+    *fd_count = 1;
+    fd = smb2_get_fd(smb2);
+    return &fd;
+}
+
+__attribute__((weak)) int
+smb2_service_fd(struct smb2_context *smb2, int fd, int revents)
+{
+    (void) fd;
+    return smb2_service(smb2, revents);
+}
+#endif
+
 static int
 vlc_smb2_mainloop(stream_t *access, bool teardown)
 {
