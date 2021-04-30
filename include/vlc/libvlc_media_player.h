@@ -2842,6 +2842,10 @@ libvlc_media_player_time_point_get_next_date(const libvlc_media_player_time_poin
 
 /** @} libvlc_media_player_watch_time */
 
+LIBVLC_API int libvlc_media_player_enable_clock_recovery(
+        libvlc_media_player_t *p_mi,
+        bool enable);
+
 /** @} media_player */
 
 # ifdef __cplusplus

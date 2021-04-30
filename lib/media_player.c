@@ -41,6 +41,7 @@
 #include "libvlc_internal.h"
 #include "media_player_internal.h"
 #include "renderer_discoverer_internal.h"
+#include <vlc_player.h>
 
 #define ES_INIT (-2) /* -1 is reserved for ES deselect */
 
@@ -789,8 +790,9 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     /* variables for signalling creation of new files */
     var_Create(mp, "record-file", VLC_VAR_STRING);
 
-    /* Video */
+    /* SK options */
     var_Create (mp, "sk-keep-last-frame", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    var_Create (mp, "clock-recovery", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
     mp->timer.id = NULL;
     mp->p_md = NULL;
@@ -2427,6 +2429,16 @@ libvlc_media_player_time_point_get_next_date(const libvlc_media_player_time_poin
                                                    VLC_TICK_FROM_US(interpolated_ts_us),
                                                    VLC_TICK_FROM_US(next_interval_us));
     return US_FROM_VLC_TICK(date);
+}
+
+int libvlc_media_player_enable_clock_recovery(
+        libvlc_media_player_t *p_mi,
+        bool enable)
+{
+    vlc_object_t *player = (vlc_object_t*)p_mi->player;
+    var_SetBool(player, "clock-recovery", enable);
+    // TODO
+    return true;
 }
 
 void libvlc_media_player_set_stopped_action( libvlc_media_player_t *p_mi,

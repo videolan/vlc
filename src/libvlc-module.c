@@ -2825,6 +2825,9 @@ vlc_module_begin ()
         change_volatile ()
     add_bool( "avstat", true, "", "" )
         change_volatile ()
+    add_bool( "clock-recovery", true, "", "" )
+        change_volatile ()
+
 vlc_module_end ()
 
 /*****************************************************************************
