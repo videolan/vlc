@@ -77,9 +77,9 @@ libvk_wl_plugin_la_SOURCES = \
 	video_output/vulkan/instance.h \
 	video_output/wayland/vulkan.c
 libvk_wl_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(WAYLAND_CFLAGS) $(VULKAN_COMMONCFLAGS) \
+	$(WAYLAND_CLIENT_CFLAGS) $(VULKAN_COMMONCFLAGS) \
 	-DVK_USE_PLATFORM_WAYLAND_KHR
-libvk_wl_plugin_la_LIBADD = $(VULKAN_COMMONLIBS) $(WAYLAND_LIBS)
+libvk_wl_plugin_la_LIBADD = $(VULKAN_COMMONLIBS) $(WAYLAND_CLIENT_LIBS)
 
 if HAVE_WAYLAND
 BUILT_SOURCES += $(nodist_libwl_shm_plugin_la_SOURCES)
