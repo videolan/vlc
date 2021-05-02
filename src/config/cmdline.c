@@ -292,19 +292,29 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
             if (i_cmd == ':')
             {
                 if( state.opt )
-                    fprintf( stderr, _( "Missing mandatory value for option `-%c'\n" ),
-                             state.opt );
+                    fprintf( stderr, _( "Missing mandatory value for option `%s-%c%s'\n" ),
+                             color ? TS_YELLOW : "",
+                             state.opt,
+                             color ? TS_RESET : "" );
                 else
-                    fprintf( stderr, _( "Missing mandatory value for option `%s'\n" ),
-                             ppsz_argv[state.ind-1] );
+                    fprintf( stderr, _( "Missing mandatory value for option `%s%s%s'\n" ),
+                             color ? TS_YELLOW : "",
+                             ppsz_argv[state.ind-1],
+                             color ? TS_RESET : "" );
             }
             else
             {
                 if( state.opt )
-                    fprintf( stderr, _( "Unknown option `-%c'\n" ), state.opt );
+                    fprintf( stderr, _( "Unknown option `%s-%c%s'\n" ),
+                             color ? TS_YELLOW : "",
+                             state.opt,
+                             color ? TS_RESET : "" );
                 else
                 {
-                    fprintf( stderr, _( "Unknown option `%s'\n" ), ppsz_argv[state.ind-1] );
+                    fprintf( stderr, _( "Unknown option `%s%s%s'\n" ),
+                             color ? TS_YELLOW : "",
+                             ppsz_argv[state.ind-1],
+                             color ? TS_RESET : "" );
 
                     /* suggestion matching */
                     float jw_filter = 0.8, best_metric = jw_filter, metric;
@@ -322,10 +332,12 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                         }
                     }
                     if (best)
-                        fprintf( stderr, _( "       Did you mean `--%s'?\n" ), best );
+                        fprintf( stderr, _( "       Did you mean `%s--%s%s'?\n" ),
+                                 color ? TS_GREEN : "", best, color ? TS_RESET : "" );
                 }
             }
-            fputs( _( "For more information try `--help'\n" ), stderr );
+            fprintf( stderr, _( "For more information try `%s--help%s'\n" ),
+                     color ? TS_GREEN : "", color ? TS_RESET : "" );
             goto out;
         }
     }
