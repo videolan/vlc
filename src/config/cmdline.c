@@ -202,7 +202,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                 if (param->obsolete)
                 {
                     fprintf(stderr,
-                            "Warning: option --%s no longer exists.\n",
+                            "Warning: Option --%s no longer exists.\n",
                             psz_full_name);
                     continue;
                 }
@@ -272,7 +272,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         /* Internal error: unknown option */
         if( !b_ignore_errors )
         {
-            fputs( "Error: unknown option"
+            fputs( "Error: Unknown option"
                      " or missing mandatory argument ", stderr );
             if( state.opt )
             {
