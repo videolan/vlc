@@ -394,136 +394,136 @@ vlc_module_begin ()
     add_module ("pl-gpu", "libplacebo gpu", NULL, PROVIDER_TEXT, PROVIDER_LONGTEXT)
 
     set_section("Scaling", NULL)
-    add_integer("upscaler-preset", SCALE_BUILTIN,
+    add_integer("pl-upscaler-preset", SCALE_BUILTIN,
             UPSCALER_PRESET_TEXT, SCALER_PRESET_LONGTEXT, false)
             change_integer_list(scale_values, scale_text)
-    add_integer("downscaler-preset", SCALE_BUILTIN,
+    add_integer("pl-downscaler-preset", SCALE_BUILTIN,
             DOWNSCALER_PRESET_TEXT, SCALER_PRESET_LONGTEXT, false)
             change_integer_list(scale_values, scale_text)
-    add_integer_with_range("lut-entries", 64, 16, 256,
+    add_integer_with_range("pl-lut-entries", 64, 16, 256,
             LUT_ENTRIES_TEXT, LUT_ENTRIES_LONGTEXT, false)
-    add_float_with_range("antiringing", 0.0,
+    add_float_with_range("pl-antiringing", 0.0,
             0.0, 1.0, ANTIRING_TEXT, ANTIRING_LONGTEXT, false)
-    add_bool("sigmoid", !!pl_render_default_params.sigmoid_params,
+    add_bool("pl-sigmoid", !!pl_render_default_params.sigmoid_params,
             SIGMOID_TEXT, SIGMOID_LONGTEXT, true)
-    add_float_with_range("sigmoid-center", pl_sigmoid_default_params.center,
+    add_float_with_range("pl-sigmoid-center", pl_sigmoid_default_params.center,
             0., 1., SIGMOID_CENTER_TEXT, SIGMOID_CENTER_LONGTEXT, true)
-    add_float_with_range("sigmoid-slope", pl_sigmoid_default_params.slope,
+    add_float_with_range("pl-sigmoid-slope", pl_sigmoid_default_params.slope,
             1., 20., SIGMOID_SLOPE_TEXT, SIGMOID_SLOPE_LONGTEXT, true)
 
     set_section("Debanding", NULL)
-    add_bool("debanding", false, DEBAND_TEXT, DEBAND_LONGTEXT, false)
-    add_integer("iterations", pl_deband_default_params.iterations,
+    add_bool("pl-debanding", false, DEBAND_TEXT, DEBAND_LONGTEXT, false)
+    add_integer("pl-iterations", pl_deband_default_params.iterations,
             DEBAND_ITER_TEXT, DEBAND_ITER_LONGTEXT, false)
-    add_float("threshold", pl_deband_default_params.threshold,
+    add_float("pl-threshold", pl_deband_default_params.threshold,
             DEBAND_THRESH_TEXT, DEBAND_THRESH_LONGTEXT, false)
-    add_float("radius", pl_deband_default_params.radius,
+    add_float("pl-radius", pl_deband_default_params.radius,
             DEBAND_RADIUS_TEXT, DEBAND_RADIUS_LONGTEXT, false)
-    add_float("grain", pl_deband_default_params.grain,
+    add_float("pl-grain", pl_deband_default_params.grain,
             DEBAND_GRAIN_TEXT, DEBAND_GRAIN_LONGTEXT, false)
 
     set_section("Colorspace conversion", NULL)
-    add_integer("intent", pl_color_map_default_params.intent,
+    add_integer("pl-intent", pl_color_map_default_params.intent,
             RENDER_INTENT_TEXT, RENDER_INTENT_LONGTEXT, false)
             change_integer_list(intent_values, intent_text)
-    add_integer("target-prim", PL_COLOR_PRIM_UNKNOWN, PRIM_TEXT, PRIM_LONGTEXT, false) \
+    add_integer("pl-target-prim", PL_COLOR_PRIM_UNKNOWN, PRIM_TEXT, PRIM_LONGTEXT, false) \
             change_integer_list(prim_values, prim_text) \
-    add_integer("target-trc", PL_COLOR_TRC_UNKNOWN, TRC_TEXT, TRC_LONGTEXT, false) \
+    add_integer("pl-target-trc", PL_COLOR_TRC_UNKNOWN, TRC_TEXT, TRC_LONGTEXT, false) \
             change_integer_list(trc_values, trc_text) \
 
     // TODO: support for ICC profiles / 3DLUTs.. we will need some way of loading
     // this from the operating system / user
 
     set_section("Tone mapping", NULL)
-    add_integer("tone-mapping", pl_color_map_default_params.tone_mapping_algo,
+    add_integer("pl-tone-mapping", pl_color_map_default_params.tone_mapping_algo,
             TONEMAPPING_TEXT, TONEMAPPING_LONGTEXT, false)
             change_integer_list(tone_values, tone_text)
-    add_float("tone-mapping-param", pl_color_map_default_params.tone_mapping_param,
+    add_float("pl-tone-mapping-param", pl_color_map_default_params.tone_mapping_param,
             TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT, true)
 #if PL_API_VER >= 10
-    add_float("desat-strength", pl_color_map_default_params.desaturation_strength,
+    add_float("pl-desat-strength", pl_color_map_default_params.desaturation_strength,
             DESAT_STRENGTH_TEXT, DESAT_STRENGTH_LONGTEXT, false)
-    add_float("desat-exponent", pl_color_map_default_params.desaturation_exponent,
+    add_float("pl-desat-exponent", pl_color_map_default_params.desaturation_exponent,
             DESAT_EXPONENT_TEXT, DESAT_EXPONENT_LONGTEXT, false)
-    add_float("desat-base", pl_color_map_default_params.desaturation_base,
+    add_float("pl-desat-base", pl_color_map_default_params.desaturation_base,
             DESAT_BASE_TEXT, DESAT_BASE_LONGTEXT, false)
-    add_float("max-boost", pl_color_map_default_params.max_boost,
+    add_float("pl-max-boost", pl_color_map_default_params.max_boost,
             MAX_BOOST_TEXT, MAX_BOOST_LONGTEXT, false)
 #else
-    add_float("tone-mapping-desat", pl_color_map_default_params.tone_mapping_desaturate,
+    add_float("pl-tone-mapping-desat", pl_color_map_default_params.tone_mapping_desaturate,
             TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT, false)
 #endif
-    add_bool("gamut-warning", false, GAMUT_WARN_TEXT, GAMUT_WARN_LONGTEXT, true)
+    add_bool("pl-gamut-warning", false, GAMUT_WARN_TEXT, GAMUT_WARN_LONGTEXT, true)
 
 #if PL_API_VER < 12
-    add_integer_with_range("peak-frames", pl_color_map_default_params.peak_detect_frames,
+    add_integer_with_range("pl-peak-frames", pl_color_map_default_params.peak_detect_frames,
             0, 255, PEAK_FRAMES_TEXT, PEAK_FRAMES_LONGTEXT, false)
-    add_float_with_range("scene-threshold", pl_color_map_default_params.scene_threshold,
+    add_float_with_range("pl-scene-threshold", pl_color_map_default_params.scene_threshold,
             0., 10., SCENE_THRESHOLD_TEXT, SCENE_THRESHOLD_LONGTEXT, false)
 #endif
 
 #if PL_API_VER >= 13
-    add_float_with_range("peak-period", pl_peak_detect_default_params.smoothing_period,
+    add_float_with_range("pl-peak-period", pl_peak_detect_default_params.smoothing_period,
             0., 1000., PEAK_PERIOD_TEXT, PEAK_PERIOD_LONGTEXT, false)
-    add_float("scene-threshold-low", pl_peak_detect_default_params.scene_threshold_low,
+    add_float("pl-scene-threshold-low", pl_peak_detect_default_params.scene_threshold_low,
             SCENE_THRESHOLD_LOW_TEXT, SCENE_THRESHOLD_LOW_LONGTEXT, false)
-    add_float("scene-threshold-high", pl_peak_detect_default_params.scene_threshold_high,
+    add_float("pl-scene-threshold-high", pl_peak_detect_default_params.scene_threshold_high,
             SCENE_THRESHOLD_HIGH_TEXT, SCENE_THRESHOLD_HIGH_LONGTEXT, false)
 #endif
 
-    add_float_with_range("target-avg", 0.25,
+    add_float_with_range("pl-target-avg", 0.25,
             0.0, 1.0, TARGET_AVG_TEXT, TARGET_AVG_LONGTEXT, false)
 
     set_section("Dithering", NULL)
-    add_integer("dither", -1,
+    add_integer("pl-dither", -1,
             DITHER_TEXT, DITHER_LONGTEXT, false)
             change_integer_list(dither_values, dither_text)
-    add_integer_with_range("dither-size", pl_dither_default_params.lut_size,
+    add_integer_with_range("pl-dither-size", pl_dither_default_params.lut_size,
             1, 8, DITHER_SIZE_TEXT, DITHER_SIZE_LONGTEXT, false)
-    add_bool("temporal-dither", pl_dither_default_params.temporal,
+    add_bool("pl-temporal-dither", pl_dither_default_params.temporal,
             TEMPORAL_DITHER_TEXT, TEMPORAL_DITHER_LONGTEXT, false)
-    add_integer_with_range("dither-depth", 0,
+    add_integer_with_range("pl-dither-depth", 0,
             0, 16, DITHER_DEPTH_TEXT, DITHER_DEPTH_LONGTEXT, false)
 
     set_section("Custom upscaler (when preset = custom)", NULL)
-    add_integer("upscaler-kernel", FILTER_BOX,
+    add_integer("pl-upscaler-kernel", FILTER_BOX,
             KERNEL_TEXT, KERNEL_LONGTEXT, true)
             change_integer_list(filter_values, filter_text)
-    add_integer("upscaler-window", FILTER_NONE,
+    add_integer("pl-upscaler-window", FILTER_NONE,
             WINDOW_TEXT, WINDOW_LONGTEXT, true)
             change_integer_list(filter_values, filter_text)
-    add_bool("upscaler-polar", false, POLAR_TEXT, POLAR_LONGTEXT, true)
-    add_float_with_range("upscaler-clamp", 0.0,
+    add_bool("pl-upscaler-polar", false, POLAR_TEXT, POLAR_LONGTEXT, true)
+    add_float_with_range("pl-upscaler-clamp", 0.0,
             0.0, 1.0, CLAMP_TEXT, CLAMP_LONGTEXT, true)
-    add_float_with_range("upscaler-blur", 1.0,
+    add_float_with_range("pl-upscaler-blur", 1.0,
             0.0, 100.0, BLUR_TEXT, BLUR_LONGTEXT, true)
-    add_float_with_range("upscaler-taper", 0.0,
+    add_float_with_range("pl-upscaler-taper", 0.0,
             0.0, 10.0, TAPER_TEXT, TAPER_LONGTEXT, true)
 
     set_section("Custom downscaler (when preset = custom)", NULL)
-    add_integer("downscaler-kernel", FILTER_BOX,
+    add_integer("pl-downscaler-kernel", FILTER_BOX,
             KERNEL_TEXT, KERNEL_LONGTEXT, true)
             change_integer_list(filter_values, filter_text)
-    add_integer("downscaler-window", FILTER_NONE,
+    add_integer("pl-downscaler-window", FILTER_NONE,
             WINDOW_TEXT, WINDOW_LONGTEXT, true)
             change_integer_list(filter_values, filter_text)
-    add_bool("downscaler-polar", false, POLAR_TEXT, POLAR_LONGTEXT, true)
-    add_float_with_range("downscaler-clamp", 0.0,
+    add_bool("pl-downscaler-polar", false, POLAR_TEXT, POLAR_LONGTEXT, true)
+    add_float_with_range("pl-downscaler-clamp", 0.0,
             0.0, 1.0, CLAMP_TEXT, CLAMP_LONGTEXT, true)
-    add_float_with_range("downscaler-blur", 1.0,
+    add_float_with_range("pl-downscaler-blur", 1.0,
             0.0, 100.0, BLUR_TEXT, BLUR_LONGTEXT, true)
-    add_float_with_range("downscaler-taper", 0.0,
+    add_float_with_range("pl-downscaler-taper", 0.0,
             0.0, 10.0, TAPER_TEXT, TAPER_LONGTEXT, true)
 
     set_section("Performance tweaks / debugging", NULL)
-    add_bool("skip-aa", false, SKIP_AA_TEXT, SKIP_AA_LONGTEXT, false)
-    add_float_with_range("polar-cutoff", 0.001,
+    add_bool("pl-skip-aa", false, SKIP_AA_TEXT, SKIP_AA_LONGTEXT, false)
+    add_float_with_range("pl-polar-cutoff", 0.001,
             0., 1., POLAR_CUTOFF_TEXT, POLAR_CUTOFF_LONGTEXT, false)
-    add_bool("overlay-direct", false, OVERLAY_DIRECT_TEXT, OVERLAY_DIRECT_LONGTEXT, false)
-    add_bool("disable-linear", false, DISABLE_LINEAR_TEXT, DISABLE_LINEAR_LONGTEXT, false)
-    add_bool("force-general", false, FORCE_GENERAL_TEXT, FORCE_GENERAL_LONGTEXT, false)
+    add_bool("pl-overlay-direct", false, OVERLAY_DIRECT_TEXT, OVERLAY_DIRECT_LONGTEXT, false)
+    add_bool("pl-disable-linear", false, DISABLE_LINEAR_TEXT, DISABLE_LINEAR_LONGTEXT, false)
+    add_bool("pl-force-general", false, FORCE_GENERAL_TEXT, FORCE_GENERAL_LONGTEXT, false)
 #if PL_API_VER >= 13
-    add_bool("delayed-peak", false, DELAYED_PEAK_TEXT, DELAYED_PEAK_LONGTEXT, false)
+    add_bool("pl-delayed-peak", false, DELAYED_PEAK_TEXT, DELAYED_PEAK_LONGTEXT, false)
 #endif
 
 vlc_module_end ()
@@ -538,77 +538,77 @@ static void UpdateParams(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     sys->deband = pl_deband_default_params;
-    sys->deband.iterations = var_InheritInteger(vd, "iterations");
-    sys->deband.threshold = var_InheritFloat(vd, "threshold");
-    sys->deband.radius = var_InheritFloat(vd, "radius");
-    sys->deband.grain = var_InheritFloat(vd, "grain");
+    sys->deband.iterations = var_InheritInteger(vd, "pl-iterations");
+    sys->deband.threshold = var_InheritFloat(vd, "pl-threshold");
+    sys->deband.radius = var_InheritFloat(vd, "pl-radius");
+    sys->deband.grain = var_InheritFloat(vd, "pl-grain");
     bool use_deband = sys->deband.iterations > 0 || sys->deband.grain > 0;
-    use_deband &= var_InheritBool(vd, "debanding");
+    use_deband &= var_InheritBool(vd, "pl-debanding");
 
     sys->sigmoid = pl_sigmoid_default_params;
-    sys->sigmoid.center = var_InheritFloat(vd, "sigmoid-center");
-    sys->sigmoid.slope = var_InheritFloat(vd, "sigmoid-slope");
-    bool use_sigmoid = var_InheritBool(vd, "sigmoid");
+    sys->sigmoid.center = var_InheritFloat(vd, "pl-sigmoid-center");
+    sys->sigmoid.slope = var_InheritFloat(vd, "pl-sigmoid-slope");
+    bool use_sigmoid = var_InheritBool(vd, "pl-sigmoid");
 
     sys->color_map = pl_color_map_default_params;
-    sys->color_map.intent = var_InheritInteger(vd, "intent");
-    sys->color_map.tone_mapping_algo = var_InheritInteger(vd, "tone-mapping");
-    sys->color_map.tone_mapping_param = var_InheritFloat(vd, "tone-mapping-param");
+    sys->color_map.intent = var_InheritInteger(vd, "pl-intent");
+    sys->color_map.tone_mapping_algo = var_InheritInteger(vd, "pl-tone-mapping");
+    sys->color_map.tone_mapping_param = var_InheritFloat(vd, "pl-tone-mapping-param");
 #if PL_API_VER >= 10
-    sys->color_map.desaturation_strength = var_InheritFloat(vd, "desat-strength");
-    sys->color_map.desaturation_exponent = var_InheritFloat(vd, "desat-exponent");
-    sys->color_map.desaturation_base = var_InheritFloat(vd, "desat-base");
-    sys->color_map.max_boost = var_InheritFloat(vd, "max-boost");
+    sys->color_map.desaturation_strength = var_InheritFloat(vd, "pl-desat-strength");
+    sys->color_map.desaturation_exponent = var_InheritFloat(vd, "pl-desat-exponent");
+    sys->color_map.desaturation_base = var_InheritFloat(vd, "pl-desat-base");
+    sys->color_map.max_boost = var_InheritFloat(vd, "pl-max-boost");
 #else
-    sys->color_map.tone_mapping_desaturate = var_InheritFloat(vd, "tone-mapping-desat");
+    sys->color_map.tone_mapping_desaturate = var_InheritFloat(vd, "pl-tone-mapping-desat");
 #endif
-    sys->color_map.gamut_warning = var_InheritBool(vd, "gamut-warning");
+    sys->color_map.gamut_warning = var_InheritBool(vd, "pl-gamut-warning");
 #if PL_API_VER < 12
-    sys->color_map.peak_detect_frames = var_InheritInteger(vd, "peak-frames");
-    sys->color_map.scene_threshold = var_InheritFloat(vd, "scene-threshold");
+    sys->color_map.peak_detect_frames = var_InheritInteger(vd, "pl-peak-frames");
+    sys->color_map.scene_threshold = var_InheritFloat(vd, "pl-scene-threshold");
 #endif
 
     sys->dither = pl_dither_default_params;
-    int method = var_InheritInteger(vd, "dither");
+    int method = var_InheritInteger(vd, "pl-dither");
     bool use_dither = method >= 0;
     sys->dither.method = use_dither ? method : 0;
-    sys->dither.lut_size = var_InheritInteger(vd, "dither-size");
-    sys->dither.temporal = var_InheritBool(vd, "temporal-dither");
+    sys->dither.lut_size = var_InheritInteger(vd, "pl-dither-size");
+    sys->dither.temporal = var_InheritBool(vd, "pl-temporal-dither");
 
     sys->params = pl_render_default_params;
     sys->params.deband_params = use_deband ? &sys->deband : NULL;
     sys->params.sigmoid_params = use_sigmoid ? &sys->sigmoid : NULL;
     sys->params.color_map_params = &sys->color_map;
     sys->params.dither_params = use_dither ? &sys->dither : NULL;
-    sys->params.lut_entries = var_InheritInteger(vd, "lut-entries");
-    sys->params.antiringing_strength = var_InheritFloat(vd, "antiringing");
-    sys->params.skip_anti_aliasing = var_InheritBool(vd, "skip-aa");
-    sys->params.polar_cutoff = var_InheritFloat(vd, "polar-cutoff");
-    sys->params.disable_overlay_sampling = var_InheritBool(vd, "overlay-direct");
-    sys->params.disable_linear_scaling = var_InheritBool(vd, "disable-linear");
-    sys->params.disable_builtin_scalers = var_InheritBool(vd, "force-general");
+    sys->params.lut_entries = var_InheritInteger(vd, "pl-lut-entries");
+    sys->params.antiringing_strength = var_InheritFloat(vd, "pl-antiringing");
+    sys->params.skip_anti_aliasing = var_InheritBool(vd, "pl-skip-aa");
+    sys->params.polar_cutoff = var_InheritFloat(vd, "pl-polar-cutoff");
+    sys->params.disable_overlay_sampling = var_InheritBool(vd, "pl-overlay-direct");
+    sys->params.disable_linear_scaling = var_InheritBool(vd, "pl-disable-linear");
+    sys->params.disable_builtin_scalers = var_InheritBool(vd, "pl-force-general");
 
 #if PL_API_VER >= 13
-    sys->peak_detect.smoothing_period = var_InheritFloat(vd, "peak-period");
-    sys->peak_detect.scene_threshold_low = var_InheritFloat(vd, "scene-threshold-low");
-    sys->peak_detect.scene_threshold_high = var_InheritFloat(vd, "scene-threshold-high");
+    sys->peak_detect.smoothing_period = var_InheritFloat(vd, "pl-peak-period");
+    sys->peak_detect.scene_threshold_low = var_InheritFloat(vd, "pl-scene-threshold-low");
+    sys->peak_detect.scene_threshold_high = var_InheritFloat(vd, "pl-scene-threshold-high");
     if (sys->peak_detect.smoothing_period > 0.0) {
         sys->params.peak_detect_params = &sys->peak_detect;
-        sys->params.allow_delayed_peak_detect = var_InheritBool(vd, "delayed-peak");
+        sys->params.allow_delayed_peak_detect = var_InheritBool(vd, "pl-delayed-peak");
     }
 #endif
 
-    int preset = var_InheritInteger(vd, "upscaler-preset");
+    int preset = var_InheritInteger(vd, "pl-upscaler-preset");
     sys->params.upscaler = scale_config[preset];
     if (preset == SCALE_CUSTOM) {
         sys->params.upscaler = &sys->upscaler;
         sys->upscaler = (struct pl_filter_config) {
-            .kernel = filter_fun[var_InheritInteger(vd, "upscaler-kernel")],
-            .window = filter_fun[var_InheritInteger(vd, "upscaler-window")],
-            .clamp  = var_InheritFloat(vd, "upscaler-clamp"),
-            .blur   = var_InheritFloat(vd, "upscaler-blur"),
-            .taper  = var_InheritFloat(vd, "upscaler-taper"),
-            .polar  = var_InheritBool(vd, "upscaler-polar"),
+            .kernel = filter_fun[var_InheritInteger(vd, "pl-upscaler-kernel")],
+            .window = filter_fun[var_InheritInteger(vd, "pl-upscaler-window")],
+            .clamp  = var_InheritFloat(vd, "pl-upscaler-clamp"),
+            .blur   = var_InheritFloat(vd, "pl-upscaler-blur"),
+            .taper  = var_InheritFloat(vd, "pl-upscaler-taper"),
+            .polar  = var_InheritBool(vd, "pl-upscaler-polar"),
         };
 
         if (!sys->upscaler.kernel) {
@@ -617,17 +617,17 @@ static void UpdateParams(vout_display_t *vd)
         }
     };
 
-    preset = var_InheritInteger(vd, "downscaler-preset");
+    preset = var_InheritInteger(vd, "pl-downscaler-preset");
     sys->params.downscaler = scale_config[preset];
     if (preset == SCALE_CUSTOM) {
         sys->params.downscaler = &sys->downscaler;
         sys->downscaler = (struct pl_filter_config) {
-            .kernel = filter_fun[var_InheritInteger(vd, "downscaler-kernel")],
-            .window = filter_fun[var_InheritInteger(vd, "downscaler-window")],
-            .clamp  = var_InheritFloat(vd, "downscaler-clamp"),
-            .blur   = var_InheritFloat(vd, "downscaler-blur"),
-            .taper  = var_InheritFloat(vd, "downscaler-taper"),
-            .polar  = var_InheritBool(vd, "downscaler-polar"),
+            .kernel = filter_fun[var_InheritInteger(vd, "pl-downscaler-kernel")],
+            .window = filter_fun[var_InheritInteger(vd, "pl-downscaler-window")],
+            .clamp  = var_InheritFloat(vd, "pl-downscaler-clamp"),
+            .blur   = var_InheritFloat(vd, "pl-downscaler-blur"),
+            .taper  = var_InheritFloat(vd, "pl-downscaler-taper"),
+            .polar  = var_InheritBool(vd, "pl-downscaler-polar"),
         };
 
         if (!sys->downscaler.kernel) {
@@ -636,10 +636,10 @@ static void UpdateParams(vout_display_t *vd)
         }
     };
 
-    sys->dither_depth = var_InheritInteger(vd, "dither-depth");
+    sys->dither_depth = var_InheritInteger(vd, "pl-dither-depth");
     sys->target = (struct pl_color_space) {
-        .primaries = var_InheritInteger(vd, "target-prim"),
-        .transfer = var_InheritInteger(vd, "target-trc"),
-        .sig_avg = var_InheritFloat(vd, "target-avg"),
+        .primaries = var_InheritInteger(vd, "pl-target-prim"),
+        .transfer = var_InheritInteger(vd, "pl-target-trc"),
+        .sig_avg = var_InheritFloat(vd, "pl-target-avg"),
     };
 }
