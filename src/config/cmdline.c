@@ -277,17 +277,22 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         /* Internal error: unknown option or missing option value */
         if( !b_ignore_errors )
         {
+            fputs( "Error: ", stderr );
             if (i_cmd == ':')
-                fputs( "Error: Missing mandatory value for option ", stderr );
-            else
-                fputs( "Error: Unknown option ", stderr );
-            if( state.opt )
             {
-                fprintf( stderr, "`-%c'\n", state.opt );
+                if( state.opt )
+                    fprintf( stderr, "Missing mandatory value for option `-%c'\n",
+                             state.opt );
+                else
+                    fprintf( stderr, "Missing mandatory value for option `%s'\n",
+                             ppsz_argv[state.ind-1] );
             }
             else
             {
-                fprintf( stderr, "`%s'\n", ppsz_argv[state.ind-1] );
+                if( state.opt )
+                    fprintf( stderr, "Unknown option `-%c'\n", state.opt );
+                else
+                    fprintf( stderr, "Unknown option `%s'\n", ppsz_argv[state.ind-1] );
             }
             fputs( "Try `vlc --help' for more information.\n", stderr );
             goto out;
