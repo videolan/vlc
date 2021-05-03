@@ -316,8 +316,36 @@ raspbian-arm:
 #
 # macOS
 #
+.ccache-common-apple:
+  variables:
+    CCACHE_BASEDIR: ${CI_PROJECT_DIR}
+    CCACHE_DIR: ${CI_PROJECT_DIR}/ccache
+    CCACHE_COMPILERCHECK: content
+    CCACHE_CPP2: 'true'
+    VLC_CCACHE_BINS_PATH: '/Users/videolanci/sandbox/bin/ccache/bin'
+  before_script:
+    - |
+      if [ -x "${VLC_CCACHE_BINS_PATH}/ccache" ]; then
+        ${VLC_CCACHE_BINS_PATH}/ccache --zero-stats
+        ${VLC_CCACHE_BINS_PATH}/ccache --show-stats
+      else
+        echo "No ccache present, disabling caching"
+        unset VLC_CCACHE_BINS_PATH
+      fi
+  after_script:
+    - |
+      if [ -x "${VLC_CCACHE_BINS_PATH}/ccache" ]; then
+        ${VLC_CCACHE_BINS_PATH}/ccache --show-stats
+      fi
+  cache:
+    key: ${CI_JOB_NAME}
+    paths:
+      - ccache
+
 .macos-common:
-    extends: .base-template
+    extends:
+        - .base-template
+        - .ccache-common-apple
     tags:
         - amd64
         - catalina
