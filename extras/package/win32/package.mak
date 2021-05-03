@@ -54,9 +54,10 @@ endif
 	for file in AUTHORS THANKS ; \
 		do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(win32_destdir)/$${file}.txt"; \
 	done
-	for file in NEWS COPYING README.md; \
+	for file in NEWS COPYING; \
 		do cp "$(srcdir)/$$file" "$(win32_destdir)/$${file}.txt"; \
 	done
+	cp "$(srcdir)/README.md" "$(win32_destdir)/README.txt"
 
 	cp $(srcdir)/share/icons/vlc.ico $(win32_destdir)
 	for plugindir in $(prefix)/lib/vlc/plugins/*/; do \
