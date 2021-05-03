@@ -280,7 +280,7 @@ vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
 {
     struct seek_target seek_target = {
         .type = VLC_THUMBNAILER_SEEK_POS,
-        .time = pos,
+        .pos = pos,
     };
     return RequestCommon(thumbnailer, seek_target, speed, item, timeout, cb,
                          userdata);
