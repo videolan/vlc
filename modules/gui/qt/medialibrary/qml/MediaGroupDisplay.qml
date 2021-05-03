@@ -44,7 +44,7 @@ VideoAll {
     property alias parentId: modelGroup.parentId
 
     // NOTE: The name of the group.
-    property string name
+    property string name: initialName
 
     //---------------------------------------------------------------------------------------------
     // Childs
