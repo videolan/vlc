@@ -1175,7 +1175,7 @@ player_vout_on_fullscreen_changed(vout_thread_t *vout, bool enabled,
 static void
 player_on_captions_to_display(const void *p_cc, size_t i_cc, void *p_data)
 {
-    printf("DBUS player_on_captions_to_display %ld", i_cc);
+    //printf("DBUS player_on_captions_to_display %ld", i_cc);
 }
 
 static void
