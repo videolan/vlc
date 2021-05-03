@@ -27,7 +27,7 @@ appname = os.path.basename(application)
 format = defines.get('format', 'UDBZ')
 
 # Volume size (must be large enough for your files)
-size = defines.get('size', '150M')
+size = defines.get('size', '300M')
 
 # Files to include
 files = [ application ]
