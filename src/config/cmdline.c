@@ -325,7 +325,7 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                         fprintf( stderr, _( "       Did you mean `--%s'?\n" ), best );
                 }
             }
-            fputs( _( "Try `vlc --help' for more information.\n" ), stderr );
+            fputs( _( "For more information try `--help'\n" ), stderr );
             goto out;
         }
     }
