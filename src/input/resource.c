@@ -49,6 +49,7 @@ struct vout_resource
     vout_thread_t *vout;
     enum vlc_vout_order order;
     bool started;
+    char *psz_prev_title;
 
     struct vlc_list node;
 };
@@ -109,6 +110,7 @@ vout_resource_Create(vout_thread_t *vout)
 
     vout_rsc->started = false;
     vout_rsc->vout = vout;
+    vout_rsc->psz_prev_title = NULL;
     return vout_rsc;
 }
 
@@ -123,6 +125,7 @@ vout_resource_Remove(struct vout_resource *vout_rsc)
 {
     vlc_list_remove(&vout_rsc->node);
     vout_thread_t *vout = vout_rsc->vout;
+    free(vout_rsc->psz_prev_title);
     free(vout_rsc);
 
     assert(vout);
@@ -160,8 +163,22 @@ static void DestroyVout( input_resource_t *p_resource )
     }
 }
 
+static void VoutSetAndDeduplicateTitle( vout_thread_t *p_vout,
+                                        char **ppsz_title,
+                                        char **ppsz_prev_title )
+{
+    if( !*ppsz_prev_title || strcmp( *ppsz_prev_title, *ppsz_title ) )
+    {
+        vout_DisplayTitle( p_vout, *ppsz_title );
+        free( *ppsz_prev_title );
+        *ppsz_prev_title = *ppsz_title;
+        *ppsz_title = NULL;
+    }
+}
+
 static void DisplayVoutTitle( input_resource_t *p_resource,
-                              vout_thread_t *p_vout )
+                              vout_thread_t *p_vout,
+                              char ** ppsz_prev_title )
 {
     if( p_resource->p_input == NULL )
         return;
@@ -173,7 +190,7 @@ static void DisplayVoutTitle( input_resource_t *p_resource,
     char *psz_nowplaying = input_item_GetNowPlayingFb( p_item );
     if( psz_nowplaying && *psz_nowplaying )
     {
-        vout_DisplayTitle( p_vout, psz_nowplaying );
+        VoutSetAndDeduplicateTitle( p_vout, &psz_nowplaying, ppsz_prev_title );
     }
     else
     {
@@ -190,13 +207,13 @@ static void DisplayVoutTitle( input_resource_t *p_resource,
             char *psz_string;
             if( asprintf( &psz_string, "%s - %s", psz_name, psz_artist ) != -1 )
             {
-                vout_DisplayTitle( p_vout, psz_string );
+                VoutSetAndDeduplicateTitle( p_vout, &psz_string, ppsz_prev_title );
                 free( psz_string );
             }
         }
         else if( psz_name )
         {
-            vout_DisplayTitle( p_vout, psz_name );
+            VoutSetAndDeduplicateTitle( p_vout, &psz_name, ppsz_prev_title );
         }
         free( psz_name );
         free( psz_artist );
@@ -495,7 +512,7 @@ vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
     if (has_started != NULL)
         *has_started = true;
 
-    DisplayVoutTitle(p_resource, cfg->vout);
+    DisplayVoutTitle(p_resource, cfg->vout, &vout_rsc->psz_prev_title);
 
     /* Send original viewpoint to the input in order to update other ESes */
     if (p_resource->p_input != NULL)
