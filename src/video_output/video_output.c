@@ -107,7 +107,12 @@ typedef struct vout_thread_sys_t
         bool        is_interlaced;
         picture_t   *decoded; // decoded picture before passed through chain_static
         picture_t   *current;
+        picture_t   *last_caption_reference;
+        picture_t   *caption_reference;
         picture_captions_t captions;
+#ifdef DEBUG_CAPTION
+        FILE *caption_file;
+#endif
     } displayed;
 
     struct {
@@ -1087,6 +1092,7 @@ static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reus
         sys->displayed.timestamp     = decoded->date;
         sys->displayed.captions      = decoded->captions;
         sys->displayed.is_interlaced = !decoded->b_progressive;
+        sys->displayed.caption_reference = decoded;
 
         vout_chrono_Start(&sys->static_filter);
         picture = filter_chain_VideoFilter(sys->filter.chain_static, sys->displayed.decoded);
@@ -1559,10 +1565,30 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 
     int ret = ThreadDisplayRenderPicture(vout, render_now);
 
-    if(sys->displayed.captions.size)
+    if(sys->displayed.caption_reference &&
+       sys->displayed.caption_reference != sys->displayed.last_caption_reference &&
+       sys->displayed.caption_reference->captions.size > 0)
+    {
+#ifdef DEBUG_CAPTION
+        msg_Warn(&vout->obj, " - new caption, size: %zu, %s", sys->displayed.caption_reference->captions.size,
+                sys->displayed.caption_reference->b_top_field_first ? "TOP":"BOTTOM");
+#endif
         vout_CaptionsToDisplay(&vout->obj,
-                               sys->displayed.captions.bytes,
-                               sys->displayed.captions.size);
+                               sys->displayed.caption_reference->captions.bytes,
+                               sys->displayed.caption_reference->captions.size);
+#ifdef DEBUG_CAPTION
+        fwrite(sys->displayed.caption_reference->captions.bytes, sizeof(char), sys->displayed.caption_reference->captions.size, sys->displayed.caption_file);
+#endif
+        sys->displayed.last_caption_reference = sys->displayed.caption_reference;
+    }
+#ifdef DEBUG_CAPTION
+    else
+    if(sys->displayed.caption_reference &&
+       sys->displayed.caption_reference == sys->displayed.last_caption_reference)
+    {
+        msg_Err(&vout->obj, " - -- drop duplicate");
+    }
+#endif
 
     if (first && ret == VLC_SUCCESS)
     {
@@ -1817,10 +1843,18 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
 
     sys->displayed.current       = NULL;
     sys->displayed.decoded       = NULL;
+    sys->displayed.caption_reference = NULL;
+    sys->displayed.last_caption_reference = NULL;
     sys->displayed.date          = VLC_TICK_INVALID;
     sys->displayed.timestamp     = VLC_TICK_INVALID;
     sys->displayed.captions.size = 0;
     sys->displayed.is_interlaced = false;
+
+#ifdef DEBUG_CAPTION
+    sys->displayed.caption_file = fopen("/tmp/caption_dump.hex", "wb");
+    assert(sys->displayed.caption_file);
+#endif
+
 
     sys->step.last               = VLC_TICK_INVALID;
     sys->step.timestamp          = VLC_TICK_INVALID;
@@ -1948,6 +1982,10 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
         spu_Detach(sys->spu);
     sys->clock = NULL;
     video_format_Clean(&sys->original);
+#ifdef DEBUG_CAPTION
+    msg_Info(vout, " -- fclose /tmp/caption_dump --");
+    fclose(sys->displayed.caption_file);
+#endif
 }
 
 void vout_StopDisplay(vout_thread_t *vout)
