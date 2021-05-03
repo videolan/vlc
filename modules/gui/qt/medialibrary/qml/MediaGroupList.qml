@@ -194,7 +194,7 @@ Widgets.NavigableFocusScope {
     }
 
     Widgets.DragItem {
-        id: dragItem
+        id: dragItemGroup
 
         function updateComponents(maxCovers) {
             var items = modelSelect.selectedIndexes.slice(0, maxCovers).map(function (x){
@@ -205,13 +205,13 @@ Widgets.NavigableFocusScope {
                 return { artwork: item.thumbnail || VLCStyle.noArtCover }
             });
 
-            var title = items.map(function (item) {
-                return item.title
+            var name = items.map(function (item) {
+                return item.name
             }).join(", ");
 
             return {
                 covers: covers,
-                title: title,
+                title: name,
                 count: modelSelect.selectedIndexes.length
             }
         }
@@ -284,7 +284,7 @@ Widgets.NavigableFocusScope {
                 // NOTE: We don't want to show the indicator for a group.
                 showNewIndicator: (model.count === 1)
 
-                dragItem: root.dragItem
+                dragItem: dragItemGroup
 
                 selectedUnderlay  : shadows.selected
                 unselectedUnderlay: shadows.unselected
@@ -364,7 +364,7 @@ Widgets.NavigableFocusScope {
 
             selectionDelegateModel: modelSelect
 
-            dragItem: root.dragItem
+            dragItem: dragItemGroup
 
             header: root.header
 
