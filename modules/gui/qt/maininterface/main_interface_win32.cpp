@@ -40,6 +40,8 @@
 #include <QWindow>
 #include <qpa/qplatformnativeinterface.h>
 
+#include <dwmapi.h>
+
 #define WM_APPCOMMAND 0x0319
 
 #define APPCOMMAND_VOLUME_MUTE            8
@@ -152,6 +154,10 @@ private:
             }
             SetWindowLong (winId, GWL_STYLE, style);
         }
+
+        // add back shadows
+        const MARGINS m {0, 0, (m_useClientSideDecoration ? 1 : 0) /* top margin */ , 0};
+        DwmExtendFrameIntoClientArea(winId, &m);
 
         SetWindowPos(winId, NULL, 0, 0, 0, 0,
             SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOCOPYBITS |
