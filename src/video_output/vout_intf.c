@@ -313,6 +313,8 @@ void vout_IntfReinit( vout_thread_t *p_vout )
     var_TriggerCallback( p_vout, "video-filter" );
     var_TriggerCallback( p_vout, "sub-source" );
     var_TriggerCallback( p_vout, "sub-filter" );
+    /* !Warn those will trigger also vlc_player_vout_OSDCallback and
+        cause unwanted OSD on vout start. Filter out it there. */
     var_TriggerCallback( p_vout, "sub-margin" );
     var_TriggerCallback( p_vout, "secondary-sub-margin" );
 }

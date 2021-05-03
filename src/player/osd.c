@@ -323,10 +323,10 @@ vlc_player_vout_OSDCallback(vlc_object_t *this, const char *var,
             free(mode);
     }
 
-    else if (strcmp(var, "sub-margin") == 0)
+    else if (strcmp(var, "sub-margin") == 0 && newval.i_int != oldval.i_int)
         vouts_osd_Message(&vout, 1, _("Subtitle position %d px"), newval.i_int);
 
-    else if (strcmp(var, "secondary-sub-margin") == 0)
+    else if (strcmp(var, "secondary-sub-margin") == 0 && newval.i_int != oldval.i_int)
         vouts_osd_Message(&vout, 1, _("Secondary subtitle position %d px"), newval.i_int);
 
     else if (strcmp(var, "sub-text-scale") == 0)
