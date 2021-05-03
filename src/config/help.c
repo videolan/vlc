@@ -493,11 +493,11 @@ static void print_item(const module_t *m, const struct vlc_param *param,
         strcpy(shortopt, "   ");
 
     if (CONFIG_CLASS(item->i_type) == CONFIG_ITEM_BOOL)
-        printf(color ? TS_RESET_BOLD"  %s --%s"      "%s%s%s%s%s " TS_RESET
+        printf(color ? TS_BOLD "  %s --%s"      "%s%s%s%s%s " TS_RESET
                      : "  %s --%s%s%s%s%s%s ", shortopt, item->psz_name,
                prefix, item->psz_name, bra, type, ket);
     else
-        printf(color ? TS_RESET_BOLD "  %s --%s" TS_YELLOW_BOLD "%s%s%s%s%s " TS_RESET
+        printf(color ? TS_BOLD "  %s --%s" TS_YELLOW_BOLD "%s%s%s%s%s " TS_RESET
                      : "  %s --%s%s%s%s%s%s ", shortopt, item->psz_name,
                "", "",  /* XXX */      bra, type, ket);
 
@@ -627,7 +627,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
     }
 
     if (!found)
-        printf(color ? "\n" TS_RESET_BOLD "%s" TS_RESET "\n" : "\n%s\n",
+        printf(color ? "\n" TS_BOLD "%s" TS_RESET "\n" : "\n%s\n",
                _("No matching module found. Use --list or "
                  "--list-verbose to list available modules."));
 }
