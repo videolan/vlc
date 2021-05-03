@@ -44,6 +44,7 @@ namespace adaptive
             AbstractFakeEsOut();
             virtual ~AbstractFakeEsOut();
             operator es_out_t*();
+            virtual void milestoneReached() = 0;
             /* Used by FakeES ID */
             virtual void recycle( AbstractFakeESOutID * ) = 0;
             virtual void createOrRecycleRealEsID( AbstractFakeESOutID * ) = 0;
@@ -92,6 +93,8 @@ namespace adaptive
             vlc_tick_t fixTimestamp(vlc_tick_t);
             void declareEs( const es_format_t * );
 
+            virtual void milestoneReached() override;
+
             /* Used by FakeES ID */
             virtual void recycle( AbstractFakeESOutID *id ) override;
             virtual void createOrRecycleRealEsID( AbstractFakeESOutID * ) override;
@@ -100,6 +103,7 @@ namespace adaptive
             virtual void sendMeta( int, const vlc_meta_t * ) override;
 
             /**/
+            void scheduleNecessaryMilestone();
             void schedulePCRReset();
             void scheduleAllForDeletion(); /* Queue Del commands for non Del issued ones */
             void recycleAll(); /* Cancels all commands and send fakees for recycling */
@@ -127,6 +131,7 @@ namespace adaptive
             vlc_tick_t timestamp_first;
             vlc_tick_t timestamps_offset;
             int priority;
+            bool b_in_commands_group;
             std::list<FakeESOutID *> fakeesidlist;
             std::list<FakeESOutID *> recycle_candidates;
             std::list<FakeESOutID *> declared;

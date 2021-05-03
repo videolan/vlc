@@ -426,6 +426,22 @@ void FakeESOut::recycle( AbstractFakeESOutID *id_ )
     recycle_candidates.push_back( id );
 }
 
+void FakeESOut::milestoneReached()
+{
+    gc();
+}
+
+void FakeESOut::scheduleNecessaryMilestone()
+{
+    if( b_in_commands_group )
+    {
+        AbstractCommand *command = commandsfactory->createEsOutMilestoneCommand( this );
+         if( likely(command) )
+             commandsqueue->Schedule( command );
+         b_in_commands_group = false;
+    }
+}
+
 vlc_tick_t FakeESOut::fixTimestamp(vlc_tick_t ts)
 {
     if(ts != VLC_TICK_INVALID)
@@ -506,6 +522,7 @@ es_out_id_t * FakeESOut::esOutAdd(const es_format_t *p_fmt)
         {
             fakeesidlist.push_back(es_id);
             commandsqueue->Schedule( command );
+            b_in_commands_group = true;
             return reinterpret_cast<es_out_id_t *>(es_id);
         }
         else
@@ -519,6 +536,8 @@ es_out_id_t * FakeESOut::esOutAdd(const es_format_t *p_fmt)
 int FakeESOut::esOutSend(es_out_id_t *p_es, block_t *p_block)
 {
     vlc_mutex_locker locker(&lock);
+
+    scheduleNecessaryMilestone();
 
     FakeESOutID *es_id = reinterpret_cast<FakeESOutID *>( p_es );
     assert(!es_id->scheduledForDeletion());
@@ -546,11 +565,14 @@ void FakeESOut::esOutDel(es_out_id_t *p_es)
         es_id->setScheduledForDeletion();
         commandsqueue->Schedule( command );
     }
+    b_in_commands_group = true;
 }
 
 int FakeESOut::esOutControl(int i_query, va_list args)
 {
     vlc_mutex_locker locker(&lock);
+
+    scheduleNecessaryMilestone();
 
     switch( i_query )
     {
@@ -607,6 +629,8 @@ int FakeESOut::esOutControl(int i_query, va_list args)
 void FakeESOut::esOutDestroy()
 {
     vlc_mutex_locker locker(&lock);
+
+    scheduleNecessaryMilestone();
 
     AbstractCommand *command = commandsfactory->createEsOutDestroyCommand();
     if( likely(command) )

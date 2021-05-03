@@ -38,7 +38,8 @@ enum
     ES_OUT_PRIVATE_COMMAND_DEL,
     ES_OUT_PRIVATE_COMMAND_DESTROY,
     ES_OUT_PRIVATE_COMMAND_SEND,
-    ES_OUT_PRIVATE_COMMAND_DISCONTINUITY
+    ES_OUT_PRIVATE_COMMAND_DISCONTINUITY,
+    ES_OUT_PRIVATE_COMMAND_MILESTONE,
 };
 
 AbstractCommand::AbstractCommand( int type_ )
@@ -179,6 +180,17 @@ void EsOutMetaCommand::Execute()
     out->sendMeta( group, p_meta );
 }
 
+EsOutMilestoneCommand::EsOutMilestoneCommand( AbstractFakeEsOut *out )
+    : AbstractCommand( ES_OUT_PRIVATE_COMMAND_MILESTONE )
+{
+    this->out = out;
+}
+
+void EsOutMilestoneCommand::Execute()
+{
+    out->milestoneReached();
+}
+
 /*
  * Commands Default Factory
  */
@@ -223,6 +235,11 @@ EsOutMetaCommand * CommandsFactory::createEsOutMetaCommand( AbstractFakeEsOut *o
         return new (std::nothrow) EsOutMetaCommand( out, group, p_dup );
     }
     return nullptr;
+}
+
+EsOutMilestoneCommand * CommandsFactory::createEsOutMilestoneCommand( AbstractFakeEsOut *out ) const
+{
+    return new (std::nothrow) EsOutMilestoneCommand( out );
 }
 
 /*
