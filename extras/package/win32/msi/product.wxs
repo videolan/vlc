@@ -125,7 +125,7 @@
                             <File Id='AUTHORS.txt' Name='AUTHORS.txt'  DiskId='1' />
                             <File Id='COPYING.txt' Name='COPYING.txt' DiskId='1' />
                             <File Id='NEWS.txt' Name='NEWS.txt' DiskId='1' />
-                            <File Id='README.md' Name='README.md' DiskId='1' />
+                            <File Id='README.txt' Name='README.txt' DiskId='1' />
                             <File Id='THANKS.txt' Name='THANKS.txt' DiskId='1' />
                         </Component>
 
