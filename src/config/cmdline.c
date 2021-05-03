@@ -292,12 +292,12 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
             if (i_cmd == ':')
             {
                 if( state.opt )
-                    fprintf( stderr, _( "Missing mandatory value for option `%s-%c%s'\n" ),
+                    fprintf( stderr, _( "Missing mandatory value for option %s-%c%s\n" ),
                              color ? TS_YELLOW : "",
                              state.opt,
                              color ? TS_RESET : "" );
                 else
-                    fprintf( stderr, _( "Missing mandatory value for option `%s%s%s'\n" ),
+                    fprintf( stderr, _( "Missing mandatory value for option %s%s%s\n" ),
                              color ? TS_YELLOW : "",
                              ppsz_argv[state.ind-1],
                              color ? TS_RESET : "" );
@@ -332,11 +332,11 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                         }
                     }
                     if (best)
-                        fprintf( stderr, _( "       Did you mean `%s--%s%s'?\n" ),
+                        fprintf( stderr, _( "       Did you mean %s--%s%s?\n" ),
                                  color ? TS_GREEN : "", best, color ? TS_RESET : "" );
                 }
             }
-            fprintf( stderr, _( "For more information try `%s--help%s'\n" ),
+            fprintf( stderr, _( "For more information try %s--help%s\n" ),
                      color ? TS_GREEN : "", color ? TS_RESET : "" );
             goto out;
         }
