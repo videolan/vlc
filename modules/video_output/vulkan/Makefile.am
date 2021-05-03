@@ -3,7 +3,6 @@
 
 VULKAN_COMMONSOURCES = video_output/vulkan/instance.c \
 	video_output/vulkan/instance.h \
-	video_output/vulkan/platform.h \
 	video_output/placebo_utils.c \
 	video_output/placebo_utils.h
 
