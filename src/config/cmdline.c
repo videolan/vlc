@@ -288,35 +288,30 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
         /* Internal error: unknown option or missing option value */
         if( !b_ignore_errors )
         {
+            char *optlabel;
+            if ( (state.opt && asprintf(&optlabel, "%s-%c%s",
+                                        color ? TS_YELLOW : "", state.opt,
+                                        color ? TS_RESET : "") < 0)
+              || (!state.opt && asprintf(&optlabel, "%s%s%s",
+                                         color ? TS_YELLOW : "", ppsz_argv[state.ind-1],
+                                         color ? TS_RESET : "") < 0) )
+            {
+                /* just ignore failure - unlikely and not worth trying to handle in some way */
+                optlabel = NULL;
+            }
+
             fprintf( stderr, _( "%sError:%s " ), color ? TS_RED_BOLD : "", color ? TS_RESET : "");
             if (i_cmd == ':')
             {
-                if( state.opt )
-                    fprintf( stderr, _( "Missing mandatory value for option %s-%c%s\n" ),
-                             color ? TS_YELLOW : "",
-                             state.opt,
-                             color ? TS_RESET : "" );
-                else
-                    fprintf( stderr, _( "Missing mandatory value for option %s%s%s\n" ),
-                             color ? TS_YELLOW : "",
-                             ppsz_argv[state.ind-1],
-                             color ? TS_RESET : "" );
+                fprintf( stderr, _( "Missing mandatory value for option %s\n" ), optlabel );
             }
             else
             {
-                if( state.opt )
-                    fprintf( stderr, _( "Unknown option `%s-%c%s'\n" ),
-                             color ? TS_YELLOW : "",
-                             state.opt,
-                             color ? TS_RESET : "" );
-                else
-                {
-                    fprintf( stderr, _( "Unknown option `%s%s%s'\n" ),
-                             color ? TS_YELLOW : "",
-                             ppsz_argv[state.ind-1],
-                             color ? TS_RESET : "" );
+                fprintf( stderr, _( "Unknown option `%s'\n" ), optlabel );
 
-                    /* suggestion matching */
+                /* suggestion matching */
+                if( !state.opt )
+                {
                     float jw_filter = 0.8, best_metric = jw_filter, metric;
                     const char *best = NULL;
                     const char *jw_a = ppsz_argv[state.ind-1] + 2;
