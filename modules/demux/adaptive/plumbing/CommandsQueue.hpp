@@ -137,6 +137,17 @@ namespace adaptive
             vlc_meta_t *p_meta;
     };
 
+    class EsOutMilestoneCommand : public AbstractCommand
+    {
+        friend class CommandsFactory;
+        public:
+            virtual void Execute() override;
+
+        protected:
+            EsOutMilestoneCommand( AbstractFakeEsOut * );
+            AbstractFakeEsOut *out;
+    };
+
     /* Factory so we can alter behaviour and filter on execution */
     class CommandsFactory
     {
@@ -149,6 +160,7 @@ namespace adaptive
             virtual EsOutControlResetPCRCommand * creatEsOutControlResetPCRCommand() const;
             virtual EsOutDestroyCommand * createEsOutDestroyCommand() const;
             virtual EsOutMetaCommand * createEsOutMetaCommand( AbstractFakeEsOut *, int, const vlc_meta_t * ) const;
+            virtual EsOutMilestoneCommand * createEsOutMilestoneCommand( AbstractFakeEsOut * ) const;
     };
 
     using Queueentry = std::pair<uint64_t, AbstractCommand *>;

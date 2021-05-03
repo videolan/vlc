@@ -410,6 +410,7 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(mtime_t nz_deadline,
         /* need to read, demuxer still buffering, ... */
         vlc_mutex_unlock(&lock);
         Demuxer::Status demuxStatus = demuxer->demux(nz_deadline);
+        fakeEsOut()->scheduleNecessaryMilestone();
         vlc_mutex_lock(&lock);
         if(demuxStatus != Demuxer::Status::Success)
         {
