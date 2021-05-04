@@ -47,7 +47,7 @@ struct render_context
     struct {
         ID3D11Texture2D         *textureVLC; // shared between VLC and the app
         ID3D11RenderTargetView  *textureRenderTarget;
-        HANDLE                  sharedHandled; // handle of the texture used by VLC and the app
+        HANDLE                  sharedHandle; // handle of the texture used by VLC and the app
 
         /* texture VLC renders into */
         ID3D11Texture2D          *texture;
@@ -280,10 +280,10 @@ static void init_direct3d(struct render_context *ctx)
 static void release_textures(struct render_context *ctx)
 {
     ULONG ref;
-    if (ctx->resized.sharedHandled)
+    if (ctx->resized.sharedHandle)
     {
-        CloseHandle(ctx->resized.sharedHandled);
-        ctx->resized.sharedHandled = NULL;
+        CloseHandle(ctx->resized.sharedHandle);
+        ctx->resized.sharedHandle = NULL;
     }
     if (ctx->resized.textureVLC)
     {
@@ -382,7 +382,6 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_render_cfg_t *cfg,
     D3D11_TEXTURE2D_DESC texDesc = { };
     texDesc.MipLevels = 1;
     texDesc.SampleDesc.Count = 1;
-    texDesc.MiscFlags = 0;
     texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
     texDesc.Usage = D3D11_USAGE_DEFAULT;
     texDesc.CPUAccessFlags = 0;
@@ -397,12 +396,12 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_render_cfg_t *cfg,
 
     IDXGIResource1* sharedResource = NULL;
     ctx->resized.texture->QueryInterface(__uuidof(IDXGIResource1), (LPVOID*) &sharedResource);
-    hr = sharedResource->CreateSharedHandle(NULL, DXGI_SHARED_RESOURCE_READ|DXGI_SHARED_RESOURCE_WRITE, NULL, &ctx->resized.sharedHandled);
+    hr = sharedResource->CreateSharedHandle(NULL, DXGI_SHARED_RESOURCE_READ|DXGI_SHARED_RESOURCE_WRITE, NULL, &ctx->resized.sharedHandle);
     sharedResource->Release();
 
     ID3D11Device1* d3d11VLC1;
     ctx->d3deviceVLC->QueryInterface(__uuidof(ID3D11Device1), (LPVOID*) &d3d11VLC1);
-    hr = d3d11VLC1->OpenSharedResource1(ctx->resized.sharedHandled, __uuidof(ID3D11Texture2D), (void**)&ctx->resized.textureVLC);
+    hr = d3d11VLC1->OpenSharedResource1(ctx->resized.sharedHandle, __uuidof(ID3D11Texture2D), (void**)&ctx->resized.textureVLC);
     d3d11VLC1->Release();
 
     D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc;
