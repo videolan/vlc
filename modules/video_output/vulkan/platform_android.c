@@ -27,18 +27,18 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
-#include "instance.h"
+#include "platform.h"
 #include "../android/utils.h"
 
-static void ClosePlatform(vlc_vk_t *vk);
-static int CreateSurface(vlc_vk_t *vk);
-static const struct vlc_vk_operations platform_ops =
+static void ClosePlatform(vlc_vk_platform_t *vk);
+static int CreateSurface(vlc_vk_platform_t *vk);
+static const struct vlc_vk_platform_operations platform_ops =
 {
     .close = ClosePlatform,
     .create_surface = CreateSurface,
 };
 
-static int InitPlatform(vlc_vk_t *vk)
+static int InitPlatform(vlc_vk_platform_t *vk)
 {
     if (vk->window->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
         return VLC_EGENERIC;
@@ -48,13 +48,13 @@ static int InitPlatform(vlc_vk_t *vk)
     return VLC_SUCCESS;
 }
 
-static void ClosePlatform(vlc_vk_t *vk)
+static void ClosePlatform(vlc_vk_platform_t *vk)
 {
     AWindowHandler_releaseANativeWindow(vk->window->handle.anativewindow,
                                         AWindow_Video);
 }
 
-static int CreateSurface(vlc_vk_t *vk, VkInstance vkinst)
+static int CreateSurface(vlc_vk_platform_t *vk, VkInstance vkinst)
 {
     ANativeWindow *anw =
         AWindowHandler_getANativeWindow(vk->window->handle.anativewindow,

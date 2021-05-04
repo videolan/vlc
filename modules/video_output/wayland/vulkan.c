@@ -27,12 +27,12 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
-#include "../vulkan/instance.h"
+#include "../vulkan/platform.h"
 
-static void ClosePlatform(vlc_vk_t *vk)
+static void ClosePlatform(vlc_vk_platform_t *vk)
     { (void)vk; }
 
-static int CreateSurface(vlc_vk_t *vk, VkInstance vkinst, VkSurfaceKHR *surface_out)
+static int CreateSurface(vlc_vk_platform_t *vk, VkInstance vkinst, VkSurfaceKHR *surface_out)
 {
     VkWaylandSurfaceCreateInfoKHR surface_info = {
         .sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR,
@@ -49,13 +49,13 @@ static int CreateSurface(vlc_vk_t *vk, VkInstance vkinst, VkSurfaceKHR *surface_
     return VLC_SUCCESS;
 }
 
-static const struct vlc_vk_operations platform_ops =
+static const struct vlc_vk_platform_operations platform_ops =
 {
     .close = ClosePlatform,
     .create_surface = CreateSurface,
 };
 
-static int InitPlatform(vlc_vk_t *vk)
+static int InitPlatform(vlc_vk_platform_t *vk)
 {
     if (vk->window->type != VOUT_WINDOW_TYPE_WAYLAND)
         return VLC_EGENERIC;

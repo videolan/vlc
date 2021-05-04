@@ -74,7 +74,7 @@ libegl_wl_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) $(WAYLAND_EGL_CFLAGS)
 libegl_wl_plugin_la_LIBADD = $(EGL_LIBS) $(WAYLAND_EGL_LIBS)
 
 libvk_wl_plugin_la_SOURCES = \
-	video_output/vulkan/instance.h \
+	video_output/vulkan/platform.h \
 	video_output/wayland/vulkan.c
 libvk_wl_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(WAYLAND_CLIENT_CFLAGS) $(VULKAN_COMMONCFLAGS) \

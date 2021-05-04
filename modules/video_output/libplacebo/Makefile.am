@@ -24,8 +24,8 @@ vout_LTLIBRARIES += libplacebo_plugin.la
 
 ### Vulkan ###
 libplacebo_vk_plugin_la_SOURCES = $(LIBPLACEBO_COMMONSOURCES) \
-				  video_output/vulkan/instance.h \
-				  video_output/vulkan/instance.c \
+				  video_output/vulkan/platform.h \
+				  video_output/vulkan/platform.c \
 				  video_output/libplacebo/instance_vulkan.c
 libplacebo_vk_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBPLACEBO_CFLAGS) $(VULKAN_CFLAGS)
 libplacebo_vk_plugin_la_LIBADD = $(LIBPLACEBO_LIBS) $(VULKAN_LIBS)

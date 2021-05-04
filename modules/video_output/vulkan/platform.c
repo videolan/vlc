@@ -1,5 +1,5 @@
 /*****************************************************************************
- * instance.c: Vulkan instance abstraction
+ * platform.c: Vulkan platform abstraction
  *****************************************************************************
  * Copyright (C) 2018 Niklas Haas
  *
@@ -29,12 +29,12 @@
 #include <vlc_modules.h>
 #include <vlc_atomic.h>
 
-#include "instance.h"
+#include "platform.h"
 
 static int vlc_vk_start(void *func, bool forced, va_list ap)
 {
-    int (*activate)(vlc_vk_t *vk) = func;
-    vlc_vk_t *vk = va_arg(ap, vlc_vk_t *);
+    int (*activate)(vlc_vk_platform_t *vk) = func;
+    vlc_vk_platform_t *vk = va_arg(ap, vlc_vk_platform_t *);
 
     int ret = activate(vk);
     /* TODO: vlc_objres_clear, which is not in the public API. */
@@ -43,16 +43,16 @@ static int vlc_vk_start(void *func, bool forced, va_list ap)
 }
 
 /**
- * Creates a Vulkan surface (and its underlying instance).
+ * Initializes a Vulkan platform module for a given window
  *
  * @param wnd window to use as Vulkan surface
  * @param name module name (or NULL for auto)
- * @return a new context, or NULL on failure
+ * @return a new platform object, or NULL on failure
  */
-vlc_vk_t *vlc_vk_Create(struct vout_window_t *wnd, const char *name)
+vlc_vk_platform_t *vlc_vk_platform_Create(struct vout_window_t *wnd, const char *name)
 {
     vlc_object_t *parent = (vlc_object_t *) wnd;
-    struct vlc_vk_t *vk;
+    struct vlc_vk_platform_t *vk;
 
     vk = vlc_object_create(parent, sizeof (*vk));
     if (unlikely(vk == NULL))
@@ -75,12 +75,12 @@ vlc_vk_t *vlc_vk_Create(struct vout_window_t *wnd, const char *name)
     return vk;
 }
 
-void vlc_vk_Hold(vlc_vk_t *vk)
+void vlc_vk_platform_Hold(vlc_vk_platform_t *vk)
 {
     vlc_atomic_rc_inc(&vk->ref_count);
 }
 
-void vlc_vk_Release(vlc_vk_t *vk)
+void vlc_vk_platform_Release(vlc_vk_platform_t *vk)
 {
     if (!vlc_atomic_rc_dec(&vk->ref_count))
         return;

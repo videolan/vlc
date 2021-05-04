@@ -1,8 +1,8 @@
 
 ### Vulkan ###
 
-VULKAN_COMMONSOURCES = video_output/vulkan/instance.c \
-	video_output/vulkan/instance.h
+VULKAN_COMMONSOURCES = video_output/vulkan/platform.c \
+	video_output/vulkan/platform.h
 
 # Trigger the c++ linker because of glslang dependency of libplacebo
 VULKAN_COMMONSOURCES += dummy.cpp

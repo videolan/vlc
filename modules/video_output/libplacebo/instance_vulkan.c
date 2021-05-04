@@ -29,12 +29,12 @@
 
 #include <libplacebo/vulkan.h>
 
-#include "../vulkan/instance.h"
+#include "../vulkan/platform.h"
 #include "instance.h"
 #include "utils.h"
 
 struct vlc_placebo_system_t {
-    vlc_vk_t *vk;
+    vlc_vk_platform_t *platform;
     const struct pl_vk_inst *instance;
     const struct pl_vulkan *vulkan;
 };
@@ -53,16 +53,16 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
         return VLC_ENOMEM;
 
     char *platform_name = var_InheritString(pl, "vk-platform");
-    sys->vk = vlc_vk_Create(cfg->window, platform_name);
+    sys->platform = vlc_vk_platform_Create(cfg->window, platform_name);
     free(platform_name);
-    if (!sys->vk)
+    if (!sys->platform)
         goto error;
 
     sys->instance = pl_vk_inst_create(pl->ctx, &(struct pl_vk_inst_params) {
         .debug = var_InheritBool(pl, "vk-debug"),
         .extensions = (const char *[]) {
             VK_KHR_SURFACE_EXTENSION_NAME,
-            sys->vk->platform_ext,
+            sys->platform->platform_ext,
         },
         .num_extensions = 2,
     });
@@ -71,7 +71,7 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
 
     // Create the platform-specific surface object
     VkSurfaceKHR surface;
-    if (vlc_vk_CreateSurface(sys->vk, sys->instance->instance, &surface) != VLC_SUCCESS)
+    if (vlc_vk_CreateSurface(sys->platform, sys->instance->instance, &surface) != VLC_SUCCESS)
         goto error;
 
     // Create vulkan device
@@ -116,8 +116,8 @@ static void CloseInstance(vlc_placebo_t *pl)
     pl_vulkan_destroy(&sys->vulkan);
     pl_vk_inst_destroy(&sys->instance);
 
-    if (sys->vk != NULL)
-        vlc_vk_Release(sys->vk);
+    if (sys->platform != NULL)
+        vlc_vk_platform_Release(sys->platform);
 
     vlc_obj_free(VLC_OBJECT(pl), sys);
     pl->sys = NULL;
