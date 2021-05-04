@@ -588,12 +588,19 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
     SD::MediaServerDesc* p_server = NULL;
 
     char *psz_satip_channellist = config_GetPsz(m_sd, "satip-channelist");
-    if( !psz_satip_channellist ) {
-        psz_satip_channellist = strdup("Auto");
-    }
 
-    if( unlikely( !psz_satip_channellist ) )
-        return;
+    /* In Auto mode, default to MasterList list from satip.info */
+    bool automode = false;
+    if( !psz_satip_channellist || /* On lookup failure or empty string, use auto mode */
+        strcmp(psz_satip_channellist, "Auto") == 0 )
+    {
+        automode = true;
+        if( psz_satip_channellist )
+            free(psz_satip_channellist);
+        psz_satip_channellist = strdup( "MasterList" );
+        if( unlikely( !psz_satip_channellist ) )
+            return;
+    }
 
     vlc_url_t url;
     vlc_UrlParse( &url, psz_base_url );
@@ -622,8 +629,7 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
 
     /* Part 2: device playlist
      * In Automatic mode, or if requested by the user, check for a SAT>IP m3u list on the device */
-    if (strcmp(psz_satip_channellist, "ServerList") == 0 ||
-        strcmp(psz_satip_channellist, "Auto") == 0 ) {
+    if (automode || strcmp(psz_satip_channellist, "ServerList") == 0) {
         const char* psz_m3u_url = xml_getChildElementValue( p_device_element, "satip:X_SATIPM3U" );
         if ( psz_m3u_url ) {
             if ( strncmp( "http", psz_m3u_url, 4) )
@@ -653,7 +659,7 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
             msg_Dbg( m_sd, "SAT>IP server '%s' did not provide a playlist", url.psz_host);
         }
 
-        if(strcmp(psz_satip_channellist, "ServerList") == 0) {
+        if (!automode) {
             /* to comply with the SAT>IP specifications, we don't fallback on another channel list if this path failed,
              * but in Automatic mode, we continue */
             free(psz_satip_channellist);
@@ -666,12 +672,6 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
      * In the normal case, fetch a playlist from the satip website,
      * which will be processed by a lua script a bit later, to make it work sanely
      * MasterList is a list of usual Satellites */
-
-    /* In Auto mode, default to MasterList list from satip.info */
-    if( strcmp(psz_satip_channellist, "Auto") == 0 ) {
-        free(psz_satip_channellist);
-        psz_satip_channellist = strdup( "MasterList" );
-    }
 
     char *psz_url;
     if (asprintf( &psz_url, "http://www.satip.info/Playlists/%s.m3u",
