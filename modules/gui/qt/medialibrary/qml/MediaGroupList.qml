@@ -279,7 +279,7 @@ Widgets.NavigableFocusScope {
                 title: (model.name) ? model.name
                                     : i18n.qtr("Unknown title")
 
-                labels: _getLabels(model, i18n.qtr("%1 Medias"))
+                labels: _getLabels(model, i18n.qtr("%1 Videos"))
 
                 // NOTE: We don't want to show the indicator for a group.
                 showNewIndicator: (model.count === 1)
