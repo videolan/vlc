@@ -144,8 +144,8 @@ typedef struct
 #define POSY_TEXT N_("Y offset")
 #define POSY_LONGTEXT N_("Y offset, from top-left, or from relative position." )
 #define OPACITY_TEXT N_("Opacity")
-#define OPACITY_LONGTEXT N_("Opacity (inverse of transparency) of " \
-    "overlay text. 0 = transparent, 255 = totally opaque." )
+#define OPACITY_LONGTEXT N_("Opacity (inverse of transparency), " \
+  "from 0 for fully transparent to 255 for fully opaque." )
 
 #define SIZE_TEXT N_("Font size, pixels")
 #define SIZE_LONGTEXT N_("Font size, in pixels. Default is 0 (use default " \
@@ -157,11 +157,11 @@ typedef struct
     "chars are for red, then green, then blue. #000000 = black, #FF0000 = red,"\
     " #00FF00 = green, #FFFF00 = yellow (red + green), #FFFFFF = white" )
 
-#define POS_TEXT N_("Text position")
+#define POS_TEXT N_("Position")
 #define POS_LONGTEXT N_( \
-  "You can enforce the text position on the video " \
+  "Set the position on the video " \
   "(-1=absolute, 0=center, 1=left, 2=right, 4=top, 8=bottom; you can " \
-  "also use combinations of these values, eg 6 = top-right).")
+  "also use combinations of these values, e.g. 6 = top-right).")
 
 #define TITLE_TEXT N_("Title display mode")
 #define TITLE_LONGTEXT N_("Title display mode. Default is 0 (hidden) if the feed has an image and feed images are enabled, 1 otherwise.")

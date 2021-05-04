@@ -49,10 +49,10 @@
 #define FILE_LONGTEXT N_("Full path of the image files to use. Format is " \
 "<image>[,<delay in ms>[,<alpha>]][;<image>[,<delay>[,<alpha>]]][;...]. " \
 "If you only have one file, simply enter its filename.")
-#define REPEAT_TEXT N_("Logo animation # of loops")
+#define REPEAT_TEXT N_("Animation loops")
 #define REPEAT_LONGTEXT N_("Number of loops for the logo animation. " \
         "-1 = continuous, 0 = disabled")
-#define DELAY_TEXT N_("Logo individual image time in ms")
+#define DELAY_TEXT N_("Display time in ms")
 #define DELAY_LONGTEXT N_("Individual image display time of 0 - 60000 ms.")
 
 #define POSX_TEXT N_("X offset")
@@ -61,14 +61,14 @@
 #define POSY_TEXT N_("Y offset")
 #define POSY_LONGTEXT N_("Y offset, from top-left, or from relative position. " \
                          "You can move the logo by left-clicking it." )
-#define OPACITY_TEXT N_("Opacity of the logo")
-#define OPACITY_LONGTEXT N_("Logo opacity value " \
-  "(from 0 for full transparency to 255 for full opacity)." )
-#define POS_TEXT N_("Logo position")
+#define OPACITY_TEXT N_("Opacity")
+#define OPACITY_LONGTEXT N_("Opacity (inverse of transparency), " \
+  "from 0 for fully transparent to 255 for fully opaque." )
+#define POS_TEXT N_("Position")
 #define POS_LONGTEXT N_( \
-  "Enforce the logo position on the video " \
-  "(-1=absolute, 0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
-  "also use combinations of these values, eg 6 = top-right).")
+  "Set the position on the video " \
+  "(-1=absolute, 0=center, 1=left, 2=right, 4=top, 8=bottom; you can " \
+  "also use combinations of these values, e.g. 6 = top-right).")
 
 #define LOGO_HELP N_("Use a local picture as logo on the video")
 

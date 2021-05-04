@@ -45,14 +45,13 @@
 #define POSX_LONGTEXT N_("X offset, from top-left, or from relative position." )
 #define POSY_TEXT N_("Y offset")
 #define POSY_LONGTEXT N_("Y offset, from top-left, or from relative position." )
-#define TRANS_TEXT N_("Transparency of the bargraph")
-#define TRANS_LONGTEXT N_("Bargraph transparency value " \
-  "(from 0 for full transparency to 255 for full opacity).")
-#define POS_TEXT N_("Bargraph position")
+#define TRANS_TEXT N_("Transparency")
+#define TRANS_LONGTEXT N_("Transparency (from 0 for full transparency to 255 for full opacity).")
+#define POS_TEXT N_("Position")
 #define POS_LONGTEXT N_(\
-  "Enforce the bargraph position on the video " \
-  "(-1=absolute, 0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
-  "also use combinations of these values, eg 6 = top-right).")
+  "Set the position on the video " \
+  "(-1=absolute, 0=center, 1=left, 2=right, 4=top, 8=bottom; you can " \
+  "also use combinations of these values, e.g. 6 = top-right).")
 #define BARWIDTH_TEXT N_("Bar width in pixel")
 #define BARWIDTH_LONGTEXT N_("Width in pixel of each bar in the BarGraph to be displayed." )
 #define BARHEIGHT_TEXT N_("Bar Height in pixel")
