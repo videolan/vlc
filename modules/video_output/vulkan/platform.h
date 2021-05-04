@@ -26,9 +26,6 @@
 
 #include <vulkan/vulkan.h>
 
-struct vout_window_t;
-struct vout_window_cfg_t;
-
 struct vlc_vk_platform_t;
 struct vlc_vk_platform_operations
 {
@@ -40,14 +37,14 @@ struct vlc_vk_platform_operations
 // Struct for platform-specific Vulkan state
 typedef struct vlc_vk_platform_t
 {
-    // fields internal to platform.c, should not be touched
+    // set by platform.c
     struct vlc_object_t obj;
+    struct vout_window_t *window;
     module_t *module;
+
+    // set by the platform
     void *platform_sys;
     const char *platform_ext;
-
-    struct vout_window_t *window;
-
     const struct vlc_vk_platform_operations *ops;
 } vlc_vk_platform_t;
 
