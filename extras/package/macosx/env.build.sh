@@ -48,6 +48,9 @@ vlcGetRootDir() {
     echo "$(cd -P "$(dirname "$SOURCE")/../../../" && pwd)"
 }
 
+# If VLC_CCACHE_BINS_PATH is set, it is assumed it contains
+# clang and clang++ symlinks to the ccache binary which will
+# then act as a compiler wrapper
 vlcSetBaseEnvironment() {
     local LOCAL_BUILD_TRIPLET="$BUILD_TRIPLET"
     if [ -z "$LOCAL_BUILD_TRIPLET" ]; then
@@ -67,6 +70,19 @@ vlcSetBaseEnvironment() {
     export OBJCXX="$(xcrun --find clang++)"
     export RANLIB="$(xcrun --find ranlib)"
     export STRIP="$(xcrun --find strip)"
+
+    if [ -n "${VLC_CCACHE_BINS_PATH}" ]; then
+        if [ -d "${VLC_CCACHE_BINS_PATH}" ]; then
+            echo "Using ccache compiler wrappers in '${VLC_CCACHE_BINS_PATH}'"
+            export CC="${VLC_CCACHE_BINS_PATH}/cc"
+            export CXX="${VLC_CCACHE_BINS_PATH}/c++"
+            export OBJC="${VLC_CCACHE_BINS_PATH}/cc"
+            export OBJCXX="${VLC_CCACHE_BINS_PATH}/c++"
+        else
+            echo "Invalid VLC_CCACHE_BINS_PATH given, directory not found: '${VLC_CCACHE_BINS_PATH}'"
+            echo "Proceeding without ccache wrappers"
+        fi
+    fi
 
     python3Path=$(echo /Library/Frameworks/Python.framework/Versions/3.*/bin | awk '{print $1;}')
     if [ ! -d "$python3Path" ]; then
