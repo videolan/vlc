@@ -22,7 +22,6 @@
 #define VLC_VULKAN_PLATFORM_H
 
 #include <vlc_common.h>
-#include <vlc_atomic.h>
 #include <vlc_vout_window.h>
 
 #include <vulkan/vulkan.h>
@@ -44,7 +43,6 @@ typedef struct vlc_vk_platform_t
     // fields internal to platform.c, should not be touched
     struct vlc_object_t obj;
     module_t *module;
-    vlc_atomic_rc_t ref_count;
     void *platform_sys;
     const char *platform_ext;
 
@@ -55,7 +53,6 @@ typedef struct vlc_vk_platform_t
 
 vlc_vk_platform_t *vlc_vk_platform_Create(struct vout_window_t *, const char *) VLC_USED;
 void vlc_vk_platform_Release(vlc_vk_platform_t *);
-void vlc_vk_platform_Hold(vlc_vk_platform_t *);
 
 // Create a vulkan surface and store it to `surface_out`
 static inline int vlc_vk_CreateSurface(vlc_vk_platform_t * vk, VkInstance instance,
