@@ -139,7 +139,7 @@ void MLFoldersModel::removeAt( int index )
 
 void MLFoldersModel::add(const QUrl &mrl )
 {
-    vlc_ml_add_folder( ml() , qtu( mrl.toString( QUrl::None ) ) );
+    vlc_ml_add_folder( ml() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
 }
 
 void MLBannedFoldersModel::removeAt(int index)
@@ -154,7 +154,7 @@ void MLBannedFoldersModel::removeAt(int index)
 
 void MLBannedFoldersModel::add(const QUrl &mrl)
 {
-    vlc_ml_ban_folder( ml() , qtu( mrl.toString( QUrl::None ) ) );
+    vlc_ml_ban_folder( ml() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
 }
 
 std::vector<MLFoldersBaseModel::EntryPoint> MLBannedFoldersModel::entryPoints() const
