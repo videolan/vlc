@@ -69,8 +69,8 @@ Control {
         trackPositionSlider.visible = true
         mediaTime.visible = true
         mediaRemainingTime.visible = true
-        mediaTime.font.pixelSize = VLCStyle.fontSize_normal
-        mediaRemainingTime.font.pixelSize = VLCStyle.fontSize_normal
+        mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
+        mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_normal })
         row2.Layout.leftMargin = 0
         row2.Layout.rightMargin = 0
 
@@ -92,10 +92,10 @@ Control {
         case ControlBar.TimeTextPosition.LeftRightSlider:
             row1.children = []
             row2.children = [mediaTime, trackPositionSlider, mediaRemainingTime]
-            row2.Layout.leftMargin = VLCStyle.margin_xsmall
-            row2.Layout.rightMargin = VLCStyle.margin_xsmall
-            mediaTime.font.pixelSize = VLCStyle.fontSize_small
-            mediaRemainingTime.font.pixelSize = VLCStyle.fontSize_small
+            row2.Layout.leftMargin = Qt.binding(function() { return VLCStyle.margin_xsmall })
+            row2.Layout.rightMargin = Qt.binding(function() { return VLCStyle.margin_xsmall })
+            mediaTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_small })
+            mediaRemainingTime.font.pixelSize = Qt.binding(function() { return VLCStyle.fontSize_small })
             trackPositionSlider.Layout.alignment = Qt.AlignVCenter
             break;
 
