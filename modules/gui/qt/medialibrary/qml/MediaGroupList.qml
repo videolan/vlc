@@ -150,9 +150,12 @@ Widgets.NavigableFocusScope {
                 model.resolution_name || "",
                 model.channel         || ""
             ].filter(function(a) { return a !== "" });
-        } else return [
-            string.arg(count)
-        ];
+        } else {
+            if (count < 100)
+                return [ string.arg(count) ];
+            else
+                return [ string.arg("99+") ];
+        }
     }
 
     //---------------------------------------------------------------------------------------------
