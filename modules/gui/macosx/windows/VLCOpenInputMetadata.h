@@ -25,6 +25,23 @@
 @interface VLCOpenInputMetadata : NSObject
 
 /**
+ * Create a new VLCOpenInputMetadata with the given file path
+ *
+ * See \c -initWithPath: for details.
+ */
++ (instancetype)inputMetaWithPath:(NSString *)path;
+
+/**
+ * Initialize the VLCOpenInputMetadata  with the given file path
+ *
+ * Initializes the new VLCOpenInputMetadata with the MRLString
+ * refering to the file given by path. Note that it is not
+ * verified that the file actually exists, so it will succeed
+ * regardless of the presence of the file.
+ */
+- (instancetype)initWithPath:(NSString *)path;
+
+/**
  * this is the MRL of the future input item and defines where to search for media
  * it is the only required property, because if unset we don't know what to play
  */
