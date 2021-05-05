@@ -23,31 +23,39 @@
 #include "config.h"
 #endif
 
+// Util includes
+#include "util/covergenerator.hpp"
+
 // MediaLibrary includes
 #include "mlqmltypes.hpp"
 
-// Qt includes
-#include <QObject>
-
-class MLPlaylist : public QObject, public MLItem
+class MLPlaylist : public MLItem
 {
-    Q_OBJECT
-
 public:
-    MLPlaylist(vlc_medialibrary_t * ml,
-               const vlc_ml_playlist_t * data, QObject * parent = nullptr);
+    MLPlaylist(vlc_medialibrary_t * ml, const vlc_ml_playlist_t * data);
 
 public: // Interface
-    QString getName () const;
+    bool hasGenerator() const;
+    void setGenerator(CoverGenerator * generator);
+
+    QString getName() const;
+
     QString getCover() const;
+    void    setCover(const QString & fileName);
+
+    int64_t getDuration() const;
 
     unsigned int getCount() const;
 
 private:
     vlc_medialibrary_t * m_ml;
 
+    TaskHandle<CoverGenerator> m_generator;
+
     QString m_name;
     QString m_cover;
+
+    int64_t m_duration;
 
     unsigned int m_count;
 };

@@ -353,7 +353,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlurlmodel.moc.cpp \
 	gui/qt/medialibrary/mlvideo.moc.cpp \
 	gui/qt/medialibrary/mlvideomodel.moc.cpp \
-	gui/qt/medialibrary/mlplaylist.moc.cpp \
 	gui/qt/medialibrary/mlplaylistlistmodel.moc.cpp \
 	gui/qt/medialibrary/mlplaylistmodel.moc.cpp \
 	gui/qt/menus/custom_menus.moc.cpp \
