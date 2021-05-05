@@ -401,14 +401,14 @@ static VLCMain *sharedInstance = nil;
     NSArray *o_sorted_names = [resultItems sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
     NSMutableArray *o_result = [NSMutableArray arrayWithCapacity: [o_sorted_names count]];
     for (NSUInteger i = 0; i < [o_sorted_names count]; i++) {
-        char *psz_uri = vlc_path2uri([[o_sorted_names objectAtIndex:i] UTF8String], "file");
-        if (!psz_uri)
+        VLCOpenInputMetadata *inputMetadata;
+        NSString *filepath = [o_sorted_names objectAtIndex:i];
+
+        inputMetadata = [VLCOpenInputMetadata inputMetaWithPath:filepath];
+        if (!inputMetadata)
             continue;
 
-        VLCOpenInputMetadata *o_inputMetadata = [[VLCOpenInputMetadata alloc] init];
-        o_inputMetadata.MRLString = toNSStr(psz_uri);
-        [o_result addObject: o_inputMetadata];
-        free(psz_uri);
+        [o_result addObject:inputMetadata];
     }
 
     [_playlistController addPlaylistItems:o_result];

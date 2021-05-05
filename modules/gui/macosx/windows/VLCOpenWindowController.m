@@ -554,12 +554,11 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
         for (NSUInteger i = 0; i < count; i++) {
             VLCOpenInputMetadata *inputMetadata;
-            char *psz_uri = vlc_path2uri([[values objectAtIndex:i] UTF8String], "file");
-            if (!psz_uri)
+            NSString *filepath = [values objectAtIndex:i];
+            inputMetadata = [VLCOpenInputMetadata inputMetaWithPath:filepath];
+            if (!inputMetadata)
                 continue;
-            inputMetadata = [[VLCOpenInputMetadata alloc] init];
-            inputMetadata.MRLString = toNSStr(psz_uri);
-            free(psz_uri);
+
             [array addObject:inputMetadata];
         }
 

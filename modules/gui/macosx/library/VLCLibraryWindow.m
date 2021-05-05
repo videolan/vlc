@@ -500,12 +500,12 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
         for (NSUInteger i = 0; i < valueCount; i++) {
             VLCOpenInputMetadata *inputMetadata;
-            char *psz_uri = vlc_path2uri([values[i] UTF8String], "file");
-            if (!psz_uri)
+            NSString *filepath = values[i];
+
+            inputMetadata = [VLCOpenInputMetadata inputMetaWithPath:filepath];
+            if (!inputMetadata)
                 continue;
-            inputMetadata = [[VLCOpenInputMetadata alloc] init];
-            inputMetadata.MRLString = toNSStr(psz_uri);
-            free(psz_uri);
+
             [metadataArray addObject:inputMetadata];
         }
         [_playlistController addPlaylistItems:metadataArray];
