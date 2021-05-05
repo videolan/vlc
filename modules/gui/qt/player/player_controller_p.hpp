@@ -48,6 +48,10 @@ public:
     void UpdateSpuOrder(vlc_es_id_t *es_id, enum vlc_vout_order spu_order);
     int interpolateTime(vlc_tick_t system_now);
 
+    // SMPTE Timer
+    void addSMPTETimer();
+    void removeSMPTETimer();
+
     ///call function @a fun on object thread
     template <typename Fun>
     void callAsync(Fun&& fun)
@@ -81,6 +85,9 @@ public:
     VLCTick      m_remainingTime = 0;
     float           m_position = 0.f;
     VLCTick      m_length= 0;
+
+    QString m_highResolutionTime { "00:00:00:00" };
+    unsigned m_smpteTimerRequestCount = 0;
 
     using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
                                                   input_item_Hold,

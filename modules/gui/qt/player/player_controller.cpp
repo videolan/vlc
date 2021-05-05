@@ -58,6 +58,8 @@ using TitleListPtr = vlc_shared_data_ptr_type(vlc_player_title_list,
 
 PlayerControllerPrivate::~PlayerControllerPrivate()
 {
+    assert(m_smpteTimerRequestCount == 0);
+
     vlc_player_locker locker{m_player}; //this also locks the player
     vlc_player_vout_RemoveListener( m_player, m_player_vout_listener );
     vlc_player_aout_RemoveListener( m_player, m_player_aout_listener );
@@ -949,6 +951,22 @@ static void on_player_timer_discontinuity(vlc_tick_t system_date, void *data)
     });
 }
 
+static void on_player_timer_smpte_update(const struct vlc_player_timer_smpte_timecode *tc,
+                                         void *data)
+{
+    PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate *>(data);
+
+    that->callAsync([that, tc_copy = *tc](){
+        that->m_highResolutionTime = QString::asprintf("%02u:%02u:%02u%c%02u",
+                                                       tc_copy.hours,
+                                                       tc_copy.minutes,
+                                                       tc_copy.seconds,
+                                                       tc_copy.drop_frame ? '.' : ':',
+                                                       tc_copy.frames);
+        emit that->q_func()->highResolutionTimeChanged(that->m_highResolutionTime);
+    });
+}
+
 } //extern "C"
 
 static const struct vlc_player_cbs player_cbs = {
@@ -1009,6 +1027,10 @@ static const vlc_player_timer_cbs player_timer_cbs = []{
     return cbs;
 }();
 
+static const struct vlc_player_timer_smpte_cbs player_timer_smpte_cbs = {
+    on_player_timer_smpte_update
+};
+
 PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontroller, qt_intf_t *p_intf)
     : q_ptr(playercontroller)
     , p_intf(p_intf)
@@ -1048,6 +1070,24 @@ PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontrol
     m_fullscreen = vlc_player_vout_IsFullscreen( m_player );
 
     m_volume = vlc_player_aout_GetVolume( m_player );
+}
+
+void PlayerControllerPrivate::addSMPTETimer()
+{
+    assert( !m_player_timer_smpte );
+
+    vlc_player_locker lock{ m_player };
+    m_player_timer_smpte = vlc_player_AddSmpteTimer( m_player, &player_timer_smpte_cbs, this );
+    assert( m_player_timer_smpte );
+}
+
+void PlayerControllerPrivate::removeSMPTETimer()
+{
+    assert( m_player_timer_smpte );
+
+    vlc_player_locker lock{ m_player };
+    vlc_player_RemoveTimer( m_player, m_player_timer_smpte );
+    m_player_timer_smpte = nullptr;
 }
 
 PlayerController::PlayerController( qt_intf_t *_p_intf )
@@ -1698,6 +1738,27 @@ void PlayerController::toggleVisualization()
     }
 }
 
+void PlayerController::requestAddSMPTETimer()
+{
+    Q_D(PlayerController);
+
+    if ( ++d->m_smpteTimerRequestCount == 1 )
+    {
+        d->addSMPTETimer();
+    }
+}
+
+void PlayerController::requestRemoveSMPTETimer()
+{
+    Q_D(PlayerController);
+
+    assert( d->m_smpteTimerRequestCount > 0 );
+    if ( --d->m_smpteTimerRequestCount == 0 )
+    {
+        d->removeSMPTETimer();
+    }
+}
+
 void PlayerController::setRecording( bool recording )
 {
     Q_D(PlayerController);
@@ -1887,5 +1948,8 @@ PRIMITIVETYPE_GETTER(bool, isTeletextEnabled, m_teletextEnabled)
 PRIMITIVETYPE_GETTER(bool, isTeletextAvailable, m_teletextAvailable)
 PRIMITIVETYPE_GETTER(int, getTeletextPage, m_teletextPage)
 PRIMITIVETYPE_GETTER(bool, getTeletextTransparency, m_teletextTransparent)
+
+// High resolution time fed by SMPTE timer
+PRIMITIVETYPE_GETTER(QString, highResolutionTime, m_highResolutionTime)
 
 #undef PRIMITIVETYPE_GETTER

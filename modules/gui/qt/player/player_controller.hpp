@@ -186,6 +186,9 @@ public:
     Q_PROPERTY(VLCTick ABLoopB READ getABLoopB NOTIFY ABLoopBChanged FINAL)
     Q_PROPERTY(bool recording READ isRecording WRITE setRecording NOTIFY recordingChanged FINAL)
 
+    // High resolution time fed by SMPTE Timer
+    Q_PROPERTY(QString highResolutionTime READ highResolutionTime NOTIFY highResolutionTimeChanged FINAL)
+
     /* exposed actions */
 public slots:
     Q_INVOKABLE void reverse();
@@ -227,6 +230,10 @@ public slots:
     Q_INVOKABLE void snapshot();
     Q_INVOKABLE void toggleRecord();
     Q_INVOKABLE void toggleVisualization();
+
+    // SMPTE Timer
+    void requestAddSMPTETimer();
+    void requestRemoveSMPTETimer();
 
 public:
     PlayerController( qt_intf_t * );
@@ -361,6 +368,8 @@ public slots:
     VLCTick getABLoopA() const;
     VLCTick getABLoopB() const;
 
+    // High resolution time fed by SMPTE timer
+    QString highResolutionTime() const;
 signals:
     //playback
     void playingStateChanged( PlayingState state );
@@ -424,6 +433,9 @@ signals:
     void ABLoopStateChanged(ABLoopState);
     void ABLoopAChanged(VLCTick);
     void ABLoopBChanged(VLCTick);
+
+    // High resolution time fed by SMPTE timer
+    void highResolutionTimeChanged(const QString&);
 
     // Other signals
 
