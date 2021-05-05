@@ -92,6 +92,8 @@ Widgets.PageLoader {
         PlaylistMediaList {
             anchors.fill: parent
 
+            isMusic: true
+
             onCurrentIndexChanged: _updateHistoryList(currentIndex)
 
             onShowList: history.push(["mc", "music", "playlists", "list",
