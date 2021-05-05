@@ -24,18 +24,26 @@
 
 // Forward declarations
 class vlc_medialibrary_t;
-class vlc_ml_playlist_t;
+class MLPlaylist;
 
 class MLPlaylistListModel : public MLBaseModel
 {
     Q_OBJECT
+
+    Q_PROPERTY(QSize coverSize READ coverSize WRITE setCoverSize NOTIFY coverSizeChanged)
+
+    Q_PROPERTY(QString coverDefault READ coverDefault WRITE setCoverDefault
+               NOTIFY coverDefaultChanged)
+
+    Q_PROPERTY(QString coverPrefix READ coverPrefix WRITE setCoverPrefix NOTIFY coverPrefixChanged)
 
 public:
     enum Roles
     {
         PLAYLIST_ID = Qt::UserRole + 1,
         PLAYLIST_NAME,
-        PLAYLIST_COVER,
+        PLAYLIST_THUMBNAIL,
+        PLAYLIST_DURATION,
         PLAYLIST_COUNT
     };
 
@@ -67,8 +75,36 @@ protected: // MLBaseModel implementation
 
     ListCacheLoader<std::unique_ptr<MLItem>> * createLoader() const override;
 
+private: // Functions
+    QString getCover(MLPlaylist * playlist, int index) const;
+
 private: // MLBaseModel implementation
     void onVlcMlEvent(const MLEvent & event) override;
+
+    void thumbnailUpdated(int idx) override;
+
+private slots:
+    void onCover();
+
+signals:
+    void coverSizeChanged   ();
+    void coverDefaultChanged();
+    void coverPrefixChanged ();
+
+public: // Properties
+    QSize coverSize() const;
+    void  setCoverSize(const QSize & size);
+
+    QString coverDefault() const;
+    void    setCoverDefault(const QString & fileName);
+
+    QString coverPrefix() const;
+    void    setCoverPrefix(const QString & prefix);
+
+private: // Variables
+    QSize   m_coverSize;
+    QString m_coverDefault;
+    QString m_coverPrefix;
 
 private:
     struct Loader : public MLBaseModel::BaseLoader

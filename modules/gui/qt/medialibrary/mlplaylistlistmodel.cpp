@@ -30,18 +30,27 @@
 #include "mlhelper.hpp"
 #include "mlplaylist.hpp"
 
+//-------------------------------------------------------------------------------------------------
+// Static variables
+
+// NOTE: We multiply by 2 to cover most dpi settings.
+static const int MLPLAYLISTMODEL_COVER_WIDTH  = 512 * 2; // 16 / 10 ratio
+static const int MLPLAYLISTMODEL_COVER_HEIGHT = 320 * 2;
+
 //=================================================================================================
 // MLPlaylistListModel
 //=================================================================================================
 
 MLPlaylistListModel::MLPlaylistListModel(vlc_medialibrary_t * ml, QObject * parent)
     : MLBaseModel(parent)
+    , m_coverDefault(":/noart_videoCover.svg")
 {
     m_ml = ml;
 }
 
 /* explicit */ MLPlaylistListModel::MLPlaylistListModel(QObject * parent)
-    : MLBaseModel(parent) {}
+    : MLBaseModel(parent)
+    , m_coverSize(MLPLAYLISTMODEL_COVER_WIDTH, MLPLAYLISTMODEL_COVER_HEIGHT) {}
 
 //-------------------------------------------------------------------------------------------------
 
@@ -156,16 +165,19 @@ QHash<int, QByteArray> MLPlaylistListModel::roleNames() const /* override */
 {
     return
     {
-        { PLAYLIST_ID,    "id"    },
-        { PLAYLIST_NAME,  "name"  },
-        { PLAYLIST_COVER, "cover" },
-        { PLAYLIST_COUNT, "count" }
+        { PLAYLIST_ID,        "id"        },
+        { PLAYLIST_NAME,      "name"      },
+        { PLAYLIST_THUMBNAIL, "thumbnail" },
+        { PLAYLIST_DURATION,  "duration"  },
+        { PLAYLIST_COUNT,     "count"     }
     };
 }
 
 QVariant MLPlaylistListModel::data(const QModelIndex & index, int role) const /* override */
 {
-    const MLPlaylist * playlist = static_cast<MLPlaylist *>(item(index.row()));
+    int row = index.row();
+
+    MLPlaylist * playlist = static_cast<MLPlaylist *>(item(row));
 
     if (playlist == nullptr)
         return QVariant();
@@ -175,16 +187,18 @@ QVariant MLPlaylistListModel::data(const QModelIndex & index, int role) const /*
         // NOTE: This is the condition for QWidget view(s).
         case Qt::DisplayRole:
             if (index.column() == 0)
-                return QVariant::fromValue(playlist->getName());
+                return playlist->getName();
             else
                 return QVariant();
         // NOTE: These are the conditions for QML view(s).
         case PLAYLIST_ID:
             return QVariant::fromValue(playlist->getId());
         case PLAYLIST_NAME:
-            return QVariant::fromValue(playlist->getName());
-        case PLAYLIST_COVER:
-            return QVariant::fromValue(playlist->getCover());
+            return playlist->getName();
+        case PLAYLIST_THUMBNAIL:
+            return getCover(playlist, row);
+        case PLAYLIST_DURATION:
+            return QVariant::fromValue(playlist->getDuration());
         case PLAYLIST_COUNT:
             return QVariant::fromValue(playlist->getCount());
         default:
@@ -226,6 +240,36 @@ ListCacheLoader<std::unique_ptr<MLItem>> * MLPlaylistListModel::createLoader() c
 }
 
 //-------------------------------------------------------------------------------------------------
+// Private functions
+//-------------------------------------------------------------------------------------------------
+
+QString MLPlaylistListModel::getCover(MLPlaylist * playlist, int index) const
+{
+    QString cover = playlist->getCover();
+
+    // NOTE: Making sure we're not already generating a cover.
+    if (cover.isNull() == false || playlist->hasGenerator())
+        return cover;
+
+    CoverGenerator * generator = new CoverGenerator(m_ml, playlist->getId(), index);
+
+    generator->setSize(m_coverSize);
+
+    generator->setDefaultThumbnail(m_coverDefault);
+
+    generator->setPrefix(m_coverPrefix);
+
+    // NOTE: We'll apply the new thumbnail once it's loaded.
+    connect(generator, &CoverGenerator::result, this, &MLPlaylistListModel::onCover);
+
+    generator->start(*QThreadPool::globalInstance());
+
+    playlist->setGenerator(generator);
+
+    return cover;
+}
+
+//-------------------------------------------------------------------------------------------------
 // Private MLBaseModel reimplementation
 //-------------------------------------------------------------------------------------------------
 
@@ -244,6 +288,94 @@ void MLPlaylistListModel::onVlcMlEvent(const MLEvent & event) /* override */
     }
 
     MLBaseModel::onVlcMlEvent(event);
+}
+
+void MLPlaylistListModel::thumbnailUpdated(int idx) /* override */
+{
+    QModelIndex index = this->index(idx);
+
+    emit dataChanged(index, index, { PLAYLIST_THUMBNAIL });
+}
+
+//-------------------------------------------------------------------------------------------------
+// Private slots
+//-------------------------------------------------------------------------------------------------
+
+void MLPlaylistListModel::onCover()
+{
+    CoverGenerator * generator = static_cast<CoverGenerator *> (sender());
+
+    int index = generator->getIndex();
+
+    // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
+    MLItem * item = this->itemCache(index);
+
+    // NOTE: When the item is no longer cached or has been moved we return right away.
+    if (item == nullptr || item->getId() != generator->getId())
+    {
+        generator->deleteLater();
+
+        return;
+    }
+
+    MLPlaylist * playlist = static_cast<MLPlaylist *> (item);
+
+    QString fileName = QUrl::fromLocalFile(generator->takeResult()).toString();
+
+    playlist->setCover(fileName);
+
+    playlist->setGenerator(nullptr);
+
+    thumbnailUpdated(index);
+}
+
+//-------------------------------------------------------------------------------------------------
+// Properties
+//-------------------------------------------------------------------------------------------------
+
+QSize MLPlaylistListModel::coverSize() const
+{
+    return m_coverSize;
+}
+
+void MLPlaylistListModel::setCoverSize(const QSize & size)
+{
+    if (m_coverSize == size)
+        return;
+
+    m_coverSize = size;
+
+    emit coverSizeChanged();
+}
+
+QString MLPlaylistListModel::coverDefault() const
+{
+    return m_coverDefault;
+}
+
+void MLPlaylistListModel::setCoverDefault(const QString & fileName)
+{
+    if (m_coverDefault == fileName)
+        return;
+
+    m_coverDefault = fileName;
+
+    emit coverDefaultChanged();
+}
+
+QString MLPlaylistListModel::coverPrefix() const
+{
+    return m_coverPrefix;
+}
+
+void MLPlaylistListModel::setCoverPrefix(const QString & prefix)
+{
+    if (m_coverPrefix == prefix)
+        return;
+
+    m_coverPrefix = prefix;
+
+    emit coverPrefixChanged();
 }
 
 //=================================================================================================
