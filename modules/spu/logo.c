@@ -55,12 +55,12 @@
 #define DELAY_TEXT N_("Logo individual image time in ms")
 #define DELAY_LONGTEXT N_("Individual image display time of 0 - 60000 ms.")
 
-#define POSX_TEXT N_("X coordinate")
-#define POSX_LONGTEXT N_("X coordinate of the logo. You can move the logo " \
-                "by left-clicking it." )
-#define POSY_TEXT N_("Y coordinate")
-#define POSY_LONGTEXT N_("Y coordinate of the logo. You can move the logo " \
-                "by left-clicking it." )
+#define POSX_TEXT N_("X offset")
+#define POSX_LONGTEXT N_("X offset, from top-left, or from relative position. " \
+                         "You can move the logo by left-clicking it." )
+#define POSY_TEXT N_("Y offset")
+#define POSY_LONGTEXT N_("Y offset, from top-left, or from relative position. " \
+                         "You can move the logo by left-clicking it." )
 #define OPACITY_TEXT N_("Opacity of the logo")
 #define OPACITY_LONGTEXT N_("Logo opacity value " \
   "(from 0 for full transparency to 255 for full opacity)." )

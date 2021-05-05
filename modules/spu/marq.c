@@ -70,8 +70,9 @@ typedef struct
 {
     vlc_mutex_t lock;
 
-    int i_xoff, i_yoff;  /* offsets for the display string in the video window */
-    int i_pos; /* permit relative positioning (top, bottom, left, right, center) */
+    int i_xoff, i_yoff; /* positioning offsets */
+    int i_pos; /* positioning: absolute, or relative location (top, bottom, left, right, center) */
+
     vlc_tick_t i_timeout;
 
     char *format; /**< marquee text format */
@@ -93,9 +94,9 @@ typedef struct
 #define FILE_TEXT N_("Text file")
 #define FILE_LONGTEXT N_("File to read the marquee text from.")
 #define POSX_TEXT N_("X offset")
-#define POSX_LONGTEXT N_("X offset, from the left screen edge." )
+#define POSX_LONGTEXT N_("X offset, from top-left, or from relative position." )
 #define POSY_TEXT N_("Y offset")
-#define POSY_LONGTEXT N_("Y offset, down from the top." )
+#define POSY_LONGTEXT N_("Y offset, from top-left, or from relative position." )
 #define TIMEOUT_TEXT N_("Timeout")
 #define TIMEOUT_LONGTEXT N_("Number of milliseconds the marquee must remain " \
                             "displayed. Default value is " \

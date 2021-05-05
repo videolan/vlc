@@ -41,10 +41,10 @@
  * Module descriptor
  *****************************************************************************/
 
-#define POSX_TEXT N_("X coordinate")
-#define POSX_LONGTEXT N_("X coordinate of the bargraph.")
-#define POSY_TEXT N_("Y coordinate")
-#define POSY_LONGTEXT N_("Y coordinate of the bargraph.")
+#define POSX_TEXT N_("X offset")
+#define POSX_LONGTEXT N_("X offset, from top-left, or from relative position." )
+#define POSY_TEXT N_("Y offset")
+#define POSY_LONGTEXT N_("Y offset, from top-left, or from relative position." )
 #define TRANS_TEXT N_("Transparency of the bargraph")
 #define TRANS_LONGTEXT N_("Bargraph transparency value " \
   "(from 0 for full transparency to 255 for full opacity).")

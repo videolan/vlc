@@ -103,8 +103,9 @@ typedef struct
     vlc_timer_t timer;  /* Timer to refresh the rss feeds */
     bool b_fetched;
 
-    int i_xoff, i_yoff;  /* offsets for the display string in the video window */
-    int i_pos; /* permit relative positioning (top, bottom, left, right, center) */
+    int i_xoff, i_yoff; /* positioning offsets */
+    int i_pos; /* positioning: absolute, or relative location (top, bottom, left, right, center) */
+
     vlc_tick_t i_speed;
     int i_length;
 
@@ -139,9 +140,9 @@ typedef struct
 #define IMAGE_LONGTEXT N_("Display feed images if available.")
 
 #define POSX_TEXT N_("X offset")
-#define POSX_LONGTEXT N_("X offset, from the left screen edge." )
+#define POSX_LONGTEXT N_("X offset, from top-left, or from relative position." )
 #define POSY_TEXT N_("Y offset")
-#define POSY_LONGTEXT N_("Y offset, down from the top." )
+#define POSY_LONGTEXT N_("Y offset, from top-left, or from relative position." )
 #define OPACITY_TEXT N_("Opacity")
 #define OPACITY_LONGTEXT N_("Opacity (inverse of transparency) of " \
     "overlay text. 0 = transparent, 255 = totally opaque." )
