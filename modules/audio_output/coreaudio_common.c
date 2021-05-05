@@ -377,12 +377,13 @@ ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
                 return;
             }
 
-            const vlc_tick_t i_frame_ticks =
-                FramesToTicks(p_sys, BytesToFrames(p_sys, p_block->i_buffer));
+            /* The render buffer is full, Wait for the renderer to play half
+             * the data. */
+            const vlc_tick_t i_sleep_ticks =
+                FramesToTicks(p_sys, BytesToFrames(p_sys, p_sys->i_out_max_size)) / 2;
 
-            /* Wait for the render buffer to play the remaining data */
             lock_unlock(p_sys);
-            vlc_tick_sleep(i_frame_ticks);
+            vlc_tick_sleep(i_sleep_ticks);
             lock_lock(p_sys);
         }
         else
