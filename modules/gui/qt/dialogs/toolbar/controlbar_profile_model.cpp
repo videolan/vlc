@@ -208,11 +208,14 @@ ControlbarProfileModel::ControlbarProfileModel(qt_intf_t *p_intf, QObject *paren
             insertDefaults();
     });
 
-    if (reload() == false)
-    {
-        // If initial reload fails, load the default profiles:
-        insertDefaults();
-    }
+    // defer initialization reload:
+    QMetaObject::invokeMethod(this, [this] () {
+        if (reload() == false)
+        {
+            // If initial reload fails, load the default profiles:
+            insertDefaults();
+        }
+    }, Qt::QueuedConnection);
 }
 
 void ControlbarProfileModel::insertDefaults()
