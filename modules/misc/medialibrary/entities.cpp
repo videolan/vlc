@@ -429,6 +429,9 @@ bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )
 {
     output.i_id = input->id();
 
+    output.i_nb_media         = input->nbMedia();
+    output.i_nb_present_media = input->nbPresentMedia();
+
     output.i_creation_date = input->creationDate();
 
     output.b_is_read_only = input->isReadOnly();
