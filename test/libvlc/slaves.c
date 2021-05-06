@@ -20,35 +20,7 @@
 
 #include "test.h"
 
-#include <vlc_common.h>
-#include <vlc_threads.h>
-
 #define SLAVES_DIR SRCDIR "/samples/slaves"
-
-static void
-finished_event(const libvlc_event_t *p_ev, void *p_data)
-{
-    (void) p_ev;
-    vlc_sem_t *p_sem = p_data;
-    vlc_sem_post(p_sem);
-}
-
-static void
-media_parse_sync(libvlc_media_t *p_m)
-{
-    vlc_sem_t sem;
-    vlc_sem_init(&sem, 0);
-
-    libvlc_event_manager_t *p_em = libvlc_media_event_manager(p_m);
-    libvlc_event_attach(p_em, libvlc_MediaParsedChanged, finished_event, &sem);
-
-    int i_ret = libvlc_media_parse_with_options(p_m, libvlc_media_parse_local, -1);
-    assert(i_ret == 0);
-
-    vlc_sem_wait (&sem);
-
-    libvlc_event_detach(p_em, libvlc_MediaParsedChanged, finished_event, &sem);
-}
 
 static char *
 path_to_mrl(libvlc_instance_t *p_vlc, const char *psz_path)
@@ -111,7 +83,7 @@ test_media_has_slaves_from_parent(libvlc_instance_t *p_vlc,
     assert(p_m != NULL);
 
     printf("Parse media dir to get subitems\n");
-    media_parse_sync(p_m);
+    libvlc_media_parse_sync(p_m, libvlc_media_parse_local, -1);
 
     char *psz_main_media_mrl = path_to_mrl(p_vlc, psz_main_media);
     assert(psz_main_media_mrl != NULL);
