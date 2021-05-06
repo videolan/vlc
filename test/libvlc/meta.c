@@ -39,7 +39,7 @@ static void test_meta (const char ** argv, int argc)
     media = libvlc_media_new_path (vlc, SRCDIR "/samples/meta.mp3");
     assert( media );
 
-    libvlc_media_parse (media);
+    libvlc_media_parse_sync (media, libvlc_media_parse_local, -1);
 
     artist = libvlc_media_get_meta (media, libvlc_meta_Artist);
 
