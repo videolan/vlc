@@ -234,7 +234,9 @@ static inline void vlc_list_it_next(struct vlc_list_it *restrict it)
     ((sizeof (*(p)) + sizeof (max_align_t) - 1) / sizeof (max_align_t))
 
 #define vlc_list_entry_dummy(p) \
-    (0 ? (p) : ((void *)(&(max_align_t[vlc_list_entry_aligned_size(p)]){0})))
+    (0 ? (p) : ((void *)( \
+        &(max_align_t[vlc_list_entry_aligned_size(p)]){ (max_align_t){0} } \
+    )))
 
 #define vlc_list_offset_p(p, member) \
     ((p) = vlc_list_entry_dummy(p), (char *)(&(p)->member) - (char *)(p))
