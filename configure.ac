@@ -3288,10 +3288,8 @@ AC_ARG_ENABLE([libplacebo],
       [disable libplacebo support (default auto)]))
 
 AS_IF([test "$enable_libplacebo" != "no"], [
-  PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 0.5], [
+  PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 1.7], [
     AC_DEFINE([HAVE_LIBPLACEBO], [1], [Define to 1 if libplacebo is enabled.])
-    PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 1.7],
-      [have_libplacebo_vk="yes"], [have_libplacebo_vk="no"])
   ], [
     AS_IF([test -n "${enable_libplacebo}"], [
       AC_MSG_ERROR([${LIBPLACEBO_PKG_ERRORS}.])
@@ -3357,18 +3355,11 @@ AC_ARG_ENABLE(vulkan,
       [disable Vulkan support (default auto)])])
 
 AS_IF([test "$enable_vulkan" != "no"], [
-  AS_IF([test "$have_libplacebo_vk" = "yes"], [
-    PKG_CHECK_MODULES([VULKAN], [vulkan >= 1.0.26], [
-      AC_DEFINE([HAVE_VULKAN], [1], [Define to 1 if vulkan is enabled.])
-    ], [
-      AS_IF([test -n "${enable_vulkan}"], [
-        AC_MSG_ERROR([${VULKAN_PKG_ERRORS}.])
-      ])
-      enable_vulkan="no"
-    ])
+  PKG_CHECK_MODULES([VULKAN], [vulkan >= 1.0.26], [
+    AC_DEFINE([HAVE_VULKAN], [1], [Define to 1 if vulkan is enabled.])
   ], [
     AS_IF([test -n "${enable_vulkan}"], [
-      AC_MSG_ERROR([Vulkan support requires libplacebo 1.7 as well. Do not use --disable-libplacebo.])
+      AC_MSG_ERROR([${VULKAN_PKG_ERRORS}.])
     ])
     enable_vulkan="no"
   ])
