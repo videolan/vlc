@@ -42,6 +42,8 @@ public:
 
     bool setupVoutWindow(vout_window_t *p_wnd) override;
 
+    Type type() const override;
+
 protected:
     intf_thread_t *m_intf;
 

@@ -52,6 +52,8 @@ public:
 
     bool setupVoutWindow(vout_window_t *p_wnd) override;
 
+    Type type() const override;
+
 private slots:
     void onSurfacePositionChanged(QPointF position);
 

@@ -34,6 +34,12 @@ namespace vlc {
 
 class Compositor {
 public:
+    enum Type
+    {
+        DummyCompositor,
+        Win7Compositor,
+        DirectCompositionCompositor
+    };
 
     virtual ~Compositor() = default;
 
@@ -41,6 +47,8 @@ public:
     virtual void destroyMainInterface() = 0;
 
     virtual bool setupVoutWindow(vout_window_t *p_wnd) = 0;
+
+    virtual Type type() const = 0;
 
     //factory
     static Compositor* createCompositor(intf_thread_t *p_intf);

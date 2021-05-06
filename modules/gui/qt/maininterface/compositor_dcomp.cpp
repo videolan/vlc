@@ -326,4 +326,9 @@ bool CompositorDirectComposition::setupVoutWindow(vout_window_t *p_wnd)
     return true;
 }
 
+Compositor::Type CompositorDirectComposition::type() const
+{
+    return Compositor::DirectCompositionCompositor;
+}
+
 }

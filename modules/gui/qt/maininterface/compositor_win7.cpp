@@ -273,6 +273,12 @@ bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd)
     return true;
 }
 
+
+Compositor::Type CompositorWin7::type() const
+{
+    return Compositor::Win7Compositor;
+}
+
 bool CompositorWin7::eventFilter(QObject*, QEvent* ev)
 {
     switch (ev->type())

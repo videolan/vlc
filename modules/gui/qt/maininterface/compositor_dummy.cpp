@@ -74,4 +74,9 @@ bool CompositorDummy::setupVoutWindow(vout_window_t*)
     return false;
 }
 
+Compositor::Type CompositorDummy::type() const
+{
+    return Compositor::DummyCompositor;
+}
+
 }

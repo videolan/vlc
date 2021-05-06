@@ -52,6 +52,8 @@ public:
     virtual void destroyMainInterface() override;
     virtual bool setupVoutWindow(vout_window_t*) override;
 
+    Type type() const override;
+
 protected:
     bool eventFilter(QObject *obj, QEvent *ev) override;
 
