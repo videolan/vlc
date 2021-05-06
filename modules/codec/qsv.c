@@ -156,13 +156,13 @@ static const int profile_h264_list[] =
       { MFX_PROFILE_UNKNOWN, MFX_PROFILE_AVC_CONSTRAINED_BASELINE, MFX_PROFILE_AVC_MAIN,
       MFX_PROFILE_AVC_EXTENDED, MFX_PROFILE_AVC_HIGH };
 static const char *const profile_h264_text[] =
-    { "decide", "baseline", "main", "extended", "high" };
+    { N_("Undefined"), "baseline", "main", "extended", "high" };
 
 static const int profile_mpeg2_list[] =
     { MFX_PROFILE_UNKNOWN, MFX_PROFILE_MPEG2_SIMPLE, MFX_PROFILE_MPEG2_MAIN,
       MFX_PROFILE_MPEG2_HIGH };
 static const char *const profile_mpeg2_text[] =
-    { "decide", "simple", "main", "high" };
+    { N_("Undefined"), "simple", "main", "high" };
 
 static const int level_h264_list[] =
     { MFX_LEVEL_UNKNOWN, MFX_LEVEL_AVC_1, MFX_LEVEL_AVC_1b, MFX_LEVEL_AVC_12,
@@ -171,20 +171,20 @@ static const int level_h264_list[] =
       MFX_LEVEL_AVC_41, MFX_LEVEL_AVC_42, MFX_LEVEL_AVC_5, MFX_LEVEL_AVC_51,
       MFX_LEVEL_AVC_52};
 static const char *const level_h264_text[] =
-    { "decide", "1", "1.1b", "1.2", "1.3", "2", "2.1", "2.2", "3", "3.1",
+    { N_("Undefined"), "1", "1.1b", "1.2", "1.3", "2", "2.1", "2.2", "3", "3.1",
       "3.2", "4", "4.1",   "4.2",   "5", "5.1", "5.2" };
 
 static const int level_mpeg2_list[] =
     { MFX_LEVEL_UNKNOWN, MFX_LEVEL_MPEG2_LOW, MFX_LEVEL_MPEG2_MAIN,
       MFX_LEVEL_MPEG2_HIGH, MFX_LEVEL_MPEG2_HIGH1440 };
 static const char *const level_mpeg2_text[] =
-    { "decide", "low", "main", "high", "high1440" };
+    { N_("Undefined"), "low", "main", "high", "high1440" };
 
 static const int target_usage_list[] =
     { MFX_TARGETUSAGE_UNKNOWN, MFX_TARGETUSAGE_BEST_QUALITY, MFX_TARGETUSAGE_BALANCED,
       MFX_TARGETUSAGE_BEST_SPEED };
 static const char *const target_usage_text[] =
-    { "decide", "quality", "balanced", "speed" };
+    { N_("Undefined"), "quality", "balanced", "speed" };
 
 static const int rc_method_list[] =
     { MFX_RATECONTROL_CBR, MFX_RATECONTROL_VBR,
