@@ -1,5 +1,5 @@
 # aom
-AOM_VERSION := v3.0.0
+AOM_VERSION := v3.1.0
 AOM_GITURL := https://aomedia.googlesource.com/aom/+archive/$(AOM_VERSION).tar.gz
 
 PKGS += aom

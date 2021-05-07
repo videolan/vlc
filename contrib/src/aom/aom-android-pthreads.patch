@@ -1,17 +1,14 @@
-diff --git a/build/cmake/pkg_config.cmake b/build/cmake/pkg_config.cmake
-index c3914d79e..1eb36f7ec 100644
---- a/build/cmake/pkg_config.cmake
-+++ b/build/cmake/pkg_config.cmake
-@@ -53,10 +53,6 @@ file(
- file(APPEND "${pkgconfig_file}" "Version: ${package_version}\n")
- file(APPEND "${pkgconfig_file}" "Requires:\n")
- file(APPEND "${pkgconfig_file}" "Conflicts:\n")
+--- aom/build/cmake/pkg_config.cmake	2021-05-07 16:22:27.118065285 -0400
++++ aom/build/cmake/pkg_config.cmake.new	2021-05-07 16:23:24.937812883 -0400
+@@ -56,10 +56,6 @@
+   file(APPEND "${pkgconfig_file}" " libvmaf")
+ endif()
+ file(APPEND "${pkgconfig_file}" "\nConflicts:\n")
 -file(APPEND "${pkgconfig_file}" "Libs: -L\${libdir} -l${pkg_name}\n")
 -if(CONFIG_MULTITHREAD AND HAVE_PTHREAD_H)
 -  file(APPEND "${pkgconfig_file}" "Libs.private: -lm -lpthread\n")
 -else()
--  file(APPEND "${pkgconfig_file}" "Libs.private: -lm\n")
--endif()
 +file(APPEND "${pkgconfig_file}" "Libs: -L\${prefix}/lib -l${pkg_name} -lm\n")
-+file(APPEND "${pkgconfig_file}" "Libs.private: -lm\n")
+   file(APPEND "${pkgconfig_file}" "Libs.private: -lm\n")
+-endif()
  file(APPEND "${pkgconfig_file}" "Cflags: -I\${includedir}\n")
