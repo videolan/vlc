@@ -42,7 +42,8 @@
 #include <QDialogButtonBox>
 #include <QTableView>
 #include <QFileDialog>
-#include "medialibrary/mlfoldersmodel.hpp"
+
+class MLFoldersEditor;
 
 #ifdef _WIN32
 # include "util/registry.hpp"
@@ -114,8 +115,8 @@ private:
     QButtonGroup *radioGroup;
 
     char *lang;
-    MLFoldersModel *mlFoldersModel;
-    MLBannedFoldersModel *mlBannedFoldersModel;
+    MLFoldersEditor *mlFoldersEditor {};
+    MLFoldersEditor *mlBannedFoldersEditor {};
 
 #ifdef _WIN32
     QList<QTreeWidgetItem *> listAsso;
@@ -140,8 +141,6 @@ private slots:
 #endif
     void MLaddNewFolder( );
     void MLBanFolder( );
-    QWidget * MLgenerateWidget(QModelIndex index , MLFoldersBaseModel *mlf , QWidget *parent );
-    void MLdrawControls( QTableView *mlView );
 
     void configML();
     void changeStyle( );

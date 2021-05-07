@@ -1025,21 +1025,18 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
                 if ( vlc_ml_instance_get( p_intf ) != NULL )
                 {
-                    mlFoldersModel = new ProxyColumnModel<MLFoldersModel>(1, {{0, qtr("Path")}, {1, qtr("Remove")}}, this );
-                    mlFoldersModel->setMl( vlc_ml_instance_get( p_intf ) );
-                    ui.entryPoints->setModel( mlFoldersModel );
-                    connect( mlFoldersModel , &QAbstractItemModel::modelReset , this, [this, view = ui.entryPoints]() { MLdrawControls( view ); } );
+                    auto foldersModel = new MLFoldersModel( this );
+                    foldersModel->setMl( vlc_ml_instance_get( p_intf ) );
+                    ui.entryPoints->setMLFoldersModel( foldersModel );
+                    mlFoldersEditor = ui.entryPoints;
 
-                    mlBannedFoldersModel = new ProxyColumnModel<MLBannedFoldersModel>(1, {{0, qtr("Path")}, {1, qtr("Remove")}}, this );
-                    mlBannedFoldersModel->setMl( vlc_ml_instance_get( p_intf ));
-                    ui.bannedEntryPoints->setModel( mlBannedFoldersModel );
-                    connect( mlBannedFoldersModel , &QAbstractItemModel::modelReset , this, [this, view = ui.bannedEntryPoints]() { MLdrawControls( view ); } );
+                    auto bannedFoldersModel = new MLBannedFoldersModel( this );
+                    bannedFoldersModel->setMl( vlc_ml_instance_get( p_intf ));
+                    ui.bannedEntryPoints->setMLFoldersModel( bannedFoldersModel );
+                    mlBannedFoldersEditor = ui.bannedEntryPoints;
 
                     BUTTONACT( ui.addButton , MLaddNewFolder() );
                     BUTTONACT( ui.banButton , MLBanFolder() );
-
-                    MLdrawControls( ui.entryPoints );
-                    MLdrawControls( ui.bannedEntryPoints );
                 }
                 else
                 {
@@ -1276,7 +1273,13 @@ void SPrefsPanel::apply()
         else if (!b_checked ) {
             config_PutInt( "freetype-background-opacity", 0 );
         }
+        break;
+    }
 
+    case SPrefsMediaLibrary:
+    {
+        mlFoldersEditor->commit();
+        mlBannedFoldersEditor->commit();
     }
     }
 }
@@ -1617,59 +1620,17 @@ void SPrefsPanel::saveAsso()
 #endif /* _WIN32 */
 
 void SPrefsPanel::MLaddNewFolder() {
-    QUrl newEntryPoints = QFileDialog::getExistingDirectoryUrl( this , qtr("Please choose an entry point folder") ,
+    QUrl newEntryPoint = QFileDialog::getExistingDirectoryUrl( this , qtr("Please choose an entry point folder") ,
                                              QUrl( QDir::homePath( ) ) );
 
-    if(! newEntryPoints.isEmpty() )
-        mlFoldersModel->add( newEntryPoints );
+    if(! newEntryPoint.isEmpty() )
+        mlFoldersEditor->add( newEntryPoint );
 }
 
 void SPrefsPanel::MLBanFolder( ) {
-    QUrl newEntryPoints = QFileDialog::getExistingDirectoryUrl( this , qtr("Please choose an entry point folder") ,
+    QUrl newEntryPoint = QFileDialog::getExistingDirectoryUrl( this , qtr("Please choose an entry point folder") ,
                                              QUrl( QDir::homePath( ) ) );
 
-    if(! newEntryPoints.isEmpty() )
-        mlBannedFoldersModel->add( newEntryPoints );
-}
-
-QWidget *SPrefsPanel::MLgenerateWidget( QModelIndex index , MLFoldersBaseModel *mlf , QWidget *parent){
-    if ( index.column( ) == 1 ){
-        QWidget *wid = new QWidget( parent );
-
-        QBoxLayout* layout = new QBoxLayout( QBoxLayout::LeftToRight , wid );
-
-        QPushButton *pb = new QPushButton( "-" , wid );
-        pb->setFixedSize( 16 , 16 );
-
-        layout->addWidget( pb , Qt::AlignCenter );
-        wid->setLayout( layout );
-
-
-        connect( pb , &QPushButton::clicked , [=]() {
-            mlf->removeAt(index.row());
-        } );
-
-        return wid;
-    }
-
-    return nullptr;
-}
-
-void SPrefsPanel::MLdrawControls(QTableView *mlTableView) {
-    const auto model = mlTableView->model();
-    for ( int col = 0 ; col < model->columnCount( model->index(0, 0) ) ; col++ )
-    {
-        for (int row = 0 ; row < model->rowCount() ; row++ )
-        {
-            QModelIndex index = model->index ( row , col );
-            mlTableView->setIndexWidget( index, MLgenerateWidget ( index, qobject_cast<MLFoldersBaseModel *>(model),
-                                       mlTableView ) );
-        }
-    }
-
-  mlTableView->resizeColumnsToContents( );
-  mlTableView->horizontalHeader()->setMinimumSectionSize( 100 );
-  mlTableView->horizontalHeader()->setSectionResizeMode( 0 , QHeaderView::Stretch );
-
-  mlTableView->horizontalHeader()->setFixedHeight( 24 );
+    if(! newEntryPoint.isEmpty() )
+        mlBannedFoldersEditor->add( newEntryPoint );
 }
