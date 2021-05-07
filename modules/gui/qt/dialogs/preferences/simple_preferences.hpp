@@ -99,7 +99,6 @@ public:
     SPrefsPanel( intf_thread_t *, QWidget *, int );
     virtual ~SPrefsPanel();
     void apply();
-    void clean();
 #ifdef _WIN32
     void cleanLang();
 #endif
@@ -124,6 +123,10 @@ private:
     void saveLang();
 #endif
 
+    // used to revert properties on cancel which are immediately set
+    bool m_isApplied = false;
+    std::vector<std::unique_ptr<class PropertyResetter>> m_resetters;
+
 /* Display only the options for the selected audio output */
 private slots:
     void lastfm_Changed( int );
@@ -142,6 +145,8 @@ private slots:
 
     void configML();
     void changeStyle( );
+
+    void clean();
 };
 
 #endif

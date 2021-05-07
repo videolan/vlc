@@ -219,6 +219,28 @@ namespace
     }
 }
 
+class PropertyResetter
+{
+public:
+    PropertyResetter(QWidget *control, const char * property)
+        : m_control {control}
+        , m_property {property}
+        , m_initialValue {m_control->property(property)}
+    {
+    }
+
+    void reset()
+    {
+        bool success = m_control->setProperty(m_property.data(), m_initialValue);
+        vlc_assert(success);
+    }
+
+private:
+    QWidget *m_control;
+    const QByteArray m_property;
+    const QVariant m_initialValue;
+};
+
 /*********************************************************************
  * The List of categories
  *********************************************************************/
@@ -785,6 +807,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets["qtRB"] = ui.qt;
 #if !defined( _WIN32)
             fillStylesCombo( ui.stylesCombo, getSettings()->value( "MainWindow/QtStyle", "" ).toString() );
+            m_resetters.push_back( std::make_unique<PropertyResetter>( ui.stylesCombo, "currentIndex" ) );
 
             CONNECT( ui.stylesCombo, currentIndexChanged( int ), this, changeStyle( ) );
             optionWidgets["styleCB"] = ui.stylesCombo;
@@ -828,10 +851,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_BOOL( "qt-menubar", menuBarCheck );
 
             ui.pinVideoControlsCheckbox->setChecked( p_intf->p_sys->p_mi->pinVideoControls() );
+            m_resetters.push_back(std::make_unique<PropertyResetter>(ui.pinVideoControlsCheckbox, "checked"));
             QObject::connect( ui.pinVideoControlsCheckbox, &QCheckBox::stateChanged, p_intf->p_sys->p_mi, &MainInterface::setPinVideoControls );
 
             ui.colorSchemeComboBox->insertItems(0, p_intf->p_sys->p_mi->getColorScheme()->stringList());
             ui.colorSchemeComboBox->setCurrentText( p_intf->p_sys->p_mi->getColorScheme()->getCurrent() );
+            m_resetters.push_back(std::make_unique<PropertyResetter>( ui.colorSchemeComboBox, "currentIndex" ));
             QObject::connect( ui.colorSchemeComboBox, &QComboBox::currentTextChanged, p_intf->p_sys->p_mi->getColorScheme(), &ColorSchemeModel::setCurrent );
 
             const float intfScaleFloatFactor = 100.f;
@@ -857,6 +882,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                                                  , p_intf->p_sys->p_mi->getMaxIntfUserScaleFactor() * intfScaleFloatFactor);
 
             updateIntfUserScaleFactorFromControls( p_intf->p_sys->p_mi->getIntfUserScaleFactor() * intfScaleFloatFactor );
+            m_resetters.push_back( std::make_unique<PropertyResetter>( ui.intfScaleFactorSlider, "value" ) );
+
             QObject::connect( ui.intfScaleFactorSlider, QOverload<int>::of(&QSlider::valueChanged)
                               , p_intf->p_sys->p_mi , updateIntfUserScaleFactorFromControls );
             QObject::connect( ui.intfScaleFactorSpinBox, QOverload<int>::of(&QSpinBox::valueChanged)
@@ -1100,6 +1127,9 @@ void SPrefsPanel::updateAudioOptions( int number)
 
 SPrefsPanel::~SPrefsPanel()
 {
+    if (!m_isApplied)
+        clean();
+
     qDeleteAll( controls ); controls.clear();
     free( lang );
 }
@@ -1114,6 +1144,8 @@ void SPrefsPanel::updateAudioVolume( int volume )
 /* Function called from the main Preferences dialog on each SPrefs Panel */
 void SPrefsPanel::apply()
 {
+    m_isApplied = true;
+
     /* Generic save for ever panel */
     QList<ConfigControl *>::const_iterator i;
     for( i = controls.begin() ; i != controls.end() ; ++i )
@@ -1250,7 +1282,10 @@ void SPrefsPanel::apply()
 }
 
 void SPrefsPanel::clean()
-{}
+{
+    for ( auto &resetter : m_resetters )
+        resetter->reset();
+}
 
 void SPrefsPanel::lastfm_Changed( int i_state )
 {
