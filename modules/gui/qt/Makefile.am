@@ -256,6 +256,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/widgets/native/customwidgets.cpp gui/qt/widgets/native/customwidgets.hpp \
 	gui/qt/widgets/native/interface_widgets.cpp \
 	gui/qt/widgets/native/interface_widgets.hpp \
+	gui/qt/widgets/native/mlfolderseditor.cpp \
+	gui/qt/widgets/native/mlfolderseditor.hpp \
 	gui/qt/widgets/native/qvlcframe.cpp \
 	gui/qt/widgets/native/qvlcframe.hpp \
 	gui/qt/widgets/native/roundimage.cpp gui/qt/widgets/native/roundimage.hpp \
@@ -395,6 +397,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/widgets/native/animators.moc.cpp \
 	gui/qt/widgets/native/customwidgets.moc.cpp \
 	gui/qt/widgets/native/interface_widgets.moc.cpp \
+	gui/qt/widgets/native/mlfolderseditor.moc.cpp \
 	gui/qt/widgets/native/roundimage.moc.cpp \
 	gui/qt/widgets/native/searchlineedit.moc.cpp
 
