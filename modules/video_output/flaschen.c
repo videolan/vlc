@@ -49,10 +49,10 @@
     "Something like ft.noise or ftkleine.noise")
 
 #define T_WIDTH N_("Width")
-#define LT_WIDTH N_("Video width")
+#define LT_WIDTH NULL
 
 #define T_HEIGHT N_("Height")
-#define LT_HEIGHT N_("Video height")
+#define LT_HEIGHT NULL
 
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context);

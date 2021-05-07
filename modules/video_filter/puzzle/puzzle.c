@@ -56,7 +56,7 @@
 #define BORDER_TEXT N_("Border")
 #define BORDER_LONGTEXT N_("Unshuffled Border width.")
 #define PREVIEW_TEXT N_("Small preview")
-#define PREVIEW_LONGTEXT N_("Show small preview.")
+#define PREVIEW_LONGTEXT NULL
 #define PREVIEWSIZE_TEXT N_("Small preview size")
 #define PREVIEWSIZE_LONGTEXT N_("Show small preview size (percent of source).")
 #define SHAPE_SIZE_TEXT N_("Piece edge shape size")

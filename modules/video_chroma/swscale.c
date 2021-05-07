@@ -55,7 +55,7 @@ static int  OpenScaler( filter_t * );
 static void CloseScaler( filter_t * );
 
 #define SCALEMODE_TEXT N_("Scaling mode")
-#define SCALEMODE_LONGTEXT N_("Scaling mode to use.")
+#define SCALEMODE_LONGTEXT NULL
 
 static const int pi_mode_values[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 static const char *const ppsz_mode_descriptions[] =

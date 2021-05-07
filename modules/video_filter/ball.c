@@ -99,8 +99,7 @@ static int getBallColor( vlc_object_t *p_this, char const *psz_newval );
  *****************************************************************************/
 #define BALL_COLOR_TEXT N_("Ball color")
 
-#define EDGE_VISIBLE_TEXT N_("Edge visible")
-#define EDGE_VISIBLE_LONGTEXT N_("Set edge visibility.")
+#define EDGE_VISIBLE_TEXT N_("Set edge visibility")
 
 #define BALL_SPEED_TEXT N_("Ball speed")
 #define BALL_SPEED_LONGTEXT N_("Set ball speed, the displacement value " \
@@ -142,7 +141,7 @@ vlc_module_begin ()
                             GRAD_THRESH_TEXT, GRAD_THRESH_LONGTEXT, false )
 
     add_bool( FILTER_PREFIX "edge-visible", true,
-              EDGE_VISIBLE_TEXT, EDGE_VISIBLE_LONGTEXT, true )
+              EDGE_VISIBLE_TEXT, NULL, true )
 
     add_shortcut( "ball" )
     set_callback_video_filter( Create )

@@ -55,7 +55,7 @@ VIDEO_FILTER_WRAPPER_CLOSE(Filter, Destroy)
  * Module descriptor
  *****************************************************************************/
 #define SEPIA_INTENSITY_TEXT N_("Sepia intensity")
-#define SEPIA_INTENSITY_LONGTEXT N_("Intensity of sepia effect" )
+#define SEPIA_INTENSITY_LONGTEXT NULL
 
 #define CFG_PREFIX "sepia-"
 

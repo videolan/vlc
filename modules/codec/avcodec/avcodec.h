@@ -95,7 +95,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec, AVCodecContext *, const AVCodec * );
     "(-1=None, 0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)." )
 
 #define DEBUG_TEXT N_( "Debug mask" )
-#define DEBUG_LONGTEXT N_( "Set FFmpeg debug mask" )
+#define DEBUG_LONGTEXT NULL
 
 #define CODEC_TEXT N_( "Codec name" )
 #define CODEC_LONGTEXT N_( "Internal libavcodec codec name" )
@@ -133,8 +133,7 @@ int ffmpeg_OpenCodec( decoder_t *p_dec, AVCodecContext *, const AVCodec * );
   "motion estimation algorithms. This requires more CPU." )
 
 #define ENC_PRE_ME_TEXT N_( "Pre-motion estimation" )
-#define ENC_PRE_ME_LONGTEXT N_( "Enable the pre-motion " \
-  "estimation algorithm.")
+#define ENC_PRE_ME_LONGTEXT NULL
 
 #define ENC_RC_BUF_TEXT N_( "Rate control buffer size" )
 #define ENC_RC_BUF_LONGTEXT N_( "Rate control " \

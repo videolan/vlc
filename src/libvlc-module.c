@@ -210,8 +210,7 @@ static const char *const ppsz_stereo_mode_texts[] = { N_("Unset"),
 
 #define AUDIO_REPLAY_GAIN_MODE_TEXT N_( \
     "Replay gain mode" )
-#define AUDIO_REPLAY_GAIN_MODE_LONGTEXT N_( \
-    "Select the replay gain mode" )
+#define AUDIO_REPLAY_GAIN_MODE_LONGTEXT NULL
 #define AUDIO_REPLAY_GAIN_PREAMP_TEXT N_( \
     "Replay preamp" )
 #define AUDIO_REPLAY_GAIN_PREAMP_LONGTEXT N_( \
@@ -340,9 +339,7 @@ static const char *const ppsz_align_descriptions[] =
 
 #define MOUSE_HIDE_TIMEOUT_TEXT N_("Hide cursor and fullscreen " \
                                    "controller after x milliseconds")
-#define MOUSE_HIDE_TIMEOUT_LONGTEXT N_( \
-    "Hide mouse cursor and fullscreen controller after " \
-    "n milliseconds.")
+#define MOUSE_HIDE_TIMEOUT_LONGTEXT NULL
 
 #define DEINTERLACE_TEXT N_("Deinterlace")
 static const int pi_deinterlace[] = {
