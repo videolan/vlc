@@ -28,6 +28,7 @@
 
 // Qt includes
 #include <QDir>
+#include <QImageReader>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsBlurEffect>
@@ -239,32 +240,63 @@ void CoverGenerator::draw(QPainter & painter, const QStringList & fileNames)
             else
                 rect = QRect(width * x, height * y, width, height);
 
-            drawImage(painter, fileNames.at(index), rect);
+            QString fileName = fileNames.at(index);
+
+            if (fileName.isEmpty())
+                drawImage(painter, m_default, rect);
+            else
+                drawImage(painter, fileName, rect);
         }
     }
 }
 
 void CoverGenerator::drawImage(QPainter & painter, const QString & fileName, const QRect & target)
 {
-    QImage image;
+    QFile file(fileName);
 
-    if (fileName.isEmpty())
-        image.load(m_default);
-    else
-        image.load(fileName);
-
-    // NOTE: This image does not seem valid so we paint the placeholder instead.
-    if (image.isNull())
+    if (file.open(QIODevice::ReadOnly) == false)
     {
-        image.load(m_default);
+        // NOTE: This image does not seem valid so we paint the placeholder instead.
+        if (fileName != m_default)
+            drawImage(painter, m_default, target);
+
+        return;
     }
 
-    // NOTE: Should we use Qt::SmoothTransformation or favor efficiency ?
-    if (m_smooth)
-        image = image.scaled(target.size(), Qt::KeepAspectRatioByExpanding,
-                             Qt::SmoothTransformation);
+    QImageReader reader(&file);
+
+    if (reader.canRead() == false)
+        return;
+
+    QSize size = reader.size().scaled(target.width(),
+                                      target.height(), Qt::KeepAspectRatioByExpanding);
+
+    QImage image;
+
+    if (fileName.endsWith(".svg", Qt::CaseInsensitive))
+    {
+        if (size.isEmpty() == false)
+        {
+            reader.setScaledSize(size);
+        }
+
+        if (reader.read(&image) == false)
+            return;
+    }
     else
-        image = image.scaled(target.size(), Qt::KeepAspectRatioByExpanding);
+    {
+        if (reader.read(&image) == false)
+            return;
+
+        if (size.isEmpty() == false)
+        {
+            // NOTE: Should we use Qt::SmoothTransformation or favor efficiency ?
+            if (m_smooth)
+                image = image.scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+            else
+                image = image.scaled(size, Qt::IgnoreAspectRatio);
+        }
+    }
 
     int x = (image.width () - target.width ()) / 2;
     int y = (image.height() - target.height()) / 2;
