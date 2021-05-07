@@ -1,0 +1,21 @@
+diff -ru lame/configure.in lame/configure.in
+--- lame/configure.in	2021-05-07 10:51:04.000000000 +0200
++++ lame-fixed/configure.in	2021-05-07 10:51:26.000000000 +0200
+@@ -935,7 +935,7 @@
+ 						-mtune=native"
+ 					;;
+ 				*86)
+-					OPTIMIZATION="${OPTIMIZATION} -march=native \
++					OPTIMIZATION="${OPTIMIZATION} -march=i386 \
+ 						-mtune=native"
+ 					;;
+ 				arm*-gnueabi)
+@@ -986,7 +986,7 @@
+ 				-mtune=native"
+ 			;;
+ 		*86)
+-			OPTIMIZATION="${OPTIMIZATION} -march=native \
++			OPTIMIZATION="${OPTIMIZATION} -march=i386 \
+ 				-mtune=native"
+ 			;;
+ 		esac
