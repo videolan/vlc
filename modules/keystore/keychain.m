@@ -62,7 +62,8 @@ static const char *const accessibility_list_text[] = {
 #define SYNC_ITEMS_TEXT N_("Synchronize stored items")
 #define SYNC_ITEMS_LONGTEXT N_("Synchronizes stored items via iCloud Keychain if enabled in the user domain.")
 
-#define ACCESSIBILITY_TYPE_TEXT N_("Accessibility type for all future passwords saved to the Keychain")
+#define ACCESSIBILITY_TYPE_TEXT N_("Accessibility type")
+#define ACCESSIBILITY_TYPE_LONGTEXT N_("Accessibility type for all future passwords saved to the Keychain")
 
 #define ACCESS_GROUP_TEXT N_("Keychain access group")
 #define ACCESS_GROUP_LONGTEXT N_("Keychain access group as defined by the app entitlements.")
@@ -75,7 +76,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_ADVANCED_MISC)
     add_integer("keychain-synchronize", 1, SYNC_ITEMS_TEXT, SYNC_ITEMS_LONGTEXT, true)
     change_integer_list(sync_list, sync_list_text)
-    add_integer("keychain-accessibility-type", 0, ACCESSIBILITY_TYPE_TEXT, ACCESSIBILITY_TYPE_TEXT, true)
+    add_integer("keychain-accessibility-type", 0, ACCESSIBILITY_TYPE_TEXT, ACCESSIBILITY_TYPE_LONGTEXT, true)
     change_integer_list(accessibility_list, accessibility_list_text)
     add_string("keychain-access-group", NULL, ACCESS_GROUP_TEXT, ACCESS_GROUP_LONGTEXT, true)
     set_capability("keystore", 100)
