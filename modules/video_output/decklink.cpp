@@ -102,11 +102,6 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
     "This value should be a FOURCC code in textual " \
     "form, e.g. \"ntsc\".")
 
-#define AUDIO_CONNECTION_TEXT N_("Audio connection")
-#define AUDIO_CONNECTION_LONGTEXT N_(\
-    "Audio connection for DeckLink output.")
-
-
 #define RATE_TEXT N_("Audio samplerate (Hz)")
 #define RATE_LONGTEXT N_(\
     "Audio sampling rate (in hertz) for DeckLink output. " \
