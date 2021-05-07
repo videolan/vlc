@@ -59,8 +59,9 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
 public slots:
-    virtual void removeAt( int index ) = 0;
+    virtual void remove( const QUrl &mrl ) = 0;
     virtual void add( const QUrl &mrl ) = 0;
+    void removeAt( int index );
 
 signals:
     void ctxChanged();
@@ -93,7 +94,7 @@ class MLFoldersModel : public MLFoldersBaseModel
 public:
     using MLFoldersBaseModel::MLFoldersBaseModel;
 
-    void removeAt( int index ) override;
+    void remove( const QUrl &mrl ) override;
     void add( const QUrl &mrl ) override;
 
 private:
@@ -105,7 +106,7 @@ class MLBannedFoldersModel : public MLFoldersBaseModel
 public:
     using MLFoldersBaseModel::MLFoldersBaseModel;
 
-    void removeAt( int index ) override;
+    void remove( const QUrl &mrl ) override;
     void add( const QUrl &mrl ) override;
 
 private:

@@ -97,6 +97,15 @@ QHash<int, QByteArray> MLFoldersBaseModel::roleNames() const
     };
 }
 
+void MLFoldersBaseModel::removeAt(int index)
+{
+    assert(index < rowCount());
+    const QModelIndex idx = this->index( index, 0 );
+    if (idx.isValid())
+        remove( data( idx,  MRL ).toUrl() );
+
+}
+
 void MLFoldersBaseModel::update()
 {
     beginResetModel();
@@ -129,12 +138,9 @@ std::vector<MLFoldersBaseModel::EntryPoint> MLFoldersModel::entryPoints() const
     return r;
 }
 
-void MLFoldersModel::removeAt( int index )
+void MLFoldersModel::remove( const QUrl &mrl )
 {
-    assert(index < rowCount());
-    const QModelIndex idx = this->index( index, 0 );
-    if (idx.isValid())
-        vlc_ml_remove_folder( ml() , qtu( data( idx, MLFoldersBaseModel::MRL ).value<QString>() ) );
+    vlc_ml_remove_folder( ml() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
 }
 
 void MLFoldersModel::add(const QUrl &mrl )
@@ -142,14 +148,9 @@ void MLFoldersModel::add(const QUrl &mrl )
     vlc_ml_add_folder( ml() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
 }
 
-void MLBannedFoldersModel::removeAt(int index)
+void MLBannedFoldersModel::remove(const QUrl &mrl)
 {
-    assert(index < rowCount());
-    const QModelIndex idx = this->index( index, 0 );
-    if (idx.isValid())
-    {
-        vlc_ml_unban_folder( ml() , qtu( data( idx, MLFoldersBaseModel::MRL ).value<QString>() ) );
-    }
+    vlc_ml_unban_folder( ml() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
 }
 
 void MLBannedFoldersModel::add(const QUrl &mrl)
