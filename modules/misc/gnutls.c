@@ -759,7 +759,7 @@ vlc_module_begin ()
     add_bool("gnutls-system-trust", true, SYSTEM_TRUST_TEXT,
              SYSTEM_TRUST_LONGTEXT, true)
     add_string("gnutls-dir-trust", NULL, DIR_TRUST_TEXT,
-               DIR_TRUST_TEXT, true)
+               DIR_TRUST_LONGTEXT, true)
     add_string ("gnutls-priorities", "NORMAL", PRIORITIES_TEXT,
                 PRIORITIES_LONGTEXT, false)
         change_string_list (priorities_values, priorities_text)
