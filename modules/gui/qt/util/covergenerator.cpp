@@ -107,6 +107,11 @@ CoverGenerator::CoverGenerator(vlc_medialibrary_t * ml, const MLItemId & itemId,
     m_default = fileName;
 }
 
+/* Q_INVOKABLE */ void CoverGenerator::setPrefix(const QString & prefix)
+{
+    m_prefix = prefix;
+}
+
 //-------------------------------------------------------------------------------------------------
 // QRunnable implementation
 //-------------------------------------------------------------------------------------------------
@@ -121,9 +126,15 @@ QString CoverGenerator::execute() /* override */
 
     int64_t id = m_id.id;
 
-    QString string = getStringType(type);
+    QString fileName;
 
-    QString fileName = QString("%1_thumbnail_%2.jpg").arg(string).arg(id);
+    // NOTE: If we don't have a valid prefix we generate one based on the item type.
+    if (m_prefix.isEmpty())
+    {
+        m_prefix = getPrefix(type);
+    }
+
+    fileName = QString("%1_thumbnail_%2.jpg").arg(m_prefix).arg(id);
 
     fileName = dir.absoluteFilePath(fileName);
 
@@ -295,7 +306,7 @@ void CoverGenerator::blur(QImage * image)
 
 //-------------------------------------------------------------------------------------------------
 
-QString CoverGenerator::getStringType(vlc_ml_parent_type type) const
+QString CoverGenerator::getPrefix(vlc_ml_parent_type type) const
 {
     switch (type)
     {

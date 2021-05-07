@@ -75,6 +75,9 @@ public: // Interface
 
     Q_INVOKABLE void setDefaultThumbnail(const QString & fileName);
 
+    // NOTE: This lets us enforce a specific prefix for the cover fileName.
+    Q_INVOKABLE void setPrefix(const QString & prefix);
+
 public: // AsyncTask implementation
     QString execute() override;
 
@@ -85,7 +88,7 @@ private: // Functions
 
     void blur(QImage * image);
 
-    QString getStringType(vlc_ml_parent_type type) const;
+    QString getPrefix(vlc_ml_parent_type type) const;
 
     QStringList getMedias(int count, int64_t id, vlc_ml_parent_type type) const;
     QStringList getGenre (int count, int64_t id) const;
@@ -109,6 +112,8 @@ private:
     int m_blur;
 
     QString m_default;
+
+    QString m_prefix;
 };
 
 #endif // COVERGENERATOR_HPP
