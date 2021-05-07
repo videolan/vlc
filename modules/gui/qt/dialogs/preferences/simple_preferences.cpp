@@ -814,6 +814,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             QObject::connect( ui.pinVideoControlsCheckbox, &QCheckBox::stateChanged, p_intf->p_sys->p_mi, &MainInterface::setPinVideoControls );
 
             ui.colorSchemeComboBox->insertItems(0, p_intf->p_sys->p_mi->getColorScheme()->stringList());
+            ui.colorSchemeComboBox->setCurrentText( p_intf->p_sys->p_mi->getColorScheme()->getCurrent() );
             QObject::connect( ui.colorSchemeComboBox, &QComboBox::currentTextChanged, p_intf->p_sys->p_mi->getColorScheme(), &ColorSchemeModel::setCurrent );
 
             const float intfScaleFloatFactor = 100.f;
