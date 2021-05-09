@@ -83,6 +83,10 @@ static const int prim_values[] = {
     PL_COLOR_PRIM_V_GAMUT,
     PL_COLOR_PRIM_S_GAMUT,
     PL_COLOR_PRIM_DISPLAY_P3,
+#if PL_API_VER >= 95
+    PL_COLOR_PRIM_EBU_3213,
+    PL_COLOR_PRIM_FILM_C,
+#endif
 };
 
 static const char * const prim_text[] = {
@@ -100,6 +104,10 @@ static const char * const prim_text[] = {
     "Panasonic V-Gamut (VARICAM)",
     "Sony S-Gamut",
     "Display-P3 (Digital Cinema with D65)",
+#if PL_API_VER >= 95
+    "EBU Tech. 3213-E / JEDEC P22 phosphors",
+    "Traditional film primaries with Illuminant C",
+#endif
 };
 
 #define TRC_TEXT "Display gamma / transfer function"
