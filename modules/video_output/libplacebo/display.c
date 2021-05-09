@@ -468,10 +468,10 @@ vlc_module_begin ()
     add_integer("pl-intent", pl_color_map_default_params.intent,
             RENDER_INTENT_TEXT, RENDER_INTENT_LONGTEXT, false)
             change_integer_list(intent_values, intent_text)
-    add_integer("pl-target-prim", PL_COLOR_PRIM_UNKNOWN, PRIM_TEXT, PRIM_LONGTEXT, false) \
-            change_integer_list(prim_values, prim_text) \
-    add_integer("pl-target-trc", PL_COLOR_TRC_UNKNOWN, TRC_TEXT, TRC_LONGTEXT, false) \
-            change_integer_list(trc_values, trc_text) \
+    add_integer("pl-target-prim", PL_COLOR_PRIM_UNKNOWN, PRIM_TEXT, PRIM_LONGTEXT, false)
+            change_integer_list(prim_values, prim_text)
+    add_integer("pl-target-trc", PL_COLOR_TRC_UNKNOWN, TRC_TEXT, TRC_LONGTEXT, false)
+            change_integer_list(trc_values, trc_text)
 
     // TODO: support for ICC profiles / 3DLUTs.. we will need some way of loading
     // this from the operating system / user
