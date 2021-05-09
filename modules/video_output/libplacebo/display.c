@@ -74,6 +74,11 @@ struct vout_display_sys_t
     char *lut_path;
     int lut_mode;
 #endif
+
+#if PL_API_VER >= 58
+    const struct pl_hook *hook;
+    char *hook_path;
+#endif
 };
 
 // Display callbacks
@@ -189,6 +194,11 @@ static void Close(vout_display_t *vd)
 #if PL_API_VER >= 113
     pl_lut_free(&sys->lut);
     free(sys->lut_path);
+#endif
+
+#if PL_API_VER >= 58
+    pl_mpv_user_shader_destroy(&sys->hook);
+    free(sys->hook_path);
 #endif
 
     vlc_placebo_Release(sys->pl);
@@ -499,6 +509,54 @@ error:
 }
 #endif
 
+#if PL_API_VER >= 58
+static void LoadUserShader(vout_display_sys_t *sys, const char *filepath)
+{
+    if (!filepath || !*filepath) {
+        pl_mpv_user_shader_destroy(&sys->hook);
+        return;
+    }
+
+    if (sys->hook_path && strcmp(filepath, sys->hook_path) == 0)
+        return; // same shader
+
+    char *shader_str = NULL;
+    FILE *fs = NULL;
+
+    free(sys->hook_path);
+    sys->hook_path = strdup(filepath);
+
+    fs = vlc_fopen(filepath, "rb");
+    int ret = fseek(fs, 0, SEEK_END);
+    if (ret == -1)
+        goto error;
+    long length = ftell(fs);
+    if (length < 0)
+        goto error;
+    rewind(fs);
+
+    shader_str = vlc_alloc(length, sizeof(*shader_str));
+    if (!shader_str)
+        goto error;
+    ret = fread(shader_str, length, 1, fs);
+    if (ret != 1)
+        goto error;
+    sys->hook = pl_mpv_user_shader_parse(sys->pl->gpu, shader_str, length);
+    if (!sys->hook)
+        goto error;
+
+    fclose(fs);
+    free(shader_str);
+    return;
+
+error:
+    free(shader_str);
+    if (fs)
+        fclose(fs);
+    return;
+}
+#endif
+
 // Options
 
 #define PROVIDER_TEXT N_("GPU instance provider")
@@ -513,6 +571,11 @@ vlc_module_begin ()
     set_callback_display(Open, 0)
     add_shortcut ("libplacebo", "pl")
     add_module ("pl-gpu", "libplacebo gpu", NULL, PROVIDER_TEXT, PROVIDER_LONGTEXT)
+
+#if PL_API_VER >= 58
+    set_section("Custom shaders", NULL)
+    add_loadfile("pl-user-shader", NULL, USER_SHADER_FILE_TEXT, USER_SHADER_FILE_LONGTEXT)
+#endif
 
     set_section("Scaling", NULL)
     add_integer("pl-upscaler-preset", SCALE_BUILTIN,
@@ -790,6 +853,18 @@ static void UpdateParams(vout_display_t *vd)
             sys->params.lut = NULL; // the others need to be applied elsewhere
             break;
         }
+    }
+#endif
+
+#if PL_API_VER >= 58
+    char *shader_file = var_InheritString(vd, "pl-user-shader");
+    LoadUserShader(sys, shader_file);
+    free(shader_file);
+    if (sys->hook) {
+        sys->params.hooks = &sys->hook;
+        sys->params.num_hooks = 1;
+    } else {
+        sys->params.num_hooks = 0;
     }
 #endif
 }

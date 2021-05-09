@@ -178,6 +178,9 @@ static const char * const lut_mode_text[] = {
 #define LUT_MODE_TEXT "Custom LUT type"
 #define LUT_MODE_LONGTEXT "The type of operation this LUT should be used for."
 
+#define USER_SHADER_FILE_TEXT "Custom shader"
+#define USER_SHADER_FILE_LONGTEXT "Path to a file containing a custom user shader, in mpv .hook format."
+
 #define TONEMAPPING_TEXT "Tone-mapping algorithm"
 #define TONEMAPPING_LONGTEXT "Algorithm to use when converting from wide gamut to standard gamut, or from HDR to SDR."
 
