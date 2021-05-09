@@ -478,6 +478,9 @@ vlc_module_begin ()
     add_float("pl-tone-mapping-desat", pl_color_map_default_params.tone_mapping_desaturate,
             TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT, false)
 #endif
+#if PL_API_VER >= 80
+    add_bool("pl-gamut-clipping", false, GAMUT_CLIPPING_TEXT, GAMUT_CLIPPING_LONGTEXT, true)
+#endif
     add_bool("pl-gamut-warning", false, GAMUT_WARN_TEXT, GAMUT_WARN_LONGTEXT, true)
 
 #if PL_API_VER < 12
@@ -586,6 +589,9 @@ static void UpdateParams(vout_display_t *vd)
     sys->color_map.max_boost = var_InheritFloat(vd, "pl-max-boost");
 #else
     sys->color_map.tone_mapping_desaturate = var_InheritFloat(vd, "pl-tone-mapping-desat");
+#endif
+#if PL_API_VER >= 80
+    sys->color_map.gamut_clipping = var_InheritBool(vd, "pl-gamut-clipping");
 #endif
     sys->color_map.gamut_warning = var_InheritBool(vd, "pl-gamut-warning");
 #if PL_API_VER < 12

@@ -191,6 +191,9 @@ static const char * const tone_text[] = {
 #define MAX_BOOST_TEXT "Maximum brightness boost"
 #define MAX_BOOST_LONGTEXT "Maximum allowed brightness boost to compensate for dark scenes. A value of 1.0 means no brightness boost is allowed."
 
+#define GAMUT_CLIPPING_TEXT "Colorimetric gamut clipping"
+#define GAMUT_CLIPPING_LONGTEXT "Colorimetrically clip out-of-gamut colors by desaturating them until they hit the boundary of the permissible color volume."
+
 #define GAMUT_WARN_TEXT "Highlight clipped pixels"
 #define GAMUT_WARN_LONGTEXT "Debugging tool to indicate which pixels were clipped as part of the tone mapping process."
 
