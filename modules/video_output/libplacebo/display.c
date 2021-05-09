@@ -49,9 +49,6 @@ struct vout_display_sys_t
     const struct pl_tex **overlay_tex;
     int num_overlays;
 
-    // Dynamic during rendering
-    vout_display_place_t place;
-
     // Storage for rendering parameters
     struct pl_filter_config upscaler;
     struct pl_filter_config downscaler;
@@ -235,10 +232,36 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
     struct pl_render_target target;
     pl_render_target_from_swapchain(&target, &frame);
-    target.dst_rect.x0 = sys->place.x;
-    target.dst_rect.y0 = sys->place.y;
-    target.dst_rect.x1 = sys->place.x + sys->place.width;
-    target.dst_rect.y1 = sys->place.y + sys->place.height;
+
+    // Set the target crop dynamically based on the swapchain flip state
+    vout_display_place_t place;
+    vout_display_cfg_t cfg = *vd->cfg;
+    cfg.display.width = frame.fbo->params.w;
+    cfg.display.height = frame.fbo->params.h;
+    if (frame.flipped) {
+        switch (cfg.align.vertical) {
+        case VLC_VIDEO_ALIGN_TOP: cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM; break;
+        case VLC_VIDEO_ALIGN_BOTTOM: cfg.align.vertical = VLC_VIDEO_ALIGN_TOP; break;
+        default: break;
+        }
+    }
+    vout_display_PlacePicture(&place, vd->fmt, &cfg);
+    if (frame.flipped) {
+        place.y = frame.fbo->params.h - place.y;
+        place.height = -place.height;
+    }
+
+#if PL_API_VER >= 101
+    target.crop = (struct pl_rect2df) {
+        place.x, place.y, place.x + place.width, place.y + place.height,
+    };
+#else
+    // Avoid using struct initializer for backwards compatibility
+    target.dst_rect.x0 = place.x;
+    target.dst_rect.y0 = place.y;
+    target.dst_rect.x1 = place.x + place.width;
+    target.dst_rect.y1 = place.y + place.height;
+#endif
 
     // Override the target colorimetry only if the user requests it
     if (sys->target.primaries)
@@ -287,22 +310,18 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
                 assert(!"Failed processing the subpicture_t into pl_plane_data!?");
 
             struct pl_overlay *overlay = &sys->overlays[i];
+            int ysign = frame.flipped ? (-1) : 1;
             *overlay = (struct pl_overlay) {
                 .rect = {
-                    .x0 = target.dst_rect.x0 + r->i_x,
-                    .y0 = target.dst_rect.y0 + r->i_y,
-                    .x1 = target.dst_rect.x0 + r->i_x + r->fmt.i_visible_width,
-                    .y1 = target.dst_rect.y0 + r->i_y + r->fmt.i_visible_height,
+                    .x0 = place.x + r->i_x,
+                    .y0 = place.y + r->i_y * ysign,
+                    .x1 = place.x + r->i_x + r->fmt.i_visible_width,
+                    .y1 = place.y + (r->i_y + r->fmt.i_visible_height) * ysign,
                 },
                 .mode = PL_OVERLAY_NORMAL,
                 .color = vlc_placebo_ColorSpace(&r->fmt),
                 .repr  = vlc_placebo_ColorRepr(&r->fmt),
             };
-
-            if (frame.flipped) {
-                overlay->rect.y0 = frame.fbo->params.h - overlay->rect.y0;
-                overlay->rect.y1 = frame.fbo->params.h - overlay->rect.y1;
-            }
 
             if (!pl_upload_plane(gpu, &overlay->plane, &sys->overlay_tex[i], &subdata)) {
                 msg_Err(vd, "Failed uploading subpicture region!");
@@ -318,7 +337,9 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
     // If we don't cover the entire output, clear it first
     struct pl_rect2d full = {0, 0, frame.fbo->params.w, frame.fbo->params.h };
-    if (!pl_rect2d_eq(target.dst_rect, full)) {
+    struct pl_rect2d norm = {place.x, place.y, place.x + place.width, place.y + place.height };
+    pl_rect2d_normalize(&norm);
+    if (!pl_rect2d_eq(norm, full)) {
         // TODO: make background color configurable?
         pl_tex_clear(gpu, frame.fbo, (float[4]){ 0.0, 0.0, 0.0, 0.0 });
     }
@@ -362,8 +383,6 @@ static int Control(vout_display_t *vd, int query)
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_ZOOM: {
-        vout_display_PlacePicture(&sys->place, vd->fmt, vd->cfg);
-
         /* The following resize should be automatic on most platforms but can
          * trigger bugs on some platform with some drivers, that have been seen
          * on Windows in particular. Doing it right now enforces the correct
