@@ -51,7 +51,6 @@ struct vout_display_sys_t
 
     // Dynamic during rendering
     vout_display_place_t place;
-    uint64_t counter;
 
     // Storage for rendering parameters
     struct pl_filter_config upscaler;
@@ -200,7 +199,6 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
     }
 
     struct pl_image img = {
-        .signature  = sys->counter++,
         .num_planes = pic->i_planes,
         .width      = pic->format.i_visible_width,
         .height     = pic->format.i_visible_height,
