@@ -145,6 +145,38 @@ static const char * const trc_text[] = {
     "Sony S-Log2",
 };
 
+#define LUT_FILE_TEXT "Custom LUT file (.cube)"
+#define LUT_FILE_LONGTEXT "Path to a file containing an Adobe .cube style LUT to apply during rendering."
+
+enum {
+    LUT_DISABLED,
+    LUT_NATIVE,
+    LUT_LINEAR,
+    LUT_CONVERSION,
+    LUT_DECODING,
+    LUT_ENCODING,
+};
+
+static const int lut_mode_values[] = {
+    LUT_DISABLED,
+    LUT_NATIVE,
+    LUT_LINEAR,
+    LUT_CONVERSION,
+    LUT_DECODING,
+    LUT_ENCODING,
+};
+
+static const char * const lut_mode_text[] = {
+    "None / Disabled",
+    "Postprocessing (RGB->RGB)",
+    "Postprocessing, linear light (RGB->RGB)",
+    "Gamut mapping / tone mapping (RGB->RGB)",
+    "Input decoding (e.g. custom YUV->RGB)",
+    "Output encoding (e.g. custom RGB->YUV)",
+};
+
+#define LUT_MODE_TEXT "Custom LUT type"
+#define LUT_MODE_LONGTEXT "The type of operation this LUT should be used for."
 
 #define TONEMAPPING_TEXT "Tone-mapping algorithm"
 #define TONEMAPPING_LONGTEXT "Algorithm to use when converting from wide gamut to standard gamut, or from HDR to SDR."

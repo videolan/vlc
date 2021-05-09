@@ -30,6 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
+#include <vlc_fs.h>
 
 #include "utils.h"
 #include "instance.h"
@@ -37,6 +38,10 @@
 #include <libplacebo/renderer.h>
 #include <libplacebo/utils/upload.h>
 #include <libplacebo/swapchain.h>
+
+#if PL_API_VER >= 113
+# include <libplacebo/shaders/lut.h>
+#endif
 
 struct vout_display_sys_t
 {
@@ -63,6 +68,12 @@ struct vout_display_sys_t
 #endif
     enum pl_chroma_location yuv_chroma_loc;
     int dither_depth;
+
+#if PL_API_VER >= 113
+    struct pl_custom_lut *lut;
+    char *lut_path;
+    int lut_mode;
+#endif
 };
 
 // Display callbacks
@@ -174,6 +185,11 @@ static void Close(vout_display_t *vd)
         free(sys->overlays);
         free(sys->overlay_tex);
     }
+
+#if PL_API_VER >= 113
+    pl_lut_free(&sys->lut);
+    free(sys->lut_path);
+#endif
 
     vlc_placebo_Release(sys->pl);
 }
@@ -344,6 +360,19 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         pl_tex_clear(gpu, frame.fbo, (float[4]){ 0.0, 0.0, 0.0, 0.0 });
     }
 
+#if PL_API_VER >= 113
+    switch (sys->lut_mode) {
+    case LUT_DECODING:
+        img.lut_type = PL_LUT_CONVERSION;
+        img.lut = sys->lut;
+        break;
+    case LUT_ENCODING:
+        target.lut_type = PL_LUT_CONVERSION;
+        target.lut = sys->lut;
+        break;
+    }
+#endif
+
     // Dispatch the actual image rendering with the pre-configured parameters
     if (!pl_render_image(sys->renderer, &img, &target, &sys->params)) {
         msg_Err(vd, "Failed rendering frame!");
@@ -420,6 +449,56 @@ static int Control(vout_display_t *vd, int query)
     return VLC_EGENERIC;
 }
 
+#if PL_API_VER >= 113
+static void LoadCustomLUT(vout_display_sys_t *sys, const char *filepath)
+{
+    if (!filepath || !*filepath) {
+        pl_lut_free(&sys->lut);
+        return;
+    }
+
+    if (sys->lut_path && strcmp(filepath, sys->lut_path) == 0)
+        return; // same LUT
+
+    char *lut_file = NULL;
+    FILE *fs = NULL;
+
+    free(sys->lut_path);
+    sys->lut_path = strdup(filepath);
+
+    fs = vlc_fopen(filepath, "rb");
+    if (!fs)
+        goto error;
+    int ret = fseek(fs, 0, SEEK_END);
+    if (ret == -1)
+        goto error;
+    long length = ftell(fs);
+    if (length < 0)
+        goto error;
+    rewind(fs);
+
+    lut_file = vlc_alloc(length, sizeof(*lut_file));
+    if (!lut_file)
+        goto error;
+    ret = fread(lut_file, length, 1, fs);
+    if (ret != 1)
+        goto error;
+    sys->lut = pl_lut_parse_cube(sys->pl->ctx, lut_file, length);
+    if (!sys->lut)
+        goto error;
+
+    fclose(fs);
+    free(lut_file);
+    return;
+
+error:
+    free(lut_file);
+    if (fs)
+        fclose(fs);
+    return;
+}
+#endif
+
 // Options
 
 #define PROVIDER_TEXT N_("GPU instance provider")
@@ -473,8 +552,13 @@ vlc_module_begin ()
     add_integer("pl-target-trc", PL_COLOR_TRC_UNKNOWN, TRC_TEXT, TRC_LONGTEXT, false)
             change_integer_list(trc_values, trc_text)
 
-    // TODO: support for ICC profiles / 3DLUTs.. we will need some way of loading
-    // this from the operating system / user
+#if PL_API_VER >= 113
+    add_loadfile("pl-lut-file", NULL, LUT_FILE_TEXT, LUT_FILE_LONGTEXT)
+    add_integer("pl-lut-mode", LUT_DISABLED, LUT_MODE_TEXT, LUT_MODE_LONGTEXT, false)
+            change_integer_list(lut_mode_values, lut_mode_text)
+#endif
+
+    // TODO: support for ICC profiles
 
     set_section("Tone mapping", NULL)
     add_integer("pl-tone-mapping", pl_color_map_default_params.tone_mapping_algo,
@@ -690,4 +774,22 @@ static void UpdateParams(vout_display_t *vd)
         .transfer = var_InheritInteger(vd, "pl-target-trc"),
         .sig_avg = var_InheritFloat(vd, "pl-target-avg"),
     };
+
+#if PL_API_VER >= 113
+    sys->lut_mode = var_InheritInteger(vd, "pl-lut-mode");
+    char *lut_file = var_InheritString(vd, "pl-lut-file");
+    LoadCustomLUT(sys, lut_file);
+    free(lut_file);
+    if (sys->lut) {
+        sys->params.lut = sys->lut;
+        switch (sys->lut_mode) {
+        case LUT_NATIVE:     sys->params.lut_type = PL_LUT_NATIVE; break;
+        case LUT_LINEAR:     sys->params.lut_type = PL_LUT_NORMALIZED; break;
+        case LUT_CONVERSION: sys->params.lut_type = PL_LUT_CONVERSION; break;
+        default:
+            sys->params.lut = NULL; // the others need to be applied elsewhere
+            break;
+        }
+    }
+#endif
 }
