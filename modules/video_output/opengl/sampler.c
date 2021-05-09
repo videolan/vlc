@@ -1153,10 +1153,8 @@ CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
 #       endif
             },
         });
-#   elif PL_API_VER >= 6
-        priv->pl_sh = pl_shader_alloc(priv->pl_ctx, NULL, 0);
 #   else
-        priv->pl_sh = pl_shader_alloc(priv->pl_ctx, NULL, 0, 0);
+        priv->pl_sh = pl_shader_alloc(priv->pl_ctx, NULL, 0);
 #   endif
     }
 #endif
