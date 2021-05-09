@@ -149,6 +149,7 @@ static void CloseInstance(vlc_placebo_t *pl)
 
     if (sys->gl != NULL) {
         if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS) {
+            pl_swapchain_destroy(&pl->swapchain);
             pl_opengl_destroy(&sys->opengl);
             vlc_gl_ReleaseCurrent(sys->gl);
         }

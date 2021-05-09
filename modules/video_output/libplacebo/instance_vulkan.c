@@ -113,6 +113,7 @@ static void CloseInstance(vlc_placebo_t *pl)
 {
     vlc_placebo_system_t *sys = pl->sys;
 
+    pl_swapchain_destroy(&pl->swapchain);
     pl_vulkan_destroy(&sys->vulkan);
     pl_vk_inst_destroy(&sys->instance);
 

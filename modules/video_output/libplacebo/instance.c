@@ -74,7 +74,6 @@ void vlc_placebo_Release(vlc_placebo_t *pl)
     if (pl->ops)
         pl->ops->close(pl);
 
-    pl_swapchain_destroy(&pl->swapchain);
     pl_context_destroy(&pl->ctx);
 
     /* TODO: use vlc_objres_clear */
