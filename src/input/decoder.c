@@ -1455,9 +1455,9 @@ static void DecoderThread_DecodeBlock( vlc_input_decoder_t *p_owner, vlc_frame_t
 
     if( type != NULL && frame != NULL && atomic_load(&p_owner->b_display_avstat))
     {
-        msg_Info( p_dec, "avstats: ts=%" PRId64 ", [DEC][IN][%s], dts=%" PRId64
-                          ", pts=%" PRId64,
-                  NS_FROM_VLC_TICK(vlc_tick_now()), type,
+        msg_Info( p_dec, "avstats: [DEC][IN][%s] ts=%" PRId64 " dts=%" PRId64
+                          " pts=%" PRId64,
+                  type, NS_FROM_VLC_TICK(vlc_tick_now()),
                   NS_FROM_VLC_TICK(frame->i_dts),
                   NS_FROM_VLC_TICK(frame->i_pts) );
     }
