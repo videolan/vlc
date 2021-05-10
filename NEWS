@@ -3,6 +3,8 @@ Changes between 3.0.13 and 3.0.14:
 
 Core:
  * Fix double loading of slave input
+ * Fix an issue causing the auto-updater not to launch the new version
+   installer
 
 Changes between 3.0.12.1 and 3.0.13:
 ----------------------------------
