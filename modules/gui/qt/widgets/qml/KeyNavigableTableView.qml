@@ -90,6 +90,8 @@ NavigableFocusScope {
 
     property alias listScrollBar: view.listScrollBar
 
+    property alias displayMarginEnd: view.displayMarginEnd
+
     Accessible.role: Accessible.Table
 
     function positionViewAtIndex(index, mode) {

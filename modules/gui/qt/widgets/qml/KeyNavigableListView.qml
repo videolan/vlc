@@ -69,6 +69,9 @@ NavigableFocusScope {
     property alias add: view.add
     property alias displaced: view.displaced
 
+    property alias displayMarginBeginning: view.displayMarginBeginning
+    property alias displayMarginEnd: view.displayMarginEnd
+
     property int highlightMargin: VLCStyle.margin_large
     property var fadeColor: undefined
     property alias fadeRectBottomHovered: fadeRectBottom.isHovered
