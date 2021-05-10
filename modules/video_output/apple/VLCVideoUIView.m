@@ -222,7 +222,7 @@
     if (@available(iOS 10, *))
         target_ts = [sender targetTimestamp];
     if (atomic_load(&_avstatEnabled))
-        msg_Info(_wnd, "avstat: ts: %" PRId64 ", [RENDER][CADISPLAYLINK], "
+        msg_Info(_wnd, "avstats: [RENDER][CADISPLAYLINK] ts=%" PRId64 " "
                  "prev_ts=%" PRId64 " target_ts=%" PRId64,
                  NS_FROM_VLC_TICK(now),
                  NS_FROM_VLC_TICK(vlc_tick_from_sec(current_ts)),
