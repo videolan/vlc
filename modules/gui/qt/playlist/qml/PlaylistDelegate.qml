@@ -47,7 +47,7 @@ Rectangle {
     }
 
     color: {
-        if ((activeFocus && listView.mode !== PlaylistListView.Mode.Select) || (hovered && selected))
+        if ((selected && activeFocus && listView.mode !== PlaylistListView.Mode.Select) || (hovered && selected))
             colors.plItemFocused
         else if (hovered)
             colors.plItemHovered
