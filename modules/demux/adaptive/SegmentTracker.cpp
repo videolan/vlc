@@ -316,7 +316,7 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos,
         return ChunkEntry();
 
     const Timescale timescale = pos.rep->inheritTimescale();
-    return ChunkEntry(segmentChunk, pos, timescale.ToTime(segment->startTime.Get()),
+    return ChunkEntry(segmentChunk, pos, VLC_TICK_0 + timescale.ToTime(segment->startTime.Get()),
                       timescale.ToTime(segment->duration.Get()), segment->getDisplayTime());
 }
 
