@@ -38,6 +38,9 @@ NavigableFocusScope {
     property int horizontalSpacing: VLCStyle.column_margin_width
     property int verticalSpacing: VLCStyle.column_margin_width
 
+    property int displayMarginEnd: 0
+    onDisplayMarginEndChanged: flickable.layout(false)
+
     readonly property int _effectiveCellWidth: cellWidth + horizontalSpacing
     readonly property int _effectiveCellHeight: cellHeight + verticalSpacing
 
@@ -204,7 +207,7 @@ NavigableFocusScope {
         var myContentY = flickable.contentY - root.headerHeight - topMargin
 
         var contentYWithoutExpand = myContentY
-        var heightWithoutExpand = flickable.height
+        var heightWithoutExpand = flickable.height + root.displayMarginEnd
         if (root.expandIndex !== -1) {
             if (myContentY >= expandItem.y && myContentY < expandItem.y + _expandItemVerticalSpace)
                 contentYWithoutExpand = expandItem.y
