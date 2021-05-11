@@ -102,7 +102,7 @@
          <item row="1" column="0">
           <widget class="QCheckBox" name="hwYUVBox">
            <property name="text">
-            <string>Use hardware YUV-&gt;RGB conversions</string>
+            <string>Use hardware YUV to RGB conversions</string>
            </property>
           </widget>
          </item>
