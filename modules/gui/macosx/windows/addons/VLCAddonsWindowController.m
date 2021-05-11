@@ -273,10 +273,8 @@ static void addonChangedCallback( addons_manager_t *manager,
     BOOL installedOnly = _localAddonsOnlyCheckbox.state == NSOnState;
     int type = (int)[[_typeSwitcher selectedItem] tag];
 
-    NSUInteger count = _addons.count;
-    NSMutableArray *filteredItems = [[NSMutableArray alloc] initWithCapacity:count];
-    for (NSUInteger x = 0; x < count; x++) {
-        VLCAddonListItem *currentItem = [_addons objectAtIndex:x];
+    NSMutableArray *filteredItems = [[NSMutableArray alloc] initWithCapacity:_addons.count];
+    for (VLCAddonListItem *currentItem in _addons) {
         if (type != -1) {
             if ([currentItem type] == type) {
                 if (installedOnly) {

@@ -535,12 +535,9 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         }
     }
 
-    NSArray *subviews = [[self videoView] subviews];
-    NSUInteger count = [subviews count];
-
-    for (NSUInteger x = 0; x < count; x++) {
-        if ([[subviews objectAtIndex:x] respondsToSelector:@selector(reshape)])
-            [[subviews objectAtIndex:x] reshape];
+    for (__kindof NSView *view in [[self videoView] subviews]) {
+        if ([view respondsToSelector:@selector(reshape)])
+            [view reshape];
     }
 }
 

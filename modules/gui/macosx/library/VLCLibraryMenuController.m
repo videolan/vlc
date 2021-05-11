@@ -102,11 +102,8 @@
     NSModalResponse modalResponse = [openPanel runModal];
 
     if (modalResponse == NSModalResponseOK) {
-        NSArray *URLs = [openPanel URLs];
-        NSUInteger count = [URLs count];
         VLCLibraryController *libraryController = [[VLCMain sharedInstance] libraryController];
-        for (NSUInteger i = 0; i < count ; i++) {
-            NSURL *url = URLs[i];
+        for (NSURL *url in [openPanel URLs]) {
             [libraryController addFolderWithFileURL:url];
         }
     }
@@ -120,11 +117,9 @@
 - (void)moveToTrash:(id)sender
 {
     NSArray *filesToTrash = self.representedMediaItem.files;
-    NSUInteger trashCount = filesToTrash.count;
     NSFileManager *fileManager = [NSFileManager defaultManager];
 
-    for (NSUInteger x = 0; x < trashCount; x++) {
-        VLCMediaLibraryFile *fileToTrash = filesToTrash[x];
+    for (VLCMediaLibraryFile *fileToTrash in filesToTrash) {
         [fileManager trashItemAtURL:fileToTrash.fileURL resultingItemURL:nil error:nil];
     }
 }

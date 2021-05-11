@@ -46,10 +46,7 @@ static bool b_old_spaces_style = YES;
 
 + (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID
 {
-    NSUInteger count = [[NSScreen screens] count];
-
-    for ( NSUInteger i = 0; i < count; i++ ) {
-        NSScreen *screen = [[NSScreen screens] objectAtIndex:i];
+    for (NSScreen *screen in [NSScreen screens]) {
         if ([screen displayID] == displayID)
             return screen;
     }
@@ -95,9 +92,7 @@ static bool b_old_spaces_style = YES;
     [blackoutWindows makeObjectsPerformSelector:@selector(close)];
     [blackoutWindows removeAllObjects];
 
-    NSUInteger screenCount = [[NSScreen screens] count];
-    for (NSUInteger i = 0; i < screenCount; i++) {
-        NSScreen *screen = [[NSScreen screens] objectAtIndex:i];
+    for (NSScreen *screen in [NSScreen screens]) {
         VLCWindow *blackoutWindow;
         NSRect screen_rect;
 
@@ -128,10 +123,7 @@ static bool b_old_spaces_style = YES;
 
 + (void)unblackoutScreens
 {
-    NSUInteger blackoutWindowCount = [blackoutWindows count];
-
-    for (NSUInteger i = 0; i < blackoutWindowCount; i++) {
-        VLCWindow *blackoutWindow = [blackoutWindows objectAtIndex:i];
+    for (VLCWindow *blackoutWindow in blackoutWindows) {
         [[blackoutWindow screen] setNonFullscreenPresentationOptions];
         [blackoutWindow closeAndAnimate: YES];
     }

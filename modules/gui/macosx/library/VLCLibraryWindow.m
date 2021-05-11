@@ -498,9 +498,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     if (valueCount > 0) {
         NSMutableArray *metadataArray = [NSMutableArray arrayWithCapacity:valueCount];
 
-        for (NSUInteger i = 0; i < valueCount; i++) {
+        for (NSString *filepath in values) {
             VLCOpenInputMetadata *inputMetadata;
-            NSString *filepath = values[i];
 
             inputMetadata = [VLCOpenInputMetadata inputMetaWithPath:filepath];
             if (!inputMetadata)

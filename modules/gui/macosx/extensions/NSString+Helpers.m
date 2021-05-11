@@ -334,9 +334,7 @@ NSString * getVolumeTypeFromMountPath(NSString *mountPath)
         NSFileManager *fileManager = [[NSFileManager alloc] init];
 
         NSArray *directoryContents = [fileManager contentsOfDirectoryAtPath:mountPath error:nil];
-        NSUInteger directoryContentCount = [directoryContents count];
-        for (NSUInteger i = 0; i < directoryContentCount; i++) {
-            NSString *currentFile = directoryContents[i];
+        for (NSString *currentFile in directoryContents) {
             NSString *fullPath = [mountPath stringByAppendingPathComponent:currentFile];
 
             BOOL isDirectory;

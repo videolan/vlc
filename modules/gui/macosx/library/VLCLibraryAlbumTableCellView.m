@@ -108,11 +108,9 @@ const CGFloat LayoutSpacer;
         _libraryController = [[VLCMain sharedInstance] libraryController];
     }
 
-    NSArray *tracks = [_representedAlbum tracksAsMediaItems];
-    NSUInteger trackCount = tracks.count;
     BOOL playImmediately = YES;
-    for (NSUInteger x = 0; x < trackCount; x++) {
-        [_libraryController appendItemToPlaylist:tracks[x] playImmediately:playImmediately];
+    for (VLCMediaLibraryMediaItem *mediaItem in [_representedAlbum tracksAsMediaItems]) {
+        [_libraryController appendItemToPlaylist:mediaItem playImmediately:playImmediately];
         if (playImmediately) {
             playImmediately = NO;
         }

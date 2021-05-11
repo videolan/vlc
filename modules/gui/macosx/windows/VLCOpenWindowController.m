@@ -447,10 +447,8 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
 - (void)addStreamOutputOptionsToArray:(NSMutableArray *)options
 {
-    NSArray *soutMRL = [_output soutMRL];
-    NSUInteger count = [soutMRL count];
-    for (NSUInteger i = 0 ; i < count ; i++)
-        [options addObject: [NSString stringWithString: [soutMRL objectAtIndex:i]]];
+    for (NSString *item in [_output soutMRL])
+        [options addObject: [NSString stringWithString: item]];
 }
 
 - (void)addScreenRecordingOptionsToArray:(NSMutableArray *)options
@@ -548,13 +546,12 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
         NSUInteger count = [URLs count];
         NSMutableArray *values = [NSMutableArray arrayWithCapacity:count];
         NSMutableArray *array = [NSMutableArray arrayWithCapacity:count];
-        for (NSUInteger i = 0; i < count; i++)
-            [values addObject: [[URLs objectAtIndex:i] path]];
+        for (NSURL *url in URLs)
+            [values addObject: [url path]];
         [values sortUsingSelector:@selector(caseInsensitiveCompare:)];
 
-        for (NSUInteger i = 0; i < count; i++) {
+        for (NSString *filepath in values) {
             VLCOpenInputMetadata *inputMetadata;
-            NSString *filepath = [values objectAtIndex:i];
             inputMetadata = [VLCOpenInputMetadata inputMetaWithPath:filepath];
             if (!inputMetadata)
                 continue;
@@ -780,10 +777,8 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 {
     @autoreleasepool {
         NSArray *mountURLs = [[NSFileManager defaultManager] mountedVolumeURLsIncludingResourceValuesForKeys:@[NSURLVolumeIsRemovableKey] options:NSVolumeEnumerationSkipHiddenVolumes];
-        NSUInteger count = [mountURLs count];
         NSMutableArray *o_result = [NSMutableArray array];
-        for (NSUInteger i = 0; i < count; i++) {
-            NSURL *currentURL = [mountURLs objectAtIndex:i];
+        for (NSURL *currentURL in mountURLs) {
 
             NSNumber *isRemovable = nil;
             if (![currentURL getResourceValue:&isRemovable forKey:NSURLVolumeIsRemovableKey error:nil] || !isRemovable) {
@@ -836,8 +831,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
 
         NSUInteger count = [self->_allMediaDevices count];
         if (count > 0) {
-            for (NSUInteger i = 0; i < count ; i++) {
-                VLCOpenBlockDeviceDescription *deviceDescription = [self->_allMediaDevices objectAtIndex:i];
+            for (VLCOpenBlockDeviceDescription *deviceDescription in self->_allMediaDevices) {
                 [self->_discSelectorPopup addItemWithTitle: [[NSFileManager defaultManager] displayNameAtPath:deviceDescription.path]];
             }
 

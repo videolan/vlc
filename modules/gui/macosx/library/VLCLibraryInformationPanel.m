@@ -58,20 +58,14 @@
     [textContent appendFormat:@"Small artwork generated? %@\n", _representedMediaItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No")];
     [textContent appendFormat:@"Favorited? %@, Playback progress: %2.f%%\n", _representedMediaItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No"), _representedMediaItem.progress * 100.];
 
-    NSArray *array = _representedMediaItem.files;
-    NSUInteger count = array.count;
-    [textContent appendFormat:@"\nNumber of files: %lu\n", count];
-    for (NSUInteger x = 0; x < count; x++) {
-        VLCMediaLibraryFile *file = array[x];
+    [textContent appendFormat:@"\nNumber of files: %lu\n", _representedMediaItem.files.count];
+    for (VLCMediaLibraryFile *file in _representedMediaItem.files) {
         [textContent appendFormat:@"URL: %@\n", file.fileURL];
         [textContent appendFormat:@"Type: %@\n", file.readableFileType];
     }
 
-    array = _representedMediaItem.tracks;
-    count = array.count;
-    [textContent appendFormat:@"\nNumber of tracks: %lu\n", count];
-    for (NSUInteger x = 0; x < count; x++) {
-        VLCMediaLibraryTrack *track = array[x];
+    [textContent appendFormat:@"\nNumber of tracks: %lu\n", _representedMediaItem.tracks.count];
+    for (VLCMediaLibraryTrack *track in _representedMediaItem.tracks) {
         [textContent appendFormat:@"Type: %@\n", track.readableTrackType];
         [textContent appendFormat:@"Codec: %@ (%@) @ %u kB/s\n", track.readableCodecName, track.codec, track.bitrate / 1024 / 8];
         if (track.language.length > 0) {

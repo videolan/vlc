@@ -143,9 +143,9 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
         NSUInteger mediaCount = [mediaPaths count];
         if (mediaCount > 0) {
             NSMutableArray *metadataArray = [NSMutableArray arrayWithCapacity:mediaCount];
-            for (NSUInteger i = 0; i < mediaCount; i++) {
+            for (NSString *mediaPath in mediaPaths) {
                 VLCOpenInputMetadata *inputMetadata;
-                NSURL *url = [NSURL fileURLWithPath:mediaPaths[i] isDirectory:NO];
+                NSURL *url = [NSURL fileURLWithPath:mediaPath isDirectory:NO];
                 if (!url) {
                     continue;
                 }
@@ -173,10 +173,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
         @throw;
     }
 
-    NSUInteger arrayCount = array.count;
-
-    for (NSUInteger x = 0; x < arrayCount; x++) {
-        VLCMediaLibraryMediaItem *mediaItem = array[x];
+    for (VLCMediaLibraryMediaItem *mediaItem in array) {
         [_playlistController addInputItem:mediaItem.inputItem.vlcInputItem atPosition:row startPlayback:NO];
     }
 

@@ -400,9 +400,8 @@ static VLCMain *sharedInstance = nil;
 
     NSArray *o_sorted_names = [resultItems sortedArrayUsingSelector: @selector(caseInsensitiveCompare:)];
     NSMutableArray *o_result = [NSMutableArray arrayWithCapacity: [o_sorted_names count]];
-    for (NSUInteger i = 0; i < [o_sorted_names count]; i++) {
+    for (NSString *filepath in o_sorted_names) {
         VLCOpenInputMetadata *inputMetadata;
-        NSString *filepath = [o_sorted_names objectAtIndex:i];
 
         inputMetadata = [VLCOpenInputMetadata inputMetaWithPath:filepath];
         if (!inputMetadata)

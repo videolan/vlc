@@ -30,9 +30,8 @@
         return;
     }
 
-    NSUInteger count = array.count;
-    for (NSUInteger x = 0; x < count; x++) {
-        [self addItem:array[x]];
+    for (NSMenuItem *item in array) {
+        [self addItem:item];
     }
 }
 

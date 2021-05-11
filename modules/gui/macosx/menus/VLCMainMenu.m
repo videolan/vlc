@@ -981,8 +981,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [menuItem setEnabled:YES];
     [menu addItem:menuItem];
 
-    for (NSUInteger x = 0; x < count; x++) {
-        VLCTrackMetaData *metaDataItem = metadataArray[x];
+    for (VLCTrackMetaData *metaDataItem in metadataArray) {
         menuItem = [[NSMenuItem alloc] initWithTitle:metaDataItem.name
                                               action:@selector(selectTrack:)
                                        keyEquivalent:@""];
@@ -1257,10 +1256,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     i_returnValue = [openPanel runModal];
 
     if (i_returnValue == NSModalResponseOK) {
-        NSArray *URLs = [openPanel URLs];
-        NSUInteger count = [URLs count];
-        for (int i = 0; i < count ; i++) {
-            NSURL *url = URLs[i];
+        for (NSURL *url in [openPanel URLs]) {
             [_playerController addAssociatedMediaToCurrentFromURL:url
                                                        ofCategory:SPU_ES
                                                  shallSelectTrack:YES
