@@ -25,8 +25,24 @@ import "qrc:///style/"
 
 Window {
     visible: true
+
+    property var rootWindow: g_root
+    readonly property point rootLocation: rootWindow.mapToGlobal(rootWindow.x, rootWindow.y)
+
+    width: 300
+    minimumWidth: playlistView.minimumWidth
+    // minimumHeight: mainInterface.minimumHeight
     title: i18n.qtr("Playlist")
     color: VLCStyle.colors.bg
+
+    Component.onCompleted: {
+        minimumHeight = mainInterface.minimumHeight // suppress non-notifyable property binding
+
+        x = rootLocation.x + rootWindow.width + VLCStyle.dp(10, VLCStyle.scale)
+        y = rootLocation.y
+        height = rootWindow.height
+    }
+
     PlaylistListView {
         id: playlistView
         focus: true
