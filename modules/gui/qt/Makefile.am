@@ -163,6 +163,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlgrouplistmodel.hpp \
 	gui/qt/medialibrary/mlhelper.cpp \
 	gui/qt/medialibrary/mlhelper.hpp \
+	gui/qt/medialibrary/mlitemcover.cpp \
+	gui/qt/medialibrary/mlitemcover.hpp \
 	gui/qt/medialibrary/mlqmltypes.hpp \
 	gui/qt/medialibrary/mlqueryparams.cpp \
 	gui/qt/medialibrary/mlqueryparams.hpp \

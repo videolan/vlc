@@ -777,6 +777,8 @@ modules/gui/qt/medialibrary/mlgroup.cpp
 modules/gui/qt/medialibrary/mlgroup.hpp
 modules/gui/qt/medialibrary/mlgrouplistmodel.cpp
 modules/gui/qt/medialibrary/mlgrouplistmodel.hpp
+modules/gui/qt/medialibrary/mlitemcover.cpp
+modules/gui/qt/medialibrary/mlitemcover.hpp
 modules/gui/qt/medialibrary/mlplaylistlistmodel.cpp
 modules/gui/qt/medialibrary/mlplaylistlistmodel.hpp
 modules/gui/qt/medialibrary/mlplaylistmedia.cpp

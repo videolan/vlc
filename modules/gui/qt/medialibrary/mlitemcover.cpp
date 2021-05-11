@@ -1,6 +1,8 @@
 /*****************************************************************************
  * Copyright (C) 2021 VLC authors and VideoLAN
  *
+ * Authors: Benjamin Arnaud <bunjee@omega.gg>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,42 +18,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "mlplaylist.hpp"
-
-// VLC includes
-#include "qt.hpp"
+#include "mlitemcover.hpp"
 
 //-------------------------------------------------------------------------------------------------
 // Ctor / dtor
 //-------------------------------------------------------------------------------------------------
 
-MLPlaylist::MLPlaylist(vlc_medialibrary_t * ml, const vlc_ml_playlist_t * data)
-    : MLItemCover(MLItemId(data->i_id, VLC_ML_PARENT_PLAYLIST))
-    , m_ml(ml)
-    , m_name(qfu(data->psz_name))
-    , m_duration(0) // TODO m_duration
-    , m_count(data->i_nb_media)
-{
-    assert(data);
-}
+MLItemCover::MLItemCover(const MLItemId & id)
+    : MLItem(id)
+    , m_generator(nullptr) {}
 
 //-------------------------------------------------------------------------------------------------
 // Interface
 //-------------------------------------------------------------------------------------------------
 
-QString MLPlaylist::getName() const
+bool MLItemCover::hasGenerator() const
 {
-    return m_name;
+    return m_generator.get();
+}
+
+void MLItemCover::setGenerator(CoverGenerator * generator)
+{
+    m_generator.reset(generator);
 }
 
 //-------------------------------------------------------------------------------------------------
 
-int64_t MLPlaylist::getDuration() const
+QString MLItemCover::getCover() const
 {
-    return m_duration;
+    return m_cover;
 }
 
-unsigned int MLPlaylist::getCount() const
+void MLItemCover::setCover(const QString & fileName)
 {
-    return m_count;
+    m_cover = fileName;
 }

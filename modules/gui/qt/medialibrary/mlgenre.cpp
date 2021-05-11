@@ -19,24 +19,13 @@
 #include "mlgenre.hpp"
 
 MLGenre::MLGenre(vlc_medialibrary_t* ml, const vlc_ml_genre_t *_data )
-    : MLItem     ( MLItemId( _data->i_id, VLC_ML_PARENT_GENRE ) )
+    : MLItemCover( MLItemId( _data->i_id, VLC_ML_PARENT_GENRE ) )
     , m_ml       ( ml )
-    , m_generator( nullptr )
     , m_name     ( QString::fromUtf8( _data->psz_name ) )
     , m_nbTracks ( (unsigned int)_data->i_nb_tracks )
 
 {
     assert(_data);
-}
-
-bool MLGenre::hasGenerator() const
-{
-    return m_generator.get();
-}
-
-void MLGenre::setGenerator(CoverGenerator * generator)
-{
-    m_generator.reset(generator);
 }
 
 QString MLGenre::getName() const
@@ -48,14 +37,3 @@ unsigned int MLGenre::getNbTracks() const
 {
     return m_nbTracks;
 }
-
-QString MLGenre::getCover() const
-{
-    return m_cover;
-}
-
-void MLGenre::setCover(const QString & fileName)
-{
-    m_cover = fileName;
-}
-

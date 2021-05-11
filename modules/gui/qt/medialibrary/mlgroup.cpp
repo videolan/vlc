@@ -28,9 +28,8 @@
 //-------------------------------------------------------------------------------------------------
 
 MLGroup::MLGroup(vlc_medialibrary_t * ml, const vlc_ml_group_t * data)
-    : MLItem(MLItemId(data->i_id, VLC_ML_PARENT_GROUP))
+    : MLItemCover(MLItemId(data->i_id, VLC_ML_PARENT_GROUP))
     , m_ml(ml)
-    , m_generator(nullptr)
     , m_name(qfu(data->psz_name))
     , m_duration(data->i_duration)
     , m_date(data->i_creation_date)
@@ -43,33 +42,9 @@ MLGroup::MLGroup(vlc_medialibrary_t * ml, const vlc_ml_group_t * data)
 // Interface
 //-------------------------------------------------------------------------------------------------
 
-bool MLGroup::hasGenerator() const
-{
-    return m_generator.get();
-}
-
-void MLGroup::setGenerator(CoverGenerator * generator)
-{
-    m_generator.reset(generator);
-}
-
-//-------------------------------------------------------------------------------------------------
-
 QString MLGroup::getName() const
 {
     return m_name;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-QString MLGroup::getCover() const
-{
-    return m_cover;
-}
-
-void MLGroup::setCover(const QString & fileName)
-{
-    m_cover = fileName;
 }
 
 //-------------------------------------------------------------------------------------------------

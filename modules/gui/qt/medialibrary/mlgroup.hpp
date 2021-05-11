@@ -25,25 +25,16 @@
 #include "config.h"
 #endif
 
-// Util includes
-#include "util/covergenerator.hpp"
-
 // MediaLibrary includes
-#include "mlqmltypes.hpp"
+#include "mlitemcover.hpp"
 
-class MLGroup : public MLItem
+class MLGroup : public MLItemCover
 {
 public:
     MLGroup(vlc_medialibrary_t * ml, const vlc_ml_group_t * data);
 
 public: // Interface
-    bool hasGenerator() const;
-    void setGenerator(CoverGenerator * generator);
-
     QString getName() const;
-
-    QString getCover() const;
-    void    setCover(const QString & fileName);
 
     int64_t getDuration() const;
 
@@ -54,11 +45,7 @@ public: // Interface
 private:
     vlc_medialibrary_t * m_ml;
 
-    TaskHandle<CoverGenerator> m_generator;
-
     QString m_name;
-
-    QString m_cover;
 
     int64_t m_duration;
 
