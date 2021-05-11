@@ -47,6 +47,14 @@ public:
         MRL
     };
 
+    enum Operation
+    {
+        Add,
+        Remove,
+        Ban,
+        Unban
+    };
+
     MLFoldersBaseModel( QObject *parent = nullptr );
 
     void setCtx(QmlMainContext* ctx);
@@ -65,6 +73,7 @@ public slots:
 
 signals:
     void ctxChanged();
+    void operationFailed( int op, QUrl url ) const;
     void onMLEntryPointModified(QPrivateSignal);
 
 protected:
@@ -76,6 +85,7 @@ protected:
     };
 
     virtual std::vector<EntryPoint> entryPoints() const = 0;
+    virtual bool failed( const vlc_ml_event_t* event ) const = 0; // will be called outside the main thread
 
 private:
     static void onMlEvent( void* data , const vlc_ml_event_t* event );
@@ -99,6 +109,7 @@ public:
 
 private:
     std::vector<EntryPoint> entryPoints() const final;
+    bool failed( const vlc_ml_event_t* event ) const override;
 };
 
 class MLBannedFoldersModel : public MLFoldersBaseModel
@@ -111,6 +122,7 @@ public:
 
 private:
     std::vector<EntryPoint> entryPoints() const final;
+    bool failed( const vlc_ml_event_t* event ) const override;
 };
 
 #endif // ML_FOLDERS_MODEL_HPP
