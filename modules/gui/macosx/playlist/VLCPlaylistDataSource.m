@@ -161,10 +161,18 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
     }
 
     /* it is a media library item, so unarchive it and add it to the playlist */
-    NSArray *array = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    if (!data) {
-        return NO;
+    NSArray *array = nil;
+    @try {
+        array = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    } @catch (NSException *exception) {
+        if ([exception.name isEqualToString:NSInvalidArgumentException]) {
+            msg_Err(getIntf(), "Failed to unarchive MediaLibrary Item: %s",
+                    [[exception reason] UTF8String]);
+            return NO;
+        }
+        @throw;
     }
+
     NSUInteger arrayCount = array.count;
 
     for (NSUInteger x = 0; x < arrayCount; x++) {
