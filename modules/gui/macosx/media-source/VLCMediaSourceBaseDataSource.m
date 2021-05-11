@@ -390,7 +390,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     if (_gridViewMode) {
         if (self.collectionView.dataSource == self) {
             NSInteger index = [_mediaSources indexOfObject:aNotification.object];
-            if (self.collectionView.numberOfSections >= index) {
+            if (self.collectionView.numberOfSections > index) {
                 [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:index]];
             } else {
                 [self.collectionView reloadData];
