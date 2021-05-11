@@ -141,7 +141,7 @@ private slots:
     void MLdrawControls( QTableView *mlView );
 
     void configML();
-    void changeStyle( QString );
+    void changeStyle( );
 };
 
 #endif

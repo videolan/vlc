@@ -26,6 +26,7 @@
 
 #include <QApplication>
 #include <QEvent>
+#include <QStyle>
 
 #if defined(Q_OS_WIN)
 #   include "qt.hpp"
@@ -45,7 +46,7 @@ private slots:
     }
 
 public:
-    QVLCApp( int & argc, char ** argv ) : QApplication( argc, argv, true )
+    QVLCApp( int & argc, char ** argv ) : QApplication( argc, argv, true ), m_defaultStyle( style()->objectName() )
     {
         connect( this, SIGNAL(quitSignal()), this, SLOT(doQuit()) );
     }
@@ -57,8 +58,16 @@ public:
             emit app->quitSignal();
     }
 
+    QString defaultStyle() const
+    {
+        return m_defaultStyle;
+    }
+
 signals:
     void quitSignal();
 
+private:
+    const QString m_defaultStyle;
 };
+
 #endif

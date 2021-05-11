@@ -30,6 +30,7 @@
 #include "preferences_widgets.hpp"
 #include "maininterface/main_interface.hpp"
 #include "util/color_scheme_model.hpp"
+#include "util/qvlcapp.hpp"
 #include "util/proxycolumnmodel.hpp"
 
 #include <vlc_config_cat.h>
@@ -194,6 +195,28 @@ static int getDefaultAudioVolume(const char *aout)
     else
 #endif
         return -1;
+}
+
+namespace
+{
+    void fillStylesCombo( QComboBox *stylesCombo, const QString &initialStyle)
+    {
+        stylesCombo->addItem( qtr("System's default") );
+        stylesCombo->addItems( QStyleFactory::keys() );
+        stylesCombo->setCurrentIndex( stylesCombo->findText( initialStyle ) );
+        stylesCombo->insertSeparator( 1 );
+        if ( stylesCombo->currentIndex() < 0 )
+            stylesCombo->setCurrentIndex( 0 ); /* default */
+    }
+
+    QString getQStyleKey(const QComboBox *stylesCombo, const QString &defaultStyleName)
+    {
+        vlc_assert( stylesCombo );
+        const int index = stylesCombo->currentIndex();
+        if (stylesCombo->currentIndex() == 0)
+            return defaultStyleName;
+        return QStyleFactory::keys().at( index - 2 );
+    }
 }
 
 /*********************************************************************
@@ -761,15 +784,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets["skinRB"] = ui.skins;
             optionWidgets["qtRB"] = ui.qt;
 #if !defined( _WIN32)
-            ui.stylesCombo->addItem( qtr("System's default") );
-            ui.stylesCombo->addItems( QStyleFactory::keys() );
-            ui.stylesCombo->setCurrentIndex( ui.stylesCombo->findText(
-                        getSettings()->value( "MainWindow/QtStyle", "" ).toString() ) );
-            ui.stylesCombo->insertSeparator( 1 );
-            if ( ui.stylesCombo->currentIndex() < 0 )
-                ui.stylesCombo->setCurrentIndex( 0 ); /* default */
+            fillStylesCombo( ui.stylesCombo, getSettings()->value( "MainWindow/QtStyle", "" ).toString() );
 
-            CONNECT( ui.stylesCombo, currentIndexChanged( QString ), this, changeStyle( QString ) );
+            CONNECT( ui.stylesCombo, currentIndexChanged( int ), this, changeStyle( ) );
             optionWidgets["styleCB"] = ui.stylesCombo;
 #else
             ui.stylesCombo->hide();
@@ -1142,9 +1159,8 @@ void SPrefsPanel::apply()
         else
         //if( qobject_cast<QRadioButton *>(optionWidgets[qtRB])->isChecked() )
             config_PutPsz( "intf", "" );
-        if( qobject_cast<QComboBox *>(optionWidgets["styleCB"]) )
-            getSettings()->setValue( "MainWindow/QtStyle",
-                qobject_cast<QComboBox *>(optionWidgets["styleCB"])->currentText() );
+        if( auto stylesCombo = qobject_cast<QComboBox *>(optionWidgets["styleCB"]) )
+            getSettings()->setValue( "MainWindow/QtStyle", getQStyleKey(  stylesCombo , "" ) );
 #ifdef _WIN32
     saveLang();
 #endif
@@ -1244,9 +1260,10 @@ void SPrefsPanel::lastfm_Changed( int i_state )
         config_RemoveIntf( "audioscrobbler" );
 }
 
-void SPrefsPanel::changeStyle( QString s_style )
+void SPrefsPanel::changeStyle()
 {
-    QApplication::setStyle( s_style );
+    QApplication::setStyle( getQStyleKey( qobject_cast<QComboBox *>( optionWidgets["styleCB"] )
+                                          , p_intf->p_sys->p_app->defaultStyle() ) );
 
     /* force refresh on all widgets */
     QWidgetList widgets = QApplication::allWidgets();
