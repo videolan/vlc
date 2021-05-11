@@ -88,7 +88,7 @@ int DWrite_GetFallbacks( vlc_font_select_t *, const char *psz_family,
 int InitDWrite( vlc_font_select_t * );
 int ReleaseDWrite( vlc_font_select_t * );
 int DWrite_GetFontStream( vlc_font_select_t *, int i_index, FT_Stream *pp_stream );
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
 int Win32_GetFallbacks( vlc_font_select_t *, const char *psz_family,
                         uni_char_t codepoint, vlc_family_t ** );
 

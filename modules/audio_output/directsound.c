@@ -590,7 +590,7 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
     if( aout_FormatNbChannels( pfmt ) == 0 )
         return E_FAIL;
 
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     /* Set DirectSound Cooperative level, ie what control we want over Windows
      * sound device. In our case, DSSCL_EXCLUSIVE means that we can modify the
      * settings of the primary buffer, but also that only the sound of our

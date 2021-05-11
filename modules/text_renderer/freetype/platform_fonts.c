@@ -841,7 +841,7 @@ static int StaticMap_GetFamily( vlc_font_select_t *fs, const char *psz_lcname,
 }
 #endif
 
-#if !defined(_WIN32) || VLC_WINSTORE_APP
+#if !defined(_WIN32) || defined(VLC_WINSTORE_APP)
 
 char * MakeFilePath( vlc_font_select_t *fs, const char *psz_filename )
 {
@@ -902,7 +902,7 @@ vlc_font_select_t * FontSelectNew( filter_t *p_filter )
     }
     else
     {
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
         msg_Err( p_filter, "Error initializing DirectWrite" );
         goto error;
 #else

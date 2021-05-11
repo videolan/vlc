@@ -33,7 +33,7 @@
 #include "../vlc.h"
 #include "../libs.h"
 
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
 
 /* Based on modules/control/rc.c and include/vlc_interface.h */
 static HANDLE GetConsole( lua_State *L )

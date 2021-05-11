@@ -568,7 +568,7 @@ static void AllocateAllPlugins (vlc_object_t *p_this)
     if (var_InheritBool(p_this, "reset-plugins-cache"))
         mode = (mode | CACHE_WRITE_FILE) & ~CACHE_READ_FILE;
 
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     /* Windows Store Apps can not load external plugins with absolute paths. */
     AllocatePluginPath (p_this, "plugins", mode);
 #else

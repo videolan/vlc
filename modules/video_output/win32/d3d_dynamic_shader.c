@@ -324,7 +324,7 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
     ID3D10Blob* pShaderBlob = NULL, *pErrBlob = NULL;
 
     UINT compileFlags = 0;
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     VLC_UNUSED(compiler);
 #else
 # define D3DCompile(args...)    compiler->OurD3DCompile(args)
@@ -732,7 +732,7 @@ HRESULT D3D_CompileVertexShader(vlc_object_t *obj, const d3d_shader_compiler_t *
 
 int D3D_InitShaderCompiler(vlc_object_t *obj, d3d_shader_compiler_t *compiler)
 {
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     /* d3dcompiler_47 is the latest on windows 10 */
     for (int i = 47; i > 41; --i)
     {
@@ -757,7 +757,7 @@ int D3D_InitShaderCompiler(vlc_object_t *obj, d3d_shader_compiler_t *compiler)
 
 void D3D_ReleaseShaderCompiler(d3d_shader_compiler_t *compiler)
 {
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     if (compiler->compiler_dll)
     {
         FreeLibrary(compiler->compiler_dll);

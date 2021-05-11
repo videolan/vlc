@@ -81,7 +81,7 @@ vlc_module_begin ()
 
     add_bool("direct3d11-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT)
 
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     add_integer("winrt-swapchain",     0x0, NULL, NULL) /* IDXGISwapChain1*     */
 #endif
 
@@ -393,7 +393,7 @@ static int Open(vout_display_t *vd,
 
     if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
         if (vd->cfg->window->type == VOUT_WINDOW_TYPE_HWND)
         {
             if (CommonWindowInit(vd, &sys->area, &sys->sys,
@@ -404,7 +404,7 @@ static int Open(vout_display_t *vd,
 #endif /* !VLC_WINSTORE_APP */
 
         /* use our internal swapchain callbacks */
-#if defined(HAVE_DCOMP_H) && !VLC_WINSTORE_APP
+#if defined(HAVE_DCOMP_H) && !defined(VLC_WINSTORE_APP)
         if (vd->cfg->window->type == VOUT_WINDOW_TYPE_DCOMP)
             sys->outside_opaque =
                 D3D11_CreateLocalSwapchainHandleDComp(VLC_OBJECT(vd),
@@ -422,7 +422,7 @@ static int Open(vout_display_t *vd,
         sys->selectPlaneCb       = D3D11_LocalSwapchainSelectPlane;
     }
 
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
         sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
 #endif // !VLC_WINSTORE_APP
@@ -462,7 +462,7 @@ static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     D3D_ReleaseShaderCompiler(&sys->shaders);
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     UnhookWindowsSensors(sys->p_sensors);
     CommonWindowClean(&sys->sys);
 #endif
@@ -665,7 +665,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
 
     d3d11_device_lock( sys->d3d_dev );
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     if ( sys->swapCb == D3D11_LocalSwapchainSwap )
     {
         /* legacy UWP mode, the width/height was set in GUID_SWAPCHAIN_WIDTH/HEIGHT */
@@ -769,7 +769,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
     if (err != VLC_SUCCESS)
     {
         if (!is_d3d11_opaque(vd->source->i_chroma)
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
             && vd->obj.force
 #endif
                 )

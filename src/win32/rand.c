@@ -25,7 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_rand.h>
 
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
 # include <bcrypt.h>
 #else
 # include <wincrypt.h>
@@ -33,7 +33,7 @@
 
 void vlc_rand_bytes (void *buf, size_t len)
 {
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     BCRYPT_ALG_HANDLE algo_handle;
     NTSTATUS ret = BCryptOpenAlgorithmProvider(&algo_handle, BCRYPT_RNG_ALGORITHM,
                                                MS_PRIMITIVE_PROVIDER, 0);

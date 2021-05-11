@@ -57,7 +57,7 @@ struct dw_sys_t
     dw_sys_t( HMODULE p_dw_dll ) : p_dw_dll( p_dw_dll )
     {
         /* This will fail on versions of Windows prior to 8.1 */
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
         if( DWriteCreateFactory( DWRITE_FACTORY_TYPE_SHARED, __uuidof( IDWriteFactory2 ),
                 reinterpret_cast<IUnknown **>( p_dw_factory.GetAddressOf() ) ) )
             throw runtime_error( "failed to create DWrite factory" );
@@ -137,7 +137,7 @@ extern "C" int InitDWrite( vlc_font_select_t *fs )
 
     try
     {
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
         p_dw_sys = new dw_sys_t( p_dw_dll );
 #else
         p_dw_dll = LoadLibrary( TEXT( "Dwrite.dll" ) );
@@ -149,7 +149,7 @@ extern "C" int InitDWrite( vlc_font_select_t *fs )
     }
     catch( const exception &e )
     {
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
         FreeLibrary( p_dw_dll );
         (void)e;
 #else
@@ -168,7 +168,7 @@ extern "C" int ReleaseDWrite( vlc_font_select_t *fs )
 {
     dw_sys_t *p_dw_sys = ( dw_sys_t * ) fs->p_dw_sys;
 
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     delete p_dw_sys;
 #else
     HMODULE p_dw_dll = NULL;

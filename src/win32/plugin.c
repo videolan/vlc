@@ -57,7 +57,7 @@ void *vlc_dlopen(const char *psz_file, bool lazy)
         return NULL;
 
     HMODULE handle = NULL;
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     DWORD mode;
     if (SetThreadErrorMode (SEM_FAILCRITICALERRORS, &mode) != 0)
     {

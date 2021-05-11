@@ -40,7 +40,7 @@ vlc_module_begin ()
     set_description( N_("Dummy interface") )
     set_capability( "interface", 0 )
     set_callback( Open )
-#if defined(_WIN32) && !VLC_WINSTORE_APP
+#if defined(_WIN32) && !defined(VLC_WINSTORE_APP)
     add_obsolete_bool( "dummy-quiet" ) /* since 4.0.0 */
 #endif
 vlc_module_end ()

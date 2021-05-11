@@ -46,7 +46,7 @@ void CommonInit(display_win32_area_t *area)
     area->place_changed = false;
 }
 
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
 /* */
 int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
                      vout_display_sys_win32_t *sys, bool projection_gestures)
@@ -115,7 +115,7 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area)
     }
 }
 
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
 /* */
 void CommonWindowClean(vout_display_sys_win32_t *sys)
 {
@@ -138,7 +138,7 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
     }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {   /* Update dimensions */
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
         if (sys->event != NULL)
         {
             RECT clientRect;

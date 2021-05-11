@@ -48,7 +48,7 @@ struct dxgi_swapchain;
 
 struct dxgi_swapchain *DXGI_CreateLocalSwapchainHandleHwnd(vlc_object_t *, HWND);
 
-#if defined(HAVE_DCOMP_H) && !VLC_WINSTORE_APP
+#if defined(HAVE_DCOMP_H) && !defined(VLC_WINSTORE_APP)
 struct dxgi_swapchain *DXGI_CreateLocalSwapchainHandleDComp(vlc_object_t *,
                                            void /*IDCompositionDevice*/ * dcompDevice,
                                            void /*IDCompositionVisual*/ * dcompVisual);

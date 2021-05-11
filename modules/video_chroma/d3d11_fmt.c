@@ -138,7 +138,7 @@ int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
     return VLC_SUCCESS;
 }
 
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
 static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc)
 {
     HKEY hKey;
@@ -225,7 +225,7 @@ static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 
 typedef struct
 {
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     HINSTANCE                 hdll;         /* handle of the opened d3d11 dll */
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HINSTANCE                 dxgidebug_dll;
@@ -246,7 +246,7 @@ typedef struct {
 
 static int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d)
 {
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     hd3d->hdll = LoadLibrary(TEXT("D3D11.DLL"));
     if (!hd3d->hdll)
     {
@@ -278,7 +278,7 @@ static int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d)
 
 static void D3D11_Destroy(d3d11_handle_t *hd3d)
 {
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     if (hd3d->hdll)
         FreeLibrary(hd3d->hdll);
 
@@ -374,7 +374,7 @@ static HRESULT CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
                             IDXGIAdapter *adapter,
                             bool hw_decoding, d3d11_device_t *out)
 {
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
 # define D3D11CreateDevice(args...)             pf_CreateDevice(args)
     /* */
     PFN_D3D11_CREATE_DEVICE pf_CreateDevice;
@@ -480,7 +480,7 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
 
     sys->external.cleanupDeviceCb = NULL;
     HRESULT hr = E_FAIL;
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     /* LEGACY, the d3dcontext and swapchain were given by the host app */
     ID3D11DeviceContext *d3dcontext = (ID3D11DeviceContext*)(uintptr_t) var_InheritInteger(obj, "winrt-d3dcontext");
     if ( likely(d3dcontext != NULL) )
@@ -522,7 +522,7 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
                   engineType == libvlc_video_engine_d3d11 )
         {
             /* internal decoder device */
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
             if (!forced)
             {
                 /* Allow using D3D11 automatically starting from Windows 8.1 */
@@ -846,7 +846,7 @@ error:
 
 void D3D11_LogResources(d3d11_decoder_device_t *dev_sys)
 {
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
 # if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     d3d11_decoder_device *sys = container_of(dev_sys, d3d11_decoder_device, dec_device);
     d3d11_handle_t *hd3d = &sys->hd3d;

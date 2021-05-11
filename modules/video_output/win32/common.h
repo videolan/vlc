@@ -68,7 +68,7 @@ typedef struct vout_display_sys_win32_t
 /*****************************************************************************
  * Prototypes from common.c
  *****************************************************************************/
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
 int  CommonWindowInit(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *,
                       bool projection_gestures);
 void CommonWindowClean(vout_display_sys_win32_t *);

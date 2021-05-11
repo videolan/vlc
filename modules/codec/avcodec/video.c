@@ -522,7 +522,7 @@ int InitVideoDec( vlc_object_t *obj )
             i_thread_count++;
 
         //FIXME: take in count the decoding time
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
         i_thread_count = __MIN( i_thread_count, 6 );
 #else
         i_thread_count = __MIN( i_thread_count, p_codec->id == AV_CODEC_ID_HEVC ? 10 : 6 );

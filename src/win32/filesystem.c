@@ -144,7 +144,7 @@ int vlc_mkdir( const char *dirname, mode_t mode )
 
 char *vlc_getcwd (void)
 {
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     return NULL;
 #else
     wchar_t *wdir = _wgetcwd (NULL, 0);
@@ -172,7 +172,7 @@ DIR *vlc_opendir (const char *dirname)
         return NULL;
     }
 
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     /* Special mode to list drive letters */
     if (wpath[0] == L'\0' || (wcscmp (wpath, L"\\") == 0))
     {
@@ -205,7 +205,7 @@ const char *vlc_readdir (DIR *dir)
 
     free(p_dir->entry);
 
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     /* Drive letters mode */
     if (p_dir->wdir == NULL)
     {
@@ -314,7 +314,7 @@ int vlc_dup2(int oldfd, int newfd)
 
 int vlc_pipe (int fds[2])
 {
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     _set_errno(EPERM);
     return -1;
 #else

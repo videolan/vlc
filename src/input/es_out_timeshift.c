@@ -362,7 +362,7 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
              (int)p_sys->i_tmp_size_max/(1024*1024) );
 
     p_sys->psz_tmp_path = var_InheritString( p_input, "input-timeshift-path" );
-#if defined (_WIN32) && !VLC_WINSTORE_APP
+#if defined (_WIN32) && !defined(VLC_WINSTORE_APP)
     if( p_sys->psz_tmp_path == NULL )
     {
         const DWORD count = GetTempPath( 0, NULL );

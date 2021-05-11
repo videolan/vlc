@@ -39,7 +39,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <time.h>
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
 #include <mmsystem.h>
 #endif
 
@@ -47,7 +47,11 @@
 static CRITICAL_SECTION super_mutex;
 static CONDITION_VARIABLE super_variable;
 
-#define IS_INTERRUPTIBLE (!VLC_WINSTORE_APP || _WIN32_WINNT >= 0x0A00)
+#ifndef VLC_WINSTORE_APP
+# define IS_INTERRUPTIBLE (1)
+#else
+# define IS_INTERRUPTIBLE (_WIN32_WINNT >= 0x0A00)
+#endif
 
 /*** Threads ***/
 static DWORD thread_key;
@@ -340,7 +344,7 @@ void vlc_atomic_notify_all(void *addr)
 
 /*** Threads ***/
 static
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
 DWORD
 #else // !VLC_WINSTORE_APP
 unsigned
@@ -372,7 +376,7 @@ int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
     InitializeCriticalSection(&th->wait.lock);
 
     HANDLE h;
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     h = CreateThread(NULL, 0, vlc_entry, th, 0, NULL);
 #else // !VLC_WINSTORE_APP
     /* When using the MSVCRT C library you have to use the _beginthreadex
@@ -495,7 +499,7 @@ void vlc_testcancel (void)
         p->proc (p->data);
 
     th->data = NULL; /* TODO: special value? */
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     ExitThread(0);
 #else // !VLC_WINSTORE_APP
     _endthreadex(0);
@@ -555,7 +559,7 @@ static union
     {
         LARGE_INTEGER freq;
     } perf;
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     struct
     {
         MMRESULT (WINAPI *timeGetDevCaps)(LPTIMECAPS ptc,UINT cbtc);
@@ -586,7 +590,7 @@ static vlc_tick_t mdate_tick (void)
     static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
     return VLC_TICK_FROM_MS( ts );
 }
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
 static vlc_tick_t mdate_multimedia (void)
 {
     DWORD ts = clk.multimedia.timeGetTime ();
@@ -614,7 +618,7 @@ static vlc_tick_t mdate_wall (void)
     FILETIME ts;
     ULARGE_INTEGER s;
 
-#if (_WIN32_WINNT >= _WIN32_WINNT_WIN8) && (!VLC_WINSTORE_APP || _WIN32_WINNT >= 0x0A00)
+#if (_WIN32_WINNT >= _WIN32_WINNT_WIN8) && (!defined(VLC_WINSTORE_APP) || _WIN32_WINNT >= 0x0A00)
     GetSystemTimePreciseAsFileTime (&ts);
 #else
     GetSystemTimeAsFileTime (&ts);
@@ -664,7 +668,7 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 
 static BOOL SelectClockSource(vlc_object_t *obj)
 {
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     const char *name = "perf";
 #else
     const char *name = "multimedia";
@@ -685,7 +689,7 @@ static BOOL SelectClockSource(vlc_object_t *obj)
         msg_Dbg (obj, "using Windows time as clock source");
         mdate_selected = mdate_tick;
     }
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     else
     if (!strcmp (name, "multimedia"))
     {
@@ -766,7 +770,7 @@ void vlc_threads_setup(libvlc_int_t *vlc)
         abort();
     assert(mdate_selected != mdate_default);
 
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     /* Raise default priority of the current process */
 #ifndef ABOVE_NORMAL_PRIORITY_CLASS
 #   define ABOVE_NORMAL_PRIORITY_CLASS 0x00008000

@@ -1152,7 +1152,7 @@ static int FindMFT(decoder_t *p_dec)
 
 static int LoadMFTLibrary(MFHandle *mf)
 {
-#if _WIN32_WINNT < _WIN32_WINNT_WIN7 || VLC_WINSTORE_APP || __MINGW64_VERSION_MAJOR < 6
+#if _WIN32_WINNT < _WIN32_WINNT_WIN7 || defined(VLC_WINSTORE_APP) || __MINGW64_VERSION_MAJOR < 6
     mf->mfplat_dll = LoadLibrary(TEXT("mfplat.dll"));
     if (!mf->mfplat_dll)
         return VLC_EGENERIC;

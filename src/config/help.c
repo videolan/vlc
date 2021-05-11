@@ -47,7 +47,7 @@
 # include <sys/ioctl.h>
 #endif
 
-#if defined( _WIN32 ) && !VLC_WINSTORE_APP
+#if defined( _WIN32 ) && !defined( VLC_WINSTORE_APP )
 static void ShowConsole (void);
 static void PauseConsole (void);
 #else
@@ -77,7 +77,7 @@ static unsigned ConsoleWidth(void)
     if (ioctl(STDOUT_FILENO, WIOCGETD, &uw) == 0)
         return uw.uw_height / uw.uw_vs;
 #endif
-#if defined (_WIN32) && !VLC_WINSTORE_APP
+#if defined (_WIN32) && !defined(VLC_WINSTORE_APP)
     CONSOLE_SCREEN_BUFFER_INFO buf;
 
     if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &buf))
@@ -701,7 +701,7 @@ static void Version( void )
     PauseConsole();
 }
 
-#if defined( _WIN32 ) && !VLC_WINSTORE_APP
+#if defined( _WIN32 ) && !defined(VLC_WINSTORE_APP)
 /*****************************************************************************
  * ShowConsole: On Win32, create an output console for debug messages
  *****************************************************************************

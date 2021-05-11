@@ -510,7 +510,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         ID3D10Multithread_Release(pMultithread);
     }
 
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
     /* On the Xbox 1/S, any decoding of H264 with one dimension over 2304
      * crashes totally the device */
     if (codec_id == AV_CODEC_ID_H264 &&

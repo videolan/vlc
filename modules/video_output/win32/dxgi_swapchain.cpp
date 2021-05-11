@@ -34,7 +34,7 @@
 
 #include <vlc_es.h>
 
-#if defined(HAVE_DCOMP_H) && !VLC_WINSTORE_APP
+#if defined(HAVE_DCOMP_H) && !defined(VLC_WINSTORE_APP)
 # include <dcomp.h>
 #endif
 
@@ -81,7 +81,7 @@ struct dxgi_swapchain
     const dxgi_color_space *colorspace = nullptr;
 
     swapchain_surface_type  swapchainSurfaceType;
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     union {
         HWND                hwnd;
 #if defined(HAVE_DCOMP_H)
@@ -251,7 +251,7 @@ done:
                              color_spaces[best].color == (video_color_space_t) cfg->colorspace;
 }
 
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
 static void FillSwapChainDesc(dxgi_swapchain *display, UINT width, UINT height, DXGI_SWAP_CHAIN_DESC1 *out)
 {
     ZeroMemory(out, sizeof(*out));
@@ -416,7 +416,7 @@ dxgi_swapchain *DXGI_CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND hwnd)
         return NULL;
 
     display->obj = o;
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     display->swapchainSurfaceType = SWAPCHAIN_SURFACE_HWND;
     display->swapchainSurface.hwnd = hwnd;
 #else // VLC_WINSTORE_APP
@@ -426,7 +426,7 @@ dxgi_swapchain *DXGI_CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND hwnd)
     return display;
 }
 
-#if defined(HAVE_DCOMP_H) && !VLC_WINSTORE_APP
+#if defined(HAVE_DCOMP_H) && !defined(VLC_WINSTORE_APP)
 dxgi_swapchain *DXGI_CreateLocalSwapchainHandleDComp(vlc_object_t *o, void* dcompDevice, void* dcompVisual)
 {
     dxgi_swapchain *display = new (std::nothrow) dxgi_swapchain();
@@ -460,7 +460,7 @@ bool DXGI_UpdateSwapChain( dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,
                            IUnknown *pFactoryDevice,
                            const d3d_format_t *newPixelFormat, const libvlc_video_render_cfg_t *cfg )
 {
-#if !VLC_WINSTORE_APP
+#ifndef VLC_WINSTORE_APP
     if (display->dxgiswapChain.Get() && display->pixelFormat != newPixelFormat)
     {
         // the pixel format changed, we need a new swapchain
