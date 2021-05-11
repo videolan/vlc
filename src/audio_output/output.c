@@ -421,7 +421,6 @@ void aout_Release(audio_output_t *aout)
 
 static int aout_PrepareStereoMode(audio_output_t *aout,
                                   const audio_sample_format_t *restrict fmt,
-                                  audio_channel_type_t input_chan_type,
                                   unsigned i_nb_input_channels)
 {
     aout_owner_t *owner = aout_owner (aout);
@@ -473,17 +472,6 @@ static int aout_PrepareStereoMode(audio_output_t *aout,
                    _("Reverse stereo"));
     }
 
-    if (input_chan_type == AUDIO_CHANNEL_TYPE_AMBISONICS
-     || i_nb_input_channels > 2)
-    {
-        val.i_int = AOUT_VAR_CHAN_HEADPHONES;
-        var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val,
-                   _("Headphones"));
-
-        if (aout->current_sink_info.headphones)
-            i_default_mode = AOUT_VAR_CHAN_HEADPHONES;
-    }
-
     return i_default_mode;
 }
 
@@ -508,9 +496,6 @@ static void aout_UpdateStereoMode(audio_output_t *aout, int mode,
             break;
         case AOUT_VAR_CHAN_DOLBYS:
             fmt->i_chan_mode = AOUT_CHANMODE_DOLBYSTEREO;
-            break;
-        case AOUT_VAR_CHAN_HEADPHONES:
-            filters_cfg->headphones = true;
             break;
         case AOUT_VAR_CHAN_MONO:
             /* Remix all channels into one */
@@ -557,6 +542,9 @@ static void aout_SetupMixModeChoices (audio_output_t *aout,
 
     val.i_int = AOUT_MIX_MODE_STEREO;
     var_Change(aout, "mix-mode", VLC_VAR_ADDCHOICE, val, _("Stereo"));
+
+    val.i_int = AOUT_MIX_MODE_BINAURAL;
+    var_Change(aout, "mix-mode", VLC_VAR_ADDCHOICE, val, _("Binaural"));
 
     if (fmt->i_physical_channels != AOUT_CHANS_4_0)
     {
@@ -606,6 +594,10 @@ static void aout_UpdateMixMode(audio_output_t *aout, int mode,
     {
         case AOUT_MIX_MODE_UNSET:
             break;
+        case AOUT_MIX_MODE_BINAURAL:
+            fmt->i_physical_channels = AOUT_CHANS_STEREO;
+            filters_cfg->headphones = true;
+            break;
         case AOUT_MIX_MODE_STEREO:
             fmt->i_physical_channels = AOUT_CHANS_STEREO;
             break;
@@ -640,7 +632,6 @@ int aout_OutputNew (audio_output_t *aout)
     audio_sample_format_t *filter_fmt = &owner->filter_format;
     aout_filters_cfg_t *filters_cfg = &owner->filters_cfg;
 
-    audio_channel_type_t input_chan_type = fmt->channel_type;
     unsigned i_nb_input_channels = fmt->i_channels;
     vlc_fourcc_t formats[] = {
         fmt->i_format, 0, 0
@@ -737,12 +728,21 @@ int aout_OutputNew (audio_output_t *aout)
     assert(aout->flush && aout->play && aout->time_get && aout->pause);
 
     int stereo_mode =
-        aout_PrepareStereoMode(aout, fmt, input_chan_type,
-                               i_nb_input_channels);
+        aout_PrepareStereoMode(aout, fmt, i_nb_input_channels);
 
     if (stereo_mode != AOUT_VAR_CHAN_UNSET
      && aout_HasStereoMode(aout, stereo_mode))
         aout_UpdateStereoMode(aout, stereo_mode, fmt, filters_cfg);
+
+    /* Autoselect the headphones mode if available and if the user didn't
+     * request any mode */
+    if (aout->current_sink_info.headphones
+     && owner->requested_mix_mode == AOUT_VAR_CHAN_UNSET
+     && aout_HasMixModeChoice(aout, AOUT_MIX_MODE_BINAURAL))
+    {
+        assert(fmt->i_physical_channels == AOUT_CHANS_STEREO);
+        aout_UpdateMixMode(aout, AOUT_MIX_MODE_BINAURAL, fmt, filters_cfg);
+    }
 
     aout_FormatPrepare (fmt);
     assert (fmt->i_bytes_per_frame > 0 && fmt->i_frame_length > 0);

@@ -190,21 +190,21 @@ static const char *const ppsz_force_dolby_descriptions[] = {
 static const int pi_stereo_mode_values[] = { AOUT_VAR_CHAN_UNSET,
     AOUT_VAR_CHAN_STEREO, AOUT_VAR_CHAN_RSTEREO,
     AOUT_VAR_CHAN_LEFT, AOUT_VAR_CHAN_RIGHT, AOUT_VAR_CHAN_DOLBYS,
-    AOUT_VAR_CHAN_HEADPHONES, AOUT_VAR_CHAN_MONO,
+    AOUT_VAR_CHAN_MONO,
 };
 static const char *const ppsz_stereo_mode_texts[] = { N_("Unset"),
     N_("Stereo"), N_("Reverse stereo"),
     N_("Left"), N_("Right"), N_("Dolby Surround"),
-    N_("Headphones"), N_("Mono"),
+    N_("Mono"),
 };
 
 #define MIX_MODE_TEXT N_("Audio mix mode")
 static const int pi_mix_mode_values[] = { 
-    AOUT_MIX_MODE_UNSET, AOUT_MIX_MODE_STEREO,
+    AOUT_MIX_MODE_UNSET, AOUT_MIX_MODE_STEREO, AOUT_MIX_MODE_BINAURAL,
     AOUT_MIX_MODE_4_0, AOUT_MIX_MODE_5_1, AOUT_MIX_MODE_7_1,
 };
 static const char *const ppsz_mix_mode_texts[] = {
-    N_("Unset"), N_("Stereo"),
+    N_("Unset"), N_("Stereo"), N_("Binaural"),
     "4.0", "5.1", "7.1",
 };
 
