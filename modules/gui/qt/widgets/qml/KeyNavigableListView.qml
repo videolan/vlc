@@ -137,7 +137,6 @@ NavigableFocusScope {
 
         focus: true
 
-        clip: true
         ScrollBar.vertical: ScrollBar { id: scroll_id }
         ScrollBar.horizontal: ScrollBar { visible: view.contentWidth > view.width }
 
