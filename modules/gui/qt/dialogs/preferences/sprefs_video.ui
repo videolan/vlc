@@ -83,7 +83,7 @@
          <item row="4" column="0">
           <widget class="QLabel" name="fullscreenScreenLabel">
            <property name="text">
-            <string>Fullscreen Video Device</string>
+            <string>Fullscreen video device</string>
            </property>
            <property name="buddy">
             <cstring>fullscreenScreenBox</cstring>
@@ -196,7 +196,7 @@
          <item row="1" column="0">
           <widget class="QLabel" name="arLabel">
            <property name="text">
-            <string>Force Aspect Ratio</string>
+            <string>Force aspect ratio</string>
            </property>
            <property name="buddy">
             <cstring>arLine</cstring>

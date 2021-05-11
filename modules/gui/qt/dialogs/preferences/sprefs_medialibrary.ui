@@ -89,7 +89,7 @@
       <item row="2" column="0" rowspan="2">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Banned Folders:</string>
+         <string>Banned folders:</string>
         </property>
        </widget>
       </item>
