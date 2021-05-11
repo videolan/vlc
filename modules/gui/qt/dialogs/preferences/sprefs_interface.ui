@@ -729,9 +729,15 @@
   <tabstop>minimalviewBox</tabstop>
   <tabstop>pauseMinimizedBox</tabstop>
   <tabstop>systrayBox</tabstop>
+  <tabstop>menuBarCheck</tabstop>
+  <tabstop>pinVideoControlsCheckbox</tabstop>
+  <tabstop>titleBarCheckBox</tabstop>
   <tabstop>notificationCombo</tabstop>
   <tabstop>stylesCombo</tabstop>
   <tabstop>autoRaiseComboBox</tabstop>
+  <tabstop>colorSchemeComboBox</tabstop>
+  <tabstop>intfScaleFactorSlider</tabstop>
+  <tabstop>intfScaleFactorSpinBox</tabstop>
   <tabstop>fileSkin</tabstop>
   <tabstop>skinBrowse</tabstop>
   <tabstop>OneInterfaceMode</tabstop>
