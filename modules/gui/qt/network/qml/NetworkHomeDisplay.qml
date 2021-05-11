@@ -120,10 +120,6 @@ Widgets.NavigableFocusScope {
                         _centerFlickableOnItem(lanLabel.y, lanSection.y + lanSection.height)
                 }
             }
-
-            MainInterface.MiniPlayerBottomMargin {
-                width: flickable.width
-            }
         }
 
     }

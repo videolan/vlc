@@ -322,8 +322,8 @@ Widgets.NavigableFocusScope {
 
     Widgets.StackViewExt {
         id: view
+
         anchors.fill:parent
-        clip: true
         focus: true
         initialItem: mainInterface.gridView ? gridComponent : tableComponent
 

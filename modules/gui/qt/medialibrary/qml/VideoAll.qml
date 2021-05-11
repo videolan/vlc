@@ -144,8 +144,6 @@ Widgets.NavigableFocusScope {
 
         anchors.fill: parent
 
-        clip: true
-
         initialItem: (mainInterface.gridView) ? grid : list
 
         focus: (model.count !== 0)

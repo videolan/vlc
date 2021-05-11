@@ -87,8 +87,8 @@ Widgets.NavigableFocusScope {
 
     Widgets.StackViewExt {
         id: view
+
         anchors.fill:parent
-        clip: true
         focus: true
 
         onCurrentItemChanged: {

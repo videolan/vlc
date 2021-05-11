@@ -23,9 +23,5 @@ import "qrc:///widgets/" as Widgets
 Widgets.KeyNavigableTableView {
     id: root
 
-    listScrollBar.bottomPadding: footerItem.height
-
-    footer: MiniPlayerBottomMargin {
-        width: root.width
-    }
+    displayMarginEnd: miniPlayer.height
 }

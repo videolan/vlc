@@ -119,9 +119,7 @@ Widgets.NavigableFocusScope {
                                  root.width * .5)
 
             focus: true
-            footer: MainInterface.MiniPlayerBottomMargin {
-            }
-
+            displayMarginEnd: miniPlayer.height // to get blur effect while scrolling in mainview
             navigationParent: root
             navigationRightItem: albumSubView
             navigationCancel: function() {

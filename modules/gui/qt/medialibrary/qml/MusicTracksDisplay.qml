@@ -65,9 +65,7 @@ Widgets.NavigableFocusScope {
             else
                 tracklistdisplay_id.currentIndex = 0;
         }
-        listScrollBar.bottomPadding: footerItem.height
-        footer: MainInterface.MiniPlayerBottomMargin {
-        }
+        displayMarginEnd: miniPlayer.height // to get blur effect while scrolling in mainview
     }
 
     EmptyLabel {

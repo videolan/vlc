@@ -212,6 +212,7 @@ Widgets.NavigableFocusScope {
                             top: parent.top
                             left: parent.left
                             bottom: parent.bottom
+                            bottomMargin: miniPlayer.height
                             right: playlistColumn.visible ? playlistColumn.left : playlistColumn.right
                             rightMargin: (mainInterface.playlistDocked && mainInterface.playlistVisible)
                                          ? 0

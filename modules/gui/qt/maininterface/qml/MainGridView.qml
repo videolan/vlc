@@ -22,9 +22,5 @@ import "qrc:///widgets/" as Widgets
 Widgets.ExpandGridView {
     id: root
 
-    gridScrollBar.bottomPadding: footerItem.height
-
-    footerDelegate: MiniPlayerBottomMargin {
-        width: root.width
-    }
+    displayMarginEnd: miniPlayer.height
 }
