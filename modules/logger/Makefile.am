@@ -29,3 +29,7 @@ libandroid_logger_plugin_la_LIBADD = -llog
 if HAVE_ANDROID
 logger_PLUGINS += libandroid_logger_plugin.la
 endif
+
+libhttp_logger_plugin_la_SOURCES = logger/http.c
+libhttp_logger_plugin_la_LIBADD = libvlc_http.la
+logger_LTLIBRARIES += libhttp_logger_plugin.la
