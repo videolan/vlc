@@ -430,7 +430,7 @@ static int aout_PrepareStereoMode(audio_output_t *aout,
     const char *txt;
     val.i_int = 0;
 
-    if (!AOUT_FMT_LINEAR(fmt) || i_nb_input_channels == 1)
+    if (!AOUT_FMT_LINEAR(fmt) || i_nb_input_channels != 2)
         return AOUT_VAR_CHAN_UNSET;
 
     int i_default_mode = owner->requested_stereo_mode;
@@ -438,11 +438,6 @@ static int aout_PrepareStereoMode(audio_output_t *aout,
     val.i_int = AOUT_VAR_CHAN_MONO;
     var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val, _("Mono"));
 
-    if (i_nb_input_channels != 2)
-    {
-        val.i_int = AOUT_VAR_CHAN_UNSET;
-        var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val, _("Original"));
-    }
     if (fmt->i_chan_mode & AOUT_CHANMODE_DOLBYSTEREO)
     {
         val.i_int = AOUT_VAR_CHAN_DOLBYS;
@@ -455,22 +450,19 @@ static int aout_PrepareStereoMode(audio_output_t *aout,
     }
     var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val, txt);
 
-    if (i_nb_input_channels == 2)
-    {
-        if (fmt->i_chan_mode & AOUT_CHANMODE_DUALMONO)
-            i_default_mode = AOUT_VAR_CHAN_LEFT;
-        else
-            i_default_mode = val.i_int; /* Stereo or Dolby Surround */
+    if (fmt->i_chan_mode & AOUT_CHANMODE_DUALMONO)
+        i_default_mode = AOUT_VAR_CHAN_LEFT;
+    else
+        i_default_mode = val.i_int; /* Stereo or Dolby Surround */
 
-        val.i_int = AOUT_VAR_CHAN_LEFT;
-        var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val, _("Left"));
-        val.i_int = AOUT_VAR_CHAN_RIGHT;
-        var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val, _("Right"));
+    val.i_int = AOUT_VAR_CHAN_LEFT;
+    var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val, _("Left"));
+    val.i_int = AOUT_VAR_CHAN_RIGHT;
+    var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val, _("Right"));
 
-        val.i_int = AOUT_VAR_CHAN_RSTEREO;
-        var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val,
-                   _("Reverse stereo"));
-    }
+    val.i_int = AOUT_VAR_CHAN_RSTEREO;
+    var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val,
+               _("Reverse stereo"));
 
     return i_default_mode;
 }
