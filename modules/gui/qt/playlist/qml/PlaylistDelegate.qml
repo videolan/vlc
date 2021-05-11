@@ -77,7 +77,7 @@ Rectangle {
             plInfoTooltip.timeout = 2000
         else
             plInfoTooltip.timeout = 0
-        plInfoTooltip.visible = Qt.binding(function() { return ( (selectAction ? selected : hovered) && !overlayMenu.visible && mainInterface.playlistVisible &&
+        plInfoTooltip.visible = Qt.binding(function() { return ( (selectAction ? selected : hovered) && !overlayMenu.shown && mainInterface.playlistVisible &&
                                                                 (textInfo.implicitWidth > textInfo.width || textArtist.implicitWidth > textArtist.width)); })
     }
 

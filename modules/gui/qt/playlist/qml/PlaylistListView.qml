@@ -81,13 +81,24 @@ Widgets.NavigableFocusScope {
         listView.forceActiveFocus();
     }
 
-    PlaylistOverlayMenu {
+    Loader {
         id: overlayMenu
         anchors.fill: parent
         z: 1
 
-        colors: root.colors
-        backgroundItem: parentRect
+        active: mainInterface.playlistDocked
+
+        readonly property bool shown: (status === Loader.Ready) ? item.visible : false
+
+        function open() {
+            if (status === Loader.Ready)
+                item.open()
+        }
+
+        sourceComponent: PlaylistOverlayMenu {
+            colors: root.colors
+            backgroundItem: parentRect
+        }
     }
 
     Rectangle {
