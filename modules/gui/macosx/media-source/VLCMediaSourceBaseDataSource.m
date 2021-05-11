@@ -91,7 +91,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     self.homeButton.target = self;
     self.pathControl.URL = nil;
 
-    self.gridVsListSegmentedControl.action = @selector(switchGripOrListMode:);
+    self.gridVsListSegmentedControl.action = @selector(switchGridOrListMode:);
     self.gridVsListSegmentedControl.target = self;
     self.gridVsListSegmentedControl.selectedSegment = 0;
 
@@ -103,7 +103,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
 - (void)reloadViews
 {
-    self.gridVsListSegmentedControl.action = @selector(switchGripOrListMode:);
+    self.gridVsListSegmentedControl.action = @selector(switchGridOrListMode:);
     self.gridVsListSegmentedControl.target = self;
     self.gridVsListSegmentedControl.selectedSegment = _gridViewMode ? 0 : 1;
 }
@@ -343,7 +343,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     [self reloadData];
 }
 
-- (void)switchGripOrListMode:(id)sender
+- (void)switchGridOrListMode:(id)sender
 {
     _gridViewMode = !_gridViewMode;
     _childDataSource.gridViewMode = _gridViewMode;
