@@ -734,6 +734,13 @@ int aout_OutputNew (audio_output_t *aout)
         }
     }
 
+    int stereo_mode =
+        aout_PrepareStereoMode(aout, fmt, i_nb_input_channels);
+
+    if (stereo_mode != AOUT_VAR_CHAN_UNSET
+     && aout_HasStereoMode(aout, stereo_mode))
+        aout_UpdateStereoMode(aout, stereo_mode, fmt, filters_cfg);
+
     aout->current_sink_info.headphones = false;
 
     vlc_mutex_lock(&owner->lock);
@@ -754,13 +761,6 @@ int aout_OutputNew (audio_output_t *aout)
         return -1;
     }
     assert(aout->flush && aout->play && aout->time_get && aout->pause);
-
-    int stereo_mode =
-        aout_PrepareStereoMode(aout, fmt, i_nb_input_channels);
-
-    if (stereo_mode != AOUT_VAR_CHAN_UNSET
-     && aout_HasStereoMode(aout, stereo_mode))
-        aout_UpdateStereoMode(aout, stereo_mode, fmt, filters_cfg);
 
     /* Autoselect the headphones mode if available and if the user didn't
      * request any mode */
