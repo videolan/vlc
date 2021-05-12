@@ -27,8 +27,11 @@ import org.videolan.vlc 0.1
 WindowDialog {
     id: root
 
-    width: 800
+    width: minimumWidth
     height: 600
+
+    minimumWidth: 825
+    minimumHeight: 400
 
     modal: true
     title: i18n.qtr("Toolbar Editor")
