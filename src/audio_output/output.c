@@ -561,9 +561,14 @@ static void aout_SetupMixModeChoices (audio_output_t *aout,
 
     aout_AddMixModeChoice(aout, AOUT_MIX_MODE_UNSET, _("Original"), fmt);
 
-    aout_AddMixModeChoice(aout, AOUT_MIX_MODE_STEREO, _("Stereo"), NULL);
+    if (fmt->channel_type != AUDIO_CHANNEL_TYPE_AMBISONICS)
+        aout_AddMixModeChoice(aout, AOUT_MIX_MODE_STEREO, _("Stereo"), NULL);
 
     aout_AddMixModeChoice(aout, AOUT_MIX_MODE_BINAURAL, _("Binaural"), NULL);
+
+    /* Only propose Original and Binaural for Ambisonics content */
+    if (fmt->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
+        return;
 
     if (fmt->i_physical_channels != AOUT_CHANS_4_0)
     {
