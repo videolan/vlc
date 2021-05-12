@@ -452,8 +452,11 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
             updateAudioDevice( p_intf, audioDeviceSubmenu );
         });
 
-        current->addMenu( new CheckableListMenu(qtr( "&Stereo Mode" ), THEMIM->getAudioStereoMode(), CheckableListMenu::GROUPED, current) );
-        current->addMenu( new CheckableListMenu(qtr( "&Mix Mode" ), THEMIM->getAudioMixMode(), CheckableListMenu::GROUPED, current) );
+        VLCVarChoiceModel *mix_mode = THEMIM->getAudioMixMode();
+        if (mix_mode->rowCount() == 0)
+            current->addMenu( new CheckableListMenu(qtr( "&Stereo Mode" ), THEMIM->getAudioStereoMode(), CheckableListMenu::GROUPED, current) );
+        else
+            current->addMenu( new CheckableListMenu(qtr( "&Mix Mode" ), mix_mode, CheckableListMenu::GROUPED, current) );
         current->addSeparator();
 
         current->addMenu( new CheckableListMenu(qtr( "&Visualizations" ), THEMIM->getAudioVisualizations(), CheckableListMenu::GROUPED, current) );
