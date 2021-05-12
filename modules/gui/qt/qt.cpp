@@ -835,6 +835,11 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
     QApplication::postEvent( THEDP, event );
 }
 
+static void WindowCloseCb( vout_window_t *p_wnd )
+{
+    //FIXME
+}
+
 /**
  * Video output window provider
  */
@@ -864,6 +869,6 @@ static int WindowOpen( vout_window_t *p_wnd )
     if (unlikely(open_state != OPEN_STATE_OPENED))
         return VLC_EGENERIC;
 
-    return p_intf->p_compositor->setupVoutWindow( p_wnd ) ? VLC_SUCCESS : VLC_EGENERIC;
-
+    bool ret  = p_intf->p_compositor->setupVoutWindow( p_wnd, &WindowCloseCb );
+    return ret ? VLC_SUCCESS : VLC_EGENERIC;
 }

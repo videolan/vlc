@@ -101,6 +101,7 @@ void CompositorDirectComposition::window_destroy(struct vout_window_t * p_wnd)
     msg_Dbg(that->m_intf, "window_destroy");
     that->m_window = nullptr;
     that->m_videoVisual.Reset();
+    that->onWindowDestruction(p_wnd);
 }
 
 void CompositorDirectComposition::window_set_state(struct vout_window_t * p_wnd, unsigned state)
@@ -293,8 +294,10 @@ void CompositorDirectComposition::destroyMainInterface()
     m_ui.reset();
 }
 
-bool CompositorDirectComposition::setupVoutWindow(vout_window_t *p_wnd)
+bool CompositorDirectComposition::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)
 {
+    m_destroyCb = destroyCb;
+
     //Only the first video is embedded
     if (m_videoVisual.Get())
         return false;

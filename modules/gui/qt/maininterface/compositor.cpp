@@ -50,4 +50,10 @@ Compositor* Compositor::createCompositor(qt_intf_t *p_intf)
     return new CompositorDummy(p_intf);
 }
 
+void Compositor::onWindowDestruction(vout_window_t *p_wnd)
+{
+    if (m_destroyCb)
+        m_destroyCb(p_wnd);
+}
+
 }

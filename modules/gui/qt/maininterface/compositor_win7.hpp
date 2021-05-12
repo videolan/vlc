@@ -50,7 +50,7 @@ public:
 
     virtual MainInterface *makeMainInterface() override;
     virtual void destroyMainInterface() override;
-    virtual bool setupVoutWindow(vout_window_t*) override;
+    virtual bool setupVoutWindow(vout_window_t*, VoutDestroyCb destroyCb) override;
 
     Type type() const override;
 

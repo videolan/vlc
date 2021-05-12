@@ -55,6 +55,7 @@ void CompositorWin7::window_destroy(struct vout_window_t * p_wnd)
 {
     CompositorWin7* that = static_cast<CompositorWin7*>(p_wnd->sys);
     msg_Dbg(that->m_intf, "window_destroy");
+    that->onWindowDestruction(p_wnd);
 }
 
 void CompositorWin7::window_set_state(struct vout_window_t * p_wnd, unsigned state)
@@ -241,7 +242,7 @@ void CompositorWin7::destroyMainInterface()
     }
 }
 
-bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd)
+bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)
 {
     BOOL isCompositionEnabled;
     HRESULT hr = DwmIsCompositionEnabled(&isCompositionEnabled);

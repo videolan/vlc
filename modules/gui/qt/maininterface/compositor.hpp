@@ -43,17 +43,25 @@ public:
         DirectCompositionCompositor
     };
 
+    typedef void (*VoutDestroyCb)(vout_window_t *p_wnd);
+
+public:
     virtual ~Compositor() = default;
 
     virtual MainInterface* makeMainInterface() = 0;
     virtual void destroyMainInterface() = 0;
 
-    virtual bool setupVoutWindow(vout_window_t *p_wnd) = 0;
+    virtual bool setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb) = 0;
 
     virtual Type type() const = 0;
 
     //factory
     static Compositor* createCompositor(qt_intf_t *p_intf);
+
+protected:
+    void onWindowDestruction(vout_window_t *p_wnd);
+
+    VoutDestroyCb m_destroyCb = nullptr;
 };
 
 

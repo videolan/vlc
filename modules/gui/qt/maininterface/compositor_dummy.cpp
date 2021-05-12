@@ -68,7 +68,7 @@ void CompositorDummy::destroyMainInterface()
     }
 }
 
-bool CompositorDummy::setupVoutWindow(vout_window_t*)
+bool CompositorDummy::setupVoutWindow(vout_window_t*, VoutDestroyCb)
 {
     //dummy compositor doesn't handle window intergration
     return false;
