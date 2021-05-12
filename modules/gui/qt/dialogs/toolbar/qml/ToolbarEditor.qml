@@ -35,15 +35,6 @@ Rectangle{
 
     property var _viewThatContainsDrag: undefined
 
-    MouseArea {
-        anchors.fill: parent
-        z: -1
-
-        visible: _held
-
-        cursorShape: visible ? Qt.ForbiddenCursor : Qt.ArrowCursor
-    }
-
     ColumnLayout{
         anchors.fill: parent
         spacing: 0

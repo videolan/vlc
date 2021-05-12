@@ -59,6 +59,12 @@ WindowDialog {
     }
 
     contentComponent: Item {
+        MouseArea {
+            anchors.fill: parent
+
+            cursorShape: toolbarEditor._held ? Qt.ForbiddenCursor : Qt.ArrowCursor
+        }
+
         ColumnLayout {
             anchors.fill: parent
 
