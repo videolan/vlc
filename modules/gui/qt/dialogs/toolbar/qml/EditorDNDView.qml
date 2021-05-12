@@ -76,22 +76,20 @@ ListView {
     
     MouseArea {
         anchors.fill: parent
-        z: 1
-
-        visible: root._held
-
-        cursorShape: visible ? Qt.DragMoveCursor : Qt.ArrowCursor
-    }
-
-    footer: MouseArea {
-        height: VLCStyle.icon_medium
-        width: Math.max(height, playerBtnDND.width - x)
-        anchors.verticalCenter: parent.verticalCenter
-        property bool dropVisible: false
+        z: -1
 
         onWheel: {
             wheelScroll(wheel.angleDelta.y)
         }
+
+        cursorShape: root._held ? Qt.DragMoveCursor : Qt.ArrowCursor
+    }
+
+    footer: Item {
+        height: VLCStyle.icon_medium
+        width: Math.max(height, playerBtnDND.width - x)
+        anchors.verticalCenter: parent.verticalCenter
+        property bool dropVisible: false
 
         Rectangle {
             z: 2
@@ -104,6 +102,7 @@ ListView {
             visible: dropVisible
             color: VLCStyle.colors.accent
         }
+
         DropArea {
             anchors.fill: parent
 
