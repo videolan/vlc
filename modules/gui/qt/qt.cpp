@@ -393,6 +393,7 @@ vlc_module_end ()
 /*****************************************/
 
 /* Ugly, but the Qt interface assumes single instance anyway */
+static qt_intf_t* g_qtIntf = nullptr;
 static vlc::threads::condition_variable wait_ready;
 static vlc::threads::mutex lock;
 static bool busy = false;
@@ -402,12 +403,19 @@ static enum {
     OPEN_STATE_ERROR,
 } open_state = OPEN_STATE_INIT;
 
+
+enum CleanupReason {
+    CLEANUP_ERROR,
+    CLEANUP_APP_TERMINATED,
+    CLEANUP_INTF_CLOSED
+};
+
 /*****************************************************************************
  * Module callbacks
  *****************************************************************************/
 
 static void *Thread( void * );
-static void *ThreadCleanup( qt_intf_t *p_intf, bool error );
+static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason );
 
 #ifdef Q_OS_MAC
 /* Used to abort the app.exec() on OSX after libvlc_Quit is called */
@@ -421,7 +429,6 @@ static void Abort( void *obj )
 /* Open Interface */
 static int OpenInternal( qt_intf_t *p_intf )
 {
-
 #ifndef X_DISPLAY_MISSING
     if (!vlc_xlib_init(&p_intf->obj))
         return VLC_EGENERIC;
@@ -512,11 +519,13 @@ static void CloseInternal( qt_intf_t *p_intf )
     vlc_join (p_intf->thread, NULL);
 #endif
 
-    vlc::threads::mutex_locker locker (lock);
-    assert (busy);
-    assert (open_state == OPEN_STATE_INIT);
-    busy = false;
-
+    //mutex scope
+    {
+        vlc::threads::mutex_locker locker (lock);
+        assert (busy);
+        assert (open_state == OPEN_STATE_INIT);
+        busy = false;
+    }
     vlc_LogDestroy(p_intf->obj.logger);
     vlc_object_delete(p_intf);
 }
@@ -525,7 +534,7 @@ static void CloseInternal( qt_intf_t *p_intf )
 /* Open Qt interface */
 static int OpenIntfCommon( vlc_object_t *p_this, bool dialogProvider )
 {
-    auto intfthread = reinterpret_cast<intf_thread_t*>(p_this);
+    auto intfThread = reinterpret_cast<intf_thread_t*>(p_this);
     libvlc_int_t *libvlc = vlc_object_instance( p_this );
     qt_intf_t* p_intf = (qt_intf_t*)vlc_object_create( libvlc, sizeof( *p_intf ) );
     if (!p_intf)
@@ -536,17 +545,25 @@ static int OpenIntfCommon( vlc_object_t *p_this, bool dialogProvider )
         vlc_object_delete(p_intf);
         return VLC_EGENERIC;
     }
-    p_intf->intf = intfthread;
+    p_intf->intf = intfThread;
     p_intf->b_isDialogProvider = dialogProvider;
-    int ret = OpenInternal( p_intf );
-    if ( ret != VLC_SUCCESS )
+    p_intf->isShuttingDown = false;
+    p_intf->refCount = 1;
+    int ret = OpenInternal(p_intf);
+    if (ret != VLC_SUCCESS)
     {
         vlc_LogDestroy(p_intf->obj.logger);
         vlc_object_delete(p_intf);
         return VLC_EGENERIC;
     }
-    intfthread->pf_show_dialog = p_intf->pf_show_dialog;
-    intfthread->p_sys = reinterpret_cast<intf_sys_t*>(p_intf);
+    intfThread->pf_show_dialog = p_intf->pf_show_dialog;
+    intfThread->p_sys = reinterpret_cast<intf_sys_t*>(p_intf);
+
+    //mutex scope
+    {
+        vlc::threads::mutex_locker locker (lock);
+        g_qtIntf = p_intf;
+    }
     return VLC_SUCCESS;
 }
 
@@ -564,11 +581,32 @@ static int OpenDialogs( vlc_object_t *p_this )
 /* close interface */
 static void Close( vlc_object_t *p_this )
 {
-    intf_thread_t* p_intf = (intf_thread_t*)(p_this);
-    auto obj = reinterpret_cast<qt_intf_t*>(p_intf->p_sys);
-    if (obj)
+    intf_thread_t* intfThread = (intf_thread_t*)(p_this);
+    auto p_intf = reinterpret_cast<qt_intf_t*>(intfThread->p_sys);
+    if (p_intf)
     {
-        CloseInternal(obj);
+        //cleanup the interface
+        QMetaObject::invokeMethod( p_intf->p_mi, [p_intf] () {
+            ThreadCleanup(p_intf, CLEANUP_INTF_CLOSED);
+        }, Qt::BlockingQueuedConnection);
+
+        bool shutdown = false;
+        //mutex scope
+        {
+            vlc::threads::mutex_locker locker(lock);
+            assert(g_qtIntf == p_intf);
+            p_intf->refCount -= 1;
+            if (p_intf->refCount == 0)
+            {
+                shutdown = true;
+                g_qtIntf = nullptr;
+            }
+            else
+                p_intf->isShuttingDown = true;
+        }
+
+        if (shutdown)
+            CloseInternal(p_intf);
     }
 }
 
@@ -701,7 +739,7 @@ static void *Thread( void *obj )
         if (!p_mi)
         {
             msg_Err(p_intf, "unable to create main interface");
-            return ThreadCleanup( p_intf, true );
+            return ThreadCleanup( p_intf, CLEANUP_ERROR );
         }
 
         /* Check window type from the Qt platform back-end */
@@ -724,14 +762,8 @@ static void *Thread( void *obj )
 
         /* FIXME: Temporary, while waiting for a proper window provider API */
         libvlc_int_t *libvlc = vlc_object_instance( p_intf );
-
-        var_Create( libvlc, "qt4-iface", VLC_VAR_ADDRESS );
-
         if( known_type )
-        {
-            var_SetAddress( libvlc, "qt4-iface", p_intf );
             var_SetString( libvlc, "window", "qt,any" );
-        }
     }
 
     /* Explain how to show a dialog :D */
@@ -741,6 +773,8 @@ static void *Thread( void *obj )
     /* Tell the main LibVLC thread we are ready */
     {
         vlc::threads::mutex_locker locker (lock);
+        assert(g_qtIntf == nullptr);
+        g_qtIntf = p_intf;
         open_state = OPEN_STATE_OPENED;
         wait_ready.signal();
     }
@@ -768,21 +802,16 @@ static void *Thread( void *obj )
     app.exec();
 
     msg_Dbg( p_intf, "QApp exec() finished" );
-    if (p_mi != NULL)
-    {
-        libvlc_int_t *libvlc = vlc_object_instance( p_intf );
-        var_Destroy( libvlc, "qt4-iface" );
-    }
-    return ThreadCleanup( p_intf, false );
+    return ThreadCleanup( p_intf, CLEANUP_APP_TERMINATED );
 }
 
-static void *ThreadCleanup( qt_intf_t *p_intf, bool error )
+static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
 {
     {
 #ifndef Q_OS_MAC
         vlc::threads::mutex_locker locker (lock);
 #endif
-        if( error )
+        if( cleanupReason == CLEANUP_ERROR )
         {
             open_state = OPEN_STATE_ERROR;
 #ifndef Q_OS_MAC
@@ -793,13 +822,20 @@ static void *ThreadCleanup( qt_intf_t *p_intf, bool error )
             open_state = OPEN_STATE_INIT;
     }
 
-    if (p_intf->p_compositor)
+    if (p_intf->p_compositor )
     {
-        p_intf->p_compositor->destroyMainInterface();
-        p_intf->p_mi = nullptr;
+        if (cleanupReason == CLEANUP_INTF_CLOSED)
+        {
+            p_intf->p_compositor->unloadGUI();
+        }
+        else // CLEANUP_APP_TERMINATED
+        {
+            p_intf->p_compositor->destroyMainInterface();
+            p_intf->p_mi = nullptr;
 
-        delete p_intf->p_compositor;
-        p_intf->p_compositor = nullptr;
+            delete p_intf->p_compositor;
+            p_intf->p_compositor = nullptr;
+        }
     }
 
     /* */
@@ -814,11 +850,24 @@ static void *ThreadCleanup( qt_intf_t *p_intf, bool error )
     DialogsProvider::killInstance();
 
     /* Destroy the main playlist controller */
-    delete p_intf->p_mainPlaylistController;
+    if (p_intf->p_mainPlaylistController)
+    {
+        delete p_intf->p_mainPlaylistController;
+        p_intf->p_mainPlaylistController = nullptr;
+    }
+
     /* Destroy the main InputManager */
-    delete p_intf->p_mainPlayerController;
+    if (p_intf->p_mainPlayerController)
+    {
+        delete p_intf->p_mainPlayerController;
+        p_intf->p_mainPlayerController = nullptr;
+    }
     /* Delete the configuration. Application has to be deleted after that. */
-    delete p_intf->mainSettings;
+    if (p_intf->p_mainPlayerController)
+    {
+        delete p_intf->mainSettings;
+        p_intf->p_mainPlayerController = nullptr;
+    }
 
     /* Delete the application automatically */
     return NULL;
@@ -837,7 +886,21 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
 
 static void WindowCloseCb( vout_window_t *p_wnd )
 {
-    //FIXME
+    libvlc_int_t *libvlc = vlc_object_instance( p_wnd );
+    qt_intf_t *p_intf = nullptr;
+    bool shutdown = false;
+    //mutex scope
+    {
+        vlc::threads::mutex_locker locker(lock);
+        assert(g_qtIntf != nullptr);
+        p_intf = g_qtIntf;
+
+        p_intf->refCount -= 1;
+        if (p_intf->refCount == 0)
+            shutdown = true;
+    }
+    if (shutdown)
+        CloseInternal(p_intf);
 }
 
 /**
@@ -848,27 +911,36 @@ static int WindowOpen( vout_window_t *p_wnd )
     if( !var_InheritBool( p_wnd, "embedded-video" ) )
         return VLC_EGENERIC;
 
-    libvlc_int_t *libvlc = vlc_object_instance( p_wnd );
-    qt_intf_t *p_intf = (qt_intf_t *)var_InheritAddress( libvlc, "qt4-iface" );
-    if( !p_intf )
-    {   /* If another interface is used, this plugin cannot work */
-        msg_Dbg( p_wnd, "Qt interface not found" );
-        return VLC_EGENERIC;
-    }
-
-    switch( p_intf->voutWindowType )
+    qt_intf_t *p_intf = nullptr;
+    //mutex scope
     {
-        case VOUT_WINDOW_TYPE_XID:
-        case VOUT_WINDOW_TYPE_HWND:
-            if( var_InheritBool( p_wnd, "video-wallpaper" ) )
-                return VLC_EGENERIC;
-            break;
+        vlc::threads::mutex_locker locker(lock);
+
+        p_intf = g_qtIntf;
+        if( !p_intf )
+        {   /* If another interface is used, this plugin cannot work */
+            msg_Dbg( p_wnd, "Qt interface not found" );
+            return VLC_EGENERIC;
+        }
+
+        if (unlikely(open_state != OPEN_STATE_OPENED))
+            return VLC_EGENERIC;
+
+        if (p_intf->isShuttingDown)
+            return VLC_EGENERIC;
+
+        switch( p_intf->voutWindowType )
+        {
+            case VOUT_WINDOW_TYPE_XID:
+            case VOUT_WINDOW_TYPE_HWND:
+                if( var_InheritBool( p_wnd, "video-wallpaper" ) )
+                    return VLC_EGENERIC;
+                break;
+        }
+
+        bool ret = p_intf->p_compositor->setupVoutWindow( p_wnd, &WindowCloseCb );
+        if (ret)
+            p_intf->refCount += 1;
+        return ret ? VLC_SUCCESS : VLC_EGENERIC;
     }
-
-    vlc::threads::mutex_locker locker (lock);
-    if (unlikely(open_state != OPEN_STATE_OPENED))
-        return VLC_EGENERIC;
-
-    bool ret  = p_intf->p_compositor->setupVoutWindow( p_wnd, &WindowCloseCb );
-    return ret ? VLC_SUCCESS : VLC_EGENERIC;
 }

@@ -105,6 +105,9 @@ struct qt_intf_t
 #ifdef _WIN32
     bool disable_volume_keys;
 #endif
+
+    int refCount;
+    bool isShuttingDown;
 };
 
 vlc_object_cast(qt_intf_t)
