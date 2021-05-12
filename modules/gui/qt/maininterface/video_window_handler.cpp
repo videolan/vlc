@@ -23,10 +23,9 @@
 
 #include <vlc_vout_window.h>
 
-VideoWindowHandler::VideoWindowHandler(qt_intf_t* intf, MainInterface* mainInterace,QObject *parent)
+VideoWindowHandler::VideoWindowHandler(qt_intf_t* intf, QObject *parent)
     : QObject(parent)
     , m_intf(intf)
-    , m_interface(mainInterace)
 {
     /* Does the interface resize to video size or the opposite */
     m_autoresize = var_InheritBool( m_intf, "qt-video-autoresize" );

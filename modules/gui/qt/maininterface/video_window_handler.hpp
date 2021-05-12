@@ -35,7 +35,7 @@ class VideoWindowHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit VideoWindowHandler(qt_intf_t *intf, MainInterface* mainInterace, QObject *parent = nullptr);
+    explicit VideoWindowHandler(qt_intf_t *intf, QObject *parent = nullptr);
 
 public:
     void setWindow(QWindow* window);
@@ -59,7 +59,6 @@ protected slots:
 
 private:
     qt_intf_t *m_intf = nullptr;
-    MainInterface* m_interface = nullptr;
     QWindow* m_window = nullptr;
 
     bool m_videoFullScreen = false;
