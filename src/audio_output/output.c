@@ -559,15 +559,18 @@ static void aout_SetupMixModeChoices (audio_output_t *aout,
     if (fmt->i_channels <= 2)
         return;
 
+    const bool has_spatialaudio = module_exists("spatialaudio");
+
     aout_AddMixModeChoice(aout, AOUT_MIX_MODE_UNSET, _("Original"), fmt);
 
-    if (fmt->channel_type != AUDIO_CHANNEL_TYPE_AMBISONICS)
+    if (fmt->channel_type != AUDIO_CHANNEL_TYPE_AMBISONICS && has_spatialaudio)
         aout_AddMixModeChoice(aout, AOUT_MIX_MODE_STEREO, _("Stereo"), NULL);
 
-    aout_AddMixModeChoice(aout, AOUT_MIX_MODE_BINAURAL, _("Binaural"), NULL);
+    if (has_spatialaudio)
+        aout_AddMixModeChoice(aout, AOUT_MIX_MODE_BINAURAL, _("Binaural"), NULL);
 
     /* Only propose Original and Binaural for Ambisonics content */
-    if (fmt->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS)
+    if (fmt->channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS && has_spatialaudio)
         return;
 
     if (fmt->i_physical_channels != AOUT_CHANS_4_0)
