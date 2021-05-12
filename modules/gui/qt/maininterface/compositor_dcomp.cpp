@@ -277,12 +277,8 @@ void CompositorDirectComposition::destroyMainInterface()
     if (m_videoVisual)
         msg_Err(m_intf, "video surface still active while destroying main interface");
 
-    if (m_uiVisual)
-    {
-        m_rootVisual->RemoveVisual(m_uiVisual.Get());
-        m_uiVisual.Reset();
-    }
-    m_uiSurface.reset();
+    unloadGUI();
+
     m_rootVisual.Reset();
     m_dcompTarget.Reset();
     m_qmlVideoSurfaceProvider.reset();
@@ -291,6 +287,17 @@ void CompositorDirectComposition::destroyMainInterface()
         delete m_rootWindow;
         m_rootWindow = nullptr;
     }
+}
+
+void CompositorDirectComposition::unloadGUI()
+
+{
+    if (m_uiVisual)
+    {
+        m_rootVisual->RemoveVisual(m_uiVisual.Get());
+        m_uiVisual.Reset();
+    }
+    m_uiSurface.reset();
     m_ui.reset();
 }
 

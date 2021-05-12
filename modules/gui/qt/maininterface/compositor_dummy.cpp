@@ -56,15 +56,20 @@ MainInterface* CompositorDummy::makeMainInterface()
 
 void CompositorDummy::destroyMainInterface()
 {
-    if (m_qmlWidget)
-    {
-        delete m_qmlWidget;
-        m_qmlWidget = nullptr;
-    }
+    unloadGUI();
     if (m_rootWindow)
     {
         delete m_rootWindow;
         m_rootWindow = nullptr;
+    }
+}
+
+void CompositorDummy::unloadGUI()
+{
+    if (m_qmlWidget)
+    {
+        delete m_qmlWidget;
+        m_qmlWidget = nullptr;
     }
 }
 

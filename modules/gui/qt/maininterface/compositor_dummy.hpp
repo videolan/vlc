@@ -38,7 +38,18 @@ public:
     virtual ~CompositorDummy() = default;
 
     virtual MainInterface *makeMainInterface() override;
+
+    /**
+     * @brief release all resources used by the compositor.
+     * this includes the GUI and the video surfaces.
+     */
     virtual void destroyMainInterface() override;
+
+    /**
+     * @brief unloadGUI unload the UI view from the composition
+     * video view might still be active
+     */
+    virtual void unloadGUI() override;
 
     bool setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb) override;
 

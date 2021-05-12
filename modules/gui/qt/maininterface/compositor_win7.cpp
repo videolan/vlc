@@ -232,14 +232,19 @@ MainInterface* CompositorWin7::makeMainInterface()
 
 void CompositorWin7::destroyMainInterface()
 {
-    m_videoSurfaceProvider.reset();
-    m_videoWindowHandler.reset();
-    m_qmlView.reset();
+    unloadGUI();
     if (m_rootWindow)
     {
         delete m_rootWindow;
         m_rootWindow = nullptr;
     }
+}
+
+void CompositorWin7::unloadGUI()
+{
+    m_videoSurfaceProvider.reset();
+    m_videoWindowHandler.reset();
+    m_qmlView.reset();
 }
 
 bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)

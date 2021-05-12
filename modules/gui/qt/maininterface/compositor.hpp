@@ -51,6 +51,8 @@ public:
     virtual MainInterface* makeMainInterface() = 0;
     virtual void destroyMainInterface() = 0;
 
+    virtual void unloadGUI() = 0;
+
     virtual bool setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb) = 0;
 
     virtual Type type() const = 0;
