@@ -142,6 +142,7 @@ public:
 
     //aout properties
     VLCVarChoiceModel m_audioStereoMode;
+    VLCVarChoiceModel m_audioMixMode;
     float           m_volume = 0.f;
     bool            m_muted = false;
     AudioDeviceModel m_audioDeviceList;

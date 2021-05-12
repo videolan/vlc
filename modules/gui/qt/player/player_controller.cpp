@@ -296,6 +296,7 @@ static void on_player_state_changed(vlc_player_t *, enum vlc_player_state state,
             msg_Dbg( that->p_intf, "on_player_state_changed VLC_PLAYER_STATE_PLAYING");
             PlayerController::AoutPtr aout = q->getAout();
             that->m_audioStereoMode.resetObject( aout.get() );
+            that->m_audioMixMode.resetObject( aout.get() );
             that->m_audioVisualization.resetObject( aout.get() );
             break;
         }
@@ -310,6 +311,7 @@ static void on_player_state_changed(vlc_player_t *, enum vlc_player_state state,
             msg_Dbg( that->p_intf, "on_player_state_changed VLC_PLAYER_STATE_STOPPED");
 
             that->m_audioStereoMode.resetObject((audio_output_t*)nullptr);
+            that->m_audioMixMode.resetObject((audio_output_t*)nullptr);
             that->m_audioVisualization.resetObject((audio_output_t*)nullptr);
 
             /* reset the state on stop */
@@ -1019,6 +1021,7 @@ PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontrol
     , m_deinterlaceMode((vout_thread_t*)nullptr, "deinterlace-mode")
     , m_autoscale((vout_thread_t*)nullptr, "autoscale")
     , m_audioStereoMode((audio_output_t*)nullptr, "stereo-mode")
+    , m_audioMixMode((audio_output_t*)nullptr, "mix-mode")
     , m_audioDeviceList(m_player)
     , m_audioVisualization((audio_output_t*)nullptr, "visual")
 {
@@ -1826,6 +1829,7 @@ QABSTRACTLIST_GETTER( VLCVarChoiceModel, getCrop, m_crop)
 QABSTRACTLIST_GETTER( VLCVarChoiceModel, getDeinterlace, m_deinterlace)
 QABSTRACTLIST_GETTER( VLCVarChoiceModel, getDeinterlaceMode, m_deinterlaceMode)
 QABSTRACTLIST_GETTER( VLCVarChoiceModel, getAudioStereoMode, m_audioStereoMode)
+QABSTRACTLIST_GETTER( VLCVarChoiceModel, getAudioMixMode, m_audioMixMode)
 QABSTRACTLIST_GETTER( VLCVarChoiceModel, getAudioVisualizations, m_audioVisualization)
 
 

@@ -176,6 +176,7 @@ public:
     Q_PROPERTY(bool muted READ isMuted WRITE setMuted NOTIFY soundMuteChanged)
     Q_PROPERTY(AudioDeviceModel* audioDevices READ getAudioDevices CONSTANT)
     Q_PROPERTY(VLCVarChoiceModel* audioStereoMode READ getAudioStereoMode CONSTANT)
+    Q_PROPERTY(VLCVarChoiceModel* audioMixMode READ getAudioMixMode CONSTANT)
     Q_PROPERTY(VLCVarChoiceModel* audioVisualization READ getAudioVisualizations CONSTANT)
     Q_PROPERTY(bool hasAudioVisualization READ hasAudioVisualization NOTIFY hasAudioVisualizationChanged)
 
@@ -347,6 +348,7 @@ public slots:
     void setMuted( bool muted );
     AudioDeviceModel* getAudioDevices();
     VLCVarChoiceModel* getAudioStereoMode();
+    VLCVarChoiceModel* getAudioMixMode();
     VLCVarChoiceModel* getAudioVisualizations();
     bool hasAudioVisualization() const;
 

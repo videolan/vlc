@@ -453,6 +453,7 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
         });
 
         current->addMenu( new CheckableListMenu(qtr( "&Stereo Mode" ), THEMIM->getAudioStereoMode(), CheckableListMenu::GROUPED, current) );
+        current->addMenu( new CheckableListMenu(qtr( "&Mix Mode" ), THEMIM->getAudioMixMode(), CheckableListMenu::GROUPED, current) );
         current->addSeparator();
 
         current->addMenu( new CheckableListMenu(qtr( "&Visualizations" ), THEMIM->getAudioVisualizations(), CheckableListMenu::GROUPED, current) );
