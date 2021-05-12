@@ -529,39 +529,67 @@ static bool aout_HasStereoMode(audio_output_t *aout, int mode)
     return mode_available;
 }
 
+static void aout_AddMixModeChoice(audio_output_t *aout, int mode,
+                                  const char *suffix,
+                                  const audio_sample_format_t *restrict fmt)
+{
+    assert(suffix);
+    const char *text;
+    char *buffer = NULL;
+
+    if (fmt == NULL)
+        text = suffix;
+    else
+    {
+        const char *channels = aout_FormatPrintChannels(fmt);
+        if (asprintf(&buffer, "%s: %s", suffix, channels) < 0)
+            return;
+        text = buffer;
+    }
+
+    vlc_value_t val = { .i_int = mode };
+    var_Change(aout, "mix-mode", VLC_VAR_ADDCHOICE, val, text);
+
+    free(buffer);
+}
+
 static void aout_SetupMixModeChoices (audio_output_t *aout,
                                       const audio_sample_format_t *restrict fmt)
 {
     if (fmt->i_channels <= 2)
         return;
 
-    vlc_value_t val;
+    aout_AddMixModeChoice(aout, AOUT_MIX_MODE_UNSET, _("Original"), fmt);
 
-    val.i_int = AOUT_MIX_MODE_UNSET;
-    var_Change(aout, "mix-mode", VLC_VAR_ADDCHOICE, val, _("Original"));
+    aout_AddMixModeChoice(aout, AOUT_MIX_MODE_STEREO, _("Stereo"), NULL);
 
-    val.i_int = AOUT_MIX_MODE_STEREO;
-    var_Change(aout, "mix-mode", VLC_VAR_ADDCHOICE, val, _("Stereo"));
-
-    val.i_int = AOUT_MIX_MODE_BINAURAL;
-    var_Change(aout, "mix-mode", VLC_VAR_ADDCHOICE, val, _("Binaural"));
+    aout_AddMixModeChoice(aout, AOUT_MIX_MODE_BINAURAL, _("Binaural"), NULL);
 
     if (fmt->i_physical_channels != AOUT_CHANS_4_0)
     {
-        val.i_int = AOUT_MIX_MODE_4_0;
-        var_Change(aout, "mix-mode", VLC_VAR_ADDCHOICE, val, "4.0");
+        static const audio_sample_format_t fmt_4_0 = {
+            .i_physical_channels = AOUT_CHANS_4_0,
+            .i_channels = 4,
+        };
+        aout_AddMixModeChoice(aout, AOUT_MIX_MODE_4_0, _("4.0"), &fmt_4_0);
     }
 
     if (fmt->i_physical_channels != AOUT_CHANS_5_1)
     {
-        val.i_int = AOUT_MIX_MODE_5_1;
-        var_Change(aout, "mix-mode", VLC_VAR_ADDCHOICE, val, "5.1");
+        static const audio_sample_format_t fmt_5_1 = {
+            .i_physical_channels = AOUT_CHANS_5_1,
+            .i_channels = 6,
+        };
+        aout_AddMixModeChoice(aout, AOUT_MIX_MODE_5_1, _("5.1"), &fmt_5_1);
     }
 
     if (fmt->i_physical_channels != AOUT_CHANS_7_1)
     {
-        val.i_int = AOUT_MIX_MODE_7_1;
-        var_Change(aout, "mix-mode", VLC_VAR_ADDCHOICE, val, "7.1");
+        static const audio_sample_format_t fmt_7_1 = {
+            .i_physical_channels = AOUT_CHANS_7_1,
+            .i_channels = 8,
+        };
+        aout_AddMixModeChoice(aout, AOUT_MIX_MODE_7_1, _("7.1"), &fmt_7_1);
     }
 }
 
