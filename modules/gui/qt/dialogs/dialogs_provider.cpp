@@ -424,7 +424,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     {
         QString file = getSaveFileName( NULL,
                                         qfu( p_arg->psz_title ),
-                                        p_intf->filepath, extensions );
+                                        p_intf->p_mi->getDialogFilePath(), extensions );
         if( !file.isEmpty() )
         {
             p_arg->i_results = 1;
@@ -437,14 +437,14 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     else /* non-save mode */
     {
         QList<QUrl> urls = QFileDialog::getOpenFileUrls( NULL, qfu( p_arg->psz_title ),
-                                       p_intf->filepath, extensions );
+                                       p_intf->p_mi->getDialogFilePath(), extensions );
         p_arg->i_results = urls.count();
         p_arg->psz_results = (char **)vlc_alloc( p_arg->i_results, sizeof( char * ) );
         i = 0;
         foreach( const QUrl &uri, urls )
             p_arg->psz_results[i++] = strdup( uri.toEncoded().constData() );
         if( !urls.isEmpty() )
-            p_intf->filepath =  urls.last();
+            p_intf->p_mi->setDialogFilePath(urls.last());
     }
 
     /* Callback */
@@ -528,11 +528,11 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
 
     QList<QUrl> urls = QFileDialog::getOpenFileUrls( NULL,
         help.isEmpty() ? qfut(I_OP_SEL_FILES ) : help,
-        path.isEmpty() ? p_intf->filepath : path,
+        path.isEmpty() ? p_intf->p_mi->getDialogFilePath() : path,
         fileTypes );
 
     if( !urls.isEmpty() )
-        p_intf->filepath = urls.last();
+        p_intf->p_mi->setDialogFilePath(urls.last());
 
     QStringList res;
     foreach( const QUrl &url, urls )
@@ -600,12 +600,12 @@ QString DialogsProvider::getDirectoryDialog( qt_intf_t *p_intf )
 {
     const QStringList schemes = QStringList(QStringLiteral("file"));
     QUrl dirurl = QFileDialog::getExistingDirectoryUrl( NULL,
-            qfut( I_OP_DIR_WINTITLE ), p_intf->filepath,
+            qfut( I_OP_DIR_WINTITLE ), p_intf->p_mi->getDialogFilePath(),
             QFileDialog::ShowDirsOnly, schemes );
 
     if( dirurl.isEmpty() ) return QString();
 
-    p_intf->filepath = dirurl;
+    p_intf->p_mi->setDialogFilePath(dirurl);
 
     QString dir = dirurl.toLocalFile();
     const char *scheme = "directory";
@@ -669,7 +669,7 @@ void DialogsProvider::savePlayingToPlaylist()
     QString selected;
     QString file = getSaveFileName( NULL,
                                     qtr( "Save playlist as..." ),
-                                    p_intf->filepath, filters.join( ";;" ),
+                                    p_intf->p_mi->getDialogFilePath(), filters.join( ";;" ),
                                     &selected );
     const char *psz_selected_module = NULL;
     const char *psz_last_playlist_ext = NULL;

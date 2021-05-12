@@ -27,6 +27,7 @@
 #include "dialogs/sout/sout.hpp"
 #include "dialogs/sout/convert.hpp"
 #include "dialogs/sout/sout_widgets.hpp"
+#include "maininterface/main_interface.hpp"
 
 #include "util/qt_dirs.hpp"
 
@@ -158,7 +159,7 @@ void ConvertDialog::fileBrowse()
     QString fileExtension = ( ! profile->isEnabled() ) ? ".*" : "." + profile->getMux();
 
     outgoingMRL = QFileDialog::getSaveFileUrl( this, qtr( "Save file..." ),
-        p_intf->filepath,
+        p_intf->p_mi->getDialogFilePath(),
         QString( "%1 (*%2);;%3 (*.*)" ).arg( qtr( "Containers" ) )
             .arg( fileExtension ).arg( qtr("All") ), 0, QFileDialog::DontConfirmOverwrite );
     fileLine->setText( urlToDisplayString( outgoingMRL ) );

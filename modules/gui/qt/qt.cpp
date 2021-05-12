@@ -757,10 +757,6 @@ static void *Thread( void *obj )
     /* Last settings */
     app.setQuitOnLastWindowClosed( false );
 
-    /* Retrieve last known path used in file browsing */
-    p_intf->filepath =
-         getSettings()->value( "filedialog-path", QVLCUserDir( VLC_HOME_DIR ) ).toString();
-
     /* Loads and tries to apply the preferred QStyle */
     QString s_style = getSettings()->value( "MainWindow/QtStyle", "" ).toString();
     if( s_style.compare("") != 0 )
@@ -816,12 +812,6 @@ static void *ThreadCleanup( qt_intf_t *p_intf, bool error )
        Settings must be destroyed after that.
      */
     DialogsProvider::killInstance();
-
-    /* Save the path or delete if recent play are disabled */
-    if( var_InheritBool( p_intf, "qt-recentplay" ) )
-        getSettings()->setValue( "filedialog-path", p_intf->filepath );
-    else
-        getSettings()->remove( "filedialog-path" );
 
     /* Destroy the main playlist controller */
     delete p_intf->p_mainPlaylistController;

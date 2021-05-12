@@ -478,7 +478,7 @@ void CoverArtLabel::setArtFromFile()
         return;
 
     QUrl fileUrl = QFileDialog::getOpenFileUrl( this, qtr( "Choose Cover Art" ),
-        p_intf->filepath, qtr( "Image Files (*.gif *.jpg *.jpeg *.png)" ) );
+        p_intf->p_mi->getDialogFilePath(), qtr( "Image Files (*.gif *.jpg *.jpeg *.png)" ) );
 
     if( fileUrl.isEmpty() )
         return;

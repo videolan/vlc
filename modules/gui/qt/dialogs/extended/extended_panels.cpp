@@ -47,6 +47,7 @@
 #include "extended_panels.hpp"
 #include "dialogs/preferences/preferences.hpp"
 #include "qt.hpp"
+#include "maininterface/main_interface.hpp"
 #include "player/player_controller.hpp"
 #include "util/qt_dirs.hpp"
 #include "widgets/native/customwidgets.hpp"
@@ -369,7 +370,7 @@ void ExtVideo::browseLogo()
                         .arg( TITLE_EXTENSIONS_IMAGE )
                         .arg( TITLE_EXTENSIONS_ALL );
     QString file = QFileDialog::getOpenFileUrl( NULL, qtr( "Logo filenames" ),
-                   p_intf->filepath, filter,
+                   p_intf->p_mi->getDialogFilePath(), filter,
                    NULL, QFileDialog::Options(), schemes ).toLocalFile();
 
     UPDATE_AND_APPLY_TEXT( logoFileText, file );
@@ -382,7 +383,7 @@ void ExtVideo::browseEraseFile()
                         .arg( TITLE_EXTENSIONS_IMAGE )
                         .arg( TITLE_EXTENSIONS_ALL );
     QString file = QFileDialog::getOpenFileUrl( NULL, qtr( "Image mask" ),
-                   p_intf->filepath, filter,
+                   p_intf->p_mi->getDialogFilePath(), filter,
                    NULL, QFileDialog::Options(), schemes ).toLocalFile();
 
     UPDATE_AND_APPLY_TEXT( eraseMaskText, file );

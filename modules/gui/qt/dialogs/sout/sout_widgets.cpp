@@ -25,6 +25,7 @@
 
 #include "dialogs/sout/sout_widgets.hpp"
 #include "dialogs/sout/sout.hpp"
+#include "maininterface/main_interface.hpp"
 #include "util/soutchain.hpp"
 #include "util/qt_dirs.hpp"
 #include <vlc_intf_strings.h>
@@ -171,7 +172,7 @@ void FileDestBox::fileBrowse()
 {
     const QStringList schemes = QStringList(QStringLiteral("file"));
     QString fileName = QFileDialog::getSaveFileUrl( this, qtr( "Save file..." ),
-            p_intf->filepath, qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)" ),
+            p_intf->p_mi->getDialogFilePath(), qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)" ),
             nullptr, QFileDialog::Options(), schemes).toLocalFile();
     fileEdit->setText( toNativeSeparators( fileName ) );
     emit mrlUpdated();

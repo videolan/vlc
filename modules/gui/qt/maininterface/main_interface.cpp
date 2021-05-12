@@ -168,6 +168,8 @@ MainInterface::MainInterface(qt_intf_t *_p_intf , QWidget* parent, Qt::WindowFla
 #endif
     m_hasToolbarMenu = var_InheritBool( p_intf, "qt-menubar" );
 
+    m_dialogFilepath = getSettings()->value( "filedialog-path", QVLCUserDir( VLC_HOME_DIR ) ).toString();
+
     QString platformName = QGuiApplication::platformName();
 
 #ifdef QT5_HAS_WAYLAND
@@ -254,6 +256,11 @@ MainInterface::~MainInterface()
     settings->setValue( "color-scheme", m_colorScheme->getCurrent() );
     /* Save the stackCentralW sizes */
     settings->endGroup();
+
+    if( var_InheritBool( p_intf, "qt-recentplay" ) )
+        getSettings()->setValue( "filedialog-path", m_dialogFilepath );
+    else
+        getSettings()->remove( "filedialog-path" );
 
     /* Save this size */
     QVLCTools::saveWidgetPosition(settings, this);

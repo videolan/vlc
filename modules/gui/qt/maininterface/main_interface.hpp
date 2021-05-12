@@ -162,7 +162,6 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(bool pinVideoControls READ pinVideoControls WRITE setPinVideoControls NOTIFY pinVideoControlsChanged)
     Q_PROPERTY(ControlbarProfileModel* controlbarProfileModel READ controlbarProfileModel CONSTANT)
 
-
 public:
     /* tors */
     MainInterface( qt_intf_t *, QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
@@ -211,6 +210,8 @@ public:
     inline void setCanShowVideoPIP(bool canShowVideoPIP) { m_canShowVideoPIP = canShowVideoPIP; }
     inline bool pinVideoControls() const { return m_pinVideoControls; }
     inline ControlbarProfileModel* controlbarProfileModel() const { return m_controlbarProfileModel; }
+    inline QUrl getDialogFilePath() const { return m_dialogFilepath; }
+    inline void setDialogFilePath(const QUrl& filepath ){ m_dialogFilepath = filepath; }
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -282,6 +283,7 @@ protected:
     bool                 m_hasToolbarMenu = false;
     bool                 m_canShowVideoPIP = false;
     bool                 m_pinVideoControls = false;
+    QUrl                 m_dialogFilepath; /* Last path used in dialogs */
 
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?
