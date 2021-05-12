@@ -103,7 +103,7 @@ bool MainUI::setup(QQmlEngine* engine)
     QQmlContext *rootCtx = engine->rootContext();
 
     rootCtx->setContextProperty( "history", new NavigationHistory(this) );
-    rootCtx->setContextProperty( "player", m_intf->p_sys->p_mainPlayerController );
+    rootCtx->setContextProperty( "player", m_intf->p_mainPlayerController );
     rootCtx->setContextProperty( "i18n", new I18n(this) );
     rootCtx->setContextProperty( "mainctx", new QmlMainContext(m_intf, m_mainInterface, this));
     rootCtx->setContextProperty( "mainInterface", m_mainInterface);

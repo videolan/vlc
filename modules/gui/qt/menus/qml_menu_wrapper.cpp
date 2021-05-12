@@ -74,7 +74,7 @@ void QmlGlobalMenu::popup(QPoint pos)
     connect( m_menu, &QMenu::aboutToHide, this, &QmlGlobalMenu::aboutToHide );
 
     submenu = m_menu->addMenu(qtr( "&Media" ));
-    FileMenu( p_intf, submenu, p_intf->p_sys->p_mi );
+    FileMenu( p_intf, submenu, p_intf->p_mi );
 
     /* Dynamic menus, rebuilt before being showed */
     submenu = m_menu->addMenu(qtr( "P&layback" ));
@@ -94,7 +94,7 @@ void QmlGlobalMenu::popup(QPoint pos)
 
     /* View menu, a bit different */
     submenu = m_menu->addMenu(qtr( "V&iew" ));
-    ViewMenu( p_intf, submenu, p_intf->p_sys->p_mi );
+    ViewMenu( p_intf, submenu, p_intf->p_mi );
 
     submenu = m_menu->addMenu(qtr( "&Help" ));
     HelpMenu(submenu);
@@ -176,7 +176,7 @@ void QmlMenuBar::popupMediaMenu( QQuickItem* button )
 {
     popupMenuCommon(button, [this](QMenu* menu) {
         qt_intf_t* p_intf = m_ctx->getIntf();
-        FileMenu( p_intf, menu , p_intf->p_sys->p_mi );
+        FileMenu( p_intf, menu , p_intf->p_mi );
     });
 }
 
@@ -220,7 +220,7 @@ void QmlMenuBar::popupViewMenu( QQuickItem* button )
 {
     popupMenuCommon(button, [this](QMenu* menu) {
         qt_intf_t* p_intf = m_ctx->getIntf();
-        ViewMenu( p_intf, menu, p_intf->p_sys->p_mi );
+        ViewMenu( p_intf, menu, p_intf->p_mi );
     });
 }
 

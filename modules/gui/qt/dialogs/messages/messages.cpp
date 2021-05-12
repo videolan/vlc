@@ -42,6 +42,9 @@
 
 #include <vlc_common.h>
 #include <vlc_input_item.h>
+#include <vlc_playlist.h>
+#include <vlc_interface.h>
+
 
 #include "dialogs/messages/messages.hpp"
 
@@ -385,7 +388,7 @@ void MessagesDialog::updatePLTree()
 {
     pldebugTree->clear();
     {
-        vlc_playlist_t* playlist = p_intf->p_sys->p_playlist;
+        vlc_playlist_t* playlist = p_intf->p_playlist;
         vlc_playlist_Lock(playlist);
         size_t count = vlc_playlist_Count( playlist );
         for (size_t i = 0; i < count; i++)

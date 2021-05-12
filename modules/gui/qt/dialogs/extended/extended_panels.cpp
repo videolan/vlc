@@ -369,7 +369,7 @@ void ExtVideo::browseLogo()
                         .arg( TITLE_EXTENSIONS_IMAGE )
                         .arg( TITLE_EXTENSIONS_ALL );
     QString file = QFileDialog::getOpenFileUrl( NULL, qtr( "Logo filenames" ),
-                   p_intf->p_sys->filepath, filter,
+                   p_intf->filepath, filter,
                    NULL, QFileDialog::Options(), schemes ).toLocalFile();
 
     UPDATE_AND_APPLY_TEXT( logoFileText, file );
@@ -382,7 +382,7 @@ void ExtVideo::browseEraseFile()
                         .arg( TITLE_EXTENSIONS_IMAGE )
                         .arg( TITLE_EXTENSIONS_ALL );
     QString file = QFileDialog::getOpenFileUrl( NULL, qtr( "Image mask" ),
-                   p_intf->p_sys->filepath, filter,
+                   p_intf->filepath, filter,
                    NULL, QFileDialog::Options(), schemes ).toLocalFile();
 
     UPDATE_AND_APPLY_TEXT( eraseMaskText, file );
@@ -623,8 +623,8 @@ void ExtV4l2::showEvent( QShowEvent *event )
 
 void ExtV4l2::Refresh( void )
 {
-    vlc_player_Lock(p_intf->p_sys->p_player);
-    vlc_object_t *p_obj = vlc_player_GetV4l2Object(p_intf->p_sys->p_player);
+    vlc_player_Lock(p_intf->p_player);
+    vlc_object_t *p_obj = vlc_player_GetV4l2Object(p_intf->p_player);
     help->hide();
     if( box )
     {
@@ -774,7 +774,7 @@ void ExtV4l2::Refresh( void )
         if ( isVisible() )
             QTimer::singleShot( 2000, this, SLOT(Refresh()) );
     }
-    vlc_player_Unlock(p_intf->p_sys->p_player);
+    vlc_player_Unlock(p_intf->p_player);
 }
 
 void ExtV4l2::ValueChange( bool value )
@@ -785,8 +785,8 @@ void ExtV4l2::ValueChange( bool value )
 void ExtV4l2::ValueChange( int value )
 {
     QObject *s = sender();
-    vlc_player_Lock(p_intf->p_sys->p_player);
-    vlc_object_t *p_obj = vlc_player_GetV4l2Object(p_intf->p_sys->p_player);
+    vlc_player_Lock(p_intf->p_player);
+    vlc_object_t *p_obj = vlc_player_GetV4l2Object(p_intf->p_player);
     if( p_obj )
     {
         QString var = s->objectName();
@@ -808,11 +808,11 @@ void ExtV4l2::ValueChange( int value )
                 var_TriggerCallback( p_obj, qtu( var ) );
                 break;
         }
-        vlc_player_Unlock(p_intf->p_sys->p_player);
+        vlc_player_Unlock(p_intf->p_player);
     }
     else
     {
-        vlc_player_Unlock(p_intf->p_sys->p_player);
+        vlc_player_Unlock(p_intf->p_player);
         msg_Warn( p_intf, "Oops, v4l2 object isn't available anymore" );
         Refresh();
     }
@@ -963,7 +963,7 @@ void AudioFilterControlWidget::enable( bool b_enable )
     QString result = ChangeFiltersString( p_intf, "audio-filter", qtu(name),
                                           b_enable );
     emit configChanged( qfu("audio-filter"), result );
-    vlc_player_aout_EnableFilter( p_intf->p_sys->p_player, qtu(name), b_enable );
+    vlc_player_aout_EnableFilter( p_intf->p_player, qtu(name), b_enable );
 }
 
 /**********************************************************************

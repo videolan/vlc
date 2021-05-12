@@ -74,7 +74,7 @@ RendererMenu::RendererMenu( QMenu *parent, qt_intf_t *p_intf_ )
     addAction( action );
     group->addAction(action);
 
-    char *psz_renderer = var_InheritString( p_intf->p_sys->p_player, "sout" );
+    char *psz_renderer = var_InheritString( p_intf->p_player, "sout" );
     if ( psz_renderer == NULL )
         action->setChecked( true );
     else

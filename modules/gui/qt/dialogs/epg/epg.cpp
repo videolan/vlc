@@ -176,8 +176,8 @@ void EpgDialog::updateInfos()
 {
     input_item_t *media = NULL;
     {
-        vlc_player_locker lock{ p_intf->p_sys->p_player };
-        media = vlc_player_HoldCurrentMedia( p_intf->p_sys->p_player ); /* w/hold */
+        vlc_player_locker lock{ p_intf->p_player };
+        media = vlc_player_HoldCurrentMedia( p_intf->p_player ); /* w/hold */
     }
 
     if( media )

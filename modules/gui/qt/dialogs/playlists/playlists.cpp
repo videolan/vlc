@@ -47,7 +47,7 @@
 
 PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf) : QVLCFrame(_p_intf)
 {
-    MainInterface * mainInterface = p_intf->p_sys->p_mi;
+    MainInterface * mainInterface = p_intf->p_mi;
 
     assert(mainInterface->hasMediaLibrary());
 

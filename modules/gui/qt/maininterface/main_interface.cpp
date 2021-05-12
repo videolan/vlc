@@ -265,7 +265,7 @@ MainInterface::~MainInterface()
     var_DelCallback( libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
     var_DelCallback( libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
-    p_intf->p_sys->p_mi = NULL;
+    p_intf->p_mi = NULL;
 }
 
 bool MainInterface::hasVLM() const {
@@ -691,8 +691,8 @@ void MainInterface::dragLeaveEvent(QDragLeaveEvent *event)
 
 void MainInterface::closeEvent( QCloseEvent *e )
 {
-    PlaylistControllerModel* playlistController = p_intf->p_sys->p_mainPlaylistController;
-    PlayerController* playerController = p_intf->p_sys->p_mainPlayerController;
+    PlaylistControllerModel* playlistController = p_intf->p_mainPlaylistController;
+    PlayerController* playerController = p_intf->p_mainPlayerController;
 
     if (m_videoSurfaceProvider)
         m_videoSurfaceProvider->onWindowClosed();
@@ -763,7 +763,7 @@ static int PopupMenuCB( vlc_object_t *, const char *,
 
     if( p_intf->pf_show_dialog )
     {
-        p_intf->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU,
+        p_intf->pf_show_dialog( p_intf->intf, INTF_DIALOG_POPUPMENU,
                                 new_val.b_bool, NULL );
     }
 
@@ -777,7 +777,7 @@ static int IntfShowCB( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void *param )
 {
     qt_intf_t *p_intf = (qt_intf_t *)param;
-    p_intf->p_sys->p_mi->emitShow();
+    p_intf->p_mi->emitShow();
 
     return VLC_SUCCESS;
 }
@@ -789,7 +789,7 @@ static int IntfRaiseMainCB( vlc_object_t *, const char *,
                             vlc_value_t, vlc_value_t, void *param )
 {
     qt_intf_t *p_intf = (qt_intf_t *)param;
-    p_intf->p_sys->p_mi->emitRaise();
+    p_intf->p_mi->emitRaise();
 
     return VLC_SUCCESS;
 }
@@ -801,7 +801,7 @@ static int IntfBossCB( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void *param )
 {
     qt_intf_t *p_intf = (qt_intf_t *)param;
-    p_intf->p_sys->p_mi->emitBoss();
+    p_intf->p_mi->emitBoss();
 
     return VLC_SUCCESS;
 }

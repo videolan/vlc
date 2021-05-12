@@ -130,7 +130,7 @@ inline void FileOpenPanel::BuildOldPanel()
 
     /* Make this QFileDialog a child of tempWidget from the ui. */
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
-                                 p_intf->p_sys->filepath, "" );
+                                 p_intf->filepath, "" );
 
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
@@ -245,7 +245,7 @@ void FileOpenPanel::browseFile()
             );
         item->setFlags( Qt::ItemIsEnabled );
         ui.fileListWidg->addItem( item );
-        p_intf->p_sys->filepath = url;
+        p_intf->filepath = url;
     }
     updateButtons();
     updateMRL();
@@ -269,7 +269,7 @@ void FileOpenPanel::removeFile()
 void FileOpenPanel::browseFileSub()
 {
     QStringList urls = THEDP->showSimpleOpen( qtr("Open subtitle file"),
-                           EXT_FILTER_SUBTITLE, p_intf->p_sys->filepath );
+                           EXT_FILTER_SUBTITLE, p_intf->filepath );
 
     if( urls.isEmpty() ) {
         return;
@@ -310,7 +310,7 @@ void FileOpenPanel::updateMRL()
 void FileOpenPanel::accept()
 {
     if( dialogBox )
-        p_intf->p_sys->filepath = dialogBox->directory().absolutePath();
+        p_intf->filepath = dialogBox->directory().absolutePath();
     ui.fileListWidg->clear();
     urlList.clear();
 }
@@ -649,7 +649,7 @@ void DiscOpenPanel::browseDevice()
 {
     const QStringList schemes = QStringList(QStringLiteral("file"));
     QString dir = QFileDialog::getExistingDirectoryUrl( this,
-            qfut( I_DEVICE_TOOLTIP ), p_intf->p_sys->filepath,
+            qfut( I_DEVICE_TOOLTIP ), p_intf->filepath,
             QFileDialog::ShowDirsOnly, schemes ).toLocalFile();
     if( !dir.isEmpty() )
     {

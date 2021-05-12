@@ -26,7 +26,7 @@
 #include "podcast_configuration.hpp"
 
 PodcastConfigDialog::PodcastConfigDialog( qt_intf_t *_p_intf)
-                    : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
+                    : QVLCDialog( (QWidget*)_p_intf->p_mi, _p_intf )
 
 {
     ui.setupUi( this );

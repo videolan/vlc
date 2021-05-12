@@ -421,13 +421,13 @@ ControlbarProfile* ControlbarProfileModel::currentModel() const
 
 void ControlbarProfileModel::save(bool clearDirty) const
 {
-    assert(m_intf->p_sys);
-    assert(m_intf->p_sys->mainSettings);
+    assert(m_intf);
+    assert(m_intf->mainSettings);
 
-    if (!m_intf || !m_intf->p_sys || !m_intf->p_sys->mainSettings)
+    if (!m_intf || !m_intf || !m_intf->mainSettings)
         return;
 
-    const auto settings = m_intf->p_sys->mainSettings;
+    const auto settings = m_intf->mainSettings;
     const auto groupName = metaObject()->className();
 
     settings->beginGroup(groupName);
@@ -487,13 +487,13 @@ void ControlbarProfileModel::save(bool clearDirty) const
 
 bool ControlbarProfileModel::reload()
 {
-    assert(m_intf->p_sys);
-    assert(m_intf->p_sys->mainSettings);
+    assert(m_intf);
+    assert(m_intf->mainSettings);
 
-    if (!m_intf || !m_intf->p_sys || !m_intf->p_sys->mainSettings)
+    if (!m_intf || !m_intf || !m_intf->mainSettings)
         return false;
 
-    const auto settings = m_intf->p_sys->mainSettings;
+    const auto settings = m_intf->mainSettings;
     const auto groupName = metaObject()->className();
 
     settings->beginGroup(groupName);

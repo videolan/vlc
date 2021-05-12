@@ -35,7 +35,7 @@
 #include <QPushButton>
 
 GotoTimeDialog::GotoTimeDialog( qt_intf_t *_p_intf)
-               : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
+               : QVLCDialog( (QWidget*)_p_intf->p_mi, _p_intf )
 {
     setWindowFlags( Qt::Tool );
     setWindowTitle( qtr( "Go to Time" ) );

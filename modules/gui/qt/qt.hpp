@@ -29,9 +29,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_interface.h> /* intf_thread_t */
-#include <vlc_playlist.h>  /* vlc_playlist_t */
-#include <vlc_player.h>  /* vlc_player_t */
+#include <vlc_player.h>
 
 #include <qconfig.h>
 
@@ -59,6 +57,13 @@ enum{
     NOTIFICATION_ALWAYS = 2,
 };
 
+///// forward declaration
+
+extern "C" {
+typedef struct intf_dialog_args_t intf_dialog_args_t;
+typedef struct vlc_playlist vlc_playlist_t;
+}
+
 namespace vlc {
 class Compositor;
 
@@ -68,8 +73,20 @@ class PlaylistControllerModel;
 
 }
 class PlayerController;
-struct intf_sys_t
+
+///// module internal
+
+struct qt_intf_t
 {
+    struct vlc_object_t obj;
+
+    /** pointer to the actual intf module */
+    intf_thread_t* intf;
+
+    /** Specific for dialogs providers */
+    void ( *pf_show_dialog ) ( struct intf_thread_t *, int, int,
+                               intf_dialog_args_t * );
+
     vlc_thread_t thread;
 
     class QVLCApp *p_app;          /* Main Qt Application */
@@ -92,10 +109,7 @@ struct intf_sys_t
 #endif
 };
 
-//temporary definition
-extern "C" {
-typedef struct intf_thread_t qt_intf_t;
-}
+vlc_object_cast(qt_intf_t)
 
 /**
  * This class may be used for scope-bound locking/unlocking
@@ -120,8 +134,8 @@ struct vlc_player_locker {
 };
 
 #define THEDP DialogsProvider::getInstance()
-#define THEMIM p_intf->p_sys->p_mainPlayerController
-#define THEMPL p_intf->p_sys->p_mainPlaylistController
+#define THEMIM p_intf->p_mainPlayerController
+#define THEMPL p_intf->p_mainPlaylistController
 
 #define qfu( i ) QString::fromUtf8( i )
 #define qfue( i ) QString::fromUtf8( i ).replace( "&", "&&" ) /* for actions/buttons */
@@ -156,7 +170,7 @@ struct vlc_player_locker {
 /* for widgets which must not follow the RTL auto layout changes */
 #define RTL_UNAFFECTED_WIDGET setLayoutDirection( Qt::LeftToRight );
 
-#define getSettings() p_intf->p_sys->mainSettings
+#define getSettings() p_intf->mainSettings
 
 static inline QString QVLCUserDir( vlc_userdir_t type )
 {

@@ -310,8 +310,8 @@ void PrefsDialog::save()
             qtr("Preferences file could not be saved") );
     }
 
-    if( p_intf->p_sys->p_mi )
-        p_intf->p_sys->p_mi->reloadPrefs();
+    if( p_intf->p_mi )
+        p_intf->p_mi->reloadPrefs();
     accept();
 
     QVLCTools::saveWidgetPosition( p_intf, "Preferences", this );

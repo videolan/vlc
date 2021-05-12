@@ -407,7 +407,7 @@ MainInterfaceWin32::MainInterfaceWin32(qt_intf_t * _p_intf, QWidget *parent, Qt:
     : MainInterface( _p_intf, parent, flags )
 {
     /* Volume keys */
-    p_intf->p_sys->disable_volume_keys = var_InheritBool( _p_intf, "qt-disable-volume-keys" );
+    p_intf->disable_volume_keys = var_InheritBool( _p_intf, "qt-disable-volume-keys" );
 }
 
 
@@ -421,7 +421,7 @@ bool MainInterfaceWin32::nativeEvent(const QByteArray &eventType, void *message,
         case WM_APPCOMMAND:
             cmd = GET_APPCOMMAND_LPARAM(msg->lParam);
 
-            if( p_intf->p_sys->disable_volume_keys &&
+            if( p_intf->disable_volume_keys &&
                     (   cmd == APPCOMMAND_VOLUME_DOWN   ||
                         cmd == APPCOMMAND_VOLUME_UP     ||
                         cmd == APPCOMMAND_VOLUME_MUTE ) )
@@ -493,7 +493,7 @@ InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, Mai
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainInterface->useClientSideDecoration(),
-                                                       _p_intf->p_sys->p_compositor->type() == vlc::Compositor::Win7Compositor,
+                                                       _p_intf->p_compositor->type() == vlc::Compositor::Win7Compositor,
                                                        window, window))
 #endif
 
@@ -502,7 +502,7 @@ InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, Mai
 
 void MainInterfaceWin32::reloadPrefs()
 {
-    p_intf->p_sys->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
+    p_intf->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
     MainInterface::reloadPrefs();
 }
 

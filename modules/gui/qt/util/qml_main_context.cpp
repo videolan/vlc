@@ -21,7 +21,7 @@
 QmlMainContext::QmlMainContext(qt_intf_t* intf, MainInterface* mainInterface, QObject* parent)
     : QObject(parent)
     , m_intf( intf )
-    , m_playlist(intf->p_sys->p_playlist)
+    , m_playlist(intf->p_playlist)
     , m_mainInterface(mainInterface)
 {
 }

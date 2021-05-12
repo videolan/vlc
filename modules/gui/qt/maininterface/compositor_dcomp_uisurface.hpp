@@ -56,6 +56,8 @@
 #include <QtANGLE/EGL/eglext.h>
 #include <QtPlatformHeaders/QEGLNativeContext>
 
+#include "qt.hpp"
+
 namespace vlc {
 
 class CompositorDCompositionRenderControl : public QQuickRenderControl

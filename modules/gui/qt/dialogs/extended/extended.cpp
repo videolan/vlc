@@ -38,7 +38,7 @@
 #include <vlc_modules.h>
 
 ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )
-               : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
+               : QVLCDialog( (QWidget*)_p_intf->p_mi, _p_intf )
 {
 #ifdef __APPLE__
     setWindowFlags( Qt::Drawer );
@@ -137,7 +137,7 @@ ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )
     {
         resize( QSize( 400, 280 ) );
 
-        MainInterface *p_mi = p_intf->p_sys->p_mi;
+        MainInterface *p_mi = p_intf->p_mi;
         if( p_mi && p_mi->x() > 50 )
             move( ( p_mi->x() - frameGeometry().width() - 10 ), p_mi->y() );
         else

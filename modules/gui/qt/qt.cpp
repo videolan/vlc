@@ -104,12 +104,14 @@ extern "C" char **environ;
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+static int  OpenInternal ( qt_intf_t * );
+static void CloseInternal( qt_intf_t * );
 static int  OpenIntf     ( vlc_object_t * );
 static int  OpenDialogs  ( vlc_object_t * );
-static int  Open         ( vlc_object_t *, bool );
 static void Close        ( vlc_object_t * );
 static int  WindowOpen   ( vout_window_t * );
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
+
 
 /*****************************************************************************
  * Module descriptor
@@ -405,7 +407,7 @@ static enum {
  *****************************************************************************/
 
 static void *Thread( void * );
-static void *ThreadCleanup( intf_thread_t *p_intf, bool error );
+static void *ThreadCleanup( qt_intf_t *p_intf, bool error );
 
 #ifdef Q_OS_MAC
 /* Used to abort the app.exec() on OSX after libvlc_Quit is called */
@@ -417,12 +419,11 @@ static void Abort( void *obj )
 #endif
 
 /* Open Interface */
-static int Open( vlc_object_t *p_this, bool isDialogProvider )
+static int OpenInternal( qt_intf_t *p_intf )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
 #ifndef X_DISPLAY_MISSING
-    if (!vlc_xlib_init(p_this))
+    if (!vlc_xlib_init(&p_intf->obj))
         return VLC_EGENERIC;
 #endif
 
@@ -445,30 +446,27 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 
     if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
     {
-        msg_Dbg(p_this, "Qt check failed (%d). Skipping.", status);
+        msg_Dbg(p_intf, "Qt check failed (%d). Skipping.", status);
         return VLC_EGENERIC;
     }
 #endif
 
     /* Get the playlist before the lock to avoid a lock-order-inversion */
-    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(p_intf);
+    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(p_intf->intf);
 
     vlc::threads::mutex_locker locker (lock);
     if (busy || open_state == OPEN_STATE_ERROR)
     {
         if (busy)
-            msg_Err (p_this, "cannot start Qt multiple times");
+            msg_Err (p_intf, "cannot start Qt multiple times");
         return VLC_EGENERIC;
     }
 
-    /* Allocations of p_sys */
-    intf_sys_t *p_sys = p_intf->p_sys = new intf_sys_t;
-    p_sys->b_isDialogProvider = isDialogProvider;
-    p_sys->p_mi = NULL;
+    p_intf->p_mi = NULL;
 
     /* set up the playlist to work on */
-    p_sys->p_playlist = playlist;
-    p_sys->p_player = vlc_playlist_GetPlayer( p_sys->p_playlist );
+    p_intf->p_playlist = playlist;
+    p_intf->p_player = vlc_playlist_GetPlayer( p_intf->p_playlist );
 
     /* */
 #ifdef Q_OS_MAC
@@ -476,9 +474,8 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     libvlc_SetExitHandler( vlc_object_instance(p_intf), Abort, p_intf );
     Thread( (void *)p_intf );
 #else
-    if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_intf->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
-        delete p_sys;
         return VLC_ENOMEM;
     }
 #endif
@@ -494,9 +491,8 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     if (open_state == OPEN_STATE_ERROR)
     {
 #ifndef Q_OS_MAC
-        vlc_join (p_sys->thread, NULL);
+        vlc_join (p_intf->thread, NULL);
 #endif
-        delete p_sys;
         return VLC_EGENERIC;
     }
 
@@ -504,37 +500,76 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     return VLC_SUCCESS;
 }
 
-/* Open Qt interface */
-static int OpenIntf( vlc_object_t *p_this )
-{
-    return Open( p_this, false );
-}
 
-/* Open Dialog Provider */
-static int OpenDialogs( vlc_object_t *p_this )
+static void CloseInternal( qt_intf_t *p_intf )
 {
-    return Open( p_this, true );
-}
-
-static void Close( vlc_object_t *p_this )
-{
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    intf_sys_t *p_sys = p_intf->p_sys;
-
     /* And quit */
-    msg_Dbg( p_this, "requesting exit..." );
+    msg_Dbg( p_intf, "requesting exit..." );
     QVLCApp::triggerQuit();
 
-    msg_Dbg( p_this, "waiting for UI thread..." );
+    msg_Dbg( p_intf, "waiting for UI thread..." );
 #ifndef Q_OS_MAC
-    vlc_join (p_sys->thread, NULL);
+    vlc_join (p_intf->thread, NULL);
 #endif
-    delete p_sys;
 
     vlc::threads::mutex_locker locker (lock);
     assert (busy);
     assert (open_state == OPEN_STATE_INIT);
     busy = false;
+
+    vlc_LogDestroy(p_intf->obj.logger);
+    vlc_object_delete(p_intf);
+}
+
+
+/* Open Qt interface */
+static int OpenIntfCommon( vlc_object_t *p_this, bool dialogProvider )
+{
+    auto intfthread = reinterpret_cast<intf_thread_t*>(p_this);
+    libvlc_int_t *libvlc = vlc_object_instance( p_this );
+    qt_intf_t* p_intf = (qt_intf_t*)vlc_object_create( libvlc, sizeof( *p_intf ) );
+    if (!p_intf)
+        return VLC_ENOMEM;
+    p_intf->obj.logger = vlc_LogHeaderCreate(libvlc->obj.logger, "qt");
+    if (!p_intf->obj.logger)
+    {
+        vlc_object_delete(p_intf);
+        return VLC_EGENERIC;
+    }
+    p_intf->intf = intfthread;
+    p_intf->b_isDialogProvider = dialogProvider;
+    int ret = OpenInternal( p_intf );
+    if ( ret != VLC_SUCCESS )
+    {
+        vlc_LogDestroy(p_intf->obj.logger);
+        vlc_object_delete(p_intf);
+        return VLC_EGENERIC;
+    }
+    intfthread->pf_show_dialog = p_intf->pf_show_dialog;
+    intfthread->p_sys = reinterpret_cast<intf_sys_t*>(p_intf);
+    return VLC_SUCCESS;
+}
+
+static int OpenIntf( vlc_object_t *p_this )
+{
+    return OpenIntfCommon(p_this, false);
+}
+
+/* Open Dialog Provider */
+static int OpenDialogs( vlc_object_t *p_this )
+{
+    return OpenIntfCommon(p_this, false);
+}
+
+/* close interface */
+static void Close( vlc_object_t *p_this )
+{
+    intf_thread_t* p_intf = (intf_thread_t*)(p_this);
+    auto obj = reinterpret_cast<qt_intf_t*>(p_intf->p_sys);
+    if (obj)
+    {
+        CloseInternal(obj);
+    }
 }
 
 static inline void qRegisterMetaTypes()
@@ -547,8 +582,7 @@ static inline void qRegisterMetaTypes()
 
 static void *Thread( void *obj )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)obj;
-    intf_sys_t *p_sys = p_intf->p_sys;
+    qt_intf_t *p_intf = (qt_intf_t *)obj;
     char vlc_name[] = "vlc"; /* for WM_CLASS */
     char *argv[3] = { nullptr };
     int argc = 0;
@@ -578,7 +612,7 @@ static void *Thread( void *obj )
 
     Q_INIT_RESOURCE( vlc );
 
-    p_intf->p_sys->p_compositor = vlc::Compositor::createCompositor(p_intf);
+    p_intf->p_compositor = vlc::Compositor::createCompositor(p_intf);
 
     QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
     QApplication::setAttribute( Qt::AA_UseHighDpiPixmaps );
@@ -605,7 +639,7 @@ static void *Thread( void *obj )
      * necessary for  RTL locales */
     app.setLayoutDirection(QLocale().textDirection());
 
-    p_sys->p_app = &app;
+    p_intf->p_app = &app;
 
 
     /* All the settings are in the .conf/.ini style */
@@ -618,7 +652,7 @@ static void *Thread( void *obj )
     QSettings::setPath( QSettings::IniFormat, QSettings::UserScope, configDir );
 #endif
 
-    p_sys->mainSettings = new QSettings(
+    p_intf->mainSettings = new QSettings(
 #ifdef _WIN32
             QSettings::IniFormat,
 #else
@@ -637,8 +671,8 @@ static void *Thread( void *obj )
 
     /* Initialize the Dialog Provider and the Main Input Manager */
     DialogsProvider::getInstance( p_intf );
-    p_sys->p_mainPlayerController = new PlayerController(p_intf);
-    p_sys->p_mainPlaylistController = new vlc::playlist::PlaylistControllerModel(p_intf->p_sys->p_playlist);
+    p_intf->p_mainPlayerController = new PlayerController(p_intf);
+    p_intf->p_mainPlaylistController = new vlc::playlist::PlaylistControllerModel(p_intf->p_playlist);
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */
@@ -659,10 +693,10 @@ static void *Thread( void *obj )
     /* Create the normal interface in non-DP mode */
     MainInterface *p_mi = NULL;
 
-    if( !p_sys->b_isDialogProvider )
+    if( !p_intf->b_isDialogProvider )
     {
-        p_mi = p_intf->p_sys->p_compositor->makeMainInterface();
-        p_sys->p_mi = p_mi;
+        p_mi = p_intf->p_compositor->makeMainInterface();
+        p_intf->p_mi = p_mi;
 
         if (!p_mi)
         {
@@ -675,13 +709,13 @@ static void *Thread( void *obj )
 
         QString platform = app.platformName();
         if( platform == qfu("xcb") )
-            p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
+            p_intf->voutWindowType = VOUT_WINDOW_TYPE_XID;
         else if( platform == qfu("wayland") || platform == qfu("wayland-egl") )
-            p_sys->voutWindowType = VOUT_WINDOW_TYPE_WAYLAND;
+            p_intf->voutWindowType = VOUT_WINDOW_TYPE_WAYLAND;
         else if( platform == qfu("windows") )
-            p_sys->voutWindowType = VOUT_WINDOW_TYPE_HWND;
+            p_intf->voutWindowType = VOUT_WINDOW_TYPE_HWND;
         else if( platform == qfu("cocoa" ) )
-            p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
+            p_intf->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
         else
         {
             msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
@@ -712,11 +746,11 @@ static void *Thread( void *obj )
     }
 #else
     /* We took over main thread, register and start here */
-    if( !p_sys->b_isDialogProvider )
+    if( !p_intf->b_isDialogProvider )
     {
-        vlc_playlist_Lock( p_intf->p_sys->p_playlist );
-        vlc_playlist_Start( p_intf->p_sys->p_playlist );
-        vlc_playlist_Unlock( p_intf->p_sys->p_playlist );
+        vlc_playlist_Lock( p_intf->p_playlist );
+        vlc_playlist_Start( p_intf->p_playlist );
+        vlc_playlist_Unlock( p_intf->p_playlist );
     }
 #endif
 
@@ -724,7 +758,7 @@ static void *Thread( void *obj )
     app.setQuitOnLastWindowClosed( false );
 
     /* Retrieve last known path used in file browsing */
-    p_sys->filepath =
+    p_intf->filepath =
          getSettings()->value( "filedialog-path", QVLCUserDir( VLC_HOME_DIR ) ).toString();
 
     /* Loads and tries to apply the preferred QStyle */
@@ -746,10 +780,8 @@ static void *Thread( void *obj )
     return ThreadCleanup( p_intf, false );
 }
 
-static void *ThreadCleanup( intf_thread_t *p_intf, bool error )
+static void *ThreadCleanup( qt_intf_t *p_intf, bool error )
 {
-    intf_sys_t *p_sys = p_intf->p_sys;
-
     {
 #ifndef Q_OS_MAC
         vlc::threads::mutex_locker locker (lock);
@@ -765,13 +797,13 @@ static void *ThreadCleanup( intf_thread_t *p_intf, bool error )
             open_state = OPEN_STATE_INIT;
     }
 
-    if (p_sys->p_compositor)
+    if (p_intf->p_compositor)
     {
-        p_sys->p_compositor->destroyMainInterface();
-        p_sys->p_mi = nullptr;
+        p_intf->p_compositor->destroyMainInterface();
+        p_intf->p_mi = nullptr;
 
-        delete p_sys->p_compositor;
-        p_sys->p_compositor = nullptr;
+        delete p_intf->p_compositor;
+        p_intf->p_compositor = nullptr;
     }
 
     /* */
@@ -787,16 +819,16 @@ static void *ThreadCleanup( intf_thread_t *p_intf, bool error )
 
     /* Save the path or delete if recent play are disabled */
     if( var_InheritBool( p_intf, "qt-recentplay" ) )
-        getSettings()->setValue( "filedialog-path", p_sys->filepath );
+        getSettings()->setValue( "filedialog-path", p_intf->filepath );
     else
         getSettings()->remove( "filedialog-path" );
 
     /* Destroy the main playlist controller */
-    delete p_sys->p_mainPlaylistController;
+    delete p_intf->p_mainPlaylistController;
     /* Destroy the main InputManager */
-    delete p_sys->p_mainPlayerController;
+    delete p_intf->p_mainPlayerController;
     /* Delete the configuration. Application has to be deleted after that. */
-    delete p_sys->mainSettings;
+    delete p_intf->mainSettings;
 
     /* Delete the application automatically */
     return NULL;
@@ -822,15 +854,14 @@ static int WindowOpen( vout_window_t *p_wnd )
         return VLC_EGENERIC;
 
     libvlc_int_t *libvlc = vlc_object_instance( p_wnd );
-    intf_thread_t *p_intf =
-        (intf_thread_t *)var_InheritAddress( libvlc, "qt4-iface" );
+    qt_intf_t *p_intf = (qt_intf_t *)var_InheritAddress( libvlc, "qt4-iface" );
     if( !p_intf )
     {   /* If another interface is used, this plugin cannot work */
         msg_Dbg( p_wnd, "Qt interface not found" );
         return VLC_EGENERIC;
     }
 
-    switch( p_intf->p_sys->voutWindowType )
+    switch( p_intf->voutWindowType )
     {
         case VOUT_WINDOW_TYPE_XID:
         case VOUT_WINDOW_TYPE_HWND:
@@ -843,6 +874,6 @@ static int WindowOpen( vout_window_t *p_wnd )
     if (unlikely(open_state != OPEN_STATE_OPENED))
         return VLC_EGENERIC;
 
-    return p_intf->p_sys->p_compositor->setupVoutWindow( p_wnd ) ? VLC_SUCCESS : VLC_EGENERIC;
+    return p_intf->p_compositor->setupVoutWindow( p_wnd ) ? VLC_SUCCESS : VLC_EGENERIC;
 
 }

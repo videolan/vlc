@@ -850,14 +850,14 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             CONFIG_BOOL( "metadata-network-access", MetadataNetworkAccessMode );
             CONFIG_BOOL( "qt-menubar", menuBarCheck );
 
-            ui.pinVideoControlsCheckbox->setChecked( p_intf->p_sys->p_mi->pinVideoControls() );
+            ui.pinVideoControlsCheckbox->setChecked( p_intf->p_mi->pinVideoControls() );
             m_resetters.push_back(std::make_unique<PropertyResetter>(ui.pinVideoControlsCheckbox, "checked"));
-            QObject::connect( ui.pinVideoControlsCheckbox, &QCheckBox::stateChanged, p_intf->p_sys->p_mi, &MainInterface::setPinVideoControls );
+            QObject::connect( ui.pinVideoControlsCheckbox, &QCheckBox::stateChanged, p_intf->p_mi, &MainInterface::setPinVideoControls );
 
-            ui.colorSchemeComboBox->insertItems(0, p_intf->p_sys->p_mi->getColorScheme()->stringList());
-            ui.colorSchemeComboBox->setCurrentText( p_intf->p_sys->p_mi->getColorScheme()->getCurrent() );
+            ui.colorSchemeComboBox->insertItems(0, p_intf->p_mi->getColorScheme()->stringList());
+            ui.colorSchemeComboBox->setCurrentText( p_intf->p_mi->getColorScheme()->getCurrent() );
             m_resetters.push_back(std::make_unique<PropertyResetter>( ui.colorSchemeComboBox, "currentIndex" ));
-            QObject::connect( ui.colorSchemeComboBox, &QComboBox::currentTextChanged, p_intf->p_sys->p_mi->getColorScheme(), &ColorSchemeModel::setCurrent );
+            QObject::connect( ui.colorSchemeComboBox, &QComboBox::currentTextChanged, p_intf->p_mi->getColorScheme(), &ColorSchemeModel::setCurrent );
 
             const float intfScaleFloatFactor = 100.f;
             const auto updateIntfUserScaleFactorFromControls =
@@ -873,21 +873,21 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                     QSignalBlocker s( spinBox );
                     spinBox->setValue( value );
                 }
-                p_intf->p_sys->p_mi->setIntfUserScaleFactor( value / intfScaleFloatFactor );
+                p_intf->p_mi->setIntfUserScaleFactor( value / intfScaleFloatFactor );
             };
 
-            ui.intfScaleFactorSlider->setRange( p_intf->p_sys->p_mi->getMinIntfUserScaleFactor() * intfScaleFloatFactor
-                                                 , p_intf->p_sys->p_mi->getMaxIntfUserScaleFactor() * intfScaleFloatFactor);
-            ui.intfScaleFactorSpinBox->setRange( p_intf->p_sys->p_mi->getMinIntfUserScaleFactor() * intfScaleFloatFactor
-                                                 , p_intf->p_sys->p_mi->getMaxIntfUserScaleFactor() * intfScaleFloatFactor);
+            ui.intfScaleFactorSlider->setRange( p_intf->p_mi->getMinIntfUserScaleFactor() * intfScaleFloatFactor
+                                                 , p_intf->p_mi->getMaxIntfUserScaleFactor() * intfScaleFloatFactor);
+            ui.intfScaleFactorSpinBox->setRange( p_intf->p_mi->getMinIntfUserScaleFactor() * intfScaleFloatFactor
+                                                 , p_intf->p_mi->getMaxIntfUserScaleFactor() * intfScaleFloatFactor);
 
-            updateIntfUserScaleFactorFromControls( p_intf->p_sys->p_mi->getIntfUserScaleFactor() * intfScaleFloatFactor );
+            updateIntfUserScaleFactorFromControls( p_intf->p_mi->getIntfUserScaleFactor() * intfScaleFloatFactor );
             m_resetters.push_back( std::make_unique<PropertyResetter>( ui.intfScaleFactorSlider, "value" ) );
 
             QObject::connect( ui.intfScaleFactorSlider, QOverload<int>::of(&QSlider::valueChanged)
-                              , p_intf->p_sys->p_mi , updateIntfUserScaleFactorFromControls );
+                              , p_intf->p_mi , updateIntfUserScaleFactorFromControls );
             QObject::connect( ui.intfScaleFactorSpinBox, QOverload<int>::of(&QSpinBox::valueChanged)
-                              , p_intf->p_sys->p_mi , updateIntfUserScaleFactorFromControls );
+                              , p_intf->p_mi , updateIntfUserScaleFactorFromControls );
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
             CONFIG_BOOL( "qt-titlebar", titleBarCheckBox );
@@ -1293,7 +1293,7 @@ void SPrefsPanel::lastfm_Changed( int i_state )
 void SPrefsPanel::changeStyle()
 {
     QApplication::setStyle( getQStyleKey( qobject_cast<QComboBox *>( optionWidgets["styleCB"] )
-                                          , p_intf->p_sys->p_app->defaultStyle() ) );
+                                          , p_intf->p_app->defaultStyle() ) );
 
     /* force refresh on all widgets */
     QWidgetList widgets = QApplication::allWidgets();

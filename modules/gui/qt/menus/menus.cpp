@@ -293,7 +293,7 @@ QMenu *VLCMenuBar::ToolsMenu( qt_intf_t *p_intf, QMenu *menu )
         "", &DialogsProvider::pluginDialog );
     menu->addSeparator();
 
-    if( !p_intf->p_sys->b_isDialogProvider )
+    if( !p_intf->b_isDialogProvider )
         addDPStaticEntry( menu, qtr( "Customi&ze Interface..." ),
             ":/menu/preferences.svg", &DialogsProvider::showToolbarEditorDialog);
 
@@ -313,7 +313,7 @@ QMenu *VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *current, MainInterface *_
     QAction *action;
     QMenu *menu;
 
-    MainInterface *mi = _mi ? _mi : p_intf->p_sys->p_mi;
+    MainInterface *mi = _mi ? _mi : p_intf->p_mi;
     assert( mi );
 
     if( !current )
@@ -528,7 +528,7 @@ QMenu *VLCMenuBar::NavigMenu( qt_intf_t *p_intf, QMenu *menu )
     menu->addMenu( submenu );
     menu->addMenu( new CheckableListMenu( qtr("&Program") , THEMIM->getPrograms(), CheckableListMenu::GROUPED , menu) );
 
-    if (p_intf->p_sys->p_mi && p_intf->p_sys->p_mi->hasMediaLibrary() )
+    if (p_intf->p_mi && p_intf->p_mi->hasMediaLibrary() )
     {
         submenu = new QMenu( qfut( I_MENU_BOOKMARK ), menu );
         submenu->setTearOffEnabled( true );
@@ -783,7 +783,7 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
     input_item_t* p_input = THEMIM->getInput();
     QAction *action;
     bool b_isFullscreen = false;
-    MainInterface *mi = p_intf->p_sys->p_mi;
+    MainInterface *mi = p_intf->p_mi;
 
     PopupMenuPlaylistEntries( menu, p_intf );
     menu->addSeparator();
@@ -851,7 +851,7 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
         }
 
         /* In skins interface, append some items */
-        if( p_intf->p_sys->b_isDialogProvider )
+        if( p_intf->b_isDialogProvider )
         {
             vlc_object_t* p_object = vlc_object_parent(p_intf);
             submenu->setTitle( qtr( "Interface" ) );
@@ -881,7 +881,7 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
     }
 
     /* Static entries for ending, like open */
-    if( p_intf->p_sys->b_isDialogProvider )
+    if( p_intf->b_isDialogProvider )
     {
         QMenu *openmenu = FileMenu( p_intf, menu );
         openmenu->setTitle( qtr( "Open Media" ) );

@@ -171,7 +171,7 @@ void FileDestBox::fileBrowse()
 {
     const QStringList schemes = QStringList(QStringLiteral("file"));
     QString fileName = QFileDialog::getSaveFileUrl( this, qtr( "Save file..." ),
-            p_intf->p_sys->filepath, qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)" ),
+            p_intf->filepath, qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv *.webm)" ),
             nullptr, QFileDialog::Options(), schemes).toLocalFile();
     fileEdit->setText( toNativeSeparators( fileName ) );
     emit mrlUpdated();

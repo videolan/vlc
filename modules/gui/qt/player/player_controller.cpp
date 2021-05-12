@@ -1007,7 +1007,7 @@ static const struct vlc_player_timer_cbs player_timer_cbs = {
 PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontroller, qt_intf_t *p_intf)
     : q_ptr(playercontroller)
     , p_intf(p_intf)
-    , m_player(p_intf->p_sys->p_player)
+    , m_player(p_intf->p_player)
     , m_videoTracks(m_player)
     , m_audioTracks(m_player)
     , m_subtitleTracks(m_player)

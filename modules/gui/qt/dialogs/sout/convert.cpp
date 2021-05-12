@@ -158,7 +158,7 @@ void ConvertDialog::fileBrowse()
     QString fileExtension = ( ! profile->isEnabled() ) ? ".*" : "." + profile->getMux();
 
     outgoingMRL = QFileDialog::getSaveFileUrl( this, qtr( "Save file..." ),
-        p_intf->p_sys->filepath,
+        p_intf->filepath,
         QString( "%1 (*%2);;%3 (*.*)" ).arg( qtr( "Containers" ) )
             .arg( fileExtension ).arg( qtr("All") ), 0, QFileDialog::DontConfirmOverwrite );
     fileLine->setText( urlToDisplayString( outgoingMRL ) );

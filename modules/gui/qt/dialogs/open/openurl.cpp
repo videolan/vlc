@@ -41,7 +41,7 @@
 
 OpenUrlDialog::OpenUrlDialog( qt_intf_t *_p_intf,
                               bool _bClipboard ) :
-        QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf ), bClipboard( _bClipboard )
+        QVLCDialog( (QWidget*)_p_intf->p_mi, _p_intf ), bClipboard( _bClipboard )
 {
     setWindowTitle( qtr( "Open URL" ) );
     setWindowRole( "vlc-open-url" );

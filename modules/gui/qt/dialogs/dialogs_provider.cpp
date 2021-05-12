@@ -251,7 +251,7 @@ const QEvent::Type DialogEvent::DialogEvent_Type =
 
 void DialogsProvider::prefsDialog()
 {
-    PrefsDialog *p = new PrefsDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
+    PrefsDialog *p = new PrefsDialog( (QWidget *)p_intf->p_mi, p_intf );
     p->toggleVisible();
 }
 
@@ -334,7 +334,7 @@ void DialogsProvider::mediaInfoDialog( const PlaylistItem& pItem )
     if( p_input )
     {
         MediaInfoDialog * const mid = new MediaInfoDialog( p_intf, p_input );
-        mid->setParent( p_intf->p_sys->p_mi, Qt::Dialog );
+        mid->setParent( p_intf->p_mi, Qt::Dialog );
         mid->showTab( MediaInfoDialog::META_PANEL );
     }
 }
@@ -424,7 +424,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     {
         QString file = getSaveFileName( NULL,
                                         qfu( p_arg->psz_title ),
-                                        p_intf->p_sys->filepath, extensions );
+                                        p_intf->filepath, extensions );
         if( !file.isEmpty() )
         {
             p_arg->i_results = 1;
@@ -437,14 +437,14 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     else /* non-save mode */
     {
         QList<QUrl> urls = QFileDialog::getOpenFileUrls( NULL, qfu( p_arg->psz_title ),
-                                       p_intf->p_sys->filepath, extensions );
+                                       p_intf->filepath, extensions );
         p_arg->i_results = urls.count();
         p_arg->psz_results = (char **)vlc_alloc( p_arg->i_results, sizeof( char * ) );
         i = 0;
         foreach( const QUrl &uri, urls )
             p_arg->psz_results[i++] = strdup( uri.toEncoded().constData() );
         if( !urls.isEmpty() )
-            p_intf->p_sys->filepath =  urls.last();
+            p_intf->filepath =  urls.last();
     }
 
     /* Callback */
@@ -469,7 +469,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
 
 void DialogsProvider::openDialog( int i_tab )
 {
-    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf )->showTab( i_tab );
+    OpenDialog::getInstance( p_intf->p_mi , p_intf )->showTab( i_tab );
 }
 void DialogsProvider::openDialog()
 {
@@ -495,7 +495,7 @@ void DialogsProvider::openCaptureDialog()
 /* Same as the open one, but force the enqueue */
 void DialogsProvider::PLAppendDialog( int tab )
 {
-    OpenDialog::getInstance( p_intf->p_sys->p_mi, p_intf, false,
+    OpenDialog::getInstance( p_intf->p_mi, p_intf, false,
                              OPEN_AND_ENQUEUE )->showTab( tab );
 }
 
@@ -528,11 +528,11 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
 
     QList<QUrl> urls = QFileDialog::getOpenFileUrls( NULL,
         help.isEmpty() ? qfut(I_OP_SEL_FILES ) : help,
-        path.isEmpty() ? p_intf->p_sys->filepath : path,
+        path.isEmpty() ? p_intf->filepath : path,
         fileTypes );
 
     if( !urls.isEmpty() )
-        p_intf->p_sys->filepath = urls.last();
+        p_intf->filepath = urls.last();
 
     QStringList res;
     foreach( const QUrl &url, urls )
@@ -600,12 +600,12 @@ QString DialogsProvider::getDirectoryDialog( qt_intf_t *p_intf )
 {
     const QStringList schemes = QStringList(QStringLiteral("file"));
     QUrl dirurl = QFileDialog::getExistingDirectoryUrl( NULL,
-            qfut( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath,
+            qfut( I_OP_DIR_WINTITLE ), p_intf->filepath,
             QFileDialog::ShowDirsOnly, schemes );
 
     if( dirurl.isEmpty() ) return QString();
 
-    p_intf->p_sys->filepath = dirurl;
+    p_intf->filepath = dirurl;
 
     QString dir = dirurl.toLocalFile();
     const char *scheme = "directory";
@@ -669,7 +669,7 @@ void DialogsProvider::savePlayingToPlaylist()
     QString selected;
     QString file = getSaveFileName( NULL,
                                     qtr( "Save playlist as..." ),
-                                    p_intf->p_sys->filepath, filters.join( ";;" ),
+                                    p_intf->filepath, filters.join( ";;" ),
                                     &selected );
     const char *psz_selected_module = NULL;
     const char *psz_last_playlist_ext = NULL;
@@ -706,11 +706,11 @@ void DialogsProvider::savePlayingToPlaylist()
 
     if ( psz_selected_module )
     {
-        vlc_playlist_Lock( p_intf->p_sys->p_playlist  );
-        vlc_playlist_Export( p_intf->p_sys->p_playlist,
+        vlc_playlist_Lock( p_intf->p_playlist  );
+        vlc_playlist_Export( p_intf->p_playlist,
                              qtu( toNativeSeparators( file ) ),
                              psz_selected_module );
-        vlc_playlist_Unlock( p_intf->p_sys->p_playlist  );
+        vlc_playlist_Unlock( p_intf->p_playlist  );
         getSettings()->setValue( "last-playlist-ext", psz_last_playlist_ext );
     }
 }
@@ -788,13 +788,13 @@ void DialogsProvider::streamingDialog(const QList<QUrl> &urls, bool b_stream )
 
 void DialogsProvider::openAndStreamingDialogs()
 {
-    OpenDialog::getInstance( p_intf->p_sys->p_mi, p_intf, false, OPEN_AND_STREAM )
+    OpenDialog::getInstance( p_intf->p_mi, p_intf, false, OPEN_AND_STREAM )
                                 ->showTab( OPEN_FILE_TAB );
 }
 
 void DialogsProvider::openAndTranscodingDialogs()
 {
-    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, false, OPEN_AND_SAVE )
+    OpenDialog::getInstance( p_intf->p_mi , p_intf, false, OPEN_AND_SAVE )
                                 ->showTab( OPEN_FILE_TAB );
 }
 

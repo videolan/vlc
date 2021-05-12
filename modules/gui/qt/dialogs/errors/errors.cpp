@@ -34,7 +34,7 @@
 #include <QPushButton>
 
 ErrorsDialog::ErrorsDialog( qt_intf_t *_p_intf )
-             : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
+             : QVLCDialog( (QWidget*)_p_intf->p_mi, _p_intf )
 {
     setWindowTitle( qtr( "Errors" ) );
     setWindowRole( "vlc-errors" );

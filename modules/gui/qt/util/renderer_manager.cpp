@@ -148,8 +148,8 @@ void RendererManager::RendererMenuCountdown()
 void RendererManager::SelectRenderer( vlc_renderer_item_t *p_item )
 {
     p_selected_item = p_item;
-    vlc_player_locker lock{ p_intf->p_sys->p_player };
-    vlc_player_SetRenderer( p_intf->p_sys->p_player, p_item );
+    vlc_player_locker lock{ p_intf->p_player };
+    vlc_player_SetRenderer( p_intf->p_player, p_item );
 }
 
 void RendererManager::renderer_event_item_added( vlc_renderer_discovery_t* p_rd,

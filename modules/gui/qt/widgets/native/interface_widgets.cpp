@@ -153,7 +153,7 @@ void VideoWidget::request( struct vout_window_t *p_wnd )
     sync();
     p_window = p_wnd;
 
-    p_wnd->type = p_intf->p_sys->voutWindowType;
+    p_wnd->type = p_intf->voutWindowType;
     switch( p_wnd->type )
     {
         case VOUT_WINDOW_TYPE_XID:
@@ -290,8 +290,8 @@ void VideoWidget::resizeEvent( QResizeEvent *event )
 {
     QWidget::resizeEvent( event );
 
-    if ( p_intf->p_sys->voutWindowType == VOUT_WINDOW_TYPE_XID ||
-        p_intf->p_sys->voutWindowType == VOUT_WINDOW_TYPE_HWND )
+    if ( p_intf->voutWindowType == VOUT_WINDOW_TYPE_XID ||
+        p_intf->voutWindowType == VOUT_WINDOW_TYPE_HWND )
         return;
     reportSize();
 }
@@ -478,7 +478,7 @@ void CoverArtLabel::setArtFromFile()
         return;
 
     QUrl fileUrl = QFileDialog::getOpenFileUrl( this, qtr( "Choose Cover Art" ),
-        p_intf->p_sys->filepath, qtr( "Image Files (*.gif *.jpg *.jpeg *.png)" ) );
+        p_intf->filepath, qtr( "Image Files (*.gif *.jpg *.jpeg *.png)" ) );
 
     if( fileUrl.isEmpty() )
         return;
