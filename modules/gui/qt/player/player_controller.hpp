@@ -229,7 +229,7 @@ public slots:
     Q_INVOKABLE void toggleVisualization();
 
 public:
-    PlayerController( intf_thread_t * );
+    PlayerController( qt_intf_t * );
     ~PlayerController();
 
 public:

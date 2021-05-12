@@ -53,7 +53,7 @@ class VideoWidget : public QFrame
 {
     Q_OBJECT
 public:
-    VideoWidget( intf_thread_t *, QWidget* p_parent );
+    VideoWidget( qt_intf_t *, QWidget* p_parent );
     virtual ~VideoWidget();
 
     void request( struct vout_window_t * );
@@ -76,7 +76,7 @@ protected:
 
 private:
     int qtMouseButton2VLC( Qt::MouseButton );
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     vout_window_t *p_window;
 
     QWidget *stable;
@@ -101,7 +101,7 @@ class CoverArtLabel : public QLabel
 {
     Q_OBJECT
 public:
-    CoverArtLabel( QWidget *parent, intf_thread_t * );
+    CoverArtLabel( QWidget *parent, qt_intf_t * );
     void setItem( input_item_t * );
     virtual ~CoverArtLabel();
 
@@ -115,7 +115,7 @@ protected:
         event->accept();
     }
 private:
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     input_item_t *p_item;
 
 public slots:

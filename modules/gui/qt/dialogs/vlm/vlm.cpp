@@ -52,7 +52,7 @@
 #include <QFileDialog>
 
 
-VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+VLMDialog::VLMDialog( qt_intf_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     vlm_t *p_vlm = vlm_New( vlc_object_instance(p_intf), NULL );
 

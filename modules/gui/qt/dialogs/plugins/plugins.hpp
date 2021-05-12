@@ -64,7 +64,7 @@ class PluginDialog : public QVLCFrame, public Singleton<PluginDialog>
     Q_OBJECT
 
 private:
-    PluginDialog( intf_thread_t * );
+    PluginDialog( qt_intf_t * );
     virtual ~PluginDialog();
 
     QTabWidget *tabs;
@@ -90,7 +90,7 @@ protected:
     void keyPressEvent( QKeyEvent *keyEvent ) Q_DECL_OVERRIDE;
 
 private:
-    PluginTab( intf_thread_t *p_intf );
+    PluginTab( qt_intf_t *p_intf );
     virtual ~PluginTab();
 
     void FillTree();
@@ -111,7 +111,7 @@ protected:
     void keyPressEvent( QKeyEvent *keyEvent ) Q_DECL_OVERRIDE;
 
 private:
-    ExtensionTab( intf_thread_t *p_intf );
+    ExtensionTab( qt_intf_t *p_intf );
     virtual ~ExtensionTab();
 
 private slots:
@@ -139,7 +139,7 @@ private slots:
     void reposync();
 
 private:
-    AddonsTab( intf_thread_t *p_intf );
+    AddonsTab( qt_intf_t *p_intf );
     virtual ~AddonsTab();
     bool eventFilter ( QObject * watched, QEvent * event ) override;
 
@@ -336,14 +336,14 @@ class ExtensionInfoDialog : public QVLCDialog
 {
 public:
     ExtensionInfoDialog( const QModelIndex &index,
-                         intf_thread_t *p_intf, QWidget *parent );
+                         qt_intf_t *p_intf, QWidget *parent );
 };
 
 class AddonInfoDialog : public QVLCDialog
 {
 public:
     AddonInfoDialog( const QModelIndex &index,
-                     intf_thread_t *p_intf, QWidget *parent );
+                     qt_intf_t *p_intf, QWidget *parent );
 };
 
 #endif

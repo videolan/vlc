@@ -30,15 +30,15 @@ class FirstRun : public QWidget
 {
     Q_OBJECT
     public:
-        static void CheckAndRun( QWidget *_p, intf_thread_t *p_intf )
+        static void CheckAndRun( QWidget *_p, qt_intf_t *p_intf )
         {
             if( var_InheritBool( p_intf, "qt-privacy-ask") )
                 new FirstRun( _p, p_intf );
         }
-        FirstRun( QWidget *, intf_thread_t * );
+        FirstRun( QWidget *, qt_intf_t * );
     private:
         QCheckBox *checkbox, *checkbox2;
-        intf_thread_t *p_intf;
+        qt_intf_t *p_intf;
         void buildPrivDialog();
     private slots:
         void save();

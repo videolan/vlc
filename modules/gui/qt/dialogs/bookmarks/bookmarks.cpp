@@ -34,7 +34,7 @@
 #include <QDialogButtonBox>
 #include <QModelIndexList>
 
-BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
+BookmarksDialog::BookmarksDialog( qt_intf_t *_p_intf ):QVLCFrame( _p_intf )
 {
     setWindowFlags( Qt::Tool );
     setWindowOpacity( var_InheritFloat( p_intf, "qt-opacity" ) );

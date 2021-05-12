@@ -62,7 +62,7 @@ vlc_renderer_item_t * RendererAction::getItem()
     return p_item;
 }
 
-RendererMenu::RendererMenu( QMenu *parent, intf_thread_t *p_intf_ )
+RendererMenu::RendererMenu( QMenu *parent, qt_intf_t *p_intf_ )
     : QMenu( parent ), p_intf( p_intf_ )
 {
     setTitle( qtr("&Renderer") );

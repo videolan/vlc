@@ -47,7 +47,7 @@
 
 #include <assert.h>
 
-HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+HelpDialog::HelpDialog( qt_intf_t *_p_intf ) : QVLCFrame( _p_intf )
 
 {
     setWindowTitle( qtr( "Help" ) );
@@ -77,7 +77,7 @@ HelpDialog::~HelpDialog()
     saveWidgetPosition( "Help" );
 }
 
-AboutDialog::AboutDialog( intf_thread_t *_p_intf)
+AboutDialog::AboutDialog( qt_intf_t *_p_intf)
             : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf ), b_advanced( false )
 {
     /* Build UI */
@@ -204,7 +204,7 @@ const QEvent::Type UpdateDialog::UDOkEvent =
 const QEvent::Type UpdateDialog::UDErrorEvent =
         (QEvent::Type)QEvent::registerEventType();
 
-UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+UpdateDialog::UpdateDialog( qt_intf_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     /* build Ui */
     ui.setupUi( this );

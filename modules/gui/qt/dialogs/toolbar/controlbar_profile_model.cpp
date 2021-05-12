@@ -188,7 +188,7 @@ decltype (ControlbarProfileModel::m_defaults)
         };
 
 
-ControlbarProfileModel::ControlbarProfileModel(intf_thread_t *p_intf, QObject *parent)
+ControlbarProfileModel::ControlbarProfileModel(qt_intf_t *p_intf, QObject *parent)
     : QAbstractListModel(parent),
     m_intf(p_intf)
 {

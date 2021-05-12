@@ -65,7 +65,7 @@ class OpenPanel: public QWidget
 {
     Q_OBJECT
 public:
-    OpenPanel( QWidget *p, intf_thread_t *_p_intf ) : QWidget( p )
+    OpenPanel( QWidget *p, qt_intf_t *_p_intf ) : QWidget( p )
     {
         p_intf = _p_intf;
         context = CONTEXT_INTERACTIVE;
@@ -81,7 +81,7 @@ public:
     virtual void updateContext(int c) { context = c; }
 
 protected:
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     int context;
 
 public slots:
@@ -110,7 +110,7 @@ class FileOpenPanel: public OpenPanel
 {
     Q_OBJECT
 public:
-    FileOpenPanel( QWidget *, intf_thread_t * );
+    FileOpenPanel( QWidget *, qt_intf_t * );
     virtual ~FileOpenPanel();
     void clear() Q_DECL_OVERRIDE;
     virtual void accept() ;
@@ -148,7 +148,7 @@ class NetOpenPanel: public OpenPanel
 {
     Q_OBJECT
 public:
-    NetOpenPanel( QWidget *, intf_thread_t * );
+    NetOpenPanel( QWidget *, qt_intf_t * );
     virtual ~NetOpenPanel();
     void clear()  Q_DECL_OVERRIDE;
     void onFocus() Q_DECL_OVERRIDE;
@@ -172,7 +172,7 @@ class DiscOpenPanel: public OpenPanel
         BRD
     };
 public:
-    DiscOpenPanel( QWidget *, intf_thread_t * );
+    DiscOpenPanel( QWidget *, qt_intf_t * );
     virtual ~DiscOpenPanel();
     void clear() Q_DECL_OVERRIDE;
     virtual void accept();
@@ -197,7 +197,7 @@ class CaptureOpenPanel: public OpenPanel
 {
     Q_OBJECT
 public:
-    CaptureOpenPanel( QWidget *, intf_thread_t * );
+    CaptureOpenPanel( QWidget *, qt_intf_t * );
     virtual ~CaptureOpenPanel();
     void clear() Q_DECL_OVERRIDE;
 private:

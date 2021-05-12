@@ -35,7 +35,7 @@ class ConvertDialog : public QVLCDialog
 {
     Q_OBJECT
 public:
-    ConvertDialog( QWidget *, intf_thread_t *, const QStringList& );
+    ConvertDialog( QWidget *, qt_intf_t *, const QStringList& );
     virtual ~ConvertDialog(){}
 
     QStringList getMrls() {return mrls;}

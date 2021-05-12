@@ -42,7 +42,7 @@ class CompositorWin7 : public QObject, public Compositor
 {
     Q_OBJECT
 public:
-    CompositorWin7(intf_thread_t *p_intf, QObject* parent = nullptr);
+    CompositorWin7(qt_intf_t *p_intf, QObject* parent = nullptr);
 
     virtual ~CompositorWin7();
 
@@ -72,7 +72,7 @@ private slots:
     void onSurfaceSizeChanged(QSizeF size);
 
 private:
-    intf_thread_t *m_intf = nullptr;
+    qt_intf_t *m_intf = nullptr;
 
     MainInterface* m_rootWindow = nullptr;
     QWidget* m_videoWidget = nullptr;

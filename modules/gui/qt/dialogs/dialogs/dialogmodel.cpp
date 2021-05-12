@@ -100,7 +100,7 @@ int DialogErrorModel::count() const
 // DialogModel
 //=================================================================================================
 
-/* explicit */ DialogModel::DialogModel(intf_thread_t * intf, QObject * parent)
+/* explicit */ DialogModel::DialogModel(qt_intf_t * intf, QObject * parent)
     : QObject(parent), m_intf(intf)
 {
     m_model = new DialogErrorModel(this);

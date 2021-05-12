@@ -30,7 +30,7 @@
 #include <QListWidgetItem>
 #include <new>
 
-FingerprintDialog::FingerprintDialog(QWidget *parent, intf_thread_t *p_intf,
+FingerprintDialog::FingerprintDialog(QWidget *parent, qt_intf_t *p_intf,
                                      input_item_t *p_item ) :
     QDialog(parent),
     ui(new Ui::FingerprintDialog), p_r( NULL )

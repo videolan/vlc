@@ -75,7 +75,7 @@ public:
         assert( instance );
         return instance;
     }
-    static DialogsProvider *getInstance( intf_thread_t *p_intf )
+    static DialogsProvider *getInstance( qt_intf_t *p_intf )
     {
         if( !instance )
             instance = new DialogsProvider( p_intf );
@@ -93,7 +93,7 @@ public:
                                 EXT_FILTER_PLAYLIST,
                                 const QUrl& path = QUrl() );
     bool isDying() { return b_isDying; }
-    static QString getDirectoryDialog( intf_thread_t *p_intf);
+    static QString getDirectoryDialog( qt_intf_t *p_intf);
 
     static QString getSaveFileName(QWidget *parent = NULL,
                                     const QString &caption = QString(),
@@ -110,13 +110,13 @@ protected:
     void customEvent( QEvent *);
 
 private:
-    DialogsProvider( intf_thread_t *);
+    DialogsProvider( qt_intf_t *);
     virtual ~DialogsProvider();
     static DialogsProvider *instance;
 
     void loadMediaFile( es_format_category_e category, int filter, const QString& dialogTitle );
 
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
 
     QMenu* popupMenu;
     QMenu* videoPopupMenu;

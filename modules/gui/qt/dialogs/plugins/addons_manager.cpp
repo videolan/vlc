@@ -28,7 +28,7 @@ const QEvent::Type AddonManagerEvent::ChangedEvent =
 const QEvent::Type AddonManagerEvent::DiscoveryEndedEvent =
         (QEvent::Type)QEvent::registerEventType();
 
-AddonsManager::AddonsManager( intf_thread_t *p_intf )
+AddonsManager::AddonsManager( qt_intf_t *p_intf )
 {
     struct addons_manager_owner owner =
     {

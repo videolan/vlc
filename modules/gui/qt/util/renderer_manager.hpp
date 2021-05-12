@@ -52,7 +52,7 @@ public:
         IDLE = -1,
         RUNNING,
     };
-    RendererManager( intf_thread_t * );
+    RendererManager( qt_intf_t * );
     virtual ~RendererManager();
     void customEvent( QEvent * );
 
@@ -73,7 +73,7 @@ private:
                                              vlc_renderer_item_t * );
 
     typedef std::pair<bool, vlc_renderer_item_t *> ItemEntry;
-    intf_thread_t* const p_intf;
+    qt_intf_t* const p_intf;
     const vlc_renderer_item_t *p_selected_item;
     QVector<vlc_renderer_discovery_t*> m_rds;
     QHash<QString, ItemEntry> m_items;

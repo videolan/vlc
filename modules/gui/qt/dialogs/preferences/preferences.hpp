@@ -42,7 +42,7 @@ class PrefsDialog : public QVLCDialog
 {
     Q_OBJECT
 public:
-    PrefsDialog( QWidget *, intf_thread_t * );
+    PrefsDialog( QWidget *, qt_intf_t * );
     virtual ~PrefsDialog();
 #if 0
     /*Called from extended settings, is not used anymore, but could be useful one day*/

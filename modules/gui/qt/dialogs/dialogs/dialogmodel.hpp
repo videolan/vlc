@@ -32,8 +32,11 @@
 // Qt includes
 #include <QAbstractListModel>
 
+#include "qt.hpp"
+
 // Forward declarations
 class DialogModel;
+
 
 //-------------------------------------------------------------------------------------------------
 // DialogId
@@ -130,7 +133,7 @@ public: // Enums
     enum QuestionType { QUESTION_NORMAL, QUESTION_WARNING, QUESTION_CRITICAL };
 
 public:
-    explicit DialogModel(intf_thread_t * intf, QObject * parent = nullptr);
+    explicit DialogModel(qt_intf_t * intf, QObject * parent = nullptr);
 
 public: // Interface
     Q_INVOKABLE void post_login(DialogId dialogId, const QString & username,
@@ -187,7 +190,7 @@ public: // Properties
 private: // Variables
     DialogErrorModel * m_model;
 
-    intf_thread_t * m_intf;
+    qt_intf_t * m_intf;
 };
 
 #endif // DIALOGMODEL_HPP

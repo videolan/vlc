@@ -49,7 +49,7 @@ class ExtensionsDialogProvider : public QObject
 
 private:
     static ExtensionsDialogProvider *instance;
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     extensions_manager_t *p_extensions_manager;
 
 private slots:
@@ -58,11 +58,11 @@ private slots:
     ExtensionDialog* UpdateExtDialog( extension_dialog_t *p_dialog );
 
 public:
-    ExtensionsDialogProvider( intf_thread_t *p_intf,
+    ExtensionsDialogProvider( qt_intf_t *p_intf,
                               extensions_manager_t *p_mgr );
     virtual ~ExtensionsDialogProvider();
 
-    static ExtensionsDialogProvider* getInstance( intf_thread_t *p_intf = NULL,
+    static ExtensionsDialogProvider* getInstance( qt_intf_t *p_intf = NULL,
                                                   extensions_manager_t *p_mgr = NULL )
     {
         if( !instance )
@@ -89,7 +89,7 @@ class ExtensionDialog : public QDialog
 {
     Q_OBJECT
 private:
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     extensions_manager_t *p_extensions_manager;
     extension_t *p_extension;
     extension_dialog_t *p_dialog;
@@ -117,7 +117,7 @@ signals:
     void destroyDialog( extension_dialog_t *p_dialog );
 
 public:
-    ExtensionDialog( intf_thread_t *p_intf,
+    ExtensionDialog( qt_intf_t *p_intf,
                      extensions_manager_t *p_mgr,
                      extension_dialog_t *p_dialog );
     virtual ~ExtensionDialog();

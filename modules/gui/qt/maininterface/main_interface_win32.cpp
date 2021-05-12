@@ -173,7 +173,7 @@ private:
 
 }
 
-WinTaskbarWidget::WinTaskbarWidget(intf_thread_t *_p_intf, QWindow* windowHandle, QObject* parent)
+WinTaskbarWidget::WinTaskbarWidget(qt_intf_t *_p_intf, QWindow* windowHandle, QObject* parent)
     : QObject(parent)
     , p_intf(_p_intf)
     , m_window(windowHandle)
@@ -403,7 +403,7 @@ void WinTaskbarWidget::changeThumbbarButtons( PlayerController::PlayingState i_s
 }
 
 
-MainInterfaceWin32::MainInterfaceWin32(intf_thread_t * _p_intf, QWidget *parent, Qt::WindowFlags flags )
+MainInterfaceWin32::MainInterfaceWin32(qt_intf_t * _p_intf, QWidget *parent, Qt::WindowFlags flags )
     : MainInterface( _p_intf, parent, flags )
 {
     /* Volume keys */
@@ -488,7 +488,7 @@ bool MainInterfaceWin32::nativeEvent(const QByteArray &eventType, void *message,
     return false;
 }
 
-InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(intf_thread_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent)
+InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent)
     : InterfaceWindowHandler(_p_intf, mainInterface, window, parent)
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE

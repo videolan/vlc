@@ -42,7 +42,7 @@ class HelpDialog : public QVLCFrame, public Singleton<HelpDialog>
 {
     Q_OBJECT
 private:
-    HelpDialog( intf_thread_t * );
+    HelpDialog( qt_intf_t * );
     virtual ~HelpDialog();
 
 public slots:
@@ -55,7 +55,7 @@ class AboutDialog : public QVLCDialog, public Singleton<AboutDialog>
 {
     Q_OBJECT
 private:
-    AboutDialog( intf_thread_t * );
+    AboutDialog( qt_intf_t * );
     Ui::aboutWidget ui;
 
 public slots:
@@ -85,7 +85,7 @@ public:
     void updateNotify( bool );
 
 private:
-    UpdateDialog( intf_thread_t * );
+    UpdateDialog( qt_intf_t * );
     virtual ~UpdateDialog();
 
     Ui::updateWidget ui;

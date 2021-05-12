@@ -28,7 +28,7 @@
 
 namespace vlc {
 
-Compositor* Compositor::createCompositor(intf_thread_t *p_intf)
+Compositor* Compositor::createCompositor(qt_intf_t *p_intf)
 {
     bool ret;
     VLC_UNUSED(ret);

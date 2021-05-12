@@ -33,7 +33,7 @@ template <typename T>
 class       Singleton
 {
 public:
-    static T*      getInstance( intf_thread_t *p_intf = NULL )
+    static T*      getInstance( qt_intf_t *p_intf = NULL )
     {
         vlc::threads::mutex_locker lock( m_mutex );
         if ( m_instance == NULL )

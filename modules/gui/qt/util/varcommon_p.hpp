@@ -46,7 +46,7 @@ public:
     {
         assert(false);
     }
-    virtual void reset(intf_thread_t*, bool  = true )
+    virtual void reset(qt_intf_t*, bool  = true )
     {
         assert(false);
     }
@@ -95,10 +95,10 @@ private:
 };
 
 template<>
-struct VLCObjectHolderImpl<intf_thread_t> : public VLCObjectHolder
+struct VLCObjectHolderImpl<qt_intf_t> : public VLCObjectHolder
 {
 public:
-    VLCObjectHolderImpl(intf_thread_t* p_intf)
+    VLCObjectHolderImpl(qt_intf_t* p_intf)
         : m_object(p_intf)
     { }
 
@@ -109,7 +109,7 @@ public:
         return VLC_OBJECT(m_object);
     }
 
-    void reset(intf_thread_t* p_intf, bool) override
+    void reset(qt_intf_t* p_intf, bool) override
     {
         m_object = p_intf;
     }
@@ -119,7 +119,7 @@ public:
     }
 
 private:
-    intf_thread_t* m_object;
+    qt_intf_t* m_object;
 };
 
 template<>

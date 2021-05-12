@@ -42,7 +42,7 @@ class ExtensionsManager : public QObject
 {
     Q_OBJECT
 public:
-    static ExtensionsManager *getInstance( intf_thread_t *_p_intf,
+    static ExtensionsManager *getInstance( qt_intf_t *_p_intf,
                                            QObject *_parent = 0 )
     {
         if( !instance )
@@ -55,7 +55,7 @@ public:
         instance = NULL;
     }
 
-    ExtensionsManager( intf_thread_t *p_intf, QObject *parent );
+    ExtensionsManager( qt_intf_t *p_intf, QObject *parent );
     virtual ~ExtensionsManager();
 
     inline bool isLoaded() { return p_extensions_manager != NULL; }
@@ -84,7 +84,7 @@ private slots:
 
 private:
     static ExtensionsManager* instance;
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     extensions_manager_t *p_extensions_manager;
     ExtensionsDialogProvider *p_edp;
 

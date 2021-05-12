@@ -71,7 +71,7 @@ public:
 private:
     VLMWrapper *vlm;
 
-    VLMDialog( intf_thread_t * );
+    VLMDialog( qt_intf_t * );
     virtual ~VLMDialog();
 
     Ui::Vlm ui;

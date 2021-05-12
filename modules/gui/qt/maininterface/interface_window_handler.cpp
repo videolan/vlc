@@ -20,7 +20,7 @@
 #include <player/player_controller.hpp>
 #include <playlist/playlist_controller.hpp>
 
-InterfaceWindowHandler::InterfaceWindowHandler(intf_thread_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent)
+InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent)
     : QObject(parent)
     , p_intf(_p_intf)
     , m_window(window)

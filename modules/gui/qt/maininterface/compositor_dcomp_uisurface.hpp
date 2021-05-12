@@ -80,7 +80,7 @@ class CompositorDCompositionUISurface : public QObject
 {
     Q_OBJECT
 public:
-    explicit CompositorDCompositionUISurface(intf_thread_t* p_intf,
+    explicit CompositorDCompositionUISurface(qt_intf_t* p_intf,
                                              QWindow* window,
                                              Microsoft::WRL::ComPtr<IDCompositionVisual> dcVisual,
                                              QObject *parent = nullptr);
@@ -114,7 +114,7 @@ private:
     void updatePosition();
 
 private:
-    intf_thread_t* m_intf = nullptr;
+    qt_intf_t* m_intf = nullptr;
 
     class OurD3DCompiler;
     std::shared_ptr<OurD3DCompiler> m_d3dCompiler;

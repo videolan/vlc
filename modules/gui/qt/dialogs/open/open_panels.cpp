@@ -76,7 +76,7 @@ static const char psz_devModule[][8] = { "v4l2", "pvr", "dtv",
 /**************************************************************************
  * Open Files and subtitles                                               *
  **************************************************************************/
-FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
+FileOpenPanel::FileOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf ), dialogBox( NULL )
 {
     /* Classic UI Setup */
@@ -335,7 +335,7 @@ void FileOpenPanel::updateButtons()
 /**************************************************************************
  * Open Discs ( DVD, CD, VCD and similar devices )                        *
  **************************************************************************/
-DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
+DiscOpenPanel::DiscOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
@@ -671,7 +671,7 @@ void DiscOpenPanel::accept()
 /**************************************************************************
  * Open Network streams and URL pages                                     *
  **************************************************************************/
-NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
+NetOpenPanel::NetOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
@@ -748,7 +748,7 @@ void NetOpenPanel::updateMRL()
 /**************************************************************************
  * Open Capture device ( DVB, PVR, V4L, and similar )                     *
  **************************************************************************/
-CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
+CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     isInitialized = false;

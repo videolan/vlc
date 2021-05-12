@@ -38,7 +38,7 @@
 
 ExtensionsManager* ExtensionsManager::instance = NULL;
 
-ExtensionsManager::ExtensionsManager( intf_thread_t *_p_intf, QObject *parent )
+ExtensionsManager::ExtensionsManager( qt_intf_t *_p_intf, QObject *parent )
         : QObject( parent ), p_intf( _p_intf ), p_extensions_manager( NULL )
         , p_edp( NULL )
 {

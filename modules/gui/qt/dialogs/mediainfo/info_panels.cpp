@@ -56,7 +56,7 @@
  * All the usual MetaData are displayed and can be changed.
  **/
 MetaPanel::MetaPanel( QWidget *parent,
-                      intf_thread_t *_p_intf )
+                      qt_intf_t *_p_intf )
                       : QWidget( parent ), p_intf( _p_intf )
 {
     QGridLayout *metaLayout = new QGridLayout( this );

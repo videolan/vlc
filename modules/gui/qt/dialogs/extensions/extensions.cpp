@@ -46,7 +46,7 @@ static void DialogCallback( extension_dialog_t *p_ext_dialog,
                             void *p_data );
 
 
-ExtensionsDialogProvider::ExtensionsDialogProvider( intf_thread_t *_p_intf,
+ExtensionsDialogProvider::ExtensionsDialogProvider( qt_intf_t *_p_intf,
                                                     extensions_manager_t *p_mgr )
         : QObject( NULL ), p_intf( _p_intf ), p_extensions_manager( p_mgr )
 {
@@ -160,7 +160,7 @@ static void DialogCallback( extension_dialog_t *p_ext_dialog,
 }
 
 
-ExtensionDialog::ExtensionDialog( intf_thread_t *_p_intf,
+ExtensionDialog::ExtensionDialog( qt_intf_t *_p_intf,
                                   extensions_manager_t *p_mgr,
                                   extension_dialog_t *_p_dialog )
          : QDialog( NULL ), p_intf( _p_intf ), p_extensions_manager( p_mgr )

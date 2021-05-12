@@ -73,7 +73,7 @@ MsgEvent::MsgEvent( int type, const vlc_log_t *msg, const char *text )
 {
 }
 
-MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
+MessagesDialog::MessagesDialog( qt_intf_t *_p_intf)
                : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Messages" ) );

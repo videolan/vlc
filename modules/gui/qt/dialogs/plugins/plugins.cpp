@@ -74,7 +74,7 @@
 static QPixmap *loadPixmapFromData( char *, int size );
 
 
-PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
+PluginDialog::PluginDialog( qt_intf_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Plugins and extensions" ) );
     setWindowRole( "vlc-plugins" );
@@ -107,7 +107,7 @@ PluginDialog::~PluginDialog()
 
 /* Plugins tab */
 
-PluginTab::PluginTab( intf_thread_t *p_intf_ )
+PluginTab::PluginTab( qt_intf_t *p_intf_ )
         : QVLCFrame( p_intf_ )
 {
     QGridLayout *layout = new QGridLayout( this );
@@ -218,7 +218,7 @@ bool PluginTreeItem::operator< ( const QTreeWidgetItem & other ) const
 }
 
 /* Extensions tab */
-ExtensionTab::ExtensionTab( intf_thread_t *p_intf_ )
+ExtensionTab::ExtensionTab( qt_intf_t *p_intf_ )
         : QVLCFrame( p_intf_ )
 {
     // Layout
@@ -324,7 +324,7 @@ static QIcon iconFromCategory( int type )
 }
 
 /* Add-ons tab */
-AddonsTab::AddonsTab( intf_thread_t *p_intf_ ) : QVLCFrame( p_intf_ )
+AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
 {
     b_localdone = false;
     QSplitter *splitter = new QSplitter( this );
@@ -1354,7 +1354,7 @@ void AddonItemDelegate::editButtonClicked()
 /* "More information" dialog */
 
 ExtensionInfoDialog::ExtensionInfoDialog( const QModelIndex &index,
-                                          intf_thread_t *p_intf,
+                                          qt_intf_t *p_intf,
                                           QWidget *parent )
        : QVLCDialog( parent, p_intf )
 {
@@ -1438,7 +1438,7 @@ ExtensionInfoDialog::ExtensionInfoDialog( const QModelIndex &index,
 
 
 AddonInfoDialog::AddonInfoDialog( const QModelIndex &index,
-                                  intf_thread_t *p_intf, QWidget *parent )
+                                  qt_intf_t *p_intf, QWidget *parent )
        : QVLCDialog( parent, p_intf )
 {
     // Let's be a modal dialog

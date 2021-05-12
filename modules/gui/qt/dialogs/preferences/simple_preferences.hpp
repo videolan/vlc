@@ -83,10 +83,10 @@ class SPrefsCatList : public QWidget
 {
     Q_OBJECT
 public:
-    SPrefsCatList( intf_thread_t *, QWidget * );
+    SPrefsCatList( qt_intf_t *, QWidget * );
     virtual ~SPrefsCatList() {};
 private:
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
 signals:
     void currentItemChanged( int );
 public slots:
@@ -97,7 +97,7 @@ class SPrefsPanel : public QWidget
 {
     Q_OBJECT
 public:
-    SPrefsPanel( intf_thread_t *, QWidget *, int );
+    SPrefsPanel( qt_intf_t *, QWidget *, int );
     virtual ~SPrefsPanel();
     void apply();
 #ifdef _WIN32
@@ -105,7 +105,7 @@ public:
 #endif
 
 private:
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     QList<ConfigControl *> controls;
 
     int number;

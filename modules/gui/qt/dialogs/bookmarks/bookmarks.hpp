@@ -38,7 +38,7 @@ class BookmarksDialog : public QVLCFrame, public Singleton<BookmarksDialog>
 public:
     void toggleVisible();
 private:
-    BookmarksDialog( intf_thread_t * );
+    BookmarksDialog( qt_intf_t * );
     virtual ~BookmarksDialog();
 
     QTreeView *bookmarksList;

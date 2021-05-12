@@ -138,7 +138,7 @@ private:
     HINSTANCE                 m_compiler_dll = nullptr;
 };
 
-CompositorDCompositionUISurface::CompositorDCompositionUISurface(intf_thread_t* p_intf,
+CompositorDCompositionUISurface::CompositorDCompositionUISurface(qt_intf_t* p_intf,
                                                                  QWindow* window,
                                                                  Microsoft::WRL::ComPtr<IDCompositionVisual> dcVisual,
                                                                  QObject* parent)

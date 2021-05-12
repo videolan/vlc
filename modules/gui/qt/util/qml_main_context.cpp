@@ -18,7 +18,7 @@
 #include "qml_main_context.hpp"
 #include "maininterface/main_interface.hpp"
 
-QmlMainContext::QmlMainContext(intf_thread_t* intf, MainInterface* mainInterface, QObject* parent)
+QmlMainContext::QmlMainContext(qt_intf_t* intf, MainInterface* mainInterface, QObject* parent)
     : QObject(parent)
     , m_intf( intf )
     , m_playlist(intf->p_sys->p_playlist)
@@ -31,7 +31,7 @@ MainInterface*QmlMainContext::getMainInterface() const
     return m_mainInterface;
 }
 
-intf_thread_t*QmlMainContext::getIntf() const
+qt_intf_t*QmlMainContext::getIntf() const
 {
     return m_intf;
 }

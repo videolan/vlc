@@ -33,7 +33,7 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 
-ErrorsDialog::ErrorsDialog( intf_thread_t *_p_intf )
+ErrorsDialog::ErrorsDialog( qt_intf_t *_p_intf )
              : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
 {
     setWindowTitle( qtr( "Errors" ) );

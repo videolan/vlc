@@ -34,7 +34,7 @@ class PodcastConfigDialog : public QVLCDialog, public Singleton<PodcastConfigDia
     Q_OBJECT
 
 private:
-    PodcastConfigDialog( intf_thread_t * );
+    PodcastConfigDialog( qt_intf_t * );
     virtual ~PodcastConfigDialog();
 
     Ui::PodcastConfiguration ui;

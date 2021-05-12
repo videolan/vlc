@@ -25,7 +25,7 @@
 #include "playlist/playlist_controller.hpp"
 #include <QSettings>
 
-MediaLib::MediaLib(intf_thread_t *_intf, QObject *_parent)
+MediaLib::MediaLib(qt_intf_t *_intf, QObject *_parent)
     : QObject( _parent )
     , m_intf( _intf )
     , m_ml( vlcMl() )

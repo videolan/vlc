@@ -39,7 +39,7 @@ class PlaylistsDialog : public QVLCFrame, public Singleton<PlaylistsDialog>
     Q_OBJECT
 
 private: // Ctor / dtor
-    PlaylistsDialog(intf_thread_t *);
+    PlaylistsDialog(qt_intf_t *);
 
     ~PlaylistsDialog() override;
 

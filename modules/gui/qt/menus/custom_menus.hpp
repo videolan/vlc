@@ -45,7 +45,7 @@ class RendererMenu : public QMenu
     Q_OBJECT
 
 public:
-    RendererMenu( QMenu *, intf_thread_t * );
+    RendererMenu( QMenu *, qt_intf_t * );
     virtual ~RendererMenu();
     void reset();
 
@@ -62,7 +62,7 @@ private:
                                                      vlc_renderer_item_t* );
     QAction *status;
     QActionGroup *group;
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
 };
 
 

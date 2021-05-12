@@ -33,6 +33,8 @@
 #include <QTreeWidget>
 #include <QSet>
 
+#include "qt.hpp"
+
 /**
  * Notes:
  *
@@ -86,7 +88,7 @@ class PrefsTree : public QTreeWidget
     Q_OBJECT
 
 public:
-    PrefsTree( intf_thread_t *, QWidget *, module_t **, size_t );
+    PrefsTree( qt_intf_t *, QWidget *, module_t **, size_t );
 
     void applyAll();
     void cleanAll();
@@ -98,7 +100,7 @@ private:
     bool filterItems( QTreeWidgetItem *item, const QString &text, Qt::CaseSensitivity cs );
     bool collapseUnselectedItems( QTreeWidgetItem *item );
     void updateLoadedStatus( QTreeWidgetItem *item , QSet<QString> *loaded );
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     bool b_show_only_loaded;
 
 private slots:
@@ -111,14 +113,14 @@ class AdvPrefsPanel : public QWidget
 {
     Q_OBJECT
 public:
-    AdvPrefsPanel( intf_thread_t *, QWidget *, PrefsItemData * );
+    AdvPrefsPanel( qt_intf_t *, QWidget *, PrefsItemData * );
     AdvPrefsPanel( QWidget *);
     virtual ~AdvPrefsPanel();
     void apply();
     void clean();
 private:
     module_config_t *p_config;
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     QList<ConfigControl *> controls;
     QVBoxLayout *global_layout;
 };

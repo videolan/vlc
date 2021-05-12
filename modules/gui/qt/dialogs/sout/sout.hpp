@@ -44,7 +44,7 @@ class SoutDialog : public QWizard
 {
     Q_OBJECT
 public:
-    SoutDialog( QWidget* parent, intf_thread_t *, const QString& chain = "");
+    SoutDialog( QWidget* parent, qt_intf_t *, const QString& chain = "");
     virtual ~SoutDialog(){}
 
     QString getChain(){ return chain; }
@@ -57,7 +57,7 @@ private:
     QString chain;
     QPushButton *okButton;
 
-    intf_thread_t* p_intf;
+    qt_intf_t* p_intf;
 
 public slots:
     void updateChain();

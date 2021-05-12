@@ -75,7 +75,7 @@
  * This class handles resize issues
  **********************************************************************/
 
-VideoWidget::VideoWidget( intf_thread_t *_p_i, QWidget* p_parent )
+VideoWidget::VideoWidget( qt_intf_t *_p_i, QWidget* p_parent )
             : QFrame( p_parent ) , p_intf( _p_i )
 {
     /* Set the policy to expand in both directions */
@@ -395,7 +395,7 @@ void VideoWidget::release( void )
 }
 
 
-CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
+CoverArtLabel::CoverArtLabel( QWidget *parent, qt_intf_t *_p_i )
     : QLabel( parent ), p_intf( _p_i ), p_item( NULL )
 {
     setContextMenuPolicy( Qt::ActionsContextMenu );

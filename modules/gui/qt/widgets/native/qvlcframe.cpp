@@ -27,7 +27,7 @@ void QVLCTools::saveWidgetPosition(QSettings *settings, QWidget *widget)
     settings->setValue("geometry", widget->saveGeometry());
 }
 
-void QVLCTools::saveWidgetPosition(intf_thread_t *p_intf,
+void QVLCTools::saveWidgetPosition(qt_intf_t *p_intf,
                                    const QString& configName,
                                    QWidget *widget)
 {
@@ -51,7 +51,7 @@ bool QVLCTools::restoreWidgetPosition(QSettings *settings, QWidget *widget,
     return false;
 }
 
-bool QVLCTools::restoreWidgetPosition(intf_thread_t *p_intf,
+bool QVLCTools::restoreWidgetPosition(qt_intf_t *p_intf,
                                       const QString& configName,
                                       QWidget *widget, QSize defSize,
                                       QPoint defPos)

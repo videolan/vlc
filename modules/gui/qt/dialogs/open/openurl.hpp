@@ -47,7 +47,7 @@ private slots:
     void play();
 
 public:
-    OpenUrlDialog( intf_thread_t *, bool bClipboard = true );
+    OpenUrlDialog( qt_intf_t *, bool bClipboard = true );
     virtual ~OpenUrlDialog() {}
 
     QString url() const;

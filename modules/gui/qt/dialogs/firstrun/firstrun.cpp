@@ -28,7 +28,7 @@
 #include <QLabel>
 #include <QDialogButtonBox>
 
-FirstRun::FirstRun( QWidget *_p, intf_thread_t *_p_intf  )
+FirstRun::FirstRun( QWidget *_p, qt_intf_t *_p_intf  )
          : QWidget( _p ), p_intf( _p_intf )
 {
     msg_Dbg( p_intf, "Boring first Run Wizard" );

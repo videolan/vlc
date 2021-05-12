@@ -79,7 +79,7 @@ void CompositorWin7::window_set_fullscreen(struct vout_window_t * p_wnd, const c
 }
 
 
-CompositorWin7::CompositorWin7(intf_thread_t *p_intf, QObject* parent)
+CompositorWin7::CompositorWin7(qt_intf_t *p_intf, QObject* parent)
     : QObject(parent)
     , m_intf(p_intf)
 {

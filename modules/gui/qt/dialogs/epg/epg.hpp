@@ -40,7 +40,7 @@ protected:
     virtual void showEvent(QShowEvent * event) Q_DECL_OVERRIDE;
 
 private:
-    EpgDialog( intf_thread_t * );
+    EpgDialog( qt_intf_t * );
     virtual ~EpgDialog();
 
     EPGWidget *epg;

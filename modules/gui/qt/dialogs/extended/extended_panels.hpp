@@ -48,11 +48,11 @@ class ExtVideo: public QObject
     Q_OBJECT
     friend class ExtendedDialog;
 public:
-    ExtVideo( struct intf_thread_t *, QTabWidget * );
+    ExtVideo( qt_intf_t *, QTabWidget * );
 private:
     Ui::ExtVideoWidget ui;
     QSignalMapper* filterMapper;
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     void initComboBoxItems( QObject* );
     void setWidgetValue( QObject* );
     void clean();
@@ -74,12 +74,12 @@ class ExtV4l2 : public QWidget
 {
     Q_OBJECT
 public:
-    ExtV4l2( intf_thread_t *, QWidget * );
+    ExtV4l2( qt_intf_t *, QWidget * );
 
     void showEvent( QShowEvent *event ) Q_DECL_OVERRIDE;
 
 private:
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     QGroupBox *box;
     QLabel *help;
 
@@ -105,7 +105,7 @@ public:
         float f_resolution; // resolution
         float f_visual_multiplier; // only for display (f_value *)
     } slider_data_t;
-    FilterSliderData( QObject *parent, intf_thread_t *p_intf,
+    FilterSliderData( QObject *parent, qt_intf_t *p_intf,
                       QSlider *slider,
                       QLabel *valueLabel, QLabel *nameLabel,
                       const slider_data_t *p_data );
@@ -119,7 +119,7 @@ protected:
     QLabel *valueLabel;
     QLabel *nameLabel;
     const slider_data_t *p_data;
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
 
 public slots:
     virtual void onValueChanged( int i );
@@ -134,7 +134,7 @@ class AudioFilterControlWidget : public QWidget
     Q_OBJECT
 
 public:
-    AudioFilterControlWidget( intf_thread_t *, QWidget *, const char *name );
+    AudioFilterControlWidget( qt_intf_t *, QWidget *, const char *name );
 
 protected:
     virtual void build();
@@ -142,7 +142,7 @@ protected:
     QVector<FilterSliderData::slider_data_t> controls;
     QVector<FilterSliderData *> sliderDatas;
     QGroupBox *slidersBox;
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     QString name; // filter's module name
     int i_smallfont;
 
@@ -158,7 +158,7 @@ class EqualizerSliderData : public FilterSliderData
     Q_OBJECT
 
 public:
-    EqualizerSliderData( QObject *parent, intf_thread_t *p_intf,
+    EqualizerSliderData( QObject *parent, qt_intf_t *p_intf,
                          QSlider *slider,
                          QLabel *valueLabel, QLabel *nameLabel,
                          const slider_data_t *p_data, int index );
@@ -178,7 +178,7 @@ class Equalizer: public AudioFilterControlWidget
     Q_OBJECT
 
 public:
-    Equalizer( intf_thread_t *, QWidget * );
+    Equalizer( qt_intf_t *, QWidget * );
 
 protected:
     void build() Q_DECL_OVERRIDE;
@@ -197,7 +197,7 @@ class Compressor: public AudioFilterControlWidget
     Q_OBJECT
 
 public:
-    Compressor( intf_thread_t *, QWidget * );
+    Compressor( qt_intf_t *, QWidget * );
 };
 
 class Spatializer: public AudioFilterControlWidget
@@ -205,7 +205,7 @@ class Spatializer: public AudioFilterControlWidget
     Q_OBJECT
 
 public:
-    Spatializer( intf_thread_t *, QWidget * );
+    Spatializer( qt_intf_t *, QWidget * );
 };
 
 class StereoWidener: public AudioFilterControlWidget
@@ -213,7 +213,7 @@ class StereoWidener: public AudioFilterControlWidget
     Q_OBJECT
 
 public:
-    StereoWidener( intf_thread_t *, QWidget * );
+    StereoWidener( qt_intf_t *, QWidget * );
 };
 
 class PitchShifter: public AudioFilterControlWidget
@@ -221,7 +221,7 @@ class PitchShifter: public AudioFilterControlWidget
     Q_OBJECT
 
 public:
-    PitchShifter( intf_thread_t *, QWidget * );
+    PitchShifter( qt_intf_t *, QWidget * );
 };
 
 class SyncWidget : public QWidget
@@ -244,10 +244,10 @@ class SyncControls : public QWidget
     Q_OBJECT
     friend class ExtendedDialog;
 public:
-    SyncControls( intf_thread_t *, QWidget * );
+    SyncControls( qt_intf_t *, QWidget * );
     virtual ~SyncControls();
 private:
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     SyncWidget *AVSpin;
     SyncWidget *subsSpin;
     SyncWidget *secondarySubsSpin;

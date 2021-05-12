@@ -67,7 +67,7 @@
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
-DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
+DialogsProvider::DialogsProvider( qt_intf_t *_p_intf ) :
                                   QObject( NULL ), p_intf( _p_intf ),
                                   popupMenu( NULL ),
                                   videoPopupMenu( NULL ),
@@ -586,7 +586,7 @@ void DialogsProvider::openUrlDialog()
  * pl helps you to choose from playlist or media library,
  * go to start or enqueue
  **/
-static void openDirectory( intf_thread_t *p_intf, bool go )
+static void openDirectory( qt_intf_t *p_intf, bool go )
 {
     QString uri = DialogsProvider::getDirectoryDialog( p_intf );
     if( !uri.isEmpty() )
@@ -596,7 +596,7 @@ static void openDirectory( intf_thread_t *p_intf, bool go )
     }
 }
 
-QString DialogsProvider::getDirectoryDialog( intf_thread_t *p_intf )
+QString DialogsProvider::getDirectoryDialog( qt_intf_t *p_intf )
 {
     const QStringList schemes = QStringList(QStringLiteral("file"));
     QUrl dirurl = QFileDialog::getExistingDirectoryUrl( NULL,

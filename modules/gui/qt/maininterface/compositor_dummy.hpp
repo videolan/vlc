@@ -34,7 +34,7 @@ class CompositorDummy : public QObject, public Compositor
 {
     Q_OBJECT
 public:
-    CompositorDummy(intf_thread_t *p_intf, QObject* parent = nullptr);
+    CompositorDummy(qt_intf_t *p_intf, QObject* parent = nullptr);
     virtual ~CompositorDummy() = default;
 
     virtual MainInterface *makeMainInterface() override;
@@ -45,7 +45,7 @@ public:
     Type type() const override;
 
 protected:
-    intf_thread_t *m_intf;
+    qt_intf_t *m_intf;
 
     MainInterface* m_rootWindow = nullptr;
     QQuickWidget* m_qmlWidget = nullptr;

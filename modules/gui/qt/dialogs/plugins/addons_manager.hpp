@@ -63,7 +63,7 @@ class AddonsManager : public QObject, public Singleton<AddonsManager>
     friend class Singleton<AddonsManager>;
 
 public:
-    AddonsManager( intf_thread_t * );
+    AddonsManager( qt_intf_t * );
     virtual ~AddonsManager();
     static void addonFoundCallback( addons_manager_t *, addon_entry_t * );
     static void addonsDiscoveryEndedCallback( addons_manager_t * );

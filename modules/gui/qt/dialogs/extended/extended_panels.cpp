@@ -75,7 +75,7 @@ static bool filterIsPresent( const QString &filters, const QString &filter )
     return false;
 }
 
-static const char* GetVFilterType( struct intf_thread_t *p_intf, const char *psz_name )
+static const char* GetVFilterType( qt_intf_t *p_intf, const char *psz_name )
 {
     module_t *p_obj = module_find( psz_name );
     if( !p_obj )
@@ -113,7 +113,7 @@ static QString OptionFromWidgetName( QObject *obj )
         .toLower();
 }
 
-static inline void setup_vfilter( intf_thread_t *p_intf, const char* psz_name, QWidget *widget )
+static inline void setup_vfilter( qt_intf_t *p_intf, const char* psz_name, QWidget *widget )
 {
     const char *psz_filter_type = GetVFilterType( p_intf, psz_name );
     if( psz_filter_type == NULL )
@@ -147,7 +147,7 @@ static inline void setup_vfilter( intf_thread_t *p_intf, const char* psz_name, Q
     setWidgetValue( ui.widget ); \
     CONNECT( ui.widget, signal, this, updateFilterOptions() );
 
-ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
+ExtVideo::ExtVideo( qt_intf_t *_p_intf, QTabWidget *_parent ) :
             QObject( _parent ), p_intf( _p_intf )
 {
     ui.setupUi( _parent );
@@ -296,7 +296,7 @@ void ExtVideo::clean()
     ui.cropRightPx->setValue( 0 );
 }
 
-static QString ChangeFiltersString( struct intf_thread_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add )
+static QString ChangeFiltersString( qt_intf_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add )
 {
     char* psz_chain = var_GetString( p_intf, psz_filter_type );
 
@@ -319,7 +319,7 @@ static QString ChangeFiltersString( struct intf_thread_t *p_intf, const char *ps
     return list.join( ":" );
 }
 
-static void UpdateVFiltersString( struct intf_thread_t *p_intf,
+static void UpdateVFiltersString( qt_intf_t *p_intf,
                                   const char *psz_filter_type, const char *value )
 {
     /* Try to set non splitter filters on the fly */
@@ -601,7 +601,7 @@ void ExtVideo::updateFilterOptions()
  * v4l2 controls
  **********************************************************************/
 
-ExtV4l2::ExtV4l2( intf_thread_t *_p_intf, QWidget *_parent )
+ExtV4l2::ExtV4l2( qt_intf_t *_p_intf, QWidget *_parent )
     : QWidget( _parent ), p_intf( _p_intf ), box( NULL )
 {
     QVBoxLayout *layout = new QVBoxLayout( this );
@@ -828,7 +828,7 @@ FilterSliderData::FilterSliderData( QObject *parent, QSlider *_slider ) :
 }
 
 FilterSliderData::FilterSliderData( QObject *parent,
-                                    intf_thread_t *_p_intf,
+                                    qt_intf_t *_p_intf,
                                     QSlider *_slider,
                                     QLabel *_label, QLabel *_nameLabel,
                                     const slider_data_t *_p_data ):
@@ -896,7 +896,7 @@ void FilterSliderData::writeToConfig()
 }
 
 AudioFilterControlWidget::AudioFilterControlWidget
-( intf_thread_t *_p_intf, QWidget *parent, const char *_name ) :
+( qt_intf_t *_p_intf, QWidget *parent, const char *_name ) :
     QWidget( parent ), slidersBox( NULL ), p_intf( _p_intf ), name( _name ),
     i_smallfont(0)
 {}
@@ -970,7 +970,7 @@ void AudioFilterControlWidget::enable( bool b_enable )
  * Equalizer
  **********************************************************************/
 
-EqualizerSliderData::EqualizerSliderData( QObject *parent, intf_thread_t *_p_intf,
+EqualizerSliderData::EqualizerSliderData( QObject *parent, qt_intf_t *_p_intf,
                                           QSlider *slider, QLabel *_label,
                                           QLabel *_nameLabel, const slider_data_t *_p_data,
                                           int _index )
@@ -1073,7 +1073,7 @@ void EqualizerSliderData::writeToConfig()
     }
 }
 
-Equalizer::Equalizer( intf_thread_t *p_intf, QWidget *parent )
+Equalizer::Equalizer( qt_intf_t *p_intf, QWidget *parent )
     : AudioFilterControlWidget( p_intf, parent, "equalizer" )
 {
     i_smallfont = -3;
@@ -1255,7 +1255,7 @@ void Equalizer::enable2Pass( bool b_enable )
  * Dynamic range compressor
  **********************************************************************/
 
-Compressor::Compressor( intf_thread_t *p_intf, QWidget *parent )
+Compressor::Compressor( qt_intf_t *p_intf, QWidget *parent )
     : AudioFilterControlWidget( p_intf, parent, "compressor" )
 {
     i_smallfont = -2;
@@ -1277,7 +1277,7 @@ Compressor::Compressor( intf_thread_t *p_intf, QWidget *parent )
  * Spatializer
  **********************************************************************/
 
-Spatializer::Spatializer( intf_thread_t *p_intf, QWidget *parent )
+Spatializer::Spatializer( qt_intf_t *p_intf, QWidget *parent )
     : AudioFilterControlWidget( p_intf, parent, "spatializer" )
 {
     i_smallfont = -1;
@@ -1297,7 +1297,7 @@ Spatializer::Spatializer( intf_thread_t *p_intf, QWidget *parent )
  * Spatializer
  **********************************************************************/
 
-StereoWidener::StereoWidener( intf_thread_t *p_intf, QWidget *parent )
+StereoWidener::StereoWidener( qt_intf_t *p_intf, QWidget *parent )
     : AudioFilterControlWidget( p_intf, parent, "stereo_widen" )
 {
     i_smallfont = -1;
@@ -1316,7 +1316,7 @@ StereoWidener::StereoWidener( intf_thread_t *p_intf, QWidget *parent )
  * Advanced
  **********************************************************************/
 
-PitchShifter::PitchShifter( intf_thread_t *p_intf, QWidget *parent )
+PitchShifter::PitchShifter( qt_intf_t *p_intf, QWidget *parent )
     : AudioFilterControlWidget( p_intf, parent, "scaletempo_pitch" )
 {
     i_smallfont = -1;
@@ -1367,7 +1367,7 @@ void SyncWidget::setValue( double d )
     spinBox.setValue( d );
 }
 
-SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent )
+SyncControls::SyncControls( qt_intf_t *_p_intf, QWidget *_parent )
     : QWidget( _parent )
     , p_intf( _p_intf )
     , m_SubsDelayCfgFactor(p_intf, SUBSDELAY_CFG_FACTOR)

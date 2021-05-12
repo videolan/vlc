@@ -23,10 +23,11 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_interface.h>
 
 #include <QWindow>
 #include <QObject>
+
+#include "qt.hpp"
 
 class MainInterface;
 
@@ -34,7 +35,7 @@ class VideoWindowHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit VideoWindowHandler(intf_thread_t *intf, MainInterface* mainInterace, QObject *parent = nullptr);
+    explicit VideoWindowHandler(qt_intf_t *intf, MainInterface* mainInterace, QObject *parent = nullptr);
 
 public:
     void setWindow(QWindow* window);
@@ -57,7 +58,7 @@ protected slots:
     void setVideoOnTop( bool );
 
 private:
-    intf_thread_t *m_intf = nullptr;
+    qt_intf_t *m_intf = nullptr;
     MainInterface* m_interface = nullptr;
     QWindow* m_window = nullptr;
 

@@ -37,7 +37,7 @@
 #include <QPushButton>
 #include <vlc_modules.h>
 
-ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf )
+ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )
                : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
 {
 #ifdef __APPLE__

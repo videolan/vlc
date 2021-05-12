@@ -46,7 +46,7 @@ class QVLCTools
        */
        static void saveWidgetPosition( QSettings *settings, QWidget *widget);
 
-       static void saveWidgetPosition( intf_thread_t *p_intf,
+       static void saveWidgetPosition( qt_intf_t *p_intf,
                                        const QString& configName,
                                        QWidget *widget);
 
@@ -59,7 +59,7 @@ class QVLCTools
                                            QSize defSize = QSize( 0, 0 ),
                                            QPoint defPos = QPoint( 0, 0 ));
 
-       static bool restoreWidgetPosition( intf_thread_t *p_intf,
+       static bool restoreWidgetPosition( qt_intf_t *p_intf,
                                            const QString& configName,
                                            QWidget *widget,
                                            QSize defSize = QSize( 0, 0 ),
@@ -69,7 +69,7 @@ class QVLCTools
 class QVLCFrame : public QWidget
 {
 public:
-    QVLCFrame( intf_thread_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )
+    QVLCFrame( qt_intf_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )
     {};
     virtual ~QVLCFrame()   {};
 
@@ -79,7 +79,7 @@ public:
         else show();
     }
 protected:
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
 
     void restoreWidgetPosition( const QString& name,
                        QSize defSize = QSize( 1, 1 ),
@@ -107,7 +107,7 @@ protected:
 class QVLCDialog : public QDialog
 {
 public:
-    QVLCDialog( QWidget* parent, intf_thread_t *_p_intf ) :
+    QVLCDialog( QWidget* parent, qt_intf_t *_p_intf ) :
                                     QDialog( parent ), p_intf( _p_intf )
     {
         setWindowFlags( Qt::Dialog|Qt::WindowMinMaxButtonsHint|
@@ -121,7 +121,7 @@ public:
     }
 
 protected:
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
 
     virtual void cancel()
     {
@@ -137,7 +137,7 @@ protected:
 class QVLCMW : public QMainWindow
 {
 public:
-    QVLCMW( intf_thread_t *_p_intf,QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags() )
+    QVLCMW( qt_intf_t *_p_intf,QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags() )
         : QMainWindow( parent, flags )
         , p_intf( _p_intf )
     {}
@@ -148,7 +148,7 @@ public:
         else show();
     }
 protected:
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     QSize mainSize;
 
     void readSettings( const QString& name, QSize defSize )

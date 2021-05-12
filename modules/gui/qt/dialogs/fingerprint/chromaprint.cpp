@@ -26,7 +26,7 @@
 #include <vlc_fingerprinter.h>
 #include <vlc_modules.h>
 
-Chromaprint::Chromaprint( intf_thread_t *_p_intf ) : p_intf( _p_intf )
+Chromaprint::Chromaprint( qt_intf_t *_p_intf ) : p_intf( _p_intf )
 {
     Q_ASSERT( p_intf );
     p_fingerprinter = fingerprinter_Create( VLC_OBJECT( p_intf ) );

@@ -38,7 +38,7 @@ public:
     /*void addWarning( QString, QString );*/
 private:
     virtual ~ErrorsDialog() {}
-    ErrorsDialog( intf_thread_t * );
+    ErrorsDialog( qt_intf_t * );
     void add( bool, const QString&, const QString& );
 
     QCheckBox *stopShowing;

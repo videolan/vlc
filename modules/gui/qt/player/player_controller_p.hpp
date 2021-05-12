@@ -33,7 +33,7 @@ public:
     PlayerController * const q_ptr;
 
 public:
-    PlayerControllerPrivate(PlayerController* playercontroller, intf_thread_t* p_intf);
+    PlayerControllerPrivate(PlayerController* playercontroller, qt_intf_t* p_intf);
     PlayerControllerPrivate() = delete;
     ~PlayerControllerPrivate();
 
@@ -62,7 +62,7 @@ public:
     }
 
 public:
-    intf_thread_t           *p_intf;
+    qt_intf_t           *p_intf;
     vlc_player_t            *m_player;
 
     //callbacks

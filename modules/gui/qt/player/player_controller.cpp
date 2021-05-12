@@ -1004,7 +1004,7 @@ static const struct vlc_player_timer_cbs player_timer_cbs = {
     on_player_timer_discontinuity,
 };
 
-PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontroller, intf_thread_t *p_intf)
+PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontroller, qt_intf_t *p_intf)
     : q_ptr(playercontroller)
     , p_intf(p_intf)
     , m_player(p_intf->p_sys->p_player)
@@ -1043,7 +1043,7 @@ PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontrol
     m_fullscreen = vlc_player_vout_IsFullscreen( m_player );
 }
 
-PlayerController::PlayerController( intf_thread_t *_p_intf )
+PlayerController::PlayerController( qt_intf_t *_p_intf )
     : QObject(NULL)
     , d_ptr( new PlayerControllerPrivate(this, _p_intf) )
 {

@@ -64,11 +64,11 @@ class FileDestBox: public VirtualDestBox
 {
     Q_OBJECT
     public:
-        FileDestBox( QWidget *_parent = NULL, intf_thread_t * = NULL );
+        FileDestBox( QWidget *_parent = NULL, qt_intf_t * = NULL );
         QString getMRL( const QString& ) Q_DECL_OVERRIDE;
     private:
         QLineEdit *fileEdit;
-        intf_thread_t *p_intf;
+        qt_intf_t *p_intf;
     private slots:
         void fileBrowse();
 };

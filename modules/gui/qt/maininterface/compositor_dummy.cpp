@@ -23,7 +23,7 @@
 
 namespace vlc {
 
-CompositorDummy::CompositorDummy(intf_thread_t *p_intf, QObject* parent)
+CompositorDummy::CompositorDummy(qt_intf_t *p_intf, QObject* parent)
     : QObject(parent)
     , m_intf(p_intf)
 {

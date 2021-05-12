@@ -48,7 +48,7 @@
 
 #include <vlc_modules.h>
 
-PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
+PrefsDialog::PrefsDialog( QWidget *parent, qt_intf_t *_p_intf )
             : QVLCDialog( parent, _p_intf )
 {
     QGridLayout *main_layout = new QGridLayout( this );

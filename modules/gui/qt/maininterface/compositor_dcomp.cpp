@@ -124,7 +124,7 @@ void CompositorDirectComposition::window_set_fullscreen(struct vout_window_t * p
     that->m_videoWindowHandler->requestVideoFullScreen(id);
 }
 
-CompositorDirectComposition::CompositorDirectComposition( intf_thread_t* p_intf,  QObject *parent)
+CompositorDirectComposition::CompositorDirectComposition( qt_intf_t* p_intf,  QObject *parent)
     : QObject(parent)
     , m_intf(p_intf)
 {

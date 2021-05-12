@@ -39,7 +39,7 @@
 
 OpenDialog *OpenDialog::instance = NULL;
 
-OpenDialog* OpenDialog::getInstance( QWidget *parent, intf_thread_t *p_intf,
+OpenDialog* OpenDialog::getInstance( QWidget *parent, qt_intf_t *p_intf,
         bool b_rawInstance, int _action_flag, bool b_selectMode )
 {
     /* Creation */
@@ -61,7 +61,7 @@ OpenDialog* OpenDialog::getInstance( QWidget *parent, intf_thread_t *p_intf,
 }
 
 OpenDialog::OpenDialog( QWidget *parent,
-                        intf_thread_t *_p_intf,
+                        qt_intf_t *_p_intf,
                         bool b_selectMode,
                         int _action_flag )  :  QVLCDialog( parent, _p_intf )
 {

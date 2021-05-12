@@ -45,7 +45,7 @@ class MediaLib : public QObject
     Q_PROPERTY(bool idle READ idle NOTIFY idleChanged)
 
 public:
-    MediaLib(intf_thread_t* _intf, QObject* _parent = nullptr );
+    MediaLib(qt_intf_t* _intf, QObject* _parent = nullptr );
 
     Q_INVOKABLE void addToPlaylist(const MLItemId &itemId, const QStringList* options = nullptr);
     Q_INVOKABLE void addToPlaylist(const QString& mrl, const QStringList* options = nullptr);
@@ -81,7 +81,7 @@ private:
     static void onMediaLibraryEvent( void* data, const vlc_ml_event_t* event );
 
 private:
-    intf_thread_t* m_intf;
+    qt_intf_t* m_intf;
 
     bool m_idle = false;
     bool m_discoveryPending = false;

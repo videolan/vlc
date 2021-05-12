@@ -43,7 +43,7 @@
 #include "qt.hpp"
 #include "player/player_controller.hpp"
 
-EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
+EpgDialog::EpgDialog( qt_intf_t *_p_intf ): QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Program Guide" ) );
 

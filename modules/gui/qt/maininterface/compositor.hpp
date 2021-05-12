@@ -28,6 +28,8 @@
 
 #include <QQuickView>
 
+#include "qt.hpp"
+
 class MainInterface;
 
 namespace vlc {
@@ -51,7 +53,7 @@ public:
     virtual Type type() const = 0;
 
     //factory
-    static Compositor* createCompositor(intf_thread_t *p_intf);
+    static Compositor* createCompositor(qt_intf_t *p_intf);
 };
 
 

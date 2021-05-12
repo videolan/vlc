@@ -98,7 +98,7 @@ static int IntfRaiseMainCB( vlc_object_t *p_this, const char *psz_variable,
 const QEvent::Type MainInterface::ToolbarsNeedRebuild =
         (QEvent::Type)QEvent::registerEventType();
 
-MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::WindowFlags flags)
+MainInterface::MainInterface(qt_intf_t *_p_intf , QWidget* parent, Qt::WindowFlags flags)
     : QVLCMW( _p_intf, parent, flags )
 {
     /* Variables initialisation */
@@ -759,7 +759,7 @@ VLCVarChoiceModel* MainInterface::getExtraInterfaces()
 static int PopupMenuCB( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t new_val, void *param )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)param;
+    qt_intf_t *p_intf = (qt_intf_t *)param;
 
     if( p_intf->pf_show_dialog )
     {
@@ -776,7 +776,7 @@ static int PopupMenuCB( vlc_object_t *, const char *,
 static int IntfShowCB( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void *param )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)param;
+    qt_intf_t *p_intf = (qt_intf_t *)param;
     p_intf->p_sys->p_mi->emitShow();
 
     return VLC_SUCCESS;
@@ -788,7 +788,7 @@ static int IntfShowCB( vlc_object_t *, const char *,
 static int IntfRaiseMainCB( vlc_object_t *, const char *,
                             vlc_value_t, vlc_value_t, void *param )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)param;
+    qt_intf_t *p_intf = (qt_intf_t *)param;
     p_intf->p_sys->p_mi->emitRaise();
 
     return VLC_SUCCESS;
@@ -800,7 +800,7 @@ static int IntfRaiseMainCB( vlc_object_t *, const char *,
 static int IntfBossCB( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void *param )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)param;
+    qt_intf_t *p_intf = (qt_intf_t *)param;
     p_intf->p_sys->p_mi->emitBoss();
 
     return VLC_SUCCESS;

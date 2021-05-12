@@ -28,13 +28,14 @@
 #include <QString>
 #include <vlc_fingerprinter.h>
 #include <vlc_interface.h>
+#include "qt.hpp"
 
 class Chromaprint : public QObject
 {
     Q_OBJECT
 
 public:
-    Chromaprint( intf_thread_t *p_intf = NULL );
+    Chromaprint( qt_intf_t *p_intf = NULL );
     virtual ~Chromaprint();
     bool enqueue( input_item_t *p_item );
     static int results_available( vlc_object_t *p_this, const char *,
@@ -48,7 +49,7 @@ signals:
 
 private:
     void finish() { emit finished(); }
-    intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     fingerprinter_thread_t *p_fingerprinter;
 };
 

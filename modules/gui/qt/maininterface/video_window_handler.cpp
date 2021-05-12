@@ -23,7 +23,7 @@
 
 #include <vlc_vout_window.h>
 
-VideoWindowHandler::VideoWindowHandler(intf_thread_t* intf, MainInterface* mainInterace,QObject *parent)
+VideoWindowHandler::VideoWindowHandler(qt_intf_t* intf, MainInterface* mainInterace,QObject *parent)
     : QObject(parent)
     , m_intf(intf)
     , m_interface(mainInterace)

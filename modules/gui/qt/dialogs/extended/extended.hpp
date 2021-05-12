@@ -45,7 +45,7 @@ public:
     void showTab( int i );
     int currentTab();
 private:
-    ExtendedDialog( intf_thread_t * );
+    ExtendedDialog( qt_intf_t * );
     virtual ~ExtendedDialog();
 
     SyncControls *syncW;

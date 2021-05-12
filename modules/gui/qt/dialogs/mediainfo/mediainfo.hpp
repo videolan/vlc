@@ -34,7 +34,7 @@ class MediaInfoDialog : public QVLCFrame, public Singleton<MediaInfoDialog>
 {
     Q_OBJECT
 public:
-    MediaInfoDialog( intf_thread_t *,
+    MediaInfoDialog( qt_intf_t *,
                      input_item_t * input = NULL );
 
     enum panel

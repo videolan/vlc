@@ -49,7 +49,7 @@
 /*********************************************************************
  * The Tree
  *********************************************************************/
-PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent,
+PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
                       module_t **p_list, size_t count ) :
                             QTreeWidget( _parent ), p_intf( _p_intf )
 {
@@ -597,7 +597,7 @@ AdvPrefsPanel::AdvPrefsPanel( QWidget *_parent ) : QWidget( _parent )
     p_config = NULL;
 }
 
-AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
+AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                         PrefsItemData * data ) :
                         QWidget( _parent ), p_intf( _p_intf )
 {

@@ -77,7 +77,7 @@ void registerAnonymousType( const char *uri, int versionMajor )
 } // anonymous namespace
 
 
-MainUI::MainUI(intf_thread_t *p_intf, MainInterface *mainInterface, QWindow* interfaceWindow,  QObject *parent)
+MainUI::MainUI(qt_intf_t *p_intf, MainInterface *mainInterface, QWindow* interfaceWindow,  QObject *parent)
     : QObject(parent)
     , m_intf(p_intf)
     , m_mainInterface(mainInterface)

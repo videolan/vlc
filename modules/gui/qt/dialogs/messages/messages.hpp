@@ -42,7 +42,7 @@ class MessagesDialog : public QVLCFrame, public Singleton<MessagesDialog>
 {
     Q_OBJECT
 private:
-    MessagesDialog( intf_thread_t * );
+    MessagesDialog( qt_intf_t * );
     virtual ~MessagesDialog();
 
     Ui::messagesPanelWidget ui;

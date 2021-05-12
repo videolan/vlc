@@ -48,7 +48,7 @@ class MetaPanel: public QWidget
 {
     Q_OBJECT
 public:
-    MetaPanel( QWidget *, struct intf_thread_t * );
+    MetaPanel( QWidget *, qt_intf_t * );
     void saveMeta();
 
     bool isInEditMode();
@@ -56,7 +56,7 @@ public:
 
 private:
     input_item_t *p_input;
-    struct intf_thread_t *p_intf;
+    qt_intf_t *p_intf;
     bool b_inEditMode;
 
     QLineEdit *title_text;

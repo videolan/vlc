@@ -60,7 +60,7 @@ void QmlGlobalMenu::popup(QPoint pos)
     if (!m_ctx)
         return;
 
-    intf_thread_t* p_intf = m_ctx->getIntf();
+    qt_intf_t* p_intf = m_ctx->getIntf();
     if (!p_intf)
         return;
 
@@ -156,7 +156,7 @@ void QmlMenuBar::popupMenuCommon( QQuickItem* button, std::function<void(QMenu*)
     if (!m_ctx || !m_menubar || !button)
         return;
 
-    intf_thread_t* p_intf = m_ctx->getIntf();
+    qt_intf_t* p_intf = m_ctx->getIntf();
     if (!p_intf)
         return;
 
@@ -175,7 +175,7 @@ void QmlMenuBar::popupMenuCommon( QQuickItem* button, std::function<void(QMenu*)
 void QmlMenuBar::popupMediaMenu( QQuickItem* button )
 {
     popupMenuCommon(button, [this](QMenu* menu) {
-        intf_thread_t* p_intf = m_ctx->getIntf();
+        qt_intf_t* p_intf = m_ctx->getIntf();
         FileMenu( p_intf, menu , p_intf->p_sys->p_mi );
     });
 }
@@ -219,7 +219,7 @@ void QmlMenuBar::popupToolsMenu( QQuickItem* button )
 void QmlMenuBar::popupViewMenu( QQuickItem* button )
 {
     popupMenuCommon(button, [this](QMenu* menu) {
-        intf_thread_t* p_intf = m_ctx->getIntf();
+        qt_intf_t* p_intf = m_ctx->getIntf();
         ViewMenu( p_intf, menu, p_intf->p_sys->p_mi );
     });
 }

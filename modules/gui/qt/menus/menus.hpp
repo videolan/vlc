@@ -43,16 +43,16 @@ public:
     VLCMenuBar(QObject* parent = nullptr);
 
     /* Main bar creation */
-    static void createMenuBar( MainInterface *mi, intf_thread_t * );
+    static void createMenuBar( MainInterface *mi, qt_intf_t * );
 
     /* Popups Menus */
-    static QMenu* PopupMenu( intf_thread_t *, bool );
-    static QMenu* AudioPopupMenu( intf_thread_t *, bool );
-    static QMenu* VideoPopupMenu( intf_thread_t *, bool );
-    static QMenu* MiscPopupMenu( intf_thread_t *, bool );
+    static QMenu* PopupMenu( qt_intf_t *, bool );
+    static QMenu* AudioPopupMenu( qt_intf_t *, bool );
+    static QMenu* VideoPopupMenu( qt_intf_t *, bool );
+    static QMenu* MiscPopupMenu( qt_intf_t *, bool );
 
     /* Systray */
-    static void updateSystrayMenu( MainInterface *, intf_thread_t  *,
+    static void updateSystrayMenu( MainInterface *, qt_intf_t  *,
                                    bool b_force_visible = false);
 
     /* destructor for parentless Menus (kept in static variables) */
@@ -60,37 +60,37 @@ public:
 
 protected:
     /* All main Menus */
-    static QMenu *FileMenu( intf_thread_t *, QMenu *, MainInterface * mi = NULL );
-    static QMenu *FileMenu( intf_thread_t *p_intf, QWidget * parent, MainInterface * mi = NULL ){
+    static QMenu *FileMenu( qt_intf_t *, QMenu *, MainInterface * mi = NULL );
+    static QMenu *FileMenu( qt_intf_t *p_intf, QWidget * parent, MainInterface * mi = NULL ){
         return FileMenu(p_intf, new QMenu(parent), mi);
     }
 
-    static QMenu *ToolsMenu( intf_thread_t *, QMenu * );
-    static QMenu *ToolsMenu( intf_thread_t * p_intf, QWidget *parent )
+    static QMenu *ToolsMenu( qt_intf_t *, QMenu * );
+    static QMenu *ToolsMenu( qt_intf_t * p_intf, QWidget *parent )
         { return ToolsMenu( p_intf, new QMenu( parent ) ); }
 
-    static QMenu *ViewMenu( intf_thread_t *, QMenu *, MainInterface * mi = NULL );
+    static QMenu *ViewMenu( qt_intf_t *, QMenu *, MainInterface * mi = NULL );
 
-    static QMenu *InterfacesMenu( intf_thread_t *p_intf, QMenu * );
-    static void ExtensionsMenu( intf_thread_t *p_intf, QMenu * );
+    static QMenu *InterfacesMenu( qt_intf_t *p_intf, QMenu * );
+    static void ExtensionsMenu( qt_intf_t *p_intf, QMenu * );
 
-    static QMenu *NavigMenu( intf_thread_t *, QMenu * );
-    static QMenu *NavigMenu( intf_thread_t *p_intf, QWidget *parent ) {
+    static QMenu *NavigMenu( qt_intf_t *, QMenu * );
+    static QMenu *NavigMenu( qt_intf_t *p_intf, QWidget *parent ) {
         return NavigMenu( p_intf, new QMenu( parent ) );
     }
-    static QMenu *RebuildNavigMenu(intf_thread_t *, QMenu *);
+    static QMenu *RebuildNavigMenu(qt_intf_t *, QMenu *);
 
-    static QMenu *VideoMenu( intf_thread_t *, QMenu * );
-    static QMenu *VideoMenu( intf_thread_t *p_intf, QWidget *parent ) {
+    static QMenu *VideoMenu( qt_intf_t *, QMenu * );
+    static QMenu *VideoMenu( qt_intf_t *p_intf, QWidget *parent ) {
         return VideoMenu( p_intf, new QMenu( parent ) );
     }
-    static QMenu *SubtitleMenu( intf_thread_t *, QMenu *current, bool b_popup = false );
-    static QMenu *SubtitleMenu( intf_thread_t *p_intf, QWidget *parent) {
+    static QMenu *SubtitleMenu( qt_intf_t *, QMenu *current, bool b_popup = false );
+    static QMenu *SubtitleMenu( qt_intf_t *p_intf, QWidget *parent) {
         return SubtitleMenu( p_intf, new QMenu( parent ) );
     }
 
-    static QMenu *AudioMenu( intf_thread_t *, QMenu * );
-    static QMenu *AudioMenu( intf_thread_t *p_intf, QWidget *parent ) {
+    static QMenu *AudioMenu( qt_intf_t *, QMenu * );
+    static QMenu *AudioMenu( qt_intf_t *p_intf, QWidget *parent ) {
         return AudioMenu( p_intf, new QMenu( parent ) );
     }
 
@@ -101,14 +101,14 @@ protected:
 
     /* Popups Menus */
     static void PopupMenuStaticEntries( QMenu *menu );
-    static void PopupMenuPlaylistEntries( QMenu *menu, intf_thread_t *p_intf );
-    static void PopupMenuPlaylistControlEntries( QMenu *menu, intf_thread_t *p_intf );
-    static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf, bool b = true );
+    static void PopupMenuPlaylistEntries( QMenu *menu, qt_intf_t *p_intf );
+    static void PopupMenuPlaylistControlEntries( QMenu *menu, qt_intf_t *p_intf );
+    static void PopupMenuControlEntries( QMenu *menu, qt_intf_t *p_intf, bool b = true );
 
     /* recentMRL menu */
     static RendererMenu *rendererMenu;
 
-    static void updateAudioDevice(intf_thread_t *, QMenu* );
+    static void updateAudioDevice(qt_intf_t *, QMenu* );
 };
 
 #endif

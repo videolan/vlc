@@ -118,7 +118,7 @@ VirtualDestBox::~VirtualDestBox()
 }
 
 /* FileDest Box */
-FileDestBox::FileDestBox( QWidget *_parent, intf_thread_t * _p_intf ) : VirtualDestBox( _parent )
+FileDestBox::FileDestBox( QWidget *_parent, qt_intf_t * _p_intf ) : VirtualDestBox( _parent )
 {
     p_intf = _p_intf;
 

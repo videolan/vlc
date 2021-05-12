@@ -165,7 +165,7 @@ class MainInterface : public QVLCMW
 
 public:
     /* tors */
-    MainInterface( intf_thread_t *, QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
+    MainInterface( qt_intf_t *, QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
     virtual ~MainInterface();
 
     static const QEvent::Type ToolbarsNeedRebuild;
