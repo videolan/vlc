@@ -82,7 +82,7 @@ public: // AsyncTask implementation
     QString execute() override;
 
 private: // Functions
-    void draw(QPainter & painter, const QStringList & fileNames);
+    void draw(QPainter & painter, const QStringList & fileNames, int countX, int countY);
 
     void drawImage(QPainter & painter, const QString & fileName, const QRect & rect);
 

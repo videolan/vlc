@@ -153,6 +153,9 @@ QString CoverGenerator::execute() /* override */
     else
         thumbnails = getMedias(count, id, type);
 
+    int countX;
+    int countY;
+
     if (thumbnails.isEmpty())
     {
         if (m_split == CoverGenerator::Duplicate)
@@ -161,13 +164,16 @@ QString CoverGenerator::execute() /* override */
             {
                 thumbnails.append(m_default);
             }
+
+            countX = m_countX;
+            countY = m_countY;
         }
         else
         {
             thumbnails.append(m_default);
 
-            m_countX = 1;
-            m_countY = 1;
+            countX = 1;
+            countY = 1;
         }
     }
     else if (m_split == CoverGenerator::Duplicate)
@@ -180,15 +186,16 @@ QString CoverGenerator::execute() /* override */
 
             index++;
         }
+
+        countX = m_countX;
+        countY = m_countY;
     }
     else // if (m_split == CoverGenerator::Divide)
     {
-        // NOTE: This handles the 2x2 case.
-        if (thumbnails.count() == 2)
-        {
-            m_countX = 2;
-            m_countY = 1;
-        }
+        countX = m_countX;
+
+        // NOTE: We try to divide thumbnails as far as we can based on their total count.
+        countY = std::ceil((qreal) thumbnails.count() / m_countX);
     }
 
     QImage image(m_size, QImage::Format_RGB32);
@@ -199,7 +206,7 @@ QString CoverGenerator::execute() /* override */
 
     painter.begin(&image);
 
-    draw(painter, thumbnails);
+    draw(painter, thumbnails, countX, countY);
 
     painter.end();
 
@@ -215,27 +222,28 @@ QString CoverGenerator::execute() /* override */
 // Private functions
 //-------------------------------------------------------------------------------------------------
 
-void CoverGenerator::draw(QPainter & painter, const QStringList & fileNames)
+void CoverGenerator::draw(QPainter & painter,
+                          const QStringList & fileNames, int countX, int countY)
 {
     int count = fileNames.count();
 
-    int width  = m_size.width()  / m_countX;
-    int height = m_size.height() / m_countY;
+    int width  = m_size.width()  / countX;
+    int height = m_size.height() / countY;
 
-    for (int y = 0; y < m_countY; y++)
+    for (int y = 0; y < countY; y++)
     {
-        for (int x = 0; x < m_countX; x++)
+        for (int x = 0; x < countX; x++)
         {
-            int index = m_countX * y + x;
+            int index = countX * y + x;
 
             if (index == count) return;
 
             QRect rect;
 
             // NOTE: This handles the wider thumbnail case (e.g. for a 2x1 grid).
-            if (index == count - 1 && x != m_countX - 1)
+            if (index == count - 1 && x != countX - 1)
             {
-                rect = QRect(width * x, height * y, width * m_countX - x, height);
+                rect = QRect(width * x, height * y, width * countX - x, height);
             }
             else
                 rect = QRect(width * x, height * y, width, height);
