@@ -31,9 +31,19 @@ Widgets.NavigableFocusScope {
     id: root
 
     property variant model: MLAlbumModel{}
-    implicitHeight: artAndControl.height + VLCStyle.margin_large + VLCStyle.margin_xxsmall
-    implicitWidth: layout.implicitWidth
+
     signal retract()
+
+    implicitWidth: layout.implicitWidth
+
+    implicitHeight: {
+        var verticalMargins = layout.anchors.topMargin + layout.anchors.bottomMargin
+        if (tracks.contentHeight < artAndControl.height)
+            return artAndControl.height + verticalMargins
+        return Math.min(tracks.contentHeight
+                        , tracks.listView.headerItem.height + tracks.rowHeight * 6) // show a maximum of 6 rows
+                + verticalMargins
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -134,123 +144,118 @@ Widgets.NavigableFocusScope {
                     }
 
                     navigationParent: root
-                    navigationRightItem: expand_track_id
+                    navigationRightItem: tracks
                 }
 
             }
         }
 
+        /* The list of the tracks available */
+        MusicTrackListDisplay {
+            id: tracks
 
-        ColumnLayout {
-            id: expand_infos_id
+            readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tracks.availableRowWidth)
 
-            spacing: 0
+            property Component titleDelegate: RowLayout {
+                property var rowModel: parent.rowModel
+
+                anchors.fill: parent
+
+                Widgets.ListLabel {
+                    text: !!rowModel && !!rowModel.track_number ? rowModel.track_number : ""
+                    color: foregroundColor
+                    font.weight: Font.Normal
+
+                    Layout.fillHeight: true
+                    Layout.leftMargin: VLCStyle.margin_xxsmall
+                    Layout.preferredWidth: VLCStyle.margin_large
+                }
+
+                Widgets.ListLabel {
+                    text: !!rowModel && !!rowModel.title ? rowModel.title : ""
+                    color: foregroundColor
+
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                }
+            }
+
+            property Component titleHeaderDelegate: Row {
+
+                Widgets.CaptionLabel {
+                    text: "#"
+                    width: VLCStyle.margin_large
+                }
+
+                Widgets.CaptionLabel {
+                    text: i18n.qtr("Title")
+                }
+            }
+
+            header: Column {
+                width: tracks.width
+                height: implicitHeight
+                bottomPadding: VLCStyle.margin_large
+
+                RowLayout {
+                    width: parent.width
+
+                    /* The title of the albums */
+                    Widgets.SubtitleLabel {
+                        id: expand_infos_title_id
+
+                        text: model.title || i18n.qtr("Unknown title")
+
+                        Layout.fillWidth: true
+                    }
+
+                    Widgets.IconLabel {
+                        text: VLCIcons.close
+
+                        Layout.rightMargin: VLCStyle.margin_small
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: root.retract()
+                        }
+                    }
+                }
+
+                Widgets.CaptionLabel {
+                    id: expand_infos_subtitle_id
+
+                    width: parent.width
+                    text: i18n.qtr("%1 - %2 - %3")
+                        .arg(model.main_artist || i18n.qtr("Unknown artist"))
+                        .arg(model.release_year || "")
+                        .arg(Helpers.msToString(model.duration) || "")
+                }
+            }
+
+            headerPositioning: ListView.InlineHeader
+            section.property: ""
 
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            RowLayout {
-                Layout.fillWidth: true
-                Layout.preferredHeight: expand_infos_title_id.implicitHeight
+            rowHeight: VLCStyle.tableRow_height
+            headerColor: VLCStyle.colors.bgAlt
 
-                /* The title of the albums */
-                Widgets.SubtitleLabel {
-                    id: expand_infos_title_id
-
-                    text: model.title || i18n.qtr("Unknown title")
-
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: implicitHeight
-                }
-
-                Widgets.IconLabel {
-                    text: VLCIcons.close
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: root.retract()
-                    }
-                }
+            parentId: root.model.id
+            onParentIdChanged: {
+                currentIndex = 0
             }
 
-            Widgets.CaptionLabel {
-                id: expand_infos_subtitle_id
+            sortModel: [
+                { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(Math.max(tracks._nbCols - 1, 1)), visible: true, text: i18n.qtr("Title"), showSection: "", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
+                { criteria: "duration",               width: VLCStyle.colWidth(1), visible: true, showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
+            ]
 
-                text: i18n.qtr("%1 - %2 - %3")
-                    .arg(model.main_artist || i18n.qtr("Unknown artist"))
-                    .arg(model.release_year || "")
-                    .arg(Helpers.msToString(model.duration) || "")
+            navigationParent: root
+            navigationLeftItem: actionButtons
 
-                Layout.fillWidth: true
-                Layout.preferredHeight: implicitHeight
-            }
-
-            /* The list of the tracks available */
-            MusicTrackListDisplay {
-                id: expand_track_id
-
-                readonly property int _nbCols: VLCStyle.gridColumnsForWidth(expand_track_id.availableRowWidth)
-
-                property Component titleDelegate: RowLayout {
-                    property var rowModel: parent.rowModel
-
-                    anchors.fill: parent
-
-                    Widgets.ListLabel {
-                        text: !!rowModel && !!rowModel.track_number ? rowModel.track_number : ""
-                        color: foregroundColor
-                        font.weight: Font.Normal
-
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: VLCStyle.margin_large
-                    }
-
-                    Widgets.ListLabel {
-                        text: !!rowModel && !!rowModel.title ? rowModel.title : ""
-                        color: foregroundColor
-
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
-                    }
-                }
-
-                property Component titleHeaderDelegate: Row {
-
-                    Widgets.CaptionLabel {
-                        text: "#"
-                        width: VLCStyle.margin_large
-                    }
-
-                    Widgets.CaptionLabel {
-                        text: i18n.qtr("Title")
-                    }
-                }
-
-                section.property: ""
-
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.topMargin: VLCStyle.margin_large
-
-                rowHeight: VLCStyle.tableRow_height
-                headerColor: VLCStyle.colors.bgAlt
-
-                parentId : root.model.id
-                onParentIdChanged: {
-                    currentIndex = 0
-                }
-
-                sortModel: [
-                    { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(Math.max(expand_track_id._nbCols - 1, 1)), visible: true, text: i18n.qtr("Title"), showSection: "", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
-                    { criteria: "duration",               width: VLCStyle.colWidth(1), visible: true, showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
-                ]
-
-                navigationParent: root
-                navigationLeftItem: actionButtons
-
-                Widgets.TableColumns {
-                    id: tableColumns
-                }
+            Widgets.TableColumns {
+                id: tableColumns
             }
         }
     }
