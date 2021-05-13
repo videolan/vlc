@@ -443,7 +443,13 @@ NavigableFocusScope {
             sourceComponent: expandDelegate
             active: root.expandIndex !== -1
             focus: active
-            onLoaded: item.height = 0
+
+            onLoaded: {
+                item.height = 0
+
+                // only make loader visible after setting initial y pos from layout() as to not get flickering
+                expandItemLoader.visible = false
+            }
         }
 
 
@@ -551,6 +557,8 @@ NavigableFocusScope {
             if (root.expandIndex !== -1) {
                 var expandItemPos = root.getItemPos(expandItemGridId)
                 expandItem.y = expandItemPos[1]
+                if (!expandItemLoader.visible)
+                    expandItemLoader.visible = true
             }
 
             // Place the delegates after the expandItem
