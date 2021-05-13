@@ -45,6 +45,10 @@ Widgets.NavigableFocusScope {
                 + verticalMargins
     }
 
+    // components should shrink with change of height, but it doesn't happen fast enough
+    // causing expand and shrink animation bit laggy, so clip the delegate to fix it
+    clip: true
+
     Rectangle {
         anchors.fill: parent
         color: VLCStyle.colors.bgAlt
