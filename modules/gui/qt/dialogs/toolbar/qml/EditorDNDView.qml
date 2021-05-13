@@ -151,14 +151,12 @@ ListView {
     delegate: EditorDNDDelegate {
         dndView: playerBtnDND
 
-        onContainsDragChanged: {
-            for(var child in playerBtnDND.contentItem.children) {
-                if (playerBtnDND.contentItem.children[child].containsDrag === true) {
-                    playerBtnDND.containsDrag = true
-                    return
-                }
-            }
-            playerBtnDND.containsDrag = Qt.binding(function() { return footerItem.dropVisible; } )
+        Binding {
+            when: containsDrag
+            value: true
+
+            target: playerBtnDND
+            property: "containsDrag"
         }
     }
 }
