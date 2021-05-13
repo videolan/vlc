@@ -197,7 +197,7 @@ Widgets.NavigableFocusScope {
                     anchors.fill: parent
 
                     Widgets.ListLabel {
-                        text: rowModel ? rowModel.track_number : ""
+                        text: !!rowModel && !!rowModel.track_number ? rowModel.track_number : ""
                         color: foregroundColor
                         font.weight: Font.Normal
 
@@ -206,7 +206,7 @@ Widgets.NavigableFocusScope {
                     }
 
                     Widgets.ListLabel {
-                        text: rowModel ? rowModel.title : ""
+                        text: !!rowModel && !!rowModel.title ? rowModel.title : ""
                         color: foregroundColor
 
                         Layout.fillHeight: true
