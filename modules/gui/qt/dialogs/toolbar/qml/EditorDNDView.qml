@@ -73,6 +73,21 @@ ListView {
 
         NumberAnimation { property: "opacity"; to: 1.0 }
     }
+
+    function dropEvent(drag, destIndex) {
+        if (drag.source.dndView === playerBtnDND) {
+            // moving from same section
+            playerBtnDND.model.move(drag.source.DelegateModel.itemsIndex,
+                                    destIndex)
+        } else if (drag.source.objectName === "buttonsList") {
+            // moving from buttonsList
+            playerBtnDND.model.insert(destIndex, {"id" : drag.source.mIndex})
+        } else {
+            // moving between sections or views
+            playerBtnDND.model.insert(destIndex, {"id" : drag.source.controlId})
+            drag.source.dndView.model.remove(drag.source.DelegateModel.itemsIndex)
+        }
+    }
     
     MouseArea {
         anchors.fill: parent
@@ -121,17 +136,12 @@ ListView {
                 if (!dropVisible)
                     return
 
-                if (drag.source.dndView === playerBtnDND) {
-                    // moving from same section
-                    playerBtnDND.model.move(drag.source.DelegateModel.itemsIndex, playerBtnDND.count - 1)
-                } else if (drag.source.objectName == "buttonsList"){
-                    // moving from buttonsList
-                    playerBtnDND.model.insert(playerBtnDND.count, {"id" : drag.source.mIndex})
-                } else {
-                    // moving between sections or views
-                    playerBtnDND.model.insert(playerBtnDND.count, {"id" : drag.source.controlId})
-                    drag.source.dndView.model.remove(drag.source.DelegateModel.itemsIndex)
-                }
+                var destIndex = playerBtnDND.count
+
+                if (drag.source.dndView === playerBtnDND)
+                    --destIndex
+
+                dropEvent(drag, destIndex)
 
                 dropVisible = false
             }

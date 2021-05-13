@@ -172,22 +172,13 @@ MouseArea {
             if (held)
                 return
 
-            if (drag.source.dndView === playerBtnDND) {
-                // moving from same section
-                var srcIndex = drag.source.DelegateModel.itemsIndex
-                var destIndex = parent.DelegateModel.itemsIndex
+            var destIndex = parent.DelegateModel.itemsIndex
 
-                if(srcIndex < destIndex)
-                    destIndex -= 1
-                playerBtnDND.model.move(srcIndex,destIndex)
-            } else if (drag.source.objectName == "buttonsList") {
-                // moving from buttonsList
-                dndView.model.insert(parent.DelegateModel.itemsIndex, {"id" : drag.source.mIndex})
-            } else {
-                // moving between sections or views
-                dndView.model.insert(parent.DelegateModel.itemsIndex, {"id" : drag.source.controlId})
-                drag.source.dndView.model.remove(drag.source.DelegateModel.itemsIndex)
-            }
+            if((drag.source.dndView === playerBtnDND)
+                    && (drag.source.DelegateModel.itemsIndex < destIndex))
+                --destIndex
+
+            dropEvent(drag, destIndex)
 
             dropVisible = false
         }
