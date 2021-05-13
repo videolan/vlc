@@ -98,6 +98,10 @@ NavigableFocusScope {
         view.positionViewAtIndex(index, mode)
     }
 
+    function positionViewAtBeginning() {
+        view.listView.positionViewAtBeginning()
+    }
+
     Timer {
         id: availableRowWidthUpdater
 
@@ -157,6 +161,12 @@ NavigableFocusScope {
             color: headerColor
             visible: view.modelCount > 0
             z: 3
+
+            // with inline header positioning and for `root.header` which changes it's height after loading,
+            // in such cases after `root.header` completes, the ListView will try to maintain the relative contentY,
+            // and hide the completed `root.header`, try to show the `root.header` in such cases by manually
+            // positiing view at beginning
+            onHeightChanged: if (root.contentY < 0) root.positionViewAtBeginning()
 
             Widgets.ListLabel {
                 x: contentX - VLCStyle.table_section_width
