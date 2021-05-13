@@ -89,6 +89,7 @@ NavigableFocusScope {
     property Item dragItem
 
     property alias listScrollBar: view.listScrollBar
+    property alias listView: view.listView
 
     property alias displayMarginEnd: view.displayMarginEnd
 
