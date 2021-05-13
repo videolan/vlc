@@ -30,7 +30,7 @@ import "qrc:///style/"
 Widgets.NavigableFocusScope {
     id: root
 
-    property variant model: MLAlbumModel{}
+    property var model
 
     signal retract()
 
