@@ -29,32 +29,22 @@ MouseArea {
     id: dragArea
 
     property int controlId: model.id
-    property bool held: false
     property bool dropVisible: false
     property var dndView: null
     anchors.verticalCenter: (!!parent) ? parent.verticalCenter : undefined
-    cursorShape: held || root.dragActive ? Qt.DragMoveCursor : Qt.OpenHandCursor
-    drag.target: held ? content : undefined
+    cursorShape: pressed || root.dragActive ? Qt.DragMoveCursor : Qt.OpenHandCursor
+    drag.target: pressed ? content : undefined
     width: buttonloader.width
     height: VLCStyle.icon_medium
     hoverEnabled: true
 
     property alias containsDrag: dropArea.containsDrag
 
-    onHeldChanged: {
-        if (held) {
-            removeInfoRectVisible = true
-        }
-        else {
-            removeInfoRectVisible = false
-        }
-    }
-
     Rectangle {
         z: -1
         anchors.fill: parent
 
-        visible: dragArea.containsMouse && !held
+        visible: dragArea.containsMouse && !pressed
         color: VLCStyle.colors.bgHover
     }
 
@@ -72,15 +62,15 @@ MouseArea {
         color: VLCStyle.colors.accent
     }
 
-    onPressed: {
-        held = true
-    }
-
     onEntered: playerBtnDND.currentIndex = index
+
+    onPressed: {
+        removeInfoRectVisible = true
+    }
 
     onReleased: {
         drag.target.Drag.drop()
-        held = false
+        removeInfoRectVisible = false
     }
 
     onPositionChanged: {
@@ -96,14 +86,14 @@ MouseArea {
 
     Rectangle {
         id: content
-        Drag.active: dragArea.held
+        Drag.active: dragArea.pressed
         Drag.source: dragArea
         anchors {
             horizontalCenter: parent.horizontalCenter
             verticalCenter: parent.verticalCenter
         }
 
-        opacity: held ? 0.75 : 1.0
+        opacity: pressed ? 0.75 : 1.0
 
         Loader{
             id: buttonloader
@@ -120,7 +110,7 @@ MouseArea {
         }
 
         states: State {
-            when: dragArea.held
+            when: dragArea.pressed
 
             ParentChange { target: content; parent: root }
             AnchorChanges {
@@ -150,14 +140,14 @@ MouseArea {
                   (parent.DelegateModel.itemsIndex === drag.source.DelegateModel.itemsIndex + 1))))
                 return
 
-            if (held)
+            if (pressed)
                 return
 
             dropVisible = true
         }
 
         onExited: {
-            if (held)
+            if (pressed)
                 return
 
             dropVisible = false
@@ -167,7 +157,7 @@ MouseArea {
             if (!dropVisible)
                 return
 
-            if (held)
+            if (pressed)
                 return
 
             var destIndex = parent.DelegateModel.itemsIndex
