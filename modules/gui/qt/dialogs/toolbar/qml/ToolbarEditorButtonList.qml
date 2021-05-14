@@ -33,6 +33,7 @@ GridView{
     ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
     model: PlayerControlbarControls.controlList.length
 
+    currentIndex: -1
     highlightFollowsCurrentItem: false
 
     cellWidth: VLCStyle.cover_small
@@ -138,10 +139,8 @@ GridView{
             buttonDragItem.updatePos(pos.x, pos.y)
         }
 
-        onEntered: allButtonsView.currentIndex = index
-
         Loader {
-            active: allButtonsView.currentIndex === index
+            active: dragArea.containsMouse
             anchors.fill: parent
 
             sourceComponent: Rectangle {
