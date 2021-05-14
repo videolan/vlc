@@ -116,7 +116,7 @@ MouseArea {
                 horizontalCenter: parent.horizontalCenter
                 verticalCenter: parent.verticalCenter
             }
-            sourceComponent: controlButtons.returnbuttondelegate(model.id)
+            sourceComponent: controlButtons.button(model.id).component
             onLoaded: {
                 buttonloader.item.paintOnly = true
                 buttonloader.item.enabled = false
