@@ -104,27 +104,28 @@ GridView {
     }
 
     delegate: MouseArea {
-        id:dragArea
-        objectName: "buttonsList"
-        hoverEnabled: true
         width: cellWidth
         height: cellHeight
 
-        property int mIndex: PlayerControlbarControls.controlList[model.index].id
-        drag.target: pressed ? buttonDragItem : undefined
+        hoverEnabled: true
         cursorShape: Qt.OpenHandCursor
+
+        objectName: "buttonsList"
+
+        drag.target: buttonDragItem
+
+        readonly property int mIndex: PlayerControlbarControls.controlList[model.index].id
 
         onPressed: {
             buttonDragItem.text = PlayerControlbarControls.controlList[model.index].label
-            buttonDragItem.Drag.source = dragArea
+            buttonDragItem.Drag.source = this
             buttonDragItem.Drag.active = true
 
             GridView.delayRemove = true
         }
 
         onReleased: {
-            drag.target.Drag.drop()
-            buttonDragItem.Drag.active = false
+            buttonDragItem.Drag.drop()
 
             GridView.delayRemove = false
         }
@@ -137,15 +138,14 @@ GridView {
         Loader {
             anchors.fill: parent
 
-            active: dragArea.containsMouse && !buttonDragItem.Drag.active
+            active: containsMouse && !buttonDragItem.Drag.active
 
             sourceComponent: Rectangle {
                 color: VLCStyle.colors.bgHover
             }
         }
 
-        ColumnLayout{
-            id: listelemlayout
+        ColumnLayout {
             anchors.fill: parent
             anchors.margins: 10
 
@@ -153,11 +153,11 @@ GridView {
                 Layout.preferredWidth: VLCStyle.icon_medium
                 Layout.preferredHeight: VLCStyle.icon_medium
                 Layout.alignment: Qt.AlignHCenter
+
                 text: PlayerControlbarControls.controlList[model.index].label
             }
 
             Widgets.ListSubtitleLabel {
-                id: buttonName
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
@@ -169,5 +169,3 @@ GridView {
         }
     }
 }
-
-
