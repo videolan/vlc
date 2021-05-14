@@ -33,7 +33,7 @@ Item{
 
     signal requestLockUnlockAutoHide(bool lock, var source)
 
-    property var buttonList: [
+    readonly property var buttonList: [
         { id: ControlListModel.PLAY_BUTTON, component: playBtnDelegate, label: VLCIcons.play, text: i18n.qtr("Play") },
         { id: ControlListModel.STOP_BUTTON, component: stopBtndelgate, label: VLCIcons.stop, text: i18n.qtr("Stop") },
         { id: ControlListModel.OPEN_BUTTON, component: openmediaBtnDelegate, label: VLCIcons.eject, text: i18n.qtr("Open") },
