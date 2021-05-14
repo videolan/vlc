@@ -35,7 +35,7 @@ Item{
 
     readonly property var buttonList: [
         { id: ControlListModel.PLAY_BUTTON, component: playBtnDelegate, label: VLCIcons.play, text: i18n.qtr("Play") },
-        { id: ControlListModel.STOP_BUTTON, component: stopBtndelgate, label: VLCIcons.stop, text: i18n.qtr("Stop") },
+        { id: ControlListModel.STOP_BUTTON, component: stopBtnDelegate, label: VLCIcons.stop, text: i18n.qtr("Stop") },
         { id: ControlListModel.OPEN_BUTTON, component: openmediaBtnDelegate, label: VLCIcons.eject, text: i18n.qtr("Open") },
         { id: ControlListModel.PREVIOUS_BUTTON, component: prevBtnDelegate, label: VLCIcons.previous, text: i18n.qtr("Previous") },
         { id: ControlListModel.NEXT_BUTTON, component: nextBtnDelegate, label: VLCIcons.next, text: i18n.qtr("Next") },
@@ -598,7 +598,7 @@ Item{
 
 
     Component{
-        id: stopBtndelgate
+        id: stopBtnDelegate
         Widgets.IconControlButton{
             id: stopBtn
             size: VLCStyle.icon_medium
