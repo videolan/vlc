@@ -29,7 +29,7 @@ Rectangle{
     id: root
     color: VLCStyle.colors.bg
 
-    readonly property bool dragActive: !!_viewThatContainsDrag || buttonList.dragActive
+    readonly property bool dragActive: !!_viewThatContainsDrag || buttonDragItem.Drag.active
 
     property alias removeInfoRectVisible: buttonList.removeInfoRectVisible
 
@@ -236,11 +236,9 @@ Rectangle{
     EditorDummyButton {
         id: buttonDragItem
 
-        visible: false
+        visible: Drag.active
         color: VLCStyle.colors.buttonText
         opacity: 0.75
-
-        Drag.active: visible
 
         function updatePos(x, y) {
             var pos = root.mapFromGlobal(x, y)

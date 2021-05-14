@@ -26,8 +26,7 @@ import "qrc:///player/"
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
-GridView{
-    id: allButtonsView
+GridView {
     clip: true
 
     ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
@@ -38,8 +37,6 @@ GridView{
 
     cellWidth: VLCStyle.cover_small
     cellHeight: cellWidth
-
-    property bool dragActive: false
 
     property alias removeInfoRectVisible: removeInfoRect.visible
 
@@ -101,7 +98,7 @@ GridView{
         anchors.fill: parent
         z: 1
 
-        visible: root.dragActive
+        visible: buttonDragItem.Drag.active
 
         cursorShape: visible ? Qt.DragMoveCursor : Qt.ArrowCursor
     }
@@ -118,18 +115,16 @@ GridView{
         cursorShape: Qt.OpenHandCursor
 
         onPressed: {
-            buttonDragItem.visible = true
             buttonDragItem.text = PlayerControlbarControls.controlList[model.index].label
             buttonDragItem.Drag.source = dragArea
-            dragActive = true
+            buttonDragItem.Drag.active = true
 
             GridView.delayRemove = true
         }
 
         onReleased: {
             drag.target.Drag.drop()
-            buttonDragItem.visible = false
-            dragActive = false
+            buttonDragItem.Drag.active = false
 
             GridView.delayRemove = false
         }
@@ -140,8 +135,9 @@ GridView{
         }
 
         Loader {
-            active: dragArea.containsMouse
             anchors.fill: parent
+
+            active: dragArea.containsMouse && !buttonDragItem.Drag.active
 
             sourceComponent: Rectangle {
                 color: VLCStyle.colors.bgHover
