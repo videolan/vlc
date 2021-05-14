@@ -344,14 +344,12 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
     action->setCheckable( true );
     connect( action, &QAction::triggered, mi, &MainInterface::setPlaylistVisible );
     action->setChecked( mi->isPlaylistVisible() );
-    connect( mi, &MainInterface::playlistVisibleChanged,
-             action, &QAction::setChecked );
-
 
     /* Docked Playlist */
     action = menu->addAction( qtr( "Docked Playlist" ) );
     action->setCheckable( true );
     connect( action, &QAction::triggered, mi, &MainInterface::setPlaylistDocked );
+    action->setChecked( mi->isPlaylistDocked() );
 
     menu->addSeparator();
 
@@ -367,15 +365,11 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
             &MainInterface::toggleInterfaceFullScreen, QString( "F11" ) );
     action->setCheckable( true );
     action->setChecked( mi->isInterfaceFullScreen() );
-    connect( mi, &MainInterface::fullscreenInterfaceToggled,
-             action, &QAction::setChecked );
 
     action = menu->addAction( qtr( "&View Items as Grid" ), mi,
             &MainInterface::setGridView );
     action->setCheckable( true );
     action->setChecked( mi->hasGridView() );
-    connect( mi, &MainInterface::gridViewChanged,
-             action, &QAction::setChecked );
 
     menu->addMenu( new CheckableListMenu(qtr( "&Color Scheme" ), mi->getColorScheme(), CheckableListMenu::GROUPED, current) );
 
