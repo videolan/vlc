@@ -107,10 +107,12 @@ ListView {
     }
 
     footer: Item {
+        anchors.verticalCenter: parent.verticalCenter
+
         height: VLCStyle.icon_medium
         width: Math.max(height, playerBtnDND.width - x)
-        anchors.verticalCenter: parent.verticalCenter
-        property bool dropVisible: false
+
+        property alias dropVisible: footerDropArea.containsDrag
 
         Rectangle {
             z: 2
@@ -125,31 +127,24 @@ ListView {
         }
 
         DropArea {
+            id: footerDropArea
+
             anchors.fill: parent
 
             onEntered: {
-                if (drag.source.dndView === playerBtnDND && drag.source.DelegateModel.itemsIndex === playerBtnDND.count - 1)
-                    return
-
-                dropVisible = true
-            }
-
-            onExited: {
-                dropVisible = false
+                if (drag.source.dndView === playerBtnDND &&
+                        drag.source.DelegateModel.itemsIndex === playerBtnDND.count - 1) {
+                    drag.accepted = false
+                }
             }
 
             onDropped: {
-                if (!dropVisible)
-                    return
-
                 var destIndex = playerBtnDND.count
 
                 if (drag.source.dndView === playerBtnDND)
                     --destIndex
 
                 dropEvent(drag, destIndex)
-
-                dropVisible = false
             }
         }
     }
