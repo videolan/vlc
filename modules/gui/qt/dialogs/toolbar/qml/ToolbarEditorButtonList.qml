@@ -38,6 +38,8 @@ GridView{
     cellWidth: VLCStyle.cover_small
     cellHeight: cellWidth
 
+    property bool dragActive: false
+
     property alias removeInfoRectVisible: removeInfoRect.visible
 
     DropArea {
@@ -98,7 +100,7 @@ GridView{
         anchors.fill: parent
         z: 1
 
-        visible: root._held
+        visible: root.dragActive
 
         cursorShape: visible ? Qt.DragMoveCursor : Qt.ArrowCursor
     }
@@ -110,28 +112,25 @@ GridView{
         width: cellWidth
         height: cellHeight
 
-        property bool held: false
         property int mIndex: PlayerControlbarControls.controlList[model.index].id
-        drag.target: held ? buttonDragItem : undefined
+        drag.target: pressed ? buttonDragItem : undefined
         cursorShape: Qt.OpenHandCursor
 
         onPressed: {
             buttonDragItem.visible = true
             buttonDragItem.text = PlayerControlbarControls.controlList[model.index].label
             buttonDragItem.Drag.source = dragArea
-            held = true
-            root._held = true
+            dragActive = true
 
-            dragArea.ListView.delayRemove = true
+            GridView.delayRemove = true
         }
 
         onReleased: {
             drag.target.Drag.drop()
             buttonDragItem.visible = false
-            held = false
-            root._held = false
+            dragActive = false
 
-            dragArea.ListView.delayRemove = false
+            GridView.delayRemove = false
         }
 
         onPositionChanged: {

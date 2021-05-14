@@ -33,7 +33,7 @@ MouseArea {
     property bool dropVisible: false
     property var dndView: null
     anchors.verticalCenter: (!!parent) ? parent.verticalCenter : undefined
-    cursorShape: held || root._held ? Qt.DragMoveCursor : Qt.OpenHandCursor
+    cursorShape: held || root.dragActive ? Qt.DragMoveCursor : Qt.OpenHandCursor
     drag.target: held ? content : undefined
     width: buttonloader.width
     height: VLCStyle.icon_medium
@@ -74,7 +74,6 @@ MouseArea {
 
     onPressed: {
         held = true
-        root._held = true
     }
 
     onEntered: playerBtnDND.currentIndex = index
@@ -82,7 +81,6 @@ MouseArea {
     onReleased: {
         drag.target.Drag.drop()
         held = false
-        root._held = false
     }
 
     onPositionChanged: {

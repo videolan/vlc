@@ -62,7 +62,7 @@ WindowDialog {
         MouseArea {
             anchors.fill: parent
 
-            cursorShape: toolbarEditor._held ? Qt.ForbiddenCursor : Qt.ArrowCursor
+            cursorShape: toolbarEditor.dragActive ? Qt.ForbiddenCursor : Qt.ArrowCursor
         }
 
         ColumnLayout {

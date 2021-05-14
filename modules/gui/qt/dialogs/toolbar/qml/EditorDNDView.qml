@@ -97,7 +97,7 @@ ListView {
             wheelScroll(wheel.angleDelta.y)
         }
 
-        cursorShape: root._held ? Qt.DragMoveCursor : Qt.ArrowCursor
+        cursorShape: root.dragActive ? Qt.DragMoveCursor : Qt.ArrowCursor
     }
 
     footer: Item {

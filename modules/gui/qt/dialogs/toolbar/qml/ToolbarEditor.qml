@@ -29,7 +29,7 @@ Rectangle{
     id: root
     color: VLCStyle.colors.bg
 
-    property bool _held: false
+    readonly property bool dragActive: !!_viewThatContainsDrag || buttonList.dragActive
 
     property alias removeInfoRectVisible: buttonList.removeInfoRectVisible
 
@@ -104,7 +104,7 @@ Rectangle{
                     z: bar.currentIdentifier === identifier ? 0 : -1
                     width: bar.currentIdentifier === identifier ? parent.width : 0
                     height: bar.currentIdentifier === identifier ? parent.height : 0
-                    visible: root._held || (bar.currentIdentifier === identifier)
+                    visible: root.dragActive || (bar.currentIdentifier === identifier)
 
                     readonly property int identifier: modelData.identifier
                     readonly property var model: {
