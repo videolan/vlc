@@ -29,7 +29,7 @@ Rectangle{
     id: root
     color: VLCStyle.colors.bg
 
-    readonly property bool dragActive: !!_viewThatContainsDrag || buttonDragItem.Drag.active
+    property bool dragActive: !!_viewThatContainsDrag || buttonDragItem.Drag.active
 
     property alias removeInfoRectVisible: buttonList.removeInfoRectVisible
 

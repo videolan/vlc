@@ -40,9 +40,18 @@ MouseArea {
     hoverEnabled: true
 
     readonly property int controlId: model.id
-    readonly property bool dropVisible: dropArea.containsDrag
     property var dndView: null
-    property alias containsDrag: dropArea.containsDrag
+
+    readonly property bool dragActive: content.Drag.active
+    property alias dropArea: dropArea
+
+    Binding {
+        when: dragActive
+        value: true
+
+        target: root
+        property: "dragActive"
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -65,7 +74,7 @@ MouseArea {
         width: VLCStyle.dp(2, VLCStyle.scale)
         height: parent.height
 
-        visible: dropVisible
+        visible: dropArea.containsDrag
         color: VLCStyle.colors.accent
     }
 

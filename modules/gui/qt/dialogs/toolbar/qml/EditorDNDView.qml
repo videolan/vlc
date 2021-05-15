@@ -156,7 +156,7 @@ ListView {
         dndView: playerBtnDND
 
         Binding {
-            when: containsDrag
+            when: dropArea.containsDrag
             value: true
 
             target: playerBtnDND
