@@ -1160,12 +1160,12 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this, QWidget *p ) :
 void KeySelectorControl::fillGrid( QGridLayout *l, int line )
 {
     QGridLayout *gLayout = new QGridLayout();
-    gLayout->addWidget( label, 0, 0, 1, 5 );
-    gLayout->addWidget( searchLabel, 1, 0, 1, 2 );
-    gLayout->addWidget( actionSearch, 1, 2, 1, 1 );
-    gLayout->addWidget( searchOptionLabel, 1, 3, 1, 1 );
-    gLayout->addWidget( searchOption, 1, 4, 1, 1 );
-    gLayout->addWidget( table, 2, 0, 1, 5 );
+    gLayout->addWidget( label, 0, 0, 1, 4 );
+    gLayout->addWidget( searchLabel, 1, 0, 1, 1 );
+    gLayout->addWidget( actionSearch, 1, 1, 1, 1 );
+    gLayout->addWidget( searchOptionLabel, 1, 2, 1, 1 );
+    gLayout->addWidget( searchOption, 1, 3, 1, 1 );
+    gLayout->addWidget( table, 2, 0, 1, 4 );
     l->addLayout( gLayout, line, 0, 1, -1 );
 }
 
