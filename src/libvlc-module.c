@@ -2754,6 +2754,16 @@ vlc_module_begin ()
             ZOOM_ORIGINAL_KEY_TEXT, NULL)
     add_key("key-zoom-double", KEY_ZOOM_DOUBLE, ZOOM_DOUBLE_KEY_TEXT, NULL)
 
+    add_key("key-clear-playlist", KEY_PLAY_CLEAR,
+            PLAY_CLEAR_KEY_TEXT, PLAY_CLEAR_KEY_LONGTEXT)
+
+    add_key("key-subtitle-text-scale-normal", KEY_SUBTEXT_SCALE,
+            SUBTEXT_SCALE_KEY_TEXT, SUBTEXT_SCALE_KEY_LONGTEXT)
+    add_key("key-subtitle-text-scale-up", KEY_SUBTEXT_SCALEUP,
+            SUBTEXT_SCALEUP_KEY_TEXT, SUBTEXT_SCALE_KEY_LONGTEXT)
+    add_key("key-subtitle-text-scale-down", KEY_SUBTEXT_SCALEDOWN,
+            SUBTEXT_SCALEDOWN_KEY_TEXT, SUBTEXT_SCALE_KEY_LONGTEXT)
+
     set_section ( N_("Jump sizes" ), NULL )
     add_integer( "extrashort-jump-size", 3, JIEXTRASHORT_TEXT,
                                     JIEXTRASHORT_LONGTEXT, false )
@@ -2805,15 +2815,6 @@ vlc_module_begin ()
             PLAY_BOOKMARK9_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT)
     add_key("key-play-bookmark10", KEY_PLAY_BOOKMARK10,
             PLAY_BOOKMARK10_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT)
-    add_key("key-clear-playlist", KEY_PLAY_CLEAR,
-            PLAY_CLEAR_KEY_TEXT, PLAY_CLEAR_KEY_LONGTEXT)
-
-    add_key("key-subtitle-text-scale-normal", KEY_SUBTEXT_SCALE,
-            SUBTEXT_SCALE_KEY_TEXT, SUBTEXT_SCALE_KEY_LONGTEXT)
-    add_key("key-subtitle-text-scale-up", KEY_SUBTEXT_SCALEUP,
-            SUBTEXT_SCALEUP_KEY_TEXT, SUBTEXT_SCALE_KEY_LONGTEXT)
-    add_key("key-subtitle-text-scale-down", KEY_SUBTEXT_SCALEDOWN,
-            SUBTEXT_SCALEDOWN_KEY_TEXT, SUBTEXT_SCALE_KEY_LONGTEXT)
 
 /* Miscellaneous */
     /* Not displayed in GUI, listed in help output though */
