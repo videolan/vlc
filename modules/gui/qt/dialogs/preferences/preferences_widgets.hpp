@@ -531,8 +531,8 @@ class KeyInputDialog : public QDialog
 
 public:
     KeyInputDialog( QTreeWidget *, QTreeWidgetItem *, QWidget *, bool b_global = false );
-    int keyValue;
     bool conflicts;
+    QString vlckey, vlckey_tr;
     void setExistingkeysSet( const QSet<QString> *keyset = NULL );
 
 private:
@@ -542,7 +542,7 @@ private:
     QTreeWidgetItem *keyItem;
     enum KeySelectorControl::ColumnIndex column;
 
-    void checkForConflicts( int i_vlckey, const QString &sequence );
+    void checkForConflicts( const QString &sequence );
     void keyPressEvent( QKeyEvent *);
     void wheelEvent( QWheelEvent *);
     const QSet<QString> *existingkeys;

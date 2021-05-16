@@ -1297,8 +1297,6 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
 
     if( d->result() == QDialog::Accepted )
     {
-        QString newKey = VLCKeyToString( d->keyValue, false );
-
         /* In case of conflict, reset other keys*/
         if( d->conflicts )
         {
@@ -1307,7 +1305,7 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
             {
                 it = table->topLevelItem(i);
                 if( ( keyItem != it ) &&
-                    ( it->data( column, Qt::UserRole ).toString() == newKey ) )
+                    ( it->data( column, Qt::UserRole ).toString() == d->vlckey ) )
                 {
                     it->setText( column, NULL );
                     it->setData( column, Qt::UserRole, QVariant() );
@@ -1315,8 +1313,8 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
             }
         }
 
-        keyItem->setText( column, VLCKeyToString( d->keyValue, true ) );
-        keyItem->setData( column, Qt::UserRole, newKey );
+        keyItem->setText( column, d->vlckey_tr );
+        keyItem->setData( column, Qt::UserRole, d->vlckey );
     }
     else if( d->result() == 2 )
     {
@@ -1381,7 +1379,7 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
                                 QTreeWidgetItem * _keyItem,
                                 QWidget *_parent,
                                 bool b_global ) :
-                                QDialog( _parent ), keyValue(0), keyItem( _keyItem )
+                                QDialog( _parent ), keyItem( _keyItem )
 {
     setModal( true );
     conflicts = false;
@@ -1431,10 +1429,9 @@ void KeyInputDialog::setExistingkeysSet( const QSet<QString> *keyset )
     existingkeys = keyset;
 }
 
-void KeyInputDialog::checkForConflicts( int i_vlckey, const QString &sequence )
+void KeyInputDialog::checkForConflicts( const QString &sequence )
 {
     conflicts = false;
-    QString vlckey = VLCKeyToString( i_vlckey, false );
     if ( vlckey == "Unset" )
     {
         accept();
@@ -1489,18 +1486,20 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
         return;
     int i_vlck = qtEventToVLCKey( e );
     QKeySequence sequence( e->key() | e->modifiers() );
+    vlckey = VLCKeyToString( i_vlck, false );
+    vlckey_tr = VLCKeyToString( i_vlck, true );
     selected->setText( qtr( "Key or combination: " )
-                + QString("<b>%1</b>").arg( VLCKeyToString( i_vlck, true ) ) );
-    checkForConflicts( i_vlck, sequence.toString() );
-    keyValue = i_vlck;
+                + QString("<b>%1</b>").arg( vlckey_tr ) );
+    checkForConflicts( sequence.toString() );
 }
 
 void KeyInputDialog::wheelEvent( QWheelEvent *e )
 {
     int i_vlck = qtWheelEventToVLCKey( *e );
-    selected->setText( qtr( "Key: " ) + VLCKeyToString( i_vlck, true ) );
-    checkForConflicts( i_vlck, QString() );
-    keyValue = i_vlck;
+    vlckey = VLCKeyToString( i_vlck, false );
+    vlckey_tr = VLCKeyToString( i_vlck, true );
+    selected->setText( qtr( "Key: " ) + vlckey_tr );
+    checkForConflicts( QString() );
 }
 
 void KeyInputDialog::unsetAction() { done( 2 ); };
