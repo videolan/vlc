@@ -1218,7 +1218,7 @@ void KeySelectorControl::finish()
             treeItem->setData( ACTION_COL, Qt::UserRole,
                                QVariant( qfu( p_config_item->psz_name ) ) );
 
-            QString keys = qfu(p_config_item->value.psz ? _(p_config_item->value.psz) : "");
+            QString keys = p_config_item->value.psz ? qfut(p_config_item->value.psz) : qfu("");
             treeItem->setText( HOTKEY_COL, keys );
             treeItem->setToolTip( HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
             treeItem->setToolTip( GLOBAL_HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
