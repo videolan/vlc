@@ -1434,8 +1434,8 @@ void KeyInputDialog::setExistingkeysSet( const QSet<QString> *keyset )
 void KeyInputDialog::checkForConflicts( int i_vlckey, const QString &sequence )
 {
     conflicts = false;
-    QString vlckey = VLCKeyToString( i_vlckey, true );
-    if ( vlckey == qtr( "Unset" ) )
+    QString vlckey = VLCKeyToString( i_vlckey, false );
+    if ( vlckey == "Unset" )
     {
         accept();
         return;
@@ -1445,7 +1445,10 @@ void KeyInputDialog::checkForConflicts( int i_vlckey, const QString &sequence )
     {
         QTreeWidgetItem *item = *iter;
 
-        if( item == keyItem || vlckey.compare( item->text( column ) ) != 0 )
+        if( item == keyItem )
+            continue;
+
+        if( vlckey.compare( item->data( column, Qt::UserRole ).toString() ) != 0 )
             continue;
 
         warning->setText( qtr("Warning: this key or combination is already assigned to ") +
