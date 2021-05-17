@@ -82,7 +82,6 @@ namespace adaptive
             vlc_tick_t getFirstDTS() const;
             unsigned getActiveStreamsCount() const;
 
-            virtual vlc_tick_t getFirstPlaybackTime() const;
             vlc_tick_t getCurrentDemuxTime() const;
             vlc_tick_t getMinAheadTime() const;
 
