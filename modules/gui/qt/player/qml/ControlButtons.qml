@@ -495,32 +495,36 @@ Item{
         }
     }
 
-    Component{
+    Component {
         id: extendiblespacerDelegate
-        Item{
+
+        Item {
             id: extendedspacer
+
             enabled: false
-            implicitWidth: VLCStyle.widthExtendedSpacer
+
+            implicitWidth: paintOnly ? VLCStyle.widthExtendedSpacer : extraWidth
             implicitHeight: VLCStyle.icon_normal
+
             property bool paintOnly: false
             property alias spacetextExt: spacetext
+
+            readonly property real minimumWidth: 0
+            property real extraWidth: 0
+
             Label {
                 id: spacetext
+                anchors.centerIn: parent
+
                 text: VLCIcons.space
                 color: VLCStyle.colors.buttonText
                 visible: paintOnly
-
-                anchors.centerIn: parent
 
                 font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_medium)
                 font.family: VLCIcons.fontFamily
 
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
-            }
-
-            Component.onCompleted: {
-                parent.Layout.fillWidth=true
             }
         }
     }
