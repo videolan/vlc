@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCOpenWindowController.m: Open dialogues for VLC's MacOS X port
  *****************************************************************************
- * Copyright (C) 2002-2019 VLC authors and VideoLAN
+ * Copyright (C) 2002-2021 VLC authors and VideoLAN
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -259,8 +259,8 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     [[_netModeMatrix cellAtRow:0 column:0] setTitle: _NS("Unicast")];
     [[_netModeMatrix cellAtRow:1 column:0] setTitle: _NS("Multicast")];
 
-    [_netUDPPortTextField setIntegerValue: config_GetInt("server-port")];
-    [_netUDPPortStepper setIntegerValue: config_GetInt("server-port")];
+    [_netUDPPortTextField setIntegerValue: 0];
+    [_netUDPPortStepper setIntegerValue: 0];
 
     [_captureModePopup removeAllItems];
     [_captureModePopup addItemWithTitle: _NS("Input Devices")];
@@ -998,23 +998,22 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
             else
                 mrlString = @"rtp://";
 
-            if (port != config_GetInt("server-port")) {
+            if (port > 0) {
                 mrlString =
                 [mrlString stringByAppendingFormat: @"@:%i", port];
             }
         }
         else if ([mode isEqualToString: _NS("Multicast")]) {
-            NSString *oAddress = [_netUDPMAddressTextField stringValue];
-            int iPort = [_netUDPMPortTextField intValue];
+            NSString *address = [_netUDPMAddressTextField stringValue];
+            int port = [_netUDPMPortTextField intValue];
 
             if ([[_netUDPProtocolMatrix selectedCell] tag] == 0)
-                mrlString = [NSString stringWithFormat: @"udp://@%@", oAddress];
+                mrlString = [NSString stringWithFormat: @"udp://@%@", address];
             else
-                mrlString = [NSString stringWithFormat: @"rtp://@%@", oAddress];
+                mrlString = [NSString stringWithFormat: @"rtp://@%@", address];
 
-            if (iPort != config_GetInt("server-port")) {
-                mrlString =
-                [mrlString stringByAppendingFormat: @":%i", iPort];
+            if (port > 0) {
+                mrlString = [mrlString stringByAppendingFormat: @":%i", port];
             }
         }
     } else
@@ -1044,23 +1043,21 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
             else
                 mrlString = @"rtp://";
 
-            if (port != config_GetInt("server-port")) {
-                mrlString =
-                [mrlString stringByAppendingFormat: @"@:%i", port];
+            if (port > 0) {
+                mrlString = [mrlString stringByAppendingFormat: @"@:%i", port];
             }
         }
         else if ([[[_netModeMatrix selectedCell] title] isEqualToString: _NS("Multicast")]) {
-            NSString *oAddress = [_netUDPMAddressTextField stringValue];
-            int iPort = [_netUDPMPortTextField intValue];
+            NSString *address = [_netUDPMAddressTextField stringValue];
+            int port = [_netUDPMPortTextField intValue];
 
             if ([[_netUDPProtocolMatrix selectedCell] tag] == 0)
-                mrlString = [NSString stringWithFormat: @"udp://@%@", oAddress];
+                mrlString = [NSString stringWithFormat: @"udp://@%@", address];
             else
-                mrlString = [NSString stringWithFormat: @"rtp://@%@", oAddress];
+                mrlString = [NSString stringWithFormat: @"rtp://@%@", address];
 
-            if (iPort != config_GetInt("server-port")) {
-                mrlString =
-                [mrlString stringByAppendingFormat: @":%i", iPort];
+            if (port > 0) {
+                mrlString = [mrlString stringByAppendingFormat: @":%i", port];
             }
         }
         [self setMRL: mrlString];
