@@ -79,6 +79,8 @@ FocusScope {
 
         active: !!playerButtonsLayout.model && !!playerButtonsLayout.model.left
 
+        focus: true
+
         sourceComponent: ButtonsLayout {
             model: playerButtonsLayout.model.left
 
@@ -111,6 +113,8 @@ FocusScope {
             Navigation.parentItem: playerButtonsLayout
             Navigation.leftItem: buttonrow_left
             Navigation.rightItem: buttonrow_right
+
+            focus: true
         }
     }
 
@@ -130,8 +134,6 @@ FocusScope {
         active: !!playerButtonsLayout.model && !!playerButtonsLayout.model.right
 
         sourceComponent: ButtonsLayout {
-
-
             model: playerButtonsLayout.model.right
 
             extraWidth: (playerButtonsLayout.width - (buttonrow_center.x + buttonrow_center.width) - minimumWidth - (2 * layoutSpacing))
@@ -140,6 +142,8 @@ FocusScope {
 
             Navigation.parentItem: playerButtonsLayout
             Navigation.leftItem: buttonrow_center
+
+            focus: true
         }
     }
 }
