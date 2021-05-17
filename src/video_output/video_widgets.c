@@ -41,11 +41,13 @@
 #define STYLE_FILLED 1
 
 #define RGB_BLUE        0x2badde
+#define RGB_ORANGE      0xf48b00
+#define RGB_FILL        RGB_ORANGE
 
 #define COL_TRANSPARENT 0
 #define COL_WHITE       1
-#define COL_BLUE        2
-#define COL_BLUE_SHADE  3
+#define COL_FILL        2
+#define COL_FILL_SHADE  3
 
 #define SET_PALETTE_COLOR(id, rgb, alpha) \
 {\
@@ -120,8 +122,8 @@ static subpicture_region_t *OSDRegion(int x, int y, int width, int height)
     video_palette_t palette;
     SET_PALETTE_COLOR(COL_WHITE,       0xffffff, STYLE_ALPHA_OPAQUE)
     SET_PALETTE_COLOR(COL_TRANSPARENT, 0xffffff, STYLE_ALPHA_TRANSPARENT)
-    SET_PALETTE_COLOR(COL_BLUE,        RGB_BLUE, STYLE_ALPHA_OPAQUE)
-    SET_PALETTE_COLOR(COL_BLUE_SHADE,  RGB_BLUE, 0x40)
+    SET_PALETTE_COLOR(COL_FILL,        RGB_FILL, 0xA0)
+    SET_PALETTE_COLOR(COL_FILL_SHADE,  RGB_FILL, 0x25)
     palette.i_entries = 4;
 
     video_format_t fmt;
@@ -153,20 +155,21 @@ static subpicture_region_t *OSDSlider(int type, int position,
 {
     const int size = __MAX(fmt->i_visible_width, fmt->i_visible_height);
     const int margin = size * SLIDER_MARGIN_BASE;
-    const int marginbottom = size * SLIDER_MARGIN_BASE * 0.6;
-    uint8_t i_padding = __MIN(5, size * 0.25); /* small sizes */
+    const int marginbottom = margin * 0.2;
+    const int marginright = margin * 0.5;
+    uint8_t i_padding = __MIN(1, size * 0.25); /* small sizes */
 
     int x, y;
     int width, height;
     if (type == OSD_HOR_SLIDER) {
         width  = __MAX(fmt->i_visible_width - 2 * margin, 1);
-        height = __MAX(fmt->i_visible_height * 0.05,      1);
+        height = __MAX(fmt->i_visible_height * 0.01,      1);
         x      = __MIN(fmt->i_x_offset + margin, fmt->i_visible_width - width);
         y      = __MAX(fmt->i_y_offset + fmt->i_visible_height - marginbottom, 0);
     } else {
-        width  = __MAX(fmt->i_visible_width * 0.025,       1);
+        width  = __MAX(fmt->i_visible_width * 0.010,       1);
         height = __MAX(fmt->i_visible_height - 2 * margin, 1);
-        x      = __MAX(fmt->i_x_offset + fmt->i_visible_width - margin, 0);
+        x      = __MAX(fmt->i_x_offset + fmt->i_visible_width - marginright, 0);
         y      = __MIN(fmt->i_y_offset + margin, fmt->i_visible_height - height);
     }
 
@@ -190,8 +193,8 @@ static subpicture_region_t *OSDSlider(int type, int position,
     }
 
     /* one full fill is faster than drawing outline */
-    DrawRect(r, STYLE_FILLED, COL_BLUE_SHADE, 0, 0, width - 1, height - 1);
-    DrawRect(r, STYLE_FILLED, COL_BLUE, pos_x, pos_y, pos_xend, pos_yend);
+    DrawRect(r, STYLE_FILLED, COL_FILL_SHADE, 0, 0, width - 1, height - 1);
+    DrawRect(r, STYLE_FILLED, COL_FILL, pos_x, pos_y, pos_xend, pos_yend);
 
     return r;
 }
@@ -239,7 +242,7 @@ static subpicture_region_t *OSDIcon(int type, const video_format_t *fmt)
         DrawTriangle(r, STYLE_FILLED, COL_WHITE, width - delta, 0, delta, y2);
         if (type == OSD_MUTE_ICON) {
             for(int y1 = 0; y1 <= height -1; y1++)
-                DrawRect(r, STYLE_FILLED, COL_BLUE, y1, y1, __MIN(y1 + delta, width - 1), y1);
+                DrawRect(r, STYLE_FILLED, COL_FILL, y1, y1, __MIN(y1 + delta, width - 1), y1);
         }
     }
     return r;

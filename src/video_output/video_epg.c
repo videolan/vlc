@@ -60,11 +60,11 @@
 #define EPGOSD_TEXTSIZE_PROG    (OSDEPG_ROWS(2))
 #define EPGOSD_TEXTSIZE_NTWK    (OSDEPG_ROWS(2))
 
-//#define RGB_COLOR1   0xf48b00
-//#define ARGB_BGCOLOR 0xC0333333
+#define RGB_COLOR1   0xf48b00
+#define ARGB_BGCOLOR 0xC0333333
 
-#define RGB_COLOR1   0x2badde
-#define ARGB_BGCOLOR 0xc003182d
+//#define RGB_COLOR1   0x2badde
+//#define ARGB_BGCOLOR 0xc003182d
 
 typedef struct
 {
