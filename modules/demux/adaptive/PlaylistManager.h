@@ -80,7 +80,6 @@ namespace adaptive
             mtime_t getFirstDTS() const;
             unsigned getActiveStreamsCount() const;
 
-            virtual mtime_t getFirstPlaybackTime() const;
             mtime_t getCurrentDemuxTime() const;
             mtime_t getMinAheadTime() const;
 

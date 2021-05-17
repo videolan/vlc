@@ -404,11 +404,6 @@ bool PlaylistManager::updatePlaylist()
     return true;
 }
 
-mtime_t PlaylistManager::getFirstPlaybackTime() const
-{
-    return 0;
-}
-
 mtime_t PlaylistManager::getCurrentDemuxTime() const
 {
     vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&demux.lock));
@@ -636,7 +631,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
         {
             setBufferingRunState(false); /* stop downloader first */
 
-            int64_t time = va_arg(args, int64_t);// + getFirstPlaybackTime();
+            mtime_t time = va_arg(args, int64_t);
             if(!setPosition(time))
             {
                 setBufferingRunState(true);
