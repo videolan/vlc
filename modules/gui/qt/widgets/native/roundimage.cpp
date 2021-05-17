@@ -29,6 +29,7 @@
 
 #include <QBrush>
 #include <QImage>
+#include <QPainter>
 #include <QPainterPath>
 #include <QPen>
 #include <QQuickWindow>
@@ -43,6 +44,16 @@
 
 namespace
 {
+    class Image
+    {
+    public:
+        static std::unique_ptr<Image> getImage(const QUrl &source, const QSizeF &sourceSize);
+        virtual ~Image() = default;
+
+        // must be reentrant
+        virtual void paint(QPainter *painter, const QSizeF &size) = 0;
+    };
+
     QString getPath(const QUrl &url)
     {
         QString path = url.isLocalFile() ? url.toLocalFile() : url.toString();
@@ -86,6 +97,8 @@ RoundImage::RoundImage(QQuickItem *parent) : QQuickPaintedItem {parent}
 
 void RoundImage::paint(QPainter *painter)
 {
+    if (m_roundImage.isNull())
+        return;
     painter->drawImage(QPointF {0., 0.}, m_roundImage, m_roundImage.rect());
 }
 
@@ -103,7 +116,9 @@ void RoundImage::componentComplete()
     Q_ASSERT(!m_isComponentComplete); // classBegin is not called?
     m_isComponentComplete = true;
     if (!m_source.isEmpty())
-        updateSource();
+        regenerateRoundImage();
+    else
+        m_roundImage = {};
 }
 
 QUrl RoundImage::source() const
@@ -116,11 +131,6 @@ qreal RoundImage::radius() const
     return m_radius;
 }
 
-QSizeF RoundImage::sourceSize() const
-{
-    return m_sourceSize;
-}
-
 void RoundImage::setSource(QUrl source)
 {
     if (m_source == source)
@@ -128,7 +138,7 @@ void RoundImage::setSource(QUrl source)
 
     m_source = source;
     emit sourceChanged(m_source);
-    updateSource();
+    regenerateRoundImage();
 }
 
 void RoundImage::setRadius(qreal radius)
@@ -139,16 +149,6 @@ void RoundImage::setRadius(qreal radius)
     m_radius = radius;
     emit radiusChanged(m_radius);
     regenerateRoundImage();
-}
-
-void RoundImage::setSourceSize(QSizeF sourceSize)
-{
-    if (m_sourceSize == sourceSize)
-        return;
-
-    m_sourceSize = sourceSize;
-    emit sourceSizeChanged(m_sourceSize);
-    updateSource();
 }
 
 void RoundImage::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
@@ -165,35 +165,12 @@ void RoundImage::setDPR(const qreal value)
         return;
 
     m_dpr = value;
-    if (m_sourceSize.isValid())
-        updateSource(); // "effectiveSourceSize" is changed
-    else
-        regenerateRoundImage();
-}
-
-void RoundImage::updateSource()
-{
-    if (!m_isComponentComplete)
-        return;
-
-    const QSizeF effectiveSourceSize = m_sourceSize.isValid() ? m_sourceSize * m_dpr : QSize {};
-    m_loader.reset(new Loader({m_source, effectiveSourceSize}));
-    connect(m_loader.get(), &BaseAsyncTask::result, this, [this]()
-    {
-        m_sourceImage = m_loader->takeResult();
-        m_loader.reset();
-
-        regenerateRoundImage();
-    });
-
-    m_loader->start(*QThreadPool::globalInstance());
+    regenerateRoundImage();
 }
 
 void RoundImage::regenerateRoundImage()
 {
-    if (!m_isComponentComplete
-            || m_enqueuedGeneration
-            || m_loader /* when loader ends it will call regenerateRoundImage */)
+    if (!m_isComponentComplete || m_enqueuedGeneration)
         return;
 
     // use Qt::QueuedConnection to delay generation, so that dependent properties
@@ -206,7 +183,7 @@ void RoundImage::regenerateRoundImage()
 
         // Image is generated in size factor of `m_dpr` to avoid scaling artefacts when
         // generated image is set with device pixel ratio
-        m_roundImageGenerator.reset(new RoundImageGenerator({width() * m_dpr, height() * m_dpr, radius() * m_dpr, m_sourceImage}));
+        m_roundImageGenerator.reset(new RoundImageGenerator(m_source, width() * m_dpr, height() * m_dpr, radius() * m_dpr));
         connect(m_roundImageGenerator.get(), &BaseAsyncTask::result, this, [this]()
         {
             m_roundImage = m_roundImageGenerator->takeResult();
@@ -220,27 +197,24 @@ void RoundImage::regenerateRoundImage()
     }, Qt::QueuedConnection);
 }
 
-RoundImage::Loader::Loader(const Params &params) : params {params} {}
-
-RoundImage::ImagePtr RoundImage::Loader::execute()
+RoundImage::RoundImageGenerator::RoundImageGenerator(const QUrl &source, qreal width, qreal height, qreal radius)
+    : source(source)
+    , width(width)
+    , height(height)
+    , radius(radius)
 {
-    return Image::getImage(params.source, params.sourceSize);
 }
-
-RoundImage::RoundImageGenerator::RoundImageGenerator(const RoundImage::RoundImageGenerator::Params &params) : params {params} {}
 
 QImage RoundImage::RoundImageGenerator::execute()
 {
-    if (params.width <= 0 || params.height <= 0)
+    if (width <= 0 || height <= 0)
         return {};
 
-    QImage target(params.width, params.height, QImage::Format_ARGB32);
+    QImage target(width, height, QImage::Format_ARGB32);
     if (target.isNull())
         return target;
 
     target.fill(Qt::transparent);
-    if (Q_UNLIKELY(!params.image))
-        return target;
 
     QPainter painter;
     painter.begin(&target);
@@ -248,16 +222,18 @@ QImage RoundImage::RoundImageGenerator::execute()
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
     QPainterPath path;
-    path.addRoundedRect(0, 0, params.width, params.height, params.radius, params.radius);
+    path.addRoundedRect(0, 0, width, height, radius, radius);
     painter.setClipPath(path);
 
-    params.image->paint(&painter, {params.width, params.height});
+    auto image = Image::getImage(source, {width, height});
+    image->paint(&painter, {width, height});
+
     painter.end();
 
     return target;
 }
 
-std::shared_ptr<RoundImage::Image> RoundImage::Image::getImage(const QUrl &source, const QSizeF &sourceSize)
+std::unique_ptr<Image> Image::getImage(const QUrl &source, const QSizeF &sourceSize)
 {
     class QtImage : public Image
     {
@@ -319,6 +295,6 @@ std::shared_ptr<RoundImage::Image> RoundImage::Image::getImage(const QUrl &sourc
 
     const QByteArray data = readFile(source);
     if (source.toString().endsWith(".svg"))
-        return std::make_shared<SVGImage>(data);
-    return std::make_shared<QtImage>(data, sourceSize);
+        return std::make_unique<SVGImage>(data);
+    return std::make_unique<QtImage>(data, sourceSize);
 }

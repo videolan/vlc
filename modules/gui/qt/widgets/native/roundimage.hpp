@@ -27,8 +27,7 @@
 
 #include "util/asynctask.hpp"
 
-#include <QPixmap>
-#include <QPainter>
+#include <QImage>
 #include <QQuickPaintedItem>
 #include <QUrl>
 
@@ -38,9 +37,6 @@ class RoundImage : public QQuickPaintedItem
 
     // url of the image
     Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
-
-    // sets the maximum number of pixels stored for the loaded image so that large images do not use more memory than necessary
-    Q_PROPERTY(QSizeF sourceSize READ sourceSize WRITE setSourceSize NOTIFY sourceSizeChanged)
 
     Q_PROPERTY(qreal radius READ radius WRITE setRadius NOTIFY radiusChanged)
 
@@ -54,12 +50,10 @@ public:
 
     QUrl source() const;
     qreal radius() const;
-    QSizeF sourceSize() const;
 
 public slots:
     void setSource(QUrl source);
     void setRadius(qreal radius);
-    void setSourceSize(QSizeF sourceSize);
 
 signals:
     void sourceChanged(QUrl source);
@@ -70,65 +64,27 @@ protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
 
 private:
-    class Image
-    {
-    public:
-        static std::shared_ptr<Image> getImage(const QUrl &source, const QSizeF &sourceSize);
-        virtual ~Image() = default;
-
-        // must be reentrant
-        virtual void paint(QPainter *painter, const QSizeF &size) = 0;
-    };
-
-    using ImagePtr = std::shared_ptr<Image>;
-
-    class Loader : public AsyncTask<ImagePtr>
-    {
-    public:
-        struct Params
-        {
-            QUrl source;
-            QSizeF sourceSize;
-        };
-
-        Loader(const Params &params);
-
-        ImagePtr execute();
-
-    private:
-        const Params params;
-    };
-
     class RoundImageGenerator : public AsyncTask<QImage>
     {
     public:
-        struct Params
-        {
-            qreal width;
-            qreal height;
-            qreal radius;
-            ImagePtr image;
-        };
-
-        RoundImageGenerator(const Params &params);
+        RoundImageGenerator(const QUrl &source, qreal width, qreal height, qreal radius);
 
         QImage execute();
 
     private:
-        const Params params;
+        QUrl source;
+        qreal width;
+        qreal height;
+        qreal radius;
     };
 
     void setDPR(qreal value);
-    void updateSource();
     void regenerateRoundImage();
 
     QUrl m_source;
-    ImagePtr m_sourceImage;
     qreal m_radius = 0.0;
-    QSizeF m_sourceSize;
     qreal m_dpr = 1.0; // device pixel ratio
     QImage m_roundImage;
-    TaskHandle<Loader> m_loader {};
     TaskHandle<RoundImageGenerator> m_roundImageGenerator {};
 
     bool m_enqueuedGeneration = false;

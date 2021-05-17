@@ -37,7 +37,6 @@ RoundImage {
 
     height: VLCStyle.listAlbumCover_height
     width: VLCStyle.listAlbumCover_width
-    sourceSize: Qt.size(width, height)
 
     Loader {
         id: overlay

@@ -100,7 +100,6 @@ Widgets.NavigableFocusScope {
 
                             anchors.fill: parent
                             source: model.thumbnail || VLCStyle.noArtCover
-                            sourceSize: Qt.size(width, height)
                             radius: VLCStyle.gridCover_radius
                         }
 

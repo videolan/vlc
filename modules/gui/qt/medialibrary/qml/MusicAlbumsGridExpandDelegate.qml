@@ -111,7 +111,6 @@ Widgets.NavigableFocusScope {
                         width: VLCStyle.expandCover_music_width
                         radius: VLCStyle.expandCover_music_radius
                         source: model.cover || VLCStyle.noArtAlbum
-                        sourceSize: Qt.size(width, height)
                     }
 
                     Widgets.ListCoverShadow {
