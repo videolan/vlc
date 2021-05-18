@@ -1246,7 +1246,7 @@ void KeySelectorControl::finish()
         if( list.count() >= 1 )
         {
             QString keys = i.value();
-            list[0]->setText( GLOBAL_HOTKEY_COL, keys.replace( "\t", ", " ) );
+            list[0]->setText( GLOBAL_HOTKEY_COL, qfut(qtu(keys)).replace( "\t", ", " ) );
             list[0]->setData( GLOBAL_HOTKEY_COL, Qt::UserRole, keys );
         }
         if( list.count() >= 2 )
