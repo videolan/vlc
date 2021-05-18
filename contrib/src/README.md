@@ -1,18 +1,16 @@
-Writing rules
-==============
+## Writing rules
 
 At the bare minimum, a package in contrib must provide two Makefile
-targets in src/foo/rules.mak:
- - .foo to build and install the package, and
- - .sum-foo to fetch or create a source tarball and verify it,
+targets in `src/foo/rules.mak`:
+ - `.foo` to build and install the package, and
+ - `.sum-foo` to fetch or create a source tarball and verify it,
 where foo the package name.
 
 
-Tarball
---------
+### Tarball
 
-.sum-foo typically depends on a separate target that fetches the source
-code. In that case, .sum-foo needs only verify that the tarball
+`.sum-foo` typically depends on a separate target that fetches the source
+code. In that case, `.sum-foo` needs only verify that the tarball
 is correct, e.g.:
 
 
@@ -29,10 +27,9 @@ This serves two purposes:
  - source code requirements compliance.
 
 
-Compilation
-------------
+### Compilation
 
-Similarly, .foo typically depends on the source code directory. In this
+Similarly, `.foo` typically depends on the source code directory. In this
 case, care must be taken that the directory name only exists if the
 source code is fully ready. Otherwise Makefile dependencies will break
 (this is not an issue for files, only directories).
@@ -48,8 +45,7 @@ source code is fully ready. Otherwise Makefile dependencies will break
 		cd $< && $(MAKE) install
 		touch $@
 
-Conditional builds
--------------------
+### Conditional builds
 
 As far as possible, build rules should determine automatically whether
 a package is useful (for VLC media player) or not. Useful packages
@@ -83,24 +79,23 @@ variable. The build system will then skip building this package:
 	endif
 
 
-Dependencies
--------------
+### Dependencies
 
-If package bar depends on package foo, the special DEPS_bar variable
+If package bar depends on package foo, the special `DEPS_bar` variable
 should be defined as follow:
 
 	DEPS_bar = foo $(DEPS_foo)
 
 Note that dependency resolution is unfortunately _not_ recursive.
-Therefore $(DEPS_foo) really should be specified explicitly as shown
+Therefore `$(DEPS_foo)` really should be specified explicitly as shown
 above. (In practice, this will not make any difference insofar as there
 are no pure second-level nested dependencies. For instance, libass
 depends on FontConfig, which depends on FreeType, but libass depends
 directly on FreeType anyway.)
 
-Also note that DEPS_bar is set "recursively" with =, rather than
-"immediately" with :=. This is so that $(DEPS_foo) is expanded
-correctly, even if DEPS_foo it is defined after DEPS_bar.
+Also note that `DEPS_bar` is set "recursively" with `=`, rather than
+"immediately" with `:=`. This is so that `$(DEPS_foo)` is expanded
+correctly, even if `DEPS_foo` it is defined after `DEPS_bar`.
 
 Implementation note:
 
