@@ -1204,8 +1204,7 @@ void KeySelectorControl::finish()
             continue;
 
         /* If we are a (non-global) key option not empty */
-        if( p_config_item->psz_name != NULL
-         && strncmp( p_config_item->psz_name, "global-", 7 ) != 0
+        if( strncmp( p_config_item->psz_name, "global-", 7 ) != 0
          && !EMPTY_STR( p_config_item->psz_text ) )
         {
             /*
@@ -1228,8 +1227,7 @@ void KeySelectorControl::finish()
             continue;
         }
 
-        if( p_config_item->psz_name != NULL
-         && strncmp( p_config_item->psz_name, "global-", 7 ) == 0
+        if( strncmp( p_config_item->psz_name, "global-", 7 ) == 0
          && !EMPTY_STR( p_config_item->psz_text )
          && !EMPTY_STR( p_config_item->value.psz ) )
         {

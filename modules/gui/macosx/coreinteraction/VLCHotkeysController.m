@@ -65,7 +65,6 @@
         module_config_t *p_item = p_config + i;
 
         if (p_item->i_type == CONFIG_ITEM_KEY
-            && p_item->psz_name != NULL
             && strncmp( p_item->psz_name, "global-", 7 ) != 0
             && !EMPTY_STR(p_item->psz_text)) {
             if (p_item->value.psz)
