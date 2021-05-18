@@ -345,6 +345,54 @@ static es_out_id_t * MP4_CreateES( es_out_t *out, const es_format_t *p_fmt,
     return p_es;
 }
 
+static int MP4_ChunkAllocDtsEntries( mp4_chunk_t *ck )
+{
+    size_t entries = ck->i_entries_dts;
+
+    if( entries <= ARRAY_SIZE(ck->small_dts_buf) / 2 )
+    {
+        ck->p_sample_count_dts = ck->small_dts_buf;
+        ck->p_sample_delta_dts = ck->small_dts_buf + entries;
+        return 0;
+    }
+
+    uint32_t *buf = calloc( entries, sizeof( buf[0] ) * 2 );
+    if( unlikely(buf == NULL) )
+        return VLC_ENOMEM;
+
+    ck->p_sample_count_dts = buf;
+    ck->p_sample_delta_dts = buf + entries;
+    return 0;
+}
+
+static int MP4_ChunkAllocPtsEntries( mp4_chunk_t *ck )
+{
+    size_t entries = ck->i_entries_pts;
+
+    if( entries <= ARRAY_SIZE(ck->small_pts_buf) / 2 )
+    {
+        ck->p_sample_count_pts = ck->small_pts_buf;
+        ck->p_sample_offset_pts = ck->small_pts_buf + entries;
+        return 0;
+    }
+
+    uint32_t *buf = calloc( entries, sizeof( buf[0] ) * 2 );
+    if( unlikely(buf == NULL) )
+        return VLC_ENOMEM;
+
+    ck->p_sample_count_pts = buf;
+    ck->p_sample_offset_pts = buf + entries;
+    return 0;
+}
+
+static void MP4_ChunkDestroy( mp4_chunk_t *ck )
+{
+    if( ck->p_sample_count_dts != ck->small_dts_buf )
+        free( ck->p_sample_count_dts );
+    if( ck->p_sample_count_pts != ck->small_pts_buf )
+        free( ck->p_sample_count_pts );
+}
+
 static const mp4_chunk_t * MP4_TrackChunkForSample( const mp4_track_t *p_track,
                                                     uint32_t i_sample )
 {
@@ -2625,15 +2673,12 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                 return i_ret;
 
             /* allocate them */
-            ck->p_sample_count_dts = calloc( ck->i_entries_dts, sizeof( uint32_t ) );
-            ck->p_sample_delta_dts = calloc( ck->i_entries_dts, sizeof( uint32_t ) );
-            if( !ck->p_sample_count_dts || !ck->p_sample_delta_dts )
+            i_ret = MP4_ChunkAllocDtsEntries( ck );
+            if( i_ret )
             {
-                free( ck->p_sample_count_dts );
-                free( ck->p_sample_delta_dts );
                 msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, ck->i_entries_dts );
                 ck->i_entries_dts = 0;
-                return VLC_ENOMEM;
+                return i_ret;
             }
 
             /* now copy */
@@ -2740,15 +2785,12 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                 return i_ret;
 
             /* allocate them */
-            ck->p_sample_count_pts = calloc( ck->i_entries_pts, sizeof( uint32_t ) );
-            ck->p_sample_offset_pts = calloc( ck->i_entries_pts, sizeof( uint32_t ) );
-            if( !ck->p_sample_count_pts || !ck->p_sample_offset_pts )
+            i_ret = MP4_ChunkAllocPtsEntries( ck );
+            if( i_ret )
             {
-                free( ck->p_sample_count_pts );
-                free( ck->p_sample_offset_pts );
                 msg_Err( p_demux, "can't allocate memory for i_entry=%"PRIu32, ck->i_entries_pts );
                 ck->i_entries_pts = 0;
-                return VLC_ENOMEM;
+                return i_ret;
             }
 
             /* now copy */
@@ -3644,14 +3686,6 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
     p_track->b_ok = true;
 }
 
-static void DestroyChunk( mp4_chunk_t *ck )
-{
-    free( ck->p_sample_count_dts );
-    free( ck->p_sample_delta_dts );
-    free( ck->p_sample_count_pts );
-    free( ck->p_sample_offset_pts );
-}
-
 /****************************************************************************
  * MP4_TrackClean:
  ****************************************************************************
@@ -3667,7 +3701,7 @@ static void MP4_TrackClean( es_out_t *out, mp4_track_t *p_track )
     if( p_track->chunk )
     {
         for( unsigned int i_chunk = 0; i_chunk < p_track->i_chunk_count; i_chunk++ )
-            DestroyChunk( &p_track->chunk[i_chunk] );
+            MP4_ChunkDestroy( &p_track->chunk[i_chunk] );
     }
     free( p_track->chunk );
 
