@@ -1229,11 +1229,9 @@ void KeySelectorControl::finish()
             treeItem->setToolTip( GLOBAL_HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
             treeItem->setData( HOTKEY_COL, Qt::UserRole, QVariant( p_config_item->value.psz ) );
             table->addTopLevelItem( treeItem );
-            continue;
         }
-
-        if( strncmp( p_config_item->psz_name, "global-", 7 ) == 0
-         && !EMPTY_STR( p_config_item->value.psz ) )
+        /* Capture global key option mappings to fill in afterwards */
+        else if( !EMPTY_STR( p_config_item->value.psz ) )
         {
             global_keys.insert( qfu( p_config_item->psz_name + 7 ),
                                 qfu( p_config_item->value.psz ) );
