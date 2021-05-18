@@ -1243,22 +1243,16 @@ void KeySelectorControl::finish()
     QMap<QString, QString>::const_iterator i = global_keys.constBegin();
     while (i != global_keys.constEnd())
     {
-        bool found = false;
         for (QTreeWidgetItemIterator iter(table); *iter; ++iter)
         {
             QTreeWidgetItem *item = *iter;
 
             if( item->data( ACTION_COL, Qt::UserRole ) == i.key() )
             {
-                if( found )
-                {
-                    msg_Dbg( p_this, "This is probably wrong, %s", qtu(i.key()) );
-                    break;
-                }
-                found = true;
                 QString keys = i.value();
                 item->setText( GLOBAL_HOTKEY_COL, qfut(qtu(keys)).replace( "\t", ", " ) );
                 item->setData( GLOBAL_HOTKEY_COL, Qt::UserRole, keys );
+                break;
             }
         }
         ++i;
