@@ -54,7 +54,6 @@ typedef struct
     uint32_t     *p_sample_count_pts;
     uint32_t     *p_sample_offset_pts;  /* pts-dts */
 
-    uint32_t     *p_sample_size;
     /* TODO if needed add pts
         but quickly *add* support for edts and seeking */
 

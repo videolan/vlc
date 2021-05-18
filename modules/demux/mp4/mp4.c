@@ -3650,7 +3650,6 @@ static void DestroyChunk( mp4_chunk_t *ck )
     free( ck->p_sample_delta_dts );
     free( ck->p_sample_count_pts );
     free( ck->p_sample_offset_pts );
-    free( ck->p_sample_size );
 }
 
 /****************************************************************************
