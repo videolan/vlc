@@ -326,7 +326,7 @@ QString VLCKeyToString( unsigned val, bool locale )
 {
     char *base = vlc_keycode2str (val, locale);
     if (base == NULL)
-        return locale ? qtr( "Unset" ) : qfu( "Unset" );
+        return qfu( "" );
 
     QString r = qfu( base );
 

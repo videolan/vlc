@@ -1454,7 +1454,7 @@ void KeyInputDialog::setExistingkeysSet( const QSet<QString> *keyset )
 void KeyInputDialog::checkForConflicts( const QString &sequence )
 {
     conflicts = false;
-    if ( vlckey == "Unset" )
+    if ( vlckey == "" )
     {
         accept();
         return;
