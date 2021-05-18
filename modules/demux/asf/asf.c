@@ -1228,7 +1228,7 @@ static int DemuxInit( demux_t *p_demux )
     free( fmt_priorities_bitrate_ex.pi_stream_numbers );
 
     p_sys->i_data_begin = p_sys->p_root->p_data->i_object_pos + 50;
-    if( p_sys->p_root->p_data->i_object_size != 0 )
+    if( p_sys->p_root->p_data->i_object_size > 50 ) /* see libasf ASF_OBJECT_DATA <= 50 handling */
     { /* local file */
         p_sys->i_data_end = p_sys->p_root->p_data->i_object_pos +
                                     p_sys->p_root->p_data->i_object_size;
