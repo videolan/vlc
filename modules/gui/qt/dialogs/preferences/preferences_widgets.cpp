@@ -1213,11 +1213,11 @@ void KeySelectorControl::finish()
             continue;
 
         /* If we are a (non-global) key option not empty */
-        if( strncmp( p_config_item->psz_name, "global-", 7 ) != 0
-         && !EMPTY_STR( p_config_item->psz_text ) )
+        if( strncmp( p_config_item->psz_name, "global-", 7 ) != 0 )
         {
             QTreeWidgetItem *treeItem = new QTreeWidgetItem();
-            treeItem->setText( ACTION_COL, qfut( p_config_item->psz_text ) );
+            treeItem->setText( ACTION_COL, p_config_item->psz_text ?
+                                           qfut( p_config_item->psz_text ) : qfu("") );
             treeItem->setData( ACTION_COL, Qt::UserRole,
                                QVariant( qfu( p_config_item->psz_name ) ) );
             if (p_config_item->psz_longtext)
