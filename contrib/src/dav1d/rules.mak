@@ -1,6 +1,6 @@
 # libdav1d
 
-DAV1D_VERSION := 0.7.1
+DAV1D_VERSION := 0.9.0
 DAV1D_URL := $(VIDEOLAN)/dav1d/$(DAV1D_VERSION)/dav1d-$(DAV1D_VERSION).tar.xz
 
 PKGS += dav1d
@@ -18,7 +18,6 @@ $(TARBALLS)/dav1d-$(DAV1D_VERSION).tar.xz:
 
 dav1d: dav1d-$(DAV1D_VERSION).tar.xz .sum-dav1d
 	$(UNPACK)
-	$(APPLY) $(SRC)/dav1d/0001-SSE2-PIC-464ca6c2.patch
 	$(MOVE)
 
 .dav1d: dav1d crossfile.meson
