@@ -44,6 +44,20 @@ struct vlc_thumbnailer_request_t;
 
 class Logger;
 
+class EmbeddedThumbnail : public medialibrary::parser::IEmbeddedThumbnail
+{
+public:
+    EmbeddedThumbnail( input_attachment_t* a, vlc_fourcc_t fcc );
+    virtual ~EmbeddedThumbnail();
+    virtual bool save(const std::string& path) override;
+    virtual size_t size() const override;
+    virtual std::string hash() const override;
+    virtual std::string extension() const override;
+private:
+    input_attachment_t* m_attachment;
+    vlc_fourcc_t m_fcc;
+};
+
 class MetadataExtractor : public medialibrary::parser::IParserService
 {
 private:

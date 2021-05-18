@@ -24,6 +24,64 @@
 
 #include "medialibrary.h"
 
+#include <vlc_image.h>
+#include <vlc_hash.h>
+#include <vlc_fs.h>
+
+EmbeddedThumbnail::EmbeddedThumbnail( input_attachment_t* a, vlc_fourcc_t fcc )
+    : m_attachment( vlc_input_attachment_Hold( a ) )
+    , m_fcc( fcc )
+{
+}
+
+EmbeddedThumbnail::~EmbeddedThumbnail()
+{
+    vlc_input_attachment_Release( m_attachment );
+}
+
+bool EmbeddedThumbnail::save( const std::string& path )
+{
+    std::unique_ptr<FILE, decltype(&fclose)> f{ vlc_fopen( path.c_str(), "wb" ),
+                                                &fclose };
+    if ( f == nullptr )
+        return false;
+    auto res = fwrite( m_attachment->p_data, m_attachment->i_data, 1, f.get() );
+    return res == 1;
+}
+
+size_t EmbeddedThumbnail::size() const
+{
+    return m_attachment->i_data;
+}
+
+std::string EmbeddedThumbnail::hash() const
+{
+    vlc_hash_md5_t md5;
+    vlc_hash_md5_Init( &md5 );
+    vlc_hash_md5_Update( &md5, m_attachment->p_data, m_attachment->i_data );
+    uint8_t bytes[VLC_HASH_MD5_DIGEST_SIZE];
+    vlc_hash_md5_Finish( &md5, bytes, sizeof(bytes) );
+    std::string res;
+    res.reserve( VLC_HASH_MD5_DIGEST_HEX_SIZE );
+    const char* hex = "0123456789ABCDEF";
+    for ( auto i = 0u; i < VLC_HASH_MD5_DIGEST_SIZE; ++i )
+        res.append( { hex[bytes[i] >> 4], hex[bytes[i] & 0xF] } );
+    return res;
+}
+
+std::string EmbeddedThumbnail::extension() const
+{
+    switch ( m_fcc )
+    {
+    case VLC_CODEC_JPEG:
+        return "jpg";
+    case VLC_CODEC_PNG:
+        return "png";
+    default:
+        vlc_assert_unreachable();
+    }
+}
+
 MetadataExtractor::MetadataExtractor( vlc_object_t* parent )
     : m_currentCtx( nullptr )
     , m_obj( parent )
