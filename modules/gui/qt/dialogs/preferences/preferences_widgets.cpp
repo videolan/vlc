@@ -1399,7 +1399,7 @@ bool KeySelectorControl::eventFilter( QObject *obj, QEvent *e )
 KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
                                 QTreeWidgetItem * _keyItem,
                                 bool b_global ) :
-                                QDialog( _table ), keyItem( _keyItem )
+                                QDialog( _table ), table( _table ), keyItem( _keyItem )
 {
     setModal( true );
     conflicts = false;
@@ -1408,7 +1408,6 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
     column = b_global ? KeySelectorControl::GLOBAL_HOTKEY_COL
                       : KeySelectorControl::HOTKEY_COL;
 
-    table = _table;
     setWindowTitle( ( b_global ? qtr( "Global" ) + QString(" ") : "" )
                     + qtr( "Hotkey change" ) );
     setWindowRole( "vlc-key-input" );
