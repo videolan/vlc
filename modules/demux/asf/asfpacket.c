@@ -405,8 +405,8 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
 
     const uint64_t i_read_pos = vlc_stream_Tell( p_demux->s );
     if( i_read_pos < i_data_begin ||
-        i_data_packet_min > i_data_end ||
-        i_read_pos > i_data_end - i_data_packet_min )
+        (i_data_end && ( i_data_packet_min > i_data_end ||
+                         i_read_pos > i_data_end - i_data_packet_min ) ) )
         return 0;
 
     const uint8_t *p_peek;
@@ -477,8 +477,9 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     pkt.send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
     /* uint16_t i_packet_duration = GetWLE( p_peek + i_skip ); */ i_skip += 2;
 
-    if( pkt.length > i_data_end ||
-        i_read_pos > i_data_end - pkt.length )
+    if( i_data_end &&
+        (pkt.length > i_data_end ||
+         i_read_pos > i_data_end - pkt.length) )
     {
         msg_Warn( p_demux, "pkt size %"PRIu32" at %"PRIu64" does not fit data chunk",
                   pkt.length, i_read_pos );
