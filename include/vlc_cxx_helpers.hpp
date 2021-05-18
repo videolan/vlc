@@ -423,7 +423,10 @@ public:
     explicit url( const char* str )
     {
         if ( vlc_UrlParse( this, str ) )
+        {
+            vlc_UrlClean( this );
             throw invalid( str );
+        }
     }
 
     explicit url( const std::string& str )
