@@ -1184,7 +1184,15 @@ void KeySelectorControl::buildAppHotkeysList( QWidget *rootWidget )
 
 void KeySelectorControl::finish()
 {
-    /* Fill the table */
+    /* Fill the table
+
+       Each table row (action) has the following:
+        - Non-global option name stored in data of column 0 (action name) field.
+        - Translated key assignment strings displayed in columns 1 & 2, global
+          and non-global respectively.
+        - Non-translated (stored) key assignment strings stored in data of
+          columns 1 & 2, global and non-global respectively.
+     */
 
     /* Get the main Module */
     module_t *p_main = module_get_main();
@@ -1208,12 +1216,6 @@ void KeySelectorControl::finish()
         if( strncmp( p_config_item->psz_name, "global-", 7 ) != 0
          && !EMPTY_STR( p_config_item->psz_text ) )
         {
-            /*
-               Each tree item has:
-                - QString text in column 0
-                - QString name in data of column 0
-                - KeyValue in String in column 1
-             */
             QTreeWidgetItem *treeItem = new QTreeWidgetItem();
             treeItem->setText( ACTION_COL, qfut( p_config_item->psz_text ) );
             treeItem->setData( ACTION_COL, Qt::UserRole,
