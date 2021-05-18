@@ -1309,7 +1309,7 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
     bool b_global = ( column == GLOBAL_HOTKEY_COL );
 
     /* Launch a small dialog to ask for a new key */
-    KeyInputDialog *d = new KeyInputDialog( table, keyItem, table, b_global );
+    KeyInputDialog *d = new KeyInputDialog( table, keyItem, b_global );
     d->setExistingkeysSet( &existingkeys );
     d->exec();
 
@@ -1398,9 +1398,8 @@ bool KeySelectorControl::eventFilter( QObject *obj, QEvent *e )
  **/
 KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
                                 QTreeWidgetItem * _keyItem,
-                                QWidget *_parent,
                                 bool b_global ) :
-                                QDialog( _parent ), keyItem( _keyItem )
+                                QDialog( _table ), keyItem( _keyItem )
 {
     setModal( true );
     conflicts = false;

@@ -530,7 +530,7 @@ class KeyInputDialog : public QDialog
     Q_OBJECT
 
 public:
-    KeyInputDialog( QTreeWidget *, QTreeWidgetItem *, QWidget *, bool b_global = false );
+    KeyInputDialog( QTreeWidget *, QTreeWidgetItem *, bool b_global = false );
     bool conflicts;
     QString vlckey, vlckey_tr;
     void setExistingkeysSet( const QSet<QString> *keyset = NULL );
