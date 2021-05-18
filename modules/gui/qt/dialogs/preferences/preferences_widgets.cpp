@@ -1318,10 +1318,9 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
         /* In case of conflict, reset other keys*/
         if( d->conflicts )
         {
-            QTreeWidgetItem *it;
-            for( int i = 0; i < table->topLevelItemCount() ; i++ )
+            for (QTreeWidgetItemIterator iter(table); *iter; ++iter)
             {
-                it = table->topLevelItem(i);
+                QTreeWidgetItem *it = *iter;
                 if( keyItem == it )
                     continue;
                 QStringList it_keys = it->data( column, Qt::UserRole ).toString().split( "\t" );
@@ -1348,10 +1347,9 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
 
 void KeySelectorControl::doApply()
 {
-    QTreeWidgetItem *it;
-    for( int i = 0; i < table->topLevelItemCount() ; i++ )
+    for (QTreeWidgetItemIterator iter(table); *iter; ++iter)
     {
-        it = table->topLevelItem(i);
+        QTreeWidgetItem *it = *iter;
 
         config_PutPsz( qtu( it->data( ACTION_COL, Qt::UserRole ).toString() ),
                        qtu( it->data( HOTKEY_COL, Qt::UserRole ).toString() ) );
