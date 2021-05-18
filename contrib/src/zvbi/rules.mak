@@ -43,9 +43,6 @@ ZVBICONF := \
 ifdef HAVE_WIN32
 DEPS_upnp += pthreads $(DEPS_pthreads)
 endif
-ifdef HAVE_MACOSX
-ZVBI_CFLAGS += -fnested-functions
-endif
 
 .zvbi: zvbi
 	$(UPDATE_AUTOCONFIG)
