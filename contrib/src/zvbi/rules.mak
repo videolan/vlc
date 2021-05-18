@@ -36,9 +36,6 @@ ZVBICONF := \
 	--without-doxygen \
 	$(HOSTCONF)
 
-ifdef HAVE_MACOSX
-ZVBI_CFLAGS += -fnested-functions
-endif
 ifdef HAVE_WIN32
 ZVBI_CFLAGS += -DPTW32_STATIC_LIB
 endif
