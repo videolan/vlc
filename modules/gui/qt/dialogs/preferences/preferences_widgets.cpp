@@ -1351,10 +1351,12 @@ void KeySelectorControl::doApply()
     {
         QTreeWidgetItem *it = *iter;
 
-        config_PutPsz( qtu( it->data( ACTION_COL, Qt::UserRole ).toString() ),
+        QString option = it->data( ACTION_COL, Qt::UserRole ).toString();
+
+        config_PutPsz( qtu( option ),
                        qtu( it->data( HOTKEY_COL, Qt::UserRole ).toString() ) );
 
-        config_PutPsz( qtu( "global-" + it->data( ACTION_COL, Qt::UserRole ).toString() ),
+        config_PutPsz( qtu( "global-" + option ),
                        qtu( it->data( GLOBAL_HOTKEY_COL, Qt::UserRole ).toString() ) );
     }
 }
