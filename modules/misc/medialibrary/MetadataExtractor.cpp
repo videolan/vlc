@@ -184,6 +184,19 @@ void MetadataExtractor::onParserSubtreeAdded( input_item_t *,
     ctx->mde->addSubtree( *ctx, subtree );
 }
 
+void MetadataExtractor::onAttachmentFound( const vlc_event_t* p_event, void* data )
+{
+    auto ctx = static_cast<ParseContext*>( data );
+    for ( auto i = 0u; i < p_event->u.input_item_attachments_found.count; ++i )
+    {
+        auto a = p_event->u.input_item_attachments_found.attachments[i];
+        auto fcc = image_Mime2Fourcc( a->psz_mime );
+        if ( fcc != VLC_CODEC_PNG && fcc != VLC_CODEC_JPEG )
+            continue;
+        ctx->item.addEmbeddedThumbnail( std::make_shared<EmbeddedThumbnail>( a, fcc ) );
+    }
+}
+
 void MetadataExtractor::addSubtree( ParseContext& ctx, input_item_node_t *root )
 {
     for ( auto i = 0; i < root->i_children; ++i )
@@ -206,6 +219,10 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
     if ( ctx.inputItem == nullptr )
         return medialibrary::parser::Status::Fatal;
 
+    if ( vlc_event_attach( &ctx.inputItem->event_manager, vlc_InputItemAttachmentsFound,
+                      &MetadataExtractor::onAttachmentFound, &ctx ) != VLC_SUCCESS )
+        return medialibrary::parser::Status::Fatal;
+
     const input_item_parser_cbs_t cbs = {
         &MetadataExtractor::onParserEnded,
         &MetadataExtractor::onParserSubtreeAdded,
@@ -219,6 +236,8 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
     };
     if ( ctx.inputParser == nullptr )
     {
+        vlc_event_detach( &ctx.inputItem->event_manager, vlc_InputItemAttachmentsFound,
+                          &MetadataExtractor::onAttachmentFound, &ctx );
         m_currentCtx = nullptr;
         return medialibrary::parser::Status::Fatal;
     }
@@ -238,6 +257,8 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
         }
         m_currentCtx = nullptr;
     }
+    vlc_event_detach( &ctx.inputItem->event_manager, vlc_InputItemAttachmentsFound,
+                      &MetadataExtractor::onAttachmentFound, &ctx );
 
     if ( !ctx.success || ctx.inputParser == nullptr )
         return medialibrary::parser::Status::Fatal;
