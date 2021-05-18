@@ -1338,9 +1338,9 @@ void KeySelectorControl::doApply()
     for( int i = 0; i < table->topLevelItemCount() ; i++ )
     {
         it = table->topLevelItem(i);
-        if( it->data( HOTKEY_COL, Qt::UserRole ).toInt() >= 0 )
-            config_PutPsz( qtu( it->data( ACTION_COL, Qt::UserRole ).toString() ),
-                           qtu( it->data( HOTKEY_COL, Qt::UserRole ).toString() ) );
+
+        config_PutPsz( qtu( it->data( ACTION_COL, Qt::UserRole ).toString() ),
+                       qtu( it->data( HOTKEY_COL, Qt::UserRole ).toString() ) );
 
         config_PutPsz( qtu( "global-" + it->data( ACTION_COL, Qt::UserRole ).toString() ),
                        qtu( it->data( GLOBAL_HOTKEY_COL, Qt::UserRole ).toString() ) );
