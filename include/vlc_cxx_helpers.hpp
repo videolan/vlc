@@ -452,6 +452,7 @@ public:
 
     url& operator=( url&& u ) noexcept
     {
+        vlc_UrlClean( this );
         *(static_cast<vlc_url_t*>( this )) = u;
         u.psz_buffer = nullptr;
         u.psz_pathbuffer = nullptr;
