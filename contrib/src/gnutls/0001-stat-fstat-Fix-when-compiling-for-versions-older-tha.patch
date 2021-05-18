@@ -1,0 +1,67 @@
+From 1796cda9975bd459a87222676030b943869c686e Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Wed, 16 Sep 2020 23:51:52 +0200
+Subject: [PATCH] stat, fstat: Fix when compiling for versions older than
+ Windows Vista.
+
+Reported by Eli Zaretskii <eliz@gnu.org> in
+<https://lists.gnu.org/archive/html/bug-gnulib/2020-09/msg00027.html>.
+
+* lib/stat-w32.c: Include <sdkddkver.h>. Test the value of _WIN32_WINNT
+that was originally set before we redefined it.
+* m4/stat.m4 (gl_PREREQ_STAT_W32): New macro.
+(gl_PREREQ_STAT): Require it.
+* m4/fstat.m4 (gl_PREREQ_FSTAT): Likewise.
+---
+ gnutls/gl/stat-w32.c | 24 ++++++++++++++++++------
+ 4 files changed, 43 insertions(+), 8 deletions(-)
+
+diff --git gnutls/gl/lib/stat-w32.c gnutls/gl/lib/stat-w32.c
+index 19bdfaa37..72442e933 100644
+--- gnutls/gl/stat-w32.c
++++ gnutls/gl/stat-w32.c
+@@ -20,10 +20,22 @@
+ 
+ #if defined _WIN32 && ! defined __CYGWIN__
+ 
+-/* Ensure that <windows.h> defines FILE_ID_INFO.  */
+-#if !defined _WIN32_WINNT || (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+-# undef _WIN32_WINNT
+-# define _WIN32_WINNT _WIN32_WINNT_WIN8
++/* Attempt to make <windows.h> define FILE_ID_INFO.
++   But ensure that the redefinition of _WIN32_WINNT does not make us assume
++   Windows Vista or newer when building for an older version of Windows.  */
++#if HAVE_SDKDDKVER_H
++# include <sdkddkver.h>
++# if _WIN32_WINNT >= _WIN32_WINNT_VISTA
++#  define WIN32_ASSUME_VISTA 1
++# else
++#  define WIN32_ASSUME_VISTA 0
++# endif
++# if !defined _WIN32_WINNT || (_WIN32_WINNT < _WIN32_WINNT_WIN8)
++#  undef _WIN32_WINNT
++#  define _WIN32_WINNT _WIN32_WINNT_WIN8
++# endif
++#else
++# define WIN32_ASSUME_VISTA (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
+ #endif
+ 
+ #include <sys/types.h>
+@@ -46,7 +58,7 @@
+ #undef GetFinalPathNameByHandle
+ #define GetFinalPathNameByHandle GetFinalPathNameByHandleA
+ 
+-#if !(_WIN32_WINNT >= _WIN32_WINNT_VISTA)
++#if !WIN32_ASSUME_VISTA
+ 
+ /* Avoid warnings from gcc -Wcast-function-type.  */
+ # define GetProcAddress \
+@@ -149,7 +161,7 @@ _gl_fstat_by_handle (HANDLE h, const char *path, struct stat *buf)
+   DWORD type = GetFileType (h);
+   if (type == FILE_TYPE_DISK)
+     {
+-#if !(_WIN32_WINNT >= _WIN32_WINNT_VISTA)
++#if !WIN32_ASSUME_VISTA
+       if (!initialized)
+         initialize ();
+ #endif

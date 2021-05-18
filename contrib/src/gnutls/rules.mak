@@ -31,6 +31,9 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	# forbidden RtlSecureZeroMemory call in winstore builds
 	$(APPLY) $(SRC)/gnutls/0001-explicit_bzero-Do-not-call-SecureZeroMemory-on-UWP-b.patch
 
+	# Don't use functions available starting with windows vista
+	$(APPLY) $(SRC)/gnutls/0001-stat-fstat-Fix-when-compiling-for-versions-older-tha.patch
+
 	# disable the dllimport in static linking (pkg-config --static doesn't handle Cflags.private)
 	cd $(UNPACK_DIR) && sed -i.orig -e s/"_SYM_EXPORT __declspec(dllimport)"/"_SYM_EXPORT"/g lib/includes/gnutls/gnutls.h.in
 
