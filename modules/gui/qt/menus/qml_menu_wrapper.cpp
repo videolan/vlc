@@ -70,6 +70,9 @@ void QmlGlobalMenu::popup(QPoint pos)
     m_menu = new QMenu();
     QMenu* submenu;
 
+    connect( m_menu, &QMenu::aboutToShow, this, &QmlGlobalMenu::aboutToShow );
+    connect( m_menu, &QMenu::aboutToHide, this, &QmlGlobalMenu::aboutToHide );
+
     submenu = m_menu->addMenu(qtr( "&Media" ));
     FileMenu( p_intf, submenu, p_intf->p_sys->p_mi );
 

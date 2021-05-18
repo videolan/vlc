@@ -502,7 +502,11 @@ Item{
 
             QmlGlobalMenu {
                 id: contextMenu
+
                 ctx: mainctx
+
+                onAboutToShow: controlButtons.requestLockUnlockAutoHide(true, contextMenu)
+                onAboutToHide: controlButtons.requestLockUnlockAutoHide(false, contextMenu)
             }
         }
     }

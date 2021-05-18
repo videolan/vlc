@@ -63,6 +63,10 @@ public:
     explicit QmlGlobalMenu(QObject *parent = nullptr);
     ~QmlGlobalMenu();
 
+signals:
+    void aboutToShow();
+    void aboutToHide();
+
 public slots:
     void popup( QPoint pos );
 private:

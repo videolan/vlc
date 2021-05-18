@@ -262,7 +262,11 @@ Widgets.NavigableFocusScope{
 
             QmlGlobalMenu {
                 id: contextMenu
+
                 ctx: mainctx
+
+                onAboutToShow: topFocusScope.requestLockUnlockAutoHide(true, contextMenu)
+                onAboutToHide: topFocusScope.requestLockUnlockAutoHide(false, contextMenu)
             }
         }
 
