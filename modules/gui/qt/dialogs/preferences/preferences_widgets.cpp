@@ -1233,10 +1233,10 @@ void KeySelectorControl::finish()
         }
 
         if( strncmp( p_config_item->psz_name, "global-", 7 ) == 0
-         && !EMPTY_STR( p_config_item->psz_text )
          && !EMPTY_STR( p_config_item->value.psz ) )
         {
-            global_keys.insert( qfut( p_config_item->psz_text ), qfu( p_config_item->value.psz ) );
+            global_keys.insert( qfu( p_config_item->psz_name + 7 ),
+                                qfu( p_config_item->value.psz ) );
         }
     }
 
@@ -1248,7 +1248,7 @@ void KeySelectorControl::finish()
         {
             QTreeWidgetItem *item = *iter;
 
-            if( item->text( ACTION_COL ) == i.key() )
+            if( item->data( ACTION_COL, Qt::UserRole ) == i.key() )
             {
                 if( found )
                 {
