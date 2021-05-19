@@ -953,7 +953,6 @@ static void EsOutChangePosition( es_out_t *out, bool b_flush )
     vlc_list_foreach(pgrm, &p_sys->programs, node)
     {
         input_clock_Reset(pgrm->p_input_clock);
-        vlc_clock_main_Reset(pgrm->p_main_clock);
         pgrm->i_last_pcr = VLC_TICK_INVALID;
     }
 
@@ -1039,6 +1038,12 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
         if( p_es->p_dec_record )
             vlc_input_decoder_Wait( p_es->p_dec_record );
     }
+
+    /* Reset the main clock once all decoders are ready to output their first
+     * frames and not from EsOutChangePosition(), like the input clock. Indeed,
+     * flush is asynchronous and the output used by the decoder may still need
+     * a valid reference of the clock to output their last frames. */
+    vlc_clock_main_Reset( p_sys->p_pgrm->p_main_clock );
 
     msg_Dbg( p_sys->p_input, "Decoder wait done in %d ms",
               (int)MS_FROM_VLC_TICK(vlc_tick_now() - i_decoder_buffering_start) );
