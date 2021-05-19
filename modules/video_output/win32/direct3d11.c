@@ -650,6 +650,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
         while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev->d3dcontext,
                                                       sys->prepareWait, NULL, 0, 0))
         {
+            d3d11_device_unlock( sys->d3d_dev );
             vlc_tick_t sleep_duration = (date - vlc_tick_now()) / 4;
             if (sleep_duration <= VLC_TICK_FROM_MS(2))
             {
@@ -659,6 +660,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             }
             // wait a little until the rendering is done
             SleepEx(MS_FROM_VLC_TICK(sleep_duration), TRUE);
+            d3d11_device_lock( sys->d3d_dev );
         }
     }
 }
@@ -724,11 +726,13 @@ static void Display(vout_display_t *vd, picture_t *picture)
         while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev->d3dcontext,
                                                       sys->prepareWait, NULL, 0, 0))
         {
+            d3d11_device_unlock( sys->d3d_dev );
             if (start == 0)
                 start = vlc_tick_now();
             // keep waiting until all rendering (plus extra) is known to be finished
             // to let the vout thread things are not as smooth as it may think
             SleepEx(2, TRUE);
+            d3d11_device_lock( sys->d3d_dev );
         }
         if (start != 0 && sys->log_level >= 4)
             msg_Dbg(vd, "rendering wasn't finished, waited extra %lld ms", MS_FROM_VLC_TICK(vlc_tick_now() - start));
