@@ -36,6 +36,7 @@
 #include "d3d_dynamic_shader.h"
 
 static const char globPixelShaderDefault[] = "\
+#pragma warning( disable: 3571 )\n\
 cbuffer PS_CONSTANT_BUFFER : register(b0)\n\
 {\n\
     float4x3 Colorspace;\n\
