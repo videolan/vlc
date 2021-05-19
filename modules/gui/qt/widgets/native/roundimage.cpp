@@ -27,13 +27,12 @@
 
 #include "roundimage.hpp"
 
-#include <QBrush>
+#include <QBuffer>
 #include <QImage>
+#include <QImageReader>
 #include <QPainter>
 #include <QPainterPath>
-#include <QPen>
 #include <QQuickWindow>
-#include <QSvgRenderer>
 #include <QGuiApplication>
 
 #ifdef QT_NETWORK_LIB
@@ -44,16 +43,6 @@
 
 namespace
 {
-    class Image
-    {
-    public:
-        static std::unique_ptr<Image> getImage(const QUrl &source, const QSizeF &sourceSize);
-        virtual ~Image() = default;
-
-        // must be reentrant
-        virtual void paint(QPainter *painter, const QSizeF &size) = 0;
-    };
-
     QString getPath(const QUrl &url)
     {
         QString path = url.isLocalFile() ? url.toLocalFile() : url.toString();
@@ -62,7 +51,7 @@ namespace
         return path;
     }
 
-    QByteArray readFile(const QUrl &url)
+    std::unique_ptr<QIODevice> getReadable(const QUrl &url)
     {
 #ifdef QT_NETWORK_LIB
         if (url.scheme() == "http" || url.scheme() == "https")
@@ -73,16 +62,34 @@ namespace
             QEventLoop loop;
             QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
             loop.exec();
-            return reply->readAll();
+
+            class DataOwningBuffer : public QBuffer
+            {
+            public:
+                DataOwningBuffer(const QByteArray &data) : m_data {data}
+                {
+                    setBuffer(&m_data);
+                }
+
+                ~DataOwningBuffer()
+                {
+                    close();
+                    setBuffer(nullptr);
+                }
+
+            private:
+                QByteArray m_data;
+            };
+
+            auto file = std::make_unique<DataOwningBuffer>(reply->readAll());
+            file->open(QIODevice::ReadOnly);
+            return file;
         }
 #endif
 
-        QByteArray data;
-        QString path = getPath(url);
-        QFile file(path);
-        if (file.open(QIODevice::ReadOnly))
-            data = file.readAll();
-        return data;
+        auto file = std::make_unique<QFile>(getPath(url));
+        file->open(QIODevice::ReadOnly);
+        return file;
     }
 }
 
@@ -210,6 +217,23 @@ QImage RoundImage::RoundImageGenerator::execute()
     if (width <= 0 || height <= 0)
         return {};
 
+    auto file = getReadable(source);
+    if (!file || !file->isOpen())
+        return {};
+
+    QImageReader sourceReader(file.get());
+
+    // do PreserveAspectCrop
+    const QSizeF size {width, height};
+    QSizeF defaultSize = sourceReader.size();
+    if (!defaultSize.isValid())
+        defaultSize = size;
+
+    const qreal ratio = std::max(size.width() / defaultSize.width(), size.height() / defaultSize.height());
+    const QSizeF targetSize = defaultSize * ratio;
+    const QPointF alignedCenteredTopLeft {(size.width() - targetSize.width()) / 2., (size.height() - targetSize.height()) / 2.};
+    sourceReader.setScaledSize(targetSize.toSize());
+
     QImage target(width, height, QImage::Format_ARGB32);
     if (target.isNull())
         return target;
@@ -225,76 +249,8 @@ QImage RoundImage::RoundImageGenerator::execute()
     path.addRoundedRect(0, 0, width, height, radius, radius);
     painter.setClipPath(path);
 
-    auto image = Image::getImage(source, {width, height});
-    image->paint(&painter, {width, height});
-
+    painter.drawImage({alignedCenteredTopLeft, targetSize}, sourceReader.read());
     painter.end();
 
     return target;
-}
-
-std::unique_ptr<Image> Image::getImage(const QUrl &source, const QSizeF &sourceSize)
-{
-    class QtImage : public Image
-    {
-    public:
-        QtImage(const QByteArray &data, const QSizeF &sourceSize)
-        {
-            m_image.loadFromData(data);
-
-            if (sourceSize.isValid())
-                m_image = m_image.scaled(sourceSize.toSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        }
-
-        void paint(QPainter *painter, const QSizeF &size) override
-        {
-            if (m_image.isNull() || !painter || !size.isValid())
-                return;
-
-            auto image = m_image;
-
-            // do PreserveAspectCrop
-            const qreal ratio = std::max(qreal(size.width()) / image.width(), qreal(size.height()) / image.height());
-            if (ratio != 0.0)
-                image = image.scaled(qRound(image.width() * ratio), qRound(image.height() * ratio),
-                                     Qt::IgnoreAspectRatio, // aspect ratio handled manually by using `ratio`
-                                     Qt::SmoothTransformation);
-
-            const QPointF alignedCenteredTopLeft {(size.width() - image.width()) / 2, (size.height() - image.height()) / 2};
-            painter->drawImage(alignedCenteredTopLeft, image);
-        }
-
-    private:
-        QImage m_image;
-    };
-
-    class SVGImage : public Image
-    {
-    public:
-        SVGImage(const QByteArray &data)
-        {
-            m_svg.load(data);
-        }
-
-        void paint(QPainter *painter, const QSizeF &size) override
-        {
-            if (!m_svg.isValid() || !painter || !size.isValid())
-                return;
-
-            // do PreserveAspectCrop
-            const QSizeF defaultSize = m_svg.defaultSize();
-            const qreal ratio = std::max(size.width() / defaultSize.width(), size.height() / defaultSize.height());
-            const QSizeF targetSize = defaultSize * ratio;
-            const QPointF alignedCenteredTopLeft {(size.width() - targetSize.width()) / 2., (size.height() - targetSize.height()) / 2.};
-            m_svg.render(painter, QRectF {alignedCenteredTopLeft, targetSize});
-        }
-
-    private:
-        QSvgRenderer m_svg;
-    };
-
-    const QByteArray data = readFile(source);
-    if (source.toString().endsWith(".svg"))
-        return std::make_unique<SVGImage>(data);
-    return std::make_unique<QtImage>(data, sourceSize);
 }
