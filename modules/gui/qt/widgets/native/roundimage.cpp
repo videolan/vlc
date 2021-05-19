@@ -27,7 +27,10 @@
 
 #include "roundimage.hpp"
 
+#include <qhashfunctions.h>
+
 #include <QBuffer>
+#include <QCache>
 #include <QImage>
 #include <QImageReader>
 #include <QPainter>
@@ -43,6 +46,31 @@
 
 namespace
 {
+    struct ImageCacheKey
+    {
+        QUrl url;
+        QSize size;
+        qreal radius;
+    };
+
+    bool operator ==(const ImageCacheKey &lhs, const ImageCacheKey &rhs)
+    {
+        return lhs.radius == rhs.radius && lhs.size == rhs.size && lhs.url == rhs.url;
+    }
+
+    uint qHash(const ImageCacheKey &key, uint seed)
+    {
+        QtPrivate::QHashCombine hash;
+        seed = hash(seed, key.url);
+        seed = hash(seed, key.size.width());
+        seed = hash(seed, key.size.height());
+        seed = hash(seed, key.radius);
+        return seed;
+    }
+
+    // images are cached (result of RoundImageGenerator) with the cost calculated from QImage::sizeInBytes
+    QCache<ImageCacheKey, QImage> imageCache(2 * 1024 * 1024); // 2 MiB
+
     QString getPath(const QUrl &url)
     {
         QString path = url.isLocalFile() ? url.toLocalFile() : url.toString();
@@ -188,14 +216,29 @@ void RoundImage::regenerateRoundImage()
     {
         m_enqueuedGeneration = false;
 
+        const qreal scaleWidth = this->width() * m_dpr;
+        const qreal scaledHeight = this->height() * m_dpr;
+        const qreal scaledRadius = this->radius() * m_dpr;
+
+        const ImageCacheKey key {source(), QSizeF {scaleWidth, scaledHeight}.toSize(), scaledRadius};
+        if (auto image = imageCache.object(key)) // should only by called in mainthread
+        {
+            m_roundImage = *image;
+            update();
+            return;
+        }
+
         // Image is generated in size factor of `m_dpr` to avoid scaling artefacts when
         // generated image is set with device pixel ratio
-        m_roundImageGenerator.reset(new RoundImageGenerator(m_source, width() * m_dpr, height() * m_dpr, radius() * m_dpr));
-        connect(m_roundImageGenerator.get(), &BaseAsyncTask::result, this, [this]()
+        m_roundImageGenerator.reset(new RoundImageGenerator(m_source, scaleWidth, scaledHeight, scaledRadius));
+        connect(m_roundImageGenerator.get(), &BaseAsyncTask::result, this, [this, key]()
         {
             m_roundImage = m_roundImageGenerator->takeResult();
             m_roundImage.setDevicePixelRatio(m_dpr);
             m_roundImageGenerator.reset();
+
+            if (!m_roundImage.isNull())
+                imageCache.insert(key, new QImage(m_roundImage), m_roundImage.sizeInBytes());
 
             update();
         });
