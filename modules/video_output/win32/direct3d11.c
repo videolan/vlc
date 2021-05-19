@@ -92,6 +92,8 @@ struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
 
+    int                      log_level;
+
     display_info_t           display;
 
     HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
@@ -1065,7 +1067,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                 start = mdate();
             SleepEx(2, TRUE);
         }
-        if (start != 0 && var_InheritInteger(vd, "verbose") >= 4)
+        if (start != 0 && sys->log_level >= 4)
             msg_Dbg(vd, "rendering wasn't finished, waited extra %lld ms",
                         (mdate() - start) * 1000 / CLOCK_FREQ);
     }
@@ -1373,6 +1375,8 @@ static int Direct3D11Open(vout_display_t *vd)
 
     video_format_Clean(&vd->fmt);
     vd->fmt = fmt;
+
+    sys->log_level = var_InheritInteger(vd, "verbose");
 
     return VLC_SUCCESS;
 }
