@@ -29,7 +29,7 @@ ToolButton {
     padding: 0
 
     property string iconText: ""
-    property alias color: focusBackground.defaultForeground
+    property alias color: focusBackground.foregroundColor
     property color colorDisabled: VLCStyle.colors.textInactive
     property color colorOverlay: "transparent"
     property string textOverlay: ""
@@ -104,14 +104,23 @@ ToolButton {
             }
 
         }
+
+        BackgroundFocus {
+            anchors.fill: parent
+
+            visible: control.activeFocus
+        }
     }
 
     background: FocusBackground {
         id: focusBackground
 
-        active: control.activeFocus || control.hovered
-        defaultForeground: control.highlighted ? VLCStyle.colors.accent : VLCStyle.colors.icon
+        active: control.hovered
+
+        foregroundColor: (control.highlighted) ? VLCStyle.colors.accent
+                                               : VLCStyle.colors.icon
+
         implicitHeight: control.size
-        implicitWidth: control.size
+        implicitWidth : control.size
     }
 }
