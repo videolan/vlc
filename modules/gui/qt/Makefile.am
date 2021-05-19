@@ -751,6 +751,7 @@ libqt_plugin_la_QML = \
 	gui/qt/util/qml/Helpers.js \
 	gui/qt/util/qml/KeyHelper.js \
 	gui/qt/util/qml/SelectableDelegateModel.qml \
+	gui/qt/widgets/qml/BackgroundFocus.qml \
 	gui/qt/widgets/qml/BannerTabButton.qml \
 	gui/qt/widgets/qml/BusyIndicatorExt.qml \
 	gui/qt/widgets/qml/CaptionLabel.qml \

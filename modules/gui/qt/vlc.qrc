@@ -190,6 +190,7 @@
         <file alias="MiniPlayerBottomMargin.qml">maininterface/qml/MiniPlayerBottomMargin.qml</file>
     </qresource>
     <qresource prefix="/widgets">
+        <file alias="BackgroundFocus.qml">widgets/qml/BackgroundFocus.qml</file>
         <file alias="BannerTabButton.qml">widgets/qml/BannerTabButton.qml</file>
         <file alias="BusyIndicatorExt.qml">widgets/qml/BusyIndicatorExt.qml</file>
         <file alias="CSDWindowButton.qml">widgets/qml/CSDWindowButton.qml</file>
