@@ -1,6 +1,8 @@
 /*****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
+ * Authors: Benjamin Arnaud <bunjee@omega.gg>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -23,56 +25,52 @@ import "qrc:///style/"
 Rectangle {
     id: root
 
+    //---------------------------------------------------------------------------------------------
+    // Properties
+    //---------------------------------------------------------------------------------------------
+
     property bool active: activeFocus
-    property bool selected: false
-    property color defaultForeground: VLCStyle.colors.text
-    property color foregroundColor: VLCStyle.colors.text
 
-    states: [
-        State {
-            name: "selected"
+    property color foregroundColor: foregroundColorBase
 
-            PropertyChanges {
-                target: root
-                color: VLCStyle.colors.bgHoverInactive
-                foregroundColor: VLCStyle.colors.bgHoverTextInactive
-            }
-        },
-        State {
-            name: "active"
+    //---------------------------------------------------------------------------------------------
+    // Style
 
-            PropertyChanges {
-                target: root
-                color: VLCStyle.colors.accent
-                foregroundColor: VLCStyle.colors.accentText
-            }
-        },
-        State {
-            name: "normal"
+    property int durationAnimation: 100
 
-            PropertyChanges {
-                target: root
-                color: "transparent"
-                foregroundColor: root.defaultForeground
-            }
-        }
-    ]
+    property color backgroundColor: VLCStyle.colors.buttonHover
 
-    transitions: Transition {
-        to: "*"
+    property color foregroundColorBase  : VLCStyle.colors.text
+    property color foregroundColorActive: VLCStyle.colors.buttonTextHover
 
-        ColorAnimation {
-            property: "color"
-            duration: 100
-            easing.type: Easing.InOutSine
+    //---------------------------------------------------------------------------------------------
+    // Settings
+    //---------------------------------------------------------------------------------------------
+
+    // NOTE: We want the set the proper transparent color to avoid animating from black.
+    color: VLCStyle.colors.setColorAlpha(backgroundColor, 0)
+
+    states: State {
+        name: "active"
+
+        when: (active || activeFocus)
+
+        PropertyChanges {
+            target: root
+
+            color: backgroundColor
+
+            foregroundColor: foregroundColorActive
         }
     }
 
-    state: {
-        if (active || activeFocus)
-            return "active"
-        if (selected)
-            return "selected"
-        return "normal"
+    transitions: Transition {
+        ColorAnimation {
+            property: "color"
+
+            duration: durationAnimation
+
+            easing.type: Easing.InOutSine
+        }
     }
 }
