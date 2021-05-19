@@ -217,5 +217,11 @@ Rectangle {
 
             onClicked: root.contextMenuButtonClicked(this, delegate.rowModel)
         }
+
+        BackgroundFocus {
+            anchors.fill: parent
+
+            visible: delegate.activeFocus
+        }
     }
 }
