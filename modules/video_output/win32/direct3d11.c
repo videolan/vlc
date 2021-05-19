@@ -1004,9 +1004,14 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         }
     }
 
+    mtime_t render_start;
+    const char *wait_method = NULL;
+    if (sys->log_level >= 4)
+        render_start = mdate();
 #ifdef HAVE_D3D11_4_H
     if (sys->d3dcontext4)
     {
+        wait_method = "fence";
         if (sys->renderFence == UINT64_MAX)
             sys->renderFence;
         else
@@ -1022,6 +1027,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 #endif
     if (sys->prepareWait)
     {
+        wait_method = "query";
         ID3D11DeviceContext_End(sys->d3d_dev.d3dcontext, sys->prepareWait);
 
         while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev.d3dcontext,
@@ -1039,6 +1045,11 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             SleepEx(sleep_duration * 1000 / CLOCK_FREQ, TRUE);
             d3d11_device_lock( &sys->d3d_dev );
         }
+    }
+    if (sys->log_level >= 4 && wait_method != NULL)
+    {
+        msg_Dbg(vd, "waited %" PRId64 " ms for the render %s",
+            (mdate() - render_start) * 1000 / CLOCK_FREQ, wait_method);
     }
 
     if (is_d3d11_opaque(picture->format.i_chroma))
