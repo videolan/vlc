@@ -65,11 +65,37 @@ Item {
     property color bgHoverInactive: systemPalette.highlightInactive;
     property color bgHoverTextInactive: systemPalette.highlightTextInactive;
 
-    property color button: systemPalette.button;
-    property color buttonText: systemPalette.buttonText;
-    property color buttonBorder: blendColors(systemPalette.button, systemPalette.buttonText, 0.8);
+    property color bgFocus: (isThemeDark) ? white : black
 
-    property color icon: isThemeDark ? white : "#666666"
+    //---------------------------------------------------------------------------------------------
+    // Button
+
+    property color button: systemPalette.button
+
+    property color buttonHover: (isThemeDark) ? "#303030" : "#f2f2f2"
+
+    property color buttonText     : systemPalette.buttonText
+    property color buttonTextHover: bgFocus
+
+    property color buttonBorder: blendColors(systemPalette.button, systemPalette.buttonText, 0.8)
+
+    //---------------------------------------------------------------------------------------------
+    // DropDown
+
+    property color dropDown: (isThemeDark) ? "#272727" : "#e9e9e9"
+
+    // FIXME: We might want another color for this.
+    property color dropDownBorder: text
+
+    //---------------------------------------------------------------------------------------------
+    // TextField
+
+    property color textField     : (isThemeDark) ? "#6f6f6f" : "#999999"
+    property color textFieldHover: (isThemeDark) ? "#b7b7b7" : "#4c4c4c"
+
+    //---------------------------------------------------------------------------------------------
+
+    property color icon: isThemeDark ? white : "#616161"
 
     property color textActiveSource: "red";
 
@@ -110,7 +136,8 @@ Item {
     property color tooltipColor: systemPalette.tooltip
 
     //vlc orange
-    property color accent: "#FFFF950D";
+    property color accent: (isThemeDark) ? "ff8800" : "#ff610a"
+
     property color accentText: "#ffffff";
 
     property color alert: "red";
@@ -159,7 +186,7 @@ Item {
                 banner: "#d8d8d8";
                 bannerHover: "#DDDDDD";
 
-                accent: "#ff950d";
+                accent: "#ff610a";
                 alert: "#ff0000";
                 separator: "#ededed";
 
@@ -179,7 +206,7 @@ Item {
                 bgInactive: "#232629"
                 bgAlt: "#31363b"
                 bgAltInactive: "#31363b"
-                bgHover: "#2d2d2d"
+                bgHover: "#303030"
                 bgHoverText: text
                 bgHoverInactive: "#3daee9"
                 bgHoverTextInactive: text
@@ -189,7 +216,7 @@ Item {
                 textActiveSource: "#ff950d"
                 banner: "#31363b"
                 bannerHover: "#272727"
-                accent: "#ff950d"
+                accent: "#ff8800"
                 alert: "#ff0000"
                 separator: "#2d2d2d"
                 playerControlBarFg: "#ffffff"
