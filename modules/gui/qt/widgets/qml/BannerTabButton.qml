@@ -44,7 +44,7 @@ T.TabButton {
     background: Rectangle {
         height: control.height
         width: control.width
-        color: (control.activeFocus || control.hovered) ? VLCStyle.colors.accent
+        color: (control.activeFocus || control.hovered) ? VLCStyle.colors.buttonHover
                                                         : control.color
         Behavior on color {
             ColorAnimation {
@@ -68,8 +68,8 @@ T.TabButton {
 
                 text: control.iconTxt
                 font.pixelSize: VLCIcons.pixelSize(VLCStyle.banner_icon_size)
-                color: (control.activeFocus || control.hovered) ? VLCStyle.colors.accentText
-                                                                : ((control.selected) ? VLCStyle.colors.accent : VLCStyle.colors.text)
+                color: (control.activeFocus || control.hovered || control.selected) ? VLCStyle.colors.accent
+                                                                                    : VLCStyle.colors.text
             }
 
             Label {
@@ -78,7 +78,7 @@ T.TabButton {
                 visible: showText
                 font.pixelSize: VLCStyle.fontSize_normal
                 font.weight: (control.activeFocus || control.hovered || control.selected) ? Font.DemiBold : Font.Normal
-                color: (control.activeFocus || control.hovered) ? VLCStyle.colors.accentText
+                color: (control.activeFocus || control.hovered) ? VLCStyle.colors.buttonTextHover
                                                                 : ((control.selected) ? VLCStyle.colors.text : VLCStyle.colors.menuCaption)
                 text: control.text
             }
@@ -89,6 +89,12 @@ T.TabButton {
             orientation: Qt.Horizontal
             margin: VLCStyle.dp(3, VLCStyle.scale)
             visible: control.showCurrentIndicator && control.selected
+        }
+
+        BackgroundFocus {
+            anchors.fill: parent
+
+            visible: control.activeFocus
         }
     }
 }
