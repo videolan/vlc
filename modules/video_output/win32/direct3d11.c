@@ -627,9 +627,14 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
         }
     }
 
+    vlc_tick_t render_start;
+    const char *wait_method = NULL;
+    if (sys->log_level >= 4)
+        render_start = vlc_tick_now();
 #ifdef HAVE_D3D11_4_H
     if (sys->d3dcontext4)
     {
+        wait_method = "fence";
         if (sys->renderFence == UINT64_MAX)
             sys->renderFence = 0;
         else
@@ -645,6 +650,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
 #endif
     if (sys->prepareWait)
     {
+        wait_method = "query";
         ID3D11DeviceContext_End(sys->d3d_dev->d3dcontext, sys->prepareWait);
 
         while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev->d3dcontext,
@@ -662,6 +668,10 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             SleepEx(MS_FROM_VLC_TICK(sleep_duration), TRUE);
             d3d11_device_lock( sys->d3d_dev );
         }
+    }
+    if (sys->log_level >= 4 && wait_method != NULL)
+    {
+        msg_Dbg(vd, "waited %" PRId64 " ms for the render %s", MS_FROM_VLC_TICK(vlc_tick_now() - render_start), wait_method);
     }
 }
 
