@@ -1,3 +1,9 @@
+Changes between 3.0.14 and 3.0.15:
+----------------------------------
+
+Misc:
+ * Fix GnuTLS support for Windows XP
+
 Changes between 3.0.13 and 3.0.14:
 ----------------------------------
 
