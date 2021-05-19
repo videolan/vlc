@@ -210,7 +210,7 @@ MouseArea {
         width: root.width + ( root.selectedBorderWidth * 2 )
         height:  root.height + ( root.selectedBorderWidth * 2 )
         color: VLCStyle.colors.bgHover
-        visible: root.selected || root.highlighted
+        visible: root.selected
     }
 
     Loader {
@@ -279,5 +279,11 @@ MouseArea {
                     ? VLCStyle.colors.setColorAlpha(VLCStyle.colors.bgHoverText, .6)
                     : VLCStyle.colors.menuCaption
         }
+    }
+
+    BackgroundFocus {
+        anchors.fill: selectionRect
+
+        visible: root.activeFocus
     }
 }
