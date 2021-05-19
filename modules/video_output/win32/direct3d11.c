@@ -1027,6 +1027,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev.d3dcontext,
                                                       sys->prepareWait, NULL, 0, 0))
         {
+            d3d11_device_unlock( &sys->d3d_dev );
             mtime_t sleep_duration = (picture->date - mdate()) / 4;
             if (sleep_duration <= 2 * CLOCK_FREQ / 1000)
             {
@@ -1036,6 +1037,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             }
             // wait a little until the rendering is done
             SleepEx(sleep_duration * 1000 / CLOCK_FREQ, TRUE);
+            d3d11_device_lock( &sys->d3d_dev );
         }
     }
 
@@ -1063,9 +1065,11 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev.d3dcontext,
                                                       sys->prepareWait, NULL, 0, 0))
         {
+            d3d11_device_unlock( &sys->d3d_dev );
             if (start == 0)
                 start = mdate();
             SleepEx(2, TRUE);
+            d3d11_device_lock( &sys->d3d_dev );
         }
         if (start != 0 && sys->log_level >= 4)
             msg_Dbg(vd, "rendering wasn't finished, waited extra %lld ms",
