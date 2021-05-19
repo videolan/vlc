@@ -51,6 +51,8 @@ Item {
     property double margin_xlarge: dp(32, scale);
     property double margin_xxlarge: dp(36, scale);
 
+    property int focus_border: dp(2, scale)
+
     property int fontSize_xsmall: fontMetrics_xsmall.font.pixelSize
     property int fontSize_small:  fontMetrics_small.font.pixelSize
     property int fontSize_normal: fontMetrics_normal.font.pixelSize
@@ -127,8 +129,6 @@ Item {
 
     property int scrollbarWidth: dp(4, scale);
     property int scrollbarHeight: dp(100, scale);
-
-    property int selectedBorder: 2
 
     property real network_normal: dp(100, scale)
 
