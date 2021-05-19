@@ -93,6 +93,8 @@ struct vout_display_sys_t
     vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
     display_win32_area_t     area;
 
+    int                      log_level;
+
     /* Sensors */
     void *p_sensors;
 
@@ -728,7 +730,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
             // to let the vout thread things are not as smooth as it may think
             SleepEx(2, TRUE);
         }
-        if (start != 0 && var_InheritInteger(vd, "verbose") >= 4)
+        if (start != 0 && sys->log_level >= 4)
             msg_Dbg(vd, "rendering wasn't finished, waited extra %lld ms", MS_FROM_VLC_TICK(vlc_tick_now() - start));
     }
 
@@ -832,6 +834,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 
     video_format_Clean(fmtp);
     *fmtp = fmt;
+
+    sys->log_level = var_InheritInteger(vd, "verbose");
 
     return VLC_SUCCESS;
 }
