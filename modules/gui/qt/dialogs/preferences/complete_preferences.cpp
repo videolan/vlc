@@ -482,7 +482,7 @@ PrefsItemData::PrefsItemData( QObject *_parent ) : QObject( _parent )
 {
     panel = NULL;
     i_object_id = 0;
-    i_subcat_id = -1;
+    i_subcat_id = SUBCAT_UNKNOWN;
     psz_shortcut = NULL;
     b_loaded = false;
 }
