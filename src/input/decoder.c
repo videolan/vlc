@@ -813,6 +813,12 @@ static void DecoderWaitUnblock( vlc_input_decoder_t *p_owner )
 {
     vlc_mutex_assert( &p_owner->lock );
 
+    if( p_owner->b_waiting )
+    {
+        p_owner->b_has_data = true;
+        vlc_cond_signal( &p_owner->wait_acknowledge );
+    }
+
     while( p_owner->b_waiting && p_owner->b_has_data )
         vlc_cond_wait( &p_owner->wait_request, &p_owner->lock );
 }
@@ -837,12 +843,6 @@ static int DecoderThread_PlaySout( vlc_input_decoder_t *p_owner, block_t *p_sout
     assert( !p_sout_block->p_next );
 
     vlc_mutex_lock( &p_owner->lock );
-
-    if( p_owner->b_waiting )
-    {
-        p_owner->b_has_data = true;
-        vlc_cond_signal( &p_owner->wait_acknowledge );
-    }
 
     DecoderWaitUnblock( p_owner );
 
@@ -1061,15 +1061,7 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
         p_picture->b_force = true;
     }
     else
-    {
-        if( p_owner->b_waiting )
-        {
-            p_owner->b_has_data = true;
-            vlc_cond_signal( &p_owner->wait_acknowledge );
-        }
-
         DecoderWaitUnblock( p_owner );
-    }
 
     vlc_mutex_unlock( &p_owner->lock );
 
@@ -1198,11 +1190,6 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, block_t *p_audi
     /* */
     /* */
     vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->b_waiting )
-    {
-        p_owner->b_has_data = true;
-        vlc_cond_signal( &p_owner->wait_acknowledge );
-    }
 
     /* */
     DecoderWaitUnblock( p_owner );
@@ -1271,12 +1258,6 @@ static void ModuleThread_PlaySpu( vlc_input_decoder_t *p_owner, subpicture_t *p_
 
     /* */
     vlc_mutex_lock( &p_owner->lock );
-
-    if( p_owner->b_waiting )
-    {
-        p_owner->b_has_data = true;
-        vlc_cond_signal( &p_owner->wait_acknowledge );
-    }
 
     DecoderWaitUnblock( p_owner );
     vlc_mutex_unlock( &p_owner->lock );
