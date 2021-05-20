@@ -1054,20 +1054,21 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
             vout_FlushAll( p_vout );
     }
 
-    if( p_owner->b_waiting && !p_owner->b_first )
+    if( p_owner->b_first && p_owner->b_waiting )
     {
-        p_owner->b_has_data = true;
-        vlc_cond_signal( &p_owner->wait_acknowledge );
-    }
-
-    DecoderWaitUnblock( p_owner );
-
-    if( p_owner->b_waiting )
-    {
-        assert( p_owner->b_first );
         msg_Dbg( p_dec, "Received first picture" );
         p_owner->b_first = false;
         p_picture->b_force = true;
+    }
+    else
+    {
+        if( p_owner->b_waiting )
+        {
+            p_owner->b_has_data = true;
+            vlc_cond_signal( &p_owner->wait_acknowledge );
+        }
+
+        DecoderWaitUnblock( p_owner );
     }
 
     vlc_mutex_unlock( &p_owner->lock );
