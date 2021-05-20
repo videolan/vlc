@@ -947,6 +947,28 @@ static void ThreadChangeFilters(vout_thread_sys_t *vout)
     sys->filter.changed = false;
 }
 
+static bool ThreadDisplayIsPictureLate(vout_thread_sys_t *vout, picture_t *decoded,
+                                       vlc_tick_t system_now, vlc_tick_t system_pts)
+{
+    vout_thread_sys_t *sys = vout;
+
+    const vlc_tick_t prepare_decoded_duration = vout_chrono_GetHigh(&sys->render) +
+                                                VOUT_MWAIT_TOLERANCE +
+                                                vout_chrono_GetHigh(&sys->static_filter);
+    vlc_tick_t late = system_now + prepare_decoded_duration - system_pts;
+
+    vlc_tick_t late_threshold;
+    if (decoded->format.i_frame_rate && decoded->format.i_frame_rate_base) {
+        late_threshold = vlc_tick_from_samples(decoded->format.i_frame_rate_base, decoded->format.i_frame_rate);
+    }
+    else
+        late_threshold = VOUT_DISPLAY_LATE_THRESHOLD;
+    if (late > late_threshold) {
+        msg_Warn(&vout->obj, "picture is too late to be displayed (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
+        return true;
+    }
+    return false;
+}
 
 /* */
 VLC_USED
@@ -983,19 +1005,9 @@ static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reus
                 }
                 else if (is_late_dropped && !decoded->b_force)
                 {
-                    const vlc_tick_t prepare_decoded_duration = vout_chrono_GetHigh(&sys->render) +
-                                                                VOUT_MWAIT_TOLERANCE +
-                                                                vout_chrono_GetHigh(&sys->static_filter);
-                    vlc_tick_t late = system_now + prepare_decoded_duration - system_pts;
-
-                    vlc_tick_t late_threshold;
-                    if (decoded->format.i_frame_rate && decoded->format.i_frame_rate_base) {
-                        late_threshold = vlc_tick_from_samples(decoded->format.i_frame_rate_base, decoded->format.i_frame_rate);
-                    }
-                    else
-                        late_threshold = VOUT_DISPLAY_LATE_THRESHOLD;
-                    if (late > late_threshold) {
-                        msg_Warn(&vout->obj, "picture is too late to be displayed (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
+                    if (ThreadDisplayIsPictureLate(vout, decoded, system_now,
+                                                   system_pts))
+                    {
                         picture_Release(decoded);
                         vout_statistic_AddLost(&sys->statistic, 1);
                         continue;
