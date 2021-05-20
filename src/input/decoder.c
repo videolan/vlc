@@ -813,12 +813,8 @@ static void DecoderWaitUnblock( vlc_input_decoder_t *p_owner )
 {
     vlc_mutex_assert( &p_owner->lock );
 
-    for( ;; )
-    {
-        if( !p_owner->b_waiting || !p_owner->b_has_data )
-            break;
+    while( p_owner->b_waiting && p_owner->b_has_data )
         vlc_cond_wait( &p_owner->wait_request, &p_owner->lock );
-    }
 }
 
 static inline void DecoderUpdatePreroll( vlc_tick_t *pi_preroll, const block_t *p )
