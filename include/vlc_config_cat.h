@@ -274,4 +274,37 @@ static inline const char *config_CategoryHelpGet( int i_value )
     return NULL;
 }
 
+/** Check if the given subcategory is a "general" one.
+ *
+ * In a cat/subcat preference tree, subcategories typically appear as child
+ * nodes under their respective parent category node. Core config items, which
+ * are always associated with a particular subcategory, are shown when that
+ * subcategory node is selected. Each category however has a "general"
+ * subcategory which is not shown as a child node, instead the options for
+ * this are shown when the category node itself is selected in the tree.
+ *
+ * One or more nodes are also created in the tree per plugin, with the
+ * location relating to the subcategory association of its config items. Plugin
+ * nodes associated with general subcategories naturally appear as child nodes
+ * of the category node (as a sibling to its subcategory nodes), rather than as
+ * a child node of a subcategory node.
+ */
+VLC_USED
+static inline bool vlc_config_subcat_IsGeneral( int subcat )
+{
+    switch (subcat)
+    {
+        case SUBCAT_INTERFACE_GENERAL:
+        case SUBCAT_AUDIO_GENERAL:
+        case SUBCAT_VIDEO_GENERAL:
+        case SUBCAT_INPUT_GENERAL:
+        case SUBCAT_SOUT_GENERAL:
+        case SUBCAT_ADVANCED_MISC:
+        case SUBCAT_PLAYLIST_GENERAL:
+            return true;
+        default:
+            return false;
+    }
+}
+
 #endif /* VLC_HELP_H */

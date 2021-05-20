@@ -136,14 +136,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
             if( p_item->value.i == SUBCAT_HIDDEN ) break;
 
             /* Special cases: move the main subcategories to the parent cat*/
-            if( data &&
-                ( p_item->value.i == SUBCAT_VIDEO_GENERAL ||
-                  p_item->value.i == SUBCAT_ADVANCED_MISC ||
-                  p_item->value.i == SUBCAT_INPUT_GENERAL ||
-                  p_item->value.i == SUBCAT_INTERFACE_GENERAL ||
-                  p_item->value.i == SUBCAT_SOUT_GENERAL||
-                  p_item->value.i == SUBCAT_PLAYLIST_GENERAL||
-                  p_item->value.i == SUBCAT_AUDIO_GENERAL ) )
+            if( data && vlc_config_subcat_IsGeneral(p_item->value.i) )
             {
                 /* Data still contains the correct thing */
                 data->i_type = PrefsItemData::TYPE_CATSUBCAT;
