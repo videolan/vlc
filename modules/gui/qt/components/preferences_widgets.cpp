@@ -1402,13 +1402,13 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
     existingkeys = NULL;
 
     table = _table;
-    setWindowTitle( ( b_global ? qtr( "Global" ) + QString(" ") : QStringLiteral("") )
-                    + qtr( "Hotkey change" ) );
+    setWindowTitle( b_global ? qtr( "Global Hotkey change" )
+                             : qtr( "Hotkey change" ) );
     setWindowRole( "vlc-key-input" );
 
     QVBoxLayout *vLayout = new QVBoxLayout( this );
-    selected = new QLabel( qtr( "Press the new key or combination for " )
-                           + QString("<b>%1</b>").arg( keyToChange ) );
+    selected = new QLabel( qtr( "Press the new key or combination for <b>%1</b>" )
+                           .arg( keyToChange ) );
     vLayout->addWidget( selected , Qt::AlignCenter );
 
     warning = new QLabel;
@@ -1451,8 +1451,9 @@ void KeyInputDialog::checkForConflicts( int i_vlckey, const QString &sequence )
         !conflictList[0]->data( b_global ? 2 : 1, Qt::UserRole ).toString().isEmpty() &&
          conflictList[0]->data( b_global ? 2 : 1, Qt::UserRole ).toString() != "Unset" )
     {
-        warning->setText( qtr("Warning: this key or combination is already assigned to ") +
-                QString( "\"<b>%1</b>\"" ).arg( conflictList[0]->text( 0 ) ) );
+        warning->setText(
+                qtr("Warning: this key or combination is already assigned to \"<b>%1</b>\"")
+                .arg( conflictList[0]->text( 0 ) ) );
         warning->show();
         ok->show();
         unset->hide();
@@ -1486,8 +1487,7 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
         return;
     int i_vlck = qtEventToVLCKey( e );
     QKeySequence sequence( e->key() | e->modifiers() );
-    selected->setText( qtr( "Key or combination: " )
-                + QString("<b>%1</b>").arg( VLCKeyToString( i_vlck, true ) ) );
+    selected->setText( qtr( "Key or combination: <b>%1</b>" ).arg( VLCKeyToString( i_vlck, true ) ) );
     checkForConflicts( i_vlck, sequence.toString() );
     keyValue = i_vlck;
 }
@@ -1495,7 +1495,7 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
 void KeyInputDialog::wheelEvent( QWheelEvent *e )
 {
     int i_vlck = qtWheelEventToVLCKey( e );
-    selected->setText( qtr( "Key: " ) + QString("<b>%1</b>").arg( VLCKeyToString( i_vlck, true ) ) );
+    selected->setText( qtr( "Key: <b>%1</b>" ).arg( VLCKeyToString( i_vlck, true ) ) );
     checkForConflicts( i_vlck, QString() );
     keyValue = i_vlck;
 }
