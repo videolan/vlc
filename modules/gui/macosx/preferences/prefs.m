@@ -488,7 +488,7 @@
         VLCTreeSubCategoryItem * subCategoryItem = nil;
         VLCTreePluginItem * pluginItem = nil;
         module_config_t *p_configs = NULL;
-        int lastsubcat = 0;
+        int lastsubcat = SUBCAT_UNKNOWN;
         unsigned int confsize;
 
         module_t * p_module = modules[i];

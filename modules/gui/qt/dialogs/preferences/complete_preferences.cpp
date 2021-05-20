@@ -189,7 +189,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
         if( module_is_main( p_module) ) continue;
 
         unsigned  confsize;
-        int i_subcategory = 0, i_category = 0;
+        int i_subcategory = SUBCAT_UNKNOWN, i_category = CAT_UNKNOWN;
 
         bool b_options = false;
         module_config_t *const p_config = module_config_get (p_module, &confsize);
@@ -207,14 +207,14 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
             if( CONFIG_ITEM(p_item->i_type) )
                 b_options = true;
 
-            if( b_options && i_category && i_subcategory )
+            if( b_options && i_category != CAT_UNKNOWN && i_subcategory != SUBCAT_UNKNOWN )
                 break;
         }
         module_config_free (p_config);
 
         /* Dummy item, please proceed */
-        if( !b_options || i_category == 0 || i_subcategory == 0 ) continue;
-
+        if( !b_options || i_category == CAT_UNKNOWN || i_subcategory == SUBCAT_UNKNOWN )
+            continue;
 
         // Locate the category item;
         QTreeWidgetItem *subcat_item = NULL;
@@ -495,7 +495,7 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
         return false;
 
     bool is_core = this->i_type != TYPE_MODULE;
-    int id = 0;
+    int id = SUBCAT_UNKNOWN;
 
     /* find our module */
     module_t *p_module;

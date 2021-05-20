@@ -150,6 +150,10 @@ enum vlc_module_properties
 #define CAT_HIDDEN -1
 #define SUBCAT_HIDDEN -1
 
+/* Unknown/unset/invalid */
+#define CAT_UNKNOWN 0
+#define SUBCAT_UNKNOWN 0
+
 /* Categories and subcategories */
 #define CAT_INTERFACE 1
 #define SUBCAT_INTERFACE_GENERAL 101
