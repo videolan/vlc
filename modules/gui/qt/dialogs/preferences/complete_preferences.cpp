@@ -85,7 +85,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
     unsigned confsize;
     module_config_t *const p_config = module_config_get (p_module, &confsize);
 
-    /* Go through the list of conf */
+    /* Go through the list of core conf to build the base tree */
     for( size_t i = 0; i < confsize; i++ )
     {
         QIcon icon;
@@ -480,8 +480,8 @@ PrefsItemData::PrefsItemData( QObject *_parent ) : QObject( _parent )
     b_loaded = false;
 }
 
-/* go over the module config items and search text in psz_text
- * also search the module name and head */
+/* go over the config items and search text in psz_text
+ * also search the node name and head */
 bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
 {
     if( this->i_type == TYPE_CATEGORY )
@@ -521,7 +521,7 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
         return true;
     }
 
-    /* check options belonging to this subcat or module */
+    /* check options belonging to this core subcat or plugin */
 
     unsigned confsize;
     module_config_t *const p_config = module_config_get (p_module, &confsize),
@@ -558,8 +558,8 @@ bool PrefsItemData::contains( const QString &text, Qt::CaseSensitivity cs )
             /* for core, if we hit a cat or subcat, stop */
             if ( is_core )
                 break;
-            /* a module's options are grouped under one node; we can/should
-               ignore all cat/subcat entries. */
+            /* a plugin's options are grouped under one node; we can/should
+               ignore all other cat/subcat entries. */
             continue;
         }
 
