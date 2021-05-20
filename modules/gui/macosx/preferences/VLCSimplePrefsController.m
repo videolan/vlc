@@ -280,19 +280,19 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     NSToolbarItem *toolbarItem = nil;
 
     if ([itemIdent isEqual: VLCIntfSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS("Interface"), _NS("Interface Settings"), @"VLCInterfaceCone", showInterfaceSettings);
+        CreateToolbarItem(NSTR(INTF_TITLE), NSTR(INTF_TOOLTIP), @"VLCInterfaceCone", showInterfaceSettings);
     } else if ([itemIdent isEqual: VLCAudioSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS("Audio"), _NS("Audio Settings"), @"VLCAudioCone", showAudioSettings);
+        CreateToolbarItem(NSTR(AUDIO_TITLE), NSTR(AUDIO_TOOLTIP), @"VLCAudioCone", showAudioSettings);
     } else if ([itemIdent isEqual: VLCVideoSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS("Video"), _NS("Video Settings"), @"VLCVideoCone", showVideoSettings);
+        CreateToolbarItem(NSTR(VIDEO_TITLE), NSTR(VIDEO_TOOLTIP), @"VLCVideoCone", showVideoSettings);
     } else if ([itemIdent isEqual: VLCOSDSettingToolbarIdentifier]) {
-        CreateToolbarItem(NSTR(SUBPIC_TITLE), _NS("Subtitle & On Screen Display Settings"), @"VLCSubtitleCone", showOSDSettings);
+        CreateToolbarItem(NSTR(SUBPIC_TITLE), NSTR(SUBPIC_TOOLTIP), @"VLCSubtitleCone", showOSDSettings);
     } else if ([itemIdent isEqual: VLCInputSettingToolbarIdentifier]) {
-        CreateToolbarItem(NSTR(INPUT_TITLE), _NS("Input & Codec Settings"), @"VLCInputCone", showInputSettings);
+        CreateToolbarItem(NSTR(INPUT_TITLE), NSTR(INPUT_TOOLTIP), @"VLCInputCone", showInputSettings);
     } else if ([itemIdent isEqual: VLCMediaLibrarySettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS("Media Library"), _NS("Media Library settings"), @"NXHelpBacktrack", showMediaLibrarySettings);
+        CreateToolbarItem(NSTR(ML_TITLE), NSTR(ML_TOOLTIP), @"NXHelpBacktrack", showMediaLibrarySettings);
     } else if ([itemIdent isEqual: VLCHotkeysSettingToolbarIdentifier]) {
-        CreateToolbarItem(_NS("Hotkeys"), _NS("Hotkeys settings"), @"VLCHotkeysCone", showHotkeySettings);
+        CreateToolbarItem(NSTR(HOTKEYS_TITLE), NSTR(HOTKEYS_TOOLTIP), @"VLCHotkeysCone", showHotkeySettings);
     }
 
     return toolbarItem;

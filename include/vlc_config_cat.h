@@ -41,6 +41,20 @@
 #define PLAYLIST_TITLE  N_( "Playlist" )
 #define AADVANCED_TITLE N_( "Advanced" )
 #define SUBPIC_TITLE    N_( "Subtitles / OSD" )
+#define HOTKEYS_TITLE   N_( "Hotkeys" )
+#define ML_TITLE        N_( "Media Library" )
+
+/*  - Tooltip text -
+ * These are used for simple prefs view tabs.
+ */
+
+#define INTF_TOOLTIP    N_( "Interface Settings" )
+#define AUDIO_TOOLTIP   N_( "Audio Settings" )
+#define VIDEO_TOOLTIP   N_( "Video Settings" )
+#define SUBPIC_TOOLTIP  N_( "Subtitle & On Screen Display Settings" )
+#define INPUT_TOOLTIP   N_( "Input & Codec Settings" )
+#define HOTKEYS_TOOLTIP N_( "Hotkeys Settings" )
+#define ML_TOOLTIP      N_( "Media Library Settings" )
 
 /*  - Help text -
  * These are shown on advanced view panels.

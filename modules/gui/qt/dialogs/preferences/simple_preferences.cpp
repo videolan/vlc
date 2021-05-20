@@ -277,20 +277,13 @@ SPrefsCatList::SPrefsCatList( qt_intf_t *_p_intf, QWidget *_parent ) :
     mapper->setMapping( button, numb );                                     \
     layout->addWidget( button );
 
-    ADD_CATEGORY( SPrefsInterface, qtr("Interface"), qtr("Interface Settings"),
-                  cone_interface_64, 0 );
-    ADD_CATEGORY( SPrefsAudio, qtr("Audio"), qtr("Audio Settings"),
-                  cone_audio_64, 1 );
-    ADD_CATEGORY( SPrefsVideo, qtr("Video"), qtr("Video Settings"),
-                  cone_video_64, 2 );
-    ADD_CATEGORY( SPrefsSubtitles, qfut(SUBPIC_TITLE), qtr("Subtitle & On Screen Display Settings"),
-                  cone_subtitles_64, 3 );
-    ADD_CATEGORY( SPrefsInputAndCodecs, qfut(INPUT_TITLE), qtr("Input & Codecs Settings"),
-                  cone_input_64, 4 );
-    ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), qtr("Configure Hotkeys"),
-                  cone_hotkeys_64, 5 );
-    ADD_CATEGORY( SPrefsMediaLibrary, qtr("Media Library"), qtr("Configure Media Library"),
-                  cone_medialibrary_64, 6 );
+    ADD_CATEGORY( SPrefsInterface, qfut(INTF_TITLE), qfut(INTF_TOOLTIP), cone_interface_64, 0 );
+    ADD_CATEGORY( SPrefsAudio, qfut(AUDIO_TITLE), qfut(AUDIO_TOOLTIP), cone_audio_64, 1 );
+    ADD_CATEGORY( SPrefsVideo, qfut(VIDEO_TITLE), qfut(VIDEO_TOOLTIP), cone_video_64, 2 );
+    ADD_CATEGORY( SPrefsSubtitles, qfut(SUBPIC_TITLE), qfut(SUBPIC_TOOLTIP), cone_subtitles_64, 3 );
+    ADD_CATEGORY( SPrefsInputAndCodecs, qfut(INPUT_TITLE), qfut(INPUT_TOOLTIP), cone_input_64, 4 );
+    ADD_CATEGORY( SPrefsHotkeys, qfut(HOTKEYS_TITLE), qfut(HOTKEYS_TOOLTIP), cone_hotkeys_64, 5 );
+    ADD_CATEGORY( SPrefsMediaLibrary, qfut(ML_TITLE), qfut(ML_TOOLTIP), cone_medialibrary_64, 6 );
 
 #undef ADD_CATEGORY
 
