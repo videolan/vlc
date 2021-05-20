@@ -47,6 +47,10 @@ Widgets.NavigableFocusScope {
 
     signal requestLockUnlockAutoHide(bool lock, var source)
 
+    function showChapterMarks() {
+        trackPositionSlider.showChapterMarks()
+    }
+
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)
     onActionCancel: history.previous()

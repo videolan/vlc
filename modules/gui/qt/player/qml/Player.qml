@@ -501,6 +501,11 @@ Widgets.NavigableFocusScope {
         state: "visible"
         edge: Widgets.DrawerExt.Edges.Bottom
 
+        onStateChanged: {
+            if (state === "visible")
+                contentItem.showChapterMarks()
+        }
+
         component: MouseArea {
             id: controllerMouseArea
 
@@ -509,6 +514,10 @@ Widgets.NavigableFocusScope {
             height: controllerId.implicitHeight + controllerId.anchors.bottomMargin
             width: controlBarView.width
             hoverEnabled: true
+
+            function showChapterMarks() {
+                controllerId.showChapterMarks()
+            }
 
             onContainsMouseChanged: rootPlayer.lockUnlockAutoHide(containsMouse, topcontrolView)
 

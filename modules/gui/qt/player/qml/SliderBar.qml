@@ -39,6 +39,11 @@ Slider {
     Keys.onRightPressed: player.jumpFwd()
     Keys.onLeftPressed: player.jumpBwd()
 
+    function showChapterMarks() {
+        _isSeekPointsShown = true
+        seekpointTimer.restart()
+    }
+
     Timer {
         id: seekpointTimer
         running: player.hasChapters && !control.hovered && _isSeekPointsShown
