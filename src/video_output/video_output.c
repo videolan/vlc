@@ -991,26 +991,29 @@ static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reus
             decoded = picture_fifo_Pop(sys->decoder_fifo);
 
             if (decoded) {
-                const vlc_tick_t system_now = vlc_tick_now();
-                const vlc_tick_t system_pts =
-                    vlc_clock_ConvertToSystem(sys->clock, system_now,
-                                              decoded->date, sys->rate);
+                if (is_late_dropped && !decoded->b_force)
+                {
+                    const vlc_tick_t system_now = vlc_tick_now();
+                    const vlc_tick_t system_pts =
+                        vlc_clock_ConvertToSystem(sys->clock, system_now,
+                                                  decoded->date, sys->rate);
 
-                if (system_pts == INT64_MAX)
-                {
-                    /* The clock is paused, notify it (so that the current
-                        * picture is displayed but not the next one), this
-                        * current picture can't be be late. */
-                    *paused = true;
-                }
-                else if (is_late_dropped && !decoded->b_force)
-                {
-                    if (ThreadDisplayIsPictureLate(vout, decoded, system_now,
-                                                   system_pts))
+                    if (system_pts == INT64_MAX)
                     {
-                        picture_Release(decoded);
-                        vout_statistic_AddLost(&sys->statistic, 1);
-                        continue;
+                        /* The clock is paused, notify it (so that the current
+                         * picture is displayed but not the next one), this
+                         * current picture can't be be late. */
+                        *paused = true;
+                    }
+                    else
+                    {
+                        if (ThreadDisplayIsPictureLate(vout, decoded, system_now,
+                                                       system_pts))
+                        {
+                            picture_Release(decoded);
+                            vout_statistic_AddLost(&sys->statistic, 1);
+                            continue;
+                        }
                     }
                 }
                 vlc_video_context *pic_vctx = picture_GetVideoContext(decoded);
