@@ -28,70 +28,63 @@
 
 #define MAIN_TITLE N_( "VLC preferences" )
 
+/*  - Titles -
+ * These are used for simple prefs view tabs, for advanced prefs view
+ * cat & subcat nodes, and for the panel titles of general subcat panels.
+ */
+
+#define INTF_TITLE      N_( "Interface" )
+#define AUDIO_TITLE     N_( "Audio" )
+#define VIDEO_TITLE     N_( "Video" )
+#define INPUT_TITLE     N_( "Input / Codecs" )
+#define SOUT_TITLE      N_( "Stream output" )
+#define PLAYLIST_TITLE  N_( "Playlist" )
+#define AADVANCED_TITLE N_( "Advanced" )
+#define SUBPIC_TITLE    N_( "Subtitles / OSD" )
+
+/*  - Help text -
+ * These are shown on advanced view panels.
+ */
+
 /* Interface */
-#define INTF_TITLE N_("Interface")
 #define INTF_HELP  N_( "Settings for VLC's interfaces" )
-
 #define INTF_GENERAL_HELP N_( "Main interfaces settings" )
-
 #define INTF_MAIN_HELP N_( "Settings for the main interface" )
-
 #define INTF_CONTROL_HELP N_( "Settings for VLC's control interfaces" )
-
 #define INTF_HOTKEYS_HELP N_( "Hotkeys settings" )
 
 /* Audio */
-#define AUDIO_TITLE N_( "Audio" )
 #define AUDIO_HELP N_( "Audio settings" )
-
 #define AUDIO_GENERAL_HELP N_("General audio settings")
-
 #define AFILTER_HELP N_( "Audio filters are used to process the audio stream." )
-
 #define AVISUAL_HELP N_( "Audio visualizations" )
-
 #define AOUT_HELP N_("General settings for audio output modules.")
 
 /* Video */
-#define VIDEO_TITLE N_("Video")
 #define VIDEO_HELP N_("Video settings")
-
 #define VIDEO_GENERAL_HELP N_( "General video settings" )
-
 #define VOUT_HELP N_("General settings for video output modules.")
-
 #define VFILTER_HELP N_("Video filters are used to process the video stream." )
-
-#define SUBPIC_TITLE N_( "Subtitles / OSD")
 #define SUBPIC_HELP N_( "Settings related to On-Screen-Display,"\
         " subtitles and \"overlay subpictures\"")
-
 #define SPLITTER_HELP N_("Video splitters separate the stream into multiple videos.")
 
 /* Input */
-#define INPUT_TITLE N_( "Input / Codecs" )
 #define INPUT_HELP N_( "Settings for input, demultiplexing, " \
          "decoding and encoding")
-
 #define ACCESS_HELP N_( \
     "Settings related to the various access methods. " \
     "Common settings you may want to alter are HTTP proxy or " \
     "caching settings." )
-
 #define STREAM_FILTER_HELP N_( \
     "Stream filters are special modules that allow advanced operations on " \
     "the input side of VLC. Use with care..." )
-
 #define DEMUX_HELP N_( "Demuxers are used to separate audio and video streams." )
-
 #define VDEC_HELP N_( "Settings for the video, images or video+audio decoders and encoders." )
-
 #define ADEC_HELP N_( "Settings for the audio-only decoders and encoders." )
-
 #define SDEC_HELP N_( "Settings for subtitle, teletext and CC decoders and encoders." )
 
 /* Sout */
-#define SOUT_TITLE N_( "Stream output" )
 #define SOUT_HELP N_( \
       "Stream output settings are used when acting as a streaming server " \
       "or when saving incoming streams.\n" \
@@ -100,56 +93,42 @@
       "it (UDP, HTTP, RTP/RTSP).\n" \
       "Sout streams modules allow advanced stream processing (transcoding, "\
       "duplicating...).")
-
 #define SOUT_GENERAL_HELP N_( "General stream output settings")
-
 #define SOUT_MUX_HELP N_( \
        "Muxers create the encapsulation formats that are used to " \
        "put all the elementary streams (video, audio, ...) " \
        "together. This setting allows you to always force a specific muxer. " \
        "You should probably not do that.\n" \
        "You can also set default parameters for each muxer." )
-
 #define SOUT_ACO_HELP N_( \
    "Access output modules control the ways the muxed streams are sent. " \
    "This setting allows you to always force a specific access output method. " \
    "You should probably not do that.\n" \
    "You can also set default parameters for each access output.")
-
 #define SOUT_PACKET_HELP N_( \
         "Packetizers are used to \"preprocess\" the elementary "\
         "streams before muxing. " \
         "This setting allows you to always force a packetizer. " \
         "You should probably not do that.\n" \
         "You can also set default parameters for each packetizer." )
-
 #define SOUT_RENDER_HELP N_( "External renderer discovery related settings." )
-
 #define SOUT_STREAM_HELP N_( "Sout stream modules allow to build a sout " \
                 "processing chain. Please refer to the Streaming 'how-to' for " \
                 "more information. You can configure default options for " \
                 "each sout stream module here.")
-
 #define SOUT_VOD_HELP N_( "VLC's implementation of Video On Demand" )
 
-
 /* Playlist */
-#define PLAYLIST_TITLE N_( "Playlist" )
 #define PLAYLIST_HELP N_( "Settings related to playlist behaviour " \
         "(e.g. playback mode) and to modules that automatically add "\
         "items to the playlist (\"service discovery\" modules).")
-
 #define PGENERAL_HELP N_( "General playlist behaviour")
-
 #define SD_HELP N_("Services discovery modules are facilities "\
         "that automatically add items to playlist.")
-
 #define PEXPORT_HELP N_( "Settings relating to exporting playlists." )
 
 /* Advanced */
-#define AADVANCED_TITLE N_( "Advanced" )
 #define AADVANCED_HELP N_( "Advanced settings. Use with care...")
-
 #define ANETWORK_HELP N_( "Advanced network settings." )
 
 struct config_category_t
