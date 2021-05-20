@@ -201,10 +201,13 @@ Slider {
             }
         }
 
-        RowLayout {
+        Item {
             id: seekpointsRow
-            spacing: 0
+
+            width: parent.width
+            height: control.barHeight
             visible: player.hasChapters
+
             Repeater {
                 id: seekpointsRptr
                 model: player.chapters
