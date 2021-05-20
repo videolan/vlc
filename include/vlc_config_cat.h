@@ -26,13 +26,7 @@
 
 # include <vlc_plugin.h>
 
-/*
- *  First, we need help strings for the General Settings and for the
- *  Plugins screen
- */
 #define MAIN_TITLE N_( "VLC preferences" )
-#define MAIN_HELP N_( \
-    "Select \"Advanced Options\" to see all options." )
 
 /* Interface */
 #define INTF_TITLE N_("Interface")
@@ -85,11 +79,6 @@
 #define SPLITTER_TITLE N_("Splitters")
 #define SPLITTER_HELP N_("Video splitters separate the stream into multiple videos.")
 
-/*
-#define TEXT_HELP N_( \
-    "Use the settings of the \"freetype\" module to choose the font you " \
-    "want VLC to use for text rendering (to display subtitles for example).")
-*/
 /* Input */
 #define INPUT_TITLE N_( "Input / Codecs" )
 #define INPUT_HELP N_( "Settings for input, demultiplexing, " \
@@ -117,8 +106,6 @@
 
 #define SDEC_TITLE N_( "Subtitle codecs")
 #define SDEC_HELP N_( "Settings for subtitle, teletext and CC decoders and encoders." )
-
-#define ADVANCED_HELP N_( "General input settings. Use with care..." )
 
 /* Sout */
 #define SOUT_TITLE N_( "Stream output" )
