@@ -1408,13 +1408,12 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
     column = b_global ? KeySelectorControl::GLOBAL_HOTKEY_COL
                       : KeySelectorControl::HOTKEY_COL;
 
-    setWindowTitle( ( b_global ? qtr( "Global" ) + QString(" ") : "" )
-                    + qtr( "Hotkey change" ) );
+    setWindowTitle( b_global ? qtr( "Global Hotkey change" )
+                             : qtr( "Hotkey change" ) );
     setWindowRole( "vlc-key-input" );
 
     QVBoxLayout *vLayout = new QVBoxLayout( this );
-    selected = new QLabel( qtr( "Press the new key or combination for " )
-                           + QString("<b>%1</b>")
+    selected = new QLabel( qtr( "Press the new key or combination for <b>%1</b>" )
                            .arg( keyItem->text( KeySelectorControl::ACTION_COL ) ) );
     vLayout->addWidget( selected , Qt::AlignCenter );
 
@@ -1467,8 +1466,8 @@ void KeyInputDialog::checkForConflicts( const QString &sequence )
         if( !item->data( column, Qt::UserRole ).toString().split( "\t" ).contains( vlckey ) )
             continue;
 
-        warning->setText( qtr("Warning: this key or combination is already assigned to ") +
-                QString( "\"<b>%1</b>\"" )
+        warning->setText(
+                qtr("Warning: this key or combination is already assigned to \"<b>%1</b>\"")
                 .arg( item->text( KeySelectorControl::ACTION_COL ) ) );
         warning->show();
         ok->show();
@@ -1507,8 +1506,7 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
     QKeySequence sequence( e->key() | e->modifiers() );
     vlckey = VLCKeyToString( i_vlck, false );
     vlckey_tr = VLCKeyToString( i_vlck, true );
-    selected->setText( qtr( "Key or combination: " )
-                + QString("<b>%1</b>").arg( vlckey_tr ) );
+    selected->setText( qtr( "Key or combination: <b>%1</b>" ).arg( vlckey_tr ) );
     checkForConflicts( sequence.toString() );
 }
 
@@ -1517,7 +1515,7 @@ void KeyInputDialog::wheelEvent( QWheelEvent *e )
     int i_vlck = qtWheelEventToVLCKey( *e );
     vlckey = VLCKeyToString( i_vlck, false );
     vlckey_tr = VLCKeyToString( i_vlck, true );
-    selected->setText( qtr( "Key: " ) + QString("<b>%1</b>").arg( vlckey_tr ) );
+    selected->setText( qtr( "Key: <b>%1</b>" ).arg( vlckey_tr ) );
     checkForConflicts( QString() );
 }
 
