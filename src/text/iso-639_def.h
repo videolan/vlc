@@ -30,10 +30,14 @@
  * minimal adjustments. Corrections or additions, unless they pertain to custom
  * VLC adjustments, should generally be discussed with the glibc developers,
  * then updated here subsequently if accepted by glibc.
+ *
+ * The glibc ordering should be preserved to avoid making future bulk updates
+ * harder. (Rare VLC additions belong at the end).
  */
 
 static const iso639_lang_t p_languages[] =
 {
+    /* Definitions taken from GNU glibc */
     { N_( "Afar" ),                           "aa", "aar", "aar" },
     { N_( "Abkhazian" ),                      "ab", "abk", "abk" },
     { N_( "Afrikaans" ),                      "af", "afr", "afr" },
@@ -96,7 +100,6 @@ static const iso639_lang_t p_languages[] =
     { N_( "Indonesian" ),                     "id", "ind", "ind" },
     { N_( "Inupiaq" ),                        "ik", "ipk", "ipk" },
     { N_( "Italian" ),                        "it", "ita", "ita" },
-    { N_( "Hebrew" ),                         "iw", "heb", "heb" },
     { N_( "Javanese" ),                       "jv", "jav", "jav" },
     { N_( "Japanese" ),                       "ja", "jpn", "jpn" },
     { N_( "Greenlandic, Kalaallisut" ),       "kl", "kal", "kal" },
@@ -140,7 +143,6 @@ static const iso639_lang_t p_languages[] =
     { N_( "Occitan; Provençal" ),             "oc", "oci", "oci" },
     { N_( "Oriya" ),                          "or", "ori", "ori" },
     { N_( "Oromo" ),                          "om", "orm", "orm" },
-    { N_( "On Screen Display" ),              "od", "osd", "osd" },
     { N_( "Ossetian; Ossetic" ),              "os", "oss", "oss" },
     { N_( "Panjabi" ),                        "pa", "pan", "pan" },
     { N_( "Persian" ),                        "fa", "fas", "per" },
@@ -149,7 +151,6 @@ static const iso639_lang_t p_languages[] =
     { N_( "Portuguese" ),                     "pt", "por", "por" },
     { N_( "Pushto" ),                         "ps", "pus", "pus" },
     { N_( "Quechua" ),                        "qu", "que", "que" },
-    { N_( "Original audio" ),                 "",   "qaa", "qaa" },
     { N_( "Raeto-Romance" ),                  "rm", "roh", "roh" },
     { N_( "Romanian" ),                       "ro", "ron", "rum" },
     { N_( "Rundi" ),                          "rn", "run", "run" },
@@ -201,7 +202,13 @@ static const iso639_lang_t p_languages[] =
     { N_( "Yoruba" ),                         "yo", "yor", "yor" },
     { N_( "Zhuang" ),                         "za", "zha", "zha" },
     { N_( "Zulu" ),                           "zu", "zul", "zul" },
-    /* XXX psz_eng_name MUST be NULL on the last item as it is the stop condition */
+
+    /* Custom VLC additions */
+    { N_( "On Screen Display" ),              "od", "osd", "osd" },
+    { N_( "Original audio" ),                 "",   "qaa", "qaa" },
+    { N_( "Hebrew" ),                         "iw", "heb", "heb" }, /* for old DVDs */
+
+    /* End marker */
     { NULL,                                   "",   "",    "" }
 };
 
