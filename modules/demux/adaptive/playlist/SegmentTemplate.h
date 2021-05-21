@@ -70,6 +70,10 @@ namespace adaptive
                 virtual void debug(vlc_object_t *, int = 0) const override;
 
             protected:
+                bool getScaledPlaybackTimeDurationBySegmentNumber(uint64_t, stime_t *,
+                                                                  stime_t *, Timescale *) const;
+                void setVirtualSegmentTime(uint64_t pos,
+                                           SegmentTemplateSegment *virtualsegment) const;
                 SegmentInformation *parentSegmentInformation;
                 SegmentTemplateSegment *virtualsegment;
         };

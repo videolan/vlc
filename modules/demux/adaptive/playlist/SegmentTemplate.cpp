@@ -141,11 +141,27 @@ vlc_tick_t SegmentTemplate::getMinAheadTime(uint64_t number) const
     }
 }
 
+void SegmentTemplate::setVirtualSegmentTime(uint64_t pos,
+                                            SegmentTemplateSegment *virtualsegment) const
+{
+    stime_t startTime, duration;
+    Timescale timescale;
+    if(getScaledPlaybackTimeDurationBySegmentNumber(pos, &startTime,
+                                                    &duration, &timescale))
+    {
+        virtualsegment->startTime.Set(startTime);
+        virtualsegment->duration.Set(duration);
+    }
+}
+
 Segment * SegmentTemplate::getMediaSegment(uint64_t number) const
 {
     const SegmentTimeline *tl = inheritSegmentTimeline();
     if(tl == nullptr || (tl->maxElementNumber() >= number && tl->minElementNumber() <= number))
+    {
+        setVirtualSegmentTime(number, virtualsegment);
         return virtualsegment;
+    }
     return nullptr;
 }
 
@@ -188,6 +204,7 @@ Segment *  SegmentTemplate::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newp
         /* start number */
         *pi_newpos = std::max(inheritStartNumber(), i_pos);
     }
+    setVirtualSegmentTime(*pi_newpos, virtualsegment);
     return virtualsegment;
 }
 
@@ -247,27 +264,41 @@ bool SegmentTemplate::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     Timescale timescale;
     stime_t stime, sduration;
 
+    if(!getScaledPlaybackTimeDurationBySegmentNumber(number, &stime, &sduration, &timescale))
+        return false;
+
+    *time = timescale.ToTime(stime);
+    *duration = timescale.ToTime(sduration);
+
+    return true;
+}
+
+bool SegmentTemplate::getScaledPlaybackTimeDurationBySegmentNumber(uint64_t number,
+                                                                   stime_t *stime,
+                                                                   stime_t *sduration,
+                                                                   Timescale *timescale) const
+{
+    if(number == std::numeric_limits<uint64_t>::max())
+        return false;
+
     const SegmentTimeline * timeline = inheritSegmentTimeline();
     if(timeline)
     {
-        timescale = timeline->inheritTimescale();
-        if(!timeline->getScaledPlaybackTimeDurationBySegmentNumber(number, &stime, &sduration))
+        *timescale = timeline->inheritTimescale();
+        if(!timeline->getScaledPlaybackTimeDurationBySegmentNumber(number, stime, sduration))
             return false;
     }
     else
     {
-        timescale = inheritTimescale();
+        *timescale = inheritTimescale();
         uint64_t startNumber = inheritStartNumber();
         if(number < startNumber)
             return false;
-        sduration = inheritDuration();
-        stime = (number - startNumber) * sduration;
+        *sduration = inheritDuration();
+        *stime = (number - startNumber) * *sduration;
     }
 
-    *time = timescale.ToTime(stime);
-    *duration = timescale.ToTime(sduration);
     return true;
-
 }
 
 SegmentTemplateInit::SegmentTemplateInit( SegmentTemplate *templ_,
