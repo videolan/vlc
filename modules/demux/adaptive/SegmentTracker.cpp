@@ -315,9 +315,14 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos,
     if(!segmentChunk)
         return ChunkEntry();
 
-    const Timescale timescale = pos.rep->inheritTimescale();
-    return ChunkEntry(segmentChunk, pos, VLC_TS_0 + timescale.ToTime(segment->startTime.Get()),
-                      timescale.ToTime(segment->duration.Get()), segment->getDisplayTime());
+    mtime_t startTime = VLC_TS_INVALID, duration = 0;
+    if(pos.index_sent && pos.init_sent)
+    {
+        const Timescale timescale = pos.rep->inheritTimescale();
+        startTime = VLC_TS_0 + timescale.ToTime(segment->startTime.Get());
+        duration = timescale.ToTime(segment->duration.Get());
+    }
+    return ChunkEntry(segmentChunk, pos, startTime, duration, segment->getDisplayTime());
 }
 
 void SegmentTracker::resetChunksSequence()
