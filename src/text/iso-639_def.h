@@ -83,7 +83,7 @@ static const iso639_lang_t p_languages[] =
     { N_( "Irish" ),                          "ga", "gle", "gle" },
     { N_( "Gallegan" ),                       "gl", "glg", "glg" },
     { N_( "Manx" ),                           "gv", "glv", "glv" },
-    { N_( "Greek, Modern" ),                  "el", "gre", "ell" },
+    { N_( "Greek, Modern" ),                  "el", "ell", "gre" },
     { N_( "Guarani" ),                        "gn", "grn", "grn" },
     { N_( "Gujarati" ),                       "gu", "guj", "guj" },
     { N_( "Hebrew" ),                         "he", "heb", "heb" },
