@@ -28,12 +28,12 @@ This allows embedding the engine in 3rd party applications, while letting them t
 # Platforms
 
 VLC is available on the following platforms:
-- Windows *(from 7 to all versions of 10)*, including UWP platforms
-- macOS *(10.10 and more recent)*
-- GNU/Linux and affiliated
+- [Windows](https://www.videolan.org/vlc/download-windows.html) *(from 7 to all versions of 10)*, including UWP platforms
+- [macOS](https://www.videolan.org/vlc/download-macosx.html) *(10.10 and more recent)*
+- [GNU/Linux](https://www.videolan.org/vlc/#download) and affiliated
 - \*BSD and affiliated
-- Android *(4.2 and more recent)*, including Android TV and Android Auto
-- iOS *(9 and more recent)*, including AppleTV and iPadOS
+- [Android](https://www.videolan.org/vlc/download-android.html) *(4.2 and more recent)*, including Android TV and Android Auto
+- [iOS](https://www.videolan.org/vlc/download-ios.html) *(9 and more recent)*, including AppleTV and iPadOS
 - Haiku, OS/2 and a few others.
 
 Not all platforms receive the same amount of care, due to our limited resources.
@@ -86,14 +86,14 @@ streaming and converting of multimedia files and stream.
 
 You can found here several links that might help you:
 
-- [The VLC web site](http://www.videolan.org/vlc/)
+- [VLC web site](http://www.videolan.org/vlc/)
 - [Support](https://www.videolan.org/support/)
 - [Forums](https://forum.videolan.org/)
 - [Wiki](https://wiki.videolan.org/)
-- [The Developers site](https://wiki.videolan.org/Developers_Corner)
+- [Developer's Corner](https://wiki.videolan.org/Developers_Corner)
 - [VLC hacking guide](https://wiki.videolan.org/Hacker_Guide)
 - [Bugtracker](https://code.videolan.org/videolan/vlc/-/issues)
-- [The VideoLAN web site](https://www.videolan.org/)
+- [VideoLAN web site](https://www.videolan.org/)
 
 ## Source Code sitemap
 ```
