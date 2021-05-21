@@ -99,7 +99,7 @@ static const iso639_lang_t p_languages[] =
     { N_( "Inupiaq" ),                        "ik", "ipk", "ipk" },
     { N_( "Italian" ),                        "it", "ita", "ita" },
     { N_( "Hebrew" ),                         "iw", "heb", "heb" },
-    { N_( "Javanese" ),                       "jv", "jaw", "jav" },
+    { N_( "Javanese" ),                       "jv", "jav", "jav" },
     { N_( "Japanese" ),                       "ja", "jpn", "jpn" },
     { N_( "Greenlandic, Kalaallisut" ),       "kl", "kal", "kal" },
     { N_( "Kannada" ),                        "kn", "kan", "kan" },
