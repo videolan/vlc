@@ -70,7 +70,7 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE3 ( N_("Arawak"),                                                  "arw", "arw" )
     LANG_CODE  ( N_("Armenian"),                                          "hy", "hye", "arm" )
     LANG_CODE3 ( N_("Aromanian; Arumanian; Macedo-Romanian"),                   "rup", "rup" )
-    LANG_CODE3 ( N_("Artificial (Other)"),                                      "art", "art" )
+  /*LANG_CODE3 ( N_("Artificial (Other)"),                                      "art", "art" )*/
     LANG_CODE  ( N_("Assamese"),                                          "as", "asm", "asm" )
     LANG_CODE3 ( N_("Asturian; Bable"),                                         "ast", "ast" )
     LANG_CODE3 ( N_("Athapascan languages"),                                    "ath", "ath" )
@@ -139,10 +139,10 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE3 ( N_("Chinook jargon"),                                          "chn", "chn" )
     LANG_CODE3 ( N_("Chipewyan"),                                               "chp", "chp" )
     LANG_CODE3 ( N_("Choctaw"),                                                 "cho", "cho" )
-    LANG_CODE  ( N_("Church Slavic; Old Slavonic; Church Slavonic; Old Bulgarian; Old Church Slavonic"), "cu", "chu", "chu" )
+    LANG_CODE  ( N_("Church Slavic; Church Slavonic"),                    "cu", "chu", "chu" ) /* note: simplified label */
     LANG_CODE3 ( N_("Chuukese"),                                                "chk", "chk" )
     LANG_CODE  ( N_("Chuvash"),                                           "cv", "chv", "chv" )
-    LANG_CODE3 ( N_("Classical Newari; Old Newari; Classical Nepal Bhasa"),     "nwc", "nwc" )
+  /*LANG_CODE3 ( N_("Classical Newari; Old Newari; Classical Nepal Bhasa"),     "nwc", "nwc" )*/
     LANG_CODE3 ( N_("Coptic"),                                                  "cop", "cop" )
     LANG_CODE  ( N_("Cornish"),                                           "kw", "cor", "cor" )
     LANG_CODE  ( N_("Corsican"),                                          "co", "cos", "cos" )
@@ -167,16 +167,16 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE3 ( N_("Dogri"),                                                   "doi", "doi" )
     LANG_CODE3 ( N_("Dravidian (Other)"),                                       "dra", "dra" )
     LANG_CODE3 ( N_("Duala"),                                                   "dua", "dua" )
-    LANG_CODE3 ( N_("Dutch, Middle (ca.1050-1350)"),                            "dum", "dum" )
+  /*LANG_CODE3 ( N_("Dutch, Middle (ca.1050-1350)"),                            "dum", "dum" )*/
     LANG_CODE  ( N_("Dutch; Flemish"),                                    "nl", "nld", "dut" )
     LANG_CODE3 ( N_("Dyula"),                                                   "dyu", "dyu" )
     LANG_CODE  ( N_("Dzongkha"),                                          "dz", "dzo", "dzo" )
     LANG_CODE3 ( N_("Efik"),                                                    "efi", "efi" )
-    LANG_CODE3 ( N_("Egyptian (Ancient)"),                                      "egy", "egy" )
+  /*LANG_CODE3 ( N_("Egyptian (Ancient)"),                                      "egy", "egy" )*/
     LANG_CODE3 ( N_("Ekajuk"),                                                  "eka", "eka" )
     LANG_CODE3 ( N_("Elamite"),                                                 "elx", "elx" )
-    LANG_CODE3 ( N_("English, Middle (1100-1500)"),                             "enm", "enm" )
-    LANG_CODE3 ( N_("English, Old (ca.450-1100)"),                              "ang", "ang" )
+  /*LANG_CODE3 ( N_("English, Middle (1100-1500)"),                             "enm", "enm" )*/
+  /*LANG_CODE3 ( N_("English, Old (ca.450-1100)"),                              "ang", "ang" )*/
     LANG_CODE  ( N_("English"),                                           "en", "eng", "eng" )
     LANG_CODE3 ( N_("Erzya"),                                                   "myv", "myv" )
     LANG_CODE  ( N_("Esperanto"),                                         "eo", "epo", "epo" )
@@ -192,8 +192,8 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE  ( N_("Finnish"),                                           "fi", "fin", "fin" )
     LANG_CODE3 ( N_("Finno-Ugrian (Other)"),                                    "fiu", "fiu" )
     LANG_CODE3 ( N_("Fon"),                                                     "fon", "fon" )
-    LANG_CODE3 ( N_("French, Middle (ca.1400-1800)"),                           "frm", "frm" )
-    LANG_CODE3 ( N_("French, Old (842-ca.1400)"),                               "fro", "fro" )
+  /*LANG_CODE3 ( N_("French, Middle (ca.1400-1800)"),                           "frm", "frm" )*/
+  /*LANG_CODE3 ( N_("French, Old (842-ca.1400)"),                               "fro", "fro" )*/
     LANG_CODE  ( N_("French"),                                            "fr", "fra", "fre" )
     LANG_CODE3 ( N_("Northern Frisian"),                                        "frr", "frr" )
     LANG_CODE3 ( N_("Eastern Frisian"),                                         "frs", "frs" )
@@ -209,8 +209,8 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE3 ( N_("Gbaya"),                                                   "gba", "gba" )
     LANG_CODE3 ( N_("Geez"),                                                    "gez", "gez" )
     LANG_CODE  ( N_("Georgian"),                                          "ka", "kat", "geo" )
-    LANG_CODE3 ( N_("German, Middle High (ca.1050-1500)"),                      "gmh", "gmh" )
-    LANG_CODE3 ( N_("German, Old High (ca.750-1050)"),                          "goh", "goh" )
+  /*LANG_CODE3 ( N_("German, Middle High (ca.1050-1500)"),                      "gmh", "gmh" )*/
+  /*LANG_CODE3 ( N_("German, Old High (ca.750-1050)"),                          "goh", "goh" )*/
     LANG_CODE3 ( N_("Germanic (Other)"),                                        "gem", "gem" )
     LANG_CODE  ( N_("German"),                                            "de", "deu", "ger" )
     LANG_CODE3 ( N_("Swiss German; Alemannic"),                                 "gsw", "gsw" )
@@ -219,8 +219,8 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE3 ( N_("Gorontalo"),                                               "gor", "gor" )
     LANG_CODE3 ( N_("Gothic"),                                                  "got", "got" )
     LANG_CODE3 ( N_("Grebo"),                                                   "grb", "grb" )
-    LANG_CODE3 ( N_("Greek, Ancient (to 1453)"),                                "grc", "grc" )
-    LANG_CODE  ( N_("Greek, Modern (1453-)"),                             "el", "ell", "gre" )
+  /*LANG_CODE3 ( N_("Greek, Ancient (to 1453)"),                                "grc", "grc" )*/
+    LANG_CODE  ( N_("Greek, Modern"),                                     "el", "ell", "gre" ) /* note: simplified label */
     LANG_CODE  ( N_("Guarani"),                                           "gn", "grn", "grn" )
     LANG_CODE  ( N_("Gujarati"),                                          "gu", "guj", "guj" )
     LANG_CODE3 ( N_("Gwich´in"),                                                "gwi", "gwi" )
@@ -251,13 +251,13 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE3 ( N_("Indo-European (Other)"),                                   "ine", "ine" )
     LANG_CODE  ( N_("Indonesian"),                                        "id", "ind", "ind" )
     LANG_CODE3 ( N_("Ingush"),                                                  "inh", "inh" )
-    LANG_CODE  ( N_("Interlingua (International Auxiliary Language Association)"), "ia", "ina", "ina" )
+    LANG_CODE  ( N_("Interlingua"),                                       "ia", "ina", "ina" ) /* note: simplified label */
     LANG_CODE  ( N_("Interlingue"),                                       "ie", "ile", "ile" )
     LANG_CODE  ( N_("Inuktitut"),                                         "iu", "iku", "iku" )
     LANG_CODE  ( N_("Inupiaq"),                                           "ik", "ipk", "ipk" )
     LANG_CODE3 ( N_("Iranian (Other)"),                                         "ira", "ira" )
-    LANG_CODE3 ( N_("Irish, Middle (900-1200)"),                                "mga", "mga" )
-    LANG_CODE3 ( N_("Irish, Old (to 900)"),                                     "sga", "sga" )
+  /*LANG_CODE3 ( N_("Irish, Middle (900-1200)"),                                "mga", "mga" )*/
+  /*LANG_CODE3 ( N_("Irish, Old (to 900)"),                                     "sga", "sga" )*/
     LANG_CODE  ( N_("Irish"),                                             "ga", "gle", "gle" )
     LANG_CODE3 ( N_("Iroquoian languages"),                                     "iro", "iro" )
     LANG_CODE  ( N_("Italian"),                                           "it", "ita", "ita" )
@@ -317,7 +317,7 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE3 ( N_("Literary Chinese"),                                        "lzh", "lzh" )
     LANG_CODE  ( N_("Lithuanian"),                                        "lt", "lit", "lit" )
     LANG_CODE3 ( N_("Lojban"),                                                  "jbo", "jbo" )
-    LANG_CODE3 ( N_("Low German; Low Saxon; German, Low; Saxon, Low"),          "nds", "nds" )
+    LANG_CODE3 ( N_("Low German; Low Saxon"),                                   "nds", "nds" ) /* note: simplified label */
     LANG_CODE3 ( N_("Lower Sorbian"),                                           "dsb", "dsb" )
     LANG_CODE3 ( N_("Lozi"),                                                    "loz", "loz" )
     LANG_CODE  ( N_("Luba-Katanga"),                                      "lu", "lub", "lub" )
@@ -389,7 +389,7 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE3 ( N_("Niuean"),                                                  "niu", "niu" )
     LANG_CODE3 ( N_("N'Ko"),                                                    "nqo", "nqo" )
     LANG_CODE3 ( N_("Nogai"),                                                   "nog", "nog" )
-    LANG_CODE3 ( N_("Norse, Old"),                                              "non", "non" )
+  /*LANG_CODE3 ( N_("Norse, Old"),                                              "non", "non" )*/
     LANG_CODE3 ( N_("North American Indian"),                                   "nai", "nai" )
     LANG_CODE  ( N_("Northern Sami"),                                     "se", "sme", "sme" )
     LANG_CODE3 ( N_("Northern Sotho; Pedi; Sepedi"),                            "nso", "nso" )
@@ -401,7 +401,7 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE3 ( N_("Nyankole"),                                                "nyn", "nyn" )
     LANG_CODE3 ( N_("Nyoro"),                                                   "nyo", "nyo" )
     LANG_CODE3 ( N_("Nzima"),                                                   "nzi", "nzi" )
-    LANG_CODE  ( N_("Occitan (post 1500); Provençal"),                    "oc", "oci", "oci" )
+    LANG_CODE  ( N_("Occitan; Provençal"),                                "oc", "oci", "oci" ) /* note: simplified label */
     LANG_CODE  ( N_("Ojibwa"),                                            "oj", "oji", "oji" )
     LANG_CODE  ( N_("Odia"),                                              "or", "ori", "ori" )
     LANG_CODE  ( N_("Oromo"),                                             "om", "orm", "orm" )
@@ -416,7 +416,7 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE  ( N_("Panjabi; Punjabi"),                                  "pa", "pan", "pan" )
     LANG_CODE3 ( N_("Papiamento"),                                              "pap", "pap" )
     LANG_CODE3 ( N_("Papuan (Other)"),                                          "paa", "paa" )
-    LANG_CODE3 ( N_("Persian, Old (ca.600-400 B.C.)"),                          "peo", "peo" )
+  /*LANG_CODE3 ( N_("Persian, Old (ca.600-400 B.C.)"),                          "peo", "peo" )*/
     LANG_CODE  ( N_("Persian"),                                           "fa", "fas", "per" )
     LANG_CODE3 ( N_("Philippine (Other)"),                                      "phi", "phi" )
     LANG_CODE3 ( N_("Phoenician"),                                              "phn", "phn" )
@@ -424,7 +424,7 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE  ( N_("Polish"),                                            "pl", "pol", "pol" )
     LANG_CODE  ( N_("Portuguese"),                                        "pt", "por", "por" )
     LANG_CODE3 ( N_("Prakrit languages"),                                       "pra", "pra" )
-    LANG_CODE3 ( N_("Provençal, Old (to 1500)"),                                "pro", "pro" )
+  /*LANG_CODE3 ( N_("Provençal, Old (to 1500)"),                                "pro", "pro" )*/
     LANG_CODE3 ( N_("Pu-Xian Chinese"),                                         "cpx", "cpx" )
     LANG_CODE  ( N_("Pushto"),                                            "ps", "pus", "pus" )
     LANG_CODE  ( N_("Quechua"),                                           "qu", "que", "que" )
@@ -490,7 +490,7 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE  ( N_("Swahili"),                                           "sw", "swa", "swa" )
     LANG_CODE  ( N_("Swati"),                                             "ss", "ssw", "ssw" )
     LANG_CODE  ( N_("Swedish"),                                           "sv", "swe", "swe" )
-    LANG_CODE3 ( N_("Classical Syriac"),                                        "syc", "syc" )
+  /*LANG_CODE3 ( N_("Classical Syriac"),                                        "syc", "syc" )*/
     LANG_CODE3 ( N_("Syriac"),                                                  "syr", "syr" )
     LANG_CODE  ( N_("Tagalog"),                                           "tl", "tgl", "tgl" )
     LANG_CODE  ( N_("Tahitian"),                                          "ty", "tah", "tah" )
@@ -521,7 +521,7 @@ static const iso639_lang_t p_languages[] =
     LANG_CODE3 ( N_("Tulu"),                                                    "tcy", "tcy" )
     LANG_CODE3 ( N_("Tumbuka"),                                                 "tum", "tum" )
     LANG_CODE3 ( N_("Tupi languages"),                                          "tup", "tup" )
-    LANG_CODE3 ( N_("Turkish, Ottoman (1500-1928)"),                            "ota", "ota" )
+  /*LANG_CODE3 ( N_("Turkish, Ottoman (1500-1928)"),                            "ota", "ota" )*/
     LANG_CODE  ( N_("Turkish"),                                           "tr", "tur", "tur" )
     LANG_CODE  ( N_("Turkmen"),                                           "tk", "tuk", "tuk" )
     LANG_CODE3 ( N_("Tuvalu"),                                                  "tvl", "tvl" )
