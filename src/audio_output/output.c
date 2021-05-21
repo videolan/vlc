@@ -420,8 +420,7 @@ void aout_Release(audio_output_t *aout)
 }
 
 static int aout_PrepareStereoMode(audio_output_t *aout,
-                                  const audio_sample_format_t *restrict fmt,
-                                  unsigned i_nb_input_channels)
+                                  const audio_sample_format_t *restrict fmt)
 {
     aout_owner_t *owner = aout_owner (aout);
 
@@ -430,7 +429,7 @@ static int aout_PrepareStereoMode(audio_output_t *aout,
     const char *txt;
     val.i_int = 0;
 
-    if (!AOUT_FMT_LINEAR(fmt) || i_nb_input_channels != 2)
+    if (!AOUT_FMT_LINEAR(fmt) || fmt->i_channels != 2)
         return AOUT_VAR_CHAN_UNSET;
 
     int i_default_mode = owner->requested_stereo_mode;
@@ -663,7 +662,6 @@ int aout_OutputNew (audio_output_t *aout)
     audio_sample_format_t *filter_fmt = &owner->filter_format;
     aout_filters_cfg_t *filters_cfg = &owner->filters_cfg;
 
-    unsigned i_nb_input_channels = fmt->i_channels;
     vlc_fourcc_t formats[] = {
         fmt->i_format, 0, 0
     };
@@ -732,8 +730,7 @@ int aout_OutputNew (audio_output_t *aout)
         }
     }
 
-    int stereo_mode =
-        aout_PrepareStereoMode(aout, fmt, i_nb_input_channels);
+    int stereo_mode = aout_PrepareStereoMode(aout, fmt);
 
     if (stereo_mode != AOUT_VAR_CHAN_UNSET
      && aout_HasStereoMode(aout, stereo_mode))
