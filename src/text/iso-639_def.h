@@ -1,10 +1,10 @@
 /*****************************************************************************
- * iso-639_def.h: languages codes and abbreviations
+ * iso-639_def.h: language codes and abbreviations
  *****************************************************************************
  * Copyright (C) 1998-2004 VLC authors and VideoLAN
  *
- * This is used in iso_lang.cpp and is taken from the GNU glibc 2.2.5
- * tarball. It has been partially completed with native language names.
+ * Definitions taken from GNU glibc.
+ *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -23,15 +23,13 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* Define the languages codes and abbreviations according to ISO 639-[12].
- * Format is:( "English name", 639-1-code, 639-2/T-code, 639-2/B-code)
- * If you find something missing or wrong contact <bug-glibc@gnu.org> */
-
-/* The following spellings were converted to pure ASCII. They should be
- * "translated" back to Unicode in the po/en*.po files:
- *  Provençal -> Provencal
- *  Volapük -> Volapuk
- *  Bokmål -> Bokmaal
+/* This table defines ISO-639-1, ISO-639-2T and ISO-639-2B languages codes and
+ * their mappings to descriptive labels.
+ *
+ * The entries have been copied in bulk from the set defined in glibc, with
+ * minimal adjustments. Corrections or additions, unless they pertain to custom
+ * VLC adjustments, should generally be discussed with the glibc developers,
+ * then updated here subsequently if accepted by glibc.
  */
 
 static const iso639_lang_t p_languages[] =
