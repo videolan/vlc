@@ -981,7 +981,7 @@ static int CreateOutlinedGlyph( FT_Glyph src, FT_Glyph *dest, void *priv )
 {
     filter_t *p_filter = priv;
     filter_sys_t *p_sys = p_filter->p_sys;
-    if(FT_Glyph_StrokeBorder( &src, p_sys->p_stroker, 0, 0 ))
+    if(FT_Glyph_Stroke( &src, p_sys->p_stroker, 0 ))
         return -1;
     *dest = src;
     return 0;
