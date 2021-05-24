@@ -39,9 +39,10 @@ Widgets.NavigableFocusScope {
     property alias g_mainDisplay: root
     property bool _inhibitMiniPlayer: false
     property bool _showMiniPlayer: false
+    property var _defaultPages: ({}) // saves last page of view
 
     onViewChanged: {
-        viewProperties = ({})
+        viewProperties = _defaultPages[root.view] !== undefined ? ({"defaultPage": _defaultPages[root.view]}) : ({})
         loadView()
     }
     onViewPropertiesChanged: loadView()
@@ -54,6 +55,8 @@ Widgets.NavigableFocusScope {
 
     function loadView() {
         var found = stackView.loadView(root.pageModel, root.view, root.viewProperties)
+        if (stackView.currentItem.view !== undefined)
+            _defaultPages[root.view] = stackView.currentItem.view
 
         stackView.currentItem.navigationParent = medialibId
         stackView.currentItem.navigationUpItem = sourcesBanner
