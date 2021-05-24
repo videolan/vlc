@@ -10,6 +10,7 @@ description: |
   VCDs, and various streaming protocols.
   NOTE. This snap contains an untested daily build of VLC
 confinement: strict
+compression: lzo
 
 apps:
   vlc:
