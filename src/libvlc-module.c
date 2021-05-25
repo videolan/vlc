@@ -1574,7 +1574,7 @@ vlc_module_begin ()
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions )
     add_integer( "stereo-mode", 0, STEREO_MODE_TEXT, NULL )
         change_integer_list( pi_stereo_mode_values, ppsz_stereo_mode_texts )
-    add_integer( "mix-mode", AOUT_MIX_MODE_UNSET, MIX_MODE_TEXT, MIX_MODE_TEXT )
+    add_integer( "mix-mode", AOUT_MIX_MODE_UNSET, MIX_MODE_TEXT, NULL )
         change_integer_list( pi_mix_mode_values, ppsz_mix_mode_texts )
     add_integer( "audio-desync", 0, DESYNC_TEXT,
                  DESYNC_LONGTEXT )
@@ -2137,8 +2137,7 @@ vlc_module_begin ()
     add_integer( "fetch-art-threads", 1, FETCH_ART_THREADS_TEXT,
                  FETCH_ART_THREADS_LONGTEXT )
 
-    add_bool( "metadata-network-access", false, METADATA_NETWORK_TEXT,
-                 METADATA_NETWORK_TEXT )
+    add_bool( "metadata-network-access", false, METADATA_NETWORK_TEXT, NULL )
 
     add_string( "recursive", "collapse" , RECURSIVE_TEXT,
                 RECURSIVE_LONGTEXT )
