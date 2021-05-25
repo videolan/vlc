@@ -299,7 +299,7 @@ Widgets.NavigableFocusScope {
                                                           - (VLCStyle.applicationHorizontalMargin * 2)
                                                           - (VLCStyle.margin_xsmall * 2)
                                                           - (VLCStyle.margin_xxsmall * 2)
-                    readonly property bool _alignHCenter: ((localToolbar.width - width) / 2) + width < playlistGroup.x
+                    readonly property bool _alignHCenter: ((localToolbar.width - contentWidth) / 2) + contentWidth < playlistGroup.x
 
                     width: Math.min(contentWidth, availableWidth)
                     height: VLCStyle.localToolbar_height
