@@ -114,6 +114,8 @@ Widgets.NavigableFocusScope {
         Widgets.DragItem {
             id: dragItem
 
+            parent: (typeof g_mainDisplay !== 'undefined') ? g_mainDisplay : root
+
             property int index: -1
 
             colors: root.colors
