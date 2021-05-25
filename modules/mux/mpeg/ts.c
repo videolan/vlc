@@ -836,7 +836,7 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
     }
 }
 
-/* returns a pointer to a valid string, with length 0 or 3 */
+/* returns a pointer to a valid string, with length 3 */
 static const char *GetIso639_2LangCode(const char *lang)
 {
     const iso639_lang_t *pl;
@@ -845,13 +845,15 @@ static const char *GetIso639_2LangCode(const char *lang)
     {
         pl = GetLang_1(lang);
     }
-    else
+    else if (strlen(lang) == 3)
     {
-        pl = GetLang_2B(lang);      /* try native code first */
-        if (!*pl->psz_iso639_2T)
-            pl = GetLang_2T(lang);  /* else fallback to english code */
+        pl = GetLang_2B(lang);      /* try english code first */
+        if (!strcmp(pl->psz_iso639_1, "??"))
+            pl = GetLang_2T(lang);  /* else fallback to native code */
 
     }
+    else
+        return "???";
 
     return pl->psz_iso639_2T;   /* returns the english code */
 }
@@ -937,7 +939,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             continue;
 
         const char *code = GetIso639_2LangCode(lang);
-        if (*code)
+        if (strcmp(code, "???"))
         {
             memcpy(&p_stream->pes.lang[i*4], code, 3);
             p_stream->pes.lang[i*4+3] = 0x00; /* audio type: 0x00 undefined */
