@@ -47,5 +47,7 @@ Window {
         id: playlistView
         focus: true
         anchors.fill: parent
+
+        readonly property var g_root: playlistView
     }
 }
