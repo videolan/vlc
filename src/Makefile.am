@@ -185,7 +185,8 @@ AM_CPPFLAGS = $(INCICONV) $(IDN_CFLAGS) \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DPKGDATADIR=\"$(pkgdatadir)\" \
 	-DPKGLIBDIR=\"$(pkglibdir)\" \
-	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\"
+	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\" \
+	$(CPPFLAGS_libvlccore)
 AM_CFLAGS = $(CFLAGS_libvlccore)
 if HAVE_DYNAMIC_PLUGINS
 AM_CPPFLAGS += -DHAVE_DYNAMIC_PLUGINS
@@ -549,7 +550,7 @@ $(libvlccore_la_OBJECTS): libvlccore_objc.la
 libvlccore_objc_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libvlccore_objc_la_LDFLAGS = -static
 libvlccore_la_LIBADD += libvlccore_objc.la
-libvlccore_la_LDFLAGS +=  -Wl,-framework,Foundation -Xlinker -install_name -Xlinker @rpath/libvlccore.dylib -Wl,-U,_vlc_static_modules
+libvlccore_la_LDFLAGS +=  -Wl,-framework,Foundation -Xlinker -install_name -Xlinker @rpath/libvlccore.dylib #-Wl,-U,_vlc_static_modules
 endif
 
 # iOS and tvOS applications cannot install global shared libraries and
