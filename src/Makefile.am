@@ -190,7 +190,8 @@ AM_CPPFLAGS = $(INCICONV) $(IDN_CFLAGS) \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DPKGDATADIR=\"$(pkgdatadir)\" \
 	-DPKGLIBDIR=\"$(pkglibdir)\" \
-	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\"
+	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\" \
+	$(CPPFLAGS_libvlccore)
 AM_CFLAGS = $(CFLAGS_libvlccore)
 if HAVE_DYNAMIC_PLUGINS
 AM_CPPFLAGS += -DHAVE_DYNAMIC_PLUGINS
