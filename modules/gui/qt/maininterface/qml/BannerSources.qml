@@ -324,7 +324,7 @@ Widgets.NavigableFocusScope {
                         focus: !!item && item.focus && item.visible
                         visible: !!item
                         enabled: status === Loader.Ready
-                        y: (VLCStyle.localToolbar_height - item.height) / 2
+                        y: status === Loader.Ready ? (VLCStyle.localToolbar_height - item.height) / 2 : 0
                         width: !!item
                                ? Helpers.clamp(localMenuView.availableWidth,
                                                localMenuGroup.item.minimumWidth || localMenuGroup.item.implicitWidth,
