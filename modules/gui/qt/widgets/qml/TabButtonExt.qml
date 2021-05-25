@@ -38,7 +38,7 @@ T.TabButton {
     property string iconTxt: ""
     property int iconSize: VLCStyle.icon_normal
     property bool selected: false
-    property alias color: focusBackground.defaultForeground
+    property alias color: focusBackground.foregroundColor
     property bool busy: false
 
     font.pixelSize: VLCStyle.fontSize_normal
@@ -47,8 +47,9 @@ T.TabButton {
         id: focusBackground
 
         height: control.height
-        width: control.width
-        active: (control.activeFocus || control.hovered)
+        width : control.width
+
+        active: control.hovered
     }
 
     contentItem: Item {
@@ -107,6 +108,12 @@ T.TabButton {
             visible: control.selected
             color: "transparent"
             border.color: VLCStyle.colors.accent
+        }
+
+        BackgroundFocus {
+            anchors.fill: parent
+
+            visible: control.activeFocus
         }
     }
 }
