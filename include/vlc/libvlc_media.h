@@ -431,8 +431,7 @@ LIBVLC_API void libvlc_media_retain( libvlc_media_t *p_md );
 /**
  * Decrement the reference count of a media descriptor object. If the
  * reference count is 0, then libvlc_media_release() will release the
- * media descriptor object. It will send out an libvlc_MediaFreed event
- * to all listeners. If the media descriptor object has been released it
+ * media descriptor object. If the media descriptor object has been released it
  * should not be used again.
  *
  * \param p_md the media descriptor
