@@ -3970,16 +3970,8 @@ static char *LanguageGetName( const char *psz_code )
         return strdup( "" );
     }
 
-    if( strlen( psz_code ) == 2 || strlen( psz_code ) == 3 )
-    {
-        pl = vlc_find_iso639( psz_code, false );
-    }
-    else
-    {
-        char *lang = LanguageGetCode( psz_code );
-        pl = vlc_find_iso639( lang, false );
-        free( lang );
-    }
+    size_t len = strlen( psz_code );
+    pl = vlc_find_iso639( psz_code, ( len != 2 && len != 3 ) );
 
     if( !pl )
     {
