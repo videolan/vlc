@@ -53,10 +53,6 @@
 #include <vlc_dialog.h>
 #include <vlc_iso_lang.h>
 
-/* FIXME we should find a better way than including that */
-#include "../../src/text/iso-639_def.h"
-
-
 #include <dvdnav/dvdnav.h>
 /* Expose without patching headers */
 dvdnav_status_t dvdnav_jump_to_sector_by_time(dvdnav_t *, uint64_t, int32_t);
@@ -1248,20 +1244,11 @@ static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var )
     if( ( p = strchr( psz_lang, ',' ) ) )
         *p = '\0';
 
-    for( pl = p_languages; pl->psz_eng_name != NULL; pl++ )
-    {
-        if( *psz_lang == '\0' )
-            continue;
-        if( !strcasecmp( pl->psz_eng_name, psz_lang ) ||
-            !strcasecmp( pl->psz_iso639_1, psz_lang ) ||
-            !strcasecmp( pl->psz_iso639_2T, psz_lang ) ||
-            !strcasecmp( pl->psz_iso639_2B, psz_lang ) )
-            break;
-    }
+    pl = vlc_find_iso639( psz_lang, true );
 
     free( psz_lang );
 
-    if( pl->psz_eng_name != NULL )
+    if( pl != NULL )
         return strdup( pl->psz_iso639_1 );
 
     return strdup(LANGUAGE_DEFAULT);

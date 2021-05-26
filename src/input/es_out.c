@@ -54,8 +54,6 @@
 #include "../stream_output/stream_output.h"
 
 #include <vlc_iso_lang.h>
-/* FIXME we should find a better way than including that */
-#include "../text/iso-639_def.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -3997,19 +3995,12 @@ static char *LanguageGetName( const char *psz_code )
 static char *LanguageGetCode( const char *psz_lang )
 {
     const iso639_lang_t *pl;
-
-    if( psz_lang == NULL || *psz_lang == '\0' )
-        return strdup("??");
-
-    for( pl = p_languages; pl->psz_eng_name != NULL; pl++ )
+    if( psz_lang != NULL )
     {
-        if( !strcasecmp( pl->psz_eng_name, psz_lang ) ||
-            !strcasecmp( pl->psz_iso639_1, psz_lang ) ||
-            !strcasecmp( pl->psz_iso639_2T, psz_lang ) ||
-            !strcasecmp( pl->psz_iso639_2B, psz_lang ) )
+        pl = vlc_find_iso639( psz_lang, true );
+        if( pl != NULL )
             return strdup( pl->psz_iso639_1 );
     }
-
     return strdup("??");
 }
 

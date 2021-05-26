@@ -54,10 +54,6 @@
 #include "../demux/mpeg/timestamps.h"
 #include "../demux/timestamps_filter.h"
 
-/* FIXME we should find a better way than including that */
-#include "../../src/text/iso-639_def.h"
-
-
 #include <libbluray/bluray.h>
 #include <libbluray/bluray-version.h>
 #include <libbluray/keys.h>
@@ -498,20 +494,11 @@ static const char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var )
     if( ( p = strchr( psz_lang, ',' ) ) )
         *p = '\0';
 
-    for( pl = p_languages; pl->psz_eng_name != NULL; pl++ )
-    {
-        if( *psz_lang == '\0' )
-            continue;
-        if( !strcasecmp( pl->psz_eng_name, psz_lang ) ||
-            !strcasecmp( pl->psz_iso639_1, psz_lang ) ||
-            !strcasecmp( pl->psz_iso639_2T, psz_lang ) ||
-            !strcasecmp( pl->psz_iso639_2B, psz_lang ) )
-            break;
-    }
+    pl = vlc_find_iso639( psz_lang, true );
 
     free( psz_lang );
 
-    if( pl->psz_eng_name != NULL )
+    if( pl != NULL )
         return pl->psz_iso639_2T;
 
     return LANGUAGE_DEFAULT;
