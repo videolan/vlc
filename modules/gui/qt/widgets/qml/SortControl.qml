@@ -180,11 +180,13 @@ Widgets.NavigableFocusScope {
 
                 readonly property bool isActive: (delegateSortKey === sortKey)
 
-                background: Rectangle {
-                    color: colors.accent
-                    visible: !closeAnimation.running &&
-                             (itemDelegate.hovered || (!listView.containsMouse && itemDelegate.activeFocus))
-                    opacity: 0.8
+                background: FocusBackground {
+                    active: (closeAnimation.running === false && itemDelegate.hovered)
+
+                    // NOTE: We don't want animations here, because it looks sluggish.
+                    durationAnimation: 0
+
+                    backgroundColor: VLCStyle.colors.dropDown
                 }
 
                 onHoveredChanged: {
@@ -255,6 +257,12 @@ Widgets.NavigableFocusScope {
 
                     popup.close()
                 }
+
+                BackgroundFocus {
+                    anchors.fill: parent
+
+                    visible: itemDelegate.activeFocus
+                }
             }
         }
 
@@ -262,7 +270,7 @@ Widgets.NavigableFocusScope {
             id: bgRect
 
             border.width: VLCStyle.dp(1)
-            border.color: colors.accent
+            border.color: colors.dropDownBorder
 
             Loader {
                 id: effectLoader
