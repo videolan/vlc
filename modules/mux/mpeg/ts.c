@@ -917,7 +917,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             continue;
 
         const iso639_lang_t *pl = vlc_find_iso639(lang);
-        if (pl && strcmp(pl->psz_iso639_1, "??"))
+        if (pl)
         {
             memcpy(&p_stream->pes.lang[i*4], pl->psz_iso639_2T, 3);
             p_stream->pes.lang[i*4+3] = 0x00; /* audio type: 0x00 undefined */

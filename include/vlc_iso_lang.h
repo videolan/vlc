@@ -46,9 +46,7 @@ extern "C" {
  * ISO-639-2B (English) code attributes, falling back to the ISO-639-2T (native)
  * code attributes if no match. (Case insensitive).
  *
- * @return A pointer to the matching record, or to the 'unknown' record (which
- * uses codes consisting of '?' characters) if no match is found. If the code
- * provided is not of length 2 or 3, NULL is returned.
+ * @return A pointer to the matching record, or NULL if no match.
  */
 VLC_API const iso639_lang_t * vlc_find_iso639( const char *code );
 

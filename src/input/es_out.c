@@ -3983,7 +3983,7 @@ static char *LanguageGetName( const char *psz_code )
         free( lang );
     }
 
-    if( !strcmp( pl->psz_iso639_1, "??" ) )
+    if( !pl )
     {
        return strdup( psz_code );
     }

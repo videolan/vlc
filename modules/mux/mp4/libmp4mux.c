@@ -2053,7 +2053,7 @@ bo_t * mp4mux_GetMoov(mp4mux_handle_t *h, vlc_object_t *p_obj, vlc_tick_t i_dura
             const iso639_lang_t *pl = vlc_find_iso639(psz);
             uint16_t lang = 0x0;
 
-            if (pl && strcmp(pl->psz_iso639_1, "??"))
+            if (pl)
                 lang = ((pl->psz_iso639_2T[0] - 0x60) << 10) |
                        ((pl->psz_iso639_2T[1] - 0x60) <<  5) |
                        ((pl->psz_iso639_2T[2] - 0x60));

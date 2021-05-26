@@ -40,9 +40,6 @@
  *****************************************************************************/
 #include "iso-639_def.h"
 
-static const iso639_lang_t unknown_language =
-    { "Unknown", "??", "???", "???" };
-
 static const iso639_lang_t * GetLang_1( const char * psz_code )
 {
     const iso639_lang_t *p_lang;
@@ -51,7 +48,7 @@ static const iso639_lang_t * GetLang_1( const char * psz_code )
         if( !strcasecmp( p_lang->psz_iso639_1, psz_code ) )
             return p_lang;
 
-    return &unknown_language;
+    return NULL;
 }
 
 static const iso639_lang_t * GetLang_2T( const char * psz_code )
@@ -62,7 +59,7 @@ static const iso639_lang_t * GetLang_2T( const char * psz_code )
         if( !strcasecmp( p_lang->psz_iso639_2T, psz_code ) )
             return p_lang;
 
-    return &unknown_language;
+    return NULL;
 }
 
 static const iso639_lang_t * GetLang_2B( const char * psz_code )
@@ -73,7 +70,7 @@ static const iso639_lang_t * GetLang_2B( const char * psz_code )
         if( !strcasecmp( p_lang->psz_iso639_2B, psz_code ) )
             return p_lang;
 
-    return &unknown_language;
+    return NULL;
 }
 
 const iso639_lang_t * vlc_find_iso639( const char *code )
@@ -86,7 +83,7 @@ const iso639_lang_t * vlc_find_iso639( const char *code )
     else if (len == 3)
     {
         result = GetLang_2B(code);
-        if (!strcmp(result->psz_iso639_1, "??"))
+        if (result == NULL)
             result = GetLang_2T(code);
     }
     return result;
