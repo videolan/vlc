@@ -836,28 +836,6 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
     }
 }
 
-/* returns a pointer to a valid string, with length 3 */
-static const char *GetIso639_2LangCode(const char *lang)
-{
-    const iso639_lang_t *pl;
-
-    if (strlen(lang) == 2)
-    {
-        pl = GetLang_1(lang);
-    }
-    else if (strlen(lang) == 3)
-    {
-        pl = GetLang_2B(lang);      /* try english code first */
-        if (!strcmp(pl->psz_iso639_1, "??"))
-            pl = GetLang_2T(lang);  /* else fallback to native code */
-
-    }
-    else
-        return "???";
-
-    return pl->psz_iso639_2T;   /* returns the english code */
-}
-
 static void SelectPCRStream( sout_mux_t *p_mux, sout_input_t *p_removed_pcr_input )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
@@ -938,10 +916,20 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         if (!lang)
             continue;
 
-        const char *code = GetIso639_2LangCode(lang);
-        if (strcmp(code, "???"))
+        const iso639_lang_t *pl = NULL;
+        if (strlen(lang) == 2)
         {
-            memcpy(&p_stream->pes.lang[i*4], code, 3);
+            pl = GetLang_1(lang);
+        }
+        else if (strlen(lang) == 3)
+        {
+            pl = GetLang_2B(lang);
+            if (!strcmp(pl->psz_iso639_1, "??"))
+                pl = GetLang_2T(lang);
+        }
+        if (pl && strcmp(pl->psz_iso639_1, "??"))
+        {
+            memcpy(&p_stream->pes.lang[i*4], pl->psz_iso639_2T, 3);
             p_stream->pes.lang[i*4+3] = 0x00; /* audio type: 0x00 undefined */
             msg_Dbg( p_mux, "    - lang=%3.3s", &p_stream->pes.lang[i*4] );
         }
