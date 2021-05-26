@@ -62,7 +62,7 @@ T.ToolButton {
         }
     }
 
-    background: FocusBackground {
+    background: BackgroundHover {
         active: control.hovered
     }
 }

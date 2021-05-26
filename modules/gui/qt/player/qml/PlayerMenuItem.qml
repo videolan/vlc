@@ -104,7 +104,7 @@ T.MenuItem {
     }
 
 
-    background: Widgets.FocusBackground {
+    background: Widgets.BackgroundHover {
         implicitHeight: VLCStyle.fontHeight_normal
         active: control.highlighted
     }

@@ -752,6 +752,7 @@ libqt_plugin_la_QML = \
 	gui/qt/util/qml/KeyHelper.js \
 	gui/qt/util/qml/SelectableDelegateModel.qml \
 	gui/qt/widgets/qml/BackgroundFocus.qml \
+	gui/qt/widgets/qml/BackgroundHover.qml \
 	gui/qt/widgets/qml/BannerTabButton.qml \
 	gui/qt/widgets/qml/BusyIndicatorExt.qml \
 	gui/qt/widgets/qml/CaptionLabel.qml \
@@ -767,7 +768,6 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/DragItem.qml \
 	gui/qt/widgets/qml/DrawerExt.qml \
 	gui/qt/widgets/qml/ExpandGridView.qml \
-	gui/qt/widgets/qml/FocusBackground.qml \
 	gui/qt/widgets/qml/GridItem.qml \
 	gui/qt/widgets/qml/GridShadows.qml \
 	gui/qt/widgets/qml/HorizontalResizeHandle.qml \

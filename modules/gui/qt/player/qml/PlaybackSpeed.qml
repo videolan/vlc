@@ -151,7 +151,7 @@ Popup {
                     anchors.centerIn: parent
                     font.pixelSize: VLCStyle.fontSize_normal
                     text: i18n.qtr("1x")
-                    color: resetButton.background.foregroundColor // IconToolButton.background is a FocusBackground
+                    color: resetButton.background.foregroundColor // IconToolButton.background is a BackgroundHover
                 }
             }
 

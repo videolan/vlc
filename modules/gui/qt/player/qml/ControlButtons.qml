@@ -807,7 +807,7 @@ Item{
     Component {
         id: artworkInfoDelegate
 
-        Widgets.FocusBackground {
+        Widgets.BackgroundHover {
             id: artworkInfoItem
 
             property bool paintOnly: false
@@ -1016,7 +1016,7 @@ Item{
                 anchors.centerIn: parent
                 font.pixelSize: VLCStyle.fontSize_normal
                 text: !playbackSpeedButton.paintOnly ? i18n.qtr("%1x").arg(+player.rate.toFixed(2)) : i18n.qtr("1x")
-                color: playbackSpeedButton.background.foregroundColor // IconToolButton.background is a FocusBackground
+                color: playbackSpeedButton.background.foregroundColor // IconToolButton.background is a BackgroundHover
             }
         }
     }

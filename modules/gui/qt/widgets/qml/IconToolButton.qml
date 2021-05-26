@@ -29,12 +29,12 @@ ToolButton {
     padding: 0
 
     property string iconText: ""
-    property alias color: focusBackground.foregroundColor
+    property alias color: backgroundHover.foregroundColor
     property color colorDisabled: VLCStyle.colors.textInactive
     property color colorOverlay: "transparent"
     property string textOverlay: ""
     property bool borderEnabled: false
-    property bool backgroundVisible: focusBackground.active
+    property bool backgroundVisible: backgroundHover.active
 
     enabled: !paintOnly
 
@@ -58,7 +58,7 @@ ToolButton {
         Label {
             id: text
             text: control.iconText
-            color: control.enabled ? focusBackground.foregroundColor : control.colorDisabled
+            color: control.enabled ? backgroundHover.foregroundColor : control.colorDisabled
 
             anchors.centerIn: parent
 
@@ -89,7 +89,7 @@ ToolButton {
 
             Label {
                 text: VLCIcons.active_indicator
-                color: control.enabled ?  focusBackground.foregroundColor : control.colorDisabled
+                color: control.enabled ? backgroundHover.foregroundColor : control.colorDisabled
                 visible: !control.paintOnly && control.checked
 
                 anchors.centerIn: parent
@@ -112,8 +112,8 @@ ToolButton {
         }
     }
 
-    background: FocusBackground {
-        id: focusBackground
+    background: BackgroundHover {
+        id: backgroundHover
 
         active: control.hovered
 

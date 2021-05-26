@@ -180,7 +180,7 @@ Widgets.NavigableFocusScope {
 
                 readonly property bool isActive: (delegateSortKey === sortKey)
 
-                background: FocusBackground {
+                background: BackgroundHover {
                     active: (closeAnimation.running === false && itemDelegate.hovered)
 
                     // NOTE: We don't want animations here, because it looks sluggish.
