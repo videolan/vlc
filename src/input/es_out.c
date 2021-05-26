@@ -3961,7 +3961,7 @@ static const struct es_out_callbacks es_out_cbs =
 };
 
 /****************************************************************************
- * LanguageGetName: try to expend iso639 into plain name
+ * LanguageGetName: try to expand iso639 into plain name
  ****************************************************************************/
 static char *LanguageGetName( const char *psz_code )
 {
@@ -3972,22 +3972,14 @@ static char *LanguageGetName( const char *psz_code )
         return strdup( "" );
     }
 
-    if( strlen( psz_code ) == 2 )
+    if( strlen( psz_code ) == 2 || strlen( psz_code ) == 3 )
     {
-        pl = GetLang_1( psz_code );
-    }
-    else if( strlen( psz_code ) == 3 )
-    {
-        pl = GetLang_2B( psz_code );
-        if( !strcmp( pl->psz_iso639_1, "??" ) )
-        {
-            pl = GetLang_2T( psz_code );
-        }
+        pl = vlc_find_iso639( psz_code );
     }
     else
     {
         char *lang = LanguageGetCode( psz_code );
-        pl = GetLang_1( lang );
+        pl = vlc_find_iso639( lang );
         free( lang );
     }
 

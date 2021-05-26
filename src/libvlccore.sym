@@ -127,9 +127,7 @@ filter_ConfigureBlend
 filter_DeleteBlend
 filter_NewBlend
 FromCharset
-GetLang_1
-GetLang_2B
-GetLang_2T
+vlc_find_iso639
 vlc_http_auth_Init
 vlc_http_auth_Deinit
 vlc_http_auth_ParseWwwAuthenticateHeader

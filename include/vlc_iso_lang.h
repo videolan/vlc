@@ -37,10 +37,21 @@ struct iso639_lang_t
 #if defined( __cplusplus )
 extern "C" {
 #endif
-VLC_API const iso639_lang_t * GetLang_1( const char * );
-VLC_API const iso639_lang_t * GetLang_2T( const char * );
-VLC_API const iso639_lang_t * GetLang_2B( const char * );
+
+/*
+ * Tries to find the language record for the given ISO-639 language code.
+ *
+ * The provided code should either be a two character ISO-639-1 code, or a three
+ * character ISO-639-2 code. For the latter, a search is done first of the
+ * ISO-639-2B (English) code attributes, falling back to the ISO-639-2T (native)
+ * code attributes if no match. (Case insensitive).
+ *
+ * @return A pointer to the matching record, or to the 'unknown' record (which
+ * uses codes consisting of '?' characters) if no match is found. If the code
+ * provided is not of length 2 or 3, NULL is returned.
+ */
+VLC_API const iso639_lang_t * vlc_find_iso639( const char *code );
+
 #if defined( __cplusplus )
 }
 #endif
-

@@ -43,36 +43,51 @@
 static const iso639_lang_t unknown_language =
     { "Unknown", "??", "???", "???" };
 
-const iso639_lang_t * GetLang_1( const char * psz_code )
+static const iso639_lang_t * GetLang_1( const char * psz_code )
 {
     const iso639_lang_t *p_lang;
 
     for( p_lang = p_languages; p_lang->psz_eng_name; p_lang++ )
-        if( !strncasecmp( p_lang->psz_iso639_1, psz_code, 2 ) )
+        if( !strcasecmp( p_lang->psz_iso639_1, psz_code ) )
             return p_lang;
 
     return &unknown_language;
 }
 
-const iso639_lang_t * GetLang_2T( const char * psz_code )
+static const iso639_lang_t * GetLang_2T( const char * psz_code )
 {
     const iso639_lang_t *p_lang;
 
     for( p_lang = p_languages; p_lang->psz_eng_name; p_lang++ )
-        if( !strncasecmp( p_lang->psz_iso639_2T, psz_code, 3 ) )
+        if( !strcasecmp( p_lang->psz_iso639_2T, psz_code ) )
             return p_lang;
 
     return &unknown_language;
 }
 
-const iso639_lang_t * GetLang_2B( const char * psz_code )
+static const iso639_lang_t * GetLang_2B( const char * psz_code )
 {
     const iso639_lang_t *p_lang;
 
     for( p_lang = p_languages; p_lang->psz_eng_name; p_lang++ )
-        if( !strncasecmp( p_lang->psz_iso639_2B, psz_code, 3 ) )
+        if( !strcasecmp( p_lang->psz_iso639_2B, psz_code ) )
             return p_lang;
 
     return &unknown_language;
 }
 
+const iso639_lang_t * vlc_find_iso639( const char *code )
+{
+    const iso639_lang_t *result = NULL;
+    size_t len = strlen(code);
+
+    if (len == 2)
+        result = GetLang_1(code);
+    else if (len == 3)
+    {
+        result = GetLang_2B(code);
+        if (!strcmp(result->psz_iso639_1, "??"))
+            result = GetLang_2T(code);
+    }
+    return result;
+}
