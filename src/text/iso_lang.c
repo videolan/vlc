@@ -89,13 +89,6 @@ const iso639_lang_t * vlc_find_iso639( const char *code, bool try_name )
     const iso639_lang_t *result = NULL;
     size_t len = strlen(code);
 
-    if (try_name && len != 0)
-    {
-        result = GetLang_name(code);
-        if (result)
-            return result;
-    }
-
     if (len == 2)
         result = GetLang_1(code);
     else if (len == 3)
@@ -104,5 +97,9 @@ const iso639_lang_t * vlc_find_iso639( const char *code, bool try_name )
         if (result == NULL)
             result = GetLang_2T(code);
     }
+
+    if (try_name && !result && len != 0)
+        result = GetLang_name(code);
+
     return result;
 }

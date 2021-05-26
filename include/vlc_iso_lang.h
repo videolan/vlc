@@ -46,9 +46,8 @@ extern "C" {
  * ISO-639-2B (English) code attributes, falling back to the ISO-639-2T (native)
  * code attributes if no match. (Case insensitive).
  *
- * If `try_name` is set to `true`, then a (case-insensitive) search of language
- * names will be performed first, falling back upon a code search if no name
- * matched.
+ * If `try_name` is set to `true`, then as a last resort, a (case-insensitive)
+ * search of language names will be performed.
  *
  * @return A pointer to the matching record, or NULL if no match.
  */
