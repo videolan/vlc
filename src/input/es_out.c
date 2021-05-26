@@ -3974,12 +3974,12 @@ static char *LanguageGetName( const char *psz_code )
 
     if( strlen( psz_code ) == 2 || strlen( psz_code ) == 3 )
     {
-        pl = vlc_find_iso639( psz_code );
+        pl = vlc_find_iso639( psz_code, false );
     }
     else
     {
         char *lang = LanguageGetCode( psz_code );
-        pl = vlc_find_iso639( lang );
+        pl = vlc_find_iso639( lang, false );
         free( lang );
     }
 

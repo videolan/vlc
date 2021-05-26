@@ -46,9 +46,12 @@ extern "C" {
  * ISO-639-2B (English) code attributes, falling back to the ISO-639-2T (native)
  * code attributes if no match. (Case insensitive).
  *
+ * If `any_field` is set to `true`, then an alternate search is performed of all
+ * properties including language name (case-insensitive).
+ *
  * @return A pointer to the matching record, or NULL if no match.
  */
-VLC_API const iso639_lang_t * vlc_find_iso639( const char *code );
+VLC_API const iso639_lang_t * vlc_find_iso639( const char *code, bool any_field );
 
 #if defined( __cplusplus )
 }

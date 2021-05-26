@@ -352,7 +352,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     if( p_input->p_fmt->psz_language )
     {
         char *psz = p_input->p_fmt->psz_language;
-        const iso639_lang_t *pl = vlc_find_iso639( psz );
+        const iso639_lang_t *pl = vlc_find_iso639( psz, false );
 
         if( pl )
         {

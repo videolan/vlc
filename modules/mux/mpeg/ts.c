@@ -916,7 +916,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         if (!lang)
             continue;
 
-        const iso639_lang_t *pl = vlc_find_iso639(lang);
+        const iso639_lang_t *pl = vlc_find_iso639(lang, false);
         if (pl)
         {
             memcpy(&p_stream->pes.lang[i*4], pl->psz_iso639_2T, 3);

@@ -73,10 +73,28 @@ static const iso639_lang_t * GetLang_2B( const char * psz_code )
     return NULL;
 }
 
-const iso639_lang_t * vlc_find_iso639( const char *code )
+static const iso639_lang_t * GetLang_AnyField( const char * psz_lang )
+{
+    const iso639_lang_t *p_lang;
+
+    for( p_lang = p_languages; p_lang->psz_eng_name; p_lang++ )
+    {
+        if( !strcasecmp( p_lang->psz_eng_name, psz_lang ) ||
+            !strcasecmp( p_lang->psz_iso639_1, psz_lang ) ||
+            !strcasecmp( p_lang->psz_iso639_2T, psz_lang ) ||
+            !strcasecmp( p_lang->psz_iso639_2B, psz_lang ) )
+            return p_lang;
+    }
+    return NULL;
+}
+
+const iso639_lang_t * vlc_find_iso639( const char *code, bool any_field )
 {
     const iso639_lang_t *result = NULL;
     size_t len = strlen(code);
+
+    if (any_field)
+        return (len == 0) ? NULL : GetLang_AnyField(code);
 
     if (len == 2)
         result = GetLang_1(code);
