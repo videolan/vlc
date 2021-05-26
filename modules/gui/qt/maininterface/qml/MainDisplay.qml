@@ -406,7 +406,8 @@ Widgets.NavigableFocusScope {
                 target: player
                 onHasVideoOutputChanged: {
                     if (player.hasVideoOutput && mainInterface.hasEmbededVideo) {
-                        g_mainDisplay.showPlayer()
+                        if (history.current.view !== "player")
+                            g_mainDisplay.showPlayer()
                     } else {
                         _showMiniPlayer = false;
                     }
