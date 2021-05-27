@@ -1455,7 +1455,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
     p_pgrm->p_meta = NULL;
     p_pgrm->active_clock_source = VLC_CLOCK_MASTER_AUTO;
 
-    p_pgrm->p_main_clock = vlc_clock_main_New();
+    p_pgrm->p_main_clock = vlc_clock_main_New( p_input->obj.logger );
     if( !p_pgrm->p_main_clock )
     {
         free( p_pgrm );
