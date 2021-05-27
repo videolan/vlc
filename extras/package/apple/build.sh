@@ -101,6 +101,7 @@ VLC_MERGE_PLUGINS=0
 VLC_USE_BITCODE=0
 # whether to build static or dynamic plugins
 VLC_BUILD_DYNAMIC=0
+VLC_CONFIGURE_ONLY=0
 
 # Tools to be used
 VLC_HOST_CC="$(xcrun --find clang)"
@@ -127,6 +128,7 @@ usage()
     echo " --enable-bitcode Enable bitcode for compilation"
     echo " --enable-merge-plugins Enable the merging of plugins into a single archive"
     echo " --disable-debug  Disable libvlc debug mode (for release)"
+    echo " --configure      Only configure libvlc"
     echo " --verbose        Print verbose output and disable multi-core use"
     echo " --help           Print this help"
     echo ""
@@ -476,6 +478,9 @@ do
         --enable-shared)
             VLC_BUILD_DYNAMIC=1
             ;;
+        --configure)
+            VLC_CONFIGURE_ONLY=1
+            ;;
         VLC_PREBUILT_CONTRIBS_URL=*)
             VLC_PREBUILT_CONTRIBS_URL="${1#VLC_PREBUILT_CONTRIBS_URL=}"
             ;;
@@ -582,6 +587,9 @@ MAKE=${MAKE:-make}
 APPL_LIBTOOL=$(xcrun -f libtool) \
   || abort_err "Failed to find Apple libtool with xcrun"
 
+
+if [ "$VLC_CONFIGURE_ONLY" != "1" ]; then
+
 ##########################################################
 #                 Extras tools build                     #
 ##########################################################
@@ -663,6 +671,7 @@ else
 fi
 
 echo ""
+fi
 
 ##########################################################
 #                      VLC build                         #
@@ -730,9 +739,11 @@ hostenv ../../configure \
     "${VLC_CONFIG_OPTIONS[@]}" \
  || abort_err "Configuring VLC failed"
 
+if [ "$VLC_CONFIGURE_ONLY" != 1 ]; then
 $MAKE || abort_err "Building VLC failed"
 
 $MAKE install || abort_err "Installing VLC failed"
 
 echo ""
 echo "Build succeeded!"
+fi
