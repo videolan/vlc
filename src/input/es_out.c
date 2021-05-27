@@ -3623,6 +3623,18 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
         p_sys->b_active = i_mode != ES_OUT_MODE_NONE;
         p_sys->i_mode = i_mode;
 
+        if( i_mode == ES_OUT_MODE_NONE )
+        {
+            /* Reset main clocks before unselecting every ESes. This will speed
+             * up audio and video output termination. Indeed, they won't wait
+             * for a specific PTS conversion. This may also unblock outputs in
+             * case of a corrupted sample with a PTS very far in the future.
+             * */
+            es_out_pgrm_t *pgrm;
+            vlc_list_foreach(pgrm, &p_sys->programs, node)
+                vlc_clock_main_Reset(pgrm->p_main_clock);
+        }
+
         /* Reapply policy mode */
         es_out_id_t *es;
 
