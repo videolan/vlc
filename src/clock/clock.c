@@ -51,6 +51,7 @@ typedef struct VLC_VECTOR(struct vlc_clock_context) vlc_clock_context_vector;
 
 struct vlc_clock_main_t
 {
+    struct vlc_logger *logger;
     vlc_mutex_t lock;
     vlc_cond_t cond;
 
@@ -456,9 +457,7 @@ void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
     vlc_mutex_unlock(&main_clock->lock);
 }
 
-
-
-vlc_clock_main_t *vlc_clock_main_New(void)
+vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger)
 {
     vlc_clock_main_t *main_clock = malloc(sizeof(vlc_clock_main_t));
 
@@ -471,6 +470,14 @@ vlc_clock_main_t *vlc_clock_main_New(void)
     vlc_vector_init(&main_clock->context_vec);
     if (!vlc_vector_push(&main_clock->context_vec, context))
     {
+        free(main_clock);
+        return NULL;
+    }
+
+    main_clock->logger = vlc_LogHeaderCreate(parent_logger, "clock");
+    if (main_clock->logger == NULL)
+    {
+        vlc_vector_destroy(&main_clock->context_vec);
         free(main_clock);
         return NULL;
     }
@@ -586,6 +593,7 @@ void vlc_clock_main_Delete(vlc_clock_main_t *main_clock)
 {
     assert(main_clock->rc == 1);
     vlc_vector_destroy(&main_clock->context_vec);
+    vlc_LogDestroy(main_clock->logger);
     free(main_clock);
 }
 
