@@ -134,7 +134,6 @@ Widgets.NavigableFocusScope {
                         }
 
                         navigationParent: expandRect
-                        navigationRightItem: infoPannelScrollView
                     }
                 }
             }
