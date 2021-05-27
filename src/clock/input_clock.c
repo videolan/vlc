@@ -78,9 +78,6 @@
  * Constants
  *****************************************************************************/
 
-/* Maximum gap allowed between two CRs. */
-#define CR_MAX_GAP VLC_TICK_FROM_SEC(60)
-
 /* Latency introduced on DVDs with CR == 0 on chapter change - this is from
  * my dice --Meuuh */
 #define CR_MEAN_PTS_GAP VLC_TICK_FROM_MS(300)
