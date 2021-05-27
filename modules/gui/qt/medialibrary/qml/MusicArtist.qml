@@ -288,7 +288,7 @@ Widgets.NavigableFocusScope {
             model: albumModel
 
             Connections {
-                target: root
+                target: albumModel
                 // selectionModel updates but doesn't trigger any signal, this forces selection update in view
                 onParentIdChanged: currentIndex = -1
             }
