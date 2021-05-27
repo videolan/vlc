@@ -621,17 +621,17 @@ static const char *const ppsz_clock_descriptions[] =
 #define INPUT_AUDIOTRACK_LANG_TEXT N_("Audio language")
 #define INPUT_AUDIOTRACK_LANG_LONGTEXT N_( \
     "Language of the audio track you want to use " \
-    "(comma separated, two or three letter country code, you may use 'none' to avoid a fallback to another language).")
+    "(comma separated, two or three letter ISO-639 country code; you may use 'none' to avoid a fallback to another language).")
 
 #define INPUT_SUBTRACK_LANG_TEXT N_("Subtitle language")
 #define INPUT_SUBTRACK_LANG_LONGTEXT N_( \
     "Language of the subtitle track you want to use " \
-    "(comma separated, two or three letters country code, you may use 'any' as a fallback).")
+    "(comma separated, two or three letter ISO-639 country code; you may use 'any' as a fallback).")
 
 #define INPUT_MENUTRACK_LANG_TEXT N_("Menu language")
 #define INPUT_MENUTRACK_LANG_LONGTEXT N_( \
     "Language of the menus you want to use with DVD/BluRay " \
-    "(comma separated, two or three letters country code, you may use 'any' as a fallback).")
+    "(comma separated, two or three letter ISO-639 country code; you may use 'any' as a fallback).")
 
 #define INPUT_VIDEOTRACK_ID_TEXT N_("Video track ID")
 #define INPUT_VIDEOTRACK_ID_LONGTEXT N_( \
