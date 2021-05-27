@@ -44,3 +44,11 @@ function clamp(num, min, max) {
 function isValidInstanceOf(object, type) {
     return (!!object && (object instanceof type))
 }
+
+// Returns the value associated with the key.
+// If the hash contains no item with the key,
+// or the value is invalid, returns defaultValue
+function get(dict, key, defaultValue) {
+    var v = typeof dict !== "undefined" ? dict[key] : undefined
+    return !v ? defaultValue : v
+}
