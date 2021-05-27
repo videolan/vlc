@@ -235,10 +235,16 @@ vlc_clock_monotonic_to_system_locked(vlc_clock_t *clock, vlc_tick_t now,
          * ride of the input clock. This code is adapted from input_clock.c and
          * is used to introduce the same delay than the input clock (first PTS
          * - first PCR). */
-        const vlc_tick_t pcr_delay =
+        vlc_tick_t pcr_delay =
             main_clock->first_pcr.system == VLC_TICK_INVALID ? 0 :
             (ts - main_clock->first_pcr.stream) / rate +
             main_clock->first_pcr.system - now;
+
+        if (pcr_delay > CR_MAX_GAP)
+        {
+            vlc_error(main_clock->logger, "Invalid PCR delay ! Ignoring it...");
+            pcr_delay = 0;
+        }
 
         const vlc_tick_t input_delay = main_clock->input_dejitter + pcr_delay;
 
