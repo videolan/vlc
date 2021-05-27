@@ -110,7 +110,7 @@ Widgets.NavigableFocusScope {
                         height: VLCStyle.expandCover_music_height
                         width: VLCStyle.expandCover_music_width
                         radius: VLCStyle.expandCover_music_radius
-                        source: model.cover || VLCStyle.noArtAlbum
+                        source: Helpers.get(model, "cover", VLCStyle.noArtAlbum)
                     }
 
                     Widgets.ListCoverShadow {
@@ -207,7 +207,7 @@ Widgets.NavigableFocusScope {
                     Widgets.SubtitleLabel {
                         id: expand_infos_title_id
 
-                        text: model.title || i18n.qtr("Unknown title")
+                        text: Helpers.get(model, "title", i18n.qtr("Unknown title"))
 
                         Layout.fillWidth: true
                     }
@@ -229,9 +229,9 @@ Widgets.NavigableFocusScope {
 
                     width: parent.width
                     text: i18n.qtr("%1 - %2 - %3")
-                        .arg(model.main_artist || i18n.qtr("Unknown artist"))
-                        .arg(model.release_year || "")
-                        .arg(Helpers.msToString(model.duration) || "")
+                        .arg(Helpers.get(model, "main_artist", i18n.qtr("Unknown artist")))
+                        .arg(Helpers.get(model, "release_year", ""))
+                        .arg(Helpers.msToString(Helpers.get(model, "duration", 0)))
                 }
             }
 
@@ -244,7 +244,7 @@ Widgets.NavigableFocusScope {
             rowHeight: VLCStyle.tableRow_height
             headerColor: VLCStyle.colors.bgAlt
 
-            parentId: root.model.id
+            parentId: Helpers.get(root.model, "id")
             onParentIdChanged: {
                 currentIndex = 0
             }
