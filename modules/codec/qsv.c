@@ -107,7 +107,7 @@ static void     Close(vlc_object_t *);
 #define QP_TEXT N_("Quantization parameter")
 #define QP_LONGTEXT N_("Quantization parameter for all types of frames. " \
     "This parameters sets qpi, qpp and qpb. It has less precedence than " \
-    "the forementionned parameters. Used only if rc_method is 'qp'.")
+    "the forementioned parameters. Used only if rc_method is 'qp'.")
 
 #define QPI_TEXT N_("Quantization parameter for I-frames")
 #define QPI_LONGTEXT N_("Quantization parameter for I-frames. This parameter " \
@@ -130,7 +130,7 @@ static void     Close(vlc_object_t *);
 #define ACCURACY_LONGTEXT N_("Tolerance in percentage of the 'avbr' " \
     " (Average Variable BitRate) method. (e.g. 10 with a bitrate of 800 " \
     " kbps means the encoder tries not to  go above 880 kbps and under " \
-    " 730 kbps. The targeted accuracy is only reached after a certained " \
+    " 730 kbps. The targeted accuracy is only reached after a certain " \
     " convergence period. See the convergence parameter")
 
 #define CONVERGENCE_TEXT N_("Convergence time of 'avbr' RateControl")

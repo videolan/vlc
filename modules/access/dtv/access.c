@@ -177,7 +177,7 @@ static const char *const polarization_user[] = { N_("Unspecified (0V)"),
 
 #define HIGH_VOLTAGE_TEXT N_("High LNB voltage")
 #define HIGH_VOLTAGE_LONGTEXT N_( \
-    "If the cables between the satellilte low noise block-downconverter and " \
+    "If the cables between the satellite low noise block-downconverter and " \
     "the receiver are long, higher voltage may be required.\n" \
     "Not all receivers support this.")
 

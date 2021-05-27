@@ -47,7 +47,7 @@ static int  Open ( vlc_object_t *p_this );
 static void Close( vlc_object_t *p_this );
 
 #define SUB_TYPE_LONGTEXT \
-    N_("Force the subtiles format. Selecting \"auto\" means autodetection and should always work.")
+    N_("Force the subtitles format. Selecting \"auto\" means autodetection and should always work.")
 #define SUB_DESCRIPTION_LONGTEXT \
     N_("Override the default track description.")
 

@@ -100,8 +100,8 @@ static const char *enc_gop_structure_list[] = {
 static const char *enc_gop_structure_list_text[] = {
   N_("No fixed gop structure. A picture can be intra or inter and refer to previous or future pictures."),
   N_("I-frame only sequence"),
-  N_("Inter pictures refere to previous pictures only"),
-  N_("Inter pictures refere to previous pictures only"),
+  N_("Inter pictures refer to previous pictures only"),
+  N_("Inter pictures refer to previous pictures only"),
   N_("Inter pictures can refer to previous or future pictures"),
   N_("Inter pictures can refer to previous or future pictures")
 };
