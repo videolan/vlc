@@ -1446,7 +1446,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
         return NULL;
 
     /* Init */
-    p_pgrm->source = input_source_Hold( source );
+    p_pgrm->source = source;
     p_pgrm->i_id = i_group;
     p_pgrm->i_es = 0;
     p_pgrm->b_selected = false;
@@ -1491,6 +1491,8 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
 
     if( i_group == p_sys->i_group_id || ( !p_sys->p_pgrm && p_sys->i_group_id == 0 ) )
         EsOutProgramSelect( out, p_pgrm );
+
+    input_source_Hold( source );
 
     return p_pgrm;
 }
