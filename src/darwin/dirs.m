@@ -35,6 +35,7 @@
 #include <dlfcn.h>
 
 #include <Foundation/Foundation.h>
+#include <TargetConditionals.h>
 
 static bool config_isBundle()
 {
@@ -104,6 +105,13 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
 
         case VLC_PKG_LIB_DIR:
             dir = config_getLibraryDirReal(PKGLIBDIR);
+            /* On iOS and tvOS, dylibs must be located in frameworks and
+             * frameworks must be flatten in the frameworks/ directory.
+             * To respect that, redirect plugins directory to flatten it. */
+#if TARGET_OS_IPHONE
+            if (filename && strcmp("plugins", filename) == 0)
+                return dir;
+#endif
             break;
         case VLC_LIB_DIR:
             dir = config_getLibraryDirReal(LIBDIR);
