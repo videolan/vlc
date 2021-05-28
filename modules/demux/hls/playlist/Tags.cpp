@@ -261,9 +261,12 @@ void AttributesTag::parseAttributes(const std::string &field)
         std::string attrvalue = oss.str();
         oss.str("");
 
-        Attribute *attribute = new (std::nothrow) Attribute(attrname, attrvalue);
-        if(attribute)
-            attributes.push_back(attribute);
+        if(!attrname.empty())
+        {
+            Attribute *attribute = new (std::nothrow) Attribute(attrname, attrvalue);
+            if(attribute)
+                attributes.push_back(attribute);
+        }
     }
 }
 
