@@ -206,8 +206,25 @@ case "${host_os}" in
     AX_APPEND_FLAG([-Werror=partial-availability], [OBJCFLAGS])
     AX_APPEND_FLAG([-Wl,-headerpad_max_install_names], [LDFLAGS])
 
-    VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
+
+    dnl This is not supported when bitcode is enabled. In that case, we need
+    dnl to disable the static bank loader.
+    AC_MSG_CHECKING([if -Wl,-U is allowed])
+    VLC_SAVE_FLAGS
+    AX_APPEND_FLAG([LDFLAGS],[-Wl,-U,_my_array -no-undefined])
+    AC_LINK_IFELSE(
+       [AC_LANG_PROGRAM([], [dnl
+__attribute__((visibility("default"))) extern int my_array[];
+__attribute__((visibility("default"))) int foo() { return my_array[0]; }
+])],
+       [
+        VLC_ADD_LDFLAGS([libvlccore],[-Wl,-U,_vlc_static_modules])
+        VLC_ADD_LDFLAGS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
+        VLC_ADD_CPPFLAGS([libvlccore],[-DHAVE_DYLIB_DYNAMIC_LOOKUP=1])
+        AC_MSG_RESULT([yes])
+       ],[AC_MSG_RESULT([no])])
+    VLC_RESTORE_FLAGS
 
     AC_EGREP_CPP(yes,
             [#import <TargetConditionals.h>
