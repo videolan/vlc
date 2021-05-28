@@ -205,7 +205,7 @@ case "${host_os}" in
     AX_APPEND_FLAG([-Werror=partial-availability], [OBJCFLAGS])
     AX_APPEND_FLAG([-Wl,-headerpad_max_install_names], [LDFLAGS])
 
-    VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,AppKit])
+    VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
 
     AC_EGREP_CPP(yes,
