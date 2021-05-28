@@ -206,24 +206,8 @@ case "${host_os}" in
     AX_APPEND_FLAG([-Werror=partial-availability], [OBJCFLAGS])
     AX_APPEND_FLAG([-Wl,-headerpad_max_install_names], [LDFLAGS])
 
-    VLC_ADD_LDFLAGS([libvlccore],[-Wl,-framework,CoreFoundation])
-
-
-    dnl This is not supported when bitcode is enabled. In that case, we need
-    dnl to disable the static bank loader.
-    VLC_SAVE_FLAGS
-    AX_APPEND_FLAG([LDFLAGS],[-Wl,-U,_my_array])
-    AC_LINK_IFELSE(
-       [AC_LANG_PROGRAM([], [dnl
-__attribute__((visibility("default"))) extern int my_array[];
-__attribute__((visibility("default"))) int foo() { return my_array[0]; }
-])],
-       [
-        VLC_ADD_LDFLAGS([libvlccore],[-Wl,-U,_vlc_static_modules])
-        VLC_ADD_LDFLAGS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
-       ],
-       [VLC_ADD_CPPFLAGS([libvlccore],[-DHAVE_BITCODE])])
-    VLC_RESTORE_FLAGS
+    VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
+    VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
 
     AC_EGREP_CPP(yes,
             [#import <TargetConditionals.h>
@@ -248,7 +232,7 @@ __attribute__((visibility("default"))) int foo() { return my_array[0]; }
              ],)
 
     AS_IF([test "${HAVE_OSX}" = "1"],[
-      VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreServices,-framework,AppKit])
+      VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreServices])
       VLC_DARWIN_TARGET="macosx"])
 
     dnl
