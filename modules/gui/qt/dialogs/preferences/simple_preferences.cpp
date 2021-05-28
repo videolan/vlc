@@ -1009,29 +1009,29 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             break;
         }
 
-            START_SPREFS_CAT( MediaLibrary , qtr("Media Library Settings") );
+        START_SPREFS_CAT( MediaLibrary , qtr("Media Library Settings") );
 
-                if ( vlc_ml_instance_get( p_intf ) != NULL )
-                {
-                    auto foldersModel = new MLFoldersModel( this );
-                    foldersModel->setMl( vlc_ml_instance_get( p_intf ) );
-                    ui.entryPoints->setMLFoldersModel( foldersModel );
-                    mlFoldersEditor = ui.entryPoints;
+            if ( vlc_ml_instance_get( p_intf ) != NULL )
+            {
+                auto foldersModel = new MLFoldersModel( this );
+                foldersModel->setMl( vlc_ml_instance_get( p_intf ) );
+                ui.entryPoints->setMLFoldersModel( foldersModel );
+                mlFoldersEditor = ui.entryPoints;
 
-                    auto bannedFoldersModel = new MLBannedFoldersModel( this );
-                    bannedFoldersModel->setMl( vlc_ml_instance_get( p_intf ));
-                    ui.bannedEntryPoints->setMLFoldersModel( bannedFoldersModel );
-                    mlBannedFoldersEditor = ui.bannedEntryPoints;
+                auto bannedFoldersModel = new MLBannedFoldersModel( this );
+                bannedFoldersModel->setMl( vlc_ml_instance_get( p_intf ));
+                ui.bannedEntryPoints->setMLFoldersModel( bannedFoldersModel );
+                mlBannedFoldersEditor = ui.bannedEntryPoints;
 
-                    BUTTONACT( ui.addButton , MLaddNewFolder() );
-                    BUTTONACT( ui.banButton , MLBanFolder() );
-                }
-                else
-                {
-                    ui.mlGroupBox->hide( );
-                }
+                BUTTONACT( ui.addButton , MLaddNewFolder() );
+                BUTTONACT( ui.banButton , MLBanFolder() );
+            }
+            else
+            {
+                ui.mlGroupBox->hide( );
+            }
 
-            END_SPREFS_CAT;
+        END_SPREFS_CAT;
     }
 
     panel_layout->addWidget( panel_label );
