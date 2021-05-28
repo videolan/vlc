@@ -236,7 +236,7 @@ int foo() { return my_array[0]; }
              ],)
 
     AS_IF([test "${HAVE_OSX}" = "1"],[
-      VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreServices,-framework,AppKit])
+      VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreServices])
       VLC_DARWIN_TARGET="macosx"])
 
     dnl
