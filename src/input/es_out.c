@@ -3983,7 +3983,7 @@ static char *LanguageGetName( const char *psz_code )
     }
 }
 
-/* Get a 2 char code */
+/* Get a 3 char code */
 static char *LanguageGetCode( const char *psz_lang )
 {
     const iso639_lang_t *pl;
@@ -3991,9 +3991,9 @@ static char *LanguageGetCode( const char *psz_lang )
     {
         pl = vlc_find_iso639( psz_lang, true );
         if( pl != NULL )
-            return strdup( pl->psz_iso639_1 );
+            return strdup( pl->psz_iso639_2B );
     }
-    return strdup("??");
+    return strdup("???");
 }
 
 static char **LanguageSplit( const char *psz_langs )
@@ -4026,7 +4026,7 @@ static char **LanguageSplit( const char *psz_langs )
         else
         {
             psz_code = LanguageGetCode( psz_parser );
-            if( strcmp( psz_code, "??" ) )
+            if( strcmp( psz_code, "???" ) )
             {
                 TAB_APPEND( i_psz, ppsz, psz_code );
             }
