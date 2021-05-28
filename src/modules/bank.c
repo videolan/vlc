@@ -460,6 +460,52 @@ static void AllocatePluginDir (module_bank_t *bank, unsigned maxdepth,
         if (vlc_stat (abspath, &st) == -1)
             goto skip;
 
+        /* Apple specific framework library browsing */
+#ifdef __APPLE__
+        size_t len_name = strlen (file);
+        if (len_name > sizeof ".framework" - 1
+         && strcmp(file + len_name - sizeof ".framework" + 1, ".framework") == 0)
+        {
+            /* Skip frameworks not matching plugins naming conventions. */
+            if (len_name <= sizeof "_plugin.framework" - 1
+              || strncmp(file + len_name - sizeof "_plugin.framework" + 1,
+                         "_plugin", sizeof "_plugin" - 1) != 0)
+            {
+                /* The framework doesn't contain plugins, there's no need to
+                 * browse the rest of the framework folder. */
+                goto skip;
+            }
+
+            /* The framework is a plugin, extract the dylib from it. */
+            len_name -= sizeof ".framework" - 1;
+
+            char *framework_relpath = NULL, *framework_abspath = NULL;
+            /* Compute absolute path */
+            if (asprintf (&framework_abspath, "%s"DIR_SEP"%.*s",
+                          abspath, (int)len_name, file) == -1)
+            {
+                framework_abspath = NULL;
+                goto framework_skip;
+            }
+
+            struct stat framework_st;
+            if (vlc_stat (framework_abspath, &framework_st) == -1
+             || !S_ISREG (framework_st.st_mode))
+                goto framework_skip;
+
+            if (asprintf (&framework_relpath, "%s"DIR_SEP"%.*s",
+                          relpath, (int)len_name, file) == -1)
+                framework_relpath = NULL;
+
+            /* TODO: error handling is not done here */
+            AllocatePluginFile (bank, framework_abspath, framework_relpath, &framework_st);
+framework_skip:
+            free(framework_relpath);
+            free(framework_abspath);
+            goto skip;
+        }
+#endif
+
         if (S_ISREG (st.st_mode))
         {
             static const char prefix[] = "lib";
