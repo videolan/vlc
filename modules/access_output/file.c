@@ -314,7 +314,7 @@ static int Open( vlc_object_t *p_this )
                                          _("Overwrite"), NULL, path,
                                          _("The output file already exists. "
                                          "If recording continues, the file will be "
-                                         "overridden and its content will be lost.")) == 1);
+                                         "overwritten and its content will be lost.")) == 1);
         free (buf);
         if (fd == -1)
             return VLC_EGENERIC;
