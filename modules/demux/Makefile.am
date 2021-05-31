@@ -162,9 +162,6 @@ libavformat_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
 if HAVE_ZLIB
 libavformat_plugin_la_LIBADD += -lz
 endif
-if HAVE_DARWIN
-libavformat_plugin_la_LDFLAGS += -Wl,-read_only_relocs,suppress
-endif
 if HAVE_AVFORMAT
 if !MERGE_FFMPEG
 demux_PLUGINS += libavformat_plugin.la
