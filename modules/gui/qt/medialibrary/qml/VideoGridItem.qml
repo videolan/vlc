@@ -34,6 +34,13 @@ Widgets.GridItem {
         model.channel || ""
     ].filter(function(a) { return a !== "" })
 
+    function play() {
+        if ( model.id !== undefined ) {
+            g_mainDisplay.showPlayer()
+            medialib.addAndPlay( model.id )
+        }
+    }
+
     image: model.thumbnail || VLCStyle.noArtCover
     title: model.title || i18n.qtr("Unknown title")
     subtitle: Helpers.msToString(model.duration) || ""
@@ -72,12 +79,7 @@ Widgets.GridItem {
         }
     }
 
-    onPlayClicked: {
-        if ( model.id !== undefined ) {
-            g_mainDisplay.showPlayer()
-            medialib.addAndPlay( model.id )
-        }
-    }
+    onPlayClicked: root.play()
     
     Behavior on newIndicatorMedian {
         NumberAnimation {

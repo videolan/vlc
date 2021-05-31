@@ -45,7 +45,7 @@ Widgets.NavigableFocusScope {
 
     function _actionAtIndex(index, model, selectionModel) {
         g_mainDisplay.showPlayer()
-        medialib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ) )
+        medialib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ), [":restore-playback-pos=2"] )
     }
 
     onFocusChanged: {
@@ -104,12 +104,7 @@ Widgets.NavigableFocusScope {
                 unselectedUnderlay: shadows.unselected
                 selectedUnderlay: shadows.selected
 
-                onItemDoubleClicked: {
-                    if ( model.id !== undefined ) {
-                        g_mainDisplay.showPlayer()
-                        medialib.addAndPlay( model.id )
-                    }
-                }
+                onItemDoubleClicked: recentVideoGridItem.play()
 
                 onItemClicked: {
                     recentVideoSelection.updateSelection( modifier , root.model.currentIndex, index )
@@ -128,6 +123,13 @@ Widgets.NavigableFocusScope {
                         duration: 100
                     }
                 }
+
+                function play() {
+                    if (model.id !== undefined) {
+                        g_mainDisplay.showPlayer()
+                        medialib.addAndPlay( model.id, [":restore-playback-pos=2"] )
+                    }
+                }
             }
 
             footer: Item {
@@ -137,7 +139,7 @@ Widgets.NavigableFocusScope {
             onSelectionUpdated: recentVideoSelection.updateSelection( keyModifiers, oldIndex, newIndex )
             onActionAtIndex: {
                 g_mainDisplay.showPlayer()
-                medialib.addAndPlay( model.getIdsForIndexes( recentVideoSelection.selectedIndexes ) )
+                medialib.addAndPlay( model.getIdsForIndexes( recentVideoSelection.selectedIndexes ), [":restore-playback-pos=2"] )
             }
 
             Widgets.GridShadows {
