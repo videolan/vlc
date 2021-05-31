@@ -1,6 +1,17 @@
 Changes between 3.0.14 and 3.0.15:
 ----------------------------------
 
+Demux:
+ * Fix asf regression with broadcast streams
+ * MP4: Fix audio drop on seek
+
+Video Output:
+ * Fix seek & volume sliders overlapping with subtitles
+ * Fix delays when seeking with D3D11
+
+Text renderer:
+ * Improve freetype fonts outlining
+
 Misc:
  * Fix GnuTLS support for Windows XP
 
