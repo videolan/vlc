@@ -1645,6 +1645,7 @@ static void FragTrunSeekToTime( mp4_track_t *p_track, stime_t i_target_time )
 
             i_time += dur;
             i_pos += len;
+            i_sample++;
         }
     }
 
