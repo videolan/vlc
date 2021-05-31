@@ -5,12 +5,14 @@
 #USE_FFMPEG ?= 1
 
 ifndef USE_LIBAV
-FFMPEG_HASH=1e35519fe0b8bbad84641e83d49138152720b544
+FFMPEG_HASH=dc91b913b6260e85e1304c74ff7bb3c22a8c9fb1
+FFMPEG_BRANCH=release/4.4
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
 USE_FFMPEG := 1
 else
 FFMPEG_HASH=e5afa1b556542fd7a52a0a9b409c80f2e6e1e9bb
+FFMPEG_BRANCH=
 FFMPEG_GITURL := git://git.libav.org/libav.git
 FFMPEG_LAVC_MIN := 57.16.0
 endif
@@ -222,7 +224,7 @@ endif
 FFMPEGCONF += --nm="$(NM)" --ar="$(AR)" --ranlib="$(RANLIB)"
 
 $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz:
-	$(call download_git,$(FFMPEG_GITURL),,$(FFMPEG_HASH))
+	$(call download_git,$(FFMPEG_GITURL),$(FFMPEG_BRANCH),$(FFMPEG_HASH))
 
 .sum-ffmpeg: $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz
 	$(call check_githash,$(FFMPEG_HASH))
@@ -239,6 +241,7 @@ ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/0003-avcodec-hevcdec-allow-HEVC-422-10-12-bits-decoding-w.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-mpeg12dec-don-t-call-hw-end_frame-when-start.patch
 	$(APPLY) $(SRC)/ffmpeg/0002-avcodec-mpeg12dec-don-t-end-a-slice-without-first_sl.patch
+	$(APPLY) $(SRC)/ffmpeg/0001-fix-mf_utils-compilation-with-mingw64.patch
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch

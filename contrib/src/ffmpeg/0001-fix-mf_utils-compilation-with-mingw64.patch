@@ -1,0 +1,29 @@
+From b503a9056d2daf3763b49aab9ba5bebe80b70e16 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 31 May 2021 13:36:39 +0200
+Subject: [PATCH] fix mf_utils compilation with mingw64
+
+In mingw64 and Windows Kits the MF_MT_VIDEO_ROTATION is defined if WINVER is at
+least 0x0602. Normally WINVER would default to _WIN32_WINNT but here it's not
+the case, so just force it manually.
+---
+ libavcodec/mf_utils.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libavcodec/mf_utils.c b/libavcodec/mf_utils.c
+index eeabd0ce0b..9b82dacf41 100644
+--- a/libavcodec/mf_utils.c
++++ b/libavcodec/mf_utils.c
+@@ -19,7 +19,9 @@
+ #define COBJMACROS
+ #if !defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0602
+ #undef _WIN32_WINNT
++#undef WINVER
+ #define _WIN32_WINNT 0x0602
++#define WINVER 0x0602
+ #endif
+ 
+ #include "mf_utils.h"
+-- 
+2.27.0.windows.1
+

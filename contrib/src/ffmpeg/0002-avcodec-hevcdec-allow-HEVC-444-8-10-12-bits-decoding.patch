@@ -1,4 +1,4 @@
-From 664c8dd63b8fc90019e279bc34d3415deb542bcf Mon Sep 17 00:00:00 2001
+From 98c122a14739c6153c98472483e56ea2f56a4806 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Tue, 20 Aug 2019 13:10:24 +0200
 Subject: [PATCH 2/3] avcodec/hevcdec: allow HEVC 444 8/10/12 bits decoding
@@ -10,10 +10,10 @@ And 4:2:0 12 bits as well.
  1 file changed, 14 insertions(+)
 
 diff --git a/libavcodec/hevcdec.c b/libavcodec/hevcdec.c
-index 8f1c162ace..04496a002b 100644
+index 2231aed259..d400eff338 100644
 --- a/libavcodec/hevcdec.c
 +++ b/libavcodec/hevcdec.c
-@@ -420,6 +420,13 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
+@@ -442,6 +442,13 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
  #endif
          break;
      case AV_PIX_FMT_YUV444P:
@@ -27,7 +27,7 @@ index 8f1c162ace..04496a002b 100644
  #if CONFIG_HEVC_VDPAU_HWACCEL
          *fmt++ = AV_PIX_FMT_VDPAU;
  #endif
-@@ -430,6 +437,13 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
+@@ -458,6 +465,13 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
      case AV_PIX_FMT_YUV420P12:
      case AV_PIX_FMT_YUV444P10:
      case AV_PIX_FMT_YUV444P12:
@@ -38,9 +38,9 @@ index 8f1c162ace..04496a002b 100644
 +        *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
 +        *fmt++ = AV_PIX_FMT_D3D11;
 +#endif
- #if CONFIG_HEVC_NVDEC_HWACCEL
-         *fmt++ = AV_PIX_FMT_CUDA;
+ #if CONFIG_HEVC_VDPAU_HWACCEL
+         *fmt++ = AV_PIX_FMT_VDPAU;
  #endif
 -- 
-2.19.1.windows.1
+2.27.0.windows.1
 

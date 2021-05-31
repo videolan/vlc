@@ -1,4 +1,4 @@
-From e2cfacf5501fbe5d6a56de56f4f5e4f47f6ad484 Mon Sep 17 00:00:00 2001
+From 57c0b0ffa1508f6400ea034d6c0403e686794fdf Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Fri, 12 Feb 2021 11:10:03 +0100
 Subject: [PATCH 2/2] avcodec/mpeg12dec: don't end a slice without first_slice
@@ -14,10 +14,10 @@ for this check to work.
  1 file changed, 13 insertions(+), 7 deletions(-)
 
 diff --git a/libavcodec/mpeg12dec.c b/libavcodec/mpeg12dec.c
-index 5dfea63b71..2689446cfd 100644
+index 335c3713c2..42c580b8a5 100644
 --- a/libavcodec/mpeg12dec.c
 +++ b/libavcodec/mpeg12dec.c
-@@ -2476,13 +2476,19 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
+@@ -2484,13 +2484,19 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
                          s2->er.error_count += s2->thread_context[i]->er.error_count;
                  }
  
@@ -26,7 +26,7 @@ index 5dfea63b71..2689446cfd 100644
 -                    return ret;
 -                else if (ret) {
 -                    // FIXME: merge with the stuff in mpeg_decode_slice
--                    if (s2->last_picture_ptr || s2->low_delay)
+-                    if (s2->last_picture_ptr || s2->low_delay || s2->pict_type == AV_PICTURE_TYPE_B)
 -                        *got_output = 1;
 +                if (s->first_slice) // not started yet. don't end it
 +                    ret = 0;
@@ -36,7 +36,7 @@ index 5dfea63b71..2689446cfd 100644
 +                        return ret;
 +                    else if (ret) {
 +                        // FIXME: merge with the stuff in mpeg_decode_slice
-+                        if (s2->last_picture_ptr || s2->low_delay)
++                        if (s2->last_picture_ptr || s2->low_delay || s2->pict_type == AV_PICTURE_TYPE_B)
 +                            *got_output = 1;
 +                    }
 +                    // slice ended, don't end it again later
