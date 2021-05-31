@@ -117,6 +117,7 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(APPLY) $(TOOLS)/libtool-2.4.6-clang-libs.patch
 	$(APPLY) $(TOOLS)/libtool-2.4.6-response-files.patch
 	$(APPLY) $(TOOLS)/libtool-2.4.6-unarchive-old-libraries.patch
+	$(APPLY) $(TOOLS)/libtool-2.4.6-embed-bitcode.patch
 	$(MOVE)
 
 .buildlibtool: libtool .automake .help2man

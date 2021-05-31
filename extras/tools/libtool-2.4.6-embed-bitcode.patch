@@ -1,0 +1,48 @@
+From 23f7d7c98d923bd454c114ea7dfa6ded9ef49bbe Mon Sep 17 00:00:00 2001
+From: Alexandre Janniaux <ajanni@videolabs.io>
+Date: Mon, 31 May 2021 10:28:54 +0200
+Subject: [PATCH] ltmain: add support for -fembed-bitcode
+
+---
+ build-aux/ltmain.in | 8 ++++++++
+ m4/libtool.m4       | 4 ++--
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+index 96b37003..0d9f10a0 100644
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -5173,6 +5173,14 @@ func_mode_link ()
+ 	prev=xcompiler
+ 	continue
+ 	;;
++      -fembed-bitcode)
++	func_append compiler_flags " -fembed-bitcode"
++	func_append compile_command " -fembed-bitcode"
++	func_append finalize_command " -fembed-bitcode"
++	func_append linker_flags " -fembed-bitcode"
++	func_echo "TAKING -fembed-bitcode into account"
++        continue
++        ;;
+ 
+       -mt|-mthreads|-kthread|-Kthread|-pthread|-pthreads|--thread-safe \
+       |-threads|-fopenmp|-openmp|-mp|-xopenmp|-omp|-qsmp=*)
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+index f2d1f398..e5891815 100644
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
+@@ -1125,9 +1125,9 @@ m4_defun([_LT_DARWIN_LINKER_FEATURES],
+   if test yes = "$_lt_dar_can_shared"; then
+     output_verbose_link_cmd=func_echo_all
+     _LT_TAGVAR(archive_cmds, $1)="\$CC -dynamiclib \$allow_undefined_flag -o \$lib \$libobjs \$deplibs \$compiler_flags -install_name \$rpath/\$soname \$verstring $_lt_dar_single_mod$_lt_dsymutil"
+-    _LT_TAGVAR(module_cmds, $1)="\$CC \$allow_undefined_flag -o \$lib -bundle \$libobjs \$deplibs \$compiler_flags$_lt_dsymutil"
++    _LT_TAGVAR(module_cmds, $1)="\$CC \$allow_undefined_flag -o \$lib -dynamiclib \$libobjs \$deplibs \$compiler_flags$_lt_dsymutil"
+     _LT_TAGVAR(archive_expsym_cmds, $1)="sed 's|^|_|' < \$export_symbols > \$output_objdir/\$libname-symbols.expsym~\$CC -dynamiclib \$allow_undefined_flag -o \$lib \$libobjs \$deplibs \$compiler_flags -install_name \$rpath/\$soname \$verstring $_lt_dar_single_mod$_lt_dar_export_syms$_lt_dsymutil"
+-    _LT_TAGVAR(module_expsym_cmds, $1)="sed -e 's|^|_|' < \$export_symbols > \$output_objdir/\$libname-symbols.expsym~\$CC \$allow_undefined_flag -o \$lib -bundle \$libobjs \$deplibs \$compiler_flags$_lt_dar_export_syms$_lt_dsymutil"
++    _LT_TAGVAR(module_expsym_cmds, $1)="sed -e 's|^|_|' < \$export_symbols > \$output_objdir/\$libname-symbols.expsym~\$CC \$allow_undefined_flag -o \$lib -dynamiclib \$libobjs \$deplibs \$compiler_flags$_lt_dar_export_syms$_lt_dsymutil"
+     m4_if([$1], [CXX],
+ [   if test yes != "$lt_cv_apple_cc_single_mod"; then
+       _LT_TAGVAR(archive_cmds, $1)="\$CC -r -keep_private_externs -nostdlib -o \$lib-master.o \$libobjs~\$CC -dynamiclib \$allow_undefined_flag -o \$lib \$lib-master.o \$deplibs \$compiler_flags -install_name \$rpath/\$soname \$verstring$_lt_dsymutil"
+-- 
+2.31.1
+
