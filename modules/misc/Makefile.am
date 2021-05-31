@@ -50,7 +50,6 @@ libsecuretransport_plugin_la_SOURCES = misc/securetransport.c
 libsecuretransport_plugin_la_CFLAGS = $(AM_CFLAGS) $(SECURETRANSPORT_CFLAGS)
 libsecuretransport_plugin_la_LIBADD = $(SECURETRANSPORT_LIBS)
 libsecuretransport_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(misc_RPATH) -Wl,-framework,Security,-framework,CoreFoundation
-libsecuretransport_plugin_la_LDFLAGS += -Wl,-U,_SSLCopyALPNProtocols,-U,_SSLSetALPNProtocols
 misc_PLUGINS += libsecuretransport_plugin.la
 endif
 
