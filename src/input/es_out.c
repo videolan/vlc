@@ -228,6 +228,8 @@ typedef struct
     /* Used only to limit debugging output */
     int         i_prev_stream_level;
 
+    unsigned    cc_decoder;
+
     es_out_t out;
 } es_out_sys_t;
 
@@ -555,6 +557,8 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
                     "audio-track-id", "audio-track", "audio-language", "audio" );
     EsOutPropsInit( &p_sys->sub,  false, p_input, ES_OUT_ES_POLICY_AUTO,
                     "sub-track-id", "sub-track", "sub-language", "sub" );
+
+    p_sys->cc_decoder = var_InheritInteger( p_input, "captions" );
 
     p_sys->i_group_id = var_GetInteger( p_input, "program" );
 
@@ -2935,7 +2939,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     decoder_cc_desc_t desc;
 
     vlc_input_decoder_GetCcDesc( es->p_dec, &desc );
-    if( var_InheritInteger( p_input, "captions" ) == 708 )
+    if( p_sys->cc_decoder == 708 )
         EsOutCreateCCChannels( out, VLC_CODEC_CEA708, desc.i_708_channels,
                                _("DTVCC Closed captions %u"), es );
     EsOutCreateCCChannels( out, VLC_CODEC_CEA608, desc.i_608_channels,
