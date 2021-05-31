@@ -70,7 +70,7 @@ EXTRA_DIST = \
 	samples/slaves \
 	$(check_SCRIPTS)
 
-check_HEADERS = libvlc/test.h libvlc/libvlc_additions.h
+check_HEADERS = libvlc/test.h libvlc/libvlc_additions.h libvlc/media_utils.h
 
 TESTS = $(check_PROGRAMS) check_POTFILES.sh
 

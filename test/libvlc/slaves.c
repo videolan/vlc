@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include "test.h"
+#include "media_utils.h"
 
 #define SLAVES_DIR SRCDIR "/samples/slaves"
 

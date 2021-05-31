@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include "test.h"
+#include "media_utils.h"
 
 static void test_meta (const char ** argv, int argc)
 {
