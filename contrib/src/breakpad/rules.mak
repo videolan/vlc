@@ -29,7 +29,8 @@ ifdef HAVE_MACOSX
 	# Tools
 	cd $</src/tools/mac/dump_syms && \
 		xcodebuild $(XCODE_FLAGS) CLANG_CXX_LIBRARY=libc++ && \
-		cp -R build/Release/dump_syms "$(PREFIX)/bin"
+		install -d "$(PREFIX)/bin" && \
+		install build/Release/dump_syms "$(PREFIX)/bin"
 else
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-processor
