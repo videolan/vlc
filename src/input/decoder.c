@@ -2351,14 +2351,6 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
     }
 }
 
-void vlc_input_decoder_GetCcDesc( vlc_input_decoder_t *p_owner,
-                                  decoder_cc_desc_t *p_desc )
-{
-    vlc_mutex_lock( &p_owner->lock );
-    *p_desc = p_owner->cc.desc;
-    vlc_mutex_unlock( &p_owner->lock );
-}
-
 static bool vlc_input_decoder_HasCCChanFlag( vlc_input_decoder_t *p_owner,
                                              vlc_fourcc_t codec, int i_channel )
 {
@@ -2541,37 +2533,36 @@ void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_owner,
     vlc_mutex_unlock( &p_owner->lock );
 }
 
-bool vlc_input_decoder_HasFormatChanged( vlc_input_decoder_t *p_owner,
-                                         es_format_t *p_fmt, vlc_meta_t **pp_meta )
+void vlc_input_decoder_GetStatus( vlc_input_decoder_t *p_owner,
+                                  struct vlc_input_decoder_status *status )
 {
-    if( !atomic_exchange_explicit( &p_owner->b_fmt_description, false,
-                                   memory_order_acquire ) )
-        return false;
-
     vlc_mutex_lock( &p_owner->lock );
 
-    if( p_owner->fmt.i_cat == UNKNOWN_ES )
+    status->format.changed =
+        atomic_exchange_explicit( &p_owner->b_fmt_description, false,
+                                  memory_order_acquire );
+
+    if( status->format.changed && p_owner->fmt.i_cat == UNKNOWN_ES )
     {
         /* The format changed but the output creation failed */
-        vlc_mutex_unlock( &p_owner->lock );
-        return false;
+        status->format.changed = false;
     }
 
-    if( p_fmt != NULL )
-        es_format_Copy( p_fmt, &p_owner->fmt );
-
-    if( pp_meta )
+    if( status->format.changed )
     {
-        *pp_meta = NULL;
+        es_format_Copy( &status->format.fmt, &p_owner->fmt );
+        status->format.meta = NULL;
+
         if( p_owner->p_description )
         {
-            *pp_meta = vlc_meta_New();
-            if( *pp_meta )
-                vlc_meta_Merge( *pp_meta, p_owner->p_description );
+            status->format.meta  = vlc_meta_New();
+            if( status->format.meta  )
+                vlc_meta_Merge( status->format.meta, p_owner->p_description );
         }
     }
+    status->cc.desc = p_owner->cc.desc;
+
     vlc_mutex_unlock( &p_owner->lock );
-    return true;
 }
 
 size_t vlc_input_decoder_GetFifoSize( vlc_input_decoder_t *p_owner )

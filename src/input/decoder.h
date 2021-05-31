@@ -119,15 +119,30 @@ void vlc_input_decoder_GetCcDesc( vlc_input_decoder_t *, decoder_cc_desc_t * );
  */
 void vlc_input_decoder_FrameNext( vlc_input_decoder_t *p_dec, vlc_tick_t *pi_duration );
 
+struct vlc_input_decoder_status
+{
+    struct {
+        /* True if the ES format or meta data have changed since the last call.
+         * */
+        bool changed;
+        /* If changed is true, a copy of the current es_format_t, MUST be freed
+         * with es_format_Clean() */
+        es_format_t fmt;
+        /* If changed is true, a copy of the current description, can be NULL,
+         * MUST be freed with vlc_meta_Delete.() */
+        vlc_meta_t *meta;
+    } format;
+
+    struct {
+        decoder_cc_desc_t desc;
+    } cc;
+};
+
 /**
- * This function will return true if the ES format or meta data have changed since
- * the last call. In which case, it will do a copy of the current es_format_t if p_fmt
- * is not NULL and will do a copy of the current description if pp_meta is non NULL.
- * The es_format_t MUST be freed by es_format_Clean and *pp_meta MUST be freed by
- * vlc_meta_Delete.
- * Otherwise it will return false and will not initialize p_fmt and *pp_meta.
+ * Get the last status of the decoder.
  */
-bool vlc_input_decoder_HasFormatChanged( vlc_input_decoder_t *p_dec, es_format_t *p_fmt, vlc_meta_t **pp_meta );
+void vlc_input_decoder_GetStatus( vlc_input_decoder_t *p_dec,
+                                  struct vlc_input_decoder_status *status );
 
 /**
  * This function returns the current size in bytes of the decoder fifo

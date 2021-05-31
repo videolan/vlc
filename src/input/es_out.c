@@ -2921,28 +2921,26 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     vlc_input_decoder_Decode( es->p_dec, p_block,
                               input_priv(p_input)->b_out_pace_control );
 
-    es_format_t fmt_dsc;
-    vlc_meta_t  *p_meta_dsc;
-    if( vlc_input_decoder_HasFormatChanged( es->p_dec, &fmt_dsc, &p_meta_dsc ) )
+    struct vlc_input_decoder_status status;
+    vlc_input_decoder_GetStatus( es->p_dec, &status );
+
+    if( status.format.changed )
     {
-        if (EsOutEsUpdateFmt( out, es, &fmt_dsc) == VLC_SUCCESS)
+        if (EsOutEsUpdateFmt( out, es, &status.format.fmt ) == VLC_SUCCESS)
             EsOutSendEsEvent(out, es, VLC_INPUT_ES_UPDATED, false);
 
-        EsOutUpdateInfo(out, es, p_meta_dsc);
+        EsOutUpdateInfo(out, es, status.format.meta);
 
-        es_format_Clean( &fmt_dsc );
-        if( p_meta_dsc )
-            vlc_meta_Delete( p_meta_dsc );
+        es_format_Clean( &status.format.fmt );
+        if( status.format.meta )
+            vlc_meta_Delete( status.format.meta );
     }
 
     /* Check CC status */
-    decoder_cc_desc_t desc;
-
-    vlc_input_decoder_GetCcDesc( es->p_dec, &desc );
     if( p_sys->cc_decoder == 708 )
-        EsOutCreateCCChannels( out, VLC_CODEC_CEA708, desc.i_708_channels,
+        EsOutCreateCCChannels( out, VLC_CODEC_CEA708, status.cc.desc.i_708_channels,
                                _("DTVCC Closed captions %u"), es );
-    EsOutCreateCCChannels( out, VLC_CODEC_CEA608, desc.i_608_channels,
+    EsOutCreateCCChannels( out, VLC_CODEC_CEA608, status.cc.desc.i_608_channels,
                            _("Closed captions %u"), es );
 
     vlc_mutex_unlock( &p_sys->lock );
