@@ -89,7 +89,7 @@ struct vlc_input_decoder_t
     vlc_video_context *vctx;
 
     /* */
-    atomic_bool    b_fmt_description;
+    bool           b_fmt_description;
     vlc_meta_t     *p_description;
     atomic_int     reload;
 
@@ -287,8 +287,7 @@ static void DecoderUpdateFormatLocked( vlc_input_decoder_t *p_owner )
         p_dec->p_description = NULL;
     }
 
-    atomic_store_explicit( &p_owner->b_fmt_description, true,
-                           memory_order_release );
+    p_owner->b_fmt_description = true;
 }
 
 static void MouseEvent( const vlc_mouse_t *newmouse, void *user_data )
@@ -1817,7 +1816,7 @@ CreateDecoder( vlc_object_t *p_parent,
     p_owner->p_sout_input = NULL;
     p_owner->p_packetizer = NULL;
 
-    atomic_init( &p_owner->b_fmt_description, false );
+    p_owner->b_fmt_description = false;
     p_owner->p_description = NULL;
 
     p_owner->reset_out_state = false;
@@ -2538,9 +2537,8 @@ void vlc_input_decoder_GetStatus( vlc_input_decoder_t *p_owner,
 {
     vlc_mutex_lock( &p_owner->lock );
 
-    status->format.changed =
-        atomic_exchange_explicit( &p_owner->b_fmt_description, false,
-                                  memory_order_acquire );
+    status->format.changed = p_owner->b_fmt_description;
+    p_owner->b_fmt_description = false;
 
     if( status->format.changed && p_owner->fmt.i_cat == UNKNOWN_ES )
     {
