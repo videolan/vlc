@@ -4375,7 +4375,7 @@ static int FragDemuxTrack( demux_t *p_demux, mp4_track_t *p_track,
         msg_Dbg( p_demux, "tk(%i)=%"PRId64" mv=%"PRId64" pos=%"PRIu64, p_track->i_track_ID,
                  VLC_TS_0 + MP4_rescale( i_dts, p_track->i_timescale, CLOCK_FREQ ),
                  VLC_TS_0 + MP4_rescale( i_pts, p_track->i_timescale, CLOCK_FREQ ),
-                 p_track->context.i_trun_sample_pos );
+                 p_track->context.i_trun_sample_pos - i_read );
 #endif
         if ( p_track->p_es )
         {
