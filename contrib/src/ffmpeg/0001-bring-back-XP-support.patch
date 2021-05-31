@@ -1,0 +1,77 @@
+From 7a0e937637fe0544cfef85d5535230ffa6c718d8 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 8 Jun 2021 09:14:07 +0200
+Subject: [PATCH] bring back XP support
+
+Force bcrypt not to be used as it's not available on XP.
+
+It works via a win32 pthread instead of w32thread. This works by using
+--disable-w32threads --enable-pthreads --extra-libs="-lpthread"
+
+Other misdetected features mean you need this flags for proper XP support
+--disable-mediafoundation --disable-amf --disable-schannel
+---
+ configure         | 12 ++++++------
+ libavformat/udp.c |  2 +-
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/configure b/configure
+index d7a3f507e8..589338f59b 100755
+--- a/configure
++++ b/configure
+@@ -5632,8 +5632,8 @@ probe_libc(){
+         add_${pfx}cppflags -U__STRICT_ANSI__ -D__USE_MINGW_ANSI_STDIO=1
+         eval test \$${pfx_no_}cc_type = "gcc" &&
+             add_${pfx}cppflags -D__printf__=__gnu_printf__
+-        test_${pfx}cpp_condition windows.h "!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600" &&
+-            add_${pfx}cppflags -D_WIN32_WINNT=0x0600
++        test_${pfx}cpp_condition windows.h "!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0501" &&
++            add_${pfx}cppflags -D_WIN32_WINNT=0x0501
+         add_${pfx}cppflags -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
+     elif test_${pfx}cpp_condition _mingw.h "defined __MINGW_VERSION"  ||
+          test_${pfx}cpp_condition _mingw.h "defined __MINGW32_VERSION"; then
+@@ -5644,8 +5644,8 @@ probe_libc(){
+         add_${pfx}cppflags -U__STRICT_ANSI__ -D__USE_MINGW_ANSI_STDIO=1
+         test_${pfx}cpp_condition _mingw.h "__MSVCRT_VERSION__ < 0x0700" &&
+             add_${pfx}cppflags -D__MSVCRT_VERSION__=0x0700
+-        test_${pfx}cpp_condition windows.h "!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0600" &&
+-            add_${pfx}cppflags -D_WIN32_WINNT=0x0600
++        test_${pfx}cpp_condition windows.h "!defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0501" &&
++            add_${pfx}cppflags -D_WIN32_WINNT=0x0501
+         eval test \$${pfx_no_}cc_type = "gcc" &&
+             add_${pfx}cppflags -D__printf__=__gnu_printf__
+         add_${pfx}cppflags -D_POSIX_C_SOURCE=200112 -D_XOPEN_SOURCE=600
+@@ -5673,7 +5673,7 @@ probe_libc(){
+         # found in the SDK headers by default. (Alternatively, we could force
+         # _WIN32_WINNT to 0x0602 in that case.)
+         test_${pfx}cpp_condition stdlib.h "defined(_WIN32_WINNT)" ||
+-            { test_${pfx}cpp <<EOF && add_${pfx}cppflags -D_WIN32_WINNT=0x0600; }
++            { test_${pfx}cpp <<EOF && add_${pfx}cppflags -D_WIN32_WINNT=0x0501; }
+ #ifdef WINAPI_FAMILY
+ #include <winapifamily.h>
+ #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+@@ -6188,7 +6188,7 @@ check_headers asm/types.h
+ check_builtin stdatomic stdatomic.h "atomic_int foo, bar = ATOMIC_VAR_INIT(-1); atomic_store(&foo, 0); foo += bar"
+ 
+ check_lib advapi32 "windows.h"            RegCloseKey          -ladvapi32
+-check_lib bcrypt   "windows.h bcrypt.h"   BCryptGenRandom      -lbcrypt &&
++check_lib bcrypt   "windows.h bcrypt.h DISABLE_BCRYPT"   BCryptGenRandom      -lbcrypt &&
+     check_cpp_condition bcrypt bcrypt.h "defined BCRYPT_RNG_ALGORITHM"
+ check_lib ole32    "windows.h"            CoTaskMemFree        -lole32
+ check_lib shell32  "windows.h shellapi.h" CommandLineToArgvW   -lshell32
+diff --git a/libavformat/udp.c b/libavformat/udp.c
+index 9b9d3de197..c5ebee9fdf 100644
+--- a/libavformat/udp.c
++++ b/libavformat/udp.c
+@@ -1089,7 +1089,7 @@ static int udp_close(URLContext *h)
+         int ret;
+         // Cancel only read, as write has been signaled as success to the user
+         if (h->flags & AVIO_FLAG_READ) {
+-#ifdef _WIN32
++#if defined(_WIN32) && HAVE_W32THREADS
+             /* recvfrom() is not a cancellation point for win32, so we shutdown
+              * the socket and abort pending IO, subsequent recvfrom() calls
+              * will fail with WSAESHUTDOWN causing the thread to exit. */
+-- 
+2.27.0.windows.1
+

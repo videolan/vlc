@@ -5,13 +5,15 @@
 #USE_FFMPEG ?= 1
 
 ifndef USE_LIBAV
-FFMPEG_HASH=1e35519fe0b8bbad84641e83d49138152720b544
+FFMPEG_HASH=dc91b913b6260e85e1304c74ff7bb3c22a8c9fb1
+FFMPEG_BRANCH=release/4.4
 FFMPEG_SNAPURL := http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
 USE_FFMPEG := 1
 else
 FFMPEG_HASH=e5afa1b556542fd7a52a0a9b409c80f2e6e1e9bb
+FFMPEG_BRANCH=
 FFMPEG_SNAPURL := http://git.libav.org/?p=libav.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := git://git.libav.org/libav.git
 FFMPEG_LAVC_MIN := 57.16.0
@@ -173,7 +175,9 @@ ifndef HAVE_VISUALSTUDIO
 DEPS_ffmpeg += d3d11
 endif
 FFMPEGCONF += --target-os=mingw32
-FFMPEGCONF += --enable-w32threads
+FFMPEGCONF += --disable-w32threads --enable-pthreads --extra-libs="-lpthread" --extra-cflags="-DPTW32_STATIC_LIB"
+# disable modules not compatible with XP
+FFMPEGCONF += --disable-mediafoundation --disable-amf --disable-schannel
 ifndef HAVE_WINSTORE
 FFMPEGCONF += --enable-dxva2
 else
@@ -213,7 +217,7 @@ endif
 FFMPEGCONF += --nm="$(NM)" --ar="$(AR)" --ranlib="$(RANLIB)"
 
 $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz:
-	$(call download_git,$(FFMPEG_GITURL),,$(FFMPEG_HASH))
+	$(call download_git,$(FFMPEG_GITURL),$(FFMPEG_BRANCH),$(FFMPEG_HASH))
 
 .sum-ffmpeg: $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz
 	$(call check_githash,$(FFMPEG_HASH))
@@ -223,22 +227,17 @@ ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
 	rm -Rf $@ $@-$(FFMPEG_BASENAME)
 	mkdir -p $@-$(FFMPEG_BASENAME)
 	tar xvJfo "$<" --strip-components=1 -C $@-$(FFMPEG_BASENAME)
-	$(APPLY) $(SRC)/ffmpeg/0001-arm-vc1dsp-Add-commas-between-macro-arguments.patch
-	$(APPLY) $(SRC)/ffmpeg/0002-arm-Produce-.const_data-instead-of-.section-.rodata-.patch
 ifdef USE_FFMPEG
-	$(APPLY) $(SRC)/ffmpeg/0003-arm-swscale-Only-compile-the-rgb2yuv-asm-if-.dn-alia.patch
-	$(APPLY) $(SRC)/ffmpeg/0004-arm-hevcdsp-Avoid-using-macro-expansion-counters.patch
-	$(APPLY) $(SRC)/ffmpeg/0005-arm-hevcdsp-Add-commas-between-macro-arguments.patch
-	$(APPLY) $(SRC)/ffmpeg/0006-ffmpeg-Fix-memset-size-on-ctts_data-in-mov_read_trun.patch
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
 	$(APPLY) $(SRC)/ffmpeg/dxva_vc1_crash.patch
 	$(APPLY) $(SRC)/ffmpeg/h264_early_SAR.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-dxva2_hevc-add-support-for-parsing-HEVC-Rang.patch
 	$(APPLY) $(SRC)/ffmpeg/0002-avcodec-hevcdec-allow-HEVC-444-8-10-12-bits-decoding.patch
 	$(APPLY) $(SRC)/ffmpeg/0003-avcodec-hevcdec-allow-HEVC-422-10-12-bits-decoding-w.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-vp9-add-profile-2-10-bit-DXVA2-D3D11-decodin.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-mpeg12dec-don-t-call-hw-end_frame-when-start.patch
 	$(APPLY) $(SRC)/ffmpeg/0002-avcodec-mpeg12dec-don-t-end-a-slice-without-first_sl.patch
+	$(APPLY) $(SRC)/ffmpeg/0001-fix-MediaFoundation-compilation-if-WINVER-was-forced.patch
+	$(APPLY) $(SRC)/ffmpeg/0001-bring-back-XP-support.patch
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch

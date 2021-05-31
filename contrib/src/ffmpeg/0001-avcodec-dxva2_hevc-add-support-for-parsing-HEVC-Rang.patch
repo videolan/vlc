@@ -1,7 +1,7 @@
-From 5cbf399500744af87ab8f29a70080af2255994da Mon Sep 17 00:00:00 2001
+From 833195704700ba3fa326473292e91524964eeeaa Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 3 Oct 2019 14:05:40 +0200
-Subject: [PATCH] avcodec/dxva2_hevc: add support for parsing HEVC Range
+Subject: [PATCH 1/3] avcodec/dxva2_hevc: add support for parsing HEVC Range
  Extension data
 
 ---
@@ -160,5 +160,5 @@ index dbb701fb1c..98b3e74bd7 100644
                                      commit_bitstream_and_slice_buffer);
      return ret;
 -- 
-2.19.1.windows.1
+2.27.0.windows.1
 
