@@ -63,6 +63,10 @@ if HAVE_IOS
 libglinterop_cvpx_plugin_la_CFLAGS += -DUSE_OPENGL_ES2
 libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface,-framework,OpenGLES
 endif
+if HAVE_TVOS
+libglinterop_cvpx_plugin_la_CFLAGS += -DUSE_OPENGL_ES2
+libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface,-framework,OpenGLES
+endif
 
 libvout_ios_plugin_la_SOURCES = video_output/opengl/display.c
 libvout_ios_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS) -DUSE_OPENGL_ES2
