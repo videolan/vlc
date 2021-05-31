@@ -320,8 +320,10 @@ set_host_envvars()
 {
     # Flags to be used for C-like compilers (C, C++, Obj-C)
     local clike_flags="$VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH $1"
+    local bitcode_flag=""
     if [ "$VLC_USE_BITCODE" -gt "0" ]; then
         clike_flags+=" -fembed-bitcode"
+        bitcode_flag=" -fembed-bitcode"
     fi
 
     export CPPFLAGS="-arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH"
@@ -331,7 +333,7 @@ set_host_envvars()
     export OBJCFLAGS="$clike_flags"
 
     # Vanilla clang doesn't use VLC_DEPLOYMENT_TAGET_LDFLAGS but only the CFLAGS variant
-    export LDFLAGS="$VLC_DEPLOYMENT_TARGET_LDFLAG $VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH"
+    export LDFLAGS="$VLC_DEPLOYMENT_TARGET_LDFLAG $VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH ${bitcode_flag}"
 }
 
 hostenv()
