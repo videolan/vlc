@@ -146,6 +146,10 @@ AbstractDemuxer *HLSStream::newDemux(vlc_object_t *p_obj, const StreamFormat &fo
             ret = AbstractStream::newDemux(p_obj, format, out, source);
             break;
 
+        case StreamFormat::Type::Ogg:
+            ret = new Demuxer(p_obj, "ogg", out, source);
+            break;
+
 /* Disabled until we can handle empty segments/cue and absolute time
         case StreamFormat::Type::WebVTT:
             ret = new Demuxer(p_obj, "webvttstream", out, source);

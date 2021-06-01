@@ -34,6 +34,7 @@ namespace adaptive
                 MPEG2TS,
                 MP4,
                 WebM,
+                Ogg,
                 WebVTT,
                 TTML,
                 PackedAAC,

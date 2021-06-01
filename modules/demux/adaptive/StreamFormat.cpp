@@ -60,6 +60,8 @@ std::string StreamFormat::str() const
             return "Packed AC-3";
         case Type::WebM:
             return "WebM";
+        case Type::Ogg:
+            return "Ogg";
         case Type::Unsupported:
             return "Unsupported";
         default:
@@ -123,6 +125,8 @@ StreamFormat::StreamFormat(const void *data_, size_t sz)
         type = StreamFormat::Type::WebVTT;
     else if(sz > 4 && !memcmp("\x1A\x45\xDF\xA3", data, 4))
         type = StreamFormat::Type::WebM;
+    else if(sz > 4 && !memcmp("OggS", data, 4))
+        type = StreamFormat::Type::Ogg;
     else /* Check Packet Audio formats */
     {
         /* It MUST have ID3 header, but HLS spec is an oxymoron */
