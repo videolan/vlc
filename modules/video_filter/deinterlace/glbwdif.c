@@ -645,6 +645,7 @@ CreateProgramBwdif(filter_t *filter)
 
     const char *vertex_shader[] = {
         shader_version,
+        shader_precision,
         VERTEX_SHADER_BODY,
     };
 
@@ -845,6 +846,7 @@ CreateProgramDraw(filter_t *filter, video_color_space_t yuv_space, bool vflip)
 
     const char *vertex_shader[] = {
         shader_version,
+        shader_precision,
         vflip ? VERTEX_SHADER_BODY_VFLIP : VERTEX_SHADER_BODY,
     };
 
