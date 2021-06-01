@@ -676,8 +676,6 @@ void libvlc_media_release( libvlc_media_t *p_md )
         vlc_http_cookies_destroy( p_md->p_cookie_jar );
 
     libvlc_event_manager_destroy( &p_md->event_manager );
-    if( p_md->is_parsed )
-        config_AutoSaveConfigFile( p_md->p_libvlc_instance->p_libvlc_int );
     libvlc_release( p_md->p_libvlc_instance );
     free( p_md );
 }

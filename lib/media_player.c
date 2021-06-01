@@ -977,8 +977,6 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi )
     vlc_player_TogglePause(player);
 
     vlc_player_Unlock(player);
-
-    config_AutoSaveConfigFile( p_mi );
 }
 
 /**************************************************************************
