@@ -119,7 +119,7 @@ SegmentTracker::SegmentTracker(SharedResources *res,
     bufferingLogic = bl;
     setAdaptationLogic(logic_);
     adaptationSet = adaptSet;
-    format = StreamFormat::UNKNOWN;
+    format = StreamFormat::Type::Unknown;
 }
 
 SegmentTracker::~SegmentTracker()
@@ -220,7 +220,7 @@ void SegmentTracker::reset()
     next = Position();
     resetChunksSequence();
     initializing = true;
-    format = StreamFormat::UNKNOWN;
+    format = StreamFormat::Type::Unknown;
 }
 
 SegmentTracker::ChunkEntry::ChunkEntry()
@@ -363,7 +363,7 @@ ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed,
     /* advance or don't trigger duplicate events */
     next = current = chunk.pos;
 
-    if(format == StreamFormat(StreamFormat::UNSUPPORTED))
+    if(format == StreamFormat(StreamFormat::Type::Unsupported))
         return nullptr; /* Can't return chunk because no demux will be created */
 
     /* From this point chunk must be returned */
@@ -371,14 +371,14 @@ ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed,
     StreamFormat chunkformat = chunk.chunk->getStreamFormat();
 
     /* Wrap and probe format */
-    if(chunkformat == StreamFormat(StreamFormat::UNKNOWN))
+    if(chunkformat == StreamFormat(StreamFormat::Type::Unknown))
     {
         ProbeableChunk *wrappedck = new ProbeableChunk(chunk.chunk);
         const uint8_t *p_peek;
         size_t i_peek = wrappedck->peek(&p_peek);
         chunkformat = StreamFormat(p_peek, i_peek);
         /* fallback on Mime type */
-        if(chunkformat == StreamFormat(StreamFormat::UNKNOWN))
+        if(chunkformat == StreamFormat(StreamFormat::Type::Unknown))
             format = StreamFormat(chunk.chunk->getContentType());
         chunk.chunk->setStreamFormat(chunkformat);
         returnedChunk = wrappedck;
@@ -386,7 +386,7 @@ ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed,
     else returnedChunk = chunk.chunk;
 
     if(chunkformat != format &&
-       chunkformat != StreamFormat(StreamFormat::UNKNOWN))
+       chunkformat != StreamFormat(StreamFormat::Type::Unknown))
     {
         format = chunkformat;
         notify(FormatChangedEvent(&format));

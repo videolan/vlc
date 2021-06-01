@@ -532,7 +532,7 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
                 }
                 else if(typeattr->value != "AUDIO" && typeattr->value != "VIDEO")
                 {
-                    rep->streamFormat = StreamFormat(StreamFormat::UNSUPPORTED);
+                    rep->streamFormat = StreamFormat(StreamFormat::Type::Unsupported);
                 }
 
                 if(pair.second->getAttributeByName("LANGUAGE"))

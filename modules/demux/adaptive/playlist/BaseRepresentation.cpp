@@ -96,10 +96,10 @@ void BaseRepresentation::getCodecsDesc(CodecDescriptionList *desc) const
         const StreamFormat format = getStreamFormat();
         switch(format)
         {
-            case StreamFormat::TTML:
+            case StreamFormat::Type::TTML:
                 codecs.push_front("stpp");
                 break;
-            case StreamFormat::WEBVTT:
+            case StreamFormat::Type::WebVTT:
                 codecs.push_front("wvtt");
                 break;
             default:

@@ -40,7 +40,7 @@ QualityLevel::~QualityLevel ()
 
 StreamFormat QualityLevel::getStreamFormat() const
 {
-    return StreamFormat(StreamFormat::MP4);
+    return StreamFormat(StreamFormat::Type::MP4);
 }
 
 InitSegment * QualityLevel::getInitSegment() const

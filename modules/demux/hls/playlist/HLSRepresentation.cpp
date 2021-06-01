@@ -47,7 +47,7 @@ HLSRepresentation::HLSRepresentation  ( BaseAdaptationSet *set ) :
     b_failed = false;
     lastUpdateTime = 0;
     targetDuration = 0;
-    streamFormat = StreamFormat::UNKNOWN;
+    streamFormat = StreamFormat::Type::Unknown;
 }
 
 HLSRepresentation::~HLSRepresentation ()
