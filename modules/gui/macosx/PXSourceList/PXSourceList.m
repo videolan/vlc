@@ -67,14 +67,6 @@ NSString * const PXSLDeleteKeyPressedOnRowsNotification = @"PXSourceListDeleteKe
     _delegateDataSourceProxy = [[PXSourceListDelegateDataSourceProxy alloc] initWithSourceList:self];
 }
 
-- (void)dealloc
-{
-    _delegateDataSourceProxy = nil;
-    //Remove ourselves as the delegate and data source to be safe
-    [super setDataSource:nil];
-    [super setDelegate:nil];
-}
-
 
 #pragma mark -
 #pragma mark Custom Accessors
