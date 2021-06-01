@@ -50,56 +50,58 @@ typedef struct
 static picture_t *Filter(filter_t *filter, picture_t *input)
 {
     filter_sys_t *sys = filter->p_sys;
-    picture_t *head = NULL;
-    picture_t *tail = NULL;
+    picture_t *output = NULL;
+    int ret;
 
     if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
+    {
+        if (input)
+            picture_Release(input);
         return NULL;
-
-    int ret = vlc_gl_filters_UpdatePicture(sys->filters, input);
-    if (ret != VLC_SUCCESS)
-    {
-        vlc_gl_ReleaseCurrent(sys->gl);
-        goto end;
     }
 
-    while (vlc_gl_filters_WillUpdate(sys->filters, head == NULL))
+    if (input)
     {
-        /* Will store the information of the output frame */
-        struct vlc_gl_input_meta meta;
-
-        ret = vlc_gl_filters_Draw(sys->filters, &meta);
+        ret = vlc_gl_filters_UpdatePicture(sys->filters, input);
         if (ret != VLC_SUCCESS)
-        {
-            vlc_gl_ReleaseCurrent(sys->gl);
             goto end;
-        }
-
-        picture_t *output = vlc_gl_SwapOffscreen(sys->gl);
-        vlc_gl_ReleaseCurrent(sys->gl);
-        if (output == NULL)
-            goto end;
-
-        if (head == NULL)
-            head = output;
-        else
-            tail->p_next = output;
-        tail = output;
-
-        output->date = meta.pts;
-        output->b_force = input->b_force;
-        output->b_still = input->b_still;
-
-        output->format.i_frame_rate =
-            filter->fmt_out.video.i_frame_rate;
-        output->format.i_frame_rate_base =
-            filter->fmt_out.video.i_frame_rate_base;
     }
+
+    output = vlc_gl_SwapOffscreen(sys->gl);
+    vlc_gl_ReleaseCurrent(sys->gl);
+    if (output == NULL)
+        goto end;
+    if (!vlc_gl_filters_WillUpdate(sys->filters, input != NULL))
+        goto end;
+
+    /* Will store the information of the output frame */
+    struct vlc_gl_input_meta meta;
+
+    ret = vlc_gl_filters_Draw(sys->filters, &meta);
+    if (ret != VLC_SUCCESS)
+        goto end;
+
+    output = vlc_gl_SwapOffscreen(sys->gl);
+    if (output == NULL)
+        goto end;
+
+    output->date = meta.pts;
+
+    /* TODO
+    output->b_force = input->b_force;
+    output->b_still = input->b_still;
+    */
+
+    output->format.i_frame_rate =
+        filter->fmt_out.video.i_frame_rate;
+    output->format.i_frame_rate_base =
+        filter->fmt_out.video.i_frame_rate_base;
+end:
     vlc_gl_ReleaseCurrent(sys->gl);
 
-end:
-    picture_Release(input);
-    return head;
+    if (input)
+        picture_Release(input);
+    return output;
 }
 
 static int

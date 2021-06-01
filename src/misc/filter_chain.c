@@ -430,31 +430,31 @@ static picture_t *FilterChainVideoFilter( chained_filter_t *f, picture_t *p_pic 
         p_pic = p_filter->ops->filter_video( p_filter, p_pic );
         if( !p_pic )
             break;
-        if( !vlc_picture_chain_IsEmpty( &f->pending ) )
+
         {
             msg_Warn( p_filter, "dropping pictures" );
             FilterDeletePictures( &f->pending );
         }
         f->pending = picture_GetAndResetChain( p_pic );
+        p_pic->p_next = NULL;
     }
     return p_pic;
 }
 
 picture_t *filter_chain_VideoFilter( filter_chain_t *p_chain, picture_t *p_pic )
 {
+    /* If we have a picture, filter it directly */
     if( p_pic )
     {
         p_pic = FilterChainVideoFilter( p_chain->first, p_pic );
         if( p_pic )
             return p_pic;
     }
+
+    /* Try draining the picture from the last filters */
     for( chained_filter_t *b = p_chain->last; b != NULL; b = b->prev )
     {
-        if( vlc_picture_chain_IsEmpty( &b->pending ) )
-            continue;
-        p_pic = vlc_picture_chain_PopFront( &b->pending );
-
-        p_pic = FilterChainVideoFilter( b->next, p_pic );
+        p_pic = FilterChainVideoFilter( b, NULL );
         if( p_pic )
             return p_pic;
     }
