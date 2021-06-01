@@ -46,6 +46,11 @@ vlc_gl_filter_open_fn(struct vlc_gl_filter *filter,
 
 struct vlc_gl_filter_ops {
     /**
+     * Signal that the input picture has been updated
+     */
+    bool (*will_update)(struct vlc_gl_filter *filter, bool new_frame);
+
+    /**
      * Draw the result of the filter to the current framebuffer
      */
     int (*draw)(struct vlc_gl_filter *filter,

@@ -478,6 +478,16 @@ GetDrawFramebuffer(const opengl_vtable_t *vt)
     return value; /* as GLuint */
 }
 
+static bool
+WillUpdate(struct vlc_gl_filter *filter, bool new_frame)
+{
+    struct sys *sys = filter->sys;
+    if (sys->is_yadif2x)
+        return new_frame;
+
+    return new_frame || sys->order == 1;
+}
+
 static int
 Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
 {
@@ -582,6 +592,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     sys->order = 0;
 
     static const struct vlc_gl_filter_ops ops = {
+        .will_update = WillUpdate,
         .draw = Draw,
         .flush = Flush,
         .close = Close,

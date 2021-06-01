@@ -90,6 +90,9 @@ int
 vlc_gl_filters_UpdatePicture(struct vlc_gl_filters *filters,
                              picture_t *picture);
 
+bool
+vlc_gl_filters_WillUpdate(struct vlc_gl_filters *filters, bool new_picture);
+
 /**
  * Draw by executing all the filters
  *

@@ -58,34 +58,46 @@ static picture_t *Filter(filter_t *filter, picture_t *input)
     if (ret != VLC_SUCCESS)
     {
         vlc_gl_ReleaseCurrent(sys->gl);
-        return NULL;
-    }
-
-    ret = vlc_gl_filters_Draw(sys->filters);
-    if (ret != VLC_SUCCESS)
-    {
-        vlc_gl_ReleaseCurrent(sys->gl);
-        return NULL;
-    }
-
-    picture_t *output = vlc_gl_SwapOffscreen(sys->gl);
-    vlc_gl_ReleaseCurrent(sys->gl);
-
-    if (output == NULL)
         goto end;
+    }
 
-    output->date = input->date;
-    output->b_force = input->b_force;
-    output->b_still = input->b_still;
+    picture_t *head = NULL;
+    picture_t *tail = NULL;
 
-    output->format.i_frame_rate =
-        filter->fmt_out.video.i_frame_rate;
-    output->format.i_frame_rate_base =
-        filter->fmt_out.video.i_frame_rate_base;
+    while (vlc_gl_filters_WillUpdate(sys->filters, head == NULL))
+    {
+        ret = vlc_gl_filters_Draw(sys->filters);
+        if (ret != VLC_SUCCESS)
+        {
+            vlc_gl_ReleaseCurrent(sys->gl);
+            goto end;
+        }
+
+        picture_t *output = vlc_gl_SwapOffscreen(sys->gl);
+        vlc_gl_ReleaseCurrent(sys->gl);
+        if (output == NULL)
+            goto end;
+
+        if (head == NULL)
+            head = output;
+        else
+            tail->p_next = output;
+        tail = output;
+
+        output->date = input->date;
+        output->b_force = input->b_force;
+        output->b_still = input->b_still;
+
+        output->format.i_frame_rate =
+            filter->fmt_out.video.i_frame_rate;
+        output->format.i_frame_rate_base =
+            filter->fmt_out.video.i_frame_rate_base;
+    }
+    vlc_gl_ReleaseCurrent(sys->gl);
 
 end:
     picture_Release(input);
-    return output;
+    return head;
 }
 
 static int

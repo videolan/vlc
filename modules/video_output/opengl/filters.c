@@ -527,6 +527,26 @@ vlc_gl_filters_UpdatePicture(struct vlc_gl_filters *filters,
     return vlc_gl_sampler_UpdatePicture(first_filter->sampler, picture);
 }
 
+bool
+vlc_gl_filters_WillUpdate(struct vlc_gl_filters *filters, bool new_picture)
+{
+    struct vlc_gl_filter_priv *priv;
+    vlc_list_reverse_foreach(priv, &filters->list, node)
+    {
+        /* default behaviour: new frame at each frame */
+        if (priv->filter.ops->will_update == NULL)
+        {
+            if (new_picture)
+                return true;
+            else continue;
+        }
+
+        if (priv->filter.ops->will_update(&priv->filter, new_picture))
+            return true;
+    }
+    return false;
+}
+
 int
 vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
 {
