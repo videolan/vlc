@@ -131,6 +131,8 @@ AbstractDemuxer *HLSStream::newDemux(vlc_object_t *p_obj, const StreamFormat &fo
     switch(format)
     {
         case StreamFormat::Type::PackedAAC:
+        case StreamFormat::Type::PackedMP3:
+        case StreamFormat::Type::PackedAC3:
             ret = new Demuxer(p_obj, "es", out, source);
             break;
 
