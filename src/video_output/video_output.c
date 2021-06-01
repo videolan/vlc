@@ -107,6 +107,7 @@ typedef struct vout_thread_sys_t
         bool        is_interlaced;
         picture_t   *decoded; // decoded picture before passed through chain_static
         picture_t   *current;
+        picture_captions_t captions;
     } displayed;
 
     struct {
@@ -1069,6 +1070,7 @@ static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reus
 
         sys->displayed.decoded       = picture_Hold(decoded);
         sys->displayed.timestamp     = decoded->date;
+        sys->displayed.captions      = decoded->captions;
         sys->displayed.is_interlaced = !decoded->b_progressive;
 
         vout_chrono_Start(&sys->static_filter);
@@ -1426,6 +1428,7 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     vlc_mutex_unlock(&sys->filter.lock);
 
     bool render_now = true;
+    const bool first = !sys->displayed.current;
     if (frame_by_frame)
     {
         picture_t *next;
@@ -1446,7 +1449,6 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     {
         const vlc_tick_t system_now = vlc_tick_now();
         const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->render) + VOUT_MWAIT_TOLERANCE;
-        const bool first = !sys->displayed.current;
 
         bool dropped_current_frame = false;
 
@@ -1529,6 +1531,11 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 
     int ret = ThreadDisplayRenderPicture(vout, render_now);
 
+    if(sys->displayed.captions.size)
+        vout_CaptionsToDisplay(&vout->obj,
+                               sys->displayed.captions.bytes,
+                               sys->displayed.captions.size);
+
     if (first && ret == VLC_SUCCESS)
     {
         /* SEND EVENT */
@@ -1582,6 +1589,7 @@ static void vout_FlushUnlocked(vout_thread_sys_t *vout, bool below,
             sys->displayed.decoded   = NULL;
             sys->displayed.date      = VLC_TICK_INVALID;
             sys->displayed.timestamp = VLC_TICK_INVALID;
+            sys->displayed.captions.size = 0;
         }
     }
 
@@ -1783,6 +1791,7 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     sys->displayed.decoded       = NULL;
     sys->displayed.date          = VLC_TICK_INVALID;
     sys->displayed.timestamp     = VLC_TICK_INVALID;
+    sys->displayed.captions.size = 0;
     sys->displayed.is_interlaced = false;
 
     sys->step.last               = VLC_TICK_INVALID;
