@@ -40,20 +40,20 @@ MediaLib::MediaLib(qt_intf_t *_intf, QObject *_parent)
     m_threadPool.setMaxThreadCount(4);
 }
 
-void MediaLib::addToPlaylist(const QString& mrl, const QStringList* options)
+void MediaLib::addToPlaylist(const QString& mrl, const QStringList &options)
 {
     vlc::playlist::Media media{ mrl, mrl, options };
     m_intf->p_mainPlaylistController->append( {media}, false );
 }
 
-void MediaLib::addToPlaylist(const QUrl& mrl, const QStringList* options)
+void MediaLib::addToPlaylist(const QUrl& mrl, const QStringList &options)
 {
     vlc::playlist::Media media{ mrl.toString(QUrl::None), mrl.fileName(), options };
     m_intf->p_mainPlaylistController->append( {media} , false );
 }
 
 // A specific item has been asked to be added to the playlist
-void MediaLib::addToPlaylist(const MLItemId & itemId, const QStringList* options)
+void MediaLib::addToPlaylist(const MLItemId & itemId, const QStringList &options)
 {
     //invalid item
     if (itemId.id == 0)
@@ -85,7 +85,7 @@ void MediaLib::addToPlaylist(const MLItemId & itemId, const QStringList* options
     }
 }
 
-void MediaLib::addToPlaylist(const QVariantList& itemIdList, const QStringList* options)
+void MediaLib::addToPlaylist(const QVariantList& itemIdList, const QStringList &options)
 {
     for (const QVariant& varValue: itemIdList)
     {
@@ -109,7 +109,7 @@ void MediaLib::addToPlaylist(const QVariantList& itemIdList, const QStringList* 
 
 // A specific item has been asked to be played,
 // so it's added to the playlist and played
-void MediaLib::addAndPlay(const MLItemId & itemId, const QStringList* options )
+void MediaLib::addAndPlay(const MLItemId & itemId, const QStringList &options )
 {
     if (itemId.id == 0)
         return;
@@ -139,20 +139,20 @@ void MediaLib::addAndPlay(const MLItemId & itemId, const QStringList* options )
     }
 }
 
-void MediaLib::addAndPlay(const QString& mrl, const QStringList* options)
+void MediaLib::addAndPlay(const QString& mrl, const QStringList &options)
 {
     vlc::playlist::Media media{ mrl, mrl, options };
     m_intf->p_mainPlaylistController->append( {media}, true );
 }
 
-void MediaLib::addAndPlay(const QUrl& mrl, const QStringList* options)
+void MediaLib::addAndPlay(const QUrl& mrl, const QStringList &options)
 {
     vlc::playlist::Media media{ mrl.toString(QUrl::None), mrl.fileName(), options };
     m_intf->p_mainPlaylistController->append( {media}, true );
 }
 
 
-void MediaLib::addAndPlay(const QVariantList& itemIdList, const QStringList* options)
+void MediaLib::addAndPlay(const QVariantList& itemIdList, const QStringList &options)
 {
     bool b_start = true;
     for (const QVariant& varValue: itemIdList)
@@ -187,7 +187,7 @@ void MediaLib::addAndPlay(const QVariantList& itemIdList, const QStringList* opt
     }
 }
 
-void MediaLib::insertIntoPlaylist(const size_t index, const QVariantList &itemIds, const QStringList *options)
+void MediaLib::insertIntoPlaylist(const size_t index, const QVariantList &itemIds, const QStringList &options)
 {
     QVector<vlc::playlist::Media> medias;
     for ( const auto &id : itemIds )

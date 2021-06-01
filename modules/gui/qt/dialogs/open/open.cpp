@@ -375,7 +375,7 @@ void OpenDialog::enqueue( bool b_enqueue )
     /* Take options from the UI, not from what we stored */
     QStringList optionsList = getOptions().split( " :" );
     for( const QString& mrl : itemsMRL)
-        medias.push_back( vlc::playlist::Media{mrl, nullptr, &optionsList} );
+        medias.push_back( vlc::playlist::Media{mrl, nullptr, optionsList} );
     if (!medias.empty())
         THEMPL->append(medias, !b_enqueue);
 }

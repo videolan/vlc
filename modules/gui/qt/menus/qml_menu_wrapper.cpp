@@ -377,8 +377,7 @@ void VideoContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVaria
 
     action = m_menu->addAction( qtr("Play as audio") );
     connect(action, &QAction::triggered, [ml, itemIdList]( ) {
-        QStringList options({":no-video"});
-        ml->addAndPlay(itemIdList, &options);
+        ml->addAndPlay(itemIdList, {":no-video"});
     });
 
     if (options.contains("information") && options["information"].type() == QVariant::Int) {
@@ -543,8 +542,7 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
     action = m_menu->addAction(qtr("Play as audio"));
 
     connect(action, &QAction::triggered, [ml, ids]() {
-        QStringList options({":no-video"});
-        ml->addAndPlay(ids, &options);
+        ml->addAndPlay(ids, {":no-video"});
     });
 
     if (options.contains("information") && options["information"].type() == QVariant::Int) {

@@ -36,7 +36,7 @@ using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
 class Media
 {
 public:
-    Media(input_item_t *media = nullptr, const QStringList* options = nullptr)
+    Media(input_item_t *media = nullptr, const QStringList &options = {})
     {
         if (media)
         {
@@ -48,7 +48,7 @@ public:
         }
     }
 
-    Media(QString uri, QString name, const QStringList* options = nullptr)
+    Media(QString uri, QString name, const QStringList &options = {})
     {
         auto uUri = uri.toUtf8();
         auto uName = name.toUtf8();
@@ -60,23 +60,23 @@ public:
         setMediaOptions(options);
     }
 
-    void setMediaOptions(const QStringList* options = nullptr)
+    void setMediaOptions(const QStringList &options = {})
     {
-        if (options && options->count() > 0)
+        if (options.count() > 0)
         {
             char **ppsz_options = NULL;
             int i_options = 0;
 
-            ppsz_options = new char *[options->count()];
+            ppsz_options = new char *[options.count()];
             auto optionDeleter = vlc::wrap_carray<char*>(ppsz_options, [&i_options](char *ptr[]) {
                 for(int i = 0; i < i_options; i++)
                     free(ptr[i]);
                 delete[] ptr;
             });
 
-            for (int i = 0; i < options->count(); i++)
+            for (int i = 0; i < options.count(); i++)
             {
-                QString option = colon_unescape( options->at(i) );
+                QString option = colon_unescape( options[i] );
                 ppsz_options[i] = strdup(option.toUtf8().constData());
                 if (!ppsz_options[i])
                     throw std::bad_alloc();

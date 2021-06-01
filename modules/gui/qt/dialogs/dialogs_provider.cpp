@@ -548,7 +548,7 @@ void DialogsProvider::simpleOpenDialog(bool start)
     urls.sort();
     QVector<vlc::playlist::Media> medias;
     for( const QString& mrl : urls)
-        medias.push_back( vlc::playlist::Media{mrl, nullptr, nullptr} );
+        medias.push_back( vlc::playlist::Media{mrl, QString {}} );
     if (!medias.empty())
         THEMPL->append(medias, start);
 }
@@ -576,7 +576,7 @@ void DialogsProvider::openUrlDialog()
         url = qfu(uri);
         free( uri );
     }
-    QVector<vlc::playlist::Media> medias = { {url, nullptr, nullptr} };
+    QVector<vlc::playlist::Media> medias = { {url, QString {}} };
     THEMPL->append(medias, !oud.shouldEnqueue());
 }
 
@@ -591,7 +591,7 @@ static void openDirectory( qt_intf_t *p_intf, bool go )
     QString uri = DialogsProvider::getDirectoryDialog( p_intf );
     if( !uri.isEmpty() )
     {
-        QVector<vlc::playlist::Media> medias = { {uri, nullptr, nullptr} };
+        QVector<vlc::playlist::Media> medias = { {uri, QString {}} };
         THEMPL->append(medias, go);
     }
 }
@@ -766,7 +766,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
         QVector<vlc::playlist::Media> outputMedias;
         std::transform(outputMRLs.cbegin(), outputMRLs.cend(), std::back_inserter(outputMedias), [&](const QString& mrl) {
             QString title = "Converting " + mrl;
-            return vlc::playlist::Media(mrl, title, &options);
+            return vlc::playlist::Media(mrl, title, options);
         });
         THEMPL->append(outputMedias, true);
     }

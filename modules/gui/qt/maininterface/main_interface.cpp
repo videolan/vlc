@@ -662,7 +662,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
             }
 #endif
             if( mrl.length() > 0 )
-                medias.push_back( vlc::playlist::Media{ mrl, nullptr, nullptr });
+                medias.push_back( vlc::playlist::Media{ mrl, QString {} });
         }
     }
 
@@ -673,7 +673,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
         QUrl(mimeData->text()).isValid() )
     {
         QString mrl = toURI( mimeData->text() );
-        medias.push_back( vlc::playlist::Media{ mrl, nullptr, nullptr });
+        medias.push_back( vlc::playlist::Media{ mrl, QString {} });
     }
     if (!medias.empty())
         THEMPL->append(medias, b_play);
