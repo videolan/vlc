@@ -37,6 +37,8 @@ namespace adaptive
                 WebVTT,
                 TTML,
                 PackedAAC,
+                PackedMP3,
+                PackedAC3,
                 Unknown,
             };
             static const unsigned PEEK_SIZE   = 4096;

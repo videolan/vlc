@@ -54,6 +54,10 @@ std::string StreamFormat::str() const
             return "Timed Text";
         case Type::PackedAAC:
             return "Packed AAC";
+        case Type::PackedMP3:
+            return "Packed MP3";
+        case Type::PackedAC3:
+            return "Packed AC-3";
         case Type::WebM:
             return "WebM";
         case Type::Unsupported:
@@ -82,6 +86,10 @@ StreamFormat::StreamFormat( const std::string &mimetype )
             type = StreamFormat::Type::MP4;
         else if(tail == "aac")
             type = StreamFormat::Type::PackedAAC;
+        else if(tail == "mpeg" || tail == "mp3")
+            type = StreamFormat::Type::PackedMP3;
+        else if(tail == "ac3")
+            type = StreamFormat::Type::PackedAC3;
         else if (tail == "mp2t")
             type = StreamFormat::Type::MPEG2TS;
         else if (tail == "vtt")
@@ -131,6 +139,14 @@ StreamFormat::StreamFormat(const void *data_, size_t sz)
                       !memcmp("\xFF\xF9", data, 2)))
         {
             type = StreamFormat::Type::PackedAAC;
+        }
+        else if(sz > 4 && data[0] == 0xFF && (data[1] & 0xE6) > 0xE0)
+        {
+            type = StreamFormat::Type::PackedMP3;
+        }
+        else if(sz > 4 && data[0] == 0x0b && data[1] == 0x77)
+        {
+            type = StreamFormat::Type::PackedAC3;
         }
     }
 }
