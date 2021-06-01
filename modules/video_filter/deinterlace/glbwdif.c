@@ -131,6 +131,7 @@ DrawPlane(filter_t *filter, unsigned plane)
     struct sys *sys = filter->p_sys;
     struct program_bwdif *program_bwdif = &sys->program_bwdif;
     const opengl_vtable_t *vt = sys->vt;
+    GLenum tex_target = sys->interop->tex_target;
 
     unsigned width = sys->tex_widths[plane];
     unsigned height = sys->tex_heights[plane];
@@ -162,15 +163,15 @@ DrawPlane(filter_t *filter, unsigned plane)
 
     vt->Uniform1i(program_bwdif->loc_order[order].prev, 0);
     vt->ActiveTexture(GL_TEXTURE0);
-    vt->BindTexture(GL_TEXTURE_2D, sys->frames_in[prev].textures[plane]);
+    vt->BindTexture(tex_target, sys->frames_in[prev].textures[plane]);
 
     vt->Uniform1i(program_bwdif->loc_order[order].cur, 1);
     vt->ActiveTexture(GL_TEXTURE1);
-    vt->BindTexture(GL_TEXTURE_2D, sys->frames_in[cur].textures[plane]);
+    vt->BindTexture(tex_target, sys->frames_in[cur].textures[plane]);
 
     vt->Uniform1i(program_bwdif->loc_order[order].next, 2);
     vt->ActiveTexture(GL_TEXTURE2);
-    vt->BindTexture(GL_TEXTURE_2D, sys->frames_in[next].textures[plane]);
+    vt->BindTexture(tex_target, sys->frames_in[next].textures[plane]);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, program_bwdif->vbo);
     vt->EnableVertexAttribArray(program_bwdif->loc_order[order].vertex_pos);
@@ -477,15 +478,15 @@ CreateProgramBwdif(filter_t *filter)
         "}\n";
 
     static const char *const FRAGMENT_SHADER_BODY =
-        "uniform sampler2D prev;\n"
-        "uniform sampler2D cur;\n"
-        "uniform sampler2D next;\n"
+        "uniform VLC_SAMPLER prev;\n"
+        "uniform VLC_SAMPLER cur;\n"
+        "uniform VLC_SAMPLER next;\n"
         "uniform float width;\n"
         "uniform float height;\n"
         "uniform int field;\n"
         "\n"
         "float pix(sampler2D sampler, float x, float y) {\n"
-        "  return texture2D(sampler, vec2(x / width, y / height)).x;\n"
+        "  return VLC_TEXTURE(sampler, vec2(x / width, y / height)).x;\n"
         "}\n"
         "\n"
         "float compute_score(float x, float y, float j) {\n"
@@ -599,7 +600,7 @@ CreateProgramBwdif(filter_t *filter)
         "}\n";
 
     static const char *const GATHER_FRAGMENT_SHADER_BODY =
-        "uniform sampler2D cur;\n"
+        "uniform VLC_SAMPLER cur;\n"
         "uniform sampler2D computed;\n"
         "uniform float width;\n"
         "uniform float height;\n"
@@ -613,7 +614,7 @@ CreateProgramBwdif(filter_t *filter)
         /* The line number */
         "  float line = floor(y);\n"
         "\n"
-        "  float cur_pix = texture2D(cur, vec2(x / width, y / height)).x;\n"
+        "  float cur_pix = VLC_TEXTURE(cur, vec2(x / width, y / height)).x;\n"
         "  float cur_computed = texture2D(computed, vec2(x / width, y / height)).x;\n"
 
         "  float result;\n"
@@ -641,6 +642,8 @@ CreateProgramBwdif(filter_t *filter)
         shader_precision = "";
     }
 
+    const char *defines = GetDefines(sys->interop->tex_target);
+
     struct program_bwdif *program_bwdif = &sys->program_bwdif;
 
     const char *vertex_shader[] = {
@@ -652,6 +655,7 @@ CreateProgramBwdif(filter_t *filter)
     const char *fragment_shader_order0[] = {
         shader_version,
         shader_precision,
+        defines,
         "#define YADIF_ORDER 0\n",
         FRAGMENT_SHADER_BODY,
     };
@@ -659,6 +663,7 @@ CreateProgramBwdif(filter_t *filter)
     const char *fragment_shader_order1[] = {
         shader_version,
         shader_precision,
+        defines,
         "#define YADIF_ORDER 1\n",
         FRAGMENT_SHADER_BODY,
     };
@@ -719,6 +724,7 @@ CreateProgramBwdif(filter_t *filter)
     const char *fragment_shader_gather[] = {
         shader_version,
         shader_precision,
+        defines,
         GATHER_FRAGMENT_SHADER_BODY,
     };
 
@@ -812,22 +818,20 @@ CreateProgramDraw(filter_t *filter, video_color_space_t yuv_space, bool vflip)
         "}\n";
 
     static const char *const FRAGMENT_SHADER_BODY =
-        "uniform VLC_SAMPLER samplers[3];\n"
+        "uniform sampler2D samplers[3];\n"
         "uniform mat4 matrix_yuv_rgb;\n"
         "varying vec2 tex_coords;\n"
         "void main() {\n"
         "  vec4 yuv = vec4(\n"
-        "      VLC_TEXTURE(samplers[0], tex_coords).x,\n"
-        "      VLC_TEXTURE(samplers[1], tex_coords).x,\n"
-        "      VLC_TEXTURE(samplers[2], tex_coords).x,\n"
+        "      texture2D(samplers[0], tex_coords).x,\n"
+        "      texture2D(samplers[1], tex_coords).x,\n"
+        "      texture2D(samplers[2], tex_coords).x,\n"
         "      1.0);\n"
         "  gl_FragColor = matrix_yuv_rgb * yuv;\n"
         "}\n";
 
     struct sys *sys = filter->p_sys;
     const opengl_vtable_t *vt = sys->vt;
-
-    const char *defines = GetDefines(sys->interop->tex_target);
 
     const char *shader_version;
     const char *shader_precision;
@@ -853,7 +857,6 @@ CreateProgramDraw(filter_t *filter, video_color_space_t yuv_space, bool vflip)
     const char *fragment_shader[] = {
         shader_version,
         shader_precision,
-        defines,
         FRAGMENT_SHADER_BODY,
     };
 
