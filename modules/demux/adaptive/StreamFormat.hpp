@@ -28,27 +28,32 @@ namespace adaptive
     class StreamFormat
     {
         public:
-            static const unsigned UNSUPPORTED = 0;
-            static const unsigned MPEG2TS     = 1;
-            static const unsigned MP4         = 2;
-            static const unsigned WEBVTT      = 3;
-            static const unsigned TTML        = 4;
-            static const unsigned PACKEDAAC   = 5;
-            static const unsigned WEBM        = 6;
-            static const unsigned UNKNOWN     = 0xFF; /* will probe */
+            enum class Type
+            {
+                Unsupported,
+                MPEG2TS,
+                MP4,
+                WebM,
+                WebVTT,
+                TTML,
+                PackedAAC,
+                Unknown,
+            };
             static const unsigned PEEK_SIZE   = 4096;
 
-            StreamFormat( unsigned = UNSUPPORTED );
+            StreamFormat( Type = Type::Unsupported );
             explicit StreamFormat( const std::string &mime );
             StreamFormat( const void *, size_t );
             ~StreamFormat();
-            operator unsigned() const;
+            operator Type() const;
             std::string str() const;
+            bool operator==(Type) const;
+            bool operator!=(Type) const;
             bool operator==(const StreamFormat &) const;
             bool operator!=(const StreamFormat &) const;
 
         private:
-            unsigned formatid;
+            Type type;
     };
 
 }

@@ -35,38 +35,38 @@ extern "C"
 
 using namespace adaptive;
 
-StreamFormat::operator unsigned() const
+StreamFormat::operator StreamFormat::Type() const
 {
-    return formatid;
+    return type;
 }
 
 std::string StreamFormat::str() const
 {
-    switch(formatid)
+    switch(type)
     {
-        case MPEG2TS:
+        case Type::MPEG2TS:
             return "TS";
-        case MP4:
+        case Type::MP4:
             return "MP4";
-        case WEBVTT:
+        case Type::WebVTT:
             return "WebVTT";
-        case TTML:
+        case Type::TTML:
             return "Timed Text";
-        case PACKEDAAC:
+        case Type::PackedAAC:
             return "Packed AAC";
-        case WEBM:
+        case Type::WebM:
             return "WebM";
-        case UNSUPPORTED:
+        case Type::Unsupported:
             return "Unsupported";
         default:
-        case UNKNOWN:
+        case Type::Unknown:
             return "Unknown";
     }
 }
 
-StreamFormat::StreamFormat( unsigned formatid_ )
+StreamFormat::StreamFormat( Type type_ )
 {
-    formatid = formatid_;
+    type = type_;
 }
 
 StreamFormat::StreamFormat( const std::string &mimetype )
@@ -74,22 +74,22 @@ StreamFormat::StreamFormat( const std::string &mimetype )
     std::string mime = mimetype;
     std::transform(mime.begin(), mime.end(), mime.begin(), ::tolower);
     std::string::size_type pos = mime.find("/");
-    formatid = UNKNOWN;
+    type = Type::Unknown;
     if(pos != std::string::npos)
     {
         std::string tail = mime.substr(pos + 1);
         if(tail == "mp4")
-            formatid = StreamFormat::MP4;
+            type = StreamFormat::Type::MP4;
         else if(tail == "aac")
-            formatid = StreamFormat::PACKEDAAC;
+            type = StreamFormat::Type::PackedAAC;
         else if (tail == "mp2t")
-            formatid = StreamFormat::MPEG2TS;
+            type = StreamFormat::Type::MPEG2TS;
         else if (tail == "vtt")
-            formatid = StreamFormat::WEBVTT;
+            type = StreamFormat::Type::WebVTT;
         else if (tail == "ttml+xml")
-            formatid = StreamFormat::TTML;
+            type = StreamFormat::Type::TTML;
         else if (tail == "webm")
-            formatid = StreamFormat::WEBM;
+            type = StreamFormat::Type::WebM;
     }
 }
 
@@ -101,20 +101,20 @@ static int ID3Callback(uint32_t, const uint8_t *, size_t, void *)
 StreamFormat::StreamFormat(const void *data_, size_t sz)
 {
     const uint8_t *data = reinterpret_cast<const uint8_t *>(data_);
-    formatid = UNKNOWN;
+    type = Type::Unknown;
     const char moov[] = "ftypmoovmoof";
 
     if(sz > 188 && data[0] == 0x47 && data[188] == 0x47)
-        formatid = StreamFormat::MPEG2TS;
+        type = StreamFormat::Type::MPEG2TS;
     else if(sz > 8 && (!memcmp(&moov,    &data[4], 4) ||
                        !memcmp(&moov[4], &data[4], 4) ||
                        !memcmp(&moov[8], &data[4], 4)))
-        formatid = StreamFormat::MP4;
+        type = StreamFormat::Type::MP4;
     else if(sz > 7 && !memcmp("WEBVTT", data, 6) &&
             std::isspace(static_cast<unsigned char>(data[7])))
-        formatid = StreamFormat::WEBVTT;
+        type = StreamFormat::Type::WebVTT;
     else if(sz > 4 && !memcmp("\x1A\x45\xDF\xA3", data, 4))
-        formatid = StreamFormat::WEBM;
+        type = StreamFormat::Type::WebM;
     else /* Check Packet Audio formats */
     {
         /* It MUST have ID3 header, but HLS spec is an oxymoron */
@@ -130,7 +130,7 @@ StreamFormat::StreamFormat(const void *data_, size_t sz)
         if(sz > 3 && (!memcmp("\xFF\xF1", data, 2) ||
                       !memcmp("\xFF\xF9", data, 2)))
         {
-            formatid = StreamFormat::PACKEDAAC;
+            type = StreamFormat::Type::PackedAAC;
         }
     }
 }
@@ -140,12 +140,22 @@ StreamFormat::~StreamFormat()
 
 }
 
+bool StreamFormat::operator ==(Type t) const
+{
+    return type == t;
+}
+
+bool StreamFormat::operator !=(Type t) const
+{
+    return type != t;
+}
+
 bool StreamFormat::operator ==(const StreamFormat &other) const
 {
-    return formatid == other.formatid;
+    return type == other.type;
 }
 
 bool StreamFormat::operator !=(const StreamFormat &other) const
 {
-    return formatid != other.formatid;
+    return type != other.type;
 }

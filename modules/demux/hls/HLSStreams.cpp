@@ -128,24 +128,24 @@ AbstractDemuxer *HLSStream::newDemux(vlc_object_t *p_obj, const StreamFormat &fo
                                      es_out_t *out, AbstractSourceStream *source) const
 {
     AbstractDemuxer *ret = nullptr;
-    switch((unsigned)format)
+    switch(format)
     {
-        case StreamFormat::PACKEDAAC:
-            ret = new Demuxer(p_obj, "aac", out, source);
+        case StreamFormat::Type::PackedAAC:
+            ret = new Demuxer(p_obj, "es", out, source);
             break;
 
-        case StreamFormat::MPEG2TS:
+        case StreamFormat::Type::MPEG2TS:
             ret = new Demuxer(p_obj, "ts", out, source);
             if(ret)
                 ret->setBitstreamSwitchCompatible(false); /* HLS and unique PAT/PMT versions */
             break;
 
-        case StreamFormat::MP4:
+        case StreamFormat::Type::MP4:
             ret = AbstractStream::newDemux(p_obj, format, out, source);
             break;
 
 /* Disabled until we can handle empty segments/cue and absolute time
-        case StreamFormat::WEBVTT:
+        case StreamFormat::Type::WebVTT:
             ret = new Demuxer(p_obj, "webvttstream", out, source);
             if(ret)
                 ret->setRestartsOnEachSegment(true);
@@ -153,8 +153,8 @@ AbstractDemuxer *HLSStream::newDemux(vlc_object_t *p_obj, const StreamFormat &fo
 */
 
         default:
-        case StreamFormat::UNKNOWN:
-        case StreamFormat::UNSUPPORTED:
+        case StreamFormat::Type::Unknown:
+        case StreamFormat::Type::Unsupported:
             break;
     }
     return ret;

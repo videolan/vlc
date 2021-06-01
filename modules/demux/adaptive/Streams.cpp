@@ -42,7 +42,7 @@ using namespace adaptive::http;
 AbstractStream::AbstractStream(demux_t * demux_)
 {
     p_realdemux = demux_;
-    format = StreamFormat::UNKNOWN;
+    format = StreamFormat::Type::Unknown;
     currentChunk = nullptr;
     eof = false;
     valid = true;
@@ -63,7 +63,7 @@ AbstractStream::AbstractStream(demux_t * demux_)
 bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, AbstractConnectionManager *conn)
 {
     /* Don't even try if not supported or already init */
-    if((unsigned)format_ == StreamFormat::UNSUPPORTED || demuxersource)
+    if(format_ == StreamFormat::Type::Unsupported || demuxersource)
         return false;
 
     demuxersource = new (std::nothrow) BufferedChunksSourceStream( VLC_OBJECT(p_realdemux), this );
@@ -613,18 +613,18 @@ AbstractDemuxer *AbstractStream::newDemux(vlc_object_t *p_obj, const StreamForma
                                           es_out_t *out, AbstractSourceStream *source) const
 {
     AbstractDemuxer *ret = nullptr;
-    switch((unsigned)format)
+    switch(format)
     {
-        case StreamFormat::MP4:
+        case StreamFormat::Type::MP4:
             ret = new Demuxer(p_obj, "mp4", out, source);
             break;
 
-        case StreamFormat::MPEG2TS:
+        case StreamFormat::Type::MPEG2TS:
             ret = new Demuxer(p_obj, "ts", out, source);
             break;
 
         default:
-        case StreamFormat::UNSUPPORTED:
+        case StreamFormat::Type::Unsupported:
             break;
     }
     return ret;
@@ -662,7 +662,7 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
             {
                 if(!demuxer->bitstreamSwitchCompatible() ||
                    /* HLS variants can move from TS to Raw AAC */
-                   format == StreamFormat(StreamFormat::UNKNOWN) ||
+                   format == StreamFormat(StreamFormat::Type::Unknown) ||
                    (event.next &&
                    !event.next->getAdaptationSet()->isBitSwitchable()))
                     needrestart = true;

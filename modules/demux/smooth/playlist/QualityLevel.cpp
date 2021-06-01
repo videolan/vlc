@@ -50,7 +50,7 @@ QualityLevel::~QualityLevel ()
 
 StreamFormat QualityLevel::getStreamFormat() const
 {
-    return StreamFormat(StreamFormat::MP4);
+    return StreamFormat(StreamFormat::Type::MP4);
 }
 
 CodecDescription * QualityLevel::makeCodecDescription(const std::string &) const
