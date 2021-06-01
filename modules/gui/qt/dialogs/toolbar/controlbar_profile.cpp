@@ -17,6 +17,8 @@
  *****************************************************************************/
 #include "controlbar_profile.hpp"
 
+#include <QMetaMethod>
+
 #include "player/control_list_model.hpp"
 #include "player/player_controlbar_model.hpp"
 
@@ -198,7 +200,7 @@ void ControlbarProfile::generateLinearControlList()
         return;
 
     // Don't bother if there is no receiver (connection):
-    if (receivers(SIGNAL(controlListChanged (const QVector<int>&) )) <= 0)
+    if (! isSignalConnected(QMetaMethod::fromSignal(&ControlbarProfile::controlListChanged)) )
         return;
 
     QVector<int> linearControls;
