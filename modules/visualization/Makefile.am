@@ -1,5 +1,7 @@
 visudir = $(pluginsdir)/visualization
 visu_LTLIBRARIES =
+visu_RPATH =
+visu_RPATH += -rpath '$(visudir)'
 
 libglspectrum_plugin_la_SOURCES = \
 	visualization/glspectrum.c \
@@ -13,14 +15,14 @@ endif
 
 libgoom_plugin_la_SOURCES = visualization/goom.c
 libgoom_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(GOOM_CFLAGS)
-libgoom_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(visudir)'
+libgoom_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(visu_RPATH)
 libgoom_plugin_la_LIBADD = $(GOOM_LIBS) $(LIBM)
 EXTRA_LTLIBRARIES += libgoom_plugin.la
 visu_LTLIBRARIES += $(LTLIBgoom)
 
 libprojectm_plugin_la_SOURCES = visualization/projectm.cpp
 libprojectm_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(PROJECTM_CFLAGS)
-libprojectm_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(visudir)'
+libprojectm_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(visu_RPATH)
 libprojectm_plugin_la_LIBADD = $(PROJECTM_LIBS)
 EXTRA_LTLIBRARIES += libprojectm_plugin.la
 visu_LTLIBRARIES += $(LTLIBprojectm)
@@ -36,7 +38,7 @@ visu_LTLIBRARIES += libvisual_plugin.la
 
 libvsxu_plugin_la_SOURCES = visualization/vsxu.cpp visualization/cyclic_buffer.h
 libvsxu_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(VSXU_CFLAGS)
-libvsxu_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(visudir)'
+libvsxu_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(visu_RPATH)
 libvsxu_plugin_la_LIBADD = $(VSXU_LIBS) $(LIBM)
 EXTRA_LTLIBRARIES += libvsxu_plugin.la
 visu_LTLIBRARIES += $(LTLIBvsxu)

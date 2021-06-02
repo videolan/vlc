@@ -1,5 +1,7 @@
 sddir = $(pluginsdir)/services_discovery
 sd_LTLIBRARIES =
+sd_RPATH =
+sd_RPATH += -rpath '$(sddir)'
 
 libpodcast_plugin_la_SOURCES = services_discovery/podcast.c
 sd_LTLIBRARIES += libpodcast_plugin.la
@@ -11,14 +13,14 @@ sd_LTLIBRARIES += libsap_plugin.la
 
 libavahi_plugin_la_SOURCES = services_discovery/avahi.c
 libavahi_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVAHI_CFLAGS)
-libavahi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)'
+libavahi_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(sd_RPATH)
 libavahi_plugin_la_LIBADD = $(AVAHI_LIBS)
 EXTRA_LTLIBRARIES += libavahi_plugin.la
 sd_LTLIBRARIES += $(LTLIBavahi)
 
 libmtp_plugin_la_SOURCES = services_discovery/mtp.c
 libmtp_plugin_la_CFLAGS = $(AM_CFLAGS) $(MTP_CFLAGS)
-libmtp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)'
+libmtp_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(sd_RPATH)
 libmtp_plugin_la_LIBADD = $(MTP_LIBS)
 EXTRA_LTLIBRARIES += libmtp_plugin.la
 sd_LTLIBRARIES += $(LTLIBmtp)
@@ -33,7 +35,7 @@ libupnp_plugin_la_SOURCES = services_discovery/upnp.cpp services_discovery/upnp.
 			    stream_out/dlna/dlna.hpp \
 			    stream_out/dlna/dlna.cpp
 libupnp_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(UPNP_CFLAGS)
-libupnp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)'
+libupnp_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(sd_RPATH)
 libupnp_plugin_la_LIBADD = $(UPNP_LIBS)
 EXTRA_LTLIBRARIES += libupnp_plugin.la
 sd_LTLIBRARIES += $(LTLIBupnp)
@@ -55,7 +57,7 @@ if HAVE_ALSA
 libudev_plugin_la_CFLAGS += $(ALSA_CFLAGS) -DHAVE_ALSA
 libudev_plugin_la_LIBADD += $(ALSA_LIBS)
 endif
-libudev_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)'
+libudev_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(sd_RPATH)
 EXTRA_LTLIBRARIES += libudev_plugin.la
 sd_LTLIBRARIES += $(LTLIBudev)
 
@@ -79,13 +81,13 @@ endif
 libmicrodns_plugin_la_SOURCES = services_discovery/microdns.c
 libmicrodns_plugin_la_CFLAGS = $(AM_CFLAGS) $(MICRODNS_CFLAGS)
 libmicrodns_plugin_la_LIBADD = $(SOCKET_LIBS) $(MICRODNS_LIBS)
-libmicrodns_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)'
 sd_LTLIBRARIES += $(LTLIBmicrodns)
+libmicrodns_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(sd_RPATH)
 EXTRA_LTLIBRARIES += libmicrodns_plugin.la
 
 libbonjour_plugin_la_SOURCES = services_discovery/bonjour.m
 libbonjour_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
-libbonjour_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)' -Wl,-framework,Foundation
+libbonjour_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(sd_RPATH) -Wl,-framework,Foundation
 if HAVE_DARWIN
 sd_LTLIBRARIES += libbonjour_plugin.la
 endif

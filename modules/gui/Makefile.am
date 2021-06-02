@@ -1,5 +1,7 @@
 guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
+gui_RPATH =
+gui_RPATH += -rpath '$(guidir)'
 
 libncurses_plugin_la_SOURCES = gui/ncurses.c
 libncurses_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(NCURSES_CFLAGS)
@@ -16,7 +18,7 @@ libminimal_macosx_plugin_la_SOURCES = \
 	gui/minimal_macosx/VLCMinimalVoutWindow.h gui/minimal_macosx/VLCMinimalVoutWindow.m \
 	gui/minimal_macosx/macosx.c
 libminimal_macosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc -fobjc-exceptions
-libminimal_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' -Wl,-framework,Cocoa
+libminimal_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(gui_RPATH) -Wl,-framework,Cocoa
 EXTRA_LTLIBRARIES += libminimal_macosx_plugin.la
 gui_LTLIBRARIES += $(LTLIBminimal_macosx)
 

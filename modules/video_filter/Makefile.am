@@ -1,4 +1,6 @@
 video_filterdir = $(pluginsdir)/video_filter
+video_filter_RPATH =
+video_filter_RPATH += -rpath '$(video_filterdir)'
 
 noinst_HEADERS += video_filter/filter_picture.h
 
@@ -53,7 +55,7 @@ libripple_plugin_la_SOURCES = video_filter/ripple.c
 libripple_plugin_la_LIBADD = $(LIBM)
 librotate_plugin_la_SOURCES = video_filter/rotate.c
 librotate_plugin_la_LIBADD = libvlc_motion.la $(LIBM)
-librotate_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
+librotate_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(video_filter_RPATH)
 if HAVE_DARWIN
 if !HAVE_TVOS
 librotate_plugin_la_LDFLAGS += -Wl,-framework,IOKit,-framework,CoreFoundation
@@ -111,7 +113,7 @@ video_filter_LTLIBRARIES = \
 
 # macOS / iOS hardware video filters
 libci_filters_plugin_la_SOURCES = video_filter/ci_filters.m codec/vt_utils.c codec/vt_utils.h
-libci_filters_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)' \
+libci_filters_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(video_filter_RPATH) \
 	-Wl,-framework,Foundation -Wl,-framework,CoreGraphics -Wl,-framework,CoreImage \
 	-Wl,-framework,CoreVideo
 if HAVE_OSX
@@ -218,15 +220,15 @@ video_filter_LTLIBRARIES += libdeinterlace_plugin.la
 libopencv_wrapper_plugin_la_SOURCES = video_filter/opencv_wrapper.c
 libopencv_wrapper_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
 libopencv_wrapper_plugin_la_LIBADD = $(OPENCV_LIBS)
-libopencv_wrapper_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
 video_filter_LTLIBRARIES += $(LTLIBopencv_wrapper)
+libopencv_wrapper_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(video_filter_RPATH)
 EXTRA_LTLIBRARIES += libopencv_wrapper_plugin.la
 
 libpostproc_plugin_la_SOURCES = video_filter/postproc.c
 libpostproc_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(POSTPROC_CFLAGS) $(AVUTIL_CFLAGS)
 libpostproc_plugin_la_LIBADD = $(LIBM) $(POSTPROC_LIBS) $(AVUTIL_LIBS)
-libpostproc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
 video_filter_LTLIBRARIES += $(LTLIBpostproc)
+libpostproc_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(video_filter_RPATH)
 EXTRA_LTLIBRARIES += libpostproc_plugin.la
 
 # misc
@@ -236,6 +238,6 @@ video_filter_LTLIBRARIES += libblend_plugin.la
 libopencv_example_plugin_la_SOURCES = video_filter/opencv_example.cpp video_filter/filter_event_info.h
 libopencv_example_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OPENCV_CFLAGS)
 libopencv_example_plugin_la_LIBADD = $(OPENCV_LIBS)
-libopencv_example_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
 video_filter_LTLIBRARIES += $(LTLIBopencv_example)
+libopencv_example_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(video_filter_RPATH)
 EXTRA_LTLIBRARIES += libopencv_example_plugin.la

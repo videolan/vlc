@@ -1,4 +1,6 @@
 muxdir = $(pluginsdir)/mux
+mux_RPATH =
+mux_RPATH += -rpath '$(muxdir)'
 
 extradata_builder_SOURCES = mux/extradata.c mux/extradata.h \
                             packetizer/av1_obu.c
@@ -34,7 +36,7 @@ mux_LTLIBRARIES = \
 
 libmux_ogg_plugin_la_SOURCES = mux/ogg.c
 libmux_ogg_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OGG_CFLAGS)
-libmux_ogg_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(muxdir)'
+libmux_ogg_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(mux_RPATH)
 libmux_ogg_plugin_la_LIBADD = $(OGG_LIBS)
 EXTRA_LTLIBRARIES += libmux_ogg_plugin.la
 mux_LTLIBRARIES += $(LTLIBmux_ogg)

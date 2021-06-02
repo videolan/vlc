@@ -1,5 +1,7 @@
 demuxdir = $(pluginsdir)/demux
 demux_LTLIBRARIES =
+demux_RPATH =
+demux_RPATH += -rpath '$(demuxdir)'
 
 libxiph_metadata_la_SOURCES = demux/xiph_metadata.h demux/xiph_metadata.c
 libxiph_metadata_la_LDFLAGS = -static
@@ -15,7 +17,7 @@ libogg_plugin_la_SOURCES = demux/ogg.c demux/ogg.h \
                            demux/ogg_granule.c demux/ogg_granule.h \
                            demux/xiph.h demux/opus.h
 libogg_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBVORBIS_CFLAGS) $(OGG_CFLAGS)
-libogg_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
+libogg_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(demux_RPATH)
 libogg_plugin_la_LIBADD = $(LIBVORBIS_LIBS) $(OGG_LIBS) libxiph_metadata.la
 EXTRA_LTLIBRARIES += libogg_plugin.la
 demux_LTLIBRARIES += $(LTLIBogg)
@@ -50,7 +52,7 @@ demux_LTLIBRARIES += libps_plugin.la
 
 libmod_plugin_la_SOURCES = demux/mod.c
 libmod_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_mod)
-libmod_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
+libmod_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(demux_RPATH)
 libmod_plugin_la_LIBADD = $(LIBS_mod)
 EXTRA_LTLIBRARIES += libmod_plugin.la
 demux_LTLIBRARIES += $(LTLIBmod)
@@ -88,7 +90,7 @@ libnuv_plugin_la_LIBADD = $(LIBM)
 demux_LTLIBRARIES += libnuv_plugin.la
 
 libmpc_plugin_la_SOURCES = demux/mpc.c
-libmpc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
+libmpc_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(demux_RPATH)
 libmpc_plugin_la_LIBADD = $(LIBS_mpc) $(LIBM)
 EXTRA_LTLIBRARIES += libmpc_plugin.la
 demux_LTLIBRARIES += $(LTLIBmpc)
@@ -110,14 +112,14 @@ libdmxmus_plugin_la_SOURCES = demux/dmxmus.c
 demux_LTLIBRARIES += libdmxmus_plugin.la
 
 libgme_plugin_la_SOURCES = demux/gme.c
-libgme_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
+libgme_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(demux_RPATH)
 libgme_plugin_la_LIBADD = $(LIBS_gme)
 EXTRA_LTLIBRARIES += libgme_plugin.la
 demux_LTLIBRARIES += $(LTLIBgme)
 
 libsid_plugin_la_SOURCES = demux/sid.cpp
 libsid_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_sid)
-libsid_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
+libsid_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(demux_RPATH)
 libsid_plugin_la_LIBADD = $(LIBS_sid)
 EXTRA_LTLIBRARIES += libsid_plugin.la
 demux_LTLIBRARIES += $(LTLIBsid)
@@ -200,7 +202,7 @@ libmkv_plugin_la_SOURCES = \
 	demux/windows_audio_commons.h
 libmkv_plugin_la_SOURCES += packetizer/dts_header.h packetizer/dts_header.c
 libmkv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CFLAGS_mkv)
-libmkv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
+libmkv_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(demux_RPATH)
 libmkv_plugin_la_LIBADD = $(LIBS_mkv)
 if HAVE_ZLIB
 libmkv_plugin_la_LIBADD += -lz
@@ -537,7 +539,7 @@ libnoseek_plugin_la_SOURCES = demux/filter/noseek.c
 demux_LTLIBRARIES += libnoseek_plugin.la
 
 libdemux_mock_plugin_la_SOURCES = demux/mock.c
-libdemux_mock_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
+libdemux_mock_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(demux_RPATH)
 libdemux_mock_plugin_la_LIBADD = $(LIBM)
 noinst_LTLIBRARIES += libdemux_mock_plugin.la
 

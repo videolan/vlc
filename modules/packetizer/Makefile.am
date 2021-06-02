@@ -1,4 +1,6 @@
 packetizerdir = $(pluginsdir)/packetizer
+packetizer_RPATH =
+packetizer_RPATH += -rpath '$(packetizerdir)'
 
 libpacketizer_av1_plugin_la_SOURCES = packetizer/av1.c \
                                       packetizer/av1.h \

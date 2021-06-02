@@ -1,4 +1,6 @@
 soutdir = $(pluginsdir)/stream_out
+sout_RPATH =
+sout_RPATH += -rpath '$(soutdir)'
 
 libstream_out_dummy_plugin_la_SOURCES = stream_out/dummy.c
 libstream_out_cycle_plugin_la_SOURCES = stream_out/cycle.c
@@ -94,7 +96,7 @@ endif
 # Chromaprint plugin
 libstream_out_chromaprint_plugin_la_SOURCES = stream_out/chromaprint.c stream_out/chromaprint_data.h dummy.cpp
 libstream_out_chromaprint_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CHROMAPRINT_CFLAGS)
-libstream_out_chromaprint_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(soutdir)'
+libstream_out_chromaprint_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(sout_RPATH)
 libstream_out_chromaprint_plugin_la_LIBADD = $(CHROMAPRINT_LIBS)
 EXTRA_LTLIBRARIES += libstream_out_chromaprint_plugin.la
 sout_LTLIBRARIES += $(LTLIBstream_out_chromaprint)
