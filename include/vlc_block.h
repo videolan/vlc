@@ -438,7 +438,7 @@ static inline block_t *block_ChainGather( block_t *p_list )
  * @{
  */
 
-#include <vlc_queue.h>
+#include "vlc_queue.h"
 
 /**
  * Creates a thread-safe FIFO queue of blocks.

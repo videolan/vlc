@@ -39,7 +39,7 @@
 // Ensure we can use vlc_sem_wait_i11e. We can't declare different versions
 // of the semaphore helper based on vlc_interrupt inclusion, as it would
 // violate ODR
-# include <vlc_interrupt.h>
+# include "vlc_interrupt.h"
 #endif
 
 namespace vlc

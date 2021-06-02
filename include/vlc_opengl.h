@@ -24,6 +24,8 @@
 #ifndef VLC_GL_H
 #define VLC_GL_H 1
 
+#include "vlc_es.h"
+
 /**
  * \file
  * This file defines GL structures and functions.

@@ -32,8 +32,8 @@
  * HTTP clients.
  */
 
-#include <vlc_url.h>
-#include <vlc_arrays.h>
+#include "vlc_url.h"
+#include "vlc_arrays.h"
 
 /* RFC 2617: Basic and Digest Access Authentication */
 typedef struct vlc_http_auth_t

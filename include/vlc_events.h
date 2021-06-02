@@ -24,8 +24,8 @@
 #ifndef VLC_EVENTS_H
 # define VLC_EVENTS_H
 
-#include <vlc_arrays.h>
-#include <vlc_meta.h>
+#include "vlc_arrays.h"
+#include "vlc_meta.h"
 
 /**
  * \file

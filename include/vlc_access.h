@@ -23,7 +23,7 @@
 #ifndef VLC_ACCESS_H
 #define VLC_ACCESS_H 1
 
-#include <vlc_stream.h>
+#include "vlc_stream.h"
 
 /**
  * \defgroup access Access

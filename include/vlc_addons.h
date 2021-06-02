@@ -21,7 +21,7 @@
 #ifndef VLC_ADDONS_H
 #define VLC_ADDONS_H 1
 
-#include <vlc_arrays.h>
+#include "vlc_arrays.h"
 
 # ifdef __cplusplus
 extern "C" {

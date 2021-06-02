@@ -24,7 +24,7 @@
 #define VLC_AOUT_H 1
 
 #include <assert.h>
-#include <vlc_list.h>
+#include "vlc_list.h"
 
 /**
  * \defgroup audio_output Audio output
@@ -118,7 +118,7 @@
 #define A52_FRAME_NB 1536
 
 /* FIXME to remove once aout.h is cleaned a bit more */
-#include <vlc_block.h>
+#include "vlc_block.h"
 
 struct vlc_audio_output_events {
     void (*timing_report)(audio_output_t *, vlc_tick_t system_now, vlc_tick_t pts);

@@ -23,7 +23,7 @@
 #ifndef VLC_STREAM_H
 #define VLC_STREAM_H 1
 
-#include <vlc_block.h>
+#include "vlc_block.h"
 
 # ifdef __cplusplus
 extern "C" {

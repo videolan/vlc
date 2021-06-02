@@ -20,7 +20,7 @@
 
 #ifndef VLC_INTERRUPT_H
 # define VLC_INTERRUPT_H 1
-# include <vlc_threads.h>
+# include "vlc_threads.h"
 # ifndef _WIN32
 #  include <sys/socket.h> /* socklen_t */
 # else

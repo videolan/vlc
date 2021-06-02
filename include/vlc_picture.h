@@ -26,14 +26,14 @@
 #define VLC_PICTURE_H 1
 
 #include <assert.h>
-#include <vlc_atomic.h>
+#include "vlc_atomic.h"
 
 /**
  * \file
  * This file defines picture structures and functions in vlc
  */
 
-#include <vlc_es.h>
+#include "vlc_es.h"
 
 /** Description of a planar graphic field */
 typedef struct plane_t

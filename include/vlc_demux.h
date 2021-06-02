@@ -26,9 +26,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <vlc_es.h>
-#include <vlc_stream.h>
-#include <vlc_es_out.h>
+#include "vlc_es.h"
+#include "vlc_stream.h"
+#include "vlc_es_out.h"
 
 /**
  * \defgroup demux Demultiplexer

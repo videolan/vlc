@@ -35,7 +35,7 @@ using std::atomic_uintptr_t;
 using std::memory_order_relaxed;
 using std::memory_order_acq_rel;
 #endif
-# include <vlc_common.h>
+# include "vlc_common.h"
 
 typedef struct vlc_atomic_rc_t {
     atomic_uintptr_t refs;

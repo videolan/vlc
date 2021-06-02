@@ -21,10 +21,10 @@
 #ifndef VLC_FINGERPRINTER_H
 # define VLC_FINGERPRINTER_H
 
-#include <vlc_common.h>
-#include <vlc_meta.h>
-#include <vlc_input_item.h>
-#include <vlc_arrays.h>
+#include "vlc_common.h"
+#include "vlc_meta.h"
+#include "vlc_input_item.h"
+#include "vlc_arrays.h"
 
 # ifdef __cplusplus
 extern "C" {

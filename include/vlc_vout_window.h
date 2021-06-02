@@ -25,7 +25,7 @@
 #define VLC_VOUT_WINDOW_H 1
 
 #include <stdarg.h>
-#include <vlc_common.h>
+#include "vlc_common.h"
 
 /**
  * \defgroup video_window Video window

@@ -28,7 +28,7 @@
  * This file defines picture pool structures and functions in vlc
  */
 
-#include <vlc_picture.h>
+#include "vlc_picture.h"
 
 /**
  * Picture pool handle
@@ -137,4 +137,3 @@ unsigned picture_pool_GetSize(const picture_pool_t *);
 
 
 #endif /* VLC_PICTURE_POOL_H */
-

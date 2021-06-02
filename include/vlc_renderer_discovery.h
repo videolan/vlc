@@ -21,9 +21,9 @@
 #ifndef VLC_RENDERER_DISCOVERY_H
 #define VLC_RENDERER_DISCOVERY_H 1
 
-#include <vlc_input.h>
-#include <vlc_probe.h>
-#include <vlc_url.h>
+#include "vlc_input.h"
+#include "vlc_probe.h"
+#include "vlc_url.h"
 
 /**
  * @defgroup vlc_renderer VLC renderer discovery

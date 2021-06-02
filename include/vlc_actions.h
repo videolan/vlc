@@ -23,7 +23,7 @@
 #ifndef VLC_ACTIONS_H
 #define VLC_ACTIONS_H 1
 
-# include <vlc_mouse.h>
+# include "vlc_mouse.h"
 
 /* Called from src/libvlc.c */
 int

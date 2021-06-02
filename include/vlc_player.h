@@ -21,8 +21,8 @@
 #ifndef VLC_PLAYER_H
 #define VLC_PLAYER_H 1
 
-#include <vlc_input.h>
-#include <vlc_aout.h>
+#include "vlc_input.h"
+#include "vlc_aout.h"
 
 /**
  * @defgroup vlc_player Player
