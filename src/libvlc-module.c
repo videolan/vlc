@@ -706,7 +706,20 @@ static const char *const ppsz_prefres[] = {
     "the form \"{name=bookmark-name,time=optional-time-offset," \
     "bytes=optional-byte-offset},{...}\"")
 
-#define RESTORE_PLAYBACK_POS_TEXT N_("Continue playback?")
+#define RESTORE_PLAYBACK_POS_TEXT N_("Continue playback")
+#define RESTORE_PLAYBACK_POS_LONGTEXT N_("Should the playback resume where " \
+    "it was left off?")
+
+static const int pi_restore_playback_values[] = {
+    VLC_PLAYER_RESTORE_PLAYBACK_POS_NEVER,
+    VLC_PLAYER_RESTORE_PLAYBACK_POS_ASK,
+    VLC_PLAYER_RESTORE_PLAYBACK_POS_ALWAYS
+};
+static const char* const ppsz_restore_playback_desc[] = {
+    N_( "Never resume playback where it was left off" ),
+    N_( "Ask when the playback starts" ),
+    N_( "Always resume playback where it was left off" ),
+};
 
 #define RESTORE_PLAYBACK_STATE_TEXT N_("Resume last playback states")
 #define RESTORE_PLAYBACK_STATE_LONGTEXT N_("This will resume the last playback " \
@@ -1851,7 +1864,9 @@ vlc_module_begin ()
         change_safe ()
 
     add_integer( "restore-playback-pos", VLC_PLAYER_RESTORE_PLAYBACK_POS_ASK,
-                 RESTORE_PLAYBACK_POS_TEXT, NULL, false )
+                 RESTORE_PLAYBACK_POS_TEXT, RESTORE_PLAYBACK_POS_LONGTEXT, false )
+        change_integer_list( pi_restore_playback_values, ppsz_restore_playback_desc );
+
     add_bool( "restore-playback-states", false,
                  RESTORE_PLAYBACK_STATE_TEXT, RESTORE_PLAYBACK_STATE_LONGTEXT, false )
 
