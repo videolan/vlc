@@ -1,0 +1,47 @@
+From 130296d079a65b26b15acb9d0a69ef9497fad701 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Wed, 2 Jun 2021 09:49:24 +0300
+Subject: [PATCH 4/4] Don't treat -Wunused as an error
+
+This is a fragile warning - newer compilers can add warnings to cases
+that weren't there before.
+
+Clang 13 got support for the -Wunused-but-set-variable warning, which
+gets enabled implicitly via -Wunused, and it warns on one variable
+like this:
+
+hb-subset-cff1.cc:405:33: error: variable 'supp_size' set but not used [-Werror,
+-Wunused-but-set-variable]
+    unsigned int  size0, size1, supp_size;
+                                ^
+---
+ src/hb.hh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/hb.hh b/src/hb.hh
+index e46aa0b6e..b0beaaa81 100644
+--- a/src/hb.hh
++++ b/src/hb.hh
+@@ -86,10 +86,8 @@
+ #pragma GCC diagnostic error   "-Wswitch-enum"
+ #pragma GCC diagnostic error   "-Wtautological-overlap-compare"
+ #pragma GCC diagnostic error   "-Wunneeded-internal-declaration"
+-#pragma GCC diagnostic error   "-Wunused"
+ #pragma GCC diagnostic error   "-Wunused-local-typedefs"
+ #pragma GCC diagnostic error   "-Wunused-value"
+-#pragma GCC diagnostic error   "-Wunused-variable"
+ #pragma GCC diagnostic error   "-Wvla"
+ #pragma GCC diagnostic error   "-Wwrite-strings"
+ #endif
+@@ -107,6 +105,8 @@
+ #pragma GCC diagnostic warning "-Wmaybe-uninitialized"
+ #pragma GCC diagnostic warning "-Wmissing-format-attribute"
+ #pragma GCC diagnostic warning "-Wundef"
++#pragma GCC diagnostic warning "-Wunused"
++#pragma GCC diagnostic warning "-Wunused-variable"
+ #endif
+ 
+ /* Ignored currently, but should be fixed at some point. */
+-- 
+2.25.1
+
