@@ -36,8 +36,9 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input, bool force_pos)
     if (force_pos)
         restore_pos = VLC_PLAYER_RESTORE_PLAYBACK_POS_ALWAYS;
     else
-        restore_pos = var_InheritInteger(player, "restore-playback-pos");
-    bool restore_states = var_InheritBool(player, "restore-playback-states");
+        restore_pos = var_InheritInteger(input->thread, "restore-playback-pos");
+
+    const bool restore_states = var_InheritBool(input->thread, "restore-playback-states");
 
     vlc_medialibrary_t* ml = vlc_ml_instance_get(input->player);
     if (!ml)
