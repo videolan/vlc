@@ -241,19 +241,11 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define FULLSCREEN_CONTROL_PIXELS N_( "Fullscreen controller mouse sensitivity" )
 
-#define CONTINUE_PLAYBACK_TEXT N_("Continue playback?")
-
 static const int i_notification_list[] =
     { NOTIFICATION_NEVER, NOTIFICATION_MINIMIZED, NOTIFICATION_ALWAYS };
 
 static const char *const psz_notification_list_text[] =
     { N_("Never"), N_("When minimized"), N_("Always") };
-
-static const int i_continue_list[] =
-    { 0, 1, 2 };
-
-static const char *const psz_continue_list_text[] =
-    { N_("Never"), N_("Ask"), N_("Always") };
 
 static const int i_raise_list[] =
     { MainInterface::RAISE_NEVER, MainInterface::RAISE_VIDEO, \
@@ -310,8 +302,7 @@ vlc_module_begin ()
               nullptr, false )
     add_string( "qt-recentplay-filter", "",
                 RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT, false )
-    add_integer( "qt-continue", 1, CONTINUE_PLAYBACK_TEXT, nullptr, false )
-            change_integer_list(i_continue_list, psz_continue_list_text )
+    add_obsolete_integer( "qt-continue" )
 
 #ifdef UPDATE_CHECK
     add_bool( "qt-updates-notif", true, UPDATER_TEXT,
