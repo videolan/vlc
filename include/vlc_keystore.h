@@ -21,7 +21,7 @@
 #ifndef VLC_KEYSTORE_H
 # define VLC_KEYSTORE_H
 
-#include <vlc_common.h>
+#include "vlc_common.h"
 
 typedef struct vlc_keystore vlc_keystore;
 typedef struct vlc_keystore_entry vlc_keystore_entry;

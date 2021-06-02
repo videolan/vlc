@@ -1001,7 +1001,7 @@ static inline bool mul_overflow(unsigned long long a, unsigned long long b,
 
 #define EMPTY_STR(str) (!str || !*str)
 
-#include <vlc_arrays.h>
+#include "vlc_arrays.h"
 
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
  * MSB, and should be used for both network communications and files. */

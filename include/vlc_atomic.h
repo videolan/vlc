@@ -35,7 +35,7 @@ using std::atomic_uintptr_t;
 using std::memory_order_relaxed;
 using std::memory_order_acq_rel;
 #endif
-# include <vlc_common.h>
+# include "vlc_common.h"
 
 #define VLC_STATIC_RC { \
     .refs = ATOMIC_VAR_INIT(0) \

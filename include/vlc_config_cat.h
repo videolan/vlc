@@ -24,7 +24,7 @@
 #ifndef VLC_CONFIG_CAT_H
 #define VLC_CONFIG_CAT_H
 
-# include <vlc_plugin.h>
+# include "vlc_plugin.h"
 
 #define MAIN_TITLE N_( "VLC preferences" )
 

@@ -37,7 +37,7 @@
  * Transport layer functions
  */
 
-# include <vlc_network.h>
+# include "vlc_network.h"
 
 /**
  * Transport layer socket.

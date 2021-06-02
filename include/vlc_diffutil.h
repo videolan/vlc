@@ -20,8 +20,8 @@
 #ifndef VLC_DIFFUTIL_H
 #define VLC_DIFFUTIL_H
 
-#include <vlc_common.h>
-#include <vlc_vector.h>
+#include "vlc_common.h"
+#include "vlc_vector.h"
 
 /**
  * this struture defines callback to access and compare elements from

@@ -25,9 +25,9 @@
 #ifndef VLC_FILTER_H
 #define VLC_FILTER_H 1
 
-#include <vlc_es.h>
-#include <vlc_picture.h>
-#include <vlc_codec.h>
+#include "vlc_es.h"
+#include "vlc_picture.h"
+#include "vlc_codec.h"
 
 typedef struct vlc_video_context  vlc_video_context;
 struct vlc_audio_loudness;

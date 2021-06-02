@@ -23,8 +23,8 @@
 #ifndef VLC_SERVICES_DISCOVERY_H_
 #define VLC_SERVICES_DISCOVERY_H_
 
-#include <vlc_input.h>
-#include <vlc_probe.h>
+#include "vlc_input.h"
+#include "vlc_probe.h"
 
 /**
  * \file

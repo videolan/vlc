@@ -24,11 +24,11 @@
 #define VLC_AOUT_H 1
 
 #include <assert.h>
-#include <vlc_list.h>
-#include <vlc_es.h>
 
 /* FIXME to remove once aout.h is cleaned a bit more */
-#include <vlc_block.h>
+#include "vlc_block.h"
+#include "vlc_es.h"
+#include "vlc_list.h"
 
 /**
  * \defgroup audio_output Audio output

@@ -21,7 +21,7 @@
 #ifndef VLC_PLAYLIST_EXPORT_H
 #define VLC_PLAYLIST_EXPORT_H
 
-#include <vlc_playlist.h>
+#include "vlc_playlist.h"
 
 /** API for playlist export modules */
 

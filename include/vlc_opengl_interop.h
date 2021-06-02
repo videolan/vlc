@@ -21,8 +21,8 @@
 #ifndef VLC_GL_INTEROP_H
 #define VLC_GL_INTEROP_H 1
 
-#include <vlc_es.h>
-#include <vlc_picture.h>
+#include "vlc_es.h"
+#include "vlc_picture.h"
 
 struct vlc_gl_interop;
 struct vlc_video_context;

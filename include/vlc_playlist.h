@@ -21,7 +21,7 @@
 #ifndef VLC_PLAYLIST_NEW_H
 #define VLC_PLAYLIST_NEW_H
 
-#include <vlc_common.h>
+#include "vlc_common.h"
 
 # ifdef __cplusplus
 extern "C" {

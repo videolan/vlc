@@ -29,7 +29,7 @@
  * @{
  */
 
-#include <vlc_subpicture.h>
+#include "vlc_subpicture.h"
 
 typedef struct vlc_input_decoder_t vlc_input_decoder_t;
 

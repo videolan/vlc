@@ -21,7 +21,7 @@
 #ifndef VLC_VIEWPOINT_H_
 #define VLC_VIEWPOINT_H_ 1
 
-#include <vlc_common.h>
+#include "vlc_common.h"
 
 #include <math.h>
 

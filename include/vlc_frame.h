@@ -555,7 +555,7 @@ static inline vlc_frame_t *vlc_frame_ChainGather( vlc_frame_t *p_list )
  * @{
  */
 
-#include <vlc_queue.h>
+#include "vlc_queue.h"
 
 /**
  * Creates a thread-safe FIFO queue of blocks.

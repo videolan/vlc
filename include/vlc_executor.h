@@ -21,8 +21,8 @@
 #ifndef VLC_EXECUTOR_H
 #define VLC_EXECUTOR_H
 
-#include <vlc_common.h>
-#include <vlc_list.h>
+#include "vlc_common.h"
+#include "vlc_list.h"
 
 # ifdef __cplusplus
 extern "C" {

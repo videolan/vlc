@@ -23,7 +23,7 @@
 #ifndef VLC_BLOCK_H
 #define VLC_BLOCK_H 1
 
-#include <vlc_frame.h>
+#include "vlc_frame.h"
 
 /**
  * \defgroup block

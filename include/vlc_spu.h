@@ -25,7 +25,7 @@
 #ifndef VLC_SPU_H
 #define VLC_SPU_H 1
 
-#include <vlc_subpicture.h>
+#include "vlc_subpicture.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,7 +56,7 @@ VLC_API void spu_Destroy( spu_t * );
 
 /**
  * This function sends a subpicture to the spu_t core.
- * 
+ *
  * You cannot use the provided subpicture anymore. The spu_t core
  * will destroy it at its convenience.
  */
@@ -105,4 +105,3 @@ VLC_API void spu_ChangeFilters( spu_t *, const char * );
 #endif
 
 #endif /* VLC_SPU_H */
-

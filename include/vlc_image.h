@@ -23,8 +23,8 @@
 #ifndef VLC_IMAGE_H
 #define VLC_IMAGE_H 1
 
-# include <vlc_picture.h>
-# include <vlc_picture_fifo.h>
+# include "vlc_picture.h"
+# include "vlc_picture_fifo.h"
 
 /**
  * \file

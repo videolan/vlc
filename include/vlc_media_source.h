@@ -21,9 +21,9 @@
 #ifndef VLC_MEDIA_SOURCE_H
 #define VLC_MEDIA_SOURCE_H
 
-#include <vlc_common.h>
-#include <vlc_input_item.h>
-#include <vlc_services_discovery.h>
+#include "vlc_common.h"
+#include "vlc_input_item.h"
+#include "vlc_services_discovery.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -358,4 +358,3 @@ vlc_media_source_meta_list_Delete(vlc_media_source_meta_list_t *);
 #endif
 
 #endif
-

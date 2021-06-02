@@ -23,10 +23,10 @@
 #ifndef VLC_VIDEO_SPLITTER_H
 #define VLC_VIDEO_SPLITTER_H 1
 
-#include <vlc_es.h>
-#include <vlc_picture.h>
-#include <vlc_mouse.h>
-#include <vlc_vout_display.h>
+#include "vlc_es.h"
+#include "vlc_picture.h"
+#include "vlc_mouse.h"
+#include "vlc_vout_display.h"
 
 /**
  * \file
@@ -138,4 +138,3 @@ static inline int video_splitter_Mouse(video_splitter_t *splitter, int index,
 }
 
 #endif /* VLC_VIDEO_SPLITTER_H */
-
