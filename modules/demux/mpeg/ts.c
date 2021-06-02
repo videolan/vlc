@@ -2174,7 +2174,7 @@ int ProbeStart( demux_t *p_demux, int i_program )
 
     do
     {
-        i_pos = p_sys->i_packet_size * i_probe_count;
+        i_pos = (int64_t)p_sys->i_packet_size * i_probe_count;
         i_pos = __MIN( i_pos, i_stream_size );
 
         if( vlc_stream_Seek( p_sys->stream, i_pos ) )
