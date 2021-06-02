@@ -1,4 +1,6 @@
 keystoredir = $(pluginsdir)/keystore
+keystore_RPATH =
+keystore_RPATH += -rpath '$(keystoredir)'
 
 libmemory_keystore_plugin_la_SOURCES = keystore/memory.c \
 	keystore/list_util.c keystore/list_util.h
@@ -19,17 +21,17 @@ keystore_LTLIBRARIES += libfile_keystore_plugin.la
 
 libsecret_plugin_la_SOURCES = keystore/secret.c
 libsecret_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SECRET_CFLAGS)
-libsecret_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(keystoredir)'
+libsecret_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(keystore_RPATH)
 libsecret_plugin_la_LIBADD = $(SECRET_LIBS)
 
 libkwallet_plugin_la_SOURCES = keystore/kwallet.c
 libkwallet_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
-libkwallet_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(keystoredir)'
+libkwallet_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(keystore_RPATH)
 libkwallet_plugin_la_LIBADD = $(DBUS_LIBS) $(LIBM)
 
 libkeychain_plugin_la_SOURCES = keystore/keychain.m keystore/list_util.c keystore/list_util.h
 libkeychain_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
-libkeychain_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(keystoredir)' -Wl,-framework,Foundation -Wl,-framework,Security
+libkeychain_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(keystore_RPATH) -Wl,-framework,Foundation -Wl,-framework,Security
 
 if HAVE_DARWIN
 keystore_LTLIBRARIES += libkeychain_plugin.la

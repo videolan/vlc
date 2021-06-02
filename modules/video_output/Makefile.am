@@ -1,5 +1,8 @@
 voutdir = $(pluginsdir)/video_output
 vout_LTLIBRARIES =
+vout_RPATH =
+vout_RPATH += -rpath '$(voutdir)'
+
 # Install the pkglib/pkglibexec first before relinking the modules.
 # This ensures libtool re-linking is not racy.
 installvoutLTLIBRARIES = install-voutLTLIBRARIES
@@ -40,7 +43,7 @@ endif
 libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.m \
 	video_output/opengl/interop.h
 libglinterop_cvpx_plugin_la_LIBADD = libvlc_vtutils.la
-libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
+libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,Foundation,-framework,CoreVideo,-framework,IOSurface,-framework,Metal
 libglinterop_cvpx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 if HAVE_OSX
@@ -65,7 +68,7 @@ libvout_macosx_plugin_la_SOURCES = video_output/macosx.m \
 libvout_macosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libvout_macosx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DHAVE_GL_CORE_SYMBOLS -DGL_SILENCE_DEPRECATION
 libvout_macosx_plugin_la_LIBADD = libvlc_opengl.la
-libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
+libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,OpenGL,-framework,Cocoa
 
 libcaopengllayer_plugin_la_SOURCES = video_output/caopengllayer.m \
@@ -73,7 +76,7 @@ libcaopengllayer_plugin_la_SOURCES = video_output/caopengllayer.m \
 libcaopengllayer_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libcaopengllayer_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)  -DHAVE_GL_CORE_SYMBOLS -DGL_SILENCE_DEPRECATION
 libcaopengllayer_plugin_la_LIBADD = libvlc_opengl.la
-libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
+libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
 
 vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la libwindow_macosx_plugin.la
@@ -197,7 +200,7 @@ libdirect3d9_plugin_la_SOURCES = video_output/win32/direct3d9.c \
 	video_output/win32/builtin_shaders.h \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libdirect3d9_plugin_la_LIBADD = libchroma_copy.la libd3d9_common.la -ld3d9 -lgdi32 -luser32 $(LIBCOM) -luuid -ldxva2
-libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 
 libglinterop_dxva2_plugin_la_SOURCES = video_output/opengl/interop_dxva2.c \
 	video_output/opengl/interop.h
@@ -239,8 +242,8 @@ endif
 if HAVE_AMF_SCALER
 libdirect3d11_plugin_la_SOURCES += hw/amf/amf_helper.c hw/amf/amf_helper.h
 endif
-libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect3d11)
+libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 EXTRA_LTLIBRARIES += libdirect3d11_plugin.la
 
 libglwin32_plugin_la_SOURCES = $(OPENGL_VOUT_COMMONSOURCES) \
@@ -259,8 +262,8 @@ libwgl_plugin_la_LIBADD = -lopengl32 -lgdi32 libvlc_opengl.la
 libglwin32_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS)
 libwgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS)
 
-libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-libwgl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
+libwgl_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += $(LTLIBglwin32) $(LTLIBwgl)
@@ -404,7 +407,7 @@ if !HAVE_DARWIN
 libcaca_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
 endif
 endif
-libcaca_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libcaca_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 EXTRA_LTLIBRARIES += libcaca_plugin.la
 vout_LTLIBRARIES += $(LTLIBcaca)
 

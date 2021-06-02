@@ -1,5 +1,8 @@
 aoutdir = $(pluginsdir)/audio_output
 aout_LTLIBRARIES =
+aout_RPATH =
+aout_RPATH += -rpath '$(aoutdir)'
+
 # Install the pkglib/pkglibexec first before relinking the modules.
 # This ensures libtool re-linking is not racy.
 installaoutLTLIBRARIES = install-aoutLTLIBRARIES
@@ -158,7 +161,7 @@ libauhal_plugin_la_SOURCES = audio_output/apple/auhal.c \
 	audio_output/apple/coreaudio_common.c audio_output/apple/coreaudio_common.h \
 	audio_output/apple/channel_layout.c
 
-libauhal_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(aoutdir)' \
+libauhal_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(aout_RPATH) \
 	-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices
 if HAVE_OSX
 aout_LTLIBRARIES += libauhal_plugin.la libavsamplebuffer_plugin.la
@@ -166,7 +169,7 @@ endif
 libaudiounit_ios_plugin_la_SOURCES = audio_output/apple/audiounit_ios.m \
 	audio_output/apple/coreaudio_common.c audio_output/apple/coreaudio_common.h \
 	audio_output/apple/channel_layout.c audio_output/apple/avaudiosession_common.m
-libaudiounit_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(aoutdir)' \
+libaudiounit_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(aout_RPATH) \
 	-Wl,-framework,Foundation,-framework,CoreAudio,-framework,AudioToolbox,-framework,UIKit,-framework,AVFoundation
 if HAVE_IOS_OR_TVOS
 aout_LTLIBRARIES += libaudiounit_ios_plugin.la libavsamplebuffer_plugin.la
