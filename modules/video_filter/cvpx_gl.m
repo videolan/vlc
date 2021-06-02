@@ -258,7 +258,7 @@ static void Close(vlc_gl_t *gl)
     gl->make_current = MakeCurrent;
     gl->release_current = ReleaseCurrent;
     gl->resize = Resize;
-    gl->swap = Swap;
+    gl->swap_offscreen = Swap;
     gl->get_proc_address = GetSymbol;
     gl->destroy = Close;
     gl->offscreen_vflip = true;

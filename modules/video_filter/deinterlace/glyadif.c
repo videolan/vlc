@@ -964,7 +964,7 @@ Open(vlc_object_t *obj, const char *name)
 #endif
 
     struct vlc_decoder_device *device = filter_HoldDecoderDevice(filter);
-    sys->gl = vlc_gl_CreateOffscreen(obj, device, filter->fmt_out.video.i_chroma, width, height, VLCGLAPI, NULL);
+    sys->gl = vlc_gl_CreateOffscreen(obj, device, width, height, VLCGLAPI, NULL);
 
     /* The vlc_gl_t instance must have hold the device if it needs it. */
     if (device)
@@ -1043,7 +1043,7 @@ Open(vlc_object_t *obj, const char *name)
 
     /* The input picture is uploaded upside-down, so we must add an additional
      * vflip if and only if the offscreen does not adds its own vflip */
-    bool must_vflip = sys->gl->orient_out == ORIENT_VFLIPPED;
+    bool must_vflip = sys->gl->offscreen_vflip;
     ret = CreateProgramDraw(filter, filter->fmt_in.video.space, must_vflip);
     if (ret != VLC_SUCCESS)
         goto create_program_draw_failure;
@@ -1059,14 +1059,14 @@ Open(vlc_object_t *obj, const char *name)
 
     filter->fmt_out.video.i_chroma
         = filter->fmt_out.i_codec
-        = sys->gl->chroma_out;
+        = sys->gl->offscreen_chroma_out;
 
     filter->fmt_out.video.i_frame_rate = filter->fmt_in.video.i_frame_rate;
     filter->fmt_out.video.i_frame_rate_base =
         filter->fmt_in.video.i_frame_rate_base;
     assert(filter->fmt_out.video.i_frame_rate_base != 0);
 
-    filter->vctx_out = sys->gl->vctx_out;
+    filter->vctx_out = sys->gl->offscreen_vctx_out;
 
     if (sys->is_yadif2x)
         filter->fmt_out.video.i_frame_rate *= 2;

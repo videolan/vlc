@@ -210,10 +210,10 @@ static void OpenGLResize(vlc_gl_t *gl, unsigned width, unsigned height)
     vlc_gl_Resize(sys->embed_gl, width, height);
 }
 
-static picture_t *OpenGLSwap(vlc_gl_t *gl)
+static void OpenGLSwap(vlc_gl_t *gl)
 {
     struct vout_window_sys_t *sys = gl->sys;
-    return vlc_gl_Swap(sys->embed_gl);
+    vlc_gl_Swap(sys->embed_gl);
 }
 
 static void *OpenGLGetProcAddress(vlc_gl_t *gl, const char *name)
@@ -253,7 +253,7 @@ static int OpenGLOpen(vlc_gl_t *gl, unsigned width, unsigned height)
         .display.height = height,
     };
 
-    sys->embed_gl = vlc_gl_Create(&cfg, VLC_GL_FLAG_OPENGL_ES2, NULL);
+    sys->embed_gl = vlc_gl_Create(&cfg, VLC_OPENGL_ES2, NULL);
     if (sys->embed_gl == NULL)
         return VLC_EGENERIC;
 
