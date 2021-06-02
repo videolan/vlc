@@ -1,5 +1,7 @@
 aoutdir = $(pluginsdir)/audio_output
 aout_LTLIBRARIES =
+aout_RPATH =
+aout_RPATH += -rpath '$(aoutdir)'
 
 libopensles_android_plugin_la_SOURCES = audio_output/android/opensles.c
 libopensles_android_plugin_la_LIBADD = libandroid_utils.la $(LIBDL) $(LIBM)
@@ -100,14 +102,14 @@ endif
 
 libauhal_plugin_la_SOURCES = audio_output/auhal.c \
 	audio_output/coreaudio_common.c audio_output/coreaudio_common.h
-libauhal_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(aoutdir)' \
+libauhal_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(aout_RPATH) \
 	-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices
 if HAVE_OSX
 aout_LTLIBRARIES += libauhal_plugin.la
 endif
 libaudiounit_ios_plugin_la_SOURCES = audio_output/audiounit_ios.m \
 	audio_output/coreaudio_common.c audio_output/coreaudio_common.h
-libaudiounit_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(aoutdir)' \
+libaudiounit_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(aout_RPATH) \
 	-Wl,-framework,Foundation,-framework,CoreAudio,-framework,AudioToolbox,-framework,UIKit,-framework,AVFoundation
 if HAVE_IOS
 aout_LTLIBRARIES += libaudiounit_ios_plugin.la

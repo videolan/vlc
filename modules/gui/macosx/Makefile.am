@@ -14,7 +14,7 @@ xib_verbose__0 = $(xib_verbose_0)
 
 
 libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -fobjc-arc -I$(srcdir)/gui/macosx
-libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
+libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(gui_RPATH) \
 	-Wl,-framework,AVFoundation \
 	-Wl,-framework,Cocoa \
 	-Wl,-framework,CoreAudio \

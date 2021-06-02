@@ -89,7 +89,7 @@ libgles2_plugin_la_SOURCES = video_output/opengl/display.c \
     $(OPENGL_VOUT_COMMONSOURCES)
 libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
 libgles2_plugin_la_LIBADD = libvlc_opengles.la
-libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 if HAVE_GLES2
 vout_LTLIBRARIES += libgles2_plugin.la
 endif
@@ -131,7 +131,7 @@ endif
 
 libglfilter_mock_plugin_la_SOURCES = video_output/opengl/filter_mock.c
 libglfilter_mock_plugin_la_LIBADD = $(LIBM)
-libglfilter_mock_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libglfilter_mock_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 if HAVE_GL
 libglfilter_mock_plugin_la_LIBADD += libvlc_opengl.la $(GL_LIBS)
 noinst_LTLIBRARIES += libglfilter_mock_plugin.la

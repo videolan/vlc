@@ -1,4 +1,6 @@
 miscdir = $(pluginsdir)/misc
+misc_RPATH =
+misc_RPATH += -rpath '$(miscdir)'
 
 libstats_plugin_la_SOURCES = misc/stats.c
 
@@ -30,7 +32,7 @@ libgnutls_plugin_la_LIBADD = $(GNUTLS_LIBS)
 if HAVE_WIN32
 libgnutls_plugin_la_LIBADD += $(SOCKET_LIBS)
 endif
-libgnutls_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(miscdir)'
+libgnutls_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(misc_RPATH)
 if HAVE_DARWIN
 libgnutls_plugin_la_LDFLAGS += -Wl,-framework,Security,-framework,CoreFoundation
 endif
@@ -41,7 +43,7 @@ if HAVE_DARWIN
 libsecuretransport_plugin_la_SOURCES = misc/securetransport.c
 libsecuretransport_plugin_la_CFLAGS = $(AM_CFLAGS) $(SECURETRANSPORT_CFLAGS)
 libsecuretransport_plugin_la_LIBADD = $(SECURETRANSPORT_LIBS)
-libsecuretransport_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(miscdir)' -Wl,-framework,Security,-framework,CoreFoundation
+libsecuretransport_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(misc_RPATH) -Wl,-framework,Security,-framework,CoreFoundation
 misc_LTLIBRARIES += libsecuretransport_plugin.la
 endif
 
@@ -111,7 +113,7 @@ endif
 libxml_plugin_la_SOURCES = misc/xml/libxml.c
 libxml_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBXML2_CFLAGS)
 libxml_plugin_la_LIBADD = $(LIBXML2_LIBS)
-libxml_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(miscdir)' $(LDFLAGS_xml)
+libxml_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(misc_RPATH) $(LDFLAGS_xml)
 EXTRA_LTLIBRARIES += libxml_plugin.la
 misc_LTLIBRARIES += $(LTLIBxml)
 
@@ -136,6 +138,6 @@ libmedialibrary_plugin_la_SOURCES = \
 
 libmedialibrary_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(MEDIALIBRARY_CFLAGS)
 libmedialibrary_plugin_la_LIBADD = $(MEDIALIBRARY_LIBS)
-libmedialibrary_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(miscdir)'
+libmedialibrary_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(misc_RPATH)
 EXTRA_LTLIBRARIES += libmedialibrary_plugin.la
 misc_LTLIBRARIES += $(LTLIBmedialibrary)

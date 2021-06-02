@@ -1,6 +1,8 @@
 stream_filterdir = $(pluginsdir)/stream_filter
 
 stream_filter_LTLIBRARIES =
+stream_filter_RPATH =
+stream_filter_RPATH += -rpath '$(stream_filterdir)'
 
 libcache_read_plugin_la_SOURCES = stream_filter/cache_read.c
 stream_filter_LTLIBRARIES += libcache_read_plugin.la
@@ -35,13 +37,13 @@ stream_filter_LTLIBRARIES += librecord_plugin.la
 
 libaribcam_plugin_la_SOURCES = stream_filter/aribcam.c
 libaribcam_plugin_la_CFLAGS = $(AM_CFLAGS) $(ARIBB25_CFLAGS)
-libaribcam_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(ARIBB25_LDFLAGS) -rpath '$(stream_filterdir)'
+libaribcam_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(ARIBB25_LDFLAGS) $(stream_filter_RPATH)
 libaribcam_plugin_la_LIBADD = $(ARIBB25_LIBS)
 stream_filter_LTLIBRARIES += $(LTLIBaribcam)
 EXTRA_LTLIBRARIES += libaribcam_plugin.la
 
 libaccesstweaks_plugin_la_SOURCES = stream_filter/accesstweaks.c
-libaccesstweaks_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(stream_filterdir)'
+libaccesstweaks_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(stream_filte_RPATH)
 check_LTLIBRARIES += libaccesstweaks_plugin.la
 
 libadf_plugin_la_SOURCES = stream_filter/adf.c

@@ -1,4 +1,6 @@
 access_outdir = $(pluginsdir)/access_output
+access_out_RPATH =
+access_out_RPATH += -rpath '$(access_outdir)'
 
 libaccess_output_dummy_plugin_la_SOURCES = access_output/dummy.c
 libaccess_output_file_plugin_la_SOURCES = access_output/file.c
@@ -18,7 +20,7 @@ endif
 
 libaccess_output_shout_plugin_la_SOURCES = access_output/shout.c
 libaccess_output_shout_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SHOUT_CFLAGS)
-libaccess_output_shout_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(access_outdir)'
+libaccess_output_shout_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(access_out_RPATH)
 libaccess_output_shout_plugin_la_LIBADD = $(SHOUT_LIBS) $(SOCKET_LIBS)
 access_out_LTLIBRARIES += $(LTLIBaccess_output_shout)
 EXTRA_LTLIBRARIES += libaccess_output_shout_plugin.la
@@ -33,8 +35,8 @@ libaccess_output_srt_plugin_la_SOURCES = access_output/srt.c access/srt_common.c
 libaccess_output_srt_plugin_la_CFLAGS = $(AM_CFLAGS) $(SRT_CFLAGS)
 libaccess_output_srt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SRT_CPPFLAGS)
 libaccess_output_srt_plugin_la_LIBADD = $(SRT_LIBS)
-libaccess_output_srt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(access_outdir)'
 access_out_LTLIBRARIES += $(LTLIBaccess_output_srt)
+libaccess_output_srt_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(access_out_RPATH)
 EXTRA_LTLIBRARIES += libaccess_output_srt_plugin.la
 
 ### RIST ###
@@ -42,6 +44,6 @@ EXTRA_LTLIBRARIES += libaccess_output_srt_plugin.la
 libaccess_output_rist_plugin_la_SOURCES = access_output/rist.c
 libaccess_output_rist_plugin_la_CFLAGS = $(AM_CFLAGS) $(RIST_CFLAGS)
 libaccess_output_rist_plugin_la_LIBADD = $(RIST_LIBS) $(SOCKET_LIBS)
-libaccess_output_rist_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(access_outdir)'
+libaccess_output_rist_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(access_out_RPATH)
 access_out_LTLIBRARIES += $(LTLIBaccess_output_rist)
 EXTRA_LTLIBRARIES += libaccess_output_rist_plugin.la

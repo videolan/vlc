@@ -26,7 +26,7 @@ libplacebo_vk_plugin_la_SOURCES = $(LIBPLACEBO_COMMONSOURCES) \
 				  video_output/libplacebo/instance_vulkan.c
 libplacebo_vk_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBPLACEBO_CFLAGS) $(VULKAN_CFLAGS)
 libplacebo_vk_plugin_la_LIBADD = $(LIBPLACEBO_LIBS) $(VULKAN_LIBS)
-libplacebo_vk_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libplacebo_vk_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 
 if HAVE_VULKAN
 vout_LTLIBRARIES += $(LTLIBplacebo_vk)
@@ -38,13 +38,13 @@ libplacebo_gl_plugin_la_SOURCES = $(LIBPLACEBO_COMMONSOURCES) \
 				  video_output/libplacebo/instance_opengl.c
 libplacebo_gl_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBPLACEBO_CFLAGS)
 libplacebo_gl_plugin_la_LIBADD = $(LIBPLACEBO_LIBS) libvlc_opengl.la
-libplacebo_gl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libplacebo_gl_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 
 libplacebo_gles2_plugin_la_SOURCES = $(LIBPLACEBO_COMMONSOURCES) \
 				     video_output/libplacebo/instance_opengl.c
 libplacebo_gles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBPLACEBO_CFLAGS) -DUSE_OPENGL_ES2
 libplacebo_gles2_plugin_la_LIBADD = $(LIBPLACEBO_LIBS) libvlc_opengles.la
-libplacebo_gles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libplacebo_gles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 
 if HAVE_GL
 vout_LTLIBRARIES += $(LTLIBplacebo_gl)

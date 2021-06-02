@@ -1,5 +1,7 @@
 voutdir = $(pluginsdir)/video_output
 vout_LTLIBRARIES =
+vout_RPATH =
+vout_RPATH += -rpath '$(voutdir)'
 
 EXTRA_DIST += video_output/README
 
@@ -36,7 +38,7 @@ endif
 libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.m \
 	video_output/opengl/interop.h
 libglinterop_cvpx_plugin_la_LIBADD = libvlc_vtutils.la
-libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
+libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,Foundation,-framework,CoreVideo,-framework,IOSurface
 libglinterop_cvpx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 if HAVE_DARWIN
@@ -49,7 +51,6 @@ endif
 vout_LTLIBRARIES += libglinterop_cvpx_plugin.la
 endif
 
-
 if HAVE_OSX
 libwindow_macosx_plugin_la_SOURCES = video_output/window_macosx.m
 libwindow_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
@@ -61,14 +62,14 @@ libvout_macosx_plugin_la_SOURCES = video_output/macosx.m \
 	$(OPENGL_VOUT_COMMONSOURCES)
 libvout_macosx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DHAVE_GL_CORE_SYMBOLS
 libvout_macosx_plugin_la_LIBADD = libvlc_opengl.la
-libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
+libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,OpenGL,-framework,Cocoa
 
 libcaopengllayer_plugin_la_SOURCES = video_output/caopengllayer.m \
 	$(OPENGL_VOUT_COMMONSOURCES)
 libcaopengllayer_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)  -DHAVE_GL_CORE_SYMBOLS
 libcaopengllayer_plugin_la_LIBADD = libvlc_opengl.la
-libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
+libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
 
 vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la libwindow_macosx_plugin.la
@@ -159,7 +160,7 @@ libdirect3d9_plugin_la_SOURCES = video_output/win32/direct3d9.c \
 	video_output/win32/builtin_shaders.h \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libdirect3d9_plugin_la_LIBADD = libchroma_copy.la libd3d9_common.la -lgdi32 $(LIBCOM) -luuid
-libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 
 libglinterop_dxva2_plugin_la_SOURCES = video_output/opengl/interop_dxva2.c \
 	video_output/opengl/interop.h
@@ -194,8 +195,8 @@ else
 libdirect3d11_plugin_la_LIBADD += -ld3d11
 libdirect3d11_plugin_la_LIBADD += -ld3dcompiler_47
 endif
-libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect3d11)
+libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 EXTRA_LTLIBRARIES += libdirect3d11_plugin.la
 
 libglwin32_plugin_la_SOURCES = $(OPENGL_VOUT_COMMONSOURCES) \
@@ -212,8 +213,8 @@ libwgl_plugin_la_LIBADD = -lopengl32 -lgdi32 libvlc_opengl.la
 libglwin32_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS)
 libwgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(OPENGL_COMMONCFLAGS)
 
-libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-libwgl_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
+libwgl_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += $(LTLIBglwin32) $(LTLIBwgl)
@@ -309,7 +310,6 @@ endif
 
 
 ### Direct Rendering Manager (DRM) ###
-
 libkms_plugin_la_SOURCES = video_output/kms.c
 libkms_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBDRM_CFLAGS)
 libkms_plugin_la_LIBADD = $(LIBDRM_LIBS)
@@ -329,7 +329,6 @@ libdrm_display_plugin_la_CPPFLAGS += $(LIBDRM_CFLAGS) -DHAVE_LIBDRM
 vout_LTLIBRARIES += libkms_plugin.la libdrm_display_plugin.la
 endif
 
-
 ### Coloured ASCII art ###
 libcaca_plugin_la_SOURCES = video_output/caca.c
 libcaca_plugin_la_CFLAGS = $(AM_CFLAGS) $(CACA_CFLAGS)
@@ -339,7 +338,7 @@ if !HAVE_DARWIN
 libcaca_plugin_la_LIBADD += $(X_LIBS) $(X_PRE_LIBS) -lX11
 endif
 endif
-libcaca_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libcaca_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 EXTRA_LTLIBRARIES += libcaca_plugin.la
 vout_LTLIBRARIES += $(LTLIBcaca)
 
