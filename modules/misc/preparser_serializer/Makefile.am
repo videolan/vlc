@@ -7,4 +7,4 @@ libpreparserserializer_json_plugin_la_SOURCES = \
 
 libpreparserserializer_json_plugin_la_CFLAGS = $(AM_CFLAGS)
 libpreparserserializer_json_plugin_la_LIBADD = libvlc_json.la
-misc_LTLIBRARIES += libpreparserserializer_json_plugin.la
+misc_PLUGINS += libpreparserserializer_json_plugin.la

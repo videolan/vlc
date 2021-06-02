@@ -6,7 +6,7 @@ libvlc_rtp_la_LDFLAGS = -no-undefined
 noinst_LTLIBRARIES += libvlc_rtp.la
 
 # RTP plugin
-access_LTLIBRARIES += librtp_plugin.la
+access_PLUGINS += librtp_plugin.la
 librtp_plugin_la_SOURCES = \
 	access/rtp/input.c access/rtp/input.h \
 	access/rtp/sdp.c access/rtp/sdp.h \
@@ -35,7 +35,15 @@ noinst_HEADERS += access/rtp/fmtp.h
 
 # RTP payload parser plugins
 rtpparsedir = $(accessdir)/rtp
-rtpparse_LTLIBRARIES = \
+rtpparse_LTLIBRARIES =
+rtpparse_PLUGINS =
+if HAVE_PARTIAL_LINKING
+noinst_LTLIBRARIES += $(rtpparse_PLUGINS)
+else
+rtpparse_LTLIBRARIES += $(rtpparse_PLUGINS)
+endif
+
+rtpparse_PLUGINS += \
 	librtp_ac3_plugin.la \
 	librtp_mpeg12_plugin.la \
 	librtp_mpeg4_plugin.la \

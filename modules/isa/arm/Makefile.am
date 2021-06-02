@@ -1,12 +1,28 @@
 armdir = $(pluginsdir)/arm
 neondir = $(pluginsdir)/arm_neon
 
+arm_PLUGINS =
+arm_LTLIBRARIES =
+if HAVE_PARTIAL_LINKING
+noinst_LTLIBRARIES += $(arm_PLUGINS)
+else
+arm_LTLIBRARIES += $(arm_PLUGINS)
+endif
+
+neon_PLUGINS =
+neon_LTLIBRARIES =
+if HAVE_PARTIAL_LINKING
+noinst_LTLIBRARIES += $(neon_PLUGINS)
+else
+neon_LTLIBRARIES += $(neon_PLUGINS)
+endif
+
 libdeinterlace_arm_simd_plugin_la_SOURCES = \
 	isa/arm/simd/deinterlace.c isa/arm/simd/merge.S
 
 # TODO? use dedicated conditional, or purge
 if HAVE_NEON
-arm_LTLIBRARIES = \
+arm_PLUGINS += \
 	libdeinterlace_arm_simd_plugin.la
 endif
 
@@ -31,7 +47,7 @@ libyuv_rgb_neon_plugin_la_SOURCES = \
 libyuv_rgb_neon_plugin_LIBTOOLFLAGS = --tag=CC
 
 if HAVE_NEON
-neon_LTLIBRARIES = \
+neon_PLUGINS += \
 	libchroma_yuv_neon_plugin.la \
 	libdeinterlace_neon_plugin.la \
 	libvolume_neon_plugin.la \

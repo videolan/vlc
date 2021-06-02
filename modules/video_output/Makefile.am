@@ -1,7 +1,13 @@
 voutdir = $(pluginsdir)/video_output
+vout_PLUGINS =
 vout_LTLIBRARIES =
 vout_RPATH =
+if HAVE_PARTIAL_LINKING
+noinst_LTLIBRARIES += $(vout_PLUGINS)
+else
+vout_LTLIBRARIES += $(vout_PLUGINS)
 vout_RPATH += -rpath '$(voutdir)'
+endif
 
 # Install the pkglib/pkglibexec first before relinking the modules.
 # This ensures libtool re-linking is not racy.
@@ -37,7 +43,7 @@ endif
 if HAVE_LINUX
 libdecklinkoutput_plugin_la_LIBADD += $(LIBDL)
 endif
-vout_LTLIBRARIES += libdecklinkoutput_plugin.la
+vout_PLUGINS += libdecklinkoutput_plugin.la
 endif
 
 libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.m \
@@ -47,11 +53,11 @@ libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,Foundation,-framework,CoreVideo,-framework,IOSurface,-framework,Metal
 libglinterop_cvpx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 if HAVE_OSX
-vout_LTLIBRARIES += libglinterop_cvpx_plugin.la
+vout_PLUGINS += libglinterop_cvpx_plugin.la
 libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
 endif
 if HAVE_IOS_OR_TVOS
-vout_LTLIBRARIES += libglinterop_cvpx_plugin.la
+vout_PLUGINS += libglinterop_cvpx_plugin.la
 libglinterop_cvpx_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
 endif
@@ -79,7 +85,7 @@ libcaopengllayer_plugin_la_LIBADD = libvlc_opengl.la
 libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
 
-vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la libwindow_macosx_plugin.la
+vout_PLUGINS += libvout_macosx_plugin.la libcaopengllayer_plugin.la libwindow_macosx_plugin.la
 endif
 
 if HAVE_DARWIN
@@ -87,22 +93,22 @@ if !HAVE_WATCHOS
 libsamplebufferdisplay_plugin_la_SOURCES = video_output/apple/VLCSampleBufferDisplay.m codec/vt_utils.c codec/vt_utils.h
 libsamplebufferdisplay_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 if HAVE_OSX
-libsamplebufferdisplay_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
+libsamplebufferdisplay_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,AVFoundation,-framework,AVKit,-framework,Cocoa,-framework,CoreMedia,-framework,QuartzCore,-framework,CoreGraphics,-framework,CoreVideo,-framework,VideoToolbox,-framework,CoreImage
 else
-libsamplebufferdisplay_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
+libsamplebufferdisplay_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,AVFoundation,-framework,Foundation,-framework,AVKit,-framework,UIKit,-framework,CoreMedia,-framework,QuartzCore,-framework,CoreGraphics,-framework,CoreVideo,-framework,VideoToolbox,-framework,CoreImage
 endif
-vout_LTLIBRARIES += libsamplebufferdisplay_plugin.la
+vout_PLUGINS += libsamplebufferdisplay_plugin.la
 endif
 endif
 
 if HAVE_IOS_OR_TVOS
 libpictureinpicturecontroller_plugin_la_SOURCES = video_output/apple/VLCPictureInPictureController.m
 libpictureinpicturecontroller_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
-libpictureinpicturecontroller_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
+libpictureinpicturecontroller_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH) \
 	-Wl,-framework,AVFoundation,-framework,Foundation,-framework,AVKit,-framework,UIKit,-framework,QuartzCore,-framework,CoreMedia
-vout_LTLIBRARIES += libpictureinpicturecontroller_plugin.la
+vout_PLUGINS += libpictureinpicturecontroller_plugin.la
 endif
 
 libvout_ios_plugin_la_SOURCES = video_output/opengl/display.c $(OPENGL_VOUT_COMMONSOURCES)
@@ -128,26 +134,25 @@ libcvpx_gl_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
 libcvpx_gl_plugin_la_LIBADD = libvlc_vtutils.la
 
 if HAVE_OSX
-vout_LTLIBRARIES += libcvpx_gl_plugin.la
+vout_PLUGINS += libcvpx_gl_plugin.la
 libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
 libcvpx_gl_plugin_la_LIBADD += libvlc_opengl.la
 endif
 if HAVE_IOS_OR_TVOS
-vout_LTLIBRARIES += libcvpx_gl_plugin.la
+vout_PLUGINS += libcvpx_gl_plugin.la
 libcvpx_gl_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
 libcvpx_gl_plugin_la_LIBADD += libvlc_opengles.la
 endif
 
 if HAVE_IOS_OR_TVOS
-vout_LTLIBRARIES += \
+vout_PLUGINS += \
 	libvout_ios_plugin.la \
 	libuiview_window_plugin.la \
 	libcaeagl_ios_plugin.la
 endif
 if HAVE_XROS
-vout_LTLIBRARIES += \
-	libuiview_window_plugin.la
+vout_PLUGINS += libuiview_window_plugin.la
 endif
 
 libglinterop_gst_mem_plugin_la_SOURCES = video_output/opengl/interop_gst_mem.c \
@@ -170,16 +175,16 @@ libglinterop_vdpau_plugin_la_LIBADD = $(LIBDL) libvlc_vdpau.la $(X_LIBS) $(X_PRE
 if HAVE_GL
 if HAVE_EGL
 if HAVE_VAAPI
-vout_LTLIBRARIES += libglinterop_vaapi_plugin.la
+vout_PLUGINS += libglinterop_vaapi_plugin.la
 endif
 
 if HAVE_GST_DECODE
-vout_LTLIBRARIES += libglinterop_gst_mem_plugin.la
+vout_PLUGINS += libglinterop_gst_mem_plugin.la
 endif
 endif # HAVE_EGL
 
 if HAVE_VDPAU
-vout_LTLIBRARIES += libglinterop_vdpau_plugin.la
+vout_PLUGINS += libglinterop_vdpau_plugin.la
 endif
 endif # HAVE_GL
 
@@ -208,10 +213,10 @@ libglinterop_dxva2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libglinterop_dxva2_plugin_la_LIBADD = libd3d9_common.la -ld3d9 -lopengl32 -ldxva2
 
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += $(LTLIBdirect3d9)
+vout_PLUGINS += $(LTLIBdirect3d9)
 EXTRA_LTLIBRARIES += libdirect3d9_plugin.la
 if HAVE_GL
-vout_LTLIBRARIES += libglinterop_dxva2_plugin.la
+vout_PLUGINS += libglinterop_dxva2_plugin.la
 endif
 endif
 
@@ -242,8 +247,8 @@ endif
 if HAVE_AMF_SCALER
 libdirect3d11_plugin_la_SOURCES += hw/amf/amf_helper.c hw/amf/amf_helper.h
 endif
-vout_LTLIBRARIES += $(LTLIBdirect3d11)
 libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
+vout_PLUGINS += $(LTLIBdirect3d11)
 EXTRA_LTLIBRARIES += libdirect3d11_plugin.la
 
 libglwin32_plugin_la_SOURCES = $(OPENGL_VOUT_COMMONSOURCES) \
@@ -266,7 +271,7 @@ libglwin32_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 libwgl_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += $(LTLIBglwin32) $(LTLIBwgl)
+vout_PLUGINS += $(LTLIBglwin32) $(LTLIBwgl)
 EXTRA_LTLIBRARIES += libglwin32_plugin.la libwgl_plugin.la
 endif
 
@@ -276,12 +281,12 @@ libwingdi_plugin_la_SOURCES = video_output/win32/wingdi.c \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libwingdi_plugin_la_LIBADD = libchroma_copy.la -lgdi32 -luser32 $(LIBCOM) -luuid
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += libwingdi_plugin.la
+vout_PLUGINS += libwingdi_plugin.la
 endif
 
 libwinhibit_plugin_la_SOURCES = video_output/win32/inhibit.c
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += libwinhibit_plugin.la
+vout_PLUGINS += libwinhibit_plugin.la
 endif
 
 libegl_win32_plugin_la_SOURCES = video_output/opengl/egl.c
@@ -290,39 +295,39 @@ libegl_win32_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS)
 libegl_win32_plugin_la_LIBADD = $(EGL_LIBS)
 if HAVE_WIN32
 if HAVE_EGL
-vout_LTLIBRARIES += libegl_win32_plugin.la
+vout_PLUGINS += libegl_win32_plugin.la
 endif
 endif
 
 libdrawable_plugin_la_SOURCES = video_output/win32/drawable.c \
 	video_output/wasync_resize_compressor.h
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += libdrawable_plugin.la
+vout_PLUGINS += libdrawable_plugin.la
 endif
 
 libwin32_window_plugin_la_SOURCES = video_output/win32/window.c \
 	video_output/wasync_resize_compressor.h
 libwin32_window_plugin_la_LIBADD = -lgdi32
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += libwin32_window_plugin.la
+vout_PLUGINS += libwin32_window_plugin.la
 endif
 
 
 ### OS/2 ###
 libdrawable_os2_plugin_la_SOURCES = video_output/drawable_os2.c
 if HAVE_OS2
-vout_LTLIBRARIES += libdrawable_os2_plugin.la
+vout_PLUGINS += libdrawable_os2_plugin.la
 endif
 
 libwindow_os2_plugin_la_SOURCES = video_output/window_os2.c
 if HAVE_OS2
-vout_LTLIBRARIES += libwindow_os2_plugin.la
+vout_PLUGINS += libwindow_os2_plugin.la
 endif
 
 libkva_plugin_la_SOURCES = video_output/kva.c
 libkva_plugin_la_LIBADD = $(KVA_LIBS)
 if HAVE_KVA
-vout_LTLIBRARIES += libkva_plugin.la
+vout_PLUGINS += libkva_plugin.la
 endif
 
 
@@ -368,9 +373,11 @@ libglinterop_aimage_plugin_la_LIBADD = libandroid_utils.la \
 	$(EGL_LIBS) $(GLES2_LIBS)
 
 if HAVE_ANDROID
-vout_LTLIBRARIES += libandroid_window_plugin.la libandroid_display_plugin.la
+vout_PLUGINS += libandroid_window_plugin.la libandroid_display_plugin.la
 if HAVE_EGL
-vout_LTLIBRARIES += libegl_android_plugin.la libglinterop_asurface_plugin.la \
+vout_PLUGINS += \
+	libegl_android_plugin.la \
+	libglinterop_asurface_plugin.la \
 	libglinterop_aimage_plugin.la
 endif
 endif
@@ -390,11 +397,11 @@ libdrm_display_plugin_la_SOURCES = \
 	video_output/drm/display.c
 libdrm_display_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 if HAVE_DRM
-vout_LTLIBRARIES += libdrm_display_plugin.la
+vout_PLUGINS += libdrm_display_plugin.la
 endif
 if HAVE_LIBDRM
 libdrm_display_plugin_la_CPPFLAGS += $(LIBDRM_CFLAGS) -DHAVE_LIBDRM
-vout_LTLIBRARIES += libkms_plugin.la libdrm_display_plugin.la
+vout_PLUGINS += libkms_plugin.la libdrm_display_plugin.la
 endif
 
 
@@ -409,7 +416,7 @@ endif
 endif
 libcaca_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 EXTRA_LTLIBRARIES += libcaca_plugin.la
-vout_LTLIBRARIES += $(LTLIBcaca)
+vout_PLUGINS += $(LTLIBcaca)
 
 ### Common ###
 
@@ -424,7 +431,7 @@ libwextern_plugin_la_SOURCES = video_output/wextern.c
 libyuv_plugin_la_SOURCES = video_output/yuv.c
 libvgl_plugin_la_SOURCES = video_output/vgl.c
 
-vout_LTLIBRARIES += \
+vout_PLUGINS += \
 	libflaschen_plugin.la \
 	libvdummy_plugin.la \
 	libvideo_splitter_plugin.la \

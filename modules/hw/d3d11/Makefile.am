@@ -1,6 +1,13 @@
 d3d11dir = $(pluginsdir)/d3d11
+d3d11_LTLIBRARIES =
+d3d11_PLUGINS =
 d3d11_RPATH =
+if HAVE_PARTIAL_LINKING
+noinst_LTLIBRARIES += $(d3d11_PLUGINS)
+else
+d3d11_LTLIBRARIES += $(d3d11_PLUGINS)
 d3d11_RPATH += -rpath '$(d3d11dir)'
+endif
 
 libdirect3d11_filters_plugin_la_SOURCES = hw/d3d11/d3d11_filters.h \
     hw/d3d11/d3d11_filters.c \
@@ -13,6 +20,5 @@ libdirect3d11_filters_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 libdirect3d11_filters_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(d3d11_RPATH)
 libdirect3d11_filters_plugin_la_LIBADD = libchroma_copy.la libdeinterlace_common.la libd3d11_common.la $(LIBCOM) -ld3d11
 
-d3d11_LTLIBRARIES = $(LTLIBdirect3d11_filters)
+d3d11_PLUGINS += $(LTLIBdirect3d11_filters)
 EXTRA_LTLIBRARIES += libdirect3d11_filters_plugin.la
-

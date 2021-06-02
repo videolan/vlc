@@ -103,21 +103,21 @@ libvk_wl_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS)
 
 if HAVE_WAYLAND
 BUILT_SOURCES += $(nodist_libwl_shm_plugin_la_SOURCES)
-vout_LTLIBRARIES += libwl_shm_plugin.la
-vout_LTLIBRARIES += libwl_shell_plugin.la
+vout_PLUGINS += libwl_shm_plugin.la
+vout_PLUGINS += libwl_shell_plugin.la
 BUILT_SOURCES += $(nodist_libxdg_shell_plugin_la_SOURCES)
-vout_LTLIBRARIES += libxdg_shell_plugin.la
+vout_PLUGINS += libxdg_shell_plugin.la
 if HAVE_EGL
-vout_LTLIBRARIES += libegl_wl_plugin.la
+vout_PLUGINS += libegl_wl_plugin.la
 BUILT_SOURCES += $(nodist_libegl_wl_plugin_la_SOURCES)
 if HAVE_GBM
 if HAVE_LIBDRM
-vout_LTLIBRARIES += libegl_gbm_wl_plugin.la
+vout_PLUGINS += libegl_gbm_wl_plugin.la
 BUILT_SOURCES += $(nodist_libegl_gbm_wl_plugin_la_SOURCES)
 endif
 endif
 endif
 if HAVE_VULKAN
-vout_LTLIBRARIES += libvk_wl_plugin.la
+vout_PLUGINS += libvk_wl_plugin.la
 endif
 endif

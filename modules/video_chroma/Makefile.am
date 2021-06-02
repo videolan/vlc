@@ -1,6 +1,14 @@
 chromadir = $(pluginsdir)/video_chroma
+chroma_PLUGINS =
+chroma_LTLIBRARIES =
 chroma_RPATH =
+if HAVE_PARTIAL_LINKING
+noinst_LTLIBRARIES += $(chroma_PLUGINS)
+else
+chroma_LTLIBRARIES += $(chroma_PLUGINS)
 chroma_RPATH += -rpath '$(chromadir)'
+endif
+
 
 libchain_plugin_la_SOURCES = video_chroma/chain.c
 
@@ -34,7 +42,7 @@ libyuvp_plugin_la_SOURCES = video_chroma/yuvp.c
 
 liborient_plugin_la_SOURCES = video_chroma/orient.c video_chroma/orient.h
 
-chroma_LTLIBRARIES = \
+chroma_PLUGINS += \
 	libi420_rgb_plugin.la \
 	libi420_nv12_plugin.la \
 	libi422_i420_plugin.la \
@@ -55,7 +63,7 @@ libi420_rgb_sse2_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_r
 libi420_rgb_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DPLUGIN_SSE2
 
 if HAVE_SSE2
-chroma_LTLIBRARIES += \
+chroma_PLUGINS += \
 	libi420_rgb_sse2_plugin.la
 endif
 
@@ -64,7 +72,7 @@ libcvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(chroma_RPATH) -Wl,-framework,Foundat
 libcvpx_plugin_la_LIBADD = libchroma_copy.la
 if HAVE_DARWIN
 if !HAVE_WATCHOS
-chroma_LTLIBRARIES += libcvpx_plugin.la
+chroma_PLUGINS += libcvpx_plugin.la
 endif
 endif
 
@@ -74,7 +82,7 @@ libgst_mem_plugin_la_CFLAGS = $(AM_CFLAGS) $(GST_VIDEO_CFLAGS) $(GST_APP_CFLAGS)
 libgst_mem_plugin_la_LIBADD = $(GST_VIDEO_LIBS) $(GST_APP_LIBS)
 
 if HAVE_GST_DECODE
-chroma_LTLIBRARIES += libgst_mem_plugin.la
+chroma_PLUGINS += libgst_mem_plugin.la
 endif
 
 # Tests

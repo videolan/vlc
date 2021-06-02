@@ -1,3 +1,16 @@
+guidir = $(pluginsdir)/gui
+gui_LTLIBRARIES =
+gui_PLUGINS =
+gui_RPATH =
+
+if HAVE_PARTIAL_LINKING
+noinst_LTLIBRARIES = $(gui_PLUGINS)
+else
+gui_LTLIBRARIES += $(gui_PLUGINS)
+gui_RPATH += -rpath '$(guidir)'
+endif
+
+
 ## Howto
 # For each Q_OBJECT:
 #   - Add *.moc.cpp to nodist_..._SOURCES
@@ -14,8 +27,6 @@
 CLEANFILES =
 
 include ../../common.am
-guidir = $(pluginsdir)/gui
-gui_LTLIBRARIES =
 
 # Generate vlc_modules_list for Qt plugins
 include ../../modulelist.mk
@@ -620,7 +631,7 @@ libqt_x11_plugin_la_SOURCES = \
 	util/csdmenu_x11.h
 
 if ENABLE_QT
-gui_LTLIBRARIES += libqt_x11_plugin.la
+gui_PLUGINS += libqt_x11_plugin.la
 endif
 
 endif
@@ -692,7 +703,7 @@ maininterface/xdg-shell-protocol.c: $(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-sh
 #endif
 
 if ENABLE_QT
-gui_LTLIBRARIES += libqt_wayland_plugin.la
+gui_PLUGINS += libqt_wayland_plugin.la
 endif
 
 endif
@@ -709,7 +720,7 @@ libqt_kwindowsystem_plugin_la_SOURCES = \
 	maininterface/kwindowsystem_module.cpp
 
 if ENABLE_QT
-gui_LTLIBRARIES += libqt_kwindowsystem_plugin.la
+gui_PLUGINS += libqt_kwindowsystem_plugin.la
 endif
 endif
 endif
@@ -1595,12 +1606,12 @@ libqt_gtktheme_plugin_la_SOURCES = \
 	style/gtkthemeprovider/nav_button_provider_gtk.h \
 	style/gtkthemeprovider/scoped_gobject.h
 if ENABLE_QT
-gui_LTLIBRARIES += libqt_gtktheme_plugin.la
+gui_PLUGINS += libqt_gtktheme_plugin.la
 endif
 endif
 
 if ENABLE_QT
-gui_LTLIBRARIES += libqt_plugin.la
+gui_PLUGINS += libqt_plugin.la
 BUILT_SOURCES += $(nodist_libqt_plugin_la_SOURCES)
 if !HAVE_WIN32
 if !HAVE_OS2

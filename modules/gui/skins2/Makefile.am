@@ -287,9 +287,9 @@ libskins2_plugin_la_LIBTOOLFLAGS = --tag=CXX
 libskins2_plugin_la_LIBADD = $(LIBS_skins2)
 
 if BUILD_SKINS
-gui_LTLIBRARIES += libskins2_plugin.la
+gui_PLUGINS += libskins2_plugin.la
 if HAVE_DARWIN
-gui_LTLIBRARIES += libmacosx_dialogs_plugin.la
+gui_PLUGINS += libmacosx_dialogs_plugin.la
 endif
 endif
 

@@ -1,6 +1,13 @@
 muxdir = $(pluginsdir)/mux
+mux_LTLIBRARIES =
+mux_PLUGINS =
 mux_RPATH =
+if HAVE_PARTIAL_LINKING
+noinst_LTLIBRARIES += $(mux_PLUGINS)
+else
+mux_LTLIBRARIES += $(mux_PLUGINS)
 mux_RPATH += -rpath '$(muxdir)'
+endif
 
 extradata_builder_SOURCES = mux/extradata.c mux/extradata.h \
                             packetizer/av1_obu.c \
@@ -27,7 +34,7 @@ libmux_ps_plugin_la_SOURCES = \
 	demux/mpeg/timestamps.h
 libmux_wav_plugin_la_SOURCES = mux/wav.c
 
-mux_LTLIBRARIES = \
+mux_PLUGINS += \
 	libmux_dummy_plugin.la \
 	libmux_asf_plugin.la \
 	libmux_avi_plugin.la \
@@ -41,7 +48,7 @@ libmux_ogg_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(OGG_CFLAGS)
 libmux_ogg_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(mux_RPATH)
 libmux_ogg_plugin_la_LIBADD = $(OGG_LIBS)
 EXTRA_LTLIBRARIES += libmux_ogg_plugin.la
-mux_LTLIBRARIES += $(LTLIBmux_ogg)
+mux_PLUGINS += $(LTLIBmux_ogg)
 
 libmux_ts_plugin_la_SOURCES = \
 	mux/mpeg/pes.c mux/mpeg/pes.h \
@@ -56,5 +63,5 @@ libmux_ts_plugin_la_SOURCES = \
 libmux_ts_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(DVBPSI_CFLAGS)
 libmux_ts_plugin_la_LIBADD = $(DVBPSI_LIBS) $(DVBCSA_LIBS)
 if HAVE_DVBPSI
-mux_LTLIBRARIES += libmux_ts_plugin.la
+mux_PLUGINS += libmux_ts_plugin.la
 endif

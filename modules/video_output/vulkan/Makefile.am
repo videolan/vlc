@@ -17,10 +17,10 @@ libvk_android_plugin_la_CFLAGS = $(AM_CFLAGS) $(VULKAN_CFLAGS) \
 
 if HAVE_VULKAN
 if HAVE_WIN32_DESKTOP
-vout_LTLIBRARIES += libvk_win32_plugin.la
+vout_PLUGINS += libvk_win32_plugin.la
 endif
 
 if HAVE_ANDROID
-vout_LTLIBRARIES += libvk_android_plugin.la
+vout_PLUGINS += libvk_android_plugin.la
 endif
 endif
