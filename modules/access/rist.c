@@ -481,7 +481,7 @@ static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_
 {
     stream_sys_t *p_sys = p_access->p_sys;
     uint8_t  ptype;
-    uint16_t processed_bytes = 0;
+    size_t processed_bytes = 0;
     uint16_t records;
     char new_sender_name[MAX_CNAME];
     uint8_t *buf;
@@ -489,11 +489,11 @@ static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_
     while (processed_bytes < len) {
         buf = buf_in + processed_bytes;
         /* safety checks */
-        uint16_t bytes_left = len - processed_bytes + 1;
+        size_t bytes_left = len - processed_bytes + 1;
         if ( bytes_left < 4 )
         {
             /* we must have at least 4 bytes */
-            msg_Err(p_access, "Rist rtcp packet must have at least 4 bytes, we have %d",
+            msg_Err(p_access, "Rist rtcp packet must have at least 4 bytes, we have %zu",
                 bytes_left);
             return;
         }
@@ -511,7 +511,7 @@ static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_
         {
             /* check for a sane number of bytes */
             msg_Err(p_access, "Malformed rtcp packet, wrong len %d, expecting %u bytes in the " \
-                "packet, got a buffer of %u bytes.", rtcp_get_length(buf), bytes, bytes_left);
+                "packet, got a buffer of %zu bytes.", rtcp_get_length(buf), bytes, bytes_left);
             return;
         }
 
@@ -531,12 +531,12 @@ static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_
                         return;
                     /* Check for changes in source IP address or port */
                     int8_t name_length = rtcp_sdes_get_name_length(buf);
-                    if (name_length > bytes_left || name_length <= 0 ||
+                    if ((size_t)name_length > bytes_left || name_length <= 0 ||
                         (size_t)name_length > sizeof(new_sender_name))
                     {
                         /* check for a sane number of bytes */
                         msg_Err(p_access, "Malformed SDES packet, wrong cname len %d, got a " \
-                            "buffer of %u bytes.", name_length, bytes_left);
+                            "buffer of %zu bytes.", name_length, bytes_left);
                         return;
                     }
                     bool ip_port_changed = false;
