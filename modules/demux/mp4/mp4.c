@@ -416,13 +416,13 @@ static stime_t MP4_ChunkGetSampleDTS( const mp4_chunk_t *p_chunk,
     {
         if( i_sample > p_chunk->p_sample_count_dts[i_index] )
         {
-            sdts += p_chunk->p_sample_count_dts[i_index] *
+            sdts += (stime_t)p_chunk->p_sample_count_dts[i_index] *
                 p_chunk->p_sample_delta_dts[i_index];
             i_sample -= p_chunk->p_sample_count_dts[i_index++];
         }
         else
         {
-            sdts += i_sample * p_chunk->p_sample_delta_dts[i_index];
+            sdts += (stime_t)i_sample * p_chunk->p_sample_delta_dts[i_index];
             break;
         }
     }
@@ -531,7 +531,7 @@ static inline vlc_tick_t MP4_GetSamplesDuration( demux_t *p_demux, mp4_track_t *
         }
         else
         {
-            i_duration += i_nb_samples * p_chunk->p_sample_delta_dts[i_index];
+            i_duration += (stime_t)i_nb_samples * p_chunk->p_sample_delta_dts[i_index];
             break;
         }
     }
@@ -2692,7 +2692,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                     {
                         ck->p_sample_count_dts[i] = i_sample_count;
                         ck->p_sample_delta_dts[i] = stts->pi_sample_delta[i_index];
-                        i_next_dts += ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
+                        i_next_dts += (int64_t)ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
                         if ( i_sample_count ) ck->i_duration = i_next_dts - ck->i_first_dts;
                         i_current_index_samples_left -= i_sample_count;
                         i_sample_count = 0;
@@ -2703,7 +2703,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                     {
                         ck->p_sample_count_dts[i] = i_current_index_samples_left;
                         ck->p_sample_delta_dts[i] = stts->pi_sample_delta[i_index];
-                        i_next_dts += ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
+                        i_next_dts += (int64_t)ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
                         if ( i_current_index_samples_left ) ck->i_duration = i_next_dts - ck->i_first_dts;
                         i_sample_count -= i_current_index_samples_left;
                         i_current_index_samples_left = 0;
@@ -2716,7 +2716,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                     {
                         ck->p_sample_count_dts[i] = i_sample_count;
                         ck->p_sample_delta_dts[i] = stts->pi_sample_delta[i_index];
-                        i_next_dts += ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
+                        i_next_dts += (int64_t)ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
                         if ( i_sample_count ) ck->i_duration = i_next_dts - ck->i_first_dts;
                         i_current_index_samples_left = stts->pi_sample_count[i_index] - i_sample_count;
                         i_sample_count = 0;
@@ -2727,7 +2727,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
                     {
                         ck->p_sample_count_dts[i] = stts->pi_sample_count[i_index];
                         ck->p_sample_delta_dts[i] = stts->pi_sample_delta[i_index];
-                        i_next_dts += ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
+                        i_next_dts += (int64_t)ck->p_sample_count_dts[i] * stts->pi_sample_delta[i_index];
                         if ( stts->pi_sample_count[i_index] ) ck->i_duration = i_next_dts - ck->i_first_dts;
                         i_sample_count -= stts->pi_sample_count[i_index];
                         i_index++;
@@ -3212,11 +3212,11 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
          i_index++ )
     {
         if( i_dts +
-            p_track->chunk[i_chunk].p_sample_count_dts[i_index] *
+            (uint64_t)p_track->chunk[i_chunk].p_sample_count_dts[i_index] *
             p_track->chunk[i_chunk].p_sample_delta_dts[i_index] < (uint64_t)i_start )
         {
             i_dts    +=
-                p_track->chunk[i_chunk].p_sample_count_dts[i_index] *
+                (uint64_t)p_track->chunk[i_chunk].p_sample_count_dts[i_index] *
                 p_track->chunk[i_chunk].p_sample_delta_dts[i_index];
 
             i_sample += p_track->chunk[i_chunk].p_sample_count_dts[i_index];
@@ -4344,12 +4344,12 @@ static bool GetMoofTrackDuration( MP4_Box_t *p_moov, MP4_Box_t *p_moof,
             }
             else if ( BOXDATA(p_tfhd)->i_flags & MP4_TFHD_DFLT_SAMPLE_DURATION )
             {
-                i_traf_duration += p_trundata->i_sample_count *
+                i_traf_duration += (uint64_t)p_trundata->i_sample_count *
                         BOXDATA(p_tfhd)->i_default_sample_duration;
             }
             else
             {
-                i_traf_duration += p_trundata->i_sample_count *
+                i_traf_duration += (uint64_t)p_trundata->i_sample_count *
                         i_track_defaultsampleduration;
             }
 
@@ -4948,7 +4948,7 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
             }
             else
             {
-                i_trun_dts += p_trundata->i_sample_count *
+                i_trun_dts += (uint64_t)p_trundata->i_sample_count *
                         i_track_defaultsampleduration;
             }
 
