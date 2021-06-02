@@ -18,7 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-import QtQuick 2.11
+import QtQuick      2.11
+import QtQml.Models 2.11
 
 import org.videolan.medialib 0.1
 
@@ -336,7 +337,8 @@ Widgets.NavigableFocusScope {
             Connections {
                 target: contextMenu
 
-                onShowMediaInformation: gridView.switchExpandItem(index)
+                // FIXME: We need to implement this in qml_menu_wrapper.
+                //onShowMediaInformation: gridView.switchExpandItem(index)
             }
 
             //-------------------------------------------------------------------------------------
@@ -368,8 +370,6 @@ Widgets.NavigableFocusScope {
             selectionDelegateModel: modelSelect
 
             dragItem: dragItemGroup
-
-            header: root.header
 
             headerTopPadding: VLCStyle.margin_normal
 

@@ -52,11 +52,6 @@ Widgets.NavigableFocusScope {
     property int _height: (isMusic) ? VLCStyle.gridItem_music_height
                                     : VLCStyle.gridItem_video_height
 
-    property int _widthColumn:
-        Math.max(VLCStyle.gridColumnsForWidth(tableView.availableRowWidth
-                                              - VLCStyle.listAlbumCover_width
-                                              - VLCStyle.column_margin_width) - 1, 1)
-
     property int _widthCover: (isMusic) ? VLCStyle.gridCover_music_width
                                         : VLCStyle.gridCover_video_width
 

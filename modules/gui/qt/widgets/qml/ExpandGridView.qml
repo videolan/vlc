@@ -417,8 +417,7 @@ NavigableFocusScope {
 
         Loader {
             id: footerItemLoader
-
-            focus: status == Loader.Ready ? item.focus : false
+            focus: (status === Loader.Ready) ? item.focus : false
             y: root.topMargin + root.headerHeight + (root._effectiveCellHeight * (Math.ceil(model.count / getNbItemsPerRow()))) +
                _expandItemVerticalSpace
         }

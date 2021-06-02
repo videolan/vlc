@@ -50,7 +50,7 @@ VideoAll {
     }
 
     header: Column {
-        property Item focusItem: loader.item.focusItem
+        property Item focusItem: (loader.status === Loader.Ready) ? loader.item.focusItem : null
 
         width: root.width
 
@@ -63,7 +63,7 @@ VideoAll {
 
             width: parent.width
 
-            height: item.implicitHeight
+            height: (status === Loader.Ready) ? item.implicitHeight : 0
 
             active: (modelRecent.count)
 

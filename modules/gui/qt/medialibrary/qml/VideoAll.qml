@@ -100,7 +100,7 @@ Widgets.NavigableFocusScope {
         target: model
 
         onCountChanged: {
-            if (count === 0 || modelSelect.hasSelection) return;
+            if (model.count === 0 || modelSelect.hasSelection) return;
 
             resetFocus();
         }
