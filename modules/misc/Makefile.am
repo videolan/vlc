@@ -1,21 +1,27 @@
 miscdir = $(pluginsdir)/misc
+misc_PLUGINS =
+misc_LTLIBRARIES =
 misc_RPATH =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(misc_PLUGINS)
+else
+misc_LTLIBRARIES += $(misc_PLUGINS)
 misc_RPATH += -rpath '$(miscdir)'
+endif
 
 libstats_plugin_la_SOURCES = misc/stats.c
-
-misc_LTLIBRARIES = libstats_plugin.la
+misc_PLUGINS += libstats_plugin.la
 
 libaudioscrobbler_plugin_la_SOURCES = misc/audioscrobbler.c
 libaudioscrobbler_plugin_la_LIBADD = $(SOCKET_LIBS)
-misc_LTLIBRARIES += libaudioscrobbler_plugin.la
+misc_PLUGINS += libaudioscrobbler_plugin.la
 
 libexport_plugin_la_SOURCES = \
 	misc/playlist/html.c \
 	misc/playlist/m3u.c \
 	misc/playlist/xspf.c \
 	misc/playlist/export.c
-misc_LTLIBRARIES += libexport_plugin.la
+misc_PLUGINS += libexport_plugin.la
 
 libfingerprinter_plugin_la_SOURCES =  \
 	misc/webservices/acoustid.c misc/webservices/acoustid.h \
@@ -24,7 +30,7 @@ libfingerprinter_plugin_la_SOURCES =  \
 	misc/fingerprinter.c
 libfingerprinter_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/misc
 libfingerprinter_plugin_la_LIBADD = $(LIBM)
-misc_LTLIBRARIES += libfingerprinter_plugin.la
+misc_PLUGINS += libfingerprinter_plugin.la
 
 libgnutls_plugin_la_SOURCES = misc/gnutls.c
 libgnutls_plugin_la_CFLAGS = $(AM_CFLAGS) $(GNUTLS_CFLAGS)
@@ -37,7 +43,7 @@ if HAVE_DARWIN
 libgnutls_plugin_la_LDFLAGS += -Wl,-framework,Security,-framework,CoreFoundation
 endif
 EXTRA_LTLIBRARIES += libgnutls_plugin.la
-misc_LTLIBRARIES += $(LTLIBgnutls)
+misc_PLUGINS += $(LTLIBgnutls)
 
 if HAVE_DARWIN
 libsecuretransport_plugin_la_SOURCES = misc/securetransport.c
@@ -45,30 +51,30 @@ libsecuretransport_plugin_la_CFLAGS = $(AM_CFLAGS) $(SECURETRANSPORT_CFLAGS)
 libsecuretransport_plugin_la_LIBADD = $(SECURETRANSPORT_LIBS)
 libsecuretransport_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(misc_RPATH) -Wl,-framework,Security,-framework,CoreFoundation
 libsecuretransport_plugin_la_LDFLAGS += -Wl,-U,_SSLCopyALPNProtocols,-U,_SSLSetALPNProtocols
-misc_LTLIBRARIES += libsecuretransport_plugin.la
+misc_PLUGINS += libsecuretransport_plugin.la
 endif
 
 if HAVE_OSX
 libiokit_inhibit_plugin_la_SOURCES = misc/inhibit/iokit-inhibit.c
 libiokit_inhibit_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation,-framework,IOKit
-misc_LTLIBRARIES += libiokit_inhibit_plugin.la
+misc_PLUGINS += libiokit_inhibit_plugin.la
 endif
 
 libuikit_inhibit_plugin_la_SOURCES = misc/inhibit/uikit-inhibit.m
 libuikit_inhibit_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,UIKit,-framework,Foundation
 libuikit_inhibit_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 if HAVE_IOS
-misc_LTLIBRARIES += libuikit_inhibit_plugin.la
+misc_PLUGINS += libuikit_inhibit_plugin.la
 endif
 
 if HAVE_TVOS
-misc_LTLIBRARIES += libuikit_inhibit_plugin.la
+misc_PLUGINS += libuikit_inhibit_plugin.la
 endif
 
 libxdg_screensaver_plugin_la_SOURCES = misc/inhibit/xdg.c
 if HAVE_XCB
 if !HAVE_WIN32
-misc_LTLIBRARIES += libxdg_screensaver_plugin.la
+misc_PLUGINS += libxdg_screensaver_plugin.la
 endif
 endif
 
@@ -76,7 +82,7 @@ libdbus_screensaver_plugin_la_SOURCES = misc/inhibit/dbus.c
 libdbus_screensaver_plugin_la_CFLAGS = $(AM_CFLAGS) $(DBUS_CFLAGS)
 libdbus_screensaver_plugin_la_LIBADD = $(DBUS_LIBS)
 if HAVE_DBUS
-misc_LTLIBRARIES += libdbus_screensaver_plugin.la
+misc_PLUGINS += libdbus_screensaver_plugin.la
 endif
 
 libwl_idle_inhibit_plugin_la_SOURCES = misc/inhibit/wl-idle-inhibit.c
@@ -87,7 +93,7 @@ libwl_idle_inhibit_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/misc/inhibi
 libwl_idle_inhibit_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
 libwl_idle_inhibit_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS)
 if HAVE_WAYLAND
-misc_LTLIBRARIES += libwl_idle_inhibit_plugin.la
+misc_PLUGINS += libwl_idle_inhibit_plugin.la
 BUILT_SOURCES += $(nodist_libwl_idle_inhibit_plugin_la_SOURCES)
 endif
 
@@ -106,7 +112,7 @@ libaddonsvorepository_plugin_la_SOURCES = \
 libaddonsfsstorage_plugin_la_SOURCES = \
 	misc/addons/fsstorage.c misc/addons/xmlreading.h
 if ENABLE_ADDONMANAGERMODULES
-misc_LTLIBRARIES += \
+misc_PLUGINS += \
 	libaddonsvorepository_plugin.la \
 	libaddonsfsstorage_plugin.la
 endif
@@ -116,7 +122,7 @@ libxml_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBXML2_CFLAGS)
 libxml_plugin_la_LIBADD = $(LIBXML2_LIBS)
 libxml_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(misc_RPATH) $(LDFLAGS_xml)
 EXTRA_LTLIBRARIES += libxml_plugin.la
-misc_LTLIBRARIES += $(LTLIBxml)
+misc_PLUGINS += $(LTLIBxml)
 
 libmedialibrary_plugin_la_SOURCES = \
 	misc/medialibrary/medialibrary.cpp \
@@ -141,4 +147,4 @@ libmedialibrary_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(MEDIALIBRARY_CFLAGS)
 libmedialibrary_plugin_la_LIBADD = $(MEDIALIBRARY_LIBS)
 libmedialibrary_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(misc_RPATH)
 EXTRA_LTLIBRARIES += libmedialibrary_plugin.la
-misc_LTLIBRARIES += $(LTLIBmedialibrary)
+misc_PLUGINS += $(LTLIBmedialibrary)

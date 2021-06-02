@@ -1,6 +1,14 @@
 LIBTOOL=@LIBTOOL@ --tag=CC
 
 neondir = $(pluginsdir)/arm_neon
+neon_PLUGINS =
+neon_LTLIBRARIES =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(neon_PLUGINS)
+else
+neon_LTLIBRARIES += $(neon_PLUGINS)
+endif
+
 
 libchroma_yuv_neon_plugin_la_SOURCES = \
 	arm_neon/deinterleave_chroma.S \
@@ -25,7 +33,7 @@ libyuv_rgb_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libyuv_rgb_neon_plugin_LIBTOOLFLAGS = --tag=CC
 
 if HAVE_NEON
-neon_LTLIBRARIES = \
+neon_PLUGINS += \
 	libchroma_yuv_neon_plugin.la \
 	libyuv_rgb_neon_plugin.la
 endif

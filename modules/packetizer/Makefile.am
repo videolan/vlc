@@ -1,6 +1,14 @@
 packetizerdir = $(pluginsdir)/packetizer
+packetizer_PLUGINS =
+packetizer_LTLIBRARIES =
 packetizer_RPATH =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(packetizer_PLUGINS)
+else
+packetizer_LTLIBRARIES += $(packetizer_PLUGINS)
 packetizer_RPATH += -rpath '$(packetizerdir)'
+endif
+
 
 libpacketizer_av1_plugin_la_SOURCES = packetizer/av1.c \
                                       packetizer/av1.h \
@@ -50,7 +58,7 @@ libpacketizer_avparser_plugin_la_LIBADD = $(AVCODEC_LIBS) $(AVUTIL_LIBS) $(LIBM)
 
 noinst_HEADERS += packetizer/packetizer_helper.h packetizer/startcode_helper.h
 
-packetizer_LTLIBRARIES = \
+packetizer_PLUGINS += \
 	libpacketizer_av1_plugin.la \
 	libpacketizer_mpegvideo_plugin.la \
 	libpacketizer_mpeg4video_plugin.la \
@@ -69,7 +77,6 @@ packetizer_LTLIBRARIES = \
 
 if HAVE_AVCODEC
 if !MERGE_FFMPEG
-packetizer_LTLIBRARIES += libpacketizer_avparser_plugin.la
+packetizer_PLUGINS += libpacketizer_avparser_plugin.la
 endif
 endif
-

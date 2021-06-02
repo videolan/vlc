@@ -1,6 +1,14 @@
 chromadir = $(pluginsdir)/video_chroma
+chroma_PLUGINS =
+chroma_LTLIBRARIES =
 chroma_RPATH =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(chroma_PLUGINS)
+else
+chroma_LTLIBRARIES += $(chroma_PLUGINS)
 chroma_RPATH += -rpath '$(chromadir)'
+endif
+
 
 libchain_plugin_la_SOURCES = video_chroma/chain.c
 
@@ -45,7 +53,7 @@ libyuy2_i422_plugin_la_SOURCES = video_chroma/yuy2_i422.c
 
 libyuvp_plugin_la_SOURCES = video_chroma/yuvp.c
 
-chroma_LTLIBRARIES = \
+chroma_PLUGINS += \
 	libi420_rgb_plugin.la \
 	libi420_yuy2_plugin.la \
 	libi420_nv12_plugin.la \
@@ -68,7 +76,7 @@ libi420_yuy2_altivec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 libi420_yuy2_altivec_plugin_la_CFLAGS = $(AM_CFLAGS) $(ALTIVEC_CFLAGS)
 
 if HAVE_ALTIVEC
-chroma_LTLIBRARIES += \
+chroma_PLUGINS += \
 	libi420_yuy2_altivec_plugin.la
 endif
 
@@ -86,7 +94,7 @@ libi422_yuy2_mmx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_i422_yuy2_mmx
 
 if HAVE_MMX
-chroma_LTLIBRARIES += \
+chroma_PLUGINS += \
 	libi420_rgb_mmx_plugin.la \
 	libi420_yuy2_mmx_plugin.la \
 	libi422_yuy2_mmx_plugin.la
@@ -106,7 +114,7 @@ libi422_yuy2_sse2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DMODULE_NAME_IS_i422_yuy2_sse2
 
 if HAVE_SSE2
-chroma_LTLIBRARIES += \
+chroma_PLUGINS += \
 	libi420_rgb_sse2_plugin.la \
 	libi420_yuy2_sse2_plugin.la \
 	libi422_yuy2_sse2_plugin.la
@@ -122,7 +130,7 @@ endif
 libcvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(chroma_RPATH) -Wl,-framework,Foundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 libcvpx_plugin_la_LIBADD = libchroma_copy.la
 EXTRA_LTLIBRARIES += libcvpx_plugin.la
-chroma_LTLIBRARIES += $(LTLIBcvpx)
+chroma_PLUGINS += $(LTLIBcvpx)
 
 # Tests
 chroma_copy_sse_test_SOURCES = $(libchroma_copy_la_SOURCES)

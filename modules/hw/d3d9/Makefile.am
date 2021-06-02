@@ -1,6 +1,13 @@
 d3d9dir = $(pluginsdir)/d3d9
+d3d9_LTLIBRARIES =
+d3d9_PLUGINS =
 d3d9_RPATH =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(d3d9_PLUGINS)
+else
+d3d9_LTLIBRARIES += $(d3d9_PLUGINS)
 d3d9_RPATH += -rpath '$(d3d9dir)'
+endif
 
 libdirect3d9_filters_plugin_la_SOURCES = hw/d3d9/d3d9_filters.h \
     hw/d3d9/d3d9_filters.c \
@@ -11,6 +18,6 @@ libdirect3d9_filters_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(d3d9_RPATH)
 libdirect3d9_filters_plugin_la_LIBADD = libchroma_copy.la libdeinterlace_common.la libd3d9_common.la $(LIBCOM)
 
 if HAVE_WIN32_DESKTOP
-d3d9_LTLIBRARIES = $(LTLIBdirect3d9_filters)
+d3d9_PLUGINS += $(LTLIBdirect3d9_filters)
 EXTRA_LTLIBRARIES += libdirect3d9_filters_plugin.la
 endif

@@ -61,7 +61,7 @@ libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
 libgles2_plugin_la_LIBADD = libvlc_opengles.la
 libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(vout_RPATH)
 if HAVE_GLES2
-vout_LTLIBRARIES += libgles2_plugin.la
+vout_PLUGINS += libgles2_plugin.la
 endif
 
 libgl_plugin_la_SOURCES = video_output/opengl/display.c
@@ -98,36 +98,36 @@ libglfilter_yadif_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
 else
 libglfilter_yadif_plugin_la_LIBADD = libvlc_opengl.la
 endif
-vout_LTLIBRARIES += libglfilter_yadif_plugin.la
+vout_PLUGINS += libglfilter_yadif_plugin.la
 endif
 
 if HAVE_IOS
 libglfilter_yadif_plugin_la_LIBADD = libvlc_opengles.la
 libglfilter_yadif_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
-vout_LTLIBRARIES += libglfilter_yadif_plugin.la
+vout_PLUGINS += libglfilter_yadif_plugin.la
 endif
 
 if HAVE_TVOS
 libglfilter_yadif_plugin_la_LIBADD = libvlc_opengles.la
 libglfilter_yadif_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
-vout_LTLIBRARIES += libglfilter_yadif_plugin.la
+vout_PLUGINS += libglfilter_yadif_plugin.la
 endif
 
 if HAVE_OSX
 libglfilter_yadif_plugin_la_LIBADD = libvlc_opengl.la
-vout_LTLIBRARIES += libglfilter_yadif_plugin.la
+vout_PLUGINS += libglfilter_yadif_plugin.la
 endif
 
 
 if HAVE_GL
-vout_LTLIBRARIES += libgl_plugin.la
+vout_PLUGINS += libgl_plugin.la
 endif # HAVE_GL
 
 libegl_display_generic_plugin_la_SOURCES = video_output/opengl/egl_display_generic.c
 libegl_display_generic_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_FLAGS)
 libegl_display_generic_plugin_la_LIBADD = $(EGL_LIBS)
 if HAVE_EGL
-vout_LTLIBRARIES += libegl_display_generic_plugin.la
+vout_PLUGINS += libegl_display_generic_plugin.la
 endif
 
 libegl_display_gbm_plugin_la_SOURCES = video_output/opengl/egl_display_gbm.c
@@ -135,7 +135,7 @@ libegl_display_gbm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_FLAGS) $(GBM_CFLAGS
 libegl_display_gbm_plugin_la_LIBADD = $(EGL_LIBS) $(GBM_LIBS)
 if HAVE_EGL
 if HAVE_GBM
-vout_LTLIBRARIES += libegl_display_gbm_plugin.la
+vout_PLUGINS += libegl_display_gbm_plugin.la
 endif
 endif
 
@@ -147,12 +147,12 @@ libegl_pbuffer_filter_plugin_la_LIBADD = $(EGL_LIBS)
 if HAVE_EGL
 if HAVE_GL
 libegl_pbuffer_filter_plugin_la_LIBADD += libvlc_opengl.la $(GL_LIBS)
-vout_LTLIBRARIES += libegl_pbuffer_filter_plugin.la
+vout_PLUGINS += libegl_pbuffer_filter_plugin.la
 endif
 if HAVE_ANDROID
 libegl_pbuffer_filter_plugin_la_LIBADD += libvlc_opengles.la $(GLES2_LIBS)
 libegl_pbuffer_filter_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2=1
-vout_LTLIBRARIES += libegl_pbuffer_filter_plugin.la
+vout_PLUGINS += libegl_pbuffer_filter_plugin.la
 endif
 endif
 
@@ -162,6 +162,6 @@ libegl_surfacetexture_plugin_la_LIBADD = $(EGL_LIBS)
 
 if HAVE_ANDROID
 if HAVE_EGL
-vout_LTLIBRARIES += libegl_surfacetexture_plugin.la
+vout_PLUGINS += libegl_surfacetexture_plugin.la
 endif
 endif

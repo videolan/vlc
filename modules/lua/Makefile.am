@@ -1,4 +1,11 @@
 luadir = $(pluginsdir)/lua
+lua_PLUGINS =
+lua_LTLIBRARIES =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(lua_PLUGINS)
+else
+lua_LTLIBRARIES += $(lua_PLUGINS)
+endif
 
 liblua_plugin_la_SOURCES = \
 	lua/extension.c lua/extension.h \
@@ -40,5 +47,5 @@ endif
 liblua_plugin_la_CFLAGS = $(AM_CFLAGS) $(LUA_CFLAGS) -I$(srcdir)/lua
 liblua_plugin_la_LIBADD = $(LUA_LIBS) $(SOCKET_LIBS) $(LIBDL) $(LIBM)
 if BUILD_LUA
-lua_LTLIBRARIES = liblua_plugin.la
+lua_PLUGINS += liblua_plugin.la
 endif

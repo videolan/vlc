@@ -20,7 +20,7 @@ libplacebo_plugin_la_SOURCES = $(LIBPLACEBO_COMMONSOURCES) \
 libplacebo_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBPLACEBO_CFLAGS)
 libplacebo_plugin_la_LIBADD = $(LIBPLACEBO_LIBS) libplacebo_utils.la
 
-vout_LTLIBRARIES += libplacebo_plugin.la
+vout_PLUGINS += libplacebo_plugin.la
 
 ### Vulkan ###
 libplacebo_vk_plugin_la_SOURCES = $(LIBPLACEBO_COMMONSOURCES) \
@@ -32,7 +32,7 @@ libplacebo_vk_plugin_la_LIBADD = $(LIBPLACEBO_LIBS) $(VULKAN_LIBS)
 libplacebo_vk_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 if HAVE_VULKAN
-vout_LTLIBRARIES += $(LTLIBplacebo_vk)
+vout_PLUGINS += $(LTLIBplacebo_vk)
 EXTRA_LTLIBRARIES += libplacebo_vk_plugin.la
 endif
 
@@ -50,11 +50,11 @@ libplacebo_gles2_plugin_la_LIBADD = $(LIBPLACEBO_LIBS) libvlc_opengles.la
 libplacebo_gles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 if HAVE_GL
-vout_LTLIBRARIES += $(LTLIBplacebo_gl)
+vout_PLUGINS += $(LTLIBplacebo_gl)
 EXTRA_LTLIBRARIES += libplacebo_gl_plugin.la
 endif
 
 if HAVE_GLES2
-vout_LTLIBRARIES += $(LTLIBplacebo_gles2)
+vout_PLUGINS += $(LTLIBplacebo_gles2)
 EXTRA_LTLIBRARIES += libplacebo_gles2_plugin.la
 endif

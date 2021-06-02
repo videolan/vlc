@@ -263,5 +263,5 @@ libskins2_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) -O2 -fno-rtti
 libskins2_plugin_la_LIBADD = $(LIBS_skins2)
 
 if BUILD_SKINS
-gui_LTLIBRARIES += libskins2_plugin.la
+gui_PLUGINS += libskins2_plugin.la
 endif

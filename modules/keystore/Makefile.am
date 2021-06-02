@@ -1,10 +1,17 @@
 keystoredir = $(pluginsdir)/keystore
+keystore_PLUGINS =
+keystore_LTLIBRARIES =
 keystore_RPATH =
+if HAVE_MERGE_PLUGINS
+noinst_LTLIBRARIES += $(keystore_PLUGINS)
+else
+keystore_LTLIBRARIES += $(keystore_PLUGINS)
 keystore_RPATH += -rpath '$(keystoredir)'
+endif
 
 libmemory_keystore_plugin_la_SOURCES = keystore/memory.c \
 	keystore/list_util.c keystore/list_util.h
-keystore_LTLIBRARIES = libmemory_keystore_plugin.la
+keystore_PLUGINS += libmemory_keystore_plugin.la
 
 libfile_keystore_plugin_la_SOURCES = keystore/file.c \
 	keystore/file_crypt.h \
@@ -17,7 +24,7 @@ if HAVE_WIN32
 libfile_keystore_plugin_la_SOURCES += keystore/file_crypt_win32.c
 libfile_keystore_plugin_la_LIBADD = -lcrypt32
 endif
-keystore_LTLIBRARIES += libfile_keystore_plugin.la
+keystore_PLUGINS += libfile_keystore_plugin.la
 
 libsecret_plugin_la_SOURCES = keystore/secret.c
 libsecret_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SECRET_CFLAGS)
@@ -34,10 +41,10 @@ libkeychain_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libkeychain_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(keystore_RPATH) -Wl,-framework,Foundation -Wl,-framework,Security
 
 if HAVE_DARWIN
-keystore_LTLIBRARIES += libkeychain_plugin.la
+keystore_PLUGINS += libkeychain_plugin.la
 endif
 
-keystore_LTLIBRARIES += \
+keystore_PLUGINS += \
 	$(LTLIBsecret) \
 	$(LTLIBkwallet)
 
