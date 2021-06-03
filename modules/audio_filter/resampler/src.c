@@ -60,7 +60,7 @@ vlc_module_begin ()
     set_category (CAT_AUDIO)
     set_subcategory (SUBCAT_AUDIO_RESAMPLER)
     add_integer ("src-converter-type", SRC_SINC_FASTEST,
-                 SRC_CONV_TYPE_TEXT, SRC_CONV_TYPE_LONGTEXT, true)
+                 SRC_CONV_TYPE_TEXT, SRC_CONV_TYPE_LONGTEXT)
         change_integer_list (conv_type_values, conv_type_texts)
     set_capability ("audio converter", 50)
     set_callback (Open)

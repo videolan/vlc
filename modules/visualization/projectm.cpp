@@ -113,16 +113,11 @@ vlc_module_begin ()
     add_loadfile("projectm-menu-font", FONT_PATH_MENU,
                  MENU_FONT_TXT, MENU_FONT_LONGTXT)
 #endif
-    add_integer( "projectm-width", 800, WIDTH_TEXT, WIDTH_LONGTEXT,
-                 false )
-    add_integer( "projectm-height", 500, HEIGHT_TEXT, HEIGHT_LONGTEXT,
-                 false )
-    add_integer( "projectm-meshx", 32, MESHX_TEXT, MESHX_LONGTEXT,
-                 false )
-    add_integer( "projectm-meshy", 24, MESHY_TEXT, MESHY_LONGTEXT,
-                 false )
-    add_integer( "projectm-texture-size", 1024, TEXTURE_TEXT, TEXTURE_LONGTEXT,
-                 false )
+    add_integer( "projectm-width", 800, WIDTH_TEXT, WIDTH_LONGTEXT )
+    add_integer( "projectm-height", 500, HEIGHT_TEXT, HEIGHT_LONGTEXT )
+    add_integer( "projectm-meshx", 32, MESHX_TEXT, MESHX_LONGTEXT )
+    add_integer( "projectm-meshy", 24, MESHY_TEXT, MESHY_LONGTEXT )
+    add_integer( "projectm-texture-size", 1024, TEXTURE_TEXT, TEXTURE_LONGTEXT )
     add_shortcut( "projectm" )
     set_callback( Open )
 vlc_module_end ()

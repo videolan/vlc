@@ -169,5 +169,5 @@ vlc_module_begin()
     set_capability("access", 0)
     set_callbacks(Open, Close)
 
-    add_integer("imem-pts-delay", 700, "PTS delay in MS", "", false)
+    add_integer("imem-pts-delay", 700, "PTS delay in MS", "")
 vlc_module_end()

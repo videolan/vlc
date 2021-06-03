@@ -149,8 +149,6 @@ vlc_module_begin()
     set_category(CAT_SOUT)
     set_subcategory(SUBCAT_SOUT_STREAM)
     set_callbacks(Open, Close)
-    add_integer(SOUT_CFG_PREFIX "id", 0, ID_TEXT, ID_LONGTEXT,
-                false)
-    add_integer(SOUT_CFG_PREFIX "delay", 0, DELAY_TEXT, DELAY_LONGTEXT,
-                false)
+    add_integer(SOUT_CFG_PREFIX "id", 0, ID_TEXT, ID_LONGTEXT)
+    add_integer(SOUT_CFG_PREFIX "delay", 0, DELAY_TEXT, DELAY_LONGTEXT)
 vlc_module_end()

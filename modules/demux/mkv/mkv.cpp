@@ -60,27 +60,27 @@ vlc_module_begin ()
 
     add_bool( "mkv-use-ordered-chapters", true,
             N_("Respect ordered chapters"),
-            N_("Play chapters in the order specified in the segment."), false );
+            N_("Play chapters in the order specified in the segment.") );
 
     add_bool( "mkv-use-chapter-codec", true,
             N_("Chapter codecs"),
-            N_("Use chapter codecs found in the segment."), true );
+            N_("Use chapter codecs found in the segment.") );
 
     add_bool( "mkv-preload-local-dir", true,
             N_("Preload MKV files in the same directory"),
-            N_("Preload matroska files in the same directory to find linked segments (not good for broken files)."), false );
+            N_("Preload matroska files in the same directory to find linked segments (not good for broken files).") );
 
     add_bool( "mkv-seek-percent", false,
             N_("Seek based on percent not time"),
-            nullptr, true );
+            nullptr );
 
     add_bool( "mkv-use-dummy", false,
             N_("Dummy Elements"),
-            N_("Read and discard unknown EBML elements (not good for broken files)."), true );
+            N_("Read and discard unknown EBML elements (not good for broken files).") );
 
     add_bool( "mkv-preload-clusters", false,
             N_("Preload clusters"),
-            N_("Find all cluster positions by jumping cluster-to-cluster before playback"), true );
+            N_("Find all cluster positions by jumping cluster-to-cluster before playback") );
 
     add_shortcut( "mka", "mkv" )
     add_file_extension("mka")

@@ -99,21 +99,21 @@ vlc_module_begin ()
 
     /* General options */
     add_string(  CFG_PREFIX "format", "png",
-                 FORMAT_TEXT, FORMAT_LONGTEXT, false )
+                 FORMAT_TEXT, FORMAT_LONGTEXT )
     add_integer( CFG_PREFIX "width", -1,
-                 WIDTH_TEXT, WIDTH_LONGTEXT, true )
+                 WIDTH_TEXT, WIDTH_LONGTEXT )
     add_integer( CFG_PREFIX "height", -1,
-                 HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
+                 HEIGHT_TEXT, HEIGHT_LONGTEXT )
     add_string(  CFG_PREFIX "prefix", "scene",
-                 PREFIX_TEXT, PREFIX_LONGTEXT, false )
+                 PREFIX_TEXT, PREFIX_LONGTEXT )
     add_string(  CFG_PREFIX "path", NULL,
-                 PATH_TEXT, PATH_LONGTEXT, false )
+                 PATH_TEXT, PATH_LONGTEXT )
     add_bool(    CFG_PREFIX "replace", false,
-                 REPLACE_TEXT, REPLACE_LONGTEXT, false )
+                 REPLACE_TEXT, REPLACE_LONGTEXT )
 
     /* Snapshot method */
     add_integer_with_range( CFG_PREFIX "ratio", 50, 1, INT_MAX,
-                            RATIO_TEXT, RATIO_LONGTEXT, false )
+                            RATIO_TEXT, RATIO_LONGTEXT )
 
     set_callback_video_filter( Create )
 vlc_module_end ()

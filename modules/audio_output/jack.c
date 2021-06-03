@@ -102,10 +102,10 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_bool( AUTO_CONNECT_OPTION, true, AUTO_CONNECT_TEXT,
-              AUTO_CONNECT_LONGTEXT, false )
+              AUTO_CONNECT_LONGTEXT )
     add_string( CONNECT_REGEX_OPTION, "system", CONNECT_REGEX_TEXT,
-                CONNECT_REGEX_LONGTEXT, false )
-    add_string( "jack-name", "", JACK_NAME_TEXT, NULL, false)
+                CONNECT_REGEX_LONGTEXT )
+    add_string( "jack-name", "", JACK_NAME_TEXT, NULL)
 
     add_sw_gain( )
     set_callbacks( Open, Close )

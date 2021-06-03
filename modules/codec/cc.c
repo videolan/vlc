@@ -67,7 +67,7 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_bool( "cc-opaque", true,
-                 OPAQUE_TEXT, OPAQUE_LONGTEXT, false )
+                 OPAQUE_TEXT, OPAQUE_LONGTEXT )
 vlc_module_end ()
 
 /*****************************************************************************

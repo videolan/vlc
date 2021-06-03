@@ -294,15 +294,15 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_string( FILTER_CFG_PREFIX "mode", "blend", SOUT_MODE_TEXT,
-                SOUT_MODE_LONGTEXT, false )
+                SOUT_MODE_LONGTEXT )
         change_string_list( mode_list, mode_list_text )
         change_safe ()
     add_integer( FILTER_CFG_PREFIX "phosphor-chroma", 2, PHOSPHOR_CHROMA_TEXT,
-                PHOSPHOR_CHROMA_LONGTEXT, true )
+                PHOSPHOR_CHROMA_LONGTEXT )
         change_integer_list( phosphor_chroma_list, phosphor_chroma_list_text )
         change_safe ()
     add_integer( FILTER_CFG_PREFIX "phosphor-dimmer", 2, PHOSPHOR_DIMMER_TEXT,
-                PHOSPHOR_DIMMER_LONGTEXT, true )
+                PHOSPHOR_DIMMER_LONGTEXT )
         change_integer_list( phosphor_dimmer_list, phosphor_dimmer_list_text )
         change_safe ()
     set_deinterlace_callback( Open )

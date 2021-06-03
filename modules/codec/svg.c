@@ -67,13 +67,13 @@ vlc_module_begin ()
 
     /* svg options */
     add_integer_with_range( "svg-width", -1, 1, 65535,
-                            TEXT_WIDTH, LONG_TEXT_WIDTH, false )
+                            TEXT_WIDTH, LONG_TEXT_WIDTH )
         change_safe()
     add_integer_with_range( "svg-height", -1, 1, 65535,
-                            TEXT_HEIGHT, LONG_TEXT_HEIGHT, false )
+                            TEXT_HEIGHT, LONG_TEXT_HEIGHT )
         change_safe()
 
-    add_float( "svg-scale", -1.0, TEXT_SCALE, LONG_TEXT_SCALE, false )
+    add_float( "svg-scale", -1.0, TEXT_SCALE, LONG_TEXT_SCALE )
 vlc_module_end ()
 
 typedef struct

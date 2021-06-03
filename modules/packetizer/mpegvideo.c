@@ -78,7 +78,7 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_bool( "packetizer-mpegvideo-sync-iframe", false, SYNC_INTRAFRAME_TEXT,
-              SYNC_INTRAFRAME_LONGTEXT, true )
+              SYNC_INTRAFRAME_LONGTEXT )
 vlc_module_end ()
 
 enum mpeg_startcode_e

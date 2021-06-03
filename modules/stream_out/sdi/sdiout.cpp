@@ -184,32 +184,32 @@ vlc_module_begin ()
 
     set_section(N_("DeckLink General Options"), NULL)
     add_integer(CFG_PREFIX "card-index", 0,
-                CARD_INDEX_TEXT, CARD_INDEX_LONGTEXT, true)
+                CARD_INDEX_TEXT, CARD_INDEX_LONGTEXT)
 
     set_section(N_("DeckLink Video Options"), NULL)
     add_string(CFG_PREFIX "video-connection", "sdi",
-                VIDEO_CONNECTION_TEXT, VIDEO_CONNECTION_LONGTEXT, true)
+                VIDEO_CONNECTION_TEXT, VIDEO_CONNECTION_LONGTEXT)
                 change_string_list(ppsz_videoconns, ppsz_videoconns_text)
     add_string(CFG_PREFIX "mode", "",
-                MODE_TEXT, MODE_LONGTEXT, true)
+                MODE_TEXT, MODE_LONGTEXT)
     add_bool(CFG_PREFIX "tenbits", true,
-                VIDEO_TENBITS_TEXT, VIDEO_TENBITS_LONGTEXT, true)
+                VIDEO_TENBITS_TEXT, VIDEO_TENBITS_LONGTEXT)
     add_integer(CFG_PREFIX "nosignal-delay", 5,
-                NOSIGNAL_INDEX_TEXT, NOSIGNAL_INDEX_LONGTEXT, true)
+                NOSIGNAL_INDEX_TEXT, NOSIGNAL_INDEX_LONGTEXT)
     add_integer(CFG_PREFIX "afd-line", 16,
-                AFDLINE_INDEX_TEXT, AFDLINE_INDEX_LONGTEXT, true)
+                AFDLINE_INDEX_TEXT, AFDLINE_INDEX_LONGTEXT)
     add_integer_with_range(CFG_PREFIX "afd", 8, 0, 16,
-                AFD_INDEX_TEXT, nullptr, true)
+                AFD_INDEX_TEXT, nullptr)
                 change_integer_list(rgi_afd_values, rgsz_afd_text)
     add_integer_with_range(CFG_PREFIX "ar", 1, 0, 1,
-                AR_INDEX_TEXT, AR_INDEX_LONGTEXT, true)
+                AR_INDEX_TEXT, AR_INDEX_LONGTEXT)
                 change_integer_list(rgi_ar_values, rgsz_ar_text)
     add_loadfile(CFG_PREFIX "nosignal-image", NULL,
                  NOSIGNAL_IMAGE_TEXT, nullptr)
 
     set_section(N_("DeckLink Audio Options"), NULL)
     add_integer_with_range(CFG_PREFIX "channels", 2, 0, 16,
-                CHANNELS_TEXT, CHANNELS_LONGTEXT, true)
-    add_string(CFG_PREFIX "audio", "", AUDIO_TEXT, AUDIO_LONGTEXT, true)
+                CHANNELS_TEXT, CHANNELS_LONGTEXT)
+    add_string(CFG_PREFIX "audio", "", AUDIO_TEXT, AUDIO_LONGTEXT)
 
 vlc_module_end ()

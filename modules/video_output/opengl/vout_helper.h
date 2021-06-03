@@ -38,40 +38,40 @@
 #if PL_API_VER >= 10
 #define add_desat_params() \
     add_float("desat-strength", pl_color_map_default_params.desaturation_strength, \
-              DESAT_STRENGTH_TEXT, DESAT_STRENGTH_LONGTEXT, false) \
+              DESAT_STRENGTH_TEXT, DESAT_STRENGTH_LONGTEXT) \
     add_float("desat-exponent", pl_color_map_default_params.desaturation_exponent, \
-              DESAT_EXPONENT_TEXT, DESAT_EXPONENT_LONGTEXT, false) \
+              DESAT_EXPONENT_TEXT, DESAT_EXPONENT_LONGTEXT) \
     add_float("desat-base", pl_color_map_default_params.desaturation_base, \
-              DESAT_BASE_TEXT, DESAT_BASE_LONGTEXT, false) \
+              DESAT_BASE_TEXT, DESAT_BASE_LONGTEXT) \
     add_obsolete_string("tone-mapping-desat")
 #else
 #define add_desat_params() \
     add_float("tone-mapping-desat", pl_color_map_default_params.tone_mapping_desaturate, \
-              TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT, false)
+              TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT)
 #endif
 
 #define add_glopts_placebo() \
     set_section(N_("Colorspace conversion"), NULL) \
     add_integer("rendering-intent", pl_color_map_default_params.intent, \
-                RENDER_INTENT_TEXT, RENDER_INTENT_LONGTEXT, false) \
+                RENDER_INTENT_TEXT, RENDER_INTENT_LONGTEXT) \
             change_integer_list(intent_values, intent_text) \
-    add_integer("target-prim", PL_COLOR_PRIM_UNKNOWN, PRIM_TEXT, PRIM_LONGTEXT, false) \
+    add_integer("target-prim", PL_COLOR_PRIM_UNKNOWN, PRIM_TEXT, PRIM_LONGTEXT) \
             change_integer_list(prim_values, prim_text) \
-    add_integer("target-trc", PL_COLOR_TRC_UNKNOWN, TRC_TEXT, TRC_LONGTEXT, false) \
+    add_integer("target-trc", PL_COLOR_TRC_UNKNOWN, TRC_TEXT, TRC_LONGTEXT) \
             change_integer_list(trc_values, trc_text) \
     set_section(N_("Tone mapping"), NULL) \
     add_integer("tone-mapping", PL_TONE_MAPPING_HABLE, \
-                TONEMAPPING_TEXT, TONEMAPPING_LONGTEXT, false) \
+                TONEMAPPING_TEXT, TONEMAPPING_LONGTEXT) \
             change_integer_list(tone_values, tone_text) \
     add_desat_params() \
     add_float("tone-mapping-param", pl_color_map_default_params.tone_mapping_param, \
-              TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT, true) \
-    add_bool("tone-mapping-warn", false, GAMUT_WARN_TEXT, GAMUT_WARN_LONGTEXT, false) \
+              TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT) \
+    add_bool("tone-mapping-warn", false, GAMUT_WARN_TEXT, GAMUT_WARN_LONGTEXT) \
     set_section(N_("Dithering"), NULL) \
-    add_integer("dither-algo", -1, DITHER_TEXT, DITHER_LONGTEXT, false) \
+    add_integer("dither-algo", -1, DITHER_TEXT, DITHER_LONGTEXT) \
             change_integer_list(dither_values, dither_text) \
     add_integer_with_range("dither-depth", 0, 0, 16, \
-            DITHER_DEPTH_TEXT, DITHER_DEPTH_LONGTEXT, false)
+            DITHER_DEPTH_TEXT, DITHER_DEPTH_LONGTEXT)
 #else
 #define add_glopts_placebo()
 #endif

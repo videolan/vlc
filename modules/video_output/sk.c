@@ -353,10 +353,10 @@ vlc_module_begin()
     set_subcategory (SUBCAT_VIDEO_VOUT)
 
     add_bool( "sk-keep-last-frame", false, "Keep last frame",
-              "Keep the OpenGL surface and the window between media", true)
+              "Keep the OpenGL surface and the window between media")
 
     add_float( "sk-generate-vsync", -1.f, "Generate new VSYNC",
-              "Generate new VSYNC", true)
+              "Generate new VSYNC")
 
     add_submodule()
         set_capability ("opengl es2", 1000)

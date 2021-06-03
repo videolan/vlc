@@ -757,11 +757,11 @@ vlc_module_begin ()
     set_category( CAT_ADVANCED )
     set_subcategory( SUBCAT_ADVANCED_NETWORK )
     add_bool("gnutls-system-trust", true, SYSTEM_TRUST_TEXT,
-             SYSTEM_TRUST_LONGTEXT, true)
+             SYSTEM_TRUST_LONGTEXT)
     add_string("gnutls-dir-trust", NULL, DIR_TRUST_TEXT,
-               DIR_TRUST_LONGTEXT, true)
+               DIR_TRUST_LONGTEXT)
     add_string ("gnutls-priorities", "NORMAL", PRIORITIES_TEXT,
-                PRIORITIES_LONGTEXT, false)
+                PRIORITIES_LONGTEXT)
         change_string_list (priorities_values, priorities_text)
 #ifdef ENABLE_SOUT
     add_submodule ()

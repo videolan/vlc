@@ -77,18 +77,18 @@ vlc_module_begin ()
      set_subcategory( SUBCAT_INPUT_ACCESS )
 
      add_bool( "jack-input-use-vlc-pace", false,
-         PACE_TEXT, PACE_LONGTEXT, true )
+         PACE_TEXT, PACE_LONGTEXT )
      add_bool( "jack-input-auto-connect", false,
-         AUTO_CONNECT_TEXT, AUTO_CONNECT_LONGTEXT, false )
+         AUTO_CONNECT_TEXT, AUTO_CONNECT_LONGTEXT )
 
      /* Channels, potentially from MRL. */
      add_integer( "jack-input-channels", 0,
-         CHANNELS_TEXT, CHANNELS_LONGTEXT, false )
+         CHANNELS_TEXT, CHANNELS_LONGTEXT )
         change_safe()
 
     /* Ports, potentially from MRL. */
      add_string( "jack-input-ports", NULL,
-         PORTS_TEXT, PORTS_LONGTEXT, false )
+         PORTS_TEXT, PORTS_LONGTEXT )
         change_safe()
 
      add_shortcut( "jack" )

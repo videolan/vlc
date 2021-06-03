@@ -85,10 +85,10 @@ vlc_module_begin ()
     set_capability( "access", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_string( "ftp-user", NULL, USER_TEXT, USER_LONGTEXT, false )
+    add_string( "ftp-user", NULL, USER_TEXT, USER_LONGTEXT )
     add_password( "ftp-pwd", NULL, PASS_TEXT, PASS_LONGTEXT )
     add_string( "ftp-account", "anonymous", ACCOUNT_TEXT,
-                ACCOUNT_LONGTEXT, false )
+                ACCOUNT_LONGTEXT )
     add_shortcut( "ftp", "ftps", "ftpes" )
     set_callbacks( InOpen, InClose )
 

@@ -62,7 +62,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_STREAM )
 
     add_string( SOUT_CFG_PREFIX "dst-prefix", "", DST_PREFIX_TEXT,
-                DST_PREFIX_LONGTEXT, true )
+                DST_PREFIX_LONGTEXT )
 
     set_callbacks( Open, Close )
 vlc_module_end ()

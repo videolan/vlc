@@ -713,6 +713,6 @@ vlc_module_begin()
     set_callback_display(Open, 200)
     add_shortcut("x11-render", "xcb-render", "render")
     add_string("x11-render-filter", "good", N_("Scaling mode"),
-               NULL, true)
+               NULL)
         change_string_list(filter_names, filter_descs)
 vlc_module_end()

@@ -99,14 +99,14 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_integer_with_range( "vbi-page", 100, 0, 'z' << 16,
-                 PAGE_TEXT, PAGE_LONGTEXT, false )
+                 PAGE_TEXT, PAGE_LONGTEXT )
     add_bool( "vbi-opaque", true,
-                 OPAQUE_TEXT, OPAQUE_LONGTEXT, false )
-    add_integer( "vbi-position", 8, POS_TEXT, POS_LONGTEXT, false )
+                 OPAQUE_TEXT, OPAQUE_LONGTEXT )
+    add_integer( "vbi-position", 8, POS_TEXT, POS_LONGTEXT )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions );
     add_bool( "vbi-text", false,
-              TELX_TEXT, TELX_LONGTEXT, false )
-    add_integer( "vbi-level", 3, LEVEL_TEXT, NULL, false )
+              TELX_TEXT, TELX_LONGTEXT )
+    add_integer( "vbi-level", 3, LEVEL_TEXT, NULL )
         change_integer_list( level_values, level_descriptions );
 vlc_module_end ()
 

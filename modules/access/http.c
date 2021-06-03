@@ -71,7 +71,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_bool( "http-reconnect", false, RECONNECT_TEXT,
-              RECONNECT_LONGTEXT, true )
+              RECONNECT_LONGTEXT )
     /* 'itpc' = iTunes Podcast */
     add_shortcut( "http", "unsv", "itpc", "icyx" )
     set_callbacks( Open, Close )

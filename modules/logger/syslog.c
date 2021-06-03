@@ -158,13 +158,11 @@ vlc_module_begin()
     set_capability("logger", 20)
     set_callback(Open)
 
-    add_bool("syslog", false, SYSLOG_TEXT, SYSLOG_LONGTEXT,
-             false)
-    add_bool("syslog-debug", false, SYSLOG_DEBUG_TEXT, SYSLOG_DEBUG_LONGTEXT,
-             false)
+    add_bool("syslog", false, SYSLOG_TEXT, SYSLOG_LONGTEXT)
+    add_bool("syslog-debug", false, SYSLOG_DEBUG_TEXT, SYSLOG_DEBUG_LONGTEXT)
     add_string("syslog-ident", default_ident, SYSLOG_IDENT_TEXT,
-               SYSLOG_IDENT_LONGTEXT, true)
+               SYSLOG_IDENT_LONGTEXT)
     add_string("syslog-facility", fac_names[0], SYSLOG_FACILITY_TEXT,
-               SYSLOG_FACILITY_LONGTEXT, true)
+               SYSLOG_FACILITY_LONGTEXT)
         change_string_list(fac_names, fac_names)
 vlc_module_end()

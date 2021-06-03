@@ -1004,21 +1004,21 @@ vlc_module_begin ()
 
     add_loadfile("cd-audio", CD_DEVICE, CDAUDIO_DEV_TEXT, CDAUDIO_DEV_LONGTEXT)
 
-    add_integer( "cdda-track", 0 , NULL, NULL, true )
+    add_integer( "cdda-track", 0 , NULL, NULL )
         change_volatile ()
-    add_integer( "cdda-first-sector", -1, NULL, NULL, true )
+    add_integer( "cdda-first-sector", -1, NULL, NULL )
         change_volatile ()
-    add_integer( "cdda-last-sector", -1, NULL, NULL, true )
+    add_integer( "cdda-last-sector", -1, NULL, NULL )
         change_volatile ()
 
     add_string( "musicbrainz-server", MUSICBRAINZ_DEFAULT_SERVER,
                 N_( "Musicbrainz Server" ),
-                N_( "Address of the musicbrainz server to use." ), true )
+                N_( "Address of the musicbrainz server to use." ) )
 #ifdef HAVE_LIBCDDB
     add_string( "cddb-server", "freedb.videolan.org", N_( "CDDB Server" ),
-            N_( "Address of the CDDB server to use." ), true )
+            N_( "Address of the CDDB server to use." ) )
     add_integer( "cddb-port", 80, N_( "CDDB port" ),
-            N_( "CDDB Server port to use." ), true )
+            N_( "CDDB Server port to use." ) )
         change_integer_range( 1, 65535 )
 #endif
 

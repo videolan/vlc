@@ -112,25 +112,25 @@ vlc_module_begin ()
     set_capability( "sout access", 0 )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
-    add_integer( SOUT_CFG_PREFIX "seglen", 10, SEGLEN_TEXT, SEGLEN_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX "numsegs", 0, NUMSEGS_TEXT, NUMSEGS_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX "initial-segment-number", 1, INTITIAL_SEG_TEXT, INITIAL_SEG_LONGTEXT, false )
+    add_integer( SOUT_CFG_PREFIX "seglen", 10, SEGLEN_TEXT, SEGLEN_LONGTEXT )
+    add_integer( SOUT_CFG_PREFIX "numsegs", 0, NUMSEGS_TEXT, NUMSEGS_LONGTEXT )
+    add_integer( SOUT_CFG_PREFIX "initial-segment-number", 1, INTITIAL_SEG_TEXT, INITIAL_SEG_LONGTEXT )
     add_bool( SOUT_CFG_PREFIX "splitanywhere", false,
-              SPLITANYWHERE_TEXT, SPLITANYWHERE_LONGTEXT, true )
+              SPLITANYWHERE_TEXT, SPLITANYWHERE_LONGTEXT )
     add_bool( SOUT_CFG_PREFIX "delsegs", true,
-              DELSEGS_TEXT, DELSEGS_LONGTEXT, true )
+              DELSEGS_TEXT, DELSEGS_LONGTEXT )
     add_bool( SOUT_CFG_PREFIX "ratecontrol", false,
-              RATECONTROL_TEXT, NULL, true )
+              RATECONTROL_TEXT, NULL )
     add_bool( SOUT_CFG_PREFIX "caching", false,
-              NOCACHE_TEXT, NOCACHE_LONGTEXT, true )
+              NOCACHE_TEXT, NOCACHE_LONGTEXT )
     add_bool( SOUT_CFG_PREFIX "generate-iv", false,
-              RANDOMIV_TEXT, RANDOMIV_LONGTEXT, true )
+              RANDOMIV_TEXT, RANDOMIV_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "index", NULL,
-                INDEX_TEXT, INDEX_LONGTEXT, false )
+                INDEX_TEXT, INDEX_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "index-url", NULL,
-                INDEXURL_TEXT, INDEXURL_LONGTEXT, false )
+                INDEXURL_TEXT, INDEXURL_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "key-uri", NULL,
-                KEYURI_TEXT, NULL, true )
+                KEYURI_TEXT, NULL )
     add_loadfile(SOUT_CFG_PREFIX "key-file", NULL,
                  KEYFILE_TEXT, KEYFILE_LONGTEXT)
     add_loadfile(SOUT_CFG_PREFIX "key-loadfile", NULL,

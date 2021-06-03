@@ -81,14 +81,12 @@ vlc_module_begin()
     set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
 
-    add_bool("network-synchronisation", false, NETSYNC_TEXT, NETSYNC_LONGTEXT,
-             true)
+    add_bool("network-synchronisation", false, NETSYNC_TEXT, NETSYNC_LONGTEXT)
     add_bool("netsync-master", false,
-              NETSYNC_TEXT, NETSYNC_LONGTEXT, true)
-    add_string("netsync-master-ip", NULL, MIP_TEXT, MIP_LONGTEXT,
-                true)
+              NETSYNC_TEXT, NETSYNC_LONGTEXT)
+    add_string("netsync-master-ip", NULL, MIP_TEXT, MIP_LONGTEXT)
     add_integer("netsync-timeout", 500,
-                 NETSYNC_TIMEOUT_TEXT, NETSYNC_TIMEOUT_LONGTEXT, true)
+                 NETSYNC_TIMEOUT_TEXT, NETSYNC_TIMEOUT_LONGTEXT)
 
     set_capability("interface", 0)
     set_callbacks(Open, Close)

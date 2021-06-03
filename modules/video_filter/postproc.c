@@ -86,10 +86,10 @@ vlc_module_begin ()
     set_callback_video_filter( OpenPostproc )
 
     add_integer_with_range( FILTER_PREFIX "q", PP_QUALITY_MAX, 0,
-                            PP_QUALITY_MAX, Q_TEXT, Q_LONGTEXT, false )
+                            PP_QUALITY_MAX, Q_TEXT, Q_LONGTEXT )
         change_safe()
     add_string( FILTER_PREFIX "name", "default", NAME_TEXT,
-                NULL, true )
+                NULL )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {

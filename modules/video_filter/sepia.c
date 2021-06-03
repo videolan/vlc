@@ -66,8 +66,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     add_integer_with_range( CFG_PREFIX "intensity", 120, 0, 255,
-                           SEPIA_INTENSITY_TEXT, SEPIA_INTENSITY_LONGTEXT,
-                           false )
+                           SEPIA_INTENSITY_TEXT, SEPIA_INTENSITY_LONGTEXT )
     set_callback_video_filter( Create )
 vlc_module_end ()
 

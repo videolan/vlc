@@ -80,7 +80,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "dvdread-angle", 1, ANGLE_TEXT,
-        ANGLE_LONGTEXT, false )
+        ANGLE_LONGTEXT )
     set_capability( "access", 0 )
     add_shortcut( "dvd", "dvdread", "dvdsimple" )
     set_callbacks( Open, Close )

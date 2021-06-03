@@ -83,15 +83,13 @@ vlc_module_begin ()
     set_callback_video_filter( Create )
 
     add_integer_with_range( CFG_PREFIX "u", 120, 0, 255,
-                            BLUESCREENU_TEXT, BLUESCREENU_LONGTEXT, false )
+                            BLUESCREENU_TEXT, BLUESCREENU_LONGTEXT )
     add_integer_with_range( CFG_PREFIX "v", 90, 0, 255,
-                            BLUESCREENV_TEXT, BLUESCREENV_LONGTEXT, false )
+                            BLUESCREENV_TEXT, BLUESCREENV_LONGTEXT )
     add_integer_with_range( CFG_PREFIX "ut", 17, 0, 255,
-                            BLUESCREENUTOL_TEXT, BLUESCREENUTOL_LONGTEXT,
-                            false )
+                            BLUESCREENUTOL_TEXT, BLUESCREENUTOL_LONGTEXT )
     add_integer_with_range( CFG_PREFIX "vt", 17, 0, 255,
-                            BLUESCREENVTOL_TEXT, BLUESCREENVTOL_LONGTEXT,
-                            false )
+                            BLUESCREENVTOL_TEXT, BLUESCREENVTOL_LONGTEXT )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {

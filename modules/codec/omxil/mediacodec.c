@@ -201,13 +201,13 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_INPUT_VCODEC)
     set_section(N_("Decoding"), NULL)
     set_capability("video decoder", 800)
-    add_bool("mediacodec", true, MEDIACODEC_ENABLE_TEXT, NULL, false)
+    add_bool("mediacodec", true, MEDIACODEC_ENABLE_TEXT, NULL)
     add_bool(CFG_PREFIX "dr", true,
-             DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT, true)
+             DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT)
     add_bool(CFG_PREFIX "audio", false,
-             MEDIACODEC_AUDIO_TEXT, MEDIACODEC_AUDIO_LONGTEXT, true)
+             MEDIACODEC_AUDIO_TEXT, MEDIACODEC_AUDIO_LONGTEXT)
     add_bool(CFG_PREFIX "tunneled-playback", false,
-             MEDIACODEC_TUNNELEDPLAYBACK_TEXT, NULL, true)
+             MEDIACODEC_TUNNELEDPLAYBACK_TEXT, NULL)
     set_callbacks(OpenDecoderNdk, CloseDecoder)
     add_shortcut("mediacodec_ndk")
     add_submodule ()

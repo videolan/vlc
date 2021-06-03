@@ -377,24 +377,24 @@ vlc_module_begin()
 
     set_section(N_("Generic"), NULL)
     add_string(SOUT_CFG_PREFIX "access", "",
-               ACCESS_TEXT, ACCESS_LONGTEXT, true)
-    add_string(SOUT_CFG_PREFIX "mux", "", MUX_TEXT, MUX_LONGTEXT, true)
-    add_string(SOUT_CFG_PREFIX "dst", "", DEST_TEXT, DEST_LONGTEXT, true )
+               ACCESS_TEXT, ACCESS_LONGTEXT)
+    add_string(SOUT_CFG_PREFIX "mux", "", MUX_TEXT, MUX_LONGTEXT)
+    add_string(SOUT_CFG_PREFIX "dst", "", DEST_TEXT, DEST_LONGTEXT )
 
     set_section(N_("Audio"), NULL)
     add_string(SOUT_CFG_PREFIX "access-audio", "",
-               ACCESSA_TEXT, ACCESSA_LONGTEXT, true )
-    add_string(SOUT_CFG_PREFIX "mux-audio", "", MUXA_TEXT, MUXA_LONGTEXT, true)
+               ACCESSA_TEXT, ACCESSA_LONGTEXT )
+    add_string(SOUT_CFG_PREFIX "mux-audio", "", MUXA_TEXT, MUXA_LONGTEXT)
     add_string(SOUT_CFG_PREFIX "dst-audio", "",
-               DESTA_TEXT, DESTA_LONGTEXT, true)
+               DESTA_TEXT, DESTA_LONGTEXT)
 
     set_section(N_("Video"), NULL)
     add_string(SOUT_CFG_PREFIX "access-video", "", ACCESSV_TEXT,
-               ACCESSV_LONGTEXT, true)
+               ACCESSV_LONGTEXT)
     add_string(SOUT_CFG_PREFIX "mux-video", "", MUXV_TEXT,
-               MUXV_LONGTEXT, true)
+               MUXV_LONGTEXT)
     add_string(SOUT_CFG_PREFIX "dst-video", "", DESTV_TEXT,
-               DESTV_LONGTEXT, true)
+               DESTV_LONGTEXT)
 
     set_callbacks(Open, Close)
 vlc_module_end()

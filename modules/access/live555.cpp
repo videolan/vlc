@@ -109,34 +109,32 @@ vlc_module_begin ()
         set_capability( "access", 300 )
         set_callbacks( Open, Close )
         add_bool( "rtsp-tcp", false,
-                  N_("Use RTP over RTSP (TCP)"), nullptr, true )
+                  N_("Use RTP over RTSP (TCP)"), nullptr )
             change_safe()
         add_integer( "rtp-client-port", -1,
                   N_("Client port"),
-                  N_("Port to use for the RTP source of the session"), true )
+                  N_("Port to use for the RTP source of the session") )
         add_bool( "rtsp-mcast", false,
-                  N_("Force multicast RTP via RTSP"), nullptr, true )
+                  N_("Force multicast RTP via RTSP"), nullptr )
             change_safe()
         add_bool( "rtsp-http", false,
-                  N_("Tunnel RTSP and RTP over HTTP"), nullptr, true )
+                  N_("Tunnel RTSP and RTP over HTTP"), nullptr )
             change_safe()
         add_integer( "rtsp-http-port", 80,
                   N_("HTTP tunnel port"),
-                  N_("Port to use for tunneling the RTSP/RTP over HTTP."),
-                  true )
+                  N_("Port to use for tunneling the RTSP/RTP over HTTP.") )
         add_bool(   "rtsp-kasenna", false, KASENNA_TEXT,
-                    KASENNA_LONGTEXT, true )
+                    KASENNA_LONGTEXT )
             change_safe()
         add_bool(   "rtsp-wmserver", false, WMSERVER_TEXT,
-                    WMSERVER_LONGTEXT, true)
+                    WMSERVER_LONGTEXT)
             change_safe()
         add_string( "rtsp-user", NULL, USER_TEXT,
-                    USER_LONGTEXT, true )
+                    USER_LONGTEXT )
             change_safe()
         add_password("rtsp-pwd", NULL, PASS_TEXT, PASS_LONGTEXT)
         add_integer( "rtsp-frame-buffer-size", DEFAULT_FRAME_BUFFER_SIZE,
-                     FRAME_BUFFER_SIZE_TEXT, FRAME_BUFFER_SIZE_LONGTEXT,
-                     true )
+                     FRAME_BUFFER_SIZE_TEXT, FRAME_BUFFER_SIZE_LONGTEXT )
 vlc_module_end ()
 
 

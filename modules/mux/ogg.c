@@ -62,9 +62,9 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_MUX )
     add_shortcut( "ogg", "ogm" )
     add_integer_with_range( SOUT_CFG_PREFIX "indexintvl", 1000, 0, INT_MAX,
-                            INDEXINTVL_TEXT, INDEXINTVL_LONGTEXT, true )
+                            INDEXINTVL_TEXT, INDEXINTVL_LONGTEXT )
     add_float_with_range( SOUT_CFG_PREFIX "indexratio", 1.0, 1.0, 1000,
-                          INDEXRATIO_TEXT, INDEXRATIO_LONGTEXT, true )
+                          INDEXRATIO_TEXT, INDEXRATIO_LONGTEXT )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

@@ -69,8 +69,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     add_integer_with_range( CFG_PREFIX "level", 6, 2, 256,
-                           POSTERIZE_LEVEL_TEXT, POSTERIZE_LEVEL_LONGTEXT,
-                           false )
+                           POSTERIZE_LEVEL_TEXT, POSTERIZE_LEVEL_LONGTEXT )
     set_callback_video_filter( Create )
 vlc_module_end ()
 

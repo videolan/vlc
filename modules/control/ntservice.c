@@ -69,15 +69,15 @@ vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_CONTROL )
     add_bool( "ntservice-install", false,
-              INSTALL_TEXT, INSTALL_LONGTEXT, true )
+              INSTALL_TEXT, INSTALL_LONGTEXT )
     add_bool( "ntservice-uninstall", false,
-              UNINSTALL_TEXT, UNINSTALL_LONGTEXT, true )
+              UNINSTALL_TEXT, UNINSTALL_LONGTEXT )
     add_string ( "ntservice-name", VLCSERVICENAME,
-                 NAME_TEXT, NAME_LONGTEXT, true )
+                 NAME_TEXT, NAME_LONGTEXT )
     add_string ( "ntservice-options", NULL,
-                 OPTIONS_TEXT, OPTIONS_LONGTEXT, true )
+                 OPTIONS_TEXT, OPTIONS_LONGTEXT )
     add_string ( "ntservice-extraintf", NULL,
-                 EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT, true )
+                 EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT )
 
     set_capability( "interface", 0 )
     set_callbacks( Activate, Close )

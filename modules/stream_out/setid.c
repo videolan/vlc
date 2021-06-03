@@ -66,9 +66,8 @@ vlc_module_begin()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
     set_callbacks( OpenId, Close )
-    add_integer( SOUT_CFG_PREFIX_ID "id", 0, ID_TEXT, ID_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX_ID "new-id", 0, NEWID_TEXT, NEWID_LONGTEXT,
-                 false )
+    add_integer( SOUT_CFG_PREFIX_ID "id", 0, ID_TEXT, ID_LONGTEXT )
+    add_integer( SOUT_CFG_PREFIX_ID "new-id", 0, NEWID_TEXT, NEWID_LONGTEXT )
 
     add_submodule ()
     set_section( N_("Set ES Lang"), NULL )
@@ -77,9 +76,8 @@ vlc_module_begin()
     set_capability( "sout filter", 50 )
     add_shortcut( "setlang" );
     set_callbacks( OpenLang, Close )
-    add_integer( SOUT_CFG_PREFIX_LANG "id", 0, ID_TEXT, ID_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX_LANG "lang", "eng", LANG_TEXT, LANG_LONGTEXT,
-                false );
+    add_integer( SOUT_CFG_PREFIX_LANG "id", 0, ID_TEXT, ID_LONGTEXT )
+    add_string( SOUT_CFG_PREFIX_LANG "lang", "eng", LANG_TEXT, LANG_LONGTEXT );
 
 vlc_module_end()
 

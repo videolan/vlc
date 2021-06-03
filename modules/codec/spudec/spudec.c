@@ -54,7 +54,7 @@ vlc_module_begin ()
     set_callbacks( DecoderOpen, Close )
 
     add_bool( "dvdsub-transparency", false,
-              DVDSUBTRANS_DISABLE_TEXT, DVDSUBTRANS_DISABLE_LONGTEXT, true )
+              DVDSUBTRANS_DISABLE_TEXT, DVDSUBTRANS_DISABLE_LONGTEXT )
     add_submodule ()
     set_description( N_("DVD subtitles packetizer") )
     set_capability( "packetizer", 50 )

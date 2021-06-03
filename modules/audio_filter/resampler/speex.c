@@ -44,7 +44,7 @@ vlc_module_begin ()
     set_category (CAT_AUDIO)
     set_subcategory (SUBCAT_AUDIO_RESAMPLER)
     add_integer ("speex-resampler-quality", 4,
-                 QUALITY_TEXT, QUALITY_LONGTEXT, true)
+                 QUALITY_TEXT, QUALITY_LONGTEXT)
         change_integer_range (0, 10)
     set_capability ("audio converter", 0)
     set_callback (Open)

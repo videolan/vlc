@@ -53,7 +53,7 @@ vlc_module_begin ()
     set_callback( Open )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
-    add_float( "mjpeg-fps", 0.0, FPS_TEXT, FPS_LONGTEXT, false )
+    add_float( "mjpeg-fps", 0.0, FPS_TEXT, FPS_LONGTEXT )
 vlc_module_end ()
 
 /*****************************************************************************

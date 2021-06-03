@@ -51,8 +51,7 @@ vlc_module_begin ()
     set_callbacks( OpenDecoder, CloseDecoder )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
-    add_bool( "subsdec-formatted", true, FORMAT_TEXT, FORMAT_LONGTEXT,
-                 false )
+    add_bool( "subsdec-formatted", true, FORMAT_TEXT, FORMAT_LONGTEXT )
 vlc_module_end ()
 
 

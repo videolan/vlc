@@ -66,9 +66,9 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_INPUT_VCODEC)
 
     add_integer_with_range("dav1d-thread-frames", 0, 0, DAV1D_MAX_FRAME_THREADS,
-                THREAD_FRAMES_TEXT, THREAD_FRAMES_LONGTEXT, false)
+                THREAD_FRAMES_TEXT, THREAD_FRAMES_LONGTEXT)
     add_integer_with_range("dav1d-thread-tiles", 0, 0, DAV1D_MAX_TILE_THREADS,
-                THREAD_TILES_TEXT, THREAD_TILES_LONGTEXT, false)
+                THREAD_TILES_TEXT, THREAD_TILES_LONGTEXT)
 vlc_module_end ()
 
 /*****************************************************************************

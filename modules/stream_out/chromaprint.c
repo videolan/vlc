@@ -62,7 +62,7 @@ vlc_module_begin ()
     add_shortcut( "chromaprint" )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
-    add_integer( "duration", 90, DURATION_TEXT, DURATION_LONGTEXT, true )
+    add_integer( "duration", 90, DURATION_TEXT, DURATION_LONGTEXT )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

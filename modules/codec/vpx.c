@@ -77,7 +77,7 @@ vlc_module_begin ()
     set_callbacks(OpenEncoder, CloseEncoder)
 #   define ENC_CFG_PREFIX "sout-vpx-"
     add_integer( ENC_CFG_PREFIX "quality-mode", VPX_DL_GOOD_QUALITY, QUALITY_MODE_TEXT,
-                 QUALITY_MODE_LONGTEXT, true )
+                 QUALITY_MODE_LONGTEXT )
         change_integer_range( 0, 2 )
 #endif
 vlc_module_end ()

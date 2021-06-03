@@ -286,30 +286,28 @@ vlc_module_begin ()
                  VBI_DEVICE_TEXT, VBI_DEVICE_LONGTEXT)
 #endif
     add_string( CFG_PREFIX "standard", "",
-                STANDARD_TEXT, STANDARD_LONGTEXT, false )
+                STANDARD_TEXT, STANDARD_LONGTEXT )
         change_string_list( standards_vlc, standards_user )
         change_safe()
-    add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                true )
+    add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
         change_safe()
-    add_integer( CFG_PREFIX "input", 0, INPUT_TEXT, INPUT_LONGTEXT,
-                true )
+    add_integer( CFG_PREFIX "input", 0, INPUT_TEXT, INPUT_LONGTEXT )
         change_integer_range( 0, 0xFFFFFFFE )
         change_safe()
     add_integer( CFG_PREFIX "audio-input", -1, AUDIO_INPUT_TEXT,
-                 AUDIO_INPUT_LONGTEXT, true )
+                 AUDIO_INPUT_LONGTEXT )
         change_integer_range( -1, 0xFFFFFFFE )
         change_safe()
-    add_integer( CFG_PREFIX "width", 0, WIDTH_TEXT, SIZE_LONGTEXT, false )
+    add_integer( CFG_PREFIX "width", 0, WIDTH_TEXT, SIZE_LONGTEXT )
         change_integer_range( 0, VOUT_MAX_WIDTH )
         change_safe()
-    add_integer( CFG_PREFIX "height", 0, HEIGHT_TEXT, SIZE_LONGTEXT, false )
+    add_integer( CFG_PREFIX "height", 0, HEIGHT_TEXT, SIZE_LONGTEXT )
         change_integer_range( 0, VOUT_MAX_WIDTH )
         change_safe()
     add_string( CFG_PREFIX "aspect-ratio", "4:3", ASPECT_TEXT,
-              ASPECT_LONGTEXT, true )
+              ASPECT_LONGTEXT )
         change_safe()
-    add_string( CFG_PREFIX "fps", "60", FPS_TEXT, FPS_LONGTEXT, false )
+    add_string( CFG_PREFIX "fps", "60", FPS_TEXT, FPS_LONGTEXT )
         change_safe()
 
     set_section( N_( "Tuner" ), NULL )
@@ -317,11 +315,11 @@ vlc_module_begin ()
                  RADIO_DEVICE_TEXT, RADIO_DEVICE_LONGTEXT)
         change_safe()
     add_integer( CFG_PREFIX "tuner-frequency", -1, FREQUENCY_TEXT,
-                 FREQUENCY_LONGTEXT, true )
+                 FREQUENCY_LONGTEXT )
         change_integer_range( -1, 0xFFFFFFFE )
         change_safe()
     add_integer( CFG_PREFIX "tuner-audio-mode", V4L2_TUNER_MODE_LANG1,
-                 TUNER_AUDIO_MODE_TEXT, TUNER_AUDIO_MODE_LONGTEXT, true )
+                 TUNER_AUDIO_MODE_TEXT, TUNER_AUDIO_MODE_LONGTEXT )
         change_integer_list( i_tuner_audio_modes_list,
                              psz_tuner_audio_modes_list_text )
         change_safe()
@@ -329,78 +327,78 @@ vlc_module_begin ()
     set_section( N_( "Controls" ),
                  N_( "Video capture controls (if supported by the device)" ) )
     add_bool( CFG_PREFIX "controls-reset", false, CTRL_RESET_TEXT,
-              CTRL_RESET_LONGTEXT, true )
+              CTRL_RESET_LONGTEXT )
         change_safe()
     add_integer( CFG_PREFIX "brightness", -1, BRIGHTNESS_TEXT,
-                 BRIGHTNESS_LONGTEXT, true )
+                 BRIGHTNESS_LONGTEXT )
     add_integer( CFG_PREFIX "brightness-auto", -1,
-                 BRIGHTNESS_AUTO_TEXT, BRIGHTNESS_AUTO_LONGTEXT, true )
+                 BRIGHTNESS_AUTO_TEXT, BRIGHTNESS_AUTO_LONGTEXT )
         change_integer_list( tristate_vlc, tristate_user )
     add_integer( CFG_PREFIX "contrast", -1, CONTRAST_TEXT,
-                 CONTRAST_LONGTEXT, true )
+                 CONTRAST_LONGTEXT )
     add_integer( CFG_PREFIX "saturation", -1, SATURATION_TEXT,
-                 SATURATION_LONGTEXT, true )
+                 SATURATION_LONGTEXT )
     add_integer( CFG_PREFIX "hue", -1, HUE_TEXT,
-                 HUE_LONGTEXT, true )
+                 HUE_LONGTEXT )
     add_integer( CFG_PREFIX "hue-auto", -1,
-                 HUE_AUTO_TEXT, HUE_AUTO_LONGTEXT, true )
+                 HUE_AUTO_TEXT, HUE_AUTO_LONGTEXT )
         change_integer_list( tristate_vlc, tristate_user )
     add_integer( CFG_PREFIX "white-balance-temperature", -1,
-                 WHITE_BALANCE_TEMP_TEXT, WHITE_BALANCE_TEMP_LONGTEXT, true )
+                 WHITE_BALANCE_TEMP_TEXT, WHITE_BALANCE_TEMP_LONGTEXT )
         /* Ideally, the range should be 2800-6500 */
         change_integer_range( -1, 6500 )
     add_integer( CFG_PREFIX "auto-white-balance", -1,
-                 AUTOWHITEBALANCE_TEXT, AUTOWHITEBALANCE_LONGTEXT, true )
+                 AUTOWHITEBALANCE_TEXT, AUTOWHITEBALANCE_LONGTEXT )
         change_integer_list( tristate_vlc, tristate_user )
     add_integer( CFG_PREFIX "red-balance", -1, REDBALANCE_TEXT,
-                 REDBALANCE_LONGTEXT, true )
+                 REDBALANCE_LONGTEXT )
     add_integer( CFG_PREFIX "blue-balance", -1, BLUEBALANCE_TEXT,
-                 BLUEBALANCE_LONGTEXT, true )
+                 BLUEBALANCE_LONGTEXT )
     add_integer( CFG_PREFIX "gamma", -1, GAMMA_TEXT,
-                 GAMMA_LONGTEXT, true )
+                 GAMMA_LONGTEXT )
     add_integer( CFG_PREFIX "autogain", -1, AUTOGAIN_TEXT,
-                 AUTOGAIN_LONGTEXT, true )
+                 AUTOGAIN_LONGTEXT )
         change_integer_list( tristate_vlc, tristate_user )
     add_integer( CFG_PREFIX "gain", -1, GAIN_TEXT,
-                 GAIN_LONGTEXT, true )
+                 GAIN_LONGTEXT )
     add_integer( CFG_PREFIX "sharpness", -1,
-                 SHARPNESS_TEXT, SHARPNESS_LONGTEXT, true )
+                 SHARPNESS_TEXT, SHARPNESS_LONGTEXT )
     add_integer( CFG_PREFIX "chroma-gain", -1,
-                 CHROMA_GAIN_TEXT, CHROMA_GAIN_LONGTEXT, true )
+                 CHROMA_GAIN_TEXT, CHROMA_GAIN_LONGTEXT )
     add_integer( CFG_PREFIX "chroma-gain-auto", -1,
-                 CHROMA_GAIN_AUTO_TEXT, CHROMA_GAIN_AUTO_LONGTEXT, true )
+                 CHROMA_GAIN_AUTO_TEXT, CHROMA_GAIN_AUTO_LONGTEXT )
     add_integer( CFG_PREFIX"power-line-frequency", -1,
-                 POWER_FREQ_TEXT, POWER_FREQ_LONGTEXT, true )
+                 POWER_FREQ_TEXT, POWER_FREQ_LONGTEXT )
         change_integer_list( power_freq_vlc, power_freq_user )
     add_integer( CFG_PREFIX"backlight-compensation", -1,
-                 BKLT_COMPENSATE_TEXT, BKLT_COMPENSATE_LONGTEXT, true )
+                 BKLT_COMPENSATE_TEXT, BKLT_COMPENSATE_LONGTEXT )
     add_integer( CFG_PREFIX "band-stop-filter", -1,
-                 BAND_STOP_FILTER_TEXT, BAND_STOP_FILTER_LONGTEXT, true )
-    add_bool( CFG_PREFIX "hflip", false, HFLIP_TEXT, HFLIP_LONGTEXT, true )
-    add_bool( CFG_PREFIX "vflip", false, VFLIP_TEXT, VFLIP_LONGTEXT, true )
-    add_integer( CFG_PREFIX "rotate", -1, ROTATE_TEXT, ROTATE_LONGTEXT, true )
+                 BAND_STOP_FILTER_TEXT, BAND_STOP_FILTER_LONGTEXT )
+    add_bool( CFG_PREFIX "hflip", false, HFLIP_TEXT, HFLIP_LONGTEXT )
+    add_bool( CFG_PREFIX "vflip", false, VFLIP_TEXT, VFLIP_LONGTEXT )
+    add_integer( CFG_PREFIX "rotate", -1, ROTATE_TEXT, ROTATE_LONGTEXT )
         change_integer_range( -1, 359 )
     add_integer( CFG_PREFIX"color-killer", -1,
-                 COLOR_KILLER_TEXT, COLOR_KILLER_LONGTEXT, true )
+                 COLOR_KILLER_TEXT, COLOR_KILLER_LONGTEXT )
         change_integer_list( tristate_vlc, tristate_user )
     add_integer( CFG_PREFIX"color-effect", -1,
-                 COLOR_EFFECT_TEXT, COLOR_EFFECT_LONGTEXT, true )
+                 COLOR_EFFECT_TEXT, COLOR_EFFECT_LONGTEXT )
         change_integer_list( colorfx_vlc, colorfx_user )
 
     add_integer( CFG_PREFIX "audio-volume", -1, AUDIO_VOLUME_TEXT,
-                AUDIO_VOLUME_LONGTEXT, true )
+                AUDIO_VOLUME_LONGTEXT )
     add_integer( CFG_PREFIX "audio-balance", -1, AUDIO_BALANCE_TEXT,
-                AUDIO_BALANCE_LONGTEXT, true )
+                AUDIO_BALANCE_LONGTEXT )
     add_bool( CFG_PREFIX "audio-mute", false, AUDIO_MUTE_TEXT,
-              AUDIO_MUTE_LONGTEXT, true )
+              AUDIO_MUTE_LONGTEXT )
     add_integer( CFG_PREFIX "audio-bass", -1, AUDIO_BASS_TEXT,
-                AUDIO_BASS_LONGTEXT, true )
+                AUDIO_BASS_LONGTEXT )
     add_integer( CFG_PREFIX "audio-treble", -1, AUDIO_TREBLE_TEXT,
-                AUDIO_TREBLE_LONGTEXT, true )
+                AUDIO_TREBLE_LONGTEXT )
     add_bool( CFG_PREFIX "audio-loudness", false, AUDIO_LOUDNESS_TEXT,
-              AUDIO_LOUDNESS_LONGTEXT, true )
+              AUDIO_LOUDNESS_LONGTEXT )
     add_string( CFG_PREFIX "set-ctrls", NULL, S_CTRLS_TEXT,
-              S_CTRLS_LONGTEXT, true )
+              S_CTRLS_LONGTEXT )
         change_safe()
 
     add_shortcut( "v4l", "v4l2" )

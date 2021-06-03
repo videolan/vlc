@@ -77,20 +77,19 @@ vlc_module_begin ()
     add_shortcut( "asf", "asfh" )
     set_callbacks( Open, Close )
 
-    add_string( SOUT_CFG_PREFIX "title", "", TITLE_TEXT, TITLE_LONGTEXT,
-                                 true )
+    add_string( SOUT_CFG_PREFIX "title", "", TITLE_TEXT, TITLE_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "author",   "", AUTHOR_TEXT,
-                                 AUTHOR_LONGTEXT, true )
+                                 AUTHOR_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "copyright","", COPYRIGHT_TEXT,
-                                 COPYRIGHT_LONGTEXT, true )
+                                 COPYRIGHT_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "comment",  "", COMMENT_TEXT,
-                                 COMMENT_LONGTEXT, true )
+                                 COMMENT_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "rating",  "", RATING_TEXT,
-                                 RATING_LONGTEXT, true )
+                                 RATING_LONGTEXT )
     add_integer( SOUT_CFG_PREFIX "packet-size", 4096, PACKETSIZE_TEXT,
-                                 PACKETSIZE_LONGTEXT, true )
+                                 PACKETSIZE_LONGTEXT )
     add_integer( SOUT_CFG_PREFIX "bitrate-override", 0, BITRATE_TEXT,
-                                 BITRATE_LONGTEXT, true )
+                                 BITRATE_LONGTEXT )
 
 vlc_module_end ()
 

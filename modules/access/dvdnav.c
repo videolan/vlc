@@ -92,9 +92,9 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "dvdnav-angle", 1, ANGLE_TEXT,
-        ANGLE_LONGTEXT, false )
+        ANGLE_LONGTEXT )
     add_bool( "dvdnav-menu", true,
-        MENU_TEXT, MENU_LONGTEXT, false )
+        MENU_TEXT, MENU_LONGTEXT )
     set_capability( "access", 305 )
     add_shortcut( "dvd", "dvdnav", "file" )
     set_callbacks( AccessDemuxOpen, Close )

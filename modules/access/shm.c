@@ -87,24 +87,24 @@ vlc_module_begin ()
     set_capability ("access", 0)
     set_callbacks (Open, Close)
 
-    add_float ("shm-fps", 10.0, FPS_TEXT, FPS_LONGTEXT, true)
-    add_integer ("shm-depth", 0, DEPTH_TEXT, DEPTH_LONGTEXT, true)
+    add_float ("shm-fps", 10.0, FPS_TEXT, FPS_LONGTEXT)
+    add_integer ("shm-depth", 0, DEPTH_TEXT, DEPTH_LONGTEXT)
         change_integer_list (depths, depth_texts)
         change_safe ()
-    add_integer ("shm-width", 800, WIDTH_TEXT, WIDTH_LONGTEXT, false)
+    add_integer ("shm-width", 800, WIDTH_TEXT, WIDTH_LONGTEXT)
         change_integer_range (0, 65535)
         change_safe ()
-    add_integer ("shm-height", 480, HEIGHT_TEXT, HEIGHT_LONGTEXT, false)
+    add_integer ("shm-height", 480, HEIGHT_TEXT, HEIGHT_LONGTEXT)
         change_integer_range (0, 65535)
         change_safe ()
 
     /* We need to "trust" the memory segment. If it were shrunk while we copy
      * its content our process may crash - or worse. So we pass the shared
      * memory location via an unsafe variable rather than the URL. */
-    add_string ("shm-file", NULL, FILE_TEXT, FILE_LONGTEXT, false)
+    add_string ("shm-file", NULL, FILE_TEXT, FILE_LONGTEXT)
         change_volatile ()
 #ifdef HAVE_SYS_SHM_H
-    add_integer ("shm-id", (int64_t)IPC_PRIVATE, ID_TEXT, ID_LONGTEXT, false)
+    add_integer ("shm-id", (int64_t)IPC_PRIVATE, ID_TEXT, ID_LONGTEXT)
         change_volatile ()
 #endif
     add_shortcut ("shm")

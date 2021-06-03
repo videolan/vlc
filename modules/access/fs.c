@@ -50,6 +50,6 @@ vlc_module_begin ()
     set_callbacks( DirOpen, DirClose )
 
     add_bool("list-special-files", false, N_("List special files"),
-             N_("Include devices and pipes when listing directories"), true)
+             N_("Include devices and pipes when listing directories"))
     add_obsolete_string("directory-sort") /* since 3.0.0 */
 vlc_module_end ()

@@ -756,10 +756,8 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_loadfile(KMS_VAR, "/dev/dri/card0", DEVICE_TEXT, DEVICE_LONGTEXT)
 
-    add_string( "kms-vlc-chroma", NULL, VLC_CHROMA_TEXT, VLC_CHROMA_LONGTEXT,
-                true)
-    add_string( "kms-drm-chroma", NULL, DRM_CHROMA_TEXT, DRM_CHROMA_LONGTEXT,
-                true)
+    add_string( "kms-vlc-chroma", NULL, VLC_CHROMA_TEXT, VLC_CHROMA_LONGTEXT)
+    add_string( "kms-drm-chroma", NULL, DRM_CHROMA_TEXT, DRM_CHROMA_LONGTEXT)
     set_description("Linux kernel mode setting video output")
     set_callback_display(Open, 30)
 vlc_module_end ()

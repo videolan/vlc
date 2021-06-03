@@ -97,12 +97,12 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_string ("alsa-audio-device", "default",
-                AUDIO_DEV_TEXT, AUDIO_DEV_LONGTEXT, false)
+                AUDIO_DEV_TEXT, AUDIO_DEV_LONGTEXT)
     add_integer ("alsa-audio-channels", AOUT_CHANS_FRONT,
-                 AUDIO_CHAN_TEXT, AUDIO_CHAN_LONGTEXT, false)
+                 AUDIO_CHAN_TEXT, AUDIO_CHAN_LONGTEXT)
         change_integer_list (channels, channels_text)
     add_integer("alsa-passthrough", PASSTHROUGH_NONE, PASSTHROUGH_TEXT,
-                NULL, false)
+                NULL)
         change_integer_list(passthrough_modes, passthrough_modes_text)
     add_sw_gain ()
     set_capability( "audio output", 150 )

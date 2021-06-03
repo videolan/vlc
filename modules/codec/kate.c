@@ -274,48 +274,39 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_SCODEC )
     add_shortcut( "kate" )
 
-    add_bool( "kate-formatted", true, FORMAT_TEXT, FORMAT_LONGTEXT,
-              true )
+    add_bool( "kate-formatted", true, FORMAT_TEXT, FORMAT_LONGTEXT )
 
 #ifdef HAVE_TIGER
-    add_bool( "kate-use-tiger", true, TIGER_TEXT, TIGER_LONGTEXT,
-              true )
+    add_bool( "kate-use-tiger", true, TIGER_TEXT, TIGER_LONGTEXT )
     add_float_with_range( "kate-tiger-quality",
                           TIGER_QUALITY_DEFAULT, 0.0f, 1.0f,
-                          TIGER_QUALITY_TEXT, TIGER_QUALITY_LONGTEXT,
-                          true )
+                          TIGER_QUALITY_TEXT, TIGER_QUALITY_LONGTEXT )
 
     set_section( N_("Tiger rendering defaults"), NULL );
     add_string( "kate-tiger-default-font-desc", TIGER_DEFAULT_FONT_DESC_DEFAULT,
-                TIGER_DEFAULT_FONT_DESC_TEXT, TIGER_DEFAULT_FONT_DESC_LONGTEXT, true);
+                TIGER_DEFAULT_FONT_DESC_TEXT, TIGER_DEFAULT_FONT_DESC_LONGTEXT);
     add_integer_with_range( "kate-tiger-default-font-effect",
                             TIGER_DEFAULT_FONT_EFFECT_DEFAULT,
                             0, sizeof(pi_font_effects)/sizeof(pi_font_effects[0])-1,
-                            TIGER_DEFAULT_FONT_EFFECT_TEXT, TIGER_DEFAULT_FONT_EFFECT_LONGTEXT,
-                            true )
+                            TIGER_DEFAULT_FONT_EFFECT_TEXT, TIGER_DEFAULT_FONT_EFFECT_LONGTEXT )
     change_integer_list( pi_font_effects, ppsz_font_effect_names );
     add_float_with_range( "kate-tiger-default-font-effect-strength",
               TIGER_DEFAULT_FONT_EFFECT_STRENGTH_DEFAULT, 0.0f, 1.0f,
-              TIGER_DEFAULT_FONT_EFFECT_STRENGTH_TEXT, TIGER_DEFAULT_FONT_EFFECT_STRENGTH_LONGTEXT,
-              true )
+              TIGER_DEFAULT_FONT_EFFECT_STRENGTH_TEXT, TIGER_DEFAULT_FONT_EFFECT_STRENGTH_LONGTEXT )
     add_integer_with_range( "kate-tiger-default-font-color",
                             TIGER_DEFAULT_FONT_COLOR_DEFAULT, 0, 0x00ffffff,
-                            TIGER_DEFAULT_FONT_COLOR_TEXT, TIGER_DEFAULT_FONT_COLOR_LONGTEXT,
-                            true);
+                            TIGER_DEFAULT_FONT_COLOR_TEXT, TIGER_DEFAULT_FONT_COLOR_LONGTEXT);
     change_integer_list( pi_color_values, ppsz_color_descriptions );
     add_integer_with_range( "kate-tiger-default-font-alpha",
                             TIGER_DEFAULT_FONT_ALPHA_DEFAULT, 0, 255,
-                            TIGER_DEFAULT_FONT_ALPHA_TEXT, TIGER_DEFAULT_FONT_ALPHA_LONGTEXT,
-                            true);
+                            TIGER_DEFAULT_FONT_ALPHA_TEXT, TIGER_DEFAULT_FONT_ALPHA_LONGTEXT);
     add_integer_with_range( "kate-tiger-default-background-color",
                             TIGER_DEFAULT_BACKGROUND_COLOR_DEFAULT, 0, 0x00ffffff,
-                            TIGER_DEFAULT_BACKGROUND_COLOR_TEXT, TIGER_DEFAULT_BACKGROUND_COLOR_LONGTEXT,
-                            true);
+                            TIGER_DEFAULT_BACKGROUND_COLOR_TEXT, TIGER_DEFAULT_BACKGROUND_COLOR_LONGTEXT);
     change_integer_list( pi_color_values, ppsz_color_descriptions );
     add_integer_with_range( "kate-tiger-default-background-alpha",
                             TIGER_DEFAULT_BACKGROUND_ALPHA_DEFAULT, 0, 255,
-                            TIGER_DEFAULT_BACKGROUND_ALPHA_TEXT, TIGER_DEFAULT_BACKGROUND_ALPHA_LONGTEXT,
-                            true);
+                            TIGER_DEFAULT_BACKGROUND_ALPHA_TEXT, TIGER_DEFAULT_BACKGROUND_ALPHA_LONGTEXT);
 #endif
 
 #ifdef ENABLE_PACKETIZER

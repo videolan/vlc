@@ -56,10 +56,10 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_AUDIO_AOUT)
     set_callbacks(Open, Close)
     add_integer("auhal-volume", AOUT_VOLUME_DEFAULT,
-                VOLUME_TEXT, NULL, true)
+                VOLUME_TEXT, NULL)
     change_integer_range(0, AOUT_VOLUME_MAX)
-    add_string("auhal-audio-device", "", DEVICE_TEXT, NULL, true)
-    add_string("auhal-warned-devices", "", NULL, NULL, true)
+    add_string("auhal-audio-device", "", DEVICE_TEXT, NULL)
+    add_string("auhal-warned-devices", "", NULL, NULL)
     change_private()
 vlc_module_end ()
 

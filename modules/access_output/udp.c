@@ -76,9 +76,8 @@ vlc_module_begin ()
     set_shortname( "UDP" )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
-    add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT, CACHING_LONGTEXT, true )
-    add_integer( SOUT_CFG_PREFIX "group", 1, GROUP_TEXT, GROUP_LONGTEXT,
-                                 true )
+    add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, CACHING_TEXT, CACHING_LONGTEXT )
+    add_integer( SOUT_CFG_PREFIX "group", 1, GROUP_TEXT, GROUP_LONGTEXT )
 
     set_capability( "sout access", 0 )
     add_shortcut( "udp" )

@@ -102,9 +102,9 @@ vlc_module_begin( )
     set_section( N_( "Decoding" ) , NULL )
     set_callbacks( OpenDecoder, CloseDecoder )
     add_bool( "use-decodebin", true, USEDECODEBIN_TEXT,
-        USEDECODEBIN_LONGTEXT, false )
+        USEDECODEBIN_LONGTEXT )
     add_bool( "use-vlcpool", false, USEVLCPOOL_TEXT,
-        USEVLCPOOL_LONGTEXT, false )
+        USEVLCPOOL_LONGTEXT )
 vlc_module_end( )
 
 void gst_vlc_dec_ensure_empty_queue( decoder_t *p_dec )

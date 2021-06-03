@@ -494,7 +494,7 @@ vlc_module_begin()
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
 
-    add_bool("wasapi-loopback", false, LOOPBACK_TEXT, LOOPBACK_LONGTEXT, true)
+    add_bool("wasapi-loopback", false, LOOPBACK_TEXT, LOOPBACK_LONGTEXT)
 
     add_shortcut("wasapi")
     set_callbacks(Open, Close)

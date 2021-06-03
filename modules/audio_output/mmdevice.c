@@ -1473,10 +1473,10 @@ vlc_module_begin()
     add_module("mmdevice-backend", "aout stream", "any",
                N_("Output back-end"), N_("Audio output back-end interface."))
     add_integer( "mmdevice-passthrough", MM_PASSTHROUGH_DEFAULT,
-                 MM_PASSTHROUGH_TEXT, MM_PASSTHROUGH_LONGTEXT, false )
+                 MM_PASSTHROUGH_TEXT, MM_PASSTHROUGH_LONGTEXT )
         change_integer_list( pi_mmdevice_passthrough_values,
                              ppsz_mmdevice_passthrough_texts )
-    add_string("mmdevice-audio-device", NULL, DEVICE_TEXT, DEVICE_LONGTEXT, false)
-    add_float("mmdevice-volume", 1.f, VOLUME_TEXT, VOLUME_LONGTEXT, true)
+    add_string("mmdevice-audio-device", NULL, DEVICE_TEXT, DEVICE_LONGTEXT)
+    add_float("mmdevice-volume", 1.f, VOLUME_TEXT, VOLUME_LONGTEXT)
         change_float_range( 0.f, 1.25f )
 vlc_module_end()

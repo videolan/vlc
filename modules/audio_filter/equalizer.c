@@ -83,16 +83,16 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
     add_string( "equalizer-preset", "flat", PRESET_TEXT,
-                PRESET_LONGTEXT, false )
+                PRESET_LONGTEXT )
         change_string_list( preset_list, preset_list_text )
     add_string( "equalizer-bands", NULL, BANDS_TEXT,
-                BANDS_LONGTEXT, true )
+                BANDS_LONGTEXT )
     add_bool( "equalizer-2pass", false, TWOPASS_TEXT,
-              TWOPASS_LONGTEXT, true )
+              TWOPASS_LONGTEXT )
     add_bool( "equalizer-vlcfreqs", true, VLC_BANDS_TEXT,
-              VLC_BANDS_LONGTEXT, true )
+              VLC_BANDS_LONGTEXT )
     add_float( "equalizer-preamp", 12.0f, PREAMP_TEXT,
-               PREAMP_LONGTEXT, true )
+               PREAMP_LONGTEXT )
     set_callback( Open )
     add_shortcut( "equalizer" )
 vlc_module_end ()

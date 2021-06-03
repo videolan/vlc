@@ -51,7 +51,7 @@ vlc_module_begin ()
     set_capability( "demux", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
-    add_bool( "rawdv-hurry-up", false, HURRYUP_TEXT, HURRYUP_LONGTEXT, false )
+    add_bool( "rawdv-hurry-up", false, HURRYUP_TEXT, HURRYUP_LONGTEXT )
     set_callbacks( Open, Close )
     /* It isn't easy to recognize a raw DV stream. The chances that we'll
      * mistake a stream from another type for a raw DV stream are too high, so

@@ -82,14 +82,14 @@ vlc_module_begin ()
     add_shortcut( "logo" )
 
     add_loadfile(CFG_PREFIX "file", NULL, FILE_TEXT, FILE_LONGTEXT)
-    add_integer( CFG_PREFIX "x", -1, POSX_TEXT, POSX_LONGTEXT, true )
-    add_integer( CFG_PREFIX "y", -1, POSY_TEXT, POSY_LONGTEXT, true )
+    add_integer( CFG_PREFIX "x", -1, POSX_TEXT, POSX_LONGTEXT )
+    add_integer( CFG_PREFIX "y", -1, POSY_TEXT, POSY_LONGTEXT )
     /* default to 1000 ms per image, continuously cycle through them */
-    add_integer( CFG_PREFIX "delay", 1000, DELAY_TEXT, DELAY_LONGTEXT, true )
-    add_integer( CFG_PREFIX "repeat", -1, REPEAT_TEXT, REPEAT_LONGTEXT, true )
+    add_integer( CFG_PREFIX "delay", 1000, DELAY_TEXT, DELAY_LONGTEXT )
+    add_integer( CFG_PREFIX "repeat", -1, REPEAT_TEXT, REPEAT_LONGTEXT )
     add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255,
-        OPACITY_TEXT, OPACITY_LONGTEXT, false )
-    add_integer( CFG_PREFIX "position", -1, POS_TEXT, POS_LONGTEXT, false )
+        OPACITY_TEXT, OPACITY_LONGTEXT )
+    add_integer( CFG_PREFIX "position", -1, POS_TEXT, POS_LONGTEXT )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions )
 
     /* video output filter submodule */

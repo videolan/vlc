@@ -79,7 +79,7 @@ vlc_module_begin ()
 
 #define CHANNEL( idx ) \
     add_integer( channel_name[idx], idx, channel_desc[idx], \
-            channel_desc[idx], false) \
+            channel_desc[idx]) \
         change_integer_list( channel_idx, channel_desc )
     CHANNEL(0) CHANNEL(1) CHANNEL(2)
     CHANNEL(3) CHANNEL(4) CHANNEL(5)
@@ -88,7 +88,7 @@ vlc_module_begin ()
 
     add_bool( REMAP_CFG "normalize", true, "Normalize channels",
             "When mapping more than one channel to a single output channel, "
-            "normalize the output accordingly.", false )
+            "normalize the output accordingly." )
 
 vlc_module_end ()
 

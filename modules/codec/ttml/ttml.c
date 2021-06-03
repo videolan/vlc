@@ -47,7 +47,7 @@ vlc_module_begin ()
     set_callback( tt_OpenDecoder )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
-    add_integer( "ttml-align", 0, ALIGN_TEXT, ALIGN_LONGTEXT, false )
+    add_integer( "ttml-align", 0, ALIGN_TEXT, ALIGN_LONGTEXT )
 
     add_submodule()
         set_shortname( N_("TTML") )

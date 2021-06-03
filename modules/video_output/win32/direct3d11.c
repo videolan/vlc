@@ -78,10 +78,10 @@ vlc_module_begin ()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
-    add_bool("direct3d11-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT, true)
+    add_bool("direct3d11-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT)
 
 #if VLC_WINSTORE_APP
-    add_integer("winrt-swapchain",     0x0, NULL, NULL, true) /* IDXGISwapChain1*     */
+    add_integer("winrt-swapchain",     0x0, NULL, NULL) /* IDXGISwapChain1*     */
 #endif
 
     add_shortcut("direct3d11")

@@ -86,9 +86,9 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
     set_description( N_("VDR recordings") )
     add_integer( "vdr-chapter-offset", 0,
-        CHAPTER_OFFSET_TEXT, CHAPTER_OFFSET_LONGTEXT, true )
+        CHAPTER_OFFSET_TEXT, CHAPTER_OFFSET_LONGTEXT )
     add_float_with_range( "vdr-fps", 25, 1, 1000,
-        FPS_TEXT, FPS_LONGTEXT, true )
+        FPS_TEXT, FPS_LONGTEXT )
     set_capability( "access", 60 )
     add_shortcut( "vdr" )
     add_shortcut( "directory" )

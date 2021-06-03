@@ -71,9 +71,9 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_integer( SOUT_CFG_PREFIX "dts-delay", 200, DTS_TEXT,
-                 DTS_LONGTEXT, true )
+                 DTS_LONGTEXT )
     add_integer( SOUT_CFG_PREFIX "pes-max-size", PES_PAYLOAD_SIZE_MAX,
-                 PES_SIZE_TEXT, PES_SIZE_LONGTEXT, true )
+                 PES_SIZE_TEXT, PES_SIZE_LONGTEXT )
 vlc_module_end ()
 
 /*****************************************************************************

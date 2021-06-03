@@ -80,13 +80,11 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_bool( "dvb-probe", true, PROBE_TEXT, PROBE_LONGTEXT, true )
+    add_bool( "dvb-probe", true, PROBE_TEXT, PROBE_LONGTEXT )
     /* DVB-S (satellite) */
-    add_string( "dvb-satellite", NULL, SATELLITE_TEXT, SATELLITE_LONGTEXT,
-                true )
-    add_string( "dvb-scanlist", NULL, SCANLIST_TEXT, SCANLIST_LONGTEXT,
-                true )
-    add_bool( "dvb-scan-nit", true, SCAN_NIT_TEXT, NULL, true )
+    add_string( "dvb-satellite", NULL, SATELLITE_TEXT, SATELLITE_LONGTEXT )
+    add_string( "dvb-scanlist", NULL, SCANLIST_TEXT, SCANLIST_LONGTEXT )
+    add_bool( "dvb-scan-nit", true, SCAN_NIT_TEXT, NULL )
 
     set_capability( "access", 0 )
     add_shortcut( "dvb",                        /* Generic name */

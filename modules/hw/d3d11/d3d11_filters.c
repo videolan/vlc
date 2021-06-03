@@ -571,22 +571,22 @@ vlc_module_begin()
     add_shortcut( "adjust" )
 
     add_float_with_range( "contrast", 1.0, 0.0, 2.0,
-                          CONT_TEXT, CONT_LONGTEXT, false )
+                          CONT_TEXT, CONT_LONGTEXT )
         change_safe()
     add_float_with_range( "brightness", 1.0, 0.0, 2.0,
-                           LUM_TEXT, LUM_LONGTEXT, false )
+                           LUM_TEXT, LUM_LONGTEXT )
         change_safe()
     add_float_with_range( "hue", 0, -180., +180.,
-                            HUE_TEXT, HUE_LONGTEXT, false )
+                            HUE_TEXT, HUE_LONGTEXT )
         change_safe()
     add_float_with_range( "saturation", 1.0, 0.0, 3.0,
-                          SAT_TEXT, SAT_LONGTEXT, false )
+                          SAT_TEXT, SAT_LONGTEXT )
         change_safe()
     add_float_with_range( "gamma", 1.0, 0.01, 10.0,
-                          GAMMA_TEXT, GAMMA_LONGTEXT, false )
+                          GAMMA_TEXT, GAMMA_LONGTEXT )
         change_safe()
     add_bool( "brightness-threshold", false,
-              THRES_TEXT, THRES_LONGTEXT, false )
+              THRES_TEXT, THRES_LONGTEXT )
         change_safe()
 
     add_submodule()
@@ -608,7 +608,7 @@ vlc_module_begin()
     set_callback_dec_device( D3D11OpenDecoderDeviceAny, 8 )
 #if VLC_WINSTORE_APP
     /* LEGACY, the d3dcontext and swapchain were given by the host app */
-    add_integer("winrt-d3dcontext", 0x0, N_("Context"), NULL, true) /* ID3D11DeviceContext* */
+    add_integer("winrt-d3dcontext", 0x0, N_("Context"), NULL) /* ID3D11DeviceContext* */
 #endif /* VLC_WINSTORE_APP */
     add_shortcut ("d3d11")
 

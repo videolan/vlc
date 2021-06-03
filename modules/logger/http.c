@@ -204,11 +204,11 @@ vlc_module_begin()
     set_callback(Open)
 
     add_bool("http-logging", false,
-             HTTP_LOGGING_TEXT, HTTP_LOGGING_LONGTEXT, false)
+             HTTP_LOGGING_TEXT, HTTP_LOGGING_LONGTEXT)
     add_string(CFG_PREFIX "endpoint", "",
-               HTTP_ENDPOINT_TEXT, HTTP_ENDPOINT_LONGTEXT, false)
+               HTTP_ENDPOINT_TEXT, HTTP_ENDPOINT_LONGTEXT)
     add_string(CFG_PREFIX "username", "",
-               HTTP_USERNAME_TEXT, "", false)
+               HTTP_USERNAME_TEXT, "")
     add_string(CFG_PREFIX "password", "",
-               HTTP_PASSWORD_TEXT, "", false)
+               HTTP_PASSWORD_TEXT, "")
 vlc_module_end ()

@@ -70,7 +70,7 @@ vlc_module_begin()
     set_description(N_("MMAL resizing conversion filter"))
     add_shortcut("mmal_converter")
 #ifndef NDEBUG
-    add_integer( MMAL_CONVERTER_TYPE_NAME, FILTER_RESIZER_HVS, MMAL_CONVERTER_TYPE_TEXT, MMAL_CONVERTER_TYPE_LONGTEXT, true )
+    add_integer( MMAL_CONVERTER_TYPE_NAME, FILTER_RESIZER_HVS, MMAL_CONVERTER_TYPE_TEXT, MMAL_CONVERTER_TYPE_LONGTEXT )
         change_integer_list( pi_converter_modes, ppsz_converter_text )
 #endif
     set_callback_video_converter(OpenConverter, 900)

@@ -82,23 +82,23 @@ vlc_module_begin ()
 
     set_section( N_("Crop"), NULL )
         add_integer_with_range( CFG_PREFIX "croptop", 0, 0, INT_MAX,
-                                CROPTOP_TEXT, CROPTOP_LONGTEXT, false )
+                                CROPTOP_TEXT, CROPTOP_LONGTEXT )
         add_integer_with_range( CFG_PREFIX "cropbottom", 0, 0, INT_MAX,
-                                CROPBOTTOM_TEXT, CROPBOTTOM_LONGTEXT, false )
+                                CROPBOTTOM_TEXT, CROPBOTTOM_LONGTEXT )
         add_integer_with_range( CFG_PREFIX "cropleft", 0, 0, INT_MAX,
-                                CROPLEFT_TEXT, CROPLEFT_LONGTEXT, false )
+                                CROPLEFT_TEXT, CROPLEFT_LONGTEXT )
         add_integer_with_range( CFG_PREFIX "cropright", 0, 0, INT_MAX,
-                                CROPRIGHT_TEXT, CROPRIGHT_LONGTEXT, false )
+                                CROPRIGHT_TEXT, CROPRIGHT_LONGTEXT )
 
     set_section( N_("Padd"), NULL )
         add_integer_with_range( CFG_PREFIX "paddtop", 0, 0, INT_MAX,
-                                PADDTOP_TEXT, PADDTOP_LONGTEXT, false )
+                                PADDTOP_TEXT, PADDTOP_LONGTEXT )
         add_integer_with_range( CFG_PREFIX "paddbottom", 0, 0, INT_MAX,
-                                PADDBOTTOM_TEXT, PADDBOTTOM_LONGTEXT, false )
+                                PADDBOTTOM_TEXT, PADDBOTTOM_LONGTEXT )
         add_integer_with_range( CFG_PREFIX "paddleft", 0, 0, INT_MAX,
-                                PADDLEFT_TEXT, PADDLEFT_LONGTEXT, false )
+                                PADDLEFT_TEXT, PADDLEFT_LONGTEXT )
         add_integer_with_range( CFG_PREFIX "paddright", 0, 0, INT_MAX,
-                                PADDRIGHT_TEXT, PADDRIGHT_LONGTEXT, false )
+                                PADDRIGHT_TEXT, PADDRIGHT_LONGTEXT )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {

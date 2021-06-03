@@ -74,19 +74,18 @@ vlc_module_begin ()
     set_callback_video_filter( Create )
     add_float_with_range( "opencv-scale", 1.0, 0.1, 2.0,
                           N_("Scale factor (0.1-2.0)"),
-                          N_("Amount by which to scale the picture before sending it to the internal OpenCV filter"),
-                          false )
+                          N_("Amount by which to scale the picture before sending it to the internal OpenCV filter") )
     add_string( "opencv-chroma", "input",
                           N_("OpenCV filter chroma"),
-                          N_("Chroma to convert picture to before sending it to the internal OpenCV filter"), false);
+                          N_("Chroma to convert picture to before sending it to the internal OpenCV filter"));
         change_string_list( chroma_list, chroma_list_text )
     add_string( "opencv-output", "input",
                           N_("Wrapper filter output"),
-                          N_("Determines what (if any) video is displayed by the wrapper filter"), false);
+                          N_("Determines what (if any) video is displayed by the wrapper filter"));
         change_string_list( output_list, output_list_text )
     add_string( "opencv-filter-name", "none",
                           N_("OpenCV internal filter name"),
-                          N_("Name of internal OpenCV plugin filter to use"), false);
+                          N_("Name of internal OpenCV plugin filter to use"));
 vlc_module_end ()
 
 

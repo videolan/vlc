@@ -129,21 +129,21 @@ vlc_module_begin ()
         set_capability( "demux", 12 )
         set_category( CAT_INPUT )
         set_subcategory( SUBCAT_INPUT_DEMUX )
-        add_string( "adaptive-logic",  "", ADAPT_LOGIC_TEXT, nullptr, false )
+        add_string( "adaptive-logic",  "", ADAPT_LOGIC_TEXT, nullptr )
             change_string_list( ppsz_logics_values, ppsz_logics )
         add_integer( "adaptive-maxwidth",  0,
-                     ADAPT_WIDTH_TEXT,  nullptr,  false )
+                     ADAPT_WIDTH_TEXT,  nullptr )
         add_integer( "adaptive-maxheight", 0,
-                     ADAPT_HEIGHT_TEXT, nullptr, false )
-        add_integer( "adaptive-bw",     250, ADAPT_BW_TEXT,     ADAPT_BW_LONGTEXT,     false )
-        add_bool   ( "adaptive-use-access", false, ADAPT_ACCESS_TEXT, ADAPT_ACCESS_LONGTEXT, true );
+                     ADAPT_HEIGHT_TEXT, nullptr )
+        add_integer( "adaptive-bw",     250, ADAPT_BW_TEXT,     ADAPT_BW_LONGTEXT )
+        add_bool   ( "adaptive-use-access", false, ADAPT_ACCESS_TEXT, ADAPT_ACCESS_LONGTEXT );
         add_integer( "adaptive-livedelay",
                      MS_FROM_VLC_TICK(AbstractBufferingLogic::DEFAULT_LIVE_BUFFERING),
-                     ADAPT_BUFFER_TEXT, ADAPT_BUFFER_LONGTEXT, true );
+                     ADAPT_BUFFER_TEXT, ADAPT_BUFFER_LONGTEXT );
         add_integer( "adaptive-maxbuffer",
                      MS_FROM_VLC_TICK(AbstractBufferingLogic::DEFAULT_MAX_BUFFERING),
-                     ADAPT_MAXBUFFER_TEXT, nullptr, true );
-        add_integer( "adaptive-lowlatency", -1, ADAPT_LOWLATENCY_TEXT, ADAPT_LOWLATENCY_LONGTEXT, true );
+                     ADAPT_MAXBUFFER_TEXT, nullptr );
+        add_integer( "adaptive-lowlatency", -1, ADAPT_LOWLATENCY_TEXT, ADAPT_LOWLATENCY_LONGTEXT );
             change_integer_list(rgi_latency, ppsz_latency)
         set_callbacks( Open, Close )
 vlc_module_end ()

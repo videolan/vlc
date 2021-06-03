@@ -86,14 +86,14 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
 
-    add_string( SOUT_CFG_PREFIX "access", "", ACCESS_TEXT, ACCESS_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "mux", "", MUX_TEXT, MUX_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "dst", "", DEST_TEXT, DEST_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "bind", "", BIND_TEXT, BIND_LONGTEXT, false )
-    add_string( SOUT_CFG_PREFIX "path", "", PATH_TEXT, PATH_LONGTEXT, false )
-    add_bool(   SOUT_CFG_PREFIX "sap", false, SAP_TEXT, SAP_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "name", "", NAME_TEXT, NAME_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "description", "", DESC_TEXT, DESC_LONGTEXT, true )
+    add_string( SOUT_CFG_PREFIX "access", "", ACCESS_TEXT, ACCESS_LONGTEXT )
+    add_string( SOUT_CFG_PREFIX "mux", "", MUX_TEXT, MUX_LONGTEXT )
+    add_string( SOUT_CFG_PREFIX "dst", "", DEST_TEXT, DEST_LONGTEXT )
+    add_string( SOUT_CFG_PREFIX "bind", "", BIND_TEXT, BIND_LONGTEXT )
+    add_string( SOUT_CFG_PREFIX "path", "", PATH_TEXT, PATH_LONGTEXT )
+    add_bool(   SOUT_CFG_PREFIX "sap", false, SAP_TEXT, SAP_LONGTEXT )
+    add_string( SOUT_CFG_PREFIX "name", "", NAME_TEXT, NAME_LONGTEXT )
+    add_string( SOUT_CFG_PREFIX "description", "", DESC_TEXT, DESC_LONGTEXT )
     add_obsolete_string( SOUT_CFG_PREFIX "url" ) /* since 4.0.0 */
     add_obsolete_string( SOUT_CFG_PREFIX "email" ) /* since 4.0.0 */
     add_obsolete_string( SOUT_CFG_PREFIX "phone" ) /* since 3.0.0 */

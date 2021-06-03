@@ -191,63 +191,61 @@ vlc_module_begin ()
     set_description( N_("DirectShow input") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_string( "dshow-vdev", NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
+    add_string( "dshow-vdev", NULL, VDEV_TEXT, VDEV_LONGTEXT)
 
-    add_string( "dshow-adev", NULL, ADEV_TEXT, ADEV_LONGTEXT, false)
+    add_string( "dshow-adev", NULL, ADEV_TEXT, ADEV_LONGTEXT)
 
-    add_string( "dshow-size", NULL, SIZE_TEXT, SIZE_LONGTEXT, false)
+    add_string( "dshow-size", NULL, SIZE_TEXT, SIZE_LONGTEXT)
         change_safe()
 
-    add_string( "dshow-aspect-ratio", "4:3", ASPECT_TEXT, ASPECT_LONGTEXT, false)
+    add_string( "dshow-aspect-ratio", "4:3", ASPECT_TEXT, ASPECT_LONGTEXT)
         change_safe()
 
-    add_string( "dshow-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
+    add_string( "dshow-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
         change_safe()
 
-    add_float( "dshow-fps", 0.0f, FPS_TEXT, FPS_LONGTEXT, true )
+    add_float( "dshow-fps", 0.0f, FPS_TEXT, FPS_LONGTEXT )
         change_safe()
 
-    add_bool( "dshow-config", false, CONFIG_TEXT, CONFIG_LONGTEXT, true )
+    add_bool( "dshow-config", false, CONFIG_TEXT, CONFIG_LONGTEXT )
 
-    add_bool( "dshow-tuner", false, TUNER_TEXT, TUNER_LONGTEXT, true )
+    add_bool( "dshow-tuner", false, TUNER_TEXT, TUNER_LONGTEXT )
 
-    add_integer( "dshow-tuner-channel", 0, CHANNEL_TEXT, CHANNEL_LONGTEXT,
-                true )
+    add_integer( "dshow-tuner-channel", 0, CHANNEL_TEXT, CHANNEL_LONGTEXT )
         change_safe()
 
-    add_integer( "dshow-tuner-country", 0, COUNTRY_TEXT, COUNTRY_LONGTEXT,
-                true )
+    add_integer( "dshow-tuner-country", 0, COUNTRY_TEXT, COUNTRY_LONGTEXT )
 
     add_integer( "dshow-tuner-input", 0, TUNER_INPUT_TEXT,
-                 TUNER_INPUT_LONGTEXT, true )
+                 TUNER_INPUT_LONGTEXT )
         change_integer_list( pi_tuner_input, ppsz_tuner_input_text )
         change_safe()
 
     add_integer( "dshow-video-input",  -1, VIDEO_IN_TEXT,
-                 VIDEO_IN_LONGTEXT, true )
+                 VIDEO_IN_LONGTEXT )
         change_safe()
 
     add_integer( "dshow-video-output", -1, VIDEO_OUT_TEXT,
-                 VIDEO_OUT_LONGTEXT, true )
+                 VIDEO_OUT_LONGTEXT )
 
     add_integer( "dshow-audio-input",  -1, AUDIO_IN_TEXT,
-                 AUDIO_IN_LONGTEXT, true )
+                 AUDIO_IN_LONGTEXT )
         change_safe()
 
     add_integer( "dshow-audio-output", -1, AUDIO_OUT_TEXT,
-                 AUDIO_OUT_LONGTEXT, true )
+                 AUDIO_OUT_LONGTEXT )
 
     add_integer( "dshow-amtuner-mode", AMTUNER_MODE_TV,
-                AMTUNER_MODE_TEXT, AMTUNER_MODE_LONGTEXT, false)
+                AMTUNER_MODE_TEXT, AMTUNER_MODE_LONGTEXT)
         change_integer_list( pi_amtuner_mode, ppsz_amtuner_mode_text )
         change_safe()
 
     add_integer( "dshow-audio-channels", 0, AUDIO_CHANNELS_TEXT,
-                 AUDIO_CHANNELS_LONGTEXT, true )
+                 AUDIO_CHANNELS_LONGTEXT )
     add_integer( "dshow-audio-samplerate", 0, AUDIO_SAMPLERATE_TEXT,
-                 AUDIO_SAMPLERATE_LONGTEXT, true )
+                 AUDIO_SAMPLERATE_LONGTEXT )
     add_integer( "dshow-audio-bitspersample", 0, AUDIO_BITSPERSAMPLE_TEXT,
-                 AUDIO_BITSPERSAMPLE_LONGTEXT, true )
+                 AUDIO_BITSPERSAMPLE_LONGTEXT )
 
     add_shortcut( "dshow" )
     set_capability( "access", 1 )

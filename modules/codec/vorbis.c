@@ -208,14 +208,14 @@ vlc_module_begin ()
     set_callbacks( OpenEncoder, CloseEncoder )
 
     add_integer( ENC_CFG_PREFIX "quality", 0, ENC_QUALITY_TEXT,
-                 ENC_QUALITY_LONGTEXT, false )
+                 ENC_QUALITY_LONGTEXT )
         change_integer_range( 0, 10 )
     add_integer( ENC_CFG_PREFIX "max-bitrate", 0, ENC_MAXBR_TEXT,
-                 ENC_MAXBR_LONGTEXT, false )
+                 ENC_MAXBR_LONGTEXT )
     add_integer( ENC_CFG_PREFIX "min-bitrate", 0, ENC_MINBR_TEXT,
-                 ENC_MINBR_LONGTEXT, false )
+                 ENC_MINBR_LONGTEXT )
     add_bool( ENC_CFG_PREFIX "cbr", false, ENC_CBR_TEXT,
-                 ENC_CBR_LONGTEXT, false )
+                 ENC_CBR_LONGTEXT )
 #endif
 
 vlc_module_end ()
