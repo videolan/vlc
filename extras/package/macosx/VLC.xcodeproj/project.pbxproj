@@ -80,6 +80,7 @@
 		6B0292E61F43256300A50082 /* VLCBottomBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0292E51F43256300A50082 /* VLCBottomBarView.m */; };
 		6B0AB0F01F1AC8B3003A1B4E /* VLCSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0AB0ED1F1AC8B3003A1B4E /* VLCSlider.m */; };
 		6B0AB0F11F1AC8B3003A1B4E /* VLCSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0AB0EF1F1AC8B3003A1B4E /* VLCSliderCell.m */; };
+		6B196852265E974400870512 /* window_macosx.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B19684F265E928A00870512 /* window_macosx.m */; };
 		6B2EFC601F2819F700F3C0EA /* VLCVolumeSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B2EFC5F1F2819F700F3C0EA /* VLCVolumeSlider.m */; };
 		6B2EFC631F281A0900F3C0EA /* VLCVolumeSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B2EFC621F281A0900F3C0EA /* VLCVolumeSliderCell.m */; };
 		6B397C4F216C8EB200403ED0 /* NSString+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B397C4E216C8EB200403ED0 /* NSString+Helpers.m */; };
@@ -231,6 +232,7 @@
 		6B0AB0EF1F1AC8B3003A1B4E /* VLCSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCSliderCell.m; sourceTree = "<group>"; };
 		6B13E2A61BC67678001AD24A /* VLCScrollingClipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCScrollingClipView.h; sourceTree = "<group>"; };
 		6B13E2A71BC67678001AD24A /* VLCScrollingClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCScrollingClipView.m; sourceTree = "<group>"; };
+		6B19684F265E928A00870512 /* window_macosx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = window_macosx.m; path = ../../../modules/video_output/window_macosx.m; sourceTree = "<group>"; };
 		6B2EFC5E1F2819F700F3C0EA /* VLCVolumeSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCVolumeSlider.h; sourceTree = "<group>"; };
 		6B2EFC5F1F2819F700F3C0EA /* VLCVolumeSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCVolumeSlider.m; sourceTree = "<group>"; };
 		6B2EFC611F281A0900F3C0EA /* VLCVolumeSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCVolumeSliderCell.h; sourceTree = "<group>"; };
@@ -1534,6 +1536,7 @@
 		CCDDF1AE172FF4CE007729A1 /* vout */ = {
 			isa = PBXGroup;
 			children = (
+				6B19684F265E928A00870512 /* window_macosx.m */,
 				CCDBA3B313D32E200006127B /* macosx.m */,
 				7DBB06631CC2314D004C74D2 /* caopengllayer.m */,
 			);
@@ -1835,6 +1838,7 @@
 			files = (
 				7D903EA92243921000917358 /* darwinvlc.m in Sources */,
 				7D903EB6224394BE00917358 /* specific.c in Sources */,
+				6B196852265E974400870512 /* window_macosx.m in Sources */,
 				7D903E0E22438F8F00917358 /* error.c in Sources */,
 				7D903E2222438F8F00917358 /* dirs.m in Sources */,
 				7D903E4D22438F8F00917358 /* netconf.m in Sources */,
