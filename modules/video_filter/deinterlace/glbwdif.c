@@ -74,7 +74,6 @@ struct program_bwdif {
         GLint vertex_pos;
         GLint cur;
         GLint computed;
-        GLint width;
         GLint height;
         GLint field;
     } loc_gather;
@@ -194,7 +193,6 @@ DrawPlane(filter_t *filter, unsigned plane)
 
     vt->Uniform1i(program_bwdif->loc_gather.field, field);
 
-    vt->Uniform1f(program_bwdif->loc_gather.width, width);
     vt->Uniform1f(program_bwdif->loc_gather.height, height);
 
     /* Binded in previous step */
@@ -473,11 +471,15 @@ CreateProgramBwdif(filter_t *filter)
 {
     static const char *const VERTEX_SHADER_BODY =
         "attribute vec2 vertex_pos;\n"
+        "varying vec2 tex_coords;\n"
         "void main() {\n"
         "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
+        "  tex_coords = vec2((vertex_pos.x + 1.0) / 2.0,\n"
+        "                    (vertex_pos.y + 1.0) / 2.0);\n"
         "}\n";
 
     static const char *const FRAGMENT_SHADER_BODY =
+        "varying vec2 tex_coords;\n"
         "uniform VLC_SAMPLER prev;\n"
         "uniform VLC_SAMPLER cur;\n"
         "uniform VLC_SAMPLER next;\n"
@@ -587,10 +589,8 @@ CreateProgramBwdif(filter_t *filter)
         "}\n"
         "\n"
         "void main() {\n"
-           /* bottom-left is (0.5, 0.5)
-              top-right is (width-0.5, height / 2.0 -0.5) */
-        "  float x = gl_FragCoord.x;\n"
-        "  float y = gl_FragCoord.y * 2.0 - 0.5;\n"
+        "  float x = tex_coords.x * width;\n"
+        "  float y = floor(tex_coords.y * height / 2.0) * 2.0 + 0.5;\n"
         /* bwdif is applied upside-down, because the texture is uploaded
          * upside-down, that's why the condition is (field == 0) instead of
          * (field == 1) */
@@ -600,22 +600,18 @@ CreateProgramBwdif(filter_t *filter)
         "}\n";
 
     static const char *const GATHER_FRAGMENT_SHADER_BODY =
+        "varying vec2 tex_coords;\n"
         "uniform VLC_SAMPLER cur;\n"
         "uniform sampler2D computed;\n"
-        "uniform float width;\n"
         "uniform float height;\n"
         "uniform int field;\n"
         "\n"
         "void main() {\n"
-           /* bottom-left is (0.5, 0.5)
-              top-right is (width-0.5, height-0.5) */
-        "  float x = gl_FragCoord.x;\n"
-        "  float y = gl_FragCoord.y;\n"
         /* The line number */
-        "  float line = floor(y);\n"
+        "  float line = floor(tex_coords.y * height);\n"
         "\n"
-        "  float cur_pix = VLC_TEXTURE(cur, vec2(x / width, y / height)).x;\n"
-        "  float cur_computed = texture2D(computed, vec2(x / width, y / height)).x;\n"
+        "  float cur_pix = VLC_TEXTURE(cur, tex_coords).x;\n"
+        "  float cur_computed = texture2D(computed, tex_coords).x;\n"
 
         "  float result;\n"
         "  if (int(mod(line, 2.0)) == field) {\n"
@@ -752,10 +748,6 @@ CreateProgramBwdif(filter_t *filter)
     program_bwdif->loc_gather.computed =
         vt->GetUniformLocation(program_bwdif->id_gather, "computed");
     assert(program_bwdif->loc_gather.computed != -1);
-
-    program_bwdif->loc_gather.width =
-        vt->GetUniformLocation(program_bwdif->id_gather, "width");
-    assert(program_bwdif->loc_gather.width != -1);
 
     program_bwdif->loc_gather.height =
         vt->GetUniformLocation(program_bwdif->id_gather, "height");
