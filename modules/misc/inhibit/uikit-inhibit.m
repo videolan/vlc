@@ -34,8 +34,10 @@
 
 static void UpdateInhibit(vlc_inhibit_t *ih, unsigned mask)
 {
-    [UIApplication sharedApplication].idleTimerDisabled =
-        (mask & VLC_INHIBIT_DISPLAY) == VLC_INHIBIT_DISPLAY;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIApplication sharedApplication].idleTimerDisabled =
+            (mask & VLC_INHIBIT_DISPLAY) == VLC_INHIBIT_DISPLAY;
+    });
 }
 
 static int OpenInhibit(vlc_object_t *obj)
