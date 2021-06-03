@@ -431,21 +431,21 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( SRT_PARAM_CHUNK_SIZE, SRT_DEFAULT_CHUNK_SIZE,
-            N_( "SRT chunk size (bytes)" ), NULL, true )
+            N_( "SRT chunk size (bytes)" ), NULL )
     add_integer( SRT_PARAM_POLL_TIMEOUT, SRT_DEFAULT_POLL_TIMEOUT,
             N_( "Return poll wait after timeout milliseconds (-1 = infinite)" ),
-            NULL, true )
+            NULL )
     add_integer( SRT_PARAM_LATENCY, SRT_DEFAULT_LATENCY,
-            N_( "SRT latency (ms)" ), NULL, true )
+            N_( "SRT latency (ms)" ), NULL )
     add_password( SRT_PARAM_PASSPHRASE, "",
             N_( "Password for stream encryption" ), NULL )
     add_integer( SRT_PARAM_PAYLOAD_SIZE, SRT_DEFAULT_PAYLOAD_SIZE,
-            N_( "SRT maximum payload size (bytes)" ), NULL, true )
+            N_( "SRT maximum payload size (bytes)" ), NULL )
     add_integer( SRT_PARAM_KEY_LENGTH, SRT_DEFAULT_KEY_LENGTH,
-            SRT_KEY_LENGTH_TEXT, NULL, false )
+            SRT_KEY_LENGTH_TEXT, NULL )
     change_integer_list( srt_key_lengths, srt_key_length_names )
     add_string(SRT_PARAM_STREAMID, "",
-            N_(" SRT Stream ID"), NULL, false)
+            N_(" SRT Stream ID"), NULL)
     change_safe()
 
     set_capability("access", 0)

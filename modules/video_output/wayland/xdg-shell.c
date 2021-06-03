@@ -823,8 +823,8 @@ vlc_module_begin()
 #endif
     set_callback(Open)
 
-    add_string("wl-display", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
-    add_integer("wl-output", 0, OUTPUT_TEXT, OUTPUT_LONGTEXT, true)
+    add_string("wl-display", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT)
+    add_integer("wl-output", 0, OUTPUT_TEXT, OUTPUT_LONGTEXT)
         change_integer_range(0, UINT32_MAX)
         change_volatile()
 vlc_module_end()

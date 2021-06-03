@@ -579,45 +579,45 @@ vlc_module_begin ()
 
     set_section("Scaling", NULL)
     add_integer("pl-upscaler-preset", SCALE_BUILTIN,
-            UPSCALER_PRESET_TEXT, SCALER_PRESET_LONGTEXT, false)
+            UPSCALER_PRESET_TEXT, SCALER_PRESET_LONGTEXT)
             change_integer_list(scale_values, scale_text)
     add_integer("pl-downscaler-preset", SCALE_BUILTIN,
-            DOWNSCALER_PRESET_TEXT, SCALER_PRESET_LONGTEXT, false)
+            DOWNSCALER_PRESET_TEXT, SCALER_PRESET_LONGTEXT)
             change_integer_list(scale_values, scale_text)
     add_integer_with_range("pl-lut-entries", 64, 16, 256,
-            LUT_ENTRIES_TEXT, LUT_ENTRIES_LONGTEXT, false)
+            LUT_ENTRIES_TEXT, LUT_ENTRIES_LONGTEXT)
     add_float_with_range("pl-antiringing", 0.0,
-            0.0, 1.0, ANTIRING_TEXT, ANTIRING_LONGTEXT, false)
+            0.0, 1.0, ANTIRING_TEXT, ANTIRING_LONGTEXT)
     add_bool("pl-sigmoid", !!pl_render_default_params.sigmoid_params,
-            SIGMOID_TEXT, SIGMOID_LONGTEXT, true)
+            SIGMOID_TEXT, SIGMOID_LONGTEXT)
     add_float_with_range("pl-sigmoid-center", pl_sigmoid_default_params.center,
-            0., 1., SIGMOID_CENTER_TEXT, SIGMOID_CENTER_LONGTEXT, true)
+            0., 1., SIGMOID_CENTER_TEXT, SIGMOID_CENTER_LONGTEXT)
     add_float_with_range("pl-sigmoid-slope", pl_sigmoid_default_params.slope,
-            1., 20., SIGMOID_SLOPE_TEXT, SIGMOID_SLOPE_LONGTEXT, true)
+            1., 20., SIGMOID_SLOPE_TEXT, SIGMOID_SLOPE_LONGTEXT)
 
     set_section("Debanding", NULL)
-    add_bool("pl-debanding", false, DEBAND_TEXT, DEBAND_LONGTEXT, false)
+    add_bool("pl-debanding", false, DEBAND_TEXT, DEBAND_LONGTEXT)
     add_integer("pl-iterations", pl_deband_default_params.iterations,
-            DEBAND_ITER_TEXT, DEBAND_ITER_LONGTEXT, false)
+            DEBAND_ITER_TEXT, DEBAND_ITER_LONGTEXT)
     add_float("pl-threshold", pl_deband_default_params.threshold,
-            DEBAND_THRESH_TEXT, DEBAND_THRESH_LONGTEXT, false)
+            DEBAND_THRESH_TEXT, DEBAND_THRESH_LONGTEXT)
     add_float("pl-radius", pl_deband_default_params.radius,
-            DEBAND_RADIUS_TEXT, DEBAND_RADIUS_LONGTEXT, false)
+            DEBAND_RADIUS_TEXT, DEBAND_RADIUS_LONGTEXT)
     add_float("pl-grain", pl_deband_default_params.grain,
-            DEBAND_GRAIN_TEXT, DEBAND_GRAIN_LONGTEXT, false)
+            DEBAND_GRAIN_TEXT, DEBAND_GRAIN_LONGTEXT)
 
     set_section("Colorspace conversion", NULL)
     add_integer("pl-intent", pl_color_map_default_params.intent,
-            RENDER_INTENT_TEXT, RENDER_INTENT_LONGTEXT, false)
+            RENDER_INTENT_TEXT, RENDER_INTENT_LONGTEXT)
             change_integer_list(intent_values, intent_text)
-    add_integer("pl-target-prim", PL_COLOR_PRIM_UNKNOWN, PRIM_TEXT, PRIM_LONGTEXT, false)
+    add_integer("pl-target-prim", PL_COLOR_PRIM_UNKNOWN, PRIM_TEXT, PRIM_LONGTEXT)
             change_integer_list(prim_values, prim_text)
-    add_integer("pl-target-trc", PL_COLOR_TRC_UNKNOWN, TRC_TEXT, TRC_LONGTEXT, false)
+    add_integer("pl-target-trc", PL_COLOR_TRC_UNKNOWN, TRC_TEXT, TRC_LONGTEXT)
             change_integer_list(trc_values, trc_text)
 
 #if PL_API_VER >= 113
     add_loadfile("pl-lut-file", NULL, LUT_FILE_TEXT, LUT_FILE_LONGTEXT)
-    add_integer("pl-lut-mode", LUT_DISABLED, LUT_MODE_TEXT, LUT_MODE_LONGTEXT, false)
+    add_integer("pl-lut-mode", LUT_DISABLED, LUT_MODE_TEXT, LUT_MODE_LONGTEXT)
             change_integer_list(lut_mode_values, lut_mode_text)
 #endif
 
@@ -625,97 +625,97 @@ vlc_module_begin ()
 
     set_section("Tone mapping", NULL)
     add_integer("pl-tone-mapping", pl_color_map_default_params.tone_mapping_algo,
-            TONEMAPPING_TEXT, TONEMAPPING_LONGTEXT, false)
+            TONEMAPPING_TEXT, TONEMAPPING_LONGTEXT)
             change_integer_list(tone_values, tone_text)
     add_float("pl-tone-mapping-param", pl_color_map_default_params.tone_mapping_param,
-            TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT, true)
+            TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT)
 #if PL_API_VER >= 10
     add_float("pl-desat-strength", pl_color_map_default_params.desaturation_strength,
-            DESAT_STRENGTH_TEXT, DESAT_STRENGTH_LONGTEXT, false)
+            DESAT_STRENGTH_TEXT, DESAT_STRENGTH_LONGTEXT)
     add_float("pl-desat-exponent", pl_color_map_default_params.desaturation_exponent,
-            DESAT_EXPONENT_TEXT, DESAT_EXPONENT_LONGTEXT, false)
+            DESAT_EXPONENT_TEXT, DESAT_EXPONENT_LONGTEXT)
     add_float("pl-desat-base", pl_color_map_default_params.desaturation_base,
-            DESAT_BASE_TEXT, DESAT_BASE_LONGTEXT, false)
+            DESAT_BASE_TEXT, DESAT_BASE_LONGTEXT)
     add_float("pl-max-boost", pl_color_map_default_params.max_boost,
-            MAX_BOOST_TEXT, MAX_BOOST_LONGTEXT, false)
+            MAX_BOOST_TEXT, MAX_BOOST_LONGTEXT)
 #else
     add_float("pl-tone-mapping-desat", pl_color_map_default_params.tone_mapping_desaturate,
-            TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT, false)
+            TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT)
 #endif
 #if PL_API_VER >= 80
-    add_bool("pl-gamut-clipping", false, GAMUT_CLIPPING_TEXT, GAMUT_CLIPPING_LONGTEXT, true)
+    add_bool("pl-gamut-clipping", false, GAMUT_CLIPPING_TEXT, GAMUT_CLIPPING_LONGTEXT)
 #endif
-    add_bool("pl-gamut-warning", false, GAMUT_WARN_TEXT, GAMUT_WARN_LONGTEXT, true)
+    add_bool("pl-gamut-warning", false, GAMUT_WARN_TEXT, GAMUT_WARN_LONGTEXT)
 
 #if PL_API_VER < 12
     add_integer_with_range("pl-peak-frames", pl_color_map_default_params.peak_detect_frames,
-            0, 255, PEAK_FRAMES_TEXT, PEAK_FRAMES_LONGTEXT, false)
+            0, 255, PEAK_FRAMES_TEXT, PEAK_FRAMES_LONGTEXT)
     add_float_with_range("pl-scene-threshold", pl_color_map_default_params.scene_threshold,
-            0., 10., SCENE_THRESHOLD_TEXT, SCENE_THRESHOLD_LONGTEXT, false)
+            0., 10., SCENE_THRESHOLD_TEXT, SCENE_THRESHOLD_LONGTEXT)
 #endif
 
 #if PL_API_VER >= 13
     add_float_with_range("pl-peak-period", pl_peak_detect_default_params.smoothing_period,
-            0., 1000., PEAK_PERIOD_TEXT, PEAK_PERIOD_LONGTEXT, false)
+            0., 1000., PEAK_PERIOD_TEXT, PEAK_PERIOD_LONGTEXT)
     add_float("pl-scene-threshold-low", pl_peak_detect_default_params.scene_threshold_low,
-            SCENE_THRESHOLD_LOW_TEXT, SCENE_THRESHOLD_LOW_LONGTEXT, false)
+            SCENE_THRESHOLD_LOW_TEXT, SCENE_THRESHOLD_LOW_LONGTEXT)
     add_float("pl-scene-threshold-high", pl_peak_detect_default_params.scene_threshold_high,
-            SCENE_THRESHOLD_HIGH_TEXT, SCENE_THRESHOLD_HIGH_LONGTEXT, false)
+            SCENE_THRESHOLD_HIGH_TEXT, SCENE_THRESHOLD_HIGH_LONGTEXT)
 #endif
 
     add_float_with_range("pl-target-avg", 0.25,
-            0.0, 1.0, TARGET_AVG_TEXT, TARGET_AVG_LONGTEXT, false)
+            0.0, 1.0, TARGET_AVG_TEXT, TARGET_AVG_LONGTEXT)
 
     set_section("Dithering", NULL)
     add_integer("pl-dither", -1,
-            DITHER_TEXT, DITHER_LONGTEXT, false)
+            DITHER_TEXT, DITHER_LONGTEXT)
             change_integer_list(dither_values, dither_text)
     add_integer_with_range("pl-dither-size", pl_dither_default_params.lut_size,
-            1, 8, DITHER_SIZE_TEXT, DITHER_SIZE_LONGTEXT, false)
+            1, 8, DITHER_SIZE_TEXT, DITHER_SIZE_LONGTEXT)
     add_bool("pl-temporal-dither", pl_dither_default_params.temporal,
-            TEMPORAL_DITHER_TEXT, TEMPORAL_DITHER_LONGTEXT, false)
+            TEMPORAL_DITHER_TEXT, TEMPORAL_DITHER_LONGTEXT)
     add_integer_with_range("pl-dither-depth", 0,
-            0, 16, DITHER_DEPTH_TEXT, DITHER_DEPTH_LONGTEXT, false)
+            0, 16, DITHER_DEPTH_TEXT, DITHER_DEPTH_LONGTEXT)
 
     set_section("Custom upscaler (when preset = custom)", NULL)
     add_integer("pl-upscaler-kernel", FILTER_BOX,
-            KERNEL_TEXT, KERNEL_LONGTEXT, true)
+            KERNEL_TEXT, KERNEL_LONGTEXT)
             change_integer_list(filter_values, filter_text)
     add_integer("pl-upscaler-window", FILTER_NONE,
-            WINDOW_TEXT, WINDOW_LONGTEXT, true)
+            WINDOW_TEXT, WINDOW_LONGTEXT)
             change_integer_list(filter_values, filter_text)
-    add_bool("pl-upscaler-polar", false, POLAR_TEXT, POLAR_LONGTEXT, true)
+    add_bool("pl-upscaler-polar", false, POLAR_TEXT, POLAR_LONGTEXT)
     add_float_with_range("pl-upscaler-clamp", 0.0,
-            0.0, 1.0, CLAMP_TEXT, CLAMP_LONGTEXT, true)
+            0.0, 1.0, CLAMP_TEXT, CLAMP_LONGTEXT)
     add_float_with_range("pl-upscaler-blur", 1.0,
-            0.0, 100.0, BLUR_TEXT, BLUR_LONGTEXT, true)
+            0.0, 100.0, BLUR_TEXT, BLUR_LONGTEXT)
     add_float_with_range("pl-upscaler-taper", 0.0,
-            0.0, 10.0, TAPER_TEXT, TAPER_LONGTEXT, true)
+            0.0, 10.0, TAPER_TEXT, TAPER_LONGTEXT)
 
     set_section("Custom downscaler (when preset = custom)", NULL)
     add_integer("pl-downscaler-kernel", FILTER_BOX,
-            KERNEL_TEXT, KERNEL_LONGTEXT, true)
+            KERNEL_TEXT, KERNEL_LONGTEXT)
             change_integer_list(filter_values, filter_text)
     add_integer("pl-downscaler-window", FILTER_NONE,
-            WINDOW_TEXT, WINDOW_LONGTEXT, true)
+            WINDOW_TEXT, WINDOW_LONGTEXT)
             change_integer_list(filter_values, filter_text)
-    add_bool("pl-downscaler-polar", false, POLAR_TEXT, POLAR_LONGTEXT, true)
+    add_bool("pl-downscaler-polar", false, POLAR_TEXT, POLAR_LONGTEXT)
     add_float_with_range("pl-downscaler-clamp", 0.0,
-            0.0, 1.0, CLAMP_TEXT, CLAMP_LONGTEXT, true)
+            0.0, 1.0, CLAMP_TEXT, CLAMP_LONGTEXT)
     add_float_with_range("pl-downscaler-blur", 1.0,
-            0.0, 100.0, BLUR_TEXT, BLUR_LONGTEXT, true)
+            0.0, 100.0, BLUR_TEXT, BLUR_LONGTEXT)
     add_float_with_range("pl-downscaler-taper", 0.0,
-            0.0, 10.0, TAPER_TEXT, TAPER_LONGTEXT, true)
+            0.0, 10.0, TAPER_TEXT, TAPER_LONGTEXT)
 
     set_section("Performance tweaks / debugging", NULL)
-    add_bool("pl-skip-aa", false, SKIP_AA_TEXT, SKIP_AA_LONGTEXT, false)
+    add_bool("pl-skip-aa", false, SKIP_AA_TEXT, SKIP_AA_LONGTEXT)
     add_float_with_range("pl-polar-cutoff", 0.001,
-            0., 1., POLAR_CUTOFF_TEXT, POLAR_CUTOFF_LONGTEXT, false)
-    add_bool("pl-overlay-direct", false, OVERLAY_DIRECT_TEXT, OVERLAY_DIRECT_LONGTEXT, false)
-    add_bool("pl-disable-linear", false, DISABLE_LINEAR_TEXT, DISABLE_LINEAR_LONGTEXT, false)
-    add_bool("pl-force-general", false, FORCE_GENERAL_TEXT, FORCE_GENERAL_LONGTEXT, false)
+            0., 1., POLAR_CUTOFF_TEXT, POLAR_CUTOFF_LONGTEXT)
+    add_bool("pl-overlay-direct", false, OVERLAY_DIRECT_TEXT, OVERLAY_DIRECT_LONGTEXT)
+    add_bool("pl-disable-linear", false, DISABLE_LINEAR_TEXT, DISABLE_LINEAR_LONGTEXT)
+    add_bool("pl-force-general", false, FORCE_GENERAL_TEXT, FORCE_GENERAL_LONGTEXT)
 #if PL_API_VER >= 13
-    add_bool("pl-delayed-peak", false, DELAYED_PEAK_TEXT, DELAYED_PEAK_LONGTEXT, false)
+    add_bool("pl-delayed-peak", false, DELAYED_PEAK_TEXT, DELAYED_PEAK_LONGTEXT)
 #endif
 
 vlc_module_end ()

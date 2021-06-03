@@ -76,15 +76,15 @@ vlc_module_begin ()
     set_callback( Open )
     add_shortcut( "spatializer" )
     add_float_with_range( "spatializer-roomsize", 0.85, 0., 1.1,
-                            ROOMSIZE_TEXT, ROOMSIZE_LONGTEXT, false )
+                            ROOMSIZE_TEXT, ROOMSIZE_LONGTEXT )
     add_float_with_range( "spatializer-width", 1,     0.,  1.,
-                            WIDTH_TEXT,WIDTH_LONGTEXT, false )
+                            WIDTH_TEXT,WIDTH_LONGTEXT )
     add_float_with_range( "spatializer-wet",   0.4,   0.,  1.,
-                            WET_TEXT,WET_LONGTEXT, false )
+                            WET_TEXT,WET_LONGTEXT )
     add_float_with_range( "spatializer-dry",   0.5,   0.,  1.,
-                            DRY_TEXT,DRY_LONGTEXT, false )
+                            DRY_TEXT,DRY_LONGTEXT )
     add_float_with_range( "spatializer-damp",  0.5,   0.,  1.,
-                            DAMP_TEXT,DAMP_LONGTEXT, false )
+                            DAMP_TEXT,DAMP_LONGTEXT )
 vlc_module_end ()
 
 /*****************************************************************************

@@ -68,7 +68,7 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_RESAMPLER )
     add_integer( "soxr-resampler-quality", 2,
-                SOXR_QUALITY_TEXT, NULL, true )
+                SOXR_QUALITY_TEXT, NULL )
         change_integer_list( soxr_resampler_quality_vlclist,
                              soxr_resampler_quality_vlctext )
     set_capability ( "audio converter", 51 )

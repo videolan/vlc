@@ -911,7 +911,7 @@ vlc_module_begin()
     set_capability("aout stream", 50)
     set_category(CAT_AUDIO)
     add_bool("wasapi-exclusive", false, WASAPI_EXCLUSIVE_TEXT,
-             WASAPI_EXCLUSIVE_LONGTEXT, true)
+             WASAPI_EXCLUSIVE_LONGTEXT)
     set_subcategory(SUBCAT_AUDIO_AOUT)
     set_callback(Start)
 vlc_module_end()

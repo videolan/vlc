@@ -184,54 +184,53 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_STREAM )
 
     add_string( SOUT_CFG_PREFIX "dst", "", DEST_TEXT,
-                DEST_LONGTEXT, true )
+                DEST_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "sdp", "", SDP_TEXT,
-                SDP_LONGTEXT, true )
+                SDP_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "mux", "", MUX_TEXT,
-                MUX_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "sap", false, SAP_TEXT, SAP_LONGTEXT,
-              true )
+                MUX_LONGTEXT )
+    add_bool( SOUT_CFG_PREFIX "sap", false, SAP_TEXT, SAP_LONGTEXT )
 
     add_string( SOUT_CFG_PREFIX "name", "", NAME_TEXT,
-                NAME_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "cat", "", CAT_TEXT, CAT_LONGTEXT, true )
+                NAME_LONGTEXT )
+    add_string( SOUT_CFG_PREFIX "cat", "", CAT_TEXT, CAT_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "description", "", DESC_TEXT,
-                DESC_LONGTEXT, true )
+                DESC_LONGTEXT )
     add_obsolete_string( SOUT_CFG_PREFIX "url" ) /* since 4.0.0 */
     add_obsolete_string( SOUT_CFG_PREFIX "email" ) /* since 4.0.0 */
     add_obsolete_string( SOUT_CFG_PREFIX "phone" ) /* since 3.0.0 */
 
     add_string( SOUT_CFG_PREFIX "proto", "udp", PROTO_TEXT,
-                PROTO_LONGTEXT, false )
+                PROTO_LONGTEXT )
         change_string_list( ppsz_protos, ppsz_protocols )
     add_integer( SOUT_CFG_PREFIX "port", 5004, PORT_TEXT,
-                 PORT_LONGTEXT, true )
+                 PORT_LONGTEXT )
     add_integer( SOUT_CFG_PREFIX "port-audio", 0, PORT_AUDIO_TEXT,
-                 PORT_AUDIO_LONGTEXT, true )
+                 PORT_AUDIO_LONGTEXT )
     add_integer( SOUT_CFG_PREFIX "port-video", 0, PORT_VIDEO_TEXT,
-                 PORT_VIDEO_LONGTEXT, true )
+                 PORT_VIDEO_LONGTEXT )
 
     add_integer( SOUT_CFG_PREFIX "ttl", -1, TTL_TEXT,
-                 TTL_LONGTEXT, true )
+                 TTL_LONGTEXT )
     add_bool( SOUT_CFG_PREFIX "rtcp-mux", false,
-              RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, false )
+              RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT )
     add_integer( SOUT_CFG_PREFIX "caching", MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY),
-                 CACHING_TEXT, CACHING_LONGTEXT, true )
+                 CACHING_TEXT, CACHING_LONGTEXT )
     add_integer( "rtsp-timeout", 60, RTSP_TIMEOUT_TEXT,
-                 RTSP_TIMEOUT_LONGTEXT, true )
+                 RTSP_TIMEOUT_LONGTEXT )
     add_string( "sout-rtsp-user", "",
-                RTSP_USER_TEXT, RTSP_USER_LONGTEXT, true )
+                RTSP_USER_TEXT, RTSP_USER_LONGTEXT )
     add_password("sout-rtsp-pwd", "", RTSP_PASS_TEXT, RTSP_PASS_LONGTEXT)
 
 #ifdef HAVE_SRTP
     add_string( SOUT_CFG_PREFIX "key", "",
-                SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false )
+                SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT )
     add_string( SOUT_CFG_PREFIX "salt", "",
-                SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false )
+                SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT )
 #endif
 
     add_bool( SOUT_CFG_PREFIX "mp4a-latm", false, RFC3016_TEXT,
-                 RFC3016_LONGTEXT, false )
+                 RFC3016_LONGTEXT )
 
     set_callbacks( Open, Close )
 vlc_module_end ()

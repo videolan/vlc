@@ -1144,8 +1144,7 @@ vlc_module_begin()
     add_float_with_range("denoise-sigma", 1.f, .0f, .0f,
                          "Denoise strength (0-2)",
                          "Set the Denoise strength, between 0 and 2. "
-                            "Defaults to 1.",
-                         false)
+                            "Defaults to 1.")
     add_shortcut("denoise")
 
     add_submodule()

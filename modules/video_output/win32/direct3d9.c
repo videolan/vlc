@@ -99,14 +99,14 @@ vlc_module_begin ()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
-    add_bool("direct3d9-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT, true)
-    add_bool("directx-hw-yuv", true, HW_YUV_TEXT, HW_YUV_LONGTEXT, true)
+    add_bool("direct3d9-hw-blending", true, HW_BLENDING_TEXT, HW_BLENDING_LONGTEXT)
+    add_bool("directx-hw-yuv", true, HW_YUV_TEXT, HW_YUV_LONGTEXT)
 
-    add_string("direct3d9-shader", "", PIXEL_SHADER_TEXT, PIXEL_SHADER_LONGTEXT, true)
+    add_string("direct3d9-shader", "", PIXEL_SHADER_TEXT, PIXEL_SHADER_LONGTEXT)
     add_loadfile("direct3d9-shader-file", NULL,
                  PIXEL_SHADER_FILE_TEXT, PIXEL_SHADER_FILE_LONGTEXT)
 
-    add_bool("direct3d9-dxvahd", true, DXVAHD_TEXT, NULL, true)
+    add_bool("direct3d9-dxvahd", true, DXVAHD_TEXT, NULL)
 
     add_shortcut("direct3d9", "direct3d")
     set_callback_display(Open, 280)

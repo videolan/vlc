@@ -172,7 +172,7 @@ vlc_module_begin()
     set_capability("logger", 10)
     set_callback(Open)
 
-    add_bool("quiet", false, QUIET_TEXT, QUIET_LONGTEXT, false)
+    add_bool("quiet", false, QUIET_TEXT, QUIET_LONGTEXT)
         change_short('q')
         change_volatile()
 vlc_module_end ()

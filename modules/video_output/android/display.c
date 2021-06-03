@@ -60,7 +60,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_description("Android video output")
     add_shortcut("android-display")
-    add_string(CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
+    add_string(CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT)
     set_callback_display(Open, 260)
 vlc_module_end()
 

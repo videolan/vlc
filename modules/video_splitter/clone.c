@@ -58,7 +58,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SPLITTER )
 
-    add_integer( CFG_PREFIX "count", 2, COUNT_TEXT, COUNT_LONGTEXT, false )
+    add_integer( CFG_PREFIX "count", 2, COUNT_TEXT, COUNT_LONGTEXT )
     add_module_list(CFG_PREFIX "vout-list", "vout display", NULL,
                     VOUTLIST_TEXT, VOUTLIST_LONGTEXT)
 

@@ -218,13 +218,13 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_SOUT_STREAM)
     set_callbacks(Open, Close)
 
-    add_string(SOUT_CFG_PREFIX "ip", NULL, NULL, NULL, false)
+    add_string(SOUT_CFG_PREFIX "ip", NULL, NULL, NULL)
         change_private()
-    add_integer(SOUT_CFG_PREFIX "port", CHROMECAST_CONTROL_PORT, NULL, NULL, false)
+    add_integer(SOUT_CFG_PREFIX "port", CHROMECAST_CONTROL_PORT, NULL, NULL)
         change_private()
-    add_bool(SOUT_CFG_PREFIX "video", true, NULL, NULL, false)
+    add_bool(SOUT_CFG_PREFIX "video", true, NULL, NULL)
         change_private()
-    add_integer(SOUT_CFG_PREFIX "http-port", HTTP_PORT, HTTP_PORT_TEXT, HTTP_PORT_LONGTEXT, false)
+    add_integer(SOUT_CFG_PREFIX "http-port", HTTP_PORT, HTTP_PORT_TEXT, HTTP_PORT_LONGTEXT)
     add_obsolete_string(SOUT_CFG_PREFIX "mux") /* since 4.0.0 */
     add_obsolete_string(SOUT_CFG_PREFIX "mime") /* since 4.0.0 */
     add_renderer_opts(SOUT_CFG_PREFIX)

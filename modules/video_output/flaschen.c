@@ -66,9 +66,9 @@ vlc_module_begin ()
 
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
-    add_string( "flaschen-display", NULL, T_FLDISPLAY, LT_FLDISPLAY, true )
-    add_integer("flaschen-width", 25, T_WIDTH, LT_WIDTH, false)
-    add_integer("flaschen-height", 20, T_HEIGHT, LT_HEIGHT, false)
+    add_string( "flaschen-display", NULL, T_FLDISPLAY, LT_FLDISPLAY )
+    add_integer("flaschen-width", 25, T_WIDTH, LT_WIDTH)
+    add_integer("flaschen-height", 20, T_HEIGHT, LT_HEIGHT)
 vlc_module_end ()
 
 

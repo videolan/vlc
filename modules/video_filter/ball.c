@@ -128,20 +128,20 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_string( FILTER_PREFIX "color", "red",
-                BALL_COLOR_TEXT, NULL, false )
+                BALL_COLOR_TEXT, NULL )
     change_string_list( mode_list, mode_list_text )
 
     add_integer_with_range( FILTER_PREFIX "speed", 4, 1, 15,
-                            BALL_SPEED_TEXT, BALL_SPEED_LONGTEXT, false )
+                            BALL_SPEED_TEXT, BALL_SPEED_LONGTEXT )
 
     add_integer_with_range( FILTER_PREFIX "size", 10, 5, 30,
-                            BALL_SIZE_TEXT, BALL_SIZE_LONGTEXT, false )
+                            BALL_SIZE_TEXT, BALL_SIZE_LONGTEXT )
 
     add_integer_with_range( FILTER_PREFIX "gradient-threshold", 40, 1, 200,
-                            GRAD_THRESH_TEXT, GRAD_THRESH_LONGTEXT, false )
+                            GRAD_THRESH_TEXT, GRAD_THRESH_LONGTEXT )
 
     add_bool( FILTER_PREFIX "edge-visible", true,
-              EDGE_VISIBLE_TEXT, NULL, true )
+              EDGE_VISIBLE_TEXT, NULL )
 
     add_shortcut( "ball" )
     set_callback_video_filter( Create )

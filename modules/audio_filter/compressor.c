@@ -180,19 +180,19 @@ vlc_module_begin()
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
     add_float_with_range( "compressor-rms-peak", 0.2, 0.0, 1.0,
-               RMS_PEAK_TEXT, RMS_PEAK_LONGTEXT, false )
+               RMS_PEAK_TEXT, RMS_PEAK_LONGTEXT )
     add_float_with_range( "compressor-attack", 25.0, 1.5, 400.0,
-               ATTACK_TEXT, ATTACK_LONGTEXT, false )
+               ATTACK_TEXT, ATTACK_LONGTEXT )
     add_float_with_range( "compressor-release", 100.0, 2.0, 800.0,
-               RELEASE_TEXT, RELEASE_LONGTEXT, false )
+               RELEASE_TEXT, RELEASE_LONGTEXT )
     add_float_with_range( "compressor-threshold", -11.0, -30.0, 0.0,
-               THRESHOLD_TEXT, THRESHOLD_LONGTEXT, false )
+               THRESHOLD_TEXT, THRESHOLD_LONGTEXT )
     add_float_with_range( "compressor-ratio", 4.0, 1.0, 20.0,
-               RATIO_TEXT, RATIO_LONGTEXT, false )
+               RATIO_TEXT, RATIO_LONGTEXT )
     add_float_with_range( "compressor-knee", 5.0, 1.0, 10.0,
-               KNEE_TEXT, KNEE_LONGTEXT, false )
+               KNEE_TEXT, KNEE_LONGTEXT )
     add_float_with_range( "compressor-makeup-gain", 7.0, 0.0, 24.0,
-               MAKEUP_GAIN_TEXT, MAKEUP_GAIN_LONGTEXT, false )
+               MAKEUP_GAIN_TEXT, MAKEUP_GAIN_LONGTEXT )
     set_callback( Open )
     add_shortcut( "compressor" )
 vlc_module_end ()

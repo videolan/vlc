@@ -146,24 +146,22 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
 
-    add_string( CFG_PREFIX "id", "Id", ID_TEXT, ID_LONGTEXT,
-                false )
+    add_string( CFG_PREFIX "id", "Id", ID_TEXT, ID_LONGTEXT )
     add_integer( CFG_PREFIX "width", 0, WIDTH_TEXT,
-                 WIDTH_LONGTEXT, true )
+                 WIDTH_LONGTEXT )
     add_integer( CFG_PREFIX "height", 0, HEIGHT_TEXT,
-                 HEIGHT_LONGTEXT, true )
+                 HEIGHT_LONGTEXT )
     add_string( CFG_PREFIX "sar", "1:1", RATIO_TEXT,
-                RATIO_LONGTEXT, false )
-    add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                false )
+                RATIO_LONGTEXT )
+    add_string( CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
 
     add_module_list(CFG_PREFIX "vfilter", "video filter", NULL,
                     VFILTER_TEXT, VFILTER_LONGTEXT)
 
     add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255,
-                            ALPHA_TEXT, ALPHA_LONGTEXT, false )
-    add_integer( CFG_PREFIX "x", -1, X_TEXT, X_LONGTEXT, false )
-    add_integer( CFG_PREFIX "y", -1, Y_TEXT, Y_LONGTEXT, false )
+                            ALPHA_TEXT, ALPHA_LONGTEXT )
+    add_integer( CFG_PREFIX "x", -1, X_TEXT, X_LONGTEXT )
+    add_integer( CFG_PREFIX "y", -1, Y_TEXT, Y_LONGTEXT )
 
     set_callbacks( Open, Close )
 vlc_module_end ()

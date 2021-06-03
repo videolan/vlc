@@ -60,8 +60,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_float_with_range( FILTER_PREFIX "sigma", 2., SIGMA_MIN, SIGMA_MAX,
-                          SIGMA_TEXT, SIGMA_LONGTEXT,
-                          false )
+                          SIGMA_TEXT, SIGMA_LONGTEXT )
 
     set_callback_video_filter( Create )
 vlc_module_end ()

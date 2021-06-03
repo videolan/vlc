@@ -65,13 +65,13 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VFILTER)
 
     add_float_with_range(FILTER_PREFIX "luma-spat", 4.0, 0.0, 254.0,
-            LUMA_SPAT_TEXT, NULL, false)
+            LUMA_SPAT_TEXT, NULL)
     add_float_with_range(FILTER_PREFIX "chroma-spat", 3.0, 0.0, 254.0,
-            CHROMA_SPAT_TEXT, NULL, false)
+            CHROMA_SPAT_TEXT, NULL)
     add_float_with_range(FILTER_PREFIX "luma-temp", 6.0, 0.0, 254.0,
-            LUMA_TEMP_TEXT, NULL, false)
+            LUMA_TEMP_TEXT, NULL)
     add_float_with_range(FILTER_PREFIX "chroma-temp", 4.5, 0.0, 254.0,
-            CHROMA_TEMP_TEXT, NULL, false)
+            CHROMA_TEMP_TEXT, NULL)
 
     add_shortcut("hqdn3d")
 

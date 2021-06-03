@@ -122,7 +122,7 @@ vlc_module_begin()
     set_capability("encoder", 1000)
     set_callbacks(OpenEncoder, CloseEncoder)
     add_integer_with_range(ENC_CFG_PREFIX "quality", 95, 0, 100,
-                           ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT, true)
+                           ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT)
 vlc_module_end()
 
 

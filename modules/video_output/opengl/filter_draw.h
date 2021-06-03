@@ -37,7 +37,7 @@
     set_capability("opengl filter", 0) \
     set_callback(vlc_gl_filter_draw_Open) \
     add_bool(DRAW_CFG_PREFIX "vflip", false, \
-             DRAW_VFLIP_SHORTTEXT, DRAW_VFLIP_LONGTEXT, false)
+             DRAW_VFLIP_SHORTTEXT, DRAW_VFLIP_LONGTEXT)
 
 vlc_gl_filter_open_fn vlc_gl_filter_draw_Open;
 

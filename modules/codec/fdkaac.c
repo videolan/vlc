@@ -110,17 +110,17 @@ vlc_module_begin ()
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACODEC)
     add_integer(ENC_CFG_PREFIX "profile", PROFILE_AAC_LC, AOT_TEXT,
-             AOT_LONGTEXT, false)
+             AOT_LONGTEXT)
     change_integer_list(pi_aot_values, ppsz_aot_descriptions);
     add_bool(ENC_CFG_PREFIX "sbr", false, SIDEBAND_TEXT,
-              SIDEBAND_LONGTEXT, false)
+              SIDEBAND_LONGTEXT)
     add_integer(ENC_CFG_PREFIX "vbr", 0, VBR_QUALITY_TEXT,
-              VBR_QUALITY_LONGTEXT, false)
+              VBR_QUALITY_LONGTEXT)
     change_integer_range (0, 5)
     add_bool(ENC_CFG_PREFIX "afterburner", true, AFTERBURNER_TEXT,
-              AFTERBURNER_LONGTEXT, true)
+              AFTERBURNER_LONGTEXT)
     add_integer(ENC_CFG_PREFIX "signaling", SIGNALING_COMPATIBLE, SIGNALING_TEXT,
-             SIGNALING_LONGTEXT, true)
+             SIGNALING_LONGTEXT)
     change_integer_range (0, 2)
 vlc_module_end ()
 

@@ -67,8 +67,7 @@ vlc_module_begin ()
     set_shortname("MP4")
 
     add_bool(SOUT_CFG_PREFIX "faststart", false,
-              FASTSTART_TEXT, FASTSTART_LONGTEXT,
-              true)
+              FASTSTART_TEXT, FASTSTART_LONGTEXT)
     set_capability("sout mux", 5)
     add_shortcut("mp4", "mov", "3gp")
     set_callbacks(Open, Close)

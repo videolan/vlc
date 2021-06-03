@@ -853,14 +853,14 @@ vlc_module_begin()
     set_subcategory( SUBCAT_SOUT_ACO )
 
     add_integer( SOUT_CFG_PREFIX "packet-size", RIST_TARGET_PACKET_SIZE,
-            N_("RIST target packet size (bytes)"), NULL, true )
+            N_("RIST target packet size (bytes)"), NULL )
     add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_CACHING_DELAY,
-            CACHING_TEXT, CACHING_LONGTEXT, true )
+            CACHING_TEXT, CACHING_LONGTEXT )
     add_integer( SOUT_CFG_PREFIX "buffer-size", DEFAULT_BUFFER_SIZE,
-            BUFFER_TEXT, BUFFER_LONGTEXT, true )
+            BUFFER_TEXT, BUFFER_LONGTEXT )
     add_integer( SOUT_CFG_PREFIX "ssrc", 0,
-            SSRC_TEXT, SSRC_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "stream-name", NULL, NAME_TEXT, NAME_LONGTEXT, true )
+            SSRC_TEXT, SSRC_LONGTEXT )
+    add_string( SOUT_CFG_PREFIX "stream-name", NULL, NAME_TEXT, NAME_LONGTEXT )
 
     set_capability( "sout access", 0 )
     add_shortcut( "rist", "tr06" )

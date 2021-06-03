@@ -57,7 +57,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
     add_bool( "playlist-skip-ads", true,
-              SKIP_ADS_TEXT, SKIP_ADS_LONGTEXT, false )
+              SKIP_ADS_TEXT, SKIP_ADS_LONGTEXT )
 
     set_shortname( N_("Playlist") )
     set_description( N_("Playlist") )

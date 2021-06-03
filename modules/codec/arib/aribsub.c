@@ -57,8 +57,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_SCODEC )
     set_callbacks( Open, Close )
 
-    add_bool( ARIBSUB_CFG_PREFIX "ignore-ruby", false, IGNORE_RUBY_TEXT, IGNORE_RUBY_LONGTEXT, true )
-    add_bool( ARIBSUB_CFG_PREFIX "use-coretext", false, USE_CORETEXT_TEXT, USE_CORETEXT_LONGTEXT, true )
+    add_bool( ARIBSUB_CFG_PREFIX "ignore-ruby", false, IGNORE_RUBY_TEXT, IGNORE_RUBY_LONGTEXT )
+    add_bool( ARIBSUB_CFG_PREFIX "use-coretext", false, USE_CORETEXT_TEXT, USE_CORETEXT_LONGTEXT )
 vlc_module_end ()
 
 

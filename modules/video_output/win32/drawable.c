@@ -51,7 +51,7 @@ vlc_module_begin ()
     set_callback(Open)
     add_shortcut ("embed-hwnd")
 
-    add_integer ("drawable-hwnd", 0, HWND_TEXT, HWND_LONGTEXT, true)
+    add_integer ("drawable-hwnd", 0, HWND_TEXT, HWND_LONGTEXT)
         change_volatile ()
 vlc_module_end ()
 

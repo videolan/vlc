@@ -136,16 +136,16 @@ vlc_module_begin ()
 
 #   define ENC_CFG_PREFIX "sout-daala-"
     add_integer_with_range( ENC_CFG_PREFIX "quality", 10, 0, 511,
-                 ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT, false )
+                 ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT )
     add_integer_with_range( ENC_CFG_PREFIX "keyint", 256, 1, 1000,
-                 ENC_KEYINT_TEXT, ENC_KEYINT_LONGTEXT, false )
+                 ENC_KEYINT_TEXT, ENC_KEYINT_LONGTEXT )
 
 #   define ENC_CHROMAFMT_TEXT N_("Chroma format")
 #   define ENC_CHROMAFMT_LONGTEXT N_("Picking chroma format will force a " \
                                      "conversion of the video into that format")
 
     add_string( ENC_CFG_PREFIX "chroma-fmt", "420", ENC_CHROMAFMT_TEXT,
-                ENC_CHROMAFMT_LONGTEXT, false )
+                ENC_CHROMAFMT_LONGTEXT )
     change_string_list( enc_chromafmt_list, enc_chromafmt_list_text )
 #endif
 vlc_module_end ()

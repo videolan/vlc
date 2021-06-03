@@ -47,7 +47,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_shortcut( "fps" )
-    add_string( CFG_PREFIX "fps", NULL, FPS_TEXT, NULL, false )
+    add_string( CFG_PREFIX "fps", NULL, FPS_TEXT, NULL )
     set_callback_video_filter( Open )
 vlc_module_end ()
 

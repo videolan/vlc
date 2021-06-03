@@ -51,7 +51,7 @@ vlc_module_begin ()
 
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
-    add_string( "dummy-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
+    add_string( "dummy-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
 
     add_submodule ()
     set_description( N_("Statistics video output") )

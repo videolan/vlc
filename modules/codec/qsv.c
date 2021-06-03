@@ -200,50 +200,50 @@ vlc_module_begin ()
     set_capability("encoder", 0)
     set_callbacks(Open, Close)
 
-    add_bool(SOUT_CFG_PREFIX "software", false, SW_IMPL_TEXT, SW_IMPL_LONGTEXT, true)
+    add_bool(SOUT_CFG_PREFIX "software", false, SW_IMPL_TEXT, SW_IMPL_LONGTEXT)
 
-    add_string(SOUT_CFG_PREFIX "h264-profile", "unspecified" , PROFILE_TEXT, PROFILE_LONGTEXT, false)
+    add_string(SOUT_CFG_PREFIX "h264-profile", "unspecified" , PROFILE_TEXT, PROFILE_LONGTEXT)
         change_string_list(profile_h264_text, profile_h264_text)
 
-    add_string(SOUT_CFG_PREFIX "h264-level", "unspecified", LEVEL_TEXT, LEVEL_LONGTEXT, false)
+    add_string(SOUT_CFG_PREFIX "h264-level", "unspecified", LEVEL_TEXT, LEVEL_LONGTEXT)
         change_string_list(level_h264_text, level_h264_text)
 
-    add_string(SOUT_CFG_PREFIX "mpeg2-profile", "unspecified", PROFILE_TEXT, PROFILE_LONGTEXT, false)
+    add_string(SOUT_CFG_PREFIX "mpeg2-profile", "unspecified", PROFILE_TEXT, PROFILE_LONGTEXT)
         change_string_list(profile_mpeg2_text, profile_mpeg2_text)
 
-    add_string(SOUT_CFG_PREFIX "mpeg2-level", "unspecified", LEVEL_TEXT, LEVEL_LONGTEXT, false)
+    add_string(SOUT_CFG_PREFIX "mpeg2-level", "unspecified", LEVEL_TEXT, LEVEL_LONGTEXT)
         change_string_list(level_mpeg2_text, level_mpeg2_text)
 
-    add_integer(SOUT_CFG_PREFIX "gop-size", 32, GOP_SIZE_TEXT, GOP_SIZE_LONGTEXT, true)
-    add_integer(SOUT_CFG_PREFIX "gop-refdist", 4, GOP_REF_DIST_TEXT, GOP_REF_DIST_LONGTEXT, true)
-    add_integer(SOUT_CFG_PREFIX "idr-interval", 0, IDR_INTERVAL_TEXT, IDR_INTERVAL_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "gop-size", 32, GOP_SIZE_TEXT, GOP_SIZE_LONGTEXT)
+    add_integer(SOUT_CFG_PREFIX "gop-refdist", 4, GOP_REF_DIST_TEXT, GOP_REF_DIST_LONGTEXT)
+    add_integer(SOUT_CFG_PREFIX "idr-interval", 0, IDR_INTERVAL_TEXT, IDR_INTERVAL_LONGTEXT)
 
-    add_string(SOUT_CFG_PREFIX "target-usage", "quality", TARGET_USAGE_TEXT, TARGET_USAGE_LONGTEXT, false)
+    add_string(SOUT_CFG_PREFIX "target-usage", "quality", TARGET_USAGE_TEXT, TARGET_USAGE_LONGTEXT)
         change_string_list(target_usage_text, target_usage_text)
 
-    add_string(SOUT_CFG_PREFIX "rc-method", "vbr", RATE_CONTROL_TEXT, RATE_CONTROL_LONGTEXT, true)
+    add_string(SOUT_CFG_PREFIX "rc-method", "vbr", RATE_CONTROL_TEXT, RATE_CONTROL_LONGTEXT)
         change_string_list(rc_method_text, rc_method_text)
 
-    add_integer(SOUT_CFG_PREFIX "qp", 0, QP_TEXT, QP_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "qp", 0, QP_TEXT, QP_LONGTEXT)
         change_integer_range(0, 51)
-    add_integer(SOUT_CFG_PREFIX "qpi", 0, QPI_TEXT, QPI_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "qpi", 0, QPI_TEXT, QPI_LONGTEXT)
         change_integer_range(0, 51)
-    add_integer(SOUT_CFG_PREFIX "qpp", 0, QPP_TEXT, QPP_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "qpp", 0, QPP_TEXT, QPP_LONGTEXT)
         change_integer_range(0, 51)
-    add_integer(SOUT_CFG_PREFIX "qpb", 0, QPB_TEXT, QPB_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "qpb", 0, QPB_TEXT, QPB_LONGTEXT)
         change_integer_range(0, 51)
 
-    add_integer(SOUT_CFG_PREFIX "bitrate-max", 0, MAX_BITRATE_TEXT, MAX_BITRATE_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "bitrate-max", 0, MAX_BITRATE_TEXT, MAX_BITRATE_LONGTEXT)
 
-    add_integer(SOUT_CFG_PREFIX "accuracy", 0, ACCURACY_TEXT, ACCURACY_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "accuracy", 0, ACCURACY_TEXT, ACCURACY_LONGTEXT)
         change_integer_range(0, 100)
 
-    add_integer(SOUT_CFG_PREFIX "convergence", 0, CONVERGENCE_TEXT, CONVERGENCE_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "convergence", 0, CONVERGENCE_TEXT, CONVERGENCE_LONGTEXT)
 
-    add_integer(SOUT_CFG_PREFIX "num-slice", 0, NUM_SLICE_TEXT, NUM_SLICE_LONGTEXT, true)
-    add_integer(SOUT_CFG_PREFIX "num-ref-frame", 0, NUM_REF_FRAME_TEXT, NULL, true)
+    add_integer(SOUT_CFG_PREFIX "num-slice", 0, NUM_SLICE_TEXT, NUM_SLICE_LONGTEXT)
+    add_integer(SOUT_CFG_PREFIX "num-ref-frame", 0, NUM_REF_FRAME_TEXT, NULL)
 
-    add_integer(SOUT_CFG_PREFIX "async-depth", 4, ASYNC_DEPTH_TEXT, ASYNC_DEPTH_LONGTEXT, true)
+    add_integer(SOUT_CFG_PREFIX "async-depth", 4, ASYNC_DEPTH_TEXT, ASYNC_DEPTH_LONGTEXT)
         change_integer_range(1, 32)
 
 vlc_module_end ()

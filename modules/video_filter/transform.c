@@ -60,7 +60,7 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
 
-    add_string(CFG_PREFIX "type", "90", TYPE_TEXT, NULL, false)
+    add_string(CFG_PREFIX "type", "90", TYPE_TEXT, NULL)
         change_string_list(type_list, type_list_text)
         change_safe()
 

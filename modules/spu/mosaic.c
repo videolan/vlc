@@ -179,48 +179,47 @@ vlc_module_begin ()
     set_callback_sub_source( CreateFilter, 0 )
 
     add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255,
-                            ALPHA_TEXT, ALPHA_LONGTEXT, false )
+                            ALPHA_TEXT, ALPHA_LONGTEXT )
 
     add_integer( CFG_PREFIX "height", 100,
-                 HEIGHT_TEXT, HEIGHT_LONGTEXT, false )
+                 HEIGHT_TEXT, HEIGHT_LONGTEXT )
     add_integer( CFG_PREFIX "width", 100,
-                 WIDTH_TEXT, WIDTH_LONGTEXT, false )
+                 WIDTH_TEXT, WIDTH_LONGTEXT )
 
     add_integer( CFG_PREFIX "align", 5,
-                 ALIGN_TEXT, ALIGN_LONGTEXT, true)
+                 ALIGN_TEXT, ALIGN_LONGTEXT)
         change_integer_list( pi_align_values, ppsz_align_descriptions )
 
     add_integer( CFG_PREFIX "xoffset", 0,
-                 XOFFSET_TEXT, XOFFSET_LONGTEXT, true )
+                 XOFFSET_TEXT, XOFFSET_LONGTEXT )
     add_integer( CFG_PREFIX "yoffset", 0,
-                 YOFFSET_TEXT, YOFFSET_LONGTEXT, true )
+                 YOFFSET_TEXT, YOFFSET_LONGTEXT )
 
     add_integer( CFG_PREFIX "borderw", 0,
-                 BORDERW_TEXT, BORDERW_LONGTEXT, true )
+                 BORDERW_TEXT, BORDERW_LONGTEXT )
     add_integer( CFG_PREFIX "borderh", 0,
-                 BORDERH_TEXT, BORDERH_LONGTEXT, true )
+                 BORDERH_TEXT, BORDERH_LONGTEXT )
 
     add_integer( CFG_PREFIX "position", 0,
-                 POS_TEXT, POS_LONGTEXT, false )
+                 POS_TEXT, POS_LONGTEXT )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions )
     add_integer( CFG_PREFIX "rows", 2,
-                 ROWS_TEXT, ROWS_LONGTEXT, false )
+                 ROWS_TEXT, ROWS_LONGTEXT )
     add_integer( CFG_PREFIX "cols", 2,
-                 COLS_TEXT, COLS_LONGTEXT, false )
+                 COLS_TEXT, COLS_LONGTEXT )
 
     add_bool( CFG_PREFIX "keep-aspect-ratio", false,
-              AR_TEXT, AR_LONGTEXT, false )
+              AR_TEXT, AR_LONGTEXT )
     add_bool( CFG_PREFIX "keep-picture", false,
-              KEEP_TEXT, KEEP_LONGTEXT, false )
+              KEEP_TEXT, KEEP_LONGTEXT )
 
     add_string( CFG_PREFIX "order", "",
-                ORDER_TEXT, ORDER_LONGTEXT, false )
+                ORDER_TEXT, ORDER_LONGTEXT )
 
     add_string( CFG_PREFIX "offsets", "",
-                OFFSETS_TEXT, OFFSETS_LONGTEXT, false )
+                OFFSETS_TEXT, OFFSETS_LONGTEXT )
 
-    add_integer( CFG_PREFIX "delay", 0, DELAY_TEXT, DELAY_LONGTEXT,
-                 false )
+    add_integer( CFG_PREFIX "delay", 0, DELAY_TEXT, DELAY_LONGTEXT )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {

@@ -80,10 +80,9 @@ vlc_module_begin ()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_loadfile(FB_DEV_VAR, "/dev/fb0", DEVICE_TEXT, DEVICE_LONGTEXT)
-    add_bool("fb-tty", true, TTY_TEXT, TTY_LONGTEXT, true)
-    add_string( "fb-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
-    add_integer("fb-mode", 4, FB_MODE_TEXT, FB_MODE_LONGTEXT,
-                 true)
+    add_bool("fb-tty", true, TTY_TEXT, TTY_LONGTEXT)
+    add_string( "fb-chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT )
+    add_integer("fb-mode", 4, FB_MODE_TEXT, FB_MODE_LONGTEXT)
     add_obsolete_bool("fb-hw-accel") /* since 4.0.0 */
     set_description(N_("GNU/Linux framebuffer video output"))
     set_callback_display(Open, 30)

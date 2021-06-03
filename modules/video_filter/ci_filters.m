@@ -810,5 +810,5 @@ vlc_module_begin()
     add_submodule()
     set_callback_video_filter(OpenCustom)
     add_shortcut("ci")
-    add_string("ci-filter", "CIComicEffect", CI_CUSTOM_FILTER_TEXT, CI_CUSTOM_FILTER_LONGTEXT, true);
+    add_string("ci-filter", "CIComicEffect", CI_CUSTOM_FILTER_TEXT, CI_CUSTOM_FILTER_LONGTEXT);
 vlc_module_end()

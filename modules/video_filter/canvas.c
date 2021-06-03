@@ -111,15 +111,15 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_integer_with_range( CFG_PREFIX "width", 0, 0, INT_MAX,
-                            WIDTH_TEXT, WIDTH_LONGTEXT, false )
+                            WIDTH_TEXT, WIDTH_LONGTEXT )
     add_integer_with_range( CFG_PREFIX "height", 0, 0, INT_MAX,
-                            HEIGHT_TEXT, HEIGHT_LONGTEXT, false )
+                            HEIGHT_TEXT, HEIGHT_LONGTEXT )
 
     add_string( CFG_PREFIX "aspect", NULL,
-                ASPECT_TEXT, ASPECT_LONGTEXT, false )
+                ASPECT_TEXT, ASPECT_LONGTEXT )
 
     add_bool( CFG_PREFIX "padd", true,
-              PADD_TEXT, PADD_LONGTEXT, false )
+              PADD_TEXT, PADD_LONGTEXT )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {

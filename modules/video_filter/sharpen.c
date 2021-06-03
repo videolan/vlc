@@ -68,7 +68,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     add_float_with_range( FILTER_PREFIX "sigma", 0.05, 0.0, 2.0,
-        SIG_TEXT, SIG_LONGTEXT, false )
+        SIG_TEXT, SIG_LONGTEXT )
     change_safe()
     add_shortcut( "sharpen" )
     set_callback_video_filter( Create )

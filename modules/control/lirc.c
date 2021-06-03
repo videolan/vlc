@@ -63,7 +63,7 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_string( "lirc-file", NULL,
-                LIRC_TEXT, LIRC_LONGTEXT, true )
+                LIRC_TEXT, LIRC_LONGTEXT )
 vlc_module_end ()
 
 /*****************************************************************************

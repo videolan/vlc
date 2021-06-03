@@ -1128,25 +1128,25 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "packet-size", RIST_MAX_PACKET_SIZE,
-        N_("RIST maximum packet size (bytes)"), NULL, true )
+        N_("RIST maximum packet size (bytes)"), NULL )
     add_integer( "maximum-jitter", RIST_DEFAULT_POLL_TIMEOUT,
         N_("RIST demux/decode maximum jitter (default is 5ms)"),
         N_("This controls the maximum jitter that will be passed to the demux/decode chain. "
-            "The lower the value, the more CPU cycles the algorithm will consume"), true )
-    add_integer( "latency", RIST_DEFAULT_LATENCY, N_("RIST latency (ms)"), NULL, true )
+            "The lower the value, the more CPU cycles the algorithm will consume") )
+    add_integer( "latency", RIST_DEFAULT_LATENCY, N_("RIST latency (ms)"), NULL )
     add_integer( "retry-interval", RIST_DEFAULT_RETRY_INTERVAL, N_("RIST nack retry interval (ms)"),
-        NULL, true )
+        NULL )
     add_integer( "reorder-buffer", RIST_DEFAULT_REORDER_BUFFER, N_("RIST reorder buffer (ms)"),
-        NULL, true )
-    add_integer( "max-retries", RIST_MAX_RETRIES, N_("RIST maximum retry count"), NULL, true )
+        NULL )
+    add_integer( "max-retries", RIST_MAX_RETRIES, N_("RIST maximum retry count"), NULL )
     add_integer( "nack-type", NACK_FMT_RANGE,
-            N_("RIST nack type, 0 = range, 1 = bitmask. Default is range"), NULL, true )
+            N_("RIST nack type, 0 = range, 1 = bitmask. Default is range"), NULL )
         change_integer_list( nack_type, nack_type_names )
     add_bool( "disable-nacks", false, N_("Disable NACK output packets"),
-        N_("Use this to disable packet recovery"), true )
+        N_("Use this to disable packet recovery") )
     add_bool( "mcast-blind-nacks", false, N_("Do not check for a valid rtcp message from the encoder"),
         N_("Send nack messages even when we have not confirmed that the encoder is on our local " \
-        "network."), true )
+        "network.") )
 
     set_capability( "access", 0 )
     add_shortcut( "rist", "tr06" )

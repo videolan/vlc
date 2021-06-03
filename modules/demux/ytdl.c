@@ -439,7 +439,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_INPUT_STREAM_FILTER)
     set_capability("demux", 5)
     set_callbacks(OpenFilter, Close)
-    add_bool("ytdl", true, N_("Enable YT-DL"), NULL, true)
+    add_bool("ytdl", true, N_("Enable YT-DL"), NULL)
         change_safe()
 
     add_submodule()

@@ -111,28 +111,28 @@ vlc_module_begin ()
     set_callbacks( OpenEncoder, CloseEncoder )
 
     add_integer( ENC_CFG_PREFIX "mode", 0, ENC_MODE_TEXT,
-                 ENC_MODE_LONGTEXT, false )
+                 ENC_MODE_LONGTEXT )
         change_integer_list( pi_enc_mode_values, ppsz_enc_mode_descriptions )
 
     add_integer( ENC_CFG_PREFIX "complexity", 3, ENC_COMPLEXITY_TEXT,
-                 ENC_COMPLEXITY_LONGTEXT, false )
+                 ENC_COMPLEXITY_LONGTEXT )
         change_integer_range( 1, 10 )
 
     add_bool( ENC_CFG_PREFIX "cbr", false, ENC_CBR_TEXT,
-                 ENC_CBR_LONGTEXT, false )
+                 ENC_CBR_LONGTEXT )
 
     add_float( ENC_CFG_PREFIX "quality", 8.0, ENC_QUALITY_TEXT,
-               ENC_QUALITY_LONGTEXT, false )
+               ENC_QUALITY_LONGTEXT )
         change_float_range( 0.0, 10.0 )
 
     add_integer( ENC_CFG_PREFIX "max-bitrate", 0, ENC_MAXBITRATE_TEXT,
-                 ENC_MAXBITRATE_LONGTEXT, false )
+                 ENC_MAXBITRATE_LONGTEXT )
 
     add_bool( ENC_CFG_PREFIX "vad", true, ENC_VAD_TEXT,
-                 ENC_VAD_LONGTEXT, false )
+                 ENC_VAD_LONGTEXT )
 
     add_bool( ENC_CFG_PREFIX "dtx", false, ENC_DTX_TEXT,
-                 ENC_DTX_LONGTEXT, false )
+                 ENC_DTX_LONGTEXT )
 
     /* TODO agc, noise suppression, */
 #endif

@@ -268,62 +268,61 @@ vlc_module_begin ()
     add_shortcut("qt")
 
     add_bool( "qt-minimal-view", false, QT_MINIMAL_MODE_TEXT,
-              nullptr, false );
+              nullptr );
 
-    add_bool( "qt-system-tray", true, SYSTRAY_TEXT, SYSTRAY_LONGTEXT, false)
+    add_bool( "qt-system-tray", true, SYSTRAY_TEXT, SYSTRAY_LONGTEXT)
 
     add_integer( "qt-notification", NOTIFICATION_MINIMIZED,
                  NOTIFICATION_TEXT,
-                 NOTIFICATION_LONGTEXT, false )
+                 NOTIFICATION_LONGTEXT )
             change_integer_list( i_notification_list, psz_notification_list_text )
 
     add_bool( "qt-start-minimized", false, MINIMIZED_TEXT,
-              MINIMIZED_LONGTEXT, true)
+              MINIMIZED_LONGTEXT)
     add_bool( "qt-pause-minimized", false, QT_PAUSE_MINIMIZED_TEXT,
-              QT_PAUSE_MINIMIZED_LONGTEXT, false )
+              QT_PAUSE_MINIMIZED_LONGTEXT )
 
     add_float_with_range( "qt-opacity", 1., 0.1, 1., OPACITY_TEXT,
-                          OPACITY_LONGTEXT, false )
+                          OPACITY_LONGTEXT )
     add_float_with_range( "qt-fs-opacity", 0.8, 0.1, 1., OPACITY_FS_TEXT,
-                          OPACITY_FS_LONGTEXT, false )
+                          OPACITY_FS_LONGTEXT )
 
     //qt-interface-scale is stored in Qt config file
     //this option is here to force an initial scale factor at startup
     add_float_with_range( "qt-interface-scale", -1.0, 0.3, 3.0, INTERFACE_SCALE_TEXT,
-                          nullptr, false )
+                          nullptr )
         change_volatile()
 
     add_bool( "qt-video-autoresize", true, KEEPSIZE_TEXT,
-              KEEPSIZE_LONGTEXT, false )
+              KEEPSIZE_LONGTEXT )
     add_bool( "qt-name-in-title", true, TITLE_TEXT,
-              TITLE_LONGTEXT, false )
+              TITLE_LONGTEXT )
     add_bool( "qt-fs-controller", true, QT_FULLSCREEN_TEXT,
-              nullptr, false )
+              nullptr )
 
     add_bool( "qt-recentplay", true, RECENTPLAY_TEXT,
-              nullptr, false )
+              nullptr )
     add_string( "qt-recentplay-filter", "",
-                RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT, false )
+                RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT )
     add_obsolete_integer( "qt-continue" )
 
 #ifdef UPDATE_CHECK
     add_bool( "qt-updates-notif", true, UPDATER_TEXT,
-              UPDATER_LONGTEXT, false )
+              UPDATER_LONGTEXT )
     add_integer_with_range( "qt-updates-days", 3, 0, 180,
-              UPDATER_DAYS_TEXT, nullptr, false )
+              UPDATER_DAYS_TEXT, nullptr )
 #endif
 
 #ifdef QT_QML_DEBUG
     add_string( "qt-qmljsdebugger", NULL,
-                QT_QML_DEBUG_TEXT, QT_QML_DEBUG_LONGTEXT, false )
+                QT_QML_DEBUG_TEXT, QT_QML_DEBUG_LONGTEXT )
 #endif
 
 #ifdef _WIN32
     add_bool( "qt-disable-volume-keys"             /* name */,
               true                                 /* default value */,
               QT_DISABLE_VOLUME_KEYS_TEXT          /* text */,
-              QT_DISABLE_VOLUME_KEYS_LONGTEXT      /* longtext */,
-              false                                /* advanced mode only */)
+              QT_DISABLE_VOLUME_KEYS_LONGTEXT      /* longtext */)
 #endif
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
@@ -333,47 +332,45 @@ vlc_module_begin ()
 #else
               true                               /* but not on linux */,
 #endif
-              QT_CLIENT_SIDE_DECORATION_TEXT, QT_CLIENT_SIDE_DECORATION_LONGTEXT, false )
+              QT_CLIENT_SIDE_DECORATION_TEXT, QT_CLIENT_SIDE_DECORATION_LONGTEXT )
 #endif
 
-    add_bool( "qt-menubar", false, QT_MENUBAR_TEXT, QT_MENUBAR_LONGTEXT, false )
+    add_bool( "qt-menubar", false, QT_MENUBAR_TEXT, QT_MENUBAR_LONGTEXT )
 
     add_bool( "qt-embedded-open", false, QT_NATIVEOPEN_TEXT,
-               nullptr, false )
+               nullptr )
 
 
     add_bool( "qt-advanced-pref", false, ADVANCED_PREFS_TEXT,
-              ADVANCED_PREFS_LONGTEXT, false )
+              ADVANCED_PREFS_LONGTEXT )
     add_bool( "qt-error-dialogs", true, ERROR_TEXT,
-              nullptr, false )
+              nullptr )
 
     add_string( "qt-slider-colours", "153;210;153;20;210;20;255;199;15;245;39;29",
-                SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, false )
+                SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT )
 
-    add_bool( "qt-privacy-ask", true, PRIVACY_TEXT, nullptr,
-              false )
+    add_bool( "qt-privacy-ask", true, PRIVACY_TEXT, nullptr )
         change_private ()
 
     add_integer( "qt-fullscreen-screennumber", -1, FULLSCREEN_NUMBER_TEXT,
-               FULLSCREEN_NUMBER_LONGTEXT, false );
+               FULLSCREEN_NUMBER_LONGTEXT );
 
     add_bool( "qt-autoload-extensions", true,
-              QT_AUTOLOAD_EXTENSIONS_TEXT, QT_AUTOLOAD_EXTENSIONS_LONGTEXT,
-              false )
+              QT_AUTOLOAD_EXTENSIONS_TEXT, QT_AUTOLOAD_EXTENSIONS_LONGTEXT )
 
-    add_bool( "qt-bgcone", true, QT_BGCONE_TEXT, QT_BGCONE_LONGTEXT, true )
+    add_bool( "qt-bgcone", true, QT_BGCONE_TEXT, QT_BGCONE_LONGTEXT )
     add_bool( "qt-bgcone-expands", false, QT_BGCONE_EXPANDS_TEXT,
-              QT_BGCONE_EXPANDS_LONGTEXT, true )
+              QT_BGCONE_EXPANDS_LONGTEXT )
 
-    add_bool( "qt-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true )
+    add_bool( "qt-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT )
 
-    add_integer_with_range( "qt-max-volume", 125, 60, 300, VOLUME_MAX_TEXT, nullptr, true)
+    add_integer_with_range( "qt-max-volume", 125, 60, 300, VOLUME_MAX_TEXT, nullptr)
 
     add_integer_with_range( "qt-fs-sensitivity", 3, 0, 4000, FULLSCREEN_CONTROL_PIXELS,
-            nullptr, true)
+            nullptr)
 
     add_integer( "qt-auto-raise", MainInterface::RAISE_VIDEO, AUTORAISE_ON_PLAYBACK_TEXT,
-                 AUTORAISE_ON_PLAYBACK_LONGTEXT, false )
+                 AUTORAISE_ON_PLAYBACK_LONGTEXT )
             change_integer_list( i_raise_list, psz_raise_list_text )
 
     cannot_unload_broken_library()

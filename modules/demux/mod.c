@@ -76,28 +76,27 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
     add_bool( "mod-noisereduction", true, N_("Noise reduction"),
-              NOISE_LONGTEXT, false )
+              NOISE_LONGTEXT )
 
     add_bool( "mod-reverb", false, N_("Reverb"),
-              REVERB_LONGTEXT, false )
+              REVERB_LONGTEXT )
     add_integer_with_range( "mod-reverb-level", 0, 0, 100,
-             N_("Reverberation level"), REVERB_LEVEL_LONGTEXT, true )
+             N_("Reverberation level"), REVERB_LEVEL_LONGTEXT )
     add_integer_with_range( "mod-reverb-delay", 40, 0, 1000,
-             N_("Reverberation delay"), REVERB_DELAY_LONGTEXT, true )
+             N_("Reverberation delay"), REVERB_DELAY_LONGTEXT )
 
     add_bool( "mod-megabass", false, N_("Mega bass"),
-                    MEGABASS_LONGTEXT, false )
+                    MEGABASS_LONGTEXT )
     add_integer_with_range( "mod-megabass-level", 0, 0, 100,
-              N_("Mega bass level"), MEGABASS_LEVEL_LONGTEXT, true )
+              N_("Mega bass level"), MEGABASS_LEVEL_LONGTEXT )
     add_integer_with_range( "mod-megabass-range", 10, 10, 100,
-              N_("Mega bass cutoff"), MEGABASS_RANGE_LONGTEXT, true )
+              N_("Mega bass cutoff"), MEGABASS_RANGE_LONGTEXT )
 
-    add_bool( "mod-surround", false, N_("Surround"), N_("Surround"),
-               false )
+    add_bool( "mod-surround", false, N_("Surround"), N_("Surround") )
     add_integer_with_range( "mod-surround-level", 0, 0, 100,
-              N_("Surround level"), SURROUND_LEVEL_LONGTEXT, true )
+              N_("Surround level"), SURROUND_LEVEL_LONGTEXT )
     add_integer_with_range( "mod-surround-delay", 5, 0, 1000,
-              N_("Surround delay (ms)"), SURROUND_DELAY_LONGTEXT, true )
+              N_("Surround delay (ms)"), SURROUND_DELAY_LONGTEXT )
 
     set_callbacks( Open, Close )
     add_shortcut( "mod" )

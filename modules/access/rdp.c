@@ -89,13 +89,13 @@ vlc_module_begin()
     set_description( N_("RDP Remote Desktop") )
     set_capability( "access", 0 )
 
-    add_string( CFG_PREFIX "user", NULL, USER_TEXT, USER_LONGTEXT, false )
+    add_string( CFG_PREFIX "user", NULL, USER_TEXT, USER_LONGTEXT )
         change_safe()
     add_password(CFG_PREFIX "password", NULL, PASS_TEXT, PASS_LONGTEXT)
         change_safe()
-    add_float( CFG_PREFIX "fps", 5, RDP_FPS, RDP_FPS_LONGTEXT, true )
+    add_float( CFG_PREFIX "fps", 5, RDP_FPS, RDP_FPS_LONGTEXT )
 
-    add_bool( CFG_PREFIX "encrypt", false, RDP_ENCRYPT, NULL, true )
+    add_bool( CFG_PREFIX "encrypt", false, RDP_ENCRYPT, NULL )
         change_safe()
 
     set_callbacks( Open, Close )

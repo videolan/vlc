@@ -67,7 +67,7 @@ vlc_module_begin ()
     set_capability("glinterop", 1)
     set_callbacks(GLConvOpen, GLConvClose)
 
-    add_bool("direct3d9-dxvahd", true, DXVAHD_TEXT, NULL, true)
+    add_bool("direct3d9-dxvahd", true, DXVAHD_TEXT, NULL)
 vlc_module_end ()
 
 struct wgl_vt {

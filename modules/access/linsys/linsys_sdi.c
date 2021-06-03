@@ -96,15 +96,14 @@ vlc_module_begin()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "linsys-sdi-link", 0,
-        LINK_TEXT, LINK_LONGTEXT, true )
+        LINK_TEXT, LINK_LONGTEXT )
 
-    add_integer( "linsys-sdi-id-video", 0, VIDEO_TEXT, VIDEO_LONGTEXT, true )
+    add_integer( "linsys-sdi-id-video", 0, VIDEO_TEXT, VIDEO_LONGTEXT )
     add_string( "linsys-sdi-aspect-ratio", "", VIDEO_ASPECT_TEXT,
-                VIDEO_ASPECT_LONGTEXT, true )
-    add_string( "linsys-sdi-audio", "0=1,1", AUDIO_TEXT, AUDIO_LONGTEXT, true )
-    add_string( "linsys-sdi-telx", "", TELX_TEXT, TELX_LONGTEXT, true )
-    add_string( "linsys-sdi-telx-lang", "", TELX_LANG_TEXT, TELX_LANG_LONGTEXT,
-                true )
+                VIDEO_ASPECT_LONGTEXT )
+    add_string( "linsys-sdi-audio", "0=1,1", AUDIO_TEXT, AUDIO_LONGTEXT )
+    add_string( "linsys-sdi-telx", "", TELX_TEXT, TELX_LONGTEXT )
+    add_string( "linsys-sdi-telx-lang", "", TELX_LANG_TEXT, TELX_LANG_LONGTEXT )
 
     set_capability( "access", 0 )
     add_shortcut( "linsys-sdi" )

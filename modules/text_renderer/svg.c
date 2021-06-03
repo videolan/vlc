@@ -74,7 +74,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
     add_shortcut( "svg" )
-    add_string( "svg-template-file", "", TEMPLATE_TEXT, TEMPLATE_LONGTEXT, true )
+    add_string( "svg-template-file", "", TEMPLATE_TEXT, TEMPLATE_LONGTEXT )
     set_callback_text_renderer( Create, 99 )
 vlc_module_end ()
 

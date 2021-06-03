@@ -69,17 +69,17 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_deinterlace_callback(OpenMmalDeinterlace)
     add_bool(MMAL_DEINTERLACE_NO_QPU, false, MMAL_DEINTERLACE_NO_QPU_TEXT,
-                    MMAL_DEINTERLACE_NO_QPU_LONGTEXT, true);
+                    MMAL_DEINTERLACE_NO_QPU_LONGTEXT);
     add_bool(MMAL_DEINTERLACE_ADV, false, MMAL_DEINTERLACE_ADV_TEXT,
-                    MMAL_DEINTERLACE_ADV_LONGTEXT, true);
+                    MMAL_DEINTERLACE_ADV_LONGTEXT);
     add_bool(MMAL_DEINTERLACE_FAST, false, MMAL_DEINTERLACE_FAST_TEXT,
-                    MMAL_DEINTERLACE_FAST_LONGTEXT, true);
+                    MMAL_DEINTERLACE_FAST_LONGTEXT);
     add_bool(MMAL_DEINTERLACE_NONE, false, MMAL_DEINTERLACE_NONE_TEXT,
-                    MMAL_DEINTERLACE_NONE_LONGTEXT, true);
+                    MMAL_DEINTERLACE_NONE_LONGTEXT);
     add_bool(MMAL_DEINTERLACE_HALF_RATE, false, MMAL_DEINTERLACE_HALF_RATE_TEXT,
-                    MMAL_DEINTERLACE_HALF_RATE_LONGTEXT, true);
+                    MMAL_DEINTERLACE_HALF_RATE_LONGTEXT);
     add_bool(MMAL_DEINTERLACE_FULL_RATE, false, MMAL_DEINTERLACE_FULL_RATE_TEXT,
-                    MMAL_DEINTERLACE_FULL_RATE_LONGTEXT, true);
+                    MMAL_DEINTERLACE_FULL_RATE_LONGTEXT);
 
 vlc_module_end()
 

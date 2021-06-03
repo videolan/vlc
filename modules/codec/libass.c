@@ -64,7 +64,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
     set_callbacks( Create, Destroy )
-    add_string("ssa-fontsdir", NULL, TEXT_SSA_FONTSDIR, NULL, false)
+    add_string("ssa-fontsdir", NULL, TEXT_SSA_FONTSDIR, NULL)
 vlc_module_end ()
 
 /*****************************************************************************

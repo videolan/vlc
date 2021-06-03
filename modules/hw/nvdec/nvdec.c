@@ -64,7 +64,7 @@ vlc_module_begin ()
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
     add_integer( "nvdec-deint", cudaVideoDeinterlaceMode_Bob,
-                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT, true )
+                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT )
         change_integer_list( ppsi_deinterlace_type, ppsz_deinterlace_type )
     set_callbacks(OpenDecoder, CloseDecoder)
     add_submodule()

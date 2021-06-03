@@ -67,7 +67,7 @@ vlc_module_begin ()
     set_description( N_("LibNotify Notification Plugin") )
 
     add_integer( "notify-timeout", 4000,
-                 TIMEOUT_TEXT, TIMEOUT_LONGTEXT, true )
+                 TIMEOUT_TEXT, TIMEOUT_LONGTEXT )
 
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )

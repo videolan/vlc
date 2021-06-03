@@ -76,13 +76,13 @@ vlc_module_begin()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
 
-    add_integer(MMAL_LAYER_NAME, 1, MMAL_LAYER_TEXT, MMAL_LAYER_LONGTEXT, false)
+    add_integer(MMAL_LAYER_NAME, 1, MMAL_LAYER_TEXT, MMAL_LAYER_LONGTEXT)
     add_bool(MMAL_ADJUST_REFRESHRATE_NAME, false, MMAL_ADJUST_REFRESHRATE_TEXT,
-                    NULL, false)
+                    NULL)
     add_bool(MMAL_NATIVE_INTERLACED, false, MMAL_NATIVE_INTERLACE_TEXT,
-                    MMAL_NATIVE_INTERLACE_LONGTEXT, false)
+                    MMAL_NATIVE_INTERLACE_LONGTEXT)
     add_string(MMAL_DISPLAY_NAME, "auto", MMAL_DISPLAY_TEXT,
-                    MMAL_DISPLAY_LONGTEXT, false)
+                    MMAL_DISPLAY_LONGTEXT)
     set_callback_display(OpenMmalVout, 16)  // 1 point better than ASCII art
 vlc_module_end()
 

@@ -562,9 +562,9 @@ vlc_module_begin()
     set_capability("opengl filter", 0)
     set_callback(Open)
     add_shortcut("mock");
-    add_float(MOCK_CFG_PREFIX "angle", 0.f, NULL, NULL, false) /* in degrees */
-    add_float(MOCK_CFG_PREFIX "speed", 0.f, NULL, NULL, false) /* in rotations per minute */
-    add_bool(MOCK_CFG_PREFIX "mask", false, NULL, NULL, false)
-    add_bool(MOCK_CFG_PREFIX "plane", false, NULL, NULL, false)
-    add_integer(MOCK_CFG_PREFIX "msaa", 4, NULL, NULL, false);
+    add_float(MOCK_CFG_PREFIX "angle", 0.f, NULL, NULL) /* in degrees */
+    add_float(MOCK_CFG_PREFIX "speed", 0.f, NULL, NULL) /* in rotations per minute */
+    add_bool(MOCK_CFG_PREFIX "mask", false, NULL, NULL)
+    add_bool(MOCK_CFG_PREFIX "plane", false, NULL, NULL)
+    add_integer(MOCK_CFG_PREFIX "msaa", 4, NULL, NULL);
 vlc_module_end()

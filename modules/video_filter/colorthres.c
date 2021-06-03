@@ -73,9 +73,9 @@ vlc_module_begin ()
     add_rgb(CFG_PREFIX "color", 0x00FF0000, COLOR_TEXT, COLOR_LONGTEXT)
         change_integer_list( pi_color_values, ppsz_color_descriptions )
     add_integer( CFG_PREFIX "saturationthres", 20,
-                 N_("Saturation threshold"), "", false )
+                 N_("Saturation threshold"), "" )
     add_integer( CFG_PREFIX "similaritythres", 15,
-                 N_("Similarity threshold"), "", false )
+                 N_("Similarity threshold"), "" )
     set_callback_video_filter( Create )
 vlc_module_end ()
 

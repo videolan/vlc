@@ -61,11 +61,11 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_VISUAL )
     set_capability( "visualization", 0 )
     add_integer( "goom-width", 800,
-                 WIDTH_TEXT, RES_LONGTEXT, false )
+                 WIDTH_TEXT, RES_LONGTEXT )
     add_integer( "goom-height", 500,
-                 HEIGHT_TEXT, RES_LONGTEXT, false )
+                 HEIGHT_TEXT, RES_LONGTEXT )
     add_integer_with_range( "goom-speed", 6, 1, 10,
-                 SPEED_TEXT, SPEED_LONGTEXT, false )
+                 SPEED_TEXT, SPEED_LONGTEXT )
     set_callback( Open )
     add_shortcut( "goom" )
 vlc_module_end ()

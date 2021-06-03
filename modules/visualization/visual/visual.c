@@ -121,46 +121,46 @@ vlc_module_begin ()
     set_description( N_("Visualizer filter") )
     set_section( N_( "General") , NULL )
     add_string("effect-list", "spectrum",
-            ELIST_TEXT, ELIST_LONGTEXT, true )
+            ELIST_TEXT, ELIST_LONGTEXT )
     add_integer("effect-width",VOUT_WIDTH,
-             WIDTH_TEXT, WIDTH_LONGTEXT, false )
+             WIDTH_TEXT, WIDTH_LONGTEXT )
     add_integer("effect-height" , VOUT_HEIGHT ,
-             HEIGHT_TEXT, HEIGHT_LONGTEXT, false )
+             HEIGHT_TEXT, HEIGHT_LONGTEXT )
     add_string("effect-fft-window", "flat",
-            FFT_WINDOW_TEXT, FFT_WINDOW_LONGTEXT, true )
+            FFT_WINDOW_TEXT, FFT_WINDOW_LONGTEXT )
         change_string_list( window_list, window_list_text )
     add_float("effect-kaiser-param", 3.0f,
-            KAISER_PARAMETER_TEXT, KAISER_PARAMETER_LONGTEXT, true )
+            KAISER_PARAMETER_TEXT, KAISER_PARAMETER_LONGTEXT )
     set_section( N_("Spectrum analyser") , NULL )
     add_bool("visual-80-bands", true,
-             NBBANDS_TEXT, NULL, true );
+             NBBANDS_TEXT, NULL );
     add_bool("visual-peaks", true,
-             PEAKS_TEXT, NULL, true )
+             PEAKS_TEXT, NULL )
     set_section( N_("Spectrometer") , NULL )
     add_bool("spect-show-original", false,
-             ORIG_TEXT, ORIG_LONGTEXT, true )
+             ORIG_TEXT, ORIG_LONGTEXT )
     add_bool("spect-show-base", true,
-             BASE_TEXT, NULL, true )
+             BASE_TEXT, NULL )
     add_integer("spect-radius", 42,
-             RADIUS_TEXT, RADIUS_LONGTEXT, true )
+             RADIUS_TEXT, RADIUS_LONGTEXT )
     add_integer_with_range("spect-sections", 3, 1, INT_MAX,
-             SSECT_TEXT, SSECT_LONGTEXT, true )
+             SSECT_TEXT, SSECT_LONGTEXT )
     add_integer("spect-color", 80,
-             COLOR1_TEXT, COLOR1_LONGTEXT, true )
+             COLOR1_TEXT, COLOR1_LONGTEXT )
     add_bool("spect-show-bands", true,
-             BANDS_TEXT, NULL, true );
+             BANDS_TEXT, NULL );
     add_bool("spect-80-bands", true,
-             NBBANDS_TEXT, NULL, true )
+             NBBANDS_TEXT, NULL )
     add_integer("spect-separ", 1,
-             SEPAR_TEXT, NULL, true )
+             SEPAR_TEXT, NULL )
     add_integer("spect-amp", 8,
-             AMP_TEXT, AMP_LONGTEXT, true )
+             AMP_TEXT, AMP_LONGTEXT )
     add_bool("spect-show-peaks", true,
-             PEAKS_TEXT, NULL, true )
+             PEAKS_TEXT, NULL )
     add_integer("spect-peak-width", 61,
-             PEAK_WIDTH_TEXT, PEAK_WIDTH_LONGTEXT, true )
+             PEAK_WIDTH_TEXT, PEAK_WIDTH_LONGTEXT )
     add_integer("spect-peak-height", 1,
-             PEAK_HEIGHT_TEXT, PEAK_HEIGHT_LONGTEXT, true )
+             PEAK_HEIGHT_TEXT, PEAK_HEIGHT_LONGTEXT )
     set_capability( "visualization", 0 )
     set_callback( Open )
     add_shortcut( "visualizer")

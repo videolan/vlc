@@ -379,7 +379,7 @@ VLC_METADATA_EXPORTS
     add_typedesc_inner( CONFIG_HINT_CATEGORY, text, longtext )
 #endif
 
-#define add_string( name, value, text, longtext, advc ) \
+#define add_string( name, value, text, longtext ) \
     add_string_inner(CONFIG_ITEM_STRING, name, text, longtext, value)
 
 #define add_password(name, value, text, longtext) \
@@ -416,7 +416,7 @@ VLC_METADATA_EXPORTS
     change_integer_range (i_subcategory /* gruik */, 0);
 #endif
 
-#define add_integer( name, value, text, longtext, advc ) \
+#define add_integer( name, value, text, longtext ) \
     add_int_inner(CONFIG_ITEM_INTEGER, name, text, longtext, value)
 
 #define add_rgb(name, value, text, longtext) \
@@ -428,19 +428,19 @@ VLC_METADATA_EXPORTS
                      KEY_UNSET) \
     add_string_inner(CONFIG_ITEM_KEY, name, text, longtext, value)
 
-#define add_integer_with_range( name, value, i_min, i_max, text, longtext, advc ) \
-    add_integer( name, value, text, longtext, advc ) \
+#define add_integer_with_range( name, value, i_min, i_max, text, longtext ) \
+    add_integer( name, value, text, longtext ) \
     change_integer_range( i_min, i_max )
 
-#define add_float( name, v, text, longtext, advc ) \
+#define add_float( name, v, text, longtext ) \
     add_typename_inner(CONFIG_ITEM_FLOAT, name, text, longtext) \
     vlc_config_set (VLC_CONFIG_VALUE, (double)(v));
 
-#define add_float_with_range( name, value, f_min, f_max, text, longtext, advc ) \
-    add_float( name, value, text, longtext, advc ) \
+#define add_float_with_range( name, value, f_min, f_max, text, longtext ) \
+    add_float( name, value, text, longtext ) \
     change_float_range( f_min, f_max )
 
-#define add_bool( name, v, text, longtext, advc ) \
+#define add_bool( name, v, text, longtext ) \
     add_typename_inner(CONFIG_ITEM_BOOL, name, text, longtext) \
     if (v) vlc_config_set (VLC_CONFIG_VALUE, (int64_t)true);
 

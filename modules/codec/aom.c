@@ -77,24 +77,24 @@ vlc_module_begin ()
         set_capability("encoder", 101)
         set_description(N_("AOM video encoder"))
         set_callbacks(OpenEncoder, CloseEncoder)
-        add_integer( SOUT_CFG_PREFIX "profile", 0, "Profile", NULL, true )
+        add_integer( SOUT_CFG_PREFIX "profile", 0, "Profile", NULL )
             change_integer_range( 0, 3 )
-        add_integer( SOUT_CFG_PREFIX "bitdepth", 8, "Bit Depth", NULL, true )
+        add_integer( SOUT_CFG_PREFIX "bitdepth", 8, "Bit Depth", NULL )
             change_integer_list( pi_enc_bitdepth_values_list, ppsz_enc_bitdepth_text )
-        add_integer( SOUT_CFG_PREFIX "tile-rows", 0, "Tile Rows (in log2 units)", NULL, true )
+        add_integer( SOUT_CFG_PREFIX "tile-rows", 0, "Tile Rows (in log2 units)", NULL )
             change_integer_range( 0, 6 ) /* 1 << 6 == MAX_TILE_ROWS */
-        add_integer( SOUT_CFG_PREFIX "tile-columns", 0, "Tile Columns (in log2 units)", NULL, true )
+        add_integer( SOUT_CFG_PREFIX "tile-columns", 0, "Tile Columns (in log2 units)", NULL )
             change_integer_range( 0, 6 ) /* 1 << 6 == MAX_TILE_COLS */
-        add_integer( SOUT_CFG_PREFIX "cpu-used", 1, "Speed setting", NULL, true )
+        add_integer( SOUT_CFG_PREFIX "cpu-used", 1, "Speed setting", NULL )
             change_integer_range( 0, 8 ) /* good: 0-5, realtime: 6-8 */
-        add_integer( SOUT_CFG_PREFIX "lag-in-frames", 16, "Maximum number of lookahead frames", NULL, true )
+        add_integer( SOUT_CFG_PREFIX "lag-in-frames", 16, "Maximum number of lookahead frames", NULL )
             change_integer_range(0, 70 /* MAX_LAG_BUFFERS + MAX_LAP_BUFFERS */ )
-        add_integer( SOUT_CFG_PREFIX "usage", 0, "Usage (0: good, 1: realtime)", NULL, true )
+        add_integer( SOUT_CFG_PREFIX "usage", 0, "Usage (0: good, 1: realtime)", NULL )
             change_integer_range( 0, 1 )
-        add_integer( SOUT_CFG_PREFIX "rc-end-usage", 1, "Usage (0: VBR, 1: CBR, 2: CQ, 3: Q)", NULL, true )
+        add_integer( SOUT_CFG_PREFIX "rc-end-usage", 1, "Usage (0: VBR, 1: CBR, 2: CQ, 3: Q)", NULL )
             change_integer_range( 0, 4 )
 #ifdef AOM_CTRL_AV1E_SET_ROW_MT
-        add_bool( SOUT_CFG_PREFIX "row-mt", false, "Row Multithreading", NULL, true )
+        add_bool( SOUT_CFG_PREFIX "row-mt", false, "Row Multithreading", NULL )
 #endif
 #endif
 vlc_module_end ()

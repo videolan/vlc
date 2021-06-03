@@ -478,22 +478,21 @@ vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     add_loadfile("skins2-last", "", SKINS2_LAST, SKINS2_LAST_LONG)
-    add_string( "skins2-config", "", SKINS2_CONFIG, SKINS2_CONFIG_LONG,
-                true )
+    add_string( "skins2-config", "", SKINS2_CONFIG, SKINS2_CONFIG_LONG )
         change_private ()
 #ifdef _WIN32
     add_bool( "skins2-systray", true, SKINS2_SYSTRAY,
-              SKINS2_SYSTRAY_LONG, false );
+              SKINS2_SYSTRAY_LONG );
     add_bool( "skins2-taskbar", true, SKINS2_TASKBAR,
-              nullptr, false );
+              nullptr );
 #endif
     add_bool( "skins2-transparency", false, SKINS2_TRANSPARENCY,
-              SKINS2_TRANSPARENCY_LONG, false );
+              SKINS2_TRANSPARENCY_LONG );
 
     add_bool( "skinned-playlist", true, SKINS2_PLAYLIST,
-              nullptr, false );
+              nullptr );
     add_bool( "skinned-video", true, SKINS2_VIDEO,
-              SKINS2_VIDEO_LONG, false );
+              SKINS2_VIDEO_LONG );
     set_shortname( N_("Skins"))
     set_description( N_("Skinnable Interface") )
     set_capability( "interface", 30 )

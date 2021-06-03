@@ -67,7 +67,7 @@ vlc_module_begin ()
     add_shortcut( "ps" )
 
     add_bool( "ps-trust-timestamps", true, TIME_TEXT,
-                 TIME_LONGTEXT, true )
+                 TIME_LONGTEXT )
         change_safe ()
 
     add_submodule ()

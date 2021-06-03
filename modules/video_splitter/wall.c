@@ -64,12 +64,11 @@ vlc_module_begin()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SPLITTER )
 
-    add_integer( CFG_PREFIX "cols", 3, COLS_TEXT, COLS_LONGTEXT, false )
+    add_integer( CFG_PREFIX "cols", 3, COLS_TEXT, COLS_LONGTEXT )
     change_integer_range( 1, COL_MAX )
-    add_integer( CFG_PREFIX "rows", 3, ROWS_TEXT, ROWS_LONGTEXT, false )
+    add_integer( CFG_PREFIX "rows", 3, ROWS_TEXT, ROWS_LONGTEXT )
     change_integer_range( 1, ROW_MAX )
-    add_string( CFG_PREFIX "active", NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT,
-                 true )
+    add_string( CFG_PREFIX "active", NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT )
     add_obsolete_string( CFG_PREFIX "element-aspect" ) /* since 4.0.0 */
 
     add_shortcut( "wall" )

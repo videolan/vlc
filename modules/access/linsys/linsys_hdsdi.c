@@ -92,14 +92,14 @@ vlc_module_begin()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "linsys-hdsdi-link", 0,
-        LINK_TEXT, LINK_LONGTEXT, true )
+        LINK_TEXT, LINK_LONGTEXT )
 
     add_integer( "linsys-hdsdi-id-video", 0,
-        VIDEO_TEXT, VIDEO_LONGTEXT, true )
+        VIDEO_TEXT, VIDEO_LONGTEXT )
     add_string( "linsys-hdsdi-aspect-ratio", "",
-        VIDEO_ASPECT_TEXT, VIDEO_ASPECT_LONGTEXT, true )
+        VIDEO_ASPECT_TEXT, VIDEO_ASPECT_LONGTEXT )
     add_string( "linsys-hdsdi-audio", "0=1,1",
-        AUDIO_TEXT, AUDIO_LONGTEXT, true )
+        AUDIO_TEXT, AUDIO_LONGTEXT )
 
     set_capability( "access", 0 )
     add_shortcut( "linsys-hdsdi" )

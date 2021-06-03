@@ -63,14 +63,14 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
     add_integer_with_range( "scaletempo-stride", 30, 1, 2000,
-        N_("Stride Length"), N_("Length in milliseconds to output each stride"), true )
+        N_("Stride Length"), N_("Length in milliseconds to output each stride") )
     add_float_with_range( "scaletempo-overlap", .20, 0.0, 1.0,
-        N_("Overlap Length"), N_("Percentage of stride to overlap"), true )
+        N_("Overlap Length"), N_("Percentage of stride to overlap") )
     add_integer_with_range( "scaletempo-search", 14, 0, 200,
-        N_("Search Length"), N_("Length in milliseconds to search for best overlap position"), true )
+        N_("Search Length"), N_("Length in milliseconds to search for best overlap position") )
 #ifdef PITCH_SHIFTER
     add_float_with_range( "pitch-shift", 0, -12, 12,
-        N_("Pitch Shift"), N_("Pitch shift in semitones."), false )
+        N_("Pitch Shift"), N_("Pitch shift in semitones.") )
     set_callback( OpenPitch )
 #else
     set_callback( Open )

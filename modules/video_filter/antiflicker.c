@@ -69,10 +69,10 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_integer_with_range( FILTER_PREFIX "window-size", 10, 0, MAX_WINDOW_SZ,
-        WINDOW_TEXT, WINDOW_LONGTEXT, false )
+        WINDOW_TEXT, WINDOW_LONGTEXT )
 
     add_integer_with_range( FILTER_PREFIX "softening-size", 10, 0, MAX_SOFTENING_SZ,
-        SFTN_TEXT, SFTN_LONGTEXT, false )
+        SFTN_TEXT, SFTN_LONGTEXT )
 
     add_shortcut( "antiflicker" )
     set_callback_video_filter( Create )

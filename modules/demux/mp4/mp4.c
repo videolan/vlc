@@ -72,7 +72,7 @@ vlc_module_begin ()
     add_file_extension("mp4")
 
     set_section("Hacks", NULL)
-    add_bool( CFG_PREFIX"m4a-audioonly", false, MP4_M4A_TEXT, MP4_M4A_LONGTEXT, true )
+    add_bool( CFG_PREFIX"m4a-audioonly", false, MP4_M4A_TEXT, MP4_M4A_LONGTEXT )
 
     add_submodule()
         set_category( CAT_INPUT )
@@ -83,7 +83,7 @@ vlc_module_begin ()
         set_callbacks( OpenHEIF, CloseHEIF )
         set_section( N_("HEIF demuxer"), NULL )
         add_float( "heif-image-duration", HEIF_DEFAULT_DURATION,
-                   HEIF_DURATION_TEXT, HEIF_DURATION_LONGTEXT, false )
+                   HEIF_DURATION_TEXT, HEIF_DURATION_LONGTEXT )
             change_safe()
 vlc_module_end ()
 

@@ -78,14 +78,14 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACODEC )
 
     add_float( ENC_CFG_PREFIX "quality", 0.0, ENC_QUALITY_TEXT,
-               ENC_QUALITY_LONGTEXT, false )
+               ENC_QUALITY_LONGTEXT )
     add_integer( ENC_CFG_PREFIX "mode", 0, ENC_MODE_TEXT,
-                 ENC_MODE_LONGTEXT, false )
+                 ENC_MODE_LONGTEXT )
         change_integer_list( pi_stereo_values, ppsz_stereo_descriptions );
     add_bool( ENC_CFG_PREFIX "vbr", false, ENC_VBR_TEXT,
-              ENC_VBR_LONGTEXT, false )
+              ENC_VBR_LONGTEXT )
     add_integer( ENC_CFG_PREFIX "psy", 3, ENC_PSY_TEXT,
-                 ENC_PSY_LONGTEXT, false )
+                 ENC_PSY_LONGTEXT )
 vlc_module_end ()
 
 static const char *const ppsz_enc_options[] = {

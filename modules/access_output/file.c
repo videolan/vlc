@@ -392,14 +392,11 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_ACO )
     add_shortcut( "file", "stream", "fd" )
     add_bool( SOUT_CFG_PREFIX "overwrite", true, OVERWRITE_TEXT,
-              OVERWRITE_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "append", false, APPEND_TEXT,APPEND_LONGTEXT,
-              true )
-    add_bool( SOUT_CFG_PREFIX "format", false, FORMAT_TEXT, FORMAT_LONGTEXT,
-              true )
+              OVERWRITE_LONGTEXT )
+    add_bool( SOUT_CFG_PREFIX "append", false, APPEND_TEXT,APPEND_LONGTEXT )
+    add_bool( SOUT_CFG_PREFIX "format", false, FORMAT_TEXT, FORMAT_LONGTEXT )
 #ifdef O_SYNC
-    add_bool( SOUT_CFG_PREFIX "sync", false, SYNC_TEXT,SYNC_LONGTEXT,
-              false )
+    add_bool( SOUT_CFG_PREFIX "sync", false, SYNC_TEXT,SYNC_LONGTEXT )
 #endif
     set_callbacks( Open, Close )
 vlc_module_end ()

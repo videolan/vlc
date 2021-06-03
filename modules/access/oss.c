@@ -81,10 +81,9 @@ vlc_module_begin ()
     set_capability( "access", 0 )
     set_callbacks( DemuxOpen, DemuxClose )
 
-    add_bool( CFG_PREFIX "stereo", true, STEREO_TEXT, STEREO_LONGTEXT,
-                true )
+    add_bool( CFG_PREFIX "stereo", true, STEREO_TEXT, STEREO_LONGTEXT )
     add_integer( CFG_PREFIX "samplerate", 48000, SAMPLERATE_TEXT,
-                SAMPLERATE_LONGTEXT, true )
+                SAMPLERATE_LONGTEXT )
 vlc_module_end ()
 
 /*****************************************************************************

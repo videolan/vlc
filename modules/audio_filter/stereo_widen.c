@@ -83,13 +83,13 @@ vlc_module_begin ()
     set_callback( Open )
 
     add_float_with_range( CONFIG_PREFIX "delay", 20, 1, 100,
-        DELAY_TEXT, DELAY_LONGTEXT, true )
+        DELAY_TEXT, DELAY_LONGTEXT )
     add_float_with_range( CONFIG_PREFIX "feedback", 0.3, 0.0, 0.9,
-        FEEDBACK_TEXT, FEEDBACK_LONGTEXT, true )
+        FEEDBACK_TEXT, FEEDBACK_LONGTEXT )
     add_float_with_range( CONFIG_PREFIX "crossfeed", 0.3, 0.0, 0.8,
-        CROSSFEED_TEXT, CROSSFEED_LONGTEXT, true )
+        CROSSFEED_TEXT, CROSSFEED_LONGTEXT )
     add_float_with_range( CONFIG_PREFIX "dry-mix", 0.8, 0.0, 1.0,
-        DRYMIX_TEXT, DRYMIX_LONGTEXT, true )
+        DRYMIX_TEXT, DRYMIX_LONGTEXT )
 vlc_module_end ()
 
 /*****************************************************************************

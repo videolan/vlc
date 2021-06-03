@@ -99,16 +99,16 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_float( "screen-fps", SCREEN_FPS, FPS_TEXT, FPS_LONGTEXT, false )
+    add_float( "screen-fps", SCREEN_FPS, FPS_TEXT, FPS_LONGTEXT )
 
 #ifdef SCREEN_SUBSCREEN
-    add_integer( "screen-top", 0, TOP_TEXT, TOP_LONGTEXT, true )
-    add_integer( "screen-left", 0, LEFT_TEXT, LEFT_LONGTEXT, true )
-    add_integer( "screen-width", 0, WIDTH_TEXT, NULL, true )
-    add_integer( "screen-height", 0, HEIGHT_TEXT, NULL, true )
+    add_integer( "screen-top", 0, TOP_TEXT, TOP_LONGTEXT )
+    add_integer( "screen-left", 0, LEFT_TEXT, LEFT_LONGTEXT )
+    add_integer( "screen-width", 0, WIDTH_TEXT, NULL )
+    add_integer( "screen-height", 0, HEIGHT_TEXT, NULL )
 
     add_bool( "screen-follow-mouse", false, FOLLOW_MOUSE_TEXT,
-              FOLLOW_MOUSE_LONGTEXT, false )
+              FOLLOW_MOUSE_LONGTEXT )
 #endif
 
 #ifdef SCREEN_MOUSE
@@ -116,12 +116,12 @@ vlc_module_begin ()
 #endif
 
 #ifdef _WIN32
-    add_integer( "screen-fragment-size", 0, FRAGS_TEXT, FRAGS_LONGTEXT, true )
+    add_integer( "screen-fragment-size", 0, FRAGS_TEXT, FRAGS_LONGTEXT )
 #endif
 
 #ifdef SCREEN_DISPLAY_ID
-    add_integer( "screen-display-id", 0, DISPLAY_ID_TEXT, DISPLAY_ID_LONGTEXT, true )
-    add_integer( "screen-index", 0, INDEX_TEXT, INDEX_LONGTEXT, true )
+    add_integer( "screen-display-id", 0, DISPLAY_ID_TEXT, DISPLAY_ID_LONGTEXT )
+    add_integer( "screen-index", 0, INDEX_TEXT, INDEX_LONGTEXT )
 #endif
 
     set_capability( "access", 0 )

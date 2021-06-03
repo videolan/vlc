@@ -544,10 +544,10 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 
     add_integer("prefetch-buffer-size", 1 << 14, N_("Buffer size"),
-                N_("Prefetch buffer size (KiB)"), false)
+                N_("Prefetch buffer size (KiB)"))
         change_integer_range(4, 1 << 20)
     add_obsolete_integer("prefetch-read-size") /* since 4.0.0 */
     add_integer("prefetch-seek-threshold", 1 << 14, N_("Seek threshold"),
-                N_("Prefetch forward seek threshold (bytes)"), true)
+                N_("Prefetch forward seek threshold (bytes)"))
         change_integer_range(0, UINT64_C(1) << 60)
 vlc_module_end()

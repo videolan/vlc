@@ -72,10 +72,10 @@ vlc_module_begin()
 
     set_section("Context settings", NULL)
 #if PL_API_VER >= 90
-    add_bool("gl-allow-sw", false, ALLOWSW_TEXT, ALLOWSW_LONGTEXT, false)
+    add_bool("gl-allow-sw", false, ALLOWSW_TEXT, ALLOWSW_LONGTEXT)
 #endif
     add_integer_with_range("gl-swap-depth", 0,
-            0, 4, SWAP_DEPTH_TEXT, SWAP_DEPTH_LONGTEXT, false)
+            0, 4, SWAP_DEPTH_TEXT, SWAP_DEPTH_LONGTEXT)
 vlc_module_end()
 
 struct vlc_placebo_system_t {

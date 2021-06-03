@@ -256,8 +256,8 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "amt-native-timeout", 5, TIMEOUT_TEXT, NULL, true )
-    add_string( "amt-relay", AMT_DEFAULT_RELAY, AMT_RELAY_ADDRESS, AMT_RELAY_ADDR_LONG, true )
+    add_integer( "amt-native-timeout", 5, TIMEOUT_TEXT, NULL )
+    add_string( "amt-relay", AMT_DEFAULT_RELAY, AMT_RELAY_ADDRESS, AMT_RELAY_ADDR_LONG )
 
     set_capability( "access", 0 )
     add_shortcut( "amt" )

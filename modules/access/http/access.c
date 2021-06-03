@@ -290,20 +290,19 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 
     add_bool("http-continuous", false, N_("Continuous stream"),
-             N_("Keep reading a resource that keeps being updated."), true)
+             N_("Keep reading a resource that keeps being updated."))
         change_volatile()
     add_bool("http-forward-cookies", true, N_("Cookies forwarding"),
-             N_("Forward cookies across HTTP redirections."), true)
+             N_("Forward cookies across HTTP redirections."))
     add_string("http-referrer", NULL, N_("Referrer"),
-               N_("Provide the referral URL, i.e. HTTP \"Referer\" (sic)."),
-               true)
+               N_("Provide the referral URL, i.e. HTTP \"Referer\" (sic)."))
         change_safe()
         change_volatile()
     add_string("http-user-agent", NULL, N_("User agent"),
                N_("Override the name and version of the application as "
                   "provided to the HTTP server, i.e. the HTTP \"User-Agent\". "
                   "Name and version must be separated by a forward slash, "
-                  "e.g. \"FooBar/1.2.3\"."), true)
+                  "e.g. \"FooBar/1.2.3\"."))
         change_safe()
         change_private()
 vlc_module_end()

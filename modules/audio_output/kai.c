@@ -112,12 +112,11 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_string( "kai-audio-device", ppsz_kai_audio_device[0],
-                KAI_AUDIO_DEVICE_TEXT, KAI_AUDIO_DEVICE_LONGTEXT, false )
+                KAI_AUDIO_DEVICE_TEXT, KAI_AUDIO_DEVICE_LONGTEXT )
         change_string_list( ppsz_kai_audio_device, ppsz_kai_audio_device_text )
     add_sw_gain( )
     add_bool( "kai-audio-exclusive-mode", false,
-              KAI_AUDIO_EXCLUSIVE_MODE_TEXT, KAI_AUDIO_EXCLUSIVE_MODE_LONGTEXT,
-              true )
+              KAI_AUDIO_EXCLUSIVE_MODE_TEXT, KAI_AUDIO_EXCLUSIVE_MODE_LONGTEXT )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
