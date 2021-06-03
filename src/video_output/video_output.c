@@ -859,7 +859,9 @@ static void ThreadChangeFilters(vout_thread_sys_t *vout)
 
         if (likely(e))
         {
-            free(config_ChainCreate(&e->name, &e->cfg, "deinterlace"));
+            char *filter = var_InheritString(&vout->obj, "deinterlace-filter");
+            free(config_ChainCreate(&e->name, &e->cfg, filter));
+            free(filter);
             vlc_array_append_or_abort(&array_static, e);
         }
     }

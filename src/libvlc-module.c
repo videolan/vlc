@@ -373,6 +373,9 @@ static const char * const ppsz_deinterlace_mode_text[] = {
     N_("Film NTSC (IVTC)")
 };
 
+#define DEINTERLACE_FILTER_TEXT N_("Deinterlace filter")
+#define DEINTERLACE_FILTER_LONGTEXT N_("Deinterlace module to use.")
+
 static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -1714,6 +1717,9 @@ vlc_module_begin ()
     add_string( "deinterlace-mode", "auto",
                 DEINTERLACE_MODE_TEXT, DEINTERLACE_MODE_LONGTEXT )
         change_string_list( ppsz_deinterlace_mode, ppsz_deinterlace_mode_text )
+        change_safe()
+    add_string( "deinterlace-filter", "deinterlace",
+                DEINTERLACE_FILTER_TEXT, DEINTERLACE_FILTER_LONGTEXT )
         change_safe()
 
     set_subcategory( SUBCAT_VIDEO_VOUT )
