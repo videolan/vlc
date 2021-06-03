@@ -597,6 +597,7 @@ else
 endif
 endif
 	echo "set(CMAKE_AR $(AR) CACHE FILEPATH \"Archiver\")" >> $@
+	echo "set(CMAKE_RANLIB $(RANLIB) CACHE FILEPATH \"Add index to Archive\")" >> $@
 ifdef HAVE_CROSS_COMPILE
 	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(HOST)-)" >> $@
 ifdef HAVE_ANDROID
