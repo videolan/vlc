@@ -50,6 +50,12 @@ endif
 
 
 if HAVE_OSX
+libwindow_macosx_plugin_la_SOURCES = video_output/window_macosx.m
+libwindow_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
+	-Wl,-framework,Cocoa
+libwindow_macosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) \
+	-fobjc-arc -fobjc-exceptions
+
 libvout_macosx_plugin_la_SOURCES = video_output/macosx.m \
 	$(OPENGL_VOUT_COMMONSOURCES)
 libvout_macosx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DHAVE_GL_CORE_SYMBOLS
@@ -64,7 +70,7 @@ libcaopengllayer_plugin_la_LIBADD = libvlc_opengl.la
 libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
 
-vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la
+vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la libwindow_macosx_plugin.la
 endif
 
 libvout_ios_plugin_la_SOURCES = video_output/opengl/display.c $(OPENGL_VOUT_COMMONSOURCES)
