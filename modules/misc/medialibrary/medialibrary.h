@@ -198,6 +198,7 @@ public:
     virtual void onMediaAdded(std::vector<medialibrary::MediaPtr> media) override;
     virtual void onMediaModified(std::set<int64_t> media) override;
     virtual void onMediaDeleted(std::set<int64_t> mediaIds) override;
+    virtual void onMediaConvertedToExternal(std::set<int64_t> mediaIds) override;
     virtual void onArtistsAdded(std::vector<medialibrary::ArtistPtr> artists) override;
     virtual void onArtistsModified(std::set<int64_t> artists) override;
     virtual void onArtistsDeleted(std::set<int64_t> artistsIds) override;
@@ -216,14 +217,15 @@ public:
     virtual void onBookmarksAdded( std::vector<medialibrary::BookmarkPtr> bookmarks ) override;
     virtual void onBookmarksModified( std::set<int64_t> bookmarksIds ) override;
     virtual void onBookmarksDeleted( std::set<int64_t> bookmarksIds ) override;
-    virtual void onDiscoveryStarted(const std::string& entryPoint) override;
+    virtual void onDiscoveryStarted() override;
     virtual void onDiscoveryProgress(const std::string& entryPoint) override;
-    virtual void onDiscoveryCompleted(const std::string& entryPoint, bool success) override;
+    virtual void onDiscoveryCompleted() override;
+    virtual void onDiscoveryFailed( const std::string& entryPoint ) override;
     virtual void onEntryPointAdded(const std::string& entryPoint, bool success) override;
     virtual void onEntryPointRemoved(const std::string& entryPoint, bool success) override;
     virtual void onEntryPointBanned(const std::string& entryPoint, bool success) override;
     virtual void onEntryPointUnbanned(const std::string& entryPoint, bool success) override;
-    virtual void onParsingStatsUpdated(uint32_t percent) override;
+    virtual void onParsingStatsUpdated(uint32_t done, uint32_t scheduled) override;
     virtual void onBackgroundTasksIdleChanged(bool isIdle) override;
     virtual void onMediaThumbnailReady(medialibrary::MediaPtr media,
                                        medialibrary::ThumbnailSizeType sizeType,

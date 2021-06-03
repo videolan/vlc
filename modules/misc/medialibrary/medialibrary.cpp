@@ -150,6 +150,10 @@ void MediaLibrary::onMediaDeleted( std::set<int64_t> mediaIds )
     wrapEntityDeletedEventCallback( m_vlc_ml, mediaIds, VLC_ML_EVENT_MEDIA_DELETED );
 }
 
+void MediaLibrary::onMediaConvertedToExternal(std::set<int64_t>)
+{
+}
+
 void MediaLibrary::onArtistsAdded( std::vector<medialibrary::ArtistPtr> artists )
 {
     wrapEntityCreatedEventCallback<vlc_ml_artist_t>( m_vlc_ml, artists, VLC_ML_EVENT_ARTIST_ADDED );
@@ -248,11 +252,10 @@ void MediaLibrary::onBookmarksDeleted( std::set<int64_t> bookmarkIds )
                                     VLC_ML_EVENT_BOOKMARKS_DELETED );
 }
 
-void MediaLibrary::onDiscoveryStarted( const std::string& entryPoint )
+void MediaLibrary::onDiscoveryStarted()
 {
     vlc_ml_event_t ev;
     ev.i_type = VLC_ML_EVENT_DISCOVERY_STARTED;
-    ev.discovery_started.psz_entry_point = entryPoint.c_str();
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
@@ -264,14 +267,21 @@ void MediaLibrary::onDiscoveryProgress( const std::string& entryPoint )
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
-void MediaLibrary::onDiscoveryCompleted( const std::string& entryPoint, bool success )
+void MediaLibrary::onDiscoveryCompleted()
 {
     vlc_ml_event_t ev;
     ev.i_type = VLC_ML_EVENT_DISCOVERY_COMPLETED;
-    ev.discovery_completed.psz_entry_point = entryPoint.c_str();
-    ev.discovery_completed.b_success = success;
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
+
+void MediaLibrary::onDiscoveryFailed( const std::string& entryPoint )
+{
+    vlc_ml_event_t ev;
+    ev.i_type = VLC_ML_EVENT_DISCOVERY_FAILED;
+    ev.discovery_failed.psz_entry_point = entryPoint.c_str();
+    m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
+}
+
 
 void MediaLibrary::onEntryPointAdded( const std::string& entryPoint, bool success )
 {
@@ -309,11 +319,11 @@ void MediaLibrary::onEntryPointUnbanned( const std::string& entryPoint, bool suc
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
-void MediaLibrary::onParsingStatsUpdated( uint32_t progress )
+void MediaLibrary::onParsingStatsUpdated( uint32_t done, uint32_t scheduled )
 {
     vlc_ml_event_t ev;
     ev.i_type = VLC_ML_EVENT_PARSING_PROGRESS_UPDATED;
-    ev.parsing_progress.i_percent = progress;
+    ev.parsing_progress.i_percent = (float)done / (float)scheduled * 100.f;
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
@@ -1162,8 +1172,6 @@ medialibrary::IMedia::MetadataType MediaLibrary::metadataType( int meta )
             return medialibrary::IMedia::MetadataType::Chapter;
         case VLC_ML_PLAYBACK_STATE_PROGRAM:
             return medialibrary::IMedia::MetadataType::Program;
-        case VLC_ML_PLAYBACK_STATE_SEEN:
-            return medialibrary::IMedia::MetadataType::Seen;
         case VLC_ML_PLAYBACK_STATE_VIDEO_TRACK:
             return medialibrary::IMedia::MetadataType::VideoTrack;
         case VLC_ML_PLAYBACK_STATE_ASPECT_RATIO:
@@ -1349,7 +1357,7 @@ int MediaLibrary::controlMedia( int query, va_list args )
     switch( query )
     {
         case VLC_ML_MEDIA_UPDATE_PROGRESS:
-            if ( m->setProgress( va_arg( args, double ) ) == false )
+            if ( m->setLastPosition( va_arg( args, double ) ) == false )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         case VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE:

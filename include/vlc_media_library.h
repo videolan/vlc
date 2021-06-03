@@ -575,7 +575,6 @@ enum vlc_ml_playback_state
     VLC_ML_PLAYBACK_STATE_TITLE,
     VLC_ML_PLAYBACK_STATE_CHAPTER,
     VLC_ML_PLAYBACK_STATE_PROGRAM,
-    VLC_ML_PLAYBACK_STATE_SEEN,
     VLC_ML_PLAYBACK_STATE_VIDEO_TRACK,
     VLC_ML_PLAYBACK_STATE_ASPECT_RATIO,
     VLC_ML_PLAYBACK_STATE_ZOOM,
@@ -638,11 +637,13 @@ enum vlc_ml_event_type
     VLC_ML_EVENT_BOOKMARKS_DELETED,
     /**
      * A discovery started.
-     * For each VLC_ML_EVENT_DISCOVERY_STARTED event, there will be
-     * 1 VLC_ML_EVENT_DISCOVERY_COMPLETED event, and N
-     * VLC_ML_EVENT_DISCOVERY_PROGRESS events.
-     * The entry point being discovered is stored in
-     * vlc_ml_event_t::discovery_started::psz_entry_point.
+     *
+     * This event will be emitted when the media library starts discovering a
+     * scheduled entry point.
+     * If more than a single entry point are queued, this event won't be fired
+     * again until all operations are completed and a new operation is scheduled.
+     * Once all currently queued operations are done
+     * VLC_ML_EVENT_DISCOVERY_COMPLETED will be emitted.
      */
     VLC_ML_EVENT_DISCOVERY_STARTED,
     /**
@@ -652,13 +653,15 @@ enum vlc_ml_event_type
      */
     VLC_ML_EVENT_DISCOVERY_PROGRESS,
     /**
-     * Sent when an entry point discovery is completed.
-     * The entry point that was being discovered is stored in
-     * vlc_ml_event_t::discovery_completed::psz_entry_point.
-     * The success or failure state is stored in
-     * vlc_ml_event_t::discovery_completed::b_success
+     * Sent when all queued discovery operations are done being processed.
      */
     VLC_ML_EVENT_DISCOVERY_COMPLETED,
+    /**
+     * This event is sent when a discovery failed. The entry point that failed to
+     * be discovered is stored in
+     * vlc_ml_event_t::discovery_failed::psz_entry_point
+     */
+    VLC_ML_EVENT_DISCOVERY_FAILED,
     /**
      * Sent when a new entry point gets added to the database.
      * The entry point that was added is stored in
@@ -733,16 +736,11 @@ typedef struct vlc_ml_event_t
         struct
         {
             const char* psz_entry_point;
-        } discovery_started;
-        struct
-        {
-            const char* psz_entry_point;
         } discovery_progress;
         struct
         {
             const char* psz_entry_point;
-            bool b_success;
-        } discovery_completed;
+        } discovery_failed;
         struct
         {
             const char* psz_entry_point;

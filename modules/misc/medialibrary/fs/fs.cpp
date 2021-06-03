@@ -172,6 +172,19 @@ void vlc::medialibrary::SDFileSystemFactory::onDeviceUnmounted(const std::string
     m_callbacks->onDeviceUnmounted(*device, mountpoint);
 }
 
+bool SDFileSystemFactory::waitForDevice(const std::string& mrl,
+                                        uint32_t timeout) const
+{
+    auto deadline = vlc_tick_now() + VLC_TICK_FROM_MS(timeout);
+    vlc::threads::mutex_locker lock{ m_mutex };
+    while ( deviceByMrl(mrl) == nullptr )
+    {
+        if ( m_cond.timedwait(m_mutex, deadline) != 0 )
+            return false;
+    }
+    return true;
+}
+
 std::shared_ptr<IDevice> SDFileSystemFactory::deviceByUuid(const std::string& uuid)
 {
     auto it = std::find_if( begin( m_devices ), end( m_devices ),
@@ -188,7 +201,7 @@ bool SDFileSystemFactory::isStarted() const
     return m_callbacks != nullptr;
 }
 
-std::shared_ptr<IDevice> SDFileSystemFactory::deviceByMrl(const std::string& mrl)
+std::shared_ptr<IDevice> SDFileSystemFactory::deviceByMrl(const std::string& mrl) const
 {
     std::shared_ptr<fs::IDevice> res;
     std::string mountpoint;

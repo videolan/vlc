@@ -190,7 +190,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readwrite) int lastTitle;
 @property (readwrite) int lastChapter;
 @property (readwrite) int lastProgram;
-@property (readwrite) BOOL seen;
 @property (readwrite) int lastVideoTrack;
 @property (readwrite) NSString *lastAspectRatio;
 @property (readwrite) NSString *lastZoom;

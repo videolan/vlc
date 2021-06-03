@@ -87,13 +87,16 @@ public:
     void
     onDeviceUnmounted(const std::string& uuid, const std::string& mountpoint) override;
 
+    bool
+    waitForDevice(const std::string& mrl, uint32_t timeout) const override;
+
 private:
     std::shared_ptr<fs::IDevice>
     deviceByUuid(const std::string& uuid);
 
     bool isStarted() const override;
 
-    std::shared_ptr<fs::IDevice> deviceByMrl(const std::string& mrl);
+    std::shared_ptr<fs::IDevice> deviceByMrl(const std::string& mrl) const;
 
 private:
     vlc_object_t *const m_parent;
@@ -103,7 +106,8 @@ private:
     IFileSystemFactoryCb *m_callbacks;
     bool m_isNetwork;
 
-    vlc::threads::mutex m_mutex;
+    mutable vlc::threads::mutex m_mutex;
+    mutable vlc::threads::condition_variable m_cond;
     std::vector<std::shared_ptr<IDevice>> m_devices;
 };
 

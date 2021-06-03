@@ -639,16 +639,6 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     [self setIntegerPreference:lastProgram forKey:VLC_ML_PLAYBACK_STATE_PROGRAM];
 }
 
-- (BOOL)seen
-{
-    return [self integerPreferenceForKey:VLC_ML_PLAYBACK_STATE_SEEN] > 0 ? YES : NO;
-}
-
-- (void)setSeen:(BOOL)seen
-{
-    [self setIntegerPreference:seen forKey:VLC_ML_PLAYBACK_STATE_SEEN];
-}
-
 - (int)lastVideoTrack
 {
     return [self integerPreferenceForKey:VLC_ML_PLAYBACK_STATE_VIDEO_TRACK];
