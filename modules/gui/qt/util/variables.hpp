@@ -222,7 +222,7 @@ class QVLCBool : public QVLCVariable<QVLCBool, bool>
 {
     Q_OBJECT
 public:
-    Q_PROPERTY(bool value READ getValue WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(bool value READ getValue WRITE setValue NOTIFY valueChanged FINAL)
 
     template<typename T>
     QVLCBool(T* object, QString property, QObject* parent = nullptr)
@@ -248,7 +248,7 @@ class QVLCString : public QVLCVariable<QVLCString, QString>
 {
     Q_OBJECT
 public:
-    Q_PROPERTY(QString value READ getValue WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(QString value READ getValue WRITE setValue NOTIFY valueChanged FINAL)
 
     template<typename T>
     QVLCString(T* object, QString property, QObject* parent = nullptr)
@@ -274,7 +274,7 @@ class QVLCFloat : public QVLCVariable<QVLCFloat, float>
 {
     Q_OBJECT
 public:
-    Q_PROPERTY(float value READ getValue WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(float value READ getValue WRITE setValue NOTIFY valueChanged FINAL)
 
     template<typename T>
     QVLCFloat(T* object, QString property, QObject* parent = nullptr)
@@ -301,7 +301,7 @@ class QVLCInteger : public QVLCVariable<QVLCInteger, int64_t>
 {
     Q_OBJECT
 public:
-    Q_PROPERTY(int64_t value READ getValue WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(int64_t value READ getValue WRITE setValue NOTIFY valueChanged FINAL)
 
     template<typename T>
     QVLCInteger(T* object, QString property, QObject* parent = nullptr)

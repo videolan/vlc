@@ -29,8 +29,8 @@ class ControlbarProfile : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool dirty READ dirty RESET resetDirty NOTIFY dirtyChanged)
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(bool dirty READ dirty RESET resetDirty NOTIFY dirtyChanged FINAL)
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged FINAL)
 
     friend class ControlbarProfileModel;
 

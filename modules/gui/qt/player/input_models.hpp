@@ -44,8 +44,8 @@
 class TrackListModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
-    Q_PROPERTY(bool multiSelect READ getMultiSelect WRITE setMultiSelect NOTIFY multiSelectChanged)
+    Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
+    Q_PROPERTY(bool multiSelect READ getMultiSelect WRITE setMultiSelect NOTIFY multiSelectChanged FINAL)
 
 public:
     TrackListModel(vlc_player_t* player, QObject* parent = nullptr);
@@ -110,7 +110,7 @@ private:
 class TitleListModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
+    Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
 
 public:
 
@@ -159,7 +159,7 @@ private:
 class ChapterListModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
+    Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
 
 public:
     //user role
@@ -211,7 +211,7 @@ private:
 class ProgramListModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
+    Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
 
 public:
     ProgramListModel(vlc_player_t* player, QObject* parent = nullptr);

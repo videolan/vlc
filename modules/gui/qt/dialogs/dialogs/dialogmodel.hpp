@@ -71,7 +71,7 @@ class DialogErrorModel : public QAbstractListModel
 
     Q_ENUMS(DialogRoles)
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_PROPERTY(int count READ count NOTIFY countChanged FINAL)
 
 public: // Enums
     enum DialogRoles
@@ -126,7 +126,7 @@ class DialogModel : public QObject
 
     Q_ENUMS(QuestionType)
 
-    Q_PROPERTY(DialogErrorModel * model READ model CONSTANT)
+    Q_PROPERTY(DialogErrorModel * model READ model CONSTANT FINAL)
 
 public: // Enums
     // NOTE: Is it really useful to have this declared here ?

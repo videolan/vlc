@@ -34,7 +34,7 @@
 class MLRecentsVideoModel : public MLBaseModel
 {
     Q_OBJECT
-    Q_PROPERTY(int numberOfItemsToShow READ getNumberOfItemsToShow WRITE setNumberOfItemsToShow)
+    Q_PROPERTY(int numberOfItemsToShow READ getNumberOfItemsToShow WRITE setNumberOfItemsToShow FINAL)
 
 public:
     explicit MLRecentsVideoModel( QObject* parent = nullptr );

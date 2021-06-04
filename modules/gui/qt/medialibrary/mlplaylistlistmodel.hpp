@@ -30,12 +30,12 @@ class MLPlaylistListModel : public MLBaseModel
 {
     Q_OBJECT
 
-    Q_PROPERTY(QSize coverSize READ coverSize WRITE setCoverSize NOTIFY coverSizeChanged)
+    Q_PROPERTY(QSize coverSize READ coverSize WRITE setCoverSize NOTIFY coverSizeChanged FINAL)
 
     Q_PROPERTY(QString coverDefault READ coverDefault WRITE setCoverDefault
-               NOTIFY coverDefaultChanged)
+               NOTIFY coverDefaultChanged FINAL)
 
-    Q_PROPERTY(QString coverPrefix READ coverPrefix WRITE setCoverPrefix NOTIFY coverPrefixChanged)
+    Q_PROPERTY(QString coverPrefix READ coverPrefix WRITE setCoverPrefix NOTIFY coverPrefixChanged FINAL)
 
 public:
     enum Roles

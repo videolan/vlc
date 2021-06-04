@@ -36,9 +36,9 @@ class RoundImage : public QQuickPaintedItem
     Q_OBJECT
 
     // url of the image
-    Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
+    Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged FINAL)
 
-    Q_PROPERTY(qreal radius READ radius WRITE setRadius NOTIFY radiusChanged)
+    Q_PROPERTY(qreal radius READ radius WRITE setRadius NOTIFY radiusChanged FINAL)
 
 public:
     RoundImage(QQuickItem *parent = nullptr);

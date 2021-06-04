@@ -26,71 +26,71 @@ class SystemPalette : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QColor text         READ text         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor textDisabled READ textDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor textInactive READ textInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor text         READ text         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor textDisabled READ textDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor textInactive READ textInactive NOTIFY paletteChanged FINAL)
 
 
-    Q_PROPERTY(QColor textBright         READ textBright         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor textBrightDisabled READ textBrightDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor textBrightInactive READ textBrightInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor textBright         READ textBright         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor textBrightDisabled READ textBrightDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor textBrightInactive READ textBrightInactive NOTIFY paletteChanged FINAL)
 
 
-    Q_PROPERTY(QColor link         READ link         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor linkDisabled READ linkDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor linkInactive READ linkInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor link         READ link         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor linkDisabled READ linkDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor linkInactive READ linkInactive NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(QColor linkVisited         READ linkVisited         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor linkVisitedDisabled READ linkVisitedDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor linkVisitedInactive READ linkVisitedInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor linkVisited         READ linkVisited         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor linkVisitedDisabled READ linkVisitedDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor linkVisitedInactive READ linkVisitedInactive NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(QColor base         READ base         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor baseDisabled READ baseDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor baseInactive READ baseInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor base         READ base         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor baseDisabled READ baseDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor baseInactive READ baseInactive NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(QColor alternateBase         READ alternateBase         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor alternateBaseDisabled READ alternateBaseDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor alternateBaseInactive READ alternateBaseInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor alternateBase         READ alternateBase         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor alternateBaseDisabled READ alternateBaseDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor alternateBaseInactive READ alternateBaseInactive NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(QColor window         READ window         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor windowDisabled READ windowDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor windowInactive READ windowInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor window         READ window         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor windowDisabled READ windowDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor windowInactive READ windowInactive NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(QColor windowText         READ windowText         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor windowTextDisabled READ windowTextDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor windowTextInactive READ windowTextInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor windowText         READ windowText         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor windowTextDisabled READ windowTextDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor windowTextInactive READ windowTextInactive NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(QColor button         READ button         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor buttonDisabled READ buttonDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor buttonInactive READ buttonInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor button         READ button         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor buttonDisabled READ buttonDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor buttonInactive READ buttonInactive NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(QColor buttonText         READ buttonText         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor buttonTextDisabled READ buttonTextDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor buttonTextInactive READ buttonTextInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor buttonText         READ buttonText         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor buttonTextDisabled READ buttonTextDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor buttonTextInactive READ buttonTextInactive NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(QColor highlight         READ highlight         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor highlightDisabled READ highlightDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor highlightInactive READ highlightInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor highlight         READ highlight         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor highlightDisabled READ highlightDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor highlightInactive READ highlightInactive NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(QColor highlightText         READ highlightText         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor highlightTextDisabled READ highlightTextDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor highlightTextInactive READ highlightTextInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor highlightText         READ highlightText         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor highlightTextDisabled READ highlightTextDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor highlightTextInactive READ highlightTextInactive NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(QColor tooltip         READ tooltip         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor tooltipDisabled READ tooltipDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor tooltipInactive READ tooltipInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor tooltip         READ tooltip         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor tooltipDisabled READ tooltipDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor tooltipInactive READ tooltipInactive NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(QColor tooltipText         READ tooltipText         NOTIFY paletteChanged)
-    Q_PROPERTY(QColor tooltipTextDisabled READ tooltipTextDisabled NOTIFY paletteChanged)
-    Q_PROPERTY(QColor tooltipTextInactive READ tooltipTextInactive NOTIFY paletteChanged)
+    Q_PROPERTY(QColor tooltipText         READ tooltipText         NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor tooltipTextDisabled READ tooltipTextDisabled NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor tooltipTextInactive READ tooltipTextInactive NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(QColor light     READ light    NOTIFY paletteChanged)
-    Q_PROPERTY(QColor midlight  READ midlight NOTIFY paletteChanged)
-    Q_PROPERTY(QColor dark      READ dark     NOTIFY paletteChanged)
-    Q_PROPERTY(QColor mid       READ mid      NOTIFY paletteChanged)
-    Q_PROPERTY(QColor shadow    READ shadow   NOTIFY paletteChanged)
+    Q_PROPERTY(QColor light     READ light    NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor midlight  READ midlight NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor dark      READ dark     NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor mid       READ mid      NOTIFY paletteChanged FINAL)
+    Q_PROPERTY(QColor shadow    READ shadow   NOTIFY paletteChanged FINAL)
 
-    Q_PROPERTY(bool isDark READ isDark NOTIFY paletteChanged)
+    Q_PROPERTY(bool isDark READ isDark NOTIFY paletteChanged FINAL)
 
 public:
     SystemPalette(QObject* parent = nullptr);

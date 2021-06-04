@@ -37,7 +37,7 @@
 class MLFoldersBaseModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
+    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
 
 public:
     enum Roles

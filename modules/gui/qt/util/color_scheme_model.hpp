@@ -26,8 +26,8 @@
 class ColorSchemeModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QString current READ currentText NOTIFY currentChanged)
-    Q_PROPERTY(ColorScheme scheme READ currentScheme WRITE setCurrentScheme NOTIFY currentChanged)
+    Q_PROPERTY(QString current READ currentText NOTIFY currentChanged FINAL)
+    Q_PROPERTY(ColorScheme scheme READ currentScheme WRITE setCurrentScheme NOTIFY currentChanged FINAL)
 
 public:
     enum ColorScheme

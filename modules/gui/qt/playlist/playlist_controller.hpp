@@ -73,21 +73,21 @@ public:
     };
     Q_ENUM(SortOrder)
 
-    Q_PROPERTY(QVariantList sortKeyTitleList READ getSortKeyTitleList CONSTANT)
+    Q_PROPERTY(QVariantList sortKeyTitleList READ getSortKeyTitleList CONSTANT FINAL)
 
-    Q_PROPERTY(PlaylistPtr playlistPtr READ getPlaylistPtr WRITE setPlaylistPtr NOTIFY playlistPtrChanged)
+    Q_PROPERTY(PlaylistPtr playlistPtr READ getPlaylistPtr WRITE setPlaylistPtr NOTIFY playlistPtrChanged FINAL)
 
-    Q_PROPERTY(PlaylistItem currentItem READ getCurrentItem NOTIFY currentItemChanged)
+    Q_PROPERTY(PlaylistItem currentItem READ getCurrentItem NOTIFY currentItemChanged FINAL)
 
-    Q_PROPERTY(bool hasNext READ hasNext NOTIFY hasNextChanged)
-    Q_PROPERTY(bool hasPrev READ hasPrev NOTIFY hasPrevChanged)
-    Q_PROPERTY(bool random READ isRandom WRITE setRandom NOTIFY randomChanged )
-    Q_PROPERTY(PlaybackRepeat repeatMode READ getRepeatMode WRITE setRepeatMode NOTIFY repeatModeChanged)
-    Q_PROPERTY(bool playAndExit READ isPlayAndExit WRITE setPlayAndExit NOTIFY playAndExitChanged)
-    Q_PROPERTY(bool empty READ isEmpty NOTIFY isEmptyChanged)
-    Q_PROPERTY(size_t count READ count NOTIFY countChanged)
-    Q_PROPERTY(SortKey sortKey READ getSortKey WRITE setSortKey NOTIFY sortKeyChanged)
-    Q_PROPERTY(SortOrder sortOrder READ getSortOrder WRITE setSortOrder NOTIFY sortOrderChanged)
+    Q_PROPERTY(bool hasNext READ hasNext NOTIFY hasNextChanged FINAL)
+    Q_PROPERTY(bool hasPrev READ hasPrev NOTIFY hasPrevChanged FINAL)
+    Q_PROPERTY(bool random READ isRandom WRITE setRandom NOTIFY randomChanged  FINAL)
+    Q_PROPERTY(PlaybackRepeat repeatMode READ getRepeatMode WRITE setRepeatMode NOTIFY repeatModeChanged FINAL)
+    Q_PROPERTY(bool playAndExit READ isPlayAndExit WRITE setPlayAndExit NOTIFY playAndExitChanged FINAL)
+    Q_PROPERTY(bool empty READ isEmpty NOTIFY isEmptyChanged FINAL)
+    Q_PROPERTY(size_t count READ count NOTIFY countChanged FINAL)
+    Q_PROPERTY(SortKey sortKey READ getSortKey WRITE setSortKey NOTIFY sortKeyChanged FINAL)
+    Q_PROPERTY(SortOrder sortOrder READ getSortOrder WRITE setSortOrder NOTIFY sortOrderChanged FINAL)
 
 public:
     Q_INVOKABLE void play();

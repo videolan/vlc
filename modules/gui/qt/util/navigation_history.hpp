@@ -9,8 +9,8 @@ class NavigationHistory : public QObject
 {
     Q_OBJECT
 public:
-    Q_PROPERTY(QVariant current READ getCurrent NOTIFY currentChanged)
-    Q_PROPERTY(bool previousEmpty READ isPreviousEmpty NOTIFY previousEmptyChanged)
+    Q_PROPERTY(QVariant current READ getCurrent NOTIFY currentChanged FINAL)
+    Q_PROPERTY(bool previousEmpty READ isPreviousEmpty NOTIFY previousEmptyChanged FINAL)
 
     enum class PostAction{
         Stay,

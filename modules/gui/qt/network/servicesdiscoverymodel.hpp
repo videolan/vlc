@@ -41,9 +41,9 @@ class ServicesDiscoveryModel : public QAbstractListModel
 
 public:
 
-    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
-    Q_PROPERTY(bool parsingPending READ getParsingPending NOTIFY parsingPendingChanged)
-    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
+    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+    Q_PROPERTY(bool parsingPending READ getParsingPending NOTIFY parsingPendingChanged FINAL)
+    Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
 
     enum State // equivalent to addon_state_t
     {

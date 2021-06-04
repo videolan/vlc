@@ -80,8 +80,8 @@ public:
 class PathNode
 {
     Q_GADGET
-    Q_PROPERTY( QVariant tree READ getTree CONSTANT )
-    Q_PROPERTY( QString display READ getDisplay CONSTANT )
+    Q_PROPERTY( QVariant tree READ getTree CONSTANT  FINAL )
+    Q_PROPERTY( QString display READ getDisplay CONSTANT  FINAL )
 
 public:
     PathNode() = default;

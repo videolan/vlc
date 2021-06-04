@@ -31,11 +31,11 @@ class PlayerControlbarModel : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool dirty READ dirty WRITE setDirty NOTIFY dirtyChanged)
+    Q_PROPERTY(bool dirty READ dirty WRITE setDirty NOTIFY dirtyChanged FINAL)
 
-    Q_PROPERTY(ControlListModel* left READ left CONSTANT)
-    Q_PROPERTY(ControlListModel* center READ center CONSTANT)
-    Q_PROPERTY(ControlListModel* right READ right CONSTANT)
+    Q_PROPERTY(ControlListModel* left READ left CONSTANT FINAL)
+    Q_PROPERTY(ControlListModel* center READ center CONSTANT FINAL)
+    Q_PROPERTY(ControlListModel* right READ right CONSTANT FINAL)
 
 public:
     // When there is a need to add a new Player, just

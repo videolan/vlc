@@ -66,9 +66,9 @@ protected:
 class VideoSurface : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
-    Q_PROPERTY(QSize sourceSize READ getSourceSize NOTIFY sourceSizeChanged)
-    Q_PROPERTY(Qt::CursorShape cursorShape READ getCursorShape WRITE setCursorShape RESET unsetCursor)
+    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+    Q_PROPERTY(QSize sourceSize READ getSourceSize NOTIFY sourceSizeChanged FINAL)
+    Q_PROPERTY(Qt::CursorShape cursorShape READ getCursorShape WRITE setCursorShape RESET unsetCursor FINAL)
 
 public:
     VideoSurface( QQuickItem* parent = nullptr );

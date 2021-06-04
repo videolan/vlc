@@ -25,7 +25,7 @@
 class ControlListModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
+    Q_PROPERTY(int count READ rowCount NOTIFY countChanged FINAL)
 
 public:
     explicit ControlListModel(QObject *parent = nullptr);

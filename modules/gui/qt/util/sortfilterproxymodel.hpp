@@ -31,11 +31,11 @@ class SortFilterProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 
-    Q_PROPERTY( QByteArray searchRole READ searchRole WRITE setSearchRole NOTIFY searchRoleChanged )
-    Q_PROPERTY( QString searchPattern READ searchPattern WRITE setSearchPattern NOTIFY searchPatternChanged )
-    Q_PROPERTY( QString sortCriteria READ sortCriteria WRITE setSortCriteria NOTIFY sortCriteriaChanged )
-    Q_PROPERTY( Qt::SortOrder sortOrder READ sortOrder WRITE setSortOrder NOTIFY sortOrderChanged )
-    Q_PROPERTY( int count READ count NOTIFY countChanged )
+    Q_PROPERTY( QByteArray searchRole READ searchRole WRITE setSearchRole NOTIFY searchRoleChanged  FINAL)
+    Q_PROPERTY( QString searchPattern READ searchPattern WRITE setSearchPattern NOTIFY searchPatternChanged  FINAL)
+    Q_PROPERTY( QString sortCriteria READ sortCriteria WRITE setSortCriteria NOTIFY sortCriteriaChanged  FINAL)
+    Q_PROPERTY( Qt::SortOrder sortOrder READ sortOrder WRITE setSortOrder NOTIFY sortOrderChanged  FINAL)
+    Q_PROPERTY( int count READ count NOTIFY countChanged  FINAL)
 
 public:
     SortFilterProxyModel( QObject * parent = nullptr );

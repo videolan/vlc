@@ -47,7 +47,7 @@ class PlaylistListModel;
 }
 
 #define SIMPLE_MENU_PROPERTY(type, name, defaultValue) \
-    Q_PROPERTY(type name READ get##name WRITE set##name) \
+    Q_PROPERTY(type name READ get##name WRITE set##name FINAL) \
     public: \
     inline void set##name( type data) { m_##name = data; } \
     inline type get##name() const { return m_##name; } \

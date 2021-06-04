@@ -28,10 +28,10 @@ class ControlbarProfileModel : public QAbstractListModel
 {
     Q_OBJECT
 
-    Q_PROPERTY(int selectedProfile READ selectedProfile WRITE setSelectedProfile NOTIFY selectedProfileChanged)
-    Q_PROPERTY(ControlbarProfile* currentModel READ currentModel NOTIFY selectedProfileChanged)
+    Q_PROPERTY(int selectedProfile READ selectedProfile WRITE setSelectedProfile NOTIFY selectedProfileChanged FINAL)
+    Q_PROPERTY(ControlbarProfile* currentModel READ currentModel NOTIFY selectedProfileChanged FINAL)
 
-    Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
+    Q_PROPERTY(int count READ rowCount NOTIFY countChanged FINAL)
 
 public:
     explicit ControlbarProfileModel(qt_intf_t *p_intf, QObject *parent = nullptr);

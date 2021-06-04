@@ -26,9 +26,9 @@
 class ImageLuminanceExtractor : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
-    Q_PROPERTY(int luminance READ luminance NOTIFY luminanceChanged)
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setIsEnabled NOTIFY enabledChanged)
+    Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged FINAL)
+    Q_PROPERTY(int luminance READ luminance NOTIFY luminanceChanged FINAL)
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setIsEnabled NOTIFY enabledChanged FINAL)
 
 public:
     enum Status

@@ -37,10 +37,10 @@ class PlaylistListModelPrivate;
 class PlaylistListModel : public SelectableListModel
 {
     Q_OBJECT
-    Q_PROPERTY(PlaylistPtr playlistId READ getPlaylistId WRITE setPlaylistId NOTIFY playlistIdChanged)
-    Q_PROPERTY(int currentIndex READ getCurrentIndex NOTIFY currentIndexChanged)
-    Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
-    Q_PROPERTY(VLCTick duration READ getDuration NOTIFY countChanged)
+    Q_PROPERTY(PlaylistPtr playlistId READ getPlaylistId WRITE setPlaylistId NOTIFY playlistIdChanged FINAL)
+    Q_PROPERTY(int currentIndex READ getCurrentIndex NOTIFY currentIndexChanged FINAL)
+    Q_PROPERTY(int count READ rowCount NOTIFY countChanged FINAL)
+    Q_PROPERTY(VLCTick duration READ getDuration NOTIFY countChanged FINAL)
 
 public:
     enum Roles

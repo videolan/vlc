@@ -46,18 +46,18 @@ class MLBaseModel : public QAbstractListModel
     Q_OBJECT
 
     Q_PROPERTY(MLItemId parentId READ parentId WRITE setParentId NOTIFY parentIdChanged
-               RESET unsetParentId)
+               RESET unsetParentId FINAL)
 
-    Q_PROPERTY(MediaLib * ml READ ml WRITE setMl)
+    Q_PROPERTY(MediaLib * ml READ ml WRITE setMl FINAL)
 
-    Q_PROPERTY(QString searchPattern READ searchPattern WRITE setSearchPattern)
+    Q_PROPERTY(QString searchPattern READ searchPattern WRITE setSearchPattern FINAL)
 
-    Q_PROPERTY(Qt::SortOrder sortOrder READ getSortOrder WRITE setSortOder NOTIFY sortOrderChanged)
+    Q_PROPERTY(Qt::SortOrder sortOrder READ getSortOrder WRITE setSortOder NOTIFY sortOrderChanged FINAL)
 
     Q_PROPERTY(QString sortCriteria READ getSortCriteria WRITE setSortCriteria
-               NOTIFY sortCriteriaChanged RESET unsetSortCriteria)
+               NOTIFY sortCriteriaChanged RESET unsetSortCriteria FINAL)
 
-    Q_PROPERTY(unsigned int count READ getCount NOTIFY countChanged)
+    Q_PROPERTY(unsigned int count READ getCount NOTIFY countChanged FINAL)
 
 public:
     explicit MLBaseModel(QObject *parent = nullptr);

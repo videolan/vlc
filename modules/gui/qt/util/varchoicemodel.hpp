@@ -44,7 +44,7 @@ class VLCVarChoiceModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    Q_PROPERTY(bool hasCurrent READ hasCurrent NOTIFY hasCurrentChanged)
+    Q_PROPERTY(bool hasCurrent READ hasCurrent NOTIFY hasCurrentChanged FINAL)
 
     template<typename T>
     VLCVarChoiceModel(T *p_object, const char* varName, QObject *parent = nullptr);

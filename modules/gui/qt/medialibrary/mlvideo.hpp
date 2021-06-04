@@ -36,9 +36,9 @@ class VideoDescription
 {
     Q_GADGET
 
-    Q_PROPERTY(QString codec READ getCodec CONSTANT)
-    Q_PROPERTY(QString language READ getLanguage CONSTANT)
-    Q_PROPERTY(unsigned int fps READ getFps CONSTANT)
+    Q_PROPERTY(QString codec READ getCodec CONSTANT FINAL)
+    Q_PROPERTY(QString language READ getLanguage CONSTANT FINAL)
+    Q_PROPERTY(unsigned int fps READ getFps CONSTANT FINAL)
 
 public:
     VideoDescription() = default;
@@ -61,10 +61,10 @@ class AudioDescription
 {
     Q_GADGET
 
-    Q_PROPERTY(QString codec READ getCodec CONSTANT)
-    Q_PROPERTY(QString language READ getLanguage CONSTANT)
-    Q_PROPERTY(unsigned int nbchannels READ getNbChannels CONSTANT)
-    Q_PROPERTY(unsigned int sampleRate READ getSampleRate CONSTANT)
+    Q_PROPERTY(QString codec READ getCodec CONSTANT FINAL)
+    Q_PROPERTY(QString language READ getLanguage CONSTANT FINAL)
+    Q_PROPERTY(unsigned int nbchannels READ getNbChannels CONSTANT FINAL)
+    Q_PROPERTY(unsigned int sampleRate READ getSampleRate CONSTANT FINAL)
 
 public:
     AudioDescription() = default;

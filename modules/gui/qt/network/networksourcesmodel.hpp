@@ -39,8 +39,8 @@ class NetworkSourcesModel : public QAbstractListModel
 {
     Q_OBJECT
 
-    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
-    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
+    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+    Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
 
 public:
     enum Role {

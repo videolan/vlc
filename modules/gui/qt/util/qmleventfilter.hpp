@@ -46,8 +46,8 @@ class QmlEventFilter : public QQuickItem
 {
     Q_OBJECT
 public:
-    Q_PROPERTY(QObject * source READ getSource WRITE setSource)
-    Q_PROPERTY(bool filterEnabled READ getFilterEnabled WRITE setFilterEnabled)
+    Q_PROPERTY(QObject * source READ getSource WRITE setSource FINAL)
+    Q_PROPERTY(bool filterEnabled READ getFilterEnabled WRITE setFilterEnabled FINAL)
 
 public:
     QmlEventFilter(QQuickItem *parent = nullptr);

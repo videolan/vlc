@@ -74,11 +74,11 @@ public:
     Q_ENUM( SDCatType )
 
 
-    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
-    Q_PROPERTY(SDCatType sd_source READ getSdSource WRITE setSdSource NOTIFY sdSourceChanged)
-    Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
-    Q_PROPERTY(QString source_name READ getSourceName WRITE setSourceName NOTIFY sourceNameChanged)
-    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
+    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+    Q_PROPERTY(SDCatType sd_source READ getSdSource WRITE setSdSource NOTIFY sdSourceChanged FINAL)
+    Q_PROPERTY(QString name READ getName NOTIFY nameChanged FINAL)
+    Q_PROPERTY(QString source_name READ getSourceName WRITE setSourceName NOTIFY sourceNameChanged FINAL)
+    Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
 
 public:
     NetworkDeviceModel( QObject* parent = nullptr );

@@ -27,7 +27,7 @@ class SelectableListModel : public QAbstractListModel
 {
     Q_OBJECT
 
-    Q_PROPERTY(int selectedCount READ getSelectedCount NOTIFY selectedCountChanged)
+    Q_PROPERTY(int selectedCount READ getSelectedCount NOTIFY selectedCountChanged FINAL)
 public:
     SelectableListModel(QObject *parent = nullptr) :
         QAbstractListModel(parent) {}

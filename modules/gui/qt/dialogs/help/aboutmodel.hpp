@@ -24,10 +24,10 @@ class AboutModel : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString license READ getLicense CONSTANT)
-    Q_PROPERTY(QString authors READ getAuthors CONSTANT)
-    Q_PROPERTY(QString thanks  READ getThanks  CONSTANT)
-    Q_PROPERTY(QString version  READ getVersion  CONSTANT)
+    Q_PROPERTY(QString license READ getLicense CONSTANT FINAL)
+    Q_PROPERTY(QString authors READ getAuthors CONSTANT FINAL)
+    Q_PROPERTY(QString thanks  READ getThanks  CONSTANT FINAL)
+    Q_PROPERTY(QString version  READ getVersion  CONSTANT FINAL)
 public:
     explicit AboutModel(QObject *parent = nullptr);
 
