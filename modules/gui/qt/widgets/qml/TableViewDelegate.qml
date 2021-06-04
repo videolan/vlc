@@ -17,7 +17,7 @@
  *****************************************************************************/
 
 import QtQuick         2.11
-import QtQuick.Layouts 1.3
+import QtQuick.Layouts 1.11
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"

@@ -20,7 +20,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Controls.impl 2.4
 import QtQuick.Templates 2.4 as T
 import org.videolan.vlc 0.1
-import QtQuick.Layouts 1.3
+import QtQuick.Layouts 1.11
 
 import "qrc:///style/"
 

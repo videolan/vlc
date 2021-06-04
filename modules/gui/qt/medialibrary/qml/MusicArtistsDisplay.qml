@@ -18,7 +18,7 @@
 import QtQuick.Controls 2.4
 import QtQuick 2.11
 import QtQml.Models 2.2
-import QtQuick.Layouts 1.3
+import QtQuick.Layouts 1.11
 
 import org.videolan.medialib 0.1
 import org.videolan.vlc 0.1
