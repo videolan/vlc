@@ -953,7 +953,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_block = block_Realloc( p_block, 0,
                             p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
         if( !p_block )
-            return VLCDEC_SUCCESS;
+            return VLCDEC_ECRITICAL;
         p_block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
         *pp_block = p_block;
         memset( p_block->p_buffer + p_block->i_buffer, 0,
