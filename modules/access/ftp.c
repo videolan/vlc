@@ -77,7 +77,7 @@ static void OutClose( vlc_object_t * );
 
 #define LOGIN_DIALOG_TITLE _("FTP authentication")
 #define LOGIN_DIALOG_TEXT _("Please enter a valid login and password for " \
-        "the ftp connexion to %s")
+        "the FTP connection to %s")
 
 vlc_module_begin ()
     set_shortname( "FTP" )

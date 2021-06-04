@@ -420,7 +420,7 @@ static int Open( vlc_object_t* p_this )
     } while( vlc_credential_get( &credential, p_access, "sftp-user", "sftp-pwd",
                                 _("SFTP authentication"),
                                 _("Please enter a valid login and password for "
-                                "the sftp connexion to %s"), url.psz_host ) );
+                                "the SFTP connection to %s"), url.psz_host ) );
 
     /* Create the sftp session */
     p_sys->sftp_session = libssh2_sftp_init( p_sys->ssh_session );
