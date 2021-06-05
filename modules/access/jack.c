@@ -164,7 +164,7 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_demux, "jack-input-auto-connect",
         VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
-    /* JACK connexions */
+    /* JACK connections */
     /* define name and connect to jack server */
     char p_vlc_client_name[32];
     sprintf( p_vlc_client_name, "vlc-input-%d", getpid() );

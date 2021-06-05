@@ -199,7 +199,7 @@ static int SSHSessionInit( stream_t *p_access, const char *psz_host, int i_port 
     if( p_sys->i_socket < 0 )
         goto error;
 
-    /* Create the ssh connexion and wait until the server answer */
+    /* Create the ssh connection and wait until the server answer */
     p_sys->ssh_session = libssh2_session_init();
     if( p_sys->ssh_session == NULL )
         goto error;
@@ -275,7 +275,7 @@ static int Open( vlc_object_t* p_this )
     else
         i_port = url.i_port;
 
-    /* Create the ssh connexion and wait until the server answer */
+    /* Create the ssh connection and wait until the server answer */
     if( SSHSessionInit( p_access, url.psz_host, i_port ) != VLC_SUCCESS )
         goto error;
 

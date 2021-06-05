@@ -568,7 +568,7 @@ static int MMSOpen( stream_t  *p_access, vlc_url_t *p_url, int  i_proto )
     free( tmp );
 
     mms_CommandSend( p_access,
-                     0x01,          /* connexion request */
+                     0x01,          /* connection request */
                      0x00000000,    /* flags, FIXME */
                      0x0004000b,    /* ???? */
                      buffer.p_data,
@@ -645,7 +645,7 @@ do \
     free( tmp );
 
     mms_CommandSend( p_access,
-                     0x02,          /* connexion request */
+                     0x02,          /* connection request */
                      0x00000000,    /* flags, FIXME */
                      0xffffffff,    /* ???? */
                      buffer.p_data,

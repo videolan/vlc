@@ -69,7 +69,7 @@
 #define PASS_LONGTEXT N_("Password that will be used for the connection, " \
         "if no username or password are set in URL.")
 
-#define RDP_ENCRYPT N_("Encrypted connexion")
+#define RDP_ENCRYPT N_("Encrypted connection")
 #define RDP_FPS N_("Frame rate")
 #define RDP_FPS_LONGTEXT N_("Acquisition rate (in fps)")
 
@@ -215,7 +215,7 @@ static bool preConnectHandler( freerdp *p_instance )
     vlcrdp_context_t * p_vlccontext = (vlcrdp_context_t *) p_instance->context;
     demux_sys_t *p_sys = p_vlccontext->p_demux->p_sys;
 
-    /* Configure connexion */
+    /* Configure connection */
     p_instance->settings->SoftwareGdi = true; /* render in buffer */
     p_instance->settings->Fullscreen = true;
     p_instance->settings->ServerHostname = strdup( p_sys->psz_hostname );
