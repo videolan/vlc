@@ -1,14 +1,14 @@
 # VLC media player
 
-**VLC** is a libre and open source **media player** and **multimedia engine**,
+**VLC** is a libre and open-source **media player** and **multimedia engine**,
 focused on **playing everything**, and **running everywhere**.
 
 **VLC** can play most multimedia files, discs, streams, devices and is also able to
-convert, encode, **stream** and manipulate streams into numerous formats.
+convert, encode, **stream**, and manipulate streams into numerous formats.
 
 VLC is used by many over the world, on numerous platforms, for very different use cases.
 
-The **engine of VLC** can be embedded into 3rd party applications, and is called *libVLC*.
+The **engine of VLC** can be embedded into 3rd party applications and is called *libVLC*.
 
 **VLC** is part of the [VideoLAN project](https://videolan.org) and
 is developed and supported by a community of volunteers.
@@ -23,7 +23,7 @@ been downloaded **billions** of times.
 *On some platforms, it is de facto GPLv3, because of the licenses of dependencies*.
 
 **libVLC**, the engine is released under the LGPLv2 *(or later)* license. \
-This allows embedding the engine in 3rd party applications, while letting them to be licensed under other licenses.
+This allows embedding the engine in 3rd party applications while letting them be licensed under other licenses.
 
 # Platforms
 
@@ -51,11 +51,11 @@ than the main one.
 # Contributing & Community
 
 **VLC** is maintained by a community of people, and VideoLAN is not paying any of them.\
-The community is composed of developers, helpers, maintainers, designers and writers that want
+The community is composed of developers, helpers, maintainers, designers, and writers that want
 this open source project to thrive.
 
 The main development of VLC is done in the C language, but this repository also contains
-plenty of C++, Obj-C, asm and Rust.
+plenty of C++, Obj-C, asm, and Rust.
 
 Other repositories linked to vlc are done in languages including Kotlin/Java [(Android)](https://code.videolan.org/videolan/vlc-android/),
 Swift [(iOS)](https://code.videolan.org/videolan/vlc-ios/), and C# [(libVLCSharp)](https://code.videolan.org/videolan/libvlcsharp/).
@@ -85,7 +85,7 @@ CI and discussions should be resolved before a Merge Request can be merged.
 **libVLC** is an embeddable engine for 3rd party applications and frameworks.
 
 It runs on the same platforms as VLC *(and sometimes on more)* and can provide playback,
-streaming and converting of multimedia files and streams.
+streaming, and converting multimedia files and streams.
 
 
 **libVLC** has numerous bindings for other languages, like C++, Python and C#.
