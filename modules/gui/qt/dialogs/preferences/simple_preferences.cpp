@@ -776,7 +776,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             ui.skinsLabel->setFont( italicFont );
 
 #ifdef _WIN32
-            BUTTONACT( ui.assoButton, assoDialog() );
+            BUTTONACT( ui.assoButton, &SPrefsPanel::assoDialog );
 #else
             ui.osGroupBox->hide();
 #endif
@@ -1045,8 +1045,8 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 ui.bannedEntryPoints->setMLFoldersModel( bannedFoldersModel );
                 mlBannedFoldersEditor = ui.bannedEntryPoints;
 
-                BUTTONACT( ui.addButton , MLaddNewFolder() );
-                BUTTONACT( ui.banButton , MLBanFolder() );
+                BUTTONACT( ui.addButton, &SPrefsPanel::MLaddNewFolder );
+                BUTTONACT( ui.banButton, &SPrefsPanel::MLBanFolder );
             }
             else
             {

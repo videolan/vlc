@@ -272,7 +272,7 @@ FileConfigControl::FileConfigControl( module_config_t *_p_item, QWidget *p ) :
     text = new QLineEdit( qfu(p_item->value.psz), p );
     browse = new QPushButton( qtr( "Browse..." ), p );
 
-    BUTTONACT( browse, updateField() );
+    BUTTONACT( browse, &FileConfigControl::updateField );
 
     finish();
 }
@@ -286,7 +286,7 @@ FileConfigControl::FileConfigControl( module_config_t *_p_item,
     text = _text;
     label = _label;
 
-    BUTTONACT( browse, updateField() );
+    BUTTONACT( browse, &FileConfigControl::updateField );
 
     finish( );
 }
@@ -1003,7 +1003,7 @@ void ColorConfigControl::finish()
         color_but->setToolTip( formatTooltip(qfut(p_item->psz_longtext)) );
     }
 
-    BUTTONACT( color_but, selectColor() );
+    BUTTONACT( color_but, &ColorConfigControl::selectColor );
 }
 
 int ColorConfigControl::getValue() const
@@ -1432,7 +1432,7 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
 
     connect( buttonBox, &QDialogButtonBox::accepted, this, &KeyInputDialog::accept );
     connect( buttonBox, &QDialogButtonBox::rejected, this, &KeyInputDialog::reject );
-    BUTTONACT( unset, unsetAction() );
+    BUTTONACT( unset, &KeyInputDialog::unsetAction );
 }
 
 void KeyInputDialog::setExistingkeysSet( const QSet<QString> *keyset )

@@ -113,10 +113,10 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
     ui.subGroupBox->setEnabled( false );
 
     /* Connects  */
-    BUTTONACT( ui.fileBrowseButton, browseFile() );
-    BUTTONACT( ui.removeFileButton, removeFile() );
+    BUTTONACT( ui.fileBrowseButton, &FileOpenPanel::browseFile );
+    BUTTONACT( ui.removeFileButton, &FileOpenPanel::removeFile );
 
-    BUTTONACT( ui.subBrowseButton, browseFileSub() );
+    BUTTONACT( ui.subBrowseButton, &FileOpenPanel::browseFileSub );
     connect( ui.subGroupBox, &QGroupBox::toggled, this, &FileOpenPanel::updateMRL );
 
     connect( ui.fileListWidg, &QListWidget::itemChanged, this, &FileOpenPanel::updateMRL );
@@ -374,14 +374,14 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
 #endif
 
     /* CONNECTs */
-    BUTTONACT( ui.dvdRadioButton,     updateButtons() );
-    BUTTONACT( ui.bdRadioButton,      updateButtons() );
-    BUTTONACT( ui.vcdRadioButton,     updateButtons() );
-    BUTTONACT( ui.audioCDRadioButton, updateButtons() );
-    BUTTONACT( ui.dvdsimple,          updateButtons() );
-    BUTTONACT( ui.browseDiscButton, browseDevice() );
+    BUTTONACT( ui.dvdRadioButton,     &DiscOpenPanel::updateButtons );
+    BUTTONACT( ui.bdRadioButton,      &DiscOpenPanel::updateButtons );
+    BUTTONACT( ui.vcdRadioButton,     &DiscOpenPanel::updateButtons );
+    BUTTONACT( ui.audioCDRadioButton, &DiscOpenPanel::updateButtons );
+    BUTTONACT( ui.dvdsimple,          &DiscOpenPanel::updateButtons );
+    BUTTONACT( ui.browseDiscButton,   &DiscOpenPanel::browseDevice );
     BUTTON_SET_ACT_I( ui.ejectButton, "", toolbar/eject, qtr( "Eject the disc" ),
-            eject() );
+            &DiscOpenPanel::eject );
 
     connect( ui.deviceCombo, &QComboBox::editTextChanged, this, &DiscOpenPanel::updateMRL );
     connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -787,7 +787,7 @@ void CaptureOpenPanel::initialize()
 
     ui.setupUi( this );
 
-    BUTTONACT( ui.advancedButton, advancedDialog() );
+    BUTTONACT( ui.advancedButton, &CaptureOpenPanel::advancedDialog );
     connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
              this, &CaptureOpenPanel::enableAdvancedDialog );
 
@@ -1051,20 +1051,20 @@ void CaptureOpenPanel::initialize()
     CuMRL( dvbPskBox, QOverload<int>::of(&QComboBox::currentIndexChanged) );
     CuMRL( dvbBandBox, QOverload<int>::of(&QComboBox::currentIndexChanged) );
 
-    BUTTONACT( dvbc, updateButtons() );
-    BUTTONACT( dvbs, updateButtons() );
-    BUTTONACT( dvbs2, updateButtons() );
-    BUTTONACT( dvbt, updateButtons() );
-    BUTTONACT( dvbt2, updateButtons() );
-    BUTTONACT( atsc, updateButtons() );
-    BUTTONACT( cqam, updateButtons() );
-    BUTTONACT( dvbc, updateMRL() );
-    BUTTONACT( dvbt, updateMRL() );
-    BUTTONACT( dvbt2, updateMRL() );
-    BUTTONACT( dvbs, updateMRL() );
-    BUTTONACT( dvbs2, updateMRL() );
-    BUTTONACT( atsc, updateMRL() );
-    BUTTONACT( cqam, updateMRL() );
+    BUTTONACT( dvbc, &CaptureOpenPanel::updateButtons );
+    BUTTONACT( dvbs, &CaptureOpenPanel::updateButtons );
+    BUTTONACT( dvbs2, &CaptureOpenPanel::updateButtons );
+    BUTTONACT( dvbt, &CaptureOpenPanel::updateButtons );
+    BUTTONACT( dvbt2, &CaptureOpenPanel::updateButtons );
+    BUTTONACT( atsc, &CaptureOpenPanel::updateButtons );
+    BUTTONACT( cqam, &CaptureOpenPanel::updateButtons );
+    BUTTONACT( dvbc, &CaptureOpenPanel::updateMRL );
+    BUTTONACT( dvbt, &CaptureOpenPanel::updateMRL );
+    BUTTONACT( dvbt2, &CaptureOpenPanel::updateMRL );
+    BUTTONACT( dvbs, &CaptureOpenPanel::updateMRL );
+    BUTTONACT( dvbs2, &CaptureOpenPanel::updateMRL );
+    BUTTONACT( atsc, &CaptureOpenPanel::updateMRL );
+    BUTTONACT( cqam, &CaptureOpenPanel::updateMRL );
     configList << "dvb-adapter" << "dvb-frequency" << "dvb-modulation"
                << "dvb-bandwidth";
     }

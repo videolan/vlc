@@ -155,7 +155,7 @@ struct vlc_player_locker {
 /* For marking translatable static strings (like `_()`) */
 #define qtr( i ) qfut( i )
 
-#define BUTTONACT( b, a ) connect( b, SIGNAL(clicked()), this, SLOT(a) )
+#define BUTTONACT( b, a ) connect( b, &QAbstractButton::clicked, this, a )
 
 #define BUTTON_SET( button, text, tooltip )  \
     button->setText( text );                 \

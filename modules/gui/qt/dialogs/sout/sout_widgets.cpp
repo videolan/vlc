@@ -136,7 +136,7 @@ FileDestBox::FileDestBox( QWidget *_parent, qt_intf_t * _p_intf ) : VirtualDestB
 
     layout->addWidget(fileSelectButton, 1, 5, 1, 1);
     connect( fileEdit, &QLineEdit::textChanged, this, &FileDestBox::mrlUpdated );
-    BUTTONACT( fileSelectButton, fileBrowse() );
+    BUTTONACT( fileSelectButton, &FileDestBox::fileBrowse );
 }
 
 QString FileDestBox::getMRL( const QString& mux )

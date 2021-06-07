@@ -79,7 +79,7 @@ SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inpu
     ui.destBox->addItem( "UDP (legacy)" );
     ui.destBox->addItem( "Icecast" );
 
-    BUTTONACT( ui.addButton, addDest() );
+    BUTTONACT( ui.addButton, &SoutDialog::addDest );
 
     /* Connect everything to the updateChain function */
 

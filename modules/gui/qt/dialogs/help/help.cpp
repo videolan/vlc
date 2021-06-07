@@ -221,7 +221,7 @@ UpdateDialog::UpdateDialog( qt_intf_t *_p_intf ) : QVLCFrame( _p_intf )
     setWindowTitle( qtr( "VLC media player updates" ) );
     setWindowRole( "vlc-update" );
 
-    BUTTONACT( recheckButton, UpdateOrDownload() );
+    BUTTONACT( recheckButton, &UpdateDialog::UpdateOrDownload );
     connect( ui.updateDialogButtonBox, &QDialogButtonBox::rejected, this, &UpdateDialog::close );
 
     connect( ui.updateNotifyButtonBox, &QDialogButtonBox::accepted, this, &UpdateDialog::UpdateOrDownload );

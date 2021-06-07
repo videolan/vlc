@@ -156,13 +156,13 @@ OpenDialog::OpenDialog( QWindow *parent,
              this, QOverload<>::of(&OpenDialog::updateMRL) );
     connect( ui.stopTimeTimeEdit, &QTimeEdit::timeChanged,
              this, QOverload<>::of(&OpenDialog::updateMRL) );
-    BUTTONACT( ui.advancedCheckBox, toggleAdvancedPanel() );
-    BUTTONACT( ui.slaveBrowseButton, browseInputSlave() );
+    BUTTONACT( ui.advancedCheckBox, &OpenDialog::toggleAdvancedPanel );
+    BUTTONACT( ui.slaveBrowseButton, &OpenDialog::browseInputSlave );
 
     /* Buttons action */
-    BUTTONACT( playButton, selectSlots() );
-    BUTTONACT( selectButton, close() );
-    BUTTONACT( cancelButton, cancel() );
+    BUTTONACT( playButton, &OpenDialog::selectSlots );
+    BUTTONACT( selectButton, &OpenDialog::close );
+    BUTTONACT( cancelButton, &OpenDialog::cancel );
 
     /* Hide the advancedPanel */
     if( !getSettings()->value( "OpenDialog/advanced", false ).toBool())

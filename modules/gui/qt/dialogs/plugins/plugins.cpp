@@ -93,7 +93,7 @@ PluginDialog::PluginDialog( qt_intf_t *_p_intf ) : QVLCFrame( _p_intf )
     QPushButton *okButton = new QPushButton( qtr( "&Close" ), this );
     box->addButton( okButton, QDialogButtonBox::RejectRole );
     layout->addWidget( box );
-    BUTTONACT( okButton, close() );
+    BUTTONACT( okButton, &PluginDialog::close );
     restoreWidgetPosition( "PluginsDialog", QSize( 435, 280 ) );
 }
 
@@ -1427,7 +1427,7 @@ ExtensionInfoDialog::ExtensionInfoDialog( const QModelIndex &index,
     QDialogButtonBox *group = new QDialogButtonBox( this );
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     group->addButton( closeButton, QDialogButtonBox::RejectRole );
-    BUTTONACT( closeButton, close() );
+    BUTTONACT( closeButton, &ExtensionInfoDialog::close );
 
     layout->addWidget( group, 7, 0, 1, -1 );
 
@@ -1540,7 +1540,7 @@ AddonInfoDialog::AddonInfoDialog( const QModelIndex &index,
     QDialogButtonBox *group = new QDialogButtonBox( this );
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     group->addButton( closeButton, QDialogButtonBox::RejectRole );
-    BUTTONACT( closeButton, close() );
+    BUTTONACT( closeButton, &AddonInfoDialog::close );
 
     layout->addWidget( group, 7, 0, 1, -1 );
 

@@ -224,7 +224,7 @@ ExtVideo::ExtVideo( qt_intf_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( eraseMaskText, &QLineEdit::editingFinished )
     SETUP_VFILTER_OPTION( eraseYSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
     SETUP_VFILTER_OPTION( eraseXSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
-    BUTTONACT( ui.eraseBrowseBtn, browseEraseFile() );
+    BUTTONACT( ui.eraseBrowseBtn, &ExtVideo::browseEraseFile );
 
     SETUP_VFILTER_gb( marq )
     SETUP_VFILTER_OPTION( marqMarqueeText, &QLineEdit::textChanged )
@@ -235,7 +235,7 @@ ExtVideo::ExtVideo( qt_intf_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( logoYSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
     SETUP_VFILTER_OPTION( logoXSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
     SETUP_VFILTER_OPTION( logoOpacitySlider, &QSlider::valueChanged )
-    BUTTONACT( ui.logoBrowseBtn, browseLogo() );
+    BUTTONACT( ui.logoBrowseBtn, &ExtVideo::browseLogo );
 
     SETUP_VFILTER_gb( gradfun )
     SETUP_VFILTER_OPTION( gradfunRadiusSlider, &QSlider::valueChanged )
@@ -1482,7 +1482,7 @@ SyncControls::SyncControls( qt_intf_t *_p_intf, QWidget *_parent )
     connect( &m_SubsDelayCfgFactor, &QVLCFloat::valueChanged, subDurationSpin, &QDoubleSpinBox::setValue);
 
     BUTTON_SET_ACT_I( updateButton, "", update,
-            qtr( "Force update of this dialog's values" ), update() );
+            qtr( "Force update of this dialog's values" ), &SyncControls::update );
 
     initSubsDuration();
 

@@ -81,7 +81,7 @@ ConvertDialog::ConvertDialog( QWindow *parent, qt_intf_t *_p_intf,
     {
         QPushButton *fileSelectButton = new QPushButton( qtr( "Browse" ) );
         destLayout->addWidget( fileSelectButton, 0, 2);
-        BUTTONACT( fileSelectButton, fileBrowse() );
+        BUTTONACT( fileSelectButton, &ConvertDialog::fileBrowse );
     }
 
     // but multiple files follow a naming convention
@@ -143,8 +143,8 @@ ConvertDialog::ConvertDialog( QWindow *parent, qt_intf_t *_p_intf,
 
     mainLayout->addWidget( buttonBox, 5, 3 );
 
-    BUTTONACT(okButton,close());
-    BUTTONACT(cancelButton,cancel());
+    BUTTONACT( okButton, &ConvertDialog::close );
+    BUTTONACT( cancelButton, &ConvertDialog::cancel );
 
     connect( convertRadio, &QRadioButton::toggled, convertPanel, &QWidget::setEnabled );
     connect( profile, &VLCProfileSelector::optionsChanged, this, &ConvertDialog::setDestinationFileExtension );

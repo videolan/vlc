@@ -145,14 +145,14 @@ VLMDialog::VLMDialog( qt_intf_t *_p_intf ) : QVLCFrame( _p_intf )
     connect( ui.vlmListItem, &QListWidget::currentRowChanged,
              this, &VLMDialog::selectVLMItem );
 
-    BUTTONACT( closeButton, close() );
-    BUTTONACT( exportButton, exportVLMConf() );
-    BUTTONACT( importButton, importVLMConf() );
-    BUTTONACT( ui.addButton, addVLMItem() );
-    BUTTONACT( ui.clearButton, clearWidgets() );
-    BUTTONACT( ui.saveButton, saveModifications() );
-    BUTTONACT( ui.inputButton, selectInput() );
-    BUTTONACT( ui.outputButton, selectOutput() );
+    BUTTONACT( closeButton, &VLMDialog::close );
+    BUTTONACT( exportButton, &VLMDialog::exportVLMConf );
+    BUTTONACT( importButton, &VLMDialog::importVLMConf );
+    BUTTONACT( ui.addButton, &VLMDialog::addVLMItem );
+    BUTTONACT( ui.clearButton, &VLMDialog::clearWidgets );
+    BUTTONACT( ui.saveButton, &VLMDialog::saveModifications );
+    BUTTONACT( ui.inputButton, &VLMDialog::selectInput );
+    BUTTONACT( ui.outputButton, &VLMDialog::selectOutput );
 
     if( !restoreGeometry( getSettings()->value("VLM/geometry").toByteArray() ) )
     {
@@ -473,8 +473,8 @@ VLMAWidget::VLMAWidget( VLMWrapper *_vlm, const QString& _name,
     deleteButton->setToolTip( qtr("Delete") );
     objLayout->addWidget( deleteButton, 0, 6 );
 
-    BUTTONACT( modifyButton, modify() );
-    BUTTONACT( deleteButton, del() );
+    BUTTONACT( modifyButton, &VLMAWidget::modify );
+    BUTTONACT( deleteButton, &VLMAWidget::del );
     connect( this, &VLMAWidget::clicked, this, &VLMAWidget::toggleEnabled );
 }
 
@@ -524,9 +524,9 @@ VLMBroadcast::VLMBroadcast( VLMWrapper *vlm, const QString& _name,
     loopButton->setToolTip( qtr("Repeat") );
     objLayout->addWidget( loopButton, 1, 2 );
 
-    BUTTONACT( playButton, togglePlayPause() );
-    BUTTONACT( stopButton, stop() );
-    BUTTONACT( loopButton, toggleLoop() );
+    BUTTONACT( playButton, &VLMBroadcast::togglePlayPause );
+    BUTTONACT( stopButton, &VLMBroadcast::stop );
+    BUTTONACT( loopButton, &VLMBroadcast::toggleLoop );
 
     update();
 }

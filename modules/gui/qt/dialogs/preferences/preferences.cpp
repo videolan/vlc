@@ -144,12 +144,12 @@ PrefsDialog::PrefsDialog( QWindow *parent, qt_intf_t *_p_intf )
     else
         setSimple();
 
-    BUTTONACT( save, save() );
-    BUTTONACT( cancel, cancel() );
-    BUTTONACT( reset, reset() );
+    BUTTONACT( save, &PrefsDialog::save );
+    BUTTONACT( cancel, &PrefsDialog::cancel );
+    BUTTONACT( reset, &PrefsDialog::reset );
 
-    BUTTONACT( simple, setSimple() );
-    BUTTONACT( all, setAdvanced() );
+    BUTTONACT( simple, &PrefsDialog::setSimple );
+    BUTTONACT( all, &PrefsDialog::setAdvanced );
 
     QVLCTools::restoreWidgetPosition( p_intf, "Preferences", this, QSize( 850, 700 ) );
 }
