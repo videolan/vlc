@@ -349,8 +349,10 @@ SpinningIcon::SpinningIcon( QWidget *parent ) : QLabel( parent )
     frames << ":/util/wait3.svg";
     frames << ":/util/wait4.svg";
     animator = new PixmapAnimator( this, frames, SPINNER_SIZE, SPINNER_SIZE );
-    CONNECT( animator, pixmapReady( const QPixmap & ), this, setPixmap( const QPixmap & ) );
-    CONNECT( animator, pixmapReady( const QPixmap & ), this, repaint() );
+    connect( animator, &PixmapAnimator::pixmapReady, this, [=]( const QPixmap &pixmap ) {
+        this->setPixmap( pixmap );
+        this->repaint();
+    } );
     setScaledContents( true );
     setFixedSize( 16, 16 );
     animator->setCurrentTime( 0 );
@@ -365,8 +367,8 @@ QToolButtonExt::QToolButtonExt(QWidget *parent, int ms )
     /* default to twice the doubleclick delay */
     setAutoRepeatDelay( ( ms > 0 )? ms : 2 * QApplication::doubleClickInterval() );
     setAutoRepeatInterval( 100 );
-    connect( this, SIGNAL(released()), this, SLOT(releasedSlot()) );
-    connect( this, SIGNAL(clicked()), this, SLOT(clickedSlot()) );
+    connect( this, &QToolButtonExt::released, this, &QToolButtonExt::releasedSlot );
+    connect( this, &QToolButtonExt::clicked, this, &QToolButtonExt::clickedSlot );
 }
 
 /* table illustrating the different scenarios and the events generated

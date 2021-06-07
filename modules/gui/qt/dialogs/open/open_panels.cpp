@@ -117,10 +117,10 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
     BUTTONACT( ui.removeFileButton, removeFile() );
 
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
-    CONNECT( ui.subGroupBox, toggled( bool ), this, updateMRL() );
+    connect( ui.subGroupBox, &QGroupBox::toggled, this, &FileOpenPanel::updateMRL );
 
-    CONNECT( ui.fileListWidg, itemChanged( QListWidgetItem * ), this, updateMRL() );
-    CONNECT( ui.subInput, textChanged( const QString& ), this, updateMRL() );
+    connect( ui.fileListWidg, &QListWidget::itemChanged, this, &FileOpenPanel::updateMRL );
+    connect( ui.subInput, &QLineEdit::textChanged, this, &FileOpenPanel::updateMRL );
     updateButtons();
 }
 
@@ -174,7 +174,7 @@ inline void FileOpenPanel::BuildOldPanel()
     if( !lineEdits.isEmpty() )
     {
         QLineEdit *lineFileEdit = lineEdits[0];
-        CONNECT( lineFileEdit, textChanged( const QString& ), this, updateMRL() );
+        connect( lineFileEdit, &QLineEdit::textChanged, this, &FileOpenPanel::updateMRL );
     }
 
     dialogBox->layout()->setMargin( 0 );
@@ -383,13 +383,18 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
     BUTTON_SET_ACT_I( ui.ejectButton, "", toolbar/eject, qtr( "Eject the disc" ),
             eject() );
 
-    CONNECT( ui.deviceCombo, editTextChanged( QString ), this, updateMRL());
-    CONNECT( ui.deviceCombo, currentIndexChanged( QString ), this, updateMRL());
-    CONNECT( ui.titleSpin, valueChanged( int ), this, updateMRL());
-    CONNECT( ui.chapterSpin, valueChanged( int ), this, updateMRL());
-    CONNECT( ui.audioSpin, valueChanged( int ), this, updateMRL());
-    CONNECT( ui.subtitlesSpin, valueChanged( int ), this, updateMRL());
-    CONNECT( ui.dvdsimple, toggled( bool ), this, updateMRL());
+    connect( ui.deviceCombo, &QComboBox::editTextChanged, this, &DiscOpenPanel::updateMRL );
+    connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+             this, &DiscOpenPanel::updateMRL );
+    connect( ui.titleSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+             this, &DiscOpenPanel::updateMRL );
+    connect( ui.chapterSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+             this, &DiscOpenPanel::updateMRL );
+    connect( ui.audioSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+             this, &DiscOpenPanel::updateMRL );
+    connect( ui.subtitlesSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+             this, &DiscOpenPanel::updateMRL );
+    connect( ui.dvdsimple, &QCheckBox::toggled, this, &DiscOpenPanel::updateMRL );
 
     /* Run once the updateButtons function in order to fill correctly the comboBoxes */
     updateButtons();
@@ -678,7 +683,7 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
-    CONNECT( ui.urlComboBox, editTextChanged( const QString& ), this, updateMRL());
+    connect( ui.urlComboBox, &QComboBox::editTextChanged, this, &NetOpenPanel::updateMRL );
 
     /* */
     if( var_InheritBool( p_intf, "save-recentplay" ) )
@@ -783,7 +788,8 @@ void CaptureOpenPanel::initialize()
     ui.setupUi( this );
 
     BUTTONACT( ui.advancedButton, advancedDialog() );
-    CONNECT( ui.deviceCombo, currentIndexChanged(int), this, enableAdvancedDialog(int) );
+    connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+             this, &CaptureOpenPanel::enableAdvancedDialog );
 
     /* Create two stacked layouts in the main comboBoxes */
     QStackedLayout *stackedDevLayout = new QStackedLayout;
@@ -804,7 +810,7 @@ void CaptureOpenPanel::initialize()
     name ## PropPage->setLayout( name ## PropLayout );                \
     ui.deviceCombo->addItem( qfut( label ), QVariant( number ) );
 
-#define CuMRL( widget, slot ) CONNECT( widget , slot , this, updateMRL() );
+#define CuMRL( widget, slot ) connect( widget, slot, this, &CaptureOpenPanel::updateMRL );
 
 #ifdef _WIN32
     /*********************
@@ -835,9 +841,9 @@ void CaptureOpenPanel::initialize()
             1, 0, 3, 1 );
 
     /* dshow CONNECTs */
-    CuMRL( vdevDshowW, changed() );
-    CuMRL( adevDshowW, changed() );
-    CuMRL( dshowVSizeLine, textChanged( const QString& ) );
+    CuMRL( vdevDshowW, &StringListConfigControl::changed );
+    CuMRL( adevDshowW, &StringListConfigControl::changed );
+    CuMRL( dshowVSizeLine, &QLineEdit::textChanged );
     configList << "dshow-vdev" << "dshow-adev" << "dshow-size";
     }
 #else /* _WIN32 */
@@ -889,11 +895,11 @@ void CaptureOpenPanel::initialize()
             1, 0, 3, 2 );
 
     /* v4l2 CONNECTs */
-    CuMRL( v4l2VideoDevice->lineEdit(), textChanged( const QString& ) );
-    CuMRL( v4l2VideoDevice,  currentIndexChanged ( int ) );
-    CuMRL( v4l2AudioDevice->lineEdit(), textChanged( const QString& ) );
-    CuMRL( v4l2AudioDevice,  currentIndexChanged ( int ) );
-    CuMRL( v4l2StdBox,  currentIndexChanged ( int ) );
+    CuMRL( v4l2VideoDevice->lineEdit(), &QLineEdit::textChanged );
+    CuMRL( v4l2VideoDevice, QOverload<int>::of(&QComboBox::currentIndexChanged) );
+    CuMRL( v4l2AudioDevice->lineEdit(), &QLineEdit::textChanged );
+    CuMRL( v4l2AudioDevice, QOverload<int>::of(&QComboBox::currentIndexChanged) );
+    CuMRL( v4l2StdBox, QOverload<int>::of(&QComboBox::currentIndexChanged) );
     configList << "v4l2-standard";
     }
 
@@ -935,10 +941,10 @@ void CaptureOpenPanel::initialize()
     jackPropLayout->addWidget( jackConnect, 1, 2 );
 
     /* Jack CONNECTs */
-    CuMRL( jackChannels, valueChanged( int ) );
-    CuMRL( jackPace, stateChanged( int ) );
-    CuMRL( jackConnect, stateChanged( int ) );
-    CuMRL( jackPortsSelected, textChanged( const QString& ) );
+    CuMRL( jackChannels, QOverload<int>::of(&QSpinBox::valueChanged) );
+    CuMRL( jackPace, &QCheckBox::stateChanged );
+    CuMRL( jackConnect, &QCheckBox::stateChanged );
+    CuMRL( jackPortsSelected, &QLineEdit::textChanged );
     configList << "jack-input-use-vlc-pace" << "jack-input-auto-connect";
     }
 #endif
@@ -1038,12 +1044,12 @@ void CaptureOpenPanel::initialize()
             2, 0, 2, 1 );
 
     /* DVB CONNECTs */
-    CuMRL( dvbCard, valueChanged ( int ) );
-    CuMRL( dvbFreq, valueChanged ( int ) );
-    CuMRL( dvbSrate, valueChanged ( int ) );
-    CuMRL( dvbQamBox, currentIndexChanged ( int ) );
-    CuMRL( dvbPskBox, currentIndexChanged ( int ) );
-    CuMRL( dvbBandBox, currentIndexChanged ( int ) );
+    CuMRL( dvbCard, QOverload<int>::of(&QSpinBox::valueChanged) );
+    CuMRL( dvbFreq, QOverload<int>::of(&QSpinBox::valueChanged) );
+    CuMRL( dvbSrate, QOverload<int>::of(&QSpinBox::valueChanged) );
+    CuMRL( dvbQamBox, QOverload<int>::of(&QComboBox::currentIndexChanged) );
+    CuMRL( dvbPskBox, QOverload<int>::of(&QComboBox::currentIndexChanged) );
+    CuMRL( dvbBandBox, QOverload<int>::of(&QComboBox::currentIndexChanged) );
 
     BUTTONACT( dvbc, updateButtons() );
     BUTTONACT( dvbs, updateButtons() );
@@ -1120,10 +1126,10 @@ void CaptureOpenPanel::initialize()
                             2, 0, 1, 1 );
 
     /* PVR CONNECTs */
-    CuMRL( pvrDevice, editTextChanged( const QString& ) );
-    CuMRL( pvrAudioDevice, editTextChanged( const QString& ) );
-    CuMRL( pvrFreq, valueChanged ( int ) );
-    CuMRL( pvrNormBox, currentIndexChanged ( int ) );
+    CuMRL( pvrDevice, &QComboBox::editTextChanged );
+    CuMRL( pvrAudioDevice, &QComboBox::editTextChanged );
+    CuMRL( pvrFreq, QOverload<int>::of(&QSpinBox::valueChanged) );
+    CuMRL( pvrNormBox, QOverload<int>::of(&QComboBox::currentIndexChanged) );
     }
 #endif
 
@@ -1149,15 +1155,15 @@ void CaptureOpenPanel::initialize()
     screenPropLayout->addWidget( screenFPS, 0, 1 );
 
     /* Screen connect */
-    CuMRL( screenFPS, valueChanged( double ) );
+    CuMRL( screenFPS, QOverload<double>::of(&QDoubleSpinBox::valueChanged) );
 
     /* General connects */
-    CONNECT( ui.deviceCombo, activated( int ) ,
-             stackedDevLayout, setCurrentIndex( int ) );
-    CONNECT( ui.deviceCombo, activated( int ),
-             stackedPropLayout, setCurrentIndex( int ) );
-    CONNECT( ui.deviceCombo, activated( int ), this, updateMRL() );
-    CONNECT( ui.deviceCombo, activated( int ), this, updateButtons() );
+    connect( ui.deviceCombo, QOverload<int>::of(&QComboBox::activated), [=]( int index ) {
+        stackedDevLayout->setCurrentIndex( index );
+        stackedPropLayout->setCurrentIndex( index );
+        this->updateMRL();
+        this->updateButtons();
+    } );
 
 #undef CuMRL
 #undef addModuleAndLayouts
@@ -1396,8 +1402,8 @@ void CaptureOpenPanel::advancedDialog()
     QPushButton *closeButton = new QPushButton( qtr( "OK" ) );
     QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ) );
 
-    CONNECT( closeButton, clicked(), adv, accept() );
-    CONNECT( cancelButton, clicked(), adv, reject() );
+    connect( closeButton, &QPushButton::clicked, adv, &QDialog::accept );
+    connect( cancelButton, &QPushButton::clicked, adv, &QDialog::reject );
 
     advButtonBox->addButton( closeButton, QDialogButtonBox::AcceptRole );
     advButtonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );

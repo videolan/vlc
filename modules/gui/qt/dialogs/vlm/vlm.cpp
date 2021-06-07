@@ -138,12 +138,12 @@ VLMDialog::VLMDialog( qt_intf_t *_p_intf ) : QVLCFrame( _p_intf )
     showScheduleWidget( QVLM_Broadcast );
 
     /* Connect the comboBox to show the right Widgets */
-    CONNECT( ui.mediaType, currentIndexChanged( int ),
-             this, showScheduleWidget( int ) );
+    connect( ui.mediaType, QOverload<int>::of(&QComboBox::currentIndexChanged),
+             this, &VLMDialog::showScheduleWidget );
 
     /* Connect the leftList to show the good VLMItem */
-    CONNECT( ui.vlmListItem, currentRowChanged( int ),
-             this, selectVLMItem( int ) );
+    connect( ui.vlmListItem, &QListWidget::currentRowChanged,
+             this, &VLMDialog::selectVLMItem );
 
     BUTTONACT( closeButton, close() );
     BUTTONACT( exportButton, exportVLMConf() );
@@ -475,7 +475,7 @@ VLMAWidget::VLMAWidget( VLMWrapper *_vlm, const QString& _name,
 
     BUTTONACT( modifyButton, modify() );
     BUTTONACT( deleteButton, del() );
-    CONNECT( this, clicked( bool ), this, toggleEnabled( bool ) );
+    connect( this, &VLMAWidget::clicked, this, &VLMAWidget::toggleEnabled );
 }
 
 void VLMAWidget::modify()

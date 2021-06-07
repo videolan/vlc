@@ -37,9 +37,9 @@ PodcastConfigDialog::PodcastConfigDialog( qt_intf_t *_p_intf)
     ui.okCancel->addButton( okButton, QDialogButtonBox::AcceptRole );
     ui.okCancel->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
-    CONNECT( ui.podcastAdd, clicked(), this, add() );
-    CONNECT( ui.podcastDelete, clicked(), this, remove() );
-    CONNECT( okButton, clicked(), this, close() );
+    connect( ui.podcastAdd, &QPushButton::clicked, this, &PodcastConfigDialog::add );
+    connect( ui.podcastDelete, &QPushButton::clicked, this, &PodcastConfigDialog::remove );
+    connect( okButton, &QPushButton::clicked, this, &PodcastConfigDialog::close );
 
     char *psz_urls = config_GetPsz( "podcast-urls" );
     if( psz_urls )

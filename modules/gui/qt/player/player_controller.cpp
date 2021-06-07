@@ -1096,9 +1096,10 @@ PlayerController::PlayerController( qt_intf_t *_p_intf )
 {
     /* Audio Menu */
     menusAudioMapper = new QSignalMapper(this);
-    CONNECT( menusAudioMapper, mapped(const QString&), this, menusUpdateAudio(const QString&) );
-    CONNECT( &d_ptr->m_position_timer, timeout(), this, updatePositionFromTimer() );
-    CONNECT( &d_ptr->m_time_timer, timeout(), this, updateTimeFromTimer() );
+    connect( menusAudioMapper, QOverload<const QString &>::of(&QSignalMapper::mappedString),
+             this, &PlayerController::menusUpdateAudio );
+    connect( &d_ptr->m_position_timer, &QTimer::timeout, this, &PlayerController::updatePositionFromTimer );
+    connect( &d_ptr->m_time_timer, &QTimer::timeout, this, &PlayerController::updateTimeFromTimer );
 
     input_fetcher_cbs.on_art_fetch_ended = onArtFetchEnded_callback;
 }

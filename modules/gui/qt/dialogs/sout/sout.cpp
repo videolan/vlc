@@ -65,7 +65,7 @@ SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inpu
     ui.destTab->setTabsClosable( true );
     QTabBar* tb = ui.destTab->findChild<QTabBar*>();
     if( tb != NULL ) tb->tabButton(0, QTabBar::RightSide)->hide();
-    CONNECT( ui.destTab, tabCloseRequested( int ), this, closeTab( int ) );
+    connect( ui.destTab, &QTabWidget::tabCloseRequested, this, &SoutDialog::closeTab );
     ui.destTab->setTabIcon( 0, QIcon( ":/buttons/playlist/playlist_add.svg" ) );
 
     ui.destBox->addItem( qtr( "File" ) );
@@ -81,26 +81,18 @@ SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inpu
 
     BUTTONACT( ui.addButton, addDest() );
 
-//     /* Connect everything to the updateChain function */
-#define CB( x ) CONNECT( ui.x, toggled( bool ), this, updateChain() );
-#define CT( x ) CONNECT( ui.x, textChanged( const QString& ), this, updateChain() );
-#define CS( x ) CONNECT( ui.x, valueChanged( int ), this, updateChain() );
-#define CC( x ) CONNECT( ui.x, currentIndexChanged( int ), this, updateChain() );
+    /* Connect everything to the updateChain function */
 
     /* Misc */
-    CB( soutAll );
-    CB( localOutput ); CB( transcodeBox );
-    CONNECT( ui.profileSelect, optionsChanged(), this, updateChain() );
+    connect( ui.soutAll, &QCheckBox::toggled, this, &SoutDialog::updateChain );
+    connect( ui.localOutput, &QCheckBox::toggled, this, &SoutDialog::updateChain );
+    connect( ui.transcodeBox, &QCheckBox::toggled, this, &SoutDialog::updateChain );
+    connect( ui.profileSelect, &VLCProfileSelector::optionsChanged, this, &SoutDialog::updateChain );
 
     setButtonText( QWizard::BackButton, qtr("Back") );
     setButtonText( QWizard::CancelButton, qtr("Cancel") );
     setButtonText( QWizard::NextButton, qtr("Next") );
     setButtonText( QWizard::FinishButton, qtr("Stream") );
-
-#undef CC
-#undef CS
-#undef CT
-#undef CB
 }
 
 void SoutDialog::closeTab( int i )
@@ -166,7 +158,7 @@ void SoutDialog::addDest( )
     }
 
     int index = ui.destTab->addTab( db, caption );
-    CONNECT( db, mrlUpdated(), this, updateChain() );
+    connect( db, &VirtualDestBox::mrlUpdated, this, &SoutDialog::updateChain );
     ui.destTab->setCurrentIndex( index );
     updateChain();
 }

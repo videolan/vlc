@@ -60,7 +60,7 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
     setTextElideMode( Qt::ElideNone );
 
     setUniformRowHeights( true );
-    CONNECT( this, itemExpanded(QTreeWidgetItem*), this, resizeColumns() );
+    connect( this, &PrefsTree::itemExpanded, this, &PrefsTree::resizeColumns );
 
     main_module = module_get_main();
     assert( main_module );

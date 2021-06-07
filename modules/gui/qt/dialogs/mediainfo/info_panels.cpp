@@ -76,7 +76,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     metaLayout->addWidget( label, line++, col, 1, colspan );              \
     widget = new QLineEdit;                                               \
     metaLayout->addWidget( widget, line, col, 1, colspan );               \
-    CONNECT( widget, textEdited( QString ), this, enterEditMode() );      \
+    connect( widget, &QLineEdit::textEdited, this, &MetaPanel::enterEditMode );      \
 }
 
     /* Title, artist and album*/
@@ -132,7 +132,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     fingerprintButton->setToolTip( qtr( "Find meta data using audio fingerprinting" ) );
     fingerprintButton->setVisible( false );
     metaLayout->addWidget( fingerprintButton, line, 7 , 3, -1 );
-    CONNECT( fingerprintButton, clicked(), this, fingerprint() );
+    connect( fingerprintButton, &QPushButton::clicked, this, &MetaPanel::fingerprint );
 
     line++;
 
@@ -156,7 +156,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     description_text = new QTextEdit;
     description_text->setAcceptRichText( false );
     metaLayout->addWidget( description_text, line, 0, 1, 7 );
-    CONNECT( description_text, textChanged(), this, enterEditMode() );
+    connect( description_text, &QTextEdit::textChanged, this, &MetaPanel::enterEditMode );
     line++;
 
     /* VLC_META_SETTING: Useless */
@@ -168,11 +168,12 @@ MetaPanel::MetaPanel( QWidget *parent,
     metaLayout->setRowStretch( line, 10 );
 #undef ADD_META
 
-    CONNECT( seqnum_text, textEdited( QString ), this, enterEditMode() );
-    CONNECT( seqtot_text, textEdited( QString ), this, enterEditMode() );
+    connect( seqnum_text, &QLineEdit::textEdited, this, &MetaPanel::enterEditMode );
+    connect( seqtot_text, &QLineEdit::textEdited, this, &MetaPanel::enterEditMode );
 
-    CONNECT( date_text, textEdited( QString ), this, enterEditMode() );
-//    CONNECT( THEMIM, artChanged( QString ), this, enterEditMode() );
+    connect( date_text, &QLineEdit::textEdited, this, &MetaPanel::enterEditMode );
+//    connect( THEMIM, QOverload<input_item_t *>::of(&PlayerController::artChanged),
+//             this, &MetaPanel::enterEditMode );
 
     /* We are not yet in Edit Mode */
     b_inEditMode = false;
@@ -227,10 +228,9 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META( Genre, genre_text );
     UPDATE_META( Copyright, copyright_text );
     UPDATE_META( Album, collection_text );
-    disconnect( description_text, SIGNAL(textChanged()), this,
-                SLOT(enterEditMode()) );
+    disconnect( description_text, &QTextEdit::textChanged, this, &MetaPanel::enterEditMode );
     UPDATE_META( Description, description_text );
-    CONNECT( description_text, textChanged(), this, enterEditMode() );
+    connect( description_text, &QTextEdit::textChanged, this, &MetaPanel::enterEditMode );
     UPDATE_META( Language, language_text );
     UPDATE_META( Publisher, publisher_text );
     UPDATE_META( EncodedBy, encodedby_text );
@@ -335,10 +335,9 @@ void MetaPanel::clear()
     collection_text->clear();
     seqnum_text->clear();
     seqtot_text->clear();
-    disconnect( description_text, SIGNAL(textChanged()), this,
-                SLOT(enterEditMode()) );
+    disconnect( description_text, &QTextEdit::textChanged, this, &MetaPanel::enterEditMode );
     description_text->clear();
-    CONNECT( description_text, textChanged(), this, enterEditMode() );
+    connect( description_text, &QTextEdit::textChanged, this, &MetaPanel::enterEditMode );
     date_text->clear();
     language_text->clear();
     nowplaying_text->clear();
@@ -355,7 +354,7 @@ void MetaPanel::clear()
 void MetaPanel::fingerprint()
 {
     FingerprintDialog *dialog = new FingerprintDialog( this, p_intf, p_input );
-    CONNECT( dialog, metaApplied( input_item_t * ), this, fingerprintUpdate( input_item_t * ) );
+    connect( dialog, &FingerprintDialog::metaApplied, this, &MetaPanel::fingerprintUpdate );
     dialog->setAttribute( Qt::WA_DeleteOnClose, true );
     dialog->show();
 }

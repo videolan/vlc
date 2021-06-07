@@ -10,7 +10,7 @@ const QEvent::Type RendererManagerEvent::RemovedEvent =
 RendererManager::RendererManager( qt_intf_t *p_intf_ ) :
     p_intf( p_intf_ ), p_selected_item( NULL )
 {
-    CONNECT( &m_stop_scan_timer, timeout(), this, RendererMenuCountdown() );
+    connect( &m_stop_scan_timer, &QTimer::timeout, this, &RendererManager::RendererMenuCountdown );
 }
 
 RendererManager::~RendererManager()

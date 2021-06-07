@@ -145,10 +145,6 @@ struct vlc_player_locker {
 /* For marking translatable static strings (like `_()`) */
 #define qtr( i ) qfut( i )
 
-#define CONNECT( a, b, c, d ) \
-        connect( a, SIGNAL(b), c, SLOT(d) )
-#define DCONNECT( a, b, c, d ) \
-        connect( a, SIGNAL(b), c, SLOT(d), Qt::DirectConnection )
 #define BUTTONACT( b, a ) connect( b, SIGNAL(clicked()), this, SLOT(a) )
 
 #define BUTTON_SET( button, text, tooltip )  \

@@ -90,7 +90,7 @@ namespace
             networkMgr.setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
             auto reply = networkMgr.get(QNetworkRequest(url));
             QEventLoop loop;
-            QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+            QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
             loop.exec();
 
             if (reply->error() != QNetworkReply::NoError)

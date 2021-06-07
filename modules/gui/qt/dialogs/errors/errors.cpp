@@ -57,7 +57,7 @@ ErrorsDialog::ErrorsDialog( qt_intf_t *_p_intf )
     layout->addWidget( stopShowing, 1, 0 );
     layout->addWidget( buttonBox, 1, 2 );
 
-    CONNECT( buttonBox, rejected(), this, close() );
+    connect( buttonBox, &QDialogButtonBox::rejected, this, &ErrorsDialog::close );
     BUTTONACT( clearButton, clear() );
     BUTTONACT( stopShowing, dontShow() );
 }

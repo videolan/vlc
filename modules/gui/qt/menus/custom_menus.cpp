@@ -109,14 +109,13 @@ RendererMenu::RendererMenu( QMenu *parent, qt_intf_t *p_intf_ )
     status = qwa;
 
     RendererManager *manager = RendererManager::getInstance( p_intf );
-    CONNECT( this, aboutToShow(), manager, StartScan() );
-    CONNECT( group, triggered(QAction*), this, RendererSelected( QAction* ) );
-    DCONNECT( manager, rendererItemAdded( vlc_renderer_item_t * ),
-              this, addRendererItem( vlc_renderer_item_t * ) );
-    DCONNECT( manager, rendererItemRemoved( vlc_renderer_item_t * ),
-              this, removeRendererItem( vlc_renderer_item_t * ) );
-    CONNECT( manager, statusUpdated( int ),
-             this, updateStatus( int ) );
+    connect( this, &RendererMenu::aboutToShow, manager, &RendererManager::StartScan );
+    connect( group, &QActionGroup::triggered, this, &RendererMenu::RendererSelected );
+    connect( manager, SIGNAL(rendererItemAdded( vlc_renderer_item_t * )),
+             this, SLOT(addRendererItem( vlc_renderer_item_t * )), Qt::DirectConnection );
+    connect( manager, SIGNAL(rendererItemRemoved( vlc_renderer_item_t * )),
+             this, SLOT(removeRendererItem( vlc_renderer_item_t * )), Qt::DirectConnection );
+    connect( manager, &RendererManager::statusUpdated, this, &RendererMenu::updateStatus );
 }
 
 RendererMenu::~RendererMenu()

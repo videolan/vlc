@@ -80,7 +80,7 @@ DelegateAnimationHelper::DelegateAnimationHelper( QAbstractItemView *view_,
         animator->setLoopCount( -1 );
     }
     setIndex( QModelIndex() );
-    CONNECT( animator, frameChanged(), this, updateDelegate() );
+    connect( animator, &BasicAnimator::frameChanged, this, &DelegateAnimationHelper::updateDelegate );
 }
 
 void DelegateAnimationHelper::setIndex( const QModelIndex &index_ )

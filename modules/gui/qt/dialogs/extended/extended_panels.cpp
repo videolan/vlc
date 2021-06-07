@@ -139,137 +139,138 @@ static inline void setup_vfilter( qt_intf_t *p_intf, const char* psz_name, QWidg
     free( psz_filters );
 }
 
-#define SETUP_VFILTER( widget ) \
+#define SETUP_VFILTER( widget, type ) \
     setup_vfilter( p_intf, #widget, ui.widget##Enable ); \
-    CONNECT( ui.widget##Enable, clicked(), this, updateFilters() );
+    connect( ui.widget##Enable, &type::clicked, this, &ExtVideo::updateFilters );
+
+#define SETUP_VFILTER_cb( widget ) SETUP_VFILTER( widget, QCheckBox )
+#define SETUP_VFILTER_gb( widget ) SETUP_VFILTER( widget, QGroupBox )
 
 #define SETUP_VFILTER_OPTION( widget, signal ) \
     initComboBoxItems( ui.widget ); \
     setWidgetValue( ui.widget ); \
-    CONNECT( ui.widget, signal, this, updateFilterOptions() );
+    connect( ui.widget, signal, this, &ExtVideo::updateFilterOptions );
 
 ExtVideo::ExtVideo( qt_intf_t *_p_intf, QTabWidget *_parent ) :
             QObject( _parent ), p_intf( _p_intf )
 {
     ui.setupUi( _parent );
 
-    SETUP_VFILTER( adjust )
-    SETUP_VFILTER_OPTION( hueSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( contrastSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( brightnessSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( saturationSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( gammaSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( brightnessThresholdCheck, stateChanged( int ) )
+    SETUP_VFILTER_gb( adjust )
+    SETUP_VFILTER_OPTION( hueSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( contrastSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( brightnessSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( saturationSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( gammaSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( brightnessThresholdCheck, &QCheckBox::stateChanged )
 
-    SETUP_VFILTER( extract )
-    SETUP_VFILTER_OPTION( extractComponentText, textChanged( const QString& ) )
+    SETUP_VFILTER_gb( extract )
+    SETUP_VFILTER_OPTION( extractComponentText, &QLineEdit::textChanged )
 
-    SETUP_VFILTER( posterize )
+    SETUP_VFILTER_cb( posterize )
 
-    SETUP_VFILTER( colorthres )
-    SETUP_VFILTER_OPTION( colorthresColorText, textChanged( const QString& ) )
-    SETUP_VFILTER_OPTION( colorthresSaturationthresSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( colorthresSimilaritythresSlider, valueChanged( int ) )
+    SETUP_VFILTER_gb( colorthres )
+    SETUP_VFILTER_OPTION( colorthresColorText, &QLineEdit::textChanged )
+    SETUP_VFILTER_OPTION( colorthresSaturationthresSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( colorthresSimilaritythresSlider, &QSlider::valueChanged )
 
-    SETUP_VFILTER( sepia )
-    SETUP_VFILTER_OPTION( sepiaIntensitySpin, valueChanged( int ) )
+    SETUP_VFILTER_gb( sepia )
+    SETUP_VFILTER_OPTION( sepiaIntensitySpin, QOverload<int>::of(&QSpinBox::valueChanged) )
 
-    SETUP_VFILTER( invert )
+    SETUP_VFILTER_cb( invert )
 
-    SETUP_VFILTER( gradient )
-    SETUP_VFILTER_OPTION( gradientModeCombo, currentIndexChanged( QString ) )
-    SETUP_VFILTER_OPTION( gradientTypeCheck, stateChanged( int ) )
-    SETUP_VFILTER_OPTION( gradientCartoonCheck, stateChanged( int ) )
+    SETUP_VFILTER_gb( gradient )
+    SETUP_VFILTER_OPTION( gradientModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged) )
+    SETUP_VFILTER_OPTION( gradientTypeCheck, &QCheckBox::stateChanged )
+    SETUP_VFILTER_OPTION( gradientCartoonCheck, &QCheckBox::stateChanged )
 
-    SETUP_VFILTER( motionblur )
-    SETUP_VFILTER_OPTION( blurFactorSlider, valueChanged( int ) )
+    SETUP_VFILTER_gb( motionblur )
+    SETUP_VFILTER_OPTION( blurFactorSlider, &QSlider::valueChanged )
 
-    SETUP_VFILTER( motiondetect )
+    SETUP_VFILTER_cb( motiondetect )
 
-    SETUP_VFILTER( psychedelic )
+    SETUP_VFILTER_cb( psychedelic )
 
-    SETUP_VFILTER( sharpen )
-    SETUP_VFILTER_OPTION( sharpenSigmaSlider, valueChanged( int ) )
+    SETUP_VFILTER_gb( sharpen )
+    SETUP_VFILTER_OPTION( sharpenSigmaSlider, &QSlider::valueChanged )
 
-    SETUP_VFILTER( ripple )
+    SETUP_VFILTER_cb( ripple )
 
-    SETUP_VFILTER( wave )
+    SETUP_VFILTER_cb( wave )
 
-    SETUP_VFILTER( transform )
-    SETUP_VFILTER_OPTION( transformTypeCombo, currentIndexChanged( QString ) )
+    SETUP_VFILTER_gb( transform )
+    SETUP_VFILTER_OPTION( transformTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged) )
 
-    SETUP_VFILTER( rotate )
-    SETUP_VFILTER_OPTION( rotateAngleDial, valueChanged( int ) )
+    SETUP_VFILTER_gb( rotate )
+    SETUP_VFILTER_OPTION( rotateAngleDial, &VLCQDial::valueChanged )
     ui.rotateAngleDial->setWrapping( true );
     ui.rotateAngleDial->setNotchesVisible( true );
 
-    SETUP_VFILTER( puzzle )
-    SETUP_VFILTER_OPTION( puzzleRowsSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( puzzleColsSpin, valueChanged( int ) )
+    SETUP_VFILTER_gb( puzzle )
+    SETUP_VFILTER_OPTION( puzzleRowsSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
+    SETUP_VFILTER_OPTION( puzzleColsSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
 
-    SETUP_VFILTER( magnify )
+    SETUP_VFILTER_cb( magnify )
 
-    SETUP_VFILTER( clone )
-    SETUP_VFILTER_OPTION( cloneCountSpin, valueChanged( int ) )
+    SETUP_VFILTER_gb( clone )
+    SETUP_VFILTER_OPTION( cloneCountSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
 
-    SETUP_VFILTER( wall )
-    SETUP_VFILTER_OPTION( wallRowsSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( wallColsSpin, valueChanged( int ) )
+    SETUP_VFILTER_gb( wall )
+    SETUP_VFILTER_OPTION( wallRowsSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
+    SETUP_VFILTER_OPTION( wallColsSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
 
 
-    SETUP_VFILTER( erase )
-    SETUP_VFILTER_OPTION( eraseMaskText, editingFinished() )
-    SETUP_VFILTER_OPTION( eraseYSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( eraseXSpin, valueChanged( int ) )
+    SETUP_VFILTER_gb( erase )
+    SETUP_VFILTER_OPTION( eraseMaskText, &QLineEdit::editingFinished )
+    SETUP_VFILTER_OPTION( eraseYSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
+    SETUP_VFILTER_OPTION( eraseXSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
     BUTTONACT( ui.eraseBrowseBtn, browseEraseFile() );
 
-    SETUP_VFILTER( marq )
-    SETUP_VFILTER_OPTION( marqMarqueeText, textChanged( const QString& ) )
-    SETUP_VFILTER_OPTION( marqPositionCombo, currentIndexChanged( QString ) )
+    SETUP_VFILTER_gb( marq )
+    SETUP_VFILTER_OPTION( marqMarqueeText, &QLineEdit::textChanged )
+    SETUP_VFILTER_OPTION( marqPositionCombo, QOverload<int>::of(&QComboBox::currentIndexChanged) )
 
-    SETUP_VFILTER( logo )
-    SETUP_VFILTER_OPTION( logoFileText, editingFinished() )
-    SETUP_VFILTER_OPTION( logoYSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( logoXSpin, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( logoOpacitySlider, valueChanged( int ) )
+    SETUP_VFILTER_gb( logo )
+    SETUP_VFILTER_OPTION( logoFileText, &QLineEdit::editingFinished )
+    SETUP_VFILTER_OPTION( logoYSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
+    SETUP_VFILTER_OPTION( logoXSpin, QOverload<int>::of(&QSpinBox::valueChanged) )
+    SETUP_VFILTER_OPTION( logoOpacitySlider, &QSlider::valueChanged )
     BUTTONACT( ui.logoBrowseBtn, browseLogo() );
 
-    SETUP_VFILTER( gradfun )
-    SETUP_VFILTER_OPTION( gradfunRadiusSlider, valueChanged( int ) )
+    SETUP_VFILTER_gb( gradfun )
+    SETUP_VFILTER_OPTION( gradfunRadiusSlider, &QSlider::valueChanged )
 
-    SETUP_VFILTER( grain )
-    SETUP_VFILTER_OPTION( grainVarianceSlider, valueChanged( int ) )
+    SETUP_VFILTER_gb( grain )
+    SETUP_VFILTER_OPTION( grainVarianceSlider, &QSlider::valueChanged )
 
-    SETUP_VFILTER( mirror )
+    SETUP_VFILTER_cb( mirror )
 
-    SETUP_VFILTER( gaussianblur )
-    SETUP_VFILTER_OPTION( gaussianblurSigmaSlider, valueChanged( int ) )
+    SETUP_VFILTER_gb( gaussianblur )
+    SETUP_VFILTER_OPTION( gaussianblurSigmaSlider, &QSlider::valueChanged )
 
-    SETUP_VFILTER( antiflicker )
-    SETUP_VFILTER_OPTION( antiflickerSofteningSizeSlider, valueChanged( int ) )
+    SETUP_VFILTER_gb( antiflicker )
+    SETUP_VFILTER_OPTION( antiflickerSofteningSizeSlider, &QSlider::valueChanged )
 
-    SETUP_VFILTER( hqdn3d )
-    SETUP_VFILTER_OPTION( hqdn3dLumaSpatSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( hqdn3dLumaTempSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( hqdn3dChromaSpatSlider, valueChanged( int ) )
-    SETUP_VFILTER_OPTION( hqdn3dChromaTempSlider, valueChanged( int ) )
+    SETUP_VFILTER_gb( hqdn3d )
+    SETUP_VFILTER_OPTION( hqdn3dLumaSpatSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( hqdn3dLumaTempSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( hqdn3dChromaSpatSlider, &QSlider::valueChanged )
+    SETUP_VFILTER_OPTION( hqdn3dChromaTempSlider, &QSlider::valueChanged )
 
 
-    SETUP_VFILTER( anaglyph )
+    SETUP_VFILTER_cb( anaglyph )
 
 #undef SETUP_VFILTER
 #undef SETUP_VFILTER_OPTION
 
-    CONNECT( ui.cropTopPx, valueChanged( int ), this, cropChange() );
-    CONNECT( ui.cropBotPx, valueChanged( int ), this, cropChange() );
-    CONNECT( ui.cropLeftPx, valueChanged( int ), this, cropChange() );
-    CONNECT( ui.cropRightPx, valueChanged( int ), this, cropChange() );
-    CONNECT( ui.leftRightCropSync, toggled ( bool ), this, cropChange() );
-    CONNECT( ui.topBotCropSync, toggled ( bool ), this, cropChange() );
-    CONNECT( ui.topBotCropSync, toggled( bool ),
-             ui.cropBotPx, setDisabled( bool ) );
-    CONNECT( ui.leftRightCropSync, toggled( bool ),
-             ui.cropRightPx, setDisabled( bool ) );
+    connect( ui.cropTopPx, QOverload<int>::of(&QSpinBox::valueChanged), this, &ExtVideo::cropChange );
+    connect( ui.cropBotPx, QOverload<int>::of(&QSpinBox::valueChanged), this, &ExtVideo::cropChange );
+    connect( ui.cropLeftPx, QOverload<int>::of(&QSpinBox::valueChanged), this, &ExtVideo::cropChange );
+    connect( ui.cropRightPx, QOverload<int>::of(&QSpinBox::valueChanged), this, &ExtVideo::cropChange );
+    connect( ui.leftRightCropSync, &QCheckBox::toggled, this, &ExtVideo::cropChange );
+    connect( ui.topBotCropSync, &QCheckBox::toggled, this, &ExtVideo::cropChange );
+    connect( ui.topBotCropSync, &QCheckBox::toggled, ui.cropBotPx, &QSpinBox::setDisabled );
+    connect( ui.leftRightCropSync, &QCheckBox::toggled, ui.cropRightPx, &QSpinBox::setDisabled );
 }
 
 void ExtVideo::cropChange()
@@ -358,8 +359,7 @@ void ExtVideo::updateFilters()
 }
 
 #define UPDATE_AND_APPLY_TEXT( widget, file ) \
-    CONNECT( ui.widget, textChanged( const QString& ), \
-             this, updateFilterOptions() ); \
+    connect( ui.widget, &QLineEdit::textChanged, this, &ExtVideo::updateFilterOptions ); \
     ui.widget->setText( toNativeSeparators( file ) ); \
     ui.widget->disconnect( SIGNAL( textChanged( const QString& ) ) );
 
@@ -701,8 +701,8 @@ void ExtV4l2::Refresh( void )
                         free(text2);
                         free(val2);
 
-                        CONNECT( combobox, currentIndexChanged( int ), this,
-                                 ValueChange( int ) );
+                        connect( combobox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+                                 this, QOverload<int>::of(&ExtV4l2::ValueChange) );
                         hlayout->addWidget( combobox );
                     }
                     else
@@ -723,8 +723,8 @@ void ExtV4l2::Refresh( void )
                                          &val2 ) )
                             slider->setSingleStep( val2.i_int );
                         slider->setValue( i_val );
-                        CONNECT( slider, valueChanged( int ), this,
-                                 ValueChange( int ) );
+                        connect( slider, &QSlider::valueChanged,
+                                 this, QOverload<int>::of(&ExtV4l2::ValueChange) );
                         hlayout->addWidget( slider );
                     }
                     layout->addLayout( hlayout );
@@ -736,8 +736,8 @@ void ExtV4l2::Refresh( void )
                     button->setObjectName( qfu( psz_var ) );
                     button->setChecked( var_GetBool( p_obj, psz_var ) );
 
-                    CONNECT( button, clicked( bool ), this,
-                             ValueChange( bool ) );
+                    connect( button, &QCheckBox::clicked,
+                             this, QOverload<bool>::of(&ExtV4l2::ValueChange) );
                     layout->addWidget( button );
                     break;
                 }
@@ -748,8 +748,8 @@ void ExtV4l2::Refresh( void )
                         QPushButton *button = new QPushButton( name, box );
                         button->setObjectName( qfu( psz_var ) );
 
-                        CONNECT( button, clicked( bool ), this,
-                                 ValueChange( bool ) );
+                        connect( button, &QPushButton::clicked,
+                                 this, QOverload<bool>::of(&ExtV4l2::ValueChange) );
                         layout->addWidget( button );
                     }
                     else
@@ -773,7 +773,7 @@ void ExtV4l2::Refresh( void )
         msg_Dbg( p_intf, "Couldn't find v4l2 instance" );
         help->show();
         if ( isVisible() )
-            QTimer::singleShot( 2000, this, SLOT(Refresh()) );
+            QTimer::singleShot( 2000, this, &ExtV4l2::Refresh );
     }
     vlc_player_Unlock(p_intf->p_player);
 }
@@ -839,13 +839,13 @@ FilterSliderData::FilterSliderData( QObject *parent,
     slider->setMinimum( p_data->f_min / p_data->f_resolution );
     slider->setMaximum( p_data->f_max / p_data->f_resolution );
     nameLabel->setText( p_data->descs );
-    CONNECT( slider, valueChanged( int ), this, updateText( int ) );
+    connect( slider, &QSlider::valueChanged, this, &FilterSliderData::updateText );
     setValue( initialValue() );
     /* In case current == min|max text would not be first updated */
     if ( slider->value() == slider->maximum() ||
          slider->value() == slider->minimum() )
         updateText( slider->value() );
-    CONNECT( slider, valueChanged( int ), this, onValueChanged( int ) );
+    connect( slider, &QSlider::valueChanged, this, &FilterSliderData::onValueChanged );
 }
 
 void FilterSliderData::setValue( float f )
@@ -904,8 +904,7 @@ AudioFilterControlWidget::AudioFilterControlWidget
 
 void AudioFilterControlWidget::connectConfigChanged( FilterSliderData *slider )
 {
-    connect( slider, SIGNAL( configChanged(QString, QVariant) ),
-             this, SIGNAL( configChanged(QString, QVariant) ) );
+    connect( slider, &FilterSliderData::configChanged, this, &AudioFilterControlWidget::configChanged );
 }
 
 void AudioFilterControlWidget::build()
@@ -947,7 +946,7 @@ void AudioFilterControlWidget::build()
         slidersBox->setChecked( true );
     else
         slidersBox->setChecked( false );
-    CONNECT( slidersBox, toggled(bool), this, enable(bool) );
+    connect( slidersBox, &QGroupBox::toggled, this, &AudioFilterControlWidget::enable );
 
     free( psz_af );
 }
@@ -985,10 +984,10 @@ EqualizerSliderData::EqualizerSliderData( QObject *parent, qt_intf_t *_p_intf,
     slider->setMinimum( p_data->f_min / p_data->f_resolution );
     slider->setMaximum( p_data->f_max / p_data->f_resolution );
     nameLabel->setText( p_data->descs );
-    CONNECT( slider, valueChanged( int ), this, updateText( int ) );
+    connect( slider, &QSlider::valueChanged, this, &EqualizerSliderData::updateText );
     setValue( initialValue() );
     updateText( slider->value() );
-    CONNECT( slider, valueChanged( int ), this, onValueChanged( int ) );
+    connect( slider, &QSlider::valueChanged, this, &EqualizerSliderData::onValueChanged );
 }
 
 QStringList EqualizerSliderData::getBandsFromAout() const
@@ -1180,7 +1179,7 @@ void Equalizer::build()
         ui.presetsCombo->addItem( icon, qfut( preset_list_text[i] ),
                                      QVariant( preset_list[i] ) );
     }
-    CONNECT( ui.presetsCombo, activated(int), this, setCorePreset(int) );
+    connect( ui.presetsCombo, QOverload<int>::of(&QComboBox::activated), this, &Equalizer::setCorePreset );
 
     /* Set enable checkbox */
     PlayerController::AoutPtr p_aout = THEMIM->getAout();
@@ -1191,14 +1190,16 @@ void Equalizer::build()
         psz_af = var_InheritString( p_intf, "audio-filter" );
 
     /* To enable or disable subwidgets */
-    /* If that list grows, better iterate over layout's childs */
-    CONNECT( ui.enableCheck, toggled(bool), ui.presetsCombo, setEnabled(bool) );
-    CONNECT( ui.enableCheck, toggled(bool), ui.presetLabel, setEnabled(bool) );
-    CONNECT( ui.enableCheck, toggled(bool), ui.eq2PassCheck, setEnabled(bool) );
-    CONNECT( ui.enableCheck, toggled(bool), ui.slidersPlaceholder, setEnabled(bool) );
-    CONNECT( ui.enableCheck, toggled(bool), ui.preampSlider, setEnabled(bool) );
-    CONNECT( ui.enableCheck, toggled(bool), ui.preampValue, setEnabled(bool) );
-    CONNECT( ui.enableCheck, toggled(bool), ui.preampLabel, setEnabled(bool) );
+    /* If that list grows, better iterate over layout's children */
+    connect( ui.enableCheck, &QCheckBox::toggled, [=]( bool checked ) {
+        ui.presetsCombo->setEnabled( checked );
+        ui.presetLabel->setEnabled( checked );
+        ui.eq2PassCheck->setEnabled( checked );
+        ui.slidersPlaceholder->setEnabled( checked );
+        ui.preampSlider->setEnabled( checked );
+        ui.preampValue->setEnabled( checked );
+        ui.preampLabel->setEnabled( checked );
+    } );
 
     if( psz_af && filterIsPresent( qfu(psz_af), name ) )
         ui.enableCheck->setChecked( true );
@@ -1209,11 +1210,11 @@ void Equalizer::build()
     ui.enableCheck->toggle(); ui.enableCheck->toggle();
 
     free( psz_af );
-    CONNECT( ui.enableCheck, toggled(bool), this, enable(bool) );
+    connect( ui.enableCheck, &QCheckBox::toggled, this, &Equalizer::enable );
 
     /* Connect and set 2 Pass checkbox */
     ui.eq2PassCheck->setChecked( var_InheritBool( p_aout.get(), "equalizer-2pass" ) );
-    CONNECT( ui.eq2PassCheck, toggled(bool), this, enable2Pass(bool) );
+    connect( ui.eq2PassCheck, &QCheckBox::toggled, this, &Equalizer::enable2Pass );
 }
 
 void Equalizer::setCorePreset( int i_preset )
@@ -1354,7 +1355,8 @@ SyncWidget::SyncWidget( QWidget *_parent ) : QWidget( _parent )
     spinBox.setSingleStep( 0.1 );
     spinBox.setSuffix( " s" );
     spinBox.setButtonSymbols( QDoubleSpinBox::PlusMinus );
-    CONNECT( &spinBox, valueChanged( double ), this, valueChangedHandler( double ) );
+    connect( &spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+             this, &SyncWidget::valueChangedHandler );
     layout->addWidget( &spinBox );
     layout->addWidget( &spinLabel );
     layout->setContentsMargins( 0, 0, 0, 0 );

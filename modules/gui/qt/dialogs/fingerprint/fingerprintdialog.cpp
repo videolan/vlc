@@ -48,14 +48,14 @@ FingerprintDialog::FingerprintDialog(QWidget *parent, qt_intf_t *p_intf,
     ui->buttonsBox->addButton( "&Discard all identities",
                                 QDialogButtonBox::RejectRole );
 
-    CONNECT( ui->buttonsBox, accepted(), this, applyIdentity() );
-    CONNECT( ui->buttonBox, rejected(), this, close() );
-    CONNECT( ui->buttonsBox, rejected(), this, close() );
+    connect( ui->buttonsBox, &QDialogButtonBox::accepted, this, &FingerprintDialog::applyIdentity );
+    connect( ui->buttonBox, &QDialogButtonBox::rejected, this, &FingerprintDialog::close );
+    connect( ui->buttonsBox, &QDialogButtonBox::rejected, this, &FingerprintDialog::close );
 
     t = new (std::nothrow) Chromaprint( p_intf );
     if ( t )
     {
-        CONNECT( t, finished(), this, handleResults() );
+        connect( t, &Chromaprint::finished, this, &FingerprintDialog::handleResults );
         t->enqueue( p_item );
     }
 }

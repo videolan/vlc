@@ -95,11 +95,11 @@ MediaInfoDialog::MediaInfoDialog( qt_intf_t *_p_intf,
     BUTTONACT( saveMetaButton, saveMeta() );
 
     /* Let the MetaData Panel update the URI */
-    CONNECT( MP, uriSet( const QString& ), this, updateURI( const QString& ) );
-    CONNECT( MP, editing(), saveMetaButton, show() );
+    connect( MP, &MetaPanel::uriSet, this, &MediaInfoDialog::updateURI );
+    connect( MP, &MetaPanel::editing, saveMetaButton, &QPushButton::show );
 
     /* Display the buttonBar according to the Tab selected */
-    CONNECT( infoTabW, currentChanged( int ), this, updateButtons( int ) );
+    connect( infoTabW, &QTabWidget::currentChanged, this, &MediaInfoDialog::updateButtons );
 
     /* If using the General Mode */
     if( isMainInputInfo )

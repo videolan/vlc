@@ -101,9 +101,6 @@ void SoutInputBox::setMRL( const QString& mrl )
     }
 }
 
-#define CT( x ) connect( x, SIGNAL(textChanged(QString)), this, SIGNAL(mrlUpdated()) );
-#define CS( x ) connect( x, SIGNAL(valueChanged(int)), this, SIGNAL(mrlUpdated()) );
-
 VirtualDestBox::VirtualDestBox( QWidget *_parent ) : QWidget( _parent )
 {
     label = new QLabel( this );
@@ -138,7 +135,7 @@ FileDestBox::FileDestBox( QWidget *_parent, qt_intf_t * _p_intf ) : VirtualDestB
     fileSelectButton->setSizePolicy(sizePolicy);
 
     layout->addWidget(fileSelectButton, 1, 5, 1, 1);
-    CT( fileEdit );
+    connect( fileEdit, &QLineEdit::textChanged, this, &FileDestBox::mrlUpdated );
     BUTTONACT( fileSelectButton, fileBrowse() );
 }
 
@@ -201,8 +198,8 @@ HTTPDestBox::HTTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
 
     layout->addWidget(HTTPEdit, 2, 1, 1, 1);
     layout->addWidget(HTTPPort, 1, 1, 1, 1);
-    CS( HTTPPort );
-    CT( HTTPEdit );
+    connect( HTTPPort, QOverload<int>::of(&QSpinBox::valueChanged), this, &HTTPDestBox::mrlUpdated );
+    connect( HTTPEdit, &QLineEdit::textChanged, this, &HTTPDestBox::mrlUpdated );
 }
 
 QString HTTPDestBox::getMRL( const QString& mux )
@@ -256,8 +253,8 @@ MMSHDestBox::MMSHDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
 
     layout->addWidget(MMSHEdit, 1, 1, 1, 1);
     layout->addWidget(MMSHPort, 2, 1, 1, 1);
-    CS( MMSHPort );
-    CT( MMSHEdit );
+    connect( MMSHPort, QOverload<int>::of(&QSpinBox::valueChanged), this, &MMSHDestBox::mrlUpdated );
+    connect( MMSHEdit, &QLineEdit::textChanged, this, &MMSHDestBox::mrlUpdated );
 }
 
 QString MMSHDestBox::getMRL( const QString& )
@@ -297,8 +294,8 @@ RTSPDestBox::RTSPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
 
     layout->addWidget( RTSPEdit, 2, 1, 1, 1 );
     layout->addWidget( RTSPPort, 1, 1, 1, 1 );
-    CS( RTSPPort );
-    CT( RTSPEdit );
+    connect( RTSPPort, QOverload<int>::of(&QSpinBox::valueChanged), this, &RTSPDestBox::mrlUpdated );
+    connect( RTSPEdit, &QLineEdit::textChanged, this, &RTSPDestBox::mrlUpdated );
 }
 
 QString RTSPDestBox::getMRL( const QString& )
@@ -342,8 +339,8 @@ UDPDestBox::UDPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
 
     layout->addWidget(UDPEdit, 1, 1, 1, 1);
     layout->addWidget(UDPPort, 2, 1, 1, 1);
-    CS( UDPPort );
-    CT( UDPEdit );
+    connect( UDPPort, QOverload<int>::of(&QSpinBox::valueChanged), this, &UDPDestBox::mrlUpdated );
+    connect( UDPEdit, &QLineEdit::textChanged, this, &UDPDestBox::mrlUpdated );
 }
 
 QString UDPDestBox::getMRL( const QString& mux )
@@ -389,9 +386,9 @@ SRTDestBox::SRTDestBox(QWidget *_parent, const char *_mux) :
     layout->addWidget( SAPNameLabel, 3, 0, 1, 1 );
     layout->addWidget( SAPName, 3, 1, 1, 1 );
 
-    CT( SRTEdit );
-    CS( SRTPort );
-    CT( SAPName );
+    connect( SRTEdit, &QLineEdit::textChanged, this, &SRTDestBox::mrlUpdated );
+    connect( SRTPort, QOverload<int>::of(&QSpinBox::valueChanged), this, &SRTDestBox::mrlUpdated );
+    connect( SAPName, &QLineEdit::textChanged, this, &SRTDestBox::mrlUpdated );
 }
 
 QString SRTDestBox::getMRL(const QString&)
@@ -442,9 +439,9 @@ RISTDestBox::RISTDestBox( QWidget *_parent, const char *_mux )
     layout->addWidget(RISTNameLabel, 3, 0, 1, 1);
     layout->addWidget(RISTName, 3, 1, 1, 1);
 
-    CT( RISTAddress );
-    CS( RISTPort );
-    CT( RISTName );
+    connect( RISTAddress, &QLineEdit::textChanged, this, &RISTDestBox::mrlUpdated );
+    connect( RISTPort, QOverload<int>::of(&QSpinBox::valueChanged), this, &RISTDestBox::mrlUpdated );
+    connect( RISTName, &QLineEdit::textChanged, this, &RISTDestBox::mrlUpdated );
 }
 
 QString RISTDestBox::getMRL( const QString& )
@@ -497,9 +494,9 @@ RTPDestBox::RTPDestBox( QWidget *_parent, const char *_mux )
     layout->addWidget(SAPNameLabel, 3, 0, 1, 1);
     layout->addWidget(SAPName, 3, 1, 1, 1);
 
-    CT( RTPEdit );
-    CS( RTPPort );
-    CT( SAPName );
+    connect( RTPEdit, &QLineEdit::textChanged, this, &RTPDestBox::mrlUpdated );
+    connect( RTPPort, QOverload<int>::of(&QSpinBox::valueChanged), this, &RTPDestBox::mrlUpdated );
+    connect( SAPName, &QLineEdit::textChanged, this, &RTPDestBox::mrlUpdated );
 }
 
 QString RTPDestBox::getMRL( const QString& )
@@ -558,14 +555,11 @@ ICEDestBox::ICEDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     layout->addWidget(IcecastNameLabel, 4, 0, 1, 1 );
     layout->addWidget(ICEPassEdit, 4, 1, 1, -1 );
 
-    CS( ICEPort );
-    CT( ICEEdit );
-    CT( ICEMountEdit );
-    CT( ICEPassEdit );
+    connect( ICEPort, QOverload<int>::of(&QSpinBox::valueChanged), this, &ICEDestBox::mrlUpdated );
+    connect( ICEEdit, &QLineEdit::textChanged, this, &ICEDestBox::mrlUpdated );
+    connect( ICEMountEdit, &QLineEdit::textChanged, this, &ICEDestBox::mrlUpdated );
+    connect( ICEPassEdit, &QLineEdit::textChanged, this, &ICEDestBox::mrlUpdated );
 }
-
-#undef CS
-#undef CT
 
 QString ICEDestBox::getMRL( const QString& )
 {

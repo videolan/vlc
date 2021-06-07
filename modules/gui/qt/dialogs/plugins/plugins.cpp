@@ -143,8 +143,7 @@ PluginTab::PluginTab( qt_intf_t *p_intf_ )
 
     layout->addWidget( label, 1, 0 );
     layout->addWidget( edit, 1, 1, 1, 1 );
-    CONNECT( edit, textChanged( const QString& ),
-            this, search( const QString& ) );
+    connect( edit, &SearchLineEdit::textChanged, this, &PluginTab::search );
 
     setMinimumSize( 500, 300 );
     restoreWidgetPosition( "Plugins", QSize( 540, 400 ) );
@@ -226,8 +225,7 @@ ExtensionTab::ExtensionTab( qt_intf_t *p_intf_ )
 
     // ListView
     extList = new QListView( this );
-    CONNECT( extList, activated( const QModelIndex& ),
-             this, moreInformation() );
+    connect( extList, &QListView::activated, this, &ExtensionTab::moreInformation );
     layout->addWidget( extList );
 
     // List item delegate
@@ -250,7 +248,7 @@ ExtensionTab::ExtensionTab( qt_intf_t *p_intf_ )
     butMoreInfo = new QPushButton( QIcon( ":/menu/info.svg" ),
                                    qtr( "More information..." ),
                                    this );
-    CONNECT( butMoreInfo, clicked(), this, moreInformation() );
+    connect( butMoreInfo, &QPushButton::clicked, this, &ExtensionTab::moreInformation );
     buttonsBox->addButton( butMoreInfo, QDialogButtonBox::ActionRole );
 
     // Reload button
@@ -258,12 +256,10 @@ ExtensionTab::ExtensionTab( qt_intf_t *p_intf_ )
     QPushButton *reload = new QPushButton( QIcon( ":/update.svg" ),
                                            qtr( "Reload extensions" ),
                                            this );
-    CONNECT( reload, clicked(), EM, reloadExtensions() );
-    CONNECT( reload, clicked(), this, updateButtons() );
-    CONNECT( extList->selectionModel(),
-             selectionChanged( const QItemSelection &, const QItemSelection & ),
-             this,
-             updateButtons() );
+    connect( reload, &QPushButton::clicked, EM, &ExtensionsManager::reloadExtensions );
+    connect( reload, &QPushButton::clicked, this, &ExtensionTab::updateButtons );
+    connect( extList->selectionModel(), &QItemSelectionModel::selectionChanged,
+             this, &ExtensionTab::updateButtons );
     buttonsBox->addButton( reload, QDialogButtonBox::ResetRole );
 
     layout->addWidget( buttonsBox );
@@ -370,7 +366,7 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     button->setCheckable( true );\
     if ( numb == -1 ) button->setChecked( true );\
     button->setAutoExclusive( true );\
-    CONNECT( button, clicked(), signalMapper, map() );\
+    connect( button, &QToolButton::clicked, signalMapper, QOverload<>::of(&QSignalMapper::map) );\
     signalMapper->setMapping( button, numb );\
     leftPane->layout()->addWidget( button );
 
@@ -419,14 +415,14 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     QCheckBox *installedOnlyBox = new QCheckBox( qtr("Only installed") );
     installedOnlyBox->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
     switchStack->insertWidget( WITHONLINEADDONS, installedOnlyBox );
-    CONNECT( installedOnlyBox, stateChanged(int), this, installChecked(int) );
+    connect( installedOnlyBox, &QCheckBox::stateChanged, this, &AddonsTab::installChecked );
 
     QPushButton *reposyncButton = new QPushButton( QIcon( ":/update.svg" ),
                                               qtr("Find more addons online") );
     reposyncButton->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
     switchStack->insertWidget( ONLYLOCALADDONS, reposyncButton );
     switchStack->setCurrentIndex( ONLYLOCALADDONS );
-    CONNECT( reposyncButton, clicked(), this, reposync() );
+    connect( reposyncButton, &QPushButton::clicked, this, &AddonsTab::reposync );
 
     leftPane->layout()->addItem( new QSpacerItem( 0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding ) );
 
@@ -435,14 +431,14 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
 
     // ListView
     addonsView = new QListView( this );
-    CONNECT( addonsView, activated( const QModelIndex& ), this, moreInformation() );
+    connect( addonsView, &QListView::activated, this, &AddonsTab::moreInformation );
     layout->addWidget( addonsView );
 
     // List item delegate
     AddonItemDelegate *addonsDelegate = new AddonItemDelegate( addonsView );
     addonsView->setItemDelegate( addonsDelegate );
     addonsDelegate->setAnimator( new DelegateAnimationHelper( addonsView ) );
-    CONNECT( addonsDelegate, showInfo(), this, moreInformation() );
+    connect( addonsDelegate, &AddonItemDelegate::showInfo, this, &AddonsTab::moreInformation );
 
     // Extension list look & feeling
     addonsView->setAlternatingRowColors( true );
@@ -465,18 +461,19 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     addonsModel->setFilterRole( Qt::DisplayRole );
     addonsView->setModel( addonsModel );
 
-    CONNECT( signalMapper, mapped(int), addonsModel, setTypeFilter(int) );
+    connect( signalMapper, QOverload<int>::of(&QSignalMapper::mapped),
+             addonsModel, &AddonsSortFilterProxyModel::setTypeFilter );
 
-    CONNECT( searchInput, textChanged( const QString &),
-             addonsModel, setFilterFixedString( QString ) );
+    connect( searchInput, &SearchLineEdit::textChanged,
+             addonsModel, &AddonsSortFilterProxyModel::setFilterFixedString );
 
-    CONNECT( addonsView->selectionModel(), currentChanged(QModelIndex,QModelIndex),
-             addonsView, edit(QModelIndex) );
+    connect( addonsView->selectionModel(), &QItemSelectionModel::currentChanged,
+             addonsView, QOverload<const QModelIndex&>::of(&QListView::edit) );
 
-    CONNECT( AM, addonAdded( addon_entry_t * ),
-             model, addonAdded( addon_entry_t * ) );
-    CONNECT( AM, addonChanged( const addon_entry_t * ),
-             model, addonChanged( const addon_entry_t * ) );
+    connect( AM, SIGNAL(addonAdded( addon_entry_t * )),
+             model, SLOT(addonAdded( addon_entry_t * )) );
+    connect( AM, SIGNAL(addonChanged( const addon_entry_t * )),
+             model, SLOT(addonChanged( const addon_entry_t * )) );
 
     QList<QString> frames;
     frames << ":/util/wait1.svg";
@@ -484,8 +481,8 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     frames << ":/util/wait3.svg";
     frames << ":/util/wait4.svg";
     spinnerAnimation = new PixmapAnimator( this, frames, SPINNER_SIZE, SPINNER_SIZE );
-    CONNECT( spinnerAnimation, pixmapReady( const QPixmap & ),
-             addonsView->viewport(), update() );
+    connect( spinnerAnimation, &PixmapAnimator::pixmapReady,
+             addonsView->viewport(), QOverload<>::of(&QWidget::update) );
     addonsView->viewport()->installEventFilter( this );
 }
 
@@ -615,8 +612,8 @@ void AddonsTab::reposync()
     {
         tab->setCurrentIndex( WITHONLINEADDONS );
         AddonsManager *AM = AddonsManager::getInstance( p_intf );
-        CONNECT( AM, discoveryEnded(), spinnerAnimation, stop() );
-        CONNECT( AM, discoveryEnded(), addonsView->viewport(), update() );
+        connect( AM, &AddonsManager::discoveryEnded, spinnerAnimation, &PixmapAnimator::stop );
+        connect( AM, &AddonsManager::discoveryEnded, addonsView->viewport(), QOverload<>::of(&QWidget::update) );
         spinnerAnimation->start();
         AM->findNewAddons();
     }
@@ -679,7 +676,7 @@ ExtensionListModel::ExtensionListModel( QObject *parent, ExtensionsManager* EM_ 
         : QAbstractListModel( parent ), EM( EM_ )
 {
     // Connect to ExtensionsManager::extensionsUpdated()
-    CONNECT( EM, extensionsUpdated(), this, updateList() );
+    connect( EM, &ExtensionsManager::extensionsUpdated, this, &ExtensionListModel::updateList );
 
     // Load extensions now if not already loaded
     EM->loadExtensions();
@@ -1283,7 +1280,7 @@ QWidget *AddonItemDelegate::createEditor( QWidget *parent,
 
     infoButton = new QPushButton( QIcon( ":/menu/info.svg" ),
                                   qtr( "More information..." ) );
-    connect( infoButton, SIGNAL(clicked()), this, SIGNAL(showInfo()) );
+    connect( infoButton, &QPushButton::clicked, this, &AddonItemDelegate::showInfo );
     editorWidget->layout()->addWidget( infoButton );
 
     if ( ADDON_MANAGEABLE &
@@ -1295,7 +1292,7 @@ QWidget *AddonItemDelegate::createEditor( QWidget *parent,
         else
             installButton = new QPushButton( QIcon( ":/buttons/playlist/playlist_add.svg" ),
                                              qtr("&Install"), parent );
-        CONNECT( installButton, clicked(), this, editButtonClicked() );
+        connect( installButton, &QPushButton::clicked, this, &AddonItemDelegate::editButtonClicked );
         editorWidget->layout()->addWidget( installButton );
     }
 

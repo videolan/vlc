@@ -182,14 +182,10 @@ void PrefsDialog::setAdvanced()
         advanced_tree_panel->layout()->addWidget( advanced_tree );
         advanced_tree_panel->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
 
-        CONNECT( advanced_tree,
-                 currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ),
-                 this, changeAdvPanel( QTreeWidgetItem * ) );
-        CONNECT( tree_filter, textChanged( const QString &  ),
-                 this, advancedTreeFilterChanged( const QString & ) );
-        CONNECT( current_filter, stateChanged(int),
-                 this, onlyLoadedToggled() );
-        CONNECT( search, activated(), tree_filter, setFocus() );
+        connect( advanced_tree, &PrefsTree::currentItemChanged, this, &PrefsDialog::changeAdvPanel );
+        connect( tree_filter, &SearchLineEdit::textChanged, this, &PrefsDialog::advancedTreeFilterChanged );
+        connect( current_filter, &QCheckBox::stateChanged, this, &PrefsDialog::onlyLoadedToggled );
+        connect( search, &QShortcut::activated, tree_filter, QOverload<>::of(&SearchLineEdit::setFocus) );
 
         /* Set initial selection */
         advanced_tree->setCurrentIndex(
@@ -206,10 +202,9 @@ void PrefsDialog::setSimple()
     /* If no simple_tree, create one, connect it */
     if( !simple_tree )
     {
-         simple_tree = new SPrefsCatList( p_intf, simple_tree_panel );
-         CONNECT( simple_tree,
-                  currentItemChanged( int ),
-                  this, changeSimplePanel( int ) );
+        simple_tree = new SPrefsCatList( p_intf, simple_tree_panel );
+        connect( simple_tree, &SPrefsCatList::currentItemChanged,
+                 this, &PrefsDialog::changeSimplePanel );
         simple_tree_panel->layout()->addWidget( simple_tree );
         simple_tree_panel->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Preferred );
     }

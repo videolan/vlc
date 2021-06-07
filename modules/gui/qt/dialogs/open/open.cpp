@@ -110,13 +110,13 @@ OpenDialog::OpenDialog( QWindow *parent,
 
     /* Menu for the Play button */
     QMenu * openButtonMenu = new QMenu( "Open", playButton );
-    openButtonMenu->addAction( qtr( "&Enqueue" ), this, SLOT( enqueue() ),
+    openButtonMenu->addAction( qtr( "&Enqueue" ), this, &OpenDialog::enqueue,
                                     QKeySequence( "Alt+E" ) );
-    openButtonMenu->addAction( qtr( "&Play" ), this, SLOT( play() ),
+    openButtonMenu->addAction( qtr( "&Play" ), this, &OpenDialog::play,
                                     QKeySequence( "Alt+P" ) );
-    openButtonMenu->addAction( qtr( "&Stream" ), this, SLOT( stream() ) ,
+    openButtonMenu->addAction( qtr( "&Stream" ), this, &OpenDialog::stream,
                                     QKeySequence( "Alt+S" ) );
-    openButtonMenu->addAction( qtr( "C&onvert" ), this, SLOT( transcode() ) ,
+    openButtonMenu->addAction( qtr( "C&onvert" ), this, &OpenDialog::transcode,
                                     QKeySequence( "Alt+O" ) );
 
     playButton->setMenu( openButtonMenu );
@@ -129,32 +129,33 @@ OpenDialog::OpenDialog( QWindow *parent,
     setMenuAction();
 
     /* Force MRL update on tab change */
-    CONNECT( ui.Tab, currentChanged( int ), this, signalCurrent( int ) );
+    connect( ui.Tab, &QTabWidget::currentChanged, this, &OpenDialog::signalCurrent );
 
-    CONNECT( fileOpenPanel, mrlUpdated( const QStringList&, const QString& ),
-             this, updateMRL( const QStringList&, const QString& ) );
-    CONNECT( netOpenPanel, mrlUpdated( const QStringList&, const QString& ),
-             this, updateMRL( const QStringList&, const QString& ) );
-    CONNECT( discOpenPanel, mrlUpdated( const QStringList&, const QString& ),
-             this, updateMRL( const QStringList&, const QString& ) );
-    CONNECT( captureOpenPanel, mrlUpdated( const QStringList&, const QString& ),
-             this, updateMRL( const QStringList&, const QString& ) );
+    connect( fileOpenPanel, &FileOpenPanel::mrlUpdated,
+             this, QOverload<const QStringList&, const QString&>::of(&OpenDialog::updateMRL) );
+    connect( netOpenPanel, &NetOpenPanel::mrlUpdated,
+             this, QOverload<const QStringList&, const QString&>::of(&OpenDialog::updateMRL) );
+    connect( discOpenPanel, &DiscOpenPanel::mrlUpdated,
+             this, QOverload<const QStringList&, const QString&>::of(&OpenDialog::updateMRL) );
+    connect( captureOpenPanel, &CaptureOpenPanel::mrlUpdated,
+             this, QOverload<const QStringList&, const QString&>::of(&OpenDialog::updateMRL) );
 
-    CONNECT( fileOpenPanel, methodChanged( const QString& ),
-             this, newCachingMethod( const QString& ) );
-    CONNECT( netOpenPanel, methodChanged( const QString& ),
-             this, newCachingMethod( const QString& ) );
-    CONNECT( discOpenPanel, methodChanged( const QString& ),
-             this, newCachingMethod( const QString& ) );
-    CONNECT( captureOpenPanel, methodChanged( const QString& ),
-             this, newCachingMethod( const QString& ) );
+    connect( fileOpenPanel, &FileOpenPanel::methodChanged, this, &OpenDialog::newCachingMethod );
+    connect( netOpenPanel, &NetOpenPanel::methodChanged, this, &OpenDialog::newCachingMethod );
+    connect( discOpenPanel, &DiscOpenPanel::methodChanged, this, &OpenDialog::newCachingMethod );
+    connect( captureOpenPanel, &CaptureOpenPanel::methodChanged, this, &OpenDialog::newCachingMethod );
 
     /* Advanced frame Connects */
-    CONNECT( ui.slaveCheckbox, toggled( bool ), this, updateMRL() );
-    CONNECT( ui.slaveText, textChanged( const QString& ), this, updateMRL() );
-    CONNECT( ui.cacheSpinBox, valueChanged( int ), this, updateMRL() );
-    CONNECT( ui.startTimeTimeEdit, timeChanged ( const QTime& ), this, updateMRL() );
-    CONNECT( ui.stopTimeTimeEdit, timeChanged ( const QTime& ), this, updateMRL() );
+    connect( ui.slaveCheckbox, &QCheckBox::toggled,
+             this, QOverload<>::of(&OpenDialog::updateMRL) );
+    connect( ui.slaveText, &QLineEdit::textChanged,
+             this, QOverload<>::of(&OpenDialog::updateMRL) );
+    connect( ui.cacheSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+             this, QOverload<>::of(&OpenDialog::updateMRL) );
+    connect( ui.startTimeTimeEdit, &QTimeEdit::timeChanged,
+             this, QOverload<>::of(&OpenDialog::updateMRL) );
+    connect( ui.stopTimeTimeEdit, &QTimeEdit::timeChanged,
+             this, QOverload<>::of(&OpenDialog::updateMRL) );
     BUTTONACT( ui.advancedCheckBox, toggleAdvancedPanel() );
     BUTTONACT( ui.slaveBrowseButton, browseInputSlave() );
 

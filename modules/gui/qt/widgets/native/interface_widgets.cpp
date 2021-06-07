@@ -88,7 +88,7 @@ VideoWidget::VideoWidget( qt_intf_t *_p_i, QWidget* p_parent )
 
     cursorTimer = new QTimer( this );
     cursorTimer->setSingleShot( true );
-    connect( cursorTimer, SIGNAL(timeout()), this, SLOT(hideCursor()) );
+    connect( cursorTimer, &QTimer::timeout, this, &VideoWidget::hideCursor );
     cursorTimeout = var_InheritInteger( _p_i, "mouse-hide-timeout" );
 
     show();
@@ -408,11 +408,11 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, qt_intf_t *_p_i )
     setAlignment( Qt::AlignCenter );
 
     QAction *action = new QAction( qtr( "Download cover art" ), this );
-    CONNECT( action, triggered(), this, askForUpdate() );
+    connect( action, &QAction::triggered, this, &CoverArtLabel::askForUpdate );
     addAction( action );
 
     action = new QAction( qtr( "Add cover art from file" ), this );
-    CONNECT( action, triggered(), this, setArtFromFile() );
+    connect( action, &QAction::triggered, this, &CoverArtLabel::setArtFromFile );
     addAction( action );
 
     p_item = THEMIM->getInput();
