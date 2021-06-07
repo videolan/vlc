@@ -687,6 +687,8 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
     if ( Init() == false )
         return VLC_EGENERIC;
 
+    auto priorityAccess = m_ml->acquirePriorityAccess();
+
     medialibrary::QueryParameters p{};
     medialibrary::QueryParameters* paramsPtr = nullptr;
     uint32_t nbItems = 0;
@@ -1072,6 +1074,8 @@ void* MediaLibrary::Get( int query, va_list args )
 {
     if ( Init() == false )
         return nullptr;
+
+    auto priorityAccess = m_ml->acquirePriorityAccess();
 
     switch ( query )
     {
@@ -1927,6 +1931,11 @@ int MediaLibrary::listMedia( int listQuery, const medialibrary::QueryParameters 
         default:
             vlc_assert_unreachable();
     }
+}
+
+medialibrary::PriorityAccess MediaLibrary::acquirePriorityAccess()
+{
+    return m_ml->acquirePriorityAccess();
 }
 
 static void* Get( vlc_medialibrary_module_t* module, int query, va_list args )
