@@ -578,6 +578,10 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
 {
     VLC_UNUSED(p_private);
     VLC_UNUSED(p_au);
+
+    if(p_au->i_dts == VLC_TICK_INVALID)
+        return VLC_EGENERIC;
+
     return VLC_SUCCESS;
 }
 
