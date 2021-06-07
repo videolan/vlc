@@ -102,7 +102,7 @@ bool InterfaceWindowHandler::CSDSetCursor(QMouseEvent* mouseEvent)
     const int y = mouseEvent->y();
     const int winHeight = m_window->height();
     const int winWidth = m_window->width();
-    const int b = 5 * m_mainInterface->getIntfScaleFactor();
+    const int b = m_mainInterface->CSDBorderSize();
 
     if (x < b && y < b) shape = Qt::SizeFDiagCursor;
     else if (x >= winWidth - b && y >= winHeight - b) shape = Qt::SizeFDiagCursor;
@@ -126,7 +126,7 @@ bool InterfaceWindowHandler::CSDHandleClick(QMouseEvent* mouseEvent)
 {
     if (!m_mainInterface->useClientSideDecoration())
         return false;
-    const int b = 5 * m_mainInterface->getIntfScaleFactor();
+    const int b = m_mainInterface->CSDBorderSize();
     if( mouseEvent->buttons() != Qt::LeftButton)
         return false;
     if ((m_window->visibility() & QWindow::Maximized) != 0)

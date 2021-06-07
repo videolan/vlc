@@ -157,6 +157,7 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(ColorSchemeModel* colorScheme READ getColorScheme CONSTANT)
     Q_PROPERTY(bool hasVLM READ hasVLM CONSTANT)
     Q_PROPERTY(bool clientSideDecoration READ useClientSideDecoration NOTIFY useClientSideDecorationChanged)
+    Q_PROPERTY(int  csdBorderSize READ CSDBorderSize NOTIFY useClientSideDecorationChanged)
     Q_PROPERTY(bool hasToolbarMenu READ hasToolbarMenu NOTIFY hasToolbarMenuChanged)
     Q_PROPERTY(bool canShowVideoPIP READ canShowVideoPIP CONSTANT)
     Q_PROPERTY(bool pinVideoControls READ pinVideoControls WRITE setPinVideoControls NOTIFY pinVideoControlsChanged)
@@ -197,6 +198,7 @@ public:
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
     inline float getIntfScaleFactor() const { return m_intfScaleFactor; }
     inline float getIntfUserScaleFactor() const { return m_intfUserScaleFactor; }
+    inline int CSDBorderSize() const { return 5 * getIntfScaleFactor(); }
     inline float getMinIntfUserScaleFactor() const { return MIN_INTF_USER_SCALE_FACTOR; }
     inline float getMaxIntfUserScaleFactor() const { return MAX_INTF_USER_SCALE_FACTOR; }
     inline bool hasMediaLibrary() const { return b_hasMedialibrary; }
