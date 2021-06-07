@@ -1,0 +1,23 @@
+From e9f8967461ac2498f8af9e3127188c0095f9306c Mon Sep 17 00:00:00 2001
+From: thor <thor@35dc7657-300d-0410-a2e5-dc2837fedb53>
+Date: Mon, 7 Jun 2021 19:21:27 +0000
+Subject: [PATCH] build: fix arm_fpu setup again
+
+git-svn-id: svn://scm.orgis.org/mpg123/trunk@4945 35dc7657-300d-0410-a2e5-dc2837fedb53
+---
+ configure.ac | 2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index de90297f..9753588e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1436,7 +1436,7 @@ case $cpu_type in
+   ;;
+   arm_fpu)
+     ADD_CPPFLAGS="$ADD_CPPFLAGS -DOPT_MULTI -DOPT_GENERIC -DOPT_GENERIC_DITHER -DOPT_NEON -DREAL_IS_FLOAT"
+-    more_sources="$s_neon$s_dither $s_arm_multi"
++    more_sources="$s_neon $s_dither $s_arm_multi"
+   ;;
+   neon64)
+     ADD_CPPFLAGS="$ADD_CPPFLAGS -DOPT_NEON64 -DREAL_IS_FLOAT"
