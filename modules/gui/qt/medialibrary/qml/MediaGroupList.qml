@@ -118,24 +118,18 @@ Widgets.NavigableFocusScope {
 
     function _actionAtIndex() {
         if (modelSelect.selectedIndexes.length > 1) {
-            _play(model.getIdsForIndexes(modelSelect.selectedIndexes));
+            g_mainDisplay.play(medialib, model.getIdsForIndexes(modelSelect.selectedIndexes));
         } else if (modelSelect.selectedIndexes.length === 1) {
             var index = modelSelect.selectedIndexes[0];
             _showList(model.getDataAt(index));
         }
     }
 
-    function _play(ids) {
-        g_mainDisplay.showPlayer();
-
-        medialib.addAndPlay(ids);
-    }
-
     function _showList(model)
     {
         // NOTE: If the count is 1 we consider the group is a media.
         if (model.count == 1)
-            _play(model.id);
+            g_mainDisplay.play(medialib, model.id);
         else
             showList(model);
     }

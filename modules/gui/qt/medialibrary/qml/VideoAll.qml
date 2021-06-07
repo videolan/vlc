@@ -129,12 +129,6 @@ Widgets.NavigableFocusScope {
     //---------------------------------------------------------------------------------------------
     // Private
 
-    function _play(id) {
-        g_mainDisplay.showPlayer();
-
-        medialib.addAndPlay(id);
-    }
-
     function _actionAtIndex() {
         g_mainDisplay.showPlayer();
 
@@ -272,7 +266,7 @@ Widgets.NavigableFocusScope {
 
                 onItemClicked: gridView.leftClickOnItem(modifier, index)
 
-                onItemDoubleClicked: _play(model.id)
+                onItemDoubleClicked: g_mainDisplay.play(medialib, model.id)
 
                 onContextMenuButtonClicked: {
                     gridView.rightClickOnItem(index);
@@ -346,7 +340,7 @@ Widgets.NavigableFocusScope {
 
             onActionForSelection: _actionAtIndex()
 
-            onItemDoubleClicked: _play(model.id)
+            onItemDoubleClicked: g_mainDisplay.play(medialib, model.id)
 
             onContextMenuButtonClicked: contextMenu.popup(modelSelect.selectedIndexes,
                                                           menuParent.mapToGlobal(0,0))

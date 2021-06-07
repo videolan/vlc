@@ -161,6 +161,12 @@ Widgets.NavigableFocusScope {
         history.push(["player"])
     }
 
+    function play(backend, ids) {
+        showPlayer();
+
+        backend.addAndPlay(ids);
+    }
+
     Rectangle {
         color: VLCStyle.colors.bg
         anchors.fill: parent
