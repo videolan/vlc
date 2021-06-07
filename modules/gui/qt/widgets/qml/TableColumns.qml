@@ -61,7 +61,7 @@ Item {
                 source: (rowModel ? (root.showTitleText ? rowModel.cover : rowModel[model.criteria]) : VLCStyle.noArtCover) || VLCStyle.noArtCover
                 playCoverVisible: currentlyFocused || containsMouse
                 playIconSize: VLCStyle.play_cover_small
-                onPlayIconClicked: medialib.addAndPlay( rowModel.id )
+                onPlayIconClicked: g_mainDisplay.play(medialib, rowModel.id)
                 radius: root.titleCover_radius
 
                 imageOverlay: Item {
