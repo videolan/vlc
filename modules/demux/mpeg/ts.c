@@ -2611,7 +2611,7 @@ static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pk
 
                 pid->i_cc = i_cc;
                 pid->i_dup = 0;
-                p_pkt->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+                p_pkt->i_flags |= BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED;
             }
             else pid->i_cc = i_cc;
         }
