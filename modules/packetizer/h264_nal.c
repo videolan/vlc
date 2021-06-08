@@ -615,6 +615,20 @@ static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
     return true;
 }
 
+static bool h264_parse_sequence_parameter_set_extension_rbsp( bs_t *p_bs,
+                                 h264_sequence_parameter_set_extension_t *p_sps_ext )
+{
+    p_sps_ext->i_sps_id = bs_read_ue( p_bs );
+    if( p_sps_ext->i_sps_id > H264_SPSEXT_ID_MAX )
+        return false;
+    return true;
+}
+
+void h264_release_sps_extension( h264_sequence_parameter_set_extension_t *p_sps_ext )
+{
+    free( p_sps_ext );
+}
+
 #define IMPL_h264_generic_decode( name, h264type, decode, release ) \
     h264type * name( const uint8_t *p_buf, size_t i_buf, bool b_escaped ) \
     { \
@@ -644,6 +658,9 @@ IMPL_h264_generic_decode( h264_decode_sps, h264_sequence_parameter_set_t,
 
 IMPL_h264_generic_decode( h264_decode_pps, h264_picture_parameter_set_t,
                           h264_parse_picture_parameter_set_rbsp, h264_release_pps )
+
+IMPL_h264_generic_decode( h264_decode_sps_extension, h264_sequence_parameter_set_extension_t,
+                          h264_parse_sequence_parameter_set_extension_rbsp, h264_release_sps_extension )
 
 block_t *h264_NAL_to_avcC( uint8_t i_nal_length_size,
                            const uint8_t **pp_sps_buf,
