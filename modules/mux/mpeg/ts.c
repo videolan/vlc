@@ -921,7 +921,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         {
             memcpy(&p_stream->pes.lang[i*4], pl->psz_iso639_2T, 3);
             p_stream->pes.lang[i*4+3] = 0x00; /* audio type: 0x00 undefined */
-            msg_Dbg( p_mux, "    - lang=%3.3s", &p_stream->pes.lang[i*4] );
+            msg_Dbg( p_mux, "    - lang=%3.3s", pl->psz_iso639_2T );
         }
     }
 
