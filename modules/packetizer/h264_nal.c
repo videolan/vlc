@@ -649,7 +649,9 @@ block_t *h264_NAL_to_avcC( uint8_t i_nal_length_size,
                            const uint8_t **pp_sps_buf,
                            const size_t *p_sps_size, uint8_t i_sps_count,
                            const uint8_t **pp_pps_buf,
-                           const size_t *p_pps_size, uint8_t i_pps_count )
+                           const size_t *p_pps_size, uint8_t i_pps_count,
+                           const uint8_t **pp_sps_ext_buf,
+                           const size_t *p_sps_ext_size, uint8_t i_sps_ext_count )
 {
     /* The length of the NAL size is encoded using 1, 2 or 4 bytes */
     if( i_nal_length_size != 1 && i_nal_length_size != 2
@@ -696,6 +698,26 @@ block_t *h264_NAL_to_avcC( uint8_t i_nal_length_size,
     {
         bo_add_16be( &bo, p_pps_size[i] );
         bo_add_mem( &bo, p_pps_size[i], pp_pps_buf[i] );
+    }
+
+    const uint8_t i_profile = pp_sps_buf[0][1];
+    if( i_profile == PROFILE_H264_HIGH ||
+        i_profile == PROFILE_H264_HIGH_10 ||
+        i_profile == PROFILE_H264_HIGH_422 ||
+        i_profile == PROFILE_H264_HIGH_444 )
+    {
+        h264_sequence_parameter_set_t *p_sps = h264_decode_sps( pp_sps_buf[0], p_sps_size[0], true );
+        bo_add_8( &bo, 0xfc | (p_sps ? p_sps->i_chroma_idc : 0) );
+        bo_add_8( &bo, 0xf8 | (p_sps ? (p_sps->i_bit_depth_luma - 8) : 0) );
+        bo_add_8( &bo, 0xf8 | (p_sps ? (p_sps->i_bit_depth_chroma - 8) : 0) );
+        if( p_sps )
+            h264_release_sps( p_sps );
+        bo_add_8( &bo, i_sps_ext_count );
+        for( size_t i = 0; i < i_sps_ext_count; ++i )
+        {
+            bo_add_16be( &bo, p_sps_ext_size[i] );
+            bo_add_mem( &bo, p_sps_ext_size[i], pp_sps_ext_buf[i] );
+        }
     }
 
     return bo.b;
