@@ -45,6 +45,7 @@
 
 #define H264_SPS_ID_MAX (31)
 #define H264_PPS_ID_MAX (255)
+#define H264_SPSEXT_ID_MAX H264_SPS_ID_MAX
 
 enum h264_nal_unit_type_e
 {
@@ -77,12 +78,15 @@ enum h264_nal_unit_type_e
 
 typedef struct h264_sequence_parameter_set_t h264_sequence_parameter_set_t;
 typedef struct h264_picture_parameter_set_t h264_picture_parameter_set_t;
+typedef struct h264_sequence_parameter_set_extension_t h264_sequence_parameter_set_extension_t;
 
 h264_sequence_parameter_set_t * h264_decode_sps( const uint8_t *, size_t, bool );
 h264_picture_parameter_set_t *  h264_decode_pps( const uint8_t *, size_t, bool );
+h264_sequence_parameter_set_extension_t * h264_decode_sps_extension( const uint8_t *, size_t, bool );
 
 void h264_release_sps( h264_sequence_parameter_set_t * );
 void h264_release_pps( h264_picture_parameter_set_t * );
+void h264_release_sps_extension( h264_sequence_parameter_set_extension_t * );
 
 struct h264_sequence_parameter_set_t
 {
@@ -147,6 +151,11 @@ struct h264_picture_parameter_set_t
     uint8_t i_redundant_pic_present_flag;
     uint8_t weighted_pred_flag;
     uint8_t weighted_bipred_idc;
+};
+
+struct h264_sequence_parameter_set_extension_t
+{
+    uint8_t i_sps_id;
 };
 
 /*
