@@ -1831,7 +1831,8 @@ static block_t* ReadTSPacket( demux_t *p_demux )
     /* Check sync byte and re-sync if needed */
     if( p_pkt->p_buffer[0] != 0x47 )
     {
-        msg_Warn( p_demux, "lost synchro" );
+        msg_Warn( p_demux, "lost synchro at %"PRIu64,
+                            vlc_stream_Tell( p_sys->stream ) - p_sys->i_packet_size );
         block_Release( p_pkt );
         for( ;; )
         {
