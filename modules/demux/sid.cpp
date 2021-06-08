@@ -34,6 +34,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_charset.h>
 #include <vlc_input.h>
 #include <vlc_demux.h>
 #include <vlc_plugin.h>
@@ -253,9 +254,17 @@ static int Control (demux_t *demux, int query, va_list args)
             vlc_meta_t *p_meta = va_arg (args, vlc_meta_t *);
 
             /* These are specified in the sid tune class as 0 = Title, 1 = Artist, 2 = Copyright/Publisher */
-            vlc_meta_SetTitle( p_meta, sys->tuneInfo.infoString[0] );
-            vlc_meta_SetArtist( p_meta, sys->tuneInfo.infoString[1] );
-            vlc_meta_SetCopyright( p_meta, sys->tuneInfo.infoString[2] );
+            char *psz_title = FromCharset( "CP1252", sys->tuneInfo.infoString[0], strlen(sys->tuneInfo.infoString[0]) );
+            char *psz_artist = FromCharset( "CP1252", sys->tuneInfo.infoString[1], strlen(sys->tuneInfo.infoString[1]) );
+            char *psz_copyright = FromCharset( "CP1252", sys->tuneInfo.infoString[2], strlen(sys->tuneInfo.infoString[2]) );
+
+            vlc_meta_SetTitle( p_meta, psz_title );
+            vlc_meta_SetArtist( p_meta, psz_artist );
+            vlc_meta_SetCopyright( p_meta, psz_copyright );
+
+            free( psz_title );
+            free( psz_artist );
+            free( psz_copyright );
 
             return VLC_SUCCESS;
         }
