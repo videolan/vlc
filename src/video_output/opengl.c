@@ -196,7 +196,7 @@ static void vlc_gl_surface_ResizeNotify(vout_window_t *surface,
     sys->height = height;
 
     if (cb != NULL)
-        cb(surface, opaque);
+        cb(surface, width, height, opaque);
     vlc_mutex_unlock(&sys->lock);
 }
 

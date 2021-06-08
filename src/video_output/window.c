@@ -201,6 +201,8 @@ void vout_window_ReportFullscreen(vout_window_t *window, const char *id)
 struct vout_window_ack_data {
     vout_window_t *window;
     vout_window_ack_cb callback;
+    unsigned width;
+    unsigned height;
     void *opaque;
 };
 
@@ -209,7 +211,8 @@ static void vout_window_Ack(void *data)
     struct vout_window_ack_data *cb_data = data;
 
     if (cb_data->callback != NULL)
-        cb_data->callback(cb_data->window, cb_data->opaque);
+        cb_data->callback(cb_data->window, cb_data->width, cb_data->height,
+                          cb_data->opaque);
 }
 
 /* Video output display integration */
@@ -234,7 +237,7 @@ static void vout_display_window_ResizeNotify(vout_window_t *window,
 {
     vout_display_window_t *state = window->owner.sys;
     vout_thread_t *vout = state->vout;
-    struct vout_window_ack_data data = { window, cb, opaque };
+    struct vout_window_ack_data data = { window, cb, width, height, opaque };
 
     msg_Dbg(window, "resized to %ux%u", width, height);
     vout_ChangeDisplaySize(vout, width, height, vout_window_Ack, &data);

@@ -157,7 +157,8 @@ static void *Thread(void *data)
     //return NULL;
 }
 
-static void ResizeAck(vout_window_t *wnd, void *data)
+static void ResizeAck(vout_window_t *wnd, unsigned width, unsigned height,
+                      void *data)
 {
 #ifdef XDG_SHELL
     vout_window_sys_t *sys = wnd->sys;
@@ -166,7 +167,7 @@ static void ResizeAck(vout_window_t *wnd, void *data)
     if (serial != NULL)
         xdg_surface_ack_configure(sys->surface, *serial);
 #else
-    (void) wnd; (void) data;
+    (void) wnd; (void) width; (void) height; (void) data;
 #endif
 }
 
