@@ -75,7 +75,7 @@ variables:
     only:
         refs:
             - merge_requests
-            - master@videolan/vlc-3.0
+            - 3.0.x@videolan/vlc
     except:
         - schedules
     artifacts:
