@@ -148,7 +148,7 @@ static void vlc_vidsplit_window_Resized(vout_window_t *wnd,
         vout_display_SetSize(part->display, width, height);
 
     if (cb != NULL)
-        cb(wnd, opaque);
+        cb(wnd, width, height, opaque);
     vlc_sem_post(&part->lock);
 }
 

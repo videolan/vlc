@@ -175,8 +175,13 @@ typedef struct vout_window_cfg_t {
 
 /**
  * Callback prototype for window event acknowledgement.
+ *
+ * @param width pixel width as supplied to vout_window_callbacks::resized
+ * @param height pixel height as supplied to vout_window_callbacks::resized
+ * @param data opaque pointer as supplied to vout_window_callbacks::resized
  */
-typedef void (*vout_window_ack_cb)(struct vout_window_t *, void *);
+typedef void (*vout_window_ack_cb)(struct vout_window_t *, unsigned width,
+                                   unsigned height, void *data);
 
 /**
  * Window event callbacks structure.
