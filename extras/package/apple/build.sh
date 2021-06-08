@@ -716,6 +716,9 @@ fi
 cd "$VLC_SRC_DIR" || abort_err "Failed cd to VLC source dir"
 if ! [ -e configure ]; then
     echo "Bootstraping vlc"
+
+    ACLOCAL_PATH=$VLC_SRC_DIR/extras/tools/build/share/libtool/aclocal.m4 \
+    LIBTOOLIZE_OPTIONS="--verbose" \
     ./bootstrap
 fi
 
@@ -741,6 +744,7 @@ hostenv ../../configure \
     --build="$VLC_BUILD_TRIPLET" \
     --prefix="$VLC_INSTALL_DIR" \
     "${VLC_CONFIG_OPTIONS[@]}" \
+    ACLOCAL_PATH=$VLC_SRC_DIR/extras/tools/build/share/libtool/ \
  || abort_err "Configuring VLC failed"
 
 if [ "$VLC_CONFIGURE_ONLY" != 1 ]; then
