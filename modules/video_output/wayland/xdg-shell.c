@@ -166,6 +166,8 @@ static void ResizeAck(vout_window_t *wnd, unsigned width, unsigned height,
 
     if (serial != NULL)
         xdg_surface_ack_configure(sys->surface, *serial);
+
+    xdg_surface_set_window_geometry(sys->surface, 0, 0, width, height);
 #else
     (void) wnd; (void) width; (void) height; (void) data;
 #endif
@@ -180,7 +182,6 @@ static void ReportSize(vout_window_t *wnd, void *data)
     unsigned height = sys->wm.height ? sys->wm.height : sys->set.height;
 
     wnd->owner.cbs->resized(wnd, width, height, ResizeAck, data);
-    xdg_surface_set_window_geometry(sys->surface, 0, 0, width, height);
 }
 
 static void Resize(vout_window_t *wnd, unsigned width, unsigned height)
