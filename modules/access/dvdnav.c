@@ -420,7 +420,14 @@ static int AccessDemuxOpen ( vlc_object_t *p_this )
         goto bailout;
 
     /* Open dvdnav */
+#if DVDREAD_VERSION < DVDREAD_VERSION_CODE(6, 1, 2)
+    /* In libdvdread prior to 6.1.2, UTF8 is not supported for windows and
+     * requires a prior conversion.
+     * For non win32/os2 platforms, this is just a no-op */
     psz_path = ToLocale( psz_file );
+#else
+    psz_path = psz_file;
+#endif
 #if DVDNAV_VERSION >= 60100
     dvdnav_logger_cb cbs = { .pf_log = DvdNavLog };
     if( dvdnav_open2( &p_dvdnav, p_demux, &cbs, psz_path  ) != DVDNAV_STATUS_OK )
@@ -438,8 +445,10 @@ static int AccessDemuxOpen ( vlc_object_t *p_this )
 
 bailout:
     free( psz_file );
+#if DVDREAD_VERSION < DVDREAD_VERSION_CODE(6, 1, 2)
     if( psz_path )
         LocaleFree( psz_path );
+#endif
     return i_ret;
 }
 
