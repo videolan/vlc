@@ -1846,10 +1846,15 @@ static stime_t GetPCR( const block_t *p_pkt )
 
     stime_t i_pcr = -1;
 
-    if( likely(p_pkt->i_buffer > 11) &&
-        ( p[3]&0x20 ) && /* adaptation */
-        ( p[5]&0x10 ) &&
-        ( p[4] >= 7 ) )
+    if(unlikely(p_pkt->i_buffer < 12))
+        return i_pcr;
+
+    const uint8_t i_adaption = p[3] & 0x30;
+
+    if( ( ( i_adaption == 0x30 && p[4] <= 182 ) ||   /* adaptation 0b11 */
+          ( i_adaption == 0x20 && p[4] == 183 ) ) && /* adaptation 0b10 */
+        ( p[4] >= 7 )  &&
+        ( p[5] & 0x10 ) ) /* PCR carry flag */
     {
         /* PCR is 33 bits */
         i_pcr = ( (stime_t)p[6] << 25 ) |
