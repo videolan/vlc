@@ -35,6 +35,7 @@ struct hxxx_helper_nal
         void                            *xps;
         h264_sequence_parameter_set_t   *h264_sps;
         h264_picture_parameter_set_t    *h264_pps;
+        h264_sequence_parameter_set_extension_t *h264_spsext;
         hevc_sequence_parameter_set_t   *hevc_sps;
         hevc_picture_parameter_set_t    *hevc_pps;
         hevc_video_parameter_set_t      *hevc_vps;
@@ -55,9 +56,11 @@ struct hxxx_helper
         struct {
             struct hxxx_helper_nal sps_list[H264_SPS_ID_MAX + 1];
             struct hxxx_helper_nal pps_list[H264_PPS_ID_MAX + 1];
+            struct hxxx_helper_nal spsext_list[H264_SPS_ID_MAX + 1];
             uint8_t i_current_sps;
             uint8_t i_sps_count;
             uint8_t i_pps_count;
+            uint8_t i_spsext_count;
         } h264;
         struct {
             struct hxxx_helper_nal sps_list[HEVC_SPS_ID_MAX + 1];
