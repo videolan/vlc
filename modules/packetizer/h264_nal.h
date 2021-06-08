@@ -176,7 +176,9 @@ block_t *h264_NAL_to_avcC( uint8_t i_nal_length_size,
                            const uint8_t **pp_sps_buf,
                            const size_t *p_sps_size, uint8_t i_sps_count,
                            const uint8_t **pp_pps_buf,
-                           const size_t *p_pps_size, uint8_t i_pps_count );
+                           const size_t *p_pps_size, uint8_t i_pps_count,
+                           const uint8_t **pp_sps_ext_buf,
+                           const size_t *p_sps_ext_size, uint8_t i_sps_ext_count);
 
 /* Convert AVCDecoderConfigurationRecord SPS/PPS to Annex B format */
 uint8_t * h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,

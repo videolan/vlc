@@ -788,7 +788,8 @@ h264_helper_get_avcc_config(const struct hxxx_helper *hh)
         p_pps_sizes[i_nal_found - 1] = p_nal->b->i_buffer;
     }
     return h264_NAL_to_avcC(4, pp_sps_bufs, p_sps_sizes, hh->h264.i_sps_count,
-                            pp_pps_bufs, p_pps_sizes, hh->h264.i_pps_count);
+                            pp_pps_bufs, p_pps_sizes, hh->h264.i_pps_count,
+                            NULL, NULL, 0);
 }
 
 block_t *
