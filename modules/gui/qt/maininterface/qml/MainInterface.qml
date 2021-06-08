@@ -173,4 +173,9 @@ Rectangle {
             stackView.focus = true
         }
     }
+
+    Loader {
+        active: mainInterface.clientSideDecoration
+        source: "qrc:///widgets/CSDMouseStealer.qml"
+    }
 }
