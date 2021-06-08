@@ -1822,7 +1822,8 @@ static block_t* ReadTSPacket( demux_t *p_demux )
                 }
                 i_skip++;
             }
-            msg_Dbg( p_demux, "skipping %d bytes of garbage", i_skip );
+            msg_Dbg( p_demux, "skipping %d bytes of garbage at %"PRIu64,
+                     i_skip, vlc_stream_Tell( p_sys->stream ) );
             if (vlc_stream_Read( p_sys->stream, NULL, i_skip ) != i_skip)
                 return NULL;
 
@@ -1831,6 +1832,7 @@ static block_t* ReadTSPacket( demux_t *p_demux )
                 break;
             }
         }
+        msg_Dbg( p_demux, "resynced at %" PRIu64, vlc_stream_Tell( p_sys->stream ) );
         if( !( p_pkt = vlc_stream_Block( p_sys->stream, p_sys->i_packet_size ) ) )
         {
             msg_Dbg( p_demux, "eof ?" );
