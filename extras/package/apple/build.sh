@@ -401,6 +401,8 @@ write_config_mak()
     printf '%s := %s\n' "RANLIB" "${VLC_HOST_RANLIB}" >&3
     printf '%s := %s\n' "NM" "${VLC_HOST_NM}" >&3
 
+    printf 'export %s=%s\n' "ACLOCAL_PATH" "$VLC_SRC_DIR/extras/tools/build/share/aclocal/" >&3
+
     # Add the ac_cv_ var exports in the config.mak for the contribs
     echo "Appending ac_cv_ vars to config.mak"
     vlcSetSymbolEnvironment ac_var_to_export_ac_var >&3
