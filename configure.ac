@@ -623,6 +623,7 @@ TOOLS_DIR="${srcdir}/extras/tools/build/bin"
 AS_IF([test -d "${TOOLS_DIR}"], [
     TOOLS_DIR=`cd "${TOOLS_DIR}" && pwd`
     export PATH="${TOOLS_DIR}:$PATH"
+    export ACLOCAL_PATH="${srcdir}/extras/tools/build/share/aclocal"
 ])
 
 dnl
@@ -4733,6 +4734,7 @@ echo "#! $SHELL
 rm -f .error\$\$
 ERROR=0
 export PATH=\"$PATH\" LANG=C
+export ACLOCAL_PATH="${srcdir}/extras/tools/build/share/aclocal"
 ($MAKE V=1 \$@ 2>&1 || touch .error\$\$)| $compile_top_srcdir/extras/buildsystem/make.pl
 test -f .error\$\$ && ERROR=1
 rm -f .error\$\$
