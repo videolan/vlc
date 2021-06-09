@@ -116,6 +116,14 @@
 @property (readwrite, weak) IBOutlet NSButton *filterScaleTempoCheckbox;
 @property (readwrite, weak) IBOutlet NSButton *filterStereoEnhancerCheckbox;
 
+/* Advanced */
+@property (readwrite, weak) IBOutlet NSView *advancedView;
+@property (readwrite, weak) IBOutlet NSButton *advancedEnableCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *advancedResetButton;
+@property (readwrite, weak) IBOutlet NSSlider *advancedPitchSlider;
+@property (readwrite, weak) IBOutlet NSTextField *advancedPitchTextField;
+@property (readwrite, weak) IBOutlet NSTextField *advancedPitchLabel;
+
 /* generic */
 - (IBAction)profileSelectorAction:(id)sender;
 - (IBAction)applyProfileCheckboxChanged:(id)sender;
@@ -146,5 +154,10 @@
 - (IBAction)filterEnableKaraoke:(id)sender;
 - (IBAction)filterEnableScaleTempo:(id)sender;
 - (IBAction)filterEnableStereoEnhancer:(id)sender;
+
+/* Advanced */
+- (IBAction)resetAdvancedValues:(id)sender;
+- (IBAction)advancedEnable:(id)sender;
+- (IBAction)advancedSliderUpdated:(id)sender;
 
 @end

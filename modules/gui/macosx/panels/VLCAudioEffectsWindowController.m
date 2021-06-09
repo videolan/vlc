@@ -104,8 +104,8 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
 
 + (NSString *)defaultProfileString
 {
-    return [NSString stringWithFormat:@"ZmxhdA==;;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%i",
-            .0,25.,100.,-11.,8.,2.5,7.,.85,1.,.4,.5,.5,2.,0];
+    return [NSString stringWithFormat:@"ZmxhdA==;;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%i;%f",
+            .0,25.,100.,-11.,8.,2.5,7.,.85,1.,.4,.5,.5,2.,0,0.25f];
 }
 
 - (id)init
@@ -123,6 +123,7 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
                 [self resetCompressor];
                 [self resetSpatializer];
                 [self resetAudioFilters];
+                [self resetAdvanced];
 
                 [self loadProfile];
             } else {
@@ -155,11 +156,12 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
     aout_EnableFilter(p_aout, "equalizer", false);
     aout_EnableFilter(p_aout, "compressor", false);
     aout_EnableFilter(p_aout, "spatializer", false);
-    aout_EnableFilter(p_aout, "compressor", false);
+    aout_EnableFilter(p_aout, "scaletempo", false);
     aout_EnableFilter(p_aout, "headphone", false);
     aout_EnableFilter(p_aout, "normvol", false);
     aout_EnableFilter(p_aout, "karaoke", false);
-
+    aout_EnableFilter(p_aout, "scaletempo_pitch", false);
+  
     /* fetch preset */
     NSString *profileString;
     if (profileIndex == 0)
@@ -194,6 +196,18 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
     var_SetFloat(p_aout, "spatializer-damp", [[items objectAtIndex:13] floatValue]);
     var_SetFloat(p_aout, "norm-max-level", [[items objectAtIndex:14] floatValue]);
     var_SetBool(p_aout, "equalizer-2pass", (BOOL)[[items objectAtIndex:15] intValue]);
+    
+    // The old version of the defaults data contains 16 members (without pitch).
+    // These values are used above.
+    // In case the user updates VLC, this check handles the 1 time case that the data
+    // is still in the old format, and sets the pitch value to the default, otherwise
+    // it loads normally the saved pitch value.
+    if (likely(items.count >= 17)) {
+        var_SetFloat(p_aout, "pitch-shift", [[items objectAtIndex:16] floatValue]);
+    } else {
+        var_SetFloat(p_aout, "pitch-shift", 0.25f);
+    }
+    
     var_SetString(p_aout, "equalizer-bands", [[[defaults objectForKey:VLCAudioEffectsEqualizerValuesKey] objectAtIndex:presetIndex] UTF8String]);
     var_SetFloat(p_aout, "equalizer-preamp", [[[defaults objectForKey:VLCAudioEffectsEqualizerPreampValuesKey] objectAtIndex:presetIndex] floatValue]);
     var_SetString(p_aout, "equalizer-preset", [[[defaults objectForKey:VLCAudioEffectsEqualizerProfileNamesKey] objectAtIndex:presetIndex] UTF8String]);
@@ -272,12 +286,19 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
                                                   "suppressing mono (signal common to both channels) "\
                                                   "and by delaying the signal of left into right and vice versa, "\
                                                   "thereby widening the stereo effect.")];
-
+    
+    /* Advanced */
+    [_advancedEnableCheckbox setTitle:_NS("Enable")];
+    [_advancedResetButton setTitle:_NS("Reset")];
+    [_advancedPitchLabel setStringValue:_NS("Adjust pitch")];
+    
+    
     /* generic */
     [_segmentView setLabel:_NS("Equalizer") forSegment:0];
     [_segmentView setLabel:_NS("Compressor") forSegment:1];
     [_segmentView setLabel:_NS("Spatializer") forSegment:2];
     [_segmentView setLabel:_NS("Filter") forSegment:3];
+    [_segmentView setLabel:_NS("Advanced") forSegment:4];
 
     [self.window setTitle:_NS("Audio Effects")];
     [self.window setExcludedFromWindowsMenu:YES];
@@ -288,6 +309,8 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
     [self resetSpatializer];
     [self resetAudioFilters];
     [self resetProfileSelector];
+    [self resetAdvanced];
+
 }
 
 - (void)dealloc
@@ -370,7 +393,7 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
     if (!p_aout)
         return nil;
 
-    return [NSString stringWithFormat:@"%@;%@;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%i",
+    return [NSString stringWithFormat:@"%@;%@;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%i;%f",
                      B64EncAndFree(var_GetNonEmptyString(p_aout, "equalizer-preset")),
                      B64EncAndFree(var_InheritString(p_aout, "audio-filter")),
                      var_InheritFloat(p_aout, "compressor-rms-peak"),
@@ -386,7 +409,8 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
                      var_InheritFloat(p_aout, "spatializer-dry"),
                      var_InheritFloat(p_aout, "spatializer-damp"),
                      var_InheritFloat(p_aout, "norm-max-level"),
-                     var_InheritBool(p_aout,"equalizer-2pass")];
+                     var_InheritBool(p_aout, "equalizer-2pass"),
+                     var_InheritFloat(p_aout, "pitch-shift")];
 }
 
 - (void)saveCurrentProfile
@@ -506,6 +530,7 @@ NSString *VLCAudioEffectsProfileNamesKey = @"AudioEffectProfileNames";
     [self resetCompressor];
     [self resetSpatializer];
     [self resetAudioFilters];
+    [self resetAdvanced];
     [self updatePresetSelector];
 }
 
@@ -1190,5 +1215,69 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
 {
     [_playerController enableAudioFilterWithName:@"stereo_widen" state:[sender state]];
 }
+
+#pragma mark -
+#pragma mark Advanced
+- (void)resetAdvanced
+{
+    BOOL bEnable_advanced = NO;
+    char *psz_afilters    = NULL;
+    
+    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    if (!p_aout)
+        return;
+
+    psz_afilters = var_InheritString(p_aout, "audio-filter");
+    if (psz_afilters) {
+        bEnable_advanced = strstr(psz_afilters, "scaletempo_pitch") != NULL;
+        free(psz_afilters);
+    }
+
+    [_advancedView enableSubviews:bEnable_advanced];
+    [_advancedEnableCheckbox setState:(bEnable_advanced ? NSOnState : NSOffState)];
+    
+    [_advancedPitchSlider setFloatValue: var_CreateGetFloat(p_aout, "pitch-shift")];
+    [_advancedPitchTextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f semitones", [_advancedPitchSlider floatValue]]];
+
+    aout_Release(p_aout);
+}
+
+- (IBAction)resetAdvancedValues:(id)sender
+{
+    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    if (p_aout) {
+        var_SetFloat(p_aout, "pitch-shift", 0.25f);
+        aout_Release(p_aout);
+    }
+    
+    [self resetAdvanced];
+}
+
+- (IBAction)advancedSliderUpdated:(id)sender
+{
+    char *psz_property = nil;
+    float f_value = [sender floatValue];
+
+    if (sender == _advancedPitchSlider)
+        psz_property = "pitch-shift";
+
+    assert(psz_property);
+
+    audio_output_t *p_aout = [_playerController mainAudioOutput];
+    if (p_aout) {
+        var_SetFloat(p_aout, psz_property, f_value);
+        aout_Release(p_aout);
+    }
+
+    if (sender == _advancedPitchSlider)
+        [_advancedPitchTextField setStringValue:[NSString localizedStringWithFormat:@"%1.1f semitones", f_value]];
+}
+
+- (IBAction)advancedEnable:(id)sender
+{
+    [_advancedView enableSubviews:[sender state]];
+    [_playerController enableAudioFilterWithName:@"scaletempo_pitch" state:[sender state]];
+}
+
 
 @end
