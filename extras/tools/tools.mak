@@ -122,7 +122,8 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 
 .buildlibtool: libtool .automake .help2man
 	(cd $(UNPACK_DIR) && autoreconf -fv)
-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE))
+	(cd $<; touch build-aux/ltmain.in && $(MAKE) libtool && $(MAKE) install)
 	ln -sf libtool $(PREFIX)/bin/glibtool
 	ln -sf libtoolize $(PREFIX)/bin/glibtoolize
 	touch $@
