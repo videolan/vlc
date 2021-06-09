@@ -506,6 +506,19 @@ bool MediaLibrary::Start()
 
 int MediaLibrary::Control( int query, va_list args )
 {
+    /*
+     * Contrary to Get and List requests, not all Control requests may acquire
+     * the priority access safely (without deadlocks) currently: some of them
+     * indirectly acquire the internal medialibrary mutex (for example,
+     * MediaLibrary::reload() calls startDiscoverer()), which may be locked by
+     * a non-priority caller.
+     *
+     * Therefore, priority access is only acquired for Control requests which
+     * do not suffer for this problem.
+     *
+     * See <https://code.videolan.org/videolan/vlc/-/merge_requests/223>
+     */
+
     switch ( query )
     {
         case VLC_ML_ADD_FOLDER:
@@ -553,6 +566,8 @@ int MediaLibrary::Control( int query, va_list args )
         }
         case VLC_ML_IS_INDEXED:
         {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
             auto mrl = va_arg( args, const char* );
             auto res = va_arg( args, bool* );
             *res = m_ml->isIndexed( mrl );
@@ -578,6 +593,8 @@ int MediaLibrary::Control( int query, va_list args )
             break;
         case VLC_ML_NEW_EXTERNAL_MEDIA:
         {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
             auto mrl = va_arg( args, const char* );
             auto media = m_ml->addExternalMedia( mrl, -1 );
             if ( media == nullptr )
@@ -587,6 +604,8 @@ int MediaLibrary::Control( int query, va_list args )
         }
         case VLC_ML_NEW_STREAM:
         {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
             auto mrl = va_arg( args, const char* );
             auto media = m_ml->addStream( mrl );
             if ( media == nullptr )
@@ -596,6 +615,8 @@ int MediaLibrary::Control( int query, va_list args )
         }
         case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
         {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
             auto mediaId = va_arg( args, int64_t );
             auto sizeType = va_arg( args, int );
             auto width = va_arg( args, uint32_t );
@@ -618,9 +639,15 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_MEDIA_REMOVE_BOOKMARK:
         case VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS:
         case VLC_ML_MEDIA_UPDATE_BOOKMARK:
+        {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
             return controlMedia( query, args );
+        }
         case VLC_ML_PLAYLIST_CREATE:
         {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
             auto name = va_arg( args, const char * );
             auto playlist = m_ml->createPlaylist( name );
             if ( playlist == nullptr )
@@ -631,12 +658,16 @@ int MediaLibrary::Control( int query, va_list args )
         }
         case VLC_ML_PLAYLIST_DELETE:
         {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
             if ( m_ml->deletePlaylist( va_arg( args, int64_t ) ) == false )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
         case VLC_ML_PLAYLIST_APPEND:
         {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
             auto playlist = m_ml->playlist( va_arg( args, int64_t ) );
             if ( playlist == nullptr )
                 return VLC_EGENERIC;
@@ -646,6 +677,8 @@ int MediaLibrary::Control( int query, va_list args )
         }
         case VLC_ML_PLAYLIST_INSERT:
         {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
             auto playlist = m_ml->playlist( va_arg( args, int64_t ) );
             if ( playlist == nullptr )
                 return VLC_EGENERIC;
@@ -657,6 +690,8 @@ int MediaLibrary::Control( int query, va_list args )
         }
         case VLC_ML_PLAYLIST_MOVE:
         {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
             auto playlist = m_ml->playlist( va_arg( args, int64_t ) );
             if ( playlist == nullptr )
                 return VLC_EGENERIC;
@@ -668,6 +703,8 @@ int MediaLibrary::Control( int query, va_list args )
         }
         case VLC_ML_PLAYLIST_REMOVE:
         {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
             auto playlist = m_ml->playlist( va_arg( args, int64_t ) );
             if ( playlist == nullptr )
                 return VLC_EGENERIC;
