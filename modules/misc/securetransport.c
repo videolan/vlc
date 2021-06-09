@@ -441,12 +441,11 @@ static int st_Handshake (vlc_tls_t *session,
     (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MAX_ALLOWED  >= 110000) || \
     (TARGET_OS_TV     && __TV_OS_VERSION_MAX_ALLOWED      >= 110000) || \
     (TARGET_OS_WATCH  && __WATCH_OS_VERSION_MAX_ALLOWED   >= 40000)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 
     /* Handle ALPN data */
     if (alp != NULL) {
-        if (SSLCopyALPNProtocols != NULL) {
+        if (__builtin_available(iOS 11, macOS 10.13.4, tvOS 11, watchOS 4, *))
+        {
             CFArrayRef alpnArray = NULL;
             OSStatus res = SSLCopyALPNProtocols(sys->p_context, &alpnArray);
             if (res == noErr && alpnArray) {
@@ -462,7 +461,6 @@ static int st_Handshake (vlc_tls_t *session,
         }
     }
 
-#pragma clang diagnostic pop
 #else
 
     /* No ALPN support */
@@ -745,12 +743,11 @@ static vlc_tls_t *st_ClientSessionOpen(vlc_tls_client_t *crd, vlc_tls_t *sock,
     (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MAX_ALLOWED  >= 110000) || \
     (TARGET_OS_TV     && __TV_OS_VERSION_MAX_ALLOWED      >= 110000) || \
     (TARGET_OS_WATCH  && __WATCH_OS_VERSION_MAX_ALLOWED   >= 40000)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 
     /* Handle ALPN */
     if (alpn != NULL) {
-        if (SSLSetALPNProtocols != NULL) {
+        if (__builtin_available(iOS 11, macOS 10.13.4, tvOS 11, watchOS 4, *))
+        {
             CFMutableArrayRef alpnValues = alpnToCFArray(alpn);
 
             if (alpnValues == NULL) {
@@ -768,7 +765,6 @@ static vlc_tls_t *st_ClientSessionOpen(vlc_tls_client_t *crd, vlc_tls_t *sock,
         }
     }
 
-#pragma clang diagnostic pop
 #else
 
     /* No ALPN support */
