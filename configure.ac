@@ -4896,7 +4896,11 @@ echo "#! $SHELL
 rm -f .error\$\$
 ERROR=0
 export PATH=\"$PATH\" LANG=C
+if [ "$NO_COLOR" = 1 ]; then
+($MAKE V=1 \$@ 2>&1 || touch .error\$\$)
+else
 ($MAKE V=1 \$@ 2>&1 || touch .error\$\$)| $compile_top_srcdir/extras/buildsystem/make.pl
+fi
 test -f .error\$\$ && ERROR=1
 rm -f .error\$\$
 exit \$ERROR" >compile
