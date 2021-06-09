@@ -4727,7 +4727,7 @@ rm -f .error\$\$
 ERROR=0
 export PATH=\"$PATH\" LANG=C
 export ACLOCAL_PATH="${srcdir}/extras/tools/build/share/aclocal"
-($MAKE V=1 \$@ 2>&1 || touch .error\$\$)| $compile_top_srcdir/extras/buildsystem/make.pl
+($MAKE V=1 \$@ 2>&1 || touch .error\$\$)
 test -f .error\$\$ && ERROR=1
 rm -f .error\$\$
 exit \$ERROR" >compile
