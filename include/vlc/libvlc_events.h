@@ -85,7 +85,8 @@ enum libvlc_event_e {
     libvlc_MediaSubItemTreeAdded,
     /**
      * A thumbnail generation for this \link #libvlc_media_t media \endlink completed.
-     * \see libvlc_media_get_thumbnail()
+     * \see libvlc_media_thumbnail_request_by_time()
+     * \see libvlc_media_thumbnail_request_by_pos()
      */
     libvlc_MediaThumbnailGenerated,
     /**
