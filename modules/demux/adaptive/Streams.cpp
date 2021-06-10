@@ -252,6 +252,7 @@ bool AbstractStream::startDemux()
     {
         currentChunk = getNextChunk();
         needrestart = false;
+        discontinuity = false;
     }
 
     demuxersource->Reset();
