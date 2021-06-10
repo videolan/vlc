@@ -31,11 +31,12 @@ libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.m \
 libglinterop_cvpx_plugin_la_SOURCES += codec/vt_utils.c codec/vt_utils.h
 libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,Foundation,-framework,CoreVideo
+libglinterop_cvpx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 
 if HAVE_OSX
 libvout_macosx_plugin_la_SOURCES = video_output/macosx.m \
 	$(OPENGL_VOUT_COMMONSOURCES)
-libvout_macosx_plugin_la_CFLAGS = $(AM_CFLAGS) -DHAVE_GL_CORE_SYMBOLS
+libvout_macosx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DHAVE_GL_CORE_SYMBOLS
 libvout_macosx_plugin_la_LIBADD = libvlc_opengl.la
 libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGL,-framework,Cocoa
@@ -52,7 +53,7 @@ vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la \
 	libglinterop_cvpx_plugin.la
 endif
 if HAVE_IOS
-libglinterop_cvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
+libglinterop_cvpx_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface,-framework,OpenGLES
 endif
 
