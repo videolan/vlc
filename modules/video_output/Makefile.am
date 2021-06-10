@@ -30,8 +30,18 @@ libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.m \
 	video_output/opengl/interop.h
 libglinterop_cvpx_plugin_la_SOURCES += codec/vt_utils.c codec/vt_utils.h
 libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
-	-Wl,-framework,Foundation,-framework,CoreVideo
+	-Wl,-framework,Foundation,-framework,CoreVideo,-framework,IOSurface
 libglinterop_cvpx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+if HAVE_DARWIN
+if HAVE_OSX
+libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
+else
+libglinterop_cvpx_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
+libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
+endif
+vout_LTLIBRARIES += libglinterop_cvpx_plugin.la
+endif
+
 
 if HAVE_OSX
 libvout_macosx_plugin_la_SOURCES = video_output/macosx.m \
@@ -48,16 +58,7 @@ libcaopengllayer_plugin_la_LIBADD = libvlc_opengl.la
 libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
 
-libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface,-framework,OpenGL
-vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la \
-	libglinterop_cvpx_plugin.la
-endif
-
-if HAVE_DARWIN
-if !HAVE_OSX
-libglinterop_cvpx_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
-libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface,-framework,OpenGLES
-endif
+vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la
 endif
 
 libvout_ios_plugin_la_SOURCES = video_output/opengl/display.c
@@ -76,14 +77,12 @@ libcaeagl_ios_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 
 if HAVE_IOS
 vout_LTLIBRARIES += libvout_ios_plugin.la \
-	libglinterop_cvpx_plugin.la \
 	libuiview_window_plugin.la \
 	libcaeagl_ios_plugin.la
 endif
 if HAVE_TVOS
 vout_LTLIBRARIES += \
 	libvout_ios_plugin.la \
-	libglinterop_cvpx_plugin.la \
 	libuiview_window_plugin.la \
 	libcaeagl_ios_plugin.la
 endif
