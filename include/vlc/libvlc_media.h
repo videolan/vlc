@@ -713,7 +713,7 @@ typedef enum libvlc_thumbnailer_seek_speed_t
 } libvlc_thumbnailer_seek_speed_t;
 
 /**
- * \brief libvlc_media_get_thumbnail_by_time Start an asynchronous thumbnail generation
+ * \brief libvlc_media_request_thumbnail_by_time Start an asynchronous thumbnail generation
  *
  * If the request is successfuly queued, the libvlc_MediaThumbnailGenerated
  * is guaranteed to be emited.
@@ -750,7 +750,7 @@ libvlc_media_thumbnail_request_by_time( libvlc_media_t *md,
                                         libvlc_time_t timeout );
 
 /**
- * \brief libvlc_media_get_thumbnail_by_pos Start an asynchronous thumbnail generation
+ * \brief libvlc_media_request_thumbnail_by_pos Start an asynchronous thumbnail generation
  *
  * If the request is successfuly queued, the libvlc_MediaThumbnailGenerated
  * is guaranteed to be emited.
