@@ -54,14 +54,14 @@ QtObject {
         source: "{{qml_file_prefix}}{{font_file}}"
     }
 
-    property string fontFamily: "{{font_name}}"
+    readonly property string fontFamily: "{{font_name}}"
 
     function pixelSize(size) {
         return size * 0.6
     }
 
     // Icons
-{% for f in glyphs %}    property string {{f.key}} : "{{f.charcode}}"
+{% for f in glyphs %}    readonly property string {{f.key}} : "{{f.charcode}}"
 {% endfor %}
 }
 
