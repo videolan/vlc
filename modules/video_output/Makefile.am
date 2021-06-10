@@ -28,7 +28,7 @@ endif
 
 libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.m \
 	video_output/opengl/interop.h
-libglinterop_cvpx_plugin_la_SOURCES += codec/vt_utils.c codec/vt_utils.h
+libglinterop_cvpx_plugin_la_LIBADD = libvlc_vtutils.la
 libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,Foundation,-framework,CoreVideo,-framework,IOSurface
 libglinterop_cvpx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
