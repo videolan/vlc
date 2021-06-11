@@ -324,6 +324,7 @@ raspbian-arm:
     CCACHE_CPP2: 'true'
     VLC_CCACHE_BINS_PATH: '/Users/videolanci/sandbox/bin/ccache/bin'
   before_script:
+    - !reference [default, before_script]
     - |
       if [ -x "${VLC_CCACHE_BINS_PATH}/ccache" ]; then
         ${VLC_CCACHE_BINS_PATH}/ccache --zero-stats
@@ -333,6 +334,7 @@ raspbian-arm:
         unset VLC_CCACHE_BINS_PATH
       fi
   after_script:
+    - !reference [default, after_script]
     - |
       if [ -x "${VLC_CCACHE_BINS_PATH}/ccache" ]; then
         ${VLC_CCACHE_BINS_PATH}/ccache --show-stats
