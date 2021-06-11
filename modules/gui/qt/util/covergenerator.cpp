@@ -53,7 +53,7 @@ CoverGenerator::CoverGenerator(vlc_medialibrary_t * ml, const MLItemId & itemId,
     , m_countX(COVERGENERATOR_COUNT)
     , m_countY(COVERGENERATOR_COUNT)
     , m_split(Divide)
-    , m_smooth(false)
+    , m_smooth(true)
     , m_blur(0)
     , m_default(COVERGENERATOR_DEFAULT) {}
 
