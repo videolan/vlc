@@ -288,6 +288,21 @@ static unsigned char* parseVorbisConfigStr( char const* configStr,
 
 static char *passwordLessURL( vlc_url_t *url );
 
+static bool copyExtradata( const void *p_extra, size_t i_extra, es_format_t *dst )
+{
+    dst->i_extra = 0;
+    dst->p_extra = NULL;
+    if( i_extra )
+    {
+        dst->p_extra = std::malloc( i_extra );
+        if( !dst->p_extra )
+            return false;
+        memcpy( dst->p_extra, p_extra, i_extra );
+        dst->i_extra = i_extra;
+    }
+    return true;
+}
+
 #define PCR_OBS VLC_TICK_FROM_MS(250)
 #define PCR_OFF PCR_OBS
 
@@ -966,9 +981,7 @@ static int SessionsSetup( demux_t *p_demux )
                     if( ( p_extra = parseStreamMuxConfigStr( sub->fmtp_config(),
                                                              i_extra ) ) )
                     {
-                        tk->fmt.i_extra = i_extra;
-                        tk->fmt.p_extra = xmalloc( i_extra );
-                        memcpy( tk->fmt.p_extra, p_extra, i_extra );
+                        copyExtradata( p_extra, i_extra, &tk->fmt );
                         delete[] p_extra;
                     }
                     /* Because the "faad" decoder does not handle the LATM
@@ -986,9 +999,7 @@ static int SessionsSetup( demux_t *p_demux )
                     if( ( p_extra = parseGeneralConfigStr( sub->fmtp_config(),
                                                            i_extra ) ) )
                     {
-                        tk->fmt.i_extra = i_extra;
-                        tk->fmt.p_extra = xmalloc( i_extra );
-                        memcpy( tk->fmt.p_extra, p_extra, i_extra );
+                        copyExtradata( p_extra, i_extra, &tk->fmt );
                         delete[] p_extra;
                     }
                 }
@@ -1057,45 +1068,44 @@ static int SessionsSetup( demux_t *p_demux )
                     if((p_extra=parseH264ConfigStr( sub->fmtp_spropparametersets(),
                                                     i_extra ) ) )
                     {
-                        tk->fmt.i_extra = i_extra;
-                        tk->fmt.p_extra = xmalloc( i_extra );
-                        memcpy( tk->fmt.p_extra, p_extra, i_extra );
-
+                        copyExtradata( p_extra, i_extra, &tk->fmt );
                         delete[] p_extra;
                     }
                 }
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1393372800 // 2014.02.26
                 else if( !strcmp( sub->codecName(), "H265" ) )
                 {
-                   unsigned int i_extra1 = 0, i_extra2 = 0, i_extra3 = 0, i_extraTot;
-                    uint8_t      *p_extra1 = NULL, *p_extra2 = NULL, *p_extra3 = NULL;
+                    struct
+                    {
+                        unsigned int i_data;
+                        uint8_t * p_data;
+                    } xps[3] = {{0, NULL},{0, NULL},{0, NULL}};
+                    unsigned int i_extraTot = 0;
+                    uint8_t      *p_extra;
 
                     tk->fmt.i_codec = VLC_CODEC_HEVC;
                     tk->fmt.b_packetized = false;
 
-                    p_extra1 = parseH264ConfigStr( sub->fmtp_spropvps(), i_extra1 );
-                    p_extra2 = parseH264ConfigStr( sub->fmtp_spropsps(), i_extra2 );
-                    p_extra3 = parseH264ConfigStr( sub->fmtp_sproppps(), i_extra3 );
-                   i_extraTot = i_extra1 + i_extra2 + i_extra3;
-                   if( i_extraTot > 0 )
+                    xps[0].p_data = parseH264ConfigStr( sub->fmtp_spropvps(), xps[0].i_data );
+                    xps[1].p_data = parseH264ConfigStr( sub->fmtp_spropsps(), xps[1].i_data );
+                    xps[2].p_data = parseH264ConfigStr( sub->fmtp_sproppps(), xps[2].i_data );
+                    for( int i=0; i<3; i++ )
+                        i_extraTot += xps[i].i_data;
+                    if( i_extraTot > 0 && (p_extra = (uint8_t *)std::malloc( i_extraTot )) )
                     {
+                        tk->fmt.p_extra = p_extra;
                         tk->fmt.i_extra = i_extraTot;
-                        tk->fmt.p_extra = xmalloc( i_extraTot );
-                       if( p_extra1 )
-                       {
-                            memcpy( tk->fmt.p_extra, p_extra1, i_extra1 );
-                       }
-                       if( p_extra2 )
-                       {
-                         memcpy( ((char*)tk->fmt.p_extra)+i_extra1, p_extra2, i_extra2 );
-                       }
-                       if( p_extra3 )
-                       {
-                         memcpy( ((char*)tk->fmt.p_extra)+i_extra1+i_extra2, p_extra3, i_extra3 );
-                       }
-
-                        delete[] p_extra1; delete[] p_extra2; delete[] p_extra3;
+                        for( int i=0; i<3; i++ )
+                        {
+                            if( xps[i].i_data )
+                            {
+                                memcpy( p_extra, xps[i].p_data, xps[i].i_data );
+                                p_extra += xps[i].i_data;
+                            }
+                        }
                     }
+                    for( int i=0; i<3; i++ )
+                        delete [] xps[i].p_data;
                 }
 #endif
                 else if( !strcmp( sub->codecName(), "JPEG" ) )
@@ -1112,9 +1122,7 @@ static int SessionsSetup( demux_t *p_demux )
                     if( ( p_extra = parseGeneralConfigStr( sub->fmtp_config(),
                                                            i_extra ) ) )
                     {
-                        tk->fmt.i_extra = i_extra;
-                        tk->fmt.p_extra = xmalloc( i_extra );
-                        memcpy( tk->fmt.p_extra, p_extra, i_extra );
+                        copyExtradata( p_extra, i_extra, &tk->fmt );
                         delete[] p_extra;
                     }
                 }
@@ -1971,9 +1979,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
                         atomLength > 8 &&
                         atomLength <= INT_MAX )
                     {
-                        tk->fmt.i_extra = atomLength-8;
-                        tk->fmt.p_extra = xmalloc( tk->fmt.i_extra );
-                        memcpy(tk->fmt.p_extra, pos+8, atomLength-8);
+                        copyExtradata( pos+8, atomLength-8, &tk->fmt );
                         break;
                     }
                     pos += atomLength;
@@ -1981,9 +1987,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
             }
             else
             {
-                tk->fmt.i_extra        = qtState.sdAtomSize - 16;
-                tk->fmt.p_extra        = xmalloc( tk->fmt.i_extra );
-                memcpy( tk->fmt.p_extra, &sdAtom[12], tk->fmt.i_extra );
+                copyExtradata( &sdAtom[12], qtState.sdAtomSize - 16, &tk->fmt );
             }
         }
         else {
@@ -2380,9 +2384,13 @@ static uint8_t *parseVorbisConfigStr( char const* configStr,
     const unsigned int headerSkip = 9;
     if( configSize > headerSkip && ((uint8_t*)p_cfg)[3] == 1 )
     {
-        configSize -= headerSkip;
-        p_extra = (uint8_t*)xmalloc( configSize );
-        memcpy( p_extra, p_cfg+headerSkip, configSize );
+        p_extra = (uint8_t *) std::malloc( configSize - headerSkip );
+        if( p_extra )
+        {
+            configSize -= headerSkip;
+            memcpy( p_extra, p_cfg+headerSkip, configSize );
+        }
+        else configSize = 0;
     }
     delete[] p_cfg;
     return p_extra;
