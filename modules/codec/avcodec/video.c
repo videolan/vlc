@@ -383,18 +383,13 @@ static int OpenVideoCodec( decoder_t *p_dec )
     cc_Init( &p_sys->cc );
 
     set_video_color_settings( &p_dec->fmt_in.video, ctx );
-    if( p_dec->fmt_in.video.i_frame_rate_base &&
+    if( var_InheritBool(p_dec, "low-delay") ||
+      ( p_dec->fmt_in.video.i_frame_rate_base &&
         p_dec->fmt_in.video.i_frame_rate &&
         (double) p_dec->fmt_in.video.i_frame_rate /
-                 p_dec->fmt_in.video.i_frame_rate_base < 6 )
+                 p_dec->fmt_in.video.i_frame_rate_base < 6 ) )
     {
         ctx->flags |= AV_CODEC_FLAG_LOW_DELAY;
-    }
-
-    if( var_InheritBool(p_dec, "low-delay") )
-    {
-        ctx->flags |= AV_CODEC_FLAG_LOW_DELAY;
-        ctx->active_thread_type = FF_THREAD_SLICE;
     }
 
     ret = ffmpeg_OpenCodec( p_dec, ctx, codec );
@@ -557,6 +552,9 @@ int InitVideoDec( vlc_object_t *obj )
         default:
             break;
     }
+
+    if( var_InheritBool(p_dec, "low-delay") )
+        p_context->thread_type &= ~FF_THREAD_FRAME;
 
     if( p_context->thread_type & FF_THREAD_FRAME )
         p_dec->i_extra_picture_buffers = 2 * p_context->thread_count;
