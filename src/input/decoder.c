@@ -160,7 +160,7 @@ struct vlc_input_decoder_t
     bool b_idle;
     bool aborting;
 
-    bool b_display_avstat;
+    atomic_bool b_display_avstat;
 
     /* CC */
 #define MAX_CC_DECODERS 64 /* The es_out only creates one type of es */
@@ -1128,7 +1128,7 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
         p_dec->fmt_in.i_cat == AUDIO_ES ? "AUDIO" :
         NULL;
 
-    if( type != NULL && p_owner->b_display_avstat)
+    if( type != NULL && atomic_load(&p_owner->b_display_avstat))
     {
         msg_Info( p_dec, "avstats: ts=%" PRId64 ", [DEC][OUT][%s], pts=%" PRId64,
                   NS_FROM_VLC_TICK(vlc_tick_now()), type,
@@ -1342,7 +1342,7 @@ static void DecoderThread_DecodeBlock( vlc_input_decoder_t *p_owner, block_t *p_
         p_dec->fmt_in.i_cat == AUDIO_ES ? "AUDIO" :
         NULL;
 
-    if( type != NULL && p_block && p_owner->b_display_avstat)
+    if( type != NULL && p_block && atomic_load(&p_owner->b_display_avstat))
     {
         msg_Info( p_dec, "avstats: ts=%" PRId64 ", [DEC][IN][%s], dts=%" PRId64
                           ", pts=%" PRId64,
@@ -1806,6 +1806,13 @@ static const struct decoder_owner_callbacks dec_spu_cbs =
     .get_attachments = InputThread_GetInputAttachments,
 };
 
+static int avstat_callback(vlc_object_t *obj, const char *name,
+        vlc_value_t oldval, vlc_value_t newval, void *opaque)
+{
+    vlc_input_decoder_t *p_owner = opaque;
+    atomic_store(&p_owner->b_display_avstat, newval.b_bool);
+}
+
 /**
  * Create a decoder object
  *
@@ -1866,7 +1873,10 @@ CreateDecoder( vlc_object_t *p_parent,
     p_owner->drained = false;
     atomic_init( &p_owner->reload, RELOAD_NO_REQUEST );
     p_owner->b_idle = false;
-    p_owner->b_display_avstat = var_InheritBool(p_parent, "avstat");
+
+    libvlc_int_t *libvlc = vlc_object_instance(p_parent);
+    var_AddCallback(libvlc, "avstat", avstat_callback, p_owner);
+    atomic_store(&p_owner->b_display_avstat, var_InheritBool(libvlc, "avstat"));
 
     p_owner->mouse_event = NULL;
     p_owner->mouse_opaque = NULL;
@@ -2050,6 +2060,9 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner )
 
     if( p_owner->p_description )
         vlc_meta_Delete( p_owner->p_description );
+
+    libvlc_int_t *libvlc = vlc_object_instance( &p_owner->dec );
+    var_DelCallback(libvlc, "avstat", avstat_callback, p_owner);
 
     decoder_Destroy( p_owner->p_packetizer );
     decoder_Destroy( &p_owner->dec );
