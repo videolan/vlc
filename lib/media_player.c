@@ -2441,6 +2441,16 @@ int libvlc_media_player_enable_clock_recovery(
     return true;
 }
 
+int libvlc_media_player_enable_avstat(
+        libvlc_media_player_t *p_mi,
+        bool enable)
+{
+    vlc_object_t *player = (vlc_object_t*)p_mi->player;
+    var_SetBool(player, "avstat", enable);
+    // TODO
+    return true;
+}
+
 void libvlc_media_player_set_stopped_action( libvlc_media_player_t *p_mi,
                                              libvlc_media_player_stopped_action_t action )
 {

@@ -232,7 +232,7 @@ typedef struct
 
     unsigned    cc_decoder;
 
-    bool        b_display_avstat;
+    atomic_bool        b_display_avstat;
 
     es_out_t out;
 } es_out_sys_t;
@@ -532,6 +532,13 @@ static void EsOutPropsInit( es_out_es_props_t *p_props,
 
 static const struct es_out_callbacks es_out_cbs;
 
+static int avstat_callback(vlc_object_t *obj, const char *name,
+        vlc_value_t oldval, vlc_value_t newval, void *opaque)
+{
+    es_out_sys_t *p_owner = opaque;
+    atomic_store(&p_owner->b_display_avstat, newval.b_bool);
+}
+
 /*****************************************************************************
  * input_EsOutNew:
  *****************************************************************************/
@@ -548,7 +555,10 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
     p_sys->p_input = p_input;
     p_sys->main_source = main_source;
 
-    p_sys->b_display_avstat = var_InheritBool( p_input, "avstat" );
+    libvlc_int_t *libvlc = vlc_object_instance(p_input);
+    var_AddCallback(libvlc, "avstat", avstat_callback, p_sys);
+    atomic_store(&p_sys->b_display_avstat, var_InheritBool( libvlc, "avstat" ));
+
     p_sys->b_active = false;
     p_sys->i_mode   = ES_OUT_MODE_NONE;
     p_sys->input_type = input_type;
@@ -660,6 +670,9 @@ static void EsOutDelete( es_out_t *out )
     EsOutPropsCleanup( &p_sys->video );
     EsOutPropsCleanup( &p_sys->audio );
     EsOutPropsCleanup( &p_sys->sub );
+
+    libvlc_int_t *libvlc = vlc_object_instance(p_sys->p_input);
+    var_DelCallback(libvlc, "avstat", avstat_callback, p_sys);
 
     free( p_sys );
 }
@@ -2948,7 +2961,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         es->fmt.i_cat == AUDIO_ES ? "AUDIO" :
         NULL;
 
-    if( type != NULL && p_sys->b_display_avstat )
+    if( type != NULL && atomic_load(&p_sys->b_display_avstat) )
     {
         msg_Info( p_input, "avstats: ts=%" PRId64 ", [DMX][OUT][%s], dts=%" PRId64 ", pts=%" PRId64,
                   NS_FROM_VLC_TICK(vlc_tick_now()), type,
@@ -3415,7 +3428,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
             vlc_tracer_TracePCR(tracer, "DEMUX", "PCR", i_pcr);
         }
 
-        if( p_sys->b_display_avstat )
+        if( atomic_load(&p_sys->b_display_avstat) )
             msg_Info( p_sys->p_input, "avstats: ts=%" PRId64 ", [DMX][OUT][PCR], pcr=%" PRId64,
                   NS_FROM_VLC_TICK(vlc_tick_now()), NS_FROM_VLC_TICK(i_pcr) );
 

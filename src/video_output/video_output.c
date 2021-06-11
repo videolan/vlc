@@ -179,7 +179,7 @@ typedef struct vout_thread_sys_t
         vout_chrono_t render;         /**< picture render time estimator */
     } chrono;
 
-    bool b_display_avstat;
+    atomic_bool b_display_avstat;
     vlc_atomic_rc_t rc;
 
 } vout_thread_sys_t;
@@ -1407,7 +1407,7 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
         vout_display_Display(vd, todisplay);
 
     vlc_tick_t now_ts = vlc_tick_now();
-    if (sys->b_display_avstat)
+    if (atomic_load(&sys->b_display_avstat))
         msg_Info( vd, "avstats: ts=%" PRId64 ", [RENDER][VIDEO], pts_per_vsync=%" PRId64 " pts=%" PRId64 " pcr=%" PRId64,
                   NS_FROM_VLC_TICK(now_ts),
                   NS_FROM_VLC_TICK(pts),
@@ -1873,6 +1873,13 @@ void vout_Stop(vout_thread_t *vout)
     vout_DisableWindow(sys);
 }
 
+static int avstat_callback(vlc_object_t *obj, const char *name,
+        vlc_value_t oldval, vlc_value_t newval, void *opaque)
+{
+    vout_thread_sys_t *p_owner = opaque;
+    atomic_store(&p_owner->b_display_avstat, newval.b_bool);
+}
+
 void vout_Close(vout_thread_t *vout)
 {
     assert(vout);
@@ -1898,6 +1905,9 @@ void vout_Release(vout_thread_t *vout)
 
     if (!vlc_atomic_rc_dec(&sys->rc))
         return;
+
+    libvlc_int_t *libvlc = vlc_object_instance(vout);
+    var_DelCallback(libvlc, "avstat", avstat_callback, sys);
 
     if (sys->dummy)
     {
@@ -1945,7 +1955,10 @@ vout_CreateCommon(vlc_object_t *object, void *owner,
     vlc_atomic_rc_init(&sys->rc);
     vlc_mouse_Init(&sys->mouse);
     sys->rendering_enabled = true;
-    sys->b_display_avstat = var_InheritBool(object, "avstat");
+
+    libvlc_int_t *libvlc = vlc_object_instance(object);
+    var_AddCallback(libvlc, "avstat", avstat_callback, sys);
+    atomic_store(&sys->b_display_avstat, var_InheritBool( libvlc, "avstat" ));
 
     return vout;
 }

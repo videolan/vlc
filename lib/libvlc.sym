@@ -295,3 +295,4 @@ libvlc_picture_list_at
 libvlc_picture_list_count
 libvlc_picture_list_destroy
 libvlc_abi_version
+libvlc_media_player_enable_avstat
