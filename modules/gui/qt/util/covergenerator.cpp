@@ -387,7 +387,7 @@ QStringList CoverGenerator::getGenre(int count, int64_t id) const
         if (url.isLocalFile() == false)
             continue;
 
-        thumbnails.append(url.path());
+        thumbnails.append(url.toLocalFile());
 
         if (thumbnails.count() == count)
             return thumbnails;
@@ -420,7 +420,7 @@ QStringList CoverGenerator::getMedias(int count, int64_t id, vlc_ml_parent_type 
         if (url.isLocalFile() == false)
             continue;
 
-        thumbnails.append(url.path());
+        thumbnails.append(url.toLocalFile());
 
         if (thumbnails.count() == count)
             return thumbnails;
