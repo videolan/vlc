@@ -900,16 +900,19 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     bool b_need_output_picture = true;
     bool b_error = false;
 
-    block_t *p_block;
+    block_t *p_block = pp_block ? *pp_block : NULL;
 
     if( !p_context->extradata_size && p_dec->fmt_in.i_extra )
     {
         ffmpeg_InitCodec( p_dec );
-        if( !avcodec_is_open( p_context ) )
-            OpenVideoCodec( p_dec );
+        if( !avcodec_is_open( p_context ) && OpenVideoCodec(p_dec) < 0 )
+        {
+            if( p_block != NULL )
+                block_Release( p_block );
+            return VLCDEC_ECRITICAL;
+        }
     }
 
-    p_block = pp_block ? *pp_block : NULL;
     if(!p_block && !(p_sys->p_codec->capabilities & AV_CODEC_CAP_DELAY) )
         return VLCDEC_SUCCESS;
 

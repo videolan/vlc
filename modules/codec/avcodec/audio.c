@@ -305,7 +305,12 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
      && !avcodec_is_open( ctx ) )
     {
         InitDecoderConfig( p_dec, ctx );
-        OpenAudioCodec( p_dec );
+        if( OpenAudioCodec( p_dec ) < 0 )
+        {
+            if( pp_block != NULL && *pp_block != NULL )
+                block_Release( *pp_block );
+            return VLCDEC_ECRITICAL;
+        }
     }
 
     if( !avcodec_is_open( ctx ) )
