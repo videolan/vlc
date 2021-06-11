@@ -1114,17 +1114,20 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
     bool eos_spotted = false;
 
 
-    block_t *p_block;
+    block_t *p_block = pp_block ? *pp_block : NULL;
     vlc_tick_t current_time;
 
     if( !p_context->extradata_size && p_dec->fmt_in.i_extra )
     {
         ffmpeg_InitCodec( p_dec );
-        if( !avcodec_is_open( p_context ) )
-            OpenVideoCodec( p_dec );
+        if( !avcodec_is_open( p_context ) && OpenVideoCodec(p_dec) < 0 )
+        {
+            if( p_block != NULL )
+                block_Release( p_block );
+            return NULL;
+        }
     }
 
-    p_block = pp_block ? *pp_block : NULL;
     if(!p_block && !(p_sys->p_codec->capabilities & AV_CODEC_CAP_DELAY) )
         return NULL;
 
