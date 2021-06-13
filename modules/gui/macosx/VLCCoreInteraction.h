@@ -1,7 +1,7 @@
 /*****************************************************************************
  * CoreInteraction.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2015 Felix Paul Kühne
+ * Copyright (C) 2011-2021 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -30,13 +30,17 @@
 @property (readwrite) int volume;
 @property (readonly, nonatomic) float maxVolume;
 @property (readwrite) int playbackRate;
+@property (readonly) float internalPlaybackRate;
 @property (nonatomic, readwrite) BOOL aspectRatioIsLocked;
 @property (readonly) int durationOfCurrentPlaylistItem;
 @property (readonly) NSURL * URLOfCurrentPlaylistItem;
 @property (readonly) NSString * nameOfCurrentPlaylistItem;
 @property (nonatomic, readwrite) BOOL mute;
+@property (readonly) float currentPlaybackPosition;
+@property (readonly) long long currentPlaybackTimeInSeconds;
 
 - (void)playOrPause;
+- (void)play;
 - (void)pause;
 - (void)stop;
 - (void)faster;
@@ -55,6 +59,7 @@
 - (void)backwardMedium;
 - (void)forwardLong;
 - (void)backwardLong;
+- (BOOL)seekToTime:(mtime_t)time;
 
 - (void)repeatOne;
 - (void)repeatAll;

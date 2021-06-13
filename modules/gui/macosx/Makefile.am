@@ -6,7 +6,7 @@ libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
 	-Wl,-framework,AVFoundation -Wl,-framework,CoreMedia -Wl,-framework,IOKit \
 	-Wl,-framework,AddressBook -Wl,-framework,WebKit -Wl,-framework,CoreAudio \
 	-Wl,-framework,SystemConfiguration -Wl,-framework,ScriptingBridge \
-	-Wl,-framework,QuartzCore
+	-Wl,-framework,QuartzCore -Wl,-weak_framework,MediaPlayer
 
 if HAVE_SPARKLE
 libmacosx_plugin_la_LDFLAGS += -Wl,-framework,Sparkle
@@ -106,7 +106,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCSliderCell.h gui/macosx/VLCSliderCell.m \
 	gui/macosx/VLCVolumeSlider.h gui/macosx/VLCVolumeSlider.m \
 	gui/macosx/VLCVolumeSliderCell.h gui/macosx/VLCVolumeSliderCell.m \
-	gui/macosx/VLCWrappableTextField.h gui/macosx/VLCWrappableTextField.m
+	gui/macosx/VLCWrappableTextField.h gui/macosx/VLCWrappableTextField.m \
+	gui/macosx/VLCRemoteControlService.h gui/macosx/VLCRemoteControlService.m
 
 # PXSourceList sources
 libmacosx_plugin_la_SOURCES += \

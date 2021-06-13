@@ -1,8 +1,10 @@
 /*****************************************************************************
- * VLCInputManager.h: MacOS X interface module
+ * VLCRemoteControlService.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2015 VLC authors and VideoLAN
- * $Id$
+ * Copyright (C) 2017, 2018, 2021 VLC authors and VideoLAN
+ *
+ * Authors: Carola Nitz <nitz.carola # gmail.com>
+ *          Felix Paul Kühne <fkuehne # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,28 +22,15 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-
 #include <vlc_common.h>
-#import <vlc_interface.h>
 
-#import <IOKit/pwr_mgt/IOPMLib.h>           /* for sleep prevention */
+@interface VLCRemoteControlService : NSObject
 
-@class VLCMain;
+- (void)subscribeToRemoteCommands;
+- (void)unsubscribeFromRemoteCommands;
 
-extern NSString *VLCPlayerRateChanged;
-
-@interface VLCInputManager : NSObject
-
-- (id)initWithMain:(VLCMain *)o_mainObj;
-- (void)deinit;
-
-- (void)inputThreadChanged;
-
-- (void)playbackStatusUpdated;
 - (void)playbackPositionUpdated;
-
-- (void)onPlaybackHasEnded:(id)sender;
-
-- (BOOL)hasInput;
+- (void)playbackStateChangedTo:(int)state;
+- (void)metaDataChangedForCurrentMediaItem:(input_item_t *)p_input_item;
 
 @end

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * CoreInteraction.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2015 Felix Paul Kühne
+ * Copyright (C) 2011-2021 Felix Paul Kühne
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -128,6 +128,12 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 #pragma mark - Playback Controls
 
+- (void)play
+{
+    playlist_t *p_playlist = pl_Get(getIntf());
+    playlist_Play(p_playlist);
+}
+
 - (void)playOrPause
 {
     input_thread_t *p_input = pl_CurrentInput(getIntf());
@@ -228,6 +234,19 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     i_currentPlaybackRate = returnValue;
     return returnValue;
+}
+
+- (float)internalPlaybackRate
+{
+    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
+    float rate = 0.;
+
+    if (p_input_thread) {
+        rate = var_GetFloat(p_input_thread, "rate");
+        vlc_object_release(p_input_thread);
+    }
+
+    return rate;
 }
 
 - (void)previous
@@ -331,6 +350,33 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     return o_name;
 }
 
+- (long long)currentPlaybackTimeInSeconds
+{
+    input_thread_t *p_input_thread = pl_CurrentInput(getIntf());
+    long long timeInSeconds = 0;
+
+    if (p_input_thread) {
+        int64_t time = var_GetInteger(p_input_thread, "time");
+        timeInSeconds = time / CLOCK_FREQ;
+        vlc_object_release(p_input_thread);
+    }
+
+    return timeInSeconds;
+}
+
+- (float)currentPlaybackPosition
+{
+    input_thread_t * p_input_thread = pl_CurrentInput(getIntf());
+    float position = 0.;
+
+    if (p_input_thread) {
+        position = var_GetFloat(p_input_thread, "position");
+        vlc_object_release(p_input_thread);
+    }
+
+    return position;
+}
+
 - (void)forward
 {
     //LEGACY SUPPORT
@@ -397,6 +443,21 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 - (void)backwardLong
 {
     [self jumpWithValue:"long-jump-size" forward:NO];
+}
+
+- (BOOL)seekToTime:(mtime_t)time
+{
+    input_thread_t * p_input_thread = pl_CurrentInput(getIntf());
+    if (p_input_thread) {
+        bool b_seekable = var_GetBool(p_input_thread, "can-seek");
+        if (b_seekable) {
+            var_SetInteger(p_input_thread, "time", time);
+            vlc_object_release(p_input_thread);
+            return YES;
+        }
+        vlc_object_release(p_input_thread);
+    }
+    return NO;
 }
 
 - (void)shuffle

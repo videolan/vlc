@@ -34,9 +34,12 @@
 #import "VLCResumeDialogController.h"
 #import "VLCTrackSynchronizationWindowController.h"
 #import "VLCVoutView.h"
+#import "VLCRemoteControlService.h"
 
 #import "iTunes.h"
 #import "Spotify.h"
+
+NSString *VLCPlayerRateChanged = @"VLCPlayerRateChanged";
 
 @interface VLCInputManager()
 - (void)updateMainMenu;
@@ -72,6 +75,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                 break;
             case INPUT_EVENT_RATE:
                 [[[VLCMain sharedInstance] mainMenu] performSelectorOnMainThread:@selector(updatePlaybackRate) withObject: nil waitUntilDone:NO];
+                [[NSNotificationCenter defaultCenter] postNotificationName:VLCPlayerRateChanged object:nil];
                 break;
             case INPUT_EVENT_POSITION:
 
@@ -164,6 +168,8 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     BOOL b_has_spotify_paused;
 
     NSTimer *hasEndedTimer;
+
+    VLCRemoteControlService *_remoteControlService;
 }
 @end
 
@@ -190,6 +196,10 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
         informInputChangedQueue = dispatch_queue_create("org.videolan.vlc.inputChangedQueue", DISPATCH_QUEUE_SERIAL);
 
+        if (@available(macOS 10.12.2, *)) {
+            _remoteControlService = [[VLCRemoteControlService alloc] init];
+            [_remoteControlService subscribeToRemoteCommands];
+        }
     }
     return self;
 }
@@ -211,6 +221,10 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         var_DelCallback(p_current_input, "intf-event", InputEvent, (__bridge void *)self);
         vlc_object_release(p_current_input);
         p_current_input = NULL;
+    }
+
+    if (@available(macOS 10.12.2, *)) {
+        [_remoteControlService unsubscribeFromRemoteCommands];
     }
 
     var_DelCallback(pl_Get(getIntf()), "input-current", InputThreadChanged, (__bridge void *)self);
@@ -281,6 +295,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 {
     [[[VLCMain sharedInstance] mainWindow] updateTimeSlider];
     [[[VLCMain sharedInstance] statusBarIcon] updateProgress];
+    [_remoteControlService playbackPositionUpdated];
 }
 
 - (void)playbackStatusUpdated
@@ -338,6 +353,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     [self updateMainWindow];
     [self sendDistributedNotificationWithUpdatedPlaybackStatus];
+    [_remoteControlService playbackStateChangedTo:state];
 }
 
 // Called when playback has ended and likely no subsequent media will start playing
@@ -514,6 +530,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 {
     if (!p_current_input) {
         [[[VLCMain sharedInstance] currentMediaInfoPanel] updatePanelWithItem:nil];
+        [_remoteControlService metaDataChangedForCurrentMediaItem:NULL];
         return;
     }
 
@@ -521,6 +538,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     [[[o_main playlist] model] updateItem:p_input_item];
     [[[VLCMain sharedInstance] currentMediaInfoPanel] updatePanelWithItem:p_input_item];
+    [_remoteControlService metaDataChangedForCurrentMediaItem:p_input_item];
 }
 
 - (void)updateMainWindow
