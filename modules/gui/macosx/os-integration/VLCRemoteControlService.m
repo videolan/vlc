@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCRemoteControlService.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2017-2019 VLC authors and VideoLAN
+ * Copyright (C) 2017-2021 VLC authors and VideoLAN
  *
  * Authors: Carola Nitz <nitz.carola # gmail.com>
  *          Felix Paul Kühne <fkuehne # videolan.org>
@@ -157,7 +157,22 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
     currentlyPlayingTrackInfo[MPMediaItemPropertyArtist] = inputItem.artist;
     currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTitle] = inputItem.albumName;
     currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTrackNumber] = @([inputItem.trackNumber intValue]);
-    currentlyPlayingTrackInfo[MPMediaItemPropertyPlaybackDuration] = @(SEC_FROM_VLC_TICK(inputItem.duration));
+
+    vlc_tick_t duration = inputItem.duration;
+    currentlyPlayingTrackInfo[MPMediaItemPropertyPlaybackDuration] = @(SEC_FROM_VLC_TICK(duration));
+    currentlyPlayingTrackInfo[MPNowPlayingInfoPropertyIsLiveStream] = @(duration <= 0);
+
+    NSURL *artworkURL = inputItem.artworkURL;
+    if (artworkURL) {
+        NSImage *coverArtImage = [[NSImage alloc] initWithContentsOfURL:artworkURL];
+        if (coverArtImage) {
+            MPMediaItemArtwork *mpartwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:coverArtImage.size
+                                                                            requestHandler:^NSImage* _Nonnull(CGSize size) {
+                return coverArtImage;
+            }];
+            currentlyPlayingTrackInfo[MPMediaItemPropertyArtwork] = mpartwork;
+        }
+    }
 
     [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = currentlyPlayingTrackInfo;
 }
