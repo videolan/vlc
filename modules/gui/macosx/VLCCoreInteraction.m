@@ -395,12 +395,15 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (!p_input)
         return;
 
-    int i_interval = var_InheritInteger( p_input, p_value );
-    if (i_interval > 0) {
-        mtime_t val = CLOCK_FREQ * i_interval;
-        if (!b_value)
-            val = val * -1;
-        var_SetInteger( p_input, "time-offset", val );
+    bool b_seekable = var_GetBool(p_input, "can-seek");
+    if (b_seekable) {
+        long long i_interval = var_InheritInteger( p_input, p_value );
+        if (i_interval > 0) {
+            mtime_t val = CLOCK_FREQ * i_interval;
+            if (!b_value)
+                val = val * -1;
+            var_SetInteger( p_input, "time-offset", val );
+        }
     }
     vlc_object_release(p_input);
 }
