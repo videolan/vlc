@@ -346,6 +346,7 @@ void MetaPanel::clear()
     encodedby_text->clear();
     art_cover->clear();
     fingerprintButton->setVisible( false );
+    lblURL->clear();
 
     setEditMode( false );
     emit uriSet( "" );
