@@ -129,10 +129,10 @@
     BOOL b_muted = _playerController.mute;
 
     if (b_muted)
-        f_volume = 0.;
+        f_volume = 0.f;
 
     [self.volumeSlider setFloatValue: f_volume];
-    NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), f_volume * 100];
+    NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), (int)(f_volume * 100.0f)];
     [self.volumeSlider setToolTip:volumeTooltip];
 
     [self.volumeSlider setEnabled: !b_muted];
