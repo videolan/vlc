@@ -2474,7 +2474,7 @@ static char * get_language_from_filename( const char * psz_sub_file )
     if( !psz_sub_file ) return NULL;
     char *psz_work = strdup( psz_sub_file );
 
-    /* Removing extension, but leaving the dot */
+    /* Remove extension */
     psz_tmp = strrchr( psz_work, '.' );
     if( psz_tmp )
     {
@@ -2482,7 +2482,6 @@ static char * get_language_from_filename( const char * psz_sub_file )
         psz_language_begin = strrchr( psz_work, '.' );
         if( psz_language_begin )
             psz_ret = strdup(++psz_language_begin);
-        psz_tmp[0] = '.';
     }
 
     free( psz_work );
