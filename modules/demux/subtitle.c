@@ -2425,7 +2425,11 @@ static char * get_language_from_filename( const char * psz_sub_file )
     if( !psz_sub_file )
         return NULL;
 
-    char *psz_work = strdup( psz_sub_file );
+    /* Remove path */
+    const char *psz_fname = strrchr( psz_sub_file, DIR_SEP_CHAR );
+    psz_fname = (psz_fname == NULL) ? psz_sub_file : psz_fname + 1;
+
+    char *psz_work = strdup( psz_fname );
     if( !psz_work )
         return NULL;
 
