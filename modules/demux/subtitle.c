@@ -1239,20 +1239,25 @@ static int  ParseSSA( vlc_object_t *p_obj, subs_properties_t *p_props,
          * Dialogue: Layer#,0:02:40.65,0:02:41.79,Wolf main,Cher,0000,0000,0000,,Et les enregistrements de ses ondes delta ?
          */
 
-        /* The output text is always shorter than the input text. */
-        psz_text = malloc( strlen(s) );
-        if( !psz_text )
-            return VLC_ENOMEM;
+        psz_text = NULL;
+        if( s[0] == 'D' || s[0] == 'L' )
+        {
+            /* The output text is always shorter than the input text. */
+            psz_text = malloc( strlen(s) );
+            if( !psz_text )
+                return VLC_ENOMEM;
+        }
 
         /* Try to capture the language property */
-        if( sscanf( s, "Language: %[^\r\n]", psz_text ) == 1 )
+        if( s[0] == 'L' &&
+            sscanf( s, "Language: %[^\r\n]", psz_text ) == 1 )
         {
             free( p_props->psz_lang ); /* just in case of multiple instances */
             p_props->psz_lang = psz_text;
             psz_text = NULL;
         }
-        else
-        if( sscanf( s,
+        else if( s[0] == 'D' &&
+            sscanf( s,
                     "Dialogue: %15[^,],%d:%d:%d.%d,%d:%d:%d.%d,%[^\r\n]",
                     temp,
                     &h1, &m1, &s1, &c1,
