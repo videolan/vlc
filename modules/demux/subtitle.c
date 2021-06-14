@@ -692,12 +692,16 @@ static int Open ( vlc_object_t *p_this )
     {
         fmt.psz_language = p_sys->props.psz_lang;
         p_sys->props.psz_lang = NULL;
+        msg_Dbg( p_demux, "detected language '%s' of subtitle: %s", fmt.psz_language,
+                 p_demux->psz_location );
     }
     else
+    {
         fmt.psz_language = get_language_from_filename( p_demux->psz_filepath );
-    if( fmt.psz_language )
-        msg_Dbg( p_demux, "detected language %s of subtitle: %s", fmt.psz_language,
-                 p_demux->psz_location );
+        if( fmt.psz_language )
+            msg_Dbg( p_demux, "selected '%s' as possible filename language substring of subtitle: %s",
+                     fmt.psz_language, p_demux->psz_location );
+    }
 
     char *psz_description = var_InheritString( p_demux, "sub-description" );
     if( psz_description && *psz_description )
