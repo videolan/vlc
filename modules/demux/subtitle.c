@@ -2416,7 +2416,7 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
     return VLC_SUCCESS;
 }
 
-/* Matches filename.xx.srt */
+/* Tries to extract language from common filename pattern filename.LANG.ext */
 static char * get_language_from_filename( const char * psz_sub_file )
 {
     char *psz_ret = NULL;
