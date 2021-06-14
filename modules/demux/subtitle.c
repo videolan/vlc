@@ -2420,21 +2420,24 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
 static char * get_language_from_filename( const char * psz_sub_file )
 {
     char *psz_ret = NULL;
-    char *psz_tmp, *psz_language_begin;
+    char *psz_tmp;
 
-    if( !psz_sub_file ) return NULL;
+    if( !psz_sub_file )
+        return NULL;
+
     char *psz_work = strdup( psz_sub_file );
     if( !psz_work )
         return NULL;
 
-    /* Remove extension */
-    psz_tmp = strrchr( psz_work, '.' );
+    psz_tmp = strrchr( psz_work, '.' ); /* Find extension */
     if( psz_tmp )
     {
-        psz_tmp[0] = '\0';
-        psz_language_begin = strrchr( psz_work, '.' );
-        if( psz_language_begin )
-            psz_ret = strdup(++psz_language_begin);
+        psz_tmp[0] = '\0'; /* Remove it */
+
+        /* Get substr after next last period - hopefully our language string */
+        psz_tmp = strrchr( psz_work, '.' );
+        if( psz_tmp )
+            psz_ret = strdup(++psz_tmp);
     }
 
     free( psz_work );
