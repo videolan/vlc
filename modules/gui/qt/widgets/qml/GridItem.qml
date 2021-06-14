@@ -201,16 +201,21 @@ MouseArea {
         }
     }
 
-    /* background visible when selected */
-    Rectangle {
-        id: selectionRect
+    Widgets.AnimatedBackground {
+        id: background
 
         x: - root.selectedBorderWidth
         y: - root.selectedBorderWidth
         width: root.width + ( root.selectedBorderWidth * 2 )
         height:  root.height + ( root.selectedBorderWidth * 2 )
-        color: VLCStyle.colors.bgHover
-        visible: root.selected
+
+        active: root.activeFocus
+
+        backgroundColor: root.selected
+                         ? VLCStyle.colors.bgHover
+                         : VLCStyle.colors.setColorAlpha(VLCStyle.colors.bgHover, 0)
+
+        visible: backgroundAnimationRunning || background.active || root.selected
     }
 
     Loader {
@@ -262,7 +267,7 @@ MouseArea {
                 width: pictureWidth
                 horizontalAlignment: root.textAlignHCenter && titleLabel.contentWidth <= titleLabel.width ? Text.AlignHCenter : Text.AlignLeft
                 topPadding: root.titleMargin
-                color: selectionRect.visible ? VLCStyle.colors.bgHoverText : VLCStyle.colors.text
+                color: background.foregroundColor
             }
         }
 
@@ -275,15 +280,11 @@ MouseArea {
             topPadding: VLCStyle.margin_xsmall              
             elide: Text.ElideRight
             horizontalAlignment: root.textAlignHCenter && subtitleTxt.contentWidth <= subtitleTxt.width ? Text.AlignHCenter : Text.AlignLeft
-            color: selectionRect.visible
-                    ? VLCStyle.colors.setColorAlpha(VLCStyle.colors.bgHoverText, .6)
-                    : VLCStyle.colors.menuCaption
+            color: background.foregroundColor
+
+            // this is based on that MenuCaption.color.a == .6, color of this component is animated (via binding with background.foregroundColor),
+            // to save operation during animation, directly set the opacity
+            opacity: .6
         }
-    }
-
-    BackgroundFocus {
-        anchors.fill: selectionRect
-
-        visible: root.activeFocus
     }
 }
