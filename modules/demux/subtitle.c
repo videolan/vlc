@@ -2424,6 +2424,8 @@ static char * get_language_from_filename( const char * psz_sub_file )
 
     if( !psz_sub_file ) return NULL;
     char *psz_work = strdup( psz_sub_file );
+    if( !psz_work )
+        return NULL;
 
     /* Remove extension */
     psz_tmp = strrchr( psz_work, '.' );
