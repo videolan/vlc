@@ -2416,7 +2416,8 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
     return VLC_SUCCESS;
 }
 
-/* Tries to extract language from common filename pattern filename.LANG.ext */
+/* Tries to extract language from common filename patterns PATH/filename.LANG.ext
+   and PATH/Subs/x_LANG.ext (where 'x' is an integer). */
 static char * get_language_from_filename( const char * psz_sub_file )
 {
     char *psz_ret = NULL;
@@ -2440,6 +2441,10 @@ static char * get_language_from_filename( const char * psz_sub_file )
 
         /* Get substr after next last period - hopefully our language string */
         psz_tmp = strrchr( psz_work, '.' );
+        /* Otherwise try substr after last underscore for alternate pattern */
+        if( !psz_tmp )
+            psz_tmp = strchr( psz_work, '_' );
+
         if( psz_tmp )
             psz_ret = strdup(++psz_tmp);
     }
