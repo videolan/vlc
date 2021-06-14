@@ -47,10 +47,6 @@ static inline void vout_chrono_Init(vout_chrono_t *chrono, int shift, vlc_tick_t
 
     chrono->start = VLC_TICK_INVALID;
 }
-static inline void vout_chrono_Clean(vout_chrono_t *chrono)
-{
-    VLC_UNUSED(chrono);
-}
 static inline void vout_chrono_Start(vout_chrono_t *chrono)
 {
     chrono->start = vlc_tick_now();
@@ -83,9 +79,7 @@ static inline void vout_chrono_Stop(vout_chrono_t *chrono)
 }
 static inline void vout_chrono_Reset(vout_chrono_t *chrono)
 {
-    vout_chrono_t ch = *chrono;
-    vout_chrono_Clean(chrono);
-    vout_chrono_Init(chrono, ch.shift, ch.avg_initial);
+    vout_chrono_Init(chrono, chrono->shift, chrono->avg_initial);
 }
 
 #endif
