@@ -1099,8 +1099,11 @@ error:
         ID3D11Fence_Release(sys->d3dRenderFence);
         sys->d3dRenderFence = NULL;
     }
-    ID3D11DeviceContext4_Release(sys->d3dcontext4);
-    sys->d3dcontext4 = NULL;
+    if (sys->d3dcontext4)
+    {
+        ID3D11DeviceContext4_Release(sys->d3dcontext4);
+        sys->d3dcontext4 = NULL;
+    }
     CloseHandle(sys->renderFinished);
     return hr;
 }
