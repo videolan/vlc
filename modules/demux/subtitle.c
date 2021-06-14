@@ -128,6 +128,7 @@ typedef struct
     vlc_tick_t  i_microsecperframe;
 
     char        *psz_header; /* SSA */
+    char        *psz_lang;
 
     struct
     {
@@ -318,6 +319,7 @@ static int Open ( vlc_object_t *p_this )
     p_sys->subtitles.p_array  = NULL;
 
     p_sys->props.psz_header         = NULL;
+    p_sys->props.psz_lang           = NULL;
     p_sys->props.i_microsecperframe = VLC_TICK_FROM_MS(40);
     p_sys->props.jss.b_inited       = false;
     p_sys->props.mpsub.b_inited     = false;
@@ -686,15 +688,16 @@ static int Open ( vlc_object_t *p_this )
     if( p_sys->subtitles.i_count > 0 )
         p_sys->i_length = p_sys->subtitles.p_array[p_sys->subtitles.i_count-1].i_stop;
 
-    /* Stupid language detection in the filename */
-    char * psz_language = get_language_from_filename( p_demux->psz_filepath );
-
-    if( psz_language )
+    if( p_sys->props.psz_lang )
     {
-        fmt.psz_language = psz_language;
-        msg_Dbg( p_demux, "detected language %s of subtitle: %s", psz_language,
-                 p_demux->psz_location );
+        fmt.psz_language = p_sys->props.psz_lang;
+        p_sys->props.psz_lang = NULL;
     }
+    else
+        fmt.psz_language = get_language_from_filename( p_demux->psz_filepath );
+    if( fmt.psz_language )
+        msg_Dbg( p_demux, "detected language %s of subtitle: %s", fmt.psz_language,
+                 p_demux->psz_location );
 
     char *psz_description = var_InheritString( p_demux, "sub-description" );
     if( psz_description && *psz_description )
