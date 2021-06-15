@@ -77,6 +77,9 @@ WindowDialog {
 
                 Widgets.ComboBoxExt {
                     id: comboBox
+
+                    Layout.maximumWidth: (root.width / 2)
+
                     font.pixelSize: VLCStyle.fontSize_normal
 
                     width: VLCStyle.combobox_width_large
