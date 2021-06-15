@@ -72,11 +72,11 @@ const es_format_t *FakeESOutID::getFmt() const
 
 bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
 {
-    if( p_other->fmt.i_cat != fmt.i_cat )
+    if( p_other->fmt.i_cat != fmt.i_cat ||
+        fmt.i_codec != p_other->fmt.i_codec ||
+        fmt.i_original_fourcc != p_other->fmt.i_original_fourcc )
         return false;
 
-    if(fmt.i_original_fourcc != p_other->fmt.i_original_fourcc)
-        return false;
     if((fmt.i_extra > 0) ^ (p_other->fmt.i_extra > 0))
         return false;
 
@@ -91,8 +91,7 @@ bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
         case VLC_CODEC_VC1:
         case VLC_CODEC_AV1:
         {
-            if(fmt.i_codec == p_other->fmt.i_codec &&
-               fmt.i_extra && p_other->fmt.i_extra &&
+            if(fmt.i_extra && p_other->fmt.i_extra &&
                fmt.i_extra == p_other->fmt.i_extra)
             {
                return !!memcmp(fmt.p_extra, p_other->fmt.p_extra, fmt.i_extra);
