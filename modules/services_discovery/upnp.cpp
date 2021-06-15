@@ -1695,7 +1695,9 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, services_disc
             return NULL;
         }
 
-    #ifdef UPNP_ENABLE_IPV6
+        /* libupnp 1.8.3 deprecate `UpnpInit` and introduce `UpnpInit2` as a replacement.
+           libupnp <1.8.3 provides `UpnpInit2` only if built with IPv6. */
+    #if UPNP_VERSION >= 10803 || defined( UPNP_ENABLE_IPV6 )
         char* psz_miface = var_InheritString( p_obj, "miface" );
         if (psz_miface == NULL)
             psz_miface = getPreferedAdapter();
@@ -1703,11 +1705,11 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj, services_disc
         int i_res = UpnpInit2( psz_miface, 0 );
         free( psz_miface );
     #else
-        /* If UpnpInit2 isnt available, initialize on first IPv4-capable interface */
+        /* If UpnpInit2 isn't available, initialize on first IPv4-capable interface */
         char *psz_hostip = getIpv4ForMulticast();
         int i_res = UpnpInit( psz_hostip, 0 );
         free(psz_hostip);
-    #endif /* UPNP_ENABLE_IPV6 */
+    #endif /* UPNP_VERSION >= 10803 || defined( UPNP_ENABLE_IPV6 ) */
         if( i_res != UPNP_E_SUCCESS )
         {
             msg_Err( p_obj, "Initialization failed: %s", UpnpGetErrorMessage( i_res ) );
