@@ -117,13 +117,6 @@ typedef struct
      * thread (start, stop, close) needs no protection. */
     vlc_mutex_t                 selected_device_lock;
 
-    /* Synchronizes access to au_unit and f_volume. This is needed by the
-     * VolumeSet callback, that can be called from any threads. The au_unit
-     * variable is written in the start and stop callbacks from the aout
-     * thread. Streams callbacks (play, pause, flush...) doesn't need this lock
-     * to access au_unit since they are called from the aout thread. */
-    vlc_mutex_t                 volume_lock;
-
     float                       f_volume;
 
     bool                        b_ignore_streams_changed_callback;
@@ -902,16 +895,15 @@ SwitchAudioDevice(audio_output_t *p_aout, const char *name)
 }
 
 static int
-VolumeSetLocked(audio_output_t * p_aout, float volume)
+VolumeSet(audio_output_t * p_aout, float volume)
 {
     aout_sys_t *p_sys = p_aout->sys;
     OSStatus err;
 
-    p_sys->f_volume = volume;
-
-    if (p_sys->au_unit == NULL)
+    if (p_sys->b_digital)
         return VLC_EGENERIC;
 
+    p_sys->f_volume = volume;
     aout_VolumeReport(p_aout, volume);
 
     /* Set volume for output unit */
@@ -926,17 +918,6 @@ VolumeSetLocked(audio_output_t * p_aout, float volume)
         config_PutInt("auhal-volume", lroundf(volume * AOUT_VOLUME_DEFAULT));
 
     return (err == noErr) ? VLC_SUCCESS : VLC_EGENERIC;
-}
-
-static int
-VolumeSet(audio_output_t * p_aout, float volume)
-{
-    aout_sys_t *p_sys = p_aout->sys;
-
-    vlc_mutex_lock(&p_sys->volume_lock);
-    int ret = VolumeSetLocked(p_aout, volume);
-    vlc_mutex_unlock(&p_sys->volume_lock);
-    return ret;
 }
 
 static int
@@ -1120,7 +1101,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt)
     }
 
     /* Set volume for output unit */
-    VolumeSetLocked(p_aout, p_sys->f_volume);
+    VolumeSet(p_aout, p_sys->f_volume);
 
     free(layout);
 
@@ -1414,14 +1395,10 @@ Stop(audio_output_t *p_aout)
 
     if (p_sys->au_unit)
     {
-        vlc_mutex_lock(&p_sys->volume_lock);
-
         AudioOutputUnitStop(p_sys->au_unit);
         au_Uninitialize(p_aout, p_sys->au_unit);
         AudioComponentInstanceDispose(p_sys->au_unit);
         p_sys->au_unit = NULL;
-
-        vlc_mutex_unlock(&p_sys->volume_lock);
     }
     else
     {
@@ -1617,11 +1594,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     }
     else
     {
-        vlc_mutex_lock(&p_sys->volume_lock);
-        int ret = StartAnalog(p_aout, fmt);
-        vlc_mutex_unlock(&p_sys->volume_lock);
-
-        if (ret == VLC_SUCCESS)
+        if (StartAnalog(p_aout, fmt) == VLC_SUCCESS)
         {
             msg_Dbg(p_aout, "analog output successfully opened");
             fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
@@ -1706,7 +1679,6 @@ static int Open(vlc_object_t *obj)
 
     vlc_mutex_init(&p_sys->device_list_lock);
     vlc_mutex_init(&p_sys->selected_device_lock);
-    vlc_mutex_init(&p_sys->volume_lock);
     p_sys->b_digital = false;
     p_sys->au_unit = NULL;
     p_sys->b_ignore_streams_changed_callback = false;
