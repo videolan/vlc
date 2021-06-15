@@ -96,6 +96,7 @@ struct httpd_host_t
     bool           b_no_timeout;
     int            i_client;
     httpd_client_t **client;
+    unsigned timeout_sec;
 
     /* TLS data */
     vlc_tls_creds_t *p_tls;
@@ -147,7 +148,6 @@ struct httpd_client_t
     uint8_t i_state;
 
     mtime_t i_timeout_date;
-    mtime_t i_activity_timeout;
 
     /* buffer for reading header */
     int     i_buffer_size;
@@ -860,12 +860,13 @@ void httpd_StreamDelete(httpd_stream_t *stream)
  *****************************************************************************/
 static void* httpd_HostThread(void *);
 static httpd_host_t *httpd_HostCreate(vlc_object_t *, const char *,
-                                       const char *, vlc_tls_creds_t *);
+                                      const char *, vlc_tls_creds_t *,
+                                      unsigned);
 
 /* create a new host */
 httpd_host_t *vlc_http_HostNew(vlc_object_t *p_this)
 {
-    return httpd_HostCreate(p_this, "http-host", "http-port", NULL);
+    return httpd_HostCreate(p_this, "http-host", "http-port", NULL, 10);
 }
 
 httpd_host_t *vlc_https_HostNew(vlc_object_t *obj)
@@ -889,12 +890,13 @@ httpd_host_t *vlc_https_HostNew(vlc_object_t *obj)
     free(key);
     free(cert);
 
-    return httpd_HostCreate(obj, "http-host", "https-port", tls);
+    return httpd_HostCreate(obj, "http-host", "https-port", tls, 10);
 }
 
 httpd_host_t *vlc_rtsp_HostNew(vlc_object_t *p_this)
 {
-    return httpd_HostCreate(p_this, "rtsp-host", "rtsp-port", NULL);
+    /* XXX: for QT I have to disable timeout. Try to find why */
+    return httpd_HostCreate(p_this, "rtsp-host", "rtsp-port", NULL, 0);
 }
 
 static struct httpd
@@ -908,7 +910,8 @@ static struct httpd
 static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
                                        const char *hostvar,
                                        const char *portvar,
-                                       vlc_tls_creds_t *p_tls)
+                                       vlc_tls_creds_t *p_tls,
+                                       unsigned timeout_sec)
 {
     httpd_host_t *host;
     unsigned port = var_InheritInteger(p_this, portvar);
@@ -968,6 +971,7 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
     host->url      = NULL;
     host->i_client = 0;
     host->client   = NULL;
+    host->timeout_sec = timeout_sec;
     host->p_tls    = p_tls;
 
     /* create the thread */
@@ -1184,11 +1188,9 @@ void httpd_MsgAdd(httpd_message_t *msg, const char *name, const char *psz_value,
     msg->i_headers++;
 }
 
-static void httpd_ClientInit(httpd_client_t *cl, mtime_t now)
+static void httpd_ClientInit(httpd_client_t *cl)
 {
     cl->i_state = HTTPD_CLIENT_RECEIVING;
-    cl->i_activity_timeout = INT64_C(10000000);
-    cl->i_timeout_date = now + cl->i_activity_timeout;
     cl->i_buffer_size = HTTPD_CL_BUFSIZE;
     cl->i_buffer = 0;
     cl->p_buffer = xmalloc(cl->i_buffer_size);
@@ -1219,7 +1221,7 @@ static void httpd_ClientDestroy(httpd_client_t *cl)
     free(cl);
 }
 
-static httpd_client_t *httpd_ClientNew(vlc_tls_t *sock, mtime_t now)
+static httpd_client_t *httpd_ClientNew(vlc_tls_t *sock)
 {
     httpd_client_t *cl = malloc(sizeof(httpd_client_t));
 
@@ -1229,7 +1231,7 @@ static httpd_client_t *httpd_ClientNew(vlc_tls_t *sock, mtime_t now)
     cl->sock    = sock;
     cl->url     = NULL;
 
-    httpd_ClientInit(cl, now);
+    httpd_ClientInit(cl);
     return cl;
 }
 
@@ -1559,10 +1561,6 @@ static int httpd_ClientRecv(httpd_client_t *cl)
         return 0;
     }
 
-    /* XXX: for QT I have to disable timeout. Try to find why */
-    if (cl->query.i_proto == HTTPD_PROTO_RTSP)
-        cl->i_activity_timeout = 0;
-
     return 0;
 }
 
@@ -1737,7 +1735,7 @@ static void httpdLoop(httpd_host_t *host)
 
         if (cl->i_ref < 0 || (cl->i_ref == 0 &&
                     (cl->i_state == HTTPD_CLIENT_DEAD ||
-                      (cl->i_activity_timeout > 0 &&
+                      (host->timeout_sec > 0 &&
                         cl->i_timeout_date < now)))) {
             TAB_REMOVE(host->i_client, host->client, cl);
             i_client--;
@@ -1746,7 +1744,7 @@ static void httpdLoop(httpd_host_t *host)
         }
 
         if (val == 0) {
-            cl->i_timeout_date = now + cl->i_activity_timeout;
+            cl->i_timeout_date = now + (host->timeout_sec * 1000 * 1000);
             delay = 0;
         }
 
@@ -2035,13 +2033,14 @@ static void httpdLoop(httpd_host_t *host)
             sk = tls;
         }
 
-        cl = httpd_ClientNew(sk, now);
+        cl = httpd_ClientNew(sk);
         if (host->b_no_timeout)
-            cl->i_activity_timeout = 0;
+            host->timeout_sec = 0;
 
         if (host->p_tls != NULL)
             cl->i_state = HTTPD_CLIENT_TLS_HS_OUT;
 
+        cl->i_timeout_date = now + (host->timeout_sec * 1000 * 1000);
         TAB_APPEND(host->i_client, host->client, cl);
     }
 
