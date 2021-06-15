@@ -146,7 +146,7 @@ struct httpd_client_t
     bool    b_stream_mode;
     uint8_t i_state;
 
-    mtime_t i_activity_date;
+    mtime_t i_timeout_date;
     mtime_t i_activity_timeout;
 
     /* buffer for reading header */
@@ -1187,8 +1187,8 @@ void httpd_MsgAdd(httpd_message_t *msg, const char *name, const char *psz_value,
 static void httpd_ClientInit(httpd_client_t *cl, mtime_t now)
 {
     cl->i_state = HTTPD_CLIENT_RECEIVING;
-    cl->i_activity_date = now;
     cl->i_activity_timeout = INT64_C(10000000);
+    cl->i_timeout_date = now + cl->i_activity_timeout;
     cl->i_buffer_size = HTTPD_CL_BUFSIZE;
     cl->i_buffer = 0;
     cl->p_buffer = xmalloc(cl->i_buffer_size);
@@ -1738,7 +1738,7 @@ static void httpdLoop(httpd_host_t *host)
         if (cl->i_ref < 0 || (cl->i_ref == 0 &&
                     (cl->i_state == HTTPD_CLIENT_DEAD ||
                       (cl->i_activity_timeout > 0 &&
-                        cl->i_activity_date+cl->i_activity_timeout < now)))) {
+                        cl->i_timeout_date < now)))) {
             TAB_REMOVE(host->i_client, host->client, cl);
             i_client--;
             httpd_ClientDestroy(cl);
@@ -1746,7 +1746,7 @@ static void httpdLoop(httpd_host_t *host)
         }
 
         if (val == 0) {
-            cl->i_activity_date = now;
+            cl->i_timeout_date = now + cl->i_activity_timeout;
             delay = 0;
         }
 
