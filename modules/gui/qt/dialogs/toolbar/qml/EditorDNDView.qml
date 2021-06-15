@@ -33,6 +33,9 @@ ListView {
     currentIndex: -1
     highlightFollowsCurrentItem: false
 
+    boundsBehavior: Flickable.StopAtBounds
+    boundsMovement: Flickable.StopAtBounds
+
     property bool containsDrag: footerItem.dropVisible
 
     property alias scrollBar: scrollBar
