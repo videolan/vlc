@@ -40,6 +40,7 @@
 #import "SPMediaKeyTap.h"
 #import "AppleRemote.h"
 #import "VLCInputManager.h"
+#import "CompatibilityFixes.h"
 
 #import "NSSound+VLCAdditions.h"
 
@@ -98,15 +99,18 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (self) {
         intf_thread_t *p_intf = getIntf();
 
-        /* init media key support */
-        b_mediaKeySupport = var_InheritBool(p_intf, "macosx-mediakeys");
-        if (b_mediaKeySupport) {
-            _mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
+        /* init media key support on earlier macOS versions
+         * this feature is covered by VLCRemoteControlService in later releases */
+        if (!OSX_SIERRA_AND_HIGHER) {
+            b_mediaKeySupport = var_InheritBool(p_intf, "macosx-mediakeys");
+            if (b_mediaKeySupport) {
+                _mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
+            }
+            [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(coreChangedMediaKeySupportSetting:)
+                                                         name:VLCMediaKeySupportSettingChangedNotification
+                                                       object:nil];
         }
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(coreChangedMediaKeySupportSetting:)
-                                                     name:VLCMediaKeySupportSettingChangedNotification
-                                                   object:nil];
 
         /* init Apple Remote support */
         _remote = [[AppleRemote alloc] init];
