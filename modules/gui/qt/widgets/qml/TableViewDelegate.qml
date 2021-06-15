@@ -22,7 +22,7 @@ import QtQuick.Layouts 1.3
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Rectangle {
+Widgets.AnimatedBackground {
     id: delegate
 
     //---------------------------------------------------------------------------------------------
@@ -33,14 +33,9 @@ Rectangle {
 
     property bool selected: selectionDelegateModel.isSelected(root.model.index(index, 0))
 
-    readonly property bool highlighted: (selected || hoverArea.containsMouse || activeFocus)
-
     readonly property int _index: index
 
     property int _modifiersOnLastPress: Qt.NoModifier
-
-    readonly property color foregroundColor: (highlighted) ? VLCStyle.colors.bgHoverText
-                                                           : VLCStyle.colors.text
 
     //---------------------------------------------------------------------------------------------
     // Settings
@@ -50,8 +45,15 @@ Rectangle {
 
     height: root.rowHeight
 
-    color: (highlighted) ? VLCStyle.colors.bgHover
-                         : "transparent"
+    active: activeFocus
+
+    animationDuration: 140
+
+    backgroundColor: {
+        if (delegate.selected || hoverArea.containsMouse)
+            return VLCStyle.colors.bgHover
+        return VLCStyle.colors.setColorAlpha(VLCStyle.colors.bgHover)
+    }
 
     //---------------------------------------------------------------------------------------------
     // Connections
@@ -61,7 +63,9 @@ Rectangle {
         target: selectionDelegateModel
 
         onSelectionChanged: {
-            delegate.selected = selectionDelegateModel.isSelected(root.model.index(index, 0));
+            delegate.selected = Qt.binding(function() {
+              return  selectionDelegateModel.isSelected(root.model.index(index, 0))
+            })
         }
     }
 
@@ -216,12 +220,6 @@ Rectangle {
             visible: hoverArea.containsMouse
 
             onClicked: root.contextMenuButtonClicked(this, delegate.rowModel)
-        }
-
-        BackgroundFocus {
-            anchors.fill: parent
-
-            visible: delegate.activeFocus
         }
     }
 }
