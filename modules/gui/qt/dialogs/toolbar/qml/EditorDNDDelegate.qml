@@ -149,39 +149,20 @@ MouseArea {
 
         onEntered: {
             if ((drag.source === null ||
-                 (drag.source.dndView === playerBtnDND &&
-                  (parent.DelegateModel.itemsIndex === drag.source.DelegateModel.itemsIndex + 1))))
-                return
-
-            if (pressed)
-                return
-
-            dropVisible = true
-        }
-
-        onExited: {
-            if (pressed)
-                return
-
-            dropVisible = false
+                 (drag.source.dndView === dndView &&
+                  (parent.DelegateModel.itemsIndex === drag.source.DelegateModel.itemsIndex + 1))) ||
+                    pressed)
+                drag.accepted = false
         }
 
         onDropped: {
-            if (!dropVisible)
-                return
-
-            if (pressed)
-                return
-
             var destIndex = parent.DelegateModel.itemsIndex
 
-            if((drag.source.dndView === playerBtnDND)
+            if((drag.source.dndView === dndView)
                     && (drag.source.DelegateModel.itemsIndex < destIndex))
                 --destIndex
 
             dropEvent(drag, destIndex)
-
-            dropVisible = false
         }
     }
 }
