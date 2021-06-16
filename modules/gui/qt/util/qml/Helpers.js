@@ -59,3 +59,7 @@ function enforceFocus(item, reason) {
 
     item.forceActiveFocus(reason);
 }
+
+function pointInRadius(x, y, radius) {
+     return (x * x + y * y < radius * radius)
+}
