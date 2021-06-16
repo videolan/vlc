@@ -1359,6 +1359,18 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
     return VLC_SUCCESS;
 }
 
+static void UpdateDeinterlaceFilter(vout_thread_sys_t *sys)
+{
+    vlc_mutex_lock(&sys->filter.lock);
+    if (sys->filter.changed ||
+        sys->private.interlacing.has_deint != sys->filter.new_interlaced)
+    {
+        sys->private.interlacing.has_deint = sys->filter.new_interlaced;
+        ChangeFilters(sys);
+    }
+    vlc_mutex_unlock(&sys->filter.lock);
+}
+
 static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 {
     vout_thread_sys_t *sys = vout;
@@ -1367,14 +1379,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 
     assert(sys->clock);
 
-    vlc_mutex_lock(&sys->filter.lock);
-    if (sys->filter.changed ||
-        sys->private.interlacing.has_deint != sys->filter.new_interlaced)
-    {
-        sys->private.interlacing.has_deint = sys->filter.new_interlaced;
-        ChangeFilters(vout);
-    }
-    vlc_mutex_unlock(&sys->filter.lock);
+    UpdateDeinterlaceFilter(sys);
 
     bool render_now = true;
     if (frame_by_frame)
