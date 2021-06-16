@@ -169,37 +169,25 @@ Widgets.AnimatedBackground {
             Repeater {
                 model: sortModel
 
-                Item {
+                Loader{
+                    property var rowModel: delegate.rowModel
+
+                    property var colModel: modelData
+
+                    readonly property int index: delegate._index
+
+                    readonly property bool currentlyFocused: delegate.activeFocus
+
+                    readonly property bool containsMouse: hoverArea.containsMouse
+
+                    readonly property color foregroundColor: delegate.foregroundColor
+
+                    width: (modelData.width) ? modelData.width : 0
+
                     height: parent.height
 
-                    width: (modelData.width) ? modelData.width
-                                             : 1
-
-                    Layout.alignment: Qt.AlignVCenter
-
-                    SmoothedAnimation on width {
-                        duration: 256
-
-                        easing.type: Easing.OutCubic
-                    }
-
-                    Loader{
-                        property var rowModel: delegate.rowModel
-                        property var colModel: modelData
-
-                        readonly property int index: delegate._index
-
-                        readonly property bool currentlyFocused: delegate.activeFocus
-
-                        readonly property bool containsMouse: hoverArea.containsMouse
-
-                        readonly property color foregroundColor: delegate.foregroundColor
-
-                        anchors.fill: parent
-
-                        sourceComponent: (colModel.colDelegate) ? colModel.colDelegate
-                                                                : root.colDelegate
-                    }
+                    sourceComponent: (colModel.colDelegate) ? colModel.colDelegate
+                                                            : root.colDelegate
                 }
             }
         }
