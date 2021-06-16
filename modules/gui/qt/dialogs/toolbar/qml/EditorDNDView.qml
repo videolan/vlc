@@ -25,6 +25,7 @@ import "qrc:///style/"
 
 ListView {
     id: playerBtnDND
+
     spacing: VLCStyle.margin_xsmall
     orientation: Qt.Horizontal
     clip: true
@@ -115,13 +116,14 @@ ListView {
         property alias dropVisible: footerDropArea.containsDrag
 
         Rectangle {
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+
             z: 2
+
             width: VLCStyle.dp(2, VLCStyle.scale)
-            height: parent.height
-            anchors {
-                left: parent.left
-            }
-            antialiasing: true
+
             visible: dropVisible
             color: VLCStyle.colors.accent
         }
