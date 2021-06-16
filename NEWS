@@ -1,3 +1,15 @@
+Changes between 3.0.15 and 3.0.16:
+----------------------------------
+
+Video Output:
+ * Fix a D3D11 crash on Windows 8/8.1
+
+Interfaces:
+ * macOS: Add touchbar support
+
+Misc
+ * Multiple settings improvements
+
 Changes between 3.0.14 and 3.0.15:
 ----------------------------------
 
