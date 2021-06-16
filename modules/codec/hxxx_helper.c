@@ -799,6 +799,8 @@ h264_helper_get_avcc_config(const struct hxxx_helper *hh)
         p_pps_sizes[i_nal_found - 1] = p_nal->b->i_buffer;
     }
 
+    fprintf(stderr, "DEBUGVT: SPS EXT COUNT: %d\n",
+            hh->h264.i_spsext_count);
     const uint8_t *pp_spsext_bufs[hh->h264.i_spsext_count];
     size_t p_spsext_sizes[hh->h264.i_spsext_count];
     HELPER_FOREACH_NAL(p_nal, hh->h264.spsext_list, hh->h264.i_spsext_count,

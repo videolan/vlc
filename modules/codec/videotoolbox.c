@@ -33,6 +33,7 @@
 #import <vlc_bits.h>
 #import <vlc_boxes.h>
 #import <vlc_threads.h>
+#import <vlc_strings.h>
 #import "vt_utils.h"
 #import "../packetizer/h264_nal.h"
 #import "../packetizer/h264_slice.h"
@@ -1388,6 +1389,18 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (var_Type(p_dec, "videotoolbox-failed") != 0)
         return VLC_EGENERIC;
 
+    msg_Info(p_dec, "DEBUGVT: opening VT extradata %p size %zu",
+             p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
+
+    if (p_dec->fmt_in.i_extra > 0)
+    {
+        char buffer[256];
+        vlc_hex_encode_binary(p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra,                       buffer);
+        msg_Info(p_dec, "DEBUGVT: opening VT with extradata %s",
+                 buffer);
+    }
+
+
     /* check quickly if we can digest the offered data */
     CMVideoCodecType codec;
 
@@ -1644,6 +1657,12 @@ static CFDictionaryRef ExtradataInfoCreate(CFStringRef name,
     if (p_data == NULL)
         return NULL;
 
+
+    char buffer[256];
+    vlc_hex_encode_binary(p_data, i_data, buffer);
+    fprintf(stderr, "DEBUGVT: ExtradataInfoCreate size %zu content: %s\n",
+            i_data, buffer);
+
     CFDataRef extradata = CFDataCreate(kCFAllocatorDefault, p_data, i_data);
     if (extradata == NULL)
         return NULL;
@@ -1654,6 +1673,7 @@ static CFDictionaryRef ExtradataInfoCreate(CFStringRef name,
         1,
         &kCFTypeDictionaryKeyCallBacks,
         &kCFTypeDictionaryValueCallBacks);
+    CFShow(extradataInfo);
 
     CFRelease(extradata);
     return extradataInfo;
