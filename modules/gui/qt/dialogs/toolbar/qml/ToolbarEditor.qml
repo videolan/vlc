@@ -207,14 +207,14 @@ Rectangle{
             }
         }
 
-        Rectangle{
-            id : allBtnsGrid
+        Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.margins: VLCStyle.margin_xxsmall
+
             color: VLCStyle.colors.bgAlt
 
-            ColumnLayout{
+            ColumnLayout {
                 anchors.fill: parent
 
                 Widgets.MenuCaption {
@@ -233,13 +233,14 @@ Rectangle{
         }
     }
 
-    EditorDummyButton{
+    EditorDummyButton {
         id: buttonDragItem
-        visible: false
-        Drag.active: visible
-        color: VLCStyle.colors.buttonText
 
+        visible: false
+        color: VLCStyle.colors.buttonText
         opacity: 0.75
+
+        Drag.active: visible
 
         function updatePos(x, y) {
             var pos = root.mapFromGlobal(x, y)
@@ -248,7 +249,7 @@ Rectangle{
         }
 
         onXChanged: {
-            if (buttonDragItem.Drag.active)
+            if (Drag.active)
                 handleScroll(this)
         }
     }
