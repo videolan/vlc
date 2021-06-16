@@ -390,7 +390,6 @@ vlc_player_RemoveTimerSource(vlc_player_t *player, vlc_es_id_t *es_source)
         if (source->es == es_source)
         {
             /* Discontinuity should have been already signaled */
-            assert(source->point.system_date == VLC_TICK_INVALID);
             source->es = NULL;
         }
     }
