@@ -70,31 +70,10 @@ MouseArea {
     Accessible.role: Accessible.Cell
     Accessible.name: title
 
-    state: highlighted ? "selected" : "unselected"
     states: [
         State {
-            name: "unselected"
-
-            PropertyChanges {
-                target: selectedUnderlayLoader
-                opacity: 0
-                visible: false
-            }
-
-            PropertyChanges {
-                target: unselectedUnderlayLoader
-                opacity: 1
-                visible: true
-            }
-
-            PropertyChanges {
-                target: picture
-                playCoverOpacity: 0
-                playCoverVisible: false
-            }
-        },
-        State {
-            name: "selected"
+            name: "highlighted"
+            when: highlighted
 
             PropertyChanges {
                 target: selectedUnderlayLoader
@@ -118,8 +97,8 @@ MouseArea {
 
     transitions: [
         Transition {
-            from: "unselected"
-            to: "selected"
+            from: ""
+            to: "highlighted"
             // reversible: true // doesn't work
 
             SequentialAnimation {
@@ -142,8 +121,8 @@ MouseArea {
         },
 
         Transition {
-            from: "selected"
-            to: "unselected"
+            from: "highlighted"
+            to: ""
 
             SequentialAnimation {
                 PropertyAction {
@@ -230,6 +209,8 @@ MouseArea {
         asynchronous: true
         active: false
         visible: false
+        opacity: 0
+
         onVisibleChanged: {
             if (visible && !active)
                 active = true
@@ -246,9 +227,11 @@ MouseArea {
 
             width: pictureWidth
             height: pictureHeight
-            playCoverVisible: root.highlighted
-            onPlayIconClicked: root.playClicked()
+            playCoverVisible: false
+            playCoverOpacity: 0
             radius: VLCStyle.gridCover_radius
+
+            onPlayIconClicked: root.playClicked()
         }
 
         Widgets.ScrollingText {
