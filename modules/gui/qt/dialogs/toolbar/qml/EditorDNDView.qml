@@ -30,6 +30,7 @@ ListView {
     orientation: Qt.Horizontal
     clip: true
 
+    currentIndex: -1
     highlightFollowsCurrentItem: false
 
     property bool containsDrag: footerItem.dropVisible

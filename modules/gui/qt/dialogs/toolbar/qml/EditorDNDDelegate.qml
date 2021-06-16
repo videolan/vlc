@@ -69,8 +69,6 @@ MouseArea {
         color: VLCStyle.colors.accent
     }
 
-    onEntered: playerBtnDND.currentIndex = index
-
     onPressed: {
         removeInfoRectVisible = true
     }
