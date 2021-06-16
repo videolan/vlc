@@ -1654,7 +1654,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         vout_ReportFirstFrame(&vout->obj);
     }
 
-    return render_now ? VLC_EGENERIC : ret;
+    return render_now && !frame_by_frame ? VLC_EGENERIC : ret;
 }
 
 void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
@@ -1738,7 +1738,7 @@ void vout_NextPicture(vout_thread_t *vout, vlc_tick_t *duration)
     if (sys->step.last == VLC_TICK_INVALID)
         sys->step.last = sys->displayed.timestamp;
 
-    if (DisplayPicture(sys, NULL) == 0) {
+    if (DisplayPicture(sys, NULL) == VLC_SUCCESS) {
         sys->step.timestamp = sys->displayed.timestamp;
 
         if (sys->step.last != VLC_TICK_INVALID &&
