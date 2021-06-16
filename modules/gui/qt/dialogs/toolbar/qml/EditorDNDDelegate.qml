@@ -28,36 +28,43 @@ import "qrc:///style/"
 MouseArea {
     id: dragArea
 
-    property int controlId: model.id
-    property bool dropVisible: false
-    property var dndView: null
     anchors.verticalCenter: (!!parent) ? parent.verticalCenter : undefined
-    cursorShape: pressed || root.dragActive ? Qt.DragMoveCursor : Qt.OpenHandCursor
-    drag.target: pressed ? content : undefined
-    width: buttonloader.width
+
+    cursorShape: (pressed || root.dragActive) ? Qt.DragMoveCursor : Qt.OpenHandCursor
+
+    drag.target: content
+
+    width: loader.width
     height: VLCStyle.icon_medium
+
     hoverEnabled: true
 
+    readonly property int controlId: model.id
+    readonly property bool dropVisible: dropArea.containsDrag
+    property var dndView: null
     property alias containsDrag: dropArea.containsDrag
 
     Rectangle {
-        z: -1
         anchors.fill: parent
+
+        z: -1
 
         visible: dragArea.containsMouse && !pressed
         color: VLCStyle.colors.bgHover
     }
 
     Rectangle {
-        z: 1
-        width: VLCStyle.dp(2, VLCStyle.scale)
-        height: parent.height
         anchors {
             left: parent.left
             verticalCenter: parent.verticalCenter
             leftMargin: index === 0 ? 0 : -width
         }
-        antialiasing: true
+
+        z: 1
+
+        width: VLCStyle.dp(2, VLCStyle.scale)
+        height: parent.height
+
         visible: dropVisible
         color: VLCStyle.colors.accent
     }
@@ -86,33 +93,39 @@ MouseArea {
 
     Rectangle {
         id: content
-        Drag.active: dragArea.pressed
-        Drag.source: dragArea
+
         anchors {
             horizontalCenter: parent.horizontalCenter
             verticalCenter: parent.verticalCenter
         }
 
-        opacity: pressed ? 0.75 : 1.0
+        opacity: Drag.active ? 0.75 : 1.0
 
-        Loader{
-            id: buttonloader
+        Drag.active: pressed
+        Drag.source: dragArea
+
+        Loader {
+            id: loader
+
             anchors {
                 horizontalCenter: parent.horizontalCenter
                 verticalCenter: parent.verticalCenter
             }
             source: PlayerControlbarControls.control(model.id).source
             onLoaded: {
-                buttonloader.item.paintOnly = true
-                buttonloader.item.enabled = false
+                item.paintOnly = true
+                item.enabled = false
             }
-
         }
 
         states: State {
             when: dragArea.pressed
 
-            ParentChange { target: content; parent: root }
+            ParentChange {
+                target: content;
+                parent: root
+            }
+
             AnchorChanges {
                 target: content
                 anchors { horizontalCenter: undefined; verticalCenter: undefined }
