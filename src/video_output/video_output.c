@@ -1070,7 +1070,7 @@ static bool IsPictureLate(vout_thread_sys_t *vout, picture_t *decoded,
 /* */
 VLC_USED
 static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
-                                 bool frame_by_frame, bool *paused)
+                                 bool frame_by_frame)
 {
     vout_thread_sys_t *sys = vout;
     bool is_late_dropped = sys->is_late_dropped && !frame_by_frame;
@@ -1095,22 +1095,12 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                         vlc_clock_ConvertToSystem(sys->clock, system_now,
                                                   decoded->date, sys->rate);
 
-                    if (system_pts == INT64_MAX)
+                    if (system_pts != INT64_MAX &&
+                        IsPictureLate(vout, decoded, system_now, system_pts))
                     {
-                        /* The clock is paused, notify it (so that the current
-                         * picture is displayed but not the next one), this
-                         * current picture can't be be late. */
-                        *paused = true;
-                    }
-                    else
-                    {
-                        if (IsPictureLate(vout, decoded, system_now,
-                                                       system_pts))
-                        {
-                            picture_Release(decoded);
-                            vout_statistic_AddLost(&sys->statistic, 1);
-                            continue;
-                        }
+                        picture_Release(decoded);
+                        vout_statistic_AddLost(&sys->statistic, 1);
+                        continue;
                     }
                 }
                 vlc_video_context *pic_vctx = picture_GetVideoContext(decoded);
@@ -1536,7 +1526,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     if (frame_by_frame)
     {
         picture_t *next;
-        next = PreparePicture(vout, !sys->displayed.current, true, &paused);
+        next = PreparePicture(vout, !sys->displayed.current, true);
 
         if (next)
         {
@@ -1571,7 +1561,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         picture_t *next = NULL;
         if (first)
         {
-            next = PreparePicture(vout, true, false, &paused);
+            next = PreparePicture(vout, true, false);
             if (!next)
             {
                 *deadline = VLC_TICK_INVALID;
@@ -1589,7 +1579,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                 if (date_next <= system_now)
                 {
                     // the current frame will be late, look for the next not late one
-                    next = PreparePicture(vout, false, false, &paused);
+                    next = PreparePicture(vout, false, false);
                 }
             }
         }
