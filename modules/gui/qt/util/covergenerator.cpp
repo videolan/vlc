@@ -141,7 +141,7 @@ QString CoverGenerator::execute() /* override */
 
     if (dir.exists(fileName))
     {
-        return fileName;
+        return QUrl::fromLocalFile(fileName).toString();
     }
 
     QStringList thumbnails;
@@ -215,7 +215,7 @@ QString CoverGenerator::execute() /* override */
 
     image.save(fileName, "jpg");
 
-    return fileName;
+    return QUrl::fromLocalFile(fileName).toString();
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -295,9 +295,7 @@ void MLGroupListModel::onCover()
 
     MLGroup * group = static_cast<MLGroup *> (item);
 
-    QString fileName = QUrl::fromLocalFile(generator->takeResult()).toString();
-
-    group->setCover(fileName);
+    group->setCover(generator->takeResult());
 
     group->setGenerator(nullptr);
 

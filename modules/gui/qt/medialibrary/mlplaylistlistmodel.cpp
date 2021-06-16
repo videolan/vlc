@@ -320,9 +320,7 @@ void MLPlaylistListModel::onCover()
 
     MLPlaylist * playlist = static_cast<MLPlaylist *> (item);
 
-    QString fileName = QUrl::fromLocalFile(generator->takeResult()).toString();
-
-    playlist->setCover(fileName);
+    playlist->setCover(generator->takeResult());
 
     playlist->setGenerator(nullptr);
 

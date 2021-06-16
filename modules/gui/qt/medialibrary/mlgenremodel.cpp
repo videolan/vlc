@@ -176,9 +176,7 @@ void MLGenreModel::onCover()
 
     MLGenre * genre = static_cast<MLGenre *> (item);
 
-    QString fileName = QUrl::fromLocalFile(generator->takeResult()).toString();
-
-    genre->setCover(fileName);
+    genre->setCover(generator->takeResult());
 
     genre->setGenerator(nullptr);
 
