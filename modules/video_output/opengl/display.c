@@ -94,7 +94,11 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, PictureRender, PictureDisplay, Control, NULL, SetViewpoint,
+    .close = Close,
+    .prepare = PictureRender,
+    .display = PictureDisplay,
+    .control = Control,
+    .set_viewpoint = SetViewpoint,
 };
 
 static void

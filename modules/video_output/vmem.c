@@ -103,7 +103,10 @@ static void           Display(vout_display_t *, picture_t *);
 static int            Control(vout_display_t *, int);
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, Display, Control, NULL, NULL,
+    .close = Close,
+    .prepare = Prepare,
+    .display = Display,
+    .control = Control,
 };
 
 /*****************************************************************************

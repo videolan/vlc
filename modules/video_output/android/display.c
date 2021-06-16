@@ -477,7 +477,11 @@ static void SetRGBMask(video_format_t *p_fmt)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, Display, Control, NULL, NULL,
+    .close = Close,
+    .prepare = Prepare,
+    .display = Display,
+    .control = Control,
+    .set_viewpoint = NULL,
 };
 
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,

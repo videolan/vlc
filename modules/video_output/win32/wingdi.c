@@ -104,7 +104,10 @@ static int Control(vout_display_t *vd, int query)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, Display, Control, NULL, NULL,
+    .close = Close,
+    .prepare = Prepare,
+    .display = Display,
+    .control = Control,
 };
 
 /* */

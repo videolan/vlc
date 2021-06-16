@@ -224,7 +224,10 @@ static vout_window_t *video_splitter_CreateWindow(vlc_object_t *obj,
 }
 
 static const struct vlc_display_operations ops = {
-    vlc_vidsplit_Close, vlc_vidsplit_Prepare, vlc_vidsplit_Display, vlc_vidsplit_Control, NULL, NULL,
+    .close = vlc_vidsplit_Close,
+    .prepare = vlc_vidsplit_Prepare,
+    .display = vlc_vidsplit_Display,
+    .control = vlc_vidsplit_Control,
 };
 
 static int vlc_vidsplit_Open(vout_display_t *vd,

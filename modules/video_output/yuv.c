@@ -87,7 +87,9 @@ typedef struct vout_display_sys_t {
 } vout_display_sys_t;
 
 static const struct vlc_display_operations ops = {
-    Close, NULL, Display, Control, NULL, NULL,
+    .close = Close,
+    .display = Display,
+    .control = Control,
 };
 
 /* */

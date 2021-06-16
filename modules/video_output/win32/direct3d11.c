@@ -349,7 +349,11 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, Display, Control, NULL, SetViewpoint,
+    .close = Close,
+    .prepare = Prepare,
+    .display = Display,
+    .control = Control,
+    .set_viewpoint = SetViewpoint,
 };
 
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,

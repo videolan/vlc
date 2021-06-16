@@ -286,7 +286,11 @@ static int Control(vout_display_t *vd, int query)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Queue, Wait, Control, ResetPictures, NULL,
+    .close = Close,
+    .prepare = Queue,
+    .display = Wait,
+    .control = Control,
+    .reset_pictures = ResetPictures,
 };
 
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,

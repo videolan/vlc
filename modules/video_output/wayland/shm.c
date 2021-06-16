@@ -263,7 +263,11 @@ static void Close(vout_display_t *vd)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, Display, Control, ResetPictures, NULL,
+    .close = Close,
+    .prepare = Prepare,
+    .display = Display,
+    .control = Control,
+    .reset_pictures = ResetPictures,
 };
 
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
