@@ -1535,6 +1535,8 @@ static const staticentry_t p_list_audio[] = {
         A("Qclq"),
         A("sqcp"),
 
+    B(VLC_CODEC_CODEC2, "Codec 2 Audio"),
+
     B(VLC_CODEC_SPEEX, "Speex Audio"),
         A("spx "),
         A("spxr"),
