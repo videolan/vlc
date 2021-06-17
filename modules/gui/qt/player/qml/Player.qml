@@ -465,6 +465,7 @@ Widgets.NavigableFocusScope {
                         onClicked: player.jumpBwd()
                         text: i18n.qtr("Step back")
                         color: rootPlayer.colors.playerFg
+                        colorFocus: rootPlayer.colors.bgFocus
                     }
 
                     Widgets.IconToolButton {
@@ -473,6 +474,7 @@ Widgets.NavigableFocusScope {
                         onClicked: player.toggleVisualization()
                         text: i18n.qtr("Visualization")
                         color: rootPlayer.colors.playerFg
+                        colorFocus: rootPlayer.colors.bgFocus
                     }
 
                     Widgets.IconToolButton{
@@ -481,6 +483,7 @@ Widgets.NavigableFocusScope {
                         onClicked: player.jumpFwd()
                         text: i18n.qtr("Step forward")
                         color: rootPlayer.colors.playerFg
+                        colorFocus: rootPlayer.colors.bgFocus
                     }
                 }
             }

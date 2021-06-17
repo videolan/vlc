@@ -68,6 +68,7 @@ FocusScope{
                     VLCIcons.volume_high
             text: i18n.qtr("Mute")
             color: widgetfscope.color
+            colorFocus: colors.bgFocus
             onClicked: player.muted = !player.muted
             KeyNavigation.right: volControl
 

@@ -32,6 +32,7 @@ ToolButton {
     property alias color: backgroundHover.foregroundColor
     property color colorDisabled: VLCStyle.colors.textInactive
     property color colorOverlay: "transparent"
+    property color colorFocus: VLCStyle.colors.bgFocus
     property string textOverlay: ""
     property bool borderEnabled: false
     property bool backgroundVisible: backgroundHover.active
@@ -58,7 +59,7 @@ ToolButton {
         Label {
             id: text
             text: control.iconText
-            color: control.enabled ? backgroundHover.foregroundColor : control.colorDisabled
+            color: (control.enabled) ? control.color : control.colorDisabled
 
             anchors.centerIn: parent
 
@@ -89,7 +90,7 @@ ToolButton {
 
             Label {
                 text: VLCIcons.active_indicator
-                color: control.enabled ? backgroundHover.foregroundColor : control.colorDisabled
+                color: (control.enabled) ? control.color : control.colorDisabled
                 visible: !control.paintOnly && control.checked
 
                 anchors.centerIn: parent
@@ -109,6 +110,10 @@ ToolButton {
             anchors.fill: parent
 
             visible: control.activeFocus
+
+            // NOTE: This ensures the focus rectangle stays visible when switching between light
+            //       and dark theme on the player view.
+            border.color: control.colorFocus
         }
     }
 

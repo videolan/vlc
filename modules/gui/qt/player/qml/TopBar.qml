@@ -147,6 +147,7 @@ Widgets.NavigableFocusScope{
             iconText: VLCIcons.topbar_previous
             text: i18n.qtr("Back")
             color: topFocusScope.colors.playerFg
+            colorFocus: topFocusScope.colors.bgFocus
             focus: true
             KeyNavigation.right: menuSelector
             onClicked: {
@@ -253,6 +254,7 @@ Widgets.NavigableFocusScope{
             iconText: VLCIcons.ellipsis
             text: i18n.qtr("Menu")
             color: rootPlayer.colors.playerFg
+            colorFocus: rootPlayer.colors.bgFocus
             property bool acceptFocus: true
 
             onClicked: contextMenu.popup(this.mapToGlobal(0, height))
@@ -278,6 +280,7 @@ Widgets.NavigableFocusScope{
             iconText: VLCIcons.playlist
             text: i18n.qtr("Playlist")
             color: rootPlayer.colors.playerFg
+            colorFocus: rootPlayer.colors.bgFocus
             focus: false
 
             property bool acceptFocus: true

@@ -176,6 +176,7 @@ Item {
                 bgHoverText: text
                 bgHoverInactive: "#3daee9"
                 bgHoverTextInactive: text
+                bgFocus: "black"
 
                 button: "#eff0f1";
                 buttonText: "#232627";
@@ -210,6 +211,7 @@ Item {
                 bgHoverText: text
                 bgHoverInactive: "#3daee9"
                 bgHoverTextInactive: text
+                bgFocus: "white"
                 button: "#31363b"
                 buttonText: "#eff0f1"
                 buttonBorder: "#575b5f"

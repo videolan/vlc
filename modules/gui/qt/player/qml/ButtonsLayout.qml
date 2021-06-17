@@ -108,6 +108,8 @@ Widgets.NavigableFocusScope {
                                     return VLCStyle.colors.setColorAlpha(colors.playerBg, 0.8); })
                             if (!!buttonloader.item.borderColor)
                                 buttonloader.item.borderColor = Qt.binding(function() { return colors.playerBorder; })
+                            if (!!buttonloader.item.colorFocus)
+                                buttonloader.item.colorFocus = Qt.binding(function() { return colors.bgFocus; })
                     }
 
                     if (index > 0)
