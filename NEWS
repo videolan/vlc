@@ -314,6 +314,7 @@ Packetizers:
 
 Decoder:
  * avcodec: revector video decoder to fix incomplete drain
+ * avcodec: support Codec 2 decoding
  * spudec: implemented palette updates, fixing missing subtitles
    on some DVD
  * Fixed WebVTT CSS styling not being applied on Windows/macOS
