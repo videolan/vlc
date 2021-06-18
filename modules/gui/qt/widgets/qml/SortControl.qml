@@ -180,13 +180,15 @@ Widgets.NavigableFocusScope {
 
                 readonly property bool isActive: (delegateSortKey === sortKey)
 
-                background: BackgroundHover {
-                    active: (closeAnimation.running === false && itemDelegate.hovered)
+                background: Widgets.AnimatedBackground {
+                    active: itemDelegate.activeFocus
 
                     // NOTE: We don't want animations here, because it looks sluggish.
-                    durationAnimation: 0
+                    animationDuration: 0
 
-                    backgroundColor: VLCStyle.colors.dropDown
+                    backgroundColor: (closeAnimation.running === false && itemDelegate.hovered)
+                                     ? VLCStyle.colors.dropDown
+                                     : "transparent"
                 }
 
                 onHoveredChanged: {
@@ -256,12 +258,6 @@ Widgets.NavigableFocusScope {
                     }
 
                     popup.close()
-                }
-
-                BackgroundFocus {
-                    anchors.fill: parent
-
-                    visible: itemDelegate.activeFocus
                 }
             }
         }
