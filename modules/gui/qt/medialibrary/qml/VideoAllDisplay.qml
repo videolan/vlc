@@ -58,6 +58,10 @@ VideoAll {
 
         spacing: VLCStyle.margin_normal
 
+        // NOTE: We want the header to be visible when we have at least one media visible.
+        //       Otherwise it overlaps the default caption.
+        visible: (model.count)
+
         Loader {
             id: loader
 
