@@ -384,9 +384,11 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         pkt->dts = p_data->i_dts * p_stream->time_base.den /
             CLOCK_FREQ / p_stream->time_base.num;
 
+#if LIBAVFORMAT_VERSION_MICRO >= 100 && LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(59, 2, 103)
     /* this is another hack to prevent libavformat from triggering the "non monotone timestamps" check in avformat/utils.c */
     p_stream->cur_dts = ( p_data->i_dts * p_stream->time_base.den /
             CLOCK_FREQ / p_stream->time_base.num ) - 1;
+#endif
 
     if( av_write_frame( p_sys->oc, pkt ) < 0 )
     {
