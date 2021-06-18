@@ -405,14 +405,6 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         pkt.dts = av_rescale_q( p_data->i_dts - VLC_TICK_0,
                                 VLC_TIME_BASE_Q, p_stream->time_base );
 
-    /* this is another hack to prevent libavformat from triggering the "non monotone timestamps" check in avformat/utils.c */
-    if( p_stream->cur_dts >= pkt.dts )
-    {
-        msg_Warn( p_mux, "Non monotonic stream %d(%4.4s) %"PRId64" >= %"PRId64,
-                  p_input->fmt.i_id, (const char *) &p_input->fmt.i_codec, p_stream->cur_dts, pkt.dts );
-        p_stream->cur_dts = pkt.dts - 1;
-    }
-
     if( av_write_frame( p_sys->oc, &pkt ) < 0 )
     {
         msg_Err( p_mux, "could not write frame (pts: %"PRId64", dts: %"PRId64") "
@@ -422,7 +414,6 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         return VLC_EGENERIC;
     }
 
-    p_stream->cur_dts = pkt.dts;
 
     block_Release( p_data );
     return VLC_SUCCESS;
