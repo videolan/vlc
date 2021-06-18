@@ -1109,22 +1109,28 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_sys_t *vout, picture_t *pic,
     return NULL;
 }
 
-static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
+static picture_t *FilterPictureInteractive(vout_thread_sys_t *sys)
 {
     // hold it as the filter chain will release it or return it and we release it
     picture_Hold(sys->displayed.current);
-
-    vout_chrono_Start(&sys->render);
 
     vlc_mutex_lock(&sys->filter.lock);
     picture_t *filtered = filter_chain_VideoFilter(sys->filter.chain_interactive, sys->displayed.current);
     vlc_mutex_unlock(&sys->filter.lock);
 
+    if (filtered && filtered->date != sys->displayed.current->date)
+        msg_Warn(&sys->obj, "Unsupported timestamp modifications done by chain_interactive");
+
+    return filtered;
+}
+
+static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
+{
+    vout_chrono_Start(&sys->render);
+
+    picture_t *filtered = FilterPictureInteractive(sys);
     if (!filtered)
         return VLC_EGENERIC;
-
-    if (filtered->date != sys->displayed.current->date)
-        msg_Warn(&sys->obj, "Unsupported timestamp modifications done by chain_interactive");
 
     vout_display_t *vd = sys->display;
 
