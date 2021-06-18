@@ -38,18 +38,24 @@ T.TabButton {
     property string iconTxt: ""
     property int iconSize: VLCStyle.icon_normal
     property bool selected: false
-    property alias color: backgroundHover.foregroundColor
+    property color color: VLCStyle.colors.text
     property bool busy: false
 
     font.pixelSize: VLCStyle.fontSize_normal
 
-    background: BackgroundHover {
-        id: backgroundHover
+    background: Widgets.AnimatedBackground {
+        id: background
 
         height: control.height
         width : control.width
 
-        active: control.hovered
+        active: control.activeFocus
+
+        backgroundColor: control.hovered ? VLCStyle.colors.buttonHover
+                                         : VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0)
+
+        foregroundColor: control.hovered ? VLCStyle.colors.buttonTextHover
+                                         : control.color
     }
 
     contentItem: Item {
@@ -80,7 +86,7 @@ T.TabButton {
                     visible: !control.busy
 
                     text: control.iconTxt
-                    color: control.color
+                    color: background.foregroundColor
 
                     font.pixelSize: VLCIcons.pixelSize(control.iconSize)
                 }
@@ -94,7 +100,7 @@ T.TabButton {
 
             Widgets.ListLabel {
                 text: control.text
-                color: backgroundHover.foregroundColor
+                color: background.foregroundColor
             }
         }
 
@@ -108,12 +114,6 @@ T.TabButton {
             visible: control.selected
             color: "transparent"
             border.color: VLCStyle.colors.accent
-        }
-
-        BackgroundFocus {
-            anchors.fill: parent
-
-            visible: control.activeFocus
         }
     }
 }
