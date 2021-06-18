@@ -90,7 +90,9 @@ int InitSubtitleDec(vlc_object_t *obj)
     context->extradata_size = 0;
     context->extradata = NULL;
 
-#if LIBAVFORMAT_VERSION_MICRO >= 100
+#if LIBAVFORMAT_VERSION_MAJOR >= 59
+    context->pkt_timebase=AV_TIME_BASE_Q;
+#elif LIBAVFORMAT_VERSION_MICRO >= 100
     av_codec_set_pkt_timebase(context, AV_TIME_BASE_Q);
 #endif
 
