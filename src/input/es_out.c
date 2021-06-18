@@ -328,6 +328,14 @@ static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
     for( int fetes_i=0; fetes_i<2; fetes_i++ ) \
         vlc_list_foreach( pos, (!fetes_i ? &p_sys->es : &p_sys->es_slaves), node )
 
+static int ForwardValue(vlc_object_t *obj, const char *var, vlc_value_t oldv,
+                        vlc_value_t newv, void *opaque)
+{
+    vlc_object_t *target = opaque;
+    return var_Set(target, var, newv);
+}
+
+
 static void
 decoder_on_vout_started(vlc_input_decoder_t *decoder, vout_thread_t *vout,
                       enum vlc_vout_order order, void *userdata)
@@ -349,6 +357,8 @@ decoder_on_vout_started(vlc_input_decoder_t *decoder, vout_thread_t *vout,
     };
 
     input_SendEventVout(p_sys->p_input, &event);
+
+    var_AddCallback(p_sys->p_input, "avstat", ForwardValue, vout);
 }
 
 static void
@@ -371,6 +381,7 @@ decoder_on_vout_stopped(vlc_input_decoder_t *decoder, vout_thread_t *vout, void 
     };
 
     input_SendEventVout(p_sys->p_input, &event);
+    var_DelCallback(p_sys->p_input, "avstat", ForwardValue, vout);
 }
 
 static void
@@ -555,9 +566,8 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
     p_sys->p_input = p_input;
     p_sys->main_source = main_source;
 
-    libvlc_int_t *libvlc = vlc_object_instance(p_input);
-    var_AddCallback(libvlc, "avstat", avstat_callback, p_sys);
-    atomic_store(&p_sys->b_display_avstat, var_InheritBool( libvlc, "avstat" ));
+    var_AddCallback(p_input, "avstat", avstat_callback, p_sys);
+    var_TriggerCallback(p_input, "avstat");
 
     p_sys->b_active = false;
     p_sys->i_mode   = ES_OUT_MODE_NONE;
@@ -671,8 +681,7 @@ static void EsOutDelete( es_out_t *out )
     EsOutPropsCleanup( &p_sys->audio );
     EsOutPropsCleanup( &p_sys->sub );
 
-    libvlc_int_t *libvlc = vlc_object_instance(p_sys->p_input);
-    var_DelCallback(libvlc, "avstat", avstat_callback, p_sys);
+    var_DelCallback(p_sys->p_input, "avstat", avstat_callback, p_sys);
 
     free( p_sys );
 }

@@ -297,6 +297,9 @@ void vout_CreateVars( vout_thread_t *p_vout )
     /* Viewpoint */
     var_Create( p_vout, "viewpoint", VLC_VAR_ADDRESS  );
     var_Create( p_vout, "viewpoint-changeable", VLC_VAR_BOOL );
+
+    /* SK specific options */
+    var_Create( p_vout, "avstat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 }
 
 void vout_IntfInit( vout_thread_t *p_vout )

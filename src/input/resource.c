@@ -90,6 +90,13 @@ struct input_resource_t
     audio_output_t *p_aout;
 };
 
+static int ForwardValue(vlc_object_t *obj, const char *var, vlc_value_t oldv,
+                        vlc_value_t newv, void *opaque)
+{
+    vlc_object_t *target = opaque;
+    return var_Set(target, var, newv);
+}
+
 #define resource_GetFirstVoutRsc(resource) \
     vlc_list_first_entry_or_null(&resource->vout_rscs, struct vout_resource, node)
 
@@ -325,6 +332,8 @@ input_resource_t *input_resource_New( vlc_object_t *p_parent,
         free( p_resource );
         return NULL;
     }
+    var_AddCallback(p_parent, "avstat", ForwardValue, p_resource->p_vout_dummy);
+    var_TriggerCallback(p_parent, "avstat");
 
     vlc_list_init( &p_resource->vout_rscs );
 
@@ -344,6 +353,8 @@ void input_resource_Release( input_resource_t *p_resource )
     DestroyVout( p_resource );
     if( p_resource->p_aout != NULL )
         aout_Release( p_resource->p_aout );
+
+    var_DelCallback(p_resource->p_parent, "avstat", ForwardValue, p_resource->p_vout_dummy);
 
     vout_Release( p_resource->p_vout_dummy );
     free( p_resource );
@@ -403,6 +414,8 @@ static void input_resource_PutVoutLocked(input_resource_t *p_resource,
         vlc_mutex_unlock(&p_resource->lock_hold);
 
         vout_Stop(vout);
+
+        var_DelCallback(vlc_object_parent(vout), "avstat", ForwardValue, vout);
         vout_Close(vout);
     }
 }
@@ -453,6 +466,9 @@ RequestVoutRsc(input_resource_t *p_resource)
         vlc_mutex_lock(&p_resource->lock_hold);
         vout_resource_Add(vout_rsc, p_resource);
         vlc_mutex_unlock(&p_resource->lock_hold);
+
+        var_AddCallback(parent, "avstat", ForwardValue, vout);
+        var_TriggerCallback(parent, "avstat");
     }
 
     return vout_rsc;

@@ -1947,9 +1947,8 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     atomic_init( &p_owner->reload, RELOAD_NO_REQUEST );
     p_owner->b_idle = false;
 
-    libvlc_int_t *libvlc = vlc_object_instance(p_parent);
-    var_AddCallback(libvlc, "avstat", avstat_callback, p_owner);
-    atomic_store(&p_owner->b_display_avstat, var_InheritBool(libvlc, "avstat"));
+    var_AddCallback(p_parent, "avstat", avstat_callback, p_owner);
+    atomic_init(&p_owner->b_display_avstat, var_InheritBool(p_parent, "avstat"));
 
     p_owner->mouse_event = NULL;
     p_owner->mouse_opaque = NULL;
@@ -2139,8 +2138,8 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner, enum es_format_category
 
     block_FifoRelease( p_owner->p_fifo );
 
-    libvlc_int_t *libvlc = vlc_object_instance( &p_owner->dec );
-    var_DelCallback(libvlc, "avstat", avstat_callback, p_owner);
+    vlc_object_t *p_parent = vlc_object_parent( &p_owner->dec );
+    var_DelCallback(p_parent, "avstat", avstat_callback, p_owner);
 
     decoder_Destroy( p_owner->p_packetizer );
     decoder_Destroy( &p_owner->dec );

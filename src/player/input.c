@@ -934,6 +934,13 @@ vlc_player_input_GetSelectedTrackStringIds(struct vlc_player_input *input,
     return !first_track && vlc_memstream_close(&ms) == 0 ? ms.ptr : NULL;
 }
 
+static int ForwardValue(vlc_object_t *obj, const char *var, vlc_value_t oldv,
+                        vlc_value_t newv, void *opaque)
+{
+    vlc_object_t *target = opaque;
+    return var_Set(target, var, newv);
+}
+
 struct vlc_player_input *
 vlc_player_input_New(vlc_player_t *player, input_item_t *item)
 {
@@ -996,6 +1003,8 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
         free(input);
         return NULL;
     }
+
+    var_AddCallback(player, "avstat", ForwardValue, input->thread);
     vlc_player_input_RestoreMlStates(input, false);
 
     if (player->video_string_ids)
@@ -1052,6 +1061,8 @@ vlc_player_input_Delete(struct vlc_player_input *input)
     vlc_vector_destroy(&input->audio_track_vector);
     vlc_vector_destroy(&input->spu_track_vector);
 
+    var_DelCallback(vlc_object_parent(input->thread), "avstat",
+                    ForwardValue, input->thread);
     input_Close(input->thread);
     free(input);
 }

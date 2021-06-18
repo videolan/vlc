@@ -1878,6 +1878,11 @@ static int avstat_callback(vlc_object_t *obj, const char *name,
 {
     vout_thread_sys_t *p_owner = opaque;
     atomic_store(&p_owner->b_display_avstat, newval.b_bool);
+    vlc_mutex_lock(&p_owner->window_lock);
+    if (p_owner->display_cfg.window)
+        var_SetBool(p_owner->display_cfg.window, "avstat", newval.b_bool);
+    vlc_mutex_unlock(&p_owner->window_lock);
+    return VLC_SUCCESS;
 }
 
 void vout_Close(vout_thread_t *vout)
@@ -1906,8 +1911,7 @@ void vout_Release(vout_thread_t *vout)
     if (!vlc_atomic_rc_dec(&sys->rc))
         return;
 
-    libvlc_int_t *libvlc = vlc_object_instance(vout);
-    var_DelCallback(libvlc, "avstat", avstat_callback, sys);
+    var_DelCallback(vout, "avstat", avstat_callback, sys);
 
     if (sys->dummy)
     {
@@ -1956,9 +1960,8 @@ vout_CreateCommon(vlc_object_t *object, void *owner,
     vlc_mouse_Init(&sys->mouse);
     sys->rendering_enabled = true;
 
-    libvlc_int_t *libvlc = vlc_object_instance(object);
-    var_AddCallback(libvlc, "avstat", avstat_callback, sys);
-    atomic_store(&sys->b_display_avstat, var_InheritBool( libvlc, "avstat" ));
+    var_AddCallback(&vout->obj, "avstat", avstat_callback, sys);
+    var_TriggerCallback(&vout->obj, "avstat");
 
     return vout;
 }
