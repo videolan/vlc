@@ -83,7 +83,7 @@
 
     /* Window state */
     BOOL _enabled;
-    BOOL _avstatEnabled;
+    atomic_bool _avstatEnabled;
 
     /* Constraints */
     NSArray<NSLayoutConstraint*> *_constraints;
@@ -100,6 +100,7 @@
 - (void)disable;
 - (void)applicationStateChanged:(NSNotification*)notification;
 - (void)displayLinkUpdate:(CADisplayLink *)sender;
+- (void)setAvstatEnabled:(bool)enabled;
 @end
 
 /*****************************************************************************
@@ -111,7 +112,7 @@
 {
     _wnd = wnd;
     _enabled = NO;
-    _avstatEnabled = var_InheritBool(wnd, "avstat");
+    atomic_init(&_avstatEnabled, false);
 
     UIView *superview = [self fetchViewContainer];
     if (superview == nil)
@@ -220,7 +221,7 @@
     CFTimeInterval target_ts = 0.;
     if (@available(iOS 10, *))
         target_ts = [sender targetTimestamp];
-    if (_avstatEnabled)
+    if (atomic_load(&_avstatEnabled))
         msg_Info(_wnd, "avstat: ts: %" PRId64 ", [RENDER][CADISPLAYLINK], "
                  "prev_ts=%" PRId64 " target_ts=%" PRId64,
                  NS_FROM_VLC_TICK(now),
@@ -385,6 +386,11 @@
 {
     return YES;
 }
+
+- (void)setAvstatEnabled:(BOOL)enabled
+{
+    atomic_store(&_avstatEnabled, enabled);
+}
 @end
 
 /**
@@ -408,9 +414,19 @@ static void Disable(vout_window_t *wnd)
     });
 }
 
+static int OnAvstatChanged(vlc_object_t *obj, const char *name, vlc_value_t oldv,
+                           vlc_value_t newv, void *opaque)
+{
+    VLCVideoUIView *view = (__bridge VLCVideoUIView*)opaque;
+    [view setAvstatEnabled: newv.b_bool ? YES : NO];
+    return VLC_SUCCESS;
+}
+
 static void Close(vout_window_t *wnd)
 {
     VLCVideoUIView *sys = (__bridge_transfer VLCVideoUIView*)wnd->sys;
+
+    var_DelCallback(wnd, "avstat", OnAvstatChanged, (__bridge void*)sys);
 
     /* We need to signal the asynchronous implementation that we have been
      * closed and cannot used _wnd anymore. */
@@ -436,6 +452,10 @@ static int Open(vout_window_t *wnd)
         msg_Err(wnd, "Creating UIView window provider failed");
         return VLC_EGENERIC;
     }
+
+    var_Create(wnd, "avstat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    var_AddCallback(wnd, "avstat", OnAvstatChanged, wnd->sys);
+    var_TriggerCallback(wnd, "avstat");
 
     wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
     wnd->handle.nsobject = wnd->sys;

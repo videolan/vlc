@@ -296,6 +296,8 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     msg_Dbg( p_input, "Creating an input for %s'%s'", option_str, psz_name);
     free( psz_name );
 
+    var_Create(p_input, "avstat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+
     /* Parse input options */
     input_item_ApplyOptions( VLC_OBJECT(p_input), p_item );
 
