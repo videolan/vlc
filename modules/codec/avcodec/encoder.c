@@ -1108,6 +1108,29 @@ static block_t *vlc_av_packet_Wrap(AVPacket *packet, mtime_t i_length, AVCodecCo
     p_block->i_pts = p_block->i_pts * CLOCK_FREQ * context->time_base.num / context->time_base.den;
     p_block->i_dts = p_block->i_dts * CLOCK_FREQ * context->time_base.num / context->time_base.den;
 
+    uint8_t *av_packet_sidedata = av_packet_get_side_data(packet, AV_PKT_DATA_QUALITY_STATS, NULL);
+    if( av_packet_sidedata )
+    {
+       switch ( av_packet_sidedata[4] )
+       {
+       case AV_PICTURE_TYPE_I:
+       case AV_PICTURE_TYPE_SI:
+           p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+           break;
+       case AV_PICTURE_TYPE_P:
+       case AV_PICTURE_TYPE_SP:
+           p_block->i_flags |= BLOCK_FLAG_TYPE_P;
+           break;
+       case AV_PICTURE_TYPE_B:
+       case AV_PICTURE_TYPE_BI:
+           p_block->i_flags |= BLOCK_FLAG_TYPE_B;
+           break;
+       default:
+           p_block->i_flags |= BLOCK_FLAG_TYPE_PB;
+       }
+
+    }
+
     return p_block;
 }
 
@@ -1240,27 +1263,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     }
 
     block_t *p_block = encode_avframe( p_enc, p_sys, frame );
-
-    if( p_block )
-    {
-       switch ( p_sys->p_context->coded_frame->pict_type )
-       {
-       case AV_PICTURE_TYPE_I:
-       case AV_PICTURE_TYPE_SI:
-           p_block->i_flags |= BLOCK_FLAG_TYPE_I;
-           break;
-       case AV_PICTURE_TYPE_P:
-       case AV_PICTURE_TYPE_SP:
-           p_block->i_flags |= BLOCK_FLAG_TYPE_P;
-           break;
-       case AV_PICTURE_TYPE_B:
-       case AV_PICTURE_TYPE_BI:
-           p_block->i_flags |= BLOCK_FLAG_TYPE_B;
-           break;
-       default:
-           p_block->i_flags |= BLOCK_FLAG_TYPE_PB;
-       }
-    }
 
     return p_block;
 }
