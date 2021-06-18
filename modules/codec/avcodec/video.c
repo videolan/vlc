@@ -1160,6 +1160,9 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             b_first_output_sequence = false;
         }
 
+        if( frame->decode_error_flags & ~FF_DECODE_ERROR_INVALID_BITSTREAM )
+            frame->flags |= AV_FRAME_FLAG_CORRUPT;
+
         if( !p_frame_info->b_display ||
            ( !p_sys->p_va && !frame->linesize[0] ) ||
            ( p_dec->b_frame_drop_allowed && (frame->flags & AV_FRAME_FLAG_CORRUPT) &&
