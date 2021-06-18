@@ -41,16 +41,15 @@ T.TabButton {
     property string iconTxt: ""
     property bool selected: false
 
-    background: Rectangle {
+    background: Widgets.AnimatedBackground {
         height: control.height
         width: control.width
-        color: (control.activeFocus || control.hovered) ? VLCStyle.colors.buttonHover
-                                                        : control.color
-        Behavior on color {
-            ColorAnimation {
-                duration: 128
-            }
-        }
+        active: control.activeFocus
+        animationDuration: 140
+        foregroundColor: (control.activeFocus || control.hovered) ? VLCStyle.colors.buttonTextHover
+                                                                  : ((control.selected) ? VLCStyle.colors.text : VLCStyle.colors.menuCaption)
+        backgroundColor: (control.activeFocus || control.hovered) ? VLCStyle.colors.buttonHover
+                                                                  : control.color
     }
 
     contentItem: Item {
@@ -78,9 +77,8 @@ T.TabButton {
                 visible: showText
                 font.pixelSize: VLCStyle.fontSize_normal
                 font.weight: (control.activeFocus || control.hovered || control.selected) ? Font.DemiBold : Font.Normal
-                color: (control.activeFocus || control.hovered) ? VLCStyle.colors.buttonTextHover
-                                                                : ((control.selected) ? VLCStyle.colors.text : VLCStyle.colors.menuCaption)
                 text: control.text
+                color: control.background.foregroundColor
             }
         }
 
@@ -89,12 +87,6 @@ T.TabButton {
             orientation: Qt.Horizontal
             margin: VLCStyle.dp(3, VLCStyle.scale)
             visible: control.showCurrentIndicator && control.selected
-        }
-
-        BackgroundFocus {
-            anchors.fill: parent
-
-            visible: control.activeFocus
         }
     }
 }
