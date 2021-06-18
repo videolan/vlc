@@ -54,15 +54,12 @@ T.ToolButton {
             visible: control.checked
             color: control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.bgHover
         }
-
-        BackgroundFocus {
-            anchors.fill: parent
-
-            visible: control.activeFocus
-        }
     }
 
-    background: BackgroundHover {
-        active: control.hovered
+    background: AnimatedBackground {
+        active: control.activeFocus
+
+        backgroundColor: control.hovered ? VLCStyle.colors.buttonHover
+                                         : VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0)
     }
 }
