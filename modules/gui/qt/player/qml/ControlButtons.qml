@@ -807,7 +807,7 @@ Item{
     Component {
         id: artworkInfoDelegate
 
-        Widgets.BackgroundHover {
+        Widgets.AnimatedBackground {
             id: artworkInfoItem
 
             property bool paintOnly: false
