@@ -297,6 +297,7 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     free( psz_name );
 
     var_Create(p_input, "avstat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    var_Create(p_input, "clock-recovery", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
     /* Parse input options */
     input_item_ApplyOptions( VLC_OBJECT(p_input), p_item );
