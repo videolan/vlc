@@ -29,13 +29,16 @@ ToolButton {
     padding: 0
 
     property string iconText: ""
-    property alias color: backgroundHover.foregroundColor
+
+    property color color: (control.highlighted) ? VLCStyle.colors.accent
+                                                : VLCStyle.colors.icon
+
     property color colorDisabled: VLCStyle.colors.textInactive
     property color colorOverlay: "transparent"
     property color colorFocus: VLCStyle.colors.bgFocus
     property string textOverlay: ""
     property bool borderEnabled: false
-    property bool backgroundVisible: backgroundHover.active
+    property bool backgroundVisible: background.active
 
     enabled: !paintOnly
 
@@ -59,7 +62,7 @@ ToolButton {
         Label {
             id: text
             text: control.iconText
-            color: (control.enabled) ? control.color : control.colorDisabled
+            color: (control.enabled) ? background.foregroundColor : control.colorDisabled
 
             anchors.centerIn: parent
 
@@ -90,7 +93,7 @@ ToolButton {
 
             Label {
                 text: VLCIcons.active_indicator
-                color: (control.enabled) ? control.color : control.colorDisabled
+                color: (control.enabled) ? background.foregroundColor : control.colorDisabled
                 visible: !control.paintOnly && control.checked
 
                 anchors.centerIn: parent
@@ -105,25 +108,20 @@ ToolButton {
             }
 
         }
-
-        BackgroundFocus {
-            anchors.fill: parent
-
-            visible: control.activeFocus
-
-            // NOTE: This ensures the focus rectangle stays visible when switching between light
-            //       and dark theme on the player view.
-            border.color: control.colorFocus
-        }
     }
 
-    background: BackgroundHover {
-        id: backgroundHover
+    background: AnimatedBackground {
+        id: background
 
-        active: control.hovered
+        active: control.activeFocus
 
-        foregroundColor: (control.highlighted) ? VLCStyle.colors.accent
-                                               : VLCStyle.colors.icon
+        backgroundColor: control.hovered ? VLCStyle.colors.buttonHover
+                                         : VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0)
+
+        foregroundColor: control.hovered ? VLCStyle.colors.buttonTextHover
+                                         : control.color
+
+        activeBorderColor: control.colorFocus
 
         implicitHeight: control.size
         implicitWidth : control.size
