@@ -98,8 +98,9 @@ IsoTime::operator vlc_tick_t () const
 
 UTCTime::UTCTime(const std::string &str)
 {
-    enum { UTCTIME_YEAR = 0, UTCTIME_MON, UTCTIME_DAY, UTCTIME_HOUR, UTCTIME_MIN, UTCTIME_SEC, UTCTIME_MSEC, UTCTIME_TZ };
-    int values[8] = {0};
+    enum { UTCTIME_YEAR = 0, UTCTIME_MON, UTCTIME_DAY, UTCTIME_HOUR, UTCTIME_MIN,
+           UTCTIME_SEC, UTCTIME_FRAC_NUM, UTCTIME_FRAC_DEN, UTCTIME_TZ };
+    int values[9] = {0};
     std::istringstream in(str);
     in.imbue(std::locale("C"));
 
@@ -124,7 +125,16 @@ UTCTime::UTCTime(const std::string &str)
         if(!in.eof() && in.peek() == '.')
         {
             in.ignore(1);
-            in >> values[UTCTIME_MSEC];
+            values[UTCTIME_FRAC_NUM] = 0;
+            values[UTCTIME_FRAC_DEN] = 1;
+            int c = in.peek();
+            while(c >= '0' && c <= '9')
+            {
+                values[UTCTIME_FRAC_NUM] = values[UTCTIME_FRAC_NUM] * 10 + (c - '0');
+                values[UTCTIME_FRAC_DEN] *= 10;
+                in.ignore(1);
+                c = in.peek();
+            }
         }
         /* Timezone */
         if(!in.eof() && in.peek() == 'Z')
@@ -172,8 +182,9 @@ UTCTime::UTCTime(const std::string &str)
             int64_t mst = timegm( &tm );
             mst += values[UTCTIME_TZ] * -60;
             mst *= 1000;
-            mst += values[UTCTIME_MSEC];
             t = VLC_TICK_FROM_MS(mst);
+            if(values[UTCTIME_FRAC_DEN] > 0)
+                t += vlc_tick_from_samples(values[UTCTIME_FRAC_NUM], values[UTCTIME_FRAC_DEN]);
         } else {
             // Failure parsing time string
             t = 0;
