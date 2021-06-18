@@ -1005,6 +1005,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     }
 
     var_AddCallback(player, "avstat", ForwardValue, input->thread);
+    var_AddCallback(player, "clock-recovery", ForwardValue, input->thread);
     vlc_player_input_RestoreMlStates(input, false);
 
     if (player->video_string_ids)
@@ -1062,6 +1063,8 @@ vlc_player_input_Delete(struct vlc_player_input *input)
     vlc_vector_destroy(&input->spu_track_vector);
 
     var_DelCallback(vlc_object_parent(input->thread), "avstat",
+                    ForwardValue, input->thread);
+    var_DelCallback(vlc_object_parent(input->thread), "clock-recovery",
                     ForwardValue, input->thread);
     input_Close(input->thread);
     free(input);
