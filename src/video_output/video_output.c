@@ -1109,10 +1109,8 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_sys_t *vout, picture_t *pic,
     return NULL;
 }
 
-static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
+static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
 {
-    vout_thread_sys_t *sys = vout;
-
     // hold it as the filter chain will release it or return it and we release it
     picture_Hold(sys->displayed.current);
 
@@ -1126,7 +1124,7 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
         return VLC_EGENERIC;
 
     if (filtered->date != sys->displayed.current->date)
-        msg_Warn(&vout->obj, "Unsupported timestamp modifications done by chain_interactive");
+        msg_Warn(&sys->obj, "Unsupported timestamp modifications done by chain_interactive");
 
     vout_display_t *vd = sys->display;
 
@@ -1206,9 +1204,9 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
         }
         if (!sys->spu_blend && sys->spu_blend_chroma != fmt_spu.i_chroma) {
             sys->spu_blend_chroma = fmt_spu.i_chroma;
-            sys->spu_blend = filter_NewBlend(VLC_OBJECT(&vout->obj), &fmt_spu);
+            sys->spu_blend = filter_NewBlend(VLC_OBJECT(&sys->obj), &fmt_spu);
             if (!sys->spu_blend)
-                msg_Err(&vout->obj, "Failed to create blending filter, OSD/Subtitles will not work");
+                msg_Err(&sys->obj, "Failed to create blending filter, OSD/Subtitles will not work");
         }
     }
 
@@ -1246,7 +1244,7 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
                      * software RGB32 one before blending it. */
                     if (do_snapshot)
                     {
-                        picture_t *copy = ConvertRGB32AndBlend(vout, blent, subpic);
+                        picture_t *copy = ConvertRGB32AndBlend(sys, blent, subpic);
                         if (copy)
                             snap_pic = copy;
                     }
@@ -1308,7 +1306,7 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
         {
         static int i = 0;
         if (((i++)%10) == 0)
-            msg_Info(&vout->obj, "render: avg %d ms var %d ms",
+            msg_Info(&sys->obj, "render: avg %d ms var %d ms",
                      (int)(sys->render.avg/1000), (int)(sys->render.var/1000));
         }
 #endif
