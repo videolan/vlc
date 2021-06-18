@@ -242,7 +242,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, con
                   video_format_t *fmt_out, vlc_video_context **vtcx_out)
 {
     VLC_UNUSED(desc);
-    if ( hwfmt != AV_PIX_FMT_VAAPI_VLD || dec_device == NULL ||
+    if ( hwfmt != AV_PIX_FMT_VAAPI || dec_device == NULL ||
         dec_device->type != VLC_DECODER_DEVICE_VAAPI)
         return VLC_EGENERIC;
 

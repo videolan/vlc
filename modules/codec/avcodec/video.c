@@ -1627,7 +1627,7 @@ no_reuse:
         AV_PIX_FMT_D3D11VA_VLD,
         AV_PIX_FMT_DXVA2_VLD,
 #endif
-        AV_PIX_FMT_VAAPI_VLD,
+        AV_PIX_FMT_VAAPI,
         AV_PIX_FMT_VDPAU,
         AV_PIX_FMT_NONE,
     };

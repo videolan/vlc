@@ -85,7 +85,7 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *,
  * AV_PIX_FMT_D3D11VA_VLD - ID3D11VideoDecoderOutputView*
  * AV_PIX_FMT_DXVA2_VLD   - IDirect3DSurface9*
  * AV_PIX_FMT_VDPAU       - VdpVideoSurface
- * AV_PIX_FMT_VAAPI_VLD   - VASurfaceID
+ * AV_PIX_FMT_VAAPI       - VASurfaceID
  *
  * @param pic pointer to VLC picture containing the surface [IN/OUT]
  * @param surface pointer to the AVFrame data[0] and data[3] pointers [OUT]
