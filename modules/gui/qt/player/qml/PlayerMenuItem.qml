@@ -104,9 +104,11 @@ T.MenuItem {
     }
 
 
-    background: Widgets.BackgroundHover {
+    background: Widgets.AnimatedBackground {
         implicitHeight: VLCStyle.fontHeight_normal
-        active: control.highlighted
+
+        backgroundColor: control.highlighted ? VLCStyle.colors.buttonHover
+                                             : VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0)
     }
 
     //hack around QTBUG-79115
