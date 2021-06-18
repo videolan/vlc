@@ -1124,17 +1124,11 @@ static picture_t *FilterPictureInteractive(vout_thread_sys_t *sys)
     return filtered;
 }
 
-static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
+static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
+                            bool *render_now, picture_t **out_pic,
+                            subpicture_t **out_subpic)
 {
-    vout_chrono_Start(&sys->render);
-
-    picture_t *filtered = FilterPictureInteractive(sys);
-    if (!filtered)
-        return VLC_EGENERIC;
-
     vout_display_t *vd = sys->display;
-
-    vlc_mutex_lock(&sys->display_lock);
 
     /*
      * Get the rendering date for the current subpicture to be displayed.
@@ -1155,7 +1149,7 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
         if (unlikely(render_subtitle_date == VLC_TICK_MAX))
         {
             render_subtitle_date = system_now;
-            render_now = true;
+            *render_now = true;
         }
     }
 
@@ -1285,10 +1279,43 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
         return VLC_EGENERIC;
     }
 
-    if (!do_dr_spu && sys->spu_blend != NULL && subpic != NULL)
-        picture_BlendSubpicture(todisplay, sys->spu_blend, subpic);
+    if (!do_dr_spu && subpic)
+    {
+        if (sys->spu_blend)
+            picture_BlendSubpicture(todisplay, sys->spu_blend, subpic);
 
-    system_now = vlc_tick_now();
+        /* The subpic will not be used anymore */
+        subpicture_Delete(subpic);
+        subpic = NULL;
+    }
+
+    *out_pic = todisplay;
+    *out_subpic = subpic;
+    return VLC_SUCCESS;
+}
+
+static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
+{
+    vout_display_t *vd = sys->display;
+
+    vout_chrono_Start(&sys->render);
+
+    picture_t *filtered = FilterPictureInteractive(sys);
+    if (!filtered)
+        return VLC_EGENERIC;
+
+    vlc_mutex_lock(&sys->display_lock);
+
+    picture_t *todisplay;
+    subpicture_t *subpic;
+    int ret = PrerenderPicture(sys, filtered, &render_now, &todisplay, &subpic);
+    if (ret != VLC_SUCCESS)
+    {
+        vlc_mutex_unlock(&sys->display_lock);
+        return ret;
+    }
+
+    vlc_tick_t system_now = vlc_tick_now();
     const vlc_tick_t pts = todisplay->date;
     vlc_tick_t system_pts = render_now ? system_now :
         vlc_clock_ConvertToSystem(sys->clock, system_now, pts, sys->rate);
@@ -1305,7 +1332,7 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
     const unsigned frame_rate_base = todisplay->format.i_frame_rate_base;
 
     if (vd->ops->prepare != NULL)
-        vd->ops->prepare(vd, todisplay, do_dr_spu ? subpic : NULL, system_pts);
+        vd->ops->prepare(vd, todisplay, subpic, system_pts);
 
     vout_chrono_Stop(&sys->render);
 #if 0
