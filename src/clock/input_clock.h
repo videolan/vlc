@@ -40,7 +40,7 @@ typedef struct input_clock_t input_clock_t;
  *
  * You must use input_clock_Delete to delete it once unused.
  */
-input_clock_t *input_clock_New( float rate );
+input_clock_t *input_clock_New( float rate, bool recovery );
 
 /**
  * This function attach a clock listener to the input clock
@@ -130,5 +130,7 @@ void input_clock_SetJitter( input_clock_t *,
  * XXX in the current implementation, the pts_delay will never be decreased.
  */
 vlc_tick_t input_clock_GetJitter( input_clock_t * );
+
+void input_clock_EnableRecovery( input_clock_t *, bool );
 
 #endif
