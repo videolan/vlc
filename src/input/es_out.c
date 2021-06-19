@@ -1521,6 +1521,7 @@ static int OnClockRecoveryChanged(vlc_object_t *obj, const char *name, vlc_value
 {
     input_clock_t *cl = opaque;
     input_clock_EnableRecovery(cl, newv.b_bool);
+    msg_Info(obj, "Clock recovery has been %s", newv.b_bool ? "enabled" : "disabled");
     return VLC_SUCCESS;
 }
 
