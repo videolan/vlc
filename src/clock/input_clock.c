@@ -140,6 +140,8 @@ struct input_clock_t
     float   rate;
     vlc_tick_t i_pts_delay;
     vlc_tick_t i_pause_date;
+
+    atomic_bool b_recovery;
 };
 
 static vlc_tick_t ClockStreamToSystem( input_clock_t *, vlc_tick_t i_stream );
@@ -163,7 +165,7 @@ static void UpdateListener( input_clock_t *cl, bool discontinuity )
 /*****************************************************************************
  * input_clock_New: create a new clock
  *****************************************************************************/
-input_clock_t *input_clock_New( float rate )
+input_clock_t *input_clock_New( float rate, bool recovery )
 {
     input_clock_t *cl = malloc( sizeof(*cl) );
     if( !cl )
@@ -173,6 +175,9 @@ input_clock_t *input_clock_New( float rate )
     cl->b_has_reference = false;
     cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
     cl->b_has_external_clock = false;
+
+    // TODO: this should be init from constructor
+    atomic_init(&cl->b_recovery, recovery);
 
     cl->last = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
 
@@ -248,7 +253,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
 
             const double system_gap = fabs(system_diff - AvgGet( &cl->system_avg));
             const double stream_gap = fabs(stream_diff - AvgGet( &cl->stream_avg));
-            if (fabs(system_gap - stream_gap) > CR_MAX_GAP)
+            if (fabs(system_gap - stream_gap) > CR_MAX_GAP && atomic_load(&cl->b_recovery))
             {
                 /* Stream discontinuity, for which we haven't received a
                  * warning from the stream control facilities (dd-edited
@@ -502,6 +507,11 @@ vlc_tick_t input_clock_GetJitter( input_clock_t *cl )
     vlc_tick_t i_pts_delay = cl->i_pts_delay ;
 
     return i_pts_delay + i_late_median;
+}
+
+void input_clock_EnableRecovery( input_clock_t *clock, bool enable)
+{
+    atomic_store(&clock->b_recovery, enable);
 }
 
 /*****************************************************************************

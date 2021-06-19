@@ -1517,6 +1517,13 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     }
 }
 
+static int OnClockRecoveryChanged(vlc_object_t *obj, const char *name, vlc_value_t oldv, vlc_value_t newv, void *opaque)
+{
+    input_clock_t *cl = opaque;
+    input_clock_EnableRecovery(cl, newv.b_bool);
+    return VLC_SUCCESS;
+}
+
 /* EsOutAddProgram:
  *  Add a program
  */
@@ -1553,7 +1560,11 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
         return NULL;
     }
 
-    p_pgrm->p_input_clock = input_clock_New( p_sys->rate );
+    // TODO clock recovery
+    p_pgrm->p_input_clock = input_clock_New( p_sys->rate,
+            var_InheritBool( p_sys->p_input, "clock-recovery" ) );
+    var_AddCallback( p_sys->p_input, "clock-recovery", OnClockRecoveryChanged, p_pgrm->p_input_clock );
+
     if( !p_pgrm->p_input_clock )
     {
         vlc_clock_main_Delete( p_pgrm->p_main_clock );
@@ -1651,6 +1662,8 @@ static int EsOutProgramDel( es_out_t *out, input_source_t *source, int i_group )
     /* If program is selected we need to unselect it */
     if( p_sys->p_pgrm == p_pgrm )
         p_sys->p_pgrm = NULL;
+
+    var_DelCallback( p_input, "clock-recovery", OnClockRecoveryChanged, p_pgrm->p_input_clock );
 
     /* Update "program" variable */
     input_SendEventProgramDel( p_input, i_group );
