@@ -298,3 +298,4 @@ libvlc_picture_list_at
 libvlc_picture_list_count
 libvlc_picture_list_destroy
 libvlc_media_player_enable_avstat
+libvlc_media_player_enable_clock_recovery
