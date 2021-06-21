@@ -85,6 +85,20 @@ vlc_static_DEPENDENCIES = $(vlc_DEPENDENCIES)
 vlc_static_LDADD = $(vlc_LDADD)
 vlc_static_LDFLAGS = $(vlc_LDFLAGS) -no-install -static
 
+vlcsk_SOURCES = debugsk.c
+vlcsk_LDFLAGS = $(LDFLAGS_vlc)
+vlcsk_CPPFLAGS = \
+	$(AM_CPPFLAGS) \
+	-DTOP_BUILDDIR=\"$$(cd "$(top_builddir)"; pwd)\" \
+	-DTOP_SRCDIR=\"$$(cd "$(top_srcdir)"; pwd)\" \
+	$(NULL)
+
+vlcsk_LDADD = ../compat/libcompat.la ../lib/libvlc.la
+
+if BUILD_VLC
+bin_PROGRAMS += vlcsk
+endif
+
 #
 # Root wrapper
 #
