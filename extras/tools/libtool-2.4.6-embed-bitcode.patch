@@ -12,16 +12,15 @@ diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
 index 96b37003..0d9f10a0 100644
 --- a/build-aux/ltmain.in
 +++ b/build-aux/ltmain.in
-@@ -5173,6 +5173,14 @@ func_mode_link ()
+@@ -5173,6 +5173,13 @@ func_mode_link ()
  	prev=xcompiler
  	continue
  	;;
-+      -fembed-bitcode)
-+	func_append compiler_flags " -fembed-bitcode"
-+	func_append compile_command " -fembed-bitcode"
-+	func_append finalize_command " -fembed-bitcode"
-+	func_append linker_flags " -fembed-bitcode"
-+	func_echo "TAKING -fembed-bitcode into account"
++      -fembed-bitcode|-fembed-bitcode-marker)
++	func_append compiler_flags " $arg"
++	func_append compile_command " $arg"
++	func_append finalize_command " $arg"
++	func_append linker_flags " $arg"
 +        continue
 +        ;;
  
