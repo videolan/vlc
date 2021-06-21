@@ -120,6 +120,7 @@ ca_Open(audio_output_t *p_aout)
     vlc_sem_init(&p_sys->flush_sem, 0);
     lock_init(p_sys);
     p_sys->p_out_chain = NULL;
+    p_sys->chans_to_reorder = 0;
 
     p_aout->play = ca_Play;
     p_aout->pause = ca_Pause;
@@ -434,7 +435,6 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     p_sys->i_rate = fmt->i_rate;
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;
     p_sys->i_frame_length = fmt->i_frame_length;
-    p_sys->chans_to_reorder = 0;
 
     /* TODO VLC can't handle latency higher than 1 seconds */
     if (i_dev_latency_us > 1000000)
@@ -472,6 +472,7 @@ ca_Uninitialize(audio_output_t *p_aout)
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
     ca_ClearOutBuffers(p_aout);
     p_sys->i_out_max_size = 0;
+    p_sys->chans_to_reorder = 0;
 }
 
 void
