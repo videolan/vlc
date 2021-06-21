@@ -49,7 +49,12 @@ void *vlc_dlopen(const char *path, bool lazy)
     const int flags = 0;
     VLC_UNUSED(lazy);
 #endif
-    return dlopen (path, flags);
+    void *handle = dlopen (path, flags);
+    const char *error = dlerror ();
+
+    if (error != NULL)
+        fprintf(stderr, "DLERROR: %s\n", error);
+    return handle;
 }
 
 int vlc_dlclose(void *handle)
