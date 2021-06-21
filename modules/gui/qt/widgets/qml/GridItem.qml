@@ -194,7 +194,7 @@ MouseArea {
                          ? VLCStyle.colors.bgHover
                          : VLCStyle.colors.setColorAlpha(VLCStyle.colors.bgHover, 0)
 
-        visible: backgroundAnimationRunning || background.active || root.selected
+        visible: backgroundAnimationRunning || borderColorAnimationRunning || background.active || root.selected
     }
 
     Loader {

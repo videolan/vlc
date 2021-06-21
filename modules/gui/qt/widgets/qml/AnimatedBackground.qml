@@ -43,9 +43,13 @@ Rectangle {
         return brightness > .6 ? "black" : "white"
     }
 
+    property color activeBorderColor: VLCStyle.colors.bgFocus
+
     property int animationDuration: 200
 
     property bool backgroundAnimationRunning: false
+
+    property bool borderColorAnimationRunning: false
 
     //---------------------------------------------------------------------------------------------
     // Implementation
@@ -53,12 +57,27 @@ Rectangle {
 
     color: backgroundColor
 
-    border.width: root.active ? VLCStyle.focus_border : 0
-    border.color: VLCStyle.colors.bgFocus
+    border.color: root.active
+                  ? root.activeBorderColor
+                  : VLCStyle.colors.setColorAlpha(root.activeBorderColor, 0)
 
     //---------------------------------------------------------------------------------------------
     // Animations
     //---------------------------------------------------------------------------------------------
+
+    Behavior on border.color {
+        ColorAnimation {
+            duration: root.animationDuration
+            onRunningChanged: {
+                root.borderColorAnimationRunning = running
+                if (running && root.active) {
+                    border.width = VLCStyle.focus_border
+                } else if (!running && !root.active) {
+                    border.width = 0
+                }
+            }
+        }
+    }
 
     Behavior on color {
         ColorAnimation {
