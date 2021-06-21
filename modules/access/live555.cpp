@@ -286,7 +286,7 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
 static unsigned char* parseVorbisConfigStr( char const* configStr,
                                             unsigned int& configSize );
 
-static char *passwordLessURL( vlc_url_t *url );
+static char *passwordLessURL( const vlc_url_t *url );
 
 static bool copyExtradata( const void *p_extra, size_t i_extra, es_format_t *dst )
 {
@@ -2396,7 +2396,7 @@ static uint8_t *parseVorbisConfigStr( char const* configStr,
     return p_extra;
 }
 
-static char *passwordLessURL( vlc_url_t *p_url )
+static char *passwordLessURL( const vlc_url_t *p_url )
 {
     vlc_url_t url;
 
