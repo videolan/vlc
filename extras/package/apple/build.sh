@@ -99,6 +99,7 @@ VLC_DISABLE_DEBUG=0
 VLC_MERGE_PLUGINS=0
 # whether to compile with bitcode or not
 VLC_USE_BITCODE=0
+VLC_BITCODE_FLAG="-fembed-bitcode"
 # whether to build static or dynamic plugins
 VLC_BUILD_DYNAMIC=0
 VLC_CONFIGURE_ONLY=0
@@ -125,7 +126,8 @@ usage()
     echo " --arch=ARCH      Architecture to build for"
     echo "                   (i386|x86_64|armv7|arm64)"
     echo " --sdk=SDK        Name of the SDK to build with (see 'xcodebuild -showsdks')"
-    echo " --enable-bitcode Enable bitcode for compilation"
+    echo " --enable-bitcode Enable bitcode for compilation, same as with =full"
+    echo " --enable-bitcode=marker Enable bitcode marker for compilation"
     echo " --enable-merge-plugins Enable the merging of plugins into a single archive"
     echo " --disable-debug  Disable libvlc debug mode (for release)"
     echo " --configure      Only configure libvlc"
@@ -322,8 +324,8 @@ set_host_envvars()
     local clike_flags="$VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH $1"
     local bitcode_flag=""
     if [ "$VLC_USE_BITCODE" -gt "0" ]; then
-        clike_flags+=" -fembed-bitcode"
-        bitcode_flag=" -fembed-bitcode"
+        clike_flags+=" $VLC_BITCODE_FLAG"
+        bitcode_flag=" $VLC_BTICODE_FLAG"
     fi
 
     export CPPFLAGS="-arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH"
@@ -370,6 +372,7 @@ write_config_mak()
     # Flags to be used for C-like compilers (C, C++, Obj-C)
     local clike_flags="$VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH $1"
     if [ "$VLC_USE_BITCODE" -gt "0" ]; then
+        # We use bitcode for contribs anyway, no dylib or executable built from them
         clike_flags+=" -fembed-bitcode"
     fi
 
@@ -461,8 +464,12 @@ do
         --disable-debug)
             VLC_DISABLE_DEBUG=1
             ;;
-        --enable-bitcode)
+        --enable-bitcode|--enable-bitcode=full)
             VLC_USE_BITCODE=1
+            ;;
+        --enable-bitcode=marker)
+            VLC_USE_BITCODE=1
+            VLC_BITCODE_FLAG="-fembed-bitcode-marker"
             ;;
         --enable-merge-plugins)
             VLC_MERGE_PLUGINS=1
