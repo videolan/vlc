@@ -46,7 +46,7 @@ endif
 	echo "non_pic_object=none" >> $@.lo
 	echo "pic_object=.deps/$@.o" >> $@.lo
 	$(LIBTOOL) --mode=link --tag=CXX c++ -Wl,-Ur -fPIC -o $@ "$@.lo" \
-		-export-symbols-regex "^vlc_entry__" ../compat/libcompat.la ../src/libvlccore.la
+		-export-symbols-regex "^vlc_entry__"
 	dependencies=`$(top_srcdir)/extras/package/apple/dependencies.sh forward $<`; \
 	sed -i.orig "s,dependency_libs=.*\$$,dependency_libs=' $${dependencies}'," $@ \
 		|| (rm $@ && exit 1)
