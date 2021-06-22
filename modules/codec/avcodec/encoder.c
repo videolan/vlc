@@ -1406,7 +1406,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
             p_sys->frame->nb_samples = p_aout_buf->i_nb_samples;
         else
             p_sys->frame->nb_samples = p_sys->i_frame_size;
-        p_sys->frame->format     = p_sys->p_context->sample_fmt;
+        p_sys->frame->format = p_sys->p_context->sample_fmt;
         p_sys->frame->channel_layout = p_sys->p_context->channel_layout;
         p_sys->frame->channels = p_sys->p_context->channels;
 
