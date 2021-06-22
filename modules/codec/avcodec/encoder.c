@@ -1277,6 +1277,8 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, uns
     av_frame_unref( p_sys->frame );
     p_sys->frame->format     = p_sys->p_context->sample_fmt;
     p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
+    p_sys->frame->channel_layout = p_sys->p_context->channel_layout;
+    p_sys->frame->channels = p_sys->p_context->channels;
 
     if( likely( date_Get( &p_sys->buffer_date ) != VLC_TICK_INVALID) )
     {
@@ -1405,6 +1407,9 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         else
             p_sys->frame->nb_samples = p_sys->i_frame_size;
         p_sys->frame->format     = p_sys->p_context->sample_fmt;
+        p_sys->frame->channel_layout = p_sys->p_context->channel_layout;
+        p_sys->frame->channels = p_sys->p_context->channels;
+
         if( likely(date_Get( &p_sys->buffer_date ) != VLC_TICK_INVALID) )
         {
             /* Convert to AV timing */
