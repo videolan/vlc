@@ -20,6 +20,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "sdi.h"
 
 static inline uint32_t av_le2ne32(uint32_t val)
