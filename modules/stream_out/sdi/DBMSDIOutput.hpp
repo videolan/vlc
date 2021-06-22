@@ -65,7 +65,6 @@ namespace sdi_sout
                 BMDTimeValue hardware_reference;
             } clock;
             bool b_running;
-            bool b_prerolled;
             vlc_tick_t streamStartTime;
             int StartPlayback();
             struct

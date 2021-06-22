@@ -101,18 +101,6 @@ static const char *const ppsz_videoconns_text[] = {
     "Composite",
     "S-video",
 };
-static const BMDVideoConnection rgbmd_videoconns[] =
-{
-    bmdVideoConnectionSDI,
-    bmdVideoConnectionHDMI,
-    bmdVideoConnectionOpticalSDI,
-    bmdVideoConnectionComponent,
-    bmdVideoConnectionComposite,
-    bmdVideoConnectionSVideo,
-};
-static_assert(ARRAY_SIZE(rgbmd_videoconns) == ARRAY_SIZE(ppsz_videoconns), "videoconn arrays messed up");
-static_assert(ARRAY_SIZE(rgbmd_videoconns) == ARRAY_SIZE(ppsz_videoconns_text), "videoconn arrays messed up");
-
 static const int rgi_afd_values[] = {
     0, 2, 3, 4, 8, 9, 10, 11, 13, 14, 15,
 };
