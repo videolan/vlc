@@ -134,7 +134,7 @@ MainInterface::MainInterface(qt_intf_t *_p_intf , QWidget* parent, Qt::WindowFla
     updateIntfScaleFactor();
 
     /* Get the available interfaces */
-    m_extraInterfaces = new VLCVarChoiceModel(p_intf, "intf-add", this);
+    m_extraInterfaces = new VLCVarChoiceModel(VLC_OBJECT(p_intf->intf), "intf-add", this);
 
     vlc_medialibrary_t* ml = vlc_ml_instance_get( p_intf );
     b_hasMedialibrary = (ml != NULL);

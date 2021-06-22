@@ -390,7 +390,7 @@ QMenu *VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *current, MainInterface *_
 QMenu *VLCMenuBar::InterfacesMenu( qt_intf_t *p_intf, QMenu *current )
 {
     assert(current);
-    VLCVarChoiceModel* model = new VLCVarChoiceModel(VLC_OBJECT(p_intf), "intf-add", current);
+    VLCVarChoiceModel* model = new VLCVarChoiceModel(VLC_OBJECT(p_intf->intf), "intf-add", current);
     CheckableListMenu* submenu = new CheckableListMenu(qtr("Interfaces"), model, CheckableListMenu::UNGROUPED, current);
     current->addMenu(submenu);
     return current;
@@ -853,7 +853,7 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
         /* In skins interface, append some items */
         if( p_intf->b_isDialogProvider )
         {
-            vlc_object_t* p_object = vlc_object_parent(p_intf);
+            vlc_object_t* p_object = vlc_object_parent(p_intf->intf);
             submenu->setTitle( qtr( "Interface" ) );
 
             /* Open skin dialog box */

@@ -1371,7 +1371,7 @@ void SyncWidget::setValue( double d )
 SyncControls::SyncControls( qt_intf_t *_p_intf, QWidget *_parent )
     : QWidget( _parent )
     , p_intf( _p_intf )
-    , m_SubsDelayCfgFactor(p_intf, SUBSDELAY_CFG_FACTOR)
+    , m_SubsDelayCfgFactor(VLC_OBJECT(p_intf->intf), SUBSDELAY_CFG_FACTOR)
 {
     QGroupBox *AVBox, *subsBox;
     QToolButton *updateButton;
