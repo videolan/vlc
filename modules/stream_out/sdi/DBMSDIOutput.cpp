@@ -45,7 +45,9 @@
 
 #include "sdiout.hpp"
 
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
+#endif
 
 #define DECKLINK_CARD_BUFFER (CLOCK_FREQ)
 #define DECKLINK_PREROLL (CLOCK_FREQ*3/4)

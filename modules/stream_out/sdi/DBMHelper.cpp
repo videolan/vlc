@@ -28,7 +28,9 @@
 
 #include "DBMHelper.hpp"
 
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
+#endif
 
 using namespace Decklink;
 
