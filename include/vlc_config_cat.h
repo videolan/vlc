@@ -215,8 +215,6 @@ static const struct config_category_t categories_array[] =
     { CAT_SOUT,       SOUT_TITLE,       SOUT_HELP      },
     { CAT_PLAYLIST,   PLAYLIST_TITLE,   PLAYLIST_HELP  },
     { CAT_ADVANCED,   AADVANCED_TITLE,  AADVANCED_HELP },
-
-    { -1, NULL, NULL }
 };
 
 static const struct config_subcategory_t subcategories_array[] =
@@ -260,72 +258,70 @@ static const struct config_subcategory_t subcategories_array[] =
 
     { SUBCAT_ADVANCED_MISC, MISC_TITLE, AADVANCED_HELP },
     { SUBCAT_ADVANCED_NETWORK, ANETWORK_TITLE, ANETWORK_HELP },
-
-    { -1, NULL, NULL }
 };
+
+/** Get the table index for the given category entry. */
+VLC_USED
+static inline int vlc_config_cat_IndexOf( int cat )
+{
+    int index = -1;
+    for( unsigned i = 0; i < ARRAY_SIZE(categories_array); i++ )
+    {
+        if( categories_array[i].id == cat )
+        {
+            index = i;
+            break;
+        }
+    }
+    return index;
+}
+
+/** Get the table index for the given subcategory entry. */
+VLC_USED
+static inline int vlc_config_subcat_IndexOf( int subcat )
+{
+    int index = -1;
+    for( unsigned i = 0; i < ARRAY_SIZE(subcategories_array); i++ )
+    {
+        if( subcategories_array[i].id == subcat )
+        {
+            index = i;
+            break;
+        }
+    }
+    return index;
+}
 
 /** Get the name for a category. */
 VLC_USED
 static inline const char *vlc_config_cat_GetName( int cat )
 {
-    int i = 0;
-    while( categories_array[i].name != NULL )
-    {
-        if( categories_array[i].id == cat )
-        {
-            return vlc_gettext(categories_array[i].name);
-        }
-        i++;
-    }
-    return NULL;
+    int i = vlc_config_cat_IndexOf( cat );
+    return (i != -1) ? vlc_gettext(categories_array[i].name) : NULL;
 }
 
 /** Get the help text for a category. */
 VLC_USED
 static inline const char *vlc_config_cat_GetHelp( int cat )
 {
-    int i = 0;
-    while( categories_array[i].help != NULL )
-    {
-        if( categories_array[i].id == cat )
-        {
-            return vlc_gettext(categories_array[i].help);
-        }
-        i++;
-    }
-    return NULL;
+    int i = vlc_config_cat_IndexOf( cat );
+    return (i != -1) ? vlc_gettext(categories_array[i].help) : NULL;
 }
 
 /** Get the name for a subcategory. */
 VLC_USED
 static inline const char *vlc_config_subcat_GetName( int subcat )
 {
-    int i = 0;
-    while( subcategories_array[i].name != NULL )
-    {
-        if( subcategories_array[i].id == subcat )
-        {
-            return vlc_gettext(subcategories_array[i].name);
-        }
-        i++;
-    }
-    return NULL;
+    int i = vlc_config_subcat_IndexOf( subcat );
+    return (i != -1) ? vlc_gettext(subcategories_array[i].name) : NULL;
 }
 
 /** Get the help text for a subcategory. */
 VLC_USED
 static inline const char *vlc_config_subcat_GetHelp( int subcat )
 {
-    int i = 0;
-    while( subcategories_array[i].help != NULL )
-    {
-        if( subcategories_array[i].id == subcat )
-        {
-            return vlc_gettext(subcategories_array[i].help);
-        }
-        i++;
-    }
-    return NULL;
+    int i = vlc_config_subcat_IndexOf( subcat );
+    return (i != -1) ? vlc_gettext(subcategories_array[i].help) : NULL;
 }
 
 /** Check if the given subcategory is a "general" one.
