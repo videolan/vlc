@@ -318,6 +318,8 @@ Widgets.NavigableFocusScope {
 
                 focus: true
 
+                clip: true // else out of view items will overlap with surronding items
+
                 model: PlaylistListModel {
                     playlistId: mainctx.playlist
                 }
