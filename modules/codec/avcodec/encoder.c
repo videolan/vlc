@@ -1267,6 +1267,8 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, uns
     av_frame_unref( p_sys->frame );
     p_sys->frame->format     = p_sys->p_context->sample_fmt;
     p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
+    p_sys->frame->channel_layout = p_sys->p_context->channel_layout;
+    p_sys->frame->channels = p_sys->p_context->channels;
 
     p_sys->frame->pts        = date_Get( &p_sys->buffer_date ) * p_sys->p_context->time_base.den /
                                 CLOCK_FREQ / p_sys->p_context->time_base.num;
@@ -1395,6 +1397,9 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         p_sys->frame->format     = p_sys->p_context->sample_fmt;
         p_sys->frame->pts        = date_Get( &p_sys->buffer_date ) * p_sys->p_context->time_base.den /
                                     CLOCK_FREQ / p_sys->p_context->time_base.num;
+
+        p_sys->frame->channel_layout = p_sys->p_context->channel_layout;
+        p_sys->frame->channels = p_sys->p_context->channels;
 
         const int in_bytes = p_sys->frame->nb_samples *
             p_sys->p_context->channels * p_sys->i_sample_bytes;
