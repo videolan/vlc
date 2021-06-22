@@ -281,7 +281,7 @@ public:
             return S_OK;
         }
 
-        BMDPixelFormat fmt = 0;
+        BMDPixelFormat fmt;
         switch (flags) {
             case bmdDetectedVideoInputYCbCr422:
                 fmt = sys->tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV;
