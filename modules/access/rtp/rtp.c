@@ -417,7 +417,7 @@ static int OpenURL(vlc_object_t *obj)
 
     free (tmp);
     p_sys->rtp_sock = (co ? vlc_dccp_CreateFD : vlc_datagram_CreateFD)(fd);
-    if (p_sys->rtcp_sock == NULL) {
+    if (p_sys->rtp_sock == NULL) {
         if (rtcp_fd != -1)
             net_Close(rtcp_fd);
         return VLC_EGENERIC;
