@@ -577,7 +577,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     free(layout);
     fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
-    p_aout->mute_set  = MuteSet;
     p_aout->pause = Pause;
     p_aout->flush = Flush;
 
@@ -669,6 +668,7 @@ Open(vlc_object_t *obj)
     sys->au_dev = var_InheritBool(aout, "spdif") ? AU_DEV_ENCODED : AU_DEV_PCM;
     aout->start = Start;
     aout->stop = Stop;
+    aout->mute_set  = MuteSet;
     aout->device_select = DeviceSelect;
 
     aout_SoftVolumeInit( aout );
