@@ -58,7 +58,7 @@ demux_LTLIBRARIES += $(LTLIBmod)
 libpva_plugin_la_SOURCES = demux/pva.c demux/mpeg/pes.h demux/mpeg/timestamps.h
 demux_LTLIBRARIES += libpva_plugin.la
 
-libaiff_plugin_la_SOURCES = demux/aiff.c
+libaiff_plugin_la_SOURCES = demux/aiff.c demux/mp4/coreaudio.h
 demux_LTLIBRARIES += libaiff_plugin.la
 
 libmjpeg_plugin_la_SOURCES = demux/mjpeg.c demux/mxpeg_helper.h

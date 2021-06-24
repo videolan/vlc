@@ -31,7 +31,10 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
+#include <vlc_aout.h>
 #include <limits.h>
+
+#include "mp4/coreaudio.h"
 
 /* TODO:
  *  - ...
@@ -73,6 +76,10 @@ typedef struct
     int         i_ssnd_fsize;
 
     vlc_tick_t  i_time;
+
+    bool        b_reorder;
+    uint8_t     pi_chan_table[AOUT_CHAN_MAX];
+    vlc_fourcc_t audio_fourcc;
 } demux_sys_t;
 
 static int Demux  ( demux_t *p_demux );
@@ -120,6 +127,9 @@ static int Open( vlc_object_t *p_this )
     es_format_Init( &p_sys->fmt, AUDIO_ES, VLC_FOURCC( 't', 'w', 'o', 's' ) );
     p_sys->i_time = 0;
     p_sys->i_ssnd_pos = -1;
+    p_sys->b_reorder = false;
+
+    const uint32_t *pi_channels_in = NULL;
 
     for( ;; )
     {
@@ -158,6 +168,26 @@ static int Open( vlc_object_t *p_this )
             msg_Dbg( p_demux, "SSND: (offset=%d blocksize=%d)",
                      p_sys->i_ssnd_offset, p_sys->i_ssnd_blocksize );
         }
+        else if( !memcmp( p_peek, "CHAN", 4 ) && i_chunk_size > 8 + 12 )
+        {
+            ssize_t ret = vlc_stream_Peek( p_demux->s, &p_peek, i_chunk_size );
+            if( ret == -1 || (size_t) ret != i_chunk_size )
+                return VLC_EGENERIC;
+
+            struct CoreAudio_layout_s layout;
+            layout.i_channels_layout_tag = GetDWBE( &p_peek[8] );
+            layout.i_channels_bitmap = GetDWBE( &p_peek[8+4] );
+            layout.i_channels_description_count = GetDWBE( &p_peek[8+8] );
+            /* TODO: handle CoreAudio_layout_s.p_descriptions */
+
+            if ( CoreAudio_Layout_to_vlc( &layout,
+                                          &p_sys->fmt.audio.i_physical_channels,
+                                          &p_sys->fmt.audio.i_channels,
+                                          &pi_channels_in ) != VLC_SUCCESS )
+                msg_Warn( p_demux, "discarding chan mapping" );
+
+        }
+
         if( p_sys->i_ssnd_pos >= 12 && p_sys->fmt.audio.i_channels != 0 )
         {
             /* We have found the 2 needed chunks */
@@ -178,6 +208,19 @@ static int Open( vlc_object_t *p_this )
                 return VLC_EGENERIC;
             }
         }
+    }
+
+    if( pi_channels_in != NULL )
+    {
+        p_sys->b_reorder =
+            aout_CheckChannelReorder( pi_channels_in, NULL,
+                                      p_sys->fmt.audio.i_physical_channels,
+                                      p_sys->pi_chan_table ) > 0;
+        p_sys->audio_fourcc =
+            vlc_fourcc_GetCodecAudio( p_sys->fmt.i_codec,
+                                      p_sys->fmt.audio.i_bitspersample );
+        if( p_sys->audio_fourcc == 0 )
+            p_sys->b_reorder = false;
     }
 
     p_sys->i_ssnd_start = p_sys->i_ssnd_pos + 16 + p_sys->i_ssnd_offset;
@@ -256,6 +299,10 @@ static int Demux( demux_t *p_demux )
                                            p_sys->i_ssnd_fsize) /
                      p_sys->fmt.audio.i_rate;
 
+    if( p_sys->b_reorder )
+        aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
+                             p_sys->fmt.audio.i_channels, p_sys->pi_chan_table,
+                             p_sys->audio_fourcc );
     /* */
     es_out_Send( p_demux->out, p_sys->es, p_block );
     return VLC_DEMUXER_SUCCESS;
