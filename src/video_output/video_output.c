@@ -1370,6 +1370,8 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
     vout_display_Display(vd, todisplay);
     vlc_mutex_unlock(&sys->display_lock);
 
+    picture_Release(todisplay);
+
     if (subpic)
         subpicture_Delete(subpic);
 

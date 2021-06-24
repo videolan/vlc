@@ -86,7 +86,10 @@ static void vlc_vidsplit_Display(vout_display_t *vd, picture_t *picture)
         struct vlc_vidsplit_part *part = &sys->parts[i];
 
         if (sys->pictures[i] != NULL)
+        {
             vout_display_Display(part->display, sys->pictures[i]);
+            picture_Release(sys->pictures[i]);
+        }
         vlc_sem_post(&part->lock);
     }
 
