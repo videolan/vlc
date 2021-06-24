@@ -42,6 +42,7 @@ namespace adaptive
             static std::string & rtrim(std::string &, const std::string &);
             static std::string & ltrim(std::string &, const std::string &);
             static std::string & trim(std::string &, const std::string &);
+            static std::string unescape(const std::string &);
     };
 }
 

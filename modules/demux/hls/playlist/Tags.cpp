@@ -22,12 +22,14 @@
 #endif
 
 #include "Tags.hpp"
+#include "../../adaptive/tools/Helper.h"
 #include <sstream>
 #include <stack>
 
 #include <vlc_common.h>
 
 using namespace hls::playlist;
+using namespace adaptive;
 
 Attribute::Attribute(const std::string &name_, const std::string &value_)
 {
@@ -124,22 +126,7 @@ std::string Attribute::quotedString() const
     if(value.length() < 2)
         return "";
 
-    std::istringstream is(value.substr(1, value.length() - 2));
-    std::ostringstream os;
-
-    char c;
-    while(is.get(c))
-    {
-        if(c == '\\')
-        {
-            if(!is.get(c))
-                break;
-        }
-
-        os << c;
-    }
-
-    return os.str();
+    return Helper::unescape(value.substr(1, value.length() - 2));
 }
 
 Tag::Tag(int type_)

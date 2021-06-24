@@ -27,6 +27,8 @@
 
 #include "Helper.h"
 #include <algorithm>
+#include <sstream>
+
 using namespace adaptive;
 
 std::string Helper::combinePaths        (const std::string &path1, const std::string &path2)
@@ -124,4 +126,24 @@ std::string & Helper::ltrim(std::string &s, const std::string &l)
 std::string & Helper::trim(std::string &s, const std::string &l)
 {
     return ltrim(rtrim(s, l), l);
+}
+
+std::string Helper::unescape(const std::string &s)
+{
+    std::istringstream is(s);
+    std::ostringstream os;
+
+    char c;
+    while(is.get(c))
+    {
+        if(c == '\\')
+        {
+            if(!is.get(c))
+                break;
+        }
+
+        os << c;
+    }
+
+    return os.str();
 }
