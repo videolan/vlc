@@ -91,15 +91,24 @@ ModalDialog {
                     Layout.fillWidth: true
                     focus: true
                     visible: cancelBtn.text !== ""
-                    KeyNavigation.right: okBtn
+
                     onClicked: root.reject()
+
+                    Navigation.rightItem: okBtn
+                    Keys.priority: Keys.AfterItem
+                    Keys.onPressed: okBtn.Navigation.defaultKeyAction(event)
                 }
 
                 Widgets.TextToolButton {
                     id: okBtn
                     Layout.fillWidth: true
                     visible: okBtn.text !== ""
+
                     onClicked: root.accept()
+
+                    Navigation.leftItem: cancelBtn
+                    Keys.priority: Keys.AfterItem
+                    Keys.onPressed: cancelBtn.Navigation.defaultKeyAction(event)
                 }
             }
         }

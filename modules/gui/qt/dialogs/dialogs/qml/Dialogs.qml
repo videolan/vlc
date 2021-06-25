@@ -205,12 +205,17 @@ Item {
             }
 
             TextField {
-                Layout.fillWidth:true
                 id: username
+
                 focus: true
                 text: loginDialog.defaultUsername
                 font.pixelSize: VLCStyle.fontSize_normal
-                KeyNavigation.down: password
+
+                Layout.fillWidth:true
+
+                Navigation.downItem: password
+                Keys.priority: Keys.AfterItem
+                Keys.onPressed: Navigation.defaultKeyAction(event)
             }
 
             Text {
@@ -220,11 +225,16 @@ Item {
             }
 
             TextField {
-                Layout.fillWidth:true
                 id: password
+
                 echoMode: TextInput.Password
                 font.pixelSize: VLCStyle.fontSize_normal
-                KeyNavigation.down: savePassword
+                Layout.fillWidth:true
+
+                Navigation.upItem: username
+                Navigation.downItem: savePassword
+                Keys.priority: Keys.AfterItem
+                Keys.onPressed: Navigation.defaultKeyAction(event)
             }
 
             Text {
@@ -234,7 +244,11 @@ Item {
             }
             CheckBox {
                 id: savePassword
-                KeyNavigation.down: loginButtons
+
+                Navigation.upItem: password
+                Navigation.downItem: loginButtons
+                Keys.priority: Keys.AfterItem
+                Keys.onPressed: Navigation.defaultKeyAction(event)
             }
         }
 
@@ -255,8 +269,12 @@ Item {
                         id: loginCancel
                         Layout.fillWidth: true
                         text: i18n.qtr("cancel")
-                        KeyNavigation.up: savePassword
-                        KeyNavigation.right: loginOk
+
+                        Navigation.upItem: savePassword
+                        Navigation.rightItem: loginOk
+                        Keys.priority: Keys.AfterItem
+                        Keys.onPressed: Navigation.defaultKeyAction(event)
+
                         onClicked: {
                             loginDialog.reject()
                             loginDialog.close()
@@ -268,7 +286,12 @@ Item {
                         Layout.fillWidth: true
                         text: i18n.qtr("Ok")
                         focus: true
-                        KeyNavigation.up: savePassword
+
+                        Navigation.upItem: savePassword
+                        Navigation.leftItem: loginCancel
+                        Keys.priority: Keys.AfterItem
+                        Keys.onPressed: Navigation.defaultKeyAction(event)
+
                         onClicked: {
                             loginDialog.accept()
                             loginDialog.close()
@@ -328,11 +351,17 @@ Item {
                     anchors.fill: parent
 
                     Widgets.TextToolButton {
-                        Layout.fillWidth: true
                         id: cancel
+
                         focus: true
                         visible: cancel.text !== ""
-                        KeyNavigation.right: action1
+
+                        Layout.fillWidth: true
+
+                        Navigation.rightItem: action1
+                        Keys.priority: Keys.AfterItem
+                        Keys.onPressed: Navigation.defaultKeyAction(event)
+
                         onClicked: {
                             dialogModel.dismiss(questionDialog.dialogId)
                             questionDialog.dialogId = undefined
@@ -342,9 +371,16 @@ Item {
 
                     Widgets.TextToolButton {
                         id: action1
-                        Layout.fillWidth: true
+
                         visible: action1.text !== ""
-                        KeyNavigation.right: action2
+
+                        Layout.fillWidth: true
+
+                        Navigation.leftItem: cancel
+                        Navigation.rightItem: action2
+                        Keys.priority: Keys.AfterItem
+                        Keys.onPressed: Navigation.defaultKeyAction(event)
+
                         onClicked: {
                             dialogModel.post_action1(questionDialog.dialogId)
                             questionDialog.dialogId = undefined
@@ -354,8 +390,14 @@ Item {
 
                     Widgets.TextToolButton {
                         id: action2
-                        Layout.fillWidth: true
                         visible: action2.text !== ""
+
+                        Layout.fillWidth: true
+
+                        Navigation.leftItem: action1
+                        Keys.priority: Keys.AfterItem
+                        Keys.onPressed: Navigation.defaultKeyAction(event)
+
                         onClicked: {
                             dialogModel.post_action2(questionDialog.dialogId)
                             questionDialog.dialogId = undefined
