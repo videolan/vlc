@@ -1147,7 +1147,6 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     while( 1 )
     {
         IWMCodecPrivateData *p_privdata;
-        VIDEOINFOHEADER *p_vih;
         uint8_t *p_data = 0;
         uint32_t i_data = 0, i_vih;
 
@@ -1192,7 +1191,6 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
 
     i_err = p_dmo->vt->SetOutputType( p_dmo, 0, &dmo_type, 0 );
 
-    p_vih = (VIDEOINFOHEADER *)dmo_type.pbFormat;
     p_enc->fmt_in.i_codec = VLC_CODEC_I420;
 
     DMOFreeMediaType( &dmo_type );
