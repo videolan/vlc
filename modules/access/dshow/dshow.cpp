@@ -2132,7 +2132,7 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
          * TV Audio filter
          */
         ComPtr<IAMTVAudio> p_TVA;
-        HRESULT hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+        hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                              &MEDIATYPE_Audio, p_device_filter,
                                              IID_IAMTVAudio, (void **)p_TVA.GetAddressOf() );
         if( SUCCEEDED(hr) )
