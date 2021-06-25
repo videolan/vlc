@@ -138,7 +138,7 @@ void SDIAudioMultiplexConfig::setSubFrameSlotUsed(uint8_t i)
     subframeslotbitmap |= (1 << i);
 }
 
-void SDIAudioMultiplexConfig::parseConfiguration(vlc_object_t *obj, const char *psz)
+void SDIAudioMultiplexConfig::parseConfiguration(const char *psz)
 {
     char *name = NULL;
     char *psz_in = (char*)psz;
@@ -367,7 +367,7 @@ const es_format_t *
 }
 
 SDIAudioMultiplex::SDIAudioMultiplex(vlc_object_t *obj, uint8_t channels)
-    : config(SDIAudioMultiplexConfig(obj, channels))
+    : config(obj, channels)
 {
     p_obj = obj;
     head = VLC_TICK_INVALID;

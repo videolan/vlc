@@ -57,7 +57,7 @@ namespace sdi_sout
             bool decode(const StreamID &) const;
             bool SubFrameSlotUsed(uint8_t) const;
             void setSubFrameSlotUsed(uint8_t);
-            void parseConfiguration(vlc_object_t *, const char *);
+            void parseConfiguration(const char *);
             uint8_t getMultiplexedFramesCount() const { return framewidth; }
             std::vector<uint8_t> getFreeSubFrameSlots(bool = false) const;
             std::vector<uint8_t> getConfiguredSlots(const StreamID &) const;

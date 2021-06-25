@@ -59,7 +59,7 @@ SDIOutput::SDIOutput(sout_stream_t *p_stream_)
     char *psz_channelsconf = var_InheritString(p_stream, CFG_PREFIX "audio");
     if(psz_channelsconf)
     {
-        audioMultiplex->config.parseConfiguration(VLC_OBJECT(p_stream), psz_channelsconf);
+        audioMultiplex->config.parseConfiguration(psz_channelsconf);
         free(psz_channelsconf);
     }
 }
