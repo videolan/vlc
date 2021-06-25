@@ -22,13 +22,14 @@ import QtQuick.Layouts  1.3
 import QtQml.Models     2.2
 
 import org.videolan.medialib 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/"    as MainInterface
 import "qrc:///util/"    as Util
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     //---------------------------------------------------------------------------------------------
@@ -62,23 +63,7 @@ Widgets.NavigableFocusScope {
 
     property alias currentItem: view
 
-    //---------------------------------------------------------------------------------------------
-
     property alias dragItem: dragItem
-
-    //---------------------------------------------------------------------------------------------
-    // Settings
-    //---------------------------------------------------------------------------------------------
-
-    navigationCancel: function() {
-        if (currentItem.currentIndex <= 0) {
-            defaultNavigationCancel()
-        } else {
-            currentItem.currentIndex = 0;
-
-            currentItem.positionViewAtIndex(0, ItemView.Contain);
-        }
-    }
 
     //---------------------------------------------------------------------------------------------
     // Events
@@ -226,8 +211,16 @@ Widgets.NavigableFocusScope {
 
         headerPositioning: ListView.InlineHeader
 
-        navigationParent: root
-        navigationUpItem: (headerItem) ? headerItem.focus : undefined
+        Navigation.parentItem: root
+        Navigation.upItem: (headerItem) ? headerItem.focus : null
+        Navigation.cancelAction: function () {
+            if (view.currentIndex <= 0) {
+                root.Navigation.defaultNavigationCancel()
+            } else {
+                view.currentIndex = 0;
+                view.positionViewAtIndex(0, ItemView.Contain);
+            }
+        }
 
         //-----------------------------------------------------------------------------------------
         // Events
@@ -251,6 +244,6 @@ Widgets.NavigableFocusScope {
 
         cover: VLCStyle.noArtAlbumCover
 
-        navigationParent: root
+        Navigation.parentItem: root
     }
 }

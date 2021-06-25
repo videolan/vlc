@@ -20,7 +20,7 @@ import QtQuick.Controls 2.4
 import "qrc:///util/KeyHelper.js" as KeyHelper
 
 
-NavigableFocusScope {
+FocusScope {
     id: gridview_id
 
     property int modelCount: view.count
@@ -107,7 +107,7 @@ NavigableFocusScope {
             }
 
             if (!event.accepted)
-                defaultKeyAction(event)
+                gridview_id.Navigation.defaultKeyAction(event)
         }
 
         Keys.onReleased: {

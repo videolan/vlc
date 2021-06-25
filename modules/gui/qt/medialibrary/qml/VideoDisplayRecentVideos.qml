@@ -20,13 +20,14 @@ import QtQuick.Controls 2.4
 import QtQml.Models 2.2
 
 import org.videolan.medialib 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/" as Util
 import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     property Item focusItem: recentVideosListView
@@ -81,8 +82,8 @@ Widgets.NavigableFocusScope {
             orientation: ListView.Horizontal
 
             focus: true
-            navigationParent: root
-            navigationDown: function() {
+            Navigation.parentItem: root
+            Navigation.downAction: function() {
                 recentVideosListView.focus = false
                 view.currentItem.setCurrentItemFocus()
             }

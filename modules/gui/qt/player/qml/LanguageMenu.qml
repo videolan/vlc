@@ -127,7 +127,7 @@ T.Popup {
                 Layout.preferredWidth: VLCStyle.dp(72, VLCStyle.scale)
                 Layout.alignment: Qt.AlignTop | Qt.AlignLeft
                 Layout.topMargin: VLCStyle.margin_large
-                navigationRightItem: tracksListRow
+                Navigation.rightItem: tracksListRow
 
                 model: [{
                         "icon": VLCIcons.download,
@@ -180,7 +180,7 @@ T.Popup {
             Widgets.NavigableRow {
                 id: tracksListRow
 
-                navigationLeftItem: btnsCol
+                Navigation.leftItem: btnsCol
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 

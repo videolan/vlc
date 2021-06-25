@@ -29,7 +29,7 @@ import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///playlist/" as PL
 import "qrc:///player/" as Player
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     //name and properties of the tab to be initially loaded
@@ -58,10 +58,10 @@ Widgets.NavigableFocusScope {
         if (stackView.currentItem.view !== undefined)
             _defaultPages[root.view] = stackView.currentItem.view
 
-        stackView.currentItem.navigationParent = medialibId
-        stackView.currentItem.navigationUpItem = sourcesBanner
-        stackView.currentItem.navigationRightItem = playlistColumn
-        stackView.currentItem.navigationDownItem = Qt.binding(function() {
+        stackView.currentItem.Navigation.parentItem = medialibId
+        stackView.currentItem.Navigation.upItem = sourcesBanner
+        stackView.currentItem.Navigation.rightItem = playlistColumn
+        stackView.currentItem.Navigation.downItem = Qt.binding(function() {
             return miniPlayer.expanded ? miniPlayer : medialibId
         })
 
@@ -87,7 +87,7 @@ Widgets.NavigableFocusScope {
             _showMiniPlayer = true
     }
 
-    navigationCancel: function() {
+    Navigation.cancelAction: function() {
         history.previous()
     }
 
@@ -171,12 +171,12 @@ Widgets.NavigableFocusScope {
         color: VLCStyle.colors.bg
         anchors.fill: parent
 
-        Widgets.NavigableFocusScope {
+        FocusScope {
             focus: true
             id: medialibId
             anchors.fill: parent
 
-            navigationParent: root
+            Navigation.parentItem: root
 
             ColumnLayout {
                 id: mainColumn
@@ -203,8 +203,8 @@ Widgets.NavigableFocusScope {
                         history.push(["mc", name])
                     }
 
-                    navigationParent: medialibId
-                    navigationDownItem: stackView
+                    Navigation.parentItem: medialibId
+                    Navigation.downItem: stackView
                 }
 
                 Item {
@@ -245,7 +245,7 @@ Widgets.NavigableFocusScope {
                         }
                     }
 
-                    Widgets.NavigableFocusScope {
+                    FocusScope {
                         id: playlistColumn
                         anchors {
                             top: parent.top
@@ -311,11 +311,11 @@ Widgets.NavigableFocusScope {
 
                             rightPadding: VLCStyle.applicationHorizontalMargin
 
-                            navigationParent: medialibId
-                            navigationLeftItem: stackView
-                            navigationUpItem: sourcesBanner
-                            navigationDownItem: miniPlayer.expanded ? miniPlayer : undefined
-                            navigationCancel: function() {
+                            Navigation.parentItem: medialibId
+                            Navigation.leftItem: stackView
+                            Navigation.upItem: sourcesBanner
+                            Navigation.downItem: miniPlayer.expanded ? miniPlayer : null
+                            Navigation.cancelAction: function() {
                                 mainInterface.playlistVisible = false
                                 stackView.forceActiveFocus()
                             }
@@ -391,9 +391,9 @@ Widgets.NavigableFocusScope {
                 anchors.bottom: parent.bottom
 
                 z: 3
-                navigationParent: medialibId
-                navigationUpItem: stackView
-                navigationCancelItem:sourcesBanner
+                Navigation.parentItem: medialibId
+                Navigation.upItem: stackView
+                Navigation.cancelItem:sourcesBanner
                 onExpandedChanged: {
                     if (!expanded && miniPlayer.activeFocus)
                         stackView.forceActiveFocus()

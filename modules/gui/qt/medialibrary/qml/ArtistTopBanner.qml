@@ -23,11 +23,12 @@ import QtGraphicalEffects 1.0
 
 import org.videolan.medialib 0.1
 import org.videolan.controls 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     property var artist: ({})
@@ -114,7 +115,7 @@ Widgets.NavigableFocusScope {
                 id: actionButtons
 
                 focus: true
-                navigationParent: root
+                Navigation.parentItem: root
                 spacing: VLCStyle.margin_large
 
                 Layout.fillWidth: true

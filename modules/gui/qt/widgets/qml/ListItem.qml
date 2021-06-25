@@ -20,12 +20,13 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
 import QtGraphicalEffects 1.0
+import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/KeyHelper.js" as KeyHelper
 
-NavigableFocusScope {
+FocusScope {
     id: root
     signal playClicked
     signal addToPlaylistClicked
@@ -168,12 +169,12 @@ NavigableFocusScope {
 
                         Keys.onRightPressed: {
                             if (actionButtons.length === 0 && !root.showContextButton)
-                                root.navigationRight()
+                                root.Navigation.defaultNavigationRight()
                             else
                                 toolButtons.focus = true
                         }
                         Keys.onLeftPressed: {
-                            root.navigationLeft()
+                            root.Navigation.defaultNavigationLeft()
                         }
 
                         Keys.onReleased: {
@@ -225,7 +226,7 @@ NavigableFocusScope {
                     }
                     Keys.onRightPressed: {
                         if (toolButtons.focusIndex === (actionButtons.length - (!root.showContextButton ? 1 : 0) ) )
-                            root.navigationRight()
+                            root.Navigation.defaultNavigationRight()
                         else {
                             toolButtons.focusIndex += 1
                         }

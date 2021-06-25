@@ -22,13 +22,14 @@ import QtQuick.Layouts  1.3
 import QtQml.Models     2.2
 
 import org.videolan.medialib 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/"    as MainInterface
 import "qrc:///util/"    as Util
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     //---------------------------------------------------------------------------------------------
@@ -60,20 +61,6 @@ Widgets.NavigableFocusScope {
     //---------------------------------------------------------------------------------------------
 
     property alias dragItem: dragItem
-
-    //---------------------------------------------------------------------------------------------
-    // Settings
-    //---------------------------------------------------------------------------------------------
-
-    navigationCancel: function() {
-        if (currentItem.currentIndex <= 0) {
-            defaultNavigationCancel()
-        } else {
-            currentItem.currentIndex = 0;
-
-            currentItem.positionViewAtIndex(0, ItemView.Contain);
-        }
-    }
 
     //---------------------------------------------------------------------------------------------
     // Events
@@ -133,6 +120,16 @@ Widgets.NavigableFocusScope {
         g_mainDisplay.showPlayer();
 
         medialib.addAndPlay(model.getIdsForIndexes(modelSelect.selectedIndexes));
+    }
+
+    function _onNavigationCancel() {
+        if (root.currentItem.currentIndex <= 0) {
+            root.Navigation.defaultNavigationCancel()
+        } else {
+            root.currentItem.currentIndex = 0;
+
+            root.currentItem.positionViewAtIndex(0, ItemView.Contain);
+        }
     }
 
     //---------------------------------------------------------------------------------------------
@@ -214,19 +211,21 @@ Widgets.NavigableFocusScope {
 
             activeFocusOnTab: true
 
-            navigationParent: root
-            navigationUpItem: (headerItem) ? headerItem.focusItem : undefined
+            Navigation.parentItem: root
+            Navigation.upItem: (headerItem) ? headerItem.focusItem : null
+            //cancelAction takes a *function* pass it directly
+            Navigation.cancelAction: root._onNavigationCancel
 
             expandDelegate: VideoInfoExpandPanel {
                 width: gridView.width
 
                 x: 0
 
-                navigationParent: gridView
+                Navigation.parentItem: gridView
 
-                navigationCancel: function() { gridView.retract() }
-                navigationUp    : function() { gridView.retract() }
-                navigationDown  : function() { gridView.retract() }
+                Navigation.cancelAction: function() { gridView.retract() }
+                Navigation.upAction    : function() { gridView.retract() }
+                Navigation.downAction  : function() { gridView.retract() }
 
                 onRetract: gridView.retract()
             }
@@ -332,8 +331,10 @@ Widgets.NavigableFocusScope {
 
             headerPositioning: ListView.InlineHeader
 
-            navigationParent: root
-            navigationUpItem: (headerItem) ? headerItem.focus : undefined
+            Navigation.parentItem: root
+            Navigation.upItem: (headerItem) ? headerItem.focus : null
+            //cancelAction takes a *function* pass it directly
+            Navigation.cancelAction: root._onNavigationCancel
 
             //-------------------------------------------------------------------------------------
             // Events
@@ -361,7 +362,7 @@ Widgets.NavigableFocusScope {
 
         cover: VLCStyle.noArtVideoCover
 
-        navigationParent: root
+        Navigation.parentItem: root
 
         focus: visible
     }

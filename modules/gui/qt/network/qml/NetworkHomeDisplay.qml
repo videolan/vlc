@@ -27,7 +27,7 @@ import "qrc:///main/" as MainInterface
 import "qrc:///util/" as Util
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: topFocusScope
     focus: true
 
@@ -85,8 +85,8 @@ Widgets.NavigableFocusScope {
                 visible: deviceSection.model.count !== 0
                 onVisibleChanged: topFocusScope.resetFocus()
 
-                navigationParent: topFocusScope
-                navigationDownItem: lanSection.visible ?  lanSection : undefined
+                Navigation.parentItem: topFocusScope
+                Navigation.downItem: lanSection.visible ?  lanSection : null
 
                 onActiveFocusChanged: {
                     if (activeFocus)
@@ -112,8 +112,8 @@ Widgets.NavigableFocusScope {
                 visible: lanSection.model.count !== 0
                 onVisibleChanged: topFocusScope.resetFocus()
 
-                navigationParent: topFocusScope
-                navigationUpItem: deviceSection.visible ?  deviceSection : undefined
+                Navigation.parentItem: topFocusScope
+                Navigation.upItem: deviceSection.visible ?  deviceSection : null
 
                 onActiveFocusChanged: {
                     if (activeFocus)

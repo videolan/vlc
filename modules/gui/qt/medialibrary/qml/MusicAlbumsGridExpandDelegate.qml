@@ -22,12 +22,13 @@ import QtQml.Models 2.11
 
 import org.videolan.medialib 0.1
 import org.videolan.controls 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     property var model
@@ -146,8 +147,8 @@ Widgets.NavigableFocusScope {
                         }
                     }
 
-                    navigationParent: root
-                    navigationRightItem: tracks
+                    Navigation.parentItem: root
+                    Navigation.rightItem: tracks
                 }
 
             }
@@ -254,8 +255,8 @@ Widgets.NavigableFocusScope {
                 { criteria: "duration",               width: VLCStyle.colWidth(1), visible: true, showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
             ]
 
-            navigationParent: root
-            navigationLeftItem: actionButtons
+            Navigation.parentItem: root
+            Navigation.leftItem: actionButtons
 
             Widgets.TableColumns {
                 id: tableColumns
@@ -264,6 +265,6 @@ Widgets.NavigableFocusScope {
     }
 
 
-    Keys.priority:  KeyNavigation.AfterItem
-    Keys.onPressed:  defaultKeyAction(event)
+    Keys.priority:  Keys.AfterItem
+    Keys.onPressed:  root.Navigation.defaultKeyAction(event)
 }

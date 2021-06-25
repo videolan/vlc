@@ -20,14 +20,14 @@ import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
 import QtQml.Models 2.2
 import org.videolan.medialib 0.1
-
+import org.videolan.vlc 0.1
 
 import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/" as MainInterface
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     property var sortModel: [
@@ -44,15 +44,6 @@ Widgets.NavigableFocusScope {
     property var initialIndex: 0
     property int gridViewMarginTop: VLCStyle.margin_large
     property var gridViewRowX: mainInterface.gridView ? view.currentItem.rowX : undefined
-
-    navigationCancel: function() {
-        if (view.currentItem.currentIndex <= 0) {
-            defaultNavigationCancel()
-        } else {
-            view.currentItem.currentIndex = 0;
-            view.currentItem.positionViewAtIndex(0, ItemView.Contain)
-        }
-    }
 
     property Component header: Item{}
     readonly property var headerItem: view.currentItem ? view.currentItem.headerItem : undefined
@@ -80,6 +71,16 @@ Widgets.NavigableFocusScope {
             medialib.addAndPlay( model.getIdForIndex(index) )
         }
     }
+
+    function _onNavigationCancel() {
+        if (view.currentItem.currentIndex <= 0) {
+            root.Navigation.defaultNavigationCancel()
+        } else {
+            view.currentItem.currentIndex = 0;
+            view.currentItem.positionViewAtIndex(0, ItemView.Contain)
+        }
+    }
+
 
     MLAlbumModel {
         id: albumModelId
@@ -180,10 +181,10 @@ Widgets.NavigableFocusScope {
                 x: 0
                 width: gridView_id.width
                 onRetract: gridView_id.retract()
-                navigationParent: root
-                navigationCancel:  function() {  gridView_id.retract() }
-                navigationUp: function() {  gridView_id.retract() }
-                navigationDown: function() {}
+                Navigation.parentItem: root
+                Navigation.cancelAction:  function() {  gridView_id.retract() }
+                Navigation.upAction: function() {  gridView_id.retract() }
+                Navigation.downAction: function() {}
             }
 
             onActionAtIndex: {
@@ -196,7 +197,8 @@ Widgets.NavigableFocusScope {
             onSelectAll: selectionModel.selectAll()
             onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
 
-            navigationParent: root
+            Navigation.parentItem: root
+            Navigation.cancelAction: root._onNavigationCancel
 
             Connections {
                 target: contextMenu
@@ -217,7 +219,7 @@ Widgets.NavigableFocusScope {
             selectionDelegateModel: selectionModel
             headerColor: VLCStyle.colors.bg
             onActionForSelection: _actionAtIndex(selection[0]);
-            navigationParent: root
+            Navigation.parentItem: root
             section.property: "title_first_symbol"
             header: root.header
             dragItem: albumDragItem
@@ -230,12 +232,7 @@ Widgets.NavigableFocusScope {
                 { criteria: "duration", width:VLCStyle.colWidth(1), showSection: "", headerDelegate: tableColumns.timeHeaderDelegate, colDelegate: tableColumns.timeColDelegate },
             ]
 
-            navigationCancel: function() {
-                if (tableView_id.currentIndex <= 0)
-                    defaultNavigationCancel()
-                else
-                    tableView_id.currentIndex = 0;
-            }
+            Navigation.cancelAction: root._onNavigationCancel
 
             onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes,  menuParent.mapToGlobal(0,0))
             onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
@@ -294,7 +291,7 @@ Widgets.NavigableFocusScope {
         visible: albumModelId.count === 0
         focus: visible
         text: i18n.qtr("No albums found\nPlease try adding sources, by going to the Network tab")
-        navigationParent: root
+        Navigation.parentItem: root
         cover: VLCStyle.noArtAlbumCover
     }
 }

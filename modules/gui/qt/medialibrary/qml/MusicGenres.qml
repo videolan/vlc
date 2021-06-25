@@ -26,7 +26,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///main/" as MainInterface
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
     property alias model: genreModel
     property var sortModel: [
@@ -38,13 +38,6 @@ Widgets.NavigableFocusScope {
     property var initialIndex: 0
 
     onInitialIndexChanged:  resetFocus()
-
-    navigationCancel: function() {
-        if (view.currentItem.currentIndex <= 0)
-            defaultNavigationCancel()
-        else
-            view.currentItem.currentIndex = 0;
-    }
 
     Component.onCompleted: loadView()
 
@@ -232,7 +225,13 @@ Widgets.NavigableFocusScope {
             onSelectionUpdated:  selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onActionAtIndex: _actionAtIndex(index)
 
-            navigationParent: root
+            Navigation.parentItem: root
+            Navigation.cancelAction: function() {
+                if (view.currentItem.currentIndex <= 0)
+                    root.Navigation.defaultNavigationCancel()
+                else
+                    view.currentItem.currentIndex = 0;
+            }
         }
     }
 
@@ -251,7 +250,13 @@ Widgets.NavigableFocusScope {
             headerColor: VLCStyle.colors.bg
             focus: true
             onActionForSelection: _actionAtIndex(selection)
-            navigationParent: root
+            Navigation.parentItem: root
+            Navigation.cancelAction: function() {
+                if (view.currentItem.currentIndex <= 0)
+                    root.Navigation.defaultNavigationCancel()
+                else
+                    view.currentItem.currentIndex = 0;
+            }
             dragItem: genreDragItem
             rowHeight: VLCStyle.tableCoverRow_height
             headerTopPadding: VLCStyle.margin_normal
@@ -305,7 +310,7 @@ Widgets.NavigableFocusScope {
         visible: genreModel.count === 0
         focus: genreModel.count === 0
         text: i18n.qtr("No genres found\nPlease try adding sources, by going to the Network tab")
-        navigationParent: root
+        Navigation.parentItem: root
         cover: VLCStyle.noArtAlbumCover
     }
 }

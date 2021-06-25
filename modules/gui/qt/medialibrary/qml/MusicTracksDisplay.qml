@@ -18,12 +18,13 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import org.videolan.medialib 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/" as MainInterface
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
     property alias sortModel: tracklistdisplay_id.sortModel
     property alias model: tracklistdisplay_id.model
@@ -58,10 +59,10 @@ Widgets.NavigableFocusScope {
         focus: model.count > 0
         dragItem: trackDragItem
         headerTopPadding: VLCStyle.margin_normal
-        navigationParent: root
-        navigationCancel: function() {
+        Navigation.parentItem: root
+        Navigation.cancelAction: function() {
             if (tracklistdisplay_id.currentIndex <= 0)
-                defaultNavigationCancel()
+                root.Navigation.defaultNavigationCancel()
             else
                 tracklistdisplay_id.currentIndex = 0;
         }
@@ -73,7 +74,7 @@ Widgets.NavigableFocusScope {
         visible: tracklistdisplay_id.model.count === 0
         focus: tracklistdisplay_id.model.count === 0
         text: i18n.qtr("No tracks found\nPlease try adding sources, by going to the Network tab")
-        navigationParent: root
+        Navigation.parentItem: root
         cover: VLCStyle.noArtAlbumCover
     }
 }

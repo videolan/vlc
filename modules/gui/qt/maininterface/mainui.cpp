@@ -51,6 +51,7 @@
 #include "menus/qml_menu_wrapper.hpp"
 
 #include "widgets/native/roundimage.hpp"
+#include "widgets/native/navigation_attached.hpp"
 
 #include "videosurface.hpp"
 
@@ -261,6 +262,9 @@ void MainUI::registerQMLTypes()
     qmlRegisterType<RoundImage>( "org.videolan.controls", 0, 1, "RoundImage" );
 
     qRegisterMetaType<QList<QQmlError>>("QList<QQmlError>");
+
+    qmlRegisterUncreatableType<NavigationAttached>( "org.videolan.vlc", 0, 1, "Navigation", "Navigation is only available via attached properties");
+
 }
 
 void MainUI::onQmlWarning(const QList<QQmlError>& qmlErrors)

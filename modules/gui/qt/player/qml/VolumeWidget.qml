@@ -19,6 +19,7 @@ import QtQuick 2.11
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.4
 import QtGraphicalEffects 1.0
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -42,8 +43,8 @@ FocusScope{
 
     // these are uninitialized because they will be set by button loader
     // not 'undefined' because the loader must know if they exist
-    property var navigationLeft: null
-    property var navigationRight: null
+    property var leftAction: null
+    property var rightAction: null
 
     property VLCColors colors: VLCStyle.colors
 
@@ -79,8 +80,8 @@ FocusScope{
                 }
                 if (left)
                     left.forceActiveFocus()
-                else if (!!navigationLeft)
-                    navigationLeft()
+                else
+                    widgetfscope.Navigation.defaultNavigationLeft()
             }
         }
 
@@ -143,8 +144,8 @@ FocusScope{
                 }
                 if (right)
                     right.forceActiveFocus()
-                else if (!!navigationRight)
-                    navigationRight()
+                else if (!!rightAction)
+                    rightAction()
             }
 
             Keys.onLeftPressed: {

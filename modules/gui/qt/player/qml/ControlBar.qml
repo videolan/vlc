@@ -28,7 +28,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///playlist/" as PL
 
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     enum TimeTextPosition {
@@ -52,8 +52,8 @@ Widgets.NavigableFocusScope {
     }
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: defaultKeyAction(event)
-    onActionCancel: history.previous()
+    Keys.onPressed: root.Navigation.defaultKeyAction(event)
+    Navigation.onActionCancel: history.previous()
 
     onActiveFocusChanged: if (activeFocus) trackPositionSlider.forceActiveFocus()
 
@@ -149,7 +149,7 @@ Widgets.NavigableFocusScope {
                     bottomMargin: VLCStyle.applicationVerticalMargin
                 }
 
-                navigationUpItem: trackPositionSlider.enabled ? trackPositionSlider : root.navigationUpItem
+                Navigation.upItem: trackPositionSlider.enabled ? trackPositionSlider : root.Navigation.upItem
 
                 colors: root.colors
 

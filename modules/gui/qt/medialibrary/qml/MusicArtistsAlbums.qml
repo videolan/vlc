@@ -22,6 +22,7 @@ import QtQuick.Layouts 1.3
 
 import org.videolan.medialib 0.1
 import org.videolan.controls 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///util/" as Util
 import "qrc:///util/Helpers.js" as Helpers
@@ -29,7 +30,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///main/" as MainInterface
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     property alias model: artistModel
@@ -120,11 +121,11 @@ Widgets.NavigableFocusScope {
 
             focus: true
             displayMarginEnd: miniPlayer.height // to get blur effect while scrolling in mainview
-            navigationParent: root
-            navigationRightItem: albumSubView
-            navigationCancel: function() {
+            Navigation.parentItem: root
+            Navigation.rightItem: albumSubView
+            Navigation.cancelAction: function() {
                 if (artistList.currentIndex <= 0)
-                    defaultNavigationCancel()
+                    root.Navigation.defaultNavigationCancel()
                 else
                     artistList.currentIndex = 0;
             }
@@ -236,8 +237,8 @@ Widgets.NavigableFocusScope {
             width: root.width - artistList.width
             focus: true
             initialIndex: root.initialAlbumIndex
-            navigationParent: root
-            navigationLeftItem: artistList
+            Navigation.parentItem: root
+            Navigation.leftItem: artistList
         }
     }
     }
@@ -247,6 +248,6 @@ Widgets.NavigableFocusScope {
         visible: artistModel.count === 0
         focus: visible
         text: i18n.qtr("No artists found\nPlease try adding sources, by going to the Network tab")
-        navigationParent: root
+        Navigation.parentItem: root
     }
 }

@@ -23,7 +23,7 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: playerButtonsLayout
 
     implicitHeight: Math.max(buttonrow_left.implicitHeight, buttonrow_center.implicitHeight, buttonrow_right.implicitHeight)
@@ -86,8 +86,8 @@ Widgets.NavigableFocusScope {
 
             visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
 
-            navigationParent: playerButtonsLayout
-            navigationRightItem: buttonrow_center
+            Navigation.parentItem: playerButtonsLayout
+            Navigation.rightItem: buttonrow_center
 
             focus: true
         }
@@ -108,9 +108,9 @@ Widgets.NavigableFocusScope {
         sourceComponent: ButtonsLayout {
             model: playerButtonsLayout.model.center
 
-            navigationParent: playerButtonsLayout
-            navigationLeftItem: buttonrow_left
-            navigationRightItem: buttonrow_right
+            Navigation.parentItem: playerButtonsLayout
+            Navigation.leftItem: buttonrow_left
+            Navigation.rightItem: buttonrow_right
         }
     }
 
@@ -138,8 +138,8 @@ Widgets.NavigableFocusScope {
 
             visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
 
-            navigationParent: playerButtonsLayout
-            navigationLeftItem: buttonrow_center
+            Navigation.parentItem: playerButtonsLayout
+            Navigation.leftItem: buttonrow_center
         }
     }
 }

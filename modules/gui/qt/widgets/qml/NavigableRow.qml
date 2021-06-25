@@ -19,7 +19,7 @@ import QtQuick 2.11
 import org.videolan.vlc 0.1
 
 
-NavigableFocusScope {
+FocusScope {
     id: navigableRow
 
     property alias model: rowRepeater.model
@@ -32,9 +32,9 @@ NavigableFocusScope {
     property alias implicitHeight: row.implicitHeight
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: defaultKeyAction(event)
+    Keys.onPressed: navigableRow.Navigation.defaultKeyAction(event)
 
-    navigable: _countEnabled > 0
+    Navigation.navigable: _countEnabled > 0
     property int _countEnabled: 0
 
     Component {
@@ -68,7 +68,7 @@ NavigableFocusScope {
                         } while (i >= 0 && (!rowRepeater.itemAt(i).enabled || !rowRepeater.itemAt(i).visible))
 
                         if (i === -1) {
-                            navigableRow.navigationLeft()
+                            navigableRow.Navigation.defaultNavigationLeft()
                         } else {
                             rowRepeater.itemAt(i).forceActiveFocus()
                         }
@@ -80,7 +80,7 @@ NavigableFocusScope {
                         } while (i < rowRepeater.count && (!rowRepeater.itemAt(i).enabled || !rowRepeater.itemAt(i).visible))
 
                         if (i === rowRepeater.count) {
-                            navigableRow.navigationRight()
+                            navigableRow.Navigation.defaultNavigationRight()
                         } else {
                             rowRepeater.itemAt(i).forceActiveFocus()
                         }

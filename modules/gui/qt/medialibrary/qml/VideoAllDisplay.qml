@@ -22,6 +22,7 @@ import QtQuick.Layouts  1.3
 import QtQml.Models     2.2
 
 import org.videolan.medialib 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/"    as MainInterface
@@ -84,9 +85,9 @@ VideoAll {
 
                 focus: true
 
-                navigationParent: root
+                Navigation.parentItem: root
 
-                navigationDown: function() {
+                Navigation.downAction: function() {
                     component.focus = false;
 
                     currentItem.setCurrentItemFocus();

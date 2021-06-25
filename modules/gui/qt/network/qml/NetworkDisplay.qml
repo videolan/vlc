@@ -25,7 +25,7 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     property var extraLocalActions: undefined
@@ -93,7 +93,7 @@ Widgets.NavigableFocusScope {
 
         onCurrentItemChanged: {
             extraLocalActions = view.currentItem.extraLocalActions
-            view.currentItem.navigationParent = root
+            view.currentItem.Navigation.parentItem = root
         }
     }
 }

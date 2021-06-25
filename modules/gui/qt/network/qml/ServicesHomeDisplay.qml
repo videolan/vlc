@@ -384,8 +384,8 @@ Widgets.PageLoader {
                     history.push(["mc", "discover", "services", "source_root", { source_name: itemData.name } ])
             }
 
-            navigationParent: root
-            navigationCancel: function() {
+            Navigation.parentItem: root
+            Navigation.cancelAction: function() {
                 history.previous()
             }
 

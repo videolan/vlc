@@ -25,7 +25,7 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: buttonsLayout
 
     property alias model: buttonsRepeater.model
@@ -57,7 +57,7 @@ Widgets.NavigableFocusScope {
     Keys.priority: Keys.AfterItem
     Keys.onPressed: {
         if (!event.accepted)
-            defaultKeyAction(event)
+            buttonsLayout.Navigation.defaultKeyAction(event)
     }
 
     RowLayout {
@@ -113,13 +113,13 @@ Widgets.NavigableFocusScope {
                     }
 
                     if (index > 0)
-                        buttonloader.item.KeyNavigation.left = buttonrow.children[index-1].item
+                        buttonloader.item.Navigation.leftItem = buttonrow.children[index-1].item
 
-                    if (buttonloader.item.navigationRight !== undefined)
-                        buttonloader.item.navigationRight = buttonsLayout.navigationRight
+                    if (buttonloader.item.Navigation.rightAction !== null)
+                        buttonloader.item.Navigation.rightAction = buttonsLayout.Navigation.rightAction
 
-                    if (buttonloader.item.navigationLeft !== undefined)
-                        buttonloader.item.navigationLeft = buttonsLayout.navigationLeft
+                    if (buttonloader.item.Navigation.leftAction !== null)
+                        buttonloader.item.Navigation.leftAction = buttonsLayout.Navigation.leftAction
 
                     if (buttonloader.item.extraWidth !== undefined && buttonsLayout.extraWidth !== undefined) {
                         buttonsLayout.expandableCount++

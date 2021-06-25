@@ -26,7 +26,7 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///menus/" as Menus
 
-Widgets.NavigableFocusScope{
+FocusScope{
     id: topFocusScope
 
     enum GroupAlignment {
@@ -44,7 +44,7 @@ Widgets.NavigableFocusScope{
 
     implicitHeight: topcontrollerMouseArea.implicitHeight
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: defaultKeyAction(event)
+    Keys.onPressed: topFocusScope.Navigation.defaultKeyAction(event)
 
     Component.onCompleted: {
         // if groupAlignment == Horizontal, then onGroupAlignment isn't called when Component is created

@@ -24,11 +24,11 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/KeyHelper.js" as KeyHelper
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
     property alias columnLayout: columnLayout
 
-    onActionCancel: {
+    Navigation.onActionCancel: {
         history.previous()
     }
 
@@ -172,5 +172,5 @@ Widgets.NavigableFocusScope {
     }
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: defaultKeyAction(event)
+    Keys.onPressed: root.Navigation.defaultKeyAction(event)
 }

@@ -28,7 +28,7 @@ import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     property alias model: listView.model
@@ -519,33 +519,33 @@ Widgets.NavigableFocusScope {
                 Keys.onDeletePressed: onDelete()
                 Keys.onMenuPressed: overlayMenu.open()
 
-                navigationParent: root
-                navigationRight: function() {
+                Navigation.parentItem: root
+                Navigation.rightAction: function() {
                     overlayMenu.open()
                 }
-                navigationLeft: function() {
+                Navigation.leftAction: function() {
                     if (mode === PlaylistListView.Mode.Normal) {
-                        root.navigationLeft()
+                        root.Navigation.defaultNavigationLeft()
                     } else {
                         mode = PlaylistListView.Mode.Normal
                     }
                 }
-                navigationCancel: function() {
+                Navigation.cancelAction: function() {
                     if (mode === PlaylistListView.Mode.Normal) {
-                        root.navigationCancel()
+                        root.Navigation.defaultNavigationCancel()
                     } else {
                         mode = PlaylistListView.Mode.Normal
                     }
                 }
 
-                navigationUp: function() {
+                Navigation.upAction: function() {
                     if (mode === PlaylistListView.Mode.Normal)
-                        root.navigationUp()
+                        root.Navigation.defaultNavigationUp()
                 }
 
-                navigationDown: function() {
+                Navigation.downAction: function() {
                     if (mode === PlaylistListView.Mode.Normal)
-                        root.navigationDown()
+                        root.Navigation.defaultNavigationDown()
                 }
 
                 onActionAtIndex: {
@@ -657,5 +657,5 @@ Widgets.NavigableFocusScope {
 
     Keys.priority: Keys.AfterItem
     Keys.forwardTo: listView
-    Keys.onPressed: defaultKeyAction(event)
+    Keys.onPressed: root.Navigation.defaultKeyAction(event)
 }

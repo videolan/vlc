@@ -25,7 +25,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///util/" as Util
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     height: deviceListView.implicitHeight
@@ -118,6 +118,6 @@ Widgets.NavigableFocusScope {
         onActionAtIndex: {
             _actionAtIndex(index, deviceModel, deviceSelection)
         }
-        navigationParent: root
+        Navigation.parentItem: root
     }
 }

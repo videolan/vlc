@@ -9,7 +9,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     readonly property bool expanded: root.implicitHeight === VLCStyle.miniPlayerHeight
@@ -84,11 +84,11 @@ Widgets.NavigableFocusScope {
         sliderBackgroundColor: colors.sliderBarMiniplayerBgColor
         sliderProgressColor: colors.accent
         identifier: PlayerControlbarModel.Miniplayer
-        navigationParent: root
+        Navigation.parentItem: root
 
         Keys.onPressed: {
             if (!event.accepted)
-                defaultKeyAction(event)
+                controlbar.Navigation.defaultKeyAction(event)
             if (!event.accepted)
                 mainInterface.sendHotkey(event.key, event.modifiers);
         }

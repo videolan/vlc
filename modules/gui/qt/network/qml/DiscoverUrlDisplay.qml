@@ -26,7 +26,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     readonly property bool isViewMultiView: false
@@ -52,15 +52,15 @@ Widgets.NavigableFocusScope {
     Column {
         anchors.fill: parent
 
-        Widgets.NavigableFocusScope {
+        FocusScope {
             id: searchFieldContainer
 
             width: root.width
             height: searchField.height + VLCStyle.margin_normal * 2
             focus: true
 
-            navigationParent:  root
-            navigationDownItem: !medialib ? undefined : urlListDisplay.item
+            Navigation.parentItem:  root
+            Navigation.downItem: (!!urlListDisplay.item) ? urlListDisplay.item : null
 
             TextField {
                 id: searchField
@@ -90,11 +90,7 @@ Widgets.NavigableFocusScope {
                 }
 
                 Keys.priority: Keys.AfterItem
-                Keys.onPressed: {
-                    if (event.accepted)
-                        return
-                    searchFieldContainer.defaultKeyAction(event)
-                }
+                Keys.onPressed: searchFieldContainer.Navigation.defaultKeyAction(event)
             }
         }
 
@@ -107,8 +103,8 @@ Widgets.NavigableFocusScope {
             active:  !!medialib
             source: "qrc:///medialibrary/UrlListDisplay.qml"
             onLoaded: {
-                item.navigationUpItem = searchField
-                item.navigationParent =  root
+                item.Navigation.upItem = searchField
+                item.Navigation.parentItem =  root
             }
         }
     }

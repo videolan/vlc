@@ -19,7 +19,7 @@ import QtQuick 2.11
 import org.videolan.vlc 0.1
 
 
-NavigableFocusScope {
+FocusScope {
     id: navigableCol
 
     property alias model: colRepeater.model
@@ -31,9 +31,9 @@ NavigableFocusScope {
     property alias implicitHeight: col.implicitHeight
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: defaultKeyAction(event)
+    Keys.onPressed: navigableCol.Navigation.defaultKeyAction(event)
 
-    navigable: _countEnabled > 0
+    Navigation.navigable: _countEnabled > 0
     property int _countEnabled: 0
 
     Component {
@@ -67,7 +67,7 @@ NavigableFocusScope {
                         } while (i >= 0 && (!colRepeater.itemAt(i).enabled || !colRepeater.itemAt(i).visible))
 
                         if (i === -1) {
-                            navigableCol.navigationUp()
+                            navigableCol.Navigation.defaultNavigationUp()
                         } else {
                             colRepeater.itemAt(i).forceActiveFocus()
                         }
@@ -79,7 +79,7 @@ NavigableFocusScope {
                         } while (i < colRepeater.count && (!colRepeater.itemAt(i).enabled || !colRepeater.itemAt(i).visible))
 
                         if (i === colRepeater.count) {
-                            navigableCol.navigationDown()
+                            navigableCol.Navigation.defaultNavigationDown()
                         } else {
                             colRepeater.itemAt(i).forceActiveFocus()
                         }

@@ -25,7 +25,6 @@ import org.videolan.medialib 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-import org.videolan.medialib 0.1
 
 Widgets.PageLoader {
     id: root

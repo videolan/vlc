@@ -17,11 +17,12 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///util/KeyHelper.js" as KeyHelper
 
-NavigableFocusScope {
+FocusScope {
     id: listview_id
 
     property int modelCount: view.count
@@ -151,10 +152,10 @@ NavigableFocusScope {
         boundsMovement :Flickable.StopAtBounds
 
         Connections {
-            target: view.currentItem
+            target: view.currentItem.Navigation
             ignoreUnknownSignals: true
-            onActionRight: if ( !listview_id.keyNavigationWraps ) listview_id.navigationRight();
-            onActionLeft: if ( !listview_id.keyNavigationWraps ) listview_id.navigationLeft();
+            onActionRight: if ( !listview_id.keyNavigationWraps ) listview_id.Navigation.rightAction();
+            onActionLeft: if ( !listview_id.keyNavigationWraps ) listview_id.Navigation.leftAction();
             onActionDown: {
                 if ( listview_id.keyNavigationWraps )
                     return
@@ -165,7 +166,7 @@ NavigableFocusScope {
                     currentIndex = newIndex
                     selectionUpdated(0, oldIndex, newIndex)
                 } else {
-                    listview_id.navigationDown()
+                    listview_id.Navigation.downAction()
                 }
             }
             onActionUp: {
@@ -178,7 +179,7 @@ NavigableFocusScope {
                     currentIndex = newIndex
                     selectionUpdated(0, oldIndex, newIndex)
                 } else {
-                    listview_id.navigationUp()
+                    listview_id.Navigation.upAction()
                 }
             }
         }
@@ -234,8 +235,9 @@ NavigableFocusScope {
                 selectionUpdated(event.modifiers, oldIndex, newIndex)
             }
 
-            if (!event.accepted)
-                defaultKeyAction(event)
+            if (!event.accepted) {
+                listview_id.Navigation.defaultKeyAction(event)
+            }
         }
 
         Keys.onReleased: {

@@ -20,7 +20,7 @@ import QtQuick 2.11
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
-Widgets.NavigableFocusScope {
+FocusScope {
 
     Column {
         anchors.centerIn: parent

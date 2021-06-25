@@ -16,8 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.0
+import org.videolan.vlc 0.1
 
-NavigableFocusScope {
+FocusScope {
     id: root
 
     property string view: defaultPage
@@ -55,9 +56,7 @@ NavigableFocusScope {
         if (!found)
             stackView.replace(root.pageModel[0].component)
 
-        if (stackView.currentItem && stackView.currentItem.hasOwnProperty("navigationParent")) {
-            stackView.currentItem.navigationParent = root
-        }
+        stackView.currentItem.Navigation.parentItem = root
         root.currentItemChanged(stackView.currentItem)
     }
 

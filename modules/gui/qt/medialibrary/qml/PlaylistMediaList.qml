@@ -22,13 +22,14 @@ import QtQuick.Layouts  1.3
 import QtQml.Models     2.2
 
 import org.videolan.medialib 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/"    as MainInterface
 import "qrc:///util/"    as Util
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     //---------------------------------------------------------------------------------------------
@@ -72,17 +73,6 @@ Widgets.NavigableFocusScope {
 
     signal showList(variant model)
 
-    //---------------------------------------------------------------------------------------------
-    // Settings
-    //---------------------------------------------------------------------------------------------
-
-    navigationCancel: function() {
-        if (currentItem.currentIndex > 0) {
-            currentItem.currentIndex = 0;
-        } else {
-            defaultNavigationCancel();
-        }
-    }
 
     //---------------------------------------------------------------------------------------------
     // Events
@@ -158,6 +148,15 @@ Widgets.NavigableFocusScope {
             return count;
         else
             return i18n.qtr("99+");
+    }
+
+    function _onNavigationCancel() {
+        if (root.currentItem.currentIndex <= 0) {
+            root.Navigation.defaultNavigationCancel()
+        } else {
+            root.currentItem.currentIndex = 0;
+            root.currentItem.positionViewAtIndex(0, ItemView.Contain);
+        }
     }
 
     //---------------------------------------------------------------------------------------------
@@ -255,7 +254,9 @@ Widgets.NavigableFocusScope {
 
             delegateModel: modelSelect
 
-            navigationParent: root
+            Navigation.parentItem: root
+
+            Navigation.cancelAction: root._onNavigationCancel
 
             focus: true
 
@@ -363,8 +364,6 @@ Widgets.NavigableFocusScope {
 
             selectionDelegateModel: modelSelect
 
-            navigationParent: root
-
             dragItem: dragItemPlaylist
 
             focus: true
@@ -392,6 +391,9 @@ Widgets.NavigableFocusScope {
 
                 text: i18n.qtr("Tracks")
             }]
+
+            Navigation.parentItem: root
+            Navigation.cancelAction: root._onNavigationCancel
 
             //-------------------------------------------------------------------------------------
             // Events
@@ -446,6 +448,6 @@ Widgets.NavigableFocusScope {
 
         cover: VLCStyle.noArtAlbumCover
 
-        navigationParent: root
+        Navigation.parentItem: root
     }
 }

@@ -22,7 +22,7 @@ import QtQuick.Layouts 1.3
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: control
     height: implicitHeight
     width: implicitWidth

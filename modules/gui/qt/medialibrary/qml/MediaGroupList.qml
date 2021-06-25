@@ -22,13 +22,14 @@ import QtQuick      2.11
 import QtQml.Models 2.11
 
 import org.videolan.medialib 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/"    as MainInterface
 import "qrc:///util/"    as Util
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     //---------------------------------------------------------------------------------------------
@@ -57,20 +58,6 @@ Widgets.NavigableFocusScope {
     //---------------------------------------------------------------------------------------------
 
     signal showList(variant model)
-
-    //---------------------------------------------------------------------------------------------
-    // Settings
-    //---------------------------------------------------------------------------------------------
-
-    navigationCancel: function() {
-        if (currentItem.currentIndex > 0) {
-            currentItem.currentIndex = 0;
-
-            currentItem.positionViewAtIndex(0, ItemView.Contain);
-        } else {
-            defaultNavigationCancel();
-        }
-    }
 
     //---------------------------------------------------------------------------------------------
     // Events
@@ -134,7 +121,15 @@ Widgets.NavigableFocusScope {
             showList(model);
     }
 
-    //---------------------------------------------------------------------------------------------
+    function _onNavigationCancel() {
+        if (root.currentItem.currentIndex > 0) {
+            root.currentItem.currentIndex = 0;
+
+            root.currentItem.positionViewAtIndex(0, ItemView.Contain);
+        } else {
+            root.Navigation.defaultNavigationCancel();
+        }
+    }
 
     function _getLabels(model, string)
     {
@@ -242,18 +237,20 @@ Widgets.NavigableFocusScope {
 
             activeFocusOnTab: true
 
-            navigationParent: root
+            Navigation.parentItem: root
+            //cancelAction takes a *function* pass it directly
+            Navigation.cancelAction: root._onNavigationCancel
 
             expandDelegate: VideoInfoExpandPanel {
                 width: gridView.width
 
                 x: 0
 
-                navigationParent: gridView
+                Navigation.parentItem: gridView
 
-                navigationUp    : function() { gridView.retract() }
-                navigationDown  : function() { gridView.retract() }
-                navigationCancel: function() { gridView.retract() }
+                Navigation.upAction    : function() { gridView.retract() }
+                Navigation.downAction  : function() { gridView.retract() }
+                Navigation.cancelAction: function() { gridView.retract() }
 
                 onRetract: gridView.retract()
             }
@@ -369,7 +366,9 @@ Widgets.NavigableFocusScope {
 
             headerPositioning: ListView.InlineHeader
 
-            navigationParent: root
+            Navigation.parentItem: root
+            //cancelAction takes a *function* pass it directly
+            Navigation.cancelAction: root._onNavigationCancel
 
             //-------------------------------------------------------------------------------------
             // Events
@@ -402,7 +401,7 @@ Widgets.NavigableFocusScope {
 
         cover: VLCStyle.noArtVideoCover
 
-        navigationParent: root
+        Navigation.parentItem: root
 
         focus: visible
     }

@@ -29,7 +29,7 @@ import "qrc:///menus/" as Menus
 import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///util/Helpers.js" as Helpers
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     height: VLCStyle.applicationVerticalMargin
@@ -150,8 +150,8 @@ Widgets.NavigableFocusScope {
 
                             focus: true
 
-                            navigationParent: root
-                            navigationDownItem: localMenuGroup.visible ?  localMenuGroup : playlistGroup
+                            Navigation.parentItem: root
+                            Navigation.downItem: localMenuGroup.visible ?  localMenuGroup : playlistGroup
 
                             delegate: Widgets.BannerTabButton {
                                 iconTxt: model.icon
@@ -177,7 +177,7 @@ Widgets.NavigableFocusScope {
                 }
             }
 
-            Widgets.NavigableFocusScope {
+            FocusScope {
                 id: localToolbar
 
                 width: parent.width
@@ -286,9 +286,9 @@ Widgets.NavigableFocusScope {
                         }
                     }
 
-                    navigationParent: root
-                    navigationRightItem: localMenuGroup.visible ? localMenuGroup : playlistGroup
-                    navigationUpItem: globalMenuGroup
+                    Navigation.parentItem: root
+                    Navigation.rightItem: localMenuGroup.visible ? localMenuGroup : playlistGroup
+                    Navigation.upItem: globalMenuGroup
                 }
 
                 Flickable {
@@ -343,26 +343,11 @@ Widgets.NavigableFocusScope {
                         onItemChanged: {
                             if (!item)
                                 return
-                            if (item.hasOwnProperty("navigationParent")) {
-                                item.navigationParent = root
-                                item.navigationLeftItem = localContextGroup.enabled ? localContextGroup : undefined
-                                item.navigationRightItem = playlistGroup.enabled ? playlistGroup : undefined
-                                item.navigationUpItem = globalMenuGroup
-                            } else {
-                                item.KeyNavigation.left = localContextGroup.enabled ? localContextGroup : undefined
-                                item.KeyNavigation.right = playlistGroup.enabled ? playlistGroup : undefined
-                                item.KeyNavigation.up = globalMenuGroup
-                                item.Keys.pressed.connect(function (event) {
-                                    if (event.accepted)
-                                        return
-                                    if (KeyHelper.matchDown(event)) {
-                                        root.navigationDown()
-                                        event.accepted = true
-                                    }
-                                })
-                            }
+                            item.Navigation.parentItem = root
+                            item.Navigation.leftItem = localContextGroup.enabled ? localContextGroup : null
+                            item.Navigation.rightItem = playlistGroup.enabled ? playlistGroup : null
+                            item.Navigation.upItem = globalMenuGroup
                         }
-
                     }
                 }
 
@@ -417,17 +402,14 @@ Widgets.NavigableFocusScope {
                         }
                     }
 
-                    navigationParent: root
-                    navigationLeftItem: localMenuGroup.visible ? localMenuGroup : localContextGroup
-                    navigationUpItem: globalMenuGroup
+                    Navigation.parentItem: root
+                    Navigation.leftItem: localMenuGroup.visible ? localMenuGroup : localContextGroup
+                    Navigation.upItem: globalMenuGroup
                 }
             }
         }
 
         Keys.priority: Keys.AfterItem
-        Keys.onPressed: {
-            if (!event.accepted)
-                defaultKeyAction(event)
-        }
+        Keys.onPressed: root.Navigation.defaultKeyAction(event)
     }
 }

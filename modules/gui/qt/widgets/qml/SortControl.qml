@@ -24,7 +24,7 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     // when height/width is explicitly set (force size), implicit values will not be used.

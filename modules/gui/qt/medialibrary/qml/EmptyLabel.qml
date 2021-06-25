@@ -24,7 +24,7 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/KeyHelper.js" as KeyHelper
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     property alias text: label.text
@@ -81,15 +81,17 @@ Widgets.NavigableFocusScope {
             anchors.horizontalCenter: parent.horizontalCenter
             onClicked: history.push(["mc", "network"])
             width: VLCStyle.dp(84, VLCStyle.scale)
+
+            Navigation.parentItem: root
         }
     }
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: defaultKeyAction(event)
+    Keys.onPressed: Navigation.defaultKeyAction(event)
     Keys.onReleased: {
         if (KeyHelper.matchOk(event)) {
             history.push(["mc", "network"])
         }
-        defaultKeyReleaseAction(event)
+        Navigation.defaultKeyReleaseAction(event)
     }
 }

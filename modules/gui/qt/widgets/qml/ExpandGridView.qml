@@ -17,10 +17,11 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import org.videolan.vlc 0.1
 import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///style/"
 
-NavigableFocusScope {
+FocusScope {
     id: root
 
     /// cell Width
@@ -708,8 +709,9 @@ NavigableFocusScope {
             root.selectionUpdated(event.modifiers, oldIndex, newIndex)
         }
 
-        if (!event.accepted)
-            defaultKeyAction(event)
+        if (!event.accepted) {
+            root.Navigation.defaultKeyAction(event)
+        }
     }
 
     Keys.onReleased: {

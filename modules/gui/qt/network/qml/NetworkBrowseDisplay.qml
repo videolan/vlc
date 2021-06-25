@@ -29,7 +29,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///main/" as MainInterface
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+FocusScope {
     id: root
 
     property alias model: filterModel
@@ -137,10 +137,18 @@ Widgets.NavigableFocusScope {
             delegateModel: selectionModel
             model: filterModel
 
-            headerDelegate: Widgets.NavigableFocusScope {
+            headerDelegate: FocusScope {
+                id: headerId
+
                 width: view.width
                 height: layout.implicitHeight + VLCStyle.margin_large + VLCStyle.margin_normal
-                navigable: btn.visible
+
+                Navigation.navigable: btn.visible
+                Navigation.parentItem: root
+                Navigation.downAction: function() {
+                    focus = false
+                    gridView.forceActiveFocus()
+                }
 
                 RowLayout {
                     id: layout
@@ -167,14 +175,9 @@ Widgets.NavigableFocusScope {
                         onClicked: providerModel.indexed = !providerModel.indexed
 
                         Layout.preferredWidth: implicitWidth
-                    }
-                }
 
-                Keys.onPressed: defaultKeyAction(event)
-                navigationParent: root
-                navigationDown: function() {
-                    focus = false
-                    gridView.forceActiveFocus()
+                        Navigation.parentItem: headerId
+                    }
                 }
             }
 
@@ -213,9 +216,9 @@ Widgets.NavigableFocusScope {
             onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onActionAtIndex: _actionAtIndex(index)
 
-            navigationParent: root
-            navigationUpItem: gridView.headerItem
-            navigationCancel: function() {
+            Navigation.parentItem: root
+            Navigation.upItem: gridView.headerItem
+            Navigation.cancelAction: function() {
                 history.previous()
             }
 
@@ -257,18 +260,21 @@ Widgets.NavigableFocusScope {
             selectionDelegateModel: selectionModel
             focus: true
             headerColor: VLCStyle.colors.bg
-            navigationParent: root
-            navigationUpItem: tableView.headerItem
-            navigationCancel: function() {
+            Navigation.parentItem: root
+            Navigation.upItem: tableView.headerItem
+            Navigation.cancelAction: function() {
                 history.previous()
             }
 
             rowHeight: VLCStyle.tableCoverRow_height
 
-            header: Widgets.NavigableFocusScope {
+            header: FocusScope {
+                id: head
+
                 width: view.width
                 height: layout.implicitHeight + VLCStyle.margin_large + VLCStyle.margin_small
-                navigable: btn.visible
+
+                Navigation.navigable: btn.visible
 
                 RowLayout {
                     id: layout
@@ -294,16 +300,14 @@ Widgets.NavigableFocusScope {
                         visible: !providerModel.is_on_provider_list && !!providerModel.canBeIndexed
                         onClicked: providerModel.indexed = !providerModel.indexed
 
+                        Navigation.parentItem: root
+                        Navigation.downAction: function() {
+                            head.focus = false
+                            tableView.forceActiveFocus()
+                        }
+
                         Layout.preferredWidth: implicitWidth
                     }
-                }
-
-                Keys.onPressed: defaultKeyAction(event)
-                navigationParent: root
-                navigationUpItem: root.navigationUpItem
-                navigationDown: function() {
-                    focus = false
-                    tableView.forceActiveFocus()
                 }
             }
 

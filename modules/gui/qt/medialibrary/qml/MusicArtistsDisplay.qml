@@ -21,6 +21,7 @@ import QtQml.Models 2.2
 import QtQuick.Layouts 1.3
 
 import org.videolan.medialib 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
@@ -60,7 +61,7 @@ Widgets.PageLoader {
     Component {
         id: artistGridComponent
 
-        Widgets.NavigableFocusScope {
+        FocusScope {
             id: artistAllView
 
             readonly property int currentIndex: view.currentItem.currentIndex
@@ -88,6 +89,15 @@ Widgets.PageLoader {
                 if (view.currentItem) {
                     view.currentItem.currentIndex = initialIndex
                     view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+                }
+            }
+
+            function _onNavigationCancel() {
+                if (view.currentItem.currentIndex <= 0) {
+                    artistAllView.Navigation.defaultNavigationCancel()
+                } else {
+                    view.currentItem.currentIndex = 0;
+                    view.currentItem.positionViewAtIndex(0, ItemView.Contain);
                 }
             }
 
@@ -146,10 +156,12 @@ Widgets.PageLoader {
                     focus: true
                     cellWidth: VLCStyle.colWidth(1)
                     cellHeight: VLCStyle.gridItem_music_height
+
+                    Navigation.parentItem: root
+                    Navigation.cancelAction: artistAllView._onNavigationCancel
+
                     onSelectAll: selectionModel.selectAll()
                     onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
-                    navigationParent: root
-
                     onActionAtIndex: {
                         if (selectionModel.selectedIndexes.length > 1) {
                             medialib.addAndPlay( artistModel.getIdsForIndexes( selectionModel.selectedIndexes ) )
@@ -214,10 +226,12 @@ Widgets.PageLoader {
                     model: artistModel
                     focus: true
                     headerColor: VLCStyle.colors.bg
-                    navigationParent: root
                     dragItem: artistsDragItem
                     rowHeight: VLCStyle.tableCoverRow_height
                     headerTopPadding: VLCStyle.margin_normal
+
+                    Navigation.parentItem: root
+                    Navigation.cancelAction: artistAllView._onNavigationCancel
 
                     onActionForSelection: {
                         if (selection.length > 1) {
@@ -270,7 +284,7 @@ Widgets.PageLoader {
                 visible: artistModel.count === 0
                 focus: artistModel.count === 0
                 text: i18n.qtr("No artists found\nPlease try adding sources, by going to the Network tab")
-                navigationParent: root
+                Navigation.parentItem: root
                 cover: VLCStyle.noArtArtistCover
             }
         }
@@ -280,6 +294,9 @@ Widgets.PageLoader {
         id: artistAlbumsComponent
         /* List View */
         MusicArtistsAlbums {
+
+            Navigation.parentItem: root
+
             onCurrentIndexChanged: _updateArtistsAlbumsHistory(currentIndex, currentAlbumIndex)
             onCurrentAlbumIndexChanged: _updateArtistsAlbumsHistory(currentIndex, currentAlbumIndex)
         }
