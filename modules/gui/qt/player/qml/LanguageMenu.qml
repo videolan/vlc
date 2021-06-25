@@ -162,6 +162,8 @@ T.Popup {
                     ToolTip.delay: 1000
                     ToolTip.toolTip.z: 2
 
+                    Navigation.parentItem: btnsCol
+
                     onClicked: {
                         if (index === 0) {
                             player.openVLsub()
@@ -180,9 +182,10 @@ T.Popup {
             Widgets.NavigableRow {
                 id: tracksListRow
 
-                Navigation.leftItem: btnsCol
                 Layout.fillHeight: true
                 Layout.fillWidth: true
+
+                Navigation.leftItem: btnsCol
 
                 model: [{
                         "title": i18n.qtr("Subtitle"),
@@ -264,7 +267,8 @@ T.Popup {
                                 }
                             }
 
-                            KeyNavigation.down: tracksList
+                            Navigation.parentItem: tracksListContainer
+                            Navigation.downItem: tracksList
                         }
                     }
 
@@ -277,6 +281,11 @@ T.Popup {
                         leftMargin: separator.width
                         focus: true
                         clip: true
+
+                        Navigation.parentItem: tracksListContainer
+                        Navigation.upItem: addBtn
+                        Keys.priority: Keys.AfterItem
+                        Keys.onPressed: Navigation.defaultKeyAction(event)
 
                         delegate: Widgets.CheckedDelegate {
                             readonly property bool isModelChecked: model.checked
@@ -300,8 +309,6 @@ T.Popup {
                                     model.checked = checked
                             }
                         }
-
-                        KeyNavigation.up: addBtn
                     }
                 }
             }
@@ -337,7 +344,7 @@ T.Popup {
                         control._updateWidth(true)
                         delayPageRoot.StackView.view.pop()
                     }
-                    KeyNavigation.right: audioDelaySpin
+                    Navigation.rightItem: audioDelaySpin
                 }
             }
 
@@ -357,7 +364,7 @@ T.Popup {
                 Layout.topMargin: VLCStyle.margin_large
                 spacing: VLCStyle.margin_xxsmall
 
-                KeyNavigation.left: backBtn
+                Navigation.leftItem: backBtn
 
                 Widgets.SubtitleLabel {
                     Layout.fillWidth: true
@@ -416,7 +423,7 @@ T.Popup {
                             }
                         }
 
-                        KeyNavigation.right: audioDelaySpinReset
+                        Navigation.rightItem: audioDelaySpinReset
                     }
 
                     Widgets.TabButtonExt {
@@ -426,9 +433,9 @@ T.Popup {
                         color: "white"
 
                         onClicked: audioDelaySpin.value = 0
-                        KeyNavigation.left: audioDelaySpin
-                        KeyNavigation.right: primarySubSpin
-                        KeyNavigation.down: primarySubSpinReset
+                        Navigation.leftItem: audioDelaySpin
+                        Navigation.rightItem: primarySubSpin
+                        Navigation.downItem: primarySubSpinReset
                     }
                 }
 
@@ -482,7 +489,7 @@ T.Popup {
                             }
                         }
 
-                        KeyNavigation.right: primarySubSpinReset
+                        Navigation.rightItem: primarySubSpinReset
                     }
 
                     Widgets.TabButtonExt {
@@ -492,10 +499,10 @@ T.Popup {
                         color: "white"
                         focus: true
                         onClicked: primarySubSpin.value = 0
-                        KeyNavigation.left: primarySubSpin
-                        KeyNavigation.right: secondarySubSpin
-                        KeyNavigation.up: audioDelaySpinReset
-                        KeyNavigation.down: secondarySubSpinReset
+                        Navigation.leftItem: primarySubSpin
+                        Navigation.rightItem: secondarySubSpin
+                        Navigation.upItem: audioDelaySpinReset
+                        Navigation.downItem: secondarySubSpinReset
                     }
                 }
 
@@ -542,7 +549,7 @@ T.Popup {
                             }
                         }
 
-                        KeyNavigation.right: secondarySubSpinReset
+                        Navigation.rightItem: secondarySubSpinReset
                     }
 
                     Widgets.TabButtonExt {
@@ -551,8 +558,8 @@ T.Popup {
                         text: i18n.qtr("Reset")
                         color: "white"
                         onClicked: secondarySubSpin.value = 0
-                        KeyNavigation.left: secondarySubSpin
-                        KeyNavigation.up: primarySubSpinReset
+                        Navigation.leftItem: secondarySubSpin
+                        Navigation.upItem: primarySubSpinReset
                     }
                 }
             }
@@ -588,7 +595,7 @@ T.Popup {
                         control._updateWidth(true)
                         syncPageRoot.StackView.view.pop()
                     }
-                    KeyNavigation.right: subSpeedSpin
+                    Navigation.rightItem: subSpeedSpin
                 }
             }
 
@@ -600,6 +607,8 @@ T.Popup {
             }
 
             ColumnLayout {
+                id: subtitleSyncLayout
+
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignTop
@@ -608,7 +617,7 @@ T.Popup {
                 Layout.topMargin: VLCStyle.margin_large
                 spacing: VLCStyle.margin_xsmall
 
-                KeyNavigation.left: backBtn
+                Navigation.leftItem: backBtn
 
                 Widgets.SubtitleLabel {
                     Layout.fillWidth: true
@@ -665,7 +674,8 @@ T.Popup {
                             }
                         }
 
-                        KeyNavigation.right: subSpeedSpinReset
+                        Navigation.parentItem: subtitleSyncLayout
+                        Navigation.rightItem: subSpeedSpinReset
                     }
 
                     Widgets.TabButtonExt {
@@ -675,7 +685,9 @@ T.Popup {
                         color: "white"
                         onClicked: subSpeedSpin.value = 10
 
-                        KeyNavigation.right: subSpeedSpin
+
+                        Navigation.parentItem: subtitleSyncLayout
+                        Navigation.leftItem: subSpeedSpin
                     }
                 }
             }
