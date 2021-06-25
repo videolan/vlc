@@ -486,8 +486,8 @@ void CtrlSliderBg::notifyLayout( int width, int height,
         float factorX, factorY;
         getResizeFactors( factorX, factorY );
         // real background size
-        int width = m_bgWidth - (int)(m_padHoriz * factorX);
-        int height = m_bgHeight - (int)(m_padVert * factorY);
+        width = m_bgWidth - (int)(m_padHoriz * factorX);
+        height = m_bgHeight - (int)(m_padVert * factorY);
         CtrlGeneric::notifyLayout( width, height );
     }
 }

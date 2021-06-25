@@ -271,7 +271,7 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
     // Draw the trailing dots if the text is truncated
     if( maxIndex < len )
     {
-        int penX = firstDotX;
+        penX = firstDotX;
         FT_BitmapGlyphRec *pBmpGlyph = (FT_BitmapGlyphRec*)dotGlyph.m_glyph;
         for( n = 0; n < 3; n++ )
         {
