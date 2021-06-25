@@ -58,35 +58,32 @@ FocusScope {
                 }
                 enabledConnection.createObject(item, {target: item})
 
-                item.Keys.pressed.connect(function(event) {
-                    if (event.accepted)
-                        return
+                item.Navigation.parentItem = navigableRow
+                item.Navigation.leftAction =function() {
                     var i = index
-                    if (event.key ===  Qt.Key_Left) {
-                        do {
-                            i--;
-                        } while (i >= 0 && (!rowRepeater.itemAt(i).enabled || !rowRepeater.itemAt(i).visible))
+                    do {
+                        i--;
+                    } while (i >= 0 && (!rowRepeater.itemAt(i).enabled || !rowRepeater.itemAt(i).visible))
 
-                        if (i === -1) {
-                            navigableRow.Navigation.defaultNavigationLeft()
-                        } else {
-                            rowRepeater.itemAt(i).forceActiveFocus()
-                        }
-                        event.accepted = true
-
-                    } else if (event.key ===  Qt.Key_Right) {
-                        do {
-                            i++;
-                        } while (i < rowRepeater.count && (!rowRepeater.itemAt(i).enabled || !rowRepeater.itemAt(i).visible))
-
-                        if (i === rowRepeater.count) {
-                            navigableRow.Navigation.defaultNavigationRight()
-                        } else {
-                            rowRepeater.itemAt(i).forceActiveFocus()
-                        }
-                        event.accepted = true
+                    if (i === -1) {
+                        navigableRow.Navigation.defaultNavigationLeft()
+                    } else {
+                        rowRepeater.itemAt(i).forceActiveFocus()
                     }
-                })
+                }
+
+                item.Navigation.rightAction =function() {
+                    var i = index
+                    do {
+                        i++;
+                    } while (i < rowRepeater.count && (!rowRepeater.itemAt(i).enabled || !rowRepeater.itemAt(i).visible))
+
+                    if (i === rowRepeater.count) {
+                        navigableRow.Navigation.defaultNavigationRight()
+                    } else {
+                        rowRepeater.itemAt(i).forceActiveFocus()
+                    }
+                }
             }
 
             onItemRemoved:  {

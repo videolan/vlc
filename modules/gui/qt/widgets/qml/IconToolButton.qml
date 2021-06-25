@@ -46,18 +46,6 @@ ToolButton {
     ToolTip.text: control.text
     ToolTip.delay: 500
 
-    onActiveFocusChanged: {
-        if (!enabled) {
-            var keyNavigationLeft = control.KeyNavigation.left
-            var keyNavigationRight = control.KeyNavigation.right
-
-            if (!!keyNavigationLeft)
-                keyNavigationLeft.forceActiveFocus()
-            else if (!!keyNavigationRight)
-                keyNavigationRight.forceActiveFocus()
-        }
-    }
-
     contentItem: Item {
 
         Label {

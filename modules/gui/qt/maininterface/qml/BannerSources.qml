@@ -127,6 +127,10 @@ FocusScope {
                                  colorDisabled: VLCStyle.colors.textDisabled
                                  onClicked: history.previous()
                                  enabled: !history.previousEmpty
+
+                                 Navigation.parentItem: root
+                                 Navigation.rightItem: globalMenuGroup
+                                 Navigation.downItem: localMenuGroup.visible ? localMenuGroup : localToolbarBg
                              }
 
                             Image {
@@ -151,6 +155,7 @@ FocusScope {
                             focus: true
 
                             Navigation.parentItem: root
+                            Navigation.leftItem: history_back.enabled ? history_back : null
                             Navigation.downItem: localMenuGroup.visible ?  localMenuGroup : playlistGroup
 
                             delegate: Widgets.BannerTabButton {
@@ -344,8 +349,8 @@ FocusScope {
                             if (!item)
                                 return
                             item.Navigation.parentItem = root
-                            item.Navigation.leftItem = localContextGroup.enabled ? localContextGroup : null
-                            item.Navigation.rightItem = playlistGroup.enabled ? playlistGroup : null
+                            item.Navigation.leftItem = Qt.binding(function(){ return localContextGroup.enabled ? localContextGroup : null})
+                            item.Navigation.rightItem = Qt.binding(function(){ return playlistGroup.enabled ? playlistGroup : null})
                             item.Navigation.upItem = globalMenuGroup
                         }
                     }

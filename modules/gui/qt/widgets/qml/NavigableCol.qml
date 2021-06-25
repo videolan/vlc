@@ -57,35 +57,32 @@ FocusScope {
                 }
                 enabledConnection.createObject(item, {target: item})
 
-                item.Keys.pressed.connect(function(event) {
-                    if (event.accepted)
-                        return
+
+                item.Navigation.upAction = function() {
                     var i = index
-                    if (event.key ===  Qt.Key_Up) {
-                        do {
-                            i--;
-                        } while (i >= 0 && (!colRepeater.itemAt(i).enabled || !colRepeater.itemAt(i).visible))
+                    do {
+                        i--;
+                    } while (i >= 0 && (!colRepeater.itemAt(i).enabled || !colRepeater.itemAt(i).visible))
 
-                        if (i === -1) {
-                            navigableCol.Navigation.defaultNavigationUp()
-                        } else {
-                            colRepeater.itemAt(i).forceActiveFocus()
-                        }
-                        event.accepted = true
-
-                    } else if (event.key ===  Qt.Key_Down) {
-                        do {
-                            i++;
-                        } while (i < colRepeater.count && (!colRepeater.itemAt(i).enabled || !colRepeater.itemAt(i).visible))
-
-                        if (i === colRepeater.count) {
-                            navigableCol.Navigation.defaultNavigationDown()
-                        } else {
-                            colRepeater.itemAt(i).forceActiveFocus()
-                        }
-                        event.accepted = true
+                    if (i === -1) {
+                        navigableCol.Navigation.defaultNavigationUp()
+                    } else {
+                        colRepeater.itemAt(i).forceActiveFocus()
                     }
-                })
+                }
+
+                item.Navigation.downAction = function() {
+                    var i = index
+                    do {
+                        i++;
+                    } while (i < colRepeater.count && (!colRepeater.itemAt(i).enabled || !colRepeater.itemAt(i).visible))
+
+                    if (i === colRepeater.count) {
+                        navigableCol.Navigation.defaultNavigationDown()
+                    } else {
+                        colRepeater.itemAt(i).forceActiveFocus()
+                    }
+                }
             }
 
             onItemRemoved:  {

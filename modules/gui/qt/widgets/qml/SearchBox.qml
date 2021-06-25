@@ -19,11 +19,12 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
 
+import org.videolan.vlc 0.1
+
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
 FocusScope {
-
     id: root
 
     width: content.width
@@ -36,7 +37,7 @@ FocusScope {
     onExpandedChanged: {
         if (expanded) {
             searchBox.forceActiveFocus()
-            icon.KeyNavigation.right = searchBox
+            icon.Navigation.rightItem = searchBox
             animateExpand.start()
         }
         else {
@@ -44,7 +45,7 @@ FocusScope {
             searchBox.text = ""
             icon.focus = true
             searchBox.focus = false
-            icon.KeyNavigation.right = null
+            icon.Navigation.rightItem = null
             animateRetract.start()
         }
     }
@@ -97,6 +98,10 @@ FocusScope {
                     expanded = !expanded
                 }
             }
+
+            Navigation.parentItem: root
+            Keys.priority: Keys.AfterItem
+            Keys.onPressed: Navigation.defaultKeyAction(event)
         }
 
         Rectangle {
@@ -120,6 +125,8 @@ FocusScope {
             TextField {
                 id: searchBox
 
+                enabled: root.expanded
+
                 anchors.fill: searchBoxRect
                 anchors.rightMargin: clearButton.visible ? (VLCStyle.margin_xxsmall + clearButton.width) : 0
 
@@ -138,6 +145,10 @@ FocusScope {
                         contentModel.searchPattern = text;
                 }
 
+                Navigation.parentItem: root
+                Navigation.leftItem: icon
+                Navigation.rightItem: clearButton.visible ? clearButton : null
+                Keys.priority: Keys.AfterItem
                 Keys.onPressed: {
                     //don't use KeyHelper.matchCancel here as we don't want to match Backspace
                     if (event.key === Qt.Key_Back
@@ -147,6 +158,7 @@ FocusScope {
                     {
                         event.accepted = true
                     }
+                    Navigation.defaultKeyAction(event)
                 }
 
                 Keys.onReleased: {
@@ -160,6 +172,7 @@ FocusScope {
                         expanded = false
                         event.accepted = true
                     }
+                    Navigation.defaultKeyReleaseAction(event)
                 }
             }
 
@@ -174,10 +187,16 @@ FocusScope {
                 iconText: VLCIcons.close
 
                 visible: ( expanded && searchBox.text.length > 0 )
+                enabled: visible
 
                 onClicked: {
                     searchBox.clear()
                 }
+
+                Navigation.parentItem: root
+                Navigation.leftItem: searchBox
+                Keys.priority: Keys.AfterItem
+                Keys.onPressed: Navigation.defaultKeyAction(event)
             }
         }
     }
