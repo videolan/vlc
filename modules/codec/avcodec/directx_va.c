@@ -68,6 +68,9 @@ static const int PROF_HEVC_MAIN_REXT[]  = { FF_PROFILE_HEVC_REXT,
 static const int PROF_VP9_MAIN[]    = { FF_PROFILE_VP9_0, FF_PROFILE_UNKNOWN };
 static const int PROF_VP9_10[]      = { FF_PROFILE_VP9_2, FF_PROFILE_UNKNOWN };
 
+static const int PROF_AV1_MAIN[]    = { FF_PROFILE_AV1_MAIN, FF_PROFILE_UNKNOWN };
+static const int PROF_AV1_HIGH[]    = { FF_PROFILE_AV1_HIGH, FF_PROFILE_AV1_MAIN, FF_PROFILE_UNKNOWN };
+
 #include <winapifamily.h>
 #if defined(WINAPI_FAMILY)
 # undef WINAPI_FAMILY
@@ -141,6 +144,14 @@ DEFINE_GUID(DXVA_ModeVP8_VLD,                       0x90b899ea, 0x3a62, 0x4705, 
 DEFINE_GUID(DXVA_ModeVP9_VLD_Profile0,              0x463707f8, 0xa1d0, 0x4585, 0x87, 0x6d, 0x83, 0xaa, 0x6d, 0x60, 0xb8, 0x9e);
 DEFINE_GUID(DXVA_ModeVP9_VLD_10bit_Profile2,        0xa4c749ef, 0x6ecf, 0x48aa, 0x84, 0x48, 0x50, 0xa7, 0xa1, 0x16, 0x5f, 0xf7);
 DEFINE_GUID(DXVA_ModeVP9_VLD_Intel,                 0x76988a52, 0xdf13, 0x419a, 0x8e, 0x64, 0xff, 0xcf, 0x4a, 0x33, 0x6c, 0xf5);
+
+#ifndef _DIRECTX_AV1_VA_
+DEFINE_GUID(DXVA_ModeAV1_VLD_Profile0, 0xb8be4ccb, 0xcf53, 0x46ba, 0x8d, 0x59, 0xd6, 0xb8, 0xa6, 0xda, 0x5d, 0x2a);
+DEFINE_GUID(DXVA_ModeAV1_VLD_Profile1, 0x6936ff0f, 0x45b1, 0x4163, 0x9c, 0xc1, 0x64, 0x6e, 0xf6, 0x94, 0x61, 0x08);
+DEFINE_GUID(DXVA_ModeAV1_VLD_Profile2, 0x0c5f2aa1, 0xe541, 0x4089, 0xbb, 0x7b, 0x98, 0x11, 0x0a, 0x19, 0xd7, 0xc8);
+DEFINE_GUID(DXVA_ModeAV1_VLD_12bit_Profile2, 0x17127009, 0xa00f, 0x4ce1, 0x99, 0x4e, 0xbf, 0x40, 0x81, 0xf6, 0xf3, 0xf0);
+DEFINE_GUID(DXVA_ModeAV1_VLD_12bit_Profile2_420, 0x2d80bed6, 0x9cac, 0x4835, 0x9e, 0x91, 0x32, 0x7b, 0xbc, 0x4f, 0x9e, 0xe8);
+#endif
 
 /* XXX Prefered modes must come first */
 static const directx_va_mode_t DXVA_MODES[] = {
@@ -251,6 +262,19 @@ static const directx_va_mode_t DXVA_MODES[] = {
 #endif
     { "VP9 profile Intel",                                                            &DXVA_ModeVP9_VLD_Intel,                8, {1, 1}, 0, NULL, 0 },
 
+    /* AV1 */
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 58, 112, 103 ) && LIBAVCODEC_VERSION_MICRO >= 100
+    { "AV1 Main profile 8",                                                           &DXVA_ModeAV1_VLD_Profile0,             8, {1, 1}, AV_CODEC_ID_AV1, PROF_AV1_MAIN, 0 },
+    { "AV1 Main profile 10",                                                          &DXVA_ModeAV1_VLD_Profile0,            10, {1, 1}, AV_CODEC_ID_AV1, PROF_AV1_MAIN, 0 },
+    { "AV1 High profile 8",                                                           &DXVA_ModeAV1_VLD_Profile1,             8, {1, 1}, AV_CODEC_ID_AV1, PROF_AV1_HIGH, 0 },
+    { "AV1 High profile 10",                                                          &DXVA_ModeAV1_VLD_Profile1,            10, {1, 1}, AV_CODEC_ID_AV1, PROF_AV1_HIGH, 0 },
+#else
+    { "AV1 Main profile 8",                                                           &DXVA_ModeAV1_VLD_Profile0,             8, {1, 1}, 0, NULL, 0 },
+    { "AV1 Main profile 10",                                                          &DXVA_ModeAV1_VLD_Profile0,            10, {1, 1}, 0, NULL, 0 },
+    { "AV1 High profile 8",                                                           &DXVA_ModeAV1_VLD_Profile1,             8, {1, 1}, 0, NULL, 0 },
+    { "AV1 High profile 10",                                                          &DXVA_ModeAV1_VLD_Profile1,            10, {1, 1}, 0, NULL, 0 },
+#endif
+
     { NULL, NULL, 0, {0, 0}, 0, NULL, 0 }
 };
 
@@ -302,6 +326,10 @@ const directx_va_mode_t *directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_
         surface_count += 16 + 2;
         break;
     case AV_CODEC_ID_VP9:
+        surface_count += 8 + 1;
+        break;
+    case AV_CODEC_ID_AV1:
+        surface_alignment = 128;
         surface_count += 8 + 1;
         break;
     default:
