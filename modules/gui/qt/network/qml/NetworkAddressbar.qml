@@ -21,6 +21,8 @@ import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
 import QtQml.Models 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
@@ -88,37 +90,41 @@ Control {
         AddressbarButton {
             id: homeButton
 
-            Layout.fillHeight: true
             text: VLCIcons.home
 
-            onClicked: control.homeButtonClicked()
-            Keys.onPressed: {
-                if (event.accepted || event.key !== Qt.Key_Right)
-                    return
+            Layout.fillHeight: true
+
+            Navigation.parentItem: control
+            Navigation.rightAction: function () {
                 if (menuButton.visible)
-                    menuButton.forceActiveFocus()
+                        menuButton.forceActiveFocus()
                 else
                     contentRepeater.itemAt(0).forceActiveFocus()
-                event.accepted = true
             }
+            Keys.priority: Keys.AfterItem
+            Keys.onPressed: Navigation.defaultKeyAction(event)
+
+            onClicked: control.homeButtonClicked()
         }
 
         AddressbarButton {
             id: menuButton
 
-            Layout.fillHeight: true
             visible: !!control._menuModel && control._menuModel.length > 0
             text: VLCIcons.back + VLCIcons.back
             font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_small)
-            KeyNavigation.left: homeButton
+
+            Layout.fillHeight: true
+
+            Navigation.parentItem: control
+            Navigation.leftItem: homeButton
+            Navigation.rightAction: function () {
+                contentRepeater.itemAt(0).forceActiveFocus()
+            }
+            Keys.priority: Keys.AfterItem
+            Keys.onPressed: Navigation.defaultKeyAction(event)
 
             onClicked: popup.open()
-            Keys.onPressed: {
-                if (event.accepted || event.key !== Qt.Key_Right)
-                    return
-                contentRepeater.itemAt(0).forceActiveFocus()
-                event.accepted = true
-            }
         }
 
         Repeater {
@@ -131,26 +137,30 @@ Control {
                 Layout.maximumWidth: implicitWidth
                 focus: true
                 spacing: VLCStyle.margin_xxxsmall
-                onActiveFocusChanged: if (activeFocus)
-                                          btn.forceActiveFocus()
-                Keys.onPressed: {
-                    if (event.accepted)
-                        return
-                    if (event.key === Qt.Key_Right
-                            && index !== contentRepeater.count - 1) {
-                        contentRepeater.itemAt(index + 1).forceActiveFocus()
-                        event.accepted = true
-                    }
-                    else if (event.key === Qt.Key_Left) {
-                        if (index !== 0)
-                            contentRepeater.itemAt(index - 1).forceActiveFocus()
-                        else if (menuButton.visible)
-                            menuButton.forceActiveFocus()
-                        else
-                            homeButton.forceActiveFocus()
-                        event.accepted = true
-                    }
+                onActiveFocusChanged: {
+                    if (activeFocus)
+                                btn.forceActiveFocus()
                 }
+
+                Navigation.parentItem: control
+                Navigation.leftAction: function() {
+                    if (index !== 0)
+                        contentRepeater.itemAt(index - 1).forceActiveFocus()
+                    else if (menuButton.visible)
+                        menuButton.forceActiveFocus()
+                    else
+                        homeButton.forceActiveFocus()
+                }
+
+                Navigation.rightAction: function () {
+                    if (index !== contentRepeater.count - 1)
+                        contentRepeater.itemAt(index + 1).forceActiveFocus()
+                    else
+                        control.Navigation.defaultNavigationRight()
+                }
+
+                Keys.priority: Keys.AfterItem
+                Keys.onPressed: Navigation.defaultKeyAction(event)
 
                 AddressbarButton {
                     id: btn
@@ -209,13 +219,13 @@ Control {
         onOpened: {
             updateBgRect()
 
-            menuButton.KeyNavigation.down = optionList
+            menuButton.Navigation.downItem= optionList
             menuButton.highlighted = true
             optionList.forceActiveFocus()
         }
 
         onClosed: {
-            menuButton.KeyNavigation.down = null
+            menuButton.Navigation.downItem = null
             menuButton.highlighted = false
             menuButton.forceActiveFocus()
         }
