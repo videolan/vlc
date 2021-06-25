@@ -52,7 +52,7 @@ Widgets.NavigableFocusScope {
     Keys.onPressed: {
         if (event.accepted)
             return
-        defaultKeyAction(event, 0)
+        defaultKeyAction(event)
 
         //unhandled keys are forwarded as hotkeys
         if (!event.accepted || controlBarView.state !== "visible")
@@ -65,7 +65,7 @@ Widgets.NavigableFocusScope {
         if (event.key === Qt.Key_Menu) {
             toolbarAutoHide.toggleForceVisible()
         } else {
-            defaultKeyReleaseAction(event, 0)
+            defaultKeyReleaseAction(event)
         }
     }
 

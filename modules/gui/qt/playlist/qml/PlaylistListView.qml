@@ -520,32 +520,32 @@ Widgets.NavigableFocusScope {
                 Keys.onMenuPressed: overlayMenu.open()
 
                 navigationParent: root
-                navigationRight: function(index) {
+                navigationRight: function() {
                     overlayMenu.open()
                 }
-                navigationLeft: function(index) {
+                navigationLeft: function() {
                     if (mode === PlaylistListView.Mode.Normal) {
-                        root.navigationLeft(index)
+                        root.navigationLeft()
                     } else {
                         mode = PlaylistListView.Mode.Normal
                     }
                 }
-                navigationCancel: function(index) {
+                navigationCancel: function() {
                     if (mode === PlaylistListView.Mode.Normal) {
-                        root.navigationCancel(index)
+                        root.navigationCancel()
                     } else {
                         mode = PlaylistListView.Mode.Normal
                     }
                 }
 
-                navigationUp: function(index) {
+                navigationUp: function() {
                     if (mode === PlaylistListView.Mode.Normal)
-                        root.navigationUp(index)
+                        root.navigationUp()
                 }
 
-                navigationDown: function(index) {
+                navigationDown: function() {
                     if (mode === PlaylistListView.Mode.Normal)
-                        root.navigationDown(index)
+                        root.navigationDown()
                 }
 
                 onActionAtIndex: {
@@ -657,5 +657,5 @@ Widgets.NavigableFocusScope {
 
     Keys.priority: Keys.AfterItem
     Keys.forwardTo: listView
-    Keys.onPressed: defaultKeyAction(event, 0)
+    Keys.onPressed: defaultKeyAction(event)
 }

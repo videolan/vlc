@@ -709,7 +709,7 @@ NavigableFocusScope {
         }
 
         if (!event.accepted)
-            defaultKeyAction(event, currentIndex)
+            defaultKeyAction(event)
     }
 
     Keys.onReleased: {

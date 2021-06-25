@@ -170,7 +170,7 @@ Widgets.NavigableFocusScope {
                     }
                 }
 
-                Keys.onPressed: defaultKeyAction(event, 0)
+                Keys.onPressed: defaultKeyAction(event)
                 navigationParent: root
                 navigationDown: function() {
                     focus = false
@@ -298,7 +298,7 @@ Widgets.NavigableFocusScope {
                     }
                 }
 
-                Keys.onPressed: defaultKeyAction(event, 0)
+                Keys.onPressed: defaultKeyAction(event)
                 navigationParent: root
                 navigationUpItem: root.navigationUpItem
                 navigationDown: function() {

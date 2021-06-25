@@ -427,7 +427,7 @@ Widgets.NavigableFocusScope {
         Keys.priority: Keys.AfterItem
         Keys.onPressed: {
             if (!event.accepted)
-                defaultKeyAction(event, 0)
+                defaultKeyAction(event)
         }
     }
 }

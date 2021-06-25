@@ -93,7 +93,7 @@ Widgets.NavigableFocusScope {
                 Keys.onPressed: {
                     if (event.accepted)
                         return
-                    searchFieldContainer.defaultKeyAction(event, 0)
+                    searchFieldContainer.defaultKeyAction(event)
                 }
             }
         }

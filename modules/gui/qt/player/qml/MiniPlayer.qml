@@ -88,7 +88,7 @@ Widgets.NavigableFocusScope {
 
         Keys.onPressed: {
             if (!event.accepted)
-                defaultKeyAction(event, 0)
+                defaultKeyAction(event)
             if (!event.accepted)
                 mainInterface.sendHotkey(event.key, event.modifiers);
         }

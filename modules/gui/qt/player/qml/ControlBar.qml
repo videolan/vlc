@@ -52,7 +52,7 @@ Widgets.NavigableFocusScope {
     }
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: defaultKeyAction(event, 0)
+    Keys.onPressed: defaultKeyAction(event)
     onActionCancel: history.previous()
 
     onActiveFocusChanged: if (activeFocus) trackPositionSlider.forceActiveFocus()

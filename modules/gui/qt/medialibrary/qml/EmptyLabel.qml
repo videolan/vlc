@@ -85,11 +85,11 @@ Widgets.NavigableFocusScope {
     }
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: defaultKeyAction(event, 0)
+    Keys.onPressed: defaultKeyAction(event)
     Keys.onReleased: {
         if (KeyHelper.matchOk(event)) {
             history.push(["mc", "network"])
         }
-        defaultKeyReleaseAction(event, 0)
+        defaultKeyReleaseAction(event)
     }
 }

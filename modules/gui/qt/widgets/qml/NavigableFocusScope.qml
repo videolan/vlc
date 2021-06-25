@@ -24,15 +24,15 @@ import "qrc:///util/KeyHelper.js" as KeyHelper
  * classes that inherits this class should provide something like
  * Keys.onPressed {
  *   //custom key handling
- *   defaultKeyAction(event, index)
+ *   defaultKeyAction(event)
  * }
  */
 FocusScope {
-    signal actionUp( int index )
-    signal actionDown( int index )
-    signal actionLeft( int index )
-    signal actionRight( int index )
-    signal actionCancel( int index )
+    signal actionUp( )
+    signal actionDown( )
+    signal actionLeft( )
+    signal actionRight( )
+    signal actionCancel( )
 
     property bool navigable: true
 
@@ -50,23 +50,23 @@ FocusScope {
     property var navigationCancelItem: undefined
 
 
-    function defaultNavigationUp(index) {
+    function defaultNavigationUp() {
         if (navigationUpItem) {
             if (navigationUpItem.visible
                 && navigationUpItem.enabled
                 && (navigationUpItem.navigable === undefined || navigationUpItem.navigable)) {
                 navigationUpItem.forceActiveFocus()
             } else {
-                navigationUpItem.navigationUp(index)
+                navigationUpItem.navigationUp()
             }
         } else if (navigationParent) {
-            navigationParent.navigationUp(index)
+            navigationParent.navigationUp()
         } else {
-            actionUp(index)
+            actionUp()
         }
     }
 
-    function defaultNavigationDown(index) {
+    function defaultNavigationDown() {
         if (navigationDownItem) {
             var item = navigationDownItem
             if (item.visible
@@ -74,16 +74,16 @@ FocusScope {
                 && (item.navigable === undefined || item.navigable)) {
                 item.forceActiveFocus()
             } else {
-                item.navigationDown(index)
+                item.navigationDown()
             }
         } else if (navigationParent) {
-            navigationParent.navigationDown(index)
+            navigationParent.navigationDown()
         } else {
-            actionDown(index)
+            actionDown()
         }
     }
 
-    function defaultNavigationLeft(index) {
+    function defaultNavigationLeft() {
         if (navigationLeftItem) {
             var item = navigationLeftItem
             if (item.visible
@@ -91,16 +91,16 @@ FocusScope {
                 && (item.navigable === undefined || item.navigable)) {
                 item.forceActiveFocus()
             } else {
-                item.navigationLeft(index)
+                item.navigationLeft()
             }
         } else if (navigationParent) {
-            navigationParent.navigationLeft(index)
+            navigationParent.navigationLeft()
         } else {
-            actionLeft(index)
+            actionLeft()
         }
     }
 
-    function defaultNavigationRight(index) {
+    function defaultNavigationRight() {
         if (navigationRightItem) {
             var item = navigationRightItem
             if (item.visible
@@ -108,16 +108,16 @@ FocusScope {
                 && (item.navigable === undefined || item.navigable)) {
                 item.forceActiveFocus()
             } else {
-                item.navigationRight(index)
+                item.navigationRight()
             }
         } else if (navigationParent) {
-            navigationParent.navigationRight(index)
+            navigationParent.navigationRight()
         } else {
-            actionRight(index)
+            actionRight()
         }
     }
 
-    function defaultNavigationCancel(index) {
+    function defaultNavigationCancel() {
         if (navigationCancelItem) {
             var item = navigationCancelItem
             if (item.visible
@@ -125,37 +125,37 @@ FocusScope {
                 && (item.navigable === undefined || item.navigable)) {
                 item.forceActiveFocus()
             } else {
-                item.navigationCancel(index)
+                item.navigationCancel()
             }
         } else if (navigationParent) {
-            navigationParent.navigationCancel(index)
+            navigationParent.navigationCancel()
         } else {
-            actionCancel(index)
+            actionCancel()
         }
     }
 
-    function defaultKeyAction(event, index) {
+    function defaultKeyAction(event) {
         if (event.accepted)
             return
         if ( KeyHelper.matchDown(event) ) {
             event.accepted = true
-            navigationDown( index )
+            navigationDown()
         } else if ( KeyHelper.matchUp(event) ) {
             event.accepted = true
-            navigationUp( index  )
+            navigationUp()
         } else if ( KeyHelper.matchRight(event) ) {
             event.accepted = true
-            navigationRight( index )
+            navigationRight()
         } else if ( KeyHelper.matchLeft(event) ) {
             event.accepted = true
-            navigationLeft( index )
+            navigationLeft()
         } else if ( KeyHelper.matchCancel(event) ) {
             event.accepted = true
-            navigationCancel( index )
+            navigationCancel()
         }
     }
 
-    function defaultKeyReleaseAction(event, index) {
+    function defaultKeyReleaseAction(event) {
         if (event.accepted)
             return
 

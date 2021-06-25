@@ -153,8 +153,8 @@ NavigableFocusScope {
         Connections {
             target: view.currentItem
             ignoreUnknownSignals: true
-            onActionRight: if ( !listview_id.keyNavigationWraps ) listview_id.navigationRight(currentIndex);
-            onActionLeft: if ( !listview_id.keyNavigationWraps ) listview_id.navigationLeft(currentIndex);
+            onActionRight: if ( !listview_id.keyNavigationWraps ) listview_id.navigationRight();
+            onActionLeft: if ( !listview_id.keyNavigationWraps ) listview_id.navigationLeft();
             onActionDown: {
                 if ( listview_id.keyNavigationWraps )
                     return
@@ -165,7 +165,7 @@ NavigableFocusScope {
                     currentIndex = newIndex
                     selectionUpdated(0, oldIndex, newIndex)
                 } else {
-                    listview_id.navigationDown(currentIndex)
+                    listview_id.navigationDown()
                 }
             }
             onActionUp: {
@@ -178,7 +178,7 @@ NavigableFocusScope {
                     currentIndex = newIndex
                     selectionUpdated(0, oldIndex, newIndex)
                 } else {
-                    listview_id.navigationUp(currentIndex)
+                    listview_id.navigationUp()
                 }
             }
         }
@@ -235,7 +235,7 @@ NavigableFocusScope {
             }
 
             if (!event.accepted)
-                defaultKeyAction(event, currentIndex)
+                defaultKeyAction(event)
         }
 
         Keys.onReleased: {

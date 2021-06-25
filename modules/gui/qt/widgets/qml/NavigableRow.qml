@@ -32,7 +32,7 @@ NavigableFocusScope {
     property alias implicitHeight: row.implicitHeight
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: defaultKeyAction(event, 0)
+    Keys.onPressed: defaultKeyAction(event)
 
     navigable: _countEnabled > 0
     property int _countEnabled: 0
