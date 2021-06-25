@@ -462,7 +462,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
             if( cp->codec_id == AV_CODEC_ID_RAWVIDEO )
             {
                 msg_Dbg( p_demux, "raw video, pixel format: %i", cp->format );
-                if( GetVlcChroma( &es_fmt.video, cp->format ) != VLC_SUCCESS)
+                if( GetVlcChroma( &es_fmt.video, (enum AVPixelFormat)cp->format ) != VLC_SUCCESS)
                 {
                     msg_Err( p_demux, "was unable to find a FourCC match for raw video" );
                 }

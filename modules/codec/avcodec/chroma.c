@@ -53,7 +53,7 @@
 static const struct
 {
     vlc_fourcc_t  i_chroma;
-    int           i_chroma_id;
+    enum PixelFormat i_chroma_id;
     uint32_t      i_rmask;
     uint32_t      i_gmask;
     uint32_t      i_bmask;
@@ -206,7 +206,7 @@ static const struct
 };
 
 /* FIXME special case the RGB formats */
-int GetFfmpegChroma( int *restrict i_ffmpeg_chroma, const video_format_t *fmt )
+int GetFfmpegChroma( enum PixelFormat *restrict i_ffmpeg_chroma, const video_format_t *fmt )
 {
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
     {
@@ -227,7 +227,7 @@ int GetFfmpegChroma( int *restrict i_ffmpeg_chroma, const video_format_t *fmt )
     return VLC_EGENERIC;
 }
 
-vlc_fourcc_t FindVlcChroma( int i_ffmpeg_id )
+vlc_fourcc_t FindVlcChroma( enum PixelFormat i_ffmpeg_id )
 {
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
         if( chroma_table[i].i_chroma_id == i_ffmpeg_id )
@@ -235,7 +235,7 @@ vlc_fourcc_t FindVlcChroma( int i_ffmpeg_id )
     return 0;
 }
 
-int GetVlcChroma( video_format_t *fmt, int i_ffmpeg_chroma )
+int GetVlcChroma( video_format_t *fmt, enum PixelFormat i_ffmpeg_chroma )
 {
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
     {
@@ -252,7 +252,7 @@ int GetVlcChroma( video_format_t *fmt, int i_ffmpeg_chroma )
     return VLC_EGENERIC;
 }
 
-int FindFfmpegChroma( vlc_fourcc_t fourcc )
+enum AVPixelFormat FindFfmpegChroma( vlc_fourcc_t fourcc )
 {
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
         if( chroma_table[i].i_chroma == fourcc )

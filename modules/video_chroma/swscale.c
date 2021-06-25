@@ -111,8 +111,8 @@ static void Clean( filter_t * );
 
 typedef struct
 {
-    int  i_fmti;
-    int  i_fmto;
+    enum AVPixelFormat i_fmti;
+    enum AVPixelFormat i_fmto;
     bool b_has_a;
     bool b_add_a;
     int  i_sws_flags;
@@ -244,7 +244,7 @@ static int GetSwsCpuMask(void)
     return i_sws_cpu;
 }
 
-static void FixParameters( int *pi_fmt, bool *pb_has_a, bool *pb_swap_uv, vlc_fourcc_t fmt )
+static void FixParameters( enum AVPixelFormat *pi_fmt, bool *pb_has_a, bool *pb_swap_uv, vlc_fourcc_t fmt )
 {
     switch( fmt )
     {
@@ -290,8 +290,8 @@ static int GetParameters( ScalerConfiguration *p_cfg,
                           const video_format_t *p_fmto,
                           int i_sws_flags_default )
 {
-    int i_fmti = -1;
-    int i_fmto = -1;
+    enum AVPixelFormat i_fmti = AV_PIX_FMT_NONE;
+    enum AVPixelFormat i_fmto = AV_PIX_FMT_NONE;
 
     bool b_has_ai = false;
     bool b_has_ao = false;
