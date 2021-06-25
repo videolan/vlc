@@ -833,15 +833,15 @@ static void ReadMetaFromMP4( MP4::Tag* tag, demux_meta_t *p_demux_meta, vlc_meta
 
     if( tag->itemListMap().contains("covr") )
     {
-        MP4::CoverArtList list = tag->itemListMap()["covr"].toCoverArtList();
-        const char *psz_format = list[0].format() == MP4::CoverArt::PNG ? "image/png" : "image/jpeg";
+        MP4::CoverArtList cover_list = tag->itemListMap()["covr"].toCoverArtList();
+        const char *psz_format = cover_list[0].format() == MP4::CoverArt::PNG ? "image/png" : "image/jpeg";
 
         msg_Dbg( p_demux_meta, "Found embedded art (%s) is %i bytes",
-                 psz_format, list[0].data().size() );
+                 psz_format, cover_list[0].data().size() );
 
         input_attachment_t *p_attachment =
                 vlc_input_attachment_New( "cover", psz_format, "cover",
-                                          list[0].data().data(), list[0].data().size() );
+                                          cover_list[0].data().data(), cover_list[0].data().size() );
         if( p_attachment )
         {
             TAB_APPEND_CAST( (input_attachment_t**),
