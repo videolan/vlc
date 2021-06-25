@@ -657,7 +657,6 @@ static int Open(vlc_object_t *p_this)
         uint32_t field_flags;
         const char *field = GetFieldDominance(m->GetFieldDominance(), &field_flags);
         BMDDisplayMode id = ntohl(m->GetDisplayMode());
-        decklink_str_t tmp_name;
 
         if (m->GetName(&tmp_name) != S_OK) {
             mode_name = "unknown";
