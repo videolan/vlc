@@ -120,7 +120,7 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
 {
     aout_stream_sys_t *sys = s->sys;
     void *pv;
-    UINT64 pos, qpcpos, freq;
+    UINT64 pos, qpcpos, clock_freq;
     HRESULT hr;
 
     if (atomic_load(&sys->started_state) != STARTED_STATE_OK)
@@ -137,7 +137,7 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
 
     hr = IAudioClock_GetPosition(clock, &pos, &qpcpos);
     if (SUCCEEDED(hr))
-        hr = IAudioClock_GetFrequency(clock, &freq);
+        hr = IAudioClock_GetFrequency(clock, &clock_freq);
     IAudioClock_Release(clock);
     if (FAILED(hr))
     {
@@ -146,7 +146,7 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
     }
 
     vlc_tick_t written = vlc_tick_from_frac(sys->written, sys->rate);
-    vlc_tick_t tick_pos = vlc_tick_from_frac(pos, freq);
+    vlc_tick_t tick_pos = vlc_tick_from_frac(pos, clock_freq);
 
     static_assert((10000000 % CLOCK_FREQ) == 0, "Frequency conversion broken");
 
