@@ -67,7 +67,11 @@ Popup {
             to: 4
             clip: true
             implicitHeight: VLCStyle.heightBar_small
-            KeyNavigation.down: slowerButton
+
+            Navigation.parentItem: root
+            Navigation.downItem: resetButton
+            Keys.priority: Keys.AfterItem
+            Keys.onPressed: Navigation.defaultKeyAction(event)
 
             background: Rectangle {
                 x: speedSlider.leftPadding
@@ -121,15 +125,21 @@ Popup {
         }
 
         RowLayout {
+            id: buttonLayout
+
             spacing: 0
-            KeyNavigation.up: speedSlider
+
+            Navigation.parentItem: root
+            Navigation.upItem: speedSlider
 
             Widgets.IconControlButton {
                 id: slowerButton
 
                 iconText: VLCIcons.slower
                 colors: root.colors
-                KeyNavigation.right: resetButton
+
+                Navigation.parentItem: buttonLayout
+                Navigation.rightItem: resetButton
 
                 onClicked: speedSlider.decrease()
             }
@@ -142,10 +152,14 @@ Popup {
                 id: resetButton
 
                 colors: root.colors
-                KeyNavigation.left: slowerButton
-                KeyNavigation.right: fasterButton
+
+                Navigation.parentItem: buttonLayout
+                Navigation.leftItem: slowerButton
+                Navigation.rightItem: fasterButton
 
                 onClicked: speedSlider.value = 1.0
+
+                focus: true
 
                 Label {
                     anchors.centerIn: parent
@@ -164,7 +178,9 @@ Popup {
 
                 iconText: VLCIcons.faster
                 colors: root.colors
-                KeyNavigation.left: resetButton
+
+                Navigation.parentItem: buttonLayout
+                Navigation.leftItem: resetButton
 
                 onClicked: speedSlider.increase()
             }

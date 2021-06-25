@@ -56,8 +56,9 @@ FocusScope{
             color: widgetfscope.color
             checked: player.teletextEnabled
             focus: true
-            KeyNavigation.right: player.teletextEnabled ?
-                                     teleTransparencyBtn : blueKeyBtn.KeyNavigation.right
+
+            Navigation.parentItem: widgetfscope
+            Navigation.rightItem: player.teletextEnabled ? teleTransparencyBtn : null
         }
 
         Widgets.IconToolButton{
@@ -70,7 +71,10 @@ FocusScope{
             enabled: player.teletextEnabled
             onClicked: player.teletextTransparency = !player.teletextTransparency
             color: widgetfscope.color
-            KeyNavigation.right: telePageNumber
+
+            Navigation.parentItem: widgetfscope
+            Navigation.leftItem: teleActivateBtn
+            Navigation.rightItem: telePageNumber
         }
 
         Widgets.SpinBoxExt{
@@ -81,7 +85,10 @@ FocusScope{
             editable: true
             textColor: widgetfscope.color
             bgColor: widgetfscope.bgColor
-            KeyNavigation.right: indexKeyBtn
+
+            Navigation.parentItem: widgetfscope
+            Navigation.leftItem: teleTransparencyBtn
+            Navigation.rightItem: indexKeyBtn
 
             //only update the player teletext page when the user change the value manually
             property bool inhibitPageUpdate: true
@@ -117,7 +124,10 @@ FocusScope{
             onClicked: player.teletextPage = PlayerController.TELE_INDEX
             color: "grey"
             colorDisabled: "grey"
-            KeyNavigation.right: redKeyBtn
+
+            Navigation.parentItem: widgetfscope
+            Navigation.leftItem: telePageNumber
+            Navigation.rightItem: redKeyBtn
         }
         Widgets.IconToolButton{
             id: redKeyBtn
@@ -129,7 +139,10 @@ FocusScope{
             onClicked: player.teletextPage = PlayerController.TELE_RED
             color: "red"
             colorDisabled: "grey"
-            KeyNavigation.right: greenKeyBtn
+
+            Navigation.parentItem: widgetfscope
+            Navigation.leftItem: indexKeyBtn
+            Navigation.rightItem: greenKeyBtn
         }
         Widgets.IconToolButton{
             id: greenKeyBtn
@@ -141,7 +154,10 @@ FocusScope{
             onClicked: player.teletextPage = PlayerController.TELE_GREEN
             color: "green"
             colorDisabled: "grey"
-            KeyNavigation.right: yellowKeyBtn
+
+            Navigation.parentItem: widgetfscope
+            Navigation.leftItem: redKeyBtn
+            Navigation.rightItem: yellowKeyBtn
         }
         Widgets.IconToolButton{
             id: yellowKeyBtn
@@ -153,7 +169,10 @@ FocusScope{
             onClicked: player.teletextPage = PlayerController.TELE_YELLOW
             color: "yellow"
             colorDisabled: "grey"
-            KeyNavigation.right: blueKeyBtn
+
+            Navigation.parentItem: widgetfscope
+            Navigation.leftItem: greenKeyBtn
+            Navigation.rightItem: blueKeyBtn
         }
         Widgets.IconToolButton{
             id: blueKeyBtn
@@ -165,6 +184,9 @@ FocusScope{
             onClicked: player.teletextPage = PlayerController.TELE_BLUE
             color: "blue"
             colorDisabled: "grey"
+
+            Navigation.parentItem: widgetfscope
+            Navigation.leftItem: yellowKeyBtn
         }
     }
 }

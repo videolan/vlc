@@ -71,17 +71,16 @@ FocusScope{
             color: widgetfscope.color
             colorFocus: colors.bgFocus
             onClicked: player.muted = !player.muted
-            KeyNavigation.right: volControl
 
-            Keys.onLeftPressed: {
-                var left = widgetfscope.KeyNavigation.left
-                while (left && (!left.enabled || !left.visible)) {
-                    left = left.KeyNavigation ? left.KeyNavigation.left : undefined
-                }
-                if (left)
-                    left.forceActiveFocus()
-                else
-                    widgetfscope.Navigation.defaultNavigationLeft()
+            Navigation.parentItem: widgetfscope
+            Navigation.upAction: function() {
+                volControl.increase()
+                tooltipShower.restart()
+            }
+
+            Navigation.downAction: function() {
+                volControl.decrease()
+                tooltipShower.restart()
             }
         }
 
@@ -125,32 +124,6 @@ FocusScope{
                     else
                         volumeTooltip.visible = Qt.binding(function() {return sliderMouseArea.containsMouse;})
                 }
-            }
-
-            Keys.onUpPressed: {
-                volControl.increase()
-                tooltipShower.restart()
-            }
-
-            Keys.onDownPressed: {
-                volControl.decrease()
-                tooltipShower.restart()
-            }
-
-            Keys.onRightPressed: {
-                var right = widgetfscope.KeyNavigation.right
-                while (right && (!right.enabled || !right.visible)) {
-                    right = right.KeyNavigation ? right.KeyNavigation.right : undefined
-                }
-                if (right)
-                    right.forceActiveFocus()
-                else if (!!rightAction)
-                    rightAction()
-            }
-
-            Keys.onLeftPressed: {
-                volumeBtn.forceActiveFocus()
-                event.accepted = true
             }
 
             property color sliderColor: (volControl.position > fullvolpos) ? colors.volmax : widgetfscope.color

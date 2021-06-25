@@ -174,6 +174,7 @@ Item{
                 if (KeyHelper.matchOk(event) ) {
                     event.accepted = true
                 }
+                Navigation.defaultKeyAction(event)
             }
             Keys.onReleased: {
                 if (!event.accepted && KeyHelper.matchOk(event))
@@ -825,6 +826,7 @@ Item{
                 if (KeyHelper.matchOk(event) ) {
                     event.accepted = true
                 }
+                Navigation.defaultKeyAction(event)
             }
             Keys.onReleased: {
                 if (!event.accepted && KeyHelper.matchOk(event))

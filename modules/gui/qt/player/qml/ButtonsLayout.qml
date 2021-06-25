@@ -54,12 +54,6 @@ FocusScope {
 
     visible: model.count > 0
 
-    Keys.priority: Keys.AfterItem
-    Keys.onPressed: {
-        if (!event.accepted)
-            buttonsLayout.Navigation.defaultKeyAction(event)
-    }
-
     RowLayout {
         id: buttonrow
         property bool _focusGiven: false
@@ -112,14 +106,11 @@ FocusScope {
                                 buttonloader.item.colorFocus = Qt.binding(function() { return colors.bgFocus; })
                     }
 
-                    if (index > 0)
+                    buttonloader.item.Navigation.parentItem = buttonsLayout
+                    if (index > 0) {
                         buttonloader.item.Navigation.leftItem = buttonrow.children[index-1].item
-
-                    if (buttonloader.item.Navigation.rightAction !== null)
-                        buttonloader.item.Navigation.rightAction = buttonsLayout.Navigation.rightAction
-
-                    if (buttonloader.item.Navigation.leftAction !== null)
-                        buttonloader.item.Navigation.leftAction = buttonsLayout.Navigation.leftAction
+                        buttonrow.children[index-1].item.Navigation.rightItem = buttonloader.item
+                   }
 
                     if (buttonloader.item.extraWidth !== undefined && buttonsLayout.extraWidth !== undefined) {
                         buttonsLayout.expandableCount++
