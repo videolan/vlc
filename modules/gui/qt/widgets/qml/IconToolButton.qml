@@ -127,4 +127,7 @@ ToolButton {
         implicitHeight: control.size
         implicitWidth : control.size
     }
+
+    Keys.priority: Keys.AfterItem
+    Keys.onPressed: Navigation.defaultKeyAction(event)
 }

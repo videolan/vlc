@@ -20,6 +20,8 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -38,6 +40,9 @@ T.SpinBox {
     padding: VLCStyle.dp(6, VLCStyle.scale)
     font.pixelSize: VLCStyle.fontSize_normal
     implicitHeight: VLCStyle.fontHeight_normal + control.topPadding + control.bottomPadding
+
+    Keys.priority: Keys.AfterItem
+    Keys.onPressed: Navigation.defaultKeyAction(event)
 
     contentItem: TextInput {
         z: 2

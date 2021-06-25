@@ -18,6 +18,8 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
+import org.videolan.vlc 0.1
+
 import "qrc:///style/"
 
 ComboBox {
@@ -29,6 +31,9 @@ ComboBox {
     property color color: VLCStyle.colors.buttonText
     property color bgColor: VLCStyle.colors.button
     property color borderColor: VLCStyle.colors.buttonBorder
+
+    Keys.priority: Keys.AfterItem
+    Keys.onPressed: Navigation.defaultKeyAction(event)
 
     delegate: ItemDelegate {
         width: control.width

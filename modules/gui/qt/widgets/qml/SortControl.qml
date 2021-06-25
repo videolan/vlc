@@ -90,6 +90,10 @@ FocusScope {
             else
                 popup._open()
         }
+
+        Navigation.parentItem: root
+        Keys.priority: Keys.AfterItem
+        Keys.onPressed: Navigation.defaultKeyAction(event)
     }
 
     Popup {

@@ -21,6 +21,8 @@ import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -40,6 +42,9 @@ T.TabButton {
 
     property string iconTxt: ""
     property bool selected: false
+
+    Keys.priority: Keys.AfterItem
+    Keys.onPressed: Navigation.defaultKeyAction(event)
 
     background: Widgets.AnimatedBackground {
         height: control.height

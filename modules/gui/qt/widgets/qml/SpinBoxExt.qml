@@ -19,6 +19,8 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
+import org.videolan.vlc 0.1
+
 import "qrc:///style/"
 
 SpinBox{
@@ -28,6 +30,9 @@ SpinBox{
     property color textColor: VLCStyle.colors.buttonText
     property color bgColor: VLCStyle.colors.bg
     property color borderColor:  VLCStyle.colors.buttonBorder
+
+    Keys.priority: Keys.AfterItem
+    Keys.onPressed: Navigation.defaultKeyAction(event)
 
     background: Rectangle {
         implicitWidth: VLCStyle.dp(4, VLCStyle.scale)
