@@ -53,7 +53,7 @@ FocusScope {
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: root.Navigation.defaultKeyAction(event)
-    Navigation.onActionCancel: history.previous()
+    Navigation.cancelAction: function() { history.previous() }
 
     onActiveFocusChanged: if (activeFocus) trackPositionSlider.forceActiveFocus()
 

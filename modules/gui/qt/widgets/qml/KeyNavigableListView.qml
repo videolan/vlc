@@ -151,39 +151,6 @@ FocusScope {
         boundsBehavior: Flickable.StopAtBounds
         boundsMovement :Flickable.StopAtBounds
 
-        Connections {
-            target: view.currentItem.Navigation
-            ignoreUnknownSignals: true
-            onActionRight: if ( !listview_id.keyNavigationWraps ) listview_id.Navigation.rightAction();
-            onActionLeft: if ( !listview_id.keyNavigationWraps ) listview_id.Navigation.leftAction();
-            onActionDown: {
-                if ( listview_id.keyNavigationWraps )
-                    return
-
-                if ( currentIndex !== modelCount - 1 ) {
-                    var newIndex = currentIndex + 1
-                    var oldIndex = currentIndex
-                    currentIndex = newIndex
-                    selectionUpdated(0, oldIndex, newIndex)
-                } else {
-                    listview_id.Navigation.downAction()
-                }
-            }
-            onActionUp: {
-                if ( listview_id.keyNavigationWraps )
-                    return
-
-                if ( currentIndex !== 0 ) {
-                    var newIndex = currentIndex - 1
-                    var oldIndex = currentIndex
-                    currentIndex = newIndex
-                    selectionUpdated(0, oldIndex, newIndex)
-                } else {
-                    listview_id.Navigation.upAction()
-                }
-            }
-        }
-
         Keys.onPressed: {
             var newIndex = -1
 

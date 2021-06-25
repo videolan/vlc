@@ -79,16 +79,9 @@ public:
 private:
     void defaultNavigationGeneric(QJSValue& jsCallback, QQuickItem* directionItem,
                                   void (NavigationAttached::* defaultNavFn)(void),
-                                  void (NavigationAttached::* actionSignal)(void),
                                   Qt::FocusReason reason);
 
 signals:
-    void actionUp();
-    void actionDown();
-    void actionLeft();
-    void actionRight();
-    void actionCancel();
-
     void navigableChanged();
     void parentItemChanged();
     void upItemChanged();

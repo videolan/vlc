@@ -95,7 +95,6 @@ NavigationAttached::NavigationAttached(QObject *parent)
 
 void NavigationAttached::defaultNavigationGeneric(QJSValue& jsCallback, QQuickItem* directionItem,
                                         void (NavigationAttached::* defaultNavFn)(void),
-                                        void (NavigationAttached::* actionSignal)(void),
                                         Qt::FocusReason reason)
 {
     if (jsCallback.isCallable()) {
@@ -120,17 +119,12 @@ void NavigationAttached::defaultNavigationGeneric(QJSValue& jsCallback, QQuickIt
         NavigationAttached* parentNav = qobject_cast<NavigationAttached*>(qmlAttachedPropertiesObject<NavigationAttached>(m_parentItem));
         (parentNav->*defaultNavFn)();
     }
-    else
-    {
-        emit (this->*actionSignal)();
-    }
 }
 
 void NavigationAttached::defaultNavigationUp()
 {
     defaultNavigationGeneric(m_upAction, m_upItem,
                              &NavigationAttached::defaultNavigationUp,
-                             &NavigationAttached::actionUp,
                              Qt::BacktabFocusReason);
 }
 
@@ -139,7 +133,6 @@ void NavigationAttached::defaultNavigationDown()
 {
     defaultNavigationGeneric(m_downAction, m_downItem,
                              &NavigationAttached::defaultNavigationDown,
-                             &NavigationAttached::actionDown,
                              Qt::TabFocusReason);
 }
 
@@ -147,7 +140,6 @@ void NavigationAttached::defaultNavigationLeft()
 {
     defaultNavigationGeneric(m_leftAction, m_leftItem,
                              &NavigationAttached::defaultNavigationLeft,
-                             &NavigationAttached::actionLeft,
                              Qt::BacktabFocusReason);
 }
 
@@ -156,7 +148,6 @@ void NavigationAttached::defaultNavigationRight()
 {
     defaultNavigationGeneric(m_rightAction, m_rightItem,
                              &NavigationAttached::defaultNavigationRight,
-                             &NavigationAttached::actionRight,
                              Qt::TabFocusReason);
 }
 
@@ -164,7 +155,6 @@ void NavigationAttached::defaultNavigationCancel()
 {
     defaultNavigationGeneric(m_cancelAction, m_cancelItem,
                              &NavigationAttached::defaultNavigationCancel,
-                             &NavigationAttached::actionCancel,
                              Qt::OtherFocusReason);
 }
 
