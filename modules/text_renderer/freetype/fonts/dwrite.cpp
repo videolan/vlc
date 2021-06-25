@@ -239,7 +239,7 @@ class TextSource : public IDWriteTextAnalysisSource
     IDWriteNumberSubstitution   *mp_substitution;
     wchar_t                      mpwsz_text[ 3 ];
     uint32_t                     mi_text_length;
-    ULONG                        ml_ref_count;
+    LONG                         ml_ref_count;
 
 public:
     TextSource( IDWriteNumberSubstitution *p_substitution,
