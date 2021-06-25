@@ -1201,7 +1201,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     {
         D3DLOCKED_RECT d3drect;
         surface = sys->dx_render;
-        HRESULT hr = IDirect3DSurface9_LockRect(surface, &d3drect, NULL, 0);
+        hr = IDirect3DSurface9_LockRect(surface, &d3drect, NULL, 0);
         if (unlikely(FAILED(hr))) {
             msg_Err(vd, "failed to lock surface");
             return;
@@ -1225,7 +1225,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
                 surface = picsys->surface;
             else
             {
-                HRESULT hr;
                 RECT visibleSource;
                 visibleSource.left = 0;
                 visibleSource.top = 0;
