@@ -208,7 +208,6 @@
         <file alias="TableViewDelegate.qml">widgets/qml/TableViewDelegate.qml</file>
         <file alias="TableColumns.qml">widgets/qml/TableColumns.qml</file>
         <file alias="TransparentSpinBox.qml">widgets/qml/TransparentSpinBox.qml</file>
-        <file alias="NavigableFocusScope.qml">widgets/qml/NavigableFocusScope.qml</file>
         <file alias="ImageToolButton.qml">widgets/qml/ImageToolButton.qml</file>
         <file alias="TextToolButton.qml">widgets/qml/TextToolButton.qml</file>
         <file alias="IconToolButton.qml">widgets/qml/IconToolButton.qml</file>

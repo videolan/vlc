@@ -794,7 +794,6 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/MenuItemExt.qml \
 	gui/qt/widgets/qml/MenuLabel.qml \
 	gui/qt/widgets/qml/NavigableCol.qml \
-	gui/qt/widgets/qml/NavigableFocusScope.qml \
 	gui/qt/widgets/qml/NavigableRow.qml \
 	gui/qt/widgets/qml/PlayCover.qml \
 	gui/qt/widgets/qml/RoundButton.qml \
