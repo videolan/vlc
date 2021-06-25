@@ -38,7 +38,7 @@
 struct vlc_avcodec_fourcc
 {
     vlc_fourcc_t i_fourcc;
-    unsigned i_codec;
+    enum AVCodecID i_codec;
 };
 
 /*
@@ -535,7 +535,7 @@ static const struct vlc_avcodec_fourcc spu_codecs[] =
 };
 
 bool GetFfmpegCodec( enum es_format_category_e cat, vlc_fourcc_t i_fourcc,
-                     unsigned *pi_ffmpeg_codec, const char **ppsz_name )
+                     enum AVCodecID *pi_ffmpeg_codec, const char **ppsz_name )
 {
     const struct vlc_avcodec_fourcc *base;
     size_t count;
@@ -575,7 +575,7 @@ bool GetFfmpegCodec( enum es_format_category_e cat, vlc_fourcc_t i_fourcc,
     return false;
 }
 
-vlc_fourcc_t GetVlcFourcc( unsigned i_ffmpeg_codec )
+vlc_fourcc_t GetVlcFourcc( enum AVCodecID i_ffmpeg_codec )
 {
     for( size_t i = 0; i < ARRAY_SIZE(video_codecs); i++ )
     {

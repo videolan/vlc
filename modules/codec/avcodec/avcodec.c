@@ -202,7 +202,7 @@ vlc_module_end ()
 AVCodecContext *ffmpeg_AllocContext( decoder_t *p_dec,
                                      const AVCodec **restrict codecp )
 {
-    unsigned i_codec_id;
+    enum AVCodecID i_codec_id;
     const char *psz_namecodec;
     const AVCodec *p_codec = NULL;
 

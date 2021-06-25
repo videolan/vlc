@@ -89,7 +89,7 @@ int avparser_OpenPacketizer( vlc_object_t *p_this )
     if( p_dec->fmt_in.i_codec != VLC_CODEC_VP9 )
         return VLC_EGENERIC;
 
-    unsigned i_avcodec_id;
+    enum AVCodecID i_avcodec_id;
 
     if( !GetFfmpegCodec( p_dec->fmt_in.i_cat, p_dec->fmt_in.i_codec,
                          &i_avcodec_id, NULL ) )

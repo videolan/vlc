@@ -297,7 +297,7 @@ int InitVideoEnc( vlc_object_t *p_this )
     encoder_sys_t *p_sys;
     AVCodecContext *p_context;
     AVCodec *p_codec = NULL;
-    unsigned i_codec_id;
+    enum AVCodecID i_codec_id;
     const char *psz_namecodec;
     float f_val;
     char *psz_val;
