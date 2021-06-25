@@ -274,9 +274,9 @@ virtual_segment_c::virtual_segment_c( matroska_segment_c & main_segment, std::ve
         virtual_edition_c * p_vedition = new virtual_edition_c( main_segment.stored_editions[i], main_segment, p_opened_segments );
 
         bool b_has_translate = false;
-        for (size_t i=0; i < p_vedition->vchapters.size(); i++)
+        for (size_t j=0; i < p_vedition->vchapters.size(); i++)
         {
-            if ( p_vedition->vchapters[i]->segment.translations.size() != 0 )
+            if ( p_vedition->vchapters[j]->segment.translations.size() != 0 )
             {
                 b_has_translate = true;
                 break;

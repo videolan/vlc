@@ -514,9 +514,9 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
             add_cluster(ms.cluster);
             break;
         }
-        else if( MKV_CHECKED_PTR_DECL( p_tc, EbmlCrc32, el ) )
+        else if( MKV_CHECKED_PTR_DECL( crc, EbmlCrc32, el ) )
         {
-            p_tc->ReadData( ms.es.I_O(), SCOPE_ALL_DATA ); /* avoid a skip that may fail */
+            crc->ReadData( ms.es.I_O(), SCOPE_ALL_DATA ); /* avoid a skip that may fail */
         }
     }
 

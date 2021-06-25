@@ -57,7 +57,6 @@ namespace {
       void insert_glob (ProcessorEntry const& data) {
         std::istringstream iss (data.first);
         std::vector<std::string> parts;
-        std::string s1;
 
         for (std::string s1; std::getline (iss, s1, '*'); )
           parts.push_back (s1);
