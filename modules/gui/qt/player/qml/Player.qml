@@ -456,8 +456,8 @@ FocusScope {
                 focus: visible
                 spacing: VLCStyle.margin_xxsmall
                 Navigation.parentItem: rootPlayer
-                KeyNavigation.up: topcontrolView
-                KeyNavigation.down: controlBarView
+                Navigation.upItem: topcontrolView
+                Navigation.downItem: controlBarView
 
                 model: ObjectModel {
                     Widgets.IconToolButton {

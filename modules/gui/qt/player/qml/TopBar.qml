@@ -43,8 +43,6 @@ FocusScope{
     signal requestLockUnlockAutoHide(bool lock, var source)
 
     implicitHeight: topcontrollerMouseArea.implicitHeight
-    Keys.priority: Keys.AfterItem
-    Keys.onPressed: topFocusScope.Navigation.defaultKeyAction(event)
 
     Component.onCompleted: {
         // if groupAlignment == Horizontal, then onGroupAlignment isn't called when Component is created
@@ -149,7 +147,8 @@ FocusScope{
             color: topFocusScope.colors.playerFg
             colorFocus: topFocusScope.colors.bgFocus
             focus: true
-            KeyNavigation.right: menuSelector
+            Navigation.parentItem: topFocusScope
+            Navigation.rightItem: menuSelector
             onClicked: {
                 if (mainInterface.hasEmbededVideo && !mainInterface.canShowVideoPIP) {
                    mainPlaylistController.stop()
@@ -259,8 +258,9 @@ FocusScope{
 
             onClicked: contextMenu.popup(this.mapToGlobal(0, height))
 
-            KeyNavigation.left: backBtn
-            KeyNavigation.right: playlistButton
+            Navigation.parentItem: topFocusScope
+            Navigation.leftItem: backBtn
+            Navigation.rightItem: playlistButton
 
             QmlGlobalMenu {
                 id: contextMenu
@@ -285,7 +285,8 @@ FocusScope{
 
             property bool acceptFocus: true
 
-            KeyNavigation.left: menuSelector
+            Navigation.parentItem: topFocusScope
+            Navigation.leftItem: menuSelector
             onClicked: tooglePlaylistVisibility()
         }
     }
