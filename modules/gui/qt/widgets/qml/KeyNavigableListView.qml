@@ -89,7 +89,7 @@ FocusScope {
         view.contentX += (Math.min(view.width, (view.contentWidth - view.width - view.contentX ) ))
     }
     function prevPage() {
-        view.contentX -= Math.min(view.width,view.contentX )
+        view.contentX -= Math.min(view.width,view.contentX - view.originX)
     }
 
     function positionViewAtIndex(index, mode) {
