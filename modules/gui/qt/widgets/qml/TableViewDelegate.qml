@@ -25,9 +25,7 @@ import "qrc:///style/"
 Widgets.AnimatedBackground {
     id: delegate
 
-    //---------------------------------------------------------------------------------------------
     // Properties
-    //---------------------------------------------------------------------------------------------
 
     property var rowModel: model
 
@@ -37,9 +35,7 @@ Widgets.AnimatedBackground {
 
     property int _modifiersOnLastPress: Qt.NoModifier
 
-    //---------------------------------------------------------------------------------------------
     // Settings
-    //---------------------------------------------------------------------------------------------
 
     width: view.width
 
@@ -50,14 +46,15 @@ Widgets.AnimatedBackground {
     animationDuration: 140
 
     backgroundColor: {
-        if (delegate.selected || hoverArea.containsMouse)
-            return VLCStyle.colors.bgHover
-        return VLCStyle.colors.setColorAlpha(VLCStyle.colors.bgHover)
+        if (delegate.selected)
+            return VLCStyle.colors.gridSelect;
+        else if (hoverArea.containsMouse)
+            return VLCStyle.colors.listHover;
+        else
+            return VLCStyle.colors.setColorAlpha(VLCStyle.colors.listHover, 0);
     }
 
-    //---------------------------------------------------------------------------------------------
     // Connections
-    //---------------------------------------------------------------------------------------------
 
     Connections {
         target: selectionDelegateModel
@@ -69,14 +66,11 @@ Widgets.AnimatedBackground {
         }
     }
 
-    //---------------------------------------------------------------------------------------------
     // Childs
-    //---------------------------------------------------------------------------------------------
 
     MouseArea {
         id: hoverArea
 
-        //-----------------------------------------------------------------------------------------
         // Settings
 
         anchors.fill: parent
@@ -91,7 +85,6 @@ Widgets.AnimatedBackground {
 
         drag.axis: Drag.XAndYAxis
 
-        //-----------------------------------------------------------------------------------------
         // Events
 
         onPressed: _modifiersOnLastPress = mouse.modifiers
@@ -146,7 +139,6 @@ Widgets.AnimatedBackground {
             root.dragItem.Drag.active = drag.active;
         }
 
-        //-----------------------------------------------------------------------------------------
         // Childs
 
         Row {
