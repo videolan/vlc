@@ -103,7 +103,7 @@ typedef struct
 
     /* VA API */
     vlc_va_t *p_va; /* Protected by lock */
-    enum PixelFormat pix_fmt;
+    enum AVPixelFormat pix_fmt;
     int profile;
     int level;
     vlc_video_context *vctx_out;
@@ -122,8 +122,8 @@ typedef struct
  *****************************************************************************/
 static void ffmpeg_InitCodec      ( decoder_t * );
 static int lavc_GetFrame(struct AVCodecContext *, AVFrame *, int);
-static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *,
-                                          const enum PixelFormat * );
+static enum AVPixelFormat ffmpeg_GetFormat( AVCodecContext *,
+                                          const enum AVPixelFormat * );
 static int  DecodeVideo( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
@@ -1538,15 +1538,15 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     return ret;
 }
 
-static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
-                                          const enum PixelFormat *pi_fmt )
+static enum AVPixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
+                                          const enum AVPixelFormat *pi_fmt )
 {
     decoder_t *p_dec = p_context->opaque;
     decoder_sys_t *p_sys = p_dec->p_sys;
     video_format_t fmt;
 
     /* Enumerate available formats */
-    enum PixelFormat swfmt = avcodec_default_get_format(p_context, pi_fmt);
+    enum AVPixelFormat swfmt = avcodec_default_get_format(p_context, pi_fmt);
     bool can_hwaccel = false;
 
     for (size_t i = 0; pi_fmt[i] != AV_PIX_FMT_NONE; i++)
@@ -1624,7 +1624,7 @@ no_reuse:
 
     vlc_mutex_lock(&p_sys->lock);
 
-    static const enum PixelFormat hwfmts[] =
+    static const enum AVPixelFormat hwfmts[] =
     {
 #ifdef _WIN32
         AV_PIX_FMT_D3D11VA_VLD,
@@ -1639,7 +1639,7 @@ no_reuse:
 
     for( size_t i = 0; hwfmts[i] != AV_PIX_FMT_NONE; i++ )
     {
-        enum PixelFormat hwfmt = AV_PIX_FMT_NONE;
+        enum AVPixelFormat hwfmt = AV_PIX_FMT_NONE;
         for( size_t j = 0; hwfmt == AV_PIX_FMT_NONE && pi_fmt[j] != AV_PIX_FMT_NONE; j++ )
             if( hwfmts[i] == pi_fmt[j] )
                 hwfmt = hwfmts[i];

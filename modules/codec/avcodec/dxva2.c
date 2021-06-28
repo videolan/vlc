@@ -49,7 +49,7 @@ struct dxva2_pic_context
 
 #include "directx_va.h"
 
-static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat hwfmt, const AVPixFmtDescriptor *,
+static int Open(vlc_va_t *, AVCodecContext *, enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *,
                 const es_format_t *, vlc_decoder_device *, video_format_t *, vlc_video_context **);
 
 vlc_module_begin()
@@ -232,7 +232,7 @@ static void Close(vlc_va_t *va)
 
 static const struct vlc_va_operations ops = { Get, Close, };
 
-static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const AVPixFmtDescriptor *desc,
+static int Open(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *desc,
                 const es_format_t *fmt_in, vlc_decoder_device *dec_device,
                 video_format_t *fmt_out, vlc_video_context **vtcx_out)
 {

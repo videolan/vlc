@@ -96,11 +96,6 @@
 # define FF_API_AUDIOCONVERT 1
 #endif
 
-/* libavutil/pixfmt.h */
-#ifndef PixelFormat
-# define PixelFormat AVPixelFormat
-#endif
-
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
 # include <libavformat/avformat.h>
 

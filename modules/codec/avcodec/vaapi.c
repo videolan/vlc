@@ -237,7 +237,7 @@ static void VAAPISetupAVCodecContext(void *opaque, AVCodecContext *avctx)
     avctx->hwaccel_context = &sys->hw_ctx;
 }
 
-static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const AVPixFmtDescriptor *desc,
+static int Create(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *desc,
                   const es_format_t *fmt_in, vlc_decoder_device *dec_device,
                   video_format_t *fmt_out, vlc_video_context **vtcx_out)
 {

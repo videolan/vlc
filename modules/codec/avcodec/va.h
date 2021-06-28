@@ -44,7 +44,7 @@ struct vlc_va_t {
 };
 
 typedef int (*vlc_va_open)(vlc_va_t *, AVCodecContext *,
-                           enum PixelFormat hwfmt, const AVPixFmtDescriptor *,
+                           enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *,
                            const es_format_t *, vlc_decoder_device *,
                            video_format_t *, vlc_video_context **);
 
@@ -63,7 +63,7 @@ typedef int (*vlc_va_open)(vlc_va_t *, AVCodecContext *,
  * @param swfmt the software pixel format
  * @return true if the hardware acceleration should be supported
  */
-bool vlc_va_MightDecode(enum PixelFormat hwfmt, enum PixelFormat swfmt);
+bool vlc_va_MightDecode(enum AVPixelFormat hwfmt, enum AVPixelFormat swfmt);
 
 /**
  * Creates an accelerated video decoding back-end for libavcodec.
@@ -72,7 +72,7 @@ bool vlc_va_MightDecode(enum PixelFormat hwfmt, enum PixelFormat swfmt);
  * @return a new VLC object on success, NULL on error.
  */
 vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *,
-                     enum PixelFormat hwfmt, const AVPixFmtDescriptor *,
+                     enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *,
                      const es_format_t *fmt, vlc_decoder_device *device,
                      video_format_t *, vlc_video_context **vtcx_out);
 

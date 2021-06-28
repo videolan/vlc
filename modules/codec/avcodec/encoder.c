@@ -557,7 +557,7 @@ int InitVideoEnc( vlc_object_t *p_this )
                 AV_PIX_FMT_RGB24,
             };
             bool found = false;
-            const enum PixelFormat *p = p_codec->pix_fmts;
+            const enum AVPixelFormat *p = p_codec->pix_fmts;
             for( ; !found && *p != -1; p++ )
             {
                 for( size_t i = 0; i < ARRAY_SIZE(vlc_pix_fmts); ++i )

@@ -30,7 +30,7 @@
 #include <libavcodec/avcodec.h>
 #include "va.h"
 
-bool vlc_va_MightDecode(enum PixelFormat hwfmt, enum PixelFormat swfmt)
+bool vlc_va_MightDecode(enum AVPixelFormat hwfmt, enum AVPixelFormat swfmt)
 {
     switch (hwfmt)
     {
@@ -100,7 +100,7 @@ bool vlc_va_MightDecode(enum PixelFormat hwfmt, enum PixelFormat swfmt)
 }
 
 vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
-                     enum PixelFormat hwfmt, const AVPixFmtDescriptor *src_desc,
+                     enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *src_desc,
                      const es_format_t *fmt_in, vlc_decoder_device *device,
                      video_format_t *fmt_out, vlc_video_context **vtcx_out)
 {

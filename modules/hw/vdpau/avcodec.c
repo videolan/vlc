@@ -147,7 +147,7 @@ const struct vlc_video_context_operations vdpau_vctx_ops = {
     DestroyVDPAUVideoContext,
 };
 
-static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat hwfmt, const AVPixFmtDescriptor *desc,
+static int Open(vlc_va_t *va, AVCodecContext *avctx, enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *desc,
                 const es_format_t *fmt_in, vlc_decoder_device *dec_device,
                 video_format_t *fmt_out, vlc_video_context **vtcx_out)
 {
