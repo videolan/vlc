@@ -38,26 +38,20 @@ Rectangle {
 
     property alias hovered: mouseArea.containsMouse
 
-    border.width: VLCStyle.dp(1)
-    border.color: {
-        if (activeFocus && (listView.mode === PlaylistListView.Mode.Select))
-            colors.caption
-        else
-            "transparent"
-    }
+    height: artworkItem.height * 1.5
 
     color: {
-        if ((selected && activeFocus && listView.mode !== PlaylistListView.Mode.Select) || (hovered && selected))
-            colors.plItemFocused
+        if (selected)
+            return colors.gridSelect;
         else if (hovered)
-            colors.plItemHovered
-        else if (selected)
-            colors.plItemSelected
+            return colors.listHover;
         else
-            "transparent"
+            return "transparent";
     }
 
-    height: artworkItem.height * 1.5
+    border.width: (activeFocus) ? VLCStyle.focus_border : 0
+
+    border.color: VLCStyle.colors.bgFocus
 
     onHoveredChanged: {
         if(hovered)
