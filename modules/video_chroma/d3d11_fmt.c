@@ -161,7 +161,7 @@ static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc
         len = sizeof(szData);
         ret = RegQueryValueEx( hKey, TEXT("MatchingDeviceId"), NULL, NULL, (LPBYTE) &szData, &len );
         if ( ret == ERROR_SUCCESS ) {
-            if (wcsncmp(lookup, szData, wcslen(lookup)) == 0)
+            if (_wcsnicmp(lookup, szData, wcslen(lookup)) == 0)
                 return hKey;
             msg_Dbg(obj, "different %d device %ls vs %ls", i, lookup, szData);
         }
