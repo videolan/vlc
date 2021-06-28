@@ -607,7 +607,7 @@ static int Demux( demux_t * p_demux )
         }
     }
 
-    if( p_sys->b_preparsing_done )
+    if( p_sys->b_preparsing_done && p_sys->b_es_created )
         Ogg_OutputQueues( p_demux, false );
 
     return VLC_DEMUXER_SUCCESS;
