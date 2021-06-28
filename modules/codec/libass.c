@@ -76,6 +76,7 @@ static void Flush( decoder_t * );
 /* */
 typedef struct
 {
+    vlc_tick_t     i_last_pts;
     vlc_tick_t     i_max_stop;
 
     /* The following fields of decoder_sys_t are shared between decoder and spu units */
@@ -107,8 +108,6 @@ static void SubpictureDestroy( subpicture_t * );
 typedef struct
 {
     decoder_sys_t *p_dec_sys;
-    void          *p_subs_data;
-    int           i_subs_len;
     vlc_tick_t    i_pts;
 
     ASS_Image     *p_img;
@@ -148,7 +147,8 @@ static int Create( vlc_object_t *p_this )
     /* */
     vlc_mutex_init( &p_sys->lock );
     p_sys->i_refcount = 1;
-    memset( &p_sys->fmt, 0, sizeof(p_sys->fmt) );
+    video_format_Init( &p_sys->fmt, 0 );
+    p_sys->i_last_pts = VLC_TICK_INVALID;
     p_sys->i_max_stop = VLC_TICK_INVALID;
     p_sys->p_library  = NULL;
     p_sys->p_renderer = NULL;
@@ -332,6 +332,7 @@ static void Flush( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     p_sys->i_max_stop = VLC_TICK_INVALID;
+    p_sys->i_last_pts = VLC_TICK_INVALID;
 }
 
 /****************************************************************************
@@ -359,62 +360,59 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
     }
 
-    libass_spu_updater_sys_t *p_spu_sys = malloc( sizeof(*p_spu_sys) );
-    if( !p_spu_sys )
+    if( p_block->i_pts != p_sys->i_last_pts )
     {
-        block_Release( p_block );
-        return VLCDEC_SUCCESS;
+        libass_spu_updater_sys_t *p_spu_sys = malloc( sizeof(*p_spu_sys) );
+        if( !p_spu_sys )
+        {
+            block_Release( p_block );
+            return VLCDEC_SUCCESS;
+        }
+
+        subpicture_updater_t updater = {
+            .pf_validate = SubpictureValidate,
+            .pf_update   = SubpictureUpdate,
+            .pf_destroy  = SubpictureDestroy,
+            .p_sys       = p_spu_sys,
+        };
+
+        p_spu = decoder_NewSubpicture( p_dec, &updater );
+        if( !p_spu )
+        {
+            msg_Warn( p_dec, "can't get spu buffer" );
+            free( p_spu_sys );
+            block_Release( p_block );
+            return VLCDEC_SUCCESS;
+        }
+
+        p_spu_sys->p_img = NULL;
+        p_spu_sys->p_dec_sys = p_sys;
+        p_spu_sys->i_pts = p_block->i_pts;
+        p_spu->i_start = p_block->i_pts;
+        p_spu->i_stop = __MAX( p_sys->i_max_stop, p_block->i_pts + p_block->i_length );
+        p_spu->b_ephemer = true;
+        p_spu->b_absolute = true;
+
+        p_sys->i_max_stop = p_spu->i_stop;
+
+        DecSysHold( p_sys ); /* Keep a reference for the returned subpicture */
     }
 
-    subpicture_updater_t updater = {
-        .pf_validate = SubpictureValidate,
-        .pf_update   = SubpictureUpdate,
-        .pf_destroy  = SubpictureDestroy,
-        .p_sys       = p_spu_sys,
-    };
-    p_spu = decoder_NewSubpicture( p_dec, &updater );
-    if( !p_spu )
-    {
-        msg_Warn( p_dec, "can't get spu buffer" );
-        free( p_spu_sys );
-        block_Release( p_block );
-        return VLCDEC_SUCCESS;
-    }
-
-    p_spu_sys->p_img = NULL;
-    p_spu_sys->p_dec_sys = p_sys;
-    p_spu_sys->i_subs_len = p_block->i_buffer;
-    p_spu_sys->p_subs_data = malloc( p_block->i_buffer );
-    p_spu_sys->i_pts = p_block->i_pts;
-    if( !p_spu_sys->p_subs_data )
-    {
-        subpicture_Delete( p_spu );
-        block_Release( p_block );
-        return VLCDEC_SUCCESS;
-    }
-    memcpy( p_spu_sys->p_subs_data, p_block->p_buffer,
-            p_block->i_buffer );
-
-    p_spu->i_start = p_block->i_pts;
-    p_spu->i_stop = __MAX( p_sys->i_max_stop, p_block->i_pts + p_block->i_length );
-    p_spu->b_ephemer = true;
-    p_spu->b_absolute = true;
-
-    p_sys->i_max_stop = p_spu->i_stop;
+    p_sys->i_last_pts = p_block->i_pts;
 
     vlc_mutex_lock( &p_sys->lock );
     if( p_sys->p_track )
     {
-        ass_process_chunk( p_sys->p_track, p_spu_sys->p_subs_data, p_spu_sys->i_subs_len,
+        ass_process_chunk( p_sys->p_track,(void *) p_block->p_buffer, p_block->i_buffer,
                            MS_FROM_VLC_TICK( p_block->i_pts ), MS_FROM_VLC_TICK( p_block->i_length ) );
     }
     vlc_mutex_unlock( &p_sys->lock );
 
-    DecSysHold( p_sys ); /* Keep a reference for the returned subpicture */
-
     block_Release( p_block );
 
-    decoder_QueueSub( p_dec, p_spu );
+    if( p_spu )
+        decoder_QueueSub( p_dec, p_spu );
+
     return VLCDEC_SUCCESS;
 }
 
@@ -533,7 +531,6 @@ static void SubpictureDestroy( subpicture_t *p_subpic )
     libass_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
 
     DecSysRelease( p_spusys->p_dec_sys );
-    free( p_spusys->p_subs_data );
     free( p_spusys );
 }
 
