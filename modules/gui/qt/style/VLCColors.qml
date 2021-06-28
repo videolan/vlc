@@ -67,33 +67,55 @@ Item {
 
     property color bgFocus: (isThemeDark) ? white : black
 
-    //---------------------------------------------------------------------------------------------
     // Button
 
     property color button: systemPalette.button
 
     property color buttonHover: (isThemeDark) ? "#303030" : "#f2f2f2"
 
-    property color buttonText     : systemPalette.buttonText
+    property color buttonText: systemPalette.buttonText
     property color buttonTextHover: bgFocus
 
     property color buttonBorder: blendColors(systemPalette.button, systemPalette.buttonText, 0.8)
 
-    //---------------------------------------------------------------------------------------------
-    // DropDown
+    // ButtonBanner (BannerTabButton)
 
-    property color dropDown: (isThemeDark) ? "#272727" : "#e9e9e9"
+    property color buttonBannerDark: "#a6a6a6"
 
-    // FIXME: We might want another color for this.
-    property color dropDownBorder: text
+    property color buttonBanner: (isThemeDark) ? buttonBannerDark : "#666666"
 
-    //---------------------------------------------------------------------------------------------
+    // ButtonPrimary (ActionButtonPrimary)
+
+    property color buttonPrimaryHover: (isThemeDark) ? "#e67A00" : "#e65609"
+
+    // ButtonPlayer (IconControlButton)
+
+    property color buttonPlayer: (isThemeDark) ? "#e5e5e5" : "#484848"
+
+    // ButtonPlay (ControlButtons)
+
+    property color buttonPlayA: "#f89a06"
+    property color buttonPlayB: "#e25b01"
+
+    property color buttonPlayIcon: "#333333"
+
+    // GridItem
+
+    property color gridSelect: (isThemeDark) ? "#303030" : "#e5e5e5"
+
+    // ListItem
+
+    property color listHover: (isThemeDark) ? "#272727" : "#e9e9e9"
+
+    // TrackItem (CheckedDelegate)
+
+    property color trackItem: "#303030"
+    property color trackItemHover: "#2a2a2a"
+
     // TextField
 
-    property color textField     : (isThemeDark) ? "#6f6f6f" : "#999999"
+    property color textField: (isThemeDark) ? "#6f6f6f" : "#999999"
     property color textFieldHover: (isThemeDark) ? "#b7b7b7" : "#4c4c4c"
-
-    //---------------------------------------------------------------------------------------------
 
     property color icon: isThemeDark ? white : "#616161"
 
@@ -136,7 +158,7 @@ Item {
     property color tooltipColor: systemPalette.tooltip
 
     //vlc orange
-    property color accent: (isThemeDark) ? "ff8800" : "#ff610a"
+    property color accent: (isThemeDark) ? "#ff8800" : "#ff610a"
 
     property color accentText: "#ffffff";
 
