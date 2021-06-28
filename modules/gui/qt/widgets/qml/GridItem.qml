@@ -191,8 +191,8 @@ MouseArea {
         active: root.activeFocus
 
         backgroundColor: root.selected
-                         ? VLCStyle.colors.bgHover
-                         : VLCStyle.colors.setColorAlpha(VLCStyle.colors.bgHover, 0)
+                         ? VLCStyle.colors.gridSelect
+                         : VLCStyle.colors.setColorAlpha(VLCStyle.colors.gridSelect, 0)
 
         visible: backgroundAnimationRunning || borderColorAnimationRunning || background.active || root.selected
     }
