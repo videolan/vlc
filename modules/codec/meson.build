@@ -591,6 +591,9 @@ if avcodec_dep.found()
                 'avcodec/audio.c',
                 'avcodec/va.c',
                 'avcodec/avcodec.c',
+                '../packetizer/av1_obu.c',
+                '../packetizer/av1_obu.h',
+                '../packetizer/av1.h',
                 avcodec_extra_sources
         ),
         'dependencies' : [avutil_dep, avcodec_dep],
