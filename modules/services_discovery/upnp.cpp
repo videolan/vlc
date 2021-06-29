@@ -174,7 +174,7 @@ vlc_module_begin()
         set_callbacks(DLNA::OpenSout, DLNA::CloseSout)
 
         add_string(SOUT_CFG_PREFIX "ip", NULL, IP_ADDR_TEXT, IP_ADDR_LONGTEXT)
-        add_integer(SOUT_CFG_PREFIX "port", NULL, PORT_TEXT, PORT_LONGTEXT)
+        add_integer(SOUT_CFG_PREFIX "port", 0, PORT_TEXT, PORT_LONGTEXT)
         add_integer(SOUT_CFG_PREFIX "http-port", HTTP_PORT, HTTP_PORT_TEXT, HTTP_PORT_LONGTEXT)
         add_bool(SOUT_CFG_PREFIX "video", true, HAS_VIDEO_TEXT, HAS_VIDEO_LONGTEXT)
         add_string(SOUT_CFG_PREFIX "base_url", NULL, BASE_URL_TEXT, BASE_URL_LONGTEXT)
