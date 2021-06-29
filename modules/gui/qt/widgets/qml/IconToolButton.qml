@@ -15,8 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
@@ -24,15 +26,20 @@ import "qrc:///style/"
 ToolButton {
     id: control
 
+    // Properties
+
     property bool paintOnly: false
 
     property int size: VLCStyle.icon_normal
 
     property string iconText: ""
 
+    // Style
+
     // background colors
+    // NOTE: We want the background to be transparent for IconToolButton(s).
     property color backgroundColor: "transparent"
-    property color backgroundColorHover: VLCStyle.colors.buttonHover
+    property color backgroundColorHover: "transparent"
 
     // foreground colors based on state
     property color color: VLCStyle.colors.icon
@@ -40,79 +47,92 @@ ToolButton {
     property color colorHighlighted: VLCStyle.colors.accent
     property color colorDisabled: VLCStyle.colors.textInactive
 
-    // active border color
-    property color colorFocus: VLCStyle.colors.bgFocus
+    // Aliases
 
-    enabled: !paintOnly
+    // active border color
+    property alias colorFocus: background.activeBorderColor
+
+    // Settings
 
     padding: 0
 
-    ToolTip.text: control.text
+    enabled: !paintOnly
+
+    ToolTip.text: text
     ToolTip.delay: 500
 
-    contentItem: Label {
-        id: text
+    // Keys
 
-        text: control.iconText
-        color: background.foregroundColor
+    Keys.priority: Keys.AfterItem
 
-        anchors.centerIn: parent
+    Keys.onPressed: Navigation.defaultKeyAction(event)
 
-        font.pixelSize: VLCIcons.pixelSize(control.size)
-        font.family: VLCIcons.fontFamily
-        font.underline: control.font.underline
-
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
-
-        Accessible.ignored: true
-
-        Label {
-            text: VLCIcons.active_indicator
-            color: background.foregroundColor
-            visible: !control.paintOnly && control.checked
-
-            anchors.centerIn: parent
-
-            font.pixelSize: VLCIcons.pixelSize(control.size)
-            font.family: VLCIcons.fontFamily
-
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-
-            Accessible.ignored: true
-        }
-    }
+    // Childs
 
     background: AnimatedBackground {
         id: background
+
+        implicitWidth: size
+        implicitHeight: size
 
         active: control.activeFocus
 
         backgroundColor: {
             if (control.hovered)
-                return control.backgroundColorHover
-            if (control.backgroundColor.a === 0) // if base color is transparent, animation starts with black color
-                return VLCStyle.colors.setColorAlpha(control.backgroundColorHover, 0)
-            return control.backgroundColor
+                return control.backgroundColorHover;
+            // if base color is transparent, animation starts with black color
+            else if (control.backgroundColor.a === 0)
+                return VLCStyle.colors.setColorAlpha(control.backgroundColorHover, 0);
+            else
+                return control.backgroundColor;
         }
 
         foregroundColor: {
-            if (control.hovered)
-                return control.colorHover
             if (control.highlighted)
-                return control.colorHighlighted
-            if (!control.enabled)
-                return control.colorDisabled
-            return control.color
+                return control.colorHighlighted;
+            else if (control.hovered)
+                return control.colorHover;
+            else if (!control.enabled)
+                return control.colorDisabled;
+            else
+                return control.color;
         }
 
-        activeBorderColor: control.colorFocus
-
-        implicitHeight: control.size
-        implicitWidth : control.size
+        activeBorderColor: VLCStyle.colors.bgFocus
     }
 
-    Keys.priority: Keys.AfterItem
-    Keys.onPressed: Navigation.defaultKeyAction(event)
+    contentItem: Label {
+        anchors.centerIn: parent
+
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+
+        text: iconText
+
+        color: background.foregroundColor
+
+        font.pixelSize: VLCIcons.pixelSize(size)
+        font.family: VLCIcons.fontFamily
+        font.underline: control.font.underline
+
+        Accessible.ignored: true
+
+        Label {
+            anchors.centerIn: parent
+
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+
+            visible: !paintOnly && control.checked
+
+            text: VLCIcons.active_indicator
+
+            color: background.foregroundColor
+
+            font.pixelSize: VLCIcons.pixelSize(size)
+            font.family: VLCIcons.fontFamily
+
+            Accessible.ignored: true
+        }
+    }
 }

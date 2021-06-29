@@ -466,6 +466,7 @@ FocusScope {
                         onClicked: player.jumpBwd()
                         text: i18n.qtr("Step back")
                         color: rootPlayer.colors.playerFg
+                        colorHover: rootPlayer.colors.buttonTextHover
                         colorFocus: rootPlayer.colors.bgFocus
                     }
 
@@ -475,6 +476,7 @@ FocusScope {
                         onClicked: player.toggleVisualization()
                         text: i18n.qtr("Visualization")
                         color: rootPlayer.colors.playerFg
+                        colorHover: rootPlayer.colors.buttonTextHover
                         colorFocus: rootPlayer.colors.bgFocus
                     }
 
@@ -484,6 +486,7 @@ FocusScope {
                         onClicked: player.jumpFwd()
                         text: i18n.qtr("Step forward")
                         color: rootPlayer.colors.playerFg
+                        colorHover: rootPlayer.colors.buttonTextHover
                         colorFocus: rootPlayer.colors.bgFocus
                     }
                 }

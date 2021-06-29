@@ -97,6 +97,8 @@ FocusScope {
                             // legacy color forcing for IconToolButton etc. :
                             if (!!buttonloader.item.color)
                                 buttonloader.item.color = Qt.binding(function() { return colors.playerFg; })
+                            if (!!buttonloader.item.colorHover)
+                                buttonloader.item.colorHover = Qt.binding(function() { return colors.buttonTextHover; })
                             if (!!buttonloader.item.bgColor)
                                 buttonloader.item.bgColor = Qt.binding(function() {
                                     return VLCStyle.colors.setColorAlpha(colors.playerBg, 0.8); })
