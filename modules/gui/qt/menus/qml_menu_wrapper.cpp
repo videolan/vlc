@@ -44,6 +44,24 @@ static inline void addSubMenu( QMenu *func, QString title, QMenu *bar ) {
     bar->addMenu( func);
 }
 
+
+void StringListMenu::popup(const QPoint &point, const QVariantList &stringList)
+{
+    QMenu *m = new QMenu;
+    m->setAttribute(Qt::WA_DeleteOnClose);
+
+    for (int i = 0; i != stringList.size(); ++i)
+    {
+        const auto str = stringList[i].toString();
+        m->addAction(str, this, [this, i, str]()
+        {
+            emit selected(i, str);
+        });
+    }
+
+    m->popup(point);
+}
+
 QmlGlobalMenu::QmlGlobalMenu(QObject *parent)
     : VLCMenuBar(parent)
 {

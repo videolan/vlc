@@ -54,6 +54,21 @@ class PlaylistListModel;
     private: \
     type m_##name = defaultValue;
 
+
+class StringListMenu : public QObject
+{
+    Q_OBJECT
+
+public:
+    using QObject::QObject;
+
+    Q_INVOKABLE void popup(const QPoint &point, const QVariantList &stringList);
+
+signals:
+    void selected(int index, const QString &str);
+};
+
+
 //inherit VLCMenuBar so we can access menu creation functions
 class QmlGlobalMenu : public VLCMenuBar
 {
