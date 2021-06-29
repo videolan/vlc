@@ -46,6 +46,8 @@
 #include "avcodec.h"
 #include "va.h"
 
+#include "../../packetizer/av1_obu.h"
+#include "../../packetizer/av1.h"
 #include "../codec/cc.h"
 
 /*****************************************************************************
@@ -413,8 +415,11 @@ static int OpenVideoCodec( decoder_t *p_dec )
     ctx->width  = p_dec->fmt_in.video.i_visible_width;
     ctx->height = p_dec->fmt_in.video.i_visible_height;
 
-    ctx->coded_width = p_dec->fmt_in.video.i_width;
-    ctx->coded_height = p_dec->fmt_in.video.i_height;
+    if (!ctx->coded_width || !ctx->coded_height)
+    {
+        ctx->coded_width = p_dec->fmt_in.video.i_width;
+        ctx->coded_height = p_dec->fmt_in.video.i_height;
+    }
 
     ctx->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
     p_sys->pix_fmt = AV_PIX_FMT_NONE;
@@ -694,6 +699,110 @@ static const enum PixelFormat hwfmts[] =
     AV_PIX_FMT_NONE,
 };
 
+int InitVideoHwDec( vlc_object_t *obj )
+{
+    decoder_t *p_dec = container_of(obj, decoder_t, obj);
+
+    if (p_dec->fmt_in.i_codec != VLC_CODEC_AV1)
+        return VLC_EGENERIC;
+
+    decoder_sys_t *p_sys = calloc(1, sizeof(*p_sys));
+    if( unlikely(p_sys == NULL) )
+        return VLC_ENOMEM;
+
+    const AVCodec *p_codec;
+    AVCodecContext *p_context = ffmpeg_AllocContext( p_dec, &p_codec );
+    if( unlikely(p_context == NULL) )
+    {
+        free(p_sys);
+        return VLC_ENOMEM;
+    }
+
+    av1_OBU_sequence_header_t *sequence_hdr = NULL;
+    unsigned w, h;
+
+    if (p_dec->fmt_in.i_extra > 4)
+    {
+        // in ISOBMFF/WebM/Matroska the first 4 bytes are from the AV1CodecConfigurationBox
+        // and then one or more OBU
+        const uint8_t *obu_start = ((const uint8_t*) p_dec->fmt_in.p_extra) + 4;
+        int obu_size = p_dec->fmt_in.i_extra - 4;
+        if (AV1_OBUIsValid(obu_start, obu_size) && AV1_OBUGetType(obu_start) == AV1_OBU_SEQUENCE_HEADER)
+            sequence_hdr = AV1_OBU_parse_sequence_header(obu_start, obu_size);
+    }
+
+    if (sequence_hdr == NULL)
+        goto failed;
+
+    // fill the AVCodecContext with the values from the sequence header
+    // so we can create the expected VA right away:
+    // coded_width, coded_height, framerate, profile and sw_pix_fmt
+
+    vlc_fourcc_t chroma = AV1_get_chroma(sequence_hdr);
+    if (chroma == 0)
+    {
+        AV1_release_sequence_header(sequence_hdr);
+        goto failed;
+    }
+    p_context->sw_pix_fmt = FindFfmpegChroma(chroma);
+
+    if (p_context->sw_pix_fmt == AV_PIX_FMT_NONE)
+    {
+        AV1_release_sequence_header(sequence_hdr);
+        goto failed;
+    }
+
+    AV1_get_frame_max_dimensions(sequence_hdr, &w, &h);
+
+    p_context->coded_width  = p_context->width  = w;
+    p_context->coded_height = p_context->height = h;
+
+    if (!p_dec->fmt_in.video.i_frame_rate || !p_dec->fmt_in.video.i_frame_rate_base)
+    {
+        unsigned num, den;
+        if (AV1_get_frame_rate(sequence_hdr, &num, &den))
+        {
+            p_context->framerate.num = num;
+            p_context->framerate.den = den;
+        }
+    }
+
+    int tier;
+    AV1_get_profile_level(sequence_hdr, &p_sys->profile, &p_sys->level, &tier);
+
+    AV1_release_sequence_header(sequence_hdr);
+
+    p_dec->p_sys = p_sys;
+    p_sys->p_context = p_context;
+    p_sys->p_codec = p_codec;
+    p_sys->pix_fmt = AV_PIX_FMT_NONE;
+    p_sys->b_hardware_only = true;
+
+    int res = InitVideoDecCommon( p_dec );
+    if (res != VLC_SUCCESS)
+        goto not_usable;
+
+    for( size_t i = 0; hwfmts[i] != AV_PIX_FMT_NONE; i++ )
+    {
+        enum AVPixelFormat hwfmt = hwfmts[i];
+
+        const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(hwfmt);
+        if (dsc == NULL)
+            continue;
+
+        if (ffmpeg_OpenVa(p_dec, p_context, hwfmt, p_context->sw_pix_fmt, dsc, NULL) == VLC_SUCCESS)
+            // we have a matching hardware decoder
+            return VLC_SUCCESS;
+    }
+
+not_usable:
+    EndVideoDec(obj);
+    return VLC_EGENERIC;
+failed:
+    avcodec_free_context( &p_context );
+    free(p_sys);
+    return VLC_EGENERIC;
+}
 
 /*****************************************************************************
  * InitVideo: initialize the video decoder

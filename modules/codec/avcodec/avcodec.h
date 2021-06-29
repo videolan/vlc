@@ -36,6 +36,7 @@ void EndVideoEnc( vlc_object_t * );
 
 /* Video Decoder */
 int InitVideoDec( vlc_object_t * );
+int InitVideoHwDec( vlc_object_t * );
 void EndVideoDec( vlc_object_t * );
 
 /* Audio Decoder */

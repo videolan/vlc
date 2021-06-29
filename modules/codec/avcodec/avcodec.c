@@ -86,6 +86,11 @@ vlc_module_begin ()
     set_callbacks(InitVideoDec, EndVideoDec)
 
     add_submodule()
+    add_shortcut("ffmpeghw")
+    set_capability("video decoder", 10001)
+    set_callbacks(InitVideoHwDec, EndVideoDec)
+
+    add_submodule()
     add_shortcut("ffmpeg")
     set_capability("audio decoder", 70)
     set_callbacks(InitAudioDec, EndAudioDec)
