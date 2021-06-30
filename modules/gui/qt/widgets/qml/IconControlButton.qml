@@ -15,22 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.11
-import QtQuick.Controls 2.4
 
 import "qrc:///style/"
 
 IconToolButton {
-    id: control
+    // Properties
 
     property VLCColors colors: VLCStyle.colors
 
-    backgroundColor: "transparent"
-    backgroundColorHover: "transparent"
+    // Style
 
-    color: colors.playerControlBarFg
-    colorHover: colors.playerControlBarFg
+    color: colors.buttonPlayer
+    colorHover: colors.buttonTextHover
     colorHighlighted: colors.accent
-    colorDisabled: colors.blendColors(control.colors.playerBg, control.colors.playerControlBarFg, .75)
+    colorDisabled: colors.blendColors(colors.playerBg, colors.playerControlBarFg, 0.75)
+
     colorFocus: colors.bgFocus
 }
