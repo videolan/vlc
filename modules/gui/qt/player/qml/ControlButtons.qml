@@ -847,7 +847,7 @@ Item{
                 id: playingItemInfoRow
                 width: (coverItem.width + infoColumn.width + spacing)
 
-                spacing: VLCStyle.margin_xsmall
+                spacing: infoColumn.visible ? VLCStyle.margin_xsmall : 0
 
                 Item {
                     id: coverItem
