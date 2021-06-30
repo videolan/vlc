@@ -155,11 +155,13 @@ Item{
             width: VLCStyle.icon_medium
             height: width
 
-            property bool isOpaque: history.current.view === "player"
+            scale: (playBtnMouseArea.pressed) ? 0.95 : 1.0
 
             property VLCColors colors: VLCStyle.colors
-            property color color: isOpaque ? colors.buttonText : "#303030"
-            property color colorDisabled: isOpaque ? colors.textInactive : "#7f8c8d"
+
+            property color color: colors.buttonPlayIcon
+
+            property color colorDisabled: colors.textInactive
 
             property bool paintOnly: false
 
@@ -180,11 +182,6 @@ Item{
                 State {
                     name: "hovered"
                     when: interactionIndicator
-
-                    PropertyChanges {
-                        target: contentLabel
-                        color: "#FF610A"
-                    }
 
                     PropertyChanges {
                         target: hoverShadow
@@ -223,30 +220,6 @@ Item{
                     }
                 }
 
-                Behavior on text {
-                    SequentialAnimation {
-                        NumberAnimation {
-                            target: contentLabel
-                            property: "font.pixelSize"
-                            to: 0
-                            easing.type: Easing.OutSine
-                            duration: 75
-                        }
-
-                        // this blank PropertyAction triggers the
-                        // text (icon) change amidst the size animation
-                        PropertyAction { }
-
-                        NumberAnimation {
-                            target: contentLabel
-                            property: "font.pixelSize"
-                            to: VLCIcons.pixelSize(VLCStyle.icon_normal)
-                            easing.type: Easing.InSine
-                            duration: 75
-                        }
-                    }
-                }
-
                 font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_normal)
                 font.family: VLCIcons.fontFamily
 
@@ -257,8 +230,8 @@ Item{
             background: Item {
                 Gradient {
                     id: playBtnGradient
-                    GradientStop { position: 0.0; color: "#f89a06" }
-                    GradientStop { position: 1.0; color: "#e25b01" }
+                    GradientStop { position: 0.0; color: VLCStyle.colors.buttonPlayA }
+                    GradientStop { position: 1.0; color: VLCStyle.colors.buttonPlayB }
                 }
 
                 MouseArea {
@@ -332,7 +305,6 @@ Item{
                     anchors.margins: VLCStyle.dp(1, VLCStyle.scale)
 
                     color: VLCStyle.colors.white
-                    opacity: playBtn.isOpaque ? 0.4 : 1.0
                 }
 
                 Rectangle {
