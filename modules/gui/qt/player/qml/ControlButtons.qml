@@ -600,23 +600,35 @@ Item{
         id: toggleABloopstateDelegate
         Widgets.IconControlButton {
             id: abBtn
+
+            property bool acceptFocus: true
+
             size: VLCStyle.icon_medium
             checked: player.ABloopState !== PlayerController.ABLOOP_STATE_NONE
-            iconText: switch(player.ABloopState) {
+            onClicked: player.toggleABloopState()
+            text: i18n.qtr("A to B")
+
+            iconText: {
+                switch(player.ABloopState) {
                   case PlayerController.ABLOOP_STATE_A: return VLCIcons.atob_bg_b
                   case PlayerController.ABLOOP_STATE_B: return VLCIcons.atob_bg_none
                   case PlayerController.ABLOOP_STATE_NONE: return VLCIcons.atob_bg_ab
-                  }
-            textOverlay: switch(player.ABloopState) {
-                         case PlayerController.ABLOOP_STATE_A: return VLCIcons.atob_fg_a
-                         case PlayerController.ABLOOP_STATE_B: return VLCIcons.atob_fg_ab
-                         case PlayerController.ABLOOP_STATE_NONE: return ""
-                         }
-            onClicked: player.toggleABloopState()
-            color: VLCStyle.colors.buttonText
-            colorOverlay: VLCStyle.colors.banner
-            property bool acceptFocus: true
-            text: i18n.qtr("A to B")
+                }
+            }
+
+            Widgets.IconLabel {
+                anchors.centerIn: abBtn.contentItem
+
+                color: abBtn.colors.accent
+
+                text: {
+                    switch(player.ABloopState) {
+                      case PlayerController.ABLOOP_STATE_A: return VLCIcons.atob_fg_a
+                      case PlayerController.ABLOOP_STATE_B: return VLCIcons.atob_fg_ab
+                      case PlayerController.ABLOOP_STATE_NONE: return ""
+                    }
+                }
+            }
         }
     }
 
