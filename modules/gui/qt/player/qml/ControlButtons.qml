@@ -897,7 +897,7 @@ Item{
                             delay: 500
 
                             contentItem: Text {
-                                text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
+                                text: i18n.qtr("%1\n%2\n%3").arg(titleLabel.text).arg(artistLabel.text).arg(progressIndicator.text)
                                 color: colors.tooltipTextColor
                             }
 
