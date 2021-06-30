@@ -815,12 +815,11 @@ Item{
 
             property VLCColors colors: VLCStyle.colors
 
-            readonly property real minimumWidth: cover.width
+            readonly property real minimumWidth: cover.width + VLCStyle.focus_border * 2
             property real extraWidth: 0
 
-            width: playingItemInfoRow.width
-            implicitWidth: playingItemInfoRow.implicitWidth
-            implicitHeight: playingItemInfoRow.implicitHeight
+            implicitWidth: playingItemInfoRow.width + VLCStyle.focus_border * 2
+            implicitHeight: playingItemInfoRow.height + VLCStyle.focus_border * 2
 
             activeBorderColor: colors.bgFocus
 
@@ -845,6 +844,9 @@ Item{
 
             Row {
                 id: playingItemInfoRow
+
+                anchors.centerIn: parent
+
                 width: (coverItem.width + infoColumn.width + spacing)
 
                 spacing: infoColumn.visible ? VLCStyle.margin_xsmall : 0
