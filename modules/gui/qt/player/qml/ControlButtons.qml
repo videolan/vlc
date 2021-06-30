@@ -902,7 +902,8 @@ Item{
 
                     ToolTip {
                         text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
-                        visible: (titleLabel.implicitWidth > titleLabel.width || artistLabel.implicitWidth > titleLabel.width)
+                        visible: artworkInfoItem.visible
+                                 && (titleLabel.implicitWidth > titleLabel.width || artistLabel.implicitWidth > titleLabel.width)
                                  && (artworkInfoMouseArea.containsMouse || artworkInfoItem.active)
                         delay: 500
 
