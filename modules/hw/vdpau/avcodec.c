@@ -189,9 +189,11 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum AVPixelFormat hwfmt, c
     unsigned codec_refs;
     switch (avctx->codec_id)
     {
-        case AV_CODEC_ID_HEVC:
         case AV_CODEC_ID_H264:
             codec_refs = avctx->refs; // we can rely on this
+            break;
+        case AV_CODEC_ID_HEVC:
+            codec_refs = 16;
             break;
         case AV_CODEC_ID_VP9:
             codec_refs = 8;
