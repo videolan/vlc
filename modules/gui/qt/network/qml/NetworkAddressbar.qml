@@ -26,6 +26,8 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
+import org.videolan.vlc 0.1
+
 Control {
     id: control
 
@@ -47,7 +49,6 @@ Control {
                               contentItem.forceActiveFocus()
 
     function changeTree(newTree) {
-        popup.close()
         history.push(["mc", "network", {
                           "tree": newTree
                       }])
@@ -124,7 +125,7 @@ Control {
             Keys.priority: Keys.AfterItem
             Keys.onPressed: Navigation.defaultKeyAction(event)
 
-            onClicked: popup.open()
+            onClicked: popup.show()
         }
 
         Repeater {
@@ -206,110 +207,21 @@ Control {
         }
     }
 
-    Popup {
+    StringListMenu {
         id: popup
 
-        y: menuButton.height + VLCStyle.margin_xxsmall
-        closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
-        width: VLCStyle.dp(150, VLCStyle.scale)
-        implicitHeight: contentItem.implicitHeight + padding * 2
-        leftPadding: 0
-        rightPadding: 0
+        function show() {
+            var model = control._menuModel.map(function (modelData) {
+                return modelData.display
+            })
 
-        onOpened: {
-            updateBgRect()
+            var point = control.mapToGlobal(0, menuButton.height + VLCStyle.margin_xxsmall)
 
-            menuButton.Navigation.downItem= optionList
-            menuButton.highlighted = true
-            optionList.forceActiveFocus()
+            popup.popup(point, model)
         }
 
-        onClosed: {
-            menuButton.Navigation.downItem = null
-            menuButton.highlighted = false
-            menuButton.forceActiveFocus()
-        }
-
-        contentItem: ListView {
-            id: optionList
-
-            implicitHeight: contentHeight
-            model: control._menuModel
-            spacing: VLCStyle.margin_xxxsmall
-            delegate: ItemDelegate {
-                id: delegate
-
-                text: modelData.display
-                width: parent.width
-                background: Rectangle {
-                    color: VLCStyle.colors.accent
-                    visible: parent.hovered || parent.activeFocus
-                }
-
-                contentItem: Widgets.ListLabel {
-                    text: delegate.text
-                }
-
-                onClicked: {
-                    changeTree(modelData.tree)
-                }
-            }
-        }
-
-        function updateBgRect() {
-            glassEffect.popupGlobalPos = g_root.mapFromItem(control, popup.x, popup.y)
-        }
-
-        background: Rectangle {
-            border.width: VLCStyle.dp(1)
-            border.color: VLCStyle.colors.accent
-
-            Widgets.FrostedGlassEffect {
-                id: glassEffect
-                source: g_root
-
-                anchors.fill: parent
-                anchors.margins: VLCStyle.dp(1)
-
-                property point popupGlobalPos
-                sourceRect: Qt.rect(popupGlobalPos.x, popupGlobalPos.y,
-                                    glassEffect.width, glassEffect.height)
-
-                tint: VLCStyle.colors.bg
-                tintStrength: 0.3
-            }
-        }
-
-        Connections {
-            target: mainInterfaceRect
-
-            enabled: popup.visible
-
-            onWidthChanged: {
-                popup.updateBgRect()
-            }
-
-            onHeightChanged: {
-                popup.updateBgRect()
-            }
-        }
-
-        Connections {
-            target: mainInterface
-
-            enabled: popup.visible
-
-            onIntfScaleFactorChanged: {
-                popup.updateBgRect()
-            }
-        }
-
-        Connections {
-            target: playlistColumn
-
-            onWidthChanged: {
-                popup.updateBgRect()
-            }
+        onSelected: {
+            changeTree(control._menuModel[index].tree)
         }
     }
 }
