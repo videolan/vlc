@@ -37,7 +37,6 @@ ToolButton {
     property color colorDisabled: VLCStyle.colors.textInactive
     property color colorFocus: VLCStyle.colors.bgFocus
     property bool borderEnabled: false
-    property bool backgroundVisible: background.active
 
     enabled: !paintOnly
 
