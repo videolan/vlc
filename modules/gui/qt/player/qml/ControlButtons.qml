@@ -887,6 +887,24 @@ Item{
 
                         width: VLCStyle.dp(60)
                         height: VLCStyle.dp(60)
+
+                        ToolTip {
+                            x: parent.x
+
+                            visible: artworkInfoItem.visible
+                                     && (titleLabel.implicitWidth > titleLabel.width || artistLabel.implicitWidth > titleLabel.width)
+                                     && (artworkInfoMouseArea.containsMouse || artworkInfoItem.active)
+                            delay: 500
+
+                            contentItem: Text {
+                                text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
+                                color: colors.tooltipTextColor
+                            }
+
+                            background: Rectangle {
+                                color: colors.tooltipColor
+                            }
+                        }
                     }
                 }
 
@@ -899,23 +917,6 @@ Item{
                                                                                           : artworkInfoItem.extraWidth
 
                     visible: width > 0
-
-                    ToolTip {
-                        text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
-                        visible: artworkInfoItem.visible
-                                 && (titleLabel.implicitWidth > titleLabel.width || artistLabel.implicitWidth > titleLabel.width)
-                                 && (artworkInfoMouseArea.containsMouse || artworkInfoItem.active)
-                        delay: 500
-
-                        contentItem: Text {
-                                  text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
-                                  color: colors.tooltipTextColor
-                        }
-
-                        background: Rectangle {
-                            color: colors.tooltipColor
-                        }
-                    }
 
                     Widgets.MenuLabel {
                         id: titleLabel
