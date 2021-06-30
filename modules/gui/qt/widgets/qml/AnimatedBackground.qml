@@ -71,7 +71,7 @@ Rectangle {
             onRunningChanged: {
                 root.borderColorAnimationRunning = running
                 if (running && root.active) {
-                    border.width = VLCStyle.focus_border
+                    border.width = Qt.binding(function() { return VLCStyle.focus_border })
                 } else if (!running && !root.active) {
                     border.width = 0
                 }
