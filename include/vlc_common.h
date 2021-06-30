@@ -1230,4 +1230,10 @@ VLC_API const char * VLC_Compiler( void ) VLC_USED;
     "Public License;\nsee the file named COPYING for details.\n" \
     "Written by the VideoLAN team; see the AUTHORS file.\n")
 
+#if defined(__cplusplus) || defined(_MSC_VER)
+#define ARRAY_STATIC_SIZE
+#else
+#define ARRAY_STATIC_SIZE  static
+#endif
+
 #endif /* !VLC_COMMON_H */
