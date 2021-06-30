@@ -104,9 +104,35 @@ Item{
         case ControlListModel.PLAYER_SWITCH_BUTTON: return playerSwitchBtnDelegate
         case ControlListModel.ARTWORK_INFO: return artworkInfoDelegate
         case ControlListModel.PLAYBACK_SPEED_BUTTON: return playbackSpeedButtonDelegate
+        default:
+            console.log("button delegate id " + inpID +  " doesn't exists")
+            return fallbackDelegate
         }
-        console.log("button delegate id " + inpID +  " doesn't exists")
-        return spacerDelegate
+    }
+
+    Component {
+        id: fallbackDelegate
+
+        Widgets.AnimatedBackground {
+            implicitWidth: fbLabel.width + VLCStyle.focus_border * 2
+            implicitHeight: fbLabel.height + VLCStyle.focus_border * 2
+
+            activeBorderColor: colors.bgFocus
+
+            property bool paintOnly: false
+            property VLCColors colors: VLCStyle.colors
+
+            Widgets.MenuLabel {
+                id: fbLabel
+
+                anchors.centerIn: parent
+
+                text: i18n.qtr("WIDGET\nNOT\nFOUND")
+                horizontalAlignment: Text.AlignHCenter
+
+                color: colors.text
+            }
+        }
     }
 
     Component{
