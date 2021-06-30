@@ -324,6 +324,8 @@ static int GetParameters( ScalerConfiguration *p_cfg,
     case AV_PIX_FMT_ABGR:
         i_sws_flags |= SWS_ACCURATE_RND;
         break;
+    default:
+        break;
     }
 #endif
 
