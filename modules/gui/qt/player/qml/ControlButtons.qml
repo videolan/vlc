@@ -822,6 +822,8 @@ Item{
             implicitWidth: playingItemInfoRow.implicitWidth
             implicitHeight: playingItemInfoRow.implicitHeight
 
+            activeBorderColor: colors.bgFocus
+
             Keys.onPressed: {
                 if (KeyHelper.matchOk(event) ) {
                     event.accepted = true
