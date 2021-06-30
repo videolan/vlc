@@ -135,7 +135,7 @@ FocusScope{
 
         spacing: VLCStyle.margin_xxsmall
 
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: backBtn
 
             Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
@@ -144,9 +144,9 @@ FocusScope{
             size: VLCStyle.banner_icon_size
             iconText: VLCIcons.topbar_previous
             text: i18n.qtr("Back")
-            color: topFocusScope.colors.playerFg
-            colorFocus: topFocusScope.colors.bgFocus
             focus: true
+            colors: topFocusScope.colors
+
             Navigation.parentItem: topFocusScope
             Navigation.rightItem: menuSelector
             onClicked: {
@@ -245,22 +245,22 @@ FocusScope{
         topPadding: VLCStyle.margin_xxsmall
         rightPadding: VLCStyle.margin_xxsmall
 
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: menuSelector
+
+            property bool acceptFocus: true // is it really needed?
 
             focus: true
             size: VLCStyle.banner_icon_size
             iconText: VLCIcons.ellipsis
             text: i18n.qtr("Menu")
-            color: rootPlayer.colors.playerFg
-            colorFocus: rootPlayer.colors.bgFocus
-            property bool acceptFocus: true
-
-            onClicked: contextMenu.popup(this.mapToGlobal(0, height))
+            colors: topFocusScope.colors
 
             Navigation.parentItem: topFocusScope
             Navigation.leftItem: backBtn
             Navigation.rightItem: playlistButton
+
+            onClicked: contextMenu.popup(this.mapToGlobal(0, height))
 
             QmlGlobalMenu {
                 id: contextMenu
@@ -272,15 +272,14 @@ FocusScope{
             }
         }
 
-        Widgets.IconToolButton {
+        Widgets.IconControlButton {
             id: playlistButton
 
             objectName: ControlListModel.PLAYLIST_BUTTON
             size: VLCStyle.banner_icon_size
             iconText: VLCIcons.playlist
             text: i18n.qtr("Playlist")
-            color: rootPlayer.colors.playerFg
-            colorFocus: rootPlayer.colors.bgFocus
+            colors: topFocusScope.colors
             focus: false
 
             property bool acceptFocus: true
