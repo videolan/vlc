@@ -78,6 +78,7 @@ private:
             sortKeyTitleList.push_back(map);
         };
 
+        filler(PlaylistControllerModel::SORT_KEY_TITLE, qtr("Title"));
         filler(PlaylistControllerModel::SORT_KEY_DURATION, qtr("Duration"));
         filler(PlaylistControllerModel::SORT_KEY_ARTIST, qtr("Artist"));
         filler(PlaylistControllerModel::SORT_KEY_ALBUM, qtr("Album"));
