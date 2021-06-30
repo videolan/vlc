@@ -27,6 +27,5 @@ IconToolButton {
 
     color: colors.playerControlBarFg
     colorDisabled: colors.blendColors(control.colors.playerBg, control.colors.playerControlBarFg, .75)
-    colorOverlay: "transparent"
     colorFocus: colors.bgFocus
 }

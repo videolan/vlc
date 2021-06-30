@@ -35,9 +35,7 @@ ToolButton {
                                                 : VLCStyle.colors.icon
 
     property color colorDisabled: VLCStyle.colors.textInactive
-    property color colorOverlay: "transparent"
     property color colorFocus: VLCStyle.colors.bgFocus
-    property string textOverlay: ""
     property bool borderEnabled: false
     property bool backgroundVisible: background.active
 
@@ -46,56 +44,37 @@ ToolButton {
     ToolTip.text: control.text
     ToolTip.delay: 500
 
-    contentItem: Item {
+    contentItem: Label {
+        id: text
+
+        text: control.iconText
+        color: (control.enabled) ? background.foregroundColor : control.colorDisabled
+
+        anchors.centerIn: parent
+
+        font.pixelSize: VLCIcons.pixelSize(control.size)
+        font.family: VLCIcons.fontFamily
+        font.underline: control.font.underline
+
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+
+        Accessible.ignored: true
 
         Label {
-            id: text
-            text: control.iconText
+            text: VLCIcons.active_indicator
             color: (control.enabled) ? background.foregroundColor : control.colorDisabled
+            visible: !control.paintOnly && control.checked
 
             anchors.centerIn: parent
 
             font.pixelSize: VLCIcons.pixelSize(control.size)
             font.family: VLCIcons.fontFamily
-            font.underline: control.font.underline
 
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
 
             Accessible.ignored: true
-
-            Label {
-                text: control.textOverlay
-                color: control.colorOverlay
-
-                anchors.centerIn: parent
-
-                font.pixelSize: VLCIcons.pixelSize(control.size)
-                font.family: VLCIcons.fontFamily
-
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-
-                Accessible.ignored: true
-
-            }
-
-            Label {
-                text: VLCIcons.active_indicator
-                color: (control.enabled) ? background.foregroundColor : control.colorDisabled
-                visible: !control.paintOnly && control.checked
-
-                anchors.centerIn: parent
-
-                font.pixelSize: VLCIcons.pixelSize(control.size)
-                font.family: VLCIcons.fontFamily
-
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-
-                Accessible.ignored: true
-            }
-
         }
     }
 
