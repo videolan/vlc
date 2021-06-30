@@ -40,6 +40,8 @@ ListView {
 
     property alias scrollBar: scrollBar
 
+    property bool extraWidthAvailable: true
+
     ScrollBar.horizontal: ScrollBar {
         id: scrollBar
         policy: playerBtnDND.contentWidth > playerBtnDND.width ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded

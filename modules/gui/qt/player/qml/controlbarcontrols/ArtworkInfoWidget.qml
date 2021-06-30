@@ -134,8 +134,8 @@ Control {
             anchors.verticalCenter: parent.verticalCenter
 
             readonly property real preferredWidth: Math.max(titleLabel.implicitWidth, artistLabel.implicitWidth, progressIndicator.implicitWidth)
-            width: ((extraWidth > preferredWidth) || (paintOnly)) ? preferredWidth
-                                                                  : extraWidth
+            width: ((extraWidth > preferredWidth)) ? preferredWidth
+                                                   : extraWidth
 
             visible: width > VLCStyle.dp(15, VLCStyle.scale)
 

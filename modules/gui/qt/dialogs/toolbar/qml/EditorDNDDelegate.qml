@@ -122,6 +122,13 @@ MouseArea {
             onLoaded: {
                 item.paintOnly = true
                 item.enabled = false
+
+                if (item.extraWidth !== undefined) {
+                    if (extraWidthAvailable)
+                        item.extraWidth = Number.MAX_VALUE
+                    else
+                        item.extraWidth = 0
+                }
             }
         }
 

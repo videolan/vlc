@@ -184,6 +184,10 @@ Rectangle{
 
                                     model: repeater.getModel(index)
 
+                                    // controls in the center view can not have
+                                    // extra width
+                                    extraWidthAvailable: model !== layout.model.center
+
                                     onContainsDragChanged: {
                                         if (containsDrag)
                                             _viewThatContainsDrag = this
