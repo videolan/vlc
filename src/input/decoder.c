@@ -1360,8 +1360,14 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, vlc_frame_t *p_aout_buf )
                             p_aout_buf->i_pts, p_aout_buf->i_dts );
     }
 
-    vlc_fifo_Lock(p_owner->p_fifo);
+    if(p_aout_buf && atomic_load(&p_owner->b_display_avstat))
+    {
+        msg_Info( p_dec, "avstats: [DEC][OUT][AUDIO] ts=%" PRId64 " pts=%" PRId64,
+                  NS_FROM_VLC_TICK(vlc_tick_now()),
+                  NS_FROM_VLC_TICK(p_aout_buf->i_pts) );
+    }
 
+    vlc_fifo_Lock(p_owner->p_fifo);
     int success = ModuleThread_PlayAudio( p_owner, p_aout_buf );
 
     unsigned played = 0;
