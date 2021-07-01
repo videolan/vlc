@@ -88,8 +88,12 @@ static int Control(stream_t *access, int query, va_list args)
             break;
 
         case STREAM_GET_PTS_DELAY:
-            *va_arg(args, vlc_tick_t *) = DEFAULT_PTS_DELAY;
+        {
+            vlc_tick_t delay = VLC_TICK_FROM_MS(
+                    var_InheritInteger(access, "imem-pts-delay"));
+            *va_arg(args, vlc_tick_t *) = delay ? delay : DEFAULT_PTS_DELAY;
             break;
+        }
 
         case STREAM_SET_PAUSE_STATE:
             break;
@@ -164,4 +168,6 @@ vlc_module_begin()
     add_shortcut("imem")
     set_capability("access", 0)
     set_callbacks(Open, Close)
+
+    add_integer("imem-pts-delay", 700, "PTS delay in MS", "", false)
 vlc_module_end()
