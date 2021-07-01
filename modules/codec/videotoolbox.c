@@ -1353,7 +1353,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     free(p_sys);
 }
 
-static int OpenDecoder(vlc_object_t *p_this)
+static int OpenDecoder(vlc_object_t *p_this, bool h264_support)
 {
     int i_ret;
     decoder_t *p_dec = (decoder_t *)p_this;
@@ -1362,6 +1362,8 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (var_Type(p_dec, "videotoolbox-failed") != 0)
         return VLC_EGENERIC;
 
+    if (!h264_support && p_dec->fmt_in->i_codec == VLC_CODEC_H264)
+        return VLC_EGENERIC;
     /* check quickly if we can digest the offered data */
     CMVideoCodecType codec;
 
@@ -1485,6 +1487,12 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     return i_ret;
 }
+
+static int OpenDecoderAll(vlc_object_t *p_this)
+    { return OpenDecoder(p_this, true); }
+
+static int OpenDecoderNoH264(vlc_object_t *p_this)
+    { return OpenDecoder(p_this, false); }
 
 #pragma mark - helpers
 
@@ -2321,8 +2329,8 @@ static const char *const chroma_list_names[] =
 vlc_module_begin()
     set_subcategory(SUBCAT_INPUT_VCODEC)
     set_description(N_("VideoToolbox video decoder"))
-    set_capability("video decoder", 800)
-    set_callbacks(OpenDecoder, CloseDecoder)
+    set_capability("video decoder", 60)
+    set_callbacks(OpenDecoderAll, CloseDecoder)
 
     add_bool("videotoolbox-error-fallback", true, VT_FALLBACK_ERROR, VT_FALLBACK_ERROR_LONG)
     add_bool("videotoolbox-hw-decoder-only", true, VT_REQUIRE_HW_DEC, VT_REQUIRE_HW_DEC)
@@ -2332,6 +2340,10 @@ vlc_module_begin()
     /* Deprecated options */
     add_obsolete_bool("videotoolbox-temporal-deinterlacing") // Since 4.0.0
     add_obsolete_bool("videotoolbox") // Since 4.0.0
+
+    add_submodule()
+        set_capability("video decoder", 800)
+        set_callbacks(OpenDecoderNoH264, CloseDecoder)
 
     add_submodule()
         set_callback_dec_device(OpenDecDevice, 1)
