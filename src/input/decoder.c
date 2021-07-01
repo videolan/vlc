@@ -1269,6 +1269,12 @@ static void ModuleThread_QueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
 {
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
 
+    if(p_aout_buf && atomic_load(&p_owner->b_display_avstat))
+    {
+        msg_Info( p_dec, "avstats: [DEC][OUT][AUDIO] ts=%" PRId64 " pts=%" PRId64,
+                  NS_FROM_VLC_TICK(vlc_tick_now()),
+                  NS_FROM_VLC_TICK(p_aout_buf->i_pts) );
+    }
     int success = ModuleThread_PlayAudio( p_owner, p_aout_buf );
 
     ModuleThread_UpdateStatAudio( p_owner, success != VLC_SUCCESS );
