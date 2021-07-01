@@ -31,10 +31,13 @@ ToolButton {
 
     property string iconText: ""
 
-    property color color: (control.highlighted) ? VLCStyle.colors.accent
-                                                : VLCStyle.colors.icon
-
+    // foreground colors based on state
+    property color color: VLCStyle.colors.icon
+    property color colorHover: VLCStyle.colors.buttonTextHover
+    property color colorHighlighted: VLCStyle.colors.accent
     property color colorDisabled: VLCStyle.colors.textInactive
+
+    // active border color
     property color colorFocus: VLCStyle.colors.bgFocus
 
     enabled: !paintOnly
@@ -46,7 +49,7 @@ ToolButton {
         id: text
 
         text: control.iconText
-        color: (control.enabled) ? background.foregroundColor : control.colorDisabled
+        color: background.foregroundColor
 
         anchors.centerIn: parent
 
@@ -61,7 +64,7 @@ ToolButton {
 
         Label {
             text: VLCIcons.active_indicator
-            color: (control.enabled) ? background.foregroundColor : control.colorDisabled
+            color: background.foregroundColor
             visible: !control.paintOnly && control.checked
 
             anchors.centerIn: parent
@@ -84,8 +87,15 @@ ToolButton {
         backgroundColor: control.hovered ? VLCStyle.colors.buttonHover
                                          : VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0)
 
-        foregroundColor: control.hovered ? VLCStyle.colors.buttonTextHover
-                                         : control.color
+        foregroundColor: {
+            if (control.hovered)
+                return control.colorHover
+            if (control.highlighted)
+                return control.colorHighlighted
+            if (!control.enabled)
+                return control.colorDisabled
+            return control.color
+        }
 
         activeBorderColor: control.colorFocus
 
