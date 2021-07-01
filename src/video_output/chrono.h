@@ -28,7 +28,6 @@
 typedef struct {
     int     shift;
     vlc_tick_t avg;
-    vlc_tick_t avg_initial;
 
     int     shift_var;
     vlc_tick_t var;
@@ -39,7 +38,6 @@ typedef struct {
 static inline void vout_chrono_Init(vout_chrono_t *chrono, int shift, vlc_tick_t avg_initial)
 {
     chrono->shift       = shift;
-    chrono->avg_initial =
     chrono->avg         = avg_initial;
 
     chrono->shift_var   = shift+1;
@@ -76,10 +74,6 @@ static inline void vout_chrono_Stop(vout_chrono_t *chrono)
 
     /* For assert */
     chrono->start = VLC_TICK_INVALID;
-}
-static inline void vout_chrono_Reset(vout_chrono_t *chrono)
-{
-    vout_chrono_Init(chrono, chrono->shift, chrono->avg_initial);
 }
 
 #endif
