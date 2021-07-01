@@ -23,13 +23,16 @@ import "qrc:///style/"
 
 ToolButton {
     id: control
+
     property bool paintOnly: false
 
     property int size: VLCStyle.icon_normal
 
-    padding: 0
-
     property string iconText: ""
+
+    // background colors
+    property color backgroundColor: "transparent"
+    property color backgroundColorHover: VLCStyle.colors.buttonHover
 
     // foreground colors based on state
     property color color: VLCStyle.colors.icon
@@ -41,6 +44,8 @@ ToolButton {
     property color colorFocus: VLCStyle.colors.bgFocus
 
     enabled: !paintOnly
+
+    padding: 0
 
     ToolTip.text: control.text
     ToolTip.delay: 500
@@ -84,8 +89,13 @@ ToolButton {
 
         active: control.activeFocus
 
-        backgroundColor: control.hovered ? VLCStyle.colors.buttonHover
-                                         : VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0)
+        backgroundColor: {
+            if (control.hovered)
+                return control.backgroundColorHover
+            if (control.backgroundColor.a === 0) // if base color is transparent, animation starts with black color
+                return VLCStyle.colors.setColorAlpha(control.backgroundColorHover, 0)
+            return control.backgroundColor
+        }
 
         foregroundColor: {
             if (control.hovered)
