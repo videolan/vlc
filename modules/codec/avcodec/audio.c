@@ -56,6 +56,7 @@ typedef struct
      */
     audio_sample_format_t aout_format;
     date_t                end_date;
+    vlc_tick_t last_increment;
 
     /* */
     int     i_reject_count;
@@ -234,6 +235,7 @@ int InitAudioDec( vlc_object_t *obj )
     p_dec->p_sys = p_sys;
     p_sys->p_context = avctx;
     p_sys->p_codec = codec;
+    p_sys->last_increment = VLC_TICK_INVALID;
 
     // Initialize decoder extradata
     InitDecoderConfig( p_dec, avctx );
@@ -278,6 +280,7 @@ static void Flush( decoder_t *p_dec )
     if( avcodec_is_open( ctx ) )
         avcodec_flush_buffers( ctx );
     date_Set( &p_sys->end_date, VLC_TICK_INVALID );
+    p_sys->last_increment = VLC_TICK_INVALID;
 
     if( ctx->codec_id == AV_CODEC_ID_MP2 ||
         ctx->codec_id == AV_CODEC_ID_MP3 )
@@ -335,6 +338,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
         {
             date_Set( &p_sys->end_date, VLC_TICK_INVALID );
+            p_sys->last_increment = VLC_TICK_INVALID;
         }
 
         /* We've just started the stream, wait for the first PTS. */
@@ -377,7 +381,10 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 /* Only set new pts from input block if it has been used,
                  * otherwise let it be through interpolation */
-                if( p_block->i_pts > date_Get( &p_sys->end_date ) )
+                vlc_tick_t end_tick = date_Get( &p_sys->end_date );
+                if( p_block->i_pts > end_tick
+                 || ( p_sys->last_increment != VLC_TICK_INVALID
+                   && p_block->i_pts + 2 * p_sys->last_increment < end_tick ) )
                 {
                     date_Set( &p_sys->end_date, p_block->i_pts );
                 }
@@ -434,6 +441,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_converted->i_pts = date_Get( &p_sys->end_date );
                 p_converted->i_length = date_Increment( &p_sys->end_date,
                                                       p_converted->i_nb_samples ) - p_converted->i_pts;
+                p_sys->last_increment = p_converted->i_length;
 
                 decoder_QueueAudio( p_dec, p_converted );
             }
