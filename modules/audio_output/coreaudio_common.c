@@ -358,10 +358,10 @@ ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
 
         if (first_render_delay > VLC_TICK_FROM_SEC(10))
         {
-            block_Release(p_block);
             lock_unlock(p_sys);
             msg_Warn(p_aout, "WARNING, dropped audio block with pts: %"PRId64 " (converted ts: %"PRId64 ")",
                      p_block->i_pts, date);
+            block_Release(p_block);
             return;
         }
         p_sys->i_first_render_host_time
