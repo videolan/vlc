@@ -25,6 +25,9 @@ IconToolButton {
 
     property VLCColors colors: VLCStyle.colors
 
+    backgroundColor: "transparent"
+    backgroundColorHover: "transparent"
+
     color: colors.playerControlBarFg
     colorDisabled: colors.blendColors(control.colors.playerBg, control.colors.playerControlBarFg, .75)
     colorFocus: colors.bgFocus
