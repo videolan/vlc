@@ -619,9 +619,11 @@ static size_t spu_channel_UpdateDates(struct spu_channel *channel,
     for (size_t index = 0; index < channel->entries.size; index++)
     {
         spu_render_entry_t *render_entry = &channel->entries.data[index];
-
-        render_entry->start = date_array[index * 2];
-        render_entry->stop = date_array[index * 2 + 1];
+        if(date_array[index * 2] != INT64_MAX) /* pause triggered before or during spu render */
+        {
+            render_entry->start = date_array[index * 2];
+            render_entry->stop = date_array[index * 2 + 1];
+        }
     }
 
     free(date_array);
