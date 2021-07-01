@@ -2033,6 +2033,14 @@ static int avstat_callback(vlc_object_t *obj, const char *name,
     return VLC_SUCCESS;
 }
 
+static int ForwardValue(vlc_object_t *obj, const char *var, vlc_value_t oldv,
+                        vlc_value_t newv, void *opaque)
+{
+
+    vlc_object_t *target = opaque;
+    return var_Set(target, var, newv);
+}
+
 void vout_Close(vout_thread_t *vout)
 {
     assert(vout);
@@ -2061,13 +2069,16 @@ void vout_Release(vout_thread_t *vout)
     if (!vlc_atomic_rc_dec(&sys->rc))
         return;
 
-    var_DelCallback(vout, "avstat", avstat_callback, sys);
+    var_DelCallback(vlc_object_parent(vout), "avstat", ForwardValue, vout);
 
     if (sys->dummy)
     {
         vlc_object_delete(VLC_OBJECT(vout));
         return;
     }
+    else
+        var_DelCallback(vout, "avstat", avstat_callback, sys);
+
 
     free(sys->splitter_name);
 
@@ -2108,7 +2119,7 @@ vout_CreateCommon(vlc_object_t *object, void *owner,
     vlc_atomic_rc_init(&sys->rc);
     sys->rendering_enabled = true;
 
-    var_AddCallback(&vout->obj, "avstat", avstat_callback, sys);
+    var_AddCallback(vlc_object_parent(vout), "avstat", ForwardValue, vout);
     var_TriggerCallback(&vout->obj, "avstat");
 
     return vout;
@@ -2204,6 +2215,9 @@ vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
         vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_BELOW);
     else if (var_InheritBool(vout, "video-on-top"))
         vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_ABOVE);
+
+    var_AddCallback(&vout->obj, "avstat", avstat_callback, sys);
+    var_TriggerCallback(&vout->obj, "avstat");
 
     return vout;
 }
