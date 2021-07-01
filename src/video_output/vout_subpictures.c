@@ -630,8 +630,7 @@ static size_t spu_channel_UpdateDates(struct spu_channel *channel,
 
 static bool
 spu_render_entry_IsSelected(spu_render_entry_t *render_entry, size_t channel_id,
-                            vlc_tick_t system_now,
-                            vlc_tick_t render_subtitle_date, bool ignore_osd)
+                            vlc_tick_t render_date, bool ignore_osd)
 {
     subpicture_t *subpic = render_entry->subpic;
     assert(subpic);
@@ -641,9 +640,6 @@ spu_render_entry_IsSelected(spu_render_entry_t *render_entry, size_t channel_id,
 
     if (ignore_osd && !subpic->b_subtitle)
         return false;
-
-    const vlc_tick_t render_date =
-        subpic->b_subtitle ? render_subtitle_date : system_now;
 
     if (render_date && render_date < render_entry->start)
         return false; /* Too early, come back next monday */
@@ -699,13 +695,11 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
         for (size_t index = 0; index < channel->entries.size; index++) {
             spu_render_entry_t *render_entry = &channel->entries.data[index];
             subpicture_t *current = render_entry->subpic;
+            const vlc_tick_t render_date = current->b_subtitle ? render_subtitle_date : system_now;
 
             if (!spu_render_entry_IsSelected(render_entry, channel->id,
-                                             system_now, render_subtitle_date,
-                                             ignore_osd))
+                                             render_date, ignore_osd))
                 continue;
-
-            const vlc_tick_t render_date = current->b_subtitle ? render_subtitle_date : system_now;
 
             vlc_tick_t *date_ptr  = current->b_subtitle ? &ephemer_subtitle_date  : &ephemer_osd_date;
             if (current->i_start >= *date_ptr) {
@@ -744,7 +738,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             bool is_late = render_entry->is_late;
 
             if (!spu_render_entry_IsSelected(render_entry, channel->id,
-                                             system_now, render_subtitle_date,
+                                             current->b_subtitle ? render_subtitle_date : system_now,
                                              ignore_osd))
             {
                 index++;
