@@ -29,6 +29,8 @@ IconToolButton {
     backgroundColorHover: "transparent"
 
     color: colors.playerControlBarFg
+    colorHover: colors.playerControlBarFg
+    colorHighlighted: colors.accent
     colorDisabled: colors.blendColors(control.colors.playerBg, control.colors.playerControlBarFg, .75)
     colorFocus: colors.bgFocus
 }
