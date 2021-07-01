@@ -740,8 +740,8 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
 
         action = m_menu->addAction( qtr("Show Containing Directory...") );
         action->setIcon(QIcon(":/type/folder-grey.svg"));
-        connect(action, &QAction::triggered, [currentItem]( ) {
-            DialogsProvider::getInstance()->mediaInfoDialog(currentItem);
+        connect(action, &QAction::triggered, [this, currentItem]( ) {
+            m_controler->explore(currentItem);
         });
 
         m_menu->addSeparator();
