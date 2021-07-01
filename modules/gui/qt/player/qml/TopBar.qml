@@ -248,8 +248,6 @@ FocusScope{
         Widgets.IconControlButton {
             id: menuSelector
 
-            property bool acceptFocus: true // is it really needed?
-
             focus: true
             size: VLCStyle.banner_icon_size
             iconText: VLCIcons.ellipsis
@@ -281,8 +279,6 @@ FocusScope{
             text: i18n.qtr("Playlist")
             colors: topFocusScope.colors
             focus: false
-
-            property bool acceptFocus: true
 
             Navigation.parentItem: topFocusScope
             Navigation.leftItem: menuSelector

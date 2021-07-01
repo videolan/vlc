@@ -33,7 +33,6 @@ FocusScope{
     height: teleWidget.height
 
     property bool autohide: !paintOnly && !player.isTeletextAvailable
-    property bool acceptFocus: autohide
     property bool paintOnly: false
     visible: !autohide
 

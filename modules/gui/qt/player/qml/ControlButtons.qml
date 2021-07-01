@@ -119,7 +119,6 @@ Item{
             iconText: VLCIcons.exit
             text: i18n.qtr("Back")
             onClicked: history.previous()
-            property bool acceptFocus: true
         }
     }
 
@@ -131,7 +130,6 @@ Item{
             checked: mainPlaylistController.random
             iconText: VLCIcons.shuffle_on
             onClicked: mainPlaylistController.toggleRandom()
-            property bool acceptFocus: true
             text: i18n.qtr("Random")
         }
     }
@@ -144,7 +142,6 @@ Item{
             iconText: VLCIcons.previous
             enabled: mainPlaylistController.hasPrev
             onClicked: mainPlaylistController.prev()
-            property bool acceptFocus: true
             text: i18n.qtr("Previous")
         }
     }
@@ -163,8 +160,6 @@ Item{
             property VLCColors colors: VLCStyle.colors
             property color color: isOpaque ? colors.buttonText : "#303030"
             property color colorDisabled: isOpaque ? colors.textInactive : "#7f8c8d"
-
-            property bool acceptFocus: true
 
             property bool paintOnly: false
 
@@ -382,7 +377,6 @@ Item{
             iconText: VLCIcons.next
             enabled: mainPlaylistController.hasNext
             onClicked: mainPlaylistController.next()
-            property bool acceptFocus: true
             text: i18n.qtr("Next")
         }
     }
@@ -395,7 +389,6 @@ Item{
             iconText: VLCIcons.dvd_prev
             onClicked: player.chapterPrev()
             enabled: player.hasChapters
-            property bool acceptFocus: visible
             text: i18n.qtr("Previous chapter")
         }
     }
@@ -409,7 +402,6 @@ Item{
             iconText: VLCIcons.dvd_next
             onClicked: player.chapterNext()
             enabled: player.hasChapters
-            property bool acceptFocus: visible
             text: i18n.qtr("Next chapter")
         }
     }
@@ -425,7 +417,6 @@ Item{
                   ? VLCIcons.repeat_one
                   : VLCIcons.repeat_all
             onClicked: mainPlaylistController.toggleRepeatMode()
-            property bool acceptFocus: true
             text: i18n.qtr("Repeat")
         }
     }
@@ -485,7 +476,7 @@ Item{
                     playlistWidget.gainFocus(playlistBtn)
                 }
             }
-            property bool acceptFocus: true
+
             text: i18n.qtr("Playlist")
         }
 
@@ -497,9 +488,9 @@ Item{
             id: menuBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.ellipsis
-            onClicked: contextMenu.popup(this.mapToGlobal(0, 0))
-            property bool acceptFocus: true
             text: i18n.qtr("Menu")
+
+            onClicked: contextMenu.popup(this.mapToGlobal(0, 0))
 
             QmlGlobalMenu {
                 id: contextMenu
@@ -535,7 +526,6 @@ Item{
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
             }
-            property bool acceptFocus: false
         }
     }
 
@@ -562,7 +552,7 @@ Item{
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
             }
-            property bool acceptFocus: false
+
             Component.onCompleted: {
                 parent.Layout.fillWidth=true
             }
@@ -577,7 +567,6 @@ Item{
             enabled: player.hasVideoOutput
             iconText: player.fullscreen ? VLCIcons.defullscreen :VLCIcons.fullscreen
             onClicked: player.fullscreen = !player.fullscreen
-            property bool acceptFocus: true
             text: i18n.qtr("fullscreen")
         }
     }
@@ -591,7 +580,6 @@ Item{
             enabled: player.isPlaying
             checked: player.isRecording
             onClicked: player.toggleRecord()
-            property bool acceptFocus: true
             text: i18n.qtr("record")
         }
     }
@@ -600,8 +588,6 @@ Item{
         id: toggleABloopstateDelegate
         Widgets.IconControlButton {
             id: abBtn
-
-            property bool acceptFocus: true
 
             size: VLCStyle.icon_medium
             checked: player.ABloopState !== PlayerController.ABLOOP_STATE_NONE
@@ -640,7 +626,6 @@ Item{
             enabled: player.isPlaying
             iconText: VLCIcons.snapshot
             onClicked: player.snapshot()
-            property bool acceptFocus: true
             text: i18n.qtr("Snapshot")
         }
     }
@@ -654,7 +639,6 @@ Item{
             enabled: player.isPlaying
             iconText: VLCIcons.stop
             onClicked: mainPlaylistController.stop()
-            property bool acceptFocus: true
             text: i18n.qtr("Stop")
         }
     }
@@ -667,7 +651,6 @@ Item{
             enabled: player.isPlaying
             iconText: VLCIcons.info
             onClicked: dialogProvider.mediaInfoDialog()
-            property bool acceptFocus: true
             text: i18n.qtr("Informations")
         }
     }
@@ -681,7 +664,6 @@ Item{
             enabled: player.isPlaying
             iconText: VLCIcons.frame_by_frame
             onClicked: player.frameNext()
-            property bool acceptFocus: true
             text: i18n.qtr("Next frame")
         }
     }
@@ -694,7 +676,6 @@ Item{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.faster
             onClicked: player.faster()
-            property bool acceptFocus: true
             text: i18n.qtr("Faster")
         }
     }
@@ -707,7 +688,6 @@ Item{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.slower
             onClicked: player.slower()
-            property bool acceptFocus: true
             text: i18n.qtr("Slower")
         }
     }
@@ -719,7 +699,6 @@ Item{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.eject
             onClicked: dialogProvider.openDialog()
-            property bool acceptFocus: true
             text: i18n.qtr("Open media")
         }
     }
@@ -731,7 +710,6 @@ Item{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.extended
             onClicked: dialogProvider.extendedDialog()
-            property bool acceptFocus: true
             Accessible.name: i18n.qtr("Extended settings")
         }
     }
@@ -743,7 +721,6 @@ Item{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.skip_for
             onClicked: player.jumpFwd()
-            property bool acceptFocus: true
             text: i18n.qtr("Step forward")
         }
     }
@@ -755,7 +732,6 @@ Item{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.skip_back
             onClicked: player.jumpBwd()
-            property bool acceptFocus: true
             text: i18n.qtr("Step back")
         }
     }
@@ -767,7 +743,6 @@ Item{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.clear
             onClicked: mainInterface.close()
-            property bool acceptFocus: true
             text: i18n.qtr("Quit")
         }
     }
@@ -783,7 +758,6 @@ Item{
             model: player.aspectRatio
             currentIndex: -1
             onCurrentIndexChanged: model.toggleIndex(currentIndex)
-            property bool acceptFocus: true
             Accessible.name: i18n.qtr("Aspect ratio")
         }
     }
@@ -812,7 +786,6 @@ Item{
                     g_mainDisplay.showPlayer()
             }
 
-            property bool acceptFocus: true
             text: i18n.qtr("Switch Player")
         }
     }

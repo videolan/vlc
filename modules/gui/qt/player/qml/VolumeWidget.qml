@@ -34,7 +34,6 @@ FocusScope{
     property bool paintOnly: true
     enabled: !paintOnly
 
-    property bool acceptFocus: true
     Component.onCompleted: paintOnly = false
 
     property color color: colors.buttonText
