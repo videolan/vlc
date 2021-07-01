@@ -29,32 +29,65 @@ import "qrc:///style/"
 T.TabButton {
     id: control
 
-    property color color: VLCStyle.colors.banner
+    // Properties
+
+    property bool selected: false
+
+    property string iconTxt: ""
+
     property bool showText: true
     property bool showCurrentIndicator: true
 
-    text: model.displayText
-    padding: 0
-    width: control.showText ? VLCStyle.bannerTabButton_width_large : VLCStyle.banner_icon_size
+    property color color: VLCStyle.colors.banner
+
+    // Settings
+
+    width: control.showText ? VLCStyle.bannerTabButton_width_large
+                            : VLCStyle.banner_icon_size
+
     height: implicitHeight
+
     implicitWidth: contentItem.implicitWidth
     implicitHeight: contentItem.implicitHeight
 
-    property string iconTxt: ""
-    property bool selected: false
+    padding: 0
+
+    text: model.displayText
+
+    // Keys
 
     Keys.priority: Keys.AfterItem
+
     Keys.onPressed: Navigation.defaultKeyAction(event)
+
+    // Private functions
+
+    function _getBackground() {
+        if (activeFocus || hovered)
+            return VLCStyle.colors.buttonHover;
+        else
+            return color;
+    }
+
+    function _getForeground() {
+        if (activeFocus || hovered || selected)
+            return VLCStyle.colors.buttonTextHover;
+        else
+            return VLCStyle.colors.buttonBanner;
+    }
+
+    // Childs
 
     background: Widgets.AnimatedBackground {
         height: control.height
         width: control.width
+
         active: control.activeFocus
+
         animationDuration: 140
-        foregroundColor: (control.activeFocus || control.hovered) ? VLCStyle.colors.buttonTextHover
-                                                                  : ((control.selected) ? VLCStyle.colors.text : VLCStyle.colors.menuCaption)
-        backgroundColor: (control.activeFocus || control.hovered) ? VLCStyle.colors.buttonHover
-                                                                  : control.color
+
+        backgroundColor: _getBackground()
+        foregroundColor: _getForeground()
     }
 
     contentItem: Item {
@@ -65,33 +98,44 @@ T.TabButton {
             id: tabRow
 
             anchors.centerIn: parent
+
             spacing: VLCStyle.margin_xsmall
 
             Widgets.IconLabel {
-                id: icon
-
                 text: control.iconTxt
+
+                color: (control.activeFocus ||
+                        control.hovered     ||
+                        control.selected) ? VLCStyle.colors.accent
+                                          : VLCStyle.colors.text
+
                 font.pixelSize: VLCIcons.pixelSize(VLCStyle.banner_icon_size)
-                color: (control.activeFocus || control.hovered || control.selected) ? VLCStyle.colors.accent
-                                                                                    : VLCStyle.colors.text
             }
 
             Label {
-                id: txt
-
                 visible: showText
-                font.pixelSize: VLCStyle.fontSize_normal
-                font.weight: (control.activeFocus || control.hovered || control.selected) ? Font.DemiBold : Font.Normal
+
                 text: control.text
+
                 color: control.background.foregroundColor
+
+                font.pixelSize: VLCStyle.fontSize_normal
+
+                font.weight: (control.activeFocus ||
+                              control.hovered     ||
+                              control.selected) ? Font.DemiBold
+                                                : Font.Normal
             }
         }
 
         Widgets.CurrentIndicator {
             width: tabRow.width
+
             orientation: Qt.Horizontal
+
             margin: VLCStyle.dp(3, VLCStyle.scale)
-            visible: control.showCurrentIndicator && control.selected
+
+            visible: (control.showCurrentIndicator && control.selected)
         }
     }
 }
