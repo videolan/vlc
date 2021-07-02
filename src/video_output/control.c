@@ -39,6 +39,7 @@ void vout_control_Init(vout_control_t *ctrl)
     ctrl->is_held = false;
     ctrl->yielding = false;
     ctrl->forced_awake = false;
+    ctrl->pending_count = 0;
     ARRAY_INIT(ctrl->cmd);
 }
 
@@ -67,9 +68,14 @@ void vout_control_Wake(vout_control_t *ctrl)
 void vout_control_Hold(vout_control_t *ctrl)
 {
     vlc_mutex_lock(&ctrl->lock);
+    ++ctrl->pending_count;
+    vlc_cond_signal(&ctrl->wait_request);
     while (ctrl->is_held || !ctrl->yielding)
         vlc_cond_wait(&ctrl->wait_available, &ctrl->lock);
     ctrl->is_held = true;
+    --ctrl->pending_count;
+    if (ctrl->pending_count == 0)
+        vlc_cond_signal(&ctrl->wait_request);
     vlc_mutex_unlock(&ctrl->lock);
 }
 
@@ -87,14 +93,32 @@ int vout_control_Pop(vout_control_t *ctrl, vlc_mouse_t *mouse, vlc_tick_t deadli
     bool has_cmd = false;
     vlc_mutex_lock(&ctrl->lock);
 
-    if (ctrl->cmd.i_size <= 0) {
-        /* Spurious wakeups are perfectly fine */
-        if (deadline != VLC_TICK_INVALID && !ctrl->forced_awake) {
+    bool timed_out = false;
+    for (;;)
+    {
+        if (ctrl->forced_awake)
+            break;
+
+        if (ctrl->pending_count != 0)
+        {
+            /* Let vout_control_Hold() callers pass */
             ctrl->yielding = true;
             vlc_cond_signal(&ctrl->wait_available);
-            vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, deadline);
+            vlc_cond_wait(&ctrl->wait_request, &ctrl->lock);
             ctrl->yielding = false;
         }
+        else if (timed_out)
+            break;
+        else if (ctrl->cmd.i_size <= 0 && deadline != VLC_TICK_INVALID)
+        {
+            ctrl->yielding = true;
+            vlc_cond_signal(&ctrl->wait_available);
+            timed_out =
+                vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, deadline);
+            ctrl->yielding = false;
+        }
+        else
+            break;
     }
 
     while (ctrl->is_held)
