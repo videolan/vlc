@@ -130,7 +130,7 @@ FocusScope {
                     Layout.alignment: Qt.AlignCenter
 
                     model: ObjectModel {
-                        Widgets.TabButtonExt {
+                        Widgets.ActionButtonPrimary {
                             id: playActionBtn
 
                             iconTxt: VLCIcons.play_outline
