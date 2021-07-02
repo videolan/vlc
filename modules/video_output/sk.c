@@ -253,7 +253,7 @@ static int OpenGLOpen(vlc_gl_t *gl, unsigned width, unsigned height)
         .display.height = height,
     };
 
-    sys->embed_gl = vlc_gl_Create(&cfg, VLC_OPENGL_ES2, NULL);
+    sys->embed_gl = vlc_gl_Create(&cfg, gl->api_type, NULL);
     if (sys->embed_gl == NULL)
         return VLC_EGENERIC;
 
@@ -279,6 +279,11 @@ vlc_module_begin()
 
     add_submodule()
         set_capability ("opengl es2", 1000)
+        set_callback(OpenGLOpen)
+        add_shortcut ("sk")
+
+    add_submodule()
+        set_capability ("opengl", 1000)
         set_callback(OpenGLOpen)
         add_shortcut ("sk")
 
