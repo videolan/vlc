@@ -561,11 +561,6 @@ struct vlc_plugin_symbol
 static int vlc_plugin_symbol_compare(const void *a, const void *b)
 {
     const struct vlc_plugin_symbol *sa = a , *sb = b;
-
-    int ret = strcmp(sa->capability, sb->capability);
-    if (ret != 0)
-        return ret;
-
     return strcmp(sa->name, sb->name);
 }
 
@@ -733,7 +728,11 @@ static int vlc_plugin_get_symbol(void *root, const char *name,
         return 0;
     }
 
-    const void **symp = tfind(&name, &root, vlc_plugin_symbol_compare);
+    const struct vlc_plugin_symbol ps =
+    {
+        .name = name
+    };
+    const void **symp = tfind(&ps, &root, vlc_plugin_symbol_compare);
 
     if (symp == NULL)
         return -1;
