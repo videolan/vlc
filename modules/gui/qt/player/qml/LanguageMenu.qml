@@ -147,17 +147,15 @@ T.Popup {
                         "component": undefined
                     }]
 
-                delegate: Widgets.IconToolButton {
-                    id: btn
-
+                delegate: Widgets.IconTrackButton {
                     iconText: modelData.icon
-                    color: "white"
+
                     size: VLCStyle.dp(40, VLCStyle.scale)
                     x: (btnsCol.width - width) / 2
                     highlighted: index === 3
                                  && player.subtitleTracks.multiSelect
 
-                    ToolTip.visible: btn.hovered || btn.activeFocus
+                    ToolTip.visible: (hovered || activeFocus)
                     ToolTip.text: modelData.tooltip
                     ToolTip.delay: 1000
                     ToolTip.toolTip.z: 2
@@ -217,7 +215,7 @@ T.Popup {
 
                            x: 0
                            y: 0
-                           width: VLCStyle.dp(2, VLCStyle.scale)
+                           width: VLCStyle.margin_xxxsmall
 
                            height: tracksListContainer.height
                            color: "white"
@@ -246,12 +244,11 @@ T.Popup {
                                    - parent.leftPadding - parent.rightPadding
                         }
 
-                        Widgets.IconToolButton {
+                        Widgets.IconTrackButton {
                             id: addBtn
 
                             iconText: VLCIcons.add
                             size: VLCStyle.icon_normal
-                            color: "white"
                             focus: true
                             onClicked: {
                                 switch (index) {
@@ -293,7 +290,7 @@ T.Popup {
 
                             focus: true
                             text: model.display
-                            width: tracksListContainer.width
+                            width: tracksListContainer.width - VLCStyle.margin_xxxsmall
                             height: VLCStyle.dp(40, VLCStyle.scale)
                             opacity: hovered || activeFocus || checked ? 1 : .6
                             font.weight: hovered
@@ -332,13 +329,12 @@ T.Popup {
                 Layout.topMargin: VLCStyle.margin_large
                 Layout.fillHeight: true
 
-                Widgets.IconToolButton {
+                Widgets.IconTrackButton {
                     id: backBtn
 
                     anchors.horizontalCenter: parent.horizontalCenter
                     size: VLCStyle.dp(36, VLCStyle.scale)
                     iconText: VLCIcons.back
-                    color: "white"
 
                     onClicked: {
                         control._updateWidth(true)
@@ -349,7 +345,7 @@ T.Popup {
             }
 
             Rectangle {
-                Layout.preferredWidth: VLCStyle.dp(2, VLCStyle.scale)
+                Layout.preferredWidth: VLCStyle.margin_xxxsmall
                 Layout.fillHeight: true
                 color: "white"
                 opacity: .1
@@ -426,11 +422,10 @@ T.Popup {
                         Navigation.rightItem: audioDelaySpinReset
                     }
 
-                    Widgets.TabButtonExt {
+                    Widgets.ActionButtonOverlay {
                         id: audioDelaySpinReset
 
                         text: i18n.qtr("Reset")
-                        color: "white"
 
                         onClicked: audioDelaySpin.value = 0
                         Navigation.leftItem: audioDelaySpin
@@ -492,11 +487,10 @@ T.Popup {
                         Navigation.rightItem: primarySubSpinReset
                     }
 
-                    Widgets.TabButtonExt {
+                    Widgets.ActionButtonOverlay {
                         id: primarySubSpinReset
 
                         text: i18n.qtr("Reset")
-                        color: "white"
                         focus: true
                         onClicked: primarySubSpin.value = 0
                         Navigation.leftItem: primarySubSpin
@@ -552,11 +546,10 @@ T.Popup {
                         Navigation.rightItem: secondarySubSpinReset
                     }
 
-                    Widgets.TabButtonExt {
+                    Widgets.ActionButtonOverlay {
                         id: secondarySubSpinReset
 
                         text: i18n.qtr("Reset")
-                        color: "white"
                         onClicked: secondarySubSpin.value = 0
                         Navigation.leftItem: secondarySubSpin
                         Navigation.upItem: primarySubSpinReset
@@ -583,13 +576,12 @@ T.Popup {
                 Layout.topMargin: VLCStyle.margin_large
                 Layout.fillHeight: true
 
-                Widgets.IconToolButton {
+                Widgets.IconTrackButton {
                     id: backBtn
 
                     anchors.horizontalCenter: parent.horizontalCenter
                     size: VLCStyle.dp(36, VLCStyle.scale)
                     iconText: VLCIcons.back
-                    color: "white"
 
                     onClicked: {
                         control._updateWidth(true)
@@ -600,7 +592,7 @@ T.Popup {
             }
 
             Rectangle {
-                Layout.preferredWidth: VLCStyle.dp(2, VLCStyle.scale)
+                Layout.preferredWidth: VLCStyle.margin_xxxsmall
                 Layout.fillHeight: true
                 color: "white"
                 opacity: .1
@@ -678,11 +670,10 @@ T.Popup {
                         Navigation.rightItem: subSpeedSpinReset
                     }
 
-                    Widgets.TabButtonExt {
+                    Widgets.ActionButtonOverlay {
                         id: subSpeedSpinReset
 
                         text: i18n.qtr("Reset")
-                        color: "white"
                         onClicked: subSpeedSpin.value = 10
 
 
