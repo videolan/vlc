@@ -415,6 +415,19 @@ static int Control(stream_t *stream, int query, va_list args)
         case STREAM_SET_PRIVATE_ID_CA:
         case STREAM_GET_PRIVATE_ID_STATE:
             return VLC_EGENERIC;
+
+        case STREAM_CLEAR_BUFFER:
+            vlc_mutex_lock(&sys->lock);
+
+            sys->buffer_offset = 0;
+            sys->stream_offset = 0;
+            sys->buffer_length = 0;
+
+            /* clear buffer */
+            vlc_stream_Control(stream->s, STREAM_CLEAR_BUFFER);
+            vlc_cond_signal(&sys->wait_space);
+            vlc_mutex_unlock (&sys->lock);
+            return VLC_SUCCESS;
         default:
             msg_Err(stream, "unimplemented query (%d) in control", query);
             return VLC_EGENERIC;

@@ -172,6 +172,8 @@ enum stream_query_e
     STREAM_SET_PRIVATE_ID_STATE = 0x1000, /* arg1= int i_private_data, bool b_selected    res=can fail */
     STREAM_SET_PRIVATE_ID_CA,             /* arg1= void * */
     STREAM_GET_PRIVATE_ID_STATE,          /* arg1=int i_private_data arg2=bool *          res=can fail */
+
+    STREAM_CLEAR_BUFFER = 0x10000, /* SK extension */
 };
 
 /**

@@ -1022,3 +1022,4 @@ vlc_executor_WaitIdle
 vlc_input_attachment_Release
 vlc_input_attachment_New
 vlc_input_attachment_Hold
+vlc_player_ClearBuffer

@@ -3225,6 +3225,8 @@ struct vlc_player_cbs
      * @param data opaque pointer set by vlc_player_AddListener()
      */
     void (*on_playback_restore_queried)(vlc_player_t *player, void *data);
+
+    void (*on_buffer_cleared)(vlc_player_t *player, void *data);
 };
 
 /**
@@ -3454,6 +3456,10 @@ vlc_player_timer_point_GetNextIntervalDate(const struct vlc_player_timer_point *
                                            vlc_tick_t next_interval);
 
 /** @} vlc_player__timer */
+
+
+VLC_API void
+vlc_player_ClearBuffer(vlc_player_t *player);
 
 /** @} vlc_player */
 

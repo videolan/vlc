@@ -1945,6 +1945,13 @@ static bool Control( input_thread_t *p_input,
 
     switch( i_type )
     {
+        case INPUT_CONTROL_CLEAR_BUFFER:
+            demux_Control( priv->master->p_demux, DEMUX_CLEAR_BUFFER );
+            es_out_Control( priv->p_es_out, ES_OUT_CLEAR_BUFFER );
+            input_SendEvent( p_input, &(const struct vlc_input_event){
+                .type = INPUT_EVENT_BUFFER_CLEARED
+            });
+            break;
         case INPUT_CONTROL_SET_POSITION:
         case INPUT_CONTROL_JUMP_POSITION:
         {

@@ -276,7 +276,9 @@ enum demux_query_e
      * work in future VLC versions, nor with all demux filters
      */
     DEMUX_FILTER_ENABLE,
-    DEMUX_FILTER_DISABLE
+    DEMUX_FILTER_DISABLE,
+
+    DEMUX_CLEAR_BUFFER = 1000 /* SK extensions */
 };
 
 /*************************************************************************

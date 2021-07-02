@@ -237,6 +237,7 @@ enum libvlc_event_e {
     libvlc_VideoOutputFrameDisplayed,
 
     libvlc_CaptionsToDisplay,
+    libvlc_MediaPlayerBufferCleared,
 };
 
 /**

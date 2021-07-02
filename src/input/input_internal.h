@@ -149,6 +149,8 @@ typedef enum input_event_type_e
 
     /* Thumbnail generation */
     INPUT_EVENT_THUMBNAIL_READY,
+
+    INPUT_EVENT_BUFFER_CLEARED = 0x1000
 } input_event_type_e;
 
 #define VLC_INPUT_CAPABILITIES_SEEKABLE (1<<0)
@@ -584,6 +586,8 @@ enum input_control_e
 
     INPUT_CONTROL_SET_VBI_PAGE,
     INPUT_CONTROL_SET_VBI_TRANSPARENCY,
+
+    INPUT_CONTROL_CLEAR_BUFFER = 0x1000,
 };
 
 /* Internal helpers */

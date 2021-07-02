@@ -887,6 +887,8 @@ input_thread_Events(input_thread_t *input_thread,
             vlc_player_SendEvent(player, on_teletext_transparency_changed,
                                  input->teletext_transparent);
             break;
+        case INPUT_EVENT_BUFFER_CLEARED:
+            vlc_player_SendEvent(player, on_buffer_cleared);
         default:
             break;
     }

@@ -966,6 +966,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         break;
 
+    case DEMUX_CLEAR_BUFFER:
+        return vlc_stream_Control( p_sys->stream, STREAM_CLEAR_BUFFER );
+
     case DEMUX_SET_POSITION:
         f = va_arg( args, double );
         b_bool = (bool) va_arg( args, int ); /* precise */

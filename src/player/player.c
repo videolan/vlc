@@ -2094,3 +2094,14 @@ vlc_player_GetObject(vlc_player_t *player)
 {
     return VLC_OBJECT(player);
 }
+
+void
+vlc_player_ClearBuffer(vlc_player_t *player)
+{
+    struct vlc_player_input *input = vlc_player_get_input_locked(player);
+    if (!input)
+        return;
+
+    int ret = input_ControlPush(input->thread, INPUT_CONTROL_CLEAR_BUFFER, NULL);
+    (void)ret;
+}

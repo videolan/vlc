@@ -80,6 +80,17 @@ on_current_media_changed(vlc_player_t *player, input_item_t *new_media,
 }
 
 static void
+on_buffer_cleared(vlc_player_t *player, void *data)
+{
+    (void)player;
+    libvlc_media_player_t *mp = data;
+    libvlc_event_t event = {
+        .type = libvlc_MediaPlayerBufferCleared,
+    };
+    libvlc_event_send(&mp->event_manager, &event);
+}
+
+static void
 on_state_changed(vlc_player_t *player, enum vlc_player_state new_state,
                  void *data)
 {
@@ -525,6 +536,7 @@ static const struct vlc_player_cbs vlc_player_cbs = {
     .on_cork_changed = on_cork_changed,
     .on_vout_changed = on_vout_changed,
     .on_recording_changed = on_recording_changed,
+    .on_buffer_cleared = on_buffer_cleared,
 };
 
 static const struct vlc_player_aout_cbs vlc_player_aout_cbs = {
@@ -2468,6 +2480,15 @@ void libvlc_media_player_set_stopped_action( libvlc_media_player_t *p_mi,
     };
     vlc_player_Lock(player);
     vlc_player_SetMediaStoppedAction(player, player_action);
+    vlc_player_Unlock(player);
+}
+
+void libvlc_media_player_clear_buffer( libvlc_media_player_t *p_mi )
+{
+    vlc_player_t *player = p_mi->player;
+
+    vlc_player_Lock(player);
+    vlc_player_ClearBuffer(player);
     vlc_player_Unlock(player);
 }
 
