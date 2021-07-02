@@ -90,22 +90,8 @@ FocusScope {
                         buttonloader.item.size = Qt.binding(function() { return defaultSize; })
 
                     // force colors:
-                    if (!!colors) {
-                        if (!!buttonloader.item.colors)
-                            buttonloader.item.colors = Qt.binding(function() { return colors; })
-                        else
-                            // legacy color forcing for IconToolButton etc. :
-                            if (!!buttonloader.item.color)
-                                buttonloader.item.color = Qt.binding(function() { return colors.playerFg; })
-                            if (!!buttonloader.item.colorHover)
-                                buttonloader.item.colorHover = Qt.binding(function() { return colors.buttonTextHover; })
-                            if (!!buttonloader.item.bgColor)
-                                buttonloader.item.bgColor = Qt.binding(function() {
-                                    return VLCStyle.colors.setColorAlpha(colors.playerBg, 0.8); })
-                            if (!!buttonloader.item.borderColor)
-                                buttonloader.item.borderColor = Qt.binding(function() { return colors.playerBorder; })
-                            if (!!buttonloader.item.colorFocus)
-                                buttonloader.item.colorFocus = Qt.binding(function() { return colors.bgFocus; })
+                    if (!!colors && !!buttonloader.item.colors) {
+                        buttonloader.item.colors = Qt.binding(function() { return colors; })
                     }
 
                     buttonloader.item.Navigation.parentItem = buttonsLayout
