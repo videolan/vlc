@@ -76,6 +76,9 @@ static void Close ( vlc_object_t * );
  *          1. pid:pcr (to force the pcr pid)
  *          2. pid:stream_type
  *          3. pid:type=fourcc where type=(video|audio|spu)
+ *   Ex: Program 1 on pid 8190 with hevc on pid 289, aac on pid 305
+ *       and pcr on 305
+ *      "8190:1=289:video=hevc,305:pcr,305:audio=mp4a"
  */
 #define PMT_TEXT N_("Extra PMT")
 #define PMT_LONGTEXT N_( \
