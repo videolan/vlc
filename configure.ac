@@ -396,10 +396,14 @@ int foo() { return my_array[0]; }
     ;;
 esac
 
+ANDROID_API=17
 dnl Vendor-specific configuration
 case "${host_os}" in
   linux-android*)
     VENDOR=android
+    AC_MSG_CHECKING([Check Android API version])
+    ANDROID_API="`echo ${host_os} | tr -c -d '[[:digit:]]'`"
+    AC_MSG_RESULT([${ANDROID_API}])
     ;;
 esac
 
