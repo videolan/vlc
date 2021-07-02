@@ -396,6 +396,13 @@ int foo() { return my_array[0]; }
     ;;
 esac
 
+dnl Vendor-specific configuration
+case "${host_os}" in
+  linux-android*)
+    VENDOR=android
+    ;;
+esac
+
 dnl WinRT
 AC_ARG_ENABLE([winstore_app],
      AS_HELP_STRING([--enable-winstore-app],
@@ -439,6 +446,7 @@ AS_IF([test "${SYS}" = "mingw32"],[
 
 AM_CONDITIONAL([HAVE_FREEBSD], [test "${SYS}" = "freebsd"])
 AM_CONDITIONAL([HAVE_LINUX],   [test "${SYS}" = "linux"])
+AM_CONDITIONAL([HAVE_ANDROID], [test "${VENDOR}" = "android"])
 AM_CONDITIONAL([HAVE_OS2],     [test "${SYS}" = "os2"])
 
 AM_CONDITIONAL([HAVE_DARWIN],  [test "${SYS}" = "darwin"])
@@ -486,23 +494,6 @@ case "${build_os}" in
     ;;
 esac
 AC_SUBST([BUILDEXEEXT])
-
-dnl Android is linux, but a bit different
-AS_IF([test "$SYS" = linux],[
-    AC_MSG_CHECKING([for an Android system])
-    AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
-        [[#ifndef __ANDROID__
-         # error Not Android
-         #endif
-        ]],[[;]])
-    ],[
-      HAVE_ANDROID="1"
-      AC_MSG_RESULT([yes])
-    ],[
-      AC_MSG_RESULT([no])
-    ])
-])
-AM_CONDITIONAL([HAVE_ANDROID], [test "${HAVE_ANDROID}" = "1"])
 
 dnl
 dnl  Check for the contrib directory
@@ -3845,13 +3836,11 @@ dnl  OpenSLES Android
 dnl
 AC_ARG_ENABLE([opensles],
   AS_HELP_STRING([--enable-opensles], [Android OpenSL ES audio module (default disabled)]))
-if test "${HAVE_ANDROID}" = "1"; then
-  if test "${enable_opensles}" = "yes"; then
-      AC_CHECK_HEADERS([SLES/OpenSLES.h],
-        [ VLC_ADD_PLUGIN([opensles_android]) ],
-        [ AC_MSG_ERROR([cannot find OpenSLES headers])] )
-  fi
-fi
+AS_IF([test "${VENDOR}" = "android" -a "${enable_opensles}" = "yes"],[
+  AC_CHECK_HEADERS([SLES/OpenSLES.h],
+    [ VLC_ADD_PLUGIN([opensles_android]) ],
+    [ AC_MSG_ERROR([cannot find OpenSLES headers])] )
+])
 
 dnl
 dnl libsamplerate plugin
@@ -4570,7 +4559,7 @@ AC_ARG_WITH(kde-solid,
   AS_HELP_STRING([--with-kde-solid=PATH],
                  [KDE Solid actions directory (auto)]),, [
 
-if test "${SYS}" != "mingw32" -a "${SYS}" != "darwin" -a "${HAVE_ANDROID}" != "1" ; then
+if test "${SYS}" != "mingw32" -a "${SYS}" != "darwin" -a "${VENDOR}" != "android" ; then
   with_kde_solid="yes"
 fi
 ])
