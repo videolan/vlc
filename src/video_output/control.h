@@ -28,8 +28,8 @@
 /* */
 typedef struct {
     vlc_mutex_t lock;
-    vlc_cond_t  wait_request;
-    vlc_cond_t  wait_available;
+    vlc_cond_t wait_request;
+    vlc_cond_t wait_available; /* available: yielding && !is_held */
 
     /* */
     bool forced_awake;
