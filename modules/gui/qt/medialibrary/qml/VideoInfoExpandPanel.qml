@@ -118,7 +118,7 @@ FocusScope {
                         spacing: VLCStyle.margin_large
 
                         model: ObjectModel {
-                            Widgets.TabButtonExt {
+                            Widgets.ActionButtonPrimary {
                                 id: playActionBtn
 
                                 iconTxt: VLCIcons.play_outline
