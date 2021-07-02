@@ -754,6 +754,8 @@ static int ControlLocked( es_out_t *p_out, input_source_t *in, int i_query,
                                   i_system );
     }
 
+    case ES_OUT_CLEAR_BUFFER:
+            return VLC_SUCCESS;
     default:
         vlc_assert_unreachable();
         return VLC_EGENERIC;
