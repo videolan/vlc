@@ -33,7 +33,7 @@ typedef struct {
 
     /* */
     bool forced_awake;
-    bool is_waiting;
+    bool yielding;
     bool is_held;
     DECL_ARRAY(vlc_mouse_t) cmd;
 } vout_control_t;
