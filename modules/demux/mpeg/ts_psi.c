@@ -2073,6 +2073,8 @@ int UserPmt( demux_t *p_demux, const char *psz_fmt )
     }
 
     ARRAY_APPEND( GetPID(p_sys, 0)->u.p_pat->programs, pmtpid );
+    ARRAY_APPEND( p_sys->programs, pmtpid->i_pid );
+    p_sys->b_default_selection = true;
 
     psz = strchr( psz, '=' );
     if( psz )
