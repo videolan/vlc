@@ -122,20 +122,18 @@ FocusScope {
                 Layout.topMargin: VLCStyle.margin_large
 
                 model: ObjectModel {
-                    Widgets.TabButtonExt {
+                    Widgets.ActionButtonPrimary {
                         id: playActionBtn
                         iconTxt: VLCIcons.play
                         text: i18n.qtr("Play all")
-                        color: "white"
                         focus: true
                         onClicked: medialib.addAndPlay( artist.id )
                     }
 
-                    Widgets.TabButtonExt {
+                    Widgets.ActionButtonOverlay {
                         id: enqueueActionBtn
                         iconTxt: VLCIcons.enqueue
                         text: i18n.qtr("Enqueue all")
-                        color: "white"
                         onClicked: medialib.addToPlaylist( artist.id )
                     }
                 }
