@@ -35,6 +35,8 @@ libspatializer_plugin_la_SOURCES = \
 libspatializer_plugin_la_LIBADD = $(LIBM)
 libcenter_plugin_la_SOURCES = audio_filter/center.c
 libcenter_plugin_la_LIBADD  = $(LIBM)
+libstereopan_plugin_la_SOURCES = audio_filter/stereo_pan.c
+libstereopan_plugin_la_LIBADD = $(LIBM)
 
 audio_filter_LTLIBRARIES = \
 	libaudiobargraph_a_plugin.la \
@@ -49,7 +51,8 @@ audio_filter_LTLIBRARIES = \
 	libscaletempo_pitch_plugin.la \
 	libspatializer_plugin.la \
 	libstereo_widen_plugin.la \
-	libcenter_plugin.la
+	libcenter_plugin.la \
+	libstereopan_plugin.la
 
 # Channel mixers
 libdolby_surround_decoder_plugin_la_SOURCES = \

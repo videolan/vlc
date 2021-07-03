@@ -1326,6 +1326,15 @@ PitchShifter::PitchShifter( qt_intf_t *p_intf, QWidget *parent )
     build();
 }
 
+StereoPanner::StereoPanner( qt_intf_t *p_intf, QWidget *parent )
+    : AudioFilterControlWidget( p_intf, parent, "stereo_pan" )
+{
+    i_smallfont = -1;
+    controls.append( { "pan-control", qtr("Adjust pan"), "", 0.0, 1.0,
+            0.5, 0.1, 1.0 } );
+    build();
+}
+
 #include <QToolButton>
 #include <QGridLayout>
 

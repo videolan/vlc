@@ -85,8 +85,12 @@ ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )
     PitchShifter *pitchshifter = new PitchShifter( p_intf, audioTab );
     CONNECT( pitchshifter, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
 
-    advancedTabLayout->setColumnStretch( 1, 10 );
+    StereoPanner *stereopanner = new StereoPanner( p_intf, audioTab );
+    CONNECT( stereopanner, configChanged(QString, QVariant), this, putAudioConfig(QString, QVariant) );
+
+    advancedTabLayout->setColumnStretch( 2, 10 );
     advancedTabLayout->addWidget( pitchshifter );
+    advancedTabLayout->addWidget( stereopanner );
 
     advancedTab->setLayout( advancedTabLayout );
     audioTab->addTab( advancedTab, qtr( "Advanced" ) );

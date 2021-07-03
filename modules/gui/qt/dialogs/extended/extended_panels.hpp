@@ -224,6 +224,14 @@ public:
     PitchShifter( qt_intf_t *, QWidget * );
 };
 
+class StereoPanner: public AudioFilterControlWidget
+{
+    Q_OBJECT
+
+public:
+    StereoPanner( qt_intf_t *, QWidget * );
+};
+
 class SyncWidget : public QWidget
 {
     Q_OBJECT
