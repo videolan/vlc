@@ -1,21 +1,40 @@
-diff -ru lame/configure.in lame/configure.in
---- lame/configure.in	2021-05-07 10:51:04.000000000 +0200
-+++ lame-fixed/configure.in	2021-05-07 10:51:26.000000000 +0200
-@@ -935,7 +935,7 @@
- 						-mtune=native"
+--- lame/configure.in.orig	2021-07-03 17:02:42.240179812 +0300
++++ lame/configure.in	2021-07-03 17:07:38.366445785 +0300
+@@ -927,16 +927,12 @@
+ 					OPTIMIZATION="${OPTIMIZATION} -march=i486"
+ 					;;
+ 				*586)
+-					OPTIMIZATION="${OPTIMIZATION} -march=i586 \
+-						-mtune=native"
++					OPTIMIZATION="${OPTIMIZATION} -march=i586"
+ 					;;
+ 				*686)
+-					OPTIMIZATION="${OPTIMIZATION} -march=i686 \
+-						-mtune=native"
++					OPTIMIZATION="${OPTIMIZATION} -march=i686"
  					;;
  				*86)
 -					OPTIMIZATION="${OPTIMIZATION} -march=native \
-+					OPTIMIZATION="${OPTIMIZATION} -march=i386 \
- 						-mtune=native"
+-						-mtune=native"
  					;;
  				arm*-gnueabi)
-@@ -986,7 +986,7 @@
- 				-mtune=native"
+ 					if [ -z "$(echo ${GCC_version} | awk '/4\.0/')" ]; then
+@@ -978,16 +974,12 @@
+ 			OPTIMIZATION="${OPTIMIZATION} -march=i486"
+ 			;;
+ 		*586)
+-			OPTIMIZATION="${OPTIMIZATION} -march=i586 \
+-				-mtune=native"
++			OPTIMIZATION="${OPTIMIZATION} -march=i586"
+ 			;;
+ 		*686)
+-			OPTIMIZATION="${OPTIMIZATION} -march=i686 \
+-				-mtune=native"
++			OPTIMIZATION="${OPTIMIZATION} -march=i686"
  			;;
  		*86)
 -			OPTIMIZATION="${OPTIMIZATION} -march=native \
-+			OPTIMIZATION="${OPTIMIZATION} -march=i386 \
- 				-mtune=native"
+-				-mtune=native"
  			;;
  		esac
+ 
