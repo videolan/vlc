@@ -95,8 +95,8 @@ static vlc_tick_t vlc_clock_context_stream_to_system(struct vlc_clock_context *c
 {
     if (context->offset == VLC_TICK_INVALID)
         return VLC_TICK_INVALID;
-    return (vlc_tick_t)
-        (ts * context->coeff / context->rate + context->offset);
+    return ((vlc_tick_t) (ts * context->coeff / context->rate))
+            + context->offset;
 }
 
 static void vlc_clock_context_reset(struct vlc_clock_context *context)
@@ -229,7 +229,8 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                 clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
         }
 
-        context->offset = system_now - ts * context->coeff / rate;
+        context->offset =
+            system_now - ((vlc_tick_t)(ts * context->coeff / rate));
 
         context->last = clock_point_Create(system_now, ts);
 
