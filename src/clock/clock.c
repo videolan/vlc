@@ -83,8 +83,8 @@ static vlc_tick_t main_stream_to_system(vlc_clock_main_t *main_clock,
 {
     if (main_clock->offset == VLC_TICK_INVALID)
         return VLC_TICK_INVALID;
-    return (vlc_tick_t)
-        (ts * main_clock->coeff / main_clock->rate + main_clock->offset);
+    return ((vlc_tick_t) (ts * main_clock->coeff / main_clock->rate))
+            + main_clock->offset;
 }
 
 static void vlc_clock_main_reset(vlc_clock_main_t *main_clock)
@@ -151,7 +151,8 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
                 clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
         }
 
-        main_clock->offset = system_now - ts * main_clock->coeff / rate;
+        main_clock->offset =
+            system_now - ((vlc_tick_t) (ts * main_clock->coeff / rate));
 
         main_clock->last = clock_point_Create(system_now, ts);
 
