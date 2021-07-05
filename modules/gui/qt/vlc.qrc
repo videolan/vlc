@@ -211,6 +211,7 @@
         <file alias="ImageToolButton.qml">widgets/qml/ImageToolButton.qml</file>
         <file alias="TextToolButton.qml">widgets/qml/TextToolButton.qml</file>
         <file alias="IconToolButton.qml">widgets/qml/IconToolButton.qml</file>
+        <file alias="IconTrackButton.qml">widgets/qml/IconTrackButton.qml</file>
         <file alias="StackViewExt.qml">widgets/qml/StackViewExt.qml</file>
         <file alias="ComboBoxExt.qml">widgets/qml/ComboBoxExt.qml</file>
         <file alias="SpinBoxExt.qml">widgets/qml/SpinBoxExt.qml</file>
