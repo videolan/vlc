@@ -191,7 +191,7 @@ FocusScope {
                     animationDuration: 0
 
                     backgroundColor: (closeAnimation.running === false && itemDelegate.hovered)
-                                     ? VLCStyle.colors.dropDown
+                                     ? VLCStyle.colors.listHover
                                      : "transparent"
                 }
 
@@ -270,7 +270,9 @@ FocusScope {
             id: bgRect
 
             border.width: VLCStyle.dp(1)
-            border.color: colors.dropDownBorder
+
+            // FIXME: We might want another color for this.
+            border.color: VLCStyle.colors.text
 
             Loader {
                 id: effectLoader
