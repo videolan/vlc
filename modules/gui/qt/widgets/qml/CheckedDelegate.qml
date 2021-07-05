@@ -26,38 +26,68 @@ import "qrc:///util/KeyHelper.js" as KeyHelper
 T.ItemDelegate {
     id: control
 
-    checkable: true
-    font.pixelSize: VLCStyle.fontSize_large
+    // Settings
+
     leftPadding: VLCStyle.margin_xlarge
     rightPadding: VLCStyle.margin_xsmall
 
-    background: Rectangle {
-        color: control.hovered || control.activeFocus ? "#2A2A2A" : "transparent"
+    checkable: true
+
+    font.pixelSize: VLCStyle.fontSize_large
+
+    // Childs
+
+    background: AnimatedBackground {
+        active: control.activeFocus
+
+        backgroundColor: {
+            if (control.hovered) {
+                if (control.checked)
+                    return VLCStyle.colors.trackItemHover;
+                else
+                    return VLCStyle.colors.trackItem;
+            } else if (control.checked)
+                return VLCStyle.colors.trackItem;
+            else
+                return "transparent"
+        }
+
+        activeBorderColor: VLCStyle.colors.white
     }
 
     contentItem: Item { // don't use a row, it will move text when control is unchecked
         IconLabel {
             id: checkIcon
 
-            text: VLCIcons.check
-            visible: control.checked
             height: parent.height
-            font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_checkedDelegate)
-            color: "white"
+
             verticalAlignment: Text.AlignVCenter
+
+            visible: control.checked
+
+            text: VLCIcons.check
+
+            color: "white"
+
+            font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_checkedDelegate)
         }
 
         MenuLabel {
             id: text
 
             anchors.left: checkIcon.right
+
             height: parent.height
-            font: control.font
-            text: control.text
-            color: "white"
-            verticalAlignment: Text.AlignVCenter
-            leftPadding: VLCStyle.margin_normal
             width: parent.width - checkIcon.width
+
+            leftPadding: VLCStyle.margin_normal
+
+            verticalAlignment: Text.AlignVCenter
+
+            text: control.text
+            font: control.font
+
+            color: "white"
         }
     }
 }
