@@ -944,7 +944,7 @@ VOUT_ACTION_HANDLER(SubtitleDisplay)
             else
             {
                 scale = var_GetInteger(vout, varname);
-                unsigned delta = (scale > 100 ? scale - 100 : 100 - scale) / 25;
+                int delta = (scale > 100 ? scale - 100 : 100 - scale) / 25;
                 delta = delta <= 1 ? 10 : 25;
                 if (action_id == ACTIONID_SUBTITLE_TEXT_SCALE_DOWN)
                     delta = -delta;
