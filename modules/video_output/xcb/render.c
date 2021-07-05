@@ -43,7 +43,7 @@
 #include "pictures.h"
 #include "events.h"
 
-struct vout_display_sys_t {
+typedef struct vout_display_sys_t {
     xcb_connection_t *conn;
 
     struct {
@@ -76,7 +76,7 @@ struct vout_display_sys_t {
     int32_t src_x;
     int32_t src_y;
     vlc_fourcc_t spu_chromas[2];
-};
+} vout_display_sys_t;
 
 static size_t PictureAttach(vout_display_t *vd, picture_t *pic)
 {

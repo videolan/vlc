@@ -88,7 +88,7 @@ vlc_module_begin ()
     set_callback_display(Open, 300)
 vlc_module_end ()
 
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
     display_win32_area_t     area;
@@ -135,7 +135,7 @@ struct vout_display_sys_t
     libvlc_video_makeCurrent_cb              startEndRenderingCb;
     libvlc_video_frameMetadata_cb            sendMetadataCb;
     libvlc_video_output_select_plane_cb      selectPlaneCb;
-};
+} vout_display_sys_t;
 
 static void Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture, vlc_tick_t);
 static void Display(vout_display_t *, picture_t *);
@@ -451,11 +451,13 @@ error:
 
 static void Close(vout_display_t *vd)
 {
-    D3D_ReleaseShaderCompiler(&vd->sys->shaders);
+    vout_display_sys_t *sys = vd->sys;
+
+    D3D_ReleaseShaderCompiler(&sys->shaders);
     Direct3D11Close(vd);
 #if !VLC_WINSTORE_APP
-    UnhookWindowsSensors(vd->sys->p_sensors);
-    CommonWindowClean(&vd->sys->sys);
+    UnhookWindowsSensors(sys->p_sensors);
+    CommonWindowClean(&sys->sys);
 #endif
 }
 static int Control(vout_display_t *vd, int query)
@@ -708,17 +710,21 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
 static const d3d_format_t *GetDirectRenderingFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)
 {
+    vout_display_sys_t *sys = vd->sys;
+
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     if (is_d3d11_opaque(i_src_chroma))
         supportFlags |= D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-    return FindD3D11Format( vd, vd->sys->d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0,
+    return FindD3D11Format( vd, sys->d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0,
                             is_d3d11_opaque(i_src_chroma) ? DXGI_CHROMA_GPU : DXGI_CHROMA_CPU, supportFlags );
 }
 
 static const d3d_format_t *GetDirectDecoderFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)
 {
+    vout_display_sys_t *sys = vd->sys;
+
     UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-    return FindD3D11Format( vd, vd->sys->d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0,
+    return FindD3D11Format( vd, sys->d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0,
                             DXGI_CHROMA_GPU, supportFlags );
 }
 
@@ -728,18 +734,22 @@ static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t b
                                                    bool from_processor,
                                                    int rgb_yuv)
 {
+    vout_display_sys_t *sys = vd->sys;
+
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     if (from_processor)
         supportFlags |= D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT;
-    return FindD3D11Format( vd, vd->sys->d3d_dev, 0, rgb_yuv,
+    return FindD3D11Format( vd, sys->d3d_dev, 0, rgb_yuv,
                             bit_depth, widthDenominator+1, heightDenominator+1,
                             DXGI_CHROMA_CPU, supportFlags );
 }
 
 static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)
 {
+    vout_display_sys_t *sys = vd->sys;
+
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_BLENDABLE;
-    return FindD3D11Format( vd, vd->sys->d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0, DXGI_CHROMA_CPU, supportFlags );
+    return FindD3D11Format( vd, sys->d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0, DXGI_CHROMA_CPU, supportFlags );
 }
 
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_context *vctx)
@@ -952,6 +962,8 @@ static void Direct3D11Close(vout_display_t *vd)
 
 static bool CanUseTextureArray(vout_display_t *vd)
 {
+    vout_display_sys_t *sys = vd->sys;
+
 #ifndef HAVE_ID3D11VIDEODECODER
     (void) vd;
     return false;
@@ -962,7 +974,7 @@ static bool CanUseTextureArray(vout_display_t *vd)
     struct wddm_version WDDM_os = {
         .wddm         = 21,  // starting with drivers designed for W10 Anniversary Update
     };
-    if (D3D11CheckDriverVersion(vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_os) != VLC_SUCCESS)
+    if (D3D11CheckDriverVersion(sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_os) != VLC_SUCCESS)
     {
         msg_Dbg(vd, "AMD driver too old, fallback to legacy shader mode");
         return false;
@@ -972,7 +984,7 @@ static bool CanUseTextureArray(vout_display_t *vd)
     struct wddm_version WDDM_build = {
         .revision     = 162,
     };
-    if (D3D11CheckDriverVersion(vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_build) != VLC_SUCCESS)
+    if (D3D11CheckDriverVersion(sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_build) != VLC_SUCCESS)
     {
         msg_Dbg(vd, "Bogus AMD driver detected, fallback to legacy shader mode");
         return false;
@@ -984,10 +996,12 @@ static bool CanUseTextureArray(vout_display_t *vd)
 
 static bool BogusZeroCopy(const vout_display_t *vd)
 {
-    if (vd->sys->d3d_dev->adapterDesc.VendorId != GPU_MANUFACTURER_AMD)
+    vout_display_sys_t *sys = vd->sys;
+
+    if (sys->d3d_dev->adapterDesc.VendorId != GPU_MANUFACTURER_AMD)
         return false;
 
-    switch (vd->sys->d3d_dev->adapterDesc.DeviceId)
+    switch (sys->d3d_dev->adapterDesc.DeviceId)
     {
     case 0x687F: // RX Vega 56/64
     case 0x6863: // RX Vega Frontier Edition
@@ -996,7 +1010,7 @@ static bool BogusZeroCopy(const vout_display_t *vd)
         struct wddm_version WDDM = {
             .revision     = 14011, // 18.10.2 - 2018/06/11
         };
-        return D3D11CheckDriverVersion(vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM) != VLC_SUCCESS;
+        return D3D11CheckDriverVersion(sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM) != VLC_SUCCESS;
     }
     default:
         return false;

@@ -67,7 +67,7 @@
 
 typedef enum { drvSuccess, drvTryNext, drvFail } deviceRval;
 
-struct vout_display_sys_t {
+typedef struct vout_display_sys_t {
 /*
  * buffer information
  */
@@ -99,7 +99,7 @@ struct vout_display_sys_t {
  * other generic stuff
  */
     int             drm_fd;
-};
+} vout_display_sys_t;
 
 static void DestroyFB(vout_display_sys_t const *sys, uint32_t const buf)
 {

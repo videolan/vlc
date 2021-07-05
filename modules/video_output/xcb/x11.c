@@ -38,7 +38,7 @@
 #include "pictures.h"
 #include "events.h"
 
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     xcb_connection_t *conn;
 
@@ -48,7 +48,7 @@ struct vout_display_sys_t
     bool attached;
     uint8_t depth; /* useful bits per pixel */
     video_format_t fmt;
-};
+} vout_display_sys_t;
 
 static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                     vlc_tick_t date)

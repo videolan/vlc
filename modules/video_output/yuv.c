@@ -80,11 +80,11 @@ static int            Control(vout_display_t *, int);
 /*****************************************************************************
  * vout_display_sys_t: video output descriptor
  *****************************************************************************/
-struct vout_display_sys_t {
+typedef struct vout_display_sys_t {
     FILE *f;
     bool  is_first;
     bool  is_yuv4mpeg2;
-};
+} vout_display_sys_t;
 
 static const struct vlc_display_operations ops = {
     Close, NULL, Display, Control, NULL, NULL,

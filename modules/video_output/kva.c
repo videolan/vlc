@@ -80,7 +80,7 @@ vlc_module_end ()
  * This structure is part of the video output thread descriptor.
  * It describes the module specific properties of an output thread.
  *****************************************************************************/
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     TID                tid;
     HEV                ack_event;
@@ -102,7 +102,7 @@ struct vout_display_sys_t
     ULONG              cursor_timeout;
 
     int                i_chroma_shift;
-};
+} vout_display_sys_t;
 
 /*****************************************************************************
  * Local prototypes
@@ -820,21 +820,25 @@ static MRESULT EXPENTRY MyFrameWndProc( HWND hwnd, ULONG msg, MPARAM mp1,
 
 static void MousePressed( vout_display_t *vd, HWND hwnd, unsigned button )
 {
+    vout_display_sys_t *sys = vd->sys;
+
     if( WinQueryFocus( HWND_DESKTOP ) != hwnd )
         WinSetFocus( HWND_DESKTOP, hwnd );
 
-    if( !vd->sys->button_pressed )
+    if( !sys->button_pressed )
         WinSetCapture( HWND_DESKTOP, hwnd );
 
-    vd->sys->button_pressed |= 1 << button;
+    sys->button_pressed |= 1 << button;
 
     vout_window_ReportMousePressed( vd->cfg->window, button );
 }
 
 static void MouseReleased( vout_display_t *vd, unsigned button )
 {
-    vd->sys->button_pressed &= ~(1 << button);
-    if( !vd->sys->button_pressed )
+    vout_display_sys_t *sys = vd->sys;
+
+    sys->button_pressed &= ~(1 << button);
+    if( !sys->button_pressed )
         WinSetCapture( HWND_DESKTOP, NULLHANDLE );
 
     vout_window_ReportMouseReleased( vd->cfg->window, button );

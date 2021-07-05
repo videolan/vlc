@@ -104,7 +104,7 @@ struct buffer_bounds
     ARect bounds;
 };
 
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     vout_window_t *embed;
 
@@ -129,7 +129,7 @@ struct vout_display_sys_t
     ARect sub_last_region;
 
     bool b_has_subpictures;
-};
+} vout_display_sys_t;
 
 #define PRIV_WINDOW_FORMAT_YV12 0x32315659
 

@@ -87,7 +87,7 @@ static void OpenglSwap         (vlc_gl_t *gl);
 @end
 
 
-struct vout_display_sys_t {
+typedef struct vout_display_sys_t {
 
     CALayer <VLCCoreAnimationVideoLayerEmbedding> *container;
     vout_window_t *embed;
@@ -99,7 +99,7 @@ struct vout_display_sys_t {
     vout_display_place_t place;
 
     bool  b_frame_available;
-};
+} vout_display_sys_t;
 
 struct gl_sys
 {
@@ -449,7 +449,9 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
     if (!_voutDisplay)
         return false;
 
-    return _voutDisplay->sys->b_frame_available;
+    vout_display_sys_t *sys = _voutDisplay->sys;
+
+    return sys->b_frame_available;
 }
 
 - (void)drawInCGLContext:(CGLContextObj)glContext pixelFormat:(CGLPixelFormatObj)pixelFormat forLayerTime:(CFTimeInterval)timeInterval displayTime:(const CVTimeStamp *)timeStamp

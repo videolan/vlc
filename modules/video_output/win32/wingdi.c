@@ -58,7 +58,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
     display_win32_area_t     area;
@@ -79,7 +79,7 @@ struct vout_display_sys_t
         RGBQUAD    green;
         RGBQUAD    blue;
     };
-};
+} vout_display_sys_t;
 
 static void           Display(vout_display_t *, picture_t *);
 
@@ -143,9 +143,11 @@ error:
 /* */
 static void Close(vout_display_t *vd)
 {
+    vout_display_sys_t *sys = vd->sys;
+
     Clean(vd);
 
-    CommonWindowClean(&vd->sys->sys);
+    CommonWindowClean(&sys->sys);
 
     free(vd->sys);
 }

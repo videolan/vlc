@@ -83,7 +83,7 @@ typedef struct
 } picture_sys_t;
 
 /* NOTE: the callback prototypes must match those of LibVLC */
-struct vout_display_sys_t {
+typedef struct vout_display_sys_t {
     void *opaque;
     void *pic_opaque;
     void *(*lock)(void *sys, void **plane);
@@ -93,7 +93,7 @@ struct vout_display_sys_t {
 
     unsigned pitches[PICTURE_PLANE_MAX];
     unsigned lines[PICTURE_PLANE_MAX];
-};
+} vout_display_sys_t;
 
 typedef unsigned (*vlc_format_cb)(void **, char *, unsigned *, unsigned *,
                                   unsigned *, unsigned *);

@@ -74,13 +74,13 @@ vlc_module_begin ()
     add_opengl_submodule_draw()
 vlc_module_end ()
 
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     vout_display_opengl_t *vgl;
     vlc_gl_t *gl;
     vout_display_place_t place;
     bool place_changed;
-};
+} vout_display_sys_t;
 
 /* Display callbacks */
 static void PictureRender (vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);

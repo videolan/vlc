@@ -43,13 +43,13 @@ struct vlc_vidsplit_part {
     unsigned height;
 };
 
-struct vout_display_sys_t {
+typedef struct vout_display_sys_t {
     video_splitter_t splitter;
     vlc_mutex_t lock;
 
     picture_t **pictures;
     struct vlc_vidsplit_part *parts;
-};
+} vout_display_sys_t;
 
 static void vlc_vidsplit_Prepare(vout_display_t *vd, picture_t *pic,
                                  subpicture_t *subpic, vlc_tick_t date)

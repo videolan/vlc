@@ -47,7 +47,7 @@
 #include <caca.h>
 
 /* */
-struct vout_display_sys_t {
+typedef struct vout_display_sys_t {
     cucul_canvas_t *cv;
     caca_display_t *dp;
     cucul_dither_t *dither;
@@ -60,7 +60,7 @@ struct vout_display_sys_t {
 
     vlc_tick_t cursor_timeout;
     vlc_tick_t cursor_deadline;
-};
+} vout_display_sys_t;
 
 typedef struct vlc_caca_event {
     struct vlc_caca_event *next;

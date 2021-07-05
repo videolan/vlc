@@ -44,7 +44,7 @@
 
 #define MAX_PICTURES 4
 
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     vout_window_t *embed; /* VLC window */
     struct wl_event_queue *eventq;
@@ -56,7 +56,7 @@ struct vout_display_sys_t
 
     unsigned display_width;
     unsigned display_height;
-};
+} vout_display_sys_t;
 
 struct buffer_data
 {

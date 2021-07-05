@@ -804,7 +804,7 @@ static int OpenVideo(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     vd->ops = &ops;
 
-    vd->sys = (vout_display_sys_t*) sys;
+    vd->sys = (void *) sys;
 
     return VLC_SUCCESS;
 }

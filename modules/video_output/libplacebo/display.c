@@ -43,7 +43,7 @@
 # include <libplacebo/shaders/lut.h>
 #endif
 
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     vlc_placebo_t *pl;
     const struct pl_tex *plane_tex[4];
@@ -79,7 +79,7 @@ struct vout_display_sys_t
     const struct pl_hook *hook;
     char *hook_path;
 #endif
-};
+} vout_display_sys_t;
 
 // Display callbacks
 static void PictureRender(vout_display_t *, picture_t *, subpicture_t *, mtime_t);

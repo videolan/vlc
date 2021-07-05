@@ -130,7 +130,7 @@ typedef struct
     uint32_t     bmask;
 } d3d9_format_t;
 
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
     display_win32_area_t     area;
@@ -172,7 +172,7 @@ struct vout_display_sys_t
         HMODULE                 dll;
         IDXVAHD_VideoProcessor *proc;
     } processor;
-};
+} vout_display_sys_t;
 
 /* */
 typedef struct
@@ -485,11 +485,13 @@ static void Direct3D9DestroyShaders(vout_display_t *vd)
  */
 static void Direct3D9DestroyResources(vout_display_t *vd)
 {
+    vout_display_sys_t *sys = vd->sys;
+
     Direct3D9DestroyScene(vd);
-    if (vd->sys->dx_render)
+    if (sys->dx_render)
     {
-        IDirect3DSurface9_Release(vd->sys->dx_render);
-        vd->sys->dx_render = NULL;
+        IDirect3DSurface9_Release(sys->dx_render);
+        sys->dx_render = NULL;
     }
     Direct3D9DestroyShaders(vd);
 }
@@ -1019,7 +1021,7 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
 {
     vout_display_sys_t *sys = vd->sys;
 
-    IDirect3DDevice9 *d3ddev = vd->sys->d3d9_device->d3ddev.dev;
+    IDirect3DDevice9 *d3ddev = sys->d3d9_device->d3ddev.dev;
 
     HRESULT hr;
 
@@ -1895,11 +1897,13 @@ error:
  */
 static void Close(vout_display_t *vd)
 {
+    vout_display_sys_t *sys = vd->sys;
+
     Direct3D9Close(vd);
 
-    CommonWindowClean(&vd->sys->sys);
+    CommonWindowClean(&sys->sys);
 
-    Direct3D9Destroy(vd->sys);
+    Direct3D9Destroy(sys);
 
-    free(vd->sys);
+    free(sys);
 }

@@ -107,7 +107,7 @@ static int  TtyInit(vout_display_t *);
 static void TtyExit(vout_display_t *);
 
 /* */
-struct vout_display_sys_t {
+typedef struct vout_display_sys_t {
     /* System information */
     int                 tty;                          /* tty device handle */
     bool                is_tty;
@@ -140,7 +140,7 @@ struct vout_display_sys_t {
     size_t      video_size;                                    /* page size */
 
     picture_t       *picture;
-};
+} vout_display_sys_t;
 
 
 static void ClearScreen(vout_display_sys_t *sys)
@@ -326,7 +326,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
     /* swap the two Y offsets if the drivers supports panning */
     if (sys->has_pan) {
         sys->var_info.yoffset = 0;
-        /*vd->sys->var_info.yoffset = vd->sys->var_info.yres; */
+        /*sys->var_info.yoffset = sys->var_info.yres; */
 
         /* the X offset should be 0, but who knows ...
          * some other app might have played with the framebuffer */

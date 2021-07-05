@@ -91,7 +91,7 @@ typedef struct vout_subpic_s {
     subpic_reg_stash_t sub;
 } vout_subpic_t;
 
-struct vout_display_sys_t {
+typedef struct vout_display_sys_t {
     vlc_mutex_t manage_mutex;
 
     vlc_decoder_device *dec_dev;
@@ -145,7 +145,7 @@ struct vout_display_sys_t {
 
     // Subpic blend if we have to do it here
     vzc_pool_ctl_t * vzc;
-};
+} vout_display_sys_t;
 
 
 // ISP setup
@@ -238,7 +238,8 @@ static void isp_output_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf)
         // The filter structure etc. should always exist if we have contents
         // but might not on later flushes as we shut down
         vout_display_t * const vd = (vout_display_t *)port->userdata;
-        struct vout_isp_conf_s *const isp = &vd->sys->isp;
+        vout_display_sys_t *sys = vd->sys;
+        struct vout_isp_conf_s *const isp = &sys->isp;
 
         mmal_queue_put(isp->out_q, buf);
     }
@@ -955,13 +956,14 @@ static void adjust_refresh_rate(vout_display_t *vd, const video_format_t *fmt)
 
 static void maintain_phase_sync(vout_display_t *vd)
 {
+    vout_display_sys_t *sys = vd->sys;
+
     MMAL_PARAMETER_VIDEO_RENDER_STATS_T render_stats = {
         .hdr = { MMAL_PARAMETER_VIDEO_RENDER_STATS, sizeof(render_stats) },
     };
     int32_t frame_duration = CLOCK_FREQ /
-        ((double)vd->sys->i_frame_rate /
-        vd->sys->i_frame_rate_base);
-    vout_display_sys_t *sys = vd->sys;
+        ((double)sys->i_frame_rate /
+        sys->i_frame_rate_base);
     int32_t phase_offset;
     MMAL_STATUS_T status;
 

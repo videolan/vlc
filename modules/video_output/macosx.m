@@ -103,7 +103,7 @@ vlc_module_end ()
 @end
 
 
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     VLCOpenGLVideoView *glView;
     id<VLCVideoViewEmbedding> container;
@@ -116,7 +116,7 @@ struct vout_display_sys_t
     bool has_first_frame;
 
     vout_display_cfg_t cfg;
-};
+} vout_display_sys_t;
 
 struct gl_sys
 {
@@ -329,7 +329,7 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
         if (@available(macOS 10.14, *)) {
             vout_display_place_t place;
             vout_display_PlacePicture(&place, vd->source, &sys->cfg);
-            vout_display_opengl_Viewport(vd->sys->vgl, place.x,
+            vout_display_opengl_Viewport(sys->vgl, place.x,
                                          sys->cfg.display.height - (place.y + place.height),
                                          place.width, place.height);
         }
@@ -555,8 +555,10 @@ static void OpenglSwap (vlc_gl_t *gl)
     VLCAssertMainThread();
 
     @synchronized(self) {
-        BOOL hasFirstFrame = vd && vd->sys->has_first_frame;
-        return !_hasPendingReshape && hasFirstFrame;
+        if (!vd)
+            return false;
+        vout_display_sys_t *sys = vd->sys;
+        return !_hasPendingReshape && sys->has_first_frame;
     }
 }
 
@@ -596,14 +598,17 @@ static void OpenglSwap (vlc_gl_t *gl)
     if ([self canSkipRendering])
         return;
 
+    vout_display_sys_t *sys;
+
     BOOL hasFirstFrame;
     @synchronized(self) { // vd can be accessed from multiple threads
-        hasFirstFrame = vd && vd->sys->has_first_frame;
+        sys = vd ? vd->sys : NULL;
+        hasFirstFrame = sys && sys->has_first_frame;
     }
 
     if (hasFirstFrame)
         // This will lock gl.
-        vout_display_opengl_Display(vd->sys->vgl);
+        vout_display_opengl_Display(sys->vgl);
     else
         glClear (GL_COLOR_BUFFER_BIT);
 }

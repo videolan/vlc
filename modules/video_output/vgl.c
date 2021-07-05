@@ -38,7 +38,7 @@
 #define GL_RGBA 0x1908
 #endif
 
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     libvlc_video_output_cleanup_cb cleanupCb;
     libvlc_video_output_setup_cb setupCb;
@@ -50,7 +50,7 @@ struct vout_display_sys_t
     void* opaque;
     unsigned width;
     unsigned height;
-};
+} vout_display_sys_t;
 
 
 static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)

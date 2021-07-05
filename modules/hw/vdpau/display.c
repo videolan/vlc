@@ -51,7 +51,7 @@ vlc_module_begin()
     add_shortcut("vdpau")
 vlc_module_end()
 
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     xcb_connection_t *conn; /**< XCB connection */
     vdp_t *vdp; /**< VDPAU back-end */
@@ -64,7 +64,7 @@ struct vout_display_sys_t
 
     unsigned width;
     unsigned height;
-};
+} vout_display_sys_t;
 
 static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
                          const subpicture_t *subpic,

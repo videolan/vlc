@@ -57,7 +57,7 @@ vlc_module_end()
  * Local prototypes.
  *****************************************************************************/
 
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     HWND                  hvideownd;
     HDC                   hGLDC;
@@ -71,7 +71,7 @@ struct vout_display_sys_t
         PFNWGLGETEXTENSIONSSTRINGEXTPROC GetExtensionsStringEXT;
         PFNWGLGETEXTENSIONSSTRINGARBPROC GetExtensionsStringARB;
     } exts;
-};
+} vout_display_sys_t;
 
 static void          Swap(vlc_gl_t *);
 static void          *OurGetProcAddress(vlc_gl_t *, const char *);

@@ -75,9 +75,9 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct vout_display_sys_t {
+typedef struct vout_display_sys_t {
     int             fd;
-};
+} vout_display_sys_t;
 static void            Display(vout_display_t *, picture_t *);
 static int             Control(vout_display_t *, int);
 

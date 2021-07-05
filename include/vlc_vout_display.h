@@ -44,7 +44,6 @@
  */
 
 typedef struct vout_display_t vout_display_t;
-typedef struct vout_display_sys_t vout_display_sys_t;
 typedef struct vout_display_owner_t vout_display_owner_t;
 
 /**
@@ -365,7 +364,7 @@ struct vout_display_t {
      *
      * A module is free to use it as it wishes.
      */
-    vout_display_sys_t *sys;
+    void *sys;
 
     /**
      * Callbacks the display module must set on Open.

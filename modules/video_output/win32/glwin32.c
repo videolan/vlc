@@ -63,7 +63,7 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-struct vout_display_sys_t
+typedef struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;
     display_win32_area_t     area;
@@ -73,7 +73,7 @@ struct vout_display_sys_t
 
     /* Sensors */
     void *p_sensors;
-};
+} vout_display_sys_t;
 
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
 static void           Display(vout_display_t *, picture_t *);
