@@ -82,6 +82,8 @@
     /* Window state */
     BOOL _enabled;
     int _subviews;
+
+    dispatch_queue_t _eventq;
 }
 
 - (id)initWithWindow:(vout_window_t *)wnd;
@@ -107,6 +109,7 @@
     if (!self)
         return nil;
 
+    _eventq = dispatch_queue_create("vlc_eventq", DISPATCH_QUEUE_SERIAL);
     vlc_mutex_init(&_mutex);
 
     /* The window is controlled by the host application through the UIView
@@ -171,7 +174,7 @@
     CFStringRef mode = CFSTR("org.videolan.vlccore.window");
     CFRunLoopRef runloop = CFRunLoopGetCurrent();
     CFRunLoopPerformBlock(runloop, mode, ^{
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+        dispatch_async(_eventq, ^{
             (eventBlock)();
             CFRunLoopStop(runloop);
         });
