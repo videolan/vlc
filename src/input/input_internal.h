@@ -736,4 +736,6 @@ void input_stats_Destroy(struct input_stats *);
 void input_rate_Add(input_rate_t *, uintmax_t);
 void input_stats_Compute(struct input_stats *, input_stats_t*);
 
+void input_ClearBuffer(input_thread_t *);
+
 #endif

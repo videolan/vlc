@@ -2102,6 +2102,5 @@ vlc_player_ClearBuffer(vlc_player_t *player)
     if (!input)
         return;
 
-    int ret = input_ControlPush(input->thread, INPUT_CONTROL_CLEAR_BUFFER, NULL);
-    (void)ret;
+    input_ClearBuffer(input->thread);
 }

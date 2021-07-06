@@ -900,6 +900,9 @@ void UpdatePESFilters( demux_t *p_demux, bool b_all )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    if (i_query == DEMUX_CLEAR_BUFFER)
+        return vlc_stream_Control( p_sys->stream, STREAM_CLEAR_BUFFER );
+
     double f, *pf;
     bool b_bool, *pb_bool;
     int64_t i64;

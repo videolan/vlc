@@ -1946,11 +1946,7 @@ static bool Control( input_thread_t *p_input,
     switch( i_type )
     {
         case INPUT_CONTROL_CLEAR_BUFFER:
-            demux_Control( priv->master->p_demux, DEMUX_CLEAR_BUFFER );
             es_out_Control( priv->p_es_out, ES_OUT_CLEAR_BUFFER );
-            input_SendEvent( p_input, &(const struct vlc_input_event){
-                .type = INPUT_EVENT_BUFFER_CLEARED
-            });
             break;
         case INPUT_CONTROL_SET_POSITION:
         case INPUT_CONTROL_JUMP_POSITION:
@@ -3526,4 +3522,19 @@ bool input_CanPaceControl(input_thread_t *input)
 {
     input_thread_private_t *priv = input_priv(input);
     return priv->master->b_can_pace_control;
+}
+
+void input_ClearBuffer(input_thread_t *input)
+{
+    input_thread_private_t *sys = input_priv(input);
+
+    vlc_mutex_lock( &sys->lock_control );
+    demux_Control( sys->master->p_demux, DEMUX_CLEAR_BUFFER );
+    vlc_mutex_unlock( &sys->lock_control );
+    int ret = input_ControlPush(input, INPUT_CONTROL_CLEAR_BUFFER, NULL);
+    input_SendEvent( input, &(const struct vlc_input_event){
+        .type = INPUT_EVENT_BUFFER_CLEARED
+    });
+
+    (void)ret;
 }
