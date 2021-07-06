@@ -25,6 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_rand.h>
 #include <vlc_sort.h>
+#include <vlc_strings.h>
 #include "control.h"
 #include "item.h"
 #include "notify.h"
@@ -230,6 +231,26 @@ CompareStrings(const char *a, const char *b)
 }
 
 static inline int
+CompareFilenameStrings(const char *a, const char *b)
+{
+    if (a && b)
+        return vlc_filenamecmp(a, b);
+    if (!a && !b)
+        return 0;
+    return a ? 1 : -1;
+}
+
+static inline int
+CompareVersionStrings(const char *a, const char *b)
+{
+    if (a && b)
+        return strverscmp(a, b);
+    if (!a && !b)
+        return 0;
+    return a ? 1 : -1;
+}
+
+static inline int
 CompareIntegers(int64_t a, int64_t b)
 {
     if (a < b)
@@ -259,13 +280,13 @@ CompareMetaByKey(const struct vlc_playlist_item_meta *a,
     switch (key)
     {
         case VLC_PLAYLIST_SORT_KEY_TITLE:
-            return CompareStrings(a->title_or_name, b->title_or_name);
+            return CompareFilenameStrings(a->title_or_name, b->title_or_name);
         case VLC_PLAYLIST_SORT_KEY_DURATION:
             return CompareIntegers(a->duration, b->duration);
         case VLC_PLAYLIST_SORT_KEY_ARTIST:
             return CompareStrings(a->artist, b->artist);
         case VLC_PLAYLIST_SORT_KEY_ALBUM:
-            return CompareStrings(a->album, b->album);
+            return CompareFilenameStrings(a->album, b->album);
         case VLC_PLAYLIST_SORT_KEY_ALBUM_ARTIST:
             return CompareStrings(a->album_artist, b->album_artist);
         case VLC_PLAYLIST_SORT_KEY_GENRE:
@@ -280,7 +301,7 @@ CompareMetaByKey(const struct vlc_playlist_item_meta *a,
             return CompareOptionalIntegers(a->has_disc_number, a->disc_number,
                                            b->has_disc_number, b->disc_number);
         case VLC_PLAYLIST_SORT_KEY_URL:
-            return CompareStrings(a->url, b->url);
+            return CompareVersionStrings(a->url, b->url);
         case VLC_PLAYLIST_SORT_KEY_RATING:
             return CompareOptionalIntegers(a->has_rating, a->rating,
                                            b->has_rating, b->rating);
