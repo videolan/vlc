@@ -93,15 +93,6 @@ static void strcpy_strip_ext( char *d, const char *s )
     }
 }
 
-static void strcpy_get_ext( char *d, const char *s )
-{
-    const char *tmp = strrchr(s, '.');
-    if( !tmp )
-        strcpy(d, "");
-    else
-        strcpy( d, tmp + 1 );
-}
-
 static int whiteonly( const char *s )
 {
     unsigned char c;
@@ -285,13 +276,11 @@ int subtitles_Detect( input_thread_t *p_this, char *psz_path, const char *psz_na
 
             char tmp_fname_noext[strlen( psz_name ) + 1];
             char tmp_fname_trim[strlen( psz_name ) + 1];
-            char tmp_fname_ext[strlen( psz_name ) + 1];
             const char *tmp;
             int i_prio = 0;
 
             /* retrieve various parts of the filename */
             strcpy_strip_ext( tmp_fname_noext, psz_name );
-            strcpy_get_ext( tmp_fname_ext, psz_name );
             strcpy_trim( tmp_fname_trim, tmp_fname_noext );
 
             if( !strcmp( tmp_fname_trim, f_fname_trim ) )
