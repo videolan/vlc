@@ -1857,6 +1857,10 @@ libvlc_media_player_select_track(libvlc_media_player_t *p_mi,
 
     const libvlc_media_trackpriv_t *trackpriv =
         libvlc_media_track_to_priv(track);
+    
+    // It must be a player track
+    assert(trackpriv->es_id);
+
     vlc_player_SelectEsId(player, trackpriv->es_id,
                           VLC_PLAYER_SELECT_EXCLUSIVE);
 
@@ -1898,6 +1902,9 @@ libvlc_media_player_select_tracks(libvlc_media_player_t *p_mi,
         const libvlc_media_track_t *track = tracks[i];
         const libvlc_media_trackpriv_t *trackpriv =
             libvlc_media_track_to_priv(track);
+
+        // It must be a player track
+        assert(trackpriv->es_id);
 
         es_id_list[es_id_idx++] = trackpriv->es_id;
     }

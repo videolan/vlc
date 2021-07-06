@@ -1374,6 +1374,8 @@ libvlc_media_player_get_track_from_id( libvlc_media_player_t *p_mi,
  *
  * \note Use libvlc_media_player_select_tracks() for multiple selection
  *
+ * \warning Only use a \ref libvlc_media_track_t retrieved with \ref libvlc_media_player_get_tracklist
+ *
  * \param p_mi the media player
  * \param track track to select, can't be NULL
  */
@@ -1404,6 +1406,8 @@ libvlc_media_player_unselect_track_type( libvlc_media_player_t *p_mi,
  * track is not present anymore, the player will just ignore it.
  *
  * \note selecting multiple audio tracks is currently not supported.
+ *
+ * \warning Only use a \ref libvlc_media_track_t retrieved with \ref libvlc_media_player_get_tracklist
  *
  * \param p_mi the media player
  * \param type type of the selected track
@@ -1441,6 +1445,8 @@ libvlc_media_player_select_tracks( libvlc_media_player_t *p_mi,
  * libvlc_media_track_t
  *
  * \note selecting multiple audio tracks is currently not supported.
+ *
+ * \warning Only use a \ref libvlc_media_track_t id retrieved with \ref libvlc_media_player_get_tracklist
  *
  * \param p_mi the media player
  * \param type type to select
