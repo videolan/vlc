@@ -151,6 +151,10 @@ else
 VPX_CONF += --disable-optimizations
 endif
 
+ifdef HAVE_EMSCRIPTEN
+VPX_CONF += --extra-cflags="$(CFLAGS) -pthread"
+endif
+
 # Always enable debug symbols, we strip in the final executables if needed
 VPX_CONF += --enable-debug
 
