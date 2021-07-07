@@ -1015,14 +1015,18 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
 
         if( b_has_data || b_start_drain )
         {
-            AVPacket pkt;
-            av_init_packet( &pkt );
+            AVPacket *pkt = av_packet_alloc();
+            if(!pkt)
+            {
+                *error = true;
+                break;
+            }
             if( b_has_data )
             {
-                pkt.data = p_block->p_buffer;
-                pkt.size = p_block->i_buffer;
-                pkt.pts = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : AV_NOPTS_VALUE;
-                pkt.dts = p_block->i_dts > VLC_TS_INVALID ? p_block->i_dts : AV_NOPTS_VALUE;
+                pkt->data = p_block->p_buffer;
+                pkt->size = p_block->i_buffer;
+                pkt->pts = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : AV_NOPTS_VALUE;
+                pkt->dts = p_block->i_dts > VLC_TS_INVALID ? p_block->i_dts : AV_NOPTS_VALUE;
 
                 /* Make sure we don't reuse the same timestamps twice */
                 p_block->i_pts =
@@ -1031,21 +1035,21 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
             else /* start drain */
             {
                 /* Return delayed frames if codec has CODEC_CAP_DELAY */
-                pkt.data = NULL;
-                pkt.size = 0;
+                pkt->data = NULL;
+                pkt->size = 0;
                 p_sys->b_draining = true;
             }
 
             if( !p_sys->palette_sent )
             {
-                uint8_t *pal = av_packet_new_side_data(&pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
+                uint8_t *pal = av_packet_new_side_data(pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
                 if (pal) {
                     memcpy(pal, p_dec->fmt_in.video.p_palette->palette, AVPALETTE_SIZE);
                     p_sys->palette_sent = true;
                 }
             }
 
-            ret = avcodec_send_packet(p_context, &pkt);
+            ret = avcodec_send_packet(p_context, pkt);
             if( ret != 0 && ret != AVERROR(EAGAIN) )
             {
                 if (ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL))
@@ -1053,11 +1057,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
                     msg_Err(p_dec, "avcodec_send_packet critical error");
                     *error = true;
                 }
-                av_packet_unref( &pkt );
+                av_packet_free( &pkt );
                 break;
             }
-            i_used = ret != AVERROR(EAGAIN) ? pkt.size : 0;
-            av_packet_unref( &pkt );
+            i_used = ret != AVERROR(EAGAIN) ? pkt->size : 0;
+            av_packet_free( &pkt );
         }
 
         AVFrame *frame = av_frame_alloc();
