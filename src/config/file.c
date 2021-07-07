@@ -530,25 +530,20 @@ error:
 
 int config_AutoSaveConfigFile( vlc_object_t *p_this )
 {
-    int ret = 0;
-
     assert( p_this );
 
-    if (atomic_exchange_explicit(&config_dirty, false, memory_order_acquire))
-    {
-        vlc_rwlock_rdlock (&config_lock);
-        /* Note: this will get the read lock recursively. Ok. */
-        ret = config_SaveConfigFile (p_this);
-        vlc_rwlock_unlock (&config_lock);
+    if (!atomic_exchange_explicit(&config_dirty, false, memory_order_acquire))
+        return 0;
 
-        if (unlikely(ret != 0))
-            /*
-             * On write failure, set the dirty flag back again. While it looks
-             * racy, it really means to retry later in hope that it does not
-             * fail again. Concurrent write attempts would not succeed anyway.
-             */
-            atomic_store_explicit(&config_dirty, true, memory_order_relaxed);
-    }
+    int ret = config_SaveConfigFile (p_this);
+
+    if (unlikely(ret != 0))
+        /*
+         * On write failure, set the dirty flag back again. While it looks
+         * racy, it really means to retry later in hope that it does not
+         * fail again. Concurrent write attempts would not succeed anyway.
+         */
+        atomic_store_explicit(&config_dirty, true, memory_order_relaxed);
 
     return ret;
 }
