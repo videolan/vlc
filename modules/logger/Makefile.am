@@ -33,3 +33,6 @@ endif
 libhttp_logger_plugin_la_SOURCES = logger/http.c
 libhttp_logger_plugin_la_LIBADD = libvlc_http.la
 logger_LTLIBRARIES += libhttp_logger_plugin.la
+
+libjson_tracer_plugin_la_SOURCES = logger/json.c
+logger_LTLIBRARIES += libjson_tracer_plugin.la
