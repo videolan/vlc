@@ -70,6 +70,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_media_source.h \
 	../include/vlc_memstream.h \
 	../include/vlc_messages.h \
+	../include/vlc_tracer.h \
 	../include/vlc_meta.h \
 	../include/vlc_meta_fetcher.h \
 	../include/vlc_mime.h \
@@ -386,6 +387,7 @@ libvlccore_la_SOURCES = \
 	misc/events.c \
 	misc/image.c \
 	misc/messages.c \
+	misc/tracer.c \
 	misc/mime.c \
 	misc/objects.c \
 	misc/objres.c \
