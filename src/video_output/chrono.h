@@ -30,8 +30,8 @@ typedef struct {
     vlc_tick_t avg;
     vlc_tick_t avg_initial;
 
-    int     shift_var;
-    vlc_tick_t var;
+    int     shift_mad;
+    vlc_tick_t mad; /* mean absolute deviation */
 
     vlc_tick_t start;
 } vout_chrono_t;
@@ -42,22 +42,25 @@ static inline void vout_chrono_Init(vout_chrono_t *chrono, int shift, vlc_tick_t
     chrono->avg_initial =
     chrono->avg         = avg_initial;
 
-    chrono->shift_var   = shift+1;
-    chrono->var         = avg_initial / 2;
+    chrono->shift_mad   = shift+1;
+    chrono->mad         = avg_initial / 2;
 
     chrono->start = VLC_TICK_INVALID;
 }
+
 static inline void vout_chrono_Start(vout_chrono_t *chrono)
 {
     chrono->start = vlc_tick_now();
 }
+
 static inline vlc_tick_t vout_chrono_GetHigh(vout_chrono_t *chrono)
 {
-    return chrono->avg + 2 * chrono->var;
+    return chrono->avg + 2 * chrono->mad;
 }
+
 static inline vlc_tick_t vout_chrono_GetLow(vout_chrono_t *chrono)
 {
-    return __MAX(chrono->avg - 2 * chrono->var, 0);
+    return __MAX(chrono->avg - 2 * chrono->mad, 0);
 }
 
 static inline void vout_chrono_Stop(vout_chrono_t *chrono)
@@ -66,13 +69,13 @@ static inline void vout_chrono_Stop(vout_chrono_t *chrono)
 
     /* */
     const vlc_tick_t duration = vlc_tick_now() - chrono->start;
-    const vlc_tick_t var = llabs( duration - chrono->avg );
+    const vlc_tick_t abs_diff = llabs( duration - chrono->avg );
 
     /* Update average only if the current point is 'valid' */
     if( duration < vout_chrono_GetHigh( chrono ) )
         chrono->avg = (((1 << chrono->shift) - 1) * chrono->avg + duration) >> chrono->shift;
-    /* Always update the variance */
-    chrono->var = (((1 << chrono->shift_var) - 1) * chrono->var + var) >> chrono->shift_var;
+    /* Always update the mean absolute deviation */
+    chrono->mad = (((1 << chrono->shift_mad) - 1) * chrono->mad + abs_diff) >> chrono->shift_mad;
 
     /* For assert */
     chrono->start = VLC_TICK_INVALID;
