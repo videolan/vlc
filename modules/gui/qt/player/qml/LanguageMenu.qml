@@ -27,7 +27,6 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/" as Util
-import "qrc:///util/KeyHelper.js" as KeyHelper
 
 T.Popup {
     id: control

@@ -26,7 +26,6 @@ import org.videolan.controls 0.1
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
-import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 

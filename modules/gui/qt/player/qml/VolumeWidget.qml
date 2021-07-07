@@ -23,7 +23,6 @@ import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
-import "qrc:///util/KeyHelper.js" as KeyHelper
 
 FocusScope{
     id: widgetfscope

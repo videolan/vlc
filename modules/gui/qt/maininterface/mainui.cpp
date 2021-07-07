@@ -32,6 +32,7 @@
 #include "util/qmleventfilter.hpp"
 #include "util/imageluminanceextractor.hpp"
 #include "util/i18n.hpp"
+#include "util/keyhelper.hpp"
 #include "util/systempalette.hpp"
 #include "util/sortfilterproxymodel.hpp"
 #include "util/navigation_history.hpp"
@@ -265,7 +266,7 @@ void MainUI::registerQMLTypes()
     qRegisterMetaType<QList<QQmlError>>("QList<QQmlError>");
 
     qmlRegisterUncreatableType<NavigationAttached>( "org.videolan.vlc", 0, 1, "Navigation", "Navigation is only available via attached properties");
-
+    qmlRegisterSingletonType<QmlKeyHelper>("org.videolan.vlc", 0, 1, "KeyHelper", &QmlKeyHelper::getSingletonInstance);
 }
 
 void MainUI::onQmlWarning(const QList<QQmlError>& qmlErrors)

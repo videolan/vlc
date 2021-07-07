@@ -17,7 +17,6 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
-import "qrc:///util/KeyHelper.js" as KeyHelper
 
 import org.videolan.vlc 0.1
 

@@ -20,7 +20,6 @@ import QtQuick.Controls 2.4
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
-import "qrc:///util/KeyHelper.js" as KeyHelper
 
 FocusScope {
     id: listview_id

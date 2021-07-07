@@ -24,10 +24,10 @@ import org.videolan.vlc 0.1
 import "qrc:///style/"
 import "qrc:///main/" as Main
 import "qrc:///widgets/" as Widgets
-import "qrc:///util/KeyHelper.js" as KeyHelper
-import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///playlist/" as PL
 import "qrc:///player/" as Player
+
+import "qrc:///util/Helpers.js" as Helpers
 
 FocusScope {
     id: root

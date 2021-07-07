@@ -26,7 +26,6 @@ import QtQml.Models 2.11
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///menus/" as Menus
-import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///util/Helpers.js" as Helpers
 
 FocusScope {
