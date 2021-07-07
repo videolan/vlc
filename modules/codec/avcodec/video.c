@@ -973,29 +973,33 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         if( (p_block && p_block->i_buffer > 0) || b_drain )
         {
-            AVPacket pkt;
-            av_init_packet( &pkt );
+            AVPacket *pkt = av_packet_alloc();
+            if(!pkt)
+            {
+                b_error = true;
+                break;
+            }
             if( p_block && p_block->i_buffer > 0 )
             {
-                pkt.data = p_block->p_buffer;
-                pkt.size = p_block->i_buffer;
-                pkt.pts = p_block->i_pts != VLC_TICK_INVALID ? TO_AV_TS(p_block->i_pts) : AV_NOPTS_VALUE;
-                pkt.dts = p_block->i_dts != VLC_TICK_INVALID ? TO_AV_TS(p_block->i_dts) : AV_NOPTS_VALUE;
+                pkt->data = p_block->p_buffer;
+                pkt->size = p_block->i_buffer;
+                pkt->pts = p_block->i_pts != VLC_TICK_INVALID ? TO_AV_TS(p_block->i_pts) : AV_NOPTS_VALUE;
+                pkt->dts = p_block->i_dts != VLC_TICK_INVALID ? TO_AV_TS(p_block->i_dts) : AV_NOPTS_VALUE;
                 if (p_block->i_flags & BLOCK_FLAG_TYPE_I)
-                    pkt.flags |= AV_PKT_FLAG_KEY;
+                    pkt->flags |= AV_PKT_FLAG_KEY;
             }
             else
             {
                 /* Drain */
-                pkt.data = NULL;
-                pkt.size = 0;
+                pkt->data = NULL;
+                pkt->size = 0;
                 b_drain = false;
                 b_drained = true;
             }
 
             if( !p_sys->palette_sent )
             {
-                uint8_t *pal = av_packet_new_side_data(&pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
+                uint8_t *pal = av_packet_new_side_data(pkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
                 if (pal) {
                     memcpy(pal, p_dec->fmt_in.video.p_palette->palette, AVPALETTE_SIZE);
                     p_sys->palette_sent = true;
@@ -1009,7 +1013,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_block->i_dts = VLC_TICK_INVALID;
             }
 
-            int ret = avcodec_send_packet(p_context, &pkt);
+            int ret = avcodec_send_packet(p_context, pkt);
             if( ret != 0 && ret != AVERROR(EAGAIN) )
             {
                 if (ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL))
@@ -1017,7 +1021,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     msg_Err(p_dec, "avcodec_send_packet critical error");
                     b_error = true;
                 }
-                av_packet_unref( &pkt );
+                av_packet_free( &pkt );
                 break;
             }
 
@@ -1026,8 +1030,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_frame_info->b_display = b_need_output_picture;
 
             p_context->reordered_opaque++;
-            i_used = ret != AVERROR(EAGAIN) ? pkt.size : 0;
-            av_packet_unref( &pkt );
+            i_used = ret != AVERROR(EAGAIN) ? pkt->size : 0;
+            av_packet_free( &pkt );
 
             if( p_frame_info->b_eos && !b_drained )
             {

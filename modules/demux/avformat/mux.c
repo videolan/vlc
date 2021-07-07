@@ -377,14 +377,16 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     block_t *p_data = block_FifoGet( p_input->p_fifo );
     int i_stream = *((int *)p_input->p_sys);
     AVStream *p_stream = p_sys->oc->streams[i_stream];
-    AVPacket pkt;
+    AVPacket *pkt = av_packet_alloc();
+    if( !pkt )
+    {
+        block_Release( p_data );
+        return VLC_EGENERIC;
+    }
 
-    memset( &pkt, 0, sizeof(AVPacket) );
-
-    av_init_packet(&pkt);
-    pkt.data = p_data->p_buffer;
-    pkt.size = p_data->i_buffer;
-    pkt.stream_index = i_stream;
+    pkt->data = p_data->p_buffer;
+    pkt->size = p_data->i_buffer;
+    pkt->stream_index = i_stream;
 
     if( p_data->i_flags & BLOCK_FLAG_TYPE_I )
     {
@@ -395,26 +397,28 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
 #endif
 
         p_sys->b_write_keyframe = true;
-        pkt.flags |= AV_PKT_FLAG_KEY;
+        pkt->flags |= AV_PKT_FLAG_KEY;
     }
 
     if( p_data->i_pts >= VLC_TICK_0 )
-        pkt.pts = av_rescale_q( p_data->i_pts - VLC_TICK_0,
+        pkt->pts = av_rescale_q( p_data->i_pts - VLC_TICK_0,
                                 VLC_TIME_BASE_Q, p_stream->time_base );
     if( p_data->i_dts >= VLC_TICK_0 )
-        pkt.dts = av_rescale_q( p_data->i_dts - VLC_TICK_0,
+        pkt->dts = av_rescale_q( p_data->i_dts - VLC_TICK_0,
                                 VLC_TIME_BASE_Q, p_stream->time_base );
 
-    if( av_write_frame( p_sys->oc, &pkt ) < 0 )
+    if( av_write_frame( p_sys->oc, pkt ) < 0 )
     {
         msg_Err( p_mux, "could not write frame (pts: %"PRId64", dts: %"PRId64") "
                  "(pkt pts: %"PRId64", dts: %"PRId64")",
-                 p_data->i_pts, p_data->i_dts, pkt.pts, pkt.dts );
+                 p_data->i_pts, p_data->i_dts, pkt->pts, pkt->dts );
         block_Release( p_data );
+        av_packet_unref( pkt );
         return VLC_EGENERIC;
     }
 
 
+    av_packet_unref( pkt );
     block_Release( p_data );
     return VLC_SUCCESS;
 }

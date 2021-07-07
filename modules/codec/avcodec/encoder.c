@@ -1067,14 +1067,14 @@ error:
 typedef struct
 {
     block_t self;
-    AVPacket packet;
+    AVPacket *packet;
 } vlc_av_packet_t;
 
 static void vlc_av_packet_Release(block_t *block)
 {
     vlc_av_packet_t *b = (void *) block;
 
-    av_packet_unref(&b->packet);
+    av_packet_free( &b->packet );
     free(b);
 }
 
@@ -1100,7 +1100,7 @@ static block_t *vlc_av_packet_Wrap(AVPacket *packet, AVCodecContext *context )
     block_Init( p_block, &vlc_av_packet_cbs, packet->data, packet->size );
     p_block->i_nb_samples = 0;
     p_block->cbs = &vlc_av_packet_cbs;
-    b->packet = *packet;
+    b->packet = packet;
 
     p_block->i_length = FROM_AVSCALE(packet->duration, context->time_base);
     if( unlikely( packet->flags & AV_PKT_FLAG_CORRUPT ) )
@@ -1170,11 +1170,13 @@ static void check_hurry_up( encoder_sys_t *p_sys, AVFrame *frame, encoder_t *p_e
 
 static block_t *encode_avframe( encoder_t *p_enc, encoder_sys_t *p_sys, AVFrame *frame )
 {
-    AVPacket av_pkt;
-    av_pkt.data = NULL;
-    av_pkt.size = 0;
+    AVPacket *av_pkt = av_packet_alloc();
 
-    av_init_packet( &av_pkt );
+    if( !av_pkt )
+    {
+        av_frame_unref( frame );
+        return NULL;
+    }
 
     int ret = avcodec_send_frame( p_sys->p_context, frame );
     if( frame && ret != 0 && ret != AVERROR(EAGAIN) )
@@ -1182,17 +1184,18 @@ static block_t *encode_avframe( encoder_t *p_enc, encoder_sys_t *p_sys, AVFrame 
         msg_Warn( p_enc, "cannot send one frame to encoder %d", ret );
         return NULL;
     }
-    ret = avcodec_receive_packet( p_sys->p_context, &av_pkt );
+    ret = avcodec_receive_packet( p_sys->p_context, av_pkt );
     if( ret != 0 && ret != AVERROR(EAGAIN) )
     {
         msg_Warn( p_enc, "cannot encode one frame" );
+        av_packet_free( &av_pkt );
         return NULL;
     }
 
-    block_t *p_block = vlc_av_packet_Wrap( &av_pkt, p_sys->p_context );
+    block_t *p_block = vlc_av_packet_Wrap( av_pkt, p_sys->p_context );
     if( unlikely(p_block == NULL) )
     {
-        av_packet_unref( &av_pkt );
+        av_packet_free( &av_pkt );
         return NULL;
     }
     return p_block;
