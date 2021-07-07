@@ -68,6 +68,7 @@ struct vlc_input_decoder_t
     decoder_t        dec;
     input_resource_t*p_resource;
     vlc_clock_t     *p_clock;
+    const char *psz_id;
 
     const struct vlc_input_decoder_callbacks *cbs;
     void *cbs_userdata;
@@ -1868,8 +1869,8 @@ static int avstat_callback(vlc_object_t *obj, const char *name,
  * \return the decoder object
  */
 static vlc_input_decoder_t *
-CreateDecoder( vlc_object_t *p_parent,
-               const es_format_t *fmt, vlc_clock_t *p_clock,
+CreateDecoder( vlc_object_t *p_parent, const es_format_t *fmt,
+               const char *psz_id, vlc_clock_t *p_clock,
                input_resource_t *p_resource, sout_stream_t *p_sout,
                bool b_thumbnailing, const struct vlc_input_decoder_callbacks *cbs,
                void *cbs_userdata )
@@ -1884,6 +1885,7 @@ CreateDecoder( vlc_object_t *p_parent,
         return NULL;
     p_dec = &p_owner->dec;
 
+    p_owner->psz_id = psz_id;
     p_owner->p_clock = p_clock;
     p_owner->i_preroll_end = PREROLL_NONE;
     p_owner->p_resource = p_resource;
@@ -2134,7 +2136,7 @@ static void DecoderUnsupportedCodec( decoder_t *p_dec, const es_format_t *fmt, b
 
 /* TODO: pass p_sout through p_resource? -- Courmisch */
 static vlc_input_decoder_t *
-decoder_New( vlc_object_t *p_parent, const es_format_t *fmt,
+decoder_New( vlc_object_t *p_parent, const es_format_t *fmt, const char *psz_id,
              vlc_clock_t *p_clock, input_resource_t *p_resource,
              sout_stream_t *p_sout, bool thumbnailing,
              const struct vlc_input_decoder_callbacks *cbs, void *userdata)
@@ -2144,7 +2146,7 @@ decoder_New( vlc_object_t *p_parent, const es_format_t *fmt,
 
     /* Create the decoder configuration structure */
     vlc_input_decoder_t *p_owner =
-        CreateDecoder( p_parent, fmt, p_clock, p_resource, p_sout,
+        CreateDecoder( p_parent, fmt, psz_id, p_clock, p_resource, p_sout,
                        thumbnailing, cbs, userdata );
     if( p_owner == NULL )
     {
@@ -2208,12 +2210,13 @@ decoder_New( vlc_object_t *p_parent, const es_format_t *fmt,
  */
 vlc_input_decoder_t *
 vlc_input_decoder_New( vlc_object_t *parent, es_format_t *fmt,
-                  vlc_clock_t *p_clock, input_resource_t *resource,
+                  const char *psz_id, vlc_clock_t *p_clock,
+                  input_resource_t *resource,
                   sout_stream_t *p_sout, bool thumbnailing,
                   const struct vlc_input_decoder_callbacks *cbs,
                   void *cbs_userdata)
 {
-    return decoder_New( parent, fmt, p_clock, resource, p_sout, thumbnailing,
+    return decoder_New( parent, fmt, psz_id, p_clock, resource, p_sout, thumbnailing,
                         cbs, cbs_userdata );
 }
 
@@ -2224,7 +2227,7 @@ vlc_input_decoder_t *
 vlc_input_decoder_Create( vlc_object_t *p_parent, const es_format_t *fmt,
                      input_resource_t *p_resource )
 {
-    return decoder_New( p_parent, fmt, NULL, p_resource, NULL, false, NULL,
+    return decoder_New( p_parent, fmt, NULL, NULL, p_resource, NULL, false, NULL,
                         NULL );
 }
 
@@ -2485,9 +2488,9 @@ int vlc_input_decoder_SetCcState( vlc_input_decoder_t *p_owner, vlc_fourcc_t cod
         es_format_Init( &fmt, SPU_ES, codec );
         fmt.subs.cc.i_channel = i_channel;
         fmt.subs.cc.i_reorder_depth = p_owner->cc.desc.i_reorder_depth;
-        p_ccowner = vlc_input_decoder_New( VLC_OBJECT(p_dec), &fmt, p_owner->p_clock,
-                                      p_owner->p_resource, p_owner->p_sout, false,
-                                      NULL, NULL );
+        p_ccowner = vlc_input_decoder_New( VLC_OBJECT(p_dec), &fmt, p_owner->psz_id,
+                                      p_owner->p_clock, p_owner->p_resource, p_owner->p_sout,
+                                      false, NULL, NULL );
         if( !p_ccowner )
         {
             msg_Err( p_dec, "could not create decoder" );

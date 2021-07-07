@@ -922,7 +922,8 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
                 continue;
 
             p_es->p_dec_record =
-                vlc_input_decoder_New( VLC_OBJECT(p_input), &p_es->fmt, NULL,
+                vlc_input_decoder_New( VLC_OBJECT(p_input), &p_es->fmt,
+                                       p_es->id.str_id, NULL,
                                        input_priv(p_input)->p_resource,
                                        p_sys->p_sout_record, false,
                                        &decoder_cbs, p_es );
@@ -2432,7 +2433,8 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     }
 
     input_thread_private_t *priv = input_priv(p_input);
-    dec = vlc_input_decoder_New( VLC_OBJECT(p_input), &p_es->fmt, p_es->p_clock,
+    dec = vlc_input_decoder_New( VLC_OBJECT(p_input), &p_es->fmt,
+                                 p_es->id.str_id, p_es->p_clock,
                                  priv->p_resource, priv->p_sout,
                                  priv->b_thumbnailing, &decoder_cbs, p_es );
     if( dec != NULL )
@@ -2445,7 +2447,8 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
         if( !p_es->p_master && p_sys->p_sout_record )
         {
             p_es->p_dec_record =
-                vlc_input_decoder_New( VLC_OBJECT(p_input), &p_es->fmt, NULL,
+                vlc_input_decoder_New( VLC_OBJECT(p_input), &p_es->fmt,
+                                       p_es->id.str_id, NULL,
                                        priv->p_resource, p_sys->p_sout_record,
                                        false, &decoder_cbs, p_es );
             if( p_es->p_dec_record && p_sys->b_buffering )
