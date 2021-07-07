@@ -225,6 +225,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/imageluminanceextractor.cpp gui/qt/util/imageluminanceextractor.hpp \
 	gui/qt/util/imagehelper.cpp gui/qt/util/imagehelper.hpp \
 	gui/qt/util/i18n.cpp gui/qt/util/i18n.hpp \
+	gui/qt/util/keyhelper.cpp gui/qt/util/keyhelper.hpp \
 	gui/qt/util/listcache.hpp \
 	gui/qt/util/listcacheloader.hpp \
 	gui/qt/util/navigation_history.cpp gui/qt/util/navigation_history.hpp \
@@ -382,6 +383,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/covergenerator.moc.cpp \
 	gui/qt/util/imageluminanceextractor.moc.cpp \
 	gui/qt/util/i18n.moc.cpp \
+	gui/qt/util/keyhelper.moc.cpp \
 	gui/qt/util/listcache.moc.cpp \
 	gui/qt/util/navigation_history.moc.cpp \
 	gui/qt/util/qml_main_context.moc.cpp \

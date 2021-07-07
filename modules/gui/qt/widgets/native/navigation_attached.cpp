@@ -16,69 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "navigation_attached.hpp"
-
-class KeyHelper
-{
-public:
-    static bool matchLeft(const QKeyEvent* event)
-    {
-        return event->key() == Qt::Key_Left
-            || event->matches(QKeySequence::MoveToPreviousChar);
-    }
-
-    static bool matchRight(const QKeyEvent* event)
-    {
-        return event->key() == Qt::Key_Right
-            || event->matches(QKeySequence::MoveToNextChar);
-    }
-
-    static bool matchUp(const QKeyEvent* event)
-    {
-        return event->key() == Qt::Key_Up
-            || event->matches(QKeySequence::MoveToPreviousLine);
-    }
-
-    static bool matchDown(const QKeyEvent* event)
-    {
-        return event->key() == Qt::Key_Down
-            || event->matches(QKeySequence::MoveToNextLine);
-    }
-
-
-    static bool matchPageDown(const QKeyEvent* event)
-    {
-        return event->key() == Qt::Key_PageDown
-            || event->matches(QKeySequence::MoveToNextPage);
-    }
-
-    static bool matchPageUp(const QKeyEvent* event)
-    {
-        return event->key() == Qt::Key_PageUp
-            || event->matches(QKeySequence::MoveToPreviousPage);
-    }
-
-    static bool matchOk( const QKeyEvent* event )
-    {
-        return event->key() == Qt::Key_Space
-            || event->matches(QKeySequence::InsertParagraphSeparator);
-    }
-
-    static bool matchSearch( const QKeyEvent* event )
-    {
-        return event->key() == Qt::Key_Search
-            || event->key() == Qt::Key_Slash
-            || ( (event->modifiers() & Qt::ControlModifier) && event->key() == Qt::Key_F );
-    }
-
-    static bool matchCancel(const QKeyEvent* event)
-    {
-        return event->key() == Qt::Key_Backspace
-            || event->key() == Qt::Key_Back
-            || event->key() == Qt::Key_Cancel
-            || event->matches(QKeySequence::Back)
-            || event->matches(QKeySequence::Cancel);
-    }
-};
+#include "util/keyhelper.hpp"
 
 NavigationAttached::NavigationAttached(QObject *parent)
     : QObject(parent)
