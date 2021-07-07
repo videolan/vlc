@@ -24,6 +24,7 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
 #include <vlc_common.h>
 #include <vlc_actions.h>
 #include <vlc_modules.h>
@@ -38,7 +39,7 @@
 #include "modules/modules.h"
 
 vlc_rwlock_t config_lock = VLC_STATIC_RWLOCK;
-bool config_dirty = false;
+atomic_bool config_dirty = ATOMIC_VAR_INIT(false);
 
 static inline char *strdupnull (const char *src)
 {
@@ -151,8 +152,8 @@ void config_PutPsz(const char *psz_name, const char *psz_value)
     vlc_rwlock_wrlock (&config_lock);
     oldstr = (char *)p_config->value.psz;
     p_config->value.psz = str;
-    config_dirty = true;
     vlc_rwlock_unlock (&config_lock);
+    atomic_store_explicit(&config_dirty, true, memory_order_release);
 
     free (oldstr);
 }
@@ -172,8 +173,9 @@ void config_PutInt(const char *psz_name, int64_t i_value )
 
     vlc_rwlock_wrlock (&config_lock);
     p_config->value.i = i_value;
-    config_dirty = true;
     vlc_rwlock_unlock (&config_lock);
+    atomic_store_explicit(&config_dirty, true, memory_order_release);
+
 }
 
 void config_PutFloat(const char *psz_name, float f_value)
@@ -194,8 +196,8 @@ void config_PutFloat(const char *psz_name, float f_value)
 
     vlc_rwlock_wrlock (&config_lock);
     p_config->value.f = f_value;
-    config_dirty = true;
     vlc_rwlock_unlock (&config_lock);
+    atomic_store_explicit(&config_dirty, true, memory_order_release);
 }
 
 ssize_t config_GetIntChoices(const char *name,
@@ -520,6 +522,6 @@ void config_ResetAll(void)
             }
         }
     }
-    config_dirty = true;
     vlc_rwlock_unlock (&config_lock);
+    atomic_store_explicit(&config_dirty, true, memory_order_release);
 }
