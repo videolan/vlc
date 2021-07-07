@@ -86,6 +86,7 @@ struct vlc_clock_t
     vlc_clock_main_t *owner;
     vlc_tick_t delay;
     unsigned priority;
+    const char *track_str_id;
 
     const struct vlc_clock_cbs *cbs;
     void *cbs_data;
@@ -666,6 +667,7 @@ static void vlc_clock_set_slave_callbacks(vlc_clock_t *clock)
 }
 
 static vlc_clock_t *vlc_clock_main_Create(vlc_clock_main_t *main_clock,
+                                          const char* track_str_id,
                                           unsigned priority,
                                           const struct vlc_clock_cbs *cbs,
                                           void *cbs_data)
@@ -675,6 +677,7 @@ static vlc_clock_t *vlc_clock_main_Create(vlc_clock_main_t *main_clock,
         return NULL;
 
     clock->owner = main_clock;
+    clock->track_str_id = track_str_id;
     clock->delay = 0;
     clock->cbs = cbs;
     clock->cbs_data = cbs_data;
@@ -685,11 +688,12 @@ static vlc_clock_t *vlc_clock_main_Create(vlc_clock_main_t *main_clock,
 }
 
 vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
+                                         const char *track_str_id,
                                          const struct vlc_clock_cbs *cbs,
                                          void *cbs_data)
 {
     /* The master has always the 0 priority */
-    vlc_clock_t *clock = vlc_clock_main_Create(main_clock, 0, cbs, cbs_data);
+    vlc_clock_t *clock = vlc_clock_main_Create(main_clock, track_str_id, 0, cbs, cbs_data);
     if (!clock)
         return NULL;
 
@@ -711,7 +715,7 @@ vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
 vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock)
 {
     /* The master has always the 0 priority */
-    vlc_clock_t *clock = vlc_clock_main_Create(main_clock, 0, NULL, NULL);
+    vlc_clock_t *clock = vlc_clock_main_Create(main_clock, NULL, 0, NULL, NULL);
     if (!clock)
         return NULL;
 
@@ -738,6 +742,7 @@ vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock)
 }
 
 vlc_clock_t *vlc_clock_main_CreateSlave(vlc_clock_main_t *main_clock,
+                                        const char* track_str_id,
                                         enum es_format_category_e cat,
                                         const struct vlc_clock_cbs *cbs,
                                         void *cbs_data)
@@ -759,7 +764,7 @@ vlc_clock_t *vlc_clock_main_CreateSlave(vlc_clock_main_t *main_clock,
             break;
     }
 
-    vlc_clock_t *clock = vlc_clock_main_Create(main_clock, priority, cbs,
+    vlc_clock_t *clock = vlc_clock_main_Create(main_clock, track_str_id, priority, cbs,
                                                cbs_data);
     if (!clock)
         return NULL;
@@ -775,7 +780,7 @@ vlc_clock_t *vlc_clock_main_CreateSlave(vlc_clock_main_t *main_clock,
 vlc_clock_t *vlc_clock_CreateSlave(const vlc_clock_t *clock,
                                    enum es_format_category_e cat)
 {
-    return vlc_clock_main_CreateSlave(clock->owner, cat, NULL, NULL);
+    return vlc_clock_main_CreateSlave(clock->owner, clock->track_str_id, cat, NULL, NULL);
 }
 
 void vlc_clock_Delete(vlc_clock_t *clock)
