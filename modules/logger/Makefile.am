@@ -22,3 +22,6 @@ libandroid_logger_plugin_la_LIBADD = -llog
 if HAVE_ANDROID
 logger_LTLIBRARIES += libandroid_logger_plugin.la
 endif
+
+libjson_tracer_plugin_la_SOURCES = logger/json.c
+logger_LTLIBRARIES += libjson_tracer_plugin.la
