@@ -28,20 +28,25 @@
 typedef struct {
     int     shift;
     vlc_tick_t avg;
+    unsigned avg_count;
 
     int     shift_mad;
     vlc_tick_t mad; /* mean absolute deviation */
+    unsigned mad_count;
 
     vlc_tick_t start;
 } vout_chrono_t;
 
 static inline void vout_chrono_Init(vout_chrono_t *chrono, int shift, vlc_tick_t avg_initial)
 {
+    chrono->avg_count   = 0;
+    chrono->mad_count   = 0;
+
     chrono->shift       = shift;
     chrono->avg         = avg_initial;
 
     chrono->shift_mad   = shift+1;
-    chrono->mad         = avg_initial / 2;
+    chrono->mad         = 0;
 
     chrono->start = VLC_TICK_INVALID;
 }
@@ -65,15 +70,31 @@ static inline void vout_chrono_Stop(vout_chrono_t *chrono)
 {
     assert(chrono->start != VLC_TICK_INVALID);
 
-    /* */
     const vlc_tick_t duration = vlc_tick_now() - chrono->start;
-    const vlc_tick_t abs_diff = llabs( duration - chrono->avg );
 
-    /* Update average only if the current point is 'valid' */
-    if( duration < vout_chrono_GetHigh( chrono ) )
-        chrono->avg = (((1 << chrono->shift) - 1) * chrono->avg + duration) >> chrono->shift;
-    /* Always update the mean absolute deviation */
-    chrono->mad = (((1 << chrono->shift_mad) - 1) * chrono->mad + abs_diff) >> chrono->shift_mad;
+    if (chrono->avg_count == 0)
+    {
+        /* Overwrite the arbitrary initial values with the real first sample */
+        chrono->avg = duration;
+        chrono->avg_count = 1;
+    }
+    else
+    {
+        /* Update average only if the current point is 'valid' */
+        if( duration < vout_chrono_GetHigh( chrono ) )
+        {
+            if (chrono->avg_count < (1u << chrono->shift))
+                ++chrono->avg_count;
+            chrono->avg = ((chrono->avg_count - 1) * chrono->avg + duration) / chrono->avg_count;
+        }
+
+        const vlc_tick_t abs_diff = llabs( duration - chrono->avg );
+
+        /* Always update the mean absolute deviation */
+        if (chrono->mad_count < (1u << chrono->shift_mad))
+            ++chrono->mad_count;
+        chrono->mad = ((chrono->mad_count - 1) * chrono->mad + abs_diff) / chrono->mad_count;
+    }
 
     /* For assert */
     chrono->start = VLC_TICK_INVALID;
