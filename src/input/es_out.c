@@ -2315,12 +2315,14 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
         p_es->master = true;
         p_es->p_pgrm->p_master_es_clock = p_es->p_clock =
             vlc_clock_main_CreateMaster( p_es->p_pgrm->p_main_clock,
+                                         p_es->id.str_id,
                                          &clock_cbs, p_es );
     }
     else
     {
         p_es->master = false;
         p_es->p_clock = vlc_clock_main_CreateSlave( p_es->p_pgrm->p_main_clock,
+                                                    p_es->id.str_id,
                                                     p_es->fmt.i_cat,
                                                     &clock_cbs, p_es );
     }
