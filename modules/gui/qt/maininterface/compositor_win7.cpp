@@ -271,6 +271,11 @@ bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroy
     return true;
 }
 
+QWindow *CompositorWin7::interfaceMainWindow() const
+{
+    return m_qmlView.get();
+}
+
 
 Compositor::Type CompositorWin7::type() const
 {

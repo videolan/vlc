@@ -54,6 +54,7 @@ public:
     void unloadGUI() override;
 
     bool setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb) override;
+    virtual QWindow* interfaceMainWindow() const override;
 
     Type type() const override;
 

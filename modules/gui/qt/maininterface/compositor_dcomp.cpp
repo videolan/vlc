@@ -430,6 +430,11 @@ bool CompositorDirectComposition::setupVoutWindow(vout_window_t *p_wnd, VoutDest
     return true;
 }
 
+QWindow *CompositorDirectComposition::interfaceMainWindow() const
+{
+    return m_rootWindow;
+}
+
 Compositor::Type CompositorDirectComposition::type() const
 {
     return Compositor::DirectCompositionCompositor;

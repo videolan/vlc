@@ -69,6 +69,10 @@ MainInterface* CompositorDummy::makeMainInterface()
 
     return m_mainInterface.get();
 }
+
+QWindow* CompositorDummy::interfaceMainWindow() const
+{
+    return m_qmlWidget.get();
 }
 
 void CompositorDummy::destroyMainInterface()

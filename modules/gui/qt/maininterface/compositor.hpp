@@ -59,6 +59,8 @@ public:
 
     virtual Type type() const = 0;
 
+    virtual QWindow* interfaceMainWindow() const = 0;
+
 protected:
     void onWindowDestruction(vout_window_t *p_wnd);
 

@@ -53,6 +53,7 @@ public:
     virtual void destroyMainInterface() override;
     virtual void unloadGUI() override;
     virtual bool setupVoutWindow(vout_window_t*, VoutDestroyCb destroyCb) override;
+    virtual QWindow* interfaceMainWindow() const override;
 
     Type type() const override;
 
