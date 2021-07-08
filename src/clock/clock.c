@@ -617,6 +617,12 @@ int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t deadline)
     return vlc_cond_timedwait(&main_clock->cond, &main_clock->lock, deadline);
 }
 
+void vlc_clock_Wake(vlc_clock_t *clock)
+{
+    vlc_clock_main_t *main_clock = clock->owner;
+    vlc_cond_broadcast(&main_clock->cond);
+}
+
 vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger)
 {
     vlc_clock_main_t *main_clock = malloc(sizeof(vlc_clock_main_t));

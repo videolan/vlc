@@ -207,6 +207,11 @@ bool vlc_clock_IsPaused(vlc_clock_t *clock);
 int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_deadline);
 
 /**
+ * Wake up any vlc_clock_Wait()
+ */
+void vlc_clock_Wake(vlc_clock_t *clock);
+
+/**
  * This function converts a timestamp from stream to system
  *
  * The clock mutex must be locked.
