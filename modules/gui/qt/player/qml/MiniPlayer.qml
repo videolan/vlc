@@ -86,10 +86,11 @@ FocusScope {
         Navigation.parentItem: root
 
         Keys.onPressed: {
-            if (!event.accepted)
-                controlbar.Navigation.defaultKeyAction(event)
-            if (!event.accepted)
-                mainInterface.sendHotkey(event.key, event.modifiers);
+            controlBar.Navigation.defaultKeyAction(event)
+
+            if (!event.accepted) {
+                mainInterface.sendHotkey(event.key, event.modifiers)
+            }
         }
     }
 }
