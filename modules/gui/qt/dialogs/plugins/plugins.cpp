@@ -297,7 +297,7 @@ void ExtensionTab::moreInformation()
     if( !index.isValid() )
         return;
 
-    ExtensionInfoDialog dlg( index, p_intf, this );
+    ExtensionInfoDialog dlg( index, p_intf, windowHandle() );
     dlg.exec();
 }
 
@@ -592,7 +592,7 @@ void AddonsTab::moreInformation()
 {
     QModelIndex index = addonsView->selectionModel()->selectedIndexes().first();
     if( !index.isValid() ) return;
-    AddonInfoDialog dlg( index, p_intf, this );
+    AddonInfoDialog dlg( index, p_intf, windowHandle() );
     dlg.exec();
 }
 
@@ -1355,7 +1355,7 @@ void AddonItemDelegate::editButtonClicked()
 
 ExtensionInfoDialog::ExtensionInfoDialog( const QModelIndex &index,
                                           qt_intf_t *p_intf,
-                                          QWidget *parent )
+                                          QWindow *parent )
        : QVLCDialog( parent, p_intf )
 {
     // Let's be a modal dialog
@@ -1438,7 +1438,7 @@ ExtensionInfoDialog::ExtensionInfoDialog( const QModelIndex &index,
 
 
 AddonInfoDialog::AddonInfoDialog( const QModelIndex &index,
-                                  qt_intf_t *p_intf, QWidget *parent )
+                                  qt_intf_t *p_intf, QWindow *parent )
        : QVLCDialog( parent, p_intf )
 {
     // Let's be a modal dialog

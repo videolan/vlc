@@ -29,20 +29,23 @@
 #include "dialogs/sout/sout.hpp"
 #include "util/qt_dirs.hpp"
 #include "dialogs/sout/sout_widgets.hpp"
+#include "widgets/native/qvlcframe.hpp"
 
 #include <QString>
 #include <QFileDialog>
 #include <QToolButton>
 #include <QSpinBox>
 #include <assert.h>
+#include <QWindow>
 
-SoutDialog::SoutDialog( QWidget *parent, qt_intf_t *_p_intf, const QString& inputChain )
-           : QWizard( parent )
+SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inputChain )
 {
     p_intf = _p_intf;
 
     setWindowTitle( qtr( "Stream Output" ) );
     setWindowRole( "vlc-stream-output" );
+
+    QVLCDialog::setWindowTransientParent(this, parent , p_intf);
 
     /* UI stuff */
     ui.setupUi( this );

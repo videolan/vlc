@@ -38,7 +38,7 @@
 #include <vlc_modules.h>
 
 ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )
-               : QVLCDialog( (QWidget*)_p_intf->p_mi, _p_intf )
+               : QVLCDialog( nullptr, _p_intf )
 {
 #ifdef __APPLE__
     setWindowFlags( Qt::Drawer );

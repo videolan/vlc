@@ -107,18 +107,15 @@ protected:
 class QVLCDialog : public QDialog
 {
 public:
-    QVLCDialog( QWidget* parent, qt_intf_t *_p_intf ) :
-                                    QDialog( parent ), p_intf( _p_intf )
-    {
-        setWindowFlags( Qt::Dialog|Qt::WindowMinMaxButtonsHint|
-                        Qt::WindowSystemMenuHint|Qt::WindowCloseButtonHint );
-    }
+    QVLCDialog(QWindow *parent, qt_intf_t *_p_intf );
     virtual ~QVLCDialog() {};
     void toggleVisible()
     {
         if( isVisible() ) hide();
         else show();
     }
+
+    static void setWindowTransientParent(QWidget* widget, QWindow* parent, qt_intf_t* p_intf);
 
 protected:
     qt_intf_t *p_intf;

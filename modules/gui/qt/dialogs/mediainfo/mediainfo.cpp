@@ -42,8 +42,8 @@
    Please be Careful of not breaking one the modes behaviour... */
 
 MediaInfoDialog::MediaInfoDialog( qt_intf_t *_p_intf,
-                                  input_item_t *p_item ) :
-                                  QVLCFrame( _p_intf )
+                                  input_item_t *p_item )
+    : QVLCFrame( _p_intf )
 {
     isMainInputInfo = ( p_item == NULL );
 

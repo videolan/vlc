@@ -59,7 +59,7 @@ class OpenDialog : public QVLCDialog
 {
     Q_OBJECT
 public:
-    static OpenDialog * getInstance( QWidget *parent, qt_intf_t *p_intf,
+    static OpenDialog * getInstance(qt_intf_t *p_intf,
                                 bool b_rawInstance = false, int _action_flag = 0,
                                 bool b_selectMode = false );
 
@@ -83,7 +83,7 @@ public slots:
     void transcode();
 
 private:
-    OpenDialog( QWidget *parent, qt_intf_t *, bool b_selectMode,
+    OpenDialog( QWindow *parent, qt_intf_t *, bool b_selectMode,
                 int _action_flag = 0 );
     virtual ~OpenDialog();
 

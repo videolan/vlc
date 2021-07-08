@@ -171,7 +171,7 @@ public slots:
     void PLOpenDir();
     void PLAppendDir();
 
-    void streamingDialog( QWidget *parent, const QStringList& mrls, bool b_stream = true,
+    void streamingDialog( QWindow *parent, const QStringList& mrls, bool b_stream = true,
                           QStringList options = QStringList("") );
     void streamingDialog( const QList<QUrl>& urls, bool b_stream = true );
     void openAndStreamingDialogs();

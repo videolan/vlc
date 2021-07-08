@@ -44,7 +44,7 @@ class SoutDialog : public QWizard
 {
     Q_OBJECT
 public:
-    SoutDialog( QWidget* parent, qt_intf_t *, const QString& chain = "");
+    SoutDialog( QWindow* parent, qt_intf_t *, const QString& chain = "");
     virtual ~SoutDialog(){}
 
     QString getChain(){ return chain; }

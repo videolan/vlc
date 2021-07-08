@@ -69,7 +69,7 @@ class VLCProfileEditor : public QVLCDialog
 
     Ui::Profiles ui;
 public:
-    VLCProfileEditor( const QString&, const QString&, QWidget * );
+    VLCProfileEditor(const QString&, const QString&, QWindow * );
 
     QString name;
     QString muxValue;

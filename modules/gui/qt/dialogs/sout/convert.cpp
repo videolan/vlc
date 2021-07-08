@@ -40,7 +40,7 @@
 #define urlToDisplayString(filestr) toNativeSeparators(QUrl(filestr).toDisplayString(\
     QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments ))
 
-ConvertDialog::ConvertDialog( QWidget *parent, qt_intf_t *_p_intf,
+ConvertDialog::ConvertDialog( QWindow *parent, qt_intf_t *_p_intf,
                               const QStringList& inputMRLs )
               : QVLCDialog( parent, _p_intf ),
                 singleFileSelected( inputMRLs.length() == 1 )

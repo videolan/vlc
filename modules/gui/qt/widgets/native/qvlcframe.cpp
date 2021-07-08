@@ -20,7 +20,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <QWindow>
+
 #include "qvlcframe.hpp"
+#include "maininterface/compositor.hpp"
 
 void QVLCTools::saveWidgetPosition(QSettings *settings, QWidget *widget)
 {
@@ -88,4 +91,27 @@ void QVLCDialog::keyPressEvent(QKeyEvent *keyEvent)
     {
         this->close();
     }
+}
+
+void QVLCDialog::setWindowTransientParent(QWidget* widget, QWindow* parent, qt_intf_t* p_intf)
+{
+    if (!parent)
+        parent = p_intf->p_compositor->interfaceMainWindow();
+    if (!parent)
+        return;
+
+    widget->createWinId();
+    QWindow* handle  = widget->windowHandle();
+    handle->setTransientParent(parent);
+}
+
+
+QVLCDialog::QVLCDialog(QWindow *parent, qt_intf_t *_p_intf)
+    : QDialog(),
+      p_intf( _p_intf )
+{
+    setWindowFlags( Qt::Dialog|Qt::WindowMinMaxButtonsHint|
+                    Qt::WindowSystemMenuHint|Qt::WindowCloseButtonHint );
+
+    setWindowTransientParent(this, parent, p_intf);
 }

@@ -257,7 +257,8 @@ const QEvent::Type DialogEvent::DialogEvent_Type =
 
 void DialogsProvider::prefsDialog()
 {
-    PrefsDialog *p = new PrefsDialog( (QWidget *)p_intf->p_mi, p_intf );
+    PrefsDialog *p = new PrefsDialog( nullptr, p_intf );
+    p->setAttribute(Qt::WA_DeleteOnClose);
     p->toggleVisible();
 }
 
@@ -340,7 +341,8 @@ void DialogsProvider::mediaInfoDialog( const PlaylistItem& pItem )
     if( p_input )
     {
         MediaInfoDialog * const mid = new MediaInfoDialog( p_intf, p_input );
-        mid->setParent( p_intf->p_mi, Qt::Dialog );
+        mid->setWindowFlag( Qt::Dialog );
+        mid->setAttribute(Qt::WA_DeleteOnClose);
         mid->showTab( MediaInfoDialog::META_PANEL );
     }
 }
@@ -475,7 +477,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
 
 void DialogsProvider::openDialog( int i_tab )
 {
-    OpenDialog::getInstance( p_intf->p_mi , p_intf )->showTab( i_tab );
+    OpenDialog::getInstance(p_intf )->showTab( i_tab );
 }
 void DialogsProvider::openDialog()
 {
@@ -501,7 +503,7 @@ void DialogsProvider::openCaptureDialog()
 /* Same as the open one, but force the enqueue */
 void DialogsProvider::PLAppendDialog( int tab )
 {
-    OpenDialog::getInstance( p_intf->p_mi, p_intf, false,
+    OpenDialog::getInstance(p_intf, false,
                              OPEN_AND_ENQUEUE )->showTab( tab );
 }
 
@@ -725,7 +727,7 @@ void DialogsProvider::savePlayingToPlaylist()
  * Sout emulation
  ****************************************************************************/
 
-void DialogsProvider::streamingDialog( QWidget *parent,
+void DialogsProvider::streamingDialog( QWindow *parent,
                                        const QStringList& mrls,
                                        bool b_transcode_only,
                                        QStringList options )
@@ -794,13 +796,13 @@ void DialogsProvider::streamingDialog(const QList<QUrl> &urls, bool b_stream )
 
 void DialogsProvider::openAndStreamingDialogs()
 {
-    OpenDialog::getInstance( p_intf->p_mi, p_intf, false, OPEN_AND_STREAM )
+    OpenDialog::getInstance(p_intf, false, OPEN_AND_STREAM )
                                 ->showTab( OPEN_FILE_TAB );
 }
 
 void DialogsProvider::openAndTranscodingDialogs()
 {
-    OpenDialog::getInstance( p_intf->p_mi , p_intf, false, OPEN_AND_SAVE )
+    OpenDialog::getInstance(p_intf, false, OPEN_AND_SAVE )
                                 ->showTab( OPEN_FILE_TAB );
 }
 

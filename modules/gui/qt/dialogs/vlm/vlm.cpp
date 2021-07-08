@@ -348,7 +348,7 @@ void VLMDialog::clearWidgets()
 
 void VLMDialog::selectInput()
 {
-    OpenDialog *o = OpenDialog::getInstance( this, p_intf, false, SELECT, true );
+    OpenDialog *o = OpenDialog::getInstance( p_intf, false, SELECT, true );
     o->exec();
     ui.inputLedit->setText( o->getMRL( false ) );
     inputOptions = o->getOptions();
@@ -356,7 +356,7 @@ void VLMDialog::selectInput()
 
 void VLMDialog::selectOutput()
 {
-    SoutDialog *s = new SoutDialog( this, p_intf );
+    SoutDialog *s = new SoutDialog( windowHandle(), p_intf );
     if( s->exec() == QDialog::Accepted )
     {
         int i = s->getChain().indexOf( " " );

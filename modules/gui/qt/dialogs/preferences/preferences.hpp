@@ -42,7 +42,7 @@ class PrefsDialog : public QVLCDialog
 {
     Q_OBJECT
 public:
-    PrefsDialog( QWidget *, qt_intf_t * );
+    PrefsDialog( QWindow *, qt_intf_t * );
     virtual ~PrefsDialog();
 
 private:

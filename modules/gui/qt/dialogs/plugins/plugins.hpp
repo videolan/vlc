@@ -335,15 +335,15 @@ protected:
 class ExtensionInfoDialog : public QVLCDialog
 {
 public:
-    ExtensionInfoDialog( const QModelIndex &index,
-                         qt_intf_t *p_intf, QWidget *parent );
+    ExtensionInfoDialog(const QModelIndex &index,
+                         qt_intf_t *p_intf, QWindow *parent );
 };
 
 class AddonInfoDialog : public QVLCDialog
 {
 public:
-    AddonInfoDialog( const QModelIndex &index,
-                     qt_intf_t *p_intf, QWidget *parent );
+    AddonInfoDialog(const QModelIndex &index,
+                     qt_intf_t *p_intf, QWindow *parent );
 };
 
 #endif

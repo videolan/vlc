@@ -39,12 +39,12 @@
 
 OpenDialog *OpenDialog::instance = NULL;
 
-OpenDialog* OpenDialog::getInstance( QWidget *parent, qt_intf_t *p_intf,
+OpenDialog* OpenDialog::getInstance(  qt_intf_t *p_intf,
         bool b_rawInstance, int _action_flag, bool b_selectMode )
 {
     /* Creation */
     if( !instance )
-        instance = new OpenDialog( parent, p_intf, b_selectMode,
+        instance = new OpenDialog( nullptr, p_intf, b_selectMode,
                                    _action_flag );
     else if( !b_rawInstance )
     {
@@ -60,10 +60,11 @@ OpenDialog* OpenDialog::getInstance( QWidget *parent, qt_intf_t *p_intf,
     return instance;
 }
 
-OpenDialog::OpenDialog( QWidget *parent,
+OpenDialog::OpenDialog( QWindow *parent,
                         qt_intf_t *_p_intf,
                         bool b_selectMode,
-                        int _action_flag )  :  QVLCDialog( parent, _p_intf )
+                        int _action_flag )
+    :  QVLCDialog( parent, _p_intf )
 {
     i_action_flag = _action_flag;
 
@@ -276,7 +277,7 @@ void OpenDialog::toggleAdvancedPanel()
 
 void OpenDialog::browseInputSlave()
 {
-    OpenDialog *od = new OpenDialog( this, p_intf, true, SELECT );
+    OpenDialog *od = new OpenDialog( windowHandle(), p_intf, true, SELECT );
     od->exec();
     ui.slaveText->setText( od->getMRL( false ) );
     delete od;
@@ -407,7 +408,7 @@ void OpenDialog::stream( bool b_transcode_only )
     {
         msg_Dbg( p_intf, "MRL(s) passed to the Sout: %s", qtu( soutMRLS[i] ) );
     }
-    THEDP->streamingDialog( this, soutMRLS, b_transcode_only,
+    THEDP->streamingDialog( windowHandle(), soutMRLS, b_transcode_only,
                             getOptions().split( " :" ) );
 }
 
