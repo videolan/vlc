@@ -28,7 +28,7 @@
 
 #include "extended.hpp"
 
-#include "maininterface/main_interface.hpp" /* Needed for external MI size */
+#include "maininterface/compositor.hpp" /* Needed for external MI size */
 #include "player/player_controller.hpp"
 
 #include <QTabWidget>
@@ -141,9 +141,9 @@ ExtendedDialog::ExtendedDialog( qt_intf_t *_p_intf )
     {
         resize( QSize( 400, 280 ) );
 
-        MainInterface *p_mi = p_intf->p_mi;
-        if( p_mi && p_mi->x() > 50 )
-            move( ( p_mi->x() - frameGeometry().width() - 10 ), p_mi->y() );
+        QWindow *window = p_intf->p_compositor->interfaceMainWindow();
+        if( window && window->x() > 50 )
+            move( ( window->x() - frameGeometry().width() - 10 ), window->y() );
         else
             move ( 450 , 0 );
     }
