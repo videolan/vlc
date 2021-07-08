@@ -69,6 +69,27 @@ signals:
 };
 
 
+class SortMenu : public QObject
+{
+    Q_OBJECT
+
+public:
+    using QObject::QObject;
+
+    ~SortMenu();
+
+    Q_INVOKABLE void popup(const QPoint &point, bool popupAbovePoint, const QVariantList &model);
+
+    Q_INVOKABLE void close();
+
+signals:
+    void selected(int index);
+
+private:
+    QMenu *m_menu = nullptr;
+};
+
+
 //inherit VLCMenuBar so we can access menu creation functions
 class QmlGlobalMenu : public VLCMenuBar
 {

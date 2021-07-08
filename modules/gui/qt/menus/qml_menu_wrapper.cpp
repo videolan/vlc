@@ -38,6 +38,35 @@
 
 #include <QSignalMapper>
 
+namespace
+{
+    QIcon sortIcon(QWidget *widget, int order)
+    {
+        assert(order == Qt::AscendingOrder || order == Qt::DescendingOrder);
+
+        QStyleOptionHeader headerOption;
+        headerOption.init(widget);
+        headerOption.sortIndicator = (order == Qt::AscendingOrder)
+                ? QStyleOptionHeader::SortDown
+                : QStyleOptionHeader::SortUp;
+
+        QStyle *style = qApp->style();
+        int arrowsize = style->pixelMetric(QStyle::PM_HeaderMarkSize, &headerOption, widget);
+        if (arrowsize <= 0)
+            arrowsize = 32;
+
+        headerOption.rect = QRect(0, 0, arrowsize, arrowsize);
+        QPixmap arrow(arrowsize, arrowsize);
+        arrow.fill(Qt::transparent);
+
+        {
+            QPainter arrowPainter(&arrow);
+            style->drawPrimitive(QStyle::PE_IndicatorHeaderArrow, &headerOption, &arrowPainter, widget);
+        }
+
+        return QIcon(arrow);
+    }
+}
 
 static inline void addSubMenu( QMenu *func, QString title, QMenu *bar ) {
     func->setTitle( title );
@@ -60,6 +89,55 @@ void StringListMenu::popup(const QPoint &point, const QVariantList &stringList)
     }
 
     m->popup(point);
+}
+
+SortMenu::~SortMenu()
+{
+    if (m_menu)
+        delete m_menu;
+}
+
+void SortMenu::popup(const QPoint &point, const bool popupAbovePoint, const QVariantList &model)
+{
+    if (m_menu)
+        delete m_menu;
+
+    m_menu = new QMenu;
+
+    // model => [{text: "", checked: <bool>, order: <sort order> if checked else <invalid>}...]
+    for (int i = 0; i != model.size(); ++i)
+    {
+        const auto obj = model[i].toMap();
+
+        auto action = m_menu->addAction(obj.value("text").toString());
+        action->setCheckable(true);
+
+        const bool checked = obj.value("checked").toBool();
+        action->setChecked(checked);
+
+        if (checked)
+            action->setIcon(sortIcon(m_menu, obj.value("order").toInt()));
+
+        connect(action, &QAction::triggered, this, [this, i]()
+        {
+            emit selected(i);
+        });
+    }
+
+    // m_menu->height() returns invalid height until initial popup call
+    // so in case of 'popupAbovePoint', first show the menu and then reposition it
+    m_menu->popup(point);
+    if (popupAbovePoint)
+    {
+        // use 'popup' instead of 'move' so that menu can reposition itself if it's parts are hidden
+        m_menu->popup(QPoint(point.x(), point.y() - m_menu->height()));
+    }
+}
+
+void SortMenu::close()
+{
+    if (m_menu)
+        m_menu->close();
 }
 
 QmlGlobalMenu::QmlGlobalMenu(QObject *parent)
