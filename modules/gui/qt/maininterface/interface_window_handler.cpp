@@ -241,6 +241,21 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
         m_mainInterface->dropEventPlay(dropEvent, true);
         return true;
     }
+    case QEvent::Close:
+    {
+        bool ret = m_mainInterface->onWindowClose(m_window);
+        if (ret)
+        {
+            /* Accept session quit. Otherwise we break the desktop mamager. */
+            event->accept();
+            return false;
+        }
+        else
+        {
+            event->ignore();
+            return true;
+        }
+    }
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     //Handle CSD edge behaviors
     case QEvent::MouseMove:

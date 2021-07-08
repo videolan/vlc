@@ -223,7 +223,11 @@ public:
     Q_INVOKABLE static inline void restoreCursor(void) { QApplication::restoreOverrideCursor(); };
 
     void dropEventPlay( QDropEvent* event, bool b_play );
-    void closeEvent( QCloseEvent *) Q_DECL_OVERRIDE;
+    /**
+     * @brief ask for the application to terminate
+     * @return true if the application can be close right away, false if it will be delayed
+     */
+    bool onWindowClose(QWindow* );
 
 protected:
     /* Systray */

@@ -680,7 +680,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
  * Events stuff
  ************************************************************************/
 
-void MainInterface::closeEvent( QCloseEvent *e )
+bool MainInterface::onWindowClose( QWindow* )
 {
     PlaylistControllerModel* playlistController = p_intf->p_mainPlaylistController;
     PlayerController* playerController = p_intf->p_mainPlayerController;
@@ -692,21 +692,18 @@ void MainInterface::closeEvent( QCloseEvent *e )
     //from the main window is still valid.
     //vout_window_ReportClose is currently stubbed
     if (playerController && playerController->hasVideoOutput()) {
-
         connect(playerController, &PlayerController::playingStateChanged, [this](PlayerController::PlayingState state){
             if (state == PlayerController::PLAYING_STATE_STOPPED) {
-                QMetaObject::invokeMethod(this, &MainInterface::close, Qt::QueuedConnection, nullptr);
+                emit askToQuit();
             }
         });
         playlistController->stop();
-
-        e->ignore();
+        return false;
     }
     else
     {
         emit askToQuit(); /* ask THEDP to quit, so we have a unique method */
-        /* Accept session quit. Otherwise we break the desktop mamager. */
-        e->accept();
+        return true;
     }
 }
 
