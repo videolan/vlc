@@ -75,6 +75,8 @@ typedef struct
     /* Clock for this program */
     input_clock_t    *p_input_clock;
     vlc_clock_main_t *p_main_clock;
+    /* Weak reference to the master ES clock */
+    const vlc_clock_t *p_master_es_clock;
     enum vlc_clock_master_source active_clock_source;
 
     vlc_tick_t i_last_pcr;
@@ -1460,6 +1462,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
     p_pgrm->b_scrambled = false;
     p_pgrm->i_last_pcr = VLC_TICK_INVALID;
     p_pgrm->p_meta = NULL;
+    p_pgrm->p_master_es_clock = NULL;
     p_pgrm->active_clock_source = VLC_CLOCK_MASTER_AUTO;
 
     p_pgrm->p_main_clock = vlc_clock_main_New( p_input->obj.logger );
@@ -2268,10 +2271,11 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     }
 
     if( p_es->fmt.i_cat != UNKNOWN_ES
-     && p_es->fmt.i_cat == clock_source_cat )
+     && p_es->fmt.i_cat == clock_source_cat
+     && p_es->p_pgrm->p_master_es_clock == NULL )
     {
         p_es->master = true;
-        p_es->p_clock =
+        p_es->p_pgrm->p_master_es_clock = p_es->p_clock =
             vlc_clock_main_CreateMaster( p_es->p_pgrm->p_main_clock,
                                          &clock_cbs, p_es );
     }
@@ -2334,6 +2338,8 @@ static void EsOutDestroyDecoder( es_out_t *out, es_out_id_t *p_es )
 
     vlc_input_decoder_Delete( p_es->p_dec );
     p_es->p_dec = NULL;
+    if( p_es->p_pgrm->p_master_es_clock == p_es->p_clock )
+        p_es->p_pgrm->p_master_es_clock = NULL;
     vlc_clock_Delete( p_es->p_clock );
     p_es->p_clock = NULL;
 
