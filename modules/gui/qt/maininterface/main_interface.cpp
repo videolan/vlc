@@ -606,10 +606,6 @@ void MainInterface::updateSystrayTooltipStatus( PlayerController::PlayingState )
 /************************************************************************
  * D&D Events
  ************************************************************************/
-void MainInterface::dropEvent(QDropEvent *event)
-{
-    dropEventPlay( event, true );
-}
 
 /**
  * dropEventPlay
@@ -678,18 +674,6 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
     if (!medias.empty())
         THEMPL->append(medias, b_play);
     event->accept();
-}
-void MainInterface::dragEnterEvent(QDragEnterEvent *event)
-{
-     event->acceptProposedAction();
-}
-void MainInterface::dragMoveEvent(QDragMoveEvent *event)
-{
-     event->acceptProposedAction();
-}
-void MainInterface::dragLeaveEvent(QDragLeaveEvent *event)
-{
-     event->accept();
 }
 
 /************************************************************************

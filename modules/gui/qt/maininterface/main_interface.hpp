@@ -222,12 +222,7 @@ public:
     Q_INVOKABLE static inline void setCursor(Qt::CursorShape cursor) { QApplication::setOverrideCursor(QCursor(cursor)); };
     Q_INVOKABLE static inline void restoreCursor(void) { QApplication::restoreOverrideCursor(); };
 
-protected:
     void dropEventPlay( QDropEvent* event, bool b_play );
-    void dropEvent( QDropEvent *) Q_DECL_OVERRIDE;
-    void dragEnterEvent( QDragEnterEvent * ) Q_DECL_OVERRIDE;
-    void dragMoveEvent( QDragMoveEvent * ) Q_DECL_OVERRIDE;
-    void dragLeaveEvent( QDragLeaveEvent * ) Q_DECL_OVERRIDE;
     void closeEvent( QCloseEvent *) Q_DECL_OVERRIDE;
 
 protected:
