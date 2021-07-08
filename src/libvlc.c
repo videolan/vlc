@@ -179,6 +179,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         goto error;
 
     vlc_LogInit(p_libvlc);
+    vlc_tracer_Init(p_libvlc);
 
     /*
      * Support for gettext
@@ -389,6 +390,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         config_AutoSaveConfigFile( VLC_OBJECT(p_libvlc) );
 
     vlc_LogDestroy(p_libvlc->obj.logger);
+    vlc_tracer_Destroy(p_libvlc);
     /* Free module bank. It is refcounted, so we call this each time  */
     module_EndBank (true);
 #if defined(_WIN32) || defined(__OS2__)
