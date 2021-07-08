@@ -584,11 +584,30 @@ static vlc_tick_t vlc_clock_slave_set_delay(vlc_clock_t *clock, vlc_tick_t delay
     return 0;
 }
 
-void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
-                   double rate, vlc_tick_t max_duration)
+void vlc_clock_Lock(vlc_clock_t *clock)
 {
     vlc_clock_main_t *main_clock = clock->owner;
     vlc_mutex_lock(&main_clock->lock);
+}
+
+void vlc_clock_Unlock(vlc_clock_t *clock)
+{
+    vlc_clock_main_t *main_clock = clock->owner;
+    vlc_mutex_unlock(&main_clock->lock);
+}
+
+static inline void AssertLocked(vlc_clock_t *clock)
+{
+    vlc_clock_main_t *main_clock = clock->owner;
+    vlc_mutex_assert(&main_clock->lock);
+}
+
+void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
+                   double rate, vlc_tick_t max_duration)
+{
+    AssertLocked(clock);
+
+    vlc_clock_main_t *main_clock = clock->owner;
     const vlc_tick_t max_deadline =
         max_duration > 0 ? system_now + max_duration : VLC_TICK_MAX;
     while (!main_clock->abort)
@@ -603,7 +622,6 @@ void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
         if (vlc_cond_timedwait(&main_clock->cond, &main_clock->lock, deadline))
             break;
     }
-    vlc_mutex_unlock(&main_clock->lock);
 }
 
 vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger)
@@ -785,14 +803,11 @@ vlc_tick_t vlc_clock_SetDelay(vlc_clock_t *clock, vlc_tick_t delay)
     return clock->set_delay(clock, delay);
 }
 
-vlc_tick_t vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
-                                     vlc_tick_t ts, double rate)
+vlc_tick_t vlc_clock_ConvertToSystemLocked(vlc_clock_t *clock,
+                                           vlc_tick_t system_now, vlc_tick_t ts,
+                                           double rate)
 {
-    vlc_clock_main_t *main_clock = clock->owner;
-    vlc_mutex_lock(&main_clock->lock);
-    vlc_tick_t system = clock->to_system_locked(clock, system_now, ts, rate);
-    vlc_mutex_unlock(&main_clock->lock);
-    return system;
+    return clock->to_system_locked(clock, system_now, ts, rate);
 }
 
 vlc_tick_t vlc_clock_GetOffset(vlc_clock_t *clock, vlc_tick_t system_now,

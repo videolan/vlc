@@ -1600,8 +1600,10 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
         {
             /* Wait to reach system_pts if the plugin doesn't handle
              * asynchronous display */
+            vlc_clock_Lock(sys->clock);
             vlc_clock_Wait(sys->clock, system_now, pts, sys->rate,
                            VOUT_REDISPLAY_DELAY);
+            vlc_clock_Unlock(sys->clock);
 
             /* Don't touch system_pts. Tell the clock that the pts was rendered
              * at the expected date */

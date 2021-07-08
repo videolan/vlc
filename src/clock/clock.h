@@ -179,17 +179,44 @@ void vlc_clock_Reset(vlc_clock_t *clock);
 vlc_tick_t vlc_clock_SetDelay(vlc_clock_t *clock, vlc_tick_t ts_delay);
 
 /**
+ * Lock the clock mutex
+ */
+void vlc_clock_Lock(vlc_clock_t *clock);
+
+/**
+ * Unlock the clock mutex
+ */
+void vlc_clock_Unlock(vlc_clock_t *clock);
+
+/**
  * Wait for a timestamp expressed in stream time
+ *
+ * The clock mutex must be locked.
  */
 void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
                    double rate, vlc_tick_t max_duration);
 
 /**
  * This function converts a timestamp from stream to system
+ *
+ * The clock mutex must be locked.
+ *
  * @return the valid system time or VLC_TICK_MAX when the clock is paused
  */
-vlc_tick_t vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
-                                     vlc_tick_t ts, double rate);
+vlc_tick_t vlc_clock_ConvertToSystemLocked(vlc_clock_t *clock,
+                                           vlc_tick_t system_now, vlc_tick_t ts,
+                                           double rate);
+
+static inline vlc_tick_t
+vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
+                          vlc_tick_t ts, double rate)
+{
+    vlc_clock_Lock(clock);
+    vlc_tick_t system =
+        vlc_clock_ConvertToSystemLocked(clock, system_now, ts, rate);
+    vlc_clock_Unlock(clock);
+    return system;
+}
 
 vlc_tick_t vlc_clock_GetOffset(vlc_clock_t *clock, vlc_tick_t system_now,
                                vlc_tick_t ts, double rate);
