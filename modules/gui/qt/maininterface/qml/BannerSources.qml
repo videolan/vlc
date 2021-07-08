@@ -251,8 +251,6 @@ FocusScope {
                             height: VLCStyle.bannerButton_height
                             iconSize: VLCStyle.banner_icon_size
 
-                            popupAlignment: Qt.AlignLeft | Qt.AlignBottom
-
                             visible: root.sortModel !== undefined && root.sortModel.length > 1
                             enabled: visible
 

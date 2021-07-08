@@ -78,7 +78,8 @@ RowLayout {
             anchors.centerIn: parent
 
             enabled: mainPlaylistController.count > 1
-            popupAlignment: Qt.AlignRight | Qt.AlignTop
+
+            popupAbove: true
 
             focusPolicy: Qt.NoFocus
 

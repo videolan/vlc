@@ -35,14 +35,15 @@ FocusScope {
     implicitWidth: button.implicitWidth
     implicitHeight: button.implicitHeight
 
-    property alias model: listView.model
+    property var model: []
     property string textRole
     property string criteriaRole
     // provided for convenience:
     property alias titleRole: root.textRole
     property alias keyRole: root.criteriaRole
 
-    property int popupAlignment: Qt.AlignRight | Qt.AlignBottom
+    property bool popupAbove: false
+
     property real listWidth: VLCStyle.widthSortBox
     property alias focusPolicy: button.focusPolicy
     property alias iconSize: button.size
@@ -62,12 +63,12 @@ FocusScope {
 
     onVisibleChanged: {
         if (!visible)
-            popup._close()
+            popup.close()
     }
 
     onEnabledChanged: {
         if (!enabled)
-            popup._close()
+            popup.close()
     }
 
     Widgets.IconToolButton {
@@ -84,246 +85,44 @@ FocusScope {
 
         focus: true
 
-        onClicked: {
-            if (popup.visible && !closeAnimation.running)
-                popup._close()
-            else
-                popup._open()
-        }
+        onClicked: popup.show()
 
         Navigation.parentItem: root
         Keys.priority: Keys.AfterItem
         Keys.onPressed: Navigation.defaultKeyAction(event)
     }
 
-    Popup {
-        id: popup
+    SortMenu {
+       id: popup
 
-        closePolicy: Popup.NoAutoClose
-        y: (popupAlignment & Qt.AlignBottom) ? (root.height) : -(height)
-        x: (popupAlignment & Qt.AlignRight) ? (button.width - width) : 0
-
-        width: listWidth
-
-        padding: bgRect.border.width
-
-        clip: true
-
-        height: 0
-
-        NumberAnimation {
-            id: openAnimation
-            target: popup
-            property: "height"
-            duration: 125
-            easing.type: Easing.InOutSine
-            to: popup.implicitHeight
-
-            onStarted: closeAnimation.stop()
-        }
-
-        NumberAnimation {
-            id: closeAnimation
-            target: popup
-            property: "height"
-            duration: 125
-            easing.type: Easing.InOutSine
-            to: 0
-
-            onStarted: openAnimation.stop()
-            onStopped: if (!openAnimation.running) popup.close()
-        }
-
-        function _open() {
-            if (!popup.visible)
-                popup.open()
-            openAnimation.start()
-        }
-
-        function _close() {
-            closeAnimation.start()
-        }
-
-        onOpened: {
-            button.highlighted = true
-            listView.forceActiveFocus()
-        }
-
-        onClosed: {
-            popup.height = 0
-
-            button.highlighted = false
-
-            if (button.focusPolicy !== Qt.NoFocus)
-                button.forceActiveFocus()
-        }
-
-        contentItem: ListView {
-            id: listView
-
-            implicitHeight: contentHeight
-
-            onActiveFocusChanged: {
-                // since Popup.CloseOnReleaseOutside closePolicy is limited to
-                // modal popups, this is an alternative way of closing the popup
-                // when the focus is lost
-                if (!activeFocus && !button.activeFocus)
-                    popup._close()
-            }
-
-            ScrollIndicator.vertical: ScrollIndicator { }
-
-            property bool containsMouse: false
-
-            delegate: ItemDelegate {
-                id: itemDelegate
-
-                width: parent.width
-
-                readonly property var delegateSortKey: modelData[root.criteriaRole]
-
-                readonly property bool isActive: (delegateSortKey === sortKey)
-
-                background: Widgets.AnimatedBackground {
-                    active: itemDelegate.activeFocus
-
-                    // NOTE: We don't want animations here, because it looks sluggish.
-                    animationDuration: 0
-
-                    backgroundColor: (closeAnimation.running === false && itemDelegate.hovered)
-                                     ? VLCStyle.colors.listHover
-                                     : "transparent"
+        function show() {
+            var model = root.model.map(function(modelData) {
+                var checked = modelData[root.criteriaRole] === sortKey
+                var order = checked ? root.sortOrder : undefined
+                return {
+                    "text": modelData[root.textRole],
+                    "checked": checked,
+                    "order": order
                 }
+            })
 
-                onHoveredChanged: {
-                    listView.containsMouse = hovered
-                    itemDelegate.forceActiveFocus()
-                }
+            var point
 
-                contentItem: Item {
-                    implicitHeight: itemRow.height
-                    width: itemDelegate.width
+            if (root.popupAbove)
+                point = root.mapToGlobal(0, - VLCStyle.margin_xxsmall)
+            else
+                point = root.mapToGlobal(0, root.height + VLCStyle.margin_xxsmall)
 
-                    RowLayout {
-                        id: itemRow
-
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-
-                        anchors {
-                            leftMargin: VLCStyle.margin_xxsmall
-                            rightMargin: VLCStyle.margin_xxsmall
-                        }
-
-                        MenuCaption {
-                            Layout.preferredHeight: itemText.implicitHeight
-                            Layout.preferredWidth: tickMetric.width
-
-                            horizontalAlignment: Text.AlignHCenter
-
-                            text: isActive ? tickMetric.text : ""
-
-                            color: colors.buttonText
-
-                            TextMetrics {
-                                id: tickMetric
-                                text: "✓"
-                            }
-                        }
-
-                        MenuCaption {
-                            Layout.fillWidth: true
-                            Layout.leftMargin: VLCStyle.margin_xxsmall
-
-                            id: itemText
-                            text: modelData[root.textRole]
-
-                            color: colors.buttonText
-                        }
-
-                        MenuCaption {
-                            Layout.preferredHeight: itemText.implicitHeight
-
-                            text: (sortOrder === Qt.AscendingOrder ? "↓" : "↑")
-                            visible: isActive
-
-                            color: colors.buttonText
-                        }
-                    }
-                }
-
-                onClicked: {
-                    if (root.sortKey !== delegateSortKey) {
-                        root.sortSelected(delegateSortKey)
-                        root.sortOrderSelected(Qt.AscendingOrder)
-                    }
-                    else {
-                        root.sortOrderSelected(root.sortOrder === Qt.AscendingOrder ? Qt.DescendingOrder : Qt.AscendingOrder)
-                    }
-
-                    popup.close()
-                }
-            }
+            popup.popup(point, root.popupAbove, model)
         }
 
-        background: Rectangle {
-            id: bgRect
-
-            border.width: VLCStyle.dp(1)
-
-            // FIXME: We might want another color for this.
-            border.color: VLCStyle.colors.text
-
-            Loader {
-                id: effectLoader
-
-                anchors.fill: parent
-                anchors.margins: VLCStyle.dp(1)
-
-                asynchronous: true
-
-                Component {
-                    id: frostedGlassEffect
-
-                    Widgets.FrostedGlassEffect {
-                        source: g_root
-
-                        // since Popup is not an Item, we can not directly map its position
-                        // to the source item. Instead, we can use root because popup's
-                        // position is relative to root's position.
-                        // This method unfortunately causes issues when source item is resized.
-                        // But in that case, we reload the effectLoader to redraw the effect.
-                        property point popupMappedPos: g_root.mapFromItem(root, popup.x, popup.y)
-                        sourceRect: Qt.rect(popupMappedPos.x, popupMappedPos.y, width, height)
-
-                        tint: colors.bg
-                        tintStrength: 0.3
-                    }
-                }
-
-                sourceComponent: frostedGlassEffect
-
-                function reload() {
-                    if (status != Loader.Ready)
-                        return
-
-                    sourceComponent = undefined
-                    sourceComponent = frostedGlassEffect
-                }
-            }
-        }
-
-        Connections {
-            target: g_root
-
-            enabled: popup.visible
-
-            onWidthChanged: {
-                effectLoader.reload()
-            }
-
-            onHeightChanged: {
-                effectLoader.reload()
+        onSelected: {
+            var selectedSortKey = root.model[index][root.criteriaRole]
+            if (root.sortKey !== selectedSortKey) {
+                root.sortSelected(selectedSortKey)
+                root.sortOrderSelected(Qt.AscendingOrder)
+            } else {
+                root.sortOrderSelected(root.sortOrder === Qt.AscendingOrder ? Qt.DescendingOrder : Qt.AscendingOrder)
             }
         }
     }
