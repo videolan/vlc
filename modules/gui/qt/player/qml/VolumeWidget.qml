@@ -39,11 +39,6 @@ FocusScope{
 
     property alias parentWindow: volumeTooltip.parentWindow
 
-    // these are uninitialized because they will be set by button loader
-    // not 'undefined' because the loader must know if they exist
-    property var leftAction: null
-    property var rightAction: null
-
     property VLCColors colors: VLCStyle.colors
 
     RowLayout{
@@ -72,15 +67,7 @@ FocusScope{
             onClicked: player.muted = !player.muted
 
             Navigation.parentItem: widgetfscope
-            Navigation.upAction: function() {
-                volControl.increase()
-                tooltipShower.restart()
-            }
-
-            Navigation.downAction: function() {
-                volControl.decrease()
-                tooltipShower.restart()
-            }
+            Navigation.rightItem: volControl
         }
 
         Slider
@@ -101,6 +88,8 @@ FocusScope{
             Keys.onPressed: {
                 if (KeyHelper.matchOk(event)) {
                     event.accepted = true
+                } else {
+                    Navigation.defaultKeyAction(event)
                 }
             }
 
@@ -124,6 +113,21 @@ FocusScope{
                         volumeTooltip.visible = Qt.binding(function() {return sliderMouseArea.containsMouse;})
                 }
             }
+
+            Navigation.leftItem: volumeBtn
+            Navigation.parentItem: widgetfscope
+
+            Keys.onUpPressed: {
+                volControl.increase()
+                tooltipShower.restart()
+            }
+
+            Keys.onDownPressed: {
+                volControl.decrease()
+                tooltipShower.restart()
+            }
+
+            Keys.priority: Keys.BeforeItem
 
             property color sliderColor: (volControl.position > fullvolpos) ? colors.volmax : widgetfscope.color
             property int maxvol: 125

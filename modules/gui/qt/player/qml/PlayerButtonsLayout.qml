@@ -77,7 +77,8 @@ FocusScope {
             rightMargin: layoutSpacing
         }
 
-        active: !!playerButtonsLayout.model && !!playerButtonsLayout.model.left
+        active: !!playerButtonsLayout.model
+                && !!playerButtonsLayout.model.left
 
         focus: true
 
@@ -89,9 +90,11 @@ FocusScope {
             visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
 
             Navigation.parentItem: playerButtonsLayout
-            Navigation.rightItem: buttonrow_center
+            Navigation.rightItem: buttonrow_center.item
 
             focus: true
+
+            altFocusAction: Navigation.defaultNavigationRight
         }
     }
 
@@ -105,16 +108,19 @@ FocusScope {
             bottomMargin: playerButtonsLayout.marginBottom
         }
 
-        active: !!playerButtonsLayout.model && !!playerButtonsLayout.model.center
+        active: !!playerButtonsLayout.model
+                && !!playerButtonsLayout.model.center
 
         sourceComponent: ButtonsLayout {
             model: playerButtonsLayout.model.center
 
             Navigation.parentItem: playerButtonsLayout
-            Navigation.leftItem: buttonrow_left
-            Navigation.rightItem: buttonrow_right
+            Navigation.leftItem: buttonrow_left.item
+            Navigation.rightItem: buttonrow_right.item
 
             focus: true
+
+            altFocusAction: Navigation.defaultNavigationUp
         }
     }
 
@@ -131,7 +137,8 @@ FocusScope {
             leftMargin: layoutSpacing
         }
 
-        active: !!playerButtonsLayout.model && !!playerButtonsLayout.model.right
+        active: !!playerButtonsLayout.model
+                && !!playerButtonsLayout.model.right
 
         sourceComponent: ButtonsLayout {
             model: playerButtonsLayout.model.right
@@ -141,9 +148,11 @@ FocusScope {
             visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
 
             Navigation.parentItem: playerButtonsLayout
-            Navigation.leftItem: buttonrow_center
+            Navigation.leftItem: buttonrow_center.item
 
             focus: true
+
+            altFocusAction: Navigation.defaultNavigationLeft
         }
     }
 }
