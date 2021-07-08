@@ -67,7 +67,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open(vout_display_t *, const vout_display_cfg_t *,
+static int  Open(vout_display_t *,
                  video_format_t *, vlc_video_context *);
 static void Close(vout_display_t *);
 
@@ -1774,7 +1774,7 @@ static const struct vlc_display_operations ops = {
 /**
  * It creates a Direct3D vout display.
  */
-static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
     vout_display_sys_t *sys;
@@ -1884,7 +1884,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->ops = &ops;
 
     /* Change the window title bar text */
-    vout_window_SetTitle(cfg->window, VOUT_TITLE " (Direct3D9 output)");
+    vout_window_SetTitle(vd->cfg->window, VOUT_TITLE " (Direct3D9 output)");
 
     return VLC_SUCCESS;
 error:

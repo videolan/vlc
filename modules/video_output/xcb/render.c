@@ -265,7 +265,7 @@ static void Display(vout_display_t *vd, picture_t *pic)
     (void) pic;
 }
 
-static void CreateBuffers(vout_display_t *vd, const vout_display_cfg_t *cfg)
+static void CreateBuffers(vout_display_t *vd)
 {
     const video_format_t *fmt = vd->source;
     vout_display_sys_t *sys = vd->sys;
@@ -274,14 +274,14 @@ static void CreateBuffers(vout_display_t *vd, const vout_display_cfg_t *cfg)
     xcb_create_pixmap(conn, 32, sys->drawable.crop, sys->root,
                       fmt->i_visible_width, fmt->i_visible_height);
     xcb_create_pixmap(conn, 32, sys->drawable.scale, sys->root,
-                      cfg->display.width, cfg->display.height);
+                      vd->cfg->display.width, vd->cfg->display.height);
     xcb_render_create_picture(conn, sys->picture.crop, sys->drawable.crop,
                               sys->format.argb, 0, NULL);
     xcb_render_create_picture(conn, sys->picture.scale, sys->drawable.scale,
                               sys->format.argb, 0, NULL);
 
     vout_display_place_t *place = &sys->place;
-    vout_display_PlacePicture(place, fmt, cfg);
+    vout_display_PlacePicture(place, fmt, vd->cfg);
 
     /* Homogeneous coordinates transform from destination(place)
      * to source(fmt) */
@@ -368,7 +368,7 @@ static int Control(vout_display_t *vd, int query)
 
             xcb_configure_window(sys->conn, sys->drawable.dest, mask, values);
             DeleteBuffers(vd);
-            CreateBuffers(vd, vd->cfg);
+            CreateBuffers(vd);
             xcb_flush(sys->conn);
             return VLC_SUCCESS;
         }
@@ -550,7 +550,7 @@ static const struct vlc_display_operations ops = {
 /**
  * Probe the X server.
  */
-static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *ctx)
 {
     vlc_object_t *obj = VLC_OBJECT(vd);
@@ -565,7 +565,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     xcb_connection_t *conn;
     const xcb_screen_t *screen;
 
-    if (vlc_xcb_parent_Create(vd, cfg->window, &conn, &screen) != VLC_SUCCESS)
+    if (vlc_xcb_parent_Create(vd, vd->cfg->window, &conn, &screen) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
     sys->conn = conn;
@@ -675,14 +675,14 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     xcb_create_pixmap(conn, 32, sys->drawable.source, screen->root,
                       vd->source->i_width, vd->source->i_height);
     xcb_create_gc(conn, sys->gc, sys->drawable.source, 0, NULL);
-    xcb_create_window(conn, 32, sys->drawable.dest, cfg->window->handle.xid,
-                      0, 0, cfg->display.width, cfg->display.height, 0,
+    xcb_create_window(conn, 32, sys->drawable.dest, vd->cfg->window->handle.xid,
+                      0, 0, vd->cfg->display.width, vd->cfg->display.height, 0,
                       XCB_WINDOW_CLASS_INPUT_OUTPUT, visual, cw_mask, cw_list);
     xcb_render_create_picture(conn, sys->picture.source, sys->drawable.source,
                               sys->format.argb, 0, NULL);
     xcb_render_create_picture(conn, sys->picture.dest, sys->drawable.dest,
                               sys->format.argb, 0, NULL);
-    CreateBuffers(vd, cfg);
+    CreateBuffers(vd);
     xcb_map_window(conn, sys->drawable.dest);
 
     sys->spu_chromas[0] = fmtp->i_chroma;

@@ -283,7 +283,6 @@ static int vout_display_start(void *func, bool forced, va_list ap)
 {
     vout_display_open_cb activate = func;
     vout_display_priv_t *osys = va_arg(ap, vout_display_priv_t *);
-    const vout_display_cfg_t *cfg = &osys->cfg;
     vout_display_t *vd = &osys->display;
     vlc_video_context *context = osys->src_vctx;
 
@@ -291,7 +290,7 @@ static int vout_display_start(void *func, bool forced, va_list ap)
     video_format_Copy(&osys->display_fmt, vd->source);
     vd->obj.force = forced; /* TODO: pass to activate() instead? */
 
-    int ret = activate(vd, cfg, &osys->display_fmt, context);
+    int ret = activate(vd, &osys->display_fmt, context);
     if (ret != VLC_SUCCESS) {
         video_format_Clean(&osys->display_fmt);
         vlc_objres_clear(VLC_OBJECT(vd));

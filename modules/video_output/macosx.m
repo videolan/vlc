@@ -53,7 +53,7 @@
 /**
  * Forward declarations
  */
-static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int Open(vout_display_t *vd,
                 video_format_t *fmt, vlc_video_context *context);
 static void Close(vout_display_t *vd);
 
@@ -141,17 +141,17 @@ static const struct vlc_display_operations ops = {
     Close, PictureRender, PictureDisplay, Control, NULL, SetViewpoint,
 };
 
-static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int Open (vout_display_t *vd,
                  video_format_t *fmt, vlc_video_context *context)
 {
     vout_display_sys_t *sys = calloc (1, sizeof(*sys));
 
-    if (cfg->window->type != VOUT_WINDOW_TYPE_NSOBJECT)
+    if (vd->cfg->window->type != VOUT_WINDOW_TYPE_NSOBJECT)
         return VLC_EGENERIC;
 
     if (!sys)
         return VLC_ENOMEM;
-    sys->cfg = *cfg;
+    sys->cfg = *vd->cfg;
 
     @autoreleasepool {
         if (!CGDisplayUsesOpenGLAcceleration (kCGDirectMainDisplay))
@@ -165,7 +165,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         /* Get the drawable object */
         id container = var_CreateGetAddress (vd, "drawable-nsobject");
         if (!container) {
-            sys->embed = cfg->window;
+            sys->embed = vd->cfg->window;
             container = sys->embed->handle.nsobject;
 
             if (!container) {
@@ -237,7 +237,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
             goto error;
         }
         sys->vgl = vout_display_opengl_New (fmt, &subpicture_chromas, sys->gl,
-                                            &cfg->viewpoint, context);
+                                            &vd->cfg->viewpoint, context);
         vlc_gl_ReleaseCurrent(sys->gl);
         if (!sys->vgl) {
             msg_Err(vd, "Error while initializing opengl display.");

@@ -95,7 +95,7 @@ static const struct vlc_display_operations ops = {
     .control = Control,
 };
 
-static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int Open(vout_display_t *vd,
                 video_format_t *fmt, vlc_video_context *context)
 {
     vout_display_sys_t *sys = vd->sys =
@@ -110,7 +110,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     char *name = var_InheritString(vd, "pl-gpu");
-    sys->pl = vlc_placebo_Create(cfg, name);
+    sys->pl = vlc_placebo_Create(vd->cfg, name);
     free(name);
     if (sys->pl == NULL)
         goto error;
@@ -165,7 +165,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->ops = &ops;
 
     UpdateParams(vd);
-    (void) cfg; (void) context;
+    (void) context;
     return VLC_SUCCESS;
 
 error:

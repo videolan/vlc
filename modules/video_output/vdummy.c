@@ -38,9 +38,9 @@
     "format instead of trying to improve performances by using the most " \
     "efficient one.")
 
-static int OpenDummy(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int OpenDummy(vout_display_t *vd,
                      video_format_t *fmtp, vlc_video_context *context);
-static int OpenStats(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int OpenStats(vout_display_t *vd,
                      video_format_t *fmtp, vlc_video_context *context);
 
 vlc_module_begin ()
@@ -88,10 +88,10 @@ static const struct vlc_display_operations ops_dummy = {
     .control = Control,
 };
 
-static int OpenDummy(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int OpenDummy(vout_display_t *vd,
                      video_format_t *fmtp, vlc_video_context *context)
 {
-    (void) cfg; (void) context;
+    (void) context;
     Open(vd, fmtp);
     vd->ops = &ops_dummy;
     return VLC_SUCCESS;
@@ -102,10 +102,10 @@ static const struct vlc_display_operations ops_stats = {
     .control = Control,
 };
 
-static int OpenStats(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int OpenStats(vout_display_t *vd,
                      video_format_t *fmtp, vlc_video_context *context)
 {
-    (void) cfg; (void) context;
+    (void) context;
     Open(vd, fmtp);
     vd->ops = &ops_stats;
     return VLC_SUCCESS;

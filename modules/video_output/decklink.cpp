@@ -228,7 +228,7 @@ struct decklink_sys_t
  * Local prototypes.
  *****************************************************************************/
 
-static int  OpenVideo           (vout_display_t *, const vout_display_cfg_t *,
+static int  OpenVideo           (vout_display_t *,
                                  video_format_t *, vlc_video_context *);
 static void CloseVideo          (vout_display_t *);
 static int  OpenAudio           (vlc_object_t *);
@@ -765,10 +765,10 @@ static const struct vlc_display_operations ops = {
     CloseVideo, PrepareVideo, NULL, ControlVideo, NULL, NULL,
 };
 
-static int OpenVideo(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int OpenVideo(vout_display_t *vd,
                      video_format_t *fmtp, vlc_video_context *context)
 {
-    VLC_UNUSED(cfg); VLC_UNUSED(context);
+    VLC_UNUSED(context);
     decklink_sys_t *sys = HoldDLSys(VLC_OBJECT(vd), VIDEO_ES);
     if(!sys)
         return VLC_ENOMEM;

@@ -42,7 +42,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open ( vout_display_t *, const vout_display_cfg_t *,
+static int  Open ( vout_display_t *,
                    video_format_t *, vlc_video_context * );
 static void Close( vout_display_t * );
 
@@ -310,7 +310,7 @@ exit_frame :
 /**
  * This function initializes KVA vout method.
  */
-static int Open ( vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int Open ( vout_display_t *vd,
                   video_format_t *fmtp, vlc_video_context *context )
 {
     vout_display_sys_t *sys;
@@ -326,7 +326,7 @@ static int Open ( vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     sys->b_fixt23 = var_CreateGetBool( vd, "kva-fixt23");
 
-    if( !sys->b_fixt23 && cfg->window->type != VOUT_WINDOW_TYPE_HWND )
+    if( !sys->b_fixt23 && vd->cfg->window->type != VOUT_WINDOW_TYPE_HWND )
     {
         free( sys );
         return VLC_EBADVAR;

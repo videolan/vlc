@@ -676,7 +676,7 @@ static const struct vlc_display_operations ops = {
 /**
  * This function allocates and initializes a KMS vout method.
  */
-static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
     vout_display_sys_t *sys;
@@ -685,7 +685,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     video_format_t fmt = {};
     char *chroma;
 
-    if (vout_display_cfg_IsWindowed(cfg))
+    if (vout_display_cfg_IsWindowed(vd->cfg))
         return VLC_EGENERIC;
 
     /*

@@ -231,12 +231,11 @@ static const struct vlc_display_operations ops = {
 };
 
 static int vlc_vidsplit_Open(vout_display_t *vd,
-                             const vout_display_cfg_t *cfg,
                              video_format_t *fmtp, vlc_video_context *ctx)
 {
     vlc_object_t *obj = VLC_OBJECT(vd);
 
-    if (vout_display_cfg_IsWindowed(cfg))
+    if (vout_display_cfg_IsWindowed(vd->cfg))
         return VLC_EGENERIC;
 
     char *name = var_InheritString(obj, "video-splitter");

@@ -380,14 +380,14 @@ static const struct vlc_display_operations ops = {
 /**
  * This function initializes libcaca vout method.
  */
-static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
     vout_display_sys_t *sys;
 
     (void) context;
 
-    if (vout_display_cfg_IsWindowed(cfg))
+    if (vout_display_cfg_IsWindowed(vd->cfg))
         return VLC_EGENERIC;
 #if !defined(__APPLE__) && !defined(_WIN32)
 # ifndef X_DISPLAY_MISSING
@@ -456,7 +456,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
     }
 
-    sys->window = cfg->window;
+    sys->window = vd->cfg->window;
     const char *driver = NULL;
 #ifdef __APPLE__
     // Make sure we don't try to open a window.

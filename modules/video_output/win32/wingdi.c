@@ -42,7 +42,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open (vout_display_t *, const vout_display_cfg_t *,
+static int  Open (vout_display_t *,
                   video_format_t *, vlc_video_context *);
 static void Close(vout_display_t *);
 
@@ -111,7 +111,7 @@ static const struct vlc_display_operations ops = {
 };
 
 /* */
-static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
     VLC_UNUSED(context);
@@ -132,7 +132,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (Init(vd, fmtp))
         goto error;
 
-    vout_window_SetTitle(cfg->window, VOUT_TITLE " (WinGDI output)");
+    vout_window_SetTitle(vd->cfg->window, VOUT_TITLE " (WinGDI output)");
 
     /* */
     vd->ops = &ops;

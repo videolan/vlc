@@ -63,8 +63,7 @@
 #define PHASE_OFFSET_TARGET ((double)0.25)
 #define PHASE_CHECK_INTERVAL 100
 
-static int OpenMmalVout(vout_display_t *, const vout_display_cfg_t *,
-                video_format_t *, vlc_video_context *);
+static int OpenMmalVout(vout_display_t *, video_format_t *, vlc_video_context *);
 
 #define SUBS_MAX 4
 
@@ -1094,7 +1093,7 @@ static const struct vlc_display_operations ops = {
     .reset_pictures = vd_reset_pictures,
 };
 
-static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int OpenMmalVout(vout_display_t *vd,
                         video_format_t *fmtp, vlc_video_context *vctx)
 {
     vout_display_sys_t *sys;
@@ -1122,7 +1121,7 @@ static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     if (sys->dec_dev == NULL)
-        sys->dec_dev = vlc_decoder_device_Create(VLC_OBJECT(vd), cfg->window);
+        sys->dec_dev = vlc_decoder_device_Create(VLC_OBJECT(vd), vd->cfg->window);
     if (sys->dec_dev == NULL || sys->dec_dev->type != VLC_DECODER_DEVICE_MMAL)
     {
         msg_Err(vd, "Missing decoder device");

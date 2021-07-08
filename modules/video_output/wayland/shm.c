@@ -270,10 +270,10 @@ static const struct vlc_display_operations ops = {
     .reset_pictures = ResetPictures,
 };
 
-static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
-    if (cfg->window->type != VOUT_WINDOW_TYPE_WAYLAND)
+    if (vd->cfg->window->type != VOUT_WINDOW_TYPE_WAYLAND)
         return VLC_EGENERIC;
 
     vout_display_sys_t *sys = malloc(sizeof (*sys));
@@ -285,11 +285,11 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->eventq = NULL;
     sys->shm = NULL;
     sys->active_buffers = 0;
-    sys->display_width = cfg->display.width;
-    sys->display_height = cfg->display.height;
+    sys->display_width = vd->cfg->display.width;
+    sys->display_height = vd->cfg->display.height;
 
     /* Get window */
-    sys->embed = cfg->window;
+    sys->embed = vd->cfg->window;
     assert(sys->embed != NULL);
 
     struct wl_display *display = sys->embed->display.wl;

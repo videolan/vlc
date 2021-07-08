@@ -63,7 +63,7 @@
 
 using Microsoft::WRL::ComPtr;
 
-static int  Open(vout_display_t *, const vout_display_cfg_t *,
+static int  Open(vout_display_t *,
                  video_format_t *, vlc_video_context *);
 static void Close(vout_display_t *);
 
@@ -355,7 +355,7 @@ static const struct vlc_display_operations ops = {
     .set_viewpoint = SetViewpoint,
 };
 
-static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
     vout_display_sys_t *sys = new (std::nothrow) vout_display_sys_t();
@@ -394,7 +394,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
 #if !VLC_WINSTORE_APP
-        if (cfg->window->type == VOUT_WINDOW_TYPE_HWND)
+        if (vd->cfg->window->type == VOUT_WINDOW_TYPE_HWND)
         {
             if (CommonWindowInit(vd, &sys->area, &sys->sys,
                        vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR))
@@ -405,8 +405,11 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
         /* use our internal swapchain callbacks */
 #if defined(HAVE_DCOMP_H) && !VLC_WINSTORE_APP
-        if (cfg->window->type == VOUT_WINDOW_TYPE_DCOMP)
-            sys->outside_opaque      = D3D11_CreateLocalSwapchainHandleDComp(VLC_OBJECT(vd), cfg->window->display.dcomp_device, cfg->window->handle.dcomp_visual, sys->d3d_dev);
+        if (vd->cfg->window->type == VOUT_WINDOW_TYPE_DCOMP)
+            sys->outside_opaque =
+                D3D11_CreateLocalSwapchainHandleDComp(VLC_OBJECT(vd),
+                                                      vd->cfg->window->display.dcomp_device,
+                                                      vd->cfg->window->handle.dcomp_visual, sys->d3d_dev);
         else
 #endif
             sys->outside_opaque      = D3D11_CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), sys->sys.hvideownd, sys->d3d_dev);
@@ -429,7 +432,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
     }
 
-    vout_window_SetTitle(cfg->window, VOUT_TITLE " (Direct3D11 output)");
+    vout_window_SetTitle(vd->cfg->window, VOUT_TITLE " (Direct3D11 output)");
     msg_Dbg(vd, "Direct3D11 display adapter successfully initialized");
 
     vd->info.can_scale_spu        = true;
