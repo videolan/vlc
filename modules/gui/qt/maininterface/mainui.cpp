@@ -244,8 +244,6 @@ void MainUI::registerQMLTypes()
 
     qmlRegisterType<QmlEventFilter>( "org.videolan.vlc", 0, 1, "EventFilter" );
 
-    qRegisterMetaType<ControlbarProfile*>();
-    qRegisterMetaType<ControlbarProfileModel*>();
     qmlRegisterUncreatableType<ControlbarProfileModel>("org.videolan.vlc", 0, 1, "ControlbarProfileModel", "");
     qmlRegisterUncreatableType<ControlbarProfile>("org.videolan.vlc", 0, 1, "ControlbarProfile", "");
     qmlRegisterUncreatableType<PlayerControlbarModel>("org.videolan.vlc", 0, 1, "PlayerControlbarModel", "");
