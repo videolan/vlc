@@ -17,6 +17,8 @@
  *****************************************************************************/
 #include "compositor_dummy.hpp"
 
+#include <QQuickView>
+
 #include "maininterface/main_interface.hpp"
 #include "maininterface/mainui.hpp"
 #include "maininterface/interface_window_handler.hpp"
@@ -26,6 +28,10 @@ namespace vlc {
 CompositorDummy::CompositorDummy(qt_intf_t *p_intf, QObject* parent)
     : QObject(parent)
     , m_intf(p_intf)
+{
+}
+
+CompositorDummy::~CompositorDummy()
 {
 }
 
@@ -41,46 +47,39 @@ bool CompositorDummy::init()
 
 MainInterface* CompositorDummy::makeMainInterface()
 {
-    m_rootWindow = new MainInterface(m_intf);
-    if (m_rootWindow->useClientSideDecoration())
-        m_rootWindow->setWindowFlag(Qt::FramelessWindowHint);
-    m_rootWindow->show();
-    m_qmlWidget = new QQuickWidget(m_rootWindow);
-    m_qmlWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    m_mainInterface = std::make_unique<MainInterface>(m_intf);
 
-    new InterfaceWindowHandler(m_intf, m_rootWindow, m_rootWindow->windowHandle(), m_rootWindow);
+    m_qmlWidget = std::make_unique<QQuickView>();
+    if (m_mainInterface->useClientSideDecoration())
+        m_qmlWidget->setFlag(Qt::FramelessWindowHint);
+    m_qmlWidget->setResizeMode(QQuickView::SizeRootObjectToView);
 
-    MainUI* m_ui = new MainUI(m_intf, m_rootWindow, m_rootWindow->windowHandle(), this);
-    m_ui->setup(m_qmlWidget->engine());
-    m_qmlWidget->setContent(QUrl(), m_ui->getComponent(), m_ui->createRootItem());
+    new InterfaceWindowHandler(m_intf, m_mainInterface.get(), m_qmlWidget.get(), m_qmlWidget.get());
 
-    m_rootWindow->setCentralWidget(m_qmlWidget);
+    MainUI* ui = new MainUI(m_intf, m_mainInterface.get(), m_qmlWidget.get(), m_qmlWidget.get());
+    ui->setup(m_qmlWidget->engine());
+    m_qmlWidget->setContent(QUrl(), ui->getComponent(), ui->createRootItem());
 
-    connect(m_rootWindow, &MainInterface::requestInterfaceMaximized,
-            m_rootWindow, &MainInterface::showMaximized);
-    connect(m_rootWindow, &MainInterface::requestInterfaceNormal,
-            m_rootWindow, &MainInterface::showNormal);
+    m_qmlWidget->show();
 
-    return m_rootWindow;
+    connect(m_mainInterface.get(), &MainInterface::requestInterfaceMaximized,
+            m_qmlWidget.get(), &QWindow::showMaximized);
+    connect(m_mainInterface.get(), &MainInterface::requestInterfaceNormal,
+            m_qmlWidget.get(), &QWindow::showNormal);
+
+    return m_mainInterface.get();
+}
 }
 
 void CompositorDummy::destroyMainInterface()
 {
     unloadGUI();
-    if (m_rootWindow)
-    {
-        delete m_rootWindow;
-        m_rootWindow = nullptr;
-    }
 }
 
 void CompositorDummy::unloadGUI()
 {
-    if (m_qmlWidget)
-    {
-        delete m_qmlWidget;
-        m_qmlWidget = nullptr;
-    }
+    m_qmlWidget.reset();
+    m_mainInterface.reset();
 }
 
 bool CompositorDummy::setupVoutWindow(vout_window_t*, VoutDestroyCb)

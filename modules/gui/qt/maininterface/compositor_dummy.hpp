@@ -18,15 +18,15 @@
 #ifndef VLC_COMPOSITOR_DUMMY
 #define VLC_COMPOSITOR_DUMMY
 
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
+#include <memory>
 #include "compositor.hpp"
 
 class MainInterface;
-class QQuickWidget;
+class QQuickView;
 
 namespace vlc {
 
@@ -35,7 +35,7 @@ class CompositorDummy : public QObject, public Compositor
     Q_OBJECT
 public:
     CompositorDummy(qt_intf_t *p_intf, QObject* parent = nullptr);
-    virtual ~CompositorDummy() = default;
+    virtual ~CompositorDummy();
 
     static bool preInit(qt_intf_t*);
     virtual bool init() override;
@@ -61,8 +61,8 @@ public:
 protected:
     qt_intf_t *m_intf;
 
-    MainInterface* m_rootWindow = nullptr;
-    QQuickWidget* m_qmlWidget = nullptr;
+    std::unique_ptr<MainInterface> m_mainInterface;
+    std::unique_ptr<QQuickView> m_qmlWidget;
 };
 
 }
