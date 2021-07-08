@@ -31,6 +31,7 @@
 struct vlc_clock_main_t
 {
     struct vlc_logger *logger;
+    struct vlc_tracer *tracer;
     vlc_mutex_t lock;
     vlc_cond_t cond;
 
@@ -385,7 +386,7 @@ void vlc_clock_Wake(vlc_clock_t *clock)
     vlc_cond_broadcast(&main_clock->cond);
 }
 
-vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger)
+vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger, struct vlc_tracer *parent_tracer)
 {
     vlc_clock_main_t *main_clock = malloc(sizeof(vlc_clock_main_t));
 
@@ -398,6 +399,7 @@ vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger)
         free(main_clock);
         return NULL;
     }
+    main_clock->tracer = parent_tracer;
 
     vlc_mutex_init(&main_clock->lock);
     vlc_cond_init(&main_clock->cond);

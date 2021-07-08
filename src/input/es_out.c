@@ -1498,7 +1498,8 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
     p_pgrm->p_master_es_clock = NULL;
     p_pgrm->active_clock_source = VLC_CLOCK_MASTER_AUTO;
 
-    p_pgrm->p_main_clock = vlc_clock_main_New( p_input->obj.logger );
+    struct vlc_tracer *tracer = vlc_object_get_tracer( &p_input->obj );
+    p_pgrm->p_main_clock = vlc_clock_main_New( p_input->obj.logger, tracer );
     if( !p_pgrm->p_main_clock )
     {
         free( p_pgrm );
