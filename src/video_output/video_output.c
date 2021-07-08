@@ -1598,11 +1598,28 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
         }*/
         else if (vd->ops->display != NULL && false)
         {
+            vlc_tick_t max_deadline = system_now + VOUT_REDISPLAY_DELAY;
+
             /* Wait to reach system_pts if the plugin doesn't handle
              * asynchronous display */
             vlc_clock_Lock(sys->clock);
-            vlc_clock_Wait(sys->clock, system_now, pts, sys->rate,
-                           VOUT_REDISPLAY_DELAY);
+
+            bool timed_out = false;
+            while (!timed_out) {
+                vlc_tick_t deadline;
+                if (vlc_clock_IsPaused(sys->clock))
+                    deadline = max_deadline;
+                else
+                {
+                    deadline = vlc_clock_ConvertToSystemLocked(sys->clock,
+                                                vlc_tick_now(), pts, sys->rate);
+                    if (deadline > max_deadline)
+                        deadline = max_deadline;
+                }
+
+                timed_out = vlc_clock_Wait(sys->clock, deadline);
+            };
+
             vlc_clock_Unlock(sys->clock);
 
             /* Don't touch system_pts. Tell the clock that the pts was rendered

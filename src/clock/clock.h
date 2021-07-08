@@ -189,12 +189,27 @@ void vlc_clock_Lock(vlc_clock_t *clock);
 void vlc_clock_Unlock(vlc_clock_t *clock);
 
 /**
- * Wait for a timestamp expressed in stream time
+ * Indicate if the clock is paused
  *
  * The clock mutex must be locked.
+ *
+ * @retval true if the clock is paused
+ * @retval false if the clock is not paused
  */
-void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
-                   double rate, vlc_tick_t max_duration);
+bool vlc_clock_IsPaused(vlc_clock_t *clock);
+
+/**
+ * Wait for a timestamp expressed in system time
+ *
+ * The wait will be interrupted (signaled) on clock state changes which could
+ * invalidate the computed deadline. In that case, the caller must recompute
+ * the new deadline and call it again.
+ *
+ * The clock mutex must be locked.
+ *
+ * @return 0 if the condition was signaled, an error code in case of timeout
+ */
+int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_deadline);
 
 /**
  * This function converts a timestamp from stream to system

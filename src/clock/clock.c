@@ -602,26 +602,20 @@ static inline void AssertLocked(vlc_clock_t *clock)
     vlc_mutex_assert(&main_clock->lock);
 }
 
-void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
-                   double rate, vlc_tick_t max_duration)
+bool vlc_clock_IsPaused(vlc_clock_t *clock)
 {
     AssertLocked(clock);
 
     vlc_clock_main_t *main_clock = clock->owner;
-    const vlc_tick_t max_deadline =
-        max_duration > 0 ? system_now + max_duration : VLC_TICK_MAX;
-    while (!main_clock->abort)
-    {
-        vlc_tick_t deadline;
-        if (main_clock->pause_date != VLC_TICK_INVALID)
-            deadline = VLC_TICK_MAX;
-        else
-            deadline = clock->to_system_locked(clock, system_now, ts, rate);
-        deadline = __MIN(deadline, max_deadline);
+    return main_clock->pause_date != VLC_TICK_INVALID;
+}
 
-        if (vlc_cond_timedwait(&main_clock->cond, &main_clock->lock, deadline))
-            break;
-    }
+int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t deadline)
+{
+    AssertLocked(clock);
+
+    vlc_clock_main_t *main_clock = clock->owner;
+    return vlc_cond_timedwait(&main_clock->cond, &main_clock->lock, deadline);
 }
 
 vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger)
