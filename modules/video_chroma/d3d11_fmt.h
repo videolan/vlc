@@ -29,6 +29,15 @@
 
 #include "dxgi_fmt.h"
 
+#ifdef __cplusplus
+extern "C" {
+
+#ifndef IID_GRAPHICS_PPV_ARGS
+#define IID_GRAPHICS_PPV_ARGS(ppType) IID_PPV_ARGS(ppType)
+#endif
+
+#endif
+
 DEFINE_GUID(GUID_CONTEXT_MUTEX, 0x472e8835, 0x3f8e, 0x4f93, 0xa0, 0xcb, 0x25, 0x79, 0x77, 0x6c, 0xed, 0x86);
 
 /* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics
@@ -100,7 +109,7 @@ static inline d3d11_decoder_device_t *GetD3D11OpaqueDevice(vlc_decoder_device *d
 {
     if (device == NULL || device->type != VLC_DECODER_DEVICE_D3D11VA)
         return NULL;
-    return device->opaque;
+    return (d3d11_decoder_device_t *)device->opaque;
 }
 
 static inline d3d11_decoder_device_t *GetD3D11OpaqueContext(vlc_video_context *vctx)
@@ -185,5 +194,9 @@ picture_context_t *d3d11_pic_context_copy(picture_context_t *);
 
 picture_t *D3D11_AllocPicture(vlc_object_t *,
                               const video_format_t *, vlc_video_context *, const d3d_format_t *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* include-guard */

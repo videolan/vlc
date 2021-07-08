@@ -29,6 +29,10 @@
 
 #include <vlc_es.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif// __cplusplus
+
 #define DEFAULT_BRIGHTNESS         100
 #define DEFAULT_SRGB_BRIGHTNESS    100
 #define MAX_HLG_BRIGHTNESS        1000
@@ -101,7 +105,7 @@ static inline void D3D_ShaderBlobRelease(d3d_shader_blob *blob)
 {
     if (blob->pf_release)
         blob->pf_release(blob);
-    *blob = (d3d_shader_blob) { 0 };
+    *blob = (d3d_shader_blob) { };
 }
 
 float D3D_GetFormatLuminance(vlc_object_t *, const video_format_t *);
@@ -117,5 +121,9 @@ bool D3D_QuadSetupBuffers(vlc_object_t *, d3d_quad_t *, video_projection_mode_t)
 bool D3D_SetupQuadData(vlc_object_t *, d3d_quad_t *, const RECT *, d3d_vertex_t*, void *, video_orientation_t);
 
 void D3D_UpdateViewpoint(d3d_quad_t *, const vlc_viewpoint_t *, float f_sar);
+
+#ifdef __cplusplus
+}
+#endif// __cplusplus
 
 #endif /* VLC_D3D_SHADERS_H */

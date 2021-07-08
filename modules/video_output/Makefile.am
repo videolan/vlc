@@ -137,18 +137,15 @@ vout_LTLIBRARIES += libglinterop_dxva2_plugin.la
 endif
 endif
 
-libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.c \
- video_output/win32/d3d11_quad.c video_output/win32/d3d11_quad.h \
- video_output/win32/d3d11_shaders.c video_output/win32/d3d11_shaders.h \
+libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.cpp \
+ video_output/win32/d3d11_quad.cpp video_output/win32/d3d11_quad.h \
+ video_output/win32/d3d11_shaders.cpp video_output/win32/d3d11_shaders.h \
  video_output/win32/d3d_shaders.c video_output/win32/d3d_shaders.h \
  video_output/win32/d3d_dynamic_shader.c video_output/win32/d3d_dynamic_shader.h \
- video_output/win32/d3d11_swapchain.c video_output/win32/d3d11_swapchain.h \
- video_output/win32/dxgi_swapchain.c video_output/win32/dxgi_swapchain.h \
+ video_output/win32/d3d11_swapchain.cpp video_output/win32/d3d11_swapchain.h \
+ video_output/win32/dxgi_swapchain.cpp video_output/win32/dxgi_swapchain.h \
  video_output/win32/common.c video_output/win32/common.h
 libdirect3d11_plugin_la_LIBADD = libchroma_copy.la libd3d11_common.la $(LIBCOM) -luuid
-if HAVE_DCOMP
-libdirect3d11_plugin_la_SOURCES += video_output/win32/dcomp_wrapper.cpp video_output/win32/dcomp_wrapper.h
-endif
 if !HAVE_WINSTORE
 libdirect3d11_plugin_la_SOURCES += video_output/win32/events.c \
  video_output/win32/events.h \

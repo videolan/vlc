@@ -23,6 +23,10 @@
 #ifndef VLC_D3D_DYNAMIC_SHADER_H
 #define VLC_D3D_DYNAMIC_SHADER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif// __cplusplus
+
 typedef struct
 {
     HINSTANCE                 compiler_dll; /* handle of the opened d3dcompiler dll */
@@ -44,5 +48,9 @@ HRESULT D3D_CompilePixelShader(vlc_object_t *, const d3d_shader_compiler_t *,
 HRESULT D3D_CompileVertexShader(vlc_object_t *, const d3d_shader_compiler_t *,
                                 D3D_FEATURE_LEVEL, bool flat,
                                 d3d_shader_blob *);
+
+#ifdef __cplusplus
+}
+#endif// __cplusplus
 
 #endif /* VLC_D3D_DYNAMIC_SHADER_H */

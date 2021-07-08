@@ -29,7 +29,7 @@
 #include "../../video_chroma/d3d11_fmt.h"
 
 void *D3D11_CreateLocalSwapchainHandleHwnd(vlc_object_t *, HWND, d3d11_device_t *d3d_dev);
-#ifdef HAVE_DCOMP_H
+#if defined(HAVE_DCOMP_H) && !VLC_WINSTORE_APP
 void *D3D11_CreateLocalSwapchainHandleDComp(vlc_object_t *, void* dcompDevice, void* dcompVisual, d3d11_device_t *d3d_dev);
 #endif
 

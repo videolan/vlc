@@ -28,30 +28,32 @@
 
 #include "../../video_chroma/d3d11_fmt.h"
 
+#include <wrl/client.h>
+
 /* Vertex Shader compiled sructures */
-typedef struct {
-    ID3D11VertexShader        *shader;
-    ID3D11InputLayout         *layout;
-} d3d11_vertex_shader_t;
+struct d3d11_vertex_shader_t {
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> shader;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>  layout;
+};
 
 /* A Quad is texture that can be displayed in a rectangle */
-typedef struct
+struct d3d11_quad_t
 {
     picture_sys_d3d11_t       picSys;
     d3d_quad_t                generic;
-    UINT                      resourceCount;
-    ID3D11Buffer              *pVertexBuffer;
-    ID3D11Buffer              *pIndexBuffer;
-    ID3D11Buffer              *viewpointShaderConstant;
-    ID3D11Buffer              *pPixelShaderConstants;
-    UINT                       PSConstantsCount;
-    ID3D11PixelShader         *d3dpixelShader[DXGI_MAX_RENDER_TARGET];
-    ID3D11SamplerState        *SamplerStates[2];
+    UINT                      resourceCount = 0;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> viewpointShaderConstant;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> pPixelShaderConstants;
+    UINT                       PSConstantsCount = 0;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader>  d3dpixelShader[DXGI_MAX_RENDER_TARGET];
+    Microsoft::WRL::ComPtr<ID3D11SamplerState> SamplerStates[2];
     D3D11_VIEWPORT            cropViewport[DXGI_MAX_RENDER_TARGET];
 
     PS_CONSTANT_BUFFER        pConstants;
     VS_PROJECTION_CONST       vConstants;
-} d3d11_quad_t;
+};
 
 HRESULT D3D11_CompilePixelShaderBlob(vlc_object_t *, const d3d_shader_compiler_t *,
                                  d3d11_device_t *, const display_info_t *,
@@ -72,10 +74,10 @@ HRESULT D3D11_CreateVertexShader(vlc_object_t *, d3d_shader_blob *, d3d11_device
 #define D3D11_CreateVertexShader(a,b,c,d) D3D11_CreateVertexShader(VLC_OBJECT(a),b,c,d)
 
 HRESULT D3D11_CreateRenderTargets(d3d11_device_t *, ID3D11Resource *, const d3d_format_t *,
-                                  ID3D11RenderTargetView *output[DXGI_MAX_RENDER_TARGET]);
+                                  Microsoft::WRL::ComPtr<ID3D11RenderTargetView> output[DXGI_MAX_RENDER_TARGET]);
 
 void D3D11_ClearRenderTargets(d3d11_device_t *, const d3d_format_t *,
-                              ID3D11RenderTargetView *targets[DXGI_MAX_RENDER_TARGET]);
+                              Microsoft::WRL::ComPtr<ID3D11RenderTargetView> targets[DXGI_MAX_RENDER_TARGET]);
 
 void D3D11_ReleaseVertexShader(d3d11_vertex_shader_t *);
 

@@ -31,13 +31,15 @@
 
 #include <vlc_common.h>
 
-#include <assert.h>
+#include <cassert>
 
 #define COBJMACROS
 #include <d3d11.h>
 
 #include "d3d11_shaders.h"
 #include "d3d_dynamic_shader.h"
+
+using Microsoft::WRL::ComPtr;
 
 HRESULT (D3D11_CompilePixelShaderBlob)(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
                                    d3d11_device_t *d3d_dev,
@@ -56,8 +58,7 @@ HRESULT D3D11_SetQuadPixelShader(vlc_object_t *o, d3d11_device_t *d3d_dev,
                                 bool sharp,
                                 d3d11_quad_t *quad, d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET])
 {
-    D3D11_SAMPLER_DESC sampDesc;
-    memset(&sampDesc, 0, sizeof(sampDesc));
+    D3D11_SAMPLER_DESC sampDesc = { };
     sampDesc.Filter = sharp ? D3D11_FILTER_MIN_MAG_MIP_POINT : D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
     sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
     sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -67,31 +68,31 @@ HRESULT D3D11_SetQuadPixelShader(vlc_object_t *o, d3d11_device_t *d3d_dev,
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
     HRESULT hr;
-    hr = ID3D11Device_CreateSamplerState(d3d_dev->d3ddevice, &sampDesc, &quad->SamplerStates[0]);
+    hr = d3d_dev->d3ddevice->CreateSamplerState(&sampDesc, quad->SamplerStates[0].GetAddressOf());
     if (FAILED(hr)) {
         msg_Err(o, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
         return hr;
     }
 
     sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-    hr = ID3D11Device_CreateSamplerState(d3d_dev->d3ddevice, &sampDesc, &quad->SamplerStates[1]);
+    hr = d3d_dev->d3ddevice->CreateSamplerState(&sampDesc, quad->SamplerStates[1].GetAddressOf());
     if (FAILED(hr)) {
         msg_Err(o, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
-        ID3D11SamplerState_Release(quad->SamplerStates[0]);
+        quad->SamplerStates[0].Reset();
         return hr;
     }
 
-    hr = ID3D11Device_CreatePixelShader(d3d_dev->d3ddevice,
+    hr = d3d_dev->d3ddevice->CreatePixelShader(
                                         pPSBlob[0].buffer, pPSBlob[0].buf_size,
-                                        NULL, &quad->d3dpixelShader[0]);
+                                        NULL, quad->d3dpixelShader[0].GetAddressOf());
 
     D3D_ShaderBlobRelease(&pPSBlob[0]);
 
     if (pPSBlob[1].buffer)
     {
-        hr = ID3D11Device_CreatePixelShader(d3d_dev->d3ddevice,
+        hr = d3d_dev->d3ddevice->CreatePixelShader(
                                             pPSBlob[1].buffer, pPSBlob[1].buf_size,
-                                            NULL, &quad->d3dpixelShader[1]);
+                                            NULL, quad->d3dpixelShader[1].GetAddressOf());
 
         D3D_ShaderBlobRelease(&pPSBlob[1]);
     }
@@ -102,21 +103,13 @@ void D3D11_ReleaseQuadPixelShader(d3d11_quad_t *quad)
 {
     for (size_t i=0; i<ARRAY_SIZE(quad->d3dpixelShader); i++)
     {
-        if (quad->d3dpixelShader[i])
-        {
-            ID3D11PixelShader_Release(quad->d3dpixelShader[i]);
-            quad->d3dpixelShader[i] = NULL;
-        }
-        if (quad->SamplerStates[i])
-        {
-            ID3D11SamplerState_Release(quad->SamplerStates[i]);
-            quad->SamplerStates[i] = NULL;
-        }
+        quad->d3dpixelShader[i].Reset();
+        quad->SamplerStates[i].Reset();
     }
 }
 
 HRESULT D3D11_CreateRenderTargets( d3d11_device_t *d3d_dev, ID3D11Resource *texture,
-                                   const d3d_format_t *cfg, ID3D11RenderTargetView *output[DXGI_MAX_RENDER_TARGET] )
+                                   const d3d_format_t *cfg, ComPtr<ID3D11RenderTargetView> output[DXGI_MAX_RENDER_TARGET] )
 {
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
     renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
@@ -127,8 +120,8 @@ HRESULT D3D11_CreateRenderTargets( d3d11_device_t *d3d_dev, ID3D11Resource *text
         if (cfg->resourceFormat[i])
         {
             renderTargetViewDesc.Format = cfg->resourceFormat[i];
-            HRESULT hr = ID3D11Device_CreateRenderTargetView(d3d_dev->d3ddevice, texture,
-                                                             &renderTargetViewDesc, &output[i]);
+            HRESULT hr = d3d_dev->d3ddevice->CreateRenderTargetView(texture,
+                                                             &renderTargetViewDesc, output[i].GetAddressOf());
             if (FAILED(hr))
             {
                 return hr;
@@ -139,7 +132,7 @@ HRESULT D3D11_CreateRenderTargets( d3d11_device_t *d3d_dev, ID3D11Resource *text
 }
 
 void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
-                              ID3D11RenderTargetView *targets[DXGI_MAX_RENDER_TARGET])
+                              ComPtr<ID3D11RenderTargetView> targets[DXGI_MAX_RENDER_TARGET])
 {
     union DXGI_Color black[DXGI_MAX_RENDER_TARGET];
     size_t colorCount[DXGI_MAX_RENDER_TARGET];
@@ -147,11 +140,11 @@ void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
 
     if (colorCount[0])
     {
-        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], black[0].array);
+        d3d_dev->d3dcontext->ClearRenderTargetView(targets[0].Get(), black[0].array);
     }
     if (colorCount[1])
     {
-        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[1], black[1].array);
+        d3d_dev->d3dcontext->ClearRenderTargetView(targets[1].Get(), black[1].array);
     }
 }
 
@@ -159,8 +152,8 @@ HRESULT (D3D11_CreateVertexShader)(vlc_object_t *obj, d3d_shader_blob *pVSBlob,
                                    d3d11_device_t *d3d_dev, d3d11_vertex_shader_t *output)
 {
     HRESULT hr;
-    hr = ID3D11Device_CreateVertexShader(d3d_dev->d3ddevice, pVSBlob->buffer,
-                                         pVSBlob->buf_size, NULL, &output->shader);
+    hr = d3d_dev->d3ddevice->CreateVertexShader(pVSBlob->buffer, pVSBlob->buf_size,
+                                                NULL, output->shader.GetAddressOf());
 
     if(FAILED(hr)) {
         msg_Err(obj, "Failed to create the flat vertex shader. (hr=0x%lX)", hr);
@@ -173,8 +166,8 @@ HRESULT (D3D11_CreateVertexShader)(vlc_object_t *obj, d3d_shader_blob *pVSBlob,
         { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
 
-    hr = ID3D11Device_CreateInputLayout(d3d_dev->d3ddevice, layout, 2, pVSBlob->buffer,
-                                    pVSBlob->buf_size, &output->layout);
+    hr = d3d_dev->d3ddevice->CreateInputLayout(layout, 2, pVSBlob->buffer,
+                                    pVSBlob->buf_size, output->layout.GetAddressOf());
 
     if(FAILED(hr)) {
         msg_Err(obj, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
@@ -188,16 +181,8 @@ error:
 
 void D3D11_ReleaseVertexShader(d3d11_vertex_shader_t *shader)
 {
-    if (shader->layout)
-    {
-        ID3D11InputLayout_Release(shader->layout);
-        shader->layout = NULL;
-    }
-    if (shader->shader)
-    {
-        ID3D11VertexShader_Release(shader->shader);
-        shader->shader = NULL;
-    }
+    shader->layout.Reset();
+    shader->shader.Reset();
 }
 
 HRESULT D3D11_CompileVertexShaderBlob(vlc_object_t *obj, const d3d_shader_compiler_t *compiler,

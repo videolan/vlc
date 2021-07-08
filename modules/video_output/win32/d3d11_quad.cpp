@@ -29,14 +29,15 @@
 # define _WIN32_WINNT 0x0601 // _WIN32_WINNT_WIN7
 #endif
 
-#include <assert.h>
+#include <cassert>
 #include <vlc_common.h>
 
-#define COBJMACROS
 #include <d3d11.h>
 
 #include "d3d11_quad.h"
 #include "common.h"
+
+using Microsoft::WRL::ComPtr;
 
 void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d11_quad_t *quad, d3d11_vertex_shader_t *vsshader,
                       ID3D11ShaderResourceView *resourceView[DXGI_MAX_SHADER_VIEW],
@@ -45,29 +46,32 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d11_quad_t *quad, d3d11_vertex_
     UINT offset = 0;
 
     /* Render the quad */
-    ID3D11DeviceContext_IASetPrimitiveTopology(d3d_dev->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    d3d_dev->d3dcontext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     /* vertex shader */
-    ID3D11DeviceContext_IASetInputLayout(d3d_dev->d3dcontext, vsshader->layout);
-    ID3D11DeviceContext_IASetVertexBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pVertexBuffer, &quad->generic.vertexStride, &offset);
-    ID3D11DeviceContext_IASetIndexBuffer(d3d_dev->d3dcontext, quad->pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-    if ( quad->viewpointShaderConstant )
-        ID3D11DeviceContext_VSSetConstantBuffers(d3d_dev->d3dcontext, 0, 1, &quad->viewpointShaderConstant);
+    d3d_dev->d3dcontext->IASetInputLayout(vsshader->layout.Get());
+    d3d_dev->d3dcontext->IASetVertexBuffers(0, 1, quad->vertexBuffer.GetAddressOf(), &quad->generic.vertexStride, &offset);
+    d3d_dev->d3dcontext->IASetIndexBuffer(quad->indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+    if ( quad->viewpointShaderConstant.Get() )
+        d3d_dev->d3dcontext->VSSetConstantBuffers(0, 1, quad->viewpointShaderConstant.GetAddressOf());
 
-    ID3D11DeviceContext_VSSetShader(d3d_dev->d3dcontext, vsshader->shader, NULL, 0);
+    d3d_dev->d3dcontext->VSSetShader(vsshader->shader.Get(), NULL, 0);
 
-    if (quad->SamplerStates[0])
-        ID3D11DeviceContext_PSSetSamplers(d3d_dev->d3dcontext, 0, 2, quad->SamplerStates);
+    if (quad->SamplerStates[0].Get())
+    {
+        ID3D11SamplerState *states[] = {quad->SamplerStates[0].Get(), quad->SamplerStates[1].Get()};
+        d3d_dev->d3dcontext->PSSetSamplers(0, 2, states);
+    }
 
     /* pixel shader */
-    ID3D11DeviceContext_PSSetConstantBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pPixelShaderConstants);
+    d3d_dev->d3dcontext->PSSetConstantBuffers(0, 1, quad->pPixelShaderConstants.GetAddressOf());
     assert(quad->resourceCount <= DXGI_MAX_SHADER_VIEW);
 
-    ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, resourceView);
+    d3d_dev->d3dcontext->PSSetShaderResources(0, quad->resourceCount, resourceView);
 
     for (size_t i=0; i<ARRAY_SIZE(quad->d3dpixelShader); i++)
     {
-        if (!quad->d3dpixelShader[i])
+        if (!quad->d3dpixelShader[i].Get())
             break;
 
         ID3D11RenderTargetView *renderView = NULL;
@@ -75,18 +79,18 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d11_quad_t *quad, d3d11_vertex_
             continue;
 
         if (renderView != NULL)
-            ID3D11DeviceContext_OMSetRenderTargets(d3d_dev->d3dcontext, 1, &renderView, NULL);
+            d3d_dev->d3dcontext->OMSetRenderTargets(1, &renderView, NULL);
 
-        ID3D11DeviceContext_PSSetShader(d3d_dev->d3dcontext, quad->d3dpixelShader[i], NULL, 0);
+        d3d_dev->d3dcontext->PSSetShader(quad->d3dpixelShader[i].Get(), NULL, 0);
 
-        ID3D11DeviceContext_RSSetViewports(d3d_dev->d3dcontext, 1, &quad->cropViewport[i]);
+        d3d_dev->d3dcontext->RSSetViewports(1, &quad->cropViewport[i]);
 
-        ID3D11DeviceContext_DrawIndexed(d3d_dev->d3dcontext, quad->generic.indexCount, 0, 0);
+        d3d_dev->d3dcontext->DrawIndexed(quad->generic.indexCount, 0, 0);
 
         // /* force unbinding the input texture, otherwise we get:
         // * OMSetRenderTargets: Resource being set to OM RenderTarget slot 0 is still bound on input! */
         // ID3D11ShaderResourceView *reset[DXGI_MAX_SHADER_VIEW] = { 0 };
-        // ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, reset);
+        // d3d_dev->d3dcontext->PSSetShaderResources(0, quad->resourceCount, reset);
     }
 }
 
@@ -97,28 +101,24 @@ static bool AllocQuadVertices(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_qu
     if (!D3D_QuadSetupBuffers(o, &quad->generic, projection))
         return false;
 
-    D3D11_BUFFER_DESC bd;
-    memset(&bd, 0, sizeof(bd));
+    D3D11_BUFFER_DESC bd = { };
+
     bd.Usage = D3D11_USAGE_DYNAMIC;
     bd.ByteWidth = quad->generic.vertexStride * quad->generic.vertexCount;
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-    hr = ID3D11Device_CreateBuffer(d3d_dev->d3ddevice, &bd, NULL, &quad->pVertexBuffer);
+    hr = d3d_dev->d3ddevice->CreateBuffer(&bd, NULL, quad->vertexBuffer.GetAddressOf());
     if(FAILED(hr)) {
         msg_Err(o, "Failed to create vertex buffer. (hr=%lX)", hr);
         goto fail;
     }
 
     /* create the index of the vertices */
-    D3D11_BUFFER_DESC quadDesc = {
-        .Usage = D3D11_USAGE_DYNAMIC,
-        .ByteWidth = sizeof(WORD) * quad->generic.indexCount,
-        .BindFlags = D3D11_BIND_INDEX_BUFFER,
-        .CPUAccessFlags = D3D11_CPU_ACCESS_WRITE,
-    };
+    bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    bd.ByteWidth = sizeof(WORD) * quad->generic.indexCount;
 
-    hr = ID3D11Device_CreateBuffer(d3d_dev->d3ddevice, &quadDesc, NULL, &quad->pIndexBuffer);
+    hr = d3d_dev->d3ddevice->CreateBuffer(&bd, NULL, quad->indexBuffer.GetAddressOf());
     if(FAILED(hr)) {
         msg_Err(o, "Could not create the quad indices. (hr=0x%lX)", hr);
         goto fail;
@@ -126,41 +126,17 @@ static bool AllocQuadVertices(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_qu
 
     return true;
 fail:
-    if (quad->pVertexBuffer)
-    {
-        ID3D11Buffer_Release(quad->pVertexBuffer);
-        quad->pVertexBuffer = NULL;
-    }
-    if (quad->pIndexBuffer)
-    {
-        ID3D11Buffer_Release(quad->pIndexBuffer);
-        quad->pIndexBuffer = NULL;
-    }
+    quad->vertexBuffer.Reset();
+    quad->indexBuffer.Reset();
     return false;
 }
 
 void D3D11_ReleaseQuad(d3d11_quad_t *quad)
 {
-    if (quad->pPixelShaderConstants)
-    {
-        ID3D11Buffer_Release(quad->pPixelShaderConstants);
-        quad->pPixelShaderConstants = NULL;
-    }
-    if (quad->pVertexBuffer)
-    {
-        ID3D11Buffer_Release(quad->pVertexBuffer);
-        quad->pVertexBuffer = NULL;
-    }
-    if (quad->pIndexBuffer)
-    {
-        ID3D11Buffer_Release(quad->pIndexBuffer);
-        quad->pIndexBuffer = NULL;
-    }
-    if (quad->viewpointShaderConstant)
-    {
-        ID3D11Buffer_Release(quad->viewpointShaderConstant);
-        quad->viewpointShaderConstant = NULL;
-    }
+    quad->pPixelShaderConstants.Reset();
+    quad->vertexBuffer.Reset();
+    quad->indexBuffer.Reset();
+    quad->viewpointShaderConstant.Reset();
     D3D11_ReleaseQuadPixelShader(quad);
     ReleaseD3D11PictureSys(&quad->picSys);
 }
@@ -174,29 +150,29 @@ bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_q
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     d3d_vertex_t *dst_data;
 
-    if (unlikely(quad->pVertexBuffer == NULL))
+    if (unlikely(quad->vertexBuffer.Get() == NULL))
         return false;
 
     /* create the vertices */
-    hr = ID3D11DeviceContext_Map(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    hr = d3d_dev->d3dcontext->Map(quad->vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
     if (FAILED(hr)) {
         msg_Err(o, "Failed to lock the vertex buffer (hr=0x%lX)", hr);
         return false;
     }
-    dst_data = mappedResource.pData;
+    dst_data = static_cast<d3d_vertex_t*>(mappedResource.pData);
 
     /* create the vertex indices */
-    hr = ID3D11DeviceContext_Map(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    hr = d3d_dev->d3dcontext->Map(quad->indexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
     if (FAILED(hr)) {
         msg_Err(o, "Failed to lock the index buffer (hr=0x%lX)", hr);
-        ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
+        d3d_dev->d3dcontext->Unmap(quad->vertexBuffer.Get(), 0);
         return false;
     }
 
     result = D3D_SetupQuadData(o, &quad->generic, output, dst_data, mappedResource.pData, orientation);
 
-    ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0);
-    ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
+    d3d_dev->d3dcontext->Unmap(quad->indexBuffer.Get(), 0);
+    d3d_dev->d3dcontext->Unmap(quad->vertexBuffer.Get(), 0);
 
     return result;
 }
@@ -207,15 +183,15 @@ static bool ShaderUpdateConstants(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d1
     switch (type)
     {
         case PS_CONST_LUMI_BOUNDS:
-            res = (ID3D11Resource *)quad->pPixelShaderConstants;
+            res = quad->pPixelShaderConstants.Get();
             break;
         case VS_CONST_VIEWPOINT:
-            res = (ID3D11Resource *)quad->viewpointShaderConstant;
+            res = quad->viewpointShaderConstant.Get();
             break;
     }
 
     D3D11_MAPPED_SUBRESOURCE mappedResource;
-    HRESULT hr = ID3D11DeviceContext_Map(d3d_dev->d3dcontext, res, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    HRESULT hr = d3d_dev->d3dcontext->Map(res, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
     if (unlikely(FAILED(hr)))
     {
         msg_Err(o, "Failed to lock the picture shader constants (hr=0x%lX)", hr);
@@ -231,7 +207,7 @@ static bool ShaderUpdateConstants(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d1
             memcpy(mappedResource.pData, new_buf, sizeof(VS_PROJECTION_CONST));
             break;
     }
-    ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, res, 0);
+    d3d_dev->d3dcontext->Unmap(res, 0);
     return true;
 }
 
@@ -258,7 +234,7 @@ void (D3D11_UpdateQuadLuminanceScale)(vlc_object_t *o, d3d11_device_t *d3d_dev, 
 void (D3D11_UpdateViewpoint)(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_quad_t *quad,
                              const vlc_viewpoint_t *viewpoint, float f_sar)
 {
-    if (!quad->viewpointShaderConstant)
+    if (!quad->viewpointShaderConstant.Get())
         return;
 
     D3D_UpdateViewpoint(&quad->generic, viewpoint, f_sar);
@@ -275,13 +251,12 @@ int D3D11_AllocateQuad(vlc_object_t *o, d3d11_device_t *d3d_dev,
 
     HRESULT hr;
     static_assert((sizeof(PS_CONSTANT_BUFFER)%16)==0,"Constant buffers require 16-byte alignment");
-    D3D11_BUFFER_DESC constantDesc = {
-        .Usage = D3D11_USAGE_DYNAMIC,
-        .ByteWidth = sizeof(PS_CONSTANT_BUFFER),
-        .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
-        .CPUAccessFlags = D3D11_CPU_ACCESS_WRITE,
-    };
-    hr = ID3D11Device_CreateBuffer(d3d_dev->d3ddevice, &constantDesc, NULL, &quad->pPixelShaderConstants);
+    D3D11_BUFFER_DESC constantDesc = { };
+    constantDesc.Usage = D3D11_USAGE_DYNAMIC;
+    constantDesc.ByteWidth = sizeof(PS_CONSTANT_BUFFER);
+    constantDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    constantDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    hr = d3d_dev->d3ddevice->CreateBuffer(&constantDesc, NULL, quad->pPixelShaderConstants.GetAddressOf());
     if(FAILED(hr)) {
         msg_Err(o, "Could not create the pixel shader constant buffer. (hr=0x%lX)", hr);
         goto error;
@@ -291,7 +266,7 @@ int D3D11_AllocateQuad(vlc_object_t *o, d3d11_device_t *d3d_dev,
     {
         static_assert((sizeof(VS_PROJECTION_CONST)%16)==0,"Constant buffers require 16-byte alignment");
         constantDesc.ByteWidth = sizeof(VS_PROJECTION_CONST);
-        hr = ID3D11Device_CreateBuffer(d3d_dev->d3ddevice, &constantDesc, NULL, &quad->viewpointShaderConstant);
+        hr = d3d_dev->d3ddevice->CreateBuffer(&constantDesc, NULL, quad->viewpointShaderConstant.GetAddressOf());
         if(FAILED(hr)) {
             msg_Err(o, "Could not create the vertex shader constant buffer. (hr=0x%lX)", hr);
             goto error;

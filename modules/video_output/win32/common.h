@@ -24,6 +24,10 @@
 
 #include <vlc_vout_display.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif// __cplusplus
+
 /*****************************************************************************
  * event_thread_t: event thread
  *****************************************************************************/
@@ -75,9 +79,6 @@ void CommonPlacePicture (vout_display_t *, display_win32_area_t *);
 
 void CommonInit(display_win32_area_t *);
 
-# ifdef __cplusplus
-extern "C" {
-# endif
 void* HookWindowsSensors(vout_display_t*, HWND);
 void UnhookWindowsSensors(void*);
 # ifdef __cplusplus

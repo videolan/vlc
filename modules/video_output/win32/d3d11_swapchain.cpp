@@ -31,7 +31,7 @@
 #include <vlc/libvlc_renderer_discoverer.h>
 #include <vlc/libvlc_media_player.h>
 
-#include <assert.h>
+#include <cassert>
 
 #if !defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0601 // _WIN32_WINNT_WIN7
 # undef _WIN32_WINNT
@@ -40,45 +40,44 @@
 
 #include <windows.h>
 
-#define COBJMACROS
-#include <initguid.h>
 #include <d3d11.h>
 
 #include "dxgi_swapchain.h"
 #include "d3d11_swapchain.h"
 #include "d3d11_shaders.h"
 
-#ifdef HAVE_DCOMP_H
-#  include "dcomp_wrapper.h"
-#endif
+#include <new>
+
+using Microsoft::WRL::ComPtr;
 
 struct d3d11_local_swapchain
 {
-    struct dxgi_swapchain *sys;
+    struct dxgi_swapchain *sys = nullptr;
 
-    vlc_object_t           *obj;
-    d3d11_device_t         *d3d_dev;
+    vlc_object_t           *obj = nullptr;
+    d3d11_device_t         *d3d_dev = nullptr;
 
-    ID3D11RenderTargetView *swapchainTargetView[DXGI_MAX_RENDER_TARGET];
+    ComPtr<ID3D11RenderTargetView> swapchainTargetView[DXGI_MAX_RENDER_TARGET];
 };
 
 DEFINE_GUID(GUID_SWAPCHAIN_WIDTH,  0xf1b59347, 0x1643, 0x411a, 0xad, 0x6b, 0xc7, 0x80, 0x17, 0x7a, 0x06, 0xb6);
 DEFINE_GUID(GUID_SWAPCHAIN_HEIGHT, 0x6ea976a0, 0x9d60, 0x4bb7, 0xa5, 0xa9, 0x7d, 0xd1, 0x18, 0x7f, 0xc9, 0xbd);
 
-static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc_video_render_cfg_t *cfg )
+static bool UpdateSwapchain( d3d11_local_swapchain *display, const libvlc_video_render_cfg_t *cfg )
 {
     HRESULT hr;
 
-    D3D11_TEXTURE2D_DESC dsc = { 0 };
+    D3D11_TEXTURE2D_DESC dsc = { };
     uint8_t bitsPerChannel = 0;
 
-    if ( display->swapchainTargetView[0] ) {
-        ID3D11Resource *res = NULL;
-        ID3D11RenderTargetView_GetResource( display->swapchainTargetView[0], &res );
+    if ( display->swapchainTargetView[0].Get() ) {
+        ComPtr<ID3D11Resource> res;
+        display->swapchainTargetView[0]->GetResource( res.GetAddressOf() );
         if ( res )
         {
-            ID3D11Texture2D_GetDesc( (ID3D11Texture2D*) res, &dsc );
-            ID3D11Resource_Release( res );
+            ComPtr<ID3D11Texture2D> res2d;
+            if (SUCCEEDED(res.As(&res2d)))
+                res2d->GetDesc( &dsc );
         }
         assert(DXGI_GetPixelFormat(display->sys)->formatTexture == dsc.Format);
         bitsPerChannel = DXGI_GetPixelFormat(display->sys)->bitsPerChannel;
@@ -89,22 +88,17 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc
         return true; /* nothing changed */
 
     for ( size_t i = 0; i < ARRAY_SIZE( display->swapchainTargetView ); i++ )
-    {
-        if ( display->swapchainTargetView[i] ) {
-            ID3D11RenderTargetView_Release( display->swapchainTargetView[i] );
-            display->swapchainTargetView[i] = NULL;
-        }
-    }
+        display->swapchainTargetView[i].Reset();
 
     const d3d_format_t *newPixelFormat = NULL;
 #if VLC_WINSTORE_APP
-    IDXGISwapChain1 *dxgiswapChain = DXGI_GetSwapChain1(display->sys);
-    if (dxgiswapChain == NULL)
-        dxgiswapChain = (void*)(uintptr_t)var_InheritInteger(display->obj, "winrt-swapchain");
-    if (dxgiswapChain != NULL)
+    ComPtr<IDXGISwapChain1> dxgiswapChain = DXGI_GetSwapChain1(display->sys);
+    if (!dxgiswapChain.Get())
+        dxgiswapChain = static_cast<IDXGISwapChain1*>((void*)(uintptr_t)var_InheritInteger(display->obj, "winrt-swapchain"));
+    if (dxgiswapChain.Get())
     {
         DXGI_SWAP_CHAIN_DESC1 scd;
-        if (SUCCEEDED(IDXGISwapChain1_GetDesc1(dxgiswapChain, &scd)))
+        if (SUCCEEDED(dxgiswapChain->GetDesc1(&scd)))
         {
             for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
                  output_format->name != NULL; ++output_format)
@@ -135,35 +129,29 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc
         return false;
     }
 
-    IDXGIDevice *pDXGIDevice = NULL;
-    hr = ID3D11Device_QueryInterface(display->d3d_dev->d3ddevice, &IID_IDXGIDevice, (void **)&pDXGIDevice);
+    ComPtr<IDXGIDevice> pDXGIDevice;
+    hr = display->d3d_dev->d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(pDXGIDevice.GetAddressOf()));
     if (FAILED(hr)) {
         return false;
     }
-    IDXGIAdapter *dxgiadapter;
-    hr = IDXGIDevice_GetAdapter(pDXGIDevice, &dxgiadapter);
-    IDXGIDevice_Release(pDXGIDevice);
+    ComPtr<IDXGIAdapter> dxgiadapter;
+    hr = pDXGIDevice->GetAdapter(dxgiadapter.GetAddressOf());
     if (FAILED(hr)) {
         return false;
     }
 
-    if (!DXGI_UpdateSwapChain( display->sys, dxgiadapter, (IUnknown*) display->d3d_dev->d3ddevice, newPixelFormat, cfg ))
-    {
-        IDXGIAdapter_Release(dxgiadapter);
+    if (!DXGI_UpdateSwapChain( display->sys, dxgiadapter.Get(), display->d3d_dev->d3ddevice, newPixelFormat, cfg ))
         return false;
-    }
-    IDXGIAdapter_Release(dxgiadapter);
 
-    ID3D11Resource* pBackBuffer;
-    hr = IDXGISwapChain1_GetBuffer( DXGI_GetSwapChain1(display->sys), 0, &IID_ID3D11Resource, (LPVOID *) &pBackBuffer );
+    ComPtr<ID3D11Resource> pBackBuffer;
+    hr = DXGI_GetSwapChain1(display->sys)->GetBuffer( 0, IID_GRAPHICS_PPV_ARGS(pBackBuffer.GetAddressOf()) );
     if ( FAILED( hr ) ) {
         msg_Err( display->obj, "Could not get the backbuffer for the Swapchain. (hr=0x%lX)", hr );
         return false;
     }
 
-    hr = D3D11_CreateRenderTargets( display->d3d_dev, pBackBuffer,
+    hr = D3D11_CreateRenderTargets( display->d3d_dev, pBackBuffer.Get(),
                                     DXGI_GetPixelFormat(display->sys), display->swapchainTargetView );
-    ID3D11Resource_Release( pBackBuffer );
     if ( FAILED( hr ) ) {
         msg_Err( display->obj, "Failed to create the target view. (hr=0x%lX)", hr );
         return false;
@@ -176,20 +164,14 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc
 
 void D3D11_LocalSwapchainCleanupDevice( void *opaque )
 {
-    struct d3d11_local_swapchain *display = opaque;
-    for (size_t i=0; i < ARRAY_SIZE(display->swapchainTargetView); i++)
-    {
-        if (display->swapchainTargetView[i]) {
-            ID3D11RenderTargetView_Release(display->swapchainTargetView[i]);
-            display->swapchainTargetView[i] = NULL;
-        }
-    }
+    d3d11_local_swapchain *display = static_cast<d3d11_local_swapchain *>(opaque);
     DXGI_LocalSwapchainCleanupDevice(display->sys);
+    delete display;
 }
 
 bool D3D11_LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_cfg_t *cfg, libvlc_video_output_cfg_t *out )
 {
-    struct d3d11_local_swapchain *display = opaque;
+    d3d11_local_swapchain *display = static_cast<d3d11_local_swapchain *>(opaque);
     if ( !UpdateSwapchain( display, cfg ) )
         return false;
     DXGI_SwapchainUpdateOutput(display->sys, out);
@@ -198,26 +180,26 @@ bool D3D11_LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_c
 
 void D3D11_LocalSwapchainSwap( void *opaque )
 {
-    struct d3d11_local_swapchain *display = opaque;
+    d3d11_local_swapchain *display = static_cast<d3d11_local_swapchain *>(opaque);
     DXGI_LocalSwapchainSwap( display->sys );
 }
 
 void D3D11_LocalSwapchainSetMetadata( void *opaque, libvlc_video_metadata_type_t type, const void *metadata )
 {
-    struct d3d11_local_swapchain *display = opaque;
+    d3d11_local_swapchain *display = static_cast<d3d11_local_swapchain *>(opaque);
     DXGI_LocalSwapchainSetMetadata( display->sys, type, metadata );
 }
 
 bool D3D11_LocalSwapchainWinstoreSize( void *opaque, uint32_t *width, uint32_t *height )
 {
 #if VLC_WINSTORE_APP
-    struct d3d11_local_swapchain *display = opaque;
+    d3d11_local_swapchain *display = static_cast<d3d11_local_swapchain *>(opaque);
     /* legacy UWP mode, the width/height was set in GUID_SWAPCHAIN_WIDTH/HEIGHT */
     UINT dataSize = sizeof(*width);
-    HRESULT hr = IDXGISwapChain1_GetPrivateData(DXGI_GetSwapChain1(display->sys), &GUID_SWAPCHAIN_WIDTH, &dataSize, width);
+    HRESULT hr = DXGI_GetSwapChain1(display->sys)->GetPrivateData(GUID_SWAPCHAIN_WIDTH, &dataSize, width);
     if (SUCCEEDED(hr)) {
         dataSize = sizeof(*height);
-        hr = IDXGISwapChain1_GetPrivateData(DXGI_GetSwapChain1(display->sys), &GUID_SWAPCHAIN_HEIGHT, &dataSize, height);
+        hr = DXGI_GetSwapChain1(display->sys)->GetPrivateData(GUID_SWAPCHAIN_HEIGHT, &dataSize, height);
         return SUCCEEDED(hr);
     }
 #else
@@ -228,7 +210,7 @@ bool D3D11_LocalSwapchainWinstoreSize( void *opaque, uint32_t *width, uint32_t *
 
 bool D3D11_LocalSwapchainStartEndRendering( void *opaque, bool enter )
 {
-    struct d3d11_local_swapchain *display = opaque;
+    d3d11_local_swapchain *display = static_cast<d3d11_local_swapchain *>(opaque);
 
     if ( enter )
         D3D11_ClearRenderTargets( display->d3d_dev, DXGI_GetPixelFormat(display->sys), display->swapchainTargetView );
@@ -238,17 +220,17 @@ bool D3D11_LocalSwapchainStartEndRendering( void *opaque, bool enter )
 
 bool D3D11_LocalSwapchainSelectPlane( void *opaque, size_t plane, void *out )
 {
-    struct d3d11_local_swapchain *display = opaque;
-    if (!display->swapchainTargetView[plane])
+    d3d11_local_swapchain *display = static_cast<d3d11_local_swapchain *>(opaque);
+    if (!display->swapchainTargetView[plane].Get())
         return false;
-    ID3D11RenderTargetView **output = out;
-    *output = display->swapchainTargetView[plane];
+    ID3D11RenderTargetView **output = static_cast<ID3D11RenderTargetView **>(out);
+    *output = display->swapchainTargetView[plane].Get();
     return true;
 }
 
 void *D3D11_CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND hwnd, d3d11_device_t *d3d_dev)
 {
-    struct d3d11_local_swapchain *display = vlc_obj_calloc(o, 1, sizeof(*display));
+    d3d11_local_swapchain *display = new (std::nothrow) d3d11_local_swapchain();
     if (unlikely(display == NULL))
         return NULL;
 
@@ -262,10 +244,10 @@ void *D3D11_CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND hwnd, d3d11_dev
     return display;
 }
 
-#ifdef HAVE_DCOMP_H
+#if defined(HAVE_DCOMP_H) && !VLC_WINSTORE_APP
 void *D3D11_CreateLocalSwapchainHandleDComp(vlc_object_t *o, void* dcompDevice, void* dcompVisual, d3d11_device_t *d3d_dev)
 {
-    struct d3d11_local_swapchain *display = vlc_obj_calloc(o, 1, sizeof(*display));
+    d3d11_local_swapchain *display = new (std::nothrow) d3d11_local_swapchain();
     if (unlikely(display == NULL))
         return NULL;
 

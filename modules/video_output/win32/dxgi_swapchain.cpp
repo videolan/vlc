@@ -25,7 +25,7 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
+#include <cassert>
 
 #if !defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0601 // _WIN32_WINNT_WIN7
 # undef _WIN32_WINNT
@@ -34,10 +34,8 @@
 
 #include <vlc_es.h>
 
-#define COBJMACROS
-
-#ifdef HAVE_DCOMP_H
-#  include "dcomp_wrapper.h"
+#if defined(HAVE_DCOMP_H) && !VLC_WINSTORE_APP
+# include <dcomp.h>
 #endif
 
 #include <initguid.h>
@@ -48,6 +46,12 @@
 #endif
 
 #include "../../video_chroma/dxgi_fmt.h"
+
+#include <new>
+
+#include <wrl/client.h>
+
+using Microsoft::WRL::ComPtr;
 
 typedef enum video_color_axis {
     COLOR_AXIS_RGB,
@@ -71,30 +75,30 @@ typedef struct {
 
 struct dxgi_swapchain
 {
-    vlc_object_t           *obj;
+    vlc_object_t           *obj = nullptr;
 
-    const d3d_format_t     *pixelFormat;
-    const dxgi_color_space *colorspace;
+    const d3d_format_t     *pixelFormat = nullptr;
+    const dxgi_color_space *colorspace = nullptr;
 
     swapchain_surface_type  swapchainSurfaceType;
-    union {
 #if !VLC_WINSTORE_APP
+    union {
         HWND                hwnd;
-#endif /* !VLC_WINSTORE_APP */
-#ifdef HAVE_DCOMP_H
+#if defined(HAVE_DCOMP_H)
         struct {
-            void*           device; // IDCompositionDevice
-            void*           visual; // IDCompositionVisual
+            IDCompositionDevice  *device;
+            IDCompositionVisual  *visual;
         } dcomp;
 #endif // HAVE_DCOMP_H
     } swapchainSurface;
+#endif /* !VLC_WINSTORE_APP */
 
-    IDXGISwapChain1        *dxgiswapChain;   /* DXGI 1.2 swap chain */
-    IDXGISwapChain4        *dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
+    ComPtr<IDXGISwapChain1> dxgiswapChain;   /* DXGI 1.2 swap chain */
+    ComPtr<IDXGISwapChain4> dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
     bool                    send_metadata;
     DXGI_HDR_METADATA_HDR10 hdr10;
 
-    bool                   logged_capabilities;
+    bool                   logged_capabilities = false;
 };
 
 DEFINE_GUID(GUID_SWAPCHAIN_WIDTH,  0xf1b59347, 0x1643, 0x411a, 0xad, 0x6b, 0xc7, 0x80, 0x17, 0x7a, 0x06, 0xb6);
@@ -135,7 +139,7 @@ static const dxgi_color_space color_spaces[] = {
     DXGIMAP(YCBCR, STUDIO,  HLG, TOPLEFT,  2020)
     DXGIMAP(YCBCR, FULL,    HLG, TOPLEFT,  2020)
     /*DXGIMAP(YCBCR, FULL,     22,    NONE,  2020, 601)*/
-    {DXGI_COLOR_SPACE_RESERVED, NULL, 0, 0, 0, 0, 0},
+    {DXGI_COLOR_SPACE_RESERVED, NULL, COLOR_AXIS_RGB, COLOR_PRIMARIES_UNDEF, TRANSFER_FUNC_UNDEF, COLOR_SPACE_UNDEF, 0},
 #undef DXGIMAP
 };
 
@@ -152,14 +156,16 @@ static bool canHandleConversion(const dxgi_color_space *src, const dxgi_color_sp
 }
 #endif
 
-void DXGI_SelectSwapchainColorspace(struct dxgi_swapchain *display, const libvlc_video_render_cfg_t *cfg)
+void DXGI_SelectSwapchainColorspace(dxgi_swapchain *display, const libvlc_video_render_cfg_t *cfg)
 {
     HRESULT hr;
     int best = 0;
     int score, best_score = 0;
     UINT support;
-    IDXGISwapChain3 *dxgiswapChain3 = NULL;
-    hr = IDXGISwapChain_QueryInterface( display->dxgiswapChain, &IID_IDXGISwapChain3, (void **)&dxgiswapChain3);
+    ComPtr<IDXGISwapChain3> dxgiswapChain3;
+    ComPtr<IDXGIOutput> dxgiOutput;
+
+    hr = display->dxgiswapChain.As(&dxgiswapChain3);
     if (FAILED(hr)) {
         msg_Warn(display->obj, "could not get a IDXGISwapChain3");
         goto done;
@@ -170,7 +176,7 @@ void DXGI_SelectSwapchainColorspace(struct dxgi_swapchain *display, const libvlc
     best = -1;
     for (int i=0; color_spaces[i].name; ++i)
     {
-        hr = IDXGISwapChain3_CheckColorSpaceSupport(dxgiswapChain3, color_spaces[i].dxgi, &support);
+        hr = dxgiswapChain3->CheckColorSpaceSupport(color_spaces[i].dxgi, &support);
         if (SUCCEEDED(hr) && support) {
             if (!display->logged_capabilities)
                 msg_Dbg(display->obj, "supports colorspace %s", color_spaces[i].name);
@@ -181,7 +187,7 @@ void DXGI_SelectSwapchainColorspace(struct dxgi_swapchain *display, const libvlc
                 score += 2; /* we don't want to translate color spaces */
             if (color_spaces[i].transfer == (video_transfer_func_t) cfg->transfer ||
                 /* favor 2084 output for HLG source */
-                (color_spaces[i].transfer == TRANSFER_FUNC_SMPTE_ST2084 && cfg->transfer == TRANSFER_FUNC_HLG))
+                (color_spaces[i].transfer == TRANSFER_FUNC_SMPTE_ST2084 && cfg->transfer == libvlc_video_transfer_func_HLG))
                 score++;
             if (color_spaces[i].b_full_range == cfg->full_range)
                 score++;
@@ -199,18 +205,16 @@ void DXGI_SelectSwapchainColorspace(struct dxgi_swapchain *display, const libvlc
         msg_Warn(display->obj, "no matching colorspace found force %s", color_spaces[best].name);
     }
 
-    IDXGISwapChain_QueryInterface( display->dxgiswapChain, &IID_IDXGISwapChain4, (void **)&display->dxgiswapChain4);
+    display->dxgiswapChain.As(&display->dxgiswapChain4);
 
 #ifdef HAVE_DXGI1_6_H
-    IDXGIOutput *dxgiOutput = NULL;
-
-    if (SUCCEEDED(IDXGISwapChain_GetContainingOutput( display->dxgiswapChain, &dxgiOutput )))
+    if (SUCCEEDED(display->dxgiswapChain->GetContainingOutput(dxgiOutput.GetAddressOf())))
     {
-        IDXGIOutput6 *dxgiOutput6 = NULL;
-        if (SUCCEEDED(IDXGIOutput_QueryInterface( dxgiOutput, &IID_IDXGIOutput6, (void **)&dxgiOutput6 )))
+        ComPtr<IDXGIOutput6> dxgiOutput6;
+        if (SUCCEEDED(dxgiOutput.As(&dxgiOutput6)))
         {
             DXGI_OUTPUT_DESC1 desc1;
-            if (SUCCEEDED(IDXGIOutput6_GetDesc1( dxgiOutput6, &desc1 )))
+            if (SUCCEEDED(dxgiOutput6->GetDesc1(&desc1 )))
             {
                 const dxgi_color_space *csp = NULL;
                 for (int i=0; color_spaces[i].name; ++i)
@@ -231,13 +235,11 @@ void DXGI_SelectSwapchainColorspace(struct dxgi_swapchain *display, const libvlc
                 msg_Dbg(display->obj, "Output max luminance: %.1f, colorspace %s, bits per pixel %d", desc1.MaxFullFrameLuminance, csp?csp->name:"unknown", desc1.BitsPerColor);
                 //sys->display.luminance_peak = desc1.MaxFullFrameLuminance;
             }
-            IDXGIOutput6_Release( dxgiOutput6 );
         }
-        IDXGIOutput_Release( dxgiOutput );
     }
 #endif
 
-    hr = IDXGISwapChain3_SetColorSpace1(dxgiswapChain3, color_spaces[best].dxgi);
+    hr = dxgiswapChain3->SetColorSpace1(color_spaces[best].dxgi);
     if (SUCCEEDED(hr))
         msg_Dbg(display->obj, "using colorspace %s", color_spaces[best].name);
     else
@@ -247,12 +249,10 @@ done:
     display->send_metadata = color_spaces[best].transfer == (video_transfer_func_t) cfg->transfer &&
                              color_spaces[best].primaries == (video_color_primaries_t) cfg->primaries &&
                              color_spaces[best].color == (video_color_space_t) cfg->colorspace;
-    if (dxgiswapChain3)
-        IDXGISwapChain3_Release(dxgiswapChain3);
 }
 
 #if !VLC_WINSTORE_APP
-static void FillSwapChainDesc(struct dxgi_swapchain *display, UINT width, UINT height, DXGI_SWAP_CHAIN_DESC1 *out)
+static void FillSwapChainDesc(dxgi_swapchain *display, UINT width, UINT height, DXGI_SWAP_CHAIN_DESC1 *out)
 {
     ZeroMemory(out, sizeof(*out));
     out->BufferCount = DXGI_SWAP_FRAME_COUNT;
@@ -285,7 +285,7 @@ static void FillSwapChainDesc(struct dxgi_swapchain *display, UINT width, UINT h
     }
 }
 
-static void DXGI_CreateSwapchainHwnd(struct dxgi_swapchain *display,
+static void DXGI_CreateSwapchainHwnd(dxgi_swapchain *display,
                               IDXGIAdapter *dxgiadapter, IUnknown *pFactoryDevice,
                               UINT width, UINT height)
 {
@@ -299,38 +299,37 @@ static void DXGI_CreateSwapchainHwnd(struct dxgi_swapchain *display,
     DXGI_SWAP_CHAIN_DESC1 scd;
     FillSwapChainDesc(display, width, height, &scd);
 
-    IDXGIFactory2 *dxgifactory;
-    HRESULT hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&dxgifactory);
+    ComPtr<IDXGIFactory2> dxgifactory;
+    HRESULT hr = dxgiadapter->GetParent(IID_GRAPHICS_PPV_ARGS(dxgifactory.GetAddressOf()));
     if (FAILED(hr)) {
         msg_Err(display->obj, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
         return;
     }
 
-    hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, pFactoryDevice,
+    hr = dxgifactory->CreateSwapChainForHwnd(pFactoryDevice,
                                               display->swapchainSurface.hwnd, &scd,
-                                              NULL, NULL, &display->dxgiswapChain);
+                                              NULL, NULL, display->dxgiswapChain.GetAddressOf());
 
     if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
     {
         msg_Warn(display->obj, "10 bits swapchain failed, try 8 bits");
         scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, pFactoryDevice,
+        hr = dxgifactory->CreateSwapChainForHwnd(pFactoryDevice,
                                                   display->swapchainSurface.hwnd, &scd,
-                                                  NULL, NULL, &display->dxgiswapChain);
+                                                  NULL, NULL, display->dxgiswapChain.GetAddressOf());
     }
-    IDXGIFactory2_Release(dxgifactory);
     if (FAILED(hr)) {
         msg_Err(display->obj, "Could not create the SwapChain. (hr=0x%lX)", hr);
     }
 }
 
-#ifdef HAVE_DCOMP_H
-static void DXGI_CreateSwapchainDComp(struct dxgi_swapchain *display,
+#if defined(HAVE_DCOMP_H)
+static void DXGI_CreateSwapchainDComp(dxgi_swapchain *display,
                                IDXGIAdapter *dxgiadapter, IUnknown *pFactoryDevice,
                                UINT width, UINT height)
 {
     vlc_assert(display->swapchainSurfaceType == SWAPCHAIN_SURFACE_DCOMP);
-    if (display->swapchainSurface.dcomp.device == NULL || display->swapchainSurface.dcomp.visual == NULL)
+    if (!display->swapchainSurface.dcomp.device || !display->swapchainSurface.dcomp.visual)
     {
         msg_Err(display->obj, "missing a HWND to create the swapchain");
         return;
@@ -342,28 +341,26 @@ static void DXGI_CreateSwapchainDComp(struct dxgi_swapchain *display,
     scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
     scd.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 
-    IDXGIFactory2 *dxgifactory;
-    HRESULT hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&dxgifactory);
+    ComPtr<IDXGIFactory2> dxgifactory;
+    HRESULT hr = dxgiadapter->GetParent(IID_GRAPHICS_PPV_ARGS(dxgifactory.GetAddressOf()));
     if (FAILED(hr)) {
         msg_Err(display->obj, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
         return;
     }
 
-    hr = IDXGIFactory2_CreateSwapChainForComposition(dxgifactory, pFactoryDevice,
-                                                    &scd, NULL, &display->dxgiswapChain);
+    hr = dxgifactory->CreateSwapChainForComposition(pFactoryDevice,
+                                                    &scd, NULL, display->dxgiswapChain.GetAddressOf());
     if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
     {
         msg_Warn(display->obj, "10 bits swapchain failed, try 8 bits");
         scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        hr = IDXGIFactory2_CreateSwapChainForComposition(dxgifactory, pFactoryDevice,
-                                                        &scd, NULL, &display->dxgiswapChain);
+        hr = dxgifactory->CreateSwapChainForComposition(pFactoryDevice,
+                                                        &scd, NULL, display->dxgiswapChain.GetAddressOf());
     }
-    IDXGIFactory2_Release(dxgifactory);
     if (SUCCEEDED(hr)) {
-        IDCompositionVisual_SetContent(display->swapchainSurface.dcomp.visual, (IUnknown *)display->dxgiswapChain);
-        IDCompositionDevice_Commit(display->swapchainSurface.dcomp.device);
-    }
-    if (FAILED(hr)) {
+        display->swapchainSurface.dcomp.visual->SetContent(display->dxgiswapChain.Get());
+        display->swapchainSurface.dcomp.device->Commit();
+    } else {
         msg_Err(display->obj, "Could not create the SwapChain. (hr=0x%lX)", hr);
     }
 }
@@ -371,11 +368,11 @@ static void DXGI_CreateSwapchainDComp(struct dxgi_swapchain *display,
 
 #endif /* !VLC_WINSTORE_APP */
 
-void DXGI_LocalSwapchainSwap( struct dxgi_swapchain *display )
+void DXGI_LocalSwapchainSwap( dxgi_swapchain *display )
 {
-    DXGI_PRESENT_PARAMETERS presentParams = { 0 };
+    DXGI_PRESENT_PARAMETERS presentParams = { };
 
-    HRESULT hr = IDXGISwapChain1_Present1( display->dxgiswapChain, 0, 0, &presentParams );
+    HRESULT hr = display->dxgiswapChain->Present1(0, 0, &presentParams );
     if ( hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET )
     {
         /* TODO device lost */
@@ -383,14 +380,14 @@ void DXGI_LocalSwapchainSwap( struct dxgi_swapchain *display )
     }
 }
 
-void DXGI_LocalSwapchainSetMetadata( struct dxgi_swapchain *display, libvlc_video_metadata_type_t type, const void *metadata )
+void DXGI_LocalSwapchainSetMetadata( dxgi_swapchain *display, libvlc_video_metadata_type_t type, const void *metadata )
 {
     assert(type == libvlc_video_metadata_frame_hdr10);
     if ( type == libvlc_video_metadata_frame_hdr10 && metadata &&
-         display->send_metadata && display->dxgiswapChain4 )
+         display->send_metadata && display->dxgiswapChain4.Get() )
     {
-        const libvlc_video_frame_hdr10_metadata_t *p_hdr10 = metadata;
-        DXGI_HDR_METADATA_HDR10 hdr10 = { 0 };
+        const libvlc_video_frame_hdr10_metadata_t *p_hdr10 = static_cast<const libvlc_video_frame_hdr10_metadata_t *>(metadata);
+        DXGI_HDR_METADATA_HDR10 hdr10 = { };
         hdr10.GreenPrimary[0] = p_hdr10->GreenPrimary[0];
         hdr10.GreenPrimary[1] = p_hdr10->GreenPrimary[1];
         hdr10.BluePrimary[0] = p_hdr10->BluePrimary[0];
@@ -406,15 +403,15 @@ void DXGI_LocalSwapchainSetMetadata( struct dxgi_swapchain *display, libvlc_vide
         if (memcmp(&display->hdr10, &hdr10, sizeof(hdr10)))
         {
             memcpy(&display->hdr10, &hdr10, sizeof(hdr10));
-            IDXGISwapChain4_SetHDRMetaData( display->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10,
+            display->dxgiswapChain4->SetHDRMetaData(DXGI_HDR_METADATA_TYPE_HDR10,
                                             sizeof( &display->hdr10 ), &display->hdr10 );
         }
     }
 }
 
-struct dxgi_swapchain *DXGI_CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND hwnd)
+dxgi_swapchain *DXGI_CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND hwnd)
 {
-    struct dxgi_swapchain *display = vlc_obj_calloc(o, 1, sizeof(*display));
+    dxgi_swapchain *display = new (std::nothrow) dxgi_swapchain();
     if (unlikely(display == NULL))
         return NULL;
 
@@ -429,37 +426,28 @@ struct dxgi_swapchain *DXGI_CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND
     return display;
 }
 
-#ifdef HAVE_DCOMP_H
-struct dxgi_swapchain *DXGI_CreateLocalSwapchainHandleDComp(vlc_object_t *o, void* dcompDevice, void* dcompVisual)
+#if defined(HAVE_DCOMP_H) && !VLC_WINSTORE_APP
+dxgi_swapchain *DXGI_CreateLocalSwapchainHandleDComp(vlc_object_t *o, void* dcompDevice, void* dcompVisual)
 {
-    struct dxgi_swapchain *display = vlc_obj_calloc(o, 1, sizeof(*display));
+    dxgi_swapchain *display = new (std::nothrow) dxgi_swapchain();
     if (unlikely(display == NULL))
         return NULL;
 
     display->obj = o;
     display->swapchainSurfaceType = SWAPCHAIN_SURFACE_DCOMP;
-    display->swapchainSurface.dcomp.device = dcompDevice;
-    display->swapchainSurface.dcomp.visual = dcompVisual;
+    display->swapchainSurface.dcomp.device = static_cast<IDCompositionDevice*>(dcompDevice);
+    display->swapchainSurface.dcomp.visual = static_cast<IDCompositionVisual*>(dcompVisual);
 
     return display;
 }
 #endif
 
-void DXGI_LocalSwapchainCleanupDevice( struct dxgi_swapchain *display )
+void DXGI_LocalSwapchainCleanupDevice( dxgi_swapchain *display )
 {
-    if (display->dxgiswapChain4)
-    {
-        IDXGISwapChain4_Release(display->dxgiswapChain4);
-        display->dxgiswapChain4 = NULL;
-    }
-    if (display->dxgiswapChain)
-    {
-        IDXGISwapChain_Release(display->dxgiswapChain);
-        display->dxgiswapChain = NULL;
-    }
+    delete display;
 }
 
-void DXGI_SwapchainUpdateOutput( struct dxgi_swapchain *display, libvlc_video_output_cfg_t *out )
+void DXGI_SwapchainUpdateOutput( dxgi_swapchain *display, libvlc_video_output_cfg_t *out )
 {
     out->dxgi_format    = display->pixelFormat->formatTexture;
     out->full_range     = display->colorspace->b_full_range;
@@ -468,45 +456,44 @@ void DXGI_SwapchainUpdateOutput( struct dxgi_swapchain *display, libvlc_video_ou
     out->transfer       = (libvlc_video_transfer_func_t)   display->colorspace->transfer;
 }
 
-bool DXGI_UpdateSwapChain( struct dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,
+bool DXGI_UpdateSwapChain( dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,
                            IUnknown *pFactoryDevice,
                            const d3d_format_t *newPixelFormat, const libvlc_video_render_cfg_t *cfg )
 {
 #if !VLC_WINSTORE_APP
-    if (display->dxgiswapChain != NULL && display->pixelFormat != newPixelFormat)
+    if (display->dxgiswapChain.Get() && display->pixelFormat != newPixelFormat)
     {
         // the pixel format changed, we need a new swapchain
-        IDXGISwapChain_Release(display->dxgiswapChain);
-        display->dxgiswapChain = NULL;
+        display->dxgiswapChain.Reset();
         display->logged_capabilities = false;
     }
 
-    if ( display->dxgiswapChain == NULL )
+    if ( !display->dxgiswapChain.Get() )
     {
         display->pixelFormat = newPixelFormat;
 
-#ifdef HAVE_DCOMP_H
+#if defined(HAVE_DCOMP_H)
         if (display->swapchainSurfaceType == SWAPCHAIN_SURFACE_DCOMP)
             DXGI_CreateSwapchainDComp(display, dxgiadapter, pFactoryDevice,
                                       cfg->width, cfg->height);
         else // SWAPCHAIN_TARGET_HWND
-#endif
+#endif // HAVE_DCOMP_H
             DXGI_CreateSwapchainHwnd(display, dxgiadapter, pFactoryDevice,
                                      cfg->width, cfg->height);
 
     }
 #else /* VLC_WINSTORE_APP */
-    if ( display->dxgiswapChain == NULL )
+    if ( !display->dxgiswapChain.Get() )
     {
-        display->dxgiswapChain = (void*)(uintptr_t)var_InheritInteger(display->obj, "winrt-swapchain");
+        display->dxgiswapChain = static_cast<IDXGISwapChain1*>((void*)(uintptr_t)var_InheritInteger(display->obj, "winrt-swapchain"));
     }
 #endif /* VLC_WINSTORE_APP */
-    if (display->dxgiswapChain == NULL)
+    if ( !display->dxgiswapChain.Get() )
         return false;
 
     /* TODO detect is the size is the same as the output and switch to fullscreen mode */
     HRESULT hr;
-    hr = IDXGISwapChain_ResizeBuffers( display->dxgiswapChain, 0, cfg->width, cfg->height,
+    hr = display->dxgiswapChain->ResizeBuffers(0, cfg->width, cfg->height,
                                         DXGI_FORMAT_UNKNOWN, 0 );
     if ( FAILED( hr ) ) {
         msg_Err( display->obj, "Failed to resize the backbuffer. (hr=0x%lX)", hr );
@@ -517,17 +504,17 @@ bool DXGI_UpdateSwapChain( struct dxgi_swapchain *display, IDXGIAdapter *dxgiada
     return true;
 }
 
-IDXGISwapChain1 *DXGI_GetSwapChain1( struct dxgi_swapchain *display )
+Microsoft::WRL::ComPtr<IDXGISwapChain1> & DXGI_GetSwapChain1( dxgi_swapchain *display )
 {
     return display->dxgiswapChain;
 }
 
-IDXGISwapChain4 *DXGI_GetSwapChain4( struct dxgi_swapchain *display )
+Microsoft::WRL::ComPtr<IDXGISwapChain4> & DXGI_GetSwapChain4( dxgi_swapchain *display )
 {
     return display->dxgiswapChain4;
 }
 
-const d3d_format_t  *DXGI_GetPixelFormat( struct dxgi_swapchain *display )
+const d3d_format_t  *DXGI_GetPixelFormat( dxgi_swapchain *display )
 {
     return display->pixelFormat;
 }

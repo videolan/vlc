@@ -32,8 +32,15 @@
 #include <vlc/libvlc_renderer_discoverer.h>
 #include <vlc/libvlc_media_player.h>
 
+#include <wrl/client.h>
+
 #include <dxgi1_5.h>
 #include "../../video_chroma/dxgi_fmt.h"
+
+
+#ifndef IID_GRAPHICS_PPV_ARGS
+#define IID_GRAPHICS_PPV_ARGS(ppType) IID_PPV_ARGS(ppType)
+#endif
 
 #define DXGI_SWAP_FRAME_COUNT   3
 
@@ -41,14 +48,14 @@ struct dxgi_swapchain;
 
 struct dxgi_swapchain *DXGI_CreateLocalSwapchainHandleHwnd(vlc_object_t *, HWND);
 
-#ifdef HAVE_DCOMP_H
+#if defined(HAVE_DCOMP_H) && !VLC_WINSTORE_APP
 struct dxgi_swapchain *DXGI_CreateLocalSwapchainHandleDComp(vlc_object_t *,
                                            void /*IDCompositionDevice*/ * dcompDevice,
                                            void /*IDCompositionVisual*/ * dcompVisual);
 #endif
 
-IDXGISwapChain1 *DXGI_GetSwapChain1( struct dxgi_swapchain * );
-IDXGISwapChain4 *DXGI_GetSwapChain4( struct dxgi_swapchain * );
+Microsoft::WRL::ComPtr<IDXGISwapChain1> & DXGI_GetSwapChain1( struct dxgi_swapchain * );
+Microsoft::WRL::ComPtr<IDXGISwapChain4> & DXGI_GetSwapChain4( struct dxgi_swapchain * );
 const d3d_format_t  *DXGI_GetPixelFormat( struct dxgi_swapchain * );
 
 void DXGI_SelectSwapchainColorspace( struct dxgi_swapchain *, const libvlc_video_render_cfg_t * );
@@ -61,4 +68,4 @@ bool DXGI_UpdateSwapChain( struct dxgi_swapchain *, IDXGIAdapter *,
 void DXGI_LocalSwapchainSwap( struct dxgi_swapchain * );
 void DXGI_LocalSwapchainSetMetadata( struct dxgi_swapchain *, libvlc_video_metadata_type_t, const void * );
 
-#endif /* VLC_D3D11_SWAPCHAIN_H */
+#endif /* VLC_DXGI_SWAPCHAIN_H */

@@ -29,6 +29,10 @@
 #include <vlc_common.h>
 #include <vlc_fourcc.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif// __cplusplus
+
 #define GPU_MANUFACTURER_AMD           0x1002
 #define GPU_MANUFACTURER_NVIDIA        0x10DE
 #define GPU_MANUFACTURER_VIA           0x1106
@@ -82,5 +86,9 @@ union DXGI_Color
 void DXGI_GetBlackColor( const d3d_format_t *,
                          union DXGI_Color black[DXGI_MAX_RENDER_TARGET],
                          size_t colors[DXGI_MAX_RENDER_TARGET] );
+
+#ifdef __cplusplus
+}
+#endif// __cplusplus
 
 #endif /* include-guard */
