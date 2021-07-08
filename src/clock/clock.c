@@ -820,18 +820,6 @@ vlc_tick_t vlc_clock_GetOffset(vlc_clock_t *clock, vlc_tick_t system_now,
     return system;
 }
 
-void vlc_clock_ConvertArrayToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
-                                    vlc_tick_t *ts_array, size_t ts_count,
-                                    double rate)
-{
-    vlc_clock_main_t *main_clock = clock->owner;
-    vlc_mutex_lock(&main_clock->lock);
-    for (size_t i = 0; i < ts_count; ++i)
-        ts_array[i] = clock->to_system_locked(clock, system_now, ts_array[i],
-                                              rate);
-    vlc_mutex_unlock(&main_clock->lock);
-}
-
 static void vlc_clock_set_master_callbacks(vlc_clock_t *clock)
 {
     clock->update = vlc_clock_master_update;

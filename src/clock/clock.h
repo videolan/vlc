@@ -221,11 +221,4 @@ vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
 vlc_tick_t vlc_clock_GetOffset(vlc_clock_t *clock, vlc_tick_t system_now,
                                vlc_tick_t ts, double rate);
 
-/**
- * This functon converts an array of timestamp from stream to system
- */
-void vlc_clock_ConvertArrayToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
-                                    vlc_tick_t *ts_array, size_t ts_count,
-                                    double rate);
-
 #endif /*VLC_CLOCK_H*/
