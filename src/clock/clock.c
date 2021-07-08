@@ -75,7 +75,6 @@ struct vlc_clock_main_t
     clock_point_t first_pcr;
     vlc_tick_t output_dejitter; /* Delay used to absorb the output clock jitter */
     vlc_tick_t input_dejitter; /* Delay used to absorb the input jitter */
-    bool abort;
 };
 
 struct vlc_clock_t
@@ -654,18 +653,8 @@ vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger)
     main_clock->pause_date = VLC_TICK_INVALID;
     main_clock->input_dejitter = DEFAULT_PTS_DELAY;
     main_clock->output_dejitter = AOUT_MAX_PTS_ADVANCE * 2;
-    main_clock->abort = false;
 
     return main_clock;
-}
-
-void vlc_clock_main_Abort(vlc_clock_main_t *main_clock)
-{
-    vlc_mutex_lock(&main_clock->lock);
-    main_clock->abort = true;
-    vlc_cond_broadcast(&main_clock->cond);
-
-    vlc_mutex_unlock(&main_clock->lock);
 }
 
 void vlc_clock_main_Reset(vlc_clock_main_t *main_clock)
