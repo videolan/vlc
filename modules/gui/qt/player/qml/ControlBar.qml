@@ -194,6 +194,11 @@ FocusScope {
         parentWindow: g_root
         colors: root.colors
 
-        Keys.onDownPressed: playerButtonsLayout.focus = true
+        Navigation.parentItem: root
+        Navigation.downItem: playerButtonsLayout
+
+        Keys.onPressed: {
+            Navigation.defaultKeyAction(event)
+        }
     }
 }
