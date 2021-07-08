@@ -58,7 +58,7 @@ struct vlc_clock_cbs
 /**
  * This function creates the vlc_clock_main_t of the program
  */
-vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger);
+vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger, struct vlc_tracer *parent_tracer);
 
 /**
  * Destroy the clock main
