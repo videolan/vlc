@@ -246,6 +246,7 @@ void MainUI::registerQMLTypes()
 
     qRegisterMetaType<ControlbarProfile*>();
     qRegisterMetaType<ControlbarProfileModel*>();
+    qmlRegisterUncreatableType<ControlbarProfileModel>("org.videolan.vlc", 0, 1, "ControlbarProfileModel", "");
     qmlRegisterUncreatableType<ControlbarProfile>("org.videolan.vlc", 0, 1, "ControlbarProfile", "");
     qmlRegisterUncreatableType<PlayerControlbarModel>("org.videolan.vlc", 0, 1, "PlayerControlbarModel", "");
     qmlRegisterUncreatableType<ControlListModel>( "org.videolan.vlc", 0, 1, "ControlListModel", "" );
