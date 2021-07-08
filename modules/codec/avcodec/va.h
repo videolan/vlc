@@ -31,7 +31,7 @@ typedef struct vlc_decoder_device vlc_decoder_device;
 typedef struct vlc_video_context vlc_video_context;
 
 struct vlc_va_operations {
-    int (*get)(vlc_va_t *, picture_t *pic, uint8_t **surface);
+    int (*get)(vlc_va_t *, picture_t *pic, AVCodecContext *ctx, AVFrame *frame);
     void (*close)(vlc_va_t *);
 };
 
@@ -87,15 +87,17 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *,
  * AV_PIX_FMT_VAAPI       - VASurfaceID
  *
  * @param pic pointer to VLC picture containing the surface [IN/OUT]
- * @param surface pointer to the AVFrame data[0] and data[3] pointers [OUT]
+ * @param ctx pointer to the current AVCodecContext [IN]
+ * @param frame pointer to the AVFrame [IN]
  *
  * @note This function needs not be reentrant.
  *
  * @return VLC_SUCCESS on success, otherwise an error code.
  */
-static inline int vlc_va_Get(vlc_va_t *va, picture_t *pic, uint8_t **surface)
+static inline int vlc_va_Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx,
+                             AVFrame *frame)
 {
-    return va->ops->get(va, pic, surface);
+    return va->ops->get(va, pic, ctx, frame);
 }
 
 /**

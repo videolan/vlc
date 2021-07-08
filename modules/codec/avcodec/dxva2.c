@@ -191,8 +191,9 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *v
     return &pic_ctx->ctx.s;
 }
 
-static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
+static int Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx, AVFrame *frame)
 {
+    (void) ctx;
     vlc_va_sys_t *sys = va->sys;
 
     /* Check the device */
@@ -215,7 +216,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
         va_surface_Release(va_surface);
         return VLC_ENOITEM;
     }
-    data[3] = (uint8_t*)DXVA2_PICCONTEXT_FROM_PICCTX(pic->context)->ctx.picsys.surface;
+    frame->data[3] = (uint8_t*)DXVA2_PICCONTEXT_FROM_PICCTX(pic->context)->ctx.picsys.surface;
     return VLC_SUCCESS;
 }
 

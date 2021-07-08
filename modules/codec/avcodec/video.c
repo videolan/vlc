@@ -1395,7 +1395,7 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
         return -1;
 
     /* data[3] will contains the format-specific surface handle. */
-    if (vlc_va_Get(va, pic, &frame->data[0]))
+    if (vlc_va_Get(va, pic, ctx, frame))
     {
         msg_Err(dec, "hardware acceleration picture allocation failed");
         picture_Release(pic);

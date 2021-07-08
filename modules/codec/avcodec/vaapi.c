@@ -150,8 +150,10 @@ static picture_context_t *vaapi_dec_pic_context_copy(picture_context_t *src)
     return &pic_ctx->ctx.s;
 }
 
-static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
+static int Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx, AVFrame *frame)
 {
+    (void) ctx;
+
     vlc_va_sys_t *sys = va->sys;
     vlc_va_surface_t *va_surface = va_pool_Get(sys->va_pool);
     if (unlikely(va_surface == NULL))
@@ -170,7 +172,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     vaapi_ctx->ctx.va_dpy = sys->hw_ctx.display;
     vaapi_ctx->va_surface = va_surface;
     vlc_vaapi_PicSetContext(pic, &vaapi_ctx->ctx);
-    data[3] = (void *) (uintptr_t) vaapi_ctx->ctx.surface;
+    frame->data[3] = (void *) (uintptr_t) vaapi_ctx->ctx.surface;
 
     return VLC_SUCCESS;
 }

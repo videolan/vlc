@@ -109,8 +109,10 @@ static vlc_vdp_video_field_t *Get(vlc_va_sys_t *sys)
     return field;
 }
 
-static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
+static int Lock(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx, AVFrame *frame)
 {
+    (void) ctx;
+
     vlc_va_sys_t *sys = va->sys;
     vlc_vdp_video_field_t *field = Get(sys);
     if (field == NULL)
@@ -120,7 +122,7 @@ static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
     field->context.vctx = vlc_video_context_Hold(sys->vctx);
 
     pic->context = &field->context;
-    data[3] = (void *)(uintptr_t)field->frame->surface;
+    frame->data[3] = (void *)(uintptr_t)field->frame->surface;
     return VLC_SUCCESS;
 }
 
