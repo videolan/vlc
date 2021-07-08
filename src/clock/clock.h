@@ -66,11 +66,6 @@ vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger);
 void vlc_clock_main_Delete(vlc_clock_main_t *main_clock);
 
 /**
- * Abort all the pending vlc_clock_Wait
- */
-void vlc_clock_main_Abort(vlc_clock_main_t *main_clock);
-
-/**
  * Reset the vlc_clock_main_t
  */
 void vlc_clock_main_Reset(vlc_clock_main_t *main_clock);
