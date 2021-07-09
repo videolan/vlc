@@ -1402,10 +1402,10 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
         return -1;
     }
 
-    frame->buf[0] = av_buffer_create(frame->data[0], 0, lavc_ReleaseFrame, pic, 0);
+    frame->buf[0] = av_buffer_create(NULL, 0, lavc_ReleaseFrame, pic, 0);
     if (unlikely(frame->buf[0] == NULL))
     {
-        lavc_ReleaseFrame(pic, frame->data[0]);
+        lavc_ReleaseFrame(pic, NULL);
         return -1;
     }
 
