@@ -1402,12 +1402,18 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
         return -1;
     }
 
-    frame->buf[0] = av_buffer_create(NULL, 0, lavc_ReleaseFrame, pic, 0);
-    if (unlikely(frame->buf[0] == NULL))
+    AVBufferRef *buf = av_buffer_create(NULL, 0, lavc_ReleaseFrame, pic, 0);
+    if (unlikely(buf == NULL))
     {
         lavc_ReleaseFrame(pic, NULL);
         return -1;
     }
+
+    /* frame->buf[0] must be valid but can be previously set by the VA module. */
+    if (frame->buf[0] == NULL)
+        frame->buf[0] = buf;
+    else
+        frame->opaque_ref = buf;
 
     frame->opaque = pic;
     return 0;
