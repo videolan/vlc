@@ -1538,8 +1538,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_LENGTH:
             if( p_sys->f_npt_length > 0 )
             {
-                if( unlikely(p_sys->f_npt_length >= (double)(INT64_MAX / CLOCK_FREQ)) )
-                    *va_arg( args, vlc_tick_t * ) = INT64_MAX;
+                if( unlikely(p_sys->f_npt_length >= (double)(VLC_TICK_MAX / CLOCK_FREQ)) )
+                    *va_arg( args, vlc_tick_t * ) = VLC_TICK_MAX;
                 else
                     *va_arg( args, vlc_tick_t * ) = vlc_tick_from_sec(p_sys->f_npt_length);
                 return VLC_SUCCESS;

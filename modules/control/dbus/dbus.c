@@ -458,7 +458,7 @@ static void toggle_timeout(DBusTimeout *to, void *data)
 static int next_timeout(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
-    vlc_tick_t next_timeout = INT64_MAX;
+    vlc_tick_t next_timeout = VLC_TICK_MAX;
     unsigned count = vlc_array_count(&sys->timeouts);
 
     for (unsigned i = 0; i < count; i++)
@@ -474,7 +474,7 @@ static int next_timeout(intf_thread_t *intf)
             next_timeout = *expiry;
     }
 
-    if (next_timeout == INT64_MAX)
+    if (next_timeout == VLC_TICK_MAX)
         return -1;
 
     if (MS_FROM_VLC_TICK(next_timeout) > INT_MAX)

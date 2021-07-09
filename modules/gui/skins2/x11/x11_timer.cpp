@@ -103,7 +103,7 @@ void X11TimerLoop::removeTimer( X11Timer &rTimer )
 void X11TimerLoop::waitNextTimer()
 {
     vlc_tick_t curDate = vlc_tick_now();
-    vlc_tick_t nextDate = INT64_MAX;
+    vlc_tick_t nextDate = VLC_TICK_MAX;
 
     X11Timer *nextTimer = NULL;
 

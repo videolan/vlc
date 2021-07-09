@@ -619,7 +619,7 @@ static size_t spu_channel_UpdateDates(struct spu_channel *channel,
     for (size_t index = 0; index < channel->entries.size; index++)
     {
         spu_render_entry_t *render_entry = &channel->entries.data[index];
-        if(date_array[index * 2] != INT64_MAX) /* pause triggered before or during spu render */
+        if(date_array[index * 2] != VLC_TICK_MAX) /* pause triggered before or during spu render */
         {
             render_entry->start = date_array[index * 2];
             render_entry->stop = date_array[index * 2 + 1];
@@ -731,7 +731,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
         if (start_date < sys->last_sort_date)
             start_date = sys->last_sort_date;
         if (start_date <= 0)
-            start_date = INT64_MAX;
+            start_date = VLC_TICK_MAX;
 
         /* Select pictures to be displayed */
         for (size_t index = 0; index < channel->entries.size; ) {

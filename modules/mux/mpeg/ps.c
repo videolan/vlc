@@ -461,7 +461,7 @@ static int Mux( sout_mux_t *p_mux )
         /* Write regulary PackHeader */
         if( p_sys->i_pes_count % 30 == 0)
         {
-            vlc_tick_t i_mindts = INT64_MAX;
+            vlc_tick_t i_mindts = VLC_TICK_MAX;
             for( int i=0; i < p_mux->i_nb_inputs; i++ )
             {
                 ps_stream_t *p_s = (ps_stream_t*)p_input->p_sys;
@@ -471,7 +471,7 @@ static int Mux( sout_mux_t *p_mux )
                     i_mindts = p_s->i_dts;
             }
 
-            if( i_mindts != INT64_MAX && i_mindts > p_sys->i_instant_dts )
+            if( i_mindts != VLC_TICK_MAX && i_mindts > p_sys->i_instant_dts )
             {
                 /* Update the instant bitrate every second or so */
                 if( p_sys->i_instant_size &&

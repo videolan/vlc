@@ -331,7 +331,7 @@ static void *Thread (void *data)
     };
     xcb_cursor_t cursor = CursorCreate(conn, p_sys->root); /* blank cursor */
     vlc_tick_t lifetime = VLC_TICK_FROM_MS( var_InheritInteger(wnd, "mouse-hide-timeout") );
-    vlc_tick_t deadline = INT64_MAX;
+    vlc_tick_t deadline = VLC_TICK_MAX;
 
     if (ufd.fd == -1)
         return NULL;
@@ -340,7 +340,7 @@ static void *Thread (void *data)
     {
         int timeout = -1;
 
-        if (deadline != INT64_MAX)
+        if (deadline != VLC_TICK_MAX)
         {
             vlc_tick_t delay = deadline - vlc_tick_now();
             timeout = (delay > 0) ? MS_FROM_VLC_TICK(delay) : 0;
@@ -355,7 +355,7 @@ static void *Thread (void *data)
             xcb_change_window_attributes(conn, wnd->handle.xid,
                                          XCB_CW_CURSOR, &cursor);
             xcb_flush(conn);
-            deadline = INT64_MAX;
+            deadline = VLC_TICK_MAX;
         }
         else
         {

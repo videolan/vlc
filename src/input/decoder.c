@@ -135,8 +135,8 @@ struct vlc_input_decoder_t
     /* Preroll */
     vlc_tick_t i_preroll_end;
 
-#define PREROLL_NONE    INT64_MIN // vlc_tick_t
-#define PREROLL_FORCED  INT64_MAX // vlc_tick_t
+#define PREROLL_NONE   VLC_TICK_MIN
+#define PREROLL_FORCED VLC_TICK_MAX
 
     /* Pause & Rate */
     bool reset_out_state;

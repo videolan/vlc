@@ -40,8 +40,8 @@ struct vlc_clock_cbs
      * Called when a clock is updated
      *
      * @param system_ts system date when the ts will be rendered,
-     * VLC_TICK_INVALID when the clock is reset or INT64_MAX when the update is
-     * forced (an output was still rendered while paused for example). Note:
+     * VLC_TICK_INVALID when the clock is reset or VLC_TICK_MAX when the update
+     * is forced (an output was still rendered while paused for example). Note:
      * when valid, this date can be in the future, it is not necessarily now.
      * @param ts stream timestamp or VLC_TICK_INVALID when the clock is reset,
      * should be subtracted with VLC_TICK_0 to get the original value
@@ -142,10 +142,10 @@ void vlc_clock_Delete(vlc_clock_t *clock);
 
 /**
  * This function will update the clock drift and returns the drift
- * @param system_now valid system time or INT64_MAX is the updated point is
+ * @param system_now valid system time or VLC_TICK_MAX is the updated point is
  * forced (when paused for example)
  * @return a valid drift relative time, VLC_TICK_INVALID if there is no drift
- * (clock is master) or INT64_MAX if the clock is paused
+ * (clock is master) or VLC_TICK_MAX if the clock is paused
  */
 vlc_tick_t vlc_clock_Update(vlc_clock_t *clock, vlc_tick_t system_now,
                             vlc_tick_t ts, double rate);
@@ -181,7 +181,7 @@ void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
 
 /**
  * This function converts a timestamp from stream to system
- * @return the valid system time or INT64_MAX when the clock is paused
+ * @return the valid system time or VLC_TICK_MAX when the clock is paused
  */
 vlc_tick_t vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
                                      vlc_tick_t ts, double rate);

@@ -945,14 +945,14 @@ static int Demux( demux_t *p_demux )
     if( p_frame->i_dts != VLC_TICK_INVALID && p_track->p_es != NULL )
         p_track->i_pcr = p_frame->i_dts;
 
-    vlc_tick_t i_ts_max = INT64_MIN;
+    vlc_tick_t i_ts_max = VLC_TICK_MIN;
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
         if( p_sys->tracks[i].p_es != NULL )
             i_ts_max = __MAX( i_ts_max, p_sys->tracks[i].i_pcr );
     }
 
-    vlc_tick_t i_ts_min = INT64_MAX;
+    vlc_tick_t i_ts_min = VLC_TICK_MAX;
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
         if( p_sys->tracks[i].p_es != NULL &&
@@ -960,7 +960,7 @@ static int Demux( demux_t *p_demux )
                 p_sys->tracks[i].i_pcr + VLC_TICK_FROM_SEC(10)>= i_ts_max )
             i_ts_min = __MIN( i_ts_min, p_sys->tracks[i].i_pcr );
     }
-    if( i_ts_min >= p_sys->i_pcr && likely(i_ts_min != INT64_MAX) )
+    if( i_ts_min >= p_sys->i_pcr && likely(i_ts_min != VLC_TICK_MAX) )
     {
         p_sys->i_pcr = i_ts_min;
         es_out_SetPCR( p_demux->out, p_sys->i_pcr );

@@ -1131,7 +1131,7 @@ static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es )
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
 
     vlc_tick_t i_delay;
-    if( p_es->delay != INT64_MAX )
+    if( p_es->delay != VLC_TICK_MAX )
         i_delay = p_es->delay; /* The track use its own delay, and not a category delay */
     else if( p_es->fmt.i_cat == AUDIO_ES )
         i_delay = p_sys->i_audio_delay;
@@ -2182,7 +2182,7 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
     es->mouse_event_cb = NULL;
     es->mouse_event_userdata = NULL;
     es->i_pts_level = VLC_TICK_INVALID;
-    es->delay = INT64_MAX;
+    es->delay = VLC_TICK_MAX;
 
     vlc_list_append(&es->node, es->p_master ? &p_sys->es_slaves : &p_sys->es);
 
@@ -3082,7 +3082,7 @@ static vlc_tick_t EsOutGetTracksDelay(es_out_t *out)
     {
         if (es->p_dec)
         {
-            if (es->delay != INT64_MAX)
+            if (es->delay != VLC_TICK_MAX)
                 tracks_delay = __MIN(tracks_delay, es->delay);
             else if (es->fmt.i_cat == AUDIO_ES)
                 has_audio = true;

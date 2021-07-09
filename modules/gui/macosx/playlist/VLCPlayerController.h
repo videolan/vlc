@@ -640,14 +640,14 @@ extern const CGFloat VLCVolumeDefault;
 
 /**
  * fetch the delay for a specific track identified through its elementary stream ID
- * @return the delay for the track or INT64_MAX if none is set
+ * @return the delay for the track or VLC_TICK_MAX if none is set
  */
 - (vlc_tick_t)delayForElementaryStreamID:(vlc_es_id_t *)esID;
 
 /**
  * set the delay of a specific track identified through its elementary stream ID
  * @warning Setting the delay of one specific track will override previous and future changes of delay made through generic calls
- * @param delay the delay as a valid time or INT64_MAX to reset to the default for the ES category
+ * @param delay the delay as a valid time or VLC_TICK_MAX to reset to the default for the ES category
  * @param esID the ID for the elementary stream
  * @param relative use an absolute or relative whence to describe the time
  * @return VLC_SUCCESS on success

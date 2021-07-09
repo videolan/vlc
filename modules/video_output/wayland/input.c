@@ -218,7 +218,7 @@ static void pointer_create(struct seat_data *sd)
         wl_pointer_add_listener(sd->pointer, &pointer_cbs, sd);
 
     sd->cursor_timeout = VLC_TICK_FROM_MS( var_InheritInteger(sd->owner, "mouse-hide-timeout") );
-    sd->cursor_deadline = INT64_MAX;
+    sd->cursor_deadline = VLC_TICK_MAX;
 }
 
 static void pointer_destroy(struct seat_data *sd)
@@ -454,7 +454,7 @@ int seat_create(vout_window_t *wnd, struct wl_registry *registry,
 
 static vlc_tick_t seat_next_deadline(const struct seat_data *sd)
 {
-    return (sd->pointer != NULL) ? sd->cursor_deadline : INT64_MAX;
+    return (sd->pointer != NULL) ? sd->cursor_deadline : VLC_TICK_MAX;
 }
 
 static void seat_refresh(struct seat_data *sd, vlc_tick_t now)
@@ -462,7 +462,7 @@ static void seat_refresh(struct seat_data *sd, vlc_tick_t now)
     if (sd->pointer != NULL && sd->cursor_deadline <= now)
     {   /* Hide cursor */
         wl_pointer_set_cursor(sd->pointer, sd->cursor_serial, NULL, 0, 0);
-        sd->cursor_deadline = INT64_MAX;
+        sd->cursor_deadline = VLC_TICK_MAX;
     }
 }
 
@@ -511,7 +511,7 @@ void seat_destroy_all(struct wl_list *list)
 int seat_next_timeout(const struct wl_list *list)
 {
     struct seat_data *sd;
-    vlc_tick_t deadline = INT64_MAX;
+    vlc_tick_t deadline = VLC_TICK_MAX;
 
     wl_list_for_each(sd, list, node)
     {
@@ -520,7 +520,7 @@ int seat_next_timeout(const struct wl_list *list)
             deadline = d;
     }
 
-    if (deadline == INT64_MAX)
+    if (deadline == VLC_TICK_MAX)
         return -1;
 
     vlc_tick_t now = vlc_tick_now();

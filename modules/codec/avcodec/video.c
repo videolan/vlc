@@ -641,7 +641,7 @@ static block_t * filter_earlydropped_blocks( decoder_t *p_dec, block_t *block )
         p_sys->i_late_frames = 0;
         p_sys->framedrop = FRAMEDROP_NONE;
         p_sys->b_from_preroll = true;
-        p_sys->i_last_late_delay = INT64_MAX;
+        p_sys->i_last_late_delay = VLC_TICK_MAX;
     }
 
     if( p_sys->i_late_frames == 0 )
