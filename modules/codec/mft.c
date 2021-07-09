@@ -516,6 +516,7 @@ static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, IMFSample** re
     *result = NULL;
 
     IMFSample *input_sample = NULL;
+    IMFMediaBuffer *input_media_buffer = NULL;
 
     MFT_INPUT_STREAM_INFO input_info;
     hr = IMFTransform_GetInputStreamInfo(p_sys->mft, stream_id, &input_info);
@@ -526,7 +527,6 @@ static int AllocateInputSample(decoder_t *p_dec, DWORD stream_id, IMFSample** re
     if (FAILED(hr))
         goto error;
 
-    IMFMediaBuffer *input_media_buffer = NULL;
     DWORD allocation_size = __MAX(input_info.cbSize, size);
     hr = mf->fptr_MFCreateMemoryBuffer(allocation_size, &input_media_buffer);
     if (FAILED(hr))
@@ -1029,7 +1029,7 @@ static int InitializeMFT(decoder_t *p_dec)
 
         if (p_dec->fmt_in.i_extra)
         {
-            if (h264_isavcC((uint8_t*)p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra))
+            if (h264_isavcC(p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra))
             {
                 size_t i_buf;
                 uint8_t *buf = h264_avcC_to_AnnexB_NAL(p_dec->fmt_in.p_extra,
