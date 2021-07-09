@@ -301,9 +301,9 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
     assert(context != NULL);
 //vlc_error(main_clock->logger, "clock[%s] is using a clock_context[%zu] for ts: %"PRId64 " (update)", vlc_clock_get_name(clock), context->idx, original_ts);
 
-    /* If system_now is INT64_MAX, the update is forced, don't modify anything
-     * but only notify the new clock point. */
-    if (system_now != INT64_MAX)
+    /* If system_now is VLC_TICK_MAX, the update is forced, don't modify
+     * anything but only notify the new clock point. */
+    if (system_now != VLC_TICK_MAX)
     {
         if (context->offset != VLC_TICK_INVALID
          && ts != context->last.stream)
@@ -439,7 +439,7 @@ static vlc_tick_t vlc_clock_slave_to_system_locked(vlc_clock_t *clock,
 {
     vlc_clock_main_t *main_clock = clock->owner;
     if (main_clock->pause_date != VLC_TICK_INVALID)
-        return INT64_MAX;
+        return VLC_TICK_MAX;
 
     struct vlc_clock_context *context =
         vlc_clock_main_get_context(main_clock, clock, ts, false, clock->updating);
@@ -532,12 +532,13 @@ static vlc_tick_t vlc_clock_slave_update(vlc_clock_t *clock,
     (void) discontinuity;
     vlc_clock_main_t *main_clock = clock->owner;
 
-    if (system_now == INT64_MAX)
+    if (system_now == VLC_TICK_MAX)
     {
-        /* If system_now is INT64_MAX, the update is forced, don't modify anything
-        * but only notify the new clock point. */
-        vlc_clock_on_update(clock, INT64_MAX, ts, rate, frame_rate, frame_rate_base);
-        return INT64_MAX;
+        /* If system_now is VLC_TICK_MAX, the update is forced, don't modify
+         * anything but only notify the new clock point. */
+        vlc_clock_on_update(clock, VLC_TICK_MAX, ts, rate, frame_rate,
+                            frame_rate_base);
+        return VLC_TICK_MAX;
     }
 
     vlc_mutex_lock(&main_clock->lock);
@@ -589,12 +590,12 @@ void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
     vlc_clock_main_t *main_clock = clock->owner;
     vlc_mutex_lock(&main_clock->lock);
     const vlc_tick_t max_deadline =
-        max_duration > 0 ? system_now + max_duration : INT64_MAX;
+        max_duration > 0 ? system_now + max_duration : VLC_TICK_MAX;
     while (!main_clock->abort)
     {
         vlc_tick_t deadline;
         if (main_clock->pause_date != VLC_TICK_INVALID)
-            deadline = INT64_MAX;
+            deadline = VLC_TICK_MAX;
         else
             deadline = clock->to_system_locked(clock, system_now, ts, rate);
         deadline = __MIN(deadline, max_deadline);

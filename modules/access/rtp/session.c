@@ -396,7 +396,7 @@ bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
     vlc_tick_t now = vlc_tick_now ();
     bool pending = false;
 
-    *deadlinep = INT64_MAX;
+    *deadlinep = VLC_TICK_MAX;
 
     for (unsigned i = 0, max = session->srcc; i < max; i++)
     {

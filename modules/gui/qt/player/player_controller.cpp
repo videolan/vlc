@@ -907,7 +907,7 @@ static void on_player_timer_update(const struct vlc_player_timer_point *point,
             {
                 q->updatePosition();
 
-                if (that->m_player_time.system_date != INT64_MAX)
+                if (that->m_player_time.system_date != VLC_TICK_MAX)
                 {
                     // Setup the position update interval, depending on media
                     // length and rate.  XXX: VLC_TICK_FROM_MS(1) is an educated
@@ -1575,7 +1575,7 @@ void PlayerController::updateTime(vlc_tick_t system_now, bool forceUpdate)
         d->m_remainingTime = VLC_TICK_INVALID;
     emit remainingTimeChanged(d->m_remainingTime);
 
-    if (d->m_player_time.system_date != INT64_MAX
+    if (d->m_player_time.system_date != VLC_TICK_MAX
      && (forceUpdate || !d->m_time_timer.isActive()))
     {
         // Tell the timer to wait until the next second is reached.

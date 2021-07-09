@@ -110,7 +110,7 @@ vlc_player_track_priv_New(vlc_es_id_t *id, const char *name, const es_format_t *
         return NULL;
     struct vlc_player_track *track = &trackpriv->t;
 
-    trackpriv->delay = INT64_MAX;
+    trackpriv->delay = VLC_TICK_MAX;
     trackpriv->vout = NULL;
     trackpriv->vout_order = VLC_VOUT_ORDER_NONE;
     trackpriv->selected_by_user = false;

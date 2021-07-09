@@ -55,11 +55,11 @@ vlc_player_SendTimerSourceUpdates(vlc_player_t *player,
         /* Respect refresh delay of the timer */
         if (force_update || timer->period == VLC_TICK_INVALID
          || timer->last_update_date == VLC_TICK_INVALID
-         || point->system_date == INT64_MAX /* always update when paused */
+         || point->system_date == VLC_TICK_MAX /* always update when paused */
          || point->system_date - timer->last_update_date >= timer->period)
         {
             timer->cbs->on_update(point, timer->data);
-            timer->last_update_date = point->system_date == INT64_MAX ?
+            timer->last_update_date = point->system_date == VLC_TICK_MAX ?
                                       VLC_TICK_INVALID : point->system_date;
         }
     }
@@ -244,7 +244,7 @@ vlc_player_UpdateTimerSource(vlc_player_t *player,
      * interpolation (behave as paused), indeed, we should wait for one more
      * point before starting interpolation (ideally, it should be more) */
     if (source->point.system_date == VLC_TICK_INVALID)
-        source->point.system_date = INT64_MAX;
+        source->point.system_date = VLC_TICK_MAX;
     else
         source->point.system_date = system_date;
 
@@ -302,7 +302,7 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
 
     vlc_tick_t system_date = point->system_date;
     if (player->timer.state == VLC_PLAYER_TIMER_STATE_PAUSED)
-        system_date = INT64_MAX;
+        system_date = VLC_TICK_MAX;
 
     /* An update after a discontinuity means that the playback is resumed */
     if (player->timer.state == VLC_PLAYER_TIMER_STATE_DISCONTINUITY)
@@ -330,11 +330,12 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
             force_update = true;
         }
 
-        /* When paused (INT64_MAX), the same ts can be send more than one time
-         * from the video source, only send it if different in that case. */
+        /* When paused (VLC_TICK_MAX), the same ts can be send more than one
+         * time from the video source, only send it if different in that case.
+         */
         if (point->ts != player->timer.last_ts
           || source->point.system_date != system_date
-          || system_date != INT64_MAX)
+          || system_date != VLC_TICK_MAX)
         {
             vlc_player_UpdateTimerSource(player, source, point->rate, point->ts,
                                          system_date);
@@ -478,9 +479,9 @@ vlc_player_timer_point_Interpolate(const struct vlc_player_timer_point *point,
     assert(system_now > 0);
     assert(out_ts || out_pos);
 
-    /* A system_date == INT64_MAX means the clock was paused when it updated
+    /* A system_date == VLC_TICK_MAX means the clock was paused when it updated
      * this point, so there is nothing to interpolate */
-    const vlc_tick_t drift = point->system_date == INT64_MAX ? 0
+    const vlc_tick_t drift = point->system_date == VLC_TICK_MAX ? 0
                            : (system_now - point->system_date) * point->rate;
     vlc_tick_t ts = point->ts;
     float pos = point->position;

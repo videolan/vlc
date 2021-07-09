@@ -2065,7 +2065,7 @@ static void LoadExtradata( decoder_t *p_dec )
 static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    ClearCuesByTime( &p_sys->p_root->p_child, INT64_MAX );
+    ClearCuesByTime( &p_sys->p_root->p_child, VLC_TICK_MAX );
 }
 
 /****************************************************************************

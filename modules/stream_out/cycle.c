@@ -194,24 +194,24 @@ static vlc_tick_t ParseTime(const char *str)
     switch (*end)
     {
         case 'w':
-            if (u < ((unsigned long long)INT64_MAX)/ (60 * 60 * 24 * 7 * CLOCK_FREQ))
+            if (u < ((unsigned long long)VLC_TICK_MAX)/ (60 * 60 * 24 * 7 * CLOCK_FREQ))
                 return vlc_tick_from_sec( 60LU * 60 * 24 * 7 * u );
             break;
         case 'd':
-            if (u < ((unsigned long long)INT64_MAX)/ (60 * 60 * 24 * CLOCK_FREQ))
+            if (u < ((unsigned long long)VLC_TICK_MAX)/ (60 * 60 * 24 * CLOCK_FREQ))
                 return vlc_tick_from_sec( 60LU * 60 * 24 * u );
             break;
         case 'h':
-            if (u < ((unsigned long long)INT64_MAX)/ (60 * 60 * CLOCK_FREQ))
+            if (u < ((unsigned long long)VLC_TICK_MAX)/ (60 * 60 * CLOCK_FREQ))
                 return vlc_tick_from_sec( 60LLU * 60 * u );
             break;
         case 'm':
-            if (u < ((unsigned long long)INT64_MAX)/ (60 * CLOCK_FREQ))
+            if (u < ((unsigned long long)VLC_TICK_MAX)/ (60 * CLOCK_FREQ))
                 return vlc_tick_from_sec( 60LLU * u );
             break;
         case 's':
         case 0:
-            if (u < ((unsigned long long)INT64_MAX)/CLOCK_FREQ)
+            if (u < ((unsigned long long)VLC_TICK_MAX)/CLOCK_FREQ)
                 return vlc_tick_from_sec( u );
             break;
     }

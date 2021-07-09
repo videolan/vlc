@@ -234,7 +234,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     vlc_tick_t i_pkt_time_delta = 0;
     uint32_t i_payload_data_length = 0;
     uint32_t i_temp_payload_length = 0;
-    *p_packetsys->pi_preroll = __MIN( *p_packetsys->pi_preroll, INT64_MAX );
+    *p_packetsys->pi_preroll = __MIN( *p_packetsys->pi_preroll, VLC_TICK_MAX );
 
     /* First packet, in case we do not have index to guess preroll start time */
     if ( *p_packetsys->pi_preroll_start == ASFPACKET_PREROLL_FROM_CURRENT )

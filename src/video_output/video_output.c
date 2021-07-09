@@ -1179,7 +1179,7 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                 if (is_late_dropped && !decoded->b_force)
                 {
 
-                    if (system_pts != INT64_MAX &&
+                    if (system_pts != VLC_TICK_MAX &&
                         IsPictureLate(vout, decoded, system_now, system_pts, vsync_date))
                     {
                         picture_Release(decoded);
@@ -1344,7 +1344,7 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
         /* The clock is paused, it's too late to fallback to the previous
          * picture, display the current picture anyway and force the rendering
          * to now. */
-        if (unlikely(render_subtitle_date == INT64_MAX))
+        if (unlikely(render_subtitle_date == VLC_TICK_MAX))
         {
             render_subtitle_date = system_now;
             render_now = true;
@@ -1485,7 +1485,7 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
     const vlc_tick_t pts = todisplay->date;
     vlc_tick_t system_pts = render_now ? system_now :
         vlc_clock_ConvertToSystem(sys->clock, system_now, pts, sys->rate);
-    if (unlikely(system_pts == INT64_MAX))
+    if (unlikely(system_pts == VLC_TICK_MAX))
     {
         /* The clock is paused, it's too late to fallback to the previous
          * picture, display the current picture anyway and force the rendering
@@ -1593,7 +1593,7 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
     {
         sys->displayed.date = system_now;
         /* Tell the clock that the pts was forced */
-        system_pts = INT64_MAX;
+        system_pts = VLC_TICK_MAX;
     }
 
     vlc_clock_UpdateVideo(sys->clock, system_pts, pts, sys->rate,
@@ -1840,7 +1840,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         const vlc_tick_t swap_next_pts =
             vlc_clock_ConvertToSystem(sys->clock, vlc_tick_now(),
                                         next->date, sys->rate);
-        if (likely(swap_next_pts != INT64_MAX) && vsync_date == VLC_TICK_INVALID)
+        if (likely(swap_next_pts != VLC_TICK_MAX) && vsync_date == VLC_TICK_INVALID)
             date_refresh = swap_next_pts - render_delay;
 
         // next frame will still need some waiting before display
@@ -2292,7 +2292,7 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
 
     /* Destroy the rendering display */
     if (sys->private.display_pool != NULL)
-        vout_FlushUnlocked(vout, true, INT64_MAX);
+        vout_FlushUnlocked(vout, true, VLC_TICK_MAX);
 
     vlc_mutex_lock(&sys->display_lock);
     vout_CloseWrapper(&vout->obj, &sys->private, sys->display);

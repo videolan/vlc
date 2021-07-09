@@ -1732,8 +1732,8 @@ static int64_t AVI_Rescale( vlc_tick_t i_value, uint32_t i_timescale, uint32_t i
     if( i_timescale == i_newscale )
         return i_value;
 
-    if( (i_value >= 0 && i_value <= INT64_MAX / i_newscale) ||
-        (i_value < 0  && i_value >= INT64_MIN / i_newscale) )
+    if( (i_value >= 0 && i_value <= VLC_TICK_MAX / i_newscale) ||
+        (i_value < 0  && i_value >= VLC_TICK_MIN / i_newscale) )
         return i_value * i_newscale / i_timescale;
 
     /* overflow */
