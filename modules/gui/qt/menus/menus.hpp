@@ -42,9 +42,6 @@ class VLCMenuBar : public QObject
 public:
     VLCMenuBar(QObject* parent = nullptr);
 
-    /* Main bar creation */
-    static void createMenuBar( MainInterface *mi, qt_intf_t * );
-
     /* Popups Menus */
     static QMenu* PopupMenu( qt_intf_t *, bool );
     static QMenu* AudioPopupMenu( qt_intf_t *, bool );

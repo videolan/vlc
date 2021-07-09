@@ -171,30 +171,6 @@ VLCMenuBar::VLCMenuBar(QObject* parent)
     : QObject(parent)
 {}
 
-void VLCMenuBar::createMenuBar( MainInterface *mi,
-                              qt_intf_t *p_intf )
-{
-    /* QMainWindows->menuBar()
-       gives the QProcess::destroyed timeout issue on Cleanlooks style with
-       setDesktopAware set to false */
-    QMenuBar *bar = mi->menuBar();
-
-    addMenuToMainbar( FileMenu( p_intf, bar, mi ), qtr( "&Media" ), bar );
-
-    /* Dynamic menus, rebuilt before being showed */
-    addMenuToMainbar( NavigMenu( p_intf, bar ), qtr( "P&layback" ), bar);
-    addMenuToMainbar( AudioMenu( p_intf, bar ), qtr( "&Audio" ), bar );
-    addMenuToMainbar( VideoMenu( p_intf, bar ), qtr( "&Video" ), bar );
-    addMenuToMainbar( SubtitleMenu( p_intf, bar ), qtr( "Subti&tle" ), bar );
-
-    addMenuToMainbar( ToolsMenu( p_intf, bar ), qtr( "Tool&s" ), bar );
-
-    /* View menu, a bit different */
-    addMenuToMainbar( ViewMenu( p_intf, NULL, mi ), qtr( "V&iew" ), bar );
-
-    addMenuToMainbar( HelpMenu( bar ), qtr( "&Help" ), bar );
-
-}
 
 /**
  * Media ( File ) Menu
