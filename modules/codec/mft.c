@@ -177,6 +177,9 @@ typedef struct
 static const pair_format_guid video_format_table[] =
 {
     { VLC_CODEC_H264, &MFVideoFormat_H264 },
+    { VLC_CODEC_MPGV, &MFVideoFormat_MPEG2 },
+    { VLC_CODEC_MP2V, &MFVideoFormat_MPEG2 },
+    { VLC_CODEC_MP1V, &MFVideoFormat_MPG1 },
     { VLC_CODEC_MJPG, &MFVideoFormat_MJPG },
     { VLC_CODEC_WMV1, &MFVideoFormat_WMV1 },
     { VLC_CODEC_WMV2, &MFVideoFormat_WMV2 },
