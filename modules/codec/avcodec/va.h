@@ -27,7 +27,6 @@
 #include <libavutil/pixdesc.h>
 
 typedef struct vlc_va_t vlc_va_t;
-typedef struct vlc_va_sys_t vlc_va_sys_t;
 typedef struct vlc_decoder_device vlc_decoder_device;
 typedef struct vlc_video_context vlc_video_context;
 
@@ -39,7 +38,7 @@ struct vlc_va_operations {
 struct vlc_va_t {
     struct vlc_object_t obj;
 
-    vlc_va_sys_t *sys;
+    void *sys;
     const struct vlc_va_operations *ops;
 };
 

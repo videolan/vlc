@@ -74,7 +74,7 @@ vlc_module_end()
 #include <initguid.h> /* must be last included to not redefine existing GUIDs */
 DEFINE_GUID(DXVA2_NoEncrypt,                        0x1b81bed0, 0xa0c7, 0x11d3, 0xb9, 0x84, 0x00, 0xc0, 0x4f, 0x2e, 0x73, 0xc5);
 
-struct vlc_va_sys_t
+typedef struct
 {
     d3d11_device_t               *d3d_dev;
 
@@ -94,7 +94,7 @@ struct vlc_va_sys_t
     va_pool_t                     *va_pool;
     ID3D11VideoDecoderOutputView  *hw_surface[MAX_SURFACE_COUNT];
     ID3D11ShaderResourceView      *renderSrc[MAX_SURFACE_COUNT * DXGI_MAX_SHADER_VIEW];
-};
+} vlc_va_sys_t;
 
 /* */
 static int D3dCreateDevice(vlc_va_t *);
@@ -400,17 +400,17 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     int idx = 0;
     const d3d_format_t *decoder_format;
     UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
-    decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
+    decoder_format = FindD3D11Format( va, sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
                                       mode->bit_depth, mode->log2_chroma_h+1, mode->log2_chroma_w+1,
                                       DXGI_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL)
-        decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
+        decoder_format = FindD3D11Format( va, sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
                                         mode->bit_depth, 0, 0, DXGI_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL && mode->bit_depth > 10)
-        decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
+        decoder_format = FindD3D11Format( va, sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
                                         10, 0, 0, DXGI_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL)
-        decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
+        decoder_format = FindD3D11Format( va, sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
                                         0, 0, 0, DXGI_CHROMA_GPU, supportFlags );
     if (decoder_format != NULL)
     {

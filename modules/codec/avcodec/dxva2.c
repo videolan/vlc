@@ -92,7 +92,7 @@ static const d3d9_format_t *D3dFindFormat(D3DFORMAT format)
     return NULL;
 }
 
-struct vlc_va_sys_t
+typedef struct
 {
     /* Direct3D */
     vlc_video_context      *vctx;
@@ -118,7 +118,7 @@ struct vlc_va_sys_t
 
     /* avcodec internals */
     struct dxva_context hw;
-};
+} vlc_va_sys_t;
 
 
 /* */

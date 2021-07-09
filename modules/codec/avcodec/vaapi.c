@@ -49,13 +49,13 @@
 #include "../../hw/vaapi/vlc_vaapi.h"
 #include "va_surface.h"
 
-struct vlc_va_sys_t
+typedef struct
 {
     struct vaapi_context hw_ctx;
     vlc_video_context *vctx;
     va_pool_t *va_pool;
     VASurfaceID render_targets[MAX_SURFACE_COUNT];
-};
+} vlc_va_sys_t;
 
 static int GetVaProfile(const AVCodecContext *ctx, const es_format_t *fmt_in,
                         VAProfile *va_profile, int *vlc_chroma,

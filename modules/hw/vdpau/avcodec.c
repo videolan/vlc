@@ -40,14 +40,14 @@
 #include "vlc_vdpau.h"
 #include "../../codec/avcodec/va.h"
 
-struct vlc_va_sys_t
+typedef struct
 {
     VdpChromaType type;
     void *hwaccel_context;
     uint32_t width;
     uint32_t height;
     vlc_video_context *vctx;
-};
+} vlc_va_sys_t;
 
 static inline vlc_vdp_video_field_t **GetVDPAUContextPrivate(vlc_video_context *vctx)
 {
