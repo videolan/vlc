@@ -584,9 +584,9 @@ codec_LTLIBRARIES += libdmo_plugin.la
 endif
 endif
 
-libmft_plugin_la_SOURCES = codec/mft.c packetizer/h264_nal.c packetizer/h264_nal.h
+libmft_plugin_la_SOURCES = codec/mft.c
 if HAVE_WIN32
-libmft_plugin_la_LIBADD = $(LIBCOM) -luuid -lmfuuid -lmfplat
+libmft_plugin_la_LIBADD = $(LIBCOM) -luuid -lmfuuid -lmfplat libvlc_hxxxhelper.la
 codec_LTLIBRARIES += libmft_plugin.la
 endif
 

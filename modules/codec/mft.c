@@ -43,7 +43,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
-#include "../packetizer/h264_nal.h"
+#include "hxxx_helper.h"
 #define _VIDEOINFOHEADER_
 #include <vlc_codecs.h>
 
@@ -107,7 +107,8 @@ typedef struct
     IMFMediaType *output_type;
 
     /* H264 only. */
-    uint8_t nal_length_size;
+    struct hxxx_helper hh;
+    bool   b_xps_pushed; ///< (for xvcC) parameter sets pushed (SPS/PPS/VPS)
 } decoder_sys_t;
 
 static const int pi_channels_maps[9] =
@@ -619,7 +620,27 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     HRESULT hr;
     IMFSample *input_sample = NULL;
 
-    if (AllocateInputSample(p_dec, stream_id, &input_sample, p_block->i_buffer))
+    block_t *p_xps_blocks = NULL;
+    DWORD alloc_size = p_block->i_buffer;
+
+    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+    {
+        /* in-place NAL to annex B conversion. */
+        p_block = hxxx_helper_process_block(&p_sys->hh, p_block);
+
+        if (p_sys->hh.i_input_nal_length_size && !p_sys->b_xps_pushed)
+        {
+            p_xps_blocks = hxxx_helper_get_extradata_block(&p_sys->hh);
+            if (p_xps_blocks)
+            {
+                size_t extrasize;
+                block_ChainProperties(p_xps_blocks, NULL, &extrasize, NULL);
+                alloc_size += extrasize;
+            }
+        }
+    }
+
+    if (AllocateInputSample(p_dec, stream_id, &input_sample, alloc_size))
         goto error;
 
     IMFMediaBuffer *input_media_buffer = NULL;
@@ -633,11 +654,9 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
         goto error;
 
     memcpy(buffer_start, p_block->p_buffer, p_block->i_buffer);
-
-    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
-    {
-        /* in-place NAL to annex B conversion. */
-        h264_AVC_to_AnnexB(buffer_start, p_block->i_buffer, p_sys->nal_length_size);
+    if (p_xps_blocks) {
+        buffer_start += block_ChainExtract(p_xps_blocks, buffer_start, alloc_size);
+        p_sys->b_xps_pushed = true;
     }
 
     hr = IMFMediaBuffer_Unlock(input_media_buffer);
@@ -661,6 +680,7 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
 
     IMFMediaBuffer_Release(input_media_buffer);
     IMFSample_Release(input_sample);
+    block_ChainRelease(p_xps_blocks);
 
     return VLC_SUCCESS;
 
@@ -668,6 +688,7 @@ error:
     msg_Err(p_dec, "Error in ProcessInputStream()");
     if (input_sample)
         IMFSample_Release(input_sample);
+    block_ChainRelease(p_xps_blocks);
     return VLC_EGENERIC;
 }
 
@@ -1034,22 +1055,8 @@ static int InitializeMFT(decoder_t *p_dec)
         /* It's not an error if the following call fails. */
         IMFAttributes_SetUINT32(attributes, &CODECAPI_AVLowLatencyMode, true);
 
-        if (p_dec->fmt_in.i_extra)
-        {
-            if (h264_isavcC(p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra))
-            {
-                size_t i_buf;
-                uint8_t *buf = h264_avcC_to_AnnexB_NAL(p_dec->fmt_in.p_extra,
-                                                       p_dec->fmt_in.i_extra,
-                                                      &i_buf, &p_sys->nal_length_size);
-                if(buf)
-                {
-                    free(p_dec->fmt_in.p_extra);
-                    p_dec->fmt_in.p_extra = buf;
-                    p_dec->fmt_in.i_extra = i_buf;
-                }
-            }
-        }
+        hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec), p_dec->fmt_in.i_codec, 0, 0);
+        hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
     }
     return VLC_SUCCESS;
 
@@ -1079,6 +1086,9 @@ static void DestroyMFT(decoder_t *p_dec)
         IMFMediaType_Release(p_sys->output_type);
     if (p_sys->mft)
         IMFTransform_Release(p_sys->mft);
+
+    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
+        hxxx_helper_clean(&p_sys->hh);
 
     p_sys->event_generator = NULL;
     p_sys->input_type = NULL;
