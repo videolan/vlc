@@ -410,7 +410,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id, IMFMediaType **resul
 
         if (p_dec->fmt_in.i_cat == VIDEO_ES)
         {
-            if (IsEqualGUID(&subtype, &MFVideoFormat_YV12) || IsEqualGUID(&subtype, &MFVideoFormat_I420))
+            if (IsEqualGUID(&subtype, &MFVideoFormat_NV12) || IsEqualGUID(&subtype, &MFVideoFormat_YV12) || IsEqualGUID(&subtype, &MFVideoFormat_I420))
                 found = true;
             /* Transform might offer output in a D3DFMT propietary FCC. If we can
              * use it, fall back to it in case we do not find YV12 or I420 */
