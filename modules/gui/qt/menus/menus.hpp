@@ -57,44 +57,26 @@ public:
 
 protected:
     /* All main Menus */
-    static QMenu *FileMenu( qt_intf_t *, QMenu *, MainInterface * mi = NULL );
-    static QMenu *FileMenu( qt_intf_t *p_intf, QWidget * parent, MainInterface * mi = NULL ){
-        return FileMenu(p_intf, new QMenu(parent), mi);
-    }
+    static QMenu *FileMenu( qt_intf_t *, QMenu * );
 
     static QMenu *ToolsMenu( qt_intf_t *, QMenu * );
-    static QMenu *ToolsMenu( qt_intf_t * p_intf, QWidget *parent )
-        { return ToolsMenu( p_intf, new QMenu( parent ) ); }
 
-    static QMenu *ViewMenu( qt_intf_t *, QMenu *, MainInterface * mi = NULL );
+    static QMenu *ViewMenu( qt_intf_t *, QMenu *);
 
     static QMenu *InterfacesMenu( qt_intf_t *p_intf, QMenu * );
     static void ExtensionsMenu( qt_intf_t *p_intf, QMenu * );
 
     static QMenu *NavigMenu( qt_intf_t *, QMenu * );
-    static QMenu *NavigMenu( qt_intf_t *p_intf, QWidget *parent ) {
-        return NavigMenu( p_intf, new QMenu( parent ) );
-    }
+
     static QMenu *RebuildNavigMenu(qt_intf_t *, QMenu *);
 
     static QMenu *VideoMenu( qt_intf_t *, QMenu * );
-    static QMenu *VideoMenu( qt_intf_t *p_intf, QWidget *parent ) {
-        return VideoMenu( p_intf, new QMenu( parent ) );
-    }
+
     static QMenu *SubtitleMenu( qt_intf_t *, QMenu *current, bool b_popup = false );
-    static QMenu *SubtitleMenu( qt_intf_t *p_intf, QWidget *parent) {
-        return SubtitleMenu( p_intf, new QMenu( parent ) );
-    }
 
     static QMenu *AudioMenu( qt_intf_t *, QMenu * );
-    static QMenu *AudioMenu( qt_intf_t *p_intf, QWidget *parent ) {
-        return AudioMenu( p_intf, new QMenu( parent ) );
-    }
 
     static QMenu *HelpMenu( QMenu *menu );
-    static QMenu *HelpMenu( QWidget *parent ) {
-        return HelpMenu( new QMenu( parent ) );
-    }
 
     /* Popups Menus */
     static void PopupMenuStaticEntries( QMenu *menu );

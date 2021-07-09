@@ -176,8 +176,9 @@ VLCMenuBar::VLCMenuBar(QObject* parent)
  * Media ( File ) Menu
  * Opening, streaming and quit
  **/
-QMenu *VLCMenuBar::FileMenu( qt_intf_t *p_intf, QMenu *menu, MainInterface *mi )
+QMenu *VLCMenuBar::FileMenu(qt_intf_t *p_intf, QMenu *menu)
 {
+    auto mi = p_intf->p_mi;
     QAction *action;
 
     //use a lambda here as the Triggrered signal is emiting and it will pass false (checked) as a first argument
@@ -284,17 +285,18 @@ QMenu *VLCMenuBar::ToolsMenu( qt_intf_t *p_intf, QMenu *menu )
  * Interface modification, load other interfaces, activate Extensions
  * \param current, set to NULL for menu creation, else for menu update
  **/
-QMenu *VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *current, MainInterface *_mi )
+QMenu *VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *current )
 {
     QAction *action;
     QMenu *menu;
 
-    MainInterface *mi = _mi ? _mi : p_intf->p_mi;
+    MainInterface *mi = p_intf->p_mi;
     assert( mi );
 
     if( !current )
     {
-        menu = new QMenu( qtr( "&View" ), mi );
+        menu = new QMenu( qtr( "&View" ) );
+        menu->setAttribute(Qt::WA_DeleteOnClose);
     }
     else
     {
@@ -821,7 +823,7 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
 
         if( mi )
         {
-            QMenu* viewMenu = ViewMenu( p_intf, NULL, mi );
+            QMenu* viewMenu = ViewMenu( p_intf, NULL );
             viewMenu->setTitle( qtr( "V&iew" ) );
             submenu->addMenu( viewMenu );
         }
