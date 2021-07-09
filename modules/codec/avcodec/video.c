@@ -1556,7 +1556,8 @@ static enum AVPixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     video_format_t fmt;
 
     /* Enumerate available formats */
-    enum AVPixelFormat swfmt = avcodec_default_get_format(p_context, pi_fmt);
+    enum AVPixelFormat defaultfmt = avcodec_default_get_format(p_context, pi_fmt);
+    enum AVPixelFormat swfmt = AV_PIX_FMT_NONE;
     bool can_hwaccel = false;
 
     for (size_t i = 0; pi_fmt[i] != AV_PIX_FMT_NONE; i++)
@@ -1569,8 +1570,22 @@ static enum AVPixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
         msg_Dbg( p_dec, "available %sware decoder output format %d (%s)",
                  hwaccel ? "hard" : "soft", pi_fmt[i], dsc->name );
         if (hwaccel)
+        {
+            /* The default fmt is a hw format, it can happen with some va
+             * implementations (when using a hw_device_ctx). */
+            if (defaultfmt == pi_fmt[i])
+                defaultfmt = AV_PIX_FMT_NONE;
+
             can_hwaccel = true;
+        }
+        else if (swfmt == AV_PIX_FMT_NONE)
+            swfmt = pi_fmt[i];
     }
+
+    /* Use the default fmt in priority of any sw fmt if the default fmt is a hw
+     * one */
+    if (defaultfmt != AV_PIX_FMT_NONE)
+        swfmt = defaultfmt;
 
     if (p_sys->pix_fmt == AV_PIX_FMT_NONE)
         goto no_reuse;
