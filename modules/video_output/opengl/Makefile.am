@@ -223,7 +223,8 @@ endif
 
 libegl_surfacetexture_plugin_la_SOURCES = video_filter/egl_surfacetexture.c
 libegl_surfacetexture_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_OPENGL_ES2
-libegl_surfacetexture_plugin_la_LIBADD = $(EGL_LIBS) libandroid_utils.la libvlc_opengles.la
+libegl_surfacetexture_plugin_la_LIBADD = $(EGL_LIBS) \
+	libandroid_env.la libandroid_utils.la libvlc_opengles.la
 
 if HAVE_ANDROID
 if HAVE_EGL

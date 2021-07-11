@@ -115,15 +115,6 @@ struct vlc_asurfacetexture_operations
 };
 
 /**
- * Attach or get a JNIEnv*
- *
- * The returned JNIEnv* is created from the android JavaVM attached to the VLC
- * object var.
- * \return a valid JNIEnv * or NULL. It doesn't need to be released.
- */
-JNIEnv *android_getEnv(vlc_object_t *p_obj, const char *psz_thread_name);
-
-/**
  * Create new AWindowHandler
  *
  * This handle allow to access IAWindowNativeHandler jobject attached to the

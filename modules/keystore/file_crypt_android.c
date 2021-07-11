@@ -32,7 +32,7 @@
 
 #include <jni.h>
 
-JNIEnv * android_getEnv(vlc_object_t *, const char *);
+#include "../video_output/android/env.h"
 #define GET_ENV() android_getEnv(VLC_OBJECT(p_keystore), "android keystore")
 
 static struct

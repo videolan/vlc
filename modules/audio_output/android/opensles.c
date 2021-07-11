@@ -33,12 +33,13 @@
 #include <dlfcn.h>
 #include <math.h>
 
+#include "../../video_output/android/env.h"
+
 // For native audio
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 
 #include <jni.h>
-JNIEnv *android_getEnv(vlc_object_t *p_obj, const char *psz_thread_name);
 
 #define OPENSLES_BUFFERS 255 /* maximum number of buffers */
 #define OPENSLES_BUFLEN  VLC_TICK_FROM_MS(10)

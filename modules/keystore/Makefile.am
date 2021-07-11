@@ -9,7 +9,7 @@ libfile_keystore_plugin_la_SOURCES = keystore/file.c \
 	keystore/list_util.c keystore/list_util.h
 if HAVE_ANDROID
 libfile_keystore_plugin_la_SOURCES += keystore/file_crypt_android.c
-libfile_keystore_plugin_la_LIBADD = libandroid_utils.la
+libfile_keystore_plugin_la_LIBADD = libandroid_env.la
 endif
 if HAVE_WIN32
 libfile_keystore_plugin_la_SOURCES += keystore/file_crypt_win32.c

@@ -29,7 +29,7 @@
 #include <vlc_modules.h>
 #include <vlc_aout.h>
 #include "device.h"
-#include "../video_output/android/utils.h"
+#include "../video_output/android/env.h"
 
 /* There is an undefined behavior when configuring AudioTrack with SPDIF or
  * more than 2 channels when there is no HDMI out. It may succeed and the

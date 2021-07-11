@@ -37,6 +37,7 @@
 #include "../../packetizer/hevc_nal.h"
 
 #include "mediacodec.h"
+#include "../../video_output/android/env.h"
 
 char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
                          int profile, int *p_quirks);

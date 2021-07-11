@@ -33,7 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include "../video_output/android/utils.h"
+#include "../video_output/android/env.h"
 #include "device.h"
 
 #define SMOOTHPOS_SAMPLE_COUNT 10
