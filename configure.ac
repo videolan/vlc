@@ -404,6 +404,12 @@ case "${host_os}" in
     AC_MSG_CHECKING([Check Android API version])
     ANDROID_API="`echo ${host_os} | tr -c -d '[[:digit:]]'`"
     AC_MSG_RESULT([${ANDROID_API}])
+
+    dnl GLESv2 and EGL are provided by android NDK without .pc files
+    GLES2_LIBS="-lGLESv2"
+    GLES2_CFLAGS=" "
+    EGL_LIBS="-lEGL"
+    EGL_CFLAGS=" "
     ;;
 esac
 
