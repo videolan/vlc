@@ -132,7 +132,7 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
 
     wl_buffer_add_listener(buf, &buffer_cbs, d);
     wl_surface_attach(surface, buf, 0, 0);
-    wl_surface_damage(surface, 0, 0, sys->display_width, sys->display_height);
+    wl_surface_damage(surface, 0, 0, vd->cfg->display.width, vd->cfg->display.height);
     wl_display_flush(display);
 
     sys->active_buffers++;
@@ -187,9 +187,6 @@ static int Control(vout_display_t *vd, int query)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
-            sys->display_width = vd->cfg->display.width;
-            sys->display_height = vd->cfg->display.height;
-
             if (sys->viewport != NULL)
             {
                 video_format_t fmt;
@@ -285,8 +282,6 @@ static int Open(vout_display_t *vd,
     sys->eventq = NULL;
     sys->shm = NULL;
     sys->active_buffers = 0;
-    sys->display_width = vd->cfg->display.width;
-    sys->display_height = vd->cfg->display.height;
 
     /* Get window */
     sys->embed = vd->cfg->window;
