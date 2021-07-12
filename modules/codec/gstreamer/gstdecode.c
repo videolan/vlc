@@ -507,7 +507,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_sys->p_decode_in = gst_element_factory_create(
                 ( GstElementFactory* )p_l->data, NULL );
         VLC_GST_CHECK( p_sys->p_decode_in, NULL,
-                "failed to create decoder", VLC_ENOMOD );
+                "failed to create decoder", VLC_ENOMEM );
     }
     else
     {
@@ -530,8 +530,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->p_que = gst_atomic_queue_new( 0 );
 
     p_sys->p_decode_src = gst_element_factory_make( "appsrc", NULL );
-    VLC_GST_CHECK( p_sys->p_decode_src, NULL, "appsrc not found",
-            VLC_ENOMOD );
+    VLC_GST_CHECK( p_sys->p_decode_src, NULL, "appsrc not found", VLC_ENOMEM );
     g_object_set( G_OBJECT( p_sys->p_decode_src ), "caps", caps.p_sinkcaps,
             "emit-signals", TRUE, "format", GST_FORMAT_BYTES,
             "stream-type", GST_APP_STREAM_TYPE_SEEKABLE,
@@ -553,7 +552,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         p_sys->p_decode_in = gst_element_factory_make( "decodebin", NULL );
         VLC_GST_CHECK( p_sys->p_decode_in, NULL, "decodebin not found",
-                VLC_ENOMOD );
+                       VLC_ENOMEM );
         //g_object_set( G_OBJECT( p_sys->p_decode_in ),
         //"max-size-buffers", 2, NULL );
         //g_signal_connect( G_OBJECT( p_sys->p_decode_in ), "no-more-pads",
@@ -566,7 +565,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* videosink: will emit signal for every available buffer */
     p_sys->p_decode_out = gst_element_factory_make( "vlcvideosink", NULL );
     VLC_GST_CHECK( p_sys->p_decode_out, NULL, "vlcvideosink not found",
-            VLC_ENOMOD );
+                   VLC_ENOMEM );
 
     vlc_pool = var_CreateGetBool( p_dec, "use-vlcpool" );
     msg_Dbg( p_dec, "Using vlc pool? %s", vlc_pool ? "yes ":"no" );
@@ -587,10 +586,9 @@ static int OpenDecoder( vlc_object_t *p_this )
 #endif
 
     p_sys->p_decoder = GST_ELEMENT( gst_bin_new( "decoder" ) );
-    VLC_GST_CHECK( p_sys->p_decoder, NULL, "bin not found", VLC_ENOMOD );
+    VLC_GST_CHECK( p_sys->p_decoder, NULL, "bin not found", VLC_ENOMEM );
     p_sys->p_bus = gst_bus_new( );
-    VLC_GST_CHECK( p_sys->p_bus, NULL, "failed to create bus",
-            VLC_ENOMOD );
+    VLC_GST_CHECK( p_sys->p_bus, NULL, "failed to create bus", VLC_ENOMEM );
     gst_element_set_bus( p_sys->p_decoder, p_sys->p_bus );
 
     gst_bin_add_many( GST_BIN( p_sys->p_decoder ),
