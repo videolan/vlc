@@ -329,7 +329,7 @@ static int Open ( vout_display_t *vd,
     if( !sys->b_fixt23 && vd->cfg->window->type != VOUT_WINDOW_TYPE_HWND )
     {
         free( sys );
-        return VLC_EBADVAR;
+        return VLC_ENOTSUP;
     }
 
     DosCreateEventSem( NULL, &sys->ack_event, 0, FALSE );

@@ -488,6 +488,8 @@ typedef union
 #define VLC_ENOITEM        (-8)
 /** Operation forbidden */
 #define VLC_EACCES         (-9)
+/** Operation not supported */
+#define VLC_ENOTSUP        (-10)
 
 /*****************************************************************************
  * Variable callbacks: called when the value is modified

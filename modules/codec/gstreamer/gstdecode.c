@@ -502,8 +502,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         /* Sort them as per ranks */
         p_list = g_list_sort( p_list, gst_plugin_feature_rank_compare_func );
         p_l = g_list_find_custom( p_list, &caps, find_decoder_func );
-        VLC_GST_CHECK( p_l, NULL, "no suitable decoder found",
-                VLC_ENOMOD );
+        VLC_GST_CHECK( p_l, NULL, "no suitable decoder found", VLC_ENOTSUP );
         /* create the decoder with highest rank */
         p_sys->p_decode_in = gst_element_factory_create(
                 ( GstElementFactory* )p_l->data, NULL );
@@ -516,8 +515,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         /* Just check if any suitable decoder exists, rest will be
          * handled by decodebin */
         p_l = g_list_find_custom( p_list, &caps, find_decoder_func );
-        VLC_GST_CHECK( p_l, NULL, "no suitable decoder found",
-                VLC_ENOMOD );
+        VLC_GST_CHECK( p_l, NULL, "no suitable decoder found", VLC_ENOTSUP );
     }
     gst_plugin_feature_list_free( p_list );
     p_list = NULL;

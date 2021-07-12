@@ -117,7 +117,7 @@ int D3D11_CreateProcessor(vlc_object_t *o, d3d11_device_t *d3d_dev,
     return VLC_SUCCESS;
 error:
     D3D11_ReleaseProcessor(out);
-    return VLC_ENOMOD;
+    return VLC_ENOTSUP;
 }
 
 void D3D11_ReleaseProcessor(d3d11_processor_t *out)

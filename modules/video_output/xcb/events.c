@@ -108,7 +108,7 @@ int vlc_xcb_parent_Create(vout_display_t *vd, const vout_window_t *wnd,
     if (wnd->type != VOUT_WINDOW_TYPE_XID)
     {
         msg_Err (vd, "window not available");
-        return VLC_EBADVAR;
+        return VLC_ENOTSUP;
     }
 
     xcb_connection_t *conn = Connect (VLC_OBJECT(vd), wnd->display.x11);
