@@ -100,9 +100,7 @@ int vlclua_push_ret( lua_State *L, int i_error )
         case VLC_ENOMEM:    err = ENOMEM;    break;
         case VLC_ETIMEOUT:  err = ETIMEDOUT; break;
         case VLC_EINVAL:    err = EINVAL;    break;
-        case VLC_ENOMOD:    err = ENOENT;    break;
-        case VLC_ENOOBJ:    err = ENOENT;    break;
-        case VLC_ENOVAR:    err = ENOENT;    break;
+        case VLC_ENOENT:    err = ENOENT;    break;
         case VLC_EGENERIC:
             lua_pushstring( L, "generic error" );
             return 2;

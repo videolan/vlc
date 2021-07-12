@@ -182,7 +182,7 @@ static int Create( filter_t* p_filter )
         vlc_object_delete(p_sys->p_opencv);
         free( p_sys );
 
-        return VLC_ENOMOD;
+        return VLC_ENOENT;
     }
     assert( p_sys->p_opencv->ops != NULL );
 

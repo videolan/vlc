@@ -208,13 +208,13 @@ static int Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx, AVFrame *frame
 
     vlc_va_surface_t *va_surface = va_pool_Get(sys->va_pool);
     if (unlikely(va_surface==NULL))
-        return VLC_ENOITEM;
+        return VLC_ENOENT;
 
     pic->context = NewSurfacePicContext(va, va_surface);
     if (unlikely(pic->context == NULL))
     {
         va_surface_Release(va_surface);
-        return VLC_ENOITEM;
+        return VLC_ENOENT;
     }
     frame->data[3] = (uint8_t*)DXVA2_PICCONTEXT_FROM_PICCTX(pic->context)->ctx.picsys.surface;
     return VLC_SUCCESS;

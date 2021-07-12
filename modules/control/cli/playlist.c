@@ -483,7 +483,7 @@ static int PlaylistMove(struct cli_client *cl, const char *const *args,
         cli_printf(cl, vlc_ngettext("Playlist has only %zu element",
                                     "Playlist has only %zu elements", size),
                   size);
-        ret = VLC_ENOITEM;
+        ret = VLC_ENOENT;
     }
     vlc_playlist_Unlock(playlist);
     return ret;

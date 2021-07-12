@@ -421,7 +421,7 @@ static void test_creation_and_type( libvlc_int_t *p_libvlc )
     var_Destroy( p_libvlc, "bla" );
     var_Destroy( p_libvlc, "bla" );
     var_Destroy( p_libvlc, "bla" );
-    assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOVAR );
+    assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOENT );
 
     var_Create( p_libvlc, "program", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     assert( var_Type( p_libvlc, "program" ) == (VLC_VAR_INTEGER) );
@@ -432,7 +432,7 @@ static void test_creation_and_type( libvlc_int_t *p_libvlc )
     var_Destroy( p_libvlc, "bla" );
     var_Destroy( p_libvlc, "bla" );
     var_Destroy( p_libvlc, "bla" );
-    assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOVAR );
+    assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOENT );
 
     var_Create( p_libvlc, "bla", VLC_VAR_INTEGER );
     assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND ) == VLC_SUCCESS );
@@ -441,7 +441,7 @@ static void test_creation_and_type( libvlc_int_t *p_libvlc )
     var_Destroy( p_libvlc, "bla" );
     var_Destroy( p_libvlc, "bla" );
     var_Destroy( p_libvlc, "bla" );
-    assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOVAR );
+    assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOENT );
 }
 
 static void test_variables( libvlc_instance_t *p_vlc )

@@ -270,7 +270,7 @@ static int vlclua_playlist_gotoitem(lua_State *L)
     vlc_playlist_Lock(playlist);
     ssize_t index = vlc_playlist_IndexOfId(playlist, id);
     if (index == -1)
-        ret = VLC_ENOITEM;
+        ret = VLC_ENOENT;
     else
     {
         vlc_playlist_GoTo(playlist, index);

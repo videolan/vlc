@@ -651,7 +651,7 @@ int DBMSDIOutput::doSchedule()
         StartPlayback();
     }
 
-    return (bufferedFramesCount < bufferedFramesTarget) ? VLC_ENOITEM : VLC_SUCCESS;
+    return (bufferedFramesCount < bufferedFramesTarget) ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 int DBMSDIOutput::ProcessAudio(block_t *p_block)

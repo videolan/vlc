@@ -476,16 +476,10 @@ typedef union
 #define VLC_ENOMEM         (-2)
 /** Timeout */
 #define VLC_ETIMEOUT       (-3)
-/** Module not found */
-#define VLC_ENOMOD         (-4)
-/** Object not found */
-#define VLC_ENOOBJ         (-5)
-/** Variable not found */
-#define VLC_ENOVAR         (-6)
+/** Not found */
+#define VLC_ENOENT         (-4)
 /** Bad variable value */
 #define VLC_EINVAL         (-7)
-/** Item not found */
-#define VLC_ENOITEM        (-8)
 /** Operation forbidden */
 #define VLC_EACCES         (-9)
 /** Operation not supported */

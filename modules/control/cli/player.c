@@ -366,7 +366,7 @@ static int PlayerSetChapter(struct cli_client *cl, const char *const *args,
         else
         {
             cli_printf(cl, "No chapter selected.");
-            ret = VLC_ENOITEM;
+            ret = VLC_ENOENT;
         }
     }
     vlc_player_Unlock(player);
@@ -401,7 +401,7 @@ static int PlayerSetTitle(struct cli_client *cl, const char *const *args,
         else
         {
             cli_printf(cl, "No title selected.");
-            ret = VLC_ENOITEM;
+            ret = VLC_ENOENT;
         }
     }
     vlc_player_Unlock(player);
@@ -527,7 +527,7 @@ static int PlayerItemInfo(struct cli_client *cl, const char *const *args,
         cli_printf(cl, "no input");
     vlc_player_Unlock(player);
     (void) args; (void) count;
-    return (item != NULL) ? 0 : VLC_ENOITEM;
+    return (item != NULL) ? 0 : VLC_ENOENT;
 }
 
 static int PlayerGetTime(struct cli_client *cl, const char *const *args,
@@ -540,7 +540,7 @@ static int PlayerGetTime(struct cli_client *cl, const char *const *args,
     t = vlc_player_GetTime(player);
     vlc_player_Unlock(player);
     if (t == VLC_TICK_INVALID)
-        return VLC_ENOITEM;
+        return VLC_ENOENT;
 
     cli_printf(cl, "%"PRIu64, SEC_FROM_VLC_TICK(t));
     (void) args; (void) count;
@@ -558,7 +558,7 @@ static int PlayerGetLength(struct cli_client *cl, const char *const *args,
     vlc_player_Unlock(player);
 
     if (l == VLC_TICK_INVALID)
-        return VLC_ENOITEM;
+        return VLC_ENOENT;
 
     cli_printf(cl, "%"PRIu64, SEC_FROM_VLC_TICK(l));
     (void) args; (void) count;
@@ -576,7 +576,7 @@ static int PlayerGetTitle(struct cli_client *cl, const char *const *args,
     cli_printf(cl, "%s", (title != NULL) ? title->name : "");
     vlc_player_Unlock(player);
     (void) args; (void) count;
-    return (title != NULL) ? 0 : VLC_ENOITEM;
+    return (title != NULL) ? 0 : VLC_ENOENT;
 }
 
 static int PlayerVoutSnapshot(struct cli_client *cl, const char *const *args,
@@ -707,7 +707,7 @@ static int VideoConfig(struct cli_client *cl, const char *const *args,
             if( psz_value == NULL )
             {
                 vout_Release(p_vout);
-                return VLC_ENOVAR;
+                return VLC_ENOENT;
             }
         }
 
@@ -772,7 +772,7 @@ static int AudioDevice(struct cli_client *cl, const char *const *args,
     int ret = 0;
 
     if (aout == NULL)
-        return VLC_ENOOBJ;
+        return VLC_ENOENT;
 
     char **ids, **names;
     int n = aout_DevicesList(aout, &ids, &names);
@@ -836,7 +836,7 @@ static int AudioChannel(struct cli_client *cl, const char *const *args,
     int ret = 0;
 
     if ( p_aout == NULL )
-         return VLC_ENOOBJ;
+         return VLC_ENOENT;
 
     if ( !*arg )
     {
@@ -933,7 +933,7 @@ static int Statistics(struct cli_client *cl, const char *const *args,
     }
     vlc_player_Unlock(player);
     (void) args; (void) count;
-    return (item != NULL) ? 0 : VLC_ENOITEM;
+    return (item != NULL) ? 0 : VLC_ENOENT;
 }
 
 static int IsPlaying(struct cli_client *cl, const char *const *args,

@@ -537,7 +537,7 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
 - (int)preparseInputItem
 {
     if (!_vlcInputItem) {
-        return VLC_ENOVAR;
+        return VLC_ENOENT;
     }
 
     return libvlc_MetadataRequest(vlc_object_instance(getIntf()),
@@ -558,7 +558,7 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
 - (int)writeMetadataToFile
 {
     if (!_vlcInputItem) {
-        return VLC_ENOVAR;
+        return VLC_ENOENT;
     }
     return input_item_WriteMeta(VLC_OBJECT(getIntf()), _vlcInputItem);
 }

@@ -790,7 +790,7 @@ static int Scan_GetNextTunerConfig( scan_t *p_scan, scan_tuner_config_t *p_cfg, 
         }
     }
 
-    return VLC_ENOITEM;
+    return VLC_ENOENT;
 }
 
 static int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
@@ -852,7 +852,7 @@ int scan_Run( scan_t *p_scan )
 {
     scan_tuner_config_t cfg;
     if( scan_Next( p_scan, &cfg ) )
-        return VLC_ENOITEM;
+        return VLC_ENOENT;
 
     scan_session_t *session = scan_session_New( p_scan, &cfg );
     if( unlikely(session == NULL) )

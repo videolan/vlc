@@ -70,7 +70,7 @@ vlc_playlist_ExpandItemFromNode(vlc_playlist_t *playlist,
     input_item_t *media = subitems->p_item;
     ssize_t index = vlc_playlist_IndexOfMedia(playlist, media);
     if (index == -1)
-        return VLC_ENOITEM;
+        return VLC_ENOENT;
 
     /* replace the item by its flatten subtree */
     return vlc_playlist_ExpandItem(playlist, index, subitems);

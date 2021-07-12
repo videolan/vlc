@@ -322,7 +322,7 @@ static int ScanReadCallback( scan_t *p_scan, void *p_privdata,
         }
         else if( i_ret == 0 )
         {
-            return VLC_ENOITEM;
+            return VLC_ENOENT;
         }
 
         if( ufds[1].revents )

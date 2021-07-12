@@ -746,7 +746,7 @@ static int BossCallback(vlc_object_t *p_this,
 - (int)setCurrentMedia:(VLCInputItem *)currentMedia
 {
     if (currentMedia == NULL) {
-        return VLC_ENOITEM;
+        return VLC_ENOENT;
     }
     vlc_player_Lock(_p_player);
     int ret = vlc_player_SetCurrentMedia(_p_player, currentMedia.vlcInputItem);

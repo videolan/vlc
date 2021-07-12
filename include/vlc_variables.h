@@ -188,7 +188,7 @@ VLC_API int var_GetChecked( vlc_object_t *, const char *, int, vlc_value_t * );
  *           (see \ref vlc_var_atomic_op)
  * \param value value of the variable after the modification
  * \retval VLC_SUCCESS Operation successful
- * \retval VLC_ENOVAR Variable not found
+ * \retval VLC_ENOENT Variable not found
  *
  * \bug The modified value is returned rather than the original value.
  * As such, the original value cannot be known in the case of non-reversible
