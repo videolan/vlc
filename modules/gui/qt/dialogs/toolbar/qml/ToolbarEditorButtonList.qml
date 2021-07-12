@@ -138,36 +138,39 @@ GridView {
             buttonDragItem.updatePos(pos.x, pos.y)
         }
 
-        Loader {
+        Rectangle {
             anchors.fill: parent
 
-            active: containsMouse && !buttonDragItem.Drag.active
+            implicitWidth: childrenRect.width
+            implicitHeight: childrenRect.height
 
-            sourceComponent: Rectangle {
-                color: VLCStyle.colors.bgHover
-            }
-        }
+            color: "transparent"
 
-        ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: 10
+            border.width: VLCStyle.dp(1, VLCStyle.scale)
+            border.color: containsMouse && !buttonDragItem.Drag.active ? VLCStyle.colors.buttonBorder
+                                                                       : "transparent"
 
-            EditorDummyButton {
-                Layout.preferredWidth: VLCStyle.icon_medium
-                Layout.preferredHeight: VLCStyle.icon_medium
-                Layout.alignment: Qt.AlignHCenter
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 10
 
-                text: PlayerControlbarControls.controlList[model.index].label
-            }
+                EditorDummyButton {
+                    Layout.preferredWidth: VLCStyle.icon_medium
+                    Layout.preferredHeight: VLCStyle.icon_medium
+                    Layout.alignment: Qt.AlignHCenter
 
-            Widgets.ListSubtitleLabel {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                    text: PlayerControlbarControls.controlList[model.index].label
+                }
 
-                elide: Text.ElideNone
-                text: PlayerControlbarControls.controlList[model.index].text
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignHCenter
+                Widgets.ListSubtitleLabel {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    elide: Text.ElideNone
+                    text: PlayerControlbarControls.controlList[model.index].text
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                }
             }
         }
     }

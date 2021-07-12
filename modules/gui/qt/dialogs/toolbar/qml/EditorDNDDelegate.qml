@@ -34,8 +34,8 @@ MouseArea {
 
     drag.target: content
 
-    width: loader.width
-    height: VLCStyle.icon_medium
+    implicitWidth: loader.implicitWidth + content.border.width * 2
+    implicitHeight: VLCStyle.icon_medium
 
     hoverEnabled: true
 
@@ -51,15 +51,6 @@ MouseArea {
 
         target: root
         property: "dragActive"
-    }
-
-    Rectangle {
-        anchors.fill: parent
-
-        z: -1
-
-        visible: dragArea.containsMouse && !pressed
-        color: VLCStyle.colors.bgHover
     }
 
     Rectangle {
@@ -106,7 +97,16 @@ MouseArea {
             verticalCenter: parent.verticalCenter
         }
 
+        implicitWidth: loader.implicitWidth
+        implicitHeight: loader.implicitHeight
+
         opacity: Drag.active ? 0.75 : 1.0
+
+        color: "transparent"
+
+        border.width: VLCStyle.dp(1, VLCStyle.scale)
+        border.color: dragArea.containsMouse && !pressed ? VLCStyle.colors.buttonBorder
+                                                         : "transparent"
 
         Drag.active: pressed
         Drag.source: dragArea
