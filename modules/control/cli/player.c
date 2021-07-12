@@ -848,7 +848,7 @@ static int AudioChannel(struct cli_client *cl, const char *const *args,
         if ( var_Change( p_aout, "stereo-mode", VLC_VAR_GETCHOICES,
                          &count, &val, &text ) < 0 )
         {
-            ret = VLC_ENOVAR;
+            ret = VLC_EACCES;
             goto out;
         }
 

@@ -486,6 +486,8 @@ typedef union
 #define VLC_EBADVAR        (-7)
 /** Item not found */
 #define VLC_ENOITEM        (-8)
+/** Operation forbidden */
+#define VLC_EACCES         (-9)
 
 /*****************************************************************************
  * Variable callbacks: called when the value is modified

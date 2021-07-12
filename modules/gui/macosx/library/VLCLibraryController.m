@@ -85,7 +85,7 @@
 - (int)appendItemToPlaylist:(VLCMediaLibraryMediaItem *)mediaItem playImmediately:(BOOL)playImmediately
 {
     if (!_p_libraryInstance) {
-        return VLC_ENOOBJ;
+        return VLC_EACCES;
     }
     input_item_t *p_inputItem = vlc_ml_get_input_item(_p_libraryInstance, mediaItem.libraryID);
     if (!p_inputItem) {
@@ -100,7 +100,7 @@
 - (int)appendItemsToPlaylist:(NSArray <VLCMediaLibraryMediaItem *> *)mediaItemArray playFirstItemImmediately:(BOOL)playFirstItemImmediately
 {
     if (!_p_libraryInstance) {
-        return VLC_ENOOBJ;
+        return VLC_EACCES;
     }
 
     NSUInteger itemCount = [mediaItemArray count];
@@ -138,7 +138,7 @@
 - (int)addFolderWithFileURL:(NSURL *)fileURL
 {
     if (!_p_libraryInstance) {
-        return VLC_ENOOBJ;
+        return VLC_EACCES;
     }
     if (!fileURL) {
         return VLC_EBADVAR;
@@ -149,7 +149,7 @@
 - (int)banFolderWithFileURL:(NSURL *)fileURL
 {
     if (!_p_libraryInstance) {
-        return VLC_ENOOBJ;
+        return VLC_EACCES;
     }
     if (!fileURL) {
         return VLC_EBADVAR;
@@ -160,7 +160,7 @@
 - (int)unbanFolderWithFileURL:(NSURL *)fileURL
 {
     if (!_p_libraryInstance) {
-        return VLC_ENOOBJ;
+        return VLC_EACCES;
     }
     if (!fileURL) {
         return VLC_EBADVAR;
@@ -171,7 +171,7 @@
 - (int)removeFolderWithFileURL:(NSURL *)fileURL
 {
     if (!_p_libraryInstance) {
-        return VLC_ENOOBJ;
+        return VLC_EACCES;
     }
     if (!fileURL) {
         return VLC_EBADVAR;
@@ -182,7 +182,7 @@
 - (int)clearHistory
 {
     if (!_p_libraryInstance) {
-        return VLC_ENOOBJ;
+        return VLC_EACCES;
     }
     return vlc_ml_clear_history(_p_libraryInstance);
 }
