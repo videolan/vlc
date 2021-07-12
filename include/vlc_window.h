@@ -350,8 +350,7 @@ struct vlc_window_callbacks {
     void (*visibility_changed)(struct vlc_window *,
                                enum vlc_window_visibility visibility);
 
-    void (*vsync_reached)(struct vlc_window *,
-                          vlc_tick_t next_vsync);
+    void (*vsync_reached)(struct vlc_window *, vlc_tick_t next_vsync);
 };
 
 /**
@@ -800,6 +799,12 @@ vlc_window_ReportVisibilityChanged(vlc_window_t *window,
         window->owner.cbs->visibility_changed(window, visibility);
 }
 
+static inline void
+vlc_window_ReportVsyncReached(vlc_window_t *window, vlc_tick_t next_vsync)
+{
+    if (window->owner.cbs->vsync_reached != NULL)
+        window->owner.cbs->vsync_reached(window, next_vsync);
+}
 /** @} */
 /** @} */
 #endif /* VLC_WINDOW_H */
