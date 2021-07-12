@@ -246,6 +246,7 @@ void FakeESOut::createOrRecycleRealEsID( AbstractFakeESOutID *es_id_ )
     recycle_candidates.insert(recycle_candidates.begin(), declared.begin(), declared.end());
     declared.clear();
 
+    bool b_replace_es = true;
     bool b_preexisting = false;
     bool b_select = false;
     for( it=recycle_candidates.begin(); it!=recycle_candidates.end(); ++it )
@@ -261,12 +262,24 @@ void FakeESOut::createOrRecycleRealEsID( AbstractFakeESOutID *es_id_ )
         }
         else if( cand->getFmt()->i_cat == es_id->getFmt()->i_cat && cand->realESID() )
         {
-            b_preexisting = true;
-            /* We need to enforce same selection when not reused
-               Otherwise the es will select any other compatible track
-               and will end this in a activate/select loop when reactivating a track */
-            if( !b_select )
-                es_out_Control( real_es_out, ES_OUT_GET_ES_STATE, cand->realESID(), &b_select );
+            if( b_replace_es )
+            {
+                b_preexisting = true;
+                /* We need to enforce same selection when not reused
+                   Otherwise the es will select any other compatible track
+                   and will end this in a activate/select loop when reactivating a track */
+                if( !b_select )
+                    es_out_Control( real_es_out, ES_OUT_GET_ES_STATE, cand->realESID(), &b_select );
+            }
+            else /* replace format instead of new ES */
+            {
+                realid = cand->realESID();
+                cand->setRealESID( nullptr );
+                es_out_Control( real_es_out, ES_OUT_SET_ES_FMT, realid, es_id->getFmt() );
+                delete *it;
+                recycle_candidates.erase( it );
+                break;
+            }
         }
     }
 
