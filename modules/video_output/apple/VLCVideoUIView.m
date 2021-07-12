@@ -238,6 +238,10 @@
     vlc_tick_t now = vlc_tick_now();
     CFTimeInterval current_ts = [sender timestamp];
     CFTimeInterval target_ts = 0.;
+
+    // TODO: clock timeline?
+    vlc_tick_t offset =  vlc_tick_from_sec(target_ts - current_ts);
+
     if (@available(iOS 10, *))
         target_ts = [sender targetTimestamp];
     if (atomic_load(&_avstatEnabled))
@@ -246,6 +250,10 @@
                  NS_FROM_VLC_TICK(now),
                  NS_FROM_VLC_TICK(vlc_tick_from_sec(current_ts)),
                  NS_FROM_VLC_TICK(vlc_tick_from_sec(target_ts)));
+
+    [self reportEvent:^{ 
+        vout_window_ReportVsyncReached(_wnd, now + offset);
+    }];
 
     vlc_mutex_unlock(&_mutex);
 }
