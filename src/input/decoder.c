@@ -744,7 +744,7 @@ static int InputThread_GetInputAttachments( decoder_t *p_dec,
 {
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
     if (!p_owner->cbs || !p_owner->cbs->get_attachments)
-        return VLC_ENOOBJ;
+        return VLC_EINVAL;
 
     int ret = p_owner->cbs->get_attachments(p_owner, ppp_attachment,
                                             p_owner->cbs_userdata);

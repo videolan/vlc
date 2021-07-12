@@ -187,7 +187,7 @@ extern "C" int DWrite_GetFontStream( vlc_font_select_t *fs, int i_index, FT_Stre
     dw_sys_t *p_dw_sys = ( dw_sys_t * ) fs->p_dw_sys;
 
     if( i_index < 0 || i_index >= ( int ) p_dw_sys->streams.size() )
-        return VLC_ENOITEM;
+        return VLC_EINVAL;
 
     *pp_stream = p_dw_sys->streams.at( i_index );
 

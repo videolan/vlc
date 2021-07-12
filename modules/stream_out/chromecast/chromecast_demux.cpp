@@ -467,7 +467,7 @@ int Open(vlc_object_t *p_this)
     if ( p_renderer == NULL )
     {
         msg_Warn( p_this, "using Chromecast demuxer with no sout" );
-        return VLC_ENOOBJ;
+        return VLC_EINVAL;
     }
 
     demux_cc *p_sys = new(std::nothrow) demux_cc( p_demux, p_renderer );

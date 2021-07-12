@@ -112,7 +112,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_stream, "Fingerprint data holder not set" );
         free( p_sys );
-        return VLC_ENOVAR;
+        return VLC_EINVAL;
     }
     msg_Dbg( p_stream, "chromaprint version %s", chromaprint_get_version() );
     p_sys->p_chromaprint_ctx = chromaprint_new( CHROMAPRINT_ALGORITHM_DEFAULT );

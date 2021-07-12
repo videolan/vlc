@@ -221,26 +221,26 @@ static int ReadDir(stream_t *s, input_item_node_t *node)
     {
         msg_Warn(s, "error running script %s: function %s(): %s",
                  sys->filename, "parse", "not found");
-        return VLC_ENOITEM;
+        return VLC_EINVAL;
     }
 
     if( lua_pcall( L, 0, 1, 0 ) )
     {
         msg_Warn(s, "error running script %s: function %s(): %s",
                  sys->filename, "parse", lua_tostring(L, lua_gettop(L)));
-        return VLC_ENOITEM;
+        return VLC_EINVAL;
     }
 
     if (!lua_gettop(L))
     {
         msg_Err(s, "script went completely foobar");
-        return VLC_ENOITEM;
+        return VLC_EINVAL;
     }
 
     if (!lua_istable(L, -1))
     {
         msg_Warn(s, "Playlist should be a table.");
-        return VLC_ENOITEM;
+        return VLC_EINVAL;
     }
 
     lua_pushnil(L);
