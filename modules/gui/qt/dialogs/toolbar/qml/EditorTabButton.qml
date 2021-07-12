@@ -24,7 +24,7 @@ import "qrc:///widgets/" as Widgets
 TabButton {
     id: mainPlayerControl
 
-    property bool active: index == bar.currentIndex
+    readonly property bool active: index === bar.currentIndex
 
     implicitWidth: VLCStyle.button_width_large
 
@@ -60,6 +60,14 @@ TabButton {
             visible: active
 
             height: parent.border.width * 2
+        }
+    }
+
+    DropArea {
+        anchors.fill: parent
+
+        onEntered: {
+            bar.currentIndex = index
         }
     }
 }

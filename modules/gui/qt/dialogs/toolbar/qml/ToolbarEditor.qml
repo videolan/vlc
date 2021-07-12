@@ -45,6 +45,8 @@ Rectangle{
 
             background: Item { }
 
+            readonly property int currentIdentifier: currentItem.identifier
+
             Repeater {
                 model: PlayerListModel.model
 
@@ -87,109 +89,115 @@ Rectangle{
                 font.pixelSize: VLCStyle.fontSize_xxlarge
             }
 
-            StackLayout{
-                anchors.fill: parent
-                currentIndex: bar.currentIndex
+            Repeater {
+                model: PlayerListModel.model
 
-                Repeater {
-                    model: PlayerListModel.model
+                delegate: RowLayout {
+                    id: layout
 
-                    delegate: RowLayout {
-                        id: layout
+                    // can't use StackLayout or change visibility
+                    // because there is a bug with the dragging
+                    // that it doesn't work when the visibility
+                    // is set to false, so instead use stacking
+                    // and width/height to show the current view
+                    clip: true
+                    z: bar.currentIdentifier === identifier ? 0 : -1
+                    width: bar.currentIdentifier === identifier ? parent.width : 0
+                    height: bar.currentIdentifier === identifier ? parent.height : 0
+                    visible: root._held || (bar.currentIdentifier === identifier)
 
-                        readonly property int identifier: modelData.identifier
-                        readonly property var model: {
-                            if (!!mainInterface.controlbarProfileModel.currentModel)
-                                return mainInterface.controlbarProfileModel.currentModel.getModel(identifier)
-                            else
-                                return undefined
-                        }
+                    readonly property int identifier: modelData.identifier
+                    readonly property var model: {
+                        if (!!mainInterface.controlbarProfileModel.currentModel)
+                            return mainInterface.controlbarProfileModel.currentModel.getModel(identifier)
+                        else
+                            return undefined
+                    }
 
-                        spacing: VLCStyle.margin_small
+                    spacing: VLCStyle.margin_small
 
-                        Repeater {
-                            id: repeater
+                    Repeater {
+                        id: repeater
 
-                            model: 3 // left, center, and right
+                        model: 3 // left, center, and right
 
-                            function getModel(index) {
-                                if (!!layout.model) {
-                                    switch (index) {
-                                    case 0:
-                                        return layout.model.left
-                                    case 1:
-                                        return layout.model.center
-                                    case 2:
-                                        return layout.model.right
-                                    default:
-                                        return undefined
-                                    }
-                                } else {
-                                    return undefined
-                                }
-                            }
-
-                            function getMetric(index) {
+                        function getModel(index) {
+                            if (!!layout.model) {
                                 switch (index) {
                                 case 0:
-                                    return leftMetric
+                                    return layout.model.left
                                 case 1:
-                                    return centerMetric
+                                    return layout.model.center
                                 case 2:
-                                    return rightMetric
+                                    return layout.model.right
+                                default:
+                                    return undefined
                                 }
+                            } else {
+                                return undefined
+                            }
+                        }
+
+                        function getMetric(index) {
+                            switch (index) {
+                            case 0:
+                                return leftMetric
+                            case 1:
+                                return centerMetric
+                            case 2:
+                                return rightMetric
+                            }
+                        }
+
+                        Loader {
+                            id : playerBtnDND
+                            active: !!repeater.getModel(index)
+
+                            Layout.fillHeight: true
+                            Layout.fillWidth: count > 0 ||
+                                              (repeater.itemAt(0).count === 0 &&
+                                               repeater.itemAt(1).count === 0 &&
+                                               repeater.itemAt(2).count === 0)
+
+                            Layout.minimumWidth: Math.max(leftMetric.width,
+                                                          centerMetric.width,
+                                                          rightMetric.width) * 1.25
+                            Layout.margins: parentRectangle.border.width
+
+                            readonly property int count: {
+                                if (status === Loader.Ready)
+                                    return item.count
+                                else
+                                    return 0
                             }
 
-                            Loader {
-                                id : playerBtnDND
-                                active: !!repeater.getModel(index)
+                            sourceComponent: Rectangle {
+                                color: VLCStyle.colors.bgAlt
 
-                                Layout.fillHeight: true
-                                Layout.fillWidth: count > 0 ||
-                                                  (repeater.itemAt(0).count === 0 &&
-                                                   repeater.itemAt(1).count === 0 &&
-                                                   repeater.itemAt(2).count === 0)
+                                property alias count: dndView.count
 
-                                Layout.minimumWidth: Math.max(leftMetric.width,
-                                                              centerMetric.width,
-                                                              rightMetric.width) * 1.25
-                                Layout.margins: parentRectangle.border.width
+                                EditorDNDView {
+                                    id: dndView
+                                    anchors.fill: parent
 
-                                readonly property int count: {
-                                    if (status === Loader.Ready)
-                                        return item.count
-                                    else
-                                        return 0
-                                }
+                                    model: repeater.getModel(index)
 
-                                sourceComponent: Rectangle {
-                                    color: VLCStyle.colors.bgAlt
+                                    onContainsDragChanged: {
+                                        if (containsDrag)
+                                            _viewThatContainsDrag = this
+                                        else if (_viewThatContainsDrag === this)
+                                            _viewThatContainsDrag = null
+                                    }
 
-                                    property alias count: dndView.count
-
-                                    EditorDNDView {
-                                        id: dndView
+                                    Text {
                                         anchors.fill: parent
 
-                                        model: repeater.getModel(index)
-
-                                        onContainsDragChanged: {
-                                            if (containsDrag)
-                                                _viewThatContainsDrag = this
-                                            else if (_viewThatContainsDrag === this)
-                                                _viewThatContainsDrag = null
-                                        }
-
-                                        Text {
-                                            anchors.fill: parent
-
-                                            text: repeater.getMetric(index).text
-                                            verticalAlignment: Text.AlignVCenter
-                                            font.pixelSize: VLCStyle.fontSize_xxlarge
-                                            color: VLCStyle.colors.menuCaption
-                                            horizontalAlignment: Text.AlignHCenter
-                                            visible: (playerBtnDND.count === 0)
-                                        }
+                                        text: repeater.getMetric(index).text
+                                        verticalAlignment: Text.AlignVCenter
+                                        font.pixelSize: VLCStyle.fontSize_xxlarge
+                                        color: VLCStyle.colors.menuCaption
+                                        horizontalAlignment: Text.AlignHCenter
+                                        visible: (playerBtnDND.count === 0)
                                     }
                                 }
                             }

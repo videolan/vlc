@@ -124,13 +124,11 @@ ListView {
                 if (drag.source.dndView === playerBtnDND) {
                     // moving from same section
                     playerBtnDND.model.move(drag.source.DelegateModel.itemsIndex, playerBtnDND.count - 1)
-                }
-                else if (drag.source.objectName == "buttonsList"){
+                } else if (drag.source.objectName == "buttonsList"){
                     // moving from buttonsList
                     playerBtnDND.model.insert(playerBtnDND.count, {"id" : drag.source.mIndex})
-                }
-                else {
-                    // moving between sections
+                } else {
+                    // moving between sections or views
                     playerBtnDND.model.insert(playerBtnDND.count, {"id" : drag.source.controlId})
                     drag.source.dndView.model.remove(drag.source.DelegateModel.itemsIndex)
                 }

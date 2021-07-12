@@ -180,13 +180,11 @@ MouseArea {
                 if(srcIndex < destIndex)
                     destIndex -= 1
                 playerBtnDND.model.move(srcIndex,destIndex)
-            }
-            else if (drag.source.objectName == "buttonsList"){
+            } else if (drag.source.objectName == "buttonsList") {
                 // moving from buttonsList
                 dndView.model.insert(parent.DelegateModel.itemsIndex, {"id" : drag.source.mIndex})
-            }
-            else {
-                // moving between sections
+            } else {
+                // moving between sections or views
                 dndView.model.insert(parent.DelegateModel.itemsIndex, {"id" : drag.source.controlId})
                 drag.source.dndView.model.remove(drag.source.DelegateModel.itemsIndex)
             }
