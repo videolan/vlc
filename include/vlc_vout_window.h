@@ -184,8 +184,6 @@ typedef struct vout_window_cfg_t {
 
 } vout_window_cfg_t;
 
-typedef void (*vout_window_ack_cb)(struct vout_window_t *, void *);
-
 /**
  * Callback prototype for window event acknowledgement.
  */
