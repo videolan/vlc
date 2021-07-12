@@ -51,6 +51,8 @@ Item {
     property double margin_xlarge: dp(32, scale);
     property double margin_xxlarge: dp(36, scale);
 
+    // Borders
+    property int border: dp(1, scale)
     property int focus_border: dp(2, scale)
 
     property int fontSize_xsmall: fontMetrics_xsmall.font.pixelSize

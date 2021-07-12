@@ -69,6 +69,10 @@ Item {
 
     property color bgFocus: (isThemeDark) ? white : black
 
+    // Banner
+
+    property color bannerBorder: (isThemeDark) ? "#303030" : "#e0e0e0"
+
     // Button
 
     property color button: systemPalette.button

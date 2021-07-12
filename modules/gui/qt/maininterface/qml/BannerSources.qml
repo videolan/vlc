@@ -206,13 +206,14 @@ FocusScope {
                     anchors.fill: parent
                 }
 
-                Widgets.CoverShadow {
-                    anchors.fill: localToolbarBg
-                    source: localToolbarBg
-                    primaryVerticalOffset: VLCStyle.dp(1)
-                    primaryRadius: VLCStyle.dp(9)
-                    secondaryVerticalOffset: VLCStyle.dp(0)
-                    secondaryRadius: VLCStyle.dp(2)
+                Rectangle {
+                    anchors.left : localToolbarBg.left
+                    anchors.right: localToolbarBg.right
+                    anchors.top  : localToolbarBg.bottom
+
+                    height: VLCStyle.border
+
+                    color: VLCStyle.colors.bannerBorder
                 }
 
                 Widgets.NavigableRow {
