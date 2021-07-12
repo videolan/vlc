@@ -183,6 +183,12 @@ typedef struct vout_thread_sys_t
     atomic_bool b_display_avstat;
     vlc_atomic_rc_t rc;
 
+
+    struct {
+        vlc_mutex_t lock;
+        vlc_tick_t last_displayed_date;
+    } avstat;
+
 } vout_thread_sys_t;
 
 #define VOUT_THREAD_TO_SYS(vout) \
@@ -600,6 +606,24 @@ void vout_ChangeDisplayRenderingEnabled(vout_thread_t *vout, bool enabled)
     vlc_mutex_lock(&sys->render_lock);
     sys->rendering_enabled = enabled;
     vlc_mutex_unlock(&sys->render_lock);
+}
+
+void vout_NotifyVsyncReached(vout_thread_t *vout, vlc_tick_t next_vsync)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+
+    (void)next_vsync;
+
+    vlc_tick_t now = vlc_tick_now();
+    vlc_mutex_lock(&sys->avstat.lock);
+    vlc_tick_t last_date = sys->avstat.last_displayed_date;
+    vlc_mutex_unlock(&sys->avstat.lock);
+
+    if (last_date != VLC_TICK_INVALID && atomic_load(&sys->b_display_avstat))
+        msg_Info( vout, "avstats: [RENDER][VSYNC] ts=%" PRId64 " pts_per_vsync=%" PRId64,
+                NS_FROM_VLC_TICK(now),
+                NS_FROM_VLC_TICK(last_date));
 }
 
 void vout_ControlChangeFilters(vout_thread_t *vout, const char *filters)
@@ -1411,7 +1435,12 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
 
     /* Display the direct buffer returned by vout_RenderPicture */
     if (sys->rendering_enabled)
+    {
+        vlc_mutex_lock(&sys->avstat.lock);
         vout_display_Display(vd, todisplay);
+        sys->avstat.last_displayed_date = todisplay->date;
+        vlc_mutex_unlock(&sys->avstat.lock);
+    }
 
     vlc_tick_t now_ts = vlc_tick_now();
     if (atomic_load(&sys->b_display_avstat))
@@ -2087,6 +2116,8 @@ vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
     else if (var_InheritBool(vout, "video-on-top"))
         vlc_window_SetState(sys->display_cfg.window, VLC_WINDOW_STATE_ABOVE);
 
+    sys->avstat.last_displayed_date = VLC_TICK_INVALID;
+    vlc_mutex_init(&sys->avstat.lock);
     var_AddCallback(&vout->obj, "avstat", avstat_callback, sys);
     var_TriggerCallback(&vout->obj, "avstat");
 
