@@ -57,7 +57,7 @@ static void VoutViewpointMoved(void *sys, const vlc_viewpoint_t *vp)
  *****************************************************************************/
 vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys,
                      const char *splitter_name, const vout_display_cfg_t *cfg,
-                     video_format_t *fmt, vlc_video_context *vctx)
+                     const video_format_t *fmt, vlc_video_context *vctx)
 {
     vout_display_t *vd;
     vout_display_owner_t owner = {
