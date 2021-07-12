@@ -55,7 +55,6 @@ typedef struct vout_display_sys_t {
     bool dead;
     vlc_queue_t q;
     vlc_thread_t thread;
-    vout_window_t *window;
     vout_display_place_t place;
 
     vlc_tick_t cursor_timeout;
@@ -74,7 +73,7 @@ static void *VoutDisplayEventKeyDispatch(void *data)
     vlc_caca_event_t *event;
 
     while ((event = vlc_queue_DequeueKillable(&sys->q, &sys->dead)) != NULL) {
-        vout_window_ReportKeyPress(sys->window, event->key);
+        vout_window_ReportKeyPress(vd->cfg->window, event->key);
         free(event);
     }
 
@@ -316,7 +315,7 @@ static void Manage(vout_display_t *vd)
         case CACA_EVENT_MOUSE_MOTION:
             caca_set_mouse(sys->dp, 1);
             sys->cursor_deadline = vlc_tick_now() + sys->cursor_timeout;
-            vout_window_ReportMouseMoved(sys->window,
+            vout_window_ReportMouseMoved(vd->cfg->window,
                                          caca_get_event_mouse_x(&ev),
                                          caca_get_event_mouse_y(&ev));
             break;
@@ -329,10 +328,10 @@ static void Manage(vout_display_t *vd)
             for (int i = 0; mouses[i].caca != -1; i++) {
                 if (mouses[i].caca == caca) {
                     if (caca_get_event_type(&ev) == CACA_EVENT_MOUSE_PRESS)
-                        vout_window_ReportMousePressed(sys->window,
+                        vout_window_ReportMousePressed(vd->cfg->window,
                                                        mouses[i].vlc);
                     else
-                        vout_window_ReportMouseReleased(sys->window,
+                        vout_window_ReportMouseReleased(vd->cfg->window,
                                                         mouses[i].vlc);
                     return;
                 }
@@ -340,7 +339,7 @@ static void Manage(vout_display_t *vd)
             break;
         }
         case CACA_EVENT_QUIT:
-            vout_window_ReportClose(sys->window);
+            vout_window_ReportClose(vd->cfg->window);
             break;
         default:
             break;
@@ -456,7 +455,6 @@ static int Open(vout_display_t *vd,
         goto error;
     }
 
-    sys->window = vd->cfg->window;
     const char *driver = NULL;
 #ifdef __APPLE__
     // Make sure we don't try to open a window.
