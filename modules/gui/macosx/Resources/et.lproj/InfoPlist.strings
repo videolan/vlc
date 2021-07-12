@@ -1,10 +1,10 @@
 /* Localized versions of Info.plist keys */
 
-"NSCameraUsageDescription" = "VLC wants to access the camera as requested by the user.";
-"NSMicrophoneUsageDescription" = "VLC wants to access the microphone as requested by the user.";
-"NSAppleEventsUsageDescription" = "VLC wants to pause and resume external media players.";
-"NSDesktopFolderUsageDescription" = "VLC wants to access the desktop folder as requested by the user.";
-"NSDocumentsFolderUsageDescription" = "VLC wants to access the documents folder as requested by the user.";
-"NSDownloadsFolderUsageDescription" = "VLC wants to access the downloads folder as requested by the user.";
-"NSNetworkVolumesUsageDescription" = "VLC wants to access a network volume as requested by the user.";
-"NSRemovableVolumesUsageDescription" = "VLC wants to access a removable volume as requested by the user.";
+"NSCameraUsageDescription" = "Kasutaja soovil vajab VLC luba kaamera kasutamiseks.";
+"NSMicrophoneUsageDescription" = "Kasutaja soovil vajab VLC luba mikrofoni kasutamiseks.";
+"NSAppleEventsUsageDescription" = "Kasutaja soovil vajab VLC luba väliste meediamängijate peatamiseks ja töö jätkamiseks.";
+"NSDesktopFolderUsageDescription" = "Kasutaja soovil vajab VLC luba ligipääsuks töölauakaustale.";
+"NSDocumentsFolderUsageDescription" = "Kasutaja soovil vajab VLC luba ligipääsuks dokumentide kaustale.";
+"NSDownloadsFolderUsageDescription" = "Kasutaja soovil vajab VLC luba ligipääsuks allalaaditud failide kaustale.";
+"NSNetworkVolumesUsageDescription" = "Kasutaja soovil vajab VLC luba ligipääsuks andmekandjale võrgus.";
+"NSRemovableVolumesUsageDescription" = "Kasutaja soovil vajab VLC luba ligipääsuks eemaldatavale andmekandjale.";
