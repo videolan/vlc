@@ -189,7 +189,13 @@ static const pair_format_guid video_format_table[] =
 };
 
 // 8-bit luminance only
-DEFINE_MEDIATYPE_GUID (MFVideoFormat_L8, 50);
+
+// Older versions of mingw-w64 lack this GUID, but it was added in mingw-w64
+// git on 2021-07-11 (during __MINGW64_VERSION_MAJOR 10). Use a local
+// redefinition of this GUID with a custom prefix, to let the same code build
+// with both older and newer versions of mingw-w64 (and earlier git snapshots
+// with __MINGW64_VERSION_MAJOR == 10).
+DEFINE_MEDIATYPE_GUID (vlc_MFVideoFormat_L8, 50);
 
 /*
  * Table to map MF Transform raw 3D3 output formats to native VLC FourCC
@@ -198,7 +204,7 @@ static const pair_format_guid d3d_format_table[] = {
     { VLC_CODEC_RGB32, &MFVideoFormat_RGB32  },
     { VLC_CODEC_RGB24, &MFVideoFormat_RGB24  },
     { VLC_CODEC_RGBA,  &MFVideoFormat_ARGB32 },
-    { VLC_CODEC_GREY,  &MFVideoFormat_L8     },
+    { VLC_CODEC_GREY,  &vlc_MFVideoFormat_L8 },
     { 0, NULL }
 };
 
