@@ -136,8 +136,6 @@ static int OpenPostproc( filter_t *p_filter )
         i_flags |= PP_CPU_CAPS_MMX;
     if( vlc_CPU_MMXEXT() )
         i_flags |= PP_CPU_CAPS_MMX2;
-    if( vlc_CPU_3dNOW() )
-        i_flags |= PP_CPU_CAPS_3DNOW;
 #elif defined(__ppc__) || defined(__ppc64__) || defined(__powerpc__)
     if( vlc_CPU_ALTIVEC() )
         i_flags |= PP_CPU_CAPS_ALTIVEC;

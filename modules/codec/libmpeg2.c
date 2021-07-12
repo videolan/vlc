@@ -201,8 +201,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 #if defined( __i386__ ) || defined( __x86_64__ )
     if( vlc_CPU_MMX() )
         i_accel |= MPEG2_ACCEL_X86_MMX;
-    if( vlc_CPU_3dNOW() )
-        i_accel |= MPEG2_ACCEL_X86_3DNOW;
     if( vlc_CPU_MMXEXT() )
         i_accel |= MPEG2_ACCEL_X86_MMXEXT;
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )

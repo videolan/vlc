@@ -42,7 +42,6 @@ unsigned vlc_CPU_raw(void);
 # if defined (__i386__) || defined (__x86_64__)
 #  define HAVE_FPU 1
 #  define VLC_CPU_MMX    0x00000008
-#  define VLC_CPU_3dNOW  0x00000010
 #  define VLC_CPU_MMXEXT 0x00000020
 #  define VLC_CPU_SSE    0x00000040
 #  define VLC_CPU_SSE2   0x00000080
@@ -122,12 +121,6 @@ unsigned vlc_CPU_raw(void);
 #  define vlc_CPU_AVX2() (1)
 # else
 #  define vlc_CPU_AVX2() ((vlc_CPU() & VLC_CPU_AVX2) != 0)
-# endif
-
-# ifdef __3dNOW__
-#  define vlc_CPU_3dNOW() (1)
-# else
-#  define vlc_CPU_3dNOW() ((vlc_CPU() & VLC_CPU_3dNOW) != 0)
 # endif
 
 # ifdef __XOP__

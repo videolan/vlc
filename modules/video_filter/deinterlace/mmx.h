@@ -191,12 +191,6 @@ typedef    union {
 #define    pxor_r2r(regs,regd)    mmx_r2r (pxor, regs, regd)
 
 
-/* 3DNOW extensions */
-
-#define pavgusb_m2r(var,reg)    mmx_m2r (pavgusb, var, reg)
-#define pavgusb_r2r(regs,regd)    mmx_r2r (pavgusb, regs, regd)
-
-
 /* AMD MMX extensions - also available in intel SSE */
 
 

@@ -93,12 +93,6 @@ VLC_SSE static void SSE_test (void)
     asm volatile ("xorps %%xmm0,%%xmm0\n" : : : "xmm0", "xmm1");
 }
 #endif
-#if defined (CAN_COMPILE_3DNOW)
-VLC_MMX static void ThreeD_Now_test (void)
-{
-    asm volatile ("pfadd %%mm0,%%mm0\n" "femms\n" : : : "mm0");
-}
-#endif
 
 #if defined (CAN_COMPILE_ALTIVEC)
 static void Altivec_test (void)
@@ -214,11 +208,6 @@ VLC_WEAK unsigned vlc_CPU_raw(void)
     /* list these additional capabilities */
     cpuid( 0x80000001 );
 
-# if defined (CAN_COMPILE_3DNOW) && !defined (__3dNOW__)
-    if ((i_edx & 0x80000000) && vlc_CPU_check ("3D Now!", ThreeD_Now_test))
-# endif
-        i_capabilities |= VLC_CPU_3dNOW;
-
     if( b_amd && ( i_edx & 0x00400000 ) )
         i_capabilities |= VLC_CPU_MMXEXT;
 out:
@@ -291,8 +280,6 @@ void vlc_CPU_dump (vlc_object_t *obj)
         vlc_memstream_puts(&stream, "AVX ");
     if (vlc_CPU_AVX2())
         vlc_memstream_puts(&stream, "AVX2 ");
-    if (vlc_CPU_3dNOW())
-        vlc_memstream_puts(&stream, "3DNow! ");
     if (vlc_CPU_XOP())
         vlc_memstream_puts(&stream, "XOP ");
     if (vlc_CPU_FMA4())

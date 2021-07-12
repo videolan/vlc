@@ -96,8 +96,6 @@ unsigned vlc_CPU_raw(void)
                 core_caps |= VLC_CPU_AVX;
             if (!strcmp (cap, "avx2"))
                 core_caps |= VLC_CPU_AVX2;
-            if (!strcmp (cap, "3dnow"))
-                core_caps |= VLC_CPU_3dNOW;
             if (!strcmp (cap, "xop"))
                 core_caps |= VLC_CPU_XOP;
             if (!strcmp (cap, "fma4"))
