@@ -431,10 +431,6 @@ static inline void vout_display_SendEventMouseReleased(vout_display_t *vd, int b
 {
     vout_window_ReportMouseReleased(vd->cfg->window, button);
 }
-static inline void vout_display_SendEventMouseDoubleClick(vout_display_t *vd)
-{
-    vout_window_ReportMouseDoubleClick(vd->cfg->window, MOUSE_BUTTON_LEFT);
-}
 static inline void vout_display_SendEventViewpointMoved(vout_display_t *vd,
                                                         const vlc_viewpoint_t *vp)
 {
