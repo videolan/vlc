@@ -735,6 +735,9 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
     /* Use the returned sample since it can be provided by the MFT. */
     IMFSample *output_sample = output_buffer.pSample;
 
+    if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT)
+        return VLC_SUCCESS;
+
     if (hr == S_OK)
     {
         if (!output_sample)
@@ -812,8 +815,16 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
             /* Sample is provided by the MFT: decrease refcount. */
             IMFSample_Release(output_sample);
         }
+
+        if (p_dec->fmt_in.i_cat == VIDEO_ES)
+            decoder_QueueVideo(p_dec, picture);
+        else
+            decoder_QueueAudio(p_dec, aout_buffer);
+
+        return VLC_SUCCESS;
     }
-    else if (hr == MF_E_TRANSFORM_STREAM_CHANGE || hr == MF_E_TRANSFORM_TYPE_NOT_SET)
+
+    if (hr == MF_E_TRANSFORM_STREAM_CHANGE || hr == MF_E_TRANSFORM_TYPE_NOT_SET)
     {
         if (p_sys->output_type)
             IMFMediaType_Release(p_sys->output_type);
@@ -828,22 +839,9 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
             goto error;
         return VLC_SUCCESS;
     }
-    else if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT)
-    {
-        return VLC_SUCCESS;
-    }
-    else /* An error not listed above occurred */
-    {
-        msg_Dbg(p_dec, "Failed to process output stream %lu (error 0x%lX)", stream_id, hr);
-        goto error;
-    }
 
-    if (p_dec->fmt_in.i_cat == VIDEO_ES)
-        decoder_QueueVideo(p_dec, picture);
-    else
-        decoder_QueueAudio(p_dec, aout_buffer);
-
-    return VLC_SUCCESS;
+    /* An error not listed above occurred */
+    msg_Dbg(p_dec, "Failed to process output stream %lu (error 0x%lX)", stream_id, hr);
 
 error:
     msg_Err(p_dec, "Error in ProcessOutputStream()");
