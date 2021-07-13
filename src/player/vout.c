@@ -28,17 +28,6 @@
 #include "player.h"
 #include "input/resource.h"
 
-#define vlc_player_vout_SendEvent(player, event, ...) do { \
-    vlc_mutex_lock(&player->vout_listeners_lock); \
-    vlc_player_vout_listener_id *listener; \
-    vlc_list_foreach(listener, &player->vout_listeners, node) \
-    { \
-        if (listener->cbs->event) \
-            listener->cbs->event(__VA_ARGS__, listener->cbs_data); \
-    } \
-    vlc_mutex_unlock(&player->vout_listeners_lock); \
-} while(0)
-
 vout_thread_t *
 vlc_player_vout_Hold(vlc_player_t *player)
 {
