@@ -472,8 +472,11 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
     }
 
     vout_configuration_t cfg = {
-        .vout = p_owner->p_vout, .clock = p_owner->p_clock, .fmt = &p_dec->fmt_out.video,
-        .mouse_event = MouseEvent, .mouse_opaque = p_dec,
+        .vout = p_owner->p_vout,
+        .clock = p_owner->p_clock,
+        .fmt = &p_dec->fmt_out.video,
+        .mouse_event = MouseEvent,
+        .mouse_opaque = p_dec,
     };
     bool has_started;
     vout_thread_t *p_vout =
