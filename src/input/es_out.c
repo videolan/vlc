@@ -331,6 +331,7 @@ static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
 static int ForwardValue(vlc_object_t *obj, const char *var, vlc_value_t oldv,
                         vlc_value_t newv, void *opaque)
 {
+    (void)obj; (void)oldv;
     vlc_object_t *target = opaque;
     return var_Set(target, var, newv);
 }
@@ -546,8 +547,10 @@ static const struct es_out_callbacks es_out_cbs;
 static int avstat_callback(vlc_object_t *obj, const char *name,
         vlc_value_t oldval, vlc_value_t newval, void *opaque)
 {
+    (void)obj; (void)name; (void)oldval;
     es_out_sys_t *p_owner = opaque;
     atomic_store(&p_owner->b_display_avstat, newval.b_bool);
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -1519,6 +1522,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
 
 static int OnClockRecoveryChanged(vlc_object_t *obj, const char *name, vlc_value_t oldv, vlc_value_t newv, void *opaque)
 {
+    (void)name; (void)oldv;
     input_clock_t *cl = opaque;
     input_clock_EnableRecovery(cl, newv.b_bool);
     msg_Info(obj, "Clock recovery has been %s", newv.b_bool ? "enabled" : "disabled");
