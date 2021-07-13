@@ -32,7 +32,6 @@
 /** Stream output instance */
 sout_stream_t *sout_NewInstance( vlc_object_t *, const char * );
 #define sout_NewInstance(a,b) sout_NewInstance(VLC_OBJECT(a),b)
-void sout_DeleteInstance( sout_stream_t * );
 
 sout_packetizer_input_t *sout_InputNew( sout_stream_t *, const es_format_t * );
 int sout_InputDelete( sout_stream_t *, sout_packetizer_input_t * );
