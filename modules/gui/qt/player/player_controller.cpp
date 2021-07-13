@@ -988,21 +988,26 @@ static const struct vlc_player_cbs player_cbs = {
     on_player_playback_restore_queried
 };
 
-static const struct vlc_player_vout_cbs player_vout_cbs = {
-    on_player_vout_fullscreen_changed,
-    on_player_vout_wallpaper_mode_changed
-};
+static const vlc_player_vout_cbs player_vout_cbs = []{
+    struct vlc_player_vout_cbs cbs{};
+    cbs.on_fullscreen_changed = on_player_vout_fullscreen_changed;
+    cbs.on_wallpaper_mode_changed = on_player_vout_wallpaper_mode_changed;
+    return cbs;
+}();
 
-static const struct vlc_player_aout_cbs player_aout_cbs = {
-    on_player_aout_volume_changed,
-    on_player_aout_mute_changed,
-    nullptr
-};
+static const vlc_player_aout_cbs player_aout_cbs = []{
+    struct vlc_player_aout_cbs cbs{};
+    cbs.on_volume_changed = on_player_aout_volume_changed;
+    cbs.on_mute_changed = on_player_aout_mute_changed;
+    return cbs;
+}();
 
-static const struct vlc_player_timer_cbs player_timer_cbs = {
-    on_player_timer_update,
-    on_player_timer_discontinuity,
-};
+static const vlc_player_timer_cbs player_timer_cbs = []{
+    struct vlc_player_timer_cbs cbs {};
+    cbs.on_update = on_player_timer_update;
+    cbs.on_discontinuity = on_player_timer_discontinuity;
+    return cbs;
+}();
 
 PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontroller, qt_intf_t *p_intf)
     : q_ptr(playercontroller)
