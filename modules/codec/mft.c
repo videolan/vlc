@@ -359,7 +359,7 @@ static int SetInputType(decoder_t *p_dec, DWORD stream_id, IMFMediaType **result
         if (hr == MF_E_ATTRIBUTENOTFOUND)
         {
             hr = IMFMediaType_SetBlob(input_media_type, &MF_MT_USER_DATA,
-                                      (const UINT8*)p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
+                                      p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
             if (FAILED(hr))
                 goto error;
         }
