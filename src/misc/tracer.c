@@ -78,11 +78,16 @@ static struct vlc_tracer *vlc_TraceModuleCreate(vlc_object_t *parent)
     if (unlikely(module == NULL))
         return NULL;
 
-    if (vlc_module_load(VLC_OBJECT(module), "tracer", NULL, false,
+    char *module_name = var_InheritString(parent, "tracer");
+    if (vlc_module_load(VLC_OBJECT(module), "tracer", module_name, false,
                         vlc_tracer_load, module) == NULL) {
         vlc_object_delete(VLC_OBJECT(module));
+        if (module_name)
+            free(module_name);
         return NULL;
     }
+    if (module_name)
+        free(module_name);
 
     return &module->tracer;
 }
