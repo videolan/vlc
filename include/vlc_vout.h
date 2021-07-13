@@ -34,6 +34,8 @@ struct vlc_video_output_callbacks
     /* Event triggered when the first frame of the vout is being displayed. */
     void (*first_frame_reported)(vout_thread_t *vout, void *owner);
     void (*captions_to_display)(const void *, size_t, void *owner);
+    void (*on_frame_displayed)(vout_thread_t *vout, vlc_tick_t pts,
+                               void *owner);
 };
 
 /**
