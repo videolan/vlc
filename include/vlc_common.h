@@ -483,7 +483,7 @@ typedef union
 /** Variable not found */
 #define VLC_ENOVAR         (-6)
 /** Bad variable value */
-#define VLC_EBADVAR        (-7)
+#define VLC_EINVAL         (-7)
 /** Item not found */
 #define VLC_ENOITEM        (-8)
 /** Operation forbidden */

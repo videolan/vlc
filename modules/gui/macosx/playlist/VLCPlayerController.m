@@ -1718,7 +1718,7 @@ static int BossCallback(vlc_object_t *p_this,
 - (int)enableAudioFilterWithName:(NSString *)name state:(BOOL)state
 {
     if (name == nil || name.length == 0) {
-        return VLC_EBADVAR;
+        return VLC_EINVAL;
     }
 
     return vlc_player_aout_EnableFilter(_p_player, [name UTF8String], state);

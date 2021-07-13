@@ -531,7 +531,7 @@ static int InstallEntry( addons_manager_t *p_manager, addon_entry_t *p_entry )
     if ( p_entry->e_type == ADDON_UNKNOWN ||
          p_entry->e_type == ADDON_PLUGIN ||
          p_entry->e_type == ADDON_OTHER )
-        return VLC_EBADVAR;
+        return VLC_EINVAL;
 
     vlc_mutex_lock( &p_manager->p_priv->installer.lock );
     ARRAY_APPEND( p_manager->p_priv->installer.entries, p_entry );

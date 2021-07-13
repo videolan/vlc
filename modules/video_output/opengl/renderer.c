@@ -402,7 +402,7 @@ vlc_gl_renderer_SetViewpoint(struct vlc_gl_renderer *renderer,
 {
     if (p_vp->fov > FIELD_OF_VIEW_DEGREES_MAX
             || p_vp->fov < FIELD_OF_VIEW_DEGREES_MIN)
-        return VLC_EBADVAR;
+        return VLC_EINVAL;
 
     // Convert degree into radian
     float f_fovx = p_vp->fov * (float)M_PI / 180.f;

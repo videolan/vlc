@@ -535,7 +535,7 @@ int hw_mmal_copy_pic_to_buf(void * const buf_data,
         default:
             if (pLength != NULL)
                 *pLength = 0;
-            return VLC_EBADVAR;
+            return VLC_EINVAL;
     }
 
     if (!is_cma) {  // ** CMA is currently always uncached

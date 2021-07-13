@@ -801,7 +801,7 @@ static int ActiveKeyCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
 
     if (use_odd < 0)
-        return VLC_EBADVAR;
+        return VLC_EINVAL;
 
     vlc_mutex_lock( &p_sys->csa_lock );
     csa_UseKey( p_this, p_sys->csa, use_odd );

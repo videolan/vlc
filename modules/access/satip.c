@@ -156,7 +156,7 @@ static int parse_port(char *str, uint16_t *port)
 {
     int p = atoi(str);
     if (p < 0 || p > UINT16_MAX)
-        return VLC_EBADVAR;
+        return VLC_EINVAL;
 
     *port = p;
 

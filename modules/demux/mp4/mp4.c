@@ -2532,7 +2532,7 @@ static int xTTS_CountEntries( demux_t *p_demux, uint32_t *pi_entry /* out */,
         if ( i_array_offset >= i_table_count )
         {
             msg_Err( p_demux, "invalid index counting total samples %u %u", i_array_offset,  i_table_count );
-            return VLC_EBADVAR;
+            return VLC_EINVAL;
         }
 
         if ( i_index_samples_left )

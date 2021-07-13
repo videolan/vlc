@@ -141,7 +141,7 @@
         return VLC_EACCES;
     }
     if (!fileURL) {
-        return VLC_EBADVAR;
+        return VLC_EINVAL;
     }
     return vlc_ml_add_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
@@ -152,7 +152,7 @@
         return VLC_EACCES;
     }
     if (!fileURL) {
-        return VLC_EBADVAR;
+        return VLC_EINVAL;
     }
     return vlc_ml_ban_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
@@ -163,7 +163,7 @@
         return VLC_EACCES;
     }
     if (!fileURL) {
-        return VLC_EBADVAR;
+        return VLC_EINVAL;
     }
     return vlc_ml_unban_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }
@@ -174,7 +174,7 @@
         return VLC_EACCES;
     }
     if (!fileURL) {
-        return VLC_EBADVAR;
+        return VLC_EINVAL;
     }
     return vlc_ml_remove_folder(_p_libraryInstance, [[fileURL absoluteString] UTF8String]);
 }

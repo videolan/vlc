@@ -423,7 +423,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 - (int)addInputItem:(input_item_t *)p_inputItem atPosition:(size_t)insertionIndex startPlayback:(BOOL)startPlayback
 {
     if (p_inputItem == NULL) {
-        return VLC_EBADVAR;
+        return VLC_EINVAL;
     }
     int ret = 0;
 

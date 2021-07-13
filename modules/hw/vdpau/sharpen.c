@@ -110,7 +110,7 @@ static int Open(filter_t *filter)
     if (vdpau_decoder == NULL)
     {
         vlc_decoder_device_Release(dec_dev);
-        return VLC_EBADVAR;
+        return VLC_EINVAL;
     }
 
     /* Check for sharpen support */
