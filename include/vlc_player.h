@@ -2395,7 +2395,7 @@ vlc_player_aout_GetVolume(vlc_player_t *player);
  * functions.
  *
  * @note A successful call will trigger the
- * vlc_player_vout_cbs.on_volume_changed event.
+ * vlc_player_aout_cbs.on_volume_changed event.
  *
  * @param player player instance
  * @param volume volume in the range [0;2.f]
