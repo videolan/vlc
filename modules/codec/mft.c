@@ -720,7 +720,7 @@ static void CopyPackedBufferToPicture(picture_t *p_pic, const uint8_t *p_src)
     }
 }
 
-static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
+static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_reading)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     HRESULT hr;
@@ -735,6 +735,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
     /* Use the returned sample since it can be provided by the MFT. */
     IMFSample *output_sample = output_buffer.pSample;
 
+    *keep_reading = false;
     if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT)
         return VLC_SUCCESS;
 
@@ -821,6 +822,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
         else
             decoder_QueueAudio(p_dec, aout_buffer);
 
+        *keep_reading = true;
         return VLC_SUCCESS;
     }
 
@@ -839,6 +841,8 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
         }
         if (AllocateOutputSample(p_dec, 0, &p_sys->output_sample))
             goto error;
+        // there's an output ready, keep trying
+        *keep_reading = hr == MF_E_TRANSFORM_STREAM_CHANGE;
         return VLC_SUCCESS;
     }
 
@@ -868,7 +872,12 @@ static int DecodeSync(decoder_t *p_dec, block_t *p_block)
     }
 
     /* Drain the output stream before sending the input packet. */
-    if (ProcessOutputStream(p_dec, p_sys->output_stream_id))
+    bool keep_reading;
+    int err;
+    do {
+        err = ProcessOutputStream(p_dec, p_sys->output_stream_id, &keep_reading);
+    } while (err == VLC_SUCCESS && keep_reading);
+    if (err != VLC_SUCCESS)
         goto error;
     if (ProcessInputStream(p_dec, p_sys->input_stream_id, p_block))
         goto error;
@@ -931,7 +940,12 @@ static int DecodeAsync(decoder_t *p_dec, block_t *p_block)
     if (p_sys->pending_output_events > 0)
     {
         p_sys->pending_output_events -= 1;
-        if (ProcessOutputStream(p_dec, p_sys->output_stream_id))
+        bool keep_reading;
+        int err;
+        do {
+            err = ProcessOutputStream(p_dec, p_sys->output_stream_id, &keep_reading);
+        } while (err == VLC_SUCCESS && keep_reading);
+        if (err != VLC_SUCCESS)
             goto error;
     }
 
@@ -951,7 +965,12 @@ static int DecodeAsync(decoder_t *p_dec, block_t *p_block)
         if (p_sys->pending_output_events > 0)
         {
             p_sys->pending_output_events -= 1;
-            if (ProcessOutputStream(p_dec, p_sys->output_stream_id))
+            bool keep_reading;
+            int err;
+            do {
+                err = ProcessOutputStream(p_dec, p_sys->output_stream_id, &keep_reading);
+            } while (err == VLC_SUCCESS && keep_reading);
+            if (err != VLC_SUCCESS)
                 goto error;
             break;
         }
