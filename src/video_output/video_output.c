@@ -1345,13 +1345,11 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
                         deadline = max_deadline;
                 }
 
+                system_pts = deadline;
                 timed_out = vlc_clock_Wait(sys->clock, deadline);
             };
 
             vlc_clock_Unlock(sys->clock);
-
-            /* Don't touch system_pts. Tell the clock that the pts was rendered
-             * at the expected date */
         }
         sys->displayed.date = system_pts;
     }
