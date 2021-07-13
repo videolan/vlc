@@ -366,66 +366,39 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
         pVarManager->registerVar( m_varEqBands.getBand( i ), ss.str() );
     }
 
-    static const struct vlc_playlist_callbacks playlist_cbs = {
-    on_playlist_items_reset,
-    on_playlist_items_added,
-    NULL, // on_playlist_items_moved,
-    on_playlist_items_removed,
-    on_playlist_items_updated,
-    on_playlist_playback_repeat_changed,
-    on_playlist_playback_order_changed,
-    on_playlist_current_index_changed,
-    NULL, // on_playlist_has_prev_changed
-    NULL, // on_playlist_has_next_changed
-    };
+    static const struct vlc_playlist_callbacks playlist_cbs = []{
+        struct vlc_playlist_callbacks cbs {};
+        cbs.on_items_reset = on_playlist_items_reset;
+        cbs.on_items_added = on_playlist_items_added;
+        cbs.on_items_removed = on_playlist_items_removed;
+        cbs.on_items_updated = on_playlist_items_updated;
+        cbs.on_playback_repeat_changed = on_playlist_playback_repeat_changed;
+        cbs.on_playback_order_changed = on_playlist_playback_order_changed;
+        cbs.on_current_index_changed = on_playlist_current_index_changed;
+        return cbs;
+    }();
 
-    static const struct vlc_player_cbs player_cbs = {
-    on_player_current_media_changed,
-    on_player_state_changed,
-    NULL, //on_player_error_changed,
-    NULL, //on_player_buffering,
-    on_player_rate_changed,
-    on_player_capabilities_changed,
-    on_player_position_changed,
-    NULL, //on_player_length_changed,
-    NULL, //on_player_track_list_changed,
-    on_player_track_selection_changed,
-    NULL, //on_player_track_delay_changed,
-    NULL, //on_player_program_list_changed,
-    NULL, //on_player_program_selection_changed,
-    on_player_titles_changed,
-    NULL, //on_player_title_selection_changed,
-    NULL, //on_player_chapter_selection_changed,
-    NULL, //on_player_teletext_menu_changed,
-    NULL, //on_player_teletext_enabled_changed,
-    NULL, //on_player_teletext_page_changed,
-    NULL, //on_player_teletext_transparency_changed,
-    NULL, //on_player_category_delay_changed,
-    NULL, //on_player_associated_subs_fps_changed,
-    NULL, //on_player_renderer_changed,
-    on_player_recording_changed,
-    NULL, //on_player_signal_changed,
-    NULL, //on_player_stats_changed,
-    NULL, //on_player_atobloop_changed,
-    NULL, //on_player_media_stopped_action_changed,
-    NULL, //on_player_media_meta_changed,
-    NULL, //on_player_media_epg_changed,
-    NULL, //on_player_subitems_changed,
-    on_player_vout_changed,
-    NULL, //on_player_corks_changed
-    NULL, //on_playback_restore_queried
-    };
+    static const struct vlc_player_cbs player_cbs = []{
+        struct vlc_player_cbs cbs {};
+        cbs.on_current_media_changed = on_player_current_media_changed;
+        cbs.on_state_changed = on_player_state_changed;
+        cbs.on_rate_changed = on_player_rate_changed;
+        cbs.on_capabilities_changed = on_player_capabilities_changed;
+        cbs.on_position_changed = on_player_position_changed;
+        cbs.on_track_selection_changed = on_player_track_selection_changed;
+        cbs.on_titles_changed = on_player_titles_changed;
+        cbs.on_recording_changed = on_player_recording_changed;
+        cbs.on_vout_changed = on_player_vout_changed;
+        return cbs;
+    }();
 
-    static const struct vlc_player_vout_cbs player_vout_cbs = {
-    NULL, // on_player_vout_fullscreen_changed,
-    NULL, // on_player_vout_wallpaper_mode_changed
-    };
-
-    static const struct vlc_player_aout_cbs player_aout_cbs = {
-    on_player_aout_volume_changed,
-    on_player_aout_mute_changed,
-    NULL, //on_player_device_changed,
-    };
+    static const struct vlc_player_vout_cbs player_vout_cbs {};
+    static const struct vlc_player_aout_cbs player_aout_cbs = []{
+        struct vlc_player_aout_cbs cbs {};
+        cbs.on_volume_changed = on_player_aout_volume_changed;
+        cbs.on_mute_changed = on_player_aout_mute_changed;
+        return cbs;
+    }();
 
     // Add various listeners
     vlc_playlist_Lock( getPL() );
