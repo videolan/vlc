@@ -1913,6 +1913,8 @@ void vout_Stop(vout_thread_t *vout)
 static int avstat_callback(vlc_object_t *obj, const char *name,
         vlc_value_t oldval, vlc_value_t newval, void *opaque)
 {
+    (void)obj ; (void)name; (void)oldval;
+
     vout_thread_sys_t *p_owner = opaque;
     atomic_store(&p_owner->b_display_avstat, newval.b_bool);
     vlc_mutex_lock(&p_owner->window_lock);
@@ -1925,7 +1927,7 @@ static int avstat_callback(vlc_object_t *obj, const char *name,
 static int ForwardValue(vlc_object_t *obj, const char *var, vlc_value_t oldv,
                         vlc_value_t newv, void *opaque)
 {
-
+    (void)obj ; (void) var; (void) oldv;
     vlc_object_t *target = opaque;
     return var_Set(target, var, newv);
 }
