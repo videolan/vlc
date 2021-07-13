@@ -47,6 +47,11 @@ typedef struct {
     const video_format_t *fmt;
     vlc_mouse_event      mouse_event;
     void                 *mouse_opaque;
+
+    struct {
+        const struct vlc_video_output_callbacks *cbs;
+        void *opaque;
+    } video;
 } vout_configuration_t;
 
 /**
