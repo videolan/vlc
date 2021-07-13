@@ -4,6 +4,10 @@ options:
   deploymentTarget:
     iOS: 9.0
   StripBitcodeFromCopiedFiles: NO
+configs:
+  Debug: debug
+  Release: release
+  Debug-bitcode: debug
 targets:
   VLCAutomake:
     type: ""
