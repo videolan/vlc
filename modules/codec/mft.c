@@ -676,7 +676,10 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
 
     hr = IMFTransform_ProcessInput(p_sys->mft, stream_id, input_sample, 0);
     if (FAILED(hr))
+    {
+        msg_Dbg(p_dec, "Failed to process input stream %lu (error 0x%lX)", stream_id, hr);
         goto error;
+    }
 
     IMFMediaBuffer_Release(input_media_buffer);
     IMFSample_Release(input_sample);
@@ -685,7 +688,7 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     return VLC_SUCCESS;
 
 error:
-    msg_Err(p_dec, "Error in ProcessInputStream()");
+    msg_Err(p_dec, "Error in ProcessInputStream(). (hr=0x%lX)\n", hr);
     if (input_sample)
         IMFSample_Release(input_sample);
     block_ChainRelease(p_xps_blocks);
@@ -831,8 +834,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
     }
     else /* An error not listed above occurred */
     {
-        msg_Err(p_dec, "Unexpected error in IMFTransform::ProcessOutput: %#lx",
-                hr);
+        msg_Dbg(p_dec, "Failed to process output stream %lu (error 0x%lX)", stream_id, hr);
         goto error;
     }
 
@@ -1136,7 +1138,7 @@ static int FindMFT(decoder_t *p_dec)
     if (FAILED(hr))
         return VLC_EGENERIC;
 
-    msg_Dbg(p_dec, "Found %d available MFT module(s)", activate_objects_count);
+    msg_Dbg(p_dec, "Found %d available MFT module(s) for %4.4s", activate_objects_count, (const char*)&p_dec->fmt_in.i_codec);
     if (activate_objects_count == 0)
         return VLC_EGENERIC;
 
