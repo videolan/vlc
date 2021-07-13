@@ -512,7 +512,7 @@ typedef struct input_thread_private_t
 
     /* Output */
     bool            b_out_pace_control; /* XXX Move it ot es_sout ? */
-    sout_instance_t *p_sout;            /* Idem ? */
+    sout_stream_t   *p_sout;            /* Idem ? */
     es_out_t        *p_es_out;
     es_out_t        *p_es_out_display;
     vlc_viewpoint_t viewpoint;

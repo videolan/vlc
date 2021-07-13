@@ -58,7 +58,7 @@ struct vlc_input_decoder_callbacks {
 
 vlc_input_decoder_t *
 vlc_input_decoder_New( vlc_object_t *parent, es_format_t *, vlc_clock_t *,
-                       input_resource_t *, sout_instance_t *, bool thumbnailing,
+                       input_resource_t *, sout_stream_t *, bool thumbnailing,
                        const struct vlc_input_decoder_callbacks *cbs,
                        void *userdata ) VLC_USED;
 

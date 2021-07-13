@@ -224,7 +224,7 @@ typedef struct
     vlc_tick_t  i_buffering_extra_system;
 
     /* Record */
-    sout_instance_t *p_sout_record;
+    sout_stream_t *p_sout_record;
 
     /* Used only to limit debugging output */
     int         i_prev_stream_level;

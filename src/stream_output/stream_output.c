@@ -77,9 +77,9 @@ static void mrl_Clean( mrl_t *p_mrl );
 /*****************************************************************************
  * sout_NewInstance: creates a new stream output instance
  *****************************************************************************/
-sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest )
+sout_stream_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest )
 {
-    sout_instance_t *p_sout;
+    sout_stream_t *p_sout;
     char *psz_chain;
 
     assert( psz_dest != NULL );
@@ -109,12 +109,12 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
 /*****************************************************************************
  * sout_DeleteInstance: delete a previously allocated instance
  *****************************************************************************/
-void sout_DeleteInstance( sout_instance_t * p_sout )
+void sout_DeleteInstance( sout_stream_t * p_sout )
 {
     sout_StreamChainDelete( p_sout, NULL );
 }
 
-bool sout_instance_ControlsPace( sout_instance_t *sout )
+bool sout_instance_ControlsPace( sout_stream_t *sout )
 {
     return !sout_StreamIsSynchronous(sout);
 }
@@ -129,7 +129,7 @@ struct sout_packetizer_input_t
     bool                 b_flushed;
 };
 
-sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
+sout_packetizer_input_t *sout_InputNew( sout_stream_t *p_sout,
                                         const es_format_t *p_fmt )
 {
     sout_packetizer_input_t *p_input;
@@ -159,7 +159,7 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
 /*****************************************************************************
  *
  *****************************************************************************/
-int sout_InputDelete( sout_instance_t *p_sout,
+int sout_InputDelete( sout_stream_t *p_sout,
                       sout_packetizer_input_t *p_input )
 {
 
@@ -171,7 +171,7 @@ int sout_InputDelete( sout_instance_t *p_sout,
     return( VLC_SUCCESS);
 }
 
-static int sout_InputControlVa( sout_instance_t *p_sout,
+static int sout_InputControlVa( sout_stream_t *p_sout,
                                 sout_packetizer_input_t *p_input,
                                 int i_query, va_list args )
 {
@@ -183,7 +183,7 @@ static int sout_InputControlVa( sout_instance_t *p_sout,
     return VLC_EGENERIC;
 }
 
-int sout_InputControl( sout_instance_t *p_sout,
+int sout_InputControl( sout_stream_t *p_sout,
                        sout_packetizer_input_t *p_input, int i_query, ... )
 {
     va_list args;
@@ -195,7 +195,7 @@ int sout_InputControl( sout_instance_t *p_sout,
     return i_result;
 }
 
-void sout_InputFlush( sout_instance_t *p_sout,
+void sout_InputFlush( sout_stream_t *p_sout,
                       sout_packetizer_input_t *p_input )
 {
     sout_StreamFlush( p_sout, p_input->id );
@@ -205,7 +205,7 @@ void sout_InputFlush( sout_instance_t *p_sout,
 /*****************************************************************************
  *
  *****************************************************************************/
-int sout_InputSendBuffer( sout_instance_t *p_sout,
+int sout_InputSendBuffer( sout_stream_t *p_sout,
                           sout_packetizer_input_t *p_input,
                           block_t *p_buffer )
 {

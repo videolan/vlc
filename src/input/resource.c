@@ -66,7 +66,7 @@ struct input_resource_t
     /* */
     input_thread_t *p_input;
 
-    sout_instance_t *p_sout;
+    sout_stream_t *p_sout;
     char *psz_sout;
     vout_thread_t   *p_vout_dummy;
     struct vout_resource *vout_rsc_free;
@@ -603,9 +603,9 @@ void input_resource_StopFreeVout(input_resource_t *p_resource)
 }
 
 /* */
-sout_instance_t *input_resource_RequestSout( input_resource_t *p_resource, const char *psz_sout )
+sout_stream_t *input_resource_RequestSout( input_resource_t *p_resource, const char *psz_sout )
 {
-    sout_instance_t *sout;
+    sout_stream_t *sout;
 
     assert(psz_sout != NULL);
     vlc_mutex_lock( &p_resource->lock );
@@ -642,7 +642,7 @@ sout_instance_t *input_resource_RequestSout( input_resource_t *p_resource, const
     return sout;
 }
 
-void input_resource_PutSout(input_resource_t *resource, sout_instance_t *sout)
+void input_resource_PutSout(input_resource_t *resource, sout_stream_t *sout)
 {
     if (sout == NULL)
     {

@@ -75,7 +75,7 @@ struct vlc_input_decoder_t
     ssize_t          i_spu_channel;
     int64_t          i_spu_order;
 
-    sout_instance_t         *p_sout;
+    sout_stream_t           *p_sout;
     sout_packetizer_input_t *p_sout_input;
 
     vlc_thread_t     thread;
@@ -1870,7 +1870,7 @@ static int avstat_callback(vlc_object_t *obj, const char *name,
 static vlc_input_decoder_t *
 CreateDecoder( vlc_object_t *p_parent,
                const es_format_t *fmt, vlc_clock_t *p_clock,
-               input_resource_t *p_resource, sout_instance_t *p_sout,
+               input_resource_t *p_resource, sout_stream_t *p_sout,
                bool b_thumbnailing, const struct vlc_input_decoder_callbacks *cbs,
                void *cbs_userdata )
 {
@@ -2136,7 +2136,7 @@ static void DecoderUnsupportedCodec( decoder_t *p_dec, const es_format_t *fmt, b
 static vlc_input_decoder_t *
 decoder_New( vlc_object_t *p_parent, const es_format_t *fmt,
              vlc_clock_t *p_clock, input_resource_t *p_resource,
-             sout_instance_t *p_sout, bool thumbnailing,
+             sout_stream_t *p_sout, bool thumbnailing,
              const struct vlc_input_decoder_callbacks *cbs, void *userdata)
 {
     const char *psz_type = p_sout ? N_("packetizer") : N_("decoder");
@@ -2209,7 +2209,7 @@ decoder_New( vlc_object_t *p_parent, const es_format_t *fmt,
 vlc_input_decoder_t *
 vlc_input_decoder_New( vlc_object_t *parent, es_format_t *fmt,
                   vlc_clock_t *p_clock, input_resource_t *resource,
-                  sout_instance_t *p_sout, bool thumbnailing,
+                  sout_stream_t *p_sout, bool thumbnailing,
                   const struct vlc_input_decoder_callbacks *cbs,
                   void *cbs_userdata)
 {

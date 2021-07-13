@@ -66,7 +66,6 @@ function VlcSyntax()
   " Images
   syn keyword cType image_handler_t
   " Sout
-  syn keyword cType sout_instance_t sout_cfg_t
   syn keyword cType sout_input_t sout_packetizer_input_t
   syn keyword cType sout_access_out_t sout_access_out_sys_t 
   syn keyword cType sout_mux_t sout_mux_sys_t
