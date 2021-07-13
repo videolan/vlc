@@ -939,6 +939,7 @@ vlc_player_input_GetSelectedTrackStringIds(struct vlc_player_input *input,
 static int ForwardValue(vlc_object_t *obj, const char *var, vlc_value_t oldv,
                         vlc_value_t newv, void *opaque)
 {
+    (void)obj; (void)oldv;
     vlc_object_t *target = opaque;
     return var_Set(target, var, newv);
 }
