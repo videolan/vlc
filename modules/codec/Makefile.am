@@ -592,8 +592,11 @@ endif
 
 libmft_plugin_la_SOURCES = codec/mft.cpp
 if HAVE_WIN32
-libmft_plugin_la_LIBADD = $(LIBCOM) -luuid -lmfuuid -lmfplat libvlc_hxxxhelper.la
+libmft_plugin_la_LIBADD = $(LIBCOM) -luuid -lmfuuid -lmfplat libvlc_hxxxhelper.la libd3d11_common.la
 codec_LTLIBRARIES += libmft_plugin.la
+if HAVE_WINSTORE
+libmft_plugin_la_LIBADD += -ld3d11
+endif
 endif
 
 libgstdecode_plugin_la_SOURCES = codec/gstreamer/gstdecode.c \

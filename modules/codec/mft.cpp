@@ -37,6 +37,8 @@ extern "C" {
 #include "hxxx_helper.h"
 }
 
+#include "../video_chroma/d3d11_fmt.h"
+
 #include <initguid.h>
 #include <mfapi.h>
 #include <mftransform.h>
@@ -70,6 +72,8 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end()
 
+typedef HRESULT (WINAPI *pf_MFCreateDXGIDeviceManager)(UINT *, IMFDXGIDeviceManager **);
+
 struct decoder_sys_t
 {
     ComPtr<IMFTransform> mft;
@@ -78,6 +82,17 @@ struct decoder_sys_t
     const GUID* subtype = nullptr;
     /* Container for a dynamically constructed subtype */
     GUID custom_subtype;
+
+    // Direct3D
+    vlc_video_context  *vctx_out = nullptr;
+    HRESULT (WINAPI *fptr_MFCreateDXGIDeviceManager)(UINT *resetToken, IMFDXGIDeviceManager **ppDeviceManager);
+    UINT dxgi_token = 0;
+    ComPtr<IMFDXGIDeviceManager> dxgi_manager;
+    HANDLE d3d_handle = 0;
+
+    // D3D11
+    ComPtr<ID3D11Texture2D> cached_tex;
+    ID3D11ShaderResourceView *cachedSRV[32][DXGI_MAX_SHADER_VIEW] = {{nullptr}};
 
     /* For asynchronous MFT */
     bool is_async = false;
@@ -117,10 +132,34 @@ struct decoder_sys_t
 
     void DoRelease()
     {
+        mft->SetInputType(input_stream_id, nullptr, 0);
+        mft->SetOutputType(output_stream_id, nullptr, 0);
+
         if (output_sample.Get())
             output_sample->RemoveAllBuffers();
 
+        if (vctx_out)
+            mft->ProcessMessage(MFT_MESSAGE_SET_D3D_MANAGER, (ULONG_PTR)0);
+
         endStreaming();
+
+        for (size_t i=0; i < ARRAY_SIZE(cachedSRV); i++)
+        {
+            for (size_t j=0; j < ARRAY_SIZE(cachedSRV[i]); j++)
+            {
+                if (cachedSRV[i][j] != nullptr)
+                    cachedSRV[i][j]->Release();
+            }
+        }
+
+        if (vctx_out && dxgi_manager.Get())
+        {
+            if (d3d_handle)
+                dxgi_manager->CloseDeviceHandle(d3d_handle);
+        }
+
+        if (vctx_out)
+            vlc_video_context_Release(vctx_out);
 
         delete this;
 
@@ -169,6 +208,15 @@ struct decoder_sys_t
         return hr;
     }
 };
+
+struct mf_d3d11_pic_ctx
+{
+    struct d3d11_pic_context ctx;
+    IMFMediaBuffer *out_media;
+    decoder_sys_t  *mfdec;
+};
+#define MF_D3D11_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
+    container_of(pic_ctx, mf_d3d11_pic_ctx, ctx.s)
 
 static const int pi_channels_maps[9] =
 {
@@ -743,6 +791,63 @@ static void CopyPackedBufferToPicture(picture_t *p_pic, const uint8_t *p_src)
     }
 }
 
+static void d3d11mf_pic_context_destroy(picture_context_t *ctx)
+{
+    mf_d3d11_pic_ctx *pic_ctx = MF_D3D11_PICCONTEXT_FROM_PICCTX(ctx);
+    decoder_sys_t *mfdec = pic_ctx->mfdec;
+    pic_ctx->out_media->Release();
+    static_assert(offsetof(mf_d3d11_pic_ctx, ctx.s) == 0, "Cast assumption failure");
+    d3d11_pic_context_destroy(ctx);
+    mfdec->Release();
+}
+
+static picture_context_t *d3d11mf_pic_context_copy(picture_context_t *ctx)
+{
+    mf_d3d11_pic_ctx *src_ctx = MF_D3D11_PICCONTEXT_FROM_PICCTX(ctx);
+    mf_d3d11_pic_ctx *pic_ctx = static_cast<mf_d3d11_pic_ctx *>(malloc(sizeof(*pic_ctx)));
+    if (unlikely(pic_ctx==nullptr))
+        return nullptr;
+    *pic_ctx = *src_ctx;
+    vlc_video_context_Hold(pic_ctx->ctx.s.vctx);
+    pic_ctx->out_media->AddRef();
+    pic_ctx->mfdec->AddRef();
+    for (int i=0;i<DXGI_MAX_SHADER_VIEW; i++)
+    {
+        pic_ctx->ctx.picsys.resource[i]  = src_ctx->ctx.picsys.resource[i];
+        pic_ctx->ctx.picsys.renderSrc[i] = src_ctx->ctx.picsys.renderSrc[i];
+    }
+    AcquireD3D11PictureSys(&pic_ctx->ctx.picsys);
+    return &pic_ctx->ctx.s;
+}
+
+static mf_d3d11_pic_ctx *CreatePicContext(ID3D11Texture2D *texture, UINT slice,
+                                          ComPtr<IMFMediaBuffer> &media_buffer,
+                                          decoder_sys_t *mfdec,
+                                          ID3D11ShaderResourceView *renderSrc[DXGI_MAX_SHADER_VIEW],
+                                          vlc_video_context *vctx)
+{
+    mf_d3d11_pic_ctx *pic_ctx = static_cast<mf_d3d11_pic_ctx *>(calloc(1, sizeof(*pic_ctx)));
+    if (unlikely(pic_ctx==nullptr))
+        return nullptr;
+
+    media_buffer.CopyTo(&pic_ctx->out_media);
+    pic_ctx->mfdec = mfdec;
+    pic_ctx->mfdec->AddRef();
+
+    pic_ctx->ctx.s.copy = d3d11mf_pic_context_copy;
+    pic_ctx->ctx.s.destroy = d3d11mf_pic_context_destroy;
+    pic_ctx->ctx.s.vctx = vlc_video_context_Hold(vctx);
+
+    pic_ctx->ctx.picsys.slice_index = slice;
+    for (int i=0;i<DXGI_MAX_SHADER_VIEW; i++)
+    {
+        pic_ctx->ctx.picsys.texture[i] = texture;
+        pic_ctx->ctx.picsys.renderSrc[i] = renderSrc ? renderSrc[i] : NULL;
+    }
+    AcquireD3D11PictureSys(&pic_ctx->ctx.picsys);
+    return pic_ctx;
+}
+
 static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_reading)
 {
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
@@ -805,11 +910,99 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 
         if (p_dec->fmt_in.i_cat == VIDEO_ES)
         {
-            if (decoder_UpdateVideoFormat(p_dec))
-                return VLC_SUCCESS;
+            mf_d3d11_pic_ctx *pic_ctx = nullptr;
+            UINT sliceIndex = 0;
+            ComPtr<IMFDXGIBuffer> spDXGIBuffer;
+            hr = output_media_buffer.As(&spDXGIBuffer);
+            if (SUCCEEDED(hr))
+            {
+                ID3D11Texture2D *d3d11Res;
+                void *pv;
+                hr = spDXGIBuffer->GetResource(__uuidof(d3d11Res), &pv);
+                if (SUCCEEDED(hr))
+                {
+                    d3d11Res = static_cast<ID3D11Texture2D *>(pv);
+                    hr = spDXGIBuffer->GetSubresourceIndex(&sliceIndex);
+                    if (!p_sys->vctx_out)
+                    {
+                        vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
+                        d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueDevice(dec_dev);
+                        if (dev_sys != NULL)
+                        {
+                            D3D11_TEXTURE2D_DESC desc;
+                            d3d11Res->GetDesc(&desc);
+
+                            p_sys->vctx_out = D3D11CreateVideoContext( dec_dev, desc.Format );
+                            vlc_decoder_device_Release(dec_dev);
+                            if (unlikely(p_sys->vctx_out == NULL))
+                            {
+                                msg_Err(p_dec, "failed to create a video context");
+                                d3d11Res->Release();
+                                return VLC_EGENERIC;
+                            }
+                            p_dec->fmt_out.video.i_width = desc.Width;
+                            p_dec->fmt_out.video.i_height = desc.Height;
+
+                            const d3d_format_t *cfg = nullptr;
+                            for (const d3d_format_t *output_format = DxgiGetRenderFormatList();
+                                    output_format->name != NULL; ++output_format)
+                            {
+                                if (output_format->formatTexture == desc.Format &&
+                                    is_d3d11_opaque(output_format->fourcc))
+                                {
+                                    cfg = output_format;
+                                    break;
+                                }
+                            }
+
+                            p_dec->fmt_out.i_codec = cfg->fourcc;
+                            p_dec->fmt_out.video.i_chroma = cfg->fourcc;
+
+                            // pre allocate all the SRV for that texture
+                            for (size_t slice=0; slice < desc.ArraySize; slice++)
+                            {
+                                ID3D11Texture2D *tex[DXGI_MAX_SHADER_VIEW] = {
+                                    d3d11Res, d3d11Res, d3d11Res, d3d11Res
+                                };
+
+                                if (D3D11_AllocateResourceView(p_dec, dev_sys->d3d_dev.d3ddevice, cfg, tex, slice, p_sys->cachedSRV[slice]) != VLC_SUCCESS)
+                                {
+                                    d3d11Res->Release();
+                                    goto error;
+                                }
+                            }
+                            p_sys->cached_tex = d3d11Res;
+                        }
+                    }
+                    else if (p_sys->cached_tex.Get() != d3d11Res)
+                    {
+                        msg_Err(p_dec, "separate texture not supported");
+                        d3d11Res->Release();
+                        goto error;
+                    }
+
+                    pic_ctx = CreatePicContext(d3d11Res, sliceIndex, output_media_buffer, p_sys, p_sys->cachedSRV[sliceIndex], p_sys->vctx_out);
+                    d3d11Res->Release();
+
+                    if (unlikely(pic_ctx == nullptr))
+                        goto error;
+                }
+            }
+
+            if (decoder_UpdateVideoOutput(p_dec, p_sys->vctx_out))
+            {
+                if (pic_ctx)
+                    d3d11mf_pic_context_destroy(&pic_ctx->ctx.s);
+                return VLC_EGENERIC;
+            }
+
             picture = decoder_NewPicture(p_dec);
             if (!picture)
-                return VLC_SUCCESS;
+            {
+                if (pic_ctx)
+                    d3d11mf_pic_context_destroy(&pic_ctx->ctx.s);
+                return VLC_EGENERIC;
+            }
 
             UINT32 interlaced = false;
             hr = output_sample->GetUINT32(MFSampleExtension_Interlaced, &interlaced);
@@ -820,6 +1013,12 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
 
             picture->date = samp_time;
 
+            if (pic_ctx)
+            {
+                picture->context = &pic_ctx->ctx.s;
+            }
+            else
+            {
             BYTE *buffer_start;
             hr = output_media_buffer->Lock(&buffer_start, NULL, NULL);
             if (FAILED(hr))
@@ -835,6 +1034,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool & keep_re
             {
                 picture_Release(picture);
                 goto error;
+            }
             }
 
             decoder_QueueVideo(p_dec, picture);
@@ -1055,6 +1255,29 @@ error:
 
 static void DestroyMFT(decoder_t *p_dec);
 
+static int SetD3D11(decoder_t *p_dec, d3d11_device_t *d3d_dev)
+{
+    decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
+    HRESULT hr;
+    hr = p_sys->fptr_MFCreateDXGIDeviceManager(&p_sys->dxgi_token, p_sys->dxgi_manager.GetAddressOf());
+    if (FAILED(hr))
+        return VLC_EGENERIC;
+
+    hr = p_sys->dxgi_manager->ResetDevice(d3d_dev->d3ddevice, p_sys->dxgi_token);
+    if (FAILED(hr))
+        return VLC_EGENERIC;
+
+    hr = p_sys->dxgi_manager->OpenDeviceHandle(&p_sys->d3d_handle);
+    if (FAILED(hr))
+        return VLC_EGENERIC;
+
+    hr = p_sys->mft->ProcessMessage(MFT_MESSAGE_SET_D3D_MANAGER, (ULONG_PTR)p_sys->dxgi_manager.Get());
+    if (FAILED(hr))
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
+}
+
 static int InitializeMFT(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = static_cast<decoder_sys_t*>(p_dec->p_sys);
@@ -1110,6 +1333,35 @@ static int InitializeMFT(decoder_t *p_dec)
 
     if (SetInputType(p_dec, p_sys->input_stream_id, p_sys->input_type))
         goto error;
+
+    if (attributes.Get() && p_dec->fmt_in.i_cat == VIDEO_ES)
+    {
+        if (p_sys->fptr_MFCreateDXGIDeviceManager)
+        {
+            vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
+            if (dec_dev != nullptr)
+            {
+                d3d11_decoder_device_t *devsys11 = GetD3D11OpaqueDevice(dec_dev);
+                if (devsys11 != nullptr)
+                {
+                    UINT32 can_d3d11;
+                    hr = attributes->GetUINT32(MF_SA_D3D11_AWARE, &can_d3d11);
+                    if (SUCCEEDED(hr) && can_d3d11)
+                    {
+                        SetD3D11(p_dec, &devsys11->d3d_dev);
+
+                        IMFAttributes *outputAttr = NULL;
+                        hr = p_sys->mft->GetOutputStreamAttributes(p_sys->output_stream_id, &outputAttr);
+                        if (SUCCEEDED(hr))
+                        {
+                            hr = outputAttr->SetUINT32(MF_SA_D3D11_BINDFLAGS, D3D11_BIND_SHADER_RESOURCE);
+                        }
+                    }
+                }
+                vlc_decoder_device_Release(dec_dev);
+            }
+        }
+    }
 
     if (SetOutputType(p_dec, p_sys->output_stream_id))
         goto error;
@@ -1227,12 +1479,23 @@ static int FindMFT(decoder_t *p_dec)
     return VLC_EGENERIC;
 }
 
-static int LoadMFTLibrary()
+static int LoadMFTLibrary(decoder_sys_t *p_sys)
 {
     HRESULT hr = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
     if (FAILED(hr))
         return VLC_EGENERIC;
 
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
+    HINSTANCE mfplat_dll = LoadLibrary(TEXT("mfplat.dll"));
+    if (mfplat_dll)
+    {
+        p_sys->fptr_MFCreateDXGIDeviceManager = (pf_MFCreateDXGIDeviceManager)GetProcAddress(mfplat_dll, "MFCreateDXGIDeviceManager");
+        // we still have the DLL automatically loaded after this
+        FreeLibrary(mfplat_dll);
+    }
+#else // Win8+
+    p_sys->fptr_MFCreateDXGIDeviceManager = &MFCreateDXGIDeviceManager;
+#endif // Win8+
 
     return VLC_SUCCESS;
 }
@@ -1253,7 +1516,7 @@ static int Open(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    if (LoadMFTLibrary())
+    if (LoadMFTLibrary(p_sys))
     {
         msg_Err(p_dec, "Failed to load MFT library.");
         goto error;
