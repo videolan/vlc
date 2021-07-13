@@ -143,19 +143,16 @@ on_playlist_current_item_changed(vlc_playlist_t *playlist, ssize_t index,
 
 } // extern "C"
 
-static const struct vlc_playlist_callbacks playlist_callbacks = {
-    /* C++ (before C++20) does not support designated initializers */
-    on_playlist_items_reset,
-    on_playlist_items_added,
-    on_playlist_items_moved,
-    on_playlist_items_removed,
-    on_playlist_items_updated,
-    nullptr,
-    nullptr,
-    on_playlist_current_item_changed,
-    nullptr,
-    nullptr,
-};
+static const struct vlc_playlist_callbacks playlist_callbacks = []{
+    struct vlc_playlist_callbacks cbs {};
+    cbs.on_items_reset = on_playlist_items_reset;
+    cbs.on_items_added = on_playlist_items_added;
+    cbs.on_items_moved = on_playlist_items_moved;
+    cbs.on_items_removed = on_playlist_items_removed;
+    cbs.on_items_updated = on_playlist_items_updated;
+    cbs.on_current_index_changed = on_playlist_current_item_changed;
+    return cbs;
+}();
 
 // private API
 
