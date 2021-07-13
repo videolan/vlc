@@ -267,19 +267,20 @@ on_playlist_has_next_changed(vlc_playlist_t *playlist, bool has_next,
 
 } // extern "C"
 
-static const struct vlc_playlist_callbacks playlist_callbacks = {
-    /* C++ (before C++20) does not support designated initializers */
-    on_playlist_items_reset,
-    on_playlist_items_added,
-    on_playlist_items_moved,
-    on_playlist_items_removed,
-    on_playlist_items_updated,
-    on_playlist_playback_repeat_changed,
-    on_playlist_playback_order_changed,
-    on_playlist_current_item_changed,
-    on_playlist_has_prev_changed,
-    on_playlist_has_next_changed,
-};
+static const struct vlc_playlist_callbacks playlist_callbacks = []{
+    struct vlc_playlist_callbacks cbs {};
+    cbs.on_items_reset = on_playlist_items_reset;
+    cbs.on_items_added = on_playlist_items_added;
+    cbs.on_items_moved = on_playlist_items_moved;
+    cbs.on_items_removed = on_playlist_items_removed;
+    cbs.on_items_updated = on_playlist_items_updated;
+    cbs.on_playback_repeat_changed = on_playlist_playback_repeat_changed;
+    cbs.on_playback_order_changed= on_playlist_playback_order_changed;
+    cbs.on_current_index_changed = on_playlist_current_item_changed;
+    cbs.on_has_next_changed = on_playlist_has_prev_changed;
+    cbs.on_has_prev_changed = on_playlist_has_next_changed;
+    return cbs;
+}();
 
 
 //private API
