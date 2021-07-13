@@ -8,6 +8,8 @@ convert, encode, **stream** and manipulate streams into numerous formats.
 
 VLC is used by many over the world, on numerous platforms, for very different use cases.
 
+VLC is platform that take cares for user interface experience, visit videolan store(https://www.videolan.org/vlc/skins.html) for customization like window skin or customized buttons.
+
 The **engine of VLC** can be embedded into 3rd party applications, and is called *libVLC*.
 
 **VLC** is part of the [VideoLAN project](https://videolan.org) and
