@@ -1073,6 +1073,10 @@ static const char *const ppsz_prefres[] = {
     "You can select which VoD server module you want to use. Set this " \
     "to 'vod_rtsp' to switch back to the old, legacy module." )
 
+#define TRACER_TEXT N_("Tracer module")
+#define TRACER_LONGTEXT N_( \
+    "This allow to select which tracer module you want to use." )
+
 #define VLM_CONF_TEXT N_("VLM configuration file")
 #define VLM_CONF_LONGTEXT N_( \
     "Read a VLM configuration file as soon as VLM is started." )
@@ -2045,6 +2049,8 @@ vlc_module_begin ()
     set_section( N_("Special modules"), NULL )
     add_module("vod-server", "vod server", NULL,
                VOD_SERVER_TEXT, VOD_SERVER_LONGTEXT)
+    add_module("tracer", "tracer", NULL,
+               TRACER_TEXT, TRACER_LONGTEXT)
 
     set_section( N_("Plugins" ), NULL )
 #ifdef HAVE_DYNAMIC_PLUGINS
