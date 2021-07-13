@@ -25,6 +25,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
+import "qrc:///util/Helpers.js" as Helpers
 
 Item{
     id: controlButtons
@@ -238,17 +239,16 @@ Item{
 
                     readonly property int radius: playBtnMouseArea.width / 2
 
-                    function distance2D(x0, y0, x1, y1) {
-                        return Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0))
-                    }
-
                     onPositionChanged: {
-                        if (distance2D(playBtnMouseArea.mouseX, playBtnMouseArea.mouseY, playBtnMouseArea.width / 2, playBtnMouseArea.height / 2) < radius) {
-                            // mouse is inside of the round button
+                        if (Helpers.pointInRadius(
+                              (playBtnMouseArea.width / 2) - playBtnMouseArea.mouseX,
+                              (playBtnMouseArea.height / 2) - playBtnMouseArea.mouseY,
+                              radius)) {
+                            // cursor is inside of the round button
                             playBtn.isCursorInside = true
                         }
                         else {
-                            // mouse is outside
+                            // cursor is outside
                             playBtn.isCursorInside = false
                         }
                     }
