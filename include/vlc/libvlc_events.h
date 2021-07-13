@@ -238,6 +238,7 @@ enum libvlc_event_e {
 
     libvlc_CaptionsToDisplay,
     libvlc_MediaPlayerBufferCleared,
+    libvlc_VoutFrameDisplayed,
 };
 
 /**
@@ -427,12 +428,19 @@ typedef struct libvlc_event_t
         struct
         {
             libvlc_video_output_t *video_output;
+
         } video_output_frame_displayed;
         struct
         {
             const void *p_cc;
             size_t i_cc;
         } captions_to_display;
+        struct
+        {
+            libvlc_video_output_t *video_output;
+            const char *psz_id;
+            int64_t timestamp; // TODO: unit
+        } frame_displayed;
     } u; /**< Type-dependent event description */
 } libvlc_event_t;
 
