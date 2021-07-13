@@ -819,7 +819,7 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
             open_state = OPEN_STATE_INIT;
     }
 
-    if (p_intf->p_compositor )
+    if ( p_intf->p_compositor )
     {
         if (cleanupReason == CLEANUP_INTF_CLOSED)
         {
@@ -829,6 +829,9 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
         {
             p_intf->p_compositor->destroyMainInterface();
             p_intf->p_mi = nullptr;
+
+            delete p_intf->mainSettings;
+            p_intf->mainSettings = nullptr;
 
             delete p_intf->p_compositor;
             p_intf->p_compositor = nullptr;
@@ -857,12 +860,6 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
     if (p_intf->p_mainPlayerController)
     {
         delete p_intf->p_mainPlayerController;
-        p_intf->p_mainPlayerController = nullptr;
-    }
-    /* Delete the configuration. Application has to be deleted after that. */
-    if (p_intf->p_mainPlayerController)
-    {
-        delete p_intf->mainSettings;
         p_intf->p_mainPlayerController = nullptr;
     }
 
