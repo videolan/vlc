@@ -833,8 +833,10 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
 
         /* Reallocate output sample. */
         if (p_sys->output_sample)
+        {
             IMFSample_Release(p_sys->output_sample);
-        p_sys->output_sample = NULL;
+            p_sys->output_sample = NULL;
+        }
         if (AllocateOutputSample(p_dec, 0, &p_sys->output_sample))
             goto error;
         return VLC_SUCCESS;
@@ -1081,6 +1083,7 @@ static void DestroyMFT(decoder_t *p_dec)
         if (SUCCEEDED(hr))
             IMFSample_Release(output_media_buffer);
         IMFSample_Release(p_sys->output_sample);
+        p_sys->output_sample = NULL;
     }
     if (p_sys->output_type)
         IMFMediaType_Release(p_sys->output_type);
@@ -1092,7 +1095,6 @@ static void DestroyMFT(decoder_t *p_dec)
 
     p_sys->event_generator = NULL;
     p_sys->input_type = NULL;
-    p_sys->output_sample = NULL;
     p_sys->output_type = NULL;
     p_sys->mft = NULL;
 }
