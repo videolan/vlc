@@ -511,6 +511,9 @@ vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
     if (order != NULL)
         *order = vout_rsc->order;
 
+    dcfg.vout->cbs = cfg->video.cbs;
+    dcfg.vout->owner = cfg->video.opaque;
+
     if (dcfg.fmt == NULL)
     {
         /* A NULL fmt means that only the vout creation is requested, do not

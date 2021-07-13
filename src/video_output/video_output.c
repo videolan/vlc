@@ -2223,7 +2223,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     if (vout_ChangeSource(cfg->vout, &original, vctx) == 0)
     {
         video_format_Clean(&original);
-        return 0;
+        goto end;
     }
 
     vlc_mutex_lock(&sys->window_lock);
@@ -2287,6 +2287,10 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     if (input != NULL && sys->spu)
         spu_Attach(sys->spu, input);
     vout_IntfReinit(cfg->vout);
+
+end:
+    cfg->vout->owner = cfg->video.opaque;
+    cfg->vout->cbs = cfg->video.cbs;
     return 0;
 }
 
