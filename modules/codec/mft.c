@@ -734,6 +734,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
         IMFCollection_Release(output_buffer.pEvents);
     /* Use the returned sample since it can be provided by the MFT. */
     IMFSample *output_sample = output_buffer.pSample;
+    IMFMediaBuffer *output_media_buffer = NULL;
 
     *keep_reading = false;
     if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT)
@@ -751,8 +752,10 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
         /* Convert from 100 nanoseconds unit to microseconds. */
         vlc_tick_t samp_time = VLC_TICK_FROM_MSFTIME(sample_time);
 
-        DWORD total_length = 0;
-        hr = IMFSample_GetTotalLength(output_sample, &total_length);
+        hr = IMFSample_GetBufferByIndex(output_sample, 0, &output_media_buffer);
+
+        BYTE *buffer_start;
+        hr = IMFMediaBuffer_Lock(output_media_buffer, &buffer_start, NULL, NULL);
         if (FAILED(hr))
             goto error;
 
@@ -769,6 +772,8 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
             picture->b_progressive = !interlaced;
 
             picture->date = samp_time;
+
+            CopyPackedBufferToPicture(picture, buffer_start);
         }
         else
         {
@@ -776,6 +781,12 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
                 goto error;
             if (p_dec->fmt_out.audio.i_bitspersample == 0 || p_dec->fmt_out.audio.i_channels == 0)
                 goto error;
+
+            DWORD total_length = 0;
+            hr = IMFSample_GetTotalLength(output_sample, &total_length);
+            if (FAILED(hr))
+                goto error;
+
             int samples = total_length / (p_dec->fmt_out.audio.i_bitspersample * p_dec->fmt_out.audio.i_channels / 8);
             aout_buffer = decoder_NewAudioBuffer(p_dec, samples);
             if (!aout_buffer)
@@ -784,20 +795,9 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
                 goto error;
 
             aout_buffer->i_pts = samp_time;
-        }
 
-        IMFMediaBuffer *output_media_buffer = NULL;
-        hr = IMFSample_GetBufferByIndex(output_sample, 0, &output_media_buffer);
-
-        BYTE *buffer_start;
-        hr = IMFMediaBuffer_Lock(output_media_buffer, &buffer_start, NULL, NULL);
-        if (FAILED(hr))
-            goto error;
-
-        if (p_dec->fmt_in.i_cat == VIDEO_ES)
-            CopyPackedBufferToPicture(picture, buffer_start);
-        else
             memcpy(aout_buffer->p_buffer, buffer_start, total_length);
+        }
 
         hr = IMFMediaBuffer_Unlock(output_media_buffer);
         IMFSample_Release(output_media_buffer);
@@ -851,6 +851,8 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
 
 error:
     msg_Err(p_dec, "Error in ProcessOutputStream()");
+    if (output_media_buffer)
+        IMFSample_Release(output_media_buffer);
     if (picture)
         picture_Release(picture);
     if (aout_buffer)
