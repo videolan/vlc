@@ -773,7 +773,18 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
 
             picture->date = samp_time;
 
+            BYTE *buffer_start;
+            hr = IMFMediaBuffer_Lock(output_media_buffer, &buffer_start, NULL, NULL);
+            if (FAILED(hr))
+                goto error;
+
             CopyPackedBufferToPicture(picture, buffer_start);
+
+            hr = IMFMediaBuffer_Unlock(output_media_buffer);
+            if (FAILED(hr))
+                goto error;
+
+            decoder_QueueVideo(p_dec, picture);
         }
         else
         {
@@ -796,7 +807,18 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
 
             aout_buffer->i_pts = samp_time;
 
+            BYTE *buffer_start;
+            hr = IMFMediaBuffer_Lock(output_media_buffer, &buffer_start, NULL, NULL);
+            if (FAILED(hr))
+                goto error;
+
             memcpy(aout_buffer->p_buffer, buffer_start, total_length);
+
+            hr = IMFMediaBuffer_Unlock(output_media_buffer);
+            if (FAILED(hr))
+                goto error;
+
+            decoder_QueueAudio(p_dec, aout_buffer);
         }
 
         hr = IMFMediaBuffer_Unlock(output_media_buffer);
@@ -816,11 +838,6 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
             /* Sample is provided by the MFT: decrease refcount. */
             IMFSample_Release(output_sample);
         }
-
-        if (p_dec->fmt_in.i_cat == VIDEO_ES)
-            decoder_QueueVideo(p_dec, picture);
-        else
-            decoder_QueueAudio(p_dec, aout_buffer);
 
         *keep_reading = true;
         return VLC_SUCCESS;
