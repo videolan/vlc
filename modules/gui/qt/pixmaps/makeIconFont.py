@@ -49,8 +49,8 @@ QML_TEMPLATE=u"""
 pragma Singleton
 import QtQuick 2.0
 
-Item {
-    FontLoader {
+QtObject {
+    readonly property FontLoader fontLoader : FontLoader {
         source: "{{qml_file_prefix}}{{font_file}}"
     }
 
@@ -64,6 +64,7 @@ Item {
 {% for f in glyphs %}    property string {{f.key}} : "{{f.charcode}}"
 {% endfor %}
 }
+
 """
 
 UTF8_AREA = 0xE000
