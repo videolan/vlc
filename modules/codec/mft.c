@@ -773,7 +773,10 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id, bool *keep_rea
 
                 UINT32 interlaced = false;
                 hr = IMFSample_GetUINT32(output_sample, &MFSampleExtension_Interlaced, &interlaced);
-                picture->b_progressive = !interlaced;
+                if (FAILED(hr))
+                    picture->b_progressive = true;
+                else
+                    picture->b_progressive = !interlaced;
 
                 picture->date = samp_time;
 
