@@ -24,16 +24,6 @@
 # include "config.h"
 #endif
 
-/* Needed for many mingw macros. */
-#define COBJMACROS
-
-/* Avoid having GUIDs being defined as "extern". */
-#define INITGUID
-
-#ifndef STDCALL
-# define STDCALL __stdcall
-#endif
-
 #include <winapifamily.h>
 #undef WINAPI_FAMILY
 #define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
@@ -47,6 +37,8 @@
 #define _VIDEOINFOHEADER_
 #include <vlc_codecs.h>
 
+#define COBJMACROS
+#include <initguid.h>
 #include <mfapi.h>
 #include <mftransform.h>
 #include <mferror.h>
