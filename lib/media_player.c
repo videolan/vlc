@@ -568,9 +568,28 @@ static void on_captions_to_display( const void *p_cc, size_t i_cc, void *p_data 
     libvlc_event_send(&mp->event_manager, &event);
 }
 
+static void on_frame_displayed(vout_thread_t *vout, struct vlc_player_track *track,
+        vlc_tick_t pts, void *p_data)
+{
+    (void)vout;
+    libvlc_media_player_t *mp = p_data;
+
+    libvlc_event_t event = {
+        .type = libvlc_VoutFrameDisplayed,
+        .u.frame_displayed = {
+            .psz_id = vlc_es_id_GetStrId(track->es_id),
+            .timestamp = pts, // TODO
+            .video_output = NULL,
+            // TODO vout
+        },
+    };
+    libvlc_event_send(&mp->event_manager, &event);
+}
+
 static const struct vlc_player_vout_cbs vlc_player_vout_cbs = {
     .on_first_frame_reported = on_vout_first_frame_reported,
     .on_captions_to_display = on_captions_to_display,
+    .on_frame_displayed = on_frame_displayed,
 };
 
 /**************************************************************************
