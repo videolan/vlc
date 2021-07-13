@@ -554,6 +554,10 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
 
         p_owner->out_pool = pool;
     }
+    static const struct vlc_video_output_callbacks vout_thread_cbs =
+    {
+        NULL,
+    };
 
     vout_configuration_t cfg = {
         .vout = p_owner->p_vout,
@@ -562,10 +566,14 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         .fmt = &p_dec->fmt_out.video,
         .mouse_event = MouseEvent,
         .mouse_opaque = p_dec,
+        /* Vout owner part */
+        .video.opaque = p_owner,
+        .video.cbs = &vout_thread_cbs,
     };
     vlc_fifo_Unlock(p_owner->p_fifo);
 
     enum input_resource_vout_state vout_state;
+
     vout_thread_t *p_vout =
         input_resource_RequestVout(p_owner->p_resource, vctx, &cfg, NULL,
                                    &vout_state);
