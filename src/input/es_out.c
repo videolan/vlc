@@ -942,7 +942,7 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
             p_es->p_dec_record = NULL;
         }
 #ifdef ENABLE_SOUT
-        sout_DeleteInstance( p_sys->p_sout_record );
+        sout_StreamChainDelete( p_sys->p_sout_record, NULL );
 #endif
         p_sys->p_sout_record = NULL;
     }

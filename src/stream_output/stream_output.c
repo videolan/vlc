@@ -107,14 +107,6 @@ sout_stream_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest )
 }
 
 /*****************************************************************************
- * sout_DeleteInstance: delete a previously allocated instance
- *****************************************************************************/
-void sout_DeleteInstance( sout_stream_t * p_sout )
-{
-    sout_StreamChainDelete( p_sout, NULL );
-}
-
-/*****************************************************************************
  * Packetizer/Input
  *****************************************************************************/
 

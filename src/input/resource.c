@@ -148,7 +148,7 @@ static void DestroySout( input_resource_t *p_resource )
     if( p_resource->p_sout )
     {
         msg_Dbg( p_resource->p_parent, "destroying stream output" );
-        sout_DeleteInstance( p_resource->p_sout );
+        sout_StreamChainDelete( p_resource->p_sout, NULL );
         free(p_resource->psz_sout);
     }
 #endif
