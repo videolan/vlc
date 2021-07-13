@@ -494,6 +494,12 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
 
 static int CreateVoutIfNeeded(vlc_input_decoder_t *);
 
+static void decoder_vout_on_frame_displayed(
+        vout_thread_t *vout, vlc_tick_t pts, void *opaque)
+{
+    vlc_input_decoder_t *p_owner = opaque;
+    decoder_Notify(p_owner, on_vout_frame_displayed, vout, pts);
+}
 
 static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *vctx )
 {
@@ -556,7 +562,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
     }
     static const struct vlc_video_output_callbacks vout_thread_cbs =
     {
-        NULL,
+        .on_frame_displayed = decoder_vout_on_frame_displayed,
     };
 
     vout_configuration_t cfg = {
