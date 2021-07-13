@@ -18,19 +18,19 @@
 pragma Singleton
 import QtQuick 2.11
 
-Item {
+QtObject {
     id: vlc_style
 
     readonly property real scale: mainInterface.intfScaleFactor
 
-    FontMetrics { id: fontMetrics_xxsmall;  font.pixelSize: dp(6, scale);  }
-    FontMetrics { id: fontMetrics_xsmall;   font.pixelSize: dp(8, scale);  }
-    FontMetrics { id: fontMetrics_small;    font.pixelSize: dp(10, scale); }
-    FontMetrics { id: fontMetrics_normal;   font.pixelSize: dp(12, scale); }
-    FontMetrics { id: fontMetrics_large;    font.pixelSize: dp(14, scale); }
-    FontMetrics { id: fontMetrics_xlarge;   font.pixelSize: dp(16, scale); }
-    FontMetrics { id: fontMetrics_xxlarge;  font.pixelSize: dp(20, scale); }
-    FontMetrics { id: fontMetrics_xxxlarge; font.pixelSize: dp(24, scale); }
+    readonly property FontMetrics fontMetrics_xxsmall  : FontMetrics { font.pixelSize: dp(6, scale);  }
+    readonly property FontMetrics fontMetrics_xsmall   : FontMetrics { font.pixelSize: dp(8, scale);  }
+    readonly property FontMetrics fontMetrics_small    : FontMetrics { font.pixelSize: dp(10, scale); }
+    readonly property FontMetrics fontMetrics_normal   : FontMetrics { font.pixelSize: dp(12, scale); }
+    readonly property FontMetrics fontMetrics_large    : FontMetrics { font.pixelSize: dp(14, scale); }
+    readonly property FontMetrics fontMetrics_xlarge   : FontMetrics { font.pixelSize: dp(16, scale); }
+    readonly property FontMetrics fontMetrics_xxlarge  : FontMetrics { font.pixelSize: dp(20, scale); }
+    readonly property FontMetrics fontMetrics_xxxlarge : FontMetrics { font.pixelSize: dp(24, scale); }
 
     property alias self: vlc_style
 
