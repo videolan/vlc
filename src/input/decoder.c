@@ -1886,6 +1886,7 @@ static const struct decoder_owner_callbacks dec_spu_cbs =
 static int avstat_callback(vlc_object_t *obj, const char *name,
         vlc_value_t oldval, vlc_value_t newval, void *opaque)
 {
+    (void)obj; (void)name; (void)oldval;
     vlc_input_decoder_t *p_owner = opaque;
     atomic_store(&p_owner->b_display_avstat, newval.b_bool);
     return VLC_SUCCESS;
