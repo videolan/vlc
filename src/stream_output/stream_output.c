@@ -114,11 +114,6 @@ void sout_DeleteInstance( sout_stream_t * p_sout )
     sout_StreamChainDelete( p_sout, NULL );
 }
 
-bool sout_instance_ControlsPace( sout_stream_t *sout )
-{
-    return !sout_StreamIsSynchronous(sout);
-}
-
 /*****************************************************************************
  * Packetizer/Input
  *****************************************************************************/
