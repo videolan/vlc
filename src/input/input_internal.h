@@ -150,7 +150,8 @@ typedef enum input_event_type_e
     /* Thumbnail generation */
     INPUT_EVENT_THUMBNAIL_READY,
 
-    INPUT_EVENT_BUFFER_CLEARED = 0x1000
+    INPUT_EVENT_BUFFER_CLEARED = 0x1000,
+    INPUT_EVENT_VOUT_FRAME_DISPLAYED,
 } input_event_type_e;
 
 #define VLC_INPUT_CAPABILITIES_SEEKABLE (1<<0)
@@ -266,6 +267,13 @@ struct vlc_input_event_vout
     vlc_es_id_t *id;
 };
 
+struct vlc_input_event_vout_frame_displayed
+{
+    vout_thread_t *vout;
+    struct vlc_es_out_id_t *id;
+    vlc_tick_t pts;
+};
+
 struct vlc_input_event
 {
     input_event_type_e type;
@@ -299,6 +307,8 @@ struct vlc_input_event
         float cache;
         /* INPUT_EVENT_VOUT */
         struct vlc_input_event_vout vout;
+        /* INPUT_EVENT_VOUT_FRAME_DISPLAYED */
+        struct vlc_input_event_vout_frame_displayed vout_frame;
         /* INPUT_EVENT_SUBITEMS */
         input_item_node_t *subitems;
         /* INPUT_EVENT_VBI_PAGE */
