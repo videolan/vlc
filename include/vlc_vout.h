@@ -63,7 +63,7 @@ struct vout_thread_t {
 
     /* Feedback */
     void *owner;
-    struct vlc_video_output_callbacks *cbs;
+    const struct vlc_video_output_callbacks *cbs;
 };
 
 /* Alignment flags */
