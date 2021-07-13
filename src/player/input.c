@@ -859,6 +859,21 @@ input_thread_Events(input_thread_t *input_thread,
         case INPUT_EVENT_VOUT:
             vlc_player_input_HandleVoutEvent(input, &event->vout);
             break;
+        case INPUT_EVENT_VOUT_FRAME_DISPLAYED:
+        {
+            vlc_player_track_vector *vec =
+                vlc_player_input_GetTrackVector(input, VIDEO_ES);
+            assert(vec);
+
+            struct vlc_player_track_priv *track =
+                vlc_player_track_vector_FindById(vec, event->vout_frame.id, NULL);
+            assert(track);
+
+            vlc_player_vout_SendEvent(player, on_frame_displayed,
+                event->vout_frame.vout, track,
+                event->vout_frame.pts);
+            break;
+        }
         case INPUT_EVENT_ITEM_META:
             vlc_player_SendEvent(player, on_media_meta_changed,
                                  input_GetItem(input->thread));
