@@ -2,6 +2,7 @@
 PROTOBUF_VERSION := 3.1.0
 PROTOBUF_URL := https://github.com/google/protobuf/releases/download/v$(PROTOBUF_VERSION)/protobuf-cpp-$(PROTOBUF_VERSION).tar.gz
 
+ifndef HAVE_TVOS
 PKGS += protobuf
 ifeq ($(call need_pkg, "protobuf-lite >= 3.1.0 protobuf-lite < 3.2.0"),)
 PKGS_FOUND += protobuf
@@ -21,6 +22,7 @@ PROTOC = $(PROTOC_ABSPATH)
 endif
 endif
 endif
+endif # !HAVE_TVOS
 
 $(TARBALLS)/protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz:
 	$(call download_pkg,$(PROTOBUF_URL),protobuf)
