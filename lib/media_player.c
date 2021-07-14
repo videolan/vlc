@@ -557,7 +557,8 @@ static void on_vout_first_frame_reported(vout_thread_t *vout, void *p_data)
     libvlc_event_send(&mp->event_manager, &event);
 }
 
-static void on_captions_to_display( const void *p_cc, size_t i_cc, void *p_data )
+static void on_captions_to_display(vout_thread_t *vout,
+    const void *p_cc, size_t i_cc, void *p_data )
 {
     libvlc_media_player_t *mp = p_data;
 

@@ -2549,7 +2549,7 @@ struct vlc_player_vout_cbs
      * Called when the vout has captions data to display
      *
      */
-    void (*on_captions_to_display)(const void *, size_t, void *data);
+    void (*on_captions_to_display)(vout_thread_t *vout, const void *, size_t, void *data);
 
     void (*on_frame_displayed)(vout_thread_t *vout,
                                struct vlc_player_track *track,

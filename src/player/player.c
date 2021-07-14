@@ -1944,7 +1944,7 @@ static void PlayerCaptionsToDisplay(const void *p_cc, size_t i_cc, void *opaque)
     vlc_list_foreach(listener, &player->vout_listeners, node)
     {
         if (listener->cbs->on_captions_to_display)
-            listener->cbs->on_captions_to_display(p_cc, i_cc, listener->cbs_data);
+            listener->cbs->on_captions_to_display(NULL, p_cc, i_cc, listener->cbs_data);
     }
     vlc_player_Unlock(player);
 }
