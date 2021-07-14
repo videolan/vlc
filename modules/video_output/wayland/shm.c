@@ -53,9 +53,6 @@ typedef struct vout_display_sys_t
     struct wp_viewport *viewport;
 
     size_t active_buffers;
-
-    unsigned display_width;
-    unsigned display_height;
 } vout_display_sys_t;
 
 struct buffer_data
