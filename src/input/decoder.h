@@ -43,6 +43,9 @@ struct vlc_input_decoder_callbacks {
                                void *userdata);
     void (*on_new_audio_stats)(vlc_input_decoder_t *decoder, unsigned decoded,
                                unsigned lost, unsigned played, void *userdata);
+    void (*on_captions_to_display)(vlc_input_decoder_t *decoder,
+                                   vout_thread_t *vout, const void *p_cc, size_t i_cc,
+                                   void *userdata);
     void (*on_vout_frame_displayed)(vlc_input_decoder_t *decoder,
                                     vout_thread_t *vout, vlc_tick_t pts,
                                     void *userdata);
