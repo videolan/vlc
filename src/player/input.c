@@ -904,6 +904,10 @@ input_thread_Events(input_thread_t *input_thread,
             break;
         case INPUT_EVENT_BUFFER_CLEARED:
             vlc_player_SendEvent(player, on_buffer_cleared);
+            break;
+        case INPUT_EVENT_VOUT_CAPTIONS_TO_DISPLAY:
+            vlc_player_vout_SendEvent(player, on_captions_to_display, event->captions.vout, event->captions.p_cc, event->captions.i_cc);
+            break;
         default:
             break;
     }
