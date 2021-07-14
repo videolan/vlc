@@ -385,6 +385,30 @@ decoder_on_vout_stopped(vlc_input_decoder_t *decoder, vout_thread_t *vout, void 
     var_DelCallback(p_sys->p_input, "avstat", ForwardValue, vout);
 }
 
+static void
+decoder_on_captions_to_display(vlc_input_decoder_t *decoder, vout_thread_t *vout,
+                               void *p_cc, size_t i_cc, void *userdata)
+{
+    (void)decoder;
+    es_out_id_t *id = userdata;
+    es_out_t *out = id->out;
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if (!p_sys->p_input)
+        return;
+
+    struct vlc_input_event event = {
+        .type = INPUT_EVENT_VOUT_CAPTIONS_TO_DISPLAY,
+        .captions = {
+            .vout = vout,
+            .p_cc = p_cc,
+            .i_cc = i_cc,
+        },
+    };
+
+    input_SendEvent(p_sys->p_input, &event);
+}
+
 static void 
 decoder_on_vout_frame_displayed(vlc_input_decoder_t *decoder, vout_thread_t *vout,
                                 vlc_tick_t pts, void *userdata)
@@ -501,6 +525,7 @@ decoder_get_attachments(vlc_input_decoder_t *decoder,
 static const struct vlc_input_decoder_callbacks decoder_cbs = {
     .on_vout_started = decoder_on_vout_started,
     .on_vout_stopped = decoder_on_vout_stopped,
+    .on_captions_to_display = decoder_on_captions_to_display,
     .on_vout_frame_displayed = decoder_on_vout_frame_displayed,
     .on_thumbnail_ready = decoder_on_thumbnail_ready,
     .on_new_video_stats = decoder_on_new_video_stats,
