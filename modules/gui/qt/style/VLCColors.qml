@@ -238,10 +238,10 @@ Item {
 
                 text: "#eff0f1"
                 textInactive: "#bdc3c7"
-                bg: "#232629"
+                bg: "#1a1a1a"
                 bgInactive: "#232629"
-                bgAlt: "#31363b"
-                bgAltInactive: "#31363b"
+                bgAlt: "#242424"
+                bgAltInactive: "#212121"
                 bgHover: "#303030"
                 bgHoverText: text
                 bgHoverInactive: "#3daee9"
@@ -251,7 +251,7 @@ Item {
                 buttonText: "#eff0f1"
                 buttonBorder: "#575b5f"
                 textActiveSource: "#ff950d"
-                banner: "#31363b"
+                banner: "#000000"
                 bannerHover: "#272727"
                 accent: "#ff8800"
                 alert: "#ff0000"
