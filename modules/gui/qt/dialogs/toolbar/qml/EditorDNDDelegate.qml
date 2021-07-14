@@ -35,7 +35,7 @@ MouseArea {
     drag.target: content
 
     implicitWidth: loader.implicitWidth + content.border.width * 2
-    implicitHeight: VLCStyle.icon_medium
+    implicitHeight: loader.implicitHeight
 
     hoverEnabled: true
 
@@ -62,8 +62,8 @@ MouseArea {
 
         z: 1
 
-        width: VLCStyle.dp(2, VLCStyle.scale)
-        height: parent.height
+        implicitWidth: VLCStyle.dp(2, VLCStyle.scale)
+        implicitHeight: VLCStyle.icon_medium
 
         visible: dropArea.containsDrag
         color: VLCStyle.colors.accent
