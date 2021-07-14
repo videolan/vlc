@@ -418,6 +418,15 @@ static void decoder_vout_on_frame_displayed(
             p_owner, vout, pts, p_owner->cbs_userdata);
 }
 
+static void decoder_vout_captions_to_display(
+        const void *p_cc, size_t i_cc, void *opaque)
+{
+    vlc_input_decoder_t *p_owner = opaque;
+
+    if (p_owner->cbs != NULL && p_owner->cbs->on_captions_to_display != NULL)
+        p_owner->cbs->on_captions_to_display(p_owner, NULL, p_cc, i_cc, p_owner->cbs_userdata);
+}
+
 static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *vctx )
 {
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
@@ -482,6 +491,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
     static const struct vlc_video_output_callbacks vout_thread_cbs =
     {
         .on_frame_displayed = decoder_vout_on_frame_displayed,
+        .captions_to_display = decoder_vout_captions_to_display,
     };
 
     vout_configuration_t cfg = {
