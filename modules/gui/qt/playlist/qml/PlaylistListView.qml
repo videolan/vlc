@@ -103,7 +103,7 @@ FocusScope {
     Rectangle {
         id: parentRect
         anchors.fill: parent
-        color: colors.banner
+        color: colors.bgAlt
 
         onActiveFocusChanged: {
             if (activeFocus)
