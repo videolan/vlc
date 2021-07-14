@@ -71,7 +71,7 @@ Rectangle{
         Rectangle{
             id: parentRectangle
 
-            Layout.preferredHeight: VLCStyle.heightBar_large * 1.25
+            Layout.preferredHeight: VLCStyle.maxControlbarControlHeight * 1.5
             Layout.fillWidth: true
 
             color: "transparent"
