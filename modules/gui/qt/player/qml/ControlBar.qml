@@ -113,7 +113,7 @@ FocusScope {
     ColumnLayout {
         id: columnLayout
         anchors.fill: parent
-        spacing: VLCStyle.margin_small
+        spacing: VLCStyle.margin_xsmall
 
         RowLayout {
             id: row1
