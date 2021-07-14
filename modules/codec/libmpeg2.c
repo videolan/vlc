@@ -148,7 +148,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
-    uint32_t i_accel = 0;
 
     if( p_dec->fmt_in.i_codec != VLC_CODEC_MPGV )
         return VLC_EGENERIC;
@@ -197,34 +196,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 #endif
     p_sys->p_gop_user_data = NULL;
     p_sys->i_gop_user_data = 0;
-
-#if defined( __i386__ ) || defined( __x86_64__ )
-    if( vlc_CPU_MMX() )
-        i_accel |= MPEG2_ACCEL_X86_MMX;
-    if( vlc_CPU_MMXEXT() )
-        i_accel |= MPEG2_ACCEL_X86_MMXEXT;
-#elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-    if( vlc_CPU_ALTIVEC() )
-        i_accel |= MPEG2_ACCEL_PPC_ALTIVEC;
-
-#elif defined(__arm__)
-# ifdef MPEG2_ACCEL_ARM
-    i_accel |= MPEG2_ACCEL_ARM;
-# endif
-# ifdef MPEG2_ACCEL_ARM_NEON
-    if( vlc_CPU_ARM_NEON() )
-        i_accel |= MPEG2_ACCEL_ARM_NEON;
-# endif
-
-    /* TODO: sparc */
-#else
-    /* If we do not know this CPU, trust libmpeg2's feature detection */
-    i_accel = MPEG2_ACCEL_DETECT;
-
-#endif
-
-    /* Set CPU acceleration features */
-    mpeg2_accel( i_accel );
 
     /* Initialize decoder */
     p_sys->p_mpeg2dec = mpeg2_init();
