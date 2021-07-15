@@ -85,7 +85,7 @@ vlc_module_end ()
 typedef struct
 {
     SwsFilter *p_filter;
-    int i_cpu_mask, i_sws_flags;
+    int i_sws_flags;
 
     video_format_t fmt_in;
     video_format_t fmt_out;
@@ -125,8 +125,6 @@ static int GetParameters( ScalerConfiguration *,
                           const video_format_t *p_fmti,
                           const video_format_t *p_fmto,
                           int i_sws_flags_default );
-
-static int GetSwsCpuMask(void);
 
 /* SwScaler point resize quality seems really bad, let our scale module do it
  * (change it to true to try) */
@@ -211,9 +209,6 @@ static int OpenScaler( filter_t *p_filter )
     if( ( p_filter->p_sys = p_sys = calloc(1, sizeof(filter_sys_t)) ) == NULL )
         return VLC_ENOMEM;
 
-    /* Set CPU capabilities */
-    p_sys->i_cpu_mask = GetSwsCpuMask();
-
     /* */
     i_sws_mode = var_CreateGetInteger( p_filter, "swscale-mode" );
     switch( i_sws_mode )
@@ -275,25 +270,6 @@ static void CloseScaler( filter_t *p_filter )
 /*****************************************************************************
  * Helpers
  *****************************************************************************/
-static int GetSwsCpuMask(void)
-{
-    int i_sws_cpu = 0;
-
-#if LIBSWSCALE_VERSION_MAJOR < 4
-#if defined(__i386__) || defined(__x86_64__)
-    if( vlc_CPU_MMX() )
-        i_sws_cpu |= SWS_CPU_CAPS_MMX;
-    if( vlc_CPU_MMXEXT() )
-        i_sws_cpu |= SWS_CPU_CAPS_MMX2;
-#elif defined(__ppc__) || defined(__ppc64__) || defined(__powerpc__)
-    if( vlc_CPU_ALTIVEC() )
-        i_sws_cpu |= SWS_CPU_CAPS_ALTIVEC;
-#endif
-#endif
-
-    return i_sws_cpu;
-}
-
 static void FixParameters( enum AVPixelFormat *pi_fmt, bool *pb_has_a, bool *pb_swap_uv, vlc_fourcc_t fmt )
 {
     switch( fmt )
@@ -455,7 +431,7 @@ static int Init( filter_t *p_filter )
 
         ctx = sws_getContext( i_fmti_visible_width, p_fmti->i_visible_height, i_fmti,
                               i_fmto_visible_width, p_fmto->i_visible_height, i_fmto,
-                              cfg.i_sws_flags | p_sys->i_cpu_mask,
+                              cfg.i_sws_flags,
                               p_sys->p_filter, NULL, 0 );
         if( n == 0 )
             p_sys->ctx = ctx;
