@@ -246,6 +246,7 @@ ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/0002-avcodec-mpeg12dec-don-t-end-a-slice-without-first_sl.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-fix-mf_utils-compilation-with-mingw64.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-workaround-bogus-ER-with-fields-and-add-corruption-l.patch
+	$(APPLY) $(SRC)/ffmpeg/0001-flag-recursively-missing-reference-corruptions.patch
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch

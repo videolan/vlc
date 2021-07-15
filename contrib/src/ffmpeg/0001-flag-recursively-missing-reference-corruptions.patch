@@ -1,0 +1,96 @@
+From 53e2d3db2c0c19861e3a4df2874e4f207c140c28 Mon Sep 17 00:00:00 2001
+From: Francois Cartegnie <fcvlcdev@free.fr>
+Date: Fri, 15 Oct 2021 10:02:26 +0200
+Subject: [PATCH] recursively set corruption for h264 missing references
+
+---
+ libavcodec/h264_refs.c  | 16 ++++++++++++++++
+ libavcodec/h264_slice.c |  3 ++-
+ libavcodec/h264dec.c    |  2 ++
+ 3 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/libavcodec/h264_refs.c b/libavcodec/h264_refs.c
+index dae8bd2..70cfe1a 100644
+--- a/libavcodec/h264_refs.c
++++ b/libavcodec/h264_refs.c
+@@ -378,6 +378,7 @@ int ff_h264_build_ref_list(H264Context *h, H264SliceContext *sl)
+                        i < 0 ? "reference picture missing during reorder\n" :
+                                "mismatching reference\n"
+                       );
++                h->cur_pic_ptr->f->flags |= AV_FRAME_FLAG_CORRUPT;
+                 memset(&sl->ref_list[list][index], 0, sizeof(sl->ref_list[0][0])); // FIXME
+             } else {
+                 for (i = index; i + 1 < sl->ref_count[list]; i++) {
+@@ -402,6 +403,7 @@ int ff_h264_build_ref_list(H264Context *h, H264SliceContext *sl)
+                 || (!FIELD_PICTURE(h) && (sl->ref_list[list][index].reference&3) != 3)) {
+                 int i;
+                 av_log(h->avctx, AV_LOG_ERROR, "Missing reference picture, default is %d\n", h->default_ref[list].poc);
++                h->cur_pic_ptr->f->flags |= AV_FRAME_FLAG_CORRUPT;
+                 for (i = 0; i < FF_ARRAY_ELEMS(h->last_pocs); i++)
+                     h->last_pocs[i] = INT_MIN;
+                 if (h->default_ref[list].parent
+@@ -414,6 +416,19 @@ int ff_h264_build_ref_list(H264Context *h, H264SliceContext *sl)
+         }
+     }
+ 
++    for (list = 0; list < sl->list_count; list++) {
++        for (index = 0; index < sl->ref_count[list]; index++) {
++            if (  sl->ref_list[list][index].parent &&
++                  sl->ref_list[list][index].parent->f->flags & AV_FRAME_FLAG_CORRUPT)
++                  /*sl->ref_list[list][index].parent->corrupted )*/
++            {
++                h->cur_pic_ptr->f->flags |= AV_FRAME_FLAG_CORRUPT;
++                av_log(h->avctx, AV_LOG_ERROR, "reference %d is corrupted for %d %p\n",
++                       sl->ref_list[list][index].poc , h->cur_pic_ptr->poc, h->cur_pic_ptr);
++            }
++        }
++    }
++
+     if (FRAME_MBAFF(h))
+         h264_fill_mbaff_ref_list(sl);
+ 
+@@ -645,6 +660,7 @@ int ff_h264_execute_ref_pic_marking(H264Context *h)
+                     h->long_ref[mmco[i].long_arg]->frame_num != frame_num) {
+                     av_log(h->avctx, h->short_ref_count ? AV_LOG_ERROR : AV_LOG_DEBUG, "mmco: unref short failure\n");
+                     err = AVERROR_INVALIDDATA;
++                    h->cur_pic_ptr->f->flags |= AV_FRAME_FLAG_CORRUPT;
+                 }
+                 continue;
+             }
+diff --git a/libavcodec/h264_slice.c b/libavcodec/h264_slice.c
+index 2e17243..217e0e9 100644
+--- a/libavcodec/h264_slice.c
++++ b/libavcodec/h264_slice.c
+@@ -2155,7 +2155,7 @@ static int h264_slice_init(H264Context *h, H264SliceContext *sl,
+ 
+     if (h->avctx->debug & FF_DEBUG_PICT_INFO) {
+         av_log(h->avctx, AV_LOG_DEBUG,
+-               "slice:%d %s mb:%d %c%s%s frame:%d poc:%d/%d ref:%d/%d qp:%d loop:%d:%d:%d weight:%d%s %s\n",
++               "slice:%d %s mb:%d %c%s%s frame:%d poc:%d/%d crpt%d ref:%d/%d qp:%d loop:%d:%d:%d weight:%d%s %s\n",
+                sl->slice_num,
+                (h->picture_structure == PICT_FRAME ? "F" : h->picture_structure == PICT_TOP_FIELD ? "T" : "B"),
+                sl->mb_y * h->mb_width + sl->mb_x,
+@@ -2165,6 +2165,7 @@ static int h264_slice_init(H264Context *h, H264SliceContext *sl,
+                h->poc.frame_num,
+                h->cur_pic_ptr->field_poc[0],
+                h->cur_pic_ptr->field_poc[1],
++               h->cur_pic_ptr->f->flags & AV_FRAME_FLAG_CORRUPT,
+                sl->ref_count[0], sl->ref_count[1],
+                sl->qscale,
+                sl->deblocking_filter,
+diff --git a/libavcodec/h264dec.c b/libavcodec/h264dec.c
+index 269cdaf..9965805 100644
+--- a/libavcodec/h264dec.c
++++ b/libavcodec/h264dec.c
+@@ -949,6 +949,8 @@ static int finalize_frame(H264Context *h, AVFrame *dst, H264Picture *out, int *g
+             int linesizes[4];
+             const uint8_t *src_data[4];
+ 
++            out->f->flags |= AV_FRAME_FLAG_CORRUPT;
++
+             av_log(h->avctx, AV_LOG_DEBUG, "Duplicating field %d to fill missing\n", field);
+ 
+             for (p = 0; p<4; p++) {
+-- 
+2.31.1
+
