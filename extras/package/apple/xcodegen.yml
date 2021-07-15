@@ -3,11 +3,17 @@ options:
   bundleIdPrefix: org.videolan.vlc
   deploymentTarget:
     iOS: 9.0
-  StripBitcodeFromCopiedFiles: NO
 configs:
   Debug: debug
   Release: release
   Debug-bitcode: debug
+settings:
+  configs:
+    Debug:
+      PBXCP_BITCODE_STRIP_MODE: replace-with-marker
+      STRIP_BITCODE_FROM_COPIED_FILES: YES
+    Debug-bitcode:
+      STRIP_BITCODE_FROM_COPIED_FILES: NO
 targets:
   VLCAutomake:
     type: ""
@@ -78,8 +84,6 @@ targets:
       - target: VLCAutomake
     info:
       path: "vlc_plugin/Info.plist"
-    settings:
-      STRIP_BITCODE_FROM_COPIED_FILES: NO
     sources:
       - path: ${VLC_BUILD_DIR}/modules/.libs/libvlc_plugin.dylib
         optional: true
@@ -118,8 +122,6 @@ targets:
       - target: VLCAutomake
     info:
       path: "vlccore/Info.plist"
-    settings:
-      STRIP_BITCODE_FROM_COPIED_FILES: NO
     sources:
       - path: ${VLC_BUILD_DIR}/src/.libs/libvlccore.dylib
         name: vlccore
