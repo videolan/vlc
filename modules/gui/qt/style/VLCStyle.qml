@@ -134,8 +134,6 @@ QtObject {
 
     readonly property real network_normal: dp(100, scale)
 
-    readonly property int miniPlayerHeight: dp(76, scale)
-
     readonly property int expandAlbumTracksHeight: dp(200, scale)
 
     //combobox

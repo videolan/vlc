@@ -11,47 +11,30 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
-    readonly property bool expanded: root.implicitHeight === VLCStyle.miniPlayerHeight
+    implicitHeight: controlBar.implicitHeight
+    height: 0
+
+    readonly property bool expanded: (height !== 0)
 
     property var mainContent: undefined
 
-    Component.onCompleted: {
-        if (player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
-            root.implicitHeight = Qt.binding(function() { return VLCStyle.miniPlayerHeight; })
-    }
+    state: (player.playingState === PlayerController.PLAYING_STATE_STOPPED) ? ""
+                                                                            : "expanded"
 
-    Connections {
-        target: player
-        onPlayingStateChanged: {
-            if (player.playingState === PlayerController.PLAYING_STATE_STOPPED)
-                animateRetract.start()
-            else if (player.playingState === PlayerController.PLAYING_STATE_PLAYING)
-                animateExpand.start()
+    states: State {
+        id: stateExpanded
+        name: "expanded"
+
+        PropertyChanges {
+            target: root
+            height: implicitHeight
         }
     }
 
-    PropertyAnimation {
-        id: animateExpand;
-        target: root;
-        properties: "implicitHeight"
-        duration: VLCStyle.duration_normal
-        easing.type: Easing.InSine
-        to: VLCStyle.miniPlayerHeight
-        onStopped: {
-            root.implicitHeight = Qt.binding(function() { return VLCStyle.miniPlayerHeight; })
-        }
-    }
-
-    PropertyAnimation {
-        id: animateRetract;
-        target: root;
-        properties: "implicitHeight"
-        duration: VLCStyle.duration_normal
-        easing.type: Easing.OutSine
-        to: 0
-        onStopped: {
-            root.implicitHeight = 0
-        }
+    transitions: Transition {
+        from: ""; to: "expanded"
+        reversible: true
+        NumberAnimation { property: "height"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_normal; }
     }
 
     // this MouseArea prevents mouse events to be sent below miniplayer
@@ -73,11 +56,10 @@ FocusScope {
     ControlBar {
         id: controlBar
 
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.fill: parent
+
         focus: true
         colors: VLCStyle.colors
-        height: VLCStyle.miniPlayerHeight
         textPosition: ControlBar.TimeTextPosition.Hide
         sliderHeight: VLCStyle.dp(3, VLCStyle.scale)
         sliderBackgroundColor: colors.sliderBarMiniplayerBgColor

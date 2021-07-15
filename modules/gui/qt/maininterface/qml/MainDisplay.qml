@@ -258,7 +258,7 @@ FocusScope {
                         }
                         focus: false
 
-                        height: parent.height - miniPlayer.implicitHeight
+                        height: parent.height - miniPlayer.height
 
                         property bool expanded: mainInterface.playlistDocked && mainInterface.playlistVisible
 
