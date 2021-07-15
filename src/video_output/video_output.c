@@ -1334,14 +1334,6 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
         vd->ops->prepare(vd, todisplay, subpic, system_pts);
 
     vout_chrono_Stop(&sys->render);
-#if 0
-        {
-        static int i = 0;
-        if (((i++)%10) == 0)
-            msg_Info(&sys->obj, "render: avg %d ms var %d ms",
-                     (int)(sys->render.avg/1000), (int)(sys->render.var/1000));
-        }
-#endif
 
     system_now = vlc_tick_now();
     if (!render_now)
