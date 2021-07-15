@@ -46,8 +46,8 @@
 #   include <libpostproc/postprocess.h>
 #endif
 
-#ifndef PP_CPU_CAPS_ALTIVEC
-#   define PP_CPU_CAPS_ALTIVEC 0
+#ifndef PP_CPU_CAPS_AUTO
+#   define PP_CPU_CAPS_AUTO 0
 #endif
 
 /*****************************************************************************
@@ -120,7 +120,7 @@ static int OpenPostproc( filter_t *p_filter )
     filter_sys_t *p_sys;
     vlc_value_t val, val_orig;
     const char *desc;
-    int i_flags = 0;
+    int i_flags = PP_CPU_CAPS_AUTO;
 
     if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma ||
         p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height ||
@@ -129,17 +129,6 @@ static int OpenPostproc( filter_t *p_filter )
         msg_Err( p_filter, "Filter input and output formats must be identical" );
         return VLC_EGENERIC;
     }
-
-    /* Set CPU capabilities */
-#if defined(__i386__) || defined(__x86_64__)
-    if( vlc_CPU_MMX() )
-        i_flags |= PP_CPU_CAPS_MMX;
-    if( vlc_CPU_MMXEXT() )
-        i_flags |= PP_CPU_CAPS_MMX2;
-#elif defined(__ppc__) || defined(__ppc64__) || defined(__powerpc__)
-    if( vlc_CPU_ALTIVEC() )
-        i_flags |= PP_CPU_CAPS_ALTIVEC;
-#endif
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
