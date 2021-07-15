@@ -30,11 +30,6 @@ FocusScope {
 
     property alias parentWindow: controlmodelbuttons.parentWindow
 
-    property real marginLeft: VLCStyle.margin_normal
-    property real marginRight: VLCStyle.margin_normal
-    property real marginTop: 0
-    property real marginBottom: 0
-
     property var colors: undefined
 
     property var defaultSize: VLCStyle.icon_normal // default size for IconToolButton based controls
@@ -72,9 +67,6 @@ FocusScope {
             top: parent.top
             bottom: parent.bottom
 
-            leftMargin: marginLeft
-            topMargin: marginTop
-            bottomMargin: marginBottom
             rightMargin: layoutSpacing
         }
 
@@ -106,9 +98,6 @@ FocusScope {
             horizontalCenter: parent.horizontalCenter
             top: parent.top
             bottom: parent.bottom
-
-            topMargin: playerButtonsLayout.marginTop
-            bottomMargin: playerButtonsLayout.marginBottom
         }
 
         active: !!playerButtonsLayout.model
@@ -135,9 +124,6 @@ FocusScope {
             top: parent.top
             bottom: parent.bottom
 
-            rightMargin: marginRight
-            topMargin: marginTop
-            bottomMargin: marginBottom
             leftMargin: layoutSpacing
         }
 
