@@ -1306,17 +1306,6 @@ static int  Open ( vlc_object_t *p_this )
         x264_param_apply_profile( &p_sys->param, psz_val );
     free( psz_val );
 
-#if defined (__i386__) || defined (__x86_64__)
-    if( !vlc_CPU_MMX() )
-        p_sys->param.cpu &= ~X264_CPU_MMX;
-    if( !vlc_CPU_MMXEXT() )
-        p_sys->param.cpu &= ~X264_CPU_MMXEXT;
-    if( !vlc_CPU_SSE() )
-        p_sys->param.cpu &= ~X264_CPU_SSE;
-    if( !vlc_CPU_SSE2() )
-        p_sys->param.cpu &= ~X264_CPU_SSE2;
-#endif
-
     /* BUILD 29 adds support for multi-threaded encoding while BUILD 49 (r543)
        also adds support for threads = 0 for automatically selecting an optimal
        value (cores * 1.5) based on detected CPUs. Default behavior for x264 is
