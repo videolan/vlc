@@ -82,6 +82,13 @@ static void EmbedVisibilityChanged(struct vout_window_t *wnd,
     vout_window_ReportVisibilityChanged(parent, visibility);
 }
 
+static void EmbedVsyncReached(struct vout_window_t *wnd,
+                              vlc_tick_t pts)
+{
+    vout_window_t *parent = wnd->owner.sys;
+    vout_window_ReportVsyncReached(parent, pts);
+}
+
 /**
  * Operations
  */
@@ -162,6 +169,7 @@ static int WindowOpen(struct vout_window_t *wnd)
         .keyboard_event = EmbedKeyboardEvent,
         .output_event = EmbedOutputEvent,
         .visibility_changed = EmbedVisibilityChanged,
+        .vsync_reached = EmbedVsyncReached,
     };
 
     sys->window_owner = (const struct vout_window_owner)
