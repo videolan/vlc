@@ -133,8 +133,8 @@ FocusScope {
 
         Item {
             Layout.fillWidth: true
-            Layout.leftMargin: VLCStyle.margin_normal
-            Layout.rightMargin: VLCStyle.margin_normal
+            Layout.leftMargin: VLCStyle.margin_large
+            Layout.rightMargin: VLCStyle.margin_large
             Layout.bottomMargin: VLCStyle.margin_xsmall
             Layout.preferredHeight: playerButtonsLayout.implicitHeight
 
