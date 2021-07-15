@@ -220,12 +220,37 @@ Item {
     property int bannerButton_height: dp(32, scale)
     property int bannerButton_width: dp(40, scale)
 
+    // Speed
+
+    property bool animate: true
+
+    property real speed: 1.0
+
+    // NOTE: This ratio is useful because we want a 1.2 speed to be *faster* than 1.0.
+    property real ratioSpeed: (animate && speed) ? 1 / speed : 0.0
+
+    // duration
+
+    property int duration_slower: 300 * ratioSpeed
+    property int duration_slow  : 250 * ratioSpeed
+    property int duration_normal: 200 * ratioSpeed
+    property int duration_fast  : 150 * ratioSpeed
+    property int duration_faster: 100 * ratioSpeed
+
+    property int ms2000: 2000 * ratioSpeed
+    property int ms1000: 1000 * ratioSpeed
+
+    property int ms500: 500 * ratioSpeed
+    property int ms140: 140 * ratioSpeed
+    property int ms128: 128 * ratioSpeed
+    property int ms125: 125 * ratioSpeed
+
+    property int ms75: 75 * ratioSpeed
+    property int ms64: 64 * ratioSpeed
+    property int ms10: 10 * ratioSpeed
+
     //timings
-    property int delayToolTipAppear: 500;
-    property int timingPlaylistClose: 1000;
-    property int timingPlaylistOpen: 1000;
-    property int timingGridExpandOpen: 200;
-    property int timingListExpandOpen: 200;
+    property int delayToolTipAppear: 500
 
     //default arts
     property url noArtCover: "qrc:///noart.png";
