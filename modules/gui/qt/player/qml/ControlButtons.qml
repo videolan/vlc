@@ -239,7 +239,7 @@ Item{
 
                 Behavior on color {
                     ColorAnimation {
-                        duration: 75
+                        duration: VLCStyle.ms75
                         easing.type: Easing.InOutSine
                     }
                 }
@@ -317,7 +317,7 @@ Item{
 
                     Behavior on radius {
                         NumberAnimation {
-                            duration: 75
+                            duration: VLCStyle.ms75
                             easing.type: Easing.InOutSine
                         }
                     }

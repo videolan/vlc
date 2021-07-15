@@ -121,7 +121,7 @@ FocusScope {
 
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: 100
+                        duration: VLCStyle.duration_faster
                     }
                 }
 

@@ -188,20 +188,20 @@ Slider {
                 PropertyAnimation {
                     from: 0.0
                     to: bufferRect.bufferFrames
-                    duration: 2000
+                    duration: VLCStyle.ms2000
                     easing.type: "OutBounce"
                 }
                 PauseAnimation {
-                    duration: 500
+                    duration: VLCStyle.ms500
                 }
                 PropertyAnimation {
                     from: bufferRect.bufferFrames
                     to: 0.0
-                    duration: 2000
+                    duration: VLCStyle.ms2000
                     easing.type: "OutBounce"
                 }
                 PauseAnimation {
-                    duration: 500
+                    duration: VLCStyle.ms500
                 }
             }
         }
@@ -255,7 +255,14 @@ Slider {
             Transition {
                 to: "hidden"
                 SequentialAnimation {
-                    NumberAnimation { target: sliderHandle; properties: "implicitWidth,implicitHeight"; to: 0; duration: 150; easing.type: Easing.OutSine}
+                    NumberAnimation {
+                        target: sliderHandle; properties: "implicitWidth,implicitHeight"
+
+                        to: 0
+
+                        duration: VLCStyle.duration_fast; easing.type: Easing.OutSine
+                    }
+
                     PropertyAction { target: sliderHandle; property: "visible"; value: false; }
                 }
             },
@@ -263,7 +270,14 @@ Slider {
                 to: "visible"
                 SequentialAnimation {
                     PropertyAction { target: sliderHandle; property: "visible"; value: true; }
-                    NumberAnimation { target: sliderHandle; properties: "implicitWidth,implicitHeight"; to: VLCStyle.margin_small; duration: 150; easing.type: Easing.InSine}
+
+                    NumberAnimation {
+                        target: sliderHandle; properties: "implicitWidth,implicitHeight"
+
+                        to: VLCStyle.margin_small
+
+                        duration: VLCStyle.duration_fast; easing.type: Easing.InSine
+                    }
                 }
             }
         ]

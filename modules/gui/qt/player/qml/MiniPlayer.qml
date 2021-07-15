@@ -34,7 +34,7 @@ FocusScope {
         id: animateExpand;
         target: root;
         properties: "implicitHeight"
-        duration: 200
+        duration: VLCStyle.duration_normal
         easing.type: Easing.InSine
         to: VLCStyle.miniPlayerHeight
         onStopped: {
@@ -46,7 +46,7 @@ FocusScope {
         id: animateRetract;
         target: root;
         properties: "implicitHeight"
-        duration: 200
+        duration: VLCStyle.duration_normal
         easing.type: Easing.OutSine
         to: 0
         onStopped: {

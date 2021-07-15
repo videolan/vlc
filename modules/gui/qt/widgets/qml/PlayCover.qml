@@ -34,7 +34,7 @@ Rectangle {
     color: 'transparent'
 
     Behavior on opacity {
-        NumberAnimation { duration: 150; easing.type: Easing.OutQuad }
+        NumberAnimation { duration: VLCStyle.duration_fast; easing.type: Easing.OutQuad }
     }
 
     Image {

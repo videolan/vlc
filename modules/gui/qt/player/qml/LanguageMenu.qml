@@ -55,7 +55,7 @@ T.Popup {
                 property: "opacity"
                 from: 0
                 to: 1
-                duration: 200
+                duration: VLCStyle.duration_normal
             }
         }
         pushExit: Transition {
@@ -63,7 +63,7 @@ T.Popup {
                 property: "opacity"
                 from: 1
                 to: 0
-                duration: 200
+                duration: VLCStyle.duration_normal
             }
         }
         popEnter: Transition {
@@ -71,7 +71,7 @@ T.Popup {
                 property: "opacity"
                 from: 0
                 to: 1
-                duration: 200
+                duration: VLCStyle.duration_normal
             }
         }
         popExit: Transition {
@@ -79,7 +79,7 @@ T.Popup {
                 property: "opacity"
                 from: 1
                 to: 0
-                duration: 200
+                duration: VLCStyle.duration_normal
             }
         }
     }
@@ -103,7 +103,7 @@ T.Popup {
 
     Behavior on width {
         SmoothedAnimation {
-            duration: 64
+            duration: VLCStyle.ms64
             easing.type: Easing.InOutSine
         }
     }

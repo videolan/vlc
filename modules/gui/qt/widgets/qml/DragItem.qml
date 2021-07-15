@@ -103,7 +103,7 @@ Item {
     Behavior on opacity {
         NumberAnimation {
             easing.type: Easing.InOutSine
-            duration: 128
+            duration: VLCStyle.ms128
         }
     }
 

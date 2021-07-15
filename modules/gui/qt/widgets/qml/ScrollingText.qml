@@ -18,6 +18,8 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
+import "qrc:///style/"
+
 Item {
     id: control
 
@@ -39,7 +41,7 @@ Item {
         }
 
         PauseAnimation {
-            duration: 1000
+            duration: VLCStyle.ms1000
         }
 
         SmoothedAnimation {
@@ -53,7 +55,7 @@ Item {
         }
 
         PauseAnimation {
-            duration: 1000
+            duration: VLCStyle.ms1000
         }
 
         PropertyAction {

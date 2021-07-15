@@ -335,7 +335,7 @@ Item {
 
             NumberAnimation {
                 property: "width"
-                duration: 125
+                duration: VLCStyle.ms125
                 easing.type: Easing.InOutSine
             }
         }

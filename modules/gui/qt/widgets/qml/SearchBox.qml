@@ -59,7 +59,7 @@ FocusScope {
         id: animateExpand;
         target: searchBoxRect;
         properties: "width"
-        duration: 125
+        duration: VLCStyle.ms125
         to: VLCStyle.widthSearchInput
         easing.type: Easing.InSine
         onStopped: {
@@ -71,7 +71,7 @@ FocusScope {
         id: animateRetract;
         target: searchBoxRect;
         properties: "width"
-        duration: 125
+        duration: VLCStyle.ms125
         to: 0
         easing.type: Easing.OutSine
     }

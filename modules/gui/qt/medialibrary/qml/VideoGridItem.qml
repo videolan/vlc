@@ -83,7 +83,7 @@ Widgets.GridItem {
     
     Behavior on newIndicatorMedian {
         NumberAnimation {
-            duration: 200
+            duration: VLCStyle.duration_normal
             easing.type: Easing.InOutSine
         }
     }

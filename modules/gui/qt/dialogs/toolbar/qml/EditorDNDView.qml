@@ -48,15 +48,29 @@ ListView {
     }
 
     remove: Transition {
-        NumberAnimation { property: "opacity"; from: 1.0; to: 0; duration: 200 }
+        NumberAnimation {
+            property: "opacity"; from: 1.0; to: 0
+
+            duration: VLCStyle.duration_normal
+        }
     }
 
     add: Transition {
-        NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 200 }
+        NumberAnimation {
+            property: "opacity"; from: 0; to: 1.0
+
+            duration: VLCStyle.duration_normal
+        }
     }
 
     displaced: Transition {
-        NumberAnimation { properties: "x"; duration: 200; easing.type: Easing.OutSine }
+        NumberAnimation {
+            properties: "x"
+
+            duration: VLCStyle.duration_normal
+            easing.type: Easing.OutSine
+        }
+
         NumberAnimation { property: "opacity"; to: 1.0 }
     }
     

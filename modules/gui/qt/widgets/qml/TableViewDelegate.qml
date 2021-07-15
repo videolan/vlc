@@ -43,7 +43,7 @@ Widgets.AnimatedBackground {
 
     active: activeFocus
 
-    animationDuration: 140
+    animationDuration: VLCStyle.ms140
 
     backgroundColor: {
         if (delegate.selected)

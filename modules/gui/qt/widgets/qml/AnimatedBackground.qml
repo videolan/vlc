@@ -45,7 +45,7 @@ Rectangle {
 
     property color activeBorderColor: VLCStyle.colors.bgFocus
 
-    property int animationDuration: 200
+    property int animationDuration: VLCStyle.duration_normal
 
     property bool backgroundAnimationRunning: false
 

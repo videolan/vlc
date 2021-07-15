@@ -622,7 +622,7 @@ FocusScope {
             target: root;
             properties: "_expandItemVerticalSpace"
             easing.type: Easing.OutQuad
-            duration: 250
+            duration: VLCStyle.duration_slow
             to: 0
             onStopped: {
                 expandIndex = -1
@@ -638,7 +638,7 @@ FocusScope {
             target: root;
             properties: "_expandItemVerticalSpace"
             easing.type: Easing.InQuad
-            duration: 250
+            duration: VLCStyle.duration_slow
             from: 0
         }
 
@@ -661,7 +661,7 @@ FocusScope {
 
     function animateFlickableContentY( newContentY ) {
         animateContentY.stop()
-        animateContentY.duration = 250
+        animateContentY.duration = VLCStyle.duration_slow
         animateContentY.to = newContentY
         animateContentY.start()
     }

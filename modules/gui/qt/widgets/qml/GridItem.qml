@@ -109,7 +109,7 @@ MouseArea {
 
                 NumberAnimation {
                     properties: "opacity,playCoverOpacity"
-                    duration: 240
+                    duration: VLCStyle.duration_slow
                     easing.type: Easing.InSine
                 }
 
@@ -132,7 +132,7 @@ MouseArea {
 
                 NumberAnimation {
                     properties: "opacity,playCoverOpacity"
-                    duration: 200
+                    duration: VLCStyle.duration_normal
                     easing.type: Easing.OutSine
                 }
 

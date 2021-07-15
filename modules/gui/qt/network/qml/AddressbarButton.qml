@@ -61,7 +61,7 @@ AbstractButton {
         to: "*"
 
         ColorAnimation {
-            duration: 200
+            duration: VLCStyle.duration_normal
             properties: "foregroundColor,color"
         }
     }

@@ -84,7 +84,7 @@ T.TabButton {
 
         active: control.activeFocus
 
-        animationDuration: 140
+        animationDuration: VLCStyle.ms140
 
         backgroundColor: _getBackground()
         foregroundColor: _getForeground()

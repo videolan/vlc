@@ -286,7 +286,13 @@ FocusScope {
                                 to: "collapsed"
 
                                 SequentialAnimation {
-                                    SmoothedAnimation { target: playlistColumn; property: "width"; easing.type: Easing.OutSine; duration: 150; }
+                                    SmoothedAnimation {
+                                        target: playlistColumn; property: "width"
+
+                                        duration: VLCStyle.duration_fast
+                                        easing.type: Easing.OutSine
+                                    }
+
                                     PropertyAction { target: playlistColumn; property: "visible" }
                                 }
                             },
@@ -297,7 +303,13 @@ FocusScope {
 
                                 SequentialAnimation {
                                     PropertyAction { target: playlistColumn; property: "visible" }
-                                    SmoothedAnimation { target: playlistColumn; property: "width"; easing.type: Easing.InSine; duration: 150; }
+
+                                    SmoothedAnimation {
+                                        target: playlistColumn; property: "width"
+
+                                        duration: VLCStyle.duration_fast
+                                        easing.type: Easing.InSine
+                                    }
                                 }
                             }
                         ]

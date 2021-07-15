@@ -253,7 +253,7 @@ FocusScope {
             transitions: Transition {
                 NumberAnimation {
                     property: "opacity"
-                    duration: 150
+                    duration: VLCStyle.duration_fast
                     easing.type: Easing.InOutSine
                 }
             }
@@ -298,7 +298,7 @@ FocusScope {
             transitions: Transition {
                 NumberAnimation {
                     property: "opacity"
-                    duration: 150
+                    duration: VLCStyle.duration_fast
                     easing.type: Easing.InOutSine
                 }
             }

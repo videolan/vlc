@@ -18,6 +18,8 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
+import "qrc:///style/"
+
 /*
  * Custom StackView with brief transitions and helper to load view from the history
  */
@@ -31,7 +33,7 @@ StackView {
             property: "opacity"
             from: 0.0
             to: 1.0
-            duration: 250
+            duration: VLCStyle.duration_slow
             easing.type: Easing.InSine
         }
     }
@@ -41,7 +43,7 @@ StackView {
             property: "opacity"
             from: 1.0
             to: 0.0
-            duration: 250
+            duration: VLCStyle.duration_slow
             easing.type: Easing.OutSine
         }
     }
