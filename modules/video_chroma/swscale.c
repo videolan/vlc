@@ -141,6 +141,58 @@ static const struct vlc_filter_operations filter_ops = {
     .filter_video = Filter, .close = CloseScaler,
 };
 
+static int GetSwsColorspace( const video_format_t *format )
+{
+    /* We currently map bt2020, bt709 and bt601, all other are unspecified */
+    switch( format->space )
+    {
+        case COLOR_SPACE_BT709:
+            return SWS_CS_ITU709;
+        case COLOR_SPACE_BT601:
+            return SWS_CS_ITU601;
+        case COLOR_SPACE_BT2020:
+            return SWS_CS_BT2020;
+        default:
+            return SWS_CS_DEFAULT;
+    }
+}
+
+static const char* GetColorspaceName( video_color_space_t space )
+{
+    switch( space )
+    {
+        case COLOR_SPACE_BT601:
+            return "BT601";
+        case COLOR_SPACE_BT709:
+            return "BT709";
+        case COLOR_SPACE_BT2020:
+            return "BT2020";
+        default:
+            return "Undefined";
+    }
+}
+
+static void SetColorspace( filter_sys_t *p_sys )
+{
+    int input_range, output_range;
+    int brightness, contrast, saturation;
+    const int *input_table, *output_table;
+
+    sws_getColorspaceDetails( p_sys->ctx, (int **)&input_table, &input_range,
+                              (int **)&output_table, &output_range,
+                              &brightness, &contrast, &saturation );
+
+    input_range = p_sys->fmt_in.color_range == COLOR_RANGE_FULL;
+    output_range = p_sys->fmt_out.color_range == COLOR_RANGE_FULL;
+
+    input_table = sws_getCoefficients( GetSwsColorspace( &p_sys->fmt_in ) );
+    output_table = sws_getCoefficients( GetSwsColorspace( &p_sys->fmt_out ) );
+
+    sws_setColorspaceDetails( p_sys->ctx, input_table, input_range,
+                              output_table, output_range,
+                              brightness, contrast, saturation );
+}
+
 /*****************************************************************************
  * OpenScaler: probe the filter and return score
  *****************************************************************************/
@@ -195,13 +247,13 @@ static int OpenScaler( filter_t *p_filter )
     /* */
     p_filter->ops = &filter_ops;
 
-    msg_Dbg( p_filter, "%ix%i (%ix%i) chroma: %4.4s -> %ix%i (%ix%i) chroma: %4.4s with scaling using %s",
+    msg_Dbg( p_filter, "%ix%i (%ix%i) chroma: %4.4s colorspace: %s -> %ix%i (%ix%i) chroma: %4.4s colorspace: %s with scaling using %s",
              p_filter->fmt_in.video.i_visible_width, p_filter->fmt_in.video.i_visible_height,
              p_filter->fmt_in.video.i_width, p_filter->fmt_in.video.i_height,
-             (char *)&p_filter->fmt_in.video.i_chroma,
+             (char *)&p_filter->fmt_in.video.i_chroma, GetColorspaceName( p_filter->fmt_in.video.space ),
              p_filter->fmt_out.video.i_visible_width, p_filter->fmt_out.video.i_visible_height,
              p_filter->fmt_out.video.i_width, p_filter->fmt_out.video.i_height,
-             (char *)&p_filter->fmt_out.video.i_chroma,
+             (char *)&p_filter->fmt_out.video.i_chroma, GetColorspaceName( p_filter->fmt_out.video.space ),
              ppsz_mode_descriptions[i_sws_mode] );
 
     return VLC_SUCCESS;
@@ -461,6 +513,8 @@ static int Init( filter_t *p_filter )
     p_sys->fmt_out = *p_fmto;
     p_sys->b_swap_uvi = cfg.b_swap_uvi;
     p_sys->b_swap_uvo = cfg.b_swap_uvo;
+
+    SetColorspace( p_sys );
 
     return VLC_SUCCESS;
 }
