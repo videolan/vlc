@@ -1462,6 +1462,10 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
     if (subpic)
         subpicture_Delete(subpic);
 
+    vout_thread_t *p_vout = &sys->obj;
+    if (p_vout->cbs && p_vout->cbs->on_frame_displayed)
+        p_vout->cbs->on_frame_displayed(p_vout, pts, p_vout->owner);
+
     vout_statistic_AddDisplayed(&sys->statistic, 1);
 
     if (tracer != NULL && system_pts != VLC_TICK_MAX)
