@@ -1469,6 +1469,10 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
     vlc_mutex_unlock(&sys->display_lock);
     vlc_mutex_unlock(&sys->render_lock);
 
+    vout_thread_t *p_vout = &vout->obj;
+    if (p_vout->cbs && p_vout->cbs->on_frame_displayed)
+        p_vout->cbs->on_frame_displayed(p_vout, pts, p_vout->owner);
+
     if (subpic)
         subpicture_Delete(subpic);
 
