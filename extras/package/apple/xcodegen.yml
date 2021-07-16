@@ -30,6 +30,8 @@ targets:
         excludes: "**/Makefile.in"
       - path: "${VLC_SRC_DIR}/modules"
         excludes: "**/Makefile.in"
+      - path: "${VLC_SRC_DIR}/lib"
+        excludes: "**/Makefile.in"
 
   vlccoreios:
     type: "application"
