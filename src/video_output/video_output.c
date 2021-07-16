@@ -1391,6 +1391,15 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
 
     if (sys->rendering_enabled)
     {
+        vlc_tick_t now_ts = vlc_tick_now();
+        if (atomic_load(&sys->b_display_avstat))
+        {
+            msg_Info( vd, "avstats: [RENDER][VIDEOPREPARE] ts=%" PRId64 " pts_per_vsync=%" PRId64 " pts=%" PRId64,
+                      NS_FROM_VLC_TICK(now_ts),
+                      NS_FROM_VLC_TICK(todisplay->date),
+                      NS_FROM_VLC_TICK(system_pts == INT64_MAX ? now_ts : system_pts));
+        }
+
         if (vd->ops->prepare != NULL)
             vd->ops->prepare(vd, todisplay, do_dr_spu ? subpic : NULL, system_pts);
 
