@@ -1370,9 +1370,10 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
 
     struct vlc_tracer *tracer = GetTracer(sys);
     system_now = vlc_tick_now();
+    const vlc_tick_t late = system_now - system_pts;
+
     if (!render_now)
     {
-        const vlc_tick_t late = system_now - system_pts;
         if (unlikely(late > 0))
         {
             if (tracer != NULL)
@@ -1444,11 +1445,14 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
 
     vlc_tick_t now_ts = vlc_tick_now();
     if (atomic_load(&sys->b_display_avstat))
-        msg_Info( vd, "avstats: [RENDER][VIDEO] ts=%" PRId64 " pts_per_vsync=%" PRId64 " pts=%" PRId64 " pcr=%" PRId64,
+    {
+        msg_Info( vd, "avstats: [RENDER][VIDEO] ts=%" PRId64 " pts_per_vsync=%" PRId64 " pts=%" PRId64 " pts_late=%" PRId64 " pcr=%" PRId64,
                   NS_FROM_VLC_TICK(now_ts),
                   NS_FROM_VLC_TICK(pts),
+                  NS_FROM_VLC_TICK(pts + late),
                   NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts),
                   NS_FROM_VLC_TICK(system_now - clock_offset));
+    }
 
     vlc_queuedmutex_unlock(&sys->display_lock);
     vlc_mutex_unlock(&sys->render_lock);
