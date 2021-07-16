@@ -1042,7 +1042,7 @@ AudioTrack_New( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
     if( !p_sys->p_audiotrack )
         return -1;
 
-    if( jfields.DynamicsProcessing.clazz )
+    if( jfields.DynamicsProcessing.clazz && !p_sys->b_passthrough )
     {
         if (session_id == 0 )
             session_id = JNI_AT_CALL_INT( getAudioSessionId );
@@ -1256,15 +1256,16 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
         p_sys->fmt.i_format = VLC_CODEC_SPDIFB;
     }
 
+    p_sys->b_passthrough = true;
     int i_ret = AudioTrack_Create( env, p_aout, p_sys->fmt.i_rate, i_at_format,
                                    p_sys->fmt.i_physical_channels );
     if( i_ret != VLC_SUCCESS )
-        msg_Warn( p_aout, "SPDIF configuration failed" );
-    else
     {
-        p_sys->b_passthrough = true;
-        p_sys->i_chans_to_reorder = 0;
+        p_sys->b_passthrough = false;
+        msg_Warn( p_aout, "SPDIF configuration failed" );
     }
+    else
+        p_sys->i_chans_to_reorder = 0;
 
     return i_ret;
 }
