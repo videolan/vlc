@@ -108,6 +108,20 @@ static int ID3Callback(uint32_t, const uint8_t *, size_t, void *)
     return VLC_EGENERIC;
 }
 
+static bool IsWebVTT(const char *p, size_t sz)
+{
+    /* match optional U+FEFF BOM */
+    const uint8_t webvtt[] = { 0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54 };
+    for(int i=3; i>=0; i-=3)
+    {
+        if(sz > (size_t)(10 - i) &&
+           !memcmp(webvtt + i, p, 9 - i) &&
+           (p[9 - i] == '\n' || p[9 - i] == '\r' || p[9 - i] == ' ' || p[9 - i] == '\t'))
+            return true;
+    }
+    return false;
+}
+
 StreamFormat::StreamFormat(const void *data_, size_t sz)
 {
     const uint8_t *data = reinterpret_cast<const uint8_t *>(data_);
@@ -120,8 +134,7 @@ StreamFormat::StreamFormat(const void *data_, size_t sz)
                        !memcmp(&moov[4], &data[4], 4) ||
                        !memcmp(&moov[8], &data[4], 4)))
         type = StreamFormat::Type::MP4;
-    else if(sz > 7 && !memcmp("WEBVTT", data, 6) &&
-            std::isspace(static_cast<unsigned char>(data[7])))
+    else if(IsWebVTT((const char *)data, sz))
         type = StreamFormat::Type::WebVTT;
     else if(sz > 4 && !memcmp("\x1A\x45\xDF\xA3", data, 4))
         type = StreamFormat::Type::WebM;
