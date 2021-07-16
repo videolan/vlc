@@ -188,17 +188,25 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 - (id)initWithMain:(VLCMain *)o_mainObj
 {
     self = [super init];
-    if(self) {
-        msg_Dbg(getIntf(), "Initializing input manager");
+    if (self) {
+        intf_thread_t *p_intf = getIntf();
+        msg_Dbg(p_intf, "Initializing input manager");
 
         o_main = o_mainObj;
-        var_AddCallback(pl_Get(getIntf()), "input-current", InputThreadChanged, (__bridge void *)self);
+        var_AddCallback(pl_Get(p_intf), "input-current", InputThreadChanged, (__bridge void *)self);
 
         informInputChangedQueue = dispatch_queue_create("org.videolan.vlc.inputChangedQueue", DISPATCH_QUEUE_SERIAL);
 
         if (@available(macOS 10.12.2, *)) {
-            _remoteControlService = [[VLCRemoteControlService alloc] init];
-            [_remoteControlService subscribeToRemoteCommands];
+            BOOL b_mediaKeySupport = var_InheritBool(p_intf, "macosx-mediakeys");
+            if (b_mediaKeySupport) {
+                _remoteControlService = [[VLCRemoteControlService alloc] init];
+                [_remoteControlService subscribeToRemoteCommands];
+            }
+            [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(coreChangedMediaKeySupportSetting:)
+                                                         name:VLCMediaKeySupportSettingChangedNotification
+                                                       object:nil];
         }
     }
     return self;
@@ -214,6 +222,9 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 - (void)deinit
 {
     msg_Dbg(getIntf(), "Deinitializing input manager");
+
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+
     if (p_current_input) {
         /* continue playback where you left off */
         [self storePlaybackPositionForItem:p_current_input];
@@ -569,6 +580,23 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                                                                    object:nil
                                                                  userInfo:nil
                                                        deliverImmediately:YES];
+}
+
+- (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification
+{
+    intf_thread_t *p_intf = getIntf();
+    if (!p_intf)
+        return;
+
+    BOOL b_mediaKeySupport = var_InheritBool(p_intf, "macosx-mediakeys");
+    if (b_mediaKeySupport) {
+        if (!_remoteControlService) {
+            _remoteControlService = [[VLCRemoteControlService alloc] init];
+        }
+        [_remoteControlService subscribeToRemoteCommands];
+    } else {
+        [_remoteControlService unsubscribeFromRemoteCommands];
+    }
 }
 
 - (BOOL)hasInput
