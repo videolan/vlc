@@ -113,6 +113,7 @@ typedef struct vout_thread_sys_t
 #ifdef DEBUG_CAPTION
         FILE *caption_file;
 #endif
+        picture_t   *next;
     } displayed;
 
     struct {
@@ -873,6 +874,12 @@ static void ThreadFilterFlush(vout_thread_sys_t *sys, bool is_locked)
         sys->displayed.current = NULL;
     }
 
+    if (sys->displayed.next)
+    {
+        picture_Release( sys->displayed.next );
+        sys->displayed.next = NULL;
+    }
+
     if (!is_locked)
         vlc_mutex_lock(&sys->filter.lock);
     filter_chain_VideoFlush(sys->filter.chain_static);
@@ -1512,8 +1519,17 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     if (frame_by_frame)
     {
         picture_t *next;
-        next =
-            ThreadDisplayPreparePicture(vout, !sys->displayed.current, true, &paused);
+        if (likely(!sys->displayed.next))
+        {
+            next =
+                ThreadDisplayPreparePicture(vout, !sys->displayed.current, true, &paused);
+        }
+        else
+        {
+            // remaining from normal playback
+            next = sys->displayed.next;
+            sys->displayed.next = NULL;
+        }
 
         if (next)
         {
@@ -1888,6 +1904,7 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     assert(sys->private.display_pool != NULL && sys->private.private_pool != NULL);
 
     sys->displayed.current       = NULL;
+    sys->displayed.next          = NULL;
     sys->displayed.decoded       = NULL;
     sys->displayed.caption_reference = NULL;
     sys->displayed.last_caption_reference = NULL;
