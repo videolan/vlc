@@ -1683,30 +1683,69 @@
   <tabstop>grainEnable</tabstop>
   <tabstop>grainVarianceSlider</tabstop>
   <tabstop>cropTopPx</tabstop>
+  <tabstop>cropLeftPx</tabstop>
+  <tabstop>cropRightPx</tabstop>
   <tabstop>cropBotPx</tabstop>
   <tabstop>topBotCropSync</tabstop>
   <tabstop>leftRightCropSync</tabstop>
-  <tabstop>rotateEnable</tabstop>
-  <tabstop>rotateAngleDial</tabstop>
-  <tabstop>transformTypeCombo</tabstop>
-  <tabstop>puzzleRowsSpin</tabstop>
-  <tabstop>puzzleColsSpin</tabstop>
+  <tabstop>extractEnable</tabstop>
+  <tabstop>extractComponentText</tabstop>
   <tabstop>colorthresEnable</tabstop>
   <tabstop>colorthresColorText</tabstop>
   <tabstop>colorthresSaturationthresSlider</tabstop>
   <tabstop>colorthresSimilaritythresSlider</tabstop>
-  <tabstop>extractComponentText</tabstop>
+  <tabstop>invertEnable</tabstop>
+  <tabstop>posterizeEnable</tabstop>
+  <tabstop>gradientEnable</tabstop>
   <tabstop>gradientModeCombo</tabstop>
+  <tabstop>gradientTypeCheck</tabstop>
+  <tabstop>gradientCartoonCheck</tabstop>
+  <tabstop>sepiaEnable</tabstop>
   <tabstop>sepiaIntensitySpin</tabstop>
-  <tabstop>cloneCountSpin</tabstop>
+  <tabstop>magnifyEnable</tabstop>
+  <tabstop>transformEnable</tabstop>
+  <tabstop>transformTypeCombo</tabstop>
+  <tabstop>rotateEnable</tabstop>
+  <tabstop>rotateAngleDial</tabstop>
+  <tabstop>wallEnable</tabstop>
+  <tabstop>wallRowsSpin</tabstop>
+  <tabstop>wallColsSpin</tabstop>
+  <tabstop>puzzleEnable</tabstop>
+  <tabstop>puzzleRowsSpin</tabstop>
+  <tabstop>puzzleColsSpin</tabstop>
   <tabstop>logoEnable</tabstop>
   <tabstop>logoFileText</tabstop>
+  <tabstop>logoBrowseBtn</tabstop>
   <tabstop>logoYSpin</tabstop>
   <tabstop>logoXSpin</tabstop>
   <tabstop>logoOpacitySlider</tabstop>
+  <tabstop>eraseEnable</tabstop>
   <tabstop>eraseMaskText</tabstop>
+  <tabstop>eraseBrowseBtn</tabstop>
   <tabstop>eraseYSpin</tabstop>
   <tabstop>eraseXSpin</tabstop>
+  <tabstop>marqEnable</tabstop>
+  <tabstop>marqMarqueeText</tabstop>
+  <tabstop>marqPositionCombo</tabstop>
+  <tabstop>antiflickerEnable</tabstop>
+  <tabstop>antiflickerSofteningSizeSlider</tabstop>
+  <tabstop>motionblurEnable</tabstop>
+  <tabstop>blurFactorSlider</tabstop>
+  <tabstop>gaussianblurEnable</tabstop>
+  <tabstop>gaussianblurSigmaSlider</tabstop>
+  <tabstop>cloneEnable</tabstop>
+  <tabstop>cloneCountSpin</tabstop>
+  <tabstop>hqdn3dEnable</tabstop>
+  <tabstop>hqdn3dLumaSpatSlider</tabstop>
+  <tabstop>hqdn3dLumaTempSlider</tabstop>
+  <tabstop>hqdn3dChromaSpatSlider</tabstop>
+  <tabstop>hqdn3dChromaTempSlider</tabstop>
+  <tabstop>anaglyphEnable</tabstop>
+  <tabstop>mirrorEnable</tabstop>
+  <tabstop>psychedelicEnable</tabstop>
+  <tabstop>waveEnable</tabstop>
+  <tabstop>rippleEnable</tabstop>
+  <tabstop>motiondetectEnable</tabstop>
  </tabstops>
  <resources/>
  <connections/>
