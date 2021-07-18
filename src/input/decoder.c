@@ -1148,12 +1148,7 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
     assert( p_pic );
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
 
-    const char *type =
-        p_dec->fmt_in.i_cat == VIDEO_ES ? "VIDEO" :
-        p_dec->fmt_in.i_cat == AUDIO_ES ? "AUDIO" :
-        NULL;
-
-    if( type != NULL && atomic_load(&p_owner->b_display_avstat))
+    if( atomic_load(&p_owner->b_display_avstat))
     {
         msg_Info( p_dec, "avstats: [DEC][OUT][%s] ts=%" PRId64 " pts=%" PRId64,
                   type, NS_FROM_VLC_TICK(vlc_tick_now()),
