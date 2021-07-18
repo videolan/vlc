@@ -412,10 +412,7 @@ static void decoder_vout_on_frame_displayed(
         vout_thread_t *vout, vlc_tick_t pts, void *opaque)
 {
     vlc_input_decoder_t *p_owner = opaque;
-
-    if (p_owner->cbs != NULL && p_owner->cbs->on_vout_frame_displayed != NULL)
-        p_owner->cbs->on_vout_frame_displayed(
-            p_owner, vout, pts, p_owner->cbs_userdata);
+    decoder_Notify(p_owner, on_vout_frame_displayed, vout, pts);
 }
 
 static void decoder_vout_captions_to_display(
