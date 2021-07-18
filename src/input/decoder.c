@@ -1150,8 +1150,8 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
 
     if( atomic_load(&p_owner->b_display_avstat))
     {
-        msg_Info( p_dec, "avstats: [DEC][OUT][%s] ts=%" PRId64 " pts=%" PRId64,
-                  type, NS_FROM_VLC_TICK(vlc_tick_now()),
+        msg_Info( p_dec, "avstats: [DEC][OUT][VIDEO] ts=%" PRId64 " pts=%" PRId64,
+                  NS_FROM_VLC_TICK(vlc_tick_now()),
                   NS_FROM_VLC_TICK(p_pic->date) );
     }
 
