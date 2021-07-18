@@ -419,9 +419,7 @@ static void decoder_vout_captions_to_display(
         const void *p_cc, size_t i_cc, void *opaque)
 {
     vlc_input_decoder_t *p_owner = opaque;
-
-    if (p_owner->cbs != NULL && p_owner->cbs->on_captions_to_display != NULL)
-        p_owner->cbs->on_captions_to_display(p_owner, NULL, p_cc, i_cc, p_owner->cbs_userdata);
+    decoder_Notify(p_owner, on_captions_to_display, NULL, p_cc, i_cc);
 }
 
 static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *vctx )
