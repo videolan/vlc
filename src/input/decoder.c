@@ -1838,6 +1838,7 @@ static int avstat_callback(vlc_object_t *obj, const char *name,
     (void)obj; (void)name; (void)oldval;
     vlc_input_decoder_t *p_owner = opaque;
     atomic_store(&p_owner->b_display_avstat, newval.b_bool);
+    return VLC_SUCCESS;
 }
 
 /**
