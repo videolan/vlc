@@ -211,6 +211,20 @@ void FakeESOut::setAssociatedTimestamp(vlc_tick_t ts)
     }
 }
 
+void FakeESOut::setAssociatedTimestamp(vlc_tick_t mpegts, vlc_tick_t muxed)
+{
+    if(mpegts < 0)
+    {
+        setAssociatedTimestamp(mpegts);
+    }
+    else
+    {
+        associated.b_timestamp_set = true;
+        associated.b_offset_calculated = true;
+        timestamps_offset = mpegts - muxed;
+    }
+}
+
 void FakeESOut::setExtraInfoProvider( ExtraFMTInfoInterface *extra )
 {
     extrainfo = extra;

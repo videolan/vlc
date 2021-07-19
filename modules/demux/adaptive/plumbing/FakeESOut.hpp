@@ -83,6 +83,7 @@ namespace adaptive
             AbstractCommandsQueue * commandsQueue();
             CommandsFactory *commandsFactory() const;
             void setAssociatedTimestamp( vlc_tick_t );
+            void setAssociatedTimestamp( vlc_tick_t, vlc_tick_t );
             void setExpectedTimestamp( vlc_tick_t );
             void resetTimestamps();
             size_t esCount() const;
