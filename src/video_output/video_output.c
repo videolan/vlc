@@ -969,7 +969,8 @@ static bool IsPictureLate(vout_thread_sys_t *vout, picture_t *decoded,
         if (tracer != NULL)
             vlc_tracer_TraceEvent(tracer, "RENDER", sys->str_id, "toolate");
 
-        msg_Warn(&vout->obj, "picture is too late to be displayed (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
+        msg_Warn(&vout->obj, "picture is too late to be displayed (currently missing %"PRId64"ms and will be missing %"PRId64" ms)",
+                 MS_FROM_VLC_TICK(system_now - system_pts), MS_FROM_VLC_TICK(late));
         return true;
     }
     return false;
