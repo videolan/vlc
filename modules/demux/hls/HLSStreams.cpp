@@ -22,6 +22,7 @@
 #endif
 
 #include "HLSStreams.hpp"
+#include "../adaptive/tools/Conversions.hpp"
 #include <vlc_demux.h>
 #include <vlc_meta.h>
 
@@ -62,6 +63,11 @@ void HLSStream::setMetadataTimeOffset(vlc_tick_t i_offset)
         fakeEsOut()->setAssociatedTimestamp(-1);
         b_id3_timestamps_offset_set = false;
     }
+}
+
+void HLSStream::setMetadataTimeOffset(vlc_tick_t mpegts, vlc_tick_t muxed)
+{
+    fakeEsOut()->setAssociatedTimestamp(mpegts, muxed);
 }
 
 bool HLSStream::setPosition(vlc_tick_t ts , bool b)
@@ -115,6 +121,43 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
             /* Skip ID3 for demuxer */
             p_block->p_buffer += i_size;
             p_block->i_buffer -= i_size;
+        }
+    }
+
+    if(b_first && p_block && format == StreamFormat::Type::WebVTT && p_block->i_buffer > 7)
+    {
+        /* "WEBVTT\n"
+           "X-TIMESTAMP-MAP=LOCAL:00:00:00.000,MPEGTS:2147483647\n" */
+        const char *p = (const char *) p_block->p_buffer;
+        const char *end = p + p_block->i_buffer;
+        p = strnstr(p + 7, "X-TIMESTAMP-MAP=", p_block->i_buffer - 7);
+        if(p)
+        {
+            const char *eol = (const char *) memchr(p, '\n', end - p);
+            if(eol)
+            {
+                uint64_t mpegts = std::numeric_limits<uint64_t>::max();
+                vlc_tick_t local = std::numeric_limits<vlc_tick_t>::max();
+                std::string str(p + 16, eol - p - 16);
+
+                std::string::size_type pos = str.find("LOCAL:");
+                if(pos != std::string::npos && str.length() - pos >= 12+6)
+                    local = UTCTime("T" + str.substr(pos + 6, 12)).mtime();
+
+                pos = str.find("MPEGTS:");
+                if(pos != std::string::npos && str.size() - pos > 7)
+                {
+                    pos += 7;
+                    std::string::size_type tail = str.find_last_not_of("0123456789", pos);
+                    mpegts = Integer<uint64_t>(str.substr(pos, (tail != std::string::npos) ? tail - pos : tail));
+                }
+
+                if(mpegts != std::numeric_limits<uint64_t>::max() &&
+                   local != std::numeric_limits<vlc_tick_t>::max())
+                {
+                    setMetadataTimeOffset(mpegts * 100/9, local);
+                }
+            }
         }
     }
 
