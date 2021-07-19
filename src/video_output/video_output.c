@@ -113,7 +113,7 @@ typedef struct vout_thread_sys_t
 #ifdef DEBUG_CAPTION
         FILE *caption_file;
 #endif
-        picture_t   *next;
+        picture_t   *next; // optional picture after the current
     } displayed;
 
     struct {
@@ -868,6 +868,11 @@ static picture_t *VoutVideoFilterStaticNewPicture(filter_t *filter)
 
 static void FilterFlush(vout_thread_sys_t *sys, bool is_locked)
 {
+    if (sys->displayed.next)
+    {
+        picture_Release( sys->displayed.next );
+        sys->displayed.next = NULL;
+    }
     if (sys->displayed.current)
     {
         picture_Release( sys->displayed.current );
@@ -1520,7 +1525,16 @@ static int DisplayNextFrame(vout_thread_sys_t *sys)
 {
     UpdateDeinterlaceFilter(sys);
 
-    picture_t *next = PreparePicture(sys, !sys->displayed.current, true);
+    picture_t *next;
+    if (sys->displayed.next)
+    {
+        next = sys->displayed.next;
+        sys->displayed.next = NULL;
+    }
+    else
+    {
+        next = PreparePicture(sys, !sys->displayed.current, true);
+    }
 
     if (next)
     {
@@ -1584,10 +1598,13 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         if (likely(next_system_pts != INT64_MAX))
         {
             vlc_tick_t date_next = next_system_pts - render_delay;
+            if (!sys->displayed.next)
+                sys->displayed.next = PreparePicture(vout, false, false);
             if (date_next <= system_now)
             {
-                // the current frame will be late, look for the next not late one
-                next = PreparePicture(vout, false, false);
+                // the current frame will be late, use the next not late one
+                next = sys->displayed.next;
+                sys->displayed.next = NULL;
             }
         }
     }
@@ -1611,7 +1628,12 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
     {
         // next date we need to display again the current picture
-        date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
+        if (sys->displayed.next)
+            date_refresh = vlc_clock_ConvertToSystem(sys->clock, system_now,
+                                                     sys->displayed.next->date, sys->rate);
+        else
+            date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY;
+        date_refresh -= render_delay;
         refresh = date_refresh <= system_now;
         render_now = refresh;
     }
