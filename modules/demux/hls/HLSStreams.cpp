@@ -211,13 +211,11 @@ AbstractDemuxer *HLSStream::newDemux(vlc_object_t *p_obj, const StreamFormat &fo
             ret = new Demuxer(p_obj, "ogg", out, source);
             break;
 
-/* Disabled until we can handle empty segments/cue and absolute time
         case StreamFormat::Type::WebVTT:
             ret = new Demuxer(p_obj, "webvttstream", out, source);
             if(ret)
                 ret->setRestartsOnEachSegment(true);
             break;
-*/
 
         default:
         case StreamFormat::Type::Unknown:
