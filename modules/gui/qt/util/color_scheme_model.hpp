@@ -19,32 +19,58 @@
 #ifndef COLORSCHEMEMODEL_HPP
 #define COLORSCHEMEMODEL_HPP
 
-#include <QStringListModel>
+#include <QAbstractListModel>
 
-class ColorSchemeModel : public QStringListModel
+#include <memory>
+
+class ColorSchemeModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QString current READ getCurrent WRITE setCurrent NOTIFY currentChanged)
+    Q_PROPERTY(QString current READ currentText NOTIFY currentChanged)
+    Q_PROPERTY(ColorScheme scheme READ currentScheme WRITE setCurrentScheme NOTIFY currentChanged)
+
 public:
+    enum ColorScheme
+    {
+        System,
+        Day,
+        Night
+    };
+
+    Q_ENUM(ColorScheme);
+
     explicit ColorSchemeModel(QObject* parent = nullptr);
 
-    Q_INVOKABLE void setAvailableColorSchemes(const QStringList& colorSchemeList);
-
+    virtual int rowCount(const QModelIndex& parent) const override;
     virtual Qt::ItemFlags flags (const QModelIndex& index) const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
-    inline QString getCurrent() const { return m_current; }
-    void setCurrent(const QString& );
+    int currentIndex() const;
+    void setCurrentIndex(int newIndex);
+
+    QString currentText() const;
+
+    void setCurrentScheme(ColorScheme scheme);
+    ColorScheme currentScheme() const;
 
 signals:
-    void currentChanged(const QString& colorScheme);
+    void currentChanged();
 
 private:
-    QString               m_current;
-    QPersistentModelIndex m_checkedItem;
+    class SchemeList
+    {
+    public:
+        virtual ~SchemeList() = default;
+        virtual ColorScheme scheme(int i) const = 0;
+        virtual QString text(int i) const = 0;
+        virtual int size() const = 0;
+    };
 
+    class DefaultSchemeList;
 
+    const std::unique_ptr<SchemeList> m_list;
+    int m_currentIndex;
 };
 
 #endif // COLORSCHEMEMODEL_HPP

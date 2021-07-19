@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2020 the VideoLAN team
+ * Copyright (C) 2021 the VideoLAN team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,89 +18,127 @@
 
 #include "color_scheme_model.hpp"
 
-ColorSchemeModel::ColorSchemeModel(QObject* parent)
-    : QStringListModel(parent)
+#include "qt.hpp"
+
+class ColorSchemeModel::DefaultSchemeList : public ColorSchemeModel::SchemeList
 {
-}
-
-void ColorSchemeModel::setAvailableColorSchemes(const QStringList& colorSchemeList)
-{
-    setStringList(colorSchemeList);
-
-    //indexOf return -1 on "not found", wich will generate an invalid index
-    int position = colorSchemeList.indexOf(m_current);
-
-    QPersistentModelIndex oldIndex = m_checkedItem;
-    m_checkedItem = index(position);
-    if (oldIndex.isValid())
-        emit dataChanged(oldIndex, oldIndex);
-    if (m_checkedItem.isValid())
-        emit dataChanged(m_checkedItem, m_checkedItem);
-    else
+public:
+    DefaultSchemeList()
+        : m_items {{qtr("System"), ColorScheme::System}, {qtr("Day"), ColorScheme::Day}, {qtr("Night"), ColorScheme::Night}}
     {
-        m_current = QString{};
-        emit currentChanged(m_current);
     }
+
+    ColorScheme scheme(int i) const override
+    {
+        return m_items.at(i).scheme;
+    }
+
+    QString text(int i) const override
+    {
+        return m_items.at(i).text;
+    }
+
+    int size() const override
+    {
+        return m_items.size();
+    }
+
+private:
+    struct Item
+    {
+        QString text;
+        ColorScheme scheme;
+    };
+
+    const QVector<Item> m_items;
+};
+
+ColorSchemeModel::ColorSchemeModel(QObject* parent)
+    : QAbstractListModel(parent)
+    , m_list {new DefaultSchemeList}
+    , m_currentIndex {0}
+{
 }
 
-Qt::ItemFlags ColorSchemeModel::flags (const QModelIndex & index) const
+int ColorSchemeModel::rowCount(const QModelIndex &) const
 {
-    Qt::ItemFlags defaultFlags = QStringListModel::flags(index);
-    if (index.isValid()){
+    return m_list->size();
+}
+
+Qt::ItemFlags ColorSchemeModel::flags (const QModelIndex &index) const
+{
+    Qt::ItemFlags defaultFlags = QAbstractListModel::flags(index);
+    if (index.isValid())
         return defaultFlags | Qt::ItemIsUserCheckable;
-    }
     return defaultFlags;
 }
 
+QVariant ColorSchemeModel::data(const QModelIndex &index, const int role) const
+{
+    if (!checkIndex(index, CheckIndexOption::IndexIsValid))
+        return QVariant {};
+
+    if (role == Qt::CheckStateRole)
+        return m_currentIndex == index.row() ? Qt::Checked : Qt::Unchecked;
+
+    if (role == Qt::DisplayRole)
+        return m_list->text(index.row());
+
+    return QVariant {};
+}
 
 bool ColorSchemeModel::setData(const QModelIndex &index,
-                                const QVariant &value, int role)
+                               const QVariant &value, const int role)
 {
-    if(!index.isValid())
-        return false;
-
-    if (role != Qt::CheckStateRole)
-        return QStringListModel::setData(index, value, role);
-
-    if (value.type() != QVariant::Bool || value.toBool() == false)
-        return false;
-
-    if (index != m_checkedItem) {
-        QPersistentModelIndex oldIndex = m_checkedItem;
-        m_checkedItem = index;
-        if (oldIndex.isValid())
-            emit dataChanged(oldIndex, oldIndex);
-        emit dataChanged(m_checkedItem, m_checkedItem);
-        m_current = data(index, Qt::DisplayRole).toString();
-        emit currentChanged(m_current);
+    if (role == Qt::CheckStateRole
+            && checkIndex(index, CheckIndexOption::IndexIsValid)
+            && index.row() != m_currentIndex
+            && value.type() == QVariant::Bool
+            && value.toBool())
+    {
+        setCurrentIndex(index.row());
+        return true;
     }
 
-    return true;
+    return false;
 }
 
-void ColorSchemeModel::setCurrent(const QString& current)
+int ColorSchemeModel::currentIndex() const
 {
-    //indexOf return -1 on "not found", wich will generate an invalid index
-    int position = stringList().indexOf(current);
-
-    QPersistentModelIndex oldIndex = m_checkedItem;
-    m_checkedItem = index(position);
-    if (oldIndex.isValid())
-        emit dataChanged(oldIndex, oldIndex);
-    if (m_checkedItem.isValid())
-        emit dataChanged(m_checkedItem, m_checkedItem);
-
-    m_current = current;
-    emit currentChanged(m_current);
+    return m_currentIndex;
 }
 
-QVariant ColorSchemeModel::data(const QModelIndex &index, int role) const
+void ColorSchemeModel::setCurrentIndex(const int newIndex)
 {
-    if (!index.isValid())
-        return QVariant();
+    if (m_currentIndex == newIndex)
+        return;
 
-    if(role == Qt::CheckStateRole)
-        return m_checkedItem == index ? Qt::Checked : Qt::Unchecked;
+    assert(newIndex >= 0 && newIndex < m_list->size());
+    const auto oldIndex = this->index(m_currentIndex);
+    m_currentIndex = newIndex;
+    emit dataChanged(index(m_currentIndex), index(m_currentIndex), {Qt::CheckStateRole});
+    emit dataChanged(oldIndex, oldIndex, {Qt::CheckStateRole});
+    emit currentChanged();
+}
 
-    return QStringListModel::data(index, role);
+QString ColorSchemeModel::currentText() const
+{
+    return m_list->text(m_currentIndex);
+}
+
+void ColorSchemeModel::setCurrentScheme(const ColorScheme scheme)
+{
+    for (int i = 0; i < m_list->size(); ++i)
+    {
+        if (m_list->scheme(i) == scheme)
+        {
+            setCurrentIndex(i);
+            break;
+        }
+    }
+}
+
+ColorSchemeModel::ColorScheme ColorSchemeModel::currentScheme() const
+{
+    return m_list->scheme(m_currentIndex);
 }

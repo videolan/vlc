@@ -150,12 +150,12 @@ MainInterface::MainInterface(qt_intf_t *_p_intf , QWidget* parent, Qt::WindowFla
     playlistVisible  = getSettings()->value( "MainWindow/playlist-visible", false ).toBool();
     playlistWidthFactor = getSettings()->value( "MainWindow/playlist-width-factor", 4.0 ).toDouble();
     m_gridView = getSettings()->value( "MainWindow/grid-view", true).toBool();
-    QString currentColorScheme = getSettings()->value( "MainWindow/color-scheme", "system").toString();
     m_showRemainingTime = getSettings()->value( "MainWindow/ShowRemainingTime", false ).toBool();
     m_pinVideoControls = getSettings()->value("MainWindow/pin-video-controls", false ).toBool();
 
     m_colorScheme = new ColorSchemeModel(this);
-    m_colorScheme->setCurrent(currentColorScheme);
+    const auto currentColorScheme = static_cast<ColorSchemeModel::ColorScheme>(getSettings()->value( "MainWindow/color-scheme", ColorSchemeModel::System ).toInt());
+    m_colorScheme->setCurrentScheme(currentColorScheme);
 
     /* Controlbar Profile Model Creation */
     m_controlbarProfileModel = new ControlbarProfileModel(p_intf, this);
@@ -253,7 +253,7 @@ MainInterface::~MainInterface()
     settings->setValue( "playlist-width-factor", playlistWidthFactor);
 
     settings->setValue( "grid-view", m_gridView );
-    settings->setValue( "color-scheme", m_colorScheme->getCurrent() );
+    settings->setValue( "color-scheme", m_colorScheme->currentScheme() );
     /* Save the stackCentralW sizes */
     settings->endGroup();
 

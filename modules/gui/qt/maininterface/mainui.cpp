@@ -170,6 +170,7 @@ void MainUI::registerQMLTypes()
 {
     qRegisterMetaType<VLCTick>();
     qmlRegisterUncreatableType<VLCTick>("org.videolan.vlc", 0, 1, "VLCTick", "");
+    qmlRegisterUncreatableType<ColorSchemeModel>("org.videolan.vlc", 0, 1, "ColorSchemeModel", "");
 
     qRegisterMetaType<QmlInputItem>();
 

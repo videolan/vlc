@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 Item {
     id: colors_id
 
@@ -168,16 +170,23 @@ Item {
 
     property color seekpoint: "red";
 
-    property var colorSchemes: mainInterface.colorScheme
-    Component.onCompleted:  {
-        mainInterface.colorScheme.setAvailableColorSchemes(["system", "day", "night"])
-    }
-
     property color windowCSDButtonDarkBg:  "#80484848"
     property color windowCSDButtonLightBg: "#80DADADA"
     property color windowCSDButtonBg: isThemeDark ? windowCSDButtonDarkBg : windowCSDButtonLightBg
 
-    state: mainInterface.colorScheme.current
+    state: {
+        switch (mainInterface.colorScheme.scheme) {
+        case ColorSchemeModel.System:
+            return "system"
+        case ColorSchemeModel.Day:
+            return "day"
+        case ColorSchemeModel.Night:
+            return "night"
+        default:
+            console.assert(false, "Unknown color scheme")
+        }
+    }
+
     states: [
         //other styles are provided for testing purpose
         State {

@@ -852,10 +852,11 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             m_resetters.push_back(std::make_unique<PropertyResetter>(ui.pinVideoControlsCheckbox, "checked"));
             QObject::connect( ui.pinVideoControlsCheckbox, &QCheckBox::stateChanged, p_intf->p_mi, &MainInterface::setPinVideoControls );
 
-            ui.colorSchemeComboBox->insertItems(0, p_intf->p_mi->getColorScheme()->stringList());
-            ui.colorSchemeComboBox->setCurrentText( p_intf->p_mi->getColorScheme()->getCurrent() );
+            ui.colorSchemeComboBox->setModel( p_intf->p_mi->getColorScheme() );
+            ui.colorSchemeComboBox->setCurrentText( p_intf->p_mi->getColorScheme()->currentText() );
             m_resetters.push_back(std::make_unique<PropertyResetter>( ui.colorSchemeComboBox, "currentIndex" ));
-            QObject::connect( ui.colorSchemeComboBox, &QComboBox::currentTextChanged, p_intf->p_mi->getColorScheme(), &ColorSchemeModel::setCurrent );
+            QObject::connect( ui.colorSchemeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged)
+                              , p_intf->p_mi->getColorScheme(), &ColorSchemeModel::setCurrentIndex );
 
             const float intfScaleFloatFactor = 100.f;
             const auto updateIntfUserScaleFactorFromControls =
