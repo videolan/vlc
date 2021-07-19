@@ -220,7 +220,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
 {
     SegmentList *segmentList = new (std::nothrow) SegmentList(rep);
 
-    Timescale timescale(100);
+    Timescale timescale(1000000);
     rep->addAttribute(new TimescaleAttr(timescale));
     rep->b_loaded = true;
 
