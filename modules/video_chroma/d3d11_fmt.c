@@ -37,8 +37,8 @@
 #define COBJMACROS
 #include <d3d11.h>
 #include <assert.h>
+#include <initguid.h>
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-# include <initguid.h>
 # include <dxgidebug.h>
 #endif
 
