@@ -26,6 +26,7 @@
 #include <vlc_vector.h>
 #include <assert.h>
 #include <limits.h>
+#include <vlc_tracer.h>
 #include "clock.h"
 #include "clock_internal.h"
 
@@ -273,9 +274,16 @@ static inline void vlc_clock_on_update(vlc_clock_t *clock,
                                        unsigned frame_rate,
                                        unsigned frame_rate_base)
 {
+    vlc_clock_main_t *main_clock = clock->owner;
+
     if (clock->cbs && ts >= VLC_TICK_0)
         clock->cbs->on_update(system_now, ts, rate, frame_rate, frame_rate_base,
                               clock->cbs_data);
+
+    if (main_clock->tracer != NULL && clock->track_str_id)
+    {
+        vlc_tracer_TraceRender(main_clock->tracer, "RENDER", clock->track_str_id, ts, system_now);
+    }
 }
 
 static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,

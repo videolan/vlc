@@ -40,6 +40,7 @@
 #include <vlc_list.h>
 #include <vlc_decoder.h>
 #include <vlc_memstream.h>
+#include <vlc_tracer.h>
 
 #include "input_internal.h"
 #include "../clock/input_clock.h"
@@ -2991,6 +2992,13 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     input_thread_t *p_input = p_sys->p_input;
 
     assert( p_block->p_next == NULL );
+    struct vlc_tracer *tracer = vlc_object_get_tracer( &p_input->obj );
+
+    if ( tracer != NULL )
+    {
+        vlc_tracer_TraceStreamDTS( tracer, "DEMUX", es->id.str_id, "OUT",
+                            p_block->i_pts, p_block->i_dts);
+    }
 
     const char *type =
         es->fmt.i_cat == VIDEO_ES ? "VIDEO" :
@@ -3462,6 +3470,11 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
             msg_Info( p_sys->p_input, "avstats: [DMX][OUT][PCR] ts=%" PRId64 " pcr=%" PRId64,
                       NS_FROM_VLC_TICK(vlc_tick_now()), NS_FROM_VLC_TICK(i_pcr) );
 
+        struct vlc_tracer *tracer = vlc_object_get_tracer( &p_sys->p_input->obj );
+        if ( tracer != NULL )
+        {
+            vlc_tracer_TracePCR(tracer, "DEMUX", "PCR", i_pcr);
+        }
         input_thread_private_t *priv = input_priv(p_sys->p_input);
 
         /* TODO do not use vlc_tick_now() but proper stream acquisition date */

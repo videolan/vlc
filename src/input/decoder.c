@@ -43,6 +43,7 @@
 #include <vlc_modules.h>
 #include <vlc_decoder.h>
 #include <vlc_picture_pool.h>
+#include <vlc_tracer.h>
 
 #include "audio_output/aout_internal.h"
 #include "stream_output/stream_output.h"
@@ -1167,6 +1168,7 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
 {
     assert( p_pic );
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
+    struct vlc_tracer *tracer = vlc_object_get_tracer( &p_dec->obj );
 
     if( atomic_load(&p_owner->b_display_avstat))
     {
@@ -1175,6 +1177,11 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
                   NS_FROM_VLC_TICK(p_pic->date) );
     }
 
+    if ( tracer != NULL )
+    {
+        vlc_tracer_TraceStreamPTS( tracer, "DEC", p_owner->psz_id,
+                            "OUT", p_pic->date );
+    }
     int success = ModuleThread_PlayVideo( p_owner, p_pic );
 
     ModuleThread_UpdateStatVideo( p_owner, success != VLC_SUCCESS );
@@ -1308,12 +1315,18 @@ static void ModuleThread_UpdateStatAudio( vlc_input_decoder_t *p_owner,
 static void ModuleThread_QueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
 {
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
+    struct vlc_tracer *tracer = vlc_object_get_tracer( &p_dec->obj );
 
     if(p_aout_buf && atomic_load(&p_owner->b_display_avstat))
     {
         msg_Info( p_dec, "avstats: [DEC][OUT][AUDIO] ts=%" PRId64 " pts=%" PRId64,
                   NS_FROM_VLC_TICK(vlc_tick_now()),
                   NS_FROM_VLC_TICK(p_aout_buf->i_pts) );
+    }
+    if ( tracer != NULL && p_aout_buf != NULL )
+    {
+        vlc_tracer_TraceStreamDTS( tracer, "DEC", p_owner->psz_id, "OUT",
+                            p_aout_buf->i_pts, p_aout_buf->i_dts );
     }
     int success = ModuleThread_PlayAudio( p_owner, p_aout_buf );
 
@@ -1358,6 +1371,13 @@ static void ModuleThread_QueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
 {
     assert( p_spu );
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
+    struct vlc_tracer *tracer = vlc_object_get_tracer( &p_dec->obj );
+
+    if ( tracer != NULL && p_spu != NULL )
+    {
+        vlc_tracer_TraceStreamPTS( tracer, "DEC", p_owner->psz_id,
+                            "OUT", p_spu->i_start );
+    }
 
     /* The vout must be created from a previous decoder_NewSubpicture call. */
     assert( p_owner->p_vout );
@@ -1382,6 +1402,13 @@ static void DecoderThread_ProcessInput( vlc_input_decoder_t *p_owner, block_t *p
 static void DecoderThread_DecodeBlock( vlc_input_decoder_t *p_owner, block_t *p_block )
 {
     decoder_t *p_dec = &p_owner->dec;
+    struct vlc_tracer *tracer = vlc_object_get_tracer( &p_dec->obj );
+
+    if ( tracer != NULL && p_block != NULL )
+    {
+        vlc_tracer_TraceStreamDTS( tracer, "DEC", p_owner->psz_id, "IN",
+                            p_block->i_pts, p_block->i_dts );
+    }
 
     const char *type =
         p_dec->fmt_in.i_cat == VIDEO_ES ? "VIDEO" :
