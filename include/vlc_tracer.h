@@ -142,6 +142,43 @@ static inline struct vlc_tracer_entry VLC_TRACE(const char *key, const char *val
 }
 #endif
 
+/*
+ * Helper trace functions
+ */
+
+static inline void vlc_tracer_TraceStreamPTS(struct vlc_tracer *tracer, const char *type,
+                                const char *id, const char* stream,
+                                vlc_tick_t pts)
+{
+    vlc_tracer_Trace(tracer, VLC_TRACE("type", type), VLC_TRACE("id", id),
+                     VLC_TRACE("stream", stream), VLC_TRACE("pts", NS_FROM_VLC_TICK(pts)),
+                     VLC_TRACE_END);
+}
+
+static inline void vlc_tracer_TraceStreamDTS(struct vlc_tracer *tracer, const char *type,
+                                const char *id, const char* stream,
+                                vlc_tick_t pts, vlc_tick_t dts)
+{
+    vlc_tracer_Trace(tracer, VLC_TRACE("type", type), VLC_TRACE("id", id),
+                     VLC_TRACE("stream", stream), VLC_TRACE("pts", NS_FROM_VLC_TICK(pts)),
+                     VLC_TRACE("dts", NS_FROM_VLC_TICK(dts)), VLC_TRACE_END);
+}
+
+static inline void vlc_tracer_TraceRender(struct vlc_tracer *tracer, const char *type,
+                                const char *id, vlc_tick_t pts, vlc_tick_t now)
+{
+    vlc_tracer_Trace(tracer, VLC_TRACE("type", type), VLC_TRACE("id", id),
+                     VLC_TRACE("pts", NS_FROM_VLC_TICK(pts)),
+                     VLC_TRACE("render_ts", NS_FROM_VLC_TICK(now)), VLC_TRACE_END);
+}
+
+static inline void vlc_tracer_TracePCR( struct vlc_tracer *tracer, const char *type,
+                                    const char *id, vlc_tick_t pcr)
+{
+    vlc_tracer_Trace(tracer, VLC_TRACE("type", type), VLC_TRACE("id", id),
+                     VLC_TRACE("pcr", NS_FROM_VLC_TICK(pcr)), VLC_TRACE_END);
+}
+
 /**
  * @}
  */
