@@ -29,6 +29,7 @@
  */
 
 struct vlc_logger;
+struct vlc_tracer;
 struct vlc_object_internals;
 struct vlc_object_marker;
 
@@ -161,6 +162,13 @@ static inline struct vlc_logger *vlc_object_logger(vlc_object_t *obj)
     return obj->logger;
 }
 #define vlc_object_logger(o) vlc_object_logger(VLC_OBJECT(o))
+
+ /**
+ * Get tracer of a vlc instance from an object.
+ *
+ * \return the tracer of a vlc instance from an object (NULL if none).
+ */
+VLC_API struct vlc_tracer *vlc_object_get_tracer(vlc_object_t *obj);
 
 /**
  * Tries to get the name of module bound to an object.

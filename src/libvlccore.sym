@@ -656,6 +656,7 @@ vlc_object_create
 vlc_object_delete
 vlc_object_typename
 vlc_object_parent
+vlc_object_get_tracer
 vlc_object_Log
 vlc_object_vaLog
 vlc_once
