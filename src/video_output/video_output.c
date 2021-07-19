@@ -955,7 +955,6 @@ static bool IsPictureLate(vout_thread_sys_t *vout, picture_t *decoded,
     vout_thread_sys_t *sys = vout;
 
     const vlc_tick_t prepare_decoded_duration = vout_chrono_GetHigh(&sys->render) +
-                                                VOUT_MWAIT_TOLERANCE +
                                                 vout_chrono_GetHigh(&sys->static_filter);
     vlc_tick_t late = system_now + prepare_decoded_duration - system_pts;
 
