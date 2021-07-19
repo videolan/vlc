@@ -379,6 +379,9 @@ vlccoreiostuner_OBJCFLAGS += -DHAVE_MERGE_PLUGINS
 endif
 endif
 
+vlccoretuner_SOURCES = vlctuner.c
+vlccoretuner_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
+
 if HAVE_IOS
 noinst_PROGRAMS += vlccoreios vlccoreiostuner
 endif
@@ -386,3 +389,5 @@ endif
 if HAVE_TVOS
 noinst_PROGRAMS += vlccoreios vlccoreiostuner
 endif
+
+noinst_PROGRAMS += vlccoretuner
