@@ -116,6 +116,13 @@ vlc_object_t *(vlc_object_parent)(vlc_object_t *obj)
     return vlc_internals(obj)->parent;
 }
 
+struct vlc_tracer *vlc_object_get_tracer(vlc_object_t *obj)
+{
+    libvlc_int_t *vlc = vlc_object_instance(obj);
+    libvlc_priv_t *vlc_priv = libvlc_priv(vlc);
+    return vlc_priv->tracer;
+}
+
 void vlc_object_deinit(vlc_object_t *obj)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
