@@ -1711,7 +1711,7 @@ vlc_module_begin ()
         change_string_list( ppsz_deinterlace_mode, ppsz_deinterlace_mode_text )
         change_safe()
     add_string( "deinterlace-filter", "deinterlace",
-                DEINTERLACE_FILTER_TEXT, DEINTERLACE_FILTER_LONGTEXT )
+                DEINTERLACE_FILTER_TEXT, DEINTERLACE_FILTER_LONGTEXT, false )
         change_safe()
 
     set_subcategory( SUBCAT_VIDEO_VOUT )
