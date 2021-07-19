@@ -83,6 +83,7 @@ namespace adaptive
             AbstractCommandsQueue * commandsQueue();
             CommandsFactory *commandsFactory() const;
             void setAssociatedTimestamp( mtime_t );
+            void setAssociatedTimestamp( mtime_t, mtime_t );
             void setExpectedTimestamp( mtime_t );
             void resetTimestamps();
             size_t esCount() const;
