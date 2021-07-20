@@ -15,100 +15,172 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.11
+import QtQuick.Controls 2.4
+
 import org.videolan.vlc 0.1
 
 
-FocusScope {
-    id: navigableCol
+Control {
+    id: root
 
-    property alias model: colRepeater.model
-    property alias delegate: colRepeater.delegate
+    // Properties
 
-    width: col.width
-    height: col.height
-    property alias implicitWidth: col.implicitWidth
-    property alias implicitHeight: col.implicitHeight
+    property int indexFocus: -1
+
+    property int _countEnabled: 0
+
+    // Aliases
+
+    property alias model: repeater.model
+    property alias delegate: repeater.delegate
+
+    // Settings
+
+    Navigation.navigable: (_countEnabled > 0)
+
+    // Events
+
+    onIndexFocusChanged: if (_hasFocus()) _applyFocus()
+
+    onActiveFocusChanged: {
+        // NOTE: We try to restore the preferred focussed item.
+        if (!activeFocus || _applyFocus())
+            return;
+
+        // Next item
+        if (focusReason === Qt.TabFocusReason) {
+            for (var i = 0; i < count; i++) {
+                var item = repeater.itemAt(i);
+
+                if (item.visible && item.enabled) {
+                    item.forceActiveFocus(Qt.TabFocusReason);
+
+                    return;
+                }
+            }
+        }
+        // Previous item
+        else if (focusReason === Qt.BacktabFocusReason) {
+            for (var i = count -1; i >= 0; i--) {
+                var item= repeater.itemAt(i);
+
+                if (item.visible && item.enabled) {
+                    item.forceActiveFocus(Qt.BacktabFocusReason);
+
+                    return;
+                }
+            }
+        }
+        // NOTE: We make sure that one item has the focus.
+        else {
+            var itemFocus = undefined;
+
+            for (var i = 0 ; i < count; i++) {
+                var item = repeater.itemAt(i);
+
+                if (item.visible && item.enabled) {
+                    // NOTE: We already have a focussed item, so we keep it this way.
+                    if (item.activeFocus)
+                        return;
+
+                    if (itemFocus == undefined)
+                        itemFocus = item;
+                }
+            }
+
+            if (itemFocus)
+                itemFocus.forceActiveFocus(focusReason);
+        }
+    }
+
+    // Keys
 
     Keys.priority: Keys.AfterItem
-    Keys.onPressed: navigableCol.Navigation.defaultKeyAction(event)
 
-    Navigation.navigable: _countEnabled > 0
-    property int _countEnabled: 0
+    Keys.onPressed: root.Navigation.defaultKeyAction(event)
+
+    // Functions
+
+    function _applyFocus() {
+        if (indexFocus < 0 || indexFocus >= count) return false;
+
+        var item = repeater.itemAt(indexFocus);
+
+        if (item.visible && item.enabled) {
+            item.forceActiveFocus(focusReason);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    function _hasFocus() {
+        for (var i = 0 ; i < count; i++) {
+            if (repeater.itemAt(i).activeFocus)
+                return true;
+        }
+
+        return false;
+    }
+
+    // Childs
 
     Component {
         id: enabledConnection
+
         Connections {
-            onEnabledChanged: {
-                navigableCol._countEnabled += ( target.enabled ? 1 : -1)
-            }
+            onEnabledChanged: root._countEnabled += (target.enabled ? 1 : -1)
         }
     }
 
-    Column {
-        id: col
+    // Childs
+
+    contentItem: Column {
+        spacing: root.spacing
 
         Repeater{
-            id: colRepeater
+            id: repeater
 
             onItemAdded: {
-                if (item.enabled) {
-                    navigableCol._countEnabled += 1
-                }
-                enabledConnection.createObject(item, {target: item})
+                if (item.enabled) root._countEnabled += 1;
 
+                enabledConnection.createObject(item, { target: item });
 
                 item.Navigation.upAction = function() {
-                    var i = index
+                    var i = index;
+
                     do {
                         i--;
-                    } while (i >= 0 && (!colRepeater.itemAt(i).enabled || !colRepeater.itemAt(i).visible))
+                    } while (i >= 0
+                             &&
+                             (!repeater.itemAt(i).enabled || !repeater.itemAt(i).visible));
 
-                    if (i === -1) {
-                        navigableCol.Navigation.defaultNavigationUp()
-                    } else {
-                        colRepeater.itemAt(i).forceActiveFocus()
-                    }
+                    if (i == -1)
+                        root.Navigation.defaultNavigationUp();
+                    else
+                        repeater.itemAt(i).forceActiveFocus(Qt.BacktabFocusReason);
                 }
 
                 item.Navigation.downAction = function() {
-                    var i = index
+                    var i = index;
+
                     do {
                         i++;
-                    } while (i < colRepeater.count && (!colRepeater.itemAt(i).enabled || !colRepeater.itemAt(i).visible))
+                    } while (i < repeater.count
+                             &&
+                             (!repeater.itemAt(i).enabled || !repeater.itemAt(i).visible));
 
-                    if (i === colRepeater.count) {
-                        navigableCol.Navigation.defaultNavigationDown()
-                    } else {
-                        colRepeater.itemAt(i).forceActiveFocus()
-                    }
+                    if (i == repeater.count)
+                        root.Navigation.defaultNavigationDown();
+                    else
+                        repeater.itemAt(i).forceActiveFocus(Qt.TabFocusReason);
                 }
             }
 
-            onItemRemoved:  {
-                if (item.enabled) {
-                    navigableCol._countEnabled -= 1
-                }
-            }
-        }
-    }
-
-    onActiveFocusChanged: {
-        if (activeFocus) {
-            var firstWithoutFocus = undefined
-            for (var i = 0 ; i < colRepeater.count; i++) {
-                var item= colRepeater.itemAt(i)
-                if (item.enabled && item.visible) {
-                    //already an item with the focus, keep it this way
-                    if (item.focus )
-                        return
-                    else if (!firstWithoutFocus)
-                        firstWithoutFocus = item
-                }
-            }
-            if (firstWithoutFocus)
-                firstWithoutFocus.focus = true
-            return
+            onItemRemoved: if (item.enabled) root._countEnabled -= 1
         }
     }
 }
