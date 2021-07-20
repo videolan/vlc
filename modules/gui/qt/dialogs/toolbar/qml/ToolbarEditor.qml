@@ -35,6 +35,9 @@ Rectangle{
 
     property var _viewThatContainsDrag: undefined
 
+    signal dragStarted(int controlId)
+    signal dragStopped(int controlId)
+
     ColumnLayout{
         anchors.fill: parent
         spacing: 0
@@ -159,9 +162,10 @@ Rectangle{
                                                repeater.itemAt(1).count === 0 &&
                                                repeater.itemAt(2).count === 0)
 
-                            Layout.minimumWidth: Math.max(leftMetric.width,
-                                                          centerMetric.width,
-                                                          rightMetric.width) * 1.25
+                            Layout.minimumWidth: !!item && item.visible ? Math.max(leftMetric.width,
+                                                                                   centerMetric.width,
+                                                                                   rightMetric.width) * 1.25
+                                                                        : 0
                             Layout.margins: parentRectangle.border.width
 
                             readonly property int count: {
@@ -175,6 +179,23 @@ Rectangle{
                                 color: VLCStyle.colors.bgAlt
 
                                 property alias count: dndView.count
+
+                                Connections {
+                                    target: root
+                                    enabled: dndView.model === layout.model.center
+
+                                    onDragStarted: {
+                                        // extending spacer widget should not be placed in the
+                                        // central alignment view
+                                        if (controlId === ControlListModel.WIDGET_SPACER_EXTEND)
+                                            visible = false
+                                    }
+
+                                    onDragStopped: {
+                                        if (controlId === ControlListModel.WIDGET_SPACER_EXTEND)
+                                            visible = true
+                                    }
+                                }
 
                                 EditorDNDView {
                                     id: dndView
@@ -203,7 +224,7 @@ Rectangle{
                                         font.pixelSize: VLCStyle.fontSize_xxlarge
                                         color: VLCStyle.colors.menuCaption
                                         horizontalAlignment: Text.AlignHCenter
-                                        visible: (playerBtnDND.count === 0)
+                                        visible: (count === 0)
                                     }
                                 }
                             }

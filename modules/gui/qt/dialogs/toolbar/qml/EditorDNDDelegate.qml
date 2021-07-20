@@ -70,12 +70,16 @@ MouseArea {
     }
 
     onPressed: {
+        root.dragStarted(controlId)
+
         removeInfoRectVisible = true
     }
 
     onReleased: {
         drag.target.Drag.drop()
         removeInfoRectVisible = false
+
+        root.dragStopped(controlId)
     }
 
     onPositionChanged: {

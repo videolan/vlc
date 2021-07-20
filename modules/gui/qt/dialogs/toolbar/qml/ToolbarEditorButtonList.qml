@@ -120,6 +120,8 @@ GridView {
         readonly property int mIndex: PlayerControlbarControls.controlList[model.index].id
 
         onPressed: {
+            root.dragStarted(mIndex)
+
             buttonDragItem.text = PlayerControlbarControls.controlList[model.index].label
             buttonDragItem.Drag.source = this
             buttonDragItem.Drag.active = true
@@ -129,6 +131,8 @@ GridView {
 
         onReleased: {
             buttonDragItem.Drag.drop()
+
+            root.dragStopped(mIndex)
 
             GridView.delayRemove = false
         }
