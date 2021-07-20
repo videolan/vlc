@@ -36,7 +36,6 @@ FocusScope {
             + VLCStyle.globalToolbar_height
             + VLCStyle.localToolbar_height
 
-
     property int selectedIndex: 0
     property int subSelectedIndex: 0
 
@@ -153,6 +152,8 @@ FocusScope {
                             }
 
                             focus: true
+
+                            indexFocus: selectedIndex
 
                             Navigation.parentItem: root
                             Navigation.leftItem: history_back.enabled ? history_back : null
