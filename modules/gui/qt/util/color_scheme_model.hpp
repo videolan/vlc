@@ -34,7 +34,9 @@ public:
     {
         System,
         Day,
-        Night
+        Night,
+
+        Auto
     };
 
     Q_ENUM(ColorScheme);
@@ -68,6 +70,12 @@ private:
     };
 
     class DefaultSchemeList;
+    class WinColorSchemeList;
+
+    static std::unique_ptr<SchemeList> createList(ColorSchemeModel *parent);
+
+    // \internal used by SchemeList to notify scheme changed
+    void indexChanged(int i);
 
     const std::unique_ptr<SchemeList> m_list;
     int m_currentIndex;

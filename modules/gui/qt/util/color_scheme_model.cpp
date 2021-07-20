@@ -20,6 +20,89 @@
 
 #include "qt.hpp"
 
+
+#ifdef Q_OS_WIN
+
+#include <QAbstractNativeEventFilter>
+#include <QApplication>
+#include <QSettings>
+
+#include <qt_windows.h>
+
+namespace
+{
+    const char *WIN_THEME_SETTING_PATH = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
+    const char *WIN_THEME_SETTING_LIGHT_THEME_KEY = "AppsUseLightTheme";
+}
+
+class ColorSchemeModel::WinColorSchemeList
+        : public ColorSchemeModel::SchemeList
+        , public QAbstractNativeEventFilter
+{
+public:
+    static bool canDetectTheme()
+    {
+        QSettings settings(QLatin1String {WIN_THEME_SETTING_PATH}, QSettings::NativeFormat);
+        return settings.contains(WIN_THEME_SETTING_LIGHT_THEME_KEY);
+    }
+
+    WinColorSchemeList(ColorSchemeModel *colorSchemeModel)
+        : m_colorSchemeModel {colorSchemeModel}
+        , m_settings(QLatin1String {WIN_THEME_SETTING_PATH}, QSettings::NativeFormat)
+        , m_items {{qtr("Auto"), ColorScheme::Auto}, {qtr("Day"), ColorScheme::Day}, {qtr("Night"), ColorScheme::Night}}
+    {
+        qApp->installNativeEventFilter(this);
+    }
+
+    ~WinColorSchemeList()
+    {
+        qApp->removeNativeEventFilter(this);
+    }
+
+    ColorScheme scheme(int i) const override
+    {
+        if (m_items.at(i).scheme == ColorScheme::Auto)
+            return m_settings.value(WIN_THEME_SETTING_LIGHT_THEME_KEY).toBool()
+                    ? ColorScheme::Day : ColorScheme::Night;
+
+        return m_items.at(i).scheme;
+    }
+
+    QString text(int i) const override
+    {
+        return m_items.at(i).text;
+    }
+
+    int size() const override
+    {
+        return m_items.size();
+    }
+
+    bool nativeEventFilter(const QByteArray &, void *message, long *) override
+    {
+        MSG* msg = static_cast<MSG*>( message );
+        if ( msg->message == WM_SETTINGCHANGE
+             && !lstrcmp( LPCTSTR( msg->lParam ), L"ImmersiveColorSet" ) )
+        {
+            m_colorSchemeModel->indexChanged(0);
+        }
+        return false;
+    }
+
+private:
+    struct Item
+    {
+        QString text;
+        ColorScheme scheme;
+    };
+
+    ColorSchemeModel *m_colorSchemeModel;
+    QSettings m_settings;
+    const QVector<Item> m_items;
+};
+
+#endif
+
 class ColorSchemeModel::DefaultSchemeList : public ColorSchemeModel::SchemeList
 {
 public:
@@ -53,9 +136,19 @@ private:
     const QVector<Item> m_items;
 };
 
+std::unique_ptr<ColorSchemeModel::SchemeList> ColorSchemeModel::createList(ColorSchemeModel *parent)
+{
+#ifdef Q_OS_WIN
+    if (WinColorSchemeList::canDetectTheme)
+        return std::make_unique<WinColorSchemeList>(parent);
+#endif
+    Q_UNUSED(parent);
+    return std::make_unique<DefaultSchemeList>();
+}
+
 ColorSchemeModel::ColorSchemeModel(QObject* parent)
     : QAbstractListModel(parent)
-    , m_list {new DefaultSchemeList}
+    , m_list {createList(this)}
     , m_currentIndex {0}
 {
 }
@@ -141,4 +234,11 @@ void ColorSchemeModel::setCurrentScheme(const ColorScheme scheme)
 ColorSchemeModel::ColorScheme ColorSchemeModel::currentScheme() const
 {
     return m_list->scheme(m_currentIndex);
+}
+
+void ColorSchemeModel::indexChanged(const int i)
+{
+    emit dataChanged(index(i), index(i));
+    if (i == m_currentIndex)
+        emit currentChanged();
 }
