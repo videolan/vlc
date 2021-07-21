@@ -32,17 +32,24 @@ import "qrc:///style/"
 VideoAll {
     id: root
 
-    //---------------------------------------------------------------------------------------------
     // Events
-    //---------------------------------------------------------------------------------------------
 
     onCurrentIndexChanged: {
         history.update([ "mc", "video", { "initialIndex": currentIndex }])
     }
 
-    //---------------------------------------------------------------------------------------------
-    // Settings
-    //---------------------------------------------------------------------------------------------
+    // Functions
+
+    function setCurrentItemFocus(reason) {
+        var loader = headerItem.loader;
+
+        if (loader.visible)
+            loader.item.forceActiveFocus(reason);
+        else
+            _currentView.setCurrentItemFocus(reason);
+    }
+
+    // Children
 
     MLRecentsVideoModel {
         id: modelRecent
@@ -52,6 +59,8 @@ VideoAll {
 
     header: Column {
         property Item focusItem: (loader.status === Loader.Ready) ? loader.item.focusItem : null
+
+        property alias loader: loader
 
         width: root.width
 
@@ -74,8 +83,6 @@ VideoAll {
 
             visible: active
 
-            focus: true
-
             sourceComponent: VideoDisplayRecentVideos {
                 id: component
 
@@ -88,9 +95,7 @@ VideoAll {
                 Navigation.parentItem: root
 
                 Navigation.downAction: function() {
-                    component.focus = false;
-
-                    currentItem.setCurrentItemFocus();
+                    _currentView.setCurrentItemFocus(Qt.TabFocusReason);
                 }
             }
         }

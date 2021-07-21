@@ -30,23 +30,25 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
-    property Item focusItem: recentVideosListView
-    implicitHeight: recentVideosColumn.height
+    // Properties
 
     property int leftPadding: VLCStyle.margin_xlarge
     property int rightPadding: VLCStyle.margin_xlarge
+
+    property Item focusItem: recentVideosListView
 
     property int currentIndex: -1
 
     property var model: undefined;
 
+    // Settings
+
+    implicitHeight: recentVideosColumn.height
+
+    // Events
+
     onCurrentIndexChanged: {
         recentVideoListView.currentIndex = _currentIndex
-    }
-
-    function _actionAtIndex(index, model, selectionModel) {
-        g_mainDisplay.showPlayer()
-        medialib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ), [":restore-playback-pos=2"] )
     }
 
     onFocusChanged: {
@@ -54,6 +56,12 @@ FocusScope {
             root.currentIndex = 0
     }
 
+    function _actionAtIndex(index, model, selectionModel) {
+        g_mainDisplay.showPlayer()
+        medialib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ), [":restore-playback-pos=2"] )
+    }
+
+    // Childs
 
     Util.SelectableDelegateModel {
         id: recentVideoSelection
@@ -64,6 +72,7 @@ FocusScope {
         id: recentVideosColumn
 
         width: root.width
+
         spacing: VLCStyle.margin_xsmall
 
         Widgets.SubtitleLabel {
@@ -82,11 +91,8 @@ FocusScope {
             orientation: ListView.Horizontal
 
             focus: true
+
             Navigation.parentItem: root
-            Navigation.downAction: function() {
-                recentVideosListView.focus = false
-                view.currentItem.setCurrentItemFocus()
-            }
 
             model: root.model
 
@@ -97,11 +103,13 @@ FocusScope {
             delegate: VideoGridItem {
                 id: recentVideoGridItem
 
-                focus: true
                 x: selectedBorderWidth
                 y: selectedBorderWidth
                 pictureWidth: VLCStyle.gridCover_video_width_large
                 pictureHeight: VLCStyle.gridCover_video_height_large
+
+                focus: true
+
                 unselectedUnderlay: shadows.unselected
                 selectedUnderlay: shadows.selected
 
