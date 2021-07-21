@@ -551,6 +551,32 @@ static webvtt_dom_node_t * webvtt_domnode_getFirstChild( webvtt_dom_node_t *p_no
 }
 #define webvtt_domnode_getFirstChild(a) webvtt_domnode_getFirstChild((webvtt_dom_node_t *)a)
 
+static void webvtt_domnode_mergeCues( webvtt_dom_cue_t *p_dst, webvtt_dom_cue_t *p_src )
+{
+    p_dst->i_nzstop = p_src->i_nzstop;
+    /* needs more work */
+    webvtt_dom_cue_Delete( p_src );
+}
+
+static webvtt_dom_cue_t * webvtt_domnode_getCue( webvtt_dom_node_t *p_node,
+                                                 mtime_t i_nzstart,
+                                                 const char *psz_id )
+{
+    for( ; p_node ; p_node = p_node->p_next )
+    {
+        if( p_node->type != NODE_CUE )
+            continue;
+        webvtt_dom_cue_t *p_cue = (webvtt_dom_cue_t *) p_node;
+        if( p_cue->i_nzstart != i_nzstart )
+            continue;
+        if( !psz_id != !p_cue->psz_id ||
+            (psz_id && strcmp(psz_id, p_cue->psz_id)) )
+            continue;
+        return p_cue;
+    }
+    return NULL;
+}
+
 static mtime_t webvtt_domnode_GetPlaybackTime( const webvtt_dom_node_t *p_node, bool b_end )
 {
     for( ; p_node; p_node = p_node->p_parent )
@@ -1840,6 +1866,7 @@ static int ProcessISOBMFF( decoder_t *p_dec,
                            const uint8_t *p_buffer, size_t i_buffer,
                            mtime_t i_nzstart, mtime_t i_nzstop )
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     mp4_box_iterator_t it;
     mp4_box_iterator_Init( &it, p_buffer, i_buffer );
     while( mp4_box_iterator_Next( &it ) )
@@ -1877,17 +1904,28 @@ static int ProcessISOBMFF( decoder_t *p_dec,
                 free( psz );
             }
 
-            webvtt_region_t *p_region = webvtt_region_GetByID( p_dec->p_sys,
+            webvtt_region_t *p_region = webvtt_region_GetByID( p_sys,
                                                                p_cue->settings.psz_region );
-            if( p_region )
+            webvtt_dom_cue_t *p_existingcue = webvtt_domnode_getCue( p_region ? p_region->p_child
+                                                                              : p_sys->p_root->p_child,
+                                                                     p_cue->i_nzstart,
+                                                                     p_cue->psz_id );
+            if( p_existingcue )
             {
-                webvtt_region_AddCue( p_region, p_cue );
-                assert( p_region->p_child );
+                webvtt_domnode_mergeCues( p_existingcue, p_cue );
             }
             else
             {
-                webvtt_domnode_AppendLast( &p_dec->p_sys->p_root->p_child, p_cue );
-                p_cue->p_parent = (webvtt_dom_node_t *) p_dec->p_sys->p_root;
+                if( p_region )
+                {
+                    webvtt_region_AddCue( p_region, p_cue );
+                    assert( p_region->p_child );
+                }
+                else
+                {
+                    webvtt_domnode_AppendLast( &p_sys->p_root->p_child, p_cue );
+                    p_cue->p_parent = (webvtt_dom_node_t *) p_sys->p_root;
+                }
             }
         }
     }
