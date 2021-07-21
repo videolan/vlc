@@ -24,13 +24,21 @@ import "qrc:///style/"
 FocusScope {
     id: listview_id
 
+    // Properties
+
     property int modelCount: view.count
 
-    signal selectionUpdated( int keyModifiers, int oldIndex,int newIndex )
-    signal selectAll()
-    signal actionAtIndex( int index )
-
     property alias listView: view
+
+    property int highlightMargin: VLCStyle.margin_large
+
+    property var fadeColor: undefined
+
+    property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
+
+    property bool keyNavigationWraps : false
+
+    // Aliases
 
     //forward view properties
     property alias spacing: view.spacing
@@ -72,20 +80,39 @@ FocusScope {
     property alias displayMarginBeginning: view.displayMarginBeginning
     property alias displayMarginEnd: view.displayMarginEnd
 
-    property int highlightMargin: VLCStyle.margin_large
-    property var fadeColor: undefined
     property alias fadeRectBottomHovered: fadeRectBottom.isHovered
     property alias fadeRectTopHovered: fadeRectTop.isHovered
 
     property alias listScrollBar: scroll_id
-    property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
 
-    property bool keyNavigationWraps : false
+    // Signals
+
+    signal selectionUpdated(int keyModifiers, int oldIndex, int newIndex)
+
+    signal selectAll()
+
+    signal actionAtIndex(int index)
+
+    // Settings
 
     Accessible.role: Accessible.List
 
+    // Functions
+
+    function setCurrentItemFocus(reason) {
+        if (!model || model.count === 0)
+            return;
+
+        if (currentIndex === -1)
+            currentIndex = 0;
+
+        positionViewAtIndex(currentIndex, ItemView.Contain);
+
+        currentItem.forceActiveFocus(reason);
+    }
+
     function nextPage() {
-        view.contentX += (Math.min(view.width, (view.contentWidth - view.width - view.contentX ) ))
+        view.contentX += (Math.min(view.width, (view.contentWidth - view.width - view.contentX)))
     }
     function prevPage() {
         view.contentX -= Math.min(view.width,view.contentX - view.originX)
@@ -98,6 +125,8 @@ FocusScope {
     function itemAtIndex(index) {
         return view.itemAtIndex(index)
     }
+
+    // Events
 
     Component {
         id: sectionHeading
@@ -119,23 +148,29 @@ FocusScope {
         }
     }
 
+    // Connections
 
+    // FIXME: This is probably not useful anymore.
     Connections {
         target: view.headerItem
         onFocusChanged: {
             if (!headerItem.focus) {
-                view.currentItem.focus = true
+                currentItem.focus = true
             }
         }
     }
 
+    // Children
+
     ListView {
         id: view
+
         anchors.fill: parent
-        //key navigation is reimplemented for item selection
-        keyNavigationEnabled: false
 
         focus: true
+
+        //key navigation is reimplemented for item selection
+        keyNavigationEnabled: false
 
         ScrollBar.vertical: ScrollBar { id: scroll_id }
         ScrollBar.horizontal: ScrollBar { visible: view.contentWidth > view.width }
@@ -195,10 +230,22 @@ FocusScope {
             }
 
             if (newIndex >= 0 && newIndex < modelCount) {
-                var oldIndex = currentIndex
-                currentIndex = newIndex
-                event.accepted = true
-                selectionUpdated(event.modifiers, oldIndex, newIndex)
+                event.accepted = true;
+
+                var oldIndex = currentIndex;
+
+                currentIndex = newIndex;
+
+                selectionUpdated(event.modifiers, oldIndex, newIndex);
+
+                // FIXME: This clears the focus so we can pass the right focusReason.
+                currentItem.focus = false;
+
+                // NOTE: We make sure we have the proper visual focus on components.
+                if (oldIndex < currentIndex)
+                    currentItem.forceActiveFocus(Qt.TabFocusReason);
+                else
+                    currentItem.forceActiveFocus(Qt.BacktabFocusReason);
             }
 
             if (!event.accepted) {
@@ -319,7 +366,6 @@ FocusScope {
         onClicked: listview_id.prevPage()
         visible: view.orientation === ListView.Horizontal && !view.atXBeginning
     }
-
 
     RoundButton {
         id: rightBtn
