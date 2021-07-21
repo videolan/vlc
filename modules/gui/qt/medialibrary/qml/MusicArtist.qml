@@ -77,7 +77,7 @@ FocusScope {
                     if (albumsListView)
                         albumsListView.forceActiveFocus(Qt.TabFocusReason)
                     else
-                        view.currentItem.setCurrentItemFocus()
+                        view.currentItem.setCurrentItemFocus(Qt.TabFocusReason)
 
                 }
             }
@@ -119,7 +119,7 @@ FocusScope {
                         Navigation.upItem: artistBanner
                         Navigation.downAction: function() {
                             headerFs.focus = false
-                            view.currentItem.setCurrentItemFocus()
+                            view.currentItem.setCurrentItemFocus(Qt.TabFocusReason)
                         }
 
                         delegate: Widgets.GridItem {
@@ -431,9 +431,9 @@ FocusScope {
                 id: tableColumns
             }
 
-            function setCurrentItemFocus() {
+            function setCurrentItemFocus(reason) {
                 positionViewAtIndex(currentIndex, ItemView.Contain)
-                currentItem.forceActiveFocus()
+                currentItem.forceActiveFocus(reason)
             }
 
             Util.SelectableDelegateModel {
