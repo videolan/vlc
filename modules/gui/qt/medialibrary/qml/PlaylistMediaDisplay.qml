@@ -16,29 +16,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-import QtQuick          2.11
+import QtQuick 2.11
 import QtQuick.Controls 2.4
-import QtQuick.Layouts  1.11
-import QtQml.Models     2.2
+import QtQuick.Layouts 1.11
+import QtQml.Models 2.2
 
 import org.videolan.medialib 0.1
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
-import "qrc:///main/"    as MainInterface
-import "qrc:///util/"    as Util
+import "qrc:///main/" as MainInterface
+import "qrc:///util/" as Util
 import "qrc:///style/"
 
 FocusScope {
     id: root
 
-    //---------------------------------------------------------------------------------------------
     // Properties
-    //---------------------------------------------------------------------------------------------
 
     readonly property bool isViewMultiView: false
 
-    readonly property int currentIndex: currentItem.currentIndex
+    readonly property int currentIndex: view.currentIndex
 
     property int     initialIndex: 0
     property variant initialId
@@ -47,11 +45,9 @@ FocusScope {
     // NOTE: Specify an optionnal header for the view.
     property Component header: undefined
 
-    property Item headerItem: (currentItem) ? currentItem.headerItem : undefined
+    property Item headerItem: view.headerItem
 
-    //---------------------------------------------------------------------------------------------
     // Aliases
-    //---------------------------------------------------------------------------------------------
 
     // NOTE: This is used to determine which media(s) shall be displayed.
     property alias parentId: model.parentId
@@ -65,19 +61,15 @@ FocusScope {
 
     property alias dragItem: dragItem
 
-    //---------------------------------------------------------------------------------------------
     // Events
-    //---------------------------------------------------------------------------------------------
 
     onModelChanged: resetFocus()
 
     onInitialIndexChanged: resetFocus()
 
-    //---------------------------------------------------------------------------------------------
     // Functions
-    //---------------------------------------------------------------------------------------------
 
-    function setCurrentItemFocus() { view.currentItem.forceActiveFocus() }
+    function setCurrentItemFocus(reason) { view.setCurrentItemFocus(reason); }
 
     function resetFocus() {
         if (model.count === 0) return
@@ -89,11 +81,9 @@ FocusScope {
 
         modelSelect.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect);
 
-        if (currentItem)
-            currentItem.positionViewAtIndex(initialIndex, ItemView.Contain);
+        view.positionViewAtIndex(initialIndex, ItemView.Contain);
     }
 
-    //---------------------------------------------------------------------------------------------
     // Events
 
     function onDelete()
@@ -106,9 +96,7 @@ FocusScope {
         model.remove(indexes);
     }
 
-    //---------------------------------------------------------------------------------------------
     // Childs
-    //---------------------------------------------------------------------------------------------
 
     MLPlaylistModel {
         id: model
@@ -122,7 +110,8 @@ FocusScope {
             //       from 'onModelReset' only ?
             dragItem.Drag.cancel();
 
-            if (count === 0 || modelSelect.hasSelection) return;
+            if (count === 0 || modelSelect.hasSelection)
+                return;
 
             resetFocus();
         }
@@ -187,7 +176,6 @@ FocusScope {
     {
         id: view
 
-        //-----------------------------------------------------------------------------------------
         // Settings
 
         anchors.left  : parent.left
@@ -212,7 +200,8 @@ FocusScope {
         headerPositioning: ListView.InlineHeader
 
         Navigation.parentItem: root
-        Navigation.upItem: (headerItem) ? headerItem.focus : null
+        Navigation.upItem: (headerItem) ? headerItem.focusItem : null
+
         Navigation.cancelAction: function () {
             if (view.currentIndex <= 0) {
                 root.Navigation.defaultNavigationCancel()
@@ -222,13 +211,14 @@ FocusScope {
             }
         }
 
-        //-----------------------------------------------------------------------------------------
         // Events
 
         onContextMenuButtonClicked: contextMenu.popup(modelSelect.selectedIndexes,
                                                       menuParent.mapToGlobal(0,0))
 
         onRightClick: contextMenu.popup(modelSelect.selectedIndexes, globalMousePos)
+
+        // Keys
 
         Keys.onDeletePressed: onDelete()
     }
