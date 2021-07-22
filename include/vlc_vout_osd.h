@@ -65,8 +65,9 @@ VLC_API int vout_OSDEpg( vout_thread_t *, input_item_t * );
 VLC_API void vout_OSDText( vout_thread_t *vout, int channel, int position, vlc_tick_t duration, const char *text );
 
 /**
- * \brief Write an informative message at the default location,
- *        for the default duration and only if the OSD option is enabled.
+ * Write an informative message at the default location, for the default duration and only
+ * if the OSD option is enabled.
+ *
  * \param vout The vout on which the message will be displayed
  * \param channel Subpicture channel
  * \param format printf style formatting
@@ -74,7 +75,7 @@ VLC_API void vout_OSDText( vout_thread_t *vout, int channel, int position, vlc_t
  *
  * Provided for convenience.
  */
-VLC_API void vout_OSDMessageVa(vout_thread_t *, int, const char *, va_list);
+VLC_API void vout_OSDMessageVa(vout_thread_t *vout, int channel, const char *format, va_list args);
 
 static inline void
 vout_OSDMessage(vout_thread_t *vout, int channel, const char *format, ...)
@@ -89,10 +90,11 @@ vout_OSDMessage(vout_thread_t *vout, int channel, const char *format, ...)
  * Display a slider on the video output.
  * \param p_this    The object that called the function.
  * \param i_channel Subpicture channel
- * \param i_postion Current position in the slider
+ * \param i_position Current position in the slider
  * \param i_type    Types are: OSD_HOR_SLIDER and OSD_VERT_SLIDER.
  */
-VLC_API void vout_OSDSlider( vout_thread_t *, int, int , short );
+VLC_API void vout_OSDSlider( vout_thread_t *p_this, int i_channel,
+                             int i_position, short i_type);
 
 /**
  * Display an Icon on the video output.
@@ -100,7 +102,8 @@ VLC_API void vout_OSDSlider( vout_thread_t *, int, int , short );
  * \param i_channel Subpicture channel
  * \param i_type    Types are: OSD_PLAY_ICON, OSD_PAUSE_ICON, OSD_SPEAKER_ICON, OSD_MUTE_ICON
  */
-VLC_API void vout_OSDIcon( vout_thread_t *, int, short );
+VLC_API void vout_OSDIcon( vout_thread_t *p_this, int i_channel,
+                           short i_type);
 
 /** @} */
 #ifdef __cplusplus
