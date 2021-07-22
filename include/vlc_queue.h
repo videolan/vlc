@@ -196,11 +196,11 @@ VLC_API void vlc_queue_Enqueue(vlc_queue_t *, void *entry);
  * This function dequeues an entry from a thread-safe queue. If the queue is
  * empty, it will wait until at least one entry is available.
  *
- * @param offset offset of the next pointer within a queue entry
+ * @param queue queue object to dequeue an entry from
  *
  * @return the first entry in the queue, or NULL if the queue is empty
  */
-VLC_API void *vlc_queue_Dequeue(vlc_queue_t *) VLC_USED;
+VLC_API void *vlc_queue_Dequeue(vlc_queue_t *queue) VLC_USED;
 
 /**
  * Dequeues all entries.
