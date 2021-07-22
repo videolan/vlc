@@ -215,7 +215,7 @@ libvlc_media_tracklist_delete( libvlc_media_tracklist_t *list );
  * \return the same track, need to be released with libvlc_media_track_release()
  */
 LIBVLC_API libvlc_media_track_t *
-libvlc_media_track_hold( libvlc_media_track_t * );
+libvlc_media_track_hold( libvlc_media_track_t *track );
 
 /**
  * Release a single track
