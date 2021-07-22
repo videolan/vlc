@@ -836,7 +836,6 @@ vlc_player_Navigate(vlc_player_t *player, enum vlc_player_nav nav);
   * @param player locked player instance
   * @param viewpoint the viewpoint value
   * @param whence absolute or relative
-  * @return VLC_SUCCESS or a VLC error code
   */
 VLC_API void
 vlc_player_UpdateViewpoint(vlc_player_t *player,
@@ -1456,7 +1455,7 @@ vlc_player_GetSubtitleTrackAt(vlc_player_t *player, size_t index)
  * The referenced structure can be safely copied with vlc_player_track_Dup().
  *
  * @param player locked player instance
- * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
+ * @param es_id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
  * vlc_player_GetTrackAt())
  * @return a valid player track or NULL (if the track was terminated by the
  * playback thread)
@@ -1474,7 +1473,7 @@ vlc_player_GetTrack(vlc_player_t *player, vlc_es_id_t *es_id);
  * unlocked.
  *
  * @param player locked player instance
- * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
+ * @param es_id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
  * vlc_player_GetTrackAt())
  * @param order if not null, the order of the vout
  * @return a valid vout or NULL (if the track is disabled, it it's not a video
@@ -1559,7 +1558,7 @@ vlc_player_SelectTracksByStringIds(vlc_player_t *player,
  * vlc_player_cbs.on_track_selection_changed event.
  *
  * @param player locked player instance
- * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
+ * @param es_id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
  * vlc_player_GetTrackAt())
  * @param policy exclusive or simultaneous
  * @return the number of track selected for es_id category
@@ -1650,7 +1649,7 @@ vlc_player_SelectPrevTrack(vlc_player_t *player,
  * vlc_player_cbs.on_track_selection_changed event.
  *
  * @param player locked player instance
- * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
+ * @param es_id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
  * vlc_player_GetTrackAt())
  */
 VLC_API void
@@ -1691,7 +1690,7 @@ vlc_player_UnselectTrackCategory(vlc_player_t *player,
  * vlc_player_cbs.on_track_selection_changed event.
  *
  * @param player locked player instance
- * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
+ * @param es_id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
  * vlc_player_GetTrackAt())
  */
 VLC_API void
@@ -1927,7 +1926,7 @@ vlc_player_SetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat,
  * @see vlc_player_cbs.on_track_delay_changed
  *
  * @param player locked player instance
- * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
+ * @param es_id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
  * vlc_player_GetTrackAt())
  * @return a valid delay or INT64_MAX is no delay is set for this track
  */
@@ -1944,7 +1943,7 @@ vlc_player_GetEsIdDelay(vlc_player_t *player, vlc_es_id_t *es_id);
  * future changes of delay made by vlc_player_SetCategoryDelay()
  *
  * @param player locked player instance
- * @param id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
+ * @param es_id an ES ID (retrieved from vlc_player_cbs.on_track_list_changed or
  * vlc_player_GetTrackAt())
  * @param delay a valid time or INT64_MAX to use default category delay
  * @param whence absolute or relative
@@ -3368,7 +3367,8 @@ struct vlc_player_timer_smpte_cbs
  */
 VLC_API vlc_player_timer_id *
 vlc_player_AddTimer(vlc_player_t *player, vlc_tick_t min_period,
-                    const struct vlc_player_timer_cbs *cbs, void *data);
+                    const struct vlc_player_timer_cbs *cbs,
+                    void *cbs_data);
 
 /**
  * Add a smpte timer in order to get accurate video frame updates
@@ -3383,7 +3383,7 @@ vlc_player_AddTimer(vlc_player_t *player, vlc_tick_t min_period,
 VLC_API vlc_player_timer_id *
 vlc_player_AddSmpteTimer(vlc_player_t *player,
                          const struct vlc_player_timer_smpte_cbs *cbs,
-                         void *data);
+                         void *cbs_data);
 
 /**
  * Remove a player timer
@@ -3400,7 +3400,6 @@ vlc_player_RemoveTimer(vlc_player_t *player, vlc_player_timer_id *timer);
  * @param point time update obtained via the vlc_player_timer_cbs.on_update()
  * callback
  * @param system_now current system date
- * @param player_rate rate of the player
  * @param out_ts pointer where to set the interpolated ts, subtract this time
  * with VLC_TICK_0 to get the original value.
  * @param out_pos pointer where to set the interpolated position
