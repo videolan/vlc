@@ -16,13 +16,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-import QtQuick         2.11
-import QtQuick.Layouts 1.11
+import QtQuick 2.11
+import QtQuick.Controls 2.4
+import QtQuick.Layouts 1.3
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Widgets.AnimatedBackground {
+Control {
     id: delegate
 
     // Properties
@@ -41,19 +42,6 @@ Widgets.AnimatedBackground {
 
     height: root.rowHeight
 
-    active: activeFocus
-
-    animationDuration: VLCStyle.ms140
-
-    backgroundColor: {
-        if (delegate.selected)
-            return VLCStyle.colors.gridSelect;
-        else if (hoverArea.containsMouse)
-            return VLCStyle.colors.listHover;
-        else
-            return VLCStyle.colors.setColorAlpha(VLCStyle.colors.listHover, 0);
-    }
-
     // Connections
 
     Connections {
@@ -68,7 +56,24 @@ Widgets.AnimatedBackground {
 
     // Childs
 
-    MouseArea {
+    background: AnimatedBackground {
+        id: background
+
+        active: visualFocus
+
+        animationDuration: VLCStyle.ms140
+
+        backgroundColor: {
+            if (delegate.selected)
+                return VLCStyle.colors.gridSelect;
+            else if (hoverArea.containsMouse)
+                return VLCStyle.colors.listHover;
+            else
+                return VLCStyle.colors.setColorAlpha(VLCStyle.colors.listHover, 0);
+        }
+    }
+
+    contentItem: MouseArea {
         id: hoverArea
 
         // Settings
@@ -172,7 +177,7 @@ Widgets.AnimatedBackground {
 
                     readonly property bool containsMouse: hoverArea.containsMouse
 
-                    readonly property color foregroundColor: delegate.foregroundColor
+                    readonly property color foregroundColor: background.foregroundColor
 
                     width: (modelData.width) ? modelData.width : 0
 
@@ -184,14 +189,14 @@ Widgets.AnimatedBackground {
             }
         }
 
-        Widgets.ContextButton {
+        ContextButton {
             anchors.left: content.right
 
             anchors.leftMargin: VLCStyle.margin_xxsmall
 
             anchors.verticalCenter: content.verticalCenter
 
-            color: delegate.foregroundColor
+            color: background.foregroundColor
 
             backgroundColor: (hovered || activeFocus)
                              ? VLCStyle.colors.getBgColor(delegate.selected, hovered, activeFocus)
