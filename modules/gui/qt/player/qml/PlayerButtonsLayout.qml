@@ -28,7 +28,7 @@ FocusScope {
 
     implicitHeight: VLCStyle.maxControlbarControlHeight
 
-    property alias parentWindow: controlmodelbuttons.parentWindow
+    property var parentWindow: g_root
 
     property var colors: undefined
 
@@ -53,10 +53,6 @@ FocusScope {
 
     ControlButtons {
         id: controlmodelbuttons
-
-        parentWindow: g_root
-
-        onRequestLockUnlockAutoHide: playerButtonsLayout.requestLockUnlockAutoHide(lock, source)
     }
 
     Loader {

@@ -97,7 +97,7 @@ FocusScope {
             delegate: Loader {
                 id: buttonloader
 
-                sourceComponent: controlmodelbuttons.button(model.id).component
+                source: controlmodelbuttons.button(model.id).source
 
                 focus: (index === 0)
 

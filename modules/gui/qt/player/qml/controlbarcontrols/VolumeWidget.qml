@@ -175,6 +175,8 @@ FocusScope{
                 xPos: (handle.x + handle.width / 2)
 
                 colors: widgetfscope.colors
+
+                parentWindow: (typeof playerButtonsLayout === "undefined") ? g_root : playerButtonsLayout.parentWindow
             }
 
             background: Rectangle {

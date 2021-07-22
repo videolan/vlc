@@ -15,28 +15,36 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.11
+import QtQuick.Layouts 1.3
+import QtQuick.Controls 2.4
+import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
+import "qrc:///util/Helpers.js" as Helpers
 
 
-Widgets.IconControlButton {
-    id: menuBtn
-    size: VLCStyle.icon_medium
-    iconText: VLCIcons.ellipsis
-    text: i18n.qtr("Menu")
+Widgets.AnimatedBackground {
+    implicitWidth: fbLabel.width + VLCStyle.focus_border * 2
+    implicitHeight: fbLabel.height + VLCStyle.focus_border * 2
 
-    onClicked: contextMenu.popup(this.mapToGlobal(0, 0))
+    activeBorderColor: colors.bgFocus
 
-    QmlGlobalMenu {
-        id: contextMenu
+    property bool paintOnly: false
+    property VLCColors colors: VLCStyle.colors
 
-        ctx: mainctx
+    Widgets.MenuLabel {
+        id: fbLabel
 
-        onAboutToShow: playerButtonsLayout.requestLockUnlockAutoHide(true, contextMenu)
-        onAboutToHide: playerButtonsLayout.requestLockUnlockAutoHide(false, contextMenu)
+        anchors.centerIn: parent
+
+        text: i18n.qtr("WIDGET\nNOT\nFOUND")
+        horizontalAlignment: Text.AlignHCenter
+
+        color: colors.text
     }
 }
