@@ -26,38 +26,18 @@ import "qrc:///main/" as MainInterface
 
 FocusScope {
     id: root
+
     property alias sortModel: tracklistdisplay_id.sortModel
     property alias model: tracklistdisplay_id.model
     property alias selectionModel: tracklistdisplay_id.selectionDelegateModel
     readonly property bool isViewMultiView: false
 
-    Widgets.DragItem {
-        id: trackDragItem
-
-        function updateComponents(maxCovers) {
-          var items = selectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
-            return model.getDataAt(x.row)
-          })
-          var title = items.map(function (item){ return item.title}).join(", ")
-          var covers = items.map(function (item) { return {artwork: item.cover || VLCStyle.noArtCover}})
-          return {
-            covers: covers,
-            title: title,
-            count: selectionModel.selectedIndexes.length
-          }
-        }
-
-        function getSelectedInputItem() {
-            return model.getItemsForIndexes(selectionModel.selectedIndexes);
-        }
-    }
-
     MusicTrackListDisplay {
         id: tracklistdisplay_id
+
         anchors.fill: parent
         visible: model.count > 0
         focus: model.count > 0
-        dragItem: trackDragItem
         headerTopPadding: VLCStyle.margin_normal
         Navigation.parentItem: root
         Navigation.cancelAction: function() {
