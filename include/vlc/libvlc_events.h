@@ -185,22 +185,22 @@ enum libvlc_event_e {
      * \deprecated No longer used.
      * This belonged to the removed libvlc_media_list_view_t
      */
-    libvlc_MediaListViewItemAdded=0x300,
+    libvlc_MediaListViewItemAdded LIBVLC_DEPRECATED =0x300,
     /**
      * \deprecated No longer used.
      * This belonged to the removed libvlc_media_list_view_t
      */
-    libvlc_MediaListViewWillAddItem,
+    libvlc_MediaListViewWillAddItem LIBVLC_DEPRECATED,
     /**
      * \deprecated No longer used.
      * This belonged to the removed libvlc_media_list_view_t
      */
-    libvlc_MediaListViewItemDeleted,
+    libvlc_MediaListViewItemDeleted LIBVLC_DEPRECATED,
     /**
      * \deprecated No longer used.
      * This belonged to the removed libvlc_media_list_view_t
      */
-    libvlc_MediaListViewWillDeleteItem,
+    libvlc_MediaListViewWillDeleteItem LIBVLC_DEPRECATED,
 
     /**
      * Playback of a \link #libvlc_media_list_player_t media list
