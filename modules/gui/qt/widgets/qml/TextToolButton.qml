@@ -57,7 +57,7 @@ T.ToolButton {
     }
 
     background: AnimatedBackground {
-        active: control.activeFocus
+        active: visualFocus
 
         backgroundColor: control.hovered ? VLCStyle.colors.buttonHover
                                          : VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0)
