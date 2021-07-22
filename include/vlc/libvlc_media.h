@@ -511,8 +511,8 @@ LIBVLC_API libvlc_state_t libvlc_media_get_state(
 
 /**
  * Get the current statistics about the media
- * \param p_md: media descriptor object
- * \param p_stats: structure that contain the statistics about the media
+ * \param p_md media descriptor object
+ * \param p_stats structure that contain the statistics about the media
  *                 (this structure must be allocated by the caller)
  * \retval true statistics are available
  * \retval false otherwise
