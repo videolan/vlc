@@ -661,9 +661,8 @@ vlc_audio_meter_Reset(struct vlc_audio_meter *meter, const audio_sample_format_t
  * @param meter audio meter structure
  * @param chain name of the module, can contain specific module options using
  * the following chain convention:"name{option1=a,option2=b}"
- * @param cbs pointer to a vlc_audio_meter_events structure, the
+ * @param owner pointer to a vlc_audio_meter_plugin_owner  structure, the
  * structure must stay valid during the lifetime of the plugin
- * @param cbs_data opaque pointer used by the callbacks
  * @return a valid audio meter plugin, or NULL in case of error
  */
 VLC_API vlc_audio_meter_plugin *
