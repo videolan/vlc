@@ -396,7 +396,8 @@ vlc_playlist_AddListener(vlc_playlist_t *playlist,
  *                 vlc_playlist_AddListener()
  */
 VLC_API void
-vlc_playlist_RemoveListener(vlc_playlist_t *, vlc_playlist_listener_id *);
+vlc_playlist_RemoveListener(vlc_playlist_t *playlist,
+                            vlc_playlist_listener_id *id);
 
 /**
  * Return the number of items.
@@ -687,7 +688,7 @@ vlc_playlist_GetPlaybackRepeat(vlc_playlist_t *playlist);
  * \return the playback order
  */
 VLC_API enum vlc_playlist_playback_order
-vlc_playlist_GetPlaybackOrder(vlc_playlist_t *);
+vlc_playlist_GetPlaybackOrder(vlc_playlist_t *playlist);
 
 /**
  * Change the playback "repeat" mode.
@@ -703,7 +704,7 @@ vlc_playlist_SetPlaybackRepeat(vlc_playlist_t *playlist,
  * Change the playback order
  *
  * \param playlist the playlist, locked
- * \param repeat the new playback order
+ * \param order the new playback order
  */
 VLC_API void
 vlc_playlist_SetPlaybackOrder(vlc_playlist_t *playlist,
@@ -818,7 +819,6 @@ vlc_playlist_Start(vlc_playlist_t *playlist);
  * Stop the player.
  *
  * \param playlist the playlist, locked
- * \return VLC_SUCCESS on success, another value on error
  */
 VLC_API void
 vlc_playlist_Stop(vlc_playlist_t *playlist);
@@ -827,7 +827,6 @@ vlc_playlist_Stop(vlc_playlist_t *playlist);
  * Pause the player.
  *
  * \param playlist the playlist, locked
- * \return VLC_SUCCESS on success, another value on error
  */
 VLC_API void
 vlc_playlist_Pause(vlc_playlist_t *playlist);
@@ -836,7 +835,6 @@ vlc_playlist_Pause(vlc_playlist_t *playlist);
  * Resume the player.
  *
  * \param playlist the playlist, locked
- * \return VLC_SUCCESS on success, another value on error
  */
 VLC_API void
 vlc_playlist_Resume(vlc_playlist_t *playlist);
@@ -861,7 +859,6 @@ vlc_playlist_PlayAt(vlc_playlist_t *playlist, size_t index)
  * Preparse a media, and expand it in the playlist on subitems added.
  *
  * \param playlist the playlist (not necessarily locked)
- * \param libvlc the libvlc instance
  * \param media the media to preparse
  */
 VLC_API void
