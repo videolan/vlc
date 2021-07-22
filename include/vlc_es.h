@@ -707,7 +707,7 @@ static inline void es_format_Change( es_format_t *fmt, int i_cat, vlc_fourcc_t i
  *
  * Any held ES tracks must be released with vlc_es_id_Release().
  *
- * @param id pointer to the ES id
+ * @param es pointer to the ES id
  * @return the same ES pointer, for convenience
  */
 VLC_API vlc_es_id_t *
