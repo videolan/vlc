@@ -111,7 +111,7 @@ LIBVLC_API const char *libvlc_vprinterr (const char *fmt, va_list ap);
  * Sets the LibVLC error status and message for the current thread.
  * Any previous error is overridden.
  * \param fmt the format string
- * \param args the arguments
+ * \param ...  the arguments for the format string
  * \return a nul terminated string in any case
  */
 LIBVLC_API const char *libvlc_printerr (const char *fmt, ...);
@@ -409,7 +409,7 @@ LIBVLC_API void libvlc_log_get_context(const libvlc_log_t *ctx,
  * \param ctx message context (as passed to the @ref libvlc_log_cb callback)
  * \param name object name storage (or NULL) [OUT]
  * \param header object header (or NULL) [OUT]
- * \param line source code file line number storage (or NULL) [OUT]
+ * \param id temporarily-unique object identifier (or 0) [OUT]
  * \warning The returned module name and source code file name, if non-NULL,
  * are only valid until the logging callback returns.
  *
