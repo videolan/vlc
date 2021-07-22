@@ -121,7 +121,7 @@ struct libvlc_int_t
  *
  * @return the new object, or NULL on error.
  */
-VLC_API void *vlc_object_create( vlc_object_t *, size_t ) VLC_MALLOC VLC_USED;
+VLC_API void *vlc_object_create( vlc_object_t *, size_t i_size) VLC_MALLOC VLC_USED;
 
 /**
  * Drops the strong reference to an object.
