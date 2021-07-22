@@ -155,9 +155,9 @@ QtObject {
 
     readonly property Component aspectRatioDelegate : Controls.AspectRatioWidget { }
 
-    readonly property Component teletextdelegate : TeletextWidget { }
+    readonly property Component teletextdelegate : Controls.TeletextWidget { }
 
-    readonly property Component volumeBtnDelegate : VolumeWidget { parentWindow: controlButtons.parentWindow }
+    readonly property Component volumeBtnDelegate : Controls.VolumeWidget { parentWindow: controlButtons.parentWindow }
 
     readonly property Component playerSwitchBtnDelegate : Controls.PlayerSwitchButton { }
 

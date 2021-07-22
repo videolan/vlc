@@ -750,10 +750,8 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/PlayerMenuItem.qml \
 	gui/qt/player/qml/ResumeDialog.qml \
 	gui/qt/player/qml/SliderBar.qml \
-	gui/qt/player/qml/TeletextWidget.qml \
 	gui/qt/player/qml/TopBar.qml \
 	gui/qt/player/qml/TrackInfo.qml \
-	gui/qt/player/qml/VolumeWidget.qml \
 	gui/qt/player/qml/ButtonsLayout.qml \
 	gui/qt/player/qml/controlbarcontrols/ArtworkInfoWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/AspectRatioWidget.qml \
@@ -786,6 +784,8 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/controlbarcontrols/SnapshotButton.qml \
 	gui/qt/player/qml/controlbarcontrols/SpacerWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/StopButton.qml \
+	gui/qt/player/qml/controlbarcontrols/TeletextWidget.qml \
+	gui/qt/player/qml/controlbarcontrols/VolumeWidget.qml \
 	gui/qt/playlist/qml/PlaylistDelegate.qml \
 	gui/qt/playlist/qml/PlaylistListView.qml \
 	gui/qt/playlist/qml/PlaylistOverlayMenu.qml \
