@@ -346,6 +346,39 @@
         <file alias="ButtonsLayout.qml">player/qml/ButtonsLayout.qml</file>
         <file alias="PlaybackSpeed.qml">player/qml/PlaybackSpeed.qml</file>
     </qresource>
+    <qresource prefix="/player/controlbarcontrols">
+        <file alias="ArtworkInfoWidget.qml">player/qml/controlbarcontrols/ArtworkInfoWidget.qml</file>
+        <file alias="AspectRatioWidget.qml">player/qml/controlbarcontrols/AspectRatioWidget.qml</file>
+        <file alias="AtoBButton.qml">player/qml/controlbarcontrols/AtoBButton.qml</file>
+        <file alias="BackButton.qml">player/qml/controlbarcontrols/BackButton.qml</file>
+        <file alias="ChapterNextButton.qml">player/qml/controlbarcontrols/ChapterNextButton.qml</file>
+        <file alias="ChapterPreviousButton.qml">player/qml/controlbarcontrols/ChapterPreviousButton.qml</file>
+        <file alias="ExpandingSpacerWidget.qml">player/qml/controlbarcontrols/ExpandingSpacerWidget.qml</file>
+        <file alias="ExtendedSettingsButton.qml">player/qml/controlbarcontrols/ExtendedSettingsButton.qml</file>
+        <file alias="FasterButton.qml">player/qml/controlbarcontrols/FasterButton.qml</file>
+        <file alias="FrameButton.qml">player/qml/controlbarcontrols/FrameButton.qml</file>
+        <file alias="FullscreenButton.qml">player/qml/controlbarcontrols/FullscreenButton.qml</file>
+        <file alias="InfoButton.qml">player/qml/controlbarcontrols/InfoButton.qml</file>
+        <file alias="LangButton.qml">player/qml/controlbarcontrols/LangButton.qml</file>
+        <file alias="LoopButton.qml">player/qml/controlbarcontrols/LoopButton.qml</file>
+        <file alias="MenuButton.qml">player/qml/controlbarcontrols/MenuButton.qml</file>
+        <file alias="NextButton.qml">player/qml/controlbarcontrols/NextButton.qml</file>
+        <file alias="OpenButton.qml">player/qml/controlbarcontrols/OpenButton.qml</file>
+        <file alias="PlaybackSpeedButton.qml">player/qml/controlbarcontrols/PlaybackSpeedButton.qml</file>
+        <file alias="PlayButton.qml">player/qml/controlbarcontrols/PlayButton.qml</file>
+        <file alias="PlayerSwitchButton.qml">player/qml/controlbarcontrols/PlayerSwitchButton.qml</file>
+        <file alias="PlaylistButton.qml">player/qml/controlbarcontrols/PlaylistButton.qml</file>
+        <file alias="PreviousButton.qml">player/qml/controlbarcontrols/PreviousButton.qml</file>
+        <file alias="QuitButton.qml">player/qml/controlbarcontrols/QuitButton.qml</file>
+        <file alias="RandomButton.qml">player/qml/controlbarcontrols/RandomButton.qml</file>
+        <file alias="RecordButton.qml">player/qml/controlbarcontrols/RecordButton.qml</file>
+        <file alias="SkipBackButton.qml">player/qml/controlbarcontrols/SkipBackButton.qml</file>
+        <file alias="SkipForwardButton.qml">player/qml/controlbarcontrols/SkipForwardButton.qml</file>
+        <file alias="SlowerButton.qml">player/qml/controlbarcontrols/SlowerButton.qml</file>
+        <file alias="SnapshotButton.qml">player/qml/controlbarcontrols/SnapshotButton.qml</file>
+        <file alias="SpacerWidget.qml">player/qml/controlbarcontrols/SpacerWidget.qml</file>
+        <file alias="StopButton.qml">player/qml/controlbarcontrols/StopButton.qml</file>
+    </qresource>
     <qresource prefix="/about">
         <file alias="About.qml">dialogs/help/qml/About.qml</file>
     </qresource>

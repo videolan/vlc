@@ -755,6 +755,37 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/TrackInfo.qml \
 	gui/qt/player/qml/VolumeWidget.qml \
 	gui/qt/player/qml/ButtonsLayout.qml \
+	gui/qt/player/qml/controlbarcontrols/ArtworkInfoWidget.qml \
+	gui/qt/player/qml/controlbarcontrols/AspectRatioWidget.qml \
+	gui/qt/player/qml/controlbarcontrols/AtoBButton.qml \
+	gui/qt/player/qml/controlbarcontrols/BackButton.qml \
+	gui/qt/player/qml/controlbarcontrols/ChapterNextButton.qml \
+	gui/qt/player/qml/controlbarcontrols/ChapterPreviousButton.qml \
+	gui/qt/player/qml/controlbarcontrols/ExpandingSpacerWidget.qml \
+	gui/qt/player/qml/controlbarcontrols/ExtendedSettingsButton.qml \
+	gui/qt/player/qml/controlbarcontrols/FasterButton.qml \
+	gui/qt/player/qml/controlbarcontrols/FrameButton.qml \
+	gui/qt/player/qml/controlbarcontrols/FullscreenButton.qml \
+	gui/qt/player/qml/controlbarcontrols/InfoButton.qml \
+	gui/qt/player/qml/controlbarcontrols/LangButton.qml \
+	gui/qt/player/qml/controlbarcontrols/LoopButton.qml \
+	gui/qt/player/qml/controlbarcontrols/MenuButton.qml \
+	gui/qt/player/qml/controlbarcontrols/NextButton.qml \
+	gui/qt/player/qml/controlbarcontrols/OpenButton.qml \
+	gui/qt/player/qml/controlbarcontrols/PlaybackSpeedButton.qml \
+	gui/qt/player/qml/controlbarcontrols/PlayButton.qml \
+	gui/qt/player/qml/controlbarcontrols/PlayerSwitchButton.qml \
+	gui/qt/player/qml/controlbarcontrols/PlaylistButton.qml \
+	gui/qt/player/qml/controlbarcontrols/PreviousButton.qml \
+	gui/qt/player/qml/controlbarcontrols/QuitButton.qml \
+	gui/qt/player/qml/controlbarcontrols/RandomButton.qml \
+	gui/qt/player/qml/controlbarcontrols/RecordButton.qml \
+	gui/qt/player/qml/controlbarcontrols/SkipBackButton.qml \
+	gui/qt/player/qml/controlbarcontrols/SkipForwardButton.qml \
+	gui/qt/player/qml/controlbarcontrols/SlowerButton.qml \
+	gui/qt/player/qml/controlbarcontrols/SnapshotButton.qml \
+	gui/qt/player/qml/controlbarcontrols/SpacerWidget.qml \
+	gui/qt/player/qml/controlbarcontrols/StopButton.qml \
 	gui/qt/playlist/qml/PlaylistDelegate.qml \
 	gui/qt/playlist/qml/PlaylistListView.qml \
 	gui/qt/playlist/qml/PlaylistOverlayMenu.qml \
