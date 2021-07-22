@@ -212,6 +212,12 @@ typedef struct libvlc_media_slave_t
 } libvlc_media_slave_t;
 
 /**
+ * Type of stat that can be requested from libvlc_media_get_stat()
+ */
+#define libvlc_media_stat_mtime 0
+#define libvlc_media_stat_size 1
+
+/**
  * Callback prototype to open a custom bitstream input media.
  *
  * The same media item can be opened multiple times. Each time, this callback
@@ -559,6 +565,22 @@ LIBVLC_API libvlc_event_manager_t *
  */
 LIBVLC_API libvlc_time_t
    libvlc_media_get_duration( libvlc_media_t *p_md );
+
+/**
+ * Get a 'stat' value of media descriptor object item.
+ *
+ * \note 'stat' values are currently only parsed by directory accesses. This
+ * mean that only sub medias of a directory media, parsed with
+ * libvlc_media_parse_with_options() can have valid 'stat' properties.
+ * \version LibVLC 4.0.0 and later.
+ *
+ * \param p_md media descriptor object
+ * \param type a valid libvlc_media_stat_ define
+ * \param out field in which the value will be stored
+ * \return 1 on success, 0 if not found, -1 on error.
+ */
+LIBVLC_API int
+   libvlc_media_get_stat( libvlc_media_t *p_md, unsigned type, uint64_t *out );
 
 /**
  * Parse the media asynchronously with options.

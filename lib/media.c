@@ -838,6 +838,43 @@ libvlc_media_get_duration( libvlc_media_t * p_md )
     return from_mtime(input_item_GetDuration( p_md->p_input_item ));
 }
 
+int
+libvlc_media_get_stat( libvlc_media_t *p_md, unsigned type, uint64_t *out )
+{
+    assert( p_md );
+    assert( out );
+
+    if( !p_md->p_input_item )
+    {
+        libvlc_printerr( "No input item" );
+        return -1;
+    }
+
+    const char *name;
+    switch (type)
+    {
+        case libvlc_media_stat_mtime:   name = "mtime"; break;
+        case libvlc_media_stat_size:    name = "size"; break;
+        default:
+            libvlc_printerr( "unknown libvlc_media_stat" );
+            return -1;
+    };
+
+    char *str = input_item_GetInfo( p_md->p_input_item, ".stat", name );
+    if( str == NULL )
+        return 0;
+
+    char *end;
+    unsigned long long val = strtoull( str, &end, 10 );
+    free( str );
+
+    if( *end != '\0' )
+        return -1;
+
+    *out = val;
+    return 1;
+}
+
 static const input_preparser_callbacks_t input_preparser_callbacks = {
     .on_preparse_ended = input_item_preparse_ended,
     .on_subtree_added = input_item_subtree_added,
