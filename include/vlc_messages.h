@@ -76,7 +76,7 @@ typedef struct vlc_log_t
  * \param func calling function name (normally __func__) or NULL
  * \param format printf-like message format
  */
-VLC_API void vlc_object_Log(vlc_object_t *obj, int prio, const char *module,
+VLC_API void vlc_object_Log(vlc_object_t *obj, int type, const char *module,
                             const char *file, unsigned line, const char *func,
                             const char *format, ...) VLC_FORMAT(7, 8);
 
