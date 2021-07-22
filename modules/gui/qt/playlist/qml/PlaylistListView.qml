@@ -104,10 +104,8 @@ FocusScope {
         id: parentRect
         anchors.fill: parent
         color: colors.topBanner
-        onActiveFocusChanged: {
-            if (activeFocus)
-                listView.forceActiveFocus()
-        }
+
+        onActiveFocusChanged: if (activeFocus) listView.forceActiveFocus(focusReason)
 
         Widgets.DragItem {
             id: dragItem

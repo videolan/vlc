@@ -116,8 +116,7 @@ T.Popup {
 
             spacing: 0
             focus: true
-            onActiveFocusChanged: if (activeFocus)
-                                      btnsCol.forceActiveFocus()
+            onActiveFocusChanged: if (activeFocus) btnsCol.forceActiveFocus()
 
             Widgets.NavigableCol {
                 id: btnsCol
@@ -204,8 +203,7 @@ T.Popup {
                     height: tracksListRow.height
                     focus: true
 
-                    onActiveFocusChanged: if (activeFocus)
-                                              tracksList.forceActiveFocus()
+                    onActiveFocusChanged: if (activeFocus) tracksList.forceActiveFocus(focusReason)
 
                     Item {
                         // keep it inside so "Column" doesn't mess with it
@@ -319,8 +317,7 @@ T.Popup {
 
             spacing: 0
             focus: true
-            onActiveFocusChanged: if (activeFocus)
-                                      backBtn.forceActiveFocus()
+            onActiveFocusChanged: if (activeFocus) backBtn.forceActiveFocus()
 
             Item {
                 Layout.alignment: Qt.AlignLeft | Qt.AlignTop
@@ -566,8 +563,7 @@ T.Popup {
 
             spacing: 0
             focus: true
-            onActiveFocusChanged: if (activeFocus)
-                                      backBtn.forceActiveFocus()
+            onActiveFocusChanged: if (activeFocus) backBtn.forceActiveFocus()
 
             Item {
                 Layout.alignment: Qt.AlignLeft | Qt.AlignTop

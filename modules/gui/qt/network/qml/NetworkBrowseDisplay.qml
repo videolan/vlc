@@ -144,7 +144,7 @@ FocusScope {
                 Navigation.parentItem: root
                 Navigation.downAction: function() {
                     focus = false
-                    gridView.forceActiveFocus()
+                    gridView.forceActiveFocus(Qt.TabFocusReason)
                 }
 
                 RowLayout {
@@ -300,7 +300,7 @@ FocusScope {
                         Navigation.parentItem: root
                         Navigation.downAction: function() {
                             head.focus = false
-                            tableView.forceActiveFocus()
+                            tableView.forceActiveFocus(Qt.TabFocusReason)
                         }
 
                         Layout.preferredWidth: implicitWidth

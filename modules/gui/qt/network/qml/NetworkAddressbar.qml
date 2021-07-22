@@ -45,8 +45,7 @@ Control {
     implicitWidth: VLCStyle.bannerTabButton_width_large * 4
     implicitHeight: VLCStyle.dp(24, VLCStyle.scale)
     focus: true
-    onActiveFocusChanged: if (activeFocus)
-                              contentItem.forceActiveFocus()
+    onActiveFocusChanged: if (activeFocus) contentItem.forceActiveFocus(focusReason)
 
     function changeTree(newTree) {
         history.push(["mc", "network", {
@@ -85,8 +84,7 @@ Control {
     contentItem: RowLayout {
         spacing: VLCStyle.margin_xxsmall
         width: control.availableWidth
-        onActiveFocusChanged: if (activeFocus)
-                                  homeButton.forceActiveFocus()
+        onActiveFocusChanged: if (activeFocus) homeButton.forceActiveFocus(focusReason)
 
         AddressbarButton {
             id: homeButton
@@ -98,9 +96,9 @@ Control {
             Navigation.parentItem: control
             Navigation.rightAction: function () {
                 if (menuButton.visible)
-                        menuButton.forceActiveFocus()
+                    menuButton.forceActiveFocus(Qt.TabFocusReason)
                 else
-                    contentRepeater.itemAt(0).forceActiveFocus()
+                    contentRepeater.itemAt(0).forceActiveFocus(Qt.TabFocusReason)
             }
             Keys.priority: Keys.AfterItem
             Keys.onPressed: Navigation.defaultKeyAction(event)
@@ -120,7 +118,7 @@ Control {
             Navigation.parentItem: control
             Navigation.leftItem: homeButton
             Navigation.rightAction: function () {
-                contentRepeater.itemAt(0).forceActiveFocus()
+                contentRepeater.itemAt(0).forceActiveFocus(Qt.TabFocusReason)
             }
             Keys.priority: Keys.AfterItem
             Keys.onPressed: Navigation.defaultKeyAction(event)
@@ -138,24 +136,21 @@ Control {
                 Layout.maximumWidth: implicitWidth
                 focus: true
                 spacing: VLCStyle.margin_xxxsmall
-                onActiveFocusChanged: {
-                    if (activeFocus)
-                                btn.forceActiveFocus()
-                }
+                onActiveFocusChanged: if (activeFocus) btn.forceActiveFocus(focusReason)
 
                 Navigation.parentItem: control
                 Navigation.leftAction: function() {
                     if (index !== 0)
-                        contentRepeater.itemAt(index - 1).forceActiveFocus()
+                        contentRepeater.itemAt(index - 1).forceActiveFocus(Qt.BacktabFocusReason)
                     else if (menuButton.visible)
-                        menuButton.forceActiveFocus()
+                        menuButton.forceActiveFocus(Qt.BacktabFocusReason)
                     else
-                        homeButton.forceActiveFocus()
+                        homeButton.forceActiveFocus(Qt.BacktabFocusReason)
                 }
 
                 Navigation.rightAction: function () {
                     if (index !== contentRepeater.count - 1)
-                        contentRepeater.itemAt(index + 1).forceActiveFocus()
+                        contentRepeater.itemAt(index + 1).forceActiveFocus(Qt.TabFocusReason)
                     else
                         control.Navigation.defaultNavigationRight()
                 }

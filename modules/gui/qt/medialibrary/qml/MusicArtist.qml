@@ -75,7 +75,7 @@ FocusScope {
                 Navigation.downAction: function() {
                     headerFs.focus = false
                     if (albumsListView)
-                        albumsListView.forceActiveFocus()
+                        albumsListView.forceActiveFocus(Qt.TabFocusReason)
                     else
                         view.currentItem.setCurrentItemFocus()
 
