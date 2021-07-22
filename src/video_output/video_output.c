@@ -187,6 +187,7 @@ typedef struct vout_thread_sys_t
     struct {
         vlc_mutex_t lock;
         vlc_tick_t last_displayed_date;
+        vlc_tick_t last_system_pts;
     } avstat;
 
 } vout_thread_sys_t;
@@ -618,12 +619,14 @@ void vout_NotifyVsyncReached(vout_thread_t *vout, vlc_tick_t next_vsync)
     vlc_tick_t now = vlc_tick_now();
     vlc_mutex_lock(&sys->avstat.lock);
     vlc_tick_t last_date = sys->avstat.last_displayed_date;
+    vlc_tick_t last_system_pts = sys->avstat.last_system_pts;
     vlc_mutex_unlock(&sys->avstat.lock);
 
     if (last_date != VLC_TICK_INVALID && atomic_load(&sys->b_display_avstat))
-        msg_Info( vout, "avstats: [RENDER][VSYNC] ts=%" PRId64 " pts_per_vsync=%" PRId64,
+        msg_Info( vout, "avstats: [RENDER][VSYNC] ts=%" PRId64 " pts_per_vsync=%" PRId64 " system_pts=%" PRId64,
                 NS_FROM_VLC_TICK(now),
-                NS_FROM_VLC_TICK(last_date));
+                NS_FROM_VLC_TICK(last_date),
+                NS_FROM_VLC_TICK(last_system_pts));
 }
 
 void vout_ControlChangeFilters(vout_thread_t *vout, const char *filters)
@@ -1450,6 +1453,7 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
         vlc_mutex_lock(&sys->avstat.lock);
         vout_display_Display(vd, todisplay);
         sys->avstat.last_displayed_date = todisplay->date;
+        sys->avstat.last_system_pts = system_pts;
         vlc_mutex_unlock(&sys->avstat.lock);
     }
 
@@ -2137,6 +2141,8 @@ vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
         vlc_window_SetState(sys->display_cfg.window, VLC_WINDOW_STATE_ABOVE);
 
     sys->avstat.last_displayed_date = VLC_TICK_INVALID;
+    sys->avstat.last_system_pts = VLC_TICK_INVALID;
+
     vlc_mutex_init(&sys->avstat.lock);
     var_AddCallback(&vout->obj, "avstat", avstat_callback, sys);
     var_TriggerCallback(&vout->obj, "avstat");
