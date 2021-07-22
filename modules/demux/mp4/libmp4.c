@@ -2954,6 +2954,73 @@ static int MP4_ReadBox_stsz( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_stz2( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    uint32_t count;
+    uint8_t field_size;
+
+    MP4_READBOX_ENTER( MP4_Box_data_stsz_t, MP4_FreeBox_stsz );
+
+    MP4_GETVERSIONFLAGS( p_box->data.p_stsz );
+
+    uint32_t reserved;
+    MP4_GET3BYTES( reserved );
+    MP4_GET1BYTE(field_size);
+
+    MP4_GET4BYTES( count );
+    p_box->data.p_stsz->i_sample_count = count;
+
+    if( field_size != 4 && field_size != 8 && field_size != 16 )
+        MP4_READBOX_EXIT( 0 );
+    if( ( (uint64_t)field_size * count + 7 ) / 8 > i_read )
+        MP4_READBOX_EXIT( 0 );
+
+    p_box->data.p_stsz->i_entry_size =
+            vlc_alloc( count, sizeof(uint32_t) );
+    if( unlikely( p_box->data.p_stsz->i_entry_size == NULL ) )
+        MP4_READBOX_EXIT( 0 );
+
+    if( field_size == 16 )
+    {
+        for( uint32_t i = 0; i < count; i++ )
+            MP4_GET2BYTES( p_box->data.p_stsz->i_entry_size[i] );
+    }
+    else if( field_size == 8 )
+    {
+        for( uint32_t i = 0; i < count; i++ )
+            MP4_GET1BYTE( p_box->data.p_stsz->i_entry_size[i] );
+    }
+    else
+    {
+        vlc_assert( field_size == 4 );
+        count &= ~1;
+        for( uint32_t i = 0; i < count; i += 2 )
+        {
+            uint8_t entry;
+            MP4_GET1BYTE( entry );
+            p_box->data.p_stsz->i_entry_size[i] = entry >> 4;
+            p_box->data.p_stsz->i_entry_size[i + 1] = entry & 0x0F;
+        }
+        if( count < p_box->data.p_stsz->i_sample_count )
+        {
+            uint8_t entry;
+            /* ISO-14496-12: if the sizes do not fill an integral number of
+             * bytes, the last byte is padded with zeros.
+             */
+            MP4_GET1BYTE( entry );
+            p_box->data.p_stsz->i_entry_size[count] = entry >> 4;
+        }
+    }
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream, "read box: \"stz2\" field-size %d sample-count %d",
+             field_size,
+             p_box->data.p_stsz->i_sample_count );
+
+#endif
+    MP4_READBOX_EXIT( 1 );
+}
+
 static void MP4_FreeBox_stsc( MP4_Box_t *p_box )
 {
     free( p_box->data.p_stsc->i_first_chunk );
@@ -4866,6 +4933,7 @@ static const struct
     { ATOM_cslg,    MP4_ReadBox_cslg,         ATOM_stbl },
     { ATOM_stsd,    MP4_ReadBox_stsd,         ATOM_stbl },
     { ATOM_stsz,    MP4_ReadBox_stsz,         ATOM_stbl },
+    { ATOM_stz2,    MP4_ReadBox_stz2,         ATOM_stbl },
     { ATOM_stsc,    MP4_ReadBox_stsc,         ATOM_stbl },
     { ATOM_stco,    MP4_ReadBox_stco_co64,    ATOM_stbl },
     { ATOM_co64,    MP4_ReadBox_stco_co64,    ATOM_stbl },

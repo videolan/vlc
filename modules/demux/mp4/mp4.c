@@ -2570,14 +2570,14 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
     /* TODO use also stss and stsh table for seeking */
     /* FIXME use edit table */
 
-    /* Find stsz
-     *  Gives the sample size for each samples. There is also a stz2 table
-     *  (compressed form) that we need to implement TODO */
+    /* Find stsz or stz2
+     *  Gives the sample size for each samples. */
     p_box = MP4_BoxGet( p_demux_track->p_stbl, "stsz" );
     if( !p_box )
+        p_box = MP4_BoxGet( p_demux_track->p_stbl, "stz2" );
+    if( !p_box )
     {
-        /* FIXME and stz2 */
-        msg_Warn( p_demux, "cannot find STSZ box" );
+        msg_Warn( p_demux, "cannot find STSZ or STZ2 box" );
         return VLC_EGENERIC;
     }
     stsz = p_box->data.p_stsz;

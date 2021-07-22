@@ -902,19 +902,6 @@ typedef struct MP4_Box_data_stsz_s
 
 } MP4_Box_data_stsz_t;
 
-typedef struct MP4_Box_data_stz2_s
-{
-    uint8_t  i_version;
-    uint32_t i_flags;
-
-    uint32_t i_sample_size; /* 24 bits */
-    uint8_t  i_field_size;
-    uint32_t i_sample_count;
-
-    uint32_t *i_entry_size; /* array: unsigned int(i_field_size) entry_size */
-
-} MP4_Box_data_stz2_t;
-
 typedef struct MP4_Box_data_stsc_s
 {
     uint8_t  i_version;
@@ -1772,7 +1759,6 @@ typedef union MP4_Box_data_s
     MP4_Box_data_tssy_t *p_tssy;
 
     MP4_Box_data_stsz_t *p_stsz;
-    MP4_Box_data_stz2_t *p_stz2;
     MP4_Box_data_stsc_t *p_stsc;
     MP4_Box_data_co64_t *p_co64;
     MP4_Box_data_stss_t *p_stss;
