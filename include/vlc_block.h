@@ -245,7 +245,7 @@ static inline block_t *block_Duplicate( const block_t *p_block )
  * @return NULL in case of error (ptr free()'d in that case), or a valid
  * block_t pointer.
  */
-VLC_API block_t *block_heap_Alloc(void *, size_t) VLC_USED VLC_MALLOC;
+VLC_API block_t *block_heap_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC;
 
 /**
  * Wraps a memory mapping in a block
@@ -565,7 +565,7 @@ static inline void vlc_fifo_WaitCond(vlc_fifo_t *fifo, vlc_cond_t *condvar)
  * @warning The FIFO must be locked by the calling thread using
  * vlc_fifo_Lock(). Otherwise behaviour is undefined.
  */
-VLC_API void vlc_fifo_QueueUnlocked(vlc_fifo_t *fifo, block_t *);
+VLC_API void vlc_fifo_QueueUnlocked(vlc_fifo_t *fifo, block_t *block);
 
 /**
  * Dequeues the first block from a locked FIFO, if any.
