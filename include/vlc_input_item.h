@@ -446,7 +446,7 @@ input_item_Parse(input_item_t *item, vlc_object_t *parent,
  * afterward.
  * @note Calling this function will cause the on_ended callback to be invoked.
  *
- * @param the parser to interrupt
+ * @param parser the parser to interrupt
  */
 VLC_API void
 input_item_parser_id_Interrupt(input_item_parser_id_t *parser);
