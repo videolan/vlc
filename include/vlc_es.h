@@ -289,7 +289,7 @@ typedef enum video_transfer_func_t
 {
     TRANSFER_FUNC_UNDEF,
     TRANSFER_FUNC_LINEAR,
-    TRANSFER_FUNC_SRGB /*< Gamma 2.2 */,
+    TRANSFER_FUNC_SRGB /**< Gamma 2.2 */,
     TRANSFER_FUNC_BT470_BG,
     TRANSFER_FUNC_BT470_M,
     TRANSFER_FUNC_BT709,
@@ -326,8 +326,8 @@ typedef enum video_color_space_t
 typedef enum video_chroma_location_t
 {
     CHROMA_LOCATION_UNDEF,
-    CHROMA_LOCATION_LEFT,   /*< Most common in MPEG-2 Video, H.264/265 */
-    CHROMA_LOCATION_CENTER, /*< Most common in MPEG-1 Video, JPEG */
+    CHROMA_LOCATION_LEFT,   /**< Most common in MPEG-2 Video, H.264/265 */
+    CHROMA_LOCATION_CENTER, /**< Most common in MPEG-1 Video, JPEG */
     CHROMA_LOCATION_TOP_LEFT,
     CHROMA_LOCATION_TOP_CENTER,
     CHROMA_LOCATION_BOTTOM_LEFT,
@@ -641,7 +641,7 @@ struct es_format_t
     union {
         struct {
             audio_format_t  audio;    /**< description of audio format */
-            audio_replay_gain_t audio_replay_gain; /*< audio replay gain information */
+            audio_replay_gain_t audio_replay_gain; /**< audio replay gain information */
         };
         video_format_t video;     /**< description of video format */
         subs_format_t  subs;      /**< description of subtitle format */
