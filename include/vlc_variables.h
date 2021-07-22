@@ -760,11 +760,11 @@ VLC_API int var_InheritURational(vlc_object_t *obj, unsigned *num,
  *
  * @param obj VLC object on which to set variables (and emit error messages)
  * @param mrl string to parse
- * @param pref prefix to prepend to option names in the string
+ * @param prefix prefix to prepend to option names in the string
  *
  * @return VLC_ENOMEM on error, VLC_SUCCESS on success.
  */
-VLC_API int var_LocationParse(vlc_object_t *, const char *mrl, const char *prefix);
+VLC_API int var_LocationParse(vlc_object_t *obj, const char *mrl, const char *prefix);
 
 #ifndef DOC
 #define var_Create(a,b,c) var_Create(VLC_OBJECT(a), b, c)
