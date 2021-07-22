@@ -22,6 +22,7 @@ import QtQuick.Layouts 1.11
 
 import org.videolan.vlc 0.1
 
+import "qrc:///player/"
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
@@ -30,7 +31,7 @@ GridView{
     clip: true
 
     ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
-    model: controlButtons.buttonList.length
+    model: PlayerControlButtons.buttonList.length
 
     highlightFollowsCurrentItem: false
 
@@ -110,13 +111,13 @@ GridView{
         height: cellHeight
 
         property bool held: false
-        property int mIndex: controlButtons.buttonList[model.index].id
+        property int mIndex: PlayerControlButtons.buttonList[model.index].id
         drag.target: held ? buttonDragItem : undefined
         cursorShape: Qt.OpenHandCursor
 
         onPressed: {
             buttonDragItem.visible = true
-            buttonDragItem.text = controlButtons.buttonList[model.index].label
+            buttonDragItem.text = PlayerControlButtons.buttonList[model.index].label
             buttonDragItem.Drag.source = dragArea
             held = true
             root._held = true
@@ -154,7 +155,7 @@ GridView{
                 Layout.preferredWidth: VLCStyle.icon_medium
                 Layout.preferredHeight: VLCStyle.icon_medium
                 Layout.alignment: Qt.AlignHCenter
-                text: controlButtons.buttonList[model.index].label
+                text: PlayerControlButtons.buttonList[model.index].label
             }
 
             Widgets.ListSubtitleLabel {
@@ -163,7 +164,7 @@ GridView{
                 Layout.fillHeight: true
 
                 elide: Text.ElideNone
-                text: controlButtons.buttonList[model.index].text
+                text: PlayerControlButtons.buttonList[model.index].text
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
             }

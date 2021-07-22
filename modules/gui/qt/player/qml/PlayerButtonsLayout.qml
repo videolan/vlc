@@ -51,10 +51,6 @@ FocusScope {
         console.assert(identifier >= 0)
     }
 
-    ControlButtons {
-        id: controlmodelbuttons
-    }
-
     Loader {
         id: buttonrow_left
 

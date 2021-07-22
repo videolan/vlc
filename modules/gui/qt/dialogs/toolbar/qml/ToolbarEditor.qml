@@ -22,7 +22,6 @@ import QtQml.Models 2.11
 
 import org.videolan.vlc 0.1
 
-import "qrc:///player/" as Player
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
@@ -233,10 +232,6 @@ Rectangle{
                 }
             }
         }
-    }
-
-    Player.ControlButtons{
-        id: controlButtons
     }
 
     EditorDummyButton{

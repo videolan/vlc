@@ -328,6 +328,7 @@
         <file alias="GlobalShortcutsMedialib.qml">menus/qml/GlobalShortcutsMedialib.qml</file>
     </qresource>
     <qresource prefix="/player">
+        <file alias="qmldir">player/qml/qmldir</file>
         <file alias="Player.qml">player/qml/Player.qml</file>
         <file alias="ControlBar.qml">player/qml/ControlBar.qml</file>
         <file alias="ResumeDialog.qml">player/qml/ResumeDialog.qml</file>

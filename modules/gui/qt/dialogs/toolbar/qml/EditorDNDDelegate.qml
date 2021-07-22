@@ -21,6 +21,7 @@ import QtQml.Models 2.11
 
 import org.videolan.vlc 0.1
 
+import "qrc:///player/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -116,7 +117,7 @@ MouseArea {
                 horizontalCenter: parent.horizontalCenter
                 verticalCenter: parent.verticalCenter
             }
-            source: controlButtons.button(model.id).source
+            source: PlayerControlButtons.button(model.id).source
             onLoaded: {
                 buttonloader.item.paintOnly = true
                 buttonloader.item.enabled = false
