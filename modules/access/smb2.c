@@ -374,7 +374,7 @@ vlc_smb2_get_url(vlc_url_t *url, const char *file)
 }
 
 static int AddItem(stream_t *access, struct vlc_readdir_helper *rdh,
-                   const char *name, int i_type)
+                   const char* name, int i_type, struct smb2_stat_64 *stats)
 {
     struct access_sys *sys = access->p_sys;
     char *name_encoded = vlc_uri_encode(name);
@@ -386,8 +386,15 @@ static int AddItem(stream_t *access, struct vlc_readdir_helper *rdh,
     if (url == NULL)
         return VLC_ENOMEM;
 
+    input_item_t *p_item; 
     int ret = vlc_readdir_helper_additem(rdh, url, NULL, name, i_type,
-                                         ITEM_NET, NULL);
+                                         ITEM_NET, &p_item);
+
+    if (ret == VLC_SUCCESS && p_item && stats)
+    {
+        input_item_AddStat( p_item, "mtime", stats->smb2_mtime);
+        input_item_AddStat( p_item, "size", stats->smb2_size);
+    }
     free(url);
     return ret;
 }
@@ -419,7 +426,7 @@ DirRead(stream_t *access, input_item_node_t *p_node)
             i_type = ITEM_TYPE_UNKNOWN;
             break;
         }
-        ret = AddItem(access, &rdh, smb2dirent->name, i_type);
+        ret = AddItem(access, &rdh, smb2dirent->name, i_type, &smb2dirent->st);
     }
 
     vlc_readdir_helper_finish(&rdh, ret == VLC_SUCCESS);
@@ -447,7 +454,7 @@ ShareEnum(stream_t *access, input_item_node_t *p_node)
        switch (info->type & 0x3)
        {
            case SHARE_TYPE_DISKTREE:
-               ret = AddItem(access, &rdh, info->name, ITEM_TYPE_DIRECTORY);
+               ret = AddItem(access, &rdh, info->name, ITEM_TYPE_DIRECTORY, NULL);
                break;
        }
     }
