@@ -977,7 +977,7 @@ static inline void vlc_timer_schedule_asap(vlc_timer_t timer, vlc_tick_t interva
  * \param timer initialized timer
  * \return the timer overrun counter (typically zero)
  */
-VLC_API unsigned vlc_timer_getoverrun(vlc_timer_t) VLC_USED;
+VLC_API unsigned vlc_timer_getoverrun(vlc_timer_t timer) VLC_USED;
 
 /** @} */
 
