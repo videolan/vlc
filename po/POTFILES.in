@@ -860,7 +860,7 @@ modules/gui/qt/network/qml/NetworkGridItem.qml
 modules/gui/qt/network/qml/NetworkHomeDisplay.qml
 modules/gui/qt/network/qml/NetworkListItem.qml
 modules/gui/qt/network/qml/ServicesHomeDisplay.qml
-modules/gui/qt/player/qml/ControlButtons.qml
+modules/gui/qt/player/qml/ControlbarControls.qml
 modules/gui/qt/player/qml/LanguageMenu.qml
 modules/gui/qt/player/qml/Player.qml
 modules/gui/qt/player/qml/ResumeDialog.qml

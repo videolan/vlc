@@ -31,7 +31,7 @@ GridView{
     clip: true
 
     ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
-    model: PlayerControlButtons.buttonList.length
+    model: PlayerControlbarControls.controlList.length
 
     highlightFollowsCurrentItem: false
 
@@ -111,13 +111,13 @@ GridView{
         height: cellHeight
 
         property bool held: false
-        property int mIndex: PlayerControlButtons.buttonList[model.index].id
+        property int mIndex: PlayerControlbarControls.controlList[model.index].id
         drag.target: held ? buttonDragItem : undefined
         cursorShape: Qt.OpenHandCursor
 
         onPressed: {
             buttonDragItem.visible = true
-            buttonDragItem.text = PlayerControlButtons.buttonList[model.index].label
+            buttonDragItem.text = PlayerControlbarControls.controlList[model.index].label
             buttonDragItem.Drag.source = dragArea
             held = true
             root._held = true
@@ -155,7 +155,7 @@ GridView{
                 Layout.preferredWidth: VLCStyle.icon_medium
                 Layout.preferredHeight: VLCStyle.icon_medium
                 Layout.alignment: Qt.AlignHCenter
-                text: PlayerControlButtons.buttonList[model.index].label
+                text: PlayerControlbarControls.controlList[model.index].label
             }
 
             Widgets.ListSubtitleLabel {
@@ -164,7 +164,7 @@ GridView{
                 Layout.fillHeight: true
 
                 elide: Text.ElideNone
-                text: PlayerControlButtons.buttonList[model.index].text
+                text: PlayerControlbarControls.controlList[model.index].text
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
             }

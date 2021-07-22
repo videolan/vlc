@@ -27,11 +27,9 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 QtObject {
-    id: controlButtons
-
     readonly property string controlPath : "qrc:///player/controlbarcontrols/"
 
-    readonly property var buttonList: [
+    readonly property var controlList: [
         { id: ControlListModel.PLAY_BUTTON, file: "PlayButton.qml", label: VLCIcons.play, text: i18n.qtr("Play") },
         { id: ControlListModel.STOP_BUTTON, file: "StopButton.qml", label: VLCIcons.stop, text: i18n.qtr("Stop") },
         { id: ControlListModel.OPEN_BUTTON, file: "OpenButton.qml", label: VLCIcons.eject, text: i18n.qtr("Open") },
@@ -67,16 +65,16 @@ QtObject {
         { id: ControlListModel.PLAYBACK_SPEED_BUTTON, file: "PlaybackSpeedButton.qml", label: "1x", text: i18n.qtr("Playback Speed") }
     ]
 
-    function button(id) {
-        var button = buttonList.find( function(button) { return ( button.id === id ) } )
+    function control(id) {
+        var control = controlList.find( function(control) { return ( control.id === id ) } )
 
-        if (button === undefined) {
-            console.log("button delegate id " + id +  " doesn't exist")
+        if (control === undefined) {
+            console.log("control delegate id " + id +  " doesn't exist")
             return { source: controlPath + "Fallback.qml" }
         }
         
-        button.source = controlPath + button.file
+        control.source = controlPath + control.file
 
-        return button
+        return control
     }
 }

@@ -334,7 +334,7 @@
         <file alias="ResumeDialog.qml">player/qml/ResumeDialog.qml</file>
         <file alias="SliderBar.qml">player/qml/SliderBar.qml</file>
         <file alias="TrackInfo.qml">player/qml/TrackInfo.qml</file>
-        <file alias="ControlButtons.qml">player/qml/ControlButtons.qml</file>
+        <file alias="ControlbarControls.qml">player/qml/ControlbarControls.qml</file>
         <file alias="MiniPlayer.qml">player/qml/MiniPlayer.qml</file>
         <file alias="TopBar.qml">player/qml/TopBar.qml</file>
         <file alias="PIPPlayer.qml">player/qml/PIPPlayer.qml</file>

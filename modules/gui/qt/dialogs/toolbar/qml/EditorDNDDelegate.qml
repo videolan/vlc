@@ -117,7 +117,7 @@ MouseArea {
                 horizontalCenter: parent.horizontalCenter
                 verticalCenter: parent.verticalCenter
             }
-            source: PlayerControlButtons.button(model.id).source
+            source: PlayerControlbarControls.control(model.id).source
             onLoaded: {
                 buttonloader.item.paintOnly = true
                 buttonloader.item.enabled = false
