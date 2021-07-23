@@ -2434,7 +2434,6 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     sys->delay = 0;
     sys->rate = 1.f;
     sys->clock = cfg->clock;
-    sys->delay = 0;
 
     if (vout_Start(vout, vctx, cfg))
     {
