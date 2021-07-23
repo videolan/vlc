@@ -214,6 +214,7 @@ static int vlc_rd_probe_open(vlc_object_t *obj) \
         set_capability("renderer probe", 100) \
         set_callback(vlc_rd_probe_open)
 
-/** @} @} */
+/** @} */
+/** @} */
 
 #endif
