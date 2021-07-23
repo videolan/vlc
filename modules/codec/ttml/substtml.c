@@ -584,7 +584,7 @@ static void FillTTMLStyle( const char *psz_attr, const char *psz_namespace,
 static void DictionaryMerge( const vlc_dictionary_t *p_src, vlc_dictionary_t *p_dst,
                              bool b_override )
 {
-    for( int i = 0; i < p_src->i_size; ++i )
+    for (size_t i = 0; i < p_src->i_size; ++i)
     {
         for ( const vlc_dictionary_entry_t* p_entry = p_src->p_entries[i];
                                             p_entry != NULL; p_entry = p_entry->p_next )
@@ -677,7 +677,7 @@ static void DictToTTMLStyle( ttml_context_t *p_ctx, tt_namespaces_t *p_nss,
                              const vlc_dictionary_t *p_dict,
                              ttml_style_t *p_ttml_style )
 {
-    for( int i = 0; i < p_dict->i_size; ++i )
+    for (size_t i = 0; i < p_dict->i_size; ++i)
     {
         for ( vlc_dictionary_entry_t* p_entry = p_dict->p_entries[i];
               p_entry != NULL; p_entry = p_entry->p_next )
@@ -827,7 +827,7 @@ static ttml_region_t *GetTTMLRegion( ttml_context_t *p_ctx, tt_namespaces_t *p_n
             if( (p_region = ttml_region_New( false )) )
             {
                 /* Fill from its own attributes */
-                for( int i = 0; i < merged.i_size; ++i )
+                for (size_t i = 0; i < merged.i_size; ++i)
                 {
                     for ( vlc_dictionary_entry_t* p_entry = merged.p_entries[i];
                           p_entry != NULL; p_entry = p_entry->p_next )
@@ -1119,7 +1119,7 @@ static ttml_region_t *GenerateRegions( tt_namespaces_t *p_nss, tt_node_t *p_root
             vlc_dictionary_init( &context.regions, 1 );
             ConvertNodesToRegionContent( &context, p_nss, p_bodynode, NULL, NULL, playbacktime );
 
-            for( int i = 0; i < context.regions.i_size; ++i )
+            for (size_t i = 0; i < context.regions.i_size; ++i)
             {
                 for ( const vlc_dictionary_entry_t* p_entry = context.regions.p_entries[i];
                                                     p_entry != NULL; p_entry = p_entry->p_next )

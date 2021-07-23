@@ -405,13 +405,13 @@ typedef struct vlc_dictionary_entry_t
 
 typedef struct vlc_dictionary_t
 {
-    int i_size;
+    size_t i_size;
     vlc_dictionary_entry_t ** p_entries;
 } vlc_dictionary_t;
 
 static void * const kVLCDictionaryNotFound = NULL;
 
-static inline void vlc_dictionary_init( vlc_dictionary_t * p_dict, int i_size )
+static inline void vlc_dictionary_init(vlc_dictionary_t * p_dict, size_t i_size)
 {
     p_dict->p_entries = NULL;
 
@@ -430,7 +430,7 @@ static inline void vlc_dictionary_clear( vlc_dictionary_t * p_dict,
 {
     if( p_dict->p_entries )
     {
-        for( int i = 0; i < p_dict->i_size; i++ )
+        for (size_t i = 0; i < p_dict->i_size; i++)
         {
             vlc_dictionary_entry_t * p_current, * p_next;
             p_current = p_dict->p_entries[i];
@@ -488,11 +488,11 @@ vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_
     return kVLCDictionaryNotFound;
 }
 
-static inline int
+static inline size_t
 vlc_dictionary_keys_count( const vlc_dictionary_t * p_dict )
 {
     vlc_dictionary_entry_t * p_entry;
-    int i, count = 0;
+    size_t i, count = 0;
 
     if( !p_dict->p_entries )
         return 0;
@@ -508,7 +508,7 @@ static inline bool
 vlc_dictionary_is_empty( const vlc_dictionary_t * p_dict )
 {
     if( p_dict->p_entries )
-        for( int i = 0; i < p_dict->i_size; i++ )
+        for (size_t i = 0; i < p_dict->i_size; i++)
             if( p_dict->p_entries[i] )
                 return false;
     return true;
@@ -519,7 +519,7 @@ vlc_dictionary_all_keys( const vlc_dictionary_t * p_dict )
 {
     vlc_dictionary_entry_t * p_entry;
     char ** ppsz_ret;
-    int i, count = vlc_dictionary_keys_count( p_dict );
+    size_t i, count = vlc_dictionary_keys_count(p_dict);
 
     ppsz_ret = (char**)malloc(sizeof(char *) * (count + 1));
     if( unlikely(!ppsz_ret) )
@@ -560,8 +560,8 @@ vlc_dictionary_insert_impl_( vlc_dictionary_t * p_dict, const char * psz_key,
         {
             /* Here it starts to be not good, rebuild a bigger dictionary */
             struct vlc_dictionary_t new_dict;
-            int i_new_size = ( (p_dict->i_size+2) * 3) / 2; /* XXX: this need tuning */
-            int i;
+            size_t i_new_size = (p_dict->i_size + 2) * 3 / 2; /* XXX: this need tuning */
+            size_t i;
             vlc_dictionary_init( &new_dict, i_new_size );
             for( i = 0; i < p_dict->i_size; i++ )
             {

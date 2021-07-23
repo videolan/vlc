@@ -89,7 +89,7 @@ void tt_node_AttributesToText( struct vlc_memstream *p_stream, const tt_node_t* 
 {
     bool b_timed_node = false;
     const vlc_dictionary_t* p_attr_dict = &p_node->attr_dict;
-    for( int i = 0; i < p_attr_dict->i_size; ++i )
+    for (size_t i = 0; i < p_attr_dict->i_size; ++i)
     {
         for ( vlc_dictionary_entry_t* p_entry = p_attr_dict->p_entries[i];
              p_entry != NULL; p_entry = p_entry->p_next )

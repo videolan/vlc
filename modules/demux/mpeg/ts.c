@@ -1222,7 +1222,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         *pi_int = 0;
-        for( int i = 0; i < p_sys->attachments.i_size; i++ )
+        for (size_t i = 0; i < p_sys->attachments.i_size; i++)
         {
             for( vlc_dictionary_entry_t *p_entry = p_sys->attachments.p_entries[i];
                                          p_entry; p_entry = p_entry->p_next )
