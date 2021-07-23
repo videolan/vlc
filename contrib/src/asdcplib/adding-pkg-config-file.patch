@@ -8,16 +8,16 @@ Subject: [PATCH 5/5] adding pkg-config file
  1 file changed, 10 insertions(+)
  create mode 100644 asdcplib.pc
 
-diff --git a/asdcplib.pc b/asdcplib.pc
+diff --git a/asdcplib.pc.in b/asdcplib.pc.in
 new file mode 100644
 index 0000000..36fdd12
 --- /dev/null
-+++ b/asdcplib.pc
++++ b/asdcplib.pc.in
 @@ -0,0 +1,10 @@
-+prefix=/usr/local
-+exec_prefix=${prefix}
-+includedir=${prefix}/include
-+libdir=${exec_prefix}/lib
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++includedir=@incudedir@
++libdir=@libdir@
 +
 +Name: asdcplib
 +Description: The asdcp library
@@ -27,3 +27,22 @@ index 0000000..36fdd12
 -- 
 2.11.0
 
+--- asdcplib/configure.ac.old	2021-07-23 12:28:12.527748193 +0200
++++ asdcplib/configure.ac	2021-07-23 12:28:37.223750245 +0200
+@@ -142,5 +142,6 @@
+ AC_CONFIG_FILES([Makefile
+                  src/Makefile
+ 		 win32/Makefile
+-		 win32/Makefile.mak:win32/Makefile.wmk])
++		 win32/Makefile.mak:win32/Makefile.wmk
++         asdcplib.pc])
+ AC_OUTPUT
+--- asdcplib/Makefile.am	2021-07-23 12:38:49.607823290 +0200
++++ asdcplib/Makefile.am.old	2021-07-23 12:39:46.655848784 +0200
+@@ -28,3 +28,6 @@
+ SUBDIRS = src win32
+ 
+ ACLOCAL_AMFLAGS = -I m4
++pkgconfigdir = $(libdir)/pkgconfig
++pkgconfig_DATA = asdcplib.pc
++CLEANFILES = asdcplib.pc
