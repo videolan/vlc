@@ -29,6 +29,9 @@
 #include <vlc_atomic.h>
 
 /**
+ * \defgroup picture Generic picture API
+ * \ingroup output
+ * @{
  * \file
  * This file defines picture structures and functions in vlc
  */
@@ -480,6 +483,6 @@ static inline void picture_SwapUV(picture_t *picture)
     picture->p[V_PLANE] = tmp_plane;
 }
 
-/**@}*/
+/** @} */
 
 #endif /* VLC_PICTURE_H */
