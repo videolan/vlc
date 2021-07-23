@@ -46,13 +46,38 @@ ToolButton {
 
     Keys.onPressed: {
         if (KeyHelper.matchOk(event) ) {
+            if (!event.isAutoRepeat) {
+                keyHoldTimer.restart()
+            }
             event.accepted = true
         }
         Navigation.defaultKeyAction(event)
     }
+
     Keys.onReleased: {
-        if (!event.accepted && KeyHelper.matchOk(event))
-            mainPlaylistController.togglePlayPause()
+        if (KeyHelper.matchOk(event)) {
+            if (!event.isAutoRepeat) {
+                keyHoldTimer.stop()
+                if (player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
+                    mainPlaylistController.togglePlayPause()
+            }
+            event.accepted = true
+        }
+    }
+
+    function _pressAndHoldAction() {
+        mainPlaylistController.stop()
+    }
+
+    Timer {
+        id: keyHoldTimer
+
+        interval: playBtnMouseArea.pressAndHoldInterval
+        repeat: false
+
+        Component.onCompleted: {
+            triggered.connect(_pressAndHoldAction)
+        }
     }
 
     states: [
@@ -151,7 +176,7 @@ ToolButton {
                 if (!playBtn.isCursorInside)
                     return
 
-                mainPlaylistController.stop()
+                _pressAndHoldAction()
             }
         }
 
