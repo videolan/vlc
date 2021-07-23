@@ -545,6 +545,7 @@ static inline int aout_TimeGet(audio_output_t *aout, vlc_tick_t *delay)
 
 /**
  * @defgroup audio_output__meter Audio meter API
+ * @{
  */
 
 /**
