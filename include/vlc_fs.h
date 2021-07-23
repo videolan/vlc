@@ -312,4 +312,5 @@ static inline void vlc_rewinddir( DIR *dir )
 # define lseek lseek64
 #endif
 
+/** @} */
 #endif
