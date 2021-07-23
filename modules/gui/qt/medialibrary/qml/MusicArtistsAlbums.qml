@@ -207,6 +207,38 @@ FocusScope {
                             else
                                 albumSubView.forceActiveFocus()
                         }
+
+                        drag.axis: Drag.XAndYAxis
+                        drag.target: Widgets.DragItem {
+                            function updateComponents(maxCovers) {
+                                return {
+                                    covers: [{artwork: model.cover || VLCStyle.noArtArtistSmall}],
+                                    title: model.name || i18n.qtr("Unknown artist"),
+                                    count: 1
+                                }
+                            }
+
+                            function getSelectedInputItem() {
+                                return artistModel.getItemsForIndexes([artistModel.index(index, 0)])
+                            }
+                        }
+
+                        drag.onActiveChanged: {
+                            var dragItem = drag.target
+
+                            if (!drag.active)
+                                dragItem.Drag.drop()
+
+                            dragItem.Drag.active = drag.active
+                        }
+
+                        onPositionChanged: {
+                            if (drag.active) {
+                                var pos = drag.target.parent.mapFromItem(item, mouseX, mouseY)
+                                drag.target.x = pos.x + 12
+                                drag.target.y = pos.y + 12
+                            }
+                        }
                     }
                 }
 
