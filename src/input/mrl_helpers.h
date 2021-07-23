@@ -159,8 +159,6 @@ error:
     return VLC_EGENERIC;;
 }
 
-/*
- * @}
- **/
+/** @} */
 
 #endif /* include-guard */
