@@ -363,8 +363,16 @@ DirRead(stream_t *p_access, input_item_node_t *p_node)
         default:
             i_type = ITEM_TYPE_UNKNOWN;
         }
+
+        input_item_t *p_item;
+
         i_ret = vlc_readdir_helper_additem(&rdh, psz_url, NULL, p_nfsdirent->name,
-                                           i_type, ITEM_NET, NULL);
+                                           i_type, ITEM_NET, &p_item);
+        if (i_ret == VLC_SUCCESS && p_item && p_nfsdirent->mtime.tv_sec >= 0)
+        {
+            input_item_AddStat(p_item, "mtime", p_nfsdirent->mtime.tv_sec);
+            input_item_AddStat(p_item, "size", p_nfsdirent->size);
+        }
         free(psz_url);
     }
 
