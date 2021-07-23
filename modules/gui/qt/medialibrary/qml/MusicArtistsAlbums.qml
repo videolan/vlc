@@ -138,14 +138,16 @@ FocusScope {
                     topPadding: VLCStyle.margin_xlarge
                 }
 
-                delegate: Rectangle {
+                delegate: Widgets.AnimatedBackground {
                     id: item
 
                     property bool _highlighted: mouseArea.containsMouse || this.activeFocus
 
                     height: VLCStyle.play_cover_small + (VLCStyle.margin_xsmall * 2)
                     width: artistList.width
-                    color: _highlighted ? VLCStyle.colors.bgHover : "transparent"
+                    active: false
+                    backgroundColor: _highlighted ? VLCStyle.colors.bgHover : "transparent"
+                    foregroundColor: _highlighted ? VLCStyle.colors.bgHoverText : VLCStyle.colors.text
 
                     Widgets.CurrentIndicator {
                        visible: item.ListView.isCurrentItem
@@ -180,7 +182,7 @@ FocusScope {
 
                         Widgets.ListLabel {
                             text: model.name || i18n.qtr("Unknown artist")
-                            color: _highlighted ? VLCStyle.colors.bgHoverText : VLCStyle.colors.text
+                            color: item.foregroundColor
 
                             Layout.fillWidth: true
                             Layout.fillHeight: true
