@@ -36,6 +36,4 @@ DEPS_asdcplib = nettle $(DEPS_nettle)
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-freedist --enable-dev-headers --with-nettle=$(PREFIX)
 	cd $< && $(MAKE) install
-	mkdir -p -- "$(PREFIX)/lib/pkgconfig"
-	cp $</asdcplib.pc "$(PREFIX)/lib/pkgconfig/"
 	touch $@
