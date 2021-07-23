@@ -41,17 +41,30 @@ then
 else
     old_prefix=$1
     new_prefix=$2
+    CHECK_PREFIX=1
 fi
 
-# process [dir] [filemask] [text_only]
+# process [dir] [filemask] [text_only|check]
 process() {
     for file in `find $1 \( ! -name \`basename $1\` -o -type f \) -prune -type f -name "$2"`
     do
-        if [ -n "$3" ]
+        if [ -n "$3" -a "$3" = "text_only" ]
         then
             file $file | sed "s/^.*: //" | grep -q 'text\|shell' || continue
         fi
         echo "Fixing up $file"
+        if [ -n "$3" -a "$3" = "check" -a ! -z "$CHECK_PREFIX" ]
+        then
+            # Ensure the file we're checking contains a prefix
+            if grep -q '^prefix=' $file; then
+                # And if it does, ensure it's correctly pointing to the configured one
+                if ! grep -q $old_prefix $file; then
+                    echo "Can't find the old_prefix ($old_prefix) in file $file:"
+                    cat $file
+                    exit 1;
+                fi
+            fi
+        fi
         sed -i.orig -e "s,$old_prefix,$new_prefix,g" $file
         rm -f $file.orig
     done
@@ -59,4 +72,4 @@ process() {
 
 process bin/ "*" text_only
 process lib/ "*.la"
-process lib/pkgconfig/ "*.pc"
+process lib/pkgconfig/ "*.pc" check
