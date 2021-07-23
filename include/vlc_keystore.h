@@ -313,6 +313,7 @@ struct vlc_keystore
                                      const char *const ppsz_values[KEY_MAX]);
 };
 
-/** @} @} */
+/** @} */
+/** @} */
 
 #endif
