@@ -71,8 +71,7 @@ FocusScope {
     // Signals
     //---------------------------------------------------------------------------------------------
 
-    signal showList(variant model)
-
+    signal showList(variant model, int reason)
 
     //---------------------------------------------------------------------------------------------
     // Events
@@ -82,7 +81,8 @@ FocusScope {
     //       Component.onCompleted because modelSelect.selectedGroup update itself after this
     //       event.
     onActiveFocusChanged: {
-        if (activeFocus == false || model.count === 0 || modelSelect.hasSelection) return;
+        if (activeFocus == false || model.count === 0 || modelSelect.hasSelection)
+            return;
 
         var initialIndex = 0;
 
@@ -115,7 +115,8 @@ FocusScope {
     //---------------------------------------------------------------------------------------------
 
     function resetFocus() {
-        if (model.count === 0) return;
+        if (model.count === 0)
+            return;
 
         var initialIndex = root.initialIndex;
 
@@ -136,7 +137,7 @@ FocusScope {
             medialib.addAndPlay(model.getIdsForIndexes(modelSelect.selectedIndexes));
         } else if (modelSelect.selectedIndexes.length === 1) {
             var index = modelSelect.selectedIndexes[0];
-            showList(model.getDataAt(index));
+            showList(model.getDataAt(index), Qt.TabFocusReason);
         }
     }
 
@@ -176,7 +177,8 @@ FocusScope {
         coverPrefix: (isMusic) ? "playlist-music" : "playlist-video"
 
         onCountChanged: {
-            if (count === 0 || modelSelect.hasSelection) return;
+            if (count === 0 || modelSelect.hasSelection)
+                return;
 
             resetFocus();
         }
@@ -258,8 +260,6 @@ FocusScope {
 
             Navigation.cancelAction: root._onNavigationCancel
 
-            focus: true
-
             delegate: VideoGridItem {
                 //---------------------------------------------------------------------------------
                 // Properties
@@ -293,7 +293,7 @@ FocusScope {
 
                 onItemClicked: gridView.leftClickOnItem(modifier, index)
 
-                onItemDoubleClicked: showList(model)
+                onItemDoubleClicked: showList(model, Qt.MouseFocusReason)
 
                 onPlayClicked: if (model.id) medialib.addAndPlay(model.id)
 
@@ -316,7 +316,8 @@ FocusScope {
             //       than Component.onCompleted because modelSelect.selectedGroup update itself
             //       after this event.
             onActiveFocusChanged: {
-                if (activeFocus == false || model.count === 0 || modelSelect.hasSelection) return;
+                if (activeFocus == false || model.count === 0 || modelSelect.hasSelection)
+                    return;
 
                 modelSelect.select(model.index(0,0), ItemSelectionModel.ClearAndSelect)
             }
@@ -366,8 +367,6 @@ FocusScope {
 
             dragItem: dragItemPlaylist
 
-            focus: true
-
             headerColor: VLCStyle.colors.bg
 
             sortModel: [{
@@ -400,7 +399,7 @@ FocusScope {
 
             onActionForSelection: _actionAtIndex()
 
-            onItemDoubleClicked: showList(model)
+            onItemDoubleClicked: showList(model, Qt.MouseFocusReason)
 
             onContextMenuButtonClicked: contextMenu.popup(modelSelect.selectedIndexes,
                                                           menuParent.mapToGlobal(0,0))
