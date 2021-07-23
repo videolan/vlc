@@ -232,5 +232,6 @@ VLC_API void vlc_interrupt_forward_start(vlc_interrupt_t *to,
  */
 VLC_API int vlc_interrupt_forward_stop(void *const data[2]);
 
-/** @} @} */
+/** @} */
+/** @} */
 #endif
