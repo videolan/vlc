@@ -478,6 +478,7 @@ vlc_dialog_provider_set_ext_callback(vlc_object_t *p_obj,
 #define vlc_dialog_provider_set_ext_callback(a, b, c) \
     vlc_dialog_provider_set_ext_callback(VLC_OBJECT(a), b, c)
 
-/** @} @} */
+/** @} */
+/** @} */
 
 #endif
