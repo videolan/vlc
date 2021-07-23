@@ -19,7 +19,7 @@ endif
 	$(MOVE)
 
 .glew: glew
-	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -DGLEW_STATIC" $(MAKE)
+	cd $< && $(HOSTVARS) GLEW_DEST=$(PREFIX) CFLAGS="$(CFLAGS) -DGLEW_STATIC" $(MAKE)
 	cd $< && $(HOSTVARS) GLEW_DEST=$(PREFIX) $(MAKE) install
 ifdef HAVE_WIN32
 	-rm $(PREFIX)/lib/*glew32.dll*
