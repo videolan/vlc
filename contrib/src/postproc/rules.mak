@@ -59,7 +59,7 @@ endif
 
 # x86_64 stuff
 ifeq ($(ARCH),x86_64)
-POSTPROCCONF += --arch=x64_64
+POSTPROCCONF += --arch=x86_64
 endif
 
 # Darwin
