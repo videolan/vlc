@@ -1429,6 +1429,21 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
             p_pgrm->active_clock_source = p_sys->user_clock_source;
             break;
     }
+
+    const char *clock_source_str;
+    switch( p_pgrm->active_clock_source )
+    {
+        case VLC_CLOCK_MASTER_AUDIO:    clock_source_str = "audio"; break;
+        case VLC_CLOCK_MASTER_INPUT:    clock_source_str = "input"; break;
+        case VLC_CLOCK_MASTER_MONOTONIC:clock_source_str = "monotonic"; break;
+
+        case VLC_CLOCK_MASTER_AUTO:
+        default:
+            vlc_assert_unreachable();
+    }
+
+    msg_Dbg( p_input, "program(%d): using clock source: '%s'\n",
+             p_pgrm->i_id, clock_source_str );
 }
 
 /* EsOutIsGroupSticky
