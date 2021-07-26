@@ -182,7 +182,7 @@ typedef struct
     struct vlc_list programs;
     es_out_pgrm_t *p_pgrm;  /* Master program */
 
-    enum vlc_clock_master_source clock_source;
+    enum vlc_clock_master_source user_clock_source;
 
     /* all es */
     int         i_id;
@@ -633,7 +633,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
 
     p_sys->i_group_id = var_GetInteger( p_input, "program" );
 
-    p_sys->clock_source = clock_source_Inherit( VLC_OBJECT(p_input) );
+    p_sys->user_clock_source = clock_source_Inherit( VLC_OBJECT(p_input) );
 
     p_sys->i_pause_date = -1;
 
@@ -1404,7 +1404,7 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
      * ES_OUT_SET_PCR). */
     assert( p_sys->b_active );
 
-    switch( p_sys->clock_source )
+    switch( p_sys->user_clock_source )
     {
         case VLC_CLOCK_MASTER_AUTO:
             if (input_CanPaceControl(p_input))
@@ -1426,7 +1426,7 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
             break;
         }
         default:
-            p_pgrm->active_clock_source = p_sys->clock_source;
+            p_pgrm->active_clock_source = p_sys->user_clock_source;
             break;
     }
 }
@@ -2374,7 +2374,7 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     assert( p_es->p_pgrm );
 
     enum es_format_category_e clock_source_cat;
-    switch( p_sys->clock_source )
+    switch( p_sys->user_clock_source )
     {
         case VLC_CLOCK_MASTER_AUTO:
         case VLC_CLOCK_MASTER_AUDIO:
