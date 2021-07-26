@@ -26,16 +26,14 @@ import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
+// FIXME: Maybe we could inherit from KeyNavigableListView directly.
 FocusScope {
     id: root
 
-    //forwarded from subview
-    signal actionForSelection( var selection )
-    signal contextMenuButtonClicked(Item menuParent, var menuModel)
-    signal rightClick(Item menuParent, var menuModel, var globalMousePos)
-    signal itemDoubleClicked(var index, var model)
+    // Properties
 
     property var sortModel: []
+
     property Component colDelegate: Widgets.ListLabel {
         property var rowModel: parent.rowModel
         property var model: parent.colModel
@@ -44,9 +42,29 @@ FocusScope {
         text: !rowModel ? "" : (rowModel[model.criteria] || "")
         color: parent.foregroundColor
     }
+
     property Component tableHeaderDelegate: Widgets.CaptionLabel {
         text: model.text || ""
     }
+
+    property Component header: Item{}
+    property var headerItem: view.headerItem.loadedHeader
+    property color headerColor
+    property int headerTopPadding: 0
+
+    property var selectionDelegateModel
+    property real rowHeight: VLCStyle.tableRow_height
+    readonly property int _contextButtonHorizontalSpace: VLCStyle.icon_normal + VLCStyle.margin_xxsmall * 2
+    property int horizontalSpacing: VLCStyle.column_margin_width
+
+    property real availableRowWidth: 0
+    property real _availabeRowWidthLastUpdateTime: Date.now()
+
+    property Item dragItem
+
+    // Aliases
+
+    property alias spacing: view.spacing
 
     property alias model: view.model
 
@@ -63,23 +81,11 @@ FocusScope {
     property alias currentItem: view.currentItem
 
     property alias headerPositioning: view.headerPositioning
-    property Component header: Item{}
-    property var headerItem: view.headerItem.loadedHeader
+
     property alias tableHeaderItem: view.headerItem
-    property color headerColor
-    property int headerTopPadding: 0
 
     property alias footerItem: view.footerItem
     property alias footer: view.footer
-
-    property var selectionDelegateModel
-    property real rowHeight: VLCStyle.tableRow_height
-    readonly property int _contextButtonHorizontalSpace: VLCStyle.icon_normal + VLCStyle.margin_xxsmall * 2
-    property alias spacing: view.spacing
-    property int horizontalSpacing: VLCStyle.column_margin_width
-
-    property real availableRowWidth: 0
-    property real _availabeRowWidthLastUpdateTime: Date.now()
 
     property alias fadeColor:             view.fadeColor
     property alias fadeRectBottomHovered: view.fadeRectBottomHovered
@@ -87,14 +93,70 @@ FocusScope {
 
     property alias add:       view.add
     property alias displaced: view.displaced
-    property Item dragItem
 
     property alias listScrollBar: view.listScrollBar
     property alias listView: view.listView
 
     property alias displayMarginEnd: view.displayMarginEnd
 
+    // Signals
+
+    //forwarded from subview
+    signal actionForSelection( var selection )
+    signal contextMenuButtonClicked(Item menuParent, var menuModel)
+    signal rightClick(Item menuParent, var menuModel, var globalMousePos)
+    signal itemDoubleClicked(var index, var model)
+
+    // Settings
+
     Accessible.role: Accessible.Table
+
+    // Events
+
+    Component.onDestruction: {
+        _qtAvoidSectionUpdate()
+    }
+
+    onWidthChanged: {
+        availableRowWidthUpdater.enqueueUpdate()
+    }
+
+    onSectionChanged: {
+        availableRowWidthUpdater.enqueueUpdate()
+    }
+
+    /*
+     *define the intial position/selection
+     * This is done on activeFocus rather than Component.onCompleted because delegateModel.
+     * selectedGroup update itself after this event
+     */
+    onActiveFocusChanged: {
+        if (activeFocus == false || view.modelCount == 0)
+            return;
+
+        if (view.currentIndex == -1)
+            view.currentIndex = 0;
+
+        if (selectionDelegateModel.hasSelection === false)
+            selectionDelegateModel.select(model.index(view.currentIndex, 0),
+                                          ItemSelectionModel.ClearAndSelect);
+
+        view.forceActiveFocus();
+    }
+
+    // Functions
+
+    function setCurrentItemFocus(reason) {
+        view.setCurrentItemFocus(reason);
+    }
+
+    function positionViewAtIndex(index, mode) {
+        view.positionViewAtIndex(index, mode)
+    }
+
+    function positionViewAtBeginning() {
+        view.listView.positionViewAtBeginning()
+    }
 
     function _qtAvoidSectionUpdate() {
         // Qt SEG. FAULT WORKAROUND
@@ -121,17 +183,7 @@ FocusScope {
         section.delegate = null
     }
 
-    Component.onDestruction: {
-        _qtAvoidSectionUpdate()
-    }
-
-    function positionViewAtIndex(index, mode) {
-        view.positionViewAtIndex(index, mode)
-    }
-
-    function positionViewAtBeginning() {
-        view.listView.positionViewAtBeginning()
-    }
+    // Childs
 
     Timer {
         id: availableRowWidthUpdater
@@ -162,14 +214,6 @@ FocusScope {
                 availableRowWidthUpdater.start()
             }
         }
-    }
-
-    onWidthChanged: {
-        availableRowWidthUpdater.enqueueUpdate()
-    }
-
-    onSectionChanged: {
-        availableRowWidthUpdater.enqueueUpdate()
     }
 
     KeyNavigableListView {
@@ -292,20 +336,4 @@ FocusScope {
 
         Navigation.parentItem: root
     }
-
-    /*
-     *define the intial position/selection
-     * This is done on activeFocus rather than Component.onCompleted because delegateModel.
-     * selectedGroup update itself after this event
-     */
-    onActiveFocusChanged: {
-        if (activeFocus && view.count > 0 && !selectionDelegateModel.hasSelection) {
-            var initialIndex = 0
-            if (view.currentIndex !== -1)
-                initialIndex = view.currentIndex
-            selectionDelegateModel.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-            view.currentIndex = initialIndex
-        }
-    }
-
 }
