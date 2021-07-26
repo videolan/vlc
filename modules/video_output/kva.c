@@ -131,7 +131,7 @@ static MRESULT EXPENTRY WndProc       ( HWND, ULONG, MPARAM, MPARAM );
 
 #define WC_VLC_KVA "WC_VLC_KVA"
 
-#define COLOR_KEY 0x0F0F0F
+#define COLOR_KEY 0x000001
 
 #define WM_VLC_MANAGE               ( WM_USER + 1 )
 #define WM_VLC_FULLSCREEN_CHANGE    ( WM_USER + 2 )
