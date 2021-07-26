@@ -360,7 +360,7 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
             return segmentBase->getSequenceNumber();
 
         const Timescale timescale = rep->inheritTimescale();
-        if(!timeline->isValid())
+        if(!timescale.isValid())
             return std::numeric_limits<uint64_t>::max();
         const Segment *back = list.back();
         const stime_t bufferingstart = back->startTime.Get() + back->duration.Get() -
