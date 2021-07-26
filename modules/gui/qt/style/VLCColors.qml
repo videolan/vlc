@@ -204,8 +204,8 @@ Item {
                 bg: "#fcfdfc"
                 bgInactive: "#fcfdfc"
 
-                bgAlt: "#eff0f1"
-                bgAltInactive: "#eff0f1"
+                bgAlt: "#ededed"
+                bgAltInactive: "#ededed"
 
                 bgHover: "#ededed"
                 bgHoverText: text
@@ -219,8 +219,8 @@ Item {
 
                 textActiveSource: "#ff950d";
 
-                banner: "#d8d8d8";
-                bannerHover: "#DDDDDD";
+                banner: "#ededed"
+                bannerHover: "#f2f2f2"
 
                 accent: "#ff610a";
                 alert: "#ff0000";
