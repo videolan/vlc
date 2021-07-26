@@ -38,7 +38,7 @@ T.ItemDelegate {
     // Childs
 
     background: AnimatedBackground {
-        active: control.activeFocus
+        active: visualFocus
 
         backgroundColor: {
             if (control.hovered) {

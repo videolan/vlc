@@ -82,7 +82,7 @@ T.TabButton {
         height: control.height
         width: control.width
 
-        active: control.activeFocus
+        active: visualFocus
 
         animationDuration: VLCStyle.ms140
 

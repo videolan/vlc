@@ -76,7 +76,7 @@ T.TabButton {
         height: control.height
         width: control.width
 
-        active: control.activeFocus
+        active: visualFocus
 
         foregroundColor: (hovered) ? VLCStyle.colors.buttonTextHover
                                    : VLCStyle.colors.buttonBanner

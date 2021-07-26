@@ -75,7 +75,7 @@ ToolButton {
         implicitWidth: size
         implicitHeight: size
 
-        active: control.activeFocus
+        active: control.visualFocus
 
         backgroundColor: {
             if (control.hovered)

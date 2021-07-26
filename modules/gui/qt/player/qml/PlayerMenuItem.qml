@@ -106,6 +106,8 @@ T.MenuItem {
     background: Widgets.AnimatedBackground {
         implicitHeight: VLCStyle.fontHeight_normal
 
+        active: visualFocus
+
         backgroundColor: control.highlighted ? VLCStyle.colors.buttonHover
                                              : VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0)
     }
