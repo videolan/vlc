@@ -96,6 +96,8 @@ FocusScope {
 
         sourceComponent: PlaylistOverlayMenu {
             colors: root.colors
+
+            itemParent: listView
             backgroundItem: parentRect
         }
     }
@@ -104,8 +106,6 @@ FocusScope {
         id: parentRect
         anchors.fill: parent
         color: colors.topBanner
-
-        onActiveFocusChanged: if (activeFocus) listView.forceActiveFocus(focusReason)
 
         Widgets.DragItem {
             id: dragItem
@@ -622,7 +622,7 @@ FocusScope {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         text: VLCIcons.playlist
-                        color: listView.activeFocus ? colors.accent : colors.text
+                        color: (listView.activeFocus) ? colors.accent : colors.text
                         opacity: 0.3
                     }
 
@@ -633,7 +633,7 @@ FocusScope {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pixelSize: VLCStyle.fontSize_xxlarge
-                        color: listView.activeFocus ? colors.accent : colors.text
+                        color: (listView.activeFocus) ? colors.accent : colors.text
                         opacity: 0.4
                     }
 
@@ -643,7 +643,7 @@ FocusScope {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pixelSize: VLCStyle.fontSize_large
-                        color: listView.activeFocus ? colors.accent : colors.text
+                        color: (listView.activeFocus) ? colors.accent : colors.text
                         opacity: 0.4
                     }
                 }
