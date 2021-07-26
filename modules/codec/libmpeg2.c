@@ -197,6 +197,11 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->p_gop_user_data = NULL;
     p_sys->i_gop_user_data = 0;
 
+#if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
+    /* libmpeg's detection is not thread safe for ppc-altivec */
+    mpeg2_accel( vlc_CPU_ALTIVEC() ? MPEG2_ACCEL_PPC_ALTIVEC : 0 );
+#endif
+
     /* Initialize decoder */
     p_sys->p_mpeg2dec = mpeg2_init();
     if( p_sys->p_mpeg2dec == NULL)
