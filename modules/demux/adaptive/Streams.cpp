@@ -253,11 +253,11 @@ bool AbstractStream::startDemux()
     }
 
     demuxersource->Reset();
+    demuxfirstchunk = true;
     demuxer = createDemux(format);
     if(!demuxer && format != StreamFormat())
         msg_Err(p_realdemux, "Failed to create demuxer %p %s", (void *)demuxer,
                 format.str().c_str());
-    demuxfirstchunk = true;
 
     return !!demuxer;
 }
@@ -506,13 +506,13 @@ block_t * AbstractStream::readNextBlock()
     if (currentChunk == nullptr && !eof)
         currentChunk = getNextChunk();
 
-    if(discontinuity && demuxfirstchunk)
+    if(demuxfirstchunk)
     {
         /* clear up discontinuity on demux start (discontinuity on start segment bug) */
         discontinuity = false;
+        needrestart = false;
     }
-
-    if(discontinuity || needrestart)
+    else if(discontinuity || needrestart)
     {
         msg_Info(p_realdemux, "Ending demuxer stream. %s%s",
                  discontinuity ? "[discontinuity]" : "",
