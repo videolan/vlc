@@ -522,7 +522,7 @@ package: install
 	cd tmp/$(notdir $(PREFIX)); \
 		cd share; rm -Rf man doc gtk-doc info lua projectM; cd ..; \
 		rm -Rf man sbin etc lib/lua lib/sidplay
-	cd tmp/$(notdir $(PREFIX)) && $(abspath $(SRC))/change_prefix.sh $(PREFIX) @@CONTRIB_PREFIX@@
+	cd tmp/$(notdir $(PREFIX)) && $(abspath $(SRC))/change_prefix.sh $(PREFIX)
 ifneq ($(notdir $(PREFIX)),$(HOST))
 	(cd tmp && mv $(notdir $(PREFIX)) $(HOST))
 endif

@@ -27,10 +27,15 @@ LANG=C
 export LANG
 
 usage() {
-echo "Usage: $0 [old prefix] [new prefix]
+  echo "Usage: $0 [prefix]
 
-Without arguments, this script assumes old prefix = @@CONTRIB_PREFIX@@,
-and new prefix = current directory.
+ * If a prefix is provided, this script will replaces any of its occurences
+   with its own internal value to be able to replace the prefixes when using a
+   prebuild package.
+   If the .pc file contains a prefix which doesn't match the provided one, this
+   script will error out
+ * If no prefix is provided, this script will replace its internal value with
+   the current working directory
 "
 }
 
@@ -40,12 +45,12 @@ if test "$1" = "-h" -o "$1" = "--help" ; then
 elif [ $# -gt 2 ]; then
     usage
     exit 1
-elif [ $# != 2 ]; then
+elif [ $# != 1 ]; then
     old_prefix=@@CONTRIB_PREFIX@@
     new_prefix=`pwd`
 else
     old_prefix=$1
-    new_prefix=$2
+    new_prefix=@@CONTRIB_PREFIX@@
     CHECK_PREFIX=1
 fi
 
