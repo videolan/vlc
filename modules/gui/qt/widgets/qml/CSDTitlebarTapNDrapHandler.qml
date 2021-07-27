@@ -27,7 +27,7 @@ Item {
                 if ((topWindow.visibility & Window.Maximized) !== 0) {
                     mainInterface.requestInterfaceNormal()
                 } else {
-                    mainInterface.requestInterfaceMaximized()()
+                    mainInterface.requestInterfaceMaximized()
                 }
             }
         }
