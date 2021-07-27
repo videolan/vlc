@@ -326,9 +326,6 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl)
     if (ret != VLC_SUCCESS)
         return ret;
 
-    /* Display */
-    vlc_gl_Swap(vgl->gl);
-
     GL_ASSERT_NOERROR(&vgl->api.vt);
 
     return VLC_SUCCESS;

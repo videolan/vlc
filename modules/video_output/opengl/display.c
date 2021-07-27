@@ -238,9 +238,9 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
                                          sys->place.width, sys->place.height);
             sys->place_changed = false;
         }
-
         vout_display_opengl_Display(sys->vgl);
-        vlc_gl_ReleaseCurrent (sys->gl);
+        vlc_gl_Swap(sys->gl);
+        vlc_gl_ReleaseCurrent(sys->gl);
     }
 }
 

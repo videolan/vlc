@@ -906,6 +906,7 @@ shouldInheritContentsScale:(CGFloat)newScale
 
         vout_display_opengl_Display(sys->vgl);
         vlc_gl_ReleaseCurrent(sys->gl);
+        vlc_gl_Swap(sys->gl);
     }
 }
 
