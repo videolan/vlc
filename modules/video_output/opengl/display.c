@@ -77,6 +77,7 @@ typedef struct vout_display_sys_t
     vlc_gl_t *gl;
     vout_display_place_t place;
     bool place_changed;
+    bool is_dirty;
 
     struct {
         PFNGLFLUSHPROC Flush;
@@ -123,6 +124,7 @@ static int Open(vout_display_t *vd,
         return VLC_ENOMEM;
 
     sys->gl = NULL;
+    sys->is_dirty = false;
 
     vout_window_t *surface = vd->cfg->window;
     char *gl_name = var_InheritString(surface, MODULE_VARNAME);
@@ -219,17 +221,6 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *sub
     {
         vout_display_opengl_Prepare (sys->vgl, pic, subpicture);
         sys->vt.Flush();
-        vlc_gl_ReleaseCurrent (sys->gl);
-    }
-}
-
-static void PictureDisplay (vout_display_t *vd, picture_t *pic)
-{
-    vout_display_sys_t *sys = vd->sys;
-    VLC_UNUSED(pic);
-
-    if (vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
-    {
         if (sys->place_changed)
         {
             vout_display_opengl_SetOutputSize(sys->vgl, sys->place.width,
@@ -239,9 +230,20 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
             sys->place_changed = false;
         }
         vout_display_opengl_Display(sys->vgl);
-        vlc_gl_Swap(sys->gl);
-        vlc_gl_ReleaseCurrent(sys->gl);
+        sys->vt.Flush();
+        vlc_gl_ReleaseCurrent (sys->gl);
+        sys->is_dirty = true;
     }
+}
+
+static void PictureDisplay (vout_display_t *vd, picture_t *pic)
+{
+    vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(pic);
+
+    /* Present on screen */
+    if (sys->is_dirty)
+        vlc_gl_Swap(sys->gl);
 }
 
 static int Control (vout_display_t *vd, int query)
