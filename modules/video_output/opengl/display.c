@@ -226,6 +226,16 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *sub
     if (vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
     {
         vout_display_opengl_Prepare (sys->vgl, pic, subpicture);
+        if (sys->place_changed)
+        {
+            float window_ar = (float)sys->place.width / sys->place.height;
+            vout_display_opengl_SetWindowAspectRatio(sys->vgl, window_ar);
+            vout_display_opengl_Viewport(sys->vgl, sys->place.x, sys->place.y,
+                                         sys->place.width, sys->place.height);
+            sys->place_changed = false;
+        }
+        vout_display_opengl_Display(sys->vgl);
+
         vlc_gl_ReleaseCurrent (sys->gl);
     }
 }
@@ -235,20 +245,8 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(pic);
 
-    if (vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
-    {
-        if (sys->place_changed)
-        {
-            float window_ar = (float)sys->place.width / sys->place.height;
-            vout_display_opengl_SetWindowAspectRatio(sys->vgl, window_ar);
-            vout_display_opengl_Viewport(sys->vgl, sys->place.x, sys->place.y,
-                                         sys->place.width, sys->place.height);
-            sys->place_changed = false;
-        }
-
-        vout_display_opengl_Display(sys->vgl);
-        vlc_gl_ReleaseCurrent (sys->gl);
-    }
+    /* Display */
+    vlc_gl_Swap(sys->gl);
 }
 
 static int Control (vout_display_t *vd, int query)
