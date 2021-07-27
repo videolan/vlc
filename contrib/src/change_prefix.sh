@@ -43,7 +43,7 @@ else
     new_prefix=$2
 fi
 
-# process [dir] [filemask] [text only]
+# process [dir] [filemask] [text_only]
 process() {
     for file in `find $1 \( ! -name \`basename $1\` -o -type f \) -prune -type f -name "$2"`
     do
@@ -57,6 +57,6 @@ process() {
     done
 }
 
-process bin/ "*" check
+process bin/ "*" text_only
 process lib/ "*.la"
 process lib/pkgconfig/ "*.pc"
