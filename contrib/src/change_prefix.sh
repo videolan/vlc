@@ -26,16 +26,21 @@ set -e
 LANG=C
 export LANG
 
-if test "$1" = "-h" -o "$1" = "--help" -o $# -gt 2; then
-  echo "Usage: $0 [old prefix] [new prefix]
+usage() {
+echo "Usage: $0 [old prefix] [new prefix]
 
 Without arguments, this script assumes old prefix = @@CONTRIB_PREFIX@@,
 and new prefix = current directory.
 "
-fi
+}
 
-if [ $# != 2 ]
-then
+if test "$1" = "-h" -o "$1" = "--help" ; then
+    usage
+    exit 0;
+elif [ $# -gt 2 ]; then
+    usage
+    exit 1
+elif [ $# != 2 ]; then
     old_prefix=@@CONTRIB_PREFIX@@
     new_prefix=`pwd`
 else
