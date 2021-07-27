@@ -85,6 +85,16 @@
 
 using namespace vlc::playlist;
 
+#ifndef WM_NCUAHDRAWCAPTION
+// Not documented, only available since Windows Vista
+#define WM_NCUAHDRAWCAPTION 0x00AE
+#endif
+
+#ifndef WM_NCUAHDRAWFRAME
+// Not documented, only available since Windows Vista
+#define WM_NCUAHDRAWFRAME 0x00AF
+#endif
+
 namespace  {
 
 HWND WinId( QWindow *windowHandle )
@@ -109,19 +119,79 @@ public:
         updateCSDSettings();
     }
 
+    static int resizeBorderWidth(QWindow *window)
+    {
+        const int result = GetSystemMetrics(SM_CXSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER);
+        if (result > 0)
+            return qRound(static_cast<qreal>(result) / window->devicePixelRatio());
+        else
+            return qRound(static_cast<qreal>(8) * window->devicePixelRatio());
+    }
+
+    static int resizeBorderHeight(QWindow *window)
+    {
+        const int result = GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER);
+        if (result > 0)
+            return qRound(static_cast<qreal>(result) / window->devicePixelRatio());
+        else
+            return qRound(static_cast<qreal>(8) * window->devicePixelRatio());
+    }
+
     bool nativeEventFilter(const QByteArray &, void *message, long *result) override
     {
         MSG* msg = static_cast<MSG*>( message );
 
-        if ( (msg->message == WM_NCCALCSIZE) && (msg->hwnd == WinId(m_window)) )
+        if ( !m_useClientSideDecoration || (msg->hwnd != WinId(m_window)) )
+            return false;
+
+        if ( msg->message == WM_NCCALCSIZE )
         {
             /* This is used to remove the decoration instead of using FramelessWindowHint because
              * frameless window don't support areo snapping
              */
-            if (m_useClientSideDecoration) {
-                *result = WVR_REDRAW;
+
+            if (!msg->wParam)
+            {
+                *result = 0;
                 return true;
             }
+
+
+            bool nonClientAreaExists = false;
+            const auto clientRect = &(reinterpret_cast<LPNCCALCSIZE_PARAMS>(msg->lParam)->rgrc[0]);
+            // We don't need this correction when we're fullscreen. We will
+            // have the WS_POPUP size, so we don't have to worry about
+            // borders, and the default frame will be fine.
+            if (IsZoomed(msg->hwnd) && (m_window->windowState() != Qt::WindowFullScreen))
+            {
+                // Windows automatically adds a standard width border to all
+                // sides when a window is maximized. We have to remove it
+                // otherwise the content of our window will be cut-off from
+                // the screen.
+                // The value of border width and border height should be
+                // identical in most cases, when the scale factor is 1.0, it
+                // should be eight pixels.
+                const int rbh = resizeBorderHeight(m_window);
+                clientRect->top += rbh;
+                clientRect->bottom -= rbh;
+
+                const int rbw = resizeBorderWidth(m_window);
+                clientRect->left += rbw;
+                clientRect->right -= rbw;
+                nonClientAreaExists = true;
+            }
+
+            *result = nonClientAreaExists ? 0 : WVR_REDRAW;
+            return true;
+        }
+
+        // These undocumented messages are sent to draw themed window
+        // borders. Block them to prevent drawing borders over the client
+        // area.
+        if ( msg->message == WM_NCUAHDRAWCAPTION || msg->message == WM_NCUAHDRAWFRAME)
+        {
+             *result = 0;
+             return true;
         }
 
         return false;
