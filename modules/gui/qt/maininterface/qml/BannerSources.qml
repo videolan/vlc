@@ -203,8 +203,9 @@ FocusScope {
 
                 Rectangle {
                     id: localToolbarBg
-                    color: VLCStyle.colors.bg
+
                     anchors.fill: parent
+                    color: VLCStyle.colors.lowerBanner
                 }
 
                 Rectangle {
