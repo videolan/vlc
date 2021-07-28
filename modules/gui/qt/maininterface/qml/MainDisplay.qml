@@ -332,6 +332,16 @@ FocusScope {
                                 stackView.forceActiveFocus()
                             }
 
+                            Rectangle {
+                                // id: playlistLeftBorder
+
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                                anchors.left: parent.left
+
+                                width: VLCStyle.border
+                                color: VLCStyle.colors.border
+                            }
 
                             Widgets.HorizontalResizeHandle {
                                 id: resizeHandle
