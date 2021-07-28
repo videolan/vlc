@@ -1698,6 +1698,10 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 
     vlc_tick_t date_refresh = VLC_TICK_INVALID;
 
+    vlc_mutex_lock(&sys->vsync.lock);
+    vlc_tick_t vsync_date = sys->vsync.next_date;
+    vlc_mutex_unlock(&sys->vsync.lock);
+
     picture_t *next = NULL;
     if (first)
     {
@@ -1713,11 +1717,65 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         const vlc_tick_t next_system_pts =
             vlc_clock_ConvertToSystem(sys->clock, system_now,
                                       sys->displayed.current->date, sys->rate);
+
+        if (!sys->displayed.next)
+            sys->displayed.next = PreparePicture(vout, false, false);
+
+        if (sys->displayed.next)
+        {
+            const vlc_tick_t new_next_pts =
+                vlc_clock_ConvertToSystem(sys->clock, system_now,
+                                          sys->displayed.next->date, sys->rate);
+
+            /* Well, we should use the most recent picture fitting in the vsync period */
+            if (new_next_pts < vsync_date - render_delay)
+            {
+                msg_Dbg(vout, "Dropping 1/2 because of vsync, offset to vsync is now %dms", MS_FROM_VLC_TICK(vsync_date - new_next_pts));
+                picture_Release(sys->displayed.current);
+                sys->displayed.current = sys->displayed.next;
+                sys->displayed.next = NULL;
+
+                /* DO NOT WAIT */
+                return VLC_SUCCESS;
+            }
+            else {
+                msg_Dbg(vout, "not dropped because of vsync");
+            }
+
+            vlc_mutex_lock(&sys->vsync.lock);
+            while (sys->vsync.last_date == sys->vsync.next_date
+                   && !atomic_load(&sys->control_is_terminated))
+                vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
+            vsync_date = sys->vsync.next_date;
+            vlc_mutex_unlock(&sys->vsync.lock);
+
+            if (atomic_load(&sys->control_is_terminated))
+                return VLC_SUCCESS;
+
+            if (new_next_pts < vsync_date - render_delay)
+            {
+                msg_Dbg(vout, "Dropping 2/2 because of vsync, offset to vsync is now %dms", MS_FROM_VLC_TICK(vsync_date - new_next_pts));
+                picture_Release(sys->displayed.current);
+                sys->displayed.current = sys->displayed.next;
+                sys->displayed.next = NULL;
+
+                /* DO NOT WAIT */
+                return VLC_SUCCESS;
+            }
+            else {
+                msg_Dbg(vout, "not dropped because of vsync");
+            }
+
+
+
+        }
+        else {
+            msg_Dbg(vout, "no next picture available");
+        }
+
         if (likely(next_system_pts != INT64_MAX))
         {
             vlc_tick_t date_next = next_system_pts - render_delay;
-            if (!sys->displayed.next)
-                sys->displayed.next = PreparePicture(vout, false, false);
             if (date_next <= system_now)
             {
                 // the current frame will be late, use the next not late one
@@ -1742,6 +1800,9 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         if (likely(dropped_current_frame))
             picture_Release(sys->displayed.current);
         sys->displayed.current = next;
+
+        if (vsync_date != VLC_TICK_INVALID)
+            date_refresh = __MIN(date_refresh, vsync_date - render_delay);
     }
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
     {
@@ -2213,6 +2274,8 @@ void vout_StopDisplay(vout_thread_t *vout)
     atomic_store(&sys->control_is_terminated, true);
     // wake up so it goes back to the loop that will detect the terminated state
     vout_control_Wake(&sys->control);
+    vlc_cond_signal(&sys->vsync.cond_update);
+
     vlc_join(sys->thread, NULL);
 
     vout_ReleaseDisplay(sys);
