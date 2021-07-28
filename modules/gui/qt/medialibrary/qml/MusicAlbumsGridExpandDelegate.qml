@@ -52,7 +52,7 @@ FocusScope {
 
     Rectangle {
         anchors.fill: parent
-        color: VLCStyle.colors.bgAlt
+        color: VLCStyle.colors.expandDelegate
 
         Rectangle {
             anchors {
@@ -243,7 +243,7 @@ FocusScope {
             Layout.fillHeight: true
 
             rowHeight: VLCStyle.tableRow_height
-            headerColor: VLCStyle.colors.bgAlt
+            headerColor: VLCStyle.colors.expandDelegate
 
             parentId: Helpers.get(root.model, "id")
             onParentIdChanged: {
