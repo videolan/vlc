@@ -44,7 +44,7 @@ FocusScope {
 
         implicitHeight: contentLayout.implicitHeight + ( VLCStyle.margin_normal * 2 )
         width: parent.width
-        color: VLCStyle.colors.bgAlt
+        color: VLCStyle.colors.expandDelegate
 
         Rectangle {
             anchors {
