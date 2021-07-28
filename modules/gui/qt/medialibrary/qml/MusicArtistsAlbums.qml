@@ -249,6 +249,18 @@ FocusScope {
                     }
                 }
 
+                Rectangle {
+                    // id: musicArtistLeftBorder
+
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+
+                    width: VLCStyle.border
+                    color: VLCStyle.colors.border
+                }
+
+
                 Widgets.HorizontalResizeHandle {
                     id: resizeHandle
 
