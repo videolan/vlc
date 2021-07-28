@@ -64,10 +64,11 @@ FocusScope {
     Rectangle {
         id: pLBannerSources
 
+        property alias model: globalMenuGroup.model
+
         anchors.fill: parent
 
-        color: VLCStyle.colors.banner
-        property alias model: globalMenuGroup.model
+        color: VLCStyle.colors.topBanner
 
         Column {
             id: col

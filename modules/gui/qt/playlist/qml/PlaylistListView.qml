@@ -103,8 +103,7 @@ FocusScope {
     Rectangle {
         id: parentRect
         anchors.fill: parent
-        color: colors.bgAlt
-
+        color: colors.topBanner
         onActiveFocusChanged: {
             if (activeFocus)
                 listView.forceActiveFocus()

@@ -257,7 +257,7 @@ Item {
             implicitHeight: VLCStyle.icon_normal
 
             Rectangle {
-                color: VLCStyle.colors.banner
+                color: VLCStyle.colors.topBanner
                 anchors.fill: parent
 
                 RowLayout {
@@ -342,7 +342,7 @@ Item {
             implicitHeight: VLCStyle.icon_normal
 
             Rectangle {
-                color: VLCStyle.colors.banner
+                color: VLCStyle.colors.topBanner
                 anchors.fill: parent
                 anchors.leftMargin: VLCStyle.margin_xxsmall
                 anchors.rightMargin: VLCStyle.margin_xxsmall

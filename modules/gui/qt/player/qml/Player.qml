@@ -561,7 +561,7 @@ FocusScope {
         edge: Widgets.DrawerExt.Edges.Right
         state: showPlaylist && mainInterface.playlistDocked ? "visible" : "hidden"
         component: Rectangle {
-            color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.banner, 0.8)
+            color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.topBanner, 0.8)
             width: rootPlayer.width/4
             height: playlistpopup.height
 

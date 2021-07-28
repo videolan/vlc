@@ -51,7 +51,7 @@ Dialog {
     }
 
     background: Rectangle {
-        color: VLCStyle.colors.banner
+        color: VLCStyle.colors.topBanner
     }
 
     header: Label {
@@ -65,7 +65,7 @@ Dialog {
             x: 1; y: 1
             width: parent.width - 2
             height: parent.height - 1
-            color: VLCStyle.colors.banner
+            color: VLCStyle.colors.topBanner
         }
     }
 

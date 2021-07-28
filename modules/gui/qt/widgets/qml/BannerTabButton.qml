@@ -38,7 +38,7 @@ T.TabButton {
     property bool showText: true
     property bool showCurrentIndicator: true
 
-    property color color: VLCStyle.colors.banner
+    property color color: VLCStyle.colors.topBanner
 
     // Settings
 

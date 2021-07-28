@@ -31,7 +31,7 @@ Rectangle {
 
     color: tint
 
-    property color tint: VLCStyle.colors.banner
+    property color tint: VLCStyle.colors.topBanner
     property real tintStrength: 0.7
     property real noiseStrength: 0.02
     property real exclusionStrength: 0.09

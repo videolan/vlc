@@ -127,8 +127,9 @@ Item {
 
     property color textActiveSource: "red";
 
-    property color banner: systemPalette.window;
-    property color bannerHover: systemPalette.highlight;
+    property color topBanner: systemPalette.window
+    property color topBannerHover: systemPalette.highlight
+
     property color volsliderbg: "#bdbebf"
     property color volbelowmid: "#99d299"
     property color volabovemid: "#14d214"
@@ -146,7 +147,7 @@ Item {
     property color roundPlayCoverBorder: "#979797"
 
     // playlist
-    property color plItemHovered:  bannerHover
+    property color plItemHovered:  topBannerHover
     property color plItemSelected: blendColors(plItemHovered, plItemFocused, 0.5)
     property color plItemFocused: isThemeDark ? "#1E1E1E" : "#EDEDED"
 
@@ -156,7 +157,7 @@ Item {
 
     // glow colors:
     property color glowColor: setColorAlpha(blendColors(bg, black, 0.8), 0.35)
-    property color glowColorBanner: setColorAlpha(blendColors(banner, black, isThemeDark ? 0.25 : 0.35), 0.25)
+    property color glowColorBanner: setColorAlpha(blendColors(topBanner, black, isThemeDark ? 0.25 : 0.35), 0.25)
 
     property color sliderBarMiniplayerBgColor: isThemeDark ? "#FF929292" : "#FFEEEEEE"
 
@@ -219,8 +220,8 @@ Item {
 
                 textActiveSource: "#ff950d";
 
-                banner: "#ededed"
-                bannerHover: "#f2f2f2"
+                topBanner: "#ededed"
+                topBannerHover: "#f2f2f2"
 
                 accent: "#ff610a";
                 alert: "#ff0000";
@@ -251,8 +252,8 @@ Item {
                 buttonText: "#eff0f1"
                 buttonBorder: "#575b5f"
                 textActiveSource: "#ff950d"
-                banner: "#000000"
-                bannerHover: "#272727"
+                topBanner: "#000000"
+                topBannerHover: "#272727"
                 accent: "#ff8800"
                 alert: "#ff0000"
                 separator: "#2d2d2d"
@@ -286,8 +287,8 @@ Item {
                 buttonBorder: blendColors(button, buttonText, 0.8)
 
                 textActiveSource: accent
-                banner: systemPalette.window
-                bannerHover: systemPalette.highlight
+                topBanner: systemPalette.window
+                topBannerHover: systemPalette.highlight
 
                 separator: blendColors(bg, text, .95)
 

@@ -48,7 +48,7 @@ FocusScope {
 
             Layout.preferredWidth: columnLayout.implicitWidth
             Layout.fillHeight: true
-            color: VLCStyle.colors.banner
+            color: VLCStyle.colors.topBanner
 
             ColumnLayout {
                 id: columnLayout

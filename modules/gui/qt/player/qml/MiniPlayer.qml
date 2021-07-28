@@ -67,7 +67,7 @@ FocusScope {
         source: mainContent
         sourceRect: Qt.rect(root.x, root.y, root.width, root.height)
 
-        tint: VLCStyle.colors.blendColors(VLCStyle.colors.bg, VLCStyle.colors.banner, 0.85)
+        tint: VLCStyle.colors.blendColors(VLCStyle.colors.bg, VLCStyle.colors.topBanner, 0.85)
     }
 
     ControlBar {
