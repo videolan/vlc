@@ -56,19 +56,23 @@ Item {
         listView.resetStack()
     }
 
-    property var backgroundItem: undefined
+    /* required */ property var itemParent
+    /* required */ property var backgroundItem
 
     visible: false
 
     function open() {
-        listView.currentModel = root.model
-        visible = true
-        listView.forceActiveFocus()
+        listView.currentModel = root.model;
+
+        visible = true;
+
+        listView.forceActiveFocus(Qt.TabFocusReason);
     }
 
     function close() {
-        visible = false
-        backgroundItem.forceActiveFocus()
+        visible = false;
+
+        itemParent.forceActiveFocus(Qt.BacktabFocusReason);
     }
 
     Rectangle {
@@ -141,11 +145,7 @@ Item {
                 resetStack()
             }
 
-            onActiveFocusChanged: {
-                if (!activeFocus) {
-                    root.close()
-                }
-            }
+            onActiveFocusChanged: if (!activeFocus) root.close()
 
             function resetStack() {
                 if (stack.length > 0)
