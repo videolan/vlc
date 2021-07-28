@@ -181,6 +181,8 @@ Item {
     property color windowCSDButtonLightBg: "#80DADADA"
     property color windowCSDButtonBg: isThemeDark ? windowCSDButtonDarkBg : windowCSDButtonLightBg
 
+    property color expandDelegate
+
     state: {
         switch (mainInterface.colorScheme.scheme) {
         case ColorSchemeModel.System:
@@ -232,6 +234,8 @@ Item {
 
                 playerControlBarFg: "#333333"
 
+                expandDelegate: "#ffffff"
+
                 isThemeDark: false;
             }
         },
@@ -262,6 +266,8 @@ Item {
                 alert: "#ff0000"
                 separator: "#2d2d2d"
                 playerControlBarFg: "#ffffff"
+
+                expandDelegate: "#000000"
 
                 isThemeDark: true
             }
@@ -299,6 +305,8 @@ Item {
                 separator: blendColors(bg, text, .95)
 
                 playerControlBarFg: systemPalette.text
+
+                expandDelegate: bg
 
                 isThemeDark: systemPalette.isDark
             }
