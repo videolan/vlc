@@ -1085,9 +1085,17 @@ static void ChangeFilters(vout_thread_sys_t *vout)
 }
 
 static bool IsPictureLate(vout_thread_sys_t *vout, picture_t *decoded,
-                          vlc_tick_t system_now, vlc_tick_t system_pts)
+                          vlc_tick_t system_now, vlc_tick_t system_pts,
+                          vlc_tick_t vsync_date)
 {
     vout_thread_sys_t *sys = vout;
+
+    bool vsync_late = vsync_date != VLC_TICK_INVALID && vsync_date > system_pts;
+    /*if (vsync_late)
+    {
+        msg_Warn(&vout->obj, "picture will miss vsync, dropping");
+        return true;
+    }*/
 
     const vlc_tick_t prepare_decoded_duration = vout_chrono_GetHigh(&sys->render) +
                                                 vout_chrono_GetHigh(&sys->static_filter);
@@ -1115,6 +1123,10 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
     vout_thread_sys_t *sys = vout;
     bool is_late_dropped = sys->is_late_dropped && !frame_by_frame;
 
+    vlc_mutex_lock(&sys->vsync.lock);
+    const vlc_tick_t vsync_date = sys->vsync.next_date;
+    vlc_mutex_unlock(&sys->vsync.lock);
+
     vlc_mutex_lock(&sys->filter.lock);
 
     picture_t *picture = filter_chain_VideoFilter(sys->filter.chain_static, NULL);
@@ -1141,8 +1153,9 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
 
                 if (is_late_dropped && !decoded->b_force)
                 {
-                                        if (system_pts != INT64_MAX &&
-                        IsPictureLate(vout, decoded, system_now, system_pts))
+
+                    if (system_pts != INT64_MAX &&
+                        IsPictureLate(vout, decoded, system_now, system_pts, vsync_date))
                     {
                         picture_Release(decoded);
                         vout_statistic_AddLost(&sys->statistic, 1);
