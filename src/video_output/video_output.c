@@ -1404,6 +1404,11 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
     const unsigned frame_rate = todisplay->format.i_frame_rate;
     const unsigned frame_rate_base = todisplay->format.i_frame_rate_base;
 
+    vlc_mutex_lock(&sys->vsync.lock);
+    const vlc_tick_t vsync_date = sys->vsync.next_date;
+    sys->vsync.last_date = vsync_date;
+    vlc_mutex_unlock(&sys->vsync.lock);
+
     if (sys->rendering_enabled)
     {
         vlc_tick_t now_ts = vlc_tick_now();
