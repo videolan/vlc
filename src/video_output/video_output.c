@@ -188,6 +188,8 @@ typedef struct vout_thread_sys_t
         vlc_tick_t next_date;
         vlc_tick_t last_date;
     } vsync;
+
+    vlc_tick_t latency;
 } vout_thread_sys_t;
 
 #define VOUT_THREAD_TO_SYS(vout) \
@@ -1504,7 +1506,16 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
 
     if (!render_now)
     {
-        if (unlikely(late > 0))
+        vlc_tick_t latency = system_pts - vsync_date;
+        if (vsync_date != VLC_TICK_INVALID)
+        {
+            msg_Info(vd, "display latency: %dms system latency: %dms",
+                     MS_FROM_VLC_TICK(latency),
+                     MS_FROM_VLC_TICK(system_now - vsync_date));
+            sys->latency = latency;
+        }
+
+        if (unlikely(late > __MAX(latency,-latency) + VLC_TICK_FROM_MS(2)))
         {
             msg_Dbg(vd, "picture displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
             vout_statistic_AddLate(&sys->statistic, 1);
@@ -2411,6 +2422,8 @@ vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
     sys->vsync.current_date = VLC_TICK_INVALID;
     sys->vsync.next_date = VLC_TICK_INVALID;
     sys->vsync.last_date = VLC_TICK_INVALID;
+
+    sys->latency = 0;
 
     return vout;
 }
