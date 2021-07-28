@@ -1362,6 +1362,24 @@ static void EsOutSendEsEvent(es_out_t *out, es_out_id_t *es, int action,
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t *p_input = p_sys->p_input;
 
+    const char *action_str;
+    switch( action )
+    {
+        case VLC_INPUT_ES_ADDED:
+            action_str = "added"; break;
+        case VLC_INPUT_ES_DELETED:
+            action_str = "deleted"; break;
+        case VLC_INPUT_ES_SELECTED:
+            action_str = forced ? "selected (forced)" : "selected"; break;
+        case VLC_INPUT_ES_UNSELECTED:
+            action_str = "unselected"; break;
+        default:
+            action_str = NULL; break;
+    }
+    if( action_str != NULL )
+        msg_Dbg( p_sys->p_input, "ES track %s: '%s' (fourcc: '%4.4s')",
+                 action_str, es->id.str_id, (const char *) &es->fmt.i_codec );
+
     input_SendEventEs(p_input, &(struct vlc_input_event_es) {
         .action = action,
         .id = &es->id,
