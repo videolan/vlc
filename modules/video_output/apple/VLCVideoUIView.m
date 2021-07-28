@@ -237,7 +237,7 @@
     }
     vlc_tick_t now = vlc_tick_now();
     CFTimeInterval current_ts = [sender timestamp];
-    CFTimeInterval target_ts = 0.;
+    CFTimeInterval target_ts = [sender targetTimestamp];
 
     // TODO: clock timeline?
     vlc_tick_t offset =  vlc_tick_from_sec(target_ts - current_ts);
