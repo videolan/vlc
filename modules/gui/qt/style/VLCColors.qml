@@ -130,6 +130,8 @@ Item {
     property color topBanner: systemPalette.window
     property color topBannerHover: systemPalette.highlight
 
+    property color lowerBanner: bg
+
     property color volsliderbg: "#bdbebf"
     property color volbelowmid: "#99d299"
     property color volabovemid: "#14d214"
@@ -222,6 +224,7 @@ Item {
 
                 topBanner: "#ededed"
                 topBannerHover: "#f2f2f2"
+                lowerBanner: "#ffffff"
 
                 accent: "#ff610a";
                 alert: "#ff0000";
@@ -252,8 +255,9 @@ Item {
                 buttonText: "#eff0f1"
                 buttonBorder: "#575b5f"
                 textActiveSource: "#ff950d"
-                topBanner: "#000000"
+                topBanner: "#242424"
                 topBannerHover: "#272727"
+                lowerBanner: "#000000"
                 accent: "#ff8800"
                 alert: "#ff0000"
                 separator: "#2d2d2d"
@@ -287,8 +291,10 @@ Item {
                 buttonBorder: blendColors(button, buttonText, 0.8)
 
                 textActiveSource: accent
+
                 topBanner: systemPalette.window
                 topBannerHover: systemPalette.highlight
+                lowerBanner: systemPalette.base
 
                 separator: blendColors(bg, text, .95)
 
