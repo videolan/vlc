@@ -71,7 +71,7 @@ Item {
 
     // Banner
 
-    property color bannerBorder: (isThemeDark) ? "#303030" : "#e0e0e0"
+    property color border: (isThemeDark) ? "#303030" : "#e0e0e0"
 
     // Button
 

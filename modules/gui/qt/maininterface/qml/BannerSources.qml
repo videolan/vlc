@@ -215,7 +215,7 @@ FocusScope {
 
                     height: VLCStyle.border
 
-                    color: VLCStyle.colors.bannerBorder
+                    color: VLCStyle.colors.border
                 }
 
                 Widgets.NavigableRow {
