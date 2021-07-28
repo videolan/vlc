@@ -190,6 +190,13 @@ typedef struct vout_thread_sys_t
         vlc_tick_t last_system_pts;
     } avstat;
 
+    struct {
+        vlc_mutex_t lock;
+        vlc_cond_t cond_update;
+        vlc_tick_t current_date;
+        vlc_tick_t next_date;
+        vlc_tick_t last_date;
+    } vsync;
 } vout_thread_sys_t;
 
 #define VOUT_THREAD_TO_SYS(vout) \
@@ -614,8 +621,6 @@ void vout_NotifyVsyncReached(vout_thread_t *vout, vlc_tick_t next_vsync)
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
 
-    (void)next_vsync;
-
     vlc_tick_t now = vlc_tick_now();
     vlc_mutex_lock(&sys->avstat.lock);
     vlc_tick_t last_date = sys->avstat.last_displayed_date;
@@ -627,6 +632,20 @@ void vout_NotifyVsyncReached(vout_thread_t *vout, vlc_tick_t next_vsync)
                 NS_FROM_VLC_TICK(now),
                 NS_FROM_VLC_TICK(last_date),
                 NS_FROM_VLC_TICK(last_system_pts));
+
+
+    /**
+     * TODO: we want to synchronize frame sampling on vsync:
+     *  - as a first step, consider only framerate = refresh rate case
+     *  - when a new vsync even happens, choose the frame matching the VSYNC time (next_pts)
+     *  - prepare and render the frame, before next_pts happens
+     *  - 
+     */
+
+    vlc_mutex_lock(&sys->scheduler_lock);
+    if (sys->scheduler && sys->scheduler->ops->signal_vsync != NULL)
+        sys->scheduler->ops->signal_vsync(sys->scheduler, next_vsync);
+    vlc_mutex_unlock(&sys->scheduler_lock);
 }
 
 void vout_ControlChangeFilters(vout_thread_t *vout, const char *filters)
@@ -2200,6 +2219,12 @@ vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
     vlc_mutex_init(&sys->avstat.lock);
     var_AddCallback(&vout->obj, "avstat", avstat_callback, sys);
     var_TriggerCallback(&vout->obj, "avstat");
+
+    vlc_mutex_init(&sys->vsync.lock);
+    vlc_cond_init(&sys->vsync.cond_update);
+    sys->vsync.current_date = VLC_TICK_INVALID;
+    sys->vsync.next_date = VLC_TICK_INVALID;
+    sys->vsync.last_date = VLC_TICK_INVALID;
 
     return vout;
 }
