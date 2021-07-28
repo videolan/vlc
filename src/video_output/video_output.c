@@ -1542,7 +1542,13 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
              * rendered late. */
             system_pts = system_now;
         }
-        else if (vd->ops->display != NULL)
+        /*else if (vd->ops->display != NULL && vsync_date > system_now)
+        {
+            const vlc_tick_t vsync_deadline = vsync_date - VLC_TICK_FROM_MS(2);
+            vlc_tick_wait(vsync_deadline);
+            msg_Dbg(vd, "Using vsync deadline, waiting %dms", (int)MS_FROM_VLC_TICK(vsync_deadline - system_now)); 
+        }*/
+        else if (vd->ops->display != NULL && false)
         {
             /* Wait to reach system_pts if the plugin doesn't handle
              * asynchronous display */
