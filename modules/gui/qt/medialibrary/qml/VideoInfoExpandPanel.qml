@@ -52,7 +52,7 @@ FocusScope {
                 left: parent.left
                 right: parent.right
             }
-            color: VLCStyle.colors.buttonBorder
+            color: VLCStyle.colors.border
             height: VLCStyle.expandDelegate_border
         }
 
@@ -62,7 +62,7 @@ FocusScope {
                 left: parent.left
                 right: parent.right
             }
-            color: VLCStyle.colors.buttonBorder
+            color: VLCStyle.colors.border
             height: VLCStyle.expandDelegate_border
         }
 
