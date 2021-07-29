@@ -670,8 +670,15 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
         free( psz_uri );
 
         int i_type = LIBSSH2_SFTP_S_ISDIR( attrs.permissions ) ? ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
+
+        input_item_t *p_item;
         i_ret = vlc_readdir_helper_additem( &rdh, psz_full_uri, NULL, psz_file,
-                                            i_type, ITEM_NET, NULL );
+                                            i_type, ITEM_NET, &p_item );
+        if (i_ret == VLC_SUCCESS && p_item)
+        {
+            input_item_AddStat(p_item, "mtime", attrs.mtime);
+            input_item_AddStat(p_item, "size", attrs.filesize);
+        }
         free( psz_full_uri );
     }
 
