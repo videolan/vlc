@@ -2570,27 +2570,37 @@ static bool EsOutSelectHasExplicitParams( const es_out_es_props_t *p_esprops )
     return p_esprops->str_ids || p_esprops->i_channel >= 0;
 }
 
+static bool EsOutIdMatchStrIds( const es_out_id_t *es, char *str_ids )
+{
+    char *saveptr;
+
+    for( const char *str_id = strtok_r( str_ids, ",", &saveptr );
+         str_id != NULL ;
+         str_id = strtok_r( NULL, ",", &saveptr ) )
+    {
+        if( strcmp( str_id, es->id.str_id ) == 0 )
+            return true;
+    }
+
+    return false;
+}
+
 static bool EsOutSelectMatchExplicitParams( const es_out_es_props_t *p_esprops,
                                             const es_out_id_t *es )
 {
     /* user designated by ID ES have higher prio than everything */
     if( p_esprops->str_ids )
     {
-        char *saveptr, *str_ids = strdup( p_esprops->str_ids );
+        /* EsOutIdMatchStrIds will modify str_ids */
+        char *str_ids = strdup( p_esprops->str_ids );
         if( str_ids )
         {
-            for( const char *str_id = strtok_r( str_ids, ",", &saveptr );
-                 str_id != NULL ;
-                 str_id = strtok_r( NULL, ",", &saveptr ) )
-            {
-                if( strcmp( str_id, es->id.str_id ) == 0 )
-                {
-                    free( str_ids );
-                    return true;
-                }
-            }
+            bool matching = EsOutIdMatchStrIds( es, str_ids );
+            free( str_ids );
+
+            if( matching )
+                return true;
         }
-        free( str_ids );
     }
 
     /* then channel index */
@@ -2760,19 +2770,10 @@ static void EsOutSelectListFromProps( es_out_t *out, enum es_format_category_e c
         bool select = false;
         if( !unselect_others )
         {
-            /* strtok_r will modify str_ids */
+            /* EsOutIdMatchStrIds will modify str_ids */
             strcpy( buffer, esprops->str_ids );
-            char *saveptr;
-            for( const char *str_id = strtok_r( buffer, ",", &saveptr );
-                 str_id != NULL;
-                 str_id = strtok_r( NULL, ",", &saveptr ) )
-            {
-                if( strcmp( other->id.str_id, str_id ) == 0 )
-                {
-                    select = true;
-                    break;
-                }
-            }
+            if( EsOutIdMatchStrIds( other, buffer ) )
+                select = true;
         }
 
         if( !select )
