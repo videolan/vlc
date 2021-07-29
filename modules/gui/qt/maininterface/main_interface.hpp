@@ -175,7 +175,7 @@ public:
 public:
     /* Getters */
     QSystemTrayIcon *getSysTray() { return sysTray; }
-    QMenu *getSysTrayMenu() { return systrayMenu; }
+    QMenu *getSysTrayMenu() { return systrayMenu.get(); }
     enum
     {
         CONTROLS_VISIBLE  = 0x1,
@@ -246,7 +246,7 @@ protected:
     /* */
     QSettings           *settings;
     QSystemTrayIcon     *sysTray;
-    QMenu               *systrayMenu;
+    std::unique_ptr<QMenu> systrayMenu;
 
     QString              input_name;
 

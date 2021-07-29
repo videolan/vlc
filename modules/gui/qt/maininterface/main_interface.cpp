@@ -474,7 +474,7 @@ void MainInterface::createSystray()
     sysTray = new QSystemTrayIcon( iconVLC, this );
     sysTray->setToolTip( qtr( "VLC media player" ));
 
-    systrayMenu = new QMenu( qtr( "VLC media player" ), this );
+    systrayMenu.reset(new QMenu( qtr( "VLC media player") ));
     systrayMenu->setIcon( iconVLC );
 
     VLCMenuBar::updateSystrayMenu( this, p_intf, true );
