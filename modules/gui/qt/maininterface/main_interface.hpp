@@ -249,11 +249,6 @@ protected:
     QMenu               *systrayMenu;
 
     QString              input_name;
-    QVBoxLayout         *mainLayout;
-
-    /* Status Bar */
-    QLabel              *nameLabel;
-    QLabel              *cryptedLabel;
 
     /* Status and flags */
     QPoint              lastWinPosition;
@@ -290,10 +285,6 @@ protected:
     bool                 playlistVisible;       ///< Is the playlist visible ?
     double               playlistWidthFactor;   ///< playlist size: root.width / playlistScaleFactor
 
-
-    static const Qt::Key kc[10]; /* easter eggs */
-    int i_kc_offset;
-
     VLCVarChoiceModel* m_extraInterfaces;
 
     ControlbarProfileModel* m_controlbarProfileModel;
@@ -324,8 +315,6 @@ protected slots:
     void handleSystrayClick( QSystemTrayIcon::ActivationReason );
     void updateSystrayTooltipName( const QString& );
     void updateSystrayTooltipStatus( PlayerController::PlayingState );
-
-    void showBuffering( float );
 
     void onInputChanged( bool );
     void updateIntfScaleFactor();

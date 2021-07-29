@@ -104,13 +104,11 @@ MainInterface::MainInterface(qt_intf_t *_p_intf , QWidget* parent, Qt::WindowFla
     /* Variables initialisation */
     lastWinScreen        = NULL;
     sysTray              = NULL;
-    cryptedLabel         = NULL;
 
     b_hideAfterCreation  = false; // --qt-start-minimized
     playlistVisible      = false;
     playlistWidthFactor  = 4.0;
     b_interfaceFullScreen= false;
-    i_kc_offset          = false;
 
     /**
      *  Configuration and settings
@@ -176,14 +174,6 @@ MainInterface::MainInterface(qt_intf_t *_p_intf , QWidget* parent, Qt::WindowFla
     b_hasWayland = platformName.startsWith(QLatin1String("wayland"), Qt::CaseInsensitive);
 #endif
 
-    /**************************
-     *  UI and Widgets design
-     **************************/
-
-    /* Main settings */
-    setFocusPolicy( Qt::StrongFocus );
-    setAcceptDrops( true );
-
     /*********************************
      * Create the Systray Management *
      *********************************/
@@ -227,11 +217,6 @@ MainInterface::MainInterface(qt_intf_t *_p_intf , QWidget* parent, Qt::WindowFla
     QVLCTools::restoreWidgetPosition( settings, this, QSize(600, 420) );
 
     b_interfaceFullScreen = isFullScreen();
-
-    //add a dummy transparent widget
-    QWidget* widget = new QWidget(this);
-    widget->setStyleSheet("background-color: transparent");
-    setCentralWidget(widget);
 
     computeMinimumSize();
 }
@@ -470,21 +455,6 @@ void MainInterface::setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfacePr
 VideoSurfaceProvider* MainInterface::getVideoSurfaceProvider() const
 {
     return m_videoSurfaceProvider;
-}
-
-const Qt::Key MainInterface::kc[10] =
-{
-    Qt::Key_Up, Qt::Key_Up,
-    Qt::Key_Down, Qt::Key_Down,
-    Qt::Key_Left, Qt::Key_Right, Qt::Key_Left, Qt::Key_Right,
-    Qt::Key_B, Qt::Key_A
-};
-
-
-void MainInterface::showBuffering( float f_cache )
-{
-    QString amount = QString("Buffering: %1%").arg( (int)(100*f_cache) );
-    statusBar()->showMessage( amount, 1000 );
 }
 
 /*****************************************************************************
