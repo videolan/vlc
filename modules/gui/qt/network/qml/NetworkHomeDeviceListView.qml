@@ -109,7 +109,7 @@ FocusScope {
                 if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
                     history.push( ["mc", "network", { tree: model.tree } ])
                 else
-                    model.addAndPlay( index )
+                    deviceModel.addAndPlay( index )
             }
         }
 
