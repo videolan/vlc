@@ -2753,6 +2753,7 @@ static void EsOutSelectListFromProps( es_out_t *out, enum es_format_category_e c
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     es_out_es_props_t *esprops = GetPropsByCat( p_sys, cat );
+    es_out_id_t *other;
     if( !esprops || !esprops->str_ids )
         return;
 
@@ -2760,33 +2761,35 @@ static void EsOutSelectListFromProps( es_out_t *out, enum es_format_category_e c
     if( !buffer )
         return;
 
-    bool unselect_others = false;
-    es_out_id_t *other;
+    /* Unselect all ES that are not on the str_ids list.
+     * This step need to be done before the selection step, specially
+     * for the EXCLUSIVE ES policy. Indeed, having multiple ES selected is not
+     * supported for this policy. */
+    foreach_es_then_es_slaves(other)
+    {
+        if( other->fmt.i_cat != cat )
+            continue;
+
+        /* EsOutIdMatchStrIds will modify str_ids */
+        strcpy( buffer, esprops->str_ids );
+        if( !EsOutIdMatchStrIds( other, buffer ) && EsIsSelected( other ) ) 
+            EsOutUnselectEs( out, other, other->p_pgrm == p_sys->p_pgrm );
+    }
+
+    /* Now, select all ES from the str_ids list */
     foreach_es_then_es_slaves( other )
     {
         if( other->fmt.i_cat != cat )
             continue;
 
-        bool select = false;
-        if( !unselect_others )
+        /* EsOutIdMatchStrIds will modify str_ids */
+        strcpy( buffer, esprops->str_ids );
+        if( EsOutIdMatchStrIds( other, buffer ) && !EsIsSelected( other ) )
         {
-            /* EsOutIdMatchStrIds will modify str_ids */
-            strcpy( buffer, esprops->str_ids );
-            if( EsOutIdMatchStrIds( other, buffer ) )
-                select = true;
-        }
+            EsOutSelectEs( out, other, true );
 
-        if( !select )
-        {
-            if( EsIsSelected( other ) )
-                EsOutUnselectEs( out, other, other->p_pgrm == p_sys->p_pgrm );
-        }
-        else
-        {
-            if( !EsIsSelected( other ) )
-                EsOutSelectEs( out, other, true );
             if( esprops->e_policy == ES_OUT_ES_POLICY_EXCLUSIVE )
-                unselect_others = true;
+                break;
         }
     }
 
