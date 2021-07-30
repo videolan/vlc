@@ -2792,6 +2792,16 @@ static void EsOutSelectListFromProps( es_out_t *out, enum es_format_category_e c
     free( buffer );
 }
 
+static bool EsOutIdMatchEsList( const es_out_id_t *es, vlc_es_id_t * const*es_id_list )
+{
+    for( size_t i = 0; es_id_list[i] != NULL; i++ )
+    {
+        if( es_id_list[i] == &es->id )
+            return true;
+    }
+    return false;
+}
+
 static void EsOutSelectList( es_out_t *out, enum es_format_category_e cat,
                              vlc_es_id_t * const*es_id_list )
 {
@@ -2807,19 +2817,8 @@ static void EsOutSelectList( es_out_t *out, enum es_format_category_e cat,
 
         bool select = false;
         if( !unselect_others )
-        {
-            for( size_t i = 0; ; i++ )
-            {
-                vlc_es_id_t *es_id = es_id_list[i];
-                if( es_id == NULL )
-                    break;
-                else if( es_id == &other->id )
-                {
-                    select = true;
-                    break;
-                }
-            }
-        }
+            select = EsOutIdMatchEsList( other, es_id_list );
+
         if( !select )
         {
             if( EsIsSelected( other ) )
