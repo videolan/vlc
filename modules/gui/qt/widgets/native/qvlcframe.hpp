@@ -64,6 +64,12 @@ class QVLCTools
                                            QWidget *widget,
                                            QSize defSize = QSize( 0, 0 ),
                                            QPoint defPos = QPoint( 0, 0 ) );
+
+
+       static void saveWindowPosition(QSettings *settings, QWindow *window);
+       static void restoreWindowPosition(QSettings *settings, QWindow *window,
+                                          QSize defSize = QSize( 0, 0 ),
+                                          QPoint defPos = QPoint( 0, 0 ) );
 };
 
 class QVLCFrame : public QWidget
