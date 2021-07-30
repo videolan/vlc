@@ -212,7 +212,7 @@ static int DirRead(stream_t *p_access, input_item_node_t *p_node)
                 free( psz_path );
 
                 i_ret = vlc_readdir_helper_additem( &rdh, psz_uri, NULL,
-                                    psz_name, ITEM_TYPE_DIRECTORY, ITEM_NET );
+                                    psz_name, ITEM_TYPE_DIRECTORY, ITEM_NET, NULL );
                 free( psz_name );
                 free( psz_uri );
             }

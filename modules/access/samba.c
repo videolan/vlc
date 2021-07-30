@@ -171,7 +171,7 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_node )
         }
         free(psz_encoded_name);
         i_ret = vlc_readdir_helper_additem(&rdh, uri, NULL, p_entry->name,
-                                           i_type, ITEM_NET);
+                                           i_type, ITEM_NET, NULL);
         free(uri);
     }
 

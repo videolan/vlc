@@ -387,7 +387,7 @@ static int AddItem(stream_t *access, struct vlc_readdir_helper *rdh,
         return VLC_ENOMEM;
 
     int ret = vlc_readdir_helper_additem(rdh, url, NULL, name, i_type,
-                                         ITEM_NET);
+                                         ITEM_NET, NULL);
     free(url);
     return ret;
 }

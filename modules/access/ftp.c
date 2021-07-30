@@ -999,7 +999,7 @@ static int DirRead (stream_t *p_access, input_item_node_t *p_current_node)
             msg_Err(p_access, "%s -> %s", p_sys->url.psz_path, ms.ptr);
 
             i_ret = vlc_readdir_helper_additem( &rdh, ms.ptr, NULL, psz_file,
-                                                type, ITEM_NET );
+                                                type, ITEM_NET, NULL );
             free(ms.ptr);
         }
         free( psz_line );

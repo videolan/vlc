@@ -1823,7 +1823,8 @@ void vlc_readdir_helper_finish(struct vlc_readdir_helper *p_rdh, bool b_success)
 
 int vlc_readdir_helper_additem(struct vlc_readdir_helper *p_rdh,
                                const char *psz_uri, const char *psz_flatpath,
-                               const char *psz_filename, int i_type, int i_net)
+                               const char *psz_filename, int i_type, int i_net,
+                               input_item_t **restrict created_item)
 {
     enum slave_type i_slave_type;
     struct rdh_slave *p_rdh_slave = NULL;
@@ -1869,7 +1870,11 @@ int vlc_readdir_helper_additem(struct vlc_readdir_helper *p_rdh,
     }
 
     if (rdh_file_is_ignored(p_rdh, psz_filename))
+    {
+        if (created_item != NULL)
+            *created_item = NULL;
         return VLC_SUCCESS;
+    }
 
     input_item_node_t *p_node = p_rdh->p_node;
 
@@ -1896,5 +1901,8 @@ int vlc_readdir_helper_additem(struct vlc_readdir_helper *p_rdh,
      * slaves will be ignored by rdh_file_is_ignored() */
     if (p_rdh_slave != NULL)
         p_rdh_slave->p_node = p_node;
+
+    if (created_item != NULL)
+        *created_item = p_item;
     return VLC_SUCCESS;
 }

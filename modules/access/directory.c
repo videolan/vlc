@@ -208,7 +208,7 @@ static int DirRead (stream_t *access, input_item_node_t *node)
             break;
         }
         ret = vlc_readdir_helper_additem(&rdh, uri, NULL, entry, type,
-                                         ITEM_NET_UNKNOWN);
+                                         ITEM_NET_UNKNOWN, NULL);
         free(uri);
     }
 

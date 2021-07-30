@@ -548,7 +548,7 @@ static int ReadDir( stream_directory_t* p_directory, input_item_node_t* p_node )
             break;
 
         if( vlc_readdir_helper_additem( &rdh, mrl, path, NULL, ITEM_TYPE_FILE,
-                                        ITEM_LOCAL ) )
+                                        ITEM_LOCAL, NULL ) )
         {
             free( mrl );
             break;
