@@ -139,7 +139,7 @@ private:
 std::unique_ptr<ColorSchemeModel::SchemeList> ColorSchemeModel::createList(ColorSchemeModel *parent)
 {
 #ifdef Q_OS_WIN
-    if (WinColorSchemeList::canDetectTheme)
+    if (WinColorSchemeList::canDetectTheme())
         return std::make_unique<WinColorSchemeList>(parent);
 #endif
     Q_UNUSED(parent);
