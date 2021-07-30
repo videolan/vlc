@@ -25,6 +25,7 @@ import QtGraphicalEffects 1.0
 import org.videolan.vlc 0.1
 
 import "qrc:///util/" as Util
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///widgets/" as Widgets
 import "qrc:///main/" as MainInterface
 import "qrc:///style/"
@@ -342,7 +343,7 @@ FocusScope {
         }
 
         Widgets.BusyIndicatorExt {
-            runningDelayed: providerModel.parsingPending
+            runningDelayed: Helpers.get(providerModel, "parsingPending", false) // 'parsingPending' property is not available with NetworkDevicesModel
             anchors.centerIn: parent
             z: 1
         }
