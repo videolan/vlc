@@ -16,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
-import QtQuick.Layouts 1.11
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -24,7 +23,6 @@ import "qrc:///style/"
 
 Widgets.ComboBoxExt {
     property bool paintOnly: false
-    Layout.alignment: Qt.AlignVCenter
     width: VLCStyle.combobox_width_normal
     height: VLCStyle.combobox_height_normal
     textRole: "display"
