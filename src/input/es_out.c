@@ -2809,27 +2809,31 @@ static void EsOutSelectList( es_out_t *out, enum es_format_category_e cat,
     es_out_id_t *other;
     es_out_es_props_t *p_esprops = GetPropsByCat( p_sys, cat );
 
-    bool unselect_others = false;
+    /* Unselect all ES that are not on es_id_list.
+     * This step need to be done before the selection step, specially
+     * for the EXCLUSIVE ES policy. Indeed, having multiple ES selected is not
+     * supported for this policy. */
     foreach_es_then_es_slaves(other)
     {
         if( other->fmt.i_cat != cat )
             continue;
 
-        bool select = false;
-        if( !unselect_others )
-            select = EsOutIdMatchEsList( other, es_id_list );
+        if( !EsOutIdMatchEsList( other, es_id_list ) && EsIsSelected( other ) )
+            EsOutUnselectEs( out, other, other->p_pgrm == p_sys->p_pgrm );
+    }
 
-        if( !select )
+    /* Now, select all ES from es_id_list */
+    foreach_es_then_es_slaves(other)
+    {
+        if( other->fmt.i_cat != cat )
+            continue;
+
+        if( EsOutIdMatchEsList( other, es_id_list ) && !EsIsSelected( other ) )
         {
-            if( EsIsSelected( other ) )
-                EsOutUnselectEs( out, other, other->p_pgrm == p_sys->p_pgrm );
-        }
-        else
-        {
-            if( !EsIsSelected( other ) )
-                EsOutSelectEs( out, other, true );
+            EsOutSelectEs( out, other, true );
+
             if( p_esprops->e_policy == ES_OUT_ES_POLICY_EXCLUSIVE )
-                unselect_others = true;
+                break;
         }
     }
 }
