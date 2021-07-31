@@ -576,7 +576,11 @@ $(libvlccore_la_OBJECTS): libvlccore_objc.la
 libvlccore_objc_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libvlccore_objc_la_LDFLAGS = -static
 libvlccore_la_LIBADD += libvlccore_objc.la
+if HAVE_TVOS
+libvlccore_la_LDFLAGS +=  -Wl,-framework,Foundation -Xlinker -install_name -Xlinker @rpath/vlccore.framework/vlccore
+else
 libvlccore_la_LDFLAGS +=  -Wl,-framework,Foundation -Xlinker -install_name -Xlinker @rpath/libvlccore.dylib
+endif
 endif
 
 # iOS and tvOS applications cannot install global shared libraries and
