@@ -98,6 +98,10 @@ libvlc_static_modules_la_LDFLAGS += $(libvlc_plugin_frameworks)
 endif
 EXTRA_libvlc_static_modules_la_DEPENDENCIES = vlc_modules_manifest.h
 
+../src/vlccore.framework/vlccore: $(LTLIBVLCCORE)
+	mkdir -p $(shell dirname $@)
+	cp ../src/.libs/libvlccore.dylib $@
+
 EXTRA_libvlc_plugin_la_SOURCES = dummy.cpp
 libvlc_plugin_la_SOURCES = plugin_static.c
 libvlc_plugin_la_CFLAGS =
@@ -106,12 +110,13 @@ libvlc_plugin_la_LDFLAGS = \
 	-export-symbols-regex ^vlc_entry \
 	-shrext $(LIBEXT) \
 	-no-undefined \
-	$(top_builddir)/compat/libcompat.la $(LTLIBVLCCORE)
+	$(top_builddir)/compat/libcompat.la \
+	-Wl,-F../src/ -Wl,-framework,vlccore
 if HAVE_TVOS
 libvlc_plugin_la_LDFLAGS += $(libvlc_plugin_frameworks)
 endif
 libvlc_plugin_la_LIBADD = $(PARTIAL_PLUGINS)
-EXTRA_libvlc_plugin_la_DEPENDENCIES = vlc_modules_manifest.h
+EXTRA_libvlc_plugin_la_DEPENDENCIES = vlc_modules_manifest.h ../src/vlccore.framework/vlccore
 
 if HAVE_IOS
 libvlc_plugin_la_LDFLAGS += -avoid-version
