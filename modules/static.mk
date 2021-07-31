@@ -117,7 +117,7 @@ if HAVE_IOS
 libvlc_plugin_la_LDFLAGS += -avoid-version
 endif
 if HAVE_TVOS
-libvlc_plugin_la_LDFLAGS += -avoid-version
+libvlc_plugin_la_LDFLAGS += -avoid-version -Xlinker -install_name -Xlinker @rpath/vlc_plugin.framework/vlc_plugin
 endif
 
 if HAVE_OSX
