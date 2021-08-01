@@ -1,7 +1,7 @@
 # schroedinger
 
 SCHROEDINGER_VERSION := 1.0.11
-SCHROEDINGER_URL := http://diracvideo.org/download/schroedinger/schroedinger-$(SCHROEDINGER_VERSION).tar.gz
+SCHROEDINGER_URL := $(CONTRIB_VIDEOLAN)/schroedinger/schroedinger-$(SCHROEDINGER_VERSION).tar.gz
 
 PKGS += schroedinger
 ifeq ($(call need_pkg,"schroedinger-1.0"),)
@@ -9,7 +9,7 @@ PKGS_FOUND += schroedinger
 endif
 
 $(TARBALLS)/schroedinger-$(SCHROEDINGER_VERSION).tar.gz:
-	$(call download_pkg,$(SCHROEDINGER_URL),schroedinger)
+	$(call download,$(SCHROEDINGER_URL),schroedinger)
 
 .sum-schroedinger: schroedinger-$(SCHROEDINGER_VERSION).tar.gz
 
