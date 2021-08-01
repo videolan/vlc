@@ -1,7 +1,7 @@
 # TagLib
 
 TAGLIB_VERSION := 1.11.1
-TAGLIB_URL := http://taglib.github.io/releases/taglib-$(TAGLIB_VERSION).tar.gz
+TAGLIB_URL := https://taglib.org/releases/taglib-$(TAGLIB_VERSION).tar.gz
 
 PKGS += taglib
 ifeq ($(call need_pkg,"taglib >= 1.9"),)
