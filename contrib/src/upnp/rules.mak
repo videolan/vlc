@@ -1,6 +1,6 @@
 # UPNP
 UPNP_VERSION := 1.6.19
-UPNP_URL := $(SF)/pupnp/libupnp-$(UPNP_VERSION).tar.bz2
+UPNP_URL := $(GITHUB)/pupnp/pupnp/archive/refs/tags/release-$(UPNP_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
 PKGS += upnp
