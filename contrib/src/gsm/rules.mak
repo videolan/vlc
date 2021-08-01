@@ -1,6 +1,6 @@
 # GSM
 GSM_VERSION := 1.0.13
-GSM_URL := http://libgsm.sourcearchive.com/downloads/$(GSM_VERSION)/libgsm_$(GSM_VERSION).orig.tar.gz
+GSM_URL := http://www.quut.com/gsm/gsm-$(GSM_VERSION).tar.gz
 
 $(TARBALLS)/libgsm_$(GSM_VERSION).tar.gz:
 	$(call download_pkg,$(GSM_URL),gsm)
