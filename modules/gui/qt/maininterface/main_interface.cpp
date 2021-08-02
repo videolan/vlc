@@ -29,6 +29,7 @@
 #include "qt.hpp"
 
 #include "maininterface/main_interface.hpp"
+#include "compositor.hpp"
 #include "player/player_controller.hpp"                    // Creation
 #include "util/renderer_manager.hpp"
 
@@ -108,7 +109,6 @@ MainInterface::MainInterface(qt_intf_t *_p_intf , QWidget* parent, Qt::WindowFla
     b_hideAfterCreation  = false; // --qt-start-minimized
     playlistVisible      = false;
     playlistWidthFactor  = 4.0;
-    b_interfaceFullScreen= false;
 
     /**
      *  Configuration and settings
@@ -125,11 +125,6 @@ MainInterface::MainInterface(qt_intf_t *_p_intf , QWidget* parent, Qt::WindowFla
     m_intfUserScaleFactor = var_InheritFloat(p_intf, "qt-interface-scale");
     if (m_intfUserScaleFactor == -1)
         m_intfUserScaleFactor = getSettings()->value( "MainWindow/interface-scale", 1.0).toFloat();
-    winId(); //force window creation
-    QWindow* window = windowHandle();
-    if (window)
-        connect(window, &QWindow::screenChanged, this, &MainInterface::updateIntfScaleFactor);
-    updateIntfScaleFactor();
 
     /* Get the available interfaces */
     m_extraInterfaces = new VLCVarChoiceModel(VLC_OBJECT(p_intf->intf), "intf-add", this);
@@ -212,8 +207,6 @@ MainInterface::MainInterface(qt_intf_t *_p_intf , QWidget* parent, Qt::WindowFla
 
     /* Register callback for the intf-popupmenu variable */
     var_AddCallback( libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
-
-    b_interfaceFullScreen = isFullScreen();
 }
 
 MainInterface::~MainInterface()
@@ -263,7 +256,7 @@ bool MainInterface::hasVLM() const {
 bool MainInterface::useClientSideDecoration() const
 {
     //don't show CSD when interface is fullscreen
-    return m_clientSideDecoration && !b_interfaceFullScreen;
+    return m_clientSideDecoration && m_windowVisibility != QWindow::FullScreen;
 }
 
 /*****************************
@@ -273,7 +266,7 @@ bool MainInterface::useClientSideDecoration() const
 void MainInterface::reloadPrefs()
 {
     i_notificationSetting = var_InheritInteger( p_intf, "qt-notification" );
-    
+
     if ( m_hasToolbarMenu != var_InheritBool( p_intf, "qt-menubar" ) )
     {
         m_hasToolbarMenu = !m_hasToolbarMenu;
@@ -319,7 +312,7 @@ void MainInterface::sendHotkey(Qt::Key key , Qt::KeyboardModifiers modifiers)
 
 void MainInterface::updateIntfScaleFactor()
 {
-    QWindow* window = windowHandle();
+    QWindow* window = p_intf->p_compositor->interfaceMainWindow();
     m_intfScaleFactor = m_intfUserScaleFactor;
     if (window)
     {
@@ -331,6 +324,11 @@ void MainInterface::updateIntfScaleFactor()
         }
     }
     emit intfScaleFactorChanged();
+}
+
+void MainInterface::onWindowVisibilityChanged(QWindow::Visibility visibility)
+{
+    m_windowVisibility = visibility;
 }
 
 void MainInterface::incrementIntfUserScaleFactor(bool increment)
@@ -536,7 +534,7 @@ void MainInterface::updateSystrayTooltipName( const QString& name )
     {
         sysTray->setToolTip( name );
         if( ( i_notificationSetting == NOTIFICATION_ALWAYS ) ||
-            ( i_notificationSetting == NOTIFICATION_MINIMIZED && (isMinimized() || isHidden()) ) )
+            ( i_notificationSetting == NOTIFICATION_MINIMIZED && (m_windowVisibility == QWindow::Hidden || m_windowVisibility == QWindow::Minimized)))
         {
             sysTray->showMessage( qtr( "VLC media player" ), name,
                     QSystemTrayIcon::NoIcon, 3000 );
@@ -660,16 +658,9 @@ bool MainInterface::onWindowClose( QWindow* )
     }
 }
 
-void MainInterface::setInterfaceFullScreen( bool fs )
-{
-    b_interfaceFullScreen = fs;
-    emit interfaceFullScreenChanged( fs );
-}
-
 void MainInterface::toggleInterfaceFullScreen()
 {
-    setInterfaceFullScreen( !b_interfaceFullScreen );
-    emit fullscreenInterfaceToggled( b_interfaceFullScreen );
+    emit setInterfaceFullScreen( m_windowVisibility != QWindow::FullScreen );
 }
 
 void MainInterface::emitBoss()

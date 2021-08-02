@@ -189,7 +189,8 @@ public:
         RAISE_AUDIO,
         RAISE_AUDIOVIDEO,
     };
-    bool isInterfaceFullScreen() { return b_interfaceFullScreen; }
+    inline bool isInterfaceFullScreen() const { return m_windowVisibility == QWindow::FullScreen; }
+    inline bool isInterfaceVisible() const { return m_windowVisibility != QWindow::Hidden; }
     bool isPlaylistDocked() { return b_playlistDocked; }
     bool isPlaylistVisible() { return playlistVisible; }
     inline double getPlaylistWidthFactor() const { return playlistWidthFactor; }
@@ -235,8 +236,6 @@ protected:
     void initSystray();
     void handleSystray();
 
-    /* */
-    void setInterfaceFullScreen( bool );
 
     bool m_hasEmbededVideo = false;
     VideoSurfaceProvider* m_videoSurfaceProvider = nullptr;
@@ -265,7 +264,7 @@ protected:
     bool                 b_hideAfterCreation;
     bool                 b_minimalView;         ///< Minimal video
     bool                 b_playlistDocked;
-    bool                 b_interfaceFullScreen;
+    QWindow::Visibility  m_windowVisibility = QWindow::Windowed;
     bool                 b_interfaceOnTop;      ///keep UI on top
 #ifdef QT5_HAS_WAYLAND
     bool                 b_hasWayland;
@@ -302,6 +301,8 @@ public slots:
     void incrementIntfUserScaleFactor( bool increment);
     void setIntfUserScaleFactor( float );
     void setPinVideoControls( bool );
+    void updateIntfScaleFactor();
+    void onWindowVisibilityChanged(QWindow::Visibility);
 
     void emitBoss();
     void emitRaise();
@@ -316,7 +317,6 @@ protected slots:
     void updateSystrayTooltipStatus( PlayerController::PlayingState );
 
     void onInputChanged( bool );
-    void updateIntfScaleFactor();
 
     void sendHotkey(Qt::Key key, Qt::KeyboardModifiers modifiers );
 
@@ -324,6 +324,7 @@ signals:
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
     void setInterfaceVisibible(bool );
+    void setInterfaceFullScreen( bool );
     void toggleWindowVisibility();
     void askToQuit();
     void askShow();

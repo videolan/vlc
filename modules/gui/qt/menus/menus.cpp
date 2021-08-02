@@ -900,7 +900,7 @@ void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
 
 #ifndef Q_OS_MAC
     /* Hide / Show VLC and cone */
-    if( mi->isVisible() || b_force_visible )
+    if( mi->isInterfaceVisible() || b_force_visible )
     {
         sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
                             qtr( "&Hide VLC media player in taskbar" ), mi,

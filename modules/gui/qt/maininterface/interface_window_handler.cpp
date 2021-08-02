@@ -19,6 +19,7 @@
 #include "main_interface.hpp"
 #include <player/player_controller.hpp>
 #include <playlist/playlist_controller.hpp>
+#include <QScreen>
 
 InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent)
     : QObject(parent)
@@ -41,7 +42,8 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainInterface
     QVLCTools::restoreWindowPosition( getSettings(), m_window, QSize(600, 420) );
 
     WindowStateHolder::holdOnTop( m_window,  WindowStateHolder::INTERFACE, m_mainInterface->isInterfaceAlwaysOnTop() );
-    WindowStateHolder::holdFullscreen( m_window,  WindowStateHolder::INTERFACE, m_mainInterface->isInterfaceFullScreen() );
+    WindowStateHolder::holdFullscreen( m_window,  WindowStateHolder::INTERFACE, m_window->visibility() == QWindow::FullScreen );
+
 
     if (m_mainInterface->isHideAfterCreation())
     {
@@ -60,6 +62,13 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainInterface
         connect( THEMIM, &PlayerController::nameChanged, m_window, &QWindow::setTitle );
     }
 
+    connect( m_window, &QWindow::screenChanged, m_mainInterface, &MainInterface::updateIntfScaleFactor);
+    m_mainInterface->updateIntfScaleFactor();
+
+    m_mainInterface->onWindowVisibilityChanged(m_window->visibility());
+    connect( m_window, &QWindow::visibilityChanged,
+             m_mainInterface, &MainInterface::onWindowVisibilityChanged);
+
     connect( m_mainInterface, &MainInterface::askBoss,
              this, &InterfaceWindowHandler::setBoss, Qt::QueuedConnection  );
     connect( m_mainInterface, &MainInterface::askRaise,
@@ -68,7 +77,7 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainInterface
     connect( m_mainInterface, &MainInterface::interfaceAlwaysOnTopChanged,
              this, &InterfaceWindowHandler::setInterfaceAlwaysOnTop);
 
-    connect( m_mainInterface, &MainInterface::interfaceFullScreenChanged,
+    connect( m_mainInterface, &MainInterface::setInterfaceFullScreen,
              this, &InterfaceWindowHandler::setInterfaceFullScreen);
 
     connect( m_mainInterface, &MainInterface::toggleWindowVisibility,
