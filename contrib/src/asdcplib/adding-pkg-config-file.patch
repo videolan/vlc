@@ -16,7 +16,7 @@ index 0000000..36fdd12
 @@ -0,0 +1,10 @@
 +prefix=@prefix@
 +exec_prefix=@exec_prefix@
-+includedir=@incudedir@
++includedir=@includedir@
 +libdir=@libdir@
 +
 +Name: asdcplib
