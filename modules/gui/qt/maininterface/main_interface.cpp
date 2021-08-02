@@ -213,12 +213,7 @@ MainInterface::MainInterface(qt_intf_t *_p_intf , QWidget* parent, Qt::WindowFla
     /* Register callback for the intf-popupmenu variable */
     var_AddCallback( libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
-
-    QVLCTools::restoreWidgetPosition( settings, this, QSize(600, 420) );
-
     b_interfaceFullScreen = isFullScreen();
-
-    computeMinimumSize();
 }
 
 MainInterface::~MainInterface()
@@ -247,9 +242,6 @@ MainInterface::~MainInterface()
     else
         getSettings()->remove( "filedialog-path" );
 
-    /* Save this size */
-    QVLCTools::saveWidgetPosition(settings, this);
-
     /* Unregister callbacks */
     libvlc_int_t* libvlc = vlc_object_instance(p_intf);
     var_DelCallback( libvlc, "intf-boss", IntfBossCB, p_intf );
@@ -273,15 +265,6 @@ bool MainInterface::useClientSideDecoration() const
     //don't show CSD when interface is fullscreen
     return m_clientSideDecoration && !b_interfaceFullScreen;
 }
-
-void MainInterface::computeMinimumSize()
-{
-    int minWidth = 450;
-    int minHeight = 300;
-    setMinimumWidth( minWidth );
-    setMinimumHeight( minHeight );
-}
-
 
 /*****************************
  *   Main UI handling        *

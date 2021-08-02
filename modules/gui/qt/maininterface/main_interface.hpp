@@ -237,7 +237,6 @@ protected:
 
     /* */
     void setInterfaceFullScreen( bool );
-    void computeMinimumSize();
 
     bool m_hasEmbededVideo = false;
     VideoSurfaceProvider* m_videoSurfaceProvider = nullptr;

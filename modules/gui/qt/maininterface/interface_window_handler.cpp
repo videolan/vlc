@@ -35,6 +35,11 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainInterface
     m_window->setIcon( QApplication::windowIcon() );
     m_window->setOpacity( var_InheritFloat( p_intf, "qt-opacity" ) );
 
+    m_window->setMinimumWidth( 450 );
+    m_window->setMinimumHeight( 300 );
+
+    QVLCTools::restoreWindowPosition( getSettings(), m_window, QSize(600, 420) );
+
     WindowStateHolder::holdOnTop( m_window,  WindowStateHolder::INTERFACE, m_mainInterface->isInterfaceAlwaysOnTop() );
     WindowStateHolder::holdFullscreen( m_window,  WindowStateHolder::INTERFACE, m_mainInterface->isInterfaceFullScreen() );
 
@@ -88,6 +93,8 @@ InterfaceWindowHandler::~InterfaceWindowHandler()
     m_window->removeEventFilter(this);
     WindowStateHolder::holdOnTop( m_window,  WindowStateHolder::INTERFACE, false );
     WindowStateHolder::holdFullscreen( m_window,  WindowStateHolder::INTERFACE, false );
+    /* Save this size */
+    QVLCTools::saveWindowPosition(getSettings(), m_window);
 }
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
