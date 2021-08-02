@@ -118,7 +118,7 @@ static int get_address( stream_t *p_access );
 static int login( stream_t *p_access );
 static bool get_path( stream_t *p_access );
 static int add_item( stream_t *p_access,  struct vlc_readdir_helper *p_rdh,
-                     const char *psz_name, int i_type );
+                     const char *psz_name, int i_type, smb_stat *p_st );
 
 typedef struct
 {
@@ -576,7 +576,7 @@ static int Control( stream_t *p_access, int i_query, va_list args )
 }
 
 static int add_item( stream_t *p_access, struct vlc_readdir_helper *p_rdh,
-                     const char *psz_name, int i_type )
+                     const char *psz_name, int i_type, smb_stat *p_st )
 {
     char         *psz_uri;
     int           i_ret;
@@ -593,8 +593,14 @@ static int add_item( stream_t *p_access, struct vlc_readdir_helper *p_rdh,
     if( i_ret == -1 )
         return VLC_ENOMEM;
 
+    input_item_t *p_item;
     i_ret = vlc_readdir_helper_additem( p_rdh, psz_uri, NULL, psz_name, i_type,
-                                        ITEM_NET, NULL );
+                                        ITEM_NET, &p_item );
+    if ( i_ret == VLC_SUCCESS && p_item && p_st )
+    {
+        input_item_AddStat( p_item, "mtime", smb_stat_get( *p_st, SMB_STAT_MTIME ));
+        input_item_AddStat( p_item, "size", smb_stat_get( *p_st, SMB_STAT_SIZE ));
+    }
     free( psz_uri );
     return i_ret;
 }
@@ -621,7 +627,7 @@ static int BrowseShare( stream_t *p_access, input_item_node_t *p_node )
         if( psz_name[strlen( psz_name ) - 1] == '$')
             continue;
 
-        i_ret = add_item( p_access, &rdh, psz_name, ITEM_TYPE_DIRECTORY );
+        i_ret = add_item( p_access, &rdh, psz_name, ITEM_TYPE_DIRECTORY, NULL );
     }
 
     vlc_readdir_helper_finish( &rdh, i_ret == VLC_SUCCESS );
@@ -672,7 +678,7 @@ static int BrowseDirectory( stream_t *p_access, input_item_node_t *p_node )
 
         i_type = smb_stat_get( st, SMB_STAT_ISDIR ) ?
                  ITEM_TYPE_DIRECTORY : ITEM_TYPE_FILE;
-        i_ret = add_item( p_access, &rdh, psz_name, i_type );
+        i_ret = add_item( p_access, &rdh, psz_name, i_type, &st );
     }
 
     vlc_readdir_helper_finish( &rdh, i_ret == VLC_SUCCESS );
