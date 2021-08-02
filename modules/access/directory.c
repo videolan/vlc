@@ -207,8 +207,15 @@ static int DirRead (stream_t *access, input_item_node_t *node)
             ret = VLC_ENOMEM;
             break;
         }
+        input_item_t *p_item;
         ret = vlc_readdir_helper_additem(&rdh, uri, NULL, entry, type,
-                                         ITEM_NET_UNKNOWN, NULL);
+                                         ITEM_NET_UNKNOWN, &p_item);
+
+        if (ret == VLC_SUCCESS && p_item && st.st_mtime >= 0 && st.st_size >= 0)
+        {
+            input_item_AddStat( p_item, "mtime", st.st_mtime );
+            input_item_AddStat( p_item, "size", st.st_size );
+        }
         free(uri);
     }
 
