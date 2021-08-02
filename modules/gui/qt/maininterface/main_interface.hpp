@@ -138,7 +138,7 @@ public:
 
 };
 
-class MainInterface : public QVLCMW
+class MainInterface : public QObject
 {
     Q_OBJECT
 
@@ -165,7 +165,7 @@ class MainInterface : public QVLCMW
 
 public:
     /* tors */
-    MainInterface( qt_intf_t *, QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
+    MainInterface(qt_intf_t *);
     virtual ~MainInterface();
 
     static const QEvent::Type ToolbarsNeedRebuild;
@@ -236,6 +236,7 @@ protected:
     void initSystray();
     void handleSystray();
 
+    qt_intf_t* p_intf = nullptr;
 
     bool m_hasEmbededVideo = false;
     VideoSurfaceProvider* m_videoSurfaceProvider = nullptr;
