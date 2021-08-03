@@ -8,14 +8,14 @@ lld (impersonating GNU ld) only supports response files, not
 linker scripts. Using a linker script as input just to pass a
 list of files is overkill for cases when a response file is enough.
 ---
- libtool-2.4.6/config/ltmain.m4sh | 28 ++++++++++++++--------------
+ libtool-2.4.6/build-aux/ltmain.in | 28 ++++++++++++++--------------
  libtool-2.4.6/m4/libtool.m4      |  2 ++
  2 files changed, 16 insertions(+), 14 deletions(-)
 
-diff --git libtool-2.4.6/build-aux/ltmain.sh.orig libtool-2.4.6/build-aux/ltmain.sh
+diff --git libtool-2.4.6/build-aux/ltmain.in.orig libtool-2.4.6/build-aux/ltmain.in
 index 2641327..f6b4217 100644
---- libtool-2.4.6/build-aux/ltmain.sh.orig	2019-05-14 15:41:21.977391100 +0200
-+++ libtool-2.4.6/build-aux/ltmain.sh	2019-05-14 15:43:07.767697900 +0200
+--- libtool-2.4.6/build-aux/ltmain.in.orig	2019-05-14 15:41:21.977391100 +0200
++++ libtool-2.4.6/build-aux/ltmain.in	2019-05-14 15:43:07.767697900 +0200
 @@ -9852,20 +9852,7 @@ EOF
  	  last_robj=
  	  k=1
