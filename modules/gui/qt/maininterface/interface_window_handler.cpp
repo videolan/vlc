@@ -94,6 +94,12 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainInterface
              this, &InterfaceWindowHandler::updateCSDWindowSettings );
 #endif
 
+    connect(m_mainInterface, &MainInterface::requestInterfaceMaximized,
+            m_window, &QWindow::showMaximized);
+
+    connect(m_mainInterface, &MainInterface::requestInterfaceNormal,
+            m_window, &QWindow::showNormal);
+
     m_window->installEventFilter(this);
 }
 

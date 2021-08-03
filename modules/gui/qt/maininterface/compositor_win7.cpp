@@ -209,11 +209,6 @@ MainInterface* CompositorWin7::makeMainInterface()
 
     m_qmlView->setContent(QUrl(), m_ui->getComponent(), m_ui->createRootItem());
 
-    connect(m_mainInterface, &MainInterface::requestInterfaceMaximized,
-            m_qmlView.get(), &QWindow::showMaximized);
-    connect(m_mainInterface, &MainInterface::requestInterfaceNormal,
-            m_qmlView.get(), &QWindow::showNormal);
-
     return m_mainInterface;
 }
 

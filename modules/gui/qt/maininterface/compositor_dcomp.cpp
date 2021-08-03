@@ -328,11 +328,6 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
                 this, &CompositorDirectComposition::onSurfacePositionChanged);
 
-        connect(m_mainInterface, &MainInterface::requestInterfaceMaximized,
-                m_rootWindow, &QWindow::showMaximized);
-        connect(m_mainInterface, &MainInterface::requestInterfaceNormal,
-                m_rootWindow, &QWindow::showNormal);
-
         m_ui = std::make_unique<MainUI>(m_intf, m_mainInterface, m_rootWindow);
         ret = m_ui->setup(m_uiSurface->engine());
         if (! ret)

@@ -62,11 +62,6 @@ MainInterface* CompositorDummy::makeMainInterface()
 
     m_qmlWidget->show();
 
-    connect(m_mainInterface.get(), &MainInterface::requestInterfaceMaximized,
-            m_qmlWidget.get(), &QWindow::showMaximized);
-    connect(m_mainInterface.get(), &MainInterface::requestInterfaceNormal,
-            m_qmlWidget.get(), &QWindow::showNormal);
-
     return m_mainInterface.get();
 }
 
