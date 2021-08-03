@@ -472,91 +472,22 @@ void WinTaskbarWidget::changeThumbbarButtons( PlayerController::PlayingState i_s
     }
 }
 
+// MainInterface
 
-MainInterfaceWin32::MainInterfaceWin32(qt_intf_t * _p_intf, QWidget *parent, Qt::WindowFlags flags )
-    : MainInterface( _p_intf, parent, flags )
+MainInterfaceWin32::MainInterfaceWin32(qt_intf_t * _p_intf )
+    : MainInterface( _p_intf )
 {
     /* Volume keys */
     p_intf->disable_volume_keys = var_InheritBool( _p_intf, "qt-disable-volume-keys" );
 }
 
-
-bool MainInterfaceWin32::nativeEvent(const QByteArray &eventType, void *message, long *result)
+void MainInterfaceWin32::reloadPrefs()
 {
-    MSG* msg = static_cast<MSG*>( message );
-
-    short cmd;
-    switch( msg->message )
-    {
-        case WM_APPCOMMAND:
-            cmd = GET_APPCOMMAND_LPARAM(msg->lParam);
-
-            if( p_intf->disable_volume_keys &&
-                    (   cmd == APPCOMMAND_VOLUME_DOWN   ||
-                        cmd == APPCOMMAND_VOLUME_UP     ||
-                        cmd == APPCOMMAND_VOLUME_MUTE ) )
-            {
-                break;
-            }
-
-            *result = TRUE;
-
-            switch(cmd)
-            {
-                case APPCOMMAND_MEDIA_PLAY_PAUSE:
-                    THEMPL->togglePlayPause();
-                    break;
-                case APPCOMMAND_MEDIA_PLAY:
-                    THEMPL->play();
-                    break;
-                case APPCOMMAND_MEDIA_PAUSE:
-                    THEMPL->pause();
-                    break;
-                case APPCOMMAND_MEDIA_CHANNEL_DOWN:
-                case APPCOMMAND_MEDIA_PREVIOUSTRACK:
-                    THEMPL->prev();
-                    break;
-                case APPCOMMAND_MEDIA_CHANNEL_UP:
-                case APPCOMMAND_MEDIA_NEXTTRACK:
-                    THEMPL->next();
-                    break;
-                case APPCOMMAND_MEDIA_STOP:
-                    THEMPL->stop();
-                    break;
-                case APPCOMMAND_MEDIA_RECORD:
-                    THEMIM->toggleRecord();
-                    break;
-                case APPCOMMAND_VOLUME_DOWN:
-                    THEMIM->setVolumeDown();
-                    break;
-                case APPCOMMAND_VOLUME_UP:
-                    THEMIM->setVolumeUp();
-                    break;
-                case APPCOMMAND_VOLUME_MUTE:
-                    THEMIM->toggleMuted();
-                    break;
-                case APPCOMMAND_MEDIA_FAST_FORWARD:
-                    THEMIM->faster();
-                    break;
-                case APPCOMMAND_MEDIA_REWIND:
-                    THEMIM->slower();
-                    break;
-                case APPCOMMAND_HELP:
-                    THEDP->mediaInfoDialog();
-                    break;
-                case APPCOMMAND_OPEN:
-                    THEDP->simpleOpenDialog();
-                    break;
-                default:
-                     msg_Dbg( p_intf, "unknown APPCOMMAND = %d", cmd);
-                     *result = FALSE;
-                     break;
-            }
-            if (*result) return true;
-            break;
-    }
-    return false;
+    p_intf->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
+    MainInterface::reloadPrefs();
 }
+
+// InterfaceWindowHandlerWin32
 
 InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent)
     : InterfaceWindowHandler(_p_intf, mainInterface, window, parent)
@@ -568,14 +499,13 @@ InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, Mai
 #endif
 
 {
+    QApplication::instance()->installNativeEventFilter(this);
 }
 
-void MainInterfaceWin32::reloadPrefs()
+InterfaceWindowHandlerWin32::~InterfaceWindowHandlerWin32()
 {
-    p_intf->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
-    MainInterface::reloadPrefs();
+    QApplication::instance()->removeNativeEventFilter(this);
 }
-
 
 void InterfaceWindowHandlerWin32::toggleWindowVisiblity()
 {
@@ -663,6 +593,85 @@ bool InterfaceWindowHandlerWin32::eventFilter(QObject* obj, QEvent* ev)
 
     return ret;
 }
+
+bool InterfaceWindowHandlerWin32::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+{
+    MSG* msg = static_cast<MSG*>( message );
+
+    short cmd;
+    switch( msg->message )
+    {
+        case WM_APPCOMMAND:
+            cmd = GET_APPCOMMAND_LPARAM(msg->lParam);
+
+            if( p_intf->disable_volume_keys &&
+                    (   cmd == APPCOMMAND_VOLUME_DOWN   ||
+                        cmd == APPCOMMAND_VOLUME_UP     ||
+                        cmd == APPCOMMAND_VOLUME_MUTE ) )
+            {
+                break;
+            }
+
+            *result = TRUE;
+
+            switch(cmd)
+            {
+                case APPCOMMAND_MEDIA_PLAY_PAUSE:
+                    THEMPL->togglePlayPause();
+                    break;
+                case APPCOMMAND_MEDIA_PLAY:
+                    THEMPL->play();
+                    break;
+                case APPCOMMAND_MEDIA_PAUSE:
+                    THEMPL->pause();
+                    break;
+                case APPCOMMAND_MEDIA_CHANNEL_DOWN:
+                case APPCOMMAND_MEDIA_PREVIOUSTRACK:
+                    THEMPL->prev();
+                    break;
+                case APPCOMMAND_MEDIA_CHANNEL_UP:
+                case APPCOMMAND_MEDIA_NEXTTRACK:
+                    THEMPL->next();
+                    break;
+                case APPCOMMAND_MEDIA_STOP:
+                    THEMPL->stop();
+                    break;
+                case APPCOMMAND_MEDIA_RECORD:
+                    THEMIM->toggleRecord();
+                    break;
+                case APPCOMMAND_VOLUME_DOWN:
+                    THEMIM->setVolumeDown();
+                    break;
+                case APPCOMMAND_VOLUME_UP:
+                    THEMIM->setVolumeUp();
+                    break;
+                case APPCOMMAND_VOLUME_MUTE:
+                    THEMIM->toggleMuted();
+                    break;
+                case APPCOMMAND_MEDIA_FAST_FORWARD:
+                    THEMIM->faster();
+                    break;
+                case APPCOMMAND_MEDIA_REWIND:
+                    THEMIM->slower();
+                    break;
+                case APPCOMMAND_HELP:
+                    THEDP->mediaInfoDialog();
+                    break;
+                case APPCOMMAND_OPEN:
+                    THEDP->simpleOpenDialog();
+                    break;
+                default:
+                     msg_Dbg( p_intf, "unknown APPCOMMAND = %d", cmd);
+                     *result = FALSE;
+                     break;
+            }
+            if (*result) return true;
+            break;
+    }
+    return false;
+}
+
+
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
 void InterfaceWindowHandlerWin32::updateCSDWindowSettings()

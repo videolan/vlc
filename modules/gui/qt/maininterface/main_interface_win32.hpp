@@ -59,25 +59,25 @@ class MainInterfaceWin32 : public MainInterface
 {
     Q_OBJECT
 public:
-    MainInterfaceWin32( qt_intf_t *, QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
+    explicit MainInterfaceWin32(qt_intf_t *);
     virtual ~MainInterfaceWin32() = default;
-
-private:
-    virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
 
 public slots:
     virtual void reloadPrefs() override;
 };
 
-class InterfaceWindowHandlerWin32 : public InterfaceWindowHandler
+class InterfaceWindowHandlerWin32 : public InterfaceWindowHandler, public QAbstractNativeEventFilter
 {
     Q_OBJECT
 public:
     explicit InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent = nullptr);
-    virtual ~InterfaceWindowHandlerWin32() = default;
+    virtual ~InterfaceWindowHandlerWin32();
     virtual void toggleWindowVisiblity() override;
 
     virtual bool eventFilter(QObject*, QEvent* event) override;
+
+protected:
+    bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
 
 private:
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
