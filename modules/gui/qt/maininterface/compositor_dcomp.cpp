@@ -288,28 +288,25 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
     try
     {
         bool ret;
-        m_rootWindow = new MainInterfaceWin32(m_intf);
-        m_rootWindow->setAttribute(Qt::WA_NativeWindow);
-        m_rootWindow->setAttribute(Qt::WA_DontCreateNativeAncestors);
-        m_rootWindow->setAttribute(Qt::WA_TranslucentBackground);
+        m_mainInterface = new MainInterfaceWin32(m_intf);
 
-        m_rootWindow->winId();
+        m_rootWindow = new QWindow();
         m_rootWindow->show();
 
-        WinTaskbarWidget* taskbarWidget = new WinTaskbarWidget(m_intf, m_rootWindow->windowHandle(), this);
-        qApp->installNativeEventFilter(taskbarWidget);
+        m_taskbarWidget = std::make_unique<WinTaskbarWidget>(m_intf, m_rootWindow);
+        qApp->installNativeEventFilter(m_taskbarWidget.get());
 
-        m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf, m_rootWindow);
-        m_videoWindowHandler->setWindow( m_rootWindow->windowHandle() );
+        m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf);
+        m_videoWindowHandler->setWindow( m_rootWindow );
 
-        HR(m_dcompDevice->CreateTargetForHwnd((HWND)m_rootWindow->windowHandle()->winId(), TRUE, &m_dcompTarget), "create target");
+        HR(m_dcompDevice->CreateTargetForHwnd((HWND)m_rootWindow->winId(), TRUE, &m_dcompTarget), "create target");
         HR(m_dcompDevice->CreateVisual(&m_rootVisual), "create root visual");
         HR(m_dcompTarget->SetRoot(m_rootVisual.Get()), "set root visual");
 
         HR(m_dcompDevice->CreateVisual(&m_uiVisual), "create ui visual");
 
         m_uiSurface  = std::make_unique<CompositorDCompositionUISurface>(m_intf,
-                                                                         m_rootWindow->windowHandle(),
+                                                                         m_rootWindow,
                                                                          m_uiVisual);
         ret = m_uiSurface->init();
         if (!ret)
@@ -320,23 +317,23 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
 
         //install the interface window handler after the creation of CompositorDCompositionUISurface
         //so the event filter is handled before the one of the UISurface (for wheel events)
-        m_interfaceWindowHandler = new InterfaceWindowHandlerWin32(m_intf, m_rootWindow, m_rootWindow->window()->windowHandle(), m_rootWindow);
+        m_interfaceWindowHandler = new InterfaceWindowHandlerWin32(m_intf, m_mainInterface, m_rootWindow, m_rootWindow);
 
         m_qmlVideoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
-        m_rootWindow->setVideoSurfaceProvider(m_qmlVideoSurfaceProvider.get());
-        m_rootWindow->setCanShowVideoPIP(true);
+        m_mainInterface->setVideoSurfaceProvider(m_qmlVideoSurfaceProvider.get());
+        m_mainInterface->setCanShowVideoPIP(true);
 
         connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::hasVideoEmbedChanged,
                 m_interfaceWindowHandler, &InterfaceWindowHandlerWin32::onVideoEmbedChanged);
         connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
                 this, &CompositorDirectComposition::onSurfacePositionChanged);
 
-        connect(m_rootWindow, &MainInterface::requestInterfaceMaximized,
-                m_rootWindow, &MainInterface::showMaximized);
-        connect(m_rootWindow, &MainInterface::requestInterfaceNormal,
-                m_rootWindow, &MainInterface::showNormal);
+        connect(m_mainInterface, &MainInterface::requestInterfaceMaximized,
+                m_rootWindow, &QWindow::showMaximized);
+        connect(m_mainInterface, &MainInterface::requestInterfaceNormal,
+                m_rootWindow, &QWindow::showNormal);
 
-        m_ui = std::make_unique<MainUI>(m_intf, m_rootWindow, m_rootWindow->windowHandle());
+        m_ui = std::make_unique<MainUI>(m_intf, m_mainInterface, m_rootWindow);
         ret = m_ui->setup(m_uiSurface->engine());
         if (! ret)
         {
@@ -346,7 +343,7 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         m_uiSurface->setContent(m_ui->getComponent(), m_ui->createRootItem());
         HR(m_rootVisual->AddVisual(m_uiVisual.Get(), FALSE, nullptr), "add ui visual to root");
         HR(m_dcompDevice->Commit(), "commit UI visual");
-        return m_rootWindow;
+        return m_mainInterface;
     }
     catch (const DXError& err)
     {
@@ -390,6 +387,12 @@ void CompositorDirectComposition::unloadGUI()
     }
     m_uiSurface.reset();
     m_ui.reset();
+    m_taskbarWidget.reset();
+    if (m_mainInterface)
+    {
+        delete m_mainInterface;
+        m_mainInterface = nullptr;
+    }
 }
 
 bool CompositorDirectComposition::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)

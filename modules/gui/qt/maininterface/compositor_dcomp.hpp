@@ -35,6 +35,7 @@
 #include <QOpenGLContext>
 
 class MainInterface;
+class WinTaskbarWidget;
 
 namespace vlc {
 
@@ -70,7 +71,9 @@ private:
 
     qt_intf_t *m_intf = nullptr;
 
-    MainInterface* m_rootWindow = nullptr;
+    MainInterface* m_mainInterface = nullptr;
+    QWindow* m_rootWindow = nullptr;
+    std::unique_ptr<WinTaskbarWidget> m_taskbarWidget;
 
     std::unique_ptr<CompositorDCompositionUISurface> m_uiSurface;
     vout_window_t *m_window = nullptr;
