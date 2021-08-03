@@ -76,14 +76,14 @@ private slots:
 private:
     qt_intf_t *m_intf = nullptr;
 
-    MainInterface* m_rootWindow = nullptr;
+    MainInterface* m_mainInterface = nullptr;
     QWidget* m_videoWidget = nullptr;
     QWidget* m_stable = nullptr;
     std::unique_ptr<QQuickView> m_qmlView;
     std::unique_ptr<VideoWindowHandler> m_videoWindowHandler;
     std::unique_ptr<VideoSurfaceProvider> m_videoSurfaceProvider;
-    WinTaskbarWidget* m_taskbarWidget = nullptr;
-    Win7NativeEventFilter* m_nativeEventFilter = nullptr;
+    std::unique_ptr<WinTaskbarWidget> m_taskbarWidget;
+    std::unique_ptr<Win7NativeEventFilter> m_nativeEventFilter;
 
     HWND m_qmlWindowHWND = nullptr;
     HWND m_videoWindowHWND = nullptr;

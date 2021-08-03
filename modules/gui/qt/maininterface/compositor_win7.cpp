@@ -88,12 +88,6 @@ CompositorWin7::CompositorWin7(qt_intf_t *p_intf, QObject* parent)
 
 CompositorWin7::~CompositorWin7()
 {
-    if (m_taskbarWidget)
-        qApp->removeNativeEventFilter(m_taskbarWidget);
-    if (m_nativeEventFilter)
-        qApp->removeNativeEventFilter(m_nativeEventFilter);
-    if (m_stable)
-        delete m_stable;
 }
 
 bool CompositorWin7::preInit(qt_intf_t *p_intf)
@@ -148,11 +142,8 @@ bool CompositorWin7::init()
 
 MainInterface* CompositorWin7::makeMainInterface()
 {
-    //Tool flag needs to be passed in the window constructor otherwise the
-    //window will still appears int the taskbar
-    MainInterfaceWin32* rootWindowW32 =  new MainInterfaceWin32(m_intf, nullptr, Qt::Tool | Qt::FramelessWindowHint );
-    m_rootWindow = rootWindowW32;
-    //m_rootWindow6>show() is not called on purpose
+    MainInterfaceWin32* mainInterfaceW32 =  new MainInterfaceWin32(m_intf);
+    m_mainInterface = mainInterfaceW32;
 
     /*
      * m_stable is not attached to the main interface because dialogs are attached to the mainInterface
@@ -162,17 +153,14 @@ MainInterface* CompositorWin7::makeMainInterface()
     m_stable = new QWidget(m_videoWidget);
     m_stable->setContextMenuPolicy( Qt::PreventContextMenu );
 
-    QPalette plt = m_rootWindow->palette();
+    QPalette plt = m_stable->palette();
     plt.setColor( QPalette::Window, Qt::black );
-    m_rootWindow->setPalette(plt);
-
     m_stable->setPalette( plt );
     m_stable->setAutoFillBackground(true);
     /* Force the widget to be native so that it gets a winId() */
     m_stable->setAttribute( Qt::WA_NativeWindow, true );
     m_stable->setAttribute( Qt::WA_PaintOnScreen, true );
     m_stable->setMouseTracking( true );
-    //m_stable->setWindowFlags( Qt::Tool | Qt::FramelessWindowHint | Qt::WindowDoesNotAcceptFocus );
     m_stable->setAttribute( Qt::WA_ShowWithoutActivating );
     m_stable->setVisible(true);
 
@@ -184,8 +172,8 @@ MainInterface* CompositorWin7::makeMainInterface()
     DwmSetWindowAttribute(m_videoWindowHWND, DWMWA_DISALLOW_PEEK, &excluseFromPeek, sizeof(excluseFromPeek));
 
     m_videoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
-    m_rootWindow->setVideoSurfaceProvider(m_videoSurfaceProvider.get());
-    m_rootWindow->setCanShowVideoPIP(true);
+    m_mainInterface->setVideoSurfaceProvider(m_videoSurfaceProvider.get());
+    m_mainInterface->setCanShowVideoPIP(true);
 
     connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
             this, &CompositorWin7::onSurfacePositionChanged);
@@ -196,52 +184,46 @@ MainInterface* CompositorWin7::makeMainInterface()
     m_qmlView->setResizeMode(QQuickView::SizeRootObjectToView);
     m_qmlView->setClearBeforeRendering(true);
     m_qmlView->setColor(QColor(Qt::transparent));
-    m_qmlView->setGeometry(m_rootWindow->geometry());
-    m_qmlView->setMinimumSize( m_rootWindow->minimumSize() );
 
     m_qmlView->installEventFilter(this);
-    Win7NativeEventFilter* m_nativeEventFilter = new Win7NativeEventFilter(this);
-    qApp->installNativeEventFilter(m_nativeEventFilter);
-    connect(m_nativeEventFilter, &Win7NativeEventFilter::windowStyleChanged,
+    m_nativeEventFilter = std::make_unique<Win7NativeEventFilter>(this);
+    qApp->installNativeEventFilter(m_nativeEventFilter.get());
+    connect(m_nativeEventFilter.get(), &Win7NativeEventFilter::windowStyleChanged,
             this, &CompositorWin7::resetVideoZOrder);
 
     m_qmlView->show();
 
     m_qmlWindowHWND = (HWND)m_qmlView->winId();
 
-    m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf, m_rootWindow);
+    m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf, m_mainInterface);
     m_videoWindowHandler->setWindow( m_qmlView.get() );
 
-    new InterfaceWindowHandlerWin32(m_intf, m_rootWindow, m_qmlView.get(), m_qmlView.get());
+    new InterfaceWindowHandlerWin32(m_intf, m_mainInterface, m_qmlView.get(), m_qmlView.get());
 
-    m_taskbarWidget = new WinTaskbarWidget(m_intf, m_qmlView.get(), this);
-    qApp->installNativeEventFilter(m_taskbarWidget);
+    m_taskbarWidget = std::make_unique<WinTaskbarWidget>(m_intf, m_qmlView.get());
+    qApp->installNativeEventFilter(m_taskbarWidget.get());
 
-    MainUI* m_ui = new MainUI(m_intf, m_rootWindow, m_qmlView.get(), this);
+    MainUI* m_ui = new MainUI(m_intf, m_mainInterface, m_qmlView.get(), this);
     m_ui->setup(m_qmlView->engine());
 
 
     m_qmlView->setContent(QUrl(), m_ui->getComponent(), m_ui->createRootItem());
 
-    connect(m_rootWindow, &MainInterface::windowTitleChanged,
-            m_qmlView.get(), &QQuickView::setTitle);
-    connect(m_rootWindow, &MainInterface::windowIconChanged,
-            m_qmlView.get(), &QQuickView::setIcon);
-    connect(m_rootWindow, &MainInterface::requestInterfaceMaximized,
+    connect(m_mainInterface, &MainInterface::requestInterfaceMaximized,
             m_qmlView.get(), &QWindow::showMaximized);
-    connect(m_rootWindow, &MainInterface::requestInterfaceNormal,
+    connect(m_mainInterface, &MainInterface::requestInterfaceNormal,
             m_qmlView.get(), &QWindow::showNormal);
 
-    return m_rootWindow;
+    return m_mainInterface;
 }
 
 void CompositorWin7::destroyMainInterface()
 {
     unloadGUI();
-    if (m_rootWindow)
+    if (m_videoWidget)
     {
-        delete m_rootWindow;
-        m_rootWindow = nullptr;
+        delete m_videoWidget;
+        m_videoWidget = nullptr;
     }
 }
 
@@ -250,6 +232,12 @@ void CompositorWin7::unloadGUI()
     m_videoSurfaceProvider.reset();
     m_videoWindowHandler.reset();
     m_qmlView.reset();
+    m_taskbarWidget.reset();
+    if (m_mainInterface)
+    {
+        delete m_mainInterface;
+        m_mainInterface = nullptr;
+    }
 }
 
 bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)
@@ -273,6 +261,7 @@ bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroy
         nullptr, //window_set_title
     };
 
+    m_destroyCb = destroyCb;
     p_wnd->sys = this;
     p_wnd->type = VOUT_WINDOW_TYPE_HWND;
     p_wnd->handle.hwnd = (HWND)m_stable->winId();
@@ -292,9 +281,6 @@ bool CompositorWin7::eventFilter(QObject*, QEvent* ev)
 {
     switch (ev->type())
     {
-    case QEvent::Close:
-        m_rootWindow->close();
-        break;
     case QEvent::Move:
     case QEvent::Resize:
     case QEvent::ApplicationStateChange:
