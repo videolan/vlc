@@ -26,17 +26,3 @@ Copyright-paperwork-exempt: Yes
          func_quote_for_eval "$arg"
  	arg=$func_quote_for_eval_result
          func_append compile_command " $arg"
---- libtool-2.4.6/build-aux/ltmain.sh.orig	2019-03-06 17:25:38.610781500 +0100
-+++ libtool-2.4.6/build-aux/ltmain.sh	2019-03-06 17:26:53.790387700 +0100
-@@ -7273,9 +7273,10 @@
-       # --sysroot=*          for sysroot support
-       # -O*, -g*, -flto*, -fwhopr*, -fuse-linker-plugin GCC link-time optimization
-       # -stdlib=*            select c++ std lib with clang
-+      # -fsanitize=*         Clang/GCC memory and address sanitizer
-       -64|-mips[0-9]|-r[0-9][0-9]*|-xarch=*|-xtarget=*|+DA*|+DD*|-q*|-m*| \
-       -t[45]*|-txscale*|-p|-pg|--coverage|-fprofile-*|-F*|@*|-tp=*|--sysroot=*| \
--      -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*)
-+      -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*|-fsanitize=*)
-         func_quote_for_eval "$arg"
- 	arg=$func_quote_for_eval_result
-         func_append compile_command " $arg"
