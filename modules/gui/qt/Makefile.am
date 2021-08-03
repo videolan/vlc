@@ -17,6 +17,7 @@ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt/ \
 	-I$(builddir)/gui/qt/dialogs/extended \
 	-I$(builddir)/gui/qt/dialogs/fingerprint \
+	-I$(builddir)/gui/qt/dialogs/firstrun \
 	-I$(builddir)/gui/qt/dialogs/help \
 	-I$(builddir)/gui/qt/dialogs/messages \
 	-I$(builddir)/gui/qt/dialogs/open \
@@ -82,6 +83,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.cpp \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.hpp \
 	gui/qt/dialogs/firstrun/firstrun.cpp gui/qt/dialogs/firstrun/firstrun.hpp \
+	gui/qt/dialogs/firstrun/firstrunwizard.cpp gui/qt/dialogs/firstrun/firstrunwizard.hpp \
 	gui/qt/dialogs/gototime/gototime.cpp gui/qt/dialogs/gototime/gototime.hpp \
 	gui/qt/dialogs/help/aboutmodel.cpp \
 	gui/qt/dialogs/help/aboutmodel.hpp \
@@ -313,6 +315,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/fingerprint/chromaprint.moc.cpp \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.moc.cpp \
 	gui/qt/dialogs/firstrun/firstrun.moc.cpp \
+	gui/qt/dialogs/firstrun/firstrunwizard.moc.cpp \
 	gui/qt/dialogs/gototime/gototime.moc.cpp \
 	gui/qt/dialogs/help/aboutmodel.moc.cpp \
 	gui/qt/dialogs/help/help.moc.cpp \
@@ -422,6 +425,7 @@ nodist_libqt_plugin_la_SOURCES += \
 	gui/qt/dialogs/extended/ui_equalizer.h \
 	gui/qt/dialogs/extended/ui_video_effects.h \
 	gui/qt/dialogs/fingerprint/ui_fingerprintdialog.h \
+	gui/qt/dialogs/firstrun/ui_firstrunwizard.h \
 	gui/qt/dialogs/help/ui_about.h \
 	gui/qt/dialogs/help/ui_update.h \
 	gui/qt/dialogs/messages/ui_messages_panel.h \
@@ -462,6 +466,7 @@ libqt_plugin_la_UI = \
 	gui/qt/dialogs/extended/equalizer.ui \
 	gui/qt/dialogs/extended/video_effects.ui \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.ui \
+	gui/qt/dialogs/firstrun/firstrunwizard.ui \
 	gui/qt/dialogs/help/about.ui \
 	gui/qt/dialogs/help/update.ui \
 	gui/qt/dialogs/messages/messages_panel.ui \
