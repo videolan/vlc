@@ -90,15 +90,9 @@ public:
     }
 
 private:
-    struct Item
-    {
-        QString text;
-        ColorScheme scheme;
-    };
-
     ColorSchemeModel *m_colorSchemeModel;
     QSettings m_settings;
-    const QVector<Item> m_items;
+    const QVector<ColorSchemeModel::Item> m_items;
 };
 
 #endif
@@ -127,13 +121,7 @@ public:
     }
 
 private:
-    struct Item
-    {
-        QString text;
-        ColorScheme scheme;
-    };
-
-    const QVector<Item> m_items;
+    const QVector<ColorSchemeModel::Item> m_items;
 };
 
 std::unique_ptr<ColorSchemeModel::SchemeList> ColorSchemeModel::createList(ColorSchemeModel *parent)
@@ -217,6 +205,18 @@ void ColorSchemeModel::setCurrentIndex(const int newIndex)
 QString ColorSchemeModel::currentText() const
 {
     return m_list->text(m_currentIndex);
+}
+
+QVector<ColorSchemeModel::Item> ColorSchemeModel::getSchemes() const
+{
+    QVector<ColorSchemeModel::Item> vec;
+    vec.reserve( m_list->size() );
+
+    for(int i = 0; i < m_list->size(); ++i)
+    {
+        vec.push_back( { m_list->text(i), m_list->scheme(i) } );
+    }
+    return vec;
 }
 
 void ColorSchemeModel::setCurrentScheme(const ColorScheme scheme)

@@ -39,6 +39,12 @@ public:
         Auto
     };
 
+    struct Item
+    {
+        QString text;
+        ColorScheme scheme;
+    };
+
     Q_ENUM(ColorScheme);
 
     explicit ColorSchemeModel(QObject* parent = nullptr);
@@ -52,6 +58,7 @@ public:
     void setCurrentIndex(int newIndex);
 
     QString currentText() const;
+    QVector<Item> getSchemes() const;
 
     void setCurrentScheme(ColorScheme scheme);
     ColorScheme currentScheme() const;
