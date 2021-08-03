@@ -14,6 +14,8 @@ settings:
       STRIP_BITCODE_FROM_COPIED_FILES: YES
     Debug-bitcode:
       STRIP_BITCODE_FROM_COPIED_FILES: NO
+    Release:
+      STRIP_BITCODE_FROM_COPIED_FILES: NO
 targets:
   VLCAutomake:
     type: ""
