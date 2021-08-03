@@ -229,33 +229,33 @@
 
 - (void)displayLinkUpdate:(CADisplayLink *)sender
 {
-    vlc_mutex_lock(&_mutex);
-    if (_wnd == NULL)
-    {
-        vlc_mutex_unlock(&_mutex);
-        return;
-    }
-    vlc_tick_t now = vlc_tick_now();
-    CFTimeInterval current_ts = [sender timestamp];
-    CFTimeInterval target_ts = [sender targetTimestamp];
+    [self reportEvent:^{
+        vlc_mutex_lock(&_mutex);
+        if (_wnd == NULL || !_enabled)
+        {
+            vlc_mutex_unlock(&_mutex);
+            return;
+        }
+        vlc_tick_t now = vlc_tick_now();
+        CFTimeInterval current_ts = [sender timestamp];
+        CFTimeInterval target_ts = [sender targetTimestamp];
 
-    // TODO: clock timeline?
-    vlc_tick_t offset =  vlc_tick_from_sec(target_ts - current_ts);
+        // TODO: clock timeline?
+        vlc_tick_t offset =  vlc_tick_from_sec(target_ts - current_ts);
 
-    if (@available(iOS 10, *))
-        target_ts = [sender targetTimestamp];
-    if (atomic_load(&_avstatEnabled))
-        msg_Info(_wnd, "avstats: [RENDER][CADISPLAYLINK] ts=%" PRId64 " "
-                 "prev_ts=%" PRId64 " target_ts=%" PRId64,
-                 NS_FROM_VLC_TICK(now),
-                 NS_FROM_VLC_TICK(vlc_tick_from_sec(current_ts)),
-                 NS_FROM_VLC_TICK(vlc_tick_from_sec(target_ts)));
+        if (@available(iOS 10, *))
+            target_ts = [sender targetTimestamp];
+        if (atomic_load(&_avstatEnabled))
+            msg_Info(_wnd, "avstats: [RENDER][CADISPLAYLINK] ts=%" PRId64 " "
+                     "prev_ts=%" PRId64 " target_ts=%" PRId64,
+                     NS_FROM_VLC_TICK(now),
+                     NS_FROM_VLC_TICK(vlc_tick_from_sec(current_ts)),
+                     NS_FROM_VLC_TICK(vlc_tick_from_sec(target_ts)));
 
-    [self reportEvent:^{ 
         vout_window_ReportVsyncReached(_wnd, now + offset);
+        vlc_mutex_unlock(&_mutex);
     }];
 
-    vlc_mutex_unlock(&_mutex);
 }
 
 - (void)reportEventAsync:(void(^)())eventBlock
