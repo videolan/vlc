@@ -1,0 +1,66 @@
+From 7151ed6928f66d8ecd5a57d9db2b08f4fcc8f647 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Mon, 2 Aug 2021 17:42:38 +0200
+Subject: [PATCH] Force -lpthread when -nostdlib is provided to the C++ Gnu
+ linker
+
+-nostdlib will be provided, which makes -pthread not imply -lpthread by
+design
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=25460
+---
+ build-aux/ltmain.in | 8 ++++++++
+ m4/libtool.m4       | 5 +++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+index 96b37003..9f3a3d6f 100644
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -5183,6 +5183,14 @@ func_mode_link ()
+ 	    *" $arg "*) ;;
+ 	    * ) func_append new_inherited_linker_flags " $arg" ;;
+ 	esac
++    case $arg in
++      -pthread|-pthreads)
++        if test -n "$hardcode_lpthread" &&
++          test yes = "$hardcode_lpthread"; then
++          func_append new_inherited_linker_flags " -lpthread"
++        fi
++      ;;
++    esac
+ 	continue
+ 	;;
+ 
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+index f2d1f398..221ee689 100644
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
+@@ -6207,6 +6207,8 @@ _LT_TAGDECL([], [postlink_cmds], [2],
+     [Commands necessary for finishing linking programs])
+ _LT_TAGDECL([], [file_list_spec], [1],
+     [Specify filename containing input files])
++_LT_TAGDECL([], [hardcode_lpthread], [0],
++    [Force -lpthread even when -ptherad is specified])
+ dnl FIXME: Not yet implemented
+ dnl _LT_TAGDECL([], [thread_safe_flag_spec], [1],
+ dnl    [Compiler flag to generate thread safe objects])
+@@ -6343,6 +6345,7 @@ _LT_TAGVAR(reload_cmds, $1)=$reload_cmds
+ _LT_TAGVAR(no_undefined_flag, $1)=
+ _LT_TAGVAR(whole_archive_flag_spec, $1)=
+ _LT_TAGVAR(enable_shared_with_static_runtimes, $1)=no
++_LT_TAGVAR(hardcode_lpthread, $1)=no
+ 
+ # Source file extension for C++ test sources.
+ ac_ext=cpp
+@@ -6417,6 +6420,8 @@ if test yes != "$_lt_caught_CXX_error"; then
+         _LT_TAGVAR(hardcode_libdir_flag_spec, $1)='$wl-rpath $wl$libdir'
+         _LT_TAGVAR(export_dynamic_flag_spec, $1)='$wl--export-dynamic'
+ 
++        _LT_TAGVAR(hardcode_lpthread, $1)='yes'
++
+         # If archive_cmds runs LD, not CC, wlarc should be empty
+         # XXX I think wlarc can be eliminated in ltcf-cxx, but I need to
+         #     investigate it a little bit more. (MM)
+-- 
+2.30.2
+
