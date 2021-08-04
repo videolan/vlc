@@ -201,6 +201,10 @@ AM_CPPFLAGS += -DHAVE_DBUS
 AM_CFLAGS += $(DBUS_CFLAGS)
 endif
 
+libvlc_darwin_la_SOURCES = darwin/runloop.c darwin/runloop.h
+libvlc_darwin_la_CFLAGS =
+libvlc_darwin_la_CPPFLAGS =
+
 libvlccore_la_SOURCES = \
 	libvlc.c \
 	libvlc.h \
