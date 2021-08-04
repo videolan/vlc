@@ -82,9 +82,16 @@ SegmentChunk* ISegment::toChunk(SharedResources *res, AbstractConnectionManager 
     BytesRange range;
     if(startByte != endByte)
         range = BytesRange(startByte, endByte);
+    ChunkType chunkType;
+    if(dynamic_cast<InitSegment *>(this))
+        chunkType = ChunkType::Init;
+    else if(dynamic_cast<IndexSegment *>(this))
+        chunkType = ChunkType::Index;
+    else
+        chunkType = ChunkType::Segment;
     AbstractChunkSource *source = connManager->makeSource(url,
                                                           rep->getAdaptationSet()->getID(),
-                                                          ChunkType::Segment,
+                                                          chunkType,
                                                           range);
     if(source)
     {
