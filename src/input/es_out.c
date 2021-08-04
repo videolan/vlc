@@ -3040,10 +3040,15 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 
     if( type != NULL && atomic_load(&p_sys->b_display_avstat) )
     {
-        msg_Info( p_input, "avstats: [DMX][OUT][%s] ts=%" PRId64 " dts=%" PRId64 " pts=%" PRId64,
+        vlc_tick_t system_pts = VLC_TICK_INVALID;
+        if (es->p_clock )
+            system_pts = vlc_clock_ConvertToSystem(
+                es->p_clock, vlc_tick_now(), p_block->i_pts, p_sys->rate);
+        msg_Info( p_input, "avstats: [DMX][OUT][%s] ts=%" PRId64 " dts=%" PRId64 " pts=%" PRId64 " system_pts=%" PRId64,
                   type, NS_FROM_VLC_TICK(vlc_tick_now()),
                   NS_FROM_VLC_TICK(p_block->i_dts),
-                  NS_FROM_VLC_TICK(p_block->i_pts) );
+                  NS_FROM_VLC_TICK(p_block->i_pts),
+                  NS_FROM_VLC_TICK(system_pts));
     }
 
     struct input_stats *stats = input_priv(p_input)->stats;
