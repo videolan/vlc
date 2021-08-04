@@ -812,7 +812,7 @@ void PlaylistManager::updateControlsPosition()
         if(playlist->duration.Get() > cached.playlistLength)
             cached.playlistLength = playlist->duration.Get();
 
-        if(cached.playlistLength && currentTimes.segment.media)
+        if(cached.playlistLength && currentTimes.segment.media != VLC_TICK_INVALID)
         {
             cached.i_time = currentTimes.segment.media;
             cached.f_position = (double) (cached.i_time - VLC_TICK_0 - cached.playlistStart) / cached.playlistLength;
