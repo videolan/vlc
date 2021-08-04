@@ -91,6 +91,7 @@ libuiview_window_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
 libuiview_window_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 
 libcaeagl_ios_plugin_la_SOURCES = video_output/apple/VLCOpenGLES2VideoView.m
+libcaeagl_ios_plugin_la_LIBADD = ../src/libvlc_darwin.la
 libcaeagl_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
 	-Wl,-framework,Foundation,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit
 libcaeagl_ios_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
