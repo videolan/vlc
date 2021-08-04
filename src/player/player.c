@@ -39,8 +39,7 @@
 
 #ifdef __APPLE__
 #include <dispatch/dispatch.h>
-#include <CoreFoundation/CFRunLoop.h>
-static const CFStringRef runloop_mode = CFSTR("org.videolan.vlccore.window");
+#include "darwin/runloop.h"
 #endif
 
 static_assert(VLC_PLAYER_CAP_SEEK == VLC_INPUT_CAPABILITIES_SEEKABLE &&
@@ -265,10 +264,9 @@ vlc_player_destructor_Thread(void *data)
      * end of the input. On Darwin, we'll be waiting for CFRunLoopStop. */
 #ifdef  __APPLE__
     CFRunLoopRef runloop = CFRunLoopGetMain();
-    CFRunLoopPerformBlock(runloop, runloop_mode, ^{
+    vlc_darwin_runloop_PerformBlock(runloop, ^{
         CFRunLoopStop(runloop);
     });
-    CFRunLoopWakeUp(runloop);
 #endif
     vlc_mutex_unlock(&player->lock);
     return NULL;
@@ -1899,31 +1897,6 @@ vlc_player_InitLocks(vlc_player_t *player, enum vlc_player_lock_type lock_type)
     vlc_cond_init(&player->destructor.wait);
 }
 
-#ifdef  __APPLE__
-static void
-vlc_player_RunLoopUntilStopped()
-{
-    for (;;)
-    {
-        /* We need a timeout here, otherwise the CFRunLoopInMode
-         * call will check the events (if woken up), and since
-         * we might have no event, it would return a timeout
-         * result code, and loop again, creating a busy loop.
-         * INFINITY is more than enough, and we'll interrupt
-         * anyway. */
-        CFRunLoopRunResult ret = CFRunLoopRunInMode(runloop_mode, INFINITY, true);
-
-        /* Usual CFRunLoop are typically checking result code
-         * like kCFRunLoopRunFinished too, but we really want
-         * to receive the Stop signal from above to leave the
-         * loop in the correct state. */
-        if (ret == kCFRunLoopRunStopped)
-            break;
-    }
-
-}
-#endif
-
 void
 vlc_player_Delete(vlc_player_t *player)
 {
@@ -1936,6 +1909,7 @@ vlc_player_Delete(vlc_player_t *player)
     }
 
     player->deleting = true;
+    vlc_cond_signal(&player->destructor.wait);
 
     assert(vlc_list_is_empty(&player->listeners));
     assert(vlc_list_is_empty(&player->metadata_listeners));
@@ -1949,24 +1923,19 @@ vlc_player_Delete(vlc_player_t *player)
     CFRunLoopRef runloop = CFRunLoopGetMain();
     if (CFRunLoopGetCurrent() == runloop)
     {
-        CFRunLoopPerformBlock(runloop, runloop_mode, ^{
+        vlc_darwin_runloop_PerformBlock(runloop, ^{
             vlc_mutex_unlock(&player->lock);
         });
-        CFRunLoopWakeUp(runloop);
-        vlc_cond_signal(&player->destructor.wait);
-        vlc_player_RunLoopUntilStopped();
+        vlc_darwin_runloop_RunUntilStopped(runloop);
     }
     else
     {
         dispatch_async(dispatch_get_main_queue(), ^{
-            vlc_cond_signal(&player->destructor.wait);
-            vlc_player_RunLoopUntilStopped();
+            vlc_darwin_runloop_RunUntilStopped(runloop);
         });
         vlc_mutex_unlock(&player->lock);
-        dispatch_sync(dispatch_get_main_queue(), ^{});
     }
 #else
-    vlc_cond_signal(&player->destructor.wait);
     vlc_mutex_unlock(&player->lock);
 #endif
 
