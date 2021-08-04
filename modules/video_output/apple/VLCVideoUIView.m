@@ -69,6 +69,7 @@
 #import <vlc_window.h>
 
 #import <assert.h>
+#import "../../../src/darwin/runloop.h"
 
 @interface VLCVideoUIView : UIView {
     /* VLC window object, set to NULL under _mutex lock when closing. */
@@ -265,48 +266,19 @@
 
 - (void)reportEvent:(void(^)())eventBlock
 {
-    CFStringRef mode = CFSTR("org.videolan.vlccore.window");
     CFRunLoopRef runloop = CFRunLoopGetCurrent();
 
-    /* Callback hell right below, we need to execute the call
-     * to CFRunLoopStop inside the CFRunLoopRunInMode context
-     * since the CFRunLoopRunInMode might have already returned
-     * otherwise, which means more callback wrapping. */
-    CFRunLoopPerformBlock(runloop, mode, ^{
+    vlc_darwin_runloop_PerformBlock(runloop, ^{
         /* Execute the event in a different thread, we don't
          * want to block the main CFRunLoop since the vout
          * display module typically needs it to Open(). */
         dispatch_async(_eventq, ^{
             (eventBlock)();
-            CFRunLoopPerformBlock(runloop, mode, ^{
-                /* Signal that we can end the ReportEvent call */
-                CFRunLoopStop(runloop);
-            });
-            CFRunLoopWakeUp(runloop);
+            vlc_darwin_runloop_Stop(runloop);
         });
     });
-    /* Above and here, the CFRunLoopWakeUp call is necessary to
-     * signal to the event loop that it will need to process the
-     * blocks. They don't act like CFRunLoopSource so they won't
-     * wake up the loop otherwise. */
-    CFRunLoopWakeUp(runloop);
-    for (;;)
-    {
-        /* We need a timeout here, otherwise the CFRunLoopInMode
-         * call will check the events (if woken up), and since
-         * we might have no event, it would return a timeout
-         * result code, and loop again, creating a busy loop.
-         * INFINITY is more than enough, and we'll interrupt
-         * anyway. */
-        CFRunLoopRunResult ret = CFRunLoopRunInMode(mode, INFINITY, YES);
 
-        /* Usual CFRunLoop are typically checking result code
-         * like kCFRunLoopRunFinished too, but we really want
-         * to receive the Stop signal from above to leave the
-         * loop in the correct state. */
-        if (ret == kCFRunLoopRunStopped)
-            break;
-    }
+    vlc_darwin_runloop_RunUntilStopped(runloop);
 }
 
 - (void)detachFromParent
