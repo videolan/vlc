@@ -662,7 +662,14 @@ bool CompositorDCompositionUISurface::eventFilter(QObject* object, QEvent* event
     case QEvent::DragLeave:
     case QEvent::DragResponse:
     case QEvent::Drop:
+
+    case QEvent::TouchBegin:
+    case QEvent::TouchEnd:
+    case QEvent::TouchCancel:
+    case QEvent::TouchUpdate:
+
         return QCoreApplication::sendEvent(m_uiWindow, event) || event->isAccepted();
+
 
     case QEvent::KeyPress:
     case QEvent::KeyRelease:
