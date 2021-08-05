@@ -92,6 +92,12 @@ DialogsProvider::~DialogsProvider()
     PluginDialog::killInstance();
     EpgDialog::killInstance();
     PlaylistsDialog::killInstance();
+    ExtendedDialog::killInstance();
+    GotoTimeDialog::killInstance();
+    AboutDialog::killInstance();
+    PodcastConfigDialog::killInstance();
+    OpenDialog::killInstance();
+    ErrorsDialog::killInstance();
 
     delete popupMenu;
     delete videoPopupMenu;
