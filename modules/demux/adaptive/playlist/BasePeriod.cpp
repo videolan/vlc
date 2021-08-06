@@ -63,16 +63,8 @@ const std::vector<BaseAdaptationSet*>&  BasePeriod::getAdaptationSets() const
 
 void BasePeriod::addAdaptationSet(BaseAdaptationSet *adaptationSet)
 {
-    if ( adaptationSet != nullptr )
-    {
-        if(adaptationSet->getRepresentations().empty())
-        {
-            assert(!adaptationSet->getRepresentations().empty());
-            return; /* will leak */
-        }
-        adaptationSets.push_back(adaptationSet);
-        childs.push_back(adaptationSet);
-    }
+    adaptationSets.push_back(adaptationSet);
+    childs.push_back(adaptationSet);
 }
 
 BaseAdaptationSet *BasePeriod::getAdaptationSetByID(const adaptive::ID &id) const
