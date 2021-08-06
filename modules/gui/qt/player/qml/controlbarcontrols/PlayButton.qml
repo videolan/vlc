@@ -32,7 +32,8 @@ ToolButton {
     width: VLCStyle.icon_medium
     height: width
 
-    scale: (playBtnMouseArea.pressed) ? 0.95 : 1.0
+    scale: (_keyOkPressed || (playBtnMouseArea.pressed && isCursorInside)) ? 0.95
+                                                                           : 1.0
 
     property VLCColors colors: VLCStyle.colors
 
@@ -44,9 +45,12 @@ ToolButton {
 
     property bool isCursorInside: false
 
+    property bool _keyOkPressed: false
+
     Keys.onPressed: {
         if (KeyHelper.matchOk(event) ) {
             if (!event.isAutoRepeat) {
+                _keyOkPressed = true
                 keyHoldTimer.restart()
             }
             event.accepted = true
@@ -57,6 +61,7 @@ ToolButton {
     Keys.onReleased: {
         if (KeyHelper.matchOk(event)) {
             if (!event.isAutoRepeat) {
+                _keyOkPressed = false
                 keyHoldTimer.stop()
                 if (player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
                     mainPlaylistController.togglePlayPause()
@@ -66,6 +71,7 @@ ToolButton {
     }
 
     function _pressAndHoldAction() {
+        _keyOkPressed = false
         mainPlaylistController.stop()
     }
 
