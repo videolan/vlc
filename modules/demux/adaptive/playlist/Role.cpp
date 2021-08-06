@@ -26,7 +26,7 @@
 using namespace adaptive;
 using namespace adaptive::playlist;
 
-Role::Role(unsigned r)
+Role::Role(Value r)
 {
     value = r;
 }
@@ -38,13 +38,13 @@ bool Role::operator ==(const Role &other) const
 
 bool Role::isDefault() const
 {
-    return value == ROLE_MAIN;
+    return value == Value::Main;
 }
 
 bool Role::autoSelectable() const
 {
-    return value == ROLE_MAIN ||
-           value == ROLE_ALTERNATE ||
-           value == ROLE_SUBTITLE ||
-           value == ROLE_CAPTION;
+    return value == Value::Main ||
+           value == Value::Alternate ||
+           value == Value::Subtitle ||
+           value == Value::Caption;
 }
