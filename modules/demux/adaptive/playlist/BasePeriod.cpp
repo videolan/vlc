@@ -33,6 +33,7 @@
 
 #include <vlc_common.h>
 #include <vlc_arrays.h>
+#include <algorithm>
 #include <cassert>
 
 using namespace adaptive::playlist;
@@ -63,7 +64,10 @@ const std::vector<BaseAdaptationSet*>&  BasePeriod::getAdaptationSets() const
 
 void BasePeriod::addAdaptationSet(BaseAdaptationSet *adaptationSet)
 {
-    adaptationSets.push_back(adaptationSet);
+    auto p = std::find_if(adaptationSets.begin(), adaptationSets.end(),
+        [adaptationSet](BaseAdaptationSet *s){
+            return adaptationSet->getRole() < s->getRole(); });
+    adaptationSets.insert(p, adaptationSet);
     childs.push_back(adaptationSet);
 }
 
