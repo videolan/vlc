@@ -27,20 +27,23 @@ namespace adaptive
         class Role
         {
             public:
-                static const unsigned ROLE_MAIN           = 0;
-                static const unsigned ROLE_ALTERNATE      = 1;
-                static const unsigned ROLE_SUPPLEMENTARY  = 2;
-                static const unsigned ROLE_COMMENTARY     = 3;
-                static const unsigned ROLE_DUB            = 4;
-                static const unsigned ROLE_CAPTION        = 5;
-                static const unsigned ROLE_SUBTITLE       = 6;
-                Role(unsigned = ROLE_ALTERNATE);
+                enum class Value
+                {
+                    Main,
+                    Alternate,
+                    Supplementary,
+                    Commentary,
+                    Dub,
+                    Caption,
+                    Subtitle,
+                };
+                Role(Value = Value::Main);
                 bool operator==(const Role &) const;
                 bool isDefault() const;
                 bool autoSelectable() const;
 
             private:
-                unsigned value;
+                Value value;
         };
     }
 }
