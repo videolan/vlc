@@ -31,6 +31,11 @@ Role::Role(Value r)
     value = r;
 }
 
+bool Role::operator <(const Role &other) const
+{
+    return value > other.value;
+}
+
 bool Role::operator ==(const Role &other) const
 {
     return value == other.value;

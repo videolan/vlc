@@ -38,6 +38,7 @@ namespace adaptive
                     Subtitle,
                 };
                 Role(Value = Value::Main);
+                bool operator<(const Role &) const;
                 bool operator==(const Role &) const;
                 bool isDefault() const;
                 bool autoSelectable() const;
