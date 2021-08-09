@@ -244,7 +244,6 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         const vlc_tick_t stream_diff = i_ck_stream - cl->last.stream;
         const vlc_tick_t system_diff = i_ck_system - cl->last.system;
 
-        if (stream_diff > CR_MAX_GAP || stream_diff < - CR_MAX_GAP)
         {
             /* Possible unexpected stream discontinuity, do a finer calcul to
              * detect it. The stream gap need to be comparated with the system
