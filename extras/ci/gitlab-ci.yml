@@ -301,6 +301,70 @@ nightly-debian:
     artifacts:
 
 #
+# Linux Meson build
+#
+debian-meson:
+    extends: .base-template
+    image:
+        name: $VLC_DEBIAN_IMAGE
+    script:
+        - |
+            export NCPU=$(getconf _NPROCESSORS_ONLN)
+            echo "Building branch '${CI_COMMIT_BRANCH}' (default: '${CI_DEFAULT_BRANCH}')"
+        - |
+            echo -e "\e[0Ksection_start:$(date +%s):build_tools_section\r\e[0KTools build"
+            # Build tools
+            ( cd extras/tools && ./bootstrap && make -j$NCPU --output-sync=recurse )
+            # Build meson from extras/tool explicitly
+            ( cd extras/tools && make -j$NCPU .buildmeson )
+            export PATH="$(pwd)/extras/tools/build/bin:$PATH"
+            echo -e "\e[0Ksection_end:$(date +%s):build_tools_section\r\e[0K"
+
+        - |
+            echo -e "\e[0Ksection_start:$(date +%s):build_contribs_section\r\e[0KContribs build"
+            # Build contribs
+            mkdir -p contrib/contrib-$TRIPLET && cd contrib/contrib-$TRIPLET
+            ../bootstrap
+            if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+                echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
+                make prebuilt PREBUILT_URL="${VLC_PREBUILT_CONTRIBS_URL}" || PREBUILT_FAILED=yes
+            else
+                PREBUILT_FAILED=yes
+            fi
+            if [ -n "$PREBUILT_FAILED" ]; then
+                make list
+                make -j$NCPU --output-sync=recurse fetch
+                make -j$NCPU --output-sync=recurse
+                if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+                    make package
+                fi
+            else
+                make -j$NCPU --output-sync=recurse tools
+            fi
+            cd ../../
+            echo -e "\e[0Ksection_end:$(date +%s):build_contribs_section\r\e[0K"
+
+        - |
+            echo -e "\e[0Ksection_start:$(date +%s):setup_meson_section\r\e[0KMeson setup"
+            # Setup meson build dir
+            meson setup build-meson || (echo "ERROR: Meson setup failed!" >&2 ; cat build-meson/meson-logs/meson-log.txt >&2 ; exit 1)
+            echo -e "\e[0Ksection_end:$(date +%s):setup_meson_section\r\e[0K"
+
+        - |
+            echo -e "\e[0Ksection_start:$(date +%s):build_meson_section\r\e[0KVLC build"
+            # Build VLC
+            ninja -C build-meson || (echo "ERROR: Build failed!" >&2 ; exit 2)
+            echo -e "\e[0Ksection_end:$(date +%s):build_meson_section\r\e[0K"
+
+        - |
+            echo -e "\e[0Ksection_start:$(date +%s):tests_meson_section\r\e[0KVLC tests"
+            # Run tests
+            meson test -C build-meson || (echo "ERROR: Tests failed!" >&2 ; cat build-meson/meson-logs/testlog.txt >&2 ; exit 3)
+            echo -e "\e[0Ksection_end:$(date +%s):tests_meson_section\r\e[0K"
+    allow_failure: true
+    variables: *variables-debian
+
+#
 # Snap builds
 #
 .snap-common:
