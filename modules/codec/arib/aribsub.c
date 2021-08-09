@@ -28,11 +28,9 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 
-#ifdef HAVE_ARIBB24
  #include "substext.h"
  #include <aribb24/parser.h>
  #include <aribb24/decoder.h>
-#endif
 
 //#define DEBUG_ARIBSUB 1
 
