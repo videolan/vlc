@@ -157,6 +157,7 @@ class MainInterface : public QObject
     Q_PROPERTY(ColorSchemeModel* colorScheme READ getColorScheme CONSTANT FINAL)
     Q_PROPERTY(bool hasVLM READ hasVLM CONSTANT FINAL)
     Q_PROPERTY(bool clientSideDecoration READ useClientSideDecoration NOTIFY useClientSideDecorationChanged FINAL)
+    Q_PROPERTY(bool hasFirstrun READ hasFirstrun CONSTANT FINAL)
     Q_PROPERTY(int  csdBorderSize READ CSDBorderSize NOTIFY useClientSideDecorationChanged FINAL)
     Q_PROPERTY(bool hasToolbarMenu READ hasToolbarMenu NOTIFY hasToolbarMenuChanged FINAL)
     Q_PROPERTY(bool canShowVideoPIP READ canShowVideoPIP CONSTANT FINAL)
@@ -208,6 +209,7 @@ public:
     inline ColorSchemeModel* getColorScheme() const { return m_colorScheme; }
     bool hasVLM() const;
     bool useClientSideDecoration() const;
+    bool hasFirstrun() const;
     inline bool hasToolbarMenu() const { return m_hasToolbarMenu; }
     inline bool canShowVideoPIP() const { return m_canShowVideoPIP; }
     inline void setCanShowVideoPIP(bool canShowVideoPIP) { m_canShowVideoPIP = canShowVideoPIP; }

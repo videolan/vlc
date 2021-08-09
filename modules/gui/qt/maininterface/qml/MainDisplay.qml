@@ -48,7 +48,7 @@ FocusScope {
     onViewPropertiesChanged: loadView()
     Component.onCompleted: {
         loadView()
-        if (medialib)
+        if (medialib && !mainInterface.hasFirstrun)
             // asynchronous call
             medialib.reload()
     }

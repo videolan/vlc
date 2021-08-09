@@ -259,6 +259,10 @@ bool MainInterface::useClientSideDecoration() const
     return m_clientSideDecoration && m_windowVisibility != QWindow::FullScreen;
 }
 
+bool MainInterface::hasFirstrun() const {
+    return config_GetInt( "qt-privacy-ask" );
+}
+
 /*****************************
  *   Main UI handling        *
  *****************************/
