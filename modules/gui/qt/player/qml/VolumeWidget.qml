@@ -70,9 +70,11 @@ FocusScope{
             Navigation.rightItem: volControl
         }
 
-        Slider
-        {
+        Slider {
             id: volControl
+
+            property bool _inhibitPlayerVolumeUpdate: false
+
             width: VLCStyle.dp(100, VLCStyle.scale)
             height: parent.height
 
@@ -80,7 +82,6 @@ FocusScope{
             from: 0
             to: maxvolpos
             stepSize: 0.05
-            value: player.volume
             opacity: player.muted ? 0.5 : 1
 
             Accessible.name: i18n.qtr("Volume")
@@ -97,6 +98,23 @@ FocusScope{
                 if (KeyHelper.matchOk(event)) {
                     player.muted = !player.muted
                 }
+            }
+
+            function _syncVolumeWithPlayer() {
+                if (paintOnly)
+                    return
+
+                volControl._inhibitPlayerVolumeUpdate = true
+                volControl.value = player.volume
+                volControl._inhibitPlayerVolumeUpdate = false
+            }
+
+            Component.onCompleted: volControl._syncVolumeWithPlayer()
+
+            Connections {
+                target: player
+
+                onVolumeChanged: volControl._syncVolumeWithPlayer()
             }
 
             Timer {
@@ -135,8 +153,14 @@ FocusScope{
             property double maxvolpos: maxvol / 100
 
             onValueChanged: {
-                if (!paintOnly && player.muted) player.muted = false
-                player.volume = volControl.value
+                if (paintOnly)
+                    return
+
+                if (player.muted)
+                    player.muted = false
+
+                if (!volControl._inhibitPlayerVolumeUpdate)
+                    player.volume = volControl.value
             }
 
             Widgets.PointingTooltip {
