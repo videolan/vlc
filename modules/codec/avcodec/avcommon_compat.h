@@ -92,10 +92,6 @@
 
 #endif /* HAVE_LIBAVUTIL_AVUTIL_H */
 
-#if LIBAVUTIL_VERSION_MAJOR >= 55
-# define FF_API_AUDIOCONVERT 1
-#endif
-
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
 # include <libavformat/avformat.h>
 
