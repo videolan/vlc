@@ -1511,19 +1511,19 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
         system_pts = VLC_TICK_MAX;
     }
 
-    vlc_tick_t clock_offset = vlc_clock_ConvertToSystem(sys->clock, system_now, 0, sys->rate);
     vlc_tick_t drift = vlc_clock_UpdateVideo(sys->clock, system_pts, pts, sys->rate,
                                              frame_rate, frame_rate_base);
-
     /* Display the direct buffer returned by vout_RenderPicture */
     if (sys->rendering_enabled)
     {
-        vlc_tick_t now_ts = vlc_tick_now();
         if (atomic_load(&sys->b_display_avstat))
-        msg_Info( vd, "avstats: [RENDER][DISPLAY] ts=%" PRId64 " pts_per_vsync=%" PRId64 " pts=%" PRId64,
-                NS_FROM_VLC_TICK(now_ts),
-                NS_FROM_VLC_TICK(todisplay->date),
-                NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts));
+        {
+            vlc_tick_t now_ts = vlc_tick_now();
+            msg_Info( vd, "avstats: [RENDER][DISPLAY] ts=%" PRId64 " pts_per_vsync=%" PRId64 " pts=%" PRId64,
+                    NS_FROM_VLC_TICK(now_ts),
+                    NS_FROM_VLC_TICK(todisplay->date),
+                    NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts));
+        }
 
         vout_display_Display(vd, todisplay);
         vlc_mutex_lock(&sys->avstat.lock);
@@ -1531,19 +1531,21 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
         sys->avstat.last_system_pts = system_pts;
         vlc_mutex_unlock(&sys->avstat.lock);
 
-        now_ts = vlc_tick_now();
         if (atomic_load(&sys->b_display_avstat))
-        msg_Info( vd, "avstats: [RENDER][DISPLAYED] ts=%" PRId64 " pts_per_vsync=%" PRId64 " pts=%" PRId64,
-                NS_FROM_VLC_TICK(now_ts),
-                NS_FROM_VLC_TICK(todisplay->date),
-                NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts));
-
-
+        {
+            vlc_tick_t now_ts = vlc_tick_now();
+            msg_Info( vd, "avstats: [RENDER][DISPLAYED] ts=%" PRId64 " pts_per_vsync=%" PRId64 " pts=%" PRId64,
+                    NS_FROM_VLC_TICK(now_ts),
+                    NS_FROM_VLC_TICK(todisplay->date),
+                    NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts));
+        }
     }
 
-    vlc_tick_t now_ts = vlc_tick_now();
     if (atomic_load(&sys->b_display_avstat))
     {
+        vlc_tick_t now_ts = vlc_tick_now();
+        vlc_tick_t clock_offset = vlc_clock_ConvertToSystem(sys->clock, system_now, 0, sys->rate);
+
         msg_Info( vd, "avstats: [RENDER][VIDEO] ts=%" PRId64 " pts_per_vsync=%" PRId64 " pts_late=%" PRId64 " pts=%" PRId64 " pcr=%" PRId64,
                   NS_FROM_VLC_TICK(now_ts),
                   NS_FROM_VLC_TICK(pts),
