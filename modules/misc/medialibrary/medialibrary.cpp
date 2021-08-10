@@ -461,49 +461,6 @@ bool MediaLibrary::Init()
     return true;
 }
 
-bool MediaLibrary::Start()
-{
-    if ( Init() == false )
-        return false;
-
-    if ( m_started.test_and_set() )
-        /* The code below should be executed at most once */
-        return true;
-
-    /*
-     * If we already provided the medialib with some entry points, then we have
-     * nothing left to do
-     */
-    auto entryPoints = m_ml->entryPoints()->all();
-    if ( entryPoints.empty() == false )
-        return true;
-
-    auto folders = vlc::wrap_cptr( var_InheritString( m_vlc_ml, "ml-folders" ) );
-    if ( folders != nullptr && strlen( folders.get() ) > 0 )
-    {
-        std::istringstream ss( folders.get() );
-        std::string folder;
-        while ( std::getline( ss, folder, ';' ) )
-            m_ml->discover( folder );
-    }
-    else
-    {
-        std::string varValue;
-        for( auto&& target : { VLC_VIDEOS_DIR, VLC_MUSIC_DIR } )
-        {
-            auto folder = vlc::wrap_cptr( config_GetUserDir( target ) );
-            if( folder == nullptr )
-                continue;
-            auto folderMrl = vlc::wrap_cptr( vlc_path2uri( folder.get(), nullptr ) );
-            m_ml->discover( folderMrl.get() );
-            varValue += std::string{ ";" } + folderMrl.get();
-        }
-        if ( varValue.empty() == false )
-            config_PutPsz( "ml-folders", varValue.c_str()+1 ); /* skip initial ';' */
-    }
-    return true;
-}
-
 int MediaLibrary::Control( int query, va_list args )
 {
     /*
@@ -531,7 +488,7 @@ int MediaLibrary::Control( int query, va_list args )
         {
             /* These operations require the media library to be started
              * ie. that the background threads are started */
-            if ( Start() == false )
+            if ( !Init() )
                 return VLC_EGENERIC;
             break;
         }
@@ -2035,6 +1992,5 @@ vlc_module_begin()
     set_subcategory(SUBCAT_ADVANCED_MISC)
     set_capability("medialibrary", 100)
     set_callbacks(Open, Close)
-    add_string( "ml-folders", nullptr, ML_FOLDER_TEXT, ML_FOLDER_LONGTEXT )
     add_bool( "ml-verbose", false, ML_VERBOSE, nullptr )
 vlc_module_end()
