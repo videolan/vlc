@@ -26,7 +26,6 @@
 
 #define AVPROVIDER(lib) ((lib##_VERSION_MICRO < 100) ? "libav" : "ffmpeg")
 
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
 #include <libavcodec/avcodec.h>
 
 /* LIBAVCODEC_VERSION_CHECK checks for the right version of libav and FFmpeg
@@ -77,9 +76,6 @@
 # define  FF_MAX_B_FRAMES 16 // FIXME: remove this
 #endif
 
-#endif /* HAVE_LIBAVCODEC_AVCODEC_H */
-
-#ifdef HAVE_LIBAVUTIL_AVUTIL_H
 # include <libavutil/avutil.h>
 
 /* LIBAVUTIL_VERSION_CHECK checks for the right version of libav and FFmpeg
@@ -89,8 +85,6 @@
 #define LIBAVUTIL_VERSION_CHECK( a, b, c, d, e ) \
     ( (LIBAVUTIL_VERSION_MICRO <  100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( a, b, c ) ) || \
       (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( a, d, e ) ) )
-
-#endif /* HAVE_LIBAVUTIL_AVUTIL_H */
 
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
 # include <libavformat/avformat.h>

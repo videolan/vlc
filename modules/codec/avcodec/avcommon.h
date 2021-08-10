@@ -36,7 +36,6 @@
 
 #include "avcommon_compat.h"
 
-#ifdef HAVE_LIBAVUTIL_AVUTIL_H
 # include <libavutil/avutil.h>
 # include <libavutil/dict.h>
 # include <libavutil/cpu.h>
@@ -106,7 +105,6 @@ static inline void vlc_init_avutil(vlc_object_t *obj)
 
     msg_Dbg(obj, "CPU flags: 0x%08x", av_get_cpu_flags());
 }
-#endif
 
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
 # include <libavformat/avformat.h>
@@ -127,7 +125,6 @@ static inline void vlc_init_avformat(vlc_object_t *obj)
 }
 #endif
 
-#ifdef HAVE_LIBAVCODEC_AVCODEC_H
 # include <libavcodec/avcodec.h>
 # include <libavcodec/version.h>
 static inline void vlc_init_avcodec(vlc_object_t *obj)
@@ -142,7 +139,6 @@ static inline void vlc_init_avcodec(vlc_object_t *obj)
 
     vlc_avcodec_unlock();
 }
-#endif
 
 #ifndef AV_ERROR_MAX_STRING_SIZE
  #define AV_ERROR_MAX_STRING_SIZE 64

@@ -2492,12 +2492,6 @@ AS_IF([test "${enable_avcodec}" != "no"], [
     *) AC_MSG_ERROR([Missing libav or FFmpeg. Pass --disable-avcodec to ignore this error.])
   esac
   PKG_CHECK_MODULES(AVCODEC,[libavcodec >= ${av_codec_ver} libavutil >= 55.9.0], [
-    VLC_SAVE_FLAGS
-    CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
-    CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
-    AC_CHECK_HEADERS([libavcodec/avcodec.h])
-    AC_CHECK_HEADERS([libavutil/avutil.h])
-    VLC_RESTORE_FLAGS
     have_avcodec="yes"
   ],[
     AC_MSG_ERROR([${AVCODEC_PKG_ERRORS}. Pass --disable-avcodec to ignore this error.])
@@ -2691,8 +2685,6 @@ AS_IF([test "${enable_avformat}" != "no"], [
       CPPFLAGS="${CPPFLAGS} ${AVFORMAT_CFLAGS}"
       CFLAGS="${CFLAGS} ${AVFORMAT_CFLAGS}"
       AC_CHECK_HEADERS([libavformat/avformat.h libavformat/avio.h])
-      AC_CHECK_HEADERS([libavcodec/avcodec.h])
-      AC_CHECK_HEADERS([libavutil/avutil.h])
       AS_IF([test "$enable_merge_ffmpeg" = "no"], [
         have_avformat="no"
       ])
