@@ -29,6 +29,7 @@ using namespace smooth;
 SmoothStream::SmoothStream(demux_t *demux)
     :AbstractStream(demux)
 {
+    mightalwaysstartfromzero = true;
 }
 
 AbstractDemuxer *SmoothStream::newDemux(vlc_object_t *p_obj, const StreamFormat &format,

@@ -83,8 +83,10 @@ namespace adaptive
     class DiscontinuityEvent : public TrackerEvent
     {
         public:
-            DiscontinuityEvent();
+            DiscontinuityEvent(uint64_t);
             virtual ~DiscontinuityEvent()  = default;
+
+            uint64_t discontinuitySequenceNumber;
     };
 
     class RepresentationSwitchEvent : public TrackerEvent
@@ -112,10 +114,12 @@ namespace adaptive
     {
         public:
             SegmentChangedEvent() = delete;
-            SegmentChangedEvent(const ID &, mtime_t, mtime_t, mtime_t = VLC_TS_INVALID);
+            SegmentChangedEvent(const ID &, uint64_t,
+                                mtime_t, mtime_t, mtime_t = VLC_TS_INVALID);
             virtual ~SegmentChangedEvent() = default;
 
             const ID *id;
+            uint64_t sequence;
             mtime_t displaytime;
             mtime_t starttime;
             mtime_t duration;
@@ -169,7 +173,8 @@ namespace adaptive
             SegmentTracker(SharedResources *,
                            AbstractAdaptationLogic *,
                            const AbstractBufferingLogic *,
-                           BaseAdaptationSet *);
+                           BaseAdaptationSet *,
+                           SynchronizationReferences *);
             ~SegmentTracker();
 
             class Position
@@ -198,6 +203,8 @@ namespace adaptive
             mtime_t getPlaybackTime(bool = false) const; /* Current segment start time if selected */
             bool getMediaPlaybackRange(mtime_t *, mtime_t *, mtime_t *) const;
             mtime_t getMinAheadTime() const;
+            bool getSynchronizationReference(uint64_t, mtime_t, SynchronizationReference &) const;
+            void updateSynchronizationReference(uint64_t, const Times &);
             void notifyBufferingState(bool) const;
             void notifyBufferingLevel(mtime_t, mtime_t, mtime_t, mtime_t) const;
             void registerListener(SegmentTrackerListenerInterface *);
@@ -229,6 +236,7 @@ namespace adaptive
             Position next;
             StreamFormat format;
             SharedResources *resources;
+            SynchronizationReferences *synchronizationReferences;
             AbstractAdaptationLogic *logic;
             const AbstractBufferingLogic *bufferingLogic;
             BaseAdaptationSet *adaptationSet;

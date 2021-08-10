@@ -47,6 +47,7 @@ namespace adaptive
             StreamFormat getStreamFormat() const;
             void setStreamFormat(const StreamFormat &);
             bool discontinuity;
+            uint64_t discontinuitySequenceNumber;
             uint64_t sequence;
 
         protected:

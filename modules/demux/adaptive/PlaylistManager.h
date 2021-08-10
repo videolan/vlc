@@ -136,6 +136,8 @@ namespace adaptive
                 time_t      lastupdate;
             } cached;
 
+            SynchronizationReferences synchronizationReferences;
+
         private:
             void setBufferingRunState(bool);
             void Run();

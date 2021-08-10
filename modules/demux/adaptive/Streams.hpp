@@ -122,6 +122,8 @@ namespace adaptive
         bool inrestart;
         bool demuxfirstchunk;
 
+        bool mightalwaysstartfromzero;
+
         demux_t *p_realdemux;
         StreamFormat format;
 
@@ -145,6 +147,7 @@ namespace adaptive
         SegmentTimes currentTimeContext;
         SegmentTimes prevTimeContext;
         mtime_t currentDuration;
+        uint64_t currentSequence;
 
     private:
         void declaredCodecs();

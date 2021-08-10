@@ -53,10 +53,10 @@ TrackerEvent::Type TrackerEvent::getType() const
     return type;
 }
 
-DiscontinuityEvent::DiscontinuityEvent()
+DiscontinuityEvent::DiscontinuityEvent(uint64_t d)
     : TrackerEvent(Type::Discontinuity)
 {
-
+    discontinuitySequenceNumber = d;
 }
 
 RepresentationSwitchEvent::RepresentationSwitchEvent(BaseRepresentation *prev,
@@ -73,11 +73,12 @@ FormatChangedEvent::FormatChangedEvent(const StreamFormat *f)
     this->format = f;
 }
 
-SegmentChangedEvent::SegmentChangedEvent(const ID &id, mtime_t starttime,
+SegmentChangedEvent::SegmentChangedEvent(const ID &id, uint64_t sequence, mtime_t starttime,
                                          mtime_t duration, mtime_t displaytime)
     : TrackerEvent(Type::SegmentChange)
 {
     this->id = &id;
+    this->sequence = sequence;
     this->duration = duration;
     this->starttime = starttime;
     this->displaytime = displaytime;
@@ -111,7 +112,8 @@ PositionChangedEvent::PositionChangedEvent(mtime_t r)
 SegmentTracker::SegmentTracker(SharedResources *res,
         AbstractAdaptationLogic *logic_,
         const AbstractBufferingLogic *bl,
-        BaseAdaptationSet *adaptSet)
+        BaseAdaptationSet *adaptSet,
+        SynchronizationReferences *refs)
 {
     resources = res;
     first = true;
@@ -119,6 +121,7 @@ SegmentTracker::SegmentTracker(SharedResources *res,
     bufferingLogic = bl;
     setAdaptationLogic(logic_);
     adaptationSet = adaptSet;
+    synchronizationReferences = refs;
     format = StreamFormat::Type::Unknown;
 }
 
@@ -357,6 +360,7 @@ ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed,
         /* if we are on the same segment and indexes have been sent, then discontinuity was */
         b_discontinuity = false;
     }
+    const uint64_t discontinuitySequenceNumber = chunk.chunk->discontinuitySequenceNumber;
 
     if(b_switched)
     {
@@ -409,10 +413,11 @@ ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed,
 
     /* Handle both implicit and explicit discontinuities */
     if(b_gap || b_discontinuity)
-        notify(DiscontinuityEvent());
+        notify(DiscontinuityEvent(discontinuitySequenceNumber));
 
     /* Notify new segment length for stats / logic */
     notify(SegmentChangedEvent(adaptationSet->getID(),
+                               discontinuitySequenceNumber,
                                chunk.starttime, chunk.duration, chunk.displaytime));
 
     if(!b_gap)
@@ -534,6 +539,19 @@ mtime_t SegmentTracker::getMinAheadTime() const
             return rep->getMinAheadTime(startnumber);
     }
     return 0;
+}
+
+bool SegmentTracker::getSynchronizationReference(uint64_t discontinuitysequence,
+                                                 mtime_t time,
+                                                 SynchronizationReference &r) const
+{
+    return synchronizationReferences->getReference(discontinuitysequence, time, r);
+}
+
+void SegmentTracker::updateSynchronizationReference(uint64_t discontinuitysequence,
+                                                    const Times &t)
+{
+    synchronizationReferences->addReference(discontinuitysequence, t);
 }
 
 void SegmentTracker::notifyBufferingState(bool enabled) const
