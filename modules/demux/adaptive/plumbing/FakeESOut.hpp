@@ -92,6 +92,7 @@ namespace adaptive
             bool restarting() const;
             void setExtraInfoProvider( ExtraFMTInfoInterface * );
             vlc_tick_t fixTimestamp(vlc_tick_t);
+            vlc_tick_t applyTimestampContinuity(vlc_tick_t);
             void declareEs( const es_format_t * );
 
             virtual void milestoneReached() override;
@@ -107,6 +108,8 @@ namespace adaptive
             void scheduleNecessaryMilestone();
             bool hasSegmentStartTimes() const;
             void setSegmentStartTimes(const SegmentTimes &);
+            bool hasSynchronizationReference() const;
+            void setSynchronizationReference(const SynchronizationReference &);
             void schedulePCRReset();
             void scheduleAllForDeletion(); /* Queue Del commands for non Del issued ones */
             void recycleAll(); /* Cancels all commands and send fakees for recycling */
@@ -138,6 +141,7 @@ namespace adaptive
             std::list<FakeESOutID *> recycle_candidates;
             std::list<FakeESOutID *> declared;
             SegmentTimes startTimes;
+            SynchronizationReference synchronizationReference;
     };
 
 }

@@ -39,6 +39,8 @@ SegmentChunk::SegmentChunk(AbstractChunkSource *source, BaseRepresentation *rep_
 {
     rep = rep_;
     encryptionSession = nullptr;
+    discontinuity = false;
+    discontinuitySequenceNumber = 0;
 }
 
 SegmentChunk::~SegmentChunk()

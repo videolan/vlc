@@ -56,6 +56,7 @@ AbstractStream::AbstractStream(demux_t * demux_)
     demuxer = nullptr;
     fakeesout = nullptr;
     notfound_sequence = 0;
+    mightalwaysstartfromzero = false;
     last_buffer_status = BufferingStatus::Lessthanmin;
     vlc_mutex_init(&lock);
 }
@@ -153,7 +154,8 @@ bool AbstractStream::resetForNewPosition(vlc_tick_t seekMediaTime)
         currentTimeContext = SegmentTimes();
         prevTimeContext = SegmentTimes();
         currentChunk = getNextChunk();
-        fakeEsOut()->setExpectedTimestamp(seekMediaTime);
+        if(mightalwaysstartfromzero)
+            fakeEsOut()->setExpectedTimestamp(seekMediaTime);
         if( !restartDemux() )
         {
             msg_Info(p_realdemux, "Restart demux failed");
@@ -257,9 +259,6 @@ bool AbstractStream::startDemux()
         needrestart = false;
         discontinuity = false;
     }
-
-    if(!fakeEsOut()->hasSegmentStartTimes())
-        fakeEsOut()->setSegmentStartTimes(startTimeContext);
 
     demuxersource->Reset();
     demuxfirstchunk = true;
@@ -418,6 +417,8 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(Times deadline,
             i_demuxed = prevTimeContext.media - deadline.segment.media;
     }
 
+    bool b_starting = fakeEsOut()->commandsQueue()->getPCR().continuous == VLC_TICK_INVALID;
+
     segmentTracker->notifyBufferingLevel(i_min_buffering, i_max_buffering, i_demuxed, i_target_buffering);
     if(i_demuxed < i_max_buffering) /* not already demuxed */
     {
@@ -447,8 +448,15 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(Times deadline,
                 {
                     msg_Dbg(p_realdemux, "Draining on discontinuity");
                     fakeEsOut()->commandsQueue()->setDraining();
-                    discontinuity = false;
+                    fakeEsOut()->setSegmentStartTimes(startTimeContext);
+                    assert(startTimeContext.media);
                 }
+                if(!fakeEsOut()->hasSynchronizationReference())
+                {
+                    SynchronizationReference r(currentSequence, Times());
+                    fakeEsOut()->setSynchronizationReference(r);
+                }
+                discontinuity = false;
                 needrestart = false;
                 vlc_mutex_unlock(&lock);
                 return BufferingStatus::Ongoing;
@@ -461,6 +469,10 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(Times deadline,
         segmentTracker->notifyBufferingLevel(i_min_buffering, i_max_buffering, i_demuxed, i_target_buffering);
     }
     vlc_mutex_unlock(&lock);
+
+    Times first = fakeEsOut()->commandsQueue()->getFirstTimes();
+    if(isContiguousMux() && first.continuous != 0 && b_starting)
+        segmentTracker->updateSynchronizationReference(currentSequence, first);
 
     if(i_demuxed < i_max_buffering) /* need to read more */
     {
@@ -537,6 +549,14 @@ ChunkInterface * AbstractStream::getNextChunk() const
     ChunkInterface *ck = segmentTracker->getNextChunk(!b_restarting, connManager);
     if(ck && !fakeEsOut()->hasSegmentStartTimes())
         fakeEsOut()->setSegmentStartTimes(startTimeContext);
+
+    if(ck && !fakeEsOut()->hasSynchronizationReference())
+    {
+        assert(fakeEsOut()->hasSegmentStartTimes());
+        SynchronizationReference r;
+        if(segmentTracker->getSynchronizationReference(currentSequence, startTimeContext.media, r))
+            fakeEsOut()->setSynchronizationReference(r);
+    }
     return ck;
 }
 
@@ -679,7 +699,12 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
     switch(ev.getType())
     {
         case TrackerEvent::Type::Discontinuity:
+        {
+            const DiscontinuityEvent &event =
+                    static_cast<const DiscontinuityEvent &>(ev);
             discontinuity = true;
+            currentSequence = event.discontinuitySequenceNumber;
+        }
             break;
 
         case TrackerEvent::Type::FormatChange:
@@ -731,6 +756,7 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
             prevTimeContext = currentTimeContext;
             currentTimeContext.media = event.starttime;
             currentTimeContext.display = event.displaytime;
+            currentSequence = event.sequence;
             currentDuration = event.duration;
             if(startTimeContext.media == VLC_TICK_INVALID)
                 startTimeContext = currentTimeContext;

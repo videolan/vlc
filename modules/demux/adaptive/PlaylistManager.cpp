@@ -122,7 +122,8 @@ bool PlaylistManager::setupPeriod()
         if(set && streamFactory)
         {
             SegmentTracker *tracker = new SegmentTracker(resources, logic,
-                                                         bufferingLogic, set);
+                                                         bufferingLogic, set,
+                                                         &synchronizationReferences);
             if(!tracker)
                 continue;
 

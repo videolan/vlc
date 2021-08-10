@@ -21,6 +21,7 @@
 #define TIME_HPP
 
 #include <vlc_common.h>
+#include <list>
 
 namespace adaptive
 {
@@ -106,6 +107,41 @@ class Times
         }
         vlc_tick_t continuous;
         SegmentTimes segment;
+};
+
+using SynchronizationReference = std::pair<uint64_t, Times>;
+
+class SynchronizationReferences
+{
+    public:
+        SynchronizationReferences()
+        {
+
+        }
+        void addReference(uint64_t seq, Times t)
+        {
+            for(auto t : refs)
+                if(t.first == seq)
+                    return;
+            while(refs.size() > 10)
+                refs.pop_back();
+            refs.push_front(SynchronizationReference(seq, t));
+        }
+        bool getReference(uint64_t seq, vlc_tick_t,
+                          SynchronizationReference &ref) const
+        {
+            for(auto t : refs)
+            {
+                if(t.first != seq)
+                    continue;
+                ref = t;
+                return true;
+            }
+            return false;
+        }
+
+    private:
+        std::list<SynchronizationReference> refs;
 };
 
 }
