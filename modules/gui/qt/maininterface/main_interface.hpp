@@ -349,6 +349,8 @@ signals:
     void requestInterfaceMaximized();
     /// forward window normal query to the actual window or widget
     void requestInterfaceNormal();
+    /// forward window normal query to the actual window or widget
+    void requestInterfaceMinimized();
 
     void intfScaleFactorChanged();
     void pinVideoControlsChanged( bool );

@@ -31,7 +31,7 @@ Row {
 
     CSDWindowButton {
         iconTxt: VLCIcons.window_minimize
-        onClicked: topWindow.showMinimized()
+        onClicked: mainInterface.requestInterfaceMinimized()
         height: windowButtonGroup.height
         color: windowButtonGroup.color
         hoverColor: windowButtonGroup.hoverColor

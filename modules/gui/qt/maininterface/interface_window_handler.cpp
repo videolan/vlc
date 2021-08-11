@@ -100,6 +100,14 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainInterface
     connect(m_mainInterface, &MainInterface::requestInterfaceNormal,
             m_window, &QWindow::showNormal);
 
+    connect(m_mainInterface, &MainInterface::requestInterfaceMinimized,
+            m_window, [this]()
+    {
+        // taking OR with the current state, we preserve the current state
+        // so with next active request, we restore window in it's pre-minimized state
+        m_window->setWindowStates(m_window->windowStates() | Qt::WindowMinimized);
+    });
+
     m_window->installEventFilter(this);
 }
 
