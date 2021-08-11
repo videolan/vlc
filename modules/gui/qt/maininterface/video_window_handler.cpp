@@ -47,13 +47,8 @@ void VideoWindowHandler::setWindow(QWindow* window)
         WindowStateHolder::holdOnTop(m_window, WindowStateHolder::VIDEO, false);
         WindowStateHolder::holdFullscreen(m_window, WindowStateHolder::VIDEO, false);
     }
+
     m_window = window;
-    if (m_window)
-    {
-        m_lastWinGeometry = m_window->geometry();
-    }
-    else
-        m_lastWinGeometry = QRect{};
 }
 
 void VideoWindowHandler::disable()
