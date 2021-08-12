@@ -744,7 +744,19 @@ void NetOpenPanel::updateMRL()
     emit methodChanged( qfu( "network-caching" ) );
 
     QStringList qsl;
-    if( !url.isEmpty() ) qsl << url;
+    if( url.isEmpty() )
+        return;
+
+    if( url.contains( QLatin1String( "://" ) ) )
+    {
+        char *uri = vlc_uri_fixup( qtu( url ) );
+        if( uri == NULL )
+            return;
+        url = qfu(uri);
+        free( uri );
+    }
+
+    qsl << url;
     emit mrlUpdated( qsl, "" );
 }
 
