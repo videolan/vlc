@@ -553,14 +553,18 @@ void DialogsProvider::openUrlDialog()
     if( url.isEmpty() )
         return;
 
+    char *uri = NULL;
     if( !url.contains( qfu( "://" ) ) )
     {
-        char *uri = vlc_path2uri( qtu( url ), NULL );
-        if( uri == NULL )
-            return;
-        url = qfu(uri);
-        free( uri );
+        uri = vlc_path2uri( qtu( url ), NULL );
+    } else {
+        uri = vlc_uri_fixup( qtu( url ) );
     }
+
+    if( uri == NULL )
+        return;
+    url = qfu(uri);
+    free( uri );
 
     Open::openMRL( p_intf, qtu(url), !oud.shouldEnqueue() );
 }
