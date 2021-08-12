@@ -576,14 +576,19 @@ void DialogsProvider::openUrlDialog()
     if( url.isEmpty() )
         return;
 
+    char *uri;
     if( !url.contains( qfu( "://" ) ) )
     {
-        char *uri = vlc_path2uri( qtu( url ), NULL );
-        if( uri == NULL )
-            return;
-        url = qfu(uri);
-        free( uri );
+        uri = vlc_path2uri( qtu( url ), NULL );
+    } else {
+        uri = vlc_uri_fixup( qtu( url ) );
     }
+
+    if( uri == NULL )
+        return;
+    url = qfu(uri);
+    free( uri );
+
     QVector<vlc::playlist::Media> medias = { {url, QString {}} };
     THEMPL->append(medias, !oud.shouldEnqueue());
 }
