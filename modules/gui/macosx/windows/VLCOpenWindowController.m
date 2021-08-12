@@ -1009,8 +1009,19 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
                 mrlString = [mrlString stringByAppendingFormat: @":%i", port];
             }
         }
-    } else
+    } else {
         mrlString = [_netHTTPURLTextField stringValue];
+
+        // Fixup the user-provided URI
+        const char *orig_uri = [mrlString UTF8String];
+        if (orig_uri == NULL)
+            return;
+        char *fixed_uri = vlc_uri_fixup(orig_uri);
+        if (fixed_uri) {
+            mrlString = [[NSString alloc] initWithUTF8String:fixed_uri];
+            free(fixed_uri);
+        }
+    }
 
     [self setMRL: mrlString];
 }
