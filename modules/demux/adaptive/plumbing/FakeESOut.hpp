@@ -130,7 +130,6 @@ namespace adaptive
                 bool b_timestamp_set;
                 bool b_offset_calculated;
             } associated, expected;
-            mtime_t timestamp_first;
             mtime_t timestamps_offset;
             int priority;
             bool b_in_commands_group;
