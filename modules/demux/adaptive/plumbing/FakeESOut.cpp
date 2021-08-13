@@ -146,7 +146,6 @@ FakeESOut::FakeESOut( es_out_t *es, AbstractCommandsQueue *queue,
 {
     associated.b_timestamp_set = false;
     expected.b_timestamp_set = false;
-    timestamp_first = 0;
     priority = ES_PRIORITY_SELECTABLE_MIN;
     vlc_mutex_init(&lock);
 }
@@ -456,7 +455,6 @@ vlc_tick_t FakeESOut::fixTimestamp(vlc_tick_t ts)
             {
                 timestamps_offset = associated.timestamp - ts;
                 associated.b_offset_calculated = true;
-                timestamp_first = ts + timestamps_offset;
             }
         }
         else if(expected.b_timestamp_set)
@@ -471,7 +469,6 @@ vlc_tick_t FakeESOut::fixTimestamp(vlc_tick_t ts)
                 else
                     timestamps_offset = 0;
                 expected.b_offset_calculated = true;
-                timestamp_first = ts + timestamps_offset;
             }
         }
         ts += timestamps_offset;

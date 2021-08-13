@@ -130,7 +130,6 @@ namespace adaptive
                 bool b_timestamp_set;
                 bool b_offset_calculated;
             } associated, expected;
-            vlc_tick_t timestamp_first;
             vlc_tick_t timestamps_offset;
             int priority;
             bool b_in_commands_group;
