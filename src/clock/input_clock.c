@@ -226,6 +226,7 @@ void input_clock_AttachListener( input_clock_t *cl, vlc_clock_t *clock_listener 
  *  i_ck_system: date in system clock
  *****************************************************************************/
 vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
+                         bool b_buffering,
                          bool b_can_pace_control, bool b_buffering_allowed,
                          vlc_tick_t i_ck_stream, vlc_tick_t i_ck_system )
 {
@@ -250,19 +251,22 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
              * gap (if system and stream gap are the same then it's not a
              * discontinuity) */
 
-            const double system_gap = fabs(system_diff - AvgGet( &cl->system_avg));
-            const double stream_gap = fabs(stream_diff - AvgGet( &cl->stream_avg));
-            if (fabs(system_gap - stream_gap) > CR_MAX_GAP && atomic_load(&cl->b_recovery))
+            if( !b_buffering )
             {
-                /* Stream discontinuity, for which we haven't received a
-                 * warning from the stream control facilities (dd-edited
-                 * stream ?). */
-                msg_Warn( p_log, "clock gap, unexpected stream discontinuity" );
+                const double system_gap = fabs(system_diff - AvgGet( &cl->system_avg));
+                const double stream_gap = fabs(stream_diff - AvgGet( &cl->stream_avg));
+                if (fabs(system_gap - stream_gap) > CR_MAX_GAP && atomic_load(&cl->b_recovery))
+                {
+                    /* Stream discontinuity, for which we haven't received a
+                     * warning from the stream control facilities (dd-edited
+                     * stream ?). */
+                    msg_Warn( p_log, "clock gap, unexpected stream discontinuity" );
 
-                /* */
-                msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
-                b_reset_reference= true;
-                b_discontinuity = true;
+                    /* */
+                    msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
+                    b_reset_reference= true;
+                    b_discontinuity = true;
+                }
             }
         }
 

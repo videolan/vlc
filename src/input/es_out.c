@@ -3526,6 +3526,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         bool b_extra_buffering_allowed = !b_low_delay && EsOutIsExtraBufferingAllowed( out );
         vlc_tick_t i_late = input_clock_Update(
                             p_pgrm->p_input_clock, VLC_OBJECT(p_sys->p_input),
+                            p_sys->b_buffering,
                             input_CanPaceControl(p_sys->p_input) || p_sys->b_buffering,
                             b_extra_buffering_allowed,
                             i_pcr, vlc_tick_now() );
