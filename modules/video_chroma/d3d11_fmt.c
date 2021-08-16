@@ -44,6 +44,18 @@
 
 #include "d3d11_fmt.h"
 
+#include <winapifamily.h>
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#define BUILD_FOR_UAP 0
+#else
+#define BUILD_FOR_UAP 1
+#endif
+#if defined(WINAPI_FAMILY)
+# undef WINAPI_FAMILY
+#endif
+#define WINAPI_FAMILY WINAPI_PARTITION_DESKTOP
+#include <wbemidl.h>
+
 #define D3D11_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
     container_of((pic_ctx), struct d3d11_pic_context, s)
 
@@ -138,64 +150,8 @@ int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
     return VLC_SUCCESS;
 }
 
-#ifndef VLC_WINSTORE_APP
-static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc)
+static void SetDriverString(vlc_object_t *obj, d3d11_device_t *d3d_dev, const WCHAR *szData)
 {
-    HKEY hKey;
-    WCHAR key[128];
-    WCHAR szData[256], lookup[256];
-    DWORD len = 256;
-    LSTATUS ret;
-
-    _snwprintf(lookup, 256, TEXT("pci\\ven_%04x&dev_%04x"), adapterDesc->VendorId, adapterDesc->DeviceId);
-    for (int i=0;;i++)
-    {
-        _snwprintf(key, 128, TEXT("SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\%04d"), i);
-        ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey);
-        if ( ret != ERROR_SUCCESS )
-        {
-            msg_Warn(obj, "failed to read the %d Display Adapter registry key (%ld)", i, ret);
-            return NULL;
-        }
-
-        len = sizeof(szData);
-        ret = RegQueryValueEx( hKey, TEXT("MatchingDeviceId"), NULL, NULL, (LPBYTE) &szData, &len );
-        if ( ret == ERROR_SUCCESS ) {
-            if (_wcsnicmp(lookup, szData, wcslen(lookup)) == 0)
-                return hKey;
-            msg_Dbg(obj, "different %d device %ls vs %ls", i, lookup, szData);
-        }
-        else
-            msg_Warn(obj, "failed to get the %d MatchingDeviceId (%ld)", i, ret);
-
-        RegCloseKey(hKey);
-    }
-    return NULL;
-}
-
-static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
-{
-    memset(&d3d_dev->WDDM, 0, sizeof(d3d_dev->WDDM));
-
-    LONG err = ERROR_ACCESS_DENIED;
-    WCHAR szData[256];
-    DWORD len = sizeof(szData);
-    HKEY hKey = GetAdapterRegistry(obj, &d3d_dev->adapterDesc);
-    if (hKey == NULL)
-    {
-        msg_Warn(obj, "can't find adapter in registry");
-        return;
-    }
-
-    err = RegQueryValueEx( hKey, TEXT("DriverVersion"), NULL, NULL, (LPBYTE) &szData, &len );
-    RegCloseKey(hKey);
-
-    if (err != ERROR_SUCCESS )
-    {
-        msg_Warn(obj, "failed to read the adapter DriverVersion");
-        return;
-    }
-
     int wddm, d3d_features, revision, build;
     /* see https://docs.microsoft.com/en-us/windows-hardware/drivers/display/wddm-2-1-features#driver-versioning */
     if (swscanf(szData, TEXT("%d.%d.%d.%d"), &wddm, &d3d_features, &revision, &build) != 4)
@@ -214,14 +170,117 @@ static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
         d3d_dev->WDDM.build += (revision - 100) * 1000;
     }
 }
-#else /* VLC_WINSTORE_APP */
+
 static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 {
-    VLC_UNUSED(obj);
-    VLC_UNUSED(d3d_dev);
-    return;
+    HRESULT hr;
+    IWbemLocator *pLoc = NULL;
+    IWbemServices *pSvc = NULL;
+    IEnumWbemClassObject* pEnumerator = NULL;
+
+    BSTR bRootNamespace = SysAllocString(L"ROOT\\CIMV2");
+    BSTR bWQL = SysAllocString(L"WQL");
+
+    WCHAR lookup[256];
+    _snwprintf(lookup, ARRAY_SIZE(lookup),
+               L"SELECT * FROM Win32_VideoController WHERE PNPDeviceID LIKE 'PCI\\\\VEN_%04X&DEV_%04X&SUBSYS_%08X&REV_%02X%%'",
+               d3d_dev->adapterDesc.VendorId, d3d_dev->adapterDesc.DeviceId,
+               d3d_dev->adapterDesc.SubSysId, d3d_dev->adapterDesc.Revision);
+    BSTR bVideoController = SysAllocString(lookup);
+
+    hr =  CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if (FAILED(hr))
+    {
+        msg_Dbg(obj, "Unable to initialize COM library");
+        return;
+    }
+
+    MULTI_QI res = { 0 };
+    res.pIID = &IID_IWbemLocator;
+#if !BUILD_FOR_UAP
+    hr = CoCreateInstanceEx(&CLSID_WbemLocator, NULL, CLSCTX_INPROC_SERVER, 0,
+                                1, &res);
+#else // BUILD_FOR_UAP
+    hr = CoCreateInstanceFromApp(&CLSID_WbemLocator, NULL, CLSCTX_INPROC_SERVER, 0,
+                                1, &res);
+#endif // BUILD_FOR_UAP
+    if (FAILED(hr) || FAILED(res.hr))
+    {
+        msg_Dbg(obj, "Failed to create IWbemLocator object");
+        goto done;
+    }
+    pLoc = (IWbemLocator *)res.pItf;
+
+    hr = IWbemLocator_ConnectServer(pLoc, bRootNamespace,
+                                    NULL, NULL, NULL, 0, NULL, NULL, &pSvc);
+    if (FAILED(hr))
+    {
+        msg_Dbg(obj, "Could not connect to namespace");
+        goto done;
+    }
+
+#if !BUILD_FOR_UAP
+    hr = CoSetProxyBlanket(
+        (IUnknown*)pSvc,
+        RPC_C_AUTHN_WINNT,
+        RPC_C_AUTHZ_NONE,
+        NULL,
+        RPC_C_AUTHN_LEVEL_CALL,
+        RPC_C_IMP_LEVEL_IMPERSONATE,
+        NULL,
+        EOAC_NONE
+    );
+    if (FAILED(hr))
+    {
+        msg_Dbg(obj, "Could not set proxy blanket");
+        goto done;
+    }
+#endif // !BUILD_FOR_UAP
+
+    hr = IWbemServices_ExecQuery( pSvc, bWQL, bVideoController,
+        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
+    if (FAILED(hr) || !pEnumerator)
+    {
+        msg_Dbg(obj, "Query for Win32_VideoController failed");
+        goto done;
+    }
+
+    IWbemClassObject *pclsObj = NULL;
+    ULONG uReturn = 0;
+    hr = IEnumWbemClassObject_Next(pEnumerator, WBEM_INFINITE, 1, &pclsObj, &uReturn);
+    if (!uReturn)
+    {
+        msg_Warn(obj, "failed to find the device");
+        goto done;
+    }
+
+    VARIANT vtProp;
+    VariantInit(&vtProp);
+
+    hr = IWbemClassObject_Get(pclsObj, L"DriverVersion", 0, &vtProp, 0, 0);
+    if ( FAILED( hr ) )
+    {
+        msg_Warn(obj, "failed to read the driver version");
+        goto done;
+    }
+
+    SetDriverString(obj, d3d_dev, vtProp.bstrVal);
+
+    VariantClear(&vtProp);
+    IWbemClassObject_Release(pclsObj);
+
+done:
+    SysFreeString(bRootNamespace);
+    SysFreeString(bWQL);
+    SysFreeString(bVideoController);
+    if (pEnumerator)
+        IEnumWbemClassObject_Release(pEnumerator);
+    if (pSvc)
+        IWbemServices_Release(pSvc);
+    if (pLoc)
+        IWbemLocator_Release(pLoc);
+    CoUninitialize();
 }
-#endif /* VLC_WINSTORE_APP */
 
 typedef struct
 {
