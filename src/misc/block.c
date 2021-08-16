@@ -305,6 +305,43 @@ block_t *block_mmap_Alloc (void *addr, size_t length)
     (void)addr; (void)length; return NULL;
 }
 #endif
+#if defined(_WIN32)
+struct block_mv
+{
+    block_t b;
+    HANDLE  hMap;
+};
+
+static void block_mapview_Release (block_t *block)
+{
+    struct block_mv *mvblock = container_of(block, struct block_mv, b);
+
+    UnmapViewOfFile(block->p_start);
+    CloseHandle(mvblock->hMap);
+    free(mvblock);
+}
+
+static const struct vlc_block_callbacks block_mapview_cbs =
+{
+    block_mapview_Release,
+};
+
+static block_t *block_mapview_Alloc(HANDLE hMap, void *addr, size_t length)
+{
+    struct block_mv *mvblock = malloc (sizeof (*mvblock));
+    if (unlikely(mvblock == NULL))
+    {
+        UnmapViewOfFile(addr);
+        CloseHandle(hMap);
+        return NULL;
+    }
+    mvblock->hMap = hMap;
+
+    block_t *block = &mvblock->b;
+    block_Init(block, &block_mapview_cbs, addr, length);
+    return block;
+}
+#endif
 
 #ifdef HAVE_SYS_SHM_H
 # include <sys/shm.h>
@@ -404,6 +441,32 @@ block_t *block_File(int fd, bool write)
 
         if (addr != MAP_FAILED)
             return block_mmap_Alloc (addr, length);
+    }
+#elif defined(_WIN32)
+    if (length > 0)
+    {
+        HANDLE handle = (HANDLE)(intptr_t)_get_osfhandle (fd);
+        if (handle != INVALID_HANDLE_VALUE)
+        {
+            void *addr = NULL;
+            HANDLE hMap;
+            DWORD prot = write ? PAGE_READWRITE : PAGE_READONLY;
+            DWORD access = FILE_MAP_READ | (write ? FILE_MAP_WRITE : 0);
+#if VLC_WINSTORE_APP
+            hMap = CreateFileMappingFromApp(handle, NULL, prot, length, NULL);
+            if (hMap != INVALID_HANDLE_VALUE)
+                addr = MapViewOfFileFromApp(hMap, access, 0, length);
+#else
+            hMap = CreateFileMapping(handle, NULL, prot, 0, length, NULL);
+            if (hMap != INVALID_HANDLE_VALUE)
+                addr = MapViewOfFile(hMap, access, 0, 0, length);
+#endif
+
+            if (addr != NULL)
+                return block_mapview_Alloc(hMap, addr, length);
+
+            CloseHandle(hMap);
+        }
     }
 #else
     (void) write;
