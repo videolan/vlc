@@ -64,6 +64,10 @@ FocusScope {
         }
     }
 
+    function setCurrentItemFocus(reason) {
+        artistList.setCurrentItemFocus(reason);
+    }
+
     function _actionAtIndex(index) {
         albumSubView.forceActiveFocus()
     }

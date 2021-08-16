@@ -129,6 +129,10 @@ FocusScope {
             _currentView.positionViewAtIndex(initialIndex, ItemView.Contain);
     }
 
+    function setCurrentItemFocus(reason) {
+        _currentView.setCurrentItemFocus(reason);
+    }
+
     //---------------------------------------------------------------------------------------------
     // Private
 

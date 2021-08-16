@@ -25,6 +25,7 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
+// FIXME: We should refactor this to a PageLoader.
 FocusScope {
     id: root
 
@@ -44,6 +45,10 @@ FocusScope {
         root.tree = undefined
     }
 
+    function setCurrentItemFocus(reason) {
+        _currentView.setCurrentItemFocus(reason);
+    }
+
     property Component localMenuDelegate
 
     function loadView() {
@@ -60,6 +65,10 @@ FocusScope {
             isViewMultiView = true
         }
         view.replace(page, props)
+
+        extraLocalActions = _currentView.extraLocalActions
+        _currentView.Navigation.parentItem = root
+
         if (_currentView.model)
             root.contentModel = _currentView.model
         root.sortModel = _currentView.sortModel
@@ -92,10 +101,5 @@ FocusScope {
 
         anchors.fill:parent
         focus: true
-
-        onCurrentItemChanged: {
-            extraLocalActions = _currentView.extraLocalActions
-            _currentView.Navigation.parentItem = root
-        }
     }
 }

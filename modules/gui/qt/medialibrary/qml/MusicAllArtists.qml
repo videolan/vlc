@@ -58,6 +58,10 @@ FocusScope {
         }
     }
 
+    function setCurrentItemFocus(reason) {
+        _currentView.setCurrentItemFocus(reason);
+    }
+
     function _onNavigationCancel() {
         if (_currentView.currentIndex <= 0) {
             root.Navigation.defaultNavigationCancel()

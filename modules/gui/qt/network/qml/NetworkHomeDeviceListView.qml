@@ -40,6 +40,10 @@ FocusScope {
         deviceListView.currentIndex = _currentIndex
     }
 
+    function setCurrentItemFocus(reason) {
+        deviceListView.setCurrentItemFocus(reason);
+    }
+
     function _actionAtIndex(index, model, selectionModel) {
         var data = model.getDataAt(index)
         if (data.type === NetworkMediaModel.TYPE_DIRECTORY

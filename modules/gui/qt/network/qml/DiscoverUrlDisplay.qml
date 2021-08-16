@@ -33,6 +33,11 @@ FocusScope {
     //---------------------------------------------------------------------------------------------
     // Functions
     //---------------------------------------------------------------------------------------------
+
+    function setCurrentItemFocus(reason) {
+        searchField.forceActiveFocus(reason);
+    }
+
     // Private
 
     function _getColor() {

@@ -32,6 +32,10 @@ FocusScope {
     property alias selectionModel: tracklistdisplay_id.selectionDelegateModel
     readonly property bool isViewMultiView: false
 
+    function setCurrentItemFocus(reason) {
+        tracklistdisplay_id.setCurrentItemFocus(reason);
+    }
+
     MusicTrackListDisplay {
         id: tracklistdisplay_id
 

@@ -107,4 +107,8 @@ StackView {
             _currentView = view
         return found
     }
+
+    function setCurrentItemFocus(reason) {
+        currentItem.setCurrentItemFocus(reason);
+    }
 }

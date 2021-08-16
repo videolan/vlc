@@ -56,6 +56,10 @@ FocusScope {
         providerModel.addAndPlay(filterModel.mapIndexToSource(index))
     }
 
+    function setCurrentItemFocus(reason) {
+        _currentView.setCurrentItemFocus(reason);
+    }
+
     Util.SelectableDelegateModel{
         id: selectionModel
 

@@ -31,6 +31,10 @@ FocusScope {
     id: topFocusScope
     focus: true
 
+    function setCurrentItemFocus(reason) {
+        deviceSection.setCurrentItemFocus(reason);
+    }
+
     function _centerFlickableOnItem(minY, maxY) {
         if (maxY > flickable.contentItem.contentY + flickable.height) {
             flickable.contentItem.contentY = maxY - flickable.height
@@ -86,7 +90,13 @@ FocusScope {
                 onVisibleChanged: topFocusScope.resetFocus()
 
                 Navigation.parentItem: topFocusScope
-                Navigation.downItem: lanSection.visible ?  lanSection : null
+
+                Navigation.downAction: function() {
+                    if (lanSection.visible == false)
+                        return;
+
+                    lanSection.setCurrentItemFocus(Qt.TabFocusReason);
+                }
 
                 onActiveFocusChanged: {
                     if (activeFocus)
@@ -113,7 +123,13 @@ FocusScope {
                 onVisibleChanged: topFocusScope.resetFocus()
 
                 Navigation.parentItem: topFocusScope
-                Navigation.upItem: deviceSection.visible ?  deviceSection : null
+
+                Navigation.upAction: function() {
+                    if (deviceSection.visible == false)
+                        return;
+
+                    deviceSection.setCurrentItemFocus(Qt.TabFocusReason);
+                }
 
                 onActiveFocusChanged: {
                     if (activeFocus)

@@ -28,6 +28,8 @@ FocusScope {
 
     property var pageModel: []
 
+    property alias stackView: stackView
+
     signal pageChanged(string page)
     signal currentItemChanged(var currentItem)
 
@@ -58,6 +60,10 @@ FocusScope {
 
         stackView.currentItem.Navigation.parentItem = root
         root.currentItemChanged(stackView.currentItem)
+    }
+
+    function setCurrentItemFocus(reason) {
+        stackView.setCurrentItemFocus(reason);
     }
 
     StackViewExt {

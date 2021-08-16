@@ -204,7 +204,10 @@ FocusScope {
                     }
 
                     Navigation.parentItem: medialibId
-                    Navigation.downItem: stackView
+
+                    Navigation.downAction: function() {
+                        stackView.currentItem.setCurrentItemFocus(Qt.TabFocusReason);
+                    }
                 }
 
                 Item {
