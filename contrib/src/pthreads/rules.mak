@@ -9,6 +9,14 @@ ifdef HAVE_WIN32
 PKGS += pthreads
 endif
 
+ifndef HAVE_VISUALSTUDIO
+PKGS += dxvahd
+PKGS_ALL += dxvahd
+endif
+ifeq ($(HAVE_MINGW64_V8),true)
+PKGS_FOUND += dxvahd
+endif
+
 $(TARBALLS)/mingw-w64-$(WINPTHREADS_HASH).tar.xz:
 	$(call download_git,$(WINPTHREADS_GITURL),,$(WINPTHREADS_HASH))
 
@@ -25,4 +33,12 @@ pthreads: mingw-w64-$(WINPTHREADS_HASH).tar.xz .sum-pthreads
 .pthreads: pthreads
 	cd $</mingw-w64-libraries/winpthreads && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) -C mingw-w64-libraries -C winpthreads install
+	touch $@
+
+.sum-dxvahd: .sum-pthreads
+	touch $@
+
+.dxvahd: pthreads
+	mkdir -p -- "$(PREFIX)/include"
+	cd $< && cp mingw-w64-headers/include/dxvahd.h "$(PREFIX)/include"
 	touch $@
