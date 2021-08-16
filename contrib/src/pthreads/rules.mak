@@ -14,9 +14,11 @@ ifdef HAVE_WINSTORE
 PKGS += winrt_headers
 PKGS_ALL += winrt_headers
 endif
+PKGS += dxvahd
+PKGS_ALL += dxvahd
 endif
 ifeq ($(HAVE_MINGW64_V8),true)
-PKGS_FOUND += winrt_headers
+PKGS_FOUND += winrt_headers dxvahd
 endif
 
 $(TARBALLS)/mingw-w64-$(WINPTHREADS_HASH).tar.xz:
@@ -43,4 +45,12 @@ pthreads: mingw-w64-$(WINPTHREADS_HASH).tar.xz .sum-pthreads
 .winrt_headers: pthreads
 	mkdir -p -- "$(PREFIX)/include"
 	cd $< && cp mingw-w64-headers/include/windows.storage.h "$(PREFIX)/include"
+	touch $@
+
+.sum-dxvahd: .sum-pthreads
+	touch $@
+
+.dxvahd: pthreads
+	mkdir -p -- "$(PREFIX)/include"
+	cd $< && cp mingw-w64-headers/include/dxvahd.h "$(PREFIX)/include"
 	touch $@
