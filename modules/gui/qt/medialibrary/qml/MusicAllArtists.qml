@@ -32,9 +32,11 @@ import "qrc:///style/"
 FocusScope {
     id: root
 
-    readonly property int currentIndex: view.currentItem.currentIndex
+    readonly property int currentIndex: _currentView.currentIndex
     property int initialIndex: 0
     property alias model: artistModel
+
+    property alias _currentView: view.currentItem
 
     onInitialIndexChanged: resetFocus()
 
@@ -50,18 +52,18 @@ FocusScope {
         if (initialIndex >= artistModel.count)
             initialIndex = 0
         selectionModel.select(artistModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        if (view.currentItem) {
-            view.currentItem.currentIndex = initialIndex
-            view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+        if (_currentView) {
+            _currentView.currentIndex = initialIndex
+            _currentView.positionViewAtIndex(initialIndex, ItemView.Contain)
         }
     }
 
     function _onNavigationCancel() {
-        if (view.currentItem.currentIndex <= 0) {
+        if (_currentView.currentIndex <= 0) {
             root.Navigation.defaultNavigationCancel()
         } else {
-            view.currentItem.currentIndex = 0;
-            view.currentItem.positionViewAtIndex(0, ItemView.Contain);
+            _currentView.currentIndex = 0;
+            _currentView.positionViewAtIndex(0, ItemView.Contain);
         }
     }
 
@@ -130,7 +132,7 @@ FocusScope {
                 if (selectionModel.selectedIndexes.length > 1) {
                     medialib.addAndPlay( artistModel.getIdsForIndexes( selectionModel.selectedIndexes ) )
                 } else {
-                    view.currentItem.currentIndex = index
+                    _currentView.currentIndex = index
                     requestArtistAlbumView()
                     medialib.addAndPlay( artistModel.getIdForIndex(index) )
                 }

@@ -36,7 +36,7 @@ FocusScope {
     // Properties
     //---------------------------------------------------------------------------------------------
 
-    readonly property int currentIndex: currentItem.currentIndex
+    readonly property int currentIndex: _currentView.currentIndex
 
     property bool isMusic: false
 
@@ -65,7 +65,7 @@ FocusScope {
 
     property alias model: model
 
-    property alias currentItem: view.currentItem
+    property alias _currentView: view.currentItem
 
     //---------------------------------------------------------------------------------------------
     // Signals
@@ -86,13 +86,13 @@ FocusScope {
 
         var initialIndex = 0;
 
-        if (currentItem.currentIndex !== -1) {
-            initialIndex = currentItem.currentIndex;
+        if (_currentView.currentIndex !== -1) {
+            initialIndex = _currentView.currentIndex;
         }
 
         modelSelect.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect);
 
-        currentItem.currentIndex = initialIndex;
+        _currentView.currentIndex = initialIndex;
     }
 
     onInitialIndexChanged: resetFocus()
@@ -125,8 +125,8 @@ FocusScope {
 
         modelSelect.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect);
 
-        if (currentItem)
-            currentItem.positionViewAtIndex(initialIndex, ItemView.Contain);
+        if (_currentView)
+            _currentView.positionViewAtIndex(initialIndex, ItemView.Contain);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -152,11 +152,11 @@ FocusScope {
     }
 
     function _onNavigationCancel() {
-        if (root.currentItem.currentIndex <= 0) {
-            root.Navigation.defaultNavigationCancel()
+        if (_currentView.currentIndex <= 0) {
+            Navigation.defaultNavigationCancel()
         } else {
-            root.currentItem.currentIndex = 0;
-            root.currentItem.positionViewAtIndex(0, ItemView.Contain);
+            _currentView.currentIndex = 0;
+            _currentView.positionViewAtIndex(0, ItemView.Contain);
         }
     }
 

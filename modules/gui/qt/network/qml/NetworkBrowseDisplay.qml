@@ -34,13 +34,15 @@ FocusScope {
     property var contextMenu
     property var tree
     onTreeChanged: providerModel.tree = tree
-    readonly property var currentIndex: view.currentItem.currentIndex
+    readonly property var currentIndex: _currentView.currentIndex
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
     property var sortModel: [
         { text: i18n.qtr("Alphabetic"), criteria: "name"},
         { text: i18n.qtr("Url"), criteria: "mrl" }
     ]
+
+    property alias _currentView: view.currentItem
 
     function changeTree(new_tree) {
         history.push(["mc", "network", { tree: new_tree }]);
@@ -104,9 +106,9 @@ FocusScope {
         if (initialIndex >= filterModel.count)
             initialIndex = 0
         selectionModel.select(filterModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        if (view.currentItem) {
-            view.currentItem.currentIndex = initialIndex
-            view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+        if (_currentView) {
+            _currentView.currentIndex = initialIndex
+            _currentView.positionViewAtIndex(initialIndex, ItemView.Contain)
         }
     }
 

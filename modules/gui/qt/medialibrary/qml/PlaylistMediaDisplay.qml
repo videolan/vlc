@@ -57,8 +57,6 @@ FocusScope {
 
     property alias model: model
 
-    property alias currentItem: view
-
     property alias dragItem: dragItem
 
     // Events

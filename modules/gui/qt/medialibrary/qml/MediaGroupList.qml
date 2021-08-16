@@ -51,7 +51,9 @@ FocusScope {
 
     property alias model: model
 
-    property alias currentItem: view.currentItem
+    // Private
+
+    property alias _currentView: view.currentItem
 
     //---------------------------------------------------------------------------------------------
     // Signals
@@ -84,7 +86,9 @@ FocusScope {
     // Functions
     //---------------------------------------------------------------------------------------------
 
-    function setCurrentItemFocus(reason) { listView.setCurrentItemFocus(reason); }
+    function setCurrentItemFocus(reason) {
+        _currentView.setCurrentItemFocus(reason);
+    }
 
     function resetFocus() {
         if (model.count === 0)
@@ -97,8 +101,8 @@ FocusScope {
 
         modelSelect.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect);
 
-        if (currentItem)
-            currentItem.positionViewAtIndex(initialIndex, ItemView.Contain);
+        if (_currentView)
+            _currentView.positionViewAtIndex(initialIndex, ItemView.Contain);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -123,10 +127,10 @@ FocusScope {
     }
 
     function _onNavigationCancel() {
-        if (root.currentItem.currentIndex > 0) {
-            root.currentItem.currentIndex = 0;
+        if (_currentView.currentIndex > 0) {
+            _currentView.currentIndex = 0;
 
-            root.currentItem.positionViewAtIndex(0, ItemView.Contain);
+            _currentView.positionViewAtIndex(0, ItemView.Contain);
         } else {
             root.Navigation.defaultNavigationCancel();
         }

@@ -37,6 +37,8 @@ FocusScope {
     property var contentModel
     property var sortModel
 
+    property alias _currentView: view.currentItem
+
     //reset view
     function loadDefaultView() {
         root.tree = undefined
@@ -58,9 +60,9 @@ FocusScope {
             isViewMultiView = true
         }
         view.replace(page, props)
-        if (view.currentItem.model)
-            root.contentModel = view.currentItem.model
-        root.sortModel = view.currentItem.sortModel
+        if (_currentView.model)
+            root.contentModel = _currentView.model
+        root.sortModel = _currentView.sortModel
     }
 
     Component {
@@ -92,8 +94,8 @@ FocusScope {
         focus: true
 
         onCurrentItemChanged: {
-            extraLocalActions = view.currentItem.extraLocalActions
-            view.currentItem.Navigation.parentItem = root
+            extraLocalActions = _currentView.extraLocalActions
+            _currentView.Navigation.parentItem = root
         }
     }
 }

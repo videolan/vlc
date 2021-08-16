@@ -33,9 +33,11 @@ FocusScope {
         { text: i18n.qtr("Alphabetic"), criteria: "title" }
     ]
 
-    readonly property var currentIndex: view.currentItem.currentIndex
+    readonly property var currentIndex: _currentView.currentIndex
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
+
+    property alias _currentView: view.currentItem
 
     onInitialIndexChanged:  resetFocus()
 
@@ -61,8 +63,8 @@ FocusScope {
         if (initialIndex >= genreModel.count)
             initialIndex = 0
         selectionModel.select(genreModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        if (view.currentItem)
-            view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+        if (_currentView)
+            _currentView.positionViewAtIndex(initialIndex, ItemView.Contain)
     }
 
     MLGenreModel {
@@ -120,10 +122,10 @@ FocusScope {
     onActiveFocusChanged: {
         if (activeFocus && genreModel.count > 0 && !selectionModel.hasSelection) {
             var initialIndex = 0
-            if (view.currentItem.currentIndex !== -1)
-                initialIndex = view.currentItem.currentIndex
+            if (_currentView.currentIndex !== -1)
+                initialIndex = _currentView.currentIndex
             selectionModel.select(genreModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-            view.currentItem.currentIndex = initialIndex
+            _currentView.currentIndex = initialIndex
         }
     }
 
@@ -227,10 +229,10 @@ FocusScope {
 
             Navigation.parentItem: root
             Navigation.cancelAction: function() {
-                if (view.currentItem.currentIndex <= 0)
+                if (_currentView.currentIndex <= 0)
                     root.Navigation.defaultNavigationCancel()
                 else
-                    view.currentItem.currentIndex = 0;
+                    _currentView.currentIndex = 0;
             }
         }
     }
@@ -252,10 +254,10 @@ FocusScope {
             onActionForSelection: _actionAtIndex(selection)
             Navigation.parentItem: root
             Navigation.cancelAction: function() {
-                if (view.currentItem.currentIndex <= 0)
+                if (_currentView.currentIndex <= 0)
                     root.Navigation.defaultNavigationCancel()
                 else
-                    view.currentItem.currentIndex = 0;
+                    _currentView.currentIndex = 0;
             }
             dragItem: genreDragItem
             rowHeight: VLCStyle.tableCoverRow_height

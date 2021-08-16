@@ -37,9 +37,9 @@ FocusScope {
     // NOTE: Specify an optionnal header for the view.
     property Component header: undefined
 
-    property Item headerItem: (currentItem) ? currentItem.headerItem : undefined
+    property Item headerItem: (_currentView) ? _currentView.headerItem : undefined
 
-    readonly property int currentIndex: currentItem.currentIndex
+    readonly property int currentIndex: _currentView.currentIndex
 
     property int initialIndex: 0
 
@@ -52,9 +52,11 @@ FocusScope {
 
     // Aliases
 
-    property alias currentItem: view.currentItem
-
     property alias dragItem: dragItem
+
+    // Private
+
+    property alias _currentView: view.currentItem
 
     // Events
 
@@ -87,7 +89,7 @@ FocusScope {
     // Functions
 
     function setCurrentItemFocus(reason) {
-        currentItem.setCurrentItemFocus(reason);
+        _currentView.setCurrentItemFocus(reason);
     }
 
     function resetFocus() {
@@ -100,8 +102,8 @@ FocusScope {
 
         modelSelect.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect);
 
-        if (currentItem)
-            currentItem.positionViewAtIndex(initialIndex, ItemView.Contain);
+        if (_currentView)
+            _currentView.positionViewAtIndex(initialIndex, ItemView.Contain);
     }
 
     // Private
@@ -113,12 +115,12 @@ FocusScope {
     }
 
     function _onNavigationCancel() {
-        if (root.currentItem.currentIndex <= 0) {
-            root.Navigation.defaultNavigationCancel()
+        if (_currentView.currentIndex <= 0) {
+            Navigation.defaultNavigationCancel()
         } else {
-            root.currentItem.currentIndex = 0;
+            _currentView.currentIndex = 0;
 
-            root.currentItem.positionViewAtIndex(0, ItemView.Contain);
+            _currentView.positionViewAtIndex(0, ItemView.Contain);
         }
     }
 

@@ -36,17 +36,19 @@ FocusScope {
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
 
-    property Item headerItem: view.currentItem ? view.currentItem.headerItem : null
+    property Item headerItem: _currentView ? _currentView.headerItem : null
 
     // current index of album model
     readonly property int currentIndex: {
-        if (!view.currentItem)
+        if (!_currentView)
            return -1
         else if (mainInterface.gridView)
-           return view.currentItem.currentIndex
+           return _currentView.currentIndex
         else
            return headerItem.albumsListView.currentIndex
     }
+
+    property alias _currentView: view.currentItem
 
     property Component header: FocusScope {
         id: headerFs
@@ -77,7 +79,7 @@ FocusScope {
                     if (albumsListView)
                         albumsListView.forceActiveFocus(Qt.TabFocusReason)
                     else
-                        view.currentItem.setCurrentItemFocus(Qt.TabFocusReason)
+                        _currentView.setCurrentItemFocus(Qt.TabFocusReason)
 
                 }
             }
@@ -119,7 +121,7 @@ FocusScope {
                         Navigation.upItem: artistBanner
                         Navigation.downAction: function() {
                             headerFs.focus = false
-                            view.currentItem.setCurrentItemFocus(Qt.TabFocusReason)
+                            _currentView.setCurrentItemFocus(Qt.TabFocusReason)
                         }
 
                         delegate: Widgets.GridItem {
@@ -188,7 +190,7 @@ FocusScope {
     onActiveFocusChanged: {
         if (activeFocus && albumModel.count > 0 && !albumSelectionModel.hasSelection) {
             var initialIndex = 0
-            var albumsListView = mainInterface.gridView ? view.currentItem : headerItem.albumsListView
+            var albumsListView = mainInterface.gridView ? _currentView : headerItem.albumsListView
             if (albumsListView.currentIndex !== -1)
                 initialIndex = albumsListView.currentIndex
             albumSelectionModel.select(albumModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
@@ -204,7 +206,7 @@ FocusScope {
         if (initialIndex >= albumModel.count)
             initialIndex = 0
         albumSelectionModel.select(albumModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        var albumsListView = mainInterface.gridView ? view.currentItem : headerItem.albumsListView
+        var albumsListView = mainInterface.gridView ? _currentView : headerItem.albumsListView
         if (albumsListView) {
             albumsListView.currentIndex = initialIndex
             albumsListView.positionViewAtIndex(initialIndex, ItemView.Contain)
@@ -220,11 +222,11 @@ FocusScope {
     }
 
     function _onNavigationCancel() {
-        if (view.currentItem.currentIndex <= 0) {
+        if (_currentView.currentIndex <= 0) {
             root.Navigation.defaultNavigationCancel()
         } else {
-            view.currentItem.currentIndex = 0;
-            view.currentItem.positionViewAtIndex(0, ItemView.Contain)
+            _currentView.currentIndex = 0;
+            _currentView.positionViewAtIndex(0, ItemView.Contain)
         }
 
         if (tableView_id.currentIndex <= 0)
@@ -433,7 +435,7 @@ FocusScope {
 
             function setCurrentItemFocus(reason) {
                 positionViewAtIndex(currentIndex, ItemView.Contain)
-                currentItem.forceActiveFocus(reason)
+                _currentView.forceActiveFocus(reason)
             }
 
             Util.SelectableDelegateModel {

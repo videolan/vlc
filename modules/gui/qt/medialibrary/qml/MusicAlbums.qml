@@ -39,14 +39,16 @@ FocusScope {
 
     property alias model: albumModelId
     property alias parentId: albumModelId.parentId
-    readonly property var currentIndex: view.currentItem.currentIndex
+    readonly property var currentIndex: _currentView.currentIndex
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
     property int gridViewMarginTop: VLCStyle.margin_large
-    property var gridViewRowX: mainInterface.gridView ? view.currentItem.rowX : undefined
+    property var gridViewRowX: mainInterface.gridView ? _currentView.rowX : undefined
 
     property Component header: Item{}
-    readonly property var headerItem: view.currentItem ? view.currentItem.headerItem : undefined
+    readonly property var headerItem: _currentView ? _currentView.headerItem : undefined
+
+    property alias _currentView: view.currentItem
 
     onInitialIndexChanged:  resetFocus()
     onModelChanged: resetFocus()
@@ -60,8 +62,12 @@ FocusScope {
         if (initialIndex >= albumModelId.count)
             initialIndex = 0
         selectionModel.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        if (view.currentItem)
-            view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+        if (_currentView)
+            _currentView.positionViewAtIndex(initialIndex, ItemView.Contain)
+    }
+
+    function setCurrentItemFocus(reason) {
+        _currentView.setCurrentItemFocus(reason);
     }
 
     function _actionAtIndex(index) {
@@ -73,11 +79,11 @@ FocusScope {
     }
 
     function _onNavigationCancel() {
-        if (view.currentItem.currentIndex <= 0) {
+        if (_currentView.currentIndex <= 0) {
             root.Navigation.defaultNavigationCancel()
         } else {
-            view.currentItem.currentIndex = 0;
-            view.currentItem.positionViewAtIndex(0, ItemView.Contain)
+            _currentView.currentIndex = 0;
+            _currentView.positionViewAtIndex(0, ItemView.Contain)
         }
     }
 
@@ -188,12 +194,12 @@ FocusScope {
             }
 
             onActionAtIndex: {
-                if (selectionModel.selectedIndexes.length === 1) {
-                    view._switchExpandItem(index)
-                } else {
+                if (selectionModel.selectedIndexes.length === 1)
+                    switchExpandItem(index)
+                else
                     _actionAtIndex(index)
-                }
             }
+
             onSelectAll: selectionModel.selectAll()
             onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
 
@@ -274,15 +280,6 @@ FocusScope {
                 else
                     view.replace(tableComponent)
             }
-        }
-
-        function _switchExpandItem(index) {
-            view.currentItem.switchExpandItem(index)
-
-            /*if (view.currentItem.expandIndex === index)
-                view.currentItem.expandIndex = -1
-            else
-                view.currentItem.expandIndex = index*/
         }
     }
 
