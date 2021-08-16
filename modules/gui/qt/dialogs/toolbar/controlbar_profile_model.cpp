@@ -184,6 +184,65 @@ decltype (ControlbarProfileModel::m_defaults)
                         }
                     }
                 }
+            },
+            {
+                N_("Classic Style"),
+                {
+                    {
+                        PlayerControlbarModel::Mainplayer,
+                        {
+                            {
+                                {
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::PREVIOUS_BUTTON,
+                                    ControlListModel::STOP_BUTTON,
+                                    ControlListModel::NEXT_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::FULLSCREEN_BUTTON,
+                                    ControlListModel::EXTENDED_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::PLAYLIST_BUTTON,
+                                    ControlListModel::LOOP_BUTTON,
+                                    ControlListModel::RANDOM_BUTTON
+                                },
+                                {
+
+                                },
+                                {
+                                    ControlListModel::VOLUME
+                                }
+                            }
+                        }
+                    },
+                    {
+                        PlayerControlbarModel::Miniplayer,
+                        {
+                            {
+                                {
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::PREVIOUS_BUTTON,
+                                    ControlListModel::STOP_BUTTON,
+                                    ControlListModel::NEXT_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::FULLSCREEN_BUTTON,
+                                    ControlListModel::EXTENDED_BUTTON,
+                                    ControlListModel::WIDGET_SPACER,
+                                    ControlListModel::PLAYLIST_BUTTON,
+                                    ControlListModel::LOOP_BUTTON,
+                                    ControlListModel::RANDOM_BUTTON
+                                },
+                                {
+
+                                },
+                                {
+                                    ControlListModel::VOLUME
+                                }
+                            }
+                        }
+                    }
+                }
             }
         };
 
