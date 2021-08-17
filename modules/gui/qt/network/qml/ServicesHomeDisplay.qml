@@ -67,17 +67,14 @@ Widgets.PageLoader {
                 path: [{display: deviceModel.name, tree: {}}]
 
                 onHomeButtonClicked: history.push(["mc", "discover", "services"])
-
-                function changeTree(new_tree) {
-                }
             }
 
             providerModel: deviceModel
             contextMenu: contextMenu
 
-            function changeTree(new_tree) {
-                history.push(["mc", "discover", "services", "source_browse", { tree: new_tree, "root_name": deviceModel.name, "source_name": source_name }]);
-            }
+            onBrowse: history.push(["mc", "discover", "services", "source_browse",
+                                    { tree: tree,
+                                      "root_name": deviceModel.name, "source_name": source_name }])
 
             NetworkDeviceModel {
                 id: deviceModel
@@ -118,9 +115,8 @@ Widgets.PageLoader {
                 }
             }
 
-            function changeTree(new_tree) {
-                history.push(["mc", "discover", "services", "source_browse", { tree: new_tree, "root": root_name }]);
-            }
+            onBrowse: history.push(["mc", "discover", "services", "source_browse",
+                                    { tree: tree, "root": root_name }])
 
             NetworkMediaModel {
                 id: mediaModel

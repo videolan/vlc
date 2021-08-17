@@ -33,8 +33,11 @@ FocusScope {
     property var providerModel
     property var contextMenu
     property var tree
-    onTreeChanged: providerModel.tree = tree
+
     readonly property var currentIndex: _currentView.currentIndex
+
+    readonly property bool isViewMultiView: true
+
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
     property var sortModel: [
@@ -44,9 +47,13 @@ FocusScope {
 
     property alias _currentView: view.currentItem
 
-    function changeTree(new_tree) {
-        history.push(["mc", "network", { tree: new_tree }]);
-    }
+    signal browse(variant tree, int reason)
+
+    providerModel: modelMedia
+
+    contextMenu: NetworkMediaContextMenu { model: modelMedia }
+
+    onTreeChanged: providerModel.tree = tree
 
     function playSelected() {
         providerModel.addAndPlay(filterModel.mapIndexesToSource(selectionModel.selectedIndexes))
@@ -124,7 +131,7 @@ FocusScope {
             var data = filterModel.getDataAt(index)
             if (data.type === NetworkMediaModel.TYPE_DIRECTORY
                     || data.type === NetworkMediaModel.TYPE_NODE)  {
-                changeTree(data.tree)
+                browse(data.tree, Qt.TabFocusReason)
             } else {
                 playAt(index)
             }
@@ -204,7 +211,7 @@ FocusScope {
 
                 onItemDoubleClicked: {
                     if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
-                        changeTree(model.tree)
+                        browse(tree, Qt.MouseFocusReason)
                     else
                         playAt(index)
                 }
