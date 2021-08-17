@@ -96,8 +96,12 @@ Widgets.PageLoader {
 
             onCurrentIndexChanged: _updateHistoryAll(currentIndex)
 
-            onShowList: history.push(["mc", "video", "groups", "list",
-                                      { parentId: model.id, name: model.name }])
+            onShowList: {
+                history.push(["mc", "video", "groups", "list",
+                             { parentId: model.id, name: model.name }]);
+
+                stackView.currentItem.setCurrentItemFocus(reason);
+            }
         }
     }
 
