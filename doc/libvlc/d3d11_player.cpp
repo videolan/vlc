@@ -74,7 +74,7 @@ struct render_context
 
     ID3D11SamplerState *samplerState;
 
-    CRITICAL_SECTION sizeLock; // the ReportSize callback cannot be called during/after the Cleanup_cb is called
+    SRWLOCK sizeLock; // the ReportSize callback cannot be called during/after the Cleanup_cb is called
     unsigned width, height;
     void (*ReportSize)(void *ReportOpaque, unsigned width, unsigned height);
     void *ReportOpaque;
@@ -489,12 +489,13 @@ static void Cleanup_cb( void *opaque )
     ctx->d3dctxVLC->Release();
 }
 
+// receive the libvlc callback to call when we want to change the libvlc output size
 static void Resize_cb( void *opaque,
                        void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
                        void *report_opaque )
 {
     struct render_context *ctx = static_cast<struct render_context *>( opaque );
-    EnterCriticalSection(&ctx->sizeLock);
+    AcquireSRWLockExclusive(&ctx->sizeLock);
     ctx->ReportSize = report_size_change;
     ctx->ReportOpaque = report_opaque;
 
@@ -503,7 +504,7 @@ static void Resize_cb( void *opaque,
         /* report our initial size */
         ctx->ReportSize(ctx->ReportOpaque, ctx->width, ctx->height);
     }
-    LeaveCriticalSection(&ctx->sizeLock);
+    ReleaseSRWLockExclusive(&ctx->sizeLock);
 }
 
 static const char *AspectRatio = NULL;
@@ -530,10 +531,13 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             /* tell libvlc that our size has changed */
             ctx->width  = LOWORD(lParam) * (BORDER_RIGHT - BORDER_LEFT) / 2.0f; /* remove the orange part ! */
             ctx->height = HIWORD(lParam) * (BORDER_TOP - BORDER_BOTTOM) / 2.0f;
-            EnterCriticalSection(&ctx->sizeLock);
+
+            // tell libvlc we want a new rendering size
+            // we could also match the source video size and scale in swapchain render
+            AcquireSRWLockExclusive(&ctx->sizeLock);
             if (ctx->ReportSize != nullptr)
                 ctx->ReportSize(ctx->ReportOpaque, ctx->width, ctx->height);
-            LeaveCriticalSection(&ctx->sizeLock);
+            ReleaseSRWLockExclusive(&ctx->sizeLock);
         }
         break;
 
@@ -606,7 +610,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     free( file_path );
     Context.p_mp = libvlc_media_player_new_from_media( p_media );
 
-    InitializeCriticalSection(&Context.sizeLock);
+    InitializeSRWLock(&Context.sizeLock);
 
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
 
@@ -670,8 +674,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
     release_direct3d(&Context);
 
     libvlc_release( p_libvlc );
-
-    DeleteCriticalSection(&Context.sizeLock);
 
     return msg.wParam;
 }
