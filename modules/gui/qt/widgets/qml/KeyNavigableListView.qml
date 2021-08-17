@@ -20,6 +20,7 @@ import QtQuick.Controls 2.4
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
+import "qrc:///util/Helpers.js" as Helpers
 
 FocusScope {
     id: listview_id
@@ -37,6 +38,10 @@ FocusScope {
     property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
 
     property bool keyNavigationWraps : false
+
+    // Private
+
+    property int _currentFocusReason: Qt.OtherFocusReason
 
     // Aliases
 
@@ -97,18 +102,34 @@ FocusScope {
 
     Accessible.role: Accessible.List
 
+    // Events
+
+    onCurrentItemChanged: {
+        if (_currentFocusReason === Qt.OtherFocusReason)
+            return;
+
+        if (currentItem)
+            Helpers.enforceFocus(currentItem, _currentFocusReason);
+
+        _currentFocusReason = Qt.OtherFocusReason;
+    }
+
     // Functions
 
     function setCurrentItemFocus(reason) {
-        if (!model || model.count === 0)
+        if (!model || model.count === 0) {
+            // NOTE: Saving the focus reason for later.
+            _currentFocusReason = reason;
+
             return;
+        }
 
         if (currentIndex === -1)
             currentIndex = 0;
 
         positionViewAtIndex(currentIndex, ItemView.Contain);
 
-        currentItem.forceActiveFocus(reason);
+        Helpers.enforceFocus(currentItem, reason);
     }
 
     function nextPage() {
