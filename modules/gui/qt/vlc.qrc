@@ -117,6 +117,9 @@
         <file alias="noart_videoCover.svg">pixmaps/noart_videoCover.svg</file>
         <file alias="play_button.svg">pixmaps/play_button.svg</file>
         <file alias="back.svg">pixmaps/back.svg</file>
+        <file alias="theme_dark.svg">pixmaps/theme_dark.svg</file>
+        <file alias="theme_daynight.svg">pixmaps/theme_daynight.svg</file>
+        <file alias="theme_light.svg">pixmaps/theme_light.svg</file>
     </qresource>
     <qresource prefix="/prefsmenu">
         <file alias="cone_audio_64.png">pixmaps/prefs/spref_cone_Audio_64.png</file>

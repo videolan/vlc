@@ -653,7 +653,10 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/cone.svg \
 	gui/qt/pixmaps/album_cover.svg \
 	gui/qt/pixmaps/back.svg \
-	gui/qt/pixmaps/time.svg
+	gui/qt/pixmaps/time.svg \
+	gui/qt/pixmaps/theme_dark.svg \
+	gui/qt/pixmaps/theme_daynight.svg \
+	gui/qt/pixmaps/theme_light.svg
 
 if HAVE_WIN32
 libqt_plugin_la_RES += gui/qt/pixmaps/windows-theme.conf
