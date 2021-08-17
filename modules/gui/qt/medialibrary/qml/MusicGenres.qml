@@ -39,6 +39,8 @@ FocusScope {
 
     property alias _currentView: view.currentItem
 
+    signal showAlbumView(variant id, string name, int reason)
+
     onInitialIndexChanged:  resetFocus()
 
     Component.onCompleted: loadView()
@@ -49,10 +51,6 @@ FocusScope {
         } else {
             view.replace(tableComponent)
         }
-    }
-
-    function showAlbumView( m ) {
-        history.push([ "mc", "music", "genres", "albums", { parentId: m.id, genreName: m.name } ])
     }
 
     function resetFocus() {
@@ -87,7 +85,8 @@ FocusScope {
             medialib.addAndPlay(model.getIdsForIndexes(selectionModel.selectedIndexes))
         } else if (selectionModel.selectedIndexes.length === 1) {
             var sel = selectionModel.selectedIndexes[0]
-            showAlbumView( genreModel.getDataAt(sel) )
+            var model = genreModel.getDataAt(sel)
+            showAlbumView(model.id, model.name, Qt.TabFocusReason)
         }
     }
 
@@ -172,7 +171,7 @@ FocusScope {
                 unselectedUnderlay: shadows.unselected
                 selectedUnderlay: shadows.selected
 
-                onItemDoubleClicked: root.showAlbumView(model)
+                onItemDoubleClicked: root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
                 onItemClicked: gridView_id.leftClickOnItem(modifier, item.index)
 
                 onPlayClicked: {
@@ -274,7 +273,7 @@ FocusScope {
             ]
 
             onItemDoubleClicked: {
-                root.showAlbumView(model)
+                root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
             }
 
             onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))

@@ -63,6 +63,13 @@ Widgets.PageLoader {
         /* List View */
         MusicGenres {
             onCurrentIndexChanged: _updateGenresAllHistory(currentIndex)
+
+            onShowAlbumView: {
+                history.push(["mc", "music", "genres", "albums",
+                             { parentId: id, genreName: name }]);
+
+                stackView.currentItem.setCurrentItemFocus(reason);
+            }
         }
     }
 
