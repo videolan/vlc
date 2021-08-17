@@ -380,8 +380,8 @@ FocusScope {
                 width: VLCStyle.dp(320, VLCStyle.scale)
                 height: VLCStyle.dp(180, VLCStyle.scale)
                 z: 2
-                visible: !root._inhibitMiniPlayer && root._showMiniPlayer
-                enabled: !root._inhibitMiniPlayer && root._showMiniPlayer
+                visible: !root._inhibitMiniPlayer && root._showMiniPlayer && mainInterface.hasEmbededVideo
+                enabled: !root._inhibitMiniPlayer && root._showMiniPlayer && mainInterface.hasEmbededVideo
 
                 dragXMin: 0
                 dragXMax: root.width - playerPip.width
