@@ -64,8 +64,11 @@ Widgets.PageLoader {
         MusicAllArtists {
             onCurrentIndexChanged: _updateArtistsAllHistory(currentIndex)
 
-            function requestArtistAlbumView() /* override */ {
-                history.push([ "mc", "music", "artists", "albums", { initialIndex: currentIndex } ])
+            onRequestArtistAlbumView: {
+                history.push(["mc", "music", "artists", "albums",
+                              { initialIndex: currentIndex } ]);
+
+                stackView.currentItem.setCurrentItemFocus(reason);
             }
         }
     }

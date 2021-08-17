@@ -40,9 +40,7 @@ FocusScope {
 
     onInitialIndexChanged: resetFocus()
 
-    function requestArtistAlbumView() {
-        console.assert(false, "must be reimplemented")
-    }
+    signal requestArtistAlbumView(int reason)
 
     function resetFocus() {
         if (artistModel.count === 0)
@@ -137,7 +135,7 @@ FocusScope {
                     medialib.addAndPlay( artistModel.getIdsForIndexes( selectionModel.selectedIndexes ) )
                 } else {
                     _currentView.currentIndex = index
-                    requestArtistAlbumView()
+                    requestArtistAlbumView(Qt.TabFocusReason)
                     medialib.addAndPlay( artistModel.getIdForIndex(index) )
                 }
             }
@@ -171,7 +169,7 @@ FocusScope {
 
                 onItemClicked: artistGrid.leftClickOnItem(modifier, index)
 
-                onItemDoubleClicked: root.requestArtistAlbumView(model)
+                onItemDoubleClicked: root.requestArtistAlbumView(Qt.MouseFocusReason)
 
                 onContextMenuButtonClicked: {
                     artistGrid.rightClickOnItem(index)
@@ -206,7 +204,7 @@ FocusScope {
                 if (selection.length > 1) {
                     medialib.addAndPlay( artistModel.getIdsForIndexes( selection ) )
                 } else if ( selection.length === 1) {
-                    requestArtistAlbumView()
+                    requestArtistAlbumView(Qt.TabFocusReason)
                     medialib.addAndPlay( artistModel.getIdForIndex( selection[0] ) )
                 }
             }
@@ -216,9 +214,8 @@ FocusScope {
                 { criteria: "nb_tracks", width: VLCStyle.colWidth(1), text: i18n.qtr("Tracks") }
             ]
 
-            onItemDoubleClicked: {
-                root.requestArtistAlbumView(model)
-            }
+            onItemDoubleClicked: root.requestArtistAlbumView(Qt.MouseFocusReason)
+
             onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
             onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
