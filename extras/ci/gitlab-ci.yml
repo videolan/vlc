@@ -10,6 +10,7 @@ default:
     after_script:
         - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
         - mv contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 2>/dev/null || true
+        - cd contrib && find . -maxdepth 1 -type f -name "vlc-contrib-*-${VLC_CONTRIB_SHA}.tar.bz2" -exec sh -c 'tar tvf "$0" && shasum -a 512 "$0" | tee SHA512SUM' "{}" \;
 
 variables:
     VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20201106141924
@@ -120,6 +121,7 @@ variables:
     artifacts:
         paths:
             - contrib/vlc-contrib-${TRIPLET}-*.tar.bz2
+            - contrib/SHA512SUM
 
 # Common rules for jobs using docker
 .docker-template:
