@@ -25,81 +25,95 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-// FIXME: We should refactor this to a PageLoader.
-FocusScope {
+Widgets.PageLoader {
     id: root
 
-    property var extraLocalActions: undefined
-    property bool isViewMultiView: true
-    property var tree: undefined
-    onTreeChanged:  loadView()
-    Component.onCompleted: loadView()
+    // Properties
 
-    property var contentModel
     property var sortModel
+    property var contentModel
+    property bool isViewMultiView: true
 
-    property alias _currentView: view.currentItem
-
-    //reset view
-    function loadDefaultView() {
-        root.tree = undefined
-    }
-
-    function setCurrentItemFocus(reason) {
-        _currentView.setCurrentItemFocus(reason);
-    }
+    property var tree: undefined
 
     property Component localMenuDelegate
 
-    function loadView() {
-        var page = "";
-        var props = undefined;
-        if (root.tree === undefined) {
-            page ="qrc:///network/NetworkHomeDisplay.qml"
-            root.localMenuDelegate = null
-            isViewMultiView = false
+    // Settings
+
+    defaultPage: "home"
+
+    pageModel: [{
+        name: "home",
+        url: "qrc:///network/NetworkHomeDisplay.qml"
+    }, {
+        name: "browse",
+        url: "qrc:///network/NetworkBrowseDisplay.qml"
+    }]
+
+    // Events
+
+    onCurrentItemChanged: {
+        sortModel = currentItem.sortModel;
+        contentModel = currentItem.model;
+
+        isViewMultiView = (currentItem.isViewMultiView === undefined
+                           ||
+                           currentItem.isViewMultiView);
+
+        if (tree) {
+            if (view == "home")
+                localMenuDelegate = null;
+            else
+                localMenuDelegate = componentBar;
         } else {
-            page = "qrc:///network/NetworkBrowseDisplay.qml"
-            props = { providerModel: mediaModel, contextMenu: mediaContextMenu, tree: root.tree }
-            root.localMenuDelegate = addressBar
-            isViewMultiView = true
-        }
-        view.replace(page, props)
-
-        extraLocalActions = _currentView.extraLocalActions
-        _currentView.Navigation.parentItem = root
-
-        if (_currentView.model)
-            root.contentModel = _currentView.model
-        root.sortModel = _currentView.sortModel
-    }
-
-    Component {
-        id: addressBar
-
-        NetworkAddressbar {
-            path: mediaModel.path
-
-            onHomeButtonClicked: history.push(["mc", "network"])
+            localMenuDelegate = null;
         }
     }
+
+    // Functions
+    // PageLoader reimplementation
+
+    // FIXME: Maybe this could be done with a 'guard' mechanism on the pageModel.
+    function loadView() {
+        if (tree)
+            stackView.loadView(pageModel, view, viewProperties);
+        else
+            stackView.loadView(pageModel, "home", viewProperties);
+
+        stackView.currentItem.Navigation.parentItem = root;
+
+        currentItemChanged(stackView.currentItem);
+    }
+
+    // Connections
+
+    Connections {
+        target: stackView.currentItem
+
+        onBrowse: {
+            root.tree = tree;
+
+            history.push(["mc", "network", "browse", { tree: tree }]);
+
+            stackView.currentItem.setCurrentItemFocus(reason);
+        }
+    }
+
+    // Children
 
     NetworkMediaModel {
-        id: mediaModel
+        id: modelMedia
 
         ctx: mainctx
     }
 
-    NetworkMediaContextMenu {
-        id: mediaContextMenu
+    Component {
+        id: componentBar
 
-        model: mediaModel
-    }
+        NetworkAddressbar {
+            path: modelMedia.path
 
-    Widgets.StackViewExt {
-        id: view
-
-        anchors.fill:parent
-        focus: true
+            onHomeButtonClicked: history.push(["mc", "network", "home"])
+        }
     }
 }
