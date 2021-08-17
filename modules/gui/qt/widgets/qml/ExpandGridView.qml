@@ -20,6 +20,7 @@ import QtQuick.Controls 2.4
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
+import "qrc:///util/Helpers.js" as Helpers
 
 FocusScope {
     id: root
@@ -101,16 +102,20 @@ FocusScope {
     Accessible.role: Accessible.Table
 
     function setCurrentItemFocus(reason) {
-        if (!model || model.count === 0 || currentIndex === -1 || expandIndex !== -1)
-            return;
 
+        // NOTE: Saving the focus reason for later.
         _currentFocusReason = reason;
 
+        if (!model || model.count === 0 || currentIndex === -1 || expandIndex !== -1) {
+            // NOTE: By default we want the focus on the flickable.
+            flickable.forceActiveFocus(reason);
+
+            return;
+        }
+
         if (_containsItem(currentIndex))
-            _getItem(currentIndex).forceActiveFocus(reason);
+            Helpers.enforceFocus(_getItem(currentIndex), reason);
         else
-            // NOTE: By default we want the focus on the flickable. This is useful when no item is
-            //       instanciated.
             flickable.forceActiveFocus(reason);
 
         // NOTE: We make sure the current item is fully visible.
