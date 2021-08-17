@@ -25,8 +25,8 @@
 
 #include <vlc/vlc.h>
 
-#define SCREEN_WIDTH  1500
-#define SCREEN_HEIGHT  900
+#define INITIAL_WIDTH  1500
+#define INITIAL_HEIGHT  900
 #define BORDER_LEFT    (-0.95f)
 #define BORDER_RIGHT   ( 0.85f)
 #define BORDER_TOP     ( 0.95f)
@@ -75,7 +75,11 @@ struct render_context
     ID3D11SamplerState *samplerState;
 
     SRWLOCK sizeLock; // the ReportSize callback cannot be called during/after the Cleanup_cb is called
+    SRWLOCK swapchainLock; // protect the swapchain access when the UI needs to resize it
     unsigned width, height;
+    struct {
+        unsigned width, height;
+    } client_area;
     void (*ReportSize)(void *ReportOpaque, unsigned width, unsigned height);
     void *ReportOpaque;
 };
@@ -131,8 +135,8 @@ static void init_direct3d(struct render_context *ctx)
 
     scd.BufferCount = 1;
     scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    scd.BufferDesc.Width = SCREEN_WIDTH;
-    scd.BufferDesc.Height = SCREEN_HEIGHT;
+    scd.BufferDesc.Width = ctx->client_area.width;
+    scd.BufferDesc.Height = ctx->client_area.height;
     scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     scd.OutputWindow = ctx->hWnd;
     scd.SampleDesc.Count = 1;
@@ -165,12 +169,7 @@ static void init_direct3d(struct render_context *ctx)
         pMultithread->Release();
     }
 
-    // RECT currentRect;
-    // GetWindowRect(hWnd, &currentRect);
-    //currentRect.right - currentRect.left;
-    //currentRect.bottom - currentRect.top;
-
-    D3D11_VIEWPORT viewport = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0 };
+    D3D11_VIEWPORT viewport = { 0, 0, (FLOAT)ctx->client_area.width, (FLOAT)ctx->client_area.height, 0, 0 };
 
     ctx->d3dctx->RSSetViewports(1, &viewport);
 
@@ -443,6 +442,7 @@ static bool StartRendering_cb( void *opaque, bool enter )
     struct render_context *ctx = static_cast<struct render_context *>( opaque );
     if ( enter )
     {
+        AcquireSRWLockExclusive(&ctx->swapchainLock);
         // DEBUG: draw greenish background to show where libvlc doesn't draw in the texture
         // Normally you should Clear with a black background
         static const FLOAT greenRGBA[4] = {0.5f, 0.5f, 0.0f, 1.0f};
@@ -457,6 +457,7 @@ static bool StartRendering_cb( void *opaque, bool enter )
         // We start the drawing of the shared texture in our app as early as possible
         // in hope it's done as soon as Swap_cb is called
         ctx->d3dctx->DrawIndexed(ctx->quadIndexCount, 0, 0);
+        ReleaseSRWLockExclusive(&ctx->swapchainLock);
     }
 
     return true;
@@ -528,7 +529,30 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
     {
         case WM_SIZE:
         {
-            /* tell libvlc that our size has changed */
+            ctx->client_area.width  = LOWORD(lParam);
+            ctx->client_area.height = HIWORD(lParam);
+
+            // update the swapchain to match our window client area
+            AcquireSRWLockExclusive(&ctx->swapchainLock);
+            if (ctx->swapchain != nullptr)
+            {
+                ctx->swapchainRenderTarget->Release();
+                ctx->swapchain->ResizeBuffers(0, ctx->client_area.width, ctx->client_area.height, DXGI_FORMAT_UNKNOWN, 0);
+
+                ID3D11Texture2D *pBackBuffer;
+                ctx->swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+
+                ctx->d3device->CreateRenderTargetView(pBackBuffer, NULL, &ctx->swapchainRenderTarget);
+                pBackBuffer->Release();
+
+                ctx->d3dctx->OMSetRenderTargets(1, &ctx->swapchainRenderTarget, NULL);
+
+                D3D11_VIEWPORT viewport = { 0, 0, (FLOAT)ctx->client_area.width, (FLOAT)ctx->client_area.height, 0, 0 };
+
+                ctx->d3dctx->RSSetViewports(1, &viewport);
+            }
+            ReleaseSRWLockExclusive(&ctx->swapchainLock);
+
             ctx->width  = LOWORD(lParam) * (BORDER_RIGHT - BORDER_LEFT) / 2.0f; /* remove the orange part ! */
             ctx->height = HIWORD(lParam) * (BORDER_TOP - BORDER_BOTTOM) / 2.0f;
 
@@ -611,6 +635,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     Context.p_mp = libvlc_media_player_new_from_media( p_media );
 
     InitializeSRWLock(&Context.sizeLock);
+    InitializeSRWLock(&Context.swapchainLock);
 
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
 
@@ -623,16 +648,19 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     RegisterClassEx(&wc);
 
-    RECT wr = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+    RECT wr = {0, 0, INITIAL_WIDTH, INITIAL_HEIGHT};
     AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
+
+    Context.client_area.width  = wr.right - wr.left;
+    Context.client_area.height = wr.bottom - wr.top;
 
     Context.hWnd = CreateWindowEx(0,
                           "WindowClass",
                           "libvlc Demo app",
                           WS_OVERLAPPEDWINDOW,
                           CW_USEDEFAULT, CW_USEDEFAULT,
-                          wr.right - wr.left,
-                          wr.bottom - wr.top,
+                          Context.client_area.width,
+                          Context.client_area.height,
                           NULL,
                           NULL,
                           hInstance,
