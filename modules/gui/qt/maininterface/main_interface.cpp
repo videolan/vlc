@@ -39,7 +39,6 @@
 #include "util/color_scheme_model.hpp"
 
 #include "widgets/native/interface_widgets.hpp"     // bgWidget, videoWidget
-#include "dialogs/firstrun/firstrun.hpp"                 // First Run
 
 #include "playlist/playlist_model.hpp"
 #include "playlist/playlist_controller.hpp"

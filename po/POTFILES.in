@@ -731,8 +731,6 @@ modules/gui/qt/dialogs/extensions/extensions.cpp
 modules/gui/qt/dialogs/extensions/extensions.hpp
 modules/gui/qt/dialogs/fingerprint/fingerprintdialog.cpp
 modules/gui/qt/dialogs/fingerprint/fingerprintdialog.hpp
-modules/gui/qt/dialogs/firstrun/firstrun.cpp
-modules/gui/qt/dialogs/firstrun/firstrun.hpp
 modules/gui/qt/dialogs/firstrun/firstrunwizard.cpp
 modules/gui/qt/dialogs/firstrun/firstrunwizard.hpp
 modules/gui/qt/dialogs/gototime/gototime.cpp

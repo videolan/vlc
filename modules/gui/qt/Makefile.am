@@ -82,7 +82,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/fingerprint/chromaprint.hpp \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.cpp \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.hpp \
-	gui/qt/dialogs/firstrun/firstrun.cpp gui/qt/dialogs/firstrun/firstrun.hpp \
 	gui/qt/dialogs/firstrun/firstrunwizard.cpp gui/qt/dialogs/firstrun/firstrunwizard.hpp \
 	gui/qt/dialogs/gototime/gototime.cpp gui/qt/dialogs/gototime/gototime.hpp \
 	gui/qt/dialogs/help/aboutmodel.cpp \
@@ -314,7 +313,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/extensions/extensions_manager.moc.cpp \
 	gui/qt/dialogs/fingerprint/chromaprint.moc.cpp \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.moc.cpp \
-	gui/qt/dialogs/firstrun/firstrun.moc.cpp \
 	gui/qt/dialogs/firstrun/firstrunwizard.moc.cpp \
 	gui/qt/dialogs/gototime/gototime.moc.cpp \
 	gui/qt/dialogs/help/aboutmodel.moc.cpp \
