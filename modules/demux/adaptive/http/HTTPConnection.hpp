@@ -68,7 +68,7 @@ namespace adaptive
         {
             public:
                 HTTPConnection(vlc_object_t *, AuthStorage *,  Transport *,
-                               const ConnectionParams &, bool = false);
+                               const ConnectionParams &);
                 virtual ~HTTPConnection();
 
                 virtual bool    canReuse     (const ConnectionParams &) const;

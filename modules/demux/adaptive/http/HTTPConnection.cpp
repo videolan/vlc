@@ -66,7 +66,7 @@ const std::string & AbstractConnection::getContentType() const
 }
 
 HTTPConnection::HTTPConnection(vlc_object_t *p_object_, AuthStorage *auth,
-                               Transport *socket_, const ConnectionParams &proxy, bool persistent)
+                               Transport *socket_, const ConnectionParams &proxy)
     : AbstractConnection( p_object_ )
 {
     transport = socket_;
@@ -79,7 +79,7 @@ HTTPConnection::HTTPConnection(vlc_object_t *p_object_, AuthStorage *auth,
     queryOk = false;
     retries = 0;
     authStorage = auth;
-    connectionClose = !persistent;
+    connectionClose = false;
     chunked = false;
     chunked_eof = false;
     chunkLength = 0;
@@ -611,14 +611,12 @@ AbstractConnection * NativeConnectionFactory::createConnection(vlc_object_t *p_o
     }
     else scheme = params.getScheme();
 
-    const bool b_secure = (params.getScheme() == "https");
-    Transport *socket = new (std::nothrow) Transport(b_secure);
+    Transport *socket = new (std::nothrow) Transport(params.getScheme() == "https");
     if(!socket)
         return NULL;
 
-    /* disable pipelined tls until we have ticket/resume session support */
     HTTPConnection *conn = new (std::nothrow)
-            HTTPConnection(p_object, authStorage, socket, proxy, !b_secure);
+            HTTPConnection(p_object, authStorage, socket, proxy);
     if(!conn)
     {
         delete socket;
