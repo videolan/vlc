@@ -156,7 +156,7 @@ endif
 libdshow_plugin_la_SOURCES = access/dshow/vlc_dshow.h access/dshow/dshow.cpp access/dshow/access.h \
 	access/dshow/filter.cpp access/dshow/filter.h access/dshow/crossbar.cpp ../src/win32/mta_holder.h
 libdshow_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DSTRSAFE_NO_DEPRECATE
-libdshow_plugin_la_LIBADD = $(LIBCOM) -loleaut32 -luuid -lstrmiids -lksuser
+libdshow_plugin_la_LIBADD = $(LIBCOM) -luuid -lstrmiids -lksuser
 if HAVE_WIN32_DESKTOP
 access_LTLIBRARIES += libdshow_plugin.la
 endif
@@ -292,7 +292,7 @@ if HAVE_WIN32_DESKTOP
 # Use an import library for C++ to retain C linker on other platforms.
 libbda_la_SOURCES = access/dtv/bdadefs.h access/dtv/bdagraph.cpp access/dtv/bdagraph.hpp
 libbda_la_LDFLAGS = -static
-libbda_la_LIBADD = -lstrmiids $(LIBCOM) -loleaut32 -luuid
+libbda_la_LIBADD = -lstrmiids $(LIBCOM) -luuid
 noinst_LTLIBRARIES += libbda.la
 
 libdtv_plugin_la_DEPENDENCIES = libbda.la

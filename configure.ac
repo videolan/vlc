@@ -390,10 +390,10 @@ AC_ARG_ENABLE([winstore_app],
 
 vlc_winstore_app=0
 AS_IF([test "${SYS}" = "mingw32"],[
-  LIBCOM="-lole32"
+  LIBCOM="-lole32 -loleaut32"
   AS_IF([test "${enable_winstore_app}" = "yes"], [
     vlc_winstore_app=1
-    LIBCOM=""
+    LIBCOM="-loleaut32"
     AX_APPEND_FLAG([-DWINSTORECOMPAT],[CFLAGS])
     AX_APPEND_FLAG([-DWINSTORECOMPAT],[CPPFLAGS])
     AX_APPEND_FLAG([-DWINSTORECOMPAT],[CXXFLAGS])
