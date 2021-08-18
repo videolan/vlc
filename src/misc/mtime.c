@@ -38,15 +38,16 @@
 #include <time.h>
 #include <stdlib.h>
 
-char *secstotimestr( char *psz_buffer, int32_t i_seconds )
+char *secstotimestr( char *psz_buffer, vlc_tick_t ticks )
 {
-    if( unlikely(i_seconds < 0) )
+    if( unlikely(ticks < 0) )
     {
-        secstotimestr( psz_buffer + 1, -i_seconds );
+        secstotimestr( psz_buffer + 1, -ticks );
         *psz_buffer = '-';
         return psz_buffer;
     }
 
+    int i_seconds = SEC_FROM_VLC_TICK(ticks);
     div_t d;
 
     d = div( i_seconds, 60 );
