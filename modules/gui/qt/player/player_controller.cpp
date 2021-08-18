@@ -1046,6 +1046,8 @@ PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontrol
 
     // Initialise fullscreen to match the player state
     m_fullscreen = vlc_player_vout_IsFullscreen( m_player );
+
+    m_volume = vlc_player_aout_GetVolume( m_player );
 }
 
 PlayerController::PlayerController( qt_intf_t *_p_intf )
