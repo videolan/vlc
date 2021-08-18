@@ -59,6 +59,8 @@ FocusScope {
 
     property bool _isInitialised: false
 
+    property bool _releaseActionButtonPressed: false
+
     /// the id of the item to be expanded
     property int expandIndex: -1
     property int _newExpandIndex: -1
@@ -702,6 +704,12 @@ FocusScope {
             event.accepted = true
         }
 
+        if (event.matches(StandardKey.SelectAll) || KeyHelper.matchOk(event)) {
+            _releaseActionButtonPressed = true
+        } else {
+            _releaseActionButtonPressed = false
+        }
+
         if (newIndex !== -1 && newIndex !== currentIndex) {
             event.accepted = true
             var oldIndex = currentIndex
@@ -715,6 +723,9 @@ FocusScope {
     }
 
     Keys.onReleased: {
+        if (!_releaseActionButtonPressed)
+            return
+
         if (event.matches(StandardKey.SelectAll)) {
             event.accepted = true
             root.selectAll()
@@ -722,5 +733,6 @@ FocusScope {
             event.accepted = true
             root.actionAtIndex(currentIndex)
         }
+        _releaseActionButtonPressed = false
     }
 }
