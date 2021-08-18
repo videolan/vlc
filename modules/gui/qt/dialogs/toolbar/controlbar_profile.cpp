@@ -162,6 +162,16 @@ void ControlbarProfile::setName(const QString &name)
     emit nameChanged(m_name);
 }
 
+void ControlbarProfile::setId( const int id )
+{
+    if(id == m_id)
+        return;
+
+    m_id = id;
+
+    emit idChanged(m_id);
+}
+
 bool ControlbarProfile::dirty() const
 {
     return (m_dirty > 0);
@@ -170,6 +180,11 @@ bool ControlbarProfile::dirty() const
 QString ControlbarProfile::name() const
 {
     return m_name;
+}
+
+int ControlbarProfile::id() const
+{
+    return m_id;
 }
 
 void ControlbarProfile::injectDefaults(bool resetDirty)

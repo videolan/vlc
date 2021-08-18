@@ -31,6 +31,7 @@ class ControlbarProfile : public QObject
 
     Q_PROPERTY(bool dirty READ dirty RESET resetDirty NOTIFY dirtyChanged FINAL)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged FINAL)
+    Q_PROPERTY(int profileId READ id WRITE setId NOTIFY idChanged FINAL)
 
     friend class ControlbarProfileModel;
 
@@ -50,9 +51,16 @@ public:
     bool dirty() const;
     QString name() const;
 
+    // The id is a unique number supplied to each profile
+    // which differentiates it independently from its index
+    // in the profiles array. Provides a more stable way to
+    // identify a profile than using its name.
+    int id() const;
+
 public slots:
     void resetDirty();
     void setName(const QString& name);
+    void setId( const int id );
 
 private:
     // m_dirty indicates the count of PlayerControlbarModel
@@ -60,6 +68,7 @@ private:
     // set true.
     int m_dirty = 0;
 
+    int m_id = -1;
     QString m_name {"N/A"};
     bool m_pauseControlListGeneration = false;
 
@@ -84,6 +93,7 @@ private slots:
 signals:
     void dirtyChanged(bool dirty);
     void nameChanged(QString name);
+    void idChanged(int id);
 
     void controlListChanged(const QVector<int>& linearControlList);
 };

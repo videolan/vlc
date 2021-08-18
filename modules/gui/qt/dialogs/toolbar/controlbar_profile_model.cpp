@@ -28,6 +28,7 @@
 #define SETTINGS_ARRAYNAME_PROFILES "Profiles"
 #define SETTINGS_KEY_NAME "Name"
 #define SETTINGS_KEY_MODEL "Model"
+#define SETTINGS_KEY_ID "Id"
 
 #define SETTINGS_CONTROL_SEPARATOR ","
 #define SETTINGS_CONFIGURATION_SEPARATOR "|"
@@ -37,6 +38,7 @@ decltype (ControlbarProfileModel::m_defaults)
     ControlbarProfileModel::m_defaults =
         {
             {
+                MINIMALIST_STYLE,
                 N_("Minimalist Style"),
                 {
                     {
@@ -89,6 +91,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 }
             },
             {
+                ONE_LINER_STYLE,
                 N_("One-liner Style"),
                 {
                     {
@@ -145,6 +148,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 }
             },
             {
+                SIMPLEST_STYLE,
                 N_("Simplest Style"),
                 {
                     {
@@ -186,6 +190,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 }
             },
             {
+                CLASSIC_STYLE,
                 N_("Classic Style"),
                 {
                     {
@@ -281,12 +286,13 @@ void ControlbarProfileModel::insertDefaults()
 {
     // First, add a blank new profile:
     // ControlbarProfile will inject the default configurations during its construction.
-    newProfile(tr("Default Profile"));
+    m_maxId = 0;
+    newProfile(tr("Default Profile"), DEFAULT_STYLE);
 
     // Add default profiles:
     for (const auto& i : m_defaults)
     {
-        const auto ptrNewProfile = newProfile(qfut(i.name));
+        const auto ptrNewProfile = newProfile(qfut(i.name), i.id);
         if (!ptrNewProfile)
             continue;
 
@@ -481,6 +487,18 @@ ControlbarProfile* ControlbarProfileModel::currentModel() const
     return getProfile(selectedProfile());
 }
 
+/* Set the selected profile to the profile with the matching id */
+bool ControlbarProfileModel::setSelectedProfileFromId(int id)
+{
+    for(int i = 0; i < rowCount(); i++)
+    {
+        if(id == m_profiles.at(i)->id())
+            return setSelectedProfile(i);
+    }
+
+    return false;
+}
+
 void ControlbarProfileModel::save(bool clearDirty) const
 {
     assert(m_intf);
@@ -541,6 +559,7 @@ void ControlbarProfileModel::save(bool clearDirty) const
 
         settings->setValue(SETTINGS_KEY_NAME, m_profiles.at(i)->name());
         settings->setValue(SETTINGS_KEY_MODEL, val);
+        settings->setValue(SETTINGS_KEY_ID, m_profiles.at(i)->id());
     }
 
     settings->endArray();
@@ -587,6 +606,7 @@ bool ControlbarProfileModel::reload()
 
         const auto ptrNewProfile = new ControlbarProfile(this);
         ptrNewProfile->setName(settings->value(SETTINGS_KEY_NAME).toString());
+        ptrNewProfile->setId(settings->value(SETTINGS_KEY_ID).toInt());
 
         for (auto j : val)
         {
@@ -642,6 +662,7 @@ bool ControlbarProfileModel::reload()
 
     bool ok = false;
     int index = settings->value(SETTINGS_KEY_SELECTEDPROFILE).toInt(&ok);
+    m_maxId = m_profiles.isEmpty() ? 0 : m_profiles.back()->id() + 1;
 
     if (ok)
         setSelectedProfile(index);
@@ -692,7 +713,7 @@ ControlbarProfile *ControlbarProfileModel::getProfile(int index) const
     return m_profiles.at(index);
 }
 
-ControlbarProfile *ControlbarProfileModel::newProfile(const QString &name)
+ControlbarProfile *ControlbarProfileModel::newProfile(const QString &name, const int id)
 {
     if (name.isEmpty())
         return nullptr;
@@ -700,6 +721,8 @@ ControlbarProfile *ControlbarProfileModel::newProfile(const QString &name)
     const auto ptrProfile = newProfile();
 
     ptrProfile->setName(generateUniqueName(name));
+    ptrProfile->setId(id);
+    m_maxId++;
 
     return ptrProfile;
 }
@@ -719,7 +742,8 @@ ControlbarProfile *ControlbarProfileModel::newProfile()
 
 ControlbarProfile *ControlbarProfileModel::cloneProfile(const ControlbarProfile *profile)
 {
-    const auto ptrNewProfile = newProfile(profile->name());
+    // Any new profiles will just have the next incremental id
+    const auto ptrNewProfile = newProfile(profile->name(), m_maxId);
 
     if (!ptrNewProfile)
         return nullptr;
@@ -763,7 +787,6 @@ void ControlbarProfileModel::deleteSelectedProfile()
         return;
 
     const auto _selectedProfile = m_selectedProfile;
-
     beginRemoveRows(QModelIndex(), _selectedProfile, _selectedProfile);
 
     m_selectedProfile = -1;

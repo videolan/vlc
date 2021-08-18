@@ -42,6 +42,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     QHash<int, QByteArray> roleNames() const override;
+    enum {DEFAULT_STYLE, MINIMALIST_STYLE, ONE_LINER_STYLE, SIMPLEST_STYLE, CLASSIC_STYLE};
 
     // Editable:
     Q_INVOKABLE bool setData(const QModelIndex &index, const QVariant &value,
@@ -62,13 +63,14 @@ public:
 
     int selectedProfile() const;
     ControlbarProfile* currentModel() const;
+    bool setSelectedProfileFromId(int id);
 
     ControlbarProfile* cloneProfile(const ControlbarProfile* profile);
     Q_INVOKABLE void cloneSelectedProfile(const QString& newProfileName);
 
     Q_INVOKABLE ControlbarProfile* getProfile(int index) const;
 
-    Q_INVOKABLE ControlbarProfile* newProfile(const QString& name);
+    Q_INVOKABLE ControlbarProfile* newProfile(const QString& name, const int id);
     ControlbarProfile* newProfile();
 
     Q_INVOKABLE void deleteSelectedProfile();
@@ -89,8 +91,10 @@ private:
     QVector<ControlbarProfile *> m_profiles;
 
     int m_selectedProfile = -1;
+    int m_maxId = 0;
 
     struct Profile {
+        const int id;
         const char* name;
         QVector<ControlbarProfile::Configuration> modelData;
     };
