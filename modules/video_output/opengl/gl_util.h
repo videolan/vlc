@@ -70,4 +70,16 @@ vlc_gl_BuildProgram(vlc_object_t *obj, const opengl_vtable_t *vt,
                     GLsizei vstring_count, const GLchar **vstrings,
                     GLsizei fstring_count, const GLchar **fstrings);
 
+/**
+ * Wrap an OpenGL filter from a video filter
+ *
+ * Open an OpenGL filter (with capability "opengl filter") from a video filter
+ * (with capability "video filter").
+ *
+ * This internally uses the "opengl" video filter to load the OpenGL filter
+ * with the given name.
+ */
+module_t *
+vlc_gl_WrapOpenGLFilter(filter_t *filter, const char *opengl_filter_name);
+
 #endif

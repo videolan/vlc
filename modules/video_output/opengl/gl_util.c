@@ -25,6 +25,9 @@
 
 #include "gl_util.h"
 
+#include <vlc_filter.h>
+#include <vlc_modules.h>
+
 static void
 LogShaderErrors(vlc_object_t *obj, const opengl_vtable_t *vt, GLuint id)
 {
@@ -130,4 +133,20 @@ finally_1:
     vt->DeleteShader(vertex_shader);
 
     return program;
+}
+
+module_t *
+vlc_gl_WrapOpenGLFilter(filter_t *filter, const char *opengl_filter_name)
+{
+    const config_chain_t *prev_chain = filter->p_cfg;
+    var_Create(filter, "opengl-filter", VLC_VAR_STRING);
+    var_SetString(filter, "opengl-filter", opengl_filter_name);
+
+    filter->p_cfg = NULL;
+    module_t *module = module_need(filter, "video filter", "opengl", true);
+    filter->p_cfg = prev_chain;
+
+    var_Destroy(filter, "opengl-filter");
+
+    return module;
 }

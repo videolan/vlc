@@ -205,16 +205,7 @@ static int OpenVideoFilter(vlc_object_t *obj)
     if (!is_supported)
         return VLC_EGENERIC;
 
-    const config_chain_t *prev_chain = filter->p_cfg;
-    var_Create(filter, "opengl-filter", VLC_VAR_STRING);
-    var_SetString(filter, "opengl-filter", "glblend");
-
-    filter->p_cfg = NULL;
-    module_t *module = module_need(obj, "video filter", "opengl", true);
-    filter->p_cfg = prev_chain;
-
-    var_Destroy(filter, "opengl-filter");
-
+    module_t *module = vlc_gl_WrapOpenGLFilter(filter, "glblend");
     if (module == NULL)
         return VLC_EGENERIC;
 
