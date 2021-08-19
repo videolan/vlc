@@ -54,6 +54,7 @@
 #include "dialogs/epg/epg.hpp"
 #include "dialogs/errors/errors.hpp"
 #include "dialogs/playlists/playlists.hpp"
+#include "dialogs/firstrun/firstrunwizard.hpp"
 
 #include <QEvent>
 #include <QApplication>
@@ -260,6 +261,13 @@ void DialogsProvider::prefsDialog()
     PrefsDialog *p = new PrefsDialog( nullptr, p_intf );
     p->setAttribute(Qt::WA_DeleteOnClose);
     p->toggleVisible();
+}
+
+void DialogsProvider::firstRunDialog()
+{
+    FirstRunWizard *p = new FirstRunWizard( p_intf );
+    QVLCDialog::setWindowTransientParent(p, nullptr, p_intf);
+    p->show();
 }
 
 void DialogsProvider::extendedDialog()
