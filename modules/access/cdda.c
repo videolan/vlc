@@ -554,7 +554,6 @@ static cddb_disc_t *GetCDDBInfo( vlc_object_t *obj, const vcddev_toc_t *p_toc )
         goto error;
     }
 
-    int64_t i_length = 2000000; /* PreGap */
     for( int i = 0; i < p_toc->i_tracks; i++ )
     {
         int cddb_offset = LBAPregap(p_toc->p_sectors[i].i_lba); // 2s Pregap offset
@@ -567,10 +566,10 @@ static cddb_disc_t *GetCDDBInfo( vlc_object_t *obj, const vcddev_toc_t *p_toc )
     }
     const int64_t i_size = ( p_toc->p_sectors[p_toc->i_tracks].i_lba - p_toc->p_sectors[0].i_lba ) *
                            (int64_t)CDDA_DATA_SIZE;
-    i_length += INT64_C(1000000) * i_size / 44100 / 4  ;
+    int64_t i_length = i_size / 44100 / 4 + 2 ; // 2s PreGap
 
-    msg_Dbg( obj, "Total length: %i", (int)(i_length/1000000) );
-    cddb_disc_set_length( p_disc, (int)(i_length/1000000) );
+    msg_Dbg( obj, "Total length: %i", (int)(i_length) );
+    cddb_disc_set_length( p_disc, (int)(i_length) );
 
     if( !cddb_disc_calc_discid( p_disc ) )
     {
