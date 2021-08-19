@@ -562,12 +562,12 @@ static cddb_disc_t *GetCDDBInfo( vlc_object_t *obj, const vcddev_toc_t *p_toc )
         cddb_track_set_frame_offset( t, cddb_offset );
 
         cddb_disc_add_track( p_disc, t );
-        const int64_t i_size = ( p_toc->p_sectors[i+1].i_lba - p_toc->p_sectors[i].i_lba ) *
-                               (int64_t)CDDA_DATA_SIZE;
-        i_length += INT64_C(1000000) * i_size / 44100 / 4  ;
 
         msg_Dbg( obj, "Track %i offset: %i", i, cddb_offset );
     }
+    const int64_t i_size = ( p_toc->p_sectors[p_toc->i_tracks].i_lba - p_toc->p_sectors[0].i_lba ) *
+                           (int64_t)CDDA_DATA_SIZE;
+    i_length += INT64_C(1000000) * i_size / 44100 / 4  ;
 
     msg_Dbg( obj, "Total length: %i", (int)(i_length/1000000) );
     cddb_disc_set_length( p_disc, (int)(i_length/1000000) );
