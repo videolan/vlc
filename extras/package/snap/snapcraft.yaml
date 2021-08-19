@@ -158,7 +158,6 @@ parts:
       - libavutil-dev
       - libbluray-dev
       - libcaca-dev
-      - libcddb2-dev
       - libchromaprint-dev
       - libdav1d-dev
       - libdca-dev
@@ -280,7 +279,6 @@ parts:
       - libavutil58
       - libbluray2
       - libcaca0
-      - libcddb2
       - libchromaprint1
       - libdav1d7
       - libdb5.3

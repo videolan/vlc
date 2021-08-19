@@ -9,7 +9,6 @@ OPTIONS="
       --enable-dvdnav
       --enable-sftp
       --enable-vcd
-      --enable-libcddb
       --enable-dvbpsi
       --enable-ogg
       --enable-mad
