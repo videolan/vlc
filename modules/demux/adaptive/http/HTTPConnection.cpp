@@ -130,6 +130,7 @@ void HTTPConnection::disconnect()
     queryOk = false;
     bytesRead = 0;
     contentLength = 0;
+    connectionClose = false;
     chunked = false;
     chunkLength = 0;
     bytesRange = BytesRange();
