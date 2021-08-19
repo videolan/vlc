@@ -557,15 +557,16 @@ static cddb_disc_t *GetCDDBInfo( vlc_object_t *obj, const vcddev_toc_t *p_toc )
     int64_t i_length = 2000000; /* PreGap */
     for( int i = 0; i < p_toc->i_tracks; i++ )
     {
+        int cddb_offset = LBAPregap(p_toc->p_sectors[i].i_lba); // 2s Pregap offset
         cddb_track_t *t = cddb_track_new();
-        cddb_track_set_frame_offset( t, p_toc->p_sectors[i].i_lba + 150 );  /* Pregap offset */
+        cddb_track_set_frame_offset( t, cddb_offset );
 
         cddb_disc_add_track( p_disc, t );
         const int64_t i_size = ( p_toc->p_sectors[i+1].i_lba - p_toc->p_sectors[i].i_lba ) *
                                (int64_t)CDDA_DATA_SIZE;
         i_length += INT64_C(1000000) * i_size / 44100 / 4  ;
 
-        msg_Dbg( obj, "Track %i offset: %i", i, p_toc->p_sectors[i].i_lba + 150 );
+        msg_Dbg( obj, "Track %i offset: %i", i, cddb_offset );
     }
 
     msg_Dbg( obj, "Total length: %i", (int)(i_length/1000000) );
@@ -678,10 +679,10 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
     const vcddev_toc_t *p_toc = sys->p_toc;
 
     /* Build title table */
-    const int i_start_track_offset = sys->i_cdda_first - sys->p_toc->i_first_track;
+    const int i_start_cddb_offset = sys->i_cdda_first - sys->p_toc->i_first_track;
     for (int i = 0; i < sys->i_cdda_tracks; i++)
     {
-        if(i < i_start_track_offset)
+        if(i < i_start_cddb_offset)
             continue;
 
         msg_Dbg(access, "track[%d] start=%d", i, p_toc->p_sectors[i].i_lba);
@@ -690,7 +691,7 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
         char *name;
 
         if (unlikely(asprintf(&name, _("Audio CD - Track %02i"),
-                              i - i_start_track_offset + 1 ) == -1))
+                              i - i_start_cddb_offset + 1 ) == -1))
             name = NULL;
 
         /* Create playlist items */
