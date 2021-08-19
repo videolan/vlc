@@ -198,7 +198,7 @@ MainInterface* CompositorWin7::makeMainInterface()
     m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf, m_mainInterface);
     m_videoWindowHandler->setWindow( m_qmlView.get() );
 
-    new InterfaceWindowHandlerWin32(m_intf, m_mainInterface, m_qmlView.get(), m_qmlView.get());
+    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandlerWin32>(m_intf, m_mainInterface, m_qmlView.get());
 
     m_taskbarWidget = std::make_unique<WinTaskbarWidget>(m_intf, m_qmlView.get());
     qApp->installNativeEventFilter(m_taskbarWidget.get());
@@ -226,6 +226,7 @@ void CompositorWin7::unloadGUI()
 {
     m_videoSurfaceProvider.reset();
     m_videoWindowHandler.reset();
+    m_interfaceWindowHandler.reset();
     m_qmlView.reset();
     m_taskbarWidget.reset();
     if (m_mainInterface)

@@ -317,14 +317,14 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
 
         //install the interface window handler after the creation of CompositorDCompositionUISurface
         //so the event filter is handled before the one of the UISurface (for wheel events)
-        m_interfaceWindowHandler = new InterfaceWindowHandlerWin32(m_intf, m_mainInterface, m_rootWindow, m_rootWindow);
+        m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandlerWin32>(m_intf, m_mainInterface, m_rootWindow);
 
         m_qmlVideoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
         m_mainInterface->setVideoSurfaceProvider(m_qmlVideoSurfaceProvider.get());
         m_mainInterface->setCanShowVideoPIP(true);
 
         connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::hasVideoEmbedChanged,
-                m_interfaceWindowHandler, &InterfaceWindowHandlerWin32::onVideoEmbedChanged);
+                m_interfaceWindowHandler.get(), &InterfaceWindowHandlerWin32::onVideoEmbedChanged);
         connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
                 this, &CompositorDirectComposition::onSurfacePositionChanged);
 
@@ -383,6 +383,7 @@ void CompositorDirectComposition::unloadGUI()
     m_uiSurface.reset();
     m_ui.reset();
     m_taskbarWidget.reset();
+    m_interfaceWindowHandler.reset();
     if (m_mainInterface)
     {
         delete m_mainInterface;

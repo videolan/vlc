@@ -27,6 +27,7 @@
 
 class MainInterface;
 class QQuickView;
+class InterfaceWindowHandler;
 
 namespace vlc {
 
@@ -63,6 +64,7 @@ public:
 protected:
     qt_intf_t *m_intf;
 
+    std::unique_ptr<InterfaceWindowHandler> m_intfWindowHandler;
     std::unique_ptr<MainInterface> m_mainInterface;
     std::unique_ptr<QQuickView> m_qmlWidget;
 };

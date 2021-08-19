@@ -25,6 +25,7 @@
 #include <memory>
 
 class WinTaskbarWidget;
+class InterfaceWindowHandlerWin32;
 
 namespace vlc {
 
@@ -80,6 +81,7 @@ private:
     MainInterface* m_mainInterface = nullptr;
     QWidget* m_videoWidget = nullptr;
     QWidget* m_stable = nullptr;
+    std::unique_ptr<InterfaceWindowHandlerWin32> m_interfaceWindowHandler;
     std::unique_ptr<QQuickView> m_qmlView;
     std::unique_ptr<VideoWindowHandler> m_videoWindowHandler;
     std::unique_ptr<VideoSurfaceProvider> m_videoSurfaceProvider;

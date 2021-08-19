@@ -81,7 +81,7 @@ private:
     std::unique_ptr<MainUI> m_ui;
     std::unique_ptr<VideoWindowHandler> m_videoWindowHandler;
     std::unique_ptr<VideoSurfaceProvider> m_qmlVideoSurfaceProvider;
-    InterfaceWindowHandler* m_interfaceWindowHandler = nullptr;
+    std::unique_ptr<InterfaceWindowHandler> m_interfaceWindowHandler;
 
     //main window composition
     HINSTANCE m_dcomp_dll = nullptr;
