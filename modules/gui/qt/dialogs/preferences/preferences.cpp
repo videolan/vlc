@@ -305,6 +305,7 @@ void PrefsDialog::reset()
         config_ResetAll();
         config_SaveConfigFile( p_intf );
         getSettings()->clear();
+        p_intf->p_mi->reloadPrefs();
 
 #ifdef _WIN32
         simple_panels[0]->cleanLang();
