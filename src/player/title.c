@@ -65,7 +65,7 @@ input_title_GetName(const struct input_title_t *input_title, int idx,
     if (input_title->i_length > 0)
     {
         strcpy(length_str, " [");
-        secstotimestr(&length_str[2], input_title->i_length);
+        vlc_tick_to_str(&length_str[2], input_title->i_length);
         strcat(length_str, "]");
     }
     else

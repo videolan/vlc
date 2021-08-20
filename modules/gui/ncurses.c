@@ -967,8 +967,8 @@ static int DrawStatus(intf_thread_t *intf)
             /* Fall-through */
 
         default:
-            secstotimestr(buf1, vlc_player_GetTime(player));
-            secstotimestr(buf2, vlc_player_GetLength(player));
+            vlc_tick_to_str(buf1, vlc_player_GetTime(player));
+            vlc_tick_to_str(buf2, vlc_player_GetLength(player));
 
             mvnprintw(y++, 0, COLS, _(" Position : %s/%s"), buf1, buf2);
 

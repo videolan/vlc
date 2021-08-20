@@ -59,10 +59,10 @@ NSString *const kVLCMediaUnknown = @"Unknown";
         vlc_tick_t remaining = (duration > time) ? (duration - time) : 0;
 
         return [NSString stringWithFormat:@"-%s",
-                secstotimestr(psz_time, remaining)];
+                vlc_tick_to_str(psz_time, remaining)];
     } else {
         return [NSString stringWithUTF8String:
-                secstotimestr(psz_time, time)];
+                vlc_tick_to_str(psz_time, time)];
     }
 }
 
@@ -70,7 +70,7 @@ NSString *const kVLCMediaUnknown = @"Unknown";
 {
     char psz_time[MSTRTIME_MAX_SIZE];
     return [NSString stringWithUTF8String:
-            secstotimestr(psz_time, time)];
+            vlc_tick_to_str(psz_time, time)];
 }
 
 + (instancetype)stringWithTime:(long long int)time

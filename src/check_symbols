@@ -23,7 +23,7 @@ cat libvlccore.sym | grep -v \
 	-e '^date_' -e '^plane_' \
 	-e '^us_' -e '^utf8_' -e '^xml_' \
 	-e '^[A-Z][a-z]*Charset$' \
-	-e '^NTPtime64$' -e '^secstotimestr$' \
+	-e '^NTPtime64$' \
 		&& exit 1
 
 echo "None found."

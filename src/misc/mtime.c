@@ -38,11 +38,11 @@
 #include <time.h>
 #include <stdlib.h>
 
-char *secstotimestr( char *psz_buffer, vlc_tick_t ticks )
+char *vlc_tick_to_str( char *psz_buffer, vlc_tick_t ticks )
 {
     if( unlikely(ticks < 0) )
     {
-        secstotimestr( psz_buffer + 1, -ticks );
+        vlc_tick_to_str( psz_buffer + 1, -ticks );
         *psz_buffer = '-';
         return psz_buffer;
     }

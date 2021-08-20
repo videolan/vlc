@@ -250,6 +250,7 @@ vlc_uri_compose
 vlc_uri_resolve
 vlc_uri_fixup
 vlc_tick_now
+vlc_tick_to_str
 module_config_free
 module_config_get
 module_find
@@ -324,7 +325,6 @@ picture_pool_Wait
 picture_Reset
 picture_Setup
 plane_CopyPixels
-secstotimestr
 sout_AccessOutControl
 sout_AccessOutDelete
 sout_AccessOutNew

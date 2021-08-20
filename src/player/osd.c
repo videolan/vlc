@@ -142,11 +142,11 @@ vlc_player_osd_Position(vlc_player_t *player,
         }
 
         char time_text[MSTRTIME_MAX_SIZE];
-        secstotimestr(time_text, time);
+        vlc_tick_to_str(time_text, time);
         if (input->length != VLC_TICK_INVALID)
         {
             char len_text[MSTRTIME_MAX_SIZE];
-            secstotimestr(len_text, input->length);
+            vlc_tick_to_str(len_text, input->length);
             vouts_osd_Message(vouts, count, "%s / %s", time_text, len_text);
         }
         else

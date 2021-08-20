@@ -154,7 +154,7 @@ static void print_playlist(struct cli_client *cl, vlc_playlist_t *playlist)
         if (len != INPUT_DURATION_INDEFINITE && len != VLC_TICK_INVALID)
         {
             char buf[MSTRTIME_MAX_SIZE];
-            secstotimestr(buf, len);
+            vlc_tick_to_str(buf, len);
             cli_printf(cl, "| %c%zu %s (%s)", selected, i, item->psz_name, buf);
         }
         else

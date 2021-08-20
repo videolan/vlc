@@ -345,7 +345,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 
     /* Update current position (left field) */
     char psz_time[MSTRTIME_MAX_SIZE];
-    NSString *playbackPosition = toNSStr(secstotimestr(psz_time, time));
+    NSString *playbackPosition = toNSStr(vlc_tick_to_str(psz_time, time));
 
     [_elapsedTime setStringValue:playbackPosition];
 }
