@@ -815,9 +815,10 @@ static int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
     const vlc_tick_t i_eta = f_position > 0.005 ? (vlc_tick_now() - p_scan->i_time_start) * ( 1.0 / f_position - 1.0 ) : -1;
     char psz_eta[MSTRTIME_MAX_SIZE];
     const char *psz_fmt = _("%.1f MHz (%d services)\n~%s remaining");
+    vlc_tick_to_str( psz_eta, i_eta );
 
     if( i_eta >= 0 )
-        msg_Info( p_scan->p_obj, "Scan ETA %s | %f", vlc_tick_to_str( psz_eta, i_eta ), f_position * 100 );
+        msg_Info( p_scan->p_obj, "Scan ETA %s | %f", psz_eta, f_position * 100 );
 
     if( p_scan->p_dialog_id == NULL )
     {
@@ -827,7 +828,7 @@ static int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
                                          _("Scanning DVB"), psz_fmt,
                                          (double)p_cfg->i_frequency / 1000000,
                                          i_total_services,
-                                         vlc_tick_to_str( psz_eta, i_eta ) );
+                                         psz_eta);
     }
     else
     {
@@ -835,7 +836,7 @@ static int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
                                          f_position, psz_fmt,
                                          (double)p_cfg->i_frequency / 1000000,
                                          i_total_services,
-                                         vlc_tick_to_str( psz_eta, i_eta ) );
+                                         psz_eta );
     }
 
     return VLC_SUCCESS;
