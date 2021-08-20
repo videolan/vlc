@@ -332,9 +332,9 @@ set_host_envvars()
 
     export CPPFLAGS="-arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH"
 
-    export CFLAGS="$clike_flags"
-    export CXXFLAGS="$clike_flags"
-    export OBJCFLAGS="$clike_flags"
+    export CFLAGS="$clike_flags -DI_CAN_HAZ_TSD"
+    export CXXFLAGS="$clike_flags -DI_CAN_HAZ_TSD"
+    export OBJCFLAGS="$clike_flags -DI_CAN_HAZ_TSD"
 
     # Vanilla clang doesn't use VLC_DEPLOYMENT_TAGET_LDFLAGS but only the CFLAGS variant
     export LDFLAGS="$VLC_DEPLOYMENT_TARGET_LDFLAG $VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH ${bitcode_flag}"
