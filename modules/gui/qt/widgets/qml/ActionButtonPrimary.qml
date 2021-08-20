@@ -29,6 +29,4 @@ TabButtonExt {
                                : VLCStyle.colors.accent
 
     foregroundColor: "white"
-
-    colorFocus: VLCStyle.colors.white
 }
