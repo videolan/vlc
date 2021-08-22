@@ -8,11 +8,13 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCAudioEffectsWindowController">
             <connections>
-                <outlet property="advancedEnableCheckbox" destination="rjL-0q-isR" id="Tjh-on-9sb"/>
-                <outlet property="advancedPitchLabel" destination="f9i-Ql-mCB" id="9nt-SB-ROX"/>
+                <outlet property="advancedEnablePitchCheckBox" destination="rjL-0q-isR" id="uT4-QE-Mdc"/>
+                <outlet property="advancedEnableStereoPanCheckBox" destination="T4W-oT-4At" id="aJK-Hf-oWv"/>
                 <outlet property="advancedPitchSlider" destination="nTJ-ss-QlS" id="mPt-X9-kEF"/>
                 <outlet property="advancedPitchTextField" destination="8cX-Go-0bh" id="5pd-hu-267"/>
                 <outlet property="advancedResetButton" destination="fI0-dm-MVt" id="Yg0-gT-4je"/>
+                <outlet property="advancedStereoPanSlider" destination="sxu-tL-Ztr" id="wix-Eu-RX7"/>
+                <outlet property="advancedStereoPanTextField" destination="Fbj-Sr-i4z" id="vFF-M0-QUy"/>
                 <outlet property="advancedView" destination="L1S-G0-kAE" id="lDO-b5-pKe"/>
                 <outlet property="applyProfileCheckbox" destination="Dqv-cc-ZvK" id="DXd-0m-de4"/>
                 <outlet property="compressorBand1Label" destination="248" id="qCX-jv-cwZ"/>
@@ -101,7 +103,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="254" width="473" height="281"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="3440" height="1440"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="475" height="281"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -1136,18 +1138,8 @@
                                     <rect key="frame" x="0.0" y="0.0" width="475" height="211"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="rjL-0q-isR">
-                                            <rect key="frame" x="7" y="190" width="58" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Enable" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="XkH-KA-7ZB">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="message" size="11"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="advancedEnable:" target="-2" id="0wk-x7-VxI"/>
-                                            </connections>
-                                        </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fI0-dm-MVt">
-                                            <rect key="frame" x="426" y="191" width="39" height="15"/>
+                                            <rect key="frame" x="426" y="190" width="39" height="15"/>
                                             <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="buttonCell:rEJ-M5-S37:image" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="rEJ-M5-S37">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="miniSystem"/>
@@ -1157,57 +1149,85 @@
                                             </connections>
                                         </button>
                                         <customView translatesAutoresizingMaskIntoConstraints="NO" id="L1S-G0-kAE">
-                                            <rect key="frame" x="195" y="0.0" width="86" height="178"/>
+                                            <rect key="frame" x="151" y="0.0" width="174" height="177"/>
                                             <subviews>
-                                                <slider translatesAutoresizingMaskIntoConstraints="NO" id="nTJ-ss-QlS">
-                                                    <rect key="frame" x="34" y="47" width="18" height="131"/>
-                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-12" maxValue="12" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="kju-14-quf"/>
+                                                <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="rjL-0q-isR" userLabel="Enable Pitch">
+                                                    <rect key="frame" x="2" y="10" width="80" height="18"/>
+                                                    <buttonCell key="cell" type="check" title="Adjust Pitch" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="XkH-KA-7ZB">
+                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                        <font key="font" metaFont="system" size="10"/>
+                                                    </buttonCell>
                                                     <connections>
-                                                        <action selector="advancedSliderUpdated:" target="-2" id="yzS-3w-HKN"/>
+                                                        <action selector="advancedEnablePitchAction:" target="-2" id="HjV-I0-cAu"/>
+                                                    </connections>
+                                                </button>
+                                                <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="T4W-oT-4At" userLabel="Enable Pan">
+                                                    <rect key="frame" x="95" y="10" width="74" height="18"/>
+                                                    <buttonCell key="cell" type="check" title="Adjust Pan" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="spd-gN-jF7">
+                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                        <font key="font" metaFont="system" size="10"/>
+                                                    </buttonCell>
+                                                    <connections>
+                                                        <action selector="advancedEnableStereoPanAction:" target="-2" id="pl8-yv-9vM"/>
+                                                    </connections>
+                                                </button>
+                                                <slider translatesAutoresizingMaskIntoConstraints="NO" id="nTJ-ss-QlS" userLabel="Pitch Slider">
+                                                    <rect key="frame" x="34" y="48" width="18" height="129"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="-48" maxValue="48" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="kju-14-quf"/>
+                                                    <connections>
+                                                        <action selector="advancedPitchSliderUpdated:" target="-2" id="Zz3-Jj-zs3"/>
                                                     </connections>
                                                 </slider>
                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="755" translatesAutoresizingMaskIntoConstraints="NO" id="8cX-Go-0bh">
-                                                    <rect key="frame" x="8" y="33" width="70" height="11"/>
+                                                    <rect key="frame" x="8" y="34" width="70" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="0.0 semitones" usesSingleLineMode="YES" id="Ycq-EF-cb9">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="f9i-Ql-mCB" customClass="VLCWrappableTextField">
-                                                    <rect key="frame" x="8" y="13" width="70" height="11"/>
-                                                    <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="Adjust pitch" id="tFs-LA-Bdx">
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="755" translatesAutoresizingMaskIntoConstraints="NO" id="Fbj-Sr-i4z" userLabel="StreoPannerScale">
+                                                    <rect key="frame" x="122" y="34" width="22" height="11"/>
+                                                    <textFieldCell key="cell" controlSize="mini" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="0.0" usesSingleLineMode="YES" id="Inp-23-uMg">
                                                         <font key="font" metaFont="miniSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
+                                                <slider translatesAutoresizingMaskIntoConstraints="NO" id="sxu-tL-Ztr" userLabel="StereoPanner Slider">
+                                                    <rect key="frame" x="124" y="48" width="18" height="129"/>
+                                                    <sliderCell key="cell" controlSize="small" continuous="YES" alignment="left" maxValue="10" doubleValue="5" tickMarkPosition="right" numberOfTickMarks="9" sliderType="linear" id="XZV-sP-C5o"/>
+                                                    <connections>
+                                                        <action selector="advancedStereoPanSliderUpdated:" target="-2" id="Xeo-cH-SH6"/>
+                                                    </connections>
+                                                </slider>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstItem="Fbj-Sr-i4z" firstAttribute="centerY" secondItem="8cX-Go-0bh" secondAttribute="centerY" id="0pJ-WY-iAF"/>
                                                 <constraint firstItem="nTJ-ss-QlS" firstAttribute="top" secondItem="L1S-G0-kAE" secondAttribute="top" id="6RB-JZ-xWV"/>
-                                                <constraint firstAttribute="trailing" secondItem="8cX-Go-0bh" secondAttribute="trailing" constant="10" id="Jg8-TQ-Djp"/>
-                                                <constraint firstAttribute="bottom" secondItem="f9i-Ql-mCB" secondAttribute="bottom" constant="13" id="brb-yM-ZgX"/>
-                                                <constraint firstItem="nTJ-ss-QlS" firstAttribute="bottom" secondItem="f9i-Ql-mCB" secondAttribute="top" constant="-24" id="eZX-RP-sUs"/>
-                                                <constraint firstItem="8cX-Go-0bh" firstAttribute="leading" secondItem="L1S-G0-kAE" secondAttribute="leading" constant="10" id="hRo-i2-MvS"/>
+                                                <constraint firstItem="rjL-0q-isR" firstAttribute="top" secondItem="8cX-Go-0bh" secondAttribute="bottom" constant="9" id="6Zv-RC-wWK"/>
+                                                <constraint firstItem="T4W-oT-4At" firstAttribute="centerX" secondItem="sxu-tL-Ztr" secondAttribute="centerX" id="728-kt-ufE"/>
+                                                <constraint firstItem="sxu-tL-Ztr" firstAttribute="leading" secondItem="nTJ-ss-QlS" secondAttribute="trailing" constant="72" id="7Ki-5Z-S8b"/>
+                                                <constraint firstItem="Fbj-Sr-i4z" firstAttribute="centerX" secondItem="sxu-tL-Ztr" secondAttribute="centerX" id="B2m-C8-ta1"/>
+                                                <constraint firstItem="8cX-Go-0bh" firstAttribute="centerX" secondItem="nTJ-ss-QlS" secondAttribute="centerX" id="LfM-jX-y1I"/>
+                                                <constraint firstAttribute="bottom" secondItem="rjL-0q-isR" secondAttribute="bottom" constant="13" id="Lrv-ou-kcN"/>
+                                                <constraint firstItem="sxu-tL-Ztr" firstAttribute="centerY" secondItem="nTJ-ss-QlS" secondAttribute="centerY" id="PLl-ZS-7aw"/>
+                                                <constraint firstItem="T4W-oT-4At" firstAttribute="centerY" secondItem="rjL-0q-isR" secondAttribute="centerY" id="RjE-QS-KsO"/>
                                                 <constraint firstItem="nTJ-ss-QlS" firstAttribute="leading" secondItem="L1S-G0-kAE" secondAttribute="leading" constant="34" id="hw4-tY-RXC"/>
                                                 <constraint firstItem="8cX-Go-0bh" firstAttribute="top" secondItem="nTJ-ss-QlS" secondAttribute="bottom" constant="4" id="oit-FY-gc0"/>
-                                                <constraint firstAttribute="trailing" secondItem="f9i-Ql-mCB" secondAttribute="trailing" constant="10" id="rGx-6J-gH4"/>
-                                                <constraint firstItem="f9i-Ql-mCB" firstAttribute="top" secondItem="8cX-Go-0bh" secondAttribute="bottom" constant="9" id="rOG-sZ-pgI"/>
-                                                <constraint firstAttribute="trailing" secondItem="nTJ-ss-QlS" secondAttribute="trailing" constant="34" id="ruG-mu-TTd"/>
-                                                <constraint firstItem="f9i-Ql-mCB" firstAttribute="leading" secondItem="L1S-G0-kAE" secondAttribute="leading" constant="10" id="thK-bH-a3q"/>
+                                                <constraint firstItem="rjL-0q-isR" firstAttribute="centerX" secondItem="nTJ-ss-QlS" secondAttribute="centerX" id="uBH-KL-Id5"/>
+                                                <constraint firstAttribute="trailing" secondItem="sxu-tL-Ztr" secondAttribute="trailing" constant="32" id="uPa-lj-qaE"/>
+                                                <constraint firstItem="sxu-tL-Ztr" firstAttribute="top" secondItem="nTJ-ss-QlS" secondAttribute="top" id="unt-eX-rJ4"/>
                                             </constraints>
                                         </customView>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="L1S-G0-kAE" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="209-XL-dUD" secondAttribute="leading" constant="10" id="3r6-Nx-9LO"/>
-                                        <constraint firstItem="L1S-G0-kAE" firstAttribute="top" secondItem="rjL-0q-isR" secondAttribute="bottom" constant="15" id="LbX-hj-NJy"/>
-                                        <constraint firstItem="rjL-0q-isR" firstAttribute="leading" secondItem="209-XL-dUD" secondAttribute="leading" constant="10" id="MNF-lI-670"/>
+                                        <constraint firstItem="L1S-G0-kAE" firstAttribute="top" secondItem="fI0-dm-MVt" secondAttribute="bottom" constant="14" id="LbX-hj-NJy"/>
                                         <constraint firstAttribute="trailing" secondItem="fI0-dm-MVt" secondAttribute="trailing" constant="10" id="OJI-Rf-3G1"/>
+                                        <constraint firstItem="fI0-dm-MVt" firstAttribute="top" secondItem="209-XL-dUD" secondAttribute="top" constant="6" id="T4t-VG-iF4"/>
                                         <constraint firstAttribute="bottom" secondItem="L1S-G0-kAE" secondAttribute="bottom" id="cKC-Jc-Ljo"/>
                                         <constraint firstItem="L1S-G0-kAE" firstAttribute="centerX" secondItem="209-XL-dUD" secondAttribute="centerX" id="coc-Mz-9PD"/>
-                                        <constraint firstItem="rjL-0q-isR" firstAttribute="top" secondItem="209-XL-dUD" secondAttribute="top" constant="6" id="ecd-Pr-3ZQ"/>
-                                        <constraint firstItem="fI0-dm-MVt" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="rjL-0q-isR" secondAttribute="trailing" constant="10" id="ita-Ge-bQL"/>
-                                        <constraint firstItem="rjL-0q-isR" firstAttribute="centerY" secondItem="fI0-dm-MVt" secondAttribute="centerY" id="lPZ-lq-8OT"/>
                                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="L1S-G0-kAE" secondAttribute="trailing" constant="10" id="qFf-QN-rga"/>
                                     </constraints>
                                 </view>

@@ -118,11 +118,13 @@
 
 /* Advanced */
 @property (readwrite, weak) IBOutlet NSView *advancedView;
-@property (readwrite, weak) IBOutlet NSButton *advancedEnableCheckbox;
+@property (readwrite, weak) IBOutlet NSButton *advancedEnablePitchCheckBox;
+@property (readwrite, weak) IBOutlet NSButton *advancedEnableStereoPanCheckBox;
 @property (readwrite, weak) IBOutlet NSButton *advancedResetButton;
 @property (readwrite, weak) IBOutlet NSSlider *advancedPitchSlider;
 @property (readwrite, weak) IBOutlet NSTextField *advancedPitchTextField;
-@property (readwrite, weak) IBOutlet NSTextField *advancedPitchLabel;
+@property (readwrite, weak) IBOutlet NSSlider *advancedStereoPanSlider;
+@property (readwrite, weak) IBOutlet NSTextField *advancedStereoPanTextField;
 
 /* generic */
 - (IBAction)profileSelectorAction:(id)sender;
@@ -157,7 +159,9 @@
 
 /* Advanced */
 - (IBAction)resetAdvancedValues:(id)sender;
-- (IBAction)advancedEnable:(id)sender;
-- (IBAction)advancedSliderUpdated:(id)sender;
+- (IBAction)advancedPitchSliderUpdated:(id)sender;
+- (IBAction)advancedStereoPanSliderUpdated:(id)sender;
+- (IBAction)advancedEnablePitchAction:(id)sender;
+- (IBAction)advancedEnableStereoPanAction:(id)sender;
 
 @end
