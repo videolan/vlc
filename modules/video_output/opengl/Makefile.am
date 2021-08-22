@@ -1,8 +1,6 @@
 OPENGL_COMMONSOURCES = \
        video_output/opengl/filter.c \
        video_output/opengl/filter.h \
-       video_output/opengl/filter_draw.c \
-       video_output/opengl/filter_draw.h \
        video_output/opengl/filter_priv.h \
        video_output/opengl/filters.c \
        video_output/opengl/filters.h \
@@ -73,6 +71,23 @@ libgl_plugin_la_LIBADD = libvlc_opengl.la
 if HAVE_GL
 vout_LTLIBRARIES += libgl_plugin.la
 endif # HAVE_GL
+
+libglfilter_draw_plugin_la_SOURCES = video_output/opengl/filter_draw.c
+libglfilter_draw_plugin_la_LDFLAGS = $(AM_LDFLAGS)
+if HAVE_GL
+libglfilter_draw_plugin_la_LIBADD = libvlc_opengl.la $(GL_LIBS)
+vout_LTLIBRARIES += libglfilter_draw_plugin.la
+endif
+if HAVE_IOS
+libglfilter_draw_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
+libglfilter_draw_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
+vout_LTLIBRARIES += libglfilter_draw_plugin.la
+endif
+if HAVE_ANDROID
+libglfilter_draw_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
+libglfilter_draw_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
+vout_LTLIBRARIES += libglfilter_draw_plugin.la
+endif
 
 libglfilter_mock_plugin_la_SOURCES = video_output/opengl/filter_mock.c
 libglfilter_mock_plugin_la_LIBADD = $(LIBM)

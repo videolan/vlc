@@ -28,12 +28,16 @@
 #include <vlc_modules.h>
 #include <vlc_opengl.h>
 
-#include "filter_draw.h"
-
 #include "filter.h"
 #include "gl_api.h"
 #include "gl_common.h"
 #include "gl_util.h"
+
+#define DRAW_VFLIP_SHORTTEXT "VFlip the video"
+#define DRAW_VFLIP_LONGTEXT \
+    "Apply a vertical flip to the video"
+
+#define DRAW_CFG_PREFIX "draw-"
 
 static const char *const filter_options[] = { "vflip", NULL };
 
@@ -84,10 +88,9 @@ Close(struct vlc_gl_filter *filter)
     free(sys);
 }
 
-int
-vlc_gl_filter_draw_Open(struct vlc_gl_filter *filter,
-                        const config_chain_t *config,
-                        struct vlc_gl_tex_size *size_out)
+static int
+Open(struct vlc_gl_filter *filter, const config_chain_t *config,
+     struct vlc_gl_tex_size *size_out)
 {
     (void) size_out;
 
@@ -195,3 +198,12 @@ error:
     free(sys);
     return VLC_EGENERIC;
 }
+
+vlc_module_begin()
+    add_shortcut("draw");
+    set_shortname("draw")
+    set_capability("opengl filter", 0)
+    set_callback(Open)
+    add_bool(DRAW_CFG_PREFIX "vflip", false, \
+             DRAW_VFLIP_SHORTTEXT, DRAW_VFLIP_LONGTEXT)
+vlc_module_end()
