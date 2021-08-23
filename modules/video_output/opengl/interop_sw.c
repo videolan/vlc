@@ -26,9 +26,10 @@
 #include <limits.h>
 #include <stdlib.h>
 
+#include "interop_sw.h"
+
 #include <vlc_common.h>
 #include "gl_api.h"
-#include "internal.h"
 
 #define PBO_DISPLAY_COUNT 2 /* Double buffering */
 typedef struct

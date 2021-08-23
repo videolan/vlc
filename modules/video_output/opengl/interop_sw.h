@@ -1,5 +1,5 @@
 /*****************************************************************************
- * internal.h: OpenGL internal header
+ * interop_sw.h: OpenGL internal header
  *****************************************************************************
  * Copyright (C) 2017 VLC authors and VideoLAN
  *
@@ -18,11 +18,10 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_OPENGL_INTERNAL_H
-#define VLC_OPENGL_INTERNAL_H
+#ifndef VLC_OPENGL_INTEROP_SW_H
+#define VLC_OPENGL_INTEROP_SW_H
 
 #include "interop.h"
-#include "renderer.h"
 
 int
 opengl_interop_generic_init(struct vlc_gl_interop *interop, bool);

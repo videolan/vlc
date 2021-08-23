@@ -25,8 +25,9 @@
 #include <vlc_common.h>
 #include <vlc_modules.h>
 
+#include "gl_api.h"
 #include "interop.h"
-#include "internal.h"
+#include "interop_sw.h"
 #include "vout_helper.h"
 
 int
