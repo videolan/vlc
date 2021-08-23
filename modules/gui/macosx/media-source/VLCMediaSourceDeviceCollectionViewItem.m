@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "VLCMediaSourceDeviceCollectionViewItem.h"
+#import "extensions/NSColor+VLCAdditions.h"
 #import "views/VLCImageView.h"
 
 NSString *VLCMediaSourceDeviceCellIdentifier = @"VLCMediaSourceDeviceCellIdentifier";
@@ -30,6 +31,14 @@ NSString *VLCMediaSourceDeviceCellIdentifier = @"VLCMediaSourceDeviceCellIdentif
 @end
 
 @implementation VLCMediaSourceDeviceCollectionViewItem
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    _mediaImageView.cropsImagesToRoundedCorners = YES;
+    _mediaImageView.contentGravity = VLCImageViewContentGravityCenter;
+}
 
 - (void)prepareForReuse
 {

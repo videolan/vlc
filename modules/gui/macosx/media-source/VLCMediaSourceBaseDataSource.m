@@ -31,6 +31,7 @@
 #import "main/VLCMain.h"
 #import "views/VLCImageView.h"
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "extensions/NSString+Helpers.h"
 
@@ -38,7 +39,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
 @interface VLCMediaSourceBaseDataSource () <NSCollectionViewDataSource, NSCollectionViewDelegate, NSTableViewDelegate, NSTableViewDataSource>
 {
-    NSArray *_mediaSources;
+    NSArray<VLCMediaSource *> *_mediaSources;
     VLCMediaSourceDataSource *_childDataSource;
     NSArray *_discoveredLANdevices;
     BOOL _gridViewMode;
@@ -86,6 +87,14 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     self.collectionView.delegate = self;
     [self.collectionView registerClass:[VLCMediaSourceDeviceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceDeviceCellIdentifier];
     [self.collectionView registerClass:[VLCMediaSourceCollectionViewItem class] forItemWithIdentifier:VLCMediaSourceCellIdentifier];
+    [self.collectionView registerClass:[VLCLibraryCollectionViewSupplementaryElementView class]
+               forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
+                           withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
+    NSCollectionViewFlowLayout *flowLayout = (NSCollectionViewFlowLayout *)self.collectionView.collectionViewLayout;
+    flowLayout.footerReferenceSize = NSZeroSize;
+    flowLayout.headerReferenceSize = NSMakeSize(200, 50);
+    flowLayout.itemSize = NSMakeSize(149, 176);
+    flowLayout.minimumInteritemSpacing = 24.;
 
     self.homeButton.action = @selector(homeButtonAction:);
     self.homeButton.target = self;
@@ -113,7 +122,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     self.pathControl.URL = nil;
     NSArray *mediaSources;
     if (self.mediaSourceMode == VLCMediaSourceModeLAN) {
-        mediaSources = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_LAN];
+        mediaSources = [VLCMediaSourceProvider listOfLocalMediaSources];
     } else {
         mediaSources = [VLCMediaSourceProvider listOfMediaSourcesForCategory:SD_CAT_INTERNET];
     }
@@ -163,17 +172,45 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
     VLCMediaSourceDeviceCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCMediaSourceDeviceCellIdentifier forIndexPath:indexPath];
-
+    VLCMediaSource *mediaSource = _mediaSources[indexPath.section];
+    
     if (_mediaSourceMode == VLCMediaSourceModeLAN) {
-        VLCMediaSource *mediaSource = _mediaSources[indexPath.section];
         VLCInputNode *rootNode = mediaSource.rootNode;
         NSArray *nodeChildren = rootNode.children;
         VLCInputNode *childNode = nodeChildren[indexPath.item];
         VLCInputItem *childRootInput = childNode.inputItem;
         viewItem.titleTextField.stringValue = childRootInput.name;
 
+        const enum input_item_type_e inputType = childRootInput.inputType;
+        const BOOL isStream = childRootInput.isStream;
+        
         NSURL *artworkURL = childRootInput.artworkURL;
-        NSImage *placeholder = [NSImage imageNamed:@"NXdefaultappicon"];
+        NSImage *placeholder = nil;
+        
+        if (mediaSource.category == SD_CAT_LAN) {
+            placeholder = [NSImage imageNamed:@"bw-Music"];
+        } else {
+            switch (inputType) {
+                case ITEM_TYPE_DIRECTORY:
+                    if ([childRootInput.name containsString:@"home"]) {
+                        placeholder = [NSImage imageNamed:@"bw-home"];
+                    } else {
+                        placeholder = indexPath.item % 2 ? [NSImage imageNamed:@"bw-Server1"] : [NSImage imageNamed:@"bw-server2"];
+                    }
+                    break;
+                case ITEM_TYPE_DISC:
+                    if (isStream) {
+                        placeholder = indexPath.item % 2 ? [NSImage imageNamed:@"bw-Server1"] : [NSImage imageNamed:@"bw-server2"];
+                    } else {
+                        placeholder = indexPath.item % 2 ? [NSImage imageNamed:@"bw-usb1"] : [NSImage imageNamed:@"bw-usb2"];;
+                    }
+                    break;
+                default:
+                    placeholder = [NSImage imageNamed:@"bw-Music"];
+                    break;
+            }
+        }
+        
         if (artworkURL) {
             [viewItem.mediaImageView setImageURL:artworkURL placeholderImage:placeholder];
         } else {
@@ -182,7 +219,7 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     } else {
         VLCMediaSource *mediaSource = _mediaSources[indexPath.item];
         viewItem.titleTextField.stringValue = mediaSource.mediaSourceDescription;
-        viewItem.mediaImageView.image = [NSImage imageNamed:@"NXFollow"];
+        viewItem.mediaImageView.image = [NSImage imageNamed:@"bw-Music"];
     }
 
     return viewItem;
@@ -211,6 +248,47 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
     [self configureChildDataSourceWithNode:childNode andMediaSource:mediaSource];
 
     [self reloadData];
+}
+- (NSView *)collectionView:(NSCollectionView *)collectionView
+viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
+               atIndexPath:(NSIndexPath *)indexPath
+{
+    NSAssert([kind compare:NSCollectionElementKindSectionHeader] == NSOrderedSame, @"View request for non-existing footer.");
+
+    VLCLibraryCollectionViewSupplementaryElementView *labelView = [collectionView makeSupplementaryViewOfKind:kind
+                                                                                               withIdentifier:VLCLibrarySupplementaryElementViewIdentifier
+                                                                                                 forIndexPath:indexPath];
+    
+    labelView.stringValue = _mediaSources[indexPath.section].mediaSourceDescription;
+
+    return labelView;
+}
+
+- (CGSize)collectionView:(NSCollectionView *)collectionView
+                  layout:(NSCollectionViewLayout *)collectionViewLayout
+referenceSizeForHeaderInSection:(NSInteger)section
+{
+    if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+        VLCMediaSource *mediaSource = _mediaSources[section];
+        VLCInputNode *rootNode = mediaSource.rootNode;
+        // Hide Section if no children under the root node are found.
+        return rootNode.numberOfChildren == 0 ? CGSizeZero : [VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize];
+    }
+    
+    return [VLCLibraryCollectionViewSupplementaryElementView defaultHeaderSize];
+}
+- (NSEdgeInsets)collectionView:(NSCollectionView *)collectionView
+                        layout:(NSCollectionViewLayout *)collectionViewLayout
+        insetForSectionAtIndex:(NSInteger)section
+{
+    if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+        VLCMediaSource *mediaSource = _mediaSources[section];
+        VLCInputNode *rootNode = mediaSource.rootNode;
+        
+        return rootNode.numberOfChildren == 0 ? NSEdgeInsetsZero : NSEdgeInsetsMake(16., 0., 48., 0.);
+    }
+    
+    return NSEdgeInsetsMake(16., 0., 48.0, 0.);
 }
 
 #pragma mark - table view data source and delegation
@@ -314,7 +392,8 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 
     VLCInputItem *nodeInput = node.inputItem;
     self.pathControl.URL = [NSURL URLWithString:[NSString stringWithFormat:@"vlc://%@", [nodeInput.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
-
+    self.pathControl.hidden = NO;
+    
     _childDataSource.displayedMediaSource = mediaSource;
     _childDataSource.nodeToDisplay = node;
     _childDataSource.collectionView = self.collectionView;

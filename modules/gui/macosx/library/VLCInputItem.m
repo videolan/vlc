@@ -514,6 +514,14 @@ static const struct input_preparser_callbacks_t preparseCallbacks = {
     return NO;
 }
 
+- (BOOL)isStream
+{
+    if (_vlcInputItem) {
+        return (BOOL)_vlcInputItem->b_net;
+    }
+    return YES;
+}
+
 - (void)preparsingEnded:(enum input_item_preparse_status)status
 {
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];

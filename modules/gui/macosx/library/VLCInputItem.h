@@ -70,6 +70,7 @@ extern NSString *VLCInputItemPreparsingSucceeded;
 @property (readonly) struct input_item_node_t *subTree;
 @property (readonly) NSURL *artworkURL;
 @property (readonly) BOOL preparsed;
+@property (readonly) BOOL isStream;
 
 - (void)parseInputItem;
 - (void)cancelParsing;

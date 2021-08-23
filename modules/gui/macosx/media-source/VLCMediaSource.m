@@ -28,6 +28,7 @@
 
 @interface VLCMediaSource ()
 {
+    BOOL _respondsToDiskChanges;
     libvlc_int_t *_p_libvlcInstance;
     vlc_media_source_t *_p_mediaSource;
     vlc_media_tree_listener_id *_p_treeListenerID;
@@ -95,12 +96,44 @@ static const struct vlc_media_tree_callbacks treeCallbacks = {
     cb_preparse_ended,
 };
 
+static const char *const localDevicesDescription = "My Machine";
+
+#pragma mark - VLCMediaSource methods
 @implementation VLCMediaSource
 
-- (instancetype)initWithMediaSource:(vlc_media_source_t *)p_mediaSource andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance
+- (instancetype)initForLocalDevices:(libvlc_int_t *)p_libvlcInstance
+{
+    self = [super init];
+    if (self) {
+        _respondsToDiskChanges = NO;
+        _p_libvlcInstance = p_libvlcInstance;
+        
+        _p_mediaSource = malloc(sizeof(vlc_media_source_t));
+        if (!_p_mediaSource) {
+            return self;
+        }
+        
+        _p_mediaSource->description = localDevicesDescription;
+        _p_mediaSource->tree = calloc(1, sizeof(vlc_media_tree_t));
+        
+        if (_p_mediaSource->tree == NULL) {
+            free(_p_mediaSource);
+            _p_mediaSource = NULL;
+            return self;
+        }
+        
+        _category = SD_CAT_MYCOMPUTER;
+    }
+    return self;
+}
+
+- (instancetype)initWithMediaSource:(vlc_media_source_t *)p_mediaSource
+                  andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance
+                        forCategory:(enum services_discovery_category_e)category
 {
     self = [super init];
     if (self && p_mediaSource != NULL) {
+        _respondsToDiskChanges = NO;
         _p_libvlcInstance = p_libvlcInstance;
         _p_mediaSource = p_mediaSource;
         vlc_media_source_Hold(_p_mediaSource);
@@ -108,6 +141,7 @@ static const struct vlc_media_tree_callbacks treeCallbacks = {
                                                        &treeCallbacks,
                                                        (__bridge void *)self,
                                                        NO);
+        _category = category;
     }
     return self;
 }
@@ -119,16 +153,121 @@ static const struct vlc_media_tree_callbacks treeCallbacks = {
             vlc_media_tree_RemoveListener(_p_mediaSource->tree,
                                           _p_treeListenerID);
         }
-        vlc_media_source_Release(_p_mediaSource);
+        if (_p_mediaSource->description == localDevicesDescription) {
+            _p_mediaSource->description = NULL;
+            input_item_node_t **childrenNodes = _p_mediaSource->tree->root.pp_children;
+            if (childrenNodes) {
+                for (int i = 0; i <_p_mediaSource->tree->root.i_children; ++i) {
+                    input_item_node_t *childNode = childrenNodes[i];
+                    input_item_node_RemoveNode(&(_p_mediaSource->tree->root), childNode);
+                    input_item_node_Delete(childNode);
+                }
+            }
+            
+            _p_mediaSource->description = NULL;
+            
+            free(_p_mediaSource->tree);
+            free(_p_mediaSource);
+            _p_mediaSource = NULL;
+        } else {
+            vlc_media_source_Release(_p_mediaSource);
+        }
+    }
+    if (_respondsToDiskChanges) {
+        [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
     }
 }
 
 - (void)preparseInputItemWithinTree:(VLCInputItem *)inputItem
 {
+    if (_p_mediaSource->description == localDevicesDescription) {
+        [self generateLocalDevicesTree];
+        return;
+    }
     if (inputItem == nil) {
         return;
     }
     vlc_media_tree_Preparse(_p_mediaSource->tree, _p_libvlcInstance, inputItem.vlcInputItem, NULL);
+}
+
+- (void)generateLocalDevicesTree
+{
+    if (_p_mediaSource->tree->root.i_children > 0) {
+        return;
+    }
+    
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
+        NSArray<NSURL *> *mountedVolumesUrls = [[NSFileManager defaultManager]
+                                                mountedVolumeURLsIncludingResourceValuesForKeys:@[NSURLVolumeIsEjectableKey, NSURLVolumeIsRemovableKey]
+                                                                                        options:NSVolumeEnumerationSkipHiddenVolumes];
+        
+        NSURL *homeDirectoryURL =  [NSURL fileURLWithPath:NSHomeDirectoryForUser(NSUserName())];
+        NSString *homeDirectoryDescription = [NSString stringWithFormat:@"%@'s home", NSUserName()];
+        
+        if (homeDirectoryURL) {
+            input_item_t *homeDirItem = input_item_NewExt(homeDirectoryURL.absoluteString.UTF8String, homeDirectoryDescription.UTF8String, 0, ITEM_TYPE_DIRECTORY, ITEM_LOCAL);
+            if (homeDirItem != NULL) {
+                input_item_node_t *homeDirNode = input_item_node_Create(homeDirItem);
+                if (homeDirNode) {
+                    input_item_node_AppendNode(&(self->_p_mediaSource->tree->root), homeDirNode);
+                }
+                input_item_Release(homeDirItem);
+                homeDirItem = NULL;
+            }
+        }
+        
+        for (NSURL *url in mountedVolumesUrls) {
+            NSNumber *isVolume;
+            NSNumber *isEjectable;
+            NSNumber *isInternal;
+            NSNumber *isLocal;
+
+            NSString *localizedDescription;
+
+            BOOL const getKeyResult = [url getResourceValue:&isVolume forKey:NSURLIsVolumeKey error:nil];
+            if (unlikely(!getKeyResult || !isVolume.boolValue)) {
+                continue;
+            }
+
+            [url getResourceValue:&isEjectable forKey:NSURLVolumeIsEjectableKey error:nil];
+            [url getResourceValue:&isInternal forKey:NSURLVolumeIsInternalKey error:nil];
+            [url getResourceValue:&isLocal forKey:NSURLVolumeIsLocalKey error:nil];
+            [url getResourceValue:&localizedDescription forKey:NSURLVolumeLocalizedNameKey error:nil];
+            
+            const enum input_item_type_e inputType = isEjectable.boolValue ? ITEM_TYPE_DISC : ITEM_TYPE_DIRECTORY;
+            const enum input_item_net_type netType = isLocal.boolValue ? ITEM_LOCAL : ITEM_NET;
+            
+            input_item_t *urlInputItem = input_item_NewExt(url.absoluteString.UTF8String, localizedDescription.UTF8String, 0, inputType, netType);
+            if (urlInputItem != NULL) {
+                input_item_node_t *urlNode = input_item_node_Create(urlInputItem);
+                if (urlNode) {
+                    input_item_node_AppendNode(&(self->_p_mediaSource->tree->root), urlNode);
+                }
+                input_item_Release(urlInputItem);
+                urlInputItem = NULL;
+            }
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourceChildrenReset object:self];
+            
+            if (!self->_respondsToDiskChanges) {
+                // We register the notifications here, as they are retrieved from the OS.
+                // We need to avoid receiving a notification while the array is still being populated.
+                NSNotificationCenter *workspaceNotificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+                [workspaceNotificationCenter addObserver:self
+                                                selector:@selector(volumeIsMounted:)
+                                                    name:NSWorkspaceDidMountNotification
+                                                  object:nil];
+                [workspaceNotificationCenter addObserver:self
+                                                selector:@selector(volumeIsUnmounted:)
+                                                    name:NSWorkspaceWillUnmountNotification
+                                                  object:nil];
+                
+                self->_respondsToDiskChanges = YES;
+            }
+        });
+    });
 }
 
 - (NSString *)mediaSourceDescription
@@ -146,10 +285,99 @@ static const struct vlc_media_tree_callbacks treeCallbacks = {
 
 - (VLCInputNode *)rootNode
 {
-    vlc_media_tree_Lock(_p_mediaSource->tree);
-    VLCInputNode *inputNode = [[VLCInputNode alloc] initWithInputNode:&_p_mediaSource->tree->root];
-    vlc_media_tree_Unlock(_p_mediaSource->tree);
+    VLCInputNode *inputNode = nil;
+    if (_p_mediaSource->description == localDevicesDescription) {
+        // Since it is a manually constructed tree, we skip the locking
+        inputNode = [[VLCInputNode alloc] initWithInputNode:&_p_mediaSource->tree->root];
+    } else {
+        vlc_media_tree_Lock(_p_mediaSource->tree);
+        inputNode = [[VLCInputNode alloc] initWithInputNode:&_p_mediaSource->tree->root];
+        vlc_media_tree_Unlock(_p_mediaSource->tree);
+    }
     return inputNode;
 }
+
+#pragma mark - Local Media Items Methods
+- (void)volumeIsMounted:(NSNotification *)aNotification
+{
+    NSURL *mountedUrl = [aNotification.userInfo valueForKey:NSWorkspaceVolumeURLKey];
+    if (mountedUrl == nil) {
+        return;
+    }
+        
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
+        
+        NSNumber *isEjectable;
+        NSNumber *isLocal;
+        NSString *localizedDescription;
+
+        [mountedUrl getResourceValue:&isEjectable forKey:NSURLVolumeIsEjectableKey error:nil];
+        [mountedUrl getResourceValue:&isLocal forKey:NSURLVolumeIsLocalKey error:nil];
+        [mountedUrl getResourceValue:&localizedDescription forKey:NSURLVolumeLocalizedNameKey error:nil];
+
+        enum input_item_type_e const inputType = isEjectable.boolValue ? ITEM_TYPE_DISC : ITEM_TYPE_DIRECTORY;
+        enum input_item_net_type const netType = isLocal.boolValue ? ITEM_LOCAL : ITEM_NET;
+        
+        input_item_t *urlInputItem = input_item_NewExt(mountedUrl.absoluteString.UTF8String, localizedDescription.UTF8String, 0, inputType, netType);
+        if (urlInputItem != NULL) {
+            input_item_node_t *urlNode = input_item_node_Create(urlInputItem);
+            if (urlNode) {
+                input_item_node_AppendNode(&(self->_p_mediaSource->tree->root), urlNode);
+            }
+            input_item_Release(urlInputItem);
+            urlInputItem = NULL;
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourceChildrenAdded
+                                                                object:self];
+        });
+    });
+}
+
+- (void)volumeIsUnmounted:(NSNotification *)aNotification
+{
+    NSURL *unmountedUrl = [aNotification.userInfo valueForKey:NSWorkspaceVolumeURLKey];
+    if (unmountedUrl == nil) {
+        return;
+    }
+        
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
+        
+        const char *const urlString = unmountedUrl.absoluteString.UTF8String;
+        
+        input_item_node_t *nodeToRemove = NULL;
+        input_item_node_t **childrenNodes = self->_p_mediaSource->tree->root.pp_children;
+        
+        if (childrenNodes == NULL) {
+            return;
+        }
+        
+        for (int i = 0; i < self->_p_mediaSource->tree->root.i_children; ++i) {
+            input_item_node_t *childNode = childrenNodes[i];
+            if (childNode->p_item == NULL) {
+                continue;
+            }
+            if (strcmp(urlString, childNode->p_item->psz_uri) == 0) {
+                nodeToRemove = childNode;
+                break;
+            }
+        }
+        
+        if (nodeToRemove == NULL) {
+            return;
+        }
+        
+        input_item_node_RemoveNode(&(self->_p_mediaSource->tree->root), nodeToRemove);
+        input_item_node_Delete(nodeToRemove);
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourceChildrenRemoved
+                                                                object:self];
+        });
+        
+    });
+}
+
 
 @end

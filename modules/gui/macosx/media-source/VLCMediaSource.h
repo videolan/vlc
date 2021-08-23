@@ -36,12 +36,16 @@ extern NSString *VLCMediaSourcePreparsingEnded;
 
 @interface VLCMediaSource : NSObject
 
-- (instancetype)initWithMediaSource:(vlc_media_source_t *)p_mediaSource andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance;
+- (instancetype)initForLocalDevices:(libvlc_int_t *)p_libvlcInstance;
+- (instancetype)initWithMediaSource:(vlc_media_source_t *)p_mediaSource
+                  andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance
+                        forCategory:(enum services_discovery_category_e)category;
 
 - (void)preparseInputItemWithinTree:(VLCInputItem *)inputItem;
 
-@property (readonly) NSString *mediaSourceDescription;
-@property (readonly) VLCInputNode *rootNode;
+@property (nonatomic, readonly) NSString *mediaSourceDescription;
+@property (nonatomic, readonly) VLCInputNode *rootNode;
+@property (nonatomic, readonly) enum services_discovery_category_e category;
 
 @end
 
