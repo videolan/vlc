@@ -341,6 +341,37 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/File-Icons/wav.icns \
 	gui/macosx/Resources/File-Icons/wma.icns \
 	gui/macosx/Resources/File-Icons/wmv.icns \
+	gui/macosx/Resources/browsewindow/bw-Music.png \
+	gui/macosx/Resources/browsewindow/bw-Music@2x.png \
+	gui/macosx/Resources/browsewindow/bw-Music@3x.png \
+	gui/macosx/Resources/browsewindow/bw-Podcast.png \
+	gui/macosx/Resources/browsewindow/bw-Podcast@1,5x.svg \
+	gui/macosx/Resources/browsewindow/bw-Podcast@2x.png \
+	gui/macosx/Resources/browsewindow/bw-Podcast@3x.png \
+	gui/macosx/Resources/browsewindow/bw-Server1.png \
+	gui/macosx/Resources/browsewindow/bw-Server1@2x.png \
+	gui/macosx/Resources/browsewindow/bw-Server1@3x.png \
+	gui/macosx/Resources/browsewindow/bw-blu-ray.png \
+	gui/macosx/Resources/browsewindow/bw-blu-ray@2x.png \
+	gui/macosx/Resources/browsewindow/bw-blu-ray@3x.png \
+	gui/macosx/Resources/browsewindow/bw-home.png \
+	gui/macosx/Resources/browsewindow/bw-home@2x.png \
+	gui/macosx/Resources/browsewindow/bw-home@3x.png \
+	gui/macosx/Resources/browsewindow/bw-phone.png \
+	gui/macosx/Resources/browsewindow/bw-phone@2x.png \
+	gui/macosx/Resources/browsewindow/bw-phone@3x.png \
+	gui/macosx/Resources/browsewindow/bw-server2.png \
+	gui/macosx/Resources/browsewindow/bw-server2@2x.png \
+	gui/macosx/Resources/browsewindow/bw-server2@3x.png \
+	gui/macosx/Resources/browsewindow/bw-usb1.png \
+	gui/macosx/Resources/browsewindow/bw-usb1@2x.png \
+	gui/macosx/Resources/browsewindow/bw-usb1@3x.png \
+	gui/macosx/Resources/browsewindow/bw-usb2.png \
+	gui/macosx/Resources/browsewindow/bw-usb2@2x.png \
+	gui/macosx/Resources/browsewindow/bw-usb2@3x.png \
+	gui/macosx/Resources/browsewindow/bw-video.png \
+	gui/macosx/Resources/browsewindow/bw-video@2x.png \
+	gui/macosx/Resources/browsewindow/bw-video@3x.png \
 	gui/macosx/Resources/librarywindow/ellipsis.png \
 	gui/macosx/Resources/librarywindow/ellipsis@2x.png \
 	gui/macosx/Resources/librarywindow/note.png \
@@ -357,6 +388,10 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/librarywindow/shuffleOff@2x.png \
 	gui/macosx/Resources/librarywindow/shuffleOn.png \
 	gui/macosx/Resources/librarywindow/shuffleOn@2x.png \
+	gui/macosx/Resources/mainwindow/album.png \
+	gui/macosx/Resources/mainwindow/album@2x.png \
+	gui/macosx/Resources/mainwindow/artist.png \
+	gui/macosx/Resources/mainwindow/artist@2x.png \
 	gui/macosx/Resources/mainwindow/backward-3btns-pressed.png \
 	gui/macosx/Resources/mainwindow/backward-3btns-pressed@2x.png \
 	gui/macosx/Resources/mainwindow/backward-3btns.png \
@@ -400,6 +435,18 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow/pause-pressed@2x.png \
 	gui/macosx/Resources/mainwindow/pause.png \
 	gui/macosx/Resources/mainwindow/pause@2x.png \
+	gui/macosx/Resources/mainwindow/placeholder-group2.pdf \
+	gui/macosx/Resources/mainwindow/placeholder-group2.png \
+	gui/macosx/Resources/mainwindow/placeholder-group2.svg \
+	gui/macosx/Resources/mainwindow/placeholder-group2@2x.png \
+	gui/macosx/Resources/mainwindow/placeholder-music.pdf \
+	gui/macosx/Resources/mainwindow/placeholder-music.png \
+	gui/macosx/Resources/mainwindow/placeholder-music.svg \
+	gui/macosx/Resources/mainwindow/placeholder-music@2x.png \
+	gui/macosx/Resources/mainwindow/placeholder-video.pdf \
+	gui/macosx/Resources/mainwindow/placeholder-video.png \
+	gui/macosx/Resources/mainwindow/placeholder-video.svg \
+	gui/macosx/Resources/mainwindow/placeholder-video@2x.png \
 	gui/macosx/Resources/mainwindow/play-pressed.png \
 	gui/macosx/Resources/mainwindow/play-pressed@2x.png \
 	gui/macosx/Resources/mainwindow/play.png \
@@ -441,6 +488,8 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow/stop.png \
 	gui/macosx/Resources/mainwindow/stop@2x.png \
 	gui/macosx/Resources/mainwindow/topbar_background.png \
+	gui/macosx/Resources/mainwindow/video.png \
+	gui/macosx/Resources/mainwindow/video@2x.png \
 	gui/macosx/Resources/mainwindow/volume-high.png \
 	gui/macosx/Resources/mainwindow/volume-high@2x.png \
 	gui/macosx/Resources/mainwindow/volume-low.png \
