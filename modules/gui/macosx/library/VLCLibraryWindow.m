@@ -486,7 +486,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
         
         _placeholderImageView.image = [NSImage imageNamed:@"placeholder-video"];
-        _placeholderLabel.stringValue = @"Your favorite videos will appear here.\nGo to the Browse section to add videos you love.";
+        _placeholderLabel.stringValue = _NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.");
     }
     else {
         _videoLibraryStackView.translatesAutoresizingMaskIntoConstraints = NO;
