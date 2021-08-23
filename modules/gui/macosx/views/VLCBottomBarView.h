@@ -22,7 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCBottomBarView : NSView
+@interface VLCBottomBarView : NSVisualEffectView
 
 @property NSGradient *lightGradient;
 @property NSGradient *darkGradient;

@@ -25,6 +25,26 @@
 #import "extensions/NSView+VLCAdditions.h"
 #import "views/VLCSliderCell.h"
 
+static NSString *const kHeightConstraintIdentifier = @"heightConstraintIdentifier";
+
+static inline void mouseEnteredOrExited(NSLayoutConstraint *const __unsafe_unretained heightConstraint,
+                                        const BOOL eventIsEntered)
+{
+    [NSAnimationContext beginGrouping];
+    
+    NSAnimationContext.currentContext.duration = 0.2;
+    heightConstraint.animator.constant = eventIsEntered ? 10.0 : 5.0;
+    
+    [NSAnimationContext endGrouping];
+}
+
+@interface VLCSlider ()
+{
+    NSTrackingArea *_trackingArea;
+    NSLayoutConstraint *_heightConstraint;
+}
+@end
+
 @implementation VLCSlider
 
 - (instancetype)initWithCoder:(NSCoder *)coder
@@ -40,6 +60,21 @@
         } else {
             [self setSliderStyleLight];
         }
+        
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^(){
+            for (NSLayoutConstraint *constraint in self.constraints) {
+                if ([constraint.identifier isEqualToString:kHeightConstraintIdentifier]) {
+                    self->_heightConstraint = constraint;
+                    self->_trackingArea = [[NSTrackingArea alloc] initWithRect:NSZeroRect
+                                                                       options:NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect
+                                                                         owner:self
+                                                                      userInfo:nil];
+                    
+                    [self addTrackingArea:self->_trackingArea];
+                    break;
+                }
+            }
+        });
     }
     return self;
 }
@@ -122,6 +157,23 @@
     } else {
         [self setSliderStyleLight];
     }
+}
+
+#pragma mark - Mouse Events
+
+- (void)mouseEntered:(NSEvent *)event
+{
+    if (self.isKnobHidden || __builtin_expect(_heightConstraint == nil, false)) {
+        return;
+    }
+    mouseEnteredOrExited(_heightConstraint, YES);
+}
+- (void)mouseExited:(NSEvent *)event
+{
+    if (self.isKnobHidden || __builtin_expect(_heightConstraint == nil, false)) {
+        return;
+    }
+    mouseEnteredOrExited(_heightConstraint, NO);
 }
 
 @end

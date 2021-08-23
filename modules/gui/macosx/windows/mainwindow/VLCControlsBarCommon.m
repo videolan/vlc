@@ -31,8 +31,10 @@
 
 #import "views/VLCBottomBarView.h"
 #import "views/VLCDragDropView.h"
+#import "views/VLCImageView.h"
 #import "views/VLCTimeField.h"
 #import "views/VLCSlider.h"
+#import "views/VLCWrappableTextField.h"
 
 /*****************************************************************************
  * VLCControlsBarCommon
@@ -47,6 +49,11 @@
     NSImage *_pressedPauseImage;
     NSImage *_playImage;
     NSImage *_pressedPlayImage;
+    NSImage *_repeatOffImage;
+    NSImage *_repeatAllImage;
+    NSImage *_repeatOneImage;
+    NSImage *_shuffleOffImage;
+    NSImage *_shuffleOnImage;
 
     NSTimeInterval last_fwd_event;
     NSTimeInterval last_bwd_event;
@@ -95,18 +102,17 @@
     [self.fullscreenButton setToolTip: _NS("Enter fullscreen")];
     self.fullscreenButton.accessibilityLabel = self.fullscreenButton.toolTip;
 
-    [self.backwardButton setImage: imageFromRes(@"backward-3btns")];
-    [self.backwardButton setAlternateImage: imageFromRes(@"backward-3btns-pressed")];
-    _playImage = imageFromRes(@"play");
-    _pressedPlayImage = imageFromRes(@"play-pressed");
-    _pauseImage = imageFromRes(@"pause");
-    _pressedPauseImage = imageFromRes(@"pause-pressed");
-    [self.forwardButton setImage: imageFromRes(@"forward-3btns")];
-    [self.forwardButton setAlternateImage: imageFromRes(@"forward-3btns-pressed")];
+    [self.backwardButton setImage: imageFromRes(@"VLCBackwardTemplate")];
+    [self.backwardButton setAlternateImage: imageFromRes(@"VLCBackwardTemplate")];
+    _playImage = imageFromRes(@"VLCPlayTemplate");
+    _pressedPlayImage = imageFromRes(@"VLCPlayTemplate");
+    _pauseImage = imageFromRes(@"VLCPauseTemplate");
+    _pressedPauseImage = imageFromRes(@"VLCPauseTemplate");
+    [self.forwardButton setImage: imageFromRes(@"VLCForwardTemplate")];
+    [self.forwardButton setAlternateImage: imageFromRes(@"VLCForwardTemplate")];
 
-    [self.fullscreenButton setImage: imageFromRes(@"fullscreen-one-button")];
-    [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
-
+    [self.fullscreenButton setImage: imageFromRes(@"VLCFullscreenOffTemplate")];
+    [self.fullscreenButton setAlternateImage: imageFromRes(@"VLCFullscreenOffTemplate")];
     [self.playButton setImage: _playImage];
     [self.playButton setAlternateImage: _pressedPlayImage];
 
@@ -136,6 +142,22 @@
     [self.backwardButton setAction:@selector(bwd:)];
 
     [self playerStateUpdated:nil];
+
+    [_artworkImageView setCropsImagesToRoundedCorners:YES];
+    [_artworkImageView setImage:[NSImage imageNamed:@"noart"]];
+    [_artworkImageView setContentGravity:VLCImageViewContentGravityResize];
+
+    _repeatAllImage = [NSImage imageNamed:@"repeatAll"];
+    _repeatOffImage = [NSImage imageNamed:@"repeatOff"];
+    _repeatOneImage = [NSImage imageNamed:@"repeatOne"];
+
+    [_repeatButton setImage:_repeatOffImage];
+
+    _shuffleOffImage = [NSImage imageNamed:@"shuffleOff"];
+    _shuffleOnImage = [NSImage imageNamed:@"shuffleOn"];
+
+    [_shuffleButton setImage:_shuffleOffImage];
+
 }
 
 - (void)dealloc
@@ -277,11 +299,27 @@
         [self.timeField setStringValue: @"00:00"];
         [self.timeSlider setIndefinite:NO];
         [self.timeSlider setEnabled:NO];
+        [self.timeSlider setHidden:YES];
+        [self.nowPlayingView setHidden:YES];
         return;
     }
 
+    _songNameTextField.stringValue = inputItem.name;
+    _artistNameTextField.stringValue = inputItem.artist;
+
+    NSURL *artworkURL = inputItem.artworkURL;
+
+    if (artworkURL) {
+        [_artworkImageView setImageURL:inputItem.artworkURL placeholderImage:[NSImage imageNamed:@"noart"]];
+    } else {
+        _artworkImageView.image = [NSImage imageNamed:@"noart"];
+    }
+
+    [self.nowPlayingView setHidden:NO];
+    [self.timeSlider setHidden:NO];
     [self.timeSlider setKnobHidden:NO];
     [self.timeSlider setFloatValue:_playerController.position];
+    [self.bottomBarView setHidden:NO];
 
     vlc_tick_t duration = inputItem.duration;
     bool buffering = _playerController.playerState == VLC_PLAYER_STATE_STARTED;

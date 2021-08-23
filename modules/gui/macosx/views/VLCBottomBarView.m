@@ -85,6 +85,8 @@
                                                       endingColor:[NSColor colorWithSRGBRed:0.07 green:0.07 blue:0.07 alpha:1.0]];
         _darkStroke = [NSColor blackColor];
     }
+    
+    self.blendingMode = NSVisualEffectBlendingModeBehindWindow;
 }
 
 - (void)calculatePaths
@@ -147,6 +149,11 @@
 {
     [self setDark:self.shouldShowDarkAppearance];
     [self setNeedsDisplay:YES];
+}
+
+- (BOOL)allowsVibrancy
+{
+    return YES;
 }
 
 @end

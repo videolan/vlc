@@ -76,8 +76,8 @@
     [self.volumeDownButton setImage: imageFromRes(@"volume-low")];
     [self.volumeUpButton setImage: imageFromRes(@"volume-high")];
 
-    [self.fullscreenButton setImage: imageFromRes(@"fullscreen-double-buttons")];
-    [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
+    [self.fullscreenButton setImage: imageFromRes(@"VLCFullscreenOffTemplate")];
+    [self.fullscreenButton setAlternateImage: imageFromRes(@"VLCFullscreenOffTemplate")];
 
     [self.prevButton setImage: imageFromRes(@"previous-6btns")];
     [self.prevButton setAlternateImage: imageFromRes(@"previous-6btns-pressed")];
@@ -89,6 +89,7 @@
     [self updateVolumeSlider:nil];
 
     [self playbackStateChanged:nil];
+    [self.stopButton setHidden:YES];
 }
 
 #pragma mark -

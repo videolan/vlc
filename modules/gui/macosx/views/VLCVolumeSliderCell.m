@@ -23,6 +23,7 @@
 #import "VLCVolumeSliderCell.h"
 
 #import "extensions/NSGradient+VLCAdditions.h"
+#import "extensions/NSColor+VLCAdditions.h"
 #import "main/CompatibilityFixes.h"
 
 @interface VLCVolumeSliderCell () {
@@ -58,7 +59,7 @@
     _gradientColor = [NSColor colorWithCalibratedRed: 0.663 green: 0.663 blue: 0.663 alpha: 1];
     _gradientColor2 = [NSColor colorWithCalibratedRed: 0.749 green: 0.749 blue: 0.753 alpha: 1];
     _trackStrokeColor = [NSColor colorWithCalibratedRed: 0.619 green: 0.624 blue: 0.623 alpha: 1];
-    _filledTrackColor = [NSColor colorWithCalibratedRed: 0.55 green: 0.55 blue: 0.55 alpha: 1];
+    _filledTrackColor = [NSColor VLCSliderFillColor];
     _knobFillColor = [NSColor colorWithCalibratedRed: 1 green: 1 blue: 1 alpha: 1];
     _activeKnobFillColor = [NSColor colorWithCalibratedRed: 0.95 green: 0.95 blue: 0.95 alpha: 1];
     _shadowColor = [NSColor colorWithCalibratedRed: 0.32 green: 0.32 blue: 0.32 alpha: 1];
@@ -107,7 +108,7 @@
     }
     _gradientColor2 = [NSColor colorWithCalibratedRed: 0.15 green: 0.15 blue: 0.15 alpha: 1];
     _trackStrokeColor = [NSColor colorWithCalibratedRed: 0.23 green: 0.23 blue: 0.23 alpha: 1];
-    _filledTrackColor = [NSColor colorWithCalibratedRed: 0.15 green: 0.15 blue: 0.15 alpha: 1];
+    _filledTrackColor = [NSColor VLCSliderFillColor];
     _shadowColor = [NSColor colorWithCalibratedRed: 0.32 green: 0.32 blue: 0.32 alpha: 1];
 
     NSColor* knobGradientColor = [NSColor colorWithSRGBRed: 0.15 green: 0.15 blue: 0.15 alpha: 1];
