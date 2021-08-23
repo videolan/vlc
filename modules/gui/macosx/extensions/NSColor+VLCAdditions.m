@@ -74,4 +74,29 @@
     return [NSColor colorWithRed:246./255. green:127./255. blue:0. alpha:1.];
 }
 
++ (instancetype)VLClibraryItemBorderLightColor
+{
+    return [NSColor colorWithRed:0.89 green:0.89 blue:0.91 alpha:1.];
+}
+
++ (instancetype)VLClibraryItemBorderDarkColor
+{
+    return [NSColor colorWithRed:0.48 green:0.48 blue:0.48 alpha:1.];
+}
+
++ (instancetype)VLClibraryCollectionViewItemBackgroundLightColor
+{
+    return [NSColor colorWithRed:0.23 green:0.23 blue:0.23 alpha:1.];
+}
+
++ (instancetype)VLClibraryCollectionViewItemBackgroundDarkColor
+{
+    return [NSColor colorWithRed:0.23 green:0.23 blue:0.23 alpha:1.];
+}
+
++ (instancetype)VLCSliderFillColor
+{
+    return [NSColor colorWithRed:1. green:0.38039 blue:0.03921 alpha:1.];
+}
+
 @end
