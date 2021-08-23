@@ -1,4 +1,4 @@
-OPENGL_COMMONSOURCES = video_output/opengl/vout_helper.c \
+OPENGL_COMMONSOURCES = \
        video_output/opengl/filter.c \
        video_output/opengl/filter.h \
        video_output/opengl/filter_draw.c \
@@ -13,16 +13,11 @@ OPENGL_COMMONSOURCES = video_output/opengl/vout_helper.c \
        video_output/opengl/gl_util.c \
        video_output/opengl/gl_util.h \
        video_output/opengl/interop.h \
-       video_output/opengl/vout_helper.h \
        video_output/opengl/internal.h \
        video_output/opengl/interop.c video_output/opengl/interop_sw.c \
-       video_output/opengl/renderer.c \
-       video_output/opengl/renderer.h \
        video_output/opengl/sampler.c \
        video_output/opengl/sampler.h \
-       video_output/opengl/sampler_priv.h \
-       video_output/opengl/sub_renderer.c \
-       video_output/opengl/sub_renderer.h
+       video_output/opengl/sampler_priv.h
 
 OPENGL_COMMONCFLAGS = $(LIBPLACEBO_CFLAGS)
 OPENGL_COMMONLIBS = $(LIBPLACEBO_LIBS)
@@ -30,6 +25,14 @@ OPENGL_COMMONLIBS = $(LIBPLACEBO_LIBS)
 if HAVE_LIBPLACEBO
 OPENGL_COMMONLIBS += libplacebo_utils.la
 endif
+
+OPENGL_VOUT_COMMONSOURCES = \
+    video_output/opengl/renderer.c \
+    video_output/opengl/renderer.h \
+    video_output/opengl/sub_renderer.c \
+    video_output/opengl/sub_renderer.h \
+    video_output/opengl/vout_helper.c \
+    video_output/opengl/vout_helper.h
 
 # Convenience library for OpenGL components -- OpenGL only
 libvlc_opengl_la_SOURCES = $(OPENGL_COMMONSOURCES)
@@ -54,7 +57,8 @@ noinst_LTLIBRARIES += libvlc_opengles.la
 endif
 
 ### OpenGL ###
-libgles2_plugin_la_SOURCES = video_output/opengl/display.c
+libgles2_plugin_la_SOURCES = video_output/opengl/display.c \
+    $(OPENGL_VOUT_COMMONSOURCES)
 libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
 libgles2_plugin_la_LIBADD = libvlc_opengles.la
 libgles2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
@@ -62,7 +66,8 @@ if HAVE_GLES2
 vout_LTLIBRARIES += libgles2_plugin.la
 endif
 
-libgl_plugin_la_SOURCES = video_output/opengl/display.c
+libgl_plugin_la_SOURCES = video_output/opengl/display.c \
+    $(OPENGL_VOUT_COMMONSOURCES)
 libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS) $(OPENGL_COMMONCFLAGS)
 libgl_plugin_la_LIBADD = libvlc_opengl.la
 

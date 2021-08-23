@@ -29,7 +29,6 @@
 #include <vlc_list.h>
 
 #include "filter_priv.h"
-#include "renderer.h"
 #include "sampler_priv.h"
 
 /* The filter chain contains the sequential list of filters.

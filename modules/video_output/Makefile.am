@@ -33,13 +33,15 @@ libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,Foundation,-framework,CoreVideo
 
 if HAVE_OSX
-libvout_macosx_plugin_la_SOURCES = video_output/macosx.m
+libvout_macosx_plugin_la_SOURCES = video_output/macosx.m \
+	$(OPENGL_VOUT_COMMONSOURCES)
 libvout_macosx_plugin_la_CFLAGS = $(AM_CFLAGS) -DHAVE_GL_CORE_SYMBOLS
 libvout_macosx_plugin_la_LIBADD = libvlc_opengl.la
 libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGL,-framework,Cocoa
 
-libcaopengllayer_plugin_la_SOURCES = video_output/caopengllayer.m
+libcaopengllayer_plugin_la_SOURCES = video_output/caopengllayer.m \
+	$(OPENGL_VOUT_COMMONSOURCES)
 libcaopengllayer_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)  -DHAVE_GL_CORE_SYMBOLS
 libcaopengllayer_plugin_la_LIBADD = libvlc_opengl.la
 libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
@@ -160,7 +162,7 @@ libdirect3d11_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 vout_LTLIBRARIES += $(LTLIBdirect3d11)
 EXTRA_LTLIBRARIES += libdirect3d11_plugin.la
 
-libglwin32_plugin_la_SOURCES = \
+libglwin32_plugin_la_SOURCES = $(OPENGL_VOUT_COMMONSOURCES) \
 	video_output/win32/glwin32.c \
 	video_output/win32/common.c video_output/win32/common.h \
 	video_output/win32/events.c video_output/win32/events.h \
