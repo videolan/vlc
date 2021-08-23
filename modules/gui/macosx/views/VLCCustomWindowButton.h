@@ -53,4 +53,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface VLCCustomEmptyLibraryBrowseButton : NSButton
+
+@end
+
 NS_ASSUME_NONNULL_END

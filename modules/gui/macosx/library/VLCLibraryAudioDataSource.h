@@ -36,9 +36,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) NSTableView *collectionSelectionTableView;
 @property (readwrite, assign) NSTableView *groupSelectionTableView;
 @property (readwrite, assign) NSCollectionView *collectionView;
+@property (nonatomic, readwrite, assign) NSImageView *placeholderImageView;
+@property (nonatomic, readwrite, assign) NSTextField *placeholderLabel;
+@property (nonatomic, readonly, strong) NSString *imageNameForCurrentSegment;
 
 - (void)setupAppearance;
 - (void)reloadAppearance;
+- (void)reloadEmptyViewAppearance;
 
 @end
 

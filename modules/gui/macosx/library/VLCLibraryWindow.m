@@ -43,6 +43,7 @@
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 
+#import "views/VLCCustomWindowButton.h"
 #import "views/VLCDragDropView.h"
 #import "views/VLCRoundedCornerTextField.h"
 
@@ -64,6 +65,9 @@ const CGFloat VLCLibraryWindowSmallRowHeight = 24.;
 const CGFloat VLCLibraryWindowLargeRowHeight = 50.;
 const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 
+static NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
+static NSArray<NSLayoutConstraint *> *audioPlaceholderImageViewSizeConstraints;
+
 @interface VLCLibraryWindow () <VLCDragDropTarget, NSSplitViewDelegate>
 {
     VLCPlaylistDataSource *_playlistDataSource;
@@ -80,7 +84,17 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
     CGFloat _lastPlaylistWidthBeforeCollaps;
 
     VLCFSPanelController *_fspanel;
+    
+    NSInteger _currentSelectedSegment;
 }
+
+@property (nonatomic, readwrite, strong) IBOutlet NSView *emptyLibraryView;
+@property (nonatomic, readwrite, strong) IBOutlet NSImageView *placeholderImageView;
+@property (nonatomic, readwrite, strong) IBOutlet NSTextField *placeholderLabel;
+@property (nonatomic, readwrite, strong) IBOutlet VLCCustomEmptyLibraryBrowseButton *placeholderGoToBrowseButton;
+
+- (IBAction)goToBrowseSection:(id)sender;
+
 @end
 
 static int ShowFullscreenController(vlc_object_t *p_this, const char *psz_variable,
@@ -109,6 +123,18 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     }
 }
 
+static void addShadow(NSImageView *__unsafe_unretained imageView)
+{
+    NSShadow *buttonShadow = [[NSShadow alloc] init];
+
+    buttonShadow.shadowBlurRadius = 15.0f;
+    buttonShadow.shadowOffset = CGSizeMake(0.0f, -5.0f);
+    buttonShadow.shadowColor = [NSColor blackColor];
+
+    imageView.wantsLayer = YES;
+    imageView.shadow = buttonShadow;
+}
+
 @implementation VLCLibraryWindow
 
 - (void)awakeFromNib
@@ -122,9 +148,42 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
     self.videoView = [[VLCVoutView alloc] initWithFrame:self.mainSplitView.frame];
     self.videoView.hidden = YES;
+    
+    videoPlaceholderImageViewSizeConstraints = @[
+        [NSLayoutConstraint constraintWithItem:_placeholderImageView
+                                     attribute:NSLayoutAttributeWidth
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:0.f
+                                      constant:182.f],
+        [NSLayoutConstraint constraintWithItem:_placeholderImageView
+                                     attribute:NSLayoutAttributeHeight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:0.f
+                                      constant:114.f],
+    ];
+    audioPlaceholderImageViewSizeConstraints = @[
+        [NSLayoutConstraint constraintWithItem:_placeholderImageView
+                                     attribute:NSLayoutAttributeWidth
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:0.f
+                                      constant:149.f],
+        [NSLayoutConstraint constraintWithItem:_placeholderImageView
+                                     attribute:NSLayoutAttributeHeight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:0.f
+                                      constant:149.f],
+    ];
 
     [self.gridVsListSegmentedControl setToolTip: _NS("Grid View or List View")];
-     [self.librarySortButton setToolTip: _NS("Select Sorting Mode")];
+    [self.librarySortButton setToolTip: _NS("Select Sorting Mode")];
     [self.playQueueToggle setToolTip: _NS("Toggle Playqueue")];
 
     [self.gridVsListSegmentedControl setHidden:NO];
@@ -188,15 +247,17 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     _fspanel = [[VLCFSPanelController alloc] init];
     [_fspanel showWindow:self];
 
+    _currentSelectedSegment = 5; // To enforce action on the selected segment
     _segmentedTitleControl.segmentCount = 4;
     [_segmentedTitleControl setTarget:self];
     [_segmentedTitleControl setAction:@selector(segmentedControlAction:)];
     [_segmentedTitleControl setLabel:_NS("Video") forSegment:0];
     [_segmentedTitleControl setLabel:_NS("Music") forSegment:1];
-    [_segmentedTitleControl setLabel:_NS("Local Network") forSegment:2];
-    [_segmentedTitleControl setLabel:_NS("Internet") forSegment:3];
+    [_segmentedTitleControl setLabel:_NS("Browse") forSegment:2];
+    [_segmentedTitleControl setLabel:_NS("Streams") forSegment:3];
     [_segmentedTitleControl sizeToFit];
     [_segmentedTitleControl setSelectedSegment:0];
+    
 
     _playlistDragDropView.dropTarget = self;
     _playlistCounterTextField.useStrongRounding = YES;
@@ -243,6 +304,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     _libraryAudioDataSource.groupSelectionTableView = _audioGroupSelectionTableView;
     _libraryAudioDataSource.segmentedControl = self.audioSegmentedControl;
     _libraryAudioDataSource.collectionView = self.audioLibraryCollectionView;
+    _libraryAudioDataSource.placeholderImageView = _placeholderImageView;
+    _libraryAudioDataSource.placeholderLabel = _placeholderLabel;
     [_libraryAudioDataSource setupAppearance];
     _audioCollectionSelectionTableView.dataSource = _libraryAudioDataSource;
     _audioCollectionSelectionTableView.delegate = _libraryAudioDataSource;
@@ -274,6 +337,14 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     [self segmentedControlAction:nil];
     [self repeatStateUpdated:nil];
     [self shuffleStateUpdated:nil];
+    
+    const NSEdgeInsets scrollViewEdgeInsets = NSEdgeInsetsMake(16.0, 32.0, 0.0, 0.0);
+    
+    _audioCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _audioCollectionViewScrollView.contentInsets = scrollViewEdgeInsets;
+    
+    _mediaSourceCollectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _mediaSourceCollectionViewScrollView.contentInsets = scrollViewEdgeInsets;
 }
 
 - (void)dealloc
@@ -374,7 +445,12 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
 - (void)segmentedControlAction:(id)sender
 {
-    switch (_segmentedTitleControl.selectedSegment) {
+    if (_segmentedTitleControl.selectedSegment == _currentSelectedSegment) {
+        return;
+    }
+    
+    _currentSelectedSegment = _segmentedTitleControl.selectedSegment;
+    switch (_currentSelectedSegment) {
         case 0:
             [self showVideoLibrary];
             break;
@@ -391,53 +467,90 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
 - (void)showVideoLibrary
 {
-    if (_mediaSourceView.superview != nil) {
-        [_mediaSourceView removeFromSuperview];
+    for (NSView *subview in _libraryTargetView.subviews) {
+        [subview removeFromSuperview];
     }
-    if (_audioLibraryView.superview != nil) {
-        [_audioLibraryView removeFromSuperview];
+    
+    if (_libraryVideoDataSource.libraryModel.numberOfVideoMedia == 0) { // empty library
+        for (NSLayoutConstraint *constraint in audioPlaceholderImageViewSizeConstraints) {
+            constraint.active = NO;
+        }
+        for (NSLayoutConstraint *constraint in videoPlaceholderImageViewSizeConstraints) {
+            constraint.active = YES;
+        }
+        
+        _emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
+        [_libraryTargetView addSubview:_emptyLibraryView];
+        NSDictionary *dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+        
+        _placeholderImageView.image = [NSImage imageNamed:@"placeholder-video"];
+        _placeholderLabel.stringValue = @"Your favorite videos will appear here.\nGo to the Browse section to add videos you love.";
     }
-    if (_videoLibraryStackView.superview == nil) {
+    else {
         _videoLibraryStackView.translatesAutoresizingMaskIntoConstraints = NO;
         [_libraryTargetView addSubview:_videoLibraryStackView];
         NSDictionary *dict = NSDictionaryOfVariableBindings(_videoLibraryStackView);
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryStackView(>=572.)]|" options:0 metrics:0 views:dict]];
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryStackView(>=444.)]|" options:0 metrics:0 views:dict]];
+        
+        
+        [_videoLibraryCollectionView reloadData];
+        [_recentVideoLibraryCollectionView reloadData];
     }
-    [_videoLibraryCollectionView reloadData];
-    [_recentVideoLibraryCollectionView reloadData];
+    
     _librarySortButton.hidden = NO;
     _audioSegmentedControl.hidden = YES;
+
 }
 
 - (void)showAudioLibrary
 {
-    if (_mediaSourceView.superview != nil) {
-        [_mediaSourceView removeFromSuperview];
+    for (NSView *subview in _libraryTargetView.subviews) {
+        [subview removeFromSuperview];
     }
-    if (_videoLibraryStackView.superview != nil) {
-        [_videoLibraryStackView removeFromSuperview];
+    
+    if (_libraryAudioDataSource.libraryModel.numberOfAudioMedia == 0) { // empty library
+        for (NSLayoutConstraint *constraint in videoPlaceholderImageViewSizeConstraints) {
+            constraint.active = NO;
+        }
+        for (NSLayoutConstraint *constraint in audioPlaceholderImageViewSizeConstraints) {
+            constraint.active = YES;
+        }
+        
+        [_libraryAudioDataSource reloadEmptyViewAppearance];
+        
+        _emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
+        [_libraryTargetView addSubview:_emptyLibraryView];
+        
+        NSDictionary *dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
     }
-    if (_audioLibraryView.superview == nil) {
+    else {
         _audioLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
         [_libraryTargetView addSubview:_audioLibraryView];
         NSDictionary *dict = NSDictionaryOfVariableBindings(_audioLibraryView);
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_audioLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
         [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_audioLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+        
+        
+         if (self.gridVsListSegmentedControl.selectedSegment == 0) {
+            _audioLibrarySplitView.hidden = YES;
+            _audioCollectionViewScrollView.hidden = NO;
+            [_libraryAudioDataSource reloadAppearance];
+        } else {
+            _audioLibrarySplitView.hidden = NO;
+            _audioCollectionViewScrollView.hidden = YES;
+            [_libraryAudioDataSource reloadAppearance];
+            [_audioCollectionSelectionTableView reloadData];
+        }
     }
+    
     _librarySortButton.hidden = NO;
     _audioSegmentedControl.hidden = NO;
-
-    if (self.gridVsListSegmentedControl.selectedSegment == 0) {
-        _audioLibrarySplitView.hidden = YES;
-        _audioCollectionViewScrollView.hidden = NO;
-        [_libraryAudioDataSource reloadAppearance];
-    } else {
-        _audioLibrarySplitView.hidden = NO;
-        _audioCollectionViewScrollView.hidden = YES;
-        [_libraryAudioDataSource reloadAppearance];
-        [_audioCollectionSelectionTableView reloadData];
-    }
+    
     self.gridVsListSegmentedControl.target = self;
     self.gridVsListSegmentedControl.action = @selector(segmentedControlAction:);
 }
@@ -449,6 +562,9 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     }
     if (_audioLibraryView.superview != nil) {
         [_audioLibraryView removeFromSuperview];
+    }
+    if (_emptyLibraryView.superview != nil) {
+        [_emptyLibraryView removeFromSuperview];
     }
     if (_mediaSourceView.superview == nil) {
         _mediaSourceView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -525,6 +641,12 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     }
 
     return NO;
+}
+
+- (IBAction)goToBrowseSection:(id)sender
+{
+    [_segmentedTitleControl setSelected:YES forSegment:2];
+    [self segmentedControlAction:nil];
 }
 
 #pragma mark - split view delegation

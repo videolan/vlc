@@ -38,6 +38,9 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
 
 @interface VLCLibraryAudioDataSource () <NSCollectionViewDelegate, NSCollectionViewDataSource>
 {
+    NSInteger _currentSelectedSegment;
+    NSArray<NSString *> *_placeholderImageNames;
+    NSArray<NSString *> *_placeholderLabelStrings;
     NSArray *_displayedCollection;
     enum vlc_ml_parent_type _currentParentType;
 }
@@ -73,8 +76,18 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     _groupSelectionTableView.doubleAction = @selector(groubSelectionDoubleClickAction:);
     _collectionSelectionTableView.target = self;
     _collectionSelectionTableView.doubleAction = @selector(collectionSelectionDoubleClickAction:);
+    
+    _currentSelectedSegment = _segmentedControl.indexOfSelectedItem;
+    _placeholderImageNames = @[@"placeholder-group2", @"placeholder-music", @"placeholder-music", @"placeholder-music"];
+    _placeholderLabelStrings = @[
+        _NS("Your favorite artists will appear here.\nGo to the Browse section to add artists you love."),
+        _NS("Your favorite albums will appear here.\nGo to the Browse section to add albums you love."),
+        _NS("Your favorite tracks will appear here.\nGo to the Browse section to add tracks you love."),
+        _NS("Your favorite genres will appear here.\nGo to the Browse section to add genres you love."),
+    ];
 
     [self reloadAppearance];
+    [self reloadEmptyViewAppearance];
 }
 
 - (void)reloadAppearance
@@ -89,9 +102,16 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
     [self.collectionView reloadData];
 }
 
+- (void)reloadEmptyViewAppearance
+{
+    _placeholderImageView.image = [NSImage imageNamed:_placeholderImageNames[_currentSelectedSegment]];
+    _placeholderLabel.stringValue = _placeholderLabelStrings[_currentSelectedSegment];
+}
+
 - (IBAction)segmentedControlAction:(id)sender
 {
-    switch (_segmentedControl.selectedSegment) {
+    _currentSelectedSegment = _segmentedControl.selectedSegment;
+    switch (_currentSelectedSegment) {
         case 0:
             _displayedCollection = [self.libraryModel listOfArtists];
             _currentParentType = VLC_ML_PARENT_ARTIST;
@@ -113,10 +133,21 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
             NSAssert(1, @"reached the unreachable");
             break;
     }
+    
+    if (_libraryModel.listOfAudioMedia.count == 0) {
+        [self reloadEmptyViewAppearance];
+        return;
+    }
+    
     [self.collectionView reloadData];
 
     [self.collectionSelectionTableView reloadData];
     [self.groupSelectionTableView reloadData];
+}
+
+- (NSString *)imageNameForCurrentSegment
+{
+    return _placeholderImageNames[_currentSelectedSegment];
 }
 
 #pragma mark - table view data source and delegation

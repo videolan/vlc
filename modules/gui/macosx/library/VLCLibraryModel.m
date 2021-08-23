@@ -48,6 +48,9 @@ NSString *VLCLibraryModelMediaItemUpdated = @"VLCLibraryModelMediaItemUpdated";
 
     enum vlc_ml_sorting_criteria_t _sortCriteria;
     bool _sortDescending;
+    
+    size_t _initialVideoCount;
+    size_t _initialAudioCount;
 }
 
 - (void)updateCachedListOfAudioMedia;
@@ -103,6 +106,14 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                                        selector:@selector(applicationWillTerminate:)
                                            name:NSApplicationWillTerminateNotification
                                          object:nil];
+        
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+            const vlc_ml_query_params_t queryParameters = {};
+            
+            // Preload video and audio count for gui
+            self->_initialVideoCount = vlc_ml_count_video_media(self->_p_mediaLibrary, &queryParameters);
+            self->_initialAudioCount = vlc_ml_count_audio_media(self->_p_mediaLibrary, &queryParameters);
+        });
     }
     return self;
 }
@@ -132,7 +143,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 - (size_t)numberOfAudioMedia
 {
     if (!_cachedAudioMedia) {
-        [self updateCachedListOfAudioMedia];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateCachedListOfAudioMedia];
+        });
+        
+        // Return initial count here, otherwise it will return 0 on the first time
+        return _initialAudioCount;
     }
     return _cachedAudioMedia.count;
 }
@@ -279,6 +295,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateCachedListOfVideoMedia];
         });
+        
+        // Return initial count here, otherwise it will return 0 on the first time
+        return _initialVideoCount;
     }
     return _cachedVideoMedia.count;
 }

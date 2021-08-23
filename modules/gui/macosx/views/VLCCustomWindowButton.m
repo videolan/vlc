@@ -23,6 +23,8 @@
 
 #import "VLCCustomWindowButton.h"
 
+#import "extensions/NSColor+VLCAdditions.h"
+
 @interface VLCCustomWindowButtonPrototype()
 
 @property (readwrite, retain) NSImage *buttonImage;
@@ -257,6 +259,47 @@
 - (void)performDefaultButtonAction:(id)sender
 {
     [[self window] toggleFullScreen:self];
+}
+
+@end
+
+@implementation VLCCustomEmptyLibraryBrowseButton
+
+-(void)awakeFromNib
+{
+    self.wantsLayer = YES;
+    self.layer.backgroundColor = [NSColor VLClibraryHighlightColor].CGColor;
+    self.layer.cornerRadius = 6.0f;
+    
+    self.bezelStyle = NSBezelStyleRecessed;
+    self.bordered = NO;
+    
+    NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithAttributedString:self.attributedTitle];
+    NSRange const titleRange = NSMakeRange(0, [title length]);
+    
+    // Normal
+    [title addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:titleRange];
+    [self setAttributedTitle:title];
+    
+    // Highlighted
+    [title removeAttribute:NSForegroundColorAttributeName range:titleRange];
+    [title addAttribute:NSForegroundColorAttributeName value:[NSColor VLClibraryLightTitleColor] range:titleRange];
+    
+    [self setAttributedAlternateTitle:title];
+        
+    if ([self.cell isKindOfClass:[NSButtonCell class]]) {
+        NSButtonCell *cell = (NSButtonCell *)self.cell;
+        
+        cell.highlightsBy = NSContentsCellMask;
+        cell.imagePosition = NSImageLeft;
+    }
+    
+#if 0
+    // FIXME: Add the @"wifi" system symbol for macOS 11
+    if (@available(macOS 11.0, *)) {
+        [NSImage imageWithSystemSymbolName:@"wifi" accessibilityDescription:nil];
+    }
+#endif
 }
 
 @end

@@ -43,6 +43,9 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
         self.editable = NO;
         self.selectable = NO;
         self.bordered = NO;
+        self.usesSingleLineMode = NO;
+        self.drawsBackground = YES;
+        self.backgroundColor = [NSColor clearColor];
     }
     return self;
 }

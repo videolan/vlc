@@ -58,7 +58,7 @@
     if (cropsImagesToRoundedCorners) {
         self.layer.cornerRadius = 5.;
         self.layer.masksToBounds = YES;
-        self.layer.borderWidth = 1.;
+        self.layer.borderWidth = 2.;
     } else {
         self.layer.cornerRadius = 0.;
         self.layer.masksToBounds = NO;
@@ -73,7 +73,13 @@
 
 - (void)setupBorderColor
 {
-    self.layer.borderColor = self.shouldShowDarkAppearance ? [NSColor VLClibrarySeparatorDarkColor].CGColor : [NSColor VLClibrarySeparatorLightColor].CGColor;
+    if (self.shouldShowDarkAppearance) {
+        self.layer.borderColor = [NSColor VLClibraryItemBorderDarkColor].CGColor;
+        self.layer.backgroundColor = [NSColor VLClibraryCollectionViewItemBackgroundDarkColor].CGColor;
+    } else {
+        self.layer.borderColor = [NSColor VLClibraryItemBorderLightColor].CGColor;
+        self.layer.backgroundColor = [NSColor VLClibraryCollectionViewItemBackgroundLightColor].CGColor ;
+    }
 }
 
 - (void)setImage:(NSImage *)image
