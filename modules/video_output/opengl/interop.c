@@ -307,7 +307,7 @@ interop_xyz12_init(struct vlc_gl_interop *interop)
     };
 }
 
-int
+static int
 opengl_interop_init_impl(struct vlc_gl_interop *interop, GLenum tex_target,
                          vlc_fourcc_t chroma, video_color_space_t yuv_space)
 {

@@ -25,10 +25,6 @@
 #include "renderer.h"
 
 int
-opengl_interop_init_impl(struct vlc_gl_interop *interop, GLenum tex_target,
-                         vlc_fourcc_t chroma, video_color_space_t yuv_space);
-
-int
 opengl_interop_generic_init(struct vlc_gl_interop *interop, bool);
 
 void
