@@ -29,93 +29,6 @@
 #include "internal.h"
 #include "vout_helper.h"
 
-struct vlc_gl_interop *
-vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
-                   vlc_video_context *context, const video_format_t *fmt)
-{
-    struct vlc_gl_interop *interop = vlc_object_create(gl, sizeof(*interop));
-    if (!interop)
-        return NULL;
-
-    interop->init = opengl_interop_init_impl;
-    interop->ops = NULL;
-    interop->fmt_out = interop->fmt_in = *fmt;
-    /* this is the only allocated field, and we don't need it */
-    interop->fmt_out.p_palette = interop->fmt_in.p_palette = NULL;
-
-    interop->gl = gl;
-    interop->api = api;
-    interop->vt = &api->vt;
-
-    const vlc_chroma_description_t *desc =
-        vlc_fourcc_GetChromaDescription(fmt->i_chroma);
-
-    if (desc == NULL)
-    {
-        vlc_object_delete(interop);
-        return NULL;
-    }
-
-    if (desc->plane_count == 0)
-    {
-        /* Opaque chroma: load a module to handle it */
-        interop->vctx = context;
-        interop->module = module_need_var(interop, "glinterop", "glinterop");
-        if (interop->module == NULL)
-            goto error;
-    }
-    else
-    {
-        /* No opengl interop module found: use a generic interop. */
-        int ret = opengl_interop_generic_init(interop, true);
-        if (ret != VLC_SUCCESS)
-            goto error;
-    }
-
-    return interop;
-
-error:
-    vlc_object_delete(interop);
-    return NULL;
-}
-
-struct vlc_gl_interop *
-vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl,
-                                 const struct vlc_gl_api *api)
-{
-    struct vlc_gl_interop *interop = vlc_object_create(gl, sizeof(*interop));
-    if (!interop)
-        return NULL;
-
-    interop->init = opengl_interop_init_impl;
-    interop->ops = NULL;
-    interop->gl = gl;
-    interop->api = api;
-    interop->vt = &api->vt;
-
-    video_format_Init(&interop->fmt_in, VLC_CODEC_RGB32);
-    interop->fmt_out = interop->fmt_in;
-
-    int ret = opengl_interop_generic_init(interop, false);
-    if (ret != VLC_SUCCESS)
-    {
-        vlc_object_delete(interop);
-        return NULL;
-    }
-
-    return interop;
-}
-
-void
-vlc_gl_interop_Delete(struct vlc_gl_interop *interop)
-{
-    if (interop->ops && interop->ops->close)
-        interop->ops->close(interop);
-    if (interop->module)
-        module_unneed(interop, interop->module);
-    vlc_object_delete(interop);
-}
-
 int
 vlc_gl_interop_GenerateTextures(const struct vlc_gl_interop *interop,
                                 const GLsizei *tex_width,
@@ -419,4 +332,91 @@ opengl_interop_init_impl(struct vlc_gl_interop *interop, GLenum tex_target,
         return interop_yuv_base_init(interop, tex_target, chroma, desc);
 
     return interop_rgb_base_init(interop, tex_target, chroma);
+}
+
+struct vlc_gl_interop *
+vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
+                   vlc_video_context *context, const video_format_t *fmt)
+{
+    struct vlc_gl_interop *interop = vlc_object_create(gl, sizeof(*interop));
+    if (!interop)
+        return NULL;
+
+    interop->init = opengl_interop_init_impl;
+    interop->ops = NULL;
+    interop->fmt_out = interop->fmt_in = *fmt;
+    /* this is the only allocated field, and we don't need it */
+    interop->fmt_out.p_palette = interop->fmt_in.p_palette = NULL;
+
+    interop->gl = gl;
+    interop->api = api;
+    interop->vt = &api->vt;
+
+    const vlc_chroma_description_t *desc =
+        vlc_fourcc_GetChromaDescription(fmt->i_chroma);
+
+    if (desc == NULL)
+    {
+        vlc_object_delete(interop);
+        return NULL;
+    }
+
+    if (desc->plane_count == 0)
+    {
+        /* Opaque chroma: load a module to handle it */
+        interop->vctx = context;
+        interop->module = module_need_var(interop, "glinterop", "glinterop");
+        if (interop->module == NULL)
+            goto error;
+    }
+    else
+    {
+        /* No opengl interop module found: use a generic interop. */
+        int ret = opengl_interop_generic_init(interop, true);
+        if (ret != VLC_SUCCESS)
+            goto error;
+    }
+
+    return interop;
+
+error:
+    vlc_object_delete(interop);
+    return NULL;
+}
+
+struct vlc_gl_interop *
+vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl,
+                                 const struct vlc_gl_api *api)
+{
+    struct vlc_gl_interop *interop = vlc_object_create(gl, sizeof(*interop));
+    if (!interop)
+        return NULL;
+
+    interop->init = opengl_interop_init_impl;
+    interop->ops = NULL;
+    interop->gl = gl;
+    interop->api = api;
+    interop->vt = &api->vt;
+
+    video_format_Init(&interop->fmt_in, VLC_CODEC_RGB32);
+    interop->fmt_out = interop->fmt_in;
+
+    int ret = opengl_interop_generic_init(interop, false);
+    if (ret != VLC_SUCCESS)
+    {
+        vlc_object_delete(interop);
+        return NULL;
+    }
+
+    return interop;
+}
+
+void
+vlc_gl_interop_Delete(struct vlc_gl_interop *interop)
+{
+    if (interop->ops && interop->ops->close)
+        interop->ops->close(interop);
+    if (interop->module)
+        module_unneed(interop, interop->module);
+    vlc_object_delete(interop);
 }
