@@ -13,7 +13,8 @@ OPENGL_COMMONSOURCES = \
        video_output/opengl/gl_util.h \
        video_output/opengl/interop.h \
        video_output/opengl/internal.h \
-       video_output/opengl/interop.c video_output/opengl/interop_sw.c \
+       video_output/opengl/interop.c \
+       video_output/opengl/interop_sw.c \
        video_output/opengl/sampler.c \
        video_output/opengl/sampler.h \
        video_output/opengl/sampler_priv.h
