@@ -1544,7 +1544,7 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
     if (atomic_load(&sys->b_display_avstat))
     {
         vlc_tick_t now_ts = vlc_tick_now();
-        vlc_tick_t clock_offset = vlc_clock_ConvertToSystem(sys->clock, system_now, 0, sys->rate);
+        vlc_tick_t clock_offset = vlc_clock_GetOffset(sys->clock, system_now, pts, sys->rate);
 
         msg_Info( vd, "avstats: [RENDER][VIDEO] ts=%" PRId64 " pts_per_vsync=%" PRId64 " pts_late=%" PRId64 " pts=%" PRId64 " pcr=%" PRId64,
                   NS_FROM_VLC_TICK(now_ts),
