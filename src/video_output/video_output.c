@@ -1774,7 +1774,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
             msg_Dbg(vout, "no next picture available");
         }
 
-        if (likely(next_system_pts != INT64_MAX))
+        if (likely(next_system_pts != INT64_MAX) && sys->displayed.next)
         {
             vlc_tick_t date_next = next_system_pts - render_delay;
             if (date_next <= system_now)
@@ -1783,6 +1783,8 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                 next = sys->displayed.next;
                 sys->displayed.next = NULL;
             }
+            if (vsync_date != VLC_TICK_INVALID)
+                date_refresh = __MIN(date_refresh, vsync_date - render_delay);
         }
     }
 
@@ -1814,9 +1816,11 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         else
             date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY;
         date_refresh -= render_delay;
-        refresh = date_refresh <= system_now;
+        refresh = date_refresh <= system_now || vsync_date != VLC_TICK_INVALID;
         render_now = refresh;
     }
+    if (vsync_date != VLC_TICK_INVALID)
+        date_refresh = __MIN(date_refresh, vsync_date - render_delay);
 
     if (date_refresh != VLC_TICK_INVALID)
         *deadline = date_refresh;
