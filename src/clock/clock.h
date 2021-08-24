@@ -233,4 +233,7 @@ vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
     return system;
 }
 
+vlc_tick_t vlc_clock_GetOffset(vlc_clock_t *clock, vlc_tick_t system_now,
+                               vlc_tick_t ts, double rate);
+
 #endif /*VLC_CLOCK_H*/
