@@ -800,8 +800,13 @@ sampler_planes_load(const struct vlc_gl_sampler *sampler)
     vt->ActiveTexture(GL_TEXTURE0);
     vt->BindTexture(priv->tex_target, priv->textures[plane]);
 
+    /* Only one TexCoordMap matrix is necessary in the shader (its location is
+     * stored in uloc.TexCoordsMaps[0]), as there is only one plane per
+     * execution. However, for a single picture, there are several coords
+     * mapping matrices (one per plane), so the correct one
+     * (var.TexCoordsMaps[plane]) must be bound. */
     vt->UniformMatrix3fv(priv->uloc.TexCoordsMaps[0], 1, GL_FALSE,
-                         priv->var.TexCoordsMaps[0]);
+                         priv->var.TexCoordsMaps[plane]);
 
     /* Return the expected transform matrix if interop == NULL */
     const GLfloat *tm = GetTransformMatrix(priv->interop);
