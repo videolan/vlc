@@ -197,7 +197,6 @@ FocusScope {
                     model: root.tabModel
 
                     onItemClicked: {
-                        sourcesBanner.localMenuDelegate = null
                         var name = root.tabModel.get(index).name
                         selectedIndex = index
                         history.push(["mc", name])
