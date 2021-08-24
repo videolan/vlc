@@ -191,6 +191,9 @@ void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
 vlc_tick_t vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
                                      vlc_tick_t ts, double rate);
 
+vlc_tick_t vlc_clock_GetOffset(vlc_clock_t *clock, vlc_tick_t system_now,
+                               vlc_tick_t ts, double rate);
+
 /**
  * This functon converts an array of timestamp from stream to system
  */

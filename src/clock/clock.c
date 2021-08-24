@@ -88,6 +88,8 @@ struct vlc_clock_t
     vlc_tick_t (*set_delay)(vlc_clock_t *clock, vlc_tick_t delay);
     vlc_tick_t (*to_system_locked)(vlc_clock_t *clock, vlc_tick_t system_now,
                                    vlc_tick_t ts, double rate);
+    vlc_tick_t (*get_offset)(vlc_clock_t *clock, vlc_tick_t now,
+                             vlc_tick_t ts, double rate);
 
     vlc_clock_main_t *owner;
     vlc_tick_t delay;
@@ -455,6 +457,29 @@ static vlc_tick_t vlc_clock_slave_to_system_locked(vlc_clock_t *clock,
     return system + (clock->delay - main_clock->delay) * rate;
 }
 
+static vlc_tick_t vlc_clock_slave_get_offset(vlc_clock_t *clock, vlc_tick_t now,
+                                             vlc_tick_t ts, double rate)
+{
+    vlc_clock_main_t *main_clock = clock->owner;
+    if (main_clock->pause_date != VLC_TICK_INVALID)
+        return INT64_MAX;
+
+    struct vlc_clock_context *context =
+        vlc_clock_main_get_context(main_clock, clock, ts, false, clock->updating);
+    assert(context);
+//vlc_error(main_clock->logger, "clock[%s] is using a clock_context[%zu] for ts: %"PRId64, vlc_clock_get_name(clock), context->idx, ts);
+
+    vlc_tick_t system = vlc_clock_context_stream_to_system(context, 0);
+    if (system == VLC_TICK_INVALID)
+    {
+        /* We don't have a master sync point, let's fallback to a monotonic ref
+         * point */
+        system = vlc_clock_monotonic_to_system_locked(clock, context, now, 0, rate);
+    }
+
+    return system + (clock->delay - main_clock->delay) * rate;
+}
+
 static vlc_tick_t vlc_clock_master_to_system_locked(vlc_clock_t *clock,
                                                     vlc_tick_t now,
                                                     vlc_tick_t ts, double rate)
@@ -471,6 +496,27 @@ static vlc_tick_t vlc_clock_master_to_system_locked(vlc_clock_t *clock,
         /* We don't have a master sync point, let's fallback to a monotonic ref
          * point */
         system = vlc_clock_monotonic_to_system_locked(clock, context, now, ts, rate);
+    }
+
+    return system + clock->delay * rate;
+}
+
+static vlc_tick_t vlc_clock_master_get_offset(
+        vlc_clock_t *clock, vlc_tick_t now, vlc_tick_t ts, double rate)
+{
+    vlc_clock_main_t *main_clock = clock->owner;
+
+    struct vlc_clock_context *context =
+        vlc_clock_main_get_context(main_clock, clock, ts, false, false);
+    assert(context);
+
+    /* Once we got the correct clock context, we can use ts=0 to get the offset */
+    vlc_tick_t system = vlc_clock_context_stream_to_system(context, 0);
+    if (system == VLC_TICK_INVALID)
+    {
+        /* We don't have a master sync point, let's fallback to a monotonic ref
+         * point */
+        system = vlc_clock_monotonic_to_system_locked(clock, context, now, 0, rate);
     }
 
     return system + clock->delay * rate;
@@ -748,6 +794,16 @@ vlc_tick_t vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
     return system;
 }
 
+vlc_tick_t vlc_clock_GetOffset(vlc_clock_t *clock, vlc_tick_t system_now,
+                               vlc_tick_t ts, double rate)
+{
+    vlc_clock_main_t *main_clock = clock->owner;
+    vlc_mutex_lock(&main_clock->lock);
+    vlc_tick_t system = clock->get_offset(clock, system_now, ts, rate);
+    vlc_mutex_unlock(&main_clock->lock);
+    return system;
+}
+
 void vlc_clock_ConvertArrayToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
                                     vlc_tick_t *ts_array, size_t ts_count,
                                     double rate)
@@ -766,6 +822,7 @@ static void vlc_clock_set_master_callbacks(vlc_clock_t *clock)
     clock->reset = vlc_clock_master_reset;
     clock->set_delay = vlc_clock_master_set_delay;
     clock->to_system_locked = vlc_clock_master_to_system_locked;
+    clock->get_offset = vlc_clock_master_get_offset;
 }
 
 static void vlc_clock_set_slave_callbacks(vlc_clock_t *clock)
@@ -774,6 +831,7 @@ static void vlc_clock_set_slave_callbacks(vlc_clock_t *clock)
     clock->reset = vlc_clock_slave_reset;
     clock->set_delay = vlc_clock_slave_set_delay;
     clock->to_system_locked = vlc_clock_slave_to_system_locked;
+    clock->get_offset = vlc_clock_slave_get_offset;
 }
 
 static vlc_clock_t *vlc_clock_main_Create(vlc_clock_main_t *main_clock,
