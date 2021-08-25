@@ -432,8 +432,8 @@ typedef void (*libvlc_video_cleanup_cb)(void *opaque);
  * For optimal perfomances, VLC media player renders into a custom window, and
  * does not use this function and associated callbacks. It is <b>highly
  * recommended</b> that other LibVLC-based application do likewise.
- * To embed video in a window, use libvlc_media_player_set_xid() or equivalent
- * depending on the operating system.
+ * To embed video in a window, use libvlc_media_player_set_xwindow() or
+ * equivalent depending on the operating system.
  *
  * If window embedding does not fit the application use case, then a custom
  * LibVLC video output display plugin is required to maintain optimal video
