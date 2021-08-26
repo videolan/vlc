@@ -277,8 +277,8 @@ static const struct vlc_playlist_callbacks playlist_callbacks = []{
     cbs.on_playback_repeat_changed = on_playlist_playback_repeat_changed;
     cbs.on_playback_order_changed= on_playlist_playback_order_changed;
     cbs.on_current_index_changed = on_playlist_current_item_changed;
-    cbs.on_has_next_changed = on_playlist_has_prev_changed;
-    cbs.on_has_prev_changed = on_playlist_has_next_changed;
+    cbs.on_has_next_changed = on_playlist_has_next_changed;
+    cbs.on_has_prev_changed = on_playlist_has_prev_changed;
     return cbs;
 }();
 
