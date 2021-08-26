@@ -674,7 +674,9 @@ static void *Thread( void *obj )
 
     Q_INIT_RESOURCE( vlc );
 
-    vlc::CompositorFactory compositorFactory(p_intf, var_InheritString(p_intf, "qt-compositor"));
+    auto compositor = var_InheritString(p_intf, "qt-compositor");
+    vlc::CompositorFactory compositorFactory(p_intf, compositor);
+    free(compositor);
 
     compositorFactory.preInit();
 
