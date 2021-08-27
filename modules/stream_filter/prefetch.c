@@ -257,6 +257,11 @@ static void *Thread(void *data)
         assert(sys->buffer_length <= sys->buffer_size);
         //msg_Dbg(stream, "buffer: %zu/%zu", sys->buffer_length,
         //        sys->buffer_size);
+        msg_Dbg(stream, "avstat: [INPUT][PREFETCH][AVAILABLE] ts=%" PRId64
+                " buffered=%" PRIu64 " buffer_size=%" PRIu64,
+                NS_FROM_VLC_TICK(vlc_tick_now()),
+                sys->buffer_length + sys->buffer_offset,
+                sys->buffer_length);
         vlc_cond_signal(&sys->wait_data);
     }
 
@@ -334,9 +339,14 @@ static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
         copy = sys->buffer_size - offset;
 
     memcpy(buf, sys->buffer + offset, copy);
-    sys->stream_offset += copy;
+    uint64_t stream_offset = sys->stream_offset += copy;
     vlc_cond_signal(&sys->wait_space);
     vlc_mutex_unlock(&sys->lock);
+
+    // TODO: tracer
+    msg_Dbg(stream, "avstat: [INPUT][PREFETCH][CONSUMED] ts=%" PRId64 " stream_offset=%" PRIu64,
+            NS_FROM_VLC_TICK(vlc_tick_now()), stream_offset);
+
     return copy;
 }
 
