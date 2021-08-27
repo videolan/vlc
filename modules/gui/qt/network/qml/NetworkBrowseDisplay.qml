@@ -211,7 +211,7 @@ FocusScope {
 
                 onItemDoubleClicked: {
                     if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
-                        browse(tree, Qt.MouseFocusReason)
+                        browse(model.tree, Qt.MouseFocusReason)
                     else
                         playAt(index)
                 }
@@ -285,6 +285,7 @@ FocusScope {
                 height: layout.implicitHeight + VLCStyle.margin_large + VLCStyle.margin_small
 
                 Navigation.navigable: btn.visible
+                Navigation.parentItem: root
 
                 RowLayout {
                     id: layout
