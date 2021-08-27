@@ -37,7 +37,6 @@
 #include "gl_api.h"
 #include "gl_common.h"
 #include "gl_util.h"
-#include "internal.h"
 #include "interop.h"
 
 struct vlc_gl_sampler_priv {

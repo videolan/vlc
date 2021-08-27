@@ -37,7 +37,6 @@
 
 #include "gl_api.h"
 #include "../../hw/vdpau/vlc_vdpau.h"
-#include "internal.h"
 #include "interop.h"
 
 #define INTEROP_CALL(fct, ...) \

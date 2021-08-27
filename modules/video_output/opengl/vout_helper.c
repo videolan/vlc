@@ -44,7 +44,6 @@
 #include "gl_api.h"
 #include "gl_util.h"
 #include "vout_helper.h"
-#include "internal.h"
 #include "renderer.h"
 #include "sampler.h"
 #include "sampler_priv.h"

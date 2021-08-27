@@ -39,7 +39,6 @@
 
 #include "filter.h"
 #include "gl_util.h"
-#include "internal.h"
 #include "vout_helper.h"
 
 #define SPHERE_RADIUS 1.f
