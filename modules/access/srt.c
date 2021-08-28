@@ -93,7 +93,6 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
 {
     vlc_object_t *strm_obj = (vlc_object_t *) p_stream;
     int i_latency=var_InheritInteger( p_stream, SRT_PARAM_LATENCY );
-    int i_payload_size = var_InheritInteger( p_stream, SRT_PARAM_PAYLOAD_SIZE );
     int stat;
     char *psz_passphrase = var_InheritString( p_stream, SRT_PARAM_PASSPHRASE );
     bool passphrase_needs_free = true;
@@ -140,8 +139,6 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
         if (srt_parse_url( url, &params )) {
             if (params.latency != -1)
                 i_latency = params.latency;
-            if (params.payload_size != -1)
-                i_payload_size = params.payload_size;
             if (params.passphrase != NULL) {
                 free( psz_passphrase );
                 passphrase_needs_free = false;
@@ -190,11 +187,6 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
                 SRTO_STREAMID, psz_streamid, strlen(psz_streamid) );
     }
 
-    /* set maximum payload size */
-    srt_set_socket_option( strm_obj, SRT_PARAM_PAYLOAD_SIZE, p_sys->sock,
-            SRTO_PAYLOADSIZE, &i_payload_size, sizeof(i_payload_size) );
-
-
     srt_epoll_add_usock( p_sys->i_poll_id, p_sys->sock,
         &(int) { SRT_EPOLL_ERR | SRT_EPOLL_IN });
 
@@ -235,7 +227,6 @@ out:
 static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
 {
     stream_sys_t *p_sys = p_stream->p_sys;
-    int i_chunk_size = var_InheritInteger( p_stream, SRT_PARAM_CHUNK_SIZE );
     int i_poll_timeout = var_InheritInteger( p_stream, SRT_PARAM_POLL_TIMEOUT );
     /* SRT doesn't have a concept of EOF for live streams. */
     VLC_UNUSED(eof);
@@ -249,9 +240,8 @@ static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
     if ( p_sys->i_chunks == 0 )
         p_sys->i_chunks = SRT_MIN_CHUNKS_TRYREAD;
 
-    size_t i_chunk_size_actual = ( i_chunk_size > 0 )
-        ? i_chunk_size : SRT_DEFAULT_CHUNK_SIZE;
-    size_t bufsize = i_chunk_size_actual * p_sys->i_chunks;
+    const size_t i_chunk_size = SRT_LIVE_MAX_PLSIZE;
+    const size_t bufsize = i_chunk_size * p_sys->i_chunks;
     block_t *pkt = block_Alloc( bufsize );
     if ( unlikely( pkt == NULL ) )
     {
@@ -297,7 +287,7 @@ static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
          * each iteration.
          */
         pkt->i_buffer = 0;
-        while ( ( bufsize - pkt->i_buffer ) >= i_chunk_size_actual )
+        while ( ( bufsize - pkt->i_buffer ) >= i_chunk_size )
         {
             int stat = srt_recvmsg( p_sys->sock,
                 (char *)( pkt->p_buffer + pkt->i_buffer ),
@@ -311,8 +301,8 @@ static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
 
         msg_Dbg ( p_stream, "Read %zu bytes out of a max of %zu"
             " (%d chunks of %zu bytes)", pkt->i_buffer,
-            p_sys->i_chunks * i_chunk_size_actual, p_sys->i_chunks,
-                 i_chunk_size_actual );
+            p_sys->i_chunks * i_chunk_size, p_sys->i_chunks,
+                i_chunk_size );
 
 
         /* Gradually adjust number of chunks we read at a time
@@ -320,7 +310,7 @@ static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
         * settle on depends on stream's bit rate.
         */
         size_t rem = bufsize - pkt->i_buffer;
-        if ( rem < i_chunk_size_actual )
+        if ( rem < i_chunk_size )
         {
             if ( p_sys->i_chunks < SRT_MAX_CHUNKS_TRYREAD )
             {
@@ -430,8 +420,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( SRT_PARAM_CHUNK_SIZE, SRT_DEFAULT_CHUNK_SIZE,
-            N_( "SRT chunk size (bytes)" ), NULL )
+    add_obsolete_integer( SRT_PARAM_CHUNK_SIZE )
     add_integer( SRT_PARAM_POLL_TIMEOUT, SRT_DEFAULT_POLL_TIMEOUT,
             N_( "Return poll wait after timeout milliseconds (-1 = infinite)" ),
             NULL )
@@ -439,8 +428,7 @@ vlc_module_begin ()
             N_( "SRT latency (ms)" ), NULL )
     add_password( SRT_PARAM_PASSPHRASE, "",
             N_( "Password for stream encryption" ), NULL )
-    add_integer( SRT_PARAM_PAYLOAD_SIZE, SRT_DEFAULT_PAYLOAD_SIZE,
-            N_( "SRT maximum payload size (bytes)" ), NULL )
+    add_obsolete_integer( SRT_PARAM_PAYLOAD_SIZE )
     add_integer( SRT_PARAM_KEY_LENGTH, SRT_DEFAULT_KEY_LENGTH,
             SRT_KEY_LENGTH_TEXT, NULL )
     change_integer_list( srt_key_lengths, srt_key_length_names )
