@@ -397,6 +397,7 @@ static int Open(vlc_object_t *p_this)
 failed:
     if ( p_sys->sock != -1 ) srt_close( p_sys->sock );
     if ( p_sys->i_poll_id != -1 ) srt_epoll_release( p_sys->i_poll_id );
+    srt_cleanup();
 
     return VLC_EGENERIC;
 }
