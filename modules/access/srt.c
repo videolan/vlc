@@ -399,6 +399,7 @@ failed:
 
     if ( p_sys->sock != -1 ) srt_close( p_sys->sock );
     if ( p_sys->i_poll_id != -1 ) srt_epoll_release( p_sys->i_poll_id );
+    srt_cleanup();
 
     free( p_sys->psz_host );
 
