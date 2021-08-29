@@ -381,6 +381,7 @@ static int Open(vlc_object_t *p_this)
         msg_Err( p_stream, "Failed to create poll id for SRT socket." );
         goto failed;
     }
+    p_sys->sock = SRT_INVALID_SOCK;
 
     if ( !srt_schedule_reconnect( p_stream ) )
     {
@@ -397,7 +398,7 @@ static int Open(vlc_object_t *p_this)
 failed:
     vlc_mutex_destroy( &p_sys->lock );
 
-    if ( p_sys->sock != -1 ) srt_close( p_sys->sock );
+    if ( p_sys->sock != SRT_INVALID_SOCK ) srt_close( p_sys->sock );
     if ( p_sys->i_poll_id != -1 ) srt_epoll_release( p_sys->i_poll_id );
     srt_cleanup();
 
