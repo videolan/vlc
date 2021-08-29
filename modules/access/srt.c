@@ -299,11 +299,12 @@ static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
             pkt->i_buffer += (size_t)stat;
         }
 
+#if 0
         msg_Dbg ( p_stream, "Read %zu bytes out of a max of %zu"
             " (%d chunks of %zu bytes)", pkt->i_buffer,
             p_sys->i_chunks * i_chunk_size, p_sys->i_chunks,
                 i_chunk_size );
-
+#endif
 
         /* Gradually adjust number of chunks we read at a time
         * up to a predefined maximum. The actual number we might
