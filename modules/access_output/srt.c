@@ -29,6 +29,7 @@
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
+#include <vlc_block_helper.h>
 #include <vlc_network.h>
 
 typedef struct sout_access_out_sys_t
@@ -38,6 +39,7 @@ typedef struct sout_access_out_sys_t
     bool          b_interrupted;
     vlc_mutex_t   lock;
     int           i_payload_size;
+    block_bytestream_t block_stream;
 } sout_access_out_sys_t;
 
 static void srt_wait_interrupted(void *p_data)
@@ -238,19 +240,58 @@ out:
 static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    int i_len = 0;
     int i_poll_timeout = var_InheritInteger( p_access, SRT_PARAM_POLL_TIMEOUT );
     bool b_interrupted = false;
+    ssize_t i_len = 0;
+    int chunk_size;
+    uint8_t chunk[SRT_LIVE_MAX_PLSIZE];
+
+    if ( p_buffer == NULL )
+        return 0;
+    block_BytestreamPush( &p_sys->block_stream, p_buffer );
 
     vlc_interrupt_register( srt_wait_interrupted, p_access);
 
-    while( p_buffer )
+    while( true )
     {
-        block_t *p_next;
+        /* We can leave the remaining bytes less than i_payload_size for next
+         * Write() round, but it will add delay.
+         */
+        chunk_size = __MIN( block_BytestreamRemaining( &p_sys->block_stream ),
+                            p_sys->i_payload_size );
+        if ( chunk_size == 0 )
+            break;
 
-        i_len += p_buffer->i_buffer;
+        if ( vlc_killed() )
+        {
+            /* We are told to stop. Stop. */
+            i_len = VLC_EGENERIC;
+            goto out;
+        }
 
-        while( p_buffer->i_buffer )
+        switch( srt_getsockstate( p_sys->sock ) )
+        {
+            case SRTS_CONNECTED:
+                /* Good to go */
+                break;
+            case SRTS_BROKEN:
+            case SRTS_NONEXIST:
+            case SRTS_CLOSED:
+                /* Failed. Schedule recovery. */
+                if ( !srt_schedule_reconnect( p_access ) )
+                    msg_Err( p_access, "Failed to schedule connect");
+                /* Fall-through */
+            default:
+                /* Not ready */
+                i_len = VLC_EGENERIC;
+                goto out;
+        }
+
+        SRTSOCKET ready[1];
+        int readycnt = 1;
+        if ( srt_epoll_wait( p_sys->i_poll_id,
+            0, 0, &ready[0], &readycnt,
+            i_poll_timeout, NULL, 0, NULL, 0 ) < 0)
         {
             if ( vlc_killed() )
             {
@@ -259,90 +300,53 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
                 goto out;
             }
 
-            switch( srt_getsockstate( p_sys->sock ) )
+            /* if 'srt_epoll_wait' is interrupted, we still need to
+            *  finish sending current block or it may be sent only
+            *  partially. TODO: this delay can be prevented,
+            *  possibly with a FIFO and an additional thread.
+            */
+            vlc_mutex_lock( &p_sys->lock );
+            if ( p_sys->b_interrupted )
             {
-                case SRTS_CONNECTED:
-                    /* Good to go */
-                    break;
-                case SRTS_BROKEN:
-                case SRTS_NONEXIST:
-                case SRTS_CLOSED:
-                    /* Failed. Schedule recovery. */
-                    if ( !srt_schedule_reconnect( p_access ) )
-                        msg_Err( p_access, "Failed to schedule connect");
-                    /* Fall-through */
-                default:
-                    /* Not ready */
-                    i_len = VLC_EGENERIC;
-                    goto out;
+                srt_epoll_add_usock( p_sys->i_poll_id, p_sys->sock,
+                    &(int) { SRT_EPOLL_ERR | SRT_EPOLL_OUT });
+                p_sys->b_interrupted = false;
+                b_interrupted = true;
             }
+            vlc_mutex_unlock( &p_sys->lock );
 
-            SRTSOCKET ready[1];
-            int readycnt = 1;
-            if ( srt_epoll_wait( p_sys->i_poll_id,
-                0, 0, &ready[0], &readycnt,
-                i_poll_timeout, NULL, 0, NULL, 0 ) < 0)
+            if ( !b_interrupted )
             {
-                if ( vlc_killed() )
-                {
-                    /* We are told to stop. Stop. */
-                    i_len = VLC_EGENERIC;
-                    goto out;
-                }
-
-                /* if 'srt_epoll_wait' is interrupted, we still need to
-                *  finish sending current block or it may be sent only
-                *  partially. TODO: this delay can be prevented,
-                *  possibly with a FIFO and an additional thread.
-                */
-                vlc_mutex_lock( &p_sys->lock );
-                if ( p_sys->b_interrupted )
-                {
-                    srt_epoll_add_usock( p_sys->i_poll_id, p_sys->sock,
-                        &(int) { SRT_EPOLL_ERR | SRT_EPOLL_OUT });
-                    p_sys->b_interrupted = false;
-                    b_interrupted = true;
-                }
-                vlc_mutex_unlock( &p_sys->lock );
-
-                if ( !b_interrupted )
-                {
-                    continue;
-                }
-                else
-                {
-                    msg_Dbg( p_access, "srt_epoll_wait was interrupted");
-                }
+                continue;
             }
-
-            if ( readycnt > 0  && ready[0] == p_sys->sock
-                && srt_getsockstate( p_sys->sock ) == SRTS_CONNECTED)
+            else
             {
-                size_t i_write = __MIN( p_buffer->i_buffer, p_sys->i_payload_size );
-                if (srt_sendmsg2( p_sys->sock,
-                    (char *)p_buffer->p_buffer, i_write, 0 ) == SRT_ERROR )
-                {
-                    msg_Warn( p_access, "send error: %s", srt_getlasterror_str() );
-                    i_len = VLC_EGENERIC;
-                    goto out;
-                }
-
-                p_buffer->p_buffer += i_write;
-                p_buffer->i_buffer -= i_write;
+                msg_Dbg( p_access, "srt_epoll_wait was interrupted");
             }
         }
 
-        p_next = p_buffer->p_next;
-        block_Release( p_buffer );
-        p_buffer = p_next;
-
-        if ( b_interrupted )
+        if ( readycnt > 0  && ready[0] == p_sys->sock
+            && srt_getsockstate( p_sys->sock ) == SRTS_CONNECTED)
         {
-            goto out;
+            if ( block_GetBytes( &p_sys->block_stream, chunk,
+                                 chunk_size ) != VLC_SUCCESS )
+                break;
+            if (srt_sendmsg2( p_sys->sock,
+                (char *)chunk, chunk_size, 0 ) == SRT_ERROR )
+            {
+                msg_Warn( p_access, "send error: %s", srt_getlasterror_str() );
+                i_len = VLC_EGENERIC;
+                goto out;
+            }
+            else
+            {
+                i_len += chunk_size;
+            }
         }
     }
 
 out:
+    block_BytestreamEmpty( &p_sys->block_stream );
     vlc_interrupt_unregister();
 
     /* Re-add the socket to the poll if we were interrupted */
@@ -355,7 +359,6 @@ out:
     }
     vlc_mutex_unlock( &p_sys->lock );
 
-    if ( i_len <= 0 ) block_ChainRelease( p_buffer );
     return i_len;
 }
 
@@ -400,6 +403,7 @@ static int Open( vlc_object_t *p_this )
     srt_startup();
 
     vlc_mutex_init( &p_sys->lock );
+    block_BytestreamInit( &p_sys->block_stream );
 
     p_access->p_sys = p_sys;
 
@@ -443,6 +447,7 @@ static void Close( vlc_object_t * p_this )
     srt_epoll_remove_usock( p_sys->i_poll_id, p_sys->sock );
     srt_close( p_sys->sock );
     srt_epoll_release( p_sys->i_poll_id );
+    block_BytestreamRelease( &p_sys->block_stream );
 
     srt_cleanup();
 }
