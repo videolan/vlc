@@ -1728,6 +1728,8 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
     }
 
     /* msg_Dbg( p_mux, "real pck=%d", i_packet_count ); */
+    block_t *p_list = NULL;
+    block_t **pp_last = &p_list;
     for (int i = 0; i < i_packet_count; i++ )
     {
         block_t *p_ts = BufferChainGet( p_chain_ts );
@@ -1751,8 +1753,10 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
         /* latency */
         p_ts->i_dts += p_sys->i_shaping_delay * 3 / 2;
 
-        sout_AccessOutWrite( p_mux->p_access, p_ts );
+        block_ChainLastAppend( &pp_last, p_ts );
     }
+    if ( p_list != NULL )
+        sout_AccessOutWrite( p_mux->p_access, p_list );
 }
 
 static block_t *TSNew( sout_mux_t *p_mux, sout_input_sys_t *p_stream,
