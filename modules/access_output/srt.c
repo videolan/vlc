@@ -37,6 +37,7 @@ typedef struct
     int           i_poll_id;
     bool          b_interrupted;
     vlc_mutex_t   lock;
+    int           i_payload_size;
 } sout_access_out_sys_t;
 
 static void srt_wait_interrupted(void *p_data)
@@ -182,8 +183,16 @@ static bool srt_schedule_reconnect(sout_access_out_t *p_access)
     }
 
     /* set maximumu payload size */
-    srt_set_socket_option( access_obj, SRT_PARAM_PAYLOAD_SIZE, p_sys->sock,
+    stat = srt_set_socket_option( access_obj, SRT_PARAM_PAYLOAD_SIZE, p_sys->sock,
             SRTO_PAYLOADSIZE, &i_payload_size, sizeof(i_payload_size) );
+    if ( stat == SRT_ERROR )
+    {
+        msg_Err( p_access, "Failed to config payload size, %s",
+                 srt_getlasterror_str() );
+        failed = true;
+        goto out;
+    }
+    p_sys->i_payload_size = i_payload_size;
 
     /* set maximum bandwidth limit*/
     srt_set_socket_option( access_obj, SRT_PARAM_BANDWIDTH_OVERHEAD_LIMIT,
@@ -230,7 +239,6 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     int i_len = 0;
-    size_t i_chunk_size = var_InheritInteger( p_access, SRT_PARAM_CHUNK_SIZE);
     int i_poll_timeout = var_InheritInteger( p_access, SRT_PARAM_POLL_TIMEOUT );
     bool b_interrupted = false;
 
@@ -310,7 +318,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
             if ( readycnt > 0  && ready[0] == p_sys->sock
                 && srt_getsockstate( p_sys->sock ) == SRTS_CONNECTED)
             {
-                size_t i_write = __MIN( p_buffer->i_buffer, i_chunk_size );
+                size_t i_write = __MIN( p_buffer->i_buffer, p_sys->i_payload_size );
                 if (srt_sendmsg2( p_sys->sock,
                     (char *)p_buffer->p_buffer, i_write, 0 ) == SRT_ERROR )
                 {
@@ -442,8 +450,7 @@ vlc_module_begin()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
 
-    add_integer( SRT_PARAM_CHUNK_SIZE, SRT_DEFAULT_CHUNK_SIZE,
-            N_( "SRT chunk size (bytes)" ), NULL )
+    add_obsolete_integer( SRT_PARAM_CHUNK_SIZE )
     add_integer( SRT_PARAM_POLL_TIMEOUT, SRT_DEFAULT_POLL_TIMEOUT,
             N_( "Return poll wait after timeout milliseconds (-1 = infinite)" ),
             NULL )
@@ -453,6 +460,7 @@ vlc_module_begin()
             NULL )
     add_integer( SRT_PARAM_PAYLOAD_SIZE, SRT_DEFAULT_PAYLOAD_SIZE,
             N_( "SRT maximum payload size (bytes)" ), NULL )
+        change_integer_range( 1, SRT_LIVE_MAX_PLSIZE )
     add_integer( SRT_PARAM_BANDWIDTH_OVERHEAD_LIMIT,
             SRT_DEFAULT_BANDWIDTH_OVERHEAD_LIMIT,
             N_( "SRT maximum bandwidth ceiling (bytes)" ), NULL )
