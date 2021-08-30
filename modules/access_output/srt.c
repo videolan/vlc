@@ -309,7 +309,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
                 {
                     continue;
                 }
-                else if ( (true) )
+                else
                 {
                     msg_Dbg( p_access, "srt_epoll_wait was interrupted");
                 }
