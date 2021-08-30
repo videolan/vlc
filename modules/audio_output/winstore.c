@@ -339,15 +339,6 @@ static int MuteSet(audio_output_t *aout, bool mute)
         goto done;
     }
 
-    float vol;
-    hr = ISimpleAudioVolume_GetMasterVolume(pc_AudioVolume, &vol);
-    if (FAILED(hr))
-    {
-        msg_Err(aout, "cannot get volume (error 0x%lX)", hr);
-        goto done;
-    }
-
-    aout_VolumeReport(aout, cbrtf(vol * sys->gain));
     aout_MuteReport(aout, mute);
 
 done:
@@ -506,6 +497,42 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
         if (sys->client == NULL || sys->module != NULL)
             break;
+    }
+
+    // Report the initial volume and mute status to the core
+    if (sys->client != NULL)
+    {
+        ISimpleAudioVolume* pc_AudioVolume = NULL;
+
+        hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pc_AudioVolume);
+        if (FAILED(hr))
+        {
+            msg_Err(aout, "cannot get volume service (error 0x%lx)", hr);
+            goto done;
+        }
+
+        float vol;
+        hr = ISimpleAudioVolume_GetMasterVolume(pc_AudioVolume, &vol);
+        if (FAILED(hr))
+        {
+            msg_Err(aout, "cannot get initial volume (error 0x%lX)", hr);
+            goto done;
+        }
+
+        WINBOOL mute;
+        hr = ISimpleAudioVolume_GetMute(pc_AudioVolume, &mute);
+        if (FAILED(hr))
+        {
+            msg_Err(aout, "cannot get initial mute (error 0x%lX)", hr);
+            goto done;
+        }
+
+        aout_VolumeReport(aout, cbrtf(vol * sys->gain));
+        aout_MuteReport(aout, mute != 0);
+
+    done:
+        if (pc_AudioVolume)
+            ISimpleAudioVolume_Release(pc_AudioVolume);
     }
 
     LeaveCriticalSection(&sys->lock);
