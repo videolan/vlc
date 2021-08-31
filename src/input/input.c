@@ -1543,14 +1543,15 @@ static inline int ControlPop( input_thread_t *p_input,
 {
     input_thread_private_t *p_sys = input_priv(p_input);
 
+    int i_ret = VLC_SUCCESS;
     vlc_mutex_lock( &p_sys->lock_control );
     while( p_sys->i_control <= 0 ||
            ( b_postpone_seek && ControlIsSeekRequest( p_sys->control[0].i_type ) ) )
     {
         if( p_sys->is_stopped )
         {
-            vlc_mutex_unlock( &p_sys->lock_control );
-            return VLC_EGENERIC;
+            i_ret = VLC_EGENERIC;
+            goto exit;
         }
 
         if( i_deadline >= 0 )
@@ -1558,8 +1559,8 @@ static inline int ControlPop( input_thread_t *p_input,
             if( vlc_cond_timedwait( &p_sys->wait_control, &p_sys->lock_control,
                                     i_deadline ) )
             {
-                vlc_mutex_unlock( &p_sys->lock_control );
-                return VLC_EGENERIC;
+                i_ret = VLC_EGENERIC;
+                goto exit;
             }
         }
         else
@@ -1574,9 +1575,11 @@ static inline int ControlPop( input_thread_t *p_input,
     if( p_sys->i_control > 0 )
         memmove( &p_sys->control[0], &p_sys->control[1],
                  sizeof(*p_sys->control) * p_sys->i_control );
+
+exit:
     vlc_mutex_unlock( &p_sys->lock_control );
 
-    return VLC_SUCCESS;
+    return i_ret;
 }
 static bool ControlIsSeekRequest( int i_type )
 {
