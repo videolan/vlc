@@ -30,6 +30,7 @@
 #include <QDesktopWidget>
 #include <QQuickWidget>
 #include <QLibrary>
+#include <QScreen>
 
 #include <QOpenGLFunctions>
 #include <QOpenGLFramebufferObject>
@@ -338,6 +339,16 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         m_uiSurface->setContent(m_ui->getComponent(), m_ui->createRootItem());
         HR(m_rootVisual->AddVisual(m_uiVisual.Get(), FALSE, nullptr), "add ui visual to root");
         HR(m_dcompDevice->Commit(), "commit UI visual");
+
+        auto resetAcrylicSurface = [this](QScreen * = nullptr)
+        {
+            m_acrylicSurface.reset(new CompositorDCompositionAcrylicSurface(m_intf, m_d3d11Device.Get()));
+        };
+
+        resetAcrylicSurface();
+        connect(qGuiApp, &QGuiApplication::screenAdded, this, resetAcrylicSurface);
+        connect(qGuiApp, &QGuiApplication::screenRemoved, this, resetAcrylicSurface);
+
         return m_mainInterface;
     }
     catch (const DXError& err)
@@ -380,6 +391,7 @@ void CompositorDirectComposition::unloadGUI()
         m_rootVisual->RemoveVisual(m_uiVisual.Get());
         m_uiVisual.Reset();
     }
+    m_acrylicSurface.reset();
     m_uiSurface.reset();
     m_ui.reset();
     m_taskbarWidget.reset();

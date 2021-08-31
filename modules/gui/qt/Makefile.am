@@ -278,6 +278,8 @@ libqt_plugin_la_SOURCES += \
 	gui/qt/maininterface/compositor_dcomp.cpp \
 	gui/qt/maininterface/compositor_dcomp.hpp \
 	gui/qt/maininterface/compositor_dcomp_error.hpp \
+	gui/qt/maininterface/compositor_dcomp_acrylicsurface.hpp \
+	gui/qt/maininterface/compositor_dcomp_acrylicsurface.cpp \
 	gui/qt/maininterface/compositor_dcomp_uisurface.cpp \
 	gui/qt/maininterface/compositor_dcomp_uisurface.hpp
 endif
@@ -413,6 +415,7 @@ nodist_libqt_plugin_la_SOURCES += gui/qt/maininterface/main_interface_win32.moc.
 
 if HAVE_DCOMP
 nodist_libqt_plugin_la_SOURCES += \
+	gui/qt/maininterface/compositor_dcomp_acrylicsurface.moc.cpp \
 	gui/qt/maininterface/compositor_dcomp.moc.cpp \
 	gui/qt/maininterface/compositor_dcomp_uisurface.moc.cpp
 endif

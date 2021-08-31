@@ -32,6 +32,7 @@
 #include <dwmapi.h>
 
 #include "maininterface/mainui.hpp"
+#include "compositor_dcomp_acrylicsurface.hpp"
 #include "compositor_dcomp_uisurface.hpp"
 #include "videosurface.hpp"
 #include "interface_window_handler.hpp"
@@ -85,6 +86,7 @@ private:
     std::unique_ptr<WinTaskbarWidget> m_taskbarWidget;
 
     std::unique_ptr<CompositorDCompositionUISurface> m_uiSurface;
+    std::unique_ptr<CompositorDCompositionAcrylicSurface> m_acrylicSurface;
     vout_window_t *m_window = nullptr;
     std::unique_ptr<MainUI> m_ui;
     std::unique_ptr<VideoWindowHandler> m_videoWindowHandler;
