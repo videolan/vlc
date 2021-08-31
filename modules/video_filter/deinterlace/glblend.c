@@ -90,10 +90,6 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     (void) config;
     (void) size_out;
 
-    struct sys *sys = filter->sys = malloc(sizeof(*sys));
-    if (!sys)
-        return VLC_EGENERIC;
-
     static const struct vlc_gl_filter_ops ops = {
         .draw = Draw,
         .close = Close,
@@ -103,10 +99,11 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
 
     struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
     if (!sampler)
-    {
-        free(sys);
         return VLC_EGENERIC;
-    }
+
+    struct sys *sys = filter->sys = malloc(sizeof(*sys));
+    if (!sys)
+        return VLC_EGENERIC;
 
     static const char *const VERTEX_SHADER =
         "attribute vec2 vertex_pos;\n"

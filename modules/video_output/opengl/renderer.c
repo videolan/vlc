@@ -315,6 +315,10 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
 
     const opengl_vtable_t *vt = &filter->api->vt;
 
+    struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+    if (!sampler)
+        return VLC_EGENERIC;
+
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
         return VLC_EGENERIC;
@@ -325,13 +329,6 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     };
     filter->ops = &filter_ops;
     filter->sys = renderer;
-
-    struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
-    if (!sampler)
-    {
-        free(renderer);
-        return VLC_EGENERIC;
-    }
 
     renderer->sampler = sampler;
 
