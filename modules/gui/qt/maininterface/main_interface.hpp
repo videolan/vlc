@@ -163,6 +163,8 @@ class MainInterface : public QObject
     Q_PROPERTY(bool canShowVideoPIP READ canShowVideoPIP CONSTANT FINAL)
     Q_PROPERTY(bool pinVideoControls READ pinVideoControls WRITE setPinVideoControls NOTIFY pinVideoControlsChanged FINAL)
     Q_PROPERTY(ControlbarProfileModel* controlbarProfileModel READ controlbarProfileModel CONSTANT FINAL)
+    Q_PROPERTY(bool useAcrylicBackground READ useAcrylicBackground NOTIFY useAcrylicBackgroundChanged FINAL)
+    Q_PROPERTY(bool hasAcrylicSurface READ hasAcrylicSurface NOTIFY hasAcrylicSurfaceChanged FINAL)
 
 public:
     /* tors */
@@ -217,6 +219,8 @@ public:
     inline ControlbarProfileModel* controlbarProfileModel() const { return m_controlbarProfileModel; }
     inline QUrl getDialogFilePath() const { return m_dialogFilepath; }
     inline void setDialogFilePath(const QUrl& filepath ){ m_dialogFilepath = filepath; }
+    inline bool useAcrylicBackground() const { return m_useAcrylicBackground; }
+    inline bool hasAcrylicSurface() const { return m_hasAcrylicSurface; }
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -290,6 +294,9 @@ protected:
 
     ControlbarProfileModel* m_controlbarProfileModel;
 
+    bool m_useAcrylicBackground = true;
+    bool m_hasAcrylicSurface = false;
+
 public slots:
     void toggleUpdateSystrayMenu();
     void showUpdateSystrayMenu();
@@ -306,6 +313,8 @@ public slots:
     void setPinVideoControls( bool );
     void updateIntfScaleFactor();
     void onWindowVisibilityChanged(QWindow::Visibility);
+    void setUseAcrylicBackground(bool);
+    void setHasAcrylicSurface(bool);
 
     void emitBoss();
     void emitRaise();
@@ -356,6 +365,8 @@ signals:
 
     void intfScaleFactorChanged();
     void pinVideoControlsChanged( bool );
+    void useAcrylicBackgroundChanged();
+    void hasAcrylicSurfaceChanged();
 };
 
 #endif

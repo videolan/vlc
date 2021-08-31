@@ -342,6 +342,24 @@ void MainInterface::onWindowVisibilityChanged(QWindow::Visibility visibility)
     m_windowVisibility = visibility;
 }
 
+void MainInterface::setUseAcrylicBackground(const bool v)
+{
+    if (m_useAcrylicBackground == v)
+        return;
+
+    m_useAcrylicBackground = v;
+    emit useAcrylicBackgroundChanged();
+}
+
+void MainInterface::setHasAcrylicSurface(const bool v)
+{
+    if (m_hasAcrylicSurface == v)
+        return;
+
+    m_hasAcrylicSurface = v;
+    emit hasAcrylicSurfaceChanged();
+}
+
 void MainInterface::incrementIntfUserScaleFactor(bool increment)
 {
     if (increment)
