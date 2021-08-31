@@ -196,6 +196,7 @@
         <file alias="ActionButtonPrimary.qml">widgets/qml/ActionButtonPrimary.qml</file>
         <file alias="BannerTabButton.qml">widgets/qml/BannerTabButton.qml</file>
         <file alias="BusyIndicatorExt.qml">widgets/qml/BusyIndicatorExt.qml</file>
+        <file alias="AcrylicBackground.qml">widgets/qml/AcrylicBackground.qml</file>
         <file alias="AnimatedBackground.qml">widgets/qml/AnimatedBackground.qml</file>
         <file alias="CSDWindowButton.qml">widgets/qml/CSDWindowButton.qml</file>
         <file alias="CSDWindowButtonSet.qml">widgets/qml/CSDWindowButtonSet.qml</file>
