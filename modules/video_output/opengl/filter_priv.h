@@ -68,8 +68,11 @@ struct vlc_gl_filter_priv {
     struct vlc_list blend_subfilters; /**< list of vlc_gl_filter_priv.node */
 };
 
-#define vlc_gl_filter_PRIV(filter) \
-    container_of(filter, struct vlc_gl_filter_priv, filter)
+static inline struct vlc_gl_filter_priv *
+vlc_gl_filter_PRIV(struct vlc_gl_filter *filter)
+{
+    return container_of(filter, struct vlc_gl_filter_priv, filter);
+}
 
 struct vlc_gl_filter *
 vlc_gl_filter_New(vlc_object_t *parent, const struct vlc_gl_api *api);
