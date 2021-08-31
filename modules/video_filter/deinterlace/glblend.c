@@ -102,6 +102,11 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     filter->config.filter_planes = true;
 
     struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+    if (!sampler)
+    {
+        free(sys);
+        return VLC_EGENERIC;
+    }
 
     static const char *const VERTEX_SHADER =
         "attribute vec2 vertex_pos;\n"

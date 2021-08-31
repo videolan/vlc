@@ -327,6 +327,12 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     filter->sys = renderer;
 
     struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+    if (!sampler)
+    {
+        free(renderer);
+        return VLC_EGENERIC;
+    }
+
     renderer->sampler = sampler;
 
     renderer->api = filter->api;

@@ -327,6 +327,8 @@ InitMask(struct vlc_gl_filter *filter)
     const opengl_vtable_t *vt = &filter->api->vt;
 
     struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+    if (!sampler)
+        return VLC_EGENERIC;
 
     static const char *const VERTEX_SHADER_BODY =
         "attribute vec2 vertex_pos;\n"
@@ -425,6 +427,8 @@ InitPlane(struct vlc_gl_filter *filter)
     filter->config.filter_planes = true;
 
     struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+    if (!sampler)
+        return VLC_EGENERIC;
 
     static const char *const VERTEX_SHADER_BODY =
         "attribute vec2 vertex_pos;\n"
