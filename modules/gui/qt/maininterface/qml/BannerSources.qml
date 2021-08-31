@@ -60,14 +60,17 @@ FocusScope {
             searchBox.expanded = true
     }
 
-    Rectangle {
+    Widgets.AcrylicBackground {
+        alternativeColor: VLCStyle.colors.topBanner
+        anchors.fill: parent
+    }
+
+     Item {
         id: pLBannerSources
 
         property alias model: globalMenuGroup.model
 
         anchors.fill: parent
-
-        color: VLCStyle.colors.topBanner
 
         Column {
             id: col
@@ -161,6 +164,7 @@ FocusScope {
 
                             delegate: Widgets.BannerTabButton {
                                 iconTxt: model.icon
+                                color: "transparent"
                                 showText: globalToolbar.colapseTabButtons
                                 selected: model.index === selectedIndex
                                 onClicked: root.itemClicked(model.index)
