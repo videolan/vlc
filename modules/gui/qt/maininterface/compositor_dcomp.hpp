@@ -63,6 +63,9 @@ public:
 
     Type type() const override;
 
+    void addVisual(Microsoft::WRL::ComPtr<IDCompositionVisual> visual);
+    void removeVisual(Microsoft::WRL::ComPtr<IDCompositionVisual> visual);
+
 private slots:
     void onSurfacePositionChanged(QPointF position);
 

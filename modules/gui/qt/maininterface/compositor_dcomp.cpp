@@ -436,4 +436,24 @@ Compositor::Type CompositorDirectComposition::type() const
     return Compositor::DirectCompositionCompositor;
 }
 
+void CompositorDirectComposition::addVisual(Microsoft::WRL::ComPtr<IDCompositionVisual> visual)
+{
+    vlc_assert(m_rootVisual);
+
+    HRESULT hr = m_rootVisual->AddVisual(visual.Get(), FALSE, m_videoVisual ? m_videoVisual.Get() : m_uiVisual.Get());
+    if (FAILED(hr))
+        msg_Err(m_intf, "failed to add visual, code: 0x%lX", hr);
+
+    m_dcompDevice->Commit();
+}
+
+void CompositorDirectComposition::removeVisual(Microsoft::WRL::ComPtr<IDCompositionVisual> visual)
+{
+    auto hr = m_rootVisual->RemoveVisual(visual.Get());
+    if (FAILED(hr))
+        msg_Err(m_intf, "failed to remove visual, code: 0x%lX", hr);
+
+    m_dcompDevice->Commit();
+}
+
 }
