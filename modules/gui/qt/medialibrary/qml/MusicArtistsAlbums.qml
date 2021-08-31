@@ -101,11 +101,10 @@ FocusScope {
         focus: visible
         anchors.fill: parent
 
-        Rectangle {
+        Widgets.AcrylicBackground {
             width: artistList.width
             height: artistList.height
-            color: VLCStyle.colors.bgAlt
-            opacity: .8
+            alternativeColor: VLCStyle.colors.bgAlt
         }
 
         Row {
