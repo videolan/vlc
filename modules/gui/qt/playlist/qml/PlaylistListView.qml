@@ -32,6 +32,8 @@ FocusScope {
 
     property alias model: listView.model
 
+    property alias useAcrylic: acrylicBackground.enabled
+
     readonly property real minimumWidth: noContentInfoColumn.implicitWidth +
                                          leftPadding +
                                          rightPadding +
@@ -102,10 +104,16 @@ FocusScope {
         }
     }
 
-    Rectangle {
+    Widgets.AcrylicBackground {
+        id: acrylicBackground
+
+        anchors.fill: parent
+        alternativeColor: colors.bgAlt
+    }
+
+    Item {
         id: parentRect
         anchors.fill: parent
-        color: colors.topBanner
 
         Widgets.DragItem {
             id: dragItem

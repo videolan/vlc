@@ -567,6 +567,8 @@ FocusScope {
 
             PL.PlaylistListView {
                 id: playlistView
+
+                useAcrylic: false
                 focus: true
                 anchors.fill: parent
 
