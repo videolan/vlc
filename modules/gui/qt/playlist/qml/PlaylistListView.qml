@@ -39,8 +39,8 @@ FocusScope {
                                          rightPadding +
                                          2 * (VLCStyle.margin_xsmall)
 
-    property int leftPadding: 0
-    property int rightPadding: 0
+    property real leftPadding
+    property real rightPadding
 
     property VLCColors colors: VLCStyle.colors
 
@@ -661,9 +661,6 @@ FocusScope {
                 id: toolbar
 
                 Layout.fillWidth: true
-
-                Layout.leftMargin: root.leftPadding
-                Layout.rightMargin: root.rightPadding
             }
         }
     }
