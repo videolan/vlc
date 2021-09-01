@@ -282,12 +282,10 @@ bool HTTPChunkSource::prepare()
         {
             if(requeststatus == RequestStatus::Redirection)
             {
-                HTTPConnection *httpconn = dynamic_cast<HTTPConnection *>(connection);
-                if(httpconn)
-                    connparams = httpconn->getRedirection();
+                connparams = connection->getRedirection();
                 connection->setUsed(false);
                 connection = nullptr;
-                if(httpconn)
+                if(!connparams.getUrl().empty())
                     continue;
             }
             break;
