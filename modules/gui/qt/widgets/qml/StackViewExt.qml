@@ -79,6 +79,10 @@ StackView {
         {
             var model = viewModel[tab]
             if (model.name === view) {
+                if (model.guard !== undefined && typeof model.guard === "function" && !model.guard(viewProperties)) {
+                    continue //we're not allowed to load this page
+                }
+
                 //we can't use push(url, properties) as Qt interprets viewProperties
                 //as a second component to load
                 var component = undefined
