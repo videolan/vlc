@@ -73,6 +73,7 @@ struct vlc_thumbnailer_request_t
     vlc_mutex_t lock;
     vlc_cond_t cond_ended;
     bool ended;
+    picture_t *pic;
 
     struct vlc_runnable runnable; /**< to be passed to the executor */
 
@@ -101,6 +102,7 @@ TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
     vlc_mutex_init(&task->lock);
     vlc_cond_init(&task->cond_ended);
     task->ended = false;
+    task->pic = NULL;
 
     task->runnable.run = RunnableRun;
     task->runnable.userdata = task;
@@ -137,6 +139,8 @@ static void NotifyThumbnail(task_t *task, picture_t *pic)
 {
     assert(task->cb);
     task->cb(task->userdata, pic);
+    if (pic)
+        picture_Release(pic);
 }
 
 static void
@@ -162,13 +166,12 @@ on_thumbnailer_input_event( input_thread_t *input,
     }
 
     task->ended = true;
+
+    if (event->type == INPUT_EVENT_THUMBNAIL_READY)
+        task->pic = picture_Hold(event->thumbnail);
+
     vlc_mutex_unlock(&task->lock);
 
-    picture_t *pic = NULL;
-    if (event->type == INPUT_EVENT_THUMBNAIL_READY)
-        pic = event->thumbnail;
-
-    NotifyThumbnail(task, pic);
     vlc_cond_signal(&task->cond_ended);
 }
 
@@ -215,7 +218,11 @@ RunnableRun(void *userdata)
             timeout =
                 vlc_cond_timedwait(&task->cond_ended, &task->lock, deadline);
     }
+    picture_t* pic = task->pic;
+    task->pic = NULL;
     vlc_mutex_unlock(&task->lock);
+
+    NotifyThumbnail(task, pic);
 
     input_Stop(input);
     input_Close(input);

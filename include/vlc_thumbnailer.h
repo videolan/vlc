@@ -117,7 +117,7 @@ vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
  * \param thumbnailer A thumbnailer object
  * \param request An opaque thumbnail request object
  *
- * Cancelling a request will *not* invoke the completion callback.
+ * Cancelling a request will invoke the completion callback with a NULL picture
  * The behavior is undefined if the request is cancelled after its completion.
  */
 VLC_API void
