@@ -38,6 +38,7 @@ namespace adaptive
                 ~AuthStorage();
                 void addCookie( const std::string &cookie, const ConnectionParams & );
                 std::string getCookie( const ConnectionParams &, bool secure );
+                vlc_http_cookie_jar_t *getJar() const;
 
             private:
                 vlc_http_cookie_jar_t *p_cookies_jar;
