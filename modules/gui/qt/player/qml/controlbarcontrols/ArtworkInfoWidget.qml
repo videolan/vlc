@@ -25,20 +25,17 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 
-Widgets.AnimatedBackground {
+Control {
     id: artworkInfoItem
 
     property bool paintOnly: false
 
     property VLCColors colors: VLCStyle.colors
 
-    readonly property real minimumWidth: cover.width + VLCStyle.focus_border * 2
+    readonly property real minimumWidth: cover.width + (leftPadding + rightPadding)
     property real extraWidth: 0
 
-    implicitWidth: playingItemInfoRow.width + VLCStyle.focus_border * 2
-    implicitHeight: playingItemInfoRow.height + VLCStyle.focus_border * 2
-
-    activeBorderColor: colors.bgFocus
+    padding: VLCStyle.focus_border
 
     Keys.onPressed: {
         if (KeyHelper.matchOk(event))
@@ -62,29 +59,33 @@ Widgets.AnimatedBackground {
         hoverEnabled: true
     }
 
-    Row {
-        id: playingItemInfoRow
+    background: Widgets.AnimatedBackground {
+        active: visualFocus
+        activeBorderColor: colors.bgFocus
+    }
 
-        anchors.centerIn: parent
-
-        width: (coverItem.width + infoColumn.width + spacing)
-
+    contentItem: Row {
         spacing: infoColumn.visible ? VLCStyle.margin_xsmall : 0
 
         Item {
             id: coverItem
+
             anchors.verticalCenter: parent.verticalCenter
+
             implicitHeight: childrenRect.height
             implicitWidth:  childrenRect.width
 
             Rectangle {
                 id: coverRect
+
                 anchors.fill: cover
+
                 color: colors.bg
             }
 
             DropShadow {
                 anchors.fill: coverRect
+
                 source: coverRect
                 radius: 8
                 samples: 17
@@ -112,8 +113,8 @@ Widgets.AnimatedBackground {
                     x: parent.x
 
                     visible: artworkInfoItem.visible
-                             && (titleLabel.implicitWidth > titleLabel.width || artistLabel.implicitWidth > titleLabel.width)
-                             && (artworkInfoMouseArea.containsMouse || artworkInfoItem.active)
+                             && infoColumn.width < infoColumn.preferredWidth
+                             && (artworkInfoMouseArea.containsMouse || artworkInfoItem.visualFocus)
                     delay: 500
 
                     contentItem: Text {
@@ -133,10 +134,10 @@ Widgets.AnimatedBackground {
             anchors.verticalCenter: parent.verticalCenter
 
             readonly property real preferredWidth: Math.max(titleLabel.implicitWidth, artistLabel.implicitWidth, progressIndicator.implicitWidth)
-            width: ((artworkInfoItem.extraWidth > preferredWidth) || (paintOnly)) ? preferredWidth
-                                                                                  : artworkInfoItem.extraWidth
+            width: ((extraWidth > preferredWidth) || (paintOnly)) ? preferredWidth
+                                                                  : extraWidth
 
-            visible: width > 0
+            visible: width > VLCStyle.dp(15, VLCStyle.scale)
 
             Widgets.MenuLabel {
                 id: titleLabel
