@@ -32,6 +32,8 @@
 
 namespace adaptive
 {
+    class ChunksSourceStream;
+
     namespace http
     {
         class Transport;
@@ -114,6 +116,28 @@ namespace adaptive
                 Transport *transport;
        };
 
+       class LibVLCHTTPSource;
+
+       class LibVLCHTTPConnection : public AbstractConnection
+       {
+            public:
+               LibVLCHTTPConnection(vlc_object_t *, AuthStorage *);
+               virtual ~LibVLCHTTPConnection();
+               virtual bool    canReuse     (const ConnectionParams &) const override;
+               virtual RequestStatus request(const std::string& path,
+                                             const BytesRange & = BytesRange()) override;
+               virtual ssize_t read         (void *p_buffer, size_t len) override;
+               virtual void    setUsed      ( bool ) override;
+
+            private:
+               void reset();
+               std::string useragent;
+               std::string referer;
+               LibVLCHTTPSource *source;
+               ChunksSourceStream *sourceStream;
+               stream_t *stream;
+       };
+
        class StreamUrlConnection : public AbstractConnection
        {
             public:
@@ -146,6 +170,16 @@ namespace adaptive
            public:
                NativeConnectionFactory( AuthStorage * );
                virtual ~NativeConnectionFactory();
+               virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &) override;
+           private:
+               AuthStorage *authStorage;
+       };
+
+       class LibVLCHTTPConnectionFactory : public AbstractConnectionFactory
+       {
+           public:
+               LibVLCHTTPConnectionFactory( AuthStorage * );
+               virtual ~LibVLCHTTPConnectionFactory() = default;
                virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &) override;
            private:
                AuthStorage *authStorage;

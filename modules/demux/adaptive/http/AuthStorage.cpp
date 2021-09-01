@@ -62,3 +62,8 @@ std::string AuthStorage::getCookie( const ConnectionParams &params, bool secure 
     }
     return ret;
 }
+
+vlc_http_cookie_jar_t *AuthStorage::getJar() const
+{
+    return p_cookies_jar;
+}
