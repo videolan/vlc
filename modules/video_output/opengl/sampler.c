@@ -103,7 +103,11 @@ struct vlc_gl_sampler_priv {
     unsigned plane;
 };
 
-#define PRIV(sampler) container_of(sampler, struct vlc_gl_sampler_priv, sampler)
+static inline struct vlc_gl_sampler_priv *
+PRIV(struct vlc_gl_sampler *sampler)
+{
+    return container_of(sampler, struct vlc_gl_sampler_priv, sampler);
+}
 
 static const float MATRIX_COLOR_RANGE_LIMITED[4*3] = {
     255.0/219,         0,         0, -255.0/219 *  16.0/255,
