@@ -556,13 +556,14 @@ FocusScope {
             right: parent.right
             bottom: parent.bottom
             bottomMargin: parent.height - rootPlayer.positionSliderY
+            topMargin: VLCStyle.applicationVerticalMargin
         }
         focus: false
         edge: Widgets.DrawerExt.Edges.Right
         state: showPlaylist && mainInterface.playlistDocked ? "visible" : "hidden"
         component: Rectangle {
             color: rootPlayer.colors.setColorAlpha(rootPlayer.colors.topBanner, 0.8)
-            width: rootPlayer.width/4
+            width: (rootPlayer.width + playlistView.rightPadding) / 4
             height: playlistpopup.height
 
             PL.PlaylistListView {
@@ -573,6 +574,8 @@ FocusScope {
                 anchors.fill: parent
 
                 colors: rootPlayer.colors
+                rightPadding: VLCStyle.applicationHorizontalMargin
+
                 Navigation.parentItem: rootPlayer
                 Navigation.upItem: topcontrolView
                 Navigation.downItem: controlBarView
