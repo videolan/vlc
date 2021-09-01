@@ -76,7 +76,7 @@ namespace adaptive
                                               const BytesRange & = BytesRange()) override;
                 virtual ssize_t read        (void *p_buffer, size_t len) override;
 
-                void setUsed( bool ) override;
+                virtual void setUsed( bool ) override;
                 const ConnectionParams &getRedirection() const;
                 static const unsigned MAX_REDIRECTS = 3;
 
