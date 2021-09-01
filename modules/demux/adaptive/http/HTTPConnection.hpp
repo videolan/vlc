@@ -52,10 +52,12 @@ namespace adaptive
 
                 virtual size_t  getContentLength() const;
                 virtual const std::string & getContentType() const;
+                virtual const ConnectionParams &getRedirection() const;
                 virtual void    setUsed( bool ) = 0;
 
             protected:
                 vlc_object_t      *p_object;
+                ConnectionParams   locationparams;
                 ConnectionParams   params;
                 bool               available;
                 size_t             contentLength;
@@ -77,7 +79,6 @@ namespace adaptive
                 virtual ssize_t read        (void *p_buffer, size_t len) override;
 
                 virtual void setUsed( bool ) override;
-                const ConnectionParams &getRedirection() const;
                 static const unsigned MAX_REDIRECTS = 3;
 
             protected:
@@ -98,7 +99,6 @@ namespace adaptive
                 std::string useragent;
 
                 AuthStorage        *authStorage;
-                ConnectionParams    locationparams;
                 ConnectionParams    proxyparams;
                 bool                connectionClose;
                 bool                chunked;

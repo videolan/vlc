@@ -51,6 +51,7 @@ bool AbstractConnection::prepare(const ConnectionParams &params_)
     if (!available)
         return false;
     params = params_;
+    locationparams = ConnectionParams();
     available = false;
     return true;
 }
@@ -63,6 +64,11 @@ size_t AbstractConnection::getContentLength() const
 const std::string & AbstractConnection::getContentType() const
 {
     return contentType;
+}
+
+const ConnectionParams & AbstractConnection::getRedirection() const
+{
+    return locationparams;
 }
 
 HTTPConnection::HTTPConnection(vlc_object_t *p_object_, AuthStorage *auth,
@@ -461,11 +467,6 @@ std::string HTTPConnection::extraRequestHeaders() const
         ss << "\r\n";
     }
     return ss.str();
-}
-
-const ConnectionParams & HTTPConnection::getRedirection() const
-{
-    return locationparams;
 }
 
 StreamUrlConnection::StreamUrlConnection(vlc_object_t *p_object)
