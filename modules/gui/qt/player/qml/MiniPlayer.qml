@@ -58,6 +58,10 @@ FocusScope {
 
         anchors.fill: parent
 
+        rightPadding: VLCStyle.applicationHorizontalMargin
+        leftPadding: rightPadding
+        bottomPadding: VLCStyle.applicationVerticalMargin
+
         focus: true
         colors: VLCStyle.colors
         textPosition: ControlBar.TimeTextPosition.Hide
