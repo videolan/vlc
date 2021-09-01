@@ -181,6 +181,7 @@ static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
     assert( p_thumbnailer != NULL );
 
     struct test_ctx ctx;
+    ctx.b_done = false;
     vlc_cond_init( &ctx.cond );
     vlc_mutex_init( &ctx.lock );
 
