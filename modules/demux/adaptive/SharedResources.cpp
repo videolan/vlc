@@ -66,7 +66,7 @@ SharedResources * SharedResources::createDefault(vlc_object_t *obj,
     Keyring *keyring = new Keyring(obj);
     HTTPConnectionManager *m = new HTTPConnectionManager(obj);
     if(!var_InheritBool(obj, "adaptive-use-access")) /* only use http from access */
-        m->addFactory(new NativeConnectionFactory(auth));
+        m->addFactory(new LibVLCHTTPConnectionFactory(auth));
     m->addFactory(new StreamUrlConnectionFactory());
     ConnectionParams params(playlisturl);
     if(params.isLocal())
