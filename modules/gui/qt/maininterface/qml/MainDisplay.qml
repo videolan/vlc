@@ -39,13 +39,18 @@ FocusScope {
     property alias g_mainDisplay: root
     property bool _inhibitMiniPlayer: false
     property bool _showMiniPlayer: false
-    property var _defaultPages: ({}) // saves last page of view
+    property var _oldViewProperties: ({}) // saves last state of the views
+    property string _oldView: ""
 
     onViewChanged: {
-        viewProperties = _defaultPages[root.view] !== undefined ? ({"defaultPage": _defaultPages[root.view]}) : ({})
+        _oldViewProperties[_oldView] = viewProperties
+        _oldView = view
+    }
+
+    onViewPropertiesChanged: {
         loadView()
     }
-    onViewPropertiesChanged: loadView()
+
     Component.onCompleted: {
         loadView()
         if (medialib && !mainInterface.hasFirstrun)
@@ -55,8 +60,6 @@ FocusScope {
 
     function loadView() {
         var found = stackView.loadView(root.pageModel, root.view, root.viewProperties)
-        if (stackView.currentItem.view !== undefined)
-            _defaultPages[root.view] = stackView.currentItem.view
 
         stackView.currentItem.Navigation.parentItem = medialibId
         stackView.currentItem.Navigation.upItem = sourcesBanner
@@ -199,7 +202,10 @@ FocusScope {
                     onItemClicked: {
                         var name = root.tabModel.get(index).name
                         selectedIndex = index
-                        history.push(["mc", name])
+                        if (_oldViewProperties[name] === undefined)
+                            history.push(["mc", name])
+                        else
+                            history.push(["mc", name, _oldViewProperties[name]])
                     }
 
                     Navigation.parentItem: medialibId
