@@ -414,9 +414,17 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
                 goto error;
 
             for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
-                picsys->texture[plane] = textures[picture_count * D3D11_MAX_SHADER_VIEW + plane];
+            {
+                if (picture_count < slices)
+                    picsys->texture[plane] =textures[picture_count * D3D11_MAX_SHADER_VIEW + plane];
+                else if (textures[plane])
+                {
+                    picsys->texture[plane] = textures[plane];
+                    ID3D11Texture2D_AddRef(picsys->texture[plane]);
+                }
+            }
 
-            picsys->slice_index = picture_count;
+            picsys->slice_index = picture_count < slices ? picture_count : 0;
             picsys->formatTexture = sys->picQuad.formatInfo->formatTexture;
             picsys->context = sys->d3d_dev.d3dcontext;
 
@@ -442,7 +450,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
 #endif
         {
             sys->picQuad.resourceCount = DxgiResourceCount(sys->picQuad.formatInfo);
-            for (picture_count = 0; picture_count < pool_size; picture_count++) {
+            for (picture_count = 0; picture_count < slices; picture_count++) {
                 if (!pictures[picture_count]->p_sys->texture[0])
                     continue;
                 if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.formatInfo,
