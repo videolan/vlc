@@ -220,6 +220,10 @@ QtObject {
     readonly property int bannerButton_height: dp(32, scale)
     readonly property int bannerButton_width: dp(40, scale)
 
+    // Drag and drop
+
+    readonly property int dragDelta: dp(12, scale)
+
     // Speed
 
     property bool animate: true

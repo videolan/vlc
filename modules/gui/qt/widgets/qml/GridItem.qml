@@ -204,8 +204,8 @@ Control {
         onPositionChanged: {
             if (drag.active) {
                 var pos = drag.target.parent.mapFromItem(root, mouseX, mouseY)
-                drag.target.x = pos.x + 12
-                drag.target.y = pos.y + 12
+                drag.target.x = pos.x + VLCStyle.dragDelta
+                drag.target.y = pos.y + VLCStyle.dragDelta
             }
         }
 

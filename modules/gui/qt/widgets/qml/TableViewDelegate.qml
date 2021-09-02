@@ -116,11 +116,8 @@ Control {
 
             var pos = drag.target.parent.mapFromItem(hoverArea, mouseX, mouseY);
 
-            // FIXME: Shouldn't this be specified in VLCStyle ?
-            var delta = VLCStyle.dp(12);
-
-            drag.target.x = pos.x + delta;
-            drag.target.y = pos.y + delta;
+            drag.target.x = pos.x + VLCStyle.dragDelta;
+            drag.target.y = pos.y + VLCStyle.dragDelta;
         }
 
         onDoubleClicked: {
