@@ -727,8 +727,9 @@ static bool open_amt_tunnel( stream_t *p_access )
         }
 
         /* If started, the timer must be stopped before trying the next server
-         * in order to avoid data-race with sys->sAMT. */
+        * in order to avoid data-race with sys->sAMT. */
         vlc_timer_disarm( sys->updateTimer );
+        msg_Dbg( p_access, "Disarming timer!");
 
         amt_send_mem_update( p_access, sys->relayDisco, false );
         bool eof=false;
@@ -744,6 +745,12 @@ static bool open_amt_tunnel( stream_t *p_access )
         {
             block_Release( pkt );
             msg_Dbg( p_access, "Got UDP packet from multicast group via AMT relay %s, continuing...", relay_ip );
+
+            msg_Dbg( p_access, "arming timer!");
+            /* Start the IGMP timer when we receive the first packet so we don't drop any */
+            vlc_timer_schedule( sys->updateTimer, false,
+                        VLC_TICK_FROM_SEC( sys->relay_igmp_query.qqic ), VLC_TICK_FROM_SEC( sys->relay_igmp_query.qqic ) );
+
             break;   /* found an active server sending UDP packets, so exit loop */
         }
     }
@@ -881,18 +888,18 @@ static int amt_sockets_init( stream_t *p_access )
         goto error;
     }
 
-    struct sockaddr_in stSvrAddr =
-    {
-        .sin_family = AF_INET,
-        .sin_port = htons( 9124 ),
-    };
+    // struct sockaddr_in stSvrAddr =
+    // {
+    //     .sin_family = AF_INET,
+    //     .sin_port = htons( 9124 ),
+    // };
 
-    res = inet_pton( AF_INET, LOCAL_LOOPBACK, &stSvrAddr.sin_addr );
-    if( res != 1 )
-    {
-        msg_Err( p_access, "Could not convert loopback address" );
-        goto error;
-    }
+    // res = inet_pton( AF_INET, LOCAL_LOOPBACK, &stSvrAddr.sin_addr );
+    // if( res != 1 )
+    // {
+    //     msg_Err( p_access, "Could not convert loopback address" );
+    //     goto error;
+    // }
     /* TODO: stSvrAddr is unused ? */
 
     return 0;
