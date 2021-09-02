@@ -51,6 +51,7 @@ namespace adaptive
                 virtual ssize_t read        (void *p_buffer, size_t len) = 0;
 
                 virtual size_t  getContentLength() const;
+                virtual size_t  getBytesRead() const;
                 virtual const std::string & getContentType() const;
                 virtual const ConnectionParams &getRedirection() const;
                 virtual void    setUsed( bool ) = 0;

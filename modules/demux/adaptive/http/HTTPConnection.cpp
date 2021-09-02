@@ -62,6 +62,11 @@ size_t AbstractConnection::getContentLength() const
     return contentLength;
 }
 
+size_t AbstractConnection::getBytesRead() const
+{
+    return bytesRead;
+}
+
 const std::string & AbstractConnection::getContentType() const
 {
     return contentType;
