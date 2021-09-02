@@ -888,20 +888,6 @@ static int amt_sockets_init( stream_t *p_access )
         goto error;
     }
 
-    // struct sockaddr_in stSvrAddr =
-    // {
-    //     .sin_family = AF_INET,
-    //     .sin_port = htons( 9124 ),
-    // };
-
-    // res = inet_pton( AF_INET, LOCAL_LOOPBACK, &stSvrAddr.sin_addr );
-    // if( res != 1 )
-    // {
-    //     msg_Err( p_access, "Could not convert loopback address" );
-    //     goto error;
-    // }
-    /* TODO: stSvrAddr is unused ? */
-
     return 0;
 
 error:
