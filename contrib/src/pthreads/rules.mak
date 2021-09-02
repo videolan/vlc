@@ -5,7 +5,7 @@ PKGS_FOUND += pthreads
 endif
 
 PTHREADS_W32_VERSION := 2-9-1
-PTHREADS_W32_URL := ftp://sources.redhat.com/pub/pthreads-win32/pthreads-w32-$(PTHREADS_W32_VERSION)-release.tar.gz
+PTHREADS_W32_URL := https://www.sourceware.org/pub/pthreads-win32/pthreads-w32-$(PTHREADS_W32_VERSION)-release.tar.gz
 
 $(TARBALLS)/pthreads-w32-$(PTHREADS_W32_VERSION)-release.tar.gz:
 	$(call download_pkg,$(PTHREADS_W32_URL),pthreads)

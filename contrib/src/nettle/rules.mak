@@ -1,7 +1,7 @@
 # Nettle
 
 NETTLE_VERSION := 3.4.1
-NETTLE_URL := ftp://ftp.gnu.org/gnu/nettle/nettle-$(NETTLE_VERSION).tar.gz
+NETTLE_URL := $(GNU)/nettle/nettle-$(NETTLE_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"nettle >= 2.7"),)
 PKGS_FOUND += nettle
