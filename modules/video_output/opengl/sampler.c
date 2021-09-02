@@ -334,7 +334,7 @@ GetTransformMatrix(const struct vlc_gl_interop *interop)
 }
 
 static void
-sampler_base_load(const struct vlc_gl_sampler *sampler)
+sampler_base_load(struct vlc_gl_sampler *sampler)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
@@ -427,7 +427,7 @@ sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 }
 
 static void
-sampler_xyz12_load(const struct vlc_gl_sampler *sampler)
+sampler_xyz12_load(struct vlc_gl_sampler *sampler)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
     const opengl_vtable_t *vt = priv->vt;
@@ -786,7 +786,7 @@ sampler_planes_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 }
 
 static void
-sampler_planes_load(const struct vlc_gl_sampler *sampler)
+sampler_planes_load(struct vlc_gl_sampler *sampler)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
     unsigned plane = priv->plane;

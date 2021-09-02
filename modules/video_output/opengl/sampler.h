@@ -109,7 +109,7 @@ struct vlc_gl_sampler_ops {
      * \param sampler the sampler
      */
     void
-    (*load)(const struct vlc_gl_sampler *sampler);
+    (*load)(struct vlc_gl_sampler *sampler);
 };
 
 static inline void
@@ -119,7 +119,7 @@ vlc_gl_sampler_FetchLocations(struct vlc_gl_sampler *sampler, GLuint program)
 }
 
 static inline void
-vlc_gl_sampler_Load(const struct vlc_gl_sampler *sampler)
+vlc_gl_sampler_Load(struct vlc_gl_sampler *sampler)
 {
     sampler->ops->load(sampler);
 }
