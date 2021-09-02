@@ -1,0 +1,74 @@
+From e337ba0bce7595366e417b4eed8c2c321726bd87 Mon Sep 17 00:00:00 2001
+From: Andreas Rheinhardt <andreas.rheinhardt@outlook.com>
+Date: Thu, 2 Sep 2021 17:34:35 +0200
+Subject: [PATCH] avcodec/vp9: Do not destroy uninitialized mutexes/conditions
+
+Also do not destroy and reinitialize mutexes and conditions when
+certain input parameters change. Given that the decoder did not
+create these variables at all during init, uninitialized mutexes
+and conditions are destroyed before the very first initialization.
+This is undefined behaviour and certain threading implementations
+like pthreadGC2 crash when it is attempted.
+
+Fix this by initializing these objects once during init and freeing
+them in close.
+
+Reported-by: Steve Lhomme <robux4@ycbcr.xyz>
+Signed-off-by: Andreas Rheinhardt <andreas.rheinhardt@outlook.com>
+---
+ libavcodec/vp9.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/libavcodec/vp9.c b/libavcodec/vp9.c
+index 4659f94ee8..1bdaba0aef 100644
+--- a/libavcodec/vp9.c
++++ b/libavcodec/vp9.c
+@@ -43,8 +43,6 @@ static void vp9_free_entries(AVCodecContext *avctx) {
+     VP9Context *s = avctx->priv_data;
+ 
+     if (avctx->active_thread_type & FF_THREAD_SLICE)  {
+-        pthread_mutex_destroy(&s->progress_mutex);
+-        pthread_cond_destroy(&s->progress_cond);
+         av_freep(&s->entries);
+     }
+ }
+@@ -66,9 +64,6 @@ static int vp9_alloc_entries(AVCodecContext *avctx, int n) {
+ 
+         for (i  = 0; i < n; i++)
+             atomic_init(&s->entries[i], 0);
+-
+-        pthread_mutex_init(&s->progress_mutex, NULL);
+-        pthread_cond_init(&s->progress_cond, NULL);
+     }
+     return 0;
+ }
+@@ -1252,6 +1247,12 @@ static av_cold int vp9_decode_free(AVCodecContext *avctx)
+ 
+     free_buffers(s);
+     vp9_free_entries(avctx);
++#if HAVE_THREADS
++    if (avctx->active_thread_type & FF_THREAD_SLICE) {
++        pthread_mutex_destroy(&s->progress_mutex);
++        pthread_cond_destroy(&s->progress_cond);
++    }
++#endif
+     av_freep(&s->td);
+     return 0;
+ }
+@@ -1800,6 +1801,13 @@ static int init_frames(AVCodecContext *avctx)
+     VP9Context *s = avctx->priv_data;
+     int i;
+ 
++#if HAVE_THREADS
++    if (avctx->active_thread_type & FF_THREAD_SLICE) {
++        pthread_mutex_init(&s->progress_mutex, NULL);
++        pthread_cond_init(&s->progress_cond, NULL);
++    }
++#endif
++
+     for (i = 0; i < 3; i++) {
+         s->s.frames[i].tf.f = av_frame_alloc();
+         if (!s->s.frames[i].tf.f) {
+-- 
+2.27.0.windows.1
+
