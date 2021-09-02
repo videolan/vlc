@@ -188,16 +188,26 @@ FocusScope {
                 width: gridView_id.width
                 onRetract: gridView_id.retract()
                 Navigation.parentItem: root
-                Navigation.cancelAction:  function() {  gridView_id.retract() }
-                Navigation.upAction: function() {  gridView_id.retract() }
+
+                Navigation.cancelAction: function() {
+                    gridView_id.setCurrentItemFocus(Qt.TabFocusReason);
+                }
+
+                Navigation.upAction: function() {
+                    gridView_id.setCurrentItemFocus(Qt.TabFocusReason);
+                }
+
                 Navigation.downAction: function() {}
             }
 
             onActionAtIndex: {
-                if (selectionModel.selectedIndexes.length === 1)
-                    switchExpandItem(index)
-                else
-                    _actionAtIndex(index)
+                if (selectionModel.selectedIndexes.length === 1) {
+                    switchExpandItem(index);
+
+                    expandItem.setCurrentItemFocus(Qt.TabFocusReason);
+                } else {
+                    _actionAtIndex(index);
+                }
             }
 
             onSelectAll: selectionModel.selectAll()

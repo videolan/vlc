@@ -35,6 +35,10 @@ FocusScope {
 
     height: VLCStyle.artistBanner_height
 
+    function setCurrentItemFocus(reason) {
+        playActionBtn.forceActiveFocus(reason);
+    }
+
     Image {
         id: background
         asynchronous: true

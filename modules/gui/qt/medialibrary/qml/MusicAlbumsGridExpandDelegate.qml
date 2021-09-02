@@ -50,6 +50,10 @@ FocusScope {
     // causing expand and shrink animation bit laggy, so clip the delegate to fix it
     clip: true
 
+    function setCurrentItemFocus(reason) {
+        playActionBtn.forceActiveFocus(reason);
+    }
+
     Rectangle {
         anchors.fill: parent
         color: VLCStyle.colors.expandDelegate

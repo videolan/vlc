@@ -125,7 +125,11 @@ FocusScope {
                 focus: true
                 displayMarginEnd: miniPlayer.height // to get blur effect while scrolling in mainview
                 Navigation.parentItem: root
-                Navigation.rightItem: albumSubView
+
+                Navigation.rightAction: function() {
+                    albumSubView.setCurrentItemFocus(Qt.TabFocusReason);
+                }
+
                 Navigation.cancelAction: function() {
                     if (artistList.currentIndex <= 0)
                         root.Navigation.defaultNavigationCancel()
@@ -141,7 +145,29 @@ FocusScope {
                     topPadding: VLCStyle.margin_xlarge
                 }
 
-                delegate: MusicArtistDelegate {}
+                delegate: MusicArtistDelegate {
+                    width: artistList.width
+
+                    isCurrent: ListView.isCurrentItem
+
+                    artistModel: artistModel
+
+                    onItemClicked: {
+                        selectionModel.updateSelection(mouse.modifiers, artistList.currentIndex,
+                                                       index);
+
+                        artistList.currentIndex = index;
+
+                        artistList.forceActiveFocus(Qt.MouseFocusReason);
+                    }
+
+                    onItemDoubleClicked: {
+                        if (mouse.buttons === Qt.LeftButton)
+                            medialib.addAndPlay(model.id);
+                        else
+                            albumSubView.forceActiveFocus();
+                    }
+                }
 
                 Behavior on width {
                     SmoothedAnimation {

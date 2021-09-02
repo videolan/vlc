@@ -60,6 +60,10 @@ FocusScope {
         height: col.height
         width: root.width
 
+        function setCurrentItemFocus(reason) {
+            artistBanner.setCurrentItemFocus(reason);
+        }
+
         Column {
             id: col
 
@@ -75,11 +79,10 @@ FocusScope {
                 artist: root.artist
                 Navigation.parentItem: root
                 Navigation.downAction: function() {
-                    headerFs.focus = false
                     if (albumsListView)
-                        albumsListView.forceActiveFocus(Qt.TabFocusReason)
+                        albumsListView.setCurrentItemFocus(Qt.TabFocusReason);
                     else
-                        _currentView.setCurrentItemFocus(Qt.TabFocusReason)
+                        _currentView.setCurrentItemFocus(Qt.TabFocusReason);
 
                 }
             }
@@ -118,10 +121,13 @@ FocusScope {
                         spacing: VLCStyle.column_margin_width
 
                         Navigation.parentItem: root
-                        Navigation.upItem: artistBanner
+
+                        Navigation.upAction: function() {
+                            artistBanner.setCurrentItemFocus(Qt.TabFocusReason);
+                        }
+
                         Navigation.downAction: function() {
-                            headerFs.focus = false
-                            _currentView.setCurrentItemFocus(Qt.TabFocusReason)
+                            _currentView.setCurrentItemFocus(Qt.TabFocusReason);
                         }
 
                         delegate: Widgets.GridItem {
@@ -196,6 +202,10 @@ FocusScope {
             albumSelectionModel.select(albumModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
             albumsListView.currentIndex = initialIndex
         }
+    }
+
+    function setCurrentItemFocus(reason) {
+        view.currentItem.setCurrentItemFocus(reason);
     }
 
     function resetFocus() {
@@ -344,23 +354,36 @@ FocusScope {
                 width: gridView_id.width
                 onRetract: gridView_id.retract()
                 Navigation.parentItem: root
-                Navigation.cancelAction:  function() {  gridView_id.retract() }
-                Navigation.upAction: function() {  gridView_id.retract() }
+
+                Navigation.cancelAction: function() {
+                    gridView_id.setCurrentItemFocus(Qt.TabFocusReason);
+                }
+
+                Navigation.upAction: function() {
+                    gridView_id.setCurrentItemFocus(Qt.TabFocusReason);
+                }
+
                 Navigation.downAction: function() {}
             }
 
             onActionAtIndex: {
-                if (albumSelectionModel.selectedIndexes.length <= 1) {
-                    gridView_id.switchExpandItem( index )
+                if (albumSelectionModel.selectedIndexes.length === 1) {
+                    switchExpandItem(index);
+
+                    expandItem.setCurrentItemFocus(Qt.TabFocusReason);
                 } else {
-                    root._actionAtIndex( index, albumModel, albumSelectionModel )
+                    _actionAtIndex(index, albumModel, albumSelectionModel);
                 }
             }
 
             onSelectAll: albumSelectionModel.selectAll()
             onSelectionUpdated: albumSelectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
             Navigation.parentItem: root
-            Navigation.upItem: headerItem
+
+            Navigation.upAction: function() {
+                headerItem.setCurrentItemFocus(Qt.TabFocusReason);
+            }
+
             Navigation.cancelAction: root._onNavigationCancel
 
             Connections {
@@ -404,7 +427,11 @@ FocusScope {
             ]
 
             Navigation.parentItem: root
-            Navigation.upItem: headerItem
+
+            Navigation.upAction: function() {
+                headerItem.setCurrentItemFocus(Qt.TabFocusReason);
+            }
+
             Navigation.cancelAction: root._onNavigationCancel
 
             onItemDoubleClicked: medialib.addAndPlay(model.id)
