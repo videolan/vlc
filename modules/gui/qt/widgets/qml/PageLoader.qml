@@ -55,8 +55,10 @@ FocusScope {
             return
         }
         var found = stackView.loadView(root.pageModel, view, viewProperties)
-        if (!found)
-            stackView.replace(root.pageModel[0].component)
+        if (!found) {
+            loadDefaultView()
+            return
+        }
 
         stackView.currentItem.Navigation.parentItem = root
         root.currentItemChanged(stackView.currentItem)
