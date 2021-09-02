@@ -687,6 +687,9 @@ int clock_gettime(clockid_t clock_id, struct timespec *tp);
 # ifndef HAVE_CLOCK_GETRES
 int clock_getres(clockid_t clock_id, struct timespec *tp);
 # endif
+#endif
+
+#ifndef _WIN32
 # ifndef HAVE_CLOCK_NANOSLEEP
 int clock_nanosleep(clockid_t clock_id, int flags,
         const struct timespec *rqtp, struct timespec *rmtp);

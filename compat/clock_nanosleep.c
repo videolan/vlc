@@ -20,7 +20,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifdef __APPLE__
+#ifndef _WIN32
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -32,7 +32,10 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/sysctl.h>
+
+# ifdef __APPLE__
 #include <mach/clock_types.h>
+# endif
 
 int clock_nanosleep(clockid_t clock_id, int flags,
         const struct timespec *rqtp, struct timespec *rmtp)
