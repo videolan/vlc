@@ -136,7 +136,6 @@ FocusScope {
                 } else {
                     _currentView.currentIndex = index
                     requestArtistAlbumView(Qt.TabFocusReason)
-                    medialib.addAndPlay( artistModel.getIdForIndex(index) )
                 }
             }
 
