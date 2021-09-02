@@ -293,6 +293,7 @@
         <file alias="MusicAlbumsDisplay.qml">medialibrary/qml/MusicAlbumsDisplay.qml</file>
         <file alias="MusicAlbumsGridExpandDelegate.qml">medialibrary/qml/MusicAlbumsGridExpandDelegate.qml</file>
         <file alias="MusicArtist.qml">medialibrary/qml/MusicArtist.qml</file>
+        <file alias="MusicArtistDelegate.qml">medialibrary/qml/MusicArtistDelegate.qml</file>
         <file alias="MusicArtistsAlbums.qml">medialibrary/qml/MusicArtistsAlbums.qml</file>
         <file alias="MusicAllArtists.qml">medialibrary/qml/MusicAllArtists.qml</file>
         <file alias="MusicArtistsDisplay.qml">medialibrary/qml/MusicArtistsDisplay.qml</file>
