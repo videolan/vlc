@@ -1,6 +1,6 @@
 # FFI
 FFI_VERSION := 3.0.13
-FFI_URL := ftp://sourceware.org/pub/libffi/libffi-$(FFI_VERSION).tar.gz
+FFI_URL := https://www.sourceware.org/pub/libffi/libffi-$(FFI_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"libffi"),)
 PKGS_FOUND += ffi
