@@ -39,7 +39,7 @@ int clock_nanosleep(clockid_t clock_id, int flags,
 {
     // Validate timespec
     if (rqtp == NULL || rqtp->tv_sec < 0 ||
-            rqtp->tv_nsec < 0 || (unsigned long)rqtp->tv_nsec >= NSEC_PER_SEC) {
+            rqtp->tv_nsec < 0 || (unsigned long)rqtp->tv_nsec >= 1000*1000*1000) {
         errno = EINVAL;
         return -1;
     }
@@ -68,7 +68,7 @@ int clock_nanosleep(clockid_t clock_id, int flags,
             ts_rel.tv_nsec = rqtp->tv_nsec - ts_now.tv_nsec;
             if (ts_rel.tv_nsec < 0) {
                 ts_rel.tv_sec  -= 1;
-                ts_rel.tv_nsec += NSEC_PER_SEC;
+                ts_rel.tv_nsec += 1000*1000*1000;
             }
 
             // Check if time already elapsed
