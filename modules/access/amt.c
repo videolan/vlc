@@ -729,7 +729,6 @@ static bool open_amt_tunnel( stream_t *p_access )
         /* If started, the timer must be stopped before trying the next server
         * in order to avoid data-race with sys->sAMT. */
         vlc_timer_disarm( sys->updateTimer );
-        msg_Dbg( p_access, "Disarming timer!");
 
         amt_send_mem_update( p_access, sys->relayDisco, false );
         bool eof=false;
@@ -746,7 +745,6 @@ static bool open_amt_tunnel( stream_t *p_access )
             block_Release( pkt );
             msg_Dbg( p_access, "Got UDP packet from multicast group via AMT relay %s, continuing...", relay_ip );
 
-            msg_Dbg( p_access, "arming timer!");
             /* Start the IGMP timer when we receive the first packet so we don't drop any */
             vlc_timer_schedule( sys->updateTimer, false,
                         VLC_TICK_FROM_SEC( sys->relay_igmp_query.qqic ), VLC_TICK_FROM_SEC( sys->relay_igmp_query.qqic ) );
