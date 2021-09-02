@@ -235,10 +235,11 @@ block_t * HTTPChunkSource::read(size_t readsize)
             eof = true;
             downloadEndTime = mdate();
         }
-        if(ret && p_block->i_buffer &&
+        if(ret && connection->getBytesRead() &&
            downloadEndTime > requestStartTime && type == ChunkType::Segment)
         {
-            connManager->updateDownloadRate(sourceid, p_block->i_buffer,
+            connManager->updateDownloadRate(sourceid,
+                                            connection->getBytesRead(),
                                             downloadEndTime - requestStartTime,
                                             downloadEndTime - responseTime);
         }
