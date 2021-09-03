@@ -371,6 +371,9 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
         p_toc->i_first_track = cdrom_toc.FirstTrack;
         p_toc->i_last_track = cdrom_toc.LastTrack;
 
+        if ( cdrom_toc.TrackData[p_toc->i_tracks].TrackNumber != 0xAA )
+            msg_Warn(p_this, "leadout not read properly");
+
         p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(p_toc->p_sectors) );
         if( p_toc->p_sectors == NULL )
         {
