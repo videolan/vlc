@@ -260,8 +260,7 @@ void ioctl_Close( vlc_object_t * p_this, vcddev_t *p_vcddev )
  * ioctl_GetTOC: Read the Table of Content, fill in the p_sectors map
  *               if b_fill_sector_info is true.
  *****************************************************************************/
-vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
-                             bool b_fill_sectorinfo )
+vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
 {
     vcddev_toc_t *p_toc = calloc(1, sizeof(*p_toc));
     if(!p_toc)
@@ -276,8 +275,6 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         *p_toc = p_vcddev->toc;
         p_toc->p_sectors = NULL;
 
-        if( b_fill_sectorinfo )
-        {
             p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
             if( p_toc->p_sectors == NULL )
             {
@@ -286,7 +283,6 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             }
             memcpy( p_toc->p_sectors, p_vcddev->toc.p_sectors,
                     (p_toc->i_tracks + 1) * sizeof(*p_toc->p_sectors) );
-        }
 
         return p_toc;
     }
@@ -314,8 +310,6 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                                                     &p_toc->i_first_track,
                                                     &p_toc->i_last_track );
 
-        if( b_fill_sectorinfo )
-        {
             int i, i_leadout = -1;
             CDTOCDescriptor *pTrackDescriptors;
             u_char track;
@@ -357,7 +351,6 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             /* set leadout sector */
             p_toc->p_sectors[p_toc->i_tracks].i_lba =
                 CDConvertMSFToLBA( pTrackDescriptors[i_leadout].p );
-        }
 
         darwin_freeTOC( pTOC );
 
@@ -378,8 +371,6 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         p_toc->i_first_track = cdrom_toc.FirstTrack;
         p_toc->i_last_track = cdrom_toc.LastTrack;
 
-        if( b_fill_sectorinfo )
-        {
             p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(p_toc->p_sectors) );
             if( p_toc->p_sectors == NULL )
             {
@@ -396,7 +387,6 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                                            cdrom_toc.TrackData[i].Address[3] );
                 msg_Dbg( p_this, "p_sectors: %i, %i", i, p_toc->p_sectors[i].i_lba);
              }
-        }
 
 #elif defined( __OS2__ )
         cdrom_get_tochdr_t get_tochdr = {{'C', 'D', '0', '1'}};
@@ -420,8 +410,6 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         p_toc->i_first_track = tochdr.first_track;
         p_toc->i_last_track = tochdr.last_track;
 
-        if( b_fill_sectorinfo )
-        {
             cdrom_get_track_t get_track = {{'C', 'D', '0', '1'}, };
             cdrom_track_t track;
             int i;
@@ -461,7 +449,6 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                                    tochdr.lead_out.second,
                                    tochdr.lead_out.frame );
             msg_Dbg( p_this, "p_sectors: %i, %i", i, p_toc->p_sectors[i].i_lba);
-        }
 
 #elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H ) \
        || defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
@@ -480,8 +467,6 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         p_toc->i_first_track = tochdr.starting_track;
         p_toc->i_last_track = tochdr.ending_track;
 
-        if( b_fill_sectorinfo )
-        {
              p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
              if( p_toc->p_sectors == NULL )
              {
@@ -521,7 +506,6 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                  p_toc->p_sectors[ i ].i_lba = ntohl( toc_entries.data[i].addr.lba );
 #endif
              }
-        }
 #else
         struct cdrom_tochdr   tochdr;
         struct cdrom_tocentry tocent;
@@ -539,8 +523,6 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         p_toc->i_first_track = tochdr.cdth_trk0;
         p_toc->i_last_track = tochdr.cdth_trk1;
 
-        if( b_fill_sectorinfo )
-        {
             p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
             if( p_toc->p_sectors == NULL )
             {
@@ -567,7 +549,6 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                 p_toc->p_sectors[ i ].i_lba = tocent.cdte_addr.lba;
                 p_toc->p_sectors[ i ].i_control = tocent.cdte_ctrl;
             }
-        }
 #endif
 
         return p_toc;

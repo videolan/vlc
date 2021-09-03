@@ -152,7 +152,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->titles[i].seekpoints = NULL;
 
     /* We read the Table Of Content information */
-    p_sys->p_toc = ioctl_GetTOC( VLC_OBJECT(p_access), p_sys->vcddev, true );
+    p_sys->p_toc = ioctl_GetTOC( VLC_OBJECT(p_access), p_sys->vcddev );
     if( p_sys->p_toc == NULL )
     {
         msg_Err( p_access, "unable to count tracks" );

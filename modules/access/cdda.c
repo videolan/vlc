@@ -306,7 +306,7 @@ static int DemuxOpen(vlc_object_t *obj, vcddev_t *dev, unsigned track)
     /* Track number in input item */
     if (sys->start == (unsigned)-1 || sys->length == (unsigned)-1)
     {
-        vcddev_toc_t *p_toc = ioctl_GetTOC(obj, dev, true);
+        vcddev_toc_t *p_toc = ioctl_GetTOC(obj, dev);
         if(p_toc == NULL)
             goto error;
 
@@ -870,7 +870,7 @@ static int AccessOpen(vlc_object_t *obj, vcddev_t *dev)
     }
 
     sys->vcddev = dev;
-    sys->p_toc = ioctl_GetTOC(obj, dev, true);
+    sys->p_toc = ioctl_GetTOC(obj, dev);
     if (sys->p_toc == NULL)
     {
         msg_Err(obj, "cannot count tracks");
