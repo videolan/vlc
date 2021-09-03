@@ -7,14 +7,14 @@ WINPTHREADS_GITURL := https://git.code.sf.net/p/mingw-w64/mingw-w64
 
 ifdef HAVE_WIN32
 PKGS += pthreads
-endif
 
 ifndef HAVE_VISUALSTUDIO
 PKGS += dxvahd
 PKGS_ALL += dxvahd
-endif
 ifeq ($(HAVE_MINGW64_V8),true)
 PKGS_FOUND += dxvahd
+endif
+endif
 endif
 
 $(TARBALLS)/mingw-w64-$(WINPTHREADS_HASH).tar.xz:
