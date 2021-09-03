@@ -358,9 +358,10 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
         DWORD dwBytesReturned;
         CDROM_TOC cdrom_toc;
 
-        if( DeviceIoControl( p_vcddev->h_device_handle, IOCTL_CDROM_READ_TOC,
-                             NULL, 0, &cdrom_toc, sizeof(CDROM_TOC),
-                             &dwBytesReturned, NULL ) == 0 )
+        CDROM_READ_TOC_EX TOCEx = { .Format = CDROM_READ_TOC_EX_FORMAT_TOC, .Msf = 0 };
+        if( DeviceIoControl( p_vcddev->h_device_handle, IOCTL_CDROM_READ_TOC_EX,
+                             &TOCEx, sizeof(TOCEx),
+                             &cdrom_toc, sizeof(cdrom_toc), &dwBytesReturned, 0 ) == 0 )
         {
             msg_Err( p_this, "could not read TOCHDR" );
             vcddev_toc_Free( p_toc );
@@ -384,10 +385,10 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
         for( int i = 0 ; i <= p_toc->i_tracks ; i++ )
         {
             p_toc->p_sectors[ i ].i_control = cdrom_toc.TrackData[i].Control;
-            p_toc->p_sectors[ i ].i_lba = MSF_TO_LBA2(
-                                        cdrom_toc.TrackData[i].Address[1],
-                                        cdrom_toc.TrackData[i].Address[2],
-                                        cdrom_toc.TrackData[i].Address[3] );
+            p_toc->p_sectors[ i ].i_lba = (unsigned)cdrom_toc.TrackData[i].Address[0] << 24 |
+                                          (unsigned)cdrom_toc.TrackData[i].Address[1] << 16 |
+                                          (unsigned)cdrom_toc.TrackData[i].Address[2] << 8 |
+                                          (unsigned)cdrom_toc.TrackData[i].Address[3];
             msg_Dbg( p_this, "p_sectors: %i, %i", i, p_toc->p_sectors[i].i_lba);
         }
 
