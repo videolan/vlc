@@ -469,6 +469,7 @@ on_vout_changed(vlc_player_t *player, enum vlc_player_vout_action action,
     libvlc_event_t event;
     event.type = libvlc_MediaPlayerVout;
     event.u.media_player_vout.new_count = count;
+    event.u.media_player_vout.started = action == VLC_PLAYER_VOUT_STARTED;
 
     libvlc_event_send(&mp->event_manager, &event);
 }

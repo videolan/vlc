@@ -321,6 +321,7 @@ typedef struct libvlc_event_t
         struct
         {
             int new_count;
+            bool started;
         } media_player_vout;
 
         /* media list */
