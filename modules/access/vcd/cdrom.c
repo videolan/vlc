@@ -275,14 +275,14 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
         *p_toc = p_vcddev->toc;
         p_toc->p_sectors = NULL;
 
-            p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
-            if( p_toc->p_sectors == NULL )
-            {
-                free( p_toc );
-                return NULL;
-            }
-            memcpy( p_toc->p_sectors, p_vcddev->toc.p_sectors,
-                    (p_toc->i_tracks + 1) * sizeof(*p_toc->p_sectors) );
+        p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
+        if( p_toc->p_sectors == NULL )
+        {
+            free( p_toc );
+            return NULL;
+        }
+        memcpy( p_toc->p_sectors, p_vcddev->toc.p_sectors,
+                (p_toc->i_tracks + 1) * sizeof(*p_toc->p_sectors) );
 
         return p_toc;
     }
@@ -310,47 +310,47 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
                                                     &p_toc->i_first_track,
                                                     &p_toc->i_last_track );
 
-            int i, i_leadout = -1;
-            CDTOCDescriptor *pTrackDescriptors;
-            u_char track;
+        int i, i_leadout = -1;
+        CDTOCDescriptor *pTrackDescriptors;
+        u_char track;
 
-            p_toc->p_sectors = calloc( p_toc->i_tracks + 1,
-                                       sizeof(*p_toc->p_sectors) );
-            if( p_toc->p_sectors == NULL )
-            {
-                vcddev_toc_Free( p_toc );
-                darwin_freeTOC( pTOC );
-                return NULL;
-            }
+        p_toc->p_sectors = calloc( p_toc->i_tracks + 1,
+                                    sizeof(*p_toc->p_sectors) );
+        if( p_toc->p_sectors == NULL )
+        {
+            vcddev_toc_Free( p_toc );
+            darwin_freeTOC( pTOC );
+            return NULL;
+        }
 
-            pTrackDescriptors = pTOC->descriptors;
+        pTrackDescriptors = pTOC->descriptors;
 
-            for( p_toc->i_tracks = 0, i = 0; i < i_descriptors; i++ )
-            {
-                track = pTrackDescriptors[i].point;
+        for( p_toc->i_tracks = 0, i = 0; i < i_descriptors; i++ )
+        {
+            track = pTrackDescriptors[i].point;
 
-                if( track == 0xA2 )
-                    i_leadout = i;
+            if( track == 0xA2 )
+                i_leadout = i;
 
-                if( track > CD_MAX_TRACK_NO || track < CD_MIN_TRACK_NO )
-                    continue;
+            if( track > CD_MAX_TRACK_NO || track < CD_MIN_TRACK_NO )
+                continue;
 
-                p_toc->p_sectors[p_toc->i_tracks].i_control = pTrackDescriptors[i].control;
-                p_toc->p_sectors[p_toc->i_tracks++].i_lba =
-                    CDConvertMSFToLBA( pTrackDescriptors[i].p );
-            }
+            p_toc->p_sectors[p_toc->i_tracks].i_control = pTrackDescriptors[i].control;
+            p_toc->p_sectors[p_toc->i_tracks++].i_lba =
+                CDConvertMSFToLBA( pTrackDescriptors[i].p );
+        }
 
-            if( i_leadout == -1 )
-            {
-                msg_Err( p_this, "leadout not found" );
-                vcddev_toc_Free( p_toc );
-                darwin_freeTOC( pTOC );
-                return NULL;
-            }
+        if( i_leadout == -1 )
+        {
+            msg_Err( p_this, "leadout not found" );
+            vcddev_toc_Free( p_toc );
+            darwin_freeTOC( pTOC );
+            return NULL;
+        }
 
-            /* set leadout sector */
-            p_toc->p_sectors[p_toc->i_tracks].i_lba =
-                CDConvertMSFToLBA( pTrackDescriptors[i_leadout].p );
+        /* set leadout sector */
+        p_toc->p_sectors[p_toc->i_tracks].i_lba =
+            CDConvertMSFToLBA( pTrackDescriptors[i_leadout].p );
 
         darwin_freeTOC( pTOC );
 
@@ -371,22 +371,22 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
         p_toc->i_first_track = cdrom_toc.FirstTrack;
         p_toc->i_last_track = cdrom_toc.LastTrack;
 
-            p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(p_toc->p_sectors) );
-            if( p_toc->p_sectors == NULL )
-            {
-                vcddev_toc_Free( p_toc );
-                return NULL;
-            }
+        p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(p_toc->p_sectors) );
+        if( p_toc->p_sectors == NULL )
+        {
+            vcddev_toc_Free( p_toc );
+            return NULL;
+        }
 
-            for( int i = 0 ; i <= p_toc->i_tracks ; i++ )
-            {
-                p_toc->p_sectors[ i ].i_control = cdrom_toc.TrackData[i].Control;
-                p_toc->p_sectors[ i ].i_lba = MSF_TO_LBA2(
-                                           cdrom_toc.TrackData[i].Address[1],
-                                           cdrom_toc.TrackData[i].Address[2],
-                                           cdrom_toc.TrackData[i].Address[3] );
-                msg_Dbg( p_this, "p_sectors: %i, %i", i, p_toc->p_sectors[i].i_lba);
-             }
+        for( int i = 0 ; i <= p_toc->i_tracks ; i++ )
+        {
+            p_toc->p_sectors[ i ].i_control = cdrom_toc.TrackData[i].Control;
+            p_toc->p_sectors[ i ].i_lba = MSF_TO_LBA2(
+                                        cdrom_toc.TrackData[i].Address[1],
+                                        cdrom_toc.TrackData[i].Address[2],
+                                        cdrom_toc.TrackData[i].Address[3] );
+            msg_Dbg( p_this, "p_sectors: %i, %i", i, p_toc->p_sectors[i].i_lba);
+        }
 
 #elif defined( __OS2__ )
         cdrom_get_tochdr_t get_tochdr = {{'C', 'D', '0', '1'}};
@@ -410,45 +410,45 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
         p_toc->i_first_track = tochdr.first_track;
         p_toc->i_last_track = tochdr.last_track;
 
-            cdrom_get_track_t get_track = {{'C', 'D', '0', '1'}, };
-            cdrom_track_t track;
-            int i;
+        cdrom_get_track_t get_track = {{'C', 'D', '0', '1'}, };
+        cdrom_track_t track;
+        int i;
 
-            p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
-            if( p_toc->p_sectors == NULL )
+        p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
+        if( p_toc->p_sectors == NULL )
+        {
+            vcddev_toc_Free( p_toc );
+            return NULL;
+        }
+
+        for( i = 0 ; i < p_toc->i_tracks ; i++ )
+        {
+            get_track.track = tochdr.first_track + i;
+            rc = DosDevIOCtl( p_vcddev->hcd, IOCTL_CDROMAUDIO,
+                                CDROMAUDIO_GETAUDIOTRACK,
+                                &get_track, sizeof(get_track), &param_len,
+                                &track, sizeof(track), &data_len );
+            if (rc)
             {
+                msg_Err( p_this, "could not read %d track",
+                            get_track.track );
                 vcddev_toc_Free( p_toc );
                 return NULL;
             }
 
-            for( i = 0 ; i < p_toc->i_tracks ; i++ )
-            {
-                get_track.track = tochdr.first_track + i;
-                rc = DosDevIOCtl( p_vcddev->hcd, IOCTL_CDROMAUDIO,
-                                  CDROMAUDIO_GETAUDIOTRACK,
-                                  &get_track, sizeof(get_track), &param_len,
-                                  &track, sizeof(track), &data_len );
-                if (rc)
-                {
-                    msg_Err( p_this, "could not read %d track",
-                             get_track.track );
-                    vcddev_toc_Free( p_toc );
-                    return NULL;
-                }
-
-                p_toc->p_sectors[ i ].i_lba = MSF_TO_LBA2(
-                                       track.start.minute,
-                                       track.start.second,
-                                       track.start.frame );
-                msg_Dbg( p_this, "p_sectors: %i, %i", i, p_toc->p_sectors[i].i_lba);
-            }
-
-            /* for lead-out track */
             p_toc->p_sectors[ i ].i_lba = MSF_TO_LBA2(
-                                   tochdr.lead_out.minute,
-                                   tochdr.lead_out.second,
-                                   tochdr.lead_out.frame );
+                                    track.start.minute,
+                                    track.start.second,
+                                    track.start.frame );
             msg_Dbg( p_this, "p_sectors: %i, %i", i, p_toc->p_sectors[i].i_lba);
+        }
+
+        /* for lead-out track */
+        p_toc->p_sectors[ i ].i_lba = MSF_TO_LBA2(
+                                tochdr.lead_out.minute,
+                                tochdr.lead_out.second,
+                                tochdr.lead_out.frame );
+        msg_Dbg( p_this, "p_sectors: %i, %i", i, p_toc->p_sectors[i].i_lba);
 
 #elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H ) \
        || defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
@@ -467,45 +467,45 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
         p_toc->i_first_track = tochdr.starting_track;
         p_toc->i_last_track = tochdr.ending_track;
 
-             p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
-             if( p_toc->p_sectors == NULL )
-             {
-                 vcddev_toc_Free( p_toc );
-                 return NULL;
-             }
+        p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
+        if( p_toc->p_sectors == NULL )
+        {
+            vcddev_toc_Free( p_toc );
+            return NULL;
+        }
 
-             toc_entries.address_format = CD_LBA_FORMAT;
-             toc_entries.starting_track = 0;
-             toc_entries.data_len = ( p_toc->i_tracks + 1 ) *
-                                        sizeof( struct cd_toc_entry );
-             toc_entries.data = (struct cd_toc_entry *)
-                                    malloc( toc_entries.data_len );
-             if( toc_entries.data == NULL )
-             {
-                 vcddev_toc_Free( p_toc );
-                 return NULL;
-             }
+        toc_entries.address_format = CD_LBA_FORMAT;
+        toc_entries.starting_track = 0;
+        toc_entries.data_len = ( p_toc->i_tracks + 1 ) *
+                                sizeof( struct cd_toc_entry );
+        toc_entries.data = (struct cd_toc_entry *)
+                            malloc( toc_entries.data_len );
+        if( toc_entries.data == NULL )
+        {
+            vcddev_toc_Free( p_toc );
+            return NULL;
+        }
 
-             /* Read the TOC */
-             if( ioctl( p_vcddev->i_device_handle, CDIOREADTOCENTRYS,
-                        &toc_entries ) == -1 )
-             {
-                 msg_Err( p_this, "could not read the TOC" );
-                 free( toc_entries.data );
-                 vcddev_toc_Free( p_toc );
-                 return NULL;
-             }
+        /* Read the TOC */
+        if( ioctl( p_vcddev->i_device_handle, CDIOREADTOCENTRYS,
+                &toc_entries ) == -1 )
+        {
+            msg_Err( p_this, "could not read the TOC" );
+            free( toc_entries.data );
+            vcddev_toc_Free( p_toc );
+            return NULL;
+        }
 
-             /* Fill the p_sectors structure with the track/sector matches */
-             for( int i = 0 ; i <= p_toc->i_tracks ; i++ )
-             {
+        /* Fill the p_sectors structure with the track/sector matches */
+        for( int i = 0 ; i <= p_toc->i_tracks ; i++ )
+        {
 #if defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
-                 /* FIXME: is this ok? */
-                 p_toc->p_sectors[ i ].i_lba = toc_entries.data[i].addr.lba;
+            /* FIXME: is this ok? */
+            p_toc->p_sectors[ i ].i_lba = toc_entries.data[i].addr.lba;
 #else
-                 p_toc->p_sectors[ i ].i_lba = ntohl( toc_entries.data[i].addr.lba );
+            p_toc->p_sectors[ i ].i_lba = ntohl( toc_entries.data[i].addr.lba );
 #endif
-             }
+        }
 #else
         struct cdrom_tochdr   tochdr;
         struct cdrom_tocentry tocent;
@@ -523,32 +523,32 @@ vcddev_toc_t * ioctl_GetTOC( vlc_object_t *p_this, const vcddev_t *p_vcddev )
         p_toc->i_first_track = tochdr.cdth_trk0;
         p_toc->i_last_track = tochdr.cdth_trk1;
 
-            p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
-            if( p_toc->p_sectors == NULL )
+        p_toc->p_sectors = calloc( p_toc->i_tracks + 1, sizeof(*p_toc->p_sectors) );
+        if( p_toc->p_sectors == NULL )
+        {
+            free( p_toc );
+            return NULL;
+        }
+
+        /* Fill the p_sectors structure with the track/sector matches */
+        for( int i = 0 ; i <= p_toc->i_tracks ; i++ )
+        {
+            tocent.cdte_format = CDROM_LBA;
+            tocent.cdte_track =
+                ( i == p_toc->i_tracks ) ? CDROM_LEADOUT : tochdr.cdth_trk0 + i;
+
+            if( ioctl( p_vcddev->i_device_handle, CDROMREADTOCENTRY,
+                        &tocent ) == -1 )
             {
+                msg_Err( p_this, "could not read TOCENTRY" );
+                free( p_toc->p_sectors );
                 free( p_toc );
                 return NULL;
             }
 
-            /* Fill the p_sectors structure with the track/sector matches */
-            for( int i = 0 ; i <= p_toc->i_tracks ; i++ )
-            {
-                tocent.cdte_format = CDROM_LBA;
-                tocent.cdte_track =
-                    ( i == p_toc->i_tracks ) ? CDROM_LEADOUT : tochdr.cdth_trk0 + i;
-
-                if( ioctl( p_vcddev->i_device_handle, CDROMREADTOCENTRY,
-                           &tocent ) == -1 )
-                {
-                    msg_Err( p_this, "could not read TOCENTRY" );
-                    free( p_toc->p_sectors );
-                    free( p_toc );
-                    return NULL;
-                }
-
-                p_toc->p_sectors[ i ].i_lba = tocent.cdte_addr.lba;
-                p_toc->p_sectors[ i ].i_control = tocent.cdte_ctrl;
-            }
+            p_toc->p_sectors[ i ].i_lba = tocent.cdte_addr.lba;
+            p_toc->p_sectors[ i ].i_control = tocent.cdte_ctrl;
+        }
 #endif
 
         return p_toc;
