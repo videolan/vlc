@@ -106,7 +106,7 @@ FocusScope {
         // NOTE: Saving the focus reason for later.
         _currentFocusReason = reason;
 
-        if (!model || model.count === 0 || currentIndex === -1 || expandIndex !== -1) {
+        if (!model || model.count === 0 || currentIndex === -1) {
             // NOTE: By default we want the focus on the flickable.
             flickable.forceActiveFocus(reason);
 
@@ -120,6 +120,13 @@ FocusScope {
 
         // NOTE: We make sure the current item is fully visible.
         positionViewAtIndex(currentIndex, ItemView.Contain);
+
+        if (expandIndex !== -1) {
+            // NOTE: We clear expandIndex so we can apply the proper focus in _setupChild.
+            expandIndex = -1;
+
+            retract();
+        }
     }
 
     function switchExpandItem(index) {
@@ -658,7 +665,6 @@ FocusScope {
             to: 0
             onStopped: {
                 expandIndex = -1
-                setCurrentItemFocus(Qt.OtherFocusReason)
                 if (_newExpandIndex !== -1)
                     flickable.expand()
             }
