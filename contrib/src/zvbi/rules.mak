@@ -23,6 +23,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/zvbi/zvbi-win32-undefined.patch
 endif
 	$(APPLY) $(SRC)/zvbi/zvbi-fix-clang-support.patch
+	$(APPLY) $(SRC)/zvbi/zvbi-va_copy.patch
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/zvbi/zvbi-android.patch
 endif
