@@ -1,0 +1,13 @@
+--- zvbi/src/misc.h.ORIG	2013-07-01 22:32:31.000000000 -0400
++++ zvbi/src/misc.h	2021-09-01 23:30:14.400736405 -0400
+@@ -424,7 +424,9 @@
+ #endif
+ 
+ /* __va_copy is a GNU extension. */
+-#ifndef __va_copy
++#ifdef va_copy && !defined(__va_copy)
++#  define __va_copy va_copy
++#else
+ #  define __va_copy(ap1, ap2) do { ap1 = ap2; } while (0)
+ #endif
+ 
