@@ -2936,7 +2936,7 @@ static void InputSourceMeta( input_thread_t *p_input,
                               p_demux_meta->attachments );
             vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
         }
-        module_unneed( p_demux, p_id3 );
+        module_unneed( p_demux_meta, p_id3 );
     }
     vlc_object_delete(p_demux_meta);
 }
