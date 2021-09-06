@@ -186,7 +186,7 @@ static int Demux(demux_t *demux)
 
     block->i_nb_samples = block->i_buffer / 4;
     block->i_dts = block->i_pts = date_Get(&sys->pts);
-    date_Increment(&sys->pts, block->i_nb_samples);
+    date_Increment(&sys->pts, count);
 
     es_out_Send(demux->out, sys->es, block);
     es_out_SetPCR(demux->out, date_Get(&sys->pts));
@@ -349,7 +349,7 @@ static int DemuxOpen(vlc_object_t *obj, vcddev_t *dev, unsigned track)
     fmt.audio.i_channels = 2;
     sys->es = es_out_Add(demux->out, &fmt);
 
-    date_Init(&sys->pts, 44100, 1);
+    date_Init(&sys->pts, CD_ROM_CDDA_FRAMES, 1);
     date_Set(&sys->pts, VLC_TICK_0);
 
     sys->position = 0;
