@@ -412,8 +412,10 @@ static int AccessDemuxOpen ( vlc_object_t *p_this )
     if( !forced && ProbeDVD( psz_file ) != VLC_SUCCESS )
         goto bailout;
 
+#ifdef __APPLE__
     if( forced && DiscProbeMacOSPermission( p_this, psz_file ) != VLC_SUCCESS )
         goto bailout;
+#endif
 
     /* Open dvdnav */
 #if DVDREAD_VERSION < DVDREAD_VERSION_CODE(6, 1, 2)

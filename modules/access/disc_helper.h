@@ -18,6 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef __APPLE__
 #include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -25,10 +26,8 @@
 #include <vlc_dialog.h>
 #include <vlc_fs.h>
 
-
 inline static int DiscProbeMacOSPermission( vlc_object_t *p_this, const char *psz_file )
 {
-#ifdef __APPLE__
     /* Check is only relevant starting macOS Catalina */
     if( __builtin_available( macOS 10.15, * ) )
     {
@@ -62,9 +61,5 @@ inline static int DiscProbeMacOSPermission( vlc_object_t *p_this, const char *ps
     }
 
     return VLC_SUCCESS;
-#else
-    VLC_UNUSED( p_this );
-    VLC_UNUSED( psz_file );
-    return VLC_SUCCESS;
-#endif
 }
+#endif

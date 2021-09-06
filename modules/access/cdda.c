@@ -112,10 +112,12 @@ static vcddev_t *DiscOpen(vlc_object_t *obj, const char *location,
         devpath[2] = '\0';
 #endif
 
+#ifdef __APPLE__
     if (DiscProbeMacOSPermission(obj, devpath) != VLC_SUCCESS) {
         free(devpath);
         return NULL;
     }
+#endif
 
     /* Open CDDA */
     vcddev_t *dev = ioctl_Open(obj, devpath);

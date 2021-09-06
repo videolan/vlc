@@ -195,11 +195,13 @@ static int Open( vlc_object_t *p_this )
     if( unlikely(psz_file == NULL) )
         return VLC_EGENERIC;
 
+#ifdef __APPLE__
     if( DiscProbeMacOSPermission( p_this, psz_file ) != VLC_SUCCESS )
     {
         free( psz_file );
         return VLC_EGENERIC;
     }
+#endif
 
     /* Open dvdread */
 #if DVDREAD_VERSION < DVDREAD_VERSION_CODE(6, 1, 2)
