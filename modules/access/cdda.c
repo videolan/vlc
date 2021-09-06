@@ -219,6 +219,8 @@ static int DemuxControl(demux_t *demux, int query, va_list args)
 
         case DEMUX_SET_POSITION:
             sys->position = lround(va_arg(args, double) * sys->length);
+            date_Set(&sys->pts, VLC_TICK_0);
+            date_Increment(&sys->pts, sys->position);
             break;
 
         case DEMUX_GET_LENGTH:
@@ -229,6 +231,8 @@ static int DemuxControl(demux_t *demux, int query, va_list args)
             break;
         case DEMUX_SET_TIME:
             sys->position = samples_from_vlc_tick(va_arg(args, vlc_tick_t), CD_ROM_CDDA_FRAMES);
+            date_Set(&sys->pts, VLC_TICK_0);
+            date_Increment(&sys->pts, sys->position);
             break;
 
         default:
