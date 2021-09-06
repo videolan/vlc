@@ -677,24 +677,21 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
     const vcddev_toc_t *p_toc = sys->p_toc;
 
     /* Build title table */
-    const int i_start_cddb_offset = sys->i_cdda_first - sys->p_toc->i_first_track;
+    const int cdda_offset = sys->i_cdda_first - p_toc->i_first_track;
     for (int i = 0; i < sys->i_cdda_tracks; i++)
     {
-        if(i < i_start_cddb_offset)
-            continue;
-
-        msg_Dbg(access, "track[%d] start=%d", i, p_toc->p_sectors[i].i_lba);
+        msg_Dbg(access, "track[%d] start=%d", i, p_toc->p_sectors[i + cdda_offset].i_lba);
 
         /* Initial/default name */
         char *name;
 
         if (unlikely(asprintf(&name, _("Audio CD - Track %02i"),
-                              i - i_start_cddb_offset + 1 ) == -1))
+                              i + 1 ) == -1))
             name = NULL;
 
         /* Create playlist items */
-        int i_first_sector = p_toc->p_sectors[i].i_lba;
-        int i_last_sector = p_toc->p_sectors[i + 1].i_lba;
+        int i_first_sector = p_toc->p_sectors[i + cdda_offset].i_lba;
+        int i_last_sector = p_toc->p_sectors[i + cdda_offset + 1].i_lba;
         if(sys->i_cdda_first + i == sys->i_cdda_last &&
            p_toc->i_last_track > sys->i_cdda_last)
             i_last_sector -= CD_ROM_XA_INTERVAL;
@@ -717,8 +714,7 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
             free(opt);
         }
 
-        if (likely(asprintf(&opt, "cdda-first-sector=%i",
-                            p_toc->p_sectors[i].i_lba) != -1))
+        if (likely(asprintf(&opt, "cdda-first-sector=%i", i_first_sector) != -1))
         {
             input_item_AddOption(item, opt, VLC_INPUT_OPTION_TRUSTED);
             free(opt);
