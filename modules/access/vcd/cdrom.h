@@ -55,8 +55,6 @@ enum {
 /* sector containing the entry points */
 #define VCD_ENTRIES_SECTOR  151
 
-/* where the data start on a CDDA sector */
-#define CDDA_DATA_START     0
 /* size of the available data on a CDDA sector */
 #define CDDA_DATA_SIZE      CD_RAW_SECTOR_SIZE
 /* size of a CDDA sector, header and tail included */
