@@ -28,6 +28,12 @@
 #include <vlc_interface.h> /* intf_thread_t */
 
 #include <windows.h>
+
+# if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x603)
+#  undef _WIN32_WINNT
+#  define _WIN32_WINNT 0x0603
+# endif
+
 #include <d3d11.h>
 #include <dcomp.h>
 #include <wrl.h>

@@ -21,6 +21,11 @@
 #include "compositor.hpp"
 
 #include <windows.h>
+
+# if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x603)
+#  undef _WIN32_WINNT
+#  define _WIN32_WINNT 0x0603
+# endif
 #include <dcomp.h>
 #include <d3d11.h>
 #include <wrl.h>
