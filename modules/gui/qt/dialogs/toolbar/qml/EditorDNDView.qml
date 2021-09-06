@@ -40,13 +40,6 @@ ListView {
         policy: playerBtnDND.contentWidth > playerBtnDND.width ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
     }
 
-    function wheelScroll(delta) {
-        if (delta > 0)
-            scrollBar.decrease()
-        else
-            scrollBar.increase()
-    }
-
     remove: Transition {
         NumberAnimation {
             property: "opacity"; from: 1.0; to: 0
@@ -91,13 +84,26 @@ ListView {
     
     MouseArea {
         anchors.fill: parent
+
+        acceptedButtons: Qt.NoButton
         z: -1
 
-        onWheel: {
-            wheelScroll(wheel.angleDelta.y)
-        }
-
         cursorShape: root.dragActive ? Qt.DragMoveCursor : Qt.ArrowCursor
+
+        onWheel: {
+            // scrolling based on angleDelta.x is handled by the listview itself
+            var y = wheel.angleDelta.y
+
+            if (y > 0) {
+                scrollBar.decrease()
+                wheel.accepted = true
+            } else if (y < 0) {
+                scrollBar.increase()
+                wheel.accepted = true
+            } else {
+                wheel.accepted = false
+            }
+        }
     }
 
     footer: Item {
