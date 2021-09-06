@@ -883,12 +883,31 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
      * about the cuefile */
     p_toc->i_tracks = 0;
 
+    int track_subcodes = 0x00;
+
     while( fgets( line, 1024, cuefile ) && p_toc->i_tracks < INT_MAX-1 )
     {
         /* look for a TRACK line */
-        char psz_dummy[10];
-        if( !sscanf( line, "%9s", psz_dummy ) || strcmp(psz_dummy, "TRACK") )
+        unsigned track_num;
+        char psz_track_type[32];
+        const char *track_start = strstr(line, "TRACK ");
+        if( track_start == NULL )
             continue;
+        track_start += 6; // skip the "TRACK " part
+        int i = sscanf( track_start, "%u %31s", &track_num, psz_track_type );
+        if( i != 2 ) // no type set: assume audio track
+            psz_track_type[0] = '\0';
+        if( i<=0 )
+            i = sscanf( track_start, "%u", &track_num);
+        if( i<=0 )
+            continue;
+        if ( psz_track_type[0] && strcmp(psz_track_type,"AUDIO")!=0)
+        {
+            msg_Dbg( p_this, "detected %s track %02u", psz_track_type, track_num);
+            track_subcodes = CD_ROM_DATA_FLAG;
+        }
+        else
+            track_subcodes = 0x00;
 
         /* look for an INDEX line */
         while( fgets( line, 1024, cuefile ) )
@@ -905,7 +924,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
                 goto error;
             p_toc->p_sectors = buf;
             p_toc->p_sectors[p_toc->i_tracks].i_lba = MSF_TO_LBA(i_min, i_sec, i_frame);
-            p_toc->p_sectors[p_toc->i_tracks].i_control = 0x00;
+            p_toc->p_sectors[p_toc->i_tracks].i_control = track_subcodes;
             msg_Dbg( p_this, "vcd track %i begins at sector:%i",
                      p_toc->i_tracks, p_toc->p_sectors[p_toc->i_tracks].i_lba );
             p_toc->i_tracks++;
@@ -921,10 +940,9 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
     p_toc->p_sectors = buf;
     p_toc->p_sectors[p_toc->i_tracks].i_lba =
             lseek(p_vcddev->i_vcdimage_handle, 0, SEEK_END) / VCD_SECTOR_SIZE;
-    p_toc->p_sectors[p_toc->i_tracks].i_control = 0x00;
-    msg_Dbg( p_this, "vcd track %i, begins at sector:%i",
-             p_toc->i_tracks, p_toc->p_sectors[p_toc->i_tracks].i_lba );
-    p_toc->i_tracks++;
+    p_toc->p_sectors[p_toc->i_tracks].i_control = track_subcodes;
+    msg_Dbg( p_this, "vcd tracks end at sector:%i",
+             p_toc->p_sectors[p_toc->i_tracks].i_lba );
     p_toc->i_first_track = 1;
     p_toc->i_last_track = p_toc->i_tracks;
     i_ret = 0;
