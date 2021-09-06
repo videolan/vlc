@@ -856,7 +856,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
     p_vcddev->i_vcdimage_handle = vlc_open( psz_vcdfile,
                                     O_RDONLY | O_NONBLOCK | O_BINARY );
 
-    while( fgets( line, 1024, cuefile ) && !b_found )
+    while( !b_found && fgets( line, 1024, cuefile ) )
     {
         /* We have a cue file, but no valid vcd file yet */
         char filename[1024];
