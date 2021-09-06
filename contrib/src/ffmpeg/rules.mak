@@ -215,6 +215,10 @@ ifdef HAVE_NACL
 FFMPEGCONF+=--disable-inline-asm --disable-asm --target-os=linux
 endif
 
+ifdef HAVE_EMSCRIPTEN
+FFMPEGCONF+= --arch=wasm32 --target-os=emscripten
+endif
+
 # Build
 PKGS += ffmpeg
 ifeq ($(call need_pkg,"libavcodec >= $(FFMPEG_LAVC_MIN) libavformat >= 53.21.0 libswscale"),)
@@ -247,6 +251,7 @@ endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch
 endif
+	$(APPLY) $(SRC)/ffmpeg/0001-ffmpeg-add-target_os-support-for-emscripten.patch
 	$(MOVE)
 
 .ffmpeg: ffmpeg
