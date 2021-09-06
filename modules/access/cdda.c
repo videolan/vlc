@@ -186,10 +186,6 @@ static int DemuxControl(demux_t *demux, int query, va_list args)
 {
     demux_sys_t *sys = demux->p_sys;
 
-    /* One sector is 40000/3 µs */
-    static_assert (CDDA_DATA_SIZE * CLOCK_FREQ * 3 ==
-                   4 * 44100 * INT64_C(40000), "Wrong time/sector ratio");
-
     switch (query)
     {
         case DEMUX_CAN_SEEK:
@@ -215,13 +211,13 @@ static int DemuxControl(demux_t *demux, int query, va_list args)
             break;
 
         case DEMUX_GET_LENGTH:
-            *va_arg(args, vlc_tick_t *) = (INT64_C(40000) * sys->length) / 3;
+            *va_arg(args, vlc_tick_t *) = vlc_tick_from_samples(sys->length, CD_ROM_CDDA_FRAMES);
             break;
         case DEMUX_GET_TIME:
-            *va_arg(args, vlc_tick_t *) = (INT64_C(40000) * sys->position) / 3;
+            *va_arg(args, vlc_tick_t *) = vlc_tick_from_samples(sys->position, CD_ROM_CDDA_FRAMES);
             break;
         case DEMUX_SET_TIME:
-            sys->position = (va_arg(args, vlc_tick_t) * 3) / INT64_C(40000);
+            sys->position = samples_from_vlc_tick(va_arg(args, vlc_tick_t), CD_ROM_CDDA_FRAMES);
             break;
 
         default:
@@ -704,8 +700,7 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
             i_last_sector -= CD_ROM_XA_INTERVAL;
 
         const vlc_tick_t duration =
-            (vlc_tick_t)(i_last_sector - i_first_sector)
-            * CDDA_DATA_SIZE * CLOCK_FREQ / 44100 / 2 / 2;
+            vlc_tick_from_samples(i_last_sector - i_first_sector, CD_ROM_CDDA_FRAMES);
 
         input_item_t *item = input_item_NewDisc(access->psz_url,
                                                 (name != NULL) ? name :
