@@ -24,6 +24,8 @@
 #ifndef VLC_CDROM_H
 #define VLC_CDROM_H
 
+#include <assert.h>
+
 enum {
     CDDA_TYPE = 0,
     VCD_TYPE  = 1,
@@ -59,17 +61,20 @@ enum {
 #define CDDA_DATA_SIZE      CD_RAW_SECTOR_SIZE
 /* size of a CDDA sector, header and tail included */
 #define CDDA_SECTOR_SIZE    CD_RAW_SECTOR_SIZE
+/* number of audio frames per second */
+#define CD_ROM_CDDA_FRAMES  ((44100 * 4) / CDDA_DATA_SIZE)
 
 /*****************************************************************************
  * Misc. Macros
  *****************************************************************************/
 static inline int MSF_TO_LBA(uint8_t min, uint8_t sec, uint8_t frame)
 {
-    return (int)(frame + 75 * (sec + 60 * min));
+    static_assert(((44100 * 4) % CDDA_DATA_SIZE) == 0, "bogus CDDA_DATA_SIZE");
+    return (int)(frame + CD_ROM_CDDA_FRAMES * (sec + 60 * min));
 }
 static inline int MSF_TO_LBA2(uint8_t min, uint8_t sec, uint8_t frame)
 {
-    return (int)(frame + 75 * (sec -2 + 60 * min));
+    return (int)(frame + CD_ROM_CDDA_FRAMES * (sec -2 + 60 * min));
 }
 
 /* Converts BCD to Binary data */
