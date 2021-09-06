@@ -131,7 +131,7 @@ static vcddev_t *DiscOpen(vlc_object_t *obj, const char *location,
 }
 
 /* how many blocks Demux() will read in each iteration */
-#define CDDA_BLOCKS_ONCE 20
+#define CDDA_BLOCKS_ONCE 20 // ~267 ms
 
 typedef struct
 {
