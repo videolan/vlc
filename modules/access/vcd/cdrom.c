@@ -49,6 +49,7 @@
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_access.h>
@@ -1342,7 +1343,7 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
 {
     char *pppsz_info[CDTEXT_MAX_TRACKS + 1][0x10];
     int i_track_last = -1;
-    if( i_buffer < 4 )
+    if( i_buffer <= 4 )
         return -1;
 
     p_buffer += 4;
