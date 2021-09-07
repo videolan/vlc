@@ -28,7 +28,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///playlist/" as PL
 
 
-FocusScope {
+Control {
     id: root
 
     enum TimeTextPosition {
@@ -55,9 +55,7 @@ FocusScope {
     Keys.onPressed: root.Navigation.defaultKeyAction(event)
     Navigation.cancelAction: function() { history.previous() }
 
-    onActiveFocusChanged: if (activeFocus) trackPositionSlider.forceActiveFocus()
-
-    implicitHeight: columnLayout.implicitHeight
+    onActiveFocusChanged: if (activeFocus) trackPositionSlider.forceActiveFocus(focusReason)
 
     Component.onCompleted: {
         // if initially textPosition = Hide, then _onTextPositionChanged isn't called
@@ -110,9 +108,9 @@ FocusScope {
         row2.visible = row2.children.length > 0
     }
 
-    ColumnLayout {
+    contentItem: ColumnLayout {
         id: columnLayout
-        anchors.fill: parent
+
         spacing: VLCStyle.margin_xsmall
 
         RowLayout {
@@ -131,30 +129,20 @@ FocusScope {
             Layout.fillWidth: true
         }
 
-        Item {
+        PlayerButtonsLayout {
+            id: playerButtonsLayout
+
             Layout.fillWidth: true
             Layout.leftMargin: VLCStyle.margin_large
             Layout.rightMargin: VLCStyle.margin_large
             Layout.bottomMargin: VLCStyle.margin_xsmall
             Layout.preferredHeight: playerButtonsLayout.implicitHeight
 
-            PlayerButtonsLayout {
-                id: playerButtonsLayout
+            Navigation.upItem: trackPositionSlider.enabled ? trackPositionSlider : root.Navigation.upItem
 
-                anchors {
-                    fill: parent
+            colors: root.colors
 
-                    leftMargin: VLCStyle.applicationHorizontalMargin
-                    rightMargin: VLCStyle.applicationHorizontalMargin
-                    bottomMargin: VLCStyle.applicationVerticalMargin
-                }
-
-                Navigation.upItem: trackPositionSlider.enabled ? trackPositionSlider : root.Navigation.upItem
-
-                colors: root.colors
-
-                onRequestLockUnlockAutoHide: root.requestLockUnlockAutoHide(lock, source)
-            }
+            onRequestLockUnlockAutoHide: root.requestLockUnlockAutoHide(lock, source)
         }
     }
 
