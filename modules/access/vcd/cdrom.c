@@ -1443,6 +1443,7 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
             case cd_text_performer:
             case cd_text_message:
             case cd_text_genre:
+            case cd_text_ean_isrc:
             {
                 CdTextParsePackText( p_pack, e_textpackcharset,
                                      &i_textbuffer, &i_repeatbuffer, textbuffer,
@@ -1454,7 +1455,6 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
             case cd_text_arrangers:
             case cd_text_discid:
             case cd_text_closed_info:
-            case cd_text_ean_isrc:
             default:
                 continue;
         }
@@ -1518,12 +1518,18 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
                 vlc_meta_SetGenre( p_track,
                                    psz_value ? psz_value : psz_default );
                 break;
+            case cd_text_ean_isrc:
+            {
+                if ( i == 0 )
+                    vlc_meta_AddExtra( p_track, "EAN/UPN", psz_default );
+                else if ( psz_value )
+                    vlc_meta_AddExtra( p_track, "ISRC", psz_value );
+            }
             /* FIXME unsupported:
              * cd_text_songwriter
              * cd_text_composer
              * cd_text_arrangers
-             * cd_text_discid
-             * cd_text_ean_isrc */
+             * cd_text_discid */
             }
         }
     }
