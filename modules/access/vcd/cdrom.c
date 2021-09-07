@@ -1195,6 +1195,24 @@ enum cdtext_charset_e
     CDTEXT_CHARSET_MSJIS = 0x80,
 };
 
+typedef enum {
+    cd_text_title       = 0x80,
+    cd_text_performer   = 0x81,
+    cd_text_songwriter  = 0x82,
+    cd_text_composer    = 0x83,
+    cd_text_arrangers   = 0x84,
+    cd_text_message     = 0x85,
+    cd_text_discid      = 0x86, // text & binary (track 0)
+    cd_text_genre       = 0x87, // text & binary (track 0)
+    cd_text_TOC         = 0x88, // binary (track 0)
+    cd_text_TOC2        = 0x89, // binary (track 0)
+    cd_text_closed_info = 0x8d, // (track 0)
+    cd_text_ean_isrc    = 0x8e,
+    cd_text_block_size  = 0x8f, // binary
+
+    cd_text_meta_invalid = 0x00,
+} cd_text_pack_type;
+
 static void CdTextAppendPayload( const char *buffer, size_t i_len,
                                  enum cdtext_charset_e e_charset, char **ppsz_text )
 {
@@ -1355,9 +1373,10 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
     {
         const uint8_t *p_pack = &p_buffer[CDTEXT_PACK_SIZE*i];
         const uint8_t i_block_number = (p_pack[3] >> 4) & 0x07;
+        const cd_text_pack_type i_pack_type = p_pack[0];
         if( i_block_number > 0 )
             continue;
-        if( p_pack[0] == 0x8f )
+        if( i_pack_type == cd_text_block_size )
         {
             const int i_track = p_pack[1] & 0x7f;
             /* can't be higher than 3 blocks */
@@ -1391,12 +1410,12 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
     char textbuffer[CDTEXT_TEXT_BUFFER];
     size_t i_textbuffer = 0;
     size_t i_repeatbuffer = 0;
-    uint8_t i_prev_pack_type = 0x00;
+    cd_text_pack_type i_prev_pack_type = cd_text_meta_invalid;
 
     for( int i = 0; i < i_buffer/CDTEXT_PACK_SIZE; i++ )
     {
         const uint8_t *p_pack = &p_buffer[CDTEXT_PACK_SIZE*i];
-        const uint8_t i_pack_type = p_pack[0];
+        const cd_text_pack_type i_pack_type = p_pack[0];
         //const int i_sequence_number = p_block[2];
         const uint8_t i_block_number = (p_pack[3] >> 4) & 0x07;
         //const int i_crc = (p_block[4+12] << 8) | (p_block[4+13] << 0);
@@ -1413,29 +1432,29 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
             i_block_number > 0 /* support only first language */
            )
         {
-            i_prev_pack_type = 0x00;
+            i_prev_pack_type = cd_text_meta_invalid;
             continue;
         }
 
         /* */
         switch( i_pack_type )
         {
-            case 0x80:
-            case 0x81:
-            case 0x85:
-            case 0x87:
+            case cd_text_title:
+            case cd_text_performer:
+            case cd_text_message:
+            case cd_text_genre:
             {
                 CdTextParsePackText( p_pack, e_textpackcharset,
                                      &i_textbuffer, &i_repeatbuffer, textbuffer,
                                      &i_track_last, pppsz_info );
                 break;
             }
-            case 0x82:
-            case 0x83:
-            case 0x84:
-            case 0x86:
-            case 0x8d:
-            case 0x8e:
+            case cd_text_songwriter:
+            case cd_text_composer:
+            case cd_text_arrangers:
+            case cd_text_discid:
+            case cd_text_closed_info:
+            case cd_text_ean_isrc:
             default:
                 continue;
         }
@@ -1472,7 +1491,7 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
             }
             switch( 0x80 + j )
             {
-            case 0x80: /* Album/Title */
+            case cd_text_title:
                 if( i == 0 )
                 {
                     vlc_meta_SetAlbum( p_track, psz_value );
@@ -1485,25 +1504,26 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
                         vlc_meta_SetAlbum( p_track, psz_default );
                 }
                 break;
-            case 0x81: /* Performer */
+            case cd_text_performer:
                 vlc_meta_SetArtist( p_track,
                                     psz_value ? psz_value : psz_default );
                 if ( psz_value && i != 0 )
                     vlc_meta_SetAlbumArtist( p_track, psz_default );
                 break;
-            case 0x85: /* Messages */
+            case cd_text_message:
                 vlc_meta_SetDescription( p_track,
                                          psz_value ? psz_value : psz_default );
                 break;
-            case 0x87: /* Genre */
+            case cd_text_genre:
                 vlc_meta_SetGenre( p_track,
                                    psz_value ? psz_value : psz_default );
                 break;
             /* FIXME unsupported:
-             * 0x82: songwriter
-             * 0x83: composer
-             * 0x84: arrenger
-             * 0x86: disc id */
+             * cd_text_songwriter
+             * cd_text_composer
+             * cd_text_arrangers
+             * cd_text_discid
+             * cd_text_ean_isrc */
             }
         }
     }
