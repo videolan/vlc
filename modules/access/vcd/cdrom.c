@@ -1409,9 +1409,7 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
         }
         i_prev_pack_type = i_pack_type;
 
-        uint8_t i_track = p_pack[1] & 0x7f;
-        if( i_track > CDTEXT_MAX_TRACKS ||
-            (p_pack[1] & 0x80) /* extension flag */ ||
+        if( (p_pack[1] & 0x80) /* extension flag */ ||
             i_block_number > 0 /* support only first language */
            )
         {
