@@ -13,8 +13,8 @@ ifdef HAVE_WINSTORE
 PKGS += winrt_headers
 PKGS_ALL += winrt_headers
 endif
-PKGS += dxvahd
-PKGS_ALL += dxvahd
+PKGS += dxvahd dcomp
+PKGS_ALL += dxvahd dcomp
 ifeq ($(HAVE_MINGW64_V8),true)
 PKGS_FOUND += winrt_headers dxvahd
 endif
@@ -33,6 +33,7 @@ $(TARBALLS)/mingw-w64-v$(WINPTHREADS_VERSION).tar.bz2:
 pthreads: mingw-w64-v$(WINPTHREADS_VERSION).tar.bz2 .sum-pthreads
 #pthreads: mingw-w64-$(WINPTHREADS_HASH).tar.xz .sum-pthreads
 	$(UNPACK)
+	$(APPLY) $(SRC)/pthreads/0001-dcomp.h-add-some-missing-interfaces.patch
 	$(MOVE)
 
 .pthreads: pthreads
@@ -54,4 +55,12 @@ pthreads: mingw-w64-v$(WINPTHREADS_VERSION).tar.bz2 .sum-pthreads
 .dxvahd: pthreads
 	mkdir -p -- "$(PREFIX)/include"
 	cd $< && cp mingw-w64-headers/include/dxvahd.h "$(PREFIX)/include"
+	touch $@
+
+.sum-dcomp: .sum-pthreads
+	touch $@
+
+.dcomp: pthreads
+	mkdir -p -- "$(PREFIX)/include"
+	cd $< && cp mingw-w64-headers/include/dcomp.h "$(PREFIX)/include"
 	touch $@
