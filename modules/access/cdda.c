@@ -88,10 +88,21 @@ static vcddev_t *DiscOpen(vlc_object_t *obj, const char *location,
         const char *sl = strrchr(dec, '/');
         if (sl != NULL)
         {
-            if (sscanf(sl, "/Track %2u", trackp) == 1)
+            unsigned track = 0;
+
+            /* Match a location in the form "/" or "/Track <number>*".  If
+             * there's no match or if it's 0 (invalid), read the whole disk --
+             * but leave *trackp to the inherited value from cdda-track option.
+             * It's important not to reset it to 0 because although it means
+             * "whole disk" we must not switch back to that mode if we get
+             * called for a specific track later on, at the risk of recursing
+             * forever. */
+            if (sl[1] == '\0' || sscanf(sl, "/Track %2u", &track) == 1)
+            {
+                if (track != 0)
+                    *trackp = track;
                 dec[sl - dec] = '\0';
-            else
-                *trackp = 0;
+            }
         }
 
         if (unlikely(asprintf(&devpath, "/dev/%s", dec) == -1))
