@@ -1443,6 +1443,9 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
             case cd_text_performer:
             case cd_text_message:
             case cd_text_genre:
+            case cd_text_songwriter:
+            case cd_text_composer:
+            case cd_text_arrangers:
             case cd_text_ean_isrc:
             {
                 CdTextParsePackText( p_pack, e_textpackcharset,
@@ -1450,9 +1453,6 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
                                      &i_track_last, pppsz_info );
                 break;
             }
-            case cd_text_songwriter:
-            case cd_text_composer:
-            case cd_text_arrangers:
             case cd_text_discid:
             case cd_text_closed_info:
             default:
@@ -1518,6 +1518,20 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
                 vlc_meta_SetGenre( p_track,
                                    psz_value ? psz_value : psz_default );
                 break;
+            case cd_text_songwriter:
+                // lyrics
+                vlc_meta_AddExtra( p_track, "AUTHOR",
+                                   psz_value ? psz_value : psz_default );
+                break;
+            case cd_text_composer:
+                // music
+                vlc_meta_AddExtra( p_track, "COMPOSER",
+                                   psz_value ? psz_value : psz_default );
+                break;
+            case cd_text_arrangers:
+                vlc_meta_AddExtra( p_track, "ARRANGER",
+                                   psz_value ? psz_value : psz_default );
+                break;
             case cd_text_ean_isrc:
             {
                 if ( i == 0 )
@@ -1526,9 +1540,6 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
                     vlc_meta_AddExtra( p_track, "ISRC", psz_value );
             }
             /* FIXME unsupported:
-             * cd_text_songwriter
-             * cd_text_composer
-             * cd_text_arrangers
              * cd_text_discid */
             }
         }
