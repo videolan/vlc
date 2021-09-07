@@ -327,7 +327,7 @@ FocusScope {
                             focus: true
 
                             rightPadding: VLCStyle.applicationHorizontalMargin
-                            bottomPadding: Math.max(VLCStyle.applicationVerticalMargin - miniPlayer.height, 0)
+                            bottomPadding: topPadding + Math.max(VLCStyle.applicationVerticalMargin - miniPlayer.height, 0)
 
                             Navigation.parentItem: medialibId
                             Navigation.leftItem: stackView
