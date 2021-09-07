@@ -208,7 +208,7 @@ Control {
         }
 
         onSelected: {
-            browse(control._menuModel[index].tree, Qt.MouseFocusReason)
+            browse(control._menuModel[index].tree, focusReason)
         }
     }
 }

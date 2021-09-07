@@ -59,6 +59,10 @@ Widgets.PageLoader {
         isViewMultiView = currentItem.isViewMultiView === undefined || currentItem.isViewMultiView
     }
 
+    function setCurrentItemFocus(reason) {
+        stackView.currentItem.setCurrentItemFocus(reason);
+    }
+
     Component {
         id: sourceRootComponent
 
@@ -69,9 +73,9 @@ Widgets.PageLoader {
                 path: [{display: deviceModel.name, tree: {}}]
 
                 onHomeButtonClicked: {
-                    history.push(["mc", "discover", "services"])
+                    history.push(["mc", "discover", "services"]);
 
-                    stackView.currentItem.setCurrentItemFocus(reason)
+                    root.setCurrentItemFocus(reason);
                 }
             }
 
@@ -80,9 +84,10 @@ Widgets.PageLoader {
 
             onBrowse: {
                 history.push(["mc", "discover", "services", "source_browse",
-                              { tree: tree, "root_name": deviceModel.name, "source_name": source_name }])
+                              { tree: tree, "root_name": deviceModel.name,
+                                "source_name": source_name }]);
 
-                stackView.currentItem.setCurrentItemFocus(reason)
+                root.setCurrentItemFocus(reason);
             }
 
             NetworkDeviceModel {
@@ -115,19 +120,28 @@ Widgets.PageLoader {
                 }
 
                 onHomeButtonClicked: {
-                    history.push(["mc", "discover", "services"])
+                    history.push(["mc", "discover", "services"]);
 
-                    stackView.currentItem.setCurrentItemFocus(reason)
+                    root.setCurrentItemFocus(reason);
                 }
 
                 onBrowse: {
                     if (!!tree.isRoot)
-                        history.push(["mc", "discover", "services", "source_root", { source_name: tree.source_name }])
+                        history.push(["mc", "discover", "services", "source_root",
+                                      { source_name: tree.source_name }]);
                     else
-                        history.push(["mc", "discover", "services", "source_browse", { tree: tree, "root": root_name }])
+                        history.push(["mc", "discover", "services", "source_browse",
+                                      { tree: tree, "root": root_name }]);
 
-                    stackView.currentItem.setCurrentItemFocus(reason)
+                    root.setCurrentItemFocus(reason);
                 }
+            }
+
+            onBrowse: {
+                history.push(["mc", "discover", "services", "source_browse",
+                              { tree: tree, "root": root_name }]);
+
+                root.setCurrentItemFocus(reason);
             }
 
             providerModel: NetworkMediaModel {
@@ -136,13 +150,6 @@ Widgets.PageLoader {
 
             contextMenu: NetworkMediaContextMenu {
                 model: providerModel
-            }
-
-            onBrowse: {
-                history.push(["mc", "discover", "services", "source_browse",
-                                    { tree: tree, "root": root_name }])
-
-                stackView.currentItem.setCurrentItemFocus(reason)
             }
         }
     }
@@ -318,9 +325,12 @@ Widgets.PageLoader {
 
                 onItemDoubleClicked: {
                     if (is_dummy)
-                        history.push(["mc", "discover", "services", "services_manage"])
+                        history.push(["mc", "discover", "services", "services_manage"]);
                     else
-                        history.push(["mc", "discover", "services", "source_root", { source_name: model.name } ])
+                        history.push(["mc", "discover", "services", "source_root",
+                                      { source_name: model.name }]);
+
+                    root.setCurrentItemFocus(Qt.MouseFocusReason);
                 }
 
                 onItemClicked : {
@@ -387,17 +397,25 @@ Widgets.PageLoader {
 
             onSelectAll: selectionModel.selectAll()
             onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
+
             onActionAtIndex: {
-                var itemData = sourcesFilterModel.getDataAt(index)
+                var itemData = sourcesFilterModel.getDataAt(index);
+
                 if (itemData.type === NetworkSourcesModel.TYPE_DUMMY)
-                    history.push(["mc", "discover", "services", "services_manage"])
+                    history.push(["mc", "discover", "services", "services_manage"]);
                 else
-                    history.push(["mc", "discover", "services", "source_root", { source_name: itemData.name } ])
+                    history.push(["mc", "discover", "services", "source_root",
+                                  { source_name: itemData.name }]);
+
+                root.setCurrentItemFocus(Qt.TabFocusReason);
             }
 
             Navigation.parentItem: root
+
             Navigation.cancelAction: function() {
-                history.previous()
+                history.previous();
+
+                root.setCurrentItemFocus(Qt.TabFocusReason);
             }
 
             NetworkSourcesModel {
