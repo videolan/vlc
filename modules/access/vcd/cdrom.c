@@ -1488,6 +1488,8 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
             case 0x81: /* Performer */
                 vlc_meta_SetArtist( p_track,
                                     psz_value ? psz_value : psz_default );
+                if ( psz_value && i != 0 )
+                    vlc_meta_SetAlbumArtist( p_track, psz_default );
                 break;
             case 0x85: /* Messages */
                 vlc_meta_SetDescription( p_track,
