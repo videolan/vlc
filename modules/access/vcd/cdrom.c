@@ -1455,6 +1455,11 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
             /* */
             const char *psz_default = pppsz_info[0][j];
             const char *psz_value = pppsz_info[i][j];
+            // discard junk values
+            if (psz_value && (psz_value[0] == '\0' || (psz_value[0] == ' ' && psz_value[1] == '\0')))
+                psz_value = NULL;
+            if (psz_default && (psz_default[0] == '\0' || (psz_default[0] == ' ' && psz_default[1] == '\0')))
+                psz_default = NULL;
 
             if( !psz_value && !psz_default )
                 continue;
