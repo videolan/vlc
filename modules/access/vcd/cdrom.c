@@ -1531,15 +1531,13 @@ static int CdTextRead( vlc_object_t *p_object, const vcddev_t *p_vcddev,
 {
     VLC_UNUSED( p_object );
 
-    CDROM_READ_TOC_EX TOCEx;
-    memset(&TOCEx, 0, sizeof(TOCEx));
-    TOCEx.Format = CDROM_READ_TOC_EX_FORMAT_CDTEXT;
+    CDROM_READ_TOC_EX TOCEx = { .Format = CDROM_READ_TOC_EX_FORMAT_CDTEXT };
 
-    const int i_header_size = __MAX( 4, MINIMUM_CDROM_READ_TOC_EX_SIZE );
-    uint8_t header[i_header_size];
+    uint8_t header[4];
+    static_assert(ARRAY_SIZE(header) >= MINIMUM_CDROM_READ_TOC_EX_SIZE, "wrong header size");
     DWORD i_read;
     if( !DeviceIoControl( p_vcddev->h_device_handle, IOCTL_CDROM_READ_TOC_EX,
-                          &TOCEx, sizeof(TOCEx), header, i_header_size, &i_read, 0 ) )
+                          &TOCEx, sizeof(TOCEx), header, ARRAY_SIZE(header), &i_read, 0 ) )
         return -1;
 
     const int i_text = 2 + (header[0] << 8) + header[1];
