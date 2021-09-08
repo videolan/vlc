@@ -430,13 +430,6 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
     avail.signal();
 }
 
-bool HTTPChunkBufferedSource::prepare()
-{
-    if(!prepared)
-        return HTTPChunkSource::prepare();
-    return true;
-}
-
 bool HTTPChunkBufferedSource::hasMoreData() const
 {
     mutex_locker locker {lock};
