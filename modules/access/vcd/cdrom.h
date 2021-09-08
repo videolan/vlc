@@ -43,7 +43,12 @@ enum {
 #define CD_ROM_XA_INTERVAL ((60 + 90 + 2) * CD_ROM_XA_FRAMES)
 
 /* Subcode control flag */
-#define CD_ROM_DATA_FLAG    0x04
+#define CD_ROM_SUBCODE_NONE           0x00
+#define CD_ROM_SUBCODE_PRE_EMPHASIS   0x01
+#define CD_ROM_SUBCODE_COPY_PERMITTED 0x02
+#define CD_ROM_SUBCODE_DATA           0x04
+#define CD_ROM_SUBCODE_4CH            0x08
+#define CD_ROM_SUBCODE_SCMS           0x10
 
 /* size of a CD sector */
 #define CD_SECTOR_SIZE      CD_ROM_MODE1_DATA_SIZE

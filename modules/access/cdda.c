@@ -256,13 +256,13 @@ static int TOC_GetAudioRange(vcddev_toc_t *p_toc,
     int i_last = p_toc->i_last_track;
     for(int i=i_first; i<p_toc->i_tracks; i++)
     {
-        if((p_toc->p_sectors[i - 1].i_control & CD_ROM_DATA_FLAG) == 0)
+        if((p_toc->p_sectors[i - 1].i_control & CD_ROM_SUBCODE_DATA) == 0)
             break;
         i_first++;
     }
     for(int i=i_last; i > 0; i--)
     {
-        if((p_toc->p_sectors[i - 1].i_control & CD_ROM_DATA_FLAG) == 0)
+        if((p_toc->p_sectors[i - 1].i_control & CD_ROM_SUBCODE_DATA) == 0)
             break;
         i_last--;
     }

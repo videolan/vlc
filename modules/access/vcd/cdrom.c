@@ -883,7 +883,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
      * about the cuefile */
     p_toc->i_tracks = 0;
 
-    int track_subcodes = 0x00;
+    int track_subcodes = CD_ROM_SUBCODE_NONE;
 
     while( fgets( line, 1024, cuefile ) && p_toc->i_tracks < INT_MAX-1 )
     {
@@ -904,10 +904,10 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
         if ( psz_track_type[0] && strcmp(psz_track_type,"AUDIO")!=0)
         {
             msg_Dbg( p_this, "detected %s track %02u", psz_track_type, track_num);
-            track_subcodes = CD_ROM_DATA_FLAG;
+            track_subcodes = CD_ROM_SUBCODE_DATA;
         }
         else
-            track_subcodes = 0x00;
+            track_subcodes = CD_ROM_SUBCODE_NONE;
 
         /* look for an INDEX line */
         while( fgets( line, 1024, cuefile ) )
