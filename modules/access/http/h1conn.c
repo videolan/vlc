@@ -274,7 +274,16 @@ static void vlc_h1_stream_close(struct vlc_http_stream *stream, bool abort)
 
     assert(conn->active);
 
+    if (conn->connection_close)
+        /* Server requested closing the connection after this stream. */
+        abort = true;
+
+    if (conn->content_length > 0 && conn->content_length != UINTMAX_MAX)
+        /* Client left some data to be read, so pipelining is impossible. */
+        abort = true;
+
     if (abort)
+        /* Shut the underlying connection down and prevent reuse. */
         vlc_h1_stream_fatal(conn);
 
     conn->active = false;
