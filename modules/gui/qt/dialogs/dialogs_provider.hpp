@@ -136,7 +136,6 @@ public slots:
     void mediaInfoDialog( const PlaylistItem& pItem );
     void mediaCodecDialog();
     void prefsDialog();
-    void firstRunDialog();
     void extendedDialog();
     void synchroDialog();
     void messagesDialog();
