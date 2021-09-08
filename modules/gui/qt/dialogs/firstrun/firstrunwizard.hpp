@@ -20,6 +20,7 @@
 #define VLC_FIRSTRUNWIZARD_H
 
 #include "ui_firstrunwizard.h"
+#include "util/singleton.hpp"
 
 #include <QObject>
 #include <QWizard>
@@ -27,13 +28,11 @@
 class MLFoldersEditor;
 class MLFoldersModel;
 
-class FirstRunWizard : public QWizard
+class FirstRunWizard : public QWizard, public Singleton<FirstRunWizard>
 {
     Q_OBJECT
-public:
-    FirstRunWizard ( qt_intf_t*, QWidget* parent = nullptr );
-
 private:
+    explicit FirstRunWizard ( qt_intf_t*, QWidget* parent = nullptr );
     enum { WELCOME_PAGE, FOLDER_PAGE, COLOR_SCHEME_PAGE, LAYOUT_PAGE };
     enum { MODERN, CLASSIC };
 
@@ -63,6 +62,8 @@ private slots:
     void updateLayoutLabel (QAbstractButton* );
     void imageColorSchemeClick ( QAbstractButton* );
     void imageLayoutClick( QAbstractButton* );
+
+    friend class Singleton<FirstRunWizard>;
 };
 
 #endif // VLC_FIRSTRUNWIZARD_H

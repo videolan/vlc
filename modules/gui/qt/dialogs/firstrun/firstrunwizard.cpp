@@ -38,7 +38,6 @@ FirstRunWizard::FirstRunWizard( qt_intf_t *_p_intf, QWidget *parent)
     /* Set windown properties */
     setWindowTitle( qtr( "Welcome" ) );
     setWindowModality( Qt::WindowModal );
-    setAttribute( Qt::WA_DeleteOnClose );
 
     /* Build the Ui */
     ui.setupUi( this );
