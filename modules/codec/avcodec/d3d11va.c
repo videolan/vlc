@@ -503,9 +503,10 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     vlc_va_sys_t *sys = va->sys;
     HRESULT hr;
 
-    ID3D10Multithread *pMultithread;
-    hr = ID3D11Device_QueryInterface( sys->d3d_dev->d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
+    void *pv;
+    hr = ID3D11Device_QueryInterface( sys->d3d_dev->d3ddevice, &IID_ID3D10Multithread, &pv);
     if (SUCCEEDED(hr)) {
+        ID3D10Multithread *pMultithread = pv;
         ID3D10Multithread_SetMultithreadProtected(pMultithread, TRUE);
         ID3D10Multithread_Release(pMultithread);
     }

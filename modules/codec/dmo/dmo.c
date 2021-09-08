@@ -633,6 +633,7 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     DWORD i_dummy;
 
     GETCLASS GetClass;
+    void *pv;
     IClassFactory *cFactory = NULL;
     IUnknown *cObject = NULL;
     const codec_dll *codecs_table = b_out ? encoders_table : decoders_table;
@@ -691,7 +692,7 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     }
 
     /* Pickup the first available codec */
-    *pp_dmo = 0;
+    *pp_dmo = NULL;
     while( ( S_OK == IEnumDMO_Next( p_enum_dmo, 1, &clsid_dmo,
                      &psz_dmo_name, &i_dummy /* NULL doesn't work */ ) ) )
     {
@@ -700,13 +701,15 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
 
         /* Create DMO */
         if( CoCreateInstance( &clsid_dmo, NULL, CLSCTX_INPROC,
-                              &IID_IMediaObject, (void **)pp_dmo ) )
+                              &IID_IMediaObject, &pv ) )
         {
             msg_Warn( p_this, "can't create DMO" );
-            *pp_dmo = 0;
         }
         else
+        {
+            *pp_dmo = pv;
             break;
+        }
     }
 
     IEnumDMO_Release( p_enum_dmo );
@@ -746,27 +749,25 @@ loader:
         return VLC_EGENERIC;
     }
 
-    i_err = GetClass( codecs_table[i_codec].p_guid, &IID_IClassFactory,
-                      (void**)&cFactory );
+    i_err = GetClass( codecs_table[i_codec].p_guid, &IID_IClassFactory, &pv );
 
-    if( i_err || cFactory == NULL )
+    if( i_err || pv == NULL )
     {
         msg_Dbg( p_this, "no such class object" );
         FreeLibrary( *p_hmsdmo_dll );
         return VLC_EGENERIC;
     }
+    cFactory = pv;
 
-    i_err = IClassFactory_CreateInstance( cFactory, 0, &IID_IUnknown,
-                                          (void**)&cObject );
+    i_err = IClassFactory_CreateInstance( cFactory, 0, &IID_IUnknown, &pv );
     IClassFactory_Release( cFactory );
-    if( i_err || !cObject )
+    if( i_err || !pv )
     {
         msg_Dbg( p_this, "class factory failure" );
         FreeLibrary( *p_hmsdmo_dll );
         return VLC_EGENERIC;
     }
-    i_err = IUnknown_QueryInterface( cObject, &IID_IMediaObject,
-                                        (void**)pp_dmo );
+    i_err = IUnknown_QueryInterface( cObject, &IID_IMediaObject, &pv );
     IUnknown_Release( cObject );
     if( i_err || !*pp_dmo )
     {
@@ -774,6 +775,7 @@ loader:
         FreeLibrary( *p_hmsdmo_dll );
         return VLC_EGENERIC;
     }
+    *pp_dmo = pv;
 
     return VLC_SUCCESS;
 }
@@ -1147,14 +1149,15 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     /* Get the private data for the codec */
     while( 1 )
     {
+        void *pv;
         IWMCodecPrivateData *p_privdata;
         uint8_t *p_data = 0;
         uint32_t i_data = 0, i_vih;
 
         i_err = IMediaObject_QueryInterface( p_dmo,
-                                           &IID_IWMCodecPrivateData,
-                                           (void**)&p_privdata );
+                                           &IID_IWMCodecPrivateData, &pv );
         if( i_err ) break;
+        p_privdata = pv;
 
         i_err = p_privdata->vt->SetPartialOutputType( p_privdata, &dmo_type );
         if( i_err )

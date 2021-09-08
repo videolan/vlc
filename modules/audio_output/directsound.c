@@ -382,6 +382,7 @@ static HRESULT CreateDSBuffer( vlc_object_t *obj, aout_stream_sys_t *sys,
     WAVEFORMATEXTENSIBLE waveformat;
     DSBUFFERDESC         dsbdesc;
     HRESULT              hr;
+    void                 *pv = NULL;
 
     /* First set the sound buffer format */
     waveformat.dwChannelMask = 0;
@@ -493,8 +494,8 @@ static HRESULT CreateDSBuffer( vlc_object_t *obj, aout_stream_sys_t *sys,
         msg_Dbg( obj, "channel reordering needed" );
 
     hr = IDirectSoundBuffer_QueryInterface( sys->p_dsbuffer,
-                                            &IID_IDirectSoundNotify,
-                                            (void **) &sys->p_notify );
+                                            &IID_IDirectSoundNotify, &pv );
+    sys->p_notify = pv;
     if( hr != DS_OK )
     {
         msg_Err( obj, "Couldn't query IDirectSoundNotify" );

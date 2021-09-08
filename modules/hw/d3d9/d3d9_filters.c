@@ -282,6 +282,7 @@ static int D3D9OpenAdjust(filter_t *filter)
     HRESULT hr;
     GUID *processorGUIDs = NULL;
     GUID *processorGUID = NULL;
+    void *pv;
     IDirectXVideoProcessorService *processor = NULL;
 
     if (filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE
@@ -315,13 +316,14 @@ static int D3D9OpenAdjust(filter_t *filter)
     }
 
     d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(filter->vctx_in);
-    hr = CreateVideoService( d3d9_decoder->d3ddev.dev, &IID_IDirectXVideoProcessorService,
-                            (void**)&processor);
+    hr = CreateVideoService( d3d9_decoder->d3ddev.dev,
+                             &IID_IDirectXVideoProcessorService, &pv);
     if (FAILED(hr))
     {
         msg_Err(filter, "Failed to create the video processor. (hr=0x%lX)", hr);
         goto error;
     }
+    processor = pv;
 
     DXVA2_VideoDesc dsc;
     ZeroMemory(&dsc, sizeof(dsc));

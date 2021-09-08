@@ -346,6 +346,7 @@ int D3D9OpenDeinterlace(filter_t *filter)
     HRESULT hr;
     GUID *processorGUIDs = NULL;
     GUID *processorGUID = NULL;
+    void *pv;
     IDirectXVideoProcessorService *processor = NULL;
 
     if (filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE
@@ -375,10 +376,11 @@ int D3D9OpenDeinterlace(filter_t *filter)
       (void *)GetProcAddress(hdecoder_dll, "DXVA2CreateVideoService");
     if (CreateVideoService == NULL)
         goto error;
-    hr = CreateVideoService( d3d9_decoder->d3ddev.dev, &IID_IDirectXVideoProcessorService,
-                            (void**)&processor);
+    hr = CreateVideoService( d3d9_decoder->d3ddev.dev,
+                             &IID_IDirectXVideoProcessorService, &pv );
     if (FAILED(hr))
         goto error;
+    processor = pv;
 
     DXVA2_VideoDesc dsc;
     ZeroMemory(&dsc, sizeof(dsc));

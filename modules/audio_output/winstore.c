@@ -156,12 +156,14 @@ static void WaitForAudioClient(audio_output_t *aout)
             msg_Dbg(aout, "Failed to get the device instance.");
         else
         {
-            hr = IUnknown_QueryInterface(audioInterface, &IID_IAudioClient, (void**)&sys->client);
+            void *pv;
+            hr = IUnknown_QueryInterface(audioInterface, &IID_IAudioClient, &pv);
             IUnknown_Release(audioInterface);
             if (unlikely(FAILED(hr)))
                 msg_Warn(aout, "The received interface is not a IAudioClient. (hr=0x%lX)", hr);
             else
             {
+                sys->client = pv;
                 sys->acquired_device = wcsdup(devId);
 
                 char *report = FromWide(devId);
@@ -171,9 +173,9 @@ static void WaitForAudioClient(audio_output_t *aout)
                     free(report);
                 }
 
-                IAudioClient2 *audioClient2;
-                if (SUCCEEDED(IAudioClient_QueryInterface(sys->client, &IID_IAudioClient2, (void**)&audioClient2)))
+                if (SUCCEEDED(IAudioClient_QueryInterface(sys->client, &IID_IAudioClient2, &pv)))
                 {
+                    IAudioClient2 *audioClient2 = pv;
                     // "BackgroundCapableMedia" does not work in UWP
                     AudioClientProperties props = (AudioClientProperties) {
                         .cbSize = sizeof(props),
@@ -279,6 +281,7 @@ static int VolumeSet(audio_output_t *aout, float vol)
     if( unlikely( sys->client == NULL ) )
         return VLC_EGENERIC;
     HRESULT hr;
+    void *pv = NULL;
     ISimpleAudioVolume *pc_AudioVolume = NULL;
 
     float linear_vol = vol * vol * vol; /* ISimpleAudioVolume is tapered linearly. */
@@ -293,12 +296,13 @@ static int VolumeSet(audio_output_t *aout, float vol)
 
     aout_GainRequest(aout, sys->gain);
 
-    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, (void**)&pc_AudioVolume);
+    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pv);
     if (FAILED(hr))
     {
         msg_Err(aout, "cannot get volume service (error 0x%lX)", hr);
         goto done;
     }
+    pc_AudioVolume = pv;
 
     hr = ISimpleAudioVolume_SetMasterVolume(pc_AudioVolume, linear_vol, NULL);
     if (FAILED(hr))
@@ -322,14 +326,16 @@ static int MuteSet(audio_output_t *aout, bool mute)
     if( unlikely( sys->client == NULL ) )
         return VLC_EGENERIC;
     HRESULT hr;
+    void *pv = NULL;
     ISimpleAudioVolume *pc_AudioVolume = NULL;
 
-    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, (void**)&pc_AudioVolume);
+    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pv);
     if (FAILED(hr))
     {
         msg_Err(aout, "cannot get volume service (error 0x%lX)", hr);
         goto done;
     }
+    pc_AudioVolume = pv;
 
     hr = ISimpleAudioVolume_SetMute(pc_AudioVolume, mute, NULL);
     if (FAILED(hr))

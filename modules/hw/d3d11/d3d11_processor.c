@@ -73,19 +73,22 @@ int D3D11_CreateProcessor(vlc_object_t *o, d3d11_device_t *d3d_dev,
                           d3d11_processor_t *out)
 {
     HRESULT hr;
+    void *pv;
     *out = (d3d11_processor_t) { 0 };
 
-    hr = ID3D11Device_QueryInterface(d3d_dev->d3ddevice, &IID_ID3D11VideoDevice, (void **)&out->d3dviddev);
+    hr = ID3D11Device_QueryInterface(d3d_dev->d3ddevice, &IID_ID3D11VideoDevice, &pv);
     if (FAILED(hr)) {
        msg_Err(o, "Could not Query ID3D11VideoDevice Interface. (hr=0x%lX)", hr);
        goto error;
     }
+    out->d3dviddev = pv;
 
-    hr = ID3D11DeviceContext_QueryInterface(d3d_dev->d3dcontext, &IID_ID3D11VideoContext, (void **)&out->d3dvidctx);
+    hr = ID3D11DeviceContext_QueryInterface(d3d_dev->d3dcontext, &IID_ID3D11VideoContext, &pv);
     if (FAILED(hr)) {
        msg_Err(o, "Could not Query ID3D11VideoContext Interface. (hr=0x%lX)", hr);
        goto error;
     }
+    out->d3dvidctx = pv;
 
     D3D11_VIDEO_PROCESSOR_CONTENT_DESC processorDesc = {
         .InputFrameFormat = srcFields,

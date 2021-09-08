@@ -44,10 +44,12 @@
 static char * GetFolderName(IStorageFolder *folder)
 {
     HRESULT hr;
+    void *pv;
     IStorageItem *item;
-    hr = IStorageFolder_QueryInterface(folder, &IID_IStorageItem, (void**)&item);
+    hr = IStorageFolder_QueryInterface(folder, &IID_IStorageItem, &pv);
     if (FAILED(hr))
         return NULL;
+    item = pv;
 
     char *result = NULL;
     HSTRING path;
@@ -68,6 +70,7 @@ static char *config_GetShellDir(vlc_userdir_t csidl)
     HRESULT hr;
     IStorageFolder *folder = NULL;
 
+    void *pv;
     IKnownFoldersStatics *knownFoldersStatics = NULL;
     static const WCHAR *className = L"Windows.Storage.KnownFolders";
     const UINT32 clen = wcslen(className);
@@ -78,15 +81,16 @@ static char *config_GetShellDir(vlc_userdir_t csidl)
     if (FAILED(hr))
         goto end_other;
 
-    hr = RoGetActivationFactory(hClassName, &IID_IKnownFoldersStatics, (void**)&knownFoldersStatics);
+    hr = RoGetActivationFactory(hClassName, &IID_IKnownFoldersStatics, &pv);
 
     if (FAILED(hr))
         goto end_other;
 
-    if (!knownFoldersStatics) {
+    if (!pv) {
         hr = E_FAIL;
         goto end_other;
     }
+    knownFoldersStatics = pv;
 
     switch (csidl) {
     case VLC_HOME_DIR:
@@ -161,6 +165,7 @@ static char *config_GetAppDir (void)
     HRESULT hr;
     IStorageFolder *folder = NULL;
 
+    void *pv;
     IApplicationDataStatics *appDataStatics = NULL;
     IApplicationData *appData = NULL;
     static const WCHAR *className = L"Windows.Storage.ApplicationData";
@@ -172,15 +177,16 @@ static char *config_GetAppDir (void)
     if (FAILED(hr))
         goto end_appdata;
 
-    hr = RoGetActivationFactory(hClassName, &IID_IApplicationDataStatics, (void**)&appDataStatics);
+    hr = RoGetActivationFactory(hClassName, &IID_IApplicationDataStatics, &pv);
 
     if (FAILED(hr))
         goto end_appdata;
 
-    if (!appDataStatics) {
+    if (!pv) {
         hr = E_FAIL;
         goto end_appdata;
     }
+    appDataStatics = pv;
 
     hr = IApplicationDataStatics_get_Current(appDataStatics, &appData);
 
@@ -218,6 +224,7 @@ static char *config_GetCacheDir (void)
 {
     HRESULT hr;
     IStorageFolder *folder = NULL;
+    void *pv;
     IApplicationDataStatics *appDataStatics = NULL;
     IApplicationData *appData = NULL;
     IApplicationData2 *appData2 = NULL;
@@ -230,15 +237,16 @@ static char *config_GetCacheDir (void)
     if (FAILED(hr))
         goto end_appdata;
 
-    hr = RoGetActivationFactory(hClassName, &IID_IApplicationDataStatics, (void**)&appDataStatics);
+    hr = RoGetActivationFactory(hClassName, &IID_IApplicationDataStatics, &pv);
 
     if (FAILED(hr))
         goto end_appdata;
 
-    if (!appDataStatics) {
+    if (!pv) {
         hr = E_FAIL;
         goto end_appdata;
     }
+    appDataStatics = pv;
 
     hr = IApplicationDataStatics_get_Current(appDataStatics, &appData);
 
@@ -250,11 +258,12 @@ static char *config_GetCacheDir (void)
         goto end_appdata;
     }
 
-    IApplicationData_QueryInterface(appData, &IID_IApplicationData2, (void**)&appData2);
-    if (!appData2) {
+    IApplicationData_QueryInterface(appData, &IID_IApplicationData2, &pv);
+    if (!pv) {
         hr = E_FAIL;
         goto end_appdata;
     }
+    appData2 = pv;
 
     hr = IApplicationData2_get_LocalCacheFolder(appData2, &folder);
 

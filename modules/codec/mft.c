@@ -972,9 +972,11 @@ static int InitializeMFT(decoder_t *p_dec)
             hr = IMFAttributes_SetUINT32(attributes, &MF_TRANSFORM_ASYNC_UNLOCK, true);
             if (FAILED(hr))
                 goto error;
-            hr = IMFTransform_QueryInterface(p_sys->mft, &IID_IMFMediaEventGenerator, (void**)&p_sys->event_generator);
+            void *pv;
+            hr = IMFTransform_QueryInterface(p_sys->mft, &IID_IMFMediaEventGenerator, &pv);
             if (FAILED(hr))
                 goto error;
+            p_sys->event_generator = pv;
         }
     }
 
@@ -1129,12 +1131,14 @@ static int FindMFT(decoder_t *p_dec)
     if (activate_objects_count == 0)
         return VLC_EGENERIC;
 
+    void *pv;
     for (UINT32 i = 0; i < activate_objects_count; ++i)
     {
-        hr = IMFActivate_ActivateObject(activate_objects[i], &IID_IMFTransform, (void**)&p_sys->mft);
+        hr = IMFActivate_ActivateObject(activate_objects[i], &IID_IMFTransform, &pv);
         IMFActivate_Release(activate_objects[i]);
         if (FAILED(hr))
             continue;
+        p_sys->mft = pv;
 
         if (InitializeMFT(p_dec) == VLC_SUCCESS)
         {

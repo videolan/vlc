@@ -613,11 +613,13 @@ error:
 
 IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev)
 {
-    IDXGIDevice *pDXGIDevice = NULL;
-    HRESULT hr = ID3D11Device_QueryInterface(d3ddev, &IID_IDXGIDevice, (void **)&pDXGIDevice);
+    IDXGIDevice *pDXGIDevice;
+    void *pv;
+    HRESULT hr = ID3D11Device_QueryInterface(d3ddev, &IID_IDXGIDevice, &pv);
     if (FAILED(hr)) {
         return NULL;
     }
+    pDXGIDevice = pv;
 
     IDXGIAdapter *p_adapter;
     hr = IDXGIDevice_GetAdapter(pDXGIDevice, &p_adapter);
@@ -911,9 +913,12 @@ void D3D11_LogResources(d3d11_decoder_device_t *dev_sys)
     d3d11_handle_t *hd3d = &sys->hd3d;
     if (hd3d->pf_DXGIGetDebugInterface)
     {
-        IDXGIDebug *pDXGIDebug;
-        if (SUCCEEDED(hd3d->pf_DXGIGetDebugInterface(&IID_IDXGIDebug, (void**)&pDXGIDebug)))
+        void *pv;
+        if (SUCCEEDED(hd3d->pf_DXGIGetDebugInterface(&IID_IDXGIDebug, &pv)))
+        {
+            IDXGIDebug *pDXGIDebug = pv;
             IDXGIDebug_ReportLiveObjects(pDXGIDebug, DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+        }
     }
 # endif
 #endif
