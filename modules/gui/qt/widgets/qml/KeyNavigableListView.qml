@@ -108,7 +108,8 @@ FocusScope {
         if (_currentFocusReason === Qt.OtherFocusReason)
             return;
 
-        if (currentItem)
+        // NOTE: We make sure the view has active focus before enforcing it on the item.
+        if (view.activeFocus && currentItem)
             Helpers.enforceFocus(currentItem, _currentFocusReason);
 
         _currentFocusReason = Qt.OtherFocusReason;
@@ -118,6 +119,9 @@ FocusScope {
 
     function setCurrentItemFocus(reason) {
         if (!model || model.count === 0) {
+            // NOTE: By default we want the focus on the flickable.
+            view.forceActiveFocus(reason);
+
             // NOTE: Saving the focus reason for later.
             _currentFocusReason = reason;
 
@@ -205,6 +209,9 @@ FocusScope {
 
         boundsBehavior: Flickable.StopAtBounds
         boundsMovement :Flickable.StopAtBounds
+
+        // NOTE: We always want a valid 'currentIndex' by default.
+        onCountChanged: if (count && currentIndex === -1) currentIndex = 0
 
         Keys.onPressed: {
             var newIndex = -1
