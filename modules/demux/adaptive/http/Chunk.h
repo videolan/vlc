@@ -158,7 +158,6 @@ namespace adaptive
                 HTTPChunkBufferedSource(const std::string &url, AbstractConnectionManager *,
                                         const ID &, ChunkType, const BytesRange &,
                                         bool = false);
-                virtual bool       prepare()  override;
                 void               bufferize(size_t);
                 bool               isDone() const;
                 void               hold();

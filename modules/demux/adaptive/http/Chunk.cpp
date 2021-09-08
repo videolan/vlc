@@ -436,13 +436,6 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
     vlc_cond_signal(&avail);
 }
 
-bool HTTPChunkBufferedSource::prepare()
-{
-    if(!prepared)
-        return HTTPChunkSource::prepare();
-    return true;
-}
-
 bool HTTPChunkBufferedSource::hasMoreData() const
 {
     vlc_mutex_locker locker( &lock );
