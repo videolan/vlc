@@ -832,7 +832,7 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
         char num[4];
         if(snprintf(num, sizeof (num), "%u", i + 1) < 4)
             input_item_SetTrackNum(item, num);
-        snprintf(num, sizeof (num), "%u", p_toc->i_tracks);
+        snprintf(num, sizeof (num), "%u", p_toc->i_last_track - p_toc->i_first_track);
         input_item_SetTrackTotal(item, num);
 
         input_item_node_AppendItem(node, item);
