@@ -765,17 +765,17 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
         if(sys->cdtextc > 0)
         {
             const vlc_meta_t *m;
-            if (i + 1 < sys->cdtextc && (m = sys->cdtextv[i + 1]) != NULL)
-            {
-                ON_EMPTY(title,       vlc_meta_Get(m, vlc_meta_Title));
-                ON_EMPTY(artist,      vlc_meta_Get(m, vlc_meta_Artist));
-                ON_EMPTY(genre,       vlc_meta_Get(m, vlc_meta_Genre));
-                ON_EMPTY(description, vlc_meta_Get(m, vlc_meta_Description));
-            }
 
             /* Album CDtext data */
             if ((m = sys->cdtextv[0]) != NULL)
             {
+                ON_EMPTY(genre,       vlc_meta_Get(m, vlc_meta_Genre));
+                ON_EMPTY(description, vlc_meta_Get(m, vlc_meta_Description));
+            }
+
+            if (i + 1 < sys->cdtextc && (m = sys->cdtextv[i + 1]) != NULL)
+            {
+                ON_EMPTY(title,       vlc_meta_Get(m, vlc_meta_Title));
                 ON_EMPTY(artist,      vlc_meta_Get(m, vlc_meta_Artist));
                 ON_EMPTY(album,       vlc_meta_Get(m, vlc_meta_Album));
                 ON_EMPTY(genre,       vlc_meta_Get(m, vlc_meta_Genre));
