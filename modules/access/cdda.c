@@ -739,6 +739,7 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
 
         const char *title = NULL;
         const char *artist = NULL;
+        const char *album_artist = NULL;
         const char *album = NULL;
         const char *genre = NULL;
         const char *description = NULL;
@@ -777,6 +778,7 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
             {
                 ON_EMPTY(title,       vlc_meta_Get(m, vlc_meta_Title));
                 ON_EMPTY(artist,      vlc_meta_Get(m, vlc_meta_Artist));
+                ON_EMPTY(album_artist,vlc_meta_Get(m, vlc_meta_AlbumArtist));
                 ON_EMPTY(album,       vlc_meta_Get(m, vlc_meta_Album));
                 ON_EMPTY(genre,       vlc_meta_Get(m, vlc_meta_Genre));
                 ON_EMPTY(description, vlc_meta_Get(m, vlc_meta_Description));
