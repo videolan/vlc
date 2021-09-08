@@ -184,7 +184,6 @@ static int vlc_h2_stream_data(void *ctx, struct vlc_h2_frame *f)
         free(f);
         return vlc_h2_stream_fatal(s, VLC_H2_FLOW_CONTROL_ERROR);
     }
-    s->recv_cwnd -= len;
 
     *(s->recv_tailp) = f;
     s->recv_tailp = &f->next;
@@ -416,6 +415,12 @@ static block_t *vlc_h2_stream_read(struct vlc_http_stream *stream)
         s->recv_tailp = &s->recv_head;
     }
 
+    size_t len;
+    uint8_t *buf = vlc_h2_frame_data_get(f, &len);
+
+    assert(s->recv_cwnd >= len);
+    s->recv_cwnd -= len;
+
     /* Credit the receive window if missing credit exceeds 50%. */
     uint_fast32_t credit = VLC_H2_INIT_WINDOW - s->recv_cwnd;
     if (credit >= (VLC_H2_INIT_WINDOW / 2)
@@ -431,9 +436,6 @@ static block_t *vlc_h2_stream_read(struct vlc_http_stream *stream)
         vlc_h2_stream_error(conn, s->id, VLC_H2_INTERNAL_ERROR);
         return vlc_http_error;
     }
-
-    size_t len;
-    uint8_t *buf = vlc_h2_frame_data_get(f, &len);
 
     assert(block->i_buffer >= len);
     assert(block->p_buffer <= buf);
