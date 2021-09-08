@@ -30,6 +30,7 @@
 
 #include <assert.h>
 
+#define COBJMACROS
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
@@ -214,7 +215,7 @@ static const codec_dll encoders_table[] =
 static void WINAPI DMOFreeMediaType( DMO_MEDIA_TYPE *mt )
 {
     if( mt->cbFormat != 0 ) CoTaskMemFree( (PVOID)mt->pbFormat );
-    if( mt->pUnk != NULL ) mt->pUnk->vt->Release( (IUnknown *)mt->pUnk );
+    if( mt->pUnk != NULL ) IUnknown_Release( mt->pUnk );
     mt->cbFormat = 0;
     mt->pbFormat = NULL;
     mt->pUnk = NULL;
@@ -332,7 +333,7 @@ static int DecOpen( decoder_t *p_dec )
         != VLC_SUCCESS )
     {
         hmsdmo_dll = 0;
-        p_dmo = 0;
+        p_dmo = NULL;
         goto error;
     }
 
@@ -367,7 +368,7 @@ static int DecOpen( decoder_t *p_dec )
 
         dmo_input_type.formattype = FORMAT_WaveFormatEx;
         dmo_input_type.cbFormat   = i_size;
-        dmo_input_type.pbFormat   = (char *)p_wf;
+        dmo_input_type.pbFormat   = (BYTE *)p_wf;
         dmo_input_type.bFixedSizeSamples = 1;
         dmo_input_type.bTemporalCompression = 0;
         dmo_input_type.lSampleSize = p_wf->nBlockAlign;
@@ -406,10 +407,10 @@ static int DecOpen( decoder_t *p_dec )
         dmo_input_type.bFixedSizeSamples = 0;
         dmo_input_type.bTemporalCompression = 1;
         dmo_input_type.cbFormat = i_size;
-        dmo_input_type.pbFormat = (char *)p_vih;
+        dmo_input_type.pbFormat = (BYTE *)p_vih;
     }
 
-    if( p_dmo->vt->SetInputType( p_dmo, 0, &dmo_input_type, 0 ) )
+    if( IMediaObject_SetInputType( p_dmo, 0, &dmo_input_type, 0 ) )
     {
         msg_Err( p_dec, "can't set DMO input type" );
         goto error;
@@ -446,7 +447,7 @@ static int DecOpen( decoder_t *p_dec )
         dmo_output_type.formattype = FORMAT_WaveFormatEx;
         dmo_output_type.subtype    = MEDIASUBTYPE_PCM;
         dmo_output_type.cbFormat   = sizeof(WAVEFORMATEX);
-        dmo_output_type.pbFormat   = (char *)p_wf;
+        dmo_output_type.pbFormat   = (BYTE *)p_wf;
         dmo_output_type.bFixedSizeSamples = 1;
         dmo_output_type.bTemporalCompression = 0;
         dmo_output_type.lSampleSize = p_wf->nBlockAlign;
@@ -460,7 +461,7 @@ static int DecOpen( decoder_t *p_dec )
         int i = 0;
 
         /* Find out which chroma to use */
-        while( !p_dmo->vt->GetOutputType( p_dmo, 0, i++, &mt ) )
+        while( !IMediaObject_GetOutputType( p_dmo, 0, i++, &mt ) )
         {
             if( mt.subtype.Data1 == VLC_CODEC_YV12 )
             {
@@ -471,7 +472,7 @@ static int DecOpen( decoder_t *p_dec )
             }
             else if( (p_dec->fmt_in.i_codec == VLC_CODEC_MSS1 ||
                       p_dec->fmt_in.i_codec == VLC_CODEC_MSS2 ) &&
-                      guidcmp( &mt.subtype, &MEDIASUBTYPE_RGB24 ) )
+                      IsEqualGUID( &mt.subtype, &MEDIASUBTYPE_RGB24 ) )
             {
                 i_chroma = VLC_CODEC_RGB24;
                 i_bpp = 24;
@@ -524,7 +525,7 @@ static int DecOpen( decoder_t *p_dec )
         dmo_output_type.bTemporalCompression = 0;
         dmo_output_type.lSampleSize = p_bih->biSizeImage;
         dmo_output_type.cbFormat = sizeof(VIDEOINFOHEADER);
-        dmo_output_type.pbFormat = (char *)p_vih;
+        dmo_output_type.pbFormat = (BYTE *)p_vih;
     }
 
 #ifdef DMO_DEBUG
@@ -534,7 +535,7 @@ static int DecOpen( decoder_t *p_dec )
         int i = 0;
         DMO_MEDIA_TYPE mt;
 
-        while( !p_dmo->vt->GetOutputType( p_dmo, 0, i++, &mt ) )
+        while( !IMediaObject_GetOutputType( p_dmo, 0, i++, &mt ) )
         {
             msg_Dbg( p_dec, "available output chroma: %4.4s", (char *)&mt.subtype.Data1 );
             DMOFreeMediaType( &mt );
@@ -542,7 +543,7 @@ static int DecOpen( decoder_t *p_dec )
     }
 #endif
 
-    unsigned i_err = p_dmo->vt->SetOutputType( p_dmo, 0, &dmo_output_type, 0 );
+    unsigned i_err = IMediaObject_SetOutputType( p_dmo, 0, &dmo_output_type, 0 );
     if( i_err )
     {
         msg_Err( p_dec, "can't set DMO output type for decoder: 0x%x", i_err );
@@ -556,17 +557,17 @@ static int DecOpen( decoder_t *p_dec )
 
     /* Find out some properties of the output */
     {
-        uint32_t i_size, i_align;
+        DWORD i_size, i_align;
 
         p_sys->i_min_output = 0;
-        if( p_dmo->vt->GetOutputSizeInfo( p_dmo, 0, &i_size, &i_align ) )
+        if( IMediaObject_GetOutputSizeInfo( p_dmo, 0, &i_size, &i_align ) )
         {
             msg_Err( p_dec, "GetOutputSizeInfo() failed" );
             goto error;
         }
         else
         {
-            msg_Dbg( p_dec, "GetOutputSizeInfo(): bytes %i, align %i",
+            msg_Dbg( p_dec, "GetOutputSizeInfo(): bytes %ld align %ld",
                      i_size, i_align );
             p_sys->i_min_output = i_size;
             p_sys->p_buffer = malloc( i_size );
@@ -595,7 +596,7 @@ static int DecOpen( decoder_t *p_dec )
 
  error:
 
-    if( p_dmo ) p_dmo->vt->Release( (IUnknown *)p_dmo );
+    if( p_dmo ) IMediaObject_Release( p_dmo );
     if( hmsdmo_dll ) FreeLibrary( hmsdmo_dll );
 
     /* Uninitialize OLE/COM */
@@ -621,15 +622,15 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     DMO_PARTIAL_MEDIATYPE dmo_partial_type;
     int i_err;
 
-    long (STDCALL *OurDMOEnum)( const GUID *, uint32_t, uint32_t,
+    long (STDCALL *OurDMOEnum)( const GUID *, DWORD, DWORD,
                                const DMO_PARTIAL_MEDIATYPE *,
-                               uint32_t, const DMO_PARTIAL_MEDIATYPE *,
+                               DWORD, const DMO_PARTIAL_MEDIATYPE *,
                                IEnumDMO ** );
 
     IEnumDMO *p_enum_dmo = NULL;
     WCHAR *psz_dmo_name;
     GUID clsid_dmo;
-    uint32_t i_dummy;
+    DWORD i_dummy;
 
     GETCLASS GetClass;
     IClassFactory *cFactory = NULL;
@@ -691,7 +692,7 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
 
     /* Pickup the first available codec */
     *pp_dmo = 0;
-    while( ( S_OK == p_enum_dmo->vt->Next( p_enum_dmo, 1, &clsid_dmo,
+    while( ( S_OK == IEnumDMO_Next( p_enum_dmo, 1, &clsid_dmo,
                      &psz_dmo_name, &i_dummy /* NULL doesn't work */ ) ) )
     {
         msg_Dbg( p_this, "found DMO: %ls", psz_dmo_name );
@@ -708,7 +709,7 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
             break;
     }
 
-    p_enum_dmo->vt->Release( (IUnknown *)p_enum_dmo );
+    IEnumDMO_Release( p_enum_dmo );
 
     if( !*pp_dmo )
     {
@@ -755,18 +756,18 @@ loader:
         return VLC_EGENERIC;
     }
 
-    i_err = cFactory->vt->CreateInstance( cFactory, 0, &IID_IUnknown,
+    i_err = IClassFactory_CreateInstance( cFactory, 0, &IID_IUnknown,
                                           (void**)&cObject );
-    cFactory->vt->Release( (IUnknown*)cFactory );
+    IClassFactory_Release( cFactory );
     if( i_err || !cObject )
     {
         msg_Dbg( p_this, "class factory failure" );
         FreeLibrary( *p_hmsdmo_dll );
         return VLC_EGENERIC;
     }
-    i_err = cObject->vt->QueryInterface( cObject, &IID_IMediaObject,
+    i_err = IUnknown_QueryInterface( cObject, &IID_IMediaObject,
                                         (void**)pp_dmo );
-    cObject->vt->Release( (IUnknown*)cObject );
+    IUnknown_Release( cObject );
     if( i_err || !*pp_dmo )
     {
         msg_Dbg( p_this, "QueryInterface failure" );
@@ -781,7 +782,7 @@ static void DecClose( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->p_dmo ) p_sys->p_dmo->vt->Release( (IUnknown *)p_sys->p_dmo );
+    if( p_sys->p_dmo ) IMediaObject_Release( p_sys->p_dmo );
     FreeLibrary( p_sys->hmsdmo_dll );
 
     CoUninitialize();
@@ -803,7 +804,7 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
     DMO_OUTPUT_DATA_BUFFER db;
     CMediaBuffer *p_out;
     block_t block_out;
-    uint32_t i_status;
+    DWORD i_status;
 
     p_block = *pp_block;
 
@@ -834,12 +835,12 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
 
         p_in = CMediaBufferCreate( p_block, p_block->i_buffer, true );
 
-        i_result = p_sys->p_dmo->vt->ProcessInput( p_sys->p_dmo, 0,
-                       (IMediaBuffer *)p_in, DMO_INPUT_DATA_BUFFERF_SYNCPOINT,
+        i_result = IMediaObject_ProcessInput( p_sys->p_dmo, 0,
+                       &p_in->intf, DMO_INPUT_DATA_BUFFERF_SYNCPOINT,
                        0, 0 );
 
         *pp_block = NULL;
-        p_in->vt->Release( (IUnknown *)p_in );
+        IMediaBuffer_Release( &p_in->intf );
 
         if( i_result == S_FALSE )
         {
@@ -873,9 +874,9 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
 
     p_out = CMediaBufferCreate( &block_out, p_sys->i_min_output, false );
     memset( &db, 0, sizeof(db) );
-    db.pBuffer = (IMediaBuffer *)p_out;
+    db.pBuffer = &p_out->intf;
 
-    i_result = p_sys->p_dmo->vt->ProcessOutput( p_sys->p_dmo,
+    i_result = IMediaObject_ProcessOutput( p_sys->p_dmo,
                    DMO_PROCESS_OUTPUT_DISCARD_WHEN_NO_BUFFER,
                    1, &db, &i_status );
 
@@ -888,7 +889,7 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
             msg_Dbg( p_dec, "ProcessOutput(): no output" );
 #endif
 
-        p_out->vt->Release( (IUnknown *)p_out );
+        IMediaBuffer_Release( &p_out->intf );
         return -1;
     }
 
@@ -901,7 +902,7 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
 #ifdef DMO_DEBUG
         msg_Dbg( p_dec, "ProcessOutput(): no output (i_buffer_out == 0)" );
 #endif
-        p_out->vt->Release( (IUnknown *)p_out );
+        IMediaBuffer_Release( &p_out->intf );
         return -1;
     }
 
@@ -919,7 +920,7 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
         p_pic->date = date_Get( &p_sys->end_date );
         date_Increment( &p_sys->end_date, 1 );
 
-        p_out->vt->Release( (IUnknown *)p_out );
+        IMediaBuffer_Release( &p_out->intf );
 
         decoder_QueueVideo( p_dec, p_pic );
         return 0;
@@ -928,7 +929,7 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
     {
         if( decoder_UpdateAudioFormat( p_dec ) )
         {
-            p_out->vt->Release( (IUnknown *)p_out );
+            IMediaBuffer_Release( &p_out->intf );
             return -1;
         }
 
@@ -948,7 +949,7 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
                 date_Increment( &p_sys->end_date, i_samples )
                 - p_aout_buffer->i_pts;
         }
-        p_out->vt->Release( (IUnknown *)p_out );
+        IMediaBuffer_Release( &p_out->intf );
 
         decoder_QueueAudio( p_dec, p_aout_buffer );
         return 0;
@@ -1059,7 +1060,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
 
     /* Enumerate input format (for debug output) */
     i = 0;
-    while( !p_dmo->vt->GetInputType( p_dmo, 0, i++, &dmo_type ) )
+    while( !IMediaObject_GetInputType( p_dmo, 0, i++, &dmo_type ) )
     {
         p_vih = (VIDEOINFOHEADER *)dmo_type.pbFormat;
 
@@ -1103,9 +1104,9 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     dmo_type.bTemporalCompression = FALSE;
     dmo_type.lSampleSize = p_bih->biSizeImage;
     dmo_type.cbFormat = sizeof(VIDEOINFOHEADER);
-    dmo_type.pbFormat = (char *)&vih;
+    dmo_type.pbFormat = (BYTE *)&vih;
 
-    if( ( i_err = p_dmo->vt->SetInputType( p_dmo, 0, &dmo_type, 0 ) ) )
+    if( ( i_err = IMediaObject_SetInputType( p_dmo, 0, &dmo_type, 0 ) ) )
     {
         msg_Err( p_enc, "can't set DMO input type: %x", i_err );
         return VLC_EGENERIC;
@@ -1119,7 +1120,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
 
     /* Enumerate output types */
     i = 0, i_selected = -1;
-    while( !p_dmo->vt->GetOutputType( p_dmo, 0, i++, &dmo_type ) )
+    while( !IMediaObject_GetOutputType( p_dmo, 0, i++, &dmo_type ) )
     {
         p_vih = (VIDEOINFOHEADER *)dmo_type.pbFormat;
 
@@ -1139,7 +1140,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
         return VLC_EGENERIC;
     }
 
-    p_dmo->vt->GetOutputType( p_dmo, 0, i_selected, &dmo_type );
+    IMediaObject_GetOutputType( p_dmo, 0, i_selected, &dmo_type );
     ((VIDEOINFOHEADER *)dmo_type.pbFormat)->dwBitRate =
         p_enc->fmt_out.i_bitrate;
 
@@ -1150,7 +1151,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
         uint8_t *p_data = 0;
         uint32_t i_data = 0, i_vih;
 
-        i_err = p_dmo->vt->QueryInterface( (IUnknown *)p_dmo,
+        i_err = IMediaObject_QueryInterface( p_dmo,
                                            &IID_IWMCodecPrivateData,
                                            (void**)&p_privdata );
         if( i_err ) break;
@@ -1159,7 +1160,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
         if( i_err )
         {
             msg_Err( p_enc, "SetPartialOutputType() failed" );
-            p_privdata->vt->Release( (IUnknown *)p_privdata );
+            p_privdata->vt->Release( p_privdata );
             break;
         }
 
@@ -1167,7 +1168,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
         if( i_err )
         {
             msg_Err( p_enc, "GetPrivateData() failed" );
-            p_privdata->vt->Release( (IUnknown *)p_privdata );
+            p_privdata->vt->Release( p_privdata );
             break;
         }
 
@@ -1180,7 +1181,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
         memcpy( p_vih, dmo_type.pbFormat, dmo_type.cbFormat );
         memcpy( ((uint8_t *)p_vih) + dmo_type.cbFormat, p_data, i_data );
         DMOFreeMediaType( &dmo_type );
-        dmo_type.pbFormat = (char*)p_vih;
+        dmo_type.pbFormat = (BYTE*)p_vih;
         dmo_type.cbFormat = i_vih;
 
         msg_Dbg( p_enc, "found extra data: %i", i_data );
@@ -1189,7 +1190,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
         break;
     }
 
-    i_err = p_dmo->vt->SetOutputType( p_dmo, 0, &dmo_type, 0 );
+    i_err = IMediaObject_SetOutputType( p_dmo, 0, &dmo_type, 0 );
 
     p_enc->fmt_in.i_codec = VLC_CODEC_I420;
 
@@ -1225,7 +1226,7 @@ static int EncoderSetAudioType( encoder_t *p_enc, IMediaObject *p_dmo )
     /* We first need to choose an output type from the predefined
      * list of choices (we cycle through the list to select the best match) */
     i = 0; i_selected = -1; i_last_byterate = 0;
-    while( !p_dmo->vt->GetOutputType( p_dmo, 0, i++, &dmo_type ) )
+    while( !IMediaObject_GetOutputType( p_dmo, 0, i++, &dmo_type ) )
     {
         p_wf = (WAVEFORMATEX *)dmo_type.pbFormat;
         msg_Dbg( p_enc, "available format :%i, sample rate: %i, channels: %i, "
@@ -1259,7 +1260,7 @@ static int EncoderSetAudioType( encoder_t *p_enc, IMediaObject *p_dmo )
         return VLC_EGENERIC;
     }
 
-    p_dmo->vt->GetOutputType( p_dmo, 0, i_selected, &dmo_type );
+    IMediaObject_GetOutputType( p_dmo, 0, i_selected, &dmo_type );
     p_wf = (WAVEFORMATEX *)dmo_type.pbFormat;
 
     msg_Dbg( p_enc, "selected format: %i, sample rate:%i, "
@@ -1285,7 +1286,7 @@ static int EncoderSetAudioType( encoder_t *p_enc, IMediaObject *p_dmo )
         memcpy( p_enc->fmt_out.p_extra, &p_wf[1], p_enc->fmt_out.i_extra );
     }
 
-    i_err = p_dmo->vt->SetOutputType( p_dmo, 0, &dmo_type, 0 );
+    i_err = IMediaObject_SetOutputType( p_dmo, 0, &dmo_type, 0 );
     DMOFreeMediaType( &dmo_type );
 
     if( i_err )
@@ -1298,7 +1299,7 @@ static int EncoderSetAudioType( encoder_t *p_enc, IMediaObject *p_dmo )
 
     /* Setup the input type */
     i = 0; i_selected = -1;
-    while( !p_dmo->vt->GetInputType( p_dmo, 0, i++, &dmo_type ) )
+    while( !IMediaObject_GetInputType( p_dmo, 0, i++, &dmo_type ) )
     {
         p_wf = (WAVEFORMATEX *)dmo_type.pbFormat;
         msg_Dbg( p_enc, "available format :%i, sample rate: %i, channels: %i, "
@@ -1324,8 +1325,8 @@ static int EncoderSetAudioType( encoder_t *p_enc, IMediaObject *p_dmo )
         return VLC_EGENERIC;
     }
 
-    p_dmo->vt->GetInputType( p_dmo, 0, i_selected, &dmo_type );
-    i_err = p_dmo->vt->SetInputType( p_dmo, 0, &dmo_type, 0 );
+    IMediaObject_GetInputType( p_dmo, 0, i_selected, &dmo_type );
+    i_err = IMediaObject_SetInputType( p_dmo, 0, &dmo_type, 0 );
     DMOFreeMediaType( &dmo_type );
     if( i_err )
     {
@@ -1379,28 +1380,28 @@ static int EncOpen( vlc_object_t *p_this )
 
     /* Find out some properties of the inputput */
     {
-        uint32_t i_size, i_align, dum;
+        DWORD i_size, i_align, dum;
 
-        if( p_dmo->vt->GetInputSizeInfo( p_dmo, 0, &i_size, &i_align, &dum ) )
+        if( IMediaObject_GetInputSizeInfo( p_dmo, 0, &i_size, &i_align, &dum ) )
             msg_Err( p_enc, "GetInputSizeInfo() failed" );
         else
-            msg_Dbg( p_enc, "GetInputSizeInfo(): bytes %i, align %i, %i",
+            msg_Dbg( p_enc, "GetInputSizeInfo(): bytes %ld, align %ld, %ld",
                      i_size, i_align, dum );
     }
 
     /* Find out some properties of the output */
     {
-        uint32_t i_size, i_align;
+        DWORD i_size, i_align;
 
         p_sys->i_min_output = 0;
-        if( p_dmo->vt->GetOutputSizeInfo( p_dmo, 0, &i_size, &i_align ) )
+        if( IMediaObject_GetOutputSizeInfo( p_dmo, 0, &i_size, &i_align ) )
         {
             msg_Err( p_enc, "GetOutputSizeInfo() failed" );
             goto error;
         }
         else
         {
-            msg_Dbg( p_enc, "GetOutputSizeInfo(): bytes %i, align %i",
+            msg_Dbg( p_enc, "GetOutputSizeInfo(): bytes %ld, align %ld",
                      i_size, i_align );
             p_sys->i_min_output = i_size;
         }
@@ -1417,7 +1418,7 @@ static int EncOpen( vlc_object_t *p_this )
 
  error:
 
-    if( p_dmo ) p_dmo->vt->Release( (IUnknown *)p_dmo );
+    if( p_dmo ) IMediaObject_Release( (IUnknown *)p_dmo );
     if( hmsdmo_dll ) FreeLibrary( hmsdmo_dll );
 
     /* Uninitialize OLE/COM */
@@ -1437,7 +1438,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
     CMediaBuffer *p_in;
     block_t *p_chain = NULL;
     block_t *p_block_in;
-    uint32_t i_status;
+    DWORD i_status;
     int i_result;
     vlc_tick_t i_pts;
 
@@ -1487,10 +1488,10 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
 
     /* Feed input to the DMO */
     p_in = CMediaBufferCreate( p_block_in, p_block_in->i_buffer, true );
-    i_result = p_sys->p_dmo->vt->ProcessInput( p_sys->p_dmo, 0,
-       (IMediaBuffer *)p_in, DMO_INPUT_DATA_BUFFERF_TIME, MSFTIME_FROM_VLC_TICK(i_pts), 0 );
+    i_result = IMediaObject_ProcessInput( p_sys->p_dmo, 0,
+       &p_in->intf, DMO_INPUT_DATA_BUFFERF_TIME, MSFTIME_FROM_VLC_TICK(i_pts), 0 );
 
-    p_in->vt->Release( (IUnknown *)p_in );
+    IMediaBuffer_Release( &p_in->intf );
     if( i_result == S_FALSE )
     {
         /* No output generated */
@@ -1525,9 +1526,9 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
         p_block_out->i_buffer = 0;
         p_out = CMediaBufferCreate(p_block_out, p_sys->i_min_output, false);
         memset( &db, 0, sizeof(db) );
-        db.pBuffer = (IMediaBuffer *)p_out;
+        db.pBuffer = &p_out->intf;
 
-        i_result = p_sys->p_dmo->vt->ProcessOutput( p_sys->p_dmo,
+        i_result = IMediaObject_ProcessOutput( p_sys->p_dmo,
                                                     0, 1, &db, &i_status );
 
         if( i_result != S_OK )
@@ -1539,7 +1540,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
                 msg_Dbg( p_enc, "ProcessOutput(): no output" );
 #endif
 
-            p_out->vt->Release( (IUnknown *)p_out );
+            IMediaBuffer_Release( &p_out->intf );
             block_Release( p_block_out );
             return p_chain;
         }
@@ -1549,7 +1550,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
 #ifdef DMO_DEBUG
             msg_Dbg( p_enc, "ProcessOutput(): no output (i_buffer_out == 0)" );
 #endif
-            p_out->vt->Release( (IUnknown *)p_out );
+            IMediaBuffer_Release( &p_out->intf );
             block_Release( p_block_out );
             return p_chain;
         }
@@ -1595,7 +1596,7 @@ void EncoderClose( vlc_object_t *p_this )
 
     if( !p_sys ) return;
 
-    if( p_sys->p_dmo ) p_sys->p_dmo->vt->Release( (IUnknown *)p_sys->p_dmo );
+    if( p_sys->p_dmo ) IMediaObject_Release( p_sys->p_dmo );
     FreeLibrary( p_sys->hmsdmo_dll );
 
     /* Uninitialize OLE/COM */

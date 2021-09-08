@@ -45,10 +45,10 @@
 #include <vlc_codecs.h>
 #include "dmo.h"
 
-static long STDCALL QueryInterface( IUnknown *This,
+static HRESULT STDCALL QueryInterface( IMediaBuffer *This,
                                     const GUID *riid, void **ppv )
 {
-    CMediaBuffer *p_mb = (CMediaBuffer *)This;
+    CMediaBuffer *p_mb = container_of(This, CMediaBuffer, intf);
     if( !memcmp( riid, &IID_IUnknown, sizeof(GUID) ) ||
         !memcmp( riid, &IID_IMediaBuffer, sizeof(GUID) ) )
     {
@@ -63,79 +63,69 @@ static long STDCALL QueryInterface( IUnknown *This,
     }
 }
 
-static long STDCALL AddRef( IUnknown *This )
+static ULONG STDCALL AddRef( IMediaBuffer *This )
 {
-    CMediaBuffer *p_mb = (CMediaBuffer *)This;
+    CMediaBuffer *p_mb = container_of(This, CMediaBuffer, intf);
     return p_mb->i_ref++;
 }
 
-static long STDCALL Release( IUnknown *This )
+static ULONG STDCALL Release( IMediaBuffer *This )
 {
-    CMediaBuffer *p_mb = (CMediaBuffer *)This;
+    CMediaBuffer *p_mb = container_of(This, CMediaBuffer, intf);
     p_mb->i_ref--;
 
     if( p_mb->i_ref == 0 )
     {
         if( p_mb->b_own ) block_Release( p_mb->p_block );
-        free( p_mb->vt );
         free( p_mb );
     }
 
     return 0;
 }
 
-static long STDCALL SetLength( IMediaBuffer *This, uint32_t cbLength )
+static HRESULT STDCALL SetLength( IMediaBuffer *This, DWORD cbLength )
 {
-    CMediaBuffer *p_mb = (CMediaBuffer *)This;
+    CMediaBuffer *p_mb = container_of(This, CMediaBuffer, intf);
     if( cbLength > (uint32_t)p_mb->i_max_size ) return E_INVALIDARG;
     p_mb->p_block->i_buffer = cbLength;
     return S_OK;
 }
 
-static long STDCALL GetMaxLength( IMediaBuffer *This, uint32_t *pcbMaxLength )
+static HRESULT STDCALL GetMaxLength( IMediaBuffer *This, DWORD *pcbMaxLength )
 {
-    CMediaBuffer *p_mb = (CMediaBuffer *)This;
+    CMediaBuffer *p_mb = container_of(This, CMediaBuffer, intf);
     if( !pcbMaxLength ) return E_POINTER;
     *pcbMaxLength = p_mb->i_max_size;
     return S_OK;
 }
 
-static long STDCALL GetBufferAndLength( IMediaBuffer *This,
-                                        char **ppBuffer, uint32_t *pcbLength )
+static HRESULT STDCALL GetBufferAndLength( IMediaBuffer *This,
+                                        BYTE **ppBuffer, DWORD *pcbLength )
 {
-    CMediaBuffer *p_mb = (CMediaBuffer *)This;
+    CMediaBuffer *p_mb = container_of(This, CMediaBuffer, intf);
 
     if( !ppBuffer && !pcbLength ) return E_POINTER;
-    if( ppBuffer ) *ppBuffer = (char*)p_mb->p_block->p_buffer;
+    if( ppBuffer ) *ppBuffer = (BYTE*)p_mb->p_block->p_buffer;
     if( pcbLength ) *pcbLength = p_mb->p_block->i_buffer;
     return S_OK;
 }
+
+static CONST_VTBL IMediaBufferVtbl CMediaBuffer_vtable = {
+    QueryInterface, AddRef, Release,
+    SetLength, GetMaxLength, GetBufferAndLength,
+};
 
 CMediaBuffer *CMediaBufferCreate( block_t *p_block, int i_max_size,
                                   bool b_own )
 {
     CMediaBuffer *p_mb = (CMediaBuffer *)malloc( sizeof(CMediaBuffer) );
     if( !p_mb ) return NULL;
-
-    p_mb->vt = (IMediaBuffer_vt *)malloc( sizeof(IMediaBuffer_vt) );
-    if( !p_mb->vt )
-    {
-        free( p_mb );
-        return NULL;
-    }
+    p_mb->intf.lpVtbl = &CMediaBuffer_vtable;
 
     p_mb->i_ref = 1;
     p_mb->p_block = p_block;
     p_mb->i_max_size = i_max_size;
     p_mb->b_own = b_own;
-
-    p_mb->vt->QueryInterface = QueryInterface;
-    p_mb->vt->AddRef = AddRef;
-    p_mb->vt->Release = Release;
-
-    p_mb->vt->SetLength = SetLength;
-    p_mb->vt->GetMaxLength = GetMaxLength;
-    p_mb->vt->GetBufferAndLength = GetBufferAndLength;
 
     return p_mb;
 }

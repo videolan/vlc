@@ -36,20 +36,16 @@ extern const GUID MEDIASUBTYPE_YV12;
 extern const GUID MEDIASUBTYPE_RGB24;
 extern const GUID MEDIASUBTYPE_RGB565;
 
+#include <mediaobj.h>
+#include <dmoreg.h>
+
 
 #ifndef _WIN32
 void* CoTaskMemAlloc(unsigned long cb);
 void CoTaskMemFree(void* cb);
 #endif
 
-#define IUnknown IUnknownHack
-#define IClassFactory IClassFactoryHack
-typedef struct _IUnknown IUnknown;
-typedef struct _IClassFactory IClassFactory;
 typedef struct _IWMCodecPrivateData IWMCodecPrivateData;
-typedef struct _IEnumDMO IEnumDMO;
-typedef struct _IMediaBuffer IMediaBuffer;
-typedef struct _IMediaObject IMediaObject;
 
 #ifndef STDCALL
 #define STDCALL __stdcall
@@ -65,90 +61,16 @@ typedef struct _IMediaObject IMediaObject;
 #define DMO_E_NOTACCEPTING 0x80040204
 
 /*
- * DMO types definition
- */
-typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
- _DMO_PARTIAL_MEDIATYPE
-{
-    GUID type;
-    GUID subtype;
-
-} DMO_PARTIAL_MEDIATYPE;
-
-typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
- _DMO_OUTPUT_DATA_BUFFER
-{
-    IMediaBuffer *pBuffer;
-    uint32_t dwStatus;
-    REFERENCE_TIME rtTimestamp;
-    REFERENCE_TIME rtTimelength;
-
-} DMO_OUTPUT_DATA_BUFFER;
-
-typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
- _DMOMediaType
-{
-    GUID     majortype;
-    GUID     subtype;
-    int      bFixedSizeSamples;
-    int      bTemporalCompression;
-    uint32_t lSampleSize;
-    GUID     formattype;
-    IUnknown *pUnk;
-    uint32_t cbFormat;
-    char     *pbFormat;
-
-} DMO_MEDIA_TYPE;
-
-/*
- * IUnknown interface
- */
-typedef struct IUnknown_vt
-{
-    /* IUnknown methods */
-    long (STDCALL *QueryInterface)(IUnknown *This, const GUID *riid,
-                                   void **ppvObject);
-    long (STDCALL *AddRef)(IUnknown *This);
-    long (STDCALL *Release)(IUnknown *This);
-
-} IUnknown_vt;
-struct _IUnknown { IUnknown_vt* vt; };
-
-/*
- * IClassFactory interface
- */
-typedef struct IClassFactory_vt
-{
-    long (STDCALL *QueryInterface)(IUnknown *This, const GUID* riid,
-                                   void **ppvObject);
-    long (STDCALL *AddRef)(IUnknown *This) ;
-    long (STDCALL *Release)(IUnknown *This) ;
-    long (STDCALL *CreateInstance)(IClassFactory *This, IUnknown *pUnkOuter,
-                                   const GUID* riid, void** ppvObject);
-} IClassFactory_vt;
-
-struct _IClassFactory { IClassFactory_vt* vt; };
-
-/*
  * IWMCodecPrivateData interface
  */
 typedef struct IWMCodecPrivateData_vt
 {
-    long (STDCALL *QueryInterface)(IUnknown *This, const GUID* riid,
+    long (STDCALL *QueryInterface)(IWMCodecPrivateData *This, const GUID* riid,
                                    void **ppvObject);
-    long (STDCALL *AddRef)(IUnknown *This) ;
-    long (STDCALL *Release)(IUnknown *This) ;
+    long (STDCALL *AddRef)(IWMCodecPrivateData *This) ;
+    long (STDCALL *Release)(IWMCodecPrivateData *This) ;
 
- 
+
     long (STDCALL *SetPartialOutputType)(IWMCodecPrivateData * This,
                                          DMO_MEDIA_TYPE *pmt);
 
@@ -158,133 +80,10 @@ typedef struct IWMCodecPrivateData_vt
 
 struct _IWMCodecPrivateData { IWMCodecPrivateData_vt* vt; };
 
-/*
- * IEnumDMO interface
- */
-typedef struct IEnumDMO_vt
-{
-    /* IUnknown methods */
-    long (STDCALL *QueryInterface)(IUnknown *This, const GUID *riid,
-                                   void **ppvObject);
-    long (STDCALL *AddRef)(IUnknown *This);
-    long (STDCALL *Release)(IUnknown *This);
-
-    /* IEnumDMO methods */
-    long (STDCALL *Next)(IEnumDMO *This, uint32_t cItemsToFetch,
-                         const GUID *pCLSID, WCHAR **Names,
-                         uint32_t *pcItemsFetched);
-    long (STDCALL *Skip)(IEnumDMO *This, uint32_t cItemsToSkip);
-    long (STDCALL *Reset)(IEnumDMO *This);
-    long (STDCALL *Clone)(IEnumDMO *This, IEnumDMO **ppEnum);
-
-} IEnumDMO_vt;
-struct _IEnumDMO { IEnumDMO_vt* vt; };
-
-/*
- * IMediaBuffer interface
- */
-typedef struct IMediaBuffer_vt
-{
-    /* IUnknown methods */
-    long (STDCALL *QueryInterface)(IUnknown *This, const GUID *riid,
-                                   void **ppvObject);
-    long (STDCALL *AddRef)(IUnknown *This);
-    long (STDCALL *Release)(IUnknown *This);
-
-    long (STDCALL *SetLength)(IMediaBuffer* This, uint32_t cbLength);
-    long (STDCALL *GetMaxLength)(IMediaBuffer* This, uint32_t *pcbMaxLength);
-    long (STDCALL *GetBufferAndLength)(IMediaBuffer* This,
-                                       char **ppBuffer, uint32_t *pcbLength);
-
-} IMediaBuffer_vt;
-struct _IMediaBuffer { IMediaBuffer_vt* vt; };
-
-/*
- * IMediaObject interface
- */
-typedef struct IMediaObject_vt
-{
-    /* IUnknown methods */
-    long (STDCALL *QueryInterface)(IUnknown *This, const GUID *riid,
-                                   void **ppvObject);
-    long (STDCALL *AddRef)(IUnknown *This);
-    long (STDCALL *Release)(IUnknown *This);
-
-    /* IEnumDMO methods */
-    long (STDCALL *GetStreamCount)(IMediaObject *This,
-                                   uint32_t *pcInputStreams,
-                                   uint32_t *pcOutputStreams);
-    long (STDCALL *GetInputStreamInfo)(IMediaObject *This,
-                                       uint32_t dwInputStreamIndex,
-                                       uint32_t *pdwFlags);
-    long (STDCALL *GetOutputStreamInfo)(IMediaObject *This,
-                                        uint32_t dwOutputStreamIndex,
-                                        uint32_t *pdwFlags);
-    long (STDCALL *GetInputType)(IMediaObject *This,
-                                 uint32_t dwInputStreamIndex,
-                                 uint32_t dwTypeIndex,
-                                 DMO_MEDIA_TYPE *pmt);
-    long (STDCALL *GetOutputType)(IMediaObject *This,
-                                  uint32_t dwOutputStreamIndex,
-                                  uint32_t dwTypeIndex,
-                                  DMO_MEDIA_TYPE *pmt);
-    long (STDCALL *SetInputType)(IMediaObject *This,
-                                 uint32_t dwInputStreamIndex,
-                                 const DMO_MEDIA_TYPE *pmt,
-                                 uint32_t dwFlags);
-    long (STDCALL *SetOutputType)(IMediaObject *This,
-                                  uint32_t dwOutputStreamIndex,
-                                  const DMO_MEDIA_TYPE *pmt,
-                                  uint32_t dwFlags);
-    long (STDCALL *GetInputCurrentType)(IMediaObject *This,
-                                        uint32_t dwInputStreamIndex,
-                                        DMO_MEDIA_TYPE *pmt);
-    long (STDCALL *GetOutputCurrentType)(IMediaObject *This,
-                                         uint32_t dwOutputStreamIndex,
-                                         DMO_MEDIA_TYPE *pmt);
-    long (STDCALL *GetInputSizeInfo)(IMediaObject *This,
-                                     uint32_t dwInputStreamIndex,
-                                     uint32_t *pcbSize,
-                                     uint32_t *pcbMaxLookahead,
-                                     uint32_t *pcbAlignment);
-    long (STDCALL *GetOutputSizeInfo)(IMediaObject *This,
-                                      uint32_t dwOutputStreamIndex,
-                                      uint32_t *pcbSize,
-                                      uint32_t *pcbAlignment);
-    long (STDCALL *GetInputMaxLatency)(IMediaObject *This,
-                                       uint32_t dwInputStreamIndex,
-                                       REFERENCE_TIME *prtMaxLatency);
-    long (STDCALL *SetInputMaxLatency)(IMediaObject *This,
-                                       uint32_t dwInputStreamIndex,
-                                       REFERENCE_TIME rtMaxLatency);
-    long (STDCALL *Flush)(IMediaObject * This);
-    long (STDCALL *Discontinuity)(IMediaObject *This,
-                                  uint32_t dwInputStreamIndex);
-    long (STDCALL *AllocateStreamingResources)(IMediaObject * This);
-    long (STDCALL *FreeStreamingResources)(IMediaObject * This);
-    long (STDCALL *GetInputStatus)(IMediaObject *This,
-                                   uint32_t dwInputStreamIndex,
-                                   uint32_t *dwFlags);
-    long (STDCALL *ProcessInput)(IMediaObject *This,
-                                 uint32_t dwInputStreamIndex,
-                                 IMediaBuffer *pBuffer,
-                                 uint32_t dwFlags,
-                                 REFERENCE_TIME rtTimestamp,
-                                 REFERENCE_TIME rtTimelength);
-    long (STDCALL *ProcessOutput)(IMediaObject *This,
-                                  uint32_t dwFlags,
-                                  uint32_t cOutputBufferCount,
-                                  DMO_OUTPUT_DATA_BUFFER *pOutputBuffers,
-                                  uint32_t *pdwStatus);
-    long (STDCALL *Lock)(IMediaObject *This, long bLock);
-
-} IMediaObject_vt;
-struct _IMediaObject { IMediaObject_vt* vt; };
-
 /* Implementation of IMediaBuffer */
 typedef struct _CMediaBuffer
 {
-    IMediaBuffer_vt *vt;
+    IMediaBuffer intf;
     int i_ref;
     block_t *p_block;
     int i_max_size;
