@@ -47,7 +47,7 @@ FocusScope {
 
     property alias _currentView: view.currentItem
 
-    signal browse(variant tree, int reason)
+    signal browse(var tree, int reason)
 
     onTreeChanged: providerModel.tree = tree
 
