@@ -21,9 +21,10 @@ import org.videolan.vlc 0.1
 FocusScope {
     id: root
 
-    property string view: defaultPage
-    property var viewProperties: ({})
-
+    property var view: ({
+        "name": defaultPage,
+        "properties": {}
+    })
     property string defaultPage: ""
 
     property var pageModel: []
@@ -35,18 +36,18 @@ FocusScope {
 
     Component.onCompleted: loadView()
     onViewChanged: {
-        viewProperties = {}
         loadView()
     }
-    onViewPropertiesChanged: loadView()
 
     function loadDefaultView() {
-        root.view = defaultPage
-        root.viewProperties = ({})
+        root.view = {
+            "name": defaultPage,
+            "properties": {}
+        }
     }
 
     function loadView() {
-        if (view === "") {
+        if (view.name === "") {
             console.error("view is not defined")
             return
         }
@@ -54,7 +55,7 @@ FocusScope {
             console.error("pageModel is not defined")
             return
         }
-        var found = stackView.loadView(root.pageModel, view, viewProperties)
+        var found = stackView.loadView(root.pageModel, view.name, view.properties)
         if (!found) {
             loadDefaultView()
             return

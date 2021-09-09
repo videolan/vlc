@@ -33,21 +33,18 @@ FocusScope {
     id: root
 
     //name and properties of the tab to be initially loaded
-    property string view: ""
-    property var viewProperties: ({})
+    property var view: ({
+        "name": "",
+        "properties": {}
+    })
 
     property alias g_mainDisplay: root
     property bool _inhibitMiniPlayer: false
     property bool _showMiniPlayer: false
     property var _oldViewProperties: ({}) // saves last state of the views
-    property string _oldView: ""
 
     onViewChanged: {
-        _oldViewProperties[_oldView] = viewProperties
-        _oldView = view
-    }
-
-    onViewPropertiesChanged: {
+        _oldViewProperties[view.name] = view.properties
         loadView()
     }
 
@@ -59,7 +56,7 @@ FocusScope {
     }
 
     function loadView() {
-        var found = stackView.loadView(root.pageModel, root.view, root.viewProperties)
+        var found = stackView.loadView(root.pageModel, root.view.name, root.view.properties)
 
         stackView.currentItem.Navigation.parentItem = medialibId
         stackView.currentItem.Navigation.upItem = sourcesBanner

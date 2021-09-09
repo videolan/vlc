@@ -32,10 +32,12 @@ static void pushListRec(QVariantMap& itemMap, QVariantList::const_iterator it, Q
         return;
     if(it->canConvert<QString>())
     {
-        itemMap["view"] = it->toString();
-        QVariantMap subMap;
-        pushListRec(subMap, ++it, end);
-        itemMap["viewProperties"] = subMap;
+        QVariantMap subViewMap;
+        subViewMap["name"] = it->toString();
+        QVariantMap subViewProperties;
+        pushListRec(subViewProperties, ++it, end);
+        subViewMap["properties"] = subViewProperties;
+        itemMap["view"] = subViewMap;
     }
     else if ( it->canConvert<QVariantMap>() )
     {
@@ -97,7 +99,12 @@ void NavigationHistory::push(QVariantList itemList, NavigationHistory::PostActio
 {
     QVariantMap itemMap;
     pushListRec(itemMap, itemList.cbegin(), itemList.cend());
-    push(itemMap, postAction);
+    if (!itemMap.contains("view"))
+        return;
+    QVariant rootView = itemMap["view"];
+    if (!rootView.canConvert(QVariant::Map))
+        return;
+    push(rootView.toMap(), postAction);
 }
 
 
@@ -112,7 +119,12 @@ void NavigationHistory::update(QVariantList itemList)
 {
     QVariantMap itemMap;
     pushListRec(itemMap, itemList.cbegin(), itemList.cend());
-    update(itemMap);
+    if (!itemMap.contains("view"))
+        return;
+    QVariant rootView = itemMap["view"];
+    if (!rootView.canConvert(QVariant::Map))
+        return;
+    update(rootView.toMap());
 }
 
 void NavigationHistory::previous(PostAction postAction)

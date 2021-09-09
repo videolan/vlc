@@ -61,7 +61,7 @@ Widgets.PageLoader {
                            currentItem.isViewMultiView);
 
         if (tree) {
-            if (view == "home")
+            if (view.name === "home")
                 localMenuDelegate = null;
             else
                 localMenuDelegate = componentBar;
@@ -76,9 +76,9 @@ Widgets.PageLoader {
     // FIXME: Maybe this could be done with a 'guard' mechanism on the pageModel.
     function loadView() {
         if (tree)
-            stackView.loadView(pageModel, view, viewProperties);
+            stackView.loadView(pageModel, view.name, view.properties);
         else
-            stackView.loadView(pageModel, "home", viewProperties);
+            stackView.loadView(pageModel, "home", view.properties);
 
         stackView.currentItem.Navigation.parentItem = root;
 
@@ -119,7 +119,7 @@ Widgets.PageLoader {
         id: componentBar
 
         NetworkAddressbar {
-            path: view === "browse" ? root.stackView.currentItem.providerModel.path : []
+            path: view.name === "browse" ? root.stackView.currentItem.providerModel.path : []
 
             onHomeButtonClicked: {
                 history.push(["mc", "network", "home"])

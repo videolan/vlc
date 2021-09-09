@@ -34,11 +34,13 @@ public slots:
      *
      * \code
      * push({
-     *   view: "foo", //push the view foo
-     *   viewProperties: {
-     *      view : "bar",  //the sub view "bar"
-     *      viewProperties: {
-     *         baz: "plop" //the property baz will be set in the view "bar"
+     *   name: "foo", //push the view foo
+     *   properties: {
+     *      view: { //the sub view "bar"
+     *          name: "bar",
+     *          properties: {
+     *              baz: "plop" //the property baz will be set in the view "bar"
+     *          }
      *      }
      *   }
      * }, History.Go)
