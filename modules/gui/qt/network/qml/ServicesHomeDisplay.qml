@@ -48,7 +48,8 @@ Widgets.PageLoader {
         component: sourceRootComponent
     }, {
         name: "source_browse",
-        component: sourceBrowseComponent
+        component: sourceBrowseComponent,
+        guard: function (prop) { return !!prop.tree }
     }]
 
     onCurrentItemChanged: {

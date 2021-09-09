@@ -47,11 +47,11 @@ Widgets.PageLoader {
         url: "qrc:///network/NetworkHomeDisplay.qml"
     }, {
         name: "browse",
-        component: browseComponent
+        component: browseComponent,
+        guard: function (prop) { return !!prop.tree }
     }]
 
     // Events
-
     onCurrentItemChanged: {
         sortModel = currentItem.sortModel;
         contentModel = currentItem.model;
