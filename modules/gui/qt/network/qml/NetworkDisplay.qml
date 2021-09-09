@@ -47,7 +47,7 @@ Widgets.PageLoader {
         url: "qrc:///network/NetworkHomeDisplay.qml"
     }, {
         name: "browse",
-        url: "qrc:///network/NetworkBrowseDisplay.qml"
+        component: browseComponent
     }]
 
     // Events
@@ -101,17 +101,25 @@ Widgets.PageLoader {
 
     // Children
 
-    NetworkMediaModel {
-        id: modelMedia
+    Component {
+        id: browseComponent
 
-        ctx: mainctx
+        NetworkBrowseDisplay {
+            providerModel: NetworkMediaModel {
+                ctx: mainctx
+            }
+
+            contextMenu: NetworkMediaContextMenu {
+                model: providerModel
+            }
+        }
     }
 
     Component {
         id: componentBar
 
         NetworkAddressbar {
-            path: modelMedia.path
+            path: view === "browse" ? root.stackView.currentItem.providerModel.path : []
 
             onHomeButtonClicked: history.push(["mc", "network", "home"])
         }

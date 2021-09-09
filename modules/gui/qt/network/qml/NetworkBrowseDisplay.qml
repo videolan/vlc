@@ -49,10 +49,6 @@ FocusScope {
 
     signal browse(variant tree, int reason)
 
-    providerModel: modelMedia
-
-    contextMenu: NetworkMediaContextMenu { model: modelMedia }
-
     onTreeChanged: providerModel.tree = tree
 
     function playSelected() {
