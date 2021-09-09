@@ -208,6 +208,8 @@ private:
     void updateCSDSettings()
     {
         HWND winId = WinId(m_window);
+        if ( !winId )
+            return;
 
         if (m_isWin7Compositor)
         {
@@ -284,6 +286,10 @@ void WinTaskbarWidget::createTaskBarButtons()
     p_taskbl = NULL;
     himl = NULL;
 
+    auto winId = WinId(m_window);
+    if (!winId)
+        return;
+
     HRESULT hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
     if( FAILED(hr) )
         return;
@@ -350,13 +356,13 @@ void WinTaskbarWidget::createTaskBarButtons()
     thbButtons[2].iBitmap = 3;
     thbButtons[2].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
 
-    hr = p_taskbl->ThumbBarSetImageList( WinId(m_window), himl );
+    hr = p_taskbl->ThumbBarSetImageList( winId, himl );
     if( FAILED(hr) )
         msg_Err( p_intf, "%s failed with error %08lx", "ThumbBarSetImageList",
                  hr );
     else
     {
-        hr = p_taskbl->ThumbBarAddButtons( WinId(m_window), 3, thbButtons);
+        hr = p_taskbl->ThumbBarAddButtons( winId, 3, thbButtons);
         if( FAILED(hr) )
             msg_Err( p_intf, "%s failed with error %08lx",
                      "ThumbBarAddButtons", hr );
@@ -372,6 +378,9 @@ void WinTaskbarWidget::createTaskBarButtons()
 bool WinTaskbarWidget::nativeEventFilter(const QByteArray &, void *message, long* /* result */)
 {
     MSG * msg = static_cast<MSG*>( message );
+    if (msg->hwnd != WinId(m_window))
+        return false;
+
     if (msg->message == taskbar_wmsg)
     {
         //We received the taskbarbuttoncreated, now we can really create the buttons
@@ -458,7 +467,14 @@ void WinTaskbarWidget::changeThumbbarButtons( PlayerController::PlayingState i_s
             return;
     }
 
-    HRESULT hr =  p_taskbl->ThumbBarUpdateButtons(WinId(m_window), 3, thbButtons);
+    auto winId = WinId(m_window);
+    if (!winId)
+    {
+        msg_Err( p_intf, "ThumbBarUpdateButtons, window handle is null" );
+        return;
+    }
+
+    HRESULT hr =  p_taskbl->ThumbBarUpdateButtons(winId, 3, thbButtons);
 
     if(S_OK != hr)
         msg_Err( p_intf, "ThumbBarUpdateButtons failed with error %08lx", hr );
@@ -466,7 +482,7 @@ void WinTaskbarWidget::changeThumbbarButtons( PlayerController::PlayingState i_s
     // If a video is playing, let the vout handle the thumbnail.
     if( !THEMIM->hasVideoOutput() )
     {
-        hr = p_taskbl->SetThumbnailClip(WinId(m_window), NULL);
+        hr = p_taskbl->SetThumbnailClip(winId, NULL);
         if(S_OK != hr)
             msg_Err( p_intf, "SetThumbnailClip failed with error %08lx", hr );
     }
@@ -527,6 +543,8 @@ void InterfaceWindowHandlerWin32::toggleWindowVisiblity()
              * but ignore the ones always on top
              * and the ones which can't be activated */
             HWND winId = WinId(m_window);
+            if ( !winId )
+                break;
 
             WINDOWINFO wi;
             HWND hwnd;
@@ -564,6 +582,8 @@ bool InterfaceWindowHandlerWin32::eventFilter(QObject* obj, QEvent* ev)
          */
         m_isWindowTiled = false;
         HWND winHwnd = WinId( m_window );
+        if ( !winHwnd )
+            return ret;
 
         WINDOWPLACEMENT windowPlacement;
         windowPlacement.length = sizeof( windowPlacement );
