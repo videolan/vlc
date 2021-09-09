@@ -37,7 +37,7 @@ FocusScope {
 
     property int _currentIndex: -1
 
-    signal browse(variant tree, int reason)
+    signal browse(var tree, int reason)
 
     on_CurrentIndexChanged: {
         deviceListView.currentIndex = _currentIndex

@@ -39,7 +39,7 @@ MainInterface.MainTableView {
     //---------------------------------------------------------------------------------------------
     // Private
 
-    property variant _item: null
+    property var _item: null
 
     property bool _before: true
 

@@ -33,7 +33,7 @@ FocusScope {
 
     readonly property bool isViewMultiView: false
 
-    signal browse(variant tree, int reason)
+    signal browse(var tree, int reason)
 
     Component.onCompleted: resetFocus()
     onActiveFocusChanged: resetFocus()

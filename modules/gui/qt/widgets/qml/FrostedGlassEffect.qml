@@ -24,8 +24,8 @@ import "qrc:///style/"
 Rectangle {
     id: effect
 
-    property variant source
-    property variant sourceRect: undefined
+    property var source
+    property var sourceRect: undefined
 
     property bool active: true
 
@@ -59,7 +59,7 @@ Rectangle {
             ShaderEffect {
                 id: effect2
 
-                property variant source: ShaderEffectSource {
+                property var source: ShaderEffectSource {
                     sourceItem: effect1
                     visible: true
                 }

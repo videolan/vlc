@@ -39,7 +39,7 @@ FocusScope {
 
     property alias _currentView: view.currentItem
 
-    signal showAlbumView(variant id, string name, int reason)
+    signal showAlbumView(var id, string name, int reason)
 
     onInitialIndexChanged:  resetFocus()
 
