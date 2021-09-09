@@ -28,7 +28,6 @@ Control {
     id: control
 
     property var path
-    signal homeButtonClicked
 
     property var _contentModel
     property var _menuModel
@@ -37,6 +36,7 @@ Control {
     readonly property int minimumWidth: VLCStyle.bannerTabButton_width_large
 
     signal browse(var tree, int reason)
+    signal homeButtonClicked(int reason)
 
     onPathChanged: createContentModel()
     onAvailableWidthChanged: createContentModel()
@@ -95,7 +95,7 @@ Control {
             Keys.priority: Keys.AfterItem
             Keys.onPressed: Navigation.defaultKeyAction(event)
 
-            onClicked: control.homeButtonClicked()
+            onClicked: control.homeButtonClicked(focusReason)
         }
 
         AddressbarButton {

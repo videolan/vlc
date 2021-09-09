@@ -121,7 +121,11 @@ Widgets.PageLoader {
         NetworkAddressbar {
             path: view === "browse" ? root.stackView.currentItem.providerModel.path : []
 
-            onHomeButtonClicked: history.push(["mc", "network", "home"])
+            onHomeButtonClicked: {
+                history.push(["mc", "network", "home"])
+
+                stackView.currentItem.setCurrentItemFocus(reason)
+            }
 
             onBrowse: {
                 history.push(["mc", "network", "browse", { "tree": tree }])

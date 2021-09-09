@@ -63,18 +63,26 @@ Widgets.PageLoader {
 
         NetworkBrowseDisplay {
             property alias source_name: deviceModel.source_name
+
             property Component addressBar: NetworkAddressbar {
                 path: [{display: deviceModel.name, tree: {}}]
 
-                onHomeButtonClicked: history.push(["mc", "discover", "services"])
+                onHomeButtonClicked: {
+                    history.push(["mc", "discover", "services"])
+
+                    stackView.currentItem.setCurrentItemFocus(reason)
+                }
             }
 
             providerModel: deviceModel
             contextMenu: contextMenu
 
-            onBrowse: history.push(["mc", "discover", "services", "source_browse",
-                                    { tree: tree,
-                                      "root_name": deviceModel.name, "source_name": source_name }])
+            onBrowse: {
+                history.push(["mc", "discover", "services", "source_browse",
+                              { tree: tree, "root_name": deviceModel.name, "source_name": source_name }])
+
+                stackView.currentItem.setCurrentItemFocus(reason)
+            }
 
             NetworkDeviceModel {
                 id: deviceModel
@@ -105,13 +113,19 @@ Widgets.PageLoader {
                     return _path
                 }
 
-                onHomeButtonClicked: history.push(["mc", "discover", "services"])
+                onHomeButtonClicked: {
+                    history.push(["mc", "discover", "services"])
+
+                    stackView.currentItem.setCurrentItemFocus(reason)
+                }
 
                 onBrowse: {
                     if (!!tree.isRoot)
                         history.push(["mc", "discover", "services", "source_root", { source_name: tree.source_name }])
                     else
-                        history.push(["mc", "discover", "services", "source_browse", { tree: tree, "root": root_name }]);
+                        history.push(["mc", "discover", "services", "source_browse", { tree: tree, "root": root_name }])
+
+                    stackView.currentItem.setCurrentItemFocus(reason)
                 }
             }
 
@@ -123,8 +137,12 @@ Widgets.PageLoader {
                 model: providerModel
             }
 
-            onBrowse: history.push(["mc", "discover", "services", "source_browse",
+            onBrowse: {
+                history.push(["mc", "discover", "services", "source_browse",
                                     { tree: tree, "root": root_name }])
+
+                stackView.currentItem.setCurrentItemFocus(reason)
+            }
         }
     }
 
