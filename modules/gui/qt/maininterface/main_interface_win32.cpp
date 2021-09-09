@@ -99,7 +99,7 @@ namespace  {
 
 HWND WinId( QWindow *windowHandle )
 {
-    if( windowHandle )
+    if( windowHandle && windowHandle->handle() )
         return static_cast<HWND>(QGuiApplication::platformNativeInterface()->
             nativeResourceForWindow("handle", windowHandle));
     else
