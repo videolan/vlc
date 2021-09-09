@@ -34,8 +34,6 @@ Widgets.PageLoader {
     property var contentModel
     property bool isViewMultiView: true
 
-    property var tree: undefined
-
     property Component localMenuDelegate
 
     // Settings
@@ -60,29 +58,10 @@ Widgets.PageLoader {
                            ||
                            currentItem.isViewMultiView);
 
-        if (tree) {
-            if (view.name === "home")
-                localMenuDelegate = null;
-            else
-                localMenuDelegate = componentBar;
-        } else {
-            localMenuDelegate = null;
-        }
-    }
-
-    // Functions
-    // PageLoader reimplementation
-
-    // FIXME: Maybe this could be done with a 'guard' mechanism on the pageModel.
-    function loadView() {
-        if (tree)
-            stackView.loadView(pageModel, view.name, view.properties);
+        if (view.name === "browse")
+            localMenuDelegate = componentBar
         else
-            stackView.loadView(pageModel, "home", view.properties);
-
-        stackView.currentItem.Navigation.parentItem = root;
-
-        currentItemChanged(stackView.currentItem);
+            localMenuDelegate = null
     }
 
     // Connections
@@ -91,10 +70,7 @@ Widgets.PageLoader {
         target: stackView.currentItem
 
         onBrowse: {
-            root.tree = tree;
-
             history.push(["mc", "network", "browse", { tree: tree }]);
-
             stackView.currentItem.setCurrentItemFocus(reason);
         }
     }
