@@ -93,15 +93,14 @@ Widgets.PageLoader {
 
     Component {
         id: sourceBrowseComponent
-        NetworkBrowseDisplay {
 
-            providerModel: mediaModel
-            contextMenu: contextMenu
+        NetworkBrowseDisplay {
             property string root_name
             property string source_name
+
             property Component addressBar: NetworkAddressbar {
                 path: {
-                    var _path = mediaModel.path
+                    var _path = providerModel.path
                     _path.unshift({display: root_name, tree: {"source_name": source_name, "isRoot": true}})
                     return _path
                 }
@@ -116,20 +115,16 @@ Widgets.PageLoader {
                 }
             }
 
-            onBrowse: history.push(["mc", "discover", "services", "source_browse",
-                                    { tree: tree, "root": root_name }])
-
-            NetworkMediaModel {
-                id: mediaModel
-
+            providerModel: NetworkMediaModel {
                 ctx: mainctx
             }
 
-            NetworkMediaContextMenu {
-                id: contextMenu
-
-                model: mediaModel
+            contextMenu: NetworkMediaContextMenu {
+                model: providerModel
             }
+
+            onBrowse: history.push(["mc", "discover", "services", "source_browse",
+                                    { tree: tree, "root": root_name }])
         }
     }
 
