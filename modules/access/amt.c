@@ -744,6 +744,11 @@ static bool open_amt_tunnel( stream_t *p_access )
         {
             block_Release( pkt );
             msg_Dbg( p_access, "Got UDP packet from multicast group via AMT relay %s, continuing...", relay_ip );
+
+            /* Arm IGMP timer once we've confirmed we are getting packets */
+            vlc_timer_schedule( sys->updateTimer, false,
+                        VLC_TICK_FROM_SEC( sys->relay_igmp_query.qqic ), VLC_TICK_FROM_SEC( sys->relay_igmp_query.qqic ) );
+
             break;   /* found an active server sending UDP packets, so exit loop */
         }
     }
@@ -1229,10 +1234,6 @@ static bool amt_rcv_relay_mem_query( stream_t *p_access )
 
     shift++; assert( shift < RELAY_QUERY_MSG_LEN);
     memcpy( &sys->relay_igmp_query.nSrc, &pkt[shift], 2 );
-
-    /* Arms the timer for a single shot: cf. amt_update_timer_cb comment */
-    vlc_timer_schedule( sys->updateTimer, false,
-                        VLC_TICK_FROM_SEC( sys->relay_igmp_query.qqic ), 0 );
 
     return true;
 }
