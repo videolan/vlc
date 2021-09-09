@@ -26,26 +26,22 @@ import "qrc:///style/"
 import "qrc:///util/Helpers.js" as Helpers
 
 
-ToolButton {
+Control {
     id: playBtn
 
-    width: VLCStyle.icon_medium
-    height: width
+    implicitHeight: VLCStyle.icon_medium
+    implicitWidth: implicitHeight
 
-    scale: (_keyOkPressed || (playBtnMouseArea.pressed && isCursorInside)) ? 0.95
-                                                                           : 1.0
+    scale: (_keyOkPressed || (mouseArea.pressed && cursorInside)) ? 0.95
+                                                                  : 1.00
 
     property VLCColors colors: VLCStyle.colors
 
-    property color color: colors.buttonPlayIcon
-
-    property color colorDisabled: colors.textInactive
-
     property bool paintOnly: false
 
-    property bool isCursorInside: false
-
     property bool _keyOkPressed: false
+
+    property alias cursorInside: mouseArea.cursorInside
 
     Keys.onPressed: {
         if (KeyHelper.matchOk(event) ) {
@@ -78,7 +74,7 @@ ToolButton {
     Timer {
         id: keyHoldTimer
 
-        interval: playBtnMouseArea.pressAndHoldInterval
+        interval: mouseArea.pressAndHoldInterval
         repeat: false
 
         Component.onCompleted: {
@@ -86,40 +82,105 @@ ToolButton {
         }
     }
 
+    MouseArea {
+        id: mouseArea
+        anchors.fill: parent
+
+        hoverEnabled: true
+
+        readonly property bool cursorInside: {
+            if (!containsMouse)
+                return false
+
+            if (width !== height) {
+                console.warn("PlayButton should be round!")
+                return true
+            }
+
+            var center = (width / 2)
+            if (Helpers.pointInRadius( center - mouseX,
+                                       center - mouseY,
+                                       center )) {
+                return true
+            } else {
+                return false
+            }
+        }
+
+        onPressed: {
+            if (!cursorInside)
+                mouse.accepted = false
+        }
+
+        onClicked: {
+            mainPlaylistController.togglePlayPause()
+            mouse.accepted = true
+        }
+
+        onPressAndHold: {
+            _pressAndHoldAction()
+            mouse.accepted = true
+        }
+    }
+
     states: [
         State {
-            name: "hovered"
-            when: interactionIndicator
+            name: "focused"
+            when: visualFocus
 
             PropertyChanges {
                 target: hoverShadow
-                radius: VLCStyle.dp(24, VLCStyle.scale)
+
+                radius: VLCStyle.dp(18, VLCStyle.scale)
+                opacity: 1
             }
         },
         State {
-            name: "default"
-            when: !interactionIndicator
-
-            PropertyChanges {
-                target: contentLabel
-                color: enabled ? playBtn.color : playBtn.colorDisabled
-            }
+            name: "hover"
+            when: cursorInside
 
             PropertyChanges {
                 target: hoverShadow
-                radius: 0
+
+                radius: VLCStyle.dp(14, VLCStyle.scale)
+                opacity: 0.5
             }
         }
     ]
-    readonly property bool interactionIndicator: (playBtn.activeFocus || playBtn.isCursorInside || playBtn.highlighted)
+
+    transitions: Transition {
+        from: ""; to: "*"
+        reversible: true
+        NumberAnimation {
+            properties: "radius, opacity"
+            easing.type: Easing.InOutSine
+            duration: VLCStyle.ms75
+        }
+    }
 
     contentItem: Label {
         id: contentLabel
 
-        text: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
-               && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
-              ? VLCIcons.pause
-              : VLCIcons.play
+        text: {
+            var state = player.playingState
+
+            if (!paintOnly
+                    && state !== PlayerController.PLAYING_STATE_PAUSED
+                    && state !== PlayerController.PLAYING_STATE_STOPPED)
+                return VLCIcons.pause
+            else
+                return VLCIcons.play
+        }
+
+        color: cursorInside ? hoverShadow.color :
+                              (paintOnly || enabled ? colors.buttonPlayIcon
+                                                    : colors.textInactive)
+
+        font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_normal)
+        font.family: VLCIcons.fontFamily
+
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
 
         Behavior on color {
             ColorAnimation {
@@ -127,89 +188,28 @@ ToolButton {
                 easing.type: Easing.InOutSine
             }
         }
-
-        font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_normal)
-        font.family: VLCIcons.fontFamily
-
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
     }
 
     background: Item {
-        Gradient {
-            id: playBtnGradient
-            GradientStop { position: 0.0; color: VLCStyle.colors.buttonPlayA }
-            GradientStop { position: 1.0; color: VLCStyle.colors.buttonPlayB }
-        }
-
-        MouseArea {
-            id: playBtnMouseArea
-
-            anchors.fill: parent
-            anchors.margins: VLCStyle.dp(1, VLCStyle.scale)
-
-            hoverEnabled: true
-
-            readonly property int radius: playBtnMouseArea.width / 2
-
-            onPositionChanged: {
-                if (Helpers.pointInRadius(
-                      (playBtnMouseArea.width / 2) - playBtnMouseArea.mouseX,
-                      (playBtnMouseArea.height / 2) - playBtnMouseArea.mouseY,
-                      radius)) {
-                    // cursor is inside of the round button
-                    playBtn.isCursorInside = true
-                }
-                else {
-                    // cursor is outside
-                    playBtn.isCursorInside = false
-                }
-            }
-
-            onHoveredChanged: {
-                if (!playBtnMouseArea.containsMouse)
-                    playBtn.isCursorInside = false
-            }
-
-            onClicked: {
-                if (!playBtn.isCursorInside)
-                    return
-
-                mainPlaylistController.togglePlayPause()
-            }
-
-            onPressAndHold: {
-                if (!playBtn.isCursorInside)
-                    return
-
-                _pressAndHoldAction()
-            }
-        }
-
         DropShadow {
             id: hoverShadow
-
             anchors.fill: parent
 
-            visible: radius > 0
-            samples: (radius * 2) + 1
-            // opacity: 0.29 // it looks better without this
-            color: "#FF610A"
-            source: opacityMask
-            antialiasing: true
+            visible: radius > 4
 
-            Behavior on radius {
-                NumberAnimation {
-                    duration: VLCStyle.ms75
-                    easing.type: Easing.InOutSine
-                }
-            }
+            radius: 0
+            samples: 49 // should be a fixed number
+            source: opacityMask
+            spread: colors.isThemeDark && playBtn.state === "focused" ? 0.4 : 0.2
+
+            color: "#FF610A"
         }
 
         Rectangle {
-            radius: (width * 0.5)
             anchors.fill: parent
             anchors.margins: VLCStyle.dp(1, VLCStyle.scale)
+
+            radius: (width * 0.5)
 
             color: VLCStyle.colors.white
         }
@@ -218,10 +218,14 @@ ToolButton {
             id: outerRect
             anchors.fill: parent
 
-            radius: (width * 0.5)
-            gradient: playBtnGradient
-
             visible: false
+
+            radius: (width * 0.5)
+
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: VLCStyle.colors.buttonPlayA }
+                GradientStop { position: 1.0; color: VLCStyle.colors.buttonPlayB }
+            }
         }
 
         Rectangle {
