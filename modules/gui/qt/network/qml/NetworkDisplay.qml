@@ -122,6 +122,12 @@ Widgets.PageLoader {
             path: view === "browse" ? root.stackView.currentItem.providerModel.path : []
 
             onHomeButtonClicked: history.push(["mc", "network", "home"])
+
+            onBrowse: {
+                history.push(["mc", "network", "browse", { "tree": tree }])
+
+                stackView.currentItem.setCurrentItemFocus(reason)
+            }
         }
     }
 }

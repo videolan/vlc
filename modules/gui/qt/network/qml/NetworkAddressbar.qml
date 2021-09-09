@@ -36,18 +36,14 @@ Control {
     readonly property int maximumWidth: VLCStyle.bannerTabButton_width_large * 4
     readonly property int minimumWidth: VLCStyle.bannerTabButton_width_large
 
+    signal browse(var tree, int reason)
+
     onPathChanged: createContentModel()
     onAvailableWidthChanged: createContentModel()
     implicitWidth: VLCStyle.bannerTabButton_width_large * 4
     implicitHeight: VLCStyle.dp(24, VLCStyle.scale)
     focus: true
     onActiveFocusChanged: if (activeFocus) contentItem.forceActiveFocus(focusReason)
-
-    function changeTree(newTree) {
-        history.push(["mc", "network", {
-                          "tree": newTree
-                      }])
-    }
 
     function createContentModel() {
         var contentModel = []
@@ -164,7 +160,7 @@ Control {
                     onlyIcon: false
                     highlighted: index === contentRepeater.count - 1
 
-                    onClicked: changeTree(modelData.tree)
+                    onClicked: browse(modelData.tree, focusReason)
                 }
 
                 Widgets.IconLabel {
@@ -212,7 +208,7 @@ Control {
         }
 
         onSelected: {
-            changeTree(control._menuModel[index].tree)
+            browse(control._menuModel[index].tree, Qt.MouseFocusReason)
         }
     }
 }

@@ -107,11 +107,12 @@ Widgets.PageLoader {
                 }
 
                 onHomeButtonClicked: history.push(["mc", "discover", "services"])
-                function changeTree(new_tree) {
-                    if (!!new_tree.isRoot)
-                        history.push(["mc", "discover", "services", "source_root", { source_name: new_tree.source_name }])
+
+                onBrowse: {
+                    if (!!tree.isRoot)
+                        history.push(["mc", "discover", "services", "source_root", { source_name: tree.source_name }])
                     else
-                        history.push(["mc", "discover", "services", "source_browse", { tree: new_tree, "root": root_name }]);
+                        history.push(["mc", "discover", "services", "source_browse", { tree: tree, "root": root_name }]);
                 }
             }
 
