@@ -55,7 +55,7 @@ const struct
     /* Take a thumbnail of a file without video, which should timeout. */
     { 0, 1, VLC_TICK_INVALID, VLC_TICK_FROM_SEC( 60 ), .0f, false, true, VLC_TICK_FROM_MS( 100 ), false },
     /* Take a thumbnail of a file with a video track starting later */
-    { 1, 1, VLC_TICK_FROM_SEC( 120 ), VLC_TICK_FROM_SEC( 60 ), .0f, false, true,
+    { 1, 1, VLC_TICK_FROM_SEC( 60 ), VLC_TICK_FROM_SEC( 30 ), .0f, false, true,
         VLC_TICK_FROM_SEC( 2 ), true },
 };
 
