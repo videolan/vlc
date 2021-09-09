@@ -60,12 +60,19 @@ FocusScope {
             searchBox.expanded = true
     }
 
+    Binding {
+        target: contentModel
+        property: "searchPattern"
+        value: searchBox.searchPattern
+        when: !!contentModel
+    }
+
     Widgets.AcrylicBackground {
         alternativeColor: VLCStyle.colors.topBanner
         anchors.fill: parent
     }
 
-     Item {
+    Item {
         id: pLBannerSources
 
         property alias model: globalMenuGroup.model
@@ -377,7 +384,6 @@ FocusScope {
 
                             Widgets.SearchBox {
                                 id: searchBox
-                                contentModel: root.contentModel
                                 visible: root.contentModel !== undefined
                                 enabled: visible
                                 height: VLCStyle.bannerButton_height

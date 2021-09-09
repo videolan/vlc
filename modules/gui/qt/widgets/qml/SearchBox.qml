@@ -29,10 +29,11 @@ FocusScope {
 
     width: content.width
 
-    property variant contentModel
     property alias buttonWidth: icon.width
 
     property bool expanded: false
+
+    property alias searchPattern: searchBox.text
 
     onExpandedChanged: {
         if (expanded) {
@@ -139,11 +140,6 @@ FocusScope {
                 selectByMouse: true
 
                 background: Rectangle { color: "transparent" }
-
-                onTextChanged: {
-                    if (contentModel !== undefined)
-                        contentModel.searchPattern = text;
-                }
 
                 Navigation.parentItem: root
                 Navigation.leftItem: icon
