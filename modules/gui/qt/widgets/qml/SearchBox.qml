@@ -134,28 +134,20 @@ FocusScope {
                 Navigation.parentItem: root
                 Navigation.leftItem: icon
                 Navigation.rightItem: clearButton.visible ? clearButton : null
+                Navigation.cancelAction: function() { _expanded = false }
                 Keys.priority: Keys.AfterItem
                 Keys.onPressed: {
-                    //don't use KeyHelper.matchCancel here as we don't want to match Backspace
-                    if (event.key === Qt.Key_Back
-                        || event.key === Qt.Key_Cancel
-                        || event.matches(StandardKey.Back)
-                        || event.matches(StandardKey.Cancel))
-                    {
-                        event.accepted = true
+                    //we don't want Navigation.cancelAction to match Backspace
+                    if (event.matches(StandardKey.Backspace)) {
+                        return
                     }
                     Navigation.defaultKeyAction(event)
                 }
 
                 Keys.onReleased: {
-                    //don't use KeyHelper.matchCancel here as we don't want to match Backspace
-                    if (event.key === Qt.Key_Back
-                        || event.key === Qt.Key_Cancel
-                        || event.matches(StandardKey.Back)
-                        || event.matches(StandardKey.Cancel))
-                    {
-                        _expanded = false
-                        event.accepted = true
+                    //we don't want Navigation.cancelAction to match Backspace
+                    if (event.matches(StandardKey.Backspace)) {
+                        return
                     }
                     Navigation.defaultKeyReleaseAction(event)
                 }
