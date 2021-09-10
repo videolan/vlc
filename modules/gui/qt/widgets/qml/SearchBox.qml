@@ -27,52 +27,50 @@ import "qrc:///widgets/" as Widgets
 FocusScope {
     id: root
 
-    width: content.width
+    implicitWidth: content.implicitWidth
 
     property alias buttonWidth: icon.width
-
-    property bool expanded: false
-
     property alias searchPattern: searchBox.text
 
-    onExpandedChanged: {
-        if (expanded) {
-            searchBox.forceActiveFocus()
-            icon.Navigation.rightItem = searchBox
+    property bool _expanded: false
+
+    function reqExpand() {
+        if (visible)
+            _expanded = true
+    }
+
+    on_ExpandedChanged: {
+        if (_expanded) {
+            searchBox.forceActiveFocus(Qt.ShortcutFocusReason)
             animateExpand.start()
-        }
-        else {
-            searchBox.placeholderText = ""
-            searchBox.text = ""
+        } else {
+            searchBox.clear()
             icon.focus = true
             searchBox.focus = false
-            icon.Navigation.rightItem = null
             animateRetract.start()
         }
     }
 
     onActiveFocusChanged: {
-        if (!activeFocus && searchBox.text == "")
-            expanded = false
+        if (!activeFocus && searchBox.text == "") {
+            _expanded = false
+        }
     }
 
     SmoothedAnimation {
         id: animateExpand;
         target: searchBoxRect;
         properties: "width"
-        duration: VLCStyle.ms125
+        duration: VLCStyle.duration_faster
         to: VLCStyle.widthSearchInput
         easing.type: Easing.InSine
-        onStopped: {
-            searchBox.placeholderText = i18n.qtr("filter")
-        }
     }
 
     SmoothedAnimation {
         id: animateRetract;
         target: searchBoxRect;
         properties: "width"
-        duration: VLCStyle.ms125
+        duration: VLCStyle.duration_faster
         to: 0
         easing.type: Easing.OutSine
     }
@@ -92,15 +90,12 @@ FocusScope {
             focus: true
 
             onClicked: {
-                if (searchBox.text == "")
-                    expanded = !expanded
-                else {
-                    searchBox.clear()
-                    expanded = !expanded
-                }
+                searchBox.clear()
+                _expanded = !_expanded
             }
 
             Navigation.parentItem: root
+            Navigation.rightItem: _expanded ? searchBox : nullptr
             Keys.priority: Keys.AfterItem
             Keys.onPressed: Navigation.defaultKeyAction(event)
         }
@@ -126,7 +121,7 @@ FocusScope {
             TextField {
                 id: searchBox
 
-                enabled: root.expanded
+                enabled: root._expanded
 
                 anchors.fill: searchBoxRect
                 anchors.rightMargin: clearButton.visible ? (VLCStyle.margin_xxsmall + clearButton.width) : 0
@@ -138,6 +133,8 @@ FocusScope {
                 palette.highlightedText: VLCStyle.colors.bgHoverText
 
                 selectByMouse: true
+
+                placeholderText: i18n.qtr("filter")
 
                 background: Rectangle { color: "transparent" }
 
@@ -164,8 +161,7 @@ FocusScope {
                         || event.matches(StandardKey.Back)
                         || event.matches(StandardKey.Cancel))
                     {
-                        text = ""
-                        expanded = false
+                        _expanded = false
                         event.accepted = true
                     }
                     Navigation.defaultKeyReleaseAction(event)
@@ -182,7 +178,7 @@ FocusScope {
                 size: VLCStyle.icon_small
                 iconText: VLCIcons.close
 
-                visible: ( expanded && searchBox.text.length > 0 )
+                visible: ( _expanded && searchBox.text.length > 0 )
                 enabled: visible
 
                 onClicked: {

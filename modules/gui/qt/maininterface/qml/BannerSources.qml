@@ -56,8 +56,7 @@ FocusScope {
     }
 
     function search() {
-        if (searchBox.visible)
-            searchBox.expanded = true
+        searchBox.reqExpand()
     }
 
     Binding {
@@ -387,6 +386,7 @@ FocusScope {
                                 visible: root.contentModel !== undefined
                                 enabled: visible
                                 height: VLCStyle.bannerButton_height
+                                width: searchBox.implicitWith
                                 buttonWidth: VLCStyle.bannerButton_width
                             }
 
