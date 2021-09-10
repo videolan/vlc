@@ -469,7 +469,7 @@ typedef union
 /** No error */
 #define VLC_SUCCESS        (-0)
 /** Unspecified error */
-#define VLC_EGENERIC       (-1)
+#define VLC_EGENERIC       (-2 * (1 << (sizeof (int) * 8 - 2))) /* INT_MIN */
 /** Not enough memory */
 #define VLC_ENOMEM         (-2)
 /** Timeout */
