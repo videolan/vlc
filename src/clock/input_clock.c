@@ -117,7 +117,6 @@ struct input_clock_t
     vlc_tick_t i_next_drift_update;
     average_t drift;
 
-    average_t system_avg;
     average_t stream_avg;
 
     /* Late statistics */
@@ -186,7 +185,6 @@ input_clock_t *input_clock_New( float rate, bool recovery )
 
     cl->i_next_drift_update = VLC_TICK_INVALID;
     AvgInit( &cl->drift, 10 );
-    AvgInit( &cl->system_avg, 10 );
     AvgInit( &cl->stream_avg, 10 );
 
     cl->late.i_index = 0;
@@ -242,38 +240,28 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         /* */
         b_reset_reference= true;
     }
-    else if( cl->last.stream != VLC_TICK_INVALID )
+    else if( cl->last.stream != VLC_TICK_INVALID && cl->i_offset != 0 && atomic_load(&cl->b_recovery))
     {
         const vlc_tick_t stream_diff = i_ck_stream - cl->last.stream;
-        const vlc_tick_t system_diff = i_ck_system - cl->last.system;
 
+        /* Detect unexpected stream discontinuity */
+        const double stream_gap = stream_diff - AvgGet(&cl->stream_avg);
+        if (fabs(stream_gap) > CR_MAX_GAP)
         {
-            /* Possible unexpected stream discontinuity, do a finer calcul to
-             * detect it. The stream gap need to be comparated with the system
-             * gap (if system and stream gap are the same then it's not a
-             * discontinuity) */
+            /* Stream discontinuity, for which we haven't received a
+             * warning from the stream control facilities (dd-edited
+             * stream ?). */
+            msg_Warn( p_log, "clock gap, unexpected stream discontinuity. Offset: %"PRId64
+                      " stream: %"PRId64 " (%lf)",
+                      cl->i_offset, stream_diff, stream_gap );
 
-            if( !b_buffering )
-            {
-                const double system_gap = fabs(system_diff - AvgGet( &cl->system_avg));
-                const double stream_gap = fabs(stream_diff - AvgGet( &cl->stream_avg));
-                if (fabs(system_gap - stream_gap) > CR_MAX_GAP && atomic_load(&cl->b_recovery))
-                {
-                    /* Stream discontinuity, for which we haven't received a
-                     * warning from the stream control facilities (dd-edited
-                     * stream ?). */
-                    msg_Warn( p_log, "clock gap, unexpected stream discontinuity" );
-
-                    /* */
-                    msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
-                    b_reset_reference= true;
-                    b_discontinuity = true;
-                }
-            }
+            /* */
+            msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
+            b_reset_reference= true;
+            b_discontinuity = true;
         }
 
         AvgUpdate( &cl->stream_avg, stream_diff );
-        AvgUpdate( &cl->system_avg, system_diff );
     }
 
     /* */
@@ -281,7 +269,6 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
     {
         cl->i_next_drift_update = VLC_TICK_INVALID;
         AvgReset( &cl->drift );
-        AvgReset( &cl->system_avg );
         AvgReset( &cl->stream_avg );
 
         /* Feed synchro with a new reference point. */
