@@ -398,7 +398,7 @@ static bool vlc_uri_host_validate(const char *str)
 
 static bool vlc_uri_path_validate(const char *str)
 {
-    return vlc_uri_component_validate(str, "/@:");
+    return vlc_uri_component_validate(str, "/@:[]");
 }
 
 static int vlc_UrlParseInner(vlc_url_t *restrict url, const char *str)
