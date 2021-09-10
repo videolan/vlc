@@ -83,6 +83,7 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
     vlc_gl_t *gl = &glpriv->gl;
     gl->api_type = api_type;
     gl->surface = wnd;
+    gl->device = NULL;
     gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start, gl,
                                  cfg->display.width, cfg->display.height);
     if (gl->module == NULL)
@@ -170,6 +171,10 @@ void vlc_gl_Release(vlc_gl_t *gl)
 
     if (gl->destroy != NULL)
         gl->destroy(gl);
+
+    if (gl->device)
+        vlc_decoder_device_Release(gl->device);
+
     vlc_objres_clear(VLC_OBJECT(gl));
     vlc_object_delete(gl);
 }
