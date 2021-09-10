@@ -671,16 +671,6 @@ void vlc_clock_main_Reset(vlc_clock_main_t *main_clock)
 {
     vlc_mutex_lock(&main_clock->lock);
 
-    vlc_info(main_clock->logger, "Reseting all clock contexts");
-
-    for (size_t i = 0; i < main_clock->context_vec.size; ++i)
-    {
-        struct vlc_clock_context *ctx = &main_clock->context_vec.data[i];
-        vlc_info(main_clock->logger, "Removing clock_context[%zd] (reset)", ctx->idx);
-        vlc_clock_context_destroy(ctx);
-    }
-    main_clock->context_vec.size = 0;
-
     vlc_cond_broadcast(&main_clock->cond);
     main_clock->first_pcr =
         clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
