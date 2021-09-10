@@ -26,12 +26,11 @@ import "qrc:///style/"
 
 FocusScope{
     id: widgetfscope
-    x: volumeWidget.x
-    y: volumeWidget.y
-    width: volumeWidget.width
-    height: volumeWidget.height
+
+    implicitWidth: volumeWidget.implicitWidth
+    implicitHeight: volumeWidget.implicitHeight
+
     property bool paintOnly: false
-    enabled: !paintOnly
 
     property color color: colors.buttonText
 
@@ -43,6 +42,8 @@ FocusScope{
 
     RowLayout{
         id: volumeWidget
+        spacing: 0
+
         Widgets.IconToolButton{
             id: volumeBtn
 
@@ -73,12 +74,12 @@ FocusScope{
         Slider {
             id: volControl
 
+            implicitWidth: VLCStyle.dp(100, VLCStyle.scale)
+            Layout.fillHeight: true
+            Layout.margins: VLCStyle.dp(5, VLCStyle.scale)
+
             property bool _inhibitPlayerVolumeUpdate: false
 
-            width: VLCStyle.dp(100, VLCStyle.scale)
-            height: parent.height
-
-            anchors.margins: VLCStyle.dp(5, VLCStyle.scale)
             from: 0
             to: maxvolpos
             stepSize: 0.05
@@ -151,10 +152,10 @@ FocusScope{
 
             Keys.priority: Keys.BeforeItem
 
-            property color sliderColor: (volControl.position > fullvolpos) ? colors.volmax : widgetfscope.color
-            property int maxvol: 125
-            property double fullvolpos: 100 / maxvol
-            property double maxvolpos: maxvol / 100
+            readonly property color sliderColor: (volControl.position > fullvolpos) ? colors.volmax : widgetfscope.color
+            readonly property int maxvol: 125
+            readonly property real fullvolpos: 100 / maxvol
+            readonly property real maxvolpos: maxvol / 100
 
             onValueChanged: {
                 if (paintOnly)
@@ -201,24 +202,30 @@ FocusScope{
 
                 MouseArea {
                     id: sliderMouseArea
-                    property bool isEntered: false
+                    anchors.fill: parent
+                    anchors.topMargin: -VLCStyle.dp(30, VLCStyle.scale)
+                    anchors.bottomMargin: anchors.topMargin
 
-                    width: parent.width
-                    height: parent.height + VLCStyle.dp(60, VLCStyle.scale)
-                    anchors.verticalCenter: parent.verticalCenter
                     hoverEnabled: true
-
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-                    onPressed: function (event) {
-                        volControl.forceActiveFocus()
-
-                        positionChanged(event)
+                    Component.onCompleted: {
+                        positionChanged.connect(adjustVolume)
+                        onPressed.connect(adjustVolume)
                     }
 
-                    onPositionChanged: function (event) {
-                        if (sliderMouseArea.pressedButtons === Qt.RightButton) {
-                            var pos = sliderMouseArea.mouseX * volControl.maxvolpos / sliderMouseArea.width
+                    function adjustVolume(mouse) {
+                        if (pressedButtons === Qt.LeftButton) {
+                            // The slider itself can handle this,
+                            // but then the top&bottom margins need to be
+                            // set there instead of here. Also, if handled
+                            // there stepSize will be respected.
+                            volControl.value = volControl.maxvolpos * (mouseX - handle.width / 2)
+                                                                    / (width - handle.width)
+
+                            mouse.accepted = true
+                        } else if (pressedButtons === Qt.RightButton) {
+                            var pos = mouseX * volControl.maxvolpos / width
                             if (pos < 0.25)
                                 volControl.value = 0
                             else if (pos < 0.75)
@@ -227,17 +234,23 @@ FocusScope{
                                 volControl.value = 1
                             else
                                 volControl.value = 1.25
-                            return
-                        }
 
-                        if(pressed)
-                            volControl.value = volControl.maxvolpos * (event.x - handle.width / 2) / (sliderMouseArea.width - handle.width)
+                            mouse.accepted = true
+                        }
+                    }
+
+                    onPressed: {
+                        if (!volControl.activeFocus)
+                            volControl.forceActiveFocus(Qt.MouseFocusReason)
                     }
 
                     onWheel: {
-                        if(wheel.angleDelta.y > 0)
+                        var x = wheel.angleDelta.x
+                        var y = wheel.angleDelta.y
+
+                        if (x > 0 || y > 0)
                             volControl.increase()
-                        else
+                        else if (x < 0 || y < 0)
                             volControl.decrease()
                     }
                 }
