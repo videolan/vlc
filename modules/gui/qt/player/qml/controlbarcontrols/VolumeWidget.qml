@@ -30,16 +30,16 @@ FocusScope{
     y: volumeWidget.y
     width: volumeWidget.width
     height: volumeWidget.height
-    property bool paintOnly: true
+    property bool paintOnly: false
     enabled: !paintOnly
-
-    Component.onCompleted: paintOnly = false
 
     property color color: colors.buttonText
 
     property alias parentWindow: volumeTooltip.parentWindow
 
     property VLCColors colors: VLCStyle.colors
+
+    readonly property var _player: paintOnly ? ({ muted: false, volume: .5 }) : player
 
     RowLayout{
         id: volumeWidget
@@ -50,13 +50,13 @@ FocusScope{
             paintOnly: widgetfscope.paintOnly
             size: VLCStyle.icon_normal
             iconText:
-                if( player.muted )
+                if( _player.muted )
                     VLCIcons.volume_muted
-                else if ( player.volume == 0 )
+                else if ( _player.volume === 0 )
                     VLCIcons.volume_zero
-                else if ( player.volume < .33 )
+                else if ( _player.volume < .33 )
                     VLCIcons.volume_low
-                else if( player.volume <= .66 )
+                else if( _player.volume <= .66 )
                     VLCIcons.volume_medium
                 else
                     VLCIcons.volume_high
@@ -82,7 +82,7 @@ FocusScope{
             from: 0
             to: maxvolpos
             stepSize: 0.05
-            opacity: player.muted ? 0.5 : 1
+            opacity: _player.muted ? 0.5 : 1
 
             Accessible.name: i18n.qtr("Volume")
 
@@ -101,18 +101,19 @@ FocusScope{
             }
 
             function _syncVolumeWithPlayer() {
-                if (paintOnly)
-                    return
-
                 volControl._inhibitPlayerVolumeUpdate = true
-                volControl.value = player.volume
+                volControl.value = _player.volume
                 volControl._inhibitPlayerVolumeUpdate = false
             }
 
-            Component.onCompleted: volControl._syncVolumeWithPlayer()
+            Component.onCompleted: {
+                widgetfscope.paintOnlyChanged.connect(_syncVolumeWithPlayer)
+                volControl._syncVolumeWithPlayer()
+            }
 
             Connections {
                 target: player
+                enabled: !paintOnly
 
                 onVolumeChanged: volControl._syncVolumeWithPlayer()
             }
@@ -125,6 +126,9 @@ FocusScope{
                 interval: 1000
 
                 onRunningChanged: {
+                    if (!volumeTooltip.active)
+                        return
+
                     if (running)
                         volumeTooltip.visible = true
                     else
@@ -163,20 +167,25 @@ FocusScope{
                     player.volume = volControl.value
             }
 
-            Widgets.PointingTooltip {
+            Loader {
                 id: volumeTooltip
+                active: !paintOnly
 
-                visible: sliderMouseArea.containsMouse
+                property var parentWindow: (typeof playerButtonsLayout === "undefined") ? g_root : playerButtonsLayout.parentWindow
 
-                text: Math.round(volControl.value * 100) + "%"
+                sourceComponent: Widgets.PointingTooltip {
+                    visible: sliderMouseArea.containsMouse
 
-                mouseArea: sliderMouseArea
+                    text: Math.round(volControl.value * 100) + "%"
 
-                xPos: (handle.x + handle.width / 2)
+                    mouseArea: sliderMouseArea
 
-                colors: widgetfscope.colors
+                    xPos: (handle.x + handle.width / 2)
 
-                parentWindow: (typeof playerButtonsLayout === "undefined") ? g_root : playerButtonsLayout.parentWindow
+                    colors: widgetfscope.colors
+
+                    parentWindow: volumeTooltip.parentWindow
+                }
             }
 
             background: Rectangle {
@@ -239,7 +248,7 @@ FocusScope{
                     height: parent.height
                     radius: VLCStyle.dp(4, VLCStyle.scale)
                     color: widgetfscope.color
-                    layer.enabled: (volControl.hovered || volControl.activeFocus)
+                    layer.enabled: (paintOnly || volControl.hovered || volControl.activeFocus)
                     layer.effect: LinearGradient {
                         start: Qt.point(0, 0)
                         end: Qt.point(sliderBg.width, 0)
@@ -269,7 +278,7 @@ FocusScope{
                 implicitWidth: VLCStyle.dp(8, VLCStyle.scale)
                 implicitHeight: implicitWidth
                 radius: width * 0.5
-                visible: (volControl.hovered || volControl.activeFocus)
+                visible: (paintOnly || volControl.hovered || volControl.activeFocus)
                 color: volControl.sliderColor
             }
         }
