@@ -45,7 +45,7 @@ ToolButton {
     property color color: VLCStyle.colors.icon
     property color colorHover: VLCStyle.colors.buttonTextHover
     property color colorHighlighted: VLCStyle.colors.accent
-    property color colorDisabled: VLCStyle.colors.textInactive
+    property color colorDisabled: paintOnly ? color : VLCStyle.colors.textInactive
 
     // Aliases
 

@@ -30,7 +30,8 @@ IconToolButton {
     color: colors.buttonPlayer
     colorHover: colors.buttonTextHover
     colorHighlighted: colors.accent
-    colorDisabled: colors.blendColors(colors.playerBg, colors.playerControlBarFg, 0.75)
+    colorDisabled: paintOnly ? color
+                             : colors.blendColors(colors.playerBg, colors.playerControlBarFg, 0.75)
 
     colorFocus: colors.bgFocus
 }
