@@ -187,7 +187,7 @@ FocusScope {
                 }
             }
 
-            FocusScope {
+            Control {
                 id: localToolbar
 
                 width: parent.width
@@ -206,216 +206,219 @@ FocusScope {
                     }
                 }
 
-                Rectangle {
+                background: Rectangle {
                     id: localToolbarBg
 
-                    anchors.fill: parent
                     color: VLCStyle.colors.lowerBanner
+                    Rectangle {
+                        anchors.left : parent.left
+                        anchors.right: parent.right
+                        anchors.top  : parent.bottom
+
+                        height: VLCStyle.border
+
+                        color: VLCStyle.colors.border
+                    }
                 }
 
-                Rectangle {
-                    anchors.left : localToolbarBg.left
-                    anchors.right: localToolbarBg.right
-                    anchors.top  : localToolbarBg.bottom
 
-                    height: VLCStyle.border
+                contentItem: Item {
+                    id: localToolbarContent
 
-                    color: VLCStyle.colors.border
-                }
+                    Widgets.NavigableRow {
+                        id: localContextGroup
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                            left: parent.left
+                            leftMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xsmall
+                        }
+                        enabled: list_grid_btn.visible || sortControl.visible
 
-                Widgets.NavigableRow {
-                    id: localContextGroup
-                    anchors {
-                        verticalCenter: parent.verticalCenter
-                        left: parent.left
-                        leftMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xsmall
-                    }
-                    enabled: list_grid_btn.visible || sortControl.visible
+                        model: ObjectModel {
+                            id: localContextModel
 
-                    model: ObjectModel {
-                        id: localContextModel
+                            property int countExtra: 0
 
-                        property int countExtra: 0
+                            Widgets.IconToolButton {
+                                id: list_grid_btn
 
-                        Widgets.IconToolButton {
-                            id: list_grid_btn
+                                width: VLCStyle.bannerButton_width
+                                height: VLCStyle.bannerButton_height
+                                size: VLCStyle.banner_icon_size
+                                iconText: mainInterface.gridView ? VLCIcons.list : VLCIcons.grid
+                                text: i18n.qtr("List/Grid")
+                                onClicked: mainInterface.gridView = !mainInterface.gridView
+                                enabled: true
+                            }
 
-                            width: VLCStyle.bannerButton_width
-                            height: VLCStyle.bannerButton_height
-                            size: VLCStyle.banner_icon_size
-                            iconText: mainInterface.gridView ? VLCIcons.list : VLCIcons.grid
-                            text: i18n.qtr("List/Grid")
-                            onClicked: mainInterface.gridView = !mainInterface.gridView
-                            enabled: true
+                            Widgets.SortControl {
+                                id: sortControl
+
+                                textRole: "text"
+                                criteriaRole: "criteria"
+
+                                width: VLCStyle.bannerButton_width
+                                height: VLCStyle.bannerButton_height
+                                iconSize: VLCStyle.banner_icon_size
+
+                                visible: root.sortModel !== undefined && root.sortModel.length > 1
+                                enabled: visible
+
+                                onSortSelected: {
+                                    if (contentModel !== undefined) {
+                                        contentModel.sortCriteria = type
+                                    }
+                                }
+
+                                onSortOrderSelected: {
+                                    if (contentModel !== undefined) {
+                                        contentModel.sortOrder = type
+                                    }
+                                }
+
+                                sortKey: contentModel ? contentModel.sortCriteria : PlaylistControllerModel.SORT_KEY_NONE
+                                sortOrder: contentModel ? contentModel.sortOrder : undefined
+                            }
                         }
 
-                        Widgets.SortControl {
-                            id: sortControl
+                        Connections {
+                            target: root
+                            onExtraLocalActionsChanged : {
+                                for (var i = 0; i < localContextModel.countExtra; i++) {
+                                    localContextModel.remove(localContextModel.count - localContextModel.countExtra, localContextModel.countExtra)
+                                }
 
-                            textRole: "text"
-                            criteriaRole: "criteria"
-
-                            width: VLCStyle.bannerButton_width
-                            height: VLCStyle.bannerButton_height
-                            iconSize: VLCStyle.banner_icon_size
-
-                            visible: root.sortModel !== undefined && root.sortModel.length > 1
-                            enabled: visible
-
-                            onSortSelected: {
-                                if (contentModel !== undefined) {
-                                    contentModel.sortCriteria = type
+                                if (root.extraLocalActions && root.extraLocalActions instanceof ObjectModel) {
+                                    for (i = 0; i < root.extraLocalActions.count; i++)
+                                        localContextModel.append(root.extraLocalActions.get(i))
+                                    localContextModel.countExtra = root.extraLocalActions.count
+                                } else {
+                                    localContextModel.countExtra = 0
                                 }
                             }
-
-                            onSortOrderSelected: {
-                                if (contentModel !== undefined) {
-                                    contentModel.sortOrder = type
-                                }
-                            }
-
-                            sortKey: contentModel ? contentModel.sortCriteria : PlaylistControllerModel.SORT_KEY_NONE
-                            sortOrder: contentModel ? contentModel.sortOrder : undefined
                         }
+
+                        Navigation.parentItem: root
+                        Navigation.rightItem: localMenuGroup.visible ? localMenuGroup : playlistGroup
+                        Navigation.upItem: globalMenuGroup
                     }
 
-                    Connections {
-                        target: root
-                        onExtraLocalActionsChanged : {
-                            for (var i = 0; i < localContextModel.countExtra; i++) {
-                                localContextModel.remove(localContextModel.count - localContextModel.countExtra, localContextModel.countExtra)
-                            }
+                    Flickable {
+                        id: localMenuView
 
-                            if (root.extraLocalActions && root.extraLocalActions instanceof ObjectModel) {
-                                for (i = 0; i < root.extraLocalActions.count; i++)
-                                    localContextModel.append(root.extraLocalActions.get(i))
-                                localContextModel.countExtra = root.extraLocalActions.count
+                        readonly property int availableWidth: parent.width
+                                                              - (localContextGroup.width + playlistGroup.width)
+                                                              - (VLCStyle.applicationHorizontalMargin * 2)
+                                                              - (VLCStyle.margin_xsmall * 2)
+                                                              - (VLCStyle.margin_xxsmall * 2)
+                        readonly property bool _alignHCenter: ((localToolbarContent.width - contentWidth) / 2) + contentWidth < playlistGroup.x
+
+                        width: Math.min(contentWidth, availableWidth)
+                        height: VLCStyle.localToolbar_height
+                        clip: true
+                        contentWidth: localMenuGroup.width
+                        contentHeight: VLCStyle.localToolbar_height // don't allow vertical flickering
+                        anchors.rightMargin: VLCStyle.margin_xxsmall // only applied when right aligned
+
+                        on_AlignHCenterChanged: {
+                            if (_alignHCenter) {
+                                anchors.horizontalCenter = localToolbarContent.horizontalCenter
+                                anchors.right = undefined
                             } else {
-                                localContextModel.countExtra = 0
+                                anchors.horizontalCenter = undefined
+                                anchors.right = playlistGroup.left
+                            }
+                        }
+
+                        Loader {
+                            id: localMenuGroup
+
+                            focus: !!item && item.focus && item.visible
+                            visible: !!item
+                            enabled: status === Loader.Ready
+                            y: status === Loader.Ready ? (VLCStyle.localToolbar_height - item.height) / 2 : 0
+                            width: !!item
+                                   ? Helpers.clamp(localMenuView.availableWidth,
+                                                   localMenuGroup.item.minimumWidth || localMenuGroup.item.implicitWidth,
+                                                   localMenuGroup.item.maximumWidth || localMenuGroup.item.implicitWidth)
+                                   : 0
+
+                            onVisibleChanged: {
+                                //reset the focus on the global group when the local group is hidden,
+                                //this avoids losing the focus if the subview changes
+                                // FIXME: This block needs refactor for keyboard focus.
+                                if (!visible && localMenuGroup.focus) {
+                                    localMenuGroup.focus = false
+                                    globalMenuGroup.focus = true
+                                }
+                            }
+
+                            onItemChanged: {
+                                if (!item)
+                                    return
+                                item.Navigation.parentItem = root
+                                item.Navigation.leftItem = Qt.binding(function(){ return localContextGroup.enabled ? localContextGroup : null})
+                                item.Navigation.rightItem = Qt.binding(function(){ return playlistGroup.enabled ? playlistGroup : null})
+                                item.Navigation.upItem = globalMenuGroup
                             }
                         }
                     }
 
-                    Navigation.parentItem: root
-                    Navigation.rightItem: localMenuGroup.visible ? localMenuGroup : playlistGroup
-                    Navigation.upItem: globalMenuGroup
-                }
-
-                Flickable {
-                    id: localMenuView
-
-                    readonly property int availableWidth: parent.width
-                                                          - (localContextGroup.width + playlistGroup.width)
-                                                          - (VLCStyle.applicationHorizontalMargin * 2)
-                                                          - (VLCStyle.margin_xsmall * 2)
-                                                          - (VLCStyle.margin_xxsmall * 2)
-                    readonly property bool _alignHCenter: ((localToolbar.width - contentWidth) / 2) + contentWidth < playlistGroup.x
-
-                    width: Math.min(contentWidth, availableWidth)
-                    height: VLCStyle.localToolbar_height
-                    clip: true
-                    contentWidth: localMenuGroup.width
-                    contentHeight: VLCStyle.localToolbar_height // don't allow vertical flickering
-                    anchors.rightMargin: VLCStyle.margin_xxsmall // only applied when right aligned
-
-                    on_AlignHCenterChanged: {
-                        if (_alignHCenter) {
-                            anchors.horizontalCenter = localToolbar.horizontalCenter
-                            anchors.right = undefined
-                        } else {
-                            anchors.horizontalCenter = undefined
-                            anchors.right = playlistGroup.left
+                    Widgets.NavigableRow {
+                        id: playlistGroup
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                            right: parent.right
+                            rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xsmall
                         }
-                    }
+                        spacing: VLCStyle.margin_xxxsmall
 
-                    Loader {
-                        id: localMenuGroup
+                        model: ObjectModel {
 
-                        focus: !!item && item.focus && item.visible
-                        visible: !!item
-                        enabled: status === Loader.Ready
-                        y: status === Loader.Ready ? (VLCStyle.localToolbar_height - item.height) / 2 : 0
-                        width: !!item
-                               ? Helpers.clamp(localMenuView.availableWidth,
-                                               localMenuGroup.item.minimumWidth || localMenuGroup.item.implicitWidth,
-                                               localMenuGroup.item.maximumWidth || localMenuGroup.item.implicitWidth)
-                               : 0
+                            Widgets.SearchBox {
+                                id: searchBox
+                                contentModel: root.contentModel
+                                visible: root.contentModel !== undefined
+                                enabled: visible
+                                height: VLCStyle.bannerButton_height
+                                buttonWidth: VLCStyle.bannerButton_width
+                            }
 
-                        onVisibleChanged: {
-                            //reset the focus on the global group when the local group is hidden,
-                            //this avoids losing the focus if the subview changes
-                            // FIXME: This block needs refactor for keyboard focus.
-                            if (!visible && localMenuGroup.focus) {
-                                localMenuGroup.focus = false
-                                globalMenuGroup.focus = true
+                            Widgets.IconToolButton {
+                                id: playlist_btn
+
+                                size: VLCStyle.banner_icon_size
+                                iconText: VLCIcons.playlist
+                                text: i18n.qtr("Playlist")
+                                width: VLCStyle.bannerButton_width
+                                height: VLCStyle.bannerButton_height
+                                highlighted: mainInterface.playlistVisible
+
+                                onClicked:  mainInterface.playlistVisible = !mainInterface.playlistVisible
+                            }
+
+                            Widgets.IconToolButton {
+                                id: menu_selector
+
+                                size: VLCStyle.banner_icon_size
+                                iconText: VLCIcons.ellipsis
+                                text: i18n.qtr("Menu")
+                                width: VLCStyle.bannerButton_width
+                                height: VLCStyle.bannerButton_height
+
+                                onClicked: contextMenu.popup(this.mapToGlobal(0, height))
+
+                                QmlGlobalMenu {
+                                    id: contextMenu
+                                    ctx: mainctx
+                                }
                             }
                         }
 
-                        onItemChanged: {
-                            if (!item)
-                                return
-                            item.Navigation.parentItem = root
-                            item.Navigation.leftItem = Qt.binding(function(){ return localContextGroup.enabled ? localContextGroup : null})
-                            item.Navigation.rightItem = Qt.binding(function(){ return playlistGroup.enabled ? playlistGroup : null})
-                            item.Navigation.upItem = globalMenuGroup
-                        }
+                        Navigation.parentItem: root
+                        Navigation.leftItem: localMenuGroup.visible ? localMenuGroup : localContextGroup
+                        Navigation.upItem: globalMenuGroup
                     }
-                }
-
-                Widgets.NavigableRow {
-                    id: playlistGroup
-                    anchors {
-                        verticalCenter: parent.verticalCenter
-                        right: parent.right
-                        rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_xsmall
-                    }
-                    spacing: VLCStyle.margin_xxxsmall
-
-                    model: ObjectModel {
-
-                        Widgets.SearchBox {
-                            id: searchBox
-                            contentModel: root.contentModel
-                            visible: root.contentModel !== undefined
-                            enabled: visible
-                            height: VLCStyle.bannerButton_height
-                            buttonWidth: VLCStyle.bannerButton_width
-                        }
-
-                        Widgets.IconToolButton {
-                            id: playlist_btn
-
-                            size: VLCStyle.banner_icon_size
-                            iconText: VLCIcons.playlist
-                            text: i18n.qtr("Playlist")
-                            width: VLCStyle.bannerButton_width
-                            height: VLCStyle.bannerButton_height
-                            highlighted: mainInterface.playlistVisible
-
-                            onClicked:  mainInterface.playlistVisible = !mainInterface.playlistVisible
-                        }
-
-                        Widgets.IconToolButton {
-                            id: menu_selector
-
-                            size: VLCStyle.banner_icon_size
-                            iconText: VLCIcons.ellipsis
-                            text: i18n.qtr("Menu")
-                            width: VLCStyle.bannerButton_width
-                            height: VLCStyle.bannerButton_height
-
-                            onClicked: contextMenu.popup(this.mapToGlobal(0, height))
-
-                            QmlGlobalMenu {
-                                id: contextMenu
-                                ctx: mainctx
-                            }
-                        }
-                    }
-
-                    Navigation.parentItem: root
-                    Navigation.leftItem: localMenuGroup.visible ? localMenuGroup : localContextGroup
-                    Navigation.upItem: globalMenuGroup
                 }
             }
         }
