@@ -72,6 +72,7 @@ namespace sdi_sout
                 vlc_mutex_t lock; /* Driver calls callback... until buffer is empty :/ */
                 vlc_cond_t cond;
                 vlc_thread_t thread;
+                bool canceled;
             } feeder;
             static void *feederThreadCallback(void *);
             void feederThread();

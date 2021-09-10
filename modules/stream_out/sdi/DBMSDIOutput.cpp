@@ -69,6 +69,7 @@ DBMSDIOutput::DBMSDIOutput(sout_stream_t *p_stream) :
     streamStartTime = VLC_TICK_INVALID;
     vlc_mutex_init(&feeder.lock);
     vlc_cond_init(&feeder.cond);
+    feeder.canceled = false;
 }
 
 DBMSDIOutput::~DBMSDIOutput()
@@ -77,7 +78,12 @@ DBMSDIOutput::~DBMSDIOutput()
     {
         while(!isDrained())
             vlc_tick_wait(vlc_tick_now() + CLOCK_FREQ/60);
-        vlc_cancel(feeder.thread);
+
+        vlc_mutex_lock(&feeder.lock);
+        feeder.canceled = true;
+        vlc_cond_signal(&feeder.cond);
+        vlc_mutex_unlock(&feeder.lock);
+
         vlc_join(feeder.thread, NULL);
     }
 
@@ -560,14 +566,12 @@ void DBMSDIOutput::feederThread()
     for(;;)
     {
         vlc_mutex_lock(&feeder.lock);
-        mutex_cleanup_push(&feeder.lock);
         vlc_cond_timedwait(&feeder.cond, &feeder.lock, vlc_tick_now() + maxdelay);
-        vlc_cleanup_pop();
-        int cancel = vlc_savecancel();
+        if (feeder.canceled)
+            break;
         doSchedule();
         if(timescale)
             maxdelay = CLOCK_FREQ * frameduration / timescale;
-        vlc_restorecancel(cancel);
         vlc_mutex_unlock(&feeder.lock);
     }
 }
