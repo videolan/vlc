@@ -90,26 +90,16 @@ vlc_player_t *vlclua_get_player_internal( lua_State *L )
  *****************************************************************************/
 int vlclua_push_ret( lua_State *L, int i_error )
 {
+    const char *str;
+
     lua_pushnumber( L, i_error );
 
-    int err;
+    if( i_error == VLC_EGENERIC )
+        str = "Generic error";
+    else
+        str = vlc_strerror_c( -i_error );
 
-    switch( i_error )
-    {
-        case VLC_SUCCESS:   err = 0;         break;
-        case VLC_ENOMEM:    err = ENOMEM;    break;
-        case VLC_ETIMEOUT:  err = ETIMEDOUT; break;
-        case VLC_EINVAL:    err = EINVAL;    break;
-        case VLC_ENOENT:    err = ENOENT;    break;
-        case VLC_EGENERIC:
-            lua_pushstring( L, "Generic error" );
-            return 2;
-        default:
-            lua_pushstring( L, "Unknown error" );
-            return 2;
-    }
-
-    lua_pushstring( L, vlc_strerror_c(err) );
+    lua_pushstring( L, str );
     return 2;
 }
 
