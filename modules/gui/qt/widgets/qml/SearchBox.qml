@@ -109,14 +109,7 @@ FocusScope {
             width: 0
             implicitHeight: searchBox.height
 
-            border.color: {
-                if ( searchBox.text.length < 3 && searchBox.text.length !== 0 )
-                    return VLCStyle.colors.alert
-                else if ( searchBox.activeFocus )
-                    return VLCStyle.colors.accent
-                else
-                    return VLCStyle.colors.buttonBorder
-            }
+            border.color: searchBox.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.buttonBorder
 
             TextField {
                 id: searchBox
