@@ -165,6 +165,12 @@ static const struct testcase
     { true, HTTP("ex.com/testing/good_path/ks_find_realm", "Realm"),
       { "user4", "pwd4", "Realm", "Basic" }, {}, {}, false },
 
+    { true, HTTP("ex.com/testing/good_path/ks_find_realm", NULL),
+      { "user4", "pwd4", "Realm", "Basic" }, {}, {}, false },
+
+    { false, HTTP("ex.com/testing/wrong_path/ks_find_realm", NULL),
+        {}, {}, {}, false },
+
     { true, HTTP("ex.com/testing/good_path/another_path/ks_find_realm", "Realm"),
       { "user4", "pwd4", "Realm", "Basic" }, {}, {}, false },
 
