@@ -101,6 +101,10 @@ Control {
         sourceComponent: PlaylistOverlayMenu {
             colors: root.colors
 
+            isRight: true
+            rightPadding: VLCStyle.margin_xsmall + VLCStyle.applicationHorizontalMargin
+            bottomPadding: VLCStyle.margin_large + root.bottomPadding
+
             itemParent: listView
             backgroundItem: contentItem
         }
