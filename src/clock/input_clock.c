@@ -140,6 +140,7 @@ struct input_clock_t
     float   rate;
     vlc_tick_t i_pts_delay;
     vlc_tick_t i_pause_date;
+    vlc_tick_t i_offset;
 
     atomic_bool b_recovery;
 };
@@ -196,6 +197,7 @@ input_clock_t *input_clock_New( float rate, bool recovery )
     cl->i_pts_delay = 0;
     cl->b_paused = false;
     cl->i_pause_date = VLC_TICK_INVALID;
+    cl->i_offset = 0;
 
     return cl;
 }
@@ -286,6 +288,8 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         cl->b_has_reference = true;
         cl->ref = clock_point_Create( __MAX( CR_MEAN_PTS_GAP, i_ck_system ),
                                       i_ck_stream );
+        if( b_discontinuity )
+            cl->ref.system += cl->i_offset;
         cl->b_has_external_clock = false;
     }
 
@@ -444,6 +448,7 @@ void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, vlc_tic
         i_offset = i_system - cl->i_external_clock;
     }
 
+    cl->i_offset = i_offset;
     cl->ref.system += i_offset;
     cl->last.system += i_offset;
 
