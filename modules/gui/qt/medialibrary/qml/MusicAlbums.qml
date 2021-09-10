@@ -164,7 +164,7 @@ FocusScope {
                 onItemClicked : gridView_id.leftClickOnItem(modifier, index)
 
                 onItemDoubleClicked: {
-                    if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
+                    gridView_id.switchExpandItem(index)
                 }
 
                 onContextMenuButtonClicked: {
