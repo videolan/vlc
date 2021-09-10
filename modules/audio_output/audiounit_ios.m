@@ -726,6 +726,17 @@ Open(vlc_object_t *obj)
 
     aout_SoftVolumeInit( aout );
 
+    /* First call to AudioComponentFindNext can take a very long time, so cache
+     * it here in order to avoid missing timing when called from Start(). */
+    AudioComponentDescription desc = {
+        .componentType = kAudioUnitType_Output,
+        .componentSubType = kAudioUnitSubType_RemoteIO,
+        .componentManufacturer = kAudioUnitManufacturer_Apple,
+        .componentFlags = 0,
+        .componentFlagsMask = 0,
+    };
+    AudioComponent au_component = AudioComponentFindNext(NULL, &desc);
+
     for (unsigned int i = 0; i< sizeof(au_devs) / sizeof(au_devs[0]); ++i)
         aout_HotplugReport(aout, au_devs[i].psz_id, au_devs[i].psz_name);
 
