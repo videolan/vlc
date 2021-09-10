@@ -107,6 +107,11 @@ libglfilter_mock_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
 noinst_LTLIBRARIES += libglfilter_mock_plugin.la
 endif
 
+if HAVE_OSX
+libglfilter_mock_plugin_la_LIBADD += libvlc_opengl.la
+noinst_LTLIBRARIES += libglfilter_mock_plugin.la
+endif
+
 if HAVE_ANDROID
 libglfilter_mock_plugin_la_LIBADD += libvlc_opengles.la $(GLES2_LIBS)
 libglfilter_mock_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
