@@ -120,7 +120,7 @@ FocusScope {
                 }
 
                 onActiveFocusChanged: {
-                    if (activeFocus && !item.focus) {
+                    if (activeFocus && (!!item && !item.focus)) {
                         recoverFocus()
                     }
                 }
