@@ -39,6 +39,8 @@ namespace adaptive
         class Transport;
         class AuthStorage;
 
+        constexpr unsigned MAX_REDIRECTS = 3;
+
         class AbstractConnection
         {
             public:
@@ -82,7 +84,6 @@ namespace adaptive
                 virtual ssize_t read        (void *p_buffer, size_t len) override;
 
                 virtual void setUsed( bool ) override;
-                static const unsigned MAX_REDIRECTS = 3;
 
             protected:
                 virtual bool    connected   () const;

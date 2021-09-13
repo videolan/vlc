@@ -270,7 +270,7 @@ bool HTTPChunkSource::prepare()
     requestStartTime = mdate();
 
     unsigned int i_redirects = 0;
-    while(i_redirects++ < HTTPConnection::MAX_REDIRECTS)
+    while(i_redirects++ < http::MAX_REDIRECTS)
     {
         if(!connection)
         {
