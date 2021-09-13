@@ -764,7 +764,7 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
         const char* psz_description = "cover";
 
         uint8_t *p_data;
-        int i_data = vlc_b64_decode_binary( &p_data, art_list[0].toCString(true) );
+        int i_data = vlc_b64_decode_binary( &p_data, art_list[0].toCString(false) );
 
         msg_Dbg( p_demux_meta, "Found embedded art: %s (%s) is %i bytes",
                 psz_name, psz_mime, i_data );
@@ -782,7 +782,7 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
         uint8_t *p_data;
         int i_cover_score;
         int i_cover_idx;
-        int i_data = vlc_b64_decode_binary( &p_data, block_picture_list[0].toCString(true) );
+        int i_data = vlc_b64_decode_binary( &p_data, block_picture_list[0].toCString(false) );
         i_cover_score = i_cover_idx = 0;
         /* TODO: Use i_cover_score / i_cover_idx to select the picture. */
         p_attachment = ParseFlacPicture( p_data, i_data, 0,
