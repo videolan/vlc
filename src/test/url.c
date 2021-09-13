@@ -293,6 +293,8 @@ int main (void)
                    "www.example.com", 0, "/caf%C3%A9/", NULL);
     test_url_parse("p://h/white%20spaced", "p", NULL, NULL, "h", 0,
                    "/white%20spaced", NULL);
+    test_url_parse("p://h/[hello:world]", "p", NULL, NULL, "h", 0,
+                   "/[hello:world]", NULL);
     /* Relative URIs */
     test_url_parse("//example.com", NULL, NULL, NULL, "example.com", 0,
                    NULL, NULL);
