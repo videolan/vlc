@@ -215,12 +215,6 @@
 - (void)displayLinkUpdate:(CADisplayLink *)sender
 {
     [self reportEvent:^{
-        vlc_mutex_lock(&_mutex);
-        if (_wnd == NULL || !_enabled)
-        {
-            vlc_mutex_unlock(&_mutex);
-            return;
-        }
         vlc_tick_t now = vlc_tick_now();
         CFTimeInterval current_ts = [sender timestamp];
         CFTimeInterval target_ts = [sender targetTimestamp];
@@ -238,7 +232,6 @@
                      NS_FROM_VLC_TICK(vlc_tick_from_sec(target_ts)));
 
         vout_window_ReportVsyncReached(_wnd, now + offset);
-        vlc_mutex_unlock(&_mutex);
     }];
 
 }
@@ -252,8 +245,13 @@
          * want to block the main CFRunLoop since the vout
          * display module typically needs it to Open(). */
         dispatch_async(_eventq, ^{
-            (eventBlock)();
+            /* We need to lock to ensure _wnd is still valid,
+             * see detachFromParent. */
+            vlc_mutex_lock(&_mutex);
+            if (_wnd != NULL)
+                (eventBlock)();
             vlc_darwin_runloop_Stop(runloop);
+            vlc_mutex_unlock(&_mutex);
         });
     });
 
@@ -323,20 +321,11 @@
     CGSize viewSize = [self bounds].size;
     CGFloat scaleFactor = self.contentScaleFactor;
 
-    /* We need to lock to ensure _wnd is still valid, see detachFromParent. */
-    vlc_mutex_lock(&_mutex);
-    if (_wnd == NULL)
-    {
-        vlc_mutex_unlock(&_mutex);
-        return;
-    }
-
     [self reportEvent:^{
         vout_window_ReportSize(_wnd,
                 viewSize.width * scaleFactor,
                 viewSize.height * scaleFactor);
     }];
-    vlc_mutex_unlock(&_mutex);
 }
 
 - (void)tapRecognized:(UITapGestureRecognizer *)tapRecognizer
@@ -345,21 +334,12 @@
     CGPoint touchPoint = [tapRecognizer locationInView:self];
     CGFloat scaleFactor = self.contentScaleFactor;
 
-    /* We need to lock to ensure _wnd is still valid, see detachFromParent. */
-    vlc_mutex_lock(&_mutex);
-    if (_wnd == NULL)
-    {
-        vlc_mutex_unlock(&_mutex);
-        return;
-    }
-
     [self reportEvent:^{
         vout_window_ReportMouseMoved(_wnd,
                 (int)touchPoint.x * scaleFactor, (int)touchPoint.y * scaleFactor);
         vout_window_ReportMousePressed(_wnd, MOUSE_BUTTON_LEFT);
         vout_window_ReportMouseReleased(_wnd, MOUSE_BUTTON_LEFT);
     }];
-    vlc_mutex_unlock(&_mutex);
 }
 
 - (void)updateConstraints
@@ -370,22 +350,12 @@
 
 - (void)applicationStateChanged:(NSNotification *)notification
 {
-    vlc_mutex_lock(&_mutex);
-
-    if (_wnd == NULL)
-    {
-        vlc_mutex_unlock(&_mutex);
-        return;
-    }
-
     [self reportEvent:^{
         if ([[notification name] isEqualToString:UIApplicationWillEnterForegroundNotification])
             vout_window_ReportVisibilityChanged(_wnd, VOUT_WINDOW_VISIBLE);
         else if ([[notification name] isEqualToString:UIApplicationWillResignActiveNotification])
             vout_window_ReportVisibilityChanged(_wnd, VOUT_WINDOW_NOT_VISIBLE);
     }];
-
-    vlc_mutex_unlock(&_mutex);
 }
 
 /* Subview are expected to fill the whole frame so tell the compositor
