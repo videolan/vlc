@@ -41,12 +41,6 @@ static const uint8_t xiphlavc0[] = { 0x00,   30,
                                      0x01,
                                      0x00, 0x00 };
 
-enum
-{
-    OK = VLC_SUCCESS,
-    FAIL = VLC_EGENERIC,
-};
-
 struct params_s
 {
     const void *packets[XIPH_MAX_HEADER_COUNT];
@@ -61,7 +55,10 @@ struct params_s
 #define BAILOUT(run) { fprintf(stderr, "failed %s line %d\n", run, __LINE__); \
                         return 1; }
 #define RUN(run, test, a, b, res) \
-    if(test(#test " " run, a, b, &params) != res) BAILOUT(#test " " run)
+    if((!test(#test " " run, a, b, &params)) != res) \
+       BAILOUT(#test " " run)
+#define PASS(run, test, a, b) RUN(run, test, a, b, true)
+#define FAIL(run, test, a, b) RUN(run, test, a, b, false)
 #define EXPECT(foo) if(!(foo)) BAILOUT(run)
 #define EXPECT_CLEANUP(foo, cleanup) if(!(foo)) { cleanup; BAILOUT(run) }
 
@@ -70,7 +67,7 @@ static int test_xiph_IsLavcFormat(const char *run,
                  const struct params_s *source)
 {
     EXPECT(xiph_IsLavcFormat(p_extra, i_extra, source->codec) == source->lavc);
-    return OK;
+    return 0;
 }
 
 static int test_xiph_CountHeaders(const char *run,
@@ -78,7 +75,7 @@ static int test_xiph_CountHeaders(const char *run,
                  const struct params_s *source)
 {
     EXPECT(xiph_CountHeaders(p_extra, i_extra) == source->packets_count);
-    return OK;
+    return 0;
 }
 
 static int test_xiph_CountLavcHeaders(const char *run,
@@ -86,7 +83,7 @@ static int test_xiph_CountLavcHeaders(const char *run,
                  const struct params_s *source)
 {
     EXPECT(xiph_CountLavcHeaders(p_extra, i_extra) == source->packets_count);
-    return OK;
+    return 0;
 }
 
 static int SplitCompare(const char *run,
@@ -174,44 +171,44 @@ int main(void)
     params.codec = VLC_CODEC_VORBIS;
 
     /* check if we can detect lavc format */
-    RUN("0", test_xiph_IsLavcFormat, xiph0, 0, OK);
-    RUN("1", test_xiph_IsLavcFormat, xiph0, 1, OK);
-    RUN("2", test_xiph_IsLavcFormat, xiph0, 2, OK);
-    RUN("3", test_xiph_IsLavcFormat, xiph0, 6, OK);
-    RUN("lavc0", test_xiph_IsLavcFormat, xiph0, 0, OK);
-    RUN("lavc1", test_xiph_IsLavcFormat, xiph0, 1, OK);
-    RUN("lavc2", test_xiph_IsLavcFormat, xiph0, 6, OK);
-    RUN("lavc3", test_xiph_IsLavcFormat, xiphlavc0, 0, OK);
-    RUN("lavc4", test_xiph_IsLavcFormat, xiphlavc0, 1, OK);
+    PASS("0", test_xiph_IsLavcFormat, xiph0, 0);
+    PASS("1", test_xiph_IsLavcFormat, xiph0, 1);
+    PASS("2", test_xiph_IsLavcFormat, xiph0, 2);
+    PASS("3", test_xiph_IsLavcFormat, xiph0, 6);
+    PASS("lavc0", test_xiph_IsLavcFormat, xiph0, 0);
+    PASS("lavc1", test_xiph_IsLavcFormat, xiph0, 1);
+    PASS("lavc2", test_xiph_IsLavcFormat, xiph0, 6);
+    PASS("lavc3", test_xiph_IsLavcFormat, xiphlavc0, 0);
+    PASS("lavc4", test_xiph_IsLavcFormat, xiphlavc0, 1);
     params.lavc = true;
-    RUN("lavc5", test_xiph_IsLavcFormat, xiphlavc0, 37, OK);
+    PASS("lavc5", test_xiph_IsLavcFormat, xiphlavc0, 37);
     params.codec = 0;
     params.lavc = false;
-    RUN("lavc6", test_xiph_IsLavcFormat, xiphlavc0, 37, OK);
+    PASS("lavc6", test_xiph_IsLavcFormat, xiphlavc0, 37);
 
     /* check count and return 0 on error */
     params.packets_count = 0;
-    RUN("0", test_xiph_CountHeaders, xiph0, 0, OK);
+    PASS("0", test_xiph_CountHeaders, xiph0, 0);
     params.packets_count = 1;
-    RUN("1", test_xiph_CountHeaders, xiph0, 1, OK);
+    PASS("1", test_xiph_CountHeaders, xiph0, 1);
     params.packets_count = 3;
-    RUN("2", test_xiph_CountHeaders, xiph1, 11, OK);
+    PASS("2", test_xiph_CountHeaders, xiph1, 11);
 
     /* check lavc only valid with count == 3 */
     params.packets_count = 3;
     params.codec = VLC_CODEC_VORBIS;
-    RUN("lavc0", test_xiph_CountLavcHeaders, xiphlavc0, 37, OK);
+    PASS("lavc0", test_xiph_CountLavcHeaders, xiphlavc0, 37);
     params.packets_count = 0;
-    RUN("lavc1", test_xiph_CountLavcHeaders, xiphlavc0, 35, OK);
-    RUN("lavc2", test_xiph_CountLavcHeaders, xiphlavc0, 0, OK);
+    PASS("lavc1", test_xiph_CountLavcHeaders, xiphlavc0, 35);
+    PASS("lavc2", test_xiph_CountLavcHeaders, xiphlavc0, 0);
 
     /* check split on single/trail packet (no index) */
     params.packets[0] = &xiph0[1];
     params.packets_sizes[0] = 5;
     params.packets_count = 1;
-    RUN("0", test_xiph_SplitHeaders, xiph0, 6, OK);
+    PASS("0", test_xiph_SplitHeaders, xiph0, 6);
     params.packets_sizes[0] = 0;
-    RUN("1", test_xiph_SplitHeaders, xiph0, 1, OK);
+    PASS("1", test_xiph_SplitHeaders, xiph0, 1);
 
     /* check split */
     params.packets_count = 3;
@@ -221,22 +218,22 @@ int main(void)
     params.packets_sizes[1] = 1;
     params.packets[2] = &xiph1[9];
     params.packets_sizes[2] = 2;
-    RUN("2", test_xiph_SplitHeaders, xiph1, 11, OK);
-    RUN("3", test_xiph_SplitHeaders, xiph1, 7, FAIL);
+    PASS("2", test_xiph_SplitHeaders, xiph1, 11);
+    FAIL("3", test_xiph_SplitHeaders, xiph1, 7);
 
     /* check variable length decoding */
     uint8_t xiph2[265];
     memset(xiph2, 0xFF, 265);
-    RUN("4", test_xiph_SplitHeaders, xiph2, 265, FAIL);
+    FAIL("4", test_xiph_SplitHeaders, xiph2, 265);
     xiph2[0] = 1;
-    RUN("5", test_xiph_SplitHeaders, xiph2, 265, FAIL);
+    FAIL("5", test_xiph_SplitHeaders, xiph2, 265);
     xiph2[2] = 1;
     params.packets_count = 2;
     params.packets[0] = &xiph2[3];
     params.packets_sizes[0] = 256;
     params.packets[1] = &xiph2[3+256];
     params.packets_sizes[1] = 6;
-    RUN("6", test_xiph_SplitHeaders, xiph2, 265, OK);
+    PASS("6", test_xiph_SplitHeaders, xiph2, 265);
     /* /!\ xiph2 content reused in another test below */
 
     /* check lavc split */
@@ -247,21 +244,21 @@ int main(void)
     params.packets_sizes[1] = 1;
     params.packets[2] = &xiphlavc0[37];
     params.packets_sizes[2] = 0;
-    RUN("lavc0", test_xiph_SplitLavcHeaders, xiphlavc0, 37, OK);
-    RUN("lavc1", test_xiph_SplitLavcHeaders, xiphlavc0, 36, FAIL);
-    RUN("lavc2", test_xiph_SplitLavcHeaders, xiphlavc0, 31, FAIL);
+    PASS("lavc0", test_xiph_SplitLavcHeaders, xiphlavc0, 37);
+    FAIL("lavc1", test_xiph_SplitLavcHeaders, xiphlavc0, 36);
+    FAIL("lavc2", test_xiph_SplitLavcHeaders, xiphlavc0, 31);
 
     /* Test single packet packing */
     params.packets_count = XIPH_MAX_HEADER_COUNT + 1;
-    RUN("0", test_xiph_PackHeaders, xiph0, 6, FAIL);
+    FAIL("0", test_xiph_PackHeaders, xiph0, 6);
     params.packets_count = 1;
     params.packets[0] = &xiph0[1];
     params.packets_sizes[0] = 5;
-    RUN("1", test_xiph_PackHeaders, xiph0, 6, OK);
+    PASS("1", test_xiph_PackHeaders, xiph0, 6);
 
     /* Test multiple packets packing */
     params.packets_count = 0;
-    RUN("2", test_xiph_PackHeaders, xiph1, 11, FAIL);
+    FAIL("2", test_xiph_PackHeaders, xiph1, 11);
     params.packets_count = 3;
     params.packets[0] = &xiph1[3];
     params.packets_sizes[0] = 5;
@@ -269,7 +266,7 @@ int main(void)
     params.packets_sizes[1] = 1;
     params.packets[2] = &xiph1[9];
     params.packets_sizes[2] = 2;
-    RUN("3", test_xiph_PackHeaders, xiph1, 11, OK);
+    PASS("3", test_xiph_PackHeaders, xiph1, 11);
 
     /* Test multiple packets packing variable length encoding */
     params.packets_count = 2;
@@ -277,20 +274,20 @@ int main(void)
     params.packets_sizes[0] = 256;
     params.packets[1] = &xiph2[3+256];
     params.packets_sizes[1] = 6;
-    RUN("4", test_xiph_PackHeaders, xiph2, 265, OK);
+    PASS("4", test_xiph_PackHeaders, xiph2, 265);
 
     /* Appending */
     params.i_append = 0;
     params.p_append = NULL;
     params.packets[0] = &xiph0[1];
     params.packets_sizes[0] = 5;
-    RUN("0", test_xiph_AppendHeaders, xiph0, 6, OK);
+    PASS("0", test_xiph_AppendHeaders, xiph0, 6);
     /* append second time */
     xiph2[0] = 1;
     xiph2[1] = 5;
     memcpy(&xiph2[2+0], &xiph0[1], 5);
     memcpy(&xiph2[2+5], &xiph0[1], 5);
-    RUN("1", test_xiph_AppendHeaders, xiph2, 12, OK);
+    PASS("1", test_xiph_AppendHeaders, xiph2, 12);
     /* check append array overflow */
     free(params.p_append);
     params.i_append = 0;
@@ -301,7 +298,7 @@ int main(void)
         xiph2[0] = i;
         xiph2[1 + i] = 0;
         RUN("2", test_xiph_AppendHeaders, xiph2, 1 + i,
-            ((i < XIPH_MAX_HEADER_COUNT) ? OK : FAIL) );
+            (i < XIPH_MAX_HEADER_COUNT) );
     }
 
     free(params.p_append);
