@@ -36,7 +36,6 @@ namespace adaptive
 
     namespace http
     {
-        class Transport;
         class AuthStorage;
 
         constexpr unsigned MAX_REDIRECTS = 3;
@@ -70,52 +69,6 @@ namespace adaptive
                 BytesRange         bytesRange;
                 size_t             bytesRead;
         };
-
-        class HTTPConnection : public AbstractConnection
-        {
-            public:
-                HTTPConnection(vlc_object_t *, AuthStorage *,  Transport *,
-                               const ConnectionParams &);
-                virtual ~HTTPConnection();
-
-                virtual bool    canReuse     (const ConnectionParams &) const override;
-                virtual RequestStatus request(const std::string& path,
-                                              const BytesRange & = BytesRange()) override;
-                virtual ssize_t read        (void *p_buffer, size_t len) override;
-
-                virtual void setUsed( bool ) override;
-
-            protected:
-                virtual bool    connected   () const;
-                virtual bool    connect     ();
-                virtual void    disconnect  ();
-                virtual bool    send        (const void *buf, size_t size);
-                virtual bool    send        (const std::string &data);
-
-                virtual void    onHeader    (const std::string &line,
-                                             const std::string &value);
-                virtual std::string extraRequestHeaders() const;
-                virtual std::string buildRequestHeader(const std::string &path) const;
-
-                ssize_t         readChunk   (void *p_buffer, size_t len);
-                RequestStatus parseReply();
-                std::string readLine();
-                std::string useragent;
-                std::string referer;
-
-                AuthStorage        *authStorage;
-                ConnectionParams    proxyparams;
-                bool                connectionClose;
-                bool                chunked;
-                bool                chunked_eof;
-                size_t              chunkLength;
-                bool                queryOk;
-                int                 retries;
-                static const int    retryCount = 5;
-
-            private:
-                Transport *transport;
-       };
 
        class LibVLCHTTPSource;
 
@@ -164,16 +117,6 @@ namespace adaptive
                AbstractConnectionFactory() {}
                virtual ~AbstractConnectionFactory() {}
                virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &) = 0;
-       };
-
-       class NativeConnectionFactory : public AbstractConnectionFactory
-       {
-           public:
-               NativeConnectionFactory( AuthStorage * );
-               virtual ~NativeConnectionFactory();
-               virtual AbstractConnection * createConnection(vlc_object_t *, const ConnectionParams &) override;
-           private:
-               AuthStorage *authStorage;
        };
 
        class LibVLCHTTPConnectionFactory : public AbstractConnectionFactory

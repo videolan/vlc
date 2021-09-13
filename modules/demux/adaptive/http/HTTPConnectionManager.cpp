@@ -28,7 +28,6 @@
 #include "HTTPConnectionManager.h"
 #include "HTTPConnection.hpp"
 #include "ConnectionParams.hpp"
-#include "Transport.hpp"
 #include "Downloader.hpp"
 #include "tools/Debug.hpp"
 #include <vlc_url.h>

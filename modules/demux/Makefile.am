@@ -368,8 +368,6 @@ libvlc_adaptive_la_SOURCES = \
     demux/adaptive/http/HTTPConnection.hpp \
     demux/adaptive/http/HTTPConnectionManager.cpp \
     demux/adaptive/http/HTTPConnectionManager.h \
-    demux/adaptive/http/Transport.hpp \
-    demux/adaptive/http/Transport.cpp \
     demux/adaptive/plumbing/CommandsQueue.cpp \
     demux/adaptive/plumbing/CommandsQueue.hpp \
     demux/adaptive/plumbing/Demuxer.cpp \
