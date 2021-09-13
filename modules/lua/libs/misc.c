@@ -102,10 +102,10 @@ int vlclua_push_ret( lua_State *L, int i_error )
         case VLC_EINVAL:    err = EINVAL;    break;
         case VLC_ENOENT:    err = ENOENT;    break;
         case VLC_EGENERIC:
-            lua_pushstring( L, "generic error" );
+            lua_pushstring( L, "Generic error" );
             return 2;
         default:
-            lua_pushstring( L, "unknown error" );
+            lua_pushstring( L, "Unknown error" );
             return 2;
     }
 
