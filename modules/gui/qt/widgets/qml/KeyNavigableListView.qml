@@ -259,14 +259,11 @@ FocusScope {
 
                 selectionUpdated(event.modifiers, oldIndex, newIndex);
 
-                // FIXME: This clears the focus so we can pass the right focusReason.
-                currentItem.focus = false;
-
                 // NOTE: We make sure we have the proper visual focus on components.
                 if (oldIndex < currentIndex)
-                    currentItem.forceActiveFocus(Qt.TabFocusReason);
+                    Helpers.enforceFocus(currentItem, Qt.TabFocusReason);
                 else
-                    currentItem.forceActiveFocus(Qt.BacktabFocusReason);
+                    Helpers.enforceFocus(currentItem, Qt.BacktabFocusReason);
             }
 
             if (!event.accepted) {
