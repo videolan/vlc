@@ -429,17 +429,6 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         hasMetaFlags |= XIPHMETA_##var; \
     }
 
-#define IF_EXTRACT_FMT(txt,var,fmt,target) \
-    if( !strncasecmp(psz_comment, txt, strlen(txt)) ) \
-    { \
-        IF_EXTRACT(txt,var)\
-        if( fmt )\
-        {\
-            free( fmt->target );\
-            fmt->target = strdup(&psz_comment[strlen(txt)]);\
-        }\
-    }
-
         IF_EXTRACT("TITLE=", Title )
         else IF_EXTRACT("ARTIST=", Artist )
         else IF_EXTRACT("GENRE=", Genre )
@@ -472,7 +461,15 @@ void vorbis_ParseComment( es_format_t *p_fmt, vlc_meta_t **pp_meta,
         else IF_EXTRACT("COMMENTS=", Description )
         else IF_EXTRACT("RATING=", Rating )
         else IF_EXTRACT("DATE=", Date )
-        else IF_EXTRACT_FMT("LANGUAGE=", Language, p_fmt, psz_language )
+        else if( !strncasecmp(psz_comment, "LANGUAGE=", strlen("LANGUAGE=") ) )
+        {
+            IF_EXTRACT("LANGUAGE=",Language)
+            if( p_fmt )
+            {
+                free( p_fmt->psz_language );
+                p_fmt->psz_language = strdup(&psz_comment[strlen("LANGUAGE=")]);
+            }
+        }
         else IF_EXTRACT("ORGANIZATION=", Publisher )
         else IF_EXTRACT("ENCODER=", EncodedBy )
         else if( !strncasecmp( psz_comment, "METADATA_BLOCK_PICTURE=", strlen("METADATA_BLOCK_PICTURE=")))
