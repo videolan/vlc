@@ -447,8 +447,16 @@ static int Demux(demux_t *p_demux)
                 p_sys->fmt.video.i_frame_rate = 1;
                 p_sys->fmt.video.i_frame_rate_base = [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output timeScale];
                 msg_Dbg(p_demux, "using frame rate base: %i", p_sys->fmt.video.i_frame_rate_base);
-                p_sys->width = p_sys->fmt.video.i_width = [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output width];
-                p_sys->height = p_sys->fmt.video.i_height = [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output height];
+                p_sys->width
+                    = p_sys->fmt.video.i_width
+                    = p_sys->fmt.video.i_visible_width
+                    = [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output width];
+                p_sys->height
+                    = p_sys->fmt.video.i_height
+                    = p_sys->fmt.video.i_visible_height
+                    = [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output height];
+                p_sys->fmt.video.i_chroma = p_sys->fmt.i_codec;
+
                 p_sys->p_es_video = es_out_Add(p_demux->out, &p_sys->fmt);
                 msg_Dbg(p_demux, "added new video es %4.4s %dx%d", (char*)&p_sys->fmt.i_codec, p_sys->width, p_sys->height);
                 p_sys->b_es_setup = YES;
