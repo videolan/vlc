@@ -193,7 +193,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             currentPts = (mtime_t)presentationtimestamp.value;
             timeScale = (long)presentationtimestamp.timescale;
         }
-        
+
         CVBufferRelease(imageBufferToRelease);
     }
 }
@@ -458,10 +458,10 @@ static int Demux(demux_t *p_demux)
                 p_sys->b_es_setup = YES;
             }
         }
-        
+
         es_out_SetPCR(p_demux->out, p_block->i_pts);
         es_out_Send(p_demux->out, p_sys->p_es_video, p_block);
-        
+
     }
     return 1;
 }
