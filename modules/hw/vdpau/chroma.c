@@ -500,6 +500,7 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     assert(p_sys != NULL && p_sys->vdp == sys->vdp);
     dst->date = pic_f->date;
     dst->b_force = pic_f->b_force;
+    dst->b_still = pic_f->b_still;
 
     /* Enable/Disable features */
     vlc_vdp_video_field_t *f = VDPAU_FIELD_FROM_PICCTX(pic_f->context);
