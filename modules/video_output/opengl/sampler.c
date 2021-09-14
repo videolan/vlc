@@ -858,8 +858,7 @@ sampler_planes_init(struct vlc_gl_sampler *sampler)
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
         /* The coordinates are in texels values, not normalized */
-        ADD(" tex_coords = vec2(tex_coords.x * TexSize.x,\n"
-            "                   tex_coords.y * TexSize.y);\n");
+        ADD(" tex_coords = TexSize * tex_coords;\n");
     }
 
     ADDF("  return %s(Texture, tex_coords);\n", texture_fn);
@@ -1052,8 +1051,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
             if (tex_target == GL_TEXTURE_RECTANGLE)
             {
                 /* The coordinates are in texels values, not normalized */
-                ADDF(" tex_coords = vec2(tex_coords.x * TexSizes[%u].x,\n"
-                     "                   tex_coords.y * TexSizes[%u].y);\n", i, i);
+                ADDF(" tex_coords = TexSizes[%u] * tex_coords;\n", i);
             }
             ADDF(" texel = %s(Textures[%u], tex_coords);\n", lookup, i);
             for (unsigned j = 0; j < swizzle_count; ++j)
