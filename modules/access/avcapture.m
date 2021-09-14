@@ -161,19 +161,18 @@ vlc_module_end ()
     }
 }
 
--(vlc_tick_t)currentPts
+- (vlc_tick_t)currentPts
 {
     vlc_tick_t pts;
 
-    if ( !currentImageBuffer || currentPts == previousPts )
-        return 0;
-
     @synchronized (self)
     {
+       if ( !currentImageBuffer || currentPts == previousPts )
+           return 0;
         pts = previousPts = currentPts;
     }
 
-    return currentPts;
+    return pts;
 }
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput
