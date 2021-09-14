@@ -461,7 +461,7 @@ static int Demux(demux_t *p_demux)
                 p_sys->fmt.video.i_chroma = p_sys->fmt.i_codec;
 
                 p_sys->p_es_video = es_out_Add(p_demux->out, &p_sys->fmt);
-                msg_Dbg(p_demux, "added new video es %4.4s %dx%d", (char*)&p_sys->fmt.i_codec, p_sys->width, p_sys->height);
+                video_format_Print(p_demux, "added new video es", &p_sys->fmt.video);
                 p_sys->b_es_setup = YES;
             }
         }
