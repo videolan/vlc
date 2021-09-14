@@ -464,8 +464,7 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     picture_t *pic_f = sys->history[MAX_PAST];
     if (pic_f == NULL)
     {   /* There is no present field, probably just starting playback. */
-        if (!sys->history[MAX_PAST + MAX_FUTURE] ||
-            !sys->history[MAX_PAST + MAX_FUTURE]->b_force)
+        if (!sys->history[MAX_PAST + MAX_FUTURE]->b_force)
             goto skip;
 
         /* If the picture is forced, ignore deinterlacing and fast forward. */
