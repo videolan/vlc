@@ -2995,9 +2995,6 @@ if test "${enable_x262}" != "no"; then
           VLC_ADD_LIBS([x262],[${av_cv_ld_bsymbolic}])
         ])
         VLC_ADD_CFLAGS([x262],[${X262_CFLAGS}])
-        if echo ${X262_LIBS} |grep -q 'pthreadGC2'; then
-          VLC_ADD_CFLAGS([x262], [-DPTW32_STATIC_LIB])
-        fi
     ], [
        if test "${enable_x262}" = "yes"; then
         AC_MSG_ERROR([x262 module doesn't work without staticly compiled libx262.a])
@@ -3023,9 +3020,6 @@ if test "${enable_x264}" != "no"; then
         ])
 
         VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
-        if echo ${X264_LIBS} |grep -q 'pthreadGC2'; then
-          VLC_ADD_CFLAGS([x264], [-DPTW32_STATIC_LIB])
-        fi
       ],[
         if test "${enable_x264}" = "yes"; then
             AC_MSG_ERROR([${X264_PKG_ERRORS}: you may get it from http://www.videolan.org/x264.html])
@@ -3048,9 +3042,6 @@ if test "${enable_x26410b}" != "no"; then
         ])
 
         VLC_ADD_CFLAGS([x26410b],[${X264_CFLAGS}])
-        if echo ${X264_LIBS} |grep -q 'pthreadGC2'; then
-          VLC_ADD_CFLAGS([x26410b], [-DPTW32_STATIC_LIB])
-        fi
       ],[
         if test "${enable_x26410b}" = "yes"; then
             AC_MSG_ERROR([${X264_PKG_ERRORS}: you may get it from http://www.videolan.org/x264.html])
