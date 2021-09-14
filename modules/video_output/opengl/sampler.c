@@ -48,7 +48,7 @@ struct vlc_gl_sampler_priv {
 
     struct {
         GLfloat OrientationMatrix[4*4];
-        GLfloat TexCoordsMaps[PICTURE_PLANE_MAX][3*3];
+        GLfloat TexCoordsMap[3*3];
     } var;
     struct {
         GLint Textures[PICTURE_PLANE_MAX];
@@ -58,7 +58,7 @@ struct vlc_gl_sampler_priv {
 
         GLint TransformMatrix;
         GLint OrientationMatrix;
-        GLint TexCoordsMaps[PICTURE_PLANE_MAX];
+        GLint TexCoordsMap;
     } uloc;
 
     bool yuv_color;
@@ -296,18 +296,17 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         vt->GetUniformLocation(program, "OrientationMatrix");
     assert(priv->uloc.OrientationMatrix != -1);
 
+    priv->uloc.TexCoordsMap = vt->GetUniformLocation(program, "TexCoordsMap");
+    assert(priv->uloc.TexCoordsMap != -1);
+
     assert(sampler->tex_count < 10); /* to guarantee variable names length */
     for (unsigned int i = 0; i < sampler->tex_count; ++i)
     {
-        char name[sizeof("TexCoordsMaps[X]")];
+        char name[sizeof("Textures[X]")];
 
         snprintf(name, sizeof(name), "Textures[%1u]", i);
         priv->uloc.Textures[i] = vt->GetUniformLocation(program, name);
         assert(priv->uloc.Textures[i] != -1);
-
-        snprintf(name, sizeof(name), "TexCoordsMaps[%1u]", i);
-        priv->uloc.TexCoordsMaps[i] = vt->GetUniformLocation(program, name);
-        assert(priv->uloc.TexCoordsMaps[i] != -1);
 
         if (priv->tex_target == GL_TEXTURE_RECTANGLE)
         {
@@ -356,9 +355,10 @@ sampler_base_load(struct vlc_gl_sampler *sampler)
         vt->ActiveTexture(GL_TEXTURE0 + i);
         vt->BindTexture(priv->tex_target, priv->textures[i]);
 
-        vt->UniformMatrix3fv(priv->uloc.TexCoordsMaps[i], 1, GL_FALSE,
-                             priv->var.TexCoordsMaps[i]);
     }
+
+    vt->UniformMatrix3fv(priv->uloc.TexCoordsMap, 1, GL_FALSE,
+                         priv->var.TexCoordsMap);
 
     /* Return the expected transform matrix if interop == NULL */
     const GLfloat *tm = GetTransformMatrix(priv->interop);
@@ -425,9 +425,8 @@ sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         vt->GetUniformLocation(program, "OrientationMatrix");
     assert(priv->uloc.OrientationMatrix != -1);
 
-    priv->uloc.TexCoordsMaps[0] =
-        vt->GetUniformLocation(program, "TexCoordsMaps[0]");
-    assert(priv->uloc.TexCoordsMaps[0] != -1);
+    priv->uloc.TexCoordsMap = vt->GetUniformLocation(program, "TexCoordsMap");
+    assert(priv->uloc.TexCoordsMap != -1);
 }
 
 static void
@@ -442,8 +441,8 @@ sampler_xyz12_load(struct vlc_gl_sampler *sampler)
     vt->ActiveTexture(GL_TEXTURE0);
     vt->BindTexture(priv->tex_target, priv->textures[0]);
 
-    vt->UniformMatrix3fv(priv->uloc.TexCoordsMaps[0], 1, GL_FALSE,
-                         priv->var.TexCoordsMaps[0]);
+    vt->UniformMatrix3fv(priv->uloc.TexCoordsMap, 1, GL_FALSE,
+                         priv->var.TexCoordsMap);
 
     /* Return the expected transform matrix if interop == NULL */
     const GLfloat *tm = GetTransformMatrix(priv->interop);
@@ -482,13 +481,11 @@ xyz12_shader_init(struct vlc_gl_sampler *sampler)
 
         "uniform mat4 TransformMatrix;\n"
         "uniform mat4 OrientationMatrix;\n"
-        "uniform mat3 TexCoordsMaps[1];\n"
+        "uniform mat3 TexCoordsMap;\n"
         "vec4 vlc_texture(vec2 pic_coords)\n"
         "{ "
         " vec4 v_in, v_out;"
-        /* Homogeneous (oriented) coordinates */
-        " vec3 pic_hcoords = vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).st, 1.0);\n"
-        " vec2 tex_coords = (TexCoordsMaps[0] * pic_hcoords).st;\n"
+        " vec2 tex_coords = (TexCoordsMap * vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).xy, 1.0)).xy;\n"
         " v_in  = texture2D(Textures[0], tex_coords);\n"
         " v_in = pow(v_in, xyz_gamma);"
         " v_out = matrix_xyz_rgb * v_in ;"
@@ -778,9 +775,8 @@ sampler_planes_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
     priv->uloc.Textures[0] = vt->GetUniformLocation(program, "Texture");
     assert(priv->uloc.Textures[0] != -1);
 
-    priv->uloc.TexCoordsMaps[0] =
-        vt->GetUniformLocation(program, "TexCoordsMap");
-    assert(priv->uloc.TexCoordsMaps[0] != -1);
+    priv->uloc.TexCoordsMap = vt->GetUniformLocation(program, "TexCoordsMap");
+    assert(priv->uloc.TexCoordsMap != -1);
 
     if (priv->tex_target == GL_TEXTURE_RECTANGLE)
     {
@@ -803,13 +799,8 @@ sampler_planes_load(struct vlc_gl_sampler *sampler)
     vt->ActiveTexture(GL_TEXTURE0);
     vt->BindTexture(priv->tex_target, priv->textures[plane]);
 
-    /* Only one TexCoordMap matrix is necessary in the shader (its location is
-     * stored in uloc.TexCoordsMaps[0]), as there is only one plane per
-     * execution. However, for a single picture, there are several coords
-     * mapping matrices (one per plane), so the correct one
-     * (var.TexCoordsMaps[plane]) must be bound. */
-    vt->UniformMatrix3fv(priv->uloc.TexCoordsMaps[0], 1, GL_FALSE,
-                         priv->var.TexCoordsMaps[plane]);
+    vt->UniformMatrix3fv(priv->uloc.TexCoordsMap, 1, GL_FALSE,
+                         priv->var.TexCoordsMap);
 
     /* Return the expected transform matrix if interop == NULL */
     const GLfloat *tm = GetTransformMatrix(priv->interop);
@@ -851,9 +842,7 @@ sampler_planes_init(struct vlc_gl_sampler *sampler)
         ADD("uniform vec2 TexSize;\n");
 
     ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
-        /* Homogeneous (oriented) coordinates */
-        "  vec3 pic_hcoords = vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).st, 1.0);\n"
-        "  vec2 tex_coords = (TexCoordsMap * pic_hcoords).st;\n");
+        " vec2 tex_coords = (TexCoordsMap * vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).xy, 1.0)).xy;\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
@@ -943,7 +932,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     ADD("uniform mat4 TransformMatrix;\n"
         "uniform mat4 OrientationMatrix;\n");
     ADDF("uniform %s Textures[%u];\n", glsl_sampler, tex_count);
-    ADDF("uniform mat3 TexCoordsMaps[%u];\n", tex_count);
+    ADD("uniform mat3 TexCoordsMap;\n");
 
 #ifdef HAVE_LIBPLACEBO
     if (priv->pl_sh) {
@@ -1033,9 +1022,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         ADD("uniform mat4 ConvMatrix;\n");
 
     ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
-        /* Homogeneous (oriented) coordinates */
-        " vec3 pic_hcoords = vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).st, 1.0);\n"
-        " vec2 tex_coords;\n");
+        " vec2 tex_coords = (TexCoordsMap * vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).xy, 1.0)).xy;\n");
 
     unsigned color_count;
     if (is_yuv) {
@@ -1047,13 +1034,15 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
             const char *swizzle = swizzle_per_tex[i];
             assert(swizzle);
             size_t swizzle_count = strlen(swizzle);
-            ADDF(" tex_coords = (TexCoordsMaps[%u] * pic_hcoords).st;\n", i);
             if (tex_target == GL_TEXTURE_RECTANGLE)
             {
                 /* The coordinates are in texels values, not normalized */
-                ADDF(" tex_coords = TexSizes[%u] * tex_coords;\n", i);
+                ADDF(" texel = %s(Textures[%u], TexSizes[%u] * tex_coords);\n", lookup, i, i);
             }
-            ADDF(" texel = %s(Textures[%u], tex_coords);\n", lookup, i);
+            else
+            {
+                ADDF(" texel = %s(Textures[%u], tex_coords);\n", lookup, i);
+            }
             for (unsigned j = 0; j < swizzle_count; ++j)
             {
                 ADDF(" pixel[%u] = texel.%c;\n", color_idx, swizzle[j]);
@@ -1066,7 +1055,6 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     }
     else
     {
-        ADD(" tex_coords = (TexCoordsMaps[0] * pic_hcoords).st;\n");
         if (tex_target == GL_TEXTURE_RECTANGLE)
             ADD(" tex_coords *= TexSizes[0];\n");
 
@@ -1176,12 +1164,9 @@ CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
     unsigned tex_count = sampler->tex_count;
     assert(!interop || interop->tex_count == tex_count);
 
-    for (unsigned i = 0; i < tex_count; ++i)
-    {
-        /* This might be updated in UpdatePicture for non-direct samplers */
-        memcpy(&priv->var.TexCoordsMaps[i], MATRIX3_IDENTITY,
-               sizeof(MATRIX3_IDENTITY));
-    }
+    /* This might be updated in UpdatePicture for non-direct samplers */
+    memcpy(&priv->var.TexCoordsMap, MATRIX3_IDENTITY,
+           sizeof(MATRIX3_IDENTITY));
 
     if (interop)
     {
@@ -1273,74 +1258,74 @@ vlc_gl_sampler_UpdatePicture(struct vlc_gl_sampler *sampler, picture_t *picture)
      || source->i_visible_width != priv->last_source.i_visible_width
      || source->i_visible_height != priv->last_source.i_visible_height)
     {
-        memset(priv->var.TexCoordsMaps, 0, sizeof(priv->var.TexCoordsMaps));
-        for (unsigned j = 0; j < interop->tex_count; j++)
-        {
-            float scale_w = (float)interop->texs[j].w.num / interop->texs[j].w.den
-                          / priv->tex_widths[j];
-            float scale_h = (float)interop->texs[j].h.num / interop->texs[j].h.den
-                          / priv->tex_heights[j];
+        memset(priv->var.TexCoordsMap, 0, sizeof(priv->var.TexCoordsMap));
 
-            /* Warning: if NPOT is not supported a larger texture is
-               allocated. This will cause right and bottom coordinates to
-               land on the edge of two texels with the texels to the
-               right/bottom uninitialized by the call to
-               glTexSubImage2D. This might cause a green line to appear on
-               the right/bottom of the display.
-               There are two possible solutions:
-               - Manually mirror the edges of the texture.
-               - Add a "-1" when computing right and bottom, however the
-               last row/column might not be displayed at all.
-            */
-            float left   = (source->i_x_offset +                       0 ) * scale_w;
-            float top    = (source->i_y_offset +                       0 ) * scale_h;
-            float right  = (source->i_x_offset + source->i_visible_width ) * scale_w;
-            float bottom = (source->i_y_offset + source->i_visible_height) * scale_h;
+        /* The transformation is the same for all planes, even with power-of-two
+         * textures. */
+        float scale_w = (float)interop->texs[0].w.num / interop->texs[0].w.den
+                      / priv->tex_widths[0];
+        float scale_h = (float)interop->texs[0].h.num / interop->texs[0].h.den
+                      / priv->tex_heights[0];
 
-            /**
-             * This matrix converts from picture coordinates (in range [0; 1])
-             * to textures coordinates where the picture is actually stored
-             * (removing paddings).
-             *
-             *        texture           (in texture coordinates)
-             *       +----------------+--- 0.0
-             *       |                |
-             *       |  +---------+---|--- top
-             *       |  | picture |   |
-             *       |  +---------+---|--- bottom
-             *       |  .         .   |
-             *       |  .         .   |
-             *       +----------------+--- 1.0
-             *       |  .         .   |
-             *      0.0 left  right  1.0  (in texture coordinates)
-             *
-             * In particular:
-             *  - (0.0, 0.0) is mapped to (left, top)
-             *  - (1.0, 1.0) is mapped to (right, bottom)
-             *
-             * This is an affine 2D transformation, so the input coordinates
-             * are given as a 3D vector in the form (x, y, 1), and the output
-             * is (x', y', 1).
-             *
-             * The paddings are l (left), r (right), t (top) and b (bottom).
-             *
-             *               / (r-l)   0     l \
-             *      matrix = |   0   (b-t)   t |
-             *               \   0     0     1 /
-             *
-             * It is stored in column-major order.
-             */
-            GLfloat *matrix = priv->var.TexCoordsMaps[j];
+        /* Warning: if NPOT is not supported a larger texture is
+           allocated. This will cause right and bottom coordinates to
+           land on the edge of two texels with the texels to the
+           right/bottom uninitialized by the call to
+           glTexSubImage2D. This might cause a green line to appear on
+           the right/bottom of the display.
+           There are two possible solutions:
+           - Manually mirror the edges of the texture.
+           - Add a "-1" when computing right and bottom, however the
+           last row/column might not be displayed at all.
+        */
+        float left   = (source->i_x_offset +                       0 ) * scale_w;
+        float top    = (source->i_y_offset +                       0 ) * scale_h;
+        float right  = (source->i_x_offset + source->i_visible_width ) * scale_w;
+        float bottom = (source->i_y_offset + source->i_visible_height) * scale_h;
+
+        /**
+         * This matrix converts from picture coordinates (in range [0; 1])
+         * to textures coordinates where the picture is actually stored
+         * (removing paddings).
+         *
+         *        texture           (in texture coordinates)
+         *       +----------------+--- 0.0
+         *       |                |
+         *       |  +---------+---|--- top
+         *       |  | picture |   |
+         *       |  +---------+---|--- bottom
+         *       |  .         .   |
+         *       |  .         .   |
+         *       +----------------+--- 1.0
+         *       |  .         .   |
+         *      0.0 left  right  1.0  (in texture coordinates)
+         *
+         * In particular:
+         *  - (0.0, 0.0) is mapped to (left, top)
+         *  - (1.0, 1.0) is mapped to (right, bottom)
+         *
+         * This is an affine 2D transformation, so the input coordinates
+         * are given as a 3D vector in the form (x, y, 1), and the output
+         * is (x', y', 1).
+         *
+         * The paddings are l (left), r (right), t (top) and b (bottom).
+         *
+         *               / (r-l)   0     l \
+         *      matrix = |   0   (b-t)   t |
+         *               \   0     0     1 /
+         *
+         * It is stored in column-major order.
+         */
+        GLfloat *matrix = priv->var.TexCoordsMap;
 #define COL(x) (x*3)
 #define ROW(x) (x)
-            matrix[COL(0) + ROW(0)] = right - left;
-            matrix[COL(1) + ROW(1)] = bottom - top;
-            matrix[COL(2) + ROW(0)] = left;
-            matrix[COL(2) + ROW(1)] = top;
-            matrix[COL(2) + ROW(2)] = 1;
+        matrix[COL(0) + ROW(0)] = right - left;
+        matrix[COL(1) + ROW(1)] = bottom - top;
+        matrix[COL(2) + ROW(0)] = left;
+        matrix[COL(2) + ROW(1)] = top;
+        matrix[COL(2) + ROW(2)] = 1;
 #undef COL
 #undef ROW
-        }
 
         priv->last_source.i_x_offset = source->i_x_offset;
         priv->last_source.i_y_offset = source->i_y_offset;
