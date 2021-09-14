@@ -276,7 +276,10 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         cl->ref = clock_point_Create( __MAX( CR_MEAN_PTS_GAP, i_ck_system ),
                                       i_ck_stream );
         if( b_discontinuity )
+        {
             cl->ref.system += cl->i_offset;
+            cl->i_next_drift_update = i_ck_system + VLC_TICK_FROM_MS(200);
+        }
         cl->b_has_external_clock = false;
     }
 
