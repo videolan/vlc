@@ -37,6 +37,7 @@
 #include "util/navigation_history.hpp"
 #include "util/qmlinputitem.hpp"
 #include "util/mouse_event_filter.hpp"
+#include "util/flickable_scroll_handler.hpp"
 
 #include "dialogs/help/aboutmodel.hpp"
 #include "dialogs/dialogs_provider.hpp"
@@ -272,6 +273,7 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterType<ItemKeyEventFilter>( uri, versionMajor, versionMinor, "KeyEventFilter" );
         qmlRegisterType<MouseEventFilter>( uri, versionMajor, versionMinor, "MouseEventFilter" );
+        qmlRegisterType<FlickableScrollHandler>( uri, versionMajor, versionMinor, "FlickableScrollHandler" );
 
         qmlRegisterUncreatableType<ControlbarProfileModel>(uri, versionMajor, versionMinor, "ControlbarProfileModel", "");
         qmlRegisterUncreatableType<ControlbarProfile>(uri, versionMajor, versionMinor, "ControlbarProfile", "");
