@@ -737,6 +737,9 @@ Open(vlc_object_t *obj)
     };
     AudioComponent au_component = AudioComponentFindNext(NULL, &desc);
 
+    EAGLContext *eaglContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    [eaglContext release];
+
     for (unsigned int i = 0; i< sizeof(au_devs) / sizeof(au_devs[0]); ++i)
         aout_HotplugReport(aout, au_devs[i].psz_id, au_devs[i].psz_name);
 
