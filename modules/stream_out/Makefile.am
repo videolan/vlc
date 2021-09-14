@@ -59,7 +59,7 @@ if HAVE_WIN32
 libstream_out_sdi_plugin_la_LIBADD += $(LIBCOM)
 endif
 if HAVE_LINUX
-libstream_out_sdi_plugin_la_LIBADD += $(LIBDL) -lpthread
+libstream_out_sdi_plugin_la_LIBADD += $(LIBDL)
 endif
 libstream_out_sdi_plugin_la_SOURCES = stream_out/sdi/sdiout.cpp \
         stream_out/sdi/sdiout.hpp \

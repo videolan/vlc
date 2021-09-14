@@ -132,7 +132,7 @@ if HAVE_WIN32
 libdecklink_plugin_la_LIBADD += $(LIBCOM)
 endif
 if HAVE_LINUX
-libdecklink_plugin_la_LIBADD += $(LIBDL) -lpthread
+libdecklink_plugin_la_LIBADD += $(LIBDL)
 endif
 if HAVE_DECKLINK
 access_LTLIBRARIES += libdecklink_plugin.la

@@ -27,7 +27,7 @@ if HAVE_WIN32
 libdecklinkoutput_plugin_la_LIBADD += $(LIBCOM)
 endif
 if HAVE_LINUX
-libdecklinkoutput_plugin_la_LIBADD += $(LIBDL) -lpthread
+libdecklinkoutput_plugin_la_LIBADD += $(LIBDL)
 endif
 vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif
