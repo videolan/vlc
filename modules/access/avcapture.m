@@ -157,7 +157,7 @@ vlc_module_end ()
         self.videoDimensions = CMVideoFormatDescriptionGetDimensions(formatDescription);
         bytesPerRow = CVPixelBufferGetBytesPerRow(CMSampleBufferGetImageBuffer(sampleBuffer));
         videoDimensionsReady = YES;
-        msg_Dbg(p_avcapture, "Dimensionns obtained height:%i width:%i bytesPerRow:%lu", [self height], [self width], bytesPerRow);
+        msg_Dbg(p_avcapture, "Dimensions obtained height:%i width:%i bytesPerRow:%lu", [self height], [self width], bytesPerRow);
     }
 }
 
