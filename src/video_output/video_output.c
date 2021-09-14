@@ -1474,13 +1474,13 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     }
     else if (!paused)
     {
-        const vlc_tick_t next_system_pts =
+        const vlc_tick_t system_swap_current =
             vlc_clock_ConvertToSystem(sys->clock, system_now,
                                       sys->displayed.current->date, sys->rate);
-        if (likely(next_system_pts != VLC_TICK_MAX))
+        if (likely(system_swap_current != VLC_TICK_MAX))
         {
-            vlc_tick_t date_next = next_system_pts - render_delay;
-            if (date_next <= system_now)
+            vlc_tick_t system_prepare_current = system_swap_current - render_delay;
+            if (system_prepare_current <= system_now)
             {
                 // the current frame will be late, look for the next not late one
                 next = PreparePicture(vout, false, false);
