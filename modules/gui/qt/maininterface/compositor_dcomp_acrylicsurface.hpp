@@ -224,6 +224,7 @@ private:
     QBasicTimer m_resetTimer;
     bool m_resetPending = false;
     bool m_active = false;
+    bool m_transparencyEnabled = false;
     int m_leftMostScreenX = 0;
     int m_topMostScreenY = 0;
 };

@@ -30,6 +30,15 @@
 namespace
 {
 
+bool isTransparencyEnabled()
+{
+    static const char *TRANSPARENCY_SETTING_PATH = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
+    static const char *TRANSPARENCY_SETTING_KEY = "EnableTransparency";
+
+    QSettings settings(QLatin1String {TRANSPARENCY_SETTING_PATH}, QSettings::NativeFormat);
+    return settings.value(TRANSPARENCY_SETTING_KEY).toBool();
+}
+
 template <typename F>
 F loadFunction(QLibrary &library, const char *symbol)
 {
@@ -80,7 +89,7 @@ CompositorDCompositionAcrylicSurface::CompositorDCompositionAcrylicSurface(qt_in
     }
 
     if (auto w = window())
-        setActive(w->isActive());
+        setActive(m_transparencyEnabled && w->isActive());
 
     qApp->installNativeEventFilter(this);
 }
@@ -104,6 +113,9 @@ bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &e
     {
     case WM_WINDOWPOSCHANGED:
     {
+        if (!m_active)
+            break;
+
         sync();
         commitChanges();
 
@@ -112,12 +124,28 @@ bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &e
     }
     case WM_ACTIVATE:
     {
+        if (!m_transparencyEnabled)
+            break;
+
         const int activeType = LOWORD(msg->wParam);
         if ((activeType == WA_ACTIVE) || (activeType == WA_CLICKACTIVE))
             setActive(true);
         else if (activeType == WA_INACTIVE)
             setActive(false);
+        break;
+    }
+    case WM_SETTINGCHANGE:
+    {
+        if (!lstrcmpW(LPCWSTR(msg->lParam), L"ImmersiveColorSet"))
+        {
+            const auto transparencyEnabled = isTransparencyEnabled();
+            if (m_transparencyEnabled == transparencyEnabled)
+                break;
 
+            m_transparencyEnabled = transparencyEnabled;
+            if (const auto w = window())
+                setActive(m_transparencyEnabled && w->isActive());
+        }
         break;
     }
     }
@@ -139,6 +167,8 @@ bool CompositorDCompositionAcrylicSurface::init(ID3D11Device *device)
 
     if (!createBackHostVisual())
         return false;
+
+    m_transparencyEnabled = isTransparencyEnabled();
 
     m_leftMostScreenX = 0;
     m_topMostScreenY = 0;
