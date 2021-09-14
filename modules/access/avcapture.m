@@ -448,6 +448,7 @@ static int Demux(demux_t *p_demux)
             }
             else if ( !p_sys->b_es_setup )
             {
+                p_sys->fmt.video.i_frame_rate = 1;
                 p_sys->fmt.video.i_frame_rate_base = [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output timeScale];
                 msg_Dbg(p_demux, "using frame rate base: %i", p_sys->fmt.video.i_frame_rate_base);
                 p_sys->width = p_sys->fmt.video.i_width = [(__bridge VLCAVDecompressedVideoOutput *)p_sys->output width];
