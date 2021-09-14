@@ -165,15 +165,14 @@ vlc_module_end ()
 {
     mtime_t pts;
 
-    if ( !currentImageBuffer || currentPts == previousPts )
-        return 0;
-
     @synchronized (self)
     {
+       if ( !currentImageBuffer || currentPts == previousPts )
+           return 0;
         pts = previousPts = currentPts;
     }
 
-    return currentPts;
+    return pts;
 }
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput
