@@ -25,68 +25,62 @@ import "qrc:///widgets/" as Widgets
 AbstractButton {
     id: button
 
-    property bool onlyIcon: true
-    property bool highlighted: false
-    property color color
-    property color foregroundColor
+    // Properties
 
-    font.pixelSize: onlyIcon ? VLCIcons.pixelSize(VLCStyle.icon_normal) : VLCStyle.fontSize_large
-    padding: VLCStyle.margin_xxsmall
+    property bool onlyIcon: true
+
+    property bool highlighted: false
+
+    // Aliases
+
+    property alias foregroundColor: background.foregroundColor
+    property alias backgroundColor: background.backgroundColor
+
+    // Settings
+
     width: implicitWidth
     height: implicitHeight
 
-    state: (button.hovered || button.activeFocus) ? "active" : "normal"
-    states: [
-        State {
-            name: "active"
-            PropertyChanges {
-                target: button
+    padding: VLCStyle.margin_xxsmall
 
-                color: VLCStyle.colors.accent
-                foregroundColor: VLCStyle.colors.accentText
-            }
-        },
-        State {
-            name: "normal"
-            PropertyChanges {
-                target: button
+    font.pixelSize: (onlyIcon) ? VLCIcons.pixelSize(VLCStyle.icon_normal)
+                               : VLCStyle.fontSize_large
 
-                color: "transparent"
-                foregroundColor: VLCStyle.colors.text
-            }
-        }
-    ]
+    // Children
 
-    transitions: Transition {
-        to: "*"
+    background: Widgets.AnimatedBackground {
+        id: background
 
-        ColorAnimation {
-            duration: VLCStyle.duration_normal
-            properties: "foregroundColor,color"
-        }
+        active: visualFocus
+
+        backgroundColor: "transparent"
+
+        foregroundColor: (hovered) ? VLCStyle.colors.buttonTextHover
+                                   : VLCStyle.colors.buttonBanner
     }
 
     contentItem: contentLoader.item
-    background: Rectangle {
-        color: button.color
-    }
 
     Loader {
         id: contentLoader
 
-        sourceComponent: button.onlyIcon ? iconTextContent : textContent
+        sourceComponent: (onlyIcon) ? iconTextContent
+                                    : textContent
     }
 
     Component {
         id: iconTextContent
 
         Widgets.IconLabel {
-            text: button.text
-            elide: Text.ElideRight
-            font.pixelSize: button.font.pixelSize
-            color: button.foregroundColor
-            opacity: (button.highlighted  || button.hovered || button.activeFocus) ? 1 : .6
             verticalAlignment: Text.AlignVCenter
+
+            text: button.text
+
+            elide: Text.ElideRight
+
+            color: button.foregroundColor
+
+            font.pixelSize: button.font.pixelSize
         }
     }
 
@@ -94,13 +88,17 @@ AbstractButton {
         id: textContent
 
         Label {
-            text: button.text
-            elide: Text.ElideRight
-            font.pixelSize: button.font.pixelSize
-            font.weight: button.highlighted ? Font.DemiBold : Font.Normal
-            color: button.foregroundColor
-            opacity: (button.highlighted || button.hovered || button.activeFocus) ? 1 : .6
             verticalAlignment: Text.AlignVCenter
+
+            text: button.text
+
+            elide: Text.ElideRight
+
+            color: button.foregroundColor
+
+            font.pixelSize: button.font.pixelSize
+
+            font.weight: (highlighted) ? Font.DemiBold : Font.Normal
         }
     }
 }
