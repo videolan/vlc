@@ -191,12 +191,11 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
     vlc_close(p_pipe[1]);
 }
 
-#define TEST_SUBITEMS_COUNT 6
 static struct
 {
     const char *file;
     libvlc_media_type_t type;
-} test_media_subitems_list[TEST_SUBITEMS_COUNT] =
+} test_media_subitems_list[] =
 {
     { "directory", libvlc_media_type_directory, },
     { "file.jpg", libvlc_media_type_file },
@@ -232,7 +231,7 @@ static void subitem_added(const libvlc_event_t *event, void *user_data)
     file++;
     test_log ("subitem_added, file: %s\n", file);
 
-    for (unsigned i = 0; i < TEST_SUBITEMS_COUNT; ++i)
+    for (unsigned i = 0; i < ARRAY_SIZE(test_media_subitems_list); ++i)
     {
         if (strcmp (test_media_subitems_list[i].file, file) == 0)
         {
@@ -251,7 +250,7 @@ static void test_media_subitems_media(libvlc_media_t *media, bool play,
     libvlc_media_add_option(media, ":ignore-filetypes= ");
     libvlc_media_add_option(media, ":no-sub-autodetect-file");
 
-    bool subitems_found[TEST_SUBITEMS_COUNT] = { 0 };
+    bool subitems_found[ARRAY_SIZE(test_media_subitems_list)] = { 0 };
     vlc_sem_t sem;
     vlc_sem_init (&sem, 0);
 
@@ -283,7 +282,7 @@ static void test_media_subitems_media(libvlc_media_t *media, bool play,
     if (!b_items_expected)
         return;
 
-    for (unsigned i = 0; i < TEST_SUBITEMS_COUNT; ++i)
+    for (unsigned i = 0; i < ARRAY_SIZE(test_media_subitems_list); ++i)
     {
         test_log ("test if %s was added\n", test_media_subitems_list[i].file);
         assert (subitems_found[i]);
@@ -302,11 +301,10 @@ static void test_media_subitems(libvlc_instance_t *vlc)
     test_media_subitems_media (media, false, true);
     libvlc_media_release (media);
 
-    #define NB_LOCATIONS 2
     char *subitems_realpath = realpath (subitems_path, NULL);
     assert (subitems_realpath != NULL);
-    const char *schemes[NB_LOCATIONS] = { "file://", "dir://" };
-    for (unsigned i = 0; i < NB_LOCATIONS; ++i)
+    const char *schemes[] = { "file://", "dir://" };
+    for (unsigned i = 0; i < ARRAY_SIZE(schemes); ++i)
     {
         char *location;
         assert (asprintf (&location, "%s%s", schemes[i], subitems_realpath) != -1);
