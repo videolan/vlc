@@ -32,9 +32,7 @@
 
 /* Portability code to deal with differences how the Blackmagic SDK
    handles strings on various platforms */
-#ifdef _WIN32
-#error FIXME: Win32 is known to not work for decklink.
-#elif defined(__APPLE__)
+#if defined(__APPLE__)
 #include <vlc_common.h>
 #include <vlc_charset.h>
 typedef CFStringRef decklink_str_t;
