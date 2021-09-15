@@ -88,36 +88,43 @@ targets:
       - target: VLCAutomake
     info:
       path: "vlc_plugin/Info.plist"
-    sources:
-      - path: ${VLC_BUILD_DIR}/modules/.libs/libvlc_plugin.dylib
-        optional: true
-        attributes:
-          - CodeSignOnCopy
-        buildPhase:
-          copyFiles:
-            destination: productsDirectory
-            subpath: vlc_plugin.framework/
     postBuildScripts:
-      - name: Override vlc_plugin library
+      - name: Copy vlc_plugin library
         script: |
-                mv ${BUILT_PRODUCTS_DIR}/vlc_plugin.framework/libvlc_plugin.dylib \
-                ${BUILT_PRODUCTS_DIR}/vlc_plugin.framework/vlc_plugin
-                install_name_tool -id @rpath/vlc_plugin.framework/vlc_plugin \
-                ${BUILT_PRODUCTS_DIR}/vlc_plugin.framework/vlc_plugin
-                install_name_tool -change @rpath/libvlccore.dylib @rpath/vlccore.framework/vlccore \
-                ${BUILT_PRODUCTS_DIR}/vlc_plugin.framework/vlc_plugin
+            INPUT_FILES=()
+            for arch in ${ARCHS}; do
+                input_file="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}/build/modules/.libs/libvlc_plugin.dylib"
+                echo " + Adding input $input_file"
+                INPUT_FILES+=( "$input_file" )
+            done
+            lipo -create \
+                -output "${BUILT_PRODUCTS_DIR}/vlc_plugin.framework/vlc_plugin" \
+                "${INPUT_FILES[@]}"
+
+                # mv ${BUILT_PRODUCTS_DIR}/vlc_plugin.framework/libvlc_plugin.dylib \
+                # ${BUILT_PRODUCTS_DIR}/vlc_plugin.framework/vlc_plugin
+                # install_name_tool -id @rpath/vlc_plugin.framework/vlc_plugin \
+                # ${BUILT_PRODUCTS_DIR}/vlc_plugin.framework/vlc_plugin
+                # install_name_tool -change @rpath/libvlccore.dylib @rpath/vlccore.framework/vlccore \
+                # ${BUILT_PRODUCTS_DIR}/vlc_plugin.framework/vlc_plugin
 
   vlc:
     type: "library.static"
     platform: ${VLC_PLATFORM}
     dependencies:
       - target: VLCAutomake
-    sources:
-      - path: ${VLC_BUILD_DIR}/lib/.libs/libvlc.a
-        optional: true
-        buildPhase:
-          copyFiles:
-            destination: productsDirectory
+    postBuildScripts:
+      - name: Copy libvlc library
+        script: |
+            INPUT_FILES=()
+            for arch in ${ARCHS}; do
+                input_file="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}/build/lib/.libs/libvlc.a"
+                echo " + Adding input $input_file"
+                INPUT_FILES+=( "$input_file" )
+            done
+            lipo -create \
+                -output "${BUILT_PRODUCTS_DIR}/libvlc.a" \
+                "${INPUT_FILES[@]}"
 
   vlccore:
     type: "framework"
@@ -127,23 +134,19 @@ targets:
     info:
       path: "vlccore/Info.plist"
     sources:
-      - path: ${VLC_BUILD_DIR}/src/.libs/libvlccore.dylib
-        name: vlccore
-        optional: true
-        attributes:
-          - CodeSignOnCopy
-        buildPhase:
-          copyFiles:
-            destination: productsDirectory
-            subpath: vlccore.framework/
       - path: ${VLC_SRC_DIR}/include/
         includes: "vlc_*.h"
         buildPhase: headers
         headerVisibility: public
     postBuildScripts:
-      - name: Override vlccore library
+      - name: Copy vlccore library
         script: |
-                mv ${BUILT_PRODUCTS_DIR}/vlccore.framework/libvlccore.dylib \
-                ${BUILT_PRODUCTS_DIR}/vlccore.framework/vlccore
-                install_name_tool -id @rpath/vlccore.framework/vlccore \
-                ${BUILT_PRODUCTS_DIR}/vlccore.framework/vlccore
+            INPUT_FILES=()
+            for arch in ${ARCHS}; do
+                input_file="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}/build/src/.libs/libvlccore.dylib"
+                echo " + Adding input $input_file"
+                INPUT_FILES+=( "$input_file" )
+            done
+            lipo -create \
+                -output "${BUILT_PRODUCTS_DIR}/vlccore.framework/vlccore" \
+                "${INPUT_FILES[@]}"
