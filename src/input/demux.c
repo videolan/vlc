@@ -144,7 +144,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
         goto error;
 
     p_demux->psz_location = p_demux->psz_url + 3 + (p - url);
-    p_demux->psz_filepath = get_path(p_demux->psz_location); /* parse URL */
+    p_demux->psz_filepath = vlc_uri2path(url); /* parse URL */
 
     if( !b_preparsing )
         msg_Dbg( p_obj, "creating demux \"%s\", URL: %s, path: %s",
