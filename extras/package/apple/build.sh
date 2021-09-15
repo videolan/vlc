@@ -731,12 +731,13 @@ chmod +x ar.sh
 # Create VLC install dir if it does not already exist
 mkdir -p "$VLC_INSTALL_DIR"
 
+
 vlcSetSymbolEnvironment \
-hostenv ../../configure \
-    --with-contrib="$VLC_CONTRIB_INSTALL_DIR" \
+hostenv "${VLC_SRC_DIR}/configure" \
     --host="$VLC_HOST_TRIPLET" \
     --build="$VLC_BUILD_TRIPLET" \
     --prefix="$VLC_INSTALL_DIR" \
+    --with-contrib="$VLC_CONTRIB_INSTALL_DIR" \
     "${VLC_CONFIG_OPTIONS[@]}" \
  || abort_err "Configuring VLC failed"
 
