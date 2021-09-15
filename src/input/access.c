@@ -47,22 +47,6 @@ struct vlc_access_stream_private
     input_thread_t *input;
 };
 
-/* Decode URL (which has had its scheme stripped earlier) to a file path. */
-char *get_path(const char *location)
-{
-    char *url, *path;
-
-    /* Prepending "file://" is a bit hackish. But then again, we do not want
-     * to hard-code the list of schemes that use file paths in vlc_uri2path().
-     */
-    if (asprintf(&url, "file://%s", location) == -1)
-        return NULL;
-
-    path = vlc_uri2path (url);
-    free (url);
-    return path;
-}
-
 static void vlc_access_Destroy(stream_t *access)
 {
     struct vlc_access_private *priv = vlc_stream_Private(access);

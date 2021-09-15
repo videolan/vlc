@@ -120,6 +120,4 @@ stream_t *stream_FilterChainNew( stream_t *source, const char *list ) VLC_USED;
 int stream_extractor_AttachParsed( stream_t** stream, const char* psz_data,
                                    char const** out_extra );
 
-char *get_path(const char *location);
-
 #endif
