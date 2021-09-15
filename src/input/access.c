@@ -142,7 +142,7 @@ static stream_t *access_New(vlc_object_t *parent, input_thread_t *input,
             goto error;
 
         access->psz_location = p + 3;
-        access->psz_filepath = get_path(access->psz_location);
+        access->psz_filepath = vlc_uri2path(url);
         if (access->psz_filepath != NULL)
             msg_Dbg(access, " (path: %s)", access->psz_filepath);
 
