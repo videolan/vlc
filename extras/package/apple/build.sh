@@ -29,10 +29,10 @@
 readonly VLC_SCRIPT_DIR="$(cd "${BASH_SOURCE%/*}"; pwd)"
 
 # Verify script run location
-[ ! -f "$(pwd)/../src/libvlc.h" ] \
-    && echo "ERROR: This script must be run from a" \
-            "build subdirectory in the VLC source" >&2 \
-    && exit 1
+#[ ! -f "$(pwd)/../src/libvlc.h" ] \
+#    && echo "ERROR: This script must be run from a" \
+#            "build subdirectory in the VLC source" >&2 \
+#    && exit 1
 
 # Include vlc env script
 . "$VLC_SCRIPT_DIR/../macosx/env.build.sh" "none"
