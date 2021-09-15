@@ -118,6 +118,12 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
                             const char *module, const char *url,
                             stream_t *s, es_out_t *out, bool b_preparsing )
 {
+    const char *p = strstr(url, "://");
+    if (p == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
+
     struct vlc_demux_private *priv;
     demux_t *p_demux = vlc_stream_CustomNew(p_obj, demux_DestroyDemux,
                                             sizeof (*priv), "demux");
@@ -137,8 +143,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
     if (unlikely(p_demux->psz_url == NULL))
         goto error;
 
-    const char *p = strstr(p_demux->psz_url, "://");
-    p_demux->psz_location = (p != NULL) ? (p + 3) : "";
+    p_demux->psz_location = p_demux->psz_url + 3 + (p - url);
     p_demux->psz_filepath = get_path(p_demux->psz_location); /* parse URL */
 
     if( !b_preparsing )
