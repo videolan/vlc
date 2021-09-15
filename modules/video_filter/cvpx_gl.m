@@ -1,8 +1,8 @@
 /*****************************************************************************
- * cvpx_gl.m: iOS OpenGL ES offscreen provider baked by CVPX buffer
- *            supporting both iOS and MacOSX
+ * VLCCVOpenGLProvider.m: iOS OpenGL ES offscreen provider backed by
+ *                        CVPixelBuffer supporting both iOS/tvOS and MacOSX
  *****************************************************************************
- * Copyright (C) 2020 Videolabs
+ * Copyright (C) 2021 Videolabs
  *
  * Authors: Alexandre Janniaux <ajanni@videolabs.io>
  *
@@ -25,33 +25,45 @@
 # import "config.h"
 #endif
 
-#import "TargetConditionals.h"
+#import <TargetConditionals.h>
 
 #if TARGET_OS_IPHONE
 # import <OpenGLES/EAGL.h>
 # import <OpenGLES/ES2/gl.h>
 # import <CoreVideo/CVOpenGLESTextureCache.h>
-#elif TARGET_OS_MAC
+#else
 # import <Cocoa/Cocoa.h>
 # import <OpenGL/OpenGL.h>
 # import <OpenGL/gl.h>
 #endif
 
 #import <CoreVideo/CoreVideo.h>
-#include <dlfcn.h>
+#import <dlfcn.h>
 
-#include <vlc_common.h>
-#include <vlc_filter.h>
-#include <vlc_picture.h>
-#include <vlc_plugin.h>
-#include <vlc_opengl.h>
+#import <vlc_common.h>
+#import <vlc_filter.h>
+#import <vlc_picture.h>
+#import <vlc_plugin.h>
+#import <vlc_opengl.h>
+#import <vlc_picture_pool.h>
 
-#include "../codec/vt_utils.h"
-#include "../video_output/opengl/vout_helper.h"
+#import "../codec/vt_utils.h"
+#import "../video_output/opengl/vout_helper.h"
 
-struct vlc_video_context_operations vctx_ops = {0};
+#define BUFFER_COUNT 2
 
-@interface VLCCVOpenGLContext : NSObject
+struct vlc_cvbuffer {
+    CVPixelBufferRef cvpx;
+    GLuint           fbo;
+
+#if TARGET_OS_IPHONE
+    CVOpenGLESTextureRef texture;
+#else
+    CVOpenGLTextureRef texture;
+#endif
+};
+
+@interface VLCCVOpenGLProvider: NSObject
 {
     vlc_gl_t *_gl;
 
@@ -59,27 +71,37 @@ struct vlc_video_context_operations vctx_ops = {0};
     EAGLContext* _context;
     EAGLContext* _previousContext;
     CVOpenGLESTextureCacheRef _textureCache;
-    CVOpenGLESTextureRef _texture;
-    CVOpenGLESTextureRef _textures[2];
-#elif TARGET_OS_MAC
+#else
     CGLContextObj _context;
     CGLContextObj _previousContext;
     CVOpenGLTextureCacheRef _textureCache;
-    CVOpenGLTextureRef _textures[2];
 #endif
 
-    CVPixelBufferRef _buffers[2];
-    GLuint _fbos[2];
-    int _currentFlip;
+    /* Framebuffers are stored into the vlc_cvbuffer object for convenience
+     * when getting a picture from the pool, but it's also stored there for
+     * allocation/deallocation, since:
+     *  1/ The pictures won't need the framebuffer after being swapped.
+     *  2/ The picture cannot release the framebuffer at release since it
+     *     needs an OpenGL context.
+     *  3/ We can delete the framebuffer as soon as we won't draw into the
+     *     frame anymore.
+     * Note that framebuffers could be reused too when resizing, but this is
+     * a bit inconvenient to implement. */
+    GLuint _fbos[BUFFER_COUNT];
+
+    struct vlc_video_context *_vctx_out;
+    picture_pool_t *_pool;
+    picture_t *_currentPicture;
+    size_t _countCurrent;
 
     video_format_t _fmt_out;
 }
 
 - (id)initWithGL:(vlc_gl_t*)gl width:(unsigned)width height:(unsigned)height;
-- (BOOL)makeCurrent;
+- (void)makeCurrent;
 - (void)releaseCurrent;
 - (picture_t*)swap;
-- (void)resize:(CGSize)size;
+- (int)resize:(CGSize)size;
 
 @end
 
@@ -95,46 +117,178 @@ static void *GetSymbol(vlc_gl_t *gl, const char *name)
 
 static int MakeCurrent(vlc_gl_t *gl)
 {
-    VLCCVOpenGLContext *context = (__bridge VLCCVOpenGLContext*) gl->sys;
-    assert(context);
+    VLCCVOpenGLProvider *context = (__bridge VLCCVOpenGLProvider*) gl->sys;
 
-    assert([context makeCurrent]);
+    [context makeCurrent];
     return VLC_SUCCESS;
 }
 
 static void ReleaseCurrent(vlc_gl_t *gl)
 {
-    VLCCVOpenGLContext *context = (__bridge VLCCVOpenGLContext*)gl->sys;
+    VLCCVOpenGLProvider *context = (__bridge VLCCVOpenGLProvider*)gl->sys;
     [context releaseCurrent];
 }
 
 static picture_t* Swap(vlc_gl_t *gl)
 {
-    VLCCVOpenGLContext *context = (__bridge VLCCVOpenGLContext*)gl->sys;
+    VLCCVOpenGLProvider *context = (__bridge VLCCVOpenGLProvider*)gl->sys;
     return [context swap];
 }
 
 static void Resize(vlc_gl_t *gl, unsigned width, unsigned height)
 {
-    VLCCVOpenGLContext *context = (__bridge VLCCVOpenGLContext*)gl->sys;
+    VLCCVOpenGLProvider *context = (__bridge VLCCVOpenGLProvider*)gl->sys;
     [context resize:CGSizeMake(width, height)];
 }
 
 static void Close(vlc_gl_t *gl)
 {
-    VLCCVOpenGLContext *context = (__bridge_transfer VLCCVOpenGLContext*)gl->sys;
-    context = nil;
+    VLCCVOpenGLProvider *context = (__bridge_transfer VLCCVOpenGLProvider*)gl->sys;
+    gl->sys = nil;
+
+    /* context has been transferred and gl->sys won't track it now, so we can
+     * let ARC release it. */
+    (void)context;
+}
+
+static void FreeCVBuffer(picture_t *picture)
+{
+    struct vlc_cvbuffer *buffer = picture->p_sys;
+    if (buffer->cvpx)
+        CFRelease(buffer->cvpx);
+    if (buffer->texture)
+        CFRelease(buffer->texture);
+    free(buffer);
 }
 
 
-@implementation VLCCVOpenGLContext
+@implementation VLCCVOpenGLProvider
+
+- (picture_t *)initBuffer
+{
+    struct vlc_cvbuffer *buffer = malloc(sizeof *buffer);
+    if (buffer == NULL)
+        return NULL;
+    buffer->texture = NULL;
+    buffer->cvpx = NULL;
+    buffer->fbo = 0;
+
+    /* CoreVideo functions will use this variable for error reporting. */
+    CVReturn cvret;
+    unsigned width  = _fmt_out.i_visible_width;
+    unsigned height = _fmt_out.i_visible_height;
+
+    /* The buffer are IOSurface-backed, we don't map them to CPU memory. */
+    const picture_resource_t resource = {
+        .p_sys = buffer,
+        .pf_destroy = FreeCVBuffer,
+    };
+    picture_t *picture = picture_NewFromResource(&_fmt_out, &resource);
+    if (picture == NULL)
+    {
+        free(buffer);
+        return NULL;
+    }
+
+    NSDictionary *cvpx_attr = @{
+        (__bridge NSString*)kCVPixelBufferPixelFormatTypeKey: @(kCVPixelFormatType_32BGRA),
+        (__bridge NSString*)kCVPixelBufferWidthKey: @(width),
+        (__bridge NSString*)kCVPixelBufferHeightKey: @(height),
+        (__bridge NSString*)kCVPixelBufferBytesPerRowAlignmentKey: @(16),
+        /* Necessary for having iosurface-backed CVPixelBuffer, but
+         * note that iOS simulator won't be able to display them. */
+        (__bridge NSString*)kCVPixelBufferIOSurfacePropertiesKey: @{},
+#if TARGET_OS_IPHONE
+        (__bridge NSString*)kCVPixelBufferOpenGLESCompatibilityKey : @YES,
+        (__bridge NSString*)kCVPixelBufferIOSurfaceOpenGLESFBOCompatibilityKey: @YES,
+        (__bridge NSString*)kCVPixelBufferIOSurfaceOpenGLESTextureCompatibilityKey: @YES,
+#endif
+    };
+
+    cvret = CVPixelBufferCreate(kCFAllocatorDefault, width, height,
+        kCVPixelFormatType_32BGRA, (__bridge CFDictionaryRef)cvpx_attr,
+        &buffer->cvpx);
+
+    if (cvret != kCVReturnSuccess)
+    {
+        picture_Release(picture);
+        return nil;
+    }
+
+    /* The CVPX buffer will be hold by the picture_t. */
+    cvpxpic_attach(picture, buffer->cvpx, _vctx_out, NULL);
+
+#if TARGET_OS_IPHONE
+    cvret = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
+            _textureCache, buffer->cvpx,
+            nil,                                  // CFDictionaryRef textureAttributes
+            GL_TEXTURE_2D,                        // GLenum target
+            GL_RGBA,                              // GLint internalFormat
+            _fmt_out.i_visible_width,             // GLsizei width
+            _fmt_out.i_visible_height,            // GLsizei height
+            GL_BGRA,                              // GLenum format for native data
+            GL_UNSIGNED_BYTE,                     // GLenum type
+            0,                                    // size_t planeIndex
+            &buffer->texture);
+
+    if (cvret != kCVReturnSuccess)
+    {
+        picture_Release(picture);
+        return nil;
+    }
+
+    assert(CVOpenGLESTextureGetTarget(buffer->texture)
+            == GL_TEXTURE_2D);
+
+    GLuint name = CVOpenGLESTextureGetName(buffer->texture);
+    GLenum target = CVOpenGLESTextureGetTarget(buffer->texture);
+
+#else
+
+    cvret = CVOpenGLTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
+            _textureCache, buffer->cvpx,
+            nil, &buffer->texture);
+
+    if (cvret != kCVReturnSuccess)
+    {
+        picture_Release(picture);
+        return nil;
+    }
+
+    assert(CVOpenGLTextureGetTarget(buffer->texture)
+            == GL_TEXTURE_RECTANGLE);
+
+    GLenum target = CVOpenGLTextureGetTarget(buffer->texture);
+    GLuint name = CVOpenGLTextureGetName(buffer->texture);
+#endif
+
+    glGenFramebuffers(1, &buffer->fbo);
+
+    glBindTexture(target, name);
+    glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glBindFramebuffer(GL_FRAMEBUFFER, buffer->fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+            target, name, 0);
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    assert(status == GL_FRAMEBUFFER_COMPLETE);
+    assert(cvret == kCVReturnSuccess);
+
+    return picture;
+}
 
 - (id)initWithGL:(vlc_gl_t*)gl width:(unsigned)width height:(unsigned)height
 {
     _gl = gl;
+    _context = nil;
     _previousContext = nil;
-    _currentFlip = 0;
+    _textureCache = nil;
+    _pool = nil;
+    _currentPicture = nil;
 
+    /* CoreVideo functions will use this variable for error reporting. */
     CVReturn cvret;
 
     video_format_Init(&_fmt_out, VLC_CODEC_CVPX_BGRA);
@@ -147,33 +301,25 @@ static void Close(vlc_gl_t *gl)
         = _fmt_out.i_height
         = height;
 
-    CFDictionaryRef cvpx_attr = (__bridge CFDictionaryRef)@{
-        (__bridge NSString*)kCVPixelBufferPixelFormatTypeKey: @(kCVPixelFormatType_32BGRA),
-        (__bridge NSString*)kCVPixelBufferWidthKey: @(width),
-        (__bridge NSString*)kCVPixelBufferHeightKey: @(height),
-        (__bridge NSString*)kCVPixelBufferBytesPerRowAlignmentKey: @(16),
-        (__bridge NSString*)kCVPixelBufferIOSurfacePropertiesKey: @{},
+    static struct vlc_video_context_operations vctx_ops =
+        { .destroy = NULL };
+
+    _vctx_out = vlc_video_context_CreateCVPX(
+        gl->device, CVPX_VIDEO_CONTEXT_DEFAULT, sizeof(VLCCVOpenGLProvider*),
+        &vctx_ops);
+
+    if (_vctx_out == NULL)
+        return nil;
 
 #if TARGET_OS_IPHONE
-        //(__bridge NSString*)kCVPixelBufferOpenGLESCompatibilityKey : @YES,
-        //(__bridge NSString*)kCVPixelBufferIOSurfaceOpenGLESFBOCompatibilityKey: @YES,
-        //(__bridge NSString*)kCVPixelBufferIOSurfaceOpenGLESTextureCompatibilityKey: @YES,
-#endif
-
-    };
-
-#if TARGET_OS_IPHONE
-    _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
-    assert(_context != nil);
+    _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    if (_context == nil)
+        return nil;
 
     cvret = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault,
             nil, _context, nil, &_textureCache);
 
-    assert(cvret == kCVReturnSuccess);
-    EAGLContext *previous_context = [EAGLContext currentContext];
-    [EAGLContext setCurrentContext:_context];
-
-#elif TARGET_OS_MAC
+#else
     CGLPixelFormatAttribute pixel_attr[] = {
         kCGLPFAAccelerated,
         kCGLPFAAllowOfflineRenderers,
@@ -183,77 +329,21 @@ static void Close(vlc_gl_t *gl)
     CGLPixelFormatObj pixelFormat;
     GLint numPixelFormats = 0;
 
-    //CGDirectDisplayID display = CGMainDisplayID ();
-    //attribs[1] = CGDisplayIDToOpenGLDisplayMask (display);
-    CGLChoosePixelFormat (pixel_attr, &pixelFormat, &numPixelFormats);
-
-    CGLCreateContext( pixelFormat, NULL, &_context ) ;
-    CGLDestroyPixelFormat( pixelFormat ) ;
-
-    CGLContextObj previous_context = CGLGetCurrentContext();
-    CGLSetCurrentContext(_context) ;
+    CGLChoosePixelFormat(pixel_attr, &pixelFormat, &numPixelFormats);
+    CGLError cglerr = CGLCreateContext(pixelFormat, NULL, &_context);
+    CGLDestroyPixelFormat(pixelFormat);
+    if (cglerr != kCGLNoError)
+        return nil;
 
     cvret = CVOpenGLTextureCacheCreate(kCFAllocatorDefault,
-        nil,
-        _context,
-        pixelFormat,
-        nil,
-        &_textureCache);
+        nil, _context, pixelFormat, nil, &_textureCache);
 #endif
+    if (cvret != kCVReturnSuccess)
+        return nil;
 
-    // init framebuffer
-    glGenFramebuffers(ARRAY_SIZE(_buffers), _fbos);
-
-    for (int buffer = 0; buffer < ARRAY_SIZE(_buffers); ++buffer)
-    {
-        cvret = CVPixelBufferCreate(kCFAllocatorDefault, width, height, kCVPixelFormatType_32BGRA, cvpx_attr, &_buffers[buffer]);
-        assert(cvret == kCVReturnSuccess);
-
-#if TARGET_OS_IPHONE
-        cvret = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
-                _textureCache, _buffers[buffer],
-                nil,                                    // CFDictionaryRef textureAttributes
-                GL_TEXTURE_2D,                        // GLenum target
-                GL_RGBA,                                // GLint internalFormat
-                _fmt_out.i_visible_width,                   // GLsizei width
-                _fmt_out.i_visible_height,                  // GLsizei height
-                GL_BGRA,                                // GLenum format for native data
-                GL_UNSIGNED_BYTE,                       // GLenum type
-                0,                                      // size_t planeIndex
-                &_textures[buffer]);
-
-        // bind buffer
-        assert(CVOpenGLESTextureGetTarget(_textures[buffer]) == GL_TEXTURE_2D);
-        GLuint name = CVOpenGLESTextureGetName(_textures[buffer]);
-        GLenum target = CVOpenGLESTextureGetTarget(_textures[buffer]);
-
-#elif TARGET_OS_MAC
-        cvret = CVOpenGLTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
-                _textureCache, _buffers[buffer],
-                nil, // CFDictionaryRef textureAttributes
-                &_textures[buffer]);
-
-        // bind buffer
-        assert(CVOpenGLTextureGetTarget(_textures[buffer]) == GL_TEXTURE_RECTANGLE);
-
-        GLenum target = CVOpenGLTextureGetTarget(_textures[buffer]);
-        GLuint name = CVOpenGLTextureGetName(_textures[buffer]);
-#endif
-
-        glBindTexture(target, name);
-        glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glBindFramebuffer(GL_FRAMEBUFFER, _fbos[buffer]);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                target, name, 0);
-        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        assert(status == GL_FRAMEBUFFER_COMPLETE);
-        assert(cvret == kCVReturnSuccess);
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, _fbos[0]);
+    /* OpenGL context is now current, so we can use OpenGL functions. */
+    if ([self resize:CGSizeMake(width, height)] != VLC_SUCCESS)
+        return nil;
 
     gl->make_current = MakeCurrent;
     gl->release_current = ReleaseCurrent;
@@ -262,62 +352,36 @@ static void Close(vlc_gl_t *gl)
     gl->get_proc_address = GetSymbol;
     gl->destroy = Close;
     gl->offscreen_vflip = true;
-
-#if TARGET_OS_IPHONE
-    [EAGLContext setCurrentContext:previous_context];
-#elif TARGET_OS_MAC
-    CGLSetCurrentContext(previous_context);
-#endif
-
-    // TODO
-    struct vlc_decoder_device *dec_device = NULL;
-
-    struct vlc_video_context *vctx_out = vlc_video_context_CreateCVPX(
-        dec_device, CVPX_VIDEO_CONTEXT_DEFAULT, sizeof(VLCCVOpenGLContext*), &vctx_ops);
-
-    assert(vctx_out);
-    if (vctx_out == NULL)
-        goto error;
-
-    gl->offscreen_vctx_out = vctx_out;
+    gl->offscreen_vctx_out = _vctx_out;
     gl->offscreen_chroma_out = VLC_CODEC_CVPX_BGRA;
 
-#if TARGET_OS_IPHONE
-    var_Create(_gl, "ios-eaglcontext", VLC_VAR_ADDRESS);
-    var_SetAddress(_gl, "ios-eaglcontext", (__bridge void*)_context);
-#elif TARGET_OS_MAC
-    var_Create(_gl, "macosx-glcontext", VLC_VAR_ADDRESS);
-    var_SetAddress(_gl, "macosx-glcontext", _context);
-#endif
 
     return self;
-error:
-
-    return nil;
 }
 
-- (BOOL)makeCurrent
+- (void)makeCurrent
 {
-    /* TODO check if it works with app inactive */
-
-    assert(_previousContext == NULL);
+    /* TODO: check if it works with app inactive */
+    if (_countCurrent++ > 0)
+        return;
 
 #if TARGET_OS_IPHONE
     _previousContext = [EAGLContext currentContext];
     [EAGLContext setCurrentContext:_context];
-#elif TARGET_OS_MAC
+#else
     _previousContext = CGLGetCurrentContext();
     CGLSetCurrentContext(_context);
 #endif
-
-    return YES;
 }
 
 - (void)releaseCurrent
 {
+    if (--_countCurrent > 0)
+        return;
+
 #if TARGET_OS_IPHONE
     [EAGLContext setCurrentContext:_previousContext];
-#elif TARGET_OS_MAC
+#else
     CGLSetCurrentContext(_previousContext);
 #endif
 
@@ -329,70 +393,120 @@ error:
     /* EAGLContext has no formal swap operation but we swap the backing
      * CVPX buffer ourselves. */
 
-    // Note:
-    // The result must be used after completion of the rendering, meaning it must wait
-    // for completion of a fence or call glFinish:
-    //  https://www.khronos.org/registry/OpenGL/extensions/APPLE/APPLE_sync.txt
+    /* Note:
+     * The result must be used after completion of the rendering, meaning it must wait
+     * for completion of a fence or call glFinish:
+     *  https://www.khronos.org/registry/OpenGL/extensions/APPLE/APPLE_sync.txt
+     * In practice, it seems that implicit sync is enough, probably because of the
+     * actual context changes, but it might need a proper synchronization mechanism
+     * in the future. */
 
-#if TARGET_OS_IPHONE
-    EAGLContext *previous_context = [EAGLContext currentContext];
-    [EAGLContext setCurrentContext:_context];
-#elif TARGET_OS_MAC
-    CGLContextObj previous_context = CGLGetCurrentContext();
-    CGLSetCurrentContext(_context);
-#endif
+    [self makeCurrent];
 
-    CVPixelBufferRef cvpx_buffer = _buffers[_currentFlip];
+    picture_t *output = _currentPicture;
+    output->p_sys = NULL;
 
-    glFlush();
-    //glFinish();
+    picture_t *next_picture = picture_pool_Wait(_pool);
+    struct vlc_cvbuffer *buffer = next_picture->p_sys;
+    assert(buffer != NULL);
 
-    picture_t *output = picture_NewFromFormat(&_fmt_out);
-    if (output == NULL)
-        return NULL;
-    cvpxpic_attach(output, cvpx_buffer, _gl->offscreen_vctx_out, NULL);
+    _currentPicture = next_picture;
+    // TODO: rebind at makeCurrent instead, if not binded?
+    glBindFramebuffer(GL_FRAMEBUFFER, buffer->fbo);
 
-    _currentFlip = (_currentFlip + 1) % 2;
-    glBindFramebuffer(GL_FRAMEBUFFER, _fbos[_currentFlip]);
-
-#if TARGET_OS_IPHONE
-    [EAGLContext setCurrentContext:previous_context];
-#elif TARGET_OS_MAC
-    CGLSetCurrentContext(previous_context);
-#endif
+    [self releaseCurrent];
 
     return output;
 }
 
-- (void)resize:(CGSize)size
+- (int)resize:(CGSize)size
 {
+    [self makeCurrent];
 
+    if (_pool)
+    {
+        glDeleteFramebuffers(BUFFER_COUNT, _fbos);
+        picture_pool_Release(_pool);
+    }
+
+    if (_currentPicture)
+        picture_Release(_currentPicture);
+
+    picture_t *pictures[BUFFER_COUNT];
+
+    /* OpenGL context is now current, so we can use OpenGL functions.
+     * Allocate the pictures and store the framebuffer for later deallocation
+     * since framebuffers can only be deleted within an OpenGL context. */
+    size_t bufferCount;
+    for (bufferCount = 0; bufferCount < BUFFER_COUNT; ++bufferCount)
+    {
+        picture_t *picture = [self initBuffer];
+        if (picture == NULL)
+            break;
+        struct vlc_cvbuffer *buffer = picture->p_sys;
+        _fbos[bufferCount] = buffer->fbo;
+        pictures[bufferCount] = picture;
+    }
+    if (bufferCount != BUFFER_COUNT)
+    {
+        for (size_t i=0; i<bufferCount; ++i)
+            picture_Release(pictures[i]);
+        glDeleteFramebuffers(bufferCount, _fbos);
+        return VLC_ENOMEM;
+    }
+
+    _pool = picture_pool_New(BUFFER_COUNT, pictures);
+    if (_pool == nil)
+    {
+        for (size_t i=0; i<BUFFER_COUNT; ++i)
+            picture_Release(pictures[i]);
+        glDeleteFramebuffers(BUFFER_COUNT, _fbos);
+        return VLC_ENOMEM;
+    }
+
+    _currentPicture = picture_pool_Wait(_pool);
+    struct vlc_cvbuffer *buffer = _currentPicture->p_sys;
+    assert(buffer != NULL);
+    glBindFramebuffer(GL_FRAMEBUFFER, buffer->fbo);
+
+    [self releaseCurrent];
+    return VLC_SUCCESS;
 }
 
 - (void)dealloc
 {
-    // cleanup
-#if TARGET_OS_IPHONE
-    EAGLContext *previous_context = [EAGLContext currentContext];
-    [EAGLContext setCurrentContext:_context];
-    glDeleteFramebuffers(2, _fbos);
-    [EAGLContext setCurrentContext:previous_context];
+    /* Delete OpenGL resources */
+    if (_context != nil && _pool != nil)
+    {
+        [self makeCurrent];
+        glFinish();
+        /* Delete native resources */
+        glDeleteFramebuffers(BUFFER_COUNT, _fbos);
+        [self releaseCurrent];
+    }
 
-    CFRelease(_textures[0]);
-    CFRelease(_textures[1]);
-    CFRelease(_textureCache);
+    if (_textureCache != nil)
+        CFRelease(_textureCache);
 
-    CVPixelBufferRelease(_buffers[0]);
-    CVPixelBufferRelease(_buffers[1]);
-#endif
+    if (_currentPicture != nil)
+        picture_Release(_currentPicture);
+
+    if (_pool != nil)
+        picture_pool_Release(_pool);
+
+    if (_vctx_out != nil)
+        vlc_video_context_Release(_vctx_out);
+
+    video_format_Clean(&_fmt_out);
 }
 
 @end
 
 static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 {
-    VLCCVOpenGLContext *sys = [[VLCCVOpenGLContext alloc] initWithGL:gl width:width height:height];
-    assert(sys);
+    VLCCVOpenGLProvider *sys = [[VLCCVOpenGLProvider alloc] initWithGL:gl width:width height:height];
+    if (sys == nil)
+        return VLC_EGENERIC;;
 
     gl->sys = (__bridge_retained void*)sys;
 
@@ -401,11 +515,11 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 
 vlc_module_begin()
     set_shortname( N_("cvpx_gl") )
-    set_description( N_("OpenGL baked by CVPX buffer") )
+    set_description( N_("OpenGL backed by CVPixelBuffer") )
 #if TARGET_OS_IPHONE
-    set_capability( "opengl es2 offscreen", 10 )
-#elif TARGET_OS_MAC
-    set_capability( "opengl offscreen", 10 )
+    set_capability( "opengl es2 offscreen", 100 )
+#else
+    set_capability( "opengl offscreen", 100 )
 #endif
     add_shortcut( "cvpx_gl" )
     set_callback( Open)
