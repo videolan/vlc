@@ -12,16 +12,27 @@ SRCROOT="${SCRIPTDIR}/../../../"
 
 MAKEFLAGS="-j6"
 
+BUILD_SUFFIX=""
+
+BITCODE_FLAG=""
+if [ "$(echo "${ENABLE_BITCODE}" | tr '[:upper:]' '[:lower:]')" = "yes" ]; then
+    if [ -z "${BITCODE_GENERATION_MODE}" ]; then
+        BITCODE_GENERATION_MODE=full
+    fi
+    BITCODE_FLAG="--enable-bitcode=${BITCODE_GENERATION_MODE}"
+    BUILD_SUFFIX="-bitcode-${BITCODE_GENERATION_MODE}" #TODO forward
+fi
+
 for arch in $ARCHS; do
     echo "\n==========\n"
     echo "Building platform ${PLATFORM_NAME} for arch ${arch}"
-    BUILD_DIR="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}/"
-    if [ ! -f "${BUILD_DIR}/build/config.h" ]; then
+    BUILD_DIR="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}${BUILD_SUFFIX}/"
+    if [ ! -f "${BUILD_DIR}/build/config.h" -o ! -d "${SRCROOT}/contrib/${arch}-${PLATFORM_NAME}" ]; then
         mkdir -p "${BUILD_DIR}"
-        (cd "${BUILD_DIR}" && env -i V=1 VERBOSE=1 "${SCRIPTDIR}/build.sh" \
-            --enable-shared --enable-merge-plugins --enable-bitcode \
+        (cd "${BUILD_DIR}" && env -i V=1 VERBOSE=1 MAKEFLAGS="$MAKEFLAGS" "${SCRIPTDIR}/build.sh" \
+            --enable-shared --enable-merge-plugins ${BITCODE_FLAG} \
             --arch="${arch}" --sdk="${PLATFORM_NAME}")
     else
-        (cd "${BUILD_DIR}/build/" && env -i ./compile V=1 VERBOSE=1)
+        (cd "${BUILD_DIR}/build/" && env -i ./compile MAKEFLAGS="$MAKEFLAGS" V=1 VERBOSE=1)
     fi
 done

@@ -7,6 +7,7 @@ configs:
   Debug: debug
   Release: release
   Debug-bitcode: debug
+  DebugSimulator: debug
 settings:
   configs:
     Debug:
@@ -21,10 +22,9 @@ targets:
     type: ""
     platform: ${VLC_PLATFORM}
     legacy:
-      toolPath: ${VLC_BUILD_DIR}/compile
-      passSettings: false
-      attributes: -C ${VLC_BUILD_DIR}
-      workingDirectory: ${VLC_BUILD_DIR}
+      toolPath: ${VLC_SRC_DIR}/extras/package/apple/xcode.sh
+      passSettings: true
+      workingDirectory: ${VLC_SRC_DIR}
     sources:
       - path: "${VLC_SRC_DIR}/src"
         excludes: "**/Makefile.in"
@@ -92,8 +92,15 @@ targets:
       - name: Copy vlc_plugin library
         script: |
             INPUT_FILES=()
+            BUILD_SUFFIX=""
+            if [ "$(echo "${ENABLE_BITCODE}" | tr '[:upper:]' '[:lower:]')" = "yes" ]; then
+                if [ -z "${BITCODE_GENERATION_MODE}" ]; then
+                    BITCODE_GENERATION_MODE="full"
+                fi
+                BUILD_SUFFIX="-bitcode-${BITCODE_GENERATION_MODE}"
+            fi
             for arch in ${ARCHS}; do
-                input_file="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}/build/modules/.libs/libvlc_plugin.dylib"
+                input_file="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}${BUILD_SUFFIX}/build/modules/.libs/libvlc_plugin.dylib"
                 echo " + Adding input $input_file"
                 INPUT_FILES+=( "$input_file" )
             done
@@ -117,8 +124,15 @@ targets:
       - name: Copy libvlc library
         script: |
             INPUT_FILES=()
+            BUILD_SUFFIX=""
+            if [ "$(echo "${ENABLE_BITCODE}" | tr '[:upper:]' '[:lower:]')" = "yes" ]; then
+                if [ -z "${BITCODE_GENERATION_MODE}" ]; then
+                    BITCODE_GENERATION_MODE="full"
+                fi
+                BUILD_SUFFIX="-bitcode-${BITCODE_GENERATION_MODE}"
+            fi
             for arch in ${ARCHS}; do
-                input_file="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}/build/lib/.libs/libvlc.a"
+                input_file="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}${BUILD_SUFFIX}/build/lib/.libs/libvlc.a"
                 echo " + Adding input $input_file"
                 INPUT_FILES+=( "$input_file" )
             done
@@ -142,8 +156,15 @@ targets:
       - name: Copy vlccore library
         script: |
             INPUT_FILES=()
+            BUILD_SUFFIX=""
+            if [ "$(echo "${ENABLE_BITCODE}" | tr '[:upper:]' '[:lower:]')" = "yes" ]; then
+                if [ -z "${BITCODE_GENERATION_MODE}" ]; then
+                    BITCODE_GENERATION_MODE="full"
+                fi
+                BUILD_SUFFIX="-bitcode-${BITCODE_GENERATION_MODE}"
+            fi
             for arch in ${ARCHS}; do
-                input_file="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}/build/src/.libs/libvlccore.dylib"
+                input_file="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}${BUILD_SUFFIX}/build/src/.libs/libvlccore.dylib"
                 echo " + Adding input $input_file"
                 INPUT_FILES+=( "$input_file" )
             done
