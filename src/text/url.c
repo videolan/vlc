@@ -266,7 +266,8 @@ char *vlc_uri2path (const char *url)
     /* Decode path */
     vlc_uri_decode (path);
 
-    if (schemelen == 4 && !strncasecmp (url, "file", 4))
+    if ((schemelen == 4 && !strncasecmp(url, "file", 4))
+     || (schemelen == 3 && !strncasecmp(url, "dir", 3)))
     {
 #if !defined (_WIN32) && !defined (__OS2__)
         /* Leading slash => local path */
