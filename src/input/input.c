@@ -3168,20 +3168,16 @@ static void InputGetExtraFilesPattern( input_thread_t *p_input,
     char **ppsz_list;
     TAB_INIT( i_list, ppsz_list );
 
-    char *psz_base = strdup( uri );
-    if( !psz_base )
-        goto exit;
-
     /* Remove the extension */
-    char *psz_end = &psz_base[strlen(psz_base)-strlen(psz_match)];
-    assert( psz_end >= psz_base);
-    *psz_end = '\0';
+    size_t end = strlen(uri) - strlen(psz_match);
+    if (unlikely(end > INT_MAX))
+        goto exit;
 
     /* Try to list files */
     for( int i = i_start; i <= i_stop; i++ )
     {
         char *url;
-        if( asprintf( &url, psz_format, psz_base, i ) < 0 )
+        if( asprintf( &url, psz_format, (int)end, uri, i ) < 0 )
             break;
 
         char *filepath = vlc_uri2path(url);
@@ -3199,7 +3195,6 @@ static void InputGetExtraFilesPattern( input_thread_t *p_input,
         free( filepath );
         TAB_APPEND( i_list, ppsz_list, url );
     }
-    free( psz_base );
 exit:
     *pi_list = i_list;
     *pppsz_list = ppsz_list;
@@ -3218,12 +3213,12 @@ static void InputGetExtraFiles( input_thread_t *p_input,
         int i_stop;
     } patterns[] = {
         /* XXX the order is important */
-        { "concat", ".001", "%s.%.3d", 2, 999 },
-        { NULL, ".part1.rar","%s.part%.1d.rar", 2, 9 },
-        { NULL, ".part01.rar","%s.part%.2d.rar", 2, 99, },
-        { NULL, ".part001.rar", "%s.part%.3d.rar", 2, 999 },
-        { NULL, ".rar", "%s.r%.2d", 0, 99 },
-        { "concat", ".mts", "%s.mts%d", 1, 999 },
+        { "concat", ".001", "%.*s.%.3d", 2, 999 },
+        { NULL, ".part1.rar","%.*s.part%.1d.rar", 2, 9 },
+        { NULL, ".part01.rar","%.*s.part%.2d.rar", 2, 99, },
+        { NULL, ".part001.rar", "%.*s.part%.3d.rar", 2, 999 },
+        { NULL, ".rar", "%.*s.r%.2d", 0, 99 },
+        { "concat", ".mts", "%.*s.mts%d", 1, 999 },
     };
 
     assert(mrl != NULL);
