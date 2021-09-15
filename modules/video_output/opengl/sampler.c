@@ -485,7 +485,7 @@ xyz12_shader_init(struct vlc_gl_sampler *sampler)
         "vec4 vlc_texture(vec2 pic_coords)\n"
         "{ "
         " vec4 v_in, v_out;"
-        " vec2 tex_coords = (TexCoordsMap * TransformMatrix * OrientationMatrix * vec3(pic_coords, 1.0)).xy;\n"
+        " vec2 tex_coords = (TransformMatrix * TexCoordsMap * OrientationMatrix * vec3(pic_coords, 1.0)).xy;\n"
         " v_in  = texture2D(Textures[0], tex_coords);\n"
         " v_in = pow(v_in, xyz_gamma);"
         " v_out = matrix_xyz_rgb * v_in ;"
@@ -838,7 +838,7 @@ sampler_planes_init(struct vlc_gl_sampler *sampler)
         ADD("uniform vec2 TexSize;\n");
 
     ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
-        " vec2 tex_coords = (TexCoordsMap * TransformMatrix * OrientationMatrix * vec3(pic_coords, 1.0)).xy;\n");
+        " vec2 tex_coords = (TransformMatrix * TexCoordsMap * OrientationMatrix * vec3(pic_coords, 1.0)).xy;\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
@@ -1018,7 +1018,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         ADD("uniform mat4 ConvMatrix;\n");
 
     ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
-        " vec2 tex_coords = (TexCoordsMap * TransformMatrix * OrientationMatrix * vec3(pic_coords, 1.0)).xy;\n");
+        " vec2 tex_coords = (TransformMatrix * TexCoordsMap * OrientationMatrix * vec3(pic_coords, 1.0)).xy;\n");
 
     unsigned color_count;
     if (is_yuv) {
