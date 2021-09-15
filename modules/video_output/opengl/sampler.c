@@ -1022,32 +1022,26 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 
     unsigned color_count;
     if (is_yuv) {
-        ADD(" vec4 texel;\n"
-            " vec4 pixel = vec4(0.0, 0.0, 0.0, 1.0);\n");
-        unsigned color_idx = 0;
+        ADD(" vec4 pixel = vec4(\n");
+        color_count = 0;
         for (unsigned i = 0; i < tex_count; ++i)
         {
             const char *swizzle = swizzle_per_tex[i];
             assert(swizzle);
-            size_t swizzle_count = strlen(swizzle);
+            color_count += strlen(swizzle);
+            assert(color_count < PICTURE_PLANE_MAX);
             if (tex_target == GL_TEXTURE_RECTANGLE)
             {
                 /* The coordinates are in texels values, not normalized */
-                ADDF(" texel = %s(Textures[%u], TexSizes[%u] * tex_coords);\n", lookup, i, i);
+                ADDF("  %s(Textures[%u], TexSizes[%u] * tex_coords).%s;\n", lookup, i, i, swizzle);
             }
             else
             {
-                ADDF(" texel = %s(Textures[%u], tex_coords);\n", lookup, i);
-            }
-            for (unsigned j = 0; j < swizzle_count; ++j)
-            {
-                ADDF(" pixel[%u] = texel.%c;\n", color_idx, swizzle[j]);
-                color_idx++;
-                assert(color_idx <= PICTURE_PLANE_MAX);
+                ADDF("  %s(Textures[%u], tex_coords).%s,\n", lookup, i, swizzle);
             }
         }
+        ADD("  1.0);\n");
         ADD(" vec4 result = ConvMatrix * pixel;\n");
-        color_count = color_idx;
     }
     else
     {
