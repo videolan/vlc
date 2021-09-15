@@ -825,7 +825,7 @@ sampler_planes_GetFragmentPart(struct vlc_gl_sampler *sampler)
 
     struct vlc_memstream ms;
     if (vlc_memstream_open(&ms))
-        return VLC_EGENERIC;
+        return NULL;
 
 #define ADD(x) vlc_memstream_puts(&ms, x)
 #define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
@@ -862,7 +862,7 @@ sampler_planes_GetFragmentPart(struct vlc_gl_sampler *sampler)
 #undef ADDF
 
     if (vlc_memstream_close(&ms) != 0)
-        return VLC_EGENERIC;
+        return NULL;
 
     return ms.ptr;
 }
@@ -874,7 +874,7 @@ char *sampler_planes_GetVertexPart(struct vlc_gl_sampler *sampler)
 
     struct vlc_memstream ms;
     if (vlc_memstream_open(&ms))
-        return VLC_EGENERIC;
+        return NULL;
 
 #define ADD(x) vlc_memstream_puts(&ms, x)
 #define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
@@ -910,7 +910,7 @@ char *sampler_planes_GetVertexPart(struct vlc_gl_sampler *sampler)
 #undef ADDF
 
     if (vlc_memstream_close(&ms) != 0)
-        return VLC_EGENERIC;
+        return NULL;
 
     return ms.ptr;
 }
