@@ -532,7 +532,7 @@ set_build_triplet
 # FIXME: This should match the actual clang triplet and should be used for compiler invocation too!
 readonly VLC_PSEUDO_TRIPLET="${VLC_HOST_ARCH}-apple-${VLC_HOST_PLATFORM}_${VLC_DEPLOYMENT_TARGET}"
 # Contrib install dir
-readonly VLC_CONTRIB_INSTALL_DIR="$VLC_BUILD_DIR/contrib/${VLC_HOST_ARCH}-${VLC_APPLE_SDK_NAME}"
+readonly VLC_CONTRIB_INSTALL_DIR="$VLC_SRC_DIR/contrib/${VLC_HOST_ARCH}-${VLC_APPLE_SDK_NAME}"
 # VLC install dir
 readonly VLC_INSTALL_DIR="$VLC_BUILD_DIR/vlc-${VLC_APPLE_SDK_NAME}-${VLC_HOST_ARCH}"
 
