@@ -576,7 +576,7 @@ if HAVE_DBUS
 libvlccore_la_LIBADD += $(DBUS_LIBS)
 endif
 if HAVE_DARWIN
-$(libvlccore_la_OBJECTS): libvlccore_objc.la
+$(libvlccore_la_OBJECTS): libvlccore_objc.la libvlc_darwin.la
 libvlccore_objc_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libvlccore_objc_la_LDFLAGS = -static
 libvlccore_la_LIBADD += libvlccore_objc.la libvlc_darwin.la
