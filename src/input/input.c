@@ -104,7 +104,7 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta );
 static void InputUpdateMeta( input_thread_t *p_input, demux_t *p_demux );
 static void InputGetExtraFiles( input_thread_t *p_input,
                                 int *pi_list, char ***pppsz_list,
-                                const char **psz_access, const char *psz_path );
+                                const char **psz_access, const char *mrl );
 
 static void AppendAttachment(input_thread_t* p_input,
                               int i_new, input_attachment_t **pp_new);
@@ -2683,7 +2683,7 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
         char **tab;
 
         TAB_INIT( count, tab );
-        InputGetExtraFiles( p_input, &count, &tab, &psz_access, psz_path );
+        InputGetExtraFiles( p_input, &count, &tab, &psz_access, psz_mrl );
         if( count > 0 )
         {
             char *list = NULL;
@@ -3159,7 +3159,7 @@ static void InputUpdateMeta( input_thread_t *p_input, demux_t *p_demux )
  *****************************************************************************/
 static void InputGetExtraFilesPattern( input_thread_t *p_input,
                                        int *pi_list, char ***pppsz_list,
-                                       const char *psz_path,
+                                       const char *uri,
                                        const char *psz_match,
                                        const char *psz_format,
                                        int i_start, int i_stop )
@@ -3168,7 +3168,7 @@ static void InputGetExtraFilesPattern( input_thread_t *p_input,
     char **ppsz_list;
     TAB_INIT( i_list, ppsz_list );
 
-    char *psz_base = strdup( psz_path );
+    char *psz_base = strdup( uri );
     if( !psz_base )
         goto exit;
 
@@ -3180,15 +3180,9 @@ static void InputGetExtraFilesPattern( input_thread_t *p_input,
     /* Try to list files */
     for( int i = i_start; i <= i_stop; i++ )
     {
-        char *psz_probe;
-        if( asprintf( &psz_probe, psz_format, psz_base, i ) < 0 )
-            break;
-
         char *url;
-        int ret = asprintf(&url, "file://%s", psz_probe);
-        free(psz_probe);
-        if (unlikely(ret == -1))
-            continue;
+        if( asprintf( &url, psz_format, psz_base, i ) < 0 )
+            break;
 
         char *filepath = vlc_uri2path(url);
 
@@ -3213,7 +3207,7 @@ exit:
 
 static void InputGetExtraFiles( input_thread_t *p_input,
                                 int *pi_list, char ***pppsz_list,
-                                const char **ppsz_access, const char *psz_path )
+                                const char **ppsz_access, const char *mrl )
 {
     static const struct pattern
     {
@@ -3232,12 +3226,13 @@ static void InputGetExtraFiles( input_thread_t *p_input,
         { "concat", ".mts", "%s.mts%d", 1, 999 },
     };
 
+    assert(mrl != NULL);
     TAB_INIT( *pi_list, *pppsz_list );
 
-    if( ( **ppsz_access && strcmp( *ppsz_access, "file" ) ) || !psz_path )
+    if( **ppsz_access && strcmp( *ppsz_access, "file" ) )
         return;
 
-    const size_t i_path = strlen(psz_path);
+    const size_t i_path = strlen(mrl);
 
     for( size_t i = 0; i < ARRAY_SIZE( patterns ); ++i )
     {
@@ -3247,9 +3242,9 @@ static void InputGetExtraFiles( input_thread_t *p_input,
         if( i_path < i_ext )
             continue;
 
-        if( !strcmp( &psz_path[i_path-i_ext], pat->psz_match ) )
+        if( !strcmp( &mrl[i_path-i_ext], pat->psz_match ) )
         {
-            InputGetExtraFilesPattern( p_input, pi_list, pppsz_list, psz_path,
+            InputGetExtraFilesPattern( p_input, pi_list, pppsz_list, mrl,
                 pat->psz_match, pat->psz_format, pat->i_start, pat->i_stop );
 
             if( *pi_list > 0 && pat->psz_access_force )
