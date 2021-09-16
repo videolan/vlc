@@ -61,7 +61,10 @@ FocusScope {
         width: root.width
 
         function setCurrentItemFocus(reason) {
-            artistBanner.setCurrentItemFocus(reason);
+            if (albumsListView)
+                albumsListView.setCurrentItemFocus(reason);
+            else
+                artistBanner.setCurrentItemFocus(reason);
         }
 
         Column {
@@ -127,7 +130,7 @@ FocusScope {
                         }
 
                         Navigation.downAction: function() {
-                            _currentView.setCurrentItemFocus(Qt.TabFocusReason);
+                            root.setCurrentItemFocus(Qt.TabFocusReason);
                         }
 
                         delegate: Widgets.GridItem {
