@@ -526,9 +526,6 @@ static void LogWaveFormat(struct vlc_logger *l, const WAVEFORMATEX *restrict wf)
 static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
                         audio_sample_format_t *restrict audio)
 {
-    audio->i_rate = wf->nSamplesPerSec;
-    audio->i_physical_channels = 0;
-
     if (wf->wFormatTag == WAVE_FORMAT_EXTENSIBLE &&
         wf->cbSize >= sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX))
     {
@@ -573,6 +570,9 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
     }
     else
         return -1;
+
+    audio->i_rate = wf->nSamplesPerSec;
+    audio->i_physical_channels = 0;
 
     aout_FormatPrepare (audio);
 
