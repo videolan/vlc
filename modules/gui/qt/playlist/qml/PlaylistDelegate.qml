@@ -227,6 +227,8 @@ Control {
 
                     Image {
                         id: artwork
+
+                        mipmap: true
                         anchors.fill: parent
                         fillMode: Image.PreserveAspectFit
                         source: (model.artwork && model.artwork.toString()) ? model.artwork : VLCStyle.noArtCover
