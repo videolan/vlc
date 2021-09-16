@@ -343,7 +343,7 @@ QVariantList MLBaseModel::getItemsForIndexes(const QModelIndexList & indexes) co
         if (item == nullptr)
             continue;
 
-        const MLItemId & itemId = item->getId();
+        MLItemId itemId = item->getId();
 
         // NOTE: When we have a parent it's a collection of media(s).
         if (itemId.type == VLC_ML_PARENT_UNKNOWN)
