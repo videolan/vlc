@@ -3273,12 +3273,11 @@ static void input_SplitMRL( const char **access, const char **demux,
     char *p;
 
     /* Separate <path> from <access>[/<demux>]:// */
-    p = strstr( buf, "://" );
+    p = strchr( buf, ':');
     if( p != NULL )
     {
-        *p = '\0';
-        p += 3; /* skips "://" */
-        *path = p;
+        *(p++) = '\0'; /* skips ':' */
+        *path = p + (strncmp(p, "//", 2) ? 0 : 2); /* skips "//" */
 
         /* Remove HTML anchor if present (not supported).
          * The hash symbol itself should be URI-encoded. */

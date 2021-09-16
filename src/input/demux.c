@@ -118,7 +118,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
                             const char *module, const char *url,
                             stream_t *s, es_out_t *out, bool b_preparsing )
 {
-    const char *p = strstr(url, "://");
+    const char *p = strchr(url, ':');
     if (p == NULL) {
         errno = EINVAL;
         return NULL;
@@ -143,7 +143,9 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
     if (unlikely(p_demux->psz_url == NULL))
         goto error;
 
-    p_demux->psz_location = p_demux->psz_url + 3 + (p - url);
+    p_demux->psz_location = p_demux->psz_url + 1 + (p - url);
+    if (strncmp(p_demux->psz_location, "//", 2) == 0)
+        p_demux->psz_location += 2;
     p_demux->psz_filepath = vlc_uri2path(url); /* parse URL */
 
     if( !b_preparsing )

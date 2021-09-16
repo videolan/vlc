@@ -300,7 +300,7 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
 {
     assert( psz_uri );
 #ifndef NDEBUG
-    if( !strstr( psz_uri, "://" )
+    if( !strchr( psz_uri, ':' )
      || strchr( psz_uri, ' ' ) || strchr( psz_uri, '"' ) )
         fprintf( stderr, "Warning: %s(\"%s\"): file path instead of URL.\n",
                  __func__, psz_uri );
@@ -1210,7 +1210,7 @@ static enum input_item_type_e GuessType( const input_item_t *p_item, bool *p_net
 
     *p_net = false;
 
-    if( strstr( p_item->psz_uri, "://" ) == NULL )
+    if( strchr( p_item->psz_uri, ':' ) == NULL )
         return ITEM_TYPE_UNKNOWN; /* invalid URI */
 
     const struct item_type_entry *e =
