@@ -60,6 +60,35 @@ struct vlc_gl_sampler {
     const GLsizei *tex_widths;
     const GLsizei *tex_heights;
 
+    /**
+     * Matrix to convert from picture coordinates to texture coordinates
+     *
+     * The matrix is 3x3 and is stored in column-major order:
+     *
+     *     / a b c \
+     *     | d e f |
+     *     \ 0 0 1 /
+     *
+     * It is stored as an array of 9 floats:
+     *
+     *     [a, d, 1, b, e, 0, c, f, 1]
+     *
+     * To compute texture coordinates, left-multiply the picture coordinates
+     * by this matrix:
+     *
+     *     tex_coords = pic_to_tex_matrix × pic_coords
+     *
+     *      / tex_x \       / a b c \       / pic_x \
+     *      | tex_y | =     | d e f |     × | pic_y |
+     *      \   1   /       \ 0 0 1 /       \   1   /
+     *
+     * It is NULL before the first picture is available and may theoretically
+     * change on every picture (the transform matrix provided by Android may
+     * change). If it has changed since the last picture, then
+     * vlc_gl_sampler_MustRecomputeCoords() will return true.
+     */
+    const float *pic_to_tex_matrix;
+
     struct {
         /**
          * Piece of fragment shader code declaration OpenGL extensions.
@@ -123,5 +152,42 @@ vlc_gl_sampler_Load(struct vlc_gl_sampler *sampler)
 {
     sampler->ops->load(sampler);
 }
+
+/**
+ * Convert from picture coordinates to texture coordinates, which can be used to
+ * sample at the correct location.
+ *
+ * This is a equivalent to retrieve the matrix and multiply manually.
+ *
+ * The picture and texture coords may point to the same memory, in that case
+ * the transformation is applied in place (overwriting the picture coordinates
+ * by the texture coordinates).
+ *
+ * \param sampler the sampler
+ * \param coords_count the number of coordinates (x,y) coordinates to convert
+ * \param pic_coords picture coordinates as an array of 2*coords_count floats
+ * \param tex_coords_out texture coordinates as an array of 2*coords_count
+ *                       floats
+ */
+void
+vlc_gl_sampler_PicToTexCoords(struct vlc_gl_sampler *sampler,
+                              unsigned coords_count, const float *pic_coords,
+                              float *tex_coords_out);
+
+/**
+ * Indicate if the transform to convert picture coordinates to textures
+ * coordinates have changed due to the last picture.
+ *
+ * The filters should call this function on every draw() call, and update their
+ * coordinates if necessary (using vlc_gl_sampler_PicToTexCoords()).
+ *
+ * It is guaranteed that it returns true for the first picture.
+ *
+ * \param sampler the sampler
+ * \retval true if the transform has changed due to the last picture
+ * \retval false if the transform remains the same
+ */
+bool
+vlc_gl_sampler_MustRecomputeCoords(struct vlc_gl_sampler *sampler);
 
 #endif
