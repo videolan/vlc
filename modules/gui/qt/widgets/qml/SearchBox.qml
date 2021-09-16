@@ -95,7 +95,7 @@ FocusScope {
             }
 
             Navigation.parentItem: root
-            Navigation.rightItem: _expanded ? searchBox : nullptr
+            Navigation.rightItem: _expanded ? searchBox : null
             Keys.priority: Keys.AfterItem
             Keys.onPressed: Navigation.defaultKeyAction(event)
         }

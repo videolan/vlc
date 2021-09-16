@@ -60,7 +60,7 @@ FocusScope {
     }
 
     Binding {
-        target: contentModel
+        target: !!contentModel ? contentModel : null
         property: "searchPattern"
         value: searchBox.searchPattern
         when: !!contentModel
