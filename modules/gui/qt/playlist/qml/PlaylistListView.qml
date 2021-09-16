@@ -267,6 +267,7 @@ Control {
             visible: model.count !== 0
 
             Layout.topMargin: VLCStyle.margin_normal
+            Layout.bottomMargin: VLCStyle.margin_xxsmall
             Layout.leftMargin: VLCStyle.margin_normal
             Layout.rightMargin: listView.scrollBarWidth
 
