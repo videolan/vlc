@@ -47,7 +47,7 @@ struct vlc_gl_sampler_priv {
     const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
 
     struct {
-        GLfloat OrientationMatrix[4*4];
+        GLfloat OrientationMatrix[3*3];
         GLfloat TexCoordsMap[3*3];
     } var;
     struct {
@@ -364,7 +364,7 @@ sampler_base_load(struct vlc_gl_sampler *sampler)
     const GLfloat *tm = GetTransformMatrix(priv->interop);
     vt->UniformMatrix4fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
 
-    vt->UniformMatrix4fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
+    vt->UniformMatrix3fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
                          priv->var.OrientationMatrix);
 
     if (priv->tex_target == GL_TEXTURE_RECTANGLE)
@@ -448,7 +448,7 @@ sampler_xyz12_load(struct vlc_gl_sampler *sampler)
     const GLfloat *tm = GetTransformMatrix(priv->interop);
     vt->UniformMatrix4fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
 
-    vt->UniformMatrix4fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
+    vt->UniformMatrix3fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
                          priv->var.OrientationMatrix);
 }
 
@@ -480,12 +480,12 @@ xyz12_shader_init(struct vlc_gl_sampler *sampler)
         " );"
 
         "uniform mat4 TransformMatrix;\n"
-        "uniform mat4 OrientationMatrix;\n"
+        "uniform mat3 OrientationMatrix;\n"
         "uniform mat3 TexCoordsMap;\n"
         "vec4 vlc_texture(vec2 pic_coords)\n"
         "{ "
         " vec4 v_in, v_out;"
-        " vec2 tex_coords = (TexCoordsMap * vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).xy, 1.0)).xy;\n"
+        " vec2 tex_coords = (TexCoordsMap * vec3((TransformMatrix * vec4((OrientationMatrix * vec3(pic_coords, 1.0)).xy, 0.0, 1.0)).xy, 1.0)).xy;\n"
         " v_in  = texture2D(Textures[0], tex_coords);\n"
         " v_in = pow(v_in, xyz_gamma);"
         " v_out = matrix_xyz_rgb * v_in ;"
@@ -563,30 +563,26 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
 }
 
 static void
-InitOrientationMatrix(GLfloat matrix[static 4*4],
+InitOrientationMatrix(GLfloat matrix[static 3*3],
                       video_orientation_t orientation)
 {
-    memcpy(matrix, MATRIX4_IDENTITY, sizeof(MATRIX4_IDENTITY));
+    memcpy(matrix, MATRIX3_IDENTITY, sizeof(MATRIX3_IDENTITY));
 
 /**
- * / C0R0  C1R0     0  C3R0 \
- * | C0R1  C1R1     0  C3R1 |
- * |    0     0     1     0 |  <-- keep the z coordinate unchanged
- * \    0     0     0     1 /
- *                  ^
- *                  |
- *                  z never impacts the orientation
+ * / C0R0  C1R0  C3R0 \
+ * | C0R1  C1R1  C3R1 |
+ * \    0     0     1 /
  *
  * (note that in memory, the matrix is stored in column-major order)
  */
 #define MATRIX_SET(C0R0, C1R0, C3R0, \
                    C0R1, C1R1, C3R1) \
-    matrix[0*4 + 0] = C0R0; \
-    matrix[1*4 + 0] = C1R0; \
-    matrix[3*4 + 0] = C3R0; \
-    matrix[0*4 + 1] = C0R1; \
-    matrix[1*4 + 1] = C1R1; \
-    matrix[3*4 + 1] = C3R1;
+    matrix[0*3 + 0] = C0R0; \
+    matrix[1*3 + 0] = C1R0; \
+    matrix[2*3 + 0] = C3R0; \
+    matrix[0*3 + 1] = C0R1; \
+    matrix[1*3 + 1] = C1R1; \
+    matrix[2*3 + 1] = C3R1;
 
     /**
      * The following schemas show how the video picture is oriented in the
@@ -806,7 +802,7 @@ sampler_planes_load(struct vlc_gl_sampler *sampler)
     const GLfloat *tm = GetTransformMatrix(priv->interop);
     vt->UniformMatrix4fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
 
-    vt->UniformMatrix4fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
+    vt->UniformMatrix3fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
                          priv->var.OrientationMatrix);
 
     if (priv->tex_target == GL_TEXTURE_RECTANGLE)
@@ -836,13 +832,13 @@ sampler_planes_init(struct vlc_gl_sampler *sampler)
     ADDF("uniform %s Texture;\n", sampler_type);
     ADD("uniform mat3 TexCoordsMap;\n"
         "uniform mat4 TransformMatrix;\n"
-        "uniform mat4 OrientationMatrix;\n");
+        "uniform mat3 OrientationMatrix;\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
         ADD("uniform vec2 TexSize;\n");
 
     ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
-        " vec2 tex_coords = (TexCoordsMap * vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).xy, 1.0)).xy;\n");
+        " vec2 tex_coords = (TexCoordsMap * vec3((TransformMatrix * vec4((OrientationMatrix * vec3(pic_coords, 1.0)).xy, 0.0, 1.0)).xy, 1.0)).xy;\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
@@ -930,7 +926,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 #define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
 
     ADD("uniform mat4 TransformMatrix;\n"
-        "uniform mat4 OrientationMatrix;\n");
+        "uniform mat3 OrientationMatrix;\n");
     ADDF("uniform %s Textures[%u];\n", glsl_sampler, tex_count);
     ADD("uniform mat3 TexCoordsMap;\n");
 
@@ -1022,7 +1018,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         ADD("uniform mat4 ConvMatrix;\n");
 
     ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
-        " vec2 tex_coords = (TexCoordsMap * vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).xy, 1.0)).xy;\n");
+        " vec2 tex_coords = (TexCoordsMap * vec3((TransformMatrix * vec4((OrientationMatrix * vec3(pic_coords, 1.0)).xy, 0.0, 1.0)).xy, 1.0)).xy;\n");
 
     unsigned color_count;
     if (is_yuv) {
