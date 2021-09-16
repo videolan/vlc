@@ -34,11 +34,47 @@
 
 struct priv
 {
+    float mtx_3x3[3*3];
     const float *transform_mtx;
+
     bool stex_attached;
     struct vlc_asurfacetexture *previous_texture;
     picture_t *current_picture;
 };
+
+static void
+ReductMatrix(float *mtx_3x3, const float *mtx_4x4)
+{
+    /*
+     * The transform matrix provided by Android is 4x4:
+     * <https://developer.android.com/reference/android/graphics/SurfaceTexture#getTransformMatrix(float%5B%5D)>
+     *
+     * However, the third column is never used, since the input vector is in
+     * the form (s, t, 0, 1). Similarly, the third row is never used either,
+     * since only the two first coordinates of the output vector are kept.
+     *
+     *       mat_4x4        mat_3x3
+     *
+     *     / a b . c \     / a b c \
+     *     | d e . f | --> | d e f |
+     *     | . . . . |     \ g h i /
+     *     \ g h . i /
+     */
+
+#define MTX4(COL,ROW) mtx_4x4[(COL)*4 + (ROW)]
+#define MTX3(COL,ROW) mtx_3x3[(COL)*3 + (ROW)]
+    MTX3(0,0) = MTX4(0,0); // a
+    MTX3(1,0) = MTX4(1,0); // b
+    MTX3(2,0) = MTX4(3,0); // c
+    MTX3(0,1) = MTX4(0,1); // d
+    MTX3(1,1) = MTX4(1,1); // e
+    MTX3(2,1) = MTX4(3,1); // f
+    MTX3(0,2) = MTX4(0,3); // g
+    MTX3(1,2) = MTX4(1,3); // h
+    MTX3(2,2) = MTX4(3,3); // i
+#undef MTX4
+#undef MTX3
+}
 
 static int
 tc_anop_allocate_textures(const struct vlc_gl_interop *interop, GLuint *textures,
@@ -103,12 +139,16 @@ tc_anop_update(struct vlc_gl_interop *interop, GLuint *textures,
     if (previous_texture && previous_texture != texture)
         SurfaceTexture_releaseTexImage(previous_texture);
 
-    if (SurfaceTexture_updateTexImage(texture, &priv->transform_mtx)
+    const float *mtx_4x4;
+    if (SurfaceTexture_updateTexImage(texture, &mtx_4x4)
         != VLC_SUCCESS)
     {
         priv->transform_mtx = NULL;
         goto error;
     }
+
+    ReductMatrix(priv->mtx_3x3, mtx_4x4);
+    priv->transform_mtx = priv->mtx_3x3;
 
     interop->vt->ActiveTexture(GL_TEXTURE0);
     interop->vt->BindTexture(interop->tex_target, textures[0]);

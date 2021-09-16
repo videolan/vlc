@@ -332,7 +332,7 @@ GetTransformMatrix(const struct vlc_gl_interop *interop)
     if (interop && interop->ops && interop->ops->get_transform_matrix)
         tm = interop->ops->get_transform_matrix(interop);
     if (!tm)
-        tm = MATRIX4_IDENTITY;
+        tm = MATRIX3_IDENTITY;
     return tm;
 }
 
@@ -362,7 +362,7 @@ sampler_base_load(struct vlc_gl_sampler *sampler)
 
     /* Return the expected transform matrix if interop == NULL */
     const GLfloat *tm = GetTransformMatrix(priv->interop);
-    vt->UniformMatrix4fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
+    vt->UniformMatrix3fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
 
     vt->UniformMatrix3fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
                          priv->var.OrientationMatrix);
@@ -446,7 +446,7 @@ sampler_xyz12_load(struct vlc_gl_sampler *sampler)
 
     /* Return the expected transform matrix if interop == NULL */
     const GLfloat *tm = GetTransformMatrix(priv->interop);
-    vt->UniformMatrix4fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
+    vt->UniformMatrix3fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
 
     vt->UniformMatrix3fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
                          priv->var.OrientationMatrix);
@@ -479,13 +479,13 @@ xyz12_shader_init(struct vlc_gl_sampler *sampler)
         "    0.0,      0.0,         0.0,        1.0 "
         " );"
 
-        "uniform mat4 TransformMatrix;\n"
+        "uniform mat3 TransformMatrix;\n"
         "uniform mat3 OrientationMatrix;\n"
         "uniform mat3 TexCoordsMap;\n"
         "vec4 vlc_texture(vec2 pic_coords)\n"
         "{ "
         " vec4 v_in, v_out;"
-        " vec2 tex_coords = (TexCoordsMap * vec3((TransformMatrix * vec4((OrientationMatrix * vec3(pic_coords, 1.0)).xy, 0.0, 1.0)).xy, 1.0)).xy;\n"
+        " vec2 tex_coords = (TexCoordsMap * TransformMatrix * OrientationMatrix * vec3(pic_coords, 1.0)).xy;\n"
         " v_in  = texture2D(Textures[0], tex_coords);\n"
         " v_in = pow(v_in, xyz_gamma);"
         " v_out = matrix_xyz_rgb * v_in ;"
@@ -800,7 +800,7 @@ sampler_planes_load(struct vlc_gl_sampler *sampler)
 
     /* Return the expected transform matrix if interop == NULL */
     const GLfloat *tm = GetTransformMatrix(priv->interop);
-    vt->UniformMatrix4fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
+    vt->UniformMatrix3fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
 
     vt->UniformMatrix3fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
                          priv->var.OrientationMatrix);
@@ -831,14 +831,14 @@ sampler_planes_init(struct vlc_gl_sampler *sampler)
 
     ADDF("uniform %s Texture;\n", sampler_type);
     ADD("uniform mat3 TexCoordsMap;\n"
-        "uniform mat4 TransformMatrix;\n"
+        "uniform mat3 TransformMatrix;\n"
         "uniform mat3 OrientationMatrix;\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
         ADD("uniform vec2 TexSize;\n");
 
     ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
-        " vec2 tex_coords = (TexCoordsMap * vec3((TransformMatrix * vec4((OrientationMatrix * vec3(pic_coords, 1.0)).xy, 0.0, 1.0)).xy, 1.0)).xy;\n");
+        " vec2 tex_coords = (TexCoordsMap * TransformMatrix * OrientationMatrix * vec3(pic_coords, 1.0)).xy;\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
@@ -925,7 +925,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 #define ADD(x) vlc_memstream_puts(&ms, x)
 #define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
 
-    ADD("uniform mat4 TransformMatrix;\n"
+    ADD("uniform mat3 TransformMatrix;\n"
         "uniform mat3 OrientationMatrix;\n");
     ADDF("uniform %s Textures[%u];\n", glsl_sampler, tex_count);
     ADD("uniform mat3 TexCoordsMap;\n");
@@ -1018,7 +1018,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         ADD("uniform mat4 ConvMatrix;\n");
 
     ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
-        " vec2 tex_coords = (TexCoordsMap * vec3((TransformMatrix * vec4((OrientationMatrix * vec3(pic_coords, 1.0)).xy, 0.0, 1.0)).xy, 1.0)).xy;\n");
+        " vec2 tex_coords = (TexCoordsMap * TransformMatrix * OrientationMatrix * vec3(pic_coords, 1.0)).xy;\n");
 
     unsigned color_count;
     if (is_yuv) {
