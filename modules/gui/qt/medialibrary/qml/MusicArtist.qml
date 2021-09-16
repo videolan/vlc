@@ -460,11 +460,6 @@ FocusScope {
                 id: tableColumns
             }
 
-            function setCurrentItemFocus(reason) {
-                positionViewAtIndex(currentIndex, ItemView.Contain)
-                _currentView.forceActiveFocus(reason)
-            }
-
             Util.SelectableDelegateModel {
                 id: trackSelectionModel
 
