@@ -83,6 +83,8 @@ struct vlc_gl_renderer
     GLuint index_buffer_object;
     GLuint texture_buffer_object;
 
+    bool valid_coords;
+
     /* View point */
     vlc_viewpoint_t vp;
     float f_teta;

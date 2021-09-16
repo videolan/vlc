@@ -359,12 +359,8 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     vt->GenBuffers(1, &renderer->index_buffer_object);
     vt->GenBuffers(1, &renderer->texture_buffer_object);
 
-    ret = SetupCoords(renderer);
-    if (ret != VLC_SUCCESS)
-    {
-        Close(filter);
-        return ret;
-    }
+    /* The coords will be initialized on first draw */
+    renderer->valid_coords = false;
 
     return VLC_SUCCESS;
 }
@@ -689,7 +685,8 @@ static int BuildRectangle(GLfloat **vertexCoord, GLfloat **textureCoord, unsigne
 static int SetupCoords(struct vlc_gl_renderer *renderer)
 {
     const opengl_vtable_t *vt = renderer->vt;
-    const video_format_t *fmt = &renderer->sampler->fmt;
+    struct vlc_gl_sampler *sampler = renderer->sampler;
+    const video_format_t *fmt = &sampler->fmt;
 
     GLfloat *vertexCoord, *textureCoord;
     GLushort *indices;
@@ -719,6 +716,10 @@ static int SetupCoords(struct vlc_gl_renderer *renderer)
 
     if (i_ret != VLC_SUCCESS)
         return i_ret;
+
+    /* Transform picture-to-texture coordinates in place */
+    vlc_gl_sampler_PicToTexCoords(sampler, nbVertices, textureCoord,
+                                  textureCoord);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
     vt->BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
@@ -756,6 +757,18 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
 
     struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
     vlc_gl_sampler_Load(sampler);
+
+    if (vlc_gl_sampler_MustRecomputeCoords(sampler))
+        renderer->valid_coords = false;
+
+    if (!renderer->valid_coords)
+    {
+        int ret = SetupCoords(renderer);
+        if (ret != VLC_SUCCESS)
+            return ret;
+
+        renderer->valid_coords = true;
+    }
 
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
     assert(renderer->aloc.PicCoordsIn != -1);
