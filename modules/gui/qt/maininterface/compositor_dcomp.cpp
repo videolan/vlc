@@ -292,7 +292,6 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         m_mainInterface = new MainInterfaceWin32(m_intf);
 
         m_rootWindow = new QWindow();
-        m_rootWindow->show();
 
         m_taskbarWidget = std::make_unique<WinTaskbarWidget>(m_intf, m_rootWindow);
         qApp->installNativeEventFilter(m_taskbarWidget.get());
@@ -349,6 +348,7 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         connect(qGuiApp, &QGuiApplication::screenAdded, this, resetAcrylicSurface);
         connect(qGuiApp, &QGuiApplication::screenRemoved, this, resetAcrylicSurface);
 
+        m_rootWindow->show();
         return m_mainInterface;
     }
     catch (const DXError& err)
