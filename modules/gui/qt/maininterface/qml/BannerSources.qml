@@ -339,7 +339,7 @@ FocusScope {
                         Loader {
                             id: localMenuGroup
 
-                            focus: !!item && item.focus && item.visible
+                            focus: true
                             visible: !!item
                             enabled: status === Loader.Ready
                             y: status === Loader.Ready ? (VLCStyle.localToolbar_height - item.height) / 2 : 0
