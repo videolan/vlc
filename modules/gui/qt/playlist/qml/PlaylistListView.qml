@@ -476,7 +476,7 @@ Control {
                 // Instead of property forwarding, PlaylistDelegate is tightly coupled with PlaylistlistView
                 // since PlaylistDelegate is expected to be used only within PlaylistlistView
 
-                width: parent.width
+                width: listView.width
             }
 
             add: Transition {
