@@ -351,7 +351,7 @@ void CompositorDCompositionAcrylicSurface::sync()
     int frameX = 0;
     int frameY = 0;
 
-    if (!m_intf->p_mi->useClientSideDecoration())
+    if (m_intf->p_mi && !m_intf->p_mi->useClientSideDecoration())
     {
         frameX = GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER);
         frameY = GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION)
