@@ -161,11 +161,12 @@ FocusScope{
                 if (paintOnly)
                     return
 
-                if (player.muted)
-                    player.muted = false
+                if (!volControl._inhibitPlayerVolumeUpdate) {
+                    if (player.muted)
+                        player.muted = false
 
-                if (!volControl._inhibitPlayerVolumeUpdate)
                     player.volume = volControl.value
+                }
             }
 
             Loader {
