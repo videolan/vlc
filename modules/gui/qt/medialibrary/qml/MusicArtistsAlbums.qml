@@ -151,7 +151,7 @@ FocusScope {
 
                 isCurrent: ListView.isCurrentItem
 
-                artistModel: artistModel
+                mlModel: artistModel
 
                 onItemClicked: {
                     selectionModel.updateSelection(mouse.modifiers, artistList.currentIndex,

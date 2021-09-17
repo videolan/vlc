@@ -32,7 +32,7 @@ Control {
 
     // Properties
 
-    /* required */ property var artistModel
+    /* required */ property var mlModel
 
     property bool isCurrent: false
 
@@ -89,7 +89,7 @@ Control {
             }
 
             function getSelectedInputItem() {
-                return artistModel.getItemsForIndexes([artistModel.index(index, 0)]);
+                return mlModel.getItemsForIndexes([mlModel.index(index, 0)]);
             }
         }
 
