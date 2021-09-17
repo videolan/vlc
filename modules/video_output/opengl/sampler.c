@@ -96,26 +96,29 @@ struct vlc_gl_sampler_priv {
 
     /* All matrices below are stored in column-major order. */
 
-    float mtx_orientation[3*3];
-    float mtx_coords_map[3*3];
+    float mtx_orientation[3*2];
+    float mtx_coords_map[3*2];
 
-    float mtx_transform[3*3];
+    float mtx_transform[3*2];
     bool mtx_transform_defined;
 
     /**
      * tex_coords =   mtx_all  × pic_coords
      *
      *  / tex_x \    / a b c \   / pic_x \
-     *  | tex_y | =  | d e f | × | pic_y |
-     *  \   1   /    \ 0 0 1 /   \   1   /
+     *  \ tex_y / =  \ d e f / × | pic_y |
+     *                           \   1   /
      *
      * Semantically, it represents the result of:
      *
      *     get_transform_matrix() * mtx_coords_map * mtx_orientation
      *
-     * It is stored in column-major order: [a, d, 0, b, e, 0, c, f, 1].
+     * (The intermediate matrices are implicitly expanded to 3x3 with [0 0 1]
+     * as the last row.)
+     *
+     * It is stored in column-major order: [a, d, b, e, c, f].
      */
-    float mtx_all[3*3];
+    float mtx_all[3*2];
     bool mtx_all_defined;
     bool mtx_all_has_changed; /* since the previous picture */
 };
@@ -532,25 +535,22 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
 }
 
 static void
-InitOrientationMatrix(float matrix[static 3*3], video_orientation_t orientation)
+InitOrientationMatrix(float matrix[static 3*2], video_orientation_t orientation)
 {
-    memcpy(matrix, MATRIX3_IDENTITY, sizeof(MATRIX3_IDENTITY));
-
 /**
  * / C0R0  C1R0  C3R0 \
- * | C0R1  C1R1  C3R1 |
- * \    0     0     1 /
+ * \ C0R1  C1R1  C3R1 /
  *
  * (note that in memory, the matrix is stored in column-major order)
  */
 #define MATRIX_SET(C0R0, C1R0, C3R0, \
                    C0R1, C1R1, C3R1) \
-    matrix[0*3 + 0] = C0R0; \
-    matrix[1*3 + 0] = C1R0; \
-    matrix[2*3 + 0] = C3R0; \
-    matrix[0*3 + 1] = C0R1; \
-    matrix[1*3 + 1] = C1R1; \
-    matrix[2*3 + 1] = C3R1;
+    matrix[0*2 + 0] = C0R0; \
+    matrix[1*2 + 0] = C1R0; \
+    matrix[2*2 + 0] = C3R0; \
+    matrix[0*2 + 1] = C0R1; \
+    matrix[1*2 + 1] = C1R1; \
+    matrix[2*2 + 1] = C3R1;
 
     /**
      * The following schemas show how the video picture is oriented in the
@@ -1091,7 +1091,8 @@ CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
     assert(!interop || interop->tex_count == tex_count);
 
     /* This might be updated in UpdatePicture for non-direct samplers */
-    memcpy(&priv->mtx_coords_map, MATRIX3_IDENTITY, sizeof(MATRIX3_IDENTITY));
+    memcpy(&priv->mtx_coords_map, MATRIX3x2_IDENTITY,
+           sizeof(MATRIX3x2_IDENTITY));
 
     if (interop)
     {
@@ -1169,24 +1170,25 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 }
 
 /**
- * Compute out = a * b.
+ * Compute out = a * b, as if the 3x2 matrices were expanded to 3x3 with
+ *  [0 0 1] as the last row.
  */
 static void
-MatrixMultiply(float out[static 3*3],
-               const float a[static 3*3], const float b[static 3*3])
+MatrixMultiply(float out[static 3*2],
+               const float a[static 3*2], const float b[static 3*2])
 {
     /* All matrices are stored in column-major order. */
     for (unsigned i = 0; i < 3; ++i)
-        for (unsigned j = 0; j < 3; ++j)
-            out[i*3+j] = a[0*3+j] * b[i*3+0]
-                       + a[1*3+j] * b[i*3+1]
-                       + a[2*3+j] * b[i*3+2];
+        for (unsigned j = 0; j < 2; ++j)
+            out[i*2+j] = a[0*2+j] * b[i*2+0]
+                       + a[1*2+j] * b[i*2+1]
+                       + a[2*2+j];
 }
 
 static void
 UpdateMatrixAll(struct vlc_gl_sampler_priv *priv)
 {
-    float tmp[3*3];
+    float tmp[3*2];
 
     float *out = priv->mtx_transform_defined ? tmp : priv->mtx_all;
     /* out = mtx_coords_map * mtx_orientation */
@@ -1261,24 +1263,22 @@ vlc_gl_sampler_UpdatePicture(struct vlc_gl_sampler *sampler, picture_t *picture)
          *
          * This is an affine 2D transformation, so the input coordinates
          * are given as a 3D vector in the form (x, y, 1), and the output
-         * is (x', y', 1).
+         * is (x', y').
          *
          * The paddings are l (left), r (right), t (top) and b (bottom).
          *
-         *               / (r-l)   0     l \
-         *      matrix = |   0   (b-t)   t |
-         *               \   0     0     1 /
+         *      matrix = / (r-l)   0     l \
+         *               \   0   (b-t)   t /
          *
          * It is stored in column-major order.
          */
         float *matrix = priv->mtx_coords_map;
-#define COL(x) (x*3)
+#define COL(x) (x*2)
 #define ROW(x) (x)
         matrix[COL(0) + ROW(0)] = right - left;
         matrix[COL(1) + ROW(1)] = bottom - top;
         matrix[COL(2) + ROW(0)] = left;
         matrix[COL(2) + ROW(1)] = top;
-        matrix[COL(2) + ROW(2)] = 1;
 #undef COL
 #undef ROW
 
@@ -1330,7 +1330,7 @@ vlc_gl_sampler_UpdateTextures(struct vlc_gl_sampler *sampler, GLuint textures[],
 
     if (!priv->mtx_all_defined)
     {
-        memcpy(priv->mtx_all, MATRIX3_IDENTITY, sizeof(MATRIX3_IDENTITY));
+        memcpy(priv->mtx_all, MATRIX3x2_IDENTITY, sizeof(MATRIX3x2_IDENTITY));
         priv->mtx_all_defined = true;
         priv->mtx_all_has_changed = true;
 
@@ -1361,7 +1361,7 @@ vlc_gl_sampler_PicToTexCoords(struct vlc_gl_sampler *sampler,
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
     const float *mtx = priv->mtx_all;
-#define MTX(col,row) mtx[(col*3)+row]
+#define MTX(col,row) mtx[(col*2)+row]
     for (unsigned i = 0; i < coords_count; ++i)
     {
         /* Store the coordinates, in case the transform must be applied in

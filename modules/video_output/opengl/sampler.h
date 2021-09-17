@@ -63,15 +63,14 @@ struct vlc_gl_sampler {
     /**
      * Matrix to convert from picture coordinates to texture coordinates
      *
-     * The matrix is 3x3 and is stored in column-major order:
+     * The matrix is 3x2 and is stored in column-major order:
      *
      *     / a b c \
-     *     | d e f |
-     *     \ 0 0 1 /
+     *     \ d e f /
      *
-     * It is stored as an array of 9 floats:
+     * It is stored as an array of 6 floats:
      *
-     *     [a, d, 1, b, e, 0, c, f, 1]
+     *     [a, d, b, e, c, f]
      *
      * To compute texture coordinates, left-multiply the picture coordinates
      * by this matrix:
@@ -79,8 +78,8 @@ struct vlc_gl_sampler {
      *     tex_coords = pic_to_tex_matrix × pic_coords
      *
      *      / tex_x \       / a b c \       / pic_x \
-     *      | tex_y | =     | d e f |     × | pic_y |
-     *      \   1   /       \ 0 0 1 /       \   1   /
+     *      \ tex_y / =     \ d e f /     × | pic_y |
+     *                                      \   1   /
      *
      * It is NULL before the first picture is available and may theoretically
      * change on every picture (the transform matrix provided by Android may

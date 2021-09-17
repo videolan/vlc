@@ -42,6 +42,13 @@ static const float MATRIX3_IDENTITY[3*3] = {
     0, 0, 1,
 };
 
+/* In column-major order */
+static const float MATRIX3x2_IDENTITY[3*2] = {
+    1, 0,
+    0, 1,
+    0, 0,
+};
+
 /** Return the smallest larger or equal power of 2 */
 static inline unsigned vlc_align_pot(unsigned x)
 {
