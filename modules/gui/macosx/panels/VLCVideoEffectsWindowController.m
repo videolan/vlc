@@ -79,26 +79,27 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 {
     self = [super initWithWindowNibName:@"VideoEffects"];
     if (self) {
-        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-        [notificationCenter addObserver:self
-                               selector:@selector(updateCocoaWindowLevel:)
-                                   name:VLCWindowShouldUpdateLevel
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(saveCurrentProfileAtTerminate:)
-                                   name:NSApplicationWillTerminateNotification
-                                 object:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+            [notificationCenter addObserver:self
+                                   selector:@selector(updateCocoaWindowLevel:)
+                                       name:VLCWindowShouldUpdateLevel
+                                     object:nil];
+            [notificationCenter addObserver:self
+                                   selector:@selector(saveCurrentProfileAtTerminate:)
+                                       name:NSApplicationWillTerminateNotification
+                                     object:nil];
 
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        if ([defaults boolForKey:@"VideoEffectApplyProfileOnStartup"]) {
-            // This does not reset the UI (which does not exist yet), but it initalizes needed playlist vars
-            [self resetValues];
+            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+            if ([defaults boolForKey:@"VideoEffectApplyProfileOnStartup"]) {
+                // This does not reset the UI (which does not exist yet), but it initalizes needed playlist vars
+                [self resetValues];
 
-            [self loadProfile];
-        } else {
-            [self saveCurrentProfileIndex:0];
-        }
-
+                [self loadProfile];
+            } else {
+                [self saveCurrentProfileIndex:0];
+            }
+        });
     }
 
     return self;
