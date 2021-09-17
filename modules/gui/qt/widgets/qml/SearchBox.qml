@@ -64,6 +64,9 @@ FocusScope {
         duration: VLCStyle.duration_faster
         to: VLCStyle.widthSearchInput
         easing.type: Easing.InSine
+        onStarted: {
+            searchBoxRect.visible = true
+        }
     }
 
     SmoothedAnimation {
@@ -73,6 +76,9 @@ FocusScope {
         duration: VLCStyle.duration_faster
         to: 0
         easing.type: Easing.OutSine
+        onStopped: {
+            searchBoxRect.visible = false
+        }
     }
 
 
@@ -105,6 +111,7 @@ FocusScope {
             color: VLCStyle.colors.button
 
             anchors.verticalCenter: parent.verticalCenter
+            visible: false
 
             width: 0
             implicitHeight: searchBox.height
