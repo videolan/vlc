@@ -22,7 +22,7 @@ import "qrc:///style/"
 NavigableRow {
     id: row
 
-    property string currentView
+    property var currentView
     signal clicked(int index)
 
     height: VLCStyle.localToolbar_height
@@ -30,7 +30,7 @@ NavigableRow {
 
     delegate: BannerTabButton {
         text: model.displayText
-        selected: model.name === row.currentView
+        selected: model.name === row.currentView.name
         showCurrentIndicator: false
         height: VLCStyle.localToolbar_height
         color: VLCStyle.colors.lowerBanner
