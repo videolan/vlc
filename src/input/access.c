@@ -127,6 +127,15 @@ static stream_t *access_New(vlc_object_t *parent, input_thread_t *input,
 
         access->psz_location = p + (strncmp(p + 1, "//", 2) ? 1 : 3);
         access->psz_filepath = vlc_uri2path(url);
+        if (access->psz_filepath == NULL)
+        {   /* FIXME: some access plugins want a file path for non-file MRLs */
+            char *file_url;
+            if (asprintf(&file_url, "file://%s", access->psz_location) >= 0)
+            {
+                access->psz_filepath = vlc_uri2path(file_url);
+                free(file_url);
+            }
+        }
         if (access->psz_filepath != NULL)
             msg_Dbg(access, " (path: %s)", access->psz_filepath);
 
