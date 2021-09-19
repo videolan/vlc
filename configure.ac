@@ -3236,12 +3236,7 @@ AM_CONDITIONAL([HAVE_LIBPLACEBO_GL], [test "$have_libplacebo_gl" = "yes"])
 dnl
 dnl  OpenGL
 dnl
-PKG_CHECK_MODULES([EGL], [egl], [
-  have_egl="yes"
-], [
-  have_egl="no"
-])
-AM_CONDITIONAL([HAVE_EGL], [test "${have_egl}" = "yes"])
+PKG_HAVE_WITH_MODULES([EGL], [egl])
 
 have_gl="no"
 PKG_CHECK_MODULES([GL], [gl], [
