@@ -3278,14 +3278,7 @@ AS_IF([test "${have_gl}" = "yes"], [
 ])
 
 dnl OpenGL ES 2: depends on EGL 1.1
-have_gles2="no"
-AC_ARG_ENABLE(gles2,
-  [AS_HELP_STRING([--enable-gles2],
-      [enable GLES2 support (default disabled)])])
-AS_IF([test "$enable_gles2" = "yes"], [
-  PKG_CHECK_MODULES([GLES2], [glesv2], [have_gles2="yes"], [])
-  ])
-AM_CONDITIONAL([HAVE_GLES2], [test "${have_gles2}" = "yes"])
+PKG_HAVE_WITH_MODULES([GLES2], [glesv2], [enable GLES2 support (default auto)])
 
 dnl
 dnl Vulkan
