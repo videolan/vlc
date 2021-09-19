@@ -440,7 +440,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
         return nil;
     }
 
-    int chroma = VLC_CODEC_RGB32;
+    int chroma = VLC_CODEC_BGRA;
 
     memset(&_fmt, 0, sizeof(es_format_t));
     es_format_Init(&_fmt, VIDEO_ES, chroma);
