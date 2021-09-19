@@ -331,25 +331,31 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         ret = opengl_interop_init(interop, GL_TEXTURE_2D, *list, space);
         if (ret == VLC_SUCCESS)
         {
-            if (interop->fmt_out.i_chroma == VLC_CODEC_RGB32)
-            {
-#if defined(WORDS_BIGENDIAN)
-                interop->fmt_out.i_rmask  = 0xff000000;
-                interop->fmt_out.i_gmask  = 0x00ff0000;
-                interop->fmt_out.i_bmask  = 0x0000ff00;
-#else
-                interop->fmt_out.i_rmask  = 0x000000ff;
-                interop->fmt_out.i_gmask  = 0x0000ff00;
-                interop->fmt_out.i_bmask  = 0x00ff0000;
-#endif
-                video_format_FixRgb(&interop->fmt_out);
-            }
-            break;
+            goto interop_init;
         }
         list++;
     }
-    if (ret != VLC_SUCCESS)
-        return ret;
+
+    return VLC_EGENERIC;
+
+interop_init:
+    /* We found a chroma with matching parameters for OpenGL. The interop can
+     * be created. */
+
+    // TODO: video_format_FixRgb is not fixing the mask we assign here
+    if (interop->fmt_out.i_chroma == VLC_CODEC_RGB32)
+    {
+#if defined(WORDS_BIGENDIAN)
+        interop->fmt_out.i_rmask  = 0xff000000;
+        interop->fmt_out.i_gmask  = 0x00ff0000;
+        interop->fmt_out.i_bmask  = 0x0000ff00;
+#else
+        interop->fmt_out.i_rmask  = 0x000000ff;
+        interop->fmt_out.i_gmask  = 0x0000ff00;
+        interop->fmt_out.i_bmask  = 0x00ff0000;
+#endif
+        video_format_FixRgb(&interop->fmt_out);
+    }
 
     struct priv *priv = interop->priv = calloc(1, sizeof(struct priv));
     if (unlikely(priv == NULL))
