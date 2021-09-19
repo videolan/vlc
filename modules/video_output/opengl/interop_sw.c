@@ -325,12 +325,19 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
     /* The pictures are uploaded upside-down */
     video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
 
-    int ret = VLC_EGENERIC;
+    /* Check whether the given chroma is translatable to OpenGL. */
+    vlc_fourcc_t i_chroma = interop->fmt_in.i_chroma;
+    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, i_chroma, space);
+    if (ret == VLC_SUCCESS)
+        goto interop_init;
+
+    /* Check whether any fallback for the chroma is translatable to OpenGL. */
     while (*list)
     {
         ret = opengl_interop_init(interop, GL_TEXTURE_2D, *list, space);
         if (ret == VLC_SUCCESS)
         {
+            i_chroma = *list;
             goto interop_init;
         }
         list++;
@@ -343,7 +350,7 @@ interop_init:
      * be created. */
 
     // TODO: video_format_FixRgb is not fixing the mask we assign here
-    if (interop->fmt_out.i_chroma == VLC_CODEC_RGB32)
+    if (i_chroma == VLC_CODEC_RGB32)
     {
 #if defined(WORDS_BIGENDIAN)
         interop->fmt_out.i_rmask  = 0xff000000;
