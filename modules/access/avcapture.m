@@ -72,6 +72,14 @@ vlc_module_begin ()
    set_callbacks(Open, Close)
 vlc_module_end ()
 
+static mtime_t vlc_CMTime_to_mtime(CMTime timestamp)
+{
+    CMTime scaled = CMTimeConvertScale(
+            timestamp, CLOCK_FREQ,
+            kCMTimeRoundingMethod_Default);
+
+    return 1 + scaled.value;
+}
 
 /*****************************************************************************
 * AVFoundation Bridge
@@ -187,10 +195,11 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         CVBufferRetain(videoFrame);
         [self getVideoDimensions:sampleBuffer];
 
+
         @synchronized (self) {
             imageBufferToRelease = currentImageBuffer;
             currentImageBuffer = videoFrame;
-            currentPts = (mtime_t)presentationtimestamp.value;
+            currentPts = vlc_CMTime_to_mtime(presentationtimestamp);
             timeScale = (long)presentationtimestamp.timescale;
         }
 
@@ -249,6 +258,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (VLCAVCaptureDemux*)init:(demux_t *)demux;
 - (int)demux;
+- (mtime_t)pts;
 - (void)dealloc;
 @end
 
@@ -309,6 +319,7 @@ static int Demux(demux_t *p_demux)
 *****************************************************************************/
 static int Control(demux_t *p_demux, int i_query, va_list args)
 {
+    VLCAVCaptureDemux *demux = (__bridge VLCAVCaptureDemux *)p_demux->p_sys;
     bool        *pb;
 
     switch( i_query )
@@ -328,7 +339,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
            return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            *va_arg(args, int64_t *) = mdate();
+            *va_arg(args, mtime_t *) = [demux pts];
             return VLC_SUCCESS;
 
         default:
@@ -511,6 +522,11 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
         es_out_Send(_demux->out, _es_video, p_block);
     }
     return 1;
+}
+
+- (mtime_t)pts
+{
+    return [_output currentPts];
 }
 
 - (void)dealloc
