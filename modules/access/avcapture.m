@@ -76,7 +76,8 @@ vlc_module_end ()
 /*****************************************************************************
 * AVFoundation Bridge
 *****************************************************************************/
-@interface VLCAVDecompressedVideoOutput : AVCaptureVideoDataOutput
+@interface VLCAVDecompressedVideoOutput :
+    AVCaptureVideoDataOutput <AVCaptureVideoDataOutputSampleBufferDelegate>
 {
     demux_t             *p_avcapture;
 
