@@ -72,6 +72,14 @@ vlc_module_begin ()
    set_callbacks(Open, Close)
 vlc_module_end ()
 
+static vlc_tick_t vlc_CMTime_to_tick(CMTime timestamp)
+{
+    CMTime scaled = CMTimeConvertScale(
+            timestamp, CLOCK_FREQ,
+            kCMTimeRoundingMethod_Default);
+
+    return VLC_TICK_0 + scaled.value;
+}
 
 /*****************************************************************************
 * AVFoundation Bridge
@@ -169,7 +177,7 @@ vlc_module_end ()
     @synchronized (self)
     {
        if ( !currentImageBuffer || currentPts == previousPts )
-           return 0;
+           return VLC_TICK_INVALID;
         pts = previousPts = currentPts;
     }
 
@@ -187,10 +195,11 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         CVBufferRetain(videoFrame);
         [self getVideoDimensions:sampleBuffer];
 
+
         @synchronized (self) {
             imageBufferToRelease = currentImageBuffer;
             currentImageBuffer = videoFrame;
-            currentPts = (vlc_tick_t)presentationtimestamp.value;
+            currentPts = vlc_CMTime_to_tick(presentationtimestamp);
             timeScale = (long)presentationtimestamp.timescale;
         }
 
@@ -249,6 +258,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (VLCAVCaptureDemux*)init:(demux_t *)demux;
 - (int)demux;
+- (vlc_tick_t)pts;
 - (void)dealloc;
 @end
 
@@ -302,6 +312,7 @@ static int Demux(demux_t *p_demux)
 *****************************************************************************/
 static int Control(demux_t *p_demux, int i_query, va_list args)
 {
+    VLCAVCaptureDemux *demux = (__bridge VLCAVCaptureDemux *)p_demux->p_sys;
     bool        *pb;
 
     switch( i_query )
@@ -321,7 +332,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
            return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            *va_arg(args, vlc_tick_t *) = vlc_tick_now();
+            *va_arg(args, vlc_tick_t *) = [demux pts];
             return VLC_SUCCESS;
 
         default:
@@ -504,6 +515,11 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
         es_out_Send(_demux->out, _es_video, p_block);
     }
     return 1;
+}
+
+- (vlc_tick_t)pts
+{
+    return [_output currentPts];
 }
 
 - (void)dealloc
