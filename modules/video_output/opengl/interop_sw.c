@@ -374,6 +374,7 @@ interop_init:
         .close = opengl_interop_generic_deinit,
     };
     interop->ops = &ops;
+    interop->fmt_in.i_chroma = i_chroma;
 
     /* OpenGL or OpenGL ES2 with GL_EXT_unpack_subimage ext */
     priv->has_unpack_subimage =
