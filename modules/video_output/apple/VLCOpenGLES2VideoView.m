@@ -403,11 +403,11 @@ static void Close(vlc_gl_t *gl)
 - (void)resize:(CGSize)size
 {
     CFRunLoopRef runloop = CFRunLoopGetMain();
-    vlc_mutex_lock(&_mutex);
     vlc_darwin_DispatchSync(runloop, ^{
+        vlc_mutex_lock(&_mutex);
         [self resizeLocked:size];
+        vlc_mutex_unlock(&_mutex);
     });
-    vlc_mutex_unlock(&_mutex);
 }
 
 - (void)resizeLocked:(CGSize)size
