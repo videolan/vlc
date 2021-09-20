@@ -153,6 +153,9 @@ int main (void)
     test_towc("\xED\xA0\x80", -1, 0xD800);
     test_towc("\xED\xBF\xBF", -1, 0xDFFF);
     test_towc("\xEE\x80\x80", 3, 0xE000);
+    /* Overlong surrogates */
+    test_towc("\xF0\x8D\x88\x80", -1, 0xD800);
+    test_towc("\xF0\x8D\xBF\xBF", -1, 0xDFFF);
     /* Spurious continuation byte */
     test_towc("\x80", -1, 0);
     test_towc("\xBF", -1, 0);
