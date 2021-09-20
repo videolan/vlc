@@ -33,6 +33,7 @@
 #import "extensions/NSString+Helpers.h"
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
+#import "main/VLCApplication.h"
 
 #import "views/VLCScrollingClipView.h"
 
@@ -155,18 +156,8 @@
     [[self window] setExcludedFromWindowsMenu:YES];
     [[self window] setMenu:nil];
 
-    if (config_GetInt("macosx-icon-change")) {
-        /* After day 354 of the year, the usual VLC cone is replaced by another cone
-         * wearing a Father Xmas hat.
-         * Note: this icon doesn't represent an endorsement of The Coca-Cola Company.
-         */
-        NSCalendar *gregorian =
-        [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-        NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSCalendarUnitDay inUnit:NSCalendarUnitYear forDate:[NSDate date]];
-
-        if (dayOfYear >= 354)
-            [o_icon_view setImage: [NSImage imageNamed:@"VLC-Xmas"]];
-    }
+    [o_icon_view setImage:
+        [[VLCApplication sharedApplication] vlcAppIconImage]];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
