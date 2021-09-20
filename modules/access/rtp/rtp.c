@@ -416,6 +416,10 @@ static int OpenURL(vlc_object_t *obj)
     }
 
     free (tmp);
+
+    if(fd == -1)
+        return VLC_EGENERIC;
+
     p_sys->rtp_sock = (co ? vlc_dccp_CreateFD : vlc_datagram_CreateFD)(fd);
     if (p_sys->rtp_sock == NULL) {
         if (rtcp_fd != -1)
