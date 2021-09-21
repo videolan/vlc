@@ -48,7 +48,10 @@ struct sys {
 
     struct {
         GLint vertex_pos;
+        GLint tex_coords_in;
     } loc;
+
+    bool vflip;
 };
 
 static int
@@ -66,9 +69,38 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
     vlc_gl_sampler_Load(sampler);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, sys->vbo);
+
+    if (vlc_gl_sampler_MustRecomputeCoords(sampler))
+    {
+        float coords[] = {
+            0, sys->vflip ? 0 : 1,
+            0, sys->vflip ? 1 : 0,
+            1, sys->vflip ? 0 : 1,
+            1, sys->vflip ? 1 : 0,
+        };
+
+        /* Transform coordinates in place */
+        vlc_gl_sampler_PicToTexCoords(sampler, 4, coords, coords);
+
+        const float data[] = {
+            -1,  1, coords[0], coords[1],
+            -1, -1, coords[2], coords[3],
+             1,  1, coords[4], coords[5],
+             1, -1, coords[6], coords[7],
+        };
+        vt->BufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+    }
+
+    const GLsizei stride = 4 * sizeof(float);
+
     vt->EnableVertexAttribArray(sys->loc.vertex_pos);
-    vt->VertexAttribPointer(sys->loc.vertex_pos, 2, GL_FLOAT, GL_FALSE, 0,
+    vt->VertexAttribPointer(sys->loc.vertex_pos, 2, GL_FLOAT, GL_FALSE, stride,
                             (const void *) 0);
+
+    intptr_t offset = 2 * sizeof(float);
+    vt->EnableVertexAttribArray(sys->loc.tex_coords_in);
+    vt->VertexAttribPointer(sys->loc.tex_coords_in, 2, GL_FLOAT, GL_FALSE,
+                            stride, (const void *) offset);
 
     vt->Clear(GL_COLOR_BUFFER_BIT);
     vt->DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -104,20 +136,11 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
 
     static const char *const VERTEX_SHADER_BODY =
         "attribute vec2 vertex_pos;\n"
+        "attribute vec2 tex_coords_in;\n"
         "varying vec2 tex_coords;\n"
         "void main() {\n"
         "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
-        "  tex_coords = vec2((vertex_pos.x + 1.0) / 2.0,\n"
-        "                    (vertex_pos.y + 1.0) / 2.0);\n"
-        "}\n";
-
-    static const char *const VERTEX_SHADER_BODY_VFLIP =
-        "attribute vec2 vertex_pos;\n"
-        "varying vec2 tex_coords;\n"
-        "void main() {\n"
-        "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
-        "  tex_coords = vec2((vertex_pos.x + 1.0) / 2.0,\n"
-        "                    (-vertex_pos.y + 1.0) / 2.0);\n"
+        "  tex_coords = tex_coords_in;\n"
         "}\n";
 
     static const char *const FRAGMENT_SHADER_BODY =
@@ -145,11 +168,11 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     }
 
     config_ChainParse(filter, DRAW_CFG_PREFIX, filter_options, config);
-    bool vflip = var_InheritBool(filter, DRAW_CFG_PREFIX "vflip");
+    sys->vflip = var_InheritBool(filter, DRAW_CFG_PREFIX "vflip");
 
     const char *vertex_shader[] = {
         shader_version,
-        vflip ? VERTEX_SHADER_BODY_VFLIP : VERTEX_SHADER_BODY,
+        VERTEX_SHADER_BODY,
     };
     const char *fragment_shader[] = {
         shader_version,
@@ -173,20 +196,10 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     sys->loc.vertex_pos = vt->GetAttribLocation(program_id, "vertex_pos");
     assert(sys->loc.vertex_pos != -1);
 
+    sys->loc.tex_coords_in = vt->GetAttribLocation(program_id, "tex_coords_in");
+    assert(sys->loc.tex_coords_in != -1);
+
     vt->GenBuffers(1, &sys->vbo);
-
-    static const GLfloat vertex_pos[] = {
-        -1,  1,
-        -1, -1,
-         1,  1,
-         1, -1,
-    };
-
-    vt->BindBuffer(GL_ARRAY_BUFFER, sys->vbo);
-    vt->BufferData(GL_ARRAY_BUFFER, sizeof(vertex_pos), vertex_pos,
-                   GL_STATIC_DRAW);
-
-    vt->BindBuffer(GL_ARRAY_BUFFER, 0);
 
     static const struct vlc_gl_filter_ops ops = {
         .draw = Draw,
