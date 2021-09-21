@@ -45,13 +45,13 @@ Control {
     // Events
 
     onHoveredChanged: {
-        if(hovered)
-            showTooltip(false)
+        if (hovered)
+            adjustTooltip()
     }
 
-    onSelectedChanged: {
-        if(selected)
-            showTooltip(true)
+    onVisualFocusChanged: {
+        if (visualFocus)
+            adjustTooltip()
     }
 
     // Connections
@@ -68,16 +68,17 @@ Control {
 
     // Functions
 
-    function showTooltip(selectAction) {
+    function adjustTooltip() {
         plInfoTooltip.close()
         plInfoTooltip.text = Qt.binding(function() { return (textInfo.text + '\n' + textArtist.text); })
         plInfoTooltip.parent = textInfoColumn
-        if (selectionLength > 1 && selectAction)
-            plInfoTooltip.timeout = 2000
-        else
+        if (hovered)
             plInfoTooltip.timeout = 0
-        plInfoTooltip.visible = Qt.binding(function() { return ( (selectAction ? selected : hovered) && !overlayMenu.shown && mainInterface.playlistVisible &&
-                                                                (textInfo.implicitWidth > textInfo.width || textArtist.implicitWidth > textArtist.width)); })
+        else
+            plInfoTooltip.timeout = 2000
+        plInfoTooltip.visible = Qt.binding(function() { return ( (visualFocus || hovered) && !mouseArea.drag.active &&
+                                                                !overlayMenu.shown && mainInterface.playlistVisible &&
+                                                                (textInfo.implicitWidth > textInfo.width || textArtist.implicitWidth > textArtist.width) ) })
     }
 
     // Childs
@@ -182,6 +183,8 @@ Control {
                 else {
                     dragItem.Drag.drop()
                 }
+
+                delegate.ListView.delayRemove = drag.active
             }
 
             onPositionChanged: {

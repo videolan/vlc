@@ -121,6 +121,8 @@ GridView{
             buttonDragItem.Drag.source = dragArea
             held = true
             root._held = true
+
+            dragArea.ListView.delayRemove = true
         }
 
         onReleased: {
@@ -128,6 +130,8 @@ GridView{
             buttonDragItem.visible = false
             held = false
             root._held = false
+
+            dragArea.ListView.delayRemove = false
         }
 
         onPositionChanged: {

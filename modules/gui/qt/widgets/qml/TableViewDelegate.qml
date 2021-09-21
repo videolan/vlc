@@ -139,6 +139,8 @@ Control {
             }
 
             root.dragItem.Drag.active = drag.active;
+
+            root.ListView.delayRemove = drag.active;
         }
 
         // Childs

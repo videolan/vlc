@@ -133,6 +133,11 @@ MouseArea {
                 target: content
                 anchors { horizontalCenter: undefined; verticalCenter: undefined }
             }
+
+            PropertyChanges {
+                target: dragArea
+                ListView.delayRemove: true
+            }
         }
 
         onXChanged: {

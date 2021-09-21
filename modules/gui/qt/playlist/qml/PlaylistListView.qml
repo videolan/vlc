@@ -176,7 +176,6 @@ Control {
             }
         }
 
-        // FIXME: Drag animation for listView sometimes messes up dragging (dragged item sticking to the cursor).
         SmoothedAnimation {
             id: upAnimation
             target: listView.listView
