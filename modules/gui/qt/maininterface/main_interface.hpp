@@ -221,6 +221,7 @@ public:
     inline void setDialogFilePath(const QUrl& filepath ){ m_dialogFilepath = filepath; }
     inline bool useAcrylicBackground() const { return m_useAcrylicBackground; }
     inline bool hasAcrylicSurface() const { return m_hasAcrylicSurface; }
+    inline void reloadFromSettings() { loadFromSettingsImpl(true); }
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -265,9 +266,9 @@ protected:
     QMap<QWidget *, QSize> stackWidgetsSizes;
 
     /* Flags */
-    double                m_intfUserScaleFactor;
-    double                m_intfScaleFactor;
-    unsigned             i_notificationSetting; /// Systray Notifications
+    double               m_intfUserScaleFactor;
+    double               m_intfScaleFactor;
+    int                  i_notificationSetting; /// Systray Notifications
     bool                 b_hideAfterCreation;
     bool                 b_minimalView;         ///< Minimal video
     bool                 b_playlistDocked;
@@ -367,6 +368,10 @@ signals:
     void pinVideoControlsChanged( bool );
     void useAcrylicBackgroundChanged();
     void hasAcrylicSurfaceChanged();
+
+private:
+    void loadPrefs(bool callSignals);
+    void loadFromSettingsImpl(bool callSignals);
 };
 
 #endif

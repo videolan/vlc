@@ -98,6 +98,32 @@ static int IntfRaiseMainCB( vlc_object_t *p_this, const char *psz_variable,
 const QEvent::Type MainInterface::ToolbarsNeedRebuild =
         (QEvent::Type)QEvent::registerEventType();
 
+namespace
+{
+
+template <typename T>
+T loadVLCOption(vlc_object_t *obj, const char *name);
+
+template <>
+float loadVLCOption<float>(vlc_object_t *obj, const char *name)
+{
+    return var_InheritFloat(obj, name);
+}
+
+template <>
+int loadVLCOption<int>(vlc_object_t *obj, const char *name)
+{
+    return var_InheritInteger(obj, name);
+}
+
+template <>
+bool loadVLCOption<bool>(vlc_object_t *obj, const char *name)
+{
+    return var_InheritBool(obj, name);
+}
+
+}
+
 MainInterface::MainInterface(qt_intf_t *_p_intf)
     : p_intf(_p_intf)
 {
@@ -114,16 +140,11 @@ MainInterface::MainInterface(qt_intf_t *_p_intf)
      *  Pre-building of interface
      **/
 
-    /* Are we in the enhanced always-video mode or not ? */
-    b_minimalView = var_InheritBool( p_intf, "qt-minimal-view" );
+    settings = getSettings();
+    m_colorScheme = new ColorSchemeModel(this);
 
-    /* Do we want anoying popups or not */
-    i_notificationSetting = var_InheritInteger( p_intf, "qt-notification" );
-
-    /* */
-    m_intfUserScaleFactor = var_InheritFloat(p_intf, "qt-interface-scale");
-    if (m_intfUserScaleFactor == -1)
-        m_intfUserScaleFactor = getSettings()->value( "MainWindow/interface-scale", 1.0).toDouble();
+    loadPrefs(false);
+    loadFromSettingsImpl(false);
 
     /* Get the available interfaces */
     m_extraInterfaces = new VLCVarChoiceModel(VLC_OBJECT(p_intf->intf), "intf-add", this);
@@ -134,31 +155,8 @@ MainInterface::MainInterface(qt_intf_t *_p_intf)
         m_medialib = new MediaLib(p_intf, this);
     }
 
-    /* Set the other interface settings */
-    settings = getSettings();
-
-    /* playlist settings */
-    b_playlistDocked = getSettings()->value( "MainWindow/pl-dock-status", true ).toBool();
-    playlistVisible  = getSettings()->value( "MainWindow/playlist-visible", false ).toBool();
-    playlistWidthFactor = getSettings()->value( "MainWindow/playlist-width-factor", 4.0 ).toDouble();
-    m_gridView = getSettings()->value( "MainWindow/grid-view", true).toBool();
-    m_showRemainingTime = getSettings()->value( "MainWindow/ShowRemainingTime", false ).toBool();
-    m_pinVideoControls = getSettings()->value("MainWindow/pin-video-controls", false ).toBool();
-
-    m_colorScheme = new ColorSchemeModel(this);
-    const auto currentColorScheme = static_cast<ColorSchemeModel::ColorScheme>(getSettings()->value( "MainWindow/color-scheme", ColorSchemeModel::System ).toInt());
-    m_colorScheme->setCurrentScheme(currentColorScheme);
-
     /* Controlbar Profile Model Creation */
     m_controlbarProfileModel = new ControlbarProfileModel(p_intf, this);
-
-    /* Should the UI stays on top of other windows */
-    b_interfaceOnTop = var_InheritBool( p_intf, "video-on-top" );
-
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
-    m_clientSideDecoration = ! var_InheritBool( p_intf, "qt-titlebar" );
-#endif
-    m_hasToolbarMenu = var_InheritBool( p_intf, "qt-menubar" );
 
     m_dialogFilepath = getSettings()->value( "filedialog-path", QVLCUserDir( VLC_HOME_DIR ) ).toString();
 
@@ -274,25 +272,88 @@ bool MainInterface::hasFirstrun() const {
  *   Main UI handling        *
  *****************************/
 
-void MainInterface::reloadPrefs()
+void MainInterface::loadPrefs(const bool callSignals)
 {
-    i_notificationSetting = var_InheritInteger( p_intf, "qt-notification" );
-
-    if ( m_hasToolbarMenu != var_InheritBool( p_intf, "qt-menubar" ) )
+    const auto loadFromVLCOption = [this, callSignals](auto &variable, const char *name
+            , const std::function<void(MainInterface *)> signal)
     {
-        m_hasToolbarMenu = !m_hasToolbarMenu;
-        emit hasToolbarMenuChanged();
-    }
+        using variableType = std::remove_reference_t<decltype(variable)>;
+
+        const auto value =  loadVLCOption<variableType>(VLC_OBJECT(p_intf), name);
+        if (value == variable)
+            return;
+
+        variable = value;
+        if (callSignals && signal)
+            signal(this);
+    };
+
+    /* Are we in the enhanced always-video mode or not ? */
+    loadFromVLCOption(b_minimalView, "qt-minimal-view", nullptr);
+
+    /* Do we want anoying popups or not */
+    loadFromVLCOption(i_notificationSetting, "qt-notification", nullptr);
+
+    /* Should the UI stays on top of other windows */
+    loadFromVLCOption(b_interfaceOnTop, "video-on-top", [this](MainInterface *)
+    {
+        emit interfaceAlwaysOnTopChanged(b_interfaceOnTop);
+    });
+
+    loadFromVLCOption(m_hasToolbarMenu, "qt-menubar", &MainInterface::hasToolbarMenuChanged);
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
-    if (m_clientSideDecoration != (! var_InheritBool( p_intf, "qt-titlebar" )))
-    {
-        m_clientSideDecoration = !m_clientSideDecoration;
-        emit useClientSideDecorationChanged();
-    }
+    loadFromVLCOption(m_clientSideDecoration, "qt-titlebar" , &MainInterface::useClientSideDecorationChanged);
 #endif
 }
 
+void MainInterface::loadFromSettingsImpl(const bool callSignals)
+{
+    const auto loadFromSettings = [this, callSignals](auto &variable, const char *name
+            , const auto defaultValue, auto signal)
+    {
+        using variableType = std::remove_reference_t<decltype(variable)>;
+
+        const auto value = getSettings()->value(name, defaultValue).template value<variableType>();
+        if (value == variable)
+            return;
+
+        variable = value;
+        if (callSignals && signal)
+            (this->*signal)(variable);
+    };
+
+    loadFromSettings(b_playlistDocked, "MainWindow/pl-dock-status", true, &MainInterface::playlistDockedChanged);
+
+    loadFromSettings(playlistVisible, "MainWindow/playlist-visible", false, &MainInterface::playlistVisibleChanged);
+
+    loadFromSettings(playlistWidthFactor, "MainWindow/playlist-width-factor", 4.0 , &MainInterface::playlistWidthFactorChanged);
+
+    loadFromSettings(m_gridView, "MainWindow/grid-view", true, &MainInterface::gridViewChanged);
+
+    loadFromSettings(m_showRemainingTime, "MainWindow/ShowRemainingTime", false, &MainInterface::showRemainingTimeChanged);
+
+    loadFromSettings(m_pinVideoControls, "MainWindow/pin-video-controls", false, &MainInterface::pinVideoControlsChanged);
+
+    const auto colorScheme = static_cast<ColorSchemeModel::ColorScheme>(getSettings()->value( "MainWindow/color-scheme", ColorSchemeModel::System ).toInt());
+    if (m_colorScheme->currentScheme() != colorScheme)
+        m_colorScheme->setCurrentScheme(colorScheme);
+
+    /* user interface scale factor */
+    auto userIntfScaleFactor = var_InheritFloat(p_intf, "qt-interface-scale");
+    if (userIntfScaleFactor == -1)
+        userIntfScaleFactor = getSettings()->value( "MainWindow/interface-scale", 1.0).toDouble();
+    if (m_intfUserScaleFactor != userIntfScaleFactor)
+    {
+        m_intfUserScaleFactor = userIntfScaleFactor;
+        updateIntfScaleFactor();
+    }
+}
+
+void MainInterface::reloadPrefs()
+{
+    loadPrefs(true);
+}
 
 void MainInterface::onInputChanged( bool hasInput )
 {
@@ -323,9 +384,8 @@ void MainInterface::sendHotkey(Qt::Key key , Qt::KeyboardModifiers modifiers)
 
 void MainInterface::updateIntfScaleFactor()
 {
-    QWindow* window = p_intf->p_compositor->interfaceMainWindow();
     m_intfScaleFactor = m_intfUserScaleFactor;
-    if (window)
+    if (QWindow* window = p_intf->p_compositor ? p_intf->p_compositor->interfaceMainWindow() : nullptr)
     {
         QScreen* screen = window->screen();
         if (screen)
