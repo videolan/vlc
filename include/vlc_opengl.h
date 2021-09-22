@@ -52,6 +52,7 @@ struct vlc_gl_t
     module_t *module;
     void *sys;
 
+    struct vlc_decoder_device *device;
     union {
         struct { /* on-screen */
             void (*swap)(vlc_gl_t *);
@@ -61,7 +62,6 @@ struct vlc_gl_t
         struct { /* off-screen */
             picture_t *(*swap_offscreen)(vlc_gl_t *);
 
-            struct vlc_decoder_device *device;
             vlc_fourcc_t offscreen_chroma_out;
             struct vlc_video_context *offscreen_vctx_out;
             /* Flag to indicate if the OpenGL implementation produces upside-down
