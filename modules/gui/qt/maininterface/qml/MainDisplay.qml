@@ -355,6 +355,9 @@ FocusScope {
 
                             Widgets.HorizontalResizeHandle {
                                 id: resizeHandle
+
+                                property bool _inhibitMainInterfaceUpdate: false
+
                                 anchors {
                                     top: parent.top
                                     bottom: parent.bottom
@@ -367,10 +370,28 @@ FocusScope {
                                 targetWidth: playlistColumn.width
                                 sourceWidth: root.width
 
-                                onWidthFactorChanged: mainInterface.setPlaylistWidthFactor(widthFactor)
-                                Component.onCompleted:  {
-                                    //don't bind just provide the initial value, HorizontalResizeHandle.widthFactor updates itself
+                                onWidthFactorChanged: {
+                                    if (!_inhibitMainInterfaceUpdate)
+                                        mainInterface.setPlaylistWidthFactor(widthFactor)
+                                }
+
+                                Component.onCompleted:  _updateFromMainInterface()
+
+                                function _updateFromMainInterface() {
+                                    if (widthFactor == mainInterface.playlistWidthFactor)
+                                        return
+
+                                    _inhibitMainInterfaceUpdate = true
                                     widthFactor = mainInterface.playlistWidthFactor
+                                    _inhibitMainInterfaceUpdate = false
+                                }
+
+                                Connections {
+                                    target: mainInterface
+
+                                    onPlaylistWidthFactorChanged: {
+                                        resizeHandle._updateFromMainInterface()
+                                    }
                                 }
                             }
                         }
