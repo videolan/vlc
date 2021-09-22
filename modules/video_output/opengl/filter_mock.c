@@ -292,10 +292,6 @@ InitBlend(struct vlc_gl_filter *filter)
     sys->loc.vertex_color = vt->GetAttribLocation(program_id, "vertex_color");
     assert(sys->loc.vertex_color != -1);
 
-    sys->loc.rotation_matrix = vt->GetUniformLocation(sys->program_id,
-                                                      "rotation_matrix");
-    assert(sys->loc.rotation_matrix != -1);
-
     vt->GenBuffers(1, &sys->vbo);
 
     static const GLfloat data[] = {
