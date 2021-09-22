@@ -88,7 +88,7 @@ struct sys {
         GLint vertex_pos;
         GLint rotation_matrix;
         GLint vertex_color; // blend (non-mask) only
-        GLint plane;
+        GLint offset;
     } loc;
 
     float theta0;
@@ -202,7 +202,7 @@ DrawPlane(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
     struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
     vlc_gl_sampler_Load(sampler);
 
-    vt->Uniform1i(sys->loc.plane, (int) meta->plane);
+    vt->Uniform1f(sys->loc.offset, 0.02 * meta->plane);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, sys->vbo);
     vt->EnableVertexAttribArray(sys->loc.vertex_pos);
@@ -429,18 +429,16 @@ InitPlane(struct vlc_gl_filter *filter)
     static const char *const VERTEX_SHADER_BODY =
         "attribute vec2 vertex_pos;\n"
         "varying vec2 tex_coords;\n"
+        "uniform float offset;\n"
         "void main() {\n"
         "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
-        "  tex_coords = vec2((vertex_pos.x + 1.0) / 2.0,\n"
-        "                    (vertex_pos.y + 1.0) / 2.0);\n"
+        "  tex_coords = (vertex_pos + vec2(1.0)) / 2.0 + offset;\n"
         "}\n";
 
     static const char *const FRAGMENT_SHADER_BODY =
         "varying vec2 tex_coords;\n"
-        "uniform int plane;\n"
         "void main() {\n"
-        "  vec2 offset = vec2(float(plane) * 0.02);\n"
-        "  gl_FragColor = vlc_texture(fract(tex_coords + offset));\n"
+        "  gl_FragColor = vlc_texture(fract(tex_coords));\n"
         "}\n";
 
     const char *extensions = sampler->shader.extensions
@@ -485,8 +483,8 @@ InitPlane(struct vlc_gl_filter *filter)
     sys->loc.vertex_pos = vt->GetAttribLocation(sys->program_id, "vertex_pos");
     assert(sys->loc.vertex_pos != -1);
 
-    sys->loc.plane = vt->GetUniformLocation(program_id, "plane");
-    assert(sys->loc.plane != -1);
+    sys->loc.offset = vt->GetUniformLocation(program_id, "offset");
+    assert(sys->loc.offset != -1);
 
     static const GLfloat vertex_pos[] = {
         -1,  1,
