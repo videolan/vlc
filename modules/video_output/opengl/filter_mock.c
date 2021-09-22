@@ -87,6 +87,7 @@ struct sys {
     struct {
         GLint vertex_pos;
         GLint rotation_matrix;
+        GLint pic_to_tex; // mask only
         GLint vertex_color; // blend (non-mask) only
         GLint offset;
     } loc;
@@ -183,6 +184,16 @@ DrawMask(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
     InitMatrix(sys, meta->pts);
     vt->UniformMatrix4fv(sys->loc.rotation_matrix, 1, GL_FALSE,
                          sys->rotation_matrix);
+
+    const float *mtx = sampler->pic_to_tex_matrix;
+    assert(mtx);
+
+    /* Expand the 3x2 matrix to 3x3 to store it in a mat3 uniform (for better
+     * compatibility). Both are in column-major order. */
+    float pic_to_tex[] = { mtx[0], mtx[1], 0,
+                           mtx[2], mtx[3], 0,
+                           mtx[4], mtx[5], 1 };
+    vt->UniformMatrix3fv(sys->loc.pic_to_tex, 1, GL_FALSE, pic_to_tex);
 
     vt->Clear(GL_COLOR_BUFFER_BIT);
     vt->DrawArrays(GL_TRIANGLES, 0, 3);
@@ -329,11 +340,12 @@ InitMask(struct vlc_gl_filter *filter)
     static const char *const VERTEX_SHADER_BODY =
         "attribute vec2 vertex_pos;\n"
         "uniform mat4 rotation_matrix;\n"
+        "uniform mat3 pix_to_tex;\n"
         "varying vec2 tex_coords;\n"
         "void main() {\n"
         "  vec4 pos = rotation_matrix * vec4(vertex_pos, 0.0, 1.0);\n"
-        "  tex_coords = vec2((pos.x + 1.0) / 2.0,\n"
-        "                    (pos.y + 1.0) / 2.0);\n"
+        "  vec2 pic_coords = (pos.xy + vec2(1.0)) / 2.0;\n"
+        "  tex_coords = (pix_to_tex * vec3(pic_coords, 1.0)).xy;\n"
         "  gl_Position = pos\n;"
         "}\n";
 
@@ -388,6 +400,9 @@ InitMask(struct vlc_gl_filter *filter)
     sys->loc.rotation_matrix = vt->GetUniformLocation(sys->program_id,
                                                       "rotation_matrix");
     assert(sys->loc.rotation_matrix != -1);
+
+    sys->loc.pic_to_tex = vt->GetUniformLocation(sys->program_id, "pix_to_tex");
+    assert(sys->loc.pic_to_tex != -1);
 
     vt->GenBuffers(1, &sys->vbo);
 
