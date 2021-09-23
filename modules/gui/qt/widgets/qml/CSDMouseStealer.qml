@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 import QtQuick 2.15
+import QtQuick.Window 2.15
 
 Item {
     parent: g_root
@@ -52,9 +53,12 @@ Item {
         delegate: MouseArea {
             x: modelData.x
             y: modelData.y
+
             width: modelData.width
             height: modelData.height
-            hoverEnabled: true
+
+            // NOTE: We don't want to steal the mouse when we are maximized or in fullscreen.
+            hoverEnabled: (!(topWindow.visibility & Window.Maximized) && !(mainInterface.interfaceFullScreen))
         }
     }
 }
