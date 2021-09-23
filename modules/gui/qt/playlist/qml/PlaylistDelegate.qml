@@ -89,19 +89,21 @@ Control {
 
     // Childs
 
-    background: Rectangle {
+    background: Widgets.AnimatedBackground {
         color: {
             if (selected)
                 return colors.gridSelect;
             else if (hovered)
                 return colors.listHover;
             else
-                return "transparent";
+                return colors.setColorAlpha(colors.gridSelect, 0);
         }
 
-        border.width: (visualFocus) ? VLCStyle.focus_border : 0
+        active: visualFocus
 
-        border.color: colors.bgFocus
+        activeBorderColor: colors.bgFocus
+
+        visible: animationRunning || active || selected || hovered
     }
 
     contentItem: RowLayout {
