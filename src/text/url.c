@@ -51,6 +51,20 @@ char *vlc_uri_decode_duplicate (const char *str)
     return buf;
 }
 
+static char hex_to_char( char c )
+{
+    unsigned char v = (unsigned char)c - '0';
+    if ( v < 10 )
+        return v;
+    v = (unsigned)c - 'a';
+    if ( v <= 5 )
+        return v + 10;
+    v = (unsigned)c - 'A';
+    if ( v <= 5 )
+        return v + 10;
+    return -1;
+}
+
 char *vlc_uri_decode (char *str)
 {
     char *in = str, *out = str;
@@ -62,15 +76,15 @@ char *vlc_uri_decode (char *str)
     {
         if (c == '%')
         {
-            char hex[3];
+            char a, b;
 
-            if (!(hex[0] = *(in++)) || !(hex[1] = *(in++)))
+            if ((a = hex_to_char(*(in++))) < 0 ||
+                (b = hex_to_char(*(in++))) < 0)
             {
                 errno = EINVAL;
                 return NULL;
             }
-            hex[2] = '\0';
-            *(out++) = strtoul (hex, NULL, 0x10);
+            *(out++) = a << 4 | b;
         }
         else
             *(out++) = c;
