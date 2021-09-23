@@ -187,7 +187,6 @@ Control {
         Widgets.ListLabel {
             id: textDuration
 
-            Layout.preferredWidth: durationMetric.width
             text: model.duration
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter

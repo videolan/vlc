@@ -304,7 +304,7 @@ Control {
 
                     font.weight: Font.DemiBold
                     font.pixelSize: VLCStyle.fontSize_normal
-                    text: "-00:00-"
+                    text: "00:00"
                 }
             }
         }
