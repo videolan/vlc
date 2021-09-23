@@ -269,7 +269,7 @@ Control {
             Layout.topMargin: VLCStyle.margin_normal
             Layout.bottomMargin: VLCStyle.margin_xxsmall
             Layout.leftMargin: VLCStyle.margin_normal
-            Layout.rightMargin: listView.scrollBarWidth
+            Layout.rightMargin: Math.max(listView.scrollBarWidth, VLCStyle.margin_normal)
 
             spacing: 0
 
@@ -292,7 +292,6 @@ Control {
             }
 
             Widgets.IconLabel {
-                Layout.rightMargin: VLCStyle.margin_xsmall
                 Layout.preferredWidth: durationMetric.width
 
                 text: VLCIcons.time
@@ -302,6 +301,8 @@ Control {
 
                 TextMetrics {
                     id: durationMetric
+
+                    font.weight: Font.DemiBold
                     font.pixelSize: VLCStyle.fontSize_normal
                     text: "-00:00-"
                 }
