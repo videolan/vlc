@@ -174,6 +174,52 @@ vlc_gl_sampler_PicToTexCoords(struct vlc_gl_sampler *sampler,
                               float *tex_coords_out);
 
 /**
+ * Return a matrix to orient texture coordinates
+ *
+ * This matrix is 2x2 and is stored in column-major order.
+ *
+ * While pic_to_tex_matrix transforms any picture coordinates into texture
+ * coordinates, it may be useful for example for vertex or fragment shaders to
+ * sample one pixel to the left of the current one, or two pixels to the top.
+ * Since the input texture may be rotated or flipped, the shaders need to
+ * know in which direction is the top and in which direction is the right of
+ * the picture.
+ *
+ * This 2x2 matrix allows to transform a 2D vector expressed in picture
+ * coordinates into a 2D vector expressed in texture coordinates.
+ *
+ * Concretely, it contains the coordinates (U, V) of the transformed unit
+ * vectors u = / 1 \ and v = / 0 \:
+ *             \ 0 /         \ 1 /
+ *
+ *     / Ux Vx \
+ *     \ Uy Vy /
+ *
+ * It is guaranteed that:
+ *  - both U and V are unit vectors (this matrix does not change the scaling);
+ *  - only one of their components have a non-zero value (they may not be
+ *    oblique); in other words, here are the possible values for U and V:
+ *
+ *        /  0 \  or  / 0 \  or  / 1 \  or  / -1 \
+ *        \ -1 /      \ 1 /      \ 0 /      \  0 /
+ *
+ *  - U and V are orthogonal.
+ *
+ * Therefore, there are 8 possible matrices (4 possible rotations, flipped or
+ * not).
+ *
+ * Calling this function before the first picture (i.e. when
+ * sampler->pic_to_tex_matrix is NULL) results in undefined behavior.
+ *
+ * It may theoretically change on every picture (the transform matrix provided
+ * by Android may change). If it has changed since the last picture, then
+ * vlc_gl_sampler_MustRecomputeCoords() will return true.
+ */
+void
+vlc_gl_sampler_ComputeDirectionMatrix(struct vlc_gl_sampler *sampler,
+                                      float direction[static 2*2]);
+
+/**
  * Indicate if the transform to convert picture coordinates to textures
  * coordinates have changed due to the last picture.
  *

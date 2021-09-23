@@ -1375,6 +1375,44 @@ vlc_gl_sampler_PicToTexCoords(struct vlc_gl_sampler *sampler,
     }
 }
 
+void
+vlc_gl_sampler_ComputeDirectionMatrix(struct vlc_gl_sampler *sampler,
+                                      float direction[static 2*2])
+{
+    /**
+     * The direction matrix is extracted from priv->mtx_all:
+     *
+     *    mtx_all = / a b c \
+     *              \ d e f /
+     *
+     * The last column (the offset part of the affine transformation) is
+     * discarded, and the 2 remaining column vectors are normalized to remove
+     * any scaling:
+     *
+     *    direction = / a/unorm  b/vnorm \
+     *                \ d/unorm  e/vnorm /
+     *
+     * where unorm = norm( / a \ ) and vnorm = norm( / b \ ).
+     *                     \ d /                     \ e /
+     */
+
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    assert(priv->mtx_all_defined);
+
+    float ux = priv->mtx_all[0];
+    float uy = priv->mtx_all[1];
+    float vx = priv->mtx_all[2];
+    float vy = priv->mtx_all[3];
+
+    float unorm = sqrt(ux * ux + uy * uy);
+    float vnorm = sqrt(vx * vx + vy * vy);
+
+    direction[0] = ux / unorm;
+    direction[1] = uy / unorm;
+    direction[2] = vx / vnorm;
+    direction[3] = vy / vnorm;
+}
+
 bool
 vlc_gl_sampler_MustRecomputeCoords(struct vlc_gl_sampler *sampler)
 {
