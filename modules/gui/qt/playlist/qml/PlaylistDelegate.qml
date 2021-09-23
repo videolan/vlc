@@ -95,7 +95,7 @@ Control {
 
         border.width: (visualFocus) ? VLCStyle.focus_border : 0
 
-        border.color: VLCStyle.colors.bgFocus
+        border.color: colors.bgFocus
     }
 
     contentItem: Item {
