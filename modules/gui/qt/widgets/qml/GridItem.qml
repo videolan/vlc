@@ -169,7 +169,7 @@ Control {
                          ? VLCStyle.colors.gridSelect
                          : VLCStyle.colors.setColorAlpha(VLCStyle.colors.gridSelect, 0)
 
-        visible: backgroundAnimationRunning || borderColorAnimationRunning || background.active || root.selected
+        visible: animationRunning || background.active || root.selected
     }
 
     contentItem: MouseArea {

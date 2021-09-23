@@ -47,9 +47,7 @@ Rectangle {
 
     property int animationDuration: VLCStyle.duration_normal
 
-    property bool backgroundAnimationRunning: false
-
-    property bool borderColorAnimationRunning: false
+    property bool animationRunning: borderAnimation.running || bgAnimation.running
 
     //---------------------------------------------------------------------------------------------
     // Implementation
@@ -67,9 +65,10 @@ Rectangle {
 
     Behavior on border.color {
         ColorAnimation {
+            id: borderAnimation
+
             duration: root.animationDuration
             onRunningChanged: {
-                root.borderColorAnimationRunning = running
                 if (running && root.active) {
                     border.width = Qt.binding(function() { return VLCStyle.focus_border })
                 } else if (!running && !root.active) {
@@ -84,7 +83,6 @@ Rectangle {
             id: bgAnimation
 
             duration: root.animationDuration
-            onRunningChanged: root.backgroundAnimationRunning = running
         }
     }
 
