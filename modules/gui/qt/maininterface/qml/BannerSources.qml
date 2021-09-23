@@ -170,7 +170,7 @@ FocusScope {
 
                             delegate: Widgets.BannerTabButton {
                                 iconTxt: model.icon
-                                color: "transparent"
+                                color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.buttonHover, 0)
                                 showText: globalToolbar.colapseTabButtons
                                 selected: model.index === selectedIndex
                                 onClicked: root.itemClicked(model.index)
