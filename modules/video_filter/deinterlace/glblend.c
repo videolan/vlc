@@ -41,8 +41,11 @@ struct sys {
 
     struct {
         GLint vertex_pos;
-        GLint height;
+        GLint tex_coords_in;
+        GLint one_pixel_up;
     } loc;
+
+    float up_vector[2];
 };
 
 static int
@@ -58,12 +61,55 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
     vlc_gl_sampler_Load(sampler);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, sys->vbo);
+
+    if (vlc_gl_sampler_MustRecomputeCoords(sampler))
+    {
+        float coords[] = {
+            0, 1,
+            0, 0,
+            1, 1,
+            1, 0,
+        };
+
+        /* Transform coordinates in place */
+        vlc_gl_sampler_PicToTexCoords(sampler, 4, coords, coords);
+
+        const float data[] = {
+            -1,  1, coords[0], coords[1],
+            -1, -1, coords[2], coords[3],
+             1,  1, coords[4], coords[5],
+             1, -1, coords[6], coords[7],
+        };
+        vt->BufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+
+        /* Compute the (normalized) vector representing the _up_ direction in
+         * texture coordinates, to take any orientation/flip into account. */
+        float direction[2*2];
+        vlc_gl_sampler_ComputeDirectionMatrix(sampler, direction);
+        sys->up_vector[0] = direction[2];
+        sys->up_vector[1] = direction[3];
+    }
+
+    const GLsizei stride = 4 * sizeof(float);
+
     vt->EnableVertexAttribArray(sys->loc.vertex_pos);
-    vt->VertexAttribPointer(sys->loc.vertex_pos, 2, GL_FLOAT, GL_FALSE, 0,
+    vt->VertexAttribPointer(sys->loc.vertex_pos, 2, GL_FLOAT, GL_FALSE, stride,
                             (const void *) 0);
 
+    intptr_t offset = 2 * sizeof(float);
+    vt->EnableVertexAttribArray(sys->loc.tex_coords_in);
+    vt->VertexAttribPointer(sys->loc.tex_coords_in, 2, GL_FLOAT, GL_FALSE,
+                            stride, (const void *) offset);
+
+    /* If the direction matrix contains a 90° rotation, then the unit vector
+     * should be divided by width rather than by height. Since up_vector is
+     * always a unit vector with one of its components equal to 0, then we can
+     * always devide the horizontal component by width and the vertical
+     * component by height. */
+    GLsizei width = sampler->tex_widths[meta->plane];
     GLsizei height = sampler->tex_heights[meta->plane];
-    vt->Uniform1f(sys->loc.height, height);
+    vt->Uniform2f(sys->loc.one_pixel_up, sys->up_vector[0] / width,
+                                         sys->up_vector[1] / height);
 
     vt->Clear(GL_COLOR_BUFFER_BIT);
     vt->DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -107,15 +153,14 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
 
     static const char *const VERTEX_SHADER =
         "attribute vec2 vertex_pos;\n"
+        "attribute vec2 tex_coords_in;\n"
         "varying vec2 tex_coords;\n"
         "varying vec2 tex_coords_up;\n"
-        "uniform float height;\n"
+        "uniform vec2 one_pixel_up;\n"
         "void main() {\n"
         "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
-        "  tex_coords = vec2((vertex_pos.x + 1.0) / 2.0,\n"
-        "                    (vertex_pos.y + 1.0) / 2.0);\n"
-        "  tex_coords_up = vec2(tex_coords.x,\n"
-        "                       tex_coords.y + 1.0 / height);\n"
+        "  tex_coords = tex_coords_in;\n"
+        "  tex_coords_up = tex_coords_in + one_pixel_up;\n"
         "}\n";
 
     static const char *const FRAGMENT_SHADER =
@@ -169,23 +214,14 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     sys->loc.vertex_pos = vt->GetAttribLocation(program_id, "vertex_pos");
     assert(sys->loc.vertex_pos != -1);
 
-    sys->loc.height = vt->GetUniformLocation(program_id, "height");
-    assert(sys->loc.height != -1);
+    sys->loc.tex_coords_in = vt->GetAttribLocation(program_id, "tex_coords_in");
+    assert(sys->loc.tex_coords_in != -1);
+
+    sys->loc.one_pixel_up = vt->GetUniformLocation(program_id,
+                                                   "one_pixel_up");
+    assert(sys->loc.one_pixel_up != -1);
 
     vt->GenBuffers(1, &sys->vbo);
-
-    static const GLfloat vertex_pos[] = {
-        -1,  1,
-        -1, -1,
-         1,  1,
-         1, -1,
-    };
-
-    vt->BindBuffer(GL_ARRAY_BUFFER, sys->vbo);
-    vt->BufferData(GL_ARRAY_BUFFER, sizeof(vertex_pos), vertex_pos,
-                   GL_STATIC_DRAW);
-
-    vt->BindBuffer(GL_ARRAY_BUFFER, 0);
 
     return VLC_SUCCESS;
 
