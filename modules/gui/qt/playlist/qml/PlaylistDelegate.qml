@@ -150,8 +150,13 @@ Control {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 color: colors.accent
-                text: player.playingState === PlayerController.PLAYING_STATE_PLAYING ? VLCIcons.volume_high :
-                                                player.playingState === PlayerController.PLAYING_STATE_PAUSED ? VLCIcons.pause : ""
+                text: {
+                    if (player.playingState === PlayerController.PLAYING_STATE_PLAYING)
+                        return VLCIcons.volume_high
+                    if (player.playingState === PlayerController.PLAYING_STATE_PAUSED)
+                        return VLCIcons.pause
+                    return ""
+                }
             }
         }
 
