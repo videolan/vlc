@@ -107,6 +107,9 @@ Item {
 
     // GridItem
 
+    // NOTE: This needs to contrast with the background because we have no border.
+    property color grid: (isThemeDark) ? "#272727" : "#ededed"
+
     property color gridSelect: (isThemeDark) ? "#303030" : "#e5e5e5"
 
     // ListItem

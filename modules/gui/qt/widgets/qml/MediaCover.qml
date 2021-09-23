@@ -24,19 +24,48 @@ import "qrc:///style/"
 
 import org.videolan.controls 0.1
 
-RoundImage {
+// NOTE: This rectangle is useful to discern the item against a similar background.
+// FIXME: Maybe we could refactor this to draw the background directly in the RoundImage.
+Rectangle {
     id: root
+
+    // Properties
+
+    property bool playCoverOnlyBorders: false
+
+    property real playIconSize: VLCStyle.play_cover_normal
+
+    property real playCoverBorderWidth: VLCStyle.table_cover_border
+
+    // Aliases
+
+    property alias source: image.source
+
+    property alias imageOverlay: overlay.sourceComponent
 
     property alias playCoverOpacity: playCoverLoader.opacity
     property alias playCoverVisible: playCoverLoader.visible
-    property bool playCoverOnlyBorders: false
-    property real playIconSize: VLCStyle.play_cover_normal
-    property real playCoverBorderWidth: VLCStyle.table_cover_border
-    property alias imageOverlay: overlay.sourceComponent
+
+    // Signals
+
     signal playIconClicked
+
+    // Settings
 
     height: VLCStyle.listAlbumCover_height
     width: VLCStyle.listAlbumCover_width
+
+    color: VLCStyle.colors.grid
+
+    // Children
+
+    RoundImage {
+        id: image
+
+        anchors.fill: parent
+
+        radius: root.radius
+    }
 
     Loader {
         id: overlay
