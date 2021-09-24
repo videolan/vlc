@@ -161,10 +161,18 @@ FocusScope {
     }
 
     function getItemPos(id) {
-        var colCount = root.getNbItemsPerRow()
-        var remainingSpace = (flickable.width - root.rightMargin - root.leftMargin) - (colCount * root._effectiveCellWidth) + root.horizontalSpacing
-        var rowCol = getItemRowCol(id)
-        return [(rowCol[0] * root._effectiveCellWidth) + (remainingSpace / 2) + root.leftMargin, rowCol[1] * root._effectiveCellHeight + headerHeight + topMargin]
+        var remainingSpace = (flickable.width - rightMargin - leftMargin)
+                             - getNbItemsPerRow() * _effectiveCellWidth + horizontalSpacing;
+
+        var rowCol = getItemRowCol(id);
+
+        var x = rowCol[0] * _effectiveCellWidth + remainingSpace / 2 + leftMargin;
+
+        var y = rowCol[1] * _effectiveCellHeight + headerHeight + topMargin;
+
+        // NOTE: Position needs to be integer based if we want to avoid visual artifacts like
+        //       wrong alignments or blurry texture rendering.
+        return [Math.round(x), Math.round(y)];
     }
 
     //use the same signature as Gridview.positionViewAtIndex(index, PositionMode mode)
