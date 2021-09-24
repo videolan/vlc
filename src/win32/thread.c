@@ -188,17 +188,6 @@ static struct wait_addr_bucket *wait_addr_get_bucket(void volatile *addr)
     return wait_addr_buckets + ((u >> 3) % ARRAY_SIZE(wait_addr_buckets));
 }
 
-static void vlc_wait_addr_init(void)
-{
-    for (size_t i = 0; i < ARRAY_SIZE(wait_addr_buckets); i++)
-    {
-        struct wait_addr_bucket *bucket = wait_addr_buckets + i;
-
-        InitializeSRWLock(&bucket->lock);
-        InitializeConditionVariable(&bucket->wait);
-    }
-}
-
 static BOOL WINAPI WaitOnAddressFallback(void volatile *addr, void *value,
                                          SIZE_T size, DWORD ms)
 {
@@ -262,6 +251,20 @@ static void WINAPI WakeByAddressFallback(void *addr)
     /* Wake up any thread that was already sleeping. Since there are more than
      * one wait address per bucket, all threads must be woken up :-/ */
     WakeAllConditionVariable(&bucket->wait);
+}
+
+static void vlc_wait_addr_init(void)
+{
+    for (size_t i = 0; i < ARRAY_SIZE(wait_addr_buckets); i++)
+    {
+        struct wait_addr_bucket *bucket = wait_addr_buckets + i;
+
+        InitializeSRWLock(&bucket->lock);
+        InitializeConditionVariable(&bucket->wait);
+    }
+    WaitOnAddress_ = WaitOnAddressFallback;
+    WakeByAddressAll_ = WakeByAddressFallback;
+    WakeByAddressSingle_ = WakeByAddressFallback;
 }
 #endif
 
@@ -805,9 +808,6 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
              || !LOOKUP(WakeByAddressAll) || !LOOKUP(WakeByAddressSingle))
             {
                 vlc_wait_addr_init();
-                WaitOnAddress_ = WaitOnAddressFallback;
-                WakeByAddressAll_ = WakeByAddressFallback;
-                WakeByAddressSingle_ = WakeByAddressFallback;
             }
             LOOKUP(SetThreadDescription);
 #else
