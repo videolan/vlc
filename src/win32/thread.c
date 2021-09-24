@@ -800,11 +800,8 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
         case DLL_PROCESS_ATTACH:
         {
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-            HMODULE h = GetModuleHandle(TEXT("kernel32.dll"));
-            if (unlikely(h == NULL))
-                return FALSE;
-
-            if (!LOOKUP(WaitOnAddress)
+            HMODULE h = GetModuleHandle(TEXT("api-ms-win-core-synch-l1-2-0.dll"));
+            if (h == NULL || !LOOKUP(WaitOnAddress)
              || !LOOKUP(WakeByAddressAll) || !LOOKUP(WakeByAddressSingle))
             {
                 vlc_wait_addr_init();
