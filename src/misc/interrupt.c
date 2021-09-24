@@ -546,12 +546,8 @@ static void CALLBACK vlc_poll_i11e_wake_self(ULONG_PTR data)
 
 static void vlc_poll_i11e_wake(void *opaque)
 {
-#if !defined(VLC_WINSTORE_APP) || _WIN32_WINNT >= 0x0A00
     HANDLE th = opaque;
     QueueUserAPC(vlc_poll_i11e_wake_self, th, 0);
-#else
-    (void) opaque;
-#endif
 }
 
 static void vlc_poll_i11e_cleanup(void *opaque)
