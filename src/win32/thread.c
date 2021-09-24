@@ -177,7 +177,7 @@ static VOID (WINAPI *WakeByAddressSingle_)(PVOID);
 
 static struct wait_addr_bucket
 {
-    CRITICAL_SECTION lock;
+    SRWLOCK lock;
     CONDITION_VARIABLE wait;
 } wait_addr_buckets[32];
 
@@ -194,18 +194,8 @@ static void vlc_wait_addr_init(void)
     {
         struct wait_addr_bucket *bucket = wait_addr_buckets + i;
 
-        InitializeCriticalSection(&bucket->lock);
+        InitializeSRWLock(&bucket->lock);
         InitializeConditionVariable(&bucket->wait);
-    }
-}
-
-static void vlc_wait_addr_deinit(void)
-{
-    for (size_t i = 0; i < ARRAY_SIZE(wait_addr_buckets); i++)
-    {
-        struct wait_addr_bucket *bucket = wait_addr_buckets + i;
-
-        DeleteCriticalSection(&bucket->lock);
     }
 }
 
@@ -214,9 +204,9 @@ static BOOL WINAPI WaitOnAddressFallback(void volatile *addr, void *value,
 {
     struct wait_addr_bucket *bucket = wait_addr_get_bucket(addr);
     uint64_t futex, val = 0;
-    BOOL ret = 0;
+    BOOL ret = FALSE;
 
-    EnterCriticalSection(&bucket->lock);
+    AcquireSRWLockExclusive(&bucket->lock);
 
     switch (size)
     {
@@ -245,9 +235,9 @@ static BOOL WINAPI WaitOnAddressFallback(void volatile *addr, void *value,
     }
 
     if (futex == val)
-        ret = SleepConditionVariableCS(&bucket->wait, &bucket->lock, ms);
+        ret = SleepConditionVariableSRW(&bucket->wait, &bucket->lock, ms, 0);
 
-    LeaveCriticalSection(&bucket->lock);
+    ReleaseSRWLockExclusive(&bucket->lock);
     return ret;
 }
 
@@ -257,14 +247,14 @@ static void WINAPI WakeByAddressFallback(void *addr)
 
     /* Acquire the bucket critical section (only) to enforce proper sequencing.
      * The critical section does not protect any actual memory object. */
-    EnterCriticalSection(&bucket->lock);
+    AcquireSRWLockExclusive(&bucket->lock);
     /* No other threads can hold the lock for this bucket while it is held
      * here. Thus any other thread either:
      * - is already sleeping in SleepConditionVariableCS(), and to be woken up
      *   by the following WakeAllConditionVariable(), or
      * - has yet to retrieve the value at the wait address (with the
      *   'switch (size)' block). */
-    LeaveCriticalSection(&bucket->lock);
+    ReleaseSRWLockExclusive(&bucket->lock);
     /* At this point, other threads can retrieve the value at the wait address.
      * But the value will have already been changed by our call site, thus
      * (futex == val) will be false, and the threads will not go to sleep. */
@@ -842,10 +832,6 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             DeleteCriticalSection(&super_mutex);
             DeleteCriticalSection(&setup_lock);
             TlsFree(thread_key);
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-            if (WaitOnAddress_ == WaitOnAddressFallback)
-                vlc_wait_addr_deinit();
-#endif
             break;
 
         case DLL_THREAD_DETACH:
