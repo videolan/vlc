@@ -360,7 +360,7 @@ void QtVLCWidget::paintGL()
         GL->glClearColor(1.0, 0.5, 0.0, 1.0);
 
         GL->glActiveTexture(GL_TEXTURE0);
-        GL->glBindTexture(GL_TEXTURE_2D, fbo->takeTexture());
+        GL->glBindTexture(GL_TEXTURE_2D, fbo->texture());
 
         vertexBuffer.bind();
         m_program->setAttributeArray("position", (const QVector2D *)nullptr, sizeof(GLfloat)*2);
