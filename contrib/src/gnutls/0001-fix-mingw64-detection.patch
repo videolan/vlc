@@ -1,0 +1,36 @@
+From f42ec27a26433902c098cf82f7b38d93ca579869 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 23 Sep 2021 09:03:50 +0200
+Subject: [PATCH] fix mingw64 detection
+
+__MINGW64__ is only defined for 64 bits builds of mingw64 [1].
+The intended test what to only use the CertEnumCRLsInStoreFunc via LoadLibrary
+for some ancient mingw32 build and never for mingw64.
+
+__MINGW64_VERSION_MAJOR is a proper define to identify mingw64 against mingw32.
+
+[1] https://sourceforge.net/p/predef/wiki/Compilers/
+
+Co-authored-by: Johannes Kauffmann <johanneskauffmann@hotmail.com>
+
+Signed-off-by: Steve Lhomme <robux4@ycbcr.xyz>
+---
+ lib/system.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/system.h b/lib/system.h
+index 1e8ca7d07..e15c8cd33 100644
+--- a/lib/system.h
++++ b/lib/system.h
+@@ -29,7 +29,7 @@
+ #include <sys/time.h>
+ 
+ #ifdef _WIN32
+-# if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
++# if defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
+ #  define NEED_CERT_ENUM_CRLS
+ typedef PCCRL_CONTEXT WINAPI(*CertEnumCRLsInStoreFunc) (HCERTSTORE
+ 							 hCertStore,
+-- 
+2.27.0.windows.1
+
