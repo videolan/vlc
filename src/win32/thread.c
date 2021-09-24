@@ -45,12 +45,6 @@
 /*** Static mutex and condition variable ***/
 static SRWLOCK super_lock = SRWLOCK_INIT;
 
-#ifndef VLC_WINSTORE_APP
-# define IS_INTERRUPTIBLE (1)
-#else
-# define IS_INTERRUPTIBLE (_WIN32_WINNT >= 0x0A00)
-#endif
-
 /*** Threads ***/
 static thread_local struct vlc_thread *current_thread_ctx = NULL;
 
@@ -423,22 +417,18 @@ int vlc_set_priority (vlc_thread_t th, int priority)
 
 /*** Thread cancellation ***/
 
-#if IS_INTERRUPTIBLE
 /* APC procedure for thread cancellation */
 static void CALLBACK vlc_cancel_self (ULONG_PTR self)
 {
     (void) self;
 }
-#endif
 
 void vlc_cancel (vlc_thread_t th)
 {
     atomic_store_explicit(&th->killed, true, memory_order_release);
     vlc_atomic_notify_one(&th->killed);
 
-#if IS_INTERRUPTIBLE
     QueueUserAPC (vlc_cancel_self, th->id, (uintptr_t)th);
-#endif
 }
 
 int vlc_savecancel (void)
