@@ -381,10 +381,7 @@ vlc_module_begin ()
                 POLARIZATION_TEXT, POLARIZATION_LONGTEXT)
         change_string_list (polarization_vlc, polarization_user)
         change_safe ()
-    add_integer ("dvb-voltage", 13, "", "")
-        change_integer_range (0, 18)
-        change_private ()
-        change_safe ()
+    add_obsolete_integer("dvb-voltage") /* deprecated in 1.2, removed in 4.0 */
 #ifdef HAVE_LINUX_DVB
     add_bool ("dvb-high-voltage", false,
               HIGH_VOLTAGE_TEXT, HIGH_VOLTAGE_LONGTEXT)
@@ -747,29 +744,17 @@ static int dvbc_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
 /*** DVB-S ***/
 static char var_InheritPolarization (vlc_object_t *obj)
 {
-    char pol;
     char *polstr = var_InheritString (obj, "dvb-polarization");
     if (polstr != NULL)
     {
-        pol = *polstr;
+        char pol = *polstr;
         free (polstr);
         if (unlikely(pol >= 'a' && pol <= 'z'))
             pol -= 'a' - 'A';
         return pol;
     }
 
-    /* Backward compatibility with VLC for Linux < 1.2 */
-    unsigned voltage = var_InheritInteger (obj, "dvb-voltage");
-    switch (voltage)
-    {
-        case 13:  pol = 'V'; break;
-        case 18:  pol = 'H'; break;
-        default:  return 0;
-    }
-
-    msg_Warn (obj, "\"voltage=%u\" option is obsolete. "
-                   "Use \"polarization=%c\" instead.", voltage, pol);
-    return pol;
+    return '\0';
 }
 
 static void sec_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
