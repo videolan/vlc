@@ -451,8 +451,9 @@ static void vout_display_Reset(vout_display_t *vd)
 static int vout_UpdateSourceCrop(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-    video_format_t fmt = osys->source;
     int left, top, right, bottom;
+
+    video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
 
     switch (osys->crop.mode) {
         case VOUT_CROP_NONE:
@@ -503,7 +504,6 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
     osys->source.i_y_offset       = top;
     osys->source.i_visible_width  = right - left;
     osys->source.i_visible_height = bottom - top;
-    video_format_Print(VLC_OBJECT(vd), "SOURCE ", &fmt);
     video_format_Print(VLC_OBJECT(vd), "CROPPED ", &osys->source);
 
     return vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
