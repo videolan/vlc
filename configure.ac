@@ -1006,6 +1006,7 @@ AS_IF([test "${enable_shared}" = "no"], [
   have_dynamic_objects=no
 ])
 AM_CONDITIONAL([HAVE_DYNAMIC_PLUGINS], [test "${have_dynamic_objects}" != "no"])
+AM_CONDITIONAL([HAVE_PARTIAL_LINKING], 0)
 
 AC_SUBST([LIBDL])
 
