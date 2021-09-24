@@ -1033,7 +1033,26 @@ AS_IF([test "${enable_shared}" = "no"], [
   have_dynamic_objects=no
 ])
 AM_CONDITIONAL([HAVE_DYNAMIC_PLUGINS], [test "${have_dynamic_objects}" != "no"])
-AM_CONDITIONAL([HAVE_PARTIAL_LINKING], [false])
+
+dnl Partial linking merges each plugin and its static dependencies into a
+dnl single relocatable object, enabling fully-static VLC builds.
+dnl Disabled by default for now; this will become the default in the future.
+AC_ARG_ENABLE([partial-linking],
+  AS_HELP_STRING([--enable-partial-linking],
+    [use partial linking for static plugin builds (default disabled)]))
+
+have_partial_linking_support=no
+
+AS_IF([test "${enable_partial_linking}" = "yes" -a "${have_partial_linking_support}" != "yes"], [
+    AC_MSG_ERROR([Partial linking is not supported on this platform.])
+])
+
+have_partial_linking=no
+AS_IF([test "${enable_partial_linking}" = "yes" -a "${have_dynamic_objects}" = "no"], [
+    have_partial_linking=yes
+])
+
+AM_CONDITIONAL([HAVE_PARTIAL_LINKING], [test "${have_partial_linking}" = "yes"])
 
 AC_SUBST([LIBDL])
 
