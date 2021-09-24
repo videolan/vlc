@@ -466,43 +466,36 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
         case VOUT_CROP_WINDOW:
             left = osys->crop.window.x;
             top = osys->crop.window.y;
-            right = osys->crop.window.width;
-            bottom = osys->crop.window.height;
+            right = left + osys->crop.window.width;
+            bottom = top + osys->crop.window.height;
             break;
         case VOUT_CROP_BORDER:
             left = osys->crop.border.left;
             top = osys->crop.border.top;
-            right = -(int)osys->crop.border.right;
-            bottom = -(int)osys->crop.border.bottom;
+            right = osys->source.i_visible_width - osys->crop.border.right;
+            bottom = osys->source.i_visible_height - osys->crop.border.bottom;
             break;
         default:
             /* left/top/right/bottom must be initialized */
             vlc_assert_unreachable();
     }
 
-    const int right_max  = osys->source.i_x_offset
-                           + osys->source.i_visible_width;
-    const int bottom_max = osys->source.i_y_offset
-                           + osys->source.i_visible_height;
+    if (left >= right)
+        left = right - 1;
+    if (top >= bottom)
+        top = bottom - 1;
+    if (left < 0)
+        left = 0;
+    if (top < 0)
+        top = 0;
+    if ((unsigned)right > osys->source.i_visible_width)
+        right = osys->source.i_visible_width;
+    if ((unsigned)bottom > osys->source.i_visible_height)
+        right = osys->source.i_visible_height;
 
-    left = VLC_CLIP((int)osys->source.i_x_offset + left, 0, right_max - 1);
-    top  = VLC_CLIP((int)osys->source.i_y_offset + top, 0, bottom_max - 1);
-
-    if (right <= 0)
-        right = (int)(osys->source.i_x_offset + osys->source.i_visible_width) + right;
-    else
-        right = (int)osys->source.i_x_offset + right;
-    right = VLC_CLIP(right, left + 1, right_max);
-
-    if (bottom <= 0)
-        bottom = (int)(osys->source.i_y_offset + osys->source.i_visible_height) + bottom;
-    else
-        bottom = (int)osys->source.i_y_offset + bottom;
-    bottom = VLC_CLIP(bottom, top + 1, bottom_max);
-
-    osys->source.i_x_offset       = left;
-    osys->source.i_y_offset       = top;
-    osys->source.i_visible_width  = right - left;
+    osys->source.i_x_offset += left;
+    osys->source.i_y_offset += top;
+    osys->source.i_visible_width = right - left;
     osys->source.i_visible_height = bottom - top;
     video_format_Print(VLC_OBJECT(vd), "CROPPED ", &osys->source);
 
