@@ -62,12 +62,7 @@ void vlc_global_mutex (unsigned n, bool acquire)
         vlc_mutex_unlock (lock);
 }
 
-#if defined (_WIN32) && (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-/* Cannot define OS version-dependent stuff in public headers */
-# undef LIBVLC_NEED_SLEEP
-#endif
-
-#if defined(__ANDROID__)
+#ifdef LIBVLC_NEED_SLEEP
 static void do_vlc_cancel_addr_clear(void *addr)
 {
     vlc_cancel_addr_clear(addr);
@@ -89,12 +84,7 @@ static void vlc_cancel_addr_finish(atomic_uint *addr)
     /* Act on cancellation as potential wake-up source */
     vlc_testcancel();
 }
-#else
-# define vlc_cancel_addr_prepare(addr) ((void)0)
-# define vlc_cancel_addr_finish(addr) ((void)0)
-#endif
 
-#ifdef LIBVLC_NEED_SLEEP
 void (vlc_tick_wait)(vlc_tick_t deadline)
 {
     atomic_uint value = ATOMIC_VAR_INIT(0);
