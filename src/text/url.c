@@ -65,7 +65,10 @@ char *vlc_uri_decode (char *str)
             char hex[3];
 
             if (!(hex[0] = *(in++)) || !(hex[1] = *(in++)))
+            {
+                errno = EINVAL;
                 return NULL;
+            }
             hex[2] = '\0';
             *(out++) = strtoul (hex, NULL, 0x10);
         }
