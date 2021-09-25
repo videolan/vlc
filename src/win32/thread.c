@@ -493,7 +493,7 @@ void vlc_testcancel (void)
     if (!atomic_load_explicit(&th->killed, memory_order_relaxed))
         return;
 
-    th->killable = true; /* Do not re-enter cancellation cleanup */
+    th->killable = false; /* Do not re-enter cancellation cleanup */
 
     for (vlc_cleanup_t *p = th->cleaners; p != NULL; p = p->next)
         p->proc (p->data);
