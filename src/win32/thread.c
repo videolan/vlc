@@ -35,6 +35,7 @@
 #include "libvlc.h"
 #include <stdarg.h>
 #include <stdatomic.h>
+#include <stdnoreturn.h>
 #include <assert.h>
 #include <limits.h>
 #include <errno.h>
@@ -483,16 +484,8 @@ void vlc_restorecancel (int state)
     th->killable = state != 0;
 }
 
-void vlc_testcancel (void)
+static noreturn void vlc_docancel(struct vlc_thread *th)
 {
-    struct vlc_thread *th = TlsGetValue(thread_key);
-    if (th == NULL)
-        return; /* Main thread - cannot be cancelled anyway */
-    if (!th->killable)
-        return;
-    if (!atomic_load_explicit(&th->killed, memory_order_relaxed))
-        return;
-
     th->killable = false; /* Do not re-enter cancellation cleanup */
 
     for (vlc_cleanup_t *p = th->cleaners; p != NULL; p = p->next)
@@ -504,6 +497,19 @@ void vlc_testcancel (void)
 #else // !VLC_WINSTORE_APP
     _endthreadex(0);
 #endif // !VLC_WINSTORE_APP
+}
+
+void vlc_testcancel (void)
+{
+    struct vlc_thread *th = TlsGetValue(thread_key);
+    if (th == NULL)
+        return; /* Main thread - cannot be cancelled anyway */
+    if (!th->killable)
+        return;
+    if (!atomic_load_explicit(&th->killed, memory_order_relaxed))
+        return;
+
+    vlc_docancel(th);
 }
 
 void vlc_control_cancel (vlc_cleanup_t *cleaner)
