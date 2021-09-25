@@ -62,17 +62,11 @@ struct vlc_thread
     HANDLE         id;
 
     bool           killable;
-    atomic_bool    killed;
+    atomic_uint    killed;
     vlc_cleanup_t *cleaners;
 
     void        *(*entry) (void *);
     void          *data;
-
-    struct
-    {
-        atomic_uint     *addr;
-        CRITICAL_SECTION lock;
-    } wait;
 };
 
 /*** Thread-specific variables (TLS) ***/
@@ -373,8 +367,6 @@ int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
     th->killable = false; /* not until vlc_entry() ! */
     atomic_init(&th->killed, false);
     th->cleaners = NULL;
-    th->wait.addr = NULL;
-    InitializeCriticalSection(&th->wait.lock);
 
     HANDLE h;
 #ifdef VLC_WINSTORE_APP
@@ -418,7 +410,6 @@ void vlc_join (vlc_thread_t th, void **result)
     if (result != NULL)
         *result = th->data;
     CloseHandle (th->id);
-    DeleteCriticalSection(&th->wait.lock);
     free(th);
 }
 
@@ -447,14 +438,7 @@ static void CALLBACK vlc_cancel_self (ULONG_PTR self)
 void vlc_cancel (vlc_thread_t th)
 {
     atomic_store_explicit(&th->killed, true, memory_order_release);
-
-    EnterCriticalSection(&th->wait.lock);
-    if (th->wait.addr != NULL)
-    {
-        atomic_fetch_or_explicit(th->wait.addr, 1, memory_order_relaxed);
-        vlc_atomic_notify_all(th->wait.addr);
-    }
-    LeaveCriticalSection(&th->wait.lock);
+    vlc_atomic_notify_one(&th->killed);
 
 #if IS_INTERRUPTIBLE
     QueueUserAPC (vlc_cancel_self, th->id, (uintptr_t)th);
@@ -484,7 +468,7 @@ void vlc_restorecancel (int state)
     th->killable = state != 0;
 }
 
-static noreturn void vlc_docancel(struct vlc_thread *th)
+noreturn static void vlc_docancel(struct vlc_thread *th)
 {
     th->killable = false; /* Do not re-enter cancellation cleanup */
 
@@ -532,30 +516,6 @@ void vlc_control_cancel (vlc_cleanup_t *cleaner)
     {
         th->cleaners = th->cleaners->next;
     }
-}
-
-void vlc_cancel_addr_set(atomic_uint *addr)
-{
-    struct vlc_thread *th = TlsGetValue(thread_key);
-    if (th == NULL)
-        return; /* Main thread - cannot be cancelled anyway */
-
-    EnterCriticalSection(&th->wait.lock);
-    assert(th->wait.addr == NULL);
-    th->wait.addr = addr;
-    LeaveCriticalSection(&th->wait.lock);
-}
-
-void vlc_cancel_addr_clear(atomic_uint *addr)
-{
-    struct vlc_thread *th = TlsGetValue(thread_key);
-    if (th == NULL)
-        return; /* Main thread - cannot be cancelled anyway */
-
-    EnterCriticalSection(&th->wait.lock);
-    assert(th->wait.addr == addr);
-    th->wait.addr = NULL;
-    LeaveCriticalSection(&th->wait.lock);
 }
 
 /*** Clock ***/
@@ -649,20 +609,39 @@ vlc_tick_t vlc_tick_now (void)
     return mdate_selected ();
 }
 
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
 void (vlc_tick_wait)(vlc_tick_t deadline)
 {
     vlc_tick_t delay;
+#if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
+    struct vlc_thread *th = TlsGetValue(thread_key);
 
+    if (th != NULL && th->killable)
+    {
+        do
+        {
+            if (atomic_load_explicit(&th->killed, memory_order_acquire))
+                vlc_docancel(th);
+        }
+        while (vlc_atomic_timedwait(&th->killed, false, deadline) == 0);
+
+        return;
+    }
+#else
     vlc_testcancel();
+#endif
+
     while ((delay = (deadline - vlc_tick_now())) > 0)
     {
         delay = (delay + (1000-1)) / 1000;
         if (unlikely(delay > 0x7fffffff))
             delay = 0x7fffffff;
 
+#if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
+        Sleep(delay);
+#else
         SleepEx(delay, TRUE);
         vlc_testcancel();
+#endif
     }
 }
 
@@ -670,7 +649,6 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 {
     vlc_tick_wait (vlc_tick_now () + delay);
 }
-#endif
 
 static BOOL SelectClockSource(vlc_object_t *obj)
 {

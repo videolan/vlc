@@ -67,7 +67,7 @@ void vlc_global_mutex (unsigned n, bool acquire)
 # undef LIBVLC_NEED_SLEEP
 #endif
 
-#if defined(_WIN32) || defined(__ANDROID__)
+#if defined(__ANDROID__)
 static void do_vlc_cancel_addr_clear(void *addr)
 {
     vlc_cancel_addr_clear(addr);
