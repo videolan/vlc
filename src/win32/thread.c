@@ -445,7 +445,7 @@ static void CALLBACK vlc_cancel_self (ULONG_PTR self)
 
 void vlc_cancel (vlc_thread_t th)
 {
-    atomic_store_explicit(&th->killed, true, memory_order_relaxed);
+    atomic_store_explicit(&th->killed, true, memory_order_release);
 
     EnterCriticalSection(&th->wait.lock);
     if (th->wait.addr != NULL)
