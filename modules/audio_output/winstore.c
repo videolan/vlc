@@ -172,8 +172,7 @@ static void WaitForAudioClient(audio_output_t *aout)
                 }
 
                 IAudioClient2 *audioClient2;
-                if (SUCCEEDED(IAudioClient_QueryInterface(sys->client, &IID_IAudioClient2, (void**)&audioClient2))
-                    && audioClient2)
+                if (SUCCEEDED(IAudioClient_QueryInterface(sys->client, &IID_IAudioClient2, (void**)&audioClient2)))
                 {
                     // "BackgroundCapableMedia" does not work in UWP
                     AudioClientProperties props = (AudioClientProperties) {
