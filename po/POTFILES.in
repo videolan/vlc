@@ -157,6 +157,7 @@ modules/access/avio.h
 modules/access/bluray.c
 modules/access/cdda.c
 modules/access/concat.c
+modules/access/data.c
 modules/access/dc1394.c
 modules/access/dcp/dcp.cpp
 modules/access/decklink.cpp
