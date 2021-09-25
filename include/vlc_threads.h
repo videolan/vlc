@@ -124,7 +124,6 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 # include <pthread.h>
 # include <poll.h>
 # define LIBVLC_USE_PTHREAD_CLEANUP   1
-# define LIBVLC_NEED_SLEEP
 
 typedef struct vlc_thread *vlc_thread_t;
 #define VLC_THREAD_CANCELED NULL
@@ -1050,10 +1049,7 @@ static inline void vlc_cleanup_lock (void *lock)
 }
 #define mutex_cleanup_push( lock ) vlc_cleanup_push (vlc_cleanup_lock, lock)
 
-#ifndef __cplusplus
-void vlc_cancel_addr_set(atomic_uint *addr);
-void vlc_cancel_addr_clear(atomic_uint *addr);
-#else
+#ifdef __cplusplus
 /**
  * Helper C++ class to lock a mutex.
  *

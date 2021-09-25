@@ -210,7 +210,7 @@ void vlc_testcancel (void)
     pthread_exit(NULL);
 }
 
-void vlc_cancel_addr_set(atomic_uint *addr)
+static void vlc_cancel_addr_set(atomic_uint *addr)
 {
     vlc_thread_t th = thread;
     if (th == NULL)
@@ -222,7 +222,7 @@ void vlc_cancel_addr_set(atomic_uint *addr)
     vlc_mutex_unlock(&th->wait.lock);
 }
 
-void vlc_cancel_addr_clear(atomic_uint *addr)
+static void vlc_cancel_addr_clear(atomic_uint *addr)
 {
     vlc_thread_t th = thread;
     if (th == NULL)
@@ -258,6 +258,45 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
 }
 
 /* time */
+static void do_vlc_cancel_addr_clear(void *addr)
+{
+    vlc_cancel_addr_clear(addr);
+}
+
+static void vlc_cancel_addr_prepare(atomic_uint *addr)
+{
+    /* Let thread subsystem on address to broadcast for cancellation */
+    vlc_cancel_addr_set(addr);
+    vlc_cleanup_push(do_vlc_cancel_addr_clear, addr);
+    /* Check if cancellation was pending before vlc_cancel_addr_set() */
+    vlc_testcancel();
+    vlc_cleanup_pop();
+}
+
+static void vlc_cancel_addr_finish(atomic_uint *addr)
+{
+    vlc_cancel_addr_clear(addr);
+    /* Act on cancellation as potential wake-up source */
+    vlc_testcancel();
+}
+
+void (vlc_tick_wait)(vlc_tick_t deadline)
+{
+    atomic_uint value = ATOMIC_VAR_INIT(0);
+
+    vlc_cancel_addr_prepare(&value);
+
+    while (vlc_atomic_timedwait(&value, 0, deadline) == 0)
+        vlc_testcancel();
+
+    vlc_cancel_addr_finish(&value);
+}
+
+void (vlc_tick_sleep)(vlc_tick_t delay)
+{
+    vlc_tick_wait(vlc_tick_now() + delay);
+}
+
 vlc_tick_t vlc_tick_now (void)
 {
     struct timespec ts;

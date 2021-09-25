@@ -62,47 +62,6 @@ void vlc_global_mutex (unsigned n, bool acquire)
         vlc_mutex_unlock (lock);
 }
 
-#ifdef LIBVLC_NEED_SLEEP
-static void do_vlc_cancel_addr_clear(void *addr)
-{
-    vlc_cancel_addr_clear(addr);
-}
-
-static void vlc_cancel_addr_prepare(atomic_uint *addr)
-{
-    /* Let thread subsystem on address to broadcast for cancellation */
-    vlc_cancel_addr_set(addr);
-    vlc_cleanup_push(do_vlc_cancel_addr_clear, addr);
-    /* Check if cancellation was pending before vlc_cancel_addr_set() */
-    vlc_testcancel();
-    vlc_cleanup_pop();
-}
-
-static void vlc_cancel_addr_finish(atomic_uint *addr)
-{
-    vlc_cancel_addr_clear(addr);
-    /* Act on cancellation as potential wake-up source */
-    vlc_testcancel();
-}
-
-void (vlc_tick_wait)(vlc_tick_t deadline)
-{
-    atomic_uint value = ATOMIC_VAR_INIT(0);
-
-    vlc_cancel_addr_prepare(&value);
-
-    while (vlc_atomic_timedwait(&value, 0, deadline) == 0)
-        vlc_testcancel();
-
-    vlc_cancel_addr_finish(&value);
-}
-
-void (vlc_tick_sleep)(vlc_tick_t delay)
-{
-    vlc_tick_wait(vlc_tick_now() + delay);
-}
-#endif
-
 static void vlc_mutex_init_common(vlc_mutex_t *mtx, bool recursive)
 {
     atomic_init(&mtx->value, 0);
