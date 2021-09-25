@@ -636,30 +636,6 @@ void vlc_control_cancel (vlc_cleanup_t *cleaner)
     }
 }
 
-void vlc_cancel_addr_set( atomic_uint *addr )
-{
-    struct vlc_thread *th = vlc_threadvar_get( thread_key );
-    if( th == NULL )
-        return; /* Main thread - cannot be cancelled anyway */
-
-    DosRequestMutexSem( th->wait.lock, SEM_INDEFINITE_WAIT );
-    assert( th->wait.addr == NULL );
-    th->wait.addr = addr;
-    DosReleaseMutexSem( th->wait.lock );
-}
-
-void vlc_cancel_addr_clear( atomic_uint *addr )
-{
-    struct vlc_thread *th = vlc_threadvar_get( thread_key );
-    if( th == NULL )
-        return; /* Main thread - cannot be cancelled anyway */
-
-    DosRequestMutexSem( th->wait.lock, SEM_INDEFINITE_WAIT );
-    assert( th->wait.addr == addr );
-    th->wait.addr = NULL;
-    DosReleaseMutexSem( th->wait.lock );
-}
-
 static int vlc_select( int nfds, fd_set *rdset, fd_set *wrset, fd_set *exset,
                        struct timeval *timeout )
 {
