@@ -177,8 +177,8 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
         buffer[0] = i_socks_version;
         buffer[1] = 0x01;               /* CONNECT */
         SetWBE( &buffer[2], i_port );   /* Port */
-        memcpy (&buffer[4],             /* Address */
-                &((struct sockaddr_in *)(res->ai_addr))->sin_addr, 4);
+        memcpy(&buffer[4], ((unsigned char *)res->ai_addr) /* Address */
+                           + offsetof (struct sockaddr_in, sin_addr), 4);
         freeaddrinfo (res);
 
         buffer[8] = 0;                  /* Empty user id */
