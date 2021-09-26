@@ -63,7 +63,11 @@ typedef struct sap_address_t
     vlc_cond_t              wait;
 
     char                    group[NI_MAXNUMERICHOST];
-    struct sockaddr_storage orig;
+    union {
+        struct sockaddr     a;
+        struct sockaddr_in  in;
+        struct sockaddr_in6 in6;
+    } orig;
     socklen_t               origlen;
     int                     fd;
     unsigned                interval;
@@ -97,7 +101,7 @@ static sap_address_t *AddressCreate (vlc_object_t *obj, const char *group)
     strlcpy (addr->group, group, sizeof (addr->group));
     addr->fd = fd;
     addr->origlen = sizeof (addr->orig);
-    getsockname (fd, (struct sockaddr *)&addr->orig, &addr->origlen);
+    getsockname(fd, &addr->orig.a, &addr->origlen);
 
     addr->interval = var_CreateGetInteger (obj, "sap-interval");
     vlc_cond_init (&addr->wait);
@@ -283,29 +287,27 @@ matched:
     /* SAPv1, not encrypted, not compressed */
     uint8_t flags = 0x20;
 #ifdef AF_INET6
-    if (sap_addr->orig.ss_family == AF_INET6)
+    if (sap_addr->orig.a.sa_family == AF_INET6)
         flags |= 0x10;
 #endif
     vlc_memstream_putc(&stream, flags);
     vlc_memstream_putc(&stream, 0x00); /* No authentication length */
     vlc_memstream_write(&stream, &(uint16_t){ vlc_tick_now() }, 2); /* ID hash */
 
-    switch (sap_addr->orig.ss_family)
+    switch (sap_addr->orig.a.sa_family)
     {
 #ifdef AF_INET6
         case AF_INET6:
         {
-            const struct in6_addr *a6 =
-                &((const struct sockaddr_in6 *)&sap_addr->orig)->sin6_addr;
-            vlc_memstream_write(&stream, &a6, 16);
+            const struct in6_addr *a6 = &sap_addr->orig.in6.sin6_addr;
+            vlc_memstream_write(&stream, a6, 16);
             break;
         }
 #endif
         case AF_INET:
         {
-            const struct in_addr *a4 =
-                &((const struct sockaddr_in *)&sap_addr->orig)->sin_addr;
-            vlc_memstream_write(&stream, &a4, 4);
+            const struct in_addr *a4 = &sap_addr->orig.in.sin_addr;
+            vlc_memstream_write(&stream, a4, 4);
             break;
         }
         default:
