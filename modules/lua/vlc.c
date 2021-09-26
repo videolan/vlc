@@ -250,7 +250,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
         msg_Dbg( p_this, "Trying Lua scripts in %s", *ppsz_dir );
         int i_files = vlc_scandir( *ppsz_dir, &ppsz_filelist, file_select,
                                    file_compare );
-        if( i_files < 0 )
+        if( i_files <= 0 )
             continue;
 
         char **ppsz_file = ppsz_filelist;
