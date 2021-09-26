@@ -119,27 +119,34 @@ GridView {
 
         readonly property int mIndex: PlayerControlbarControls.controlList[model.index].id
 
-        onPressed: {
-            root.dragStarted(mIndex)
+        drag.onActiveChanged: {
+            if (drag.active) {
+                root.dragStarted(mIndex)
 
-            buttonDragItem.text = PlayerControlbarControls.controlList[model.index].label
-            buttonDragItem.Drag.source = this
-            buttonDragItem.Drag.active = true
+                buttonDragItem.text = PlayerControlbarControls.controlList[model.index].label
+                buttonDragItem.Drag.source = this
+                buttonDragItem.Drag.start()
 
-            GridView.delayRemove = true
-        }
+                GridView.delayRemove = true
+            } else {
+                buttonDragItem.Drag.drop()
 
-        onReleased: {
-            buttonDragItem.Drag.drop()
+                root.dragStopped(mIndex)
 
-            root.dragStopped(mIndex)
-
-            GridView.delayRemove = false
+                GridView.delayRemove = false
+            }
         }
 
         onPositionChanged: {
-            var pos = this.mapToGlobal(mouseX, mouseY)
-            buttonDragItem.updatePos(pos.x, pos.y)
+            if (drag.active) {
+                // FIXME: There must be a better way of this
+
+                var pos = mapToItem(buttonDragItem.parent, mouseX, mouseY)
+                // y should be set first, because the automatic scroll is
+                // triggered by change on X
+                buttonDragItem.y = pos.y
+                buttonDragItem.x = pos.x
+            }
         }
 
         Rectangle {

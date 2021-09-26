@@ -267,12 +267,6 @@ Rectangle{
         color: VLCStyle.colors.buttonText
         opacity: 0.75
 
-        function updatePos(x, y) {
-            var pos = root.mapFromGlobal(x, y)
-            this.x = pos.x
-            this.y = pos.y
-        }
-
         onXChanged: {
             if (Drag.active)
                 handleScroll(this)
@@ -290,20 +284,26 @@ Rectangle{
         }
 
         var dragItemX = dragItem.x
-        var viewX     = view.mapToItem(root, view.x, view.y).x
+        var viewPos   = view.mapToItem(root, view.x, view.y)
 
-        var leftMark  = (viewX + VLCStyle.dp(20, VLCStyle.scale))
-        var rightMark = (viewX + view.width - VLCStyle.dp(20, VLCStyle.scale))
+        var margin = VLCStyle.dp(25, VLCStyle.scale)
+
+        var leftMark  = (viewPos.x + margin)
+        var rightMark = (viewPos.x + view.width - margin)
 
         scrollAnimation.target = view
         scrollAnimation.dragItem = dragItem
 
-        if (!view.atXBeginning && dragItemX <= leftMark) {
-            scrollAnimation.direction = -1
-        } else if (!view.atXEnd && dragItemX >= rightMark) {
-            scrollAnimation.direction = 1
-        } else {
+        if (!view.contains(view.mapFromItem(root, dragItemX, dragItem.y))) {
             scrollAnimation.direction = 0
+        } else {
+            if (!view.atXBeginning && dragItemX <= leftMark) {
+                scrollAnimation.direction = -1
+            } else if (!view.atXEnd && dragItemX >= rightMark) {
+                scrollAnimation.direction = 1
+            } else {
+                scrollAnimation.direction = 0
+            }
         }
     }
 
@@ -312,6 +312,11 @@ Rectangle{
 
         property var dragItem
         property int direction: 0 // -1: left, 0: stop, 1: right
+
+        onDirectionChanged: {
+            if (direction === 0)
+                stop()
+        }
 
         to: {
             if (direction === -1)
