@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 import QtQuick 2.11
+import QtQuick.Controls 2.4
 import QtQml.Models 2.11
 
 import org.videolan.vlc 0.1
@@ -25,25 +26,81 @@ import "qrc:///player/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-MouseArea {
-    id: dragArea
+Control {
+    id: control
 
-    anchors.verticalCenter: (!!parent) ? parent.verticalCenter : undefined
-
-    cursorShape: (pressed || root.dragActive) ? Qt.DragMoveCursor : Qt.OpenHandCursor
-
-    drag.target: content
-
-    implicitWidth: loader.implicitWidth + content.border.width * 2
-    implicitHeight: loader.implicitHeight
-
-    hoverEnabled: true
+    padding: background.border.width
 
     readonly property int controlId: model.id
     property var dndView: null
 
-    readonly property bool dragActive: content.Drag.active
+    readonly property bool dragActive: loader.Drag.active
     property alias dropArea: dropArea
+
+    property alias containsMouse: mouseArea.containsMouse
+    property alias pressed: mouseArea.pressed
+
+    ListView.delayRemove: dragActive
+    
+    MouseArea {
+        id: mouseArea
+
+        anchors.fill: parent
+
+        cursorShape: (pressed || root.dragActive) ? Qt.DragMoveCursor
+                                                  : Qt.OpenHandCursor
+
+        drag.target: loader
+
+        hoverEnabled: true
+
+        drag.onActiveChanged: {
+            if (drag.active) {
+                root.dragStarted(controlId)
+                removeInfoRectVisible = true
+                drag.target.Drag.start()
+
+            } else {
+                drag.target.Drag.drop()
+                removeInfoRectVisible = false
+                root.dragStopped(controlId)
+            }
+        }
+
+        onPositionChanged: {
+            if (drag.active) {
+                // FIXME: There must be a better way of this
+                var pos = mapToItem(loader.parent, mouseX, mouseY)
+                // y should be set first, because the automatic scroll is
+                // triggered by change on X
+                loader.y = pos.y
+                loader.x = pos.x
+            }
+        }
+    }
+
+    DropArea {
+        id: dropArea
+        anchors.fill: parent
+
+        onEntered: {
+            if ((drag.source === null ||
+                 (drag.source.dndView === dndView &&
+                  (parent.DelegateModel.itemsIndex === drag.source.DelegateModel.itemsIndex + 1))) ||
+                    pressed)
+                drag.accepted = false
+        }
+
+        onDropped: {
+            var destIndex = parent.DelegateModel.itemsIndex
+
+            if((drag.source.dndView === dndView)
+                    && (drag.source.DelegateModel.itemsIndex < destIndex))
+                --destIndex
+
+            dropEvent(drag, destIndex)
+        }
+    }
 
     Binding {
         when: dragActive
@@ -69,60 +126,39 @@ MouseArea {
         color: VLCStyle.colors.accent
     }
 
-    onPressed: {
-        root.dragStarted(controlId)
-
-        removeInfoRectVisible = true
-    }
-
-    onReleased: {
-        drag.target.Drag.drop()
-        removeInfoRectVisible = false
-
-        root.dragStopped(controlId)
-    }
-
-    onPositionChanged: {
-        var pos = this.mapToGlobal(mouseX, mouseY)
-        updatePos(pos.x, pos.y)
-    }
-
-    function updatePos(x, y) {
-        var pos = root.mapFromGlobal(x, y)
-        content.x = pos.x
-        content.y = pos.y
-    }
-
-    Rectangle {
-        id: content
-
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            verticalCenter: parent.verticalCenter
-        }
-
-        implicitWidth: loader.implicitWidth
-        implicitHeight: loader.implicitHeight
-
+    background: Rectangle {
         opacity: Drag.active ? 0.75 : 1.0
 
         color: "transparent"
 
         border.width: VLCStyle.dp(1, VLCStyle.scale)
-        border.color: dragArea.containsMouse && !pressed ? VLCStyle.colors.buttonBorder
-                                                         : "transparent"
+        border.color: containsMouse && !pressed ? VLCStyle.colors.buttonBorder
+                                                : "transparent"
+    }
 
-        Drag.active: pressed
-        Drag.source: dragArea
+    contentItem: Item {
+        id: wrapper
+
+        implicitHeight: loader.implicitHeight
+        implicitWidth: loader.implicitWidth
 
         Loader {
             id: loader
 
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                verticalCenter: parent.verticalCenter
-            }
+            parent: Drag.active ? root : wrapper
+
+            anchors.horizontalCenter: Drag.active ? undefined : parent.horizontalCenter
+            anchors.verticalCenter:  Drag.active ? undefined : parent.verticalCenter
+
             source: PlayerControlbarControls.control(model.id).source
+
+            Drag.source: control
+
+            onXChanged: {
+                if (Drag.active)
+                    root.handleScroll(this)
+            }
+
             onLoaded: {
                 item.paintOnly = true
                 item.enabled = false
@@ -134,53 +170,6 @@ MouseArea {
                         item.extraWidth = 0
                 }
             }
-        }
-
-        states: State {
-            when: dragArea.pressed
-
-            ParentChange {
-                target: content;
-                parent: root
-            }
-
-            AnchorChanges {
-                target: content
-                anchors { horizontalCenter: undefined; verticalCenter: undefined }
-            }
-
-            PropertyChanges {
-                target: dragArea
-                ListView.delayRemove: true
-            }
-        }
-
-        onXChanged: {
-            if (content.Drag.active)
-                root.handleScroll(this)
-        }
-    }
-
-    DropArea {
-        id: dropArea
-        anchors.fill: parent
-
-        onEntered: {
-            if ((drag.source === null ||
-                 (drag.source.dndView === dndView &&
-                  (parent.DelegateModel.itemsIndex === drag.source.DelegateModel.itemsIndex + 1))) ||
-                    pressed)
-                drag.accepted = false
-        }
-
-        onDropped: {
-            var destIndex = parent.DelegateModel.itemsIndex
-
-            if((drag.source.dndView === dndView)
-                    && (drag.source.DelegateModel.itemsIndex < destIndex))
-                --destIndex
-
-            dropEvent(drag, destIndex)
         }
     }
 }

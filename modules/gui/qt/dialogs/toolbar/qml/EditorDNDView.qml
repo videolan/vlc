@@ -158,6 +158,8 @@ ListView {
     }
 
     delegate: EditorDNDDelegate {
+        anchors.verticalCenter: (!!parent) ? parent.verticalCenter : undefined
+
         dndView: playerBtnDND
 
         Binding {
