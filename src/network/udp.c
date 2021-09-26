@@ -116,17 +116,23 @@ static int net_SetupDgramSocket (vlc_object_t *p_obj, int fd,
         FreeLibrary( h_Network );
 #endif
 
-    if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
-     && (sizeof (struct sockaddr_storage) >= ptr->ai_addrlen))
+    if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen))
     {
-        // This works for IPv4 too - don't worry!
-        struct sockaddr_in6 dumb =
+        union
         {
-            .sin6_family = ptr->ai_addr->sa_family,
-            .sin6_port =  ((struct sockaddr_in *)(ptr->ai_addr))->sin_port
+            struct sockaddr a;
+            struct sockaddr_in in;
+            struct sockaddr_in6 in6;
+        } dumb = {
+            { .sa_family = ptr->ai_addr->sa_family, },
         };
 
-        bind (fd, (struct sockaddr *)&dumb, ptr->ai_addrlen);
+        static_assert (offsetof (struct sockaddr_in, sin_port) ==
+                       offsetof (struct sockaddr_in6, sin6_port), "Mismatch");
+        assert(ptr->ai_addrlen <= sizeof (dumb));
+        memcpy(&dumb.in6.sin6_port, ((unsigned char *)ptr->ai_addr)
+                               + offsetof (struct sockaddr_in, sin_port), 2);
+        bind(fd, &dumb.a, ptr->ai_addrlen);
     }
     else
 #endif
@@ -332,15 +338,8 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
     {
 #ifdef AF_INET6
         case AF_INET6:
-        {
-            const struct sockaddr_in6 *g6 = (const struct sockaddr_in6 *)grp;
-
             level = SOL_IPV6;
-            assert(grplen >= (socklen_t)sizeof (struct sockaddr_in6));
-            if (g6->sin6_scope_id != 0)
-                gsr.gsr_interface = g6->sin6_scope_id;
             break;
-        }
 #endif
         case AF_INET:
             level = SOL_IP;
@@ -354,6 +353,20 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
     memcpy (&gsr.gsr_source, src, srclen);
     assert(srclen <= (socklen_t)sizeof (gsr.gsr_source));
     memcpy (&gsr.gsr_group,  grp, grplen);
+
+#ifdef AF_INET6
+    if (grp->sa_family == AF_INET6)
+    {
+        uint32_t scope_id;
+
+        assert(grplen >= (socklen_t)sizeof (struct sockaddr_in6));
+        memcpy(&scope_id, ((unsigned char *)grp)
+                          + offsetof (struct sockaddr_in6, sin6_scope_id), 4);
+        if (scope_id != 0)
+            gsr.gsr_interface = scope_id;
+    }
+#endif
+
     if (setsockopt (fd, level, MCAST_JOIN_SOURCE_GROUP,
                     &gsr, sizeof (gsr)) == 0)
         return 0;
@@ -413,15 +426,8 @@ static int net_Subscribe(vlc_object_t *obj, int fd,
     {
 #ifdef AF_INET6
         case AF_INET6:
-        {
-            const struct sockaddr_in6 *g6 = (const struct sockaddr_in6 *)grp;
-
             level = SOL_IPV6;
-            assert(grplen >= (socklen_t)sizeof (struct sockaddr_in6));
-            if (g6->sin6_scope_id != 0)
-                gr.gr_interface = g6->sin6_scope_id;
             break;
-        }
 #endif
         case AF_INET:
             level = SOL_IP;
@@ -433,6 +439,20 @@ static int net_Subscribe(vlc_object_t *obj, int fd,
 
     assert(grplen <= (socklen_t)sizeof (gr.gr_group));
     memcpy (&gr.gr_group, grp, grplen);
+
+#ifdef AF_INET6
+    if (grp->sa_family == AF_INET6)
+    {
+        uint32_t scope_id;
+
+        assert(grplen >= (socklen_t)sizeof (struct sockaddr_in6));
+        memcpy(&scope_id, ((unsigned char *)grp)
+                          + offsetof (struct sockaddr_in6, sin6_scope_id), 4);
+        if (scope_id != 0)
+            gr.gr_interface = scope_id;
+    }
+#endif
+
     if (setsockopt (fd, level, MCAST_JOIN_GROUP, &gr, sizeof (gr)) == 0)
         return 0;
 
