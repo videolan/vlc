@@ -232,7 +232,7 @@ vlc_h2_frame_data(uint_fast32_t stream_id, const void *buf, size_t len,
     uint8_t flags = eos ? VLC_H2_DATA_END_STREAM : 0;
 
     f = vlc_h2_frame_alloc(VLC_H2_FRAME_DATA, flags, stream_id, len);
-    if (likely(f != NULL))
+    if (len > 0 && likely(f != NULL))
         memcpy(vlc_h2_frame_payload(f), buf, len);
     return f;
 }
