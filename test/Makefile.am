@@ -20,7 +20,6 @@ check_PROGRAMS = \
 	test_libvlc_media_list \
 	test_libvlc_media_player \
 	test_libvlc_media_discoverer \
-	test_libvlc_meta \
 	test_libvlc_renderer_discoverer \
 	test_libvlc_slaves \
 	test_src_config_chain \
@@ -49,6 +48,9 @@ check_PROGRAMS += test_modules_tls
 endif
 if UPDATE_CHECK
 check_PROGRAMS += test_src_crypto_update
+endif
+if HAVE_TAGLIB
+check_PROGRAMS += test_libvlc_meta
 endif
 
 check_SCRIPTS = \

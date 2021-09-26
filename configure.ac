@@ -4305,15 +4305,18 @@ AS_IF([test "${enable_gnutls}" != "no"], [
 dnl
 dnl Taglib plugin
 dnl
+have_taglib="no"
 AC_ARG_ENABLE([taglib],
   AS_HELP_STRING([--disable-taglib],
     [do not use TagLib (default enabled)]))
 AS_IF([test "${enable_taglib}" != "no"], [
   PKG_CHECK_MODULES(TAGLIB, taglib >= 1.11, [
+    have_taglib="yes"
     VLC_ADD_PLUGIN([taglib])
   ], [
     AC_MSG_WARN([${TAGLIB_PKG_ERRORS}.])])
 ])
+AM_CONDITIONAL([HAVE_TAGLIB], [test "${have_taglib}" = "yes"])
 
 dnl
 dnl  libsecret
