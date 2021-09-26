@@ -354,7 +354,8 @@ static ssize_t vlc_h2_stream_write(struct vlc_http_stream *stream,
             break;
         }
 
-        base = (const char *)base + size;
+        if (likely(size > 0))
+            base = (const char *)base + size;
         length -= size;
         total += size;
         s->send_cwnd -= size;
