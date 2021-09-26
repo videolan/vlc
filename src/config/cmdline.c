@@ -114,11 +114,10 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
     i_index = 0;
     for (const vlc_plugin_t *p = vlc_plugins; p != NULL; p = p->next)
     {
-        for (const module_config_t *p_item = p->conf.items,
-                                   *p_end = p_item + p->conf.size;
-             p_item < p_end;
-             p_item++)
+        for (size_t i = 0; i < p->conf.size; i++)
         {
+            const module_config_t *p_item = p->conf.items + i;
+
             /* Ignore hints */
             if( !CONFIG_ITEM(p_item->i_type) )
                 continue;

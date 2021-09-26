@@ -419,12 +419,10 @@ int config_SortConfig (void)
     size_t index = 0;
     for (p = vlc_plugins; p != NULL; p = p->next)
     {
-        module_config_t *item, *end;
-
-        for (item = p->conf.items, end = item + p->conf.size;
-             item < end;
-             item++)
+        for (size_t i = 0; i < p->conf.size; i++)
         {
+            module_config_t *item = p->conf.items + i;
+
             if (!CONFIG_ITEM(item->i_type))
                 continue; /* ignore hints */
             assert(index < nconf);
