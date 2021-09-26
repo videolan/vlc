@@ -55,6 +55,10 @@ ListView {
         }
     }
 
+    // FIXME: Animations are disabled because they are incompatible
+    // with the delegate loader which sets extra width after the
+    // control gets loaded.
+    /*
     add: Transition {
         NumberAnimation {
             property: "opacity"; from: 0; to: 1.0
@@ -73,6 +77,7 @@ ListView {
 
         NumberAnimation { property: "opacity"; to: 1.0 }
     }
+    */
 
     function dropEvent(drag, destIndex) {
         if (drag.source.dndView === playerBtnDND) {
