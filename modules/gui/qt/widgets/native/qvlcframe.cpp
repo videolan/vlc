@@ -96,7 +96,7 @@ static bool restoreWindowPositionImpl(QSettings *settings, QWindow *window)
     if (screenName.isNull() || screenGeometry.isNull())
         return false;
 
-    if (position.isNull() || geometry.isNull())
+    if (geometry.isNull())
         return false;
 
     bool screenFound = false;
