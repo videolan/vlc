@@ -157,10 +157,17 @@ Rectangle{
                             active: !!repeater.getModel(index)
 
                             Layout.fillHeight: true
-                            Layout.fillWidth: count > 0 ||
-                                              (repeater.itemAt(0).count === 0 &&
-                                               repeater.itemAt(1).count === 0 &&
-                                               repeater.itemAt(2).count === 0)
+                            Layout.fillWidth: {
+                                if (count === 0) {
+                                    for (var i = 0; i < repeater.count; ++i) {
+                                        var item = repeater.itemAt(i)
+                                        if (!!item && item.count > 0)
+                                            return false
+                                    }
+                                }
+
+                                return true
+                            }
 
                             Layout.minimumWidth: !!item && item.visible ? Math.max(leftMetric.width,
                                                                                    centerMetric.width,
@@ -168,12 +175,7 @@ Rectangle{
                                                                         : 0
                             Layout.margins: parentRectangle.border.width
 
-                            readonly property int count: {
-                                if (status === Loader.Ready)
-                                    return item.count
-                                else
-                                    return 0
-                            }
+                            readonly property int count: !!item ? item.count : 0
 
                             sourceComponent: Rectangle {
                                 color: VLCStyle.colors.bgAlt
