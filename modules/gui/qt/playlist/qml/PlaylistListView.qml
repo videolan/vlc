@@ -53,8 +53,32 @@ Control {
     }
 
     function isDropAcceptable(drop, index) {
-        return drop.hasUrls || // external drop (i.e. from filesystem)
-                (Helpers.isValidInstanceOf(drop.source, Widgets.DragItem)) // internal drop (inter-view or intra-playlist)
+        if (drop.hasUrls)
+            return true // external drop (i.e. from filesystem)
+
+        if (Helpers.isValidInstanceOf(drop.source, Widgets.DragItem)) {
+            // internal drop (inter-view or intra-playlist)
+            var selection = drop.source.selection
+            if (!!selection) {
+                var length = selection.length
+                var firstIndex = selection[0]
+                var lastIndex = selection[length - 1]
+                var consecutive = true
+                if (length > 1) {
+                    for (var i = 0; i < length - 1; ++i) {
+                        if (selection[i + 1] - selection[i] !== 1) {
+                            consecutive = false
+                            break
+                        }
+                    }
+                }
+                return !consecutive || (index > lastIndex + 1 || index < firstIndex)
+            } else {
+                return true
+            }
+        }
+
+        return false
     }
 
     function acceptDrop(index, drop) {
@@ -115,13 +139,13 @@ Control {
 
         parent: (typeof g_mainDisplay !== 'undefined') ? g_mainDisplay : root
 
-        property int index: -1
+        property var selection: null
 
         colors: root.colors
 
         function updateComponents(maxCovers) {
             var count = root.model.selectedCount
-            var selection = root.model.getSelection().slice(0, maxCovers)
+            selection = root.model.getSelection().slice(0, maxCovers)
 
             var title = selection.map(function (index){
                 return root.model.itemAt(index).title

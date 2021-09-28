@@ -284,7 +284,6 @@ Control {
                     root.model.setSelection([index])
                 }
 
-                dragItem.index = index
                 dragItem.Drag.active = drag.active
             }
             else {
