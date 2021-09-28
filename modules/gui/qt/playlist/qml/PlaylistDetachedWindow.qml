@@ -17,8 +17,9 @@
  *****************************************************************************/
 
 import QtQuick 2.11
-import org.videolan.vlc 0.1
 import QtQuick.Window 2.11
+
+import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 
@@ -26,21 +27,25 @@ import "qrc:///style/"
 Window {
     visible: true
 
-    property var rootWindow: g_root
-    readonly property point rootLocation: rootWindow.mapToGlobal(rootWindow.x, rootWindow.y)
+    property var window: topWindow
 
-    width: 300
+    width: 350
     minimumWidth: playlistView.minimumWidth
-    // minimumHeight: mainInterface.minimumHeight
+
     title: i18n.qtr("Playlist")
     color: VLCStyle.colors.bg
 
     Component.onCompleted: {
-        minimumHeight = mainInterface.minimumHeight // suppress non-notifyable property binding
+        if (!!window) {
+            height = window.height
+            minimumHeight = window.minimumHeight
 
-        x = rootLocation.x + rootWindow.width + VLCStyle.dp(10, VLCStyle.scale)
-        y = rootLocation.y
-        height = rootWindow.height
+            x = window.x + window.width + 10
+            y = window.y
+        } else {
+            height = 400
+            minimumHeight = 200
+        }
     }
 
     PlaylistListView {
