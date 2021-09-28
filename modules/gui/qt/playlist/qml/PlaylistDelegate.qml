@@ -48,6 +48,8 @@ Control {
 
     rightPadding: Math.max(listView.scrollBarWidth, VLCStyle.margin_normal)
 
+    ListView.delayRemove: mouseArea.drag.active
+
     // Events
 
     onHoveredChanged: {
@@ -240,8 +242,6 @@ Control {
                 {
                     listView.fadeRectTopHovered = Qt.binding(function() {return delegate.hovered})
                 }
-
-                delegate.ListView.delayRemove = drag.active
             }
         }
 
