@@ -45,7 +45,7 @@
 #endif
 
 /*** Static mutex and condition variable ***/
-static CRITICAL_SECTION super_mutex;
+static SRWLOCK super_mutex = SRWLOCK_INIT;
 static CONDITION_VARIABLE super_variable;
 
 #define IS_INTERRUPTIBLE (!VLC_WINSTORE_APP || _WIN32_WINNT >= 0x0A00)
@@ -96,13 +96,13 @@ int vlc_threadvar_create (vlc_threadvar_t *p_tls, void (*destr) (void *))
     var->next = NULL;
     *p_tls = var;
 
-    EnterCriticalSection(&super_mutex);
+    AcquireSRWLockExclusive(&super_mutex);
     var->prev = vlc_threadvar_last;
     if (var->prev)
         var->prev->next = var;
 
     vlc_threadvar_last = var;
-    LeaveCriticalSection(&super_mutex);
+    ReleaseSRWLockExclusive(&super_mutex);
     return 0;
 }
 
@@ -110,7 +110,7 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 {
     struct vlc_threadvar *var = *p_tls;
 
-    EnterCriticalSection(&super_mutex);
+    AcquireSRWLockExclusive(&super_mutex);
     if (var->prev != NULL)
         var->prev->next = var->next;
 
@@ -119,7 +119,7 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
     else
         vlc_threadvar_last = var->prev;
 
-    LeaveCriticalSection(&super_mutex);
+    ReleaseSRWLockExclusive(&super_mutex);
 
     TlsFree (var->id);
     free (var);
@@ -150,19 +150,19 @@ static void vlc_threadvars_cleanup(void)
     vlc_threadvar_t key;
 retry:
     /* TODO: use RW lock or something similar */
-    EnterCriticalSection(&super_mutex);
+    AcquireSRWLockExclusive(&super_mutex);
     for (key = vlc_threadvar_last; key != NULL; key = key->prev)
     {
         void *value = vlc_threadvar_get(key);
         if (value != NULL && key->destroy != NULL)
         {
-            LeaveCriticalSection(&super_mutex);
+            ReleaseSRWLockExclusive(&super_mutex);
             vlc_threadvar_set(key, NULL);
             key->destroy(value);
             goto retry;
         }
     }
-    LeaveCriticalSection(&super_mutex);
+    ReleaseSRWLockExclusive(&super_mutex);
 }
 
 /*** Futeces^WAddress waits ***/
@@ -819,13 +819,11 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             thread_key = TlsAlloc();
             if (unlikely(thread_key == TLS_OUT_OF_INDEXES))
                 return FALSE;
-            InitializeCriticalSection(&super_mutex);
             InitializeConditionVariable(&super_variable);
             break;
         }
 
         case DLL_PROCESS_DETACH:
-            DeleteCriticalSection(&super_mutex);
             TlsFree(thread_key);
             break;
 
