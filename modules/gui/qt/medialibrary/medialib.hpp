@@ -35,6 +35,12 @@
 #include "qt.hpp"
 #include "mlqmltypes.hpp"
 
+namespace vlc {
+namespace playlist {
+class Media;
+}
+}
+
 class MediaLib : public QObject
 {
     Q_OBJECT
@@ -79,6 +85,10 @@ signals:
 
 private:
     static void onMediaLibraryEvent( void* data, const vlc_ml_event_t* event );
+
+    void convertMLItemToPlaylistMedias(
+        const MLItemId & itemId, const QStringList &options,
+        QVector<vlc::playlist::Media>& mediasOut);
 
 private:
     qt_intf_t* m_intf;

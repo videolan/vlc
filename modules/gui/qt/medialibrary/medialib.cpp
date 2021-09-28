@@ -52,8 +52,7 @@ void MediaLib::addToPlaylist(const QUrl& mrl, const QStringList &options)
     m_intf->p_mainPlaylistController->append( {media} , false );
 }
 
-// A specific item has been asked to be added to the playlist
-void MediaLib::addToPlaylist(const MLItemId & itemId, const QStringList &options)
+void MediaLib::convertMLItemToPlaylistMedias(const MLItemId & itemId, const QStringList &options, QVector<vlc::playlist::Media>& medias)
 {
     //invalid item
     if (itemId.id == 0)
@@ -62,27 +61,32 @@ void MediaLib::addToPlaylist(const MLItemId & itemId, const QStringList &options
     if (itemId.type == VLC_ML_PARENT_UNKNOWN)
     {
         vlc::playlist::InputItemPtr item( vlc_ml_get_input_item( m_ml, itemId.id ), false );
-        if (item) {
-            QVector<vlc::playlist::Media> medias = { vlc::playlist::Media(item.get(), options) };
-            m_intf->p_mainPlaylistController->append(medias, false);
-        }
+        if (item)
+            medias.push_back(vlc::playlist::Media(item.get(), options));
     }
     else
     {
         vlc_ml_query_params_t query;
         memset(&query, 0, sizeof(vlc_ml_query_params_t));
         ml_unique_ptr<vlc_ml_media_list_t> media_list(vlc_ml_list_media_of( m_ml, &query, itemId.type, itemId.id));
-        if (media_list == nullptr)
+        if (media_list == nullptr || media_list->i_nb_items == 0)
             return;
 
         auto mediaRange = ml_range_iterate<vlc_ml_media_t>( media_list );
-        QVector<vlc::playlist::Media> medias;
         std::transform(mediaRange.begin(), mediaRange.end(), std::back_inserter(medias), [&](vlc_ml_media_t& m) {
             vlc::playlist::InputItemPtr item(vlc_ml_get_input_item( m_ml, m.i_id ), false);
             return vlc::playlist::Media(item.get(), options);
         });
-        m_intf->p_mainPlaylistController->append(medias, false);
     }
+}
+
+// A specific item has been asked to be added to the playlist
+void MediaLib::addToPlaylist(const MLItemId & itemId, const QStringList &options)
+{
+    QVector<vlc::playlist::Media> medias;
+    convertMLItemToPlaylistMedias(itemId, options, medias);
+    if (!medias.empty())
+        m_intf->p_mainPlaylistController->append(medias, false);
 }
 
 void MediaLib::addToPlaylist(const QVariantList& itemIdList, const QStringList &options)
@@ -111,32 +115,10 @@ void MediaLib::addToPlaylist(const QVariantList& itemIdList, const QStringList &
 // so it's added to the playlist and played
 void MediaLib::addAndPlay(const MLItemId & itemId, const QStringList &options )
 {
-    if (itemId.id == 0)
-        return;
-    if (itemId.type == VLC_ML_PARENT_UNKNOWN)
-    {
-        vlc::playlist::InputItemPtr item(vlc_ml_get_input_item( m_ml, itemId.id ), false);
-        if (item) {
-            QVector<vlc::playlist::Media> medias = { vlc::playlist::Media(item.get(), options) };
-            m_intf->p_mainPlaylistController->append(medias, true);
-        }
-    }
-    else
-    {
-        vlc_ml_query_params_t query;
-        memset(&query, 0, sizeof(vlc_ml_query_params_t));
-        ml_unique_ptr<vlc_ml_media_list_t> media_list(vlc_ml_list_media_of( m_ml, &query, itemId.type, itemId.id));
-        if (media_list == nullptr)
-            return;
-
-        auto mediaRange = ml_range_iterate<vlc_ml_media_t>( media_list );
-        QVector<vlc::playlist::Media> medias;
-        std::transform(mediaRange.begin(), mediaRange.end(), std::back_inserter(medias), [&](vlc_ml_media_t& m) {
-            vlc::playlist::InputItemPtr item(vlc_ml_get_input_item( m_ml, m.i_id ), false);
-            return vlc::playlist::Media(item.get(), options);
-        });
+    QVector<vlc::playlist::Media> medias;
+    convertMLItemToPlaylistMedias(itemId, options, medias);
+    if (!medias.empty())
         m_intf->p_mainPlaylistController->append(medias, true);
-    }
 }
 
 void MediaLib::addAndPlay(const QString& mrl, const QStringList &options)
@@ -196,28 +178,7 @@ void MediaLib::insertIntoPlaylist(const size_t index, const QVariantList &itemId
             continue;
 
         const MLItemId itemId = id.value<MLItemId>();
-        if (itemId.id == 0)
-            continue;
-        if (itemId.type == VLC_ML_PARENT_UNKNOWN)
-        {
-            vlc::playlist::InputItemPtr item(vlc_ml_get_input_item( m_ml, itemId.id ), false);
-            if (item)
-                medias.push_back(vlc::playlist::Media(item.get(), options));
-        }
-        else
-        {
-            vlc_ml_query_params_t query;
-            memset(&query, 0, sizeof(vlc_ml_query_params_t));
-            ml_unique_ptr<vlc_ml_media_list_t> media_list(vlc_ml_list_media_of( m_ml, &query, itemId.type, itemId.id));
-            if (media_list == nullptr)
-                return;
-
-            auto mediaRange = ml_range_iterate<vlc_ml_media_t>( media_list );
-            std::transform(mediaRange.begin(), mediaRange.end(), std::back_inserter(medias), [&](vlc_ml_media_t& m) {
-                vlc::playlist::InputItemPtr item(vlc_ml_get_input_item( m_ml, m.i_id ), false);
-                return vlc::playlist::Media(item.get(), options);
-            });
-        }
+        convertMLItemToPlaylistMedias(itemId, options, medias);
     }
     if (!medias.isEmpty())
         m_intf->p_mainPlaylistController->insert( index, medias );
