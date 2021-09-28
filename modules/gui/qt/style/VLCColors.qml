@@ -166,8 +166,8 @@ Item {
 
     property color sliderBarMiniplayerBgColor: isThemeDark ? "#FF929292" : "#FFEEEEEE"
 
-    property color tooltipTextColor: systemPalette.tooltipText
-    property color tooltipColor: systemPalette.tooltip
+    property color tooltipTextColor: isThemeDark ? white : black
+    property color tooltipColor: isThemeDark ? black : white
 
     //vlc orange
     property color accent: (isThemeDark) ? "#ff8800" : "#ff610a"
@@ -312,6 +312,9 @@ Item {
                 expandDelegate: bg
 
                 isThemeDark: systemPalette.isDark
+
+                tooltipColor: systemPalette.tooltip
+                tooltipTextColor: systemPalette.tooltipText
             }
         }
     ]
