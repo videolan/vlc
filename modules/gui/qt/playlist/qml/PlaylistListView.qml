@@ -121,7 +121,7 @@ Control {
 
         function updateComponents(maxCovers) {
             var count = root.model.selectedCount
-            var selection = root.model.getSelection()
+            var selection = root.model.getSelection().slice(0, maxCovers)
 
             var title = selection.map(function (index){
                 return root.model.itemAt(index).title
