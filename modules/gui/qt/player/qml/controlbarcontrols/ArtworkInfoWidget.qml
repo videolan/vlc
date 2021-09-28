@@ -105,7 +105,7 @@ AbstractButton {
                 width: VLCStyle.dp(60)
                 height: VLCStyle.dp(60)
 
-                ToolTip {
+                Widgets.ToolTipExt {
                     x: parent.x
 
                     visible: artworkInfoItem.visible
@@ -113,14 +113,9 @@ AbstractButton {
                              && (artworkInfoItem.hovered || artworkInfoItem.visualFocus)
                     delay: 500
 
-                    contentItem: Text {
-                        text: i18n.qtr("%1\n%2\n%3").arg(titleLabel.text).arg(artistLabel.text).arg(progressIndicator.text)
-                        color: colors.tooltipTextColor
-                    }
+                    text: i18n.qtr("%1\n%2\n%3").arg(titleLabel.text).arg(artistLabel.text).arg(progressIndicator.text)
 
-                    background: Rectangle {
-                        color: colors.tooltipColor
-                    }
+                    colors: artworkInfoItem.colors
                 }
             }
         }

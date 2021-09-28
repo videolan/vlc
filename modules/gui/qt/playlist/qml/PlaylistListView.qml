@@ -464,9 +464,11 @@ Control {
                 }
             }
 
-            ToolTip {
+            Widgets.ToolTipExt {
                 id: plInfoTooltip
                 delay: 750
+
+                colors: root.colors
             }
 
             delegate: PlaylistDelegate {

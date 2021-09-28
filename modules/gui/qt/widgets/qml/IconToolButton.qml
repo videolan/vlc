@@ -21,6 +21,7 @@ import QtQuick.Controls 2.4
 
 import org.videolan.vlc 0.1
 
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 ToolButton {
@@ -49,6 +50,8 @@ ToolButton {
 
     // Aliases
 
+    property alias toolTip: toolTip
+
     // active border color
     property alias colorFocus: background.activeBorderColor
 
@@ -58,9 +61,6 @@ ToolButton {
 
     enabled: !paintOnly
 
-    ToolTip.text: text
-    ToolTip.delay: 500
-
     // Keys
 
     Keys.priority: Keys.AfterItem
@@ -68,6 +68,12 @@ ToolButton {
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
     // Childs
+
+    Widgets.ToolTipExt {
+        id: toolTip
+        text: control.text
+        delay: 500
+    }
 
     background: AnimatedBackground {
         id: background

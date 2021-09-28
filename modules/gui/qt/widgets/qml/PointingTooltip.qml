@@ -20,7 +20,7 @@ import QtQuick.Controls 2.4
 
 import "qrc:///style/"
 
-ToolTip {
+ToolTipExt {
     id: pointingTooltip
 
     margins: 0
@@ -29,18 +29,8 @@ ToolTip {
     x: _x
     y: pos.y - (implicitHeight + arrowArea.implicitHeight + VLCStyle.dp(7.5))
 
-    font.pixelSize: VLCStyle.fontSize_normal
-
-    property VLCColors colors: VLCStyle.colors
-
     readonly property real _x: pos.x - (width / 2)
     property point pos
-
-    contentItem: Label {
-        text: pointingTooltip.text
-        font: pointingTooltip.font
-        color: colors.tooltipTextColor
-    }
 
     background: Rectangle {
         border.color: colors.border

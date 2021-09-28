@@ -29,7 +29,7 @@ MouseArea {
     hoverEnabled: true
     propagateComposedEvents: true
 
-    ToolTip {
+    ToolTipExt {
         id: tip
         text: "plop"
         delay: VLCStyle.delayToolTipAppear

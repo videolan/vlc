@@ -143,7 +143,7 @@ WindowDialog {
                         mainInterface.controlbarProfileModel.selectedProfile = (mainInterface.controlbarProfileModel.rowCount() - 1)
                     }
 
-                    ToolTip.visible: hovered
+                    toolTip.visible: hovered
                 }
 
                 Widgets.IconToolButton {
@@ -156,7 +156,7 @@ WindowDialog {
                         mainInterface.controlbarProfileModel.currentModel.injectDefaults(false)
                     }
 
-                    ToolTip.visible: hovered
+                    toolTip.visible: hovered
                 }
 
                 Widgets.IconToolButton {
@@ -167,7 +167,7 @@ WindowDialog {
                           mainInterface.controlbarProfileModel.deleteSelectedProfile()
                     }
 
-                    ToolTip.visible: hovered
+                    toolTip.visible: hovered
                 }
             }
 

@@ -153,10 +153,10 @@ T.Popup {
                     highlighted: index === 3
                                  && player.subtitleTracks.multiSelect
 
-                    ToolTip.visible: (hovered || activeFocus)
-                    ToolTip.text: modelData.tooltip
-                    ToolTip.delay: 1000
-                    ToolTip.toolTip.z: 2
+                    toolTip.visible: (hovered || activeFocus)
+                    toolTip.text: modelData.tooltip
+                    toolTip.delay: 1000
+                    toolTip.z: 2
 
                     Navigation.parentItem: btnsCol
 
