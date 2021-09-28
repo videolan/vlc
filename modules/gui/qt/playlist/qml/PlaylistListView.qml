@@ -163,36 +163,26 @@ Control {
             return model.getItemsForIndexes(model.getSelection())
         }
 
-        property point _pos
         property int _scrollingDirection: 0
 
-        function updatePos(pos) {
-            dragItem.x = pos.x + VLCStyle.dp(15)
-            dragItem.y = pos.y // y should be same otherwise dropIndicator will not be shown correctly (DropArea cares about itemY not mouseY)
-
-            // since we override position update during dragging with updatePos(),
-            // we have to track the final position:
-            _pos = pos
-        }
-
-        on_PosChanged: {
-            var dragItemY = dragItem._pos.y
+        onYChanged: {
+            var dragItemY = dragItem.y
             var viewY     = root.mapFromItem(listView, listView.x, listView.y).y
 
-            var topDiff    = (viewY + VLCStyle.dp(20, VLCStyle.scale)) - dragItemY
-            var bottomDiff = dragItemY - (viewY + listView.height - toolbar.height - VLCStyle.dp(20, VLCStyle.scale))
+            var margin = VLCStyle.dp(20, VLCStyle.scale)
 
-            if(!listView.listView.atYBeginning && topDiff > 0) {
+            var topDiff    = (viewY + margin) - dragItemY
+            var bottomDiff = dragItemY - (viewY + listView.height - toolbar.height - margin)
+
+            if (!listView.listView.atYBeginning && topDiff > 0) {
                 _scrollingDirection = -1
 
                 listView.fadeRectTopHovered = true
-            }
-            else if( !listView.listView.atYEnd && bottomDiff > 0) {
+            } else if (!listView.listView.atYEnd && bottomDiff > 0) {
                 _scrollingDirection = 1
 
                 listView.fadeRectBottomHovered = true
-            }
-            else {
+            } else {
                 _scrollingDirection = 0
 
                 listView.fadeRectTopHovered = false
@@ -395,7 +385,7 @@ Control {
                 property alias firstItemIndicatorVisible: firstItemIndicator.visible
 
                 function setDropIndicatorVisible(visible) {
-                    dropIndicator.visible = Qt.binding(function() { return (visible || dropArea.containsDragItem); })
+                    dropIndicator.visible = Qt.binding(function() { return (visible || dropArea.containsDrag); })
                 }
 
                 MouseArea {
@@ -423,7 +413,7 @@ Control {
                     height: VLCStyle.dp(1)
                     anchors.top: parent.top
 
-                    visible: dropArea.containsDragItem
+                    visible: (root.model.count > 0 && dropArea.containsDrag)
                     color: colors.accent
                 }
 
@@ -438,7 +428,7 @@ Control {
 
                     color: "transparent"
 
-                    visible: false
+                    visible: (root.model.count === 0 && dropArea.containsDrag)
 
                     opacity: 0.8
 
@@ -459,33 +449,15 @@ Control {
 
                     anchors.fill: parent
 
-                    property bool containsDragItem: false
-
                     onEntered: {
-                        if(!root.isDropAcceptable(drag, root.model.count))
+                        if(!root.isDropAcceptable(drag, root.model.count)) {
+                            drag.accepted = false
                             return
+                        }
+                    }
 
-                        if (root.model.count === 0)
-                            firstItemIndicator.visible = true
-                        else
-                            containsDragItem = true
-                    }
-                    onExited: {
-                        if (root.model.count === 0)
-                            firstItemIndicator.visible = false
-                        else
-                            containsDragItem = false
-                    }
                     onDropped: {
-                        if(!root.isDropAcceptable(drop, root.model.count))
-                            return
-
                         root.acceptDrop(root.model.count, drop)
-
-                        if (root.model.count === 0)
-                            firstItemIndicator.visible = false
-                        else
-                            containsDragItem = false
                     }
                 }
             }

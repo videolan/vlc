@@ -69,7 +69,7 @@ Control {
 
         onSetItemDropIndicatorVisible: {
             if (index === model.index) {
-                topDropIndicator.visible = Qt.binding(function() { return visible || higherDropArea.containsDragItem; })
+                topDropIndicator.visible = Qt.binding(function() { return visible || higherDropArea.containsDrag; })
             }
         }
     }
@@ -213,7 +213,7 @@ Control {
             top: parent.top
         }
 
-        visible: higherDropArea.containsDragItem
+        visible: higherDropArea.containsDrag
 
         height: VLCStyle.dp(1, VLCStyle.scale)
 
@@ -284,6 +284,13 @@ Control {
                     root.model.setSelection([index])
                 }
 
+                if (contains(mapFromItem(dragItem.parent, dragItem.x, dragItem.y))) {
+                    // Force trigger entered signal in drop areas
+                    // so that containsDrag work properly
+                    dragItem.x = -1
+                    dragItem.y = -1
+                }
+
                 dragItem.Drag.active = drag.active
             }
             else {
@@ -293,8 +300,10 @@ Control {
 
         onPositionChanged: {
             if (drag.active) {
-                var pos = drag.target.parent.mapFromItem(mouseArea, mouseX, mouseY)
-                dragItem.updatePos(pos)
+                // FIXME: Override dragItem's position
+                var pos = mapToItem(dragItem.parent, mouseX, mouseY)
+                dragItem.x = pos.x + VLCStyle.dp(15)
+                dragItem.y = pos.y // y should be changed after x
             }
         }
     }
@@ -309,24 +318,15 @@ Control {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            property bool containsDragItem: false
-
             onEntered: {
-                if (!isDropAcceptable(drag, index))
+                if (!isDropAcceptable(drag, index)) {
+                    drag.accepted = false
                     return
+                }
+            }
 
-                containsDragItem = true
-            }
-            onExited: {
-                containsDragItem = false
-            }
             onDropped: {
-                if (!isDropAcceptable(drop, index))
-                    return
-
                 root.acceptDrop(index, drop)
-
-                containsDragItem = false
             }
         }
 
@@ -344,20 +344,20 @@ Control {
             }
 
             onEntered: {
-                if (!isDropAcceptable(drag, index + 1))
+                if (!isDropAcceptable(drag, index + 1)) {
+                    drag.accepted = false
                     return
+                }
 
                 handleDropIndicators(true)
             }
+
             onExited: {
                 handleDropIndicators(false)
             }
+
             onDropped: {
-                if(!isDropAcceptable(drop, index + 1))
-                    return
-
                 root.acceptDrop(index + 1, drop)
-
                 handleDropIndicators(false)
             }
         }
