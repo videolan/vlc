@@ -47,7 +47,6 @@
 
 /*** Static mutex and condition variable ***/
 static SRWLOCK super_mutex = SRWLOCK_INIT;
-static CONDITION_VARIABLE super_variable;
 
 #ifndef VLC_WINSTORE_APP
 # define IS_INTERRUPTIBLE (1)
@@ -787,7 +786,6 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             thread_key = TlsAlloc();
             if (unlikely(thread_key == TLS_OUT_OF_INDEXES))
                 return FALSE;
-            InitializeConditionVariable(&super_variable);
             break;
         }
 
