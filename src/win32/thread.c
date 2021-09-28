@@ -756,14 +756,14 @@ unsigned vlc_GetCPUCount (void)
 
 
 /*** Initialization ***/
-static CRITICAL_SECTION setup_lock; /* FIXME: use INIT_ONCE */
+static SRWLOCK setup_lock = SRWLOCK_INIT; /* FIXME: use INIT_ONCE */
 
 void vlc_threads_setup(libvlc_int_t *vlc)
 {
-    EnterCriticalSection(&setup_lock);
+    AcquireSRWLockExclusive(&setup_lock);
     if (mdate_selected != mdate_default)
     {
-        LeaveCriticalSection(&setup_lock);
+        ReleaseSRWLockExclusive(&setup_lock);
         return;
     }
 
@@ -785,7 +785,7 @@ void vlc_threads_setup(libvlc_int_t *vlc)
             msg_Dbg(vlc, "could not raise process priority");
     }
 #endif
-    LeaveCriticalSection(&setup_lock);
+    ReleaseSRWLockExclusive(&setup_lock);
 }
 
 #define LOOKUP(s) (((s##_) = (void *)GetProcAddress(h, #s)) != NULL)
@@ -819,7 +819,6 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             thread_key = TlsAlloc();
             if (unlikely(thread_key == TLS_OUT_OF_INDEXES))
                 return FALSE;
-            InitializeCriticalSection(&setup_lock);
             InitializeCriticalSection(&super_mutex);
             InitializeConditionVariable(&super_variable);
             break;
@@ -827,7 +826,6 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 
         case DLL_PROCESS_DETACH:
             DeleteCriticalSection(&super_mutex);
-            DeleteCriticalSection(&setup_lock);
             TlsFree(thread_key);
             break;
 
