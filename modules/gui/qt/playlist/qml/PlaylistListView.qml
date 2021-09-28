@@ -337,7 +337,8 @@ Control {
                 playlistId: mainctx.playlist
             }
 
-            fadeColor: background.color
+            fadeColor: background.usingAcrylic ? undefined
+                                               : background.alternativeColor
 
             property int shiftIndex: -1
             property int mode: PlaylistListView.Mode.Normal
