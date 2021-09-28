@@ -272,6 +272,7 @@ Item {
             visible: text && text !== ""
             width: parent.width
             text: _model.subtitle || i18n.qtr("%1 selected").arg(_model.count)
+            color: colors.menuCaption
         }
     }
 
