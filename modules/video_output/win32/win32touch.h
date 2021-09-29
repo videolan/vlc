@@ -24,10 +24,6 @@
 #ifndef VLC_GESTURE_H_
 #define VLC_GESTURE_H_
 
-# if !defined(_WIN32_WINNT) || _WIN32_WINNT < 0x601
-#  undef _WIN32_WINNT
-#  define _WIN32_WINNT 0x0601
-# endif
 # include <windows.h>
 # include <winuser.h>
 
