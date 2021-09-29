@@ -786,9 +786,6 @@ AC_LINK_IFELSE([
     AC_LANG_PROGRAM([#ifdef _WIN32
         #include <ws2tcpip.h>
         #include <windows.h>
-        # if _WIN32_WINNT < 0x600
-        #  error Needs vista+
-        # endif
         #else
         #include <sys/socket.h>
         #include <arpa/inet.h>
@@ -2601,9 +2598,7 @@ AS_IF([test "${enable_dxva2}" != "no"], [
     AS_IF([test "${enable_dxva2}" = "yes"],
           [AC_MSG_ERROR([dxva2 is present but libavcodec/dxva2.h is missing])],
               [AC_MSG_WARN([dxva2 is present but libavcodec/dxva2.h is missing ])])
-        ], [#undef _WIN32_WINNT
-            /* DXVA2 is only available in Vista and above */
-            #define _WIN32_WINNT 0x600])
+        ], [])
       ],[
     AS_IF([test "${enable_dxva2}" = "yes"],
               [AC_MSG_ERROR([Could not find required dxva2api.h])],
@@ -2640,9 +2635,7 @@ AS_IF([test "${enable_d3d11va}" != "no"], [
                   AS_IF([test "${enable_d3d11va}" = "yes"],
                     [AC_MSG_ERROR([d3d11va is present but libavcodec/d3d11va.h is missing])],
                         [AC_MSG_WARN([d3d11va is present but libavcodec/d3d11va.h is missing ])])
-                  ], [#undef _WIN32_WINNT
-                      /* D3D11 is only available in Vista and above */
-                      #define _WIN32_WINNT 0x600])
+                  ], [])
                   ],[
                     AS_IF([test "${enable_d3d11va}" = "yes"],
                           [AC_MSG_ERROR([Could not find required dxva2api.h])],
