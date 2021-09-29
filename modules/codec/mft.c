@@ -24,9 +24,6 @@
 # include "config.h"
 #endif
 
-#undef WINVER
-#define WINVER 0x0601
-
 /* Needed for many mingw macros. */
 #define COBJMACROS
 
