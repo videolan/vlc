@@ -24,8 +24,6 @@
 
 #ifdef WIN32_SKINS
 
-#define WINVER 0x500
-
 #include "win32_factory.hpp"
 #include "win32_graphics.hpp"
 #include "win32_window.hpp"
