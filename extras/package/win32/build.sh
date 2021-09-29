@@ -31,6 +31,7 @@ OPTIONS:
    -D <win_path> Create PDB files during the build, map the VLC sources to <win_path>
                  e.g.: -D c:/sources/vlc
    -x            Add extra checks when compiling
+   -S <sdkver>   Use maximum Windows API version (0x0601000 by default)
    -u            Use the Universal C Runtime (instead of msvcrt)
    -w            Restrict to Windows Store APIs
    -z            Build without GUI (libvlc only)
@@ -39,7 +40,7 @@ EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:sb:dD:xuwzo:" OPTION
+while getopts "hra:pcli:sb:dD:xS:uwzo:" OPTION
 do
      case $OPTION in
          h)
@@ -80,6 +81,9 @@ do
          ;;
          x)
              EXTRA_CHECKS="yes"
+         ;;
+         S)
+             NTDDI=$OPTARG
          ;;
          u)
              BUILD_UCRT="yes"
@@ -218,7 +222,16 @@ if [ ! -z "$BUILD_UCRT" ]; then
 
     if [ ! -z "$WINSTORE" ]; then
         SHORTARCH="$SHORTARCH-uwp"
-        CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DWINAPI_FAMILY=WINAPI_FAMILY_APP -D_UNICODE -DUNICODE"
+        CPPFLAGS="$CPPFLAGS -DWINAPI_FAMILY=WINAPI_FAMILY_APP -D_UNICODE -DUNICODE"
+
+        if [ -z "$NTDDI" ]; then
+            WINVER=0x0A00
+        else
+            WINVER=`echo ${NTDDI} |cut -c 1-6`
+            if [ "$WINVER" != "0x0A00" ]; then
+                echo "Unsupported SDK/NTDDI version ${NTDDI} for Winstore"
+            fi
+        fi
 
         # WinstoreCompat: hopefully can go away someday
         LDFLAGS="$LDFLAGS -lwindowsapp -lwindowsappcompat"
@@ -228,8 +241,6 @@ if [ ! -z "$BUILD_UCRT" ]; then
         EXTRA_CRUNTIME="vcruntime140_app"
     else
         SHORTARCH="$SHORTARCH-ucrt"
-        # The current minimum for VLC is Windows 7
-        CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0601 -DWINVER=0x0601"
         # this library doesn't exist yet, so use ucrt twice as a placeholder
         # EXTRA_CRUNTIME="vcruntime140"
         EXTRA_CRUNTIME="ucrt"
@@ -258,11 +269,24 @@ if [ ! -z "$BUILD_UCRT" ]; then
 
     # the values are not passed to the makefiles/configures
     export LDFLAGS
-    export CPPFLAGS
 else
-    # The current minimum for VLC is Windows 7 and to use the regular msvcrt
-    CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 -D__MSVCRT_VERSION__=0x700"
+    # use the regular msvcrt
+    CPPFLAGS="$CPPFLAGS -D__MSVCRT_VERSION__=0x700"
 fi
+
+if [ -n "$NTDDI" ]; then
+    WINVER=`echo ${NTDDI} |cut -c 1-6`
+    CPPFLAGS="$CPPFLAGS -DNTDDI_VERSION=$NTDDI"
+fi
+if [ -z "$WINVER" ]; then
+    # The current minimum for VLC is Windows 7
+    WINVER=0x0601
+fi
+CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=${WINVER} -DWINVER=${WINVER}"
+
+# the values are not passed to the makefiles/configures
+export CPPFLAGS
+
 CFLAGS="$CPPFLAGS $CFLAGS"
 CXXFLAGS="$CPPFLAGS $CXXFLAGS"
 
