@@ -22,15 +22,6 @@
 
 #include <windows.h>
 
-# if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x603) // _WIN32_WINNT_WINBLUE = 8.1
-#  undef _WIN32_WINNT
-#  define _WIN32_WINNT 0x0603
-# endif
-#include <dcomp.h>
-#include <d3d11.h>
-#include <wrl.h>
-#include <dwmapi.h>
-
 #include "maininterface/mainui.hpp"
 #include "compositor_dcomp_acrylicsurface.hpp"
 #include "compositor_dcomp_uisurface.hpp"
