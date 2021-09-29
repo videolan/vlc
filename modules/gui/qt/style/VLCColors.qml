@@ -209,7 +209,7 @@ Item {
                 text: "#232627"
                 textInactive: "#7f8c8d"
 
-                bg: "#fcfdfc"
+                bg: "#fafafa"
                 bgInactive: "#fcfdfc"
 
                 bgAlt: "#ededed"
@@ -249,7 +249,7 @@ Item {
 
                 text: "#eff0f1"
                 textInactive: "#bdc3c7"
-                bg: "#1a1a1a"
+                bg: "#1e1e1e"
                 bgInactive: "#232629"
                 bgAlt: "#242424"
                 bgAltInactive: "#212121"
