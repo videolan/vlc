@@ -166,6 +166,16 @@ win64-llvm:
         <<: *variables-win64
         WINE_SDK_PATH: /usr/include/wine/wine/windows/
 
+win64-ucrt-llvm:
+    extends: .win-common
+    image:
+        name: $VLC_UWP_LLVM_IMAGE
+    variables:
+        <<: *variables-win64
+        WINE_SDK_PATH: /usr/include/wine/wine/windows/
+        TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
+        UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
+
 uwp64-libvlc-llvm:
     extends: .win-common
     image:
@@ -217,6 +227,16 @@ nightly-win64-llvm:
     variables:
         <<: *variables-win64
         WINE_SDK_PATH: /usr/include/wine/wine/windows/
+
+nightly-win64-ucrt-llvm:
+    extends: .nightly-win-common
+    image:
+        name: $VLC_UWP_LLVM_IMAGE
+    variables:
+        <<: *variables-win64
+        WINE_SDK_PATH: /usr/include/wine/wine/windows/
+        TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
+        UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
 
 #
 # Debian
