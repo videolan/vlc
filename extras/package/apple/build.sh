@@ -236,6 +236,10 @@ set_host_triplet()
     # exactly, which will cause autoconf to assume we are not cross-compiling.
     # Therefore we construct a triplet here without a version number, which
     # will not match the autoconf "guessed" host machine triplet.
+    if [ "${triplet_arch}" = "arm64" ]; then
+        triplet_arch="aarch64"
+    fi
+
     VLC_HOST_TRIPLET="${triplet_arch}-apple-darwin"
     VLC_HOST_TRIPLET="${VLC_HOST_TRIPLET/arm64/aarch64}"
 }
