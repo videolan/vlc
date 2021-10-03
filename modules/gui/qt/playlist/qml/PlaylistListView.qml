@@ -145,13 +145,14 @@ Control {
 
         function updateComponents(maxCovers) {
             var count = root.model.selectedCount
-            selection = root.model.getSelection().slice(0, maxCovers)
+            selection = root.model.getSelection()
+            var _selection = selection.slice(0, maxCovers)
 
-            var title = selection.map(function (index){
+            var title = _selection.map(function (index){
                 return root.model.itemAt(index).title
             }).join(", ")
 
-            var covers = selection.map(function (index) {
+            var covers = _selection.map(function (index) {
                 var artwork = root.model.itemAt(index).artwork
                 return {artwork: (artwork && artwork.toString()) ? artwork : VLCStyle.noArtCover}
             })
