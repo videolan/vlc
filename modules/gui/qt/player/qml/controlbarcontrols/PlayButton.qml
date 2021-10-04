@@ -108,8 +108,12 @@ Control {
         }
 
         onPressed: {
-            if (!cursorInside)
+            if (!cursorInside) {
                 mouse.accepted = false
+                return
+            }
+
+            playBtn.forceActiveFocus(Qt.MouseFocusReason)
         }
 
         onClicked: {
