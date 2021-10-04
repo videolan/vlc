@@ -63,9 +63,7 @@ typedef struct vout_display_sys_t
     struct pl_dither_params dither;
     struct pl_render_params params;
     struct pl_color_space target;
-#if PL_API_VER >= 13
     struct pl_peak_detect_params peak_detect;
-#endif
     enum pl_chroma_location yuv_chroma_loc;
     int dither_depth;
 
@@ -75,10 +73,8 @@ typedef struct vout_display_sys_t
     int lut_mode;
 #endif
 
-#if PL_API_VER >= 58
     const struct pl_hook *hook;
     char *hook_path;
-#endif
 } vout_display_sys_t;
 
 // Display callbacks
@@ -199,10 +195,8 @@ static void Close(vout_display_t *vd)
     free(sys->lut_path);
 #endif
 
-#if PL_API_VER >= 58
     pl_mpv_user_shader_destroy(&sys->hook);
     free(sys->hook_path);
-#endif
 
     vlc_placebo_Release(sys->pl);
 }
@@ -226,8 +220,6 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
     struct pl_image img = {
         .num_planes = pic->i_planes,
-        .width      = pic->format.i_visible_width,
-        .height     = pic->format.i_visible_height,
         .color      = vlc_placebo_ColorSpace(vd->fmt),
         .repr       = vlc_placebo_ColorRepr(vd->fmt),
         .src_rect = {
@@ -432,7 +424,6 @@ static int Control(vout_display_t *vd, int query)
          * In addition, platforms like Wayland need the call as the size of the
          * window is defined by the size of the content, and not the opposite.
          * The swapchain creation won't be done twice with this call. */
-#if PL_API_VER >= 18
         if (query == VOUT_DISPLAY_CHANGE_DISPLAY_SIZE)
         {
             int width = (int) vd->cfg->display.width;
@@ -451,7 +442,6 @@ static int Control(vout_display_t *vd, int query)
                 return VLC_EGENERIC;
             */
         }
-#endif
         return VLC_SUCCESS;
     }
 
@@ -512,7 +502,6 @@ error:
 }
 #endif
 
-#if PL_API_VER >= 58
 static void LoadUserShader(vout_display_sys_t *sys, const char *filepath)
 {
     if (!filepath || !*filepath) {
@@ -558,7 +547,6 @@ error:
         fclose(fs);
     return;
 }
-#endif
 
 // Options
 
@@ -575,10 +563,8 @@ vlc_module_begin ()
     add_shortcut ("libplacebo", "pl")
     add_module ("pl-gpu", "libplacebo gpu", NULL, PROVIDER_TEXT, PROVIDER_LONGTEXT)
 
-#if PL_API_VER >= 58
     set_section("Custom shaders", NULL)
     add_loadfile("pl-user-shader", NULL, USER_SHADER_FILE_TEXT, USER_SHADER_FILE_LONGTEXT)
-#endif
 
     set_section("Scaling", NULL)
     add_integer("pl-upscaler-preset", SCALE_BUILTIN,
@@ -632,7 +618,6 @@ vlc_module_begin ()
             change_integer_list(tone_values, tone_text)
     add_float("pl-tone-mapping-param", pl_color_map_default_params.tone_mapping_param,
             TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT)
-#if PL_API_VER >= 10
     add_float("pl-desat-strength", pl_color_map_default_params.desaturation_strength,
             DESAT_STRENGTH_TEXT, DESAT_STRENGTH_LONGTEXT)
     add_float("pl-desat-exponent", pl_color_map_default_params.desaturation_exponent,
@@ -641,30 +626,17 @@ vlc_module_begin ()
             DESAT_BASE_TEXT, DESAT_BASE_LONGTEXT)
     add_float("pl-max-boost", pl_color_map_default_params.max_boost,
             MAX_BOOST_TEXT, MAX_BOOST_LONGTEXT)
-#else
-    add_float("pl-tone-mapping-desat", pl_color_map_default_params.tone_mapping_desaturate,
-            TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT)
-#endif
 #if PL_API_VER >= 80
     add_bool("pl-gamut-clipping", false, GAMUT_CLIPPING_TEXT, GAMUT_CLIPPING_LONGTEXT)
 #endif
     add_bool("pl-gamut-warning", false, GAMUT_WARN_TEXT, GAMUT_WARN_LONGTEXT)
 
-#if PL_API_VER < 12
-    add_integer_with_range("pl-peak-frames", pl_color_map_default_params.peak_detect_frames,
-            0, 255, PEAK_FRAMES_TEXT, PEAK_FRAMES_LONGTEXT)
-    add_float_with_range("pl-scene-threshold", pl_color_map_default_params.scene_threshold,
-            0., 10., SCENE_THRESHOLD_TEXT, SCENE_THRESHOLD_LONGTEXT)
-#endif
-
-#if PL_API_VER >= 13
     add_float_with_range("pl-peak-period", pl_peak_detect_default_params.smoothing_period,
             0., 1000., PEAK_PERIOD_TEXT, PEAK_PERIOD_LONGTEXT)
     add_float("pl-scene-threshold-low", pl_peak_detect_default_params.scene_threshold_low,
             SCENE_THRESHOLD_LOW_TEXT, SCENE_THRESHOLD_LOW_LONGTEXT)
     add_float("pl-scene-threshold-high", pl_peak_detect_default_params.scene_threshold_high,
             SCENE_THRESHOLD_HIGH_TEXT, SCENE_THRESHOLD_HIGH_LONGTEXT)
-#endif
 
     add_float_with_range("pl-target-avg", 0.25,
             0.0, 1.0, TARGET_AVG_TEXT, TARGET_AVG_LONGTEXT)
@@ -717,9 +689,7 @@ vlc_module_begin ()
     add_bool("pl-overlay-direct", false, OVERLAY_DIRECT_TEXT, OVERLAY_DIRECT_LONGTEXT)
     add_bool("pl-disable-linear", false, DISABLE_LINEAR_TEXT, DISABLE_LINEAR_LONGTEXT)
     add_bool("pl-force-general", false, FORCE_GENERAL_TEXT, FORCE_GENERAL_LONGTEXT)
-#if PL_API_VER >= 13
     add_bool("pl-delayed-peak", false, DELAYED_PEAK_TEXT, DELAYED_PEAK_LONGTEXT)
-#endif
 
 vlc_module_end ()
 
@@ -749,22 +719,14 @@ static void UpdateParams(vout_display_t *vd)
     sys->color_map.intent = var_InheritInteger(vd, "pl-intent");
     sys->color_map.tone_mapping_algo = var_InheritInteger(vd, "pl-tone-mapping");
     sys->color_map.tone_mapping_param = var_InheritFloat(vd, "pl-tone-mapping-param");
-#if PL_API_VER >= 10
     sys->color_map.desaturation_strength = var_InheritFloat(vd, "pl-desat-strength");
     sys->color_map.desaturation_exponent = var_InheritFloat(vd, "pl-desat-exponent");
     sys->color_map.desaturation_base = var_InheritFloat(vd, "pl-desat-base");
     sys->color_map.max_boost = var_InheritFloat(vd, "pl-max-boost");
-#else
-    sys->color_map.tone_mapping_desaturate = var_InheritFloat(vd, "pl-tone-mapping-desat");
-#endif
 #if PL_API_VER >= 80
     sys->color_map.gamut_clipping = var_InheritBool(vd, "pl-gamut-clipping");
 #endif
     sys->color_map.gamut_warning = var_InheritBool(vd, "pl-gamut-warning");
-#if PL_API_VER < 12
-    sys->color_map.peak_detect_frames = var_InheritInteger(vd, "pl-peak-frames");
-    sys->color_map.scene_threshold = var_InheritFloat(vd, "pl-scene-threshold");
-#endif
 
     sys->dither = pl_dither_default_params;
     int method = var_InheritInteger(vd, "pl-dither");
@@ -786,7 +748,6 @@ static void UpdateParams(vout_display_t *vd)
     sys->params.disable_linear_scaling = var_InheritBool(vd, "pl-disable-linear");
     sys->params.disable_builtin_scalers = var_InheritBool(vd, "pl-force-general");
 
-#if PL_API_VER >= 13
     sys->peak_detect.smoothing_period = var_InheritFloat(vd, "pl-peak-period");
     sys->peak_detect.scene_threshold_low = var_InheritFloat(vd, "pl-scene-threshold-low");
     sys->peak_detect.scene_threshold_high = var_InheritFloat(vd, "pl-scene-threshold-high");
@@ -794,7 +755,6 @@ static void UpdateParams(vout_display_t *vd)
         sys->params.peak_detect_params = &sys->peak_detect;
         sys->params.allow_delayed_peak_detect = var_InheritBool(vd, "pl-delayed-peak");
     }
-#endif
 
     int preset = var_InheritInteger(vd, "pl-upscaler-preset");
     sys->params.upscaler = scale_config[preset];
@@ -859,7 +819,6 @@ static void UpdateParams(vout_display_t *vd)
     }
 #endif
 
-#if PL_API_VER >= 58
     char *shader_file = var_InheritString(vd, "pl-user-shader");
     LoadUserShader(sys, shader_file);
     free(shader_file);
@@ -869,5 +828,4 @@ static void UpdateParams(vout_display_t *vd)
     } else {
         sys->params.num_hooks = 0;
     }
-#endif
 }

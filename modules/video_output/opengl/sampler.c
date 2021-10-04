@@ -937,13 +937,9 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         color_params.intent = var_InheritInteger(priv->gl, "rendering-intent");
         color_params.tone_mapping_algo = var_InheritInteger(priv->gl, "tone-mapping");
         color_params.tone_mapping_param = var_InheritFloat(priv->gl, "tone-mapping-param");
-#    if PL_API_VER >= 10
         color_params.desaturation_strength = var_InheritFloat(priv->gl, "desat-strength");
         color_params.desaturation_exponent = var_InheritFloat(priv->gl, "desat-exponent");
         color_params.desaturation_base = var_InheritFloat(priv->gl, "desat-base");
-#    else
-        color_params.tone_mapping_desaturate = var_InheritFloat(priv->gl, "tone-mapping-desat");
-#    endif
         color_params.gamut_warning = var_InheritBool(priv->gl, "tone-mapping-warn");
 
         struct pl_color_space dst_space = pl_color_space_unknown;
@@ -1126,20 +1122,16 @@ CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
     // Create the main libplacebo context
     priv->pl_ctx = vlc_placebo_CreateContext(VLC_OBJECT(gl));
     if (priv->pl_ctx) {
-#   if PL_API_VER >= 20
         priv->pl_sh = pl_shader_alloc(priv->pl_ctx, &(struct pl_shader_params) {
             .glsl = {
-#       ifdef USE_OPENGL_ES2
+#   ifdef USE_OPENGL_ES2
                 .version = 100,
                 .gles = true,
-#       else
+#   else
                 .version = 120,
-#       endif
+#   endif
             },
         });
-#   else
-        priv->pl_sh = pl_shader_alloc(priv->pl_ctx, NULL, 0);
-#   endif
     }
 #endif
 

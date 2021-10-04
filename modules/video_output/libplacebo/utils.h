@@ -185,9 +185,7 @@ static const char * const lut_mode_text[] = {
 #define TONEMAPPING_LONGTEXT "Algorithm to use when converting from wide gamut to standard gamut, or from HDR to SDR."
 
 static const int tone_values[] = {
-#if PL_API_VER >= 68
     PL_TONE_MAPPING_BT_2390,
-#endif
     PL_TONE_MAPPING_HABLE,
     PL_TONE_MAPPING_MOBIUS,
     PL_TONE_MAPPING_REINHARD,
@@ -197,9 +195,7 @@ static const int tone_values[] = {
 };
 
 static const char * const tone_text[] = {
-#if PL_API_VER >= 68
     "ITU-R BT.2390 EETF (recommended)",
-#endif
     "Hable (filmic mapping)",
     "Mobius (linear + knee)",
     "Reinhard (simple non-linear)",
