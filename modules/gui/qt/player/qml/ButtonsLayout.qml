@@ -1,4 +1,4 @@
-/*****************************************************************************
+﻿/*****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
@@ -160,9 +160,14 @@ FocusScope {
                     }
                 }
 
-                function _focusIfFocusable(loader, reason) {
+                function _focusIfFocusable(loader) {
                     if (!!loader && !!loader.item && loader.item.focus) {
-                        loader.item.forceActiveFocus(reason)
+                        if (buttonloader.item.focusReason !== undefined)
+                            loader.item.forceActiveFocus(buttonloader.item.focusReason)
+                        else {
+                            console.warn("focusReason is not available in %1!".arg(buttonloader.item))
+                            loader.item.forceActiveFocus()
+                        }
                         return true
                     } else {
                         return false
@@ -191,10 +196,12 @@ FocusScope {
 
                     // focus to other alignment if focusable control
                     // in the same alignment is not found:
-                    if (_index > (buttonsRepeater.count + 1) / 2) {
+                    if (!!buttonsLayout.Navigation.rightItem) {
                         buttonsLayout.Navigation.defaultNavigationRight()
-                    } else {
+                    } else if (!!buttonsLayout.Navigation.leftItem) {
                         buttonsLayout.Navigation.defaultNavigationLeft()
+                    } else {
+                        buttonsLayout.altFocusAction()
                     }
                 }
             }
