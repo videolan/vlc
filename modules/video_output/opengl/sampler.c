@@ -1252,10 +1252,8 @@ vlc_gl_sampler_UpdatePicture(struct vlc_gl_sampler *sampler, picture_t *picture)
 
         /* The transformation is the same for all planes, even with power-of-two
          * textures. */
-        float scale_w = (float)interop->texs[0].w.num / interop->texs[0].w.den
-                      / priv->tex_widths[0];
-        float scale_h = (float)interop->texs[0].h.num / interop->texs[0].h.den
-                      / priv->tex_heights[0];
+        float scale_w = priv->tex_widths[0];
+        float scale_h = priv->tex_heights[0];
 
         /* Warning: if NPOT is not supported a larger texture is
            allocated. This will cause right and bottom coordinates to
@@ -1268,10 +1266,10 @@ vlc_gl_sampler_UpdatePicture(struct vlc_gl_sampler *sampler, picture_t *picture)
            - Add a "-1" when computing right and bottom, however the
            last row/column might not be displayed at all.
         */
-        float left   = (source->i_x_offset +                       0 ) * scale_w;
-        float top    = (source->i_y_offset +                       0 ) * scale_h;
-        float right  = (source->i_x_offset + source->i_visible_width ) * scale_w;
-        float bottom = (source->i_y_offset + source->i_visible_height) * scale_h;
+        float left   = (source->i_x_offset +                       0 ) / scale_w;
+        float top    = (source->i_y_offset +                       0 ) / scale_h;
+        float right  = (source->i_x_offset + source->i_visible_width ) / scale_w;
+        float bottom = (source->i_y_offset + source->i_visible_height) / scale_h;
 
         /**
          * This matrix converts from picture coordinates (in range [0; 1])
