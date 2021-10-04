@@ -849,7 +849,7 @@ static void Del(sout_stream_t *p_stream, void *_id)
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, Flush,
+    Add, Del, Send, NULL, Flush, NULL,
 };
 
 int OpenSout( vlc_object_t *p_this )

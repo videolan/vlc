@@ -206,7 +206,7 @@ static void Close(vlc_object_t *obj)
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, Control, Flush,
+    Add, Del, Send, Control, Flush, NULL
 };
 
 static const char *const chain_options[] = {

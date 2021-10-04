@@ -219,7 +219,7 @@ static vlc_tick_t ParseTime(const char *str)
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, NULL,
+    Add, Del, Send, NULL, NULL, NULL,
 };
 
 static int Open(vlc_object_t *obj)

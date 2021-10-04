@@ -114,7 +114,7 @@ static void OutputStart( sout_stream_t *p_stream );
 static void OutputSend( sout_stream_t *p_stream, sout_stream_id_sys_t *id, block_t * );
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, NULL,
+    Add, Del, Send, NULL, NULL, NULL,
 };
 
 /*****************************************************************************

@@ -302,7 +302,7 @@ static int ControlCommon(sout_stream_t *stream, int query, va_list args)
 }
 
 static const struct sout_stream_operations ops_out = {
-    AddOut, DelOut, SendOut, ControlCommon, NULL,
+    AddOut, DelOut, SendOut, ControlCommon, NULL, NULL,
 };
 
 /*****************************************************************************
@@ -628,7 +628,7 @@ static int SendIn( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 }
 
 static const struct sout_stream_operations ops_in = {
-    AddIn, DelIn, SendIn, ControlCommon, NULL,
+    AddIn, DelIn, SendIn, ControlCommon, NULL, NULL,
 };
 
 /*****************************************************************************

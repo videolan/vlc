@@ -205,7 +205,7 @@ static int OutputSend(sout_stream_t *stream, void *id, block_t *block)
 }
 
 static const struct sout_stream_operations output_ops = {
-    Add, Del, OutputSend, NULL, NULL,
+    Add, Del, OutputSend, NULL, NULL, NULL,
 };
 
 static int OutputOpen(vlc_object_t *obj)
@@ -251,7 +251,7 @@ static int FilterSend(sout_stream_t *stream, void *opaque, block_t *block)
 }
 
 static const struct sout_stream_operations filter_ops = {
-    FilterAdd, FilterDel, FilterSend, NULL, NULL,
+    FilterAdd, FilterDel, FilterSend, NULL, NULL, NULL,
 };
 
 static int FilterOpen(vlc_object_t *obj)

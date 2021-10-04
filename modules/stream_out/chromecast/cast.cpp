@@ -313,7 +313,7 @@ static void ProxyFlush(sout_stream_t *p_stream, void *id)
 }
 
 static const struct sout_stream_operations proxy_ops = {
-    ProxyAdd, ProxyDel, ProxySend, NULL, ProxyFlush,
+    ProxyAdd, ProxyDel, ProxySend, nullptr, ProxyFlush, nullptr,
 };
 
 static int ProxyOpen(vlc_object_t *p_this)
@@ -1223,7 +1223,7 @@ static void on_input_event_cb(void *data, enum cc_input_event event, union cc_in
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, Flush,
+    Add, Del, Send, nullptr, Flush, nullptr
 };
 
 /*****************************************************************************

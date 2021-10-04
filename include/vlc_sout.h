@@ -178,6 +178,7 @@ struct sout_stream_operations {
     int (*send)(sout_stream_t *, void *, block_t *);
     int (*control)( sout_stream_t *, int, va_list );
     void (*flush)( sout_stream_t *, void *);
+    void (*set_pcr)(sout_stream_t *, vlc_tick_t);
 };
 
 struct sout_stream_t

@@ -53,7 +53,7 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 }
 
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, NULL,
+    Add, Del, Send, NULL, NULL, NULL,
 };
 
 /*****************************************************************************
