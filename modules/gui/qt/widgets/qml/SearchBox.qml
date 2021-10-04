@@ -85,27 +85,6 @@ FocusScope {
     Row {
         id: content
 
-        Widgets.IconToolButton {
-            id: icon
-
-            size: VLCStyle.banner_icon_size
-            iconText: VLCIcons.search
-            text: i18n.qtr("Filter")
-            height: root.height
-
-            focus: true
-
-            onClicked: {
-                searchBox.clear()
-                _expanded = !_expanded
-            }
-
-            Navigation.parentItem: root
-            Navigation.rightItem: _expanded ? searchBox : null
-            Keys.priority: Keys.AfterItem
-            Keys.onPressed: Navigation.defaultKeyAction(event)
-        }
-
         Rectangle {
             id: searchBoxRect
             color: VLCStyle.colors.button
@@ -139,8 +118,7 @@ FocusScope {
                 background: Rectangle { color: "transparent" }
 
                 Navigation.parentItem: root
-                Navigation.leftItem: icon
-                Navigation.rightItem: clearButton.visible ? clearButton : null
+                Navigation.rightItem: clearButton.visible ? clearButton : icon
                 Navigation.cancelAction: function() { _expanded = false }
                 Keys.priority: Keys.AfterItem
                 Keys.onPressed: {
@@ -179,8 +157,34 @@ FocusScope {
 
                 Navigation.parentItem: root
                 Navigation.leftItem: searchBox
+                Navigation.rightItem: icon
                 Keys.priority: Keys.AfterItem
                 Keys.onPressed: Navigation.defaultKeyAction(event)
+            }
+        }
+
+        Widgets.IconToolButton {
+            id: icon
+
+            height: root.height
+
+            size: VLCStyle.banner_icon_size
+
+            iconText: VLCIcons.search
+            text: i18n.qtr("Filter")
+
+            focus: true
+
+            Keys.priority: Keys.AfterItem
+            Keys.onPressed: Navigation.defaultKeyAction(event)
+
+            Navigation.parentItem: root
+            Navigation.leftItem: (_expanded) ? searchBox : null
+
+            onClicked: {
+                searchBox.clear();
+
+                _expanded = !_expanded;
             }
         }
     }
