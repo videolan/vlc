@@ -46,7 +46,7 @@ public:
     static bool preInit(qt_intf_t *);
     bool init() override;
 
-    MainInterface *makeMainInterface() override;
+    bool makeMainInterface(MainInterface*) override;
     void destroyMainInterface() override;
     void unloadGUI() override;
 

@@ -45,24 +45,24 @@ bool CompositorDummy::init()
     return true;
 }
 
-MainInterface* CompositorDummy::makeMainInterface()
+bool CompositorDummy::makeMainInterface(MainInterface* mainInterface)
 {
-    m_mainInterface = std::make_unique<MainInterface>(m_intf);
+    m_mainInterface = mainInterface;
 
     m_qmlWidget = std::make_unique<QQuickView>();
     if (m_mainInterface->useClientSideDecoration())
         m_qmlWidget->setFlag(Qt::FramelessWindowHint);
     m_qmlWidget->setResizeMode(QQuickView::SizeRootObjectToView);
 
-    m_intfWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainInterface.get(), m_qmlWidget.get());
+    m_intfWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainInterface, m_qmlWidget.get());
 
-    MainUI* ui = new MainUI(m_intf, m_mainInterface.get(), m_qmlWidget.get(), m_qmlWidget.get());
+    MainUI* ui = new MainUI(m_intf, m_mainInterface, m_qmlWidget.get(), m_qmlWidget.get());
     ui->setup(m_qmlWidget->engine());
     m_qmlWidget->setContent(QUrl(), ui->getComponent(), ui->createRootItem());
 
     m_qmlWidget->show();
 
-    return m_mainInterface.get();
+    return true;
 }
 
 QWindow* CompositorDummy::interfaceMainWindow() const
@@ -79,7 +79,6 @@ void CompositorDummy::unloadGUI()
 {
     m_intfWindowHandler.reset();
     m_qmlWidget.reset();
-    m_mainInterface.reset();
 }
 
 bool CompositorDummy::setupVoutWindow(vout_window_t*, VoutDestroyCb)

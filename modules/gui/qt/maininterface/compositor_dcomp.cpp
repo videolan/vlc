@@ -284,12 +284,12 @@ bool CompositorDirectComposition::init()
     return true;
 }
 
-MainInterface* CompositorDirectComposition::makeMainInterface()
+bool CompositorDirectComposition::makeMainInterface(MainInterface* mainInterface)
 {
     try
     {
         bool ret;
-        m_mainInterface = new MainInterfaceWin32(m_intf);
+        m_mainInterface = mainInterface;
 
         m_rootWindow = new QWindow();
 
@@ -312,7 +312,7 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         if (!ret)
         {
             destroyMainInterface();
-            return nullptr;
+            return false;
         }
 
         //install the interface window handler after the creation of CompositorDCompositionUISurface
@@ -333,7 +333,7 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         if (! ret)
         {
             destroyMainInterface();
-            return nullptr;
+            return false;
         }
         m_uiSurface->setContent(m_ui->getComponent(), m_ui->createRootItem());
         HR(m_rootVisual->AddVisual(m_uiVisual.Get(), FALSE, nullptr), "add ui visual to root");
@@ -349,13 +349,13 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         connect(qGuiApp, &QGuiApplication::screenRemoved, this, resetAcrylicSurface);
 
         m_rootWindow->show();
-        return m_mainInterface;
+        return true;
     }
     catch (const DXError& err)
     {
         msg_Err(m_intf, "failed to initialise compositor: '%s' code: 0x%lX", err.what(), err.code());
         destroyMainInterface();
-        return nullptr;
+        return false;
     }
 }
 
@@ -396,11 +396,6 @@ void CompositorDirectComposition::unloadGUI()
     m_ui.reset();
     m_taskbarWidget.reset();
     m_interfaceWindowHandler.reset();
-    if (m_mainInterface)
-    {
-        delete m_mainInterface;
-        m_mainInterface = nullptr;
-    }
 }
 
 bool CompositorDirectComposition::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)

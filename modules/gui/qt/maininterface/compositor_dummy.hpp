@@ -41,7 +41,7 @@ public:
     static bool preInit(qt_intf_t*);
     virtual bool init() override;
 
-    virtual MainInterface *makeMainInterface() override;
+    virtual bool makeMainInterface(MainInterface*) override;
 
     /**
      * @brief release all resources used by the compositor.
@@ -65,7 +65,7 @@ protected:
     qt_intf_t *m_intf;
 
     std::unique_ptr<InterfaceWindowHandler> m_intfWindowHandler;
-    std::unique_ptr<MainInterface> m_mainInterface;
+    MainInterface* m_mainInterface;
     std::unique_ptr<QQuickView> m_qmlWidget;
 };
 

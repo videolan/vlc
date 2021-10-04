@@ -50,7 +50,7 @@ public:
 
     virtual bool init() = 0;
 
-    virtual MainInterface* makeMainInterface() = 0;
+    virtual bool makeMainInterface(MainInterface* intf) = 0;
     virtual void destroyMainInterface() = 0;
 
     virtual void unloadGUI() = 0;

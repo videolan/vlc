@@ -50,7 +50,7 @@ public:
     static bool preInit(qt_intf_t *p_intf);
     virtual bool init() override;
 
-    virtual MainInterface *makeMainInterface() override;
+    virtual bool makeMainInterface(MainInterface*) override;
     virtual void destroyMainInterface() override;
     virtual void unloadGUI() override;
     virtual bool setupVoutWindow(vout_window_t*, VoutDestroyCb destroyCb) override;

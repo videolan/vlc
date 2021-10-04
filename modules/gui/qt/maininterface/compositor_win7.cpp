@@ -140,10 +140,9 @@ bool CompositorWin7::init()
     return true;
 }
 
-MainInterface* CompositorWin7::makeMainInterface()
+bool CompositorWin7::makeMainInterface(MainInterface* mainInterface)
 {
-    MainInterfaceWin32* mainInterfaceW32 =  new MainInterfaceWin32(m_intf);
-    m_mainInterface = mainInterfaceW32;
+    m_mainInterface = mainInterface;
 
     /*
      * m_stable is not attached to the main interface because dialogs are attached to the mainInterface
@@ -209,7 +208,7 @@ MainInterface* CompositorWin7::makeMainInterface()
 
     m_qmlView->setContent(QUrl(), m_ui->getComponent(), m_ui->createRootItem());
 
-    return m_mainInterface;
+    return true;
 }
 
 void CompositorWin7::destroyMainInterface()
@@ -229,11 +228,6 @@ void CompositorWin7::unloadGUI()
     m_interfaceWindowHandler.reset();
     m_qmlView.reset();
     m_taskbarWidget.reset();
-    if (m_mainInterface)
-    {
-        delete m_mainInterface;
-        m_mainInterface = nullptr;
-    }
 }
 
 bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)

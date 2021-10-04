@@ -757,21 +757,27 @@ static void *Thread( void *obj )
 #endif
 
     /* Create the normal interface in non-DP mode */
-    MainInterface *p_mi = NULL;
+#ifdef _WIN32
+    p_intf->p_mi = new MainInterfaceWin32(p_intf);
+#else
+    p_intf->p_mi = new MainInterface(p_intf);
+#endif
 
     if( !p_intf->b_isDialogProvider )
     {
+        bool ret = false;
         do {
             p_intf->p_compositor = compositorFactory.createCompositor();
             if (! p_intf->p_compositor)
                 break;
-            p_mi = p_intf->p_compositor->makeMainInterface();
-        } while(p_mi == nullptr);
-        p_intf->p_mi = p_mi;
+            ret = p_intf->p_compositor->makeMainInterface(p_intf->p_mi);
+        } while(!ret);
 
-        if (!p_mi)
+        if (!ret)
         {
             msg_Err(p_intf, "unable to create main interface");
+            delete p_intf->p_mi;
+            p_intf->p_mi = nullptr;
             return ThreadCleanup( p_intf, CLEANUP_ERROR );
         }
 
@@ -860,10 +866,15 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
         if (cleanupReason == CLEANUP_INTF_CLOSED)
         {
             p_intf->p_compositor->unloadGUI();
+            if (p_intf->p_mi)
+                delete p_intf->p_mi;
+            p_intf->p_mi = nullptr;
         }
         else // CLEANUP_APP_TERMINATED
         {
             p_intf->p_compositor->destroyMainInterface();
+            if (p_intf->p_mi)
+                delete p_intf->p_mi;
             p_intf->p_mi = nullptr;
 
             delete p_intf->mainSettings;
