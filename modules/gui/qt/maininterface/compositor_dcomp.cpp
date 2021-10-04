@@ -47,88 +47,50 @@ using namespace Microsoft::WRL;
 //Signature for DCompositionCreateDevice
 typedef HRESULT (*DCompositionCreateDeviceFun)(IDXGIDevice *dxgiDevice, REFIID iid, void** dcompositionDevice);
 
-int CompositorDirectComposition::window_enable(struct vout_window_t * p_wnd, const vout_window_cfg_t *)
+int CompositorDirectComposition::windowEnable(const vout_window_cfg_t *)
 {
-    CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
-    msg_Dbg(that->m_intf, "window_enable");
-    if (!that->m_videoVisual)
+    if (!m_videoVisual)
     {
-        msg_Err(that->m_intf, "m_videoVisual is null");
+        msg_Err(m_intf, "m_videoVisual is null");
         return VLC_EGENERIC;
     }
 
     try
     {
-        that->m_qmlVideoSurfaceProvider->enable(p_wnd);
-        that->m_qmlVideoSurfaceProvider->setVideoEmbed(true);
-        HR(that->m_rootVisual->AddVisual(that->m_videoVisual.Get(), FALSE, that->m_uiVisual.Get()), "add video visual to root");
-        HR(that->m_dcompDevice->Commit(), "commit");
+        commonWindowEnable();
+        HR(m_rootVisual->AddVisual(m_videoVisual.Get(), FALSE, m_uiVisual.Get()), "add video visual to root");
+        HR(m_dcompDevice->Commit(), "commit");
     }
     catch (const DXError& err)
     {
-        msg_Err(that->m_intf, "failed to enable window: %s code 0x%lX", err.what(), err.code());
+        msg_Err(m_intf, "failed to enable window: %s code 0x%lX", err.what(), err.code());
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
 }
 
-void CompositorDirectComposition::window_disable(struct vout_window_t * p_wnd)
+void CompositorDirectComposition::windowDisable()
 {
-    CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
     try
     {
-        that->m_qmlVideoSurfaceProvider->setVideoEmbed(false);
-        that->m_qmlVideoSurfaceProvider->disable();
-        that->m_videoWindowHandler->disable();
-        msg_Dbg(that->m_intf, "window_disable");
-        HR(that->m_rootVisual->RemoveVisual(that->m_videoVisual.Get()), "remove video visual from root");
-        HR(that->m_dcompDevice->Commit(), "commit");
+        commonWindowDisable();
+        HR(m_rootVisual->RemoveVisual(m_videoVisual.Get()), "remove video visual from root");
+        HR(m_dcompDevice->Commit(), "commit");
     }
     catch (const DXError& err)
     {
-        msg_Err(that->m_intf, "failed to disable window: '%s' code: 0x%lX", err.what(), err.code());
+        msg_Err(m_intf, "failed to disable window: '%s' code: 0x%lX", err.what(), err.code());
     }
 }
 
-void CompositorDirectComposition::window_resize(struct vout_window_t * p_wnd, unsigned width, unsigned height)
+void CompositorDirectComposition::windowDestroy()
 {
-    CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
-    msg_Dbg(that->m_intf, "window_resize %ux%u", width, height);
-    that->m_videoWindowHandler->requestResizeVideo(width, height);
-}
-
-void CompositorDirectComposition::window_destroy(struct vout_window_t * p_wnd)
-{
-    CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
-    msg_Dbg(that->m_intf, "window_destroy");
-    that->m_window = nullptr;
-    that->m_videoVisual.Reset();
-    that->onWindowDestruction(p_wnd);
-}
-
-void CompositorDirectComposition::window_set_state(struct vout_window_t * p_wnd, unsigned state)
-{
-    CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
-    msg_Dbg(that->m_intf, "window_set_state");
-    that->m_videoWindowHandler->requestVideoState(static_cast<vout_window_state>(state));
-}
-
-void CompositorDirectComposition::window_unset_fullscreen(struct vout_window_t * p_wnd)
-{
-    CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
-    msg_Dbg(that->m_intf, "window_unset_fullscreen");
-    that->m_videoWindowHandler->requestVideoWindowed();
-}
-
-void CompositorDirectComposition::window_set_fullscreen(struct vout_window_t * p_wnd, const char *id)
-{
-    CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
-    msg_Dbg(that->m_intf, "window_set_fullscreen");
-    that->m_videoWindowHandler->requestVideoFullScreen(id);
+    m_videoVisual.Reset();
+    CompositorVideo::windowDestroy();
 }
 
 CompositorDirectComposition::CompositorDirectComposition( qt_intf_t* p_intf,  QObject *parent)
-    : QObject(parent)
+    : CompositorVideo(parent)
     , m_intf(p_intf)
 {
 }
@@ -400,8 +362,6 @@ void CompositorDirectComposition::unloadGUI()
 
 bool CompositorDirectComposition::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)
 {
-    m_destroyCb = destroyCb;
-
     //Only the first video is embedded
     if (m_videoVisual.Get())
         return false;
@@ -413,23 +373,10 @@ bool CompositorDirectComposition::setupVoutWindow(vout_window_t *p_wnd, VoutDest
         return false;
     }
 
-    static const struct vout_window_operations ops = {
-        CompositorDirectComposition::window_enable,
-        CompositorDirectComposition::window_disable,
-        CompositorDirectComposition::window_resize,
-        CompositorDirectComposition::window_destroy,
-        CompositorDirectComposition::window_set_state,
-        CompositorDirectComposition::window_unset_fullscreen,
-        CompositorDirectComposition::window_set_fullscreen,
-        nullptr, //window_set_title
-    };
-    p_wnd->sys = this;
+    commonSetupVoutWindow(p_wnd, destroyCb);
     p_wnd->type = VOUT_WINDOW_TYPE_DCOMP;
     p_wnd->display.dcomp_device = m_dcompDevice.Get();
     p_wnd->handle.dcomp_visual = m_videoVisual.Get();
-    p_wnd->ops = &ops;
-    p_wnd->info.has_double_click = true;
-    m_window = p_wnd;
     return true;
 }
 

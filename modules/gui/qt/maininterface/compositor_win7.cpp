@@ -26,62 +26,20 @@
 
 using namespace vlc;
 
-int CompositorWin7::window_enable(struct vout_window_t * p_wnd, const vout_window_cfg_t *)
+int CompositorWin7::windowEnable(const vout_window_cfg_t *)
 {
-    CompositorWin7* that = static_cast<CompositorWin7*>(p_wnd->sys);
-    msg_Dbg(that->m_intf, "window_enable");
-    that->m_videoSurfaceProvider->enable(p_wnd);
-    that->m_videoSurfaceProvider->setVideoEmbed(true);
+    commonWindowEnable();
     return VLC_SUCCESS;
 }
 
-void CompositorWin7::window_disable(struct vout_window_t * p_wnd)
+void CompositorWin7::windowDisable()
 {
-    CompositorWin7* that = static_cast<CompositorWin7*>(p_wnd->sys);
-    that->m_videoSurfaceProvider->setVideoEmbed(false);
-    that->m_videoSurfaceProvider->disable();
-    that->m_videoWindowHandler->disable();
-    msg_Dbg(that->m_intf, "window_disable");
-}
-
-void CompositorWin7::window_resize(struct vout_window_t * p_wnd, unsigned width, unsigned height)
-{
-    CompositorWin7* that = static_cast<CompositorWin7*>(p_wnd->sys);
-    msg_Dbg(that->m_intf, "window_resize %ux%u", width, height);
-    that->m_videoWindowHandler->requestResizeVideo(width, height);
-}
-
-void CompositorWin7::window_destroy(struct vout_window_t * p_wnd)
-{
-    CompositorWin7* that = static_cast<CompositorWin7*>(p_wnd->sys);
-    msg_Dbg(that->m_intf, "window_destroy");
-    that->onWindowDestruction(p_wnd);
-}
-
-void CompositorWin7::window_set_state(struct vout_window_t * p_wnd, unsigned state)
-{
-    CompositorWin7* that = static_cast<CompositorWin7*>(p_wnd->sys);
-    msg_Dbg(that->m_intf, "window_set_state");
-    that->m_videoWindowHandler->requestVideoState(static_cast<vout_window_state>(state));
-}
-
-void CompositorWin7::window_unset_fullscreen(struct vout_window_t * p_wnd)
-{
-    CompositorWin7* that = static_cast<CompositorWin7*>(p_wnd->sys);
-    msg_Dbg(that->m_intf, "window_unset_fullscreen");
-    that->m_videoWindowHandler->requestVideoWindowed();
-}
-
-void CompositorWin7::window_set_fullscreen(struct vout_window_t * p_wnd, const char *id)
-{
-    CompositorWin7* that = static_cast<CompositorWin7*>(p_wnd->sys);
-    msg_Dbg(that->m_intf, "window_set_fullscreen");
-    that->m_videoWindowHandler->requestVideoFullScreen(id);
+    commonWindowDisable();
 }
 
 
 CompositorWin7::CompositorWin7(qt_intf_t *p_intf, QObject* parent)
-    : QObject(parent)
+    : CompositorVideo(parent)
     , m_intf(p_intf)
 {
 }
@@ -240,24 +198,10 @@ bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroy
     if (FAILED(hr) || !isCompositionEnabled)
         return false;
 
-    static const struct vout_window_operations ops = {
-        CompositorWin7::window_enable,
-        CompositorWin7::window_disable,
-        CompositorWin7::window_resize,
-        CompositorWin7::window_destroy,
-        CompositorWin7::window_set_state,
-        CompositorWin7::window_unset_fullscreen,
-        CompositorWin7::window_set_fullscreen,
-        nullptr, //window_set_title
-    };
-
-    m_destroyCb = destroyCb;
-    p_wnd->sys = this;
+    commonSetupVoutWindow(p_wnd, destroyCb);
     p_wnd->type = VOUT_WINDOW_TYPE_HWND;
     p_wnd->handle.hwnd = (HWND)m_stable->winId();
     p_wnd->display.x11 = nullptr;
-    p_wnd->ops = &ops;
-    p_wnd->info.has_double_click = true;
     return true;
 }
 

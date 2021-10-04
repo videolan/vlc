@@ -340,6 +340,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/toolbar/controlbar_profile.moc.cpp \
 	gui/qt/dialogs/toolbar/controlbar_profile_model.moc.cpp \
 	gui/qt/dialogs/playlists/playlists.moc.cpp \
+	gui/qt/maininterface/compositor.moc.cpp \
 	gui/qt/maininterface/compositor_dummy.moc.cpp \
 	gui/qt/maininterface/interface_window_handler.moc.cpp \
 	gui/qt/maininterface/main_interface.moc.cpp \

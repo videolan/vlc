@@ -22,6 +22,8 @@
 # include "config.h"
 #endif
 
+#include <memory>
+
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_vout_window.h>
@@ -31,6 +33,7 @@
 #include "qt.hpp"
 
 class MainInterface;
+class VideoWindowHandler;
 
 namespace vlc {
 
@@ -61,10 +64,34 @@ public:
 
     virtual QWindow* interfaceMainWindow() const = 0;
 
-protected:
-    void onWindowDestruction(vout_window_t *p_wnd);
+};
 
+
+class CompositorVideo: public QObject, public Compositor
+{
+    Q_OBJECT
+public:
+    explicit CompositorVideo(QObject* parent = nullptr);
+    virtual ~CompositorVideo();
+
+public:
+    virtual int windowEnable(const vout_window_cfg_t *) = 0;
+    virtual void windowDisable() = 0;
+    virtual void windowDestroy();
+    virtual void windowResize(unsigned width, unsigned height);
+    virtual void windowSetState(unsigned state);
+    virtual void windowUnsetFullscreen();
+    virtual void windowSetFullscreen(const char *id);
+
+protected:
+    void commonSetupVoutWindow(vout_window_t* p_wnd, VoutDestroyCb destroyCb);
+    void commonWindowEnable();
+    void commonWindowDisable();
+
+protected:
+    vout_window_t* m_wnd = nullptr;
     VoutDestroyCb m_destroyCb = nullptr;
+    std::unique_ptr<VideoWindowHandler> m_videoWindowHandler;
 };
 
 /**

@@ -36,7 +36,7 @@ class WinTaskbarWidget;
 
 namespace vlc {
 
-class CompositorDirectComposition : public QObject, public Compositor
+class CompositorDirectComposition : public CompositorVideo
 {
     Q_OBJECT
 public:
@@ -61,15 +61,12 @@ public:
 private slots:
     void onSurfacePositionChanged(QPointF position);
 
-private:
-    static int window_enable(struct vout_window_t *, const vout_window_cfg_t *);
-    static void window_disable(struct vout_window_t *);
-    static void window_resize(struct vout_window_t *, unsigned width, unsigned height);
-    static void window_destroy(struct vout_window_t *);
-    static void window_set_state(struct vout_window_t *, unsigned state);
-    static void window_unset_fullscreen(struct vout_window_t *);
-    static void window_set_fullscreen(struct vout_window_t *, const char *id);
+protected:
+    int windowEnable(const vout_window_cfg_t *) override;
+    void windowDisable() override;
+    void windowDestroy() override;
 
+private:
     qt_intf_t *m_intf = nullptr;
 
     MainInterface* m_mainInterface = nullptr;
@@ -78,9 +75,7 @@ private:
 
     std::unique_ptr<CompositorDCompositionUISurface> m_uiSurface;
     std::unique_ptr<CompositorDCompositionAcrylicSurface> m_acrylicSurface;
-    vout_window_t *m_window = nullptr;
     std::unique_ptr<MainUI> m_ui;
-    std::unique_ptr<VideoWindowHandler> m_videoWindowHandler;
     std::unique_ptr<VideoSurfaceProvider> m_qmlVideoSurfaceProvider;
     std::unique_ptr<InterfaceWindowHandler> m_interfaceWindowHandler;
 

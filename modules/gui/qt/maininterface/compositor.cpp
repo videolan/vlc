@@ -18,6 +18,7 @@
 
 #include "compositor.hpp"
 #include "compositor_dummy.hpp"
+#include "video_window_handler.hpp"
 
 #ifdef _WIN32
 #ifdef HAVE_DCOMP_H
@@ -26,7 +27,7 @@
 #  include "compositor_win7.hpp"
 #endif
 
-namespace vlc {
+using namespace vlc;
 
 template<typename T>
 static Compositor* instanciateCompositor(qt_intf_t *p_intf) {
@@ -86,10 +87,132 @@ Compositor* CompositorFactory::createCompositor()
     return nullptr;
 }
 
-void Compositor::onWindowDestruction(vout_window_t *p_wnd)
+
+extern "C"
 {
-    if (m_destroyCb)
-        m_destroyCb(p_wnd);
+
+static int windowEnableCb(vout_window_t* p_wnd, const vout_window_cfg_t * cfg)
+{
+    assert(p_wnd->sys);
+    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
+    int ret = VLC_EGENERIC;
+    QMetaObject::invokeMethod(that, [&](){
+        ret = that->windowEnable(cfg);
+    }, Qt::BlockingQueuedConnection);
+    return ret;
 }
 
+static void windowDisableCb(vout_window_t* p_wnd)
+{
+    assert(p_wnd->sys);
+    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
+    QMetaObject::invokeMethod(that, [that](){
+        that->windowDisable();
+    }, Qt::BlockingQueuedConnection);
+}
+
+static void windowResizeCb(vout_window_t* p_wnd, unsigned width, unsigned height)
+{
+    assert(p_wnd->sys);
+    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
+    that->windowResize(width, height);
+}
+
+static void windowDestroyCb(struct vout_window_t * p_wnd)
+{
+    assert(p_wnd->sys);
+    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
+    that->windowDestroy();
+}
+
+static void windowSetStateCb(vout_window_t* p_wnd, unsigned state)
+{
+    assert(p_wnd->sys);
+    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
+    that->windowSetState(state);
+}
+
+static void windowUnsetFullscreenCb(vout_window_t* p_wnd)
+{
+    assert(p_wnd->sys);
+    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
+    that->windowUnsetFullscreen();
+}
+
+static void windowSetFullscreenCb(vout_window_t* p_wnd, const char *id)
+{
+    assert(p_wnd->sys);
+    auto that = static_cast<vlc::CompositorVideo*>(p_wnd->sys);
+    that->windowSetFullscreen(id);
+}
+
+}
+
+CompositorVideo::CompositorVideo(QObject* parent)
+    : QObject(parent)
+{
+}
+
+CompositorVideo::~CompositorVideo()
+{
+
+}
+
+void CompositorVideo::commonSetupVoutWindow(vout_window_t* p_wnd, VoutDestroyCb destroyCb)
+{
+    static const struct vout_window_operations ops = {
+        windowEnableCb,
+        windowDisableCb,
+        windowResizeCb,
+        windowDestroyCb,
+        windowSetStateCb,
+        windowUnsetFullscreenCb,
+        windowSetFullscreenCb,
+        nullptr, //window_set_title
+    };
+
+    m_wnd = p_wnd;
+    m_destroyCb = destroyCb;
+    p_wnd->sys = this;
+    p_wnd->ops = &ops;
+    p_wnd->info.has_double_click = true;
+}
+
+void CompositorVideo::windowDestroy()
+{
+    if (m_destroyCb)
+        m_destroyCb(m_wnd);
+}
+
+void CompositorVideo::windowResize(unsigned width, unsigned height)
+{
+    m_videoWindowHandler->requestResizeVideo(width, height);
+}
+
+void CompositorVideo::windowSetState(unsigned state)
+{
+    m_videoWindowHandler->requestVideoState(static_cast<vout_window_state>(state));
+}
+
+void CompositorVideo::windowUnsetFullscreen()
+{
+    m_videoWindowHandler->requestVideoWindowed();
+}
+
+void CompositorVideo::windowSetFullscreen(const char *id)
+{
+    m_videoWindowHandler->requestVideoFullScreen(id);
+}
+
+void CompositorVideo::commonWindowEnable()
+{
+    m_videoSurfaceProvider->enable(m_wnd);
+    m_videoSurfaceProvider->setVideoEmbed(true);
+}
+
+void CompositorVideo::commonWindowDisable()
+{
+    m_videoSurfaceProvider->setVideoEmbed(false);
+    m_videoSurfaceProvider->disable();
+    m_videoWindowHandler->disable();
 }

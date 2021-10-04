@@ -39,7 +39,7 @@ signals:
     void windowStyleChanged();
 };
 
-class CompositorWin7 : public QObject, public Compositor
+class CompositorWin7 : public CompositorVideo
 {
     Q_OBJECT
 public:
@@ -62,13 +62,8 @@ protected:
     bool eventFilter(QObject *obj, QEvent *ev) override;
 
 private:
-    static int window_enable(struct vout_window_t *, const vout_window_cfg_t *);
-    static void window_disable(struct vout_window_t *);
-    static void window_resize(struct vout_window_t *, unsigned width, unsigned height);
-    static void window_destroy(struct vout_window_t *);
-    static void window_set_state(struct vout_window_t *, unsigned state);
-    static void window_unset_fullscreen(struct vout_window_t *);
-    static void window_set_fullscreen(struct vout_window_t *, const char *id);
+    int windowEnable(const vout_window_cfg_t *) override;
+    void windowDisable() override;
 
 private slots:
     void resetVideoZOrder();
@@ -83,7 +78,6 @@ private:
     QWidget* m_stable = nullptr;
     std::unique_ptr<InterfaceWindowHandlerWin32> m_interfaceWindowHandler;
     std::unique_ptr<QQuickView> m_qmlView;
-    std::unique_ptr<VideoWindowHandler> m_videoWindowHandler;
     std::unique_ptr<VideoSurfaceProvider> m_videoSurfaceProvider;
     std::unique_ptr<WinTaskbarWidget> m_taskbarWidget;
     std::unique_ptr<Win7NativeEventFilter> m_nativeEventFilter;
