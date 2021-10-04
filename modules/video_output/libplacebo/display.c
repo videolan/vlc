@@ -43,6 +43,15 @@
 # include <libplacebo/shaders/lut.h>
 #endif
 
+#if PL_API_VER >= 159
+// Forward compatibility with libplacebo v4+
+#define pl_image pl_frame
+#define pl_render_target pl_frame
+#define pl_render_target_from_swapchain pl_frame_from_swapchain
+#define src_rect crop
+#define dst_rect crop
+#endif
+
 typedef struct vout_display_sys_t
 {
     vlc_placebo_t *pl;
