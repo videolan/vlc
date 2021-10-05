@@ -315,7 +315,7 @@ static stream_t *vlc_demux_NewURL(vlc_object_t *obj, const char *url,
     stream_t *stream = vlc_stream_NewURL(obj, url);
 
     if (stream != NULL) {
-        demux_t *demux = demux_New(obj, "any", stream, out);
+        demux_t *demux = demux_New(obj, "any", "", stream, out);
 
         if (demux != NULL)
             return demux;

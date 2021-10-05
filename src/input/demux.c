@@ -69,11 +69,11 @@ static const char *demux_NameFromMimeType(const char *mime)
     return (type != NULL) ? type->name : "any";
 }
 
-demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
+demux_t *demux_New( vlc_object_t *p_obj, const char *module, const char *url,
                     stream_t *s, es_out_t *out )
 {
     assert(s != NULL );
-    return demux_NewAdvanced( p_obj, NULL, psz_name, "", s, out, false );
+    return demux_NewAdvanced( p_obj, NULL, module, url, s, out, false );
 }
 
 struct vlc_demux_private

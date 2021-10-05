@@ -283,8 +283,8 @@ enum demux_query_e
  * Main Demux
  *************************************************************************/
 
-VLC_API demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
-                            stream_t *s, es_out_t *out );
+VLC_API demux_t *demux_New( vlc_object_t *p_obj, const char *module_name,
+                            const char *url, stream_t *s, es_out_t *out );
 
 static inline void demux_Delete(demux_t *demux)
 {

@@ -123,7 +123,7 @@ bool Demuxer::create()
     if(!p_newstream)
         return false;
 
-    p_demux = demux_New( p_obj, name.c_str(),
+    p_demux = demux_New( p_obj, name.c_str(), "",
                          p_newstream, p_es_out );
     if(!p_demux)
     {
