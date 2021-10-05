@@ -771,6 +771,8 @@ static void *Thread( void *obj )
             if (! p_intf->p_compositor)
                 break;
             ret = p_intf->p_compositor->makeMainInterface(p_intf->p_mi);
+            if (!ret)
+                p_intf->p_compositor->destroyMainInterface();
         } while(!ret);
 
         if (!ret)

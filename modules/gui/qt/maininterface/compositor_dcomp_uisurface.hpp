@@ -58,6 +58,7 @@
 #include <QtPlatformHeaders/QEGLNativeContext>
 
 #include "qt.hpp"
+#include "compositor.hpp"
 
 namespace vlc {
 
@@ -79,7 +80,7 @@ private:
     QWindow *m_window;
 };
 
-class CompositorDCompositionUISurface : public QObject
+class CompositorDCompositionUISurface : public QObject, public CompositorVideo::QmlUISurface
 {
     Q_OBJECT
 public:
@@ -92,9 +93,9 @@ public:
 
     bool init();
 
-    QQmlEngine* engine() const { return m_qmlEngine; }
+    QQmlEngine* engine() const override { return m_qmlEngine; }
 
-    void setContent(QQmlComponent* component,  QQuickItem* rootItem);
+    void setContent(QQmlComponent* component,  QQuickItem* rootItem) override;
 
     void timerEvent(QTimerEvent *event) override;
     bool eventFilter(QObject* object, QEvent* event) override;

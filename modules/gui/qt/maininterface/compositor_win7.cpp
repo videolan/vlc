@@ -39,8 +39,7 @@ void CompositorWin7::windowDisable()
 
 
 CompositorWin7::CompositorWin7(qt_intf_t *p_intf, QObject* parent)
-    : CompositorVideo(parent)
-    , m_intf(p_intf)
+    : CompositorVideo(p_intf, parent)
 {
 }
 
@@ -128,22 +127,13 @@ bool CompositorWin7::makeMainInterface(MainInterface* mainInterface)
     DwmSetWindowAttribute(m_videoWindowHWND, DWMWA_EXCLUDED_FROM_PEEK, &excluseFromPeek, sizeof(excluseFromPeek));
     DwmSetWindowAttribute(m_videoWindowHWND, DWMWA_DISALLOW_PEEK, &excluseFromPeek, sizeof(excluseFromPeek));
 
-    m_videoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
-    m_mainInterface->setVideoSurfaceProvider(m_videoSurfaceProvider.get());
-    m_mainInterface->setCanShowVideoPIP(true);
-
-    connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
-            this, &CompositorWin7::onSurfacePositionChanged);
-    connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
-            this, &CompositorWin7::onSurfaceSizeChanged);
-
     m_qmlView = std::make_unique<QQuickView>();
     m_qmlView->setResizeMode(QQuickView::SizeRootObjectToView);
     m_qmlView->setClearBeforeRendering(true);
     m_qmlView->setColor(QColor(Qt::transparent));
 
     m_qmlView->installEventFilter(this);
-    m_nativeEventFilter = std::make_unique<Win7NativeEventFilter>(this);
+    m_nativeEventFilter = std::make_unique<Win7NativeEventFilter>();
     qApp->installNativeEventFilter(m_nativeEventFilter.get());
     connect(m_nativeEventFilter.get(), &Win7NativeEventFilter::windowStyleChanged,
             this, &CompositorWin7::resetVideoZOrder);
@@ -152,26 +142,14 @@ bool CompositorWin7::makeMainInterface(MainInterface* mainInterface)
 
     m_qmlWindowHWND = (HWND)m_qmlView->winId();
 
-    m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf, m_mainInterface);
-    m_videoWindowHandler->setWindow( m_qmlView.get() );
-
-    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandlerWin32>(m_intf, m_mainInterface, m_qmlView.get());
-
-    m_taskbarWidget = std::make_unique<WinTaskbarWidget>(m_intf, m_qmlView.get());
-    qApp->installNativeEventFilter(m_taskbarWidget.get());
-
-    MainUI* m_ui = new MainUI(m_intf, m_mainInterface, m_qmlView.get(), this);
-    m_ui->setup(m_qmlView->engine());
-
-
-    m_qmlView->setContent(QUrl(), m_ui->getComponent(), m_ui->createRootItem());
+    commonGUICreate(m_qmlView.get(), m_qmlView.get(), CompositorVideo::CAN_SHOW_PIP);
 
     return true;
 }
 
 void CompositorWin7::destroyMainInterface()
 {
-    unloadGUI();
+    commonIntfDestroy();
     if (m_videoWidget)
     {
         delete m_videoWidget;
@@ -181,11 +159,8 @@ void CompositorWin7::destroyMainInterface()
 
 void CompositorWin7::unloadGUI()
 {
-    m_videoSurfaceProvider.reset();
-    m_videoWindowHandler.reset();
-    m_interfaceWindowHandler.reset();
+    commonGUIDestroy();
     m_qmlView.reset();
-    m_taskbarWidget.reset();
 }
 
 bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)
@@ -210,7 +185,6 @@ QWindow *CompositorWin7::interfaceMainWindow() const
     return m_qmlView.get();
 }
 
-
 Compositor::Type CompositorWin7::type() const
 {
     return Compositor::Win7Compositor;
@@ -218,6 +192,9 @@ Compositor::Type CompositorWin7::type() const
 
 bool CompositorWin7::eventFilter(QObject*, QEvent* ev)
 {
+    if (!m_videoWidget || !m_qmlView)
+        return false;
+
     switch (ev->type())
     {
     case QEvent::Move:
@@ -273,12 +250,12 @@ void CompositorWin7::resetVideoZOrder()
     );
 }
 
-void CompositorWin7::onSurfacePositionChanged(QPointF position)
+void CompositorWin7::onSurfacePositionChanged(const QPointF& position)
 {
     m_stable->move((position / m_stable->window()->devicePixelRatioF()).toPoint());
 }
 
-void CompositorWin7::onSurfaceSizeChanged(QSizeF size)
+void CompositorWin7::onSurfaceSizeChanged(const QSizeF& size)
 {
     m_stable->resize((size / m_stable->window()->devicePixelRatioF()).toSize());
 }

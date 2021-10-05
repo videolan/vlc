@@ -90,8 +90,7 @@ void CompositorDirectComposition::windowDestroy()
 }
 
 CompositorDirectComposition::CompositorDirectComposition( qt_intf_t* p_intf,  QObject *parent)
-    : CompositorVideo(parent)
-    , m_intf(p_intf)
+    : CompositorVideo(p_intf, parent)
 {
 }
 
@@ -255,9 +254,6 @@ bool CompositorDirectComposition::makeMainInterface(MainInterface* mainInterface
 
         m_rootWindow = new QWindow();
 
-        m_taskbarWidget = std::make_unique<WinTaskbarWidget>(m_intf, m_rootWindow);
-        qApp->installNativeEventFilter(m_taskbarWidget.get());
-
         m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf);
         m_videoWindowHandler->setWindow( m_rootWindow );
 
@@ -272,32 +268,12 @@ bool CompositorDirectComposition::makeMainInterface(MainInterface* mainInterface
                                                                          m_uiVisual);
         ret = m_uiSurface->init();
         if (!ret)
-        {
-            destroyMainInterface();
             return false;
-        }
 
-        //install the interface window handler after the creation of CompositorDCompositionUISurface
-        //so the event filter is handled before the one of the UISurface (for wheel events)
-        m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandlerWin32>(m_intf, m_mainInterface, m_rootWindow);
-
-        m_qmlVideoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
-        m_mainInterface->setVideoSurfaceProvider(m_qmlVideoSurfaceProvider.get());
-        m_mainInterface->setCanShowVideoPIP(true);
-
-        connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::hasVideoEmbedChanged,
-                m_interfaceWindowHandler.get(), &InterfaceWindowHandlerWin32::onVideoEmbedChanged);
-        connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
-                this, &CompositorDirectComposition::onSurfacePositionChanged);
-
-        m_ui = std::make_unique<MainUI>(m_intf, m_mainInterface, m_rootWindow);
-        ret = m_ui->setup(m_uiSurface->engine());
-        if (! ret)
-        {
-            destroyMainInterface();
+        ret = commonGUICreate(m_rootWindow, m_uiSurface.get(), CompositorVideo::CAN_SHOW_PIP);
+        if (!ret)
             return false;
-        }
-        m_uiSurface->setContent(m_ui->getComponent(), m_ui->createRootItem());
+
         HR(m_rootVisual->AddVisual(m_uiVisual.Get(), FALSE, nullptr), "add ui visual to root");
         HR(m_dcompDevice->Commit(), "commit UI visual");
 
@@ -316,16 +292,20 @@ bool CompositorDirectComposition::makeMainInterface(MainInterface* mainInterface
     catch (const DXError& err)
     {
         msg_Err(m_intf, "failed to initialise compositor: '%s' code: 0x%lX", err.what(), err.code());
-        destroyMainInterface();
         return false;
     }
 }
 
-void CompositorDirectComposition::onSurfacePositionChanged(QPointF position)
+void CompositorDirectComposition::onSurfacePositionChanged(const QPointF& position)
 {
     HR(m_videoVisual->SetOffsetX(position.x()));
     HR(m_videoVisual->SetOffsetY(position.y()));
     HR(m_dcompDevice->Commit(), "commit UI visual");
+}
+
+void CompositorDirectComposition::onSurfaceSizeChanged(const QSizeF&)
+{
+    //N/A
 }
 
 void CompositorDirectComposition::destroyMainInterface()
@@ -333,11 +313,10 @@ void CompositorDirectComposition::destroyMainInterface()
     if (m_videoVisual)
         msg_Err(m_intf, "video surface still active while destroying main interface");
 
-    unloadGUI();
+    commonIntfDestroy();
 
     m_rootVisual.Reset();
     m_dcompTarget.Reset();
-    m_qmlVideoSurfaceProvider.reset();
     if (m_rootWindow)
     {
         delete m_rootWindow;
@@ -355,9 +334,7 @@ void CompositorDirectComposition::unloadGUI()
     }
     m_acrylicSurface.reset();
     m_uiSurface.reset();
-    m_ui.reset();
-    m_taskbarWidget.reset();
-    m_interfaceWindowHandler.reset();
+    commonGUIDestroy();
 }
 
 bool CompositorDirectComposition::setupVoutWindow(vout_window_t *p_wnd, VoutDestroyCb destroyCb)

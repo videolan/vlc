@@ -59,7 +59,8 @@ public:
     void removeVisual(Microsoft::WRL::ComPtr<IDCompositionVisual> visual);
 
 private slots:
-    void onSurfacePositionChanged(QPointF position);
+    void onSurfacePositionChanged(const QPointF& position) override;
+    void onSurfaceSizeChanged(const QSizeF& size) override;
 
 protected:
     int windowEnable(const vout_window_cfg_t *) override;
@@ -67,17 +68,12 @@ protected:
     void windowDestroy() override;
 
 private:
-    qt_intf_t *m_intf = nullptr;
-
-    MainInterface* m_mainInterface = nullptr;
     QWindow* m_rootWindow = nullptr;
+
     std::unique_ptr<WinTaskbarWidget> m_taskbarWidget;
 
     std::unique_ptr<CompositorDCompositionUISurface> m_uiSurface;
     std::unique_ptr<CompositorDCompositionAcrylicSurface> m_acrylicSurface;
-    std::unique_ptr<MainUI> m_ui;
-    std::unique_ptr<VideoSurfaceProvider> m_qmlVideoSurfaceProvider;
-    std::unique_ptr<InterfaceWindowHandler> m_interfaceWindowHandler;
 
     //main window composition
     HINSTANCE m_dcomp_dll = nullptr;

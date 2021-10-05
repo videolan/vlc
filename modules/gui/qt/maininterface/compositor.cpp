@@ -18,9 +18,14 @@
 
 #include "compositor.hpp"
 #include "compositor_dummy.hpp"
+#include "main_interface.hpp"
 #include "video_window_handler.hpp"
+#include "videosurface.hpp"
+#include "interface_window_handler.hpp"
+#include "mainui.hpp"
 
 #ifdef _WIN32
+#include "main_interface_win32.hpp"
 #ifdef HAVE_DCOMP_H
 #  include "compositor_dcomp.hpp"
 #endif
@@ -148,8 +153,9 @@ static void windowSetFullscreenCb(vout_window_t* p_wnd, const char *id)
 
 }
 
-CompositorVideo::CompositorVideo(QObject* parent)
+CompositorVideo::CompositorVideo(qt_intf_t *p_intf, QObject* parent)
     : QObject(parent)
+    , m_intf(p_intf)
 {
 }
 
@@ -215,4 +221,78 @@ void CompositorVideo::commonWindowDisable()
     m_videoSurfaceProvider->setVideoEmbed(false);
     m_videoSurfaceProvider->disable();
     m_videoWindowHandler->disable();
+}
+
+
+bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flags flags)
+{
+    assert(m_mainInterface);
+
+    m_videoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
+    m_mainInterface->setVideoSurfaceProvider(m_videoSurfaceProvider.get());
+    if (flags & CompositorVideo::CAN_SHOW_PIP)
+    {
+        m_mainInterface->setCanShowVideoPIP(true);
+        connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
+                this, &CompositorVideo::onSurfacePositionChanged);
+        connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
+                this, &CompositorVideo::onSurfaceSizeChanged);
+    }
+    m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf);
+    m_videoWindowHandler->setWindow( window );
+
+#ifdef _WIN32
+    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandlerWin32>(m_intf, m_mainInterface, window);
+#else
+    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainInterface, window);
+#endif
+    m_mainInterface->setHasAcrylicSurface(flags & CompositorVideo::HAS_ACRYLIC);
+
+#ifdef _WIN32
+    m_taskbarWidget = std::make_unique<WinTaskbarWidget>(m_intf, window);
+    qApp->installNativeEventFilter(m_taskbarWidget.get());
+#endif
+    m_ui = std::make_unique<MainUI>(m_intf, m_mainInterface, window);
+    return true;
+}
+
+bool CompositorVideo::commonGUICreate(QWindow* window, QmlUISurface* qmlSurface, CompositorVideo::Flags flags)
+{
+    bool ret = commonGUICreateImpl(window, flags);
+    if (!ret)
+        return false;
+    ret = m_ui->setup(qmlSurface->engine());
+    if (! ret)
+        return false;
+    qmlSurface->setContent(m_ui->getComponent(), m_ui->createRootItem());
+    return true;
+}
+
+bool CompositorVideo::commonGUICreate(QWindow* window, QQuickView* qmlView, CompositorVideo::Flags flags)
+{
+    bool ret = commonGUICreateImpl(window, flags);
+    if (!ret)
+        return false;
+    ret = m_ui->setup(qmlView->engine());
+    if (! ret)
+        return false;
+    qmlView->setContent(QUrl(), m_ui->getComponent(), m_ui->createRootItem());
+    return true;
+}
+
+void CompositorVideo::commonGUIDestroy()
+{
+    m_ui.reset();
+#ifdef _WIN32
+    qApp->removeNativeEventFilter(m_taskbarWidget.get());
+    m_taskbarWidget.reset();
+#endif
+    m_interfaceWindowHandler.reset();
+}
+
+void CompositorVideo::commonIntfDestroy()
+{
+    unloadGUI();
+    m_videoWindowHandler.reset();
+    m_videoSurfaceProvider.reset();
 }
