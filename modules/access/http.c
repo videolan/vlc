@@ -219,19 +219,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_referrer = var_InheritString( p_access, "http-referrer" );
 
     /* Check proxy */
-    psz = var_InheritString( p_access, "http-proxy" );
-    if( psz == NULL )
-    {
-        msg_Dbg(p_access, "querying proxy for %s", psz_url);
-        psz = vlc_getProxyUrl(psz_url);
-
-        if (psz != NULL)
-            msg_Dbg(p_access, "proxy: %s", psz);
-        else
-            msg_Dbg(p_access, "no proxy");
-    }
+    msg_Dbg(p_access, "querying proxy for %s", psz_url);
+    psz = vlc_getProxyUrl(psz_url);
     if( psz != NULL )
     {
+        msg_Dbg(p_access, "proxy: %s", psz);
         p_sys->b_proxy = true;
         vlc_UrlParse( &p_sys->proxy, psz );
         free( psz );
@@ -250,6 +242,8 @@ static int Open( vlc_object_t *p_this )
             p_sys->proxy.i_port = 80;
         }
     }
+    else
+        msg_Dbg(p_access, "no proxy");
 
     msg_Dbg( p_access, "http: server='%s' port=%d file='%s'",
              p_sys->url.psz_host, p_sys->url.i_port,
