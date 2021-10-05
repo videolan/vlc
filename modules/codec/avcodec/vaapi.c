@@ -54,8 +54,8 @@ struct vaapi_vctx
 {
     VADisplay va_dpy;
     AVBufferRef *hwdev_ref;
-    vlc_mutex_t lock;
-    vlc_cond_t wait;
+    bool pool_sem_init;
+    vlc_sem_t pool_sem;
 };
 
 static int GetVaProfile(const AVCodecContext *ctx, const es_format_t *fmt_in,
@@ -129,16 +129,22 @@ static int GetVaProfile(const AVCodecContext *ctx, const es_format_t *fmt_in,
 typedef struct {
     struct vaapi_pic_context ctx;
     AVFrame *avframe;
+    bool cloned;
 } vaapi_dec_pic_context;
 
 static void vaapi_dec_pic_context_destroy(picture_context_t *context)
 {
     vaapi_dec_pic_context *pic_ctx = container_of(context, vaapi_dec_pic_context, ctx.s);
-    av_frame_free(&pic_ctx->avframe);
 
     struct vaapi_vctx *vaapi_vctx =
         vlc_video_context_GetPrivate(pic_ctx->ctx.s.vctx, VLC_VIDEO_CONTEXT_VAAPI);
-    vlc_cond_signal(&vaapi_vctx->wait);
+
+    assert(vaapi_vctx->pool_sem_init);
+
+    av_frame_free(&pic_ctx->avframe);
+
+    if (!pic_ctx->cloned)
+        vlc_sem_post(&vaapi_vctx->pool_sem);
 
     free(pic_ctx);
 }
@@ -158,6 +164,7 @@ static picture_context_t *vaapi_dec_pic_context_copy(picture_context_t *src)
         free(pic_ctx);
         return NULL;
     }
+    pic_ctx->cloned = true;
 
     vlc_video_context_Hold(pic_ctx->ctx.s.vctx);
     return &pic_ctx->ctx.s;
@@ -166,26 +173,42 @@ static picture_context_t *vaapi_dec_pic_context_copy(picture_context_t *src)
 static int Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx, AVFrame *frame)
 {
     vlc_video_context *vctx = va->sys;
+    AVHWFramesContext *hwframes = (AVHWFramesContext*)ctx->hw_frames_ctx->data;
     struct vaapi_vctx *vaapi_vctx =
         vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_VAAPI);
 
     assert(ctx->hw_frames_ctx);
 
-    int ret;
-    vlc_mutex_lock(&vaapi_vctx->lock);
-    while ((ret = av_hwframe_get_buffer(ctx->hw_frames_ctx, frame, 0)) == AVERROR(ENOMEM))
-        vlc_cond_wait(&vaapi_vctx->wait, &vaapi_vctx->lock);
-    vlc_mutex_unlock(&vaapi_vctx->lock);
+    /* The pool size can only be known after the hw context has been
+     * initialized (internally by ffmpeg), so between Create() and the first
+     * Get() */
+    if (!vaapi_vctx->pool_sem_init)
+    {
+        vlc_sem_init(&vaapi_vctx->pool_sem,
+                     hwframes->initial_pool_size +
+                     ctx->thread_count +
+                     3 /* cf. ff_decode_get_hw_frames_ctx */);
+        vaapi_vctx->pool_sem_init = true;
+    }
 
+    /* If all frames are out, wait for a frame to be released. */
+    vlc_sem_wait(&vaapi_vctx->pool_sem);
+
+    int ret = av_hwframe_get_buffer(ctx->hw_frames_ctx, frame, 0);
     if (ret)
     {
         msg_Err(va, "vaapi_va: av_hwframe_get_buffer failed: %d\n", ret);
+        vlc_sem_post(&vaapi_vctx->pool_sem);
         return ret;
     }
 
     vaapi_dec_pic_context *vaapi_pic_ctx = malloc(sizeof(*vaapi_pic_ctx));
     if (unlikely(vaapi_pic_ctx == NULL))
+    {
+        vlc_sem_post(&vaapi_vctx->pool_sem);
         return VLC_ENOMEM;
+    }
+
     vaapi_pic_ctx->ctx.s = (picture_context_t) {
         vaapi_dec_pic_context_destroy, vaapi_dec_pic_context_copy, vctx,
     };
@@ -193,6 +216,7 @@ static int Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx, AVFrame *frame
     vaapi_pic_ctx->ctx.surface = (uintptr_t) frame->data[3];
     vaapi_pic_ctx->ctx.va_dpy = vaapi_vctx->va_dpy;
     vaapi_pic_ctx->avframe = av_frame_clone(frame);
+    vaapi_pic_ctx->cloned = false;
     vlc_vaapi_PicSetContext(pic, &vaapi_pic_ctx->ctx);
 
     return VLC_SUCCESS;
@@ -257,8 +281,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt,
 
     vaapi_vctx->va_dpy = va_dpy;
     vaapi_vctx->hwdev_ref = hwdev_ref;
-    vlc_mutex_init(&vaapi_vctx->lock);
-    vlc_cond_init(&vaapi_vctx->wait);
+    vaapi_vctx->pool_sem_init = false;
 
     msg_Info(va, "Using %s", vaQueryVendorString(va_dpy));
 
