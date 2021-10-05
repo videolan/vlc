@@ -80,8 +80,6 @@ static int Open( vlc_object_t *p_this )
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         free( p_sys );
-        p_intf->p_sys = NULL;
-
         return VLC_ENOMEM;
     }
 
@@ -93,8 +91,6 @@ static int Open( vlc_object_t *p_this )
         vlc_mutex_unlock( &p_sys->lock );
         vlc_join( p_sys->thread, NULL );
         free( p_sys );
-        p_intf->p_sys = NULL;
-
         return VLC_ENOMEM;
     }
     vlc_mutex_unlock( &p_sys->lock );
