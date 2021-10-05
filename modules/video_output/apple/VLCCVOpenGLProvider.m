@@ -408,6 +408,7 @@ static void FreeCVBuffer(picture_t *picture)
 
     picture_t *output = _currentPicture;
     output->p_sys = NULL;
+    glFinish();
 
     picture_t *next_picture = picture_pool_Wait(_pool);
     struct vlc_cvbuffer *buffer = next_picture->p_sys;
