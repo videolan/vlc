@@ -3006,8 +3006,9 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     if( p_sys->cc_decoder == 708 )
         EsOutCreateCCChannels( out, VLC_CODEC_CEA708, status.cc.desc.i_708_channels,
                                _("DTVCC Closed captions %u"), es );
-    EsOutCreateCCChannels( out, VLC_CODEC_CEA608, status.cc.desc.i_608_channels,
-                           _("Closed captions %u"), es );
+    else
+        EsOutCreateCCChannels( out, VLC_CODEC_CEA608, status.cc.desc.i_608_channels,
+                               _("Closed captions %u"), es );
 
     vlc_mutex_unlock( &p_sys->lock );
 
