@@ -9,6 +9,9 @@ OPENGL_COMMONSOURCES = \
        video_output/opengl/gl_common.h \
        video_output/opengl/gl_util.c \
        video_output/opengl/gl_util.h \
+       video_output/opengl/importer.c \
+       video_output/opengl/importer.h \
+       video_output/opengl/importer_priv.h \
        video_output/opengl/interop.h \
        video_output/opengl/interop.c \
        video_output/opengl/interop_sw.c \
