@@ -51,13 +51,18 @@ vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop,
  * \param gl the OpenGL context
  * \param api the OpenGL API
  * \param fmt the input format
+ * \param tex_count the number of textures
+ * \param tex_widths the widths of textures
+ * \param tex_heights the heights of textures
  * \param expose_planes if set, vlc_texture() exposes a single plane at a time
  *                      (selected by vlc_gl_sampler_SetCurrentPlane())
  */
 struct vlc_gl_sampler *
 vlc_gl_sampler_NewFromTexture2D(struct vlc_gl_t *gl,
                                 const struct vlc_gl_api *api,
-                                const video_format_t *fmt, bool expose_planes);
+                                const video_format_t *fmt, unsigned tex_count,
+                                GLsizei tex_widths[], GLsizei tex_heights[],
+                                bool expose_planes);
 
 /**
  * Delete a sampler
@@ -88,12 +93,10 @@ vlc_gl_sampler_UpdatePicture(struct vlc_gl_sampler *sampler,
  *
  * \param sampler the sampler
  * \param textures the new textures, with target GL_TEXTURE_2D
- * \param tex_widths the textures width
- * \param tex_heights the textures height
  */
 int
-vlc_gl_sampler_UpdateTextures(struct vlc_gl_sampler *sampler, GLuint textures[],
-                              GLsizei tex_widths[], GLsizei tex_heights[]);
+vlc_gl_sampler_UpdateTextures(struct vlc_gl_sampler *sampler,
+                              GLuint textures[]);
 
 /**
  * Select the plane to expose

@@ -39,6 +39,12 @@ struct vlc_gl_filter_priv {
     /* Only meaningful for non-blend filters { */
     struct vlc_gl_sampler *sampler; /* owned */
 
+    /* Describe the output planes, independently of whether textures are
+     * created for this filter (the last filter does not own any textures). */
+    unsigned plane_count;
+    GLsizei plane_widths[PICTURE_PLANE_MAX];
+    GLsizei plane_heights[PICTURE_PLANE_MAX];
+
     /* owned (this filter must delete it) */
     GLuint framebuffers_out[PICTURE_PLANE_MAX];
 

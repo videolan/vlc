@@ -219,10 +219,10 @@ InitFramebuffersOut(struct vlc_gl_filter_priv *priv)
 
         for (unsigned i = 0; i < sampler->tex_count; ++i)
         {
-            priv->tex_widths[i] = priv->size_out.width * sampler->tex_widths[i]
-                                / sampler->tex_widths[0];
-            priv->tex_heights[i] = priv->size_out.height * sampler->tex_heights[i]
-                                 / sampler->tex_heights[0];
+            memcpy(priv->tex_widths, priv->plane_widths,
+                   priv->tex_count * sizeof(*priv->tex_widths));
+            memcpy(priv->tex_heights, priv->plane_heights,
+                   priv->tex_count * sizeof(*priv->tex_heights));
             /* Init one framebuffer and texture for each plane */
             int ret =
                 InitPlane(priv, i, priv->tex_widths[i], priv->tex_heights[i]);
@@ -308,7 +308,10 @@ GetSampler(struct vlc_gl_filter *filter)
         fmt.i_height = fmt.i_visible_height = prev_filter->size_out.height;
 
         sampler = vlc_gl_sampler_NewFromTexture2D(filters->gl, filters->api,
-                                                  &fmt, expose_planes);
+                                                  &fmt, prev_filter->plane_count,
+                                                  prev_filter->plane_widths,
+                                                  prev_filter->plane_heights,
+                                                  expose_planes);
     }
 
     priv->sampler = sampler;
@@ -413,6 +416,26 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
         {
             vlc_gl_filter_Delete(filter);
             return NULL;
+        }
+
+        if (filter->config.filter_planes)
+        {
+            priv->plane_count = sampler->tex_count;
+            for (unsigned i = 0; i < sampler->tex_count; ++i)
+            {
+                priv->plane_widths[i] = priv->size_out.width
+                                      * sampler->tex_widths[i]
+                                      / sampler->tex_widths[0];
+                priv->plane_heights[i] = priv->size_out.height
+                                       * sampler->tex_heights[i]
+                                       / sampler->tex_heights[0];
+            }
+        }
+        else
+        {
+            priv->plane_count = 1;
+            priv->plane_widths[0] = priv->size_out.width;
+            priv->plane_heights[0] = priv->size_out.height;
         }
 
         /* Append to the main filter list */
@@ -547,9 +570,7 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
         {
             /* Read from the output of the previous filter */
             int ret = vlc_gl_sampler_UpdateTextures(priv->sampler,
-                                                    previous->textures_out,
-                                                    previous->tex_widths,
-                                                    previous->tex_heights);
+                                                    previous->textures_out);
             if (ret != VLC_SUCCESS)
             {
                 msg_Err(filters->gl, "Could not update sampler texture");

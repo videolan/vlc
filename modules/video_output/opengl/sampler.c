@@ -838,7 +838,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         return VLC_EGENERIC;
 
     unsigned tex_count = desc->plane_count;
-    sampler->tex_count = tex_count;
+    assert(tex_count == sampler->tex_count);
 
     InitOrientationMatrix(priv->mtx_orientation, orientation);
 
@@ -1026,7 +1026,10 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 static struct vlc_gl_sampler *
 CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
               const struct vlc_gl_api *api, const video_format_t *fmt,
-              unsigned tex_target, bool expose_planes)
+              unsigned tex_target, unsigned tex_count,
+              GLsizei tex_widths[], GLsizei tex_heights[],
+              GLsizei visible_widths[], GLsizei visible_heights[],
+              bool expose_planes)
 {
     struct vlc_gl_sampler_priv *priv = calloc(1, sizeof(*priv));
     if (!priv)
@@ -1051,12 +1054,21 @@ CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
 
     /* Formats with palette are not supported. This also allows to copy
      * video_format_t without possibility of failure. */
-    assert(!sampler->fmt.p_palette);
+    assert(!fmt->p_palette);
 
     sampler->fmt = *fmt;
 
     sampler->shader.extensions = NULL;
     sampler->shader.body = NULL;
+
+    sampler->tex_count = tex_count;
+
+    memcpy(priv->tex_widths, tex_widths, tex_count * sizeof(*tex_widths));
+    memcpy(priv->tex_heights, tex_heights, tex_count * sizeof(*tex_heights));
+    memcpy(priv->visible_widths, visible_widths,
+           tex_count * sizeof(*visible_widths));
+    memcpy(priv->visible_heights, visible_heights,
+           tex_count * sizeof(*visible_heights));
 
     /* Expose the texture sizes publicly */
     sampler->tex_widths = priv->tex_widths;
@@ -1087,42 +1099,21 @@ CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
         return NULL;
     }
 
-    unsigned tex_count = sampler->tex_count;
     assert(!interop || interop->tex_count == tex_count);
 
     /* This might be updated in UpdatePicture for non-direct samplers */
     memcpy(&priv->mtx_coords_map, MATRIX2x3_IDENTITY,
            sizeof(MATRIX2x3_IDENTITY));
 
-    if (interop)
+    if (interop && !interop->handle_texs_gen)
     {
-        /* Texture size */
-        for (unsigned j = 0; j < interop->tex_count; j++) {
-            const GLsizei w = interop->fmt_out.i_visible_width  * interop->texs[j].w.num
-                            / interop->texs[j].w.den;
-            const GLsizei h = interop->fmt_out.i_visible_height * interop->texs[j].h.num
-                            / interop->texs[j].h.den;
-            priv->visible_widths[j] = w;
-            priv->visible_heights[j] = h;
-            if (interop->api->supports_npot) {
-                priv->tex_widths[j]  = w;
-                priv->tex_heights[j] = h;
-            } else {
-                priv->tex_widths[j]  = vlc_align_pot(w);
-                priv->tex_heights[j] = vlc_align_pot(h);
-            }
-        }
-
-        if (!interop->handle_texs_gen)
+        ret = vlc_gl_interop_GenerateTextures(interop, priv->tex_widths,
+                                              priv->tex_heights,
+                                              priv->textures);
+        if (ret != VLC_SUCCESS)
         {
-            ret = vlc_gl_interop_GenerateTextures(interop, priv->tex_widths,
-                                                  priv->tex_heights,
-                                                  priv->textures);
-            if (ret != VLC_SUCCESS)
-            {
-                free(sampler);
-                return NULL;
-            }
+            free(sampler);
+            return NULL;
         }
     }
 
@@ -1133,16 +1124,44 @@ struct vlc_gl_sampler *
 vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop,
                               bool expose_planes)
 {
+    GLsizei tex_widths[PICTURE_PLANE_MAX];
+    GLsizei tex_heights[PICTURE_PLANE_MAX];
+    GLsizei visible_widths[PICTURE_PLANE_MAX];
+    GLsizei visible_heights[PICTURE_PLANE_MAX];
+
+    /* Texture size */
+    for (unsigned j = 0; j < interop->tex_count; j++) {
+        GLsizei w = interop->fmt_out.i_visible_width  * interop->texs[j].w.num
+                  / interop->texs[j].w.den;
+        GLsizei h = interop->fmt_out.i_visible_height * interop->texs[j].h.num
+                  / interop->texs[j].h.den;
+        visible_widths[j] = w;
+        visible_heights[j] = h;
+        if (interop->api->supports_npot) {
+            tex_widths[j]  = w;
+            tex_heights[j] = h;
+        } else {
+            tex_widths[j]  = vlc_align_pot(w);
+            tex_heights[j] = vlc_align_pot(h);
+        }
+    }
+
     return CreateSampler(interop, interop->gl, interop->api, &interop->fmt_out,
-                         interop->tex_target, expose_planes);
+                         interop->tex_target, interop->tex_count, tex_widths,
+                         tex_heights, visible_widths, visible_heights,
+                         expose_planes);
 }
 
 struct vlc_gl_sampler *
 vlc_gl_sampler_NewFromTexture2D(struct vlc_gl_t *gl,
                                 const struct vlc_gl_api *api,
-                                const video_format_t *fmt, bool expose_planes)
+                                const video_format_t *fmt, unsigned tex_count,
+                                GLsizei tex_widths[], GLsizei tex_heights[],
+                                bool expose_planes)
 {
-    return CreateSampler(NULL, gl, api, fmt, GL_TEXTURE_2D, expose_planes);
+    return CreateSampler(NULL, gl, api, fmt, GL_TEXTURE_2D, tex_count,
+                         tex_widths, tex_heights, tex_widths, tex_heights,
+                         expose_planes);
 }
 
 void
@@ -1325,8 +1344,7 @@ vlc_gl_sampler_UpdatePicture(struct vlc_gl_sampler *sampler, picture_t *picture)
 }
 
 int
-vlc_gl_sampler_UpdateTextures(struct vlc_gl_sampler *sampler, GLuint textures[],
-                              GLsizei tex_widths[], GLsizei tex_heights[])
+vlc_gl_sampler_UpdateTextures(struct vlc_gl_sampler *sampler, GLuint textures[])
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
     assert(!priv->interop);
@@ -1344,8 +1362,6 @@ vlc_gl_sampler_UpdateTextures(struct vlc_gl_sampler *sampler, GLuint textures[],
 
     unsigned tex_count = sampler->tex_count;
     memcpy(priv->textures, textures, tex_count * sizeof(textures[0]));
-    memcpy(priv->tex_widths, tex_widths, tex_count * sizeof(tex_widths[0]));
-    memcpy(priv->tex_heights, tex_heights, tex_count * sizeof(tex_heights[0]));
 
     return VLC_SUCCESS;
 }

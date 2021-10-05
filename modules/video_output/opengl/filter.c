@@ -45,6 +45,7 @@ vlc_gl_filter_New(vlc_object_t *parent, const struct vlc_gl_api *api)
     priv->size_out.width = 0;
     priv->size_out.height = 0;
 
+    priv->plane_count = 0;
     priv->tex_count = 0;
 
     struct vlc_gl_filter *filter = &priv->filter;
