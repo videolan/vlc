@@ -39,7 +39,6 @@ QtObject {
     // When trying to force night/dark theme colors for items,
     // this can be used:
     readonly property VLCColors nightColors: VLCColors { state: "night" }
-    readonly property VLCColors dayColors: VLCColors { state: "day" }
 
     // Sizes
     readonly property double margin_xxxsmall: dp(2, scale);

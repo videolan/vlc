@@ -44,8 +44,10 @@ FocusScope {
     readonly property string coverSource: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
                                           ? mainPlaylistController.currentItem.artwork
                                           : VLCStyle.noArtCover
-    readonly property VLCColors colors: (mainInterface.hasEmbededVideo || (coverLuminance.luminance < 140))
-                                        ? VLCStyle.nightColors : VLCStyle.dayColors
+
+    // NOTE: We force the night theme when playing a video.
+    readonly property VLCColors colors: (mainInterface.hasEmbededVideo) ? VLCStyle.nightColors
+                                                                        : VLCStyle.colors
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: {
@@ -103,13 +105,6 @@ FocusScope {
             }
             history.previous()
         }
-    }
-
-    ImageLuminanceExtractor {
-        id: coverLuminance
-
-        enabled: !rootPlayer.hasEmbededVideo
-        source: rootPlayer.coverSource
     }
 
     VideoSurface {
