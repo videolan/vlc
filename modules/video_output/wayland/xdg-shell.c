@@ -96,7 +96,7 @@ typedef struct
             unsigned height;
             bool fullscreen;
         } latch;
-        bool configured;
+        vlc_sem_t configured;
     } wm;
 
     struct output_list *outputs;
@@ -106,7 +106,6 @@ typedef struct
     struct wl_surface *cursor_surface;
 
     vlc_mutex_t lock;
-    vlc_cond_t cond_configured;
     vlc_thread_t thread;
 } vout_window_sys_t;
 
@@ -276,14 +275,9 @@ static int Enable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
     vout_window_SetSize(wnd, cfg->width, cfg->height);
     wl_surface_commit(wnd->handle.wl);
     wl_display_flush(display);
-
 #ifdef XDG_SHELL
-    vlc_mutex_lock(&sys->lock);
-    while (!sys->wm.configured)
-        vlc_cond_wait(&sys->cond_configured, &sys->lock);
-    vlc_mutex_unlock(&sys->lock);
+    vlc_sem_wait(&sys->wm.configured);
 #endif
-
     return VLC_SUCCESS;
 }
 
@@ -356,10 +350,7 @@ static void xdg_surface_configure_cb(void *data, struct xdg_surface *surface,
     ReportSize(wnd, &serial);
     vlc_mutex_unlock(&sys->lock);
 
-    vlc_mutex_lock(&sys->lock);
-    sys->wm.configured = true;
-    vlc_cond_signal(&sys->cond_configured);
-    vlc_mutex_unlock(&sys->lock);
+    vlc_sem_post(&sys->wm.configured);
     (void) surface;
 }
 
@@ -630,7 +621,6 @@ static int Open(vout_window_t *wnd)
     sys->wm.latch.width = 0;
     sys->wm.latch.height = 0;
     sys->wm.latch.fullscreen = false;
-    sys->wm.configured = false;
     sys->set.width = 0;
     sys->set.height = 0;
     sys->outputs = output_list_create(wnd);
@@ -638,7 +628,7 @@ static int Open(vout_window_t *wnd)
     sys->cursor_theme = NULL;
     sys->cursor_surface = NULL;
     vlc_mutex_init(&sys->lock);
-    vlc_cond_init(&sys->cond_configured);
+    vlc_sem_init(&sys->wm.configured, 0);
     wnd->sys = sys;
     wnd->handle.wl = NULL;
 
