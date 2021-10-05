@@ -67,7 +67,7 @@ struct intf_sys_t
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    intf_sys_t *p_sys = malloc( sizeof (intf_sys_t) );
+    intf_sys_t *p_sys = vlc_obj_malloc( p_this, sizeof (intf_sys_t) );
 
     if( p_sys == NULL )
         return VLC_ENOMEM;
@@ -78,10 +78,7 @@ static int Open( vlc_object_t *p_this )
     vlc_cond_init( &p_sys->wait );
 
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
-    {
-        free( p_sys );
         return VLC_ENOMEM;
-    }
 
     vlc_mutex_lock( &p_sys->lock );
     while( p_sys->hotkeyWindow == NULL )
@@ -90,7 +87,6 @@ static int Open( vlc_object_t *p_this )
     {
         vlc_mutex_unlock( &p_sys->lock );
         vlc_join( p_sys->thread, NULL );
-        free( p_sys );
         return VLC_ENOMEM;
     }
     vlc_mutex_unlock( &p_sys->lock );
@@ -113,7 +109,6 @@ static void Close( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_sys->lock );
 
     vlc_join( p_sys->thread, NULL );
-    free( p_sys );
 }
 
 /*****************************************************************************
