@@ -653,63 +653,6 @@ VLC_API void *vlc_threadvar_get(vlc_threadvar_t);
 /** @} */
 
 /**
- * Waits on an address.
- *
- * Puts the calling thread to sleep if a specific unsigned 32-bits value is
- * stored at a specified address. The thread will sleep until it is woken up by
- * a call to vlc_atomic_notify_one() or vlc_atomic_notify_all() in another
- * thread, or spuriously.
- *
- * If the value does not match, do nothing and return immediately.
- *
- * \param addr address to check for
- * \param val value to match at the address
- */
-void vlc_atomic_wait(void *addr, unsigned val);
-
-/**
- * Waits on an address with a time-out.
- *
- * This function operates as vlc_atomic_wait() but provides an additional
- * time-out. If the deadline is reached, the thread resumes and the function
- * returns.
- *
- * \param addr address to check for
- * \param val value to match at the address
- * \param deadline deadline to wait until
- *
- * \retval 0 the function was woken up before the time-out
- * \retval ETIMEDOUT the deadline was reached
- */
-int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline);
-
-int vlc_atomic_timedwait_daytime(void *addr, unsigned val, time_t deadline);
-
-/**
- * Wakes up one thread on an address.
- *
- * Wakes up (at least) one of the thread sleeping on the specified address.
- * The address must be equal to the first parameter given by at least one
- * thread sleeping within the vlc_atomic_wait() or vlc_atomic_timedwait()
- * functions. If no threads are found, this function does nothing.
- *
- * \param addr address identifying which threads may be woken up
- */
-void vlc_atomic_notify_one(void *addr);
-
-/**
- * Wakes up all thread on an address.
- *
- * Wakes up all threads sleeping on the specified address (if any).
- * Any thread sleeping within a call to vlc_atomic_wait() or
- * vlc_atomic_timedwait() with the specified address as first call parameter
- * will be woken up.
- *
- * \param addr address identifying which threads to wake up
- */
-void vlc_atomic_notify_all(void *addr);
-
-/**
  * Creates and starts a new thread.
  *
  * The thread must be <i>joined</i> with vlc_join() to reclaim resources

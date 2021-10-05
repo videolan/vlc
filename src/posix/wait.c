@@ -32,6 +32,8 @@
 #include <sys/types.h>
 #include <pthread.h>
 
+#include <vlc_atomic.h>
+
 static clockid_t vlc_clock_id = CLOCK_REALTIME;
 
 #define WAIT_BUCKET_INIT \

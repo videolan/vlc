@@ -54,6 +54,8 @@
 
 #include <sys/stat.h>
 
+#include <vlc_atomic.h>
+
 /* Static mutex and condition variable */
 static vlc_mutex_t super_mutex;
 static vlc_cond_t  super_variable;

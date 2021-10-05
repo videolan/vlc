@@ -43,6 +43,8 @@
 #include <pthread.h>
 #include <sched.h>
 
+#include <vlc_atomic.h>
+
 /* debug */
 
 #ifndef NDEBUG

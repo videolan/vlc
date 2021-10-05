@@ -43,6 +43,7 @@
 #ifndef VLC_WINSTORE_APP
 #include <mmsystem.h>
 #endif
+#include <vlc_atomic.h>
 
 /*** Static mutex and condition variable ***/
 static CRITICAL_SECTION super_mutex;
