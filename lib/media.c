@@ -26,6 +26,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_picture.h>
@@ -433,11 +434,9 @@ static void input_item_preparse_ended(input_item_t *item,
     }
     send_parsed_changed( p_md, new_status );
 
-    vlc_mutex_lock(&p_md->parsed_lock);
-    assert(p_md->worker_count > 0);
-    p_md->worker_count--;
-    vlc_cond_signal(&p_md->idle_cond);
-    vlc_mutex_unlock(&p_md->parsed_lock);
+    if (atomic_fetch_sub_explicit(&p_md->worker_count, 1,
+                                  memory_order_release) == 1)
+        vlc_atomic_notify_one(&p_md->worker_count);
 }
 
 /**
@@ -512,9 +511,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     vlc_cond_init(&p_md->parsed_cond);
     vlc_mutex_init(&p_md->parsed_lock);
     vlc_mutex_init(&p_md->subitems_lock);
-
-    vlc_cond_init(&p_md->idle_cond);
-    p_md->worker_count = 0;
+    atomic_init(&p_md->worker_count, 0);
 
     p_md->state = libvlc_NothingSpecial;
 
@@ -649,6 +646,8 @@ void libvlc_media_add_option_flag( libvlc_media_t * p_md,
 // Delete a media descriptor object
 void libvlc_media_release( libvlc_media_t *p_md )
 {
+    unsigned int ref;
+
     if (!p_md)
         return;
 
@@ -661,10 +660,9 @@ void libvlc_media_release( libvlc_media_t *p_md )
     libvlc_MetadataCancel( p_md->p_libvlc_instance->p_libvlc_int, p_md );
 
     /* Wait for all async tasks to stop. */
-    vlc_mutex_lock( &p_md->parsed_lock );
-    while( p_md->worker_count > 0 )
-        vlc_cond_wait( &p_md->idle_cond, &p_md->parsed_lock );
-    vlc_mutex_unlock( &p_md->parsed_lock );
+    while ((ref = atomic_load_explicit(&p_md->worker_count,
+                                       memory_order_acquire)) > 0)
+        vlc_atomic_wait(&p_md->worker_count, ref);
 
     if( p_md->p_subitems )
         libvlc_media_list_release( p_md->p_subitems );
@@ -866,6 +864,17 @@ static int media_parse(libvlc_media_t *media, bool b_async,
         input_item_t *item = media->p_input_item;
         input_item_meta_request_option_t parse_scope = META_REQUEST_OPTION_SCOPE_LOCAL;
         int ret;
+        unsigned int ref = atomic_load_explicit(&media->worker_count,
+                                                memory_order_relaxed);
+        do
+        {
+            if (unlikely(ref == UINT_MAX))
+                return -EOVERFLOW;
+        }
+        while (!atomic_compare_exchange_weak_explicit(&media->worker_count,
+                                                      &ref, ref + 1,
+                                                      memory_order_relaxed,
+                                                      memory_order_relaxed));
 
         if (parse_flag & libvlc_media_parse_network)
             parse_scope |= META_REQUEST_OPTION_SCOPE_NETWORK;
@@ -876,22 +885,13 @@ static int media_parse(libvlc_media_t *media, bool b_async,
         if (parse_flag & libvlc_media_do_interact)
             parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
 
-        /* Note: we cannot keep parsed_lock when calling libvlc_MetadataRequest
-         * because it might also be used to submit the state synchronously
-         * which would result in recursive lock. */
-        vlc_mutex_lock(&media->parsed_lock);
-        media->worker_count++;
-        vlc_mutex_unlock(&media->parsed_lock);
-
         ret = libvlc_MetadataRequest(libvlc, item, parse_scope,
                                      &input_preparser_callbacks, media,
                                      timeout, media);
         if (ret != VLC_SUCCESS)
         {
-            vlc_mutex_lock(&media->parsed_lock);
-            assert(media->worker_count > 0);
-            media->worker_count--;
-            vlc_mutex_unlock(&media->parsed_lock);
+            atomic_fetch_sub_explicit(&media->worker_count, 1,
+                                      memory_order_relaxed);
             return ret;
         }
     }
