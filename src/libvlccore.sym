@@ -501,6 +501,10 @@ vlc_clone
 VLC_CompileBy
 VLC_CompileHost
 VLC_Compiler
+vlc_atomic_wait
+vlc_atomic_timedwait
+vlc_atomic_notify_one
+vlc_atomic_notify_all
 vlc_cond_broadcast
 vlc_cond_init
 vlc_cond_signal

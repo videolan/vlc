@@ -86,7 +86,7 @@ static inline uintptr_t vlc_atomic_rc_get(const vlc_atomic_rc_t* rc)
  * \param addr address to check for
  * \param val value to match at the address
  */
-void vlc_atomic_wait(void *addr, unsigned val);
+VLC_API void vlc_atomic_wait(void *addr, unsigned val);
 
 /**
  * Waits on an address with a time-out.
@@ -102,6 +102,7 @@ void vlc_atomic_wait(void *addr, unsigned val);
  * \retval 0 the function was woken up before the time-out
  * \retval ETIMEDOUT the deadline was reached
  */
+VLC_API
 int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline);
 
 int vlc_atomic_timedwait_daytime(void *addr, unsigned val, time_t deadline);
@@ -116,7 +117,7 @@ int vlc_atomic_timedwait_daytime(void *addr, unsigned val, time_t deadline);
  *
  * \param addr address identifying which threads may be woken up
  */
-void vlc_atomic_notify_one(void *addr);
+VLC_API void vlc_atomic_notify_one(void *addr);
 
 /**
  * Wakes up all thread on an address.
@@ -128,6 +129,6 @@ void vlc_atomic_notify_one(void *addr);
  *
  * \param addr address identifying which threads to wake up
  */
-void vlc_atomic_notify_all(void *addr);
+VLC_API void vlc_atomic_notify_all(void *addr);
 
 #endif
