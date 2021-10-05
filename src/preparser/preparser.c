@@ -55,12 +55,9 @@ struct task
 
     input_item_parser_id_t *parser;
 
-    vlc_mutex_t lock;
-    vlc_cond_t cond_ended;
-    bool preparse_ended;
-    int preparse_status;
-    bool fetch_ended;
-
+    vlc_sem_t preparse_ended;
+    vlc_sem_t fetch_ended;
+    atomic_int preparse_status;
     atomic_bool interrupted;
 
     struct vlc_runnable runnable; /**< to be passed to the executor */
@@ -93,12 +90,9 @@ TaskNew(input_preparser_t *preparser, input_item_t *item,
     input_item_Hold(item);
 
     task->parser = NULL;
-    vlc_mutex_init(&task->lock);
-    vlc_cond_init(&task->cond_ended);
-    task->preparse_ended = false;
-    task->preparse_status = ITEM_PREPARSE_SKIPPED;
-    task->fetch_ended = false;
-
+    vlc_sem_init(&task->preparse_ended, 0);
+    vlc_sem_init(&task->fetch_ended, 0);
+    atomic_init(&task->preparse_status, ITEM_PREPARSE_SKIPPED);
     atomic_init(&task->interrupted, false);
 
     task->runnable.run = RunnableRun;
@@ -133,9 +127,11 @@ PreparserRemoveTask(input_preparser_t *preparser, struct task *task)
 static void
 NotifyPreparseEnded(struct task *task)
 {
-    if (task->cbs && task->cbs->on_preparse_ended)
-        task->cbs->on_preparse_ended(task->item, task->preparse_status,
-                                     task->userdata);
+    if (task->cbs && task->cbs->on_preparse_ended) {
+        int status = atomic_load_explicit(&task->preparse_status,
+                                          memory_order_relaxed);
+        task->cbs->on_preparse_ended(task->item, status, task->userdata);
+    }
 }
 
 static void
@@ -151,14 +147,11 @@ OnParserEnded(input_item_t *item, int status, void *task_)
          */
         return;
 
-    vlc_mutex_lock(&task->lock);
-    assert(!task->preparse_ended);
-    task->preparse_status = status == VLC_SUCCESS ? ITEM_PREPARSE_DONE
-                                                  : ITEM_PREPARSE_FAILED;
-    task->preparse_ended = true;
-    vlc_mutex_unlock(&task->lock);
-
-    vlc_cond_signal(&task->cond_ended);
+    atomic_store_explicit(&task->preparse_status,
+                          status == VLC_SUCCESS ? ITEM_PREPARSE_DONE
+                                                : ITEM_PREPARSE_FAILED,
+                          memory_order_relaxed);
+    vlc_sem_post(&task->preparse_ended);
 }
 
 static void
@@ -180,12 +173,7 @@ OnArtFetchEnded(input_item_t *item, bool fetched, void *userdata)
 
     struct task *task = userdata;
 
-    vlc_mutex_lock(&task->lock);
-    assert(!task->fetch_ended);
-    task->fetch_ended = true;
-    vlc_mutex_unlock(&task->lock);
-
-    vlc_cond_signal(&task->cond_ended);
+    vlc_sem_post(&task->fetch_ended);
 }
 
 static const input_fetcher_callbacks_t input_fetcher_callbacks = {
@@ -204,31 +192,21 @@ Parse(struct task *task, vlc_tick_t deadline)
     task->parser = input_item_Parse(task->item, obj, &cbs, task);
     if (!task->parser)
     {
-        task->preparse_status = ITEM_PREPARSE_FAILED;
+        atomic_store_explicit(&task->preparse_status, ITEM_PREPARSE_FAILED,
+                              memory_order_relaxed);
         return;
     }
 
     /* Wait until the end of parsing */
-    vlc_mutex_lock(&task->lock);
     if (deadline == VLC_TICK_INVALID)
-    {
-        while (!task->preparse_ended)
-            vlc_cond_wait(&task->cond_ended, &task->lock);
-    }
+        vlc_sem_wait(&task->preparse_ended);
     else
-    {
-        bool timeout = false;
-        while (!task->preparse_ended && !timeout)
-            timeout =
-                vlc_cond_timedwait(&task->cond_ended, &task->lock, deadline);
-
-        if (timeout)
+        if (vlc_sem_timedwait(&task->preparse_ended, deadline))
         {
-            task->preparse_status = ITEM_PREPARSE_TIMEOUT;
+            atomic_store_explicit(&task->preparse_status,
+                                  ITEM_PREPARSE_TIMEOUT, memory_order_relaxed);
             atomic_store(&task->interrupted, true);
         }
-    }
-    vlc_mutex_unlock(&task->lock);
 
     /* This call also interrupts the parsing if it is still running */
     input_item_parser_id_Release(task->parser);
@@ -249,10 +227,7 @@ Fetch(struct task *task)
         return;
 
     /* Wait until the end of fetching (fetching is not interruptible) */
-    vlc_mutex_lock(&task->lock);
-    while (!task->fetch_ended)
-        vlc_cond_wait(&task->cond_ended, &task->lock);
-    vlc_mutex_unlock(&task->lock);
+    vlc_sem_wait(&task->fetch_ended);
 }
 
 static void
@@ -291,11 +266,9 @@ Interrupt(struct task *task)
     atomic_store(&task->interrupted, true);
 
     /* Wake up the preparser cond_wait */
-    vlc_mutex_lock(&task->lock);
-    task->preparse_status = ITEM_PREPARSE_TIMEOUT;
-    task->preparse_ended = true;
-    vlc_mutex_unlock(&task->lock);
-    vlc_cond_signal(&task->cond_ended);
+    atomic_store_explicit(&task->preparse_status, ITEM_PREPARSE_TIMEOUT,
+                          memory_order_relaxed);
+    vlc_sem_post(&task->preparse_ended);
 }
 
 input_preparser_t* input_preparser_New( vlc_object_t *parent )
