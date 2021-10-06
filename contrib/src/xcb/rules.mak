@@ -1,7 +1,7 @@
 # X protocol C language Bindings
 
-XCB_VERSION := 1.12
-XCB_URL := http://xcb.freedesktop.org/dist/libxcb-$(XCB_VERSION).tar.bz2
+XCB_VERSION := 1.14
+XCB_URL := http://xorg.freedesktop.org/archive/individual/lib/libxcb-$(XCB_VERSION).tar.gz
 
 ifdef HAVE_LINUX
 ifndef HAVE_ANDROID
@@ -14,12 +14,12 @@ ifeq ($(call need_pkg,"xcb >= 1.6 xcb-shm xcb-composite xcb-xv >= 1.1.90.1"),)
 PKGS_FOUND += xcb
 endif
 
-$(TARBALLS)/libxcb-$(XCB_VERSION).tar.bz2:
+$(TARBALLS)/libxcb-$(XCB_VERSION).tar.gz:
 	$(call download_pkg,$(XCB_URL),xcb)
 
-.sum-xcb: libxcb-$(XCB_VERSION).tar.bz2
+.sum-xcb: libxcb-$(XCB_VERSION).tar.gz
 
-libxcb: libxcb-$(XCB_VERSION).tar.bz2 .sum-xcb
+libxcb: libxcb-$(XCB_VERSION).tar.gz .sum-xcb
 	$(UNPACK)
 	$(call pkg_static,"xcb.pc.in")
 	$(MOVE)
