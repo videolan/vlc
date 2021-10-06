@@ -17,45 +17,64 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+
 import "qrc:///style/"
 
 Rectangle {
     id: root
 
+    // Properties
+
+    property bool showGradient: true
+
+    // Aliases
+
     property alias iconSize: icon.width
-    property bool onlyBorders: false
+
+    // Signals
+
     signal iconClicked()
 
-    border.color: VLCStyle.colors.accent
-    border.width: VLCStyle.table_cover_border
+    // Settings
 
-    opacity: visible ? 1 : 0
-    gradient: !onlyBorders ? background : undefined
-    color: 'transparent'
+    opacity: (visible)
+
+    color: (showGradient) ? undefined : "transparent"
+
+    gradient: (showGradient) ? background : undefined
+
+    // Animations
 
     Behavior on opacity {
         NumberAnimation { duration: VLCStyle.duration_fast; easing.type: Easing.OutQuad }
+    }
+
+    // Children
+
+    Gradient {
+        id: background
+
+        GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.5) }
+        GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.7) }
     }
 
     Image {
         id: icon
 
         anchors.centerIn: parent
-        fillMode: Image.PreserveAspectFit
+
+        visible: showGradient
+
         source: "qrc:/play_button.svg"
-        visible: !root.onlyBorders
-        mipmap: width < VLCStyle.icon_normal
+
+        fillMode: Image.PreserveAspectFit
+
+        mipmap: (width < VLCStyle.icon_normal)
 
         MouseArea {
             anchors.fill: parent
-            onClicked: root.iconClicked()
+
+            onClicked: iconClicked()
         }
-    }
-
-    Gradient {
-        id: background
-
-        GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, .5) }
-        GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, .7) }
     }
 }

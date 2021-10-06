@@ -31,7 +31,7 @@ Rectangle {
 
     // Properties
 
-    property bool playCoverOnlyBorders: false
+    property bool playCoverShowGradient: true
 
     property real playIconSize: VLCStyle.play_cover_normal
 
@@ -80,12 +80,11 @@ Rectangle {
         visible: false
         active: false
         sourceComponent: Widgets.PlayCover {
-            onlyBorders: root.playCoverOnlyBorders
-            iconSize: root.playIconSize
-            border.width: root.playCoverBorderWidth
+            showGradient: playCoverShowGradient
+            iconSize: playIconSize
             radius: root.radius
 
-            onIconClicked: root.playIconClicked()
+            onIconClicked: playIconClicked()
         }
 
         onVisibleChanged: {

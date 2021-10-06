@@ -63,9 +63,12 @@ Item {
             anchors.fill: parent
             iconSize: VLCStyle.play_cover_small
             visible: currentlyFocused || containsMouse
+
             onIconClicked: playClicked(item.index)
-            onlyBorders: rowModel.type === NetworkMediaModel.TYPE_NODE
-                         || rowModel.type === NetworkMediaModel.TYPE_DIRECTORY
+
+            showGradient: (rowModel.type !== NetworkMediaModel.TYPE_NODE
+                           &&
+                           rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY)
         }
     }
 
@@ -89,9 +92,12 @@ Item {
             height: artwork.paintedHeight
             iconSize: VLCStyle.play_cover_small
             visible: currentlyFocused || containsMouse
+
             onIconClicked: playClicked(item.index)
-            onlyBorders: rowModel.type === NetworkMediaModel.TYPE_NODE
-                         || rowModel.type === NetworkMediaModel.TYPE_DIRECTORY
+
+            showGradient: (rowModel.type !== NetworkMediaModel.TYPE_NODE
+                           &&
+                           rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY)
         }
     }
 }

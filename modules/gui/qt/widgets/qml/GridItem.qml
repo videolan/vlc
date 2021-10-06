@@ -52,7 +52,7 @@ Control {
     property alias title: titleLabel.text
     property alias subtitle: subtitleTxt.text
     property alias playCoverBorderWidth: picture.playCoverBorderWidth
-    property alias playCoverOnlyBorders: picture.playCoverOnlyBorders
+    property alias playCoverShowGradient: picture.playCoverShowGradient
     property alias playIconSize: picture.playIconSize
     property alias pictureRadius: picture.radius
     property alias pictureOverlay: picture.imageOverlay
