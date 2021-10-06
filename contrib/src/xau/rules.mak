@@ -1,4 +1,4 @@
-XAU_VERSION := 1.0.6
+XAU_VERSION := 1.0.9
 
 XAU_URL := http://xorg.freedesktop.org/releases/individual/lib/libXau-$(XAU_VERSION).tar.bz2
 
