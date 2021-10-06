@@ -45,7 +45,7 @@
 #endif
 
 /*** Static mutex and condition variable ***/
-static SRWLOCK super_mutex = SRWLOCK_INIT;
+static SRWLOCK super_lock = SRWLOCK_INIT;
 
 #define IS_INTERRUPTIBLE (!VLC_WINSTORE_APP || _WIN32_WINNT >= 0x0A00)
 
@@ -95,13 +95,13 @@ int vlc_threadvar_create (vlc_threadvar_t *p_tls, void (*destr) (void *))
     var->next = NULL;
     *p_tls = var;
 
-    AcquireSRWLockExclusive(&super_mutex);
+    AcquireSRWLockExclusive(&super_lock);
     var->prev = vlc_threadvar_last;
     if (var->prev)
         var->prev->next = var;
 
     vlc_threadvar_last = var;
-    ReleaseSRWLockExclusive(&super_mutex);
+    ReleaseSRWLockExclusive(&super_lock);
     return 0;
 }
 
@@ -109,7 +109,7 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 {
     struct vlc_threadvar *var = *p_tls;
 
-    AcquireSRWLockExclusive(&super_mutex);
+    AcquireSRWLockExclusive(&super_lock);
     if (var->prev != NULL)
         var->prev->next = var->next;
 
@@ -118,7 +118,7 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
     else
         vlc_threadvar_last = var->prev;
 
-    ReleaseSRWLockExclusive(&super_mutex);
+    ReleaseSRWLockExclusive(&super_lock);
 
     TlsFree (var->id);
     free (var);
@@ -149,19 +149,19 @@ static void vlc_threadvars_cleanup(void)
     vlc_threadvar_t key;
 retry:
     /* TODO: use RW lock or something similar */
-    AcquireSRWLockExclusive(&super_mutex);
+    AcquireSRWLockExclusive(&super_lock);
     for (key = vlc_threadvar_last; key != NULL; key = key->prev)
     {
         void *value = vlc_threadvar_get(key);
         if (value != NULL && key->destroy != NULL)
         {
-            ReleaseSRWLockExclusive(&super_mutex);
+            ReleaseSRWLockExclusive(&super_lock);
             vlc_threadvar_set(key, NULL);
             key->destroy(value);
             goto retry;
         }
     }
-    ReleaseSRWLockExclusive(&super_mutex);
+    ReleaseSRWLockExclusive(&super_lock);
 }
 
 /*** Futeces^WAddress waits ***/
