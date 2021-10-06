@@ -72,6 +72,21 @@ static const struct {
       AU_DEV_ENCODED }, /* This can also be forced with the --spdif option */
 };
 
+#if ((__IPHONE_OS_VERSION_MAX_ALLOWED && __IPHONE_OS_VERSION_MAX_ALLOWED < 150000) || (__TV_OS_MAX_VERSION_ALLOWED && __TV_OS_MAX_VERSION_ALLOWED < 150000))
+
+extern NSString *const AVAudioSessionSpatialAudioEnabledKey = @"AVAudioSessionSpatializationEnabledKey";
+extern NSString *const AVAudioSessionSpatialPlaybackCapabilitiesChangedNotification = @"AVAudioSessionSpatialPlaybackCapabilitiesChangedNotification";
+
+@interface AVAudioSession (iOS15RoutingConfiguration)
+- (BOOL)setSupportsMultichannelContent:(BOOL)inValue error:(NSError **)outError;
+@end
+
+@interface AVAudioSessionPortDescription (iOS15RoutingConfiguration)
+@property (readonly, getter=isSpatialAudioEnabled) BOOL spatialAudioEnabled;
+@end
+
+#endif
+
 @interface SessionManager : NSObject
 {
     NSMutableSet *_registeredInstances;
@@ -136,6 +151,7 @@ struct aout_sys_t
     bool      b_muted;
     bool      b_stopped;
     bool      b_preferred_channels_set;
+    bool      b_spatial_audio_supported;
     enum au_dev au_dev;
 
     /* sw gain */
@@ -203,6 +219,23 @@ enum port_type
     } else if (interruptionType == AVAudioSessionInterruptionTypeEnded
                && [userInfo[AVAudioSessionInterruptionOptionKey] unsignedIntegerValue] == AVAudioSessionInterruptionOptionShouldResume) {
         ca_SetAliveState(p_aout, true);
+    }
+}
+
+- (void)handleSpatialCapabilityChange:(NSNotification *)notification
+{
+    if (@available(iOS 15.0, tvOS 15.0, *)) {
+        audio_output_t *p_aout = [self aout];
+        struct aout_sys_t *p_sys = p_aout->sys;
+        NSDictionary *userInfo = notification.userInfo;
+        BOOL spatialAudioEnabled =
+            [[userInfo valueForKey:AVAudioSessionSpatialAudioEnabledKey] boolValue];
+
+        msg_Dbg(p_aout, "Spatial Audio availability changed: %i", spatialAudioEnabled);
+
+        if (spatialAudioEnabled) {
+            aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+        }
     }
 }
 @end
@@ -274,6 +307,10 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum port_type *pport_type,
         else
             port_type = PORT_TYPE_DEFAULT;
 
+        if (@available(iOS 15.0, tvOS 15.0, *)) {
+            p_sys->b_spatial_audio_supported = out.spatialAudioEnabled;
+        }
+
         NSArray<AVAudioSessionChannelDescription *> *chans = [out channels];
 
         if (chans.count > last_channel_count || port_type == PORT_TYPE_HDMI)
@@ -325,11 +362,11 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum port_type *pport_type,
             break;
     }
 
-    msg_Dbg(p_aout, "Output on %s, channel count: %u",
+    msg_Dbg(p_aout, "Output on %s, channel count: %u, spatialAudioEnabled %i",
             *pport_type == PORT_TYPE_HDMI ? "HDMI" :
             *pport_type == PORT_TYPE_USB ? "USB" :
             *pport_type == PORT_TYPE_HEADPHONES ? "Headphones" : "Default",
-            layout ? (unsigned) layout->mNumberChannelDescriptions : 2);
+            layout ? (unsigned) layout->mNumberChannelDescriptions : 2, p_sys->b_spatial_audio_supported);
 
     *playout = layout;
     return VLC_SUCCESS;
@@ -347,6 +384,9 @@ avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
     {
         ret = [instance setCategory:AVAudioSessionCategoryPlayback error:&error];
         ret = ret && [instance setMode:AVAudioSessionModeMoviePlayback error:&error];
+        if (@available(iOS 15.0, tvOS 15.0, *)) {
+            ret = ret && [instance setSupportsMultichannelContent:p_sys->b_spatial_audio_supported error:&error];
+        }
         ret = ret && [instance setActive:YES withOptions:options error:&error];
         [[SessionManager sharedInstance] addAoutInstance: p_sys->aoutWrapper];
     } else {
@@ -503,14 +543,21 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     p_sys->au_unit = NULL;
 
-    [[NSNotificationCenter defaultCenter] addObserver:p_sys->aoutWrapper
-                                             selector:@selector(audioSessionRouteChange:)
-                                                 name:AVAudioSessionRouteChangeNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:p_sys->aoutWrapper
-                                             selector:@selector(handleInterruption:)
-                                                 name:AVAudioSessionInterruptionNotification
-                                               object:nil];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:p_sys->aoutWrapper
+                           selector:@selector(audioSessionRouteChange:)
+                               name:AVAudioSessionRouteChangeNotification
+                             object:nil];
+    [notificationCenter addObserver:p_sys->aoutWrapper
+                           selector:@selector(handleInterruption:)
+                               name:AVAudioSessionInterruptionNotification
+                             object:nil];
+    if (@available(iOS 15.0, tvOS 15.0, *)) {
+        [notificationCenter addObserver:p_sys->aoutWrapper
+                               selector:@selector(handleSpatialCapabilityChange:)
+                                   name:AVAudioSessionSpatialPlaybackCapabilitiesChangedNotification
+                                 object:nil];
+    }
 
     /* Activate the AVAudioSession */
     if (avas_SetActive(p_aout, true, 0) != VLC_SUCCESS)
@@ -665,6 +712,7 @@ Open(vlc_object_t *obj)
 
     sys->b_muted = false;
     sys->b_preferred_channels_set = false;
+    sys->b_spatial_audio_supported = false;
     sys->au_dev = var_InheritBool(aout, "spdif") ? AU_DEV_ENCODED : AU_DEV_PCM;
     aout->start = Start;
     aout->stop = Stop;
