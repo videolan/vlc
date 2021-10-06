@@ -65,6 +65,7 @@ public:
         PLAYER_SWITCH_BUTTON,
         ARTWORK_INFO,
         PLAYBACK_SPEED_BUTTON,
+        HIGH_RESOLUTION_TIME_WIDGET,
 
         SPLITTER = 0x20,
         VOLUME,

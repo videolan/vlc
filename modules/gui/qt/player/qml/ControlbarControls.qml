@@ -62,7 +62,8 @@ QtObject {
         { id: ControlListModel.WIDGET_SPACER_EXTEND, file: "ExpandingSpacerWidget.qml", label: VLCIcons.space, text: i18n.qtr("Expanding Spacer") },
         { id: ControlListModel.PLAYER_SWITCH_BUTTON, file: "PlayerSwitchButton.qml", label: VLCIcons.fullscreen, text: i18n.qtr("Switch Player") },
         { id: ControlListModel.ARTWORK_INFO, file: "ArtworkInfoWidget.qml", label: VLCIcons.info, text: i18n.qtr("Artwork Info") },
-        { id: ControlListModel.PLAYBACK_SPEED_BUTTON, file: "PlaybackSpeedButton.qml", label: "1x", text: i18n.qtr("Playback Speed") }
+        { id: ControlListModel.PLAYBACK_SPEED_BUTTON, file: "PlaybackSpeedButton.qml", label: "1x", text: i18n.qtr("Playback Speed") },
+        { id: ControlListModel.HIGH_RESOLUTION_TIME_WIDGET, file: "HighResolutionTimeWidget.qml", label: VLCIcons.info, text: i18n.qtr("High Resolution Time") }
     ]
 
     function control(id) {

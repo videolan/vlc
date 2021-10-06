@@ -346,6 +346,7 @@
         <file alias="PlaybackSpeed.qml">player/qml/PlaybackSpeed.qml</file>
     </qresource>
     <qresource prefix="/player/controlbarcontrols">
+        <file alias="HighResolutionTimeWidget.qml">player/qml/controlbarcontrols/HighResolutionTimeWidget.qml</file>
         <file alias="ArtworkInfoWidget.qml">player/qml/controlbarcontrols/ArtworkInfoWidget.qml</file>
         <file alias="AspectRatioWidget.qml">player/qml/controlbarcontrols/AspectRatioWidget.qml</file>
         <file alias="AtoBButton.qml">player/qml/controlbarcontrols/AtoBButton.qml</file>
