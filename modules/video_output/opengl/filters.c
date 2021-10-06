@@ -29,6 +29,7 @@
 #include <vlc_list.h>
 
 #include "filter_priv.h"
+#include "importer_priv.h"
 #include "sampler_priv.h"
 
 /* The filter chain contains the sequential list of filters.
@@ -120,6 +121,7 @@ struct vlc_gl_filters {
      * the one which uses the picture_t as input.
      */
     struct vlc_gl_interop *interop;
+    struct vlc_gl_importer *importer;
 
     struct vlc_list list; /**< list of vlc_gl_filter.node */
 
@@ -144,6 +146,13 @@ vlc_gl_filters_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     if (!filters)
         return NULL;
 
+    filters->importer = vlc_gl_importer_New(interop);
+    if (!filters->importer)
+    {
+        free(filters);
+        return NULL;
+    }
+
     filters->gl = gl;
     filters->api = api;
     filters->interop = interop;
@@ -165,6 +174,7 @@ vlc_gl_filters_Delete(struct vlc_gl_filters *filters)
         vlc_gl_filter_Delete(filter);
     }
 
+    vlc_gl_importer_Delete(filters->importer);
     free(filters);
 }
 
@@ -289,30 +299,39 @@ GetSampler(struct vlc_gl_filter *filter)
     struct vlc_gl_filter_priv *prev_filter = priv->prev_filter;
 
     bool expose_planes = filter->config.filter_planes;
-    struct vlc_gl_sampler *sampler;
+
+    struct vlc_gl_format glfmt;
+
+    const struct vlc_gl_format *p_glfmt;
     if (!priv->prev_filter)
-        sampler = vlc_gl_sampler_NewFromInterop(filters->interop,
-                                                expose_planes);
+        p_glfmt = &filters->importer->glfmt;
     else
     {
-        video_format_t fmt;
-
         /* If the previous filter operated on planes, then its output chroma is
          * the same as its input chroma. Otherwise, it's RGBA. */
         vlc_fourcc_t chroma = prev_filter->filter.config.filter_planes
                             ? prev_filter->sampler->glfmt.fmt.i_chroma
                             : VLC_CODEC_RGBA;
 
-        video_format_Init(&fmt, chroma);
-        fmt.i_width = fmt.i_visible_width = prev_filter->size_out.width;
-        fmt.i_height = fmt.i_visible_height = prev_filter->size_out.height;
+        video_format_t *fmt = &glfmt.fmt;
+        video_format_Init(fmt, chroma);
+        fmt->i_width = fmt->i_visible_width = prev_filter->size_out.width;
+        fmt->i_height = fmt->i_visible_height = prev_filter->size_out.height;
 
-        sampler = vlc_gl_sampler_NewFromTexture2D(filters->gl, filters->api,
-                                                  &fmt, prev_filter->plane_count,
-                                                  prev_filter->plane_widths,
-                                                  prev_filter->plane_heights,
-                                                  expose_planes);
+        glfmt.tex_target = GL_TEXTURE_2D;
+        glfmt.tex_count = prev_filter->plane_count;
+
+        size_t size = glfmt.tex_count * sizeof(GLsizei);
+        memcpy(glfmt.tex_widths, prev_filter->plane_widths, size);
+        memcpy(glfmt.tex_heights, prev_filter->plane_heights, size);
+        memcpy(glfmt.visible_widths, prev_filter->plane_widths, size);
+        memcpy(glfmt.visible_heights, prev_filter->plane_heights, size);
+
+        p_glfmt = &glfmt;
     }
+
+    struct vlc_gl_sampler *sampler =
+        vlc_gl_sampler_New(filters->gl, filters->api, p_glfmt, expose_planes);
 
     priv->sampler = sampler;
 
@@ -537,15 +556,25 @@ vlc_gl_filters_UpdatePicture(struct vlc_gl_filters *filters,
 {
     assert(!vlc_list_is_empty(&filters->list));
 
+    struct vlc_gl_importer *importer = filters->importer;
+    int ret = vlc_gl_importer_Update(importer, picture);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    filters->pic.pts = picture->date;
+
     struct vlc_gl_filter_priv *first_filter =
         vlc_list_first_entry_or_null(&filters->list, struct vlc_gl_filter_priv,
                                      node);
 
     assert(first_filter);
 
-    filters->pic.pts = picture->date;
+    ret = vlc_gl_sampler_Update(first_filter->sampler, &importer->pic);
+    if (ret != VLC_SUCCESS)
+        return ret;
 
-    return vlc_gl_sampler_UpdatePicture(first_filter->sampler, picture);
+    first_filter->has_picture = true;
+    return VLC_SUCCESS;
 }
 
 int
@@ -570,14 +599,24 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
                                         struct vlc_gl_filter_priv, node);
         if (previous)
         {
+            struct vlc_gl_picture direct_pic;
+            memcpy(direct_pic.textures, previous->textures_out,
+                   previous->tex_count * sizeof(*direct_pic.textures));
+            memcpy(direct_pic.mtx, MATRIX2x3_IDENTITY,
+                   sizeof(MATRIX2x3_IDENTITY));
+            /* The transform never changes (except for the first picture, where
+             * it is defined for the first time) */
+            direct_pic.mtx_has_changed = !priv->has_picture;
+
             /* Read from the output of the previous filter */
-            int ret = vlc_gl_sampler_UpdateTextures(priv->sampler,
-                                                    previous->textures_out);
+            int ret = vlc_gl_sampler_Update(priv->sampler, &direct_pic);
             if (ret != VLC_SUCCESS)
             {
                 msg_Err(filters->gl, "Could not update sampler texture");
                 return ret;
             }
+
+            priv->has_picture = true;
         }
 
         struct vlc_gl_filter *filter = &priv->filter;

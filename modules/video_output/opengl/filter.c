@@ -48,6 +48,8 @@ vlc_gl_filter_New(vlc_object_t *parent, const struct vlc_gl_api *api)
     priv->plane_count = 0;
     priv->tex_count = 0;
 
+    priv->has_picture = false;
+
     struct vlc_gl_filter *filter = &priv->filter;
     filter->api = api;
     filter->config.filter_planes = false;

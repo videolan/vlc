@@ -72,6 +72,8 @@ struct vlc_gl_filter_priv {
     /* Blend filters are attached to their non-blend "parent" instead of the
      * filter chain to simplify the rendering code */
     struct vlc_list blend_subfilters; /**< list of vlc_gl_filter_priv.node */
+
+    bool has_picture;
 };
 
 static inline struct vlc_gl_filter_priv *

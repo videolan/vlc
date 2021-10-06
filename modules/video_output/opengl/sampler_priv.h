@@ -26,43 +26,18 @@
 #include "gl_api.h"
 #include "sampler.h"
 
-struct vlc_gl_interop;
-
 /**
- * Create a new sampler from an interop
- *
- * It receives input pictures from `picture_t`, and uses the interop to
- * uploaded them to OpenGL textures.
- *
- * \param interop the interop
- * \param expose_planes if set, vlc_texture() exposes a single plane at a time
- *                      (selected by vlc_gl_sampler_SetCurrentPlane())
- */
-struct vlc_gl_sampler *
-vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop,
-                              bool expose_planes);
-
-/**
- * Create a new direct sampler
- *
- * It receives input textures directly (typically the output of a previous
- * filter), with target GL_TEXTURE_2D.
+ * Create a new sampler
  *
  * \param gl the OpenGL context
  * \param api the OpenGL API
- * \param fmt the input format
- * \param tex_count the number of textures
- * \param tex_widths the widths of textures
- * \param tex_heights the heights of textures
+ * \param glfmt the input format
  * \param expose_planes if set, vlc_texture() exposes a single plane at a time
  *                      (selected by vlc_gl_sampler_SetCurrentPlane())
  */
 struct vlc_gl_sampler *
-vlc_gl_sampler_NewFromTexture2D(struct vlc_gl_t *gl,
-                                const struct vlc_gl_api *api,
-                                const video_format_t *fmt, unsigned tex_count,
-                                GLsizei tex_widths[], GLsizei tex_heights[],
-                                bool expose_planes);
+vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
+                   const struct vlc_gl_format *glfmt, bool expose_planes);
 
 /**
  * Delete a sampler
@@ -73,30 +48,14 @@ void
 vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler);
 
 /**
- * Update the input picture
- *
- * This changes the current input picture, available from the fragment shader.
- *
- * Warning: only call on sampler created by vlc_gl_sampler_NewFromInterop().
- *
- * \param sampler the sampler
- * \param picture the new picture
- */
-int
-vlc_gl_sampler_UpdatePicture(struct vlc_gl_sampler *sampler,
-                             picture_t *picture);
-
-/**
  * Update the input textures
  *
- * Warning: only call on sampler created by vlc_gl_sampler_NewFromTexture2D().
- *
  * \param sampler the sampler
- * \param textures the new textures, with target GL_TEXTURE_2D
+ * \param picture the OpenGL picture
  */
 int
-vlc_gl_sampler_UpdateTextures(struct vlc_gl_sampler *sampler,
-                              GLuint textures[]);
+vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler,
+                      const struct vlc_gl_picture *picture);
 
 /**
  * Select the plane to expose

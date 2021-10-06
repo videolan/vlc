@@ -37,8 +37,6 @@
 #include "gl_api.h"
 #include "gl_common.h"
 #include "gl_util.h"
-#include "importer_priv.h"
-#include "interop.h"
 
 struct vlc_gl_sampler_priv {
     struct vlc_gl_sampler sampler;
@@ -47,7 +45,6 @@ struct vlc_gl_sampler_priv {
     const struct vlc_gl_api *api;
     const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
 
-    struct vlc_gl_importer *importer;
     struct vlc_gl_picture pic;
 
     struct {
@@ -821,10 +818,9 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
     return VLC_SUCCESS;
 }
 
-static struct vlc_gl_sampler *
-CreateSampler(struct vlc_gl_importer *importer, struct vlc_gl_t *gl,
-              const struct vlc_gl_api *api, const struct vlc_gl_format *glfmt,
-              bool expose_planes)
+struct vlc_gl_sampler *
+vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
+                   const struct vlc_gl_format *glfmt, bool expose_planes)
 {
     struct vlc_gl_sampler_priv *priv = calloc(1, sizeof(*priv));
     if (!priv)
@@ -837,7 +833,6 @@ CreateSampler(struct vlc_gl_importer *importer, struct vlc_gl_t *gl,
     priv->pl_sh = NULL;
     priv->pl_sh_res = NULL;
 
-    priv->importer = importer;
     priv->gl = gl;
     priv->api = api;
     priv->vt = &api->vt;
@@ -884,57 +879,10 @@ CreateSampler(struct vlc_gl_importer *importer, struct vlc_gl_t *gl,
     return sampler;
 }
 
-struct vlc_gl_sampler *
-vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop,
-                              bool expose_planes)
-{
-    struct vlc_gl_importer *importer = vlc_gl_importer_New(interop);
-    if (!importer)
-        return NULL;
-
-    struct vlc_gl_sampler *sampler =
-        CreateSampler(importer, interop->gl, interop->api, &importer->glfmt,
-                      expose_planes);
-    if (!sampler)
-    {
-        vlc_gl_importer_Delete(importer);
-        return NULL;
-    }
-
-    return sampler;
-}
-
-struct vlc_gl_sampler *
-vlc_gl_sampler_NewFromTexture2D(struct vlc_gl_t *gl,
-                                const struct vlc_gl_api *api,
-                                const video_format_t *fmt, unsigned tex_count,
-                                GLsizei tex_widths[], GLsizei tex_heights[],
-                                bool expose_planes)
-{
-    struct vlc_gl_format glfmt;
-
-    assert(!fmt->p_palette);
-    glfmt.fmt = *fmt;
-
-    glfmt.tex_target = GL_TEXTURE_2D;
-    glfmt.tex_count = tex_count;
-
-    size_t size = tex_count * sizeof(GLsizei);
-    memcpy(glfmt.tex_widths, tex_widths, size);
-    memcpy(glfmt.tex_heights, tex_heights, size);
-    memcpy(glfmt.visible_widths, tex_widths, size);
-    memcpy(glfmt.visible_heights, tex_heights, size);
-
-    return CreateSampler(NULL, gl, api, &glfmt, expose_planes);
-}
-
 void
 vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
-
-    if (priv->importer)
-        vlc_gl_importer_Delete(priv->importer);
 
 #ifdef HAVE_LIBPLACEBO
     FREENULL(priv->uloc.pl_vars);
@@ -949,29 +897,11 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 }
 
 int
-vlc_gl_sampler_UpdatePicture(struct vlc_gl_sampler *sampler, picture_t *picture)
+vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler,
+                      const struct vlc_gl_picture *picture)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
-    assert(priv->importer);
-
-    int ret = vlc_gl_importer_Update(priv->importer, picture);
-    if (ret != VLC_SUCCESS)
-        return ret;
-
-    /* The sampler picture comes from the importer, copy its content */
-    memcpy(&priv->pic, &priv->importer->pic, sizeof(priv->pic));
-    return VLC_SUCCESS;
-}
-
-int
-vlc_gl_sampler_UpdateTextures(struct vlc_gl_sampler *sampler, GLuint textures[])
-{
-    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
-    struct vlc_gl_format *glfmt = &sampler->glfmt;
-    struct vlc_gl_picture *pic = &priv->pic;
-
-    unsigned tex_count = glfmt->tex_count;
-    memcpy(pic->textures, textures, tex_count * sizeof(textures[0]));
+    priv->pic = *picture;
 
     return VLC_SUCCESS;
 }
