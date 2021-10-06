@@ -4501,13 +4501,13 @@ AC_SUBST([VERSION_MINOR])
 AC_SUBST([VERSION_REVISION])
 AC_SUBST([VERSION_EXTRA])
 AC_SUBST([COPYRIGHT_YEARS])
-if [ -z "$VLC_COMPILE_BY" ]; then
+AS_IF([test -z "$VLC_COMPILE_BY"],[
    VLC_COMPILE_BY=`whoami|sed -e 's/\\\/\\\\\\\/g'`
-fi
+])
 AC_DEFINE_UNQUOTED([VLC_COMPILE_BY], "$VLC_COMPILE_BY", [user who ran configure])
-if [ -z "$VLC_COMPILE_HOST" ]; then
+AS_IF([test -z "$VLC_COMPILE_HOST"],[
    VLC_COMPILE_HOST=`hostname -f 2>/dev/null || hostname`
-fi
+])
 AC_DEFINE_UNQUOTED([VLC_COMPILE_HOST], "$VLC_COMPILE_HOST", [host which ran configure])
 AC_DEFINE_UNQUOTED([VLC_COMPILER], "`$CC -v 2>&1 | tail -n 1 | sed -e 's/ *$//'`", [compiler])
 dnl
