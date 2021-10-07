@@ -28,23 +28,23 @@ import "qrc:///style/"
 import "qrc:///util/Helpers.js" as Helpers
 
 
-Widgets.AnimatedBackground {
-    implicitWidth: fbLabel.width + VLCStyle.focus_border * 2
-    implicitHeight: fbLabel.height + VLCStyle.focus_border * 2
+Control {
+    padding: VLCStyle.focus_border
 
-    activeBorderColor: colors.bgFocus
+    Keys.priority: Keys.AfterItem
+    Keys.onPressed: Navigation.defaultKeyAction(event)
 
     property bool paintOnly: false
     property VLCColors colors: VLCStyle.colors
 
-    Widgets.MenuLabel {
-        id: fbLabel
+    background: Widgets.AnimatedBackground {
+        active: visualFocus
+        activeBorderColor: colors.bgFocus
+    }
 
-        anchors.centerIn: parent
-
+    contentItem: Widgets.MenuLabel {
         text: i18n.qtr("WIDGET\nNOT\nFOUND")
         horizontalAlignment: Text.AlignHCenter
-
         color: colors.text
     }
 }
