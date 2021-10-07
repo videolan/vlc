@@ -16,6 +16,7 @@ SUFFIXES = .rc.in .rc
 
 AM_CPPFLAGS = $(CPPFLAGS_vlc)
 AM_CFLAGS = $(CFLAGS_vlc)
+noinst_LTLIBRARIES =
 if HAVE_DBUS
 AM_CPPFLAGS += -DHAVE_DBUS
 endif
@@ -41,7 +42,7 @@ libbreakpad_wrapper_la_LIBADD = $(BREAKPAD_LIBS)
 libbreakpad_wrapper_la_LDFLAGS = -static
 libbreakpad_wrapper_la_CXXFLAGS = $(AM_CXXFLAGS) $(BREAKPAD_CFLAGS) -DBREAKPAD_URL=\"@BREAKPAD_URL@\"
 if HAVE_BREAKPAD
-noinst_LTLIBRARIES = libbreakpad_wrapper.la
+noinst_LTLIBRARIES += libbreakpad_wrapper.la
 vlc_LDADD += libbreakpad_wrapper.la -lstdc++ -lwininet
 EXTRA_vlc_DEPENDENCIES += libbreakpad_wrapper.la
 vlc_CPPFLAGS += -DHAVE_BREAKPAD
@@ -124,6 +125,16 @@ if HAVE_WIN32
 vlc_cache_gen_LDADD += vlc_win32_rc.$(OBJEXT)
 vlc_cache_gen_LDFLAGS = -Wc,-static
 EXTRA_vlc_cache_gen_DEPENDENCIES = vlc_win32_rc.$(OBJEXT)
+endif
+
+if HAVE_PARTIAL_LINKING
+AM_CPPFLAGS += -DVLC_PARTIAL_LINKING -I $(builddir)/../modules/
+if !HAVE_WIN32
+vlc_SOURCES += vlc_static_modules.c
+endif
+vlc_osx_SOURCES += vlc_static_modules.c
+vlc_LDADD += ../modules/libvlc_static_modules.la
+vlc_osx_LDADD += ../modules/libvlc_static_modules.la
 endif
 
 #
