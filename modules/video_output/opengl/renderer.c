@@ -308,10 +308,12 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta);
 int
 vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
                      const config_chain_t *config,
+                     const struct vlc_gl_format *glfmt,
                      struct vlc_gl_tex_size *size_out)
 {
     (void) config;
     (void) size_out;
+    (void) glfmt; /* TODO not used yet */
 
     const opengl_vtable_t *vt = &filter->api->vt;
 

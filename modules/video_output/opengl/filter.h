@@ -24,6 +24,7 @@
 
 #include <vlc_tick.h>
 
+#include "picture.h"
 #include "sampler.h"
 
 struct vlc_gl_filter;
@@ -41,6 +42,7 @@ struct vlc_gl_input_meta {
 typedef int
 vlc_gl_filter_open_fn(struct vlc_gl_filter *filter,
                       const config_chain_t *config,
+                      const struct vlc_gl_format *glfmt,
                       struct vlc_gl_tex_size *size_out);
 
 #define set_callback_opengl_filter(open) \

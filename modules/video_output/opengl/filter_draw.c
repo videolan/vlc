@@ -122,9 +122,10 @@ Close(struct vlc_gl_filter *filter)
 
 static int
 Open(struct vlc_gl_filter *filter, const config_chain_t *config,
-     struct vlc_gl_tex_size *size_out)
+     const struct vlc_gl_format *glfmt, struct vlc_gl_tex_size *size_out)
 {
     (void) size_out;
+    (void) glfmt; /* TODO not used yet */
 
     struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
     if (!sampler)

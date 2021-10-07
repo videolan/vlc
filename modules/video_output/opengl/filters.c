@@ -219,15 +219,13 @@ InitFramebuffersOut(struct vlc_gl_filter_priv *priv)
     struct vlc_gl_filter *filter = &priv->filter;
     if (filter->config.filter_planes)
     {
-        struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
-        if (!sampler)
-            return VLC_EGENERIC;
+        struct vlc_gl_format *glfmt = &priv->glfmt_in;
 
-        priv->tex_count = sampler->glfmt.tex_count;
+        priv->tex_count = glfmt->tex_count;
         vt->GenFramebuffers(priv->tex_count, priv->framebuffers_out);
         vt->GenTextures(priv->tex_count, priv->textures_out);
 
-        for (unsigned i = 0; i < sampler->glfmt.tex_count; ++i)
+        for (unsigned i = 0; i < glfmt->tex_count; ++i)
         {
             memcpy(priv->tex_widths, priv->plane_widths,
                    priv->tex_count * sizeof(*priv->tex_widths));
@@ -370,7 +368,7 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
     priv->size_out = size_in;
 
     int ret = vlc_gl_filter_LoadModule(filters->gl, name, filter, config,
-                                       &priv->size_out);
+                                       glfmt, &priv->size_out);
     if (ret != VLC_SUCCESS)
     {
         /* Creation failed, do not call close() */
