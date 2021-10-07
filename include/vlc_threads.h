@@ -228,13 +228,13 @@ typedef struct
         struct {
             atomic_uint value;
             atomic_uint recursion;
-            _Atomic (const void *) owner;
+            atomic_ulong owner;
         };
 #endif
         struct {
             unsigned int value;
             unsigned int recursion;
-            const void *owner;
+            unsigned long owner;
         } dummy;
     };
 } vlc_mutex_t;
@@ -248,7 +248,7 @@ typedef struct
 #define VLC_STATIC_MUTEX { \
     .value = ATOMIC_VAR_INIT(0), \
     .recursion = ATOMIC_VAR_INIT(0), \
-    .owner = ATOMIC_VAR_INIT(NULL), \
+    .owner = ATOMIC_VAR_INIT(0), \
 }
 
 /**
@@ -803,8 +803,8 @@ VLC_API void vlc_control_cancel(vlc_cleanup_t *);
 /**
  * Thread identifier.
  *
- * This function returns an unique identifier of the calling thread. The
- * identifier cannot change for the entire lifetime of the thread, and two
+ * This function returns a non-zero unique identifier of the calling thread.
+ * The identifier cannot change for the entire lifetime of the thread, and two
  * concurrent threads cannot have the same identifier.
  *
  * The thread identifier has no defined semantics other than uniqueness,
