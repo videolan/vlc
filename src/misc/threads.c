@@ -67,7 +67,7 @@ static void vlc_mutex_init_common(vlc_mutex_t *mtx, bool recursive)
 {
     atomic_init(&mtx->value, 0);
     atomic_init(&mtx->recursion, recursive);
-    atomic_init(&mtx->owner, NULL);
+    atomic_init(&mtx->owner, 0);
 }
 
 void vlc_mutex_init(vlc_mutex_t *mtx)
@@ -79,9 +79,6 @@ void vlc_mutex_init_recursive(vlc_mutex_t *mtx)
 {
     vlc_mutex_init_common(mtx, true);
 }
-
-static _Thread_local char thread_self[1];
-#define THREAD_SELF ((const void *)thread_self)
 
 bool vlc_mutex_held(const vlc_mutex_t *mtx)
 {
@@ -101,8 +98,8 @@ bool vlc_mutex_held(const vlc_mutex_t *mtx)
      * Even though other threads may modify the owner field at any time,
      * they will never make it compare equal to the calling thread.
      */
-    return THREAD_SELF == atomic_load_explicit(&tmp_mtx->owner,
-                                               memory_order_relaxed);
+    return vlc_thread_id() == atomic_load_explicit(&tmp_mtx->owner,
+                                                   memory_order_relaxed);
 }
 
 void vlc_mutex_lock(vlc_mutex_t *mtx)
@@ -122,7 +119,7 @@ void vlc_mutex_lock(vlc_mutex_t *mtx)
         vlc_atomic_wait(&mtx->value, 2);
 
     vlc_restorecancel(canc);
-    atomic_store_explicit(&mtx->owner, THREAD_SELF, memory_order_relaxed);
+    atomic_store_explicit(&mtx->owner, vlc_thread_id(), memory_order_relaxed);
 }
 
 int vlc_mutex_trylock(vlc_mutex_t *mtx)
@@ -149,7 +146,8 @@ int vlc_mutex_trylock(vlc_mutex_t *mtx)
     if (atomic_compare_exchange_strong_explicit(&mtx->value, &value, 1,
                                                 memory_order_acquire,
                                                 memory_order_relaxed)) {
-        atomic_store_explicit(&mtx->owner, THREAD_SELF, memory_order_relaxed);
+        atomic_store_explicit(&mtx->owner, vlc_thread_id(),
+                              memory_order_relaxed);
         return 0;
     }
 
@@ -169,7 +167,7 @@ void vlc_mutex_unlock(vlc_mutex_t *mtx)
         return;
     }
 
-    atomic_store_explicit(&mtx->owner, NULL, memory_order_relaxed);
+    atomic_store_explicit(&mtx->owner, 0, memory_order_relaxed);
 
     switch (atomic_exchange_explicit(&mtx->value, 0, memory_order_release)) {
         case 2:
