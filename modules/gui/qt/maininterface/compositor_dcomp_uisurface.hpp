@@ -34,7 +34,7 @@
 #  define _WIN32_WINNT 0x0603
 # endif
 
-#include <d3d11.h>
+#include <d3d11_1.h>
 #include <dcomp.h>
 #include <wrl.h>
 
@@ -156,7 +156,7 @@ private:
     HANDLE m_sharedTextureHandled = nullptr;
 
     //Shared texture D3D side
-    Microsoft::WRL::ComPtr<ID3D11Device> m_qtd3dDevice;
+    Microsoft::WRL::ComPtr<ID3D11Device1> m_qtd3dDevice1;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> m_d3dInterimTextureQt;
     EGLSurface m_eglInterimTextureQt = 0;
 
