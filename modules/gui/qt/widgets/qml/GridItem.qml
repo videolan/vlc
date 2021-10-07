@@ -35,7 +35,8 @@ Control {
     property int titleMargin: VLCStyle.margin_xsmall
     property Item dragItem: null
 
-    readonly property bool highlighted: mouseArea.containsMouse || activeFocus
+    readonly property bool highlighted: (mouseArea.containsMouse || visualFocus)
+
     readonly property int selectedBorderWidth: VLCStyle.gridItemSelectedBorder
 
     property int _modifiersOnLastPress: Qt.NoModifier
