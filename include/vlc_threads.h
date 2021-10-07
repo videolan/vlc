@@ -803,19 +803,23 @@ VLC_API void vlc_control_cancel(vlc_cleanup_t *);
 /**
  * Thread identifier.
  *
- * This function returns the identifier of the calling thread. The identifier
- * cannot change for the entire duration of the thread, and no other thread can
- * have the same identifier at the same time in the same process. Typically,
- * the identifier is also unique across all running threads of all existing
- * processes, but that depends on the operating system.
+ * This function returns an unique identifier of the calling thread. The
+ * identifier cannot change for the entire lifetime of the thread, and two
+ * concurrent threads cannot have the same identifier.
  *
- * There are no particular semantics to the thread ID with LibVLC.
+ * The thread identifier has no defined semantics other than uniqueness,
+ * and no particular purposes within LibVLC.
  * It is provided mainly for tracing and debugging.
  *
- * \warning This function is not currently implemented on all supported
- * platforms. Where not implemented, it returns (unsigned long)-1.
+ * On some but not all supported platforms, the thread identifier is in fact
+ * the OS/kernel thread identifier (a.k.a. task PID), and is temporally unique
+ * not only within the process but across the entire system.
  *
- * \return the thread identifier (or -1 if unimplemented)
+ * \note
+ * The `main()` thread identifier is typically identical to the process
+ * identifier, but this is not portable.
+ *
+ * \return the thread identifier (cannot fail)
  */
 VLC_API unsigned long vlc_thread_id(void) VLC_USED;
 
