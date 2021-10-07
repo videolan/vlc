@@ -120,9 +120,13 @@ InitMatrix(struct sys *sys, vlc_tick_t pts)
 }
 
 static int
-DrawBlend(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
+DrawBlend(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
+          const struct vlc_gl_input_meta *meta)
 {
     struct sys *sys = filter->sys;
+
+    (void) pic;
+    assert(!pic); /* A blend filter should not receive picture */
 
     const opengl_vtable_t *vt = &filter->api->vt;
 
@@ -166,8 +170,11 @@ DrawBlend(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
 }
 
 static int
-DrawMask(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
+DrawMask(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
+         const struct vlc_gl_input_meta *meta)
 {
+    (void) pic; /* TODO not used yet */
+
     struct sys *sys = filter->sys;
 
     const opengl_vtable_t *vt = &filter->api->vt;
@@ -203,8 +210,11 @@ DrawMask(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
 }
 
 static int
-DrawPlane(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
+DrawPlane(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
+          const struct vlc_gl_input_meta *meta)
 {
+    (void) pic; /* TODO not used yet */
+
     struct sys *sys = filter->sys;
 
     const opengl_vtable_t *vt = &filter->api->vt;

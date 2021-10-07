@@ -70,6 +70,11 @@ struct vlc_gl_picture {
     /**
      * Indicate if the transform to convert picture coordinates to textures
      * coordinates have changed due to the last picture.
+     *
+     * The filters should check this flag on every draw() call, and update
+     * their coordinates if necessary.
+     *
+     * It is guaranteed to be true for the first picture.
      */
     bool mtx_has_changed;
 };

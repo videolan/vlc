@@ -56,7 +56,7 @@ struct vlc_gl_filter_ops {
     /**
      * Draw the result of the filter to the current framebuffer
      */
-    int (*draw)(struct vlc_gl_filter *filter,
+    int (*draw)(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
                 const struct vlc_gl_input_meta *meta);
 
     /**

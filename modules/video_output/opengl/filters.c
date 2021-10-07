@@ -571,6 +571,7 @@ int
 vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
 {
     const opengl_vtable_t *vt = &filters->api->vt;
+    struct vlc_gl_importer *importer = filters->importer;
 
     GLint value;
     vt->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &value);
@@ -581,6 +582,9 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
         .plane = 0,
     };
 
+    struct vlc_gl_picture direct_pic;
+    const struct vlc_gl_picture *pic;
+
     struct vlc_gl_filter_priv *priv;
     vlc_list_foreach(priv, &filters->list, node)
     {
@@ -589,7 +593,6 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
                                         struct vlc_gl_filter_priv, node);
         if (previous)
         {
-            struct vlc_gl_picture direct_pic;
             memcpy(direct_pic.textures, previous->textures_out,
                    previous->tex_count * sizeof(*direct_pic.textures));
             memcpy(direct_pic.mtx, MATRIX2x3_IDENTITY,
@@ -607,6 +610,13 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
             }
 
             priv->has_picture = true;
+
+            pic = &direct_pic;
+        }
+        else
+        {
+            assert(importer);
+            pic = &importer->pic;
         }
 
         struct vlc_gl_filter *filter = &priv->filter;
@@ -625,7 +635,7 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
                 vt->Viewport(0, 0, priv->tex_widths[i], priv->tex_heights[i]);
 
                 vlc_gl_sampler_SelectPlane(priv->sampler, i);
-                int ret = filter->ops->draw(filter, &meta);
+                int ret = filter->ops->draw(filter, pic, &meta);
                 if (ret != VLC_SUCCESS)
                     return ret;
             }
@@ -653,7 +663,7 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
                 vt->Viewport(0, 0, priv->tex_widths[0], priv->tex_heights[0]);
 
             meta.plane = 0;
-            int ret = filter->ops->draw(filter, &meta);
+            int ret = filter->ops->draw(filter, pic, &meta);
             if (ret != VLC_SUCCESS)
                 return ret;
 
@@ -666,7 +676,7 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
                 vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
 
                 struct vlc_gl_filter *subfilter = &subfilter_priv->filter;
-                ret = subfilter->ops->draw(subfilter, &meta);
+                ret = subfilter->ops->draw(subfilter, NULL, &meta);
                 if (ret != VLC_SUCCESS)
                     return ret;
             }

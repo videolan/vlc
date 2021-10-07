@@ -303,7 +303,8 @@ Close(struct vlc_gl_filter *filter)
 static int SetupCoords(struct vlc_gl_renderer *renderer);
 
 static int
-Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta);
+Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
+     const struct vlc_gl_input_meta *meta);
 
 int
 vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
@@ -738,9 +739,11 @@ static int SetupCoords(struct vlc_gl_renderer *renderer)
 }
 
 static int
-Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
+Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
+     const struct vlc_gl_input_meta *meta)
 {
     (void) meta;
+    (void) pic; /* TODO not used yet */
 
     struct vlc_gl_renderer *renderer = filter->sys;
 

@@ -55,9 +55,11 @@ struct sys {
 };
 
 static int
-Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
+Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
+     const struct vlc_gl_input_meta *meta)
 {
     (void) meta;
+    (void) pic; /* TODO not used yet */
 
     struct sys *sys = filter->sys;
 
