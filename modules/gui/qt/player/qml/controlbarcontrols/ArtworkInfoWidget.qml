@@ -25,7 +25,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 
-Control {
+AbstractButton {
     id: artworkInfoItem
 
     property bool paintOnly: false
@@ -51,12 +51,8 @@ Control {
         }
     }
 
-    MouseArea {
-        id: artworkInfoMouseArea
-        anchors.fill: parent
-        visible: !paintOnly
-        onClicked: g_mainDisplay.showPlayer()
-        hoverEnabled: true
+    onClicked: {
+        g_mainDisplay.showPlayer()
     }
 
     background: Widgets.AnimatedBackground {
@@ -114,7 +110,7 @@ Control {
 
                     visible: artworkInfoItem.visible
                              && infoColumn.width < infoColumn.preferredWidth
-                             && (artworkInfoMouseArea.containsMouse || artworkInfoItem.visualFocus)
+                             && (artworkInfoItem.hovered || artworkInfoItem.visualFocus)
                     delay: 500
 
                     contentItem: Text {
