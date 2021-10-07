@@ -128,7 +128,10 @@ picture_pool_t *picture_pool_New(unsigned count, picture_t *const *tab)
 picture_pool_t *picture_pool_NewFromFormat(const video_format_t *fmt,
                                            unsigned count)
 {
-    picture_t *picture[count ? count : 1];
+    if (count == 0)
+        vlc_assert_unreachable();
+
+    picture_t *picture[count];
     unsigned i;
 
     for (i = 0; i < count; i++) {
@@ -151,7 +154,10 @@ error:
 
 picture_pool_t *picture_pool_Reserve(picture_pool_t *master, unsigned count)
 {
-    picture_t *picture[count ? count : 1];
+    if (count == 0)
+        vlc_assert_unreachable();
+
+    picture_t *picture[count];
     unsigned i;
 
     for (i = 0; i < count; i++) {
