@@ -38,7 +38,7 @@ typedef struct
     int           i_poll_id;
     bool          b_interrupted;
     vlc_mutex_t   lock;
-    int           i_payload_size;
+    size_t        i_payload_size;
     block_bytestream_t block_stream;
 } sout_access_out_sys_t;
 
@@ -68,7 +68,11 @@ static bool srt_schedule_reconnect(sout_access_out_t *p_access)
     char *psz_dst_addr = NULL;
     int i_dst_port;
     int i_latency=var_InheritInteger( p_access, SRT_PARAM_LATENCY );
+
     int i_payload_size = var_InheritInteger( p_access, SRT_PARAM_PAYLOAD_SIZE );
+    if (i_payload_size <= 0)
+        i_payload_size = SRT_DEFAULT_PAYLOAD_SIZE;
+
     char *psz_passphrase = var_InheritString( p_access, SRT_PARAM_PASSPHRASE );
     bool passphrase_needs_free = true;
     char *psz_streamid = var_InheritString( p_access, SRT_PARAM_STREAMID );
@@ -184,7 +188,7 @@ static bool srt_schedule_reconnect(sout_access_out_t *p_access)
                 SRTO_STREAMID, psz_streamid, strlen(psz_streamid) );
     }
 
-    /* set maximumu payload size */
+    /* set maximum payload size */
     stat = srt_set_socket_option( access_obj, SRT_PARAM_PAYLOAD_SIZE, p_sys->sock,
             SRTO_PAYLOADSIZE, &i_payload_size, sizeof(i_payload_size) );
     if ( stat == SRT_ERROR )
