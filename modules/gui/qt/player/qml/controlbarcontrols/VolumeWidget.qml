@@ -33,9 +33,6 @@ FocusScope{
     property bool paintOnly: false
 
     property color color: colors.buttonText
-
-    property alias parentWindow: volumeTooltip.parentWindow
-
     property VLCColors colors: VLCStyle.colors
 
     readonly property var _player: paintOnly ? ({ muted: false, volume: .5 }) : player
@@ -173,20 +170,14 @@ FocusScope{
                 id: volumeTooltip
                 active: !paintOnly
 
-                property var parentWindow: (typeof playerButtonsLayout === "undefined") ? g_root : playerButtonsLayout.parentWindow
-
                 sourceComponent: Widgets.PointingTooltip {
-                    visible: sliderMouseArea.containsMouse
+                    visible: sliderMouseArea.pressed || sliderMouseArea.containsMouse
 
                     text: Math.round(volControl.value * 100) + "%"
 
-                    mouseArea: sliderMouseArea
-
-                    xPos: (handle.x + handle.width / 2)
+                    pos: Qt.point(handle.x + handle.width / 2, 0)
 
                     colors: widgetfscope.colors
-
-                    parentWindow: volumeTooltip.parentWindow
                 }
             }
 

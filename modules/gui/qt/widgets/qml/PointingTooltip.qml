@@ -17,131 +17,63 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
-import QtGraphicalEffects 1.0
 
 import "qrc:///style/"
 
-Item {
+ToolTip {
     id: pointingTooltip
 
-    // set parentWindow if you want to let tooltip not exceed window boundaries
-    // if it is not set, tooltip will use mouseArea as the bounding rect.
-    // Note that for now it only works with x axis.
-    property var parentWindow: g_root
+    margins: 0
+    padding: VLCStyle.margin_xxsmall
 
-    property var mouseArea: undefined
+    x: _x
+    y: pos.y - (implicitHeight + arrowArea.implicitHeight + VLCStyle.dp(7.5))
 
-    property alias text: timeMetrics.text
-
-    // set fixedY if you want to fix y position of the tooltip
-    property bool fixedY: true
-
-    readonly property real position: xPos / mouseArea.width
-    property real xPos: Math.max(Math.min(mouseArea.mouseX, mouseArea.width), 0.0)
-    property real yPos: Math.max(Math.min(mouseArea.mouseY, mouseArea.height), 0.0)
+    font.pixelSize: VLCStyle.fontSize_normal
 
     property VLCColors colors: VLCStyle.colors
 
-    width: childrenRect.width
-    height: childrenRect.height
+    readonly property real _x: pos.x - (width / 2)
+    property point pos
 
-    function getX() {
-        var x = xPos - (pointingTooltip.width / 2)
-        var diff = (x + pointingTooltip.width)
-        var windowMappedX = !!parentWindow ? parentWindow.mapFromItem(mouseArea, mouseArea.x, mouseArea.y).x : undefined
-
-        var sliderRealX = 0
-
-        if (!!parentWindow) {
-            diff -= parentWindow.width - windowMappedX
-            sliderRealX = windowMappedX
-        } else {
-            diff -= mouseArea.width
-        }
-
-        if (x < -sliderRealX) {
-            if (!!parentWindow)
-                arrow.diff = x + windowMappedX
-            else
-                arrow.diff = x
-            x = -sliderRealX
-        } else if (diff > 0) {
-            arrow.diff = diff
-            x -= (diff)
-        } else {
-            arrow.diff = 0
-        }
-
-        return x
+    contentItem: Label {
+        text: pointingTooltip.text
+        font: pointingTooltip.font
+        color: colors.tooltipTextColor
     }
 
-    y: fixedY ? -(childrenRect.height) : yPos - childrenRect.height
-    x: getX()
-
-    Item {
-        height: arrow.height * Math.sqrt(2)
-        width: timeIndicatorRect.width
-
-        anchors.horizontalCenter: timeIndicatorRect.horizontalCenter
-        anchors.verticalCenter: timeIndicatorRect.bottom
-        anchors.verticalCenterOffset: height / 2
-
-        clip: true
-
-        Rectangle {
-            id: arrow
-            width: VLCStyle.dp(10, VLCStyle.scale)
-            height: VLCStyle.dp(10, VLCStyle.scale)
-
-            anchors.centerIn: parent
-            anchors.verticalCenterOffset: -(parent.height / 2)
-            anchors.horizontalCenterOffset: diff
-
-            property int diff: 0
-
-            color: colors.bgAlt
-
-            rotation: 45
-
-            RectangularGlow {
-                anchors.fill: parent
-                glowRadius: VLCStyle.dp(2, VLCStyle.scale)
-                spread: 0.2
-                color: colors.glowColor
-            }
-        }
-    }
-
-    Rectangle {
-        id: timeIndicatorRect
-        width: timeMetrics.width + VLCStyle.dp(10, VLCStyle.scale)
-        height: timeMetrics.height + VLCStyle.dp(5, VLCStyle.scale)
-
-        color: colors.bgAlt
+    background: Rectangle {
+        border.color: colors.border
+        color: colors.tooltipColor
         radius: VLCStyle.dp(6, VLCStyle.scale)
 
-        RectangularGlow {
-            anchors.fill: parent
+        Item {
+            id: arrowArea
 
-            glowRadius: VLCStyle.dp(2, VLCStyle.scale)
-            cornerRadius: parent.radius
-            spread: 0.2
+            z: 1
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.bottom
+            anchors.topMargin: -(parent.border.width)
 
-            color: colors.glowColor
-        }
+            implicitHeight: arrow.implicitHeight * Math.sqrt(2) / 2
 
-        Label {
-            anchors.fill: parent
-            text: timeMetrics.text
-            color: colors.text
-            font: timeMetrics.font
+            clip: true
 
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
+            Rectangle {
+                id: arrow
 
-            TextMetrics {
-                id: timeMetrics
-                font.pixelSize: VLCStyle.fontSize_normal
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.horizontalCenterOffset: _x - pointingTooltip.x
+                anchors.verticalCenter: parent.top
+
+                implicitWidth: VLCStyle.dp(10, VLCStyle.scale)
+                implicitHeight: VLCStyle.dp(10, VLCStyle.scale)
+
+                rotation: 45
+
+                color: background.color
+                border.color: background.border.color
             }
         }
     }

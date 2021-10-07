@@ -30,7 +30,6 @@ Slider {
     property bool _isHold: false
     property bool _isSeekPointsShown: true
 
-    property alias parentWindow: timeTooltip.parentWindow
     property alias backgroundColor: sliderRect.color
     property alias progressBarColor: progressRect.color
 
@@ -56,11 +55,11 @@ Slider {
 
         visible: control.hovered
 
-        text: player.length.scale(timeTooltip.position).toString() +
+        text: player.length.scale(pos.x / control.width).toString() +
               (player.hasChapters ?
                    " - " + player.chapters.getNameAtPosition(timeTooltip.position) : "")
 
-        mouseArea: sliderRectMouseArea
+        pos: Qt.point(sliderRectMouseArea.mouseX, 0)
 
         colors: control.colors
     }

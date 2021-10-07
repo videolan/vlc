@@ -179,7 +179,6 @@ Control {
         progressBarColor: activeFocus ? colors.accent : colors.playerControlBarFg
         barHeight: VLCStyle.heightBar_xxsmall
         enabled: player.playingState == PlayerController.PLAYING_STATE_PLAYING || player.playingState == PlayerController.PLAYING_STATE_PAUSED
-        parentWindow: g_root
         colors: root.colors
 
         Navigation.parentItem: root

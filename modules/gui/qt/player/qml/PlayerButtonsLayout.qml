@@ -28,8 +28,6 @@ FocusScope {
 
     implicitHeight: VLCStyle.maxControlbarControlHeight
 
-    property var parentWindow: g_root
-
     property var colors: undefined
 
     property var defaultSize: VLCStyle.icon_normal // default size for IconToolButton based controls
