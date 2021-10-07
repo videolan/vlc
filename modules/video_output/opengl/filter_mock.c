@@ -173,8 +173,6 @@ static int
 DrawMask(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
          const struct vlc_gl_input_meta *meta)
 {
-    (void) pic; /* TODO not used yet */
-
     struct sys *sys = filter->sys;
 
     const opengl_vtable_t *vt = &filter->api->vt;
@@ -193,8 +191,7 @@ DrawMask(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
     vt->UniformMatrix4fv(sys->loc.rotation_matrix, 1, GL_FALSE,
                          sys->rotation_matrix);
 
-    const float *mtx = sampler->pic_to_tex_matrix;
-    assert(mtx);
+    const float *mtx = pic->mtx;
 
     /* Expand the 2x3 matrix to 3x3 to store it in a mat3 uniform (for better
      * compatibility). Both are in column-major order. */
@@ -228,7 +225,7 @@ DrawPlane(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
     vt->BindBuffer(GL_ARRAY_BUFFER, sys->vbo);
 
-    if (vlc_gl_sampler_MustRecomputeCoords(sampler))
+    if (pic->mtx_has_changed)
     {
         float coords[] = {
             0, 1,
@@ -238,7 +235,7 @@ DrawPlane(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
         };
 
         /* Transform coordinates in place */
-        vlc_gl_sampler_PicToTexCoords(sampler, 4, coords, coords);
+        vlc_gl_picture_ToTexCoords(pic, 4, coords, coords);
 
         const float data[] = {
             -1,  1, coords[0], coords[1],

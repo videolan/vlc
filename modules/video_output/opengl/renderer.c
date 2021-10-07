@@ -300,7 +300,8 @@ Close(struct vlc_gl_filter *filter)
     free(renderer);
 }
 
-static int SetupCoords(struct vlc_gl_renderer *renderer);
+static int SetupCoords(struct vlc_gl_renderer *renderer,
+                       const struct vlc_gl_picture *pic);
 
 static int
 Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
@@ -678,7 +679,8 @@ static int BuildRectangle(GLfloat **vertexCoord, GLfloat **textureCoord, unsigne
     return VLC_SUCCESS;
 }
 
-static int SetupCoords(struct vlc_gl_renderer *renderer)
+static int SetupCoords(struct vlc_gl_renderer *renderer,
+                       const struct vlc_gl_picture *pic)
 {
     const opengl_vtable_t *vt = renderer->vt;
     struct vlc_gl_sampler *sampler = renderer->sampler;
@@ -714,8 +716,7 @@ static int SetupCoords(struct vlc_gl_renderer *renderer)
         return i_ret;
 
     /* Transform picture-to-texture coordinates in place */
-    vlc_gl_sampler_PicToTexCoords(sampler, nbVertices, textureCoord,
-                                  textureCoord);
+    vlc_gl_picture_ToTexCoords(pic, nbVertices, textureCoord, textureCoord);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
     vt->BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
@@ -743,7 +744,6 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
      const struct vlc_gl_input_meta *meta)
 {
     (void) meta;
-    (void) pic; /* TODO not used yet */
 
     struct vlc_gl_renderer *renderer = filter->sys;
 
@@ -756,12 +756,12 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
     struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
     vlc_gl_sampler_Load(sampler);
 
-    if (vlc_gl_sampler_MustRecomputeCoords(sampler))
+    if (pic->mtx_has_changed)
         renderer->valid_coords = false;
 
     if (!renderer->valid_coords)
     {
-        int ret = SetupCoords(renderer);
+        int ret = SetupCoords(renderer, pic);
         if (ret != VLC_SUCCESS)
             return ret;
 
