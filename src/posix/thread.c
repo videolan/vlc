@@ -36,6 +36,7 @@
 #include <stdnoreturn.h>
 #include <signal.h>
 #include <errno.h>
+#include <limits.h>
 #include <time.h>
 #include <assert.h>
 
@@ -199,7 +200,10 @@ void vlc_join(vlc_thread_t th, void **result)
 
 VLC_WEAK unsigned long vlc_thread_id(void)
 {
-     return -1;
+     static thread_local unsigned char dummy;
+
+     static_assert (UINTPTR_MAX <= ULONG_MAX, "Type size mismatch");
+     return (uintptr_t)(void *)&dummy;
 }
 
 int vlc_set_priority (vlc_thread_t th, int priority)
