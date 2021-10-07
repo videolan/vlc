@@ -707,9 +707,6 @@ DOLT
 
 lt_cv_deplibs_check_method=pass_all
 
-AS_IF([test "${enable_shared}" = "no" -a "${enable_vlc}" != "no"], [
-  AC_MSG_ERROR([VLC is based on plugins. Shared libraries cannot be disabled.])
-])
 
 dnl
 dnl Gettext stuff
@@ -1058,6 +1055,9 @@ AS_IF([test "${enable_partial_linking}" = "yes" -a "${have_dynamic_objects}" = "
 AM_CONDITIONAL([HAVE_PARTIAL_LINKING], [test "${have_partial_linking}" = "yes"])
 AS_IF([test "${have_partial_linking}" = "yes"], [
     AC_DEFINE([HAVE_PARTIAL_LINKING], 1, [Define if static plugins use partial linking])
+])
+AS_IF([test "${enable_shared}" = "no" -a "${have_partial_linking}" != "yes" -a "${enable_vlc}" != "no"], [
+    AC_MSG_ERROR([VLC requires partial linking to build with static plugins. Use --enable-partial-linking or --disable-vlc.])
 ])
 
 dnl Check if the linker supports --force-group-allocation.
