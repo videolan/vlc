@@ -233,7 +233,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     if ( twolame_init_params( p_sys->p_twolame ) )
     {
         msg_Err( p_enc, "twolame initialization failed" );
-        return -VLC_EGENERIC;
+        return VLC_EGENERIC;
     }
 
     p_enc->pf_encode_audio = Encode;
