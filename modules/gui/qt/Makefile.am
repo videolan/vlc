@@ -791,7 +791,7 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/SliderBar.qml \
 	gui/qt/player/qml/TopBar.qml \
 	gui/qt/player/qml/TrackInfo.qml \
-	gui/qt/player/qml/ButtonsLayout.qml \
+	gui/qt/player/qml/ControlLayout.qml \
 	gui/qt/player/qml/controlbarcontrols/HighResolutionTimeWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/ArtworkInfoWidget.qml \
 	gui/qt/player/qml/controlbarcontrols/AspectRatioWidget.qml \

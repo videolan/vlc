@@ -26,15 +26,15 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
 FocusScope {
-    id: buttonsLayout
+    id: controlLayout
 
-    property alias model: buttonsRepeater.model
+    property alias model: repeater.model
 
     readonly property real minimumWidth: {
         var minimumWidth = 0
 
-        for (var i = 0; i < buttonsRepeater.count; ++i) {
-            var item = buttonsRepeater.itemAt(i).item
+        for (var i = 0; i < repeater.count; ++i) {
+            var item = repeater.itemAt(i).item
 
             if (item.minimumWidth !== undefined)
                 minimumWidth += item.minimumWidth
@@ -42,7 +42,7 @@ FocusScope {
                 minimumWidth += item.width
         }
 
-        minimumWidth += ((buttonsRepeater.count - 1) * buttonrow.spacing)
+        minimumWidth += ((repeater.count - 1) * rowLayout.spacing)
 
         return minimumWidth
     }
@@ -50,16 +50,16 @@ FocusScope {
     property int expandableCount: 0 // widget count that can expand when extra width is available
 
     Navigation.navigable: {
-        for (var i = 0; i < buttonsRepeater.count; ++i) {
-            if (buttonsRepeater.itemAt(i).item.focus) {
+        for (var i = 0; i < repeater.count; ++i) {
+            if (repeater.itemAt(i).item.focus) {
                 return true
             }
         }
         return false
     }
 
-    implicitWidth: buttonrow.implicitWidth
-    implicitHeight: buttonrow.implicitHeight
+    implicitWidth: rowLayout.implicitWidth
+    implicitHeight: rowLayout.implicitHeight
 
     property var altFocusAction: Navigation.defaultNavigationUp
 
@@ -78,24 +78,24 @@ FocusScope {
     }
 
     RowLayout {
-        id: buttonrow
+        id: rowLayout
 
         anchors.fill: parent
 
         spacing: playerButtonsLayout.spacing
 
         Repeater {
-            id: buttonsRepeater
+            id: repeater
 
             onItemRemoved: {
                 if (item.item.extraWidth !== undefined)
-                    buttonsLayout.expandableCount--
+                    controlLayout.expandableCount--
 
                 item.recoverFocus(index)
             }
 
             delegate: Loader {
-                id: buttonloader
+                id: loader
 
                 source: PlayerControlbarControls.control(model.id).source
 
@@ -103,20 +103,20 @@ FocusScope {
 
                 function buildFocusChain() {
                     // rebuild the focus chain:
-                    if (typeof buttonsRepeater === "undefined")
+                    if (typeof repeater === "undefined")
                         return
 
-                    var rightItem = buttonsRepeater.itemAt(index + 1)
-                    var leftItem = buttonsRepeater.itemAt(index - 1)
+                    var rightItem = repeater.itemAt(index + 1)
+                    var leftItem = repeater.itemAt(index - 1)
 
                     item.Navigation.rightItem = !!rightItem ? rightItem.item : null
                     item.Navigation.leftItem = !!leftItem ? leftItem.item : null
                 }
 
                 Component.onCompleted: {
-                    buttonsRepeater.countChanged.connect(buttonloader.buildFocusChain)
-                    mainInterface.controlbarProfileModel.selectedProfileChanged.connect(buttonloader.buildFocusChain)
-                    mainInterface.controlbarProfileModel.currentModel.dirtyChanged.connect(buttonloader.buildFocusChain)
+                    repeater.countChanged.connect(loader.buildFocusChain)
+                    mainInterface.controlbarProfileModel.selectedProfileChanged.connect(loader.buildFocusChain)
+                    mainInterface.controlbarProfileModel.currentModel.dirtyChanged.connect(loader.buildFocusChain)
                 }
 
                 onActiveFocusChanged: {
@@ -128,7 +128,7 @@ FocusScope {
                 Connections {
                     target: item
 
-                    enabled: buttonloader.status === Loader.Ready
+                    enabled: loader.status === Loader.Ready
 
                     onEnabledChanged: {
                         if (activeFocus && !item.enabled) // Loader has focus but item is not enabled
@@ -140,9 +140,9 @@ FocusScope {
                     // control should not request focus if they are not enabled:
                     item.focus = Qt.binding(function() { return item.enabled })
 
-                    // navigation parent of control is always buttonsLayout
+                    // navigation parent of control is always controlLayout
                     // so it can be set here unlike leftItem and rightItem:
-                    item.Navigation.parentItem = buttonsLayout
+                    item.Navigation.parentItem = controlLayout
 
                     if (item instanceof Widgets.IconToolButton)
                         item.size = Qt.binding(function() { return defaultSize; })
@@ -152,21 +152,21 @@ FocusScope {
                         item.colors = Qt.binding(function() { return colors; })
                     }
 
-                    if (item.extraWidth !== undefined && buttonsLayout.extraWidth !== undefined) {
-                        buttonsLayout.expandableCount++
+                    if (item.extraWidth !== undefined && controlLayout.extraWidth !== undefined) {
+                        controlLayout.expandableCount++
                         item.extraWidth = Qt.binding( function() {
-                            return (buttonsLayout.extraWidth / buttonsLayout.expandableCount) // distribute extra width
+                            return (controlLayout.extraWidth / controlLayout.expandableCount) // distribute extra width
                         } )
                     }
                 }
 
-                function _focusIfFocusable(loader) {
-                    if (!!loader && !!loader.item && loader.item.focus) {
+                function _focusIfFocusable(_loader) {
+                    if (!!_loader && !!_loader.item && _loader.item.focus) {
                         if (item.focusReason !== undefined)
-                            loader.item.forceActiveFocus(item.focusReason)
+                            _loader.item.forceActiveFocus(item.focusReason)
                         else {
                             console.warn("focusReason is not available in %1!".arg(item))
-                            loader.item.forceActiveFocus()
+                            _loader.item.forceActiveFocus()
                         }
                         return true
                     } else {
@@ -178,16 +178,16 @@ FocusScope {
                     if (_index === undefined)
                         _index = index
 
-                    for (var i = 1; i <= Math.max(_index, buttonsRepeater.count - (_index + 1)); ++i) {
+                    for (var i = 1; i <= Math.max(_index, repeater.count - (_index + 1)); ++i) {
                          if (i <= _index) {
-                             var leftItem = buttonsRepeater.itemAt(_index - i)
+                             var leftItem = repeater.itemAt(_index - i)
 
                              if (_focusIfFocusable(leftItem))
                                  return
                          }
 
-                         if (_index + i <= buttonsRepeater.count - 1) {
-                             var rightItem = buttonsRepeater.itemAt(_index + i)
+                         if (_index + i <= repeater.count - 1) {
+                             var rightItem = repeater.itemAt(_index + i)
 
                              if (_focusIfFocusable(rightItem))
                                  return
@@ -196,12 +196,12 @@ FocusScope {
 
                     // focus to other alignment if focusable control
                     // in the same alignment is not found:
-                    if (!!buttonsLayout.Navigation.rightItem) {
-                        buttonsLayout.Navigation.defaultNavigationRight()
-                    } else if (!!buttonsLayout.Navigation.leftItem) {
-                        buttonsLayout.Navigation.defaultNavigationLeft()
+                    if (!!controlLayout.Navigation.rightItem) {
+                        controlLayout.Navigation.defaultNavigationRight()
+                    } else if (!!controlLayout.Navigation.leftItem) {
+                        controlLayout.Navigation.defaultNavigationLeft()
                     } else {
-                        buttonsLayout.altFocusAction()
+                        controlLayout.altFocusAction()
                     }
                 }
             }

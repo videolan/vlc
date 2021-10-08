@@ -65,7 +65,7 @@ FocusScope {
 
         focus: true
 
-        sourceComponent: ButtonsLayout {
+        sourceComponent: ControlLayout {
             model: playerButtonsLayout.model.left
 
             extraWidth: (buttonrow_center.x - buttonrow_left.x - minimumWidth - layoutSpacing)
@@ -93,7 +93,7 @@ FocusScope {
         active: !!playerButtonsLayout.model
                 && !!playerButtonsLayout.model.center
 
-        sourceComponent: ButtonsLayout {
+        sourceComponent: ControlLayout {
             model: playerButtonsLayout.model.center
 
             Navigation.parentItem: playerButtonsLayout
@@ -120,7 +120,7 @@ FocusScope {
         active: !!playerButtonsLayout.model
                 && !!playerButtonsLayout.model.right
 
-        sourceComponent: ButtonsLayout {
+        sourceComponent: ControlLayout {
             model: playerButtonsLayout.model.right
 
             extraWidth: (playerButtonsLayout.width - (buttonrow_center.x + buttonrow_center.width) - minimumWidth - (2 * layoutSpacing))
