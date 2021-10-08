@@ -411,6 +411,7 @@ static void FreeCVBuffer(picture_t *picture)
 
     _currentPicture = next_picture;
     // TODO: rebind at makeCurrent instead, if not binded?
+    glFinish();
     glBindFramebuffer(GL_FRAMEBUFFER, buffer->fbo);
 
     [self releaseCurrent];
