@@ -57,7 +57,7 @@ struct decoder_owner_callbacks
             /* cf.decoder_QueueVideo */
             void        (*queue)( decoder_t *, picture_t * );
             /* cf.decoder_QueueCC */
-            void        (*queue_cc)( decoder_t *, block_t *,
+            void        (*queue_cc)( decoder_t *, vlc_frame_t *,
                                      const decoder_cc_desc_t * );
 
             /* Display date
@@ -72,7 +72,7 @@ struct decoder_owner_callbacks
             int     (*format_update)( decoder_t * );
 
             /* cf.decoder_QueueAudio */
-            void    (*queue)( decoder_t *, block_t * );
+            void    (*queue)( decoder_t *, vlc_frame_t * );
         } audio;
         struct
         {
@@ -132,7 +132,7 @@ struct decoder_t
          * send output frames/blocks via decoder_QueueVideo(), decoder_QueueAudio()
          * or decoder_QueueSub().
          *
-         * If p_block is NULL, the decoder asks the module to drain itself. The
+         * If frame is NULL, the decoder asks the module to drain itself. The
          * module should return all available output frames/block via the queue
          * functions.
          *
@@ -143,10 +143,10 @@ struct decoder_t
          *  VLCDEC_RELOAD: Request that the decoder should be reloaded. The current
          *  module will be unloaded. Reloading a module may cause a loss of frames.
          *  When returning this status, the implementation shouldn't release or
-         *  modify the p_block in argument (The same p_block will be feed to the
+         *  modify the frame in argument (The same frame will be feed to the
          *  next decoder module).
          */
-        int             ( * pf_decode )   ( decoder_t *, block_t *p_block );
+        int             ( * pf_decode )   ( decoder_t *, vlc_frame_t *frame );
 
         /* This function is called in a loop with the same pp_block argument until
          * it returns NULL. This allows a module implementation to return more than
@@ -157,25 +157,25 @@ struct decoder_t
          * If pp_block and *pp_block are not NULL, the module implementation will
          * own the input block (*pp_block) and should process and release it. The
          * module can also process a part of the block. In that case, it should
-         * modify (*pp_block)->p_buffer/i_buffer accordingly and return a valid
-         * output block. The module can also set *pp_block to NULL when the input
+         * modify (*ppframe)->p_buffer/i_buffer accordingly and return a valid
+         * output block. The module can also set *ppframe to NULL when the input
          * block is consumed.
          *
-         * If pp_block is not NULL but *pp_block is NULL, a previous call of the pf
-         * function has set the *pp_block to NULL. Here, the module can return new
+         * If ppframe is not NULL but *ppframe is NULL, a previous call of the pf
+         * function has set the *ppframe to NULL. Here, the module can return new
          * output block for the same, already processed, input block (the
          * pf_packetize function will be called as long as the module return an
          * output block).
          *
          * When the pf function returns NULL, the next call to this function will
-         * have a new a valid pp_block (if the packetizer is not drained).
+         * have a new a valid ppframe (if the packetizer is not drained).
          *
-         * If pp_block is NULL, the packetizer asks the module to drain itself. In
+         * If ppframe is NULL, the packetizer asks the module to drain itself. In
          * that case, the module has to return all output frames available (the
          * pf_packetize function will be called as long as the module return an
          * output block).
          */
-        block_t *       ( * pf_packetize )( decoder_t *, block_t **pp_block );
+        vlc_frame_t *   ( * pf_packetize )( decoder_t *, vlc_frame_t  **ppframe );
     };
 
     /* */
@@ -187,7 +187,7 @@ struct decoder_t
      * channel bitmaps will be used to known which cc channel are present (but
      * globaly, not necessary for the current packet. Video decoders should use
      * the decoder_QueueCc() function to pass closed captions. */
-    block_t *           ( * pf_get_cc )      ( decoder_t *, decoder_cc_desc_t * );
+    vlc_frame_t *       ( * pf_get_cc )      ( decoder_t *, decoder_cc_desc_t * );
 
     /* Meta data at codec level
      *  The decoder owner set it back to NULL once it has retreived what it needs.
@@ -403,7 +403,7 @@ static inline void decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
  * \param p_cc the closed-caption to queue
  * \param p_desc decoder_cc_desc_t description structure
  */
-static inline void decoder_QueueCc( decoder_t *dec, block_t *p_cc,
+static inline void decoder_QueueCc( decoder_t *dec, vlc_frame_t *p_cc,
                                    const decoder_cc_desc_t *p_desc )
 {
     vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
@@ -421,7 +421,7 @@ static inline void decoder_QueueCc( decoder_t *dec, block_t *p_cc,
  * The caller doesn't own the audio block anymore after this call (even in case
  * of error).
  */
-static inline void decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
+static inline void decoder_QueueAudio( decoder_t *dec, vlc_frame_t *p_aout_buf )
 {
     vlc_assert( dec->fmt_in.i_cat == AUDIO_ES && dec->cbs != NULL );
     vlc_assert( p_aout_buf->p_next == NULL );
@@ -465,7 +465,7 @@ static inline int decoder_UpdateAudioFormat( decoder_t *dec )
  * output buffer. It must be released with block_Release() or returned it to
  * the caller as a decoder_QueueAudio parameter.
  */
-VLC_API block_t * decoder_NewAudioBuffer( decoder_t *, int i_nb_samples ) VLC_USED;
+VLC_API vlc_frame_t * decoder_NewAudioBuffer( decoder_t *, int i_nb_samples ) VLC_USED;
 
 /**
  * This function will return a new subpicture usable by a decoder as an output
