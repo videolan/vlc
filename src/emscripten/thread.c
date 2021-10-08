@@ -23,8 +23,10 @@
 #endif
 
 #include <pthread.h>
+#include <assert.h>
 
 unsigned long vlc_thread_id(void)
 {
+    static_assert(sizeof(pthread_t) <= sizeof(unsigned long),"invalid pthread_t size");
     return pthread_self();
 }
