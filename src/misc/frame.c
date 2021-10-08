@@ -57,6 +57,15 @@ static void vlc_frame_Check (vlc_frame_t *frame)
 # define vlc_frame_Check(b) ((void)(b))
 #endif
 
+void vlc_frame_CopyProperties(vlc_frame_t *dst, const vlc_frame_t *src)
+{
+    dst->i_flags   = src->i_flags;
+    dst->i_nb_samples = src->i_nb_samples;
+    dst->i_dts     = src->i_dts;
+    dst->i_pts     = src->i_pts;
+    dst->i_length  = src->i_length;
+}
+
 vlc_frame_t *vlc_frame_Init(vlc_frame_t *restrict f, const struct vlc_frame_callbacks *cbs,
                             void *buf, size_t size)
 {
