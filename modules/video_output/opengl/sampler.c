@@ -968,7 +968,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
             if (tex_target == GL_TEXTURE_RECTANGLE)
             {
                 /* The coordinates are in texels values, not normalized */
-                ADDF("  %s(Textures[%u], TexSizes[%u] * tex_coords).%s;\n", lookup, i, i, swizzle);
+                ADDF("  %s(Textures[%u], TexSizes[%u] * tex_coords).%s,\n", lookup, i, i, swizzle);
             }
             else
             {
