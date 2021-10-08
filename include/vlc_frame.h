@@ -204,14 +204,15 @@ VLC_API vlc_frame_t *vlc_frame_Realloc(vlc_frame_t *, ssize_t pre, size_t body) 
  */
 VLC_API void vlc_frame_Release(vlc_frame_t *frame);
 
-static inline void vlc_frame_CopyProperties( vlc_frame_t *dst, const vlc_frame_t *src )
-{
-    dst->i_flags   = src->i_flags;
-    dst->i_nb_samples = src->i_nb_samples;
-    dst->i_dts     = src->i_dts;
-    dst->i_pts     = src->i_pts;
-    dst->i_length  = src->i_length;
-}
+/**
+ * Copy frame properties from src to dst
+ *
+ * Copy i_flags, i_nb_samples, i_dts, i_pts, and i_length.
+ *
+ * @param dst the frame to copy properties into
+ * @param src the frame to copy properties from
+ */
+VLC_API void vlc_frame_CopyProperties( vlc_frame_t *dst, const vlc_frame_t *src );
 
 /**
  * Duplicates a frame.
