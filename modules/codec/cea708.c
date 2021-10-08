@@ -149,7 +149,7 @@ void CEA708_DTVCC_Demuxer_Push( cea708_demux_t *h, vlc_tick_t i_start, const uin
 #define CEA708_SERVICE_INPUT_BUFFER    128
 
 #define CEA708_WINDOWS_COUNT            8
-#define CEA708_PREDEFINED_STYLES        8
+#define CEA708_PREDEFINED_STYLES        7
 
 #define CEA708_SCREEN_ROWS              75
 #define CEA708_SCREEN_COLS_43           160
@@ -1536,11 +1536,15 @@ static int CEA708_Decode_C1( uint8_t code, cea708_t *p_cea708 )
                 v = cea708_input_buffer_get( ib );
                 /* zero values style set on init, avoid dealing with updt case */
                 i = (v >> 3) & 0x07; /* Window style id */
-                if( i > 0 && !p_cea708->p_cw->b_defined )
-                    p_cea708->p_cw->style = cea708_default_window_styles[i];
+                if( i > 0 )
+                    p_cea708->p_cw->style = cea708_default_window_styles[i-1];
+                else if( !p_cea708->p_cw->b_defined ) /* Set to style #1 or ignore */
+                    p_cea708->p_cw->style = cea708_default_window_styles[0];
                 i = v & 0x07; /* Pen style id */
-                if( i > 0 && !p_cea708->p_cw->b_defined )
-                    p_cea708->p_cw->pen = cea708_default_pen_styles[i];
+                if( i > 0 )
+                    p_cea708->p_cw->pen = cea708_default_pen_styles[i-1];
+                else if( !p_cea708->p_cw->b_defined ) /* Set to style #1 or ignore */
+                    p_cea708->p_cw->pen = cea708_default_pen_styles[0];
                 p_cea708->p_cw->b_defined = true;
             }
             else
