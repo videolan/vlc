@@ -144,17 +144,17 @@ FocusScope {
                     // so it can be set here unlike leftItem and rightItem:
                     item.Navigation.parentItem = buttonsLayout
 
-                    if (buttonloader.item instanceof Widgets.IconToolButton)
-                        buttonloader.item.size = Qt.binding(function() { return defaultSize; })
+                    if (item instanceof Widgets.IconToolButton)
+                        item.size = Qt.binding(function() { return defaultSize; })
 
                     // force colors:
-                    if (!!colors && !!buttonloader.item.colors) {
-                        buttonloader.item.colors = Qt.binding(function() { return colors; })
+                    if (!!colors && !!item.colors) {
+                        item.colors = Qt.binding(function() { return colors; })
                     }
 
-                    if (buttonloader.item.extraWidth !== undefined && buttonsLayout.extraWidth !== undefined) {
+                    if (item.extraWidth !== undefined && buttonsLayout.extraWidth !== undefined) {
                         buttonsLayout.expandableCount++
-                        buttonloader.item.extraWidth = Qt.binding( function() {
+                        item.extraWidth = Qt.binding( function() {
                             return (buttonsLayout.extraWidth / buttonsLayout.expandableCount) // distribute extra width
                         } )
                     }
@@ -162,10 +162,10 @@ FocusScope {
 
                 function _focusIfFocusable(loader) {
                     if (!!loader && !!loader.item && loader.item.focus) {
-                        if (buttonloader.item.focusReason !== undefined)
-                            loader.item.forceActiveFocus(buttonloader.item.focusReason)
+                        if (item.focusReason !== undefined)
+                            loader.item.forceActiveFocus(item.focusReason)
                         else {
-                            console.warn("focusReason is not available in %1!".arg(buttonloader.item))
+                            console.warn("focusReason is not available in %1!".arg(item))
                             loader.item.forceActiveFocus()
                         }
                         return true
