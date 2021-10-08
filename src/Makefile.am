@@ -367,7 +367,7 @@ libvlccore_la_SOURCES = \
 	misc/probe.c \
 	misc/rand.c \
 	misc/mtime.c \
-	misc/block.c \
+	misc/frame.c \
 	misc/fifo.c \
 	misc/fourcc.c \
 	misc/fourcc_list.h \
