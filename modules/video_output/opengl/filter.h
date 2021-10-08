@@ -25,7 +25,6 @@
 #include <vlc_tick.h>
 
 #include "picture.h"
-#include "sampler.h"
 
 struct vlc_gl_filter;
 
@@ -63,24 +62,6 @@ struct vlc_gl_filter_ops {
      * Free filter resources
      */
     void (*close)(struct vlc_gl_filter *filter);
-};
-
-struct vlc_gl_filter_owner_ops {
-    /**
-     * Get the sampler associated to this filter.
-     *
-     * The instance is lazy-loaded (to avoid creating one for blend filters).
-     * Successive calls to this function for the same filter is guaranteed to
-     * always return the same sampler.
-     *
-     * Important: filter->config must be initialized *before* getting the
-     * sampler, since the sampler behavior may depend on it.
-     *
-     * \param filter the filter
-     * \return sampler the sampler, NULL on error
-     */
-    struct vlc_gl_sampler *
-    (*get_sampler)(struct vlc_gl_filter *filter);
 };
 
 /**
@@ -131,14 +112,6 @@ struct vlc_gl_filter {
 
     const struct vlc_gl_filter_ops *ops;
     void *sys;
-
-    const struct vlc_gl_filter_owner_ops *owner_ops;
 };
-
-static inline struct vlc_gl_sampler *
-vlc_gl_filter_GetSampler(struct vlc_gl_filter *filter)
-{
-    return filter->owner_ops->get_sampler(filter);
-}
 
 #endif

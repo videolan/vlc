@@ -31,7 +31,6 @@
 #include <vlc_modules.h>
 
 #include "gl_api.h"
-#include "sampler.h"
 
 struct vlc_gl_filter *
 vlc_gl_filter_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api)
@@ -40,7 +39,6 @@ vlc_gl_filter_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api)
     if (!priv)
         return NULL;
 
-    priv->sampler = NULL;
     priv->size_out.width = 0;
     priv->size_out.height = 0;
 
@@ -115,9 +113,6 @@ vlc_gl_filter_Delete(struct vlc_gl_filter *filter)
         struct vlc_gl_filter *subfilter = &subfilter_priv->filter;
         vlc_gl_filter_Delete(subfilter);
     }
-
-    if (priv->sampler)
-        vlc_gl_sampler_Delete(priv->sampler);
 
     const opengl_vtable_t *vt = &filter->api->vt;
 

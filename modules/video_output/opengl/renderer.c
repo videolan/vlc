@@ -40,6 +40,7 @@
 #include "filter.h"
 #include "gl_util.h"
 #include "vout_helper.h"
+#include "sampler.h"
 
 #define SPHERE_RADIUS 1.f
 
@@ -290,6 +291,8 @@ Close(struct vlc_gl_filter *filter)
     struct vlc_gl_renderer *renderer = filter->sys;
     const opengl_vtable_t *vt = renderer->vt;
 
+    vlc_gl_sampler_Delete(renderer->sampler);
+
     vt->DeleteBuffers(1, &renderer->vertex_buffer_object);
     vt->DeleteBuffers(1, &renderer->index_buffer_object);
     vt->DeleteBuffers(1, &renderer->texture_buffer_object);
@@ -315,17 +318,20 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
 {
     (void) config;
     (void) size_out;
-    (void) glfmt; /* TODO not used yet */
 
     const opengl_vtable_t *vt = &filter->api->vt;
 
-    struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+    struct vlc_gl_sampler *sampler =
+        vlc_gl_sampler_New(filter->gl, filter->api, glfmt, false);
     if (!sampler)
         return VLC_EGENERIC;
 
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
+    {
+        vlc_gl_sampler_Delete(sampler);
         return VLC_EGENERIC;
+    }
 
     static const struct vlc_gl_filter_ops filter_ops = {
         .draw = Draw,
@@ -753,7 +759,8 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
     vt->UseProgram(renderer->program_id);
 
-    struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+    struct vlc_gl_sampler *sampler = renderer->sampler;
+    vlc_gl_sampler_Update(sampler, pic);
     vlc_gl_sampler_Load(sampler);
 
     if (pic->mtx_has_changed)

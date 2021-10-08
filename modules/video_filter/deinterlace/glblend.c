@@ -33,8 +33,11 @@
 #include "video_output/opengl/gl_api.h"
 #include "video_output/opengl/gl_common.h"
 #include "video_output/opengl/gl_util.h"
+#include "video_output/opengl/sampler.h"
 
 struct sys {
+    struct vlc_gl_sampler *sampler;
+
     GLuint program_id;
 
     GLuint vbo;
@@ -58,7 +61,9 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
     vt->UseProgram(sys->program_id);
 
-    struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+    struct vlc_gl_sampler *sampler = sys->sampler;
+    vlc_gl_sampler_SelectPlane(sampler, meta->plane);
+    vlc_gl_sampler_Update(sampler, pic);
     vlc_gl_sampler_Load(sampler);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, sys->vbo);
@@ -125,6 +130,8 @@ Close(struct vlc_gl_filter *filter)
 {
     struct sys *sys = filter->sys;
 
+    vlc_gl_sampler_Delete(sys->sampler);
+
     const opengl_vtable_t *vt = &filter->api->vt;
     vt->DeleteProgram(sys->program_id);
     vt->DeleteBuffers(1, &sys->vbo);
@@ -138,7 +145,6 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
 {
     (void) config;
     (void) size_out;
-    (void) glfmt; /* TODO not used yet */
 
     static const struct vlc_gl_filter_ops ops = {
         .draw = Draw,
@@ -147,13 +153,19 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     filter->ops = &ops;
     filter->config.filter_planes = true;
 
-    struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+    struct vlc_gl_sampler *sampler =
+        vlc_gl_sampler_New(filter->gl, filter->api, glfmt, true);
     if (!sampler)
         return VLC_EGENERIC;
 
     struct sys *sys = filter->sys = malloc(sizeof(*sys));
     if (!sys)
+    {
+        vlc_gl_sampler_Delete(sampler);
         return VLC_EGENERIC;
+    }
+
+    sys->sampler = sampler;
 
     static const char *const VERTEX_SHADER =
         "attribute vec2 vertex_pos;\n"

@@ -30,7 +30,6 @@
 
 #include "filter_priv.h"
 #include "importer_priv.h"
-#include "sampler.h"
 
 /* The filter chain contains the sequential list of filters.
  *
@@ -117,8 +116,7 @@ struct vlc_gl_filters {
     const struct vlc_gl_api *api;
 
     /**
-     * Interop to use for the sampler of the first filter of the chain,
-     * the one which uses the picture_t as input.
+     * Interop to use for the input picture.
      */
     struct vlc_gl_interop *interop;
     struct vlc_gl_importer *importer;
@@ -285,27 +283,6 @@ InitFramebufferMSAA(struct vlc_gl_filter_priv *priv, unsigned msaa_level)
     return VLC_SUCCESS;
 }
 
-static struct vlc_gl_sampler *
-GetSampler(struct vlc_gl_filter *filter)
-{
-    struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
-    if (priv->sampler)
-        /* already initialized */
-        return priv->sampler;
-
-    struct vlc_gl_filters *filters = priv->filters;
-
-    bool expose_planes = filter->config.filter_planes;
-    struct vlc_gl_format *glfmt = &priv->glfmt_in;
-
-    struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filters->gl, filters->api, glfmt, expose_planes);
-
-    priv->sampler = sampler;
-
-    return sampler;
-}
-
 struct vlc_gl_filter *
 vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
                       const config_chain_t *config)
@@ -355,14 +332,6 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
         memcpy(glfmt->visible_heights, prev_filter->plane_heights, size);
     }
 
-    priv->filters = filters;
-    priv->prev_filter = prev_filter;
-
-    static const struct vlc_gl_filter_owner_ops owner_ops = {
-        .get_sampler = GetSampler,
-    };
-    filter->owner_ops = &owner_ops;
-
     /* By default, the output size is the same as the input size. The filter
      * may change it during its Open(). */
     priv->size_out = size_in;
@@ -388,15 +357,6 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
     /* A filter operating on planes may not use anti-aliasing. */
     assert(!filter->config.filter_planes || !filter->config.msaa_level);
 
-    /* A blend filter may not read its input, so it is an error if a sampler
-     * has been requested.
-     *
-     * We assert it here instead of in vlc_gl_filter_GetSampler() because the
-     * filter implementation may set the "blend" flag after it get the sampler
-     * in its Open() function.
-     */
-    assert(!filter->config.blend || !priv->sampler);
-
     if (filter->config.blend)
     {
         if (!prev_filter || prev_filter->filter.config.filter_planes)
@@ -421,14 +381,6 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
     }
     else
     {
-        /* Make sure the sampler of non-blend filters is initialized */
-        struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
-        if (!sampler)
-        {
-            vlc_gl_filter_Delete(filter);
-            return NULL;
-        }
-
         if (filter->config.filter_planes)
         {
             priv->plane_count = glfmt->tex_count;
@@ -558,12 +510,8 @@ vlc_gl_filters_UpdatePicture(struct vlc_gl_filters *filters,
                                      node);
 
     assert(first_filter);
-
-    ret = vlc_gl_sampler_Update(first_filter->sampler, &importer->pic);
-    if (ret != VLC_SUCCESS)
-        return ret;
-
     first_filter->has_picture = true;
+
     return VLC_SUCCESS;
 }
 
@@ -601,14 +549,6 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
              * it is defined for the first time) */
             direct_pic.mtx_has_changed = !priv->has_picture;
 
-            /* Read from the output of the previous filter */
-            int ret = vlc_gl_sampler_Update(priv->sampler, &direct_pic);
-            if (ret != VLC_SUCCESS)
-            {
-                msg_Err(filters->gl, "Could not update sampler texture");
-                return ret;
-            }
-
             priv->has_picture = true;
 
             pic = &direct_pic;
@@ -634,7 +574,6 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
                 assert(!vlc_list_is_last(&priv->node, &filters->list));
                 vt->Viewport(0, 0, priv->tex_widths[i], priv->tex_heights[i]);
 
-                vlc_gl_sampler_SelectPlane(priv->sampler, i);
                 int ret = filter->ops->draw(filter, pic, &meta);
                 if (ret != VLC_SUCCESS)
                     return ret;

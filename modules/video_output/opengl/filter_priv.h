@@ -27,7 +27,6 @@
 #include <vlc_picture.h>
 
 #include "filter.h"
-#include "sampler.h"
 
 struct vlc_gl_filter_priv {
     struct vlc_gl_filter filter;
@@ -37,9 +36,6 @@ struct vlc_gl_filter_priv {
     struct vlc_gl_tex_size size_out;
 
     struct vlc_gl_format glfmt_in;
-
-    /* Only meaningful for non-blend filters { */
-    struct vlc_gl_sampler *sampler; /* owned */
 
     /* Describe the output planes, independently of whether textures are
      * created for this filter (the last filter does not own any textures). */
@@ -60,14 +56,6 @@ struct vlc_gl_filter_priv {
     GLuint framebuffer_msaa; /* owned */
     GLuint renderbuffer_msaa; /* owned (attached to framebuffer_msaa) */
     /* } */
-
-    /* For lazy-loading sampler */
-    struct vlc_gl_filters *filters; /* weak reference to the container */
-
-    /* Previous filter to construct the expected sampler. It is necessary
-     * because owner_ops->get_sampler() may be called during the Open(), while
-     * the filter is not added to the filter chain yet. */
-    struct vlc_gl_filter_priv *prev_filter;
 
     struct vlc_list node; /**< node of vlc_gl_filters.list */
 

@@ -32,6 +32,7 @@
 #include "gl_api.h"
 #include "gl_common.h"
 #include "gl_util.h"
+#include "sampler.h"
 
 #define DRAW_VFLIP_SHORTTEXT "VFlip the video"
 #define DRAW_VFLIP_LONGTEXT \
@@ -42,6 +43,8 @@
 static const char *const filter_options[] = { "vflip", NULL };
 
 struct sys {
+    struct vlc_gl_sampler *sampler;
+
     GLuint program_id;
 
     GLuint vbo;
@@ -66,7 +69,8 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
 
     vt->UseProgram(sys->program_id);
 
-    struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+    struct vlc_gl_sampler *sampler = sys->sampler;
+    vlc_gl_sampler_Update(sampler, pic);
     vlc_gl_sampler_Load(sampler);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, sys->vbo);
@@ -114,6 +118,8 @@ Close(struct vlc_gl_filter *filter)
 {
     struct sys *sys = filter->sys;
 
+    vlc_gl_sampler_Delete(sys->sampler);
+
     const opengl_vtable_t *vt = &filter->api->vt;
     vt->DeleteProgram(sys->program_id);
     vt->DeleteBuffers(1, &sys->vbo);
@@ -126,15 +132,20 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
      const struct vlc_gl_format *glfmt, struct vlc_gl_tex_size *size_out)
 {
     (void) size_out;
-    (void) glfmt; /* TODO not used yet */
 
-    struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+    struct vlc_gl_sampler *sampler =
+        vlc_gl_sampler_New(filter->gl, filter->api, glfmt, false);
     if (!sampler)
         return VLC_EGENERIC;
 
     struct sys *sys = filter->sys = malloc(sizeof(*sys));
     if (!sys)
+    {
+        vlc_gl_sampler_Delete(sampler);
         return VLC_EGENERIC;
+    }
+
+    sys->sampler = sampler;
 
     static const char *const VERTEX_SHADER_BODY =
         "attribute vec2 vertex_pos;\n"
