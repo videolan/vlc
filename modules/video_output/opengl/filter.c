@@ -33,11 +33,10 @@
 #include "gl_api.h"
 #include "sampler_priv.h"
 
-#undef vlc_gl_filter_New
 struct vlc_gl_filter *
-vlc_gl_filter_New(vlc_object_t *parent, const struct vlc_gl_api *api)
+vlc_gl_filter_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api)
 {
-    struct vlc_gl_filter_priv *priv = vlc_object_create(parent, sizeof(*priv));
+    struct vlc_gl_filter_priv *priv = vlc_object_create(gl, sizeof(*priv));
     if (!priv)
         return NULL;
 
@@ -51,6 +50,7 @@ vlc_gl_filter_New(vlc_object_t *parent, const struct vlc_gl_api *api)
     priv->has_picture = false;
 
     struct vlc_gl_filter *filter = &priv->filter;
+    filter->gl = gl;
     filter->api = api;
     filter->config.filter_planes = false;
     filter->config.blend = false;

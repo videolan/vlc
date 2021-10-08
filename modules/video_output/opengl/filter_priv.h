@@ -85,8 +85,7 @@ vlc_gl_filter_PRIV(struct vlc_gl_filter *filter)
 }
 
 struct vlc_gl_filter *
-vlc_gl_filter_New(vlc_object_t *parent, const struct vlc_gl_api *api);
-#define vlc_gl_filter_New(o, a) vlc_gl_filter_New(VLC_OBJECT(o), a)
+vlc_gl_filter_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api);
 
 int
 vlc_gl_filter_LoadModule(vlc_object_t *parent, const char *name,
