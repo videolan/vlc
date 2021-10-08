@@ -87,16 +87,6 @@ static const struct vlc_frame_callbacks vlc_frame_generic_cbs =
     vlc_frame_generic_Release,
 };
 
-static void BlockMetaCopy( vlc_frame_t *restrict out, const vlc_frame_t *in )
-{
-    out->p_next    = in->p_next;
-    out->i_nb_samples = in->i_nb_samples;
-    out->i_dts     = in->i_dts;
-    out->i_pts     = in->i_pts;
-    out->i_flags   = in->i_flags;
-    out->i_length  = in->i_length;
-}
-
 /** Initial memory alignment of data frame.
  * @note This must be a multiple of sizeof(void*) and a power of two.
  * libavcodec AVX optimizations require at least 32-bytes. */
@@ -149,7 +139,10 @@ static vlc_frame_t *vlc_frame_ReallocDup( vlc_frame_t *frame, ssize_t i_prebody,
 
     if( frame->i_buffer > 0 )
         memcpy( p_rea->p_buffer + i_prebody, frame->p_buffer, frame->i_buffer );
-    BlockMetaCopy( p_rea, frame );
+
+    p_rea->p_next = frame->p_next;
+    vlc_frame_CopyProperties( p_rea, frame );
+
     vlc_frame_Release( frame );
     return p_rea;
 }
