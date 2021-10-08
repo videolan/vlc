@@ -136,7 +136,7 @@ VideoSurface::VideoSurface(QQuickItem* parent)
     connect(this, &QQuickItem::yChanged, this, &VideoSurface::onSurfacePositionChanged);
     connect(this, &QQuickItem::widthChanged, this, &VideoSurface::onSurfaceSizeChanged);
     connect(this, &QQuickItem::heightChanged, this, &VideoSurface::onSurfaceSizeChanged);
-    connect(this, &QQuickItem::enabledChanged, this, &VideoSurface::onSurfaceSizeChanged);
+    connect(this, &VideoSurface::enabledChanged, this, &VideoSurface::updatePositionAndSize);
 }
 
 QmlMainContext*VideoSurface::getCtx()
