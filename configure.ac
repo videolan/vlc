@@ -393,6 +393,8 @@ __attribute__((visibility("default"))) int foo() { return my_array[0]; }
     # tdestroy() is a GNU extension
     CFLAGS="${CFLAGS} -pthread -D_GNU_SOURCE"
     CXXFLAGS="${CXXFLAGS} -pthread"
+    ac_cv_func_if_nameindex=yes
+    ac_cv_header_sys_shm_h=no
     ;;
   *)
     SYS="${host_os}"
