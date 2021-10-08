@@ -24,12 +24,12 @@
 #define VLC_FRAME_H 1
 
 /**
- * \defgroup block Data blocks
+ * \defgroup frame Frames
  * \ingroup input
  *
- * Blocks of binary data.
+ * Frames of binary data.
  *
- * @ref block_t is a generic structure to represent a binary blob within VLC.
+ * @ref vlc_frame_t is a generic structure to represent a binary blob within VLC.
  * The primary goal of the structure is to avoid memory copying as data is
  * passed around. It is notably used between the \ref demux, the packetizer
  * (if present) and the \ref decoder, and for audio, between the \ref decoder,
@@ -37,13 +37,13 @@
  *
  * @{
  * \file
- * Data block definition and functions
+ * Frames definition and functions
  */
 
 #include <sys/types.h>  /* for ssize_t */
 
 /****************************************************************************
- * block:
+ * frame:
  ****************************************************************************
  * - i_flags may not always be set (ie could be 0, even for a key frame
  *      it depends where you receive the buffer (before/after a packetizer
@@ -54,68 +54,70 @@
  *
  * - i_buffer number of valid data pointed by p_buffer
  *      you can freely decrease it but never increase it yourself
- *      (use block_Realloc)
+ *      (use vlc_frame_Realloc)
  * - p_buffer: pointer over datas. You should never overwrite it, you can
- *   only incremment it to skip datas, in others cases use block_Realloc
- *   (don't duplicate yourself in a bigger buffer, block_Realloc is
+ *   only incremment it to skip datas, in others cases use vlc_frame_Realloc
+ *   (don't duplicate yourself in a bigger buffer, vlc_frame_Realloc is
  *   optimised for preheader/postdatas increase)
  ****************************************************************************/
 
-/** The content doesn't follow the last block, possible some blocks in between
+typedef struct vlc_frame_t vlc_frame_t;
+
+/** The content doesn't follow the last frame, possible some frames in between
  *  have been lost */
-#define BLOCK_FLAG_DISCONTINUITY 0x0001
+#define VLC_FRAME_FLAG_DISCONTINUITY 0x0001
 /** Intra frame */
-#define BLOCK_FLAG_TYPE_I        0x0002
+#define VLC_FRAME_FLAG_TYPE_I        0x0002
 /** Inter frame with backward reference only */
-#define BLOCK_FLAG_TYPE_P        0x0004
+#define VLC_FRAME_FLAG_TYPE_P        0x0004
 /** Inter frame with backward and forward reference */
-#define BLOCK_FLAG_TYPE_B        0x0008
+#define VLC_FRAME_FLAG_TYPE_B        0x0008
 /** For inter frame when you don't know the real type */
-#define BLOCK_FLAG_TYPE_PB       0x0010
-/** Warn that this block is a header one */
-#define BLOCK_FLAG_HEADER        0x0020
-/** This block contains the last part of a sequence  */
-#define BLOCK_FLAG_END_OF_SEQUENCE 0x0040
-/** This block contains a clock reference */
-#define BLOCK_FLAG_CLOCK         0x0080
-/** This block is scrambled */
-#define BLOCK_FLAG_SCRAMBLED     0x0100
-/** This block has to be decoded but not be displayed */
-#define BLOCK_FLAG_PREROLL       0x0200
-/** This block is corrupted and/or there is data loss  */
-#define BLOCK_FLAG_CORRUPTED     0x0400
-/** This block is last of its access unit */
-#define BLOCK_FLAG_AU_END        0x0800
-/** This block contains an interlaced picture with top field stored first */
-#define BLOCK_FLAG_TOP_FIELD_FIRST 0x1000
-/** This block contains an interlaced picture with bottom field stored first */
-#define BLOCK_FLAG_BOTTOM_FIELD_FIRST 0x2000
-/** This block contains a single field from interlaced picture. */
-#define BLOCK_FLAG_SINGLE_FIELD  0x4000
+#define VLC_FRAME_FLAG_TYPE_PB       0x0010
+/** Warn that this frame is a header one */
+#define VLC_FRAME_FLAG_HEADER        0x0020
+/** This frame contains the last part of a sequence  */
+#define VLC_FRAME_FLAG_END_OF_SEQUENCE 0x0040
+/** This frame contains a clock reference */
+#define VLC_FRAME_FLAG_CLOCK         0x0080
+/** This frame is scrambled */
+#define VLC_FRAME_FLAG_SCRAMBLED     0x0100
+/** This frame has to be decoded but not be displayed */
+#define VLC_FRAME_FLAG_PREROLL       0x0200
+/** This frame is corrupted and/or there is data loss  */
+#define VLC_FRAME_FLAG_CORRUPTED     0x0400
+/** This frame is last of its access unit */
+#define VLC_FRAME_FLAG_AU_END        0x0800
+/** This frame contains an interlaced picture with top field stored first */
+#define VLC_FRAME_FLAG_TOP_FIELD_FIRST 0x1000
+/** This frame contains an interlaced picture with bottom field stored first */
+#define VLC_FRAME_FLAG_BOTTOM_FIELD_FIRST 0x2000
+/** This frame contains a single field from interlaced picture. */
+#define VLC_FRAME_FLAG_SINGLE_FIELD  0x4000
 
-/** This block contains an interlaced picture */
-#define BLOCK_FLAG_INTERLACED_MASK \
-    (BLOCK_FLAG_TOP_FIELD_FIRST|BLOCK_FLAG_BOTTOM_FIELD_FIRST|BLOCK_FLAG_SINGLE_FIELD)
+/** This frame contains an interlaced picture */
+#define VLC_FRAME_FLAG_INTERLACED_MASK \
+    (VLC_FRAME_FLAG_TOP_FIELD_FIRST|VLC_FRAME_FLAG_BOTTOM_FIELD_FIRST|VLC_FRAME_FLAG_SINGLE_FIELD)
 
-#define BLOCK_FLAG_TYPE_MASK \
-    (BLOCK_FLAG_TYPE_I|BLOCK_FLAG_TYPE_P|BLOCK_FLAG_TYPE_B|BLOCK_FLAG_TYPE_PB)
+#define VLC_FRAME_FLAG_TYPE_MASK \
+    (VLC_FRAME_FLAG_TYPE_I|VLC_FRAME_FLAG_TYPE_P|VLC_FRAME_FLAG_TYPE_B|VLC_FRAME_FLAG_TYPE_PB)
 
 /* These are for input core private usage only */
-#define BLOCK_FLAG_CORE_PRIVATE_MASK  0x00ff0000
-#define BLOCK_FLAG_CORE_PRIVATE_SHIFT 16
+#define VLC_FRAME_FLAG_CORE_PRIVATE_MASK  0x00ff0000
+#define VLC_FRAME_FLAG_CORE_PRIVATE_SHIFT 16
 
 /* These are for module private usage only */
-#define BLOCK_FLAG_PRIVATE_MASK  0xff000000
-#define BLOCK_FLAG_PRIVATE_SHIFT 24
+#define VLC_FRAME_FLAG_PRIVATE_MASK  0xff000000
+#define VLC_FRAME_FLAG_PRIVATE_SHIFT 24
 
-struct vlc_block_callbacks
+struct vlc_frame_callbacks
 {
-    void (*free)(block_t *);
+    void (*free)(vlc_frame_t *);
 };
 
-struct block_t
+struct vlc_frame_t
 {
-    block_t    *p_next;
+    vlc_frame_t    *p_next;
 
     uint8_t    *p_buffer; /**< Payload start */
     size_t      i_buffer; /**< Payload length */
@@ -129,80 +131,80 @@ struct block_t
     vlc_tick_t  i_dts;
     vlc_tick_t  i_length;
 
-    const struct vlc_block_callbacks *cbs;
+    const struct vlc_frame_callbacks *cbs;
 };
 
 /**
- * Initializes a custom block.
+ * Initializes a custom frame.
  *
- * This function initialize a block of timed data allocated by custom means.
+ * This function initialize a frame of timed data allocated by custom means.
  * This allows passing data without copying even if the data has been allocated
  * with unusual means or outside of LibVLC.
  *
- * Normally, blocks are allocated and initialized by block_Alloc() instead.
+ * Normally, frames are allocated and initialized by vlc_frame_Alloc() instead.
  *
- * @param block allocated block structure to initialize
- * @param cbs structure of custom callbacks to handle the block [IN]
- * @param base start address of the block data
- * @param length byte length of the block data
+ * @param frame allocated frame structure to initialize
+ * @param cbs structure of custom callbacks to handle the frame [IN]
+ * @param base start address of the frame data
+ * @param length byte length of the frame data
  *
- * @return @c block (this function cannot fail)
+ * @return @c frame (this function cannot fail)
  */
-VLC_API block_t *block_Init(block_t *block,
-                            const struct vlc_block_callbacks *cbs,
-                            void *base, size_t length);
+VLC_API vlc_frame_t *vlc_frame_Init(vlc_frame_t *frame,
+                                    const struct vlc_frame_callbacks *cbs,
+                                    void *base, size_t length);
 
 /**
- * Allocates a block.
+ * Allocates a frame.
  *
- * Creates a new block with the requested size.
- * The block must be released with block_Release().
+ * Creates a new frame with the requested size.
+ * The frame must be released with vlc_frame_Release().
  *
  * @param size size in bytes (possibly zero)
- * @return the created block, or NULL on memory error.
+ * @return the created frame, or NULL on memory error.
  */
-VLC_API block_t *block_Alloc(size_t size) VLC_USED VLC_MALLOC;
+VLC_API vlc_frame_t *vlc_frame_Alloc(size_t size) VLC_USED VLC_MALLOC;
 
-VLC_API block_t *block_TryRealloc(block_t *, ssize_t pre, size_t body) VLC_USED;
+VLC_API vlc_frame_t *vlc_frame_TryRealloc(vlc_frame_t *, ssize_t pre, size_t body) VLC_USED;
 
 /**
- * Reallocates a block.
+ * Reallocates a frame.
  *
- * This function expands, shrinks or moves a data block.
+ * This function expands, shrinks or moves a data frame.
  * In many cases, this function can return without any memory allocation by
- * reusing spare buffer space. Otherwise, a new block is created and data is
+ * reusing spare buffer space. Otherwise, a new frame is created and data is
  * copied.
  *
  * @param pre count of bytes to prepend if positive,
  *            count of leading bytes to discard if negative
- * @param body new bytes size of the block
+ * @param body new bytes size of the frame
  *
- * @return the reallocated block on succes, NULL on error.
+ * @return the reallocated frame on succes, NULL on error.
  *
  * @note Skipping leading bytes can be achieved directly by subtracting from
- * block_t.i_buffer and adding block_t.p_buffer.
+ * vlc_frame_t.i_buffer and adding vlc_frame_t.p_buffer.
  * @note Discard trailing bytes can be achieved directly by subtracting from
- * block_t.i_buffer.
- * @note On error, the block is discarded.
- * To avoid that, use block_TryRealloc() instead.
+ * vlc_frame_t.i_buffer.
+ * @note On error, the frame is discarded.
+ * To avoid that, use vlc_frame_TryRealloc() instead.
  */
-VLC_API block_t *block_Realloc(block_t *, ssize_t pre, size_t body) VLC_USED;
+VLC_API vlc_frame_t *vlc_frame_Realloc(vlc_frame_t *, ssize_t pre, size_t body) VLC_USED;
 
 /**
- * Releases a block.
+ * Releases a frame.
  *
- * This function works for any @ref block_t block, regardless of the way it was
+ * This function works for any @ref vlc_frame_t frame, regardless of the way it was
  * allocated.
  *
  * @note
- * If the block is in a chain, this function does <b>not</b> release any
- * subsequent block in the chain. Use block_ChainRelease() for that purpose.
+ * If the frame is in a chain, this function does <b>not</b> release any
+ * subsequent frame in the chain. Use vlc_frame_ChainRelease() for that purpose.
  *
- * @param block block to release (cannot be NULL)
+ * @param frame frame to release (cannot be NULL)
  */
-VLC_API void block_Release(block_t *block);
+VLC_API void vlc_frame_Release(vlc_frame_t *frame);
 
-static inline void block_CopyProperties( block_t *dst, const block_t *src )
+static inline void vlc_frame_CopyProperties( vlc_frame_t *dst, const vlc_frame_t *src )
 {
     dst->i_flags   = src->i_flags;
     dst->i_nb_samples = src->i_nb_samples;
@@ -212,46 +214,46 @@ static inline void block_CopyProperties( block_t *dst, const block_t *src )
 }
 
 /**
- * Duplicates a block.
+ * Duplicates a frame.
  *
- * Creates a writeable duplicate of a block.
+ * Creates a writeable duplicate of a frame.
  *
  * @return the duplicate on success, NULL on error.
  */
 VLC_USED
-static inline block_t *block_Duplicate( const block_t *p_block )
+static inline vlc_frame_t *vlc_frame_Duplicate( const vlc_frame_t *frame )
 {
-    block_t *p_dup = block_Alloc( p_block->i_buffer );
+    vlc_frame_t *p_dup = vlc_frame_Alloc( frame->i_buffer );
     if( p_dup == NULL )
         return NULL;
 
-    block_CopyProperties( p_dup, p_block );
-    memcpy( p_dup->p_buffer, p_block->p_buffer, p_block->i_buffer );
+    vlc_frame_CopyProperties( p_dup, frame );
+    memcpy( p_dup->p_buffer, frame->p_buffer, frame->i_buffer );
 
     return p_dup;
 }
 
 /**
- * Wraps heap in a block.
+ * Wraps heap in a frame.
  *
- * Creates a @ref block_t out of an existing heap allocation.
- * This is provided by LibVLC so that manually heap-allocated blocks can safely
+ * Creates a @ref vlc_frame_t out of an existing heap allocation.
+ * This is provided by LibVLC so that manually heap-allocated frames can safely
  * be deallocated even after the origin plugin has been unloaded from memory.
  *
- * When block_Release() is called, VLC will free() the specified pointer.
+ * When vlc_frame_Release() is called, VLC will free() the specified pointer.
  *
  * @param addr base address of the heap allocation (will be free()'d)
  * @param length bytes length of the heap allocation
  * @return NULL in case of error (ptr free()'d in that case), or a valid
- * block_t pointer.
+ * vlc_frame_t pointer.
  */
-VLC_API block_t *block_heap_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC;
+VLC_API vlc_frame_t *vlc_frame_heap_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC;
 
 /**
- * Wraps a memory mapping in a block
+ * Wraps a memory mapping in a frame
  *
- * Creates a @ref block_t from a virtual address memory mapping (mmap).
- * This is provided by LibVLC so that mmap blocks can safely be deallocated
+ * Creates a @ref vlc_frame_t from a virtual address memory mapping (mmap).
+ * This is provided by LibVLC so that mmap frames can safely be deallocated
  * even after the allocating plugin has been unloaded from memory.
  *
  * @param addr base address of the mapping (as returned by mmap)
@@ -259,12 +261,12 @@ VLC_API block_t *block_heap_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC
  * @return NULL if addr is MAP_FAILED, or an error occurred (in the later
  * case, munmap(addr, length) is invoked before returning).
  */
-VLC_API block_t *block_mmap_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC;
+VLC_API vlc_frame_t *vlc_frame_mmap_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC;
 
 /**
- * Wraps a System V memory segment in a block
+ * Wraps a System V memory segment in a frame
  *
- * Creates a @ref block_t from a System V shared memory segment (shmget()).
+ * Creates a @ref vlc_frame_t from a System V shared memory segment (shmget()).
  * This is provided by LibVLC so that segments can safely be deallocated
  * even after the allocating plugin has been unloaded from memory.
  *
@@ -273,12 +275,12 @@ VLC_API block_t *block_mmap_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC
  * @return NULL if an error occurred (in that case, shmdt(addr) is invoked
  * before returning NULL).
  */
-VLC_API block_t * block_shm_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC;
+VLC_API vlc_frame_t * vlc_frame_shm_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC;
 
 /**
  * Maps a file handle in memory.
  *
- * Loads a file into a block of memory through a file descriptor.
+ * Loads a file into a frame of memory through a file descriptor.
  * If possible a private file mapping is created. Otherwise, the file is read
  * normally. This function is a cancellation point.
  *
@@ -290,96 +292,96 @@ VLC_API block_t * block_shm_Alloc(void *addr, size_t length) VLC_USED VLC_MALLOC
  * @param write If true, request a read/write private mapping.
  *              If false, request a read-only potentially shared mapping.
  *
- * @return a new block with the file content at p_buffer, and file length at
- * i_buffer (release it with block_Release()), or NULL upon error (see errno).
+ * @return a new frame with the file content at p_buffer, and file length at
+ * i_buffer (release it with vlc_frame_Release()), or NULL upon error (see errno).
  */
-VLC_API block_t *block_File(int fd, bool write) VLC_USED VLC_MALLOC;
+VLC_API vlc_frame_t *vlc_frame_File(int fd, bool write) VLC_USED VLC_MALLOC;
 
 /**
  * Maps a file in memory.
  *
- * Loads a file into a block of memory from a path to the file.
- * See also block_File().
+ * Loads a file into a frame of memory from a path to the file.
+ * See also vlc_frame_File().
  *
  * @param write If true, request a read/write private mapping.
  *              If false, request a read-only potentially shared mapping.
  */
-VLC_API block_t *block_FilePath(const char *, bool write) VLC_USED VLC_MALLOC;
+VLC_API vlc_frame_t *vlc_frame_FilePath(const char *, bool write) VLC_USED VLC_MALLOC;
 
-static inline void block_Cleanup (void *block)
+static inline void vlc_frame_Cleanup (void *frame)
 {
-    block_Release ((block_t *)block);
+    vlc_frame_Release ((vlc_frame_t *)frame);
 }
-#define block_cleanup_push( block ) vlc_cleanup_push (block_Cleanup, block)
+#define vlc_frame_cleanup_push( frame ) vlc_cleanup_push (vlc_frame_Cleanup, frame)
 
 /**
- * \defgroup block_chain Block chain
+ * \defgroup vlc_frame_chain Frame chain
  * @{
  */
 
 /**
- * Appends a @ref block_t to the chain
+ * Appends a @ref vlc_frame_t to the chain
  *
- * The given block is appended to the last block of the given chain.
+ * The given frame is appended to the last frame of the given chain.
  *
  * @attention
  *  Using this function on long chains or repeatedly calling it
- *  to append a lot of blocks can be slow, as it has to iterate the
- *  whole chain to append the block.
- *  In these cases @ref block_ChainLastAppend should be used.
+ *  to append a lot of frames can be slow, as it has to iterate the
+ *  whole chain to append the frame.
+ *  In these cases @ref vlc_frame_ChainLastAppend should be used.
  *
- * @param pp_list   Pointer to the block_t chain
- * @param p_block   The block_t to append (can be NULL)
+ * @param pp_list   Pointer to the vlc_frame_t chain
+ * @param frame   The vlc_frame_t to append (can be NULL)
  *
- * @see block_ChainLastAppend()
+ * @see vlc_frame_ChainLastAppend()
  *
  * Example:
  * @code{.c}
- * block_t *p_chain = NULL;
+ * vlc_frame_t *p_chain = NULL;
  *
- * block_ChainAppend(&p_chain, p_block);
+ * vlc_frame_ChainAppend(&p_chain, p_frame);
  * @endcode
  */
-static inline void block_ChainAppend( block_t **pp_list, block_t *p_block )
+static inline void vlc_frame_ChainAppend( vlc_frame_t **pp_list, vlc_frame_t *frame )
 {
     if( *pp_list == NULL )
     {
-        *pp_list = p_block;
+        *pp_list = frame;
     }
     else
     {
-        block_t *p = *pp_list;
+        vlc_frame_t *p = *pp_list;
 
         while( p->p_next ) p = p->p_next;
-        p->p_next = p_block;
+        p->p_next = frame;
     }
 }
 
 /**
- * Appends a @ref block_t to the last block pointer and update it
+ * Appends a @ref vlc_frame_t to the last frame pointer and update it
  *
- * Uses a pointer over a pointer to p_next of the last block of the block chain
- * to append a block at the end of the chain and updates the pointer to the new
- * last block's @c p_next. If the appended block is itself a chain, it is iterated
+ * Uses a pointer over a pointer to p_next of the last frame of the frame chain
+ * to append a frame at the end of the chain and updates the pointer to the new
+ * last frame's @c p_next. If the appended frame is itself a chain, it is iterated
  * till the end to correctly update @c ppp_last.
  *
  * @param[in,out] ppp_last  Pointer to pointer to the end of the chain
- *                          (The block_t::p_next of the last block_t in the chain)
- * @param         p_block   The block_t to append
+ *                          (The vlc_frame_t::p_next of the last vlc_frame_t in the chain)
+ * @param         frame   The vlc_frame_t to append
  *
  * Example:
  * @code{.c}
- * block_t *p_block = NULL;
- * block_t **pp_block_last = &p_block;
+ * vlc_frame_t *p_frame = NULL;
+ * vlc_frame_t **pp_frame_last = &p_frame;
  *
- * block_ChainLastAppend(&pp_block_last, p_other_block);
+ * vlc_frame_ChainLastAppend(&pp_frame_last, p_other_frame);
  * @endcode
  */
-static inline void block_ChainLastAppend( block_t ***ppp_last, block_t *p_block )
+static inline void vlc_frame_ChainLastAppend( vlc_frame_t ***ppp_last, vlc_frame_t *frame )
 {
-    block_t *p_last = p_block;
+    vlc_frame_t *p_last = frame;
 
-    **ppp_last = p_block;
+    **ppp_last = frame;
 
     while( p_last->p_next ) p_last = p_last->p_next;
     *ppp_last = &p_last->p_next;
@@ -388,38 +390,38 @@ static inline void block_ChainLastAppend( block_t ***ppp_last, block_t *p_block 
 /**
  * Releases a chain of blocks
  *
- * The block pointed to by p_block and all following blocks in the
+ * The frame pointed to by frame and all following frames in the
  * chain are released.
  *
- * @param p_block   Pointer to first block_t of the chain to release
+ * @param frame   Pointer to first vlc_frame_t of the chain to release
  *
- * @see block_Release()
+ * @see vlc_frame_Release()
  */
-static inline void block_ChainRelease( block_t *p_block )
+static inline void vlc_frame_ChainRelease( vlc_frame_t *frame )
 {
-    while( p_block )
+    while( frame )
     {
-        block_t *p_next = p_block->p_next;
-        block_Release( p_block );
-        p_block = p_next;
+        vlc_frame_t *p_next = frame->p_next;
+        vlc_frame_Release( frame );
+        frame = p_next;
     }
 }
 
 /**
- * Extracts data from a chain of blocks
+ * Extracts data from a chain of frames
  *
  * Copies the specified amount of data from the chain into the given buffer.
  * If the data in the chain is less than the maximum amount given, the remainder
  * of the buffer is not modified.
  *
- * @param      p_list   Pointer to the first block_t of the chain to copy from
+ * @param      p_list   Pointer to the first vlc_frame_t of the chain to copy from
  * @param[out] p_data   Destination buffer to copy the data to
  * @param      i_max    Number of bytes to copy
  * @return              Number of bytes actually copied
  *
- * @see block_ChainGather()
+ * @see vlc_frame_ChainGather()
  */
-static size_t block_ChainExtract( block_t *p_list, void *p_data, size_t i_max )
+static size_t vlc_frame_ChainExtract( vlc_frame_t *p_list, void *p_data, size_t i_max )
 {
     size_t  i_total = 0;
     uint8_t *p = (uint8_t*)p_data;
@@ -440,15 +442,15 @@ static size_t block_ChainExtract( block_t *p_list, void *p_data, size_t i_max )
 /**
  * Retrives chain properties
  *
- * Can be used to retrieve count of blocks, number of bytes and the duration
+ * Can be used to retrieve count of frames, number of bytes and the duration
  * of the chain.
  *
- * @param       p_list      Pointer to the first block_t of the chain
- * @param[out]  pi_count    Pointer to count of blocks in the chain (may be NULL)
+ * @param       p_list      Pointer to the first vlc_frame_t of the chain
+ * @param[out]  pi_count    Pointer to count of frames in the chain (may be NULL)
  * @param[out]  pi_size     Pointer to number of bytes in the chain (may be NULL)
  * @param[out]  pi_length   Pointer to length (duration) of the chain (may be NULL)
  */
-static inline void block_ChainProperties( block_t *p_list, int *pi_count, size_t *pi_size, vlc_tick_t *pi_length )
+static inline void vlc_frame_ChainProperties( vlc_frame_t *p_list, int *pi_count, size_t *pi_size, vlc_tick_t *pi_length )
 {
     size_t i_size = 0;
     vlc_tick_t i_length = 0;
@@ -472,34 +474,34 @@ static inline void block_ChainProperties( block_t *p_list, int *pi_count, size_t
 }
 
 /**
- * Gathers a chain into a single block_t
+ * Gathers a chain into a single vlc_frame_t
  *
- * All blocks in the chain are gathered into a single block_t and the
+ * All frames in the chain are gathered into a single vlc_frame_t and the
  * original chain is released.
  * 
- * @param   p_list  Pointer to the first block_t of the chain to gather
- * @return  Returns a pointer to a new block_t or NULL if the block can not
+ * @param   p_list  Pointer to the first vlc_frame_t of the chain to gather
+ * @return  Returns a pointer to a new vlc_frame_t or NULL if the frame can not
  *          be allocated, in which case the original chain is not released.
  *          If the chain pointed to by p_list is already gathered, a pointer
- *          to it is returned and no new block will be allocated.
+ *          to it is returned and no new frame will be allocated.
  *
- * @see block_ChainExtract()
+ * @see vlc_frame_ChainExtract()
  */
-static inline block_t *block_ChainGather( block_t *p_list )
+static inline vlc_frame_t *vlc_frame_ChainGather( vlc_frame_t *p_list )
 {
     size_t  i_total = 0;
     vlc_tick_t i_length = 0;
-    block_t *g;
+    vlc_frame_t *g;
 
     if( p_list->p_next == NULL )
         return p_list;  /* Already gathered */
 
-    block_ChainProperties( p_list, NULL, &i_total, &i_length );
+    vlc_frame_ChainProperties( p_list, NULL, &i_total, &i_length );
 
-    g = block_Alloc( i_total );
+    g = vlc_frame_Alloc( i_total );
     if( !g )
         return NULL;
-    block_ChainExtract( p_list, g->p_buffer, g->i_buffer );
+    vlc_frame_ChainExtract( p_list, g->p_buffer, g->i_buffer );
 
     g->i_flags = p_list->i_flags;
     g->i_pts   = p_list->i_pts;
@@ -507,7 +509,7 @@ static inline block_t *block_ChainGather( block_t *p_list )
     g->i_length = i_length;
 
     /* free p_list */
-    block_ChainRelease( p_list );
+    vlc_frame_ChainRelease( p_list );
     return g;
 }
 
@@ -545,7 +547,7 @@ VLC_API void block_FifoRelease(block_fifo_t *);
  *
  * @return a valid block
  */
-VLC_API block_t *block_FifoGet(block_fifo_t *) VLC_USED;
+VLC_API vlc_frame_t *block_FifoGet(block_fifo_t *) VLC_USED;
 
 /**
  * Peeks the first block in the FIFO.
@@ -558,7 +560,7 @@ VLC_API block_t *block_FifoGet(block_fifo_t *) VLC_USED;
  *
  * @return a valid block.
  */
-VLC_API block_t *block_FifoShow(block_fifo_t *);
+VLC_API vlc_frame_t *block_FifoShow(block_fifo_t *);
 
 typedef struct block_fifo_t vlc_fifo_t;
 
@@ -645,7 +647,7 @@ static inline void vlc_fifo_WaitCond(vlc_fifo_t *fifo, vlc_cond_t *condvar)
  * @warning The FIFO must be locked by the calling thread using
  * vlc_fifo_Lock(). Otherwise behaviour is undefined.
  */
-VLC_API void vlc_fifo_QueueUnlocked(vlc_fifo_t *fifo, block_t *block);
+VLC_API void vlc_fifo_QueueUnlocked(vlc_fifo_t *fifo, vlc_frame_t *block);
 
 /**
  * Dequeues the first block from a locked FIFO, if any.
@@ -657,7 +659,7 @@ VLC_API void vlc_fifo_QueueUnlocked(vlc_fifo_t *fifo, block_t *block);
  *
  * @return the first block in the FIFO or NULL if the FIFO is empty
  */
-VLC_API block_t *vlc_fifo_DequeueUnlocked(vlc_fifo_t *) VLC_USED;
+VLC_API vlc_frame_t *vlc_fifo_DequeueUnlocked(vlc_fifo_t *) VLC_USED;
 
 /**
  * Dequeues the all blocks from a locked FIFO.
@@ -672,7 +674,7 @@ VLC_API block_t *vlc_fifo_DequeueUnlocked(vlc_fifo_t *) VLC_USED;
  *
  * @return a linked-list of all blocks in the FIFO (possibly NULL)
  */
-VLC_API block_t *vlc_fifo_DequeueAllUnlocked(vlc_fifo_t *) VLC_USED;
+VLC_API vlc_frame_t *vlc_fifo_DequeueAllUnlocked(vlc_fifo_t *) VLC_USED;
 
 /**
  * Counts blocks in a FIFO.
@@ -722,12 +724,12 @@ static inline void vlc_fifo_Cleanup(void *fifo)
  */
 static inline void block_FifoEmpty(block_fifo_t *fifo)
 {
-    block_t *block;
+    vlc_frame_t *block;
 
     vlc_fifo_Lock(fifo);
     block = vlc_fifo_DequeueAllUnlocked(fifo);
     vlc_fifo_Unlock(fifo);
-    block_ChainRelease(block);
+    vlc_frame_ChainRelease(block);
 }
 
 /**
@@ -736,7 +738,7 @@ static inline void block_FifoEmpty(block_fifo_t *fifo)
  * @param fifo queue
  * @param block head of a block list to queue (may be NULL)
  */
-static inline void block_FifoPut(block_fifo_t *fifo, block_t *block)
+static inline void block_FifoPut(block_fifo_t *fifo, vlc_frame_t *block)
 {
     vlc_fifo_Lock(fifo);
     vlc_fifo_QueueUnlocked(fifo, block);

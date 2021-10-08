@@ -33,7 +33,7 @@
 #include <stdint.h>
 #include <vlc_cxx_helpers.hpp>
 
-typedef struct block_t block_t;
+typedef struct vlc_frame_t block_t;
 
 namespace adaptive
 {
