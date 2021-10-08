@@ -40,7 +40,7 @@ Control {
     readonly property alias sliderY: row2.y
     property int textPosition: ControlBar.TimeTextPosition.AboveSlider
     property VLCColors colors: VLCStyle.nightColors
-    property alias identifier: playerButtonsLayout.identifier
+    property alias identifier: playerControlLayout.identifier
     property alias sliderHeight: trackPositionSlider.barHeight
     property alias sliderBackgroundColor: trackPositionSlider.backgroundColor
     property alias sliderProgressColor: trackPositionSlider.progressBarColor
@@ -129,14 +129,13 @@ Control {
             Layout.fillWidth: true
         }
 
-        PlayerButtonsLayout {
-            id: playerButtonsLayout
+        PlayerControlLayout {
+            id: playerControlLayout
 
             Layout.fillWidth: true
             Layout.leftMargin: VLCStyle.margin_large
             Layout.rightMargin: VLCStyle.margin_large
             Layout.bottomMargin: VLCStyle.margin_xsmall
-            Layout.preferredHeight: playerButtonsLayout.implicitHeight
 
             Navigation.upItem: trackPositionSlider.enabled ? trackPositionSlider : root.Navigation.upItem
 
@@ -182,7 +181,7 @@ Control {
         colors: root.colors
 
         Navigation.parentItem: root
-        Navigation.downItem: playerButtonsLayout
+        Navigation.downItem: playerControlLayout
 
         Keys.onPressed: {
             Navigation.defaultKeyAction(event)

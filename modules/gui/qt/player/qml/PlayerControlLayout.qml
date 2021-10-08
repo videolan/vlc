@@ -24,7 +24,7 @@ import "qrc:///widgets/" as Widgets
 
 
 FocusScope {
-    id: playerButtonsLayout
+    id: playerControlLayout
 
     implicitHeight: VLCStyle.maxControlbarControlHeight
 
@@ -50,7 +50,7 @@ FocusScope {
     }
 
     Loader {
-        id: buttonrow_left
+        id: layoutLoader_left
 
         anchors {
             left: parent.left
@@ -60,20 +60,20 @@ FocusScope {
             rightMargin: layoutSpacing
         }
 
-        active: !!playerButtonsLayout.model
-                && !!playerButtonsLayout.model.left
+        active: !!playerControlLayout.model
+                && !!playerControlLayout.model.left
 
         focus: true
 
         sourceComponent: ControlLayout {
-            model: playerButtonsLayout.model.left
+            model: playerControlLayout.model.left
 
-            extraWidth: (buttonrow_center.x - buttonrow_left.x - minimumWidth - layoutSpacing)
+            extraWidth: (layoutLoader_center.x - layoutLoader_left.x - minimumWidth - layoutSpacing)
 
             visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
 
-            Navigation.parentItem: playerButtonsLayout
-            Navigation.rightItem: buttonrow_center.item
+            Navigation.parentItem: playerControlLayout
+            Navigation.rightItem: layoutLoader_center.item
 
             focus: true
 
@@ -82,7 +82,7 @@ FocusScope {
     }
 
     Loader {
-        id: buttonrow_center
+        id: layoutLoader_center
 
         anchors {
             horizontalCenter: parent.horizontalCenter
@@ -90,15 +90,15 @@ FocusScope {
             bottom: parent.bottom
         }
 
-        active: !!playerButtonsLayout.model
-                && !!playerButtonsLayout.model.center
+        active: !!playerControlLayout.model
+                && !!playerControlLayout.model.center
 
         sourceComponent: ControlLayout {
-            model: playerButtonsLayout.model.center
+            model: playerControlLayout.model.center
 
-            Navigation.parentItem: playerButtonsLayout
-            Navigation.leftItem: buttonrow_left.item
-            Navigation.rightItem: buttonrow_right.item
+            Navigation.parentItem: playerControlLayout
+            Navigation.leftItem: layoutLoader_left.item
+            Navigation.rightItem: layoutLoader_right.item
 
             focus: true
 
@@ -107,7 +107,7 @@ FocusScope {
     }
 
     Loader {
-        id: buttonrow_right
+        id: layoutLoader_right
 
         anchors {
             right: parent.right
@@ -117,18 +117,18 @@ FocusScope {
             leftMargin: layoutSpacing
         }
 
-        active: !!playerButtonsLayout.model
-                && !!playerButtonsLayout.model.right
+        active: !!playerControlLayout.model
+                && !!playerControlLayout.model.right
 
         sourceComponent: ControlLayout {
-            model: playerButtonsLayout.model.right
+            model: playerControlLayout.model.right
 
-            extraWidth: (playerButtonsLayout.width - (buttonrow_center.x + buttonrow_center.width) - minimumWidth - (2 * layoutSpacing))
+            extraWidth: (playerControlLayout.width - (layoutLoader_center.x + layoutLoader_center.width) - minimumWidth - (2 * layoutSpacing))
 
             visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
 
-            Navigation.parentItem: playerButtonsLayout
-            Navigation.leftItem: buttonrow_center.item
+            Navigation.parentItem: playerControlLayout
+            Navigation.leftItem: layoutLoader_center.item
 
             focus: true
 

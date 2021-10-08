@@ -82,7 +82,7 @@ FocusScope {
 
         anchors.fill: parent
 
-        spacing: playerButtonsLayout.spacing
+        spacing: playerControlLayout.spacing
 
         Repeater {
             id: repeater

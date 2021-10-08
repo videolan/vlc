@@ -63,13 +63,13 @@ Widgets.IconControlButton {
             })
 
             // player related --
-            playerButtonsLayout.requestLockUnlockAutoHide(true, playerButtonsLayout)
+            playerControlLayout.requestLockUnlockAutoHide(true, playerControlLayout)
             if (!!rootPlayer)
                 rootPlayer.menu = playbackSpeedPopup
         }
 
         onClosed: {
-            playerButtonsLayout.requestLockUnlockAutoHide(false, playerButtonsLayout)
+            playerControlLayout.requestLockUnlockAutoHide(false, playerControlLayout)
             playbackSpeedButton.forceActiveFocus()
             if (!!rootPlayer)
                 rootPlayer.menu = undefined

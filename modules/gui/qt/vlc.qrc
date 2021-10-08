@@ -340,7 +340,7 @@
         <file alias="MiniPlayer.qml">player/qml/MiniPlayer.qml</file>
         <file alias="TopBar.qml">player/qml/TopBar.qml</file>
         <file alias="PIPPlayer.qml">player/qml/PIPPlayer.qml</file>
-        <file alias="PlayerButtonsLayout.qml">player/qml/PlayerButtonsLayout.qml</file>
+        <file alias="PlayerControlLayout.qml">player/qml/PlayerControlLayout.qml</file>
         <file alias="PlayerMenu.qml">player/qml/PlayerMenu.qml</file>
         <file alias="PlayerMenuItem.qml">player/qml/PlayerMenuItem.qml</file>
         <file alias="LanguageMenu.qml">player/qml/LanguageMenu.qml</file>

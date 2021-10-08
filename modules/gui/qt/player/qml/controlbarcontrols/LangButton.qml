@@ -47,13 +47,13 @@ Widgets.IconControlButton {
             z: 1
 
             onOpened: {
-                playerButtonsLayout.requestLockUnlockAutoHide(true, playerButtonsLayout)
+                playerControlLayout.requestLockUnlockAutoHide(true, playerControlLayout)
                 if (!!rootPlayer)
                     rootPlayer.menu = langMenu
             }
 
             onClosed: {
-                playerButtonsLayout.requestLockUnlockAutoHide(false, playerButtonsLayout)
+                playerControlLayout.requestLockUnlockAutoHide(false, playerControlLayout)
                 langBtn.forceActiveFocus()
                 if (!!rootPlayer)
                     rootPlayer.menu = undefined

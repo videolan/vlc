@@ -784,7 +784,7 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/MiniPlayer.qml \
 	gui/qt/player/qml/PIPPlayer.qml \
 	gui/qt/player/qml/Player.qml \
-	gui/qt/player/qml/PlayerButtonsLayout.qml \
+	gui/qt/player/qml/PlayerControlLayout.qml \
 	gui/qt/player/qml/PlayerMenu.qml \
 	gui/qt/player/qml/PlayerMenuItem.qml \
 	gui/qt/player/qml/ResumeDialog.qml \
