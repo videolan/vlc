@@ -141,6 +141,19 @@ void block_Release(block_t *block)
     block->cbs->free(block);
 }
 
+static block_t *block_ReallocDup( block_t *p_block, ssize_t i_prebody, size_t requested )
+{
+    block_t *p_rea = block_Alloc( requested );
+    if( p_rea == NULL )
+        return NULL;
+
+    if( p_block->i_buffer > 0 )
+        memcpy( p_rea->p_buffer + i_prebody, p_block->p_buffer, p_block->i_buffer );
+    BlockMetaCopy( p_rea, p_block );
+    block_Release( p_block );
+    return p_rea;
+}
+
 block_t *block_TryRealloc (block_t *p_block, ssize_t i_prebody, size_t i_body)
 {
     block_Check( p_block );
@@ -187,13 +200,7 @@ block_t *block_TryRealloc (block_t *p_block, ssize_t i_prebody, size_t i_body)
         }
 
         /* Not enough room: allocate a new buffer */
-        block_t *p_rea = block_Alloc( requested );
-        if( p_rea == NULL )
-            return NULL;
-
-        BlockMetaCopy( p_rea, p_block );
-        block_Release( p_block );
-        return p_rea;
+        return block_ReallocDup( p_block, i_prebody, requested );
     }
 
     uint8_t *p_start = p_block->p_start;
@@ -203,17 +210,7 @@ block_t *block_TryRealloc (block_t *p_block, ssize_t i_prebody, size_t i_body)
     assert( i_prebody >= 0 );
     if( (size_t)(p_block->p_buffer - p_start) < (size_t)i_prebody
      || (size_t)(p_end - p_block->p_buffer) < i_body )
-    {
-        block_t *p_rea = block_Alloc( requested );
-        if( p_rea == NULL )
-            return NULL;
-
-        memcpy( p_rea->p_buffer + i_prebody, p_block->p_buffer,
-                p_block->i_buffer );
-        BlockMetaCopy( p_rea, p_block );
-        block_Release( p_block );
-        return p_rea;
-    }
+        return block_ReallocDup( p_block, i_prebody, requested );
 
     /* Third, expand payload */
 
