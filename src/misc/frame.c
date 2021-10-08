@@ -1,5 +1,5 @@
 /*****************************************************************************
- * block.c: Data blocks management functions
+ * frame.c: frames management functions
  *****************************************************************************
  * Copyright (C) 2003-2004 VLC authors and VideoLAN
  * Copyright (C) 2007-2009 Rémi Denis-Courmont

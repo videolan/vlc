@@ -88,11 +88,11 @@ src/libvlc.c
 src/libvlc.h
 src/libvlc-module.c
 src/misc/actions.c
-src/misc/block.c
 src/misc/cpu.c
 src/misc/es_format.c
 src/misc/events.c
 src/misc/filter_chain.c
+src/misc/frame.c
 src/misc/image.c
 src/misc/md5.c
 src/misc/messages.c
