@@ -78,15 +78,17 @@ if HAVE_GL
 libglfilter_draw_plugin_la_LIBADD = libvlc_opengl.la $(GL_LIBS)
 vout_LTLIBRARIES += libglfilter_draw_plugin.la
 endif
+
+if HAVE_DARWIN
+vout_LTLIBRARIES += libglfilter_draw_plugin.la
 if HAVE_OSX
 libglfilter_draw_plugin_la_LIBADD = libvlc_opengl.la
-vout_LTLIBRARIES += libglfilter_draw_plugin.la
-endif
-if HAVE_IOS
+else
 libglfilter_draw_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
 libglfilter_draw_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
-vout_LTLIBRARIES += libglfilter_draw_plugin.la
 endif
+endif
+
 if HAVE_ANDROID
 libglfilter_draw_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
 libglfilter_draw_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
