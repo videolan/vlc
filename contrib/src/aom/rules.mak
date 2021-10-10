@@ -1,20 +1,18 @@
 # aom
-AOM_VERSION := v3.1.3
-AOM_GITURL := https://aomedia.googlesource.com/aom/+archive/$(AOM_VERSION).tar.gz
+AOM_VERSION := 3.1.3
+AOM_URL := https://storage.googleapis.com/aom-releases/libaom-$(AOM_VERSION).tar.gz
 
 PKGS += aom
 ifeq ($(call need_pkg,"aom"),)
 PKGS_FOUND += aom
 endif
 
-$(TARBALLS)/aom-$(AOM_VERSION).tar.gz:
-	$(call download_pkg,$(AOM_GITURL),aom)
+$(TARBALLS)/libaom-$(AOM_VERSION).tar.gz:
+	$(call download_pkg,$(AOM_URL),aom)
 
-.sum-aom: aom-$(AOM_VERSION).tar.gz
-	$(warning $@ not implemented)
-	touch $@
+.sum-aom: libaom-$(AOM_VERSION).tar.gz
 
-aom: aom-$(AOM_VERSION).tar.gz .sum-aom
+aom: libaom-$(AOM_VERSION).tar.gz .sum-aom
 	rm -Rf $(UNPACK_DIR) $@
 	mkdir -p $(UNPACK_DIR)
 	tar xvzfo "$<" -C $(UNPACK_DIR)
