@@ -452,7 +452,7 @@ block_t *block_File(int fd, bool write)
             HANDLE hMap;
             DWORD prot = write ? PAGE_READWRITE : PAGE_READONLY;
             DWORD access = FILE_MAP_READ | (write ? FILE_MAP_WRITE : 0);
-#if VLC_WINSTORE_APP
+#ifdef VLC_WINSTORE_APP
             hMap = CreateFileMappingFromApp(handle, NULL, prot, length, NULL);
             if (hMap != INVALID_HANDLE_VALUE)
                 addr = MapViewOfFileFromApp(hMap, access, 0, length);
