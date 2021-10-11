@@ -614,38 +614,55 @@ Control {
 
             Column {
                 id: noContentInfoColumn
+
                 anchors.centerIn: parent
-                visible: model.count === 0 && !listView.footerItem.firstItemIndicatorVisible
+
+                visible: (model.count === 0 && !listView.footerItem.firstItemIndicatorVisible)
+
+                opacity: (listView.activeFocus) ? 1.0 : 0.4
 
                 Widgets.IconLabel {
-                    font.pixelSize: VLCStyle.dp(48, VLCStyle.scale)
+                    id: label
+
                     anchors.horizontalCenter: parent.horizontalCenter
+
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
+
                     text: VLCIcons.playlist
-                    color: (listView.activeFocus) ? colors.accent : colors.text
-                    opacity: 0.3
+
+                    color: (listView.activeFocus) ? colors.bgFocus
+                                                  : colors.text
+
+                    font.pixelSize: VLCStyle.dp(48, VLCStyle.scale)
                 }
 
                 Label {
-                    anchors.horizontalCenter: parent.horizontalCenter
                     anchors.topMargin: VLCStyle.margin_xlarge
-                    text: i18n.qtr("No content yet")
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
+
+                    text: i18n.qtr("No content yet")
+
+                    color: label.color
+
                     font.pixelSize: VLCStyle.fontSize_xxlarge
-                    color: (listView.activeFocus) ? colors.accent : colors.text
-                    opacity: 0.4
                 }
 
                 Label {
                     anchors.topMargin: VLCStyle.margin_normal
-                    text: i18n.qtr("Drag & Drop some content here!")
+
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
+
+                    text: i18n.qtr("Drag & Drop some content here!")
+
+                    color: label.color
+
                     font.pixelSize: VLCStyle.fontSize_large
-                    color: (listView.activeFocus) ? colors.accent : colors.text
-                    opacity: 0.4
                 }
             }
         }
