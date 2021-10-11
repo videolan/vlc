@@ -52,7 +52,7 @@ QtObject {
 
     // Borders
     readonly property int border: dp(1, scale)
-    readonly property int focus_border: dp(2, scale)
+    readonly property int focus_border: border
 
     readonly property int fontSize_xsmall: fontMetrics_xsmall.font.pixelSize
     readonly property int fontSize_small:  fontMetrics_small.font.pixelSize
