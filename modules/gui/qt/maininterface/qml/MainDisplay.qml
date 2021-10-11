@@ -330,9 +330,13 @@ FocusScope {
                             bottomPadding: topPadding + Math.max(VLCStyle.applicationVerticalMargin - miniPlayer.height, 0)
 
                             Navigation.parentItem: medialibId
-                            Navigation.leftItem: stackView
                             Navigation.upItem: sourcesBanner
                             Navigation.downItem: miniPlayer.expanded ? miniPlayer : null
+
+                            Navigation.leftAction: function() {
+                                stackView.currentItem.setCurrentItemFocus(Qt.TabFocusReason);
+                            }
+
                             Navigation.cancelAction: function() {
                                 mainInterface.playlistVisible = false
                                 stackView.forceActiveFocus()
