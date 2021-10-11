@@ -45,8 +45,6 @@
 #include "gl_util.h"
 #include "vout_helper.h"
 #include "renderer.h"
-#include "sampler.h"
-#include "sampler_priv.h"
 #include "sub_renderer.h"
 
 struct vout_display_opengl_t {

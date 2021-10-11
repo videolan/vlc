@@ -30,7 +30,7 @@
 
 #include "filter_priv.h"
 #include "importer_priv.h"
-#include "sampler_priv.h"
+#include "sampler.h"
 
 /* The filter chain contains the sequential list of filters.
  *

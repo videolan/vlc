@@ -29,6 +29,7 @@
 #include <vlc_opengl.h>
 #include <vlc_picture.h>
 
+#include "gl_api.h"
 #include "gl_common.h"
 #include "picture.h"
 
@@ -145,5 +146,48 @@ vlc_gl_sampler_Load(struct vlc_gl_sampler *sampler)
 {
     sampler->ops->load(sampler);
 }
+
+/**
+ * Create a new sampler
+ *
+ * \param gl the OpenGL context
+ * \param api the OpenGL API
+ * \param glfmt the input format
+ * \param expose_planes if set, vlc_texture() exposes a single plane at a time
+ *                      (selected by vlc_gl_sampler_SetCurrentPlane())
+ */
+struct vlc_gl_sampler *
+vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
+                   const struct vlc_gl_format *glfmt, bool expose_planes);
+
+/**
+ * Delete a sampler
+ *
+ * \param sampler the sampler
+ */
+void
+vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler);
+
+/**
+ * Update the input textures
+ *
+ * \param sampler the sampler
+ * \param picture the OpenGL picture
+ */
+int
+vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler,
+                      const struct vlc_gl_picture *picture);
+
+/**
+ * Select the plane to expose
+ *
+ * If the sampler exposes planes separately (for plane filters), select the
+ * plane to expose via the GLSL function vlc_texture().
+ *
+ * \param sampler the sampler
+ * \param plane the plane number
+ */
+void
+vlc_gl_sampler_SelectPlane(struct vlc_gl_sampler *sampler, unsigned plane);
 
 #endif

@@ -19,8 +19,7 @@ OPENGL_COMMONSOURCES = \
        video_output/opengl/picture.c \
        video_output/opengl/picture.h \
        video_output/opengl/sampler.c \
-       video_output/opengl/sampler.h \
-       video_output/opengl/sampler_priv.h
+       video_output/opengl/sampler.h
 
 OPENGL_COMMONCFLAGS = $(LIBPLACEBO_CFLAGS)
 OPENGL_COMMONLIBS = $(LIBPLACEBO_LIBS)

@@ -22,7 +22,7 @@
 # include "config.h"
 #endif
 
-#include "sampler_priv.h"
+#include "sampler.h"
 
 #include <vlc_common.h>
 #include <vlc_memstream.h>
