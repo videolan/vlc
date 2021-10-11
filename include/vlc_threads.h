@@ -57,7 +57,7 @@ VLC_API void vlc_testcancel(void);
 # endif
 
 typedef struct vlc_thread *vlc_thread_t;
-# define VLC_THREAD_CANCELED NULL
+# define VLC_THREAD_CANCELED ((void*) UINTPTR_MAX)
 
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;

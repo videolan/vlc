@@ -468,7 +468,7 @@ noreturn static void vlc_docancel(struct vlc_thread *th)
     for (vlc_cleanup_t *p = th->cleaners; p != NULL; p = p->next)
         p->proc (p->data);
 
-    th->data = NULL; /* TODO: special value? */
+    th->data = VLC_THREAD_CANCELED;
 #ifdef VLC_WINSTORE_APP
     ExitThread(0);
 #else // !VLC_WINSTORE_APP
