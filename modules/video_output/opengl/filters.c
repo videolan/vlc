@@ -296,42 +296,12 @@ GetSampler(struct vlc_gl_filter *filter)
         return priv->sampler;
 
     struct vlc_gl_filters *filters = priv->filters;
-    struct vlc_gl_filter_priv *prev_filter = priv->prev_filter;
 
     bool expose_planes = filter->config.filter_planes;
-
-    struct vlc_gl_format glfmt;
-
-    const struct vlc_gl_format *p_glfmt;
-    if (!priv->prev_filter)
-        p_glfmt = &filters->importer->glfmt;
-    else
-    {
-        /* If the previous filter operated on planes, then its output chroma is
-         * the same as its input chroma. Otherwise, it's RGBA. */
-        vlc_fourcc_t chroma = prev_filter->filter.config.filter_planes
-                            ? prev_filter->sampler->glfmt.fmt.i_chroma
-                            : VLC_CODEC_RGBA;
-
-        video_format_t *fmt = &glfmt.fmt;
-        video_format_Init(fmt, chroma);
-        fmt->i_width = fmt->i_visible_width = prev_filter->size_out.width;
-        fmt->i_height = fmt->i_visible_height = prev_filter->size_out.height;
-
-        glfmt.tex_target = GL_TEXTURE_2D;
-        glfmt.tex_count = prev_filter->plane_count;
-
-        size_t size = glfmt.tex_count * sizeof(GLsizei);
-        memcpy(glfmt.tex_widths, prev_filter->plane_widths, size);
-        memcpy(glfmt.tex_heights, prev_filter->plane_heights, size);
-        memcpy(glfmt.visible_widths, prev_filter->plane_widths, size);
-        memcpy(glfmt.visible_heights, prev_filter->plane_heights, size);
-
-        p_glfmt = &glfmt;
-    }
+    struct vlc_gl_format *glfmt = &priv->glfmt_in;
 
     struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filters->gl, filters->api, p_glfmt, expose_planes);
+        vlc_gl_sampler_New(filters->gl, filters->api, glfmt, expose_planes);
 
     priv->sampler = sampler;
 
@@ -349,6 +319,7 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
     struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
 
     struct vlc_gl_tex_size size_in;
+    struct vlc_gl_format *glfmt = &priv->glfmt_in;
 
     struct vlc_gl_filter_priv *prev_filter =
         vlc_list_last_entry_or_null(&filters->list, struct vlc_gl_filter_priv,
@@ -357,10 +328,33 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
     {
         size_in.width = filters->interop->fmt_out.i_visible_width;
         size_in.height = filters->interop->fmt_out.i_visible_height;
+
+        assert(filters->importer);
+        *glfmt = filters->importer->glfmt;
     }
     else
     {
         size_in = prev_filter->size_out;
+
+        /* If the previous filter operated on planes, then its output chroma is
+         * the same as its input chroma. Otherwise, it's RGBA. */
+        vlc_fourcc_t chroma = prev_filter->filter.config.filter_planes
+                            ? prev_filter->glfmt_in.fmt.i_chroma
+                            : VLC_CODEC_RGBA;
+
+        video_format_t *fmt = &glfmt->fmt;
+        video_format_Init(fmt, chroma);
+        fmt->i_width = fmt->i_visible_width = prev_filter->size_out.width;
+        fmt->i_height = fmt->i_visible_height = prev_filter->size_out.height;
+
+        glfmt->tex_target = GL_TEXTURE_2D;
+        glfmt->tex_count = prev_filter->plane_count;
+
+        size_t size = glfmt->tex_count * sizeof(GLsizei);
+        memcpy(glfmt->tex_widths, prev_filter->plane_widths, size);
+        memcpy(glfmt->tex_heights, prev_filter->plane_heights, size);
+        memcpy(glfmt->visible_widths, prev_filter->plane_widths, size);
+        memcpy(glfmt->visible_heights, prev_filter->plane_heights, size);
     }
 
     priv->filters = filters;
@@ -439,8 +433,6 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
 
         if (filter->config.filter_planes)
         {
-            struct vlc_gl_format *glfmt = &sampler->glfmt;
-
             priv->plane_count = glfmt->tex_count;
             for (unsigned i = 0; i < glfmt->tex_count; ++i)
             {

@@ -36,6 +36,8 @@ struct vlc_gl_filter_priv {
      * filter */
     struct vlc_gl_tex_size size_out;
 
+    struct vlc_gl_format glfmt_in;
+
     /* Only meaningful for non-blend filters { */
     struct vlc_gl_sampler *sampler; /* owned */
 
