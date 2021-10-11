@@ -150,8 +150,10 @@ namespace adaptive
     class PositionChangedEvent : public TrackerEvent
     {
         public:
-            PositionChangedEvent();
+            PositionChangedEvent(vlc_tick_t);
             virtual ~PositionChangedEvent() = default;
+
+            vlc_tick_t resumeTime;
     };
 
     class SegmentTrackerListenerInterface
