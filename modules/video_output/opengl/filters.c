@@ -213,11 +213,11 @@ InitFramebuffersOut(struct vlc_gl_filter_priv *priv)
         if (!sampler)
             return VLC_EGENERIC;
 
-        priv->tex_count = sampler->tex_count;
+        priv->tex_count = sampler->glfmt.tex_count;
         vt->GenFramebuffers(priv->tex_count, priv->framebuffers_out);
         vt->GenTextures(priv->tex_count, priv->textures_out);
 
-        for (unsigned i = 0; i < sampler->tex_count; ++i)
+        for (unsigned i = 0; i < sampler->glfmt.tex_count; ++i)
         {
             memcpy(priv->tex_widths, priv->plane_widths,
                    priv->tex_count * sizeof(*priv->tex_widths));
@@ -300,7 +300,7 @@ GetSampler(struct vlc_gl_filter *filter)
         /* If the previous filter operated on planes, then its output chroma is
          * the same as its input chroma. Otherwise, it's RGBA. */
         vlc_fourcc_t chroma = prev_filter->filter.config.filter_planes
-                            ? prev_filter->sampler->fmt.i_chroma
+                            ? prev_filter->sampler->glfmt.fmt.i_chroma
                             : VLC_CODEC_RGBA;
 
         video_format_Init(&fmt, chroma);
@@ -420,15 +420,17 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
 
         if (filter->config.filter_planes)
         {
-            priv->plane_count = sampler->tex_count;
-            for (unsigned i = 0; i < sampler->tex_count; ++i)
+            struct vlc_gl_format *glfmt = &sampler->glfmt;
+
+            priv->plane_count = glfmt->tex_count;
+            for (unsigned i = 0; i < glfmt->tex_count; ++i)
             {
                 priv->plane_widths[i] = priv->size_out.width
-                                      * sampler->tex_widths[i]
-                                      / sampler->tex_widths[0];
+                                      * glfmt->tex_widths[i]
+                                      / glfmt->tex_widths[0];
                 priv->plane_heights[i] = priv->size_out.height
-                                       * sampler->tex_heights[i]
-                                       / sampler->tex_heights[0];
+                                       * glfmt->tex_heights[i]
+                                       / glfmt->tex_heights[0];
             }
         }
         else

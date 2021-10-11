@@ -101,13 +101,15 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
     vt->VertexAttribPointer(sys->loc.tex_coords_in, 2, GL_FLOAT, GL_FALSE,
                             stride, (const void *) offset);
 
+    struct vlc_gl_format *glfmt = &sampler->glfmt;
+
     /* If the direction matrix contains a 90° rotation, then the unit vector
      * should be divided by width rather than by height. Since up_vector is
      * always a unit vector with one of its components equal to 0, then we can
      * always devide the horizontal component by width and the vertical
      * component by height. */
-    GLsizei width = sampler->tex_widths[meta->plane];
-    GLsizei height = sampler->tex_heights[meta->plane];
+    GLsizei width = glfmt->tex_widths[meta->plane];
+    GLsizei height = glfmt->tex_heights[meta->plane];
     vt->Uniform2f(sys->loc.one_pixel_up, sys->up_vector[0] / width,
                                          sys->up_vector[1] / height);
 

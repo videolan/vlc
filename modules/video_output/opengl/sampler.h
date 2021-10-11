@@ -30,6 +30,7 @@
 #include <vlc_picture.h>
 
 #include "gl_common.h"
+#include "picture.h"
 
 /**
  * The purpose of a sampler is to provide pixel values of a VLC input picture,
@@ -51,14 +52,7 @@
  */
 struct vlc_gl_sampler {
     /* Input format */
-    video_format_t fmt;
-
-    /* Number of input planes */
-    unsigned tex_count;
-
-    /* Texture sizes (arrays of tex_count values) */
-    const GLsizei *tex_widths;
-    const GLsizei *tex_heights;
+    struct vlc_gl_format glfmt;
 
     /**
      * Matrix to convert from picture coordinates to texture coordinates
