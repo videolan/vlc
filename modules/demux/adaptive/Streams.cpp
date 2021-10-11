@@ -740,7 +740,11 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
             break;
 
         case TrackerEvent::Type::PositionChange:
-            resetForNewPosition(segmentTracker->getPlaybackTime(true));
+        {
+            const PositionChangedEvent &event =
+                    static_cast<const PositionChangedEvent &>(ev);
+            resetForNewPosition(event.resumeTime);
+        }
             break;
 
         default:

@@ -150,8 +150,10 @@ namespace adaptive
     class PositionChangedEvent : public TrackerEvent
     {
         public:
-            PositionChangedEvent();
+            PositionChangedEvent(mtime_t);
             virtual ~PositionChangedEvent() = default;
+
+            mtime_t resumeTime;
     };
 
     class SegmentTrackerListenerInterface

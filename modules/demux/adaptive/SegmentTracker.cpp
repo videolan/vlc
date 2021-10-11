@@ -102,10 +102,10 @@ BufferingLevelChangedEvent::BufferingLevelChangedEvent(const ID &id,
     this->target = target;
 }
 
-PositionChangedEvent::PositionChangedEvent()
+PositionChangedEvent::PositionChangedEvent(mtime_t r)
     : TrackerEvent(Type::PositionChange)
 {
-
+    resumeTime = r;
 }
 
 SegmentTracker::SegmentTracker(SharedResources *res,
@@ -456,7 +456,7 @@ void SegmentTracker::setPosition(const Position &pos, bool restarted)
     current = Position();
     next = pos;
     resetChunksSequence();
-    notify(PositionChangedEvent());
+    notify(PositionChangedEvent(getPlaybackTime(true)));
 }
 
 SegmentTracker::Position SegmentTracker::getStartPosition() const
