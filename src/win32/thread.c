@@ -55,7 +55,7 @@ static SRWLOCK super_lock = SRWLOCK_INIT;
 #endif
 
 /*** Threads ***/
-static DWORD thread_key;
+static thread_local struct vlc_thread *current_thread_ctx = NULL;
 
 struct vlc_thread
 {
@@ -341,10 +341,10 @@ __stdcall vlc_entry (void *p)
 {
     struct vlc_thread *th = p;
 
-    TlsSetValue(thread_key, th);
+    current_thread_ctx = th;
     th->killable = true;
     th->data = th->entry (th->data);
-    TlsSetValue(thread_key, NULL);
+    current_thread_ctx = NULL;
 
     return 0;
 }
@@ -440,7 +440,7 @@ void vlc_cancel (vlc_thread_t th)
 
 int vlc_savecancel (void)
 {
-    struct vlc_thread *th = TlsGetValue(thread_key);
+    struct vlc_thread *th = current_thread_ctx;
     if (th == NULL)
         return false; /* Main thread - cannot be cancelled anyway */
 
@@ -451,7 +451,7 @@ int vlc_savecancel (void)
 
 void vlc_restorecancel (int state)
 {
-    struct vlc_thread *th = TlsGetValue(thread_key);
+    struct vlc_thread *th = current_thread_ctx;
     assert (state == false || state == true);
 
     if (th == NULL)
@@ -478,7 +478,7 @@ noreturn static void vlc_docancel(struct vlc_thread *th)
 
 void vlc_testcancel (void)
 {
-    struct vlc_thread *th = TlsGetValue(thread_key);
+    struct vlc_thread *th = current_thread_ctx;
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
     if (!th->killable)
@@ -494,7 +494,7 @@ void vlc_control_cancel (vlc_cleanup_t *cleaner)
     /* NOTE: This function only modifies thread-specific data, so there is no
      * need to lock anything. */
 
-    struct vlc_thread *th = TlsGetValue(thread_key);
+    struct vlc_thread *th = current_thread_ctx;
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
@@ -606,7 +606,7 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
 {
     vlc_tick_t delay;
 #if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
-    struct vlc_thread *th = TlsGetValue(thread_key);
+    struct vlc_thread *th = current_thread_ctx;
 
     if (th != NULL && th->killable)
     {
@@ -783,15 +783,8 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
                 vlc_wait_addr_init();
             }
 #endif
-            thread_key = TlsAlloc();
-            if (unlikely(thread_key == TLS_OUT_OF_INDEXES))
-                return FALSE;
             break;
         }
-
-        case DLL_PROCESS_DETACH:
-            TlsFree(thread_key);
-            break;
 
         case DLL_THREAD_DETACH:
             vlc_threadvars_cleanup();
