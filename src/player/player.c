@@ -1914,6 +1914,8 @@ vlc_player_Delete(vlc_player_t *player)
         vlc_http_cookies_destroy(cookies);
     }
 
+    assert(!vlc_mutex_held(&player->lock));
+
     vlc_object_delete(player);
 }
 
