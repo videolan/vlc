@@ -339,6 +339,9 @@ void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex)
 {
     struct vlc_cond_waiter waiter;
 
+    // wait on a multiply locked mutex not supported
+    assert(atomic_load_explicit(&mutex->recursion, memory_order_relaxed) <= 1);
+
     vlc_cond_wait_prepare(&waiter, cond, mutex);
     vlc_atomic_wait(&waiter.value, 0);
     vlc_cond_wait_finish(&waiter, cond, mutex);
@@ -349,6 +352,9 @@ int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex,
 {
     struct vlc_cond_waiter waiter;
     int ret;
+
+    // wait on a multiply locked mutex not supported
+    assert(atomic_load_explicit(&mutex->recursion, memory_order_relaxed) <= 1);
 
     vlc_cond_wait_prepare(&waiter, cond, mutex);
     ret = vlc_atomic_timedwait(&waiter.value, 0, deadline);
