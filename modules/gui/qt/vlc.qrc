@@ -120,6 +120,7 @@
         <file alias="theme_dark.svg">pixmaps/theme_dark.svg</file>
         <file alias="theme_daynight.svg">pixmaps/theme_daynight.svg</file>
         <file alias="theme_light.svg">pixmaps/theme_light.svg</file>
+        <file alias="play_shadow.png">pixmaps/play_shadow.png</file>
     </qresource>
     <qresource prefix="/prefsmenu">
         <file alias="cone_audio_64.png">pixmaps/prefs/spref_cone_Audio_64.png</file>

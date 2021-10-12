@@ -53,7 +53,7 @@ Control {
     property alias title: titleLabel.text
     property alias subtitle: subtitleTxt.text
     property alias playCoverBorderWidth: picture.playCoverBorderWidth
-    property alias playCoverShowGradient: picture.playCoverShowGradient
+    property alias playCoverShowPlay: picture.playCoverShowPlay
     property alias playIconSize: picture.playIconSize
     property alias pictureRadius: picture.radius
     property alias pictureOverlay: picture.imageOverlay
@@ -96,8 +96,8 @@ Control {
 
             PropertyChanges {
                 target: picture
-                playCoverOpacity: 1
                 playCoverVisible: true
+                playCoverOpacity: 1.0
             }
         }
     ]
@@ -113,11 +113,11 @@ Control {
             SequentialAnimation {
                 PropertyAction {
                     targets: [picture, selectedUnderlayLoader]
-                    properties: "playCoverVisible,visible"
+                    properties: "visible, playCoverVisible"
                 }
 
                 NumberAnimation {
-                    properties: "opacity,playCoverOpacity"
+                    properties: "opacity, playCoverOpacity"
                     duration: VLCStyle.duration_slow
                     easing.type: Easing.InSine
                 }
@@ -136,18 +136,18 @@ Control {
             SequentialAnimation {
                 PropertyAction {
                     target: unselectedUnderlayLoader
-                    property: "visible"
+                    property: "visible, playCoverVisible"
                 }
 
                 NumberAnimation {
-                    properties: "opacity,playCoverOpacity"
+                    properties: "opacity, playCoverOpacity"
                     duration: VLCStyle.duration_normal
                     easing.type: Easing.OutSine
                 }
 
                 PropertyAction {
                     targets: [picture, selectedUnderlayLoader]
-                    properties: "playCoverVisible,visible"
+                    properties: "visible"
                 }
             }
         }

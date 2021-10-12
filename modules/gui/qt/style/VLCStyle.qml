@@ -262,6 +262,9 @@ QtObject {
     readonly property url noArtArtistCover: "qrc:///noart_artistCover.svg";
     readonly property url noArtVideoCover: "qrc:///noart_videoCover.svg";
 
+    // Play shadow
+    readonly property url playShadow: "qrc:///play_shadow.png";
+
     // Player controlbar
     readonly property int maxControlbarControlHeight: dp(64, scale)
 

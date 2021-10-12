@@ -59,16 +59,17 @@ Item {
         }
 
         Widgets.PlayCover {
-            radius: background.radius
-            anchors.fill: parent
-            iconSize: VLCStyle.play_cover_small
-            visible: currentlyFocused || containsMouse
+            anchors.centerIn: parent
 
-            onIconClicked: playClicked(item.index)
+            width: VLCStyle.play_cover_small
 
-            showGradient: (rowModel.type !== NetworkMediaModel.TYPE_NODE
-                           &&
-                           rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY)
+            visible: ((currentlyFocused || containsMouse)
+                      &&
+                      (rowModel.type !== NetworkMediaModel.TYPE_NODE
+                       &&
+                       rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY))
+
+            onClicked: playClicked(item.index)
         }
     }
 
@@ -88,16 +89,17 @@ Item {
         mipmap: true
 
         Widgets.PlayCover {
-            width: artwork.paintedWidth
-            height: artwork.paintedHeight
-            iconSize: VLCStyle.play_cover_small
-            visible: currentlyFocused || containsMouse
+            anchors.centerIn: parent
 
-            onIconClicked: playClicked(item.index)
+            width: VLCStyle.play_cover_small
 
-            showGradient: (rowModel.type !== NetworkMediaModel.TYPE_NODE
-                           &&
-                           rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY)
+            visible: ((currentlyFocused || containsMouse)
+                      &&
+                      (rowModel.type !== NetworkMediaModel.TYPE_NODE
+                       &&
+                       rowModel.type !== NetworkMediaModel.TYPE_DIRECTORY))
+
+            onClicked: playClicked(item.index)
         }
     }
 }

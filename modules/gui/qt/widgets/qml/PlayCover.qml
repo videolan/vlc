@@ -1,6 +1,8 @@
 /*****************************************************************************
  * Copyright (C) 2020 VLC authors and VideoLAN
  *
+ * Authors: Benjamin Arnaud <bunjee@omega.gg>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -15,66 +17,78 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 import "qrc:///style/"
+import "qrc:///widgets/" as Widgets
 
-Rectangle {
-    id: root
-
-    // Properties
-
-    property bool showGradient: true
-
-    // Aliases
-
-    property alias iconSize: icon.width
-
-    // Signals
-
-    signal iconClicked()
-
+MouseArea {
     // Settings
 
-    opacity: (visible)
+    width: VLCStyle.play_cover_normal
+    height: width
 
-    color: (showGradient) ? undefined : "transparent"
+    // NOTE: This is the same scaling than the PlayButton, except we make it bigger.
+    //       Maybe we could crank this to 1.1.
+    scale: (containsMouse && pressed === false) ? 1.05 : 1.0
 
-    gradient: (showGradient) ? background : undefined
+    opacity: (visible) ? 1.0 : 0.0
+
+    hoverEnabled: true
 
     // Animations
 
+    Behavior on scale {
+        // NOTE: We disable the animation while pressing to make it more impactful.
+        enabled: (pressed === false)
+
+        NumberAnimation {
+            duration: VLCStyle.duration_faster
+
+            easing.type: Easing.OutQuad
+        }
+    }
+
     Behavior on opacity {
-        NumberAnimation { duration: VLCStyle.duration_fast; easing.type: Easing.OutQuad }
+        NumberAnimation {
+            duration: VLCStyle.duration_fast
+
+            easing.type: Easing.OutQuad
+        }
     }
 
     // Children
 
-    Gradient {
-        id: background
-
-        GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.5) }
-        GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.7) }
-    }
-
     Image {
-        id: icon
-
         anchors.centerIn: parent
 
-        visible: showGradient
+        // NOTE: We round this to avoid blurry textures with the QML renderer.
+        width: Math.round(parent.width * 3.2)
+        height: width
 
-        source: "qrc:/play_button.svg"
+        z: -1
 
-        fillMode: Image.PreserveAspectFit
+        source: VLCStyle.playShadow
+    }
 
-        mipmap: (width < VLCStyle.icon_normal)
+    Rectangle {
+        anchors.fill: parent
 
-        MouseArea {
-            anchors.fill: parent
+        radius: width
 
-            onClicked: iconClicked()
-        }
+        color: VLCStyle.colors.white
+    }
+
+    Widgets.IconLabel {
+        anchors.centerIn: parent
+
+        text: VLCIcons.play
+
+        color: (containsMouse) ? VLCStyle.colors.accent
+                               : VLCStyle.colors.black
+
+        font.pixelSize: Math.round(parent.width / 2)
     }
 }

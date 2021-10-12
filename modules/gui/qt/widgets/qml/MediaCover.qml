@@ -31,11 +31,11 @@ Rectangle {
 
     // Properties
 
-    property bool playCoverShowGradient: true
-
     property real playIconSize: VLCStyle.play_cover_normal
 
     property real playCoverBorderWidth: VLCStyle.table_cover_border
+
+    property bool playCoverShowPlay: true
 
     // Aliases
 
@@ -43,8 +43,8 @@ Rectangle {
 
     property alias imageOverlay: overlay.sourceComponent
 
-    property alias playCoverOpacity: playCoverLoader.opacity
     property alias playCoverVisible: playCoverLoader.visible
+    property alias playCoverOpacity: playCoverLoader.opacity
 
     // Signals
 
@@ -76,20 +76,22 @@ Rectangle {
     Loader {
         id: playCoverLoader
 
-        anchors.fill: parent
+        anchors.centerIn: parent
+
         visible: false
+
         active: false
+
         sourceComponent: Widgets.PlayCover {
-            showGradient: playCoverShowGradient
-            iconSize: playIconSize
-            radius: root.radius
+            width: playIconSize
 
-            onIconClicked: playIconClicked()
+            onClicked: playIconClicked()
         }
 
-        onVisibleChanged: {
-            if (visible && !active)
-                active = true
-        }
+        asynchronous: true
+
+        // NOTE: We are lazy loading the component when this gets visible and it stays loaded.
+        //       We could consider unloading it when visible goes to false.
+        onVisibleChanged: if (playCoverShowPlay && visible) active = true
     }
 }

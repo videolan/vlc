@@ -58,8 +58,9 @@ Item {
                 id: cover
 
                 anchors.fill: parent
+
                 source: (rowModel ? (root.showTitleText ? rowModel.cover : rowModel[model.criteria]) : VLCStyle.noArtCover) || VLCStyle.noArtCover
-                playCoverVisible: currentlyFocused || containsMouse
+                playCoverVisible: (currentlyFocused || containsMouse)
                 playIconSize: VLCStyle.play_cover_small
                 onPlayIconClicked: g_mainDisplay.play(medialib, rowModel.id)
                 radius: root.titleCover_radius
