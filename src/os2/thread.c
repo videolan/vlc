@@ -589,7 +589,7 @@ void vlc_testcancel (void)
          p->proc (p->data);
 
     DosPostEventSem( th->done_event );
-    th->data = NULL; /* TODO: special value? */
+    th->data = VLC_THREAD_CANCELED;
     vlc_thread_cleanup (th);
     _endthread();
 }
