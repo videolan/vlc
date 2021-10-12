@@ -363,9 +363,9 @@ void MainInterface::setHasAcrylicSurface(const bool v)
 void MainInterface::incrementIntfUserScaleFactor(bool increment)
 {
     if (increment)
-        setIntfUserScaleFactor(m_intfScaleFactor + .1f);
+        setIntfUserScaleFactor(m_intfUserScaleFactor + .1f);
     else
-        setIntfUserScaleFactor(m_intfScaleFactor - .1f);
+        setIntfUserScaleFactor(m_intfUserScaleFactor - .1f);
 }
 
 void MainInterface::setIntfUserScaleFactor(float newValue)
