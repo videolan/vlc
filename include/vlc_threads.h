@@ -306,13 +306,16 @@ VLC_API void vlc_mutex_unlock(vlc_mutex_t *);
 /**
  * Checks if a mutex is locked.
  *
- * Do not use this function directly. Use vlc_mutex_assert() instead.
+ * This function checks if the calling thread holds a given mutual exclusion
+ * lock. It has no side effects and is essentially intended for run-time
+ * debugging.
  *
- * @note
- * This function has no effects.
- * It is only meant to be use in run-time assertions.
+ * @note To assert that the calling thread holds a lock, the helper macro
+ * vlc_mutex_assert() should be used instead of this function.
  *
- * @warning This function might not return correct results in non-debug builds.
+ * @note While it is nominally possible to implement recursive lock semantics
+ * with this function, vlc_mutex_init_recursive() should be used instead to
+ * create a recursive mutex explicitly..
  *
  * @retval false the mutex is not locked by the calling thread
  * @retval true the mutex is locked by the calling thread
