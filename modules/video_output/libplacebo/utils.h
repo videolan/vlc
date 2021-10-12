@@ -36,6 +36,8 @@ struct pl_color_space vlc_placebo_ColorSpace(const video_format_t *);
 struct pl_color_repr vlc_placebo_ColorRepr(const video_format_t *);
 enum pl_chroma_location vlc_placebo_ChromaLoc(const video_format_t *);
 
+int vlc_placebo_PlaneComponents(const video_format_t *, struct pl_plane[4]);
+
 // Fill a pl_plane_data array with various data. Returns the number of planes,
 // or 0 if the format is unsupported by the libplacebo API. If `buf` is set,
 // then all addresses of the picture_t must lie within `buf`'s mapped memory.

@@ -3180,6 +3180,11 @@ AS_IF([test "$enable_libplacebo" != "no"], [
 AM_CONDITIONAL([HAVE_LIBPLACEBO], [test "$enable_libplacebo" != "no"])
 
 dnl
+dnl  OpenGL filter pl_scale
+dnl
+PKG_HAVE_WITH_MODULES([LIBPLACEBO_SCALE], [libplacebo >= 4.167])
+
+dnl
 dnl  OpenGL
 dnl
 PKG_CHECK_MODULES([EGL], [egl], [

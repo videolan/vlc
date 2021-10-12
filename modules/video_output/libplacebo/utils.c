@@ -465,3 +465,20 @@ enum pl_chroma_location vlc_placebo_ChromaLoc(const video_format_t *fmt)
 
     return locs[fmt->chroma_location];
 }
+
+int vlc_placebo_PlaneComponents(const video_format_t *fmt,
+                                struct pl_plane planes[4]) {
+    const struct fmt_desc *desc = FindDesc(fmt->i_chroma);
+    if (!desc)
+        return 0;
+
+    for (int i = 0; i < desc->num_planes; i++) {
+        const struct plane_desc *p = &desc->planes[i];
+
+        planes[i].components = p->components;
+        for (int c = 0; c < p->components; ++c)
+            planes[i].component_mapping[c] = p->comp_map[c];
+    }
+
+    return desc->num_planes;
+}

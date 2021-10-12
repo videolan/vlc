@@ -124,6 +124,34 @@ libglfilter_mock_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
 noinst_LTLIBRARIES += libglfilter_mock_plugin.la
 endif
 
+if HAVE_LIBPLACEBO_SCALE
+
+libpl_scale_plugin_la_SOURCES = video_output/opengl/pl_scale.c
+libpl_scale_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(LIBPLACEBO_CFLAGS)
+libpl_scale_plugin_la_LIBADD = $(LIBPLACEBO_LIBS)
+if HAVE_GL
+libpl_scale_plugin_la_LIBADD += libvlc_opengl.la
+video_filter_LTLIBRARIES += libpl_scale_plugin.la
+endif
+
+if HAVE_DARWIN
+video_filter_LTLIBRARIES += libpl_scale_plugin.la
+if HAVE_OSX
+libpl_scale_plugin_la_LIBADD += libvlc_opengl.la
+else
+libpl_scale_plugin_la_LIBADD += libvlc_opengles.la
+libpl_scale_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2=1
+endif
+endif
+
+if HAVE_ANDROID
+libpl_scale_plugin_la_LIBADD += libvlc_opengles.la
+libpl_scale_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2=1
+video_filter_LTLIBRARIES += libpl_scale_plugin.la
+endif
+
+endif
+
 libegl_display_generic_plugin_la_SOURCES = video_output/opengl/egl_display_generic.c
 libegl_display_generic_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EGL_FLAGS)
 libegl_display_generic_plugin_la_LIBADD = $(EGL_LIBS)
