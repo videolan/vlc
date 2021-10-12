@@ -905,6 +905,9 @@ unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
         case 1 :    /* Termination */
             wait_bucket_destroy();
 
+            // all thread vars should be deleted
+            assert(vlc_threadvar_last == NULL);
+
             _CRT_term();
 
             return 1;
