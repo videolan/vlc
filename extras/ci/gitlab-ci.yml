@@ -19,7 +19,7 @@ variables:
     VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20211020111246
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20210803114245
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20210730131708
-    VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-focal:20211006143413
+    VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-focal:20211020115724
     VLC_RASPBIAN_IMAGE: registry.videolan.org/vlc-ubuntu-raspberry:20211006142322
     VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20210915101305
 

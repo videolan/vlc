@@ -144,6 +144,7 @@ parts:
       - libvdpau-dev
       - libx11-dev
       - libxcb-composite0-dev
+      - libxcb-damage0-dev
       - libxcb-keysyms1-dev
       - libxcb-randr0-dev
       - libxcb-shm0-dev
@@ -194,6 +195,7 @@ parts:
       - libvdpau1
       - libx11-6
       - libxcb-composite0
+      - libxcb-damage0
       - libxcb-keysyms1
       - libxcb-randr0
       - libxcb-shm0
