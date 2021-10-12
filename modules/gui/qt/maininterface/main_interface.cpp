@@ -123,7 +123,7 @@ MainInterface::MainInterface(qt_intf_t *_p_intf)
     /* */
     m_intfUserScaleFactor = var_InheritFloat(p_intf, "qt-interface-scale");
     if (m_intfUserScaleFactor == -1)
-        m_intfUserScaleFactor = getSettings()->value( "MainWindow/interface-scale", 1.0).toFloat();
+        m_intfUserScaleFactor = getSettings()->value( "MainWindow/interface-scale", 1.0).toDouble();
 
     /* Get the available interfaces */
     m_extraInterfaces = new VLCVarChoiceModel(VLC_OBJECT(p_intf->intf), "intf-add", this);
@@ -363,14 +363,14 @@ void MainInterface::setHasAcrylicSurface(const bool v)
 void MainInterface::incrementIntfUserScaleFactor(bool increment)
 {
     if (increment)
-        setIntfUserScaleFactor(m_intfUserScaleFactor + .1f);
+        setIntfUserScaleFactor(m_intfUserScaleFactor + 0.1);
     else
-        setIntfUserScaleFactor(m_intfUserScaleFactor - .1f);
+        setIntfUserScaleFactor(m_intfUserScaleFactor - 0.1);
 }
 
-void MainInterface::setIntfUserScaleFactor(float newValue)
+void MainInterface::setIntfUserScaleFactor(double newValue)
 {
-    m_intfUserScaleFactor = std::max(std::min(newValue, getMaxIntfUserScaleFactor()), getMinIntfUserScaleFactor());
+    m_intfUserScaleFactor = qBound(getMinIntfUserScaleFactor(), newValue, getMaxIntfUserScaleFactor());
     updateIntfScaleFactor();
 }
 

@@ -150,7 +150,7 @@ class MainInterface : public QObject
     Q_PROPERTY(bool hasEmbededVideo READ hasEmbededVideo NOTIFY hasEmbededVideoChanged FINAL)
     Q_PROPERTY(bool showRemainingTime READ isShowRemainingTime WRITE setShowRemainingTime NOTIFY showRemainingTimeChanged FINAL)
     Q_PROPERTY(VLCVarChoiceModel* extraInterfaces READ getExtraInterfaces CONSTANT FINAL)
-    Q_PROPERTY(float intfScaleFactor READ getIntfScaleFactor NOTIFY intfScaleFactorChanged FINAL)
+    Q_PROPERTY(double intfScaleFactor READ getIntfScaleFactor NOTIFY intfScaleFactorChanged FINAL)
     Q_PROPERTY(bool mediaLibraryAvailable READ hasMediaLibrary CONSTANT FINAL)
     Q_PROPERTY(MediaLib* mediaLibrary READ getMediaLibrary CONSTANT FINAL)
     Q_PROPERTY(bool gridView READ hasGridView WRITE setGridView NOTIFY gridViewChanged FINAL)
@@ -172,8 +172,8 @@ public:
     virtual ~MainInterface();
 
     static const QEvent::Type ToolbarsNeedRebuild;
-    static constexpr float MIN_INTF_USER_SCALE_FACTOR = .3f;
-    static constexpr float MAX_INTF_USER_SCALE_FACTOR = 3.f;
+    static constexpr double MIN_INTF_USER_SCALE_FACTOR = 0.3;
+    static constexpr double MAX_INTF_USER_SCALE_FACTOR = 3.0;
 
 public:
     /* Getters */
@@ -200,11 +200,11 @@ public:
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
     inline bool isHideAfterCreation() const { return b_hideAfterCreation; }
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
-    inline float getIntfScaleFactor() const { return m_intfScaleFactor; }
-    inline float getIntfUserScaleFactor() const { return m_intfUserScaleFactor; }
+    inline double getIntfScaleFactor() const { return m_intfScaleFactor; }
+    inline double getIntfUserScaleFactor() const { return m_intfUserScaleFactor; }
     inline int CSDBorderSize() const { return 5 * getIntfScaleFactor(); }
-    inline float getMinIntfUserScaleFactor() const { return MIN_INTF_USER_SCALE_FACTOR; }
-    inline float getMaxIntfUserScaleFactor() const { return MAX_INTF_USER_SCALE_FACTOR; }
+    inline double getMinIntfUserScaleFactor() const { return MIN_INTF_USER_SCALE_FACTOR; }
+    inline double getMaxIntfUserScaleFactor() const { return MAX_INTF_USER_SCALE_FACTOR; }
     inline bool hasMediaLibrary() const { return b_hasMedialibrary; }
     inline MediaLib* getMediaLibrary() const { return m_medialib; }
     inline bool hasGridView() const { return m_gridView; }
@@ -265,8 +265,8 @@ protected:
     QMap<QWidget *, QSize> stackWidgetsSizes;
 
     /* Flags */
-    float                m_intfUserScaleFactor;
-    float                m_intfScaleFactor;
+    double                m_intfUserScaleFactor;
+    double                m_intfScaleFactor;
     unsigned             i_notificationSetting; /// Systray Notifications
     bool                 b_hideAfterCreation;
     bool                 b_minimalView;         ///< Minimal video
@@ -309,7 +309,7 @@ public slots:
     void setShowRemainingTime( bool );
     void setGridView( bool );
     void incrementIntfUserScaleFactor( bool increment);
-    void setIntfUserScaleFactor( float );
+    void setIntfUserScaleFactor( double );
     void setPinVideoControls( bool );
     void updateIntfScaleFactor();
     void onWindowVisibilityChanged(QWindow::Visibility);
