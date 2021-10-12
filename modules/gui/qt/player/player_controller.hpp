@@ -191,45 +191,45 @@ public:
 
     /* exposed actions */
 public slots:
-    Q_INVOKABLE void reverse();
-    Q_INVOKABLE void slower();
-    Q_INVOKABLE void faster();
-    Q_INVOKABLE void littlefaster();
-    Q_INVOKABLE void littleslower();
-    Q_INVOKABLE void normalRate();
+    void reverse();
+    void slower();
+    void faster();
+    void littlefaster();
+    void littleslower();
+    void normalRate();
 
-    Q_INVOKABLE void jumpFwd();
-    Q_INVOKABLE void jumpBwd();
-    Q_INVOKABLE void jumpToTime( VLCTick i_time );
-    Q_INVOKABLE void jumpToPos( float );
-    Q_INVOKABLE void frameNext();
+    void jumpFwd();
+    void jumpBwd();
+    void jumpToTime( VLCTick i_time );
+    void jumpToPos( float );
+    void frameNext();
 
     //title/chapters/menu
-    Q_INVOKABLE void sectionNext();
-    Q_INVOKABLE void sectionPrev();
-    Q_INVOKABLE void sectionMenu();
+    void sectionNext();
+    void sectionPrev();
+    void sectionMenu();
 
-    Q_INVOKABLE void chapterNext();
-    Q_INVOKABLE void chapterPrev();
-    Q_INVOKABLE void titleNext();
-    Q_INVOKABLE void titlePrev();
+    void chapterNext();
+    void chapterPrev();
+    void titleNext();
+    void titlePrev();
 
     //programs
-    Q_INVOKABLE void changeProgram( int );
+    void changeProgram( int );
 
     //vout properties
-    Q_INVOKABLE void toggleFullscreen();
+    void toggleFullscreen();
 
     //aout properties
-    Q_INVOKABLE void setVolumeUp();
-    Q_INVOKABLE void setVolumeDown();
-    Q_INVOKABLE void toggleMuted();
+    void setVolumeUp();
+    void setVolumeDown();
+    void toggleMuted();
 
     //misc
-    Q_INVOKABLE void toggleABloopState();
-    Q_INVOKABLE void snapshot();
-    Q_INVOKABLE void toggleRecord();
-    Q_INVOKABLE void toggleVisualization();
+    void toggleABloopState();
+    void snapshot();
+    void toggleRecord();
+    void toggleVisualization();
 
     // SMPTE Timer
     void requestAddSMPTETimer();
