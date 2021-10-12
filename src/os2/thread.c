@@ -60,7 +60,7 @@
 static vlc_mutex_t super_mutex;
 
 /* Threads */
-static vlc_threadvar_t thread_key;
+static thread_local struct vlc_thread *current_thread_ctx = NULL;
 
 struct vlc_thread
 {
@@ -87,7 +87,7 @@ static ULONG vlc_DosWaitEventSemEx( HEV hev, ULONG ulTimeout )
     int       n;
     ULONG     rc;
 
-    struct vlc_thread *th = vlc_threadvar_get(thread_key);
+    struct vlc_thread *th = current_thread_ctx;
     if( th == NULL || !th->killable )
     {
         /* Main thread - cannot be cancelled anyway
@@ -430,7 +430,7 @@ static void vlc_entry( void *p )
 {
     struct vlc_thread *th = p;
 
-    vlc_threadvar_set (thread_key, th);
+    current_thread_ctx = th;
     th->killable = true;
     th->data = th->entry (th->data);
     DosPostEventSem( th->done_event );
@@ -545,7 +545,7 @@ int vlc_savecancel (void)
 {
     int state;
 
-    struct vlc_thread *th = vlc_threadvar_get(thread_key);
+    struct vlc_thread *th = current_thread_ctx;
     if (th == NULL)
         return false; /* Main thread - cannot be cancelled anyway */
 
@@ -556,7 +556,7 @@ int vlc_savecancel (void)
 
 void vlc_restorecancel (int state)
 {
-    struct vlc_thread *th = vlc_threadvar_get(thread_key);
+    struct vlc_thread *th = current_thread_ctx;
     assert (state == false || state == true);
 
     if (th == NULL)
@@ -568,7 +568,7 @@ void vlc_restorecancel (int state)
 
 void vlc_testcancel (void)
 {
-    struct vlc_thread *th = vlc_threadvar_get(thread_key);
+    struct vlc_thread *th = current_thread_ctx;
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
@@ -599,7 +599,7 @@ void vlc_control_cancel (vlc_cleanup_t *cleaner)
     /* NOTE: This function only modifies thread-specific data, so there is no
      * need to lock anything. */
 
-    struct vlc_thread *th = vlc_threadvar_get(thread_key);
+    struct vlc_thread *th = current_thread_ctx;
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
@@ -619,7 +619,7 @@ void vlc_control_cancel (vlc_cleanup_t *cleaner)
 static int vlc_select( int nfds, fd_set *rdset, fd_set *wrset, fd_set *exset,
                        struct timeval *timeout )
 {
-    struct vlc_thread *th = vlc_threadvar_get(thread_key);
+    struct vlc_thread *th = current_thread_ctx;
 
     int rc;
 
@@ -901,13 +901,10 @@ unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
             wait_bucket_init();
 
             vlc_mutex_init (&super_mutex);
-            vlc_threadvar_create (&thread_key, NULL);
 
             return 1;
 
         case 1 :    /* Termination */
-            vlc_threadvar_delete (&thread_key);
-
             wait_bucket_destroy();
 
             _CRT_term();
