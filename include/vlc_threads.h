@@ -126,7 +126,7 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 # define LIBVLC_USE_PTHREAD_CLEANUP   1
 
 typedef struct vlc_thread *vlc_thread_t;
-#define VLC_THREAD_CANCELED NULL
+#define VLC_THREAD_CANCELED ((void*) UINTPTR_MAX)
 typedef pthread_key_t   vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
