@@ -181,13 +181,15 @@ int vlc_mutex_trylock(vlc_mutex_t *mtx)
      */
     unsigned recursion = atomic_load_explicit(&mtx->recursion,
                                               memory_order_relaxed);
-    if (unlikely(recursion) && vlc_mutex_held(mtx)) {
-        /* This thread already owns the mutex, locks recursively.
-         * Other threads shall not have modified the recursion or owner fields.
-         */
-        atomic_store_explicit(&mtx->recursion, recursion + 1,
-                              memory_order_relaxed);
-        return 0;
+    if (unlikely(recursion)) {
+        if (vlc_mutex_held(mtx)) {
+            /* This thread already owns the mutex, locks recursively.
+             * Other threads shall not have modified the recursion or owner fields.
+             */
+            atomic_store_explicit(&mtx->recursion, recursion + 1,
+                                  memory_order_relaxed);
+            return 0;
+        }
     } else
         assert(!vlc_mutex_held(mtx));
 
