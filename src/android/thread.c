@@ -191,7 +191,7 @@ void vlc_testcancel (void)
     if (!atomic_load(&thread->killed))
         return;
 
-    pthread_exit(NULL);
+    pthread_exit(VLC_THREAD_CANCELED);
 }
 
 /* threadvar */
