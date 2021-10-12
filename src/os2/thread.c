@@ -58,7 +58,6 @@
 
 /* Static mutex and condition variable */
 static vlc_mutex_t super_mutex;
-static vlc_cond_t  super_variable;
 
 /* Threads */
 static vlc_threadvar_t thread_key;
@@ -902,7 +901,6 @@ unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
             wait_bucket_init();
 
             vlc_mutex_init (&super_mutex);
-            vlc_cond_init (&super_variable);
             vlc_threadvar_create (&thread_key, NULL);
 
             return 1;
