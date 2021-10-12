@@ -551,8 +551,6 @@ static int
 Open(struct vlc_gl_filter *filter, const config_chain_t *config,
      struct vlc_gl_tex_size *size_out)
 {
-    (void) config;
-
     config_ChainParse(filter, MOCK_CFG_PREFIX, filter_options, config);
 
     bool mask = var_InheritBool(filter, MOCK_CFG_PREFIX "mask");
