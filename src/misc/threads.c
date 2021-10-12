@@ -116,7 +116,7 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 static void vlc_mutex_init_common(vlc_mutex_t *mtx, bool recursive)
 {
     atomic_init(&mtx->value, 0);
-    atomic_init(&mtx->recursion, recursive);
+    atomic_init(&mtx->recursion, recursive ? 1 : 0);
     atomic_init(&mtx->owner, 0);
 }
 
