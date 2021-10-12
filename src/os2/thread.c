@@ -57,7 +57,7 @@
 #include <vlc_atomic.h>
 
 /* Static mutex and condition variable */
-static vlc_mutex_t super_mutex;
+static vlc_mutex_t super_mutex = VLC_STATIC_MUTEX;
 
 /* Threads */
 static thread_local struct vlc_thread *current_thread_ctx = NULL;
@@ -899,8 +899,6 @@ unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
                 return 0;
 
             wait_bucket_init();
-
-            vlc_mutex_init (&super_mutex);
 
             return 1;
 
