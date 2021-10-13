@@ -61,6 +61,9 @@ vlc_gl_filter_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api)
 
     vlc_list_init(&priv->blend_subfilters);
 
+    /* Expose a const pointer to the OpenGL format publicly */
+    filter->glfmt_in = &priv->glfmt_in;
+
     return filter;
 }
 
