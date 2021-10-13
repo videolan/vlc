@@ -94,13 +94,16 @@ int vlc_threadvar_create (vlc_threadvar_t *p_tls, void (*destr) (void *))
     var->next = NULL;
     *p_tls = var;
 
-    AcquireSRWLockExclusive(&super_lock);
-    var->prev = vlc_threadvar_last;
-    if (var->prev)
-        var->prev->next = var;
+    if (destr != NULL)
+    {
+        AcquireSRWLockExclusive(&super_lock);
+        var->prev = vlc_threadvar_last;
+        if (var->prev)
+            var->prev->next = var;
 
-    vlc_threadvar_last = var;
-    ReleaseSRWLockExclusive(&super_lock);
+        vlc_threadvar_last = var;
+        ReleaseSRWLockExclusive(&super_lock);
+    }
     return 0;
 }
 
@@ -108,17 +111,18 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 {
     struct vlc_threadvar *var = *p_tls;
 
-    AcquireSRWLockExclusive(&super_lock);
-    if (var->prev != NULL)
-        var->prev->next = var->next;
+    if (var->destroy != NULL)
+    {
+        AcquireSRWLockExclusive(&super_lock);
+        if (var->prev != NULL)
+            var->prev->next = var->next;
 
-    if (var->next != NULL)
-        var->next->prev = var->prev;
-    else
-        vlc_threadvar_last = var->prev;
-
-    ReleaseSRWLockExclusive(&super_lock);
-
+        if (var->next != NULL)
+            var->next->prev = var->prev;
+        else
+            vlc_threadvar_last = var->prev;
+        ReleaseSRWLockExclusive(&super_lock);
+    }
     TlsFree (var->id);
     free (var);
 }
@@ -152,10 +156,11 @@ retry:
     for (key = vlc_threadvar_last; key != NULL; key = key->prev)
     {
         void *value = vlc_threadvar_get(key);
-        if (value != NULL && key->destroy != NULL)
+        if (value != NULL)
         {
             ReleaseSRWLockExclusive(&super_lock);
             vlc_threadvar_set(key, NULL);
+            assert(key->destroy != NULL);
             key->destroy(value);
             goto retry;
         }
