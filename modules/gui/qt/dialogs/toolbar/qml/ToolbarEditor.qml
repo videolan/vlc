@@ -46,7 +46,7 @@ Rectangle{
             id: bar
             z: 1
 
-            background: Item { }
+            background: null
 
             readonly property int currentIdentifier: currentItem.identifier
 
