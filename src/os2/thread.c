@@ -172,13 +172,16 @@ int vlc_threadvar_create (vlc_threadvar_t *p_tls, void (*destr) (void *))
     var->next = NULL;
     *p_tls = var;
 
-    vlc_mutex_lock (&super_mutex);
-    var->prev = vlc_threadvar_last;
-    if (var->prev)
-        var->prev->next = var;
+    if (destr != NULL)
+    {
+        vlc_mutex_lock(&super_mutex);
+        var->prev = vlc_threadvar_last;
+        if (var->prev != NULL)
+            var->prev->next = var;
 
-    vlc_threadvar_last = var;
-    vlc_mutex_unlock (&super_mutex);
+        vlc_threadvar_last = var;
+        vlc_mutex_unlock(&super_mutex);
+    }
     return 0;
 }
 
@@ -186,17 +189,19 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 {
     struct vlc_threadvar *var = *p_tls;
 
-    vlc_mutex_lock (&super_mutex);
-    if (var->prev != NULL)
-        var->prev->next = var->next;
+    if (var->destr != NULL)
+    {
+        vlc_mutex_lock(&super_mutex);
+        if (var->prev != NULL)
+            var->prev->next = var->next;
 
-    if (var->next != NULL)
-        var->next->prev = var->prev;
-    else
-        vlc_threadvar_last = var->prev;
+        if (var->next != NULL)
+            var->next->prev = var->prev;
+        else
+            vlc_threadvar_last = var->prev;
 
-    vlc_mutex_unlock (&super_mutex);
-
+        vlc_mutex_unlock(&super_mutex);
+    }
     DosFreeThreadLocalMemory( var->id );
     free (var);
 }
@@ -420,10 +425,11 @@ retry:
     for (key = vlc_threadvar_last; key != NULL; key = key->prev)
     {
         void *value = vlc_threadvar_get (key);
-        if (value != NULL && key->destroy != NULL)
+        if (value != NULL)
         {
             vlc_mutex_unlock (&super_mutex);
             vlc_threadvar_set (key, NULL);
+            assert(key->destroy != NULL);
             key->destroy (value);
             goto retry;
         }
