@@ -156,7 +156,7 @@ retry:
     AcquireSRWLockExclusive(&super_lock);
     for (key = vlc_threadvar_last; key != NULL; key = key->prev)
     {
-        void *value = vlc_threadvar_get(key);
+        void *value = TlsGetValue(key->id);
         if (value != NULL)
         {
             ReleaseSRWLockExclusive(&super_lock);
