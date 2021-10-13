@@ -269,6 +269,9 @@ Rectangle{
         color: VLCStyle.colors.buttonText
         opacity: 0.75
 
+        x: -1
+        y: -1
+
         onXChanged: {
             if (Drag.active)
                 handleScroll(this)
