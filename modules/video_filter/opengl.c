@@ -37,7 +37,7 @@
 #include "../video_output/opengl/interop.h"
 
 #define OPENGL_CFG_PREFIX "opengl-"
-static const char *const opengl_options[] = { "filter", NULL };
+static const char *const opengl_options[] = { "filter", "gl", "gles", NULL };
 
 typedef struct
 {
@@ -161,7 +161,7 @@ static void Close( filter_t *filter )
     }
 }
 
-static int Open( vlc_object_t *obj )
+static int OpenCommon( vlc_object_t *obj, int api_type, const char *name)
 {
     filter_t *filter = (filter_t *)obj;
 
@@ -171,19 +171,16 @@ static int Open( vlc_object_t *obj )
     if (sys == NULL)
         return VLC_ENOMEM;
 
+    config_ChainParse(filter, OPENGL_CFG_PREFIX, opengl_options, filter->p_cfg);
+
     unsigned width = filter->fmt_out.video.i_visible_width;
     unsigned height = filter->fmt_out.video.i_visible_height;
 
-    // TODO: other than BGRA format ?
-#ifdef USE_OPENGL_ES2
-# define VLCGLAPI VLC_OPENGL_ES2
-#else
-# define VLCGLAPI VLC_OPENGL
-#endif
-
+    char *opengl_name = var_InheritString(obj, name);
     struct vlc_decoder_device *device = filter_HoldDecoderDevice(filter);
-    sys->gl = vlc_gl_CreateOffscreen(obj, device, width, height, VLCGLAPI,
-                                     NULL);
+    sys->gl = vlc_gl_CreateOffscreen(obj, device, width, height, api_type,
+                                     opengl_name);
+    free(opengl_name);
 
     /* The vlc_gl_t instance must have hold the device if it needs it. */
     if (device)
@@ -216,8 +213,6 @@ static int Open( vlc_object_t *obj )
         msg_Err(obj, "Could not create interop");
         goto gl_interop_failure;
     }
-
-    config_ChainParse(filter, OPENGL_CFG_PREFIX, opengl_options, filter->p_cfg);
 
     char *glfilters_config =
         var_InheritString(filter, OPENGL_CFG_PREFIX "filter");
@@ -303,6 +298,16 @@ gl_create_failure:
     return VLC_EGENERIC;
 }
 
+static int OpenGLES2(vlc_object_t *obj)
+{
+    return OpenCommon(obj, VLC_OPENGL_ES2, "opengl-gles");
+}
+
+static int OpenOpenGL(vlc_object_t *obj)
+{
+    return OpenCommon(obj, VLC_OPENGL, "opengl-gl");
+}
+
 #define FILTER_LIST_TEXT N_( "OpenGL filter" )
 #define FILTER_LIST_LONGTEXT N_( "List of OpenGL filters to execute" )
 
@@ -310,9 +315,18 @@ vlc_module_begin()
     set_shortname( N_("opengl") )
     set_description( N_("Opengl filter executor") )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter", 0 )
+    set_capability( "video filter", 1 )
     add_shortcut( "opengl" )
-    set_callback( Open )
+    set_callback( OpenOpenGL )
     add_module_list( "opengl-filter", "opengl filter", NULL,
                      FILTER_LIST_TEXT, FILTER_LIST_LONGTEXT )
+    add_module( "opengl-gl", "opengl offscreen", NULL, "OpenGL provider",
+                "OpenGL provider to execute the filters with" )
+
+    add_submodule()
+    set_capability( "video filter", 0 )
+    set_callback( OpenGLES2 )
+    add_module( "opengl-gles", "opengl es2 offscreen", NULL, "OpenGLES provider",
+                "OpenGL ES provider to execute the filters with" )
+    add_shortcut( "opengl", "opengles" )
 vlc_module_end()
