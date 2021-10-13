@@ -54,9 +54,6 @@ Rectangle{
                 model: PlayerListModel.model
 
                 delegate: EditorTabButton {
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-
                     text: modelData.name
                     readonly property int identifier: modelData.identifier
                 }
