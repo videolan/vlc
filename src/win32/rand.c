@@ -25,15 +25,10 @@
 #include <vlc_common.h>
 #include <vlc_rand.h>
 
-#ifdef VLC_WINSTORE_APP
-# include <bcrypt.h>
-#else
-# include <wincrypt.h>
-#endif
+#include <bcrypt.h>
 
 void vlc_rand_bytes (void *buf, size_t len)
 {
-#ifdef VLC_WINSTORE_APP
     BCRYPT_ALG_HANDLE algo_handle;
     NTSTATUS ret = BCryptOpenAlgorithmProvider(&algo_handle, BCRYPT_RNG_ALGORITHM,
                                                MS_PRIMITIVE_PROVIDER, 0);
@@ -42,39 +37,4 @@ void vlc_rand_bytes (void *buf, size_t len)
         BCryptGenRandom(algo_handle, buf, len, 0);
         BCryptCloseAlgorithmProvider(algo_handle, 0);
     }
-#else
-    size_t count = len;
-    uint8_t *p_buf = (uint8_t *)buf;
-
-    /* fill buffer with pseudo-random data */
-    while (count > 0)
-    {
-        unsigned int val;
-        val = rand();
-        if (count < sizeof (val))
-        {
-            memcpy (p_buf, &val, count);
-            break;
-        }
-
-        memcpy (p_buf, &val, sizeof (val));
-        count -= sizeof (val);
-        p_buf += sizeof (val);
-    }
-
-    HCRYPTPROV hProv;
-    /* acquire default encryption context */
-    if( CryptAcquireContext(
-        &hProv,                 // Variable to hold returned handle.
-        NULL,                   // Use default key container.
-        MS_DEF_PROV,            // Use default CSP.
-        PROV_RSA_FULL,          // Type of provider to acquire.
-        CRYPT_VERIFYCONTEXT) )  // Flag values
-    {
-        /* fill buffer with pseudo-random data, initial buffer content
-           is used as auxiliary random seed */
-        CryptGenRandom(hProv, len, buf);
-        CryptReleaseContext(hProv, 0);
-    }
-#endif /* VLC_WINSTORE_APP */
 }

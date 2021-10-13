@@ -1298,12 +1298,6 @@ AS_IF([test "${enable_ssp}" != "no" -a "${enable_optimizations}" != "no"], [
   ])
 ])
 
-AS_IF([test "${SYS}" = "mingw32"], [
-    dnl library for BCrypt APIs
-    AS_IF([test "${vlc_winstore_app}" = 1],
-          VLC_ADD_LIBS([libvlccore], [-lbcrypt]))
-])
-
 VLC_SAVE_FLAGS
 LDFLAGS="${LDFLAGS} -Wl,-Bsymbolic"
 AC_CACHE_CHECK([if linker supports -Bsymbolic], [ac_cv_ld_bsymbolic], [
