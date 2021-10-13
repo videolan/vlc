@@ -73,7 +73,7 @@ private slots:
     void showCredit();
 };
 
-#ifdef UPDATE_CHECK
+#if defined(UPDATE_CHECK)
 
 class UpdateDialog : public QVLCFrame, public Singleton<UpdateDialog>
 {

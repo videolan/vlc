@@ -139,7 +139,7 @@ public slots:
     void vlmDialog();
 #endif
     void helpDialog();
-#ifdef UPDATE_CHECK
+#if defined(UPDATE_CHECK)
     void updateDialog();
 #endif
     void aboutDialog();
