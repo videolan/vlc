@@ -93,7 +93,9 @@ static void *joinable_thread(void *data)
     vlc_thread_t th = data;
 
     thread = th;
-    return th->entry(th->data);
+    void *result = th->entry(th->data);
+    assert(result != VLC_THREAD_CANCELED); // don't hijack our internal values
+    return result;
 }
 
 static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),

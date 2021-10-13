@@ -439,6 +439,7 @@ static void vlc_entry( void *p )
     current_thread_ctx = th;
     th->killable = true;
     th->data = th->entry (th->data);
+    assert(th->data != VLC_THREAD_CANCELED); // don't hijack our internal values
     DosPostEventSem( th->done_event );
     vlc_thread_cleanup (th);
 }

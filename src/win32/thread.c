@@ -346,6 +346,7 @@ __stdcall vlc_entry (void *p)
     current_thread_ctx = th;
     th->killable = true;
     th->data = th->entry (th->data);
+    assert(th->data != VLC_THREAD_CANCELED); // don't hijack our internal values
     current_thread_ctx = NULL;
 
     return 0;
