@@ -53,6 +53,8 @@ static void Close( vlc_object_t * );
 #define MP4_M4A_TEXT     N_("M4A audio only")
 #define MP4_M4A_LONGTEXT N_("Ignore non audio tracks from iTunes audio files")
 
+#define MP4_ELST_TEXT       N_("Handle edit list")
+
 #define HEIF_DURATION_TEXT N_("Duration in seconds")
 #define HEIF_DURATION_LONGTEXT N_( \
     "Duration in seconds before simulating an end of file. " \
@@ -73,6 +75,7 @@ vlc_module_begin ()
 
     set_section("Hacks", NULL)
     add_bool( CFG_PREFIX"m4a-audioonly", false, MP4_M4A_TEXT, MP4_M4A_LONGTEXT )
+    add_bool( CFG_PREFIX"editlist", true, MP4_ELST_TEXT, MP4_ELST_TEXT )
 
     add_submodule()
         set_category( CAT_INPUT )
@@ -3542,7 +3545,8 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
     const MP4_Box_t *p_elst;
     p_track->i_elst = 0;
     p_track->i_elst_time = 0;
-    if( ( p_track->p_elst = p_elst = MP4_BoxGet( p_box_trak, "edts/elst" ) ) )
+    p_track->p_elst = NULL;
+    if( ( p_elst = MP4_BoxGet( p_box_trak, "edts/elst" ) ) )
     {
         MP4_Box_data_elst_t *elst = BOXDATA(p_elst);
         unsigned int i;
@@ -3559,8 +3563,12 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
                      elst->i_media_rate_integer[i],
                      elst->i_media_rate_fraction[i] );
         }
-    }
 
+        if( var_InheritBool( p_demux, CFG_PREFIX"editlist" ) )
+            p_track->p_elst = p_elst;
+        else
+            msg_Dbg( p_demux, "ignore editlist" );
+    }
 
 /*  TODO
     add support for:
