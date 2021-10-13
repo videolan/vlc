@@ -150,23 +150,23 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
 
 static void vlc_threadvars_cleanup(void)
 {
-    vlc_threadvar_t key;
+    const struct vlc_threadvar *key;
+
 retry:
-    /* TODO: use RW lock or something similar */
-    AcquireSRWLockExclusive(&super_lock);
+    AcquireSRWLockShared(&super_lock);
     for (key = vlc_threadvar_last; key != NULL; key = key->prev)
     {
         void *value = TlsGetValue(key->id);
         if (value != NULL)
         {
-            ReleaseSRWLockExclusive(&super_lock);
-            vlc_threadvar_set(key, NULL);
+            ReleaseSRWLockShared(&super_lock);
+            TlsSetValue(key->id, NULL);
             assert(key->destroy != NULL);
             key->destroy(value);
             goto retry;
         }
     }
-    ReleaseSRWLockExclusive(&super_lock);
+    ReleaseSRWLockShared(&super_lock);
 }
 
 /*** Futeces^WAddress waits ***/
