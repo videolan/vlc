@@ -324,7 +324,7 @@ Rectangle{
             if (direction === -1)
                 0
             else if (direction === 1 && !!target)
-                target.contentWidth - target.width
+                target.contentWidth - target.width + target.footerItem.width
             else
                 0
         }

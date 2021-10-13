@@ -175,40 +175,40 @@ Control {
             var topDiff    = (viewY + margin) - dragItemY
             var bottomDiff = dragItemY - (viewY + listView.height - toolbar.height - margin)
 
-            if (!listView.listView.atYBeginning && topDiff > 0) {
+            if (topDiff > 0)
                 _scrollingDirection = -1
-
-                listView.fadeRectTopHovered = true
-            } else if (!listView.listView.atYEnd && bottomDiff > 0) {
+            else if (bottomDiff > 0)
                 _scrollingDirection = 1
-
-                listView.fadeRectBottomHovered = true
-            } else {
+            else
                 _scrollingDirection = 0
-
-                listView.fadeRectTopHovered = false
-                listView.fadeRectBottomHovered = false
-            }
         }
 
         SmoothedAnimation {
             id: upAnimation
-            target: listView.listView
+            target: listView
             property: "contentY"
             to: 0
-            running: dragItem._scrollingDirection === -1 && dragItem.visible
+            running: dragItem._scrollingDirection === -1 && dragItem.visible && !target.listView.atYBeginning
 
             velocity: VLCStyle.dp(225, VLCStyle.scale)
+
+            onRunningChanged: {
+                target.fadeRectTopHovered = running
+            }
         }
 
         SmoothedAnimation {
             id: downAnimation
-            target: listView.listView
+            target: listView
             property: "contentY"
-            to: listView.listView.contentHeight - listView.height
-            running: dragItem._scrollingDirection === 1 && dragItem.visible
+            to: target.contentHeight - target.height + target.footerItem.height
+            running: dragItem._scrollingDirection === 1 && dragItem.visible && !target.listView.atYEnd
 
             velocity: VLCStyle.dp(225, VLCStyle.scale)
+
+            onRunningChanged: {
+                target.fadeRectBottomHovered = running
+            }
         }
     }
 
