@@ -457,7 +457,9 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
 
     switch (osys->crop.mode) {
         case VOUT_CROP_NONE:
-            left = top = right = bottom = 0;
+            left = top = 0;
+            right = osys->source.i_visible_width;
+            bottom = osys->source.i_visible_height;
             break;
         case VOUT_CROP_RATIO:
             VoutDisplayCropRatio(&left, &top, &right, &bottom, &osys->source,
