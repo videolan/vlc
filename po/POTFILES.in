@@ -1301,6 +1301,7 @@ modules/video_filter/edgedetection.c
 modules/video_filter/erase.c
 modules/video_filter/extract.c
 modules/video_filter/fps.c
+modules/video_filter/formatcrop.c
 modules/video_filter/freeze.c
 modules/video_filter/gaussianblur.c
 modules/video_filter/gradfun.c

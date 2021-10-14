@@ -2073,6 +2073,7 @@ Video Filters:
  * Improvements on the transform filter, to support 10bits and RGB formats
  * Revival of the openCV and openCV example filters
  * ARM NEON acceleration of chroma filters
+ * New crop filter without picture copy
 
 Stream Output:
  * Extended support for recording, notably for MKV and AVI

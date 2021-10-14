@@ -34,6 +34,7 @@ libhqdn3d_plugin_la_SOURCES = video_filter/hqdn3d.c video_filter/hqdn3d.h
 libhqdn3d_plugin_la_LIBADD = $(LIBM)
 libinvert_plugin_la_SOURCES = video_filter/invert.c
 libmagnify_plugin_la_SOURCES = video_filter/magnify.c
+libformatcrop_plugin_la_SOURCES = video_filter/formatcrop.c
 libmirror_plugin_la_SOURCES = video_filter/mirror.c
 libmotionblur_plugin_la_SOURCES = video_filter/motionblur.c
 libmotiondetect_plugin_la_SOURCES = video_filter/motiondetect.c
@@ -86,6 +87,7 @@ video_filter_LTLIBRARIES = \
 	libgaussianblur_plugin.la \
 	libinvert_plugin.la \
 	libmagnify_plugin.la \
+	libformatcrop_plugin.la \
 	libmirror_plugin.la \
 	libmotionblur_plugin.la \
 	libmotiondetect_plugin.la \
