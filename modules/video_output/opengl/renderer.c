@@ -348,13 +348,6 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
 
     getViewpointMatrixes(renderer, fmt->projection_mode);
 
-    /* */
-    vt->Disable(GL_BLEND);
-    vt->Disable(GL_DEPTH_TEST);
-    vt->DepthMask(GL_FALSE);
-    vt->Enable(GL_CULL_FACE);
-    vt->ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
     vt->GenBuffers(1, &renderer->vertex_buffer_object);
     vt->GenBuffers(1, &renderer->index_buffer_object);
     vt->GenBuffers(1, &renderer->texture_buffer_object);
