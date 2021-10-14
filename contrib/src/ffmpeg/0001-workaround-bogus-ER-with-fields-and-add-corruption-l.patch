@@ -1,0 +1,142 @@
+From af3cc8d688b9899f05bfd18a5357d5f27b5a8a58 Mon Sep 17 00:00:00 2001
+From: Francois Cartegnie <fcvlcdev@free.fr>
+Date: Wed, 13 Oct 2021 15:41:29 +0200
+Subject: [PATCH] workaround bogus ER with fields and add corruption level
+
+---
+ libavcodec/error_resilience.c |  3 ++-
+ libavcodec/h264_slice.c       | 24 ++++++++++++++++++++++++
+ libavcodec/h264dec.c          | 33 +++++++++++++++++++++++++++++++--
+ libavcodec/h264dec.h          |  1 +
+ 4 files changed, 58 insertions(+), 3 deletions(-)
+
+diff --git a/libavcodec/error_resilience.c b/libavcodec/error_resilience.c
+index f13be7b..c67c824 100644
+--- a/libavcodec/error_resilience.c
++++ b/libavcodec/error_resilience.c
+@@ -884,8 +884,9 @@ void ff_er_add_slice(ERContext *s, int startx, int starty,
+ 
+     s->error_status_table[start_xy] |= VP_START;
+ 
++    /* goes peeking a wrong status from first fields because of different ER context */
+     if (start_xy > 0 && !(s->avctx->active_thread_type & FF_THREAD_SLICE) &&
+-        er_supported(s) && s->avctx->skip_top * s->mb_width < start_i) {
++        s->avctx->skip_top * s->mb_width < start_i) {
+         int prev_status = s->error_status_table[s->mb_index2xy[start_i - 1]];
+ 
+         prev_status &= ~ VP_START;
+diff --git a/libavcodec/h264_slice.c b/libavcodec/h264_slice.c
+index 89ea16a..2e17243 100644
+--- a/libavcodec/h264_slice.c
++++ b/libavcodec/h264_slice.c
+@@ -1751,6 +1751,7 @@ static int h264_field_start(H264Context *h, const H264SliceContext *sl,
+         int field = h->picture_structure == PICT_BOTTOM_FIELD;
+         release_unused_pictures(h, 0);
+         h->cur_pic_ptr->tf.owner[field] = h->avctx;
++        ff_er_frame_start(&h->slice_ctx[0].er);
+     }
+     /* Some macroblocks can be accessed before they're available in case
+     * of lost slices, MBAFF or threading. */
+@@ -2669,6 +2670,29 @@ static void er_add_slice(H264SliceContext *sl,
+     if (CONFIG_ERROR_RESILIENCE) {
+         ERContext *er = &sl->h264->slice_ctx[0].er;
+ 
++        if(FIELD_PICTURE(sl->h264))
++        {
++            /* ER table is full size per field and unique per context...
++             * We can only feed full table without breaking slice continuity and
++               create unwanted errors, resuming on another context er table.
++               see ff_er_add_slice status continuity last step */
++            if(sl->h264->first_field)
++            {
++                /*starty = 0;
++                endy = sl->h264->mb_height / 2;*/
++            }
++            else
++             /* bottom */
++            {
++                if(starty > 0)
++                {
++                    --endy;
++                    --starty;
++                }
++                /*starty = (sl->h264->mb_height + 1) / 2;*/
++            }
++        }
++
+         ff_er_add_slice(er, startx, starty, endx, endy, status);
+     }
+ }
+diff --git a/libavcodec/h264dec.c b/libavcodec/h264dec.c
+index 6a5bf51..269cdaf 100644
+--- a/libavcodec/h264dec.c
++++ b/libavcodec/h264dec.c
+@@ -744,7 +744,35 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size)
+ 
+     // set decode_error_flags to allow users to detect concealed decoding errors
+     if ((ret < 0 || h->slice_ctx->er.error_occurred) && h->cur_pic_ptr) {
+-        h->cur_pic_ptr->f->decode_error_flags |= FF_DECODE_ERROR_DECODE_SLICES;
++        int error_level;
++        ERContext *s = &h->slice_ctx->er;
++
++        /* score macroblocks corruption / 255 */
++        if(s->error_occurred)
++        {
++            error_level = 0;
++            for (int mb_y = 0; mb_y < s->mb_height; mb_y++){
++                for (int mb_x = 0; mb_x < s->mb_width; mb_x++) {
++                    if(s->error_status_table[mb_x + mb_y * s->mb_stride] & ER_MB_ERROR)
++                        error_level++;
++                }
++            }
++
++            if(error_level && s->mb_num)
++                error_level = error_level * 255 / (s->mb_height * s->mb_width);
++
++            /* only consider corruption level < max_error_level */
++            if(error_level < h->max_error_level)
++                error_level = 0;
++        }
++        else error_level = 255;
++
++        if(error_level)
++        {
++            av_log(h->avctx, AV_LOG_ERROR, "error level %d/255\n", error_level);
++            h->cur_pic_ptr->f->decode_error_flags |= FF_DECODE_ERROR_DECODE_SLICES;
++            h->cur_pic_ptr->f->flags |= AV_FRAME_FLAG_CORRUPT;
++        }
+     }
+ 
+     ret = 0;
+@@ -763,7 +791,7 @@ end:
+      * past end by one (callers fault) and resync_mb_y != 0
+      * causes problems for the first MB line, too.
+      */
+-    if (!FIELD_PICTURE(h) && h->current_slice && h->enable_er) {
++    if(!FIELD_PICTURE(h) && h->current_slice && h->enable_er) {
+ 
+         H264SliceContext *sl = h->slice_ctx;
+         int use_last_pic = h->last_pic_for_ec.f->buf[0] && !sl->ref_count[0];
+@@ -1063,6 +1091,7 @@ static const AVOption h264_options[] = {
+     { "nal_length_size", "nal_length_size", OFFSET(nal_length_size), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 4, VDX },
+     { "enable_er", "Enable error resilience on damaged frames (unsafe)", OFFSET(enable_er), AV_OPT_TYPE_BOOL, { .i64 = -1 }, -1, 1, VD },
+     { "x264_build", "Assume this x264 version if no x264 version found in any SEI", OFFSET(x264_build), AV_OPT_TYPE_INT, {.i64 = -1}, -1, INT_MAX, VD },
++    { "max_error_level", "Max corruption level", OFFSET(max_error_level), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 255, VD },
+     { NULL },
+ };
+ 
+diff --git a/libavcodec/h264dec.h b/libavcodec/h264dec.h
+index 87c4e4e..59a64fd 100644
+--- a/libavcodec/h264dec.h
++++ b/libavcodec/h264dec.h
+@@ -563,6 +563,7 @@ typedef struct H264Context {
+     int height_from_caller;
+ 
+     int enable_er;
++    int max_error_level;
+ 
+     H264SEIContext sei;
+ 
+-- 
+2.31.1
+
