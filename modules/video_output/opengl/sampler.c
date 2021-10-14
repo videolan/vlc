@@ -1181,8 +1181,11 @@ MatrixMultiply(float out[static 3*2],
     for (unsigned i = 0; i < 3; ++i)
         for (unsigned j = 0; j < 2; ++j)
             out[i*2+j] = a[0*2+j] * b[i*2+0]
-                       + a[1*2+j] * b[i*2+1]
-                       + a[2*2+j];
+                       + a[1*2+j] * b[i*2+1];
+
+    /* Multiply the last implicit row [0 0 1] of b, expanded to 3x3 */
+    out[2*2+0] += a[2*2+0];
+    out[2*2+1] += a[2*2+1];
 }
 
 static void
