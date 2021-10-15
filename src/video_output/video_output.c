@@ -1755,7 +1755,10 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                 return VLC_SUCCESS;
             if (new_next_pts < vsync_date)
             {
-                msg_Dbg(vout, "Dropping 2/2 because of vsync, offset to vsync is now %dms", MS_FROM_VLC_TICK(vsync_date - new_next_pts));
+                msg_Dbg(vout, "Dropping 2/2 because of vsync, offset to vsync is now %dms / render_delay=%dms / next_pts=%dms vsync=%dms", MS_FROM_VLC_TICK(vsync_date - new_next_pts),
+                    MS_FROM_VLC_TICK(render_delay),
+                    MS_FROM_VLC_TICK(new_next_pts),
+                    MS_FROM_VLC_TICK(vsync_date));
                 picture_Release(sys->displayed.current);
                 sys->displayed.current = sys->displayed.next;
                 sys->displayed.next = NULL;
