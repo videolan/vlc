@@ -19,6 +19,8 @@
 import QtQuick 2.11
 import QtQuick.Layouts 1.11
 import QtQuick.Controls 2.4
+import QtQuick.Window 2.15
+
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
@@ -175,7 +177,11 @@ Rectangle {
     }
 
     Loader {
-        active: mainInterface.clientSideDecoration
+        active: (mainInterface.clientSideDecoration
+                 &&
+                 // NOTE: We don't want to steal the mouse when we are maximized or in fullscreen
+                 !((topWindow.visibility & Window.Maximized) || mainInterface.interfaceFullScreen))
+
         source: "qrc:///widgets/CSDMouseStealer.qml"
     }
 }

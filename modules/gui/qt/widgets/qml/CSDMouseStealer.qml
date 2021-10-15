@@ -57,8 +57,7 @@ Item {
             width: modelData.width
             height: modelData.height
 
-            // NOTE: We don't want to steal the mouse when we are maximized or in fullscreen.
-            hoverEnabled: (!(topWindow.visibility & Window.Maximized) && !(mainInterface.interfaceFullScreen))
+            hoverEnabled: true
         }
     }
 }
