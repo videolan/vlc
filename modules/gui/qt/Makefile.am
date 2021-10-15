@@ -902,7 +902,8 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/ListSubtitleLabel.qml \
 	gui/qt/widgets/qml/PointingTooltip.qml \
 	gui/qt/widgets/qml/FrostedGlassEffect.qml \
-	gui/qt/widgets/qml/OverlayMenu.qml
+	gui/qt/widgets/qml/OverlayMenu.qml \
+	gui/qt/widgets/qml/ToolTipExt.qml
 
 lib_qt_plugin_la_QRC = gui/qt/vlc.qrc
 
