@@ -189,7 +189,7 @@ DrawMask(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
     const float *mtx = sampler->pic_to_tex_matrix;
     assert(mtx);
 
-    /* Expand the 3x2 matrix to 3x3 to store it in a mat3 uniform (for better
+    /* Expand the 2x3 matrix to 3x3 to store it in a mat3 uniform (for better
      * compatibility). Both are in column-major order. */
     float pic_to_tex[] = { mtx[0], mtx[1], 0,
                            mtx[2], mtx[3], 0,

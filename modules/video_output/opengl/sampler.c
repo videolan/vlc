@@ -96,10 +96,10 @@ struct vlc_gl_sampler_priv {
 
     /* All matrices below are stored in column-major order. */
 
-    float mtx_orientation[3*2];
-    float mtx_coords_map[3*2];
+    float mtx_orientation[2*3];
+    float mtx_coords_map[2*3];
 
-    float mtx_transform[3*2];
+    float mtx_transform[2*3];
     bool mtx_transform_defined;
 
     /**
@@ -118,7 +118,7 @@ struct vlc_gl_sampler_priv {
      *
      * It is stored in column-major order: [a, d, b, e, c, f].
      */
-    float mtx_all[3*2];
+    float mtx_all[2*3];
     bool mtx_all_defined;
     bool mtx_all_has_changed; /* since the previous picture */
 };
@@ -535,7 +535,7 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
 }
 
 static void
-InitOrientationMatrix(float matrix[static 3*2], video_orientation_t orientation)
+InitOrientationMatrix(float matrix[static 2*3], video_orientation_t orientation)
 {
 /**
  * / C0R0  C1R0  C3R0 \
@@ -1091,8 +1091,8 @@ CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
     assert(!interop || interop->tex_count == tex_count);
 
     /* This might be updated in UpdatePicture for non-direct samplers */
-    memcpy(&priv->mtx_coords_map, MATRIX3x2_IDENTITY,
-           sizeof(MATRIX3x2_IDENTITY));
+    memcpy(&priv->mtx_coords_map, MATRIX2x3_IDENTITY,
+           sizeof(MATRIX2x3_IDENTITY));
 
     if (interop)
     {
@@ -1170,12 +1170,12 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 }
 
 /**
- * Compute out = a * b, as if the 3x2 matrices were expanded to 3x3 with
+ * Compute out = a * b, as if the 2x3 matrices were expanded to 3x3 with
  *  [0 0 1] as the last row.
  */
 static void
-MatrixMultiply(float out[static 3*2],
-               const float a[static 3*2], const float b[static 3*2])
+MatrixMultiply(float out[static 2*3],
+               const float a[static 2*3], const float b[static 2*3])
 {
     /* All matrices are stored in column-major order. */
     for (unsigned i = 0; i < 3; ++i)
@@ -1191,7 +1191,7 @@ MatrixMultiply(float out[static 3*2],
 static void
 UpdateMatrixAll(struct vlc_gl_sampler_priv *priv)
 {
-    float tmp[3*2];
+    float tmp[2*3];
 
     float *out = priv->mtx_transform_defined ? tmp : priv->mtx_all;
     /* out = mtx_coords_map * mtx_orientation */
@@ -1333,7 +1333,7 @@ vlc_gl_sampler_UpdateTextures(struct vlc_gl_sampler *sampler, GLuint textures[],
 
     if (!priv->mtx_all_defined)
     {
-        memcpy(priv->mtx_all, MATRIX3x2_IDENTITY, sizeof(MATRIX3x2_IDENTITY));
+        memcpy(priv->mtx_all, MATRIX2x3_IDENTITY, sizeof(MATRIX2x3_IDENTITY));
         priv->mtx_all_defined = true;
         priv->mtx_all_has_changed = true;
 
@@ -1364,15 +1364,15 @@ vlc_gl_sampler_PicToTexCoords(struct vlc_gl_sampler *sampler,
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
     const float *mtx = priv->mtx_all;
-#define MTX(col,row) mtx[(col*2)+row]
+#define MTX(ROW,COL) mtx[(COL)*2+(ROW)]
     for (unsigned i = 0; i < coords_count; ++i)
     {
         /* Store the coordinates, in case the transform must be applied in
          * place (i.e. with pic_coords == tex_coords_out) */
         float x = pic_coords[0];
         float y = pic_coords[1];
-        tex_coords_out[0] = MTX(0,0) * x + MTX(1,0) * y + MTX(2,0);
-        tex_coords_out[1] = MTX(0,1) * x + MTX(1,1) * y + MTX(2,1);
+        tex_coords_out[0] = MTX(0,0) * x + MTX(0,1) * y + MTX(0,2);
+        tex_coords_out[1] = MTX(1,0) * x + MTX(1,1) * y + MTX(1,2);
         pic_coords += 2;
         tex_coords_out += 2;
     }

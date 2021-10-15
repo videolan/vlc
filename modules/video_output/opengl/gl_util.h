@@ -43,7 +43,7 @@ static const float MATRIX3_IDENTITY[3*3] = {
 };
 
 /* In column-major order */
-static const float MATRIX3x2_IDENTITY[3*2] = {
+static const float MATRIX2x3_IDENTITY[2*3] = {
     1, 0,
     0, 1,
     0, 0,

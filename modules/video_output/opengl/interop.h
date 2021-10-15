@@ -76,7 +76,7 @@ struct vlc_gl_interop_ops {
      *
      * This function pointer can be NULL. If it is set, it may return NULL.
      *
-     * Otherwise, it must return a 3x2 matrix, as an array of 6 floats in
+     * Otherwise, it must return a 2x3 matrix, as an array of 6 floats in
      * column-major order.
      *
      * This transform matrix maps 2D homogeneous texture coordinates of the
@@ -88,7 +88,7 @@ struct vlc_gl_interop_ops {
      * freed before the module is closed.
      *
      * \param interop the OpenGL interop
-     * \return a 3x2 transformation matrix (possibly NULL)
+     * \return a 2x3 transformation matrix (possibly NULL)
      */
     const float *
     (*get_transform_matrix)(const struct vlc_gl_interop *interop);

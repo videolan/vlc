@@ -63,7 +63,7 @@ struct vlc_gl_sampler {
     /**
      * Matrix to convert from picture coordinates to texture coordinates
      *
-     * The matrix is 3x2 and is stored in column-major order:
+     * The matrix is 2x3 and is stored in column-major order:
      *
      *     / a b c \
      *     \ d e f /

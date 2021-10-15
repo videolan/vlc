@@ -34,7 +34,7 @@
 
 struct priv
 {
-    float mtx_3x2[3*2];
+    float mtx_2x3[2*3];
     const float *transform_mtx;
 
     bool stex_attached;
@@ -43,7 +43,7 @@ struct priv
 };
 
 static void
-ReductMatrix(float *mtx_3x2, const float *mtx_4x4)
+ReductMatrix(float *mtx_2x3, const float *mtx_4x4)
 {
     /*
      * The transform matrix provided by Android is 4x4:
@@ -53,7 +53,7 @@ ReductMatrix(float *mtx_3x2, const float *mtx_4x4)
      * the form (s, t, 0, 1). Similarly, the third row is never used either,
      * since only the two first coordinates of the output vector are kept.
      *
-     *       mat_4x4        mat_3x2
+     *       mat_4x4        mat_2x3
      *
      *     / a b . c \
      *     | d e . f | --> / a b c \
@@ -61,14 +61,14 @@ ReductMatrix(float *mtx_3x2, const float *mtx_4x4)
      *     \ . . . . /
      */
 
-#define MTX4(COL,ROW) mtx_4x4[(COL)*4 + (ROW)]
-#define MTX3(COL,ROW) mtx_3x2[(COL)*2 + (ROW)]
+#define MTX4(ROW,COL) mtx_4x4[(COL)*4 + (ROW)]
+#define MTX3(ROW,COL) mtx_2x3[(COL)*2 + (ROW)]
     MTX3(0,0) = MTX4(0,0); // a
-    MTX3(1,0) = MTX4(1,0); // b
-    MTX3(2,0) = MTX4(3,0); // c
-    MTX3(0,1) = MTX4(0,1); // d
+    MTX3(0,1) = MTX4(0,1); // b
+    MTX3(0,2) = MTX4(0,3); // c
+    MTX3(1,0) = MTX4(1,0); // d
     MTX3(1,1) = MTX4(1,1); // e
-    MTX3(2,1) = MTX4(3,1); // f
+    MTX3(1,2) = MTX4(1,3); // f
 #undef MTX4
 #undef MTX3
 }
@@ -144,8 +144,8 @@ tc_anop_update(struct vlc_gl_interop *interop, GLuint *textures,
         goto error;
     }
 
-    ReductMatrix(priv->mtx_3x2, mtx_4x4);
-    priv->transform_mtx = priv->mtx_3x2;
+    ReductMatrix(priv->mtx_2x3, mtx_4x4);
+    priv->transform_mtx = priv->mtx_2x3;
 
     interop->vt->ActiveTexture(GL_TEXTURE0);
     interop->vt->BindTexture(interop->tex_target, textures[0]);
