@@ -93,8 +93,10 @@ Window {
             onDiscarded: root.discarded()
             onReset: root.reset()
 
-            // Customize DialogButtonBox so that it matches with the app theme
-            background: Item { }
+            Component.onCompleted: {
+                background.color = Qt.binding(function() { return VLCStyle.colors.bgAlt })
+            }
+
             delegate: Widgets.TextToolButton { }
         }
     }
