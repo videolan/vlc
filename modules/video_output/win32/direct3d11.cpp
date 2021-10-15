@@ -1370,7 +1370,6 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 if (sys->regionQuad.d3dpixelShader[j])
                 {
                     d3dquad->d3dpixelShader[j] = sys->regionQuad.d3dpixelShader[j];
-                    d3dquad->d3dpixelShader[j]->AddRef();
                 }
             }
         }
