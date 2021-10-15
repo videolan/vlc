@@ -1729,7 +1729,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                                           sys->displayed.next->date, sys->rate);
 
             /* Well, we should use the most recent picture fitting in the vsync period */
-            if (new_next_pts < vsync_date - render_delay)
+            if (new_next_pts < vsync_date)
             {
                 msg_Dbg(vout, "Dropping 1/2 because of vsync, offset to vsync is now %dms", MS_FROM_VLC_TICK(vsync_date - new_next_pts));
                 picture_Release(sys->displayed.current);
@@ -1753,8 +1753,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 
             if (atomic_load(&sys->control_is_terminated))
                 return VLC_SUCCESS;
-
-            if (new_next_pts < vsync_date - render_delay)
+            if (new_next_pts < vsync_date)
             {
                 msg_Dbg(vout, "Dropping 2/2 because of vsync, offset to vsync is now %dms", MS_FROM_VLC_TICK(vsync_date - new_next_pts));
                 picture_Release(sys->displayed.current);
