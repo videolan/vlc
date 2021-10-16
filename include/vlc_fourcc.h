@@ -276,6 +276,10 @@
 #define VLC_CODEC_YUVA_444_10L    VLC_FOURCC('Y','A','0','L')
 #define VLC_CODEC_YUVA_444_10B    VLC_FOURCC('Y','A','0','B')
 
+/* Planar Y:U:V:A 4:4:4 12bits */
+#define VLC_CODEC_YUVA_444_12L    VLC_FOURCC('Y','A','2','L')
+#define VLC_CODEC_YUVA_444_12B    VLC_FOURCC('Y','A','2','B')
+
 /* Semi-planar Y/UV */
 
 /* 2 planes Y/UV 4:2:0 */

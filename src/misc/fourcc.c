@@ -234,7 +234,7 @@ const char *vlc_fourcc_GetDescription(int cat, vlc_fourcc_t fourcc)
     VLC_CODEC_I444, VLC_CODEC_J444
 
 #define VLC_CODEC_YUV_PLANAR_444_ALPHA \
-    VLC_CODEC_YUVA, VLC_CODEC_YUVA_444_10L, VLC_CODEC_YUVA_444_10B
+    VLC_CODEC_YUVA, VLC_CODEC_YUVA_444_10L, VLC_CODEC_YUVA_444_10B, VLC_CODEC_YUVA_444_12L, VLC_CODEC_YUVA_444_12B
 
 #define VLC_CODEC_YUV_SEMIPLANAR_444 \
     VLC_CODEC_NV24, VLC_CODEC_NV42
@@ -781,6 +781,8 @@ static const struct
         VLC_CODEC_I444_16B },                  PLANAR_16(3, 1, 1, 16) },
     { { VLC_CODEC_YUVA_444_10L,
         VLC_CODEC_YUVA_444_10B },              PLANAR_16(4, 1, 1, 10) },
+    { { VLC_CODEC_YUVA_444_12L,
+        VLC_CODEC_YUVA_444_12B },              PLANAR_16(4, 1, 1, 12) },
     { { VLC_CODEC_P010 },                      SEMIPLANAR(2, 2, 2, 10) },
     { { VLC_CODEC_P016 },                      SEMIPLANAR(2, 2, 2, 16) },
 
