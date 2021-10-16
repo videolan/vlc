@@ -224,6 +224,16 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     EGLSurface (*createSurface)(EGLDisplay, EGLConfig, void *, const EGLint *)
         = CreateWindowSurface;
     void *window;
+    EGLAttrib refs_name = EGL_NONE;
+    EGLAttrib refs_value = EGL_FALSE;
+
+#ifdef EGL_KHR_display_reference
+    if (CheckClientExt("EGL_KHR_display_reference"))
+    {
+        refs_name = EGL_TRACK_REFERENCES_KHR;
+        refs_value = EGL_TRUE;
+    }
+#endif
 
 #ifdef USE_PLATFORM_X11
     sys->x11 = NULL;
@@ -340,6 +350,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
         EGL_GREEN_SIZE, 5,
         EGL_BLUE_SIZE, 5,
         EGL_RENDERABLE_TYPE, api->render_bit,
+        refs_name, refs_value,
         EGL_NONE
     };
     EGLConfig cfgv[1];
