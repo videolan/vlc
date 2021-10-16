@@ -1,0 +1,35 @@
+From 0d15135fe441acfdbbb840abea53cf696cd21470 Mon Sep 17 00:00:00 2001
+From: Johannes Kauffmann <19662702+JohannesKauffmann@users.noreply.github.com>
+Date: Tue, 19 Oct 2021 21:03:39 +0200
+Subject: [PATCH 3/3] Don't change the calling convention of x86 gfx api
+
+Upstream MediaSDK, since ae85eb2, uses __cdecl, which corresponds to
+WINAPIV in mingw64 and MSDK. The removal of APIENTRY (since f45c0c2)
+changes the calling convention from __stdcall.
+
+The removal of the '@' name decorations (also gone since f45c0c2)
+remains.
+
+Co-authored-by: Steve Lhomme <robux4@ycbcr.xyz>
+---
+ src/intel_api_factory.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/intel_api_factory.h b/src/intel_api_factory.h
+index 29e9773..44ee7eb 100644
+--- a/src/intel_api_factory.h
++++ b/src/intel_api_factory.h
+@@ -25,8 +25,8 @@ extern "C"
+ {
+ #endif /* __cplusplus */
+ 
+-HRESULT InitialiseMediaSession(_Out_ HANDLE* handle, _In_ LPVOID lpParam, _Reserved_ LPVOID lpReserved);
+-HRESULT DisposeMediaSession(_In_ const HANDLE handle);
++HRESULT WINAPIV InitialiseMediaSession(_Out_ HANDLE* handle, _In_ LPVOID lpParam, _Reserved_ LPVOID lpReserved);
++HRESULT WINAPIV DisposeMediaSession(_In_ const HANDLE handle);
+ 
+ #ifdef __cplusplus
+ }
+-- 
+2.27.0.windows.1
+
