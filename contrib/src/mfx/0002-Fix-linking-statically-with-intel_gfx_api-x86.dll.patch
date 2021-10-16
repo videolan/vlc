@@ -1,0 +1,39 @@
+From d16955c72e423954145fed985ad1fbda0e5ca977 Mon Sep 17 00:00:00 2001
+From: Johannes Kauffmann <19662702+JohannesKauffmann@users.noreply.github.com>
+Date: Fri, 15 Oct 2021 21:53:51 +0200
+Subject: [PATCH 2/3] Fix linking statically with intel_gfx_api-x86.dll
+
+---
+ src/intel_api_factory.h   | 4 ++--
+ src/intel_gfx_api-x86.def | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/intel_api_factory.h b/src/intel_api_factory.h
+index 0be5dcb..29e9773 100644
+--- a/src/intel_api_factory.h
++++ b/src/intel_api_factory.h
+@@ -25,8 +25,8 @@ extern "C"
+ {
+ #endif /* __cplusplus */
+ 
+-HRESULT APIENTRY InitialiseMediaSession(_Out_ HANDLE* handle, _In_ LPVOID lpParam, _Reserved_ LPVOID lpReserved);
+-HRESULT APIENTRY DisposeMediaSession(_In_ const HANDLE handle);
++HRESULT InitialiseMediaSession(_Out_ HANDLE* handle, _In_ LPVOID lpParam, _Reserved_ LPVOID lpReserved);
++HRESULT DisposeMediaSession(_In_ const HANDLE handle);
+ 
+ #ifdef __cplusplus
+ }
+diff --git a/src/intel_gfx_api-x86.def b/src/intel_gfx_api-x86.def
+index 19d0727..c9c15e6 100644
+--- a/src/intel_gfx_api-x86.def
++++ b/src/intel_gfx_api-x86.def
+@@ -1,4 +1,4 @@
+ LIBRARY intel_gfx_api-x86.dll
+ EXPORTS
+-InitialiseMediaSession@12
+-DisposeMediaSession@4
++InitialiseMediaSession
++DisposeMediaSession
+-- 
+2.27.0.windows.1
+
