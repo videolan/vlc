@@ -1129,9 +1129,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         }
     }
 
-    if(!p_block && !(p_sys->p_codec->capabilities & AV_CODEC_CAP_DELAY) )
-        return NULL;
-
     if( !avcodec_is_open( p_context ) )
     {
         if( p_block )
