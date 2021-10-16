@@ -1259,6 +1259,8 @@ static const staticentry_t p_list_video[] = {
         A("AGM5"),
         A("AGM6"),
         A("AGM7"),
+
+    B(VLC_CODEC_NOTCHLC, "NotchLC"),
 };
 
 static const staticentry_t p_list_audio[] = {

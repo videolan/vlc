@@ -190,6 +190,7 @@
 #define VLC_CODEC_IMM4            VLC_FOURCC('I','M','M','4')
 #define VLC_CODEC_IMM5            VLC_FOURCC('I','M','M','5')
 #define VLC_CODEC_AGM             VLC_FOURCC('A','G','M','0')
+#define VLC_CODEC_NOTCHLC         VLC_FOURCC('n','c','l','c')
 
 /***********
  * Chromas
