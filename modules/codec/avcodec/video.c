@@ -913,9 +913,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
     }
 
-    if(!p_block && !(p_sys->p_codec->capabilities & AV_CODEC_CAP_DELAY) )
-        return VLCDEC_SUCCESS;
-
     if( !avcodec_is_open( p_context ) )
     {
         if( p_block )
