@@ -375,9 +375,10 @@ void CompositorDCompositionAcrylicSurface::updateVisual()
     if (!w || !w->screen())
         return;
 
-    const auto screenRect = w->screen()->availableVirtualGeometry();
-    RECT sourceRect {screenRect.left(), screenRect.top(), screenRect.right(), screenRect.bottom()};
-    SIZE destinationSize {screenRect.width(), screenRect.height()};
+    const int desktopWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    const int desktopHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+    RECT sourceRect {0, 0, desktopWidth, desktopHeight};
+    SIZE destinationSize {desktopWidth, desktopHeight};
 
     HWND hwndExclusionList[2];
     hwndExclusionList[0] = hwnd();
