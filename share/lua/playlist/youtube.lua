@@ -288,7 +288,11 @@ function pick_stream( stream_map, js_url )
     if js_url then
         js = { stream = vlc.stream( js_url ), lines = {}, i = 0 }
         if not js.stream then
-            js = nil
+            -- Retry once for transient errors
+            js.stream = vlc.stream( js_url )
+            if not js.stream then
+                js = nil
+            end
         end
     end
 
