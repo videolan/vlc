@@ -1,5 +1,5 @@
 # aom
-AOM_VERSION := 3.1.3
+AOM_VERSION := 3.2.0
 AOM_URL := https://storage.googleapis.com/aom-releases/libaom-$(AOM_VERSION).tar.gz
 
 PKGS += aom
