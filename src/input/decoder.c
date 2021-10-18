@@ -1495,12 +1495,12 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
         sout_InputFlush( p_owner->p_sout, p_owner->p_sout_input );
     }
 #endif
-    if( p_dec->fmt_out.i_cat == AUDIO_ES )
+    if( p_dec->fmt_in.i_cat == AUDIO_ES )
     {
         if( p_owner->p_aout )
             aout_DecFlush( p_owner->p_aout );
     }
-    else if( p_dec->fmt_out.i_cat == VIDEO_ES )
+    else if( p_dec->fmt_in.i_cat == VIDEO_ES )
     {
         if( p_owner->p_vout && p_owner->vout_started )
             vout_FlushAll( p_owner->p_vout );
@@ -1510,7 +1510,7 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
         if( p_owner->out_pool != NULL )
             picture_pool_Cancel( p_owner->out_pool, false );
     }
-    else if( p_dec->fmt_out.i_cat == SPU_ES )
+    else if( p_dec->fmt_in.i_cat == SPU_ES )
     {
         if( p_owner->p_vout )
         {
@@ -1528,7 +1528,7 @@ static void DecoderThread_ChangePause( vlc_input_decoder_t *p_owner, bool paused
     decoder_t *p_dec = &p_owner->dec;
 
     msg_Dbg( p_dec, "toggling %s", paused ? "resume" : "pause" );
-    switch( p_dec->fmt_out.i_cat )
+    switch( p_dec->fmt_in.i_cat )
     {
         case VIDEO_ES:
             vlc_mutex_lock( &p_owner->lock );
@@ -1555,7 +1555,7 @@ static void DecoderThread_ChangeRate( vlc_input_decoder_t *p_owner, float rate )
 
     msg_Dbg( p_dec, "changing rate: %f", rate );
     vlc_mutex_lock( &p_owner->lock );
-    switch( p_dec->fmt_out.i_cat )
+    switch( p_dec->fmt_in.i_cat )
     {
         case VIDEO_ES:
             if( p_owner->p_vout != NULL && p_owner->vout_started )
@@ -1586,7 +1586,7 @@ static void DecoderThread_ChangeDelay( vlc_input_decoder_t *p_owner, vlc_tick_t 
 
     msg_Dbg( p_dec, "changing delay: %"PRId64, delay );
 
-    switch( p_dec->fmt_out.i_cat )
+    switch( p_dec->fmt_in.i_cat )
     {
         case VIDEO_ES:
             vlc_mutex_lock( &p_owner->lock );
@@ -1726,7 +1726,7 @@ static void *DecoderThread( void *p_data )
 
         DecoderThread_ProcessInput( p_owner, p_block );
 
-        if( p_block == NULL && p_owner->dec.fmt_out.i_cat == AUDIO_ES )
+        if( p_block == NULL && p_owner->dec.fmt_in.i_cat == AUDIO_ES )
         {   /* Draining: the decoder is drained and all decoded buffers are
              * queued to the output at this point. Now drain the output. */
             if( p_owner->p_aout != NULL )
