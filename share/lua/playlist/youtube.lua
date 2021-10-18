@@ -113,7 +113,7 @@ end
 
 -- Descramble the URL signature using the javascript code that does that
 -- in the web page
-function js_descramble( sig, js_url )
+function sig_descramble( sig, js_url )
     if not js_url then
         return nil
     end
@@ -219,7 +219,7 @@ function stream_url( params, js_url )
     if s then
         s = vlc.strings.decode_uri( s )
         vlc.msg.dbg( "Found "..string.len( s ).."-character scrambled signature for youtube video URL, attempting to descramble... " )
-        local ds = js_descramble( s, js_url )
+        local ds = sig_descramble( s, js_url )
         if not ds then
             vlc.msg.dbg( "Couldn't descramble YouTube video URL signature" )
             vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
