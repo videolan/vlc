@@ -344,8 +344,8 @@ void CompositorDCompositionAcrylicSurface::sync()
     GetWindowRect(hwnd(), &rect);
     m_rootClip->SetLeft((float)rect.left + dx);
     m_rootClip->SetRight((float)rect.right + dx);
-    m_rootClip->SetTop((float)rect.top);
-    m_rootClip->SetBottom((float)rect.bottom);
+    m_rootClip->SetTop((float)rect.top + dy);
+    m_rootClip->SetBottom((float)rect.bottom + dy);
     m_rootVisual->SetClip(m_rootClip.Get());
 
     int frameX = 0;
