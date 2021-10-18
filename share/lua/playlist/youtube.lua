@@ -493,28 +493,6 @@ function parse()
         end
 
         if not path then
-            local video_id = get_url_param( vlc.path, "v" )
-            if video_id then
-                -- Passing no "el" parameter to /get_video_info seems to
-                -- let it default to "embedded", and both known values
-                -- of "embedded" and "detailpage" have historically been
-                -- wrong and failed for various restricted videos.
-                path = vlc.access.."://www.youtube.com/get_video_info?video_id="..video_id..copy_url_param( vlc.path, "fmt" )
-
-                -- The YouTube API output doesn't provide the URL to the
-                -- javascript code necessary to descramble URL signatures,
-                -- without which functionality can be seriously limited.
-                -- #18801 prevents us from using a subrequest to the API,
-                -- so we forward the URL this way.
-                if js_url then
-                    path = path.."&jsurl="..vlc.strings.encode_uri_component( js_url )
-                end
-
-                vlc.msg.warn( "Couldn't extract video URL, falling back to alternate youtube API" )
-            end
-        end
-
-        if not path then
             vlc.msg.err( "Couldn't extract youtube video URL, please check for updates to this script" )
             return { }
         end
@@ -525,7 +503,12 @@ function parse()
 
         return { { path = path; name = title; description = description; artist = artist; arturl = arturl } }
 
-    elseif string.match( vlc.path, "/get_video_info%?" ) then -- video info API
+    elseif string.match( vlc.path, "/get_video_info%?" ) then
+        -- video info API, retired since summer 2021
+        -- Replacement Innertube API requires HTTP POST requests
+        -- and so remains for now unworkable from lua parser scripts
+        -- (see #26185)
+
         local line = vlc.read( 1024*1024 ) -- data is on one line only
         if not line then
             vlc.msg.err( "YouTube API output missing" )
