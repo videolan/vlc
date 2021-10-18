@@ -108,18 +108,20 @@ function js_extract( js, pattern )
             return ex
         end
     end
-    vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
     return nil
 end
 
 -- Descramble the URL signature using the javascript code that does that
 -- in the web page
 function js_descramble( sig, js_url )
+    if not js_url then
+        return nil
+    end
+
     -- Fetch javascript code
     local js = { stream = vlc.stream( js_url ), lines = {}, i = 0 }
     if not js.stream then
-        vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
-        return sig
+        return nil
     end
 
     -- Look for the descrambler function's name
@@ -130,7 +132,7 @@ function js_descramble( sig, js_url )
     local descrambler = js_extract( js, "[=%(,&|](...?)%(decodeURIComponent%(.%.s%)%)" )
     if not descrambler then
         vlc.msg.dbg( "Couldn't extract youtube video URL signature descrambling function name" )
-        return sig
+        return nil
     end
 
     -- Fetch the code of the descrambler function
@@ -138,15 +140,14 @@ function js_descramble( sig, js_url )
     local rules = js_extract( js, "^"..descrambler.."=function%([^)]*%){(.-)};" )
     if not rules then
         vlc.msg.dbg( "Couldn't extract youtube video URL signature descrambling rules" )
-        return sig
+        return nil
     end
 
     -- Get the name of the helper object providing transformation definitions
     local helper = string.match( rules, ";(..)%...%(" )
     if not helper then
         vlc.msg.dbg( "Couldn't extract youtube video URL signature transformation helper name" )
-        vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
-        return sig
+        return nil
     end
 
     -- Fetch the helper object code
@@ -154,7 +155,7 @@ function js_descramble( sig, js_url )
     local transformations = js_extract( js, "[ ,]"..helper.."={(.-)};" )
     if not transformations then
         vlc.msg.dbg( "Couldn't extract youtube video URL signature transformation code" )
-        return sig
+        return nil
     end
 
     -- Parse the helper object to map available transformations
@@ -218,10 +219,11 @@ function stream_url( params, js_url )
     if s then
         s = vlc.strings.decode_uri( s )
         vlc.msg.dbg( "Found "..string.len( s ).."-character scrambled signature for youtube video URL, attempting to descramble... " )
-        if js_url then
-            s = js_descramble( s, js_url )
-        else
+        local ds = js_descramble( s, js_url )
+        if not ds then
+            vlc.msg.dbg( "Couldn't descramble YouTube video URL signature" )
             vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
+            ds = s
         end
 
         local sp = string.match( params, "sp=([^&]+)" )
@@ -229,7 +231,7 @@ function stream_url( params, js_url )
             vlc.msg.warn( "Couldn't extract signature parameters for youtube video URL, guessing" )
             sp = "signature"
         end
-        url = url.."&"..sp.."="..vlc.strings.encode_uri_component( s )
+        url = url.."&"..sp.."="..vlc.strings.encode_uri_component( ds )
     end
 
     return url
