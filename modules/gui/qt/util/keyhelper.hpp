@@ -75,7 +75,8 @@ public:
     {
         return event->key() == Qt::Key_Search
             || event->key() == Qt::Key_Slash
-            || ( (event->modifiers() & Qt::ControlModifier) && event->key() == Qt::Key_F );
+            || ( (event->modifiers() == Qt::ControlModifier) && event->key() == Qt::Key_K ) //global search
+            || ( (event->modifiers() == Qt::ControlModifier) && event->key() == Qt::Key_F ); //local search
     }
 
     static bool matchCancel(const QKeyEvent* event)
