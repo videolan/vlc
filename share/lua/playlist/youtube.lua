@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2007-2020 the VideoLAN team
+ Copyright © 2007-2021 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -237,7 +237,7 @@ function stream_url( params, js_url )
     return url
 end
 
--- Parse and pick our video stream URL (classic parameters)
+-- Parse and pick our video stream URL (classic parameters, out of use)
 function pick_url( url_map, fmt, js_url )
     for stream in string.gmatch( url_map, "[^,]+" ) do
         local itag = string.match( stream, "itag=(%d+)" )
