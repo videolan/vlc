@@ -688,7 +688,7 @@ VLC_API void vlc_cancel(vlc_thread_t);
  * <b>not</b> joined.
 
  * \warning A thread cannot join itself (normally VLC will abort if this is
- * attempted). Also a detached thread <b>cannot</b> be joined.
+ * attempted).
  *
  * @param th thread handle
  * @param result [OUT] pointer to write the thread return value or NULL
