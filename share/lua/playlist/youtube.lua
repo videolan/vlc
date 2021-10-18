@@ -113,14 +113,8 @@ end
 
 -- Descramble the URL signature using the javascript code that does that
 -- in the web page
-function sig_descramble( sig, js_url )
-    if not js_url then
-        return nil
-    end
-
-    -- Fetch javascript code
-    local js = { stream = vlc.stream( js_url ), lines = {}, i = 0 }
-    if not js.stream then
+function sig_descramble( sig, js )
+    if not js then
         return nil
     end
 
@@ -207,7 +201,7 @@ function sig_descramble( sig, js_url )
 end
 
 -- Parse and assemble video stream URL
-function stream_url( params, js_url )
+function stream_url( params, js )
     local url = string.match( params, "url=([^&]+)" )
     if not url then
         return nil
@@ -219,7 +213,7 @@ function stream_url( params, js_url )
     if s then
         s = vlc.strings.decode_uri( s )
         vlc.msg.dbg( "Found "..string.len( s ).."-character scrambled signature for youtube video URL, attempting to descramble... " )
-        local ds = sig_descramble( s, js_url )
+        local ds = sig_descramble( s, js )
         if not ds then
             vlc.msg.dbg( "Couldn't descramble YouTube video URL signature" )
             vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
@@ -288,13 +282,23 @@ function pick_stream( stream_map, js_url )
         return nil
     end
 
+    -- Fetch javascript code: we'll need this to descramble maybe the
+    -- URL signature, and normally always the "n" throttling parameter.
+    local js = nil
+    if js_url then
+        js = { stream = vlc.stream( js_url ), lines = {}, i = 0 }
+        if not js.stream then
+            js = nil
+        end
+    end
+
     -- Either the "url" or the "signatureCipher" parameter is present,
     -- depending on whether the URL signature is scrambled.
     local cipher = string.match( pick, '"signatureCipher":"(.-)"' )
         or string.match( pick, '"[a-zA-Z]*[Cc]ipher":"(.-)"' )
     if cipher then
         -- Scrambled signature: some assembly required
-        local url = stream_url( cipher, js_url )
+        local url = stream_url( cipher, js )
         if url then
             return url
         end
