@@ -772,7 +772,11 @@ static void *Thread( void *obj )
                 break;
             ret = p_intf->p_compositor->makeMainInterface(p_intf->p_mi);
             if (!ret)
+            {
                 p_intf->p_compositor->destroyMainInterface();
+                delete p_intf->p_compositor;
+                p_intf->p_compositor = nullptr;
+            }
         } while(!ret);
 
         if (!ret)

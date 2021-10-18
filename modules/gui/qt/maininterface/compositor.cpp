@@ -85,7 +85,11 @@ Compositor* CompositorFactory::createCompositor()
         {
             Compositor* compositor = compositorList[m_compositorIndex].instanciate(m_intf);
             if (compositor->init())
+            {
+                //avoid looping over the same compositor if the current ones fails further initialisation steps
+                m_compositorIndex++;
                 return compositor;
+            }
         }
     }
     msg_Err(m_intf, "no suitable compositor found");
