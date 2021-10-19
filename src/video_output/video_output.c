@@ -1805,8 +1805,6 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                 next = sys->displayed.next;
                 sys->displayed.next = NULL;
             }
-            if (vsync_date != VLC_TICK_INVALID)
-                date_refresh = __MIN(date_refresh, vsync_date - render_delay);
         }
     }
 
@@ -1815,20 +1813,24 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         const vlc_tick_t swap_next_pts =
             vlc_clock_ConvertToSystem(sys->clock, vlc_tick_now(),
                                         next->date, sys->rate);
-        if (likely(swap_next_pts != INT64_MAX))
+        if (likely(swap_next_pts != INT64_MAX) && vsync_date == VLC_TICK_INVALID)
             date_refresh = swap_next_pts - render_delay;
 
         // next frame will still need some waiting before display
         dropped_current_frame = sys->displayed.current != NULL;
         render_now = false;
+        if (vsync_date != VLC_TICK_INVALID)
+            render_now = true;
 
         if (likely(dropped_current_frame))
             picture_Release(sys->displayed.current);
         sys->displayed.current = next;
         sys->displayed.current_rendered = false;
-
-        if (vsync_date != VLC_TICK_INVALID)
-            date_refresh = __MIN(date_refresh, vsync_date - render_delay);
+    }
+    else if (vsync_date != VLC_TICK_INVALID)
+    {
+        render_now = true;
+        refresh = true;
     }
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
     {
@@ -1842,8 +1844,9 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         refresh = date_refresh <= system_now || vsync_date != VLC_TICK_INVALID;
         render_now = refresh;
     }
+
     if (vsync_date != VLC_TICK_INVALID)
-        date_refresh = __MIN(date_refresh, vsync_date - render_delay);
+        date_refresh = vsync_date - render_delay - VLC_TICK_FROM_MS(4);
 
     if (date_refresh != VLC_TICK_INVALID)
         *deadline = date_refresh;
