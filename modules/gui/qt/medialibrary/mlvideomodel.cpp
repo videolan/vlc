@@ -18,6 +18,19 @@
 
 #include "mlvideomodel.hpp"
 
+template<typename T>
+QVariantList getVariantList(const QList<T> & desc)
+{
+    QVariantList list;
+
+    for (const T & item : desc)
+    {
+        list.append(QVariant::fromValue(item));
+    }
+
+    return list;
+}
+
 QHash<QByteArray, vlc_ml_sorting_criteria_t> MLVideoModel::M_names_to_criteria = {
     {"id", VLC_ML_SORTING_DEFAULT},
     {"title", VLC_ML_SORTING_ALPHA},
@@ -60,9 +73,9 @@ QVariant MLVideoModel::data(const QModelIndex& index, int role) const
         case VIDEO_DISPLAY_MRL:
             return QVariant::fromValue( video->getDisplayMRL() );
         case VIDEO_VIDEO_TRACK:
-            return QVariant::fromValue( video->getVideoDesc() );
+            return getVariantList( video->getVideoDesc() );
         case VIDEO_AUDIO_TRACK:
-            return QVariant::fromValue( video->getAudioDesc() );
+            return getVariantList( video->getAudioDesc() );
         case VIDEO_TITLE_FIRST_SYMBOL:
             return QVariant::fromValue( getFirstSymbol( video->getTitle() ) );
 
