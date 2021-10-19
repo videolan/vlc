@@ -104,6 +104,10 @@ FocusScope {
 
     signal actionAtIndex(int index)
 
+    signal deselectAll()
+
+    signal showContextMenu(point globalPos)
+
     // Settings
 
     Accessible.role: Accessible.List
@@ -215,6 +219,26 @@ FocusScope {
 
         boundsBehavior: Flickable.StopAtBounds
         boundsMovement: Flickable.StopAtBounds
+
+        MouseEventFilter {
+            target: view
+
+            onMouseButtonPress: {
+                if (buttons & (Qt.LeftButton | Qt.RightButton)) {
+                    Helpers.enforceFocus(view, Qt.MouseFocusReason)
+
+                    if (!(modifiers & (Qt.ShiftModifier | Qt.ControlModifier))) {
+                        listview_id.deselectAll()
+                    }
+                }
+            }
+
+            onMouseButtonRelease: {
+                if (button & Qt.RightButton) {
+                    listview_id.showContextMenu(globalPos)
+                }
+            }
+        }
 
         // NOTE: We always want a valid 'currentIndex' by default.
         onCountChanged: if (count && currentIndex === -1) currentIndex = 0

@@ -225,6 +225,17 @@ FocusScope {
 
         headerPositioning: ListView.OverlayHeader
 
+        onDeselectAll: {
+            if (selectionDelegateModel) {
+                selectionDelegateModel.clear()
+            }
+        }
+
+        onShowContextMenu: {
+            if (selectionDelegateModel.hasSelection)
+                root.rightClick(null, null, globalPos);
+        }
+
         header: Rectangle {
 
             readonly property alias contentX: row.x

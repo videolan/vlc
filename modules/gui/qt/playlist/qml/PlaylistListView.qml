@@ -347,6 +347,14 @@ Control {
 
             signal setItemDropIndicatorVisible(int index, bool visible)
 
+            onDeselectAll: {
+                root.model.deselectAll()
+            }
+
+            onShowContextMenu: {
+                contextMenu.popup(-1, globalPos)
+            }
+
             Connections {
                 target: listView.model
 
@@ -389,23 +397,6 @@ Control {
 
                 function setDropIndicatorVisible(visible) {
                     dropIndicator.visible = Qt.binding(function() { return (visible || dropArea.containsDrag); })
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    acceptedButtons: Qt.RightButton | Qt.LeftButton
-
-                    onClicked: {
-                        listView.forceActiveFocus()
-
-                        if ( mouse.button === Qt.LeftButton || mouse.button === Qt.RightButton ) {
-                            root.model.deselectAll()
-                        }
-
-                        if ( mouse.button === Qt.RightButton ) {
-                            contextMenu.popup(-1, this.mapToGlobal(mouse.x, mouse.y))
-                        }
-                    }
                 }
 
                 Rectangle {

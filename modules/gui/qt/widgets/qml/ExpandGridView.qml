@@ -110,6 +110,8 @@ FocusScope {
     signal selectAll()
     signal actionAtIndex(int index)
 
+    signal showContextMenu(point globalPos)
+
     // Settings
 
     Accessible.role: Accessible.Table
@@ -565,6 +567,27 @@ FocusScope {
 
         ScrollBar.vertical: ScrollBar {
             id: flickableScrollBar
+        }
+
+        MouseEventFilter {
+            target: flickable
+
+            onMouseButtonPress: {
+                if (buttons & (Qt.LeftButton | Qt.RightButton)) {
+                    Helpers.enforceFocus(flickable, Qt.MouseFocusReason)
+
+                    if (!(modifiers & (Qt.ShiftModifier | Qt.ControlModifier))) {
+                        if (delegateModel)
+                            delegateModel.clear()
+                    }
+                }
+            }
+
+            onMouseButtonRelease: {
+                if (button & Qt.RightButton) {
+                    root.showContextMenu(globalPos)
+                }
+            }
         }
 
         Loader {
