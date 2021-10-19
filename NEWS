@@ -1,3 +1,9 @@
+Changes between 3.0.16 and 3.0.17:
+----------------------------------
+
+Audio Output:
+ * iOS/tvOS: add support for spatial audio
+
 Changes between 3.0.15 and 3.0.16:
 ----------------------------------
 
