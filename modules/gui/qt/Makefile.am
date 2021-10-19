@@ -261,6 +261,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/vlctick.cpp \
 	gui/qt/util/vlctick.hpp \
 	gui/qt/util/qmlinputitem.hpp \
+	gui/qt/util/mouse_event_filter.cpp \
+	gui/qt/util/mouse_event_filter.hpp \
 	gui/qt/widgets/native/animators.cpp \
 	gui/qt/widgets/native/animators.hpp \
 	gui/qt/widgets/native/customwidgets.cpp gui/qt/widgets/native/customwidgets.hpp \
@@ -417,6 +419,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/navigation_history.moc.cpp \
 	gui/qt/util/qml_main_context.moc.cpp \
 	gui/qt/util/qmleventfilter.moc.cpp \
+	gui/qt/util/mouse_event_filter.moc.cpp \
 	gui/qt/util/qvlcapp.moc.cpp \
 	gui/qt/util/renderer_manager.moc.cpp \
 	gui/qt/util/selectable_list_model.moc.cpp \
