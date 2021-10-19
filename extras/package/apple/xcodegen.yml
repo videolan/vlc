@@ -17,6 +17,8 @@ settings:
       STRIP_BITCODE_FROM_COPIED_FILES: NO
     Release:
       STRIP_BITCODE_FROM_COPIED_FILES: NO
+      ENABLE_BITCODE: YES
+      BITCODE_GENERATION_MODE: full
 targets:
   VLCAutomake:
     type: ""
