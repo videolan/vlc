@@ -37,6 +37,7 @@
 #include "util/sortfilterproxymodel.hpp"
 #include "util/navigation_history.hpp"
 #include "util/qmlinputitem.hpp"
+#include "util/mouse_event_filter.hpp"
 
 #include "dialogs/help/aboutmodel.hpp"
 #include "dialogs/dialogs_provider.hpp"
@@ -211,6 +212,7 @@ void MainUI::registerQMLTypes()
         qRegisterMetaType<DialogId>();
 
         qmlRegisterType<QmlEventFilter>( uri, versionMajor, versionMinor, "EventFilter" );
+        qmlRegisterType<MouseEventFilter>( uri, versionMajor, versionMinor, "MouseEventFilter" );
 
         qmlRegisterUncreatableType<ControlbarProfileModel>(uri, versionMajor, versionMinor, "ControlbarProfileModel", "");
         qmlRegisterUncreatableType<ControlbarProfile>(uri, versionMajor, versionMinor, "ControlbarProfile", "");
