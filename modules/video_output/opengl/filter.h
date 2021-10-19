@@ -43,6 +43,13 @@ vlc_gl_filter_open_fn(struct vlc_gl_filter *filter,
                       const config_chain_t *config,
                       struct vlc_gl_tex_size *size_out);
 
+#define set_callback_opengl_filter(open) \
+    { \
+        vlc_gl_filter_open_fn *fn = open; \
+        (void) fn; \
+        set_callback(fn); \
+    }
+
 struct vlc_gl_filter_ops {
     /**
      * Draw the result of the filter to the current framebuffer

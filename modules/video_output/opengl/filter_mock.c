@@ -547,7 +547,6 @@ InitPlane(struct vlc_gl_filter *filter)
     return VLC_SUCCESS;
 }
 
-static vlc_gl_filter_open_fn Open;
 static int
 Open(struct vlc_gl_filter *filter, const config_chain_t *config,
      struct vlc_gl_tex_size *size_out)
@@ -597,7 +596,7 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_capability("opengl filter", 0)
-    set_callback(Open)
+    set_callback_opengl_filter(Open)
     add_shortcut("mock");
     add_float(MOCK_CFG_PREFIX "angle", 0.f, NULL, NULL) /* in degrees */
     add_float(MOCK_CFG_PREFIX "speed", 0.f, NULL, NULL) /* in rotations per minute */

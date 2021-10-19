@@ -41,7 +41,7 @@ struct pl_shader_res;
     add_shortcut("renderer") \
     set_shortname("renderer") \
     set_capability("opengl filter", 0) \
-    set_callback(vlc_gl_renderer_Open)
+    set_callback_opengl_filter(vlc_gl_renderer_Open)
 
 /**
  * OpenGL picture renderer

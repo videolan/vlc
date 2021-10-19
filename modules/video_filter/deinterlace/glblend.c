@@ -262,6 +262,6 @@ vlc_module_begin()
 
     add_submodule()
         set_capability("opengl filter", 0)
-        set_callback(Open)
+        set_callback_opengl_filter(Open)
         add_shortcut("glblend")
 vlc_module_end()
