@@ -93,6 +93,9 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data)
         {
             //FIXME should we store every mrl
             m_mrl = QUrl::fromEncoded(file.psz_mrl);
+
+            m_fileName = QUrl(m_mrl).fileName();
+
             break;
         }
 
@@ -158,6 +161,11 @@ void MLVideo::onMlEvent( const vlc_ml_event_t* event )
             .p_media->thumbnails[event->media_thumbnail_generated.i_size].psz_mrl;
     m_thumbnail = QString::fromUtf8( thumbnailMrl );
     vlc_ml_event_unregister_from_callback( m_ml, m_ml_event_handle.release() );
+}
+
+QString MLVideo::getFileName() const
+{
+    return m_fileName;
 }
 
 QString MLVideo::getTitle() const

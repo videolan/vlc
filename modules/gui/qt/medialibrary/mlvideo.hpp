@@ -90,6 +90,7 @@ class MLVideo : public MLItem
 public:
     MLVideo(vlc_medialibrary_t *ml, const vlc_ml_media_t *data);
 
+    QString getFileName() const;
     QString getTitle() const;
     QString getThumbnail();
     int64_t getDuration() const;
@@ -108,6 +109,7 @@ private:
     void onMlEvent( const vlc_ml_event_t* event );
 
     vlc_medialibrary_t* m_ml;
+    QString m_fileName;
     QString m_title;
     QString m_thumbnail;
     int64_t m_duration;

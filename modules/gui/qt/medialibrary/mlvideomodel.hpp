@@ -38,6 +38,7 @@ class MLVideoModel : public MLBaseModel
 public:
     enum Role {
         VIDEO_ID = Qt::UserRole + 1,
+        VIDEO_FILENAME,
         VIDEO_TITLE,
         VIDEO_THUMBNAIL,
         VIDEO_DURATION,
