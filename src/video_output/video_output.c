@@ -105,6 +105,7 @@ typedef struct vout_thread_sys_t
         vlc_tick_t  date;
         vlc_tick_t  timestamp;
         bool        is_interlaced;
+        bool        current_rendered;
         picture_t   *decoded; // decoded picture before passed through chain_static
         picture_t   *current;
         picture_t   *last_caption_reference;
@@ -912,6 +913,7 @@ static void FilterFlush(vout_thread_sys_t *sys, bool is_locked)
     {
         picture_Release( sys->displayed.current );
         sys->displayed.current = NULL;
+        sys->displayed.current_rendered = false;
     }
 
     if (sys->displayed.next)
@@ -1587,6 +1589,7 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
         sys->avstat.last_displayed_date = todisplay->date;
         sys->avstat.last_system_pts = system_pts;
         vlc_mutex_unlock(&sys->avstat.lock);
+        sys->displayed.current_rendered = true;
 
         if (atomic_load(&sys->b_display_avstat))
         {
@@ -1660,6 +1663,7 @@ static int DisplayNextFrame(vout_thread_sys_t *sys)
         if (likely(sys->displayed.current != NULL))
             picture_Release(sys->displayed.current);
         sys->displayed.current = next;
+        sys->displayed.current_rendered = false;
     }
 
     if (!sys->displayed.current)
@@ -1731,10 +1735,12 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
             /* Well, we should use the most recent picture fitting in the vsync period */
             if (new_next_pts < vsync_date)
             {
+                if (!sys->displayed.current_rendered)
                 msg_Dbg(vout, "Dropping 1/2 because of vsync, offset to vsync is now %dms", MS_FROM_VLC_TICK(vsync_date - new_next_pts));
                 picture_Release(sys->displayed.current);
                 sys->displayed.current = sys->displayed.next;
                 sys->displayed.next = NULL;
+                sys->displayed.current_rendered = false;
 
                 /* DO NOT WAIT */
                 return VLC_SUCCESS;
@@ -1755,6 +1761,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                 return VLC_SUCCESS;
             if (new_next_pts < vsync_date)
             {
+                if (!sys->displayed.current_rendered)
                 msg_Dbg(vout, "Dropping 2/2 because of vsync, offset to vsync is now %dms / render_delay=%dms / next_pts=%dms vsync=%dms", MS_FROM_VLC_TICK(vsync_date - new_next_pts),
                     MS_FROM_VLC_TICK(render_delay),
                     MS_FROM_VLC_TICK(new_next_pts),
@@ -1762,6 +1769,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                 picture_Release(sys->displayed.current);
                 sys->displayed.current = sys->displayed.next;
                 sys->displayed.next = NULL;
+                sys->displayed.current_rendered = false;
 
                 /* DO NOT WAIT */
                 return VLC_SUCCESS;
@@ -1817,6 +1825,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         if (likely(dropped_current_frame))
             picture_Release(sys->displayed.current);
         sys->displayed.current = next;
+        sys->displayed.current_rendered = false;
 
         if (vsync_date != VLC_TICK_INVALID)
             date_refresh = __MIN(date_refresh, vsync_date - render_delay);
