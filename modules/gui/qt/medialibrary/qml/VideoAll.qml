@@ -210,6 +210,8 @@ FocusScope {
 
                 x: 0
 
+                model: root.model
+
                 Navigation.parentItem: gridView
 
                 Navigation.cancelAction: function() { gridView.retract() }

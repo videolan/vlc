@@ -139,7 +139,6 @@ FocusScope {
                 }
             }
 
-
             Column {
                 id: expand_infos_id
 
@@ -173,95 +172,64 @@ FocusScope {
                     width: parent.width
                 }
 
-                Row {
-                    width: parent.width
+                Column {
+                    width: expand_infos_id.width
+
                     topPadding: VLCStyle.margin_normal
-                    spacing: VLCStyle.margin_xlarge
 
-                    Column {
-                        width: audioTrackInfo.visible ? expand_infos_id.width / 2 : expand_infos_id.width
+                    Widgets.MenuCaption {
+                        text: "<b>" + i18n.qtr("File Name:") + "</b> " + expandRect.model.fileName
+                        width: parent.width
+                    }
 
-                        Widgets.MenuCaption {
-                            text: "<b>" + i18n.qtr("File Name:") + "</b> " + expandRect.model.title
-                            width: parent.width
-                        }
+                    Widgets.MenuCaption {
+                        text: "<b>" + i18n.qtr("Path:") + "</b> " + expandRect.model.display_mrl
+                        topPadding: VLCStyle.margin_xsmall
+                        width: parent.width
+                    }
 
-                        Widgets.MenuCaption {
-                            text: "<b>" + i18n.qtr("Path:") + "</b> " + expandRect.model.display_mrl
-                            topPadding: VLCStyle.margin_xsmall
-                            width: parent.width
-                        }
+                    MouseArea {
+                        width: childrenRect.width
+                        height: childrenRect.height
 
-                        MouseArea {
-                            width: childrenRect.width
-                            height: childrenRect.height
+                        onClicked: _showMoreInfo = !_showMoreInfo
 
-                            onClicked: _showMoreInfo = !_showMoreInfo
+                        Row {
+                            topPadding: VLCStyle.margin_large
+                            spacing: VLCStyle.margin_xsmall
 
-                            Row {
-                                topPadding: VLCStyle.margin_large
-                                spacing: VLCStyle.margin_xsmall
+                            Widgets.IconLabel {
+                                text: VLCIcons.back
+                                rotation: _showMoreInfo ? 90 : 270
 
-                                Widgets.IconLabel {
-                                    text: VLCIcons.back
-                                    rotation: _showMoreInfo ? 270 : 90
-
-                                    Behavior on rotation {
-                                        NumberAnimation {
-                                            duration: VLCStyle.duration_faster
-                                        }
+                                Behavior on rotation {
+                                    NumberAnimation {
+                                        duration: VLCStyle.duration_faster
                                     }
                                 }
-
-                                Widgets.CaptionLabel {
-                                    text: _showMoreInfo ? i18n.qtr("View Less") : i18n.qtr("View More")
-                                    color: VLCStyle.colors.text
-                                }
-                            }
-                        }
-
-                        Column {
-                            topPadding: VLCStyle.margin_xxlarge
-                            visible: _showMoreInfo && expandRect.model.videoDesc.length > 0
-                            opacity: visible ? 1 : 0
-
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: VLCStyle.duration_faster
-                                }
                             }
 
-                            Widgets.MenuCaption {
-                                text: i18n.qtr("Video track:")
-                                font.bold: true
-                                bottomPadding: VLCStyle.margin_small
-                            }
-
-                            Repeater {
-                                model: expandRect.model.videoDesc
-
-                                delegate: Repeater {
-                                    model: [
-                                        {text: i18n.qtr("Codec:"), data: modelData.codec },
-                                        {text: i18n.qtr("Language:"), data: modelData.language },
-                                        {text: i18n.qtr("FPS:"), data: modelData.fps }
-                                    ]
-
-                                    delegate: Widgets.MenuCaption {
-                                        text: modelData.text + " " + modelData.data
-                                        bottomPadding: VLCStyle.margin_xsmall
-                                    }
-
-                                }
+                            Widgets.CaptionLabel {
+                                text: _showMoreInfo ? i18n.qtr("View Less") : i18n.qtr("View More")
+                                color: VLCStyle.colors.text
                             }
                         }
                     }
+                }
+
+                Row {
+                    width: parent.width
+
+                    topPadding: VLCStyle.margin_normal
+
+                    spacing: VLCStyle.margin_xlarge
 
                     Column {
-                        id: audioTrackInfo
+                        id: videoTrackInfo
 
-                        visible: _showMoreInfo && expandRect.model.audioDesc.length > 0
-                        opacity: visible ? 1 : 0
+                        visible: (_showMoreInfo && expandRect.model.videoDesc.length > 0)
+
+                        opacity: (visible) ? 1.0 : 0.0
 
                         Behavior on opacity {
                             NumberAnimation {
@@ -270,7 +238,45 @@ FocusScope {
                         }
 
                         Widgets.MenuCaption {
-                            text: i18n.qtr("Audio track:")
+                            text: i18n.qtr("Video track")
+                            font.bold: true
+                            bottomPadding: VLCStyle.margin_small
+                        }
+
+                        Repeater {
+                            model: expandRect.model.videoDesc
+
+                            delegate: Repeater {
+                                model: [
+                                    {text: i18n.qtr("Codec:"), data: modelData.codec },
+                                    {text: i18n.qtr("Language:"), data: modelData.language },
+                                    {text: i18n.qtr("FPS:"), data: modelData.fps }
+                                ]
+
+                                delegate: Widgets.MenuCaption {
+                                    text: modelData.text + " " + modelData.data
+                                    bottomPadding: VLCStyle.margin_xsmall
+                                }
+
+                            }
+                        }
+                    }
+
+                    Column {
+                        id: audioTrackInfo
+
+                        visible: (_showMoreInfo && expandRect.model.audioDesc.length > 0)
+
+                        opacity: (visible) ? 1.0 : 0.0
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: VLCStyle.duration_faster
+                            }
+                        }
+
+                        Widgets.MenuCaption {
+                            text: i18n.qtr("Audio track")
                             font.bold: true
                             bottomPadding: VLCStyle.margin_small
                         }
@@ -291,7 +297,6 @@ FocusScope {
                                 }
                             }
                         }
-
                     }
                 }
             }
