@@ -472,15 +472,6 @@ AM_CONDITIONAL([HAVE_WINSTORE], [test "$vlc_winstore_app" = "1"])
 AM_CONDITIONAL([HAVE_WIN32_DESKTOP], [test "${SYS}" = "mingw32" -a "$vlc_winstore_app" = "0"])
 AM_CONDITIONAL([ENABLE_PDB],   [test "$vlc_build_pdb" = "1"])
 
-AS_IF([ test "${SYS}" = "darwin" ],[
-  AC_ARG_VAR([XCODEGEN],[xcode project generator])
-  AC_PATH_PROG([XCODEGEN],[xcodegen],[no])
-  AS_IF([ test "x${XCODEGEN}" != "xno" ], [
-    VLC_BUILD_DIR="$(pwd)" VLC_SRC_DIR="$(cd ${srcdir} && pwd)" VLC_PLATFORM="${VLC_DARWIN_TARGET}" \
-    ${XCODEGEN} generate --project . --spec "${srcdir}/extras/package/apple/xcodegen.yml" --project-root . --use-cache
-  ])
-])
-
 dnl Use nasm/yasm only on x86
 AC_CHECK_PROGS(X86ASM, [nasm yasm])
 AM_CONDITIONAL([HAVE_X86ASM], [test -n "${X86ASM}" && test -n "${X86ASMFLAGS}"])
