@@ -106,6 +106,7 @@ static void CreateGPUAffinityDC(vlc_gl_t *gl, UINT nVidiaAffinity) {
     PFNWGLCREATEAFFINITYDCNVPROC fncCreateAffinityDCNV = (PFNWGLCREATEAFFINITYDCNVPROC)wglGetProcAddress("wglCreateAffinityDCNV");
 
     /* delete the temporary GL context */
+    wglMakeCurrent(NULL, NULL);
     wglDeleteContext(hGLRC);
 
     /* see if we have the extensions */
@@ -146,6 +147,7 @@ static void DestroyGPUAffinityDC(vlc_gl_t *gl) {
     PFNWGLDELETEDCNVPROC fncDeleteDCNV = (PFNWGLDELETEDCNVPROC)wglGetProcAddress("wglDeleteDCNV");
 
     /* delete the temporary GL context */
+    wglMakeCurrent(NULL, NULL);
     wglDeleteContext(hGLRC);
 
     /* see if we have the extensions */
