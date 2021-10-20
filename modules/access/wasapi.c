@@ -41,6 +41,29 @@
 
 static LARGE_INTEGER freq; /* performance counters frequency */
 
+static msftime_t GetQPC(void)
+{
+    LARGE_INTEGER counter;
+
+    if (unlikely(!QueryPerformanceCounter(&counter)))
+        abort();
+
+    lldiv_t d = lldiv(counter.QuadPart, freq.QuadPart);
+    return (d.quot * 10000000) + ((d.rem * 10000000) / freq.QuadPart);
+}
+
+static msftime_t GetQPC_100ns(void)
+{
+    LARGE_INTEGER counter;
+
+    if (unlikely(!QueryPerformanceCounter(&counter)))
+        abort();
+
+    return counter.QuadPart;
+}
+
+static msftime_t (*get_qpc)(void);
+
 BOOL WINAPI DllMain(HANDLE dll, DWORD reason, LPVOID reserved)
 {
     (void) dll;
@@ -51,20 +74,13 @@ BOOL WINAPI DllMain(HANDLE dll, DWORD reason, LPVOID reserved)
         case DLL_PROCESS_ATTACH:
             if (!QueryPerformanceFrequency(&freq))
                 return FALSE;
+            if (freq.QuadPart == 10000000)
+                get_qpc = GetQPC_100ns;
+            else
+                get_qpc = GetQPC;
             break;
     }
     return TRUE;
-}
-
-static msftime_t GetQPC(void)
-{
-    LARGE_INTEGER counter;
-
-    if (!QueryPerformanceCounter(&counter))
-        abort();
-
-    lldiv_t d = lldiv(counter.QuadPart, freq.QuadPart);
-    return (d.quot * 10000000) + ((d.rem * 10000000) / freq.QuadPart);
 }
 
 static_assert(CLOCK_FREQ * 10 == 10000000,
@@ -324,7 +340,7 @@ static unsigned __stdcall Thread(void *data)
         if (hr != S_OK)
             continue;
 
-        pts = vlc_tick_now() - VLC_TICK_FROM_MSFTIME(GetQPC() - qpc);
+        pts = vlc_tick_now() - VLC_TICK_FROM_MSFTIME(get_qpc() - qpc);
 
         es_out_SetPCR(demux->out, pts);
 
