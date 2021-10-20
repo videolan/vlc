@@ -18,7 +18,7 @@ usage()
     echo "  --mode=0 incremental build (do not bootstrap and configure) "
 }
 
-NM="$EMSDK/upstream/bin/llvm-nm"
+NM="emnm"
 get_symbol()
 {
     echo "$1" | grep vlc_entry_"$2" | cut -d " " -f 3
