@@ -15,8 +15,8 @@ default:
 variables:
     VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20201106141924
     VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20201106143728
-    VLC_WIN_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-mingw:20201201162707
-    VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20201201150955
+    VLC_WIN_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-mingw:20211020094514
+    VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20211020111246
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20210803114245
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20210730131708
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-focal:20211006143413
@@ -162,9 +162,7 @@ win64-llvm:
     extends: .win-common
     image:
         name: $VLC_WIN_LLVM_IMAGE
-    variables:
-        <<: *variables-win64
-        WINE_SDK_PATH: /usr/include/wine/wine/windows/
+    variables: *variables-win64
 
 win64-ucrt-llvm:
     extends: .win-common
@@ -172,7 +170,6 @@ win64-ucrt-llvm:
         name: $VLC_UWP_LLVM_IMAGE
     variables:
         <<: *variables-win64
-        WINE_SDK_PATH: /usr/include/wine/wine/windows/
         TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
 
@@ -224,9 +221,7 @@ nightly-win64-llvm:
     extends: .nightly-win-common
     image:
         name: $VLC_WIN_LLVM_IMAGE
-    variables:
-        <<: *variables-win64
-        WINE_SDK_PATH: /usr/include/wine/wine/windows/
+    variables: *variables-win64
 
 nightly-win64-ucrt-llvm:
     extends: .nightly-win-common
@@ -234,7 +229,6 @@ nightly-win64-ucrt-llvm:
         name: $VLC_UWP_LLVM_IMAGE
     variables:
         <<: *variables-win64
-        WINE_SDK_PATH: /usr/include/wine/wine/windows/
         TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
 
