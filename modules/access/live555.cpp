@@ -63,6 +63,7 @@
 
 extern "C" {
 #include "../access/mms/asf.h"  /* Who said ugly ? */
+#include "../codec/opus_header.h"  /* Who said uglier ? */
 #include "live555_dtsgen.h"
 }
 
@@ -1036,7 +1037,17 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "OPUS" ) )
                 {
+                    int i_extra;
+                    unsigned char *p_extra;
                     tk->fmt.i_codec = VLC_CODEC_OPUS;
+                    OpusHeader header;
+                    // "The RTP clock rate in "a=rtpmap" MUST be 48000 and the number of channels MUST be 2."
+                    // See: https://datatracker.ietf.org/doc/html/draft-ietf-payload-rtp-opus-11#section-7
+                    opus_prepare_header( 2, 48000, &header );
+                    if( opus_write_header( &p_extra, &i_extra, &header, NULL ) )
+                        return VLC_ENOMEM;
+                    tk->fmt.i_extra = i_extra;
+                    tk->fmt.p_extra = p_extra;
                 }
             }
             else if( !strcmp( sub->mediumName(), "video" ) )
