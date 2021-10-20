@@ -227,6 +227,8 @@ static struct
     struct {
         jint ENCODING_PCM_8BIT;
         jint ENCODING_PCM_16BIT;
+        jint ENCODING_PCM_32BIT;
+        bool has_ENCODING_PCM_32BIT;
         jint ENCODING_PCM_FLOAT;
         bool has_ENCODING_PCM_FLOAT;
         jint ENCODING_AC3;
@@ -408,6 +410,9 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     GET_CLASS( "android/media/AudioFormat", true );
     GET_CONST_INT( AudioFormat.ENCODING_PCM_8BIT, "ENCODING_PCM_8BIT", true );
     GET_CONST_INT( AudioFormat.ENCODING_PCM_16BIT, "ENCODING_PCM_16BIT", true );
+    GET_CONST_INT( AudioFormat.ENCODING_PCM_32BIT, "ENCODING_PCM_32BIT", false );
+    jfields.AudioFormat.has_ENCODING_PCM_32BIT = field != NULL;
+
 #ifdef AUDIOTRACK_USE_FLOAT
     GET_CONST_INT( AudioFormat.ENCODING_PCM_FLOAT, "ENCODING_PCM_FLOAT",
                    false );
@@ -463,16 +468,24 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     jfields.AudioManager.has_ERROR_DEAD_OBJECT = field != NULL;
     GET_CONST_INT( AudioManager.STREAM_MUSIC, "STREAM_MUSIC", true );
 
-    GET_CLASS( "android/media/audiofx/DynamicsProcessing", false );
-    if( clazz )
+    /* Don't use DynamicsProcessing before Android 12 since it may crash
+     * randomly, cf. videolan/vlc-android#2221.
+     *
+     * ENCODING_PCM_32BIT is available on API 31, so test its availability to
+     * check if we are running Android 12 */
+    if( jfields.AudioFormat.has_ENCODING_PCM_32BIT )
     {
-        jfields.DynamicsProcessing.clazz = (jclass) (*env)->NewGlobalRef( env, clazz );
-        CHECK_EXCEPTION( "NewGlobalRef", true );
-        GET_ID( GetMethodID, DynamicsProcessing.ctor, "<init>", "(I)V", true );
-        GET_ID( GetMethodID, DynamicsProcessing.setInputGainAllChannelsTo,
-                "setInputGainAllChannelsTo", "(F)V", true );
-        GET_ID( GetMethodID, DynamicsProcessing.setEnabled,
-                "setEnabled", "(Z)I", true );
+        GET_CLASS( "android/media/audiofx/DynamicsProcessing", false );
+        if( clazz )
+        {
+            jfields.DynamicsProcessing.clazz = (jclass) (*env)->NewGlobalRef( env, clazz );
+            CHECK_EXCEPTION( "NewGlobalRef", true );
+            GET_ID( GetMethodID, DynamicsProcessing.ctor, "<init>", "(I)V", true );
+            GET_ID( GetMethodID, DynamicsProcessing.setInputGainAllChannelsTo,
+                    "setInputGainAllChannelsTo", "(F)V", true );
+            GET_ID( GetMethodID, DynamicsProcessing.setEnabled,
+                    "setEnabled", "(Z)I", true );
+        }
     }
 
 #undef CHECK_EXCEPTION
