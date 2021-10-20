@@ -7,8 +7,11 @@
 # This could also be done in configure.ac to detect what plugins are available and where to add them
 
 REAL_PREFIX="$1"
+OS_NAME="`uname -o`"
+if [ "$OS_NAME" = "Cygwin" -o "$OS_NAME" = "Msys" ]; then
 if [ ! `cygpath.exe -pm / || echo FAIL` = "FAIL" ]; then
     REAL_PREFIX=`cygpath.exe -pm ${REAL_PREFIX}`
+fi
 fi
 
 PREFIX=$(python3 -c "import os; print(os.path.realpath('${REAL_PREFIX}'))")
