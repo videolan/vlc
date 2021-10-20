@@ -160,6 +160,7 @@ if [ $BUILD_MODE -eq 1 ]; then
                         --disable-shared --disable-vlc \
                         --disable-sout --disable-vlm --disable-xcb --disable-lua \
                         --disable-addonmanagermodules --disable-ssp --disable-nls \
+                        --enable-gles2 \
                         ac_cv_func_if_nameindex=yes ac_cv_header_sys_shm_h=no \
                         --with-contrib="$VLC_SRCPATH"/contrib/wasm32-unknown-emscripten
 fi
