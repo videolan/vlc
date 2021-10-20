@@ -451,6 +451,9 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(Times deadline,
                     fakeEsOut()->setSegmentStartTimes(startTimeContext);
                     assert(startTimeContext.media);
                 }
+                assert(startTimeContext.media);
+                if(!fakeEsOut()->hasSegmentStartTimes())
+                    fakeEsOut()->setSegmentStartTimes(startTimeContext);
                 if(!fakeEsOut()->hasSynchronizationReference())
                 {
                     SynchronizationReference r(currentSequence, Times());
