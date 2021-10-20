@@ -232,22 +232,32 @@
 {
     [self reportEvent:^{
         vlc_tick_t now = vlc_tick_now();
-        CFTimeInterval current_ts = [sender timestamp];
-        CFTimeInterval target_ts = [sender targetTimestamp];
 
-        // TODO: clock timeline?
-        vlc_tick_t offset =  vlc_tick_from_sec(target_ts - current_ts);
+        CFTimeInterval ca_now = CACurrentMediaTime();
+        CFTimeInterval ca_current = [sender timestamp];
+        CFTimeInterval ca_target = [sender targetTimestamp];
 
-        if (@available(iOS 10, *))
-            target_ts = [sender targetTimestamp];
+        vlc_tick_t ca_now_ts = vlc_tick_from_sec(ca_now);
+        vlc_tick_t ca_current_ts = vlc_tick_from_sec(ca_current);
+        vlc_tick_t ca_target_ts = vlc_tick_from_sec(ca_target);
+
+        /*if (@available(iOS 10, *))
+            target_ts = [sender targetTimestamp]; */
+
+        /* this compute the length of the VSYNC and the next date for the
+         * VSYNC. */
+        vlc_tick_t clock_offset = ca_current_ts - ca_now_ts;
+        vlc_tick_t vsync_length = ca_target_ts - ca_current_ts;
+
         if (atomic_load(&_avstatEnabled))
             msg_Info(_wnd, "avstats: [RENDER][CADISPLAYLINK] ts=%" PRId64 " "
-                     "prev_ts=%" PRId64 " target_ts=%" PRId64,
+                     "clock_offset=%" PRId64 " prev_ts=%" PRId64 " target_ts=%" PRId64,
                      NS_FROM_VLC_TICK(now),
-                     NS_FROM_VLC_TICK(vlc_tick_from_sec(current_ts)),
-                     NS_FROM_VLC_TICK(vlc_tick_from_sec(target_ts)));
+                     NS_FROM_VLC_TICK(clock_offset),
+                     NS_FROM_VLC_TICK(ca_current_ts),
+                     NS_FROM_VLC_TICK(ca_target_ts));
 
-        vout_window_ReportVsyncReached(_wnd, now + offset);
+        vlc_window_ReportVsyncReached(_wnd, now + clock_offset + vsync_length);
     }];
 
 }
