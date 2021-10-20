@@ -290,7 +290,14 @@ static int MakeCurrent(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
     bool success = wglMakeCurrent(sys->hGLDC, sys->hGLRC);
-    return success ? VLC_SUCCESS : VLC_EGENERIC;
+
+    if (likely(success))
+        return VLC_SUCCESS;
+
+    DWORD dw = GetLastError();
+    msg_Err(gl, "Cannot make wgl current, error %lx", dw);
+
+    return VLC_EGENERIC;
 }
 
 static void ReleaseCurrent(vlc_gl_t *gl)
