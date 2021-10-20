@@ -569,12 +569,22 @@ static vlc_tick_t mdate_perf (void)
 {
     /* We don't need the real date, just the value of a high precision timer */
     LARGE_INTEGER counter;
-    if (!QueryPerformanceCounter (&counter))
+    if (unlikely(!QueryPerformanceCounter(&counter)))
         abort ();
 
     /* Convert to from (1/freq) to microsecond resolution */
     /* We need to split the division to avoid 63-bits overflow */
     return vlc_tick_from_frac(counter.QuadPart, clk.perf.freq.QuadPart);
+}
+
+static vlc_tick_t mdate_perf_100ns(void)
+{
+    /* We don't need the real date, just the value of a high precision timer */
+    LARGE_INTEGER counter;
+    if (unlikely(!QueryPerformanceCounter(&counter)))
+        abort ();
+
+    return VLC_TICK_FROM_MSFTIME(counter.QuadPart);
 }
 
 static vlc_tick_t mdate_wall (void)
@@ -707,7 +717,10 @@ static BOOL SelectClockSource(vlc_object_t *obj)
         if (!QueryPerformanceFrequency (&clk.perf.freq))
             abort ();
         msg_Dbg (obj, " frequency: %llu Hz", clk.perf.freq.QuadPart);
-        mdate_selected = mdate_perf;
+        if (clk.perf.freq.QuadPart == 10000000)
+            mdate_selected = mdate_perf_100ns;
+        else
+            mdate_selected = mdate_perf;
     }
     else
     if (!strcmp (name, "wall"))
