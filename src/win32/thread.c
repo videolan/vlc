@@ -791,11 +791,6 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
             break;
         }
 
-        case DLL_PROCESS_DETACH:
-            // all thread vars should have been deleted
-            assert(vlc_threadvar_last == NULL);
-            break;
-
         case DLL_THREAD_DETACH:
             vlc_threadvars_cleanup();
             break;
