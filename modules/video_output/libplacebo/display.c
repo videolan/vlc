@@ -281,6 +281,36 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         place.height = -place.height;
     }
 
+#if PL_API_VER >= 162
+#define SWAP(a, b) { float _tmp = (a); (a) = (b); (b) = _tmp; }
+    switch (vd->fmt->orientation) {
+    case ORIENT_HFLIPPED:
+        SWAP(img.crop.x0, img.crop.x1);
+        break;
+    case ORIENT_VFLIPPED:
+        SWAP(img.crop.y0, img.crop.y1);
+        break;
+    case ORIENT_ROTATED_90:
+        img.rotation = PL_ROTATION_90;
+        break;
+    case ORIENT_ROTATED_180:
+        img.rotation = PL_ROTATION_180;
+        break;
+    case ORIENT_ROTATED_270:
+        img.rotation = PL_ROTATION_270;
+        break;
+    case ORIENT_TRANSPOSED:
+        img.rotation = PL_ROTATION_90;
+        SWAP(img.crop.y0, img.crop.y1);
+        break;
+    case ORIENT_ANTI_TRANSPOSED:
+        img.rotation = PL_ROTATION_90;
+        SWAP(img.crop.x0, img.crop.x1);
+    default:
+        break;
+    }
+#endif
+
 #if PL_API_VER >= 101
     target.crop = (struct pl_rect2df) {
         place.x, place.y, place.x + place.width, place.y + place.height,
