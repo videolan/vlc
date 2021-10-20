@@ -285,10 +285,15 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos,
         }
     }
 
-    ISegment *segment = nullptr;
-
     pos.rep->scheduleNextUpdate(pos.number, b_updated);
 
+    bool b_gap = true;
+    ISegment *datasegment = pos.rep->getNextMediaSegment(pos.number, &pos.number, &b_gap);
+
+    if(!datasegment)
+        return ChunkEntry();
+
+    ISegment *segment = nullptr;
     if(!pos.init_sent)
     {
         segment = pos.rep->getInitSegment();
@@ -304,25 +309,19 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos,
             ++pos;
     }
 
-    bool b_gap = true;
     if(!segment)
-        segment = pos.rep->getNextMediaSegment(pos.number, &pos.number, &b_gap);
-
-    if(!segment)
-        return ChunkEntry();
+        segment = datasegment;
 
     SegmentChunk *segmentChunk = segment->toChunk(resources, connManager, pos.number, pos.rep);
     if(!segmentChunk)
         return ChunkEntry();
 
-    mtime_t startTime = VLC_TS_INVALID, duration = 0;
-    if(pos.index_sent && pos.init_sent)
-    {
-        const Timescale timescale = pos.rep->inheritTimescale();
-        startTime = VLC_TS_0 + timescale.ToTime(segment->startTime.Get());
-        duration = timescale.ToTime(segment->duration.Get());
-    }
-    return ChunkEntry(segmentChunk, pos, startTime, duration, segment->getDisplayTime());
+    const Timescale timescale = pos.rep->inheritTimescale();
+
+    return ChunkEntry(segmentChunk, pos,
+                      VLC_TS_0 + timescale.ToTime(datasegment->startTime.Get()),
+                      timescale.ToTime(datasegment->duration.Get()),
+                      datasegment->getDisplayTime());
 }
 
 void SegmentTracker::resetChunksSequence()
