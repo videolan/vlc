@@ -1745,9 +1745,6 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                 /* DO NOT WAIT */
                 return VLC_SUCCESS;
             }
-            else {
-                msg_Dbg(vout, "not dropped because of vsync");
-            }
 
             vlc_mutex_lock(&sys->vsync.lock);
             while ( sys->vsync.next_date != VLC_TICK_INVALID
@@ -1774,12 +1771,6 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                 /* DO NOT WAIT */
                 return VLC_SUCCESS;
             }
-            else {
-                msg_Dbg(vout, "not dropped because of vsync");
-            }
-
-
-
         }
         else {
             msg_Dbg(vout, "no next picture available");
