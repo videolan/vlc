@@ -436,12 +436,19 @@ bool SegmentTracker::setPositionByTime(mtime_t time, bool restarted, bool tryonl
         return false;
 
     /* Stream might not have been loaded at all (HLS) or expired */
-    if(pos.rep->needsUpdate(pos.number) && !pos.rep->runLocalUpdates(resources))
+    if(pos.rep->needsUpdate(pos.number))
     {
-        msg_Err(adaptationSet->getPlaylist()->getVLCObject(),
-                "Failed to update Representation %s",
-                pos.rep->getID().str().c_str());
-        return false;
+        if(pos.rep->runLocalUpdates(resources))
+        {
+            pos.rep->scheduleNextUpdate(pos.number, true);
+        }
+        else
+        {
+            msg_Err(adaptationSet->getPlaylist()->getVLCObject(),
+                    "Failed to update Representation %s",
+                    pos.rep->getID().str().c_str());
+            return false;
+        }
     }
 
     if(pos.rep->getSegmentNumberByTime(time, &pos.number))

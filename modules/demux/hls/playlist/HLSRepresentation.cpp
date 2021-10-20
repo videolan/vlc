@@ -141,11 +141,11 @@ bool HLSRepresentation::needsUpdate(uint64_t number) const
         if(elapsed < duration)
             return false;
 
-        if(number != std::numeric_limits<uint64_t>::max())
-        {
-            mtime_t minbuffer = getMinAheadTime(number);
-            return ( minbuffer < duration );
-        }
+        if(number == std::numeric_limits<uint64_t>::max())
+            return true;
+
+        mtime_t minbuffer = getMinAheadTime(number);
+        return ( minbuffer < duration );
     }
     return false;
 }
