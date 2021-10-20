@@ -31,9 +31,7 @@
 #include <vlc_common.h>
 #include "libvlc.h"
 #include "../lib/libvlc_internal.h"
-#include "config/vlc_getopt.h"
 
-#include <mmsystem.h>
 #include <winsock2.h>
 
 static int system_InitWSA(int hi, int lo)
