@@ -412,13 +412,13 @@ ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed,
         initializing = false;
     }
 
-    /* Notify new segment length for stats / logic */
-    if(chunk.pos.init_sent && chunk.pos.index_sent)
-        notify(SegmentChangedEvent(adaptationSet->getID(), chunk.starttime, chunk.duration, chunk.displaytime));
-
     /* Handle both implicit and explicit discontinuities */
     if(b_gap || b_discontinuity)
         notify(DiscontinuityEvent());
+
+    /* Notify new segment length for stats / logic */
+    notify(SegmentChangedEvent(adaptationSet->getID(),
+                               chunk.starttime, chunk.duration, chunk.displaytime));
 
     if(!b_gap)
         ++next;
