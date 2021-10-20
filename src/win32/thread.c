@@ -40,9 +40,6 @@
 #include <limits.h>
 #include <errno.h>
 #include <time.h>
-#ifndef VLC_WINSTORE_APP
-#include <mmsystem.h>
-#endif
 #include <vlc_atomic.h>
 
 /*** Static mutex and condition variable ***/
@@ -523,13 +520,6 @@ static union
     {
         LARGE_INTEGER freq;
     } perf;
-#ifndef VLC_WINSTORE_APP
-    struct
-    {
-        MMRESULT (WINAPI *timeGetDevCaps)(LPTIMECAPS ptc,UINT cbtc);
-        DWORD (WINAPI *timeGetTime)(void);
-    } multimedia;
-#endif
 } clk;
 
 static vlc_tick_t mdate_interrupt (void)
@@ -554,16 +544,6 @@ static vlc_tick_t mdate_tick (void)
     static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
     return VLC_TICK_FROM_MS( ts );
 }
-#ifndef VLC_WINSTORE_APP
-static vlc_tick_t mdate_multimedia (void)
-{
-    DWORD ts = clk.multimedia.timeGetTime ();
-
-    /* milliseconds */
-    static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
-    return VLC_TICK_FROM_MS( ts );
-}
-#endif
 
 static vlc_tick_t mdate_perf (void)
 {
@@ -660,16 +640,14 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 
 static BOOL SelectClockSource(vlc_object_t *obj)
 {
-#ifdef VLC_WINSTORE_APP
     const char *name = "perf";
-#else
-    const char *name = "multimedia";
-#endif
     char *str = NULL;
     if (obj != NULL)
+    {
         str = var_InheritString(obj, "clock-source");
-    if (str != NULL)
-        name = str;
+        if (str != NULL)
+            name = str;
+    }
     if (!strcmp (name, "interrupt"))
     {
         msg_Dbg (obj, "using interrupt time as clock source");
@@ -681,38 +659,9 @@ static BOOL SelectClockSource(vlc_object_t *obj)
         msg_Dbg (obj, "using Windows time as clock source");
         mdate_selected = mdate_tick;
     }
-#ifndef VLC_WINSTORE_APP
-    else
-    if (!strcmp (name, "multimedia"))
-    {
-        TIMECAPS caps;
-        MMRESULT (WINAPI * timeBeginPeriod)(UINT);
-
-        HMODULE hWinmm = LoadLibrary(TEXT("winmm.dll"));
-        if (!hWinmm)
-            goto perf;
-
-        clk.multimedia.timeGetDevCaps = (void*)GetProcAddress(hWinmm, "timeGetDevCaps");
-        clk.multimedia.timeGetTime = (void*)GetProcAddress(hWinmm, "timeGetTime");
-        if (!clk.multimedia.timeGetDevCaps || !clk.multimedia.timeGetTime)
-            goto perf;
-
-        msg_Dbg (obj, "using multimedia timers as clock source");
-        if (clk.multimedia.timeGetDevCaps (&caps, sizeof (caps)) != MMSYSERR_NOERROR)
-            goto perf;
-        msg_Dbg (obj, " min period: %u ms, max period: %u ms",
-                 caps.wPeriodMin, caps.wPeriodMax);
-        mdate_selected = mdate_multimedia;
-
-        timeBeginPeriod = (void*)GetProcAddress(hWinmm, "timeBeginPeriod");
-        if (timeBeginPeriod != NULL)
-            timeBeginPeriod(5);
-    }
-#endif
     else
     if (!strcmp (name, "perf"))
     {
-    perf:
         msg_Dbg (obj, "using performance counters as clock source");
         if (!QueryPerformanceFrequency (&clk.perf.freq))
             abort ();
