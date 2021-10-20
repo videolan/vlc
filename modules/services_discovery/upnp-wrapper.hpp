@@ -36,9 +36,6 @@
 #include <algorithm>
 #include <assert.h>
 
-#ifdef _WIN32
-#include <wincrypt.h>
-#endif
 #include <upnp.h>
 #include <upnptools.h>
 

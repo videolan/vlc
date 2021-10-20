@@ -28,11 +28,6 @@
 # include "config.h"
 #endif
 
-#ifdef _WIN32
-#include <windows.h>
-#include <wincrypt.h>
-#endif
-
 #include "upnp-wrapper.hpp"
 
 UpnpInstanceWrapper* UpnpInstanceWrapper::s_instance;
