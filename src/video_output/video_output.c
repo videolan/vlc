@@ -1836,8 +1836,9 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         render_now = refresh;
     }
 
+    const vlc_tick_t vsync_period = VLC_TICK_FROM_MS(16);
     if (vsync_date != VLC_TICK_INVALID)
-        date_refresh = vsync_date - render_delay - VLC_TICK_FROM_MS(4);
+        date_refresh = vsync_date - vsync_period;
 
     if (date_refresh != VLC_TICK_INVALID)
         *deadline = date_refresh;
