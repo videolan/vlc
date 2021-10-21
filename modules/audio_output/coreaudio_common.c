@@ -25,6 +25,8 @@
 #include "coreaudio_common.h"
 #include <CoreAudio/CoreAudioTypes.h>
 
+#define MAX_LATENCY 500000LL
+
 static inline uint64_t
 BytesToFrames(struct aout_sys_common *p_sys, size_t i_bytes)
 {
@@ -450,6 +452,14 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     p_sys->i_frame_length = fmt->i_frame_length;
     p_sys->chans_to_reorder = 0;
 
+    /* TODO VLC can't handle latency higher than 1 seconds */
+    if (i_dev_latency_ticks > MAX_LATENCY)
+    {
+        i_dev_latency_ticks = MAX_LATENCY;
+        msg_Warn(p_aout, "VLC can't handle this device latency, lowering it to "
+                 "%lld", i_dev_latency_ticks);
+    }
+
     p_sys->i_dev_latency_ticks = i_dev_latency_ticks;
 
     /* setup circular buffer */
@@ -509,7 +519,7 @@ void ca_SetDeviceLatency(audio_output_t *p_aout, vlc_tick_t i_dev_latency_ticks)
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
     lock_lock(p_sys);
-    p_sys->i_dev_latency_ticks = i_dev_latency_ticks;
+    p_sys->i_dev_latency_ticks = i_dev_latency_ticks > MAX_LATENCY ? MAX_LATENCY : i_dev_latency_ticks;
     lock_unlock(p_sys);
 }
 
