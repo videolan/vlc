@@ -368,6 +368,31 @@ int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi,
     return 0;
 }
 
+int64_t libvlc_video_get_delay( libvlc_media_player_t *p_mi )
+{
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    vlc_tick_t delay = vlc_player_GetVideoDelay(player);
+
+    vlc_player_Unlock(player);
+
+    return US_FROM_VLC_TICK(delay);
+}
+
+int libvlc_video_set_delay( libvlc_media_player_t *p_mi, int64_t i_delay )
+{
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    vlc_player_SetVideoDelay(player, VLC_TICK_FROM_US(i_delay),
+                             VLC_PLAYER_WHENCE_ABSOLUTE);
+
+    vlc_player_Unlock(player);
+    /* may not fail anymore, keep int not to break the API */
+    return 0;
+}
+
 float libvlc_video_get_spu_text_scale( libvlc_media_player_t *p_mi )
 {
     vlc_player_t *player = p_mi->player;
