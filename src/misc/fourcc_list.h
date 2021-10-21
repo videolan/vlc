@@ -1345,17 +1345,17 @@ static const staticentry_t p_list_audio[] = {
         A("MP3 "),
 
     /* A52 Audio (aka AC3) */
-    B(VLC_CODEC_A52, "A52 Audio (aka AC3)"),
+    B(VLC_CODEC_A52, "Audio Coding 3 (AC-3)"),
         A("a52 "),
         A("a52b"),
         A("ac-3"),
         A("sac3"),
         A("ms\x20\x00"),
 
-    B(VLC_CODEC_EAC3, "A/52 B Audio (aka E-AC3)"),
+    B(VLC_CODEC_EAC3, "Enhanced Audio Coding 3 (E-AC-3)"),
         A("ec-3"),
 
-    B(VLC_CODEC_AC4,  "AC-4 Digital Audio"),
+    B(VLC_CODEC_AC4,  "Audio Coding 4 (AC-4)"),
 
     /* DTS Audio */
     B(VLC_CODEC_DTS, "DTS Audio"),

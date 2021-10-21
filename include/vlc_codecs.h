@@ -349,7 +349,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_AMR_WIDEBAND,     VLC_CODEC_AMR_WB,                 "AMR Wideband" },
     { WAVE_FORMAT_AMR_WB,           VLC_CODEC_AMR_WB,                 "AMR Wideband" },
     { WAVE_FORMAT_SIPRO,            VLC_CODEC_SIPR,                   "Sipr Audio" },
-    { WAVE_FORMAT_A52,              VLC_CODEC_A52,                    "A/52" },
+    { WAVE_FORMAT_A52,              VLC_CODEC_A52,                    "DVM AC-3" },
     { WAVE_FORMAT_WMA1,             VLC_CODEC_WMA1,                   "Window Media Audio v1" },
     { WAVE_FORMAT_WMA2,             VLC_CODEC_WMA2,                   "Window Media Audio v2" },
     { WAVE_FORMAT_WMAP,             VLC_CODEC_WMAP,                   "Window Media Audio 9 Professional" },
