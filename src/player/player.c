@@ -1666,7 +1666,7 @@ vlc_player_SetCategoryDelay(vlc_player_t *player, enum es_format_category_e cat,
     if (!input)
         return VLC_EGENERIC;
 
-    if (cat != AUDIO_ES && cat != SPU_ES)
+    if (cat != AUDIO_ES && cat != SPU_ES && cat != VIDEO_ES)
         return VLC_EGENERIC;
     vlc_tick_t *cat_delay = &input->cat_delays[cat];
 

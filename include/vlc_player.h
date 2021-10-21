@@ -1980,6 +1980,26 @@ vlc_player_SetAudioDelay(vlc_player_t *player, vlc_tick_t delay,
 }
 
 /**
+ * Helper to get the audio delay
+ */
+static inline vlc_tick_t
+vlc_player_GetVideoDelay(vlc_player_t *player)
+{
+    return vlc_player_GetCategoryDelay(player, VIDEO_ES);
+}
+
+/**
+ * Helper to set the audio delay
+ */
+static inline void
+vlc_player_SetVideoDelay(vlc_player_t *player, vlc_tick_t delay,
+                         enum vlc_player_whence whence)
+
+{
+    vlc_player_SetCategoryDelay(player, VIDEO_ES, delay, whence);
+}
+
+/**
  * Helper to get the subtitle delay
  */
 static inline vlc_tick_t

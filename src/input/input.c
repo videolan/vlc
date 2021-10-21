@@ -2193,7 +2193,8 @@ static bool Control( input_thread_t *p_input,
 
         case INPUT_CONTROL_SET_CATEGORY_DELAY:
             assert(param.cat_delay.cat == AUDIO_ES
-                || param.cat_delay.cat == SPU_ES);
+                || param.cat_delay.cat == SPU_ES
+                || param.cat_delay.cat == VIDEO_ES);
             es_out_SetDelay(priv->p_es_out_display,
                             param.cat_delay.cat, param.cat_delay.delay);
             break;
