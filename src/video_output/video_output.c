@@ -1524,7 +1524,7 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
                 NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts));
     }
 
-    if (!render_now)
+    if (!render_now || vsync_date != VLC_TICK_INVALID)
     {
         vlc_tick_t latency = system_pts - vsync_date;
         if (vsync_date != VLC_TICK_INVALID)
