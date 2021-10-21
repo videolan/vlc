@@ -1820,7 +1820,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     }
     else if (vsync_date != VLC_TICK_INVALID)
     {
-        render_now = true;
+        render_now = false;
         refresh = true;
     }
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
