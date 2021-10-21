@@ -201,6 +201,7 @@ typedef struct
     /* delay */
     vlc_tick_t i_audio_delay;
     vlc_tick_t i_spu_delay;
+    vlc_tick_t i_video_delay;
 
     /* Clock configuration */
     vlc_tick_t  i_pts_delay;
@@ -829,7 +830,7 @@ static void EsOutSetEsDelay(es_out_t *out, es_out_id_t *es, vlc_tick_t delay)
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
 
-    assert(es->fmt.i_cat == AUDIO_ES || es->fmt.i_cat == SPU_ES);
+    assert(es->fmt.i_cat == AUDIO_ES || es->fmt.i_cat == SPU_ES || es->fmt.i_cat == VIDEO_ES);
 
     es->delay = delay;
 
@@ -842,6 +843,8 @@ static void EsOutSetEsDelay(es_out_t *out, es_out_id_t *es, vlc_tick_t delay)
 
 static void EsOutSetDelay( es_out_t *out, int i_cat, vlc_tick_t i_delay )
 {
+    fprintf(stderr, "EsOutSetDelay(%d): %" PRId64 "\n", i_cat, i_delay);
+
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     es_out_id_t *es;
 
@@ -849,6 +852,8 @@ static void EsOutSetDelay( es_out_t *out, int i_cat, vlc_tick_t i_delay )
         p_sys->i_audio_delay = i_delay;
     else if( i_cat == SPU_ES )
         p_sys->i_spu_delay = i_delay;
+    else if( i_cat == VIDEO_ES )
+        p_sys->i_video_delay = i_delay;
 
     foreach_es_then_es_slaves(es)
         EsOutDecoderChangeDelay(out, es);
@@ -1209,6 +1214,8 @@ static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es )
         i_delay = p_sys->i_audio_delay;
     else if( p_es->fmt.i_cat == SPU_ES )
         i_delay = p_sys->i_spu_delay;
+    else if( p_es->fmt.i_cat == VIDEO_ES )
+        i_delay = p_sys->i_video_delay;
     else
         return;
 
