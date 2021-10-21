@@ -275,6 +275,8 @@ libvlc_video_set_spu_delay
 libvlc_video_set_spu_text_scale
 libvlc_video_set_teletext
 libvlc_video_set_track
+libvlc_video_set_delay
+libvlc_video_get_delay
 libvlc_video_take_snapshot
 libvlc_video_new_viewpoint
 libvlc_video_update_viewpoint
