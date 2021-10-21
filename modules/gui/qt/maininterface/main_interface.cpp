@@ -105,12 +105,6 @@ template <typename T>
 T loadVLCOption(vlc_object_t *obj, const char *name);
 
 template <>
-float loadVLCOption<float>(vlc_object_t *obj, const char *name)
-{
-    return var_InheritFloat(obj, name);
-}
-
-template <>
 int loadVLCOption<int>(vlc_object_t *obj, const char *name)
 {
     return var_InheritInteger(obj, name);
