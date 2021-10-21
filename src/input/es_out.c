@@ -201,6 +201,7 @@ typedef struct
     /* delay */
     vlc_tick_t i_audio_delay;
     vlc_tick_t i_spu_delay;
+    vlc_tick_t i_video_delay;
 
     /* Clock configuration */
     vlc_tick_t  i_pts_delay;
@@ -688,7 +689,7 @@ static void EsOutUpdateDelayJitter(es_out_t *out)
 
 static void EsOutSetEsDelay(es_out_t *out, es_out_id_t *es, vlc_tick_t delay)
 {
-    assert(es->fmt.i_cat == AUDIO_ES || es->fmt.i_cat == SPU_ES);
+    assert(es->fmt.i_cat == AUDIO_ES || es->fmt.i_cat == SPU_ES || es->fmt.i_cat == VIDEO_ES);
 
     es->delay = delay;
 
@@ -706,6 +707,8 @@ static void EsOutSetDelay( es_out_t *out, int i_cat, vlc_tick_t i_delay )
         p_sys->i_audio_delay = i_delay;
     else if( i_cat == SPU_ES )
         p_sys->i_spu_delay = i_delay;
+    else if( i_cat == VIDEO_ES )
+        p_sys->i_video_delay = i_delay;
 
     foreach_es_then_es_slaves(es)
         EsOutDecoderChangeDelay(out, es);
@@ -1118,6 +1121,8 @@ static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es )
         i_delay = p_sys->i_audio_delay;
     else if( p_es->fmt.i_cat == SPU_ES )
         i_delay = p_sys->i_spu_delay;
+    else if( p_es->fmt.i_cat == VIDEO_ES )
+        i_delay = p_sys->i_video_delay;
     else
         return;
 
@@ -3075,6 +3080,7 @@ static vlc_tick_t EsOutGetTracksDelay(es_out_t *out)
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
 
     vlc_tick_t tracks_delay = 0;
+    bool has_video = false;
     bool has_audio = false;
     bool has_spu = false;
 
@@ -3088,11 +3094,15 @@ static vlc_tick_t EsOutGetTracksDelay(es_out_t *out)
 
         if (es->delay != VLC_TICK_MAX)
             tracks_delay = __MIN(tracks_delay, es->delay);
+        else if (es->fmt.i_cat == VIDEO_ES)
+            has_video = true;
         else if (es->fmt.i_cat == AUDIO_ES)
             has_audio = true;
         else if (es->fmt.i_cat == SPU_ES)
             has_spu = true;
     }
+    if (has_video)
+        tracks_delay = __MIN(tracks_delay, p_sys->i_video_delay);
     if (has_audio)
         tracks_delay = __MIN(tracks_delay, p_sys->i_audio_delay);
     if (has_spu)
