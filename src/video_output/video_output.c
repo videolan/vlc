@@ -1458,7 +1458,7 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
 
             /* vd->prepare took too much time. Tell the clock that the pts was
              * rendered late. */
-            system_pts = system_now;
+            //system_pts = system_now;
         }
         /*else if (vd->ops->display != NULL && vsync_date > system_now)
         {
