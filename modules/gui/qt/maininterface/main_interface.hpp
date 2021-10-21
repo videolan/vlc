@@ -250,8 +250,8 @@ protected:
     bool m_showRemainingTime = false;
 
     /* */
-    QSettings           *settings;
-    QSystemTrayIcon     *sysTray;
+    QSettings           *settings = nullptr;
+    QSystemTrayIcon     *sysTray = nullptr;
     std::unique_ptr<QMenu> systrayMenu;
 
     QString              input_name;
@@ -259,28 +259,28 @@ protected:
     /* Status and flags */
     QPoint              lastWinPosition;
     QSize               lastWinSize;  /// To restore the same window size when leaving fullscreen
-    QScreen             *lastWinScreen;
+    QScreen             *lastWinScreen = nullptr;
 
     QSize               pendingResize; // to be applied when fullscreen is disabled
 
     QMap<QWidget *, QSize> stackWidgetsSizes;
 
     /* Flags */
-    double               m_intfUserScaleFactor;
-    double               m_intfScaleFactor;
-    int                  i_notificationSetting; /// Systray Notifications
-    bool                 b_hideAfterCreation;
-    bool                 b_minimalView;         ///< Minimal video
-    bool                 b_playlistDocked;
+    double               m_intfUserScaleFactor = 1.;
+    double               m_intfScaleFactor = 1.;
+    int                  i_notificationSetting = 0; /// Systray Notifications
+    bool                 b_hideAfterCreation = false; /// --qt-start-minimized
+    bool                 b_minimalView = false;         ///< Minimal video
+    bool                 b_playlistDocked = false;
     QWindow::Visibility  m_windowVisibility = QWindow::Windowed;
-    bool                 b_interfaceOnTop;      ///keep UI on top
+    bool                 b_interfaceOnTop = false;      ///keep UI on top
 #ifdef QT5_HAS_WAYLAND
-    bool                 b_hasWayland;
+    bool                 b_hasWayland = false;
 #endif
-    bool                 b_hasMedialibrary;
+    bool                 b_hasMedialibrary = false;
     MediaLib*            m_medialib = nullptr;
-    bool                 m_gridView;
-    ColorSchemeModel*    m_colorScheme;
+    bool                 m_gridView = false;
+    ColorSchemeModel*    m_colorScheme = nullptr;
     bool                 m_clientSideDecoration = false;
     bool                 m_hasToolbarMenu = false;
     bool                 m_canShowVideoPIP = false;
@@ -288,12 +288,12 @@ protected:
     QUrl                 m_dialogFilepath; /* Last path used in dialogs */
 
     /* States */
-    bool                 playlistVisible;       ///< Is the playlist visible ?
-    double               playlistWidthFactor;   ///< playlist size: root.width / playlistScaleFactor
+    bool                 playlistVisible = false;       ///< Is the playlist visible ?
+    double               playlistWidthFactor = 4.;   ///< playlist size: root.width / playlistScaleFactor
 
-    VLCVarChoiceModel* m_extraInterfaces;
+    VLCVarChoiceModel* m_extraInterfaces = nullptr;
 
-    ControlbarProfileModel* m_controlbarProfileModel;
+    ControlbarProfileModel* m_controlbarProfileModel = nullptr;
 
     bool m_useAcrylicBackground = true;
     bool m_hasAcrylicSurface = false;

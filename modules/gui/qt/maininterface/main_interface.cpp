@@ -127,14 +127,6 @@ bool loadVLCOption<bool>(vlc_object_t *obj, const char *name)
 MainInterface::MainInterface(qt_intf_t *_p_intf)
     : p_intf(_p_intf)
 {
-    /* Variables initialisation */
-    lastWinScreen        = NULL;
-    sysTray              = NULL;
-
-    b_hideAfterCreation  = false; // --qt-start-minimized
-    playlistVisible      = false;
-    playlistWidthFactor  = 4.0;
-
     /**
      *  Configuration and settings
      *  Pre-building of interface
