@@ -1447,7 +1447,7 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
                 NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts));
     }
 
-    if (!render_now)
+    if (!render_now || vsync_date != VLC_TICK_INVALID)
     {
         if (unlikely(late > 0))
         {
