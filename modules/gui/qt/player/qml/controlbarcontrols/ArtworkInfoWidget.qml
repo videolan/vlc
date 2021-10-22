@@ -35,7 +35,6 @@ AbstractButton {
     property VLCColors colors: VLCStyle.colors
 
     readonly property real minimumWidth: cover.width + (leftPadding + rightPadding)
-    property real extraWidth: 0
 
     padding: VLCStyle.focus_border
 
@@ -126,9 +125,9 @@ AbstractButton {
             id: infoColumn
 
             Layout.preferredHeight: coverItem.implicitHeight
-            Layout.maximumWidth: extraWidth
+            Layout.fillWidth: true
 
-            visible: (extraWidth) > VLCStyle.dp(15)
+            clip: true
 
             Widgets.MenuLabel {
                 id: titleLabel

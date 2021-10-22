@@ -32,22 +32,23 @@ FocusScope {
 
     readonly property real minimumWidth: {
         var minimumWidth = 0
+        var count = repeater.count
 
-        for (var i = 0; i < repeater.count; ++i) {
-            var item = repeater.itemAt(i).item
+        for (var i = 0; i < count; ++i) {
+            var item = repeater.itemAt(i)
 
             if (item.minimumWidth !== undefined)
                 minimumWidth += item.minimumWidth
             else
-                minimumWidth += item.width
+                minimumWidth += item.implicitWidth
         }
 
-        minimumWidth += ((repeater.count - 1) * rowLayout.spacing)
+        minimumWidth += ((count - 1) * playerControlLayout.spacing)
 
         return minimumWidth
     }
-    property real extraWidth: 0
-    property int expandableCount: 0 // widget count that can expand when extra width is available
+
+    property bool rightAligned: false
 
     Navigation.navigable: {
         for (var i = 0; i < repeater.count; ++i) {
@@ -58,7 +59,7 @@ FocusScope {
         return false
     }
 
-    implicitWidth: rowLayout.implicitWidth
+    implicitWidth: minimumWidth
     implicitHeight: rowLayout.implicitHeight
 
     property var altFocusAction: Navigation.defaultNavigationUp
@@ -82,15 +83,16 @@ FocusScope {
 
         anchors.fill: parent
 
-        spacing: playerControlLayout.spacing
+        spacing: 0
+
+        Item {
+            Layout.fillWidth: rightAligned
+        }
 
         Repeater {
             id: repeater
 
             onItemRemoved: {
-                if (item.item.extraWidth !== undefined)
-                    controlLayout.expandableCount--
-
                 item.recoverFocus(index)
             }
 
@@ -100,6 +102,32 @@ FocusScope {
                 source: PlayerControlbarControls.control(model.id).source
 
                 focus: (index === 0)
+
+                Layout.alignment: Qt.AlignVCenter | (rightAligned ? Qt.AlignRight : Qt.AlignLeft)
+                Layout.minimumWidth: minimumWidth
+                Layout.fillWidth: expandable
+                Layout.maximumWidth: item.implicitWidth
+                // This is a workaround of not using RowLayout's built-in `spacing`
+                // RowLayout adds an unwanted spacing at the end of the layout so
+                // this is used instead.
+                Layout.rightMargin: {
+                    for (var i = index + 1; i < repeater.count; ++i) {
+                        var item = repeater.itemAt(i)
+                        if (!!item && item.visible)
+                            return playerControlLayout.spacing
+                    }
+                    return 0
+                }
+
+                readonly property real minimumWidth: (expandable ? item.minimumWidth : item.implicitWidth)
+                readonly property bool expandable: (item.minimumWidth !== undefined)
+
+                Binding {
+                    delayed: true // this is important
+                    target: loader
+                    property: "visible"
+                    value: (loader.x + minimumWidth <= rowLayout.width)
+                }
 
                 function buildFocusChain() {
                     // rebuild the focus chain:
@@ -134,11 +162,16 @@ FocusScope {
                         if (activeFocus && !item.enabled) // Loader has focus but item is not enabled
                             recoverFocus()
                     }
+
+                    onVisibleChanged: {
+                        if (activeFocus && !item.visible)
+                            recoverFocus()
+                    }
                 }
 
                 onLoaded: {
                     // control should not request focus if they are not enabled:
-                    item.focus = Qt.binding(function() { return item.enabled })
+                    item.focus = Qt.binding(function() { return item.enabled && item.visible })
 
                     // navigation parent of control is always controlLayout
                     // so it can be set here unlike leftItem and rightItem:
@@ -152,12 +185,9 @@ FocusScope {
                         item.colors = Qt.binding(function() { return colors; })
                     }
 
-                    if (item.extraWidth !== undefined && controlLayout.extraWidth !== undefined) {
-                        controlLayout.expandableCount++
-                        item.extraWidth = Qt.binding( function() {
-                            return (controlLayout.extraWidth / controlLayout.expandableCount) // distribute extra width
-                        } )
-                    }
+                    item.width = Qt.binding(function() { return loader.width } )
+
+                    item.visible = Qt.binding(function() { return loader.visible })
                 }
 
                 function _focusIfFocusable(_loader) {
@@ -205,6 +235,10 @@ FocusScope {
                     }
                 }
             }
+        }
+
+        Item {
+            Layout.fillWidth: !rightAligned
         }
     }
 }

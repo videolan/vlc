@@ -25,14 +25,13 @@ import "qrc:///style/"
 Item {
     enabled: false
 
-    implicitWidth: paintOnly ? VLCStyle.widthExtendedSpacer : extraWidth
+    implicitWidth: paintOnly ? VLCStyle.widthExtendedSpacer : Number.MAX_VALUE
     implicitHeight: VLCStyle.icon_normal
 
     property bool paintOnly: false
     property alias spacetextExt: spacetext
 
     readonly property real minimumWidth: 0
-    property real extraWidth: 0
 
     Label {
         id: spacetext

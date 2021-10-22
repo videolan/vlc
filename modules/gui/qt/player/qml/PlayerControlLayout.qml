@@ -26,6 +26,7 @@ import "qrc:///widgets/" as Widgets
 FocusScope {
     id: playerControlLayout
 
+    implicitWidth: layoutLoader_left.implicitWidth + layoutLoader_center.implicitWidth + layoutLoader_right.implicitWidth + 2 * layoutSpacing
     implicitHeight: VLCStyle.maxControlbarControlHeight
 
     property var colors: undefined
@@ -53,6 +54,7 @@ FocusScope {
         id: layoutLoader_left
 
         anchors {
+            right: layoutLoader_center.left
             left: parent.left
             top: parent.top
             bottom: parent.bottom
@@ -67,10 +69,6 @@ FocusScope {
 
         sourceComponent: ControlLayout {
             model: playerControlLayout.model.left
-
-            extraWidth: (layoutLoader_center.x - layoutLoader_left.x - minimumWidth - layoutSpacing)
-
-            visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
 
             Navigation.parentItem: playerControlLayout
             Navigation.rightItem: layoutLoader_center.item
@@ -93,6 +91,9 @@ FocusScope {
         active: !!playerControlLayout.model
                 && !!playerControlLayout.model.center
 
+        width: (parent.width < implicitWidth) ? parent.width
+                                              : implicitWidth
+
         sourceComponent: ControlLayout {
             model: playerControlLayout.model.center
 
@@ -110,6 +111,7 @@ FocusScope {
         id: layoutLoader_right
 
         anchors {
+            left: layoutLoader_center.right
             right: parent.right
             top: parent.top
             bottom: parent.bottom
@@ -123,9 +125,7 @@ FocusScope {
         sourceComponent: ControlLayout {
             model: playerControlLayout.model.right
 
-            extraWidth: (playerControlLayout.width - (layoutLoader_center.x + layoutLoader_center.width) - minimumWidth - (2 * layoutSpacing))
-
-            visible: extraWidth < 0 ? false : true // extraWidth < 0 means there is not even available space for minimumSize
+            rightAligned: true
 
             Navigation.parentItem: playerControlLayout
             Navigation.leftItem: layoutLoader_center.item
