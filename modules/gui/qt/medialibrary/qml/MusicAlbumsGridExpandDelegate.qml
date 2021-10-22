@@ -54,6 +54,15 @@ FocusScope {
         playActionBtn.forceActiveFocus(reason);
     }
 
+    function _getStringTrack() {
+        var count = Helpers.get(model, "nb_tracks", 0);
+
+        if (count < 2)
+            return i18n.qtr("%1 track").arg(count);
+        else
+            return i18n.qtr("%1 tracks").arg(count);
+    }
+
     Rectangle {
         anchors.fill: parent
         color: VLCStyle.colors.expandDelegate
@@ -233,9 +242,10 @@ FocusScope {
                     id: expand_infos_subtitle_id
 
                     width: parent.width
-                    text: i18n.qtr("%1 - %2 - %3")
+                    text: i18n.qtr("%1 - %2 - %3 - %4")
                         .arg(Helpers.get(model, "main_artist", i18n.qtr("Unknown artist")))
                         .arg(Helpers.get(model, "release_year", ""))
+                        .arg(_getStringTrack())
                         .arg(Helpers.msToString(Helpers.get(model, "duration", 0)))
                 }
             }
