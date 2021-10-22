@@ -196,7 +196,7 @@ StreamFormat SegmentTracker::getCurrentFormat() const
     {
         /* Ensure ephemere content is updated/loaded */
         if(rep->needsUpdate(next.number))
-            (void) rep->runLocalUpdates(resources);
+            rep->scheduleNextUpdate(next.number, rep->runLocalUpdates(resources));
         return rep->getStreamFormat();
     }
     return StreamFormat();
@@ -477,9 +477,9 @@ SegmentTracker::Position SegmentTracker::getStartPosition() const
     if(pos.rep)
     {
         /* Ensure ephemere content is updated/loaded */
-        if(pos.rep->needsUpdate(pos.number))
-            pos.rep->runLocalUpdates(resources);
+        bool b_updated = pos.rep->needsUpdate(pos.number) && pos.rep->runLocalUpdates(resources);
         pos.number = bufferingLogic->getStartSegmentNumber(pos.rep);
+        pos.rep->scheduleNextUpdate(pos.number, b_updated);
     }
     return pos;
 }
@@ -529,8 +529,9 @@ mtime_t SegmentTracker::getMinAheadTime() const
     if(rep)
     {
         /* Ensure ephemere content is updated/loaded */
-        if(rep->needsUpdate(next.number))
-            (void) rep->runLocalUpdates(resources);
+        rep->scheduleNextUpdate(next.number,
+                                rep->needsUpdate(next.number) &&
+                                rep->runLocalUpdates(resources));
 
         uint64_t startnumber = current.number;
         if(startnumber == std::numeric_limits<uint64_t>::max())
