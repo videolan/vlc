@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Layouts 1.11
+
 import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
@@ -60,27 +62,24 @@ AbstractButton {
         activeBorderColor: colors.bgFocus
     }
 
-    contentItem: Row {
+    contentItem: RowLayout {
         spacing: infoColumn.visible ? VLCStyle.margin_xsmall : 0
 
         Item {
             id: coverItem
 
-            anchors.verticalCenter: parent.verticalCenter
-
-            implicitHeight: childrenRect.height
-            implicitWidth:  childrenRect.width
+            implicitHeight: cover.height
+            implicitWidth: cover.width
 
             Rectangle {
                 id: coverRect
-
-                anchors.fill: cover
+                anchors.fill: parent
 
                 color: colors.bg
             }
 
             DropShadow {
-                anchors.fill: coverRect
+                anchors.fill: parent
 
                 source: coverRect
                 radius: 8
@@ -100,16 +99,19 @@ AbstractButton {
                                                         ? mainPlaylistController.currentItem.artwork
                                                         : VLCStyle.noArtAlbum
                 }
+
                 fillMode: Image.PreserveAspectFit
 
                 width: VLCStyle.dp(60)
                 height: VLCStyle.dp(60)
 
+                mipmap: true
+
                 Widgets.ToolTipExt {
                     x: parent.x
 
                     visible: artworkInfoItem.visible
-                             && infoColumn.width < infoColumn.preferredWidth
+                             && infoColumn.width < infoColumn.implicitWidth
                              && (artworkInfoItem.hovered || artworkInfoItem.visualFocus)
                     delay: 500
 
@@ -120,20 +122,19 @@ AbstractButton {
             }
         }
 
-        Column {
+        ColumnLayout {
             id: infoColumn
-            anchors.verticalCenter: parent.verticalCenter
 
-            readonly property real preferredWidth: Math.max(titleLabel.implicitWidth, artistLabel.implicitWidth, progressIndicator.implicitWidth)
-            width: ((extraWidth > preferredWidth)) ? preferredWidth
-                                                   : extraWidth
+            Layout.preferredHeight: coverItem.implicitHeight
+            Layout.maximumWidth: extraWidth
 
-            visible: width > VLCStyle.dp(15, VLCStyle.scale)
+            visible: (extraWidth) > VLCStyle.dp(15)
 
             Widgets.MenuLabel {
                 id: titleLabel
 
-                width: parent.width
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
                 text: {
                     if (paintOnly)
@@ -147,7 +148,8 @@ AbstractButton {
             Widgets.MenuCaption {
                 id: artistLabel
 
-                width: parent.width
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
                 text: {
                     if (paintOnly)
@@ -161,7 +163,8 @@ AbstractButton {
             Widgets.MenuCaption {
                 id: progressIndicator
 
-                width: parent.width
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
                 text: {
                     if (paintOnly)
