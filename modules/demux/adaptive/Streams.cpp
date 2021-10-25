@@ -233,10 +233,16 @@ bool AbstractStream::isSelected() const
     return fakeEsOut()->hasSelectedEs();
 }
 
-bool AbstractStream::reactivate(vlc_tick_t basetime)
+AbstractStream::StreamPosition::StreamPosition()
+{
+    number = std::numeric_limits<uint64_t>::max();
+    pos = -1;
+}
+
+bool AbstractStream::reactivate(const StreamPosition &pos)
 {
     vlc_mutex_locker locker(&lock);
-    if(setPosition(basetime, false))
+    if(setPosition(pos, false))
     {
         setDisabled(false);
         return true;
@@ -636,13 +642,14 @@ block_t * AbstractStream::readNextBlock()
     return block;
 }
 
-bool AbstractStream::setPosition(vlc_tick_t time, bool tryonly)
+bool AbstractStream::setPosition(const StreamPosition &pos, bool tryonly)
 {
     if(!seekAble())
         return false;
 
     bool b_needs_restart = demuxer ? demuxer->needsRestartOnSeek() : true;
-    bool ret = segmentTracker->setPositionByTime(time, b_needs_restart, tryonly);
+    bool ret = segmentTracker->setPositionByTime(pos.times.segment.media,
+                                                 b_needs_restart, tryonly);
     if(!tryonly && ret)
     {
 // in some cases, media time seek != sent dts

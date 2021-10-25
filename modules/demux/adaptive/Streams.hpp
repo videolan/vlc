@@ -68,7 +68,6 @@ namespace adaptive
         Times getFirstTimes() const;
         int esCount() const;
         bool isSelected() const;
-        virtual bool reactivate(vlc_tick_t);
         bool isDisabled() const;
         bool isValid() const;
         void setLivePause(bool);
@@ -91,7 +90,17 @@ namespace adaptive
         Times getDemuxedAmount(Times) const;
         Status dequeue(Times, Times *);
         bool decodersDrained();
-        virtual bool setPosition(vlc_tick_t, bool);
+
+        class StreamPosition
+        {
+            public:
+                StreamPosition();
+                Times times;
+                uint64_t number;
+                double pos;
+        };
+        virtual bool reactivate(const StreamPosition &);
+        virtual bool setPosition(const StreamPosition &, bool);
         bool getMediaPlaybackTimes(vlc_tick_t *, vlc_tick_t *, vlc_tick_t *) const;
         bool getMediaAdvanceAmount(vlc_tick_t *) const;
         void runUpdates();

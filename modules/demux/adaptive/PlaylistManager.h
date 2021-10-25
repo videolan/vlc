@@ -44,6 +44,8 @@ namespace adaptive
     using namespace playlist;
     using namespace logic;
 
+    using StreamPosition = AbstractStream::StreamPosition;
+
     class PlaylistManager
     {
         public:
@@ -77,8 +79,8 @@ namespace adaptive
             virtual int doDemux(vlc_tick_t);
 
             void    setLivePause(bool);
-            virtual bool    setPosition(vlc_tick_t);
-            vlc_tick_t getResumeTime() const;
+            virtual bool    setPosition(vlc_tick_t, double pos = -1);
+            StreamPosition getResumePosition() const;
             Times getFirstTimes() const;
             unsigned getActiveStreamsCount() const;
 
