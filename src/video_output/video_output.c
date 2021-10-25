@@ -196,6 +196,7 @@ typedef struct vout_thread_sys_t
         vlc_tick_t next_date;
         vlc_tick_t last_date;
         vlc_tick_t initial_offset;
+        bool missed;
     } vsync;
 
     vlc_tick_t latency;
@@ -751,6 +752,7 @@ void vout_NotifyVsyncReached(vout_thread_t *vout, vlc_tick_t next_vsync)
     vlc_tick_t offset = now - sys->vsync.current_date;
     sys->vsync.current_date = now;
     sys->vsync.next_date = next_vsync;
+    sys->vsync.missed = false;
     vlc_mutex_unlock(&sys->vsync.lock);
     vlc_cond_signal(&sys->vsync.cond_update);
 
@@ -1605,11 +1607,20 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
         }
 
         vout_display_Display(vd, todisplay);
+        vlc_tick_t display_ts = vlc_tick_now();
         vlc_mutex_lock(&sys->avstat.lock);
         sys->avstat.last_displayed_date = todisplay->date;
         sys->avstat.last_system_pts = system_pts;
         vlc_mutex_unlock(&sys->avstat.lock);
         sys->displayed.current_rendered = true;
+
+        vlc_mutex_lock(&sys->vsync.lock);
+        bool vsync_missed = sys->vsync.missed = display_ts > vsync_date;
+        vlc_mutex_unlock(&sys->vsync.lock);
+        vlc_cond_broadcast(&sys->vsync.cond_update);
+
+        if (vsync_missed)
+            msg_Warn(vout, "avstats: [VSYNC MISSED] ts=%" PRId64, NS_FROM_VLC_TICK(vlc_tick_now()));
 
         if (atomic_load(&sys->b_display_avstat))
         {
@@ -1747,9 +1758,9 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 
         vlc_mutex_lock(&sys->vsync.lock);
         while ( sys->vsync.next_date != VLC_TICK_INVALID
-               //&& sys->vsync.missed == true
-               && sys->vsync.last_date == sys->vsync.next_date
-               && !atomic_load(&sys->control_is_terminated))
+               && !atomic_load(&sys->control_is_terminated)
+               && (sys->vsync.last_date == sys->vsync.next_date
+                || sys->vsync.missed == true) )
             vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
         vsync_date = sys->vsync.next_date;
         vlc_mutex_unlock(&sys->vsync.lock);
@@ -1798,9 +1809,9 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         vlc_mutex_lock(&sys->vsync.lock);
         sys->vsync.last_date = sys->vsync.next_date;
         while ( sys->vsync.next_date != VLC_TICK_INVALID
-                // && sys->vsync.missed == true
-                && sys->vsync.last_date == sys->vsync.next_date
-                && !atomic_load(&sys->control_is_terminated))
+               && !atomic_load(&sys->control_is_terminated)
+               && (sys->vsync.last_date == sys->vsync.next_date
+                || sys->vsync.missed == true) )
             vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
         vsync_date = sys->vsync.next_date;
         vlc_mutex_unlock(&sys->vsync.lock);
