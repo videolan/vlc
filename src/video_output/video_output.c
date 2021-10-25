@@ -64,6 +64,7 @@
 
 enum vout_state_e {
     VOUT_STATE_CONTROL,
+    VOUT_STATE_PREPARE,
     VOUT_STATE_DISPLAY,
 };
 
@@ -203,6 +204,10 @@ typedef struct vout_thread_sys_t
             vlc_tick_t deadline;
             bool wait;
         } display;
+        struct {
+            bool render_now;
+            bool first;
+        } prepare;
     } state;
 } vout_thread_sys_t;
 
@@ -1860,45 +1865,13 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         // nothing changed, wait until the next deadline or a control
         return VLC_EGENERIC;
     }
-
     /* display the picture immediately */
     render_now |= sys->displayed.current->b_force;
 
-    int ret = RenderPicture(vout, render_now);
+    sys->state.prepare.render_now = render_now;
+    sys->state.prepare.first = first;
 
-    if(sys->displayed.caption_reference &&
-       sys->displayed.caption_reference != sys->displayed.last_caption_reference &&
-       sys->displayed.caption_reference->captions.size > 0)
-    {
-#ifdef DEBUG_CAPTION
-        msg_Warn(&vout->obj, " - new caption, size: %zu, %s", sys->displayed.caption_reference->captions.size,
-                sys->displayed.caption_reference->b_top_field_first ? "TOP":"BOTTOM");
-#endif
-        vout_CaptionsToDisplay(&vout->obj,
-                               sys->displayed.caption_reference->captions.bytes,
-                               sys->displayed.caption_reference->captions.size);
-#ifdef DEBUG_CAPTION
-        fwrite(sys->displayed.caption_reference->captions.bytes, sizeof(char), sys->displayed.caption_reference->captions.size, sys->displayed.caption_file);
-#endif
-        sys->displayed.last_caption_reference = sys->displayed.caption_reference;
-    }
-#ifdef DEBUG_CAPTION
-    else
-    if(sys->displayed.caption_reference &&
-       sys->displayed.caption_reference == sys->displayed.last_caption_reference)
-    {
-        msg_Err(&vout->obj, " - -- drop duplicate");
-    }
-#endif
-
-    if (first && ret == VLC_SUCCESS)
-    {
-        /* SEND EVENT */
-        msg_Info(&vout->obj, "First frame has been drawn");
-        vout_ReportFirstFrame(&vout->obj);
-    }
-
-    return render_now ? VLC_EGENERIC : ret;
+    return render_now ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
@@ -2230,20 +2203,63 @@ static void *Thread(void *object)
 
                 vlc_mouse_t video_mouse;
                 if (vout_control_Pop(&sys->control, &video_mouse, deadline) != VLC_SUCCESS) {
-                    sys->state.current = VOUT_STATE_DISPLAY;
+                    sys->state.current = VOUT_STATE_PREPARE;
                     break;
                 }
                 ProcessMouseState(vout, &video_mouse);
                 break;
             }
 
-            case VOUT_STATE_DISPLAY: {
+            case VOUT_STATE_PREPARE: {
                 vlc_tick_t deadline = VLC_TICK_INVALID;
                 bool wait = DisplayPicture(vout, &deadline) != VLC_SUCCESS;
                 sys->state.display.deadline = deadline;
                 sys->state.display.wait = wait;
                 const bool picture_interlaced = sys->displayed.is_interlaced;
                 vout_SetInterlacingState(&vout->obj, &sys->private, picture_interlaced);
+                if (wait) sys->state.current = VOUT_STATE_CONTROL;
+                else sys->state.current = VOUT_STATE_DISPLAY;
+                break;
+            }
+
+            case VOUT_STATE_DISPLAY: {
+                assert(sys->displayed.current);
+
+                bool render_now = sys->state.prepare.render_now;
+                int ret = RenderPicture(vout, render_now);
+
+                if(sys->displayed.caption_reference &&
+                   sys->displayed.caption_reference != sys->displayed.last_caption_reference &&
+                   sys->displayed.caption_reference->captions.size > 0)
+                {
+            #ifdef DEBUG_CAPTION
+                    msg_Warn(&vout->obj, " - new caption, size: %zu, %s", sys->displayed.caption_reference->captions.size,
+                            sys->displayed.caption_reference->b_top_field_first ? "TOP":"BOTTOM");
+            #endif
+                    vout_CaptionsToDisplay(&vout->obj,
+                                           sys->displayed.caption_reference->captions.bytes,
+                                           sys->displayed.caption_reference->captions.size);
+            #ifdef DEBUG_CAPTION
+                    fwrite(sys->displayed.caption_reference->captions.bytes, sizeof(char), sys->displayed.caption_reference->captions.size, sys->displayed.caption_file);
+            #endif
+                    sys->displayed.last_caption_reference = sys->displayed.caption_reference;
+                }
+            #ifdef DEBUG_CAPTION
+                else
+                if(sys->displayed.caption_reference &&
+                   sys->displayed.caption_reference == sys->displayed.last_caption_reference)
+                {
+                    msg_Err(&vout->obj, " - -- drop duplicate");
+                }
+            #endif
+
+                if (sys->state.prepare.first && ret == VLC_SUCCESS)
+                {
+                    /* SEND EVENT */
+                    msg_Info(&vout->obj, "First frame has been drawn");
+                    vout_ReportFirstFrame(&vout->obj);
+                }
+
                 sys->state.current = VOUT_STATE_CONTROL;
                 break;
             }
