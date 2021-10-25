@@ -68,9 +68,9 @@ void HLSStream::setMetadataTimeOffset(mtime_t mpegts, mtime_t muxed)
     fakeEsOut()->setAssociatedTimestamp(mpegts, muxed);
 }
 
-bool HLSStream::setPosition(mtime_t ts , bool b)
+bool HLSStream::setPosition(const StreamPosition &pos, bool b)
 {
-    bool ok = AbstractStream::setPosition(ts ,b);
+    bool ok = AbstractStream::setPosition(pos, b);
     if(b && ok)
         b_id3_timestamps_offset_set = false;
     return ok;

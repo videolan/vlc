@@ -316,10 +316,12 @@ AbstractStream::Status PlaylistManager::dequeue(Times floor, Times *barrier)
     return i_return;
 }
 
-mtime_t PlaylistManager::getResumeTime() const
+StreamPosition PlaylistManager::getResumePosition() const
 {
     vlc_mutex_locker locker(&demux.lock);
-    return demux.times.segment.media;
+    StreamPosition pos;
+    pos.times = demux.times;
+    return pos;
 }
 
 Times PlaylistManager::getFirstTimes() const
@@ -349,10 +351,13 @@ unsigned PlaylistManager::getActiveStreamsCount() const
     return count;
 }
 
-bool PlaylistManager::setPosition(mtime_t time)
+bool PlaylistManager::setPosition(mtime_t mediatime, double pos)
 {
     bool ret = true;
     bool hasValidStream = false;
+    StreamPosition streampos;
+    streampos.times.segment.media = mediatime;
+    streampos.pos = pos;
     for(int real = 0; real < 2; real++)
     {
         /* Always probe if we can seek first */
@@ -363,7 +368,7 @@ bool PlaylistManager::setPosition(mtime_t time)
             if(st->isValid() && !st->isDisabled())
             {
                 hasValidStream = true;
-                ret &= st->setPosition(time, !real);
+                ret &= st->setPosition(streampos, !real);
             }
         }
         if(!ret)
@@ -431,7 +436,7 @@ mtime_t PlaylistManager::getMinAheadTime() const
 
 bool PlaylistManager::reactivateStream(AbstractStream *stream)
 {
-    return stream->reactivate(getResumeTime());
+    return stream->reactivate(getResumePosition());
 }
 
 #define DEMUX_INCREMENT (CLOCK_FREQ / 20)
@@ -625,7 +630,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
             SeekDebug(msg_Dbg(p_demux, "Seek %f to %ld plstart %ld duration %ld",
                    pos, seekTime, cached.playlistEnd, cached.playlistLength));
 
-            if(!setPosition(seekTime))
+            if(!setPosition(seekTime, pos))
             {
                 setBufferingRunState(true);
                 return VLC_EGENERIC;

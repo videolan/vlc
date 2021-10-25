@@ -36,7 +36,7 @@ namespace hls
             virtual block_t *checkBlock(block_t *, bool) override;
             virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
                                                es_out_t *, AbstractSourceStream *) const override;
-            virtual bool setPosition(mtime_t, bool) override;
+            virtual bool setPosition(const StreamPosition &, bool) override;
             virtual bool isContiguousMux() const override;
 
         private:
