@@ -247,7 +247,7 @@ bool MainInterface::hasVLM() const {
 bool MainInterface::useClientSideDecoration() const
 {
     //don't show CSD when interface is fullscreen
-    return m_clientSideDecoration && m_windowVisibility != QWindow::FullScreen;
+    return !m_windowTitlebar && m_windowVisibility != QWindow::FullScreen;
 }
 
 bool MainInterface::hasFirstrun() const {
@@ -289,7 +289,7 @@ void MainInterface::loadPrefs(const bool callSignals)
     loadFromVLCOption(m_hasToolbarMenu, "qt-menubar", &MainInterface::hasToolbarMenuChanged);
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
-    loadFromVLCOption(m_clientSideDecoration, "qt-titlebar" , &MainInterface::useClientSideDecorationChanged);
+    loadFromVLCOption(m_windowTitlebar, "qt-titlebar" , &MainInterface::useClientSideDecorationChanged);
 #endif
 }
 

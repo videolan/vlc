@@ -281,7 +281,7 @@ protected:
     MediaLib*            m_medialib = nullptr;
     bool                 m_gridView = false;
     ColorSchemeModel*    m_colorScheme = nullptr;
-    bool                 m_clientSideDecoration = false;
+    bool                 m_windowTitlebar = false;
     bool                 m_hasToolbarMenu = false;
     bool                 m_canShowVideoPIP = false;
     bool                 m_pinVideoControls = false;
