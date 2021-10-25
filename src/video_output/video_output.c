@@ -62,6 +62,11 @@
 #include "chrono.h"
 #include "control.h"
 
+enum vout_state_e {
+    VOUT_STATE_CONTROL,
+    VOUT_STATE_DISPLAY,
+};
+
 typedef struct vout_thread_sys_t
 {
     struct vout_thread_t obj;
@@ -191,6 +196,14 @@ typedef struct vout_thread_sys_t
     } vsync;
 
     vlc_tick_t latency;
+
+    struct {
+        enum vout_state_e current;
+        struct {
+            vlc_tick_t deadline;
+            bool wait;
+        } display;
+    } state;
 } vout_thread_sys_t;
 
 #define VOUT_THREAD_TO_SYS(vout) \
@@ -2192,50 +2205,51 @@ static void *Thread(void *object)
 
     vlc_thread_set_name("vlc-vout");
 
-    vlc_tick_t deadline = VLC_TICK_INVALID;
-    bool wait = false;
+    sys->state.current = VOUT_STATE_CONTROL;
+    sys->state.display.deadline = VLC_TICK_INVALID;
+    sys->state.display.wait = false;
 
-    for (;;) {
-        if (wait)
+    while (!atomic_load(&sys->control_is_terminated))
+    {
+        switch (sys->state.current)
         {
-            const vlc_tick_t max_deadline = vlc_tick_now() + VLC_TICK_FROM_MS(100);
-            deadline = deadline == VLC_TICK_INVALID ? max_deadline : __MIN(deadline, max_deadline);
-        } else {
-            deadline = VLC_TICK_INVALID;
-        }
+            case VOUT_STATE_CONTROL: {
+                vlc_tick_t deadline = sys->state.display.deadline;
+                vlc_tick_t now_ts = vlc_tick_now();
 
-        vlc_tick_t now_ts = vlc_tick_now();
-        vlc_tick_t deadline_ts = deadline;
+                if (!sys->state.display.wait)
+                    deadline = vlc_tick_now();
+                else if (deadline == VLC_TICK_INVALID)
+                    deadline = now_ts + VLC_TICK_FROM_MS(100);
 
-        /* No deadline means that we don't wait. */
-        if (deadline == VLC_TICK_INVALID)
-            deadline_ts = now_ts;
+                if (atomic_load(&sys->b_display_avstat))
+                {
+                    msg_Info(&sys->obj, "avstats: [RENDER][DEADLINE] ts=%" PRId64 " deadline=%" PRId64,
+                             NS_FROM_VLC_TICK(now_ts), NS_FROM_VLC_TICK(deadline));
+                }
 
-        if (atomic_load(&sys->b_display_avstat))
-        {
-            msg_Info(&sys->obj, "avstats: [RENDER][DEADLINE] ts=%" PRId64 " deadline=%" PRId64,
-                     NS_FROM_VLC_TICK(now_ts), NS_FROM_VLC_TICK(deadline_ts));
-        }
-
-        vlc_mouse_t video_mouse;
-        while (vout_control_Pop(&sys->control, &video_mouse, deadline) == VLC_SUCCESS) {
-            if (atomic_load(&sys->control_is_terminated))
+                vlc_mouse_t video_mouse;
+                if (vout_control_Pop(&sys->control, &video_mouse, deadline) != VLC_SUCCESS) {
+                    sys->state.current = VOUT_STATE_DISPLAY;
+                    break;
+                }
+                ProcessMouseState(vout, &video_mouse);
                 break;
-            ProcessMouseState(vout, &video_mouse);
+            }
+
+            case VOUT_STATE_DISPLAY: {
+                vlc_tick_t deadline = VLC_TICK_INVALID;
+                bool wait = DisplayPicture(vout, &deadline) != VLC_SUCCESS;
+                sys->state.display.deadline = deadline;
+                sys->state.display.wait = wait;
+                const bool picture_interlaced = sys->displayed.is_interlaced;
+                vout_SetInterlacingState(&vout->obj, &sys->private, picture_interlaced);
+                sys->state.current = VOUT_STATE_CONTROL;
+                break;
+            }
         }
-
-        if (atomic_load(&sys->control_is_terminated))
-            break;
-
-        wait = DisplayPicture(vout, &deadline) != VLC_SUCCESS;
-
-        if (atomic_load(&sys->control_is_terminated))
-            break;
-
-        const bool picture_interlaced = sys->displayed.is_interlaced;
-
-        vout_SetInterlacingState(&vout->obj, &sys->private, picture_interlaced);
     }
+
     return NULL;
 }
 
