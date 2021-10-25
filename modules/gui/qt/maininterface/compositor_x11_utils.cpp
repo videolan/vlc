@@ -29,6 +29,7 @@ DummyNativeWidget::DummyNativeWidget(QWidget* parent, Qt::WindowFlags f)
     setAttribute(Qt::WA_NativeWindow, true);
     setAttribute(Qt::WA_OpaquePaintEvent, true);
     setAttribute(Qt::WA_PaintOnScreen, true);
+    setAttribute(Qt::WA_MouseTracking, true);
 }
 
 DummyNativeWidget::~DummyNativeWidget()

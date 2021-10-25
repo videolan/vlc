@@ -331,6 +331,7 @@ CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_conn
     m_rootWidget->setAttribute(Qt::WA_OpaquePaintEvent);
     m_rootWidget->setAttribute(Qt::WA_NoSystemBackground);
     m_rootWidget->setAttribute(Qt::WA_TranslucentBackground);
+    m_rootWidget->setAttribute(Qt::WA_MouseTracking);
 
     if (useCDS)
         m_rootWidget->setWindowFlag(Qt::FramelessWindowHint);
