@@ -3996,14 +3996,6 @@ AS_IF([test "${enable_skins2}" != "no"], [
 ])
 AM_CONDITIONAL([BUILD_SKINS], [test "${enable_skins2}" = "yes"])
 
-AC_ARG_ENABLE([libtar],
-  AS_HELP_STRING([--enable-libtar], [libtar support for skins2 (default auto)]))
-AS_IF([test "${enable_skins2}" = "yes" && test "${enable_libtar}" != "no"], [
-  AC_CHECK_HEADERS([libtar.h], [
-    VLC_ADD_LIBS([skins2],[-ltar])
-  ])
-])
-
 dnl
 dnl  MacOS X gui module
 dnl
