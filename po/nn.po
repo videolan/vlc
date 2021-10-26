@@ -16805,7 +16805,7 @@ msgstr "Lim inn"
 
 #: modules/gui/macosx/VLCMainMenu.m:362 modules/gui/macosx/VLCPlaylist.m:234
 msgid "Select All"
-msgstr "Vel allle"
+msgstr "Vel alle"
 
 #: modules/gui/macosx/VLCMainMenu.m:363
 #, fuzzy
