@@ -181,29 +181,6 @@ bool ISegment::contains(size_t byte) const
             (!endByte || byte <= endByte) );
 }
 
-int ISegment::compare(ISegment *other) const
-{
-    if(duration.Get())
-    {
-        if(startTime.Get() > other->startTime.Get())
-            return 1;
-        else if(startTime.Get() < other->startTime.Get())
-            return -1;
-    }
-
-    if(startByte > other->startByte)
-        return 1;
-    else if(startByte < other->startByte)
-        return -1;
-
-    if(endByte > other->endByte)
-        return 1;
-    else if(endByte < other->endByte)
-        return -1;
-
-    return 0;
-}
-
 void ISegment::setEncryption(CommonEncryption &e)
 {
     encryption = e;
