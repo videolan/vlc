@@ -75,7 +75,6 @@ namespace adaptive
                 virtual size_t                          getOffset       () const;
                 virtual void                            debug           (vlc_object_t *,int = 0) const;
                 virtual bool                            contains        (size_t byte) const;
-                virtual int                             compare         (ISegment *) const;
                 void                                    setEncryption   (CommonEncryption &);
                 void                                    setDisplayTime  (vlc_tick_t);
                 vlc_tick_t                              getDisplayTime  () const;
