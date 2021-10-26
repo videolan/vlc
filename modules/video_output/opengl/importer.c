@@ -83,6 +83,10 @@ InitOrientationMatrix(float matrix[static 2*3], video_orientation_t orientation)
      */
 
     switch (orientation) {
+        case ORIENT_NORMAL:
+            /* No transformation */
+            memcpy(matrix, MATRIX2x3_IDENTITY, sizeof(MATRIX2x3_IDENTITY));
+            break;
         case ORIENT_ROTATED_90:
             /**
              *     1---2          2---3
