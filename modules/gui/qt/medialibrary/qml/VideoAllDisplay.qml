@@ -41,10 +41,8 @@ VideoAll {
     // Functions
 
     function setCurrentItemFocus(reason) {
-        var loader = headerItem.loader;
-
-        if (loader.visible)
-            loader.item.forceActiveFocus(reason);
+        if (modelRecent.count)
+            headerItem.setCurrentItemFocus(reason);
         else
             _currentView.setCurrentItemFocus(reason);
     }
@@ -71,6 +69,16 @@ VideoAll {
         // NOTE: We want the header to be visible when we have at least one media visible.
         //       Otherwise it overlaps the default caption.
         visible: (model.count)
+
+        // NOTE: Making sure this item will be focussed by VideoAll::_onNavigationUp().
+        focus: true
+
+        function setCurrentItemFocus(reason) {
+            var item = loader.item;
+
+            if (item)
+                item.setCurrentItemFocus(reason);
+        }
 
         Loader {
             id: loader

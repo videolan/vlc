@@ -100,10 +100,10 @@ FocusScope {
         if (initialIndex >= model.count)
             initialIndex = 0
 
-        modelSelect.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect);
+        modelSelect.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
 
         if (_currentView)
-            _currentView.positionViewAtIndex(initialIndex, ItemView.Contain);
+            _currentView.positionViewAtIndex(initialIndex, ItemView.Contain)
     }
 
     // Private
@@ -114,9 +114,18 @@ FocusScope {
         medialib.addAndPlay(model.getIdsForIndexes(modelSelect.selectedIndexes));
     }
 
+    // Events
+
+    function _onNavigationUp() {
+        if (headerItem && headerItem.focus)
+            headerItem.setCurrentItemFocus(Qt.TabFocusReason);
+        else
+            Navigation.defaultNavigationUp();
+    }
+
     function _onNavigationCancel() {
         if (_currentView.currentIndex <= 0) {
-            Navigation.defaultNavigationCancel()
+            Navigation.defaultNavigationCancel();
         } else {
             _currentView.currentIndex = 0;
 
@@ -200,7 +209,8 @@ FocusScope {
             activeFocusOnTab: true
 
             Navigation.parentItem: root
-            Navigation.upItem: (headerItem) ? headerItem.focusItem : null
+
+            Navigation.upAction: _onNavigationUp
 
             //cancelAction takes a *function* pass it directly
             Navigation.cancelAction: root._onNavigationCancel
@@ -322,7 +332,8 @@ FocusScope {
             activeFocusOnTab: true
 
             Navigation.parentItem: root
-            Navigation.upItem: (headerItem) ? headerItem.focusItem : null
+
+            Navigation.upAction: _onNavigationUp
 
             //cancelAction takes a *function* pass it directly
             Navigation.cancelAction: root._onNavigationCancel

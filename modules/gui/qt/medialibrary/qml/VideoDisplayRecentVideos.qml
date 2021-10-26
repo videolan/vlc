@@ -56,6 +56,12 @@ FocusScope {
             root.currentIndex = 0
     }
 
+    // Functions
+
+    function setCurrentItemFocus(reason) {
+        recentVideosListView.setCurrentItemFocus(reason);
+    }
+
     function _actionAtIndex(index, model, selectionModel) {
         g_mainDisplay.showPlayer()
         medialib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ), [":restore-playback-pos=2"] )
