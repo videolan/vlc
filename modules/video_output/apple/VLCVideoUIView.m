@@ -93,6 +93,7 @@
     CADisplayLink *_displayLink;
 
     dispatch_queue_t _eventq;
+    vlc_tick_t _last_ca_target_ts;
 }
 
 - (id)initWithWindow:(vout_window_t *)wnd;
@@ -115,6 +116,7 @@
 {
     _wnd = wnd;
     _enabled = NO;
+    _last_ca_target_ts = VLC_TICK_INVALID;
     atomic_init(&_avstatEnabled, false);
 
     UIView *superview = [self fetchViewContainer];
@@ -230,8 +232,11 @@
 
         /* this compute the length of the VSYNC and the next date for the
          * VSYNC. */
+        vlc_tick_t last_ca_target_ts =_last_ca_target_ts == VLC_TICK_INVALID ?
+            ca_current_ts : _last_ca_target_ts;
         vlc_tick_t clock_offset = ca_current_ts - ca_now_ts;
-        vlc_tick_t vsync_length = ca_target_ts - ca_current_ts;
+        vlc_tick_t vsync_length = ca_target_ts - last_ca_target_ts;
+        _last_ca_target_ts = ca_target_ts;
 
         if (atomic_load(&_avstatEnabled))
             msg_Info(_wnd, "avstats: [RENDER][CADISPLAYLINK] ts=%" PRId64 " "
