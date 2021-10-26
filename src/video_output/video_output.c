@@ -195,6 +195,7 @@ typedef struct vout_thread_sys_t
         vlc_tick_t current_date;
         vlc_tick_t next_date;
         vlc_tick_t last_date;
+        vlc_tick_t initial_offset;
     } vsync;
 
     vlc_tick_t latency;
@@ -1789,6 +1790,10 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     {
         next = sys->displayed.next;
         sys->displayed.next = NULL;
+    }
+
+    if (sys->vsync.initial_offset == VLC_TICK_INVALID)
+    {
         /* Wait a new VSYNC event before starting */
         vlc_mutex_lock(&sys->vsync.lock);
         sys->vsync.last_date = sys->vsync.next_date;
@@ -1887,6 +1892,7 @@ static void vout_FlushUnlocked(vout_thread_sys_t *vout, bool below,
             sys->displayed.date      = VLC_TICK_INVALID;
             sys->displayed.timestamp = VLC_TICK_INVALID;
             sys->displayed.captions.size = 0;
+            sys->vsync.initial_offset = VLC_TICK_INVALID;
         }
     }
 
@@ -2550,6 +2556,8 @@ vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
     sys->vsync.current_date = VLC_TICK_INVALID;
     sys->vsync.next_date = VLC_TICK_INVALID;
     sys->vsync.last_date = VLC_TICK_INVALID;
+
+    sys->vsync.initial_offset = VLC_TICK_INVALID;
 
     sys->latency = 0;
 
