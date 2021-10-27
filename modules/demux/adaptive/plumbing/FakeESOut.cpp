@@ -518,6 +518,21 @@ vlc_tick_t FakeESOut::applyTimestampContinuity(vlc_tick_t ts)
     if(ts == VLC_TICK_INVALID)
         return ts;
 
+    if(synchronizationReference.second.segment.demux != VLC_TICK_INVALID)
+    {
+        constexpr vlc_tick_t rollover = INT64_C(0x1FFFFFFFF) * 100 / 9;
+        constexpr vlc_tick_t halfroll = INT64_C(0x0FFFFFFFF) * 100 / 9;
+
+        while(ts - synchronizationReference.second.segment.demux > halfroll)
+        {
+            ts -= rollover;
+        }
+        while(synchronizationReference.second.segment.demux - ts > halfroll)
+        {
+            ts += rollover;
+        }
+    }
+
     if(synchronizationReference.second.segment.demux != VLC_TICK_INVALID &&
        synchronizationReference.second.continuous != VLC_TICK_INVALID)
     {
