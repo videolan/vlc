@@ -25,7 +25,7 @@
 #include "coreaudio_common.h"
 #include <CoreAudio/CoreAudioTypes.h>
 
-#define MAX_LATENCY 500000LL
+#define MAX_LATENCY 0LL
 
 static inline uint64_t
 BytesToFrames(struct aout_sys_common *p_sys, size_t i_bytes)
@@ -517,10 +517,6 @@ ca_SetAliveState(audio_output_t *p_aout, bool alive)
 void ca_SetDeviceLatency(audio_output_t *p_aout, vlc_tick_t i_dev_latency_ticks)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
-
-    lock_lock(p_sys);
-    p_sys->i_dev_latency_ticks = i_dev_latency_ticks > MAX_LATENCY ? MAX_LATENCY : i_dev_latency_ticks;
-    lock_unlock(p_sys);
 }
 
 AudioUnit
