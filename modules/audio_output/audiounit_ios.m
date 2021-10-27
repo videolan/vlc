@@ -486,7 +486,7 @@ Pause (audio_output_t *p_aout, bool pause, vlc_tick_t date)
     {
         err = AudioOutputUnitStop(p_sys->au_unit);
         if (err != noErr)
-            ca_LogErr("AudioOutputUnitStart failed");
+            ca_LogErr("AudioOutputUnitStop failed");
         avas_SetActive(p_aout, false, 0);
     }
     else
