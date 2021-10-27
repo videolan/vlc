@@ -499,6 +499,21 @@ mtime_t FakeESOut::applyTimestampContinuity(mtime_t ts)
     if(ts == VLC_TS_INVALID)
         return ts;
 
+    if(synchronizationReference.second.segment.demux != VLC_TS_INVALID)
+    {
+        constexpr mtime_t rollover = INT64_C(0x1FFFFFFFF) * 100 / 9;
+        constexpr mtime_t halfroll = INT64_C(0x0FFFFFFFF) * 100 / 9;
+
+        while(ts - synchronizationReference.second.segment.demux > halfroll)
+        {
+            ts -= rollover;
+        }
+        while(synchronizationReference.second.segment.demux - ts > halfroll)
+        {
+            ts += rollover;
+        }
+    }
+
     if(synchronizationReference.second.segment.demux != VLC_TS_INVALID &&
        synchronizationReference.second.continuous != VLC_TS_INVALID)
     {
