@@ -10,6 +10,7 @@ default:
     after_script:
         - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
         - mv contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 2>/dev/null || true
+    interruptible: true
 
 variables:
     VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32-3.0:20211008142723
