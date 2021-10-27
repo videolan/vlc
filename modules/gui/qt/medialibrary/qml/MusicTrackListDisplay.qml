@@ -71,25 +71,10 @@ Widgets.KeyNavigableTableView {
     onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
     onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
-    dragItem: Widgets.DragItem {
+    dragItem: Widgets.MLDragItem {
+        indexes: selectionModel.selectedIndexes
 
-        function updateComponents(maxCovers) {
-          var items = selectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
-            return model.getDataAt(x.row)
-          })
-          var title = items.map(function (item){ return item.title}).join(", ")
-          var covers = items.map(function (item) { return {artwork: item.cover || VLCStyle.noArtCover}})
-          return {
-            covers: covers,
-            title: title,
-            count: selectionModel.selectedIndexes.length
-          }
-        }
-
-        function getSelectedInputItem() {
-            return model.getItemsForIndexes(selectionModel.selectedIndexes);
-        }
-
+        mlModel: model
     }
 
     Widgets.TableColumns {

@@ -266,25 +266,12 @@ FocusScope {
         model: albumModel
     }
 
-    Widgets.DragItem {
+    Widgets.MLDragItem {
         id: albumDragItem
 
-        function updateComponents(maxCovers) {
-          var items = albumSelectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
-            return albumModel.getDataAt(x.row)
-          })
-          var title = items.map(function (item){ return item.title}).join(", ")
-          var covers = items.map(function (item) { return {artwork: item.cover || VLCStyle.noArtAlbum}})
-          return {
-            covers: covers,
-            title: title,
-            count: albumSelectionModel.selectedIndexes.length
-          }
-        }
-
-        function getSelectedInputItem() {
-            return albumModel.getItemsForIndexes(albumSelectionModel.selectedIndexes);
-        }
+        mlModel: albumModel
+        indexes: albumSelectionModel.selectedIndexes
+        defaultCover: VLCStyle.noArtAlbum
     }
 
     MLAlbumTrackModel {
@@ -440,23 +427,15 @@ FocusScope {
             onItemDoubleClicked: medialib.addAndPlay(model.id)
             onContextMenuButtonClicked: trackContextMenu.popup(trackSelectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
             onRightClick: trackContextMenu.popup(trackSelectionModel.selectedIndexes, globalMousePos)
-            dragItem: Widgets.DragItem {
-                function updateComponents(maxCovers) {
-                  var items = trackSelectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
-                    return trackModel.getDataAt(x.row)
-                  })
-                  var title = items.map(function (item){ return item.title}).join(", ")
-                  var covers = items.map(function (item) { return {artwork: item.cover || VLCStyle.noArtCover}})
-                  return {
-                    covers: covers,
-                    title: title,
-                    count: trackSelectionModel.selectedIndexes.length
-                  }
-                }
 
-                function getSelectedInputItem() {
-                    return trackModel.getItemsForIndexes(trackSelectionModel.selectedIndexes);
-                }
+            dragItem: Widgets.MLDragItem {
+                mlModel: trackModel
+
+                indexes: trackSelectionModel.selectedIndexes
+
+                titleRole: "name"
+
+                defaultCover: VLCStyle.noArtCover
             }
 
             Widgets.TableColumns {

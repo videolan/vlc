@@ -130,32 +130,14 @@ FocusScope {
         text: initialName
     }
 
-    Widgets.DragItem {
+    Widgets.MLDragItem {
         id: dragItem
 
-        function updateComponents(maxCovers) {
-            var items = modelSelect.selectedIndexes.slice(0, maxCovers).map(function (x){
-                return model.getDataAt(x.row);
-            })
+        mlModel: model
 
-            var covers = items.map(function (item) {
-                return { artwork: item.thumbnail || VLCStyle.noArtCover }
-            });
+        indexes: modelSelect.selectedIndexes
 
-            var title = items.map(function (item) {
-                return item.title
-            }).join(", ");
-
-            return {
-                covers: covers,
-                title: title,
-                count: modelSelect.selectedIndexes.length
-            }
-        }
-
-        function getSelectedInputItem() {
-            return model.getItemsForIndexes(modelSelect.selectedIndexes);
-        }
+        coverRole: "thumbnail"
     }
 
     Util.SelectableDelegateModel {

@@ -76,20 +76,16 @@ T.Control {
         drag.axis: Drag.XAndYAxis
 
         drag.target: Widgets.DragItem {
-            function updateComponents(maxCovers) {
-                return {
-                    covers: [{ artwork: (model.cover) ? model.cover
-                                                      : VLCStyle.noArtArtistSmall }],
+            indexes: [index]
 
-                    title: (model.name) ? model.name
-                                        : i18n.qtr("Unknown artist"),
+            titleRole: "name"
 
-                    count: 1
-                }
+            onRequestData: {
+                setData(identifier, [model])
             }
 
             function getSelectedInputItem() {
-                return mlModel.getItemsForIndexes([mlModel.index(index, 0)]);
+                return medialib.mlInputItem(model.id)
             }
         }
 

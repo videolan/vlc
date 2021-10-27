@@ -90,25 +90,13 @@ FocusScope {
         model: artistModel
     }
 
-    Widgets.DragItem {
+    Widgets.MLDragItem {
         id: artistsDragItem
 
-        function updateComponents(maxCovers) {
-          var items = selectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
-            return artistModel.getDataAt(x.row)
-          })
-          var title = items.map(function (item){ return item.name}).join(", ")
-          var covers = items.map(function (item) { return {artwork: item.cover || VLCStyle.noArtArtistSmall}})
-          return {
-            covers: covers,
-            title: title,
-            count: selectionModel.selectedIndexes.length
-          }
-        }
-
-        function getSelectedInputItem() {
-            return artistModel.getItemsForIndexes(selectionModel.selectedIndexes);
-        }
+        mlModel: artistModel
+        indexes: selectionModel.selectedIndexes
+        titleRole: "name"
+        defaultCover: VLCStyle.noArtArtistSmall
     }
 
     Component {

@@ -97,25 +97,14 @@ FocusScope {
         model: genreModel
     }
 
-    Widgets.DragItem {
+    Widgets.MLDragItem {
         id: genreDragItem
 
-        function updateComponents(maxCovers) {
-          var items = selectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
-            return genreModel.getDataAt(x.row)
-          })
-          var title = items.map(function (item){ return item.name}).join(", ")
-          var covers = items.map(function (item) { return {artwork: item.cover || VLCStyle.noArtCover}})
-          return {
-            covers: covers,
-            title: title,
-            count: selectionModel.selectedIndexes.length
-          }
-        }
+        mlModel: genreModel
 
-        function getSelectedInputItem() {
-            return genreModel.getItemsForIndexes(selectionModel.selectedIndexes);
-        }
+        indexes: selectionModel.selectedIndexes
+
+        titleRole: "name"
     }
 
     /*

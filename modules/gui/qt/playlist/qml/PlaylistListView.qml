@@ -140,29 +140,19 @@ Control {
 
         parent: (typeof g_mainDisplay !== 'undefined') ? g_mainDisplay : root
 
-        property var selection: null
+        property var selection: null // make this indexes alias?
 
         colors: root.colors
 
-        function updateComponents(maxCovers) {
-            var count = root.model.selectedCount
+        indexes: selection
+
+        onRequestData: {
             selection = root.model.getSelection()
-            var _selection = selection.slice(0, maxCovers)
-
-            var title = _selection.map(function (index){
-                return root.model.itemAt(index).title
-            }).join(", ")
-
-            var covers = _selection.map(function (index) {
-                var artwork = root.model.itemAt(index).artwork
-                return {artwork: (artwork && artwork.toString()) ? artwork : VLCStyle.noArtCover}
-            })
-
-            return ({covers: covers, title: title, count: root.model.selectedCount})
-        }
-
-        function getSelectedInputItem(index) {
-            return model.getItemsForIndexes(model.getSelection())
+            indexes = selection
+            setData(identifier, indexes.map(function (index) {
+                var item = root.model.itemAt(index)
+                return {"title": item.title, "cover": item.artwork}
+            }))
         }
 
         property int _scrollingDirection: 0

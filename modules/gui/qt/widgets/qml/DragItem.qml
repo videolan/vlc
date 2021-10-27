@@ -1,6 +1,8 @@
 /*****************************************************************************
  * Copyright (C) 2020 VLC authors and VideoLAN
  *
+ * Author: Prince Gupta <guptaprince8832@gmail.com>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,15 +18,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-import QtQuick          2.11
+import QtQuick 2.11
 import QtQuick.Templates 2.4 as T
-import QtQml.Models     2.2
+import QtQml.Models 2.2
+
 import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///playlist/" as Playlist
+import "qrc:///util/Helpers.js" as Helpers
 
 Item {
     id: dragItem
@@ -37,17 +41,96 @@ Item {
 
     property VLCColors colors: VLCStyle.colors
 
+    property var indexes: []
+
+    // data from last setData
+    readonly property alias indexesData: dragItem._data
+
+    property string defaultCover: VLCStyle.noArtCover
+
+    property string defaultText: i18n.qtr("Unknown")
+
+    // function(index, data) - returns cover for the index in the model in the form {artwork: <string> (file-name), cover: <component>}
+    property var coverProvider: null
+
+    // string => role
+    property string coverRole: "cover"
+
+    // function(index, data) - returns title text for the index in the model i.e <string> title
+    property var titleProvider: null
+
+    // string => role
+    property string titleRole: "title"
+
+    function coversXPos(index) {
+        return VLCStyle.margin_small + (coverSize / 3) * index;
+    }
+
+    signal requestData(var identifier)
+
+    function getSelectedInputItem() {
+        console.assert(false, "getSelectedInputItem is not implemented.")
+
+        return undefined
+    }
+
+    function setData(id, data) {
+        if (id !== dragItem._currentRequest)
+            return
+
+        console.assert(data.length === indexes.length)
+        _data = data
+
+        if (!dragItem._active)
+            return
+
+        var covers = []
+        var titleList = []
+
+        for (var i in indexes) {
+            if (covers.length === _maxCovers)
+                break
+
+            var cover = _getCover(indexes[i], data[i])
+            var itemTitle = _getTitle(indexes[i], data[i])
+            if (!cover || !itemTitle) continue
+
+            covers.push(cover)
+            titleList.push(itemTitle)
+        }
+
+        if (covers.length === 0)
+            covers.push({artwork: dragItem.defaultCover})
+
+        if (titleList.length === 0)
+            titleList.push(defaultText)
+
+        _covers = covers
+        _title = titleList.join(",") + (indexes.length > _maxCovers ? "..." : "")
+    }
+
     //---------------------------------------------------------------------------------------------
     // Private
 
-    property var _model: {"covers": [], "title": "", "count": 0}
-
     readonly property int _maxCovers: 3
 
-    readonly property int _displayedCoversCount: Math.min(_model.count, _maxCovers + 1)
+    readonly property bool _active: Drag.active
+
+    readonly property int _indexesSize: !!indexes ? indexes.length : 0
+
+    readonly property int _displayedCoversCount: Math.min(_indexesSize, _maxCovers + 1)
+
+    property var _data: []
+
+    property var _covers: []
+
+    property string _title: ""
+
+    property int _currentRequest: 0
+
 
     //---------------------------------------------------------------------------------------------
-    // Settings
+    // Implementation
     //---------------------------------------------------------------------------------------------
 
     parent: g_mainDisplay
@@ -60,46 +143,36 @@ Item {
 
     visible: Drag.active
 
-    //---------------------------------------------------------------------------------------------
-    // Events
-    //---------------------------------------------------------------------------------------------
+    function _getCover(index, data) {
+        console.assert(dragItem.coverRole)
+        if (!!dragItem.coverProvider)
+            return dragItem.coverProvider(index, data)
+        else
+            return {artwork: data[dragItem.coverRole] || dragItem.defaultCover}
+    }
 
-    Drag.onActiveChanged: {
-        if (Drag.active) {
-            _model = updateComponents(_maxCovers);
-            MainCtx.setCursor(Qt.DragMoveCursor);
+    function _getTitle(index, data) {
+        console.assert(dragItem.titleRole)
+        if (!!dragItem.titleProvider)
+            return dragItem.titleProvider(index, data)
+        else
+            return data[dragItem.titleRole] || dragItem.defaultText
+    }
+
+
+    on_ActiveChanged: {
+        if (_active) {
+            if (_indexesSize < 1)
+                return
+
+            dragItem._currentRequest += 1
+            dragItem.requestData(dragItem._currentRequest)
+
+            MainCtx.setCursor(Qt.DragMoveCursor)
         } else {
-            MainCtx.restoreCursor();
+            MainCtx.restoreCursor()
         }
     }
-
-    //---------------------------------------------------------------------------------------------
-    // Functions
-    //---------------------------------------------------------------------------------------------
-
-    function coversXPos(index) {
-        return VLCStyle.margin_small + (coverSize / 3) * index;
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // Pure virtual
-
-    // return {covers: [{artwork: <string> or cover: <component>},..maxCovers]
-    //         , title: <string>, *subtitle: <string>, count: <int> /*all selected*/}
-    // * - optional
-    function updateComponents(maxCovers) {
-        console.assert(false, "updateComponents is not implemented.");
-    }
-
-    function getSelectedInputItem() {
-        console.assert(false, "getSelectedInputItem is not implemented.");
-
-        return undefined;
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // Animations
-    //---------------------------------------------------------------------------------------------
 
     Behavior on opacity {
         NumberAnimation {
@@ -107,10 +180,6 @@ Item {
             duration: VLCStyle.ms128
         }
     }
-
-    //---------------------------------------------------------------------------------------------
-    // Childs
-    //---------------------------------------------------------------------------------------------
 
     Rectangle {
         /* background */
@@ -130,7 +199,8 @@ Item {
 
     Repeater {
         id: coverRepeater
-        model: _model.covers
+
+        model: dragItem._covers
 
         Item {
             x: dragItem.coversXPos(index)
@@ -207,7 +277,7 @@ Item {
         width: dragItem.coverSize
         height: dragItem.coverSize
         radius: dragItem.coverSize
-        visible: _model.count > dragItem._maxCovers
+        visible: dragItem._indexesSize > dragItem._maxCovers
         color: colors.bgAlt
         border.width: VLCStyle.dp(1, VLCStyle.scale)
         border.color: colors.buttonBorder
@@ -215,7 +285,7 @@ Item {
         MenuLabel {
             anchors.centerIn: parent
             color: colors.accent
-            text: "+" + (_model.count - dragItem._maxCovers)
+            text: "+" + (dragItem._indexesSize - dragItem._maxCovers)
         }
     }
 
@@ -258,7 +328,7 @@ Item {
             T.Label {
                 id: titleLabel
 
-                text: _model.title
+                text: dragItem._title
                 visible: text && text !== ""
                 width: parent.width
                 elide: Text.ElideNone
@@ -272,13 +342,14 @@ Item {
 
             visible: text && text !== ""
             width: parent.width
-            text: _model.subtitle || i18n.qtr("%1 selected").arg(_model.count)
+            text: i18n.qtr("%1 selected").arg(dragItem._indexesSize)
             color: colors.menuCaption
         }
     }
 
     Component {
         id: artworkLoader
+
         Image {
             mipmap: true
             fillMode: Image.PreserveAspectCrop

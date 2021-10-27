@@ -192,32 +192,16 @@ FocusScope {
         model: root.model
     }
 
-    Widgets.DragItem {
+    Widgets.MLDragItem {
         id: dragItemGroup
 
-        function updateComponents(maxCovers) {
-            var items = modelSelect.selectedIndexes.slice(0, maxCovers).map(function (x){
-                return model.getDataAt(x.row);
-            })
+        mlModel: model
 
-            var covers = items.map(function (item) {
-                return { artwork: item.thumbnail || VLCStyle.noArtCover }
-            });
+        indexes: modelSelect.selectedIndexes
 
-            var name = items.map(function (item) {
-                return item.name
-            }).join(", ");
+        coverRole: "thumbnail"
 
-            return {
-                covers: covers,
-                title: name,
-                count: modelSelect.selectedIndexes.length
-            }
-        }
-
-        function getSelectedInputItem() {
-            return model.getItemsForIndexes(modelSelect.selectedIndexes);
-        }
+        titleRole: "name"
     }
 
     //---------------------------------------------------------------------------------------------

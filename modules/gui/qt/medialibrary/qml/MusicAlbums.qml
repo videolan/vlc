@@ -104,25 +104,12 @@ FocusScope {
         model: albumModelId
     }
 
-    Widgets.DragItem {
+    Widgets.MLDragItem {
         id: albumDragItem
 
-        function updateComponents(maxCovers) {
-          var items = selectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
-            return albumModelId.getDataAt(x.row)
-          })
-          var title = items.map(function (item){ return item.title}).join(", ")
-          var covers = items.map(function (item) { return {artwork: item.cover || VLCStyle.noArtAlbum}})
-          return {
-            covers: covers,
-            title: title,
-            count: selectionModel.selectedIndexes.length
-          }
-        }
-
-        function getSelectedInputItem() {
-            return albumModelId.getItemsForIndexes(selectionModel.selectedIndexes);
-        }
+        mlModel: albumModelId
+        indexes: selectionModel.selectedIndexes
+        defaultCover: VLCStyle.noArtAlbum
     }
 
     AlbumContextMenu {

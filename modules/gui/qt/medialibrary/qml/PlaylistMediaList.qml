@@ -198,35 +198,16 @@ FocusScope {
         focus: (model.count !== 0)
     }
 
-    Widgets.DragItem {
+    Widgets.MLDragItem {
         id: dragItemPlaylist
 
-        //---------------------------------------------------------------------------------------------
-        // DragItem implementation
+        mlModel: model
 
-        function updateComponents(maxCovers) {
-            var items = modelSelect.selectedIndexes.slice(0, maxCovers).map(function (x){
-                return model.getDataAt(x.row);
-            })
+        indexes: modelSelect.selectedIndexes
 
-            var covers = items.map(function (item) {
-                return { artwork: item.thumbnail || VLCStyle.noArtCover };
-            })
+        coverRole: "thumbnail"
 
-            var title = items.map(function (item) {
-                return item.name
-            }).join(", ");
-
-            return {
-                covers: covers,
-                title: title,
-                count: modelSelect.selectedIndexes.length
-            };
-        }
-
-        function getSelectedInputItem() {
-            return model.getItemsForIndexes(modelSelect.selectedIndexes);
-        }
+        titleRole: "name"
     }
 
     Util.SelectableDelegateModel {
