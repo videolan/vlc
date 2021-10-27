@@ -263,14 +263,6 @@ Filter(filter_t *filter, picture_t *input)
         sys->order = 1;
     }
 
-    if (sys->missing_frames >= 2)
-    {
-        assert(sys->missing_frames == 2);
-        /* Not enough input frame to produce an output */
-        assert(!output);
-        goto finally_2;
-    }
-
     for (unsigned i = 0; i < 3; ++i)
     {
         int ret = DrawPlane(filter, i);
