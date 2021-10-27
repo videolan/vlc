@@ -35,6 +35,9 @@ FocusScope {
 
     property var fadeColor: undefined
 
+    // NOTE: We want buttons to be centered verticaly but configurable.
+    property int buttonMargin: height / 2 - button.height / 2
+
     property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
 
     property bool keyNavigationWraps : false
@@ -89,6 +92,9 @@ FocusScope {
     property alias fadeRectTopHovered: fadeRectTop.isHovered
 
     property alias listScrollBar: scroll_id
+
+    property alias buttonLeft: buttonLeft
+    property alias buttonRight: buttonRight
 
     // Signals
 
@@ -208,7 +214,7 @@ FocusScope {
         section.delegate: sectionHeading
 
         boundsBehavior: Flickable.StopAtBounds
-        boundsMovement :Flickable.StopAtBounds
+        boundsMovement: Flickable.StopAtBounds
 
         // NOTE: We always want a valid 'currentIndex' by default.
         onCountChanged: if (count && currentIndex === -1) currentIndex = 0
@@ -382,23 +388,34 @@ FocusScope {
         }
     }
 
-    RoundButton {
-        id: leftBtn
+    // FIXME: We propbably need to upgrade these RoundButton(s) eventually. And we probably need
+    //        to have some kind of animation when switching pages.
 
-        anchors.verticalCenter: parent.verticalCenter
+    RoundButton {
+        id: buttonLeft
+
         anchors.left: parent.left
-        text:"<"
+        anchors.top: parent.top
+
+        anchors.topMargin: buttonMargin
+
+        text: '<'
+
+        visible: (view.orientation === ListView.Horizontal && !(view.atXBeginning))
+
         onClicked: listview_id.prevPage()
-        visible: view.orientation === ListView.Horizontal && !view.atXBeginning
     }
 
     RoundButton {
-        id: rightBtn
+        id: buttonRight
 
-        anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
-        text:">"
+        anchors.top: buttonLeft.top
+
+        text: '>'
+
+        visible: (view.orientation === ListView.Horizontal && !(view.atXEnd))
+
         onClicked: listview_id.nextPage()
-        visible: view.orientation === ListView.Horizontal && !view.atXEnd
     }
 }
