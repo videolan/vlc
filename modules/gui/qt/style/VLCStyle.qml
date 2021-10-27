@@ -164,9 +164,6 @@ QtObject {
     readonly property int gridCover_video_height: ( gridCover_video_width * 10.0 ) / 16
     readonly property int gridCover_video_border: dp(4, scale)
 
-    readonly property int gridCover_video_width_large: dp(406, scale)
-    readonly property int gridCover_video_height_large: ( gridCover_video_width_large * 10.0 ) / 16
-    
     readonly property int gridCover_radius: dp(4, scale)
 
     readonly property int expandCover_music_height: dp(171, scale)
@@ -185,10 +182,6 @@ QtObject {
 
     readonly property int gridItem_video_width: VLCStyle.gridCover_video_width
     readonly property int gridItem_video_height: VLCStyle.gridCover_video_height + VLCStyle.margin_xxsmall + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_normal
-
-    readonly property int gridItem_video_width_large: VLCStyle.gridCover_video_width_large
-    readonly property int gridItem_video_height_large: VLCStyle.gridCover_video_height_large + VLCStyle.margin_xxsmall + VLCStyle.fontHeight_large +
-                                              VLCStyle.margin_xxsmall + VLCStyle.fontHeight_normal
 
     readonly property int gridItemSelectedBorder: dp(8, scale)
 
