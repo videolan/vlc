@@ -65,6 +65,18 @@ struct program_bwdif {
     } loc_gather;
 };
 
+struct program_blend
+{
+    GLuint id;
+    GLuint vbo;
+
+    struct {
+        GLint vertex_pos;
+        GLint sampler;
+        GLint height;
+    } loc;
+};
+
 struct program_draw
 {
     GLuint id;
@@ -108,6 +120,7 @@ struct sys
 
     struct program_bwdif program_bwdif;
     struct program_draw program_draw;
+    struct program_blend program_blend;
 };
 
 static int
@@ -202,6 +215,40 @@ DrawPlane(filter_t *filter, unsigned plane)
     return VLC_SUCCESS;
 }
 
+static int
+DrawPlaneBlend(filter_t *filter, unsigned plane)
+{
+    struct sys *sys = filter->p_sys;
+    struct program_blend *program_blend = &sys->program_blend;
+    const opengl_vtable_t *vt = sys->vt;
+    GLenum tex_target = sys->interop->tex_target;
+
+    unsigned width = sys->tex_widths[plane];
+    unsigned height = sys->tex_heights[plane];
+
+    GLuint next = sys->next;
+
+    vt->UseProgram(program_blend->id);
+
+    vt->Uniform1i(program_blend->loc.sampler, 0);
+    vt->ActiveTexture(GL_TEXTURE0);
+    vt->BindTexture(tex_target, sys->frames_in[next].textures[plane]);
+
+    vt->BindBuffer(GL_ARRAY_BUFFER, program_blend->vbo);
+    vt->EnableVertexAttribArray(program_blend->loc.vertex_pos);
+    vt->VertexAttribPointer(program_blend->loc.vertex_pos, 2,
+                            GL_FLOAT, GL_FALSE, 0, (const void *) 0);
+
+    vt->Uniform1f(program_blend->loc.height, height);
+
+    vt->Viewport(0, 0, width, height);
+
+    vt->Clear(GL_COLOR_BUFFER_BIT);
+    vt->DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    return VLC_SUCCESS;
+}
+
 static picture_t *
 Filter(filter_t *filter, picture_t *input)
 {
@@ -249,11 +296,30 @@ Filter(filter_t *filter, picture_t *input)
         sys->order = 1;
     }
 
-    for (unsigned i = 0; i < 3; ++i)
+    if (sys->missing_frames == 0)
     {
-        int ret = DrawPlane(filter, i);
-        if (ret != VLC_SUCCESS)
-            goto finally_2;
+        for (unsigned i = 0; i < 3; ++i)
+        {
+            int ret = DrawPlane(filter, i);
+            if (ret != VLC_SUCCESS)
+                goto finally_2;
+        }
+    }
+    else if (sys->missing_frames == 1)
+    {
+        /* Not enough input frame to produce a bwdif output */
+        goto finally_2;
+    }
+    else
+    {
+        assert(sys->missing_frames == 2);
+        /* Use a blend filter for the very first frame */
+        for (unsigned i = 0; i < 3; ++i)
+        {
+            int ret = DrawPlaneBlend(filter, i);
+            if (ret != VLC_SUCCESS)
+                goto finally_2;
+        }
     }
 
     struct program_draw *program_draw = &sys->program_draw;
@@ -775,6 +841,111 @@ DeleteProgramBwdif(filter_t *filter)
 }
 
 static int
+CreateProgramBlend(filter_t *filter)
+{
+    static const char *const VERTEX_SHADER_BODY =
+        "attribute vec2 vertex_pos;\n"
+        "varying vec2 tex_coords;\n"
+        "varying vec2 tex_coords_up;\n"
+        "uniform float height;\n"
+        "void main() {\n"
+        "  gl_position = vec4(vertex_pos, 0.0, 1.0)\n"
+        "  tex_coords = (vertex_pos + vec2(1.0)) / 2.0;\n"
+        "  tex_coords_up = tex_coords + 1.0 / height;\n"
+        "}\n";
+
+    static const char *const FRAGMENT_SHADER_BODY =
+        "uniform VLC_SAMPLER sampler;\n"
+        "varying vec2 tex_coords;\n"
+        "varying vec2 tex_coords_up;\n"
+        "void main() {\n"
+        "  vec4 pix = VLC_TEXTURE(tex_coords);\n"
+        "  vec4 pix_up = VLC_TEXTURE(tex_coords_up);\n"
+        "  gl_FragColor = (pix + pix_up) / 2.0;\n"
+        "}\n";
+
+    struct sys *sys = filter->p_sys;
+    const opengl_vtable_t *vt = sys->vt;
+
+    const char *shader_version;
+    const char *shader_precision;
+    if (sys->api.is_gles)
+    {
+        shader_version = "#version 100\n";
+        shader_precision = "precision highp float;\n";
+    }
+    else
+    {
+        shader_version = "#version 120\n";
+        shader_precision = "";
+    }
+
+    const char *defines = GetDefines(sys->interop->tex_target);
+
+    struct program_blend *program_blend = &sys->program_blend;
+
+    const char *vertex_shader[] = {
+        shader_version,
+        shader_precision,
+        VERTEX_SHADER_BODY,
+    };
+
+    const char *fragment_shader[] = {
+        shader_version,
+        shader_precision,
+        defines,
+        FRAGMENT_SHADER_BODY,
+    };
+
+    program_blend->id =
+        vlc_gl_BuildProgram(VLC_OBJECT(filter), vt,
+                            ARRAY_SIZE(vertex_shader), vertex_shader,
+                            ARRAY_SIZE(fragment_shader), fragment_shader);
+    if (!program_blend->id)
+        return VLC_EGENERIC;
+
+    program_blend->loc.vertex_pos =
+        vt->GetAttribLocation(program_blend->id, "vertex_pos");
+    assert(program_blend->loc.vertex_pos != -1);
+
+    program_blend->loc.sampler =
+        vt->GetUniformLocation(program_blend->id, "sampler");
+    assert(program_blend->loc.sampler != -1);
+
+    program_blend->loc.height =
+        vt->GetUniformLocation(program_blend->id, "height");
+    assert(program_blend->loc.height != -1);
+
+    vt->GenBuffers(1, &program_blend->vbo);
+
+    static const GLfloat vertex_pos[] = {
+        -1,  1,
+        -1, -1,
+         1,  1,
+         1, -1,
+    };
+
+    vt->BindBuffer(GL_ARRAY_BUFFER, program_blend->vbo);
+    vt->BufferData(GL_ARRAY_BUFFER, sizeof(vertex_pos), vertex_pos,
+                   GL_STATIC_DRAW);
+
+    vt->BindBuffer(GL_ARRAY_BUFFER, 0);
+
+    return VLC_SUCCESS;
+}
+
+static void
+DeleteProgramBlend(filter_t *filter)
+{
+    struct sys *sys = filter->p_sys;
+    struct program_blend *program_blend = &sys->program_blend;
+    const opengl_vtable_t *vt = sys->vt;
+
+    vt->DeleteProgram(program_blend->id);
+    vt->DeleteBuffers(1, &program_blend->vbo);
+}
+
+static int
 CreateProgramDraw(filter_t *filter, video_color_space_t yuv_space, bool vflip)
 {
     static const char *const VERTEX_SHADER_BODY =
@@ -906,6 +1077,7 @@ Close(filter_t *filter)
     vlc_gl_MakeCurrent(sys->gl);
 
     DeleteProgramBwdif(filter);
+    DeleteProgramBlend(filter);
     DeleteProgramDraw(filter);
 
     DeletePlanes(filter);
@@ -1031,6 +1203,10 @@ Open(vlc_object_t *obj, const char *name)
     if (ret != VLC_SUCCESS)
         goto create_program_bwdif_failure;
 
+    ret = CreateProgramBlend(filter);
+    if (ret != VLC_SUCCESS)
+        goto create_program_blend_failure;
+
     ret = InitPlanes(filter);
     if (ret != VLC_SUCCESS)
         goto init_planes_failure;
@@ -1072,6 +1248,8 @@ Open(vlc_object_t *obj, const char *name)
 create_program_draw_failure:
     DeletePlanes(filter);
 init_planes_failure:
+    DeleteProgramBlend(filter);
+create_program_blend_failure:
     DeleteProgramBwdif(filter);
 create_program_bwdif_failure:
     for (unsigned i = 0; i < 3; ++i) {
