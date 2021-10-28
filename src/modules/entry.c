@@ -369,8 +369,12 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
             break;
 
         case VLC_CONFIG_PRIVATE:
-            item->b_internal = true;
+        {
+            struct vlc_param *param = container_of (item, struct vlc_param,
+                                                    item);
+            param->internal = true;
             break;
+        }
 
         case VLC_CONFIG_REMOVED:
             item->b_removed = true;

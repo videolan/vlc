@@ -25,6 +25,7 @@
 
 struct vlc_param {
     unsigned char shortname; /**< Optional short option name */
+    unsigned internal:1; /**< Hidden from preferences and help */
     struct module_config_t item;
 };
 
