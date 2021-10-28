@@ -34,6 +34,10 @@ FocusScope {
 
     // Properties
 
+    readonly property int contentMargin: (mainInterface.gridView
+                                          &&
+                                          _currentView) ? _currentView.contentMargin : 0
+
     // NOTE: Specify an optionnal header for the view.
     property Component header: undefined
 
