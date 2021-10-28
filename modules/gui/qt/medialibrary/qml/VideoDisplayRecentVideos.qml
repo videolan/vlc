@@ -32,14 +32,15 @@ FocusScope {
 
     // Properties
 
-    property int leftPadding: VLCStyle.margin_xlarge
-    property int rightPadding: VLCStyle.margin_xlarge
-
     property Item focusItem: recentVideosListView
 
     property int currentIndex: -1
 
     property var model: undefined;
+
+    // Properties
+
+    property int displayMargins: 0
 
     // Settings
 
@@ -83,8 +84,13 @@ FocusScope {
 
         Widgets.SubtitleLabel {
             id: continueWatchingLabel
-            leftPadding: VLCStyle.margin_xlarge
-            width: parent.width
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            // NOTE: We want this to be properly aligned with the grid items.
+            anchors.leftMargin: VLCStyle.margin_normal
+
             text: i18n.qtr("Continue Watching")
         }
 
@@ -92,18 +98,30 @@ FocusScope {
             id: recentVideosListView
 
             width: parent.width
-            implicitHeight: VLCStyle.gridItem_video_height_large + VLCStyle.gridItemSelectedBorder + VLCStyle.margin_xlarge
+
+            implicitHeight: VLCStyle.gridItem_video_height + VLCStyle.gridItemSelectedBorder
+                            +
+                            VLCStyle.margin_xlarge
+
             spacing: VLCStyle.column_margin_width
+
+            // NOTE: Sometimes, we want items to be visible on the sides.
+            displayMarginBeginning: root.displayMargins
+            displayMarginEnd: root.displayMargins
+
+            // NOTE: We want navigation buttons to be centered on the item cover.
+            buttonMargin: VLCStyle.margin_xsmall + VLCStyle.gridCover_video_height / 2 - buttonLeft.height / 2
+
             orientation: ListView.Horizontal
 
             focus: true
 
-            Navigation.parentItem: root
-
             model: root.model
 
+            Navigation.parentItem: root
+
             header: Item {
-                width: VLCStyle.margin_xlarge
+                width: VLCStyle.margin_normal
             }
 
             delegate: VideoGridItem {
@@ -111,8 +129,8 @@ FocusScope {
 
                 x: selectedBorderWidth
                 y: selectedBorderWidth
-                pictureWidth: VLCStyle.gridCover_video_width_large
-                pictureHeight: VLCStyle.gridCover_video_height_large
+                pictureWidth: VLCStyle.gridCover_video_width
+                pictureHeight: VLCStyle.gridCover_video_height
 
                 focus: true
 
@@ -148,7 +166,7 @@ FocusScope {
             }
 
             footer: Item {
-                width: VLCStyle.margin_xlarge
+                width: VLCStyle.margin_normal
             }
 
             onSelectionUpdated: recentVideoSelection.updateSelection( keyModifiers, oldIndex, newIndex )
@@ -160,8 +178,8 @@ FocusScope {
             Widgets.GridShadows {
                 id: shadows
 
-                coverWidth: VLCStyle.gridCover_video_width_large
-                coverHeight: VLCStyle.gridCover_video_height_large
+                coverWidth: VLCStyle.gridCover_video_width
+                coverHeight: VLCStyle.gridCover_video_height
             }
         }
     }
