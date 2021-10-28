@@ -343,9 +343,10 @@ static int vlc_swidth(const char *str)
     }
 }
 
-static void print_item(const module_t *m, const module_config_t *item,
+static void print_item(const module_t *m, const struct vlc_param *param,
                        const module_config_t **section, bool color, bool desc)
 {
+    const module_config_t *item = &param->item;
 #ifndef _WIN32
 # define OPTION_VALUE_SEP " "
 #else
@@ -566,7 +567,8 @@ static bool plugin_show(const vlc_plugin_t *plugin)
 {
     for (size_t i = 0; i < plugin->conf.size; i++)
     {
-        const module_config_t *item = plugin->conf.items + i;
+        const struct vlc_param *param = plugin->conf.params + i;
+        const module_config_t *item = &param->item;
 
         if (!CONFIG_ITEM(item->i_type))
             continue;
@@ -624,7 +626,8 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
         /* Print module options */
         for (size_t j = 0; j < p->conf.size; j++)
         {
-            const module_config_t *item = p->conf.items + j;
+            const struct vlc_param *param = p->conf.params + j;
+            const module_config_t *item = &param->item;
 
             if (item->b_removed)
                 continue; /* Skip removed options */

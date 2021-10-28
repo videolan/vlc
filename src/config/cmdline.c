@@ -116,7 +116,8 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
     {
         for (size_t i = 0; i < p->conf.size; i++)
         {
-            const module_config_t *p_item = p->conf.items + i;
+            const struct vlc_param *param = p->conf.params + i;
+            const module_config_t *p_item = &param->item;
 
             /* Ignore hints */
             if( !CONFIG_ITEM(p_item->i_type) )

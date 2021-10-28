@@ -178,8 +178,10 @@ static int vlc_cache_load_align(size_t align, block_t *file)
     if (vlc_cache_load_align(alignof(t), file)) \
         goto error
 
-static int vlc_cache_load_config(module_config_t *cfg, block_t *file)
+static int vlc_cache_load_config(struct vlc_param *param, block_t *file)
 {
+    module_config_t *cfg = &param->item;
+
     LOAD_IMMEDIATE (cfg->i_type);
     LOAD_IMMEDIATE (cfg->i_short);
     LOAD_FLAG (cfg->b_internal);
@@ -248,24 +250,25 @@ static int vlc_cache_load_plugin_config(vlc_plugin_t *plugin, block_t *file)
     /* Allocate memory */
     if (lines)
     {
-        plugin->conf.items = calloc(sizeof (module_config_t), lines);
-        if (unlikely(plugin->conf.items == NULL))
+        plugin->conf.params = calloc(sizeof (struct vlc_param), lines);
+        if (unlikely(plugin->conf.params == NULL))
         {
             plugin->conf.size = 0;
             return -1;
         }
     }
     else
-        plugin->conf.items = NULL;
+        plugin->conf.params = NULL;
 
     plugin->conf.size = lines;
 
     /* Do the duplication job */
     for (size_t i = 0; i < lines; i++)
     {
-        module_config_t *item = plugin->conf.items + i;
+        struct vlc_param *param = plugin->conf.params + i;
+        module_config_t *item = &param->item;
 
-        if (vlc_cache_load_config(item, file))
+        if (vlc_cache_load_config(param, file))
             return -1;
 
         if (CONFIG_ITEM(item->i_type))
@@ -506,8 +509,10 @@ static int CacheSaveAlign(FILE *file, size_t align)
     if (CacheSaveAlign(file, alignof (t))) \
         goto error
 
-static int CacheSaveConfig (FILE *file, const module_config_t *cfg)
+static int CacheSaveConfig(FILE *file, const struct vlc_param *param)
 {
+    const module_config_t *cfg = &param->item;
+
     SAVE_IMMEDIATE (cfg->i_type);
     SAVE_IMMEDIATE (cfg->i_short);
     SAVE_FLAG (cfg->b_internal);
@@ -556,7 +561,7 @@ static int CacheSaveModuleConfig(FILE *file, const vlc_plugin_t *plugin)
     SAVE_IMMEDIATE (lines);
 
     for (size_t i = 0; i < lines; i++)
-        if (CacheSaveConfig(file, plugin->conf.items + i))
+        if (CacheSaveConfig(file, plugin->conf.params + i))
            goto error;
 
     return 0;

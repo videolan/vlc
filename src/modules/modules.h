@@ -25,6 +25,8 @@
 
 # include <stdatomic.h>
 
+struct vlc_param;
+
 /** VLC plugin */
 typedef struct vlc_plugin_t
 {
@@ -39,7 +41,7 @@ typedef struct vlc_plugin_t
      */
     struct
     {
-        module_config_t *items; /**< Table of configuration items */
+        struct vlc_param *params; /**< Table of configuration items */
         size_t size; /**< Total count of all items */
         size_t count; /**< Count of real options (excludes hints) */
         size_t booleans; /**< Count of options that are of boolean type */

@@ -351,7 +351,9 @@ module_config_t *module_config_get( const module_t *module, unsigned *restrict p
     unsigned i, j;
     for( i = 0, j = 0; i < size; i++ )
     {
-        const module_config_t *item = plugin->conf.items + i;
+        const struct vlc_param *param = plugin->conf.params + i;
+        const module_config_t *item = &param->item;
+
         if( item->b_internal /* internal option */
          || item->b_removed /* removed option */ )
             continue;

@@ -23,9 +23,13 @@
 
 /* Internal configuration prototypes and structures */
 
+struct vlc_param {
+    struct module_config_t item;
+};
+
 int  config_AutoSaveConfigFile( vlc_object_t * );
 
-void config_Free (module_config_t *, size_t);
+void config_Free(struct vlc_param *, size_t);
 
 int config_LoadCmdLine   ( vlc_object_t *, int, const char *[], int * );
 int config_LoadConfigFile( vlc_object_t * );

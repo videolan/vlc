@@ -99,7 +99,7 @@ vlc_plugin_t *vlc_plugin_create(void)
 
     plugin->modules_count = 0;
     plugin->textdomain = NULL;
-    plugin->conf.items = NULL;
+    plugin->conf.params = NULL;
     plugin->conf.size = 0;
     plugin->conf.count = 0;
     plugin->conf.booleans = 0;
@@ -129,7 +129,7 @@ void vlc_plugin_destroy(vlc_plugin_t *plugin)
     if (plugin->module != NULL)
         vlc_module_destroy(plugin->module);
 
-    config_Free(plugin->conf.items, plugin->conf.size);
+    config_Free(plugin->conf.params, plugin->conf.size);
 #ifdef HAVE_DYNAMIC_PLUGINS
     free(plugin->abspath);
     free(plugin->path);
@@ -140,7 +140,7 @@ void vlc_plugin_destroy(vlc_plugin_t *plugin)
 static module_config_t *vlc_config_create(vlc_plugin_t *plugin, int type)
 {
     unsigned confsize = plugin->conf.size;
-    module_config_t *tab = plugin->conf.items;
+    struct vlc_param *tab = plugin->conf.params;
 
     if ((confsize & 0xf) == 0)
     {
@@ -148,24 +148,27 @@ static module_config_t *vlc_config_create(vlc_plugin_t *plugin, int type)
         if (tab == NULL)
             return NULL;
 
-        plugin->conf.items = tab;
+        plugin->conf.params = tab;
     }
 
     memset (tab + confsize, 0, sizeof (tab[confsize]));
-    tab += confsize;
-    tab->owner = plugin;
+
+    struct vlc_param *param = tab + confsize;
+    struct module_config_t *item = &param->item;
+
+    item->owner = plugin;
 
     if (IsConfigIntegerType (type))
     {
-        tab->max.i = INT64_MAX;
-        tab->min.i = INT64_MIN;
+        item->max.i = INT64_MAX;
+        item->min.i = INT64_MIN;
     }
     else if( IsConfigFloatType (type))
     {
-        tab->max.f = FLT_MAX;
-        tab->min.f = -FLT_MAX;
+        item->max.f = FLT_MAX;
+        item->min.f = -FLT_MAX;
     }
-    tab->i_type = type;
+    item->i_type = type;
 
     if (CONFIG_ITEM(type))
     {
@@ -175,7 +178,7 @@ static module_config_t *vlc_config_create(vlc_plugin_t *plugin, int type)
     }
     plugin->conf.size++;
 
-    return tab;
+    return item;
 }
 
 /**

@@ -427,7 +427,6 @@ int config_SaveConfigFile (vlc_object_t *p_this)
     for (vlc_plugin_t *p = vlc_plugins; p != NULL; p = p->next)
     {
         module_t *p_parser = p->module;
-        module_config_t *p_item, *p_end;
 
         if (p->conf.count == 0)
             continue;
@@ -438,10 +437,13 @@ int config_SaveConfigFile (vlc_object_t *p_this)
         else
             fprintf( file, "\n\n" );
 
-        for (p_item = p->conf.items, p_end = p_item + p->conf.size;
-             p_item < p_end;
-             p_item++)
+        for (struct vlc_param *param = p->conf.params,
+                              *end = param + p->conf.size;
+             param < end;
+             param++)
         {
+            module_config_t *p_item = &param->item;
+
             if (!CONFIG_ITEM(p_item->i_type)   /* ignore hint */
              || p_item->b_removed              /* ignore deprecated option */
              || p_item->b_unsaveable)          /* ignore volatile option */

@@ -383,21 +383,21 @@ error:
 
 static int confcmp (const void *a, const void *b)
 {
-    const module_config_t *const *ca = a, *const *cb = b;
+    const struct vlc_param *const *ca = a, *const *cb = b;
 
-    return strcmp ((*ca)->psz_name, (*cb)->psz_name);
+    return strcmp ((*ca)->item.psz_name, (*cb)->item.psz_name);
 }
 
 static int confnamecmp (const void *key, const void *elem)
 {
-    const module_config_t *const *conf = elem;
+    const struct vlc_param *const *conf = elem;
 
-    return strcmp (key, (*conf)->psz_name);
+    return strcmp (key, (*conf)->item.psz_name);
 }
 
 static struct
 {
-    module_config_t **list;
+    struct vlc_param **list;
     size_t count;
 } config = { NULL, 0 };
 
@@ -412,7 +412,7 @@ int config_SortConfig (void)
     for (p = vlc_plugins; p != NULL; p = p->next)
         nconf += p->conf.count;
 
-    module_config_t **clist = vlc_alloc (nconf, sizeof (*clist));
+    struct vlc_param **clist = vlc_alloc(nconf, sizeof (*clist));
     if (unlikely(clist == NULL))
         return VLC_ENOMEM;
 
@@ -421,12 +421,13 @@ int config_SortConfig (void)
     {
         for (size_t i = 0; i < p->conf.size; i++)
         {
-            module_config_t *item = p->conf.items + i;
+            struct vlc_param *param = p->conf.params + i;
+            module_config_t *item = &param->item;
 
             if (!CONFIG_ITEM(item->i_type))
                 continue; /* ignore hints */
             assert(index < nconf);
-            clist[index++] = item;
+            clist[index++] = param;
         }
     }
 
@@ -439,7 +440,7 @@ int config_SortConfig (void)
 
 void config_UnsortConfig (void)
 {
-    module_config_t **clist;
+    struct vlc_param **clist;
 
     clist = config.list;
     config.list = NULL;
@@ -453,9 +454,9 @@ module_config_t *config_FindConfig(const char *name)
     if (unlikely(name == NULL))
         return NULL;
 
-    module_config_t *const *p;
+    struct vlc_param *const *p;
     p = bsearch (name, config.list, config.count, sizeof (*p), confnamecmp);
-    return p ? *p : NULL;
+    return p ? &(*p)->item : NULL;
 }
 
 /**
@@ -463,11 +464,11 @@ module_config_t *config_FindConfig(const char *name)
  * \param config start of array of items
  * \param confsize number of items in the array
  */
-void config_Free (module_config_t *tab, size_t confsize)
+void config_Free(struct vlc_param *tab, size_t confsize)
 {
     for (size_t j = 0; j < confsize; j++)
     {
-        module_config_t *p_item = &tab[j];
+        module_config_t *p_item = &tab[j].item;
 
         if (IsConfigStringType (p_item->i_type))
         {
@@ -489,7 +490,8 @@ void config_ResetAll(void)
     {
         for (size_t i = 0; i < p->conf.size; i++ )
         {
-            module_config_t *p_config = p->conf.items + i;
+            struct vlc_param *param = p->conf.params + i;
+            module_config_t *p_config = &param->item;
 
             if (IsConfigIntegerType (p_config->i_type))
                 p_config->value.i = p_config->orig.i;
