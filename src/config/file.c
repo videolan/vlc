@@ -210,7 +210,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
         if (param->unsaved)
             continue;
         /* Ignore options that are obsolete */
-        if (item->b_removed)
+        if (param->obsolete)
             continue;
 
         const char *psz_option_value = ptr + 1;
@@ -446,7 +446,7 @@ int config_SaveConfigFile (vlc_object_t *p_this)
             module_config_t *p_item = &param->item;
 
             if (!CONFIG_ITEM(p_item->i_type)   /* ignore hint */
-             || p_item->b_removed              /* ignore deprecated option */
+             || param->obsolete                /* ignore deprecated option */
              || param->unsaved)                /* ignore volatile option */
                 continue;
 

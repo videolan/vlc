@@ -200,8 +200,10 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
             p_conf = config_FindConfig( psz_name );
             if( p_conf )
             {
+                struct vlc_param *param = container_of(p_conf,
+                                                       struct vlc_param, item);
                 /* Check if the option is deprecated */
-                if( p_conf->b_removed )
+                if (param->obsolete)
                 {
                     fprintf(stderr,
                             "Warning: option --%s no longer exists.\n",

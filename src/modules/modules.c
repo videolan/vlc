@@ -355,7 +355,7 @@ module_config_t *module_config_get( const module_t *module, unsigned *restrict p
         const module_config_t *item = &param->item;
 
         if (param->internal /* internal option */
-         || item->b_removed /* removed option */ )
+         || param->obsolete /* removed option */)
             continue;
 
         memcpy( config + j, item, sizeof( *config ) );

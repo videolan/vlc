@@ -381,8 +381,12 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
         }
 
         case VLC_CONFIG_REMOVED:
-            item->b_removed = true;
+        {
+            struct vlc_param *param = container_of (item, struct vlc_param,
+                                                    item);
+            param->obsolete = true;
             break;
+        }
 
         case VLC_CONFIG_CAPABILITY:
             item->psz_type = va_arg (ap, const char *);

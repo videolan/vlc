@@ -187,7 +187,7 @@ static int vlc_cache_load_config(struct vlc_param *param, block_t *file)
     LOAD_FLAG (param->internal);
     LOAD_FLAG (param->unsaved);
     LOAD_FLAG (param->safe);
-    LOAD_FLAG (cfg->b_removed);
+    LOAD_FLAG (param->obsolete);
     LOAD_STRING (cfg->psz_type);
     LOAD_STRING (cfg->psz_name);
     LOAD_STRING (cfg->psz_text);
@@ -518,7 +518,7 @@ static int CacheSaveConfig(FILE *file, const struct vlc_param *param)
     SAVE_FLAG (param->internal);
     SAVE_FLAG (param->unsaved);
     SAVE_FLAG (param->safe);
-    SAVE_FLAG (cfg->b_removed);
+    SAVE_FLAG (param->obsolete);
     SAVE_STRING (cfg->psz_type);
     SAVE_STRING (cfg->psz_name);
     SAVE_STRING (cfg->psz_text);

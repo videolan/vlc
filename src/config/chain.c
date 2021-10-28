@@ -361,7 +361,9 @@ void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
          * with slight changes */
         if( p_conf )
         {
-            if( p_conf->b_removed )
+            struct vlc_param *param = container_of(p_conf, struct vlc_param,
+                                                   item);
+            if (param->obsolete)
             {
                 msg_Err( p_this, "Option %s is not supported anymore.",
                          name );

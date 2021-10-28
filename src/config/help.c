@@ -572,7 +572,7 @@ static bool plugin_show(const vlc_plugin_t *plugin)
 
         if (!CONFIG_ITEM(item->i_type))
             continue;
-        if (item->b_removed)
+        if (param->obsolete)
             continue;
         return true;
     }
@@ -627,9 +627,8 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
         for (size_t j = 0; j < p->conf.size; j++)
         {
             const struct vlc_param *param = p->conf.params + j;
-            const module_config_t *item = &param->item;
 
-            if (item->b_removed)
+            if (param->obsolete)
                 continue; /* Skip removed options */
 
             print_item(m, param, &section, color, desc);

@@ -75,7 +75,6 @@ typedef int (*vlc_integer_list_cb)(const char *, int64_t **, char ***);
 struct module_config_t
 {
     uint8_t     i_type; /**< Configuration type */
-    unsigned    b_removed:1; /**< Obsolete */
 
     const char *psz_type; /**< Configuration subtype */
     const char *psz_name; /**< Option name */
