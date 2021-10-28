@@ -63,8 +63,7 @@ VideoAll {
         width: root.width
 
         topPadding: VLCStyle.margin_normal
-
-        spacing: VLCStyle.margin_normal
+        bottomPadding: VLCStyle.margin_normal
 
         // NOTE: We want the header to be visible when we have at least one media visible.
         //       Otherwise it overlaps the default caption.
@@ -83,7 +82,10 @@ VideoAll {
         Loader {
             id: loader
 
-            width: parent.width
+            anchors.left : parent.left
+            anchors.right: parent.right
+
+            anchors.margins: root.contentMargin
 
             height: (status === Loader.Ready) ? item.implicitHeight : 0
 
@@ -95,6 +97,9 @@ VideoAll {
                 id: component
 
                 width: parent.width
+
+                // NOTE: We want grid items to be visible on the sides.
+                displayMargins: root.contentMargin
 
                 model: modelRecent
 
@@ -109,10 +114,11 @@ VideoAll {
         }
 
         Widgets.SubtitleLabel {
-            width: root.width
+            anchors.left: loader.left
+            anchors.right: loader.right
 
-            leftPadding  : VLCStyle.margin_xlarge
-            bottomPadding: VLCStyle.margin_xsmall
+            // NOTE: We want this to be properly aligned with the grid items.
+            anchors.leftMargin: VLCStyle.margin_normal
 
             text: i18n.qtr("Videos")
         }
