@@ -205,8 +205,9 @@ int config_LoadConfigFile( vlc_object_t *p_this )
         if (item == NULL)
             continue;
 
+        struct vlc_param *param = container_of (item, struct vlc_param, item);
         /* Reject values of options that are unsaveable */
-        if (item->b_unsaveable)
+        if (param->unsaved)
             continue;
         /* Ignore options that are obsolete */
         if (item->b_removed)
@@ -446,7 +447,7 @@ int config_SaveConfigFile (vlc_object_t *p_this)
 
             if (!CONFIG_ITEM(p_item->i_type)   /* ignore hint */
              || p_item->b_removed              /* ignore deprecated option */
-             || p_item->b_unsaveable)          /* ignore volatile option */
+             || param->unsaved)                /* ignore volatile option */
                 continue;
 
             if (IsConfigIntegerType (p_item->i_type))

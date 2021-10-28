@@ -365,8 +365,12 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
         }
 
         case VLC_CONFIG_VOLATILE:
-            item->b_unsaveable = true;
+        {
+            struct vlc_param *param = container_of (item, struct vlc_param,
+                                                    item);
+            param->unsaved = true;
             break;
+        }
 
         case VLC_CONFIG_PRIVATE:
         {
@@ -393,8 +397,12 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
         }
 
         case VLC_CONFIG_SAFE:
-            item->b_safe = true;
+        {
+            struct vlc_param *param = container_of (item, struct vlc_param,
+                                                    item);
+            param->safe = true;
             break;
+        }
 
         case VLC_CONFIG_DESC:
             item->psz_text = va_arg (ap, const char *);
