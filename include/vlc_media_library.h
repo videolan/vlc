@@ -542,6 +542,7 @@ enum vlc_ml_control
     VLC_ML_MEDIA_GET_ALL_MEDIA_PLAYBACK_STATES, /**< arg1: media id; arg2(out): vlc_ml_playback_states_all* */
     VLC_ML_MEDIA_SET_ALL_MEDIA_PLAYBACK_STATES, /**< arg1: media id; arg2: const vlc_ml_playback_states_all* */
     VLC_ML_MEDIA_SET_THUMBNAIL,             /**< arg1: media id; arg2: const char*; arg3: vlc_ml_thumbnail_size_t */
+    VLC_ML_MEDIA_SET_GENRE_THUMBNAIL,       /**< arg1: media id; arg2: const char*; arg3: vlc_ml_thumbnail_size_t */
     VLC_ML_MEDIA_GENERATE_THUMBNAIL,        /**< arg1: media id; arg2: vlc_ml_thumbnail_size_t; arg3: width; arg4: height; arg5: position */
     VLC_ML_MEDIA_ADD_EXTERNAL_MRL,          /**< arg1: media id; arg2: const char*; arg3: type(vlc_ml_file_type_t) */
     VLC_ML_MEDIA_SET_TYPE,                  /**< arg1: media id; arg2: vlc_ml_media_type_t */
@@ -1012,6 +1013,13 @@ static inline int vlc_ml_media_set_thumbnail( vlc_medialibrary_t* p_ml, int64_t 
 {
     return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_THUMBNAIL, i_media_id, psz_mrl, sizeType );
 }
+
+static inline int vlc_ml_media_set_genre_thumbnail( vlc_medialibrary_t* p_ml, int64_t i_media_id,
+                                              const char* psz_mrl, vlc_ml_thumbnail_size_t sizeType )
+{
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_GENRE_THUMBNAIL, i_media_id, psz_mrl, sizeType );
+}
+
 
 static inline int vlc_ml_media_generate_thumbnail( vlc_medialibrary_t* p_ml, int64_t i_media_id,
                                                    vlc_ml_thumbnail_size_t size_type,

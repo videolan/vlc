@@ -611,6 +611,18 @@ int MediaLibrary::Control( int query, va_list args )
 
             return controlMedia( query, args );
         }
+        case VLC_ML_MEDIA_SET_GENRE_THUMBNAIL:
+        {
+            auto priorityAccess = m_ml->acquirePriorityAccess();
+
+            auto id = va_arg( args, int64_t );
+            auto mrl = va_arg( args, const char* );
+            auto sizeType = va_arg( args, int );
+            auto genre = m_ml->genre( id );
+            if ( !genre || !genre->setThumbnail( mrl, static_cast<medialibrary::ThumbnailSizeType>( sizeType ), true ) )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
         case VLC_ML_PLAYLIST_CREATE:
         {
             auto priorityAccess = m_ml->acquirePriorityAccess();
