@@ -18,6 +18,7 @@ LTLIBVLCCORE = $(top_builddir)/src/libvlccore.la
 MODULE_STRING = $$(p="$@"; p="$${p\#\#*/}"; p="$${p\#lib}"; p="$${p%_plugin*}"; p=$$(echo "$$p"|sed 's/-/_/g'); p="$${p%.lo}"; echo "$$p")
 MODULE_NAME = $$(p="$@"; p=$$(echo "$$p"|sed 's/lib//g'); p="$${p%_plugin*}"; p=$$(echo "$$p"|sed 's/[-\/]/_/g'); p="$${p%.lo}"; echo "$$p")
 MODULE_FULLNAME = $$(p="$@"; p="$${p\#lib}"; p="$${p%_plugin*}"; p=$$(echo "$$p"|sed 's/[-\/]/_/g'); p="$${p%.lo}"; echo "$$p")
+MODULE_STATIC = $$(p="$@"; if [ "$$p" = "libglbwdif_plugin.la" ]; then echo "-shared"; else echo "-static"; fi)
 
 AM_CPPFLAGS = -DMODULE_STRING=\"$(MODULE_STRING)\"
 AM_LDFLAGS = \
@@ -30,11 +31,11 @@ if HAVE_DYNAMIC_PLUGINS
 
 if HAVE_MERGE_PLUGINS
 AM_CPPFLAGS += -DMODULE_NAME=$(MODULE_NAME)
-AM_LDFLAGS += -static
+AM_LDFLAGS += $(MODULE_STATIC)
 else
 if HAVE_STATIC_LIBVLC
 AM_CPPFLAGS += -DMODULE_NAME=$(MODULE_NAME)
-AM_LDFLAGS += -static
+AM_LDFLAGS += $(MODULE_STATIC)
 else
 AM_CPPFLAGS += -D__PLUGIN__
 endif
@@ -42,7 +43,7 @@ endif
 
 else
 AM_CPPFLAGS += -DMODULE_NAME=$(MODULE_FULLNAME)
-AM_LDFLAGS += -static
+AM_LDFLAGS += $(MODULE_STATIC)
 endif
 AM_CFLAGS =
 AM_CXXFLAGS =

@@ -251,21 +251,20 @@ video_filter_LTLIBRARIES += libglyadif_plugin.la
 endif
 
 libglbwdif_plugin_la_SOURCES = video_filter/deinterlace/glbwdif.c
-libglbwdif_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
+libglbwdif_plugin_la_LDFLAGS = $(AM_LDFLAGS)
+if HAVE_DARWIN
+if !HAVE_OSX
+libglbwdif_plugin_la_LDFLAGS += -Xlinker -install_name -Xlinker @rpath/glbwdif_plugin.framework/glbwdif
+libglbwdif_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
+libglbwdif_plugin_la_CPPFLAGS = -DUSE_OPENGL_ES2=1 -D__PLUGIN__ -DMODULE_NAME=$(MODULE_NAME) -DMODULE_STRING=\"$(MODULE_STRING)\"
+else
+libglbwdif_plugin_la_LIBADD = libvlc_opengl.la $(GL_LIBS)
+endif
+video_filter_LTLIBRARIES += libglbwdif_plugin.la
+endif
+
 if HAVE_GL
 libglbwdif_plugin_la_LIBADD = libvlc_opengl.la $(GL_LIBS)
-video_filter_LTLIBRARIES += libglbwdif_plugin.la
-endif
-
-if HAVE_IOS
-libglbwdif_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
-libglbwdif_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
-video_filter_LTLIBRARIES += libglbwdif_plugin.la
-endif
-
-if HAVE_TVOS
-libglbwdif_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
-libglbwdif_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
 video_filter_LTLIBRARIES += libglbwdif_plugin.la
 endif
 

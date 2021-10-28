@@ -12,8 +12,8 @@ ALL_TARGETS := $(ALL_TARGETS_2:libvlc_plugin.la=)
 #  3/ rename every plugin name back into the target name
 ALL_TARGETS_PLUGIN_RENAMED := $(ALL_TARGETS:%_plugin.la=%)
 PLUGINS_NAMES := $(ALL_TARGETS_PLUGIN_RENAMED:%.la=)
-PLUGINS := $(PLUGINS_NAMES:%=%_plugin.la)
-#PLUGINS := $(PLUGINS_1:libytdl_plugin.la=)
+PLUGINS1 := $(PLUGINS_NAMES:%=%_plugin.la)
+PLUGINS := $(PLUGINS1:libglbwdif_plugin.la=)
 
 PARTIAL_PLUGINS := $(PLUGINS:%_plugin.la=%_plugin.partial.la)
 
