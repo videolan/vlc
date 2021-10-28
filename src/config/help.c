@@ -496,8 +496,8 @@ static void print_item(const module_t *m, const struct vlc_param *param,
 
     /* Add short option if any */
     char shortopt[4];
-    if (item->i_short != '\0')
-        sprintf(shortopt, "-%c,", item->i_short);
+    if (param->shortname != '\0')
+        sprintf(shortopt, "-%c,", param->shortname);
     else
         strcpy(shortopt, "   ");
 
@@ -632,7 +632,7 @@ static void Usage (vlc_object_t *p_this, char const *psz_search)
             if (item->b_removed)
                 continue; /* Skip removed options */
 
-            print_item(m, item, &section, color, desc);
+            print_item(m, param, &section, color, desc);
         }
     }
 

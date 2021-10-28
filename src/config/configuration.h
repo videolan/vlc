@@ -24,6 +24,7 @@
 /* Internal configuration prototypes and structures */
 
 struct vlc_param {
+    unsigned char shortname; /**< Optional short option name */
     struct module_config_t item;
 };
 

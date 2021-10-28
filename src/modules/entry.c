@@ -381,8 +381,12 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
             break;
 
         case VLC_CONFIG_SHORTCUT:
-            item->i_short = va_arg (ap, int);
+        {
+            struct vlc_param *param = container_of (item, struct vlc_param,
+                                                    item);
+            param->shortname = va_arg(ap, int);
             break;
+        }
 
         case VLC_CONFIG_SAFE:
             item->b_safe = true;

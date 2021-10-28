@@ -157,13 +157,13 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
             i_index++;
 
             /* If item also has a short option, add it */
-            if( p_item->i_short )
+            if (param->shortname)
             {
-                pp_shortopts[(int)p_item->i_short] = p_item;
-                psz_shortopts[i_shortopts] = p_item->i_short;
-                i_shortopts++;
+                pp_shortopts[param->shortname] = p_item;
+                psz_shortopts[i_shortopts++] = param->shortname;
+
                 if( p_item->i_type != CONFIG_ITEM_BOOL
-                 && p_item->i_short != 'v' )
+                 && param->shortname != 'v' )
                 {
                     psz_shortopts[i_shortopts] = ':';
                     i_shortopts++;
