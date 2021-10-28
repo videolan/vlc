@@ -21,10 +21,6 @@
 #ifndef LIBVLC_CONFIGURATION_H
 # define LIBVLC_CONFIGURATION_H 1
 
-# ifdef __cplusplus
-extern "C" {
-# endif
-
 /* Internal configuration prototypes and structures */
 
 int  config_AutoSaveConfigFile( vlc_object_t * );
@@ -58,7 +54,4 @@ char *config_GetLibDir(void) VLC_USED VLC_MALLOC;
 /* The configuration file */
 #define CONFIG_FILE                     "vlcrc"
 
-# ifdef __cplusplus
-}
-# endif
 #endif
