@@ -214,12 +214,13 @@ ssize_t config_GetIntChoices(const char *name,
     module_config_t *cfg = config_FindConfigChecked(name);
     assert(cfg != NULL);
 
+    struct vlc_param *param = container_of(cfg, struct vlc_param, item);
     size_t count = cfg->list_count;
     if (count == 0)
     {
         int (*cb)(const char *, int64_t **, char ***);
 
-        cb = vlc_plugin_Symbol(NULL, cfg->owner, "vlc_entry_cfg_int_enum");
+        cb = vlc_plugin_Symbol(NULL, param->owner, "vlc_entry_cfg_int_enum");
         if (cb == NULL)
             return 0;
 
@@ -324,6 +325,8 @@ ssize_t config_GetPszChoices(const char *name,
         return -1;
     }
 
+    struct vlc_param *param = container_of(cfg, struct vlc_param, item);
+
     switch (cfg->i_type)
     {
         case CONFIG_ITEM_MODULE:
@@ -342,7 +345,7 @@ ssize_t config_GetPszChoices(const char *name,
     {
         int (*cb)(const char *, char ***, char ***);
 
-        cb = vlc_plugin_Symbol(NULL, cfg->owner, "vlc_entry_cfg_str_enum");
+        cb = vlc_plugin_Symbol(NULL, param->owner, "vlc_entry_cfg_str_enum");
         if (cb == NULL)
             return 0;
 

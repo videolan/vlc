@@ -94,7 +94,6 @@ struct module_config_t
         const int  *i; /**< Table of possible integer choices */
     } list; /**< Possible choices */
     const char **list_text; /**< Human-readable names for list values */
-    void *owner; /**< Origin run-time linker module handle */
 };
 
 /**

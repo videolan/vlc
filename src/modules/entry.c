@@ -156,7 +156,7 @@ static module_config_t *vlc_config_create(vlc_plugin_t *plugin, int type)
     struct vlc_param *param = tab + confsize;
     struct module_config_t *item = &param->item;
 
-    item->owner = plugin;
+    param->owner = plugin;
 
     if (IsConfigIntegerType (type))
     {

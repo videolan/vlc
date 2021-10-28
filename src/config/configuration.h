@@ -23,7 +23,10 @@
 
 /* Internal configuration prototypes and structures */
 
+struct vlc_plugin_t;
+
 struct vlc_param {
+    struct vlc_plugin_t *owner;
     unsigned char shortname; /**< Optional short option name */
     unsigned internal:1; /**< Hidden from preferences and help */
     unsigned unsaved:1; /**< Not stored in persistent configuration */
