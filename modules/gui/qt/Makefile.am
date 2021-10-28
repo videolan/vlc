@@ -243,6 +243,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/navigation_history.cpp gui/qt/util/navigation_history.hpp \
 	gui/qt/util/item_key_event_filter.cpp \
 	gui/qt/util/item_key_event_filter.hpp \
+	gui/qt/util/flickable_scroll_handler.cpp \
+	gui/qt/util/flickable_scroll_handler.hpp \
 	gui/qt/util/qt_dirs.cpp gui/qt/util/qt_dirs.hpp \
 	gui/qt/util/qvlcapp.hpp \
 	gui/qt/util/proxycolumnmodel.hpp \
@@ -420,6 +422,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/navigation_history.moc.cpp \
 	gui/qt/util/item_key_event_filter.moc.cpp \
 	gui/qt/util/mouse_event_filter.moc.cpp \
+	gui/qt/util/flickable_scroll_handler.moc.cpp \
 	gui/qt/util/qvlcapp.moc.cpp \
 	gui/qt/util/renderer_manager.moc.cpp \
 	gui/qt/util/selectable_list_model.moc.cpp \
