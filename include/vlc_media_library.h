@@ -295,6 +295,7 @@ typedef struct vlc_ml_genre_t
     int64_t i_id;
     char* psz_name;
     size_t i_nb_tracks;
+    vlc_ml_thumbnail_t thumbnails[VLC_ML_THUMBNAIL_SIZE_COUNT];
 } vlc_ml_genre_t;
 
 typedef struct vlc_ml_media_list_t

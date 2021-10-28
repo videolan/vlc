@@ -227,6 +227,7 @@ void vlc_ml_genre_release( vlc_ml_genre_t* p_genre )
 {
     if ( p_genre == NULL )
         return;
+    vlc_ml_thumbnails_release( p_genre->thumbnails );
     free( p_genre->psz_name );
     free( p_genre );
 }
