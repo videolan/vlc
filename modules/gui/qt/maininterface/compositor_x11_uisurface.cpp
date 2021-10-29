@@ -16,8 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include <QOpenGLContext>
-#include <QPainter>
-#include <QOpenGLPaintDevice>
+#include <QOpenGLFunctions>
 #include <QQmlEngine>
 #include <QQuickWindow>
 #include <QQuickItem>

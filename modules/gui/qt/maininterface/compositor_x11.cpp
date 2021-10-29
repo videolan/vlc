@@ -16,10 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include <QX11Info>
-#include <QByteArray>
-#include <QHBoxLayout>
 #include <QWidget>
 #include <QScreen>
+
 #include "compositor_x11.hpp"
 #include "compositor_x11_renderwindow.hpp"
 #include "compositor_x11_uisurface.hpp"

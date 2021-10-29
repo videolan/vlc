@@ -17,7 +17,6 @@
  *****************************************************************************/
 #include <vlc_cxx_helpers.hpp>
 #include "compositor_x11_renderclient.hpp"
-#include <X11/extensions/Xdamage.h>
 
 #define _NET_WM_BYPASS_COMPOSITOR_NAME "_NET_WM_BYPASS_COMPOSITOR"
 

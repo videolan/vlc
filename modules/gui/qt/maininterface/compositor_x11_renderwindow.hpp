@@ -23,10 +23,8 @@
 #endif
 
 #include <memory>
-#include <set>
 
 #include <QObject>
-#include <QWidget>
 #include <QMutex>
 
 #include <xcb/xcb.h>
@@ -40,6 +38,7 @@
 
 #include "compositor_x11_utils.hpp"
 
+class QWidget;
 class QMainWindow;
 class QSocketNotifier;
 

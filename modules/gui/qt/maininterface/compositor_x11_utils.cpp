@@ -17,8 +17,6 @@
  *****************************************************************************/
 #include <vlc_cxx_helpers.hpp>
 #include "compositor_x11_utils.hpp"
-#include <cstring>
-#include <QDebug>
 
 namespace vlc {
 

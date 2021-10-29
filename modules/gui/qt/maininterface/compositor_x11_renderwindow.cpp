@@ -16,14 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include <math.h>
+
 #include <QtEvents>
 #include <QCoreApplication>
 #include <QWindow>
 #include <QQuickItem>
 #include <QX11Info>
 #include <QMainWindow>
-#include <QApplication>
-#include <QTimer>
 #include <QThread>
 #include <QSocketNotifier>
 
@@ -35,7 +34,6 @@
 
 #include <vlc_cxx_helpers.hpp>
 
-#include "util/qvlcapp.hpp"
 #include "qt.hpp"
 
 //blur behind for KDE

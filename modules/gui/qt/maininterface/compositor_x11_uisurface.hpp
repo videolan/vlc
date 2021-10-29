@@ -18,9 +18,7 @@
 #ifndef COMPOSITOR_X11_UISURFACE_HPP
 #define COMPOSITOR_X11_UISURFACE_HPP
 
-#include <QObject>
 #include <QWindow>
-#include <QOpenGLFunctions>
 #include <QQuickRenderControl>
 #include "compositor.hpp"
 
