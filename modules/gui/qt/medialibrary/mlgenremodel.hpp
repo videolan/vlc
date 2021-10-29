@@ -60,7 +60,7 @@ private:
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
 
-    QString getCover(MLGenre * genre, int index) const;
+    QString getCover(MLGenre * genre) const;
 
 private slots:
     void onCover();

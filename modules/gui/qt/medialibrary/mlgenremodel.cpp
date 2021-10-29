@@ -68,7 +68,7 @@ QVariant MLGenreModel::data(const QModelIndex &index, int role) const
     case GENRE_NB_TRACKS:
         return QVariant::fromValue( ml_genre->getNbTracks() );
     case GENRE_COVER:
-        return getCover(ml_genre, row);
+        return getCover(ml_genre);
     default :
         return QVariant();
     }
@@ -121,7 +121,7 @@ vlc_ml_sorting_criteria_t MLGenreModel::nameToCriteria(QByteArray name) const
     return M_names_to_criteria.value(name, VLC_ML_SORTING_DEFAULT);
 }
 
-QString MLGenreModel::getCover(MLGenre * genre, int index) const
+QString MLGenreModel::getCover(MLGenre * genre) const
 {
     QString cover = genre->getCover();
 
@@ -129,7 +129,7 @@ QString MLGenreModel::getCover(MLGenre * genre, int index) const
     if (cover.isNull() == false || genre->hasGenerator())
         return cover;
 
-    CoverGenerator * generator = new CoverGenerator(m_ml, genre->getId(), index);
+    CoverGenerator * generator = new CoverGenerator(m_ml, genre->getId());
 
     generator->setSize(QSize(MLGENREMODEL_COVER_WIDTH,
                              MLGENREMODEL_COVER_HEIGHT));
@@ -161,29 +161,29 @@ void MLGenreModel::onCover()
 {
     CoverGenerator * generator = static_cast<CoverGenerator *> (sender());
 
-    int index = generator->getIndex();
+    const int mlId = generator->getId().id;
 
-    // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
-    MLItem * item = this->itemCache(index);
-
-    // NOTE: When the item is no longer cached or has been moved we return right away.
-    if (item == nullptr || item->getId() != generator->getId())
+    const int count = getCount();
+    for (int i = 0; i < count; ++i)
     {
-        generator->deleteLater();
+        const auto item = itemCache(i);
+        if (item && (item->getId().id == mlId))
+        {
+            MLGenre * genre = static_cast<MLGenre *> (item);
 
-        return;
+            genre->setCover(generator->takeResult());
+            genre->setGenerator(nullptr);
+
+            vlc_ml_media_set_genre_thumbnail(ml()->vlcMl(), item->getId().id
+                                            , qtu(genre->getCover()), VLC_ML_THUMBNAIL_SMALL);
+
+            thumbnailUpdated(i);
+            return;
+        }
     }
 
-    MLGenre * genre = static_cast<MLGenre *> (item);
-
-    genre->setCover(generator->takeResult());
-
-    genre->setGenerator(nullptr);
-
-    vlc_ml_media_set_genre_thumbnail(ml()->vlcMl(), item->getId().id
-                                     , qtu(genre->getCover()), VLC_ML_THUMBNAIL_SMALL);
-
-    thumbnailUpdated(index);
+    // item is not in the cache anymore
+    generator->deleteLater();
 }
 
 //-------------------------------------------------------------------------------------------------
