@@ -334,7 +334,8 @@ void CommandsQueue::Schedule( AbstractCommand *command, EsType )
     }
     else if( command->getType() == ES_OUT_SET_GROUP_PCR )
     {
-        bufferinglevel = command->getTimes();
+        if(command->getTimes().continuous != VLC_TS_INVALID)
+            bufferinglevel = command->getTimes();
         LockedCommit();
         commands.push_back( Queueentry(nextsequence++, command) );
     }
