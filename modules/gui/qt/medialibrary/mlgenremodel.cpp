@@ -180,6 +180,9 @@ void MLGenreModel::onCover()
 
     genre->setGenerator(nullptr);
 
+    vlc_ml_media_set_genre_thumbnail(ml()->vlcMl(), item->getId().id
+                                     , qtu(genre->getCover()), VLC_ML_THUMBNAIL_SMALL);
+
     thumbnailUpdated(index);
 }
 
