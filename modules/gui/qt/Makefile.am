@@ -572,6 +572,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/pause.svg \
 	gui/qt/pixmaps/play.svg \
 	gui/qt/pixmaps/play_button.svg \
+	gui/qt/pixmaps/play_shadow.png \
 	gui/qt/pixmaps/playlist/add.svg \
 	gui/qt/pixmaps/playlist/playlist.svg \
 	gui/qt/pixmaps/playlist/remove.svg \
