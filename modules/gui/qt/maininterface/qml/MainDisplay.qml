@@ -362,8 +362,6 @@ FocusScope {
                                     top: parent.top
                                     bottom: parent.bottom
                                     left: parent.left
-
-                                    leftMargin: -(width / 2)
                                 }
 
                                 atRight: false
