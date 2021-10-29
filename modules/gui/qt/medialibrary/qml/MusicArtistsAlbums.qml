@@ -196,8 +196,6 @@ FocusScope {
                     top: parent.top
                     bottom: parent.bottom
                     right: parent.right
-
-                    rightMargin: -(width / 2)
                 }
                 sourceWidth: root.width
                 targetWidth: artistList.width
