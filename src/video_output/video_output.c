@@ -2217,13 +2217,18 @@ static void *Thread(void *object)
 
             case VOUT_STATE_SAMPLE: {
                 vlc_tick_t deadline = VLC_TICK_INVALID;
+                const bool picture_interlaced = sys->displayed.is_interlaced;
+                vout_SetInterlacingState(&vout->obj, &sys->private, picture_interlaced);
+
                 bool wait = DisplayPicture(vout, &deadline) != VLC_SUCCESS;
                 sys->state.display.deadline = deadline;
                 sys->state.display.wait = wait;
-                const bool picture_interlaced = sys->displayed.is_interlaced;
-                vout_SetInterlacingState(&vout->obj, &sys->private, picture_interlaced);
-                if (wait) sys->state.current = VOUT_STATE_CONTROL;
-                else sys->state.current = VOUT_STATE_DISPLAY;
+                if (wait)
+                    sys->state.current = VOUT_STATE_CONTROL;
+                else if(sys->displayed.next == NULL)
+                    sys->state.current = VOUT_STATE_PREPARE;
+                else
+                    sys->state.current = VOUT_STATE_DISPLAY;
                 break;
             }
 
