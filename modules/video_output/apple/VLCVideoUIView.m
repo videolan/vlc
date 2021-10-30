@@ -158,7 +158,7 @@
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationStateChanged:)
-                                                 name:UIApplicationWillResignActiveNotification
+                                                 name:UIApplicationDidEnterBackgroundNotification
                                                object:nil];
     _viewContainer = superview;
 
@@ -419,9 +419,9 @@
 {
     [self reportEvent:^{
         if ([[notification name] isEqualToString:UIApplicationWillEnterForegroundNotification])
-            vout_window_ReportVisibilityChanged(_wnd, VOUT_WINDOW_VISIBLE);
-        else if ([[notification name] isEqualToString:UIApplicationWillResignActiveNotification])
-            vout_window_ReportVisibilityChanged(_wnd, VOUT_WINDOW_NOT_VISIBLE);
+            vlc_window_ReportVisibilityChanged(_wnd, VLC_WINDOW_VISIBLE);
+        else if ([[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification])
+            vlc_window_ReportVisibilityChanged(_wnd, VLC_WINDOW_NOT_VISIBLE);
     }];
 }
 

@@ -221,7 +221,7 @@ static void Close(vlc_gl_t *gl)
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationStateChanged:)
-                                                 name:UIApplicationDidBecomeActiveNotification
+                                                 name:UIApplicationDidEnterBackgroundNotification
                                                object:nil];
     /* If size is NULL, rendering must be disabled */
     if (_appActive && self.bounds.size.width <= 1 && self.bounds.size.height <= 1)
