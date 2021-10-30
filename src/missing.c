@@ -302,4 +302,46 @@ int vlc_waitpid(pid_t pid)
     (void) pid;
     vlc_assert_unreachable();
 }
+
+VLC_WEAK
+void sout_StreamFlush(sout_stream_t *s, void *id)
+{
+    (void)s; (void)id;
+    vlc_assert_unreachable();
+}
+
+VLC_WEAK
+void *sout_StreamIdAdd(sout_stream_t *s, const es_format_t *fmt)
+{
+    (void)s; (void)fmt;
+    vlc_assert_unreachable();
+}
+
+VLC_WEAK
+void sout_StreamIdDel(sout_stream_t *s, void *id)
+{
+    (void)s; (void)id;
+    vlc_assert_unreachable();
+}
+
+VLC_WEAK
+int sout_StreamIdSend( sout_stream_t *s, void *id, block_t *b)
+{
+    (void)s; (void)id; (void)b;
+    vlc_assert_unreachable();
+}
+
+VLC_WEAK
+int sout_StreamControlVa(sout_stream_t *s, int i_query, va_list args)
+{
+    (void)s; (void)i_query; (void)args;
+    vlc_assert_unreachable();
+}
+
+VLC_WEAK
+void sout_StreamSetPCR(sout_stream_t *s, vlc_tick_t pcr)
+{
+    (void)s; (void)pcr;
+    vlc_assert_unreachable();
+}
 #endif
