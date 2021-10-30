@@ -368,7 +368,7 @@
     [self reportEvent:^{
         if ([[notification name] isEqualToString:UIApplicationWillEnterForegroundNotification])
             vout_window_ReportVisibilityChanged(_wnd, VOUT_WINDOW_VISIBLE);
-        else if ([[notification name] isEqualToString:UIApplicationWillResignActiveNotification])
+        else if ([[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification])
             vout_window_ReportVisibilityChanged(_wnd, VOUT_WINDOW_NOT_VISIBLE);
     }];
 }
