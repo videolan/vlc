@@ -139,9 +139,9 @@ endif
 #
 # Plug-ins cache
 #
-if HAVE_DYNAMIC_PLUGINS
-noinst_DATA = ../modules/plugins.dat
-endif
+#if HAVE_DYNAMIC_PLUGINS
+#noinst_DATA = ../modules/plugins.dat
+#endif
 MOSTLYCLEANFILES = $(noinst_DATA)
 
 if HAVE_OSX
