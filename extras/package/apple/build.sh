@@ -233,6 +233,7 @@ set_host_triplet()
     # Therefore we construct a triplet here without a version number, which
     # will not match the autoconf "guessed" host machine triplet.
     VLC_HOST_TRIPLET="${triplet_arch}-apple-darwin"
+    VLC_HOST_TRIPLET="${VLC_HOST_TRIPLET/arm64/aarch64}"
 }
 
 # Set the VLC_BUILD_TRIPLET based on the architecture
@@ -244,7 +245,8 @@ set_host_triplet()
 set_build_triplet()
 {
     local build_arch="$(uname -m | cut -d. -f1)"
-    VLC_BUILD_TRIPLET="$(cc -arch "${build_arch}" -dumpmachine)"
+    VLC_BUILD_TRIPLET="$(${VLC_HOST_CC} -arch "${build_arch}" -dumpmachine)"
+    VLC_BUILD_TRIPLET="${VLC_BUILD_TRIPLET/arm64/aarch64}"
 }
 
 # Take SDK name, verify it exists and populate
