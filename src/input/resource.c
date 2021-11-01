@@ -370,9 +370,9 @@ static void input_resource_PutVoutLocked(input_resource_t *p_resource,
     assert(vout_rsc != NULL);
 
     if (has_stopped != NULL)
-        *has_stopped = vout_DisplayStarted(vout_rsc->vout);
+        *has_stopped = vout_rsc->started;
 
-    if (vout_DisplayStarted(vout_rsc->vout))
+    if (vout_rsc->started)
     {
         vout_StopDisplay(vout_rsc->vout);
         vout_rsc->started = false;
@@ -500,7 +500,7 @@ vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
         return dcfg.vout;
     }
 
-    if (vout_DisplayStarted(dcfg.vout))
+    if (vout_rsc->started)
     {
         assert(cfg->vout != NULL);
         int ret = vout_ChangeSource(dcfg.vout, dcfg.fmt);
@@ -594,6 +594,7 @@ void input_resource_StopFreeVout(input_resource_t *p_resource)
     {
         msg_Dbg(p_resource->vout_rsc_free->vout, "stop free vout");
         vout_Stop(p_resource->vout_rsc_free->vout);
+        p_resource->vout_rsc_free->started = false;
     }
     vlc_mutex_unlock(&p_resource->lock);
 }
