@@ -756,6 +756,7 @@ void vout_NotifyVsyncReached(vout_thread_t *vout, vlc_tick_t next_vsync)
     vlc_mutex_unlock(&sys->vsync.lock);
     vlc_cond_signal(&sys->vsync.cond_update);
 
+    if (atomic_load(&sys->b_display_avstat))
     msg_Info(vout, "New vsync date, period=%dms offset=%dms",
              MS_FROM_VLC_TICK(next_vsync - now),
              MS_FROM_VLC_TICK(offset));
@@ -1551,6 +1552,7 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
         vlc_tick_t latency = system_pts - vsync_date;
         if (vsync_date != VLC_TICK_INVALID)
         {
+            if (atomic_load(&sys->b_display_avstat))
             msg_Info(vd, "display latency: %dms system latency: %dms",
                      MS_FROM_VLC_TICK(latency),
                      MS_FROM_VLC_TICK(system_now - vsync_date));
@@ -1619,7 +1621,7 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
         vlc_mutex_unlock(&sys->vsync.lock);
         vlc_cond_broadcast(&sys->vsync.cond_update);
 
-        if (vsync_missed)
+        if (vsync_missed && atomic_load(&sys->b_display_avstat))
             msg_Warn(vout, "avstats: [VSYNC MISSED] ts=%" PRId64, NS_FROM_VLC_TICK(vlc_tick_now()));
 
         if (atomic_load(&sys->b_display_avstat))
