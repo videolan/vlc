@@ -42,8 +42,25 @@ LogShaderErrors(vlc_object_t *obj, const opengl_vtable_t *vt, GLuint id)
             vt->GetShaderInfoLog(id, info_len, &written, info_log);
             msg_Err(obj, "shader: %s", info_log);
             free(info_log);
+
         }
     }
+
+    GLint source_len;
+    vt->GetShaderiv(id, GL_SHADER_SOURCE_LENGTH, &source_len);
+
+    if (source_len > 0)
+    {
+        char *source_log = malloc(source_len);
+        if (source_log)
+        {
+            GLsizei written;
+            vt->GetShaderSource(id, source_len, &written, source_log);
+            msg_Err(obj, "Shader:\n%s", source_log);
+            free(source_log);
+        }
+    }
+
 }
 
 static void
