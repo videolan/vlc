@@ -26,7 +26,7 @@ FFMPEGCONF = \
 	--disable-doc \
 	--disable-encoder=vorbis \
 	--disable-decoder=opus \
-	--enable-libgsm \
+	--disable-libgsm \
 	--disable-decoder=mlp \
 	--disable-demuxer=mlp \
 	--disable-parser=mlp \
@@ -63,13 +63,13 @@ FFMPEGCONF += \
 endif
 endif
 
-DEPS_ffmpeg = zlib gsm
+DEPS_ffmpeg = zlib
 
-ifndef USE_LIBAV
-FFMPEGCONF += \
-	--enable-libopenjpeg
-DEPS_ffmpeg += openjpeg $(DEPS_openjpeg)
-endif
+#ifndef USE_LIBAV
+#FFMPEGCONF += \
+#	--enable-libopenjpeg
+#DEPS_ffmpeg += openjpeg $(DEPS_openjpeg)
+#endif
 
 # Optional dependencies
 ifndef BUILD_NETWORK
