@@ -402,6 +402,24 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(Times deadline,
         return BufferingStatus::Suspended;
     }
 
+    if(!isContiguousMux())
+    {
+        if(!fakeEsOut()->hasSynchronizationReference())
+        {
+            SynchronizationReference r;
+            if(segmentTracker->getSynchronizationReference(currentSequence, startTimeContext.media, r))
+            {
+                fakeEsOut()->setSynchronizationReference(r);
+            }
+            else
+            {
+                msg_Dbg(p_realdemux, "Waiting sync reference for seq %ld", currentSequence);
+                vlc_mutex_unlock(&lock);
+                return BufferingStatus::Suspended;
+            }
+        }
+    }
+
     if(!demuxer)
     {
         if(!startDemux())
