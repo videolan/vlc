@@ -239,6 +239,7 @@ typedef void (APIENTRY *PFNGLREADPIXELSPROC) (GLint, GLint, GLsizei, GLsizei, GL
 #   define PFNGLGETPROGRAMIVPROC             typeof(glGetProgramiv)*
 #   define PFNGLGETPROGRAMINFOLOGPROC        typeof(glGetProgramInfoLog)*
 #   define PFNGLGETSHADERIVPROC              typeof(glGetShaderiv)*
+#   define PFNGLGETSHADERSOURCEPROC          typeof(glGetShaderSource)*
 #   define PFNGLGETSHADERINFOLOGPROC         typeof(glGetShaderInfoLog)*
 #   define PFNGLGETUNIFORMLOCATIONPROC       typeof(glGetUniformLocation)*
 #   define PFNGLGETATTRIBLOCATIONPROC        typeof(glGetAttribLocation)*
@@ -342,6 +343,7 @@ typedef struct {
     PFNGLGETSHADERIVPROC        GetShaderiv;
     PFNGLGETPROGRAMINFOLOGPROC  GetProgramInfoLog;
     PFNGLGETSHADERINFOLOGPROC   GetShaderInfoLog;
+    PFNGLGETSHADERSOURCEPROC    GetShaderSource;
 
     /* Shader variables commands */
     PFNGLGETUNIFORMLOCATIONPROC      GetUniformLocation;
