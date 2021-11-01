@@ -849,9 +849,10 @@ CreateProgramBlend(filter_t *filter)
         "varying vec2 tex_coords_up;\n"
         "uniform float height;\n"
         "void main() {\n"
-        "  gl_position = vec4(vertex_pos, 0.0, 1.0)\n"
-        "  tex_coords = (vertex_pos + vec2(1.0)) / 2.0;\n"
-        "  tex_coords_up = tex_coords + 1.0 / height;\n"
+        "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
+        "  vec2 coords = (vertex_pos + vec2(1.0, 1.0)) / 2.0;\n"
+        "  tex_coords = coords;\n"
+        "  tex_coords_up = coords + vec2(0.0, 1.0 / height);\n"
         "}\n";
 
     static const char *const FRAGMENT_SHADER_BODY =
