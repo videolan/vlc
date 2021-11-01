@@ -174,6 +174,7 @@
     [[self superview] addConstraints:_constraints];
     [NSLayoutConstraint activateConstraints:_constraints];
     [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+    [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:@"org.videolan.vlccore.window"];
 }
 
 - (void)willRemoveFromSuperview
@@ -182,6 +183,8 @@
         return;
 
     [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+    [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:@"org.videolan.vlccore.window"];
+
     [NSLayoutConstraint deactivateConstraints:_constraints];
     [[self superview] removeConstraints:_constraints];
     _constraints = nil;
