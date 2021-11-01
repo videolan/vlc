@@ -109,8 +109,6 @@ void vlc_darwin_runloop_RunUntilStopped(CFRunLoopRef runloop)
          * loop in the correct state. */
         if (ret == kCFRunLoopRunStopped)
             break;
-
-        fprintf(stderr, "Runloop running one loop\n");
     }
     CFRunLoopRemoveSource(runloop, source, runloop_mode);
     CFRelease(source);
