@@ -27,8 +27,10 @@
 #include <stdlib.h>
 
 #include <vlc_common.h>
-#include "gl_api.h"
-#include "internal.h"
+#include <vlc_plugin.h>
+#include <vlc_opengl.h>
+#include <vlc_opengl_filter.h>
+#include <vlc_opengl_platform.h>
 
 #define PBO_DISPLAY_COUNT 2 /* Double buffering */
 typedef struct
@@ -405,3 +407,27 @@ interop_init:
 
     return VLC_SUCCESS;
 }
+
+static int OpenInteropSW(vlc_object_t *obj)
+{
+    struct vlc_gl_interop *interop = (void *) obj;
+    return opengl_interop_generic_init(interop, false);
+}
+
+static int OpenInteropDirectRendering(vlc_object_t *obj)
+{
+    struct vlc_gl_interop *interop = (void *) obj;
+    return opengl_interop_generic_init(interop, true);
+}
+
+vlc_module_begin ()
+    set_description("Software OpenGL interop")
+    set_capability("glinterop", 1)
+    set_callback(OpenInteropSW)
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+
+    add_submodule()
+    set_callback(OpenInteropDirectRendering)
+    set_capability("glinterop", 2)
+vlc_module_end ()

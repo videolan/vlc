@@ -27,7 +27,6 @@
 
 #include "interop.h"
 #include "internal.h"
-#include "vout_helper.h"
 
 struct vlc_gl_interop *
 vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
@@ -56,21 +55,10 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
         return NULL;
     }
 
-    if (desc->plane_count == 0)
-    {
-        /* Opaque chroma: load a module to handle it */
-        interop->vctx = context;
-        interop->module = module_need_var(interop, "glinterop", "glinterop");
-        if (interop->module == NULL)
-            goto error;
-    }
-    else
-    {
-        /* No opengl interop module found: use a generic interop. */
-        int ret = opengl_interop_generic_init(interop, true);
-        if (ret != VLC_SUCCESS)
-            goto error;
-    }
+    interop->vctx = context;
+    interop->module = module_need_var(interop, "glinterop", "glinterop");
+    if (interop->module == NULL)
+        goto error;
 
     return interop;
 

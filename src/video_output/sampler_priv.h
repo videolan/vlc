@@ -23,8 +23,8 @@
 
 #include <vlc_common.h>
 
-#include "gl_api.h"
-#include "sampler.h"
+//#include "gl_api.h"
+//#include "sampler.h"
 
 struct vlc_gl_interop;
 

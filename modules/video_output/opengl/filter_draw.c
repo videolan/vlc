@@ -27,13 +27,12 @@
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
 #include <vlc_opengl.h>
+#include <vlc_opengl_filter.h>
+#include <vlc_opengl_platform.h>
 
 #include "filter_draw.h"
 
 #include "filter.h"
-#include "gl_api.h"
-#include "gl_common.h"
-#include "gl_util.h"
 
 static const char *const filter_options[] = { "vflip", NULL };
 
