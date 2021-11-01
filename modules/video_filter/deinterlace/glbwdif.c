@@ -860,8 +860,8 @@ CreateProgramBlend(filter_t *filter)
         "varying vec2 tex_coords;\n"
         "varying vec2 tex_coords_up;\n"
         "void main() {\n"
-        "  vec4 pix = VLC_TEXTURE(tex_coords);\n"
-        "  vec4 pix_up = VLC_TEXTURE(tex_coords_up);\n"
+        "  vec4 pix = VLC_TEXTURE(sampler, tex_coords);\n"
+        "  vec4 pix_up = VLC_TEXTURE(sampler, tex_coords_up);\n"
         "  gl_FragColor = (pix + pix_up) / 2.0;\n"
         "}\n";
 
