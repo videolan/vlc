@@ -126,6 +126,7 @@ vout_CaptionsToDisplay(vout_thread_t *vout, const void *p_cc, size_t i_cc)
  * \param vout the vout to close
  */
 VLC_API void vout_Close(vout_thread_t *vout);
+VLC_API bool vout_DisplayStarted(vout_thread_t *vout);
 
 /**
  * This function will handle a snapshot request.

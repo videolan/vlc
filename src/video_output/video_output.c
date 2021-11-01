@@ -2351,6 +2351,14 @@ static void vout_DisableWindow(vout_thread_sys_t *sys)
     vlc_mutex_unlock(&sys->window_lock);
 }
 
+bool vout_DisplayStarted(vout_thread_t *vout)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+
+    return sys->display != NULL;
+}
+
 void vout_Stop(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
