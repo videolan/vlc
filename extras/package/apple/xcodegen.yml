@@ -63,33 +63,6 @@ targets:
             lipo -create \
                 -output "${BUILT_PRODUCTS_DIR}/vlc_plugin.framework/vlc_plugin" \
                 "${INPUT_FILES[@]}"
-  glbwdif_plugin:
-    type: "framework"
-    platform: ${VLC_PLATFORM}
-    dependencies:
-      - target: VLCAutomake
-    info:
-      path: "glbwdif_plugin/Info.plist"
-    postBuildScripts:
-      - name: Copy glbwdif_plugin library
-        script: |
-            INPUT_FILES=()
-            BUILD_SUFFIX=""
-            if [ "$(echo "${ENABLE_BITCODE}" | tr '[:upper:]' '[:lower:]')" = "yes" ]; then
-                if [ -z "${BITCODE_GENERATION_MODE}" ]; then
-                    BITCODE_GENERATION_MODE="full"
-                fi
-                BUILD_SUFFIX="-bitcode-${BITCODE_GENERATION_MODE}"
-            fi
-            for arch in ${ARCHS}; do
-                input_file="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}${BUILD_SUFFIX}/build/modules/.libs/libglbwdif_plugin.dylib"
-                echo " + Adding input $input_file"
-                INPUT_FILES+=( "$input_file" )
-            done
-            lipo -create \
-                -output "${BUILT_PRODUCTS_DIR}/glbwdif_plugin.framework/glbwdif_plugin" \
-                "${INPUT_FILES[@]}"
-
   vlc:
     type: "library.static"
     platform: ${VLC_PLATFORM}
