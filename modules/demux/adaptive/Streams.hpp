@@ -126,6 +126,7 @@ namespace adaptive
         virtual void prepareRestart(bool = true);
         bool resetForNewPosition(vlc_tick_t);
 
+        bool segmentgap;
         bool discontinuity;
         bool needrestart;
         bool inrestart;

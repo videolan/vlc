@@ -47,6 +47,7 @@ AbstractStream::AbstractStream(demux_t * demux_)
     eof = false;
     valid = true;
     disabled = false;
+    segmentgap = false;
     discontinuity = false;
     needrestart = false;
     inrestart = false;
@@ -146,6 +147,7 @@ bool AbstractStream::resetForNewPosition(vlc_tick_t seekMediaTime)
         delete currentChunk;
         currentChunk = nullptr;
         needrestart = false;
+        segmentgap = false;
 
         fakeEsOut()->resetTimestamps();
 
@@ -261,6 +263,7 @@ bool AbstractStream::startDemux()
 
     if(!currentChunk)
     {
+        segmentgap = false;
         currentChunk = getNextChunk();
         needrestart = false;
         discontinuity = false;
@@ -590,7 +593,10 @@ ChunkInterface * AbstractStream::getNextChunk() const
 block_t * AbstractStream::readNextBlock()
 {
     if (currentChunk == nullptr && !eof)
+    {
+        segmentgap = false;
         currentChunk = getNextChunk();
+    }
 
     if(demuxfirstchunk)
     {
@@ -621,7 +627,7 @@ block_t * AbstractStream::readNextBlock()
         if(currentChunk->getRequestStatus() == RequestStatus::NotFound &&
            ++notfound_sequence < 3)
         {
-            discontinuity = true;
+            segmentgap = true;
         }
         delete currentChunk;
         currentChunk = nullptr;
@@ -733,6 +739,10 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
             discontinuity = true;
             currentSequence = event.discontinuitySequenceNumber;
         }
+            break;
+
+        case TrackerEvent::Type::SegmentGap:
+            segmentgap = true;
             break;
 
         case TrackerEvent::Type::FormatChange:
