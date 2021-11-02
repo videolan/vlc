@@ -82,10 +82,10 @@ typedef struct vlc_video_align {
  *
  * This primarily controls the size of the display area within the video
  * window, as follows:
- * - If \ref vout_display_cfg.is_display_filled is set,
+ * - If \ref vout_display_cfg::is_display_filled "is_display_filled" is set,
  *   the video size is fitted to the display size.
- * - If \ref vout_display_cfg.window size is valid, the video size is set to
- *   the window size,
+ * - If \ref vout_display_cfg::window "window" size is valid, the video size
+ *   is set to the window size,
  * - Otherwise, the video size is determined from the original video format,
  *   multiplied by the zoom factor.
  */
@@ -131,7 +131,7 @@ enum vout_display_query {
      * Notifies a change in display size.
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref vlc_display_operations.reset_pictures
+     * \retval VLC_EGENERIC if a \ref vlc_display_operations::reset_pictures
      *         request is necessary
      */
     VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
@@ -140,7 +140,7 @@ enum vout_display_query {
      * Notifies a change of the display fill display flag by the user.
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref vlc_display_operations.reset_pictures
+     * \retval VLC_EGENERIC if a \ref vlc_display_operations::reset_pictures
      *         request is necessary
      */
     VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
@@ -149,7 +149,7 @@ enum vout_display_query {
      * Notifies a change of the user zoom factor.
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref vlc_display_operations.reset_pictures
+     * \retval VLC_EGENERIC if a \ref vlc_display_operations::reset_pictures
      *         request is necessary
      */
     VOUT_DISPLAY_CHANGE_ZOOM,
@@ -158,7 +158,7 @@ enum vout_display_query {
      * Notifies a change of the sample aspect ratio.
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref vlc_display_operations.reset_pictures
+     * \retval VLC_EGENERIC if a \ref vlc_display_operations::reset_pictures
      *         request is necessary
      */
     VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
@@ -166,11 +166,11 @@ enum vout_display_query {
     /**
      * Notifies a change of the source cropping.
      *
-     * The cropping requested is stored by source video_format_t::i_x/y_offset
-     * and video_format_t::i_visible_width/height
+     * The cropping requested is stored by source \ref video_format_t `i_x`/`y_offset`
+     * and `i_visible_width`/`height`
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref vlc_display_operations.reset_pictures
+     * \retval VLC_EGENERIC if a \ref vlc_display_operations::reset_pictures
      *         request is necessary
      */
     VOUT_DISPLAY_CHANGE_SOURCE_CROP,
