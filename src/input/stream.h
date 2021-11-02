@@ -92,6 +92,11 @@ stream_t *stream_FilterAutoNew( stream_t *source ) VLC_USED;
 stream_t *stream_FilterChainNew( stream_t *source, const char *list ) VLC_USED;
 
 /**
+ * \addtogroup stream_extractor_Internals
+ * @{
+ */
+
+/**
  * Attach \ref stream_extractor%s according to specified data
  *
  * This function will parse the passed data, and try to attach a \ref
@@ -110,14 +115,19 @@ stream_t *stream_FilterChainNew( stream_t *source, const char *list ) VLC_USED;
  *          stream-extractors referred to by `psz_data`, something which is not
  *          guaranteed.
  *
- * \param[out] source a pointer-to-pointer to stream where the attached
+ * \param[out] stream a pointer-to-pointer to stream where the attached
  *             stream-extractor will be applied. `*stream` will refer
  *             to the last successful attachment.
+ * \param      data the fragment data string to parse.
  * \param[out] out_extra `*out_extra` will point to any additional data
  *             in `psz_data` that does not specify an entity (if any).
  * \return VLC_SUCCESS on success, an error-code on failure
  **/
 int stream_extractor_AttachParsed( stream_t** stream, const char* data,
                                    char const** out_extra );
+
+/**
+ * @}
+ */
 
 #endif
