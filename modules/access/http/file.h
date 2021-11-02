@@ -35,6 +35,7 @@ struct vlc_http_resource;
  *
  * Allocates a structure for a remote HTTP-served read-only file.
  *
+ * @param mgr HTTP connection manager
  * @param url URL of the file to read
  * @param ua user agent string (or NULL to ignore)
  * @param ref referral URL (or NULL to ignore)

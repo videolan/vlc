@@ -377,6 +377,9 @@ struct vlc_http_stream
  * @warning The caller is responsible for reading headers at appropriate
  * times as intended by the protocol. Failure to do so may result in protocol
  * dead lock, and/or (HTTP 1.x) connection failure.
+ *
+ * @param s HTTP stream to read from
+ *
  */
 static inline
 struct vlc_http_msg *vlc_http_stream_read_headers(struct vlc_http_stream *s)
@@ -391,6 +394,7 @@ struct vlc_http_msg *vlc_http_stream_read_headers(struct vlc_http_stream *s)
  *
  * @todo Take a block structure rather than a byte array.
  *
+ * @param s HTTP stream to write to
  * @param base start address of data to write
  * @param length length in bytes of data to write
  * @param eos whether this is the last write on the stream
@@ -409,6 +413,7 @@ static inline ssize_t vlc_http_stream_write(struct vlc_http_stream *s,
  *
  * Reads the next block of data from the message payload of an HTTP stream.
  *
+ * @param s HTTP stream to read from
  * @return a block of data (use block_Release() to free it)
  * @retval NULL The end of the stream was reached.
  * @retval vlc_http_error The stream encountered a fatal error.
@@ -423,6 +428,9 @@ static inline block_t *vlc_http_stream_read(struct vlc_http_stream *s)
  *
  * Releases all resources associated or held by an HTTP stream. Any unread
  * header or data is discarded.
+ *
+ * @param s HTTP stream to close
+ * @param abort whether to close the connection and prevent re-use
  */
 static inline void vlc_http_stream_close(struct vlc_http_stream *s, bool abort)
 {
