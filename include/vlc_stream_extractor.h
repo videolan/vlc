@@ -119,7 +119,7 @@ VLC_USED;
  * this function will only be invoked within `pf_readdir` in order to
  * get the virtual path of the listed items.
  *
- * \warning the returned value is to be freed by the caller
+ * \warning The returned value is to be freed by the caller
  *
  * \param extractor the stream_directory_t for which the entity belongs
  * \param subentry the name of the entity in question
