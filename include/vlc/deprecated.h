@@ -29,7 +29,7 @@ extern "C" {
 # endif
 
 /**
- * \ingroup libvlc libvlc_media
+ * \ingroup libvlc_media
  * @{
  */
 
@@ -124,7 +124,7 @@ void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks,
 /** @}*/
 
 /**
- * \ingroup libvlc libvlc_media_player
+ * \ingroup libvlc_media_player
  * @{
  */
 
@@ -151,7 +151,7 @@ LIBVLC_DEPRECATED LIBVLC_API void libvlc_track_description_list_release( libvlc_
 /** @}*/
 
 /**
- * \ingroup libvlc libvlc_video
+ * \ingroup libvlc_video
  * @{
  */
 
@@ -229,7 +229,7 @@ LIBVLC_DEPRECATED LIBVLC_API int libvlc_video_set_spu( libvlc_media_player_t *p_
 /** @}*/
 
 /**
- * \ingroup libvlc libvlc_audio
+ * \ingroup libvlc_audio
  * @{
  */
 
