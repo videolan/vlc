@@ -2198,7 +2198,7 @@ static void *Thread(void *object)
                 else if (deadline == VLC_TICK_INVALID)
                     deadline = now_ts + VLC_TICK_FROM_MS(100);
 
-                if (atomic_load(&sys->b_display_avstat))
+                if (atomic_load(&sys->b_display_avstat) && false)
                 {
                     msg_Info(&sys->obj, "avstats: [RENDER][DEADLINE] ts=%" PRId64 " deadline=%" PRId64,
                              NS_FROM_VLC_TICK(now_ts), NS_FROM_VLC_TICK(deadline));
