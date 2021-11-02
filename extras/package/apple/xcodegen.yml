@@ -63,6 +63,7 @@ targets:
             lipo -create \
                 -output "${BUILT_PRODUCTS_DIR}/vlc_plugin.framework/vlc_plugin" \
                 "${INPUT_FILES[@]}"
+
   vlc:
     type: "library.static"
     platform: ${VLC_PLATFORM}
