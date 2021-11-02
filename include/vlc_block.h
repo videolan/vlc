@@ -317,18 +317,29 @@ static inline void block_Cleanup (void *block)
  * @{
  */
 
-/****************************************************************************
- * Chains of blocks functions helper
- ****************************************************************************
- * - block_ChainAppend : append a block to the last block of a chain. Try to
- *      avoid using with a lot of data as it's really slow, prefer
- *      block_ChainLastAppend, p_block can be NULL
- * - block_ChainLastAppend : use a pointer over a pointer to the next blocks,
- *      and update it.
- * - block_ChainRelease : release a chain of block
- * - block_ChainExtract : extract data from a chain, return real bytes counts
- * - block_ChainGather : gather a chain, free it and return one block.
- ****************************************************************************/
+/**
+ * Appends a @ref block_t to the chain
+ *
+ * The given block is appended to the last block of the given chain.
+ *
+ * @attention
+ *  Using this function on long chains or repeatedly calling it
+ *  to append a lot of blocks can be slow, as it has to iterate the
+ *  whole chain to append the block.
+ *  In these cases @ref block_ChainLastAppend should be used.
+ *
+ * @param pp_list   Pointer to the block_t chain
+ * @param p_block   The block_t to append (can be NULL)
+ *
+ * @see block_ChainLastAppend()
+ *
+ * Example:
+ * @code{.c}
+ * block_t *p_chain = NULL;
+ *
+ * block_ChainAppend(&p_chain, p_block);
+ * @endcode
+ */
 static inline void block_ChainAppend( block_t **pp_list, block_t *p_block )
 {
     if( *pp_list == NULL )
@@ -344,6 +355,26 @@ static inline void block_ChainAppend( block_t **pp_list, block_t *p_block )
     }
 }
 
+/**
+ * Appends a @ref block_t to the last block pointer and update it
+ *
+ * Uses a pointer over a pointer to p_next of the last block of the block chain
+ * to append a block at the end of the chain and updates the pointer to the new
+ * last block's @c p_next. If the appended block is itself a chain, it is iterated
+ * till the end to correctly update @c ppp_last.
+ *
+ * @param[in,out] ppp_last  Pointer to pointer to the end of the chain
+ *                          (The block_t::p_next of the last block_t in the chain)
+ * @param         p_block   The block_t to append
+ *
+ * Example:
+ * @code{.c}
+ * block_t *p_block = NULL;
+ * block_t **pp_block_last = &p_block;
+ *
+ * block_ChainLastAppend(&pp_block_last, p_other_block);
+ * @endcode
+ */
 static inline void block_ChainLastAppend( block_t ***ppp_last, block_t *p_block )
 {
     block_t *p_last = p_block;
@@ -354,6 +385,16 @@ static inline void block_ChainLastAppend( block_t ***ppp_last, block_t *p_block 
     *ppp_last = &p_last->p_next;
 }
 
+/**
+ * Releases a chain of blocks
+ *
+ * The block pointed to by p_block and all following blocks in the
+ * chain are released.
+ *
+ * @param p_block   Pointer to first block_t of the chain to release
+ *
+ * @see block_Release()
+ */
 static inline void block_ChainRelease( block_t *p_block )
 {
     while( p_block )
@@ -364,6 +405,20 @@ static inline void block_ChainRelease( block_t *p_block )
     }
 }
 
+/**
+ * Extracts data from a chain of blocks
+ *
+ * Copies the specified amount of data from the chain into the given buffer.
+ * If the data in the chain is less than the maximum amount given, the remainder
+ * of the buffer is not modified.
+ *
+ * @param      p_list   Pointer to the first block_t of the chain to copy from
+ * @param[out] p_data   Destination buffer to copy the data to
+ * @param      i_max    Number of bytes to copy
+ * @return              Number of bytes actually copied
+ *
+ * @see block_ChainGather()
+ */
 static size_t block_ChainExtract( block_t *p_list, void *p_data, size_t i_max )
 {
     size_t  i_total = 0;
@@ -382,6 +437,17 @@ static size_t block_ChainExtract( block_t *p_list, void *p_data, size_t i_max )
     return i_total;
 }
 
+/**
+ * Retrives chain properties
+ *
+ * Can be used to retrieve count of blocks, number of bytes and the duration
+ * of the chain.
+ *
+ * @param       p_list      Pointer to the first block_t of the chain
+ * @param[out]  pi_count    Pointer to count of blocks in the chain (may be NULL)
+ * @param[out]  pi_size     Pointer to number of bytes in the chain (may be NULL)
+ * @param[out]  pi_length   Pointer to length (duration) of the chain (may be NULL)
+ */
 static inline void block_ChainProperties( block_t *p_list, int *pi_count, size_t *pi_size, vlc_tick_t *pi_length )
 {
     size_t i_size = 0;
@@ -405,6 +471,20 @@ static inline void block_ChainProperties( block_t *p_list, int *pi_count, size_t
         *pi_count = i_count;
 }
 
+/**
+ * Gathers a chain into a single block_t
+ *
+ * All blocks in the chain are gathered into a single block_t and the
+ * original chain is released.
+ * 
+ * @param   p_list  Pointer to the first block_t of the chain to gather
+ * @return  Returns a pointer to a new block_t or NULL if the block can not
+ *          be allocated, in which case the original chain is not released.
+ *          If the chain pointed to by p_list is already gathered, a pointer
+ *          to it is returned and no new block will be allocated.
+ *
+ * @see block_ChainExtract()
+ */
 static inline block_t *block_ChainGather( block_t *p_list )
 {
     size_t  i_total = 0;
