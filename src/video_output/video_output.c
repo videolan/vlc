@@ -1760,9 +1760,10 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         }
 
         vlc_mutex_lock(&sys->vsync.lock);
+        bool no_vsync_halted = true;
         while ( sys->vsync.next_date != VLC_TICK_INVALID
                && !atomic_load(&sys->control_is_terminated)
-               && !atomic_load(&sys->vsync_halted)
+               && (no_vsync_halted = !atomic_load(&sys->vsync_halted))
                && (sys->vsync.last_date == sys->vsync.next_date
                 || sys->vsync.missed == true) )
         {
@@ -1771,8 +1772,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         vsync_date = sys->vsync.next_date;
         vlc_mutex_unlock(&sys->vsync.lock);
 
-        if (atomic_load(&sys->control_is_terminated) ||
-            atomic_load(&sys->vsync_halted))
+        if (atomic_load(&sys->control_is_terminated) || !no_vsync_halted)
             return VLC_EGENERIC;
 
         // TODO: why the condition on vsync_date and system_now here ?
@@ -1794,7 +1794,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         vlc_mutex_lock(&sys->vsync.lock);
         while ( sys->vsync.next_date != VLC_TICK_INVALID
                && !atomic_load(&sys->control_is_terminated)
-               && !atomic_load(&sys->vsync_halted)
+               && (no_vsync_halted = !atomic_load(&sys->vsync_halted))
                && (sys->vsync.last_date == sys->vsync.next_date
                 || sys->vsync.missed == true) )
         {
@@ -1803,21 +1803,16 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 
         vsync_date = sys->vsync.next_date;
         vlc_mutex_unlock(&sys->vsync.lock);
-        if (atomic_load(&sys->control_is_terminated) ||
-            atomic_load(&sys->vsync_halted))
+        if (atomic_load(&sys->control_is_terminated) || !no_vsync_halted)
             return VLC_EGENERIC;
 
     }
 
     assert(sys->displayed.next);
-    if (first)
-    {
-        next = sys->displayed.next;
-        sys->displayed.next = NULL;
-    }
 
     if (first)
     {
+        bool no_vsync_halted = true;
         /* Wait a new VSYNC event before starting */
         vlc_mutex_lock(&sys->vsync.lock);
         sys->vsync.last_date = sys->vsync.next_date;
@@ -1828,11 +1823,14 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
             vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
         vsync_date = sys->vsync.next_date;
         vlc_mutex_unlock(&sys->vsync.lock);
-        if (atomic_load(&sys->control_is_terminated) ||
-            atomic_load(&sys->vsync_halted))
+        if (atomic_load(&sys->control_is_terminated) || !no_vsync_halted)
             return VLC_EGENERIC;
     }
-
+    if (first)
+    {
+        next = sys->displayed.next;
+        sys->displayed.next = NULL;
+    }
     render_now = true;
 
     if (next != NULL)
