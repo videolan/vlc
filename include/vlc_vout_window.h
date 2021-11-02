@@ -528,6 +528,9 @@ static inline void vout_window_SetTitle(vout_window_t *window, const char *title
  *
  * The window handle (vout_window_t.handle) must remain valid and constant
  * while the window is enabled.
+ *
+ * \param window window to enable
+ * \param cfg initial configuration for the window
  */
 VLC_API
 int vout_window_Enable(vout_window_t *window);
@@ -539,6 +542,8 @@ int vout_window_Enable(vout_window_t *window);
  *
  * \note
  * The window may be re-enabled later by a call to vout_window_Enable().
+ *
+ * \param window window to disable
  */
 VLC_API
 void vout_window_Disable(vout_window_t *window);
@@ -552,6 +557,10 @@ void vout_window_Disable(vout_window_t *window);
  *
  * \note This function is thread-safe. In case of concurrent call, it is
  * undefined which one is taken into account (but at least one is).
+ *
+ * \param window window implementation that reports the event
+ * \param width width of the usable window area in pixels
+ * \param height height of the usable window area in pixels
  */
 static inline void vout_window_ReportSize(vout_window_t *window,
                                           unsigned width, unsigned height)
@@ -564,6 +573,8 @@ static inline void vout_window_ReportSize(vout_window_t *window,
  *
  * This function is called by the window implementation to advise that the
  * window is being closed externally, and should be disabled by the owner.
+ *
+ * \param window window implementation that reports the event
  */
 static inline void vout_window_ReportClose(vout_window_t *window)
 {
@@ -592,6 +603,8 @@ static inline void vout_window_ReportState(vout_window_t *window,
  *
  * This notifies the owner of the window that the window is windowed, i.e. not
  * in full screen mode.
+ *
+ * \param wnd window implementation that reports the event
  */
 VLC_API void vout_window_ReportWindowed(vout_window_t *wnd);
 
@@ -708,5 +721,6 @@ static inline void vout_window_ReportOutputDevice(vout_window_t *window,
         window->owner.cbs->output_event(window, id, name);
 }
 
+/** @} */
 /** @} */
 #endif /* VLC_VOUT_WINDOW_H */
