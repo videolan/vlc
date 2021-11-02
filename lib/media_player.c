@@ -865,7 +865,7 @@ void libvlc_media_player_set_media(
     }
     p_mi->p_md = p_md;
 
-    vlc_player_SetCurrentMedia(p_mi->player, p_md->p_input_item);
+    vlc_player_SetCurrentMedia(p_mi->player, p_md ? p_md->p_input_item : NULL);
 
     vlc_player_Unlock(p_mi->player);
 }
