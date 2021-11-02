@@ -198,6 +198,7 @@ typedef struct vout_thread_sys_t
         vlc_tick_t initial_offset;
         bool missed;
     } vsync;
+    atomic_bool vsync_halted;
 
     vlc_tick_t latency;
 
@@ -1760,13 +1761,18 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         vlc_mutex_lock(&sys->vsync.lock);
         while ( sys->vsync.next_date != VLC_TICK_INVALID
                && !atomic_load(&sys->control_is_terminated)
+               && !atomic_load(&sys->vsync_halted)
                && (sys->vsync.last_date == sys->vsync.next_date
-                || sys->vsync.missed == true) )
+                || sys->vsync.missed == true
+                || sys->vsync.next_date < vlc_tick_now() + render_delay) )
+        {
             vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
+        }
         vsync_date = sys->vsync.next_date;
         vlc_mutex_unlock(&sys->vsync.lock);
 
-        if (atomic_load(&sys->control_is_terminated))
+        if (atomic_load(&sys->control_is_terminated) ||
+            atomic_load(&sys->vsync_halted))
             return VLC_EGENERIC;
 
         // TODO: why the condition on vsync_date and system_now here ?
@@ -1787,14 +1793,21 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 
         vlc_mutex_lock(&sys->vsync.lock);
         while ( sys->vsync.next_date != VLC_TICK_INVALID
-                && sys->vsync.last_date == sys->vsync.next_date
-                && !atomic_load(&sys->control_is_terminated))
+               && !atomic_load(&sys->control_is_terminated)
+               && !atomic_load(&sys->vsync_halted)
+               && (sys->vsync.last_date == sys->vsync.next_date
+                || sys->vsync.missed == true
+                || sys->vsync.next_date < vlc_tick_now() + render_delay) )
+        {
             vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
+        }
+
         vsync_date = sys->vsync.next_date;
         vlc_mutex_unlock(&sys->vsync.lock);
+        if (atomic_load(&sys->control_is_terminated) ||
+            atomic_load(&sys->vsync_halted))
+            return VLC_EGENERIC;
 
-        if (atomic_load(&sys->control_is_terminated))
-            return VLC_SUCCESS;
     }
 
     assert(sys->displayed.next);
@@ -1804,24 +1817,21 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         sys->displayed.next = NULL;
     }
 
-    if (sys->vsync.initial_offset == VLC_TICK_INVALID)
+    if (first)
     {
         /* Wait a new VSYNC event before starting */
         vlc_mutex_lock(&sys->vsync.lock);
         sys->vsync.last_date = sys->vsync.next_date;
         while ( sys->vsync.next_date != VLC_TICK_INVALID
                && !atomic_load(&sys->control_is_terminated)
+               && !atomic_load(&sys->vsync_halted)
                && (sys->vsync.last_date == sys->vsync.next_date
-                || sys->vsync.missed == true) )
             vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
         vsync_date = sys->vsync.next_date;
         vlc_mutex_unlock(&sys->vsync.lock);
-
-        const vlc_tick_t swap_next_pts =
-            vlc_clock_ConvertToSystem(sys->clock, vlc_tick_now(),
-                                        next->date, sys->rate);
-
-        sys->vsync.initial_offset = vsync_date - swap_next_pts;
+        if (atomic_load(&sys->control_is_terminated) ||
+            atomic_load(&sys->vsync_halted))
+            return VLC_EGENERIC;
     }
 
     render_now = true;
@@ -1927,9 +1937,15 @@ void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
 
+    vlc_mutex_lock(&sys->vsync.lock);
+    atomic_store(&sys->vsync_halted, true);
+    vlc_mutex_unlock(&sys->vsync.lock);
+    vlc_cond_signal(&sys->vsync.cond_update)
+
     vout_control_Hold(&sys->control);
     vout_FlushUnlocked(sys, false, date);
     vout_control_Release(&sys->control);
+    atomic_store(&sys->vsync_halted, false);
 }
 
 void vout_NextPicture(vout_thread_t *vout, vlc_tick_t *duration)
@@ -2578,6 +2594,8 @@ vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
     sys->vsync.last_date = VLC_TICK_INVALID;
 
     sys->vsync.initial_offset = VLC_TICK_INVALID;
+    atomic_init(&sys->vsync_halted, false);
+
 
     sys->latency = 0;
 
