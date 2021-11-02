@@ -1,5 +1,5 @@
 /**
- * @file rtpxiph.c
+ * @file xiph.c
  * @brief Real-Time Protocol (RTP) Xiph payloads receival
  */
 /*****************************************************************************
