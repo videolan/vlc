@@ -136,7 +136,7 @@ struct block_t
  * Initializes a custom block.
  *
  * This function initialize a block of timed data allocated by custom means.
- * This allows passing data with copying even if the data has been allocated
+ * This allows passing data without copying even if the data has been allocated
  * with unusual means or outside of LibVLC.
  *
  * Normally, blocks are allocated and initialized by block_Alloc() instead.
