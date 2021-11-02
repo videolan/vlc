@@ -159,8 +159,8 @@ vlc_vector_enforce_size_t_(size_t value)
  * \param ptr the current data to realloc
  * \param count the requested capacity, in number of items
  * \param size the size of one item
- * \param pcap a pointer to the `cap` field of the vector [IN/OUT]
- * \param psize a pointer to the `size` field of the vector [IN/OUT]
+ * \param[in,out] pcap a pointer to the `cap` field of the vector
+ * \param[in,out] psize a pointer to the `size` field of the vector
  * \return the reallocated array, or `ptr` if reallocation failed
  */
 static inline void *
@@ -609,7 +609,7 @@ vlc_vector_move_(char *array, size_t index, size_t count, size_t target)
  *
  * \param pv a pointer to the vector
  * \param item the item to find (compared with ==)
- * \param a pointer to the result (ssize_t *) [OUT]
+ * \param[out] pidx a pointer to the result (ssize_t *)
  */
 #define vlc_vector_index_of(pv, item, pidx) \
     do { \
@@ -630,8 +630,8 @@ vlc_vector_move_(char *array, size_t index, size_t count, size_t target)
  * Use only for vectors of primitive types or pointers (every struct would be
  * copied for a vector of structs).
  *
- * \param item the iteration variable [OUT]
- * \param pv a pointer to the vector [OUT]
+ * \param[out] item the iteration variable
+ * \param[out] pv a pointer to the vector
  */
 #define vlc_vector_foreach(item, pv) \
     for (size_t vlc_vector_idx_##item = 0; \
