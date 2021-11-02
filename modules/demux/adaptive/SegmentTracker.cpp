@@ -59,6 +59,12 @@ DiscontinuityEvent::DiscontinuityEvent(uint64_t d)
     discontinuitySequenceNumber = d;
 }
 
+SegmentGapEvent::SegmentGapEvent()
+    : TrackerEvent(Type::SegmentGap)
+{
+
+}
+
 RepresentationSwitchEvent::RepresentationSwitchEvent(BaseRepresentation *prev,
                                                      BaseRepresentation *next)
     : TrackerEvent(Type::RepresentationSwitch)
@@ -411,8 +417,11 @@ ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed,
         initializing = false;
     }
 
+    if(b_gap)
+        notify(SegmentGapEvent());
+
     /* Handle both implicit and explicit discontinuities */
-    if(b_gap || b_discontinuity)
+    if(b_discontinuity)
         notify(DiscontinuityEvent(discontinuitySequenceNumber));
 
     /* Notify new segment length for stats / logic */

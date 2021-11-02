@@ -62,6 +62,7 @@ namespace adaptive
             enum class Type
             {
                 Discontinuity,
+                SegmentGap,
                 RepresentationSwitch,
                 FormatChange,
                 SegmentChange,
@@ -87,6 +88,13 @@ namespace adaptive
             virtual ~DiscontinuityEvent()  = default;
 
             uint64_t discontinuitySequenceNumber;
+    };
+
+    class SegmentGapEvent : public TrackerEvent
+    {
+        public:
+            SegmentGapEvent();
+            virtual ~SegmentGapEvent()  = default;
     };
 
     class RepresentationSwitchEvent : public TrackerEvent
