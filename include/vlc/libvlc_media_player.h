@@ -199,7 +199,7 @@ LIBVLC_API void libvlc_media_player_retain( libvlc_media_player_t *p_mi );
  *
  * \note The user should listen to the libvlc_MediaPlayerMediaChanged event, to
  * know when the new media is actually used by the player (or to known that the
- * older media is no longuer used).
+ * older media is no longer used).
  *
  * \param p_mi the Media Player
  * \param p_md the Media. Afterwards the p_md can be safely
