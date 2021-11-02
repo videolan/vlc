@@ -81,8 +81,8 @@ struct stream_extractor_private {
 /**
  * Create an MRL for a specific sub-entry
  *
- * This internal function is used to create an MRL that refers to \subentry
- * within \ref base, see \ref mrl_helpers for further information.
+ * This internal function is used to create an MRL that refers to \p subentry
+ * within \p base, see \ref mrl_helpers for further information.
  **/
 
 static char*
