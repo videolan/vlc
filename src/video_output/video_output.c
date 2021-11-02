@@ -1763,8 +1763,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                && !atomic_load(&sys->control_is_terminated)
                && !atomic_load(&sys->vsync_halted)
                && (sys->vsync.last_date == sys->vsync.next_date
-                || sys->vsync.missed == true
-                || sys->vsync.next_date < vlc_tick_now() + render_delay) )
+                || sys->vsync.missed == true) )
         {
             vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
         }
