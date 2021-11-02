@@ -1940,7 +1940,7 @@ void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
     vlc_mutex_lock(&sys->vsync.lock);
     atomic_store(&sys->vsync_halted, true);
     vlc_mutex_unlock(&sys->vsync.lock);
-    vlc_cond_signal(&sys->vsync.cond_update)
+    vlc_cond_signal(&sys->vsync.cond_update);
 
     vout_control_Hold(&sys->control);
     vout_FlushUnlocked(sys, false, date);
