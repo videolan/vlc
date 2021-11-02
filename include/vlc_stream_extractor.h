@@ -126,7 +126,7 @@ VLC_USED;
  *
  * \return a pointer to the resulting MRL on success, NULL on failure
  **/
-VLC_API char* vlc_stream_extractor_CreateMRL( stream_directory_t*,
+VLC_API char* vlc_stream_extractor_CreateMRL( stream_directory_t *extractor,
                                               char const* subentry );
 
 /**
