@@ -329,12 +329,13 @@ struct vout_display_t {
      * Picture format.
      *
      * This is the format of the pictures that are supplied to the
-     * \ref vlc_display_operations.prepare and
-     * \ref vlc_display_operations.display callbacks.
+     * \ref vlc_display_operations::prepare "prepare" and
+     * \ref vlc_display_operations::display "display" callbacks.
      * Ideally, it should be identical or as close as possible as \ref source.
      *
      * This can only be changed from the display module activation callback,
-     * or within a \ref vlc_display_operations.reset_pictures request.
+     * or within a \ref vlc_display_operations::reset_pictures "reset_pictures"
+     * request.
      *
      * By default, it is equal to \ref source except for the aspect ratio
      * which is undefined(0) and is ignored.
