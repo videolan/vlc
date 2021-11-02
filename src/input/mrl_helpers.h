@@ -34,7 +34,7 @@
  * \ingroup mrl
  *
  * Helper functions related to parsing, as well as generating, data
- * related to the \link MRL-specification\endlink.
+ * related to the \link mrl MRL-specification\endlink.
  *
  * @{
  * \file
