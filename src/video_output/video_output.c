@@ -1825,7 +1825,7 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         while ( sys->vsync.next_date != VLC_TICK_INVALID
                && !atomic_load(&sys->control_is_terminated)
                && !atomic_load(&sys->vsync_halted)
-               && (sys->vsync.last_date == sys->vsync.next_date
+               && (sys->vsync.last_date == sys->vsync.next_date))
             vlc_cond_wait(&sys->vsync.cond_update, &sys->vsync.lock);
         vsync_date = sys->vsync.next_date;
         vlc_mutex_unlock(&sys->vsync.lock);
