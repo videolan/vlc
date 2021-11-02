@@ -1133,7 +1133,7 @@ static bool IsPictureLate(vout_thread_sys_t *vout, picture_t *decoded,
     }
     else
         late_threshold = VOUT_DISPLAY_LATE_THRESHOLD;
-    if (late > late_threshold) {
+    if (late > late_threshold + MS_FROM_VLC_TICK(16)) {
         msg_Warn(&vout->obj, "picture is too late to be displayed (currently missing %"PRId64"ms and will be missing %"PRId64" ms)",
                  MS_FROM_VLC_TICK(system_now - system_pts), MS_FROM_VLC_TICK(late));
         return true;
