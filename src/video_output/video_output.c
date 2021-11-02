@@ -1634,7 +1634,8 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
                     NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts));
         }
     }
-    picture_Release(todisplay);
+    else
+        picture_Release(todisplay);
 
     if (atomic_load(&sys->b_display_avstat))
     {

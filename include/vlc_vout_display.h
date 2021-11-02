@@ -430,6 +430,7 @@ static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
 {
     if (vd->ops->display != NULL)
         vd->ops->display(vd, picture);
+    picture_Release(picture);
 }
 
 VLC_API
