@@ -35,10 +35,11 @@
 using namespace adaptive;
 using namespace adaptive::playlist;
 
-SegmentList::SegmentList( SegmentInformation *parent_ ):
+SegmentList::SegmentList( SegmentInformation *parent_, bool b_relative ):
     AbstractMultipleSegmentBaseType( parent_, AttrsNode::Type::SegmentList )
 {
     totalLength = 0;
+    b_relative_mediatimes = b_relative;
 }
 SegmentList::~SegmentList()
 {

@@ -38,7 +38,7 @@ namespace adaptive
         class SegmentList : public AbstractMultipleSegmentBaseType
         {
             public:
-                SegmentList             ( SegmentInformation * = nullptr );
+                SegmentList             ( SegmentInformation * = nullptr, bool = false );
                 virtual ~SegmentList    ();
 
                 const std::vector<Segment *>&   getSegments() const;
@@ -62,6 +62,7 @@ namespace adaptive
             private:
                 std::vector<Segment *>  segments;
                 stime_t totalLength;
+                bool b_relative_mediatimes;
         };
     }
 }
