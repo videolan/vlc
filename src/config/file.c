@@ -201,11 +201,10 @@ int config_LoadConfigFile( vlc_object_t *p_this )
             continue; /* syntax error */
         *ptr = '\0';
 
-        module_config_t *item = config_FindConfig(psz_option_name);
-        if (item == NULL)
+        struct vlc_param *param = vlc_param_Find(psz_option_name);
+        if (param == NULL)
             continue;
 
-        struct vlc_param *param = container_of (item, struct vlc_param, item);
         /* Reject values of options that are unsaveable */
         if (param->unsaved)
             continue;
@@ -213,6 +212,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
         if (param->obsolete)
             continue;
 
+        module_config_t *item = &param->item;
         const char *psz_option_value = ptr + 1;
         switch (CONFIG_CLASS(item->i_type))
         {
