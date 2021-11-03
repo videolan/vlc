@@ -137,7 +137,7 @@ void vlc_plugin_destroy(vlc_plugin_t *plugin)
     free(plugin);
 }
 
-static module_config_t *vlc_config_create(vlc_plugin_t *plugin, int type)
+static struct vlc_param *vlc_config_create(vlc_plugin_t *plugin, int type)
 {
     unsigned confsize = plugin->conf.size;
     struct vlc_param *tab = plugin->conf.params;
@@ -178,7 +178,7 @@ static module_config_t *vlc_config_create(vlc_plugin_t *plugin, int type)
     }
     plugin->conf.size++;
 
-    return item;
+    return param;
 }
 
 /**
@@ -227,14 +227,14 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
         {
             int type = va_arg (ap, int);
             module_config_t **pp = va_arg (ap, module_config_t **);
+            struct vlc_param *param = vlc_config_create(plugin, type);
 
-            item = vlc_config_create(plugin, type);
-            if (unlikely(item == NULL))
+            if (unlikely(param == NULL))
             {
                 ret = -1;
                 break;
             }
-            *pp = item;
+            *pp = &param->item;
             break;
         }
 
