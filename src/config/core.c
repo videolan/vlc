@@ -69,13 +69,9 @@ int config_GetType(const char *name)
 
 bool config_IsSafe( const char *name )
 {
-    module_config_t *p_config = config_FindConfig( name );
-    if (p_config == NULL)
-        return false;
+    const struct vlc_param *param = vlc_param_Find(name);
 
-    const struct vlc_param *param = container_of(p_config, struct vlc_param,
-                                                 item);
-    return param->safe;
+    return (param != NULL) ? param->safe : false;
 }
 
 static module_config_t * config_FindConfigChecked( const char *psz_name )
