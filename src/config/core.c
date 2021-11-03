@@ -457,14 +457,23 @@ void config_UnsortConfig (void)
     free (clist);
 }
 
+struct vlc_param *vlc_param_Find(const char *name)
+{
+    struct vlc_param *const *p;
+
+    assert(name != NULL);
+    p = bsearch (name, config.list, config.count, sizeof (*p), confnamecmp);
+    return (p != NULL) ? *p : NULL;
+}
+
 module_config_t *config_FindConfig(const char *name)
 {
     if (unlikely(name == NULL))
         return NULL;
 
-    struct vlc_param *const *p;
-    p = bsearch (name, config.list, config.count, sizeof (*p), confnamecmp);
-    return p ? &(*p)->item : NULL;
+    struct vlc_param *param = vlc_param_Find(name);
+
+    return (param != NULL) ? &param->item : NULL;
 }
 
 /**

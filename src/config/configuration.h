@@ -35,6 +35,13 @@ struct vlc_param {
     struct module_config_t item;
 };
 
+/**
+ * Looks up a configuration parameter by name.
+ *
+ * \return the configuration parameter, or NULL if not found
+ */
+struct vlc_param *vlc_param_Find(const char *name);
+
 int  config_AutoSaveConfigFile( vlc_object_t * );
 
 void config_Free(struct vlc_param *, size_t);
