@@ -256,6 +256,8 @@ enum vlc_module_properties
 # define DLL_SYMBOL
 #endif
 
+struct vlc_param;
+
 EXTERN_SYMBOL typedef int (*vlc_set_cb) (void *, void *, int, ...);
 
 #define vlc_plugin_set(...) vlc_set (opaque,   NULL, __VA_ARGS__)
@@ -282,7 +284,7 @@ EXTERN_SYMBOL DLL_SYMBOL \
 int CDECL_SYMBOL VLC_SYMBOL(vlc_entry)(vlc_set_cb vlc_set, void *opaque) \
 { \
     module_t *module; \
-    module_config_t *config = NULL; \
+    struct vlc_param *config = NULL; \
     if (vlc_plugin_set (VLC_MODULE_CREATE, &module)) \
         goto error; \
     if (vlc_module_set (VLC_MODULE_NAME, (MODULE_STRING))) \

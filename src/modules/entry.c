@@ -191,7 +191,6 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
 {
     vlc_plugin_t *plugin = ctx;
     module_t *module = tgt;
-    module_config_t *item = tgt;
     va_list ap;
     int ret = 0;
 
@@ -226,15 +225,11 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
         case VLC_CONFIG_CREATE:
         {
             int type = va_arg (ap, int);
-            module_config_t **pp = va_arg (ap, module_config_t **);
             struct vlc_param *param = vlc_config_create(plugin, type);
 
+            *va_arg(ap, struct vlc_param **)= param;
             if (unlikely(param == NULL))
-            {
                 ret = -1;
-                break;
-            }
-            *pp = &param->item;
             break;
         }
 
@@ -318,16 +313,20 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
 
         case VLC_CONFIG_NAME:
         {
+            struct vlc_param *param = tgt;
             const char *name = va_arg (ap, const char *);
 
             assert (name != NULL);
-            item->psz_name = name;
+            param->item.psz_name = name;
             break;
         }
 
         case VLC_CONFIG_VALUE:
         {
-            if (IsConfigIntegerType (item->i_type)
+            struct vlc_param *param = tgt;
+            module_config_t *item = &param->item;
+
+            if (IsConfigIntegerType(item->i_type)
              || !CONFIG_ITEM(item->i_type))
             {
                 item->orig.i =
@@ -351,6 +350,9 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
 
         case VLC_CONFIG_RANGE:
         {
+            struct vlc_param *param = tgt;
+            module_config_t *item = &param->item;
+
             if (IsConfigFloatType (item->i_type))
             {
                 item->min.f = va_arg (ap, double);
@@ -366,55 +368,65 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
 
         case VLC_CONFIG_VOLATILE:
         {
-            struct vlc_param *param = container_of (item, struct vlc_param,
-                                                    item);
+            struct vlc_param *param = tgt;
+
             param->unsaved = true;
             break;
         }
 
         case VLC_CONFIG_PRIVATE:
         {
-            struct vlc_param *param = container_of (item, struct vlc_param,
-                                                    item);
+            struct vlc_param *param = tgt;
+
             param->internal = true;
             break;
         }
 
         case VLC_CONFIG_REMOVED:
         {
-            struct vlc_param *param = container_of (item, struct vlc_param,
-                                                    item);
+            struct vlc_param *param = tgt;
+
             param->obsolete = true;
             break;
         }
 
         case VLC_CONFIG_CAPABILITY:
-            item->psz_type = va_arg (ap, const char *);
+        {
+            struct vlc_param *param = tgt;
+
+            param->item.psz_type = va_arg(ap, const char *);
             break;
+        }
 
         case VLC_CONFIG_SHORTCUT:
         {
-            struct vlc_param *param = container_of (item, struct vlc_param,
-                                                    item);
+            struct vlc_param *param = tgt;
+
             param->shortname = va_arg(ap, int);
             break;
         }
 
         case VLC_CONFIG_SAFE:
         {
-            struct vlc_param *param = container_of (item, struct vlc_param,
-                                                    item);
+            struct vlc_param *param = tgt;
+
             param->safe = true;
             break;
         }
 
         case VLC_CONFIG_DESC:
-            item->psz_text = va_arg (ap, const char *);
-            item->psz_longtext = va_arg (ap, const char *);
+        {
+            struct vlc_param *param = tgt;
+
+            param->item.psz_text = va_arg(ap, const char *);
+            param->item.psz_longtext = va_arg(ap, const char *);
             break;
+        }
 
         case VLC_CONFIG_LIST:
         {
+            struct vlc_param *param = tgt;
+            module_config_t *item = &param->item;
             size_t len = va_arg (ap, size_t);
 
             assert (item->list_count == 0); /* cannot replace choices */
