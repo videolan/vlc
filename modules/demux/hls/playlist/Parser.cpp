@@ -218,11 +218,16 @@ static bool parseEncryption(const AttributesTag *keytag, const Url &playlistUrl,
 
 void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std::list<Tag *> &tagslist)
 {
-    SegmentList *segmentList = new (std::nothrow) SegmentList(rep);
+    bool b_pdt = tagslist.cend() != std::find_if(tagslist.cbegin(), tagslist.cend(),
+                    [](const Tag *t){return t->getType() == SingleValueTag::EXTXPROGRAMDATETIME;});
+    bool b_vod = tagslist.size() && tagslist.back()->getType() == SingleValueTag::EXTXENDLIST;
+
+    SegmentList *segmentList = new SegmentList(rep, !b_vod && !b_pdt);
 
     Timescale timescale(1000000);
     rep->addAttribute(new TimescaleAttr(timescale));
     rep->b_loaded = true;
+    rep->b_live = !b_vod;
 
     vlc_tick_t totalduration = 0;
     vlc_tick_t nzStartTime = 0;
@@ -381,7 +386,6 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                 break;
 
             case Tag::EXTXENDLIST:
-                rep->b_live = false;
                 break;
         }
     }
