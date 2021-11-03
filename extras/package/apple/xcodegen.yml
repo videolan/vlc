@@ -36,6 +36,10 @@ targets:
         excludes: "**/Makefile.in"
       - path: "${VLC_SRC_DIR}/lib"
         excludes: "**/Makefile.in"
+      - path: "${VLC_SRC_DIR}/contrib/src"
+      - path: "${VLC_SRC_DIR}/contrib/bootstrap"
+      - path: "${VLC_SRC_DIR}/doc"
+        excludes: "**/Makefile.in"
 
   vlc_plugin:
     type: "framework"
