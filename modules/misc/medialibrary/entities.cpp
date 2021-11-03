@@ -90,15 +90,12 @@ static bool convertThumbnails( const T input, vlc_ml_thumbnail_t *output )
             output[i].psz_mrl = nullptr;
             continue;
         }
+
         const auto thumbnailMrl = input->thumbnailMrl( sizeType );
-        if ( thumbnailMrl.empty() == false )
-        {
-            output[i].psz_mrl = strdup( thumbnailMrl.c_str() );
-            if ( output[i].psz_mrl == nullptr )
-                return false;
-        }
-        else
-            output[i].psz_mrl = nullptr;
+        assert( !thumbnailMrl.empty() );
+
+        if ( !strdup_helper(thumbnailMrl, output[i].psz_mrl ))
+            return false;
     }
     return true;
 }
