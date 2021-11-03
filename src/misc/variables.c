@@ -228,10 +228,8 @@ static void WaitUnused(vlc_object_t *obj, variable_t *var)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
 
-    mutex_cleanup_push(&priv->var_lock);
     while (var->b_incallback)
         vlc_cond_wait(&var->wait, &priv->var_lock);
-    vlc_cleanup_pop();
 }
 
 static void TriggerCallback(vlc_object_t *obj, variable_t *var,

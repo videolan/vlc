@@ -267,11 +267,7 @@ static struct vlc_http_msg *vlc_h2_stream_wait(struct vlc_http_stream *stream)
 
     vlc_h2_stream_lock(s);
     while ((m = s->recv_hdr) == NULL && !s->recv_end && !s->interrupted)
-    {
-        mutex_cleanup_push(&conn->lock);
         vlc_cond_wait(&s->recv_wait, &conn->lock);
-        vlc_cleanup_pop();
-    }
     s->recv_hdr = NULL;
     vlc_h2_stream_unlock(s);
 
@@ -315,9 +311,7 @@ static ssize_t vlc_h2_stream_write(struct vlc_http_stream *stream,
                 break;
             }
 
-            mutex_cleanup_push(&conn->lock);
             vlc_cond_wait(&s->send_wait, &conn->lock);
-            vlc_cleanup_pop();
             continue;
         }
 
@@ -332,9 +326,7 @@ static ssize_t vlc_h2_stream_write(struct vlc_http_stream *stream,
                 break;
             }
 
-            mutex_cleanup_push(&conn->lock);
             vlc_cond_wait(&conn->send_wait, &conn->lock);
-            vlc_cleanup_pop();
             continue;
         }
 
@@ -390,11 +382,7 @@ static block_t *vlc_h2_stream_read(struct vlc_http_stream *stream)
 
     vlc_h2_stream_lock(s);
     while ((f = s->recv_head) == NULL && !s->recv_end && !s->interrupted)
-    {
-        mutex_cleanup_push(&conn->lock);
         vlc_cond_wait(&s->recv_wait, &conn->lock);
-        vlc_cleanup_pop();
-    }
 
     if (f == NULL)
     {

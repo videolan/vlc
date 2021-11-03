@@ -169,11 +169,8 @@ static void *thread_func_cond(void *ptr)
 
     // Wait until termination is allowed
     vlc_mutex_lock(&data->mutex);
-    mutex_cleanup_push(&data->mutex);
-    while(data->state != -1) {
+    while (data->state != -1)
         vlc_cond_wait(&data->cond_end, &data->mutex);
-    }
-    vlc_cleanup_pop();
     vlc_mutex_unlock(&data->mutex);
 
     return &thread_return_magic;
@@ -250,7 +247,6 @@ static void *thread_func_cond_timeout(void *ptr)
     vlc_mutex_unlock(&data->mutex);
 
     vlc_mutex_lock(&data->mutex);
-    mutex_cleanup_push(&data->mutex);
 
     // Wait until termination is allowed (which is never signalled)
     vlc_tick_t now = vlc_tick_now();
@@ -261,7 +257,6 @@ static void *thread_func_cond_timeout(void *ptr)
     vlc_tick_t elapsed = vlc_tick_now() - now;
     assert(elapsed >= VLC_TICK_FROM_MS(25));
 
-    vlc_cleanup_pop();
     vlc_mutex_unlock(&data->mutex);
 
     return &thread_return_magic;
