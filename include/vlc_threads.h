@@ -993,12 +993,6 @@ struct vlc_cleanup_t
 
 #endif /* !LIBVLC_USE_PTHREAD_CLEANUP */
 
-static inline void vlc_cleanup_lock (void *lock)
-{
-    vlc_mutex_unlock ((vlc_mutex_t *)lock);
-}
-#define mutex_cleanup_push( lock ) vlc_cleanup_push (vlc_cleanup_lock, lock)
-
 #ifdef __cplusplus
 /**
  * Helper C++ class to lock a mutex.
