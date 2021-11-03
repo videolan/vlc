@@ -204,10 +204,14 @@ ssize_t config_GetIntChoices(const char *name,
     *values = NULL;
     *texts = NULL;
 
-    module_config_t *cfg = config_FindConfigChecked(name);
-    assert(cfg != NULL);
+    struct vlc_param *param = vlc_param_Find(name);
+    if (param == NULL)
+    {
+        errno = ENOENT;
+        return -1;
+    }
 
-    struct vlc_param *param = container_of(cfg, struct vlc_param, item);
+    module_config_t *cfg = &param->item;
     size_t count = cfg->list_count;
     if (count == 0)
     {
@@ -311,15 +315,14 @@ ssize_t config_GetPszChoices(const char *name,
 {
     *values = *texts = NULL;
 
-    module_config_t *cfg = config_FindConfig(name);
-    if (cfg == NULL)
+    struct vlc_param *param = vlc_param_Find(name);
+    if (param == NULL)
     {
         errno = ENOENT;
         return -1;
     }
 
-    struct vlc_param *param = container_of(cfg, struct vlc_param, item);
-
+    module_config_t *cfg = &param->item;
     switch (cfg->i_type)
     {
         case CONFIG_ITEM_MODULE:
