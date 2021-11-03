@@ -45,17 +45,14 @@ static inline char *strdupnull (const char *src)
     return src ? strdup (src) : NULL;
 }
 
-int config_GetType(const char *psz_name)
+int config_GetType(const char *name)
 {
-    module_config_t *p_config = config_FindConfig(psz_name);
+    const struct vlc_param *param = vlc_param_Find(name);
 
-    /* sanity checks */
-    if( !p_config )
-    {
+    if (param == NULL)
         return 0;
-    }
 
-    switch( CONFIG_CLASS(p_config->i_type) )
+    switch (CONFIG_CLASS(param->item.i_type))
     {
         case CONFIG_ITEM_FLOAT:
             return VLC_VAR_FLOAT;
