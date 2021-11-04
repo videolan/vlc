@@ -7,7 +7,12 @@ all: install
 
 SRC := $(TOPSRC)/src
 SRC_BUILT := $(TOPSRC_BUILT)/src
+ifneq ($(findstring $(origin VLC_TARBALLS),undefined default),)
 TARBALLS := $(TOPSRC)/tarballs
+else
+TARBALLS := $(VLC_TARBALLS)
+endif
+
 VLC_TOOLS ?= $(TOPSRC)/../extras/tools/build
 
 PATH :=$(abspath $(VLC_TOOLS)/bin):$(PATH)
