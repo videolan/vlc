@@ -1,0 +1,25 @@
+From f01e48b1debc55434442d6d9267e91a1ab1d8251 Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Fri, 5 Nov 2021 12:09:08 +0100
+Subject: [PATCH] Do not use log2f with too old Android API level
+
+---
+ src/lmathlib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lmathlib.c b/src/lmathlib.c
+index e0c61a1..7cfac2b 100644
+--- a/src/lmathlib.c
++++ b/src/lmathlib.c
+@@ -173,7 +173,7 @@ static int math_log (lua_State *L) {
+     res = l_mathop(log)(x);
+   else {
+     lua_Number base = luaL_checknumber(L, 2);
+-#if !defined(LUA_USE_C89)
++#if !defined(LUA_USE_C89) && !(defined(__ANDROID__) && (__ANDROID_API__ < 18))
+     if (base == l_mathop(2.0))
+       res = l_mathop(log2)(x);
+     else
+-- 
+2.32.0 (Apple Git-132)
+

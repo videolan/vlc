@@ -1,0 +1,241 @@
+From 0393b6a5829cb8abeacc7617f080ed1823a28aad Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Fri, 29 Jul 2022 14:24:20 +0200
+Subject: [PATCH] Avoid usage of localeconv
+
+In order to properly do this, we need to implement a locale-independent
+version of strtof and snprintf, else lua will be unable to properly
+parse floating point numbers on systems that do not use a locale where
+the dot is the decimal point.
+---
+ src/Makefile       |   2 +-
+ src/clocwrappers.c | 159 +++++++++++++++++++++++++++++++++++++++++++++
+ src/luaconf.h      |  11 +++-
+ 3 files changed, 168 insertions(+), 4 deletions(-)
+ create mode 100644 src/clocwrappers.c
+
+diff --git a/src/Makefile b/src/Makefile
+index 1907381..9e32d53 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -23,7 +23,7 @@ SYSLIBS=
+ MYCFLAGS=
+ MYLDFLAGS=
+ MYLIBS=
+-MYOBJS=
++MYOBJS= clocwrappers.o
+ 
+ # Special flags for compiler modules; -Os reduces code size.
+ CMCFLAGS= 
+diff --git a/src/clocwrappers.c b/src/clocwrappers.c
+new file mode 100644
+index 0000000..5a9b4cc
+--- /dev/null
++++ b/src/clocwrappers.c
+@@ -0,0 +1,159 @@
++#include <stdlib.h>
++#include <stdio.h>
++#include <stdarg.h>
++
++#if defined(__APPLE__)
++# include <xlocale.h>
++#elif defined(_WIN32)
++# include <windows.h>
++# include <locale.h>
++#else
++# define _GNU_SOURCE
++# include <locale.h>
++#endif
++
++/* A strtof replacement that always uses the C locale to ensure
++ * it always accepts '.' as decimal point.
++ */
++
++#if defined(__APPLE__)
++
++float strtof_c_locale(const char *nptr, char **endptr)
++{
++	return strtof_l(nptr, endptr, LC_C_LOCALE);
++}
++
++int snprintf_c_locale(char * restrict str, size_t size, const char * restrict format, ...)
++{
++	int res;
++	va_list args;
++
++    va_start(args, format);
++	res = vsnprintf_l(str, size, LC_C_LOCALE, format, args);
++	va_end(args);
++
++	return res;
++}
++
++#elif defined(_WIN32)
++
++float strtof_c_locale(const char *nptr, char **endptr)
++{
++	float res;
++
++	// Store old threadlocale state
++	int cfgtlocale_old = _configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
++	char *orig_locale = NULL;
++	if (cfgtlocale_old != -1) {
++		// Store current locale
++		orig_locale = setlocale(LC_NUMERIC, NULL);
++		setlocale(LC_NUMERIC, "C");
++	}
++	res = strtof(nptr, endptr);
++	if (orig_locale != NULL) {
++		// Restore the old locale
++		setlocale(LC_NUMERIC, orig_locale);
++	}
++	if (cfgtlocale_old != _ENABLE_PER_THREAD_LOCALE && cfgtlocale_old != -1) {
++		// Restore the old threadlocale state
++		_configthreadlocale(cfgtlocale_old);
++	}
++
++	return res;
++}
++
++int snprintf_c_locale(char * restrict str, size_t size, const char * restrict format, ...)
++{
++	int res;
++
++	// Store old threadlocale state
++	int cfgtlocale_old = _configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
++	char *orig_locale = NULL;
++	if (cfgtlocale_old != -1) {
++		// Store current locale
++		orig_locale = setlocale(LC_NUMERIC, NULL);
++		setlocale(LC_NUMERIC, "C");
++	}
++
++	va_list args;
++    va_start(args, format);
++	res = vsnprintf(str, size, format, args);
++	va_end(args);
++
++	if (orig_locale != NULL) {
++		// Restore the old locale
++		setlocale(LC_NUMERIC, orig_locale);
++	}
++	if (cfgtlocale_old != _ENABLE_PER_THREAD_LOCALE && cfgtlocale_old != -1) {
++		// Restore the old threadlocale state
++		_configthreadlocale(cfgtlocale_old);
++	}
++
++	return res;
++}
++
++#elif defined(__ANDROID__) && (__ANDROID_API__ < 21)
++
++float strtof_c_locale(const char *nptr, char **endptr)
++{
++	// Android API level < 21 has no locales support
++	return strtof(nptr, endptr);
++}
++
++int snprintf_c_locale(char * restrict str, size_t size, const char * restrict format, ...)
++{
++	// Android API level < 21 has no locales support
++	va_list args;
++    va_start(args, format);
++	return vsnprintf(str, size, format, args);
++	va_end(args);
++}
++
++#else // Version for all other OSes
++
++float strtof_c_locale(const char *nptr, char **endptr)
++{
++	float res;
++
++	locale_t orig_locale = (locale_t)0;
++	locale_t locale = newlocale(LC_NUMERIC_MASK, "C", (locale_t)0);
++	if (locale != (locale_t)0) {
++		// Store current locale
++		orig_locale = uselocale(locale);
++	}
++	res = strtof(nptr, endptr);
++	if (locale != (locale_t)0) {
++		// Restore old locale
++		uselocale(orig_locale);
++		freelocale(locale);
++	}
++
++	return res;
++}
++
++int snprintf_c_locale(char * restrict str, size_t size, const char * restrict format, ...)
++{
++	int res;
++
++	locale_t orig_locale = (locale_t)0;
++	locale_t locale = newlocale(LC_NUMERIC_MASK, "C", (locale_t)0);
++	if (locale != (locale_t)0) {
++		// Store current locale
++		orig_locale = uselocale(locale);
++	}
++
++	va_list args;
++    va_start(args, format);
++	res = vsnprintf(str, size, format, args);
++	va_end(args);
++
++	if (locale != (locale_t)0) {
++		// Restore old locale
++		uselocale(orig_locale);
++		freelocale(locale);
++	}
++
++	return res;
++}
++
++#endif
+diff --git a/src/luaconf.h b/src/luaconf.h
+index 6e59b40..12befbc 100644
+--- a/src/luaconf.h
++++ b/src/luaconf.h
+@@ -10,7 +10,12 @@
+ 
+ #include <limits.h>
+ #include <stddef.h>
++#include <stdint.h>
++#include <sys/types.h>
++#include <locale.h>
+ 
++float strtof_c_locale(const char *nptr, char **endptr);
++int snprintf_c_locale(char * restrict str, size_t size, const char * restrict format, ...);
+ 
+ /*
+ ** ===================================================================
+@@ -435,7 +440,7 @@
+ 
+ #define l_mathop(op)		op##f
+ 
+-#define lua_str2number(s,p)	strtof((s), (p))
++#define lua_str2number(s,p)	strtof_c_locale((s), (p))
+ 
+ 
+ #elif LUA_FLOAT_TYPE == LUA_FLOAT_LONGDOUBLE	/* }{ long double */
+@@ -579,7 +584,7 @@
+ ** (All uses in Lua have only one format item.)
+ */
+ #if !defined(LUA_USE_C89)
+-#define l_sprintf(s,sz,f,i)	snprintf(s,sz,f,i)
++#define l_sprintf(s,sz,f,i)	snprintf_c_locale(s,sz,f,i)
+ #else
+ #define l_sprintf(s,sz,f,i)	((void)(sz), sprintf(s,f,i))
+ #endif
+@@ -653,7 +658,7 @@
+ ** macro must include the header 'locale.h'.)
+ */
+ #if !defined(lua_getlocaledecpoint)
+-#define lua_getlocaledecpoint()		(localeconv()->decimal_point[0])
++#define lua_getlocaledecpoint()		'.'
+ #endif
+ 
+ 
+-- 
+2.32.0 (Apple Git-132)
+

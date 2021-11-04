@@ -1,0 +1,68 @@
+From 938ab15dd00a042263c8cf787c739305afdb63af Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Fri, 29 Jul 2022 14:28:40 +0200
+Subject: [PATCH] Enforce always using 64bit integers/floats
+
+---
+ src/luaconf.h | 42 ------------------------------------------
+ 1 file changed, 42 deletions(-)
+
+diff --git a/src/luaconf.h b/src/luaconf.h
+index bbd9591..d76d2ff 100644
+--- a/src/luaconf.h
++++ b/src/luaconf.h
+@@ -130,51 +130,9 @@ int snprintf_c_locale(char * restrict str, size_t size, const char * restrict fo
+ #define LUA_INT_DEFAULT		LUA_INT_LONGLONG
+ #define LUA_FLOAT_DEFAULT	LUA_FLOAT_DOUBLE
+ 
+-
+-/*
+-@@ LUA_32BITS enables Lua with 32-bit integers and 32-bit floats.
+-*/
+-#define LUA_32BITS	0
+-
+-
+-/*
+-@@ LUA_C89_NUMBERS ensures that Lua uses the largest types available for
+-** C89 ('long' and 'double'); Windows always has '__int64', so it does
+-** not need to use this case.
+-*/
+-#if defined(LUA_USE_C89) && !defined(LUA_USE_WINDOWS)
+-#define LUA_C89_NUMBERS		1
+-#else
+-#define LUA_C89_NUMBERS		0
+-#endif
+-
+-
+-#if LUA_32BITS		/* { */
+-/*
+-** 32-bit integers and 'float'
+-*/
+-#if LUAI_IS32INT  /* use 'int' if big enough */
+-#define LUA_INT_TYPE	LUA_INT_INT
+-#else  /* otherwise use 'long' */
+-#define LUA_INT_TYPE	LUA_INT_LONG
+-#endif
+-#define LUA_FLOAT_TYPE	LUA_FLOAT_FLOAT
+-
+-#elif LUA_C89_NUMBERS	/* }{ */
+-/*
+-** largest types available for C89 ('long' and 'double')
+-*/
+-#define LUA_INT_TYPE	LUA_INT_LONG
+-#define LUA_FLOAT_TYPE	LUA_FLOAT_DOUBLE
+-
+-#else		/* }{ */
+-/* use defaults */
+-
+ #define LUA_INT_TYPE	LUA_INT_DEFAULT
+ #define LUA_FLOAT_TYPE	LUA_FLOAT_DEFAULT
+ 
+-#endif				/* } */
+-
+ 
+ /* }================================================================== */
+ 
+-- 
+2.32.0 (Apple Git-132)
+

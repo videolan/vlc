@@ -1,0 +1,48 @@
+From 0b7a8a682ec59c049ccf8fd252364709a843f622 Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Thu, 4 Nov 2021 05:40:43 +0100
+Subject: [PATCH] Create an import library needed for lld
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Based on the previous patch by Martin Storsjö
+---
+ src/Makefile | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 9e32d53..db3418d 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -33,6 +33,7 @@ CMCFLAGS=
+ PLATS= guess aix bsd c89 freebsd generic linux linux-readline macosx mingw posix solaris
+ 
+ LUA_A=	liblua.a
++LUA_A_LINK= $(LUA_A)
+ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o ltm.o lundump.o lvm.o lzio.o
+ LIB_O=	lauxlib.o lbaselib.o lcorolib.o ldblib.o liolib.o lmathlib.o loadlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o linit.o
+ BASE_O= $(CORE_O) $(LIB_O) $(MYOBJS)
+@@ -61,7 +62,7 @@ $(LUA_A): $(BASE_O)
+ 	$(RANLIB) $@
+ 
+ $(LUA_T): $(LUA_O) $(LUA_A)
+-	$(CC) -o $@ $(LDFLAGS) $(LUA_O) $(LUA_A) $(LIBS)
++	$(CC) -o $@ $(LDFLAGS) $(LUA_O) $(LUA_A_LINK) $(LIBS)
+ 
+ $(LUAC_T): $(LUAC_O) $(LUA_A)
+ 	$(CC) -o $@ $(LDFLAGS) $(LUAC_O) $(LUA_A) $(LIBS)
+@@ -129,8 +130,8 @@ Darwin macos macosx:
+ 	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_MACOSX -DLUA_USE_READLINE" SYSLIBS="-lreadline"
+ 
+ mingw:
+-	$(MAKE) "LUA_A=lua54.dll" "LUA_T=lua.exe" \
+-	"AR=$(CC) -shared -o" "RANLIB=strip --strip-unneeded" \
++	$(MAKE) "LUA_A=lua54.dll" "LUA_T=lua.exe" "LUA_A_LINK=lua54.lib" \
++	"AR=$(CC) -shared -Wl,--out-implib,lua54.lib  $(LDFLAGS) -o" "RANLIB=strip --strip-unneeded" \
+ 	"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s" lua.exe
+ 	$(MAKE) "LUAC_T=luac.exe" luac.exe
+ 
+-- 
+2.32.0 (Apple Git-132)
+

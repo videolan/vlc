@@ -1,0 +1,87 @@
+From b7ce05bd2b6b80b4b71c2794191fa60db2b12b23 Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Thu, 4 Nov 2021 15:33:41 +0100
+Subject: [PATCH] Create and install a .pc file
+
+---
+ Makefile | 27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index f3bf10c..3e327ee 100644
+--- a/Makefile
++++ b/Makefile
+@@ -14,6 +14,7 @@ INSTALL_TOP= /usr/local
+ INSTALL_BIN= $(INSTALL_TOP)/bin
+ INSTALL_INC= $(INSTALL_TOP)/include
+ INSTALL_LIB= $(INSTALL_TOP)/lib
++INSTALL_LIB_PKGCONFIG= $(INSTALL_LIB)/pkgconfig
+ INSTALL_MAN= $(INSTALL_TOP)/man/man1
+ INSTALL_LMOD= $(INSTALL_TOP)/share/lua/$V
+ INSTALL_CMOD= $(INSTALL_TOP)/lib/lua/$V
+@@ -43,6 +44,7 @@ TO_BIN= lua luac
+ TO_INC= lua.h luaconf.h lualib.h lauxlib.h lua.hpp
+ TO_LIB= liblua5.4.a
+ TO_MAN= lua.1 luac.1
++TO_PKGCONFIG=  lua.pc
+ 
+ # Lua version and release.
+ V= 5.4
+@@ -54,12 +56,17 @@ all:	$(PLAT)
+ $(PLATS) help test clean:
+ 	@cd src && $(MAKE) $@
+ 
+-install: dummy
++lua.pc:
++	$(MAKE) pc > lua.pc
++
++
++install: dummy $(TO_PKGCONFIG)
+ 	cd src && $(MKDIR) $(INSTALL_BIN) $(INSTALL_INC) $(INSTALL_LIB) $(INSTALL_MAN) $(INSTALL_LMOD) $(INSTALL_CMOD)
+ 	cd src && $(INSTALL_EXEC) $(TO_BIN) $(INSTALL_BIN)
+ 	cd src && $(INSTALL_DATA) $(TO_INC) $(INSTALL_INC)
+ 	cd src && $(INSTALL_DATA) $(TO_LIB) $(INSTALL_LIB)
+ 	cd doc && $(INSTALL_DATA) $(TO_MAN) $(INSTALL_MAN)
++	$(INSTALL_DATA) $(TO_PKGCONFIG) $(INSTALL_LIB_PKGCONFIG)
+ 
+ uninstall:
+ 	cd src && cd $(INSTALL_BIN) && $(RM) $(TO_BIN)
+@@ -83,10 +90,12 @@ echo:
+ 	@echo "TO_INC= $(TO_INC)"
+ 	@echo "TO_LIB= $(TO_LIB)"
+ 	@echo "TO_MAN= $(TO_MAN)"
++	@echo "TO_PKGCONFIG= $(TO_PKGCONFIG)"
+ 	@echo "INSTALL_TOP= $(INSTALL_TOP)"
+ 	@echo "INSTALL_BIN= $(INSTALL_BIN)"
+ 	@echo "INSTALL_INC= $(INSTALL_INC)"
+ 	@echo "INSTALL_LIB= $(INSTALL_LIB)"
++	@echo "INSTALL_LIB_PKGCONFIG= $(INSTALL_LIB_PKGCONFIG)"
+ 	@echo "INSTALL_MAN= $(INSTALL_MAN)"
+ 	@echo "INSTALL_LMOD= $(INSTALL_LMOD)"
+ 	@echo "INSTALL_CMOD= $(INSTALL_CMOD)"
+@@ -95,10 +104,18 @@ echo:
+ 
+ # Echo pkg-config data.
+ pc:
+-	@echo "version=$R"
+-	@echo "prefix=$(INSTALL_TOP)"
+-	@echo "libdir=$(INSTALL_LIB)"
+-	@echo "includedir=$(INSTALL_INC)"
++	@echo 'version=$R'
++	@echo 'prefix=$(INSTALL_TOP)'
++	@echo 'libdir=$(INSTALL_LIB)'
++	@echo 'includedir=$(INSTALL_INC)'
++	@echo ''
++	@echo 'Name: lua'
++	@echo 'Description: the lua programming language'
++	@echo 'Version: $R'
++	@echo 'URL: https://www.lua.org'
++	@echo 'Cflags: -I$${includedir}'
++	@echo 'Libs:  -L$${libdir} -llua5.4'
++	@echo 'Requires:'
+ 
+ # Targets that do not create files (not all makes understand .PHONY).
+ .PHONY: all $(PLATS) help test clean install uninstall local dummy echo pc
+-- 
+2.32.0 (Apple Git-132)
+

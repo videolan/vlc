@@ -1,0 +1,39 @@
+From ba86f7a6e8c8c0b7560c26ea2cad5c4c27469be9 Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Thu, 4 Nov 2021 13:47:03 +0100
+Subject: [PATCH] Add version to library name
+
+---
+ Makefile     | 2 +-
+ src/Makefile | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index fef1af4..f3bf10c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -41,7 +41,7 @@ PLATS= guess aix bsd c89 freebsd generic linux linux-readline macosx mingw posix
+ # What to install.
+ TO_BIN= lua luac
+ TO_INC= lua.h luaconf.h lualib.h lauxlib.h lua.hpp
+-TO_LIB= liblua.a
++TO_LIB= liblua5.4.a
+ TO_MAN= lua.1 luac.1
+ 
+ # Lua version and release.
+diff --git a/src/Makefile b/src/Makefile
+index db3418d..91cd273 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -32,7 +32,7 @@ CMCFLAGS=
+ 
+ PLATS= guess aix bsd c89 freebsd generic linux linux-readline macosx mingw posix solaris
+ 
+-LUA_A=	liblua.a
++LUA_A=	liblua5.4.a
+ LUA_A_LINK= $(LUA_A)
+ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o ltm.o lundump.o lvm.o lzio.o
+ LIB_O=	lauxlib.o lbaselib.o lcorolib.o ldblib.o liolib.o lmathlib.o loadlib.o loslib.o lstrlib.o ltablib.o lutf8lib.o linit.o
+-- 
+2.32.0 (Apple Git-132)
+

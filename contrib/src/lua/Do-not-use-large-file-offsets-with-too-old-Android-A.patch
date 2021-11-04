@@ -1,0 +1,30 @@
+From 6260223f0afc96ffe6669588223f5c275c275b59 Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Fri, 5 Nov 2021 13:50:40 +0100
+Subject: [PATCH] Do not use large file offsets with too old Android API level
+
+---
+ src/lprefix.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/lprefix.h b/src/lprefix.h
+index 484f2ad..11b2889 100644
+--- a/src/lprefix.h
++++ b/src/lprefix.h
+@@ -8,6 +8,13 @@
+ #define lprefix_h
+ 
+ 
++#if defined(__ANDROID__) && (__ANDROID_API__ < 24)
++// Android API level < 24 does not support large file
++// offsets, so define this here to prevent it being
++// defined to 64 below.
++#define _FILE_OFFSET_BITS       32
++#endif
++
+ /*
+ ** Allows POSIX/XSI stuff
+ */
+-- 
+2.32.0 (Apple Git-132)
+

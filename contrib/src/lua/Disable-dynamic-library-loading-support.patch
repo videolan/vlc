@@ -1,0 +1,44 @@
+From fd3bb7deb6000a3f7930a3e03ed3e7ce82fee0e9 Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Thu, 4 Nov 2021 03:30:05 +0100
+Subject: [PATCH] Disable dynamic library loading support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Based on the previous patch by Rafaël Carré
+---
+ src/luaconf.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/luaconf.h b/src/luaconf.h
+index d42d14b..6e59b40 100644
+--- a/src/luaconf.h
++++ b/src/luaconf.h
+@@ -53,20 +53,20 @@
+ 
+ 
+ #if defined(LUA_USE_WINDOWS)
+-#define LUA_DL_DLL	/* enable support for DLL */
++//#define LUA_DL_DLL	/* enable support for DLL */
+ #define LUA_USE_C89	/* broadly, Windows is C89 */
+ #endif
+ 
+ 
+ #if defined(LUA_USE_LINUX)
+ #define LUA_USE_POSIX
+-#define LUA_USE_DLOPEN		/* needs an extra library: -ldl */
++//#define LUA_USE_DLOPEN		/* needs an extra library: -ldl */
+ #endif
+ 
+ 
+ #if defined(LUA_USE_MACOSX)
+ #define LUA_USE_POSIX
+-#define LUA_USE_DLOPEN		/* MacOS does not need -ldl */
++//#define LUA_USE_DLOPEN		/* MacOS does not need -ldl */
+ #endif
+ 
+ 
+-- 
+2.32.0 (Apple Git-132)
+

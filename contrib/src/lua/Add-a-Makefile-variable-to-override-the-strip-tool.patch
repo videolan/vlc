@@ -1,0 +1,33 @@
+From 7177fbcedd25f6ca7beb2370688a0ab447f3a202 Mon Sep 17 00:00:00 2001
+From: Marvin Scholz <epirat07@gmail.com>
+Date: Wed, 10 Nov 2021 12:44:52 +0100
+Subject: [PATCH] Add a Makefile variable to override the strip tool
+
+---
+ src/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 91cd273..8e8fc96 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -15,6 +15,7 @@ AR= ar rcu
+ RANLIB= ranlib
+ RM= rm -f
+ UNAME= uname
++STRIP= strip
+ 
+ SYSCFLAGS=
+ SYSLDFLAGS=
+@@ -131,7 +132,7 @@ Darwin macos macosx:
+ 
+ mingw:
+ 	$(MAKE) "LUA_A=lua54.dll" "LUA_T=lua.exe" "LUA_A_LINK=lua54.lib" \
+-	"AR=$(CC) -shared -Wl,--out-implib,lua54.lib  $(LDFLAGS) -o" "RANLIB=strip --strip-unneeded" \
++	"AR=$(CC) -shared -Wl,--out-implib,lua54.lib  $(LDFLAGS) -o" "RANLIB=$(STRIP) --strip-unneeded" \
+ 	"SYSCFLAGS=-DLUA_BUILD_AS_DLL" "SYSLIBS=" "SYSLDFLAGS=-s" lua.exe
+ 	$(MAKE) "LUAC_T=luac.exe" luac.exe
+ 
+-- 
+2.32.0 (Apple Git-132)
+
