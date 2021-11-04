@@ -46,7 +46,6 @@ FramesToBytes(struct aout_sys_common *p_sys, uint64_t i_frames)
 static inline int64_t
 TicksToFrames(struct aout_sys_common *p_sys, vlc_tick_t i_ticks)
 {
-    assert(i_ticks != VLC_TICK_INVALID);
     return samples_from_vlc_tick(i_ticks, p_sys->i_rate);
 }
 
