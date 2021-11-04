@@ -20,7 +20,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]==========================================================================]
 
-module("simplexml",package.seeall)
+local simplexml = {}
 
 --[[ Returns the xml tree structure
 --   Each node is of one of the following types:
@@ -85,19 +85,19 @@ local function parsexml(stream, errormsg)
     return tree
 end
 
-function parse_url(url)
+function simplexml.parse_url(url)
     return parsexml(vlc.stream(url))
 end
 
-function parse_stream(stream)
+function simplexml.parse_stream(stream)
     return parsexml(stream)
 end
 
-function parse_string(str)
+function simplexml.parse_string(str)
     return parsexml(vlc.memory_stream(str))
 end
 
-function add_name_maps(tree)
+function simplexml.add_name_maps(tree)
     tree.children_map = {}
     for _, node in pairs(tree.children) do
         if type(node) == "table" then
@@ -105,8 +105,10 @@ function add_name_maps(tree)
                 tree.children_map[node.name] = {}
             end
             table.insert(tree.children_map[node.name], node)
-            add_name_maps(node)
+            simplexml.add_name_maps(node)
         end
     end
 end
 
+_G.simplexml = simplexml
+return simplexml
