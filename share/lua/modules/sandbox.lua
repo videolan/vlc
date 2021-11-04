@@ -20,7 +20,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]==========================================================================]
 
-module("sandbox",package.seeall)
+local sandbox = {}
 
 -- See Programming in Lua (second edition) for sandbox examples
 -- See http://lua-users.org/wiki/SandBoxes for a list of SAFE/UNSAFE variables
@@ -48,7 +48,7 @@ if _VERSION == "Lua 5.1" then
     sandbox_blacklist["loadstring"] = true
 end
 
-function readonly_table_proxy(name,src,blacklist)
+function sandbox.readonly_table_proxy(name,src,blacklist)
     if type(src)=="nil" then return end
     if type(src)~="table" then error("2nd argument must be a table (or nil)") end
     local name = name
@@ -76,17 +76,17 @@ end
 -- Of course, all of this is useless if the sandbox calling code has
 -- another reference to one of these tables in his global environement.
 local sandbox_proxy = {
-    coroutine   = readonly_table_proxy("coroutine",coroutine),
-    string      = readonly_table_proxy("string",string,{"dump"}),
-    table       = readonly_table_proxy("table",table),
-    math        = readonly_table_proxy("math",math),
-    io          = readonly_table_proxy("io",io),
-    os          = readonly_table_proxy("os",os,{"exit","getenv","remove",
-                                                "rename","setlocale"}),
-    sandbox     = readonly_table_proxy("sandbox",sandbox),
+    coroutine   = sandbox.readonly_table_proxy("coroutine",coroutine),
+    string      = sandbox.readonly_table_proxy("string",string,{"dump"}),
+    table       = sandbox.readonly_table_proxy("table",table),
+    math        = sandbox.readonly_table_proxy("math",math),
+    io          = sandbox.readonly_table_proxy("io",io),
+    os          = sandbox.readonly_table_proxy("os",os,{"exit","getenv","remove",
+                                                        "rename","setlocale"}),
+    sandbox     = sandbox.readonly_table_proxy("sandbox",sandbox),
 }
 
-function sandbox(func,override)
+function sandbox.sandbox(func,override)
     local _G = getfenv(2)
     local override = override or {}
     local sandbox_metatable =
@@ -120,3 +120,6 @@ function sandbox(func,override)
         return unpack(ret)
     end
 end
+
+_G.sandbox = sandbox
+return sandbox
