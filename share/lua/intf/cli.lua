@@ -57,7 +57,7 @@ description=
     * flatplaylist: 0 to disable, 1 to enable.
 ]============================================================================]
 
-require("common")
+local common = require("common")
 skip = common.skip
 skip2 = function(foo) return skip(skip(foo)) end
 setarg = common.setarg

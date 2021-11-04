@@ -1,9 +1,9 @@
 --[[ This code is public domain (since it really isn't very interesting) ]]--
 
-module("common",package.seeall)
+local common = {}
 
 -- Iterate over a table in the keys' alphabetical order
-function pairs_sorted(t)
+function common.pairs_sorted(t)
     local s = {}
     for k,_ in pairs(t) do table.insert(s,k) end
     table.sort(s)
@@ -12,17 +12,17 @@ function pairs_sorted(t)
 end
 
 -- Return a function such as skip(foo)(a,b,c) = foo(b,c)
-function skip(foo)
+function common.skip(foo)
     return function(discard,...) return foo(...) end
 end
 
 -- Return a function such as setarg(foo,a)(b,c) = foo(a,b,c)
-function setarg(foo,a)
+function common.setarg(foo,a)
     return function(...) return foo(a,...) end
 end
 
 -- Trigger a hotkey
-function hotkey(arg)
+function common.hotkey(arg)
     local id = vlc.misc.action_id( arg )
     if id ~= nil then
         vlc.var.set( vlc.object.libvlc(), "key-action", id )
@@ -33,14 +33,14 @@ function hotkey(arg)
 end
 
 -- Take a video snapshot
-function snapshot()
+function common.snapshot()
     local vout = vlc.object.vout()
     if not vout then return end
     vlc.var.set(vout,"video-snapshot",nil)
 end
 
 -- Naive (non recursive) table copy
-function table_copy(t)
+function common.table_copy(t)
     c = {}
     for i,v in pairs(t) do c[i]=v end
     return c
@@ -48,7 +48,7 @@ end
 
 -- tonumber() for decimals number, using a dot as decimal separator
 -- regardless of the system locale 
-function us_tonumber(str)
+function common.us_tonumber(str)
     local s, i, d = string.match(str, "^([+-]?)(%d*)%.?(%d*)$")
     if not s or not i or not d then
         return nil
@@ -70,40 +70,40 @@ end
 
 -- tostring() for decimals number, using a dot as decimal separator
 -- regardless of the system locale 
-function us_tostring(n)
+function common.us_tostring(n)
     s = tostring(n):gsub(",", ".", 1)
     return s
 end
 
 -- strip leading and trailing spaces
-function strip(str)
+function common.strip(str)
     return string.gsub(str, "^%s*(.-)%s*$", "%1")
 end
 
 -- print a table (recursively)
-function table_print(t,prefix)
+function common.table_print(t,prefix)
     local prefix = prefix or ""
     if not t then
         print(prefix.."/!\\ nil")
         return
     end
-    for a,b in pairs_sorted(t) do
+    for a,b in common.pairs_sorted(t) do
         print(prefix..tostring(a),b)
         if type(b)==type({}) then
-            table_print(b,prefix.."\t")
+            common.table_print(b,prefix.."\t")
         end
     end
 end
 
 -- print the list of callbacks registered in lua
 -- useful for debug purposes
-function print_callbacks()
+function common.print_callbacks()
     print "callbacks:"
-    table_print(vlc.callbacks)
+    common.table_print(vlc.callbacks)
 end 
 
 -- convert a duration (in seconds) to a string
-function durationtostring(duration)
+function common.durationtostring(duration)
     return string.format("%02d:%02d:%02d",
                          math.floor(duration/3600),
                          math.floor(duration/60)%60,
@@ -113,7 +113,7 @@ end
 -- realpath
 -- this is for URL paths - do not use for file paths as this has
 -- no support for Windows '\' directory separators
-function realpath(path)
+function common.realpath(path)
     -- detect URLs to extract and process the path component
     local s, p, qf = string.match(path, "^([a-zA-Z0-9+%-%.]-://[^/]-)(/[^?#]*)(.*)$")
     if not s then
@@ -149,7 +149,7 @@ end
 
 -- parse the time from a string and return the seconds
 -- time format: [+ or -][<int><H or h>:][<int><M or m or '>:][<int><nothing or S or s or ">]
-function parsetime(timestring)
+function common.parsetime(timestring)
     local seconds = 0
     local hourspattern = "(%d+)[hH]"
     local minutespattern = "(%d+)[mM']"
@@ -176,11 +176,11 @@ function parsetime(timestring)
 end
 
 -- seek
-function seek(value)
+function common.seek(value)
     local input = vlc.object.input()
     if input ~= nil and value ~= nil then
         if string.sub(value,-1) == "%" then
-            local number = us_tonumber(string.sub(value,1,-2))
+            local number = common.us_tonumber(string.sub(value,1,-2))
             if number ~= nil then
                 local posPercent = number/100
                 if string.sub(value,1,1) == "+" or string.sub(value,1,1) == "-" then
@@ -190,7 +190,7 @@ function seek(value)
                 end
             end
         else
-            local posTime = parsetime(value)
+            local posTime = common.parsetime(value)
             if string.sub(value,1,1) == "+" or string.sub(value,1,1) == "-" then
                 vlc.var.set(input,"time",vlc.var.get(input,"time") + (posTime * 1000000))
             else
@@ -200,10 +200,13 @@ function seek(value)
     end
 end
 
-function volume(value)
+function common.volume(value)
     if type(value)=="string" and string.sub(value,1,1) == "+" or string.sub(value,1,1) == "-" then
         vlc.volume.set(vlc.volume.get()+tonumber(value))
     else
         vlc.volume.set(tostring(value))
     end
 end
+
+_G.common = common
+return common
