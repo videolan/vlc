@@ -19,12 +19,13 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 
-lazily_loaded = false
+local simplexml = nil
 
 function lazy_load()
-    if lazily_loaded then return nil end
-    require "simplexml"
-    lazily_loaded = true
+    if simplexml == nil
+    then
+        simplexml = require "simplexml"
+    end
 end
 
 function descriptor()
