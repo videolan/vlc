@@ -22,8 +22,6 @@
 # include "config.h"
 #endif
 
-#include "interop_sw.h"
-
 #include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -34,6 +32,7 @@
 #include <vlc_opengl_interop.h>
 
 #include "gl_util.h"
+#include "interop.h"
 
 #define PBO_DISPLAY_COUNT 2 /* Double buffering */
 typedef struct
@@ -563,7 +562,7 @@ opengl_interop_init(struct vlc_gl_interop *interop, GLenum tex_target,
     return interop_rgb_base_init(interop, tex_target, chroma);
 }
 
-void
+static void
 opengl_interop_generic_deinit(struct vlc_gl_interop *interop)
 {
     struct priv *priv = interop->priv;
@@ -573,7 +572,7 @@ opengl_interop_generic_deinit(struct vlc_gl_interop *interop)
     free(priv);
 }
 
-int
+static int
 opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
 {
 
