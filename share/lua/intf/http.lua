@@ -29,7 +29,7 @@ Configuration options:
 --]==========================================================================]
 
 
-require "common"
+local common = require "common"
 
 vlc.msg.info("Lua HTTP interface")
 
