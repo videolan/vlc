@@ -1795,8 +1795,8 @@ then
   AS_IF([test "${LUAC}" = "false"], [
     AC_MSG_ERROR([Could not find the LUA byte compiler.])
   ])
-  AS_IF([test -d "${CONTRIB_DIR}" -a -f "${CONTRIB_DIR}/lib/liblua.a" -a `echo|${LUAC} -o - -|od -j 8 -N 2 -t x2|head -n 1|tr -s ' '|cut -d' ' -f2` != 0404], [
-    AC_MSG_ERROR([You need 32-bits luac when using lua from contrib.])
+  AS_IF([test -d "${CONTRIB_DIR}" -a -f "${CONTRIB_DIR}/lib/liblua5.4.a" -a `echo|${LUAC} -o - -|od -j 12 -N 2 -t x2|head -n 1|tr -s ' '|cut -d' ' -f2` != 0804], [
+    AC_MSG_ERROR([You need 64bit luac when using lua from contrib.])
   ])
 fi
 AM_CONDITIONAL([BUILD_LUA], [test "${have_lua}" = "yes"])
