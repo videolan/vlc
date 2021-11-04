@@ -287,6 +287,7 @@ static void Close(vlc_gl_t *gl)
     if (_eaglEnabled)
         [self flushEAGLLocked];
     _eaglEnabled = NO;
+    _gl = NULL;
     vlc_mutex_unlock(&_mutex);
 
     /* This cannot be a synchronous dispatch because player is usually running
@@ -402,6 +403,11 @@ static void Close(vlc_gl_t *gl)
     CFRunLoopRef runloop = CFRunLoopGetMain();
     vlc_darwin_DispatchSync(runloop, ^{
         vlc_mutex_lock(&_mutex);
+        if (_gl == NULL)
+        {
+            vlc_mutex_unlock(&_mutex);
+            return;
+        }
         [self resizeLocked:size];
         vlc_mutex_unlock(&_mutex);
     });
@@ -444,6 +450,11 @@ static void Close(vlc_gl_t *gl)
 - (void)applicationStateChanged:(NSNotification *)notification
 {
     vlc_mutex_lock(&_mutex);
+    if (_gl == NULL)
+    {
+        vlc_mutex_unlock(&_mutex);
+        return;
+    }
 
     if ([[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification])
     {
