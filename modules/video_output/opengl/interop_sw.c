@@ -285,7 +285,7 @@ tc_common_update(const struct vlc_gl_interop *interop, GLuint *textures,
     return ret;
 }
 
-void
+static void
 opengl_interop_generic_deinit(struct vlc_gl_interop *interop)
 {
     struct priv *priv = interop->priv;
@@ -295,7 +295,7 @@ opengl_interop_generic_deinit(struct vlc_gl_interop *interop)
     free(priv);
 }
 
-int
+static int
 opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
 {
     video_color_space_t space;
