@@ -17,11 +17,11 @@
  *****************************************************************************/
 
 import QtQuick 2.11
-import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 
 import org.videolan.vlc 0.1
 
-Control {
+T.Control {
     id: root
 
     // Properties
@@ -38,6 +38,11 @@ Control {
     property alias delegate: repeater.delegate
 
     // Settings
+
+    implicitWidth: Math.max(background ? background.implicitWidth : 0,
+        (contentItem ? contentItem.implicitWidth : 0) + leftPadding + rightPadding)
+    implicitHeight: Math.max(background ? background.implicitHeight : 0,
+        (contentItem ? contentItem.implicitHeight : 0) + topPadding + bottomPadding)
 
     Navigation.navigable: (_countEnabled > 0)
 

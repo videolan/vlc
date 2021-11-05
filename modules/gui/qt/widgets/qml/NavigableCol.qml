@@ -17,12 +17,12 @@
  *****************************************************************************/
 
 import QtQuick 2.11
-import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 
 import org.videolan.vlc 0.1
 
 
-Control {
+T.Control {
     id: root
 
     // Properties
