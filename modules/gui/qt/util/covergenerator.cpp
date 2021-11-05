@@ -113,6 +113,26 @@ CoverGenerator::CoverGenerator(vlc_medialibrary_t * ml, const MLItemId & itemId,
     m_prefix = prefix;
 }
 
+bool CoverGenerator::cachedFileAvailable() const
+{
+    return QFile::exists(fileName());
+}
+
+QString CoverGenerator::cachedFileURL() const
+{
+    return QUrl::fromLocalFile(fileName()).toString();
+}
+
+QString CoverGenerator::fileName() const
+{
+    QDir dir(config_GetUserDir(VLC_CACHE_DIR) + COVERGENERATOR_STORAGE);
+    return dir.absoluteFilePath(QString("%1_thumbnail_%2_%3x%4.jpg")
+                                .arg((m_prefix.isEmpty() ? getPrefix(m_id.type) : m_prefix)
+                                     , QString::number(m_id.id)
+                                     , QString::number(m_size.width())
+                                     , QString::number(m_size.height())));
+}
+
 //-------------------------------------------------------------------------------------------------
 // QRunnable implementation
 //-------------------------------------------------------------------------------------------------
@@ -127,20 +147,7 @@ QString CoverGenerator::execute() /* override */
 
     int64_t id = m_id.id;
 
-    QString fileName;
-
-    // NOTE: If we don't have a valid prefix we generate one based on the item type.
-    if (m_prefix.isEmpty())
-    {
-        m_prefix = getPrefix(type);
-    }
-
-    fileName = QString("%1_thumbnail_%2_%3x%4.jpg")
-            .arg(m_prefix, QString::number(id)
-                 , QString::number(m_size.width()), QString::number(m_size.height()));
-
-    fileName = dir.absoluteFilePath(fileName);
-
+    QString fileName = this->fileName();
     if (dir.exists(fileName))
     {
         return QUrl::fromLocalFile(fileName).toString();

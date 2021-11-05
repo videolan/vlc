@@ -78,10 +78,16 @@ public: // Interface
     // NOTE: This lets us enforce a specific prefix for the cover fileName.
     Q_INVOKABLE void setPrefix(const QString & prefix);
 
+    bool cachedFileAvailable() const;
+
+    QString cachedFileURL() const;
+
 public: // AsyncTask implementation
     QString execute() override;
 
 private: // Functions
+    QString fileName() const;
+
     void draw(QPainter & painter, const QStringList & fileNames, int countX, int countY);
 
     void drawImage(QPainter & painter, const QString & fileName, const QRect & rect);
