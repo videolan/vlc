@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
-import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import QtQml.Models 2.2
 import QtGraphicalEffects 1.0
@@ -25,7 +25,7 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Control {
+T.Control {
     id: root
 
     // Properties
@@ -70,12 +70,15 @@ Control {
 
     // Settings
 
+    implicitWidth: layout.implicitWidth
+    implicitHeight: layout.implicitHeight
+
     Accessible.role: Accessible.Cell
     Accessible.name: title
 
-    // Keys
-
     Keys.onMenuPressed: root.contextMenuButtonClicked(picture, root.mapToGlobal(0,0))
+
+    // States
 
     states: [
         State {
@@ -99,10 +102,9 @@ Control {
                 playCoverVisible: true
                 playCoverOpacity: 1.0
             }
+
         }
     ]
-
-    // States
 
     transitions: [
         Transition {
