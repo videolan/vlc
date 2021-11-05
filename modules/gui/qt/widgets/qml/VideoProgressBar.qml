@@ -16,20 +16,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
-import QtQuick.Controls 2.4
-
+import QtQuick.Templates 2.4 as T
 import "qrc:///style/"
 
-ProgressBar {
+T.ProgressBar {
     id: progressBar
+    implicitHeight: VLCStyle.dp(2, VLCStyle.scale)
+
     background: Rectangle {
-        implicitHeight: VLCStyle.dp(2, VLCStyle.scale)
         color: "white"
     }
     contentItem: Item {
+
         Rectangle {
             width: progressBar.visualPosition * parent.width
-            height: parent.height
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
             color: VLCStyle.colors.accent
         }
     }
