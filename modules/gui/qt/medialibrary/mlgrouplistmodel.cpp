@@ -234,6 +234,13 @@ QString MLGroupListModel::getCover(MLGroup * group, int index) const
 
     generator->setDefaultThumbnail(":/noart_videoCover.svg");
 
+    if (generator->cachedFileAvailable())
+    {
+        group->setCover(generator->cachedFileURL());
+        generator->deleteLater();
+        return group->getCover();
+    }
+
     // NOTE: We'll apply the new thumbnail once it's loaded.
     connect(generator, &CoverGenerator::result, this, &MLGroupListModel::onCover);
 
