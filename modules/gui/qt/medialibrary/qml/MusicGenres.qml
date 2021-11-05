@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQml.Models 2.2
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
@@ -200,7 +201,8 @@ FocusScope {
                     Column {
                         anchors.centerIn: parent
 
-                        Label {
+                        //FIXME use the right xxxLabel class
+                        T.Label {
                              width: item.width
                              elide: Text.ElideRight
                              font.pixelSize: VLCStyle.fontSize_large

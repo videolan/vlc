@@ -19,6 +19,7 @@
 import QtQuick 2.11
 import QtQuick.Layouts 1.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 
 import org.videolan.vlc 0.1
 
@@ -95,7 +96,8 @@ FocusScope {
         anchors.leftMargin: VLCStyle.margin_small
         spacing: VLCStyle.margin_small
 
-        Label {
+        //FIXME use the right xxxLabel class
+        T.Label {
             Layout.preferredHeight: implicitHeight
             Layout.preferredWidth: implicitWidth
 

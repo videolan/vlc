@@ -36,7 +36,7 @@ T.Button {
     Keys.onPressed: Navigation.defaultKeyAction(event)
 
     contentItem: Item {
-        Label {
+        T.Label {
             id: content
             anchors.centerIn: parent
             text: control.text

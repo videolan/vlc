@@ -63,7 +63,7 @@ T.SpinBox {
         border.color: control.borderColor
     }
 
-    up.indicator: Label {
+    up.indicator: T.Label {
         x: control.mirrored ? 0 : parent.width - width
         z: 4
         height: parent.height
@@ -91,7 +91,7 @@ T.SpinBox {
         }
     }
 
-    down.indicator: Label {
+    down.indicator: T.Label {
         x: control.mirrored ? parent.width - width : 0
         z: 4
         height: parent.height

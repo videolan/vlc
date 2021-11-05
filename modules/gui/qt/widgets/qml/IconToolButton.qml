@@ -18,6 +18,7 @@
 
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 
 import org.videolan.vlc 0.1
 
@@ -107,7 +108,7 @@ ToolButton {
         activeBorderColor: VLCStyle.colors.bgFocus
     }
 
-    contentItem: Label {
+    contentItem: T.Label {
         anchors.centerIn: parent
 
         verticalAlignment: Text.AlignVCenter
@@ -123,7 +124,7 @@ ToolButton {
 
         Accessible.ignored: true
 
-        Label {
+        T.Label {
             anchors.centerIn: parent
 
             verticalAlignment: Text.AlignVCenter

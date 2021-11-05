@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQml.Models 2.2
 import QtQml 2.11
 
@@ -50,7 +51,8 @@ FocusScope {
         }
     }
 
-    Label {
+    //FIXME use the right xxxLabel class
+    T.Label {
         anchors.centerIn: parent
         visible: (deviceSection.model.count === 0 && lanSection.model.count === 0 )
         font.pixelSize: VLCStyle.fontHeight_xxlarge

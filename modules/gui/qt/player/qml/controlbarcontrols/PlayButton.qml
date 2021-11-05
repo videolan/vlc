@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
@@ -162,7 +163,7 @@ Control {
         }
     }
 
-    contentItem: Label {
+    contentItem: T.Label {
         id: contentLabel
 
         text: {

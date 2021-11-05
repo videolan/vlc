@@ -18,6 +18,7 @@
 
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import QtQml.Models 2.11
 
@@ -145,7 +146,8 @@ Control {
         }
     }
 
-    Label {
+    //FIXME use the right xxxLabel class
+    T.Label {
         id: mediaTime
 
         visible: false
@@ -154,7 +156,8 @@ Control {
         font.pixelSize: VLCStyle.fontSize_normal
     }
 
-    Label {
+    //FIXME use the right xxxLabel class
+    T.Label {
         id: mediaRemainingTime
 
         visible: false

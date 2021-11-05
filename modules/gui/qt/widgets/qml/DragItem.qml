@@ -17,7 +17,7 @@
  *****************************************************************************/
 
 import QtQuick          2.11
-import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQml.Models     2.2
 
 import QtGraphicalEffects 1.0
@@ -254,7 +254,7 @@ Item {
             height: titleLabel.height
             width: parent.width
 
-            Label {
+            T.Label {
                 id: titleLabel
 
                 text: _model.title

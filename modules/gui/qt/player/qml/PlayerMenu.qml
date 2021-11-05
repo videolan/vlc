@@ -73,7 +73,7 @@ T.Menu {
     }
 
     contentItem: ListView {
-        header: Label {
+        header: T.Label {
             leftPadding: VLCStyle.applicationHorizontalMargin
             text: control.title
             color: VLCStyle.colors.playerFg

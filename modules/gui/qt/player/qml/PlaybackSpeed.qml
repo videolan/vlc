@@ -18,6 +18,7 @@
 
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 
 import org.videolan.vlc 0.1
@@ -161,7 +162,7 @@ Popup {
 
                 focus: true
 
-                Label {
+                T.Label {
                     anchors.centerIn: parent
                     font.pixelSize: VLCStyle.fontSize_normal
                     text: i18n.qtr("1x")

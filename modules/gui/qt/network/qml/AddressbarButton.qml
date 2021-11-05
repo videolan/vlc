@@ -18,6 +18,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
@@ -87,7 +88,7 @@ AbstractButton {
     Component {
         id: textContent
 
-        Label {
+        T.Label {
             verticalAlignment: Text.AlignVCenter
 
             text: button.text

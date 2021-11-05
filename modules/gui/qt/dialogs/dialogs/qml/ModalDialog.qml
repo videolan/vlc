@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import QtGraphicalEffects 1.0
 
@@ -54,7 +55,8 @@ Dialog {
         color: VLCStyle.colors.topBanner
     }
 
-    header: Label {
+    //FIXME use the right xxxLabel class
+    header: T.Label {
         text: control.title
         visible: control.title
         elide: Label.ElideRight

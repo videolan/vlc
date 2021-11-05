@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
-import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 
 import "qrc:///style/"
 
@@ -28,7 +28,7 @@ Row {
     Repeater {
         id: repeater
 
-        delegate: Label {
+        delegate: T.Label {
             id: label
 
             text: modelData

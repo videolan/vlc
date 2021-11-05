@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import QtQml.Models 2.2
 import QtGraphicalEffects 1.0
@@ -434,7 +435,7 @@ Control {
 
                     opacity: 0.8
 
-                    Label {
+                    T.Label {
                         anchors.centerIn: parent
 
                         text: VLCIcons.add
@@ -639,7 +640,7 @@ Control {
                     font.pixelSize: VLCStyle.dp(48, VLCStyle.scale)
                 }
 
-                Label {
+                T.Label {
                     anchors.topMargin: VLCStyle.margin_xlarge
 
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -654,7 +655,7 @@ Control {
                     font.pixelSize: VLCStyle.fontSize_xxlarge
                 }
 
-                Label {
+                T.Label {
                     anchors.topMargin: VLCStyle.margin_normal
 
                     horizontalAlignment: Text.AlignHCenter

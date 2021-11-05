@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
-import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -76,7 +76,7 @@ Widgets.IconControlButton {
         }
     }
 
-    Label {
+    T.Label {
         anchors.centerIn: parent
         font.pixelSize: VLCStyle.fontSize_normal
         text: !playbackSpeedButton.paintOnly ? i18n.qtr("%1x").arg(+player.rate.toFixed(2)) : i18n.qtr("1x")

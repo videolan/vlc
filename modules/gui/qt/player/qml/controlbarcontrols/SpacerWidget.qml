@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
-import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -29,7 +29,7 @@ Item {
     implicitHeight: VLCStyle.icon_normal
     property alias spacetextExt: spacetext
     property bool paintOnly: false
-    Label {
+    T.Label {
         id: spacetext
         text: VLCIcons.space
         color: VLCStyle.colors.buttonText
