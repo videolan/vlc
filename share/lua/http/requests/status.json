@@ -26,7 +26,7 @@ vim:syntax=lua
 <?vlc
 
 --package.loaded.httprequests = nil --uncomment to debug changes
-require "httprequests"
+local httprequests = require "httprequests"
 
 httprequests.processcommands()
 

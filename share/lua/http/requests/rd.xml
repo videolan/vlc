@@ -24,7 +24,7 @@ vim:syntax=lua
 
 <?vlc
 
-require "httprequests"
+local httprequests = require "httprequests"
 
 httprequests.processcommands()
 

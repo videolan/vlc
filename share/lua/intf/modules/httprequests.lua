@@ -21,7 +21,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]==========================================================================]
 
-module("httprequests",package.seeall)
+local httprequests = {}
 
 local common = require ("common")
 local dkjson = require ("dkjson")
@@ -38,6 +38,7 @@ function round(what, precision)
     end
     return nil
 end
+httprequests.round = round
 
 --split text where it matches the delimiter
 function strsplit(text, delimiter)
@@ -63,6 +64,7 @@ function strsplit(text, delimiter)
     end
     return list
 end
+httprequests.strsplit = strsplit
 
 --main function to process commands sent with the request
 
@@ -198,6 +200,7 @@ processcommands = function ()
     local val = nil
 
 end
+httprequests.processcommands = processcommands
 
 --utilities for formatting output
 
@@ -210,6 +213,7 @@ function xmlString(s)
         return tostring(s)
     end
 end
+httprequests.xmlString = xmlString
 
 --dkjson outputs numbered tables as arrays
 --so we don't need the array indicators
@@ -229,6 +233,7 @@ function removeArrayIndicators(dict)
 
     return newDict
 end
+httprequests.removeArrayIndicators = removeArrayIndicators
 
 printTableAsJson = function (dict)
     dict=removeArrayIndicators(dict)
@@ -236,6 +241,7 @@ printTableAsJson = function (dict)
     local output=dkjson.encode (dict, { indent = true })
     print(output)
 end
+httprequests.printTableAsJson = printTableAsJson
 
 local printXmlKeyValue = function (k,v,indent)
     print("\n")
@@ -262,12 +268,14 @@ local printXmlKeyValue = function (k,v,indent)
         print("</"..k..">")
     end
 end
+httprequests.printXmlKeyValue = printXmlKeyValue
 
 printTableAsXml = function (dict,indent)
     for k,v in pairs(dict) do
         printXmlKeyValue(k,v,indent)
     end
 end
+httprequests.printTableAsXml = printTableAsXml
 
 --[[
 function logTable(t,pre)
@@ -301,6 +309,7 @@ getplaylist = function ()
 
     return p
 end
+httprequests.getplaylist = getplaylist
 
 parseplaylist = function (list)
     local playlist = {}
@@ -327,6 +336,7 @@ parseplaylist = function (list)
     return playlist
 
 end
+httprequests.parseplaylist = parseplaylist
 
 playlisttable = function ()
 
@@ -334,6 +344,7 @@ playlisttable = function ()
 
     return parseplaylist(basePlaylist)
 end
+httprequests.playlisttable = playlisttable
 
 getbrowsetable = function ()
 
@@ -411,6 +422,7 @@ getbrowsetable = function ()
 
     return result;
 end
+httprequests.getbrowsetable = getbrowsetable
 
 
 getstatus = function (includecategories)
@@ -513,6 +525,7 @@ getstatus = function (includecategories)
     end
     return s
 end
+httprequests.getstatus = getstatus
 
 get_renderers = function()
     local rd = get_renderer_discovery()
@@ -521,3 +534,7 @@ get_renderers = function()
     end
     return rd:list()
 end
+httprequests.get_renderers = get_renderers
+
+_G.httprequests = httprequests
+return httprequests
