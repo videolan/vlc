@@ -17,13 +17,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
-import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
-AbstractButton {
+T.AbstractButton {
     id: button
 
     // Properties
@@ -39,8 +38,12 @@ AbstractButton {
 
     // Settings
 
-    width: implicitWidth
-    height: implicitHeight
+    implicitWidth: Math.max(background.implicitWidth,
+            (contentItem ? contentItem.implicitWidth : 0) + leftPadding + rightPadding)
+    implicitHeight: Math.max(background.implicitHeight,
+            (contentItem ? contentItem.implicitHeight : 0) + topPadding + bottomPadding)
+    baselineOffset: contentItem ? contentItem.y + contentItem.baselineOffset : 0
+
 
     padding: VLCStyle.margin_xxsmall
 

@@ -17,7 +17,6 @@
  *****************************************************************************/
 
 import QtQuick 2.11
-import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 
 import org.videolan.vlc 0.1
@@ -25,7 +24,7 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-ToolButton {
+T.ToolButton {
     id: control
 
     // Properties
@@ -61,6 +60,12 @@ ToolButton {
     padding: 0
 
     enabled: !paintOnly
+
+    implicitWidth: Math.max(background.implicitWidth,
+                            contentItem.implicitWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(background.implicitHeight,
+                            contentItem.implicitHeight + topPadding + bottomPadding)
+    baselineOffset: contentItem.y + contentItem.baselineOffset
 
     // Keys
 
