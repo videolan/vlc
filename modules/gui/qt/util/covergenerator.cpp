@@ -135,7 +135,9 @@ QString CoverGenerator::execute() /* override */
         m_prefix = getPrefix(type);
     }
 
-    fileName = QString("%1_thumbnail_%2.jpg").arg(m_prefix).arg(id);
+    fileName = QString("%1_thumbnail_%2_%3x%4.jpg")
+            .arg(m_prefix, QString::number(id)
+                 , QString::number(m_size.width()), QString::number(m_size.height()));
 
     fileName = dir.absoluteFilePath(fileName);
 
