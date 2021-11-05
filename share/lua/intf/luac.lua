@@ -28,9 +28,6 @@ Output will be similar to that of the luac command line tool provided with lua w
   luac -o file.luac file.lua
 ]]
 
-require "string"
-require "io"
-
 function compile()
     vlc.msg.info("About to compile lua file")
     vlc.msg.info("  Input is '"..tostring(config.input).."'")
