@@ -259,6 +259,13 @@ QString MLPlaylistListModel::getCover(MLPlaylist * playlist, int index) const
 
     generator->setPrefix(m_coverPrefix);
 
+    if (generator->cachedFileAvailable())
+    {
+        playlist->setCover(generator->cachedFileURL());
+        generator->deleteLater();
+        return playlist->getCover();
+    }
+
     // NOTE: We'll apply the new thumbnail once it's loaded.
     connect(generator, &CoverGenerator::result, this, &MLPlaylistListModel::onCover);
 
