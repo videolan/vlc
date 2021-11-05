@@ -143,6 +143,13 @@ QString MLGenreModel::getCover(MLGenre * genre) const
 
     generator->setDefaultThumbnail(":/noart_album.svg");
 
+    if (generator->cachedFileAvailable())
+    {
+        genre->setCover(generator->cachedFileURL());
+        generator->deleteLater();
+        return genre->getCover();
+    }
+
     // NOTE: We'll apply the new cover once it's loaded.
     connect(generator, &CoverGenerator::result, this, &MLGenreModel::onCover);
 
