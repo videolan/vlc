@@ -2,7 +2,6 @@
 function gettext(text) print(vlc.gettext._(text)) end
 
 local _G = _G
-module("custom",package.seeall)
 
 local dialogs = setmetatable({}, {
 __index = function(self, name)
