@@ -89,10 +89,6 @@ static void stream_header (demux_t *demux, void *data, block_t *block)
 {
     VLC_UNUSED(demux);
     VLC_UNUSED(data);
-    if(block->p_buffer[1] & 0x80) /* TS M-bit == discontinuity (RFC 2250, 2.1) */
-    {
-        block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-    }
 }
 
 /* Send a packet to a chained demuxer */
