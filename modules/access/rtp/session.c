@@ -506,8 +506,13 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
      * format, a single source MUST only use payloads of a chosen frequency.
      * Otherwise it would be impossible to compute consistent timestamps. */
     const uint32_t timestamp = rtp_timestamp (block);
-    block->i_pts = src->ref_ntp
-       + vlc_tick_from_samples(timestamp - src->ref_rtp, pt->frequency);
+    union {
+        uint32_t u;
+        int32_t s;
+    } ts_delta = { .u = timestamp - src->ref_rtp };
+    vlc_tick_t ticks = vlc_tick_from_samples(ts_delta.s, pt->frequency);
+
+    block->i_pts = src->ref_ntp + ticks;
     /* TODO: proper inter-medias/sessions sync (using RTCP-SR) */
     src->ref_ntp = block->i_pts;
     src->ref_rtp = timestamp;
