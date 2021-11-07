@@ -41,7 +41,7 @@ struct rtp_session_t
     rtp_source_t **srcv;
     unsigned       srcc;
     uint8_t        ptc;
-    rtp_pt_t      *ptv;
+    rtp_pt_t     **ptv;
 };
 
 static rtp_source_t *
@@ -79,6 +79,9 @@ void rtp_session_destroy (demux_t *demux, rtp_session_t *session)
     for (unsigned i = 0; i < session->srcc; i++)
         rtp_source_destroy (demux, session, session->srcv[i]);
 
+    for (uint_fast8_t i = 0; i < session->ptc; i++)
+        vlc_rtp_pt_release(session->ptv[i]);
+
     free (session->srcv);
     free (session->ptv);
     free (session);
@@ -88,25 +91,22 @@ void rtp_session_destroy (demux_t *demux, rtp_session_t *session)
 /**
  * Adds a payload type to an RTP session.
  */
-int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt)
+int rtp_add_type(demux_t *demux, rtp_session_t *ses, rtp_pt_t *pt)
 {
+    assert(pt->frequency > 0); /* SIGFPE! */
+
     if (ses->srcc > 0)
     {
         msg_Err (demux, "cannot change RTP payload formats during session");
         return EINVAL;
     }
 
-    rtp_pt_t *ppt = realloc (ses->ptv, (ses->ptc + 1) * sizeof (rtp_pt_t));
+    rtp_pt_t **ppt = realloc(ses->ptv, (ses->ptc + 1) * sizeof (pt));
     if (ppt == NULL)
         return ENOMEM;
 
     ses->ptv = ppt;
-    ppt += ses->ptc++;
-    *ppt = *pt;
-    msg_Dbg (demux, "added payload type %"PRIu8" (f = %"PRIu32" Hz)",
-             ppt->number, ppt->frequency);
-
-    assert (ppt->frequency > 0); /* SIGFPE! */
+    ses->ptv[ses->ptc++] = pt;
     (void)demux;
     return 0;
 }
@@ -153,7 +153,7 @@ rtp_source_create (demux_t *demux, const rtp_session_t *session,
 
     /* Initializes all payload */
     for (unsigned i = 0; i < session->ptc; i++)
-        source->opaque[i] = vlc_rtp_pt_begin(&session->ptv[i], demux);
+        source->opaque[i] = vlc_rtp_pt_begin(session->ptv[i], demux);
 
     msg_Dbg (demux, "added RTP source (%08x)", ssrc);
     return source;
@@ -170,7 +170,7 @@ rtp_source_destroy (demux_t *demux, const rtp_session_t *session,
     msg_Dbg (demux, "removing RTP source (%08x)", source->ssrc);
 
     for (unsigned i = 0; i < session->ptc; i++)
-        vlc_rtp_pt_end(&session->ptv[i], demux, source->opaque[i]);
+        vlc_rtp_pt_end(session->ptv[i], demux, source->opaque[i]);
     block_ChainRelease (source->blocks);
     free (source);
 }
@@ -195,11 +195,13 @@ rtp_find_ptype (const rtp_session_t *session, rtp_source_t *source,
 
     for (unsigned i = 0; i < session->ptc; i++)
     {
-        if (session->ptv[i].number == ptype)
+        struct vlc_rtp_pt *pt = session->ptv[i];
+
+        if (pt->number == ptype)
         {
             if (pt_data != NULL)
                 *pt_data = source->opaque[i];
-            return &session->ptv[i];
+            return pt;
         }
     }
     return NULL;
