@@ -123,17 +123,22 @@ bad:
 
 static struct vlc_sdp_attr *vlc_sdp_attr_parse(const char *str, size_t len)
 {
-    struct vlc_sdp_attr *a = malloc(sizeof (*a) + len + 1);
-    const char *sep = memchr(str, ':', len);
-    size_t namelen = (sep != NULL) ? (size_t)(sep - str) : len;
+    size_t namelen = vlc_sdp_token_length(str);
+    if (namelen < len && str[namelen] != ':') {
+        errno = EINVAL;
+        return NULL;
+    }
 
+    struct vlc_sdp_attr *a = malloc(sizeof (*a) + len + 1);
     if (unlikely(a == NULL))
         return NULL;
 
     memcpy(a->name, str, len);
     a->name[namelen] = '\0';
-    a->name[len] = '\0';
-    a->value = (sep != NULL) ? a->name + namelen + 1 : NULL;
+    if (namelen < len) {
+        a->name[len] = '\0';
+        a->value = a->name + namelen + 1;
+    }
     a->next = NULL;
     return a;
 }
