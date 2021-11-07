@@ -32,6 +32,7 @@
 #include <vlc_network.h>
 #include <vlc_plugin.h>
 #include <vlc_dtls.h>
+#include <vlc_modules.h> /* module_exists() */
 
 #include "rtp.h"
 #ifdef HAVE_SRTP
@@ -44,7 +45,6 @@
 /*
  * TODO: so much stuff
  * - send RTCP-RR and RTCP-BYE
- * - dynamic payload types (need SDP parser)
  * - multiple medias (need SDP parser, and RTCP-SR parser for lip-sync)
  * - support for stream_filter in case of chained demux (MPEG-TS)
  */
@@ -199,13 +199,6 @@ static int OpenSDP(vlc_object_t *obj)
         goto error;
     }
 
-    /* Check payload type (FIXME: handle multiple, match w/ a=rtpmap) */
-    unsigned char pt = atoi(media->format);
-    if (pt >= 64 || !(UINT64_C(0x300005d09) & (UINT64_C(1) << pt))) {
-        msg_Dbg(obj, "unsupported payload format(s) %s", media->format);
-        goto error;
-    }
-
     if (vlc_sdp_media_attr_value(media, "control") != NULL
      || vlc_sdp_attr_value(sdp, "control") != NULL) {
         msg_Dbg(obj, "RTSP not supported");
@@ -294,15 +287,12 @@ static int OpenSDP(vlc_object_t *obj)
         }
     }
 
-    vlc_sdp_free(sdp);
-    sdp = NULL;
-
     sys->chained_demux = NULL;
     sys->max_src = var_InheritInteger(obj, "rtp-max-src");
     sys->timeout = vlc_tick_from_sec(var_InheritInteger(obj, "rtp-timeout"));
     sys->max_dropout  = var_InheritInteger(obj, "rtp-max-dropout");
     sys->max_misorder = -var_InheritInteger(obj, "rtp-max-misorder");
-    sys->autodetect = true;
+    sys->autodetect = false;
 
     demux->pf_demux = NULL;
     demux->pf_control = Control;
@@ -312,11 +302,22 @@ static int OpenSDP(vlc_object_t *obj)
     if (sys->session == NULL)
         goto error;
 
+    /* Parse payload types */
+    int err = vlc_rtp_add_media_types(demux, sys->session, media);
+    if (err < 0) {
+        msg_Err(obj, "SDP description parse error");
+        goto error;
+    }
+    if (err > 0 && module_exists("live555")) /* Bail out to live555 */
+        goto error;
+
     if (vlc_clone(&sys->thread, rtp_dgram_thread, demux,
                   VLC_THREAD_PRIORITY_INPUT)) {
         rtp_session_destroy(demux, sys->session);
         goto error;
     }
+
+    vlc_sdp_free(sdp);
     return VLC_SUCCESS;
 
 error:
@@ -324,8 +325,7 @@ error:
         vlc_dtls_Close(sys->rtcp_sock);
     if (sys->rtp_sock != NULL)
         vlc_dtls_Close(sys->rtp_sock);
-    if (sdp != NULL)
-        vlc_sdp_free(sdp);
+    vlc_sdp_free(sdp);
     return VLC_EGENERIC;
 }
 
