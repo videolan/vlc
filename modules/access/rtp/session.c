@@ -152,10 +152,8 @@ rtp_source_create (demux_t *demux, const rtp_session_t *session,
     source->blocks = NULL;
 
     /* Initializes all payload */
-    for (unsigned i = 0; i < session->ptc; i++) {
-        assert(session->ptv[i].init != NULL);
-        source->opaque[i] = session->ptv[i].init(&session->ptv[i], demux);
-    }
+    for (unsigned i = 0; i < session->ptc; i++)
+        source->opaque[i] = vlc_rtp_pt_begin(&session->ptv[i], demux);
 
     msg_Dbg (demux, "added RTP source (%08x)", ssrc);
     return source;
@@ -172,8 +170,7 @@ rtp_source_destroy (demux_t *demux, const rtp_session_t *session,
     msg_Dbg (demux, "removing RTP source (%08x)", source->ssrc);
 
     for (unsigned i = 0; i < session->ptc; i++)
-        if (session->ptv[i].destroy != NULL)
-            session->ptv[i].destroy (demux, source->opaque[i]);
+        vlc_rtp_pt_end(&session->ptv[i], demux, source->opaque[i]);
     block_ChainRelease (source->blocks);
     free (source);
 }
@@ -517,8 +514,7 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     block->p_buffer += skip;
     block->i_buffer -= skip;
 
-    assert(pt->decode != NULL);
-    pt->decode (demux, pt_data, block);
+    vlc_rtp_pt_decode(pt, demux, pt_data, block);
     return;
 
 drop:
