@@ -123,7 +123,6 @@ int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt)
     ppt->init = pt->init ? pt->init : no_init;
     ppt->destroy = pt->destroy ? pt->destroy : no_destroy;
     ppt->decode = pt->decode ? pt->decode : no_decode;
-    ppt->header = NULL;
     ppt->frequency = pt->frequency;
     ppt->number = pt->number;
     msg_Dbg (demux, "added payload type %"PRIu8" (f = %"PRIu32" Hz)",
@@ -501,9 +500,6 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
                  rtp_ptype (block));
         goto drop;
     }
-
-    if(pt->header)
-        pt->header(demux, pt_data, block);
 
     /* Computes the PTS from the RTP timestamp and payload RTP frequency.
      * DTS is unknown. Also, while the clock frequency depends on the payload

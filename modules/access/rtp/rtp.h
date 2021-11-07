@@ -30,7 +30,6 @@ struct rtp_pt_t
 {
     void   *(*init) (demux_t *);
     void    (*destroy) (demux_t *, void *);
-    void    (*header) (demux_t *, void *, block_t *);
     void    (*decode) (demux_t *, void *, block_t *);
     uint32_t  frequency; /* RTP clock rate (Hz) */
     uint8_t   number;
