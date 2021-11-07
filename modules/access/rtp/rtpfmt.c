@@ -346,26 +346,6 @@ void rtp_autodetect (demux_t *demux, rtp_session_t *session,
         break;
 
       default:
-        if (ptype >= 96)
-        {
-            char *dynamic = var_InheritString(demux, "rtp-dynamic-pt");
-            if (dynamic == NULL)
-                ;
-            else if (!strcmp(dynamic, "theora"))
-            {
-                msg_Dbg (demux, "assuming Theora Encoded Video");
-                pt.ops = &rtp_video_theora;
-                pt.frequency = 90000;
-
-                free (dynamic);
-                break;
-            }
-            else
-                msg_Err (demux, "unknown dynamic payload format `%s' "
-                                "specified", dynamic);
-            free (dynamic);
-        }
-
         msg_Err (demux, "unspecified payload format (type %"PRIu8")", ptype);
         msg_Info (demux, "A valid SDP is needed to parse this RTP stream.");
         vlc_dialog_display_error (demux, N_("SDP required"),

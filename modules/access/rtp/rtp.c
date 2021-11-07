@@ -532,16 +532,6 @@ error:
     "RTP packets will be discarded if they are too far behind (i.e. in the " \
     "past) by this many packets from the last received packet." )
 
-#define RTP_DYNAMIC_PT_TEXT N_("RTP payload format assumed for dynamic " \
-                               "payloads")
-#define RTP_DYNAMIC_PT_LONGTEXT N_( \
-    "This payload format will be assumed for dynamic payload types " \
-    "(between 96 and 127) if it can't be determined otherwise with " \
-    "out-of-band mappings (SDP)" )
-
-static const char *const dynamic_pt_list[] = { "", "theora" };
-static const char *const dynamic_pt_list_text[] = { N_( "Unset" ), N_( "Theora Encoded Video" ) };
-
 /*
  * Module descriptor
  */
@@ -580,9 +570,7 @@ vlc_module_begin()
     add_integer("rtp-max-misorder", 100, RTP_MAX_MISORDER_TEXT,
                 RTP_MAX_MISORDER_LONGTEXT)
         change_integer_range (0, 32767)
-    add_string("rtp-dynamic-pt", "", RTP_DYNAMIC_PT_TEXT,
-               RTP_DYNAMIC_PT_LONGTEXT)
-        change_string_list(dynamic_pt_list, dynamic_pt_list_text)
+    add_obsolete_string("rtp-dynamic-pt") /* since 4.0.0 */
 
     /*add_shortcut ("sctp")*/
     add_shortcut("dccp", "rtp", "udplite")
