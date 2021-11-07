@@ -24,8 +24,17 @@ typedef struct vlc_rtp_pt rtp_pt_t;
 typedef struct rtp_session_t rtp_session_t;
 
 struct vlc_demux_chained_t;
+struct vlc_sdp_media;
 
 /** @section RTP payload format */
+
+struct vlc_sdp_pt {
+    const struct vlc_sdp_media *media;
+    char name[16];
+    unsigned int clock_rate;
+    unsigned char channel_count;
+    const char *parameters;
+};
 
 struct vlc_rtp_pt_operations {
     void *(*init)(struct vlc_rtp_pt *, demux_t *);
@@ -108,6 +117,8 @@ void rtp_session_destroy (demux_t *, rtp_session_t *);
 void rtp_queue (demux_t *, rtp_session_t *, block_t *);
 bool rtp_dequeue (demux_t *, const rtp_session_t *, vlc_tick_t *);
 int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt);
+int vlc_rtp_add_media_types(demux_t *demux, rtp_session_t *ses,
+                            const struct vlc_sdp_media *media);
 
 void *rtp_dgram_thread (void *data);
 
