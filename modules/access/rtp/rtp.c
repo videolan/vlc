@@ -303,7 +303,7 @@ static int OpenSDP(vlc_object_t *obj)
         goto error;
 
     /* Parse payload types */
-    int err = vlc_rtp_add_media_types(demux, sys->session, media);
+    int err = vlc_rtp_add_media_types(obj, sys->session, media);
     if (err < 0) {
         msg_Err(obj, "SDP description parse error");
         goto error;

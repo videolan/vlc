@@ -103,7 +103,7 @@ static inline void vlc_rtp_pt_decode(const struct vlc_rtp_pt *pt,
     pt->ops->decode(demux, data, pkt);
 }
 
-void rtp_autodetect (demux_t *, rtp_session_t *, const block_t *);
+void rtp_autodetect(vlc_object_t *, rtp_session_t *, const block_t *);
 
 static inline uint8_t rtp_ptype (const block_t *block)
 {
@@ -122,7 +122,7 @@ void rtp_session_destroy (demux_t *, rtp_session_t *);
 void rtp_queue (demux_t *, rtp_session_t *, block_t *);
 bool rtp_dequeue (demux_t *, const rtp_session_t *, vlc_tick_t *);
 int rtp_add_type(rtp_session_t *ses, rtp_pt_t *pt);
-int vlc_rtp_add_media_types(demux_t *demux, rtp_session_t *ses,
+int vlc_rtp_add_media_types(vlc_object_t *obj, rtp_session_t *ses,
                             const struct vlc_sdp_media *media);
 
 void *rtp_dgram_thread (void *data);

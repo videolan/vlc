@@ -272,8 +272,8 @@ static const struct vlc_rtp_pt_operations rtp_av_ts = {
 
 /* Not using SDP, we need to guess the payload format used */
 /* see http://www.iana.org/assignments/rtp-parameters */
-void rtp_autodetect (demux_t *demux, rtp_session_t *session,
-                     const block_t *block)
+void rtp_autodetect(vlc_object_t *obj, rtp_session_t *session,
+                    const block_t *block)
 {
     uint8_t ptype = rtp_ptype (block);
     char type[6], proto[] = "RTP/AVP", numstr[4];
@@ -286,10 +286,10 @@ void rtp_autodetect (demux_t *demux, rtp_session_t *session,
     memcpy(type, (ptype == 32) ? "video" : "audio", 6);
     snprintf(numstr, sizeof (numstr), "%hhu", ptype);
 
-    if (vlc_rtp_add_media_types(demux, session, &media)) {
-        msg_Err (demux, "unspecified payload format (type %"PRIu8")", ptype);
-        msg_Info (demux, "A valid SDP is needed to parse this RTP stream.");
-        vlc_dialog_display_error (demux, N_("SDP required"),
+    if (vlc_rtp_add_media_types(obj, session, &media)) {
+        msg_Err(obj, "unspecified payload format (type %"PRIu8")", ptype);
+        msg_Info(obj, "A valid SDP is needed to parse this RTP stream.");
+        vlc_dialog_display_error(obj, N_("SDP required"),
              N_("A description in SDP format is required to receive the RTP "
                 "stream. Note that rtp:// URIs cannot work with dynamic "
                 "RTP payload format (%"PRIu8")."), ptype);
@@ -423,7 +423,7 @@ static void vlc_rtp_set_default_types(struct vlc_sdp_pt *restrict types,
 /**
  * Registers all payload types declared in an SDP media.
  */
-int vlc_rtp_add_media_types(demux_t *demux, rtp_session_t *session,
+int vlc_rtp_add_media_types(vlc_object_t *obj, rtp_session_t *session,
                             const struct vlc_sdp_media *media)
 {
     struct vlc_sdp_pt types[128] = { };
@@ -484,14 +484,14 @@ int vlc_rtp_add_media_types(demux_t *demux, rtp_session_t *session,
         if (type->media == NULL) /* not defined or already used */
             continue;
 
-        msg_Dbg(demux, "payload type %lu: %s/%s, %u Hz", number,
+        msg_Dbg(obj, "payload type %lu: %s/%s, %u Hz", number,
                 media->type, type->name, type->clock_rate);
         if (type->channel_count > 0)
-            msg_Dbg(demux, " - %hhu channel(s)", type->channel_count);
+            msg_Dbg(obj, " - %hhu channel(s)", type->channel_count);
         if (type->parameters != NULL)
-            msg_Dbg(demux, " - parameters: %s", type->parameters);
+            msg_Dbg(obj, " - parameters: %s", type->parameters);
 
-        struct vlc_rtp_pt *pt = vlc_rtp_pt_create(VLC_OBJECT(demux), type);
+        struct vlc_rtp_pt *pt = vlc_rtp_pt_create(obj, type);
         if (pt != NULL) {
             pt->number = number;
             if (rtp_add_type(session, pt))
