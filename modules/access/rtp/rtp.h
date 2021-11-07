@@ -20,15 +20,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  ****************************************************************************/
 
-typedef struct rtp_pt_t rtp_pt_t;
+typedef struct vlc_rtp_pt rtp_pt_t;
 typedef struct rtp_session_t rtp_session_t;
 
 struct vlc_demux_chained_t;
 
 /** @section RTP payload format */
-struct rtp_pt_t
+struct vlc_rtp_pt
 {
-    void   *(*init) (demux_t *);
+    void *(*init)(struct vlc_rtp_pt *, demux_t *);
     void    (*destroy) (demux_t *, void *);
     void    (*decode) (demux_t *, void *, block_t *);
     uint32_t  frequency; /* RTP clock rate (Hz) */
@@ -45,7 +45,7 @@ void *codec_init (demux_t *demux, es_format_t *fmt);
 void codec_destroy (demux_t *demux, void *data);
 void codec_decode (demux_t *demux, void *data, block_t *block);
 
-void *theora_init (demux_t *demux);
+void *theora_init(struct vlc_rtp_pt *, demux_t *demux);
 void xiph_destroy (demux_t *demux, void *data);
 void xiph_decode (demux_t *demux, void *data, block_t *block);
 

@@ -170,7 +170,7 @@ rtp_source_create (demux_t *demux, const rtp_session_t *session,
 
     /* Initializes all payload */
     for (unsigned i = 0; i < session->ptc; i++)
-        source->opaque[i] = session->ptv[i].init (demux);
+        source->opaque[i] = session->ptv[i].init(&session->ptv[i], demux);
 
     msg_Dbg (demux, "added RTP source (%08x)", ssrc);
     return source;
@@ -204,7 +204,7 @@ static inline uint32_t rtp_timestamp (const block_t *block)
     return GetDWBE (block->p_buffer + 4);
 }
 
-static const struct rtp_pt_t *
+static const struct vlc_rtp_pt *
 rtp_find_ptype (const rtp_session_t *session, rtp_source_t *source,
                 const block_t *block, void **pt_data)
 {

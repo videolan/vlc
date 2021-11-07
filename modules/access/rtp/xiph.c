@@ -71,9 +71,9 @@ static void *vorbis_init (demux_t *demux)
 /* PT=dynamic
  * vorbis: Xiph Theora video
  */
-void *theora_init (demux_t *demux)
+void *theora_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
-    (void)demux;
+    (void) pt; (void) demux;
     return xiph_init (false);
 }
 

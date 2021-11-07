@@ -102,7 +102,7 @@ static void stream_decode (demux_t *demux, void *data, block_t *block)
 /* PT=0
  * PCMU: G.711 µ-law (RFC3551)
  */
-static void *pcmu_init (demux_t *demux)
+static void *pcmu_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
     es_format_t fmt;
 
@@ -115,20 +115,21 @@ static void *pcmu_init (demux_t *demux)
 /* PT=3
  * GSM
  */
-static void *gsm_init (demux_t *demux)
+static void *gsm_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
     es_format_t fmt;
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_GSM);
     fmt.audio.i_rate = 8000;
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
+    (void) pt;
     return codec_init (demux, &fmt);
 }
 
 /* PT=8
  * PCMA: G.711 A-law (RFC3551)
  */
-static void *pcma_init (demux_t *demux)
+static void *pcma_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
     es_format_t fmt;
 
@@ -141,7 +142,7 @@ static void *pcma_init (demux_t *demux)
 /* PT=10,11
  * L16: 16-bits (network byte order) PCM
  */
-static void *l16s_init (demux_t *demux)
+static void *l16s_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
     es_format_t fmt;
 
@@ -151,7 +152,7 @@ static void *l16s_init (demux_t *demux)
     return codec_init (demux, &fmt);
 }
 
-static void *l16m_init (demux_t *demux)
+static void *l16m_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
     es_format_t fmt;
 
@@ -164,26 +165,28 @@ static void *l16m_init (demux_t *demux)
 /* PT=12
  * QCELP
  */
-static void *qcelp_init (demux_t *demux)
+static void *qcelp_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
     es_format_t fmt;
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_QCELP);
     fmt.audio.i_rate = 8000;
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
+    (void) pt;
     return codec_init (demux, &fmt);
 }
 
 /* PT=14
  * MPA: MPEG Audio (RFC2250, §3.4)
  */
-static void *mpa_init (demux_t *demux)
+static void *mpa_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
     es_format_t fmt;
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MPGA);
     fmt.audio.i_physical_channels = AOUT_CHANS_STEREO;
     fmt.b_packetized = false;
+    (void) pt;
     return codec_init (demux, &fmt);
 }
 
@@ -205,12 +208,13 @@ static void mpa_decode (demux_t *demux, void *data, block_t *block)
 /* PT=32
  * MPV: MPEG Video (RFC2250, §3.5)
  */
-static void *mpv_init (demux_t *demux)
+static void *mpv_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
     es_format_t fmt;
 
     es_format_Init (&fmt, VIDEO_ES, VLC_CODEC_MPGV);
     fmt.b_packetized = false;
+    (void) pt;
     return codec_init (demux, &fmt);
 }
 
@@ -238,8 +242,9 @@ static void mpv_decode (demux_t *demux, void *data, block_t *block)
 /* PT=33
  * MP2: MPEG TS (RFC2250, §2)
  */
-static void *ts_init (demux_t *demux)
+static void *ts_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
+    (void) pt;
     return stream_init (demux, "ts");
 }
 
