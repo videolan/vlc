@@ -71,13 +71,13 @@ static void *vorbis_init (demux_t *demux)
 /* PT=dynamic
  * vorbis: Xiph Theora video
  */
-void *theora_init(struct vlc_rtp_pt *pt, demux_t *demux)
+static void *theora_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
     (void) pt; (void) demux;
     return xiph_init (false);
 }
 
-void xiph_destroy (demux_t *demux, void *data)
+static void xiph_destroy(demux_t *demux, void *data)
 {
     rtp_xiph_t *self = data;
 
@@ -142,8 +142,7 @@ static ssize_t xiph_header (void **pextra, const uint8_t *buf, size_t len)
     return extra_size;
 }
 
-
-void xiph_decode (demux_t *demux, void *data, block_t *block)
+static void xiph_decode(demux_t *demux, void *data, block_t *block)
 {
     rtp_xiph_t *self = data;
 
@@ -286,3 +285,7 @@ void xiph_decode (demux_t *demux, void *data, block_t *block)
 drop:
     block_Release (block);
 }
+
+const struct vlc_rtp_pt_operations rtp_video_theora = {
+    theora_init, xiph_destroy, xiph_decode,
+};

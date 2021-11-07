@@ -26,11 +26,16 @@ typedef struct rtp_session_t rtp_session_t;
 struct vlc_demux_chained_t;
 
 /** @section RTP payload format */
+
+struct vlc_rtp_pt_operations {
+    void *(*init)(struct vlc_rtp_pt *, demux_t *);
+    void (*destroy)(demux_t *, void *);
+    void (*decode)(demux_t *, void *, block_t *);
+};
+
 struct vlc_rtp_pt
 {
-    void *(*init)(struct vlc_rtp_pt *, demux_t *);
-    void    (*destroy) (demux_t *, void *);
-    void    (*decode) (demux_t *, void *, block_t *);
+    const struct vlc_rtp_pt_operations *ops;
     uint32_t  frequency; /* RTP clock rate (Hz) */
     uint8_t   number;
 };
@@ -49,8 +54,8 @@ struct vlc_rtp_pt
  */
 static inline void *vlc_rtp_pt_begin(struct vlc_rtp_pt *pt, demux_t *demux)
 {
-    assert(pt->init != NULL);
-    return pt->init(pt, demux);
+    assert(pt->ops->init != NULL);
+    return pt->ops->init(pt, demux);
 }
 
 /**
@@ -65,8 +70,8 @@ static inline void *vlc_rtp_pt_begin(struct vlc_rtp_pt *pt, demux_t *demux)
 static inline void vlc_rtp_pt_end(struct vlc_rtp_pt *pt, demux_t *demux,
                                   void *data)
 {
-    if (pt->destroy != NULL)
-        pt->destroy(demux, data);
+    if (pt->ops->destroy != NULL)
+        pt->ops->destroy(demux, data);
 }
 
 /**
@@ -79,8 +84,8 @@ static inline void vlc_rtp_pt_decode(const struct vlc_rtp_pt *pt,
                                      demux_t *demux,
                                      void *data, block_t *pkt)
 {
-    assert(pt->decode != NULL);
-    pt->decode(demux, data, pkt);
+    assert(pt->ops->decode != NULL);
+    pt->ops->decode(demux, data, pkt);
 }
 
 void rtp_autodetect (demux_t *, rtp_session_t *, const block_t *);
@@ -94,9 +99,7 @@ void *codec_init (demux_t *demux, es_format_t *fmt);
 void codec_destroy (demux_t *demux, void *data);
 void codec_decode (demux_t *demux, void *data, block_t *block);
 
-void *theora_init(struct vlc_rtp_pt *, demux_t *demux);
-void xiph_destroy (demux_t *demux, void *data);
-void xiph_decode (demux_t *demux, void *data, block_t *block);
+extern const struct vlc_rtp_pt_operations rtp_video_theora;
 
 /** @section RTP session */
 rtp_session_t *rtp_session_create (demux_t *);

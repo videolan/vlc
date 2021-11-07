@@ -112,6 +112,10 @@ static void *pcmu_init(struct vlc_rtp_pt *pt, demux_t *demux)
     return codec_init (demux, &fmt);
 }
 
+static const struct vlc_rtp_pt_operations rtp_audio_pcmu = {
+    pcmu_init, codec_destroy, codec_decode,
+};
+
 /* PT=3
  * GSM
  */
@@ -126,6 +130,10 @@ static void *gsm_init(struct vlc_rtp_pt *pt, demux_t *demux)
     return codec_init (demux, &fmt);
 }
 
+static const struct vlc_rtp_pt_operations rtp_audio_gsm = {
+    gsm_init, codec_destroy, codec_decode,
+};
+
 /* PT=8
  * PCMA: G.711 A-law (RFC3551)
  */
@@ -138,6 +146,10 @@ static void *pcma_init(struct vlc_rtp_pt *pt, demux_t *demux)
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
     return codec_init (demux, &fmt);
 }
+
+static const struct vlc_rtp_pt_operations rtp_audio_pcma = {
+    pcma_init, codec_destroy, codec_decode,
+};
 
 /* PT=10,11
  * L16: 16-bits (network byte order) PCM
@@ -152,6 +164,10 @@ static void *l16s_init(struct vlc_rtp_pt *pt, demux_t *demux)
     return codec_init (demux, &fmt);
 }
 
+static const struct vlc_rtp_pt_operations rtp_audio_l16s = {
+    l16s_init, codec_destroy, codec_decode,
+};
+
 static void *l16m_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
     es_format_t fmt;
@@ -161,6 +177,10 @@ static void *l16m_init(struct vlc_rtp_pt *pt, demux_t *demux)
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
     return codec_init (demux, &fmt);
 }
+
+static const struct vlc_rtp_pt_operations rtp_audio_l16m = {
+    l16m_init, codec_destroy, codec_decode,
+};
 
 /* PT=12
  * QCELP
@@ -175,6 +195,10 @@ static void *qcelp_init(struct vlc_rtp_pt *pt, demux_t *demux)
     (void) pt;
     return codec_init (demux, &fmt);
 }
+
+static const struct vlc_rtp_pt_operations rtp_audio_qcelp = {
+    qcelp_init, codec_destroy, codec_decode,
+};
 
 /* PT=14
  * MPA: MPEG Audio (RFC2250, §3.4)
@@ -204,6 +228,9 @@ static void mpa_decode (demux_t *demux, void *data, block_t *block)
     codec_decode (demux, data, block);
 }
 
+static const struct vlc_rtp_pt_operations rtp_audio_mpa = {
+    mpa_init, codec_destroy, mpa_decode,
+};
 
 /* PT=32
  * MPV: MPEG Video (RFC2250, §3.5)
@@ -238,6 +265,9 @@ static void mpv_decode (demux_t *demux, void *data, block_t *block)
     codec_decode (demux, data, block);
 }
 
+static const struct vlc_rtp_pt_operations rtp_video_mpv = {
+    mpv_init, codec_destroy, mpv_decode,
+};
 
 /* PT=33
  * MP2: MPEG TS (RFC2250, §2)
@@ -248,6 +278,9 @@ static void *ts_init(struct vlc_rtp_pt *pt, demux_t *demux)
     return stream_init (demux, "ts");
 }
 
+static const struct vlc_rtp_pt_operations rtp_av_ts = {
+    ts_init, stream_destroy, stream_decode,
+};
 
 /* Not using SDP, we need to guess the payload format used */
 /* see http://www.iana.org/assignments/rtp-parameters */
@@ -256,9 +289,7 @@ void rtp_autodetect (demux_t *demux, rtp_session_t *session,
 {
     uint8_t ptype = rtp_ptype (block);
     rtp_pt_t pt = {
-        .init = NULL,
-        .destroy = codec_destroy,
-        .decode = codec_decode,
+        .ops = NULL,
         .frequency = 0,
         .number = ptype,
     };
@@ -267,59 +298,55 @@ void rtp_autodetect (demux_t *demux, rtp_session_t *session,
     {
       case 0:
         msg_Dbg (demux, "detected G.711 mu-law");
-        pt.init = pcmu_init;
+        pt.ops = &rtp_audio_pcmu;
         pt.frequency = 8000;
         break;
 
       case 3:
         msg_Dbg (demux, "detected GSM");
-        pt.init = gsm_init;
+        pt.ops = &rtp_audio_gsm;
         pt.frequency = 8000;
         break;
 
       case 8:
         msg_Dbg (demux, "detected G.711 A-law");
-        pt.init = pcma_init;
+        pt.ops = &rtp_audio_pcma;
         pt.frequency = 8000;
         break;
 
       case 10:
         msg_Dbg (demux, "detected stereo PCM");
-        pt.init = l16s_init;
+        pt.ops = &rtp_audio_l16s;
         pt.frequency = 44100;
         break;
 
       case 11:
         msg_Dbg (demux, "detected mono PCM");
-        pt.init = l16m_init;
+        pt.ops = &rtp_audio_l16m;
         pt.frequency = 44100;
         break;
 
       case 12:
         msg_Dbg (demux, "detected QCELP");
-        pt.init = qcelp_init;
+        pt.ops = &rtp_audio_qcelp;
         pt.frequency = 8000;
         break;
 
       case 14:
         msg_Dbg (demux, "detected MPEG Audio");
-        pt.init = mpa_init;
-        pt.decode = mpa_decode;
+        pt.ops = &rtp_audio_mpa;
         pt.frequency = 90000;
         break;
 
       case 32:
         msg_Dbg (demux, "detected MPEG Video");
-        pt.init = mpv_init;
-        pt.decode = mpv_decode;
+        pt.ops = &rtp_video_mpv;
         pt.frequency = 90000;
         break;
 
       case 33:
         msg_Dbg (demux, "detected MPEG2 TS");
-        pt.init = ts_init;
-        pt.destroy = stream_destroy;
-        pt.decode = stream_decode;
+        pt.ops = &rtp_av_ts;
         pt.frequency = 90000;
         break;
 
@@ -332,9 +359,7 @@ void rtp_autodetect (demux_t *demux, rtp_session_t *session,
             else if (!strcmp(dynamic, "theora"))
             {
                 msg_Dbg (demux, "assuming Theora Encoded Video");
-                pt.init = theora_init;
-                pt.destroy = xiph_destroy;
-                pt.decode = xiph_decode;
+                pt.ops = &rtp_video_theora;
                 pt.frequency = 90000;
 
                 free (dynamic);
