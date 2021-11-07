@@ -85,12 +85,6 @@ void rtp_session_destroy (demux_t *demux, rtp_session_t *session)
     (void)demux;
 }
 
-static void *no_init (demux_t *demux)
-{
-    (void)demux;
-    return NULL;
-}
-
 static void no_destroy (demux_t *demux, void *opaque)
 {
     (void)demux; (void)opaque;
@@ -120,7 +114,8 @@ int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt)
     ses->ptv = ppt;
     ppt += ses->ptc++;
 
-    ppt->init = pt->init ? pt->init : no_init;
+    assert(pt->init != NULL);
+    ppt->init = pt->init;
     ppt->destroy = pt->destroy ? pt->destroy : no_destroy;
     ppt->decode = pt->decode ? pt->decode : no_decode;
     ppt->frequency = pt->frequency;
