@@ -501,14 +501,16 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     // Report the initial volume and mute status to the core
     if (sys->client != NULL)
     {
-        ISimpleAudioVolume* pc_AudioVolume = NULL;
+        ISimpleAudioVolume *pc_AudioVolume = NULL;
+        void *pv;
 
-        hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, (void**)&pc_AudioVolume);
+        hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pv);
         if (FAILED(hr))
         {
             msg_Err(aout, "cannot get volume service (error 0x%lx)", hr);
             goto done;
         }
+        pc_AudioVolume = pv;
 
         float vol;
         hr = ISimpleAudioVolume_GetMasterVolume(pc_AudioVolume, &vol);
