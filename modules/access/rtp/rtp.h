@@ -34,6 +34,55 @@ struct vlc_rtp_pt
     uint32_t  frequency; /* RTP clock rate (Hz) */
     uint8_t   number;
 };
+
+/**
+ * Instantiates a payload type.
+ *
+ * A given SDP media can have multiple alternative payload types, each with
+ * their set of parameters. The RTP session can then have multiple concurrent
+ * RTP sources (SSRC). This function creates an instance of a given payload
+ * type for use by an unique RTP source.
+ *
+ * @param pt RTP payload type to instantiate
+ * @param demux demux object for output
+ * @return private data for the instance
+ */
+static inline void *vlc_rtp_pt_begin(struct vlc_rtp_pt *pt, demux_t *demux)
+{
+    assert(pt->init != NULL);
+    return pt->init(pt, demux);
+}
+
+/**
+ * Deinstantiates a payload type.
+ *
+ * This destroys an instance of a payload type created by vlc_rtp_pt_begin().
+ *
+ * @param pt RTP payload type to deinstantiate
+ * @param demux demux object that was used by the instance
+ * @param data instance private data as returned by vlc_rtp_pt_begin()
+ */
+static inline void vlc_rtp_pt_end(struct vlc_rtp_pt *pt, demux_t *demux,
+                                  void *data)
+{
+    if (pt->destroy != NULL)
+        pt->destroy(demux, data);
+}
+
+/**
+ * Processes an payload packet.
+ *
+ * This passes a data payload of an RTP packet to the instance of the
+ * payload type specified in the packet (PT and SSRC fields).
+ */
+static inline void vlc_rtp_pt_decode(const struct vlc_rtp_pt *pt,
+                                     demux_t *demux,
+                                     void *data, block_t *pkt)
+{
+    assert(pt->decode != NULL);
+    pt->decode(demux, data, pkt);
+}
+
 void rtp_autodetect (demux_t *, rtp_session_t *, const block_t *);
 
 static inline uint8_t rtp_ptype (const block_t *block)
