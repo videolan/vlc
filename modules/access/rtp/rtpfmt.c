@@ -107,7 +107,7 @@ static void *pcmu_init(struct vlc_rtp_pt *pt, demux_t *demux)
     es_format_t fmt;
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MULAW);
-    fmt.audio.i_rate = 8000;
+    fmt.audio.i_rate = pt->frequency;
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
     return codec_init (demux, &fmt);
 }
@@ -134,7 +134,7 @@ static void *pcma_init(struct vlc_rtp_pt *pt, demux_t *demux)
     es_format_t fmt;
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_ALAW);
-    fmt.audio.i_rate = 8000;
+    fmt.audio.i_rate = pt->frequency;
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
     return codec_init (demux, &fmt);
 }
@@ -147,7 +147,7 @@ static void *l16s_init(struct vlc_rtp_pt *pt, demux_t *demux)
     es_format_t fmt;
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_S16B);
-    fmt.audio.i_rate = 44100;
+    fmt.audio.i_rate = pt->frequency;
     fmt.audio.i_physical_channels = AOUT_CHANS_STEREO;
     return codec_init (demux, &fmt);
 }
@@ -157,7 +157,7 @@ static void *l16m_init(struct vlc_rtp_pt *pt, demux_t *demux)
     es_format_t fmt;
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_S16B);
-    fmt.audio.i_rate = 44100;
+    fmt.audio.i_rate = pt->frequency;
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
     return codec_init (demux, &fmt);
 }
