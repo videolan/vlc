@@ -154,32 +154,18 @@ static const struct vlc_rtp_pt_operations rtp_audio_pcma = {
 /* PT=10,11
  * L16: 16-bits (network byte order) PCM
  */
-static void *l16s_init(struct vlc_rtp_pt *pt, demux_t *demux)
+static void *l16_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
     es_format_t fmt;
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_S16B);
     fmt.audio.i_rate = pt->frequency;
-    fmt.audio.i_physical_channels = AOUT_CHANS_STEREO;
+    fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 1;
     return codec_init (demux, &fmt);
 }
 
-static const struct vlc_rtp_pt_operations rtp_audio_l16s = {
-    l16s_init, codec_destroy, codec_decode,
-};
-
-static void *l16m_init(struct vlc_rtp_pt *pt, demux_t *demux)
-{
-    es_format_t fmt;
-
-    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_S16B);
-    fmt.audio.i_rate = pt->frequency;
-    fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
-    return codec_init (demux, &fmt);
-}
-
-static const struct vlc_rtp_pt_operations rtp_audio_l16m = {
-    l16m_init, codec_destroy, codec_decode,
+static const struct vlc_rtp_pt_operations rtp_audio_l16 = {
+    l16_init, codec_destroy, codec_decode,
 };
 
 /* PT=12
@@ -320,14 +306,14 @@ void rtp_autodetect (demux_t *demux, rtp_session_t *session,
 
       case 10:
         msg_Dbg (demux, "detected stereo PCM");
-        pt.ops = &rtp_audio_l16s;
+        pt.ops = &rtp_audio_l16;
         pt.frequency = 44100;
         pt.channel_count = 2;
         break;
 
       case 11:
         msg_Dbg (demux, "detected mono PCM");
-        pt.ops = &rtp_audio_l16m;
+        pt.ops = &rtp_audio_l16;
         pt.frequency = 44100;
         pt.channel_count = 1;
         break;
