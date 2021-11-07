@@ -276,85 +276,24 @@ void rtp_autodetect (demux_t *demux, rtp_session_t *session,
                      const block_t *block)
 {
     uint8_t ptype = rtp_ptype (block);
-    rtp_pt_t pt = {
-        .ops = NULL,
-        .frequency = 0,
-        .number = ptype,
-        .channel_count = 0,
+    char type[6], proto[] = "RTP/AVP", numstr[4];
+    struct vlc_sdp_media media = {
+        .type = type, .port_count = 1, .proto = proto, .format = numstr
     };
 
-    switch (ptype)
-    {
-      case 0:
-        msg_Dbg (demux, "detected G.711 mu-law");
-        pt.ops = &rtp_audio_pcmu;
-        pt.frequency = 8000;
-        pt.channel_count = 1;
-        break;
+    /* We only support static audio subtypes except MPV (PT=32).
+     * MP2T (PT=33) can be treated as either audio or video. */
+    memcpy(type, (ptype == 32) ? "video" : "audio", 6);
+    snprintf(numstr, sizeof (numstr), "%hhu", ptype);
 
-      case 3:
-        msg_Dbg (demux, "detected GSM");
-        pt.ops = &rtp_audio_gsm;
-        pt.frequency = 8000;
-        pt.channel_count = 1;
-        break;
-
-      case 8:
-        msg_Dbg (demux, "detected G.711 A-law");
-        pt.ops = &rtp_audio_pcma;
-        pt.frequency = 8000;
-        pt.channel_count = 1;
-        break;
-
-      case 10:
-        msg_Dbg (demux, "detected stereo PCM");
-        pt.ops = &rtp_audio_l16;
-        pt.frequency = 44100;
-        pt.channel_count = 2;
-        break;
-
-      case 11:
-        msg_Dbg (demux, "detected mono PCM");
-        pt.ops = &rtp_audio_l16;
-        pt.frequency = 44100;
-        pt.channel_count = 1;
-        break;
-
-      case 12:
-        msg_Dbg (demux, "detected QCELP");
-        pt.ops = &rtp_audio_qcelp;
-        pt.frequency = 8000;
-        pt.channel_count = 1;
-        break;
-
-      case 14:
-        msg_Dbg (demux, "detected MPEG Audio");
-        pt.ops = &rtp_audio_mpa;
-        pt.frequency = 90000;
-        break;
-
-      case 32:
-        msg_Dbg (demux, "detected MPEG Video");
-        pt.ops = &rtp_video_mpv;
-        pt.frequency = 90000;
-        break;
-
-      case 33:
-        msg_Dbg (demux, "detected MPEG2 TS");
-        pt.ops = &rtp_av_ts;
-        pt.frequency = 90000;
-        break;
-
-      default:
+    if (vlc_rtp_add_media_types(demux, session, &media)) {
         msg_Err (demux, "unspecified payload format (type %"PRIu8")", ptype);
         msg_Info (demux, "A valid SDP is needed to parse this RTP stream.");
         vlc_dialog_display_error (demux, N_("SDP required"),
              N_("A description in SDP format is required to receive the RTP "
                 "stream. Note that rtp:// URIs cannot work with dynamic "
                 "RTP payload format (%"PRIu8")."), ptype);
-        return;
     }
-    rtp_add_type (demux, session, &pt);
 }
 
 /*
