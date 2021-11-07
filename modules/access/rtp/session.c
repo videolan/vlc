@@ -85,11 +85,6 @@ void rtp_session_destroy (demux_t *demux, rtp_session_t *session)
     (void)demux;
 }
 
-static void no_destroy (demux_t *demux, void *opaque)
-{
-    (void)demux; (void)opaque;
-}
-
 /**
  * Adds a payload type to an RTP session.
  */
@@ -107,13 +102,7 @@ int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt)
 
     ses->ptv = ppt;
     ppt += ses->ptc++;
-
-    assert(pt->init != NULL);
-    ppt->init = pt->init;
-    ppt->destroy = pt->destroy ? pt->destroy : no_destroy;
-    ppt->decode = pt->decode;
-    ppt->frequency = pt->frequency;
-    ppt->number = pt->number;
+    *ppt = *pt;
     msg_Dbg (demux, "added payload type %"PRIu8" (f = %"PRIu32" Hz)",
              ppt->number, ppt->frequency);
 
@@ -163,8 +152,10 @@ rtp_source_create (demux_t *demux, const rtp_session_t *session,
     source->blocks = NULL;
 
     /* Initializes all payload */
-    for (unsigned i = 0; i < session->ptc; i++)
+    for (unsigned i = 0; i < session->ptc; i++) {
+        assert(session->ptv[i].init != NULL);
         source->opaque[i] = session->ptv[i].init(&session->ptv[i], demux);
+    }
 
     msg_Dbg (demux, "added RTP source (%08x)", ssrc);
     return source;
@@ -181,7 +172,8 @@ rtp_source_destroy (demux_t *demux, const rtp_session_t *session,
     msg_Dbg (demux, "removing RTP source (%08x)", source->ssrc);
 
     for (unsigned i = 0; i < session->ptc; i++)
-        session->ptv[i].destroy (demux, source->opaque[i]);
+        if (session->ptv[i].destroy != NULL)
+            session->ptv[i].destroy (demux, source->opaque[i]);
     block_ChainRelease (source->blocks);
     free (source);
 }
