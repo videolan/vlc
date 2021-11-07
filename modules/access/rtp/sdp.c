@@ -221,6 +221,10 @@ bad:
 
     if (unlikely(m->type == NULL || m->proto == NULL || m->format == NULL))
         vlc_sdp_media_free(&m);
+    if (!vlc_sdp_is_token(m->type)) {
+        vlc_sdp_media_free(&m);
+        errno = EINVAL;
+    }
 
     return m;
 }
