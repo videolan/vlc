@@ -326,9 +326,13 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
     /* Check sequence number */
     /* NOTE: the sequence number is per-source,
      * but is independent from the payload type. */
-    int16_t delta_seq = seq - src->max_seq;
-    if ((delta_seq > 0) ? (delta_seq > p_sys->max_dropout)
-                        : (-delta_seq > p_sys->max_misorder))
+    union {
+        uint16_t u;
+        int16_t s;
+    } delta_seq = { .u = seq - src->max_seq };
+
+    if ((delta_seq.s > 0) ? (delta_seq.s > p_sys->max_dropout)
+                          : (-delta_seq.s > p_sys->max_misorder))
     {
         msg_Dbg (demux, "sequence discontinuity"
                  " (got: %"PRIu16", expected: %"PRIu16")", seq, src->max_seq);
@@ -347,7 +351,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
         }
     }
     else
-    if (delta_seq >= 0)
+    if (delta_seq.s >= 0)
         src->max_seq = seq + 1;
 
     /* Queues the block in sequence order,
@@ -355,10 +359,10 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
     block_t **pp = &src->blocks;
     for (block_t *prev = *pp; prev != NULL; prev = *pp)
     {
-        delta_seq = seq - rtp_seq (prev);
-        if (delta_seq < 0)
+        delta_seq.u = seq - rtp_seq (prev);
+        if (delta_seq.s < 0)
             break;
-        if (delta_seq == 0)
+        if (delta_seq.s == 0)
         {
             msg_Dbg (demux, "duplicate packet (sequence: %"PRIu16")", seq);
             goto drop; /* duplicate */
