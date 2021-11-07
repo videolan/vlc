@@ -350,7 +350,7 @@ static struct vlc_rtp_pt *vlc_rtp_pt_create(vlc_object_t *obj,
     return pt;
 }
 
-static void vlc_rtp_pt_release(struct vlc_rtp_pt *pt)
+void vlc_rtp_pt_release(struct vlc_rtp_pt *pt)
 {
     free(pt);
 }

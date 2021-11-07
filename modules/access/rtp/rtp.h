@@ -51,7 +51,12 @@ struct vlc_rtp_pt
 };
 
 /**
- * Instantiates a payload type.
+ * Destroys a payload type parameter set.
+ */
+void vlc_rtp_pt_release(struct vlc_rtp_pt *pt);
+
+/**
+ * Instantiates a payload type from a set of parameters.
  *
  * A given SDP media can have multiple alternative payload types, each with
  * their set of parameters. The RTP session can then have multiple concurrent
