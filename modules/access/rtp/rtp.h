@@ -38,6 +38,7 @@ struct vlc_rtp_pt
     const struct vlc_rtp_pt_operations *ops;
     uint32_t  frequency; /* RTP clock rate (Hz) */
     uint8_t   number;
+    uint8_t channel_count;
 };
 
 /**
