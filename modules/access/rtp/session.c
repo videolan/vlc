@@ -90,12 +90,6 @@ static void no_destroy (demux_t *demux, void *opaque)
     (void)demux; (void)opaque;
 }
 
-static void no_decode (demux_t *demux, void *opaque, block_t *block)
-{
-    (void)demux; (void)opaque;
-    block_Release (block);
-}
-
 /**
  * Adds a payload type to an RTP session.
  */
@@ -117,7 +111,7 @@ int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt)
     assert(pt->init != NULL);
     ppt->init = pt->init;
     ppt->destroy = pt->destroy ? pt->destroy : no_destroy;
-    ppt->decode = pt->decode ? pt->decode : no_decode;
+    ppt->decode = pt->decode;
     ppt->frequency = pt->frequency;
     ppt->number = pt->number;
     msg_Dbg (demux, "added payload type %"PRIu8" (f = %"PRIu32" Hz)",
@@ -531,6 +525,7 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     block->p_buffer += skip;
     block->i_buffer -= skip;
 
+    assert(pt->decode != NULL);
     pt->decode (demux, pt_data, block);
     return;
 
