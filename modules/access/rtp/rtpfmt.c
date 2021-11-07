@@ -494,7 +494,7 @@ int vlc_rtp_add_media_types(demux_t *demux, rtp_session_t *session,
         struct vlc_rtp_pt *pt = vlc_rtp_pt_create(VLC_OBJECT(demux), type);
         if (pt != NULL) {
             pt->number = number;
-            if (rtp_add_type(demux, session, pt))
+            if (rtp_add_type(session, pt))
                 vlc_rtp_pt_release(pt);
         } else
             errors++;

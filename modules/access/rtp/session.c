@@ -91,15 +91,12 @@ void rtp_session_destroy (demux_t *demux, rtp_session_t *session)
 /**
  * Adds a payload type to an RTP session.
  */
-int rtp_add_type(demux_t *demux, rtp_session_t *ses, rtp_pt_t *pt)
+int rtp_add_type(rtp_session_t *ses, rtp_pt_t *pt)
 {
     assert(pt->frequency > 0); /* SIGFPE! */
 
     if (ses->srcc > 0)
-    {
-        msg_Err (demux, "cannot change RTP payload formats during session");
-        return EINVAL;
-    }
+        return EBUSY;
 
     rtp_pt_t **ppt = realloc(ses->ptv, (ses->ptc + 1) * sizeof (pt));
     if (ppt == NULL)
@@ -107,7 +104,6 @@ int rtp_add_type(demux_t *demux, rtp_session_t *ses, rtp_pt_t *pt)
 
     ses->ptv = ppt;
     ses->ptv[ses->ptc++] = pt;
-    (void)demux;
     return 0;
 }
 

@@ -121,7 +121,7 @@ rtp_session_t *rtp_session_create (demux_t *);
 void rtp_session_destroy (demux_t *, rtp_session_t *);
 void rtp_queue (demux_t *, rtp_session_t *, block_t *);
 bool rtp_dequeue (demux_t *, const rtp_session_t *, vlc_tick_t *);
-int rtp_add_type(demux_t *demux, rtp_session_t *ses, rtp_pt_t *pt);
+int rtp_add_type(rtp_session_t *ses, rtp_pt_t *pt);
 int vlc_rtp_add_media_types(demux_t *demux, rtp_session_t *ses,
                             const struct vlc_sdp_media *media);
 
