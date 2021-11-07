@@ -244,6 +244,30 @@ static inline void vlc_rtp_es_send(struct vlc_rtp_es *es, block_t *block)
  */
 extern struct vlc_rtp_es *const vlc_rtp_es_dummy;
 
+/**
+ * Callback prototype for RTP parser module.
+ *
+ * This is the callback prototype for any RTP payload format parser module.
+ *
+ * \param obj VLC object for logging and configuration
+ * \param pt RTP payload type
+ * \param desc[in] SDP payload format description and type mapping
+ *
+ * \return VLC_SUCCESS on success, an error code on failure.
+ */
+typedef int (*vlc_rtp_parser_cb)(vlc_object_t *obj, struct vlc_rtp_pt *pt,
+                                 const struct vlc_sdp_pt *desc);
+
+#define set_rtp_parser_callback(cb) \
+    { \
+        vlc_rtp_parser_cb cb__ = (cb); (void) cb__; \
+        set_callback(cb); \
+        set_capability("rtp parser", 0); \
+    }
+
+int vlc_rtp_pt_instantiate(vlc_object_t *obj, struct vlc_rtp_pt *restrict pt,
+                           const struct vlc_sdp_pt *restrict desc);
+
 void rtp_autodetect(vlc_object_t *, rtp_session_t *,
                     const struct vlc_rtp_pt_owner *restrict);
 

@@ -258,9 +258,12 @@ static struct vlc_rtp_pt *vlc_rtp_pt_create(vlc_object_t *obj,
     pt->owner = *owner;
     pt->frequency = desc->clock_rate;
     pt->channel_count = desc->channel_count;
+
+    if (vlc_rtp_pt_instantiate(obj, pt, desc) == 0)
+        return pt;
+
     pt->ops = NULL;
 
-    /* TODO: introduce module (capabilities) for payload types */
     if (strcmp(desc->media->type, "audio") == 0) {
         if (strcmp(desc->name, "PCMU") == 0)
             pt->ops = &rtp_audio_pcmu;

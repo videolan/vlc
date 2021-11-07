@@ -151,6 +151,40 @@ static const struct vlc_rtp_pt_owner_operations vlc_rtp_pt_owner_ops = {
     vlc_rtp_es_request, vlc_rtp_mux_request,
 };
 
+int vlc_rtp_pt_instantiate(vlc_object_t *obj, struct vlc_rtp_pt *restrict pt,
+                           const struct vlc_sdp_pt *restrict desc)
+{
+    char modname[32];
+    int ret = VLC_ENOTSUP;
+
+    if (strchr(desc->name, ',') != NULL)
+        /* Comma has special meaning in vlc_module_match(), forbid it */
+        return VLC_EINVAL;
+    if ((size_t)snprintf(modname, sizeof (modname), "%s/%s",
+                         desc->media->type, desc->name) >= sizeof (modname))
+        return VLC_ENOTSUP; /* Outlandish media type with long name */
+
+    module_t **mods;
+    ssize_t n = vlc_module_match("rtp parser", modname, true, &mods, NULL);
+
+    for (ssize_t i = 0; i < n; i++) {
+        vlc_rtp_parser_cb cb = vlc_module_map(vlc_object_logger(obj), mods[i]);
+        if (cb == NULL)
+            continue;
+
+        ret = cb(obj, pt, desc);
+        if (ret == VLC_SUCCESS) {
+            msg_Dbg(obj, "- module \"%s\"", module_get_name(mods[i], true));
+            assert(pt->ops != NULL);
+            ret = 0;
+            break;
+        }
+    }
+
+    free(mods);
+    return ret;
+}
+
 /**
  * Extracts port number from "[host]:port" or "host:port" strings,
  * and remove brackets from the host name.
