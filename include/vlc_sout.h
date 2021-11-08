@@ -201,6 +201,7 @@ VLC_API void *sout_StreamIdAdd(sout_stream_t *s, const es_format_t *fmt);
 VLC_API void sout_StreamIdDel(sout_stream_t *s, void *id);
 VLC_API int sout_StreamIdSend( sout_stream_t *s, void *id, block_t *b);
 VLC_API void sout_StreamFlush(sout_stream_t *s, void *id);
+VLC_API void sout_StreamSetPCR(sout_stream_t *s, vlc_tick_t pcr);
 VLC_API int sout_StreamControlVa(sout_stream_t *s, int i_query, va_list args);
 
 static inline int sout_StreamControl( sout_stream_t *s, int i_query, ... )

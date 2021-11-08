@@ -728,6 +728,16 @@ void sout_StreamFlush(sout_stream_t *s, void *id)
     }
 }
 
+void sout_StreamSetPCR(sout_stream_t *s, vlc_tick_t pcr)
+{
+    if (s->ops->set_pcr != NULL)
+    {
+        sout_StreamLock(s);
+        s->ops->set_pcr(s, pcr);
+        sout_StreamUnlock(s);
+    }
+}
+
 int sout_StreamControlVa(sout_stream_t *s, int i_query, va_list args)
 {
     int val = VLC_EGENERIC;

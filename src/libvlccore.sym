@@ -356,6 +356,7 @@ sout_StreamIdAdd
 sout_StreamIdDel
 sout_StreamIdSend
 sout_StreamFlush
+sout_StreamSetPCR
 sout_StreamControlVa
 spu_Create
 spu_Destroy
