@@ -375,12 +375,12 @@ void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
         /* get the type of the variable */
         const int i_type = param->item.i_type;
 
-        if( i_type != VLC_VAR_BOOL && cfg->psz_value == NULL )
+        if( i_type != CONFIG_ITEM_BOOL && cfg->psz_value == NULL )
         {
             msg_Warn( p_this, "missing value for option %s", cfg->psz_name );
             continue;
         }
-        if( i_type != VLC_VAR_STRING && b_once )
+        if( i_type != CONFIG_ITEM_STRING && b_once )
         {
             msg_Warn( p_this, "*option_name need to be a string option" );
             continue;
@@ -388,17 +388,17 @@ void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
 
         switch( i_type )
         {
-            case VLC_VAR_BOOL:
+            case CONFIG_ITEM_BOOL:
                 val.b_bool = b_yes;
                 break;
-            case VLC_VAR_INTEGER:
+            case CONFIG_ITEM_INTEGER:
                 val.i_int = strtoll( cfg->psz_value ? cfg->psz_value : "0",
                                      NULL, 0 );
                 break;
-            case VLC_VAR_FLOAT:
+            case CONFIG_ITEM_FLOAT:
                 val.f_float = us_atof( cfg->psz_value ? cfg->psz_value : "0" );
                 break;
-            case VLC_VAR_STRING:
+            case CONFIG_ITEM_STRING:
                 val.psz_string = cfg->psz_value;
                 break;
             default:
