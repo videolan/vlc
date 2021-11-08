@@ -85,10 +85,10 @@ static const struct vlc_rtp_es_operations vlc_rtp_es_id_ops = {
     vlc_rtp_es_id_destroy, vlc_rtp_es_id_send,
 };
 
-struct vlc_rtp_es *vlc_rtp_es_request(void *data,
+struct vlc_rtp_es *vlc_rtp_es_request(struct vlc_rtp_pt *pt,
                                       const es_format_t *restrict fmt)
 {
-    demux_t *demux = data;
+    demux_t *demux = pt->owner.data;
 
     struct vlc_rtp_es_id *ei = malloc(sizeof (*ei));
     if (unlikely(ei == NULL))
@@ -128,9 +128,9 @@ static const struct vlc_rtp_es_operations vlc_rtp_es_mux_ops = {
     vlc_rtp_es_mux_destroy, vlc_rtp_es_mux_send,
 };
 
-struct vlc_rtp_es *vlc_rtp_mux_request(void *data, const char *name)
+struct vlc_rtp_es *vlc_rtp_mux_request(struct vlc_rtp_pt *pt, const char *name)
 {
-    demux_t *demux = data;
+    demux_t *demux = pt->owner.data;
 
     struct vlc_rtp_es_mux *em = malloc(sizeof (*em));
     if (unlikely(em == NULL))
@@ -391,7 +391,8 @@ static int OpenSDP(vlc_object_t *obj)
         goto error;
 
     /* Parse payload types */
-    int err = vlc_rtp_add_media_types(obj, sys->session, media);
+    const struct vlc_rtp_pt_owner pt_owner = { demux };
+    int err = vlc_rtp_add_media_types(obj, sys->session, media, &pt_owner);
     if (err < 0) {
         msg_Err(obj, "SDP description parse error");
         goto error;
@@ -541,7 +542,8 @@ static int OpenURL(vlc_object_t *obj)
     if (p_sys->session == NULL)
         goto error;
 
-    rtp_autodetect(VLC_OBJECT(demux), p_sys->session);
+    const struct vlc_rtp_pt_owner pt_owner = { demux };
+    rtp_autodetect(VLC_OBJECT(demux), p_sys->session, &pt_owner);
 
 #ifdef HAVE_SRTP
     char *key = var_CreateGetNonEmptyString (demux, "srtp-key");

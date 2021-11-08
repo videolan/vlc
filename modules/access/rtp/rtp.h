@@ -105,6 +105,10 @@ struct vlc_rtp_pt_operations {
     void (*decode)(struct vlc_rtp_pt *pt, void *data, block_t *block);
 };
 
+struct vlc_rtp_pt_owner {
+    void *data;
+};
+
 /**
  * RTP payload format.
  *
@@ -115,6 +119,7 @@ struct vlc_rtp_pt
 {
     const struct vlc_rtp_pt_operations *ops; /**< Payload format callbacks */
     void *opaque; /**< Private data pointer */
+    struct vlc_rtp_pt_owner owner;
     uint32_t frequency; /**< RTP clock rate (Hz) */
     uint8_t number; /**< RTP payload type number within the session (0-127) */
     uint8_t channel_count; /**< Channel count (zero if unspecified) */
@@ -218,11 +223,13 @@ static inline void vlc_rtp_es_send(struct vlc_rtp_es *es, block_t *block)
  */
 extern struct vlc_rtp_es *const vlc_rtp_es_dummy;
 
-struct vlc_rtp_es *vlc_rtp_es_request(void *, const es_format_t *fmt);
-struct vlc_rtp_es *vlc_rtp_mux_request(void *, const char *name);
+struct vlc_rtp_es *vlc_rtp_es_request(struct vlc_rtp_pt *pt,
+                                      const es_format_t *fmt);
+struct vlc_rtp_es *vlc_rtp_mux_request(struct vlc_rtp_pt *, const char *name);
 
 
-void rtp_autodetect(vlc_object_t *, rtp_session_t *);
+void rtp_autodetect(vlc_object_t *, rtp_session_t *,
+                    const struct vlc_rtp_pt_owner *restrict);
 
 static inline uint8_t rtp_ptype (const block_t *block)
 {
@@ -243,7 +250,8 @@ void rtp_queue (demux_t *, rtp_session_t *, block_t *);
 bool rtp_dequeue (demux_t *, const rtp_session_t *, vlc_tick_t *);
 int rtp_add_type(rtp_session_t *ses, rtp_pt_t *pt);
 int vlc_rtp_add_media_types(vlc_object_t *obj, rtp_session_t *ses,
-                            const struct vlc_sdp_media *media);
+                            const struct vlc_sdp_media *media,
+                            const struct vlc_rtp_pt_owner *restrict owner);
 
 void *rtp_dgram_thread (void *data);
 

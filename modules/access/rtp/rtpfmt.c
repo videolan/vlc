@@ -66,7 +66,7 @@ static void *pcmu_init(struct vlc_rtp_pt *pt, demux_t *demux)
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MULAW);
     fmt.audio.i_rate = pt->frequency;
     fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 1;
-    return vlc_rtp_es_request(demux, &fmt);
+    return vlc_rtp_es_request(pt, &fmt);
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_pcmu = {
@@ -83,8 +83,7 @@ static void *gsm_init(struct vlc_rtp_pt *pt, demux_t *demux)
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_GSM);
     fmt.audio.i_rate = 8000;
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
-    (void) pt;
-    return vlc_rtp_es_request(demux, &fmt);
+    return vlc_rtp_es_request(pt, &fmt);
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_gsm = {
@@ -101,7 +100,7 @@ static void *pcma_init(struct vlc_rtp_pt *pt, demux_t *demux)
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_ALAW);
     fmt.audio.i_rate = pt->frequency;
     fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 1;
-    return vlc_rtp_es_request(demux, &fmt);
+    return vlc_rtp_es_request(pt, &fmt);
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_pcma = {
@@ -118,7 +117,7 @@ static void *l16_init(struct vlc_rtp_pt *pt, demux_t *demux)
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_S16B);
     fmt.audio.i_rate = pt->frequency;
     fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 1;
-    return vlc_rtp_es_request(demux, &fmt);
+    return vlc_rtp_es_request(pt, &fmt);
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_l16 = {
@@ -135,8 +134,7 @@ static void *qcelp_init(struct vlc_rtp_pt *pt, demux_t *demux)
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_QCELP);
     fmt.audio.i_rate = 8000;
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
-    (void) pt;
-    return vlc_rtp_es_request(demux, &fmt);
+    return vlc_rtp_es_request(pt, &fmt);
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_qcelp = {
@@ -152,8 +150,7 @@ static void *mpa_init(struct vlc_rtp_pt *pt, demux_t *demux)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MPGA);
     fmt.b_packetized = false;
-    (void) pt;
-    return vlc_rtp_es_request(demux, &fmt);
+    return vlc_rtp_es_request(pt, &fmt);
 }
 
 static void mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
@@ -184,8 +181,7 @@ static void *mpv_init(struct vlc_rtp_pt *pt, demux_t *demux)
 
     es_format_Init (&fmt, VIDEO_ES, VLC_CODEC_MPGV);
     fmt.b_packetized = false;
-    (void) pt;
-    return vlc_rtp_es_request(demux, &fmt);
+    return vlc_rtp_es_request(pt, &fmt);
 }
 
 static void mpv_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
@@ -219,8 +215,7 @@ static const struct vlc_rtp_pt_operations rtp_video_mpv = {
  */
 static void *ts_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
-    (void) pt;
-    return vlc_rtp_mux_request(demux, "ts");
+    return vlc_rtp_mux_request(pt, "ts");
 }
 
 static const struct vlc_rtp_pt_operations rtp_av_ts = {
@@ -229,17 +224,18 @@ static const struct vlc_rtp_pt_operations rtp_av_ts = {
 
 /* Not using SDP, we need to guess the payload format used */
 /* see http://www.iana.org/assignments/rtp-parameters */
-void rtp_autodetect(vlc_object_t *obj, rtp_session_t *session)
+void rtp_autodetect(vlc_object_t *obj, rtp_session_t *session,
+                    const struct vlc_rtp_pt_owner *restrict owner)
 {
     char type[] = "audio", proto[] = "RTP/AVP";
     char format[] = "0 3 8 10 11 12 14 33";
     struct vlc_sdp_media media = {
         .type = type, .port_count = 1, .proto = proto, .format = format };
 
-    vlc_rtp_add_media_types(obj, session, &media);
+    vlc_rtp_add_media_types(obj, session, &media, owner);
     strcpy(type, "video");
     strcpy(format, "32");
-    vlc_rtp_add_media_types(obj, session, &media);
+    vlc_rtp_add_media_types(obj, session, &media, owner);
 }
 
 /*
@@ -247,7 +243,8 @@ void rtp_autodetect(vlc_object_t *obj, rtp_session_t *session)
  */
 
 static struct vlc_rtp_pt *vlc_rtp_pt_create(vlc_object_t *obj,
-                                            const struct vlc_sdp_pt *desc)
+                                            const struct vlc_sdp_pt *desc,
+                                 const struct vlc_rtp_pt_owner *restrict owner)
 {
     if (desc->clock_rate == 0) {
         /* Dynamic payload type not defined in the SDP */
@@ -259,6 +256,7 @@ static struct vlc_rtp_pt *vlc_rtp_pt_create(vlc_object_t *obj,
     if (unlikely(pt == NULL))
         return NULL;
 
+    pt->owner = *owner;
     pt->frequency = desc->clock_rate;
     pt->channel_count = desc->channel_count;
     pt->ops = NULL;
@@ -372,7 +370,8 @@ static void vlc_rtp_set_default_types(struct vlc_sdp_pt *restrict types,
  * Registers all payload types declared in an SDP media.
  */
 int vlc_rtp_add_media_types(vlc_object_t *obj, rtp_session_t *session,
-                            const struct vlc_sdp_media *media)
+                            const struct vlc_sdp_media *media,
+                            const struct vlc_rtp_pt_owner *restrict owner)
 {
     struct vlc_sdp_pt types[128] = { };
 
@@ -440,7 +439,7 @@ int vlc_rtp_add_media_types(vlc_object_t *obj, rtp_session_t *session,
         if (type->parameters != NULL)
             msg_Dbg(obj, " - parameters: %s", type->parameters);
 
-        struct vlc_rtp_pt *pt = vlc_rtp_pt_create(obj, type);
+        struct vlc_rtp_pt *pt = vlc_rtp_pt_create(obj, type, owner);
         if (pt != NULL) {
             pt->number = number;
             if (rtp_add_type(session, pt))

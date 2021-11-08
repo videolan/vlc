@@ -275,7 +275,7 @@ static void xiph_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
                          "Theora packed configuration received (%06"PRIx32")",
                          ident);
                 self->ident = ident;
-                self->id = vlc_rtp_es_request(demux, &fmt);
+                self->id = vlc_rtp_es_request(pt, &fmt);
                 break;
             }
         }
