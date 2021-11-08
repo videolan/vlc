@@ -219,6 +219,9 @@ InitFramebuffersOut(struct vlc_gl_filter_priv *priv)
 {
     assert(priv->size_out.width > 0 && priv->size_out.height > 0);
 
+    /* Not initialized yet */
+    assert(priv->tex_count == 0);
+
     const opengl_vtable_t *vt = &priv->filter.api->vt;
 
     struct vlc_gl_filter *filter = &priv->filter;
@@ -512,9 +515,6 @@ vlc_gl_filters_InitFramebuffers(struct vlc_gl_filters *filters)
         bool is_last = vlc_list_is_last(&priv->node, &filters->list);
         if (!is_last)
         {
-            /* It was the last non-blend filter before we append this one */
-            assert(priv->tex_count == 0);
-
             /* Every non-blend filter needs its own framebuffer, except the last
              * one */
             int ret = InitFramebuffersOut(priv);
