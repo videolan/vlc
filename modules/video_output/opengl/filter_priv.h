@@ -87,4 +87,7 @@ vlc_gl_filter_LoadModule(vlc_object_t *parent, const char *name,
 void
 vlc_gl_filter_Delete(struct vlc_gl_filter *filter);
 
+int
+vlc_gl_filter_InitFramebuffers(struct vlc_gl_filter *filter, bool is_last);
+
 #endif

@@ -130,3 +130,133 @@ vlc_gl_filter_Delete(struct vlc_gl_filter *filter)
 
     vlc_object_delete(&filter->obj);
 }
+
+static int
+InitPlane(struct vlc_gl_filter_priv *priv, unsigned plane, GLsizei width,
+          GLsizei height)
+{
+    const opengl_vtable_t *vt = &priv->filter.api->vt;
+
+    GLuint framebuffer = priv->framebuffers_out[plane];
+    GLuint texture = priv->textures_out[plane];
+
+    vt->BindTexture(GL_TEXTURE_2D, texture);
+    vt->TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+                   GL_UNSIGNED_BYTE, NULL);
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    /* iOS needs GL_CLAMP_TO_EDGE or power-of-two textures */
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    /* Create a framebuffer and attach the texture */
+    vt->BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    vt->FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                             GL_TEXTURE_2D, texture, 0);
+
+    GLenum status = vt->CheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
+}
+
+static int
+InitFramebuffersOut(struct vlc_gl_filter_priv *priv)
+{
+    assert(priv->size_out.width > 0 && priv->size_out.height > 0);
+
+    /* Not initialized yet */
+    assert(priv->tex_count == 0);
+
+    const opengl_vtable_t *vt = &priv->filter.api->vt;
+
+    struct vlc_gl_filter *filter = &priv->filter;
+    if (filter->config.filter_planes)
+    {
+        struct vlc_gl_format *glfmt = &priv->glfmt_in;
+
+        priv->tex_count = glfmt->tex_count;
+        vt->GenFramebuffers(priv->tex_count, priv->framebuffers_out);
+        vt->GenTextures(priv->tex_count, priv->textures_out);
+
+        for (unsigned i = 0; i < glfmt->tex_count; ++i)
+        {
+            memcpy(priv->tex_widths, priv->plane_widths,
+                   priv->tex_count * sizeof(*priv->tex_widths));
+            memcpy(priv->tex_heights, priv->plane_heights,
+                   priv->tex_count * sizeof(*priv->tex_heights));
+            /* Init one framebuffer and texture for each plane */
+            int ret =
+                InitPlane(priv, i, priv->tex_widths[i], priv->tex_heights[i]);
+            if (ret != VLC_SUCCESS)
+                return ret;
+        }
+    }
+    else
+    {
+        priv->tex_count = 1;
+
+        /* Create a texture having the expected size */
+
+        vt->GenFramebuffers(1, priv->framebuffers_out);
+        vt->GenTextures(1, priv->textures_out);
+
+        priv->tex_widths[0] = priv->size_out.width;
+        priv->tex_heights[0] = priv->size_out.height;
+
+        int ret = InitPlane(priv, 0, priv->tex_widths[0], priv->tex_heights[0]);
+        if (ret != VLC_SUCCESS)
+            return ret;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int
+InitFramebufferMSAA(struct vlc_gl_filter_priv *priv, unsigned msaa_level)
+{
+    assert(msaa_level);
+    assert(priv->size_out.width > 0 && priv->size_out.height > 0);
+
+    const opengl_vtable_t *vt = &priv->filter.api->vt;
+
+    vt->GenRenderbuffers(1, &priv->renderbuffer_msaa);
+    vt->BindRenderbuffer(GL_RENDERBUFFER, priv->renderbuffer_msaa);
+    vt->RenderbufferStorageMultisample(GL_RENDERBUFFER, msaa_level,
+                                       GL_RGBA8,
+                                       priv->size_out.width,
+                                       priv->size_out.height);
+
+    vt->GenFramebuffers(1, &priv->framebuffer_msaa);
+    vt->BindFramebuffer(GL_FRAMEBUFFER, priv->framebuffer_msaa);
+    vt->FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                GL_RENDERBUFFER, priv->renderbuffer_msaa);
+
+    GLenum status = vt->CheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
+}
+
+int
+vlc_gl_filter_InitFramebuffers(struct vlc_gl_filter *filter, bool has_out)
+{
+    struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
+
+    unsigned msaa_level = priv->filter.config.msaa_level;
+    if (msaa_level)
+    {
+        int ret = InitFramebufferMSAA(priv, msaa_level);
+        if (ret != VLC_SUCCESS)
+            return ret;
+    }
+
+    /* Every non-blend filter needs its own framebuffer, except the last one */
+    if (has_out)
+        return InitFramebuffersOut(priv);
+
+    return VLC_SUCCESS;
+}
