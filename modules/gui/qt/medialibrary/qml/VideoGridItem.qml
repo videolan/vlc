@@ -26,8 +26,7 @@ import "qrc:///style/"
 Widgets.GridItem {
     id: root
 
-    property bool showNewIndicator: true
-    property int newIndicatorMedian: root.highlighted ? VLCStyle.icon_small : VLCStyle.icon_xsmall
+    property alias showNewIndicator: image.visible
     
     property var labels: [
         model.resolution_name || "",
@@ -80,29 +79,18 @@ Widgets.GridItem {
     }
 
     onPlayClicked: root.play()
-    
-    Behavior on newIndicatorMedian {
-        NumberAnimation {
-            duration: VLCStyle.duration_normal
-            easing.type: Easing.InOutSine
-        }
-    }
 
-    Item {
-        clip: true
-        x: parent.width - width
-        y: 0
-        width: 2 * root.newIndicatorMedian
-        height: 2 * root.newIndicatorMedian
-        visible: root.showNewIndicator && model.progress <= 0
+    Image {
+        id: image
 
-        Rectangle {
-            x: parent.width - root.newIndicatorMedian
-            y: - root.newIndicatorMedian
-            width: 2 * root.newIndicatorMedian
-            height: 2 * root.newIndicatorMedian
-            color: VLCStyle.colors.accent
-            rotation: 45
-        }
+        anchors.right: parent.right
+        anchors.top: parent.top
+
+        width: VLCStyle.gridItem_newIndicator
+        height: width
+
+        visible: false
+
+        source: VLCStyle.newIndicator
     }
 }

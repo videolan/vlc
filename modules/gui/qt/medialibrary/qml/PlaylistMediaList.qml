@@ -284,9 +284,6 @@ FocusScope {
                 labels: (model.count > 1) ? [ i18n.qtr("%1 Tracks").arg(_getCount(model)) ]
                                           : [ i18n.qtr("%1 Track") .arg(_getCount(model)) ]
 
-                // NOTE: We don't want to show the new indicator for a playlist.
-                showNewIndicator: false
-
                 dragItem: dragItemPlaylist
 
                 selectedUnderlay  : shadows.selected

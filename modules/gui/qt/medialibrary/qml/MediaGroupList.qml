@@ -285,7 +285,8 @@ FocusScope {
                 labels: _getLabels(model, i18n.qtr("%1 Videos"))
 
                 // NOTE: We don't want to show the indicator for a group.
-                showNewIndicator: (model.count === 1)
+                // FIXME: Sometimes MLBaseModel::getDataAt returns {} so we use 'isNew === true'.
+                showNewIndicator: (model.count === 1 && model.isNew === true)
 
                 dragItem: dragItemGroup
 

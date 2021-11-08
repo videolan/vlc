@@ -192,6 +192,8 @@ QtObject {
 
     readonly property int gridItemSelectedBorder: dp(8, scale)
 
+    readonly property int gridItem_newIndicator: dp(8, scale)
+
     readonly property int column_width: dp(114, scale)
     readonly property int column_margin_width: dp(32, scale)
 
@@ -264,6 +266,9 @@ QtObject {
 
     // Play shadow
     readonly property url playShadow: "qrc:///play_shadow.png";
+
+    // New indicator
+    readonly property url newIndicator: "qrc:///new_indicator.svg";
 
     // Player controlbar
     readonly property int maxControlbarControlHeight: dp(64, scale)
