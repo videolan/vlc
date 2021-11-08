@@ -372,6 +372,59 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum port_type *pport_type,
     return VLC_SUCCESS;
 }
 
+struct role2policy
+{
+    char role[sizeof("accessibility")];
+    AVAudioSessionRouteSharingPolicy policy;
+};
+
+static int role2policy_cmp(const void *key, const void *val)
+{
+    const struct role2policy *entry = val;
+    return strcmp(key, entry->role);
+}
+
+static AVAudioSessionRouteSharingPolicy
+GetRouteSharingPolicy(audio_output_t *p_aout)
+{
+    /* LongFormAudio by defaut */
+    AVAudioSessionRouteSharingPolicy policy = AVAudioSessionRouteSharingPolicyLongFormAudio;
+    AVAudioSessionRouteSharingPolicy video_policy;
+#if !TARGET_OS_TV
+    if (@available(iOS 13.0, *))
+        video_policy = AVAudioSessionRouteSharingPolicyLongFormVideo;
+    else
+#endif
+        video_policy = AVAudioSessionRouteSharingPolicyLongFormAudio;
+
+    char *str = var_InheritString(p_aout, "role");
+    if (str != NULL)
+    {
+        const struct role2policy role_list[] =
+        {
+            { "accessibility", AVAudioSessionRouteSharingPolicyDefault },
+            { "animation",     AVAudioSessionRouteSharingPolicyDefault },
+            { "communication", AVAudioSessionRouteSharingPolicyDefault },
+            { "game",          AVAudioSessionRouteSharingPolicyLongFormAudio },
+            { "music",         AVAudioSessionRouteSharingPolicyLongFormAudio },
+            { "notification",  AVAudioSessionRouteSharingPolicyDefault },
+            { "production",    AVAudioSessionRouteSharingPolicyDefault },
+            { "test",          AVAudioSessionRouteSharingPolicyDefault },
+            { "video",         video_policy},
+        };
+
+        const struct role2policy *entry =
+            bsearch(str, role_list, ARRAY_SIZE(role_list),
+                    sizeof (*role_list), role2policy_cmp);
+        free(str);
+        if (entry != NULL)
+            policy = entry->policy;
+    }
+
+    return policy;
+}
+
+
 static int
 avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
 {
@@ -382,8 +435,25 @@ avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
 
     if (active)
     {
-        ret = [instance setCategory:AVAudioSessionCategoryPlayback error:&error];
-        ret = ret && [instance setMode:AVAudioSessionModeMoviePlayback error:&error];
+        AVAudioSessionCategory category = AVAudioSessionCategoryPlayback;
+        AVAudioSessionMode mode = AVAudioSessionModeMoviePlayback;
+        AVAudioSessionRouteSharingPolicy policy = GetRouteSharingPolicy(p_aout);
+
+        if (@available(iOS 11.0, tvOS 11.0, *))
+        {
+            ret = [instance setCategory:category
+                                   mode:mode
+                     routeSharingPolicy:policy
+                                options:0
+                                  error:&error];
+        }
+        else
+        {
+            ret = [instance setCategory:category
+                                  error:&error];
+            ret = ret && [instance setMode:mode error:&error];
+            /* Not AVAudioSessionRouteSharingPolicy on older devices */
+        }
         if (@available(iOS 15.0, tvOS 15.0, *)) {
             ret = ret && [instance setSupportsMultichannelContent:p_sys->b_spatial_audio_supported error:&error];
         }
