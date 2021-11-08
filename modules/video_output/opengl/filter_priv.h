@@ -90,4 +90,8 @@ vlc_gl_filter_Delete(struct vlc_gl_filter *filter);
 int
 vlc_gl_filter_InitFramebuffers(struct vlc_gl_filter *filter, bool is_last);
 
+/** Recompute plane count, widths and heights after size_out have changed */
+void
+vlc_gl_filter_InitPlaneSizes(struct vlc_gl_filter *filter);
+
 #endif

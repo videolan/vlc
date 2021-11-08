@@ -260,3 +260,31 @@ vlc_gl_filter_InitFramebuffers(struct vlc_gl_filter *filter, bool has_out)
 
     return VLC_SUCCESS;
 }
+
+void
+vlc_gl_filter_InitPlaneSizes(struct vlc_gl_filter *filter)
+{
+    struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
+
+    if (filter->config.filter_planes)
+    {
+        struct vlc_gl_format *glfmt = &priv->glfmt_in;
+
+        priv->plane_count = glfmt->tex_count;
+        for (unsigned i = 0; i < glfmt->tex_count; ++i)
+        {
+            priv->plane_widths[i] = priv->size_out.width
+                                  * glfmt->tex_widths[i]
+                                  / glfmt->tex_widths[0];
+            priv->plane_heights[i] = priv->size_out.height
+                                   * glfmt->tex_heights[i]
+                                   / glfmt->tex_heights[0];
+        }
+    }
+    else
+    {
+        priv->plane_count = 1;
+        priv->plane_widths[0] = priv->size_out.width;
+        priv->plane_heights[0] = priv->size_out.height;
+    }
+}

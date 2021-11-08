@@ -274,25 +274,7 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
     }
     else
     {
-        if (filter->config.filter_planes)
-        {
-            priv->plane_count = glfmt->tex_count;
-            for (unsigned i = 0; i < glfmt->tex_count; ++i)
-            {
-                priv->plane_widths[i] = priv->size_out.width
-                                      * glfmt->tex_widths[i]
-                                      / glfmt->tex_widths[0];
-                priv->plane_heights[i] = priv->size_out.height
-                                       * glfmt->tex_heights[i]
-                                       / glfmt->tex_heights[0];
-            }
-        }
-        else
-        {
-            priv->plane_count = 1;
-            priv->plane_widths[0] = priv->size_out.width;
-            priv->plane_heights[0] = priv->size_out.height;
-        }
+        vlc_gl_filter_InitPlaneSizes(filter);
 
         /* Append to the main filter list */
         vlc_list_append(&priv->node, &filters->list);
