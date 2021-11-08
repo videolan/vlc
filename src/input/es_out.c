@@ -71,6 +71,8 @@ typedef struct
     /* Clock for this program */
     input_clock_t *p_clock;
 
+    mtime_t i_last_pcr;
+
     vlc_meta_t *p_meta;
 } es_out_pgrm_t;
 
@@ -91,6 +93,8 @@ struct es_out_id_t
 
     decoder_t   *p_dec;
     decoder_t   *p_dec_record;
+
+    mtime_t     i_pts_level;
 
     /* Fields for Video with CC */
     struct
@@ -617,10 +621,13 @@ static void EsOutChangePosition( es_out_t *out )
                     input_DecoderStartWait( p_es->p_dec_record );
             }
         }
+        p_es->i_pts_level = VLC_TS_INVALID;
     }
 
-    for( int i = 0; i < p_sys->i_pgrm; i++ )
+    for( int i = 0; i < p_sys->i_pgrm; i++ ) {
         input_clock_Reset( p_sys->pgrm[i]->p_clock );
+        p_sys->pgrm[i]->i_last_pcr = VLC_TS_INVALID;
+    }
 
     p_sys->b_buffering = true;
     p_sys->i_buffering_extra_initial = 0;
@@ -1095,6 +1102,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->i_es = 0;
     p_pgrm->b_selected = false;
     p_pgrm->b_scrambled = false;
+    p_pgrm->i_last_pcr = VLC_TS_INVALID;
     p_pgrm->p_meta = NULL;
     p_pgrm->p_clock = input_clock_New( p_sys->i_rate );
     if( !p_pgrm->p_clock )
@@ -1639,6 +1647,7 @@ static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out
     es->cc.type = 0;
     es->cc.i_bitmap = 0;
     es->p_master = p_master;
+    es->i_pts_level = VLC_TS_INVALID;
 
     TAB_APPEND( p_sys->i_es, p_sys->es, es );
 
@@ -2081,7 +2090,24 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         if( p_block->i_pts <= VLC_TS_INVALID )
             i_date = p_block->i_dts;
 
-        if( i_date + p_block->i_length < p_sys->i_preroll_end )
+        /* In some cases, the demuxer sends non dated packets.
+           We use interpolation, previous, or pcr value to compare with
+           preroll target timestamp */
+        if( i_date == VLC_TS_INVALID )
+        {
+            if( es->i_pts_level != VLC_TS_INVALID )
+                i_date = es->i_pts_level;
+            else if( es->p_pgrm->i_last_pcr != VLC_TS_INVALID )
+                i_date = es->p_pgrm->i_last_pcr;
+        }
+
+        if( i_date != VLC_TS_INVALID )
+            es->i_pts_level = i_date + p_block->i_length;
+
+        /* If i_date is still invalid (first/all non dated), expect to be in preroll */
+
+        if( i_date == VLC_TS_INVALID ||
+            es->i_pts_level < p_sys->i_preroll_end )
             p_block->i_flags |= BLOCK_FLAG_PREROLL;
     }
 
@@ -2491,6 +2517,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             msg_Err( p_sys->p_input, "Invalid PCR value in ES_OUT_SET_(GROUP_)PCR !" );
             return VLC_EGENERIC;
         }
+
+        p_pgrm->i_last_pcr = i_pcr;
 
         /* TODO do not use mdate() but proper stream acquisition date */
         bool b_late;
