@@ -170,27 +170,24 @@ void MLGenreModel::onCover()
 
     const int mlId = generator->getId().id;
 
-    const int count = getCount();
-    for (int i = 0; i < count; ++i)
+    int itemIndex = 0;
+
+    auto genre = static_cast<MLGenre *>(findInCache(mlId, &itemIndex));
+
+    if (!genre)
     {
-        const auto item = itemCache(i);
-        if (item && (item->getId().id == mlId))
-        {
-            MLGenre * genre = static_cast<MLGenre *> (item);
-
-            genre->setCover(generator->takeResult());
-            genre->setGenerator(nullptr);
-
-            vlc_ml_media_set_genre_thumbnail(ml()->vlcMl(), item->getId().id
-                                            , qtu(genre->getCover()), VLC_ML_THUMBNAIL_SMALL);
-
-            thumbnailUpdated(i);
-            return;
-        }
+        // item is not in the cache anymore
+        generator->deleteLater();
+        return;
     }
 
-    // item is not in the cache anymore
-    generator->deleteLater();
+    genre->setCover(generator->takeResult());
+    genre->setGenerator(nullptr);
+
+    vlc_ml_media_set_genre_thumbnail(ml()->vlcMl(), mlId
+                                    , qtu(genre->getCover()), VLC_ML_THUMBNAIL_SMALL);
+
+    thumbnailUpdated(itemIndex);
 }
 
 //-------------------------------------------------------------------------------------------------
