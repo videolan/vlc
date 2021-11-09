@@ -118,7 +118,7 @@ QVariant MLGroupListModel::data(const QModelIndex & index, int role) const /* ov
             case GROUP_NAME:
                 return QVariant::fromValue(group->getName());
             case GROUP_THUMBNAIL:
-                return getCover(group, row);
+                return getCover(group);
             case GROUP_DURATION:
                 return QVariant::fromValue(group->getDuration());
             case GROUP_DATE:
@@ -222,7 +222,7 @@ ListCacheLoader<std::unique_ptr<MLItem>> * MLGroupListModel::createLoader() cons
 // Private functions
 //-------------------------------------------------------------------------------------------------
 
-QString MLGroupListModel::getCover(MLGroup * group, int index) const
+QString MLGroupListModel::getCover(MLGroup * group) const
 {
     QString cover = group->getCover();
 
@@ -230,7 +230,7 @@ QString MLGroupListModel::getCover(MLGroup * group, int index) const
     if (cover.isNull() == false || group->hasGenerator())
         return cover;
 
-    CoverGenerator * generator = new CoverGenerator(m_ml, group->getId(), index);
+    CoverGenerator * generator = new CoverGenerator(m_ml, group->getId());
 
     generator->setSize(QSize(MLGROUPLISTMODEL_COVER_WIDTH,
                              MLGROUPLISTMODEL_COVER_HEIGHT));
@@ -290,16 +290,15 @@ void MLGroupListModel::onCover()
 {
     CoverGenerator * generator = static_cast<CoverGenerator *> (sender());
 
-    int index = generator->getIndex();
+    int index = 0;
 
     // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
-    MLItem * item = this->itemCache(index);
+    MLItem * item = this->findInCache(generator->getId().id, &index);
 
     // NOTE: When the item is no longer cached or has been moved we return right away.
-    if (item == nullptr || item->getId() != generator->getId())
+    if (!item)
     {
         generator->deleteLater();
-
         return;
     }
 
