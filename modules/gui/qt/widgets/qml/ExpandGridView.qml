@@ -38,6 +38,11 @@ FocusScope {
     property int leftMargin: VLCStyle.margin_normal
     property int rightMargin: VLCStyle.margin_normal
 
+    // NOTE: The grid margin for the item(s) horizontal positioning.
+    readonly property int contentMargin: (_contentWidth - _nbItemPerRow * _effectiveCellWidth
+                                          +
+                                          horizontalSpacing) / 2
+
     property int rowX: 0
     property int horizontalSpacing: VLCStyle.column_margin_width
     property int verticalSpacing: VLCStyle.column_margin_width
@@ -46,6 +51,12 @@ FocusScope {
 
     readonly property int _effectiveCellWidth: cellWidth + horizontalSpacing
     readonly property int _effectiveCellHeight: cellHeight + verticalSpacing
+
+    readonly property int _contentWidth: width - rightMargin - leftMargin
+
+    readonly property int _nbItemPerRow: Math.max(Math.floor((_contentWidth + horizontalSpacing)
+                                                             /
+                                                             _effectiveCellWidth), 1)
 
     property var delegateModel
     property var model
@@ -105,6 +116,14 @@ FocusScope {
 
     // Events
 
+    Component.onCompleted: flickable.layout(true)
+
+    onHeightChanged: flickable.layout(false)
+
+    // NOTE: Update on contentMargin change rather than width since the margin defines the x
+    //       position and depends on the width.
+    onContentMarginChanged: flickable.layout(true)
+
     onDisplayMarginEndChanged: flickable.layout(false)
 
     onModelChanged: _onModelCountChanged()
@@ -126,30 +145,28 @@ FocusScope {
     // Keys
 
     Keys.onPressed: {
-        var colCount = getNbItemsPerRow()
-
         var newIndex = -1
         if (KeyHelper.matchRight(event)) {
-            if ((currentIndex + 1) % colCount !== 0) {//are we not at the end of line
+            if ((currentIndex + 1) % _nbItemPerRow !== 0) {//are we not at the end of line
                 newIndex = Math.min(_count - 1, currentIndex + 1)
             }
         } else if (KeyHelper.matchLeft(event)) {
-            if (currentIndex % colCount !== 0) {//are we not at the begining of line
+            if (currentIndex % _nbItemPerRow !== 0) {//are we not at the begining of line
                 newIndex = Math.max(0, currentIndex - 1)
             }
         } else if (KeyHelper.matchDown(event)) {
             // we are not on the last line
-            if (Math.floor(currentIndex / colCount) !== Math.floor(_count / colCount)) {
-                newIndex = Math.min(_count - 1, currentIndex + colCount)
+            if (Math.floor(currentIndex / _nbItemPerRow) !== Math.floor(_count / _nbItemPerRow)) {
+                newIndex = Math.min(_count - 1, currentIndex + _nbItemPerRow)
             }
         } else if (KeyHelper.matchPageDown(event)) {
-            newIndex = Math.min(_count - 1, currentIndex + colCount * 5)
+            newIndex = Math.min(_count - 1, currentIndex + _nbItemPerRow * 5)
         } else if (KeyHelper.matchUp(event)) {
-            if (Math.floor(currentIndex / colCount) !== 0) { //we are not on the first line
-                newIndex = Math.max(0, currentIndex - colCount)
+            if (Math.floor(currentIndex / _nbItemPerRow) !== 0) { //we are not on the first line
+                newIndex = Math.max(0, currentIndex - _nbItemPerRow)
             }
         } else if (KeyHelper.matchPageUp(event)) {
-            newIndex = Math.max(0, currentIndex - colCount * 5)
+            newIndex = Math.max(0, currentIndex - _nbItemPerRow * 5)
         } else if (KeyHelper.matchOk(event) || event.matches(StandardKey.SelectAll) ) {
             //these events are matched on release
             event.accepted = true
@@ -303,24 +320,16 @@ FocusScope {
         flickable.retract()
     }
 
-    function getNbItemsPerRow() {
-        return Math.max(Math.floor(((width - rightMargin - leftMargin) + horizontalSpacing) / _effectiveCellWidth), 1)
-    }
-
     function getItemRowCol(id) {
-        var nbItemsPerRow = getNbItemsPerRow()
-        var rowId = Math.floor(id / nbItemsPerRow)
-        var colId = id % nbItemsPerRow
+        var rowId = Math.floor(id / _nbItemPerRow)
+        var colId = id % _nbItemPerRow
         return [colId, rowId]
     }
 
     function getItemPos(id) {
-        var remainingSpace = (flickable.width - rightMargin - leftMargin)
-                             - getNbItemsPerRow() * _effectiveCellWidth + horizontalSpacing;
-
         var rowCol = getItemRowCol(id);
 
-        var x = rowCol[0] * _effectiveCellWidth + remainingSpace / 2 + leftMargin;
+        var x = rowCol[0] * _effectiveCellWidth + contentMargin + leftMargin;
 
         var y = rowCol[1] * _effectiveCellHeight + headerHeight + topMargin;
 
@@ -350,7 +359,7 @@ FocusScope {
         var viewTopY = flickable.contentY
         var viewBottomY = viewTopY + flickable.height
 
-        if (index < getNbItemsPerRow()) {
+        if (index < _nbItemPerRow) {
             //force to see the header when on the first row
             newContentY = 0
         } else if ( itemTopY < viewTopY ) {
@@ -423,11 +432,11 @@ FocusScope {
         }
 
         var rowId = Math.floor(contentYWithoutExpand / _effectiveCellHeight)
-        var firstId = Math.max(rowId * getNbItemsPerRow(), 0)
+        var firstId = Math.max(rowId * _nbItemPerRow, 0)
 
 
         rowId = Math.ceil((contentYWithoutExpand + heightWithoutExpand) / _effectiveCellHeight)
-        var lastId = Math.min(rowId * getNbItemsPerRow(), _count)
+        var lastId = Math.min(rowId * _nbItemPerRow, _count)
 
         return [firstId, lastId]
     }
@@ -558,9 +567,6 @@ FocusScope {
             id: flickableScrollBar
         }
 
-        onWidthChanged: { layout(true) }
-        onHeightChanged: { layout(false) }
-
         Loader {
             id: headerItemLoader
             //load the header early (when the first row is visible)
@@ -583,7 +589,8 @@ FocusScope {
         Loader {
             id: footerItemLoader
             focus: (status === Loader.Ready) ? item.focus : false
-            y: root.topMargin + root.headerHeight + (root._effectiveCellHeight * (Math.ceil(model.count / root.getNbItemsPerRow()))) +
+
+            y: root.topMargin + root.headerHeight + (root._effectiveCellHeight * (Math.ceil(model.count / root._nbItemPerRow))) +
                root._expandItemVerticalSpace
         }
 
@@ -636,7 +643,7 @@ FocusScope {
             if (root.expandIndex !== -1) {
                 var rowCol = root.getItemRowCol(root.expandIndex)
                 var rowId = rowCol[1] + 1
-                ret = rowId * root.getNbItemsPerRow()
+                ret = rowId * root._nbItemPerRow
             } else {
                 ret = root._count
             }
@@ -731,7 +738,7 @@ FocusScope {
             var newContentHeight = root.getItemPos(root._count - 1)[1] + root._effectiveCellHeight + root._expandItemVerticalSpace
             contentHeight = newContentHeight + root.bottomMargin // topMargin is included from root.getItemPos
             contentHeight += footerItemLoader.item ? footerItemLoader.item.height : 0
-            contentWidth = root._effectiveCellWidth * root.getNbItemsPerRow() - root.horizontalSpacing
+            contentWidth = root._effectiveCellWidth * root._nbItemPerRow - root.horizontalSpacing
         }
 
         Connections {
