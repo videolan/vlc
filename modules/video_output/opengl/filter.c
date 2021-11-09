@@ -295,3 +295,42 @@ vlc_gl_filter_InitPlaneSizes(struct vlc_gl_filter *filter)
         priv->plane_heights[0] = priv->size_out.height;
     }
 }
+
+void
+vlc_gl_filter_ApplyOutputSize(struct vlc_gl_filter *filter)
+{
+    struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
+
+    vlc_gl_filter_InitPlaneSizes(filter);
+
+    const opengl_vtable_t *vt = &priv->filter.api->vt;
+    GL_ASSERT_NOERROR(vt);
+
+    unsigned msaa_level = filter->config.msaa_level;
+    if (msaa_level)
+    {
+        vt->BindRenderbuffer(GL_RENDERBUFFER, priv->renderbuffer_msaa);
+        vt->RenderbufferStorageMultisample(GL_RENDERBUFFER, msaa_level,
+                                           GL_RGBA8,
+                                           priv->size_out.width,
+                                           priv->size_out.height);
+    }
+
+    if (priv->tex_count)
+    {
+        memcpy(priv->tex_widths, priv->plane_widths,
+               priv->tex_count * sizeof(*priv->tex_widths));
+        memcpy(priv->tex_heights, priv->plane_heights,
+               priv->tex_count * sizeof(*priv->tex_heights));
+
+        for (unsigned plane = 0; plane < priv->tex_count; ++plane)
+        {
+            vt->BindTexture(GL_TEXTURE_2D, priv->textures_out[plane]);
+            vt->TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, priv->tex_widths[plane],
+                           priv->tex_heights[plane], 0, GL_RGBA,
+                           GL_UNSIGNED_BYTE, NULL);
+        }
+    }
+
+    GL_ASSERT_NOERROR(vt);
+}

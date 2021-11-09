@@ -94,4 +94,7 @@ vlc_gl_filter_InitFramebuffers(struct vlc_gl_filter *filter, bool is_last);
 void
 vlc_gl_filter_InitPlaneSizes(struct vlc_gl_filter *filter);
 
+void
+vlc_gl_filter_ApplyOutputSize(struct vlc_gl_filter *filter);
+
 #endif
