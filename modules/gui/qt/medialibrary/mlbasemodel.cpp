@@ -447,6 +447,16 @@ MLItem *MLBaseModel::itemCache(int signedidx) const
     return item->get();
 }
 
+MLItem *MLBaseModel::findInCache(const int id, int *index) const
+{
+    const auto item = m_cache->find([id](const auto &item)
+    {
+        return item->getId().id == id;
+    }, index);
+
+    return item ? item->get() : nullptr;
+}
+
 //-------------------------------------------------------------------------------------------------
 
 MLBaseModel::BaseLoader::BaseLoader(vlc_medialibrary_t *ml, MLItemId parent, QString searchPattern,
