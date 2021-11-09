@@ -43,6 +43,7 @@ AbstractStreamOutputBuffer::~AbstractStreamOutputBuffer()
 AbstractQueueStreamOutputBuffer::AbstractQueueStreamOutputBuffer()
 {
     b_draining = false;
+    vlc_mutex_init(&buffer_mutex);
 }
 
 AbstractQueueStreamOutputBuffer::~AbstractQueueStreamOutputBuffer()
@@ -52,37 +53,32 @@ AbstractQueueStreamOutputBuffer::~AbstractQueueStreamOutputBuffer()
 
 void AbstractQueueStreamOutputBuffer::Enqueue(void *p)
 {
-    buffer_mutex.lock();
+    vlc_mutex_locker locker(&buffer_mutex);
     queued.push(p);
-    buffer_mutex.unlock();
 }
 
 void *AbstractQueueStreamOutputBuffer::Dequeue()
 {
     void *p = NULL;
-    buffer_mutex.lock();
+    vlc_mutex_locker locker(&buffer_mutex);
     if(!queued.empty())
     {
         p = queued.front();
         queued.pop();
     }
-    buffer_mutex.unlock();
     return p;
 }
 
 void AbstractQueueStreamOutputBuffer::Drain()
 {
-    buffer_mutex.lock();
+    vlc_mutex_locker locker(&buffer_mutex);
     b_draining = true;
-    buffer_mutex.unlock();
 }
 
 bool AbstractQueueStreamOutputBuffer::isEOS()
 {
-    buffer_mutex.lock();
-    bool b = b_draining && queued.empty();
-    buffer_mutex.unlock();
-    return b;
+    vlc_mutex_locker locker(&buffer_mutex);
+    return b_draining && queued.empty();
 }
 
 BlockStreamOutputBuffer::BlockStreamOutputBuffer()
@@ -139,12 +135,11 @@ void PictureStreamOutputBuffer::FlushQueued()
 vlc_tick_t PictureStreamOutputBuffer::NextPictureTime()
 {
     vlc_tick_t t;
-    buffer_mutex.lock();
+    vlc_mutex_locker locker(&buffer_mutex);
     if(!queued.empty())
         t = reinterpret_cast<picture_t *>(queued.front())->date;
     else
         t = VLC_TICK_INVALID;
-    buffer_mutex.unlock();
     return t;
 }
 
@@ -700,6 +695,7 @@ AbstractRawStream::AbstractRawStream(vlc_object_t *p_obj, const StreamID &id,
 {
     pcr = VLC_TICK_INVALID;
     b_draining = false;
+    vlc_mutex_init(&buffer_mutex);
 }
 
 AbstractRawStream::~AbstractRawStream()
@@ -716,9 +712,8 @@ int AbstractRawStream::Send(block_t *p_block)
         outputbuffer->Enqueue(p_block);
     else
         block_Release(p_block);
-    buffer_mutex.lock();
+    vlc_mutex_locker locker(&buffer_mutex);
     pcr = std::max(pcr, t);
-    buffer_mutex.unlock();
     return VLC_SUCCESS;
 }
 
@@ -729,26 +724,22 @@ void AbstractRawStream::Flush()
 
 void AbstractRawStream::Drain()
 {
-    buffer_mutex.lock();
+    vlc_mutex_locker locker(&buffer_mutex);
     b_draining = true;
-    buffer_mutex.unlock();
 }
 
 bool AbstractRawStream::ReachedPlaybackTime(vlc_tick_t t)
 {
-    buffer_mutex.lock();
+    vlc_mutex_locker locker(&buffer_mutex);
     bool b = (pcr != VLC_TICK_INVALID) && t < pcr;
     b |= b_draining;
-    buffer_mutex.unlock();
     return b;
 }
 
 bool AbstractRawStream::isEOS()
 {
-    buffer_mutex.lock();
-    bool b = b_draining;
-    buffer_mutex.unlock();
-    return b;
+    vlc_mutex_locker locker(&buffer_mutex);
+    return b_draining;
 }
 
 void AbstractRawStream::FlushQueued()

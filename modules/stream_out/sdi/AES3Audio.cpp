@@ -31,6 +31,7 @@ using namespace sdi_sout;
 AES3AudioBuffer::AES3AudioBuffer(vlc_object_t *p_obj, unsigned count)
 {
     obj = p_obj;
+    vlc_mutex_init(&bytestream_mutex);
     setSubFramesCount(count);
     block_BytestreamInit(&bytestream);
     toconsume = 0;
@@ -49,9 +50,8 @@ void AES3AudioBuffer::setSubFramesCount(uint8_t c)
 
 void AES3AudioBuffer::push(block_t *p_block)
 {
-    bytestream_mutex.lock();
+    vlc_mutex_locker locker(&bytestream_mutex);
     block_BytestreamPush(&bytestream, p_block);
-    bytestream_mutex.unlock();
 }
 
 unsigned AES3AudioBuffer::read(void *dstbuf, unsigned count, vlc_tick_t from,
@@ -92,7 +92,8 @@ unsigned AES3AudioBuffer::read(void *dstbuf, unsigned count, vlc_tick_t from,
     assert(count + dstpad <= orig);
 #endif
 
-    bytestream_mutex.lock();
+    {
+    vlc_mutex_locker locker(&bytestream_mutex);
     uint8_t *dst = reinterpret_cast<uint8_t *>(dstbuf);
     for(unsigned i=0; i<count; i++)
     {
@@ -107,7 +108,7 @@ unsigned AES3AudioBuffer::read(void *dstbuf, unsigned count, vlc_tick_t from,
        if(dst)
             block_PeekOffsetBytes(&bytestream, srcoffset, &dst[dstoffset], sizeof(uint16_t));
     }
-    bytestream_mutex.unlock();
+    }
 
     return 0;
 }
@@ -149,12 +150,13 @@ void AES3AudioBuffer::flushConsumed()
     if(toconsume)
     {
         size_t bytes = FramesToBytes(toconsume);
-        bytestream_mutex.lock();
+        {
+        vlc_mutex_locker locker(&bytestream_mutex);
         if(block_SkipBytes(&bytestream, bytes) == VLC_SUCCESS)
             block_BytestreamFlush(&bytestream);
         else
             block_BytestreamEmpty(&bytestream);
-        bytestream_mutex.unlock();
+        }
 #ifdef SDI_MULTIPLEX_DEBUG
         msg_Dbg(obj, "%4.4s flushed off %zd -> pts %ld",
                 reinterpret_cast<const char *>(&i_codec),
@@ -219,11 +221,10 @@ vlc_fourcc_t AES3AudioBuffer::getCodec() const
 vlc_tick_t AES3AudioBuffer::bufferStart() const
 {
     vlc_tick_t start = VLC_TICK_INVALID;
-    bytestream_mutex.lock();
+    vlc_mutex_locker locker(&bytestream_mutex);
     if(bytestream.p_block)
         start = bytestream.p_block->i_pts +
                 FramesToDuration(BytesToFrames(bytestream.i_block_offset));
-    bytestream_mutex.unlock();
     return start;
 }
 
@@ -233,10 +234,12 @@ unsigned AES3AudioBuffer::availableVirtualSamples(vlc_tick_t from) const
     if(start == VLC_TICK_INVALID)
         return 0;
 
-    bytestream_mutex.lock();
+    unsigned samples;
+    {
+    vlc_mutex_locker locker(&bytestream_mutex);
     /* FIXME */
-    unsigned samples = BytesToFrames(block_BytestreamRemaining(&bytestream));
-    bytestream_mutex.unlock();
+    samples = BytesToFrames(block_BytestreamRemaining(&bytestream));
+    }
 
     int offset = OffsetToBufferStart(from);
     if(offset > 0)

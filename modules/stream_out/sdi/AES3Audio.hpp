@@ -23,7 +23,6 @@
 #include <vlc_common.h>
 #include <vlc_block.h>
 #include <vlc_block_helper.h>
-#include <mutex>
 #include <vlc_es.h>
 
 #define MAX_AES3_AUDIO_FRAMES     8
@@ -69,7 +68,7 @@ namespace sdi_sout
             unsigned BytesToFrames(size_t) const;
             unsigned TicksDurationToFrames(vlc_tick_t) const;
             block_bytestream_t bytestream;
-            mutable std::mutex bytestream_mutex;
+            mutable vlc_mutex_t bytestream_mutex;
             uint8_t buffersubframes;
             unsigned toconsume;
             vlc_fourcc_t i_codec;

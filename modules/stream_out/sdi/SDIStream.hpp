@@ -25,7 +25,6 @@
 #include <vlc_aout.h>
 #include <vlc_codec.h>
 #include <queue>
-#include <mutex>
 #include <string>
 #include <list>
 
@@ -54,7 +53,7 @@ namespace sdi_sout
 
         protected:
             bool b_draining;
-            std::mutex buffer_mutex;
+            vlc_mutex_t buffer_mutex;
             std::queue<void *> queued;
     };
 
@@ -207,7 +206,7 @@ namespace sdi_sout
             virtual bool isEOS(); /* impl */
 
         protected:
-            std::mutex buffer_mutex;
+            vlc_mutex_t buffer_mutex;
             vlc_tick_t pcr;
             bool b_draining;
             void FlushQueued();
