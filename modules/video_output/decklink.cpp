@@ -417,7 +417,11 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
     IDeckLinkConfiguration *p_config = NULL;
     IDeckLinkProfileAttributes *p_attributes = NULL;
     IDeckLink *p_card = NULL;
-    BMDDisplayMode wanted_mode_id = bmdModeUnknown;
+    union {
+        BMDDisplayMode id;
+        char str[4];
+    } wanted_mode;
+    wanted_mode.id = bmdModeUnknown;
 
     vlc_mutex_lock(&sys->lock);
 
@@ -438,8 +442,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
             msg_Err(vd, "Invalid mode %s", mode);
             goto error;
         }
-        memset(&wanted_mode_id, ' ', 4);
-        strncpy((char*)&wanted_mode_id, mode, 4);
+        strncpy(wanted_mode.str, mode, 4);
         free(mode);
     }
 
@@ -509,7 +512,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
     CHECK("Could not set video output connection");
 
     p_display_mode = Decklink::Helper::MatchDisplayMode(VLC_OBJECT(vd), sys->p_output,
-                                          vd->source, wanted_mode_id);
+                                          vd->source, wanted_mode.id);
     if(p_display_mode == NULL)
     {
         msg_Err(vd, "Could not negociate a compatible display mode");
