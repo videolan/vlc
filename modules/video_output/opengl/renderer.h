@@ -103,7 +103,7 @@ vlc_gl_renderer_SetViewpoint(struct vlc_gl_renderer *renderer,
                              const vlc_viewpoint_t *p_vp);
 
 void
-vlc_gl_renderer_SetWindowAspectRatio(struct vlc_gl_renderer *renderer,
-                                     float f_sar);
+vlc_gl_renderer_SetOutputSize(struct vlc_gl_renderer *renderer, unsigned width,
+                              unsigned height);
 
 #endif /* include-guard */

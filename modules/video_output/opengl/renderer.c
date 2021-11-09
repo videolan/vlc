@@ -360,9 +360,11 @@ vlc_gl_renderer_SetViewpoint(struct vlc_gl_renderer *renderer,
 }
 
 void
-vlc_gl_renderer_SetWindowAspectRatio(struct vlc_gl_renderer *renderer,
-                                     float f_sar)
+vlc_gl_renderer_SetOutputSize(struct vlc_gl_renderer *renderer, unsigned width,
+                              unsigned height)
 {
+    float f_sar = (float) width / height;
+
     /* Each time the window size changes, we must recompute the minimum zoom
      * since the aspect ration changes.
      * We must also set the new current zoom value. */

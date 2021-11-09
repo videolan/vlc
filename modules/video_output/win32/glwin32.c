@@ -231,7 +231,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         const int width  = place.width;
         const int height = place.height;
         vlc_gl_Resize (sys->gl, width, height);
-        vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
+        vout_display_opengl_SetOutputSize(sys->vgl, width, height);
         vout_display_opengl_Viewport(sys->vgl, place.x, place.y, width, height);
         sys->area.place_changed = false;
     }

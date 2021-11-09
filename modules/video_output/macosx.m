@@ -373,7 +373,7 @@ static int Control (vout_display_t *vd, int query)
 
                 if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
                     return VLC_SUCCESS;
-                vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
+                vout_display_opengl_SetOutputSize(sys->vgl, place.width, place.height);
 
                 /* For resize, we call glViewport in reshape and not here.
                  This has the positive side effect that we avoid erratic sizing as we animate every resize. */

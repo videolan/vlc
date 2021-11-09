@@ -225,8 +225,8 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
     {
         if (sys->place_changed)
         {
-            float window_ar = (float)sys->place.width / sys->place.height;
-            vout_display_opengl_SetWindowAspectRatio(sys->vgl, window_ar);
+            vout_display_opengl_SetOutputSize(sys->vgl, sys->place.width,
+                                                        sys->place.height);
             vout_display_opengl_Viewport(sys->vgl, sys->place.x, sys->place.y,
                                          sys->place.width, sys->place.height);
             sys->place_changed = false;

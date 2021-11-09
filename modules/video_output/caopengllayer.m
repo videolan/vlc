@@ -343,7 +343,7 @@ static int Control (vout_display_t *vd, int query)
                 // don't return an error or we need to handle reset_pictures
                 return VLC_SUCCESS;
 
-            vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
+            vout_display_opengl_SetOutputSize(sys->vgl, place.width, place.height);
             OpenglUnlock(sys->gl);
 
             sys->place = place;

@@ -241,10 +241,10 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
     return vlc_gl_renderer_SetViewpoint(vgl->renderer, p_vp);
 }
 
-void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
-                                              float f_sar)
+void vout_display_opengl_SetOutputSize(vout_display_opengl_t *vgl,
+                                       unsigned width, unsigned height)
 {
-    vlc_gl_renderer_SetWindowAspectRatio(vgl->renderer, f_sar);
+    vlc_gl_renderer_SetOutputSize(vgl->renderer, width, height);
 }
 
 void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
