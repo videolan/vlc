@@ -106,4 +106,11 @@ void
 vlc_gl_filters_SetViewport(struct vlc_gl_filters *filters, int x, int y,
                            unsigned width, unsigned height);
 
+/**
+ * Change the output size
+ */
+int
+vlc_gl_filters_SetOutputSize(struct vlc_gl_filters *filters, unsigned width,
+                             unsigned height);
+
 #endif

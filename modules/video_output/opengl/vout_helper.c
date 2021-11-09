@@ -244,7 +244,11 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
 void vout_display_opengl_SetOutputSize(vout_display_opengl_t *vgl,
                                        unsigned width, unsigned height)
 {
-    vlc_gl_renderer_SetOutputSize(vgl->renderer, width, height);
+    int ret = vlc_gl_filters_SetOutputSize(vgl->filters, width, height);
+    /* The renderer, last filter in the chain, necessarily accepts the new
+     * output size */
+    assert(ret == VLC_SUCCESS);
+    (void) ret;
 }
 
 void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,

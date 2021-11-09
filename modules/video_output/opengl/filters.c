@@ -517,3 +517,45 @@ vlc_gl_filters_SetViewport(struct vlc_gl_filters *filters, int x, int y,
     filters->viewport.width = width;
     filters->viewport.height = height;
 }
+
+int
+vlc_gl_filters_SetOutputSize(struct vlc_gl_filters *filters, unsigned width,
+                             unsigned height)
+{
+    bool resized = false;
+    struct vlc_gl_tex_size req = { width, height };
+
+    struct vlc_gl_filter_priv *priv;
+    vlc_list_reverse_foreach(priv, &filters->list, node)
+    {
+        struct vlc_gl_filter *filter = &priv->filter;
+        if (!filter->ops->request_output_size) {
+            /* Could not propagate further */
+            break;
+        }
+
+        struct vlc_gl_tex_size optimal_in = {0};
+        int ret =
+            filter->ops->request_output_size(filter, &req, &optimal_in);
+        if (ret != VLC_SUCCESS)
+            break;
+
+        /* The filter may have modified the requested size */
+        priv->size_out = req;
+
+        /* Recreate the framebuffers/textures with the new size */
+        vlc_gl_filter_ApplyOutputSize(filter);
+
+        resized = true;
+
+        if (!optimal_in.width || !optimal_in.height)
+            /* No specific input size requested, do not propagate further */
+            break;
+
+        /* Request the previous filter to output at the optimal input size of
+         * the current filter. */
+        req = optimal_in;
+    }
+
+    return resized ? VLC_SUCCESS : VLC_EGENERIC;
+}

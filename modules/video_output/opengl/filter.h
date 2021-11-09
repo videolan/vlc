@@ -62,6 +62,28 @@ struct vlc_gl_filter_ops {
      * Free filter resources
      */
     void (*close)(struct vlc_gl_filter *filter);
+
+    /**
+     * Request a (responsive) filter to adapt its output size (optional)
+     *
+     * A responsive filter is a filter for which the size of the produced
+     * pictures depends on the output (e.g. display) size rather than the
+     * input. This is for example the case for a renderer.
+     *
+     * A new output size is requested (size_out). The filter is authorized to
+     * change the size_out to enforce its own constraints.
+     *
+     * In addition, it may request to the previous filter (if any) an optimal
+     * size it wants to receive. If set to non-zero value, this previous filter
+     * will receive this size as its requested size (and so on).
+     *
+     * \retval true if the resize is accepted (possibly with a modified
+     *              size_out)
+     * \retval false if the resize is rejected (included on error)
+     */
+    int (*request_output_size)(struct vlc_gl_filter *filter,
+                               struct vlc_gl_tex_size *size_out,
+                               struct vlc_gl_tex_size *optimal_in);
 };
 
 /**

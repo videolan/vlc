@@ -359,7 +359,7 @@ vlc_gl_renderer_SetViewpoint(struct vlc_gl_renderer *renderer,
     return VLC_SUCCESS;
 }
 
-void
+static void
 vlc_gl_renderer_SetOutputSize(struct vlc_gl_renderer *renderer, unsigned width,
                               unsigned height)
 {
@@ -368,12 +368,31 @@ vlc_gl_renderer_SetOutputSize(struct vlc_gl_renderer *renderer, unsigned width,
     /* Each time the window size changes, we must recompute the minimum zoom
      * since the aspect ration changes.
      * We must also set the new current zoom value. */
+    renderer->target_width = width;
+    renderer->target_height = height;
     renderer->f_sar = f_sar;
     UpdateFOVy(renderer);
     UpdateZ(renderer);
 
     const video_format_t *fmt = &renderer->sampler->glfmt.fmt;
     getViewpointMatrixes(renderer, fmt->projection_mode);
+}
+
+static int
+RequestOutputSize(struct vlc_gl_filter *filter,
+                  struct vlc_gl_tex_size *req,
+                  struct vlc_gl_tex_size *optimal_in)
+{
+    struct vlc_gl_renderer *renderer = filter->sys;
+
+    vlc_gl_renderer_SetOutputSize(renderer, req->width, req->height);
+
+    /* The optimal input size is the size for which the renderer do not need to
+     * scale */
+    optimal_in->width = renderer->target_width;
+    optimal_in->height = renderer->target_height;
+
+    return VLC_SUCCESS;
 }
 
 static int BuildSphere(GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
@@ -762,6 +781,7 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     static const struct vlc_gl_filter_ops filter_ops = {
         .draw = Draw,
         .close = Close,
+        .request_output_size = RequestOutputSize,
     };
     filter->ops = &filter_ops;
     filter->sys = renderer;
