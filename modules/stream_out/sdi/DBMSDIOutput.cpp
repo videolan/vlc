@@ -36,7 +36,9 @@
 #include "Ancillary.hpp"
 #include "V210.hpp"
 
+#ifndef _WIN32
 #include <DeckLinkAPIDispatch.cpp>
+#endif
 #include <DeckLinkAPIVersion.h>
 #if BLACKMAGIC_DECKLINK_API_VERSION < 0x0b010000
  #define IID_IDeckLinkProfileAttributes IID_IDeckLinkAttributes
@@ -152,7 +154,11 @@ HRESULT STDMETHODCALLTYPE DBMSDIOutput::ScheduledFrameCompleted
     else if(result == bmdOutputFrameDisplayedLate)
         msg_Warn(p_stream, "late frame");
 
+#ifdef _WIN32
+    BOOL b_active;
+#else
     bool b_active;
+#endif
     vlc_mutex_lock(&feeder.lock);
     if((S_OK == p_output->IsScheduledPlaybackRunning(&b_active)) && b_active)
         vlc_cond_signal(&feeder.cond);
@@ -358,7 +364,6 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
         }
         memset(&wanted_mode_id, ' ', 4);
         strncpy((char*)&wanted_mode_id, psz_string, 4);
-        wanted_mode_id = ntohl(wanted_mode_id);
         free(psz_string);
     }
 
@@ -366,14 +371,19 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
     result = p_card->QueryInterface(IID_IDeckLinkProfileAttributes, (void**)&p_attributes);
     CHECK("Could not get IDeckLinkAttributes");
 
-    int64_t vconn;
-    result = p_attributes->GetInt(BMDDeckLinkVideoOutputConnections, &vconn); /* reads mask */
+#ifdef _WIN32
+    LONGLONG iconn;
+#else
+    int64_t iconn;
+#endif
+    BMDVideoConnection vconn;
+    result = p_attributes->GetInt(BMDDeckLinkVideoOutputConnections, &iconn); /* reads mask */
     CHECK("Could not get BMDDeckLinkVideoOutputConnections");
 
     psz_string = var_InheritString(p_stream, CFG_PREFIX "video-connection");
     vconn = getVConn(psz_string);
     free(psz_string);
-    if (vconn == 0)
+    if (vconn == bmdVideoConnectionUnspecified)
     {
         msg_Err(p_stream, "Invalid video connection specified");
         goto error;
@@ -392,7 +402,7 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
     else
     {
         BMDDisplayMode mode_id = p_display_mode->GetDisplayMode();
-        BMDDisplayMode modenl = htonl(mode_id);
+        BMDDisplayMode modenl = mode_id;
         msg_Dbg(p_stream, "Selected mode '%4.4s'", (char *) &modenl);
 
         BMDPixelFormat pixelFormat = video.tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV;
@@ -403,7 +413,11 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
         {
             flags = bmdVideoOutputVITC;
         }
+#ifdef _WIN32
+        BOOL supported;
+#else
         bool supported;
+#endif
 #if BLACKMAGIC_DECKLINK_API_VERSION < 0x0b010000
         BMDDisplayModeSupport support = bmdDisplayModeNotSupported;
         result = p_output->DoesSupportVideoMode(mode_id,

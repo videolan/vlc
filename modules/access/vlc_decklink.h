@@ -28,6 +28,9 @@
  * This file defines Decklink portability macros and other functions
  */
 
+#ifdef _WIN32
+#include <initguid.h>
+#endif
 #include <DeckLinkAPI.h>
 
 /* Portability code to deal with differences how the Blackmagic SDK
@@ -38,9 +41,24 @@
 typedef CFStringRef decklink_str_t;
 #define DECKLINK_STRDUP(s) FromCFString(s, kCFStringEncodingUTF8)
 #define DECKLINK_FREE(s) CFRelease(s)
+#elif defined(_WIN32)
+#include <vlc_charset.h> // FromWide
+typedef BSTR decklink_str_t;
+#define DECKLINK_STRDUP(s) FromWide(s)
+#define DECKLINK_FREE(s) SysFreeString(s)
+
+static inline IDeckLinkIterator *CreateDeckLinkIteratorInstance(void)
+{
+    IDeckLinkIterator *decklink_iterator;
+    if (SUCCEEDED(CoCreateInstance(CLSID_CDeckLinkIterator, nullptr, CLSCTX_ALL,
+                                   IID_PPV_ARGS (&decklink_iterator))))
+        return decklink_iterator;
+    return nullptr;
+}
+
 #else
 typedef const char* decklink_str_t;
-#define DECKLINK_STRDUP strdup
+#define DECKLINK_STRDUP(s) strdup(s)
 #define DECKLINK_FREE(s) free((void *) s)
 #endif
 

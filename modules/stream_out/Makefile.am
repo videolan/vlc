@@ -54,7 +54,11 @@ sout_LTLIBRARIES = \
 
 if HAVE_DECKLINK
 libstream_out_sdi_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_decklinkoutput)
+if HAVE_WIN32
+libstream_out_sdi_plugin_la_LIBADD = $(LIBS_decklink) $(LIBCOM)
+else
 libstream_out_sdi_plugin_la_LIBADD = $(LIBS_decklink) $(LIBDL) -lpthread
+endif
 libstream_out_sdi_plugin_la_SOURCES = stream_out/sdi/sdiout.cpp \
         stream_out/sdi/sdiout.hpp \
         stream_out/sdi/Ancillary.cpp \
