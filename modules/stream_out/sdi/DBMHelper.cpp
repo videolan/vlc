@@ -63,7 +63,7 @@ IDeckLinkDisplayMode * Helper::MatchDisplayMode(vlc_object_t *p_obj,
                 BMDDisplayMode mode_id = p_mode->GetDisplayMode();
                 BMDTimeValue frameduration;
                 BMDTimeScale timescale;
-                const char *psz_mode_name;
+                char *psz_mode_name;
                 decklink_str_t tmp_name;
 
                 if(p_mode->GetFrameRate(&frameduration, &timescale) == S_OK &&
@@ -91,6 +91,7 @@ IDeckLinkDisplayMode * Helper::MatchDisplayMode(vlc_object_t *p_obj,
                                 double(timescale) / frameduration,
                                 timescale, frameduration);
                     }
+                    free(psz_mode_name);
                 }
                 else
                 {

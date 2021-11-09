@@ -204,13 +204,14 @@ int DBMSDIOutput::Open()
     }
 
     decklink_str_t tmp_name;
-    const char *psz_model_name;
+    char *psz_model_name;
     result = p_card->GetModelName(&tmp_name);
     CHECK("Unknown model name");
     psz_model_name = DECKLINK_STRDUP(tmp_name);
     DECKLINK_FREE(tmp_name);
 
     msg_Dbg(p_stream, "Opened DeckLink PCI card %s", psz_model_name);
+    free(psz_model_name);
 
     result = p_card->QueryInterface(IID_IDeckLinkOutput, (void**)&p_output);
     CHECK("No outputs");
