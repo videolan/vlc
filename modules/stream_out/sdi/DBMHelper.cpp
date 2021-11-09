@@ -84,7 +84,7 @@ IDeckLinkDisplayMode * Helper::MatchDisplayMode(vlc_object_t *p_obj,
                             char str[4];
                         } field;
                         field.id = p_mode->GetFieldDominance();
-                        msg_Dbg(p_obj, "Found mode '%4.4s': %s (%ldx%ld, %4.4s, %.3f fps, scale %ld dur %ld)",
+                        msg_Dbg(p_obj, "Found mode '%4.4s': %s (%ldx%ld, %4.4s, %.3f fps, scale %" PRId64 " dur %" PRId64 ")",
                                 mode.str, psz_mode_name,
                                 p_mode->GetWidth(), p_mode->GetHeight(),
                                 field.str,
