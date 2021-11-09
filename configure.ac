@@ -2100,11 +2100,14 @@ then
   if test "${with_decklink_sdk}" != "no" -a -n "${with_decklink_sdk}"
   then
     VLC_ADD_CPPFLAGS([decklink decklinkoutput stream_out_sdi],[-I${with_decklink_sdk}/include])
+  elif test -d "${CONTRIB_DIR}/include/decklink"
+  then
+    VLC_ADD_CPPFLAGS([decklink decklinkoutput stream_out_sdi],[-I${CONTRIB_DIR}/include/decklink])
   fi
   VLC_SAVE_FLAGS
   CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_decklink}"
   AC_LANG_PUSH([C++])
-  AC_CHECK_HEADERS([DeckLinkAPIDispatch.cpp], [
+  AC_CHECK_HEADERS([DeckLinkAPI.h], [
       have_decklink=yes
       AS_IF([test "${SYS}" = "darwin"], [
         VLC_ADD_LIBS([decklink decklinkoutput],[-Wl,-framework,CoreFoundation])
