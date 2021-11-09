@@ -517,15 +517,18 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
     }
     else
     {
-        BMDDisplayMode mode_id = p_display_mode->GetDisplayMode();
-        BMDDisplayMode modenl = mode_id;
-        msg_Dbg(vd, "Selected mode '%4.4s'", (char *) &modenl);
+        union {
+            BMDDisplayMode id;
+            char str[4];
+        } mode;
+        mode.id = p_display_mode->GetDisplayMode();
+        msg_Dbg(vd, "Selected mode '%4.4s'", mode.str);
 
         BMDPixelFormat pixelFormat = sys->video.tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV;
         BMDVideoOutputFlags flags = bmdVideoOutputVANC;
-        if (mode_id == bmdModeNTSC ||
-            mode_id == bmdModeNTSC2398 ||
-            mode_id == bmdModePAL)
+        if (mode.id == bmdModeNTSC ||
+            mode.id == bmdModeNTSC2398 ||
+            mode.id == bmdModePAL)
         {
             flags = bmdVideoOutputVITC;
         }
@@ -536,7 +539,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
 #endif
 #if BLACKMAGIC_DECKLINK_API_VERSION < 0x0b010000
         BMDDisplayModeSupport support = bmdDisplayModeNotSupported;
-        result = sys->p_output->DoesSupportVideoMode(mode_id,
+        result = sys->p_output->DoesSupportVideoMode(mode.id,
                                                 pixelFormat,
                                                 flags,
                                                 &support,
@@ -544,7 +547,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
         supported = (support != bmdDisplayModeNotSupported);
 #else
         result = sys->p_output->DoesSupportVideoMode(vconn,
-                                                mode_id,
+                                                mode.id,
                                                 pixelFormat,
                                                 bmdSupportedVideoModeDefault,
                                                 NULL,
@@ -567,7 +570,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
                                               &sys->timescale);
         CHECK("Could not read frame rate");
 
-        result = sys->p_output->EnableVideoOutput(mode_id, flags);
+        result = sys->p_output->EnableVideoOutput(mode.id, flags);
         CHECK("Could not enable video output");
 
         video_format_Copy(fmt, vd->source);

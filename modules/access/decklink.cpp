@@ -662,7 +662,11 @@ static int Open(vlc_object_t *p_this)
         BMDTimeValue frame_duration, time_scale;
         uint32_t field_flags;
         const char *field = GetFieldDominance(m->GetFieldDominance(), &field_flags);
-        BMDDisplayMode id = m->GetDisplayMode();
+        union {
+            BMDDisplayMode id;
+            char str[4];
+        } mode;
+        mode.id = m->GetDisplayMode();
 
         if (m->GetName(&tmp_name) != S_OK) {
             mode_name = "unknown";
@@ -676,11 +680,11 @@ static int Open(vlc_object_t *p_this)
         }
 
         msg_Dbg(demux, "Found mode '%4.4s': %s (%dx%d, %.3f fps%s)",
-                 (char*)&id, mode_name,
+                 mode.str, mode_name,
                  (int)m->GetWidth(), (int)m->GetHeight(),
                  double(time_scale) / frame_duration, field);
 
-        if (u.id == id) {
+        if (u.id == mode.id) {
             sys->video_fmt = GetModeSettings(demux, m, bmdDetectedVideoInputYCbCr422);
             msg_Dbg(demux, "Using that mode");
         }
@@ -689,7 +693,7 @@ static int Open(vlc_object_t *p_this)
     mode_it->Release();
 
     if (sys->video_fmt.video.i_width == 0) {
-        msg_Err(demux, "Unknown video mode `%4.4s\' specified.", (char*)&u.id);
+        msg_Err(demux, "Unknown video mode `%4.4s\' specified.", u.str);
         goto finish;
     }
 

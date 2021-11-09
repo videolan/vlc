@@ -401,15 +401,18 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
     }
     else
     {
-        BMDDisplayMode mode_id = p_display_mode->GetDisplayMode();
-        BMDDisplayMode modenl = mode_id;
-        msg_Dbg(p_stream, "Selected mode '%4.4s'", (char *) &modenl);
+        union {
+            BMDDisplayMode id;
+            char str[4];
+        } mode;
+        mode.id = p_display_mode->GetDisplayMode();
+        msg_Dbg(p_stream, "Selected mode '%4.4s'", mode.str);
 
         BMDPixelFormat pixelFormat = video.tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV;
         BMDVideoOutputFlags flags = bmdVideoOutputVANC;
-        if (mode_id == bmdModeNTSC ||
-            mode_id == bmdModeNTSC2398 ||
-            mode_id == bmdModePAL)
+        if (mode.id == bmdModeNTSC ||
+            mode.id == bmdModeNTSC2398 ||
+            mode.id == bmdModePAL)
         {
             flags = bmdVideoOutputVITC;
         }
@@ -420,7 +423,7 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
 #endif
 #if BLACKMAGIC_DECKLINK_API_VERSION < 0x0b010000
         BMDDisplayModeSupport support = bmdDisplayModeNotSupported;
-        result = p_output->DoesSupportVideoMode(mode_id,
+        result = p_output->DoesSupportVideoMode(mode.id,
                                                 pixelFormat,
                                                 flags,
                                                 &support,
@@ -428,7 +431,7 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
         supported = (support != bmdDisplayModeNotSupported);
 #else
         result = p_output->DoesSupportVideoMode(vconn,
-                                                mode_id,
+                                                mode.id,
                                                 pixelFormat,
                                                 bmdSupportedVideoModeDefault,
                                                 NULL,
@@ -451,7 +454,7 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
                                               &timescale);
         CHECK("Could not read frame rate");
 
-        result = p_output->EnableVideoOutput(mode_id, flags);
+        result = p_output->EnableVideoOutput(mode.id, flags);
         CHECK("Could not enable video output");
 
         p_output->SetScheduledFrameCompletionCallback(this);

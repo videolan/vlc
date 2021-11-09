@@ -69,17 +69,25 @@ IDeckLinkDisplayMode * Helper::MatchDisplayMode(vlc_object_t *p_obj,
                 if(p_mode->GetFrameRate(&frameduration, &timescale) == S_OK &&
                         p_mode->GetName(&tmp_name) == S_OK)
                 {
-                    BMDDisplayMode modenl = mode_id;
+                    union {
+                        BMDDisplayMode id;
+                        char str[4];
+                    } mode;
+                    mode.id = mode_id;
                     psz_mode_name = DECKLINK_STRDUP(tmp_name);
                     DECKLINK_FREE(tmp_name);
 
                     if(i==0)
                     {
-                        BMDFieldDominance field = p_mode->GetFieldDominance();
+                        union {
+                            BMDFieldDominance id;
+                            char str[4];
+                        } field;
+                        field.id = p_mode->GetFieldDominance();
                         msg_Dbg(p_obj, "Found mode '%4.4s': %s (%ldx%ld, %4.4s, %.3f fps, scale %ld dur %ld)",
-                                (const char*)&modenl, psz_mode_name,
+                                mode.str, psz_mode_name,
                                 p_mode->GetWidth(), p_mode->GetHeight(),
-                                (const char *)&field,
+                                field.str,
                                 double(timescale) / frameduration,
                                 timescale, frameduration);
                     }
@@ -92,8 +100,12 @@ IDeckLinkDisplayMode * Helper::MatchDisplayMode(vlc_object_t *p_obj,
 
                 if(forcedmode != bmdModeUnknown && unlikely(!p_selected))
                 {
-                    BMDDisplayMode modenl = forcedmode;
-                    msg_Dbg(p_obj, "Forced mode '%4.4s'", (char *)&modenl);
+                    union {
+                        BMDDisplayMode id;
+                        char str[4];
+                    } mode;
+                    mode.id = forcedmode;
+                    msg_Dbg(p_obj, "Forced mode '%4.4s'", mode.str);
                     if(forcedmode == mode_id)
                         p_selected = p_mode;
                     else
