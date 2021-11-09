@@ -96,6 +96,24 @@ vlc_gl_filter_LoadModule(vlc_object_t *parent, const char *name,
     return VLC_SUCCESS;
 }
 
+static void
+DeleteFramebuffersOut(struct vlc_gl_filter_priv *priv)
+{
+    const opengl_vtable_t *vt = &priv->filter.api->vt;
+
+    vt->DeleteFramebuffers(priv->tex_count, priv->framebuffers_out);
+    vt->DeleteTextures(priv->tex_count, priv->textures_out);
+}
+
+static void
+DeleteFramebufferMSAA(struct vlc_gl_filter_priv *priv)
+{
+    const opengl_vtable_t *vt = &priv->filter.api->vt;
+
+    vt->DeleteFramebuffers(1, &priv->framebuffer_msaa);
+    vt->DeleteRenderbuffers(1, &priv->renderbuffer_msaa);
+}
+
 void
 vlc_gl_filter_Delete(struct vlc_gl_filter *filter)
 {
@@ -114,19 +132,11 @@ vlc_gl_filter_Delete(struct vlc_gl_filter *filter)
         vlc_gl_filter_Delete(subfilter);
     }
 
-    const opengl_vtable_t *vt = &filter->api->vt;
-
     if (priv->tex_count)
-    {
-        vt->DeleteFramebuffers(priv->tex_count, priv->framebuffers_out);
-        vt->DeleteTextures(priv->tex_count, priv->textures_out);
-    }
+        DeleteFramebuffersOut(priv);
 
     if (filter->config.msaa_level)
-    {
-        vt->DeleteFramebuffers(1, &priv->framebuffer_msaa);
-        vt->DeleteRenderbuffers(1, &priv->renderbuffer_msaa);
-    }
+        DeleteFramebufferMSAA(priv);
 
     vlc_object_delete(&filter->obj);
 }
@@ -191,7 +201,10 @@ InitFramebuffersOut(struct vlc_gl_filter_priv *priv)
             int ret =
                 InitPlane(priv, i, priv->tex_widths[i], priv->tex_heights[i]);
             if (ret != VLC_SUCCESS)
+            {
+                DeleteFramebuffersOut(priv);
                 return ret;
+            }
         }
     }
     else
@@ -208,7 +221,10 @@ InitFramebuffersOut(struct vlc_gl_filter_priv *priv)
 
         int ret = InitPlane(priv, 0, priv->tex_widths[0], priv->tex_heights[0]);
         if (ret != VLC_SUCCESS)
+        {
+            DeleteFramebuffersOut(priv);
             return ret;
+        }
     }
 
     return VLC_SUCCESS;
@@ -236,7 +252,10 @@ InitFramebufferMSAA(struct vlc_gl_filter_priv *priv, unsigned msaa_level)
 
     GLenum status = vt->CheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        DeleteFramebufferMSAA(priv);
         return VLC_EGENERIC;
+    }
 
     return VLC_SUCCESS;
 }
@@ -256,7 +275,14 @@ vlc_gl_filter_InitFramebuffers(struct vlc_gl_filter *filter, bool has_out)
 
     /* Every non-blend filter needs its own framebuffer, except the last one */
     if (has_out)
-        return InitFramebuffersOut(priv);
+    {
+        int ret = InitFramebuffersOut(priv);
+        if (ret != VLC_SUCCESS)
+        {
+            DeleteFramebufferMSAA(priv);
+            return ret;
+        }
+    }
 
     return VLC_SUCCESS;
 }
