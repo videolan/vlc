@@ -46,10 +46,9 @@ static const QString COVERGENERATOR_DEFAULT = ":/noart.png";
 // Ctor / dtor
 //-------------------------------------------------------------------------------------------------
 
-CoverGenerator::CoverGenerator(vlc_medialibrary_t * ml, const MLItemId & itemId, int index)
+CoverGenerator::CoverGenerator(vlc_medialibrary_t * ml, const MLItemId & itemId)
     : m_ml(ml)
     , m_id(itemId)
-    , m_index(index)
     , m_countX(COVERGENERATOR_COUNT)
     , m_countY(COVERGENERATOR_COUNT)
     , m_split(Divide)
@@ -64,11 +63,6 @@ CoverGenerator::CoverGenerator(vlc_medialibrary_t * ml, const MLItemId & itemId,
 /* Q_INVOKABLE */ MLItemId CoverGenerator::getId()
 {
     return m_id;
-}
-
-/* Q_INVOKABLE */ int CoverGenerator::getIndex()
-{
-    return m_index;
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -52,12 +52,10 @@ public: // Enums
     };
 
 public:
-    CoverGenerator(vlc_medialibrary_t * ml, const MLItemId & itemId, int index = -1);
+    CoverGenerator(vlc_medialibrary_t * ml, const MLItemId & itemId);
 
 public: // Interface
     Q_INVOKABLE MLItemId getId();
-
-    Q_INVOKABLE int getIndex();
 
     Q_INVOKABLE void setSize(const QSize & size);
 
@@ -103,8 +101,6 @@ private:
     vlc_medialibrary_t * m_ml;
 
     MLItemId m_id;
-
-    int m_index;
 
     QSize m_size;
 
