@@ -124,6 +124,15 @@ public:
      */
     const T *get(size_t index) const;
 
+    /**
+     * Return the first item in the cache for which UnaryFunctor F returns true
+     *
+     * This returns the local item (`nullptr` if not present), and does not
+     * retrieve anything from the loader.
+     */
+    template <typename UnaryFunctor>
+    const T *find(const UnaryFunctor &&f, int *index = nullptr) const;
+
 
     /**
      * Return the number of items or `COUNT_UNINITIALIZED`
@@ -178,6 +187,25 @@ const T *ListCache<T>::get(size_t index) const
         return nullptr;
 
     return &m_list[index - m_offset];
+}
+
+template <typename T>
+template <typename UnaryFunctor>
+const T *ListCache<T>::find(const UnaryFunctor &&f, int *index) const
+{
+    assert(m_total_count >= 0);
+    for (auto iter = std::begin(m_list); iter != std::end(m_list); ++iter)
+    {
+        if (f(*iter))
+        {
+            if (index)
+                *index = m_offset + std::distance(std::begin(m_list), iter);
+
+            return &(*iter);
+        }
+    }
+
+    return nullptr;
 }
 
 template <typename T>
