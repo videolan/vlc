@@ -303,68 +303,6 @@ Close(struct vlc_gl_filter *filter)
     free(renderer);
 }
 
-static int
-Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
-     const struct vlc_gl_input_meta *meta);
-
-int
-vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
-                     const config_chain_t *config,
-                     const struct vlc_gl_format *glfmt,
-                     struct vlc_gl_tex_size *size_out)
-{
-    (void) config;
-    (void) size_out;
-
-    const opengl_vtable_t *vt = &filter->api->vt;
-
-    struct vlc_gl_sampler *sampler =
-        vlc_gl_sampler_New(filter->gl, filter->api, glfmt, false);
-    if (!sampler)
-        return VLC_EGENERIC;
-
-    struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
-    if (!renderer)
-    {
-        vlc_gl_sampler_Delete(sampler);
-        return VLC_EGENERIC;
-    }
-
-    static const struct vlc_gl_filter_ops filter_ops = {
-        .draw = Draw,
-        .close = Close,
-    };
-    filter->ops = &filter_ops;
-    filter->sys = renderer;
-
-    renderer->sampler = sampler;
-
-    renderer->api = filter->api;
-    renderer->vt = vt;
-    renderer->dump_shaders = var_InheritInteger(filter, "verbose") >= 4;
-
-    int ret = opengl_link_program(filter);
-    if (ret != VLC_SUCCESS)
-    {
-        free(renderer);
-        return ret;
-    }
-
-    const video_format_t *fmt = &sampler->glfmt.fmt;
-    InitStereoMatrix(renderer->var.StereoMatrix, fmt->multiview_mode);
-
-    getViewpointMatrixes(renderer, fmt->projection_mode);
-
-    vt->GenBuffers(1, &renderer->vertex_buffer_object);
-    vt->GenBuffers(1, &renderer->index_buffer_object);
-    vt->GenBuffers(1, &renderer->texture_buffer_object);
-
-    /* The coords will be initialized on first draw */
-    renderer->valid_coords = false;
-
-    return VLC_SUCCESS;
-}
-
 static void UpdateZ(struct vlc_gl_renderer *renderer)
 {
     /* Do trigonometry to calculate the minimal z value
@@ -792,6 +730,64 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
                          renderer->var.ZoomMatrix);
 
     vt->DrawElements(GL_TRIANGLES, renderer->nb_indices, GL_UNSIGNED_SHORT, 0);
+
+    return VLC_SUCCESS;
+}
+
+int
+vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
+                     const config_chain_t *config,
+                     const struct vlc_gl_format *glfmt,
+                     struct vlc_gl_tex_size *size_out)
+{
+    (void) config;
+    (void) size_out;
+
+    const opengl_vtable_t *vt = &filter->api->vt;
+
+    struct vlc_gl_sampler *sampler =
+        vlc_gl_sampler_New(filter->gl, filter->api, glfmt, false);
+    if (!sampler)
+        return VLC_EGENERIC;
+
+    struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
+    if (!renderer)
+    {
+        vlc_gl_sampler_Delete(sampler);
+        return VLC_EGENERIC;
+    }
+
+    static const struct vlc_gl_filter_ops filter_ops = {
+        .draw = Draw,
+        .close = Close,
+    };
+    filter->ops = &filter_ops;
+    filter->sys = renderer;
+
+    renderer->sampler = sampler;
+
+    renderer->api = filter->api;
+    renderer->vt = vt;
+    renderer->dump_shaders = var_InheritInteger(filter, "verbose") >= 4;
+
+    int ret = opengl_link_program(filter);
+    if (ret != VLC_SUCCESS)
+    {
+        free(renderer);
+        return ret;
+    }
+
+    const video_format_t *fmt = &sampler->glfmt.fmt;
+    InitStereoMatrix(renderer->var.StereoMatrix, fmt->multiview_mode);
+
+    getViewpointMatrixes(renderer, fmt->projection_mode);
+
+    vt->GenBuffers(1, &renderer->vertex_buffer_object);
+    vt->GenBuffers(1, &renderer->index_buffer_object);
+    vt->GenBuffers(1, &renderer->texture_buffer_object);
+
+    /* The coords will be initialized on first draw */
+    renderer->valid_coords = false;
 
     return VLC_SUCCESS;
 }
