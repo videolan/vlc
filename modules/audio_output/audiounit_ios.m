@@ -443,7 +443,8 @@ avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
             ret = ret && [instance setSupportsMultichannelContent:p_sys->b_spatial_audio_supported error:&error];
         }
         ret = ret && [instance setActive:YES withOptions:options error:&error];
-        [[SessionManager sharedInstance] addAoutInstance: p_sys->aoutWrapper];
+        if (ret)
+            [[SessionManager sharedInstance] addAoutInstance: p_sys->aoutWrapper];
     } else {
         NSInteger numberOfRegisteredInstances = [[SessionManager sharedInstance] removeAoutInstance: p_sys->aoutWrapper];
         if (numberOfRegisteredInstances == 0) {
