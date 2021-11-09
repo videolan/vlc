@@ -41,11 +41,13 @@
 typedef CFStringRef decklink_str_t;
 #define DECKLINK_STRDUP(s) FromCFString(s, kCFStringEncodingUTF8)
 #define DECKLINK_FREE(s) CFRelease(s)
+#define PRIHR  "X"
 #elif defined(_WIN32)
 #include <vlc_charset.h> // FromWide
 typedef BSTR decklink_str_t;
 #define DECKLINK_STRDUP(s) FromWide(s)
 #define DECKLINK_FREE(s) SysFreeString(s)
+#define PRIHR  "lX"
 
 static inline IDeckLinkIterator *CreateDeckLinkIteratorInstance(void)
 {
@@ -60,6 +62,7 @@ static inline IDeckLinkIterator *CreateDeckLinkIteratorInstance(void)
 typedef const char* decklink_str_t;
 #define DECKLINK_STRDUP(s) strdup(s)
 #define DECKLINK_FREE(s) free((void *) s)
+#define PRIHR  "X"
 #endif
 
 #endif /* VLC_DECKLINK_H */

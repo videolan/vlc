@@ -126,7 +126,7 @@ AbstractStream *DBMSDIOutput::Add(const es_format_t *fmt)
     if(psz_err)\
     msg_Err(p_stream, message ": %s", psz_err); \
     else \
-    msg_Err(p_stream, message ": 0x%X", result); \
+    msg_Err(p_stream, message ":0x%" PRIHR, result); \
     goto error; \
 } \
 } while(0)
@@ -698,7 +698,7 @@ int DBMSDIOutput::ProcessAudio(block_t *p_block)
                 scheduleTime, CLOCK_FREQ, &written);
 
     if (result != S_OK)
-        msg_Err(p_stream, "Failed to schedule audio sample: 0x%X", result);
+        msg_Err(p_stream, "Failed to schedule audio sample:0x%" PRIHR, result);
     else
     {
         lasttimestamp = __MAX(p_block->i_pts, lasttimestamp);
@@ -754,7 +754,7 @@ int DBMSDIOutput::doProcessVideo(picture_t *picture, block_t *p_cc)
                                         video.tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV,
                                         bmdFrameFlagDefault, &pDLVideoFrame);
     if(result != S_OK) {
-        msg_Err(p_stream, "Failed to create video frame: 0x%X", result);
+        msg_Err(p_stream, "Failed to create video frame:0x%" PRIHR, result);
         goto error;
     }
 
@@ -769,13 +769,13 @@ int DBMSDIOutput::doProcessVideo(picture_t *picture, block_t *p_cc)
 
         result = p_output->CreateAncillaryData(bmdFormat10BitYUV, &vanc);
         if (result != S_OK) {
-            msg_Err(p_stream, "Failed to create vanc: %d", result);
+            msg_Err(p_stream, "Failed to create vanc:0x%" PRIHR, result);
             goto error;
         }
 
         result = vanc->GetBufferForVerticalBlankingLine(ancillary.afd_line, &buf);
         if (result != S_OK) {
-            msg_Err(p_stream, "Failed to get VBI line %u: %d", ancillary.afd_line, result);
+            msg_Err(p_stream, "Failed to get VBI line %u:0x%" PRIHR, ancillary.afd_line, result);
             goto error;
         }
 
@@ -786,7 +786,7 @@ int DBMSDIOutput::doProcessVideo(picture_t *picture, block_t *p_cc)
         {
             result = vanc->GetBufferForVerticalBlankingLine(ancillary.captions_line, &buf);
             if (result != S_OK) {
-                msg_Err(p_stream, "Failed to get VBI line %u: %d", ancillary.captions_line, result);
+                msg_Err(p_stream, "Failed to get VBI line %u:0x%" PRIHR, ancillary.captions_line, result);
                 goto error;
             }
             sdi::Captions captions(p_cc->p_buffer, p_cc->i_buffer, timescale, frameduration);
@@ -798,7 +798,7 @@ int DBMSDIOutput::doProcessVideo(picture_t *picture, block_t *p_cc)
         result = pDLVideoFrame->SetAncillaryData(vanc);
         vanc->Release();
         if (result != S_OK) {
-            msg_Err(p_stream, "Failed to set vanc: %d", result);
+            msg_Err(p_stream, "Failed to set vanc:0x%" PRIHR, result);
             goto error;
         }
     }
@@ -816,7 +816,7 @@ int DBMSDIOutput::doProcessVideo(picture_t *picture, block_t *p_cc)
     scheduleTime = picture->date + DECKLINK_SCHED_OFFSET;
     result = p_output->ScheduleVideoFrame(pDLVideoFrame, scheduleTime, length, CLOCK_FREQ);
     if (result != S_OK) {
-        msg_Err(p_stream, "Dropped Video frame %" PRId64 ": 0x%x",
+        msg_Err(p_stream, "Dropped Video frame %" PRId64 ":0x%" PRIHR,
                 picture->date, result);
         goto error;
     }

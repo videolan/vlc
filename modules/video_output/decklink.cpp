@@ -406,7 +406,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys, video_format_t 
         if(psz_err)\
             msg_Err(vd, message ": %s", psz_err); \
         else \
-            msg_Err(vd, message ": 0x%X", result); \
+            msg_Err(vd, message ":0x%" PRIHR, result); \
         goto error; \
     } \
 } while(0)
@@ -682,7 +682,7 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
         bmdFrameFlagDefault, &pDLVideoFrame);
 
     if (result != S_OK) {
-        msg_Err(vd, "Failed to create video frame: 0x%X", result);
+        msg_Err(vd, "Failed to create video frame:0x%" PRIHR, result);
         pDLVideoFrame = NULL;
         goto end;
     }
@@ -699,14 +699,14 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
         result = sys->p_output->CreateAncillaryData(
                 sys->video.tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV, &vanc);
         if (result != S_OK) {
-            msg_Err(vd, "Failed to create vanc: %d", result);
+            msg_Err(vd, "Failed to create vanc:0x%" PRIHR, result);
             goto end;
         }
 
         line = var_InheritInteger(vd, VIDEO_CFG_PREFIX "afd-line");
         result = vanc->GetBufferForVerticalBlankingLine(line, &buf);
         if (result != S_OK) {
-            msg_Err(vd, "Failed to get VBI line %d: %d", line, result);
+            msg_Err(vd, "Failed to get VBI line %d:0x%" PRIHR, line, result);
             goto end;
         }
 
@@ -718,7 +718,7 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
         result = pDLVideoFrame->SetAncillaryData(vanc);
         vanc->Release();
         if (result != S_OK) {
-            msg_Err(vd, "Failed to set vanc: %d", result);
+            msg_Err(vd, "Failed to set vanc:0x%" PRIHR, result);
             goto end;
         }
     }
@@ -738,7 +738,7 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
         date, length, CLOCK_FREQ);
 
     if (result != S_OK) {
-        msg_Err(vd, "Dropped Video frame %" PRId64 ": 0x%x", date, result);
+        msg_Err(vd, "Dropped Video frame %" PRId64 ":0x%" PRIHR, date, result);
         goto end;
     }
 
@@ -902,7 +902,7 @@ static void PlayAudio(audio_output_t *aout, block_t *audio, vlc_tick_t systempts
             audio->p_buffer, sampleFrameCount, systempts, CLOCK_FREQ, &written);
 
     if (result != S_OK)
-        msg_Err(aout, "Failed to schedule audio sample: 0x%X", result);
+        msg_Err(aout, "Failed to schedule audio sample:0x%" PRIHR, result);
     else if (sampleFrameCount != written)
         msg_Err(aout, "Written only %d samples out of %d", written, sampleFrameCount);
 
