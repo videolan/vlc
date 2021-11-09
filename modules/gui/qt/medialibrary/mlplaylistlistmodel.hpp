@@ -76,7 +76,7 @@ protected: // MLBaseModel implementation
     ListCacheLoader<std::unique_ptr<MLItem>> * createLoader() const override;
 
 private: // Functions
-    QString getCover(MLPlaylist * playlist, int index) const;
+    QString getCover(MLPlaylist * playlist) const;
 
 private: // MLBaseModel implementation
     void onVlcMlEvent(const MLEvent & event) override;

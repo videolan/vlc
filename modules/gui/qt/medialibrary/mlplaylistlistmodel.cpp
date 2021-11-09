@@ -196,7 +196,7 @@ QVariant MLPlaylistListModel::data(const QModelIndex & index, int role) const /*
         case PLAYLIST_NAME:
             return playlist->getName();
         case PLAYLIST_THUMBNAIL:
-            return getCover(playlist, row);
+            return getCover(playlist);
         case PLAYLIST_DURATION:
             return QVariant::fromValue(playlist->getDuration());
         case PLAYLIST_COUNT:
@@ -243,7 +243,7 @@ ListCacheLoader<std::unique_ptr<MLItem>> * MLPlaylistListModel::createLoader() c
 // Private functions
 //-------------------------------------------------------------------------------------------------
 
-QString MLPlaylistListModel::getCover(MLPlaylist * playlist, int index) const
+QString MLPlaylistListModel::getCover(MLPlaylist * playlist) const
 {
     QString cover = playlist->getCover();
 
@@ -251,7 +251,7 @@ QString MLPlaylistListModel::getCover(MLPlaylist * playlist, int index) const
     if (cover.isNull() == false || playlist->hasGenerator())
         return cover;
 
-    CoverGenerator * generator = new CoverGenerator(m_ml, playlist->getId(), index);
+    CoverGenerator * generator = new CoverGenerator(m_ml, playlist->getId());
 
     generator->setSize(m_coverSize);
 
@@ -310,18 +310,17 @@ void MLPlaylistListModel::thumbnailUpdated(int idx) /* override */
 
 void MLPlaylistListModel::onCover()
 {
-    CoverGenerator * generator = static_cast<CoverGenerator *> (sender());
+    CoverGenerator * generator = static_cast<CoverGenerator *>(sender());
 
-    int index = generator->getIndex();
+    int index = 0;
 
     // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
-    MLItem * item = this->itemCache(index);
+    MLItem * item = this->findInCache(generator->getId().id, &index);
 
     // NOTE: When the item is no longer cached or has been moved we return right away.
-    if (item == nullptr || item->getId() != generator->getId())
+    if (!item)
     {
         generator->deleteLater();
-
         return;
     }
 
