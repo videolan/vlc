@@ -386,11 +386,6 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
     psz_string = var_InheritString(p_stream, CFG_PREFIX "video-connection");
     vconn = getVConn(psz_string);
     free(psz_string);
-    if (vconn == bmdVideoConnectionUnspecified)
-    {
-        msg_Err(p_stream, "Invalid video connection specified");
-        goto error;
-    }
 
     result = p_config->SetInt(bmdDeckLinkConfigVideoOutputConnection, vconn);
     CHECK("Could not set video output connection");
