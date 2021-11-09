@@ -322,7 +322,11 @@ static BMDVideoConnection getVConn(const char *psz)
 int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
 {
     HRESULT result;
-    BMDDisplayMode wanted_mode_id = bmdModeUnknown;
+    union {
+        BMDDisplayMode id;
+        char str[4];
+    } wanted_mode;
+    wanted_mode.id = bmdModeUnknown;
     IDeckLinkConfiguration *p_config = NULL;
     IDeckLinkProfileAttributes *p_attributes = NULL;
     IDeckLinkDisplayMode *p_display_mode = NULL;
@@ -362,8 +366,7 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
             msg_Err(p_stream, "Invalid mode %s", psz_string);
             goto error;
         }
-        memset(&wanted_mode_id, ' ', 4);
-        strncpy((char*)&wanted_mode_id, psz_string, 4);
+        strncpy(wanted_mode.str, psz_string, 4);
         free(psz_string);
     }
 
@@ -393,7 +396,7 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
     CHECK("Could not set video output connection");
 
     p_display_mode = Decklink::Helper::MatchDisplayMode(VLC_OBJECT(p_stream),
-                                                        p_output, vfmt, wanted_mode_id);
+                                                        p_output, vfmt, wanted_mode.id);
     if(p_display_mode == NULL)
     {
         msg_Err(p_stream, "Could not negociate a compatible display mode");
