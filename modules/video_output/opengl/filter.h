@@ -84,6 +84,15 @@ struct vlc_gl_filter_ops {
     int (*request_output_size)(struct vlc_gl_filter *filter,
                                struct vlc_gl_tex_size *size_out,
                                struct vlc_gl_tex_size *optimal_in);
+
+    /**
+     * Callback to notify input size changes
+     *
+     * When a filter changes its output size as a result of
+     * request_output_size(), the next filter is notified by this callback.
+     */
+    void (*on_input_size_change)(struct vlc_gl_filter *filter,
+                                 const struct vlc_gl_tex_size *size);
 };
 
 /**

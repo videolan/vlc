@@ -525,6 +525,8 @@ vlc_gl_filters_SetOutputSize(struct vlc_gl_filters *filters, unsigned width,
     bool resized = false;
     struct vlc_gl_tex_size req = { width, height };
 
+    struct vlc_gl_filter *next = NULL;
+
     struct vlc_gl_filter_priv *priv;
     vlc_list_reverse_foreach(priv, &filters->list, node)
     {
@@ -548,6 +550,10 @@ vlc_gl_filters_SetOutputSize(struct vlc_gl_filters *filters, unsigned width,
 
         resized = true;
 
+        /* Notify the next filter of the input size change */
+        if (next && next->ops->on_input_size_change)
+            next->ops->on_input_size_change(next, &req);
+
         if (!optimal_in.width || !optimal_in.height)
             /* No specific input size requested, do not propagate further */
             break;
@@ -555,6 +561,10 @@ vlc_gl_filters_SetOutputSize(struct vlc_gl_filters *filters, unsigned width,
         /* Request the previous filter to output at the optimal input size of
          * the current filter. */
         req = optimal_in;
+
+        /* The filters are iterated backwards, so the current filter will
+         * become the next filter. */
+        next = filter;
     }
 
     return resized ? VLC_SUCCESS : VLC_EGENERIC;
