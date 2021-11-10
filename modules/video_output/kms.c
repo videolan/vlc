@@ -71,6 +71,13 @@ struct vout_window_sys_t {
     uint32_t        height;
 
     drmModeRes *modeRes;
+    drmModeModeInfo *mode;
+    drmModeConnector *conn;
+    uint32_t connector;
+    drmModeCrtc *saved_crtc;
+
+    uint32_t framebuffer;
+    uint32_t main_buffer;
 };
 
 static deviceRval FindCRTC(vout_window_t *wnd, drmModeRes const *res,
@@ -129,6 +136,7 @@ static deviceRval SetupDevice(vout_window_t *wnd, drmModeRes const *res,
 
     sys->width = conn->modes[0].hdisplay;
     sys->height = conn->modes[0].vdisplay;
+    sys->mode = &conn->modes[0];
     msg_Dbg(wnd, "Mode resolution for connector %u is %ux%u",
             conn->connector_id, sys->width, sys->height);
 
@@ -143,6 +151,7 @@ static deviceRval SetupDevice(vout_window_t *wnd, drmModeRes const *res,
 static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
     struct vout_window_sys_t *sys = wnd->sys;
+    (void)cfg;
     drmModeRes *modeRes = sys->modeRes;
 
     bool found_connector = false;
@@ -173,7 +182,9 @@ static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
             msg_Dbg(wnd, " - Connector %d: could not setup device", c);
             continue;
         }
-        drmModeFreeConnector(conn);
+        sys->connector = conn->connector_id;
+        sys->conn = conn;
+        break;
     }
 
     if (!found_connector)
@@ -183,16 +194,92 @@ static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     }
 
     wnd->handle.crtc = sys->crtc;
+    /* Store current KMS state before modifying */
+    sys->saved_crtc = drmModeGetCrtc(sys->drm_fd, sys->crtc);
+
+    /*
+     * Create a new framebuffer to avoid compositing the planes into the saved
+     * framebuffer for the current CRTC.
+     */
+
+    struct drm_mode_create_dumb request = {
+        .width = sys->width, .height = sys->height, .bpp = 32
+    };
+
+    int ret = drmIoctl(sys->drm_fd, DRM_IOCTL_MODE_CREATE_DUMB, &request);
+    if (ret != drvSuccess)
+        goto error_create_dumb;
+
+    uint32_t new_fb;
+    ret = drmModeAddFB(sys->drm_fd, sys->width, sys->height, 24, 32, request.pitch,
+            request.handle, &new_fb);
+    if (ret != drvSuccess)
+        goto error_add_fb;
+
+    ret = drmModeSetCrtc(sys->drm_fd, sys->crtc, new_fb, 0, 0, &sys->connector, 1, sys->mode);
+    if (ret != drvSuccess)
+        goto error_set_crtc;
+
+    sys->framebuffer = new_fb;
+    sys->main_buffer = request.handle;
 
     vout_window_ReportSize(wnd, sys->width, sys->height);
 
     return VLC_SUCCESS;
+
+error_set_crtc:
+    drmModeRmFB(sys->drm_fd, new_fb);
+
+error_add_fb:
+    struct drm_mode_destroy_dumb destroy_request = {
+        .handle = request.handle
+    };
+    ret = drmIoctl(sys->drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &destroy_request);
+    /* This must be a programmation error if we cannot destroy the resources
+     * we created. */
+    assert(ret == drvSuccess);
+
+error_create_dumb:
+    if (sys->saved_crtc != NULL)
+        drmModeFreeCrtc(sys->saved_crtc);
+    sys->saved_crtc = NULL;
+    drmModeFreeConnector(sys->conn);
+    sys->conn = NULL;
+
+    return VLC_EGENERIC;
 }
 
 static void WindowDisable(vout_window_t *wnd)
 {
     struct vout_window_sys_t *sys = wnd->sys;
     sys->crtc = 0;
+
+    /* Restore previous CRTC state */
+    if (sys->saved_crtc)
+    {
+        int ret = drmModeSetCrtc(sys->drm_fd,
+            sys->saved_crtc->crtc_id,
+            sys->saved_crtc->buffer_id,
+            sys->saved_crtc->x, sys->saved_crtc->y,
+            &sys->connector, 1,
+            &sys->saved_crtc->mode);
+        assert(ret == drvSuccess);
+        drmModeFreeCrtc(sys->saved_crtc);
+    }
+    sys->saved_crtc = NULL;
+
+    drmModeFreeConnector(sys->conn);
+
+    drmModeRmFB(sys->drm_fd, sys->framebuffer);
+
+    struct drm_mode_destroy_dumb destroy_request = {
+        .handle = sys->main_buffer,
+    };
+    int ret = drmIoctl(sys->drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &destroy_request);
+    /* This must be a programmation error if we cannot destroy the resources
+     * we created. */
+    assert(ret == drvSuccess);
+    (void)ret;
 }
 
 static void WindowClose(vout_window_t *wnd)
