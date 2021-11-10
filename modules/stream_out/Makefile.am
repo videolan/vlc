@@ -53,8 +53,8 @@ sout_LTLIBRARIES = \
 	libstream_out_udp_plugin.la
 
 if HAVE_DECKLINK
-libstream_out_sdi_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_decklinkoutput)
-libstream_out_sdi_plugin_la_LIBADD = $(LIBS_decklinkoutput)
+libstream_out_sdi_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_stream_out_sdi)
+libstream_out_sdi_plugin_la_LIBADD = $(LIBS_stream_out_sdi)
 if HAVE_WIN32
 libstream_out_sdi_plugin_la_LIBADD += $(LIBCOM)
 endif

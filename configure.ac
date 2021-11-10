@@ -2110,7 +2110,7 @@ then
   AC_CHECK_HEADERS([DeckLinkAPI.h], [
       have_decklink=yes
       AS_IF([test "${SYS}" = "darwin"], [
-        VLC_ADD_LIBS([decklink decklinkoutput],[-Wl,-framework,CoreFoundation])
+        VLC_ADD_LIBS([decklink decklinkoutput stream_out_sdi],[-Wl,-framework,CoreFoundation])
       ])
   ], [
       AS_IF([test "${enable_decklink}" = "yes"], [
