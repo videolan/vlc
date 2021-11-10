@@ -48,9 +48,9 @@
 
 /* */
 typedef struct vout_display_sys_t {
-    cucul_canvas_t *cv;
+    caca_canvas_t *cv;
     caca_display_t *dp;
-    cucul_dither_t *dither;
+    caca_dither_t *dither;
 
     bool dead;
     vlc_queue_t q;
@@ -97,8 +97,8 @@ static void Place(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    const int canvas_width   = cucul_get_canvas_width(sys->cv);
-    const int canvas_height  = cucul_get_canvas_height(sys->cv);
+    const int canvas_width   = caca_get_canvas_width(sys->cv);
+    const int canvas_height  = caca_get_canvas_height(sys->cv);
     const int display_width  = caca_get_display_width(sys->dp);
     const int display_height = caca_get_display_height(sys->dp);
 
@@ -129,7 +129,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
     if (!sys->dither) {
         /* Create the libcaca dither object */
-        sys->dither = cucul_create_dither(32,
+        sys->dither = caca_create_dither(32,
                                             vd->source->i_visible_width,
                                             vd->source->i_visible_height,
                                             picture->p[0].i_pitch,
@@ -144,12 +144,12 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         }
     }
 
-    cucul_set_color_ansi(sys->cv, CUCUL_COLOR_DEFAULT, CUCUL_COLOR_BLACK);
-    cucul_clear_canvas(sys->cv);
+    caca_set_color_ansi(sys->cv, CACA_DEFAULT, CACA_BLACK);
+    caca_clear_canvas(sys->cv);
 
     const int crop_offset = vd->source->i_y_offset * picture->p->i_pitch +
                             vd->source->i_x_offset * picture->p->i_pixel_pitch;
-    cucul_dither_bitmap(sys->cv, sys->place.x, sys->place.y,
+    caca_dither_bitmap(sys->cv, sys->place.x, sys->place.y,
                         sys->place.width, sys->place.height,
                         sys->dither,
                         &picture->p->p_pixels[crop_offset]);
@@ -177,7 +177,7 @@ static int Control(vout_display_t *vd, int query)
     switch (query) {
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         if (sys->dither)
-            cucul_free_dither(sys->dither);
+            caca_free_dither(sys->dither);
         sys->dither = NULL;
         /* fall through */
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
@@ -358,9 +358,9 @@ static void Close(vout_display_t *vd)
     vlc_join(sys->thread, NULL);
 
     if (sys->dither)
-        cucul_free_dither(sys->dither);
+        caca_free_dither(sys->dither);
     caca_free_display(sys->dp);
-    cucul_free_canvas(sys->cv);
+    caca_free_canvas(sys->cv);
 
 #if defined(_WIN32)
     FreeConsole();
@@ -449,9 +449,9 @@ static int Open(vout_display_t *vd,
     if (!sys)
         goto error;
 
-    sys->cv = cucul_create_canvas(0, 0);
+    sys->cv = caca_create_canvas(0, 0);
     if (!sys->cv) {
-        msg_Err(vd, "cannot initialize libcucul");
+        msg_Err(vd, "cannot initialize libcaca");
         goto error;
     }
 
@@ -503,11 +503,11 @@ static int Open(vout_display_t *vd,
 error:
     if (sys) {
         if (sys->dither)
-            cucul_free_dither(sys->dither);
+            caca_free_dither(sys->dither);
         if (sys->dp)
             caca_free_display(sys->dp);
         if (sys->cv)
-            cucul_free_canvas(sys->cv);
+            caca_free_canvas(sys->cv);
 
         free(sys);
     }
