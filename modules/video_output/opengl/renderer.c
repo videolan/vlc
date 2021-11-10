@@ -303,9 +303,6 @@ Close(struct vlc_gl_filter *filter)
     free(renderer);
 }
 
-static int SetupCoords(struct vlc_gl_renderer *renderer,
-                       const struct vlc_gl_picture *pic);
-
 static int
 Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
      const struct vlc_gl_input_meta *meta);
