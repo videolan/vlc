@@ -22,10 +22,12 @@ libdecklinkoutput_plugin_la_SOURCES = video_output/decklink.cpp \
                                       stream_out/sdi/V210.cpp \
                                       stream_out/sdi/V210.hpp
 libdecklinkoutput_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_decklinkoutput)
+libdecklinkoutput_plugin_la_LIBADD = $(LIBS_decklinkoutput)
 if HAVE_WIN32
-libdecklinkoutput_plugin_la_LIBADD = $(LIBS_decklink) $(LIBCOM)
-else
-libdecklinkoutput_plugin_la_LIBADD = $(LIBS_decklink) $(LIBDL) -lpthread
+libdecklinkoutput_plugin_la_LIBADD += $(LIBCOM)
+endif
+if HAVE_LINUX
+libdecklinkoutput_plugin_la_LIBADD += $(LIBDL) -lpthread
 endif
 vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif

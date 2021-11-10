@@ -127,10 +127,12 @@ EXTRA_LTLIBRARIES += liblinsys_hdsdi_plugin.la liblinsys_sdi_plugin.la
 
 libdecklink_plugin_la_SOURCES = access/decklink.cpp access/sdi.c access/sdi.h access/vlc_decklink.h
 libdecklink_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_decklink)
+libdecklink_plugin_la_LIBADD = $(LIBS_decklink)
 if HAVE_WIN32
-libdecklink_plugin_la_LIBADD = $(LIBS_decklink) $(LIBCOM)
-else
-libdecklink_plugin_la_LIBADD = $(LIBS_decklink) $(LIBDL) -lpthread
+libdecklink_plugin_la_LIBADD += $(LIBCOM)
+endif
+if HAVE_LINUX
+libdecklink_plugin_la_LIBADD += $(LIBDL) -lpthread
 endif
 if HAVE_DECKLINK
 access_LTLIBRARIES += libdecklink_plugin.la
