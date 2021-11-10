@@ -106,6 +106,11 @@ MLPlaylistMedia::MLPlaylistMedia(vlc_medialibrary_t * ml, const vlc_ml_media_t *
 // Interface
 //-------------------------------------------------------------------------------------------------
 
+bool MLPlaylistMedia::isNew() const
+{
+    return (m_playCount == 1 && m_progress <= 0);
+}
+
 QString MLPlaylistMedia::getTitle() const
 {
     return m_title;

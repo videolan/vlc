@@ -163,6 +163,11 @@ void MLVideo::onMlEvent( const vlc_ml_event_t* event )
     vlc_ml_event_unregister_from_callback( m_ml, m_ml_event_handle.release() );
 }
 
+bool MLVideo::isNew() const
+{
+    return (m_playCount == 1 && m_progress <= 0);
+}
+
 QString MLVideo::getFileName() const
 {
     return m_fileName;

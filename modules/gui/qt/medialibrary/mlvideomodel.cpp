@@ -52,6 +52,8 @@ QVariant MLVideoModel::data(const QModelIndex& index, int role) const
     {
         case VIDEO_ID:
             return QVariant::fromValue( video->getId() );
+        case VIDEO_IS_NEW:
+            return QVariant::fromValue( video->isNew() );
         case VIDEO_FILENAME:
             return QVariant::fromValue( video->getFileName() );
         case VIDEO_TITLE:
@@ -88,6 +90,7 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
 {
     return {
         { VIDEO_ID, "id" },
+        { VIDEO_IS_NEW, "isNew" },
         { VIDEO_FILENAME, "fileName" },
         { VIDEO_TITLE, "title" },
         { VIDEO_THUMBNAIL, "thumbnail" },

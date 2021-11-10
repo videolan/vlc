@@ -77,6 +77,7 @@ QHash<int, QByteArray> MLGroupListModel::roleNames() const /* override */
         { GROUP_DATE,               "date"               },
         { GROUP_COUNT,              "count"              },
         // NOTE: Media specific.
+        { GROUP_IS_NEW,             "isNew"              },
         { GROUP_TITLE,              "title"              },
         { GROUP_RESOLUTION,         "resolution_name"    },
         { GROUP_CHANNEL,            "channel"            },
@@ -154,6 +155,8 @@ QVariant MLGroupListModel::data(const QModelIndex & index, int role) const /* ov
             case GROUP_COUNT:
                 return 1;
             // NOTE: Media specific.
+            case GROUP_IS_NEW:
+                return QVariant::fromValue(video->isNew());
             case GROUP_TITLE:
                 return QVariant::fromValue(video->getTitle());
             case GROUP_RESOLUTION:

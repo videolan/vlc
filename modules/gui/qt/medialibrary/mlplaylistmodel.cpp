@@ -173,6 +173,7 @@ QHash<int, QByteArray> MLPlaylistModel::roleNames() const /* override */
     return
     {
         { MEDIA_ID,                 "id"                 },
+        { MEDIA_IS_NEW,             "isNew"              },
         { MEDIA_TITLE,              "title"              },
         { MEDIA_THUMBNAIL,          "thumbnail"          },
         { MEDIA_DURATION,           "duration"           },
@@ -199,6 +200,8 @@ QVariant MLPlaylistModel::data(const QModelIndex & index, int role) const /* ove
     {
         case MEDIA_ID:
             return QVariant::fromValue(media->getId());
+        case MEDIA_IS_NEW:
+            return QVariant::fromValue(media->isNew());
         case MEDIA_TITLE:
             return QVariant::fromValue(media->getTitle());
         case MEDIA_THUMBNAIL:

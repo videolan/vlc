@@ -90,6 +90,7 @@ class MLVideo : public MLItem
 public:
     MLVideo(vlc_medialibrary_t *ml, const vlc_ml_media_t *data);
 
+    bool isNew() const;
     QString getFileName() const;
     QString getTitle() const;
     QString getThumbnail();

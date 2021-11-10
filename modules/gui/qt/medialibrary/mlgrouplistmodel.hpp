@@ -42,6 +42,7 @@ public:
         GROUP_DATE,
         GROUP_COUNT,
         // NOTE: Media specific.
+        GROUP_IS_NEW,
         GROUP_TITLE,
         GROUP_RESOLUTION,
         GROUP_CHANNEL,

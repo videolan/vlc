@@ -30,6 +30,7 @@ public:
     enum Role
     {
         MEDIA_ID = Qt::UserRole + 1,
+        MEDIA_IS_NEW,
         MEDIA_TITLE,
         MEDIA_THUMBNAIL,
         MEDIA_DURATION,
