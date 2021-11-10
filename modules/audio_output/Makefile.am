@@ -108,20 +108,25 @@ if HAVE_WIN32_DESKTOP
 aout_PLUGINS += libwaveout_plugin.la
 endif
 
+libavsamplebuffer_plugin_la_SOURCES = audio_output/avsamplebuffer.m
+libavsamplebuffer_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
+	-Wl,-framework,AVFoundation,-framework,CoreMedia,-framework,Foundation
+libavsamplebuffer_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
+
 libauhal_plugin_la_SOURCES = audio_output/auhal.c \
 	audio_output/coreaudio_common.c audio_output/coreaudio_common.h
 libauhal_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(aout_RPATH) \
 	-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,CoreServices
 if HAVE_OSX
-aout_PLUGINS += libauhal_plugin.la
+aout_PLUGINS += libauhal_plugin.la libavsamplebuffer_plugin.la
 endif
 libaudiounit_ios_plugin_la_SOURCES = audio_output/audiounit_ios.m \
 	audio_output/coreaudio_common.c audio_output/coreaudio_common.h
 libaudiounit_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(aout_RPATH) \
 	-Wl,-framework,Foundation,-framework,CoreAudio,-framework,AudioToolbox,-framework,UIKit,-framework,AVFoundation
 if HAVE_IOS
-aout_PLUGINS += libaudiounit_ios_plugin.la
+aout_PLUGINS += libaudiounit_ios_plugin.la libavsamplebuffer_plugin.la
 endif
 if HAVE_TVOS
-aout_PLUGINS += libaudiounit_ios_plugin.la
+aout_PLUGINS += libaudiounit_ios_plugin.la libavsamplebuffer_plugin.la
 endif
