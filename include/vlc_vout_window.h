@@ -64,6 +64,7 @@ enum vout_window_type {
     VOUT_WINDOW_TYPE_ANDROID_NATIVE /**< Android native window */,
     VOUT_WINDOW_TYPE_WAYLAND /**< Wayland surface */,
     VOUT_WINDOW_TYPE_DCOMP /**< Win32 DirectComposition */,
+    VOUT_WINDOW_TYPE_KMS /**< DRM KMS CRTC */,
 };
 
 /**
@@ -383,6 +384,7 @@ typedef struct vout_window_t {
         void     *anativewindow; /**< Android native window */
         struct wl_surface *wl;   /**< Wayland surface (client pointer) */
         void     *dcomp_visual;  /**<  Win32 direct composition visual */
+        uint32_t crtc;           /**< KMS CRTC identifier */
     } handle;
 
     /** Display server (mandatory)
@@ -397,6 +399,7 @@ typedef struct vout_window_t {
         char     *x11; /**< X11 display string (NULL = use default) */
         struct wl_display *wl; /**< Wayland display (client pointer) */
         void* dcomp_device; /**< DirectComposition device */
+        int      drm_fd; /**< KMS DRM device */
     } display;
 
     const struct vout_window_operations *ops; /**< operations handled by the
