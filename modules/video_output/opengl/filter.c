@@ -191,12 +191,13 @@ InitFramebuffersOut(struct vlc_gl_filter_priv *priv)
         vt->GenFramebuffers(priv->tex_count, priv->framebuffers_out);
         vt->GenTextures(priv->tex_count, priv->textures_out);
 
+        memcpy(priv->tex_widths, priv->plane_widths,
+               priv->tex_count * sizeof(*priv->tex_widths));
+        memcpy(priv->tex_heights, priv->plane_heights,
+               priv->tex_count * sizeof(*priv->tex_heights));
+
         for (unsigned i = 0; i < glfmt->tex_count; ++i)
         {
-            memcpy(priv->tex_widths, priv->plane_widths,
-                   priv->tex_count * sizeof(*priv->tex_widths));
-            memcpy(priv->tex_heights, priv->plane_heights,
-                   priv->tex_count * sizeof(*priv->tex_heights));
             /* Init one framebuffer and texture for each plane */
             int ret =
                 InitPlane(priv, i, priv->tex_widths[i], priv->tex_heights[i]);
