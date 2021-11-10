@@ -34,6 +34,12 @@
 #ifdef HAVE_LIBPLACEBO
 #include "../libplacebo/utils.h"
 
+#define UPSCALER_TEXT "OpenGL upscaler"
+#define UPSCALER_LONGTEXT "Upscaler filter to apply during rendering"
+
+#define DOWNSCALER_TEXT "OpenGL downscaler"
+#define DOWNSCALER_LONGTEXT "Downscaler filter to apply during rendering"
+
 
 #if PL_API_VER >= 10
 #define add_desat_params() \
@@ -51,6 +57,13 @@
 #endif
 
 #define add_glopts_placebo() \
+    set_section(N_("Scaling"), NULL) \
+    add_integer("pl-upscaler", SCALE_BUILTIN, UPSCALER_TEXT, \
+                UPSCALER_LONGTEXT) \
+        change_integer_list(scale_values, scale_text) \
+    add_integer("pl-downscaler", SCALE_BUILTIN, DOWNSCALER_TEXT, \
+                DOWNSCALER_LONGTEXT) \
+        change_integer_list(scale_values, scale_text) \
     set_section(N_("Colorspace conversion"), NULL) \
     add_integer("rendering-intent", pl_color_map_default_params.intent, \
                 RENDER_INTENT_TEXT, RENDER_INTENT_LONGTEXT) \
