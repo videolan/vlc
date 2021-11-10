@@ -184,43 +184,23 @@ InitFramebuffersOut(struct vlc_gl_filter_priv *priv)
 
     struct vlc_gl_filter *filter = &priv->filter;
     if (filter->config.filter_planes)
-    {
-        struct vlc_gl_format *glfmt = &priv->glfmt_in;
-
-        priv->tex_count = glfmt->tex_count;
-        vt->GenFramebuffers(priv->tex_count, priv->framebuffers_out);
-        vt->GenTextures(priv->tex_count, priv->textures_out);
-
-        memcpy(priv->tex_widths, priv->plane_widths,
-               priv->tex_count * sizeof(*priv->tex_widths));
-        memcpy(priv->tex_heights, priv->plane_heights,
-               priv->tex_count * sizeof(*priv->tex_heights));
-
-        for (unsigned i = 0; i < glfmt->tex_count; ++i)
-        {
-            /* Init one framebuffer and texture for each plane */
-            int ret =
-                InitPlane(priv, i, priv->tex_widths[i], priv->tex_heights[i]);
-            if (ret != VLC_SUCCESS)
-            {
-                DeleteFramebuffersOut(priv);
-                return ret;
-            }
-        }
-    }
+        priv->tex_count = priv->glfmt_in.tex_count;
     else
-    {
         priv->tex_count = 1;
 
-        /* Create a texture having the expected size */
+    vt->GenFramebuffers(priv->tex_count, priv->framebuffers_out);
+    vt->GenTextures(priv->tex_count, priv->textures_out);
 
-        vt->GenFramebuffers(1, priv->framebuffers_out);
-        vt->GenTextures(1, priv->textures_out);
+    memcpy(priv->tex_widths, priv->plane_widths,
+           priv->tex_count * sizeof(*priv->tex_widths));
+    memcpy(priv->tex_heights, priv->plane_heights,
+           priv->tex_count * sizeof(*priv->tex_heights));
 
-        priv->tex_widths[0] = priv->size_out.width;
-        priv->tex_heights[0] = priv->size_out.height;
-
-        int ret = InitPlane(priv, 0, priv->tex_widths[0], priv->tex_heights[0]);
+    for (unsigned i = 0; i < priv->tex_count; ++i)
+    {
+        /* Init one framebuffer and texture for each plane */
+        int ret =
+            InitPlane(priv, i, priv->tex_widths[i], priv->tex_heights[i]);
         if (ret != VLC_SUCCESS)
         {
             DeleteFramebuffersOut(priv);
