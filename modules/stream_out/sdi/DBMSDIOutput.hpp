@@ -41,8 +41,8 @@ namespace sdi_sout
             virtual HRESULT STDMETHODCALLTYPE QueryInterface (REFIID, LPVOID *);
             virtual ULONG STDMETHODCALLTYPE AddRef ();
             virtual ULONG STDMETHODCALLTYPE Release ();
-            virtual HRESULT ScheduledFrameCompleted (IDeckLinkVideoFrame *, BMDOutputFrameCompletionResult);
-            virtual HRESULT ScheduledPlaybackHasStopped (void);
+            virtual HRESULT STDMETHODCALLTYPE ScheduledFrameCompleted (IDeckLinkVideoFrame *, BMDOutputFrameCompletionResult);
+            virtual HRESULT STDMETHODCALLTYPE ScheduledPlaybackHasStopped (void);
 
         protected:
             int ProcessVideo(picture_t *, block_t *);
