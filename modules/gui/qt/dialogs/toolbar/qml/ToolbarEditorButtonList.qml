@@ -25,8 +25,11 @@ import org.videolan.vlc 0.1
 import "qrc:///player/"
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/" as Util
 
 GridView {
+    id: root
+
     clip: true
 
     ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
@@ -39,6 +42,12 @@ GridView {
     cellHeight: cellWidth
 
     property alias removeInfoRectVisible: removeInfoRect.visible
+
+    MouseEventFilter {
+        target: root
+    }
+
+    Util.FlickableScrollHandler { }
 
     DropArea {
         id: dropArea

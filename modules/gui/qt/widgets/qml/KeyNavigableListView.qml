@@ -21,6 +21,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///util/" as Util
 
 FocusScope {
     id: listview_id
@@ -240,6 +241,8 @@ FocusScope {
 
         // NOTE: We always want a valid 'currentIndex' by default.
         onCountChanged: if (count && currentIndex === -1) currentIndex = 0
+
+        Util.FlickableScrollHandler { }
 
         Keys.onPressed: {
             var newIndex = -1

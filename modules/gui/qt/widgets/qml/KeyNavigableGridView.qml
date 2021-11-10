@@ -20,6 +20,8 @@ import QtQuick.Controls 2.4
 
 import org.videolan.vlc 0.1
 
+import "qrc:///util/" as Util
+
 FocusScope {
     id: gridview_id
 
@@ -71,6 +73,8 @@ FocusScope {
         keyNavigationEnabled: false
 
         property int _colCount: Math.floor(width / cellWidth)
+
+        Util.FlickableScrollHandler { }
 
         Keys.onPressed: {
             var newIndex = -1
