@@ -2,6 +2,7 @@
  * kms.c : kernel mode setting plugin for vlc
  *****************************************************************************
  * Copyright © 2018 Intel Corporation
+ * Copyright © 2021 Videolabs
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -43,6 +44,9 @@
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
 #include <vlc_fs.h>
+#include <vlc_vout_window.h>
+
+#include <assert.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -66,6 +70,22 @@
 #define   MAXHWBUF 3
 
 typedef enum { drvSuccess, drvTryNext, drvFail } deviceRval;
+
+struct vout_window_sys_t {
+    /* modeset information */
+    uint32_t        crtc;
+
+    /* other generic stuff */
+    int             drm_fd;
+
+    /*
+     * buffer information
+     */
+    uint32_t        width;
+    uint32_t        height;
+
+    drmModeRes *modeRes;
+};
 
 typedef struct vout_display_sys_t {
 /*
@@ -92,27 +112,28 @@ typedef struct vout_display_sys_t {
 /*
  * modeset information
  */
-    uint32_t        crtc;
     uint32_t        plane_id;
-
-/*
- * other generic stuff
- */
-    int             drm_fd;
 } vout_display_sys_t;
 
-static void DestroyFB(vout_display_sys_t const *sys, uint32_t const buf)
+static void DestroyFB(vout_display_t *vd, uint32_t const buf)
 {
+    struct vout_window_t *wnd = vd->cfg->window;
+    vout_display_sys_t *sys = vd->sys;
+    int drm_fd = wnd->display.drm_fd;
+
     struct drm_mode_destroy_dumb destroy_req = { .handle = sys->handle[buf] };
 
     munmap(sys->map[buf], sys->size);
-    drmModeRmFB(sys->drm_fd, sys->fb[buf]);
-    drmIoctl(sys->drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &destroy_req);
+    drmModeRmFB(drm_fd, sys->fb[buf]);
+    drmIoctl(drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &destroy_req);
 }
 
 static deviceRval CreateFB(vout_display_t *vd, const int buf)
 {
+    struct vout_window_t *wnd = vd->cfg->window;
     vout_display_sys_t *sys = vd->sys;
+    int drm_fd = wnd->display.drm_fd;
+
     struct drm_mode_create_dumb create_req = { .width = sys->width,
                                                .height = sys->height,
                                                .bpp = 32 };
@@ -155,7 +176,7 @@ static deviceRval CreateFB(vout_display_t *vd, const int buf)
         break;
     }
 
-    ret = drmIoctl(sys->drm_fd, DRM_IOCTL_MODE_CREATE_DUMB, &create_req);
+    ret = drmIoctl(drm_fd, DRM_IOCTL_MODE_CREATE_DUMB, &create_req);
     if (ret < 0) {
         msg_Err(vd, "Cannot create dumb buffer");
         return drvFail;
@@ -174,7 +195,7 @@ static deviceRval CreateFB(vout_display_t *vd, const int buf)
         offsets[i] = sys->offsets[i];
     }
 
-    ret = drmModeAddFB2(sys->drm_fd, sys->width, sys->height, sys->drm_fourcc,
+    ret = drmModeAddFB2(drm_fd, sys->width, sys->height, sys->drm_fourcc,
                         handles, pitches, offsets, &sys->fb[buf], 0);
 
     if (ret) {
@@ -184,7 +205,7 @@ static deviceRval CreateFB(vout_display_t *vd, const int buf)
     }
 
     modify_req.handle = sys->handle[buf];
-    ret = drmIoctl(sys->drm_fd, DRM_IOCTL_MODE_MAP_DUMB, &modify_req);
+    ret = drmIoctl(drm_fd, DRM_IOCTL_MODE_MAP_DUMB, &modify_req);
     if (ret) {
         msg_Err(vd, "Cannot map dumb buffer");
         ret = drvFail;
@@ -192,7 +213,7 @@ static deviceRval CreateFB(vout_display_t *vd, const int buf)
     }
 
     sys->map[buf] = mmap(0, sys->size, PROT_READ | PROT_WRITE, MAP_SHARED,
-                         sys->drm_fd, modify_req.offset);
+                         drm_fd, modify_req.offset);
 
     if (sys->map[buf] == MAP_FAILED) {
         msg_Err(vd, "Cannot mmap dumb buffer");
@@ -202,21 +223,21 @@ static deviceRval CreateFB(vout_display_t *vd, const int buf)
     return drvSuccess;
 
 err_fb:
-    drmModeRmFB(sys->drm_fd, sys->fb[buf]);
+    drmModeRmFB(drm_fd, sys->fb[buf]);
     sys->fb[buf] = 0;
 
 err_destroy:
     memset(&destroy_req, 0, sizeof(destroy_req));
     destroy_req.handle = sys->handle[buf];
-    drmIoctl(sys->drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &destroy_req);
+    drmIoctl(drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &destroy_req);
     return ret;
 }
 
 
-static deviceRval FindCRTC(vout_display_t *vd, drmModeRes const *res,
+static deviceRval FindCRTC(vout_window_t *wnd, drmModeRes const *res,
                              drmModeConnector const *conn)
 {
-    vout_display_sys_t *sys = vd->sys;
+    struct vout_window_sys_t *sys = wnd->sys;
     drmModeEncoder *enc;
     int i, j;
 
@@ -227,7 +248,7 @@ static deviceRval FindCRTC(vout_display_t *vd, drmModeRes const *res,
         enc = drmModeGetEncoder(sys->drm_fd, conn->encoder_id);
         if (enc) {
             if (enc->crtc_id) {
-                msg_Dbg(vd, "Got CRTC %d from current encoder", enc->crtc_id);
+                msg_Dbg(wnd, "Got CRTC %d from current encoder", enc->crtc_id);
 
                 sys->crtc = enc->crtc_id;
                 drmModeFreeEncoder(enc);
@@ -245,7 +266,6 @@ static deviceRval FindCRTC(vout_display_t *vd, drmModeRes const *res,
 
         for (j = 0; enc && j < res->count_crtcs; ++j) {
             if (ffs(enc->possible_crtcs) == j && res->crtcs[j]) {
-                msg_Dbg(vd, "Got CRTC %d", res->crtcs[j]);
                 sys->crtc = res->crtcs[j];
                 drmModeFreeEncoder(enc);
                 return drvSuccess;
@@ -254,44 +274,29 @@ static deviceRval FindCRTC(vout_display_t *vd, drmModeRes const *res,
         drmModeFreeEncoder(enc);
     }
 
-    msg_Err(vd , "Cannot find CRTC for connector %d", conn->connector_id);
+    msg_Err(wnd , "Cannot find CRTC for connector %d", conn->connector_id);
     return drvTryNext;
 }
 
 
-static deviceRval SetupDevice(vout_display_t *vd, drmModeRes const *res,
+static deviceRval SetupDevice(vout_window_t *wnd, drmModeRes const *res,
                              drmModeConnector const *conn)
 {
-    vout_display_sys_t *sys = vd->sys;
+    struct vout_window_sys_t *sys = wnd->sys;
     deviceRval ret;
-    int c, c2;
 
     if (conn->connection != DRM_MODE_CONNECTED || conn->count_modes == 0)
         return drvTryNext;
 
     sys->width = conn->modes[0].hdisplay;
     sys->height = conn->modes[0].vdisplay;
-    msg_Dbg(vd, "Mode resolution for connector %u is %ux%u",
+    msg_Dbg(wnd, "Mode resolution for connector %u is %ux%u",
             conn->connector_id, sys->width, sys->height);
 
-    ret = FindCRTC(vd, res, conn);
+    ret = FindCRTC(wnd, res, conn);
     if (ret != drvSuccess) {
-        msg_Dbg(vd , "No valid CRTC for connector %d", conn->connector_id);
+        msg_Dbg(wnd, "No valid CRTC for connector %d", conn->connector_id);
         return ret;
-    }
-
-    for (c = 0; c < MAXHWBUF; c++) {
-        ret = CreateFB(vd, c);
-        if (ret != drvSuccess) {
-            msg_Err(vd, "Cannot create framebuffer %d for connector %d", c,
-                    conn->connector_id);
-            for (c2 = 0; c2 < c; c2++)
-                DestroyFB(sys, c2);
-
-            return ret;
-        } else {
-            msg_Dbg(vd, "Created HW framebuffer %d/%d", c+1, MAXHWBUF);
-        }
     }
     return drvSuccess;
 }
@@ -351,6 +356,8 @@ static void CheckFourCCList(uint32_t drmfourcc, uint32_t plane_id)
 static bool ChromaNegotiation(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
+    vout_window_t *wnd = vd->cfg->window;
+
     unsigned i, c, propi;
     uint32_t planetype;
     const char types[][16] = { "OVERLAY", "PRIMARY", "CURSOR", "UNKNOWN" };
@@ -360,27 +367,29 @@ static bool ChromaNegotiation(vout_display_t *vd)
     drmModePropertyPtr pp;
     bool YUVFormat;
 
+    int drm_fd = wnd->display.drm_fd;
+
     /*
      * For convenience print out in debug prints all supported
      * DRM modes so they can be seen if use verbose mode.
      */
-    plane_res = drmModeGetPlaneResources(sys->drm_fd);
+    plane_res = drmModeGetPlaneResources(drm_fd);
     sys->plane_id = 0;
 
     if (plane_res != NULL && plane_res->count_planes > 0) {
         msg_Dbg(vd, "List of DRM supported modes on this machine:");
         for (c = 0; c < plane_res->count_planes; c++) {
 
-            plane = drmModeGetPlane(sys->drm_fd, plane_res->planes[c]);
+            plane = drmModeGetPlane(drm_fd, plane_res->planes[c]);
             if (plane != NULL && plane->count_formats > 0) {
-                props = drmModeObjectGetProperties(sys->drm_fd,
+                props = drmModeObjectGetProperties(drm_fd,
                                                    plane->plane_id,
                                                    DRM_MODE_OBJECT_PLANE);
 
                 planetype = 3;
                 pp = NULL;
                 for (propi = 0; propi < props->count_props; propi++) {
-                    pp = drmModeGetProperty(sys->drm_fd, props->props[propi]);
+                    pp = drmModeGetProperty(drm_fd, props->props[propi]);
                     if (strcmp(pp->name, "type") == 0) {
                         break;
                     }
@@ -486,119 +495,24 @@ static bool ChromaNegotiation(vout_display_t *vd)
     return false;
 }
 
-static void CustomDestroyPicture(vout_display_sys_t *sys)
+static void CustomDestroyPicture(vout_display_t *vd)
 {
-    int c;
+    vout_window_t *wnd = vd->cfg->window;
 
-    for (c = 0; c < MAXHWBUF; c++)
-        DestroyFB(sys, c);
-
-    drmSetClientCap(sys->drm_fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 0);
-    drmDropMaster(sys->drm_fd);
-    vlc_close(sys->drm_fd);
-    sys->drm_fd = 0;
+    for (int c = 0; c < MAXHWBUF; c++)
+        DestroyFB(vd, c);
 }
 
 static int OpenDisplay(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    char *psz_device;
-    int ret;
-    uint64_t dumbRet;
-    drmModeConnector *conn;
-    drmModeRes *modeRes;
-    int c;
-    bool found_connector = false;
-
-    /*
-     * Open framebuffer device
-     */
-    psz_device = var_InheritString(vd, KMS_VAR);
-    if (psz_device == NULL) {
-        msg_Err(vd, "Don't know which DRM device to open");
-        return VLC_EGENERIC;
-    }
-
-    sys->drm_fd = vlc_open(psz_device, O_RDWR);
-    if (sys->drm_fd == -1) {
-        msg_Err(vd, "cannot open %s", psz_device);
-        free(psz_device);
-        return VLC_EGENERIC;
-    }
-
-    drmSetClientCap(sys->drm_fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1);
 
     if (!ChromaNegotiation(vd))
-    {
-        free(psz_device);
-        goto err_out;
-    }
+        return VLC_EGENERIC;
 
     msg_Dbg(vd, "Using VLC chroma '%.4s', DRM chroma '%.4s'",
             (char*)&sys->vlc_fourcc, (char*)&sys->drm_fourcc);
-
-    ret = drmGetCap(sys->drm_fd, DRM_CAP_DUMB_BUFFER, &dumbRet);
-    if (ret < 0 || !dumbRet) {
-        msg_Err(vd, "Device '%s' does not support dumb buffers", psz_device);
-        free(psz_device);
-        goto err_out;
-    }
-    free(psz_device);
-
-    modeRes = drmModeGetResources(sys->drm_fd);
-    if (modeRes == NULL) {
-        msg_Err(vd, "Didn't get DRM resources");
-        goto err_out;
-    }
-
-    for (c = 0; c < modeRes->count_connectors && sys->crtc == 0; c++) {
-
-        conn = drmModeGetConnector(sys->drm_fd, modeRes->connectors[c]);
-        if (conn == NULL)
-            continue;
-
-        found_connector = true;
-
-        ret = SetupDevice(vd, modeRes, conn);
-        if (ret != drvSuccess) {
-            if (ret != drvTryNext) {
-                msg_Err(vd, "Cannot do setup for connector %u:%u", c,
-                        modeRes->connectors[c]);
-
-                drmModeFreeConnector(conn);
-                drmModeFreeResources(modeRes);
-                goto err_out;
-            }
-            drmModeFreeConnector(conn);
-            found_connector = false;
-            continue;
-        }
-        drmModeFreeConnector(conn);
-    }
-    drmModeFreeResources(modeRes);
-
-    if (!found_connector)
-        goto err_out;
-
-    picture_resource_t rsc = { 0 };
-
-    sys->picture = picture_NewFromResource(vd->source, &rsc);
-
-    if (!sys->picture)
-        goto err_out;
-
-    for (size_t i = 0; i < PICTURE_PLANE_MAX; i++) {
-        sys->picture->p[i].p_pixels = sys->map[0] + sys->offsets[i];
-        sys->picture->p[i].i_lines  = sys->height;
-        sys->picture->p[i].i_pitch  = sys->stride;
-    }
-
     return VLC_SUCCESS;
-err_out:
-    drmDropMaster(sys->drm_fd);
-    vlc_close(sys->drm_fd);
-    sys->drm_fd = 0;
-    return VLC_EGENERIC;
 }
 
 
@@ -631,9 +545,9 @@ static void Display(vout_display_t *vd, picture_t *picture)
 {
     VLC_UNUSED(picture);
     vout_display_sys_t *sys = vd->sys;
-    int i;
+    vout_window_t *wnd = vd->cfg->window;
 
-    if (drmModeSetPlane(sys->drm_fd, sys->plane_id, sys->crtc,
+    if (drmModeSetPlane(wnd->display.drm_fd, sys->plane_id, wnd->handle.crtc,
                          sys->fb[sys->front_buf], 0,
                          0, 0, sys->width, sys->height,
                          0, 0, sys->width << 16, sys->height << 16)) {
@@ -644,7 +558,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
         sys->front_buf++;
         sys->front_buf %= MAXHWBUF;
 
-        for (i = 0; i < PICTURE_PLANE_MAX; i++)
+        for (int i = 0; i < PICTURE_PLANE_MAX; i++)
             sys->picture->p[i].p_pixels =
                     sys->map[sys->front_buf]+sys->offsets[i];
     }
@@ -660,10 +574,8 @@ static void Close(vout_display_t *vd)
 
     if (sys->picture)
         picture_Release(sys->picture);
-    CustomDestroyPicture(sys);
+    CustomDestroyPicture(vd);
 
-    if (sys->drm_fd)
-        drmDropMaster(sys->drm_fd);
 }
 
 static const struct vlc_display_operations ops = {
@@ -685,7 +597,7 @@ static int Open(vout_display_t *vd,
     video_format_t fmt = {};
     char *chroma;
 
-    if (vout_display_cfg_IsWindowed(vd->cfg))
+    if (vd->cfg->window->type != VOUT_WINDOW_TYPE_KMS)
         return VLC_EGENERIC;
 
     /*
@@ -736,17 +648,170 @@ static int Open(vout_display_t *vd,
         return VLC_EGENERIC;
     }
 
-    video_format_ApplyRotation(&fmt, vd->source);
+    video_format_ApplyRotation(&fmt, vd->fmt);
 
+    sys->width  = fmt.i_visible_width;
+    sys->height = fmt.i_visible_height;
+
+    for (int c = 0; c < MAXHWBUF; c++) {
+        int ret = CreateFB(vd, c);
+        if (ret != drvSuccess) {
+            for (int c2 = 0; c2 < c; c2++)
+                DestroyFB(vd, c2);
+            return ret;
+        }
+    }
+
+    picture_resource_t rsc = { 0 };
     fmt.i_width = fmt.i_visible_width  = sys->width;
     fmt.i_height = fmt.i_visible_height = sys->height;
     fmt.i_chroma = sys->vlc_fourcc;
-    *fmtp = fmt;
 
+    sys->picture = picture_NewFromResource(&fmt, &rsc);
+
+    if (!sys->picture)
+        goto error;
+
+    for (size_t i = 0; i < PICTURE_PLANE_MAX; i++) {
+        sys->picture->p[i].p_pixels = sys->map[0] + sys->offsets[i];
+        sys->picture->p[i].i_lines  = sys->height;
+        sys->picture->p[i].i_pitch  = sys->stride;
+    }
+
+    *fmtp = fmt;
     vd->ops = &ops;
 
     (void) context;
     return VLC_SUCCESS;
+
+error:
+    return VLC_EGENERIC;
+}
+
+static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
+{
+    struct vout_window_sys_t *sys = wnd->sys;
+    drmModeRes *modeRes = sys->modeRes;
+
+    bool found_connector = false;
+
+    msg_Info(wnd, "Looping over %d resources", modeRes->count_connectors);
+    for (int c = 0; c < modeRes->count_connectors && sys->crtc == 0; c++) {
+        msg_Info(wnd, "connector %d", c);
+
+        drmModeConnector *conn =
+            drmModeGetConnector(sys->drm_fd, modeRes->connectors[c]);
+        if (conn == NULL)
+            continue;
+
+        found_connector = true;
+
+        int ret = SetupDevice(wnd, modeRes, conn);
+        if (ret != drvSuccess) {
+            if (ret != drvTryNext) {
+                msg_Err(wnd, "Cannot do setup for connector %u:%u", c,
+                        modeRes->connectors[c]);
+
+                drmModeFreeConnector(conn);
+                drmModeFreeResources(modeRes);
+                return VLC_EGENERIC;
+            }
+            drmModeFreeConnector(conn);
+            found_connector = false;
+            msg_Dbg(wnd, " - Connector %d: could not setup device", c);
+            continue;
+        }
+        drmModeFreeConnector(conn);
+    }
+
+    if (!found_connector)
+    {
+        msg_Warn(wnd, "Could not find a valid connector");
+        return VLC_EGENERIC;
+    }
+
+    wnd->handle.crtc = sys->crtc;
+
+    vout_window_ReportSize(wnd, sys->width, sys->height);
+
+    return VLC_SUCCESS;
+}
+
+static void WindowDisable(vout_window_t *wnd)
+{
+    struct vout_window_sys_t *sys = wnd->sys;
+    sys->crtc = 0;
+}
+
+static void WindowClose(vout_window_t *wnd)
+{
+    struct vout_window_sys_t *sys = wnd->sys;
+    drmModeFreeResources(sys->modeRes);
+    drmSetClientCap(sys->drm_fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 0);
+    drmDropMaster(sys->drm_fd);
+    vlc_close(sys->drm_fd);
+    free(sys);
+}
+
+static const struct vout_window_operations window_ops =
+{
+    .destroy = WindowClose,
+    .enable = WindowEnable,
+    .disable = WindowDisable,
+};
+
+static int OpenWindow(vout_window_t *wnd)
+{
+    char *psz_device;
+
+
+    struct vout_window_sys_t *sys
+        = wnd->sys
+        = malloc(sizeof *sys);
+    if (sys == NULL)
+        return VLC_ENOMEM;
+
+    sys->crtc = 0;
+
+    /*
+     * Open framebuffer device
+     */
+    psz_device = var_InheritString(wnd, KMS_VAR);
+    if (psz_device == NULL) {
+        msg_Err(wnd, "Don't know which DRM device to open");
+        goto error_end;
+    }
+
+    sys->drm_fd = vlc_open(psz_device, O_RDWR);
+    if (sys->drm_fd == -1) {
+        msg_Err(wnd, "cannot open %s", psz_device);
+        free(psz_device);
+        goto error_end;
+    }
+    free(psz_device);
+
+    drmSetClientCap(sys->drm_fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1);
+
+    sys->modeRes = drmModeGetResources(sys->drm_fd);
+    if (sys->modeRes == NULL) {
+        msg_Err(wnd, "Didn't get DRM resources");
+        drmSetClientCap(sys->drm_fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 0);
+        goto error_drm;
+    }
+
+    wnd->ops = &window_ops;
+    wnd->type = VOUT_WINDOW_TYPE_KMS;
+    wnd->display.drm_fd = sys->drm_fd;
+    /* Note: wnd->handle.crtc will be initialized later */
+
+    return VLC_SUCCESS;
+error_drm:
+    drmDropMaster(sys->drm_fd);
+    vlc_close(sys->drm_fd);
+
+error_end:
+    free(sys);
+    return VLC_EGENERIC;
 }
 
 
@@ -762,4 +827,9 @@ vlc_module_begin ()
     add_string( "kms-drm-chroma", NULL, DRM_CHROMA_TEXT, DRM_CHROMA_LONGTEXT)
     set_description("Linux kernel mode setting video output")
     set_callback_display(Open, 30)
+
+    add_submodule()
+    set_callback(OpenWindow)
+    set_capability("vout window", 10)
+
 vlc_module_end ()
