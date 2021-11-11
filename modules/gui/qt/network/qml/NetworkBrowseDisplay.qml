@@ -93,7 +93,7 @@ FocusScope {
         }
 
         function getSelectedInputItem() {
-            return providerModel.getItemsForIndexes(selectionModel.selectedIndexes);
+            return providerModel.getItemsForIndexes(filterModel.mapIndexesToSource(selectionModel.selectedIndexes))
         }
 
         Component {
