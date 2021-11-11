@@ -130,11 +130,7 @@ ifdef HAVE_DARWIN_OS
 VPX_CONF += --enable-vp8-decoder --disable-tools
 VPX_CONF += --extra-cflags="$(CFLAGS) $(EXTRA_CFLAGS)"
 ifdef HAVE_IOS
-ifdef HAVE_TVOS
-VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) -mtvos-version-min=9.0
-else
-VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) -miphoneos-version-min=8.4
-endif
+VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) $(LDFLAGS)
 endif
 ifdef HAVE_MACOSX
 VPX_LDFLAGS := -L$(MACOSX_SDK)/usr/lib -isysroot $(MACOSX_SDK) -mmacosx-version-min=10.7
