@@ -219,6 +219,10 @@ static inline void vlc_rtp_es_send(struct vlc_rtp_es *es, block_t *block)
  */
 extern struct vlc_rtp_es *const vlc_rtp_es_dummy;
 
+struct vlc_rtp_es *vlc_rtp_es_request(void *, const es_format_t *fmt);
+struct vlc_rtp_es *vlc_rtp_mux_request(void *, const char *name);
+
+
 void rtp_autodetect(vlc_object_t *, rtp_session_t *, const block_t *);
 
 static inline uint8_t rtp_ptype (const block_t *block)

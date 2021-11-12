@@ -57,6 +57,95 @@
 # define IPPROTO_UDPLITE 136 /* from IANA */
 #endif
 
+struct vlc_rtp_es_id {
+    struct vlc_rtp_es es;
+    es_out_t *out;
+    es_out_id_t *id;
+};
+
+static void vlc_rtp_es_id_destroy(struct vlc_rtp_es *es)
+{
+    struct vlc_rtp_es_id *ei = container_of(es, struct vlc_rtp_es_id, es);
+
+    es_out_Del(ei->out, ei->id);
+    free(ei);
+}
+
+static void vlc_rtp_es_id_send(struct vlc_rtp_es *es, block_t *block)
+{
+    struct vlc_rtp_es_id *ei = container_of(es, struct vlc_rtp_es_id, es);
+
+    /* TODO: Don't set PCR here. Breaks multiple sources (in a session)
+     * and more importantly eventually multiple sessions. */
+    es_out_SetPCR(ei->out, block->i_pts);
+    es_out_Send(ei->out, ei->id, block);
+}
+
+static const struct vlc_rtp_es_operations vlc_rtp_es_id_ops = {
+    vlc_rtp_es_id_destroy, vlc_rtp_es_id_send,
+};
+
+struct vlc_rtp_es *vlc_rtp_es_request(void *data,
+                                      const es_format_t *restrict fmt)
+{
+    demux_t *demux = data;
+
+    struct vlc_rtp_es_id *ei = malloc(sizeof (*ei));
+    if (unlikely(ei == NULL))
+        return vlc_rtp_es_dummy;
+
+    ei->es.ops = &vlc_rtp_es_id_ops;
+    ei->out = demux->out;
+    ei->id = es_out_Add(demux->out, fmt);
+    if (ei->id == NULL) {
+        free(ei);
+        return NULL;
+    }
+    return &ei->es;
+}
+
+struct vlc_rtp_es_mux {
+    struct vlc_rtp_es es;
+    vlc_demux_chained_t *chained_demux;
+};
+
+static void vlc_rtp_es_mux_destroy(struct vlc_rtp_es *es)
+{
+    struct vlc_rtp_es_mux *em = container_of(es, struct vlc_rtp_es_mux, es);
+
+    vlc_demux_chained_Delete(em->chained_demux);
+    free(em);
+}
+
+static void vlc_rtp_es_mux_send(struct vlc_rtp_es *es, block_t *block)
+{
+    struct vlc_rtp_es_mux *em = container_of(es, struct vlc_rtp_es_mux, es);
+
+    vlc_demux_chained_Send(em->chained_demux, block);
+}
+
+static const struct vlc_rtp_es_operations vlc_rtp_es_mux_ops = {
+    vlc_rtp_es_mux_destroy, vlc_rtp_es_mux_send,
+};
+
+struct vlc_rtp_es *vlc_rtp_mux_request(void *data, const char *name)
+{
+    demux_t *demux = data;
+
+    struct vlc_rtp_es_mux *em = malloc(sizeof (*em));
+    if (unlikely(em == NULL))
+        return vlc_rtp_es_dummy;
+
+    em->es.ops = &vlc_rtp_es_mux_ops;
+    em->chained_demux = vlc_demux_chained_New(VLC_OBJECT(demux), name,
+                                              demux->out);
+    if (em->chained_demux == NULL) {
+        free(em);
+        return NULL;
+    }
+    return &em->es;
+}
+
 /**
  * Extracts port number from "[host]:port" or "host:port" strings,
  * and remove brackets from the host name.
