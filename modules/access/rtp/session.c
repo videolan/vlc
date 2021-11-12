@@ -306,8 +306,8 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
         int16_t s;
     } delta_seq = { .u = seq - src->max_seq };
 
-    if ((delta_seq.s > 0) ? (delta_seq.u > p_sys->max_dropout)
-                          : (delta_seq.u < p_sys->max_misorder))
+    if ((delta_seq.s >= 0) ? (delta_seq.u > p_sys->max_dropout)
+                           : (delta_seq.u < p_sys->max_misorder))
     {
         msg_Dbg (demux, "sequence discontinuity"
                  " (got: %"PRIu16", expected: %"PRIu16")", seq, src->max_seq);
