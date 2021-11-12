@@ -53,10 +53,11 @@ public:
     explicit MLAlbumModel(QObject *parent = nullptr);
     virtual ~MLAlbumModel() = default;
 
-    Q_INVOKABLE QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     Q_INVOKABLE QHash<int, QByteArray> roleNames() const override;
 
 protected:
+    QVariant itemRoleData(MLItem *item, int role) const override;
+
     ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const override;
 
 private:

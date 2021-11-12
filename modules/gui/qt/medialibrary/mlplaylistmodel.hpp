@@ -58,9 +58,9 @@ public: // Interface
 public: // QAbstractItemModel implementation
     QHash<int, QByteArray> roleNames() const override;
 
-    QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
+protected: // MLBaseModel implementation
+    QVariant itemRoleData(MLItem *item, int role = Qt::DisplayRole) const override;
 
-protected: // MLBaseModel implementation    
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
 
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;

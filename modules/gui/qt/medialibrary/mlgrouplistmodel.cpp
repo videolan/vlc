@@ -91,12 +91,8 @@ QHash<int, QByteArray> MLGroupListModel::roleNames() const /* override */
     };
 }
 
-QVariant MLGroupListModel::data(const QModelIndex & index, int role) const /* override */
+QVariant MLGroupListModel::itemRoleData(MLItem *item, const int role) const /* override */
 {
-    int row = index.row();
-
-    MLItem * item = this->item(row);
-
     if (item == nullptr)
         return QVariant();
 
@@ -108,10 +104,7 @@ QVariant MLGroupListModel::data(const QModelIndex & index, int role) const /* ov
         {
             // NOTE: This is the condition for QWidget view(s).
             case Qt::DisplayRole:
-                if (index.column() == 0)
-                    return QVariant::fromValue(group->getName());
-                else
-                    return QVariant();
+                return QVariant::fromValue(group->getName());
             // NOTE: These are the conditions for QML view(s).
             case GROUP_ID:
                 return QVariant::fromValue(group->getId());
@@ -135,13 +128,8 @@ QVariant MLGroupListModel::data(const QModelIndex & index, int role) const /* ov
 
         switch (role)
         {
-            // NOTE: This is the condition for QWidget view(s).
             case Qt::DisplayRole:
-                if (index.column() == 0)
-                    return QVariant::fromValue(video->getTitle());
-                else
-                    return QVariant();
-            // NOTE: These are the conditions for QML view(s).
+                return QVariant::fromValue(video->getTitle());
             case GROUP_ID:
                 return QVariant::fromValue(video->getId());
             case GROUP_NAME:

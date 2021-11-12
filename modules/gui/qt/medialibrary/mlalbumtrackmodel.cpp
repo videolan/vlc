@@ -33,14 +33,10 @@ MLAlbumTrackModel::MLAlbumTrackModel(QObject *parent)
 {
 }
 
-QVariant MLAlbumTrackModel::data(const QModelIndex &index, int role) const
+QVariant MLAlbumTrackModel::itemRoleData(MLItem *item, const int role) const
 {
-    if (!index.isValid() || index.row() < 0)
-        return QVariant();
-
-    const MLAlbumTrack* ml_track = static_cast<MLAlbumTrack *>(item(index.row()));
-    if ( !ml_track )
-        return QVariant();
+    const MLAlbumTrack* ml_track = static_cast<MLAlbumTrack *>(item);
+    assert( ml_track );
 
     switch (role)
     {

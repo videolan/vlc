@@ -62,7 +62,6 @@ public:
     explicit MLRecentsModel( QObject* parent = nullptr );
     virtual ~MLRecentsModel() = default;
 
-    QVariant data( const QModelIndex& index , int role ) const override;
     QHash<int, QByteArray> roleNames() const override;
     int m_numberOfItemsToShow = -1;
 
@@ -72,6 +71,8 @@ public:
     int getNumberOfItemsToShow() const;
 
 protected:
+    QVariant itemRoleData(MLItem *item, int role) const override;
+
     ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const override;
 
 private:

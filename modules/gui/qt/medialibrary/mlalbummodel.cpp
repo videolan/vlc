@@ -32,42 +32,6 @@ MLAlbumModel::MLAlbumModel(QObject *parent)
 {
 }
 
-QVariant MLAlbumModel::data(const QModelIndex &index, int role) const
-{
-    if (!index.isValid() || index.row() < 0)
-        return QVariant();
-
-    const MLAlbum* ml_item = static_cast<MLAlbum *>(item(index.row()));
-    if ( ml_item == NULL )
-        return QVariant();
-
-    switch (role)
-    {
-    case ALBUM_ID :
-        return QVariant::fromValue( ml_item->getId() );
-    case ALBUM_TITLE :
-        return QVariant::fromValue( ml_item->getTitle() );
-    case ALBUM_RELEASE_YEAR :
-        return QVariant::fromValue( ml_item->getReleaseYear() );
-    case ALBUM_SHORT_SUMMARY :
-        return QVariant::fromValue( ml_item->getShortSummary() );
-    case ALBUM_COVER :
-        return QVariant::fromValue( ml_item->getCover() );
-    case ALBUM_MAIN_ARTIST :
-        return QVariant::fromValue( ml_item->getArtist() );
-    case ALBUM_NB_TRACKS :
-        return QVariant::fromValue( ml_item->getNbTracks() );
-    case ALBUM_DURATION:
-        return QVariant::fromValue( ml_item->getDuration() );
-    case ALBUM_TITLE_FIRST_SYMBOL:
-        return QVariant::fromValue( getFirstSymbol( ml_item->getTitle() ) );
-    case ALBUM_MAIN_ARTIST_FIRST_SYMBOL:
-        return QVariant::fromValue( getFirstSymbol( ml_item->getArtist() ) );
-    default:
-        return QVariant();
-    }
-}
-
 QHash<int, QByteArray> MLAlbumModel::roleNames() const
 {
     return {
@@ -138,6 +102,38 @@ vlc_ml_sorting_criteria_t MLAlbumModel::roleToCriteria(int role) const
         return VLC_ML_SORTING_DURATION;
     default:
         return VLC_ML_SORTING_DEFAULT;
+    }
+}
+
+QVariant MLAlbumModel::itemRoleData(MLItem *item, const int role) const
+{
+    auto ml_item = static_cast<MLAlbum *>(item);
+    assert(ml_item);
+
+    switch (role)
+    {
+    case ALBUM_ID :
+        return QVariant::fromValue( ml_item->getId() );
+    case ALBUM_TITLE :
+        return QVariant::fromValue( ml_item->getTitle() );
+    case ALBUM_RELEASE_YEAR :
+        return QVariant::fromValue( ml_item->getReleaseYear() );
+    case ALBUM_SHORT_SUMMARY :
+        return QVariant::fromValue( ml_item->getShortSummary() );
+    case ALBUM_COVER :
+        return QVariant::fromValue( ml_item->getCover() );
+    case ALBUM_MAIN_ARTIST :
+        return QVariant::fromValue( ml_item->getArtist() );
+    case ALBUM_NB_TRACKS :
+        return QVariant::fromValue( ml_item->getNbTracks() );
+    case ALBUM_DURATION:
+        return QVariant::fromValue( ml_item->getDuration() );
+    case ALBUM_TITLE_FIRST_SYMBOL:
+        return QVariant::fromValue( getFirstSymbol( ml_item->getTitle() ) );
+    case ALBUM_MAIN_ARTIST_FIRST_SYMBOL:
+        return QVariant::fromValue( getFirstSymbol( ml_item->getArtist() ) );
+    default:
+        return QVariant();
     }
 }
 

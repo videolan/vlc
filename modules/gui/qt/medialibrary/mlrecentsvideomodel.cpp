@@ -42,11 +42,12 @@ MLRecentsVideoModel::MLRecentsVideoModel( QObject* parent )
 {
 }
 
-QVariant MLRecentsVideoModel::data( const QModelIndex& index , int role ) const
+QVariant MLRecentsVideoModel::itemRoleData(MLItem *item , const int role) const
 {
-    const auto video = static_cast<MLVideo *>( item( index.row() ) );
+    const auto video = static_cast<MLVideo *>( item );
     if ( video == nullptr )
         return {};
+
     switch ( role )
     {
         case VIDEO_ID:

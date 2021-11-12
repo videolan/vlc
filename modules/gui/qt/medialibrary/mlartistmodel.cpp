@@ -27,14 +27,10 @@ MLArtistModel::MLArtistModel(QObject *parent)
 {
 }
 
-QVariant MLArtistModel::data(const QModelIndex &index, int role) const
+QVariant MLArtistModel::itemRoleData(MLItem *item, const int role) const
 {
-    if (!index.isValid() || index.row() < 0)
-        return QVariant();
-
-    const MLArtist* ml_artist = static_cast<MLArtist *>(item(index.row()));
-    if ( !ml_artist )
-        return QVariant();
+    const MLArtist* ml_artist = static_cast<MLArtist *>(item);
+    assert( ml_artist );
 
     switch (role)
     {

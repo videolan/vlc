@@ -77,6 +77,10 @@ public: // Interface
     Q_INVOKABLE QMap<QString, QVariant> getDataAt(const QModelIndex & index);
     Q_INVOKABLE QMap<QString, QVariant> getDataAt(int idx);
 
+    QVariant data(const QModelIndex &index, int role) const override;
+
+    virtual QVariant itemRoleData(MLItem *item, int role) const = 0;
+
 signals:
     void parentIdChanged();
     void resetRequested();

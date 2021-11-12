@@ -173,12 +173,9 @@ QHash<int, QByteArray> MLPlaylistListModel::roleNames() const /* override */
     };
 }
 
-QVariant MLPlaylistListModel::data(const QModelIndex & index, int role) const /* override */
+QVariant MLPlaylistListModel::itemRoleData(MLItem *item, int role) const /* override */
 {
-    int row = index.row();
-
-    MLPlaylist * playlist = static_cast<MLPlaylist *>(item(row));
-
+    MLPlaylist * playlist = static_cast<MLPlaylist *>(item);
     if (playlist == nullptr)
         return QVariant();
 
@@ -186,10 +183,7 @@ QVariant MLPlaylistListModel::data(const QModelIndex & index, int role) const /*
     {
         // NOTE: This is the condition for QWidget view(s).
         case Qt::DisplayRole:
-            if (index.column() == 0)
-                return playlist->getName();
-            else
-                return QVariant();
+            return playlist->getName();
         // NOTE: These are the conditions for QML view(s).
         case PLAYLIST_ID:
             return QVariant::fromValue(playlist->getId());

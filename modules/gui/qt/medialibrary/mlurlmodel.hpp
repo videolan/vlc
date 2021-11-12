@@ -60,12 +60,13 @@ public:
 
     virtual ~MLUrlModel() = default;
 
-    QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
 
     Q_INVOKABLE void addAndPlay( const QString& url );
 
 protected:
+    QVariant itemRoleData(MLItem *item, int role) const override;
+
     ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const override;
 
 private:

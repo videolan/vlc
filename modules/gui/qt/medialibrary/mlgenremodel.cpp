@@ -47,14 +47,9 @@ MLGenreModel::MLGenreModel(QObject *parent)
 {
 }
 
-QVariant MLGenreModel::data(const QModelIndex &index, int role) const
+QVariant MLGenreModel::itemRoleData(MLItem *item, const int role) const
 {
-    int row = index.row();
-
-    if (!index.isValid() || row < 0)
-        return QVariant();
-
-    MLGenre* ml_genre = static_cast<MLGenre *>(item(row));
+    MLGenre* ml_genre = static_cast<MLGenre *>(item);
     if (!ml_genre)
         return QVariant();
 

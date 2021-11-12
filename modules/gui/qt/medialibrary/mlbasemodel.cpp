@@ -73,6 +73,15 @@ void MLBaseModel::sortByColumn(QByteArray name, Qt::SortOrder order)
     return getDataAt(index(idx));
 }
 
+QVariant MLBaseModel::data(const QModelIndex &index, int role) const
+{
+    const auto mlItem = item(index.row());
+    if (mlItem)
+        return itemRoleData(mlItem, role);
+
+    return {};
+}
+
 //-------------------------------------------------------------------------------------------------
 
 void MLBaseModel::onResetRequested()

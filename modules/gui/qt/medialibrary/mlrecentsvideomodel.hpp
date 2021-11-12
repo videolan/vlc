@@ -40,11 +40,12 @@ public:
     explicit MLRecentsVideoModel( QObject* parent = nullptr );
     virtual ~MLRecentsVideoModel() = default;
 
-    QVariant data( const QModelIndex& index , int role ) const override;
     QHash<int, QByteArray> roleNames() const override;
     int numberOfItemsToShow = 10;
 
 protected:
+    QVariant itemRoleData( MLItem *item, int role ) const override;
+
     ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const override;
 
 private:
