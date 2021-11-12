@@ -20,36 +20,102 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  ****************************************************************************/
 
+/**
+ * \defgroup rtp RTP
+ * Real-time Transport Protocol
+ * \ingroup net
+ *
+ * @{
+ * \file
+ */
+
 typedef struct vlc_rtp_pt rtp_pt_t;
 typedef struct rtp_session_t rtp_session_t;
 
 struct vlc_demux_chained_t;
 struct vlc_sdp_media;
 
-/** @section RTP payload format */
+/**
+ * \defgroup rtp_pt RTP payload format
+ * @{
+ */
 
+/**
+ * Payload type mapping.
+ *
+ * This structure represents a mapping for an RTP payload format
+ * extracted from an \ref sdp description.
+ */
 struct vlc_sdp_pt {
-    const struct vlc_sdp_media *media;
-    char name[16];
-    unsigned int clock_rate;
-    unsigned char channel_count;
-    const char *parameters;
+    const struct vlc_sdp_media *media; /**< Containant SDP media description */
+    char name[16]; /**< RTP payload format name, i.e. MIME subtype */
+    unsigned int clock_rate; /**< RTP clock rate (in Hertz) */
+    unsigned char channel_count; /**< Number of channels (0 if unspecified) */
+    const char *parameters; /**< Format parameters from the a=fmtp line */
 };
 
+/**
+ * RTP payload format operations.
+ *
+ * This structures contains the callbacks provided by an RTP payload format.
+ */
 struct vlc_rtp_pt_operations {
-    void (*release)(struct vlc_rtp_pt *);
-    void *(*init)(struct vlc_rtp_pt *, demux_t *);
-    void (*destroy)(demux_t *, void *);
-    void (*decode)(demux_t *, void *, block_t *);
+    /**
+     * Releases the payload format.
+     *
+     * This optional callback releases any resources associated with the
+     * payload format, such as copies of the payload format parameters.
+     *
+     * \param pt RTP payload format that is being released
+     */
+    void (*release)(struct vlc_rtp_pt *pt);
+
+    /**
+     * Starts using a payload format.
+     *
+     * This required callback initialises per-source resources for the payload
+     * format, such as an elementary stream output.
+     *
+     * \note There may be multiple RTP sources using the same payload format
+     * concurrently within single given RTP session. This callback is invoked
+     * for each source.
+     *
+     * \param pt RTP payload format being taken into use
+     * \return a data pointer for decode() and destroy() callbacks
+     */
+    void *(*init)(struct vlc_rtp_pt *pt, demux_t *);
+
+    /**
+     * Stops using a payload format.
+     *
+     * This optional callback deinitialises per-source resources.
+     *
+     * \param data data pointer returned by init()
+     */
+    void (*destroy)(demux_t *, void *data);
+
+    /**
+     * Processes a data payload.
+     *
+     * \param data data pointer returned by init()
+     * \param block payload of a received RTP packet
+     */
+    void (*decode)(demux_t *, void *data, block_t *block);
 };
 
+/**
+ * RTP payload format.
+ *
+ * This structures represents a payload format within an RTP session
+ * (\ref vlc_rtp_session_t).
+ */
 struct vlc_rtp_pt
 {
-    const struct vlc_rtp_pt_operations *ops;
+    const struct vlc_rtp_pt_operations *ops; /**< Payload format callbacks */
     void *opaque; /**< Private data pointer */
-    uint32_t  frequency; /* RTP clock rate (Hz) */
-    uint8_t   number;
-    uint8_t channel_count;
+    uint32_t frequency; /**< RTP clock rate (Hz) */
+    uint8_t number; /**< RTP payload type number within the session (0-127) */
+    uint8_t channel_count; /**< Channel count (zero if unspecified) */
 };
 
 /**
@@ -118,7 +184,12 @@ void codec_decode (demux_t *demux, void *data, block_t *block);
 
 extern const struct vlc_rtp_pt_operations rtp_video_theora;
 
-/** @section RTP session */
+/** @} */
+
+/**
+ * \defgroup rtp_session RTP session
+ * @{
+ */
 rtp_session_t *rtp_session_create (demux_t *);
 void rtp_session_destroy (demux_t *, rtp_session_t *);
 void rtp_queue (demux_t *, rtp_session_t *, block_t *);
@@ -128,6 +199,9 @@ int vlc_rtp_add_media_types(vlc_object_t *obj, rtp_session_t *ses,
                             const struct vlc_sdp_media *media);
 
 void *rtp_dgram_thread (void *data);
+
+/** @} */
+/** @} */
 
 /* Global data */
 typedef struct
