@@ -124,16 +124,6 @@ FocusScope{
                 running: false
                 repeat: false
                 interval: 1000
-
-                onRunningChanged: {
-                    if (!volumeTooltip.active)
-                        return
-
-                    if (running)
-                        volumeTooltip.visible = true
-                    else
-                        volumeTooltip.visible = Qt.binding(function() {return sliderMouseArea.containsMouse;})
-                }
             }
 
             Navigation.leftItem: volumeBtn
@@ -173,11 +163,11 @@ FocusScope{
                 active: !paintOnly
 
                 sourceComponent: Widgets.PointingTooltip {
-                    visible: sliderMouseArea.pressed || sliderMouseArea.containsMouse
+                    visible: tooltipShower.running || sliderMouseArea.pressed || sliderMouseArea.containsMouse
 
                     text: Math.round(volControl.value * 100) + "%"
 
-                    pos: Qt.point(handle.x + handle.width / 2, 0)
+                    pos: Qt.point(handle.x + handle.width / 2, handle.y)
 
                     colors: widgetfscope.colors
                 }
