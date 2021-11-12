@@ -90,17 +90,19 @@ struct vlc_rtp_pt_operations {
      *
      * This optional callback deinitialises per-source resources.
      *
+     * \param pt RTP payload format to relinquish
      * \param data data pointer returned by init()
      */
-    void (*destroy)(demux_t *, void *data);
+    void (*destroy)(struct vlc_rtp_pt *pt, void *data);
 
     /**
      * Processes a data payload.
      *
+     * \param pt RTP payload format of the payload
      * \param data data pointer returned by init()
      * \param block payload of a received RTP packet
      */
-    void (*decode)(demux_t *, void *data, block_t *block);
+    void (*decode)(struct vlc_rtp_pt *pt, void *data, block_t *block);
 };
 
 /**
@@ -147,14 +149,12 @@ static inline void *vlc_rtp_pt_begin(struct vlc_rtp_pt *pt, demux_t *demux)
  * This destroys an instance of a payload type created by vlc_rtp_pt_begin().
  *
  * @param pt RTP payload type to deinstantiate
- * @param demux demux object that was used by the instance
  * @param data instance private data as returned by vlc_rtp_pt_begin()
  */
-static inline void vlc_rtp_pt_end(struct vlc_rtp_pt *pt, demux_t *demux,
-                                  void *data)
+static inline void vlc_rtp_pt_end(struct vlc_rtp_pt *pt, void *data)
 {
     if (pt->ops->destroy != NULL)
-        pt->ops->destroy(demux, data);
+        pt->ops->destroy(pt, data);
 }
 
 /**
@@ -163,12 +163,11 @@ static inline void vlc_rtp_pt_end(struct vlc_rtp_pt *pt, demux_t *demux,
  * This passes a data payload of an RTP packet to the instance of the
  * payload type specified in the packet (PT and SSRC fields).
  */
-static inline void vlc_rtp_pt_decode(const struct vlc_rtp_pt *pt,
-                                     demux_t *demux,
+static inline void vlc_rtp_pt_decode(struct vlc_rtp_pt *pt,
                                      void *data, block_t *pkt)
 {
     assert(pt->ops->decode != NULL);
-    pt->ops->decode(demux, data, pkt);
+    pt->ops->decode(pt, data, pkt);
 }
 
 struct vlc_rtp_es;

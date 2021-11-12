@@ -39,14 +39,16 @@
  * Generic packet handlers
  */
 
-static void codec_destroy(demux_t *demux, void *data)
+static void codec_destroy(struct vlc_rtp_pt *pt, void *data)
 {
+    (void) pt;
     vlc_rtp_es_destroy(data);
 }
 
 /* Send a packet to ES */
-static void codec_decode(demux_t *demux, void *data, block_t *block)
+static void codec_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
 {
+    (void) pt;
     block->i_dts = VLC_TICK_INVALID;
     vlc_rtp_es_send(data, block);
 }
@@ -155,7 +157,7 @@ static void *mpa_init(struct vlc_rtp_pt *pt, demux_t *demux)
     return vlc_rtp_es_request(demux, &fmt);
 }
 
-static void mpa_decode (demux_t *demux, void *data, block_t *block)
+static void mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
 {
     if (block->i_buffer < 4)
     {
@@ -167,6 +169,7 @@ static void mpa_decode (demux_t *demux, void *data, block_t *block)
     block->p_buffer += 4;
     block->i_dts = VLC_TICK_INVALID;
     vlc_rtp_es_send(data, block);
+    (void) pt;
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_mpa = {
@@ -186,7 +189,7 @@ static void *mpv_init(struct vlc_rtp_pt *pt, demux_t *demux)
     return vlc_rtp_es_request(demux, &fmt);
 }
 
-static void mpv_decode (demux_t *demux, void *data, block_t *block)
+static void mpv_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
 {
     if (block->i_buffer < 4)
     {
@@ -205,6 +208,7 @@ static void mpv_decode (demux_t *demux, void *data, block_t *block)
     }
 #endif
     vlc_rtp_es_send(data, block);
+    (void) pt;
 }
 
 static const struct vlc_rtp_pt_operations rtp_video_mpv = {

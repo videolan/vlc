@@ -77,7 +77,7 @@ static void *theora_init(struct vlc_rtp_pt *pt, demux_t *demux)
     return xiph_init (false);
 }
 
-static void xiph_destroy(demux_t *demux, void *data)
+static void xiph_destroy(struct vlc_rtp_pt *pt, void *data)
 {
     rtp_xiph_t *self = data;
 
@@ -90,6 +90,7 @@ static void xiph_destroy(demux_t *demux, void *data)
     }
     vlc_rtp_es_destroy(self->id);
     free (self);
+    (void) pt;
 }
 
 /* Convert configuration from RTP to VLC format */
@@ -142,9 +143,10 @@ static ssize_t xiph_header (void **pextra, const uint8_t *buf, size_t len)
     return extra_size;
 }
 
-static void xiph_decode(demux_t *demux, void *data, block_t *block)
+static void xiph_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
 {
     rtp_xiph_t *self = data;
+    demux_t *demux = pt->opaque;
 
     if (!data || block->i_buffer < 4)
         goto drop;

@@ -166,7 +166,8 @@ rtp_source_destroy (demux_t *demux, const rtp_session_t *session,
     msg_Dbg (demux, "removing RTP source (%08x)", source->ssrc);
 
     for (unsigned i = 0; i < session->ptc; i++)
-        vlc_rtp_pt_end(session->ptv[i], demux, source->opaque[i]);
+        vlc_rtp_pt_end(session->ptv[i], source->opaque[i]);
+
     block_ChainRelease (source->blocks);
     free (source);
 }
@@ -183,7 +184,7 @@ static inline uint32_t rtp_timestamp (const block_t *block)
     return GetDWBE (block->p_buffer + 4);
 }
 
-static const struct vlc_rtp_pt *
+static struct vlc_rtp_pt *
 rtp_find_ptype (const rtp_session_t *session, rtp_source_t *source,
                 const block_t *block, void **pt_data)
 {
@@ -469,7 +470,7 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
 
     /* Match the payload type */
     void *pt_data;
-    const rtp_pt_t *pt = rtp_find_ptype (session, src, block, &pt_data);
+    struct vlc_rtp_pt *pt = rtp_find_ptype (session, src, block, &pt_data);
     if (pt == NULL)
     {
         msg_Dbg (demux, "unknown payload (%"PRIu8")",
@@ -512,7 +513,7 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     block->p_buffer += skip;
     block->i_buffer -= skip;
 
-    vlc_rtp_pt_decode(pt, demux, pt_data, block);
+    vlc_rtp_pt_decode(pt, pt_data, block);
     return;
 
 drop:
