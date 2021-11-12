@@ -200,6 +200,41 @@ void MediaLib::reload()
     m_threadPool.start(new Task(m_ml));
 }
 
+QVariantList MediaLib::mlInputItem(const MLItemId mlId)
+{
+    QVariantList items;
+
+    // NOTE: When we have a parent it's a collection of media(s).
+    if (mlId.type == VLC_ML_PARENT_UNKNOWN)
+    {
+        QmlInputItem input(vlc_ml_get_input_item(m_ml, mlId.id), false);
+
+        items.append(QVariant::fromValue(input));
+    }
+    else
+    {
+        ml_unique_ptr<vlc_ml_media_list_t> list;
+
+        vlc_ml_query_params_t query;
+
+        memset(&query, 0, sizeof(vlc_ml_query_params_t));
+
+        list.reset(vlc_ml_list_media_of(m_ml, &query, mlId.type, mlId.id));
+
+        if (list == nullptr)
+            return {};
+
+        for (const vlc_ml_media_t & media : ml_range_iterate<vlc_ml_media_t>(list))
+        {
+            QmlInputItem input(vlc_ml_get_input_item(m_ml, media.i_id), false);
+
+            items.append(QVariant::fromValue(input));
+        }
+    }
+
+    return items;
+}
+
 vlc_medialibrary_t* MediaLib::vlcMl()
 {
     return vlc_ml_instance_get( m_intf );

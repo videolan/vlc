@@ -35,6 +35,8 @@
 #include "qt.hpp"
 #include "mlqmltypes.hpp"
 
+#include "util/qmlinputitem.hpp"
+
 namespace vlc {
 namespace playlist {
 class Media;
@@ -65,6 +67,8 @@ public:
     Q_INVOKABLE void insertIntoPlaylist(size_t index, const QVariantList &itemIds /*QList<MLParentId>*/, const QStringList &options = {});
 
     Q_INVOKABLE void reload();
+
+    Q_INVOKABLE QVariantList mlInputItem(MLItemId mlId);
 
     inline bool idle() const { return m_idle; }
     inline int discoveryPending() const { return m_discoveryPending; }
