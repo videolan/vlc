@@ -150,7 +150,6 @@ static void *mpa_init(struct vlc_rtp_pt *pt, demux_t *demux)
     es_format_t fmt;
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MPGA);
-    fmt.audio.i_physical_channels = AOUT_CHANS_STEREO;
     fmt.b_packetized = false;
     (void) pt;
     return vlc_rtp_es_request(demux, &fmt);
