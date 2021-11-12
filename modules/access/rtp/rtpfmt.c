@@ -64,7 +64,7 @@ static void *pcmu_init(struct vlc_rtp_pt *pt, demux_t *demux)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MULAW);
     fmt.audio.i_rate = pt->frequency;
-    fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
+    fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 1;
     return vlc_rtp_es_request(demux, &fmt);
 }
 
@@ -99,7 +99,7 @@ static void *pcma_init(struct vlc_rtp_pt *pt, demux_t *demux)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_ALAW);
     fmt.audio.i_rate = pt->frequency;
-    fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
+    fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 1;
     return vlc_rtp_es_request(demux, &fmt);
 }
 
