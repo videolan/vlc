@@ -34,12 +34,15 @@
 #include <memory>
 #include "mlevent.hpp"
 #include "mlqueryparams.hpp"
+#include "util/asynctask.hpp"
 #include "util/listcacheloader.hpp"
 
 template <typename T>
 class ListCache;
 
 class MediaLib;
+
+class BulkTaskLoader;
 
 class MLBaseModel : public QAbstractListModel
 {
@@ -77,7 +80,9 @@ public: // Interface
     Q_INVOKABLE QMap<QString, QVariant> getDataAt(const QModelIndex & index);
     Q_INVOKABLE QMap<QString, QVariant> getDataAt(int idx);
 
-    QVariant data(const QModelIndex &index, int role) const override;
+    Q_INVOKABLE void getData(const QModelIndexList &indexes, QJSValue callback);
+
+    QVariant data(const QModelIndex &index, int role) const override final;
 
     virtual QVariant itemRoleData(MLItem *item, int role) const = 0;
 
@@ -176,6 +181,7 @@ protected:
     bool m_need_reset = false;
 
     mutable std::unique_ptr<ListCache<std::unique_ptr<MLItem>>> m_cache;
+    std::vector<TaskHandle<BulkTaskLoader>> m_externalLoaders;
 };
 
 #endif // MLBASEMODEL_HPP

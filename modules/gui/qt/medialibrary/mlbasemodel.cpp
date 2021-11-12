@@ -27,6 +27,64 @@
 #include "mlbasemodel.hpp"
 #include "mlhelper.hpp"
 
+#include "util/asynctask.hpp"
+
+class BulkTaskLoader : public AsyncTask<std::vector<std::unique_ptr<MLItem>>>
+{
+public:
+    BulkTaskLoader(QSharedPointer<ListCacheLoader<std::unique_ptr<MLItem>>> loader, QVector<int> indexes)
+        : m_loader(loader)
+        , m_indexes {indexes}
+    {
+    }
+
+    std::vector<std::unique_ptr<MLItem>> execute() override
+    {
+        if (m_indexes.isEmpty())
+            return {};
+
+        auto sortedIndexes = m_indexes;
+        std::sort(sortedIndexes.begin(), sortedIndexes.end());
+
+        struct Range
+        {
+            int low, high; // [low, high] (all inclusive)
+        };
+
+        QVector<Range> ranges;
+        ranges.push_back(Range {sortedIndexes[0], sortedIndexes[0]});
+        const int MAX_DIFFERENCE = 4;
+        for (const auto index : sortedIndexes)
+        {
+            if ((index - ranges.back().high) < MAX_DIFFERENCE)
+                ranges.back().high = index;
+            else
+                ranges.push_back(Range {index, index});
+        }
+
+
+        std::vector<std::unique_ptr<MLItem>> r(m_indexes.size());
+        for (const auto range : ranges)
+        {
+            auto data = m_loader->load(range.low, range.high - range.low + 1);
+            for (int i = 0; i < m_indexes.size(); ++i)
+            {
+                const auto targetIndex = m_indexes[i];
+                if (targetIndex >= range.low && targetIndex <= range.high)
+                {
+                    r.at(i) = std::move(data.at(targetIndex - range.low));
+                }
+            }
+        }
+
+        return r;
+    }
+
+private:
+    QSharedPointer<ListCacheLoader<std::unique_ptr<MLItem>>> m_loader;
+    QVector<int> m_indexes;
+};
+
 static constexpr ssize_t COUNT_UNINITIALIZED =
     ListCache<std::unique_ptr<MLItem>>::COUNT_UNINITIALIZED;
 
@@ -71,6 +129,72 @@ void MLBaseModel::sortByColumn(QByteArray name, Qt::SortOrder order)
 /* Q_INVOKABLE */ QMap<QString, QVariant> MLBaseModel::getDataAt(int idx)
 {
     return getDataAt(index(idx));
+}
+
+void MLBaseModel::getData(const QModelIndexList &indexes, QJSValue callback)
+{
+    if (!callback.isCallable()) // invalid argument
+        return;
+
+    QVector<int> indx;
+    std::transform(indexes.begin(), indexes.end(), std::back_inserter(indx), [](const auto &index)
+    {
+        return index.row();
+    });
+
+    TaskHandle<BulkTaskLoader> loader(new BulkTaskLoader(QSharedPointer<ListCacheLoader<std::unique_ptr<MLItem>>>(createLoader()), indx));
+    connect(loader.get(), &BaseAsyncTask::result, this, [this, callback, indx]() mutable
+    {
+        auto loader = (BulkTaskLoader *)sender();
+        auto freeSender = [this, &loader]()
+        {
+            m_externalLoaders.erase(std::find_if(std::begin(m_externalLoaders), std::end(m_externalLoaders), [&](auto &v)
+            {
+                if (v.get() != loader)
+                    return false;
+
+                v.release();
+                loader->deleteLater();
+                loader = nullptr;
+                return true;
+            }));
+
+            assert(!loader);
+        };
+
+        auto jsEngine = qjsEngine(this);
+        if (!jsEngine)
+        {
+            freeSender();
+            return;
+        }
+
+        const auto loadedItems = loader->takeResult();
+        assert((int)loadedItems.size() == indx.size());
+
+        const QHash<int, QByteArray> roles = roleNames();
+        auto jsArray = jsEngine->newArray(loadedItems.size());
+
+        for (size_t i = 0; i < loadedItems.size(); ++i)
+        {
+            const auto &item = loadedItems[i];
+            QMap<QString, QVariant> dataDict;
+
+            for (int role: roles.keys())
+            {
+                if (item) // item may fail to load
+                    dataDict[roles[role]] = itemRoleData(item.get(), role);
+            }
+
+            jsArray.setProperty(i, qjsEngine(this)->toScriptValue(dataDict));
+        }
+
+        callback.call({jsArray});
+        freeSender();
+    });
+
+    loader->start(*QThreadPool::globalInstance());
+    m_externalLoaders.push_back(std::move(loader));
 }
 
 QVariant MLBaseModel::data(const QModelIndex &index, int role) const
