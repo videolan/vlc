@@ -506,3 +506,24 @@ int vlc_rtp_add_media_types(vlc_object_t *obj, rtp_session_t *session,
 
     return errors;
 }
+
+static void es_dummy_destroy(struct vlc_rtp_es *es)
+{
+    assert(es == vlc_rtp_es_dummy);
+}
+
+static void es_dummy_decode(struct vlc_rtp_es *es, block_t *block)
+{
+    assert(es == vlc_rtp_es_dummy);
+    block_Release(block);
+}
+
+static const struct vlc_rtp_es_operations vlc_rtp_es_dummy_ops = {
+    es_dummy_destroy, es_dummy_decode,
+};
+
+static struct vlc_rtp_es vlc_rtp_es_dummy_instance = {
+    &vlc_rtp_es_dummy_ops,
+};
+
+struct vlc_rtp_es *const vlc_rtp_es_dummy = &vlc_rtp_es_dummy_instance;

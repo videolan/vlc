@@ -171,6 +171,54 @@ static inline void vlc_rtp_pt_decode(const struct vlc_rtp_pt *pt,
     pt->ops->decode(demux, data, pkt);
 }
 
+struct vlc_rtp_es;
+
+/**
+ * RTP elementary output stream operations.
+ */
+struct vlc_rtp_es_operations {
+    void (*destroy)(struct vlc_rtp_es *es);
+    void (*send)(struct vlc_rtp_es *es, block_t *block);
+};
+
+/**
+ * RTP elementary output stream.
+ *
+ * This structure represents a data sink for an active instance of a payload
+ * format, typically an output elementary stream (ES) \ref es_out_id_t.
+ */
+struct vlc_rtp_es {
+    const struct vlc_rtp_es_operations *ops;
+};
+
+/**
+ * Destroys an \ref vlc_rtp_es.
+ *
+ * \param es object to release
+ */
+static inline void vlc_rtp_es_destroy(struct vlc_rtp_es *es)
+{
+    assert(es->ops->destroy != NULL);
+    es->ops->destroy(es);
+}
+
+/**
+ * Sends coded data for output.
+ *
+ * \param es output stream to send the data to
+ * \param block data block to process
+ */
+static inline void vlc_rtp_es_send(struct vlc_rtp_es *es, block_t *block)
+{
+    assert(es->ops->send != NULL);
+    es->ops->send(es, block);
+}
+
+/**
+ * A dummy output that discards data.
+ */
+extern struct vlc_rtp_es *const vlc_rtp_es_dummy;
+
 void rtp_autodetect(vlc_object_t *, rtp_session_t *, const block_t *);
 
 static inline uint8_t rtp_ptype (const block_t *block)
