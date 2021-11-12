@@ -37,6 +37,7 @@ struct vlc_sdp_pt {
 };
 
 struct vlc_rtp_pt_operations {
+    void (*release)(struct vlc_rtp_pt *);
     void *(*init)(struct vlc_rtp_pt *, demux_t *);
     void (*destroy)(demux_t *, void *);
     void (*decode)(demux_t *, void *, block_t *);
@@ -45,6 +46,7 @@ struct vlc_rtp_pt_operations {
 struct vlc_rtp_pt
 {
     const struct vlc_rtp_pt_operations *ops;
+    void *opaque; /**< Private data pointer */
     uint32_t  frequency; /* RTP clock rate (Hz) */
     uint8_t   number;
     uint8_t channel_count;

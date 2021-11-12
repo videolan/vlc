@@ -73,7 +73,7 @@ static void *vorbis_init (demux_t *demux)
  */
 static void *theora_init(struct vlc_rtp_pt *pt, demux_t *demux)
 {
-    (void) pt; (void) demux;
+    pt->opaque = demux;
     return xiph_init (false);
 }
 
@@ -287,5 +287,5 @@ drop:
 }
 
 const struct vlc_rtp_pt_operations rtp_video_theora = {
-    theora_init, xiph_destroy, xiph_decode,
+    NULL, theora_init, xiph_destroy, xiph_decode,
 };

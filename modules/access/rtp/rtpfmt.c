@@ -115,7 +115,7 @@ static void *pcmu_init(struct vlc_rtp_pt *pt, demux_t *demux)
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_pcmu = {
-    pcmu_init, codec_destroy, codec_decode,
+    NULL, pcmu_init, codec_destroy, codec_decode,
 };
 
 /* PT=3
@@ -133,7 +133,7 @@ static void *gsm_init(struct vlc_rtp_pt *pt, demux_t *demux)
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_gsm = {
-    gsm_init, codec_destroy, codec_decode,
+    NULL, gsm_init, codec_destroy, codec_decode,
 };
 
 /* PT=8
@@ -150,7 +150,7 @@ static void *pcma_init(struct vlc_rtp_pt *pt, demux_t *demux)
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_pcma = {
-    pcma_init, codec_destroy, codec_decode,
+    NULL, pcma_init, codec_destroy, codec_decode,
 };
 
 /* PT=10,11
@@ -167,7 +167,7 @@ static void *l16_init(struct vlc_rtp_pt *pt, demux_t *demux)
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_l16 = {
-    l16_init, codec_destroy, codec_decode,
+    NULL, l16_init, codec_destroy, codec_decode,
 };
 
 /* PT=12
@@ -185,7 +185,7 @@ static void *qcelp_init(struct vlc_rtp_pt *pt, demux_t *demux)
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_qcelp = {
-    qcelp_init, codec_destroy, codec_decode,
+    NULL, qcelp_init, codec_destroy, codec_decode,
 };
 
 /* PT=14
@@ -217,7 +217,7 @@ static void mpa_decode (demux_t *demux, void *data, block_t *block)
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_mpa = {
-    mpa_init, codec_destroy, mpa_decode,
+    NULL, mpa_init, codec_destroy, mpa_decode,
 };
 
 /* PT=32
@@ -254,7 +254,7 @@ static void mpv_decode (demux_t *demux, void *data, block_t *block)
 }
 
 static const struct vlc_rtp_pt_operations rtp_video_mpv = {
-    mpv_init, codec_destroy, mpv_decode,
+    NULL, mpv_init, codec_destroy, mpv_decode,
 };
 
 /* PT=33
@@ -267,7 +267,7 @@ static void *ts_init(struct vlc_rtp_pt *pt, demux_t *demux)
 }
 
 static const struct vlc_rtp_pt_operations rtp_av_ts = {
-    ts_init, stream_destroy, stream_decode,
+    NULL, ts_init, stream_destroy, stream_decode,
 };
 
 /* Not using SDP, we need to guess the payload format used */
@@ -352,6 +352,8 @@ static struct vlc_rtp_pt *vlc_rtp_pt_create(vlc_object_t *obj,
 
 void vlc_rtp_pt_release(struct vlc_rtp_pt *pt)
 {
+    if (pt->ops->release != NULL)
+        pt->ops->release(pt);
     free(pt);
 }
 
