@@ -49,6 +49,12 @@ T.Control {
 
     rightPadding: Math.max(listView.scrollBarWidth, VLCStyle.margin_normal)
 
+    implicitWidth: Math.max(background.implicitWidth,
+                            contentItem.implicitWidth + leftPadding + rightPadding)
+
+    implicitHeight: Math.max(background.implicitHeight,
+                            contentItem.implicitHeight + topPadding + bottomPadding)
+
     ListView.delayRemove: mouseArea.drag.active
 
     // Events
