@@ -39,6 +39,8 @@ FocusScope{
 
     RowLayout{
         id: volumeWidget
+
+        anchors.fill: parent
         spacing: 0
 
         Widgets.IconToolButton{
@@ -192,61 +194,6 @@ FocusScope{
                 radius: VLCStyle.dp(4, VLCStyle.scale)
                 color: colors.volsliderbg
 
-                MouseArea {
-                    id: sliderMouseArea
-                    anchors.fill: parent
-                    anchors.topMargin: -VLCStyle.dp(30, VLCStyle.scale)
-                    anchors.bottomMargin: anchors.topMargin
-
-                    hoverEnabled: true
-                    acceptedButtons: Qt.LeftButton | Qt.RightButton
-
-                    Component.onCompleted: {
-                        positionChanged.connect(adjustVolume)
-                        onPressed.connect(adjustVolume)
-                    }
-
-                    function adjustVolume(mouse) {
-                        if (pressedButtons === Qt.LeftButton) {
-                            // The slider itself can handle this,
-                            // but then the top&bottom margins need to be
-                            // set there instead of here. Also, if handled
-                            // there stepSize will be respected.
-                            volControl.value = volControl.maxvolpos * (mouseX - handle.width / 2)
-                                                                    / (width - handle.width)
-
-                            mouse.accepted = true
-                        } else if (pressedButtons === Qt.RightButton) {
-                            var pos = mouseX * volControl.maxvolpos / width
-                            if (pos < 0.25)
-                                volControl.value = 0
-                            else if (pos < 0.75)
-                                volControl.value = 0.5
-                            else if (pos < 1.125)
-                                volControl.value = 1
-                            else
-                                volControl.value = 1.25
-
-                            mouse.accepted = true
-                        }
-                    }
-
-                    onPressed: {
-                        if (!volControl.activeFocus)
-                            volControl.forceActiveFocus(Qt.MouseFocusReason)
-                    }
-
-                    onWheel: {
-                        var x = wheel.angleDelta.x
-                        var y = wheel.angleDelta.y
-
-                        if (x > 0 || y > 0)
-                            volControl.increase()
-                        else if (x < 0 || y < 0)
-                            volControl.decrease()
-                    }
-                }
-
                 Rectangle {
                     id: filled
                     width: volControl.visualPosition * sliderBg.width
@@ -285,6 +232,64 @@ FocusScope{
                 radius: width * 0.5
                 visible: (paintOnly || volControl.hovered || volControl.activeFocus)
                 color: volControl.sliderColor
+            }
+
+            MouseArea {
+                id: sliderMouseArea
+                anchors.fill: parent
+
+                hoverEnabled: true
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                Component.onCompleted: {
+                    positionChanged.connect(adjustVolume)
+                    onPressed.connect(adjustVolume)
+                }
+
+                function adjustVolume(mouse) {
+                    if (pressedButtons === Qt.LeftButton) {
+                        // The slider itself can handle this,
+                        // but then the top&bottom margins need to be
+                        // set there instead of here. Also, if handled
+                        // there stepSize will be respected.
+                        volControl.value = volControl.maxvolpos * (mouse.x - handle.width)
+                                                                / (sliderBg.width - handle.width)
+
+                        mouse.accepted = true
+                    } else if (pressedButtons === Qt.RightButton) {
+                        var pos = mouse.x * volControl.maxvolpos / width
+                        if (pos < 0.25)
+                            volControl.value = 0
+                        else if (pos < 0.75)
+                            volControl.value = 0.5
+                        else if (pos < 1.125)
+                            volControl.value = 1
+                        else
+                            volControl.value = 1.25
+
+                        mouse.accepted = true
+                    }
+                }
+
+                onPressed: {
+                    if (!volControl.activeFocus)
+                        volControl.forceActiveFocus(Qt.MouseFocusReason)
+                }
+
+                onWheel: {
+                    var x = wheel.angleDelta.x
+                    var y = wheel.angleDelta.y
+
+                    if (x > 0 || y > 0) {
+                        volControl.increase()
+                        wheel.accepted = true
+                    } else if (x < 0 || y < 0) {
+                        volControl.decrease()
+                        wheel.accepted = true
+                    } else {
+                        wheel.accepted = false
+                    }
+                }
             }
         }
     }
