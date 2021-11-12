@@ -230,10 +230,6 @@ static inline uint8_t rtp_ptype (const block_t *block)
     return block->p_buffer[1] & 0x7F;
 }
 
-void *codec_init (demux_t *demux, es_format_t *fmt);
-void codec_destroy (demux_t *demux, void *data);
-void codec_decode (demux_t *demux, void *data, block_t *block);
-
 extern const struct vlc_rtp_pt_operations rtp_video_theora;
 
 /** @} */

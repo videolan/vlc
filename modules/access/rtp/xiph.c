@@ -37,7 +37,7 @@
 
 typedef struct rtp_xiph_t
 {
-    es_out_id_t *id;
+    struct vlc_rtp_es *id;
     block_t     *block;
     uint32_t     ident;
     bool         vorbis;
@@ -86,9 +86,9 @@ static void xiph_destroy(demux_t *demux, void *data)
     if (self->block)
     {
         self->block->i_flags |= BLOCK_FLAG_CORRUPTED;
-        codec_decode (demux, self->id, self->block);
+        vlc_rtp_es_send(self->id, self->block);
     }
-    codec_destroy (demux, self->id);
+    vlc_rtp_es_destroy(self->id);
     free (self);
 }
 
@@ -246,7 +246,8 @@ static void xiph_decode(demux_t *demux, void *data, block_t *block)
                 block_t *raw = block_Alloc (len);
                 memcpy (raw->p_buffer, block->p_buffer, len);
                 raw->i_pts = block->i_pts; /* FIXME: what about pkts > 1 */
-                codec_decode (demux, self->id, raw);
+                block->i_dts = VLC_TICK_INVALID;
+                vlc_rtp_es_send(self->id, raw);
                 break;
             }
 
@@ -266,13 +267,13 @@ static void xiph_decode(demux_t *demux, void *data, block_t *block)
                                              : VLC_CODEC_THEORA);
                 fmt.p_extra = extv;
                 fmt.i_extra = extc;
-                codec_destroy (demux, self->id);
+                vlc_rtp_es_destroy(self->id);
                 msg_Dbg (demux, self->vorbis ?
                          "Vorbis packed configuration received (%06"PRIx32")" :
                          "Theora packed configuration received (%06"PRIx32")",
                          ident);
                 self->ident = ident;
-                self->id = codec_init (demux, &fmt);
+                self->id = vlc_rtp_es_request(demux, &fmt);
                 break;
             }
         }
