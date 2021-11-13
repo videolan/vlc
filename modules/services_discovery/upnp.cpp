@@ -1619,32 +1619,18 @@ void *SearchThread(void *data)
 }
 
 static int OpenRD( vlc_object_t *p_this )
+try
 {
     vlc_renderer_discovery_t *p_rd = ( vlc_renderer_discovery_t* )p_this;
-    renderer_discovery_sys_t *p_sys  = new(std::nothrow) renderer_discovery_sys_t;
+    auto p_sys = std::make_unique<renderer_discovery_sys_t>();
 
-    if ( !p_sys )
-        return VLC_ENOMEM;
-    p_rd->p_sys = p_sys;
+    p_rd->p_sys = p_sys.get();
     p_sys->p_upnp = UpnpInstanceWrapper::get( p_this );
 
     if ( !p_sys->p_upnp )
-    {
-        delete p_sys;
         return VLC_EGENERIC;
-    }
 
-    try
-    {
-        p_sys->p_renderer_list = std::make_shared<RD::MediaRendererList>( p_rd );
-    }
-    catch ( const std::bad_alloc& )
-    {
-        msg_Err( p_rd, "Failed to create a MediaRendererList");
-        p_sys->p_upnp->release();
-        free(p_sys);
-        return VLC_EGENERIC;
-    }
+    p_sys->p_renderer_list = std::make_shared<RD::MediaRendererList>( p_rd );
     p_sys->p_upnp->addListener( p_sys->p_renderer_list );
 
     if( vlc_clone( &p_sys->thread, SearchThread, (void*)p_rd,
@@ -1653,10 +1639,21 @@ static int OpenRD( vlc_object_t *p_this )
             msg_Err( p_rd, "Can't run the lookup thread" );
             p_sys->p_upnp->removeListener( p_sys->p_renderer_list );
             p_sys->p_upnp->release();
-            delete p_sys;
             return VLC_EGENERIC;
         }
+
+    /* Release ownership of std::unique_ptr */
+    p_sys.release();
+
     return VLC_SUCCESS;
+}
+catch ( const std::bad_alloc& )
+{
+    vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t*)p_this;
+    renderer_discovery_sys_t *p_sys = static_cast<renderer_discovery_sys_t *>(p_rd->p_sys);
+    if (p_sys && p_sys->p_upnp)
+        p_sys->p_upnp->release();
+    return VLC_ENOMEM;
 }
 
 static void CloseRD( vlc_object_t *p_this )
