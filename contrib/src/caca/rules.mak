@@ -1,6 +1,6 @@
 # CACA
-CACA_VERSION := 0.99.beta17
-CACA_URL := http://caca.zoy.org/files/libcaca/libcaca-$(CACA_VERSION).tar.gz
+CACA_VERSION := 0.99.beta20
+CACA_URL := https://github.com/cacalabs/libcaca/releases/download/v$(CACA_VERSION)/libcaca-$(CACA_VERSION).tar.gz
 
 ifndef HAVE_DARWIN_OS
 ifndef HAVE_LINUX # see VLC Trac 17251
@@ -10,7 +10,7 @@ endif
 endif
 endif
 
-ifeq ($(call need_pkg,"caca >= 0.99.beta14"),)
+ifeq ($(call need_pkg,"caca >= 0.99.beta19"),)
 PKGS_FOUND += caca
 endif
 
@@ -22,10 +22,6 @@ $(TARBALLS)/libcaca-$(CACA_VERSION).tar.gz:
 caca: libcaca-$(CACA_VERSION).tar.gz .sum-caca
 	$(UNPACK)
 	$(APPLY) $(SRC)/caca/caca-fix-compilation-llvmgcc.patch
-	$(APPLY) $(SRC)/caca/caca-llvm-weak-alias.patch
-	$(APPLY) $(SRC)/caca/caca-osx-sdkofourchoice.patch
-	$(APPLY) $(SRC)/caca/caca-win32-static.patch
-	$(APPLY) $(SRC)/caca/caca-fix-ln-call.patch
 	$(APPLY) $(SRC)/caca/caca-fix-pkgconfig.patch
 	$(call pkg_static,"caca/caca.pc.in")
 	$(UPDATE_AUTOCONFIG)
@@ -36,22 +32,36 @@ CACA_CONF := \
 	--disable-gl \
 	--disable-imlib2 \
 	--disable-doc \
+	--disable-cppunit \
+	--disable-zzuf \
 	--disable-ruby \
 	--disable-csharp \
 	--disable-cxx \
-	--disable-java
+	--disable-java \
+	--disable-python \
+	--disable-cocoa \
+	--disable-network \
+	--disable-vga \
+	--disable-imlib2
 ifdef HAVE_MACOSX
 CACA_CONF += --disable-x11
 endif
 ifdef HAVE_WIN32
-CACA_CONF += --disable-ncurses
+CACA_CONF += --disable-ncurses \
+    ac_cv_func_vsnprintf_s=yes \
+    ac_cv_func_sprintf_s=yes
 endif
 ifdef HAVE_LINUX
 CACA_CONF += --disable-ncurses
 endif
 
+CACA_CONF += \
+	MACOSX_SDK=$(MACOSX_SDK) \
+	MACOSX_SDK_CFLAGS=" " \
+	MACOSX_SDK_CXXFLAGS=" " \
+	CPPFLAGS="$(CPPFLAGS) -DCACA_STATIC"
+
 .caca: caca
-	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(CACA_CONF)
 	cd $< && $(MAKE) -C $< install
 	touch $@

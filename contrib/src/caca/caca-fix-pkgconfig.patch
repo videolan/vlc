@@ -6,5 +6,6 @@ diff -Naur libcaca-0.99.beta17.a/caca/caca.pc.in libcaca-0.99.beta17.b/caca/caca
  Conflicts: 
  Libs: -L${libdir} -lcaca
 -Libs.private: @ZLIB_LIBS@
+-Cflags: -I${includedir}
 +Libs.private: @ZLIB_LIBS@ @CACA_LIBS@
- Cflags: -I${includedir}
++Cflags: -DCACA_STATIC -I${includedir}
