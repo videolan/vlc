@@ -54,8 +54,6 @@ typedef struct vlc_gl_sys_t
 #if defined (USE_PLATFORM_WAYLAND)
     struct wl_egl_window *window;
 #endif
-    PFNEGLCREATEIMAGEKHRPROC    eglCreateImageKHR;
-    PFNEGLDESTROYIMAGEKHRPROC   eglDestroyImageKHR;
 } vlc_gl_sys_t;
 
 static int MakeCurrent (vlc_gl_t *gl)
@@ -105,22 +103,6 @@ static const char *QueryString(vlc_gl_t *gl, int32_t name)
     vlc_gl_sys_t *sys = gl->sys;
 
     return eglQueryString(sys->display, name);
-}
-
-static void *CreateImageKHR(vlc_gl_t *gl, unsigned target, void *buffer,
-                            const int32_t *attrib_list)
-{
-    vlc_gl_sys_t *sys = gl->sys;
-
-    return sys->eglCreateImageKHR(sys->display, NULL, target, buffer,
-                                  attrib_list);
-}
-
-static bool DestroyImageKHR(vlc_gl_t *gl, void *image)
-{
-    vlc_gl_sys_t *sys = gl->sys;
-
-    return sys->eglDestroyImageKHR(sys->display, image);
 }
 
 static bool CheckAPI (EGLDisplay dpy, const char *api)
@@ -217,8 +199,6 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     sys->display = EGL_NO_DISPLAY;
     sys->surface = EGL_NO_SURFACE;
     sys->context = EGL_NO_CONTEXT;
-    sys->eglCreateImageKHR = NULL;
-    sys->eglDestroyImageKHR = NULL;
 
     vout_window_t *wnd = gl->surface;
     EGLSurface (*createSurface)(EGLDisplay, EGLConfig, void *, const EGLint *)
@@ -395,14 +375,6 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     gl->get_proc_address = GetSymbol;
     gl->destroy = Close;
     gl->egl.queryString = QueryString;
-
-    sys->eglCreateImageKHR = (void *)eglGetProcAddress("eglCreateImageKHR");
-    sys->eglDestroyImageKHR = (void *)eglGetProcAddress("eglDestroyImageKHR");
-    if (sys->eglCreateImageKHR != NULL && sys->eglDestroyImageKHR != NULL)
-    {
-        gl->egl.createImageKHR = CreateImageKHR;
-        gl->egl.destroyImageKHR = DestroyImageKHR;
-    }
 
     return VLC_SUCCESS;
 

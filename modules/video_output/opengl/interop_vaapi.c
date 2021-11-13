@@ -61,6 +61,15 @@ struct priv
     VASurfaceID *va_surface_ids;
     PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES;
 
+    struct
+    {
+        EGLDisplay display;
+        EGLDisplay (*getCurrentDisplay)();
+        EGLImage (*createImageKHR)(EGLDisplay, EGLContext, EGLenum target, EGLClientBuffer buffer,
+                const EGLint *attrib_list);
+        void (*destroyImageKHR)(EGLDisplay, EGLImage image);
+    } egl;
+
     unsigned fourcc;
     EGLint drm_fourccs[3];
 
@@ -83,7 +92,8 @@ vaegl_image_create(const struct vlc_gl_interop *interop, EGLint w, EGLint h,
                    EGLint fourcc, EGLint fd, EGLint offset, EGLint pitch,
                    EGLuint64KHR modifier)
 {
-    EGLint attribs[] = {
+    struct priv *priv = interop->priv;
+    const EGLint attribs[] = {
         EGL_WIDTH, w,
         EGL_HEIGHT, h,
         EGL_LINUX_DRM_FOURCC_EXT, fourcc,
@@ -95,14 +105,15 @@ vaegl_image_create(const struct vlc_gl_interop *interop, EGLint w, EGLint h,
         EGL_NONE
     };
 
-    return interop->gl->egl.createImageKHR(interop->gl, EGL_LINUX_DMA_BUF_EXT,
-                                           NULL, attribs);
+    return priv->egl.createImageKHR(priv->egl.display,
+            EGL_NO_CONTEXT, EGL_LINUX_DMA_BUF_EXT, NULL, attribs);
 }
 
 static void
 vaegl_image_destroy(const struct vlc_gl_interop *interop, EGLImageKHR image)
 {
-    interop->gl->egl.destroyImageKHR(interop->gl, image);
+    struct priv *priv = interop->priv;
+    priv->egl.destroyImageKHR(priv->egl.display, image);
 }
 
 static void
@@ -424,9 +435,7 @@ Open(vlc_object_t *obj)
     vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(interop->vctx);
     if (dec_device->type != VLC_DECODER_DEVICE_VAAPI
      || !vlc_vaapi_IsChromaOpaque(interop->fmt_in.i_chroma)
-     || interop->gl->ext != VLC_GL_EXT_EGL
-     || interop->gl->egl.createImageKHR == NULL
-     || interop->gl->egl.destroyImageKHR == NULL)
+     || interop->gl->ext != VLC_GL_EXT_EGL)
     {
         vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
@@ -469,9 +478,27 @@ Open(vlc_object_t *obj)
     if (vaegl_init_fourcc(priv, va_fourcc))
         goto error;
 
+    priv->egl.getCurrentDisplay = vlc_gl_GetProcAddress(interop->gl, "eglGetCurrentDisplay");
+    if (priv->egl.getCurrentDisplay == EGL_NO_DISPLAY)
+        goto error;
+
+    priv->egl.display = priv->egl.getCurrentDisplay();
+    if (priv->egl.display == EGL_NO_DISPLAY)
+        goto error;
+
     priv->glEGLImageTargetTexture2DOES =
         vlc_gl_GetProcAddress(interop->gl, "glEGLImageTargetTexture2DOES");
     if (priv->glEGLImageTargetTexture2DOES == NULL)
+        goto error;
+
+    priv->egl.createImageKHR =
+        vlc_gl_GetProcAddress(interop->gl, "eglCreateImageKHR");
+    if (priv->egl.createImageKHR == NULL)
+        goto error;
+
+    priv->egl.destroyImageKHR =
+        vlc_gl_GetProcAddress(interop->gl, "eglDestroyImageKHR");
+    if (priv->egl.destroyImageKHR == NULL)
         goto error;
 
     priv->vadpy = dec_device->opaque;
