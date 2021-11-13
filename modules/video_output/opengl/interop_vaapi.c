@@ -429,6 +429,7 @@ static int
 Open(vlc_object_t *obj)
 {
     struct vlc_gl_interop *interop = (void *) obj;
+    struct priv *priv = NULL;
 
     if (interop->vctx == NULL)
         return VLC_EGENERIC;
@@ -437,24 +438,18 @@ Open(vlc_object_t *obj)
      || !vlc_vaapi_IsChromaOpaque(interop->fmt_in.i_chroma)
      || interop->gl->ext != VLC_GL_EXT_EGL)
     {
-        vlc_decoder_device_Release(dec_device);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     if (!vlc_gl_StrHasToken(interop->api->extensions, "GL_OES_EGL_image"))
-    {
-        vlc_decoder_device_Release(dec_device);
-        return VLC_EGENERIC;
-    }
+        goto error;
 
+    /* EGL_EXT_image_dma_buf_import implies EGL_KHR_image_base */
     const char *eglexts = interop->gl->egl.queryString(interop->gl, EGL_EXTENSIONS);
     if (eglexts == NULL || !vlc_gl_StrHasToken(eglexts, "EGL_EXT_image_dma_buf_import"))
-    {
-        vlc_decoder_device_Release(dec_device);
-        return VLC_EGENERIC;
-    }
+        goto error;
 
-    struct priv *priv = interop->priv = calloc(1, sizeof(struct priv));
+    priv = interop->priv = calloc(1, sizeof(struct priv));
     if (unlikely(priv == NULL))
         goto error;
     priv->fourcc = 0;
