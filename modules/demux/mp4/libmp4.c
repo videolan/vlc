@@ -1911,12 +1911,17 @@ static int MP4_ReadBox_vpcC( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_ENTER( MP4_Box_data_vpcC_t, MP4_FreeBox_vpcC );
     MP4_Box_data_vpcC_t *p_vpcC = p_box->data.p_vpcC;
 
-    if( p_box->i_size < 6 )
+    if( p_box->i_size < 9 )
         MP4_READBOX_EXIT( 0 );
 
     MP4_GET1BYTE( p_vpcC->i_version );
     if( p_vpcC->i_version > 1 )
         MP4_READBOX_EXIT( 0 );
+
+    /* Skip flags */
+    uint32_t i_flags;
+    MP4_GET3BYTES( i_flags );
+    VLC_UNUSED( i_flags );
 
     MP4_GET1BYTE( p_vpcC->i_profile );
     MP4_GET1BYTE( p_vpcC->i_level );
