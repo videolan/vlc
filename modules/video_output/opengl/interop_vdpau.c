@@ -211,7 +211,10 @@ static const struct vlc_decoder_device_operations dev_ops = {
 static int
 DecoderDeviceOpen(vlc_decoder_device *device, vout_window_t *window)
 {
-    if (!window || !vlc_xlib_init(VLC_OBJECT(window)))
+    if (!window || window->type != VOUT_WINDOW_TYPE_XID)
+        return VLC_EGENERIC;
+
+    if (!vlc_xlib_init(VLC_OBJECT(window)))
         return VLC_EGENERIC;
 
     vdpau_decoder_device_t *sys = vlc_obj_malloc(VLC_OBJECT(device), sizeof(*sys));
