@@ -49,7 +49,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#define KMS_VAR "kms"
+#define KMS_DEVICE_VAR "kms-device"
 
 #define DEVICE_TEXT "Framebuffer device"
 #define DEVICE_LONGTEXT \
@@ -315,7 +315,7 @@ static int OpenWindow(vout_window_t *wnd)
     /*
      * Open framebuffer device
      */
-    psz_device = var_InheritString(wnd, KMS_VAR);
+    psz_device = var_InheritString(wnd, KMS_DEVICE_VAR);
     if (psz_device == NULL) {
         msg_Err(wnd, "Don't know which DRM device to open");
         goto error_end;
@@ -360,7 +360,9 @@ error_end:
 vlc_module_begin ()
     set_shortname("kms")
     set_subcategory(SUBCAT_VIDEO_VOUT)
-    add_loadfile(KMS_VAR, "/dev/dri/card0", DEVICE_TEXT, DEVICE_LONGTEXT)
+
+    add_obsolete_string("kms") /* Since 4.0.0 */
+    add_loadfile(KMS_DEVICE_VAR, "/dev/dri/card0", DEVICE_TEXT, DEVICE_LONGTEXT)
 
     set_description("Linux kernel mode setting window provider")
     set_callback(OpenWindow)
