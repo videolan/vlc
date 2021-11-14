@@ -455,13 +455,20 @@ static void Display(vout_display_t *vd, picture_t *picture)
     vout_display_sys_t *sys = vd->sys;
     vout_window_t *wnd = vd->cfg->window;
 
-    if (drmModeSetPlane(wnd->display.drm_fd, sys->plane_id, wnd->handle.crtc,
-                         sys->fb[sys->front_buf], 0,
-                         0, 0, sys->width, sys->height,
-                         0, 0, sys->width << 16, sys->height << 16)) {
+    vout_display_place_t place;
+    vout_display_PlacePicture(&place, vd->fmt, vd->cfg);
+
+    int ret = drmModeSetPlane(wnd->display.drm_fd,
+            sys->plane_id, wnd->handle.crtc, sys->fb[sys->front_buf], 0,
+            place.x, place.y, place.width, place.height,
+            vd->fmt->i_x_offset << 16, vd->fmt->i_y_offset << 16,
+            vd->fmt->i_visible_width << 16, vd->fmt->i_visible_height << 16);
+    if (ret != drvSuccess)
+    {
         msg_Err(vd, "Cannot do set plane for plane id %u, fb %x",
                 sys->plane_id,
                 sys->fb[sys->front_buf]);
+        assert(ret != -EINVAL);
         return;
     }
 
