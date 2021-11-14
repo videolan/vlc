@@ -331,6 +331,7 @@ static bool ChromaNegotiation(vout_display_t *vd)
                     }
                 }
                 drmModeFreePlane(plane);
+                drmModeFreeObjectProperties(props);
             } else {
                 msg_Err(vd, "Couldn't get list of DRM formats");
                 drmModeFreePlaneResources(plane_res);
