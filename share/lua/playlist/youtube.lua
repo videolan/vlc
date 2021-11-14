@@ -158,12 +158,14 @@ function n_descramble( nparam, js )
         return len
     end
 
-    -- Common routine shared by the compound transformations,
-    -- compounding the "n" parameter with an input string,
-    -- character by character using a Base64 alphabet.
+    -- Shared core section of compound transformations: it compounds
+    -- the "n" parameter with an input string, character by character,
+    -- using a Base64 alphabet as algebraic modulo group.
     -- var h=f.length;d.forEach(function(l,m,n){this.push(n[m]=f[(f.indexOf(l)-f.indexOf(this[m])+m+h--)%f.length])},e.split(""))
     local compound = function( ntab, str, alphabet )
-        if ntab ~= n or type( str ) ~= "string" then
+        if ntab ~= n or
+           type( str ) ~= "string" or
+           type( alphabet ) ~= "string" then
             return true
         end
         local input = {}
@@ -271,16 +273,44 @@ function n_descramble( nparam, js )
                 "^[^}]-d%.unshift%(f%)}%)},",
             }
         },
-        -- Compound transformations first build a variation of a
-        -- Base64 alphabet, then in a common section, compound the
-        -- "n" parameter with an input string, character by character.
+        -- Here functions with no arguments are not really functions,
+        -- they're constants: treat them as such. These alphabets are
+        -- passed to and used by the compound transformations.
+        alphabet1 = {
+            func = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_",
+            match = {
+                -- function(){for(var d=64,e=[];++d-e.length-32;){switch(d){case 91:d=44;continue;case 123:d=65;break;case 65:d-=18;continue;case 58:d=96;continue;case 46:d=95}e.push(String.fromCharCode(d))}return e}
+                "^function%(%){[^}]-case 58:d=96;",
+            }
+        },
+        alphabet2 = {
+            func = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_",
+            match = {
+                -- function(){for(var d=64,e=[];++d-e.length-32;)switch(d){case 46:d=95;default:e.push(String.fromCharCode(d));case 94:case 95:case 96:break;case 123:d-=76;case 92:case 93:continue;case 58:d=44;case 91:}return e}
+                "^function%(%){[^}]-case 58:d%-=14;",
+                "^function%(%){[^}]-case 58:d=44;",
+            }
+        },
+        -- Compound transformations are based on a shared core section
+        -- that compounds the "n" parameter with an input string,
+        -- character by character, using a variation of a Base64
+        -- alphabet as algebraic modulo group.
+        compound = {
+            func = compound,
+            match = {
+                -- function(d,e,f){var h=f.length;d.forEach(function(l,m,n){this.push(n[m]=f[(f.indexOf(l)-f.indexOf(this[m])+m+h--)%f.length])},e.split(""))}
+                "^function%(d,e,f%)",
+            }
+        },
+        -- These compound transformation variants first build their
+        -- Base64 alphabet themselves, before using it.
         compound1 = {
             func = function( ntab, str )
                 return compound( ntab, str, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_" )
             end,
             match = {
                 -- function(d,e){for(var f=64,h=[];++f-h.length-32;)switch(f){case 58:f=96;continue;case 91:f=44;break;case 65:f=47;continue;case 46:f=153;case 123:f-=58;default:h.push(String.fromCharCode(f))} [ compound... ] }
-                "^[^}]-case 58:f=96;",
+                "^function%(d,e%){[^}]-case 58:f=96;",
             }
         },
         compound2 = {
@@ -290,8 +320,8 @@ function n_descramble( nparam, js )
             match = {
                 -- function(d,e){for(var f=64,h=[];++f-h.length-32;){switch(f){case 58:f-=14;case 91:case 92:case 93:continue;case 123:f=47;case 94:case 95:case 96:continue;case 46:f=95}h.push(String.fromCharCode(f))} [ compound... ] }
                 -- function(d,e){for(var f=64,h=[];++f-h.length-32;)switch(f){case 46:f=95;default:h.push(String.fromCharCode(f));case 94:case 95:case 96:break;case 123:f-=76;case 92:case 93:continue;case 58:f=44;case 91:} [ compound... ] }
-                "^[^}]-case 58:f%-=14;",
-                "^[^}]-case 58:f=44;",
+                "^function%(d,e%){[^}]-case 58:f%-=14;",
+                "^function%(d,e%){[^}]-case 58:f=44;",
             }
         },
         -- Fallback
@@ -333,7 +363,9 @@ function n_descramble( nparam, js )
 
             -- Compounding functions use a subfunction, so we need to be
             -- more specific in how much parsed data we consume.
-            if el == trans.compound1.func or el == trans.compound2.func then
+            if el == trans.compound.func or
+               el == trans.compound1.func or
+               el == trans.compound2.func then
                 datac = string.match( datac, '^.-},e%.split%(""%)%)},(.*)$' )
             else
                 datac = string.match( datac, "^.-},(.*)$" )
