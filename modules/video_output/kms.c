@@ -57,6 +57,35 @@
 
 typedef enum { drvSuccess, drvTryNext, drvFail } deviceRval;
 
+static const char * const connector_type_names[] = {
+    [DRM_MODE_CONNECTOR_Unknown]      = "Unknown",
+    [DRM_MODE_CONNECTOR_VGA]          = "VGA",
+    [DRM_MODE_CONNECTOR_DVII]         = "DVI-I",
+    [DRM_MODE_CONNECTOR_DVID]         = "DVI-D",
+    [DRM_MODE_CONNECTOR_DVIA]         = "DVI-A",
+    [DRM_MODE_CONNECTOR_Composite]    = "Composite",
+    [DRM_MODE_CONNECTOR_SVIDEO]       = "SVIDEO",
+    [DRM_MODE_CONNECTOR_LVDS]         = "LVDS",
+    [DRM_MODE_CONNECTOR_Component]    = "Component",
+    [DRM_MODE_CONNECTOR_9PinDIN]      = "DIN",
+    [DRM_MODE_CONNECTOR_DisplayPort]  = "DP",
+    [DRM_MODE_CONNECTOR_HDMIA]        = "HDMI-A",
+    [DRM_MODE_CONNECTOR_HDMIB]        = "HDMI-B",
+    [DRM_MODE_CONNECTOR_TV]           = "TV",
+    [DRM_MODE_CONNECTOR_eDP]          = "eDP",
+    [DRM_MODE_CONNECTOR_VIRTUAL]      = "Virtual",
+    [DRM_MODE_CONNECTOR_DSI]          = "DSI",
+    [DRM_MODE_CONNECTOR_DPI]          = "DPI",
+    [DRM_MODE_CONNECTOR_WRITEBACK]    = "Writeback",
+#ifdef DRM_MODE_CONNECTOR_SPI
+    [DRM_MODE_CONNECTOR_SPI]          = "SPI",
+#endif
+#ifdef DRM_MODE_CONNECTOR_USB
+    [DRM_MODE_CONNECTOR_USB]          = "USB",
+#endif
+};
+
+
 struct vout_window_sys_t {
     /* modeset information */
     uint32_t        crtc;
@@ -158,20 +187,32 @@ static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     msg_Info(wnd, "Looping over %d resources", modeRes->count_connectors);
     for (int c = 0; c < modeRes->count_connectors && sys->crtc == 0; c++) {
-        msg_Info(wnd, "connector %d", c);
 
         drmModeConnector *conn =
             drmModeGetConnector(sys->drm_fd, modeRes->connectors[c]);
         if (conn == NULL)
             continue;
 
+        if (conn->connector_type >= ARRAY_SIZE(connector_type_names))
+        {
+            drmModeFreeConnector(conn);
+            continue;
+        }
+
+        char name[32];
+        snprintf(name, sizeof name, "%s-%d",
+                 connector_type_names[conn->connector_type],
+                 conn->connector_type_id);
+
+        msg_Info(wnd, "connector %d: %s", c, name);
+
         found_connector = true;
 
         int ret = SetupDevice(wnd, modeRes, conn);
         if (ret != drvSuccess) {
             if (ret != drvTryNext) {
-                msg_Err(wnd, "Cannot do setup for connector %u:%u", c,
-                        modeRes->connectors[c]);
+                msg_Err(wnd, "Cannot do setup for connector %s %u:%u",
+                        name, c, modeRes->connectors[c]);
 
                 drmModeFreeConnector(conn);
                 drmModeFreeResources(modeRes);
