@@ -449,7 +449,6 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     picture_Copy( sys->picture, pic );
 }
 
-
 static void Display(vout_display_t *vd, picture_t *picture)
 {
     VLC_UNUSED(picture);
@@ -463,16 +462,16 @@ static void Display(vout_display_t *vd, picture_t *picture)
         msg_Err(vd, "Cannot do set plane for plane id %u, fb %x",
                 sys->plane_id,
                 sys->fb[sys->front_buf]);
-    } else {
-        sys->front_buf++;
-        sys->front_buf %= MAXHWBUF;
-
-        for (int i = 0; i < PICTURE_PLANE_MAX; i++)
-            sys->picture->p[i].p_pixels =
-                    sys->map[sys->front_buf]+sys->offsets[i];
+        return;
     }
-}
 
+    sys->front_buf++;
+    sys->front_buf %= MAXHWBUF;
+
+    for (int i = 0; i < PICTURE_PLANE_MAX; i++)
+        sys->picture->p[i].p_pixels =
+                sys->map[sys->front_buf]+sys->offsets[i];
+}
 
 /**
  * Terminate an output method created by Open
