@@ -395,20 +395,22 @@ function n_descramble( nparam, js )
     -- the "n" parameter array as first argument, and often input data
     -- as a second argument. We parse and emulate those calls to follow
     -- the descrambling script.
-    -- c[40](c[14],c[2]),c[25](c[48]),c[21](c[32],c[23]), [...]
-    for ifunc, itab, iarg in string.gmatch( script, "c%[(%d+)%]%(c%[(%d+)%]([^)]-)%)" ) do
-        iarg = string.match( iarg, ",c%[(%d+)%]" )
+    -- c[40](c[14],c[2]),c[25](c[48]),c[14](c[1],c[24],c[42]()), [...]
+    for ifunc, itab, args in string.gmatch( script, "c%[(%d+)%]%(c%[(%d+)%]([^)]-)%)" ) do
+        local iarg1 = string.match( args, "^,c%[(%d+)%]" )
+        local iarg2 = string.match( args, "^,[^,]-,c%[(%d+)%]" )
 
         local func = data[tonumber( ifunc ) + 1]
         local tab = data[tonumber( itab ) + 1]
-        local arg = iarg and data[tonumber( iarg ) + 1]
+        local arg1 = iarg1 and data[tonumber( iarg1 ) + 1]
+        local arg2 = iarg2 and data[tonumber( iarg2 ) + 1]
 
         -- Uncomment to debug transformation chain
-        --vlc.msg.dbg( '"n" parameter transformation: '..prd( func ).."("..prd( tab )..( arg ~= nil and ( ", "..prd( arg, tab ) ) or "" )..") "..ifunc.."("..itab..( iarg and ( ", "..iarg ) or "" )..")" )
+        --vlc.msg.err( '"n" parameter transformation: '..prd( func ).."("..prd( tab )..( arg1 ~= nil and ( ", "..prd( arg1, tab ) ) or "" )..( arg2 ~= nil and ( ", "..prd( arg2, tab ) ) or "" )..") "..ifunc.."("..itab..( iarg1 and ( ", "..iarg1 ) or "" )..( iarg2 and ( ", "..iarg2 ) or "" )..")" )
         --local nprev = table.concat( n )
 
         if type( func ) ~= "function" or type( tab ) ~= "table"
-            or func( tab, arg ) then
+            or func( tab, arg1, arg2 ) then
             vlc.msg.dbg( "Invalid data type encountered during YouTube video throttling parameter descrambling transformation chain, aborting" )
             vlc.msg.dbg( "Couldn't descramble YouTube throttling URL parameter: data transfer will get throttled" )
             vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
