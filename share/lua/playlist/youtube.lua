@@ -161,8 +161,8 @@ function n_descramble( nparam, js )
     -- Common routine shared by the compound transformations,
     -- compounding the "n" parameter with an input string,
     -- character by character using a Base64 alphabet.
-    -- d.forEach(function(l,m,n){this.push(n[m]=h[(h.indexOf(l)-h.indexOf(this[m])+m-32+f--)%h.length])},e.split(""))
-    local compound = function( ntab, str, alphabet, charcode )
+    -- var h=f.length;d.forEach(function(l,m,n){this.push(n[m]=f[(f.indexOf(l)-f.indexOf(this[m])+m+h--)%f.length])},e.split(""))
+    local compound = function( ntab, str, alphabet )
         if ntab ~= n or type( str ) ~= "string" then
             return true
         end
@@ -181,7 +181,7 @@ function n_descramble( nparam, js )
             if ( not pos1 ) or ( not pos2 ) then
                 return true
             end
-            local pos = ( pos1 - pos2 + charcode - 32 ) % len
+            local pos = ( pos1 - pos2 ) % len
             local newc = string.sub( alphabet, pos + 1, pos + 1 )
             ntab[i] = newc
             table.insert( input, newc )
@@ -276,7 +276,7 @@ function n_descramble( nparam, js )
         -- "n" parameter with an input string, character by character.
         compound1 = {
             func = function( ntab, str )
-                return compound( ntab, str, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_", 96 )
+                return compound( ntab, str, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_" )
             end,
             match = {
                 -- function(d,e){for(var f=64,h=[];++f-h.length-32;)switch(f){case 58:f=96;continue;case 91:f=44;break;case 65:f=47;continue;case 46:f=153;case 123:f-=58;default:h.push(String.fromCharCode(f))} [ compound... ] }
@@ -285,7 +285,7 @@ function n_descramble( nparam, js )
         },
         compound2 = {
             func = function( ntab, str )
-                return compound( ntab, str,"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_", 96 )
+                return compound( ntab, str,"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_" )
             end,
             match = {
                 -- function(d,e){for(var f=64,h=[];++f-h.length-32;){switch(f){case 58:f-=14;case 91:case 92:case 93:continue;case 123:f=47;case 94:case 95:case 96:continue;case 46:f=95}h.push(String.fromCharCode(f))} [ compound... ] }
