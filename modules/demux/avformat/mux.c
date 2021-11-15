@@ -413,12 +413,12 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
                  "(pkt pts: %"PRId64", dts: %"PRId64")",
                  p_data->i_pts, p_data->i_dts, pkt->pts, pkt->dts );
         block_Release( p_data );
-        av_packet_unref( pkt );
+        av_packet_free( &pkt );
         return VLC_EGENERIC;
     }
 
 
-    av_packet_unref( pkt );
+    av_packet_free( &pkt );
     block_Release( p_data );
     return VLC_SUCCESS;
 }
