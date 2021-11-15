@@ -145,7 +145,7 @@ static deviceRval FindCRTC(vout_window_t *wnd, drmModeRes const *res,
         enc = drmModeGetEncoder(sys->drm_fd, conn->encoders[i]);
 
         for (j = 0; enc && j < res->count_crtcs; ++j) {
-            if (ffs(enc->possible_crtcs) == j && res->crtcs[j]) {
+            if ((enc->possible_crtcs & (1 << j)) != 0 && res->crtcs[j]) {
                 sys->crtc = res->crtcs[j];
                 drmModeFreeEncoder(enc);
                 return drvSuccess;
