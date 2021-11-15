@@ -249,7 +249,11 @@ static struct
     { VK_F1, KEY_F1 }, { VK_F2, KEY_F2 }, { VK_F3, KEY_F3 }, { VK_F4, KEY_F4 },
     { VK_F5, KEY_F5 }, { VK_F6, KEY_F6 }, { VK_F7, KEY_F7 }, { VK_F8, KEY_F8 },
     { VK_F9, KEY_F9 }, { VK_F10, KEY_F10 }, { VK_F11, KEY_F11 },
-    { VK_F12, KEY_F12 },
+    { VK_F12, KEY_F12 }, { VK_F13, KEY_F(13) }, { VK_F14, KEY_F(14) },
+    { VK_F15, KEY_F(15) }, { VK_F16, KEY_F(16) }, { VK_F17, KEY_F(17) },
+    { VK_F18, KEY_F(18) }, { VK_F19, KEY_F(19) }, { VK_F20, KEY_F(20) },
+    { VK_F21, KEY_F(21) }, { VK_F22, KEY_F(22) }, { VK_F23, KEY_F(23) },
+    { VK_F24, KEY_F(24) },
 
     { VK_RETURN, KEY_ENTER },
     { VK_SPACE, ' ' },
