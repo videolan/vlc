@@ -1,14 +1,40 @@
 Changes between 3.0.16 and 3.0.17:
 ----------------------------------
 
+Core:
+ * Fix a regression in parsing secondary source MRLs
+
+Access:
+ * Fix support for screen capture on macOS with avcapture
+ * Fix closing of HTTP 1.x connections
+ * Improve HTTP2 memory usage
+ * Improve AVCapture module
+
+Packetizers:
+ * Add support for DTS LBR
+
 Audio Output:
  * iOS/tvOS: add support for spatial audio
 
+Video Output:
+ * Fix a D3D11 crash when the stream changes aspect ratio
+
 Demux:
  * Support for DAV video files
+ * Add WebP image mapping
+ * Fix missing audio start of Opus audio in MKV/WebM
+
+Interface:
+ * Qt/macOS: Fixup user provided URLs
+
+Misc:
+ * Update YouTube script
+ * Fix Icecast directory parsing which could lead to missing entries
 
 3rd party libraries (contrib):
  * Update libsmb2 to fix invalid UTF-8 encoding of some filenames
+ * Update taglib to fix corruptions when editing some OGG metadata
+ * Update FFmpeg to 4.4
 
 Changes between 3.0.15 and 3.0.16:
 ----------------------------------
