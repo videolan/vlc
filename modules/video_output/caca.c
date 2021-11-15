@@ -242,9 +242,9 @@ static const struct {
     { CACA_KEY_F10,     KEY_F10 },
     { CACA_KEY_F11,     KEY_F11 },
     { CACA_KEY_F12,     KEY_F12 },
-    { CACA_KEY_F13,     -1 },
-    { CACA_KEY_F14,     -1 },
-    { CACA_KEY_F15,     -1 },
+    { CACA_KEY_F13,     KEY_F(13) },
+    { CACA_KEY_F14,     KEY_F(14) },
+    { CACA_KEY_F15,     KEY_F(15) },
 
     { CACA_KEY_UP,      KEY_UP },
     { CACA_KEY_DOWN,    KEY_DOWN },
