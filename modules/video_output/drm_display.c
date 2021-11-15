@@ -279,6 +279,21 @@ static bool ChromaNegotiation(vout_display_t *vd)
 
     int drm_fd = wnd->display.drm_fd;
 
+    drmModeRes *resources = drmModeGetResources(drm_fd);
+    if (resources == NULL)
+        return false;
+
+    int crtc_index = -1;
+    for (int crtc_id=0; crtc_id < resources->count_crtcs; ++crtc_id)
+    {
+        if (resources->crtcs[crtc_id] == wnd->handle.crtc)
+        {
+            crtc_index = crtc_id;
+            break;
+        }
+    }
+    drmModeFreeResources(resources);
+
     /*
      * For convenience print out in debug prints all supported
      * DRM modes so they can be seen if use verbose mode.
@@ -292,6 +307,12 @@ static bool ChromaNegotiation(vout_display_t *vd)
 
             plane = drmModeGetPlane(drm_fd, plane_res->planes[c]);
             if (plane != NULL && plane->count_formats > 0) {
+                if ((plane->possible_crtcs & (1 << crtc_index)) == 0)
+                {
+                    drmModeFreePlane(plane);
+                    continue;
+                }
+
                 props = drmModeObjectGetProperties(drm_fd,
                                                    plane->plane_id,
                                                    DRM_MODE_OBJECT_PLANE);
