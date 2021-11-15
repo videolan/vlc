@@ -1173,10 +1173,7 @@ static block_t *encode_avframe( encoder_t *p_enc, encoder_sys_t *p_sys, AVFrame 
     AVPacket *av_pkt = av_packet_alloc();
 
     if( !av_pkt )
-    {
-        av_frame_unref( frame );
         return NULL;
-    }
 
     int ret = avcodec_send_frame( p_sys->p_context, frame );
     if( frame && ret != 0 && ret != AVERROR(EAGAIN) )
