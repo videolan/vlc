@@ -69,9 +69,6 @@ struct surfacetexture_sys
 
     EGLConfig cfgv;
 
-    PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR;
-    PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR;
-
     picture_t *current_picture;
 };
 
@@ -111,31 +108,6 @@ static void *GetSymbol(vlc_gl_t *gl, const char *procname)
 {
     (void) gl;
     return (void *)eglGetProcAddress(procname);
-}
-
-static const char *QueryString(vlc_gl_t *gl, int32_t name)
-{
-    struct video_ctx *vctx = GetVCtx(gl);
-
-    return eglQueryString(vctx->display, name);
-}
-
-static void *CreateImageKHR(vlc_gl_t *gl, unsigned target, void *buffer,
-                            const int32_t *attrib_list)
-{
-    struct surfacetexture_sys *sys = gl->sys;
-    struct video_ctx *vctx = GetVCtx(gl);
-
-    return sys->eglCreateImageKHR(vctx->display, NULL, target, buffer,
-                                  attrib_list);
-}
-
-static bool DestroyImageKHR(vlc_gl_t *gl, void *image)
-{
-    struct surfacetexture_sys *sys = gl->sys;
-    struct video_ctx *vctx = GetVCtx(gl);
-
-    return sys->eglDestroyImageKHR(vctx->display, image);
 }
 
 static picture_context_t *CopyPictureContext(picture_context_t *input)
@@ -401,19 +373,8 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     gl->swap_offscreen = SwapOffscreen;
     gl->get_proc_address = GetSymbol;
     gl->destroy = Close;
-    gl->egl.queryString = QueryString;
 
     struct video_ctx *vctx = GetVCtx(gl);
-
-    sys->eglCreateImageKHR =
-        (PFNEGLCREATEIMAGEKHRPROC) eglGetProcAddress("eglCreateImageKHR");
-    sys->eglDestroyImageKHR =
-        (PFNEGLDESTROYIMAGEKHRPROC) eglGetProcAddress("eglDestroyImageKHR");
-    if (sys->eglCreateImageKHR != NULL && sys->eglDestroyImageKHR != NULL)
-    {
-        gl->egl.createImageKHR = CreateImageKHR;
-        gl->egl.destroyImageKHR = DestroyImageKHR;
-    }
 
     if (InitPicturePool(gl) != VLC_SUCCESS)
         goto error3;
