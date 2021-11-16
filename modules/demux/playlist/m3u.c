@@ -412,42 +412,44 @@ static void parseEXTINFIptvDiots( char *psz_string,
                                   char *(*pf_dup)(const char *),
                                   struct entry_meta_s *meta )
 {
-    char **ppsz_meta = NULL;
-    if( strncmp( psz_string, "tvg-", 4 ) &&
-        strncmp( psz_string, "group-", 6 ) )
+    char *psz = strchr( psz_string, '=' );
+    if( unlikely(!psz) )
         return;
-    char *psz_sep = strchr( psz_string + 4, '=' );
-    if( unlikely(!psz_sep) )
-        return;
-    size_t i_keylen = psz_sep - psz_string;
 
-    if( !strncmp( psz_string + 4, "logo", i_keylen - 4 ) )
-        ppsz_meta = &meta->psz_album_art;
-    else if( !strncmp( psz_string + 4, "name", i_keylen - 4 ) )
-        ppsz_meta = &meta->psz_name;
-    else if( !strncmp( psz_string + 4, "language", i_keylen - 4 ) )
-        ppsz_meta = &meta->psz_language;
-    else if( !strncmp( psz_string + 4, "id", i_keylen - 4 ) )
-        ppsz_meta = &meta->psz_tvgid;
-    else if( !strncmp( psz_string + 6, "title", i_keylen - 4 ) )
+    char **ppsz_meta = NULL;
+    *psz = 0;
+    if( !strncasecmp( psz_string, "tvg-", 4 ) )
+    {
+        if( !strcasecmp( psz_string + 4, "logo" ) )
+            ppsz_meta = &meta->psz_album_art;
+        else if( !strcasecmp( psz_string + 4, "name" ) )
+            ppsz_meta = &meta->psz_name;
+        else if( !strcasecmp( psz_string + 4, "language" ) )
+            ppsz_meta = &meta->psz_language;
+        else if( !strcasecmp( psz_string + 4, "id" ) )
+            ppsz_meta = &meta->psz_tvgid;
+    }
+    else if( !strcasecmp( psz_string, "group-title" ) )
+    {
         ppsz_meta = &meta->psz_grouptitle;
+    }
+    *psz = '=';
 
     if( !ppsz_meta || *ppsz_meta /* no overwrite */ )
         return;
 
-    char *psz_value = psz_sep + 1;
-    size_t i_valuelen = strlen( psz_value );
+    size_t i_valuelen = strlen( ++psz );
     if( unlikely(i_valuelen == 0) )
         return;
 
-    bool b_escaped = (*psz_value == '"');
+    bool b_escaped = (*psz == '"');
     if( i_valuelen > 2 && b_escaped )
     {
-        psz_value[ i_valuelen - 1 ] = 0;
-        *ppsz_meta = pf_dup( psz_value + 1 );
+        psz[ i_valuelen - 1 ] = 0;
+        *ppsz_meta = pf_dup( psz + 1 );
     }
     else
-        *ppsz_meta = pf_dup( psz_value );
+        *ppsz_meta = pf_dup( psz );
 }
 
 static void parseEXTINFIptvDiotsInDuration( char *psz_string,
