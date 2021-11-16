@@ -71,9 +71,6 @@ struct vlc_gl_pbuffer
     EGLSurface surface;
     EGLContext context;
 
-    PFNEGLCREATEIMAGEKHRPROC    eglCreateImageKHR;
-    PFNEGLDESTROYIMAGEKHRPROC   eglDestroyImageKHR;
-
     bool current;
 };
 
@@ -105,29 +102,6 @@ static void *GetSymbol(vlc_gl_t *gl, const char *procname)
 {
     (void) gl;
     return (void *)eglGetProcAddress (procname);
-}
-
-static const char *QueryString(vlc_gl_t *gl, int32_t name)
-{
-    struct vlc_gl_pbuffer *sys = gl->sys;
-
-    return eglQueryString(sys->display, name);
-}
-
-static void *CreateImageKHR(vlc_gl_t *gl, unsigned target, void *buffer,
-                            const int32_t *attrib_list)
-{
-    struct vlc_gl_pbuffer *sys = gl->sys;
-
-    return sys->eglCreateImageKHR(sys->display, NULL, target, buffer,
-                                  attrib_list);
-}
-
-static bool DestroyImageKHR(vlc_gl_t *gl, void *image)
-{
-    struct vlc_gl_pbuffer *sys = gl->sys;
-
-    return sys->eglDestroyImageKHR(sys->display, image);
 }
 
 static int InitEGL(vlc_gl_t *gl, unsigned width, unsigned height)
@@ -429,16 +403,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     gl->swap_offscreen = Swap;
     gl->get_proc_address = GetSymbol;
     gl->destroy = Close;
-    gl->egl.queryString = QueryString;
     gl->offscreen_vflip = true;
-
-    sys->eglCreateImageKHR = (void *)eglGetProcAddress("eglCreateImageKHR");
-    sys->eglDestroyImageKHR = (void *)eglGetProcAddress("eglDestroyImageKHR");
-    if (sys->eglCreateImageKHR != NULL && sys->eglDestroyImageKHR != NULL)
-    {
-        gl->egl.createImageKHR = CreateImageKHR;
-        gl->egl.destroyImageKHR = DestroyImageKHR;
-    }
 
     vlc_gl_MakeCurrent(gl);
     int ret = vlc_gl_api_Init(&sys->api, gl);
