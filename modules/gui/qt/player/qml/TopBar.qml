@@ -38,7 +38,7 @@ FocusScope{
     property string title
     property VLCColors colors: VLCStyle.nightColors
     property int groupAlignment: TopBar.GroupAlignment.Vertical
-    property Label _currentTitleText: null
+    property Item _currentTitleText: null
 
     signal tooglePlaylistVisibility()
     signal requestLockUnlockAutoHide(bool lock, var source)
