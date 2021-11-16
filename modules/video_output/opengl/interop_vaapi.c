@@ -65,6 +65,7 @@ struct priv
     {
         EGLDisplay display;
         EGLDisplay (*getCurrentDisplay)();
+        const char *(*queryString)(EGLDisplay, EGLint);
         EGLImage (*createImageKHR)(EGLDisplay, EGLContext, EGLenum target, EGLClientBuffer buffer,
                 const EGLint *attrib_list);
         void (*destroyImageKHR)(EGLDisplay, EGLImage image);
@@ -435,18 +436,12 @@ Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(interop->vctx);
     if (dec_device->type != VLC_DECODER_DEVICE_VAAPI
-     || !vlc_vaapi_IsChromaOpaque(interop->fmt_in.i_chroma)
-     || interop->gl->ext != VLC_GL_EXT_EGL)
+     || !vlc_vaapi_IsChromaOpaque(interop->fmt_in.i_chroma))
     {
         goto error;
     }
 
     if (!vlc_gl_StrHasToken(interop->api->extensions, "GL_OES_EGL_image"))
-        goto error;
-
-    /* EGL_EXT_image_dma_buf_import implies EGL_KHR_image_base */
-    const char *eglexts = interop->gl->egl.queryString(interop->gl, EGL_EXTENSIONS);
-    if (eglexts == NULL || !vlc_gl_StrHasToken(eglexts, "EGL_EXT_image_dma_buf_import"))
         goto error;
 
     priv = interop->priv = calloc(1, sizeof(struct priv));
@@ -481,9 +476,13 @@ Open(vlc_object_t *obj)
     if (priv->egl.display == EGL_NO_DISPLAY)
         goto error;
 
-    priv->glEGLImageTargetTexture2DOES =
-        vlc_gl_GetProcAddress(interop->gl, "glEGLImageTargetTexture2DOES");
-    if (priv->glEGLImageTargetTexture2DOES == NULL)
+    priv->egl.queryString = vlc_gl_GetProcAddress(interop->gl, "eglQueryString");
+    if (priv->egl.queryString == NULL)
+        goto error;
+
+    /* EGL_EXT_image_dma_buf_import implies EGL_KHR_image_base */
+    const char *eglexts = priv->egl.queryString(priv->egl.display, EGL_EXTENSIONS);
+    if (eglexts == NULL || !vlc_gl_StrHasToken(eglexts, "EGL_EXT_image_dma_buf_import"))
         goto error;
 
     priv->egl.createImageKHR =
@@ -494,6 +493,11 @@ Open(vlc_object_t *obj)
     priv->egl.destroyImageKHR =
         vlc_gl_GetProcAddress(interop->gl, "eglDestroyImageKHR");
     if (priv->egl.destroyImageKHR == NULL)
+        goto error;
+
+    priv->glEGLImageTargetTexture2DOES =
+        vlc_gl_GetProcAddress(interop->gl, "glEGLImageTargetTexture2DOES");
+    if (priv->glEGLImageTargetTexture2DOES == NULL)
         goto error;
 
     priv->vadpy = dec_device->opaque;
