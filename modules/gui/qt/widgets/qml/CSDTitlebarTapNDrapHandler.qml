@@ -22,14 +22,14 @@ import QtQuick.Window 2.15
 
 Item {
     TapHandler {
-        onTapped: {
-            if (tapCount === 2) {
+        onDoubleTapped: {
+            
                 if ((topWindow.visibility & Window.Maximized) !== 0) {
                     mainInterface.requestInterfaceNormal()
                 } else {
                     mainInterface.requestInterfaceMaximized()
                 }
-            }
+            
         }
         gesturePolicy: TapHandler.DragThreshold
     }
