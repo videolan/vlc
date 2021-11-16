@@ -593,7 +593,6 @@ codec_LTLIBRARIES += $(LTLIBqsv)
 ### External frameworks ###
 
 libdmo_plugin_la_SOURCES = codec/dmo/dmo.c codec/dmo/dmo.h codec/dmo/buffer.c
-libqsv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libdmo_plugin_la_LIBADD = $(LIBM)
 if HAVE_WIN32
 libdmo_plugin_la_LIBADD += $(LIBCOM) -luuid
