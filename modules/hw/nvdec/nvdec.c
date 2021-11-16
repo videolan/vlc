@@ -1055,6 +1055,14 @@ static const struct vlc_decoder_device_operations dev_ops = {
     .close = DecoderContextClose,
 };
 
+static int cudaInitialized;
+static void initCuda(void *opaque)
+{
+    vlc_decoder_device *device = opaque;
+    decoder_device_nvdec_t *p_sys = device->opaque;
+    cudaInitialized = CALL_CUDA_DEV(cuInit, 0);
+}
+
 static int
 DecoderContextOpen(vlc_decoder_device *device, vout_window_t *window)
 {
@@ -1073,11 +1081,14 @@ DecoderContextOpen(vlc_decoder_device *device, vout_window_t *window)
         return VLC_EGENERIC;
     }
 
-    result = CALL_CUDA_DEV(cuInit, 0);
-    if (result != VLC_SUCCESS)
+    /* Use the current device functions if not initialized yet. */
+    static vlc_once_t init_once = VLC_STATIC_ONCE;
+    vlc_once(&init_once, initCuda, device);
+
+    if (cudaInitialized != CUDA_SUCCESS)
     {
         DecoderContextClose(device);
-        return result;
+        return VLC_EGENERIC;
     }
 
     result = CALL_CUDA_DEV(cuCtxCreate, &p_sys->cuCtx, 0, 0);
