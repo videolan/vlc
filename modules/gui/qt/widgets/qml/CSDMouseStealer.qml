@@ -20,34 +20,82 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 
 Item {
-    parent: g_root
+    id: root
+
+    property int csdSize: mainInterface.csdBorderSize
+
+    //private
+    readonly property int _edgeVtHeight: g_root.height - root.csdSize * 2
+    readonly property int _edgeHzWidth: g_root.width - root.csdSize * 2
 
     Repeater {
         model: [
+            //Edges
             {
-                x: 0,
+                edge: Qt.TopEdge,
+                x: root.csdSize,
                 y: 0,
-                width: g_root.width,
-                height: mainInterface.csdBorderSize
+                width: root._edgeHzWidth,
+                height: root.csdSize,
+                cursor: Qt.SizeVerCursor,
             },
             {
+                edge: Qt.LeftEdge,
                 x: 0,
-                y: 0,
-                width: mainInterface.csdBorderSize,
-                height: g_root.height
+                y: root.csdSize,
+                width: root.csdSize,
+                height: root._edgeVtHeight,
+                cursor: Qt.SizeHorCursor,
             },
             {
-                x: g_root.width - mainInterface.csdBorderSize,
-                y: 0,
-                width: mainInterface.csdBorderSize,
-                height: g_root.height
+                edge: Qt.RightEdge,
+                x: g_root.width - root.csdSize,
+                y: root.csdSize,
+                width: root.csdSize,
+                height: root._edgeVtHeight,
+                cursor: Qt.SizeHorCursor,
             },
             {
+                edge: Qt.BottomEdge,
+                x: root.csdSize,
+                y: g_root.height - root.csdSize,
+                width: root._edgeHzWidth,
+                height: root.csdSize,
+                cursor: Qt.SizeVerCursor,
+            },
+            //Corners
+            {
+                edge: Qt.TopEdge | Qt.LeftEdge,
                 x: 0,
-                y: g_root.height - mainInterface.csdBorderSize,
-                width: g_root.width,
-                height: mainInterface.csdBorderSize
-            }
+                y: 0,
+                width: root.csdSize,
+                height: root.csdSize,
+                cursor: Qt.SizeFDiagCursor,
+            },
+            {
+                edge: Qt.BottomEdge | Qt.LeftEdge,
+                x: 0,
+                y: g_root.height - root.csdSize,
+                width: root.csdSize,
+                height: root.csdSize,
+                cursor: Qt.SizeBDiagCursor,
+            },
+            {
+                edge: Qt.TopEdge | Qt.RightEdge,
+                x: g_root.width - root.csdSize,
+                y: 0,
+                width: root.csdSize,
+                height: root.csdSize,
+                cursor: Qt.SizeBDiagCursor,
+            },
+            {
+                edge: Qt.BottomEdge | Qt.RightEdge,
+                x: g_root.width - root.csdSize,
+                y: g_root.height - root.csdSize,
+                width: root.csdSize,
+                height: root.csdSize,
+                cursor: Qt.SizeFDiagCursor,
+            },
         ]
 
         delegate: MouseArea {
@@ -58,6 +106,10 @@ Item {
             height: modelData.height
 
             hoverEnabled: true
+            cursorShape: modelData.cursor
+            acceptedButtons: Qt.LeftButton
+
+            onPressed: topWindow.startSystemResize(modelData.edge)
         }
     }
 }

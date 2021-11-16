@@ -118,58 +118,6 @@ InterfaceWindowHandler::~InterfaceWindowHandler()
 }
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
-bool InterfaceWindowHandler::CSDSetCursor(QMouseEvent* mouseEvent)
-{
-    if (!m_mainInterface->useClientSideDecoration())
-        return false;
-    if ((m_window->visibility() & QWindow::Maximized) != 0)
-        return false;
-    Qt::CursorShape shape;
-    const int x = mouseEvent->x();
-    const int y = mouseEvent->y();
-    const int winHeight = m_window->height();
-    const int winWidth = m_window->width();
-    const int b = m_mainInterface->CSDBorderSize();
-
-    if (x < b && y < b) shape = Qt::SizeFDiagCursor;
-    else if (x >= winWidth - b && y >= winHeight - b) shape = Qt::SizeFDiagCursor;
-    else if (x >= winWidth - b && y < b) shape = Qt::SizeBDiagCursor;
-    else if (x < b && y >= winHeight - b) shape = Qt::SizeBDiagCursor;
-    else if (x < b || x >= winWidth - b) shape = Qt::SizeHorCursor;
-    else if (y < b || y >= winHeight - b) shape = Qt::SizeVerCursor;
-    else if (m_hasResizeCursor) {
-        m_window->unsetCursor();
-        m_hasResizeCursor = false;
-        return false;
-    } else {
-        return false;
-    }
-    m_hasResizeCursor = true;
-    m_window->setCursor(shape);
-    return false;
-}
-
-bool InterfaceWindowHandler::CSDHandleClick(QMouseEvent* mouseEvent)
-{
-    if (!m_mainInterface->useClientSideDecoration())
-        return false;
-    const int b = m_mainInterface->CSDBorderSize();
-    if( mouseEvent->buttons() != Qt::LeftButton)
-        return false;
-    if ((m_window->visibility() & QWindow::Maximized) != 0)
-        return false;
-    Qt::Edges edge;
-    if (mouseEvent->x() < b) { edge |= Qt::LeftEdge; }
-    if (mouseEvent->x() > m_window->width() - b) { edge |= Qt::RightEdge; }
-    if (mouseEvent->y() < b) { edge |= Qt::TopEdge; }
-    if (mouseEvent->y() > m_window->height() - b) { edge |= Qt::BottomEdge; }
-    if (edge != 0) {
-        m_window->startSystemResize(edge);
-        return true;
-    }
-    return false;
-}
-
 void InterfaceWindowHandler::updateCSDWindowSettings()
 {
     m_window->hide(); // some window managers don't like to change frame window hint on visible window
@@ -283,19 +231,6 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
             return true;
         }
     }
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
-    //Handle CSD edge behaviors
-    case QEvent::MouseMove:
-    {
-        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
-        return CSDSetCursor(mouseEvent);
-    }
-    case QEvent::MouseButtonPress:
-    {
-        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
-        return CSDHandleClick(mouseEvent);
-    }
-#endif
     default:
         break;
     }

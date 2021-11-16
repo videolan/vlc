@@ -56,8 +56,6 @@ signals:
 
 private:
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
-    bool CSDSetCursor(QMouseEvent* mouseEvent);
-    bool CSDHandleClick(QMouseEvent* mouseEvent);
     virtual void updateCSDWindowSettings();
 #endif
 
