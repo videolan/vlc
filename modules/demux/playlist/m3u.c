@@ -252,6 +252,7 @@ static int CreateEntry( input_item_node_t *p_node, const struct entry_meta_s *me
 static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 {
     char       *psz_line;
+    char       *psz_group = NULL; /* group is toggling tag */
     struct entry_meta_s meta;
     entry_meta_Init( &meta );
     char *    (*pf_dup) (const char *) = p_demux->p_sys;
@@ -282,6 +283,15 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                 psz_parse += sizeof("EXTINF:") - 1;
                 meta.i_duration = INPUT_DURATION_INDEFINITE;
                 parseEXTINF( psz_parse, pf_dup, &meta );
+            }
+            else if( !strncasecmp( psz_parse, "EXTGRP:", sizeof("EXTGRP:") -1 ) )
+            {
+                psz_parse += sizeof("EXTGRP:") - 1;
+                if( *psz_parse )
+                {
+                    free( psz_group );
+                    psz_group = pf_dup( psz_parse );
+                }
             }
             else if( !strncasecmp( psz_parse, "EXTVLCOPT:",
                                    sizeof("EXTVLCOPT:") -1 ) )
@@ -323,6 +333,8 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
             if( !meta.psz_name && psz_parse )
                 /* Use filename as name for relative entries */
                 meta.psz_name = strdup( psz_parse );
+            if( psz_group && !meta.psz_grouptitle )
+                meta.psz_grouptitle = strdup( psz_group );
 
             meta.psz_mrl = ProcessMRL( psz_parse, p_demux->psz_url );
             free( psz_parse );
@@ -343,6 +355,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
             /* Cleanup state */
             entry_meta_Clean( &meta );
             entry_meta_Init( &meta );
+            free( psz_group );
         }
     }
     return VLC_SUCCESS; /* Needed for correct operation of go back */
