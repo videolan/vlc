@@ -1679,8 +1679,7 @@ no_reuse:
         const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(hwfmt);
         vlc_decoder_device *init_device = NULL;
         msg_Dbg(p_dec, "trying format %s", dsc ? dsc->name : "unknown");
-        if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt, &init_device) ||
-            init_device == NULL)
+        if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt, &init_device))
             continue; /* Unsupported brand of hardware acceleration */
         vlc_mutex_unlock(&p_sys->lock);
 
