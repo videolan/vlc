@@ -342,7 +342,7 @@ void QtVLCWidget::paintGL()
 {
     QOpenGLFunctions *GL = context()->functions();
     QOpenGLFramebufferObject *fbo = mVLC->getVideoFrame();
-    if (fbo != NULL && GL != NULL)
+    if (fbo != nullptr && GL != nullptr)
     {
         m_program->bind();
 
@@ -353,7 +353,6 @@ void QtVLCWidget::paintGL()
 
         vertexBuffer.bind();
         m_program->setAttributeArray("position", (const QVector2D *)nullptr, sizeof(GLfloat)*2);
-        //vertexBuffer.release();
 
         m_program->enableAttributeArray("position");
 
@@ -364,11 +363,8 @@ void QtVLCWidget::paintGL()
             GL_UNSIGNED_SHORT,  /* type */
             (void*)0            /* element array buffer offset */
         );
-        //vertexIndexBuffer.release();
 
         m_program->disableAttributeArray("position");
-
-        //m_program->release();
     }
 }
 
