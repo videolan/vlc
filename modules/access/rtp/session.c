@@ -472,7 +472,7 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
             vlc_rtp_pt_end(src->pt.instance, src->pt.opaque);
 
         src->pt.instance = pt;
-        src->pt.opaque = vlc_rtp_pt_begin(pt, demux);
+        src->pt.opaque = vlc_rtp_pt_begin(pt);
     }
 
     /* Computes the PTS from the RTP timestamp and payload RTP frequency.

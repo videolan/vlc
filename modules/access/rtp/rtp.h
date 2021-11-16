@@ -83,7 +83,7 @@ struct vlc_rtp_pt_operations {
      * \param pt RTP payload format being taken into use
      * \return a data pointer for decode() and destroy() callbacks
      */
-    void *(*init)(struct vlc_rtp_pt *pt, demux_t *);
+    void *(*init)(struct vlc_rtp_pt *pt);
 
     /**
      * Stops using a payload format.
@@ -139,13 +139,12 @@ void vlc_rtp_pt_release(struct vlc_rtp_pt *pt);
  * type for use by an unique RTP source.
  *
  * @param pt RTP payload type to instantiate
- * @param demux demux object for output
  * @return private data for the instance
  */
-static inline void *vlc_rtp_pt_begin(struct vlc_rtp_pt *pt, demux_t *demux)
+static inline void *vlc_rtp_pt_begin(struct vlc_rtp_pt *pt)
 {
     assert(pt->ops->init != NULL);
-    return pt->ops->init(pt, demux);
+    return pt->ops->init(pt);
 }
 
 /**

@@ -28,7 +28,6 @@
 #include <errno.h>
 
 #include <vlc_common.h>
-#include <vlc_demux.h>
 #include <vlc_aout.h> /* aout_FormatPrepare() */
 
 #include "rtp.h"
@@ -59,7 +58,7 @@ static void codec_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
 /* PT=0
  * PCMU: G.711 µ-law (RFC3551)
  */
-static void *pcmu_init(struct vlc_rtp_pt *pt, demux_t *demux)
+static void *pcmu_init(struct vlc_rtp_pt *pt)
 {
     es_format_t fmt;
 
@@ -76,7 +75,7 @@ static const struct vlc_rtp_pt_operations rtp_audio_pcmu = {
 /* PT=3
  * GSM
  */
-static void *gsm_init(struct vlc_rtp_pt *pt, demux_t *demux)
+static void *gsm_init(struct vlc_rtp_pt *pt)
 {
     es_format_t fmt;
 
@@ -93,7 +92,7 @@ static const struct vlc_rtp_pt_operations rtp_audio_gsm = {
 /* PT=8
  * PCMA: G.711 A-law (RFC3551)
  */
-static void *pcma_init(struct vlc_rtp_pt *pt, demux_t *demux)
+static void *pcma_init(struct vlc_rtp_pt *pt)
 {
     es_format_t fmt;
 
@@ -110,7 +109,7 @@ static const struct vlc_rtp_pt_operations rtp_audio_pcma = {
 /* PT=10,11
  * L16: 16-bits (network byte order) PCM
  */
-static void *l16_init(struct vlc_rtp_pt *pt, demux_t *demux)
+static void *l16_init(struct vlc_rtp_pt *pt)
 {
     es_format_t fmt;
 
@@ -127,7 +126,7 @@ static const struct vlc_rtp_pt_operations rtp_audio_l16 = {
 /* PT=12
  * QCELP
  */
-static void *qcelp_init(struct vlc_rtp_pt *pt, demux_t *demux)
+static void *qcelp_init(struct vlc_rtp_pt *pt)
 {
     es_format_t fmt;
 
@@ -144,7 +143,7 @@ static const struct vlc_rtp_pt_operations rtp_audio_qcelp = {
 /* PT=14
  * MPA: MPEG Audio (RFC2250, §3.4)
  */
-static void *mpa_init(struct vlc_rtp_pt *pt, demux_t *demux)
+static void *mpa_init(struct vlc_rtp_pt *pt)
 {
     es_format_t fmt;
 
@@ -175,7 +174,7 @@ static const struct vlc_rtp_pt_operations rtp_audio_mpa = {
 /* PT=32
  * MPV: MPEG Video (RFC2250, §3.5)
  */
-static void *mpv_init(struct vlc_rtp_pt *pt, demux_t *demux)
+static void *mpv_init(struct vlc_rtp_pt *pt)
 {
     es_format_t fmt;
 
@@ -213,7 +212,7 @@ static const struct vlc_rtp_pt_operations rtp_video_mpv = {
 /* PT=33
  * MP2: MPEG TS (RFC2250, §2)
  */
-static void *ts_init(struct vlc_rtp_pt *pt, demux_t *demux)
+static void *ts_init(struct vlc_rtp_pt *pt)
 {
     return vlc_rtp_mux_request(pt, "ts");
 }
