@@ -98,13 +98,6 @@ static void *GetSymbol(vlc_gl_t *gl, const char *procname)
     return (void *)eglGetProcAddress (procname);
 }
 
-static const char *QueryString(vlc_gl_t *gl, int32_t name)
-{
-    vlc_gl_sys_t *sys = gl->sys;
-
-    return eglQueryString(sys->display, name);
-}
-
 static bool CheckAPI (EGLDisplay dpy, const char *api)
 {
     const char *apis = eglQueryString (dpy, EGL_CLIENT_APIS);
@@ -367,14 +360,12 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
     sys->context = ctx;
 
     /* Initialize OpenGL callbacks */
-    gl->ext = VLC_GL_EXT_EGL;
     gl->make_current = MakeCurrent;
     gl->release_current = ReleaseCurrent;
     gl->resize = Resize;
     gl->swap = SwapBuffers;
     gl->get_proc_address = GetSymbol;
     gl->destroy = Close;
-    gl->egl.queryString = QueryString;
 
     return VLC_SUCCESS;
 

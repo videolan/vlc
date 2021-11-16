@@ -219,7 +219,6 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 
     wglMakeCurrent(sys->hGLDC, NULL);
 
-    gl->ext = VLC_GL_EXT_WGL;
     gl->make_current = MakeCurrent;
     gl->release_current = ReleaseCurrent;
     gl->resize = NULL;

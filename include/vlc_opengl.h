@@ -76,31 +76,6 @@ struct vlc_gl_t
     void*(*get_proc_address)(vlc_gl_t *, const char *);
     void (*destroy)(vlc_gl_t *);
 
-    enum {
-        VLC_GL_EXT_DEFAULT,
-        VLC_GL_EXT_EGL,
-        VLC_GL_EXT_WGL,
-    } ext;
-
-    union {
-        /* if ext == VLC_GL_EXT_EGL */
-        struct {
-            /* call eglQueryString() with current display */
-            const char *(*queryString)(vlc_gl_t *, int32_t name);
-            /* call eglCreateImageKHR() with current display and context, can
-             * be NULL */
-            void *(*createImageKHR)(vlc_gl_t *, unsigned target, void *buffer,
-                                    const int32_t *attrib_list);
-            /* call eglDestroyImageKHR() with current display, can be NULL */
-            bool (*destroyImageKHR)(vlc_gl_t *, void *image);
-        } egl;
-        /* if ext == VLC_GL_EXT_WGL */
-        struct
-        {
-            const char *(*getExtensionsString)(vlc_gl_t *);
-        } wgl;
-    };
-
     /* Defined by the core for libvlc_opengl API loading. */
     enum vlc_gl_api_type api_type;
 };

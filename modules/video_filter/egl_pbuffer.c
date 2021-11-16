@@ -396,7 +396,6 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
         goto error1;
     }
 
-    gl->ext = VLC_GL_EXT_EGL;
     gl->make_current = MakeCurrent;
     gl->release_current = ReleaseCurrent;
     gl->resize = NULL;
