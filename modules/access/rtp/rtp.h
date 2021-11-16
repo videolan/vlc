@@ -222,7 +222,7 @@ struct vlc_rtp_es *vlc_rtp_es_request(void *, const es_format_t *fmt);
 struct vlc_rtp_es *vlc_rtp_mux_request(void *, const char *name);
 
 
-void rtp_autodetect(vlc_object_t *, rtp_session_t *, const block_t *);
+void rtp_autodetect(vlc_object_t *, rtp_session_t *);
 
 static inline uint8_t rtp_ptype (const block_t *block)
 {
@@ -266,6 +266,5 @@ typedef struct
     uint16_t      max_dropout; /**< Max packet forward misordering */
     uint16_t      max_misorder; /**< Max packet backward misordering */
     uint8_t       max_src; /**< Max simultaneous RTP sources */
-    bool          autodetect; /**< Payload type autodetection pending */
 } demux_sys_t;
 

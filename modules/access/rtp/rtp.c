@@ -381,7 +381,6 @@ static int OpenSDP(vlc_object_t *obj)
     sys->timeout = vlc_tick_from_sec(var_InheritInteger(obj, "rtp-timeout"));
     sys->max_dropout  = var_InheritInteger(obj, "rtp-max-dropout");
     sys->max_misorder = -var_InheritInteger(obj, "rtp-max-misorder");
-    sys->autodetect = false;
 
     demux->pf_demux = NULL;
     demux->pf_control = Control;
@@ -533,7 +532,6 @@ static int OpenURL(vlc_object_t *obj)
     p_sys->timeout      = vlc_tick_from_sec( var_CreateGetInteger (obj, "rtp-timeout") );
     p_sys->max_dropout  = var_CreateGetInteger (obj, "rtp-max-dropout");
     p_sys->max_misorder = -var_CreateGetInteger (obj, "rtp-max-misorder");
-    p_sys->autodetect   = true;
 
     demux->pf_demux   = NULL;
     demux->pf_control = Control;
@@ -542,6 +540,8 @@ static int OpenURL(vlc_object_t *obj)
     p_sys->session = rtp_session_create (demux);
     if (p_sys->session == NULL)
         goto error;
+
+    rtp_autodetect(VLC_OBJECT(demux), p_sys->session);
 
 #ifdef HAVE_SRTP
     char *key = var_CreateGetNonEmptyString (demux, "srtp-key");

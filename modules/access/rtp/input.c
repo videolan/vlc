@@ -74,13 +74,6 @@ static void rtp_process (demux_t *demux, block_t *block)
     }
 #endif
 
-    /* TODO: use SDP and get rid of this hack */
-    if (unlikely(sys->autodetect))
-    {   /* Autodetect payload type, _before_ rtp_queue() */
-        rtp_autodetect(VLC_OBJECT(demux), sys->session, block);
-        sys->autodetect = false;
-    }
-
     rtp_queue (demux, sys->session, block);
     return;
 drop:

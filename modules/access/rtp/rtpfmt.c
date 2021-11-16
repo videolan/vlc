@@ -229,8 +229,7 @@ static const struct vlc_rtp_pt_operations rtp_av_ts = {
 
 /* Not using SDP, we need to guess the payload format used */
 /* see http://www.iana.org/assignments/rtp-parameters */
-void rtp_autodetect(vlc_object_t *obj, rtp_session_t *session,
-                    const block_t *block)
+void rtp_autodetect(vlc_object_t *obj, rtp_session_t *session)
 {
     char type[] = "audio", proto[] = "RTP/AVP";
     char format[] = "0 3 8 10 11 12 14 33";
