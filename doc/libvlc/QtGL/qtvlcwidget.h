@@ -33,7 +33,7 @@ protected:
 
 private:
     QOpenGLVertexArrayObject m_vao;
-    QOpenGLShaderProgram *m_program;
+    std::unique_ptr<QOpenGLShaderProgram> m_program;
 
     std::unique_ptr<class VLCVideo> mVLC;
 

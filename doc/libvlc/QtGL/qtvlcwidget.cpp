@@ -18,10 +18,6 @@ public:
     VLCVideo(QtVLCWidget *widget)
         :mWidget(widget)
     {
-        mBuffers[0] = NULL;
-        mBuffers[1] = NULL;
-        mBuffers[2] = NULL;
-
         /* Use default format for context. */
         mContext = new QOpenGLContext(widget);
 
@@ -62,7 +58,7 @@ public:
             std::swap(m_idx_swap, m_idx_display);
             m_updated = false;
         }
-        return mBuffers[m_idx_display];
+        return mBuffers[m_idx_display].get();
     }
 
     /// this callback will create the surfaces and FBO used by VLC to perform its rendering
@@ -73,9 +69,8 @@ public:
         if (cfg->width != that->m_width || cfg->height != that->m_height)
             cleanup(data);
 
-        that->mBuffers[0] = new QOpenGLFramebufferObject(cfg->width, cfg->height);
-        that->mBuffers[1] = new QOpenGLFramebufferObject(cfg->width, cfg->height);
-        that->mBuffers[2] = new QOpenGLFramebufferObject(cfg->width, cfg->height);
+        for (auto &buffer : that->mBuffers)
+            buffer = std::make_unique<QOpenGLFramebufferObject>(cfg->width, cfg->height);
 
         that->m_width = cfg->width;
         that->m_height = cfg->height;
@@ -121,12 +116,8 @@ public:
 
         if (that->m_width == 0 && that->m_height == 0)
             return;
-        delete that->mBuffers[0];
-        that->mBuffers[0] = NULL;
-        delete that->mBuffers[1];
-        that->mBuffers[1] = NULL;
-        delete that->mBuffers[2];
-        that->mBuffers[2] = NULL;
+        for (auto &buffer : that->mBuffers)
+            buffer.reset(nullptr);
     }
 
     //This callback is called after VLC performs drawing calls
@@ -176,7 +167,7 @@ private:
     unsigned m_width = 0;
     unsigned m_height = 0;
     QMutex m_text_lock;
-    QOpenGLFramebufferObject *mBuffers[3];
+    std::unique_ptr<QOpenGLFramebufferObject> mBuffers[3];
     size_t m_idx_render = 0;
     size_t m_idx_swap = 1;
     size_t m_idx_display = 2;
@@ -186,7 +177,6 @@ private:
 
 QtVLCWidget::QtVLCWidget(QWidget *parent)
     : QOpenGLWidget(parent),
-      m_program(nullptr),
       vertexBuffer(QOpenGLBuffer::VertexBuffer),
       vertexIndexBuffer(QOpenGLBuffer::IndexBuffer)
 {
@@ -257,8 +247,7 @@ void QtVLCWidget::cleanup()
     makeCurrent();
     vertexBuffer.destroy();
     vertexIndexBuffer.destroy();
-    delete m_program;
-    m_program = 0;
+    m_program.reset(nullptr);
     doneCurrent();
 }
 
@@ -337,7 +326,7 @@ void QtVLCWidget::initializeGL()
     vertexIndexBuffer.bind();
     vertexIndexBuffer.allocate(g_element_buffer_data, sizeof(g_element_buffer_data));
 
-    m_program = new QOpenGLShaderProgram;
+    m_program = std::make_unique<QOpenGLShaderProgram>();
     m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
     m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
     m_program->link();
