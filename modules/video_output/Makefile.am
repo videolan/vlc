@@ -317,9 +317,9 @@ vout_LTLIBRARIES += $(LTLIBfb)
 libkms_plugin_la_SOURCES = video_output/kms.c
 libkms_plugin_la_CFLAGS = $(AM_CFLAGS) $(KMS_CFLAGS)
 libkms_plugin_la_LIBADD = $(KMS_LIBS)
-libkms_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
-EXTRA_LTLIBRARIES += libkms_plugin.la
-vout_LTLIBRARIES += $(LTLIBkms)
+if HAVE_KMS
+vout_LTLIBRARIES += libkms_plugin.la
+endif
 
 
 ### Coloured ASCII art ###
