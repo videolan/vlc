@@ -363,20 +363,13 @@ void input_resource_SetInput( input_resource_t *p_resource, input_thread_t *p_in
 }
 
 static void input_resource_PutVoutLocked(input_resource_t *p_resource,
-                                         vout_thread_t *vout, bool *has_stopped)
+                                         vout_thread_t *vout)
 {
     assert(vout != NULL);
     struct vout_resource *vout_rsc = resource_GetVoutRsc(p_resource, vout);
     assert(vout_rsc != NULL);
 
-    if (has_stopped != NULL)
-        *has_stopped = vout_rsc->started;
-
-    if (vout_rsc->started)
-    {
-        vout_StopDisplay(vout_rsc->vout);
-        vout_rsc->started = false;
-    }
+    vout_StopDisplay(vout_rsc->vout);
 
     if (vout_rsc == resource_GetFirstVoutRsc(p_resource))
     {
@@ -401,10 +394,10 @@ static void input_resource_PutVoutLocked(input_resource_t *p_resource,
 }
 
 void input_resource_PutVout(input_resource_t *p_resource,
-                                   vout_thread_t *vout, bool *stopped)
+                            vout_thread_t *vout)
 {
     vlc_mutex_lock( &p_resource->lock );
-    input_resource_PutVoutLocked( p_resource, vout, stopped );
+    input_resource_PutVoutLocked( p_resource, vout);
     vlc_mutex_unlock( &p_resource->lock );
 }
 
@@ -456,14 +449,10 @@ RequestVoutRsc(input_resource_t *p_resource)
 vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
                                           vlc_video_context *vctx,
                                           const vout_configuration_t *cfg,
-                                          enum vlc_vout_order *order,
-                                          bool *has_started)
+                                          enum vlc_vout_order *order)
 {
     vlc_mutex_lock( &p_resource->lock );
     struct vout_resource *vout_rsc = NULL;
-
-    if (has_started != NULL)
-        *has_started = false;
 
     vout_configuration_t dcfg = *cfg;
     if (dcfg.vout == NULL)
@@ -500,27 +489,15 @@ vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
         return dcfg.vout;
     }
 
-    if (vout_rsc->started)
-    {
-        assert(cfg->vout != NULL);
-        int ret = vout_ChangeSource(dcfg.vout, dcfg.fmt);
-        if (ret == 0)
-        {
-            vlc_mutex_unlock(&p_resource->lock);
-            return dcfg.vout;
-        }
-    }
-
     if (vout_Request(&dcfg, vctx, p_resource->p_input)) {
-        input_resource_PutVoutLocked(p_resource, dcfg.vout, NULL);
+        vout_rsc->started = false;
+        input_resource_PutVoutLocked(p_resource, dcfg.vout);
         vlc_mutex_unlock(&p_resource->lock);
         return NULL;
     }
 
-    vout_rsc->started = true;
-    if (has_started != NULL)
-        *has_started = true;
-
+#if 0
+    /* TODO: move this to input */
     DisplayVoutTitle(p_resource, cfg->vout);
 
     /* Send original viewpoint to the input in order to update other ESes */
@@ -530,6 +507,7 @@ vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
         input_ControlPush(p_resource->p_input, INPUT_CONTROL_SET_INITIAL_VIEWPOINT,
                           &param);
     }
+#endif
     vlc_mutex_unlock( &p_resource->lock );
 
     return dcfg.vout;

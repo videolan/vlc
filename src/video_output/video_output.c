@@ -2684,6 +2684,8 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     assert(cfg->fmt != NULL);
     assert(cfg->clock != NULL);
 
+    /* TODO: locking */
+
     if (!VoutCheckFormat(cfg->fmt))
         /* don't stop the display and keep sys->original */
         return -1;
@@ -2711,7 +2713,10 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     vlc_mutex_unlock(&sys->window_lock);
 
     if (sys->display != NULL)
+    {
         vout_StopDisplay(cfg->vout);
+        vout_ReportStateChange(cfg->vout, VOUT_THREAD_STATE_STOPPED);
+    }
 
     vout_ReinitInterlacingSupport(cfg->vout, &sys->private);
 
@@ -2728,6 +2733,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
         vout_DisableWindow(vout);
         return -1;
     }
+
     atomic_store(&sys->control_is_terminated, false);
     if (vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
         vout_ReleaseDisplay(vout);
@@ -2738,6 +2744,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     if (input != NULL && sys->spu)
         spu_Attach(sys->spu, input);
     vout_IntfReinit(cfg->vout);
+    vout_ReportStateChange(cfg->vout, VOUT_THREAD_STATE_STARTED);
 
 end:
     cfg->vout->owner = cfg->video.opaque;
