@@ -191,6 +191,30 @@ static const char * const lut_mode_text[] = {
 #define USER_SHADER_FILE_TEXT "Custom shader"
 #define USER_SHADER_FILE_LONGTEXT "Path to a file containing a custom user shader, in mpv .hook format."
 
+enum {
+    OUTPUT_AUTO,
+    OUTPUT_SDR,
+    OUTPUT_HDR10,
+    OUTPUT_HLG,
+};
+
+static const int output_values[] = {
+    OUTPUT_AUTO,
+    OUTPUT_SDR,
+    OUTPUT_HDR10,
+    OUTPUT_HLG,
+};
+
+static const char * const output_text[] = {
+    "Automatic (passthrough)",
+    "Standard gamut SDR",
+    "HDR10 (BT.2020+PQ)",
+    "BT.2020+HLG",
+};
+
+#define OUTPUT_HINT_TEXT "Display output colorspace"
+#define OUTPUT_HINT_LONGTEXT "Determines what colorspace to try configuring the display to. Note that the HDR modes require a compatible driver and display."
+
 #define TONEMAPPING_TEXT "Tone-mapping algorithm"
 #define TONEMAPPING_LONGTEXT "Algorithm to use when converting from wide gamut to standard gamut, or from HDR to SDR."
 

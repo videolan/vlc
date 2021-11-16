@@ -96,6 +96,7 @@ static void PictureDisplay(vout_display_t *, picture_t *);
 static int Control(vout_display_t *, int);
 static void Close(vout_display_t *);
 static void UpdateParams(vout_display_t *);
+static void UpdateColorspaceHint(vout_display_t *, const video_format_t *);
 
 static const struct vlc_display_operations ops = {
     .close = Close,
@@ -126,6 +127,9 @@ static int Open(vout_display_t *vd,
 
     if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
         goto error;
+
+    // Set colorsapce hint *before* first swapchain resize
+    UpdateColorspaceHint(vd, fmt);
 
     // Set initial framebuffer size
     int width = (int) vd->cfg->display.width;
@@ -465,6 +469,53 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic)
     }
 }
 
+static void UpdateColorspaceHint(vout_display_t *vd, const video_format_t *fmt)
+{
+#if PL_API_VER >= 155
+
+    vout_display_sys_t *sys = vd->sys;
+    struct pl_swapchain_colors hint = {0};
+
+    switch (var_InheritBool(vd, "pl-output-hint")) {
+    case OUTPUT_AUTO: ;
+        const struct pl_color_space csp = vlc_placebo_ColorSpace(fmt);
+        hint.primaries = csp.primaries;
+        hint.transfer = csp.transfer;
+        hint.hdr = (struct pl_hdr_metadata) {
+            .prim.green.x   = fmt->mastering.primaries[0] / 50000.0f,
+            .prim.green.y   = fmt->mastering.primaries[1] / 50000.0f,
+            .prim.blue.x    = fmt->mastering.primaries[2] / 50000.0f,
+            .prim.blue.y    = fmt->mastering.primaries[3] / 50000.0f,
+            .prim.red.x     = fmt->mastering.primaries[4] / 50000.0f,
+            .prim.red.y     = fmt->mastering.primaries[5] / 50000.0f,
+            .prim.white.x   = fmt->mastering.white_point[0] / 50000.0f,
+            .prim.white.y   = fmt->mastering.white_point[1] / 50000.0f,
+            .max_luma       = fmt->mastering.max_luminance / 10000.0f,
+            .min_luma       = fmt->mastering.min_luminance / 10000.0f,
+            .max_cll        = fmt->lighting.MaxCLL,
+            .max_fall       = fmt->lighting.MaxFALL,
+        };
+        break;
+    case OUTPUT_SDR:
+        break;
+    case OUTPUT_HDR10:
+        hint.primaries = PL_COLOR_PRIM_BT_2020;
+        hint.transfer = PL_COLOR_TRC_PQ;
+        break;
+    case OUTPUT_HLG:
+        hint.primaries = PL_COLOR_PRIM_BT_2020;
+        hint.transfer = PL_COLOR_TRC_HLG;
+        break;
+    }
+
+    pl_swapchain_colorspace_hint(sys->pl->swapchain, &hint);
+
+#else // PL_API_VER
+    VLC_UNUSED(vd);
+    VLC_UNUSED(fmt);
+#endif
+}
+
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -654,6 +705,10 @@ vlc_module_begin ()
             DEBAND_GRAIN_TEXT, DEBAND_GRAIN_LONGTEXT)
 
     set_section("Colorspace conversion", NULL)
+#if PL_API_VER >= 155
+    add_integer("pl-output-hint", true, OUTPUT_HINT_TEXT, OUTPUT_HINT_LONGTEXT)
+            change_integer_list(output_values, output_text)
+#endif
     add_integer("pl-intent", pl_color_map_default_params.intent,
             RENDER_INTENT_TEXT, RENDER_INTENT_LONGTEXT)
             change_integer_list(intent_values, intent_text)
