@@ -29,7 +29,6 @@
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
-#include <vlc_dialog.h>
 #include <vlc_aout.h> /* aout_FormatPrepare() */
 
 #include "rtp.h"
@@ -233,25 +232,15 @@ static const struct vlc_rtp_pt_operations rtp_av_ts = {
 void rtp_autodetect(vlc_object_t *obj, rtp_session_t *session,
                     const block_t *block)
 {
-    uint8_t ptype = rtp_ptype (block);
-    char type[6], proto[] = "RTP/AVP", numstr[4];
+    char type[] = "audio", proto[] = "RTP/AVP";
+    char format[] = "0 3 8 10 11 12 14 33";
     struct vlc_sdp_media media = {
-        .type = type, .port_count = 1, .proto = proto, .format = numstr
-    };
+        .type = type, .port_count = 1, .proto = proto, .format = format };
 
-    /* We only support static audio subtypes except MPV (PT=32).
-     * MP2T (PT=33) can be treated as either audio or video. */
-    memcpy(type, (ptype == 32) ? "video" : "audio", 6);
-    snprintf(numstr, sizeof (numstr), "%hhu", ptype);
-
-    if (vlc_rtp_add_media_types(obj, session, &media)) {
-        msg_Err(obj, "unspecified payload format (type %"PRIu8")", ptype);
-        msg_Info(obj, "A valid SDP is needed to parse this RTP stream.");
-        vlc_dialog_display_error(obj, N_("SDP required"),
-             N_("A description in SDP format is required to receive the RTP "
-                "stream. Note that rtp:// URIs cannot work with dynamic "
-                "RTP payload format (%"PRIu8")."), ptype);
-    }
+    vlc_rtp_add_media_types(obj, session, &media);
+    strcpy(type, "video");
+    strcpy(format, "32");
+    vlc_rtp_add_media_types(obj, session, &media);
 }
 
 /*
