@@ -556,7 +556,7 @@ libvlccore_la_LDFLAGS = \
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
 libvlccore_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
-libvlccore_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT) -avoid-version -Wc,-static $(LIBCOM)
+libvlccore_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT) -avoid-version -Wc,-static
 endif
 if HAVE_OS2
 libvlccore_la_LDFLAGS += -avoid-version
