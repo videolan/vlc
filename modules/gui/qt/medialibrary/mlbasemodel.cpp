@@ -257,21 +257,12 @@ void MLBaseModel::onVlcMlEvent(const MLEvent &event)
                 if (stotal == COUNT_UNINITIALIZED)
                     break;
 
-                size_t total = static_cast<size_t>(stotal);
-                for (size_t i = 0; i < total; ++i)
-                {
-                    const std::unique_ptr<MLItem> *item = m_cache->get(i);
-                    if (!item)
-                        /* Only consider items available locally in cache */
-                        break;
+                int index = 0;
 
-                    MLItem *localItem = item->get();
-                    if (localItem->getId().id == event.media_thumbnail_generated.i_media_id)
-                    {
-                        thumbnailUpdated(i);
-                        break;
-                    }
-                }
+                /* Only consider items available locally in cache */
+                const auto item = findInCache(event.media_thumbnail_generated.i_media_id, &index);
+                if (item)
+                    thumbnailUpdated(index);
             }
             break;
         }
