@@ -32,9 +32,12 @@ endif
 rtpparsedir = $(accessdir)/rtp
 rtpparse_LTLIBRARIES = \
 	librtp_mpeg12_plugin.la \
-	librtp_pcm_plugin.la
+	librtp_pcm_plugin.la \
+	librtp_xiph_plugin.la
 
 librtp_mpeg12_plugin_la_SOURCES = access/rtp/mpeg12.c
 
 librtp_pcm_plugin_la_SOURCES = access/rtp/pcm.c
 librtp_pcm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/access/rtp
+
+librtp_xiph_plugin_la_SOURCES = access/rtp/xiph.c

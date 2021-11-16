@@ -23,29 +23,33 @@
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
-#include <stdarg.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <vlc_common.h>
-#include <vlc_demux.h>
-#include <vlc_network.h>
+#include <vlc_block.h>
+#include <vlc_es.h>
 #include <vlc_plugin.h>
 
 #include "../../demux/xiph.h"
-
 #include "rtp.h"
 
-typedef struct rtp_xiph_t
-{
+struct rtp_xiph {
+    vlc_object_t *obj;
+    enum es_format_category_e cat;
+    vlc_fourcc_t fourcc;
+};
+
+struct rtp_xiph_source {
     struct vlc_rtp_es *id;
     block_t     *block;
     uint32_t     ident;
-    bool         vorbis;
-} rtp_xiph_t;
+};
 
-static void *xiph_init (bool vorbis)
+static void *xiph_init(struct vlc_rtp_pt *pt)
 {
-    rtp_xiph_t *self = malloc (sizeof (*self));
+    struct rtp_xiph_source *self = malloc(sizeof (*self));
 
     if (self == NULL)
         return NULL;
@@ -53,33 +57,13 @@ static void *xiph_init (bool vorbis)
     self->id = NULL;
     self->block = NULL;
     self->ident = 0xffffffff; /* impossible value on the wire */
-    self->vorbis = vorbis;
+    (void) pt;
     return self;
-}
-
-#if 0
-/* PT=dynamic
- * vorbis: Xiph Vorbis audio (RFC 5215)
- */
-static void *vorbis_init (demux_t *demux)
-{
-    (void)demux;
-    return xiph_init (true);
-}
-#endif
-
-/* PT=dynamic
- * vorbis: Xiph Theora video
- */
-static void *theora_init(struct vlc_rtp_pt *pt)
-{
-    pt->opaque = demux;
-    return xiph_init (false);
 }
 
 static void xiph_destroy(struct vlc_rtp_pt *pt, void *data)
 {
-    rtp_xiph_t *self = data;
+    struct rtp_xiph_source *self = data;
 
     if (!data)
         return;
@@ -145,8 +129,8 @@ static ssize_t xiph_header (void **pextra, const uint8_t *buf, size_t len)
 
 static void xiph_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
 {
-    rtp_xiph_t *self = data;
-    demux_t *demux = pt->opaque;
+    struct rtp_xiph_source *self = data;
+    struct rtp_xiph *sys = pt->opaque;
 
     if (!data || block->i_buffer < 4)
         goto drop;
@@ -164,9 +148,7 @@ static void xiph_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
     /* RTP defragmentation */
     if (self->block && (block->i_flags & BLOCK_FLAG_DISCONTINUITY))
     {   /* Screwed! discontinuity within a fragmented packet */
-        msg_Warn (demux, self->vorbis ?
-                  "discontinuity in fragmented Vorbis packet" :
-                  "discontinuity in fragmented Theora packet");
+        msg_Warn(sys->obj, "discontinuity in fragmented Xiph packet");
         block_Release (self->block);
         self->block = NULL;
     }
@@ -240,9 +222,8 @@ static void xiph_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
             {
                 if (self->ident != ident)
                 {
-                    msg_Warn (demux, self->vorbis ?
-                        "ignoring raw Vorbis payload without configuration" :
-                        "ignoring raw Theora payload without configuration");
+                    msg_Warn(sys->obj,
+                             "ignoring raw payload without configuration");
                     break;
                 }
                 block_t *raw = block_Alloc (len);
@@ -264,16 +245,12 @@ static void xiph_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
                     break;
 
                 es_format_t fmt;
-                es_format_Init (&fmt, self->vorbis ? AUDIO_ES : VIDEO_ES,
-                                self->vorbis ? VLC_CODEC_VORBIS
-                                             : VLC_CODEC_THEORA);
+                es_format_Init(&fmt, sys->cat, sys->fourcc);
                 fmt.p_extra = extv;
                 fmt.i_extra = extc;
                 vlc_rtp_es_destroy(self->id);
-                msg_Dbg (demux, self->vorbis ?
-                         "Vorbis packed configuration received (%06"PRIx32")" :
-                         "Theora packed configuration received (%06"PRIx32")",
-                         ident);
+                msg_Dbg(sys->obj,
+                        "packed configuration received (%06"PRIx32")", ident);
                 self->ident = ident;
                 self->id = vlc_rtp_pt_request_es(pt, &fmt);
                 break;
@@ -289,6 +266,57 @@ drop:
     block_Release (block);
 }
 
-const struct vlc_rtp_pt_operations rtp_video_theora = {
-    NULL, theora_init, xiph_destroy, xiph_decode,
+static void xiph_release(struct vlc_rtp_pt *pt)
+{
+    free(pt->opaque);
+}
+
+static const struct vlc_rtp_pt_operations rtp_xiph_ops = {
+    xiph_release, xiph_init, xiph_destroy, xiph_decode,
 };
+
+static int xiph_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
+                     const struct vlc_sdp_pt *desc,
+                     int cat, vlc_fourcc_t fourcc)
+{
+    struct rtp_xiph *sys = malloc(sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    sys->obj = obj;
+    sys->cat = cat;
+    sys->fourcc = fourcc;
+    pt->opaque = sys;
+    pt->ops = &rtp_xiph_ops;
+    (void) desc;
+    return VLC_SUCCESS;
+}
+
+/* Xiph Vorbis audio (RFC 5215) */
+static int vorbis_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
+                       const struct vlc_sdp_pt *desc)
+{
+    return xiph_open(obj, pt, desc, AUDIO_ES, VLC_CODEC_VORBIS);
+}
+
+/* Xiph Theora video (I-D draft-barbato-avt-rtp-theora-01) */
+static int theora_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
+                       const struct vlc_sdp_pt *desc)
+{
+    return xiph_open(obj, pt, desc, VIDEO_ES, VLC_CODEC_THEORA);
+}
+
+vlc_module_begin()
+    set_shortname(N_("RTP Xiph"))
+    set_description(N_("RTP Xiph payload parser"))
+    set_category(CAT_INPUT)
+    set_subcategory(SUBCAT_INPUT_DEMUX)
+    set_capability("rtp audio parser", 0)
+    set_callback(vorbis_open)
+    add_shortcut("vorbis")
+
+    add_submodule()
+    set_capability("rtp video parser", 0)
+    set_callback(theora_open)
+    add_shortcut("theora")
+vlc_module_end()
