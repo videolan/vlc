@@ -127,6 +127,12 @@ static int Open(vout_display_t *vd,
     if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
         goto error;
 
+    // Set initial framebuffer size
+    int width = (int) vd->cfg->display.width;
+    int height = (int) vd->cfg->display.height;
+    if (!pl_swapchain_resize(sys->pl->swapchain, &width, &height))
+        goto error;
+
     const struct pl_gpu *gpu = sys->pl->gpu;
     sys->renderer = pl_renderer_create(sys->pl->ctx, gpu);
     if (!sys->renderer)
