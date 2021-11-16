@@ -85,8 +85,8 @@ static const struct vlc_rtp_es_operations vlc_rtp_es_id_ops = {
     vlc_rtp_es_id_destroy, vlc_rtp_es_id_send,
 };
 
-struct vlc_rtp_es *vlc_rtp_es_request(struct vlc_rtp_pt *pt,
-                                      const es_format_t *restrict fmt)
+static struct vlc_rtp_es *vlc_rtp_es_request(struct vlc_rtp_pt *pt,
+                                             const es_format_t *restrict fmt)
 {
     demux_t *demux = pt->owner.data;
 
@@ -128,7 +128,8 @@ static const struct vlc_rtp_es_operations vlc_rtp_es_mux_ops = {
     vlc_rtp_es_mux_destroy, vlc_rtp_es_mux_send,
 };
 
-struct vlc_rtp_es *vlc_rtp_mux_request(struct vlc_rtp_pt *pt, const char *name)
+static struct vlc_rtp_es *vlc_rtp_mux_request(struct vlc_rtp_pt *pt,
+                                              const char *name)
 {
     demux_t *demux = pt->owner.data;
 
@@ -145,6 +146,10 @@ struct vlc_rtp_es *vlc_rtp_mux_request(struct vlc_rtp_pt *pt, const char *name)
     }
     return &em->es;
 }
+
+static const struct vlc_rtp_pt_owner_operations vlc_rtp_pt_owner_ops = {
+    vlc_rtp_es_request, vlc_rtp_mux_request,
+};
 
 /**
  * Extracts port number from "[host]:port" or "host:port" strings,
@@ -391,7 +396,7 @@ static int OpenSDP(vlc_object_t *obj)
         goto error;
 
     /* Parse payload types */
-    const struct vlc_rtp_pt_owner pt_owner = { demux };
+    const struct vlc_rtp_pt_owner pt_owner = { &vlc_rtp_pt_owner_ops, demux };
     int err = vlc_rtp_add_media_types(obj, sys->session, media, &pt_owner);
     if (err < 0) {
         msg_Err(obj, "SDP description parse error");
@@ -542,7 +547,7 @@ static int OpenURL(vlc_object_t *obj)
     if (p_sys->session == NULL)
         goto error;
 
-    const struct vlc_rtp_pt_owner pt_owner = { demux };
+    const struct vlc_rtp_pt_owner pt_owner = { &vlc_rtp_pt_owner_ops, demux };
     rtp_autodetect(VLC_OBJECT(demux), p_sys->session, &pt_owner);
 
 #ifdef HAVE_SRTP

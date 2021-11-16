@@ -105,7 +105,17 @@ struct vlc_rtp_pt_operations {
     void (*decode)(struct vlc_rtp_pt *pt, void *data, block_t *block);
 };
 
+struct vlc_rtp_pt_owner;
+struct vlc_rtp_es;
+
+struct vlc_rtp_pt_owner_operations {
+    struct vlc_rtp_es *(*request_es)(struct vlc_rtp_pt *pt,
+                                     const es_format_t *restrict fmt);
+    struct vlc_rtp_es *(*request_mux)(struct vlc_rtp_pt *pt, const char *name);
+};
+
 struct vlc_rtp_pt_owner {
+    const struct vlc_rtp_pt_owner_operations *ops;
     void *data;
 };
 
@@ -174,7 +184,19 @@ static inline void vlc_rtp_pt_decode(struct vlc_rtp_pt *pt,
     pt->ops->decode(pt, data, pkt);
 }
 
-struct vlc_rtp_es;
+static inline
+struct vlc_rtp_es *vlc_rtp_pt_request_es(struct vlc_rtp_pt *pt,
+                                         const es_format_t *restrict fmt)
+{
+    return pt->owner.ops->request_es(pt, fmt);
+}
+
+static inline
+struct vlc_rtp_es *vlc_rtp_pt_request_mux(struct vlc_rtp_pt *pt,
+                                          const char *name)
+{
+    return pt->owner.ops->request_mux(pt, name);
+}
 
 /**
  * RTP elementary output stream operations.
@@ -221,11 +243,6 @@ static inline void vlc_rtp_es_send(struct vlc_rtp_es *es, block_t *block)
  * A dummy output that discards data.
  */
 extern struct vlc_rtp_es *const vlc_rtp_es_dummy;
-
-struct vlc_rtp_es *vlc_rtp_es_request(struct vlc_rtp_pt *pt,
-                                      const es_format_t *fmt);
-struct vlc_rtp_es *vlc_rtp_mux_request(struct vlc_rtp_pt *, const char *name);
-
 
 void rtp_autodetect(vlc_object_t *, rtp_session_t *,
                     const struct vlc_rtp_pt_owner *restrict);

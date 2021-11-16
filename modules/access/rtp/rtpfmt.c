@@ -65,7 +65,7 @@ static void *pcmu_init(struct vlc_rtp_pt *pt)
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MULAW);
     fmt.audio.i_rate = pt->frequency;
     fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 1;
-    return vlc_rtp_es_request(pt, &fmt);
+    return vlc_rtp_pt_request_es(pt, &fmt);
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_pcmu = {
@@ -82,7 +82,7 @@ static void *gsm_init(struct vlc_rtp_pt *pt)
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_GSM);
     fmt.audio.i_rate = 8000;
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
-    return vlc_rtp_es_request(pt, &fmt);
+    return vlc_rtp_pt_request_es(pt, &fmt);
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_gsm = {
@@ -99,7 +99,7 @@ static void *pcma_init(struct vlc_rtp_pt *pt)
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_ALAW);
     fmt.audio.i_rate = pt->frequency;
     fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 1;
-    return vlc_rtp_es_request(pt, &fmt);
+    return vlc_rtp_pt_request_es(pt, &fmt);
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_pcma = {
@@ -116,7 +116,7 @@ static void *l16_init(struct vlc_rtp_pt *pt)
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_S16B);
     fmt.audio.i_rate = pt->frequency;
     fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 1;
-    return vlc_rtp_es_request(pt, &fmt);
+    return vlc_rtp_pt_request_es(pt, &fmt);
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_l16 = {
@@ -133,7 +133,7 @@ static void *qcelp_init(struct vlc_rtp_pt *pt)
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_QCELP);
     fmt.audio.i_rate = 8000;
     fmt.audio.i_physical_channels = AOUT_CHAN_CENTER;
-    return vlc_rtp_es_request(pt, &fmt);
+    return vlc_rtp_pt_request_es(pt, &fmt);
 }
 
 static const struct vlc_rtp_pt_operations rtp_audio_qcelp = {
@@ -149,7 +149,7 @@ static void *mpa_init(struct vlc_rtp_pt *pt)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MPGA);
     fmt.b_packetized = false;
-    return vlc_rtp_es_request(pt, &fmt);
+    return vlc_rtp_pt_request_es(pt, &fmt);
 }
 
 static void mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
@@ -180,7 +180,7 @@ static void *mpv_init(struct vlc_rtp_pt *pt)
 
     es_format_Init (&fmt, VIDEO_ES, VLC_CODEC_MPGV);
     fmt.b_packetized = false;
-    return vlc_rtp_es_request(pt, &fmt);
+    return vlc_rtp_pt_request_es(pt, &fmt);
 }
 
 static void mpv_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
@@ -214,7 +214,7 @@ static const struct vlc_rtp_pt_operations rtp_video_mpv = {
  */
 static void *ts_init(struct vlc_rtp_pt *pt)
 {
-    return vlc_rtp_mux_request(pt, "ts");
+    return vlc_rtp_pt_request_mux(pt, "ts");
 }
 
 static const struct vlc_rtp_pt_operations rtp_av_ts = {
