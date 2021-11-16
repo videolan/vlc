@@ -452,7 +452,8 @@ static void parseEXTINFIptvDiots( char *psz_string,
 
 static void parseEXTINFIptvDiotsInDuration( char *psz_string,
                                             char *(*pf_dup)(const char *),
-                                            struct entry_meta_s *meta )
+                                            struct entry_meta_s *meta,
+                                            char **ppsz_end )
 {
     for( ;; )
     {
@@ -469,6 +470,18 @@ static void parseEXTINFIptvDiotsInDuration( char *psz_string,
         {
             switch( *psz_string )
             {
+                case ',': /* Last comma for title */
+                    if(!b_escaped)
+                    {
+                        if(b_value)
+                        {
+                            *psz_string = '\0';
+                            parseEXTINFIptvDiots( psz_start, pf_dup, meta );
+                        }
+                        *ppsz_end = psz_string + 1;
+                        return;
+                    }
+                    break;
                 case '"':
                     if(!b_escaped && b_value)
                         return;
@@ -515,24 +528,41 @@ static void parseEXTINF( char *psz_string,
     while( psz_string < end && ( *psz_string == '\t' || *psz_string == ' ' ) )
         psz_string++;
 
-    /* duration: read to next comma */
-    char *psz_comma = strchr( psz_string, ',' );
-    if( psz_comma )
-    {
-        *psz_comma = '\0'; /* Split strings */
-        if( ++psz_comma < end )
-            parseEXTINFTitle( psz_comma, pf_dup, meta );
-    }
-
     /* Parse duration */
     char *psz_end = NULL;
     long i_parsed_duration = strtol( psz_string, &psz_end, 10 );
     if( i_parsed_duration > 0 )
         meta->i_duration = vlc_tick_from_sec( i_parsed_duration );
 
-    if( psz_end && psz_end != psz_string && ( *psz_end == '\t' || *psz_end == ' ' ) )
+    /* skip to first unmatched */
+    if( psz_end )
+        psz_string = psz_end;
+
+    /* skip whitespaces */
+    while( psz_string < end && ( *psz_string == '\t' || *psz_string == ' ' ) )
+        psz_string++;
+
+    if( psz_string == end )
+        return;
+
+    /* EXTINF:1,title*/
+    /* EXTINF: -123.12  ,title*/
+    if( *psz_string == ',' )
     {
-        parseEXTINFIptvDiotsInDuration( psz_end, pf_dup, meta );
+        if( ++psz_string < end )
+            parseEXTINFTitle( psz_string, pf_dup, meta );
+    }
+    /* EXTINF: -1  tvg-foo="val" tvg-foo2="val",title */
+    /* EXTINF: -1  tvg-foo="val,val2" ,title */
+    else if( *psz_string >= 'A' && *psz_string <= 'z' )
+    {
+        psz_end = NULL;
+        parseEXTINFIptvDiotsInDuration( psz_string, pf_dup, meta, &psz_end );
+        if( psz_end && *psz_end ) /* returns past last comma */
+        {
+            free(meta->psz_name);
+            meta->psz_name = pf_dup( psz_end );
+        }
     }
 }
 
