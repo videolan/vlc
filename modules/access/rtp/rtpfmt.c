@@ -55,23 +55,6 @@ static void codec_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
  * Static payload types handler
  */
 
-/* PT=0
- * PCMU: G.711 µ-law (RFC3551)
- */
-static void *pcmu_init(struct vlc_rtp_pt *pt)
-{
-    es_format_t fmt;
-
-    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MULAW);
-    fmt.audio.i_rate = pt->frequency;
-    fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 1;
-    return vlc_rtp_pt_request_es(pt, &fmt);
-}
-
-static const struct vlc_rtp_pt_operations rtp_audio_pcmu = {
-    NULL, pcmu_init, codec_destroy, codec_decode,
-};
-
 /* PT=3
  * GSM
  */
@@ -87,40 +70,6 @@ static void *gsm_init(struct vlc_rtp_pt *pt)
 
 static const struct vlc_rtp_pt_operations rtp_audio_gsm = {
     NULL, gsm_init, codec_destroy, codec_decode,
-};
-
-/* PT=8
- * PCMA: G.711 A-law (RFC3551)
- */
-static void *pcma_init(struct vlc_rtp_pt *pt)
-{
-    es_format_t fmt;
-
-    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_ALAW);
-    fmt.audio.i_rate = pt->frequency;
-    fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 1;
-    return vlc_rtp_pt_request_es(pt, &fmt);
-}
-
-static const struct vlc_rtp_pt_operations rtp_audio_pcma = {
-    NULL, pcma_init, codec_destroy, codec_decode,
-};
-
-/* PT=10,11
- * L16: 16-bits (network byte order) PCM
- */
-static void *l16_init(struct vlc_rtp_pt *pt)
-{
-    es_format_t fmt;
-
-    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_S16B);
-    fmt.audio.i_rate = pt->frequency;
-    fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 1;
-    return vlc_rtp_pt_request_es(pt, &fmt);
-}
-
-static const struct vlc_rtp_pt_operations rtp_audio_l16 = {
-    NULL, l16_init, codec_destroy, codec_decode,
 };
 
 /* PT=12
@@ -265,14 +214,8 @@ static struct vlc_rtp_pt *vlc_rtp_pt_create(vlc_object_t *obj,
     pt->ops = NULL;
 
     if (strcmp(desc->media->type, "audio") == 0) {
-        if (strcmp(desc->name, "PCMU") == 0)
-            pt->ops = &rtp_audio_pcmu;
-        else if (strcmp(desc->name, "GSM") == 0)
+        if (strcmp(desc->name, "GSM") == 0)
             pt->ops = &rtp_audio_gsm;
-        else if (strcmp(desc->name, "PCMA") == 0)
-            pt->ops = &rtp_audio_pcma;
-        else if (strcmp(desc->name, "L16") == 0)
-            pt->ops = &rtp_audio_l16;
         else if (strcmp(desc->name, "QCELP") == 0)
             pt->ops = &rtp_audio_qcelp;
         else if (strcmp(desc->name, "MPA") == 0)
