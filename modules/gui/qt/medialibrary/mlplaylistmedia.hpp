@@ -31,7 +31,7 @@
 #include <QUrl>
 
 // Forward declarations
-class vlc_medialibrary_t;
+struct vlc_medialibrary_t;
 
 class MLPlaylistMedia : public MLItem
 {

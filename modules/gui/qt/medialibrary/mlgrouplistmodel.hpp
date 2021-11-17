@@ -25,7 +25,7 @@
 #include "mlbasemodel.hpp"
 
 // Forward declarations
-class vlc_medialibrary_t;
+struct vlc_medialibrary_t;
 class MLGroup;
 
 class MLGroupListModel : public MLBaseModel

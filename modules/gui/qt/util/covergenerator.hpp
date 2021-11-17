@@ -35,7 +35,7 @@
 #include <QPainter>
 
 // Forward declarations
-class vlc_medialibrary_t;
+struct vlc_medialibrary_t;
 class MLItemId;
 
 class CoverGenerator : public AsyncTask<QString>
