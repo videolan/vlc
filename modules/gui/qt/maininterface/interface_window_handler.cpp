@@ -17,9 +17,13 @@
  *****************************************************************************/
 #include "interface_window_handler.hpp"
 #include "mainctx.hpp"
+#include "compositor.hpp"
 #include <player/player_controller.hpp>
 #include <playlist/playlist_controller.hpp>
+#include "util/keyhelper.hpp"
 #include <QScreen>
+#include <QQmlProperty>
+
 
 InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent)
     : QObject(parent)
@@ -178,6 +182,21 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
         }
         break;
     }
+    case QEvent::KeyPress:
+    {
+        QKeyEvent * keyEvent = static_cast<QKeyEvent *> (event);
+
+        if (applyKeyEvent(keyEvent) == false)
+            return false;
+
+        m_mainCtx->sendHotkey(static_cast<Qt::Key> (keyEvent->key()), keyEvent->modifiers());
+
+        return true;
+    }
+    case QEvent::KeyRelease:
+    {
+        return applyKeyEvent(static_cast<QKeyEvent *> (event));
+    }
     case QEvent::Wheel:
     {
         QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
@@ -329,4 +348,38 @@ void InterfaceWindowHandler::setBoss()
 void InterfaceWindowHandler::setInterfaceAlwaysOnTop( bool on_top )
 {
     WindowStateHolder::holdOnTop(m_window, WindowStateHolder::INTERFACE, on_top);
+}
+
+// Functions private
+
+bool InterfaceWindowHandler::applyKeyEvent(QKeyEvent * event) const
+{
+    int key = event->key();
+
+    // NOTE: We have to make sure tab and backtab are never used as hotkeys.
+    if (key == Qt::Key_Tab || key == Qt::Key_Backtab)
+        return false;
+
+    // NOTE: When browsing the MediaLibrary, we let the view handle the navigation keys.
+    if (m_mainCtx->preferHotkeys() == false && (KeyHelper::matchLeft(event)  ||
+                                                KeyHelper::matchRight(event) ||
+                                                KeyHelper::matchUp(event)    ||
+                                                KeyHelper::matchDown(event)  ||
+                                                KeyHelper::matchCancel(event)))
+        return false;
+
+    QQuickItem * item = p_intf->p_compositor->activeFocusItem();
+
+    if (item && item->inherits("QQuickControl"))
+    {
+        // NOTE: This item has visual focus so we let it handle the key.
+        if (QQmlProperty(item, "visualFocus", qmlContext(item)).read().toBool())
+            return false;
+
+        event->accept();
+
+        return true;
+    }
+
+    return false;
 }

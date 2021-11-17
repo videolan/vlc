@@ -55,6 +55,8 @@ signals:
     void incrementIntfUserScaleFactor(bool increment);
 
 private:
+    bool applyKeyEvent(QKeyEvent * event) const;
+
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     virtual void updateCSDWindowSettings();
 #endif
