@@ -27,3 +27,11 @@ librtp_plugin_la_CFLAGS += $(GCRYPT_CFLAGS)
 librtp_plugin_la_LIBADD += libvlc_srtp.la $(GCRYPT_LIBS)
 librtp_plugin_la_DEPENDENCIES += libvlc_srtp.la
 endif
+
+# RTP payload parser plugins
+rtpparsedir = $(accessdir)/rtp
+rtpparse_LTLIBRARIES = \
+	librtp_pcm_plugin.la
+
+librtp_pcm_plugin_la_SOURCES = access/rtp/pcm.c
+librtp_pcm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/access/rtp
