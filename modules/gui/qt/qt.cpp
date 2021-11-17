@@ -937,9 +937,8 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
     QApplication::postEvent( THEDP, event );
 }
 
-static void WindowCloseCb( vout_window_t *p_wnd )
+static void WindowCloseCb( vout_window_t * )
 {
-    libvlc_int_t *libvlc = vlc_object_instance( p_wnd );
     qt_intf_t *p_intf = nullptr;
     bool shutdown = false;
     //mutex scope
