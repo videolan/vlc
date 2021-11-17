@@ -532,9 +532,9 @@ static void parseEXTINF( char *psz_string,
 
     /* Parse duration */
     char *psz_end = NULL;
-    long i_parsed_duration = strtol( psz_string, &psz_end, 10 );
+    float i_parsed_duration = us_strtof( psz_string, &psz_end );
     if( i_parsed_duration > 0 )
-        meta->i_duration = vlc_tick_from_sec( i_parsed_duration );
+        meta->i_duration = vlc_tick_from_sec( (double)i_parsed_duration );
 
     /* skip to first unmatched */
     if( psz_end )
