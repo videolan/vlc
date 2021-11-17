@@ -138,7 +138,8 @@ static struct vlc_sdp_attr *vlc_sdp_attr_parse(const char *str, size_t len)
     if (namelen < len) {
         a->name[len] = '\0';
         a->value = a->name + namelen + 1;
-    }
+    } else
+        a->value = NULL;
     a->next = NULL;
     return a;
 }
