@@ -590,8 +590,8 @@ typedef struct
  * Executes a function one time.
  *
  * The first time this function is called with a given one-time initialization
- * object, it executes the provided callback.
- * Any further call with the same object will be a no-op.
+ * object, it executes the provided callback with the provided data pointer as
+ * sole parameter. Any further call with the same object will be a no-op.
  *
  * In the corner case that the first time execution is ongoing in another
  * thread, then the function will wait for completion on the other thread
@@ -601,16 +601,19 @@ typedef struct
  *
  * \param once a one-time initialization object
  * \param cb callback to execute (the first time)
+ * \param opaque data pointer for the callback
  */
-VLC_API void vlc_once(vlc_once_t *restrict once, void (*cb)(void));
+VLC_API void vlc_once(vlc_once_t *restrict once, void (*cb)(void *),
+                      void *opaque);
 
-static inline void vlc_once_inline(vlc_once_t *restrict once, void (*cb)(void))
+static inline void vlc_once_inline(vlc_once_t *restrict once,
+                                   void (*cb)(void *), void *opaque)
 {
     /* Fast path: check if already initialized */
     if (unlikely(atomic_load_explicit(&once->value, memory_order_acquire) < 3))
-        vlc_once(once, cb);
+        vlc_once(once, cb, opaque);
 }
-#define vlc_once(once, cb) vlc_once_inline(once, cb)
+#define vlc_once(once, cb, opaque) vlc_once_inline(once, cb, opaque)
 #endif
 
 /**

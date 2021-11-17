@@ -330,7 +330,7 @@ static gboolean vlc_gst_plugin_init( GstPlugin *p_plugin )
 
 static bool vlc_gst_registered = false;
 
-static void vlc_gst_init_once(void)
+static void vlc_gst_init_once(void *data)
 {
     gst_init( NULL, NULL );
     vlc_gst_registered = gst_plugin_register_static( 1, 0, "videolan",
@@ -343,7 +343,7 @@ static bool vlc_gst_init( void )
 {
     static vlc_once_t once = VLC_STATIC_ONCE;
 
-    vlc_once(&once, vlc_gst_init_once);
+    vlc_once(&once, vlc_gst_init_once, NULL);
     return vlc_gst_registered;
 }
 

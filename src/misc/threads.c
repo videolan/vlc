@@ -463,7 +463,7 @@ enum { VLC_ONCE_UNDONE, VLC_ONCE_DOING, VLC_ONCE_CONTEND, VLC_ONCE_DONE };
 
 static_assert (VLC_ONCE_DONE == 3, "Check vlc_once in header file");
 
-void (vlc_once)(vlc_once_t *restrict once, void (*cb)(void))
+void (vlc_once)(vlc_once_t *restrict once, void (*cb)(void *), void *opaque)
 {
     unsigned int value = VLC_ONCE_UNDONE;
 
@@ -472,7 +472,7 @@ void (vlc_once)(vlc_once_t *restrict once, void (*cb)(void))
                                                 memory_order_acquire,
                                                 memory_order_acquire)) {
         /* First time: run the callback */
-        cb();
+        cb(opaque);
 
         if (atomic_exchange_explicit(&once->value, VLC_ONCE_DONE,
                                      memory_order_release) == VLC_ONCE_CONTEND)
