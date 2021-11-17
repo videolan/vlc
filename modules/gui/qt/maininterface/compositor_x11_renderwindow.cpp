@@ -344,8 +344,6 @@ CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_conn
 
     m_window = m_rootWidget->window()->windowHandle();
     m_wid = m_window->winId();
-
-    m_damageObserver = new X11DamageObserver(m_intf, m_conn);
 }
 
 CompositorX11RenderWindow::~CompositorX11RenderWindow()
@@ -364,9 +362,12 @@ CompositorX11RenderWindow::~CompositorX11RenderWindow()
 
 bool CompositorX11RenderWindow::init()
 {
+    m_damageObserver = new X11DamageObserver(m_intf, m_conn);
     bool ret = m_damageObserver->init();
     if (!ret)
     {
+        delete m_damageObserver;
+        m_damageObserver = nullptr;
         msg_Warn(m_intf, "can't initialize X11 damage");
         return false;
     }
@@ -422,6 +423,7 @@ bool CompositorX11RenderWindow::startRendering()
     connect(m_renderThread, &QThread::started, m_damageObserver, &X11DamageObserver::start);
     connect(this, &CompositorX11RenderWindow::registerVideoWindow, m_damageObserver,  &X11DamageObserver::onRegisterSurfaceDamage);
     connect(m_damageObserver, &X11DamageObserver::needRefresh, m_renderTask, &RenderTask::requestRefresh);
+    connect(m_renderThread, &QThread::finished, m_damageObserver, &QObject::deleteLater);
 
     //start the rendering thread
     m_renderThread->start();
