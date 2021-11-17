@@ -273,7 +273,7 @@ static struct vlc_rtp_pt *vlc_rtp_pt_create(vlc_object_t *obj,
             pt->ops = &rtp_audio_pcma;
         else if (strcmp(desc->name, "L16") == 0)
             pt->ops = &rtp_audio_l16;
-        else if (strcmp(desc->name, "QCLEP") == 0)
+        else if (strcmp(desc->name, "QCELP") == 0)
             pt->ops = &rtp_audio_qcelp;
         else if (strcmp(desc->name, "MPA") == 0)
             pt->ops = &rtp_audio_mpa;
