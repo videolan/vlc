@@ -68,12 +68,6 @@ namespace
     }
 }
 
-static inline void addSubMenu( QMenu *func, QString title, QMenu *bar ) {
-    func->setTitle( title );
-    bar->addMenu( func);
-}
-
-
 void StringListMenu::popup(const QPoint &point, const QVariantList &stringList)
 {
     QMenu *m = new QMenu;
