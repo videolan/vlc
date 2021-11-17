@@ -159,11 +159,6 @@ static QAction* addMPLStaticEntry( qt_intf_t *p_intf,
  * Simple Code
  *****************************************************************************/
 
-// Static menu
-static inline void addMenuToMainbar( QMenu *func, QString title, QMenuBar *bar ) {
-    func->setTitle( title );
-    bar->addMenu( func);
-}
 /**
  * Main Menu Bar Creation
  **/
