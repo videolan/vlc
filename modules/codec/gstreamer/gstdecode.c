@@ -328,12 +328,13 @@ static gboolean vlc_gst_plugin_init( GstPlugin *p_plugin )
     return TRUE;
 }
 
-static bool vlc_gst_registered = false;
 
 static void vlc_gst_init_once(void *data)
 {
+    bool *registered = data;
+
     gst_init( NULL, NULL );
-    vlc_gst_registered = gst_plugin_register_static( 1, 0, "videolan",
+    *registered = gst_plugin_register_static( 1, 0, "videolan",
                 "VLC Gstreamer plugins", vlc_gst_plugin_init,
                 "1.0.0", "LGPL", "NA", "vlc", "NA" );
 }
@@ -342,8 +343,9 @@ static void vlc_gst_init_once(void *data)
 static bool vlc_gst_init( void )
 {
     static vlc_once_t once = VLC_STATIC_ONCE;
+    static bool vlc_gst_registered;
 
-    vlc_once(&once, vlc_gst_init_once, NULL);
+    vlc_once(&once, vlc_gst_init_once, &vlc_gst_registered);
     return vlc_gst_registered;
 }
 
