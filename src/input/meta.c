@@ -81,7 +81,7 @@ const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
 
     assert (meta_type < (sizeof(posix_names) / sizeof(posix_names[0])));
     return vlc_gettext (posix_names[meta_type]);
-};
+}
 
 
 /**
