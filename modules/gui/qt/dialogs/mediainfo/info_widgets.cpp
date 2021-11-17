@@ -41,8 +41,7 @@ layout->addWidget( label, row, 0, 1, 1, 0 );
 VLCStatsView::VLCStatsView( QWidget *parent ) : QGraphicsView( parent )
 {
     QColor history(0, 0, 0, 255),
-        total(237, 109, 0, 160),
-        content(109, 237, 0, 160);
+        total(237, 109, 0, 160);
 
     scale( 1.0, -1.0 ); /* invert our Y axis */
     setOptimizationFlags( QGraphicsView::DontAdjustForAntialiasing );
