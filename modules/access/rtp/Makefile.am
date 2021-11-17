@@ -3,7 +3,6 @@ access_LTLIBRARIES += librtp_plugin.la
 librtp_plugin_la_SOURCES = \
 	access/rtp/input.c \
 	access/rtp/session.c \
-	access/rtp/xiph.c \
 	access/rtp/sdp.c access/rtp/sdp.h \
 	access/rtp/rtpfmt.c \
 	access/rtp/datagram.c access/rtp/vlc_dtls.h \

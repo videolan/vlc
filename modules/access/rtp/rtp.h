@@ -236,8 +236,6 @@ static inline uint8_t rtp_ptype (const block_t *block)
     return block->p_buffer[1] & 0x7F;
 }
 
-extern const struct vlc_rtp_pt_operations rtp_video_theora;
-
 /** @} */
 
 /**
