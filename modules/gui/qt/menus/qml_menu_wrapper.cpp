@@ -631,7 +631,7 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
 
     action = m_menu->addAction(qtr("Add to playlist"));
 
-    connect(action, &QAction::triggered, [ml, ids]() {
+    connect(action, &QAction::triggered, [ids]() {
         DialogsProvider::getInstance()->playlistsDialog(ids);
     });
 
