@@ -187,6 +187,7 @@ struct intf_sys_t
     short           yellow_b;
 
     int             box_type;
+    int             previous_box_type;
     int             box_y;            // start of box content
     int             box_height;
     int             box_lines_total;  // number of lines in the box
@@ -1166,7 +1167,9 @@ static void AddItem(intf_thread_t *intf, const char *path)
 
 static inline void BoxSwitch(intf_sys_t *sys, int box)
 {
-    sys->box_type = (sys->box_type == box) ? BOX_NONE : box;
+    int previous_box_type = sys->box_type;
+    sys->box_type = (sys->box_type == box) ? sys->previous_box_type : box;
+    sys->previous_box_type = previous_box_type;
     sys->box_start = 0;
     sys->box_idx = 0;
 }
@@ -1678,6 +1681,7 @@ static int Open(vlc_object_t *p_this)
     vlc_LogSet(vlc_object_instance(intf), &log_ops, sys);
 
     sys->box_type = BOX_PLAYLIST;
+    sys->previous_box_type = BOX_PLAYLIST;
     sys->plidx_follow = true;
     sys->color = var_CreateGetBool(intf, "color");
 
