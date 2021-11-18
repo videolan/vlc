@@ -128,7 +128,7 @@ private:
     STDMETHODIMP BufferCB( double d_time, BYTE* p_buffer, long l_buffer_len );
 
     vlc_object_t *p_access;
-    CLSID     guid_network_type;   /* network type in use */
+    CLSID     clsid_network_type;  /* network type in use */
     long      l_tuner_used;        /* Index of the Tuning Device in use */
     unsigned  systems;             /* bitmask of all tuners' network types */
 

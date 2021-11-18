@@ -391,7 +391,7 @@ void BDAOutput::Empty()
 BDAGraph::BDAGraph( vlc_object_t *p_this ):
     ul_cbrc( 0 ),
     p_access( p_this ),
-    guid_network_type(GUID_NULL),
+    clsid_network_type(CLSID_NULL),
     l_tuner_used(-1),
     systems(0),
     d_graph_register( 0 )
@@ -459,15 +459,15 @@ unsigned BDAGraph::GetSystem( REFCLSID clsid )
 unsigned BDAGraph::EnumSystems()
 {
     HRESULT hr = S_OK;
-    GUID guid_network_provider = GUID_NULL;
+    GUID clsid_network_provider = CLSID_NULL;
 
     msg_Dbg( p_access, "EnumSystems: Entering " );
 
     do
     {
-        hr = GetNextNetworkType( &guid_network_provider );
+        hr = GetNextNetworkType( &clsid_network_provider );
         if( hr != S_OK ) break;
-        hr = Check( guid_network_provider );
+        hr = Check( clsid_network_provider );
         if( FAILED( hr ) )
             msg_Dbg( p_access, "EnumSystems: Check failed, trying next" );
     }
@@ -1339,7 +1339,7 @@ int BDAGraph::SetInversion(int inversion)
      * in access.c. Since DVBT and DVBC don't support spectral
      * inversion, we need to return VLC_SUCCESS in those cases
      * so that dvb_tune() will be called */
-    if( ( GetSystem( guid_network_type ) & ( DTV_DELIVERY_DVB_S | DTV_DELIVERY_DVB_S2 | DTV_DELIVERY_ISDB_S ) ) == 0 )
+    if( ( GetSystem( clsid_network_type ) & ( DTV_DELIVERY_DVB_S | DTV_DELIVERY_DVB_S2 | DTV_DELIVERY_ISDB_S ) ) == 0 )
     {
         msg_Dbg( p_access, "SetInversion: Not Satellite type" );
         return VLC_SUCCESS;
@@ -1587,7 +1587,7 @@ int BDAGraph::SetDVBS(long l_frequency, long l_symbolrate, uint32_t fec,
 /*****************************************************************************
 * SetUpTuner
 ******************************************************************************
-* Sets up global p_scanning_tuner and sets guid_network_type according
+* Sets up global p_scanning_tuner and sets clsid_network_type according
 * to the Network Type requested.
 *
 * Logic: if tuner is set up and is the right network type, use it.
@@ -1596,10 +1596,10 @@ int BDAGraph::SetDVBS(long l_frequency, long l_symbolrate, uint32_t fec,
 * Then set up a tune request and try to validate it. Finally, put
 * tune request and tuning space to tuner
 *
-* on success, sets globals: p_scanning_tuner and guid_network_type
+* on success, sets globals: p_scanning_tuner and clsid_network_type
 *
 ******************************************************************************/
-HRESULT BDAGraph::SetUpTuner( REFCLSID guid_this_network_type )
+HRESULT BDAGraph::SetUpTuner( REFCLSID clsid_this_network_type )
 {
     HRESULT hr = S_OK;
     class localComPtr
@@ -1620,7 +1620,7 @@ HRESULT BDAGraph::SetUpTuner( REFCLSID guid_this_network_type )
 
         BSTR                        bstr_name;
 
-        CLSID                       guid_test_network_type;
+        CLSID                       clsid_test_network_type;
         char*                       psz_network_name;
         char*                       psz_bstr_name;
         int                         i_name_len;
@@ -1638,7 +1638,7 @@ HRESULT BDAGraph::SetUpTuner( REFCLSID guid_this_network_type )
             p_dvbc_locator(NULL),
             p_dvbs_locator(NULL),
             bstr_name(NULL),
-            guid_test_network_type(GUID_NULL),
+            clsid_test_network_type(CLSID_NULL),
             psz_network_name(NULL),
             psz_bstr_name(NULL),
             i_name_len(0)
@@ -1709,16 +1709,16 @@ HRESULT BDAGraph::SetUpTuner( REFCLSID guid_this_network_type )
     if( p_tuning_space )
     {
         msg_Dbg( p_access, "SetUpTuner: get network type" );
-        hr = p_tuning_space->get__NetworkType( &l.guid_test_network_type );
+        hr = p_tuning_space->get__NetworkType( &l.clsid_test_network_type );
         if( FAILED( hr ) )
         {
             msg_Warn( p_access, "Check: "\
                 "Cannot get network type: hr=0x%8lx", hr );
-            l.guid_test_network_type = GUID_NULL;
+            l.clsid_test_network_type = CLSID_NULL;
         }
 
         msg_Dbg( p_access, "SetUpTuner: see if it's the right one" );
-        if( l.guid_test_network_type == guid_this_network_type )
+        if( l.clsid_test_network_type == clsid_this_network_type )
         {
             msg_Dbg( p_access, "SetUpTuner: it's the right one" );
             SysFreeString( l.bstr_name );
@@ -1749,7 +1749,7 @@ HRESULT BDAGraph::SetUpTuner( REFCLSID guid_this_network_type )
             {
                 msg_Dbg( p_access, "SetUpTuner: Using Tuning Space: %s",
                     l.psz_bstr_name );
-                /* p_tuning_space and guid_network_type are already set */
+                /* p_tuning_space and clsid_network_type are already set */
                 /* you probably already have a tune request, also */
                 hr = p_scanning_tuner->get_TuneRequest( &l.p_tune_request );
                 if( SUCCEEDED( hr ) )
@@ -1769,7 +1769,7 @@ HRESULT BDAGraph::SetUpTuner( REFCLSID guid_this_network_type )
             }
         }
 
-        /* else different guid_network_type */
+        /* else different clsid_network_type */
     NoTuningSpace:
         if( p_tuning_space )
             p_tuning_space->Release();
@@ -1803,7 +1803,7 @@ HRESULT BDAGraph::SetUpTuner( REFCLSID guid_this_network_type )
     do
     {
         msg_Dbg( p_access, "SetUpTuner: top of loop" );
-        l.guid_test_network_type = GUID_NULL;
+        l.clsid_test_network_type = CLSID_NULL;
         if( l.p_test_tuning_space )
             l.p_test_tuning_space->Release();
         l.p_test_tuning_space = NULL;
@@ -1818,14 +1818,14 @@ HRESULT BDAGraph::SetUpTuner( REFCLSID guid_this_network_type )
         hr = l.p_tuning_space_enum->Next( 1, &l.p_test_tuning_space, NULL );
         if( hr != S_OK ) break;
         msg_Dbg( p_access, "SetUpTuner: get network type" );
-        hr = l.p_test_tuning_space->get__NetworkType( &l.guid_test_network_type );
+        hr = l.p_test_tuning_space->get__NetworkType( &l.clsid_test_network_type );
         if( FAILED( hr ) )
         {
             msg_Warn( p_access, "Check: "\
                 "Cannot get network type: hr=0x%8lx", hr );
-            l.guid_test_network_type = GUID_NULL;
+            l.clsid_test_network_type = CLSID_NULL;
         }
-        if( l.guid_test_network_type == guid_this_network_type )
+        if( l.clsid_test_network_type == clsid_this_network_type )
         {
             msg_Dbg( p_access, "SetUpTuner: Found matching space on tuner" );
 
@@ -1857,7 +1857,7 @@ HRESULT BDAGraph::SetUpTuner( REFCLSID guid_this_network_type )
     while( true );
     msg_Dbg( p_access, "SetUpTuner: checking what we got" );
 
-    if( l.guid_test_network_type == GUID_NULL)
+    if( l.clsid_test_network_type == CLSID_NULL)
     {
         msg_Dbg( p_access, "SetUpTuner: got null, try to clone" );
         goto TryToClone;
@@ -1932,35 +1932,35 @@ TryToClone:
 * helper function; this is probably best done as an Enumeration of
 * network providers
 *****************************************************************************/
-HRESULT BDAGraph::GetNextNetworkType( CLSID* guid_this_network_type )
+HRESULT BDAGraph::GetNextNetworkType( CLSID* clsid_this_network_type )
 {
     HRESULT hr = S_OK;
-    if( *guid_this_network_type == GUID_NULL )
+    if( *clsid_this_network_type == CLSID_NULL )
     {
         msg_Dbg( p_access, "GetNextNetworkType: DVB-C" );
-        *guid_this_network_type = CLSID_DVBCNetworkProvider;
+        *clsid_this_network_type = CLSID_DVBCNetworkProvider;
         return S_OK;
     }
-    if( *guid_this_network_type == CLSID_DVBCNetworkProvider )
+    if( *clsid_this_network_type == CLSID_DVBCNetworkProvider )
     {
         msg_Dbg( p_access, "GetNextNetworkType: DVB-T" );
-        *guid_this_network_type = CLSID_DVBTNetworkProvider;
+        *clsid_this_network_type = CLSID_DVBTNetworkProvider;
         return S_OK;
     }
-    if( *guid_this_network_type == CLSID_DVBTNetworkProvider )
+    if( *clsid_this_network_type == CLSID_DVBTNetworkProvider )
     {
         msg_Dbg( p_access, "GetNextNetworkType: DVB-S" );
-        *guid_this_network_type = CLSID_DVBSNetworkProvider;
+        *clsid_this_network_type = CLSID_DVBSNetworkProvider;
         return S_OK;
     }
-    if( *guid_this_network_type == CLSID_DVBSNetworkProvider )
+    if( *clsid_this_network_type == CLSID_DVBSNetworkProvider )
     {
         msg_Dbg( p_access, "GetNextNetworkType: ATSC" );
-        *guid_this_network_type = CLSID_ATSCNetworkProvider;
+        *clsid_this_network_type = CLSID_ATSCNetworkProvider;
         return S_OK;
     }
     msg_Dbg( p_access, "GetNextNetworkType: failed" );
-    *guid_this_network_type = GUID_NULL;
+    *clsid_this_network_type = CLSID_NULL;
     hr = E_FAIL;
     return hr;
 }
@@ -1975,7 +1975,7 @@ HRESULT BDAGraph::GetNextNetworkType( CLSID* guid_this_network_type )
 * systems, l_tuner_used, p_network_provider, p_scanning_tuner, p_tuner_device,
 * p_tuning_space, p_filter_graph
 ******************************************************************************/
-HRESULT BDAGraph::Check( REFCLSID guid_this_network_type )
+HRESULT BDAGraph::Check( REFCLSID clsid_this_network_type )
 {
     HRESULT hr = S_OK;
 
@@ -2003,7 +2003,7 @@ HRESULT BDAGraph::Check( REFCLSID guid_this_network_type )
      * from systems. It will be restored if the Check passes.
      */
 
-    systems &= ~( GetSystem( guid_this_network_type ) );
+    systems &= ~( GetSystem( clsid_this_network_type ) );
 
 
     /* If we have already have a filter graph, rebuild it*/
@@ -2025,7 +2025,7 @@ HRESULT BDAGraph::Check( REFCLSID guid_this_network_type )
     if( p_network_provider )
         p_network_provider->Release();
     p_network_provider = NULL;
-    hr = ::CoCreateInstance( guid_this_network_type, NULL, CLSCTX_INPROC_SERVER,
+    hr = ::CoCreateInstance( clsid_this_network_type, NULL, CLSCTX_INPROC_SERVER,
         IID_IBaseFilter, reinterpret_cast<void**>( &p_network_provider ) );
     if( FAILED( hr ) )
     {
@@ -2075,7 +2075,7 @@ HRESULT BDAGraph::Check( REFCLSID guid_this_network_type )
 
     /* try to set up p_scanning_tuner */
     msg_Dbg( p_access, "Check: Calling SetUpTuner" );
-    hr = SetUpTuner( guid_this_network_type );
+    hr = SetUpTuner( clsid_this_network_type );
     if( FAILED( hr ) )
     {
         msg_Dbg( p_access, "Check: "\
@@ -2109,7 +2109,7 @@ HRESULT BDAGraph::Check( REFCLSID guid_this_network_type )
      * p_tuning_space
      */
     msg_Dbg( p_access, "Check: check succeeded: hr=0x%8lx", hr );
-    systems |= GetSystem( guid_this_network_type );
+    systems |= GetSystem( clsid_this_network_type );
     msg_Dbg( p_access, "Check: returning from Check mode" );
     return S_OK;
 }
@@ -2171,7 +2171,7 @@ HRESULT BDAGraph::Build()
         msg_Warn( p_access, "Build: no tuning space" );
         return hr;
     }
-    hr = p_tuning_space->get__NetworkType( &guid_network_type );
+    hr = p_tuning_space->get__NetworkType( &clsid_network_type );
 
 
     /* Always look for all capture devices to match the Network Tuner */
@@ -3241,7 +3241,7 @@ HRESULT BDAGraph::Destroy()
 
     d_graph_register = 0;
     l_tuner_used = -1;
-    guid_network_type = GUID_NULL;
+    clsid_network_type = CLSID_NULL;
 
 //    msg_Dbg( p_access, "Destroy: returning" );
     return S_OK;
