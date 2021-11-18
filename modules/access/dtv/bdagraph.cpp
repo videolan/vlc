@@ -33,6 +33,9 @@
 
 #include <vlc_common.h>
 #include <vlc_block.h>
+
+#include <objbase.h>
+#include <initguid.h>
 #include "bdagraph.hpp"
 #include "dtv.h"
 #undef DEBUG_MONIKER_NAME
