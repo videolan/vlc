@@ -224,8 +224,7 @@ try
     ComPtr<IDCompositionDevice> dcompDevice1;
     HR(myDCompositionCreateDevice3(
                 dxgiDevice.Get(),
-                __uuidof(IDCompositionDevice),
-                &dcompDevice1), "create composition device");
+                IID_PPV_ARGS(&dcompDevice1)), "create composition device");
 
     HR(dcompDevice1.As(&m_dcompDevice), "dcompdevice not an IDCompositionDevice3");
 

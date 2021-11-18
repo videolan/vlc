@@ -1259,7 +1259,7 @@ FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
     {
         /* Getting the property page to get the device name */
         ComPtr<IPropertyBag> p_bag;
-        hr = p_moniker->BindToStorage( 0, 0, __uuidof(p_bag.Get()), &p_bag );
+        hr = p_moniker->BindToStorage( 0, 0, IID_PPV_ARGS( &p_bag ) );
         if( SUCCEEDED(hr) )
         {
             VARIANT var;
@@ -1295,7 +1295,7 @@ FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
                 {
                     msg_Dbg( p_this, "asked for %s, binding to %s", p_devicename->c_str() , devname.c_str() ) ;
                     /* NULL possibly means we don't need BindMoniker BindCtx ?? */
-                    hr = p_moniker->BindToObject( NULL, 0, __uuidof(p_base_filter.Get()), &p_base_filter );
+                    hr = p_moniker->BindToObject( NULL, 0, IID_PPV_ARGS( &p_base_filter ) );
                     if( FAILED(hr) )
                     {
                         msg_Err( p_this, "couldn't bind moniker to filter "
@@ -1631,6 +1631,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, ComPtr<IBaseFilter> &p_filte
                     mt[mt_count++] = *p_mt;
 
                     /* Setup a few properties like the audio latency */
+                    // IID_IAMBufferNegotiation in not defined in the mingw header, so can't use __uuidof()
                     ComPtr<IAMBufferNegotiation> p_ambuf;
                     if( SUCCEEDED( p_output_pin->QueryInterface( IID_IAMBufferNegotiation, &p_ambuf ) ) )
                     {
@@ -2119,7 +2120,7 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
 
         hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                      &MEDIATYPE_Audio, p_device_filter.Get(),
-                                     __uuidof(p_SC.Get()), &p_SC );
+                                     IID_PPV_ARGS( &p_SC ) );
         if( SUCCEEDED(hr) )
         {
             ShowPropertyPage(p_SC);
@@ -2129,6 +2130,7 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
          * TV Audio filter
          */
         ComPtr<IAMTVAudio> p_TVA;
+        // IID_IAMTVAudio in not defined in the mingw header, so can't use __uuidof()
         hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                      &MEDIATYPE_Audio, p_device_filter.Get(),
                                      IID_IAMTVAudio, &p_TVA );
@@ -2149,19 +2151,19 @@ static void ShowDeviceProperties( vlc_object_t *p_this,
 
         hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                      &MEDIATYPE_Interleaved, p_device_filter.Get(),
-                                     __uuidof(p_SC.Get()), &p_SC );
+                                     IID_PPV_ARGS( &p_SC ) );
         if( FAILED(hr) )
         {
             hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                          &MEDIATYPE_Video, p_device_filter.Get(),
-                                         __uuidof(p_SC.Get()), &p_SC );
+                                         IID_PPV_ARGS( &p_SC ) );
         }
 
         if( FAILED(hr) )
         {
             hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
                                          &MEDIATYPE_Stream, p_device_filter.Get(),
-                                         __uuidof(p_SC.Get()), &p_SC );
+                                         IID_PPV_ARGS( &p_SC ) );
         }
 
         if( SUCCEEDED(hr) )

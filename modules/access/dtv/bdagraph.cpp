@@ -1118,7 +1118,7 @@ int BDAGraph::SetDVBT2(long l_frequency, uint32_t fec,
     {
         msg_Dbg( p_access, "SetDVBT: pin Input0 found on tuner filter, trying to get IKsPropertySet interface for TBS tuner..." );
         ComPtr<IKsPropertySet> p_ksPropertySet;
-        hr = pinInput0->QueryInterface(__uuidof(p_ksPropertySet), &p_ksPropertySet);
+        hr = pinInput0->QueryInterface(IID_PPV_ARGS(&p_ksPropertySet));
         if( FAILED( hr ))
         {
             msg_Dbg( p_access, "SetDVBT: Cannot query for IKsPropertySet (this can be normal if not TBS tuner)  : hr=0x%8lx", hr );
@@ -2352,7 +2352,7 @@ HRESULT BDAGraph::Build()
     }
 
     /* The Media Control is used to Run and Stop the Graph */
-    hr = p_filter_graph->QueryInterface(__uuidof(p_media_control), &p_media_control);
+    hr = p_filter_graph->QueryInterface(IID_PPV_ARGS(&p_media_control));
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
@@ -2485,8 +2485,8 @@ HRESULT BDAGraph::ListFilters( REFCLSID this_clsid )
         }
 
         /* l.p_filter is Released at the top of the loop */
-        hr = l.p_moniker->BindToObject( l.p_bind_context, NULL, IID_IBaseFilter,
-            reinterpret_cast<void**>( &l.p_filter ) );
+        hr = l.p_moniker->BindToObject( l.p_bind_context, NULL,
+            IID_PPV_ARGS( &l.p_filter ) );
         if( FAILED( hr ) )
         {
             msg_Dbg( p_access, "ListFilters: "\
@@ -2524,8 +2524,8 @@ HRESULT BDAGraph::ListFilters( REFCLSID this_clsid )
         l.psz_downstream = strdup( "Downstream" );
 #endif
         /* l.p_property_bag is released at the top of the loop */
-        hr = l.p_moniker->BindToStorage( NULL, NULL, IID_IPropertyBag,
-            reinterpret_cast<void**>( &l.p_property_bag ) );
+        hr = l.p_moniker->BindToStorage( NULL, NULL,
+            IID_PPV_ARGS( &l.p_property_bag ) );
         if( FAILED( hr ) )
         {
             msg_Dbg( p_access, "ListFilters: "\
@@ -2677,8 +2677,8 @@ HRESULT BDAGraph::FindFilter( REFCLSID this_clsid, long* i_moniker_used,
 
         msg_Dbg( p_access, "FindFilter: try to create downstream filter");
         *p_p_downstream = NULL;
-        hr = l.p_moniker->BindToObject( l.p_bind_context, NULL, IID_IBaseFilter,
-            reinterpret_cast<void**>( p_p_downstream ) );
+        hr = l.p_moniker->BindToObject( l.p_bind_context, NULL,
+            IID_PPV_ARGS( p_p_downstream ) );
         if( FAILED( hr ) )
         {
             msg_Dbg( p_access, "FindFilter: "\
@@ -2720,7 +2720,7 @@ HRESULT BDAGraph::FindFilter( REFCLSID this_clsid, long* i_moniker_used,
         msg_Dbg( p_access, "FindFilter: "\
             "Moniker name is  %s, binding to storage",  l.psz_downstream );
         hr = l.p_moniker->BindToStorage( l.p_bind_context, NULL,
-            IID_IPropertyBag, reinterpret_cast<void**>( &l.p_property_bag ) );
+                IID_PPV_ARGS( &l.p_property_bag ) );
         if( FAILED( hr ) )
         {
             msg_Dbg( p_access, "FindFilter: "\

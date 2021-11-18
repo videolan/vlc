@@ -238,7 +238,7 @@ bool CompositorDirectComposition::init()
     m_d3d11Device.As(&dxgiDevice);
 
     // Create the DirectComposition device object.
-    hr = myDCompositionCreateDevice(dxgiDevice.Get(), __uuidof(IDCompositionDevice), &m_dcompDevice);
+    hr = myDCompositionCreateDevice(dxgiDevice.Get(), IID_PPV_ARGS(&m_dcompDevice));
     if (FAILED(hr))
         return false;
 
