@@ -392,6 +392,7 @@ int vlc_rtp_add_media_types(vlc_object_t *obj, rtp_session_t *session,
                     /* fall through */
                 case 4:
                     if (number < ARRAY_SIZE(types)) {
+                        types[number].media = media;
                         strcpy(types[number].name, name);
                         types[number].clock_rate = frequency;
                         types[number].channel_count = channels;
