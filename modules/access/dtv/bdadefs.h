@@ -457,12 +457,12 @@ typedef struct _MPEG_HEADER_VERSION_BITS
 class IMpeg2Data : public IUnknown
 {
 public:
-    virtual HRESULT __stdcall GetSection( PID pid, TID tid,
+    virtual HRESULT STDMETHODCALLTYPE GetSection( PID pid, TID tid,
         PMPEG2_FILTER pFilter, DWORD dwTimeout,
         ISectionList **ppSectionList )=0;
-    virtual HRESULT __stdcall GetTable( PID pid, TID tid, PMPEG2_FILTER pFilter,
+    virtual HRESULT STDMETHODCALLTYPE GetTable( PID pid, TID tid, PMPEG2_FILTER pFilter,
         DWORD dwTimeout, ISectionList **ppSectionList )=0;
-    virtual HRESULT __stdcall GetStreamOfSections( PID pid, TID tid,
+    virtual HRESULT STDMETHODCALLTYPE GetStreamOfSections( PID pid, TID tid,
         PMPEG2_FILTER pFilter, HANDLE hDataReadyEvent,
         IMpeg2Stream **ppMpegStream )=0;
 };
@@ -470,19 +470,19 @@ public:
 class IGuideData : public IUnknown
 {
 public:
-    virtual HRESULT __stdcall GetServices(
+    virtual HRESULT STDMETHODCALLTYPE GetServices(
         IEnumTuneRequests **ppEnumTuneRequestslass )=0;
-    virtual HRESULT __stdcall GetServiceProperties(
+    virtual HRESULT STDMETHODCALLTYPE GetServiceProperties(
         ITuneRequest *pTuneRequest,
         IEnumGuideDataProperties **ppEnumProperties )=0;
-    virtual HRESULT __stdcall GetGuideProgramIDs(
+    virtual HRESULT STDMETHODCALLTYPE GetGuideProgramIDs(
         IEnumVARIANT **pEnumPrograms )=0;
-    virtual HRESULT __stdcall GetProgramProperties(
+    virtual HRESULT STDMETHODCALLTYPE GetProgramProperties(
         VARIANT varProgramDescriptionID,
         IEnumGuideDataProperties **ppEnumProperties )=0;
-    virtual HRESULT __stdcall GetScheduleEntryIDs(
+    virtual HRESULT STDMETHODCALLTYPE GetScheduleEntryIDs(
         IEnumVARIANT **pEnumScheduleEntries )=0;
-    virtual HRESULT __stdcall GetScheduleEntryProperties(
+    virtual HRESULT STDMETHODCALLTYPE GetScheduleEntryProperties(
         VARIANT varScheduleEntryDescriptionID,
         IEnumGuideDataProperties **ppEnumProperties )=0;
 };
@@ -490,99 +490,99 @@ public:
 class IGuideDataEvent : public IUnknown
 {
 public:
-    virtual HRESULT __stdcall GuideDataAcquired( void )=0;
-    virtual HRESULT __stdcall ProgramChanged(
+    virtual HRESULT STDMETHODCALLTYPE GuideDataAcquired( void )=0;
+    virtual HRESULT STDMETHODCALLTYPE ProgramChanged(
         VARIANT varProgramDescriptionID )=0;
-    virtual HRESULT __stdcall ServiceChanged(
+    virtual HRESULT STDMETHODCALLTYPE ServiceChanged(
         VARIANT varServiceDescriptionID )=0;
-    virtual HRESULT __stdcall ScheduleEntryChanged(
+    virtual HRESULT STDMETHODCALLTYPE ScheduleEntryChanged(
         VARIANT varScheduleEntryDescriptionID )=0;
-    virtual HRESULT __stdcall ProgramDeleted(
+    virtual HRESULT STDMETHODCALLTYPE ProgramDeleted(
         VARIANT varProgramDescriptionID )=0;
-    virtual HRESULT __stdcall ServiceDeleted(
+    virtual HRESULT STDMETHODCALLTYPE ServiceDeleted(
         VARIANT varServiceDescriptionID )=0;
-    virtual HRESULT __stdcall ScheduleDeleted(
+    virtual HRESULT STDMETHODCALLTYPE ScheduleDeleted(
             VARIANT varScheduleEntryDescriptionID )=0;
 };
 
 class IGuideDataProperty : public IUnknown
 {
 public:
-    virtual  HRESULT __stdcall get_Name( BSTR *pbstrName )=0;
-    virtual  HRESULT __stdcall get_Language( long *idLang )=0;
-    virtual  HRESULT __stdcall get_Value( VARIANT *pvar )=0;
+    virtual  HRESULT STDMETHODCALLTYPE get_Name( BSTR *pbstrName )=0;
+    virtual  HRESULT STDMETHODCALLTYPE get_Language( long *idLang )=0;
+    virtual  HRESULT STDMETHODCALLTYPE get_Value( VARIANT *pvar )=0;
 };
 
 class IMpeg2Stream : public IUnknown
 {
 public:
-    virtual HRESULT __stdcall Initialize( MPEG_REQUEST_TYPE requestType,
+    virtual HRESULT STDMETHODCALLTYPE Initialize( MPEG_REQUEST_TYPE requestType,
         IMpeg2Data *pMpeg2Data, PMPEG_CONTEXT pContext, PID pid, TID tid,
         PMPEG2_FILTER pFilter, HANDLE hDataReadyEvent )=0;
-    virtual HRESULT __stdcall SupplyDataBuffer(
+    virtual HRESULT STDMETHODCALLTYPE SupplyDataBuffer(
         PMPEG_STREAM_BUFFER pStreamBuffer )=0;
 };
 
 class ISectionList : public IUnknown
 {
 public:
-    virtual HRESULT __stdcall Initialize( MPEG_REQUEST_TYPE requestType,
+    virtual HRESULT STDMETHODCALLTYPE Initialize( MPEG_REQUEST_TYPE requestType,
         IMpeg2Data *pMpeg2Data, PMPEG_CONTEXT pContext, PID pid, TID tid,
         PMPEG2_FILTER pFilter, DWORD timeout, HANDLE hDoneEvent )=0;
-    virtual HRESULT __stdcall InitializeWithRawSections(
+    virtual HRESULT STDMETHODCALLTYPE InitializeWithRawSections(
         PMPEG_PACKET_LIST pmplSections )=0;
-    virtual HRESULT __stdcall CancelPendingRequest( void )=0;
-    virtual HRESULT __stdcall GetNumberOfSections( WORD *pCount )=0;
-    virtual HRESULT __stdcall GetSectionData( WORD sectionNumber,
+    virtual HRESULT STDMETHODCALLTYPE CancelPendingRequest( void )=0;
+    virtual HRESULT STDMETHODCALLTYPE GetNumberOfSections( WORD *pCount )=0;
+    virtual HRESULT STDMETHODCALLTYPE GetSectionData( WORD sectionNumber,
         DWORD *pdwRawPacketLength, PSECTION *ppSection )=0;
-    virtual HRESULT __stdcall GetProgramIdentifier( PID *pPid )=0;
-    virtual HRESULT __stdcall GetTableIdentifier( TID *pTableId )=0;
+    virtual HRESULT STDMETHODCALLTYPE GetProgramIdentifier( PID *pPid )=0;
+    virtual HRESULT STDMETHODCALLTYPE GetTableIdentifier( TID *pTableId )=0;
 };
 
 class IEnumGuideDataProperties : public IUnknown
 {
 public:
-    virtual HRESULT __stdcall Next( unsigned long celt,
+    virtual HRESULT STDMETHODCALLTYPE Next( unsigned long celt,
         IGuideDataProperty **ppprop, unsigned long *pcelt )=0;
-    virtual HRESULT __stdcall Skip( unsigned long celt )=0;
-    virtual HRESULT __stdcall Reset( void )=0;
-    virtual HRESULT __stdcall Clone( IEnumGuideDataProperties **ppenum )=0;
+    virtual HRESULT STDMETHODCALLTYPE Skip( unsigned long celt )=0;
+    virtual HRESULT STDMETHODCALLTYPE Reset( void )=0;
+    virtual HRESULT STDMETHODCALLTYPE Clone( IEnumGuideDataProperties **ppenum )=0;
 };
 
 class IEnumTuneRequests : public IUnknown
 {
 public:
-    virtual HRESULT __stdcall Next( unsigned long celt, ITuneRequest **ppprop,
+    virtual HRESULT STDMETHODCALLTYPE Next( unsigned long celt, ITuneRequest **ppprop,
         unsigned long *pcelt )=0;
-    virtual HRESULT __stdcall Skip( unsigned long celt )=0;
-    virtual HRESULT __stdcall Reset( void )=0;
-    virtual HRESULT __stdcall Clone( IEnumTuneRequests **ppenum )=0;
+    virtual HRESULT STDMETHODCALLTYPE Skip( unsigned long celt )=0;
+    virtual HRESULT STDMETHODCALLTYPE Reset( void )=0;
+    virtual HRESULT STDMETHODCALLTYPE Clone( IEnumTuneRequests **ppenum )=0;
 };
 
 extern "C" {
 /* Following GUIDs are for the new windows 7 interfaces  */
 /* windows 7 universal provider applies to all networks */
-const CLSID CLSID_NetworkProvider =
-    {0xB2F3A67C,0x29DA,0x4C78,{0x88,0x31,0x09,0x1E,0xD5,0x09,0xA4,0x75}};
+DEFINE_GUID(CLSID_NetworkProvider,
+    0xB2F3A67C,0x29DA,0x4C78,0x88,0x31,0x09,0x1E,0xD5,0x09,0xA4,0x75);
 
-const CLSID CLSID_DigitalCableNetworkType =
-    {0x143827AB,0xF77B,0x498d,{0x81,0xCA,0x5A,0x00,0x7A,0xEC,0x28,0xBF}};
+DEFINE_GUID(CLSID_DigitalCableNetworkType,
+    0x143827AB,0xF77B,0x498d,0x81,0xCA,0x5A,0x00,0x7A,0xEC,0x28,0xBF);
 
 /* KSCATEGORY_BDA */
-const GUID KSCATEGORY_BDA_NETWORK_PROVIDER =
-    {0x71985F4B,0x1CA1,0x11d3,{0x9C,0xC8,0x00,0xC0,0x4F,0x79,0x71,0xE0}};
-const GUID KSCATEGORY_BDA_TRANSPORT_INFORMATION =
-    {0xa2e3074f,0x6c3d,0x11d3,{0xb6,0x53,0x00,0xc0,0x4f,0x79,0x49,0x8e}};
-const GUID KSCATEGORY_BDA_RECEIVER_COMPONENT    =
-    {0xFD0A5AF4,0xB41D,0x11d2,{0x9c,0x95,0x00,0xc0,0x4f,0x79,0x71,0xe0}};
-const GUID KSCATEGORY_BDA_NETWORK_TUNER         =
-    {0x71985f48,0x1ca1,0x11d3,{0x9c,0xc8,0x00,0xc0,0x4f,0x79,0x71,0xe0}};
-const GUID KSDATAFORMAT_SUBTYPE_BDA_MPEG2_TRANSPORT =
-    {0xF4AEB342,0x0329,0x4fdd,{0xA8,0xFD,0x4A,0xFF,0x49,0x26,0xC9,0x78}};
+DEFINE_GUID(KSCATEGORY_BDA_NETWORK_PROVIDER,
+    0x71985F4B,0x1CA1,0x11d3,0x9C,0xC8,0x00,0xC0,0x4F,0x79,0x71,0xE0);
+DEFINE_GUID(KSCATEGORY_BDA_TRANSPORT_INFORMATION,
+    0xa2e3074f,0x6c3d,0x11d3,0xb6,0x53,0x00,0xc0,0x4f,0x79,0x49,0x8e);
+DEFINE_GUID(KSCATEGORY_BDA_RECEIVER_COMPONENT,
+    0xFD0A5AF4,0xB41D,0x11d2,0x9c,0x95,0x00,0xc0,0x4f,0x79,0x71,0xe0);
+DEFINE_GUID(KSCATEGORY_BDA_NETWORK_TUNER,
+    0x71985f48,0x1ca1,0x11d3,0x9c,0xc8,0x00,0xc0,0x4f,0x79,0x71,0xe0);
+DEFINE_GUID(KSDATAFORMAT_SUBTYPE_BDA_MPEG2_TRANSPORT,
+    0xF4AEB342,0x0329,0x4fdd,0xA8,0xFD,0x4A,0xFF,0x49,0x26,0xC9,0x78);
 
 extern const CLSID CLSID_SampleGrabber; // found in strmiids
 
-const IID IID_IMpeg2Data =
-    {0x9B396D40,0xF380,0x4e3c,{0xA5,0x14,0x1A,0x82,0xBF,0x6E,0xBF,0xE6}};
+DEFINE_GUID(IID_IMpeg2Data,
+    0x9B396D40,0xF380,0x4e3c,0xA5,0x14,0x1A,0x82,0xBF,0x6E,0xBF,0xE6);
 
 };
