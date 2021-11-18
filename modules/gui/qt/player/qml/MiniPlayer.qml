@@ -14,16 +14,20 @@ FocusScope {
     implicitHeight: controlBar.implicitHeight
     height: 0
 
-    readonly property bool expanded: (height !== 0)
+    visible: false
 
-    property var mainContent: undefined
+    property alias effectSource: effect.source
 
     state: (player.playingState === PlayerController.PLAYING_STATE_STOPPED) ? ""
                                                                             : "expanded"
 
     states: State {
-        id: stateExpanded
         name: "expanded"
+
+        PropertyChanges {
+            target: root
+            visible: true
+        }
 
         PropertyChanges {
             target: root
@@ -34,7 +38,12 @@ FocusScope {
     transitions: Transition {
         from: ""; to: "expanded"
         reversible: true
-        NumberAnimation { property: "height"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_normal; }
+
+        SequentialAnimation {
+            // visible should change first, in order for inner layouts to calculate implicitHeight correctly
+            PropertyAction { property: "visible" }
+            NumberAnimation { property: "height"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_normal; }
+        }
     }
 
     // this MouseArea prevents mouse events to be sent below miniplayer
@@ -45,6 +54,7 @@ FocusScope {
     }
 
     Widgets.FrostedGlassEffect {
+        id: effect
         anchors.fill: controlBar
 
         source: mainContent

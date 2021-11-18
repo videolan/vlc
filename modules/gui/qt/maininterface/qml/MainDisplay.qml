@@ -62,7 +62,7 @@ FocusScope {
         stackView.currentItem.Navigation.upItem = sourcesBanner
         stackView.currentItem.Navigation.rightItem = playlistColumn
         stackView.currentItem.Navigation.downItem = Qt.binding(function() {
-            return miniPlayer.expanded ? miniPlayer : medialibId
+            return miniPlayer.visible ? miniPlayer : medialibId
         })
 
         sourcesBanner.localMenuDelegate = Qt.binding(function () { return !!stackView.currentItem.localMenuDelegate ? stackView.currentItem.localMenuDelegate : null })
@@ -331,7 +331,7 @@ FocusScope {
 
                             Navigation.parentItem: medialibId
                             Navigation.upItem: sourcesBanner
-                            Navigation.downItem: miniPlayer.expanded ? miniPlayer : null
+                            Navigation.downItem: miniPlayer.visible ? miniPlayer : null
 
                             Navigation.leftAction: function() {
                                 stackView.currentItem.setCurrentItemFocus(Qt.TabFocusReason);
@@ -435,7 +435,10 @@ FocusScope {
             Player.MiniPlayer {
                 id: miniPlayer
 
-                visible: !root._inhibitMiniPlayer
+                Binding on state {
+                    when: root._inhibitMiniPlayer && !miniPlayer.visible
+                    value: ""
+                }
 
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -445,12 +448,12 @@ FocusScope {
                 Navigation.parentItem: medialibId
                 Navigation.upItem: stackView
                 Navigation.cancelItem:sourcesBanner
-                onExpandedChanged: {
-                    if (!expanded && miniPlayer.activeFocus)
+                onVisibleChanged: {
+                    if (!visible && miniPlayer.activeFocus)
                         stackView.forceActiveFocus()
                 }
 
-                mainContent: mainColumn
+                effectSource: mainColumn
             }
 
             Connections {
