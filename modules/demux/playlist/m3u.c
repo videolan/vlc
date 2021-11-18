@@ -320,7 +320,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                       sizeof( "PLAYLIST:" ) - 1 ) )
             {
                 psz_parse += sizeof( "PLAYLIST:" ) - 1;
-                input_item_SetTitle( p_demux->p_input_item, psz_parse );
+                input_item_SetTitle( p_subitems->p_item, psz_parse );
             }
         }
         else if( !strncasecmp( psz_parse, "RTSPtext", sizeof("RTSPtext") -1 ) )
