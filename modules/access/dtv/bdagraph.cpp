@@ -311,8 +311,8 @@ int dvb_set_cqam (dvb_device_t *d, uint32_t freq, const char * /*mod*/)
 /*****************************************************************************
 * BDAOutput
 *****************************************************************************/
-BDAOutput::BDAOutput( vlc_object_t *p_access ) :
-    p_access(p_access), p_first(NULL), pp_next(&p_first)
+BDAOutput::BDAOutput( ) :
+    p_first(NULL), pp_next(&p_first)
 {
     vlc_mutex_init( &lock );
     vlc_cond_init( &wait );
@@ -391,8 +391,7 @@ BDAGraph::BDAGraph( vlc_object_t *p_this ):
     guid_network_type(GUID_NULL),
     l_tuner_used(-1),
     systems(0),
-    d_graph_register( 0 ),
-    output( p_this )
+    d_graph_register( 0 )
 {
     p_media_control = NULL;
 

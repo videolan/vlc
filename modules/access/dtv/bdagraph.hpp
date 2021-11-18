@@ -79,7 +79,7 @@ struct ComContext
 class BDAOutput
 {
 public:
-    BDAOutput( vlc_object_t * );
+    BDAOutput( );
     ~BDAOutput();
 
     void    Push( block_t * );
@@ -87,7 +87,6 @@ public:
     void    Empty();
 
 private:
-    vlc_object_t *p_access;
     vlc_mutex_t   lock;
     vlc_cond_t    wait;
     block_t      *p_first;
