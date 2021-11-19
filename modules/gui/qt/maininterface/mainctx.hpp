@@ -344,6 +344,8 @@ public slots:
     void onWindowVisibilityChanged(QWindow::Visibility);
     void setHasAcrylicSurface(bool);
 
+    void sendHotkey(Qt::Key key, Qt::KeyboardModifiers modifiers );
+
     void emitBoss();
     void emitRaise();
     void emitShow();
@@ -357,8 +359,6 @@ protected slots:
     void updateSystrayTooltipStatus( PlayerController::PlayingState );
 
     void onInputChanged( bool );
-
-    void sendHotkey(Qt::Key key, Qt::KeyboardModifiers modifiers );
 
 signals:
     void minimalViewToggled( bool );
