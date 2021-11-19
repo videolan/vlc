@@ -313,6 +313,7 @@
         <file alias="VideoDisplayRecentVideos.qml">medialibrary/qml/VideoDisplayRecentVideos.qml</file>
     </qresource>
     <qresource prefix="/style">
+        <file alias="AcrylicController.qml">style/AcrylicController.qml</file>
         <file alias="qmldir">style/qmldir</file>
         <file alias="VLCStyle.qml">style/VLCStyle.qml</file>
         <file alias="VLCColors.qml">style/VLCColors.qml</file>

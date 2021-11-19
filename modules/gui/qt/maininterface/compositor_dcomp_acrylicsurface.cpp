@@ -87,15 +87,18 @@ CompositorDCompositionAcrylicSurface::CompositorDCompositionAcrylicSurface(qt_in
     if (!init(device))
         return;
 
-    if (auto w = window())
-        setActive(m_transparencyEnabled && w->isActive());
-
     qApp->installNativeEventFilter(this);
+
+    setActive(m_transparencyEnabled && m_mainInterface->acrylicActive());
+    connect(m_mainInterface, &MainInterface::acrylicActiveChanged, this, [this]()
+    {
+        setActive(m_transparencyEnabled && m_mainInterface->acrylicActive());
+    });
 }
 
 CompositorDCompositionAcrylicSurface::~CompositorDCompositionAcrylicSurface()
 {
-    setActive(false);
+    m_mainInterface->setHasAcrylicSurface(false);
 
     if (m_dummyWindow)
         DestroyWindow(m_dummyWindow);
@@ -121,18 +124,6 @@ bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &e
         requestReset(); // incase z-order changed
         break;
     }
-    case WM_ACTIVATE:
-    {
-        if (!m_transparencyEnabled)
-            break;
-
-        const int activeType = LOWORD(msg->wParam);
-        if ((activeType == WA_ACTIVE) || (activeType == WA_CLICKACTIVE))
-            setActive(true);
-        else if (activeType == WA_INACTIVE)
-            setActive(false);
-        break;
-    }
     case WM_SETTINGCHANGE:
     {
         if (!lstrcmpW(LPCWSTR(msg->lParam), L"ImmersiveColorSet"))
@@ -142,8 +133,8 @@ bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &e
                 break;
 
             m_transparencyEnabled = transparencyEnabled;
-            if (const auto w = window())
-                setActive(m_transparencyEnabled && w->isActive());
+            m_mainInterface->setHasAcrylicSurface(m_transparencyEnabled);
+            setActive(m_transparencyEnabled && m_mainInterface->acrylicActive());
         }
         break;
     }
@@ -167,8 +158,6 @@ bool CompositorDCompositionAcrylicSurface::init(ID3D11Device *device)
     if (!createBackHostVisual())
         return false;
 
-    m_transparencyEnabled = isTransparencyEnabled();
-
     m_leftMostScreenX = 0;
     m_topMostScreenY = 0;
     for (const auto screen : qGuiApp->screens())
@@ -177,6 +166,9 @@ bool CompositorDCompositionAcrylicSurface::init(ID3D11Device *device)
         m_leftMostScreenX = std::min<int>(geometry.left(), m_leftMostScreenX);
         m_topMostScreenY = std::min<int>(geometry.top(), m_topMostScreenY);
     }
+
+    m_transparencyEnabled = isTransparencyEnabled();
+    m_mainInterface->setHasAcrylicSurface(m_transparencyEnabled);
 
     return true;
 }
@@ -424,22 +416,10 @@ void CompositorDCompositionAcrylicSurface::setActive(const bool newActive)
         updateVisual();
         sync();
         commitChanges();
-
-        // delay propagating changes to avoid flickering
-        QMetaObject::invokeMethod(this, [this]()
-        {
-            m_mainInterface->setHasAcrylicSurface(true);
-        }, Qt::QueuedConnection);
     }
     else
     {
-        m_mainInterface->setHasAcrylicSurface(false);
-
-        // delay propagating changes to avoid flickering
-        QMetaObject::invokeMethod(this, [this]()
-        {
-            m_compositor->removeVisual(m_rootVisual);
-        }, Qt::QueuedConnection);
+        m_compositor->removeVisual(m_rootVisual);
     }
 }
 

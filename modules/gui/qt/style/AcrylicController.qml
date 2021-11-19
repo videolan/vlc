@@ -17,31 +17,33 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
+pragma Singleton
 import QtQuick 2.11
 
-import "qrc:///style/"
-
-// This Component uses layering, avoid adding children to this widget
 Item {
     id: root
 
-    readonly property bool usingAcrylic: visible && enabled && AcrylicController.enabled
+    property real uiTransluency: (enabled && topWindow.active) ? 1 : 0
 
-    property color tintColor: VLCStyle.colors.setColorAlpha(VLCStyle.colors.bg, 0.7)
+    enabled: mainInterface.hasAcrylicSurface
 
-    property color alternativeColor: VLCStyle.colors.bgAlt
+    Behavior on uiTransluency {
+        NumberAnimation {
+            duration: VLCStyle.duration_normal
+            easing.type: Easing.InOutSine
+        }
+    }
 
-    property real _blend: usingAcrylic ? AcrylicController.uiTransluency : 0
+    Binding {
+        when: root.enabled
+        target: mainInterface
+        property: "acrylicActive"
+        value: root.uiTransluency != 0
 
-    layer.enabled: true
-    layer.effect: ShaderEffect {
-        property color overlay: VLCStyle.colors.blendColors(root.tintColor, root.alternativeColor, root._blend)
-
-        blending: false
-        fragmentShader: "
-            uniform lowp vec4 overlay;
-            void main() { gl_FragColor = overlay; }
-        "
+        Component.onCompleted: {
+            // restoreMode is only available in Qt >= 5.14
+            if ("restoreMode" in this)
+                this.restoreMode = Binding.RestoreBindingOrValue
+        }
     }
 }

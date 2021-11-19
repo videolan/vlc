@@ -388,15 +388,6 @@ void MainInterface::onWindowVisibilityChanged(QWindow::Visibility visibility)
     m_windowVisibility = visibility;
 }
 
-void MainInterface::setUseAcrylicBackground(const bool v)
-{
-    if (m_useAcrylicBackground == v)
-        return;
-
-    m_useAcrylicBackground = v;
-    emit useAcrylicBackgroundChanged();
-}
-
 void MainInterface::setHasAcrylicSurface(const bool v)
 {
     if (m_hasAcrylicSurface == v)
@@ -811,4 +802,18 @@ static int IntfBossCB( vlc_object_t *, const char *,
     p_intf->p_mi->emitBoss();
 
     return VLC_SUCCESS;
+}
+
+bool MainInterface::acrylicActive() const
+{
+    return m_acrylicActive;
+}
+
+void MainInterface::setAcrylicActive(bool newAcrylicActive)
+{
+    if (m_acrylicActive == newAcrylicActive)
+        return;
+
+    m_acrylicActive = newAcrylicActive;
+    emit acrylicActiveChanged();
 }
