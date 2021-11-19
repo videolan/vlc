@@ -222,9 +222,6 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
 }
 
 #undef aout_FormatPrint
-/**
- * Prints an audio sample format in a human-readable form.
- */
 void aout_FormatPrint( vlc_object_t *obj, const char *psz_text,
                        const audio_sample_format_t *p_format )
 {
@@ -286,17 +283,6 @@ unsigned aout_CheckChannelReorder( const uint32_t *chans_in,
     return 0;
 }
 
-/**
- * Reorders audio samples within a block of linear audio interleaved samples.
- * \param ptr start address of the block of samples
- * \param bytes size of the block in bytes (must be a multiple of the product
- *              of the channels count and the sample size)
- * \param channels channels count (also length of the chans_table table)
- * \param chans_table permutation table to reorder the channels
- *                    (usually computed by aout_CheckChannelReorder())
- * \param fourcc sample format (must be a linear sample format)
- * \note The samples must be naturally aligned in memory.
- */
 void aout_ChannelReorder( void *ptr, size_t bytes, uint8_t channels,
                           const uint8_t *restrict chans_table, vlc_fourcc_t fourcc )
 {
