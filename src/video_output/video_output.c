@@ -2270,13 +2270,6 @@ static void *Thread(void *object)
                 }
             #endif
 
-                if (sys->state.prepare.first && ret == VLC_SUCCESS)
-                {
-                    /* SEND EVENT */
-                    msg_Info(&vout->obj, "First frame has been drawn");
-                    vout_ReportFirstFrame(&vout->obj);
-                }
-
                 sys->state.current = VOUT_STATE_CONTROL;
                 break;
             }
