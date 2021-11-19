@@ -18,7 +18,7 @@
  */
 
 #include <stdio.h>
-#include "srtp.c"
+#include "../srtp.c"
 
 static void printhex (const void *buf, size_t len)
 {

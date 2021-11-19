@@ -27,7 +27,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <string.h>
-#include "sdp.h"
+#include "../sdp.h"
 #include <vlc_common.h>
 
 static void test_sdp_valid(const char *str)

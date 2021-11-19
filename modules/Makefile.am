@@ -17,6 +17,7 @@ include common.am
 include access/Makefile.am
 include access/http/Makefile.am
 include access/rtp/Makefile.am
+include access/rtp/test/Makefile.am
 include arm_neon/Makefile.am
 include audio_filter/Makefile.am
 include audio_mixer/Makefile.am

@@ -23,7 +23,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include "srtp.h"
+#include "../srtp.h"
 
 #include <stdio.h>
 #include <string.h>
