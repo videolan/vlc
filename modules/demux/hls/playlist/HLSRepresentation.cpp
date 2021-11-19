@@ -163,7 +163,7 @@ bool HLSRepresentation::runLocalUpdates(SharedResources *res)
 
 uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepresentation *from) const
 {
-    if(consistentSegmentNumber())
+    if(targetDuration == static_cast<const HLSRepresentation *>(from)->targetDuration)
         return num;
 
     ISegment *fromSeg = from->getMediaSegment(num);

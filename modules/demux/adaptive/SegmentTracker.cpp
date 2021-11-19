@@ -272,13 +272,8 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos,
                 /* Ensure ephemere content is updated/loaded */
                 if(temp.rep->needsUpdate(pos.number))
                     b_updated = temp.rep->runLocalUpdates(resources);
-                /* if we need to translate pos */
-                if(!temp.rep->consistentSegmentNumber())
-                {
-                    /* Convert our segment number */
-                    temp.number = temp.rep->translateSegmentNumber(pos.number, pos.rep);
-                }
-                else temp.number = pos.number;
+                /* Convert our segment number if we need to */
+                temp.number = temp.rep->translateSegmentNumber(pos.number, pos.rep);
             }
             if(temp.isValid())
                 pos = temp;
