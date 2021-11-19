@@ -387,4 +387,9 @@ void CompositorDirectComposition::removeVisual(Microsoft::WRL::ComPtr<IDComposit
     m_dcompDevice->Commit();
 }
 
+QQuickItem * CompositorDirectComposition::activeFocusItem() const /* override */
+{
+    return m_uiSurface->activeFocusItem();
+}
+
 }

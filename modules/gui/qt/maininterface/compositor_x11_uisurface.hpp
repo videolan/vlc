@@ -59,6 +59,8 @@ public:
     void setContent(QQmlComponent*,  QQuickItem* rootItem) override;
     QQmlEngine* engine() const override { return m_qmlEngine; }
 
+    QQuickItem * activeFocusItem() const override;
+
 signals:
     void beforeRendering();
     void afterRendering();

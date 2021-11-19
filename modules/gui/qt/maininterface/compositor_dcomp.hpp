@@ -58,6 +58,8 @@ public:
     void addVisual(Microsoft::WRL::ComPtr<IDCompositionVisual> visual);
     void removeVisual(Microsoft::WRL::ComPtr<IDCompositionVisual> visual);
 
+    QQuickItem * activeFocusItem() const override;
+
 private slots:
     void onSurfacePositionChanged(const QPointF& position) override;
     void onSurfaceSizeChanged(const QSizeF& size) override;

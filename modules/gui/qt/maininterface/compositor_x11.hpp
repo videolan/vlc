@@ -55,6 +55,8 @@ public:
 
     inline QWindow* interfaceMainWindow() const override { return m_interfaceWindow; };
 
+    QQuickItem * activeFocusItem() const override;
+
 private:
     int windowEnable(const vout_window_cfg_t *)  override;
     void windowDisable() override;

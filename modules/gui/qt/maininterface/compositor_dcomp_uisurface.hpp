@@ -97,6 +97,8 @@ public:
 
     void setContent(QQmlComponent* component,  QQuickItem* rootItem) override;
 
+    QQuickItem * activeFocusItem() const override;
+
     void timerEvent(QTimerEvent *event) override;
     bool eventFilter(QObject* object, QEvent* event) override;
 

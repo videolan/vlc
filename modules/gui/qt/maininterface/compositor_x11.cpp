@@ -209,3 +209,8 @@ bool CompositorX11::setupVoutWindow(vout_window_t* p_wnd, VoutDestroyCb destroyC
     commonSetupVoutWindow(p_wnd, destroyCb);
     return true;
 }
+
+QQuickItem * CompositorX11::activeFocusItem() const /* override */
+{
+    return m_qmlView->activeFocusItem();
+}

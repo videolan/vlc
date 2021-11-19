@@ -61,6 +61,8 @@ public:
 
     Type type() const override;
 
+    QQuickItem * activeFocusItem() const override;
+
 protected:
     qt_intf_t *m_intf;
 

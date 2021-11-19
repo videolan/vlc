@@ -76,6 +76,7 @@ public:
 
     virtual QWindow* interfaceMainWindow() const = 0;
 
+    virtual QQuickItem * activeFocusItem() const = 0;
 };
 
 /**
@@ -97,6 +98,8 @@ public:
     public:
         virtual QQmlEngine* engine() const = 0;
         virtual void setContent(QQmlComponent *component, QQuickItem *item) = 0;
+
+        virtual QQuickItem * activeFocusItem() const = 0;
     };
 public:
     explicit CompositorVideo(qt_intf_t* p_intf, QObject* parent = nullptr);
@@ -124,7 +127,6 @@ protected:
 
 private:
     bool commonGUICreateImpl(QWindow* window, CompositorVideo::Flags flags);
-
 
 protected slots:
     virtual void onSurfacePositionChanged(const QPointF&) {}

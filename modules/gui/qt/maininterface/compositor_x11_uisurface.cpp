@@ -90,6 +90,11 @@ void CompositorX11UISurface::setContent(QQmlComponent*,  QQuickItem* rootItem)
     updateSizes();
 }
 
+QQuickItem * CompositorX11UISurface::activeFocusItem() const /* override */
+{
+    return m_uiWindow->activeFocusItem();
+}
+
 void CompositorX11UISurface::createFbo()
 {
     //write to the immediate context

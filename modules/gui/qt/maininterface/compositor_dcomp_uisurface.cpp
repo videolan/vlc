@@ -516,6 +516,11 @@ void CompositorDCompositionUISurface::setContent(QQmlComponent*,  QQuickItem* ro
     requestUpdate();
 }
 
+QQuickItem * CompositorDCompositionUISurface::activeFocusItem() const /* override */
+{
+    return m_uiWindow->activeFocusItem();
+}
+
 void CompositorDCompositionUISurface::render()
 {
     EGLBoolean eglRet;

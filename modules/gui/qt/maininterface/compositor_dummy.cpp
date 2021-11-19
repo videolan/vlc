@@ -92,4 +92,9 @@ Compositor::Type CompositorDummy::type() const
     return Compositor::DummyCompositor;
 }
 
+QQuickItem * CompositorDummy::activeFocusItem() const /* override */
+{
+    return m_qmlWidget->activeFocusItem();
+}
+
 }
