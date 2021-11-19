@@ -246,6 +246,11 @@ stime_t SegmentList::getTotalLength() const
     return totalLength;
 }
 
+bool SegmentList::hasRelativeMediaTimes() const
+{
+    return b_relative_mediatimes;
+}
+
 vlc_tick_t SegmentList::getMinAheadTime(uint64_t curnum) const
 {
     const SegmentTimeline *timeline = inheritSegmentTimeline();
