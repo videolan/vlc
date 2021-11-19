@@ -63,7 +63,6 @@ namespace adaptive
                 const std::list<std::string> & getCodecs    () const;
                 void                addCodecs               (const std::string &);
                 void                getCodecsDesc           (CodecDescriptionList *) const;
-                bool                consistentSegmentNumber () const;
                 virtual void        pruneByPlaybackTime     (mtime_t) override;
 
                 virtual mtime_t     getMinAheadTime         (uint64_t) const;
@@ -93,7 +92,6 @@ namespace adaptive
                 BaseAdaptationSet                  *adaptationSet;
                 uint64_t                            bandwidth;
                 std::list<std::string>              codecs;
-                bool                                b_consistent;
         };
     }
 }

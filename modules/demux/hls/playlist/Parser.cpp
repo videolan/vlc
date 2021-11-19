@@ -327,7 +327,6 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                 break;
 
             case SingleValueTag::EXTXPROGRAMDATETIME:
-                rep->b_consistent = false;
                 absReferenceTime = VLC_TS_0 +
                         UTCTime(static_cast<const SingleValueTag *>(tag)->getValue().value).mtime();
                 /* Reverse apply UTC timespec from first discont */

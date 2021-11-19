@@ -48,7 +48,6 @@ BaseRepresentation::BaseRepresentation( BaseAdaptationSet *set ) :
                 adaptationSet   ( set ),
                 bandwidth       (0)
 {
-    b_consistent = true;
 }
 
 BaseRepresentation::~BaseRepresentation ()
@@ -142,11 +141,6 @@ void BaseRepresentation::scheduleNextUpdate(uint64_t, bool)
 
 }
 
-bool BaseRepresentation::consistentSegmentNumber() const
-{
-    return b_consistent;
-}
-
 void BaseRepresentation::pruneByPlaybackTime(mtime_t time)
 {
     uint64_t num;
@@ -201,11 +195,8 @@ bool BaseRepresentation::validateCodec(const std::string &) const
     return true;
 }
 
-uint64_t BaseRepresentation::translateSegmentNumber(uint64_t num, const BaseRepresentation *from) const
+uint64_t BaseRepresentation::translateSegmentNumber(uint64_t num, const BaseRepresentation *) const
 {
-    mtime_t time, duration;
-    if( from->getPlaybackTimeDurationBySegmentNumber(num, &time, &duration) )
-        getSegmentNumberByTime(time, &num);
     return num;
 }
 
