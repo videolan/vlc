@@ -53,7 +53,7 @@
 
 #define DEVICE_TEXT "Framebuffer device"
 #define DEVICE_LONGTEXT \
-    "Framebuffer device to use for rendering (usually /dev/dri/card0)."
+    "Framebuffer device to use for rendering (usually /dev/dri/card0 or /dev/drm0)."
 
 #define KMS_CONNECTOR_TEXT "DRM Connector"
 #define KMS_CONNECTOR_LONGTEXT \
@@ -437,7 +437,8 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
     add_obsolete_string("kms") /* Since 4.0.0 */
-    add_loadfile(KMS_DEVICE_VAR, "/dev/dri/card0", DEVICE_TEXT, DEVICE_LONGTEXT)
+    add_loadfile(KMS_DEVICE_VAR, DRM_DIR_NAME "/" DRM_PRIMARY_MINOR_NAME "0",
+                 DEVICE_TEXT, DEVICE_LONGTEXT)
     add_string("kms-connector", "", KMS_CONNECTOR_TEXT, KMS_CONNECTOR_LONGTEXT)
 
     set_description("Linux kernel mode setting window provider")
