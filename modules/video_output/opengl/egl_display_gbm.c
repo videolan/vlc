@@ -31,7 +31,12 @@
 
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
+
 #include <gbm.h>
+
+#ifdef HAVE_KMS
+#include <xf86drm.h>
+#endif
 
 #include "egl_display.h"
 
@@ -57,11 +62,22 @@ static void Close(struct vlc_egl_display *display)
 static int
 OpenDeviceFd(const char **out_path)
 {
+    /* Usually, /dev/dri/renderD* or /dev/dri/card* on Linux */
     static const char *default_drm_device_paths[] = {
+#if defined(HAVE_KMS)
+    /* OpenBSD has moved to Linux file path for DRM. libdrm defines will
+     * provide the correct path, but otherwise we'll always fallback to
+     * the standard path for Linux. */
+        DRM_DIR_NAME "/" DRM_RENDER_MINOR_NAME "128",
+        DRM_DIR_NAME "/" DRM_PRIMARY_MINOR_NAME "0",
+        DRM_DIR_NAME "/" DRM_RENDER_MINOR_NAME "129",
+        DRM_DIR_NAME "/" DRM_PRIMARY_MINOR_NAME "1",
+#else
         "/dev/dri/renderD128",
         "/dev/dri/card0",
         "/dev/dri/renderD129",
         "/dev/dri/card1",
+#endif
     };
 
     for (size_t i = 0; i < ARRAY_SIZE(default_drm_device_paths); ++i)
