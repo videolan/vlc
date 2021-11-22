@@ -38,6 +38,35 @@ MediaLib::MediaLib(qt_intf_t *_intf, QObject *_parent)
 
     /* https://xkcd.com/221/ */
     m_threadPool.setMaxThreadCount(4);
+    m_mlThreadPool.setMaxThreadCount(4);
+}
+
+MediaLib::~MediaLib()
+{
+}
+
+void MediaLib::destroy()
+{
+    m_shuttingDown = true;
+    //try to cancel as many tasks as possible
+    for (auto taskIt = m_objectTasks.begin(); taskIt != m_objectTasks.end(); /**/)
+    {
+        quint64 key = taskIt.value();
+        auto task = m_runningTasks.value(key, nullptr);
+        if (m_mlThreadPool.tryTake(task))
+        {
+            delete task;
+            m_runningTasks.remove(key);
+            taskIt = m_objectTasks.erase(taskIt);
+        }
+        else
+            ++taskIt;
+    }
+
+    if (m_runningTasks.empty())
+    {
+        deleteLater();
+    }
 }
 
 void MediaLib::addToPlaylist(const QString& mrl, const QStringList &options)
@@ -186,18 +215,11 @@ void MediaLib::insertIntoPlaylist(const size_t index, const QVariantList &itemId
 
 void MediaLib::reload()
 {
-    /* m_threadPool.start(lambda) is only supported since Qt 5.15 */
-    struct Task : QRunnable {
-        vlc_medialibrary_t *m_ml;
-
-        Task(vlc_medialibrary_t *ml) : m_ml(ml) {}
-        void run() override
-        {
-            vlc_ml_reload_folder(m_ml, nullptr);
-        }
-    };
-
-    m_threadPool.start(new Task(m_ml));
+    runOnMLThread(this,
+    //ML thread
+    [](vlc_medialibrary_t* ml){
+        vlc_ml_reload_folder(ml, nullptr);
+    });
 }
 
 QVariantList MediaLib::mlInputItem(const MLItemId mlId)
@@ -302,5 +324,105 @@ void MediaLib::onMediaLibraryEvent( void* data, const vlc_ml_event_t* event )
         }
         default:
             break;
+    }
+}
+
+quint64 MediaLib::runOnMLThread(const QObject* obj,
+                std::function< void(vlc_medialibrary_t* ml)> mlCb,
+                std::function< void()> uiCb,
+                const char* queue)
+{
+    struct NoCtx{};
+    return runOnMLThread<NoCtx>(obj,
+    [mlCb](vlc_medialibrary_t* ml, NoCtx&){
+        mlCb(ml);
+    },
+    [uiCb](quint64, NoCtx&){
+        uiCb();
+    },
+    queue);
+}
+
+quint64 MediaLib::runOnMLThread(const QObject* obj,
+                std::function< void(vlc_medialibrary_t* ml)> mlCb,
+                std::function< void(quint64)> uiCb, const char* queue)
+{
+    struct NoCtx{};
+    return runOnMLThread<NoCtx>(obj,
+    [mlCb](vlc_medialibrary_t* ml, NoCtx&){
+        mlCb(ml);
+    },
+    [uiCb](quint64 requestId, NoCtx&){
+        uiCb(requestId);
+    },
+    queue);
+}
+
+quint64 MediaLib::runOnMLThread(const QObject* obj,
+                std::function< void(vlc_medialibrary_t* ml)> mlCb,
+                const char* queue)
+{
+    struct NoCtx{};
+    return runOnMLThread<NoCtx>(obj,
+    [mlCb](vlc_medialibrary_t* ml, NoCtx&){
+        mlCb(ml);
+    },
+    [](quint64, NoCtx&){
+    },
+    queue);
+}
+
+
+void MediaLib::cancelMLTask(const QObject* object, quint64 taskId)
+{
+    assert(taskId != 0);
+
+    auto task = m_runningTasks.value(taskId, nullptr);
+    if (!task)
+        return;
+    task->cancel();
+    bool removed = m_mlThreadPool.tryTake(task);
+    if (removed)
+        delete task;
+    m_runningTasks.remove(taskId);
+    m_objectTasks.remove(object, taskId);
+}
+
+void MediaLib::runOnMLThreadDone(RunOnMLThreadBaseRunner* runner, quint64 target, const QObject* object, int status)
+{
+    if (m_shuttingDown)
+    {
+        if (m_runningTasks.contains(target))
+        {
+            m_runningTasks.remove(target);
+            m_objectTasks.remove(object, target);
+        }
+        if (m_runningTasks.empty())
+            deleteLater();
+    }
+    else if (m_runningTasks.contains(target))
+    {
+        if (status == ML_TASK_STATUS_SUCCEED)
+            runner->runUICallback();
+        m_runningTasks.remove(target);
+        m_objectTasks.remove(object, target);
+    }
+    runner->deleteLater();
+}
+
+void MediaLib::runOnMLThreadTargetDestroyed(QObject * object)
+{
+    if (m_objectTasks.contains(object))
+    {
+        for (auto taskId : m_objectTasks.values(object))
+        {
+            auto task = m_runningTasks.value(taskId, nullptr);
+            assert(task);
+            bool removed = m_mlThreadPool.tryTake(task);
+            if (removed)
+                delete task;
+            m_runningTasks.remove(taskId);
+        }
+        m_objectTasks.remove(object);
     }
 }

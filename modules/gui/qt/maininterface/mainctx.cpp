@@ -138,7 +138,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     vlc_medialibrary_t* ml = vlc_ml_instance_get( p_intf );
     b_hasMedialibrary = (ml != NULL);
     if (b_hasMedialibrary) {
-        m_medialib = new MediaLib(p_intf, this);
+        m_medialib = new MediaLib(p_intf);
     }
 
     /* Controlbar Profile Model Creation */
@@ -232,6 +232,9 @@ MainCtx::~MainCtx()
     var_DelCallback( libvlc, "intf-show", IntfRaiseMainCB, p_intf );
     var_DelCallback( libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
     var_DelCallback( libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
+
+    if (m_medialib)
+        m_medialib->destroy();
 
     p_intf->p_mi = NULL;
 }

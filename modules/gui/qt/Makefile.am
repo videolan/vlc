@@ -174,6 +174,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlhelper.hpp \
 	gui/qt/medialibrary/mlitemcover.cpp \
 	gui/qt/medialibrary/mlitemcover.hpp \
+	gui/qt/medialibrary/mlthreadpool.cpp \
+	gui/qt/medialibrary/mlthreadpool.hpp \
 	gui/qt/medialibrary/mlqmltypes.hpp \
 	gui/qt/medialibrary/mlqueryparams.cpp \
 	gui/qt/medialibrary/mlqueryparams.hpp \
@@ -383,6 +385,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlfoldersmodel.moc.cpp \
 	gui/qt/medialibrary/mlgenremodel.moc.cpp \
 	gui/qt/medialibrary/mlgrouplistmodel.moc.cpp \
+	gui/qt/medialibrary/mlthreadpool.moc.cpp \
 	gui/qt/medialibrary/mlqmltypes.moc.cpp \
 	gui/qt/medialibrary/mlrecentsmodel.moc.cpp \
 	gui/qt/medialibrary/mlrecentsvideomodel.moc.cpp \
