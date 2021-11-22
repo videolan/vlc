@@ -83,9 +83,6 @@ private: // MLBaseModel implementation
 
     void thumbnailUpdated(int idx) override;
 
-private slots:
-    void onCover();
-
 signals:
     void coverSizeChanged   ();
     void coverDefaultChanged();

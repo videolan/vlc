@@ -38,7 +38,7 @@
 struct vlc_medialibrary_t;
 class MLItemId;
 
-class CoverGenerator : public AsyncTask<QString>
+class CoverGenerator : public QObject
 {
     Q_OBJECT
 
@@ -80,8 +80,8 @@ public: // Interface
 
     QString cachedFileURL() const;
 
-public: // AsyncTask implementation
-    QString execute() override;
+public:
+    QString execute();
 
 private: // Functions
     QString fileName() const;

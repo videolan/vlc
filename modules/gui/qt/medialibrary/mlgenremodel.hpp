@@ -63,9 +63,6 @@ private:
 
     QString getCover(MLGenre * genre) const;
 
-private slots:
-    void onCover();
-
 private:
     struct Loader : public BaseLoader
     {

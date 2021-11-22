@@ -245,27 +245,45 @@ QString MLPlaylistListModel::getCover(MLPlaylist * playlist) const
     if (cover.isNull() == false || playlist->hasGenerator())
         return cover;
 
-    CoverGenerator * generator = new CoverGenerator(m_ml, playlist->getId());
-
-    generator->setSize(m_coverSize);
-
-    generator->setDefaultThumbnail(m_coverDefault);
-
-    generator->setPrefix(m_coverPrefix);
-
-    if (generator->cachedFileAvailable())
+    MLItemId playlistId = playlist->getId();
+    struct Context{
+        QString cover;
+    };
+    playlist->setGenerator(true);
+    m_mediaLib->runOnMLThread<Context>(this,
+    //ML thread
+    [playlistId, coverSize = m_coverSize, coverDefault = m_coverDefault, coverPrefix = m_coverPrefix]
+    (vlc_medialibrary_t* ml, Context& ctx)
     {
-        playlist->setCover(generator->cachedFileURL());
-        generator->deleteLater();
-        return playlist->getCover();
-    }
+        CoverGenerator generator{ml, playlistId};
 
-    // NOTE: We'll apply the new thumbnail once it's loaded.
-    connect(generator, &CoverGenerator::result, this, &MLPlaylistListModel::onCover);
+        generator.setSize(coverSize);
 
-    generator->start(*QThreadPool::globalInstance());
+        generator.setDefaultThumbnail(coverDefault);
 
-    playlist->setGenerator(generator);
+        generator.setPrefix(coverPrefix);
+
+        if (generator.cachedFileAvailable())
+            ctx.cover = generator.cachedFileURL();
+        else
+            ctx.cover = generator.execute();
+    },
+    //UI thread
+    [this, playlistId]
+    (quint64, Context& ctx)
+    {
+        int row;
+        // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
+        auto playlist = static_cast<MLPlaylist *>(findInCache(playlistId, &row));
+        if (!playlist)
+            return;
+        playlist->setCover(ctx.cover);
+        playlist->setGenerator(false);
+
+        //we're running in a callback
+        QModelIndex modelIndex = index(row);
+        emit const_cast<MLPlaylistListModel*>(this)->dataChanged(modelIndex, modelIndex, { PLAYLIST_THUMBNAIL });
+    });
 
     return cover;
 }
@@ -296,35 +314,6 @@ void MLPlaylistListModel::thumbnailUpdated(int idx) /* override */
     QModelIndex index = this->index(idx);
 
     emit dataChanged(index, index, { PLAYLIST_THUMBNAIL });
-}
-
-//-------------------------------------------------------------------------------------------------
-// Private slots
-//-------------------------------------------------------------------------------------------------
-
-void MLPlaylistListModel::onCover()
-{
-    CoverGenerator * generator = static_cast<CoverGenerator *>(sender());
-
-    int index = 0;
-
-    // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
-    MLItem * item = this->findInCache(generator->getId(), &index);
-
-    // NOTE: When the item is no longer cached or has been moved we return right away.
-    if (!item)
-    {
-        generator->deleteLater();
-        return;
-    }
-
-    MLPlaylist * playlist = static_cast<MLPlaylist *> (item);
-
-    playlist->setCover(generator->takeResult());
-
-    playlist->setGenerator(nullptr);
-
-    thumbnailUpdated(index);
 }
 
 //-------------------------------------------------------------------------------------------------

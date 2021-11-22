@@ -38,13 +38,13 @@ public:
 
 public: // Interface
     bool hasGenerator() const;
-    void setGenerator(CoverGenerator * generator);
+    void setGenerator(bool generating);
 
     QString getCover() const;
     void    setCover(const QString & fileName);
 
 private:
-    TaskHandle<CoverGenerator> m_generator;
+    bool m_isGenerating = false;
 
     QString m_cover;
 };

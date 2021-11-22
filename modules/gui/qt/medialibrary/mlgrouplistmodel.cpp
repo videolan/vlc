@@ -220,26 +220,44 @@ QString MLGroupListModel::getCover(MLGroup * group) const
     if (cover.isNull() == false || group->hasGenerator())
         return cover;
 
-    CoverGenerator * generator = new CoverGenerator(m_ml, group->getId());
+    MLItemId groupId = group->getId();
+    struct Context{
+        QString cover;
+    };
+    group->setGenerator(true);
+    m_mediaLib->runOnMLThread<Context>(this,
+    //ML thread
+    [groupId]
+    (vlc_medialibrary_t* ml, Context& ctx){
+        CoverGenerator generator{ml, groupId};
 
-    generator->setSize(QSize(MLGROUPLISTMODEL_COVER_WIDTH,
-                             MLGROUPLISTMODEL_COVER_HEIGHT));
+        generator.setSize(QSize(MLGROUPLISTMODEL_COVER_WIDTH,
+                                 MLGROUPLISTMODEL_COVER_HEIGHT));
 
-    generator->setDefaultThumbnail(":/noart_videoCover.svg");
+        generator.setDefaultThumbnail(":/noart_videoCover.svg");
 
-    if (generator->cachedFileAvailable())
+        if (generator.cachedFileAvailable())
+            ctx.cover = generator.cachedFileURL();
+        else
+            ctx.cover = generator.execute();
+    },
+    //UI Thread
+    [this, groupId]
+    (quint64, Context& ctx)
     {
-        group->setCover(generator->cachedFileURL());
-        generator->deleteLater();
-        return group->getCover();
-    }
+        int row;
+        // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
+        auto group = static_cast<MLGroup*>(findInCache(groupId, &row));
+        if (!group)
+            return;
 
-    // NOTE: We'll apply the new thumbnail once it's loaded.
-    connect(generator, &CoverGenerator::result, this, &MLGroupListModel::onCover);
+        group->setCover(ctx.cover);
+        group->setGenerator(false);
 
-    generator->start(*QThreadPool::globalInstance());
-
-    group->setGenerator(generator);
+        QModelIndex modelIndex =this->index(row);
+        //we're running in a callback
+        emit const_cast<MLGroupListModel*>(this)->dataChanged(modelIndex, modelIndex, { GROUP_THUMBNAIL });
+    });
 
     return cover;
 }
@@ -270,35 +288,6 @@ void MLGroupListModel::thumbnailUpdated(int idx) /* override */
     QModelIndex index = this->index(idx);
 
     emit dataChanged(index, index, { GROUP_THUMBNAIL });
-}
-
-//-------------------------------------------------------------------------------------------------
-// Private slots
-//-------------------------------------------------------------------------------------------------
-
-void MLGroupListModel::onCover()
-{
-    CoverGenerator * generator = static_cast<CoverGenerator *> (sender());
-
-    int index = 0;
-
-    // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
-    MLItem * item = this->findInCache(generator->getId(), &index);
-
-    // NOTE: When the item is no longer cached or has been moved we return right away.
-    if (!item)
-    {
-        generator->deleteLater();
-        return;
-    }
-
-    MLGroup * group = static_cast<MLGroup *> (item);
-
-    group->setCover(generator->takeResult());
-
-    group->setGenerator(nullptr);
-
-    thumbnailUpdated(index);
 }
 
 //=================================================================================================

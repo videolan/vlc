@@ -26,7 +26,7 @@
 
 MLItemCover::MLItemCover(const MLItemId & id)
     : MLItem(id)
-    , m_generator(nullptr) {}
+{}
 
 //-------------------------------------------------------------------------------------------------
 // Interface
@@ -34,12 +34,12 @@ MLItemCover::MLItemCover(const MLItemId & id)
 
 bool MLItemCover::hasGenerator() const
 {
-    return m_generator.get();
+    return m_isGenerating;
 }
 
-void MLItemCover::setGenerator(CoverGenerator * generator)
+void MLItemCover::setGenerator(bool generating)
 {
-    m_generator.reset(generator);
+    m_isGenerating = generating;
 }
 
 //-------------------------------------------------------------------------------------------------

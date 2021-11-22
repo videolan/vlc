@@ -82,9 +82,6 @@ private: // MLBaseModel implementation
 
     void thumbnailUpdated(int idx) override;
 
-private slots:
-    void onCover();
-
 private:
     struct Loader : public MLBaseModel::BaseLoader
     {

@@ -124,65 +124,57 @@ QString MLGenreModel::getCover(MLGenre * genre) const
     if (cover.isNull() == false || genre->hasGenerator())
         return cover;
 
-    CoverGenerator * generator = new CoverGenerator(m_ml, genre->getId());
-
-    generator->setSize(QSize(MLGENREMODEL_COVER_WIDTH,
-                             MLGENREMODEL_COVER_HEIGHT));
-
-    generator->setCountX(MLGENREMODEL_COVER_COUNTX);
-    generator->setCountY(MLGENREMODEL_COVER_COUNTY);
-
-    generator->setSplit(CoverGenerator::Duplicate);
-
-    generator->setBlur(MLGENREMODEL_COVER_BLUR);
-
-    generator->setDefaultThumbnail(":/noart_album.svg");
-
-    if (generator->cachedFileAvailable())
+    MLItemId genreId = genre->getId();
+    struct Context{
+        QString cover;
+    };
+    genre->setGenerator(true);
+    m_mediaLib->runOnMLThread<Context>(this,
+    //ML thread
+    [genreId]
+    (vlc_medialibrary_t* ml, Context& ctx)
     {
-        genre->setCover(generator->cachedFileURL());
-        generator->deleteLater();
-        return genre->getCover();
-    }
+        CoverGenerator generator{ml, genreId};
 
-    // NOTE: We'll apply the new cover once it's loaded.
-    connect(generator, &CoverGenerator::result, this, &MLGenreModel::onCover);
+        generator.setSize(QSize(MLGENREMODEL_COVER_WIDTH,
+                                 MLGENREMODEL_COVER_HEIGHT));
 
-    generator->start(*QThreadPool::globalInstance());
+        generator.setCountX(MLGENREMODEL_COVER_COUNTX);
+        generator.setCountY(MLGENREMODEL_COVER_COUNTY);
 
-    genre->setGenerator(generator);
+        generator.setSplit(CoverGenerator::Duplicate);
+
+        generator.setBlur(MLGENREMODEL_COVER_BLUR);
+
+        generator.setDefaultThumbnail(":/noart_album.svg");
+
+        if (generator.cachedFileAvailable())
+            ctx.cover = generator.cachedFileURL();
+        else
+            ctx.cover = generator.execute();
+        vlc_ml_media_set_genre_thumbnail(ml, genreId.id, qtu(ctx.cover), VLC_ML_THUMBNAIL_SMALL);
+    },
+    //UI thread
+    [this, genreId]
+    (quint64, Context& ctx)
+    {
+        int row = 0;
+        // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
+        auto genre = static_cast<MLGenre *>(findInCache(genreId, &row));
+        if (!genre)
+            return;
+
+        genre->setCover(ctx.cover);
+        genre->setGenerator(false);
+
+        //we're running in a callback
+        QModelIndex modelIndex =this->index(row);
+        //we're running in a callback
+        emit const_cast<MLGenreModel*>(this)->dataChanged(modelIndex, modelIndex, { GENRE_COVER });
+    });
+
 
     return cover;
-}
-
-//-------------------------------------------------------------------------------------------------
-// Private slots
-//-------------------------------------------------------------------------------------------------
-
-void MLGenreModel::onCover()
-{
-    CoverGenerator * generator = static_cast<CoverGenerator *> (sender());
-
-    const MLItemId mlId = generator->getId();
-
-    int itemIndex = 0;
-
-    auto genre = static_cast<MLGenre *>(findInCache(mlId, &itemIndex));
-
-    if (!genre)
-    {
-        // item is not in the cache anymore
-        generator->deleteLater();
-        return;
-    }
-
-    genre->setCover(generator->takeResult());
-    genre->setGenerator(nullptr);
-
-    vlc_ml_media_set_genre_thumbnail(ml()->vlcMl(), mlId.id
-                                    , qtu(genre->getCover()), VLC_ML_THUMBNAIL_SMALL);
-
-    thumbnailUpdated(itemIndex);
 }
 
 //-------------------------------------------------------------------------------------------------
