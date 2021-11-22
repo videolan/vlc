@@ -55,14 +55,30 @@ QHash<int, QByteArray> MLUrlModel::roleNames() const
 
 void MLUrlModel::addAndPlay( const QString &url )
 {
-    ml_unique_ptr<vlc_ml_media_t> s{vlc_ml_get_media_by_mrl( m_ml, qtu( url ))};
-    if (!s)
-        s.reset(vlc_ml_new_stream( m_ml, qtu( url ) ));
-    if (!s)
-        return;
-    MLItemId itemId( s->i_id, VLC_ML_PARENT_UNKNOWN );
-    m_mediaLib->addAndPlay(itemId);
-    emit resetRequested();
+    struct Ctx{
+        bool succeed = false;
+        MLItemId itemId;
+    };
+    m_mediaLib->runOnMLThread<Ctx>(this,
+    //ML thread
+    [url](vlc_medialibrary_t* ml, Ctx& ctx){
+
+        ml_unique_ptr<vlc_ml_media_t> s{vlc_ml_get_media_by_mrl( ml, qtu( url ))};
+        if (!s)
+            s.reset(vlc_ml_new_stream( ml, qtu( url ) ));
+        if (!s)
+            return;
+        ctx.succeed = true;
+        ctx.itemId = MLItemId( s->i_id, VLC_ML_PARENT_UNKNOWN );
+    },
+    //UI Thread
+    [this](quint64, Ctx& ctx){
+        if (!ctx.succeed)
+            return;
+
+        m_mediaLib->addAndPlay(ctx.itemId);
+        emit resetRequested();
+    });
 }
 
 vlc_ml_sorting_criteria_t MLUrlModel::roleToCriteria(int role) const
