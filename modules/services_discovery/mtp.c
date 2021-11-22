@@ -174,6 +174,19 @@ static void *Run( void *data )
     return NULL;
 }
 
+static char *GetDeviceName( LIBMTP_mtpdevice_t *p_device )
+{
+    char *name = LIBMTP_Get_Friendlyname( p_device );
+    if ( !EMPTY_STR( name ) )
+        return name;
+
+    name = LIBMTP_Get_Modelname( p_device );
+    if ( !EMPTY_STR( name ) )
+        return name;
+
+    return strdup( "MTP Device" );
+}
+
 /*****************************************************************************
  * Everything else
  *****************************************************************************/
@@ -187,10 +200,9 @@ static int AddDevice( services_discovery_t *p_sd,
 
     if( ( p_device = LIBMTP_Open_Raw_Device( p_raw_device ) ) != NULL )
     {
-        if( !( psz_name = LIBMTP_Get_Friendlyname( p_device ) ) )
-            if( !( psz_name = LIBMTP_Get_Modelname( p_device ) ) )
-                if( !( psz_name = strdup( N_( "MTP Device" ) ) ) )
-                    return VLC_ENOMEM;
+        psz_name = GetDeviceName( p_device );
+        if ( !psz_name )
+            return VLC_ENOMEM;
         msg_Info( p_sd, "Found device: %s", psz_name );
         p_sys->i_bus = p_raw_device->bus_location;
         p_sys->i_dev = p_raw_device->devnum;
