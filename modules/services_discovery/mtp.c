@@ -101,7 +101,7 @@ static int Open( vlc_object_t *p_this )
 
     static vlc_once_t mtp_init_once = VLC_STATIC_ONCE;
 
-    vlc_once(&mtp_init_once, LIBMTP_Init, NULL);
+    vlc_once(&mtp_init_once, vlc_libmtp_init, NULL);
 
     if (vlc_clone (&p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW))
     {
