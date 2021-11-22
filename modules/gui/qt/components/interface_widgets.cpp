@@ -186,6 +186,8 @@ bool VideoWidget::request( struct vout_window_t *p_wnd )
         default:
             vlc_assert_unreachable();
     }
+
+    enable_mouse_events = var_InheritBool(p_window, "mouse-events");
     return true;
 }
 
@@ -320,31 +322,50 @@ int VideoWidget::qtMouseButton2VLC( Qt::MouseButton qtButton )
 
 void VideoWidget::mouseReleaseEvent( QMouseEvent *event )
 {
+    if ( !p_window || !enable_mouse_events )
+    {
+        event->ignore();
+        return;
+    }
+
     int vlc_button = qtMouseButton2VLC( event->button() );
     if( vlc_button >= 0 )
     {
         vout_window_ReportMouseReleased( p_window, vlc_button );
         event->accept();
+        return;
     }
-    else
-        event->ignore();
+
+    event->ignore();
 }
 
 void VideoWidget::mousePressEvent( QMouseEvent* event )
 {
+    if ( !p_window || enable_mouse_events )
+    {
+        event->ignore();
+        return;
+    }
+
     int vlc_button = qtMouseButton2VLC( event->button() );
     if( vlc_button >= 0 )
     {
         vout_window_ReportMousePressed( p_window, vlc_button );
         event->accept();
+        return;
     }
-    else
-        event->ignore();
+
+    event->ignore();
 }
 
 void VideoWidget::mouseMoveEvent( QMouseEvent *event )
 {
-    if( p_window != NULL )
+    if ( !p_window || !enable_mouse_events )
+    {
+        event->ignore();
+        return;
+    }
+
     {
         QPointF current_pos = event->localPos();
 
@@ -355,21 +376,29 @@ void VideoWidget::mouseMoveEvent( QMouseEvent *event )
 #endif
         vout_window_ReportMouseMoved( p_window, current_pos.x(), current_pos.y() );
         event->accept();
+        return;
     }
-    else
-        event->ignore();
+
+    event->ignore();
 }
 
 void VideoWidget::mouseDoubleClickEvent( QMouseEvent *event )
 {
+    if ( !p_window || !enable_mouse_events )
+    {
+        event->ignore();
+        return;
+    }
+
     int vlc_button = qtMouseButton2VLC( event->button() );
     if( vlc_button >= 0 )
     {
         vout_window_ReportMouseDoubleClick( p_window, vlc_button );
         event->accept();
+        return;
     }
-    else
-        event->ignore();
+
+    event->ignore();
 }
 
 

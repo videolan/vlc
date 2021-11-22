@@ -85,6 +85,8 @@ private:
     QWidget *stable;
     QLayout *layout;
 
+    bool enable_mouse_events;
+
     void reportSize();
 
 signals:
