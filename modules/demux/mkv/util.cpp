@@ -378,6 +378,9 @@ void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsig
         p_tk->b_discontinuity = false;
     }
 
+    if ( p_sys->i_pcr == VLC_TS_INVALID )
+        UpdatePCR( p_demux );
+
     es_out_Send( p_demux->out, p_tk->p_es, p_block);
 }
 
