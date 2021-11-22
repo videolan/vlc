@@ -778,40 +778,12 @@ static int Demux( demux_t *p_demux)
         }
     }
 
-    /* update pcr */
+    if (UpdatePCR( p_demux ) != VLC_SUCCESS)
     {
-        int64_t i_pcr = VLC_TS_INVALID;
-
-        typedef matroska_segment_c::tracks_map_t tracks_map_t;
-
-        for( tracks_map_t::const_iterator it = p_segment->tracks.begin(); it != p_segment->tracks.end(); ++it )
-        {
-            mkv_track_t &track = *it->second;
-
-            if( track.i_last_dts == VLC_TS_INVALID )
-                continue;
-
-            if( track.fmt.i_cat != VIDEO_ES && track.fmt.i_cat != AUDIO_ES )
-                continue;
-
-            if( track.i_last_dts < i_pcr || i_pcr <= VLC_TS_INVALID )
-            {
-                i_pcr = track.i_last_dts;
-            }
-        }
-
-        if( i_pcr > VLC_TS_INVALID && i_pcr > p_sys->i_pcr )
-        {
-            if( es_out_SetPCR( p_demux->out, i_pcr ) )
-            {
-                msg_Err( p_demux, "ES_OUT_SET_PCR failed, aborting." );
-                delete block;
-                delete additions;
-                return 0;
-            }
-
-            p_sys->i_pcr = i_pcr;
-        }
+        msg_Err( p_demux, "ES_OUT_SET_PCR failed, aborting." );
+        delete block;
+        delete additions;
+        return VLC_DEMUXER_EGENERIC;
     }
 
     /* set pts */
