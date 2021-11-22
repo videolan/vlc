@@ -219,6 +219,12 @@ static int AddDevice( services_discovery_t *p_sd,
                                                    sizeof( input_item_t * ) ) ) )
             {
                 free( psz_name );
+                while ( p_track ) {
+                    p_tmp = p_track;
+                    p_track = p_track->next;
+                    LIBMTP_destroy_track_t( p_tmp );
+                }
+                LIBMTP_Release_Device( p_device );
                 return VLC_ENOMEM;
             }
             p_sys->i_count = 0;
