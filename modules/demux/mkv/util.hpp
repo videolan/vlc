@@ -36,6 +36,7 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, v
 block_t *WEBVTT_Repack_Sample(block_t *p_block, bool b_webm = false,
                               const uint8_t * = NULL, size_t = 0);
 void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsigned int i_number_frames, int64_t i_duration );
+int UpdatePCR( demux_t * p_demux );
 
 
 struct real_audio_private
