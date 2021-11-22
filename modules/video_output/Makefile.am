@@ -286,11 +286,9 @@ libegl_android_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_PLATFORM_ANDR
 libegl_android_plugin_la_LIBADD = $(EGL_LIBS) libandroid_utils.la
 
 libandroid_window_plugin_la_SOURCES = video_output/android/window.c
-libandroid_window_plugin_la_CFLAGS = $(AM_CFLAGS)
 libandroid_window_plugin_la_LIBADD = libandroid_utils.la $(LIBDL)
 
 libandroid_display_plugin_la_SOURCES = video_output/android/display.c
-libandroid_display_plugin_la_CFLAGS = $(AM_CFLAGS)
 libandroid_display_plugin_la_LIBADD = libandroid_utils.la $(LIBDL)
 
 libglinterop_android_plugin_la_SOURCES = video_output/opengl/interop_android.c \

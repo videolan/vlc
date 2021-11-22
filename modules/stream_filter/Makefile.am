@@ -26,10 +26,8 @@ if !HAVE_WINSTORE
 stream_filter_LTLIBRARIES += libprefetch_plugin.la
 endif
 
-libhds_plugin_la_SOURCES = \
-    stream_filter/hds/hds.c
+libhds_plugin_la_SOURCES = stream_filter/hds/hds.c
 
-libhds_plugin_la_CFLAGS = $(AM_CFLAGS)
 stream_filter_LTLIBRARIES += libhds_plugin.la
 
 librecord_plugin_la_SOURCES = stream_filter/record.c

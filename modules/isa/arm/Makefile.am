@@ -16,14 +16,12 @@ libchroma_yuv_neon_plugin_la_SOURCES = \
 	isa/arm/neon/i422_yuyv.S \
 	isa/arm/neon/yuyv_i422.S \
 	isa/arm/neon/chroma_yuv.c isa/arm/neon/chroma_neon.h
-libchroma_yuv_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libchroma_yuv_neon_plugin_LIBTOOLFLAGS = --tag=CC
 
 libdeinterlace_neon_plugin_la_SOURCES = \
 	isa/arm/neon/deinterlace.c isa/arm/neon/merge.S
 
 libvolume_neon_plugin_la_SOURCES = isa/arm/neon/volume.c isa/arm/neon/amplify.S
-libvolume_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libvolume_neon_plugin_LIBTOOLFLAGS = --tag=CC
 
 libyuv_rgb_neon_plugin_la_SOURCES = \
@@ -32,7 +30,6 @@ libyuv_rgb_neon_plugin_la_SOURCES = \
 	isa/arm/neon/nv21_rgb.S \
 	isa/arm/neon/nv12_rgb.S \
 	isa/arm/neon/yuv_rgb.c
-libyuv_rgb_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libyuv_rgb_neon_plugin_LIBTOOLFLAGS = --tag=CC
 
 if HAVE_NEON
