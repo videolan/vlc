@@ -37,6 +37,7 @@ extern const char vlc_module_name[] = "foobar";
 int main()
 {
     return
+    TEST(FakeEsOut) ||
     TEST(Inheritables) ||
     TEST(SegmentBase) ||
     TEST(SegmentList) ||
