@@ -200,9 +200,6 @@ private:
     ~MediaLib();
     static void onMediaLibraryEvent( void* data, const vlc_ml_event_t* event );
 
-    void convertMLItemToPlaylistMedias(
-        const MLItemId & itemId, const QStringList &options,
-        QVector<vlc::playlist::Media>& mediasOut);
 private slots:
     void runOnMLThreadDone(RunOnMLThreadBaseRunner* runner, quint64 target, const QObject* object, int status);
     void runOnMLThreadTargetDestroyed(QObject * object);
