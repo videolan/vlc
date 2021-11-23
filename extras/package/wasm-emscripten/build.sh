@@ -113,6 +113,9 @@ cd "$VLC_SRCPATH"/contrib/contrib-emscripten
 
 diagnostic "vlc contribs: bootstrap"
 ../bootstrap --disable-disc --disable-sout --disable-net \
+            --disable-a52 --disable-aom --disable-faad2 --disable-chromaprint \
+            --disable-mad --disable-libmpeg2 --disable-nvcodec \
+            --disable-tremor --disable-vpx --disable-theora \
             --disable-postproc --disable-gmp --disable-gcrypt --disable-ass \
             --disable-gpgerror --disable-harfbuzz --disable-fontconfig \
             --disable-asdcplib --disable-caca --disable-gettext \
@@ -158,7 +161,7 @@ if [ $BUILD_MODE -eq 1 ]; then
     # shm.h is a blacklisted module
     emconfigure "$VLC_SRCPATH"/configure --host=wasm32-unknown-emscripten --enable-debug \
                         --disable-shared --disable-vlc \
-                        --disable-sout --disable-vlm --disable-xcb --disable-lua \
+                        --disable-sout --disable-vlm --disable-a52 --disable-xcb --disable-lua \
                         --disable-addonmanagermodules --disable-ssp --disable-nls \
                         --enable-gles2 \
                         --with-contrib="$VLC_SRCPATH"/contrib/wasm32-unknown-emscripten
