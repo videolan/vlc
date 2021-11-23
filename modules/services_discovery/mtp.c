@@ -28,14 +28,15 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_services_discovery.h>
+#include <vlc_vector.h>
 
 #include <libmtp.h>
 
+typedef struct VLC_VECTOR(input_item_t *) vec_items_t;
+
 typedef struct
 {
-    int i_tracks_num;
-    input_item_t **pp_items;
-    int i_count;
+    vec_items_t items;
     char *psz_name;
     uint32_t i_bus;
     uint8_t i_dev;
@@ -60,16 +61,6 @@ static char *GetDeviceName( LIBMTP_mtpdevice_t *p_device )
         return name;
 
     return strdup( "MTP Device" );
-}
-
-static int CountTracks( uint64_t const sent, uint64_t const total,
-                        void const * const data )
-{
-    VLC_UNUSED( sent );
-    services_discovery_t *p_sd = (services_discovery_t *)data;
-    services_discovery_sys_t *p_sys = p_sd->p_sys;
-    p_sys->i_tracks_num = total;
-    return 0;
 }
 
 static void AddTrack( services_discovery_t *p_sd, LIBMTP_track_t *p_track )
@@ -111,8 +102,15 @@ static void AddTrack( services_discovery_t *p_sd, LIBMTP_track_t *p_track )
     }
     input_item_SetDate( p_input, p_track->date );
     p_input->i_duration = VLC_TICK_FROM_MS(p_track->duration);
+
+    if ( !vlc_vector_push( &p_sys->items, p_input ) )
+    {
+        msg_Err( p_sd, "Error adding %s, skipping it", p_track->filename );
+        input_item_Release( p_input );
+        return;
+    }
+
     services_discovery_AddItem( p_sd, p_input );
-    p_sys->pp_items[p_sys->i_count++] = p_input;
 }
 
 static int AddDevice( services_discovery_t *p_sd,
@@ -133,26 +131,12 @@ static int AddDevice( services_discovery_t *p_sd,
         p_sys->i_dev = p_raw_device->devnum;
         p_sys->i_product_id = p_raw_device->device_entry.product_id;
         if( ( p_track = LIBMTP_Get_Tracklisting_With_Callback( p_device,
-                            CountTracks, p_sd ) ) == NULL )
+                            NULL, NULL ) ) == NULL )
         {
             msg_Warn( p_sd, "No tracks on the device" );
-            p_sys->pp_items = NULL;
         }
         else
         {
-            if( !( p_sys->pp_items = calloc( p_sys->i_tracks_num,
-                                                   sizeof( input_item_t * ) ) ) )
-            {
-                free( psz_name );
-                while ( p_track ) {
-                    p_tmp = p_track;
-                    p_track = p_track->next;
-                    LIBMTP_destroy_track_t( p_tmp );
-                }
-                LIBMTP_Release_Device( p_device );
-                return VLC_ENOMEM;
-            }
-            p_sys->i_count = 0;
             while( p_track != NULL )
             {
                 msg_Dbg( p_sd, "Track found: %s - %s", p_track->artist,
@@ -177,21 +161,15 @@ static int AddDevice( services_discovery_t *p_sd,
 static void CloseDevice( services_discovery_t *p_sd )
 {
     services_discovery_sys_t *p_sys = p_sd->p_sys;
-    input_item_t **pp_items = p_sys->pp_items;
 
-    if( pp_items != NULL )
+    for ( size_t i = 0; i < p_sys->items.size; ++i )
     {
-        for( int i_i = 0; i_i < p_sys->i_count; i_i++ )
-        {
-            if( pp_items[i_i] != NULL )
-            {
-                services_discovery_RemoveItem( p_sd, pp_items[i_i] );
-                input_item_Release( pp_items[i_i] );
-            }
-        }
-        free( pp_items );
-        p_sys->pp_items = NULL;
+        input_item_t *item = p_sys->items.data[i];
+        services_discovery_RemoveItem( p_sd, item );
+        input_item_Release( item );
     }
+
+    vlc_vector_clear( &p_sys->items );
 }
 
 /*****************************************************************************
@@ -254,6 +232,8 @@ static int Open( vlc_object_t *p_this )
     p_sd->description = _("MTP devices");
     p_sys->psz_name = NULL;
 
+    vlc_vector_init(&p_sys->items);
+
     static vlc_once_t mtp_init_once = VLC_STATIC_ONCE;
 
     vlc_once(&mtp_init_once, vlc_libmtp_init, NULL);
@@ -275,13 +255,9 @@ static void Close( vlc_object_t *p_this )
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
 
-    if ( p_sys->pp_items != NULL )
-    {
-        for( int i_i = 0; i_i < p_sys->i_count; i_i++ )
-            if( p_sys->pp_items[i_i] != NULL )
-                input_item_Release( p_sys->pp_items[i_i] );
-        free( p_sys->pp_items );
-    }
+    for ( size_t i = 0; i < p_sys->items.size; ++i)
+        input_item_Release( p_sys->items.data[i] );
+    vlc_vector_destroy( &p_sys->items );
 
     free( p_sys );
 }
