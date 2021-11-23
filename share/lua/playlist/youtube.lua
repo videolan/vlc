@@ -376,7 +376,9 @@ function n_descramble( nparam, js )
         elseif string.match( datac, '^"[^"]*",' ) then
             el, datac = string.match( datac, '^"([^"]*)",(.*)$' )
         -- Integer input data
-        elseif string.match( datac, '^-?%d+,' ) then
+        -- 1818016376,-648890305,-1200559E3, ...
+        elseif string.match( datac, '^%-?%d+,' ) or
+               string.match( datac, '^%-?%d+[eE]%-?%d+,' ) then
             el, datac = string.match( datac, "^(.-),(.*)$" )
             el = tonumber( el )
         -- Reference to "n" parameter array
