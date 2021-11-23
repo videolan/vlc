@@ -190,6 +190,7 @@ static void CloseDevice( services_discovery_t *p_sd )
             }
         }
         free( pp_items );
+        p_sys->pp_items = NULL;
     }
 }
 
@@ -273,6 +274,15 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_name );
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
+
+    if ( p_sys->pp_items != NULL )
+    {
+        for( int i_i = 0; i_i < p_sys->i_count; i_i++ )
+            if( p_sys->pp_items[i_i] != NULL )
+                input_item_Release( p_sys->pp_items[i_i] );
+        free( p_sys->pp_items );
+    }
+
     free( p_sys );
 }
 
