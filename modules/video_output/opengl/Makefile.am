@@ -29,6 +29,7 @@ OPENGL_COMMONLIBS += libplacebo_utils.la
 endif
 
 OPENGL_VOUT_COMMONSOURCES = \
+    video_output/opengl/gl_scale.h \
     video_output/opengl/renderer.c \
     video_output/opengl/renderer.h \
     video_output/opengl/sub_renderer.c \

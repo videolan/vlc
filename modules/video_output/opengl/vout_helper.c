@@ -147,8 +147,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         goto delete_interop;
     }
 
-    int upscaler = var_InheritInteger(gl, "pl-upscaler");
-    int downscaler = var_InheritInteger(gl, "pl-downscaler");
+    int upscaler = var_InheritInteger(gl, "gl-upscaler");
+    int downscaler = var_InheritInteger(gl, "gl-downscaler");
 
     if (upscaler || downscaler)
     {

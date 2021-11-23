@@ -39,6 +39,7 @@
 #include "video_output/opengl/filter.h"
 #include "video_output/opengl/gl_api.h"
 #include "video_output/opengl/gl_common.h"
+#include "video_output/opengl/gl_scale.h"
 #include "video_output/opengl/gl_util.h"
 #include "video_output/opengl/sampler.h"
 #include "video_output/libplacebo/utils.h"
@@ -319,8 +320,12 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     };
 
     sys->render_params = pl_render_default_params;
-    sys->render_params.upscaler = scale_config[upscaler];
-    sys->render_params.downscaler = scale_config[downscaler];
+
+    int upscaler_idx = libplacebo_scale_map[upscaler];
+    sys->render_params.upscaler = scale_config[upscaler_idx];
+
+    int downscaler_idx = libplacebo_scale_map[downscaler];
+    sys->render_params.downscaler = scale_config[downscaler_idx];
 
     static const struct vlc_gl_filter_ops ops = {
         .draw = Draw,
