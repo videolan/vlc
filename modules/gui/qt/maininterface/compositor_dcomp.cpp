@@ -279,7 +279,7 @@ bool CompositorDirectComposition::makeMainInterface(MainInterface* mainInterface
 
         auto resetAcrylicSurface = [this](QScreen * = nullptr)
         {
-            m_acrylicSurface.reset(new CompositorDCompositionAcrylicSurface(m_intf, m_d3d11Device.Get()));
+            m_acrylicSurface.reset(new CompositorDCompositionAcrylicSurface(m_intf, this, m_mainInterface, m_d3d11Device.Get()));
         };
 
         resetAcrylicSurface();

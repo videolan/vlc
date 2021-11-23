@@ -155,6 +155,8 @@ typedef HRESULT (*DCompositionCreateDeviceFun)(IDXGIDevice *dxgiDevice, REFIID i
 namespace vlc
 {
 
+class CompositorDirectComposition;
+
 /**
  * @brief The CompositorDCompositionAcrylicSurface class
  * Adds acrylic surface to the compositor_dcomp when the main window becomes active
@@ -168,7 +170,7 @@ class CompositorDCompositionAcrylicSurface
     Q_OBJECT
 
 public:
-    CompositorDCompositionAcrylicSurface(qt_intf_t *intf_t, ID3D11Device *device, QObject *parent = nullptr);
+    CompositorDCompositionAcrylicSurface(qt_intf_t * intf, CompositorDirectComposition *compositor, MainInterface *mainInterface, ID3D11Device *device, QObject *parent = nullptr);
 
     ~CompositorDCompositionAcrylicSurface();
 
@@ -221,7 +223,9 @@ private:
     Microsoft::WRL::ComPtr<IDCompositionSaturationEffect> m_saturationEffect;
     Microsoft::WRL::ComPtr<IDCompositionGaussianBlurEffect> m_gaussianBlur;
 
-    qt_intf_t *m_intf {};
+    qt_intf_t *m_intf = nullptr;
+    CompositorDirectComposition *m_compositor = nullptr;
+    MainInterface *m_mainInterface = nullptr;
     QBasicTimer m_resetTimer;
     bool m_resetPending = false;
     bool m_active = false;
