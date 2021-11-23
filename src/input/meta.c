@@ -80,6 +80,7 @@ const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
     };
 
     assert (meta_type < ARRAY_SIZE(posix_names));
+    assert (strlen(posix_names[meta_type]));
     return vlc_gettext (posix_names[meta_type]);
 }
 
