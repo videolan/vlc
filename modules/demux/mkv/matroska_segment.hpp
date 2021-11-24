@@ -96,6 +96,7 @@ public:
     /* all tracks */
     tracks_map_t tracks;
     SegmentSeeker::track_ids_t priority_tracks;
+    mtime_t                  pcr_shift = 0;
 
     /* from seekhead */
     int                     i_seekhead_count;

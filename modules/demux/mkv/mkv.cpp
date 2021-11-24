@@ -512,7 +512,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         return;
     }
 
-    i_pts -= track.i_codec_delay;
+    if (i_pts != VLC_TS_INVALID)
+        i_pts += p_segment->pcr_shift - track.i_codec_delay;
 
     if ( track.fmt.i_cat != DATA_ES )
     {
