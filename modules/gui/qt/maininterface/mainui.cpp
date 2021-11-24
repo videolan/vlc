@@ -29,7 +29,7 @@
 #include "playlist/playlist_controller.hpp"
 
 #include "util/qml_main_context.hpp"
-#include "util/qmleventfilter.hpp"
+#include "util/item_key_event_filter.hpp"
 #include "util/imageluminanceextractor.hpp"
 #include "util/i18n.hpp"
 #include "util/keyhelper.hpp"
@@ -211,7 +211,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<DialogErrorModel>( uri, versionMajor, versionMinor, "DialogErrorModel", "");
         qRegisterMetaType<DialogId>();
 
-        qmlRegisterType<QmlEventFilter>( uri, versionMajor, versionMinor, "EventFilter" );
+        qmlRegisterType<ItemKeyEventFilter>( uri, versionMajor, versionMinor, "KeyEventFilter" );
         qmlRegisterType<MouseEventFilter>( uri, versionMajor, versionMinor, "MouseEventFilter" );
 
         qmlRegisterUncreatableType<ControlbarProfileModel>(uri, versionMajor, versionMinor, "ControlbarProfileModel", "");

@@ -15,15 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef QMLEVENTFILTER_HPP
-#define QMLEVENTFILTER_HPP
+#ifndef ITEMKEYEVENTFILTER_HPP
+#define ITEMKEYEVENTFILTER_HPP
 
 #include <QQuickItem>
 
 /**
- * @brief The QmlEventFilter class allows to register an event filter from QML
- * this might be usefull to process key press before they are processed (and
- * eventually accepted) by children components
+ * @brief The ItemKeyEventFilter class allows to register an event filter,
+ * which forwards the filtered key events to itself. This might be useful to
+ * process key press before they are processed (and eventually accepted) by
+ * children components
  *
  * this is usable as
  *
@@ -39,10 +40,8 @@
  *      filter.source = rootWindow
  *  }
  *
- * Note that this solution doesn't work as-is for mouse events as Qml doesn't provide
- * the equivalent of Keys.onPressed.
  */
-class QmlEventFilter : public QQuickItem
+class ItemKeyEventFilter : public QQuickItem
 {
     Q_OBJECT
 public:
@@ -50,8 +49,8 @@ public:
     Q_PROPERTY(bool filterEnabled READ getFilterEnabled WRITE setFilterEnabled FINAL)
 
 public:
-    QmlEventFilter(QQuickItem *parent = nullptr);
-    ~QmlEventFilter();
+    ItemKeyEventFilter(QQuickItem *parent = nullptr);
+    ~ItemKeyEventFilter();
 
     void setSource(QObject *source);
 
@@ -72,4 +71,4 @@ private:
     bool m_filterEnabled = true;
     bool m_qmlAccepted = false;
 };
-#endif // QMLEVENTFILTER_HPP
+#endif // ITEMKEYEVENTFILTER_HPP

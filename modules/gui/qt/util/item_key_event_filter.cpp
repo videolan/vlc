@@ -15,27 +15,27 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#include "qmleventfilter.hpp"
+#include "item_key_event_filter.hpp"
 #include <QEvent>
 
-QmlEventFilter::QmlEventFilter(QQuickItem *parent)
+ItemKeyEventFilter::ItemKeyEventFilter(QQuickItem *parent)
     : QQuickItem(parent)
 {
 }
 
-QmlEventFilter::~QmlEventFilter()
+ItemKeyEventFilter::~ItemKeyEventFilter()
 {
     if (m_source != nullptr)
         m_source->removeEventFilter(this);
 }
 
-void QmlEventFilter::setSource(QObject* source)
+void ItemKeyEventFilter::setSource(QObject* source)
 {
     source->installEventFilter(this);
     m_source = source;
 }
 
-void QmlEventFilter::keyPressEvent(QKeyEvent* event)
+void ItemKeyEventFilter::keyPressEvent(QKeyEvent* event)
 {
     // This is actually called when the QML event handler hasn't accepted the event
     m_qmlAccepted = false;
@@ -43,13 +43,13 @@ void QmlEventFilter::keyPressEvent(QKeyEvent* event)
     event->setAccepted(true);
 }
 
-void QmlEventFilter::keyReleaseEvent(QKeyEvent* event)
+void ItemKeyEventFilter::keyReleaseEvent(QKeyEvent* event)
 {
     m_qmlAccepted = false;
     event->setAccepted(true);
 }
 
-bool QmlEventFilter::eventFilter(QObject*, QEvent* event)
+bool ItemKeyEventFilter::eventFilter(QObject*, QEvent* event)
 {
     if (!m_filterEnabled)
         return false;

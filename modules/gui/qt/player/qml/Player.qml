@@ -635,9 +635,9 @@ FocusScope {
 
     }
 
-    //filter global events to keep toolbar
+    //filter key events to keep toolbar
     //visible when user navigates within the control bar
-    EventFilter {
+    KeyEventFilter {
         id: filter
         source: topWindow
         filterEnabled: controlBarView.state === "visible"
