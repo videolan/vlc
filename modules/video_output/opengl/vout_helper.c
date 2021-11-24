@@ -172,7 +172,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         struct vlc_gl_filter *scale_filter =
             vlc_gl_filters_Append(vgl->filters, "pl_scale", &cfg);
         if (!scale_filter)
-            msg_Warn(gl, "Could not load pl_scale");
+        {
+            if (upscaler)
+                msg_Err(gl, "Could not apply upscaler filter, "
+                            "ignoring --gl-upscaler=%d", upscaler);
+            if (downscaler)
+                msg_Err(gl, "Could not apply downscaler filter, "
+                            "ignoring --gl-downscaler=%d", downscaler);
+        }
     }
 
     /* The renderer is the only filter, for now */
