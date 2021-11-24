@@ -182,6 +182,50 @@ static deviceRval SetupDevice(vout_window_t *wnd, drmModeRes const *res,
     return drvSuccess;
 }
 
+static void UpdateOutputs(vout_window_t *wnd)
+{
+    struct vout_window_sys_t *sys = wnd->sys;
+    drmModeRes *modeRes = sys->modeRes;
+
+    msg_Info(wnd, "Updating list of connectors:");
+    for (int c = 0; c < modeRes->count_connectors && sys->crtc == 0; c++)
+    {
+        drmModeConnector *conn =
+            drmModeGetConnector(sys->drm_fd, modeRes->connectors[c]);
+        if (conn == NULL)
+            continue;
+
+        if (conn->connector_type >= ARRAY_SIZE(connector_type_names) ||
+            conn->connection != DRM_MODE_CONNECTED)
+        {
+            drmModeFreeConnector(conn);
+            continue;
+        }
+
+        char name[32];
+        snprintf(name, sizeof name, "%s-%d",
+                 connector_type_names[conn->connector_type],
+                 conn->connector_type_id);
+
+        /* Iterate all available encoders to find CRTC */
+        for (int i = 0; i < conn->count_encoders; i++)
+        {
+            drmModeEncoder *enc =
+                drmModeGetEncoder(sys->drm_fd, conn->encoders[i]);
+
+            size_t crtc_index = sys->crtc;
+            if ((enc->possible_crtcs & (1 << crtc_index)) != 0) {
+
+                drmModeFreeEncoder(enc);
+                vout_window_ReportOutputDevice(wnd, name, name);
+                break;
+            }
+            drmModeFreeEncoder(enc);
+        }
+        drmModeFreeConnector(conn);
+    }
+}
+
 static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
     struct vout_window_sys_t *sys = wnd->sys;
@@ -190,6 +234,7 @@ static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     bool found_connector = false;
 
+    // TODO: use kms-connector as a list of connector for clones
     char *connector_request = var_InheritString(wnd, "kms-connector");
     msg_Info(wnd, "Looping over %d resources", modeRes->count_connectors);
     for (int c = 0; c < modeRes->count_connectors && sys->crtc == 0; c++) {
@@ -417,6 +462,8 @@ static int OpenWindow(vout_window_t *wnd)
     wnd->type = VOUT_WINDOW_TYPE_KMS;
     wnd->display.drm_fd = sys->drm_fd;
     /* Note: wnd->handle.crtc will be initialized later */
+
+    UpdateOutputs(wnd);
 
     return VLC_SUCCESS;
 error_drm:
