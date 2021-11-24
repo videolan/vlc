@@ -412,6 +412,22 @@ AbstractStream::BufferingStatus AbstractStream::doBufferize(Times deadline,
     {
         if(!fakeEsOut()->hasSynchronizationReference())
         {
+            if(!demuxer)
+            {
+                /* We always need a prepared chunk info for querying a syncref */
+                if(!currentChunk)
+                {
+                    currentChunk = getNextChunk();
+                    if(!currentChunk)
+                    {
+                        vlc_mutex_unlock(&lock);
+                        return BufferingStatus::End;
+                    }
+                    segmentgap = false;
+                    needrestart = false;
+                    discontinuity = false;
+                }
+            }
             SynchronizationReference r;
             if(segmentTracker->getSynchronizationReference(currentSequence, startTimeContext.media, r))
             {
