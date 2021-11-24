@@ -225,6 +225,66 @@ static void CloseDevice( services_discovery_t *p_sd, mtp_device_t *device )
     DeviceDelete( device );
 }
 
+static int
+FindRawDevice( const LIBMTP_raw_device_t *raw_devices, int count,
+               uint32_t bus_location, uint8_t devnum )
+{
+    for ( int i = 0; i < count; ++i )
+        if ( raw_devices[i].bus_location == bus_location &&
+             raw_devices[i].devnum == devnum )
+            return i;
+    return -1;
+}
+
+static mtp_device_t *
+FindDevice( struct vlc_list *devices, uint32_t bus_location, uint8_t devnum )
+{
+    mtp_device_t *device;
+    vlc_list_foreach( device, devices, node )
+        if ( device->i_bus == bus_location &&
+             device->i_dev == devnum )
+            return device;
+    return NULL;
+}
+
+static void
+UpdateDevices( services_discovery_t *p_sd,
+               LIBMTP_raw_device_t *raw_devices, int count )
+{
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+
+    /* Remove devices which have disappeared */
+
+    mtp_device_t *device;
+    vlc_list_foreach( device, &p_sys->devices, node )
+    {
+        int idx = FindRawDevice( raw_devices, count, device->i_bus,
+                                 device->i_dev );
+        if ( idx == -1 )
+        {
+            /* Not found */
+            msg_Info( p_sd, "Device disconnected" );
+            CloseDevice( p_sd, device );
+        }
+    }
+
+    /* Add new detected devices */
+
+    for ( int i = 0; i < count; ++i )
+    {
+        LIBMTP_raw_device_t *raw_device = &raw_devices[i];
+        device = FindDevice( &p_sys->devices, raw_device->bus_location,
+                             raw_device->devnum );
+        if ( !device )
+        {
+            /* Device not found in the list, it's a new one */
+            msg_Dbg( p_sd, "New device detected" );
+            if ( AddDevice( p_sd, raw_device ) != VLC_SUCCESS )
+                msg_Err( p_sd, "Could not add MTP device" );
+        }
+    }
+}
+
 /*****************************************************************************
  * Run: main thread
  *****************************************************************************/
@@ -232,51 +292,22 @@ static void *Run( void *data )
 {
     LIBMTP_raw_device_t *p_rawdevices;
     int i_numrawdevices;
-    int i_ret;
-    int i_status = 0;
     services_discovery_t *p_sd = data;
-    services_discovery_sys_t *p_sys = p_sd->p_sys;
 
     for(;;)
     {
         int canc = vlc_savecancel();
-        i_ret = LIBMTP_Detect_Raw_Devices( &p_rawdevices, &i_numrawdevices );
-        if ( i_ret == 0 && i_numrawdevices > 0 && p_rawdevices != NULL &&
-             i_status == 0 )
+        int ret = LIBMTP_Detect_Raw_Devices( &p_rawdevices, &i_numrawdevices );
+        if ( ret == LIBMTP_ERROR_NONE ||
+             ret == LIBMTP_ERROR_NO_DEVICE_ATTACHED )
         {
-            /* Found a new device, add it */
-            msg_Dbg( p_sd, "New device found" );
-            if( AddDevice( p_sd, &p_rawdevices[0] ) == VLC_SUCCESS )
-                i_status = 1;
-            else
-                i_status = 2;
+            UpdateDevices( p_sd, p_rawdevices, i_numrawdevices );
+            if ( ret == LIBMTP_ERROR_NONE )
+                free( p_rawdevices );
         }
-        else
-        {
-            if ( ( i_ret != 0 || i_numrawdevices == 0 || p_rawdevices == NULL )
-                 && i_status == 1)
-            {
-                /* The device is not connected anymore, delete it */
-                msg_Info( p_sd, "Device disconnected" );
-                mtp_device_t *device =
-                    vlc_list_first_entry_or_null( &p_sys->devices, mtp_device_t,
-                                                  node );
-                /* Exactly 1 device */
-                assert( device );
-                assert( vlc_list_is_last( &device->node, &p_sys->devices ) );
-                CloseDevice( p_sd, device );
-                i_status = 0;
-            }
-        }
-        free( p_rawdevices );
         vlc_restorecancel(canc);
-        if( i_status == 2 )
-        {
-            vlc_tick_sleep( VLC_TICK_FROM_SEC(5) );
-            i_status = 0;
-        }
-        else
-            vlc_tick_sleep( VLC_TICK_FROM_MS(500) );
+
+        vlc_tick_sleep( VLC_TICK_FROM_MS(500) );
     }
     return NULL;
 }
