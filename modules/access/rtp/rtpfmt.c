@@ -89,37 +89,6 @@ static const struct vlc_rtp_pt_operations rtp_audio_qcelp = {
     NULL, qcelp_init, codec_destroy, codec_decode,
 };
 
-/* PT=14
- * MPA: MPEG Audio (RFC2250, §3.4)
- */
-static void *mpa_init(struct vlc_rtp_pt *pt)
-{
-    es_format_t fmt;
-
-    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MPGA);
-    fmt.b_packetized = false;
-    return vlc_rtp_pt_request_es(pt, &fmt);
-}
-
-static void mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
-{
-    if (block->i_buffer < 4)
-    {
-        block_Release (block);
-        return;
-    }
-
-    block->i_buffer -= 4; /* 32-bits RTP/MPA header */
-    block->p_buffer += 4;
-    block->i_dts = VLC_TICK_INVALID;
-    vlc_rtp_es_send(data, block);
-    (void) pt;
-}
-
-static const struct vlc_rtp_pt_operations rtp_audio_mpa = {
-    NULL, mpa_init, codec_destroy, mpa_decode,
-};
-
 /* PT=32
  * MPV: MPEG Video (RFC2250, §3.5)
  */
@@ -218,8 +187,6 @@ static struct vlc_rtp_pt *vlc_rtp_pt_create(vlc_object_t *obj,
             pt->ops = &rtp_audio_gsm;
         else if (strcmp(desc->name, "QCELP") == 0)
             pt->ops = &rtp_audio_qcelp;
-        else if (strcmp(desc->name, "MPA") == 0)
-            pt->ops = &rtp_audio_mpa;
     } else if (strcmp(desc->media->type, "video") == 0) {
         if (strcmp(desc->name, "MPV") == 0)
             pt->ops = &rtp_video_mpv;
