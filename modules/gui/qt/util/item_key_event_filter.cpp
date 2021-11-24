@@ -25,14 +25,16 @@ ItemKeyEventFilter::ItemKeyEventFilter(QQuickItem *parent)
 
 ItemKeyEventFilter::~ItemKeyEventFilter()
 {
-    if (m_source != nullptr)
-        m_source->removeEventFilter(this);
+    if (m_target)
+        m_target->removeEventFilter(this);
 }
 
-void ItemKeyEventFilter::setSource(QObject* source)
+void ItemKeyEventFilter::setTarget(QObject* target)
 {
-    source->installEventFilter(this);
-    m_source = source;
+    assert(target);
+
+    target->installEventFilter(this);
+    m_target = target;
 }
 
 void ItemKeyEventFilter::keyPressEvent(QKeyEvent* event)
@@ -51,7 +53,7 @@ void ItemKeyEventFilter::keyReleaseEvent(QKeyEvent* event)
 
 bool ItemKeyEventFilter::eventFilter(QObject*, QEvent* event)
 {
-    if (!m_filterEnabled)
+    if (!m_enabled)
         return false;
 
     bool ret = false;

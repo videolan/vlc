@@ -45,30 +45,25 @@ class ItemKeyEventFilter : public QQuickItem
 {
     Q_OBJECT
 public:
-    Q_PROPERTY(QObject * source READ getSource WRITE setSource FINAL)
-    Q_PROPERTY(bool filterEnabled READ getFilterEnabled WRITE setFilterEnabled FINAL)
+    Q_PROPERTY(QObject * target MEMBER m_target WRITE setTarget FINAL)
+    Q_PROPERTY(bool enabled MEMBER m_enabled FINAL)
 
 public:
     ItemKeyEventFilter(QQuickItem *parent = nullptr);
     ~ItemKeyEventFilter();
 
-    void setSource(QObject *source);
-
-    inline QObject * getSource() { return m_source; }
-    inline void setFilterEnabled(bool value) { m_filterEnabled = value; }
-    inline bool getFilterEnabled() { return m_filterEnabled; }
+    void setTarget(QObject *target);
 
 private:
-
     void keyPressEvent(QKeyEvent *event) override;
-
     void keyReleaseEvent(QKeyEvent *event) override;
 
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
-    QObject *m_source = nullptr;
-    bool m_filterEnabled = true;
+    QObject *m_target = nullptr;
+    bool m_enabled = true;
     bool m_qmlAccepted = false;
 };
+
 #endif // ITEMKEYEVENTFILTER_HPP
