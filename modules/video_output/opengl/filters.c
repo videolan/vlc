@@ -234,6 +234,7 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
     if (ret != VLC_SUCCESS)
     {
         /* Creation failed, do not call close() */
+        msg_Err(filters->gl, "Could not load OpenGL filter '%s'", name);
         filter->ops = NULL;
         vlc_gl_filter_Delete(filter);
         return NULL;
