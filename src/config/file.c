@@ -463,7 +463,8 @@ int config_SaveConfigFile (vlc_object_t *p_this)
 
             if (IsConfigIntegerType (p_item->i_type))
             {
-                int64_t val = p_item->value.i;
+                int64_t val = atomic_load_explicit(&param->value.i,
+                                                   memory_order_relaxed);
                 config_Write (file, p_item->psz_text,
                              (CONFIG_CLASS(p_item->i_type) == CONFIG_ITEM_BOOL)
                                   ? N_("boolean") : N_("integer"),
@@ -473,7 +474,8 @@ int config_SaveConfigFile (vlc_object_t *p_this)
             else
             if (IsConfigFloatType (p_item->i_type))
             {
-                float val = p_item->value.f;
+                float val = atomic_load_explicit(&param->value.f,
+                                                 memory_order_relaxed);
                 config_Write (file, p_item->psz_text, N_("float"),
                               val == p_item->orig.f,
                               p_item->psz_name, "%f", val);

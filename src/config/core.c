@@ -85,38 +85,26 @@ static module_config_t * config_FindConfigChecked( const char *psz_name )
     return p_config;
 }
 
-int64_t config_GetInt(const char *psz_name)
+int64_t config_GetInt(const char *name)
 {
-    module_config_t *p_config = config_FindConfigChecked( psz_name );
+    const struct vlc_param *param = vlc_param_Find(name);
 
     /* sanity checks */
-    assert(p_config != NULL);
-    assert(IsConfigIntegerType(p_config->i_type));
+    assert(param != NULL);
+    assert(IsConfigIntegerType(param->item.i_type));
 
-    int64_t val;
-
-    vlc_rwlock_rdlock (&config_lock);
-    val = p_config->value.i;
-    vlc_rwlock_unlock (&config_lock);
-    return val;
+    return atomic_load_explicit(&param->value.i, memory_order_relaxed);
 }
 
-float config_GetFloat(const char *psz_name)
+float config_GetFloat(const char *name)
 {
-    module_config_t *p_config;
-
-    p_config = config_FindConfigChecked( psz_name );
+    const struct vlc_param *param = vlc_param_Find(name);
 
     /* sanity checks */
-    assert(p_config != NULL);
-    assert(IsConfigFloatType(p_config->i_type));
+    assert(param != NULL);
+    assert(IsConfigFloatType(param->item.i_type));
 
-    float val;
-
-    vlc_rwlock_rdlock (&config_lock);
-    val = p_config->value.f;
-    vlc_rwlock_unlock (&config_lock);
-    return val;
+    return atomic_load_explicit(&param->value.f, memory_order_relaxed);
 }
 
 char *config_GetPsz(const char *psz_name)
