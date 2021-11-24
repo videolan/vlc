@@ -242,7 +242,7 @@ try
     m_saturationEffect->SetSaturation(2);
 
     m_gaussianBlur->SetBorderMode(D2D1_BORDER_MODE_HARD);
-    m_gaussianBlur->SetStandardDeviation(20);
+    m_gaussianBlur->SetStandardDeviation(40);
     m_gaussianBlur->SetInput(0, m_saturationEffect.Get(), 0);
     m_rootVisual->SetEffect(m_gaussianBlur.Get());
 
