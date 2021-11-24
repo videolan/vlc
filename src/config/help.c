@@ -485,8 +485,8 @@ static void print_item(const module_t *m, const struct vlc_param *param,
         case CONFIG_ITEM_BOOL:
             bra = type = ket = "";
             prefix = ", --no-";
-            suffix = item->value.i ? _("(default enabled)")
-                                   : _("(default disabled)");
+            suffix = item->orig.i ? _("(default enabled)")
+                                  : _("(default disabled)");
             break;
        default:
             return;
