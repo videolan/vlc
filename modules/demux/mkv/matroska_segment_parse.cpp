@@ -1097,6 +1097,12 @@ void matroska_segment_c::ParseTracks( KaxTracks *tracks )
     };
 
     TrackHandlers::Dispatcher().iterate( tracks->begin(), tracks->end(), &payload );
+
+    auto t = matroska_segment_c::tracks.begin();
+    for (t; t != matroska_segment_c::tracks.end(); ++t)
+    {
+        pcr_shift = std::max(pcr_shift, t->second->i_codec_delay);
+    }
 }
 
 /*****************************************************************************
