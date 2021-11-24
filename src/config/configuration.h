@@ -26,6 +26,11 @@
 struct vlc_plugin_t;
 
 struct vlc_param {
+    union {
+        _Atomic int64_t i; /**< Current value (if integer or boolean) */
+        _Atomic float f; /**< Current value (if floating point) */
+    } value;
+
     struct vlc_plugin_t *owner;
     unsigned char shortname; /**< Optional short option name */
     unsigned internal:1; /**< Hidden from preferences and help */

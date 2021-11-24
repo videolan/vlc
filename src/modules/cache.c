@@ -28,6 +28,7 @@
 #endif
 
 #include <stdalign.h>
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -216,6 +217,12 @@ static int vlc_cache_load_config(struct vlc_param *param, block_t *file)
         LOAD_IMMEDIATE (cfg->orig);
         LOAD_IMMEDIATE (cfg->min);
         LOAD_IMMEDIATE (cfg->max);
+        if (IsConfigFloatType(cfg->i_type))
+            atomic_store_explicit(&param->value.f, cfg->orig.f,
+                                  memory_order_relaxed);
+        else
+            atomic_store_explicit(&param->value.i, cfg->orig.i,
+                                  memory_order_relaxed);
         cfg->value = cfg->orig;
 
         if (cfg->list_count)

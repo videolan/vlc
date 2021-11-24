@@ -23,6 +23,7 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <assert.h>
@@ -329,14 +330,18 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
             if (IsConfigIntegerType(item->i_type)
              || !CONFIG_ITEM(item->i_type))
             {
-                item->orig.i =
-                item->value.i = va_arg (ap, int64_t);
+                item->orig.i = va_arg(ap, int64_t);
+                item->value.i = item->orig.i;
+                atomic_store_explicit(&param->value.i, item->orig.i,
+                                      memory_order_relaxed);
             }
             else
             if (IsConfigFloatType (item->i_type))
             {
-                item->orig.f =
-                item->value.f = va_arg (ap, double);
+                item->orig.f = va_arg(ap, double);
+                item->value.f = item->orig.f;
+                atomic_store_explicit(&param->value.f, item->orig.f,
+                                      memory_order_relaxed);
             }
             else
             if (IsConfigStringType (item->i_type))

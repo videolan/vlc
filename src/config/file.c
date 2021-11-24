@@ -27,6 +27,7 @@
 #include <errno.h>                                                  /* errno */
 #include <assert.h>
 #include <limits.h>
+#include <stdatomic.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #ifdef __APPLE__
@@ -230,15 +231,25 @@ int config_LoadConfigFile( vlc_object_t *p_this )
                               psz_option_value, psz_option_name,
                               vlc_strerror_c(errno));
                 else
+                {
+                    atomic_store_explicit(&param->value.i, l,
+                                          memory_order_relaxed);
                     item->value.i = l;
+                }
                 break;
             }
 
             case CONFIG_ITEM_FLOAT:
+            {
                 if (!*psz_option_value)
                     break;                    /* ignore empty option */
-                item->value.f = (float)atof (psz_option_value);
+
+                float f = (float)atof(psz_option_value);
+                atomic_store_explicit(&param->value.f, f,
+                                      memory_order_relaxed);
+                item->value.f = f;
                 break;
+            }
 
             default:
                 free (item->value.psz);

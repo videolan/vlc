@@ -158,33 +158,35 @@ void config_PutPsz(const char *psz_name, const char *psz_value)
     free (oldstr);
 }
 
-void config_PutInt(const char *psz_name, int64_t i_value )
+void config_PutInt(const char *name, int64_t i_value)
 {
-    module_config_t *p_config = config_FindConfigChecked( psz_name );
+    struct vlc_param *param = vlc_param_Find(name);
+    module_config_t *p_config = &param->item;
 
     /* sanity checks */
-    assert(p_config != NULL);
-    assert(IsConfigIntegerType(p_config->i_type));
+    assert(param != NULL);
+    assert(IsConfigIntegerType(param->item.i_type));
 
     if (i_value < p_config->min.i)
         i_value = p_config->min.i;
     if (i_value > p_config->max.i)
         i_value = p_config->max.i;
 
+    atomic_store_explicit(&param->value.i, i_value, memory_order_relaxed);
     vlc_rwlock_wrlock (&config_lock);
     p_config->value.i = i_value;
     vlc_rwlock_unlock (&config_lock);
     atomic_store_explicit(&config_dirty, true, memory_order_release);
-
 }
 
-void config_PutFloat(const char *psz_name, float f_value)
+void config_PutFloat(const char *name, float f_value)
 {
-    module_config_t *p_config = config_FindConfigChecked( psz_name );
+    struct vlc_param *param = vlc_param_Find(name);
+    module_config_t *p_config = &param->item;
 
     /* sanity checks */
-    assert(p_config != NULL);
-    assert(IsConfigFloatType(p_config->i_type));
+    assert(param != NULL);
+    assert(IsConfigFloatType(param->item.i_type));
 
     /* if f_min == f_max == 0, then do not use them */
     if ((p_config->min.f == 0.f) && (p_config->max.f == 0.f))
@@ -194,6 +196,7 @@ void config_PutFloat(const char *psz_name, float f_value)
     else if (f_value > p_config->max.f)
         f_value = p_config->max.f;
 
+    atomic_store_explicit(&param->value.f, f_value, memory_order_relaxed);
     vlc_rwlock_wrlock (&config_lock);
     p_config->value.f = f_value;
     vlc_rwlock_unlock (&config_lock);
@@ -509,10 +512,18 @@ void config_ResetAll(void)
             module_config_t *p_config = &param->item;
 
             if (IsConfigIntegerType (p_config->i_type))
+            {
+                atomic_store_explicit(&param->value.i, p_config->orig.i,
+                                      memory_order_relaxed);
                 p_config->value.i = p_config->orig.i;
+            }
             else
             if (IsConfigFloatType (p_config->i_type))
+            {
+                atomic_store_explicit(&param->value.f, p_config->orig.f,
+                                      memory_order_relaxed);
                 p_config->value.f = p_config->orig.f;
+            }
             else
             if (IsConfigStringType (p_config->i_type))
             {
