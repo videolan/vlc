@@ -279,7 +279,7 @@ Widgets.PageLoader {
             ServicesDiscoveryModel {
                 id: discoveryModel
 
-                ctx: mainctx
+                ctx: mainInterface
             }
 
             SortFilterProxyModel {

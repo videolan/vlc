@@ -127,7 +127,7 @@ int ServicesDiscoveryModel::getCount() const
     return static_cast<int>( m_items.size() );
 }
 
-void ServicesDiscoveryModel::setCtx(QmlMainContext* ctx)
+void ServicesDiscoveryModel::setCtx(MainInterface* ctx)
 {
     if (ctx) {
         m_ctx = ctx;
