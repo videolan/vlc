@@ -240,6 +240,16 @@ vlc_medialibrary_t* MediaLib::vlcMl()
     return vlc_ml_instance_get( m_intf );
 }
 
+vlc_ml_event_callback_t*  MediaLib::registerEventListener( void (*callback)(void*, const vlc_ml_event_t*), void* data)
+{
+    return vlc_ml_event_register_callback( m_ml , callback , data ) ;
+}
+
+void MediaLib::unregisterEventListener(vlc_ml_event_callback_t* cb)
+{
+    vlc_ml_event_unregister_callback( m_ml , cb );
+}
+
 void MediaLib::onMediaLibraryEvent( void* data, const vlc_ml_event_t* event )
 {
     MediaLib* self = static_cast<MediaLib*>( data );
