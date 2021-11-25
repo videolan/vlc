@@ -175,9 +175,9 @@ uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepre
 
     if(!segmentList->hasRelativeMediaTimes())
     {
-        const Timescale timescale = inheritTimescale();
-        const mtime_t duration = timescale.ToTime(fromSeg->duration.Get());
-        const mtime_t utcTime = fromSeg->getDisplayTime() + duration / 2;
+        const stime_t wantedTimeIn = fromSeg->startTime.Get();
+        const stime_t wantedTimeOut = wantedTimeIn + fromSeg->duration.Get();
+
         const std::vector<Segment *> &list = segmentList->getSegments();
         std::vector<Segment *>::const_iterator it;
         for(it=list.begin(); it != list.end(); ++it)
@@ -186,10 +186,13 @@ uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepre
             /* Must be in the same sequence */
             if(seg->getDiscontinuitySequenceNumber() < discontinuitySequence)
                 continue;
-            if (seg->getDisplayTime() <= utcTime || it == list.begin())
-                num = seg->getSequenceNumber();
-            else
-                return num;
+            const stime_t segTimeIn = seg->startTime.Get();
+            const stime_t segTimeOut = segTimeIn + seg->duration.Get();
+            if(wantedTimeIn >= segTimeIn && wantedTimeIn < segTimeOut)
+                return seg->getSequenceNumber();
+            /* approx / gap */
+            if(wantedTimeOut >= segTimeIn && wantedTimeOut < segTimeOut)
+                return seg->getSequenceNumber();
         }
     }
     else if(segmentList->getTotalLength())
@@ -212,10 +215,10 @@ uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepre
                 /* Must be in the same sequence */
                 if(seg->getDiscontinuitySequenceNumber() < discontinuitySequence)
                     continue;
-                if (seg->startTime.Get() <= lookup || it == list.begin())
-                    num = seg->getSequenceNumber();
-                else
-                    return num;
+                const stime_t segTimeIn = seg->startTime.Get();
+                const stime_t segTimeOut = segTimeIn + seg->duration.Get();
+                if(lookup >= segTimeIn && lookup < segTimeOut)
+                    return seg->getSequenceNumber();
             }
         }
     }
