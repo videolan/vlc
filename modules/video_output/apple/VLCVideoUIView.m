@@ -74,7 +74,6 @@
 @interface VLCVideoUIView : UIView {
     /* VLC window object, set to NULL under _mutex lock when closing. */
     vout_window_t *_wnd;
-    vlc_mutex_t _mutex;
 
     /* Parent view defined by libvlc_media_player_set_nsobject. */
     UIView *_viewContainer;
@@ -128,7 +127,6 @@
         return nil;
 
     _eventq = dispatch_queue_create("vlc_eventq", DISPATCH_QUEUE_SERIAL);
-    vlc_mutex_init(&_mutex);
 
     /* The window is controlled by the host application through the UIView
      * sizing mechanisms. */
@@ -262,11 +260,9 @@
         dispatch_async(_eventq, ^{
             /* We need to lock to ensure _wnd is still valid,
              * see detachFromParent. */
-            vlc_mutex_lock(&_mutex);
             if (_wnd != NULL)
                 (eventBlock)();
             vlc_darwin_runloop_Stop(runloop);
-            vlc_mutex_unlock(&_mutex);
         });
     });
 
@@ -275,16 +271,15 @@
 
 - (void)detachFromParent
 {
-    /* We need to lock because we consider that _wnd might be destroyed
-     * after this function returns, typically as it will be called in the
-     * Close() operation which preceed the vout_window_t destruction in
-     * the core. */
-    vlc_mutex_lock(&_mutex);
-    /* The UIView must not be attached before releasing. Disable() is doing
-     * exactly this asynchronously in the main thread so ensure it was called
-     * here before detaching from the parent. */
-    _wnd = NULL;
-    vlc_mutex_unlock(&_mutex);
+    /* We need to dispatch synchronously to ensure _wnd is set to null after
+     * all events have been reported in the _eventq
+     */
+    dispatch_sync(_eventq, ^{
+        /* The UIView must not be attached before releasing. Disable() is doing
+         * exactly this asynchronously in the main thread so ensure it was called
+         * here before detaching from the parent. */
+        _wnd = NULL;
+    });
 }
 
 /**
