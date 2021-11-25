@@ -258,8 +258,6 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos,
     if(!adaptationSet)
         return ChunkEntry();
 
-    bool b_updated = false;
-
     /* starting */
     if(!pos.isValid())
     {
@@ -278,18 +276,25 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos,
             temp.rep = logic->getNextRepresentation(adaptationSet, pos.rep);
             if(temp.rep && temp.rep != pos.rep)
             {
-                /* Ensure ephemere content is updated/loaded */
-                if(temp.rep->needsUpdate(pos.number))
-                    b_updated = temp.rep->runLocalUpdates(resources);
                 /* Convert our segment number if we need to */
                 temp.number = temp.rep->translateSegmentNumber(pos.number, pos.rep);
+
+                /* Ensure ephemere content is updated/loaded */
+                if(temp.rep->needsUpdate(temp.number))
+                    temp.rep->scheduleNextUpdate(temp.number, temp.rep->runLocalUpdates(resources));
+
+                /* could have been std::numeric_limits<uint64_t>::max() if not found because not avail */
+                if(!temp.isValid()) /* try again */
+                    temp.number = temp.rep->translateSegmentNumber(pos.number, pos.rep);
+
+                /* cancel switch that would go past playlist */
+                if(temp.isValid() && temp.rep->getMinAheadTime(temp.number) == 0)
+                    temp = Position();
             }
             if(temp.isValid())
                 pos = temp;
         }
     }
-
-    pos.rep->scheduleNextUpdate(pos.number, b_updated);
 
     bool b_gap = true;
     ISegment *datasegment = pos.rep->getNextMediaSegment(pos.number, &pos.number, &b_gap);
