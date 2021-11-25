@@ -408,9 +408,15 @@
 {
     [self reportEvent:^{
         if ([[notification name] isEqualToString:UIApplicationWillEnterForegroundNotification])
+        {
             vlc_window_ReportVisibilityChanged(_wnd, VLC_WINDOW_VISIBLE);
+            _displayLink.paused = NO;
+        }
         else if ([[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification])
+        {
             vlc_window_ReportVisibilityChanged(_wnd, VLC_WINDOW_NOT_VISIBLE);
+            _displayLink.paused = YES;
+        }
     }];
 }
 
