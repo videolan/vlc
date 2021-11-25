@@ -93,7 +93,7 @@ Widgets.PageLoader {
             NetworkDeviceModel {
                 id: deviceModel
 
-                ctx: mainctx
+                ctx: mainInterface
                 sd_source: NetworkDeviceModel.CAT_INTERNET
             }
 

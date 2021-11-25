@@ -30,7 +30,7 @@
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
-#include <util/qml_main_context.hpp>
+#include <maininterface/main_interface.hpp>
 #include "networksourcelistener.hpp"
 
 #include <memory>
@@ -74,7 +74,7 @@ public:
     Q_ENUM( SDCatType )
 
 
-    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+    Q_PROPERTY(MainInterface* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
     Q_PROPERTY(SDCatType sd_source READ getSdSource WRITE setSdSource NOTIFY sdSourceChanged FINAL)
     Q_PROPERTY(QString name READ getName NOTIFY nameChanged FINAL)
     Q_PROPERTY(QString source_name READ getSourceName WRITE setSourceName NOTIFY sourceNameChanged FINAL)
@@ -87,11 +87,11 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     int rowCount(const QModelIndex& parent = {}) const override;
 
-    void setCtx(QmlMainContext* ctx);
+    void setCtx(MainInterface* ctx);
     void setSdSource(SDCatType s);
     void setSourceName(const QString& sourceName);
 
-    inline QmlMainContext* getCtx() { return m_ctx; }
+    inline MainInterface* getCtx() { return m_ctx; }
     inline SDCatType getSdSource() { return m_sdSource; }
     inline QString getName() { return m_name; }
     inline QString getSourceName() { return m_sourceName; }
@@ -147,8 +147,7 @@ private:
 
 private:
     std::vector<Item> m_items;
-    QmlMainContext* m_ctx = nullptr;
-    vlc_medialibrary_t* m_ml = nullptr;
+    MainInterface* m_ctx = nullptr;
     SDCatType m_sdSource = CAT_UNDEFINED;
     QString m_sourceName; // '*' -> all sources
     QString m_name; // source long name

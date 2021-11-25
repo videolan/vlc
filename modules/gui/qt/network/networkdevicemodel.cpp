@@ -24,7 +24,6 @@
 
 NetworkDeviceModel::NetworkDeviceModel( QObject* parent )
     : QAbstractListModel( parent )
-    , m_ml( nullptr )
 {
 }
 
@@ -79,11 +78,10 @@ int NetworkDeviceModel::rowCount(const QModelIndex& parent) const
 }
 
 
-void NetworkDeviceModel::setCtx(QmlMainContext* ctx)
+void NetworkDeviceModel::setCtx(MainInterface* ctx)
 {
     if (ctx) {
         m_ctx = ctx;
-        m_ml = vlc_ml_instance_get( m_ctx->getIntf() );
     }
     if (m_ctx && m_sdSource != CAT_UNDEFINED && !m_sourceName.isEmpty()) {
         initializeMediaSources();
@@ -133,7 +131,7 @@ bool NetworkDeviceModel::insertIntoPlaylist(const QModelIndexList &itemIdList, s
     }
     if (medias.isEmpty())
         return false;
-    m_ctx->getIntf()->p_mainPlaylistController->insert(playlistIndex, medias, false);
+    m_ctx->getMainPlaylistController()->insert(playlistIndex, medias, false);
     return true;
 }
 
@@ -145,7 +143,7 @@ bool NetworkDeviceModel::addToPlaylist(int index)
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.inputItem.get() };
-    m_ctx->getIntf()->p_mainPlaylistController->append( { media }, false);
+    m_ctx->getMainPlaylistController()->append( { media }, false);
     return true;
 }
 
@@ -184,7 +182,7 @@ bool NetworkDeviceModel::addAndPlay(int index)
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.inputItem.get() };
-    m_ctx->getIntf()->p_mainPlaylistController->append( { media }, true);
+    m_ctx->getMainPlaylistController()->append( { media }, true);
     return true;
 }
 
@@ -233,8 +231,6 @@ QMap<QString, QVariant> NetworkDeviceModel::getDataAt(int idx)
 /* Q_INVOKABLE */
 QVariantList NetworkDeviceModel::getItemsForIndexes(const QModelIndexList & indexes) const
 {
-    assert(m_ml);
-
     QVariantList items;
 
     for (const QModelIndex & modelIndex : indexes)
