@@ -179,6 +179,7 @@ public:
 
 public:
     /* Getters */
+    inline qt_intf_t* getIntf() const { return p_intf; }
     QSystemTrayIcon *getSysTray() { return sysTray; }
     QMenu *getSysTrayMenu() { return systrayMenu.get(); }
     enum
