@@ -101,7 +101,7 @@ FirstRunWizard::FirstRunWizard( qt_intf_t *_p_intf, QWidget *parent)
     if ( vlc_ml_instance_get( p_intf ) )
     {
         const auto foldersModel = new MLFoldersModel( this );
-        foldersModel->setMl( vlc_ml_instance_get( p_intf ) );
+        foldersModel->setCtx( p_intf->p_mi );
         ui.entryPoints->setMLFoldersModel( foldersModel );
         mlFoldersEditor = ui.entryPoints;
         mlFoldersModel = foldersModel;

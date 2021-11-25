@@ -31,13 +31,13 @@
 #include <QList>
 #include "mlhelper.hpp"
 
-#include <util/qml_main_context.hpp>
+#include <maininterface/main_interface.hpp>
 #include <vlc_media_library.h>
 
 class MLFoldersBaseModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+    Q_PROPERTY(MainInterface* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
 
 public:
     enum Roles
@@ -57,10 +57,8 @@ public:
 
     MLFoldersBaseModel( QObject *parent = nullptr );
 
-    void setCtx(QmlMainContext* ctx);
-    inline QmlMainContext* getCtx() { return m_ctx; }
-    void setMl(vlc_medialibrary_t* ml);
-    inline vlc_medialibrary_t *ml() const { return m_ml; }
+    void setCtx(MainInterface* ctx);
+    inline MainInterface* getCtx() { return m_ctx; }
 
     int rowCount( QModelIndex const &parent = {} ) const  override;
     QVariant data( QModelIndex const &index , const int role = Qt::DisplayRole ) const  override;
@@ -87,15 +85,15 @@ protected:
     virtual std::vector<EntryPoint> entryPoints() const = 0;
     virtual bool failed( const vlc_ml_event_t* event ) const = 0; // will be called outside the main thread
 
-private:
+protected:
     static void onMlEvent( void* data , const vlc_ml_event_t* event );
     void update();
 
     using EventCallbackPtr = std::unique_ptr<vlc_ml_event_callback_t, std::function<void( vlc_ml_event_callback_t* )>>;
 
     std::vector<EntryPoint> m_mrls;
-    vlc_medialibrary_t *m_ml = nullptr;
-    QmlMainContext* m_ctx = nullptr;
+    MediaLib *m_mediaLib = nullptr;
+    MainInterface* m_ctx = nullptr;
     EventCallbackPtr m_ml_event_handle;
 };
 

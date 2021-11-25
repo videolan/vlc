@@ -1023,12 +1023,12 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             if ( vlc_ml_instance_get( p_intf ) != NULL )
             {
                 auto foldersModel = new MLFoldersModel( this );
-                foldersModel->setMl( vlc_ml_instance_get( p_intf ) );
+                foldersModel->setCtx( p_intf->p_mi );
                 ui.entryPoints->setMLFoldersModel( foldersModel );
                 mlFoldersEditor = ui.entryPoints;
 
                 auto bannedFoldersModel = new MLBannedFoldersModel( this );
-                bannedFoldersModel->setMl( vlc_ml_instance_get( p_intf ));
+                bannedFoldersModel->setCtx( p_intf->p_mi );
                 ui.bannedEntryPoints->setMLFoldersModel( bannedFoldersModel );
                 mlBannedFoldersEditor = ui.bannedEntryPoints;
 

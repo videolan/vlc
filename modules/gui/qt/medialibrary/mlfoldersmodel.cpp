@@ -22,8 +22,8 @@
 MLFoldersBaseModel::MLFoldersBaseModel( QObject *parent )
     : QAbstractListModel( parent )
     , m_ml_event_handle( nullptr , [this](vlc_ml_event_callback_t* cb ) {
-        if ( m_ml )
-            vlc_ml_event_unregister_callback( m_ml , cb );
+        if ( m_mediaLib )
+            vlc_ml_event_unregister_callback( m_mediaLib->vlcMl() , cb );
     })
 {
     connect( this , &MLFoldersBaseModel::onMLEntryPointModified , this , &MLFoldersBaseModel::update );
@@ -35,29 +35,23 @@ MLFoldersBaseModel::EntryPoint::EntryPoint( const vlc_ml_folder_t& entryPoint)
 {
 }
 
-void MLFoldersBaseModel::setCtx(QmlMainContext *ctx)
+void MLFoldersBaseModel::setCtx(MainInterface* ctx)
 {
     if (ctx)
     {
         m_ctx = ctx;
-        setMl(vlc_ml_instance_get( m_ctx->getIntf() ));
+        m_mediaLib = m_ctx->getMediaLibrary();
+        m_ml_event_handle.reset( vlc_ml_event_register_callback( m_mediaLib->vlcMl() , onMlEvent , this ) );
     }
     else
     {
         m_ctx = nullptr;
-        setMl(nullptr);
-    }
-    emit ctxChanged();
-}
-
-void MLFoldersBaseModel::setMl(vlc_medialibrary_t *ml)
-{
-    if (ml)
-        m_ml_event_handle.reset( vlc_ml_event_register_callback( ml , onMlEvent , this ) );
-    else
+        //reset *before* setting m_mediaLib to nullptr
         m_ml_event_handle.reset( nullptr );
-    m_ml = ml;
+        m_mediaLib = nullptr;
+    }
     update();
+    emit ctxChanged();
 }
 
 int MLFoldersBaseModel::rowCount( QModelIndex const & ) const
@@ -128,7 +122,7 @@ std::vector<MLFoldersBaseModel::EntryPoint> MLFoldersModel::entryPoints() const
 {
     std::vector<MLFoldersBaseModel::EntryPoint> r;
 
-    vlc_ml_folder_list_t* entrypoints = vlc_ml_list_entry_points( ml(), nullptr );
+    vlc_ml_folder_list_t* entrypoints = vlc_ml_list_entry_points( m_mediaLib->vlcMl(), nullptr );
     if ( entrypoints != nullptr )
     {
         for ( unsigned int i = 0; entrypoints && i < entrypoints->i_nb_items; i++ )
@@ -157,29 +151,29 @@ bool MLFoldersModel::failed(const vlc_ml_event_t *event) const
 
 void MLFoldersModel::remove( const QUrl &mrl )
 {
-    vlc_ml_remove_folder( ml() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
+    vlc_ml_remove_folder( m_mediaLib->vlcMl() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
 }
 
 void MLFoldersModel::add(const QUrl &mrl )
 {
-    vlc_ml_add_folder( ml() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
+    vlc_ml_add_folder( m_mediaLib->vlcMl() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
 }
 
 void MLBannedFoldersModel::remove(const QUrl &mrl)
 {
-    vlc_ml_unban_folder( ml() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
+    vlc_ml_unban_folder( m_mediaLib->vlcMl() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
 }
 
 void MLBannedFoldersModel::add(const QUrl &mrl)
 {
-    vlc_ml_ban_folder( ml() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
+    vlc_ml_ban_folder( m_mediaLib->vlcMl() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
 }
 
 std::vector<MLFoldersBaseModel::EntryPoint> MLBannedFoldersModel::entryPoints() const
 {
     std::vector<MLFoldersBaseModel::EntryPoint> r;
 
-    vlc_ml_folder_list_t* entrypoints = vlc_ml_list_banned_entry_points( ml(), nullptr );
+    vlc_ml_folder_list_t* entrypoints = vlc_ml_list_banned_entry_points( m_mediaLib->vlcMl(), nullptr );
     if ( entrypoints != nullptr )
     {
         for ( unsigned int i = 0; entrypoints && i < entrypoints->i_nb_items; i++ )
