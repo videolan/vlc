@@ -145,7 +145,7 @@
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationStateChanged:)
-                                                 name:UIApplicationWillResignActiveNotification
+                                                 name:UIApplicationDidEnterBackgroundNotification
                                                object:nil];
     _viewContainer = superview;
 
