@@ -27,7 +27,6 @@
 NetworkMediaModel::NetworkMediaModel( QObject* parent )
     : QAbstractListModel( parent )
     , m_preparseSem(1)
-    , m_ml( nullptr )
 {
 }
 
@@ -122,7 +121,7 @@ Qt::ItemFlags NetworkMediaModel::flags( const QModelIndex& idx ) const
 
 bool NetworkMediaModel::setData( const QModelIndex& idx, const QVariant& value, int role )
 {
-    if (!m_ml)
+    if (!m_mediaLib)
         return false;
 
     if ( role != NETWORK_INDEXED )
@@ -132,9 +131,9 @@ bool NetworkMediaModel::setData( const QModelIndex& idx, const QVariant& value, 
         return  false;
     int res;
     if ( enabled )
-        res = vlc_ml_add_folder( m_ml, qtu( m_items[idx.row()].mainMrl.toString( QUrl::FullyEncoded ) ) );
+        res = vlc_ml_add_folder( m_mediaLib->vlcMl(), qtu( m_items[idx.row()].mainMrl.toString( QUrl::FullyEncoded ) ) );
     else
-        res = vlc_ml_remove_folder( m_ml, qtu( m_items[idx.row()].mainMrl.toString( QUrl::FullyEncoded ) ) );
+        res = vlc_ml_remove_folder( m_mediaLib->vlcMl(), qtu( m_items[idx.row()].mainMrl.toString( QUrl::FullyEncoded ) ) );
     m_items[idx.row()].indexed = enabled;
     emit dataChanged(idx, idx, { NETWORK_INDEXED });
     return res == VLC_SUCCESS;
@@ -147,9 +146,9 @@ void NetworkMediaModel::setIndexed(bool indexed)
         return;
     int res;
     if ( indexed ) {
-        res = vlc_ml_add_folder( m_ml, qtu( m_url.toString( QUrl::FullyEncoded ) ) );
+        res = vlc_ml_add_folder( m_mediaLib->vlcMl(), qtu( m_url.toString( QUrl::FullyEncoded ) ) );
     } else
-        res = vlc_ml_remove_folder( m_ml, qtu( m_url.toString( QUrl::FullyEncoded ) ) );
+        res = vlc_ml_remove_folder( m_mediaLib->vlcMl(), qtu( m_url.toString( QUrl::FullyEncoded ) ) );
 
     if (res == VLC_SUCCESS) {
         m_indexed = indexed;
@@ -157,11 +156,11 @@ void NetworkMediaModel::setIndexed(bool indexed)
     }
 }
 
-void NetworkMediaModel::setCtx(QmlMainContext* ctx)
+void NetworkMediaModel::setCtx(MainInterface* ctx)
 {
     if (ctx) {
         m_ctx = ctx;
-        m_ml = vlc_ml_instance_get( m_ctx->getIntf() );
+        m_mediaLib = ctx->getMediaLibrary();
     }
     if (m_ctx && m_hasTree) {
         initializeMediaSources();
@@ -200,7 +199,7 @@ bool NetworkMediaModel::insertIntoPlaylist(const QModelIndexList &itemIdList, co
     }
     if (medias.isEmpty())
         return false;
-    m_ctx->getIntf()->p_mainPlaylistController->insert(playlistIndex, medias, false);
+    m_ctx->getMainPlaylistController()->insert(playlistIndex, medias, false);
     return true;
 }
 
@@ -212,7 +211,7 @@ bool NetworkMediaModel::addToPlaylist(const int index)
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.tree.media.get() };
-    m_ctx->getIntf()->p_mainPlaylistController->append( { media }, false);
+    m_ctx->getMainPlaylistController()->append( { media }, false);
     return true;
 }
 
@@ -255,7 +254,7 @@ bool NetworkMediaModel::addAndPlay(int index)
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.tree.media.get() };
-    m_ctx->getIntf()->p_mainPlaylistController->append( { media }, true);
+    m_ctx->getMainPlaylistController()->append( { media }, true);
     return true;
 }
 
@@ -300,8 +299,6 @@ bool NetworkMediaModel::addAndPlay(const QModelIndexList& itemIdList)
 /* Q_INVOKABLE */
 QVariantList NetworkMediaModel::getItemsForIndexes(const QModelIndexList & indexes) const
 {
-    assert(m_ml);
-
     QVariantList items;
 
     for (const QModelIndex & modelIndex : indexes)
@@ -351,7 +348,7 @@ bool NetworkMediaModel::initializeMediaSources()
         emit typeChanged();
         m_canBeIndexed = canBeIndexed( m_url, m_type );
         emit canBeIndexedChanged();
-        if ( !m_ml || vlc_ml_is_indexed( m_ml, QByteArray(m_treeItem.media->psz_uri).append('/').constData(), &m_indexed ) != VLC_SUCCESS ) {
+        if ( !m_mediaLib || vlc_ml_is_indexed( m_mediaLib->vlcMl(), QByteArray(m_treeItem.media->psz_uri).append('/').constData(), &m_indexed ) != VLC_SUCCESS ) {
             m_indexed = false;
         }
         emit isIndexedChanged();
@@ -517,9 +514,9 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
             free(artwork);
         }
 
-        if ( m_ml && item.canBeIndexed == true )
+        if ( m_mediaLib && item.canBeIndexed == true )
         {
-            if ( vlc_ml_is_indexed( m_ml, qtu( item.mainMrl.toString( QUrl::FullyEncoded ) ),
+            if ( vlc_ml_is_indexed( m_mediaLib->vlcMl(), qtu( item.mainMrl.toString( QUrl::FullyEncoded ) ),
                                     &item.indexed ) != VLC_SUCCESS )
                 item.indexed = false;
         }
@@ -543,5 +540,5 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
 
 bool NetworkMediaModel::canBeIndexed(const QUrl& url , ItemType itemType )
 {
-    return  m_ml && static_cast<input_item_type_e>(itemType) != ITEM_TYPE_FILE && (url.scheme() == "smb" || url.scheme() == "ftp" || url.scheme() == "file");
+    return  m_mediaLib && static_cast<input_item_type_e>(itemType) != ITEM_TYPE_FILE && (url.scheme() == "smb" || url.scheme() == "ftp" || url.scheme() == "file");
 }

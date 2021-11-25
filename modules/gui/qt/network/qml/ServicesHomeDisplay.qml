@@ -145,7 +145,7 @@ Widgets.PageLoader {
             }
 
             providerModel: NetworkMediaModel {
-                ctx: mainctx
+                ctx: mainInterface
             }
 
             contextMenu: NetworkMediaContextMenu {

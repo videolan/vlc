@@ -82,7 +82,7 @@ Widgets.PageLoader {
 
         NetworkBrowseDisplay {
             providerModel: NetworkMediaModel {
-                ctx: mainctx
+                ctx: mainInterface
             }
 
             contextMenu: NetworkMediaContextMenu {

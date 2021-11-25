@@ -30,8 +30,8 @@
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
-#include <util/qml_main_context.hpp>
 #include "networksourcelistener.hpp"
+#include <maininterface/main_interface.hpp>
 
 #include <QSemaphore>
 
@@ -131,7 +131,7 @@ public:
     };
     Q_ENUM( ItemType )
 
-    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
+    Q_PROPERTY(MainInterface* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
     Q_PROPERTY(QVariant tree READ getTree WRITE setTree NOTIFY treeChanged)
     Q_PROPERTY(QVariantList path READ getPath NOTIFY pathChanged)
 
@@ -144,7 +144,6 @@ public:
     Q_PROPERTY(int count READ getCount NOTIFY countChanged)
 
     explicit NetworkMediaModel(QObject* parent = nullptr);
-    NetworkMediaModel( QmlMainContext* ctx, QString parentMrl, QObject* parent = nullptr );
     virtual ~NetworkMediaModel() override;
 
     QVariant data(const QModelIndex& index, int role) const override;
@@ -155,10 +154,10 @@ public:
     bool setData( const QModelIndex& idx,const QVariant& value, int role ) override;
 
     void setIndexed(bool indexed);
-    void setCtx(QmlMainContext* ctx);
+    void setCtx(MainInterface* ctx);
     void setTree(QVariant tree);
 
-    inline QmlMainContext* getCtx() const { return m_ctx; }
+    inline MainInterface* getCtx() const { return m_ctx; }
     inline QVariant getTree() const { return QVariant::fromValue( m_treeItem); }
     inline QVariantList getPath() const { return m_path; }
 
@@ -234,8 +233,8 @@ private:
     QSemaphore m_preparseSem;
 
     std::vector<Item> m_items;
-    QmlMainContext* m_ctx = nullptr;
-    vlc_medialibrary_t* m_ml;
+    MainInterface* m_ctx = nullptr;
+    MediaLib* m_mediaLib;
     bool m_hasTree = false;
     NetworkTreeItem m_treeItem;
     std::unique_ptr<NetworkSourceListener> m_listener;
