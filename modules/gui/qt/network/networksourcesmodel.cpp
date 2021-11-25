@@ -69,7 +69,7 @@ int NetworkSourcesModel::rowCount(const QModelIndex& parent) const
 }
 
 
-void NetworkSourcesModel::setCtx(QmlMainContext* ctx)
+void NetworkSourcesModel::setCtx(MainInterface* ctx)
 {
     if (ctx) {
         m_ctx = ctx;

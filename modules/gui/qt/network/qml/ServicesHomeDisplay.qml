@@ -421,7 +421,7 @@ Widgets.PageLoader {
             NetworkSourcesModel {
                 id: sourcesModel
 
-                ctx: mainctx
+                ctx: mainInterface
             }
 
             Util.SelectableDelegateModel {
