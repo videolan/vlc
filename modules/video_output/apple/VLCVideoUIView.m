@@ -72,7 +72,7 @@
 #import "../../../src/darwin/runloop.h"
 
 @interface VLCVideoUIView : UIView {
-    /* VLC window object, set to NULL under _mutex lock when closing. */
+    /* VLC window object, set to NULL under _eventq sync dispatch when closed. */
     vlc_window_t *_wnd;
 
     vlc_mutex_t _size_mutex;
@@ -90,7 +90,10 @@
 
     /* Window state */
     BOOL _enabled;
+
+    /* Serial queue used to report events to _wnd */
     dispatch_queue_t _eventq;
+
     atomic_bool _avstatEnabled;
 
     /* Constraints */
@@ -267,7 +270,7 @@
          * want to block the main CFRunLoop since the vout
          * display module typically needs it to Open(). */
         dispatch_async(_eventq, ^{
-            /* We need to lock to ensure _wnd is still valid,
+            /* We need to dispatch to ensure _wnd is still valid,
              * see detachFromParent. */
             if (_wnd != NULL)
                 (eventBlock)();
@@ -467,7 +470,7 @@ static void Close(vlc_window_t *wnd)
     var_DelCallback(wnd, "avstat", OnAvstatChanged, (__bridge void*)sys);
 
     /* We need to signal the asynchronous implementation that we have been
-     * closed and cannot used _wnd anymore. */
+     * closed and cannot use _wnd anymore. */
     [sys detachFromParent];
 }
 
