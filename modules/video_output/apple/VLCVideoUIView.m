@@ -168,9 +168,6 @@
         vlc_window_ReportSize(_wnd, size.width, size.height);
     }];
 
-    _displayLink = [CADisplayLink displayLinkWithTarget:self
-                                               selector:@selector(displayLinkUpdate:)];
-
     return self;
 }
 
@@ -179,26 +176,17 @@
     if ([self superview] == nil)
         return;
 
+    if (_constraints != nil)
+        return;
+
     _constraints = @[
         [self.centerXAnchor constraintEqualToAnchor:[[self superview] centerXAnchor]],
         [self.centerYAnchor constraintEqualToAnchor:[[self superview] centerYAnchor]],
         [self.widthAnchor constraintEqualToAnchor:[[self superview] widthAnchor]],
         [self.heightAnchor constraintEqualToAnchor:[[self superview] heightAnchor]],
     ];
-    [[self superview] addConstraints:_constraints];
     [NSLayoutConstraint activateConstraints:_constraints];
-    [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-}
 
-- (void)willRemoveFromSuperview
-{
-    if ([self superview] == nil)
-        return;
-
-    [_displayLink removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
-    [NSLayoutConstraint deactivateConstraints:_constraints];
-    [[self superview] removeConstraints:_constraints];
-    _constraints = nil;
 }
 
 - (UIView *)fetchViewContainer
@@ -327,12 +315,17 @@
         [self addGestureRecognizer:_tapRecognizer];
     }
     [_viewContainer addSubview:self];
+    _displayLink = [CADisplayLink displayLinkWithTarget:self
+                                               selector:@selector(displayLinkUpdate:)];
+    [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
 - (void)disable
 {
     assert(_enabled);
     _enabled = NO;
+    [_displayLink invalidate];
+    _displayLink = nil;
     [self removeFromSuperview];
 
     [_tapRecognizer.view removeGestureRecognizer:_tapRecognizer];
