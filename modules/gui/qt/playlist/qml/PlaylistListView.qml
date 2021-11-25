@@ -336,7 +336,7 @@ Control {
             clip: true // else out of view items will overlap with surronding items
 
             model: PlaylistListModel {
-                playlistId: mainctx.playlist
+                playlistId: mainInterface.mainPlaylist
             }
 
             fadeColor: background.usingAcrylic ? undefined

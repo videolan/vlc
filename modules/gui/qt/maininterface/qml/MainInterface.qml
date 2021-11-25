@@ -64,7 +64,7 @@ Rectangle {
 
     PlaylistControllerModel {
         id: mainPlaylistController
-        playlistPtr: mainctx.playlist
+        playlistPtr: mainInterface.mainPlaylist
 
         onPlaylistInitialized: {
             root._playlistReady = true

@@ -30,6 +30,7 @@
 #include "player/player_controller.hpp"
 #include "util/color_scheme_model.hpp"
 #include "medialibrary/medialib.hpp"
+#include <playlist/playlist_common.hpp>
 
 #include <QSystemTrayIcon>
 #include <QStackedWidget>
@@ -60,6 +61,11 @@ class StandardPLPanel;
 struct vout_window_t;
 class VideoSurfaceProvider;
 class ControlbarProfileModel;
+namespace vlc {
+namespace playlist {
+class PlaylistControllerModel;
+}
+}
 
 class WindowStateHolder : public QObject
 {
@@ -164,6 +170,8 @@ class MainInterface : public QObject
     Q_PROPERTY(bool pinVideoControls READ pinVideoControls WRITE setPinVideoControls NOTIFY pinVideoControlsChanged FINAL)
     Q_PROPERTY(ControlbarProfileModel* controlbarProfileModel READ controlbarProfileModel CONSTANT FINAL)
     Q_PROPERTY(bool hasAcrylicSurface READ hasAcrylicSurface NOTIFY hasAcrylicSurfaceChanged FINAL)
+    Q_PROPERTY(PlaylistPtr mainPlaylist READ getMainPlaylist CONSTANT FINAL)
+    Q_PROPERTY(vlc::playlist::PlaylistControllerModel* mainPlaylistController READ getMainPlaylistController CONSTANT FINAL)
 
     // This Property only works if hasAcrylicSurface is set
     Q_PROPERTY(bool acrylicActive READ acrylicActive WRITE setAcrylicActive NOTIFY acrylicActiveChanged FINAL)
@@ -180,6 +188,9 @@ public:
 public:
     /* Getters */
     inline qt_intf_t* getIntf() const { return p_intf; }
+    inline PlaylistPtr getMainPlaylist() const { return PlaylistPtr(p_intf->p_playlist); }
+    inline vlc::playlist::PlaylistControllerModel* getMainPlaylistController() const { return p_intf->p_mainPlaylistController; }
+
     QSystemTrayIcon *getSysTray() { return sysTray; }
     QMenu *getSysTrayMenu() { return systrayMenu.get(); }
     enum
