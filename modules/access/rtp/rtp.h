@@ -36,15 +36,28 @@ struct vlc_demux_chained_t;
 struct vlc_sdp_media;
 
 /**
- * \defgroup rtp_pt RTP payload format
+ * \defgroup rtp_pt RTP payload formats
+ *
+ * RTP is a somewhat simplistic protocol to carry multiplexed and timestamped
+ * data over an unreliable network. It cannot be used as is: depending on the
+ * concrete type and subtype of data, a format must be selected which
+ * specifically defines how the data is carried as the payload of RTP packets.
+ * This format is known as an RTP payload format.
+ *
+ * A given RTP session (\ref rtp_session_t) can use up to 128 different payload
+ * types (\ref vlc_rtp_pt).
+ * Each payload type is identified by a 7-bit value and designates a
+ * payload format and an associated set of format-dependent parameters
+ * specified by a payload type mapping (\ref vlc_sdp_pt).
+ *
  * @{
  */
 
 /**
  * Payload type mapping.
  *
- * This structure represents a mapping for an RTP payload format
- * extracted from an \ref sdp description.
+ * This structure represents an RTP payload type mapping for an RTP payload
+ * format extracted from an \ref sdp description.
  */
 struct vlc_sdp_pt {
     const struct vlc_sdp_media *media; /**< Containant SDP media description */
@@ -67,40 +80,41 @@ struct vlc_rtp_pktinfo {
 /**
  * RTP payload type operations.
  *
- * This structures contains the callbacks provided by an RTP payload format.
+ * This structures contains the callbacks provided by an RTP payload type
+ * (\ref vlc_rtp_pt).
  */
 struct vlc_rtp_pt_operations {
     /**
-     * Releases the payload format.
+     * Releases the payload type.
      *
      * This optional callback releases any resources associated with the
      * payload format, such as copies of the payload format parameters.
      *
-     * \param pt RTP payload format that is being released
+     * \param pt RTP payload type that is being released
      */
     void (*release)(struct vlc_rtp_pt *pt);
 
     /**
-     * Starts using a payload format.
+     * Starts using a payload type.
      *
      * This required callback initialises per-source resources for the payload
-     * format, such as an elementary stream output.
+     * type, such as an elementary stream output.
      *
-     * \note There may be multiple RTP sources using the same payload format
+     * \note There may be multiple RTP sources using the same payload type
      * concurrently within single given RTP session. This callback is invoked
      * for each source.
      *
-     * \param pt RTP payload format being taken into use
+     * \param pt RTP payload type being taken into use
      * \return a data pointer for decode() and destroy() callbacks
      */
     void *(*init)(struct vlc_rtp_pt *pt);
 
     /**
-     * Stops using a payload format.
+     * Stops using a payload type.
      *
      * This optional callback deinitialises per-source resources.
      *
-     * \param pt RTP payload format to relinquish
+     * \param pt RTP payload type to relinquish
      * \param data data pointer returned by init()
      */
     void (*destroy)(struct vlc_rtp_pt *pt, void *data);
@@ -108,7 +122,7 @@ struct vlc_rtp_pt_operations {
     /**
      * Processes a data payload.
      *
-     * \param pt RTP payload format of the payload
+     * \param pt RTP payload type of the payload
      * \param data data pointer returned by init()
      * \param block payload of a received RTP packet
      * \param info RTP packet header infos
@@ -120,22 +134,34 @@ struct vlc_rtp_pt_operations {
 struct vlc_rtp_pt_owner;
 struct vlc_rtp_es;
 
+/**
+ * RTP payload type owner operations.
+ *
+ * This structures contains the callbacks provided by an RTP payload type owner
+ * (\ref vlc_rtp_pt_owner).
+ */
 struct vlc_rtp_pt_owner_operations {
     struct vlc_rtp_es *(*request_es)(struct vlc_rtp_pt *pt,
                                      const es_format_t *restrict fmt);
     struct vlc_rtp_es *(*request_mux)(struct vlc_rtp_pt *pt, const char *name);
 };
 
+/**
+ * RTP payload type owner.
+ *
+ * This structure embedded in \ref vlc_rtp_pt conveys the callbacks provided by
+ * the owner of a payload type.
+ */
 struct vlc_rtp_pt_owner {
-    const struct vlc_rtp_pt_owner_operations *ops;
-    void *data;
+    const struct vlc_rtp_pt_owner_operations *ops; /**< Owner callbacks */
+    void *data; /**< Owner private data */
 };
 
 /**
- * RTP payload format.
+ * RTP payload type.
  *
  * This structures represents a payload format within an RTP session
- * (\ref vlc_rtp_session_t).
+ * (\ref rtp_session_t).
  */
 struct vlc_rtp_pt
 {
@@ -149,19 +175,22 @@ struct vlc_rtp_pt
 
 /**
  * Destroys a payload type parameter set.
+ *
+ * This function destroys a payload type.
+ * It can only be called when the payload type has no active sources.
  */
 void vlc_rtp_pt_release(struct vlc_rtp_pt *pt);
 
 /**
- * Instantiates a payload type from a set of parameters.
+ * Binds a payload type to a source.
  *
  * A given SDP media can have multiple alternative payload types, each with
  * their set of parameters. The RTP session can then have multiple concurrent
- * RTP sources (SSRC). This function creates an instance of a given payload
- * type for use by an unique RTP source.
+ * RTP sources (SSRC). This function starts an association of a given payload
+ * type with an unique RTP source.
  *
- * @param pt RTP payload type to instantiate
- * @return private data for the instance
+ * @param pt RTP payload type to associate with a source
+ * @return private data for the type-source association
  */
 static inline void *vlc_rtp_pt_begin(struct vlc_rtp_pt *pt)
 {
@@ -170,12 +199,13 @@ static inline void *vlc_rtp_pt_begin(struct vlc_rtp_pt *pt)
 }
 
 /**
- * Deinstantiates a payload type.
+ * Unbinds a payload type from a source.
  *
- * This destroys an instance of a payload type created by vlc_rtp_pt_begin().
+ * This removes an association between a payload type and a source created by
+ * vlc_rtp_pt_begin().
  *
- * @param pt RTP payload type to deinstantiate
- * @param data instance private data as returned by vlc_rtp_pt_begin()
+ * @param pt RTP payload type to deassociate
+ * @param data private data as returned by vlc_rtp_pt_begin()
  */
 static inline void vlc_rtp_pt_end(struct vlc_rtp_pt *pt, void *data)
 {
@@ -184,10 +214,11 @@ static inline void vlc_rtp_pt_end(struct vlc_rtp_pt *pt, void *data)
 }
 
 /**
- * Processes an payload packet.
+ * Processes a payload packet.
  *
- * This passes a data payload of an RTP packet to the instance of the
- * payload type specified in the packet (PT and SSRC fields).
+ * This passes a data payload from an RTP packet for processing to the payload
+ * type bound to the source of the packet. The payload type is determined from
+ * the RTP header PT field and the source from the SSRC field.
  */
 static inline
 void vlc_rtp_pt_decode(struct vlc_rtp_pt *pt, void *data, block_t *pkt,
@@ -197,6 +228,16 @@ void vlc_rtp_pt_decode(struct vlc_rtp_pt *pt, void *data, block_t *pkt,
     pt->ops->decode(pt, data, pkt, info);
 }
 
+/**
+ * Starts an elementary stream (ES).
+ *
+ * This function is used by an active RTP payload type to create an
+ * elementary (audio, video or subtitle) stream to process encoded data
+ * extracted from an RTP source.
+ *
+ * A given payload type normally maintains one such elementary stream per
+ * active type-source association (\ref vlc_rtp_pt_begin).
+ */
 static inline
 struct vlc_rtp_es *vlc_rtp_pt_request_es(struct vlc_rtp_pt *pt,
                                          const es_format_t *restrict fmt)
@@ -204,6 +245,13 @@ struct vlc_rtp_es *vlc_rtp_pt_request_es(struct vlc_rtp_pt *pt,
     return pt->owner.ops->request_es(pt, fmt);
 }
 
+/**
+ * Starts a complete multiplex.
+ *
+ * This function creates a complete multiplexed multimedia stream to process
+ * data extracted from RTP packets. This should be avoided as much as possible
+ * as RTP is designed to carry raw elementary streams.
+ */
 static inline
 struct vlc_rtp_es *vlc_rtp_pt_request_mux(struct vlc_rtp_pt *pt,
                                           const char *name)
@@ -212,15 +260,28 @@ struct vlc_rtp_es *vlc_rtp_pt_request_mux(struct vlc_rtp_pt *pt,
 }
 
 /**
- * RTP elementary output stream operations.
+ * RTP abstract output stream operations.
+ *
+ * This structures contains the callbacks provided by an RTP ES
+ * (\ref vlc_rtp_pt).
  */
 struct vlc_rtp_es_operations {
+    /**
+     * Destroys the corresponding \ref vlc_rtp_es.
+     *
+     * Use vlc_rtp_es_destroy() instead.
+     */
     void (*destroy)(struct vlc_rtp_es *es);
+    /**
+     * Passes data for processing to a \ref vlc_rtp_es.
+     *
+     * Use vlc_rtp_es_send() instead.
+     */
     void (*send)(struct vlc_rtp_es *es, block_t *block);
 };
 
 /**
- * RTP elementary output stream.
+ * RTP abstract output stream.
  *
  * This structure represents a data sink for an active instance of a payload
  * format, typically an output elementary stream (ES) \ref es_out_id_t.
@@ -253,7 +314,7 @@ static inline void vlc_rtp_es_send(struct vlc_rtp_es *es, block_t *block)
 }
 
 /**
- * A dummy output that discards data.
+ * A (pointer to a) dummy output that discards data.
  */
 extern struct vlc_rtp_es *const vlc_rtp_es_dummy;
 
@@ -271,6 +332,9 @@ extern struct vlc_rtp_es *const vlc_rtp_es_dummy;
 typedef int (*vlc_rtp_parser_cb)(vlc_object_t *obj, struct vlc_rtp_pt *pt,
                                  const struct vlc_sdp_pt *desc);
 
+/**
+ * Helper to set the RTP payload format parser module capability and callback.
+ */
 #define set_rtp_parser_callback(cb) \
     { \
         vlc_rtp_parser_cb cb__ = (cb); (void) cb__; \
