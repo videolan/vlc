@@ -418,7 +418,7 @@ FocusScope {
 
                                 QmlGlobalMenu {
                                     id: contextMenu
-                                    ctx: mainctx
+                                    ctx: mainInterface
                                 }
                             }
                         }
