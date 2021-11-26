@@ -30,10 +30,12 @@
 
 #include "mlhelper.hpp"
 
+
+class MediaLib;
 class MLBookmarkModel : public QAbstractListModel
 {
 public:
-    MLBookmarkModel( vlc_medialibrary_t* ml, vlc_player_t* player, QObject* parent );
+    MLBookmarkModel( MediaLib* medialib, vlc_player_t* player, QObject* parent );
     virtual ~MLBookmarkModel();
 
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole ) const override;
@@ -58,36 +60,36 @@ private:
     static void onPlaybackStateChanged( vlc_player_t* player, vlc_player_state state,
                                         void* data );
 
-    void refresh( bool forceClear );
+    void updateMediaId(uint64_t revision, const QString mediaUri);
 
-    template <typename Fun>
-    void callAsync(Fun&& fun)
-    {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-        QMetaObject::invokeMethod(this, std::forward<Fun>(fun), Qt::QueuedConnection, nullptr);
-#else
-        QObject src;
-        QObject::connect(&src, &QObject::destroyed, this, std::forward<Fun>(fun), Qt::QueuedConnection);
-#endif
-    }
-
+    enum RefreshOperation {
+        MLBOOKMARKMODEL_REFRESH,
+        MLBOOKMARKMODEL_CLEAR,
+    };
+    void refresh( RefreshOperation forceClear );
 private:
     using BookmarkListPtr = ml_unique_ptr<vlc_ml_bookmark_list_t>;
     using InputItemPtr = std::unique_ptr<input_item_t, decltype(&input_item_Release)>;
 
-    vlc_medialibrary_t* m_ml;
-    vlc_player_t* m_player;
+    MediaLib* m_mediaLib = nullptr;
+    vlc_player_t* m_player = nullptr;
+    vlc_player_listener_id* m_listener = nullptr;
+
     // Assume to be only used from the GUI thread
     BookmarkListPtr m_bookmarks;
-    vlc_player_listener_id* m_listener;
+    uint64_t m_currentMediaId = 0;
 
-    vlc::threads::mutex m_mutex;
-    // current item & media id can be accessed by any thread and therefor
+    //avoid starting two beginReset simultaneously
+    unsigned m_countPendingReset = 0;
+
+    mutable vlc::threads::mutex m_mutex;
+    uint64_t m_revision = 0;
+    // current item & media id can be accessed by any thread and therefore
     // must be accessed with m_mutex held
     InputItemPtr m_currentItem;
-    int64_t m_currentMediaId;
-    vlc_ml_sorting_criteria_t m_sort;
-    bool m_desc;
+
+    vlc_ml_sorting_criteria_t m_sort = VLC_ML_SORTING_INSERTIONDATE;
+    bool m_desc = false;
 };
 
 #endif // MLBOOKMARKMODEL_HPP

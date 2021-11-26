@@ -27,6 +27,7 @@
 #include "bookmarks.hpp"
 #include "player/player_controller.hpp"
 #include "medialibrary/mlbookmarkmodel.hpp"
+#include "maininterface/mainctx.hpp"
 
 #include <QHBoxLayout>
 #include <QSpacerItem>
@@ -63,7 +64,7 @@ BookmarksDialog::BookmarksDialog( qt_intf_t *_p_intf ):QVLCFrame( _p_intf )
                           QDialogButtonBox::RejectRole);
 
     bookmarksList = new QTreeView( this );
-    m_model = new MLBookmarkModel( vlc_ml_instance_get(_p_intf ),
+    m_model = new MLBookmarkModel( _p_intf->p_mi->getMediaLibrary(),
                                    _p_intf->p_player,
                                    bookmarksList );
     bookmarksList->setModel( m_model );
