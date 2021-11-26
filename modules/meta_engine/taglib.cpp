@@ -931,7 +931,7 @@ static int ReadMeta( vlc_object_t* p_this)
     Tag* p_tag = f.tag();
 
 #define SET( tag, meta )                                                       \
-    if( !p_tag->tag().isNull() && !p_tag->tag().isEmpty() )                    \
+    if( !p_tag->tag().isEmpty() )                                              \
         vlc_meta_Set##meta( p_meta, p_tag->tag().toCString(true) )
 #define SETINT( tag, meta )                                                    \
     if( p_tag->tag() )                                                         \
