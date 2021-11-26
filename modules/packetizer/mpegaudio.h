@@ -29,12 +29,14 @@
 /*****************************************************************************
  * SyncInfo: parse MPEG audio sync info
  *****************************************************************************/
-static int SyncInfo(uint32_t i_header, unsigned int *pi_channels,
-                    unsigned int *pi_channels_conf,
-                    unsigned int *pi_chan_mode,
-                    unsigned int *pi_sample_rate, unsigned int *pi_bit_rate,
-                    unsigned int *pi_frame_length,
-                    unsigned int *pi_max_frame_size, unsigned int *pi_layer)
+static int SyncInfo(uint32_t i_header, unsigned int *restrict pi_channels,
+                    unsigned int *restrict pi_channels_conf,
+                    unsigned int *restrict pi_chan_mode,
+                    unsigned int *restrict pi_sample_rate,
+                    unsigned int *restrict pi_bit_rate,
+                    unsigned int *restrict pi_frame_length,
+                    unsigned int *restrict pi_max_frame_size,
+                    unsigned int *restrict pi_layer)
 {
     static const int ppi_bitrate[2][3][16] =
     {
