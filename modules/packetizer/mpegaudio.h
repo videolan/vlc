@@ -71,7 +71,7 @@ static int SyncInfo(uint32_t i_header, unsigned int *restrict pi_channels,
         { 22050, 24000, 16000, 0 }
     };
 
-    int i_frame_size = 0;
+    int i_frame_size;
 
     bool b_mpeg_2_5 = 1 - ((i_header & 0x100000) >> 20);
     int i_version = 1 - ((i_header & 0x80000) >> 19);
@@ -87,70 +87,66 @@ static int SyncInfo(uint32_t i_header, unsigned int *restrict pi_channels,
 
     *pi_chan_mode = 0;
 
-    if (*pi_layer != 4 &&
-        i_bitrate_index < 0x0f &&
-        i_samplerate_index != 0x03 &&
-        i_emphasis != 0x02)
-    {
-        switch (i_mode)
-        {
-            case 2: /* dual-mono */
-                *pi_chan_mode = AOUT_CHANMODE_DUALMONO;
-                /* fall through */
-            case 0: /* stereo */
-            case 1: /* joint stereo */
-                *pi_channels = 2;
-                *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-                break;
-            case 3: /* mono */
-                *pi_channels = 1;
-                *pi_channels_conf = AOUT_CHAN_CENTER;
-                break;
-        }
-
-        int i_max_bit_rate = ppi_bitrate[i_version][*pi_layer-1][14];
-        *pi_bit_rate = ppi_bitrate[i_version][*pi_layer-1][i_bitrate_index];
-        *pi_sample_rate = ppi_samplerate[i_version][i_samplerate_index];
-
-        if (b_mpeg_2_5)
-            *pi_sample_rate /= 2;
-
-        switch (*pi_layer)
-        {
-            case 1:
-                i_frame_size = (12000 * *pi_bit_rate / *pi_sample_rate +
-                                b_padding) * 4;
-                *pi_max_frame_size = (12000 * i_max_bit_rate /
-                                      *pi_sample_rate + 1) * 4;
-                *pi_frame_length = 384;
-                break;
-
-            case 2:
-                i_frame_size = 144000 * *pi_bit_rate / *pi_sample_rate +
-                               b_padding;
-                *pi_max_frame_size = 144000 * i_max_bit_rate /
-                                     *pi_sample_rate + 1;
-                *pi_frame_length = 1152;
-                break;
-
-            case 3:
-                i_frame_size = (i_version ? 72000 : 144000) *
-                                *pi_bit_rate / *pi_sample_rate + b_padding;
-                *pi_max_frame_size = (i_version ? 72000 : 144000) *
-                                     i_max_bit_rate / *pi_sample_rate + 1;
-                *pi_frame_length = i_version ? 576 : 1152;
-                break;
-
-            default:
-                break;
-        }
-
-        /* Free bitrate mode can support higher bitrates */
-        if (*pi_bit_rate == 0)
-            *pi_max_frame_size *= 2;
-    }
-    else
+    if (*pi_layer == 4
+     || i_bitrate_index == 0x0f
+     || i_samplerate_index == 0x03
+     || i_emphasis == 0x02)
         return -1;
+
+    switch (i_mode)
+    {
+        case 2: /* dual-mono */
+            *pi_chan_mode = AOUT_CHANMODE_DUALMONO;
+            /* fall through */
+        case 0: /* stereo */
+        case 1: /* joint stereo */
+            *pi_channels = 2;
+            *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+            break;
+        case 3: /* mono */
+            *pi_channels = 1;
+            *pi_channels_conf = AOUT_CHAN_CENTER;
+            break;
+    }
+
+    int i_max_bit_rate = ppi_bitrate[i_version][*pi_layer-1][14];
+    *pi_bit_rate = ppi_bitrate[i_version][*pi_layer-1][i_bitrate_index];
+    *pi_sample_rate = ppi_samplerate[i_version][i_samplerate_index];
+
+    if (b_mpeg_2_5)
+        *pi_sample_rate /= 2;
+
+    switch (*pi_layer)
+    {
+        case 1:
+            i_frame_size = (12000 * *pi_bit_rate / *pi_sample_rate +
+                            b_padding) * 4;
+            *pi_max_frame_size = (12000 * i_max_bit_rate /
+                                  *pi_sample_rate + 1) * 4;
+            *pi_frame_length = 384;
+            break;
+
+        case 2:
+            i_frame_size = 144000 * *pi_bit_rate / *pi_sample_rate + b_padding;
+            *pi_max_frame_size = 144000 * i_max_bit_rate / *pi_sample_rate + 1;
+            *pi_frame_length = 1152;
+            break;
+
+        case 3:
+            i_frame_size = (i_version ? 72000 : 144000) *
+                            *pi_bit_rate / *pi_sample_rate + b_padding;
+            *pi_max_frame_size = (i_version ? 72000 : 144000) *
+                                  i_max_bit_rate / *pi_sample_rate + 1;
+            *pi_frame_length = i_version ? 576 : 1152;
+            break;
+
+        default:
+            vlc_assert_unreachable();
+    }
+
+    /* Free bitrate mode can support higher bitrates */
+    if (*pi_bit_rate == 0)
+        *pi_max_frame_size *= 2;
 
     return i_frame_size;
 }
