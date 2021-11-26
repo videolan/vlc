@@ -38,7 +38,7 @@ static int SyncInfo(uint32_t i_header, unsigned int *restrict pi_channels,
                     unsigned int *restrict pi_max_frame_size,
                     unsigned int *restrict pi_layer)
 {
-    static const int ppi_bitrate[2][3][16] =
+    static const unsigned short ppi_bitrate[2][3][16] =
     {
         {
             /* v1 l1 */
@@ -65,7 +65,7 @@ static int SyncInfo(uint32_t i_header, unsigned int *restrict pi_channels,
         }
     };
 
-    static const int ppi_samplerate[2][4] = /* version 1 then 2 */
+    static const unsigned short ppi_samplerate[2][4] = /* version 1 then 2 */
     {
         { 44100, 48000, 32000, 0 },
         { 22050, 24000, 16000, 0 }
