@@ -33,9 +33,10 @@ private slots:
 
 private:
     void registerQMLTypes();
+    static QObject* getMainCtxInstance(QQmlEngine *, QJSEngine *);
 
     qt_intf_t* m_intf = nullptr;
-    MainCtx* m_mainInterface = nullptr;
+    MainCtx* m_mainCtx = nullptr;
     QWindow*       m_interfaceWindow = nullptr;
 
     QQmlComponent* m_component = nullptr;
