@@ -602,7 +602,7 @@ static void ProcessAPICListFromId3v2( const ID3v2::FrameList &list,
 static void ReadMetaFromBasicTag(const Tag* tag, vlc_meta_t *dest)
 {
 #define SET( accessor, meta )                                                  \
-    if( !tag->accessor().isNull() && !tag->accessor().isEmpty() )              \
+    if( !tag->accessor().isEmpty() )                                           \
         vlc_meta_Set##meta( dest, tag->accessor().toCString(true) )
 #define SETINT( accessor, meta )                                               \
     if( tag->accessor() )                                                      \
