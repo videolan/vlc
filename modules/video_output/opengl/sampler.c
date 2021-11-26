@@ -786,9 +786,11 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 #ifdef HAVE_LIBPLACEBO
     if (priv->pl_sh_res) {
         const struct pl_shader_res *res = priv->pl_sh_res;
-        assert(res->input  == PL_SHADER_SIG_COLOR);
-        assert(res->output == PL_SHADER_SIG_COLOR);
-        ADDF(" result = %s(result);\n", res->name);
+        if (res->input != PL_SHADER_SIG_NONE) {
+            assert(res->input  == PL_SHADER_SIG_COLOR);
+            assert(res->output == PL_SHADER_SIG_COLOR);
+            ADDF(" result = %s(result);\n", res->name);
+        }
     }
 #endif
 
