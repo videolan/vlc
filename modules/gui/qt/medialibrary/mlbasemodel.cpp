@@ -91,8 +91,8 @@ static constexpr ssize_t COUNT_UNINITIALIZED =
 MLBaseModel::MLBaseModel(QObject *parent)
     : QAbstractListModel(parent)
     , m_ml_event_handle( nullptr, [this](vlc_ml_event_callback_t* cb ) {
-            assert( m_ml != nullptr );
-            vlc_ml_event_unregister_callback( m_ml, cb );
+            assert( m_mediaLib != nullptr );
+            m_mediaLib->unregisterEventListener( cb );
         })
 {
     connect( this, &MLBaseModel::resetRequested, this, &MLBaseModel::onResetRequested );
@@ -325,7 +325,7 @@ void MLBaseModel::setMl(MediaLib* medialib)
     m_ml = medialib->vlcMl();
     m_mediaLib = medialib;
     if ( m_ml_event_handle == nullptr )
-        m_ml_event_handle.reset( vlc_ml_event_register_callback( m_ml, onVlcMlEvent, this ) );
+        m_ml_event_handle.reset( m_mediaLib->registerEventListener(onVlcMlEvent, this ) );
 }
 
 const QString& MLBaseModel::searchPattern() const

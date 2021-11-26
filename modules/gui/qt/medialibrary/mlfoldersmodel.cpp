@@ -22,8 +22,10 @@
 MLFoldersBaseModel::MLFoldersBaseModel( QObject *parent )
     : QAbstractListModel( parent )
     , m_ml_event_handle( nullptr , [this](vlc_ml_event_callback_t* cb ) {
+        if (!cb)
+            return;
         if ( m_mediaLib )
-            vlc_ml_event_unregister_callback( m_mediaLib->vlcMl() , cb );
+            m_mediaLib->unregisterEventListener(cb);
     })
 {
     connect( this , &MLFoldersBaseModel::onMLEntryPointModified , this , &MLFoldersBaseModel::update );
@@ -41,7 +43,7 @@ void MLFoldersBaseModel::setCtx(MainCtx* ctx)
     {
         m_ctx = ctx;
         m_mediaLib = m_ctx->getMediaLibrary();
-        m_ml_event_handle.reset( vlc_ml_event_register_callback( m_mediaLib->vlcMl() , onMlEvent , this ) );
+        m_ml_event_handle.reset(m_mediaLib->registerEventListener(onMlEvent, this));
     }
     else
     {
