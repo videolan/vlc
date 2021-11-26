@@ -17,7 +17,6 @@
  *****************************************************************************/
 #include "qml_menu_wrapper.hpp"
 #include "menus.hpp"
-#include "util/qml_main_context.hpp"
 #include "medialibrary/medialib.hpp"
 #include "medialibrary/mlvideomodel.hpp"
 #include "medialibrary/mlgrouplistmodel.hpp"

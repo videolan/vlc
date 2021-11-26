@@ -28,7 +28,6 @@
 #include "playlist/playlist_model.hpp"
 #include "playlist/playlist_controller.hpp"
 
-#include "util/qml_main_context.hpp"
 #include "util/item_key_event_filter.hpp"
 #include "util/imageluminanceextractor.hpp"
 #include "util/i18n.hpp"
@@ -47,8 +46,6 @@
 #include "network/networkdevicemodel.hpp"
 #include "network/networksourcesmodel.hpp"
 #include "network/servicesdiscoverymodel.hpp"
-
-#include "maininterface/main_interface.hpp"
 
 #include "menus/qml_menu_wrapper.hpp"
 
@@ -108,7 +105,6 @@ bool MainUI::setup(QQmlEngine* engine)
     rootCtx->setContextProperty( "history", new NavigationHistory(this) );
     rootCtx->setContextProperty( "player", m_intf->p_mainPlayerController );
     rootCtx->setContextProperty( "i18n", new I18n(this) );
-    rootCtx->setContextProperty( "mainctx", new QmlMainContext(m_intf, m_mainInterface, this));
     rootCtx->setContextProperty( "mainInterface", m_mainInterface);
     rootCtx->setContextProperty( "topWindow", m_interfaceWindow);
     rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
@@ -220,7 +216,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<ControlListModel>( uri, versionMajor, versionMinor, "ControlListModel", "" );
         qmlRegisterSingletonType(uri, versionMajor, versionMinor, "PlayerListModel", PlayerControlbarModel::getPlaylistIdentifierListModel);
 
-        qRegisterMetaType<QmlMainContext*>();
         qmlRegisterType<StringListMenu>( uri, versionMajor, versionMinor, "StringListMenu" );
         qmlRegisterType<SortMenu>( uri, versionMajor, versionMinor, "SortMenu" );
         qmlRegisterType<QmlGlobalMenu>( uri, versionMajor, versionMinor, "QmlGlobalMenu" );

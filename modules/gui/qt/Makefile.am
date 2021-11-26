@@ -238,8 +238,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/listcache.hpp \
 	gui/qt/util/listcacheloader.hpp \
 	gui/qt/util/navigation_history.cpp gui/qt/util/navigation_history.hpp \
-	gui/qt/util/qml_main_context.cpp \
-	gui/qt/util/qml_main_context.hpp \
 	gui/qt/util/item_key_event_filter.cpp \
 	gui/qt/util/item_key_event_filter.hpp \
 	gui/qt/util/qt_dirs.cpp gui/qt/util/qt_dirs.hpp \
@@ -417,7 +415,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/keyhelper.moc.cpp \
 	gui/qt/util/listcache.moc.cpp \
 	gui/qt/util/navigation_history.moc.cpp \
-	gui/qt/util/qml_main_context.moc.cpp \
 	gui/qt/util/item_key_event_filter.moc.cpp \
 	gui/qt/util/mouse_event_filter.moc.cpp \
 	gui/qt/util/qvlcapp.moc.cpp \

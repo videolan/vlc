@@ -21,7 +21,6 @@
 #include <QtQuick/QQuickItem>
 #include <QCursor>
 #include <QMutex>
-#include <util/qml_main_context.hpp>
 #include "qt.hpp"
 #include "vlc_vout_window.h"
 
