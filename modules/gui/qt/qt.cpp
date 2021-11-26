@@ -51,9 +51,9 @@ extern "C" char **environ;
 #include "playlist/playlist_controller.hpp" /* THEMPL creation */
 #include "dialogs/dialogs_provider.hpp" /* THEDP creation */
 #ifdef _WIN32
-# include "maininterface/main_interface_win32.hpp"
+# include "maininterface/mainctx_win32.hpp"
 #else
-# include "maininterface/main_interface.hpp"   /* MainInterface creation */
+# include "maininterface/mainctx.hpp"   /* MainCtx creation */
 #endif
 #include "dialogs/extensions/extensions_manager.hpp" /* Extensions manager */
 #include "dialogs/plugins/addons_manager.hpp" /* Addons manager */
@@ -253,8 +253,8 @@ static const char *const psz_notification_list_text[] =
     { N_("Never"), N_("When minimized"), N_("Always") };
 
 static const int i_raise_list[] =
-    { MainInterface::RAISE_NEVER, MainInterface::RAISE_VIDEO, \
-      MainInterface::RAISE_AUDIO, MainInterface::RAISE_AUDIOVIDEO,  };
+    { MainCtx::RAISE_NEVER, MainCtx::RAISE_VIDEO, \
+      MainCtx::RAISE_AUDIO, MainCtx::RAISE_AUDIOVIDEO,  };
 
 static const char *const psz_raise_list_text[] =
     { N_( "Never" ), N_( "Video" ), N_( "Audio" ), _( "Audio/Video" ) };
@@ -402,7 +402,7 @@ vlc_module_begin ()
     add_integer_with_range( "qt-fs-sensitivity", 3, 0, 4000, FULLSCREEN_CONTROL_PIXELS,
             nullptr)
 
-    add_integer( "qt-auto-raise", MainInterface::RAISE_VIDEO, AUTORAISE_ON_PLAYBACK_TEXT,
+    add_integer( "qt-auto-raise", MainCtx::RAISE_VIDEO, AUTORAISE_ON_PLAYBACK_TEXT,
                  AUTORAISE_ON_PLAYBACK_LONGTEXT )
             change_integer_list( i_raise_list, psz_raise_list_text )
 
@@ -764,9 +764,9 @@ static void *Thread( void *obj )
 
     /* Create the normal interface in non-DP mode */
 #ifdef _WIN32
-    p_intf->p_mi = new MainInterfaceWin32(p_intf);
+    p_intf->p_mi = new MainCtxWin32(p_intf);
 #else
-    p_intf->p_mi = new MainInterface(p_intf);
+    p_intf->p_mi = new MainCtx(p_intf);
 #endif
 
     if( !p_intf->b_isDialogProvider )

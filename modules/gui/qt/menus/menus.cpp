@@ -37,7 +37,7 @@
 
 #include "menus.hpp"
 
-#include "maininterface/main_interface.hpp"                     /* View modifications */
+#include "maininterface/mainctx.hpp"                     /* View modifications */
 #include "dialogs/dialogs_provider.hpp"                   /* Dialogs display */
 #include "player/player_controller.hpp"                      /* Input Management */
 #include "playlist/playlist_controller.hpp"
@@ -225,7 +225,7 @@ QMenu *VLCMenuBar::FileMenu(qt_intf_t *p_intf, QMenu *menu)
     if( mi && mi->getSysTray() )
     {
         action = menu->addAction( qtr( "Close to systray"), mi,
-                                 &MainInterface::toggleUpdateSystrayMenu );
+                                 &MainCtx::toggleUpdateSystrayMenu );
     }
 
     addDPStaticEntry( menu, qtr( "&Quit" ) ,
@@ -285,7 +285,7 @@ QMenu *VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *current )
     QAction *action;
     QMenu *menu;
 
-    MainInterface *mi = p_intf->p_mi;
+    MainCtx *mi = p_intf->p_mi;
     assert( mi );
 
     if( !current )
@@ -315,13 +315,13 @@ QMenu *VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *current )
             qtr( "Play&list" ));
     action->setShortcut(QString( "Ctrl+L" ));
     action->setCheckable( true );
-    connect( action, &QAction::triggered, mi, &MainInterface::setPlaylistVisible );
+    connect( action, &QAction::triggered, mi, &MainCtx::setPlaylistVisible );
     action->setChecked( mi->isPlaylistVisible() );
 
     /* Docked Playlist */
     action = menu->addAction( qtr( "Docked Playlist" ) );
     action->setCheckable( true );
-    connect( action, &QAction::triggered, mi, &MainInterface::setPlaylistDocked );
+    connect( action, &QAction::triggered, mi, &MainCtx::setPlaylistDocked );
     action->setChecked( mi->isPlaylistDocked() );
 
     menu->addSeparator();
@@ -329,18 +329,18 @@ QMenu *VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *current )
     action = menu->addAction( qtr( "Always on &top" ) );
     action->setCheckable( true );
     action->setChecked( mi->isInterfaceAlwaysOnTop() );
-    connect( action, &QAction::triggered, mi, &MainInterface::setInterfaceAlwaysOnTop );
+    connect( action, &QAction::triggered, mi, &MainCtx::setInterfaceAlwaysOnTop );
 
     menu->addSeparator();
 
     /* FullScreen View */
     action = menu->addAction( qtr( "&Fullscreen Interface" ), mi,
-            &MainInterface::toggleInterfaceFullScreen, QString( "F11" ) );
+            &MainCtx::toggleInterfaceFullScreen, QString( "F11" ) );
     action->setCheckable( true );
     action->setChecked( mi->isInterfaceFullScreen() );
 
     action = menu->addAction( qtr( "&View Items as Grid" ), mi,
-            &MainInterface::setGridView );
+            &MainCtx::setGridView );
     action->setCheckable( true );
     action->setChecked( mi->hasGridView() );
 
@@ -756,7 +756,7 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
     input_item_t* p_input = THEMIM->getInput();
     QAction *action;
     bool b_isFullscreen = false;
-    MainInterface *mi = p_intf->p_mi;
+    MainCtx *mi = p_intf->p_mi;
 
     PopupMenuPlaylistEntries( menu, p_intf );
     menu->addSeparator();
@@ -885,7 +885,7 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
  * Systray Menu                                                         *
  ************************************************************************/
 
-void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
+void VLCMenuBar::updateSystrayMenu( MainCtx *mi,
                                   qt_intf_t *p_intf,
                                   bool b_force_visible )
 {
@@ -899,13 +899,13 @@ void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
     {
         sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
                             qtr( "&Hide VLC media player in taskbar" ), mi,
-                            &MainInterface::hideUpdateSystrayMenu);
+                            &MainCtx::hideUpdateSystrayMenu);
     }
     else
     {
         sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
                             qtr( "Sho&w VLC media player" ), mi,
-                            &MainInterface::showUpdateSystrayMenu);
+                            &MainCtx::showUpdateSystrayMenu);
     }
     sysMenu->addSeparator();
 #endif

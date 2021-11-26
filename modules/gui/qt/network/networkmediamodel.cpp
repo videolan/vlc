@@ -156,7 +156,7 @@ void NetworkMediaModel::setIndexed(bool indexed)
     }
 }
 
-void NetworkMediaModel::setCtx(MainInterface* ctx)
+void NetworkMediaModel::setCtx(MainCtx* ctx)
 {
     if (ctx) {
         m_ctx = ctx;

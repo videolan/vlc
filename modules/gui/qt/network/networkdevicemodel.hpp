@@ -24,17 +24,18 @@
 #endif
 
 #include <QAbstractListModel>
+#include <QUrl>
 
 #include <vlc_media_library.h>
 #include <vlc_media_source.h>
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
-#include <maininterface/main_interface.hpp>
 #include "networksourcelistener.hpp"
 
 #include <memory>
 
+class MainCtx;
 class NetworkDeviceModel : public QAbstractListModel, public NetworkSourceListener::SourceListenerCb
 {
     Q_OBJECT
@@ -74,7 +75,7 @@ public:
     Q_ENUM( SDCatType )
 
 
-    Q_PROPERTY(MainInterface* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+    Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
     Q_PROPERTY(SDCatType sd_source READ getSdSource WRITE setSdSource NOTIFY sdSourceChanged FINAL)
     Q_PROPERTY(QString name READ getName NOTIFY nameChanged FINAL)
     Q_PROPERTY(QString source_name READ getSourceName WRITE setSourceName NOTIFY sourceNameChanged FINAL)
@@ -87,11 +88,11 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     int rowCount(const QModelIndex& parent = {}) const override;
 
-    void setCtx(MainInterface* ctx);
+    void setCtx(MainCtx* ctx);
     void setSdSource(SDCatType s);
     void setSourceName(const QString& sourceName);
 
-    inline MainInterface* getCtx() { return m_ctx; }
+    inline MainCtx* getCtx() { return m_ctx; }
     inline SDCatType getSdSource() { return m_sdSource; }
     inline QString getName() { return m_name; }
     inline QString getSourceName() { return m_sourceName; }
@@ -147,7 +148,7 @@ private:
 
 private:
     std::vector<Item> m_items;
-    MainInterface* m_ctx = nullptr;
+    MainCtx* m_ctx = nullptr;
     SDCatType m_sdSource = CAT_UNDEFINED;
     QString m_sourceName; // '*' -> all sources
     QString m_name; // source long name

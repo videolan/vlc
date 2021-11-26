@@ -77,14 +77,14 @@ void registerAnonymousType( const char *uri, int versionMajor )
 } // anonymous namespace
 
 
-MainUI::MainUI(qt_intf_t *p_intf, MainInterface *mainInterface, QWindow* interfaceWindow,  QObject *parent)
+MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  QObject *parent)
     : QObject(parent)
     , m_intf(p_intf)
-    , m_mainInterface(mainInterface)
+    , m_mainCtx(mainCtx)
     , m_interfaceWindow(interfaceWindow)
 {
     assert(m_intf);
-    assert(m_mainInterface);
+    assert(m_mainCtx);
     assert(m_interfaceWindow);
 
     registerQMLTypes();
@@ -111,8 +111,8 @@ bool MainUI::setup(QQmlEngine* engine)
     rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));
     rootCtx->setContextProperty( "dialogModel", new DialogModel(m_intf, this));
 
-    if (m_mainInterface->hasMediaLibrary())
-        rootCtx->setContextProperty( "medialib", m_mainInterface->getMediaLibrary() );
+    if (m_mainCtx->hasMediaLibrary())
+        rootCtx->setContextProperty( "medialib", m_mainCtx->getMediaLibrary() );
     else
         rootCtx->setContextProperty( "medialib", nullptr );
 
@@ -241,7 +241,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<RoundImage>( uri, versionMajor, versionMinor, "RoundImage" );
     }
 
-    if (m_mainInterface->hasMediaLibrary())
+    if (m_mainCtx->hasMediaLibrary())
     {
         const char* uri = "org.videolan.medialib";
         const int versionMajor = 0;

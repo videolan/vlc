@@ -127,7 +127,7 @@ int ServicesDiscoveryModel::getCount() const
     return static_cast<int>( m_items.size() );
 }
 
-void ServicesDiscoveryModel::setCtx(MainInterface* ctx)
+void ServicesDiscoveryModel::setCtx(MainCtx* ctx)
 {
     if (ctx) {
         m_ctx = ctx;

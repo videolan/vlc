@@ -18,14 +18,14 @@
 
 #include "compositor.hpp"
 #include "compositor_dummy.hpp"
-#include "main_interface.hpp"
+#include "mainctx.hpp"
 #include "video_window_handler.hpp"
 #include "videosurface.hpp"
 #include "interface_window_handler.hpp"
 #include "mainui.hpp"
 
 #ifdef _WIN32
-#include "main_interface_win32.hpp"
+#include "mainctx_win32.hpp"
 #ifdef HAVE_DCOMP_H
 #  include "compositor_dcomp.hpp"
 #endif
@@ -237,13 +237,13 @@ void CompositorVideo::commonWindowDisable()
 
 bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flags flags)
 {
-    assert(m_mainInterface);
+    assert(m_mainCtx);
 
     m_videoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
-    m_mainInterface->setVideoSurfaceProvider(m_videoSurfaceProvider.get());
+    m_mainCtx->setVideoSurfaceProvider(m_videoSurfaceProvider.get());
     if (flags & CompositorVideo::CAN_SHOW_PIP)
     {
-        m_mainInterface->setCanShowVideoPIP(true);
+        m_mainCtx->setCanShowVideoPIP(true);
         connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
                 this, &CompositorVideo::onSurfacePositionChanged);
         connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
@@ -253,17 +253,17 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
     m_videoWindowHandler->setWindow( window );
 
 #ifdef _WIN32
-    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandlerWin32>(m_intf, m_mainInterface, window);
+    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandlerWin32>(m_intf, m_mainCtx, window);
 #else
-    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainInterface, window);
+    m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx, window);
 #endif
-    m_mainInterface->setHasAcrylicSurface(flags & CompositorVideo::HAS_ACRYLIC);
+    m_mainCtx->setHasAcrylicSurface(flags & CompositorVideo::HAS_ACRYLIC);
 
 #ifdef _WIN32
     m_taskbarWidget = std::make_unique<WinTaskbarWidget>(m_intf, window);
     qApp->installNativeEventFilter(m_taskbarWidget.get());
 #endif
-    m_ui = std::make_unique<MainUI>(m_intf, m_mainInterface, window);
+    m_ui = std::make_unique<MainUI>(m_intf, m_mainCtx, window);
     return true;
 }
 

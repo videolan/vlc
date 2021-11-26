@@ -29,7 +29,7 @@
 
 #include "qt.hpp"
 
-class MainInterface;
+class MainCtx;
 
 class VideoWindowHandler : public QObject
 {

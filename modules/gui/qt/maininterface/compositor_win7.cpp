@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "compositor_win7.hpp"
-#include "main_interface_win32.hpp"
+#include "mainctx_win32.hpp"
 #include "mainui.hpp"
 
 #include <d3d11.h>
@@ -97,12 +97,12 @@ bool CompositorWin7::init()
     return true;
 }
 
-bool CompositorWin7::makeMainInterface(MainInterface* mainInterface)
+bool CompositorWin7::makeMainInterface(MainCtx* mainCtx)
 {
-    m_mainInterface = mainInterface;
+    m_mainCtx = mainCtx;
 
     /*
-     * m_stable is not attached to the main interface because dialogs are attached to the mainInterface
+     * m_stable is not attached to the main interface because dialogs are attached to the mainCtx
      * and showing them would raise the video widget above the interface
      */
     m_videoWidget = new QWidget(nullptr, Qt::Tool | Qt::FramelessWindowHint);

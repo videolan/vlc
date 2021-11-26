@@ -34,7 +34,7 @@
 #include "qt.hpp"
 
 
-class MainInterface;
+class MainCtx;
 class VideoWindowHandler;
 class VideoSurfaceProvider;
 class InterfaceWindowHandler;
@@ -65,7 +65,7 @@ public:
 
     virtual bool init() = 0;
 
-    virtual bool makeMainInterface(MainInterface* intf) = 0;
+    virtual bool makeMainInterface(MainCtx* intf) = 0;
     virtual void destroyMainInterface() = 0;
 
     virtual void unloadGUI() = 0;
@@ -134,7 +134,7 @@ protected:
     qt_intf_t *m_intf = nullptr;
     vout_window_t* m_wnd = nullptr;
 
-    MainInterface* m_mainInterface = nullptr;
+    MainCtx* m_mainCtx = nullptr;
 
     VoutDestroyCb m_destroyCb = nullptr;
     std::unique_ptr<VideoWindowHandler> m_videoWindowHandler;

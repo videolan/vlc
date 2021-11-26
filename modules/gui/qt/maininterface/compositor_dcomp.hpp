@@ -31,7 +31,7 @@
 
 #include <QOpenGLContext>
 
-class MainInterface;
+class MainCtx;
 class WinTaskbarWidget;
 
 namespace vlc {
@@ -46,7 +46,7 @@ public:
     static bool preInit(qt_intf_t *);
     bool init() override;
 
-    bool makeMainInterface(MainInterface*) override;
+    bool makeMainInterface(MainCtx*) override;
     void destroyMainInterface() override;
     void unloadGUI() override;
 

@@ -133,8 +133,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/maininterface/compositor_dummy.cpp \
 	gui/qt/maininterface/interface_window_handler.cpp \
 	gui/qt/maininterface/interface_window_handler.hpp \
-	gui/qt/maininterface/main_interface.cpp \
-	gui/qt/maininterface/main_interface.hpp \
+	gui/qt/maininterface/mainctx.cpp \
+	gui/qt/maininterface/mainctx.hpp \
 	gui/qt/maininterface/mainui.cpp \
 	gui/qt/maininterface/mainui.hpp \
 	gui/qt/maininterface/videosurface.cpp \
@@ -276,8 +276,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/widgets/native/searchlineedit.cpp gui/qt/widgets/native/searchlineedit.hpp
 if HAVE_WIN32
 libqt_plugin_la_SOURCES += \
-	gui/qt/maininterface/main_interface_win32.cpp \
-	gui/qt/maininterface/main_interface_win32.hpp \
+	gui/qt/maininterface/mainctx_win32.cpp \
+	gui/qt/maininterface/mainctx_win32.hpp \
 	gui/qt/maininterface/compositor_win7.cpp \
 	gui/qt/maininterface/compositor_win7.hpp
 
@@ -368,7 +368,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/maininterface/compositor.moc.cpp \
 	gui/qt/maininterface/compositor_dummy.moc.cpp \
 	gui/qt/maininterface/interface_window_handler.moc.cpp \
-	gui/qt/maininterface/main_interface.moc.cpp \
+	gui/qt/maininterface/mainctx.moc.cpp \
 	gui/qt/maininterface/mainui.moc.cpp \
 	gui/qt/maininterface/videosurface.moc.cpp \
 	gui/qt/maininterface/video_window_handler.moc.cpp \
@@ -436,7 +436,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/widgets/native/searchlineedit.moc.cpp
 
 if HAVE_WIN32
-nodist_libqt_plugin_la_SOURCES += gui/qt/maininterface/main_interface_win32.moc.cpp \
+nodist_libqt_plugin_la_SOURCES += gui/qt/maininterface/mainctx_win32.moc.cpp \
 	gui/qt/maininterface/compositor_win7.moc.cpp
 
 if HAVE_DCOMP

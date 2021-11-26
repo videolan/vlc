@@ -31,13 +31,13 @@
 #include <QList>
 #include "mlhelper.hpp"
 
-#include <maininterface/main_interface.hpp>
+#include <maininterface/mainctx.hpp>
 #include <vlc_media_library.h>
 
 class MLFoldersBaseModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(MainInterface* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+    Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
 
 public:
     enum Roles
@@ -57,8 +57,8 @@ public:
 
     MLFoldersBaseModel( QObject *parent = nullptr );
 
-    void setCtx(MainInterface* ctx);
-    inline MainInterface* getCtx() { return m_ctx; }
+    void setCtx(MainCtx* ctx);
+    inline MainCtx* getCtx() { return m_ctx; }
 
     int rowCount( QModelIndex const &parent = {} ) const  override;
     QVariant data( QModelIndex const &index , const int role = Qt::DisplayRole ) const  override;
@@ -93,7 +93,7 @@ protected:
 
     std::vector<EntryPoint> m_mrls;
     MediaLib *m_mediaLib = nullptr;
-    MainInterface* m_ctx = nullptr;
+    MainCtx* m_ctx = nullptr;
     EventCallbackPtr m_ml_event_handle;
 };
 

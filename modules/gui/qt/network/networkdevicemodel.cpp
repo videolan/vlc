@@ -21,6 +21,7 @@
 #include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"
 #include "util/qmlinputitem.hpp"
+#include <maininterface/mainctx.hpp>
 
 NetworkDeviceModel::NetworkDeviceModel( QObject* parent )
     : QAbstractListModel( parent )
@@ -78,7 +79,7 @@ int NetworkDeviceModel::rowCount(const QModelIndex& parent) const
 }
 
 
-void NetworkDeviceModel::setCtx(MainInterface* ctx)
+void NetworkDeviceModel::setCtx(MainCtx* ctx)
 {
     if (ctx) {
         m_ctx = ctx;

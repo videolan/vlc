@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "video_window_handler.hpp"
-#include "main_interface.hpp"
+#include "mainctx.hpp"
 
 #include <QApplication>
 #include <QScreen>

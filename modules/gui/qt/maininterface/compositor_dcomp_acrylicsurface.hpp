@@ -38,7 +38,7 @@
 #include <dwmapi.h>
 
 #include "compositor_dcomp_error.hpp"
-#include "main_interface.hpp"
+#include "mainctx.hpp"
 
 // Windows Private APIs, taken from https://blog.adeltax.com/dwm-thumbnails-but-with-idcompositionvisual/
 
@@ -170,7 +170,7 @@ class CompositorDCompositionAcrylicSurface
     Q_OBJECT
 
 public:
-    CompositorDCompositionAcrylicSurface(qt_intf_t * intf, CompositorDirectComposition *compositor, MainInterface *mainInterface, ID3D11Device *device, QObject *parent = nullptr);
+    CompositorDCompositionAcrylicSurface(qt_intf_t * intf, CompositorDirectComposition *compositor, MainCtx *mainctx, ID3D11Device *device, QObject *parent = nullptr);
 
     ~CompositorDCompositionAcrylicSurface();
 
@@ -225,7 +225,7 @@ private:
 
     qt_intf_t *m_intf = nullptr;
     CompositorDirectComposition *m_compositor = nullptr;
-    MainInterface *m_mainInterface = nullptr;
+    MainCtx *m_mainCtx = nullptr;
     QBasicTimer m_resetTimer;
     bool m_resetPending = false;
     bool m_active = false;

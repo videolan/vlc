@@ -78,27 +78,27 @@ bool isWinPreIron()
 namespace vlc
 {
 
-CompositorDCompositionAcrylicSurface::CompositorDCompositionAcrylicSurface(qt_intf_t *intf, CompositorDirectComposition *compositor, MainInterface *mainInterface, ID3D11Device *device, QObject *parent)
+CompositorDCompositionAcrylicSurface::CompositorDCompositionAcrylicSurface(qt_intf_t *intf, CompositorDirectComposition *compositor, MainCtx *mainCtx, ID3D11Device *device, QObject *parent)
     : QObject(parent)
     , m_intf {intf}
     , m_compositor {compositor}
-    , m_mainInterface {mainInterface}
+    , m_mainCtx {mainCtx}
 {
     if (!init(device))
         return;
 
     qApp->installNativeEventFilter(this);
 
-    setActive(m_transparencyEnabled && m_mainInterface->acrylicActive());
-    connect(m_mainInterface, &MainInterface::acrylicActiveChanged, this, [this]()
+    setActive(m_transparencyEnabled && m_mainCtx->acrylicActive());
+    connect(m_mainCtx, &MainCtx::acrylicActiveChanged, this, [this]()
     {
-        setActive(m_transparencyEnabled && m_mainInterface->acrylicActive());
+        setActive(m_transparencyEnabled && m_mainCtx->acrylicActive());
     });
 }
 
 CompositorDCompositionAcrylicSurface::~CompositorDCompositionAcrylicSurface()
 {
-    m_mainInterface->setHasAcrylicSurface(false);
+    m_mainCtx->setHasAcrylicSurface(false);
 
     if (m_dummyWindow)
         DestroyWindow(m_dummyWindow);
@@ -133,8 +133,8 @@ bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &e
                 break;
 
             m_transparencyEnabled = transparencyEnabled;
-            m_mainInterface->setHasAcrylicSurface(m_transparencyEnabled);
-            setActive(m_transparencyEnabled && m_mainInterface->acrylicActive());
+            m_mainCtx->setHasAcrylicSurface(m_transparencyEnabled);
+            setActive(m_transparencyEnabled && m_mainCtx->acrylicActive());
         }
         break;
     }
@@ -168,7 +168,7 @@ bool CompositorDCompositionAcrylicSurface::init(ID3D11Device *device)
     }
 
     m_transparencyEnabled = isTransparencyEnabled();
-    m_mainInterface->setHasAcrylicSurface(m_transparencyEnabled);
+    m_mainCtx->setHasAcrylicSurface(m_transparencyEnabled);
 
     return true;
 }
@@ -342,7 +342,7 @@ void CompositorDCompositionAcrylicSurface::sync()
     int frameX = 0;
     int frameY = 0;
 
-    if (!m_mainInterface->useClientSideDecoration())
+    if (!m_mainCtx->useClientSideDecoration())
     {
         frameX = GetSystemMetrics(SM_CXFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER);
         frameY = GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION)

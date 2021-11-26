@@ -28,7 +28,7 @@
 
 // VLC includes
 #include <vlc_media_library.h>
-#include <maininterface/main_interface.hpp>
+#include <maininterface/mainctx.hpp>
 #include <medialibrary/mlplaylistlistmodel.hpp>
 #include <medialibrary/mlqmltypes.hpp>
 
@@ -47,9 +47,9 @@
 
 PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf) : QVLCFrame(_p_intf)
 {
-    MainInterface * mainInterface = p_intf->p_mi;
+    MainCtx * mainCtx = p_intf->p_mi;
 
-    assert(mainInterface->hasMediaLibrary());
+    assert(mainCtx->hasMediaLibrary());
 
     setWindowFlags(Qt::Tool);
 
@@ -71,7 +71,7 @@ PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf) : QVLCFrame(_p_intf)
 
     m_model = new MLPlaylistListModel(vlc_ml_instance_get(_p_intf), m_playlists);
 
-    m_model->setMl(mainInterface->getMediaLibrary());
+    m_model->setMl(mainCtx->getMediaLibrary());
 
     m_playlists->setModel(m_model);
 

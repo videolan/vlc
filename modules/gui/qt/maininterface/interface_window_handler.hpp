@@ -23,12 +23,12 @@
 #include <QObject>
 #include <QWindow>
 
-class MainInterface;
+class MainCtx;
 class InterfaceWindowHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit InterfaceWindowHandler(qt_intf_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent = nullptr);
+    explicit InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent = nullptr);
     virtual ~InterfaceWindowHandler();
 
 public slots:
@@ -62,7 +62,7 @@ private:
 protected:
     qt_intf_t* p_intf = nullptr;
     QWindow* m_window = nullptr;
-    MainInterface* m_mainInterface = nullptr;
+    MainCtx* m_mainCtx = nullptr;
 
     bool m_hasPausedWhenMinimized = false;
 

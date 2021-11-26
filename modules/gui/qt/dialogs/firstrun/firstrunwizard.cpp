@@ -18,7 +18,7 @@
 
 #include "firstrunwizard.hpp"
 #include "util/color_scheme_model.hpp"
-#include "maininterface/main_interface.hpp"
+#include "maininterface/mainctx.hpp"
 #include "dialogs/toolbar/controlbar_profile_model.hpp"
 
 #include <QPushButton>

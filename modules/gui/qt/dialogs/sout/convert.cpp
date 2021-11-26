@@ -27,7 +27,7 @@
 #include "dialogs/sout/sout.hpp"
 #include "dialogs/sout/convert.hpp"
 #include "dialogs/sout/sout_widgets.hpp"
-#include "maininterface/main_interface.hpp"
+#include "maininterface/mainctx.hpp"
 
 #include "util/qt_dirs.hpp"
 

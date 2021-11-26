@@ -19,7 +19,7 @@
 
 #include <QQuickView>
 
-#include "maininterface/main_interface.hpp"
+#include "maininterface/mainctx.hpp"
 #include "maininterface/mainui.hpp"
 #include "maininterface/interface_window_handler.hpp"
 
@@ -45,18 +45,18 @@ bool CompositorDummy::init()
     return true;
 }
 
-bool CompositorDummy::makeMainInterface(MainInterface* mainInterface)
+bool CompositorDummy::makeMainInterface(MainCtx* mainCtx)
 {
-    m_mainInterface = mainInterface;
+    m_mainCtx = mainCtx;
 
     m_qmlWidget = std::make_unique<QQuickView>();
-    if (m_mainInterface->useClientSideDecoration())
+    if (m_mainCtx->useClientSideDecoration())
         m_qmlWidget->setFlag(Qt::FramelessWindowHint);
     m_qmlWidget->setResizeMode(QQuickView::SizeRootObjectToView);
 
-    m_intfWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainInterface, m_qmlWidget.get());
+    m_intfWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx, m_qmlWidget.get());
 
-    MainUI* ui = new MainUI(m_intf, m_mainInterface, m_qmlWidget.get(), m_qmlWidget.get());
+    MainUI* ui = new MainUI(m_intf, m_mainCtx, m_qmlWidget.get(), m_qmlWidget.get());
     ui->setup(m_qmlWidget->engine());
     m_qmlWidget->setContent(QUrl(), ui->getComponent(), ui->createRootItem());
 

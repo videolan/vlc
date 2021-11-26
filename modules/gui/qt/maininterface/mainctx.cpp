@@ -28,7 +28,7 @@
 
 #include "qt.hpp"
 
-#include "maininterface/main_interface.hpp"
+#include "maininterface/mainctx.hpp"
 #include "compositor.hpp"
 #include "player/player_controller.hpp"                    // Creation
 #include "util/renderer_manager.hpp"
@@ -95,7 +95,7 @@ static int IntfRaiseMainCB( vlc_object_t *p_this, const char *psz_variable,
                            vlc_value_t old_val, vlc_value_t new_val,
                            void *param );
 
-const QEvent::Type MainInterface::ToolbarsNeedRebuild =
+const QEvent::Type MainCtx::ToolbarsNeedRebuild =
         (QEvent::Type)QEvent::registerEventType();
 
 namespace
@@ -118,7 +118,7 @@ bool loadVLCOption<bool>(vlc_object_t *obj, const char *name)
 
 }
 
-MainInterface::MainInterface(qt_intf_t *_p_intf)
+MainCtx::MainCtx(qt_intf_t *_p_intf)
     : p_intf(_p_intf)
 {
     /**
@@ -156,7 +156,7 @@ MainInterface::MainInterface(qt_intf_t *_p_intf)
      * Create the Systray Management *
      *********************************/
     //postpone systray initialisation to speedup starting time
-    QMetaObject::invokeMethod(this, &MainInterface::initSystray, Qt::QueuedConnection);
+    QMetaObject::invokeMethod(this, &MainCtx::initSystray, Qt::QueuedConnection);
 
     /*************************************************************
      * Connect the input manager to the GUI elements it manages  *
@@ -168,14 +168,14 @@ MainInterface::MainInterface(qt_intf_t *_p_intf)
      **/
     /* Main Interface statusbar */
     /* and title of the Main Interface*/
-    connect( THEMIM, &PlayerController::inputChanged, this, &MainInterface::onInputChanged );
+    connect( THEMIM, &PlayerController::inputChanged, this, &MainCtx::onInputChanged );
 
     /* END CONNECTS ON IM */
 
     /* VideoWidget connects for asynchronous calls */
-    connect( this, &MainInterface::askToQuit, THEDP, &DialogsProvider::quit, Qt::QueuedConnection  );
+    connect( this, &MainCtx::askToQuit, THEDP, &DialogsProvider::quit, Qt::QueuedConnection  );
 
-    connect(this, &MainInterface::interfaceFullScreenChanged, this, &MainInterface::useClientSideDecorationChanged);
+    connect(this, &MainCtx::interfaceFullScreenChanged, this, &MainCtx::useClientSideDecorationChanged);
 
     /** END of CONNECTS**/
 
@@ -200,7 +200,7 @@ MainInterface::MainInterface(qt_intf_t *_p_intf)
     }
 }
 
-MainInterface::~MainInterface()
+MainCtx::~MainCtx()
 {
     RendererManager::killInstance();
 
@@ -236,7 +236,7 @@ MainInterface::~MainInterface()
     p_intf->p_mi = NULL;
 }
 
-bool MainInterface::hasVLM() const {
+bool MainCtx::hasVLM() const {
 #ifdef ENABLE_VLM
     return true;
 #else
@@ -244,13 +244,13 @@ bool MainInterface::hasVLM() const {
 #endif
 }
 
-bool MainInterface::useClientSideDecoration() const
+bool MainCtx::useClientSideDecoration() const
 {
     //don't show CSD when interface is fullscreen
     return !m_windowTitlebar && m_windowVisibility != QWindow::FullScreen;
 }
 
-bool MainInterface::hasFirstrun() const {
+bool MainCtx::hasFirstrun() const {
     return config_GetInt( "qt-privacy-ask" );
 }
 
@@ -258,10 +258,10 @@ bool MainInterface::hasFirstrun() const {
  *   Main UI handling        *
  *****************************/
 
-void MainInterface::loadPrefs(const bool callSignals)
+void MainCtx::loadPrefs(const bool callSignals)
 {
     const auto loadFromVLCOption = [this, callSignals](auto &variable, const char *name
-            , const std::function<void(MainInterface *)> signal)
+            , const std::function<void(MainCtx *)> signal)
     {
         using variableType = std::remove_reference_t<decltype(variable)>;
 
@@ -281,19 +281,19 @@ void MainInterface::loadPrefs(const bool callSignals)
     loadFromVLCOption(i_notificationSetting, "qt-notification", nullptr);
 
     /* Should the UI stays on top of other windows */
-    loadFromVLCOption(b_interfaceOnTop, "video-on-top", [this](MainInterface *)
+    loadFromVLCOption(b_interfaceOnTop, "video-on-top", [this](MainCtx *)
     {
         emit interfaceAlwaysOnTopChanged(b_interfaceOnTop);
     });
 
-    loadFromVLCOption(m_hasToolbarMenu, "qt-menubar", &MainInterface::hasToolbarMenuChanged);
+    loadFromVLCOption(m_hasToolbarMenu, "qt-menubar", &MainCtx::hasToolbarMenuChanged);
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
-    loadFromVLCOption(m_windowTitlebar, "qt-titlebar" , &MainInterface::useClientSideDecorationChanged);
+    loadFromVLCOption(m_windowTitlebar, "qt-titlebar" , &MainCtx::useClientSideDecorationChanged);
 #endif
 }
 
-void MainInterface::loadFromSettingsImpl(const bool callSignals)
+void MainCtx::loadFromSettingsImpl(const bool callSignals)
 {
     const auto loadFromSettings = [this, callSignals](auto &variable, const char *name
             , const auto defaultValue, auto signal)
@@ -309,17 +309,17 @@ void MainInterface::loadFromSettingsImpl(const bool callSignals)
             (this->*signal)(variable);
     };
 
-    loadFromSettings(b_playlistDocked, "MainWindow/pl-dock-status", true, &MainInterface::playlistDockedChanged);
+    loadFromSettings(b_playlistDocked, "MainWindow/pl-dock-status", true, &MainCtx::playlistDockedChanged);
 
-    loadFromSettings(playlistVisible, "MainWindow/playlist-visible", false, &MainInterface::playlistVisibleChanged);
+    loadFromSettings(playlistVisible, "MainWindow/playlist-visible", false, &MainCtx::playlistVisibleChanged);
 
-    loadFromSettings(playlistWidthFactor, "MainWindow/playlist-width-factor", 4.0 , &MainInterface::playlistWidthFactorChanged);
+    loadFromSettings(playlistWidthFactor, "MainWindow/playlist-width-factor", 4.0 , &MainCtx::playlistWidthFactorChanged);
 
-    loadFromSettings(m_gridView, "MainWindow/grid-view", true, &MainInterface::gridViewChanged);
+    loadFromSettings(m_gridView, "MainWindow/grid-view", true, &MainCtx::gridViewChanged);
 
-    loadFromSettings(m_showRemainingTime, "MainWindow/ShowRemainingTime", false, &MainInterface::showRemainingTimeChanged);
+    loadFromSettings(m_showRemainingTime, "MainWindow/ShowRemainingTime", false, &MainCtx::showRemainingTimeChanged);
 
-    loadFromSettings(m_pinVideoControls, "MainWindow/pin-video-controls", false, &MainInterface::pinVideoControlsChanged);
+    loadFromSettings(m_pinVideoControls, "MainWindow/pin-video-controls", false, &MainCtx::pinVideoControlsChanged);
 
     const auto colorScheme = static_cast<ColorSchemeModel::ColorScheme>(getSettings()->value( "MainWindow/color-scheme", ColorSchemeModel::System ).toInt());
     if (m_colorScheme->currentScheme() != colorScheme)
@@ -336,24 +336,24 @@ void MainInterface::loadFromSettingsImpl(const bool callSignals)
     }
 }
 
-void MainInterface::reloadPrefs()
+void MainCtx::reloadPrefs()
 {
     loadPrefs(true);
 }
 
-void MainInterface::onInputChanged( bool hasInput )
+void MainCtx::onInputChanged( bool hasInput )
 {
     if( hasInput == false )
         return;
     int autoRaise = var_InheritInteger( p_intf, "qt-auto-raise" );
-    if ( autoRaise == MainInterface::RAISE_NEVER )
+    if ( autoRaise == MainCtx::RAISE_NEVER )
         return;
     if( THEMIM->hasVideoOutput() == true )
     {
-        if( ( autoRaise & MainInterface::RAISE_VIDEO ) == 0 )
+        if( ( autoRaise & MainCtx::RAISE_VIDEO ) == 0 )
             return;
     }
-    else if ( ( autoRaise & MainInterface::RAISE_AUDIO ) == 0 )
+    else if ( ( autoRaise & MainCtx::RAISE_AUDIO ) == 0 )
         return;
     emit askRaise();
 }
@@ -361,14 +361,14 @@ void MainInterface::onInputChanged( bool hasInput )
 #ifdef KeyPress
 #undef KeyPress
 #endif
-void MainInterface::sendHotkey(Qt::Key key , Qt::KeyboardModifiers modifiers)
+void MainCtx::sendHotkey(Qt::Key key , Qt::KeyboardModifiers modifiers)
 {
     QKeyEvent event(QEvent::KeyPress, key, modifiers );
     int vlckey = qtEventToVLCKey(&event);
     var_SetInteger(vlc_object_instance(p_intf), "key-pressed", vlckey);
 }
 
-void MainInterface::updateIntfScaleFactor()
+void MainCtx::updateIntfScaleFactor()
 {
     m_intfScaleFactor = m_intfUserScaleFactor;
     if (QWindow* window = p_intf->p_compositor ? p_intf->p_compositor->interfaceMainWindow() : nullptr)
@@ -383,12 +383,12 @@ void MainInterface::updateIntfScaleFactor()
     emit intfScaleFactorChanged();
 }
 
-void MainInterface::onWindowVisibilityChanged(QWindow::Visibility visibility)
+void MainCtx::onWindowVisibilityChanged(QWindow::Visibility visibility)
 {
     m_windowVisibility = visibility;
 }
 
-void MainInterface::setHasAcrylicSurface(const bool v)
+void MainCtx::setHasAcrylicSurface(const bool v)
 {
     if (m_hasAcrylicSurface == v)
         return;
@@ -397,7 +397,7 @@ void MainInterface::setHasAcrylicSurface(const bool v)
     emit hasAcrylicSurfaceChanged();
 }
 
-void MainInterface::incrementIntfUserScaleFactor(bool increment)
+void MainCtx::incrementIntfUserScaleFactor(bool increment)
 {
     if (increment)
         setIntfUserScaleFactor(m_intfUserScaleFactor + 0.1);
@@ -405,13 +405,13 @@ void MainInterface::incrementIntfUserScaleFactor(bool increment)
         setIntfUserScaleFactor(m_intfUserScaleFactor - 0.1);
 }
 
-void MainInterface::setIntfUserScaleFactor(double newValue)
+void MainCtx::setIntfUserScaleFactor(double newValue)
 {
     m_intfUserScaleFactor = qBound(getMinIntfUserScaleFactor(), newValue, getMaxIntfUserScaleFactor());
     updateIntfScaleFactor();
 }
 
-void MainInterface::setPinVideoControls(bool pinVideoControls)
+void MainCtx::setPinVideoControls(bool pinVideoControls)
 {
     if (m_pinVideoControls == pinVideoControls)
         return;
@@ -420,7 +420,7 @@ void MainInterface::setPinVideoControls(bool pinVideoControls)
     emit pinVideoControlsChanged(m_pinVideoControls);
 }
 
-inline void MainInterface::initSystray()
+inline void MainCtx::initSystray()
 {
     bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
     bool b_systrayWanted = var_InheritBool( p_intf, "qt-system-tray" );
@@ -441,21 +441,21 @@ inline void MainInterface::initSystray()
 }
 
 
-void MainInterface::setPlaylistDocked( bool docked )
+void MainCtx::setPlaylistDocked( bool docked )
 {
     b_playlistDocked = docked;
 
     emit playlistDockedChanged(docked);
 }
 
-void MainInterface::setPlaylistVisible( bool visible )
+void MainCtx::setPlaylistVisible( bool visible )
 {
     playlistVisible = visible;
 
     emit playlistVisibleChanged(visible);
 }
 
-void MainInterface::setPlaylistWidthFactor( double factor )
+void MainCtx::setPlaylistWidthFactor( double factor )
 {
     if (factor > 0.0)
     {
@@ -464,42 +464,42 @@ void MainInterface::setPlaylistWidthFactor( double factor )
     }
 }
 
-void MainInterface::setShowRemainingTime( bool show )
+void MainCtx::setShowRemainingTime( bool show )
 {
     m_showRemainingTime = show;
     emit showRemainingTimeChanged(show);
 }
 
-void MainInterface::setGridView(bool asGrid)
+void MainCtx::setGridView(bool asGrid)
 {
     m_gridView = asGrid;
     emit gridViewChanged( asGrid );
 }
 
-void MainInterface::setInterfaceAlwaysOnTop( bool on_top )
+void MainCtx::setInterfaceAlwaysOnTop( bool on_top )
 {
     b_interfaceOnTop = on_top;
     emit interfaceAlwaysOnTopChanged(on_top);
 }
 
-bool MainInterface::hasEmbededVideo() const
+bool MainCtx::hasEmbededVideo() const
 {
     return m_videoSurfaceProvider && m_videoSurfaceProvider->hasVideoEmbed();
 }
 
-void MainInterface::setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfaceProvider)
+void MainCtx::setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfaceProvider)
 {
     if (m_videoSurfaceProvider)
-        disconnect(m_videoSurfaceProvider, &VideoSurfaceProvider::hasVideoEmbedChanged, this, &MainInterface::hasEmbededVideoChanged);
+        disconnect(m_videoSurfaceProvider, &VideoSurfaceProvider::hasVideoEmbedChanged, this, &MainCtx::hasEmbededVideoChanged);
     m_videoSurfaceProvider = videoSurfaceProvider;
     if (m_videoSurfaceProvider)
         connect(m_videoSurfaceProvider, &VideoSurfaceProvider::hasVideoEmbedChanged,
-                this, &MainInterface::hasEmbededVideoChanged,
+                this, &MainCtx::hasEmbededVideoChanged,
                 Qt::QueuedConnection);
     emit hasEmbededVideoChanged(m_videoSurfaceProvider && m_videoSurfaceProvider->hasVideoEmbed());
 }
 
-VideoSurfaceProvider* MainInterface::getVideoSurfaceProvider() const
+VideoSurfaceProvider* MainCtx::getVideoSurfaceProvider() const
 {
     return m_videoSurfaceProvider;
 }
@@ -511,7 +511,7 @@ VideoSurfaceProvider* MainInterface::getVideoSurfaceProvider() const
  * Create a SystemTray icon and a menu that would go with it.
  * Connects to a click handler on the icon.
  **/
-void MainInterface::createSystray()
+void MainCtx::createSystray()
 {
     QIcon iconVLC;
     if( QDate::currentDate().dayOfYear() >= QT_XMAS_JOKE_DAY && var_InheritBool( p_intf, "qt-icon-change" ) )
@@ -528,20 +528,20 @@ void MainInterface::createSystray()
     sysTray->show();
 
     connect( sysTray, &QSystemTrayIcon::activated,
-             this, &MainInterface::handleSystrayClick );
+             this, &MainCtx::handleSystrayClick );
 
     /* Connects on nameChanged() */
     connect( THEMIM, &PlayerController::nameChanged,
-             this, &MainInterface::updateSystrayTooltipName );
+             this, &MainCtx::updateSystrayTooltipName );
     /* Connect PLAY_STATUS on the systray */
     connect( THEMIM, &PlayerController::playingStateChanged,
-             this, &MainInterface::updateSystrayTooltipStatus );
+             this, &MainCtx::updateSystrayTooltipStatus );
 }
 
 /**
  * Updates the Systray Icon's menu and toggle the main interface
  */
-void MainInterface::toggleUpdateSystrayMenu()
+void MainCtx::toggleUpdateSystrayMenu()
 {
     emit toggleWindowVisibility();
     if( sysTray )
@@ -549,21 +549,21 @@ void MainInterface::toggleUpdateSystrayMenu()
 }
 
 /* First Item of the systray menu */
-void MainInterface::showUpdateSystrayMenu()
+void MainCtx::showUpdateSystrayMenu()
 {
     emit setInterfaceVisibible(true);
     VLCMenuBar::updateSystrayMenu( this, p_intf );
 }
 
 /* First Item of the systray menu */
-void MainInterface::hideUpdateSystrayMenu()
+void MainCtx::hideUpdateSystrayMenu()
 {
     emit setInterfaceVisibible(false);
     VLCMenuBar::updateSystrayMenu( this, p_intf );
 }
 
 /* Click on systray Icon */
-void MainInterface::handleSystrayClick(
+void MainCtx::handleSystrayClick(
                                     QSystemTrayIcon::ActivationReason reason )
 {
     switch( reason )
@@ -590,7 +590,7 @@ void MainInterface::handleSystrayClick(
  * Updates the name of the systray Icon tooltip.
  * Doesn't check if the systray exists, check before you call it.
  **/
-void MainInterface::updateSystrayTooltipName( const QString& name )
+void MainCtx::updateSystrayTooltipName( const QString& name )
 {
     if( name.isEmpty() )
     {
@@ -614,7 +614,7 @@ void MainInterface::updateSystrayTooltipName( const QString& name )
  * Updates the status of the systray Icon tooltip.
  * Doesn't check if the systray exists, check before you call it.
  **/
-void MainInterface::updateSystrayTooltipStatus( PlayerController::PlayingState )
+void MainCtx::updateSystrayTooltipStatus( PlayerController::PlayingState )
 {
     VLCMenuBar::updateSystrayMenu( this, p_intf );
 }
@@ -632,7 +632,7 @@ void MainInterface::updateSystrayTooltipStatus( PlayerController::PlayingState )
  * \param b_play whether to play the file immediately
  * \return nothing
  */
-void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
+void MainCtx::dropEventPlay( QDropEvent *event, bool b_play )
 {
     if( event->possibleActions() & ( Qt::CopyAction | Qt::MoveAction | Qt::LinkAction ) )
        event->setDropAction( Qt::CopyAction );
@@ -697,7 +697,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
  * Events stuff
  ************************************************************************/
 
-bool MainInterface::onWindowClose( QWindow* )
+bool MainCtx::onWindowClose( QWindow* )
 {
     PlaylistControllerModel* playlistController = p_intf->p_mainPlaylistController;
     PlayerController* playerController = p_intf->p_mainPlayerController;
@@ -724,27 +724,27 @@ bool MainInterface::onWindowClose( QWindow* )
     }
 }
 
-void MainInterface::toggleInterfaceFullScreen()
+void MainCtx::toggleInterfaceFullScreen()
 {
     emit setInterfaceFullScreen( m_windowVisibility != QWindow::FullScreen );
 }
 
-void MainInterface::emitBoss()
+void MainCtx::emitBoss()
 {
     emit askBoss();
 }
 
-void MainInterface::emitShow()
+void MainCtx::emitShow()
 {
     emit askShow();
 }
 
-void MainInterface::emitRaise()
+void MainCtx::emitRaise()
 {
     emit askRaise();
 }
 
-VLCVarChoiceModel* MainInterface::getExtraInterfaces()
+VLCVarChoiceModel* MainCtx::getExtraInterfaces()
 {
     return m_extraInterfaces;
 }
@@ -804,12 +804,12 @@ static int IntfBossCB( vlc_object_t *, const char *,
     return VLC_SUCCESS;
 }
 
-bool MainInterface::acrylicActive() const
+bool MainCtx::acrylicActive() const
 {
     return m_acrylicActive;
 }
 
-void MainInterface::setAcrylicActive(bool newAcrylicActive)
+void MainCtx::setAcrylicActive(bool newAcrylicActive)
 {
     if (m_acrylicActive == newAcrylicActive)
         return;

@@ -31,7 +31,7 @@
 #include <vlc_cxx_helpers.hpp>
 
 #include "networksourcelistener.hpp"
-#include <maininterface/main_interface.hpp>
+#include <maininterface/mainctx.hpp>
 
 #include <QSemaphore>
 
@@ -131,7 +131,7 @@ public:
     };
     Q_ENUM( ItemType )
 
-    Q_PROPERTY(MainInterface* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
+    Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
     Q_PROPERTY(QVariant tree READ getTree WRITE setTree NOTIFY treeChanged)
     Q_PROPERTY(QVariantList path READ getPath NOTIFY pathChanged)
 
@@ -154,10 +154,10 @@ public:
     bool setData( const QModelIndex& idx,const QVariant& value, int role ) override;
 
     void setIndexed(bool indexed);
-    void setCtx(MainInterface* ctx);
+    void setCtx(MainCtx* ctx);
     void setTree(QVariant tree);
 
-    inline MainInterface* getCtx() const { return m_ctx; }
+    inline MainCtx* getCtx() const { return m_ctx; }
     inline QVariant getTree() const { return QVariant::fromValue( m_treeItem); }
     inline QVariantList getPath() const { return m_path; }
 
@@ -233,7 +233,7 @@ private:
     QSemaphore m_preparseSem;
 
     std::vector<Item> m_items;
-    MainInterface* m_ctx = nullptr;
+    MainCtx* m_ctx = nullptr;
     MediaLib* m_mediaLib;
     bool m_hasTree = false;
     NetworkTreeItem m_treeItem;

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * main_interface_win32.cpp : Main interface
+ * mainctx_win32.cpp : Main interface
  ****************************************************************************
  * Copyright (C) 2006-2010 VideoLAN and AUTHORS
  *
@@ -24,7 +24,7 @@
 #ifndef MAIN_INTERFACE_WIN32_HPP
 #define MAIN_INTERFACE_WIN32_HPP
 
-#include "maininterface/main_interface.hpp"
+#include "maininterface/mainctx.hpp"
 #include "interface_window_handler.hpp"
 #include <QAbstractNativeEventFilter>
 
@@ -55,12 +55,12 @@ private:
 
 
 
-class MainInterfaceWin32 : public MainInterface
+class MainCtxWin32 : public MainCtx
 {
     Q_OBJECT
 public:
-    explicit MainInterfaceWin32(qt_intf_t *);
-    virtual ~MainInterfaceWin32() = default;
+    explicit MainCtxWin32(qt_intf_t *);
+    virtual ~MainCtxWin32() = default;
 
 public slots:
     virtual void reloadPrefs() override;
@@ -70,7 +70,7 @@ class InterfaceWindowHandlerWin32 : public InterfaceWindowHandler, public QAbstr
 {
     Q_OBJECT
 public:
-    explicit InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent = nullptr);
+    explicit InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent = nullptr);
     virtual ~InterfaceWindowHandlerWin32();
     virtual void toggleWindowVisiblity() override;
 

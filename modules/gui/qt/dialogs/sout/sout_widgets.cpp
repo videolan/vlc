@@ -25,7 +25,7 @@
 
 #include "dialogs/sout/sout_widgets.hpp"
 #include "dialogs/sout/sout.hpp"
-#include "maininterface/main_interface.hpp"
+#include "maininterface/mainctx.hpp"
 #include "util/soutchain.hpp"
 #include "util/qt_dirs.hpp"
 #include <vlc_intf_strings.h>

@@ -49,7 +49,7 @@ public:
     static QMenu* MiscPopupMenu( qt_intf_t *, bool );
 
     /* Systray */
-    static void updateSystrayMenu( MainInterface *, qt_intf_t  *,
+    static void updateSystrayMenu( MainCtx *, qt_intf_t  *,
                                    bool b_force_visible = false);
 
     /* destructor for parentless Menus (kept in static variables) */

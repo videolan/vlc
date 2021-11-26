@@ -16,19 +16,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "interface_window_handler.hpp"
-#include "main_interface.hpp"
+#include "mainctx.hpp"
 #include <player/player_controller.hpp>
 #include <playlist/playlist_controller.hpp>
 #include <QScreen>
 
-InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent)
+InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent)
     : QObject(parent)
     , p_intf(_p_intf)
     , m_window(window)
-    , m_mainInterface(mainInterface)
+    , m_mainCtx(mainCtx)
 {
     assert(m_window);
-    assert(m_mainInterface);
+    assert(m_mainCtx);
 
     /* */
     m_pauseOnMinimize = var_InheritBool( p_intf, "qt-pause-minimized" );
@@ -45,10 +45,10 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainInterface
     {
         QVLCTools::restoreWindowPosition( getSettings(), m_window, QSize(600, 420) );
 
-        WindowStateHolder::holdOnTop( m_window,  WindowStateHolder::INTERFACE, m_mainInterface->isInterfaceAlwaysOnTop() );
+        WindowStateHolder::holdOnTop( m_window,  WindowStateHolder::INTERFACE, m_mainCtx->isInterfaceAlwaysOnTop() );
         WindowStateHolder::holdFullscreen( m_window,  WindowStateHolder::INTERFACE, m_window->visibility() == QWindow::FullScreen );
 
-        if (m_mainInterface->isHideAfterCreation())
+        if (m_mainCtx->isHideAfterCreation())
             m_window->hide();
     }, Qt::QueuedConnection, nullptr);
 
@@ -59,45 +59,45 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainInterface
         connect( THEMIM, &PlayerController::nameChanged, m_window, &QWindow::setTitle );
     }
 
-    connect( m_window, &QWindow::screenChanged, m_mainInterface, &MainInterface::updateIntfScaleFactor);
-    m_mainInterface->updateIntfScaleFactor();
+    connect( m_window, &QWindow::screenChanged, m_mainCtx, &MainCtx::updateIntfScaleFactor);
+    m_mainCtx->updateIntfScaleFactor();
 
-    m_mainInterface->onWindowVisibilityChanged(m_window->visibility());
+    m_mainCtx->onWindowVisibilityChanged(m_window->visibility());
     connect( m_window, &QWindow::visibilityChanged,
-             m_mainInterface, &MainInterface::onWindowVisibilityChanged);
+             m_mainCtx, &MainCtx::onWindowVisibilityChanged);
 
-    connect( m_mainInterface, &MainInterface::askBoss,
+    connect( m_mainCtx, &MainCtx::askBoss,
              this, &InterfaceWindowHandler::setBoss, Qt::QueuedConnection  );
-    connect( m_mainInterface, &MainInterface::askRaise,
+    connect( m_mainCtx, &MainCtx::askRaise,
              this, &InterfaceWindowHandler::setRaise, Qt::QueuedConnection  );
 
-    connect( m_mainInterface, &MainInterface::interfaceAlwaysOnTopChanged,
+    connect( m_mainCtx, &MainCtx::interfaceAlwaysOnTopChanged,
              this, &InterfaceWindowHandler::setInterfaceAlwaysOnTop);
 
-    connect( m_mainInterface, &MainInterface::setInterfaceFullScreen,
+    connect( m_mainCtx, &MainCtx::setInterfaceFullScreen,
              this, &InterfaceWindowHandler::setInterfaceFullScreen);
 
-    connect( m_mainInterface, &MainInterface::toggleWindowVisibility,
+    connect( m_mainCtx, &MainCtx::toggleWindowVisibility,
              this, &InterfaceWindowHandler::toggleWindowVisiblity);
 
-    connect( m_mainInterface, &MainInterface::setInterfaceVisibible,
+    connect( m_mainCtx, &MainCtx::setInterfaceVisibible,
              this, &InterfaceWindowHandler::setInterfaceVisible);
 
     connect(this, &InterfaceWindowHandler::incrementIntfUserScaleFactor,
-            m_mainInterface, &MainInterface::incrementIntfUserScaleFactor);
+            m_mainCtx, &MainCtx::incrementIntfUserScaleFactor);
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
-    connect( m_mainInterface, &MainInterface::useClientSideDecorationChanged,
+    connect( m_mainCtx, &MainCtx::useClientSideDecorationChanged,
              this, &InterfaceWindowHandler::updateCSDWindowSettings );
 #endif
 
-    connect(m_mainInterface, &MainInterface::requestInterfaceMaximized,
+    connect(m_mainCtx, &MainCtx::requestInterfaceMaximized,
             m_window, &QWindow::showMaximized);
 
-    connect(m_mainInterface, &MainInterface::requestInterfaceNormal,
+    connect(m_mainCtx, &MainCtx::requestInterfaceNormal,
             m_window, &QWindow::showNormal);
 
-    connect(m_mainInterface, &MainInterface::requestInterfaceMinimized,
+    connect(m_mainCtx, &MainCtx::requestInterfaceMinimized,
             m_window, [this]()
     {
         // taking OR with the current state, we preserve the current state
@@ -121,7 +121,7 @@ InterfaceWindowHandler::~InterfaceWindowHandler()
 void InterfaceWindowHandler::updateCSDWindowSettings()
 {
     m_window->hide(); // some window managers don't like to change frame window hint on visible window
-    m_window->setFlag(Qt::FramelessWindowHint, m_mainInterface->useClientSideDecoration());
+    m_window->setFlag(Qt::FramelessWindowHint, m_mainCtx->useClientSideDecoration());
     m_window->show();
 }
 #endif
@@ -213,12 +213,12 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
     case QEvent::Drop:
     {
         auto dropEvent = static_cast<QDropEvent*>(event);
-        m_mainInterface->dropEventPlay(dropEvent, true);
+        m_mainCtx->dropEventPlay(dropEvent, true);
         return true;
     }
     case QEvent::Close:
     {
-        bool ret = m_mainInterface->onWindowClose(m_window);
+        bool ret = m_mainCtx->onWindowClose(m_window);
         if (ret)
         {
             /* Accept session quit. Otherwise we break the desktop mamager. */
@@ -316,7 +316,7 @@ void InterfaceWindowHandler::setRaise()
 void InterfaceWindowHandler::setBoss()
 {
     THEMPL->pause();
-    if( m_mainInterface->getSysTray() )
+    if( m_mainCtx->getSysTray() )
     {
         m_window->hide();
     }

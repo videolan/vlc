@@ -22,7 +22,7 @@
 
 #include "compositor_dcomp.hpp"
 
-#include "maininterface/main_interface_win32.hpp"
+#include "maininterface/mainctx_win32.hpp"
 
 #include <comdef.h>
 
@@ -245,12 +245,12 @@ bool CompositorDirectComposition::init()
     return true;
 }
 
-bool CompositorDirectComposition::makeMainInterface(MainInterface* mainInterface)
+bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
 {
     try
     {
         bool ret;
-        m_mainInterface = mainInterface;
+        m_mainCtx = mainCtx;
 
         m_rootWindow = new QWindow();
 
@@ -279,7 +279,7 @@ bool CompositorDirectComposition::makeMainInterface(MainInterface* mainInterface
 
         auto resetAcrylicSurface = [this](QScreen * = nullptr)
         {
-            m_acrylicSurface.reset(new CompositorDCompositionAcrylicSurface(m_intf, this, m_mainInterface, m_d3d11Device.Get()));
+            m_acrylicSurface.reset(new CompositorDCompositionAcrylicSurface(m_intf, this, m_mainCtx, m_d3d11Device.Get()));
         };
 
         resetAcrylicSurface();

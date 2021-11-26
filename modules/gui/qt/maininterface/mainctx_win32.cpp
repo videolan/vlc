@@ -1,5 +1,5 @@
 /*****************************************************************************
- * main_interface_win32.cpp : Main interface
+ * mainctx_win32.cpp : Main interface
  ****************************************************************************
  * Copyright (C) 2006-2010 VideoLAN and AUTHORS
  *
@@ -25,7 +25,7 @@
 # include "config.h"
 #endif
 
-#include "main_interface_win32.hpp"
+#include "mainctx_win32.hpp"
 
 #include "maininterface/compositor.hpp"
 #include "player/player_controller.hpp"
@@ -490,26 +490,26 @@ void WinTaskbarWidget::changeThumbbarButtons( PlayerController::PlayingState i_s
 
 // MainInterface
 
-MainInterfaceWin32::MainInterfaceWin32(qt_intf_t * _p_intf )
-    : MainInterface( _p_intf )
+MainCtxWin32::MainCtxWin32(qt_intf_t * _p_intf )
+    : MainCtx( _p_intf )
 {
     /* Volume keys */
     p_intf->disable_volume_keys = var_InheritBool( _p_intf, "qt-disable-volume-keys" );
 }
 
-void MainInterfaceWin32::reloadPrefs()
+void MainCtxWin32::reloadPrefs()
 {
     p_intf->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
-    MainInterface::reloadPrefs();
+    MainCtx::reloadPrefs();
 }
 
 // InterfaceWindowHandlerWin32
 
-InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent)
-    : InterfaceWindowHandler(_p_intf, mainInterface, window, parent)
+InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent)
+    : InterfaceWindowHandler(_p_intf, mainCtx, window, parent)
 
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
-    , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainInterface->useClientSideDecoration(),
+    , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainCtx->useClientSideDecoration(),
                                                        _p_intf->p_compositor->type() == vlc::Compositor::Win7Compositor,
                                                        window, window))
 #endif
@@ -696,6 +696,6 @@ bool InterfaceWindowHandlerWin32::nativeEventFilter(const QByteArray &eventType,
 #if QT_CLIENT_SIDE_DECORATION_AVAILABLE
 void InterfaceWindowHandlerWin32::updateCSDWindowSettings()
 {
-    static_cast<CSDWin32EventHandler *>(m_CSDWindowEventHandler)->setUseClientSideDecoration(m_mainInterface->useClientSideDecoration());
+    static_cast<CSDWin32EventHandler *>(m_CSDWindowEventHandler)->setUseClientSideDecoration(m_mainCtx->useClientSideDecoration());
 }
 #endif

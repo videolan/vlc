@@ -35,7 +35,7 @@ MLFoldersBaseModel::EntryPoint::EntryPoint( const vlc_ml_folder_t& entryPoint)
 {
 }
 
-void MLFoldersBaseModel::setCtx(MainInterface* ctx)
+void MLFoldersBaseModel::setCtx(MainCtx* ctx)
 {
     if (ctx)
     {

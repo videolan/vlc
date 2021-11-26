@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "videosurface.hpp"
-#include "maininterface/main_interface.hpp"
+#include "maininterface/mainctx.hpp"
 #include "widgets/native/customwidgets.hpp" //for qtEventToVLCKey
 #include <QSGRectangleNode>
 
@@ -139,12 +139,12 @@ VideoSurface::VideoSurface(QQuickItem* parent)
     connect(this, &VideoSurface::enabledChanged, this, &VideoSurface::updatePositionAndSize);
 }
 
-MainInterface* VideoSurface::getCtx()
+MainCtx* VideoSurface::getCtx()
 {
     return m_ctx;
 }
 
-void VideoSurface::setCtx(MainInterface* ctx)
+void VideoSurface::setCtx(MainCtx* ctx)
 {
     m_ctx = ctx;
     emit ctxChanged(ctx);

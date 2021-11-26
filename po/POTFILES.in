@@ -763,10 +763,10 @@ modules/gui/qt/dialogs/playlists/playlists.cpp
 modules/gui/qt/dialogs/playlists/playlists.hpp
 modules/gui/qt/dialogs/toolbar/controlbar_profile_model.cpp
 modules/gui/qt/dialogs/toolbar/controlbar_profile_model.hpp
-modules/gui/qt/maininterface/main_interface.cpp
-modules/gui/qt/maininterface/main_interface.hpp
-modules/gui/qt/maininterface/main_interface_win32.cpp
-modules/gui/qt/maininterface/main_interface_win32.hpp
+modules/gui/qt/maininterface/mainctx.cpp
+modules/gui/qt/maininterface/mainctx.hpp
+modules/gui/qt/maininterface/mainctx_win32.cpp
+modules/gui/qt/maininterface/mainctx_win32.hpp
 modules/gui/qt/dialogs/plugins/addons_manager.cpp
 modules/gui/qt/dialogs/plugins/addons_manager.hpp
 modules/gui/qt/medialibrary/mlbookmarkmodel.cpp

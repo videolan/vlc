@@ -25,7 +25,7 @@
 #include <memory>
 #include "compositor.hpp"
 
-class MainInterface;
+class MainCtx;
 class QQuickView;
 class InterfaceWindowHandler;
 
@@ -41,7 +41,7 @@ public:
     static bool preInit(qt_intf_t*);
     virtual bool init() override;
 
-    virtual bool makeMainInterface(MainInterface*) override;
+    virtual bool makeMainInterface(MainCtx*) override;
 
     /**
      * @brief release all resources used by the compositor.
@@ -65,7 +65,7 @@ protected:
     qt_intf_t *m_intf;
 
     std::unique_ptr<InterfaceWindowHandler> m_intfWindowHandler;
-    MainInterface* m_mainInterface;
+    MainCtx* m_mainCtx;
     std::unique_ptr<QQuickView> m_qmlWidget;
 };
 

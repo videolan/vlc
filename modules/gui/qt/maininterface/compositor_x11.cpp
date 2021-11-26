@@ -22,7 +22,7 @@
 #include "compositor_x11.hpp"
 #include "compositor_x11_renderwindow.hpp"
 #include "compositor_x11_uisurface.hpp"
-#include "main_interface.hpp"
+#include "mainctx.hpp"
 #include "interface_window_handler.hpp"
 #include "video_window_handler.hpp"
 #include "mainui.hpp"
@@ -142,9 +142,9 @@ bool CompositorX11::init()
     return true;
 }
 
-bool CompositorX11::makeMainInterface(MainInterface* mainInterface)
+bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
 {
-    m_mainInterface = mainInterface;
+    m_mainCtx = mainCtx;
 
     m_videoWidget = std::make_unique<DummyNativeWidget>();
     m_videoWidget->setWindowFlag(Qt::WindowType::BypassWindowManagerHint);
@@ -152,7 +152,7 @@ bool CompositorX11::makeMainInterface(MainInterface* mainInterface)
     m_videoWidget->winId();
     m_videoWidget->show();
 
-    bool useCSD = m_mainInterface->useClientSideDecoration();
+    bool useCSD = m_mainCtx->useClientSideDecoration();
     m_renderWindow = std::make_unique<vlc::CompositorX11RenderWindow>(m_intf, m_conn, useCSD);
     if (!m_renderWindow->init())
         return false;

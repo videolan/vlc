@@ -144,7 +144,7 @@ public:
 
 };
 
-class MainInterface : public QObject
+class MainCtx : public QObject
 {
     Q_OBJECT
 
@@ -178,8 +178,8 @@ class MainInterface : public QObject
 
 public:
     /* tors */
-    MainInterface(qt_intf_t *);
-    virtual ~MainInterface();
+    MainCtx(qt_intf_t *);
+    virtual ~MainCtx();
 
     static const QEvent::Type ToolbarsNeedRebuild;
     static constexpr double MIN_INTF_USER_SCALE_FACTOR = 0.3;

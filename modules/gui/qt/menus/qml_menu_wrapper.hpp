@@ -38,7 +38,7 @@ class MLPlaylistListModel;
 class MLPlaylistModel;
 class NetworkDeviceModel;
 class NetworkMediaModel;
-class MainInterface;
+class MainCtx;
 namespace vlc {
 namespace playlist {
 class PlaylistControllerModel;
@@ -94,7 +94,7 @@ private:
 class QmlGlobalMenu : public VLCMenuBar
 {
     Q_OBJECT
-    SIMPLE_MENU_PROPERTY(MainInterface*, ctx, nullptr)
+    SIMPLE_MENU_PROPERTY(MainCtx*, ctx, nullptr)
 public:
     explicit QmlGlobalMenu(QObject *parent = nullptr);
     ~QmlGlobalMenu();
@@ -114,7 +114,7 @@ class QmlMenuBarMenu;
 class QmlMenuBar : public VLCMenuBar
 {
     Q_OBJECT
-    SIMPLE_MENU_PROPERTY(MainInterface*, ctx, nullptr)
+    SIMPLE_MENU_PROPERTY(MainCtx*, ctx, nullptr)
     SIMPLE_MENU_PROPERTY(QQuickItem*, menubar, nullptr)
     SIMPLE_MENU_PROPERTY(bool, openMenuOnHover, false)
 

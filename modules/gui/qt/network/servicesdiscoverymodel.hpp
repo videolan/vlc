@@ -31,7 +31,7 @@
 #include <vlc_addons.h>
 #include <vlc_cxx_helpers.hpp>
 
-#include <maininterface/main_interface.hpp>
+#include <maininterface/mainctx.hpp>
 
 #include <memory>
 
@@ -41,7 +41,7 @@ class ServicesDiscoveryModel : public QAbstractListModel
 
 public:
 
-    Q_PROPERTY(MainInterface* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+    Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
     Q_PROPERTY(bool parsingPending READ getParsingPending NOTIFY parsingPendingChanged FINAL)
     Q_PROPERTY(int count READ getCount NOTIFY countChanged FINAL)
 
@@ -73,9 +73,9 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     int rowCount(const QModelIndex& parent = {}) const override;
 
-    void setCtx(MainInterface* ctx);
+    void setCtx(MainCtx* ctx);
 
-    inline MainInterface* getCtx() const { return m_ctx; }
+    inline MainCtx* getCtx() const { return m_ctx; }
     inline bool getParsingPending() const { return m_parsingPending; }
     int getCount() const;
 
@@ -116,7 +116,7 @@ private:
     };
 
     std::vector<Item> m_items;
-    MainInterface* m_ctx = nullptr;
+    MainCtx* m_ctx = nullptr;
     addons_manager_t* m_manager = nullptr;
     bool m_parsingPending = false;
 };

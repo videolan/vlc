@@ -32,7 +32,7 @@
 #include <assert.h>
 
 #include "qt.hpp"
-#include "maininterface/main_interface.hpp"
+#include "maininterface/mainctx.hpp"
 #include "open_panels.hpp"
 #include "dialogs/open/open.hpp"
 #include "dialogs/dialogs_provider.hpp" /* Open Subtitle file */
