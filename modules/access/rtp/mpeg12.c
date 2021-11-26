@@ -34,8 +34,12 @@
 #include <vlc_strings.h>
 
 #include "rtp.h"
+#include "../../packetizer/mpegaudio.h"
 
+/* audio/MPA: MPEG-1/2 Audio layer I/II/III ES */
 struct rtp_mpa {
+    block_t *frags;
+    block_t **frag_end;
     size_t offset;
     struct vlc_rtp_es *es;
 };
@@ -46,12 +50,30 @@ static void *rtp_mpa_init(struct vlc_rtp_pt *pt)
     if (unlikely(sys == NULL))
         return NULL;
 
+    sys->frags = NULL;
+    sys->frag_end = &sys->frags;
+    sys->offset = 0;
+
     es_format_t fmt;
 
     es_format_Init(&fmt, AUDIO_ES, VLC_CODEC_MPGA);
-    fmt.b_packetized = false;
     sys->es = vlc_rtp_pt_request_es(pt, &fmt);
     return sys;
+}
+
+static void rtp_mpa_send(struct rtp_mpa *sys)
+{
+    block_t *frags = sys->frags;
+    block_t *frame = block_ChainGather(frags);
+
+    if (likely(frame != NULL))
+        vlc_rtp_es_send(sys->es, frame);
+    else
+        block_ChainRelease(frags);
+
+    sys->frags = NULL;
+    sys->frag_end = &sys->frags;
+    sys->offset = 0;
 }
 
 static void rtp_mpa_destroy(struct vlc_rtp_pt *pt, void *data)
@@ -61,6 +83,8 @@ static void rtp_mpa_destroy(struct vlc_rtp_pt *pt, void *data)
     if (unlikely(sys == NULL))
         return;
 
+    if (sys->frags != NULL)
+        rtp_mpa_send(sys);
     vlc_rtp_es_destroy(sys->es);
     free(sys);
     (void) pt;
@@ -84,19 +108,74 @@ static void rtp_mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
     block->p_buffer += 4;
     block->i_buffer -= 4;
 
-    if (offset != 0 && offset != sys->offset) {
+    if (offset < sys->offset)
+        rtp_mpa_send(sys); /* New frame started: send pending frame if any */
+
+    if (offset != sys->offset) {
         /* Discontinuous offset, probably packet loss. */
         vlc_warning(log, "offset discontinuity: expected %zu, got %"PRIuFAST16,
                     sys->offset, offset);
-        block->i_flags |= BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED;
+        block->i_flags |= BLOCK_FLAG_CORRUPTED;
     }
 
+    if (block->i_buffer == 0)
+        goto drop;
+
+    *sys->frag_end = block;
+    sys->frag_end = &block->p_next;
     sys->offset = offset + block->i_buffer;
-    /* This payload format does not flag the last fragment of a frame,
-     * so the MPGA header must be parsed to figure out the frame size and end
-     * (without introducing a one-packet delay).
-     * We let the packetiser handle it rather than duplicate the logic. */
-    vlc_rtp_es_send(sys->es, block);
+    block = sys->frags;
+
+    /* Extract full MPEG Audio frames */
+    for (;;) {
+        uint32_t header;
+
+        if (block_ChainExtract(block, &header, 4) < 4)
+           break;
+
+        /* This RTP payload format does atypically not flag end-of-frames, so
+         * we have to parse the MPEG Audio frame header to find out. */
+        unsigned chans, conf, mode, srate, brate, samples, maxsize, layer;
+        int frame_size = SyncInfo(ntoh32(header), &chans, &conf, &mode, &srate,
+                                  &brate, &samples, &maxsize, &layer);
+        /* If the frame size is unknown due to free bit rate, then we can only
+         * sense the completion of the frame when the next frame starts. */
+        if (frame_size <= 0)
+            break;
+
+        if ((size_t)frame_size == sys->offset) {
+            rtp_mpa_send(sys);
+            break;
+        }
+
+        /* If the frame size is larger than the current offset, then we need to
+         * wait for the next fragment. */
+        if ((size_t)frame_size > sys->offset)
+            break;
+
+        if (offset != 0) {
+            vlc_warning(log, "invalid frame fragmentation");
+            block->i_flags |= BLOCK_FLAG_CORRUPTED;
+            break;
+        }
+
+        /* The RTP packet contains multiple small frames. */
+        block_t *frame = block_Alloc(frame_size);
+        if (likely(frame != NULL)) {
+            assert(block->p_next == NULL); /* Only one block to copy from */
+            memcpy(frame->p_buffer, block->p_buffer, frame_size);
+            frame->i_flags = block->i_flags;
+            frame->i_pts = block->i_pts;
+            vlc_rtp_es_send(sys->es, frame);
+
+            block->i_flags = 0;
+        } else
+            block->i_flags = BLOCK_FLAG_DISCONTINUITY;
+
+        block->p_buffer += frame_size;
+        block->i_buffer -= frame_size;
+        block->i_pts = VLC_TICK_INVALID;
+    }
     return;
 
 drop:
@@ -112,7 +191,7 @@ static int rtp_mpeg12_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
 {
     pt->opaque = vlc_object_logger(obj);
 
-    if (vlc_ascii_strcasecmp(desc->name, "MPA") == 0) /* RFC2250 */
+    if (vlc_ascii_strcasecmp(desc->name, "MPA") == 0) /* RFC2250 §3.2 */
         pt->ops = &rtp_mpa_ops;
     else
         return VLC_ENOTSUP;
