@@ -75,7 +75,7 @@ FocusScope {
             controlBar.Navigation.defaultKeyAction(event)
 
             if (!event.accepted) {
-                mainInterface.sendHotkey(event.key, event.modifiers)
+                MainCtx.sendHotkey(event.key, event.modifiers)
             }
         }
     }

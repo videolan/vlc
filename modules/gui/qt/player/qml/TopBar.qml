@@ -90,7 +90,7 @@ FocusScope{
         //drag and dbl click the titlebar in CSD mode
         Loader {
             anchors.fill: parent
-            active: mainInterface.clientSideDecoration
+            active: MainCtx.clientSideDecoration
             source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
         }
 
@@ -125,7 +125,7 @@ FocusScope{
 
         width: implicitWidth
         height: VLCStyle.icon_normal
-        visible: mainInterface.hasToolbarMenu
+        visible: MainCtx.hasToolbarMenu
         textColor: topFocusScope.colors.text
         highlightedBgColor: topFocusScope.colors.bgHover
         highlightedTextColor: topFocusScope.colors.bgHoverText
@@ -151,7 +151,7 @@ FocusScope{
             Navigation.parentItem: topFocusScope
             Navigation.rightItem: menuSelector
             onClicked: {
-                if (mainInterface.hasEmbededVideo && !mainInterface.canShowVideoPIP) {
+                if (MainCtx.hasEmbededVideo && !MainCtx.canShowVideoPIP) {
                    mainPlaylistController.stop()
                 }
                 history.previous()
@@ -229,9 +229,9 @@ FocusScope{
 
         focus: false
         height: VLCStyle.icon_normal
-        active: mainInterface.clientSideDecoration
-        enabled: mainInterface.clientSideDecoration
-        visible: mainInterface.clientSideDecoration
+        active: MainCtx.clientSideDecoration
+        enabled: MainCtx.clientSideDecoration
+        visible: MainCtx.clientSideDecoration
         source: "qrc:///widgets/CSDWindowButtonSet.qml"
         onLoaded: {
             item.color = Qt.binding(function() { return topFocusScope.colors.playerFg })
@@ -265,7 +265,7 @@ FocusScope{
             QmlGlobalMenu {
                 id: contextMenu
 
-                ctx: mainctx
+                ctx: MainCtx
 
                 onAboutToShow: topFocusScope.requestLockUnlockAutoHide(true, contextMenu)
                 onAboutToHide: topFocusScope.requestLockUnlockAutoHide(false, contextMenu)

@@ -187,7 +187,7 @@ Item {
     property color expandDelegate
 
     state: {
-        switch (mainInterface.colorScheme.scheme) {
+        switch (MainCtx.colorScheme.scheme) {
         case ColorSchemeModel.System:
             return "system"
         case ColorSchemeModel.Day:

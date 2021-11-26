@@ -34,7 +34,7 @@ FocusScope {
 
     // Properties
 
-    readonly property int contentMargin: (mainInterface.gridView
+    readonly property int contentMargin: (MainCtx.gridView
                                           &&
                                           _currentView) ? _currentView.contentMargin : 0
 
@@ -71,10 +71,10 @@ FocusScope {
     // Connections
 
     Connections {
-        target: mainInterface
+        target: MainCtx
 
         onGridViewChanged: {
-            if (mainInterface.gridView) view.replace(grid);
+            if (MainCtx.gridView) view.replace(grid);
             else                        view.replace(list);
         }
     }
@@ -146,7 +146,7 @@ FocusScope {
 
         focus: (model.count !== 0)
 
-        initialItem: (mainInterface.gridView) ? grid : list
+        initialItem: (MainCtx.gridView) ? grid : list
     }
 
     Widgets.DragItem {

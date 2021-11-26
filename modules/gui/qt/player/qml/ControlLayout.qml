@@ -143,8 +143,8 @@ FocusScope {
 
                 Component.onCompleted: {
                     repeater.countChanged.connect(loader.buildFocusChain)
-                    mainInterface.controlbarProfileModel.selectedProfileChanged.connect(loader.buildFocusChain)
-                    mainInterface.controlbarProfileModel.currentModel.dirtyChanged.connect(loader.buildFocusChain)
+                    MainCtx.controlbarProfileModel.selectedProfileChanged.connect(loader.buildFocusChain)
+                    MainCtx.controlbarProfileModel.currentModel.dirtyChanged.connect(loader.buildFocusChain)
                 }
 
                 onActiveFocusChanged: {

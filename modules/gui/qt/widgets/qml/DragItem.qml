@@ -19,8 +19,9 @@
 import QtQuick          2.11
 import QtQuick.Templates 2.4 as T
 import QtQml.Models     2.2
-
 import QtGraphicalEffects 1.0
+
+import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///playlist/" as Playlist
@@ -66,9 +67,9 @@ Item {
     Drag.onActiveChanged: {
         if (Drag.active) {
             _model = updateComponents(_maxCovers);
-            mainInterface.setCursor(Qt.DragMoveCursor);
+            MainCtx.setCursor(Qt.DragMoveCursor);
         } else {
-            mainInterface.restoreCursor();
+            MainCtx.restoreCursor();
         }
     }
 

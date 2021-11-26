@@ -92,7 +92,7 @@ T.Control {
         else
             plInfoTooltip.timeout = 2000
         plInfoTooltip.visible = Qt.binding(function() { return ( (visualFocus || hovered) && !mouseArea.drag.active &&
-                                                                !overlayMenu.shown && mainInterface.playlistVisible &&
+                                                                !overlayMenu.shown && MainCtx.playlistVisible &&
                                                                 (textInfo.implicitWidth > textInfo.width || textArtist.implicitWidth > textArtist.width) ) })
     }
 

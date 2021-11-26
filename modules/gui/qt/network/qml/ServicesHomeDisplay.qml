@@ -93,7 +93,7 @@ Widgets.PageLoader {
             NetworkDeviceModel {
                 id: deviceModel
 
-                ctx: mainInterface
+                ctx: MainCtx
                 sd_source: NetworkDeviceModel.CAT_INTERNET
             }
 
@@ -145,7 +145,7 @@ Widgets.PageLoader {
             }
 
             providerModel: NetworkMediaModel {
-                ctx: mainInterface
+                ctx: MainCtx
             }
 
             contextMenu: NetworkMediaContextMenu {
@@ -279,7 +279,7 @@ Widgets.PageLoader {
             ServicesDiscoveryModel {
                 id: discoveryModel
 
-                ctx: mainInterface
+                ctx: MainCtx
             }
 
             SortFilterProxyModel {
@@ -421,7 +421,7 @@ Widgets.PageLoader {
             NetworkSourcesModel {
                 id: sourcesModel
 
-                ctx: mainInterface
+                ctx: MainCtx
             }
 
             Util.SelectableDelegateModel {

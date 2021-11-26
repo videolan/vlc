@@ -260,7 +260,7 @@ FocusScope {
     }
 
     Connections {
-        target: mainInterface
+        target: MainCtx
         onIntfScaleFactorChanged: flickable.layout(true)
     }
 

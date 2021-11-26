@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -26,8 +28,8 @@ Widgets.IconControlButton {
     size: VLCStyle.icon_medium
     iconText: VLCIcons.playlist
     onClicked: {
-        mainInterface.playlistVisible = !mainInterface.playlistVisible
-        if (mainInterface.playlistVisible && mainInterface.playlistDocked) {
+        MainCtx.playlistVisible = !MainCtx.playlistVisible
+        if (MainCtx.playlistVisible && MainCtx.playlistDocked) {
             playlistWidget.gainFocus(playlistBtn)
         }
     }

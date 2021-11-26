@@ -110,7 +110,6 @@ bool MainUI::setup(QQmlEngine* engine)
     rootCtx->setContextProperty( "history", new NavigationHistory(this) );
     rootCtx->setContextProperty( "player", m_intf->p_mainPlayerController );
     rootCtx->setContextProperty( "i18n", new I18n(this) );
-    rootCtx->setContextProperty( "mainInterface", m_mainInterface);
     rootCtx->setContextProperty( "topWindow", m_interfaceWindow);
     rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
     rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));

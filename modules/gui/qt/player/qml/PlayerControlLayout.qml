@@ -38,8 +38,8 @@ FocusScope {
 
     property int identifier: -1
     readonly property var model: {
-        if (!!mainInterface.controlbarProfileModel.currentModel)
-            mainInterface.controlbarProfileModel.currentModel.getModel(identifier)
+        if (!!MainCtx.controlbarProfileModel.currentModel)
+            MainCtx.controlbarProfileModel.currentModel.getModel(identifier)
         else
             undefined
     }

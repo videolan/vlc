@@ -17,11 +17,12 @@
  *****************************************************************************/
 pragma Singleton
 import QtQuick 2.11
+import org.videolan.vlc 0.1
 
 QtObject {
     id: vlc_style
 
-    readonly property real scale: mainInterface.intfScaleFactor
+    readonly property real scale: MainCtx.intfScaleFactor
 
     readonly property FontMetrics fontMetrics_xxsmall  : FontMetrics { font.pixelSize: dp(6, scale);  }
     readonly property FontMetrics fontMetrics_xsmall   : FontMetrics { font.pixelSize: dp(8, scale);  }
@@ -269,7 +270,7 @@ QtObject {
     //device pixel
     function dp(px, scale) {
         if (typeof scale === "undefined")
-            scale = mainInterface.intfScaleFactor
+            scale = MainCtx.intfScaleFactor
 
         var scaledPx = Math.round(px * scale)
         if (scaledPx < 0)

@@ -43,7 +43,7 @@ FocusScope {
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
     property int gridViewMarginTop: VLCStyle.margin_large
-    property var gridViewRowX: mainInterface.gridView ? _currentView.rowX : undefined
+    property var gridViewRowX: MainCtx.gridView ? _currentView.rowX : undefined
 
     property Component header: Item{}
     readonly property var headerItem: _currentView ? _currentView.headerItem : undefined
@@ -280,12 +280,12 @@ FocusScope {
         anchors.fill: parent
         focus: albumModelId.count !== 0
 
-        initialItem: mainInterface.gridView ? gridComponent : tableComponent
+        initialItem: MainCtx.gridView ? gridComponent : tableComponent
 
         Connections {
-            target: mainInterface
+            target: MainCtx
             onGridViewChanged: {
-                if (mainInterface.gridView)
+                if (MainCtx.gridView)
                     view.replace(gridComponent)
                 else
                     view.replace(tableComponent)

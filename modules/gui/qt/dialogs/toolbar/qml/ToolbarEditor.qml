@@ -108,8 +108,8 @@ Rectangle{
 
                     readonly property int identifier: modelData.identifier
                     readonly property var model: {
-                        if (!!mainInterface.controlbarProfileModel.currentModel)
-                            return mainInterface.controlbarProfileModel.currentModel.getModel(identifier)
+                        if (!!MainCtx.controlbarProfileModel.currentModel)
+                            return MainCtx.controlbarProfileModel.currentModel.getModel(identifier)
                         else
                             return undefined
                     }

@@ -18,6 +18,8 @@
 import QtQuick 2.11
 import QtQuick.Window 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///style/"
 
 Row {
@@ -31,7 +33,7 @@ Row {
 
     CSDWindowButton {
         iconTxt: VLCIcons.window_minimize
-        onClicked: mainInterface.requestInterfaceMinimized()
+        onClicked: MainCtx.requestInterfaceMinimized()
         height: windowButtonGroup.height
         color: windowButtonGroup.color
         hoverColor: windowButtonGroup.hoverColor
@@ -41,9 +43,9 @@ Row {
         iconTxt: (topWindow.visibility & Window.Maximized)  ? VLCIcons.window_restore :VLCIcons.window_maximize
         onClicked: {
             if (topWindow.visibility & Window.Maximized) {
-                mainInterface.requestInterfaceNormal()
+                MainCtx.requestInterfaceNormal()
             } else {
-                mainInterface.requestInterfaceMaximized()
+                MainCtx.requestInterfaceMaximized()
             }
         }
         height: windowButtonGroup.height

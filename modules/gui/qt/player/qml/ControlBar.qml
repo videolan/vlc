@@ -161,7 +161,7 @@ Control {
         id: mediaRemainingTime
 
         visible: false
-        text: (mainInterface.showRemainingTime && player.remainingTime.valid())
+        text: (MainCtx.showRemainingTime && player.remainingTime.valid())
               ? "-" + player.remainingTime.toString()
               : player.length.toString()
         color: root.colors.playerFg
@@ -169,7 +169,7 @@ Control {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: mainInterface.showRemainingTime = !mainInterface.showRemainingTime
+            onClicked: MainCtx.showRemainingTime = !MainCtx.showRemainingTime
         }
     }
 

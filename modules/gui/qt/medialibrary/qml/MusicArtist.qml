@@ -42,7 +42,7 @@ FocusScope {
     readonly property int currentIndex: {
         if (!_currentView)
            return -1
-        else if (mainInterface.gridView)
+        else if (MainCtx.gridView)
            return _currentView.currentIndex
         else
            return headerItem.albumsListView.currentIndex
@@ -93,7 +93,7 @@ FocusScope {
             Loader {
                 id: albumsLoader
 
-                active: !mainInterface.gridView
+                active: !MainCtx.gridView
                 focus: true
                 sourceComponent: Column {
                     property alias albumsListView: albumsList
@@ -199,7 +199,7 @@ FocusScope {
     onActiveFocusChanged: {
         if (activeFocus && albumModel.count > 0 && !albumSelectionModel.hasSelection) {
             var initialIndex = 0
-            var albumsListView = mainInterface.gridView ? _currentView : headerItem.albumsListView
+            var albumsListView = MainCtx.gridView ? _currentView : headerItem.albumsListView
             if (albumsListView.currentIndex !== -1)
                 initialIndex = albumsListView.currentIndex
             albumSelectionModel.select(albumModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
@@ -219,7 +219,7 @@ FocusScope {
         if (initialIndex >= albumModel.count)
             initialIndex = 0
         albumSelectionModel.select(albumModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        var albumsListView = mainInterface.gridView ? _currentView : headerItem.albumsListView
+        var albumsListView = MainCtx.gridView ? _currentView : headerItem.albumsListView
         if (albumsListView) {
             albumsListView.currentIndex = initialIndex
             albumsListView.positionViewAtIndex(initialIndex, ItemView.Contain)
@@ -476,12 +476,12 @@ FocusScope {
 
         anchors.fill: parent
         focus: albumModel.count !== 0
-        initialItem: mainInterface.gridView ? gridComponent : tableComponent
+        initialItem: MainCtx.gridView ? gridComponent : tableComponent
 
         Connections {
-            target: mainInterface
+            target: MainCtx
             onGridViewChanged: {
-                if (mainInterface.gridView)
+                if (MainCtx.gridView)
                     view.replace(gridComponent)
                 else
                     view.replace(tableComponent)

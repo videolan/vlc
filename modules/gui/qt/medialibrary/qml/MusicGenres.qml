@@ -47,7 +47,7 @@ FocusScope {
     Component.onCompleted: loadView()
 
     function loadView() {
-        if (mainInterface.gridView) {
+        if (MainCtx.gridView) {
             view.replace(gridComponent)
         } else {
             view.replace(tableComponent)
@@ -295,16 +295,16 @@ FocusScope {
     Widgets.StackViewExt {
         id: view
 
-        initialItem: mainInterface.gridView ? gridComponent : tableComponent
+        initialItem: MainCtx.gridView ? gridComponent : tableComponent
 
         anchors.fill: parent
         focus: genreModel.count !== 0
     }
 
     Connections {
-        target: mainInterface
+        target: MainCtx
         onGridViewChanged: {
-            if (mainInterface.gridView) {
+            if (MainCtx.gridView) {
                 view.replace(gridComponent)
             } else {
                 view.replace(tableComponent)

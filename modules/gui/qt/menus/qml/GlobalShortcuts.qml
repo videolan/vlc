@@ -18,6 +18,8 @@
 
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 Item {
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+O"; onActivated: dialogProvider.simpleOpenDialog(); }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Shift+O"; onActivated: dialogProvider.openFileDialog(); }
@@ -38,10 +40,10 @@ Item {
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+T"; onActivated: dialogProvider.gotoTimeDialog(); }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"F1";     onActivated: dialogProvider.helpDialog(); }
 
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Shift+W"; onActivated: dialogProvider.vlmDialog(); enabled: mainInterface.hasVLM; }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Shift+W"; onActivated: dialogProvider.vlmDialog(); enabled: MainCtx.hasVLM; }
 
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+L"; onActivated: mainInterface.playlistVisible = !mainInterface.playlistVisible; }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"F11"; onActivated: mainInterface.toggleInterfaceFullScreen(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+L"; onActivated: MainCtx.playlistVisible = !MainCtx.playlistVisible; }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"F11"; onActivated: MainCtx.toggleInterfaceFullScreen(); }
 
     Loader {
         active: !!medialib

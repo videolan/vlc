@@ -20,12 +20,14 @@
 pragma Singleton
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 Item {
     id: root
 
     property real uiTransluency: (enabled && topWindow.active) ? 1 : 0
 
-    enabled: mainInterface.hasAcrylicSurface
+    enabled: MainCtx.hasAcrylicSurface
 
     Behavior on uiTransluency {
         NumberAnimation {
@@ -36,7 +38,7 @@ Item {
 
     Binding {
         when: root.enabled
-        target: mainInterface
+        target: MainCtx
         property: "acrylicActive"
         value: root.uiTransluency != 0
 

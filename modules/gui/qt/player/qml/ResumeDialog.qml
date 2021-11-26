@@ -85,7 +85,7 @@ FocusScope {
     //drag and dbl click the titlebar in CSD mode
     Loader {
         anchors.fill: parent
-        active: mainInterface.clientSideDecoration
+        active: MainCtx.clientSideDecoration
         source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
     }
 
@@ -153,9 +153,9 @@ FocusScope {
 
             focus: false
             height: VLCStyle.icon_normal
-            active: mainInterface.clientSideDecoration
-            enabled: mainInterface.clientSideDecoration
-            visible: mainInterface.clientSideDecoration
+            active: MainCtx.clientSideDecoration
+            enabled: MainCtx.clientSideDecoration
+            visible: MainCtx.clientSideDecoration
             source: "qrc:///widgets/CSDWindowButtonSet.qml"
             onLoaded: {
                 item.color = Qt.binding(function() { return resumePanel.colors.playerFg })

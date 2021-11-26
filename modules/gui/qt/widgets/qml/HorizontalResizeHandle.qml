@@ -18,6 +18,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import "qrc:///style/"
+import org.videolan.vlc 0.1
 
 // targetWidth: concerned widget's current width
 // sourceWidth: target's width is bounded by this value (parent's width?)
@@ -42,12 +43,12 @@ MouseArea {
     acceptedButtons: Qt.LeftButton
 
     onPressed: {
-        mainInterface.setCursor(cursorShape)
+        MainCtx.setCursor(cursorShape)
         _previousX = mouseX
     }
 
     onReleased: {
-        mainInterface.restoreCursor()
+        MainCtx.restoreCursor()
     }
 
     onPositionChanged: {

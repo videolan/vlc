@@ -40,17 +40,17 @@ WindowDialog {
 
     Component.onCompleted: {
         // Save first, in case the dialog is rejected.
-        mainInterface.controlbarProfileModel.save(false)
+        MainCtx.controlbarProfileModel.save(false)
     }
 
     onAccepted: {
-        mainInterface.controlbarProfileModel.save()
+        MainCtx.controlbarProfileModel.save()
         unload()
     }
 
     onRejected: {
         // Load saved to discard the changes
-        mainInterface.controlbarProfileModel.reload()
+        MainCtx.controlbarProfileModel.reload()
         unload()
     }
 
@@ -103,25 +103,25 @@ WindowDialog {
                     displayText: {
                         var text
 
-                        if (!!mainInterface.controlbarProfileModel.currentModel)
-                            text = mainInterface.controlbarProfileModel.currentModel.name
+                        if (!!MainCtx.controlbarProfileModel.currentModel)
+                            text = MainCtx.controlbarProfileModel.currentModel.name
                         else {
                             text = "N/A"
                             return text
                         }
 
-                        if (mainInterface.controlbarProfileModel.currentModel.dirty)
+                        if (MainCtx.controlbarProfileModel.currentModel.dirty)
                             return _markDirty(text)
                         else
                             return text
                     }
 
-                    model: mainInterface.controlbarProfileModel
+                    model: MainCtx.controlbarProfileModel
 
-                    currentIndex: mainInterface.controlbarProfileModel.selectedProfile
+                    currentIndex: MainCtx.controlbarProfileModel.selectedProfile
 
                     onCurrentIndexChanged: {
-                        mainInterface.controlbarProfileModel.selectedProfile = currentIndex
+                        MainCtx.controlbarProfileModel.selectedProfile = currentIndex
                     }
 
                     Accessible.name: i18n.qtr("Profiles")
@@ -139,8 +139,8 @@ WindowDialog {
                         if (!npDialog.ok)
                             return
 
-                        mainInterface.controlbarProfileModel.cloneSelectedProfile(npDialog.text)
-                        mainInterface.controlbarProfileModel.selectedProfile = (mainInterface.controlbarProfileModel.rowCount() - 1)
+                        MainCtx.controlbarProfileModel.cloneSelectedProfile(npDialog.text)
+                        MainCtx.controlbarProfileModel.selectedProfile = (MainCtx.controlbarProfileModel.rowCount() - 1)
                     }
 
                     toolTip.visible: hovered
@@ -153,7 +153,7 @@ WindowDialog {
                     iconText: VLCIcons.history
 
                     onClicked: {
-                        mainInterface.controlbarProfileModel.currentModel.injectDefaults(false)
+                        MainCtx.controlbarProfileModel.currentModel.injectDefaults(false)
                     }
 
                     toolTip.visible: hovered
@@ -164,7 +164,7 @@ WindowDialog {
                     iconText: VLCIcons.del
 
                     onClicked: {
-                          mainInterface.controlbarProfileModel.deleteSelectedProfile()
+                          MainCtx.controlbarProfileModel.deleteSelectedProfile()
                     }
 
                     toolTip.visible: hovered

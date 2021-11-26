@@ -102,10 +102,10 @@ FocusScope {
     //---------------------------------------------------------------------------------------------
 
     Connections {
-        target: mainInterface
+        target: MainCtx
 
         onGridViewChanged: {
-            if (mainInterface.gridView) view.replace(grid);
+            if (MainCtx.gridView) view.replace(grid);
             else                        view.replace(table);
         }
     }
@@ -193,7 +193,7 @@ FocusScope {
 
         anchors.fill: parent
 
-        initialItem: (mainInterface.gridView) ? grid : table
+        initialItem: (MainCtx.gridView) ? grid : table
 
         focus: (model.count !== 0)
     }

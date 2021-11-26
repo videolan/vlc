@@ -34,7 +34,7 @@ Widgets.IconControlButton {
     QmlGlobalMenu {
         id: contextMenu
 
-        ctx: mainInterface
+        ctx: MainCtx
 
         onAboutToShow: playerControlLayout.requestLockUnlockAutoHide(true, contextMenu)
         onAboutToHide: playerControlLayout.requestLockUnlockAutoHide(false, contextMenu)

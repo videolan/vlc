@@ -114,7 +114,7 @@ Control {
         anchors.fill: parent
         z: 1
 
-        active: mainInterface.playlistDocked
+        active: MainCtx.playlistDocked
 
         readonly property bool shown: (status === Loader.Ready) ? item.visible : false
 
@@ -336,7 +336,7 @@ Control {
             clip: true // else out of view items will overlap with surronding items
 
             model: PlaylistListModel {
-                playlistId: mainInterface.mainPlaylist
+                playlistId: MainCtx.mainPlaylist
             }
 
             fadeColor: background.usingAcrylic ? undefined

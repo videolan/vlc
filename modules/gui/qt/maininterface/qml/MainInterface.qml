@@ -53,18 +53,18 @@ Rectangle {
     Loader {
         id: playlistWindowLoader
         asynchronous: true
-        active: !mainInterface.playlistDocked && mainInterface.playlistVisible
+        active: !MainCtx.playlistDocked && MainCtx.playlistVisible
         source: "qrc:///playlist/PlaylistDetachedWindow.qml"
     }
     Connections {
         target: playlistWindowLoader.item
-        onClosing: mainInterface.playlistVisible = false
+        onClosing: MainCtx.playlistVisible = false
     }
 
 
     PlaylistControllerModel {
         id: mainPlaylistController
-        playlistPtr: mainInterface.mainPlaylist
+        playlistPtr: MainCtx.mainPlaylist
 
         onPlaylistInitialized: {
             root._playlistReady = true
@@ -177,10 +177,10 @@ Rectangle {
     }
 
     Loader {
-        active: (mainInterface.clientSideDecoration
+        active: (MainCtx.clientSideDecoration
                  &&
                  // NOTE: We don't want to steal the mouse when we are maximized or in fullscreen
-                 !((topWindow.visibility & Window.Maximized) || mainInterface.interfaceFullScreen))
+                 !((topWindow.visibility & Window.Maximized) || MainCtx.interfaceFullScreen))
 
         source: "qrc:///widgets/CSDMouseStealer.qml"
     }

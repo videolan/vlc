@@ -230,13 +230,13 @@ FocusScope {
         anchors.fill: parent
         visible: artistModel.count > 0
         focus: artistModel.count > 0
-        initialItem: mainInterface.gridView ? gridComponent : tableComponent
+        initialItem: MainCtx.gridView ? gridComponent : tableComponent
     }
 
     Connections {
-        target: mainInterface
+        target: MainCtx
         onGridViewChanged: {
-            if (mainInterface.gridView) {
+            if (MainCtx.gridView) {
                 view.replace(gridComponent)
             } else {
                 view.replace(tableComponent)

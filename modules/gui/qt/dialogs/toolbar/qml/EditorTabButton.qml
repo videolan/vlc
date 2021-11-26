@@ -18,6 +18,8 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
+import org.videolan.vlc 0.1
+
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
@@ -32,8 +34,8 @@ TabButton {
         text: {
             var text = mainPlayerControl.text
 
-            if (!!mainInterface.controlbarProfileModel.currentModel &&
-                    mainInterface.controlbarProfileModel.currentModel.getModel(mainPlayerControl.identifier).dirty)
+            if (!!MainCtx.controlbarProfileModel.currentModel &&
+                    MainCtx.controlbarProfileModel.currentModel.getModel(mainPlayerControl.identifier).dirty)
                 return _markDirty(text)
             else
                 return text

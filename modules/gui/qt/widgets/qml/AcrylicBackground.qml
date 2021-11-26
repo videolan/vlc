@@ -20,6 +20,8 @@
 
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///style/"
 
 // This Component uses layering, avoid adding children to this widget

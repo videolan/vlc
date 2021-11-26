@@ -19,10 +19,12 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 
+import org.videolan.vlc 0.1
+
 Item {
     id: root
 
-    property int csdSize: mainInterface.csdBorderSize
+    property int csdSize: MainCtx.csdBorderSize
 
     //private
     readonly property int _edgeVtHeight: g_root.height - root.csdSize * 2

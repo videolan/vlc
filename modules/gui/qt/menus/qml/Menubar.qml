@@ -72,7 +72,7 @@ Item {
 
     QmlMenuBar {
         id: menubar
-        ctx: mainInterface
+        ctx: MainCtx
         menubar: menubarLayout
 
         onMenuClosed: _menuIndex = -1

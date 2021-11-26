@@ -82,7 +82,7 @@ FocusScope {
 
             NetworkHomeDeviceListView {
                 id: deviceSection
-                ctx: mainInterface
+                ctx: MainCtx
                 sd_source: NetworkDeviceModel.CAT_DEVICES
 
                 width: flickable.width
@@ -117,7 +117,7 @@ FocusScope {
 
             NetworkHomeDeviceListView {
                 id: lanSection
-                ctx: mainInterface
+                ctx: MainCtx
                 sd_source: NetworkDeviceModel.CAT_LAN
 
                 width: flickable.width
