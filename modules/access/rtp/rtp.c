@@ -77,7 +77,8 @@ static void vlc_rtp_es_id_send(struct vlc_rtp_es *es, block_t *block)
 
     /* TODO: Don't set PCR here. Breaks multiple sources (in a session)
      * and more importantly eventually multiple sessions. */
-    es_out_SetPCR(ei->out, block->i_pts);
+    if (block->i_pts != VLC_TICK_INVALID)
+        es_out_SetPCR(ei->out, block->i_pts);
     es_out_Send(ei->out, ei->id, block);
 }
 
