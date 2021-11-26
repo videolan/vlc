@@ -57,7 +57,7 @@ Item {
         enabled: root.enabled
         visible: root.visible
 
-        ctx: mainctx
+        ctx: mainInterface
 
         //punch a transparent hole in the interface
         layer.enabled: true

@@ -110,7 +110,7 @@ FocusScope {
     VideoSurface {
         id: videoSurface
 
-        ctx: mainctx
+        ctx: mainInterface
         visible: rootPlayer.hasEmbededVideo
         enabled: rootPlayer.hasEmbededVideo
         anchors.fill: parent

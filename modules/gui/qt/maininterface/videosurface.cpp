@@ -139,15 +139,15 @@ VideoSurface::VideoSurface(QQuickItem* parent)
     connect(this, &VideoSurface::enabledChanged, this, &VideoSurface::updatePositionAndSize);
 }
 
-QmlMainContext*VideoSurface::getCtx()
+MainInterface* VideoSurface::getCtx()
 {
-    return m_mainCtx;
+    return m_ctx;
 }
 
-void VideoSurface::setCtx(QmlMainContext* mainctx)
+void VideoSurface::setCtx(MainInterface* ctx)
 {
-    m_mainCtx = mainctx;
-    emit ctxChanged(mainctx);
+    m_ctx = ctx;
+    emit ctxChanged(ctx);
 }
 
 QSize VideoSurface::getSourceSize() const
@@ -269,9 +269,9 @@ QSGNode*VideoSurface::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintN
 
     if (m_provider == nullptr)
     {
-        if (m_mainCtx == nullptr)
+        if (m_ctx == nullptr)
             return node;
-        m_provider =  m_mainCtx->getMainInterface()->getVideoSurfaceProvider();
+        m_provider =  m_ctx->getVideoSurfaceProvider();
         if (!m_provider)
             return node;
 

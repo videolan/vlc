@@ -40,7 +40,7 @@ public:
     bool hasVideoEmbed() const;
 
 signals:
-    void ctxChanged(QmlMainContext*);
+    void ctxChanged(MainInterface*);
     bool videoEnabledChanged(bool);
     bool hasVideoEmbedChanged(bool);
     void surfacePositionChanged(QPointF position);
@@ -66,15 +66,15 @@ protected:
 class VideoSurface : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+    Q_PROPERTY(MainInterface* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
     Q_PROPERTY(QSize sourceSize READ getSourceSize NOTIFY sourceSizeChanged FINAL)
     Q_PROPERTY(Qt::CursorShape cursorShape READ getCursorShape WRITE setCursorShape RESET unsetCursor FINAL)
 
 public:
     VideoSurface( QQuickItem* parent = nullptr );
 
-    QmlMainContext* getCtx();
-    void setCtx(QmlMainContext* mainctx);
+    MainInterface* getCtx();
+    void setCtx(MainInterface* ctx);
 
     QSize getSourceSize() const;
 
@@ -100,7 +100,7 @@ protected:
     virtual QSGNode* updatePaintNode(QSGNode *, QQuickItem::UpdatePaintNodeData *) override;
 
 signals:
-    void ctxChanged(QmlMainContext*);
+    void ctxChanged(MainInterface*);
     void sourceSizeChanged(QSize);
     void surfaceSizeChanged(QSizeF);
     void surfacePositionChanged(QPointF);
@@ -119,7 +119,7 @@ protected slots:
     void updatePositionAndSize();
 
 private:
-    QmlMainContext* m_mainCtx = nullptr;
+    MainInterface* m_ctx = nullptr;
 
     bool m_sourceSizeChanged = false;
     QSize m_sourceSize;
