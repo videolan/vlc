@@ -90,44 +90,6 @@ static const struct vlc_rtp_pt_operations rtp_audio_qcelp = {
     NULL, qcelp_init, codec_destroy, codec_decode,
 };
 
-/* PT=32
- * MPV: MPEG Video (RFC2250, §3.5)
- */
-static void *mpv_init(struct vlc_rtp_pt *pt)
-{
-    es_format_t fmt;
-
-    es_format_Init (&fmt, VIDEO_ES, VLC_CODEC_MPGV);
-    fmt.b_packetized = false;
-    return vlc_rtp_pt_request_es(pt, &fmt);
-}
-
-static void mpv_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
-{
-    if (block->i_buffer < 4)
-    {
-        block_Release (block);
-        return;
-    }
-
-    block->i_buffer -= 4; /* 32-bits RTP/MPV header */
-    block->p_buffer += 4;
-    block->i_dts = VLC_TICK_INVALID;
-#if 0
-    if (block->p_buffer[-3] & 0x4)
-    {
-        /* MPEG2 Video extension header */
-        /* TODO: shouldn't we skip this too ? */
-    }
-#endif
-    vlc_rtp_es_send(data, block);
-    (void) pt;
-}
-
-static const struct vlc_rtp_pt_operations rtp_video_mpv = {
-    NULL, mpv_init, codec_destroy, mpv_decode,
-};
-
 /* PT=33
  * MP2: MPEG TS (RFC2250, §2)
  */
@@ -188,9 +150,6 @@ static struct vlc_rtp_pt *vlc_rtp_pt_create(vlc_object_t *obj,
             pt->ops = &rtp_audio_gsm;
         else if (strcmp(desc->name, "QCELP") == 0)
             pt->ops = &rtp_audio_qcelp;
-    } else if (strcmp(desc->media->type, "video") == 0) {
-        if (strcmp(desc->name, "MPV") == 0)
-            pt->ops = &rtp_video_mpv;
     }
 
     if (strcmp(desc->name, "MP2T") == 0)
