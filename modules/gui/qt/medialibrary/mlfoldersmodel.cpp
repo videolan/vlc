@@ -19,6 +19,9 @@
 #include "mlfoldersmodel.hpp"
 #include <cassert>
 
+static const char* const ML_FOLDER_ADD_QUEUE = "ML_FOLDER_ADD_QUEUE";
+static const char* const ML_FOLDER_BAN_QUEUE = "ML_FOLDER_BAN_QUEUE";
+
 MLFoldersBaseModel::MLFoldersBaseModel( QObject *parent )
     : QAbstractListModel( parent )
     , m_ml_event_handle( nullptr , [this](vlc_ml_event_callback_t* cb ) {
@@ -102,13 +105,6 @@ void MLFoldersBaseModel::removeAt(int index)
 
 }
 
-void MLFoldersBaseModel::update()
-{
-    beginResetModel();
-    m_mrls = entryPoints();
-    endResetModel();
-}
-
 void MLFoldersBaseModel::onMlEvent( void* data , const vlc_ml_event_t* event )
 {
     auto self = static_cast<MLFoldersBaseModel *>( data );
@@ -120,20 +116,42 @@ void MLFoldersBaseModel::onMlEvent( void* data , const vlc_ml_event_t* event )
     }
 }
 
-std::vector<MLFoldersBaseModel::EntryPoint> MLFoldersModel::entryPoints() const
+void MLFoldersBaseModel::updateImpl(vlc_ml_folder_list_t* (*folderListFunc)( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params ))
 {
-    std::vector<MLFoldersBaseModel::EntryPoint> r;
+    if (m_updatePending)
+        return;
 
-    vlc_ml_folder_list_t* entrypoints = vlc_ml_list_entry_points( m_mediaLib->vlcMl(), nullptr );
-    if ( entrypoints != nullptr )
+    m_updatePending = true;
+    struct Ctx {
+        std::vector<MLFoldersBaseModel::EntryPoint> r;
+    };
+
+    m_mediaLib->runOnMLThread<Ctx>(this,
+    //ML thread
+    [folderListFunc](vlc_medialibrary_t* ml,  Ctx& ctx){
+        vlc_ml_folder_list_t* entrypoints = folderListFunc( ml, nullptr );
+        if ( entrypoints != nullptr )
+        {
+            for ( unsigned int i = 0; entrypoints && i < entrypoints->i_nb_items; i++ )
+                ctx.r.emplace_back( entrypoints->p_items[i] );
+            vlc_ml_release( entrypoints );
+        }
+    },
+    //UI thread
+    [this](quint64, Ctx& ctx)
     {
-        for ( unsigned int i = 0; entrypoints && i < entrypoints->i_nb_items; i++ )
-            r.emplace_back( entrypoints->p_items[i] );
-        vlc_ml_release( entrypoints );
-    }
-
-    return r;
+        beginResetModel();
+        m_mrls = std::move(ctx.r);
+        m_updatePending = false;
+        endResetModel();
+    });
 }
+
+void MLFoldersModel::update()
+{
+    updateImpl(vlc_ml_list_entry_points);
+}
+
 
 bool MLFoldersModel::failed(const vlc_ml_event_t *event) const
 {
@@ -153,37 +171,51 @@ bool MLFoldersModel::failed(const vlc_ml_event_t *event) const
 
 void MLFoldersModel::remove( const QUrl &mrl )
 {
-    vlc_ml_remove_folder( m_mediaLib->vlcMl() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
+    //UI data is updated on onMlEvent
+    m_mediaLib->runOnMLThread(this,
+    //ML thread
+    [mrl](vlc_medialibrary_t* ml){
+        vlc_ml_remove_folder( ml , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
+    },
+    ML_FOLDER_ADD_QUEUE);
 }
 
 void MLFoldersModel::add(const QUrl &mrl )
 {
-    vlc_ml_add_folder( m_mediaLib->vlcMl() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
+    //UI data is updated on onMlEvent
+    m_mediaLib->runOnMLThread(this,
+    //ML thread
+    [mrl](vlc_medialibrary_t* ml){
+        vlc_ml_add_folder( ml, qtu( mrl.toString( QUrl::FullyEncoded ) ) );
+    },
+    ML_FOLDER_ADD_QUEUE);
 }
 
 void MLBannedFoldersModel::remove(const QUrl &mrl)
 {
-    vlc_ml_unban_folder( m_mediaLib->vlcMl() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
+    //UI data is updated on onMlEvent
+    m_mediaLib->runOnMLThread(this,
+    //ML thread
+    [mrl](vlc_medialibrary_t* ml){
+        vlc_ml_unban_folder( ml , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
+    },
+    ML_FOLDER_BAN_QUEUE);
 }
 
 void MLBannedFoldersModel::add(const QUrl &mrl)
 {
-    vlc_ml_ban_folder( m_mediaLib->vlcMl() , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
+    //UI data is updated on onMlEvent
+    m_mediaLib->runOnMLThread(this,
+    //ML thread
+    [mrl](vlc_medialibrary_t* ml){
+        vlc_ml_ban_folder( ml , qtu( mrl.toString( QUrl::FullyEncoded ) ) );
+    },
+    ML_FOLDER_BAN_QUEUE);
 }
 
-std::vector<MLFoldersBaseModel::EntryPoint> MLBannedFoldersModel::entryPoints() const
+void MLBannedFoldersModel::update()
 {
-    std::vector<MLFoldersBaseModel::EntryPoint> r;
-
-    vlc_ml_folder_list_t* entrypoints = vlc_ml_list_banned_entry_points( m_mediaLib->vlcMl(), nullptr );
-    if ( entrypoints != nullptr )
-    {
-        for ( unsigned int i = 0; entrypoints && i < entrypoints->i_nb_items; i++ )
-            r.emplace_back( entrypoints->p_items[i] );
-        vlc_ml_release( entrypoints );
-    }
-
-    return r;
+    updateImpl(vlc_ml_list_banned_entry_points);
 }
 
 bool MLBannedFoldersModel::failed(const vlc_ml_event_t *event) const
