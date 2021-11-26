@@ -178,11 +178,11 @@ public:
     ByteVector readBlock(ulong length)
     {
         if(m_borked || m_seqReadLength >= m_seqReadLimit)
-           return ByteVector::null;
+            return {};
         ByteVector res(length, 0);
         ssize_t i_read = vlc_stream_Read( m_stream, res.data(), length);
         if (i_read < 0)
-            return ByteVector::null;
+            return {};
         else if ((size_t)i_read != length)
             res.resize(i_read);
         m_previousPos += i_read;
