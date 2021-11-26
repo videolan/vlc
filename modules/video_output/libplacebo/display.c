@@ -365,8 +365,8 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         subpicture_region_t *r = subpicture->p_region;
         for (int i = 0; i < num_regions; i++) {
             assert(r->p_picture->i_planes == 1);
-            struct pl_plane_data subdata;
-            if (!vlc_placebo_PlaneData(r->p_picture, &subdata, NULL))
+            struct pl_plane_data subdata[4];
+            if (!vlc_placebo_PlaneData(r->p_picture, subdata, NULL))
                 assert(!"Failed processing the subpicture_t into pl_plane_data!?");
 
             struct pl_overlay *overlay = &sys->overlays[i];
@@ -383,7 +383,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
                 .repr  = vlc_placebo_ColorRepr(&r->fmt),
             };
 
-            if (!pl_upload_plane(gpu, &overlay->plane, &sys->overlay_tex[i], &subdata)) {
+            if (!pl_upload_plane(gpu, &overlay->plane, &sys->overlay_tex[i], subdata)) {
                 msg_Err(vd, "Failed uploading subpicture region!");
                 num_regions = i; // stop here
                 break;
