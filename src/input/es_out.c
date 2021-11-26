@@ -1356,7 +1356,7 @@ static void EsOutProgramHandleClockSource( es_out_t *out, es_out_pgrm_t *p_pgrm 
             vlc_assert_unreachable();
     }
 
-    msg_Dbg( p_input, "program(%d): using clock source: '%s'\n",
+    msg_Dbg( p_input, "program(%d): using clock source: '%s'",
              p_pgrm->i_id, clock_source_str );
 }
 
