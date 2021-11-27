@@ -134,6 +134,27 @@ static const struct vlc_rtp_pt_operations rtp_pcm_ops = {
     rtp_pcm_release, rtp_pcm_init, rtp_pcm_destroy, rtp_pcm_decode,
 };
 
+
+static void *rtp_g722_init(struct vlc_rtp_pt *pt)
+{
+    struct rtp_pcm *sys = pt->opaque;
+    es_format_t fmt;
+
+    es_format_Init(&fmt, AUDIO_ES, VLC_CODEC_ADPCM_G722);
+    /* For historical reasons, the RTP clock rate is 8000 Hz
+     * but the sampling rate really is 16000 Hz. */
+    fmt.audio.i_rate = 16000;
+    fmt.audio.i_physical_channels = sys->channel_mask;
+    fmt.audio.i_channels = sys->channel_count;
+    aout_FormatPrepare(&fmt.audio);
+    return vlc_rtp_pt_request_es(pt, &fmt);
+}
+
+static const struct vlc_rtp_pt_operations rtp_g722_ops = {
+    rtp_pcm_release, rtp_g722_init, rtp_pcm_destroy, rtp_pcm_decode,
+};
+
+
 static void *rtp_g726_init(struct vlc_rtp_pt *pt)
 {
     struct rtp_pcm *sys = pt->opaque;
@@ -212,6 +233,11 @@ static int rtp_pcm_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
         fourcc = VLC_CODEC_MULAW; /* RFC3551 §4.5.14 */
         bits = 8;
 
+    } else if (vlc_ascii_strcasecmp(desc->name, "G722") == 0) {
+        fourcc = VLC_CODEC_ADPCM_G726; /* RFC33551 §4.5.2 */
+        bits = 8;
+        ops = &rtp_g722_ops;
+
     } else if (sscanf(desc->name, "G726-%u", &bits) == 1
             || sscanf(desc->name, "g726-%u", &bits) == 1) {
         fourcc = VLC_CODEC_ADPCM_G726; /* RFC33551 §4.5.4 */
@@ -270,7 +296,8 @@ vlc_module_begin()
     set_subcategory(SUBCAT_INPUT_DEMUX)
     set_rtp_parser_callback(rtp_pcm_open)
     add_shortcut("audio/L8", "audio/L16", "audio/L20", "audio/L24",
-                 "audio/DAT12", "audio/PCMA", "audio/PCMU", "audio/G726-16",
-                 "audio/G726-24", "audio/G726-32", "audio/G726-40")
-    /* TODO? DVI4, G722, VDVI */
+                 "audio/DAT12", "audio/PCMA", "audio/PCMU", "audio/G722",
+                 "audio/G726-16", "audio/G726-24", "audio/G726-32",
+                 "audio/G726-40")
+    /* TODO? DVI4, VDVI */
 vlc_module_end()
