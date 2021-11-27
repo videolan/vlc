@@ -90,31 +90,19 @@ static const struct vlc_rtp_pt_operations rtp_audio_qcelp = {
     NULL, qcelp_init, codec_destroy, codec_decode,
 };
 
-/* PT=33
- * MP2: MPEG TS (RFC2250, §2)
- */
-static void *ts_init(struct vlc_rtp_pt *pt)
-{
-    return vlc_rtp_pt_request_mux(pt, "ts");
-}
-
-static const struct vlc_rtp_pt_operations rtp_av_ts = {
-    NULL, ts_init, codec_destroy, codec_decode,
-};
-
 /* Not using SDP, we need to guess the payload format used */
 /* see http://www.iana.org/assignments/rtp-parameters */
 void rtp_autodetect(vlc_object_t *obj, rtp_session_t *session,
                     const struct vlc_rtp_pt_owner *restrict owner)
 {
     char type[] = "audio", proto[] = "RTP/AVP";
-    char format[] = "0 3 8 10 11 12 14 33";
+    char format[] = "0 3 8 10 11 12 14";
     struct vlc_sdp_media media = {
         .type = type, .port_count = 1, .proto = proto, .format = format };
 
     vlc_rtp_add_media_types(obj, session, &media, owner);
     strcpy(type, "video");
-    strcpy(format, "32");
+    strcpy(format, "32 33");
     vlc_rtp_add_media_types(obj, session, &media, owner);
 }
 
@@ -151,9 +139,6 @@ static struct vlc_rtp_pt *vlc_rtp_pt_create(vlc_object_t *obj,
         else if (strcmp(desc->name, "QCELP") == 0)
             pt->ops = &rtp_audio_qcelp;
     }
-
-    if (strcmp(desc->name, "MP2T") == 0)
-        pt->ops = &rtp_av_ts;
 
     if (pt->ops == NULL) {
         msg_Err(obj, "unsupported media type %s/%s", desc->media->type,
