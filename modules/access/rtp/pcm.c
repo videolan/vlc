@@ -101,6 +101,9 @@ static void rtp_pcm_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
     block->i_buffer = ((frames * frame_bits) + 7) / 8;
     block->i_dts = VLC_TICK_INVALID;
 
+    if (info->m)
+        block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+
     if (sys->channel_reorder) {
         block_t *reordered = block_Alloc(block->i_buffer);
 

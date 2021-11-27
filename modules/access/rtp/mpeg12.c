@@ -122,6 +122,9 @@ static void rtp_mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
     if (block->i_buffer == 0)
         goto drop;
 
+    if (info->m)
+        block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+
     *sys->frag_end = block;
     sys->frag_end = &block->p_next;
     sys->offset = offset + block->i_buffer;
