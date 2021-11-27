@@ -314,6 +314,33 @@ static const struct vlc_rtp_pt_operations rtp_mpv_ops = {
     NULL, rtp_mpv_init, rtp_mpv_destroy, rtp_mpv_decode,
 };
 
+/* video/MP2T: MPEG-2 Transport Stream */
+static void *rtp_mp2t_init(struct vlc_rtp_pt *pt)
+{
+    return vlc_rtp_pt_request_mux(pt, "ts");
+}
+
+static void rtp_mp2t_destroy(struct vlc_rtp_pt *pt, void *data)
+{
+    vlc_rtp_es_destroy(data);
+    (void) pt;
+}
+
+static void rtp_mp2t_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
+                            const struct vlc_rtp_pktinfo *restrict info)
+{
+    if (info->m) /* TODO: avoid stream/chained-demux to preserve flags */
+        block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+
+    block->i_buffer -= block->i_buffer % 188;
+    vlc_rtp_es_send(data, block);
+    (void) pt;
+}
+
+static const struct vlc_rtp_pt_operations rtp_mp2t_ops = {
+    NULL, rtp_mp2t_init, rtp_mp2t_destroy, rtp_mp2t_decode,
+};
+
 
 static int rtp_mpeg12_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
                         const struct vlc_sdp_pt *desc)
@@ -324,6 +351,8 @@ static int rtp_mpeg12_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
         pt->ops = &rtp_mpa_ops;
     else if (vlc_ascii_strcasecmp(desc->name, "MPV") == 0) /* RFC2250 §3.1 */
         pt->ops = &rtp_mpv_ops;
+    else if (vlc_ascii_strcasecmp(desc->name, "MP2T") == 0) /* RFC2250 §2 */
+        pt->ops = &rtp_mp2t_ops;
     else
         return VLC_ENOTSUP;
 
@@ -336,5 +365,5 @@ vlc_module_begin()
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_DEMUX)
     set_rtp_parser_callback(rtp_mpeg12_open)
-    add_shortcut("audio/MPA", "video/MPV")
+    add_shortcut("audio/MPA", "video/MPV", "video/MP2T")
 vlc_module_end()
