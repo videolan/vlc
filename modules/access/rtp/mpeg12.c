@@ -36,6 +36,8 @@
 #include "rtp.h"
 #include "../../packetizer/mpegaudio.h"
 
+#define MAX_PACKET_SIZE (1u << 18)
+
 /* audio/MPA: MPEG-1/2 Audio layer I/II/III ES */
 struct rtp_mpa {
     block_t *frags;
@@ -144,8 +146,13 @@ static void rtp_mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
                                   &brate, &samples, &maxsize, &layer);
         /* If the frame size is unknown due to free bit rate, then we can only
          * sense the completion of the frame when the next frame starts. */
-        if (frame_size <= 0)
+        if (frame_size <= 0) {
+            if (sys->offset >= MAX_PACKET_SIZE) {
+                vlc_warning(log, "oversized packet (%zu bytes)", sys->offset);
+                rtp_mpa_send(sys);
+            }
             break;
+        }
 
         if ((size_t)frame_size == sys->offset) {
             rtp_mpa_send(sys);
@@ -194,6 +201,7 @@ static const struct vlc_rtp_pt_operations rtp_mpa_ops = {
 struct rtp_mpv {
     block_t *frags;
     block_t **frag_end;
+    size_t size;
     struct vlc_rtp_es *es;
 };
 
@@ -205,6 +213,7 @@ static void *rtp_mpv_init(struct vlc_rtp_pt *pt)
 
     sys->frags = NULL;
     sys->frag_end = &sys->frags;
+    sys->size = 0;
 
     es_format_t fmt;
 
@@ -225,6 +234,7 @@ static void rtp_mpv_send(struct rtp_mpv *sys)
 
     sys->frags = NULL;
     sys->frag_end = &sys->frags;
+    sys->size = 0;
 }
 
 static void rtp_mpv_destroy(struct vlc_rtp_pt *pt, void *data)
@@ -300,7 +310,13 @@ static void rtp_mpv_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
     block->i_flags |= pic_types[EXTRACT(header, MPV_PT_MASK)];
     *sys->frag_end = block;
     sys->frag_end = &block->p_next;
+    sys->size += block->i_buffer;
 
+    if (sys->size >= MAX_PACKET_SIZE) {
+        vlc_warning(log, "oversized packet (%zu bytes)", sys->size);
+        rtp_mpv_send(sys); /* refuse to queue arbitrarily large packet */
+    }
+    else
     if (info->m)
         rtp_mpv_send(sys);
 
