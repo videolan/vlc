@@ -1,6 +1,8 @@
 /**
  * @file pcm.c
- * @brief Real-Time Protocol (RTP) linear and logarithmic audio
+ * @brief Real-Time Protocol (RTP) sample-based audio
+ * This files defines the same-based RTP payload formats (mostly from RFC3551)
+ * including linear, logarithmic and adaptive audio formats.
  */
 /*****************************************************************************
  * Copyright © 2021 Rémi Denis-Courmont
@@ -132,6 +134,26 @@ static const struct vlc_rtp_pt_operations rtp_pcm_ops = {
     rtp_pcm_release, rtp_pcm_init, rtp_pcm_destroy, rtp_pcm_decode,
 };
 
+static void *rtp_g726_init(struct vlc_rtp_pt *pt)
+{
+    struct rtp_pcm *sys = pt->opaque;
+    es_format_t fmt;
+
+    es_format_Init(&fmt, AUDIO_ES, VLC_CODEC_ADPCM_G726);
+    fmt.audio.i_rate = 8000;
+    fmt.audio.i_physical_channels = sys->channel_mask;
+    fmt.audio.i_channels = sys->channel_count;
+    /* By VLC convention, the decoder knows the bit depth from the bit rate. */
+    fmt.i_bitrate = sys->sample_bits * sys->channel_count * 8000;
+    aout_FormatPrepare(&fmt.audio);
+    return vlc_rtp_pt_request_es(pt, &fmt);
+}
+
+static const struct vlc_rtp_pt_operations rtp_g726_ops = {
+    rtp_pcm_release, rtp_g726_init, rtp_pcm_destroy, rtp_pcm_decode,
+};
+
+
 static const uint32_t channel_masks[] = {
     /* By default, there is only one channel. */
     AOUT_CHAN_CENTER,
@@ -164,6 +186,7 @@ static int rtp_pcm_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
 {
     vlc_fourcc_t fourcc;
     unsigned bits;
+    const struct vlc_rtp_pt_operations *ops = &rtp_pcm_ops;
 
     if (vlc_ascii_strcasecmp(desc->name, "L8") == 0) {
         fourcc = VLC_CODEC_U8; /* RFC3551 §4.5.10 */
@@ -188,6 +211,15 @@ static int rtp_pcm_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
     } else if (vlc_ascii_strcasecmp(desc->name, "PCMU") == 0) {
         fourcc = VLC_CODEC_MULAW; /* RFC3551 §4.5.14 */
         bits = 8;
+
+    } else if (sscanf(desc->name, "G726-%u", &bits) == 1
+            || sscanf(desc->name, "g726-%u", &bits) == 1) {
+        fourcc = VLC_CODEC_ADPCM_G726; /* RFC33551 §4.5.4 */
+        bits /= 8;
+        ops = &rtp_g726_ops;
+
+        if (unlikely(bits < 16 || bits % 8 || bits > 40))
+            return VLC_ENOTSUP;
 
     } else if (vlc_ascii_strcasecmp(desc->name, "DAT12") == 0) {
         fourcc = VLC_CODEC_DAT12; /* RFC3190 §3 */
@@ -227,7 +259,7 @@ static int rtp_pcm_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
     }
 
     pt->opaque = sys;
-    pt->ops = &rtp_pcm_ops;
+    pt->ops = ops;
     return VLC_SUCCESS;
 }
 
@@ -238,5 +270,7 @@ vlc_module_begin()
     set_subcategory(SUBCAT_INPUT_DEMUX)
     set_rtp_parser_callback(rtp_pcm_open)
     add_shortcut("audio/L8", "audio/L16", "audio/L20", "audio/L24",
-                 "audio/DAT12", "audio/PCMA", "audio/PCMU")
+                 "audio/DAT12", "audio/PCMA", "audio/PCMU", "audio/G726-16",
+                 "audio/G726-24", "audio/G726-32", "audio/G726-40")
+    /* TODO? DVI4, G722, VDVI */
 vlc_module_end()
