@@ -90,7 +90,8 @@ static void rtp_pcm_reorder(void *restrict out, const void *restrict in,
     }
 }
 
-static void rtp_pcm_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
+static void rtp_pcm_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
+                           const struct vlc_rtp_pktinfo *restrict info)
 {
     struct rtp_pcm *sys = pt->opaque;
     struct vlc_rtp_es *es = data;

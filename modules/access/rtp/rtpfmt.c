@@ -44,9 +44,10 @@ static void codec_destroy(struct vlc_rtp_pt *pt, void *data)
 }
 
 /* Send a packet to ES */
-static void codec_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
+static void codec_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
+                         const struct vlc_rtp_pktinfo *restrict info)
 {
-    (void) pt;
+    (void) pt; (void) info;
     block->i_dts = VLC_TICK_INVALID;
     vlc_rtp_es_send(data, block);
 }

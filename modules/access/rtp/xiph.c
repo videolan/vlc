@@ -127,7 +127,8 @@ static ssize_t xiph_header (void **pextra, const uint8_t *buf, size_t len)
     return extra_size;
 }
 
-static void xiph_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
+static void xiph_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
+                        const struct vlc_rtp_pktinfo *restrict info)
 {
     struct rtp_xiph_source *self = data;
     struct rtp_xiph *sys = pt->opaque;
@@ -262,6 +263,7 @@ static void xiph_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
         pkts--;
     }
 
+    (void) info;
 drop:
     block_Release (block);
 }

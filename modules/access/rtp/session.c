@@ -507,10 +507,15 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     if (block->i_buffer < skip)
         goto drop;
 
+    struct vlc_rtp_pktinfo pktinfo = {
+        .m = block->p_buffer[1] >> 7,
+        /* TODO: extension headers (e.g. AV-1 deps) */
+    };
+
     block->p_buffer += skip;
     block->i_buffer -= skip;
 
-    vlc_rtp_pt_decode(pt, src->pt.opaque, block);
+    vlc_rtp_pt_decode(pt, src->pt.opaque, block, &pktinfo);
     return;
 
 drop:

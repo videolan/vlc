@@ -90,7 +90,8 @@ static void rtp_mpa_destroy(struct vlc_rtp_pt *pt, void *data)
     (void) pt;
 }
 
-static void rtp_mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block)
+static void rtp_mpa_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
+                           const struct vlc_rtp_pktinfo *restrict info)
 {
     struct vlc_logger *log = pt->opaque;
     struct rtp_mpa *sys = data;

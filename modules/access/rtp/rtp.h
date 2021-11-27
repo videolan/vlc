@@ -55,7 +55,17 @@ struct vlc_sdp_pt {
 };
 
 /**
- * RTP payload format operations.
+ * RTP packet infos.
+ *
+ * This structure conveys infos extracted from the header of an RTP packet
+ * to payload format parsers.
+ */
+struct vlc_rtp_pktinfo {
+    bool m; /**< M bit from the RTP header */
+};
+
+/**
+ * RTP payload type operations.
  *
  * This structures contains the callbacks provided by an RTP payload format.
  */
@@ -101,8 +111,10 @@ struct vlc_rtp_pt_operations {
      * \param pt RTP payload format of the payload
      * \param data data pointer returned by init()
      * \param block payload of a received RTP packet
+     * \param info RTP packet header infos
      */
-    void (*decode)(struct vlc_rtp_pt *pt, void *data, block_t *block);
+    void (*decode)(struct vlc_rtp_pt *pt, void *data, block_t *block,
+                   const struct vlc_rtp_pktinfo *restrict info);
 };
 
 struct vlc_rtp_pt_owner;
@@ -177,11 +189,12 @@ static inline void vlc_rtp_pt_end(struct vlc_rtp_pt *pt, void *data)
  * This passes a data payload of an RTP packet to the instance of the
  * payload type specified in the packet (PT and SSRC fields).
  */
-static inline void vlc_rtp_pt_decode(struct vlc_rtp_pt *pt,
-                                     void *data, block_t *pkt)
+static inline
+void vlc_rtp_pt_decode(struct vlc_rtp_pt *pt, void *data, block_t *pkt,
+                       const struct vlc_rtp_pktinfo *restrict info)
 {
     assert(pt->ops->decode != NULL);
-    pt->ops->decode(pt, data, pkt);
+    pt->ops->decode(pt, data, pkt, info);
 }
 
 static inline
