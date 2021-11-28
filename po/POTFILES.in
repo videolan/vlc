@@ -1257,6 +1257,7 @@ modules/stream_out/smem.c
 modules/stream_out/stats.c
 modules/stream_out/standard.c
 modules/stream_out/transcode/transcode.c
+modules/stream_out/udp.c
 modules/text_renderer/freetype/fonts/fontconfig.c
 modules/text_renderer/freetype/freetype.c
 modules/text_renderer/nsspeechsynthesizer.m

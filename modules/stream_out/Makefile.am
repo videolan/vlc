@@ -30,6 +30,10 @@ libstream_out_transcode_plugin_la_SOURCES = \
 	stream_out/transcode/audio.c stream_out/transcode/video.c
 libstream_out_transcode_plugin_la_CFLAGS = $(AM_CFLAGS)
 libstream_out_transcode_plugin_la_LIBADD = $(LIBM)
+libstream_out_udp_plugin_la_SOURCES = \
+	stream_out/sdp_helper.c stream_out/sdp_helper.h \
+	stream_out/udp.c
+libstream_out_udp_plugin_la_LIBADD = $(SOCKET_LIBS)
 
 sout_LTLIBRARIES = \
 	libstream_out_dummy_plugin.la \
@@ -47,7 +51,8 @@ sout_LTLIBRARIES = \
 	libstream_out_record_plugin.la \
 	libstream_out_smem_plugin.la \
 	libstream_out_setid_plugin.la \
-	libstream_out_transcode_plugin.la
+	libstream_out_transcode_plugin.la \
+	libstream_out_udp_plugin.la
 
 if HAVE_DECKLINK
 libstream_out_sdi_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CPPFLAGS_decklinkoutput)
