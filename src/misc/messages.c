@@ -40,6 +40,7 @@
 #include <vlc_interface.h>
 #include <vlc_charset.h>
 #include <vlc_modules.h>
+#include "rcu.h"
 #include "../libvlc.h"
 
 static void vlc_LogSpam(vlc_object_t *obj)
@@ -303,9 +304,8 @@ static struct vlc_logger discard_log = { &discard_ops };
  * A message log that can be redirected live.
  */
 struct vlc_logger_switch {
-    struct vlc_logger *backend;
+    struct vlc_logger *_Atomic backend;
     struct vlc_logger frontend;
-    vlc_rwlock_t lock;
 };
 
 static void vlc_logswitch_vaLog(void *d, int type, const vlc_log_t *item,
@@ -316,10 +316,10 @@ static void vlc_logswitch_vaLog(void *d, int type, const vlc_log_t *item,
         container_of(logger, struct vlc_logger_switch, frontend);
     struct vlc_logger *backend;
 
-    vlc_rwlock_rdlock(&logswitch->lock);
-    backend = logswitch->backend;
+    vlc_rcu_read_lock();
+    backend = atomic_load_explicit(&logswitch->backend, memory_order_acquire);
     backend->ops->log(backend, type, item, format, ap);
-    vlc_rwlock_unlock(&logswitch->lock);
+    vlc_rcu_read_unlock();
 }
 
 static void vlc_logswitch_Close(void *d)
@@ -327,7 +327,8 @@ static void vlc_logswitch_Close(void *d)
     struct vlc_logger *logger = d;
     struct vlc_logger_switch *logswitch =
         container_of(logger, struct vlc_logger_switch, frontend);
-    struct vlc_logger *backend = logswitch->backend;
+    struct vlc_logger *backend = atomic_load_explicit(&logswitch->backend,
+                                                      memory_order_relaxed);
 
     backend->ops->destroy(backend);
     free(logswitch);
@@ -349,11 +350,9 @@ static void vlc_LogSwitch(vlc_logger_t *logger, vlc_logger_t *new_logger)
     if (new_logger == NULL)
         new_logger = &discard_log;
 
-    vlc_rwlock_wrlock(&logswitch->lock);
-    old_logger = logswitch->backend;
-    logswitch->backend = new_logger;
-    vlc_rwlock_unlock(&logswitch->lock);
-
+    old_logger = atomic_exchange_explicit(&logswitch->backend, new_logger,
+                                          memory_order_acq_rel);
+    vlc_rcu_synchronize();
     old_logger->ops->destroy(old_logger);
 }
 
@@ -364,8 +363,7 @@ static struct vlc_logger *vlc_LogSwitchCreate(void)
         return NULL;
 
     logswitch->frontend.ops = &switch_ops;
-    logswitch->backend = &discard_log;
-    vlc_rwlock_init(&logswitch->lock);
+    atomic_init(&logswitch->backend, &discard_log);
     return &logswitch->frontend;
 }
 
