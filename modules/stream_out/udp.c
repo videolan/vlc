@@ -222,6 +222,24 @@ static int Open(vlc_object_t *obj)
     const char *muxmod = "ts";
     int ret;
 
+    /* --sout '#std{...}' option backward compatibility */
+    if (strcmp(stream->psz_name, "std") == 0
+     || strcmp(stream->psz_name, "standard") == 0) {
+        config_chain_t *c = NULL;
+
+        for (c = stream->p_cfg; c != NULL; c = c->p_next)
+             if (strcmp(c->psz_name, "access") == 0)
+                 break;
+
+        if (c == NULL) /* default is file, not for us */
+            return VLC_ENOTSUP;
+        if (strcmp(c->psz_value, "udp"))
+            return VLC_ENOTSUP;
+
+        msg_Info(stream, "\"#standard{access=udp,mux=ts,...}\" is deprecated. "
+                 "Use \"#udp{...}\" instead.");
+    }
+
     config_ChainParse(stream, SOUT_CFG_PREFIX, chain_options, stream->p_cfg);
 
     char *dst = var_GetNonEmptyString(stream, SOUT_CFG_PREFIX "dst");
@@ -333,7 +351,7 @@ vlc_module_begin()
     set_shortname(N_("UDP"))
     set_description(N_("UDP stream output"))
     set_capability("sout output", 40)
-    add_shortcut("udp")
+    add_shortcut("standard", "std", "udp")
     set_category(CAT_SOUT)
     set_subcategory(SUBCAT_SOUT_STREAM)
 
