@@ -602,8 +602,11 @@ sout_stream_t *input_resource_RequestSout( input_resource_t *p_resource, const c
         /* Create a new one */
         p_resource->psz_sout = strdup(psz_sout);
 
-        if (likely(p_resource->psz_sout != NULL))
+        if (likely(p_resource->psz_sout != NULL)) {
             sout = sout_NewInstance(p_resource->p_parent, psz_sout);
+            if (sout == NULL)
+                free(p_resource->psz_sout);
+        }
     }
 #else
     sout = NULL;
