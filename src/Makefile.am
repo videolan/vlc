@@ -379,6 +379,8 @@ libvlccore_la_SOURCES = \
 	misc/interrupt.h \
 	misc/interrupt.c \
 	misc/keystore.c \
+	misc/rcu.h \
+	misc/rcu.c \
 	misc/renderer_discovery.c \
 	misc/threads.c \
 	misc/cpu.c \
