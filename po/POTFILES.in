@@ -221,7 +221,6 @@ modules/access_output/livehttp.c
 modules/access_output/rist.c
 modules/access_output/shout.c
 modules/access_output/srt.c
-modules/access_output/udp.c
 modules/arm_neon/chroma_yuv.c
 modules/arm_neon/volume.c
 modules/arm_neon/yuv_rgb.c

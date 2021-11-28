@@ -92,6 +92,10 @@ Stream output:
  * New SDI output with improved audio and ancillary support.
    Candidate for deprecation of decklink vout/aout modules.
  * Support for DLNA/UPNP renderers
+ * The "udp" access output module has been removed.
+   Please use the UDP stream output instead, e.g.:
+     Old: '#std{access=udp,mux=ts,dst=239.255.1.2:1234,sap}'
+     New: '#udp{dst=239.255.1.2:1234,sap}'
 
 Muxers:
  * MP4 files are no longer faststart by default
