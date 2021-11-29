@@ -55,6 +55,16 @@ struct info_category_t
     struct vlc_list infos; /**< Infos in the category */
 };
 
+/**
+ * Returns true if the category is hidden
+ *
+ * Infos from hidden categories should not be displayed directly by UI modules.
+ */
+static inline bool info_category_IsHidden(info_category_t *cat)
+{
+    return cat->psz_name[0] == '.';
+}
+
 enum input_item_type_e
 {
     ITEM_TYPE_UNKNOWN,
