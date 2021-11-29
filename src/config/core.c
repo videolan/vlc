@@ -76,16 +76,6 @@ bool config_IsSafe( const char *name )
     return (param != NULL) ? param->safe : false;
 }
 
-static module_config_t * config_FindConfigChecked( const char *psz_name )
-{
-    module_config_t *p_config = config_FindConfig( psz_name );
-#ifndef NDEBUG
-    if (p_config == NULL)
-        fprintf(stderr, "Unknown vlc configuration variable named %s\n", psz_name);
-#endif
-    return p_config;
-}
-
 int64_t config_GetInt(const char *name)
 {
     const struct vlc_param *param = vlc_param_Find(name);
