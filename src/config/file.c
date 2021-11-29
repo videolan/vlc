@@ -481,16 +481,18 @@ int config_SaveConfigFile (vlc_object_t *p_this)
             }
             else
             {
-                const char *psz_value = p_item->value.psz;
-                bool modified;
+                const char *val = p_item->value.psz;
+                const char *orig = p_item->orig.psz;
 
-                assert (IsConfigStringType (p_item->i_type));
+                if (val == NULL)
+                    val = "";
+                if (orig == NULL)
+                    orig = "";
 
-                modified = !!strcmp (psz_value ? psz_value : "",
-                                     p_item->orig.psz ? p_item->orig.psz : "");
-                config_Write (file, p_item->psz_text, N_("string"),
-                              !modified, p_item->psz_name, "%s",
-                              psz_value ? psz_value : "");
+                assert(IsConfigStringType(p_item->i_type));
+                config_Write(file, p_item->psz_text, N_("string"),
+                             strcmp(val, orig) == 0, p_item->psz_name, "%s",
+                             val);
             }
         }
     }
