@@ -170,7 +170,7 @@ static struct vlc_param *vlc_config_create(vlc_plugin_t *plugin, int type)
         item->min.f = -FLT_MAX;
     }
     else
-        item->value.psz = NULL;
+        atomic_init(&param->value.str, NULL);
     item->i_type = type;
 
     if (CONFIG_ITEM(type))

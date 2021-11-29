@@ -37,6 +37,7 @@
 
 #include "configuration.h"
 #include "modules/modules.h"
+#include "misc/rcu.h"
 
 vlc_rwlock_t config_lock = VLC_STATIC_RWLOCK;
 atomic_bool config_dirty = ATOMIC_VAR_INIT(false);
@@ -107,20 +108,22 @@ float config_GetFloat(const char *name)
     return atomic_load_explicit(&param->value.f, memory_order_relaxed);
 }
 
-char *config_GetPsz(const char *psz_name)
+char *config_GetPsz(const char *name)
 {
-    module_config_t *p_config = config_FindConfigChecked( psz_name );
+    const struct vlc_param *param = vlc_param_Find(name);
+    char *str;
 
     /* sanity checks */
-    assert(p_config != NULL);
-    assert(IsConfigStringType (p_config->i_type));
+    assert(param != NULL);
+    assert(IsConfigStringType(param->item.i_type));
 
     /* return a copy of the string */
-    vlc_rwlock_rdlock (&config_lock);
-    char *psz_value = strdupnull (p_config->value.psz);
-    vlc_rwlock_unlock (&config_lock);
-
-    return psz_value;
+    vlc_rcu_read_lock();
+    str = atomic_load_explicit(&param->value.str, memory_order_acquire);
+    if (str != NULL)
+        str = strdup(str);
+    vlc_rcu_read_unlock();
+    return str;
 }
 
 int vlc_param_SetString(struct vlc_param *param, const char *value)
@@ -136,9 +139,10 @@ int vlc_param_SetString(struct vlc_param *param, const char *value)
             return -1;
     }
 
-    oldstr = param->item.value.psz;
+    oldstr = atomic_load_explicit(&param->value.str, memory_order_relaxed);
+    atomic_store_explicit(&param->value.str, str, memory_order_release);
     param->item.value.psz = str;
-
+    vlc_rcu_synchronize();
     free(oldstr);
     return 0;
 }
@@ -479,11 +483,13 @@ void config_Free(struct vlc_param *tab, size_t confsize)
 {
     for (size_t j = 0; j < confsize; j++)
     {
-        module_config_t *p_item = &tab[j].item;
+        struct vlc_param *param = &tab[j];
+        module_config_t *p_item = &param->item;
 
         if (IsConfigStringType (p_item->i_type))
         {
-            free (p_item->value.psz);
+            free(atomic_load_explicit(&param->value.str,
+                                      memory_order_relaxed));
             if (p_item->list_count)
                 free (p_item->list.psz);
         }

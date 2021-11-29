@@ -47,6 +47,7 @@
 
 #include "configuration.h"
 #include "modules/modules.h"
+#include "misc/rcu.h"
 
 static inline char *strdupnull (const char *src)
 {
@@ -390,9 +391,6 @@ int config_SaveConfigFile (vlc_object_t *p_this)
         }
     }
 
-    /* Configuration lock must be taken before vlcrc serializer below. */
-    vlc_rwlock_rdlock (&config_lock);
-
     /* The temporary configuration file is per-PID. Therefore this function
      * should be serialized against itself within a given process. */
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
@@ -401,7 +399,6 @@ int config_SaveConfigFile (vlc_object_t *p_this)
     int fd = vlc_open (temporary, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR);
     if (fd == -1)
     {
-        vlc_rwlock_unlock (&config_lock);
         vlc_mutex_unlock (&lock);
         goto error;
     }
@@ -410,7 +407,6 @@ int config_SaveConfigFile (vlc_object_t *p_this)
     {
         msg_Err (p_this, "cannot create configuration file: %s",
                  vlc_strerror_c(errno));
-        vlc_rwlock_unlock (&config_lock);
         vlc_close (fd);
         vlc_mutex_unlock (&lock);
         goto error;
@@ -430,9 +426,7 @@ int config_SaveConfigFile (vlc_object_t *p_this)
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t baseloc = uselocale (loc);
 
-    /* We would take the config lock here. But this would cause a lock
-     * inversion with the serializer above and config_AutoSaveConfigFile().
-    vlc_rwlock_rdlock (&config_lock);*/
+    vlc_rcu_read_lock(); /* preserve string values */
 
     /* Look for the selected module, if NULL then save everything */
     for (vlc_plugin_t *p = vlc_plugins; p != NULL; p = p->next)
@@ -481,7 +475,8 @@ int config_SaveConfigFile (vlc_object_t *p_this)
             }
             else
             {
-                const char *val = p_item->value.psz;
+                const char *val = atomic_load_explicit(&param->value.str,
+                                                       memory_order_relaxed);
                 const char *orig = p_item->orig.psz;
 
                 if (val == NULL)
@@ -496,7 +491,7 @@ int config_SaveConfigFile (vlc_object_t *p_this)
             }
         }
     }
-    vlc_rwlock_unlock (&config_lock);
+    vlc_rcu_read_unlock();
 
     if (loc != (locale_t)0)
     {
