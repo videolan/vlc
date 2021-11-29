@@ -225,16 +225,14 @@ static bool VideoFormatIsCropArEqual(video_format_t *dst,
 static void vout_UpdateWindowSizeLocked(vout_thread_sys_t *vout)
 {
     vout_thread_sys_t *sys = vout;
-    unsigned width, height;
 
     if (unlikely(sys->original.i_chroma == 0))
         return; /* not started yet, postpone size computaton */
 
     vlc_mutex_assert(&sys->window_lock);
-    vout_display_SizeWindow(&width, &height, &sys->original, &sys->source.dar,
-                            &sys->source.crop, &sys->display_cfg.display);
-    msg_Dbg(&vout->obj, "requested window size: %ux%u", width, height);
-    vlc_window_SetSize(sys->display_cfg.window, width, height);
+    vout_display_ResizeWindow(sys->display_cfg.window, &sys->original,
+                              &sys->source.dar, &sys->source.crop,
+                              &sys->display_cfg.display);
 }
 
 /* */

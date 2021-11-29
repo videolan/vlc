@@ -23,9 +23,8 @@ struct vout_crop;
 vlc_window_t *vout_display_window_New(vout_thread_t *);
 void vout_display_window_Delete(vlc_window_t *);
 
-void vout_display_SizeWindow(unsigned *restrict width,
-                             unsigned *restrict height,
-                             const video_format_t *restrict original,
-                             const vlc_rational_t *restrict dar,
-                             const struct vout_crop *restrict crop,
-                             const struct vout_display_placement *restrict dp);
+void vout_display_ResizeWindow(vlc_window_t *,
+                               const video_format_t *restrict original,
+                               const vlc_rational_t *restrict dar,
+                               const struct vout_crop *restrict crop,
+                               const struct vout_display_placement *restrict dp);

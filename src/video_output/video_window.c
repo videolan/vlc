@@ -194,6 +194,7 @@ static const struct vlc_window_callbacks vout_display_window_cbs = {
     .output_event = vout_display_window_OutputEvent,
 };
 
+static
 void vout_display_SizeWindow(unsigned *restrict width,
                              unsigned *restrict height,
                              const video_format_t *restrict original,
@@ -276,6 +277,19 @@ void vout_display_SizeWindow(unsigned *restrict width,
     /* If neither width nor height are forced, use the requested zoom. */
     *width = (w * dp->zoom.num) / dp->zoom.den;
     *height = (h * dp->zoom.num) / dp->zoom.den;
+}
+
+void vout_display_ResizeWindow(struct vlc_window *window,
+                               const video_format_t *restrict original,
+                               const vlc_rational_t *restrict dar,
+                               const struct vout_crop *restrict crop,
+                               const struct vout_display_placement *restrict cfg)
+{
+    unsigned width, height;
+
+    vout_display_SizeWindow(&width, &height, original, dar, crop, cfg);
+    msg_Dbg(window, "requested window size: %ux%u", width, height);
+    vlc_window_SetSize(window, width, height);
 }
 
 /**
