@@ -41,7 +41,6 @@
 #include <libvlc.h>
 
 #include "display.h"
-#include "window.h"
 #include "vout_internal.h"
 
 /*****************************************************************************
