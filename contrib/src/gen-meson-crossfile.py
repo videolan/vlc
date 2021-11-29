@@ -34,6 +34,7 @@ if os.environ.get('HOST_SYSTEM') == 'darwin':
 _add_environ_val('ar', 'AR')
 _add_environ_val('strip', 'STRIP')
 _add_environ_val('pkgconfig', 'PKG_CONFIG')
+_add_environ_val('pkg_config_libdir', 'PKG_CONFIG_LIBDIR')
 _add_environ_val('windres', 'WINDRES')
 
 # Properties section
