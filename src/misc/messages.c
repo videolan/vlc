@@ -329,9 +329,7 @@ static void vlc_LogSwitchClose(void *d)
         container_of(logger, struct vlc_logger_switch, frontend);
     struct vlc_logger *backend = logswitch->backend;
 
-    logswitch->backend = &discard_log;
     backend->ops->destroy(backend);
-
     free(logswitch);
 }
 
