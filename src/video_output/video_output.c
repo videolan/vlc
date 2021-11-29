@@ -266,25 +266,28 @@ static void vout_SizeWindow(vout_thread_sys_t *vout,
                             unsigned *restrict height)
 {
     vout_thread_sys_t *sys = vout;
+    const vlc_rational_t *dar = &sys->source.dar;
+    const struct vout_crop *crop = &sys->source.crop;
+    const vout_display_cfg_t *cfg = &sys->display_cfg;
     unsigned w = original->i_visible_width;
     unsigned h = original->i_visible_height;
     unsigned sar_num = original->i_sar_num;
     unsigned sar_den = original->i_sar_den;
 
-    if (sys->source.dar.num > 0 && sys->source.dar.den > 0) {
-        unsigned num = sys->source.dar.num * h;
-        unsigned den = sys->source.dar.den * w;
+    if (dar->num > 0 && dar->den > 0) {
+        unsigned num = dar->num * h;
+        unsigned den = dar->den * w;
 
         vlc_ureduce(&sar_num, &sar_den, num, den, 0);
     }
 
-    switch (sys->source.crop.mode) {
+    switch (crop->mode) {
         case VOUT_CROP_NONE:
             break;
 
         case VOUT_CROP_RATIO: {
-            unsigned num = sys->source.crop.ratio.num;
-            unsigned den = sys->source.crop.ratio.den;
+            unsigned num = crop->ratio.num;
+            unsigned den = crop->ratio.den;
 
             if (w * den > h * num)
                 w = h * num / den;
@@ -294,20 +297,19 @@ static void vout_SizeWindow(vout_thread_sys_t *vout,
         }
 
         case VOUT_CROP_WINDOW:
-            w = sys->source.crop.window.width;
-            h = sys->source.crop.window.height;
+            w = crop->window.width;
+            h = crop->window.height;
             break;
 
         case VOUT_CROP_BORDER:
-            w = sys->source.crop.border.right - sys->source.crop.border.left;
-            h = sys->source.crop.border.bottom - sys->source.crop.border.top;
+            w = crop->border.right - crop->border.left;
+            h = crop->border.bottom - crop->border.top;
             break;
     }
 
     /* If the vout thread is running, the window lock must be held here. */
     vout_display_SizeWindow(width, height, w, h, sar_num, sar_den,
-                            original->orientation,
-                            &sys->display_cfg);
+                            original->orientation, cfg);
 }
 
 static void vout_UpdateWindowSizeLocked(vout_thread_sys_t *vout)
