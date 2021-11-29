@@ -186,7 +186,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t baseloc = uselocale (loc);
 
-    vlc_rwlock_wrlock (&config_lock);
+    vlc_mutex_lock(&config_lock);
     while ((linelen = getline (&line, &bufsize, file)) != -1)
     {
         line[linelen - 1] = '\0'; /* trim newline */
@@ -257,7 +257,7 @@ int config_LoadConfigFile( vlc_object_t *p_this )
                 break;
         }
     }
-    vlc_rwlock_unlock (&config_lock);
+    vlc_mutex_unlock(&config_lock);
     free (line);
 
     if (ferror (file))

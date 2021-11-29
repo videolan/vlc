@@ -39,7 +39,7 @@
 #include "modules/modules.h"
 #include "misc/rcu.h"
 
-vlc_rwlock_t config_lock = VLC_STATIC_RWLOCK;
+vlc_mutex_t config_lock = VLC_STATIC_MUTEX;
 atomic_bool config_dirty = ATOMIC_VAR_INIT(false);
 
 static inline char *strdupnull (const char *src)
@@ -139,9 +139,9 @@ int vlc_param_SetString(struct vlc_param *param, const char *value)
 
 void config_PutPsz(const char *psz_name, const char *psz_value)
 {
-    vlc_rwlock_wrlock (&config_lock);
+    vlc_mutex_lock(&config_lock);
     vlc_param_SetString(vlc_param_Find(psz_name), psz_value);
-    vlc_rwlock_unlock (&config_lock);
+    vlc_mutex_unlock(&config_lock);
     atomic_store_explicit(&config_dirty, true, memory_order_release);
 }
 
@@ -160,9 +160,9 @@ void config_PutInt(const char *name, int64_t i_value)
         i_value = p_config->max.i;
 
     atomic_store_explicit(&param->value.i, i_value, memory_order_relaxed);
-    vlc_rwlock_wrlock (&config_lock);
+    vlc_mutex_lock(&config_lock);
     p_config->value.i = i_value;
-    vlc_rwlock_unlock (&config_lock);
+    vlc_mutex_unlock(&config_lock);
     atomic_store_explicit(&config_dirty, true, memory_order_release);
 }
 
@@ -184,9 +184,9 @@ void config_PutFloat(const char *name, float f_value)
         f_value = p_config->max.f;
 
     atomic_store_explicit(&param->value.f, f_value, memory_order_relaxed);
-    vlc_rwlock_wrlock (&config_lock);
+    vlc_mutex_lock(&config_lock);
     p_config->value.f = f_value;
-    vlc_rwlock_unlock (&config_lock);
+    vlc_mutex_unlock(&config_lock);
     atomic_store_explicit(&config_dirty, true, memory_order_release);
 }
 
@@ -492,7 +492,7 @@ void config_Free(struct vlc_param *tab, size_t confsize)
 
 void config_ResetAll(void)
 {
-    vlc_rwlock_wrlock (&config_lock);
+    vlc_mutex_lock(&config_lock);
     for (vlc_plugin_t *p = vlc_plugins; p != NULL; p = p->next)
     {
         for (size_t i = 0; i < p->conf.size; i++ )
@@ -518,6 +518,6 @@ void config_ResetAll(void)
                 vlc_param_SetString(param, p_config->orig.psz);
         }
     }
-    vlc_rwlock_unlock (&config_lock);
+    vlc_mutex_lock(&config_lock);
     atomic_store_explicit(&config_dirty, true, memory_order_release);
 }
