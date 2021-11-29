@@ -223,8 +223,8 @@ static void vout_UpdateWindowSizeLocked(vout_thread_sys_t *vout)
         return; /* not started yet, postpone size computaton */
 
     vlc_mutex_assert(&sys->window_lock);
-    vout_SizeWindow(&width, &height, &sys->original, &sys->source.dar,
-                    &sys->source.crop, &sys->display_cfg);
+    vout_display_SizeWindow(&width, &height, &sys->original, &sys->source.dar,
+                            &sys->source.crop, &sys->display_cfg);
     msg_Dbg(&vout->obj, "requested window size: %ux%u", width, height);
     vout_window_SetSize(sys->display_cfg.window, width, height);
 }
@@ -2032,7 +2032,7 @@ static int EnableWindowLocked(vout_thread_sys_t *vout, const video_format_t *ori
 #endif
         };
 
-        vout_SizeWindow(&wcfg.width, &wcfg.height, original, &sys->source.dar,
+        vout_display_SizeWindow(&wcfg.width, &wcfg.height, original, &sys->source.dar,
                         &sys->source.crop, &sys->display_cfg);
 
         if (vout_window_Enable(sys->display_cfg.window, &wcfg)) {

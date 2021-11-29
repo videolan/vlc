@@ -194,14 +194,7 @@ static const struct vout_window_callbacks vout_display_window_cbs = {
     .output_event = vout_display_window_OutputEvent,
 };
 
-static void vout_display_SizeWindow(unsigned *restrict width,
-                                    unsigned *restrict height,
-                                    unsigned w, unsigned h,
-                                    unsigned sar_num, unsigned sar_den,
-                                    video_orientation_t orientation,
-                                    const vout_display_cfg_t *restrict cfg);
-
-void vout_SizeWindow(unsigned *restrict width,
+void vout_display_SizeWindow(unsigned *restrict width,
                              unsigned *restrict height,
                              const video_format_t *restrict original,
                              const vlc_rational_t *restrict dar,
@@ -246,18 +239,6 @@ void vout_SizeWindow(unsigned *restrict width,
             break;
     }
 
-    /* If the vout thread is running, the window lock must be held here. */
-    vout_display_SizeWindow(width, height, w, h, sar_num, sar_den,
-                            original->orientation, cfg);
-}
-
-static void vout_display_SizeWindow(unsigned *restrict width,
-                                    unsigned *restrict height,
-                                    unsigned w, unsigned h,
-                                    unsigned sar_num, unsigned sar_den,
-                                    video_orientation_t orientation,
-                                    const vout_display_cfg_t *restrict cfg)
-{
     *width = cfg->display.width;
     *height = cfg->display.height;
 
@@ -270,7 +251,7 @@ static void vout_display_SizeWindow(unsigned *restrict width,
     w = (w * sar_num) / sar_den;
 
     /* Adjust video size for orientation and pixel A/R. */
-    if (ORIENT_IS_SWAP(orientation)) {
+    if (ORIENT_IS_SWAP(original->orientation)) {
         unsigned x = w;
 
         w = h;
