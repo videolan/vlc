@@ -260,15 +260,13 @@ static void vout_display_SizeWindow(unsigned *restrict width,
     *height = (h * cfg->zoom.num) / cfg->zoom.den;
 }
 
-static void vout_SizeWindow(vout_thread_sys_t *vout,
-                            const video_format_t *original,
-                            unsigned *restrict width,
-                            unsigned *restrict height)
+static void vout_SizeWindow(unsigned *restrict width,
+                            unsigned *restrict height,
+                            const video_format_t *restrict original,
+                            const vlc_rational_t *restrict dar,
+                            const struct vout_crop *restrict crop,
+                            const vout_display_cfg_t *restrict cfg)
 {
-    vout_thread_sys_t *sys = vout;
-    const vlc_rational_t *dar = &sys->source.dar;
-    const struct vout_crop *crop = &sys->source.crop;
-    const vout_display_cfg_t *cfg = &sys->display_cfg;
     unsigned w = original->i_visible_width;
     unsigned h = original->i_visible_height;
     unsigned sar_num = original->i_sar_num;
@@ -321,7 +319,8 @@ static void vout_UpdateWindowSizeLocked(vout_thread_sys_t *vout)
         return; /* not started yet, postpone size computaton */
 
     vlc_mutex_assert(&sys->window_lock);
-    vout_SizeWindow(vout, &sys->original, &width, &height);
+    vout_SizeWindow(&width, &height, &sys->original, &sys->source.dar,
+                    &sys->source.crop, &sys->display_cfg);
     msg_Dbg(&vout->obj, "requested window size: %ux%u", width, height);
     vout_window_SetSize(sys->display_cfg.window, width, height);
 }
@@ -2129,7 +2128,8 @@ static int EnableWindowLocked(vout_thread_sys_t *vout, const video_format_t *ori
 #endif
         };
 
-        vout_SizeWindow(vout, original, &wcfg.width, &wcfg.height);
+        vout_SizeWindow(&wcfg.width, &wcfg.height, original, &sys->source.dar,
+                        &sys->source.crop, &sys->display_cfg);
 
         if (vout_window_Enable(sys->display_cfg.window, &wcfg)) {
             msg_Err(&vout->obj, "failed to enable window");
