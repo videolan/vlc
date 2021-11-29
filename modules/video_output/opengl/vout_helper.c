@@ -786,6 +786,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR_CORE(GenTextures);
     GET_PROC_ADDR_CORE(GetError);
     GET_PROC_ADDR_CORE(GetIntegerv);
+#ifndef USE_OPENGL_ES2
+    GET_PROC_ADDR_CORE(GetIntegeri_v);
+#endif
     GET_PROC_ADDR_CORE(GetString);
     GET_PROC_ADDR_CORE(PixelStorei);
     GET_PROC_ADDR_CORE(TexImage2D);
