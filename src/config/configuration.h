@@ -47,6 +47,8 @@ struct vlc_param {
  */
 struct vlc_param *vlc_param_Find(const char *name);
 
+int vlc_param_SetString(struct vlc_param *param, const char *value);
+
 int  config_AutoSaveConfigFile( vlc_object_t * );
 
 void config_Free(struct vlc_param *, size_t);

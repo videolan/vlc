@@ -169,6 +169,8 @@ static struct vlc_param *vlc_config_create(vlc_plugin_t *plugin, int type)
         item->max.f = FLT_MAX;
         item->min.f = -FLT_MAX;
     }
+    else
+        item->value.psz = NULL;
     item->i_type = type;
 
     if (CONFIG_ITEM(type))
@@ -347,8 +349,8 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
             if (IsConfigStringType (item->i_type))
             {
                 const char *value = va_arg (ap, const char *);
-                item->value.psz = value ? strdup (value) : NULL;
                 item->orig.psz = (char *)value;
+                vlc_param_SetString(param, value);
             }
             break;
         }

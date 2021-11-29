@@ -200,7 +200,8 @@ static int vlc_cache_load_config(struct vlc_param *param, block_t *file)
         const char *psz;
         LOAD_STRING(psz);
         cfg->orig.psz = (char *)psz;
-        cfg->value.psz = (psz != NULL) ? strdup (cfg->orig.psz) : NULL;
+        cfg->value.psz = NULL;
+        vlc_param_SetString(param, psz);
 
         if (cfg->list_count)
             cfg->list.psz = xmalloc (cfg->list_count * sizeof (char *));

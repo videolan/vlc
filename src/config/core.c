@@ -123,27 +123,32 @@ char *config_GetPsz(const char *psz_name)
     return psz_value;
 }
 
+int vlc_param_SetString(struct vlc_param *param, const char *value)
+{
+    char *str = NULL, *oldstr;
+
+    assert(param != NULL);
+    assert(IsConfigStringType(param->item.i_type));
+
+    if (value != NULL && value[0] != '\0') {
+        str = strdup(value);
+        if (unlikely(str == NULL))
+            return -1;
+    }
+
+    oldstr = param->item.value.psz;
+    param->item.value.psz = str;
+
+    free(oldstr);
+    return 0;
+}
+
 void config_PutPsz(const char *psz_name, const char *psz_value)
 {
-    module_config_t *p_config = config_FindConfigChecked( psz_name );
-
-    /* sanity checks */
-    assert(p_config != NULL);
-    assert(IsConfigStringType(p_config->i_type));
-
-    char *str, *oldstr;
-    if ((psz_value != NULL) && *psz_value)
-        str = strdup (psz_value);
-    else
-        str = NULL;
-
     vlc_rwlock_wrlock (&config_lock);
-    oldstr = (char *)p_config->value.psz;
-    p_config->value.psz = str;
+    vlc_param_SetString(vlc_param_Find(psz_name), psz_value);
     vlc_rwlock_unlock (&config_lock);
     atomic_store_explicit(&config_dirty, true, memory_order_release);
-
-    free (oldstr);
 }
 
 void config_PutInt(const char *name, int64_t i_value)
@@ -514,11 +519,7 @@ void config_ResetAll(void)
             }
             else
             if (IsConfigStringType (p_config->i_type))
-            {
-                free ((char *)p_config->value.psz);
-                p_config->value.psz =
-                        strdupnull (p_config->orig.psz);
-            }
+                vlc_param_SetString(param, p_config->orig.psz);
         }
     }
     vlc_rwlock_unlock (&config_lock);
