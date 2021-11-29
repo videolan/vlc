@@ -67,14 +67,16 @@ Widgets.GridItem {
         Widgets.VideoProgressBar {
             id: progressBar
 
-            visible: !root.highlighted && value > 0
-            value: model.progress > 0 ? model.progress : 0
             anchors {
                 bottom: parent.bottom
                 left: parent.left
                 right: parent.right
                 rightMargin: root.pictureRadius
             }
+
+            visible: (value > 0)
+
+            value: (model.progress > 0) ? model.progress : 0
         }
     }
 
