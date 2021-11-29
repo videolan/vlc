@@ -511,64 +511,6 @@ VLC_API int vlc_sem_timedwait(vlc_sem_t *sem, vlc_tick_t deadline) VLC_USED;
 
 /** @} */
 
-/**
- * \defgroup rwlock Read/write locks
- *
- * Read/write locks are a type of thread synchronization primitive meant to
- * protect access to data that is mostly read, and rarely written.
- * As long as no threads tries to acquire the lock for "writing", any number of
- * threads can acquire the lock for "reading".
- *
- * See also POSIX @c pthread_rwlock_t .
- *
- * @{
- */
-
-/**
- * Read/write lock.
- *
- * Storage space for a slim reader/writer lock.
- */
-typedef struct vlc_rwlock
-{
-    vlc_mutex_t   mutex;
-    vlc_cond_t    wait;
-    long          state;
-} vlc_rwlock_t;
-
-/**
- * Static initializer for (static) read/write lock.
- */
-#define VLC_STATIC_RWLOCK { VLC_STATIC_MUTEX, VLC_STATIC_COND, 0 }
-
-/**
- * Initializes a read/write lock.
- */
-VLC_API void vlc_rwlock_init(vlc_rwlock_t *);
-
-/**
- * Acquires a read/write lock for reading.
- *
- * \note Recursion is allowed.
- */
-VLC_API void vlc_rwlock_rdlock(vlc_rwlock_t *);
-
-/**
- * Acquires a read/write lock for writing. Recursion is not allowed.
- */
-VLC_API void vlc_rwlock_wrlock(vlc_rwlock_t *);
-
-/**
- * Releases a read/write lock.
- *
- * The calling thread must hold the lock. Otherwise behaviour is undefined.
- *
- * \note This function is not a cancellation point.
- */
-VLC_API void vlc_rwlock_unlock(vlc_rwlock_t *);
-
-/** @} */
-
 #ifndef __cplusplus
 /**
  * One-time initialization.
