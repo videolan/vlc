@@ -18,5 +18,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+struct vout_crop;
+
 vout_window_t *vout_display_window_New(vout_thread_t *);
 void vout_display_window_Delete(vout_window_t *);
+
+void vout_SizeWindow(unsigned *restrict width,
+                             unsigned *restrict height,
+                             const video_format_t *restrict original,
+                             const vlc_rational_t *restrict dar,
+                             const struct vout_crop *restrict crop,
+                             const vout_display_cfg_t *restrict cfg);
