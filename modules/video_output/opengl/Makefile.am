@@ -64,6 +64,11 @@ libglinterop_sw_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 endif
 endif
 
+if HAVE_ANDROID
+libglinterop_sw_plugin_la_LIBADD = libvlc_opengles.la
+libglinterop_sw_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
+endif
+
 ### OpenGL ###
 libgles2_plugin_la_SOURCES = video_output/opengl/display.c
 libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
