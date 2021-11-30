@@ -27,11 +27,29 @@ struct vout_window_sys_t {
  *     forward the events to the parent window owner
  */
 
+struct embed_ack_data {
+    void *opaque;
+    void (*ack)(struct vout_window_t *wnd, unsigned width, unsigned height, void *)
+};
+
+static void EmbedAckResize(struct vout_window_t *parent, unsigned width, unsigned height, void *opaque)
+{
+    struct vout_window_sys_t *sys = parent->sys;
+    vout_window_t *wnd = sys->embed_window;
+
+    struct embed_ack_data *ack_data = opaque;
+    if (ack_data->ack == NULL)
+        return;
+
+    ack_data->ack(wnd, width, height, ack_data->opaque);
+}
+
 static void EmbedResized(struct vout_window_t *wnd, unsigned width, unsigned height,
-                         void (*ack_cb)(struct vout_window_t *, void*), void *opaque)
+                         vout_window_ack_cb *ack_cb, void *opaque)
 {
     vout_window_t *parent = wnd->owner.sys;
-    vout_window_ReportSize(parent, width, height);
+    struct embed_ack_data data = { .opaque = opaque, .ack = ack_cb };
+    parent->owner.cbs->resized(parent, width, height, EmbedAckResize, &data);
 }
 
 static void EmbedClosed(struct vout_window_t *wnd)
