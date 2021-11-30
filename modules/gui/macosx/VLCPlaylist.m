@@ -228,6 +228,7 @@
     [_infoPlaylistMenuItem setTitle: _NS("Media Information...")];
     [_revealInFinderPlaylistMenuItem setTitle: _NS("Reveal in Finder")];
     [_addFilesToPlaylistMenuItem setTitle: _NS("Add File...")];
+    [_shufflePlaylistMenuItem setTitle: _NS("Shuffle playlist")];
 }
 
 - (void)playlistUpdated
@@ -451,6 +452,10 @@
         return [_outlineView numberOfSelectedRows] > 0;
     } else if ([item action] == @selector(showInfoPanel:)) {
         return [_outlineView numberOfSelectedRows] > 0;
+    } else if ([item action] == @selector(shufflePlaylist:)) {
+        return ([_outlineView numberOfRows] > 0 &&
+                [[self model] currentRootType] != ROOT_TYPE_MEDIALIBRARY &&
+                _model.editAllowed);
     }
 
     return YES;
@@ -679,6 +684,14 @@
         selectedRows = [_outlineView selectedRowIndexes];
         [selectedRows getIndexes:indexes maxCount:count inIndexRange:nil];
     }
+}
+
+- (IBAction)shufflePlaylist:(id)sender
+{
+    if ([[self model] currentRootType] == ROOT_TYPE_MEDIALIBRARY)
+        return;
+
+    [[self model] sortPlaylistBy:SORT_RANDOM withOrder:ORDER_NORMAL];
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event

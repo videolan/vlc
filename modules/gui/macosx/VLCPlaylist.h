@@ -37,6 +37,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *recursiveExpandPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *recursiveCollapsePlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *addFilesToPlaylistMenuItem;
+@property (readwrite, weak) IBOutlet NSMenuItem *shufflePlaylistMenuItem;
 
 @property (nonatomic, readwrite, weak) VLCPlaylistView *outlineView;
 @property (nonatomic, readwrite, weak) NSTableHeaderView *playlistHeaderView;
@@ -61,6 +62,7 @@
 - (IBAction)recursiveExpandOrCollapseNode:(id)sender;
 - (IBAction)showInfoPanel:(id)sender;
 - (IBAction)addFilesToPlaylist:(id)sender;
+- (IBAction)shufflePlaylist:(id)sender;
 
 - (NSArray *)draggedItems;
 

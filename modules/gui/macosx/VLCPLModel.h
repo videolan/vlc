@@ -74,6 +74,7 @@ typedef enum {
 - (void)playbackModeUpdated;
 
 // sorting / searching
+- (void)sortPlaylistBy:(int)mode withOrder:(int)order;
 - (void)sortForColumn:(NSString *)o_column withMode:(int)i_mode;
 
 - (void)searchUpdate:(NSString *)o_search;
