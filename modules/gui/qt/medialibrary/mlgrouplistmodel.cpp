@@ -44,9 +44,9 @@ static const int MLGROUPLISTMODEL_COVER_HEIGHT = 320 * 2;
 
 static const QHash<QByteArray, vlc_ml_sorting_criteria_t> criterias =
 {
-    {"id",   VLC_ML_SORTING_DEFAULT},
-    {"name", VLC_ML_SORTING_ALPHA},
-    {"date", VLC_ML_SORTING_INSERTIONDATE}
+    { "name",     VLC_ML_SORTING_ALPHA         },
+    { "duration", VLC_ML_SORTING_DURATION      },
+    { "date",     VLC_ML_SORTING_INSERTIONDATE }
 };
 
 //=================================================================================================
@@ -181,6 +181,8 @@ vlc_ml_sorting_criteria_t MLGroupListModel::roleToCriteria(int role) const /* ov
     {
         case GROUP_NAME:
             return VLC_ML_SORTING_ALPHA;
+        case GROUP_DURATION:
+            return VLC_ML_SORTING_DURATION;
         case GROUP_DATE:
             return VLC_ML_SORTING_INSERTIONDATE;
         default:
