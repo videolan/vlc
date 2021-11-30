@@ -233,7 +233,7 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     { VLC_CODEC_CLLC, AV_CODEC_ID_CLLC },
     { VLC_CODEC_MSS2, AV_CODEC_ID_MSS2 },
     { VLC_CODEC_VP9, AV_CODEC_ID_VP9 },
-#if LIBAVCODEC_VERSION_CHECK( 57, 26, 0, 83, 101 )
+#if LIBAVCODEC_VERSION_CHECK( 57, 83, 101 )
     { VLC_CODEC_AV1, AV_CODEC_ID_AV1 },
 #endif
     { VLC_CODEC_ICOD, AV_CODEC_ID_AIC },
@@ -290,7 +290,7 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     /* ffmpeg only: AV_CODEC_ID_SNOW */
     /* ffmpeg only: AV_CODEC_ID_SMVJPEG */
 
-#if LIBAVCODEC_VERSION_CHECK( 58, 0, 0, 1, 100 )
+#if LIBAVCODEC_VERSION_CHECK( 58, 1, 100 )
     { VLC_CODEC_MAGICYUV, AV_CODEC_ID_MAGICYUV },
 #endif
 

@@ -842,7 +842,7 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
             p_pic->format.multiview_mode = MULTIVIEW_2D;
             break;
         }
-#if LIBAVUTIL_VERSION_CHECK( 56, 7, 0, 4, 100 )
+#if LIBAVUTIL_VERSION_CHECK( 56, 4, 100 )
         p_pic->format.b_multiview_right_eye_first = stereo_data->flags & AV_STEREO3D_FLAG_INVERT;
         p_pic->b_multiview_left_eye = (stereo_data->view == AV_STEREO3D_VIEW_LEFT);
 
@@ -1080,7 +1080,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         vlc_mutex_lock(&p_sys->lock);
 
         /* Compute the PTS */
-#if LIBAVCODEC_VERSION_CHECK( 57, 24, 0, 61, 100 )
+#if LIBAVCODEC_VERSION_CHECK( 57, 61, 100 )
 # if LIBAVCODEC_VERSION_MICRO >= 100
         int64_t av_pts = frame->best_effort_timestamp;
 # else

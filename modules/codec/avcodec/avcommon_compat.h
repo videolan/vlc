@@ -28,13 +28,13 @@
 
 #include <libavcodec/avcodec.h>
 
-/* LIBAVCODEC_VERSION_CHECK checks for the right version of libav and FFmpeg
+/* LIBAVCODEC_VERSION_CHECK checks for the right version of FFmpeg
  * a is the major version
- * b and c the minor and micro versions of libav
- * d and e the minor and micro versions of FFmpeg */
-#define LIBAVCODEC_VERSION_CHECK( a, b, c, d, e ) \
-    ( (LIBAVCODEC_VERSION_MICRO <  100 && LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( a, b, c ) ) || \
-      (LIBAVCODEC_VERSION_MICRO >= 100 && LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( a, d, e ) ) )
+ * b is the minor version
+ * c is the micro version
+ */
+#define LIBAVCODEC_VERSION_CHECK( a, b, c ) \
+    (LIBAVCODEC_VERSION_MICRO >= 100 && LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( a, b, c ) )
 
 #ifndef AV_CODEC_FLAG_OUTPUT_CORRUPT
 # define AV_CODEC_FLAG_OUTPUT_CORRUPT CODEC_FLAG_OUTPUT_CORRUPT
@@ -78,20 +78,19 @@
 
 # include <libavutil/avutil.h>
 
-/* LIBAVUTIL_VERSION_CHECK checks for the right version of libav and FFmpeg
+/* LIBAVUTIL_VERSION_CHECK checks for the right version of FFmpeg
  * a is the major version
- * b and c the minor and micro versions of libav
- * d and e the minor and micro versions of FFmpeg */
-#define LIBAVUTIL_VERSION_CHECK( a, b, c, d, e ) \
-    ( (LIBAVUTIL_VERSION_MICRO <  100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( a, b, c ) ) || \
-      (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( a, d, e ) ) )
+ * b is the minor version
+ * c is the micro version
+ */
+#define LIBAVUTIL_VERSION_CHECK( a, b, c ) \
+    (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( a, b, c ) )
 
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
 # include <libavformat/avformat.h>
 
-#define LIBAVFORMAT_VERSION_CHECK( a, b, c, d, e ) \
-    ( (LIBAVFORMAT_VERSION_MICRO <  100 && LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( a, b, c ) ) || \
-      (LIBAVFORMAT_VERSION_MICRO >= 100 && LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( a, d, e ) ) )
+#define LIBAVFORMAT_VERSION_CHECK( a, b, c ) \
+    (LIBAVFORMAT_VERSION_MICRO >= 100 && LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( a, b, c ) )
 
 #endif
 
