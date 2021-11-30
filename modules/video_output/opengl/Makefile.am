@@ -50,6 +50,10 @@ if HAVE_GLES2
 vout_PLUGINS += libglinterop_sw_plugin.la
 endif
 
+if HAVE_GL
+vout_PLUGINS += libglinterop_sw_plugin.la
+endif
+
 if HAVE_DARWIN
 vout_PLUGINS += libglinterop_sw_plugin.la
 if HAVE_OSX
