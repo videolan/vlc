@@ -220,10 +220,6 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
     {
         fmt->i_frame_rate = ctx->framerate.num;
         fmt->i_frame_rate_base = ctx->framerate.den;
-# if LIBAVCODEC_VERSION_MICRO <  100
-        // for some reason libav don't thinkg framerate presents actually same thing as in ffmpeg
-        fmt->i_frame_rate_base *= __MAX(ctx->ticks_per_frame, 1);
-# endif
     }
     else if (ctx->time_base.num > 0 && ctx->time_base.den > 0)
     {
@@ -1081,11 +1077,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         /* Compute the PTS */
 #if LIBAVCODEC_VERSION_CHECK( 57, 61, 100 )
-# if LIBAVCODEC_VERSION_MICRO >= 100
         int64_t av_pts = frame->best_effort_timestamp;
-# else
-        int64_t av_pts = frame->pts;
-# endif
 #else
         int64_t av_pts = frame->pkt_pts;
 #endif
@@ -1634,8 +1626,7 @@ no_reuse:
     if (!can_hwaccel)
         return swfmt;
 
-#if (LIBAVCODEC_VERSION_MICRO >= 100) \
-  && (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 83, 101))
+#if LIBAVCODEC_VERSION_CHECK(57, 83, 101)
     if (p_context->active_thread_type)
     {
         msg_Warn(p_dec, "thread type %d: disabling hardware acceleration",
