@@ -1,21 +1,9 @@
 # FFmpeg
 
-#Uncomment the one you want
-#USE_LIBAV ?= 1
-#USE_FFMPEG ?= 1
-
-ifndef USE_LIBAV
 FFMPEG_HASH=dc91b913b6260e85e1304c74ff7bb3c22a8c9fb1
 FFMPEG_BRANCH=release/4.4
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
-USE_FFMPEG := 1
-else
-FFMPEG_HASH=e5afa1b556542fd7a52a0a9b409c80f2e6e1e9bb
-FFMPEG_BRANCH=
-FFMPEG_GITURL := git://git.libav.org/libav.git
-FFMPEG_LAVC_MIN := 57.16.0
-endif
 
 FFMPEG_BASENAME := $(subst .,_,$(subst \,_,$(subst /,_,$(FFMPEG_HASH))))
 
@@ -37,10 +25,7 @@ FFMPEGCONF = \
 	--disable-bzlib \
 	--disable-libvpx \
 	--disable-avresample \
-	--enable-bsf=vp9_superframe
-
-ifdef USE_FFMPEG
-FFMPEGCONF += \
+	--enable-bsf=vp9_superframe \
 	--disable-swresample \
 	--disable-iconv \
 	--disable-avisynth \
@@ -50,23 +35,12 @@ ifdef HAVE_DARWIN_OS
 FFMPEGCONF += \
 	--disable-securetransport
 endif
-endif
-
-# Disable VDA on macOS with libav
-ifdef USE_LIBAV
-ifdef HAVE_DARWIN_OS
-FFMPEGCONF += \
-	--disable-vda
-endif
-endif
 
 DEPS_ffmpeg = zlib gsm
 
-ifndef USE_LIBAV
 FFMPEGCONF += \
 	--enable-libopenjpeg
 DEPS_ffmpeg += openjpeg $(DEPS_openjpeg)
-endif
 
 # Optional dependencies
 ifndef BUILD_NETWORK
@@ -144,9 +118,7 @@ endif
 # Darwin
 ifdef HAVE_DARWIN_OS
 FFMPEGCONF += --arch=$(ARCH) --target-os=darwin --extra-cflags="$(CFLAGS)"
-ifdef USE_FFMPEG
 FFMPEGCONF += --disable-lzma
-endif
 ifeq ($(ARCH),x86_64)
 FFMPEGCONF += --cpu=core2
 endif
@@ -232,7 +204,6 @@ $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz:
 
 ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
 	$(UNPACK)
-ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
 	$(APPLY) $(SRC)/ffmpeg/dxva_vc1_crash.patch
 	$(APPLY) $(SRC)/ffmpeg/h264_early_SAR.patch
@@ -243,10 +214,6 @@ ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/0002-avcodec-mpeg12dec-don-t-end-a-slice-without-first_sl.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-fix-mf_utils-compilation-with-mingw64.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-vp9-Do-not-destroy-uninitialized-mutexes-con.patch
-endif
-ifdef USE_LIBAV
-	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch
-endif
 	$(APPLY) $(SRC)/ffmpeg/0001-ffmpeg-add-target_os-support-for-emscripten.patch
 	$(MOVE)
 
