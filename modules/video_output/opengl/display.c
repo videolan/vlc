@@ -245,8 +245,12 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(pic);
 
+    if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
+        return;
+
     /* Display */
     vlc_gl_Swap(sys->gl);
+    vlc_gl_ReleaseCurrent(sys->gl);
 }
 
 static int Control (vout_display_t *vd, int query)
