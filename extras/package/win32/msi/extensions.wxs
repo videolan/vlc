@@ -413,6 +413,14 @@
                         <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
                     </Extension>
                 </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".dav" Value="VLC.dav.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".dav" Value="" Type="string" />
+                <ProgId Id='VLC.dav.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='dav'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
                 <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".divx" Value="VLC.divx.Document" Type="string" />
                 <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".divx" Value="" Type="string" />
                 <ProgId Id='VLC.divx.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
