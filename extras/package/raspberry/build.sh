@@ -97,8 +97,6 @@ fi
 make -j$JOBS --output-sync=recurse
 cd ../..
 
-export USE_FFMPEG=1
-
 if [ "$INTERACTIVE" = "yes" ]; then
 if [ "x$SHELL" != "x" ]; then
     exec $SHELL
