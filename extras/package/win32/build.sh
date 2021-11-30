@@ -205,7 +205,6 @@ if [ ! -z "$BUILD_UCRT" ]; then
     fi
 fi
 
-export USE_FFMPEG=1
 export PATH="$PWD/contrib/$CONTRIB_PREFIX/bin":"$PATH"
 
 if [ "$INTERACTIVE" = "yes" ]; then
