@@ -84,7 +84,7 @@
  * c is the micro version
  */
 #define LIBAVUTIL_VERSION_CHECK( a, b, c ) \
-    (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( a, b, c ) )
+    (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( a, b, c ))
 
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
 # include <libavformat/avformat.h>

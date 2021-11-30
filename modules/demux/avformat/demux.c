@@ -485,18 +485,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
             psz_type = "video";
 
             AVRational rate;
-#if (LIBAVUTIL_VERSION_MICRO < 100) /* libav */
-# if (LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(55, 20, 0))
-            rate.num = s->time_base.num;
-            rate.den = s->time_base.den;
-# else
-            rate.num = s->codec->time_base.num;
-            rate.den = s->codec->time_base.den;
-# endif
-            rate.den *= __MAX( s->codec->ticks_per_frame, 1 );
-#else /* ffmpeg */
             rate = av_guess_frame_rate( p_sys->ic, s, NULL );
-#endif
             if( rate.den && rate.num )
             {
                 es_fmt.video.i_frame_rate = rate.num;
@@ -504,12 +493,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
             }
 
             AVRational ar;
-#if (LIBAVUTIL_VERSION_MICRO < 100) /* libav */
-            ar.num = s->sample_aspect_ratio.num;
-            ar.den = s->sample_aspect_ratio.den;
-#else
             ar = av_guess_sample_aspect_ratio( p_sys->ic, s, NULL );
-#endif
             if( ar.num && ar.den )
             {
                 es_fmt.video.i_sar_den = ar.den;
