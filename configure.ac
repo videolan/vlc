@@ -2479,32 +2479,12 @@ AS_HELP_STRING([--enable-merge-ffmpeg], [merge FFmpeg-based plugins (default dis
 ])
 AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
 
-AC_MSG_CHECKING([for libavutil variant])
-PKG_CHECK_EXISTS([libavutil], [
-  libavutil_version="$(${PKG_CONFIG} --modversion libavutil)"
-  libavutil_micro="${libavutil_version##*.}"
-  AS_IF([test ${libavutil_micro} -le 99], [
-    avfork="libav"
-  ], [
-    avfork="ffmpeg"
-  ])
-], [
-  avfork="none"
-])
-AC_MSG_RESULT([${avfork}])
-
 AC_ARG_ENABLE([avcodec],
 AS_HELP_STRING([--enable-avcodec], [libavcodec codec (default enabled)]))
 AS_IF([test "${enable_avcodec}" != "no"], [
-  dnl We need >=57.16.0 from libav or >=57.37.100 from ffmpeg
-  case "${avfork}" in
-    libav) av_codec_ver="57.16.0" ;;
-    dnl 05f66706d182eb0c36af54d72614bf4c33e957a9  includes libavutil 55.9.0
-    ffmpeg) av_codec_ver="57.37.100" ;;
-    dnl 7fc329e2dd6226dfecaa4a1d7adf353bf2773726  include libavutil 55.22.101
-    *) AC_MSG_ERROR([Missing libav or FFmpeg. Pass --disable-avcodec to ignore this error.])
-  esac
-  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= ${av_codec_ver} libavutil >= 55.9.0], [
+  dnl We need >=57.37.100 from ffmpeg
+  dnl 7fc329e2dd6226dfecaa4a1d7adf353bf2773726  include libavutil 55.22.101
+  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 57.37.100 libavutil >= 55.9.0], [
     have_avcodec="yes"
   ],[
     AC_MSG_ERROR([${AVCODEC_PKG_ERRORS}. Pass --disable-avcodec to ignore this error.])
@@ -3352,11 +3332,7 @@ AM_CONDITIONAL([HAVE_VDPAU], [test "${have_vdpau}" = "yes"])
 
 have_avcodec_vdpau="no"
 AS_IF([test "${have_vdpau}" = "yes" -a "${have_avcodec}" = "yes"], [
-  case "${avfork}" in
-    libav) av_vdpau_ver="56.10.0" ;;
-    ffmpeg) av_vdpau_ver="56.19.100" ;;
-  esac
-  PKG_CHECK_EXISTS([libavcodec >= ${av_vdpau_ver}], [
+  PKG_CHECK_EXISTS([libavcodec >= 56.19.100], [
     have_avcodec_vdpau="yes"
     AC_MSG_NOTICE([VDPAU decoding acceleration activated])
   ], [
