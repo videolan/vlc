@@ -238,6 +238,21 @@ static void subitem_added(const libvlc_event_t *event, void *user_data)
             assert (!subitems_found[i]);
             assert (libvlc_media_get_type(m) == test_media_subitems_list[i].type);
             subitems_found[i] = true;
+
+            uint64_t value;
+            int ret;
+
+            ret = libvlc_media_get_stat(m, libvlc_media_stat_size, &value);
+            assert(ret == 1);
+            /* All files size are 0, directory size is either 4096 or 0 */
+            if (libvlc_media_get_type(m) == libvlc_media_type_directory)
+                assert(value == 4096 || value == 0);
+            else
+                assert(value == 0);
+
+            ret = libvlc_media_get_stat(m, libvlc_media_stat_mtime, &value);
+            /* Epoch timestamp of the commit that added test/samples/subitems */
+            assert(ret == 1 && value >= 1446796477);
         }
     }
     free (mrl);
