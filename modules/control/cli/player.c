@@ -513,6 +513,9 @@ static int PlayerItemInfo(struct cli_client *cl, const char *const *args,
             info_category_t *category = item->pp_categories[i];
             info_t *info;
 
+            if (info_category_IsHidden(category))
+                continue;
+
             cli_printf(cl, "+----[ %s ]", category->psz_name);
             cli_printf(cl, "| ");
             info_foreach(info, &category->infos)
