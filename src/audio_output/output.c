@@ -893,6 +893,14 @@ int aout_MuteSet (audio_output_t *aout, bool mute)
     return ret ? -1 : 0;
 }
 
+const char *aout_NameGet (audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner (aout);
+    if (owner->module)
+        return module_get_name(owner->module, false);
+    return NULL;
+}
+
 /**
  * Gets the currently selected device.
  * \return the selected device ID (caller must free() it)

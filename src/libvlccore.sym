@@ -17,6 +17,7 @@ aout_VolumeSet
 aout_VolumeUpdate
 aout_MuteSet
 aout_MuteGet
+aout_NameGet
 aout_DeviceGet
 aout_DeviceSet
 aout_DevicesList

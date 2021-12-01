@@ -509,6 +509,7 @@ VLC_API int aout_MuteSet (audio_output_t *, bool);
 VLC_API char *aout_DeviceGet (audio_output_t *);
 VLC_API int aout_DeviceSet (audio_output_t *, const char *);
 VLC_API int aout_DevicesList (audio_output_t *, char ***, char ***);
+VLC_API const char *aout_NameGet (audio_output_t *);
 
 /** @} */
 

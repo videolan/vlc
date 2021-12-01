@@ -19,6 +19,7 @@ libvlc_audio_output_device_set
 libvlc_audio_output_list_get
 libvlc_audio_output_list_release
 libvlc_audio_output_set
+libvlc_audio_output_get_name
 libvlc_audio_get_channel
 libvlc_audio_get_delay
 libvlc_audio_get_mute

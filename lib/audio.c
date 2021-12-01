@@ -203,6 +203,19 @@ int libvlc_audio_output_device_set( libvlc_media_player_t *mp,
     return ret;
 }
 
+const char *libvlc_audio_output_get_name( libvlc_media_player_t *mp )
+{
+    audio_output_t *aout = GetAOut( mp );
+    if( aout == NULL )
+        return NULL;
+
+    const char *devid = aout_NameGet( aout );
+
+    aout_Release(aout);
+
+    return devid;
+}
+
 char *libvlc_audio_output_device_get( libvlc_media_player_t *mp )
 {
     audio_output_t *aout = GetAOut( mp );
