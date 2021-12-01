@@ -215,23 +215,6 @@ static void Close(vlc_gl_t *gl)
      * the future, which could even signal that we need to disable the whole
      * display and potentially adapt playback for that. */
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(applicationStateChanged:)
-                                                 name:UIApplicationWillEnterForegroundNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(applicationStateChanged:)
-                                                 name:UIApplicationDidEnterBackgroundNotification
-                                               object:nil];
-    /* If size is NULL, rendering must be disabled */
-    if (_appActive && self.bounds.size.width <= 1 && self.bounds.size.height <= 1)
-    {
-        EAGLContext *previousContext = [EAGLContext currentContext];
-        [EAGLContext setCurrentContext:_eaglContext];
-        [self doResetBuffers];
-        [EAGLContext setCurrentContext:previousContext];
-    }
-
     /* Setup the usual vlc_gl_t callbacks before loading the API since we need
      * the get_proc_address symbol and a current context. */
     static const struct vlc_gl_operations gl_ops =
@@ -300,21 +283,6 @@ static void Close(vlc_gl_t *gl)
          /* Remove the external references to the view so that
           * dealloc can be called by ARC. */
 
-         [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                         name:UIApplicationWillResignActiveNotification
-                                                       object:nil];
-
-         [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                         name:UIApplicationDidBecomeActiveNotification
-                                                       object:nil];
-
-         [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                         name:UIApplicationWillEnterForegroundNotification
-                                                       object:nil];
-
-         [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                         name:UIApplicationDidEnterBackgroundNotification
-                                                       object:nil];
         assert(!_gl_attached);
         [self removeFromSuperview];
     });
@@ -369,9 +337,6 @@ static void Close(vlc_gl_t *gl)
 
     vlc_mutex_lock(&_mutex);
     assert(!_gl_attached);
-
-    while (unlikely(!_appActive))
-        vlc_cond_wait(&_cond, &_mutex);
 
     assert(_eaglEnabled);
     _previousEaglContext = [EAGLContext currentContext];
@@ -450,43 +415,6 @@ static void Close(vlc_gl_t *gl)
     [EAGLContext setCurrentContext:previousEaglContext];
 }
 
-- (void)applicationStateChanged:(NSNotification *)notification
-{
-    vlc_mutex_lock(&_mutex);
-    if (_gl == NULL)
-    {
-        vlc_mutex_unlock(&_mutex);
-        return;
-    }
-
-    if ([[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification])
-    {
-        _appActive = NO;
-
-        /* Wait for the vout to unlock the eagl context before releasing
-         * it. */
-        while (_gl_attached && _eaglEnabled)
-            vlc_cond_wait(&_gl_attached_wait, &_mutex);
-
-        /* _eaglEnabled can change during the vlc_cond_wait
-         * as the mutex is unlocked during that, so this check
-         * has to be done after the vlc_cond_wait! */
-        if (_eaglEnabled) {
-            [self flushEAGLLocked];
-            _eaglEnabled = NO;
-        }
-    }
-    else if ([[notification name] isEqualToString:UIApplicationWillEnterForegroundNotification])
-    {
-        _eaglEnabled = YES;
-        [self resizeLocked:self.frame.size];
-        _appActive = YES;
-    }
-
-    vlc_cond_broadcast(&_cond);
-    vlc_mutex_unlock(&_mutex);
-}
-
 - (void)updateConstraints
 {
     [super updateConstraints];
@@ -504,8 +432,6 @@ static void Close(vlc_gl_t *gl)
     return nil;
 }
 @end
-
-
 
 static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 {
