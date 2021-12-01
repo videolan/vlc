@@ -634,7 +634,7 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_AUDIO_AOUT)
     set_callbacks(Open, Close)
     add_integer("auhal-volume", AOUT_VOLUME_DEFAULT,
-                VOLUME_TEXT, NULL)
+                VOLUME_TEXT, NULL, true)
     change_integer_range(0, AOUT_VOLUME_MAX)
     change_private()
 vlc_module_end ()
