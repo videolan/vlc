@@ -118,10 +118,10 @@ private:
 
     qt_intf_t *p_intf;
 
-    QMenu* popupMenu;
-    QMenu* videoPopupMenu;
-    QMenu* audioPopupMenu;
-    QMenu* miscPopupMenu;
+    std::unique_ptr<QMenu> popupMenu;
+    std::unique_ptr<QMenu> videoPopupMenu;
+    std::unique_ptr<QMenu> audioPopupMenu;
+    std::unique_ptr<QMenu> miscPopupMenu;
 
     QWidget* root;
     bool b_isDying;

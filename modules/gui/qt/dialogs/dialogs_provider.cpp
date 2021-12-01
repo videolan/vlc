@@ -68,12 +68,8 @@
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
-DialogsProvider::DialogsProvider( qt_intf_t *_p_intf ) :
-                                  QObject( NULL ), p_intf( _p_intf ),
-                                  popupMenu( NULL ),
-                                  videoPopupMenu( NULL ),
-                                  audioPopupMenu( NULL ),
-                                  miscPopupMenu( NULL )
+DialogsProvider::DialogsProvider( qt_intf_t *_p_intf )
+    : QObject( NULL ), p_intf( _p_intf )
 {
     b_isDying = false;
 }
@@ -100,11 +96,6 @@ DialogsProvider::~DialogsProvider()
     OpenDialog::killInstance();
     ErrorsDialog::killInstance();
     FirstRunWizard::killInstance();
-
-    delete popupMenu;
-    delete videoPopupMenu;
-    delete audioPopupMenu;
-    delete miscPopupMenu;
 
     /* free parentless menus  */
     VLCMenuBar::freeRendererMenu();
@@ -201,39 +192,39 @@ void DialogsProvider::customEvent( QEvent *event )
 #endif
         case INTF_DIALOG_POPUPMENU:
         {
-           delete popupMenu; popupMenu = NULL;
+           popupMenu.reset();
            bool show = (de->i_arg != 0);
            if( show )
            {
               //popping a QMenu prevents mouse release events to be received,
               //this ensures the coherency of the vout mouse state.
               emit releaseMouseEvents();
-              popupMenu = VLCMenuBar::PopupMenu( p_intf, true );
+              popupMenu.reset(VLCMenuBar::PopupMenu( p_intf, true ));
            }
            break;
         }
         case INTF_DIALOG_AUDIOPOPUPMENU:
         {
-           delete audioPopupMenu; audioPopupMenu = NULL;
+           audioPopupMenu.reset();
            bool show = (de->i_arg != 0);
            if( show )
-               audioPopupMenu = VLCMenuBar::AudioPopupMenu( p_intf, show );
+               audioPopupMenu.reset(VLCMenuBar::AudioPopupMenu( p_intf, show ));
            break;
         }
         case INTF_DIALOG_VIDEOPOPUPMENU:
         {
-           delete videoPopupMenu; videoPopupMenu = NULL;
+           videoPopupMenu.reset();
            bool show = (de->i_arg != 0);
            if( show )
-               videoPopupMenu = VLCMenuBar::VideoPopupMenu( p_intf, show );
+               videoPopupMenu.reset(VLCMenuBar::VideoPopupMenu( p_intf, show ));
            break;
         }
         case INTF_DIALOG_MISCPOPUPMENU:
         {
-           delete miscPopupMenu; miscPopupMenu = NULL;
+           miscPopupMenu.reset();
            bool show = (de->i_arg != 0);
            if( show )
-               miscPopupMenu = VLCMenuBar::MiscPopupMenu( p_intf, show );
+               miscPopupMenu.reset(VLCMenuBar::MiscPopupMenu( p_intf, show ));
            break;
         }
         case INTF_DIALOG_WIZARD:
@@ -404,14 +395,12 @@ void DialogsProvider::epgDialog()
 
 void DialogsProvider::setPopupMenu()
 {
-    delete popupMenu;
-    popupMenu = VLCMenuBar::PopupMenu( p_intf, true );
+    popupMenu.reset(VLCMenuBar::PopupMenu( p_intf, true ));
 }
 
 void DialogsProvider::destroyPopupMenu()
 {
-    delete popupMenu;
-    popupMenu = NULL;
+    popupMenu.reset();
 }
 
 /* Generic open file */
@@ -873,11 +862,11 @@ void DialogsProvider::sendKey( int key )
      // translate from a vlc keycode into a Qt sequence
      QKeySequence kseq0( VLCKeyToString( key, true ) );
 
-     if( popupMenu == NULL )
+     if( !popupMenu )
      {
          // make sure at least a non visible popupmenu is available
-         popupMenu = VLCMenuBar::PopupMenu( p_intf, false );
-         if( unlikely( popupMenu == NULL ) )
+         popupMenu.reset(VLCMenuBar::PopupMenu( p_intf, false ));
+         if( unlikely( !popupMenu ) )
              return;
      }
 
