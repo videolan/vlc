@@ -1,6 +1,6 @@
 /**
  * @file ac3.c
- * @brief RTP AC-3 payload format parser
+ * @brief RTP AC-3 and E-AC-3 payload format parser
  */
 /*****************************************************************************
  * Copyright © 2021 Rémi Denis-Courmont
@@ -38,6 +38,7 @@
 
 struct rtp_ac3 {
     struct vlc_logger *logger;
+    bool enhanced;
 };
 
 struct rtp_ac3_source {
@@ -49,6 +50,7 @@ struct rtp_ac3_source {
 
 static void *rtp_ac3_begin(struct vlc_rtp_pt *pt)
 {
+    struct rtp_ac3 *sys = pt->opaque;
     struct rtp_ac3_source *src = malloc(sizeof (*src));
     if (unlikely(src == NULL))
         return NULL;
@@ -58,9 +60,11 @@ static void *rtp_ac3_begin(struct vlc_rtp_pt *pt)
 
     es_format_t fmt;
 
-    es_format_Init(&fmt, AUDIO_ES, VLC_CODEC_A52);
+    es_format_Init(&fmt, AUDIO_ES, sys->enhanced ? VLC_CODEC_EAC3
+                                                 : VLC_CODEC_A52);
     fmt.audio.i_rate = pt->frequency;
-    fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 6;
+    if (!sys->enhanced)
+        fmt.audio.i_channels = pt->channel_count ? pt->channel_count : 6;
     src->es = vlc_rtp_pt_request_es(pt, &fmt);
     return src;
 }
@@ -78,7 +82,7 @@ static void rtp_ac3_end(struct vlc_rtp_pt *pt, void *data)
     (void) pt;
 }
 
-static void rtp_ac3_decode_compound(struct vlc_logger *log,
+static void rtp_ac3_decode_compound(struct vlc_logger *log, bool enhanced,
                                     struct rtp_ac3_source *src,
                                     block_t *block, unsigned int frames)
 {
@@ -91,7 +95,7 @@ static void rtp_ac3_decode_compound(struct vlc_logger *log,
 
     while (frames > 1) {
         if (vlc_a52_header_Parse(&hdr, block->p_buffer, block->i_buffer)
-         || hdr.b_eac3
+         || (hdr.b_eac3 && !enhanced)
          || hdr.i_size > block->i_buffer) {
             vlc_warning(log, "corrupt packet: %u frames, %zu bytes remaining",
                         frames, block->i_buffer);
@@ -148,14 +152,15 @@ drop:   block_Release(block);
         goto drop;
     }
 
-    /* Payload header (RFC4184 §4.1.1) */
-    uint_fast8_t frametype = block->p_buffer[0] & 3;
+    /* Payload header: 2 bytes, AC-3 (RFC4184 §4.1.1), E-AC-3 (RFC4598 §4.1) */
+    uint_fast8_t ftmask = sys->enhanced ? 1 : 3;
+    uint_fast8_t frametype = block->p_buffer[0] & ftmask;
     uint_fast8_t framenum = block->p_buffer[1];
 
     block->p_buffer += 2;
     block->i_buffer -= 2;
 
-    if (src->frags != NULL && (frametype != 3 || src->missing == 0)) {
+    if (src->frags != NULL && (frametype != ftmask || src->missing == 0)) {
         /* Missed end of previous frame. */
         src->frags->i_flags |= BLOCK_FLAG_CORRUPTED;
         rtp_ac3_send(src);
@@ -164,13 +169,14 @@ drop:   block_Release(block);
     }
 
     if (frametype == 0) {
-        rtp_ac3_decode_compound(log, src, block, framenum);
+        rtp_ac3_decode_compound(log, sys->enhanced, src, block, framenum);
         return;
     }
 
     if (src->frags == NULL) {
         if (frametype == 3) {
             /* Missed start of current frame. Not much to do without header. */
+            assert(!sys->enhanced);
             block_Release(block);
             vlc_warning(log, "reassembly error: missing initial fragment");
             return;
@@ -215,8 +221,13 @@ static const struct vlc_rtp_pt_operations rtp_ac3_ops = {
 static int rtp_ac3_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
                         const struct vlc_sdp_pt *desc)
 {
+    bool enhanced;
+
     if (vlc_ascii_strcasecmp(desc->name, "ac3") == 0) /* RFC4184 */
-        ;
+        enhanced = false;
+    else
+    if (vlc_ascii_strcasecmp(desc->name, "eac3") == 0) /* RFC4598 */
+        enhanced = true;
     else
         return VLC_ENOTSUP;
 
@@ -225,6 +236,7 @@ static int rtp_ac3_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
         return VLC_ENOMEM;
 
     sys->logger = vlc_object_logger(obj);
+    sys->enhanced = enhanced;
     pt->opaque = sys;
     pt->ops = &rtp_ac3_ops;
     return VLC_SUCCESS;
@@ -236,5 +248,5 @@ vlc_module_begin()
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_DEMUX)
     set_rtp_parser_callback(rtp_ac3_open)
-    add_shortcut("audio/ac3")
+    add_shortcut("audio/ac3", "audio/eac3")
 vlc_module_end()
