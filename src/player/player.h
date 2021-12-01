@@ -58,6 +58,7 @@ struct vlc_player_input
     input_thread_t *thread;
     vlc_player_t *player;
     bool started;
+    bool playing;
 
     enum vlc_player_state state;
     enum vlc_player_error error;

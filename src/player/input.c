@@ -246,6 +246,7 @@ vlc_player_input_HandleStateEvent(struct vlc_player_input *input,
                                          VLC_TICK_INVALID);
             break;
         case PLAYING_S:
+            input->playing = true;
             vlc_player_input_HandleState(input, VLC_PLAYER_STATE_PLAYING,
                                          state_date);
             break;
@@ -254,11 +255,18 @@ vlc_player_input_HandleStateEvent(struct vlc_player_input *input,
                                          state_date);
             break;
         case END_S:
+            input->playing = false;
             vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
                                          VLC_TICK_INVALID);
             vlc_player_destructor_AddStoppingInput(input->player, input);
             break;
         case ERROR_S:
+            if (!input->playing)
+            {
+                vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
+                                             VLC_TICK_INVALID);
+                vlc_player_destructor_AddStoppingInput(input->player, input);
+            }
             /* Don't send errors if the input is stopped by the user */
             if (input->started)
             {
@@ -943,6 +951,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
 
     input->player = player;
     input->started = false;
+    input->playing = false;
 
     input->state = VLC_PLAYER_STATE_STOPPED;
     input->error = VLC_PLAYER_ERROR_NONE;
