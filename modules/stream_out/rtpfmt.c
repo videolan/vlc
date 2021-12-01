@@ -945,6 +945,16 @@ static int rtp_packetize_ac3( sout_stream_id_sys_t *id, block_t *in )
     uint8_t *p_data = in->p_buffer;
     int     i_data  = in->i_buffer;
     int     i;
+    uint8_t hdr[2];
+
+    if (i_count <= 1)
+        hdr[0] = 0; /* One complete frame */
+    else if (i_data * 5 <= i_max * 8)
+        hdr[0] = 1; /* Initial fragment with at least 5/8th of frame */
+    else
+        hdr[0] = 2; /* Initial fragment with less than 5/8th of frame */
+
+    hdr[1] = i_count;
 
     for( i = 0; i < i_count; i++ )
     {
@@ -953,11 +963,8 @@ static int rtp_packetize_ac3( sout_stream_id_sys_t *id, block_t *in )
 
         /* rtp common header */
         rtp_packetize_common( id, out, (i == i_count - 1)?1:0, in->i_pts );
-        /* unit count */
-        out->p_buffer[12] = 1;
-        /* unit header */
-        out->p_buffer[13] = 0x00;
         /* data */
+        memcpy( &out->p_buffer[12], hdr, 2 );
         memcpy( &out->p_buffer[14], p_data, i_payload );
 
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
@@ -967,6 +974,7 @@ static int rtp_packetize_ac3( sout_stream_id_sys_t *id, block_t *in )
 
         p_data += i_payload;
         i_data -= i_payload;
+        hdr[0] = 3; /* Fragment other than initial fragment */
     }
 
     block_Release(in);
