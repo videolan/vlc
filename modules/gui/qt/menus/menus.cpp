@@ -756,7 +756,6 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
     input_item_t* p_input = THEMIM->getInput();
     QAction *action;
     bool b_isFullscreen = false;
-    MainCtx *mi = p_intf->p_mi;
 
     PopupMenuPlaylistEntries( menu, p_intf );
     menu->addSeparator();
@@ -812,22 +811,14 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
     /* Add some special entries for windowed mode: Interface Menu */
     if( !b_isFullscreen )
     {
-        QMenu *submenu = new QMenu( qtr( "Tool&s" ), menu );
-        /*QMenu *tools =*/ ToolsMenu( p_intf, submenu );
-        submenu->addSeparator();
-
-        if( mi )
-        {
-            QMenu* viewMenu = ViewMenu( p_intf, NULL );
-            viewMenu->setTitle( qtr( "V&iew" ) );
-            submenu->addMenu( viewMenu );
-        }
-
-        /* In skins interface, append some items */
         if( p_intf->b_isDialogProvider )
         {
+            // same as Tool menu but with extra entries
+            QMenu* submenu = new QMenu( qtr( "Interface" ), menu );
+            ToolsMenu( p_intf, submenu );
+            submenu->addSeparator();
+
             vlc_object_t* p_object = vlc_object_parent(p_intf->intf);
-            submenu->setTitle( qtr( "Interface" ) );
 
             /* Open skin dialog box */
             if (var_Type(p_object, "intf-skins-interactive") & VLC_VAR_ISCOMMAND)
@@ -848,9 +839,19 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
 
             /* list of extensions */
             ExtensionsMenu( p_intf, submenu );
-        }
 
-        menu->addMenu( submenu );
+            menu->addMenu( submenu );
+        }
+        else
+        {
+            QMenu* toolsMenu = new QMenu( qtr( "Tool&s" ), menu );
+            ToolsMenu( p_intf, toolsMenu );
+            menu->addMenu( toolsMenu );
+
+            QMenu* viewMenu = new QMenu( qtr( "V&iew" ), menu );
+            ViewMenu( p_intf, viewMenu );
+            menu->addMenu( viewMenu );
+        }
     }
 
     /* Static entries for ending, like open */
