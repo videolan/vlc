@@ -134,8 +134,9 @@ static void rtp_ac3_send(struct rtp_ac3_source *src)
 static void rtp_ac3_decode(struct vlc_rtp_pt *pt, void *data, block_t *block,
                            const struct vlc_rtp_pktinfo *restrict info)
 {
-    struct vlc_logger *log = pt->opaque;
+    struct rtp_ac3 *sys = pt->opaque;
     struct rtp_ac3_source *src = data;
+    struct vlc_logger *log = sys->logger;
 
     if (unlikely(src == NULL)) {
 drop:   block_Release(block);
@@ -199,8 +200,15 @@ drop:   block_Release(block);
     }
 }
 
+static void rtp_ac3_destroy(struct vlc_rtp_pt *pt)
+{
+    struct rtp_ac3 *sys = pt->opaque;
+
+    free(sys);
+}
+
 static const struct vlc_rtp_pt_operations rtp_ac3_ops = {
-    NULL, rtp_ac3_begin, rtp_ac3_end, rtp_ac3_decode,
+    rtp_ac3_destroy, rtp_ac3_begin, rtp_ac3_end, rtp_ac3_decode,
 };
 
 
@@ -212,7 +220,12 @@ static int rtp_ac3_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
     else
         return VLC_ENOTSUP;
 
-    pt->opaque = vlc_object_logger(obj);
+    struct rtp_ac3 *sys = malloc(sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    sys->logger = vlc_object_logger(obj);
+    pt->opaque = sys;
     pt->ops = &rtp_ac3_ops;
     return VLC_SUCCESS;
 }
