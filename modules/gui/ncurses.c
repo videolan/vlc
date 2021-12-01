@@ -654,6 +654,9 @@ static int DrawInfo(intf_thread_t *intf)
         info_category_t *p_category = item->pp_categories[i];
         info_t *p_info;
 
+        if (info_category_IsHidden(p_category))
+            continue;
+
         if (sys->color) color_set(C_CATEGORY, NULL);
         MainBoxWrite(sys, l++, _("  [%s]"), p_category->psz_name);
         if (sys->color) color_set(C_DEFAULT, NULL);
