@@ -502,6 +502,9 @@ void InfoPanel::update( input_item_t *p_item)
 
     for( int i = 0; i< p_item->i_categories ; i++)
     {
+        if (info_category_IsHidden(p_item->pp_categories[i]))
+            continue;
+
         struct vlc_list *const head = &p_item->pp_categories[i]->infos;
 
         current_item = new QTreeWidgetItem();
