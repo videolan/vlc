@@ -356,6 +356,9 @@
             info_category_t *cat = p_input->pp_categories[i];
             info_t *info;
 
+            if (info_category_IsHidden(cat))
+                continue;
+
             VLCCodecInformationTreeItem *subItem = [[VLCCodecInformationTreeItem alloc] init];
             subItem.propertyName = toNSStr(cat->psz_name);
 
