@@ -71,6 +71,9 @@ static int vlclua_input_item_info( lua_State *L )
         info_category_t *p_category = p_item->pp_categories[i];
         info_t *p_info;
 
+        if (info_category_IsHidden(p_category))
+            continue;
+
         lua_pushstring( L, p_category->psz_name );
         lua_newtable( L );
         info_foreach(p_info, &p_category->infos)
