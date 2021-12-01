@@ -12,7 +12,7 @@
   list=`grep ^Mime vlc.desktop|cut -d= -f2-|sed -e s/";"/\\\n/g -e s,/,@,g`
   vid=`echo $mimes|grep ^vid`
   for i in $vid
-  do 
+  do
     key=/desktop/gnome/thumbnailers/$i/enable
     gconftool-2 -t boolean -s $key true
     gconftool-2 -t string  -s $key "vlc-thumb -s %s %u %o"
