@@ -99,8 +99,6 @@ static libvlc_instance_t *create_libvlc(void)
         "--no-video-title-show",            /* nor the filename displayed     */
         "--no-stats",                       /* no stats                       */
         "--no-sub-autodetect-file",         /* we don't want subtitles        */
-        "--no-inhibit",                     /* we don't want interfaces       */
-        "--no-disable-screensaver",         /* we don't want interfaces       */
         "--no-snapshot-preview",            /* no blending in dummy vout      */
 #ifndef NDEBUG
         "--verbose=2",                      /* full log                       */
