@@ -78,6 +78,7 @@ vlc_module_end()
 
 NSString *const VLCBonjourProtocolName          = @"VLCBonjourProtocolName";
 NSString *const VLCBonjourProtocolServiceName   = @"VLCBonjourProtocolServiceName";
+NSString *const VLCBonjourProtocolModules       = @"VLCBonjourProtocolModules";
 NSString *const VLCBonjourIsRenderer            = @"VLCBonjourIsRenderer";
 NSString *const VLCBonjourRendererFlags         = @"VLCBonjourRendererFlags";
 NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
@@ -149,19 +150,23 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
 {
     NSDictionary *VLCFtpProtocol = @{ VLCBonjourProtocolName        : @"ftp",
                                       VLCBonjourProtocolServiceName : @"_ftp._tcp.",
-                                      VLCBonjourIsRenderer          : @(NO)
+                                      VLCBonjourIsRenderer          : @(NO),
+                                      VLCBonjourProtocolModules     : @[@"ftp"]
                                       };
     NSDictionary *VLCSmbProtocol = @{ VLCBonjourProtocolName        : @"smb",
                                       VLCBonjourProtocolServiceName : @"_smb._tcp.",
-                                      VLCBonjourIsRenderer          : @(NO)
+                                      VLCBonjourIsRenderer          : @(NO),
+                                      VLCBonjourProtocolModules     : @[@"dsm", @"smb2"]
                                       };
     NSDictionary *VLCNfsProtocol = @{ VLCBonjourProtocolName        : @"nfs",
                                       VLCBonjourProtocolServiceName : @"_nfs._tcp.",
-                                      VLCBonjourIsRenderer          : @(NO)
+                                      VLCBonjourIsRenderer          : @(NO),
+                                      VLCBonjourProtocolModules     : @[@"nfs"]
                                       };
     NSDictionary *VLCSftpProtocol = @{ VLCBonjourProtocolName       : @"sftp",
                                        VLCBonjourProtocolServiceName: @"_sftp-ssh._tcp.",
-                                       VLCBonjourIsRenderer         : @(NO)
+                                       VLCBonjourIsRenderer         : @(NO),
+                                       VLCBonjourProtocolModules     : @[@"sftp"]
                                        };
     NSDictionary *VLCCastProtocol = @{ VLCBonjourProtocolName       : @"chromecast",
                                        VLCBonjourProtocolServiceName: @"_googlecast._tcp.",
@@ -185,10 +190,19 @@ NSString *const VLCBonjourRendererDemux         = @"VLCBonjourRendererDemux";
 
     msg_Info(_p_this, "starting discovery");
     for (NSDictionary *protocol in VLCSupportedProtocols) {
-        /* Only discover services if we actually have a module that can handle those */
-        if (!module_exists([[protocol objectForKey: VLCBonjourProtocolName] UTF8String]) && !_isRendererDiscovery) {
-            msg_Dbg(_p_this, "no module for %s, skipping", [[protocol objectForKey: VLCBonjourProtocolName] UTF8String]);
-            continue;
+        if (!_isRendererDiscovery) {
+            /* Only discover services if we actually have at least one module that can handle their protocol */
+            BOOL canHandle = NO;
+            for (NSString *name in [protocol objectForKey: VLCBonjourProtocolModules]) {
+                if (module_exists([name UTF8String])) {
+                    canHandle = YES;
+                    break;
+                }
+            }
+            if (!canHandle) {
+                msg_Dbg(_p_this, "no module to handle %s, skipping", [[protocol objectForKey: VLCBonjourProtocolName] UTF8String]);
+                continue;
+            }
         }
 
         /* Only discover hosts it they match the current mode (renderer or service) */
