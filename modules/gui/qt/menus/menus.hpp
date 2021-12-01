@@ -57,26 +57,26 @@ public:
 
 protected:
     /* All main Menus */
-    static QMenu *FileMenu( qt_intf_t *, QMenu * );
+    static void FileMenu( qt_intf_t *, QMenu * );
 
-    static QMenu *ToolsMenu( qt_intf_t *, QMenu * );
+    static void ToolsMenu( qt_intf_t *, QMenu * );
 
-    static QMenu *ViewMenu( qt_intf_t *, QMenu *);
+    static void ViewMenu( qt_intf_t *, QMenu *);
 
-    static QMenu *InterfacesMenu( qt_intf_t *p_intf, QMenu * );
+    static void InterfacesMenu( qt_intf_t *p_intf, QMenu * );
     static void ExtensionsMenu( qt_intf_t *p_intf, QMenu * );
 
-    static QMenu *NavigMenu( qt_intf_t *, QMenu * );
+    static void NavigMenu( qt_intf_t *, QMenu * );
 
-    static QMenu *RebuildNavigMenu(qt_intf_t *, QMenu *);
+    static void RebuildNavigMenu(qt_intf_t *, QMenu *);
 
-    static QMenu *VideoMenu( qt_intf_t *, QMenu * );
+    static void VideoMenu( qt_intf_t *, QMenu * );
 
-    static QMenu *SubtitleMenu( qt_intf_t *, QMenu *current, bool b_popup = false );
+    static void SubtitleMenu( qt_intf_t *, QMenu *current, bool b_popup = false );
 
-    static QMenu *AudioMenu( qt_intf_t *, QMenu * );
+    static void AudioMenu( qt_intf_t *, QMenu * );
 
-    static QMenu *HelpMenu( QMenu *menu );
+    static void HelpMenu( QMenu *menu );
 
     /* Popups Menus */
     static void PopupMenuStaticEntries( QMenu *menu );
