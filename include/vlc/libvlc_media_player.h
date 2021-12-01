@@ -2377,6 +2377,7 @@ LIBVLC_API void libvlc_audio_output_device_set( libvlc_media_player_t *mp,
  * \version LibVLC 3.0.0 or later.
  */
 LIBVLC_API char *libvlc_audio_output_device_get( libvlc_media_player_t *mp );
+LIBVLC_API const char *libvlc_audio_output_get_name( libvlc_media_player_t *mp );
 
 /**
  * Toggle mute status.
