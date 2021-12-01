@@ -59,6 +59,9 @@ struct vlc_player_input
     vlc_player_t *player;
     bool started;
 
+    /* Monitor the OPENING_S -> PLAYING_S transition. */
+    bool playing;
+
     enum vlc_player_state state;
     enum vlc_player_error error;
     float rate;
