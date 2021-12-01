@@ -36,7 +36,7 @@ FocusScope {
     property var fadeColor: undefined
 
     // NOTE: We want buttons to be centered verticaly but configurable.
-    property int buttonMargin: height / 2 - button.height / 2
+    property int buttonMargin: height / 2 - buttonLeft.height / 2
 
     property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
 
