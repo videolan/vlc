@@ -280,32 +280,23 @@ QMenu *VLCMenuBar::ToolsMenu( qt_intf_t *p_intf, QMenu *menu )
  * Interface modification, load other interfaces, activate Extensions
  * \param current, set to NULL for menu creation, else for menu update
  **/
-QMenu *VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *current )
+QMenu *VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *menu )
 {
     QAction *action;
-    QMenu *menu;
 
     MainCtx *mi = p_intf->p_mi;
     assert( mi );
+    assert(menu);
 
-    if( !current )
+    //menu->clear();
+    //HACK menu->clear() does not delete submenus
+    QList<QAction*> actions = menu->actions();
+    foreach( QAction *a, actions )
     {
-        menu = new QMenu( qtr( "&View" ) );
-        menu->setAttribute(Qt::WA_DeleteOnClose);
-    }
-    else
-    {
-        menu = current;
-        //menu->clear();
-        //HACK menu->clear() does not delete submenus
-        QList<QAction*> actions = menu->actions();
-        foreach( QAction *a, actions )
-        {
-            QMenu *m = a->menu();
-            if( a->parent() == menu ) delete a;
-            else menu->removeAction( a );
-            if( m && m->parent() == menu ) delete m;
-        }
+        QMenu *m = a->menu();
+        if( a->parent() == menu ) delete a;
+        else menu->removeAction( a );
+        if( m && m->parent() == menu ) delete m;
     }
 
     action = menu->addAction(
@@ -344,7 +335,7 @@ QMenu *VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *current )
     action->setCheckable( true );
     action->setChecked( mi->hasGridView() );
 
-    menu->addMenu( new CheckableListMenu(qtr( "&Color Scheme" ), mi->getColorScheme(), CheckableListMenu::GROUPED, current) );
+    menu->addMenu( new CheckableListMenu(qtr( "&Color Scheme" ), mi->getColorScheme(), CheckableListMenu::GROUPED, menu) );
 
     menu->addSeparator();
 
