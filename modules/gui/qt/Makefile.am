@@ -174,6 +174,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlhelper.hpp \
 	gui/qt/medialibrary/mlitemcover.cpp \
 	gui/qt/medialibrary/mlitemcover.hpp \
+	gui/qt/medialibrary/mllistcache.cpp \
+	gui/qt/medialibrary/mllistcache.hpp \
 	gui/qt/medialibrary/mlthreadpool.cpp \
 	gui/qt/medialibrary/mlthreadpool.hpp \
 	gui/qt/medialibrary/mlqmltypes.hpp \
@@ -237,7 +239,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/imagehelper.cpp gui/qt/util/imagehelper.hpp \
 	gui/qt/util/i18n.cpp gui/qt/util/i18n.hpp \
 	gui/qt/util/keyhelper.cpp gui/qt/util/keyhelper.hpp \
-	gui/qt/util/listcache.hpp \
 	gui/qt/util/listcacheloader.hpp \
 	gui/qt/util/navigation_history.cpp gui/qt/util/navigation_history.hpp \
 	gui/qt/util/item_key_event_filter.cpp \
@@ -385,6 +386,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlfoldersmodel.moc.cpp \
 	gui/qt/medialibrary/mlgenremodel.moc.cpp \
 	gui/qt/medialibrary/mlgrouplistmodel.moc.cpp \
+	gui/qt/medialibrary/mllistcache.moc.cpp \
 	gui/qt/medialibrary/mlthreadpool.moc.cpp \
 	gui/qt/medialibrary/mlqmltypes.moc.cpp \
 	gui/qt/medialibrary/mlrecentsmodel.moc.cpp \
@@ -415,7 +417,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/imageluminanceextractor.moc.cpp \
 	gui/qt/util/i18n.moc.cpp \
 	gui/qt/util/keyhelper.moc.cpp \
-	gui/qt/util/listcache.moc.cpp \
 	gui/qt/util/navigation_history.moc.cpp \
 	gui/qt/util/item_key_event_filter.moc.cpp \
 	gui/qt/util/mouse_event_filter.moc.cpp \

@@ -291,19 +291,19 @@ void MLGroupListModel::thumbnailUpdated(int idx) /* override */
 MLGroupListModel::Loader::Loader(const MLGroupListModel & model)
     : MLBaseModel::BaseLoader(model) {}
 
-size_t MLGroupListModel::Loader::count() const /* override */
+size_t MLGroupListModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
 {
     vlc_ml_query_params_t params = getParams().toCQueryParams();
 
-    return vlc_ml_count_groups(m_ml, &params);
+    return vlc_ml_count_groups(ml, &params);
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLGroupListModel::Loader::load(size_t index, size_t count) const /* override */
+MLGroupListModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const /* override */
 {
     vlc_ml_query_params_t params = getParams(index, count).toCQueryParams();
 
-    ml_unique_ptr<vlc_ml_group_list_t> list(vlc_ml_list_groups(m_ml, &params));
+    ml_unique_ptr<vlc_ml_group_list_t> list(vlc_ml_list_groups(ml, &params));
 
     if (list == nullptr)
         return {};
@@ -319,19 +319,19 @@ MLGroupListModel::Loader::load(size_t index, size_t count) const /* override */
 
             memset(&query, 0, sizeof(vlc_ml_query_params_t));
 
-            ml_unique_ptr<vlc_ml_media_list_t> list(vlc_ml_list_group_media(m_ml,
+            ml_unique_ptr<vlc_ml_media_list_t> list(vlc_ml_list_group_media(ml,
                                                                             &query, group.i_id));
 
             // NOTE: Do we really need to check 'i_nb_items' here ?
             if (list->i_nb_items == 1)
             {
-                result.emplace_back(std::make_unique<MLVideo>(m_ml, &(list->p_items[0])));
+                result.emplace_back(std::make_unique<MLVideo>(ml, &(list->p_items[0])));
 
                 continue;
             }
         }
 
-        result.emplace_back(std::make_unique<MLGroup>(m_ml, &group));
+        result.emplace_back(std::make_unique<MLGroup>(ml, &group));
     }
 
     return result;

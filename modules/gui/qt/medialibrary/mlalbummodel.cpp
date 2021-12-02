@@ -143,31 +143,31 @@ MLAlbumModel::createLoader() const
     return new Loader(*this);
 }
 
-size_t MLAlbumModel::Loader::count() const
+size_t MLAlbumModel::Loader::count(vlc_medialibrary_t* ml) const
 {
     MLQueryParams params = getParams();
     auto queryParams = params.toCQueryParams();
 
     if ( m_parent.id <= 0 )
-        return vlc_ml_count_albums(m_ml, &queryParams);
-    return vlc_ml_count_albums_of(m_ml, &queryParams, m_parent.type, m_parent.id);
+        return vlc_ml_count_albums(ml, &queryParams);
+    return vlc_ml_count_albums_of(ml, &queryParams, m_parent.type, m_parent.id);
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLAlbumModel::Loader::load(size_t index, size_t count) const
+MLAlbumModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const
 {
     MLQueryParams params = getParams(index, count);
     auto queryParams = params.toCQueryParams();
 
     ml_unique_ptr<vlc_ml_album_list_t> album_list;
     if ( m_parent.id <= 0 )
-        album_list.reset( vlc_ml_list_albums(m_ml, &queryParams) );
+        album_list.reset( vlc_ml_list_albums(ml, &queryParams) );
     else
-        album_list.reset( vlc_ml_list_albums_of(m_ml, &queryParams, m_parent.type, m_parent.id ) );
+        album_list.reset( vlc_ml_list_albums_of(ml, &queryParams, m_parent.type, m_parent.id ) );
     if ( album_list == nullptr )
         return {};
     std::vector<std::unique_ptr<MLItem>> res;
     for( const vlc_ml_album_t& album: ml_range_iterate<vlc_ml_album_t>( album_list ) )
-        res.emplace_back( std::make_unique<MLAlbum>( m_ml, &album ) );
+        res.emplace_back( std::make_unique<MLAlbum>( ml, &album ) );
     return res;
 }

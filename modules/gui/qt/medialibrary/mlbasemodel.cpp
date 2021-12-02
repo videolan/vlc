@@ -20,7 +20,7 @@
 #include "medialib.hpp"
 #include <vlc_cxx_helpers.hpp>
 
-#include "util/listcache.hpp"
+#include "mllistcache.hpp"
 #include "util/qmlinputitem.hpp"
 
 // MediaLibrary includes
@@ -29,64 +29,7 @@
 
 #include "util/asynctask.hpp"
 
-class BulkTaskLoader : public AsyncTask<std::vector<std::unique_ptr<MLItem>>>
-{
-public:
-    BulkTaskLoader(QSharedPointer<ListCacheLoader<std::unique_ptr<MLItem>>> loader, QVector<int> indexes)
-        : m_loader(loader)
-        , m_indexes {indexes}
-    {
-    }
-
-    std::vector<std::unique_ptr<MLItem>> execute() override
-    {
-        if (m_indexes.isEmpty())
-            return {};
-
-        auto sortedIndexes = m_indexes;
-        std::sort(sortedIndexes.begin(), sortedIndexes.end());
-
-        struct Range
-        {
-            int low, high; // [low, high] (all inclusive)
-        };
-
-        QVector<Range> ranges;
-        ranges.push_back(Range {sortedIndexes[0], sortedIndexes[0]});
-        const int MAX_DIFFERENCE = 4;
-        for (const auto index : sortedIndexes)
-        {
-            if ((index - ranges.back().high) < MAX_DIFFERENCE)
-                ranges.back().high = index;
-            else
-                ranges.push_back(Range {index, index});
-        }
-
-
-        std::vector<std::unique_ptr<MLItem>> r(m_indexes.size());
-        for (const auto range : ranges)
-        {
-            auto data = m_loader->load(range.low, range.high - range.low + 1);
-            for (int i = 0; i < m_indexes.size(); ++i)
-            {
-                const auto targetIndex = m_indexes[i];
-                if (targetIndex >= range.low && targetIndex <= range.high)
-                {
-                    r.at(i) = std::move(data.at(targetIndex - range.low));
-                }
-            }
-        }
-
-        return r;
-    }
-
-private:
-    QSharedPointer<ListCacheLoader<std::unique_ptr<MLItem>>> m_loader;
-    QVector<int> m_indexes;
-};
-
-static constexpr ssize_t COUNT_UNINITIALIZED =
-    ListCache<std::unique_ptr<MLItem>>::COUNT_UNINITIALIZED;
+static constexpr ssize_t COUNT_UNINITIALIZED = MLListCache::COUNT_UNINITIALIZED;
 
 MLBaseModel::MLBaseModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -137,64 +80,82 @@ void MLBaseModel::getData(const QModelIndexList &indexes, QJSValue callback)
         return;
 
     QVector<int> indx;
-    std::transform(indexes.begin(), indexes.end(), std::back_inserter(indx), [](const auto &index)
-    {
+    std::transform(indexes.begin(), indexes.end(), std::back_inserter(indx),
+    [](const auto &index) {
         return index.row();
     });
 
-    TaskHandle<BulkTaskLoader> loader(new BulkTaskLoader(QSharedPointer<ListCacheLoader<std::unique_ptr<MLItem>>>(createLoader()), indx));
-    connect(loader.get(), &BaseAsyncTask::result, this, [this, callback, indx]() mutable
-    {
-        auto loader = (BulkTaskLoader *)sender();
-        auto freeSender = [this, &loader]()
+    QSharedPointer<ListCacheLoader<std::unique_ptr<MLItem>>> loader{ createLoader() };
+    struct Ctx {
+        std::vector<std::unique_ptr<MLItem>> items;
+    };
+    m_mediaLib->runOnMLThread<Ctx>(this,
+    //ML thread
+    [loader, indx](vlc_medialibrary_t* ml, Ctx& ctx){
+        if (indx.isEmpty())
+            return;
+
+        auto sortedIndexes = indx;
+        std::sort(sortedIndexes.begin(), sortedIndexes.end());
+
+        struct Range
         {
-            m_externalLoaders.erase(std::find_if(std::begin(m_externalLoaders), std::end(m_externalLoaders), [&](auto &v)
-            {
-                if (v.get() != loader)
-                    return false;
-
-                v.release();
-                loader->deleteLater();
-                loader = nullptr;
-                return true;
-            }));
-
-            assert(!loader);
+            int low, high; // [low, high] (all inclusive)
         };
 
-        auto jsEngine = qjsEngine(this);
-        if (!jsEngine)
+        QVector<Range> ranges;
+        ranges.push_back(Range {sortedIndexes[0], sortedIndexes[0]});
+        const int MAX_DIFFERENCE = 4;
+        for (const auto index : sortedIndexes)
         {
-            freeSender();
-            return;
+            if ((index - ranges.back().high) < MAX_DIFFERENCE)
+                ranges.back().high = index;
+            else
+                ranges.push_back(Range {index, index});
         }
 
-        const auto loadedItems = loader->takeResult();
-        assert((int)loadedItems.size() == indx.size());
+        ctx.items.resize(indx.size());
+        for (const auto range : ranges)
+        {
+            auto data = loader->load(ml, range.low, range.high - range.low + 1);
+            for (int i = 0; i < indx.size(); ++i)
+            {
+                const auto targetIndex = indx[i];
+                if (targetIndex >= range.low && targetIndex <= range.high)
+                {
+                    ctx.items.at(i) = std::move(data.at(targetIndex - range.low));
+                }
+            }
+        }
+
+    },
+    //UI thread
+    [this, indxSize = indx.size(), callback]
+    (quint64, Ctx& ctx) mutable
+    {
+        auto jsEngine = qjsEngine(this);
+        if (!jsEngine)
+            return;
+
+        assert((int)ctx.items.size() == indxSize);
 
         const QHash<int, QByteArray> roles = roleNames();
-        auto jsArray = jsEngine->newArray(loadedItems.size());
+        auto jsArray = jsEngine->newArray(indxSize);
 
-        for (size_t i = 0; i < loadedItems.size(); ++i)
+        for (int i = 0; i < indxSize; ++i)
         {
-            const auto &item = loadedItems[i];
+            const auto &item = ctx.items[i];
             QMap<QString, QVariant> dataDict;
 
-            for (int role: roles.keys())
-            {
-                if (item) // item may fail to load
+            if (item) // item may fail to load
+                for (int role: roles.keys())
                     dataDict[roles[role]] = itemRoleData(item.get(), role);
-            }
 
-            jsArray.setProperty(i, qjsEngine(this)->toScriptValue(dataDict));
+            jsArray.setProperty(i, jsEngine->toScriptValue(dataDict));
         }
 
         callback.call({jsArray});
-        freeSender();
     });
-
-    loader->start(*QThreadPool::globalInstance());
-    m_externalLoaders.push_back(std::move(loader));
 }
 
 QVariant MLBaseModel::data(const QModelIndex &index, int role) const
@@ -515,14 +476,13 @@ void MLBaseModel::validateCache() const
     if (m_cache)
         return;
 
-    auto &threadPool = m_mediaLib->threadPool();
     auto loader = createLoader();
-    m_cache.reset(new ListCache<std::unique_ptr<MLItem>>(threadPool, loader));
-    connect(&*m_cache, &BaseListCache::localSizeAboutToBeChanged,
+    m_cache.reset(new MLListCache(m_mediaLib, loader));
+    connect(&*m_cache, &MLListCache::localSizeAboutToBeChanged,
             this, &MLBaseModel::onLocalSizeAboutToBeChanged);
-    connect(&*m_cache, &BaseListCache::localSizeChanged,
+    connect(&*m_cache, &MLListCache::localSizeChanged,
             this, &MLBaseModel::onLocalSizeChanged);
-    connect(&*m_cache, &BaseListCache::localDataChanged,
+    connect(&*m_cache, &MLListCache::localDataChanged,
             this, &MLBaseModel::onLocalDataChanged);
 
     m_cache->initCount();
@@ -584,10 +544,9 @@ MLItem *MLBaseModel::findInCache(const MLItemId& id, int *index) const
 
 //-------------------------------------------------------------------------------------------------
 
-MLBaseModel::BaseLoader::BaseLoader(vlc_medialibrary_t *ml, MLItemId parent, QString searchPattern,
+MLBaseModel::BaseLoader::BaseLoader(MLItemId parent, QString searchPattern,
                                     vlc_ml_sorting_criteria_t sort, bool sort_desc)
-    : m_ml(ml)
-    , m_parent(parent)
+    : m_parent(parent)
     , m_searchPattern(searchPattern)
     , m_sort(sort)
     , m_sort_desc(sort_desc)
@@ -595,7 +554,7 @@ MLBaseModel::BaseLoader::BaseLoader(vlc_medialibrary_t *ml, MLItemId parent, QSt
 }
 
 MLBaseModel::BaseLoader::BaseLoader(const MLBaseModel &model)
-    : BaseLoader(model.m_ml, model.m_parent, model.m_search_pattern, model.m_sort, model.m_sort_desc)
+    : BaseLoader(model.m_parent, model.m_search_pattern, model.m_sort, model.m_sort_desc)
 {
 }
 

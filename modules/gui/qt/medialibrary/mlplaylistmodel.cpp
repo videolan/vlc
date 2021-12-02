@@ -310,20 +310,20 @@ QList<int> MLPlaylistModel::getRows(const QModelIndexList & indexes) const
 
 MLPlaylistModel::Loader::Loader(const MLPlaylistModel & model) : MLBaseModel::BaseLoader(model) {}
 
-size_t MLPlaylistModel::Loader::count() const /* override */
+size_t MLPlaylistModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
 {
     vlc_ml_query_params_t params = getParams().toCQueryParams();
 
-    return vlc_ml_count_playlist_media(m_ml, &params, m_parent.id);
+    return vlc_ml_count_playlist_media(ml, &params, m_parent.id);
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLPlaylistModel::Loader::load(size_t index, size_t count) const /* override */
+MLPlaylistModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const /* override */
 {
     vlc_ml_query_params_t params = getParams(index, count).toCQueryParams();
 
     ml_unique_ptr<vlc_ml_media_list_t> list {
-        vlc_ml_list_playlist_media(m_ml, &params, m_parent.id)
+        vlc_ml_list_playlist_media(ml, &params, m_parent.id)
     };
 
     if (list == nullptr)
@@ -333,7 +333,7 @@ MLPlaylistModel::Loader::load(size_t index, size_t count) const /* override */
 
     for (const vlc_ml_media_t & media : ml_range_iterate<vlc_ml_media_t> (list))
     {
-        result.emplace_back(std::make_unique<MLPlaylistMedia>(m_ml, &media));
+        result.emplace_back(std::make_unique<MLPlaylistMedia>(ml, &media));
     }
 
     return result;

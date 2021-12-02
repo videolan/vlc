@@ -106,9 +106,9 @@ private:
     {
         Loader(const MLPlaylistListModel & model);
 
-        size_t count() const override;
+        size_t count(vlc_medialibrary_t* ml) const override;
 
-        std::vector<std::unique_ptr<MLItem>> load(size_t index, size_t count) const override;
+        std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, size_t index, size_t count) const override;
     };
 };
 

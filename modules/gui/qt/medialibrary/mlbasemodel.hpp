@@ -34,15 +34,10 @@
 #include <memory>
 #include "mlevent.hpp"
 #include "mlqueryparams.hpp"
-#include "util/asynctask.hpp"
 #include "util/listcacheloader.hpp"
 
-template <typename T>
-class ListCache;
-
+class MLListCache;
 class MediaLib;
-
-class BulkTaskLoader;
 
 class MLBaseModel : public QAbstractListModel
 {
@@ -133,14 +128,13 @@ protected:
     /* Data loader for the cache */
     struct BaseLoader : public ListCacheLoader<std::unique_ptr<MLItem>>
     {
-        BaseLoader(vlc_medialibrary_t *ml, MLItemId parent, QString searchPattern,
+        BaseLoader(MLItemId parent, QString searchPattern,
                    vlc_ml_sorting_criteria_t sort, bool sort_desc);
         BaseLoader(const MLBaseModel &model);
 
         MLQueryParams getParams(size_t index = 0, size_t count = 0) const;
 
     protected:
-        vlc_medialibrary_t *m_ml;
         MLItemId m_parent;
         QString m_searchPattern;
         vlc_ml_sorting_criteria_t m_sort;
@@ -164,7 +158,7 @@ public:
     void setSortCriteria(const QString& criteria);
     void unsetSortCriteria();
 
-    int rowCount(const QModelIndex &parent = {}) const;
+    int rowCount(const QModelIndex &parent = {}) const override;
     virtual unsigned int getCount() const;
 
 protected:
@@ -180,8 +174,7 @@ protected:
                     std::function<void(vlc_ml_event_callback_t*)>> m_ml_event_handle;
     bool m_need_reset = false;
 
-    mutable std::unique_ptr<ListCache<std::unique_ptr<MLItem>>> m_cache;
-    std::vector<TaskHandle<BulkTaskLoader>> m_externalLoaders;
+    mutable std::unique_ptr<MLListCache> m_cache;
 };
 
 #endif // MLBASEMODEL_HPP

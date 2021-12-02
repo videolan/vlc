@@ -138,12 +138,6 @@ void MLVideoModel::thumbnailUpdated(int idx)
     emit dataChanged(index(idx), index(idx), {VIDEO_THUMBNAIL});
 }
 
-ListCacheLoader<std::unique_ptr<MLItem>> *
-MLVideoModel::createLoader() const
-{
-    return new Loader(*this);
-}
-
 // Protected MLBaseModel reimplementation
 
 void MLVideoModel::onVlcMlEvent(const MLEvent &event)
@@ -161,20 +155,26 @@ void MLVideoModel::onVlcMlEvent(const MLEvent &event)
     MLBaseModel::onVlcMlEvent( event );
 }
 
-size_t MLVideoModel::Loader::count() const /* override */
+ListCacheLoader<std::unique_ptr<MLItem>> *
+MLVideoModel::createLoader() const
+{
+    return new Loader(*this);
+}
+
+size_t MLVideoModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
 {
     vlc_ml_query_params_t params = getParams().toCQueryParams();
 
     int64_t id = m_parent.id;
 
     if (id <= 0)
-        return vlc_ml_count_video_media(m_ml, &params);
+        return vlc_ml_count_video_media(ml, &params);
     else
-        return vlc_ml_count_media_of(m_ml, &params, m_parent.type, id);
+        return vlc_ml_count_media_of(ml, &params, m_parent.type, id);
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLVideoModel::Loader::load(size_t index, size_t count) const /* override */
+MLVideoModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const /* override */
 {
     vlc_ml_query_params_t params = getParams(index, count).toCQueryParams();
 
@@ -183,9 +183,9 @@ MLVideoModel::Loader::load(size_t index, size_t count) const /* override */
     int64_t id = m_parent.id;
 
     if (id <= 0)
-        list.reset(vlc_ml_list_video_media(m_ml, &params));
+        list.reset(vlc_ml_list_video_media(ml, &params));
     else
-        list.reset(vlc_ml_list_media_of(m_ml, &params, m_parent.type, id));
+        list.reset(vlc_ml_list_media_of(ml, &params, m_parent.type, id));
 
     if (list == nullptr)
         return {};
@@ -194,7 +194,7 @@ MLVideoModel::Loader::load(size_t index, size_t count) const /* override */
 
     for (const vlc_ml_media_t & media : ml_range_iterate<vlc_ml_media_t>(list))
     {
-        result.emplace_back(std::make_unique<MLVideo>(m_ml, &media));
+        result.emplace_back(std::make_unique<MLVideo>(ml, &media));
     }
 
     return result;

@@ -44,6 +44,8 @@ class Media;
 }
 }
 
+struct vlc_medialibrary_t;
+
 class RunOnMLThreadBaseRunner;
 
 class MediaLib : public QObject

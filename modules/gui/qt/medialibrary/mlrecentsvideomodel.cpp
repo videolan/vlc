@@ -64,15 +64,16 @@ void MLRecentsVideoModel::onVlcMlEvent(const MLEvent & event) /* override */
 
 MLRecentsVideoModel::Loader::Loader(const MLRecentsVideoModel & model, int numberOfItemsToShow)
     : MLBaseModel::BaseLoader(model)
-    , m_numberOfItemsToShow(numberOfItemsToShow) {}
+    , m_numberOfItemsToShow(numberOfItemsToShow)
+{}
 
-size_t MLRecentsVideoModel::Loader::count() const /* override */
+size_t MLRecentsVideoModel::Loader::count(vlc_medialibrary_t* ml) const /* override */
 {
     MLQueryParams params = getParams();
 
     auto queryParams = params.toCQueryParams();
 
-    size_t realCount = vlc_ml_count_history_by_type(m_ml, &queryParams, VLC_ML_MEDIA_TYPE_VIDEO);
+    size_t realCount = vlc_ml_count_history_by_type(ml, &queryParams, VLC_ML_MEDIA_TYPE_VIDEO);
 
     if (m_numberOfItemsToShow >= 0)
     {
@@ -83,7 +84,7 @@ size_t MLRecentsVideoModel::Loader::count() const /* override */
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLRecentsVideoModel::Loader::load(size_t index, size_t count) const /* override */
+MLRecentsVideoModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const /* override */
 {
     MLQueryParams params = getParams(index, count);
 
@@ -103,7 +104,7 @@ MLRecentsVideoModel::Loader::load(size_t index, size_t count) const /* override 
 
     ml_unique_ptr<vlc_ml_media_list_t> media_list
     {
-        vlc_ml_list_history_by_type(m_ml, &queryParams, VLC_ML_MEDIA_TYPE_VIDEO)
+        vlc_ml_list_history_by_type(ml, &queryParams, VLC_ML_MEDIA_TYPE_VIDEO)
     };
 
     if (media_list == nullptr)
@@ -111,7 +112,7 @@ MLRecentsVideoModel::Loader::load(size_t index, size_t count) const /* override 
 
     for (const vlc_ml_media_t & media : ml_range_iterate<vlc_ml_media_t>(media_list))
     {
-        res.emplace_back( std::make_unique<MLVideo>(m_ml, &media));
+        res.emplace_back( std::make_unique<MLVideo>(ml, &media));
     }
 
     return res;

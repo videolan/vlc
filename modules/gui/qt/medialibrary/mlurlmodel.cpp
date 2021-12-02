@@ -137,22 +137,22 @@ MLUrlModel::createLoader() const
     return new Loader(*this);
 }
 
-size_t MLUrlModel::Loader::count() const
+size_t MLUrlModel::Loader::count(vlc_medialibrary_t* ml) const
 {
     MLQueryParams params = getParams();
     auto queryParams = params.toCQueryParams();
 
-    return vlc_ml_count_stream_history( m_ml, &queryParams );
+    return vlc_ml_count_stream_history( ml, &queryParams );
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLUrlModel::Loader::load(size_t index, size_t count) const
+MLUrlModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) const
 {
     MLQueryParams params = getParams(index, count);
     auto queryParams = params.toCQueryParams();
 
     ml_unique_ptr<vlc_ml_media_list_t> media_list;
-    media_list.reset( vlc_ml_list_stream_history(m_ml, &queryParams) );
+    media_list.reset( vlc_ml_list_stream_history(ml, &queryParams) );
     if ( media_list == nullptr )
         return {};
 
