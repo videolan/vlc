@@ -53,8 +53,7 @@
 struct vaapi_vctx
 {
     VADisplay va_dpy;
-    AVBufferRef *hwdev_ref;
-    bool pool_sem_init;
+    AVBufferRef *hwframes_ref;
     vlc_sem_t pool_sem;
 };
 
@@ -139,8 +138,6 @@ static void vaapi_dec_pic_context_destroy(picture_context_t *context)
     struct vaapi_vctx *vaapi_vctx =
         vlc_video_context_GetPrivate(pic_ctx->ctx.s.vctx, VLC_VIDEO_CONTEXT_VAAPI);
 
-    assert(vaapi_vctx->pool_sem_init);
-
     av_frame_free(&pic_ctx->avframe);
 
     if (!pic_ctx->cloned)
@@ -173,23 +170,8 @@ static picture_context_t *vaapi_dec_pic_context_copy(picture_context_t *src)
 static int Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx, AVFrame *frame)
 {
     vlc_video_context *vctx = va->sys;
-    AVHWFramesContext *hwframes = (AVHWFramesContext*)ctx->hw_frames_ctx->data;
     struct vaapi_vctx *vaapi_vctx =
         vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_VAAPI);
-
-    assert(ctx->hw_frames_ctx);
-
-    /* The pool size can only be known after the hw context has been
-     * initialized (internally by ffmpeg), so between Create() and the first
-     * Get() */
-    if (!vaapi_vctx->pool_sem_init)
-    {
-        vlc_sem_init(&vaapi_vctx->pool_sem,
-                     hwframes->initial_pool_size +
-                     ctx->thread_count +
-                     3 /* cf. ff_decode_get_hw_frames_ctx */);
-        vaapi_vctx->pool_sem_init = true;
-    }
 
     /* If all frames are out, wait for a frame to be released. */
     vlc_sem_wait(&vaapi_vctx->pool_sem);
@@ -231,7 +213,7 @@ static void vaapi_ctx_destroy(void *priv)
 {
     struct vaapi_vctx *vaapi_vctx = priv;
 
-    av_buffer_unref(&vaapi_vctx->hwdev_ref);
+    av_buffer_unref(&vaapi_vctx->hwframes_ref);
 }
 
 static const struct vlc_va_operations ops = { Get, Delete, };
@@ -261,43 +243,77 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt,
 
     AVBufferRef *hwdev_ref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_VAAPI);
     if (hwdev_ref == NULL)
-        goto error;
+        return VLC_EGENERIC;
 
     AVHWDeviceContext *hwdev_ctx = (void *) hwdev_ref->data;
     AVVAAPIDeviceContext *vadev_ctx = hwdev_ctx->hwctx;
     vadev_ctx->display = va_dpy;
 
     if (av_hwdevice_ctx_init(hwdev_ref) < 0)
-        goto error;
+    {
+        av_buffer_unref(&hwdev_ref);
+        return VLC_EGENERIC;
+    }
+
+    AVBufferRef *hwframes_ref;
+    int ret = avcodec_get_hw_frames_parameters(ctx, hwdev_ref, hwfmt, &hwframes_ref);
+    av_buffer_unref(&hwdev_ref);
+    if (ret < 0)
+    {
+        msg_Err(va, "avcodec_get_hw_frames_parameters failed: %d", ret);
+        return VLC_EGENERIC;
+    }
+
+    AVHWFramesContext *hwframes_ctx = (AVHWFramesContext*)hwframes_ref->data;
+
+    if (hwframes_ctx->initial_pool_size)
+    {
+        // cf. ff_decode_get_hw_frames_ctx()
+        // We guarantee 4 base work surfaces. The function above guarantees 1
+        // (the absolute minimum), so add the missing count.
+        hwframes_ctx->initial_pool_size += 3;
+    }
+
+    ret = av_hwframe_ctx_init(hwframes_ref);
+    if (ret < 0)
+    {
+        msg_Err(va, "av_hwframe_ctx_init failed: %d", ret);
+        av_buffer_unref(&hwframes_ref);
+        return VLC_EGENERIC;
+    }
+
+    ctx->hw_frames_ctx = av_buffer_ref(hwframes_ref);
+    if (!ctx->hw_frames_ctx)
+    {
+        av_buffer_unref(&hwframes_ref);
+        return VLC_EGENERIC;
+    }
 
     vlc_video_context *vctx =
         vlc_video_context_Create(dec_device, VLC_VIDEO_CONTEXT_VAAPI,
                                  sizeof(struct vaapi_vctx), &vaapi_ctx_ops);
     if (vctx == NULL)
-        goto error;
+    {
+        av_buffer_unref(&hwframes_ref);
+        av_buffer_unref(&ctx->hw_frames_ctx);
+        return VLC_EGENERIC;
+    }
 
     struct vaapi_vctx *vaapi_vctx =
         vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_VAAPI);
 
     vaapi_vctx->va_dpy = va_dpy;
-    vaapi_vctx->hwdev_ref = hwdev_ref;
-    vaapi_vctx->pool_sem_init = false;
+    vaapi_vctx->hwframes_ref = hwframes_ref;
+    vlc_sem_init(&vaapi_vctx->pool_sem, hwframes_ctx->initial_pool_size);
 
     msg_Info(va, "Using %s", vaQueryVendorString(va_dpy));
 
     fmt_out->i_chroma = i_vlc_chroma;
 
-    ctx->hw_device_ctx = hwdev_ref;
-
     va->ops = &ops;
     va->sys = vctx;
     *vtcx_out = vctx;
     return VLC_SUCCESS;
-
-error:
-    if (hwdev_ref != NULL)
-        av_buffer_unref(&hwdev_ref);
-    return VLC_EGENERIC;
 }
 
 vlc_module_begin ()
