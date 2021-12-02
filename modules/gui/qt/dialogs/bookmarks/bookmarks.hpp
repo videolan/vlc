@@ -25,12 +25,11 @@
 #define QVLC_BOOKMARKS_H_ 1
 
 #include "widgets/native/qvlcframe.hpp"
-#include <QStandardItemModel>
-#include <QTreeView>
-#include <QTreeWidget>
 #include "util/singleton.hpp"
+
 class QPushButton;
 class MLBookmarkModel;
+class QTreeView;
 
 class BookmarksDialog : public QVLCFrame, public Singleton<BookmarksDialog>
 {

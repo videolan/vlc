@@ -34,6 +34,7 @@
 #include <QPushButton>
 #include <QDialogButtonBox>
 #include <QModelIndexList>
+#include <QTreeView>
 
 BookmarksDialog::BookmarksDialog( qt_intf_t *_p_intf ):QVLCFrame( _p_intf )
 {
@@ -83,19 +84,17 @@ BookmarksDialog::BookmarksDialog( qt_intf_t *_p_intf ):QVLCFrame( _p_intf )
     layout->addWidget( buttonsBox );
     layout->addWidget( bookmarksList );
 
-    CONNECT( bookmarksList, activated( QModelIndex ), this,
-             activateItem( QModelIndex ) );
-    CONNECT( m_model, modelReset(), this, updateButtons() );
-    CONNECT( bookmarksList->selectionModel(), selectionChanged( const QItemSelection &, const QItemSelection & ),
-             this, updateButtons() );
-    BUTTONACT( addButton, add() );
-    BUTTONACT( delButton, del() );
-    BUTTONACT( clearButton, clear() );
+    connect( bookmarksList, &QTreeView::activated, this, &BookmarksDialog::activateItem);
+    connect( m_model, &QAbstractListModel::modelReset, this, &BookmarksDialog::updateButtons );
+    connect( bookmarksList->selectionModel(), &QItemSelectionModel::selectionChanged, this, &BookmarksDialog::updateButtons );
+    connect( addButton,   &QAbstractButton::clicked, this,  &BookmarksDialog::add );
+    connect( delButton,   &QAbstractButton::clicked, this,  &BookmarksDialog::del );
+    connect( clearButton, &QAbstractButton::clicked, this,  &BookmarksDialog::clear );
 
 #if 0
-    BUTTONACT( extractButton, extract() );
+    connect( extractButton, &QAbstractButton::clicked, this,  &BookmarksDialog::extract );
 #endif
-    CONNECT( buttonsBox, rejected(), this, close() );
+    connect( buttonsBox, &QDialogButtonBox::rejected, this, &BookmarksDialog::close);
     updateButtons();
 
     restoreWidgetPosition( "Bookmarks", QSize( 435, 280 ) );
