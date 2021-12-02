@@ -180,6 +180,16 @@ static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
     pthread_sigmask (SIG_SETMASK, &oldset, NULL);
     pthread_attr_destroy (attr);
     (void) priority;
+   
+    char name[128];
+    uint64_t tid_np;
+    pthread_threadid_np(th->handle, &tid_np);
+    mach_port_t tid = pthread_mach_thread_np(th->handle);
+    //sprintf(name,"deckard> vlc-%x-%x-%qx",tid_np,tid,th->handle);
+    
+        fprintf(stderr,"deckard> pthread create vlc-%x-%x-%qx entry=%qx\n",tid,tid_np,th->handle,entry);
+
+    //pthread_setname_np(name);
     return ret;
 }
 
@@ -194,7 +204,14 @@ int vlc_clone (vlc_thread_t *th, void *(*entry) (void *), void *data,
 
 void vlc_join(vlc_thread_t th, void **result)
 {
+    char name[128];
+    uint64_t tid_np;
+    pthread_threadid_np(th.handle, &tid_np);
+    mach_port_t tid = pthread_mach_thread_np(th.handle);
+    fprintf(stderr,"deckard> pthread join vlc-%x-%x-%qx\n",tid,tid_np,th.handle);
+    
     int val = pthread_join(th.handle, result);
+    
     VLC_THREAD_ASSERT ("joining thread");
 }
 

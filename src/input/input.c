@@ -176,6 +176,17 @@ int input_Start( input_thread_t *p_input )
     /* Create thread and wait for its readiness. */
     priv->is_running = !vlc_clone( &priv->thread, func, priv,
                                    VLC_THREAD_PRIORITY_INPUT );
+    
+   
+    char name[128];
+    vlc_thread_t *vlc_th =(vlc_thread_t*)&priv->thread;
+    mach_port_t tid = pthread_mach_thread_np(vlc_th->handle);
+    uint64_t tid_np;
+    pthread_threadid_np(vlc_th->handle, &tid_np);
+    
+    sprintf(name,"vlc-player-end, %x-%x-%qx",tid,tid_np,priv->thread);
+    pthread_setname_np(name);
+    
     if( !priv->is_running )
     {
         msg_Err( p_input, "cannot create input thread" );
@@ -215,7 +226,12 @@ void input_Stop( input_thread_t *p_input )
 void input_Close( input_thread_t *p_input )
 {
     if( input_priv(p_input)->is_running )
+    {
+        msg_Dbg( p_input, "Closing an input: thread=%qx", p_input);
+
         vlc_join( input_priv(p_input)->thread, NULL );
+    }
+    
     vlc_interrupt_deinit( &input_priv(p_input)->interrupt );
     Destroy(p_input);
 }
@@ -266,7 +282,9 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     /* Allocate descriptor */
     input_thread_private_t *priv;
 
+    char * psz_name = input_item_GetName( p_item );
     priv = vlc_custom_create( p_parent, sizeof( *priv ), "input" );
+    //priv = vlc_custom_create( p_parent, sizeof( *priv ), "input" );
     if( unlikely(priv == NULL) )
         return NULL;
 
@@ -279,7 +297,6 @@ static input_thread_t *Create( vlc_object_t *p_parent,
 
     input_thread_t *p_input = &priv->input;
 
-    char * psz_name = input_item_GetName( p_item );
     const char *option_str;
     switch (option)
     {
@@ -293,7 +310,10 @@ static input_thread_t *Create( vlc_object_t *p_parent,
             option_str = "";
             break;
     }
-    msg_Dbg( p_input, "Creating an input for %s'%s'", option_str, psz_name);
+    
+    mach_port_t tid = pthread_mach_thread_np(p_input);
+    
+    msg_Dbg( p_input, "Creating an input for %s'%s' tid=%x thread=%qx", option_str, psz_name, tid, p_input);
     free( psz_name );
 
     var_Create(p_input, "avstat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
@@ -464,7 +484,12 @@ static void *Run( void *data )
     input_thread_private_t *priv = data;
     input_thread_t *p_input = &priv->input;
 
-    vlc_thread_set_name("vlc-input");
+    char name[128];
+    uint64_t tid_np;
+    
+    pthread_threadid_np(NULL,&tid_np);
+    sprintf(name,"vlc-input tid_np=%qx",tid_np);
+    vlc_thread_set_name(name);
 
     vlc_interrupt_set(&priv->interrupt);
 
