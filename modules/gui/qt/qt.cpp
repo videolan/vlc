@@ -333,10 +333,8 @@ vlc_module_begin ()
     add_string("qt-compositor", "auto", QT_COMPOSITOR_TEXT, QT_COMPOSITOR_LONGTEXT)
             change_string_list(compositor_vlc, compositor_user)
 
-    add_bool( "qt-recentplay", true, RECENTPLAY_TEXT,
-              nullptr )
-    add_string( "qt-recentplay-filter", "",
-                RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT )
+    add_obsolete_bool( "qt-recentplay" )
+    add_obsolete_string( "qt-recentplay-filter" )
     add_obsolete_integer( "qt-continue" )
 
 #ifdef UPDATE_CHECK
