@@ -603,7 +603,6 @@ void vout_ChangeDisplaySize(vout_thread_t *vout,
     vlc_mutex_lock(&sys->render_lock);
     vlc_mutex_lock(&sys->display_lock);
 
-    sys->rendering_enabled = width != 0 && height != 0;
     sys->window_width = width;
     sys->window_height = height;
 
@@ -715,9 +714,9 @@ void vout_ChangeDisplayRenderingEnabled(vout_thread_t *vout, bool enabled)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
-    vlc_mutex_lock(&sys->render_lock);
+    vlc_mutex_lock(&sys->display_lock);
     sys->rendering_enabled = enabled;
-    vlc_mutex_unlock(&sys->render_lock);
+    vlc_mutex_unlock(&sys->display_lock);
 }
 
 void vout_NotifyVsyncReached(vout_thread_t *vout, vlc_tick_t next_vsync)
@@ -1503,7 +1502,10 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
     sys->vsync.last_date = vsync_date;
     vlc_mutex_unlock(&sys->vsync.lock);
 
-    if (sys->rendering_enabled)
+    bool rendering_enabled = sys->rendering_enabled &&
+        sys->window_width != 0 && sys->window_height != 0;
+
+    if (rendering_enabled)
     {
         vlc_tick_t now_ts = vlc_tick_now();
         if (atomic_load(&sys->b_display_avstat))
@@ -1598,7 +1600,7 @@ static int RenderPicture(vout_thread_sys_t *vout, bool render_now)
                           frame_rate, frame_rate_base);
 
     /* Display the direct buffer returned by vout_RenderPicture */
-    if (sys->rendering_enabled)
+    if (rendering_enabled)
     {
         if (atomic_load(&sys->b_display_avstat))
         {
