@@ -2484,7 +2484,7 @@ AS_HELP_STRING([--enable-avcodec], [libavcodec codec (default enabled)]))
 AS_IF([test "${enable_avcodec}" != "no"], [
   dnl We need >=57.37.100 from ffmpeg
   dnl 7fc329e2dd6226dfecaa4a1d7adf353bf2773726  include libavutil 55.22.101
-  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 57.37.100 libavutil >= 55.9.0], [
+  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= 57.37.100 libavutil >= 55.22.101], [
     have_avcodec="yes"
   ],[
     AC_MSG_ERROR([${AVCODEC_PKG_ERRORS}. Pass --disable-avcodec to ignore this error.])
