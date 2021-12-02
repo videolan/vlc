@@ -922,13 +922,8 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             }
 
             /* RECENTLY PLAYED options */
-            CONNECT( ui.saveRecentlyPlayed, toggled( bool ),
-                     ui.recentlyPlayedFilters, setEnabled( bool ) );
-            ui.recentlyPlayedFilters->setEnabled( false );
             CONFIG_BOOL( "save-recentplay", saveRecentlyPlayed );
             CONFIG_GENERIC( "restore-playback-pos", IntegerList, ui.continuePlaybackLabel, continuePlaybackComboBox );
-            CONFIG_GENERIC( "qt-recentplay-filter", String, ui.filterLabel,
-                    recentlyPlayedFilters );
             CONFIG_GENERIC( "qt-auto-raise", IntegerList, ui.autoRaiseLabel, autoRaiseComboBox );
 
         END_SPREFS_CAT;

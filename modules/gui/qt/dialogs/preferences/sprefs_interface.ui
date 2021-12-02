@@ -586,36 +586,7 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLabel" name="filterLabel">
-          <property name="text">
-           <string>Filter:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="margin">
-           <number>5</number>
-          </property>
-          <property name="buddy">
-           <cstring>recentlyPlayedFilters</cstring>
-          </property>
-         </widget>
-        </item>
        </layout>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="recentlyPlayedFilters">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="toolTip">
-         <string>Separate words by | (without space)</string>
-        </property>
-       </widget>
       </item>
       <item row="2" column="0">
        <widget class="QCheckBox" name="MetadataNetworkAccessMode">
@@ -749,7 +720,6 @@
   <tabstop>updatesBox</tabstop>
   <tabstop>updatesDays</tabstop>
   <tabstop>saveRecentlyPlayed</tabstop>
-  <tabstop>recentlyPlayedFilters</tabstop>
   <tabstop>MetadataNetworkAccessMode</tabstop>
   <tabstop>assoButton</tabstop>
  </tabstops>
