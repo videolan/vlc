@@ -925,7 +925,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             CONNECT( ui.saveRecentlyPlayed, toggled( bool ),
                      ui.recentlyPlayedFilters, setEnabled( bool ) );
             ui.recentlyPlayedFilters->setEnabled( false );
-            CONFIG_BOOL( "qt-recentplay", saveRecentlyPlayed );
+            CONFIG_BOOL( "save-recentplay", saveRecentlyPlayed );
             CONFIG_GENERIC( "restore-playback-pos", IntegerList, ui.continuePlaybackLabel, continuePlaybackComboBox );
             CONFIG_GENERIC( "qt-recentplay-filter", String, ui.filterLabel,
                     recentlyPlayedFilters );

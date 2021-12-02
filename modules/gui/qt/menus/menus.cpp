@@ -193,7 +193,7 @@ void VLCMenuBar::FileMenu(qt_intf_t *p_intf, QMenu *menu)
     addDPStaticEntry( menu, qtr( "Open &Location from clipboard" ),
                       NULL, &DialogsProvider::openUrlDialog, "Ctrl+V" );
 
-    if( mi && var_InheritBool( p_intf, "qt-recentplay" ) && mi->hasMediaLibrary() )
+    if( mi && var_InheritBool( p_intf, "save-recentplay" ) && mi->hasMediaLibrary() )
     {
         MLRecentsModel* recentModel = new MLRecentsModel(nullptr);
         recentModel->setMl(mi->getMediaLibrary());

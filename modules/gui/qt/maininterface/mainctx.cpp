@@ -221,7 +221,7 @@ MainCtx::~MainCtx()
     /* Save the stackCentralW sizes */
     settings->endGroup();
 
-    if( var_InheritBool( p_intf, "qt-recentplay" ) )
+    if( var_InheritBool( p_intf, "save-recentplay" ) )
         getSettings()->setValue( "filedialog-path", m_dialogFilepath );
     else
         getSettings()->remove( "filedialog-path" );

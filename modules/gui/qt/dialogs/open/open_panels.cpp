@@ -681,9 +681,10 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
     CONNECT( ui.urlComboBox, editTextChanged( const QString& ), this, updateMRL());
 
     /* */
-    if( var_InheritBool( p_intf, "qt-recentplay" ) )
+    if( var_InheritBool( p_intf, "save-recentplay" ) )
     {
         b_recentList = true;
+        // FIXME: use MLUrlModel
         ui.urlComboBox->addItems( getSettings()->value( "OpenDialog/netMRL" ).toStringList() );
         ui.urlComboBox->setMaxCount( 10 );
     }
