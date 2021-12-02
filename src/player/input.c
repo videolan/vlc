@@ -261,18 +261,18 @@ vlc_player_input_HandleStateEvent(struct vlc_player_input *input,
             vlc_player_destructor_AddStoppingInput(input->player, input);
             break;
         case ERROR_S:
-            if (!input->playing)
-            {
-                vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
-                                             VLC_TICK_INVALID);
-                vlc_player_destructor_AddStoppingInput(input->player, input);
-            }
             /* Don't send errors if the input is stopped by the user */
             if (input->started)
             {
                 /* Contrary to the input_thead_t, an error is not a state */
                 input->error = VLC_PLAYER_ERROR_GENERIC;
                 vlc_player_SendEvent(input->player, on_error_changed, input->error);
+            }
+            if (!input->playing)
+            {
+                vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPING,
+                                             VLC_TICK_INVALID);
+                vlc_player_destructor_AddStoppingInput(input->player, input);
             }
             break;
         default:
