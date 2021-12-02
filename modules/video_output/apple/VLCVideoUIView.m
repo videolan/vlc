@@ -292,6 +292,7 @@
     _displayLink = [CADisplayLink displayLinkWithTarget:self
                                                selector:@selector(displayLinkUpdate:)];
     [_displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+    [self reshape];
 }
 
 - (void)disable
