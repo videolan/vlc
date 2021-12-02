@@ -32,6 +32,7 @@
 #include "util/color_scheme_model.hpp"
 #include "util/qvlcapp.hpp"
 #include "util/proxycolumnmodel.hpp"
+#include "medialibrary/mlrecentsmodel.hpp"
 
 #include <vlc_config_cat.h>
 #include <vlc_configuration.h>
@@ -52,6 +53,7 @@
 #include <QtAlgorithms>
 #include <QDir>
 
+#include <QSpacerItem>
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QLabel>
@@ -922,9 +924,24 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             }
 
             /* RECENTLY PLAYED options */
+
             CONFIG_BOOL( "save-recentplay", saveRecentlyPlayed );
             CONFIG_GENERIC( "restore-playback-pos", IntegerList, ui.continuePlaybackLabel, continuePlaybackComboBox );
             CONFIG_GENERIC( "qt-auto-raise", IntegerList, ui.autoRaiseLabel, autoRaiseComboBox );
+
+            const auto hasMedialibrary = p_intf->p_mi->hasMediaLibrary();
+
+            ui.clearRecent->setVisible( hasMedialibrary );
+            ui.clearRecentSpacer->changeSize( 0, 0 );
+
+            if ( hasMedialibrary )
+            {
+                ui.clearRecentSpacer->changeSize( 1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum );
+                MLRecentsModel *recentsModel = new MLRecentsModel( ui.clearRecent );
+                recentsModel->setMl( p_intf->p_mi->getMediaLibrary() );
+                connect( ui.clearRecent, &QPushButton::clicked, recentsModel, &MLRecentsModel::clearHistory );
+            }
+
 
         END_SPREFS_CAT;
 

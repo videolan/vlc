@@ -557,23 +557,17 @@
       <string>Privacy / Network Interaction</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="MetadataNetworkAccessMode">
+        <property name="text">
+         <string>Allow metadata network access</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QCheckBox" name="updatesBox">
         <property name="text">
          <string>Activate updates notifier</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="updatesDays">
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <property name="suffix">
-         <string> days</string>
-        </property>
-        <property name="prefix">
-         <string>Every </string>
         </property>
        </widget>
       </item>
@@ -588,12 +582,38 @@
         </item>
        </layout>
       </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="MetadataNetworkAccessMode">
-        <property name="text">
-         <string>Allow metadata network access</string>
+      <item row="0" column="2">
+       <widget class="QSpinBox" name="updatesDays">
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="suffix">
+         <string> days</string>
+        </property>
+        <property name="prefix">
+         <string>Every </string>
         </property>
        </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="clearRecent">
+        <property name="text">
+         <string>Clear Recently Played Items</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <spacer name="clearRecentSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
