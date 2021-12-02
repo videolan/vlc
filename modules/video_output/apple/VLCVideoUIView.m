@@ -330,6 +330,7 @@
     [_displayLink invalidate];
     _displayLink = nil;
     [self removeFromSuperview];
+    _constraints = nil;
 
     [_tapRecognizer.view removeGestureRecognizer:_tapRecognizer];
 }
