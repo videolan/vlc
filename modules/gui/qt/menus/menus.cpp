@@ -545,13 +545,6 @@ void VLCMenuBar::HelpMenu( QMenu *menu )
 /*****************************************************************************
  * Popup menus - Right Click menus                                           *
  *****************************************************************************/
-#define POPUP_BOILERPLATE \
-    QMenu* menu;
-
-#define CREATE_POPUP \
-    menu = new QMenu(); \
-    if( show ) \
-        menu->popup( QCursor::pos() ); \
 
 void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu, qt_intf_t *p_intf )
 {
@@ -676,11 +669,6 @@ void VLCMenuBar::PopupMenuStaticEntries( QMenu *menu )
     menu->addMenu( openmenu );
 
     menu->addSeparator();
-#if 0
-    QMenu *helpmenu = HelpMenu( menu );
-    helpmenu->setTitle( qtr( "Help" ) );
-    menu->addMenu( helpmenu );
-#endif
 
     addDPStaticEntry( menu, qtr( "Quit" ), ":/menu/exit.svg",
                       &DialogsProvider::quit, "Ctrl+Q", QAction::QuitRole );
@@ -859,10 +847,6 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
         menu->popup( QCursor::pos() );
     return menu;
 }
-
-#undef CREATE_POPUP
-#undef POPUP_BOILERPLATE
-#undef BAR_DADD
 
 /************************************************************************
  * Systray Menu                                                         *
