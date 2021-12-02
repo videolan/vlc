@@ -18,10 +18,9 @@
 #include <cassert>
 #include "mlalbum.hpp"
 
-MLAlbum::MLAlbum(vlc_medialibrary_t* _ml, const vlc_ml_album_t *_data, QObject *_parent)
+MLAlbum::MLAlbum(const vlc_ml_album_t *_data, QObject *_parent)
     : QObject( _parent )
     , MLItem        ( MLItemId( _data->i_id, VLC_ML_PARENT_ALBUM ) )
-    , m_ml          ( _ml )
     , m_title       ( QString::fromUtf8( _data->psz_title ) )
     , m_releaseYear ( _data->i_year )
     , m_shortSummary( QString::fromUtf8( _data->psz_summary ) )
@@ -31,7 +30,6 @@ MLAlbum::MLAlbum(vlc_medialibrary_t* _ml, const vlc_ml_album_t *_data, QObject *
     , m_duration    ( _data->i_duration )
 {
     assert( _data );
-    assert( _ml );
 }
 
 QString MLAlbum::getTitle() const

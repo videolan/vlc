@@ -29,15 +29,13 @@
 class MLGenre : public MLItemCover
 {
 public:
-    MLGenre(vlc_medialibrary_t * _ml, const vlc_ml_genre_t * _data);
+    MLGenre(const vlc_ml_genre_t * _data);
 
     QString getName() const;
 
     unsigned int getNbTracks() const;
 
 private:
-    vlc_medialibrary_t * m_ml;
-
     QString m_name;
 
     unsigned int m_nbTracks;

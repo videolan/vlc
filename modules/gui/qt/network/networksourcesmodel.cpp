@@ -24,7 +24,6 @@
 
 NetworkSourcesModel::NetworkSourcesModel( QObject* parent )
     : QAbstractListModel( parent )
-    , m_ml( nullptr )
 {
 }
 
@@ -73,7 +72,6 @@ void NetworkSourcesModel::setCtx(MainCtx* ctx)
 {
     if (ctx) {
         m_ctx = ctx;
-        m_ml = vlc_ml_instance_get( m_ctx->getIntf() );
     }
     if (m_ctx) {
         initializeMediaSources();

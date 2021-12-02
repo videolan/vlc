@@ -88,7 +88,6 @@ private:
 private:
     std::vector<Item> m_items;
     MainCtx* m_ctx = nullptr;
-    vlc_medialibrary_t* m_ml = nullptr;
     services_discovery_category_e m_sdSource = services_discovery_category_e::SD_CAT_INTERNET;
 };
 

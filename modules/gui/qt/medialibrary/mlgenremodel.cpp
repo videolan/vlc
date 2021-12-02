@@ -201,7 +201,7 @@ MLGenreModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) c
         return {};
     std::vector<std::unique_ptr<MLItem>> res;
     for( const vlc_ml_genre_t& genre: ml_range_iterate<vlc_ml_genre_t>( genre_list ) )
-        res.emplace_back( std::make_unique<MLGenre>( ml, &genre ) );
+        res.emplace_back( std::make_unique<MLGenre>( &genre ) );
     return res;
 
 }

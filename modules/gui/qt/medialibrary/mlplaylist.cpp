@@ -25,9 +25,8 @@
 // Ctor / dtor
 //-------------------------------------------------------------------------------------------------
 
-MLPlaylist::MLPlaylist(vlc_medialibrary_t * ml, const vlc_ml_playlist_t * data)
+MLPlaylist::MLPlaylist(const vlc_ml_playlist_t * data)
     : MLItemCover(MLItemId(data->i_id, VLC_ML_PARENT_PLAYLIST))
-    , m_ml(ml)
     , m_name(qfu(data->psz_name))
     , m_duration(0) // TODO m_duration
     , m_count(data->i_nb_media)

@@ -88,7 +88,7 @@ Q_DECLARE_METATYPE(AudioDescription)
 class MLVideo : public MLItem
 {
 public:
-    MLVideo(vlc_medialibrary_t *, const vlc_ml_media_t *data);
+    MLVideo(const vlc_ml_media_t *data);
 
     bool isNew() const;
     QString getFileName() const;

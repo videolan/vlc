@@ -27,9 +27,8 @@
 // Ctor / dtor
 //-------------------------------------------------------------------------------------------------
 
-MLGroup::MLGroup(vlc_medialibrary_t * ml, const vlc_ml_group_t * data)
+MLGroup::MLGroup(const vlc_ml_group_t * data)
     : MLItemCover(MLItemId(data->i_id, VLC_ML_PARENT_GROUP))
-    , m_ml(ml)
     , m_name(qfu(data->psz_name))
     , m_duration(data->i_duration)
     , m_date(data->i_creation_date)

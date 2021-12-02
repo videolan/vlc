@@ -29,7 +29,7 @@
 class MLPlaylist : public MLItemCover
 {
 public:
-    MLPlaylist(vlc_medialibrary_t * ml, const vlc_ml_playlist_t * data);
+    MLPlaylist(const vlc_ml_playlist_t * data);
 
 public: // Interface
     QString getName() const;
@@ -39,8 +39,6 @@ public: // Interface
     unsigned int getCount() const;
 
 private:
-    vlc_medialibrary_t * m_ml;
-
     QString m_name;
 
     int64_t m_duration;

@@ -18,9 +18,8 @@
 
 #include "mlgenre.hpp"
 
-MLGenre::MLGenre(vlc_medialibrary_t* ml, const vlc_ml_genre_t *_data )
+MLGenre::MLGenre(const vlc_ml_genre_t *_data )
     : MLItemCover( MLItemId( _data->i_id, VLC_ML_PARENT_GENRE ) )
-    , m_ml       ( ml )
     , m_name     ( QString::fromUtf8( _data->psz_name ) )
     , m_nbTracks ( (unsigned int)_data->i_nb_tracks )
 

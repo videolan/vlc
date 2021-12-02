@@ -36,7 +36,7 @@ struct vlc_medialibrary_t;
 class MLPlaylistMedia : public MLItem
 {
 public:
-    MLPlaylistMedia(vlc_medialibrary_t *, const vlc_ml_media_t * data);
+    MLPlaylistMedia( const vlc_ml_media_t * data);
 
 public: // Interface
     bool isNew() const;

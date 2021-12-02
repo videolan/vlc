@@ -213,7 +213,7 @@ MLVideoModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) c
 
     for (const vlc_ml_media_t & media : ml_range_iterate<vlc_ml_media_t>(list))
     {
-        result.emplace_back(std::make_unique<MLVideo>(ml, &media));
+        result.emplace_back(std::make_unique<MLVideo>( &media));
     }
 
     return result;

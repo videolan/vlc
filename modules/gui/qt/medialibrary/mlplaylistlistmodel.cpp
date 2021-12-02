@@ -451,7 +451,7 @@ MLPlaylistListModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t c
 
     for (const vlc_ml_playlist_t & playlist : ml_range_iterate<vlc_ml_playlist_t>(list))
     {
-        result.emplace_back(std::make_unique<MLPlaylist>(ml, &playlist));
+        result.emplace_back(std::make_unique<MLPlaylist>(&playlist));
     }
 
     return result;

@@ -25,7 +25,7 @@
 // Ctor / dtor
 //-------------------------------------------------------------------------------------------------
 
-MLPlaylistMedia::MLPlaylistMedia(vlc_medialibrary_t*, const vlc_ml_media_t * data)
+MLPlaylistMedia::MLPlaylistMedia(const vlc_ml_media_t * data)
     : MLItem(MLItemId(data->i_id, VLC_ML_PARENT_UNKNOWN))
     , m_type(data->i_type)
     , m_title(qfu(data->psz_title))

@@ -350,13 +350,13 @@ MLGroupListModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t coun
             // NOTE: Do we really need to check 'i_nb_items' here ?
             if (list->i_nb_items == 1)
             {
-                result.emplace_back(std::make_unique<MLVideo>(ml, &(list->p_items[0])));
+                result.emplace_back(std::make_unique<MLVideo>(&(list->p_items[0])));
 
                 continue;
             }
         }
 
-        result.emplace_back(std::make_unique<MLGroup>(ml, &group));
+        result.emplace_back(std::make_unique<MLGroup>(&group));
     }
 
     return result;

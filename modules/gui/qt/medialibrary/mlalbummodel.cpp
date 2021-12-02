@@ -163,6 +163,6 @@ MLAlbumModel::Loader::load(vlc_medialibrary_t* ml, size_t index, size_t count) c
         return {};
     std::vector<std::unique_ptr<MLItem>> res;
     for( const vlc_ml_album_t& album: ml_range_iterate<vlc_ml_album_t>( album_list ) )
-        res.emplace_back( std::make_unique<MLAlbum>( ml, &album ) );
+        res.emplace_back( std::make_unique<MLAlbum>( &album ) );
     return res;
 }

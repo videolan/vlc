@@ -36,7 +36,7 @@ class MLAlbum : public QObject, public MLItem
     Q_OBJECT
 
 public:
-    MLAlbum(vlc_medialibrary_t* _ml, const vlc_ml_album_t *_data, QObject *_parent = nullptr);
+    MLAlbum(const vlc_ml_album_t *_data, QObject *_parent = nullptr);
 
     QString getTitle() const;
     unsigned int getReleaseYear() const;
@@ -51,8 +51,6 @@ public:
     Q_INVOKABLE QString getPresInfo() const;
 
 private:
-    vlc_medialibrary_t* m_ml;
-
     QString m_title;
     unsigned int m_releaseYear;
     QString m_shortSummary;
