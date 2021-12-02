@@ -56,8 +56,6 @@ public:
     };
 
 public:
-    explicit MLGroupListModel(vlc_medialibrary_t * ml, QObject * parent = nullptr);
-
     explicit MLGroupListModel(QObject * parent = nullptr);
 
 public: // QAbstractItemModel implementation

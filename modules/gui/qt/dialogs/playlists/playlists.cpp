@@ -69,7 +69,7 @@ PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf) : QVLCFrame(_p_intf)
     connect(m_playlists, &QTreeView::clicked,       this, &PlaylistsDialog::onClicked);
     connect(m_playlists, &QTreeView::doubleClicked, this, &PlaylistsDialog::onDoubleClicked);
 
-    m_model = new MLPlaylistListModel(vlc_ml_instance_get(_p_intf), m_playlists);
+    m_model = new MLPlaylistListModel(m_playlists);
 
     m_model->setMl(mainCtx->getMediaLibrary());
 

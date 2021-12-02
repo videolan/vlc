@@ -53,12 +53,6 @@ static const QHash<QByteArray, vlc_ml_sorting_criteria_t> criterias =
 // MLGroupListModel
 //=================================================================================================
 
-/* explicit */ MLGroupListModel::MLGroupListModel(vlc_medialibrary_t * ml, QObject * parent)
-    : MLBaseModel(parent)
-{
-    m_ml = ml;
-}
-
 /* explicit */ MLGroupListModel::MLGroupListModel(QObject * parent)
     : MLBaseModel(parent) {}
 

@@ -41,13 +41,6 @@ static const int MLPLAYLISTMODEL_COVER_HEIGHT = 320 * 2;
 // MLPlaylistListModel
 //=================================================================================================
 
-MLPlaylistListModel::MLPlaylistListModel(vlc_medialibrary_t * ml, QObject * parent)
-    : MLBaseModel(parent)
-    , m_coverDefault(":/noart_videoCover.svg")
-{
-    m_ml = ml;
-}
-
 /* explicit */ MLPlaylistListModel::MLPlaylistListModel(QObject * parent)
     : MLBaseModel(parent)
     , m_coverSize(MLPLAYLISTMODEL_COVER_WIDTH, MLPLAYLISTMODEL_COVER_HEIGHT) {}

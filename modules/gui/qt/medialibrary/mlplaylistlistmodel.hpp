@@ -48,8 +48,6 @@ public:
     };
 
 public:
-    MLPlaylistListModel(vlc_medialibrary_t * ml, QObject * parent = nullptr);
-
     explicit MLPlaylistListModel(QObject * parent = nullptr);
 
 public: // Interface
