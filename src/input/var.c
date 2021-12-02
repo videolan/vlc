@@ -123,4 +123,7 @@ void input_ConfigVarInit ( input_thread_t *p_input )
 
     /* Inherited by demux/subtitle.c */
     var_Create( p_input, "sub-original-fps", VLC_VAR_FLOAT );
+
+    /* used by Medialibrary */
+    var_Create( p_input, "save-recentplay", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 }

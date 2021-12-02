@@ -202,7 +202,8 @@ vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
     }
     assert(media->i_type != VLC_ML_MEDIA_TYPE_UNKNOWN);
 
-    vlc_ml_media_update_progress( ml, media->i_id, input->position );
+    if ( var_GetBool( input->thread, "save-recentplay" ) )
+        vlc_ml_media_update_progress( ml, media->i_id, input->position );
 
     /* If the value changed during the playback, update it in the medialibrary.
      * If not, set each state to their "unset" values, so that they aren't saved

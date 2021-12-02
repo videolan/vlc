@@ -709,6 +709,8 @@ static const char *const ppsz_prefres[] = {
     "the form \"{name=bookmark-name,time=optional-time-offset," \
     "bytes=optional-byte-offset},{...}\"")
 
+#define SAVE_RECENTPLAY N_("Save recently played items")
+
 #define RESTORE_PLAYBACK_POS_TEXT N_("Continue playback")
 #define RESTORE_PLAYBACK_POS_LONGTEXT N_("Should the playback resume where " \
     "it was left off?")
@@ -1865,6 +1867,8 @@ vlc_module_begin ()
     add_string( "bookmarks", NULL,
                  BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT )
         change_safe ()
+
+    add_bool( "save-recentplay", true, SAVE_RECENTPLAY, NULL );
 
     add_integer( "restore-playback-pos", VLC_PLAYER_RESTORE_PLAYBACK_POS_ASK,
                  RESTORE_PLAYBACK_POS_TEXT, RESTORE_PLAYBACK_POS_LONGTEXT )
