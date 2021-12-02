@@ -42,6 +42,7 @@
 static int rtp_packetize_mpa  (sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_mpv  (sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_ac3  (sout_stream_id_sys_t *, block_t *);
+static int rtp_packetize_eac3(sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_simple(sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_split(sout_stream_id_sys_t *, block_t *);
 static int rtp_packetize_pcm(sout_stream_id_sys_t *, block_t *);
@@ -277,6 +278,10 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
         case VLC_CODEC_A52:
             rtp_fmt->ptname = "ac3";
             rtp_fmt->pf_packetize = rtp_packetize_ac3;
+            break;
+        case VLC_CODEC_EAC3:
+            rtp_fmt->ptname = "eac3";
+            rtp_fmt->pf_packetize = rtp_packetize_eac3;
             break;
         case VLC_CODEC_H263:
             rtp_fmt->ptname = "H263-1998";
@@ -975,6 +980,32 @@ static int rtp_packetize_ac3( sout_stream_id_sys_t *id, block_t *in )
         p_data += i_payload;
         i_data -= i_payload;
         hdr[0] = 3; /* Fragment other than initial fragment */
+    }
+
+    block_Release(in);
+    return VLC_SUCCESS;
+}
+
+static int rtp_packetize_eac3(sout_stream_id_sys_t *id, block_t *in)
+{
+    size_t mtu = rtp_mtu(id) - 2;
+    uint_fast8_t frag_count = (in->i_buffer + mtu - 1) / mtu - 1;
+    uint8_t frame_type = frag_count > 0;
+
+    for (unsigned int i = 0; i < frag_count; i++) {
+        bool last = i == (frag_count - 1);
+        size_t len = last ? in->i_buffer : mtu;
+        block_t *out = block_Alloc(14 + len);
+
+        rtp_packetize_common(id, out, false, in->i_pts);
+        out->p_buffer[12] = frame_type;
+        out->p_buffer[13] = frag_count;
+        memcpy(&out->p_buffer[14], in->p_buffer, len);
+        out->i_dts = in->i_dts + i * in->i_length / frag_count;
+
+        rtp_packetize_send(id, out);
+        in->p_buffer += len;
+        in->i_buffer -= len;
     }
 
     block_Release(in);
