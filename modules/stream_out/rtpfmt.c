@@ -249,7 +249,7 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
             rtp_fmt->ptname = "MPV";
             rtp_fmt->pf_packetize = rtp_packetize_mpv;
             break;
-        case VLC_CODEC_ADPCM_G726:
+        case VLC_CODEC_ADPCM_G726_LE:
             switch( p_fmt->i_bitrate / 1000 )
             {
             case 16:
