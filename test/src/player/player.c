@@ -1924,8 +1924,12 @@ test_set_current_media(struct ctx *ctx)
                 /* Next vlc_player_SetCurrentMedia() call should be
                  * asynchronous since we are still playing. Therefore,
                  * vlc_player_GetCurrentMedia() should return the last one. */
-                player_set_current_mock_media(ctx, "ignored", &params, true);
+                input_item_t *ignored = create_mock_media("ignored", &params);
+                assert(ignored);
+                int ret = vlc_player_SetCurrentMedia(ctx->player, ignored);
+                assert(ret == VLC_SUCCESS);
                 assert(vlc_player_GetCurrentMedia(player) == last_media);
+                input_item_Release(ignored);
 
                 /* The previous media is ignored due to this call */
                 player_set_current_mock_media(ctx, media_names[i], &params, false);
