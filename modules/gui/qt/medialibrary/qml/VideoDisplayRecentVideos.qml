@@ -32,11 +32,11 @@ FocusScope {
 
     // Properties
 
-    property Item focusItem: recentVideosListView
+    property Item focusItem: listView
 
     property int currentIndex: -1
 
-    property var model: undefined;
+    property var model: undefined
 
     // Properties
 
@@ -60,7 +60,7 @@ FocusScope {
     // Functions
 
     function setCurrentItemFocus(reason) {
-        recentVideosListView.setCurrentItemFocus(reason);
+        listView.setCurrentItemFocus(reason);
     }
 
     function _actionAtIndex(index, model, selectionModel) {
@@ -72,6 +72,12 @@ FocusScope {
 
     Util.SelectableDelegateModel {
         id: recentVideoSelection
+        model: root.model
+    }
+
+    VideoContextMenu {
+        id: contextMenu
+
         model: root.model
     }
 
@@ -95,7 +101,7 @@ FocusScope {
         }
 
         Widgets.KeyNavigableListView {
-            id: recentVideosListView
+            id: listView
 
             width: parent.width
 
@@ -125,10 +131,11 @@ FocusScope {
             }
 
             delegate: VideoGridItem {
-                id: recentVideoGridItem
+                id: gridItem
 
                 x: selectedBorderWidth
                 y: selectedBorderWidth
+
                 pictureWidth: VLCStyle.gridCover_video_width
                 pictureHeight: VLCStyle.gridCover_video_height
 
@@ -137,12 +144,19 @@ FocusScope {
                 unselectedUnderlay: shadows.unselected
                 selectedUnderlay: shadows.selected
 
-                onItemDoubleClicked: recentVideoGridItem.play()
+                onItemDoubleClicked: gridItem.play()
 
                 onItemClicked: {
                     recentVideoSelection.updateSelection( modifier , root.model.currentIndex, index )
-                    recentVideosListView.currentIndex = index
-                    recentVideosListView.forceActiveFocus()
+                    listView.currentIndex = index
+                    listView.forceActiveFocus()
+                }
+
+                // NOTE: contextMenu.popup wants a list of indexes.
+                onContextMenuButtonClicked: {
+                    contextMenu.popup([root.model.index(index, 0)],
+                                      globalMousePos,
+                                      { "player-options": [":restore-playback-pos=2"] })
                 }
 
                 Connections {
