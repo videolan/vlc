@@ -133,6 +133,19 @@ QByteArray MLVideoModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) cons
     return M_names_to_criteria.key(criteria, "");
 }
 
+void MLVideoModel::thumbnailUpdated(int idx)
+{
+    emit dataChanged(index(idx), index(idx), {VIDEO_THUMBNAIL});
+}
+
+ListCacheLoader<std::unique_ptr<MLItem>> *
+MLVideoModel::createLoader() const
+{
+    return new Loader(*this);
+}
+
+// Protected MLBaseModel reimplementation
+
 void MLVideoModel::onVlcMlEvent(const MLEvent &event)
 {
     switch (event.i_type)
@@ -146,17 +159,6 @@ void MLVideoModel::onVlcMlEvent(const MLEvent &event)
             break;
     }
     MLBaseModel::onVlcMlEvent( event );
-}
-
-void MLVideoModel::thumbnailUpdated(int idx)
-{
-    emit dataChanged(index(idx), index(idx), {VIDEO_THUMBNAIL});
-}
-
-ListCacheLoader<std::unique_ptr<MLItem>> *
-MLVideoModel::createLoader() const
-{
-    return new Loader(*this);
 }
 
 size_t MLVideoModel::Loader::count() const /* override */

@@ -23,51 +23,40 @@
 #include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_media_library.h>
+#include "mlvideomodel.hpp"
 
-#include "mlbasemodel.hpp"
-#include "mlvideo.hpp"
-
-#include <QObject>
-
-class MLRecentsVideoModel : public MLBaseModel
+class MLRecentsVideoModel : public MLVideoModel
 {
     Q_OBJECT
-    Q_PROPERTY(int numberOfItemsToShow READ getNumberOfItemsToShow WRITE setNumberOfItemsToShow FINAL)
+
+    Q_PROPERTY(int numberOfItemsToShow READ getNumberOfItemsToShow
+               WRITE setNumberOfItemsToShow FINAL)
 
 public:
-    explicit MLRecentsVideoModel( QObject* parent = nullptr );
+    explicit MLRecentsVideoModel(QObject * parent = nullptr);
+
     virtual ~MLRecentsVideoModel() = default;
 
-    QHash<int, QByteArray> roleNames() const override;
-    int numberOfItemsToShow = 10;
+protected: // MLBaseModel implementation
+    ListCacheLoader<std::unique_ptr<MLItem>> * createLoader() const override;
 
-protected:
-    QVariant itemRoleData( MLItem *item, int role ) const override;
+private: // Functions
+    int  getNumberOfItemsToShow();
+    void setNumberOfItemsToShow(int number);
 
-    ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const override;
+protected: // MLVideoModel reimplementation
+    void onVlcMlEvent(const MLEvent & event) override;
+
+private: // Variables
+    int m_numberOfItemsToShow = 10;
 
 private:
-    vlc_ml_sorting_criteria_t roleToCriteria( int /* role */ ) const override{
-        return VLC_ML_SORTING_DEFAULT;
-    }
-    vlc_ml_sorting_criteria_t nameToCriteria( QByteArray /* name */ ) const override{
-        return VLC_ML_SORTING_DEFAULT;
-    }
-    virtual void onVlcMlEvent( const MLEvent &event ) override;
-    void setNumberOfItemsToShow(int);
-    int getNumberOfItemsToShow();
-
     struct Loader : public BaseLoader
     {
-        Loader(const MLRecentsVideoModel &model, int numberOfItemsToShow)
-            : BaseLoader(model)
-            , m_numberOfItemsToShow(numberOfItemsToShow)
-        {
-        }
+        Loader(const MLRecentsVideoModel & model, int numberOfItemsToShow);
 
         size_t count() const override;
+
         std::vector<std::unique_ptr<MLItem>> load(size_t index, size_t count) const override;
 
     private:
