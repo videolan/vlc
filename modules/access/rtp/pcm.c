@@ -238,7 +238,7 @@ static int rtp_pcm_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
         bits = 8;
 
     } else if (vlc_ascii_strcasecmp(desc->name, "G722") == 0) {
-        fourcc = VLC_CODEC_ADPCM_G726; /* RFC33551 §4.5.2 */
+        fourcc = VLC_CODEC_ADPCM_G722; /* RFC3551 §4.5.2 */
         bits = 8;
         ops = &rtp_g722_ops;
 
