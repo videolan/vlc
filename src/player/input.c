@@ -135,6 +135,7 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
      && state != VLC_PLAYER_STATE_STOPPED)
         return;
 
+    enum vlc_player_state last_state = input->state;
     input->state = state;
 
     /* Override the global state if the player is still playing and has a next
@@ -167,7 +168,15 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
             if (!player->input)
                 player->started = false;
 
-            switch (player->media_stopped_action)
+            /* If the last input was not even started, always play the next
+             * media */
+            enum vlc_player_media_stopped_action stopped_action;
+            if (last_state == VLC_PLAYER_STATE_STOPPED)
+                stopped_action = VLC_PLAYER_MEDIA_STOPPED_CONTINUE;
+            else
+                stopped_action = player->media_stopped_action;
+
+            switch (stopped_action)
             {
                 case VLC_PLAYER_MEDIA_STOPPED_EXIT:
                     if (player->input && player->started)
