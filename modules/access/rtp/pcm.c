@@ -164,7 +164,7 @@ static void *rtp_g726_init(struct vlc_rtp_pt *pt)
     struct rtp_pcm *sys = pt->opaque;
     es_format_t fmt;
 
-    es_format_Init(&fmt, AUDIO_ES, VLC_CODEC_ADPCM_G726);
+    es_format_Init(&fmt, AUDIO_ES, VLC_CODEC_ADPCM_G726_LE);
     fmt.audio.i_rate = 8000;
     fmt.audio.i_physical_channels = sys->channel_mask;
     fmt.audio.i_channels = sys->channel_count;
@@ -244,7 +244,7 @@ static int rtp_pcm_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
 
     } else if (sscanf(desc->name, "G726-%u", &bits) == 1
             || sscanf(desc->name, "g726-%u", &bits) == 1) {
-        fourcc = VLC_CODEC_ADPCM_G726; /* RFC33551 §4.5.4 */
+        fourcc = VLC_CODEC_ADPCM_G726_LE; /* RFC3551 §4.5.4 */
         bits /= 8;
         ops = &rtp_g726_ops;
 

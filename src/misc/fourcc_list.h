@@ -1430,6 +1430,10 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_ADPCM_G726, "G.726 ADPCM Audio"),
         A("g726"),
 
+    /* G.726 ADPCM */
+    B(VLC_CODEC_ADPCM_G726_LE, "G.726 ADPCM Audio (little-endian)"),
+        A("g72s"),
+
     /* G.722 ADPCM */
     B(VLC_CODEC_ADPCM_G722, "G.722 ADPCM Audio"),
         A("g722"),

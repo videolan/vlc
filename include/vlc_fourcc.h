@@ -499,6 +499,7 @@
 #define VLC_CODEC_ADPCM_IMA_WS               VLC_FOURCC('A','I','W','S')
 #define VLC_CODEC_ADPCM_G722                 VLC_FOURCC('g','7','2','2')
 #define VLC_CODEC_ADPCM_G726                 VLC_FOURCC('g','7','2','6')
+#define VLC_CODEC_ADPCM_G726_LE              VLC_FOURCC('g','7','2','s')
 #define VLC_CODEC_ADPCM_SWF                  VLC_FOURCC('S','W','F','a')
 #define VLC_CODEC_ADPCM_MS                   VLC_FOURCC('m','s',0x00,0x02)
 #define VLC_CODEC_ADPCM_IMA_WAV              VLC_FOURCC('m','s',0x00,0x11)
