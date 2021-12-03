@@ -232,9 +232,8 @@ vlc_player_destructor_Thread(void *data)
 
             keep_sout = var_GetBool(input->thread, "sout-keep");
 
-            if (input->state == VLC_PLAYER_STATE_STOPPING)
-                vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPED,
-                                             VLC_TICK_INVALID);
+            vlc_player_input_HandleState(input, VLC_PLAYER_STATE_STOPPED,
+                                         VLC_TICK_INVALID);
 
             vlc_list_remove(&input->node);
             vlc_player_input_Delete(input);
@@ -1875,7 +1874,10 @@ vlc_player_Delete(vlc_player_t *player)
     vlc_mutex_lock(&player->lock);
 
     if (player->input)
+    {
         vlc_player_destructor_AddInput(player, player->input);
+        player->input = NULL;
+    }
 
     player->deleting = true;
     vlc_cond_signal(&player->destructor.wait);
