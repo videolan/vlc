@@ -41,8 +41,9 @@ FocusScope {
     property int initialIndex: 0
 
     property var sortModel: [
-        { text: i18n.qtr("Alphabetic"), criteria: "name" },
-        { text: i18n.qtr("Date"),       criteria: "date" }
+        { text: i18n.qtr("Alphabetic"), criteria: "name"     },
+        { text: i18n.qtr("Duration"),   criteria: "duration" },
+        { text: i18n.qtr("Date"),       criteria: "date"     }
     ]
 
     //---------------------------------------------------------------------------------------------
