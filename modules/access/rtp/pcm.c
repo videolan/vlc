@@ -164,7 +164,7 @@ static void *rtp_g726_init(struct vlc_rtp_pt *pt)
     struct rtp_pcm *sys = pt->opaque;
     es_format_t fmt;
 
-    es_format_Init(&fmt, AUDIO_ES, VLC_CODEC_ADPCM_G726_LE);
+    es_format_Init(&fmt, AUDIO_ES, sys->fourcc);
     fmt.audio.i_rate = 8000;
     fmt.audio.i_physical_channels = sys->channel_mask;
     fmt.audio.i_channels = sys->channel_count;
@@ -255,6 +255,11 @@ static int rtp_pcm_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
         fourcc = VLC_CODEC_DAT12; /* RFC3190 §3 */
         bits = 12;
 
+    } else if (vlc_ascii_strcasecmp(desc->name, "32kadpcm") == 0) {
+        fourcc = VLC_CODEC_ADPCM_G726; /* RFC2422 */
+        bits = 4;
+        ops = &rtp_g726_ops;
+
     } else
         return VLC_ENOTSUP;
 
@@ -302,6 +307,6 @@ vlc_module_begin()
     add_shortcut("audio/L8", "audio/L16", "audio/L20", "audio/L24",
                  "audio/DAT12", "audio/PCMA", "audio/PCMU", "audio/G722",
                  "audio/G726-16", "audio/G726-24", "audio/G726-32",
-                 "audio/G726-40")
+                 "audio/G726-40", "audio/32kadpcm")
     /* TODO? DVI4, VDVI */
 vlc_module_end()
