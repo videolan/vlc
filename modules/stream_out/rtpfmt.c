@@ -274,6 +274,16 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
                 return VLC_EGENERIC;
             }
             break;
+        case VLC_CODEC_ADPCM_G726:
+            if( p_fmt->i_bitrate != 32000 )
+            {
+                msg_Err( obj, "cannot add this stream (unsupported "
+                        "G.726 bit rate: %u)", p_fmt->i_bitrate );
+                return VLC_EGENERIC;
+            }
+            rtp_fmt->ptname = "32kadpcm";
+            rtp_fmt->pf_packetize = rtp_packetize_g726_32;
+            break;
         case VLC_CODEC_A52:
             rtp_fmt->ptname = "ac3";
             rtp_fmt->pf_packetize = rtp_packetize_ac3;
