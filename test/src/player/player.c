@@ -1903,6 +1903,9 @@ test_set_current_media(struct ctx *ctx)
     vlc_player_t *player = ctx->player;
     struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_MS(100));
 
+    /* Ensure that this media is not played */
+    player_set_current_mock_media(ctx, "ignored", &params, true);
+
     player_set_current_mock_media(ctx, media_names[0], &params, false);
     player_start(ctx);
 
@@ -1912,10 +1915,11 @@ test_set_current_media(struct ctx *ctx)
      * the player and without passing by the next_media provider. */
     {
         vec_on_current_media_changed *vec = &ctx->report.on_current_media_changed;
-        assert(vec->size == 1);
+        assert(vec->size == 2);
+
         for (size_t i = 1; i <= media_count; ++i)
         {
-            while (vec->size != i)
+            while (vec->size - 1 /* ignored */!= i)
                 vlc_player_CondWait(player, &ctx->wait);
 
             input_item_t *last_media = VEC_LAST(vec);
