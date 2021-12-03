@@ -1894,6 +1894,32 @@ test_next_media(struct ctx *ctx)
 }
 
 static void
+test_same_media(struct ctx *ctx)
+{
+    test_log("same_media\n");
+
+    vlc_player_t *player = ctx->player;
+    struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_MS(10));
+
+    player_set_current_mock_media(ctx, "media", &params, false);
+
+    input_item_t *media = vlc_player_GetCurrentMedia(player);
+    assert(media);
+
+    input_item_Hold(media);
+    vlc_player_SetCurrentMedia(player, media);
+    bool success = vlc_vector_push(&ctx->added_medias, media);
+    assert(success);
+
+    player_start(ctx);
+
+    wait_state(ctx, VLC_PLAYER_STATE_STARTED);
+    wait_state(ctx, VLC_PLAYER_STATE_STOPPED);
+
+    test_end(ctx);
+}
+
+static void
 test_set_current_media(struct ctx *ctx)
 {
     test_log("current_media\n");
@@ -2880,6 +2906,7 @@ main(void)
 
     test_outputs(&ctx); /* Must be the first test */
 
+    test_same_media(&ctx);
     test_set_current_media(&ctx);
     test_next_media(&ctx);
     test_seeks(&ctx);
