@@ -25,6 +25,7 @@
 #include "../adaptive/tools/Conversions.hpp"
 #include <vlc_demux.h>
 #include <vlc_meta.h>
+#include <limits>
 
 extern "C"
 {
