@@ -268,6 +268,11 @@ bool StandardPLPanel::popup( const QPoint &point )
         }
         menu.addMenu( sortingMenu );
     }
+    if ( model->isSupportedAction( VLCModelSubInterface::ACTION_SHUFFLE, index ) )
+    {
+        ADD_MENU_ENTRY( QIcon(), qtr("Shuffle playlist"),
+                    VLCModelSubInterface::ACTION_SHUFFLE );
+    }
 
     /* Zoom */
     QMenu *zoomMenu = new QMenu( qtr( "Display size" ), &menu );
