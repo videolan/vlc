@@ -218,9 +218,6 @@ FocusScope {
         section.criteria: ViewSection.FullString
         section.delegate: sectionHeading
 
-        boundsBehavior: Flickable.StopAtBounds
-        boundsMovement: Flickable.StopAtBounds
-
         MouseEventFilter {
             target: view
 
