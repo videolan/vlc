@@ -405,6 +405,8 @@ libvlccore_la_LIBADD = $(LIBS_libvlccore) \
 	$(LTLIBINTL) $(LTLIBICONV) \
 	$(IDN_LIBS) $(SOCKET_LIBS) $(ATOMIC_LIB) $(LIBRT) $(LIBDL) $(LIBM)
 
+libvlccore_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_libvlccore)
+
 if HAVE_WIN32
 libvlccore_la_SOURCES += \
 	win32/error.c \
