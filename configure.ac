@@ -211,12 +211,12 @@ case "${host_os}" in
     dnl to disable the static bank loader.
     AC_MSG_CHECKING([if -Wl,-U is allowed])
     VLC_SAVE_FLAGS
-    AX_APPEND_FLAG([LDFLAGS],[-Wl,-U,_my_array -no-undefined])
+    AX_APPEND_FLAG([-Wl,-U,_my_array],[LDFLAGS])
     AC_LINK_IFELSE(
-       [AC_LANG_PROGRAM([], [dnl
+       [AC_LANG_PROGRAM([[
 __attribute__((visibility("default"))) extern int my_array[];
-__attribute__((visibility("default"))) int foo() { return my_array[0]; }
-])],
+int foo() { return my_array[0]; }
+]],[[return foo();]])],
        [
         VLC_ADD_LDFLAGS([libvlccore],[-Wl,-U,_vlc_static_modules])
         VLC_ADD_LDFLAGS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
