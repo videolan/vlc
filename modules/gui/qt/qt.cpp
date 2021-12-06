@@ -246,6 +246,9 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define QT_COMPOSITOR_TEXT N_("Select Qt video intergration backend")
 #define QT_COMPOSITOR_LONGTEXT N_("Select Qt video intergration backend. Use with care, the interface may not start if an incompatible compositor is selected")
 
+#define SMOOTH_SCROLLING_TEXT N_( "Use smooth scrolling in Flickable based views" )
+#define SMOOTH_SCROLLING_LONGTEXT N_( "Deactivating this option will disable smooth scrolling in Flickable based views (such as the Playqueue)" )
+
 static const int i_notification_list[] =
     { NOTIFICATION_NEVER, NOTIFICATION_MINIMIZED, NOTIFICATION_ALWAYS };
 
@@ -402,6 +405,8 @@ vlc_module_begin ()
     add_integer( "qt-auto-raise", MainCtx::RAISE_VIDEO, AUTORAISE_ON_PLAYBACK_TEXT,
                  AUTORAISE_ON_PLAYBACK_LONGTEXT )
             change_integer_list( i_raise_list, psz_raise_list_text )
+
+    add_bool( "qt-smooth-scrolling", true, SMOOTH_SCROLLING_TEXT, SMOOTH_SCROLLING_LONGTEXT )
 
     cannot_unload_broken_library()
 

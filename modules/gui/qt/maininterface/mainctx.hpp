@@ -172,6 +172,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool hasAcrylicSurface READ hasAcrylicSurface NOTIFY hasAcrylicSurfaceChanged FINAL)
     Q_PROPERTY(PlaylistPtr mainPlaylist READ getMainPlaylist CONSTANT FINAL)
     Q_PROPERTY(vlc::playlist::PlaylistControllerModel* mainPlaylistController READ getMainPlaylistController CONSTANT FINAL)
+    Q_PROPERTY(bool smoothScroll READ smoothScroll NOTIFY smoothScrollChanged FINAL)
 
     // This Property only works if hasAcrylicSurface is set
     Q_PROPERTY(bool acrylicActive READ acrylicActive WRITE setAcrylicActive NOTIFY acrylicActiveChanged FINAL)
@@ -190,6 +191,7 @@ public:
     inline qt_intf_t* getIntf() const { return p_intf; }
     inline PlaylistPtr getMainPlaylist() const { return PlaylistPtr(p_intf->p_playlist); }
     inline vlc::playlist::PlaylistControllerModel* getMainPlaylistController() const { return p_intf->p_mainPlaylistController; }
+    bool smoothScroll() const { return m_smoothScroll; };
 
     QSystemTrayIcon *getSysTray() { return sysTray; }
     QMenu *getSysTrayMenu() { return systrayMenu.get(); }
@@ -314,6 +316,8 @@ protected:
     bool m_hasAcrylicSurface = false;
     bool m_acrylicActive = false;
 
+    bool m_smoothScroll = true;
+
 public slots:
     void toggleUpdateSystrayMenu();
     void showUpdateSystrayMenu();
@@ -384,6 +388,8 @@ signals:
     void hasAcrylicSurfaceChanged();
 
     void acrylicActiveChanged();
+
+    void smoothScrollChanged();
 
 private:
     void loadPrefs(bool callSignals);
