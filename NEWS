@@ -7,6 +7,9 @@ Audio Output:
 Demux:
  * Support for DAV video files
 
+3rd party libraries (contrib):
+ * Update libsmb2 to fix invalid UTF-8 encoding of some filenames
+
 Changes between 3.0.15 and 3.0.16:
 ----------------------------------
 
