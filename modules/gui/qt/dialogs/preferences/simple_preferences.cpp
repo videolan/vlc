@@ -923,19 +923,23 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 CONFIG_BOOL( "one-instance-when-started-from-file", oneInstanceFromFile );
             }
 
-            /* RECENTLY PLAYED options */
-
-            CONFIG_BOOL( "save-recentplay", saveRecentlyPlayed );
-            CONFIG_GENERIC( "restore-playback-pos", IntegerList, ui.continuePlaybackLabel, continuePlaybackComboBox );
             CONFIG_GENERIC( "qt-auto-raise", IntegerList, ui.autoRaiseLabel, autoRaiseComboBox );
+
+            /* RECENTLY PLAYED options */
 
             const auto hasMedialibrary = p_intf->p_mi->hasMediaLibrary();
 
+            ui.continuePlaybackLabel->setVisible( hasMedialibrary );
+            ui.continuePlaybackComboBox->setVisible( hasMedialibrary );
+            ui.saveRecentlyPlayed->setVisible( hasMedialibrary );
             ui.clearRecent->setVisible( hasMedialibrary );
             ui.clearRecentSpacer->changeSize( 0, 0 );
 
             if ( hasMedialibrary )
             {
+                CONFIG_GENERIC( "restore-playback-pos", IntegerList, ui.continuePlaybackLabel, continuePlaybackComboBox );
+                CONFIG_BOOL( "save-recentplay", saveRecentlyPlayed );
+
                 ui.clearRecentSpacer->changeSize( 1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum );
                 MLRecentsModel *recentsModel = new MLRecentsModel( ui.clearRecent );
                 recentsModel->setMl( p_intf->p_mi->getMediaLibrary() );
