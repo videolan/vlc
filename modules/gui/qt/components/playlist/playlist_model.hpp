@@ -138,6 +138,7 @@ private:
     void dropMove( const PlMimeData * data, PLItem *target, int new_pos );
 
     /* */
+    void sortInternal( QModelIndex rootIndex, int mode, int type );
     void sort( QModelIndex caller, QModelIndex rootIndex, const int column, Qt::SortOrder order );
 
     /* Lookups */
