@@ -87,6 +87,7 @@ public:
     QStringList mimeTypes() const Q_DECL_OVERRIDE;
 
     /* Sort */
+    void shuffle();
     void sort( const int column, Qt::SortOrder order = Qt::AscendingOrder ) Q_DECL_OVERRIDE;
 
     /*** VLCModelSubInterface subclassing ***/

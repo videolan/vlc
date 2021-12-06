@@ -804,6 +804,14 @@ void PLModel::recurseDelete( QList<AbstractPLItem*> children, QModelIndexList *f
 }
 
 /******* Volume III: Sorting and searching ********/
+void PLModel::shuffle()
+{
+    msg_Dbg( p_intf, "Shuffling playlist items");
+
+    sortInternal( indexByPLID( rootItem->id(), 0 ),
+                  SORT_RANDOM, ORDER_NORMAL );
+}
+
 void PLModel::sort( const int column, Qt::SortOrder order )
 {
     sort( QModelIndex(), indexByPLID( rootItem->id(), 0 ) , column, order );
@@ -990,6 +998,10 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
         doDelete( indexes );
         return true;
 
+    case ACTION_SHUFFLE:
+        shuffle();
+        return true;
+
     case ACTION_SORT:
         if ( !indexes.empty() )
             index = indexes.first();
@@ -1041,6 +1053,7 @@ bool PLModel::isSupportedAction( actions action, const QModelIndex &index ) cons
         /* Only if we are not already in Current Playing */
         return getPLRootType() != ROOTTYPE_CURRENT_PLAYING;
     case ACTION_SORT:
+    case ACTION_SHUFFLE:
         return rowCount();
     case ACTION_PLAY:
     {
