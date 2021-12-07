@@ -529,6 +529,7 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
     action->setCheckable( true );
     if( mi->getControlsVisibilityStatus() & MainInterface::CONTROLS_ADVANCED )
         action->setChecked( true );
+    action->setEnabled(mi->isAdvancedWidgetAvailable());
 
     action = menu->addAction( qtr( "Status Bar" ) );
     action->setCheckable( true );
