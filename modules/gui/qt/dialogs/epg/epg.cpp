@@ -39,6 +39,7 @@
 #include <QDialogButtonBox>
 #include <QTimer>
 #include <QDateTime>
+#include <QLocale>
 
 #include "qt.hpp"
 #include "player/player_controller.hpp"
@@ -145,8 +146,9 @@ void EpgDialog::displayEvent( EPGItem *epgItem )
     QDateTime enddate = epgItem->start().addSecs( epgItem->duration() );
 
     QString start, end;
+    QLocale locale;
     if( epgItem->start().daysTo(now) != 0 )
-        start = epgItem->start().toString( Qt::SystemLocaleLongDate );
+        start = locale.toString(epgItem->start());
     else
         start = epgItem->start().time().toString( "hh:mm" );
 
