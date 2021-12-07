@@ -150,9 +150,9 @@ void EpgDialog::displayEvent( EPGItem *epgItem )
     if( epgItem->start().daysTo(now) != 0 )
         start = locale.toString(epgItem->start());
     else
-        start = epgItem->start().time().toString( "hh:mm" );
+        start = locale.toString(epgItem->start().time(), QLocale::ShortFormat);
 
-    end = enddate.time().toString( "hh:mm" );
+    end = locale.toString(enddate.time(), QLocale::ShortFormat);
 
     title->setText( QString("%1 - %2 : %3%4")
                    .arg( start )
