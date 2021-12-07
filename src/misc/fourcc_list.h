@@ -160,6 +160,7 @@ static const staticentry_t p_list_video[] = {
         E("QMP4", "QNAP Systems MPEG-4"),
         E("qMP4", "QNAP Systems MPEG-4"),
         E("wMP4", "QNAP Systems MPEG-4"),
+        E("G264", "GeoVision MPEG-4"),
         /* 3ivx delta 3.5 Unsupported
          * putting it here gives extreme distorted images */
         //E("3IV1", "3ivx delta 3.5 MPEG-4 Video"),
