@@ -664,9 +664,14 @@ function check_config()
   local filePath	= slash.."vlsub_conf.xml"
 
   openSub.conf.dirPath = vlc.config.userdatadir()
+  local res,err = vlc.io.mkdir( openSub.conf.dirPath, "0700" )
+  if res ~= 0 and err ~= vlc.errno.EEXIST then
+    vlc.msg.warn("Failed to create " .. openSub.conf.dirPath)
+    return false
+  end
   local subdirs = { "lua", "extensions", "userdata", "vlsub" }
   for _, dir in ipairs(subdirs) do
-    local res, err = vlc.io.mkdir( openSub.conf.dirPath .. slash .. dir, "0700" )
+    res, err = vlc.io.mkdir( openSub.conf.dirPath .. slash .. dir, "0700" )
     if res ~= 0 and err ~= vlc.errno.EEXIST then
       vlc.msg.warn("Failed to create " .. openSub.conf.dirPath .. slash .. dir )
       return false
