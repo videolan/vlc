@@ -1213,6 +1213,15 @@ int MainInterface::getControlsVisibilityStatus()
             + CONTROLS_ADVANCED * controls->b_advancedVisible );
 }
 
+/* Get whether the advanced buttons widget is available
+ * (if its actually present in any of the configurable locations).
+ */
+bool MainInterface::isAdvancedWidgetAvailable()
+{
+    if( !controls) return false;
+    return controls->advancedAvailable();
+}
+
 StandardPLPanel *MainInterface::getPlaylistView()
 {
     if( !playlistWidget ) return NULL;

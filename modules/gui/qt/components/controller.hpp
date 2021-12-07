@@ -217,6 +217,7 @@ public:
 protected:
     friend class MainInterface;
 
+    bool advancedAvailable();
     bool b_advancedVisible;
 
 private:

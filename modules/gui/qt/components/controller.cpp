@@ -741,6 +741,11 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlLayout->addLayout( controlLayout2 );
 }
 
+bool ControlsWidget::advancedAvailable()
+{
+    return advControls != nullptr;
+}
+
 void ControlsWidget::toggleAdvanced()
 {
     if( !advControls ) return;
