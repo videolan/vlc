@@ -129,8 +129,6 @@ void registerAnonymousType( const char *uri, int versionMajor )
 #endif
 }
 
-MainCtx* g_mainCtx = nullptr;
-
 } // anonymous namespace
 
 
@@ -144,15 +142,14 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     assert(m_mainCtx);
     assert(m_interfaceWindow);
 
-    assert(g_mainCtx == nullptr);
-    g_mainCtx = mainCtx;
+    SingletonRegisterHelper<MainCtx>::setInstance(*mainCtx);
 
     registerQMLTypes();
 }
 
 MainUI::~MainUI()
 {
-    g_mainCtx = nullptr;
+
 }
 
 bool MainUI::setup(QQmlEngine* engine)
@@ -229,7 +226,7 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 0;
         const int versionMinor = 1;
 
-        qmlRegisterSingletonType<MainCtx>(uri, versionMajor, versionMinor, "MainCtx", MainUI::getMainCtxInstance);
+        qmlRegisterSingletonType<MainCtx>(uri, versionMajor, versionMinor, "MainCtx", SingletonRegisterHelper<MainCtx>::callback);
 
         qRegisterMetaType<VLCTick>();
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
@@ -353,8 +350,3 @@ void MainUI::onQmlWarning(const QList<QQmlError>& qmlErrors)
     }
 }
 
-QObject* MainUI::getMainCtxInstance(QQmlEngine *, QJSEngine *)
-{
-    assert(g_mainCtx != nullptr);
-    return g_mainCtx;
-}
