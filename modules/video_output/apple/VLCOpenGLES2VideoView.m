@@ -83,35 +83,6 @@
 - (void)resize:(CGSize)size;
 @end
 
-static void vlc_dispatch_sync(void (^block_function)())
-{
-    CFRunLoopRef runloop = CFRunLoopGetMain();
-
-    __block vlc_sem_t performed;
-    vlc_sem_init(&performed, 0);
-
-    CFStringRef modes_cfstrings[] = {
-        kCFRunLoopDefaultMode,
-        CFSTR("org.videolan.vlccore.window"),
-    };
-
-    CFArrayRef modes = CFArrayCreate(NULL, (const void **)modes_cfstrings,
-            ARRAY_SIZE(modes_cfstrings),
-            &kCFTypeArrayCallBacks);
-
-    /* NOTE: we're using CFRunLoopPerformBlock with a custom mode tag
-     * to avoid deadlocks between the window module (main thread) and the
-     * display module, which would happen when using dispatch_sycn here. */
-    CFRunLoopPerformBlock(runloop, modes, ^{
-        (block_function)();
-        vlc_sem_post(&performed);
-    });
-    CFRunLoopWakeUp(runloop);
-
-    vlc_sem_wait(&performed);
-    CFRelease(modes);
-}
-
 /*****************************************************************************
  * vlc_gl_t callbacks
  *****************************************************************************/
