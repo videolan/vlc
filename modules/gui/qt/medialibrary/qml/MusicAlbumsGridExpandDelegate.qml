@@ -148,7 +148,7 @@ FocusScope {
 
                             iconTxt: VLCIcons.play_outline
                             text: I18n.qtr("Play")
-                            onClicked: medialib.addAndPlay( model.id )
+                            onClicked: MediaLib.addAndPlay( model.id )
                         }
 
                         Widgets.TabButtonExt {
@@ -156,7 +156,7 @@ FocusScope {
 
                             iconTxt: VLCIcons.enqueue
                             text: I18n.qtr("Enqueue")
-                            onClicked: medialib.addToPlaylist( model.id )
+                            onClicked: MediaLib.addToPlaylist( model.id )
                         }
                     }
 

@@ -53,7 +53,7 @@ VideoAll {
     model: MLVideoModel {
         id: modelGroup
 
-        ml: medialib
+        ml: MediaLib
 
         parentId: initialId
     }

@@ -67,8 +67,8 @@ Widgets.KeyNavigableTableView {
 
     property alias parentId: rootmodel.parentId
 
-    onActionForSelection:  medialib.addAndPlay(model.getIdsForIndexes( selection ))
-    onItemDoubleClicked: medialib.addAndPlay(model.id)
+    onActionForSelection:  MediaLib.addAndPlay(model.getIdsForIndexes( selection ))
+    onItemDoubleClicked: MediaLib.addAndPlay(model.id)
     onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
     onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
@@ -84,7 +84,7 @@ Widgets.KeyNavigableTableView {
 
     MLAlbumTrackModel {
         id: rootmodel
-        ml: medialib
+        ml: MediaLib
         onSortCriteriaChanged: {
             switch (rootmodel.sortCriteria) {
             case "title":

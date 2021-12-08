@@ -26,7 +26,7 @@ Item {
     MLRecentModel {
         id: recentModel
         numberOfItemsToShow: 10
-        ml: medialib
+        ml: MediaLib
     }
 
     //build all the shortcuts everytime, it seems that they can't be added/removed dynamically
@@ -42,7 +42,7 @@ Item {
 
                         var trackId = recentModel.data(recentModel.index(index, 0), MLRecentModel.RECENT_MEDIA_ID)
                         if (!!trackId)
-                            medialib.addAndPlay([trackId])
+                            MediaLib.addAndPlay([trackId])
                     }
                 }
                 context: Qt.ApplicationShortcut

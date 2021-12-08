@@ -164,14 +164,14 @@ FocusScope {
 
                             function play() {
                                 if ( model.id !== undefined ) {
-                                    medialib.addAndPlay( model.id )
+                                    MediaLib.addAndPlay( model.id )
                                 }
                             }
                         }
 
                         onSelectAll: albumSelectionModel.selectAll()
                         onSelectionUpdated: albumSelectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
-                        onActionAtIndex: medialib.addAndPlay( albumModel.getIdForIndex( index ) )
+                        onActionAtIndex: MediaLib.addAndPlay( albumModel.getIdForIndex( index ) )
 
                         Widgets.GridShadows {
                             id: shadows
@@ -228,9 +228,9 @@ FocusScope {
 
     function _actionAtIndex(index, model, selectionModel) {
         if (selectionModel.selectedIndexes.length > 1) {
-            medialib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ) )
+            MediaLib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ) )
         } else {
-            medialib.addAndPlay( model.getIdForIndex(index) )
+            MediaLib.addAndPlay( model.getIdForIndex(index) )
         }
     }
 
@@ -251,7 +251,7 @@ FocusScope {
     MLAlbumModel {
         id: albumModel
 
-        ml: medialib
+        ml: MediaLib
         parentId: artist.id
 
         onCountChanged: {
@@ -277,7 +277,7 @@ FocusScope {
     MLAlbumTrackModel {
         id: trackModel
 
-        ml: medialib
+        ml: MediaLib
         parentId: albumModel.parentId
     }
 
@@ -403,7 +403,7 @@ FocusScope {
             selectionDelegateModel: trackSelectionModel
             headerColor: VLCStyle.colors.bg
             onActionForSelection: {
-                medialib.addAndPlay( model.getIdsForIndexes( selection ) )
+                MediaLib.addAndPlay( model.getIdsForIndexes( selection ) )
             }
 
             header: root.header
@@ -424,7 +424,7 @@ FocusScope {
 
             Navigation.cancelAction: root._onNavigationCancel
 
-            onItemDoubleClicked: medialib.addAndPlay(model.id)
+            onItemDoubleClicked: MediaLib.addAndPlay(model.id)
             onContextMenuButtonClicked: trackContextMenu.popup(trackSelectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
             onRightClick: trackContextMenu.popup(trackSelectionModel.selectedIndexes, globalMousePos)
 

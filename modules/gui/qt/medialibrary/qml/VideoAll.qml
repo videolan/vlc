@@ -47,7 +47,7 @@ FocusScope {
 
     property int initialIndex: 0
 
-    property var model: MLVideoModel { ml: medialib }
+    property var model: MLVideoModel { ml: MediaLib }
 
     property var sortModel: [
         { text: I18n.qtr("Alphabetic"), criteria: "title"    },
@@ -115,7 +115,7 @@ FocusScope {
     function _actionAtIndex() {
         g_mainDisplay.showPlayer();
 
-        medialib.addAndPlay(model.getIdsForIndexes(modelSelect.selectedIndexes));
+        MediaLib.addAndPlay(model.getIdsForIndexes(modelSelect.selectedIndexes));
     }
 
     // Events
@@ -278,7 +278,7 @@ FocusScope {
 
                 onItemClicked: gridView.leftClickOnItem(modifier, index)
 
-                onItemDoubleClicked: g_mainDisplay.play(medialib, model.id)
+                onItemDoubleClicked: g_mainDisplay.play(MediaLib, model.id)
 
                 onContextMenuButtonClicked: {
                     gridView.rightClickOnItem(index);
@@ -328,7 +328,7 @@ FocusScope {
 
             onActionForSelection: _actionAtIndex()
 
-            onItemDoubleClicked: g_mainDisplay.play(medialib, model.id)
+            onItemDoubleClicked: g_mainDisplay.play(MediaLib, model.id)
 
             onContextMenuButtonClicked: contextMenu.popup(modelSelect.selectedIndexes,
                                                           menuParent.mapToGlobal(0,0))

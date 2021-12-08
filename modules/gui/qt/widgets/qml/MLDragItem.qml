@@ -21,6 +21,8 @@
 
 import QtQuick 2.11
 
+import org.videolan.medialib 0.1
+
 DragItem {
     id: root
 
@@ -50,7 +52,7 @@ DragItem {
 
     function _getInputItem(index, data) {
         console.assert(mlIDRole)
-        return medialib.mlInputItem(data[mlIDRole])
+        return MediaLib.mlInputItem(data[mlIDRole])
     }
 
 }

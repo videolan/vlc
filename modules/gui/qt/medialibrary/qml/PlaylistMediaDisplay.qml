@@ -99,7 +99,7 @@ FocusScope {
     MLPlaylistModel {
         id: model
 
-        ml: medialib
+        ml: MediaLib
 
         parentId: initialId
 

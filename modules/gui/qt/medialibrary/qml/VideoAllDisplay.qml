@@ -52,7 +52,7 @@ VideoAll {
     MLRecentsVideoModel {
         id: modelRecent
 
-        ml: medialib
+        ml: MediaLib
     }
 
     header: Column {

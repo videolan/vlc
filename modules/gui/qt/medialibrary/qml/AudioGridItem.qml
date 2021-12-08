@@ -35,7 +35,7 @@ Widgets.GridItem {
     playCoverBorderWidth: VLCStyle.gridCover_music_border
     onPlayClicked: {
         if ( model.id !== undefined ) {
-            medialib.addAndPlay( model.id )
+            MediaLib.addAndPlay( model.id )
         }
     }
 }

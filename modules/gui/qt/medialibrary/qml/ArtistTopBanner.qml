@@ -133,14 +133,14 @@ FocusScope {
                         focus: true
                         // NOTE: In overlay, the focus rectangle is always white.
                         colorFocus: VLCStyle.colors.white
-                        onClicked: medialib.addAndPlay( artist.id )
+                        onClicked: MediaLib.addAndPlay( artist.id )
                     }
 
                     Widgets.ActionButtonOverlay {
                         id: enqueueActionBtn
                         iconTxt: VLCIcons.enqueue
                         text: I18n.qtr("Enqueue all")
-                        onClicked: medialib.addToPlaylist( artist.id )
+                        onClicked: MediaLib.addToPlaylist( artist.id )
                     }
                 }
             }

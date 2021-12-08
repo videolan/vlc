@@ -154,6 +154,12 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     assert(DialogsProvider::getInstance());
     SingletonRegisterHelper<DialogsProvider>::setInstance(*DialogsProvider::getInstance());
 
+    if (m_mainCtx->hasMediaLibrary())
+    {
+        assert(m_mainCtx->getMediaLibrary());
+        SingletonRegisterHelper<MediaLib>::setInstance(*m_mainCtx->getMediaLibrary());
+    }
+
     registerQMLTypes();
 }
 
@@ -166,13 +172,6 @@ bool MainUI::setup(QQmlEngine* engine)
 {
     engine->setOutputWarningsToStandardError(false);
     connect(engine, &QQmlEngine::warnings, this, &MainUI::onQmlWarning);
-
-    QQmlContext *rootCtx = engine->rootContext();
-
-    if (m_mainCtx->hasMediaLibrary())
-        rootCtx->setContextProperty( "medialib", m_mainCtx->getMediaLibrary() );
-    else
-        rootCtx->setContextProperty( "medialib", nullptr );
 
     m_component  = new QQmlComponent(engine, QStringLiteral("qrc:/main/MainInterface.qml"), QQmlComponent::PreferSynchronous, engine);
     if (m_component->isLoading())
@@ -309,6 +308,8 @@ void MainUI::registerQMLTypes()
         const char* uri = "org.videolan.medialib";
         const int versionMajor = 0;
         const int versionMinor = 1;
+
+        qmlRegisterSingletonType<MediaLib>(uri, versionMajor, versionMinor, "MediaLib", SingletonRegisterHelper<MediaLib>::callback);
 
         qRegisterMetaType<MLItemId>();
         qmlRegisterType<MLAlbumModel>( uri, versionMajor, versionMinor, "MLAlbumModel" );

@@ -19,6 +19,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.11
 import QtGraphicalEffects 1.0
+
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
@@ -50,9 +51,9 @@ FocusScope {
 
     Component.onCompleted: {
         loadView()
-        if (medialib && !MainCtx.hasFirstrun)
+        if (MainCtx.mediaLibraryAvailable && !MainCtx.hasFirstrun)
             // asynchronous call
-            medialib.reload()
+            MainCtx.mediaLibrary.reload()
     }
 
     function loadView() {
@@ -103,19 +104,19 @@ FocusScope {
 
     readonly property var pageModel: [
         {
-            listed: !!medialib,
+            listed: MainCtx.mediaLibraryAvailable,
             displayText: I18n.qtr("Video"),
             icon: VLCIcons.topbar_video,
             name: "video",
             url: "qrc:///medialibrary/VideoDisplay.qml"
         }, {
-            listed: !!medialib,
+            listed: MainCtx.mediaLibraryAvailable,
             displayText: I18n.qtr("Music"),
             icon: VLCIcons.topbar_music,
             name: "music",
             url: "qrc:///medialibrary/MusicDisplay.qml"
         }, {
-            listed: !medialib,
+            listed: MainCtx.mediaLibraryAvailable,
             displayText: I18n.qtr("Home"),
             icon: VLCIcons.home,
             name: "home",
@@ -245,7 +246,7 @@ FocusScope {
                                 topMargin: VLCStyle.dp(10, VLCStyle.scale)
                                 bottomMargin: VLCStyle.dp(10, VLCStyle.scale)
                             }
-                            active: !!medialib && !medialib.idle
+                            active: MainCtx.mediaLibraryAvailable && !MainCtx.mediaLibrary.idle
                             source: "qrc:///widgets/ScanProgressBar.qml"
                         }
                     }

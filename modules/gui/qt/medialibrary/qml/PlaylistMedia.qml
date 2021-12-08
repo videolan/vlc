@@ -84,8 +84,8 @@ MainInterface.MainTableView {
     // Events
     //---------------------------------------------------------------------------------------------
 
-    onActionForSelection: medialib.addAndPlay(model.getIdsForIndexes(selection))
-    onItemDoubleClicked: medialib.addAndPlay(model.id)
+    onActionForSelection: MediaLib.addAndPlay(model.getIdsForIndexes(selection))
+    onItemDoubleClicked: MediaLib.addAndPlay(model.id)
 
     //---------------------------------------------------------------------------------------------
     // Connections

@@ -72,7 +72,7 @@ FocusScope {
 
     MLGenreModel {
         id: genreModel
-        ml: medialib
+        ml: MediaLib
 
         onCountChanged: {
             if (genreModel.count > 0 && !selectionModel.hasSelection) {
@@ -83,7 +83,7 @@ FocusScope {
 
     function _actionAtIndex(index) {
         if (selectionModel.selectedIndexes.length > 1) {
-            medialib.addAndPlay(model.getIdsForIndexes(selectionModel.selectedIndexes))
+            MediaLib.addAndPlay(model.getIdsForIndexes(selectionModel.selectedIndexes))
         } else if (selectionModel.selectedIndexes.length === 1) {
             var sel = selectionModel.selectedIndexes[0]
             var model = genreModel.getDataAt(sel)
@@ -166,7 +166,7 @@ FocusScope {
 
                 onPlayClicked: {
                     if (model.id)
-                        medialib.addAndPlay(model.id)
+                        MediaLib.addAndPlay(model.id)
                 }
 
                 onContextMenuButtonClicked: {

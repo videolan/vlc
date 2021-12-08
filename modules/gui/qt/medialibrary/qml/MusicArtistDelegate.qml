@@ -22,6 +22,7 @@ import QtQuick 2.11
 import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 
+import org.videolan.medialib 0.1
 import org.videolan.controls 0.1
 import org.videolan.vlc 0.1
 
@@ -86,7 +87,7 @@ T.Control {
             }
 
             function getSelectedInputItem() {
-                return medialib.mlInputItem(model.id)
+                return MediaLib.mlInputItem(model.id)
             }
         }
 

@@ -61,16 +61,16 @@ Widgets.KeyNavigableTableView {
     rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
     headerColor: VLCStyle.colors.bg
 
-    onActionForSelection: medialib.addAndPlay(model.getIdsForIndexes(
+    onActionForSelection: MediaLib.addAndPlay(model.getIdsForIndexes(
                                                   selection))
-    onItemDoubleClicked: medialib.addAndPlay(model.id)
+    onItemDoubleClicked: MediaLib.addAndPlay(model.id)
     onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
     onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
     MLUrlModel {
         id: urlModel
 
-        ml: medialib
+        ml: MediaLib
     }
 
     Util.SelectableDelegateModel {

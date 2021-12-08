@@ -96,7 +96,8 @@ Rectangle {
     function setInitialView() {
         //set the initial view
         var loadPlayer = !mainPlaylistController.empty;
-        if (medialib)
+
+        if (MainCtx.mediaLibraryAvailable)
             History.push(["mc", "video"], loadPlayer ? History.Stay : History.Go)
         else
             History.push(["mc", "home"], loadPlayer ? History.Stay : History.Go)
@@ -140,7 +141,7 @@ Rectangle {
                             && History.current.name === "player") {
                         if (History.previousEmpty)
                         {
-                            if (medialib)
+                            if (MainCtx.mediaLibraryAvailable)
                                 History.push(["mc", "video"])
                             else
                                 History.push(["mc", "home"])

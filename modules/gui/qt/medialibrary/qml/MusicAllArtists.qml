@@ -71,7 +71,7 @@ FocusScope {
 
     MLArtistModel {
         id: artistModel
-        ml: medialib
+        ml: MediaLib
 
         onCountChanged: {
             if (artistModel.count > 0 && !selectionModel.hasSelection) {
@@ -120,7 +120,7 @@ FocusScope {
             onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onActionAtIndex: {
                 if (selectionModel.selectedIndexes.length > 1) {
-                    medialib.addAndPlay( artistModel.getIdsForIndexes( selectionModel.selectedIndexes ) )
+                    MediaLib.addAndPlay( artistModel.getIdsForIndexes( selectionModel.selectedIndexes ) )
                 } else {
                     _currentView.currentIndex = index
                     requestArtistAlbumView(Qt.TabFocusReason)
@@ -189,10 +189,10 @@ FocusScope {
 
             onActionForSelection: {
                 if (selection.length > 1) {
-                    medialib.addAndPlay( artistModel.getIdsForIndexes( selection ) )
+                    MediaLib.addAndPlay( artistModel.getIdsForIndexes( selection ) )
                 } else if ( selection.length === 1) {
                     requestArtistAlbumView(Qt.TabFocusReason)
-                    medialib.addAndPlay( artistModel.getIdForIndex( selection[0] ) )
+                    MediaLib.addAndPlay( artistModel.getIdForIndex( selection[0] ) )
                 }
             }
 

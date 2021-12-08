@@ -138,7 +138,7 @@ FocusScope {
 
     function _actionAtIndex() {
         if (modelSelect.selectedIndexes.length > 1) {
-            medialib.addAndPlay(model.getIdsForIndexes(modelSelect.selectedIndexes));
+            MediaLib.addAndPlay(model.getIdsForIndexes(modelSelect.selectedIndexes));
         } else if (modelSelect.selectedIndexes.length === 1) {
             var index = modelSelect.selectedIndexes[0];
             showList(model.getDataAt(index), Qt.TabFocusReason);
@@ -171,7 +171,7 @@ FocusScope {
     MLPlaylistListModel {
         id: model
 
-        ml: medialib
+        ml: MediaLib
 
         coverSize: (isMusic) ? Qt.size(512, 512)
                              : Qt.size(1024, 640)
@@ -277,7 +277,7 @@ FocusScope {
 
                 onItemDoubleClicked: showList(model, Qt.MouseFocusReason)
 
-                onPlayClicked: if (model.id) medialib.addAndPlay(model.id)
+                onPlayClicked: if (model.id) MediaLib.addAndPlay(model.id)
 
                 onContextMenuButtonClicked: {
                     gridView.rightClickOnItem(index);

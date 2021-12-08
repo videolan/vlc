@@ -19,6 +19,8 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 
+import org.videolan.medialib 0.1
+
 import "qrc:///style/"
 
 T.ProgressBar {
@@ -26,9 +28,9 @@ T.ProgressBar {
 
     from: 0
     to: 100
-    value: medialib.parsingProgress
-    indeterminate: medialib.discoveryPending
-    visible: !medialib.idle
+    value: MediaLib.parsingProgress
+    indeterminate: MediaLib.discoveryPending
+    visible: !MediaLib.idle
     height: contentItem.implicitHeight
     width: implicitWidth
 
@@ -117,7 +119,7 @@ T.ProgressBar {
         }
 
         SubtitleLabel {
-            text:  medialib.discoveryPending ? medialib.discoveryEntryPoint : (medialib.parsingProgress + "%")
+            text:  MediaLib.discoveryPending ? MediaLib.discoveryEntryPoint : (MediaLib.parsingProgress + "%")
             font.weight: Font.Normal
             width: parent.width
         }

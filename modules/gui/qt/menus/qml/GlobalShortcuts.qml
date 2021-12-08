@@ -46,7 +46,7 @@ Item {
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"F11"; onActivated: MainCtx.toggleInterfaceFullScreen(); }
 
     Loader {
-        active: !!medialib
+        active: MainCtx.mediaLibraryAvailable
         source: "qrc:///menus/GlobalShortcutsMedialib.qml"
     }
 }

@@ -74,7 +74,7 @@ FocusScope {
 
     MLArtistModel {
         id: artistModel
-        ml: medialib
+        ml: MediaLib
 
         onCountChanged: {
             if (artistModel.count > 0 && !selectionModel.hasSelection) {
@@ -164,7 +164,7 @@ FocusScope {
 
                 onItemDoubleClicked: {
                     if (mouse.buttons === Qt.LeftButton)
-                        medialib.addAndPlay(model.id);
+                        MediaLib.addAndPlay(model.id);
                     else
                         albumSubView.forceActiveFocus();
                 }

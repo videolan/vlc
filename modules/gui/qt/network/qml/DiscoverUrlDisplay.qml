@@ -104,7 +104,7 @@ FocusScope {
             width: parent.width
             height: parent.height - searchFieldContainer.height
 
-            active:  !!medialib
+            active: MainCtx.mediaLibraryAvailable
             source: "qrc:///medialibrary/UrlListDisplay.qml"
             onLoaded: {
                 item.Navigation.upItem = searchField

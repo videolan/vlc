@@ -72,9 +72,9 @@ FocusScope {
 
     function _actionAtIndex(index) {
         if (selectionModel.selectedIndexes.length > 1) {
-            medialib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ) )
+            MediaLib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ) )
         } else {
-            medialib.addAndPlay( model.getIdForIndex(index) )
+            MediaLib.addAndPlay( model.getIdForIndex(index) )
         }
     }
 
@@ -90,7 +90,7 @@ FocusScope {
 
     MLAlbumModel {
         id: albumModelId
-        ml: medialib
+        ml: MediaLib
 
         onCountChanged: {
             if (albumModelId.count > 0 && !selectionModel.hasSelection) {
@@ -239,7 +239,7 @@ FocusScope {
 
             onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes,  menuParent.mapToGlobal(0,0))
             onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            onItemDoubleClicked: medialib.addAndPlay( model.id )
+            onItemDoubleClicked: MediaLib.addAndPlay( model.id )
 
             Widgets.TableColumns {
                 id: tableColumns
