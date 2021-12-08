@@ -69,6 +69,9 @@ static const vlc_fourcc_t gl_subpicture_chromas[] = {
 static void
 ResizeFormatToGLMaxTexSize(video_format_t *fmt, unsigned int max_tex_size)
 {
+    if (fmt->i_width <= max_tex_size && fmt->i_height <= max_tex_size)
+        return;
+
     if (fmt->i_width > fmt->i_height)
     {
         unsigned int const  vis_w = fmt->i_visible_width;
@@ -205,12 +208,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     /* Resize the format if it is greater than the maximum texture size
      * supported by the hardware */
-    GLint       max_tex_size;
+    GLint max_tex_size;
     vt->GetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_size);
-
-    if ((GLint)fmt->i_width > max_tex_size ||
-        (GLint)fmt->i_height > max_tex_size)
-        ResizeFormatToGLMaxTexSize(fmt, max_tex_size);
+    ResizeFormatToGLMaxTexSize(fmt, max_tex_size);
 
     vgl->interop = vlc_gl_interop_New(gl, context, fmt);
     if (!vgl->interop)
