@@ -107,6 +107,7 @@ typedef struct vout_thread_sys_t
     vout_control_t  control;
     atomic_bool     control_is_terminated; // shutdown the vout thread
     vlc_thread_t    thread;
+    vlc_sem_t       sem_init;
 
     struct {
         vlc_tick_t  date;
@@ -2184,6 +2185,9 @@ static void *Thread(void *object)
     sys->state.display.deadline = VLC_TICK_INVALID;
     sys->state.display.wait = false;
 
+    atomic_init(&sys->control_is_terminated, false);
+    vlc_sem_post(&sys->sem_init);
+
     while (!atomic_load(&sys->control_is_terminated))
     {
         switch (sys->state.current)
@@ -2535,7 +2539,7 @@ vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
                spu_Create(vout, vout) : NULL;
 
     vout_control_Init(&sys->control);
-    atomic_init(&sys->control_is_terminated, false);
+    vlc_sem_init(&sys->sem_init, 0);
 
     sys->title.show     = var_InheritBool(vout, "video-title-show");
     sys->title.timeout  = var_InheritInteger(vout, "video-title-timeout");
@@ -2729,12 +2733,13 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
         return -1;
     }
 
-    atomic_store(&sys->control_is_terminated, false);
     if (vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
         vout_ReleaseDisplay(vout);
         vout_DisableWindow(vout);
         return -1;
     }
+    /* Wait for thread to be initialized */
+    vlc_sem_wait(&sys->sem_init);
 
     if (input != NULL && sys->spu)
         spu_Attach(sys->spu, input);
