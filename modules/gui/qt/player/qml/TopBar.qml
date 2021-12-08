@@ -144,7 +144,7 @@ FocusScope{
             objectName: "IconToolButton"
             size: VLCStyle.banner_icon_size
             iconText: VLCIcons.topbar_previous
-            text: i18n.qtr("Back")
+            text: I18n.qtr("Back")
             focus: true
             colors: topFocusScope.colors
 
@@ -253,7 +253,7 @@ FocusScope{
             focus: true
             size: VLCStyle.banner_icon_size
             iconText: VLCIcons.ellipsis
-            text: i18n.qtr("Menu")
+            text: I18n.qtr("Menu")
             colors: topFocusScope.colors
 
             Navigation.parentItem: topFocusScope
@@ -278,7 +278,7 @@ FocusScope{
             objectName: ControlListModel.PLAYLIST_BUTTON
             size: VLCStyle.banner_icon_size
             iconText: VLCIcons.playlist
-            text: i18n.qtr("Playlist")
+            text: I18n.qtr("Playlist")
             colors: topFocusScope.colors
             focus: false
 

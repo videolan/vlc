@@ -66,15 +66,15 @@ Widgets.PageLoader {
 
     pageModel: [{
             name: "all",
-            displayText: i18n.qtr("All"),
+            displayText: I18n.qtr("All"),
             url: "qrc:///medialibrary/VideoAllDisplay.qml"
         },{
             name: "groups",
-            displayText: i18n.qtr("Groups"),
+            displayText: I18n.qtr("Groups"),
             url: "qrc:///medialibrary/VideoGroupsDisplay.qml"
         },{
             name: "playlists",
-            displayText: i18n.qtr("Playlists"),
+            displayText: I18n.qtr("Playlists"),
             url: "qrc:///medialibrary/VideoPlaylistsDisplay.qml"
         }
     ]

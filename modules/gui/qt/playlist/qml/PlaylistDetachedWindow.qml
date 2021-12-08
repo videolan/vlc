@@ -32,7 +32,7 @@ Window {
     width: 350
     minimumWidth: playlistView.minimumWidth
 
-    title: i18n.qtr("Playlist")
+    title: I18n.qtr("Playlist")
     color: VLCStyle.colors.bg
 
     Component.onCompleted: {

@@ -195,7 +195,7 @@ T.Control {
                 Layout.fillWidth: true
 
                 font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
-                text: (model.artist ? model.artist : i18n.qtr("Unknown Artist"))
+                text: (model.artist ? model.artist : I18n.qtr("Unknown Artist"))
                 color: colors.text
             }
         }

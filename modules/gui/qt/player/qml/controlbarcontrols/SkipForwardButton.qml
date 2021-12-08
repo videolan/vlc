@@ -28,5 +28,5 @@ Widgets.IconControlButton {
     size: VLCStyle.icon_medium
     iconText: VLCIcons.skip_for
     onClicked: Player.jumpFwd()
-    text: i18n.qtr("Step forward")
+    text: I18n.qtr("Step forward")
 }

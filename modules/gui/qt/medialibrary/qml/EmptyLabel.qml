@@ -74,7 +74,7 @@ FocusScope {
         Widgets.TabButtonExt {
             id: browseButton
 
-            text: i18n.qtr("Browse")
+            text: I18n.qtr("Browse")
             focus: true
             iconTxt: VLCIcons.topbar_network
             anchors.horizontalCenter: parent.horizontalCenter

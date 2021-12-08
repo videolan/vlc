@@ -31,5 +31,5 @@ Widgets.ComboBoxExt {
     model: Player.aspectRatio
     currentIndex: -1
     onCurrentIndexChanged: model.toggleIndex(currentIndex)
-    Accessible.name: i18n.qtr("Aspect ratio")
+    Accessible.name: I18n.qtr("Aspect ratio")
 }

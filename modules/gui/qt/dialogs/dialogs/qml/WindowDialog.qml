@@ -35,7 +35,6 @@ Window {
     width: VLCStyle.appWidth * 0.75
     height: VLCStyle.appHeight * 0.85
 
-    title: i18n.qtr("Dialog")
     color: VLCStyle.colors.bg
 
     property alias contentComponent: loader.sourceComponent

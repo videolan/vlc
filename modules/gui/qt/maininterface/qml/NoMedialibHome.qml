@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 
@@ -37,7 +39,7 @@ FocusScope {
 
         Widgets.MenuLabel {
             anchors .horizontalCenter: parent.horizontalCenter
-            text: i18n.qtr("Drag & Drop some content here!")
+            text: I18n.qtr("Drag & Drop some content here!")
         }
     }
 

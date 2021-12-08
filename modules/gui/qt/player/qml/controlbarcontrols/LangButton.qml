@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 import "qrc:///player/" as Player
@@ -30,7 +32,7 @@ Widgets.IconControlButton {
     enabled: langMenuLoader.status === Loader.Ready
     onClicked: langMenuLoader.item.open()
 
-    text: i18n.qtr("Languages and tracks")
+    text: I18n.qtr("Languages and tracks")
 
     Loader {
         id: langMenuLoader

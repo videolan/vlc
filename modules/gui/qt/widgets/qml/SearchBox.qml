@@ -113,7 +113,7 @@ FocusScope {
 
                 selectByMouse: true
 
-                placeholderText: i18n.qtr("filter")
+                placeholderText: I18n.qtr("filter")
 
                 background: Rectangle { color: "transparent" }
 
@@ -171,7 +171,7 @@ FocusScope {
             size: VLCStyle.banner_icon_size
 
             iconText: VLCIcons.search
-            text: i18n.qtr("Filter")
+            text: I18n.qtr("Filter")
 
             focus: true
 

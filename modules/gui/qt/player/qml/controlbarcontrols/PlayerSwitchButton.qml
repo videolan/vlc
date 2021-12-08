@@ -33,5 +33,5 @@ Widgets.IconControlButton {
             g_mainDisplay.showPlayer()
     }
 
-    text: i18n.qtr("Switch Player")
+    text: I18n.qtr("Switch Player")
 }

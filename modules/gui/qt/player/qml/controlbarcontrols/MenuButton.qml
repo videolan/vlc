@@ -27,7 +27,7 @@ Widgets.IconControlButton {
     id: menuBtn
     size: VLCStyle.icon_medium
     iconText: VLCIcons.ellipsis
-    text: i18n.qtr("Menu")
+    text: I18n.qtr("Menu")
 
     onClicked: contextMenu.popup(this.mapToGlobal(0, 0))
 

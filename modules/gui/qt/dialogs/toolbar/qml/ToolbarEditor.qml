@@ -73,19 +73,19 @@ Rectangle{
 
             TextMetrics {
                 id: leftMetric
-                text: i18n.qtr("L   E   F   T")
+                text: I18n.qtr("L   E   F   T")
                 font.pixelSize: VLCStyle.fontSize_xxlarge
             }
 
             TextMetrics {
                 id: centerMetric
-                text: i18n.qtr("C   E   N   T   E   R")
+                text: I18n.qtr("C   E   N   T   E   R")
                 font.pixelSize: VLCStyle.fontSize_xxlarge
             }
 
             TextMetrics {
                 id: rightMetric
-                text: i18n.qtr("R   I   G   H   T")
+                text: I18n.qtr("R   I   G   H   T")
                 font.pixelSize: VLCStyle.fontSize_xxlarge
             }
 
@@ -245,7 +245,7 @@ Rectangle{
 
                 Widgets.MenuCaption {
                     Layout.margins: VLCStyle.margin_xxsmall
-                    text: i18n.qtr("Drag items below to add them above: ")
+                    text: I18n.qtr("Drag items below to add them above: ")
                 }
 
                 ToolbarEditorButtonList {

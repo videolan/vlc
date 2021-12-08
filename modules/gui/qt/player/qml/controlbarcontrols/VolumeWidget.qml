@@ -60,7 +60,7 @@ FocusScope{
                     VLCIcons.volume_medium
                 else
                     VLCIcons.volume_high
-            text: i18n.qtr("Mute")
+            text: I18n.qtr("Mute")
             color: widgetfscope.color
             colorHover: colors.buttonTextHover
             colorFocus: colors.bgFocus
@@ -84,7 +84,7 @@ FocusScope{
             stepSize: 0.05
             opacity: _player.muted ? 0.5 : 1
 
-            Accessible.name: i18n.qtr("Volume")
+            Accessible.name: I18n.qtr("Volume")
 
             Keys.onPressed: {
                 if (KeyHelper.matchOk(event)) {

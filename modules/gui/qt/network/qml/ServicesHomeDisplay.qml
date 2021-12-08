@@ -218,7 +218,7 @@ Widgets.PageLoader {
 
                                 Widgets.CaptionLabel {
                                     color: VLCStyle.colors.text
-                                    text: model.author ? i18n.qtr("by <b>%1</b>").arg(model.author) : i18n.qtr("by <b>Unknown</b>")
+                                    text: model.author ? I18n.qtr("by <b>%1</b>").arg(model.author) : I18n.qtr("by <b>Unknown</b>")
                                     topPadding: VLCStyle.margin_xxxsmall
                                     width: parent.width
                                 }
@@ -233,13 +233,13 @@ Widgets.PageLoader {
                                 text: {
                                     switch(model.state) {
                                     case ServicesDiscoveryModel.INSTALLED:
-                                        return i18n.qtr("Remove")
+                                        return I18n.qtr("Remove")
                                     case ServicesDiscoveryModel.NOTINSTALLED:
-                                        return i18n.qtr("Install")
+                                        return I18n.qtr("Install")
                                     case ServicesDiscoveryModel.INSTALLING:
-                                        return i18n.qtr("Installing")
+                                        return I18n.qtr("Installing")
                                     case ServicesDiscoveryModel.UNINSTALLING:
-                                        return i18n.qtr("Uninstalling")
+                                        return I18n.qtr("Uninstalling")
                                     }
                                 }
 
@@ -254,7 +254,7 @@ Widgets.PageLoader {
 
                         Widgets.CaptionLabel {
                             elide: Text.ElideRight
-                            text:  model.description || model.summary || i18n.qtr("No information available")
+                            text:  model.description || model.summary || I18n.qtr("No information available")
                             topPadding: VLCStyle.margin_xsmall
                             wrapMode: Text.WordWrap
                             Layout.fillWidth: true
@@ -262,7 +262,7 @@ Widgets.PageLoader {
                         }
 
                         Widgets.CaptionLabel {
-                            text: i18n.qtr("Score: %1/5  Downloads: %2").arg(model.score).arg(model.downloads)
+                            text: I18n.qtr("Score: %1/5  Downloads: %2").arg(model.score).arg(model.downloads)
                             topPadding: VLCStyle.margin_xsmall
                             Layout.fillWidth: true
                         }
@@ -312,7 +312,7 @@ Widgets.PageLoader {
                 property int index: -1
                 readonly property bool is_dummy: model.type === NetworkSourcesModel.TYPE_DUMMY
 
-                title: is_dummy ? i18n.qtr("Add a service") : model.long_name
+                title: is_dummy ? I18n.qtr("Add a service") : model.long_name
                 subtitle: ""
                 pictureWidth: VLCStyle.colWidth(1)
                 pictureHeight: VLCStyle.gridCover_network_height

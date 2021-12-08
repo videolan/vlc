@@ -227,7 +227,7 @@ Control {
             spacing: VLCStyle.margin_xxxsmall
 
             Widgets.SubtitleLabel {
-                text: i18n.qtr("Playqueue")
+                text: I18n.qtr("Playqueue")
                 color: colors.text
                 font.weight: Font.Bold
                 font.pixelSize: VLCStyle.dp(24, VLCStyle.scale)
@@ -240,12 +240,12 @@ Control {
                 text: {
                     switch (listView.mode) {
                     case PlaylistListView.Mode.Select:
-                        return i18n.qtr("Selected tracks: %1").arg(model.selectedCount)
+                        return I18n.qtr("Selected tracks: %1").arg(model.selectedCount)
                     case PlaylistListView.Mode.Move:
-                        return i18n.qtr("Moving tracks: %1").arg(model.selectedCount)
+                        return I18n.qtr("Moving tracks: %1").arg(model.selectedCount)
                     case PlaylistListView.Mode.Normal:
                     default:
-                        return i18n.qtr("%1 elements, %2").arg(model.count).arg(getHoursMinutesText(model.duration))
+                        return I18n.qtr("%1 elements, %2").arg(model.count).arg(getHoursMinutesText(model.duration))
                     }
                 }
 
@@ -255,13 +255,13 @@ Control {
                     var text
                     if (hours >= 1) {
                         minutes = minutes % 60
-                        text = i18n.qtr("%1h %2 min").arg(hours).arg(minutes)
+                        text = I18n.qtr("%1h %2 min").arg(hours).arg(minutes)
                     }
                     else if (minutes > 0) {
-                        text = i18n.qtr("%1 min").arg(minutes)
+                        text = I18n.qtr("%1 min").arg(minutes)
                     }
                     else {
-                        text = i18n.qtr("%1 sec").arg(duration.toSeconds())
+                        text = I18n.qtr("%1 sec").arg(duration.toSeconds())
                     }
 
                     return text
@@ -293,7 +293,7 @@ Control {
                 Layout.leftMargin: VLCStyle.margin_large
 
                 verticalAlignment: Text.AlignVCenter
-                text: i18n.qtr("Title")
+                text: I18n.qtr("Title")
                 color: colors.caption
             }
 
@@ -629,7 +629,7 @@ Control {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
-                    text: i18n.qtr("No content yet")
+                    text: I18n.qtr("No content yet")
 
                     color: label.color
 
@@ -642,7 +642,7 @@ Control {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
-                    text: i18n.qtr("Drag & Drop some content here!")
+                    text: I18n.qtr("Drag & Drop some content here!")
 
                     color: label.color
 

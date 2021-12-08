@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -26,5 +28,5 @@ Widgets.IconControlButton {
     iconText: VLCIcons.previous
     enabled: mainPlaylistController.hasPrev
     onClicked: mainPlaylistController.prev()
-    text: i18n.qtr("Previous")
+    text: I18n.qtr("Previous")
 }

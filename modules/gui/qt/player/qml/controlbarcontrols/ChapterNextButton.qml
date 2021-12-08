@@ -29,5 +29,5 @@ Widgets.IconControlButton {
     iconText: VLCIcons.dvd_next
     onClicked: Player.chapterNext()
     enabled: Player.hasChapters
-    text: i18n.qtr("Next chapter")
+    text: I18n.qtr("Next chapter")
 }

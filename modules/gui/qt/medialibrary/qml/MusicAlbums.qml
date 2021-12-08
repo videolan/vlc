@@ -31,10 +31,10 @@ FocusScope {
     id: root
 
     property var sortModel: [
-        { text: i18n.qtr("Alphabetic"),  criteria: "title"},
-        { text: i18n.qtr("Duration"),    criteria: "duration" },
-        { text: i18n.qtr("Date"),        criteria: "release_year" },
-        { text: i18n.qtr("Artist"),      criteria: "main_artist" },
+        { text: I18n.qtr("Alphabetic"),  criteria: "title"},
+        { text: I18n.qtr("Duration"),    criteria: "duration" },
+        { text: I18n.qtr("Date"),        criteria: "release_year" },
+        { text: I18n.qtr("Artist"),      criteria: "main_artist" },
     ]
 
     property alias model: albumModelId
@@ -230,8 +230,8 @@ FocusScope {
             headerTopPadding: VLCStyle.margin_normal
 
             sortModel:  [
-                { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: i18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
-                { criteria: "main_artist", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)), text: i18n.qtr("Artist") },
+                { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: I18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
+                { criteria: "main_artist", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)), text: I18n.qtr("Artist") },
                 { criteria: "duration", width:VLCStyle.colWidth(1), showSection: "", headerDelegate: tableColumns.timeHeaderDelegate, colDelegate: tableColumns.timeColDelegate },
             ]
 
@@ -284,7 +284,7 @@ FocusScope {
         anchors.fill: parent
         visible: albumModelId.count === 0
         focus: visible
-        text: i18n.qtr("No albums found\nPlease try adding sources, by going to the Network tab")
+        text: I18n.qtr("No albums found\nPlease try adding sources, by going to the Network tab")
         Navigation.parentItem: root
         cover: VLCStyle.noArtAlbumCover
     }

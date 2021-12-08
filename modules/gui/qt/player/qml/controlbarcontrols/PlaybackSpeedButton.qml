@@ -28,7 +28,7 @@ Widgets.IconControlButton {
     id: playbackSpeedButton
 
     size: VLCStyle.icon_medium
-    text: i18n.qtr("Playback Speed")
+    text: I18n.qtr("Playback Speed")
     color: playbackSpeedPopup.visible ? colors.accent : colors.playerControlBarFg
 
     onClicked: playbackSpeedPopup.open()
@@ -80,7 +80,7 @@ Widgets.IconControlButton {
     T.Label {
         anchors.centerIn: parent
         font.pixelSize: VLCStyle.fontSize_normal
-        text: !playbackSpeedButton.paintOnly ? i18n.qtr("%1x").arg(+Player.rate.toFixed(2)) : i18n.qtr("1x")
+        text: !playbackSpeedButton.paintOnly ? I18n.qtr("%1x").arg(+Player.rate.toFixed(2)) : I18n.qtr("1x")
         color: playbackSpeedButton.background.foregroundColor // IconToolButton.background is a AnimatedBackground
     }
 }

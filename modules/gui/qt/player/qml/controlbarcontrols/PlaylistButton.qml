@@ -34,5 +34,5 @@ Widgets.IconControlButton {
         }
     }
 
-    text: i18n.qtr("Playlist")
+    text: I18n.qtr("Playlist")
 }

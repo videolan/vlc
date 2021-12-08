@@ -26,6 +26,6 @@ Widgets.IconControlButton {
     id: backBtn
     size: VLCStyle.icon_medium
     iconText: VLCIcons.exit
-    text: i18n.qtr("Back")
+    text: I18n.qtr("Back")
     onClicked: History.previous()
 }

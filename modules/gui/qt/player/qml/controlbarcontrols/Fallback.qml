@@ -43,7 +43,7 @@ Control {
     }
 
     contentItem: Widgets.MenuLabel {
-        text: i18n.qtr("WIDGET\nNOT\nFOUND")
+        text: I18n.qtr("WIDGET\nNOT\nFOUND")
         horizontalAlignment: Text.AlignHCenter
         color: colors.text
     }

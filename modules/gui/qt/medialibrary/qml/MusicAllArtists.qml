@@ -139,8 +139,8 @@ FocusScope {
             delegate: AudioGridItem {
                 id: gridItem
 
-                title: model.name || i18n.qtr("Unknown artist")
-                subtitle: model.nb_tracks > 1 ? i18n.qtr("%1 songs").arg(model.nb_tracks) : i18n.qtr("%1 song").arg(model.nb_tracks)
+                title: model.name || I18n.qtr("Unknown artist")
+                subtitle: model.nb_tracks > 1 ? I18n.qtr("%1 songs").arg(model.nb_tracks) : I18n.qtr("%1 song").arg(model.nb_tracks)
                 pictureRadius: VLCStyle.artistGridCover_radius
                 pictureHeight: VLCStyle.artistGridCover_radius
                 pictureWidth: VLCStyle.artistGridCover_radius
@@ -197,8 +197,8 @@ FocusScope {
             }
 
             sortModel:  [
-                { isPrimary: true, criteria: "name", width: VLCStyle.colWidth(Math.max(artistTable._nbCols - 1, 1)), text: i18n.qtr("Name"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
-                { criteria: "nb_tracks", width: VLCStyle.colWidth(1), text: i18n.qtr("Tracks") }
+                { isPrimary: true, criteria: "name", width: VLCStyle.colWidth(Math.max(artistTable._nbCols - 1, 1)), text: I18n.qtr("Name"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
+                { criteria: "nb_tracks", width: VLCStyle.colWidth(1), text: I18n.qtr("Tracks") }
             ]
 
             onItemDoubleClicked: root.requestArtistAlbumView(Qt.MouseFocusReason)
@@ -236,7 +236,7 @@ FocusScope {
         anchors.fill: parent
         visible: artistModel.count === 0
         focus: artistModel.count === 0
-        text: i18n.qtr("No artists found\nPlease try adding sources, by going to the Network tab")
+        text: I18n.qtr("No artists found\nPlease try adding sources, by going to the Network tab")
         Navigation.parentItem: root
         cover: VLCStyle.noArtArtistCover
     }

@@ -28,5 +28,5 @@ Widgets.IconControlButton {
     size: VLCStyle.icon_medium
     iconText: VLCIcons.clear
     onClicked: MainCtx.close()
-    text: i18n.qtr("Quit")
+    text: I18n.qtr("Quit")
 }

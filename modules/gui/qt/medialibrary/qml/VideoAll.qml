@@ -50,8 +50,8 @@ FocusScope {
     property var model: MLVideoModel { ml: medialib }
 
     property var sortModel: [
-        { text: i18n.qtr("Alphabetic"), criteria: "title"    },
-        { text: i18n.qtr("Duration"),   criteria: "duration" }
+        { text: I18n.qtr("Alphabetic"), criteria: "title"    },
+        { text: I18n.qtr("Duration"),   criteria: "duration" }
     ]
 
     // Aliases
@@ -345,7 +345,7 @@ FocusScope {
 
         visible: (model.count === 0)
 
-        text: i18n.qtr("No video found\nPlease try adding sources, by going to the Network tab")
+        text: I18n.qtr("No video found\nPlease try adding sources, by going to the Network tab")
 
         cover: VLCStyle.noArtVideoCover
 

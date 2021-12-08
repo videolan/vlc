@@ -43,7 +43,7 @@ Widgets.GridItem {
     image: model.artwork && model.artwork.toString() !== "" ? model.artwork : ""
 
     subtitle: model.mrl || ""
-    title: model.name || i18n.qtr("Unknown share")
+    title: model.name || I18n.qtr("Unknown share")
 
     pictureOverlay: NetworkCustomCover {
         networkModel: model

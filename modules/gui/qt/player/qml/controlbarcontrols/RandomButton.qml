@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -27,5 +29,5 @@ Widgets.IconControlButton {
     checked: mainPlaylistController.random
     iconText: VLCIcons.shuffle_on
     onClicked: mainPlaylistController.toggleRandom()
-    text: i18n.qtr("Random")
+    text: I18n.qtr("Random")
 }

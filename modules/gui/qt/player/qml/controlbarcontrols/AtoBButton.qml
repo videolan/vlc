@@ -29,7 +29,7 @@ Widgets.IconControlButton {
     size: VLCStyle.icon_medium
     checked: Player.ABloopState !== Player.ABLOOP_STATE_NONE
     onClicked: Player.toggleABloopState()
-    text: i18n.qtr("A to B")
+    text: I18n.qtr("A to B")
 
     iconText: {
         switch(Player.ABloopState) {

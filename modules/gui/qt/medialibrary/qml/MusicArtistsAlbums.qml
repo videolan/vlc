@@ -35,7 +35,7 @@ FocusScope {
 
     property alias model: artistModel
     property var sortModel: [
-        { text: i18n.qtr("Alphabetic"),  criteria: "title" }
+        { text: I18n.qtr("Alphabetic"),  criteria: "title" }
     ]
 
     property alias currentIndex: artistList.currentIndex
@@ -139,7 +139,7 @@ FocusScope {
             }
 
             header: Widgets.SubtitleLabel {
-                text: i18n.qtr("Artists")
+                text: I18n.qtr("Artists")
                 font.pixelSize: VLCStyle.fontSize_large
                 leftPadding: VLCStyle.margin_normal
                 bottomPadding: VLCStyle.margin_small
@@ -218,7 +218,7 @@ FocusScope {
         anchors.fill: parent
         visible: artistModel.count === 0
         focus: visible
-        text: i18n.qtr("No artists found\nPlease try adding sources, by going to the Network tab")
+        text: I18n.qtr("No artists found\nPlease try adding sources, by going to the Network tab")
         Navigation.parentItem: root
     }
 }

@@ -104,7 +104,7 @@ FocusScope {
                     Widgets.SubtitleLabel {
                         id: albumsText
 
-                        text: i18n.qtr("Albums")
+                        text: I18n.qtr("Albums")
                         leftPadding: VLCStyle.margin_xlarge
                         topPadding: VLCStyle.margin_normal
                         bottomPadding: VLCStyle.margin_xsmall
@@ -135,7 +135,7 @@ FocusScope {
 
                         delegate: Widgets.GridItem {
                             image: model.cover || VLCStyle.noArtAlbum
-                            title: model.title || i18n.qtr("Unknown title")
+                            title: model.title || I18n.qtr("Unknown title")
                             subtitle: model.release_year || ""
                             textAlignHCenter: true
                             x: selectedBorderWidth
@@ -184,7 +184,7 @@ FocusScope {
                     Widgets.SubtitleLabel {
                         id: tracksText
 
-                        text: i18n.qtr("Tracks")
+                        text: I18n.qtr("Tracks")
                         leftPadding: VLCStyle.margin_xlarge
                         topPadding: VLCStyle.margin_large
                     }
@@ -411,8 +411,8 @@ FocusScope {
             rowHeight: VLCStyle.tableCoverRow_height
 
             sortModel:  [
-                { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: i18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
-                { criteria: "album_title", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)), text: i18n.qtr("Album") },
+                { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: I18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
+                { criteria: "album_title", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)), text: I18n.qtr("Album") },
                 { criteria: "duration", width:VLCStyle.colWidth(1), showSection: "", headerDelegate: tableColumns.timeHeaderDelegate, colDelegate: tableColumns.timeColDelegate },
             ]
 

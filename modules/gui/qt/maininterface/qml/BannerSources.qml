@@ -130,7 +130,7 @@ FocusScope {
                                  id: history_back
                                  size: VLCStyle.banner_icon_size
                                  iconText: VLCIcons.topbar_previous
-                                 text: i18n.qtr("Previous")
+                                 text: I18n.qtr("Previous")
                                  height: VLCStyle.bannerButton_height
                                  width: VLCStyle.bannerButton_width
                                  colorDisabled: VLCStyle.colors.textDisabled
@@ -254,7 +254,7 @@ FocusScope {
                                 height: VLCStyle.bannerButton_height
                                 size: VLCStyle.banner_icon_size
                                 iconText: MainCtx.gridView ? VLCIcons.list : VLCIcons.grid
-                                text: i18n.qtr("List/Grid")
+                                text: I18n.qtr("List/Grid")
                                 onClicked: MainCtx.gridView = !MainCtx.gridView
                                 enabled: true
                             }
@@ -397,7 +397,7 @@ FocusScope {
 
                                 size: VLCStyle.banner_icon_size
                                 iconText: VLCIcons.playlist
-                                text: i18n.qtr("Playlist")
+                                text: I18n.qtr("Playlist")
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
                                 highlighted: MainCtx.playlistVisible
@@ -410,7 +410,7 @@ FocusScope {
 
                                 size: VLCStyle.banner_icon_size
                                 iconText: VLCIcons.ellipsis
-                                text: i18n.qtr("Menu")
+                                text: I18n.qtr("Menu")
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
 

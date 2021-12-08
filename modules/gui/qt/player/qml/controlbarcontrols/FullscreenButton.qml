@@ -29,5 +29,5 @@ Widgets.IconControlButton {
     enabled: Player.hasVideoOutput
     iconText: Player.fullscreen ? VLCIcons.defullscreen :VLCIcons.fullscreen
     onClicked: Player.fullscreen = !Player.fullscreen
-    text: i18n.qtr("fullscreen")
+    text: I18n.qtr("fullscreen")
 }

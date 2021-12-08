@@ -210,7 +210,7 @@ FocusScope {
 
         focus: visible
 
-        text: i18n.qtr("No media found")
+        text: I18n.qtr("No media found")
 
         cover: VLCStyle.noArtAlbumCover
 

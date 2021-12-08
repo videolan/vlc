@@ -31,5 +31,5 @@ Widgets.IconControlButton {
           ? VLCIcons.repeat_one
           : VLCIcons.repeat_all
     onClicked: mainPlaylistController.toggleRepeatMode()
-    text: i18n.qtr("Repeat")
+    text: I18n.qtr("Repeat")
 }

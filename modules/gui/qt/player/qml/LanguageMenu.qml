@@ -129,19 +129,19 @@ T.Popup {
 
                 model: [{
                         "icon": VLCIcons.download,
-                        "tooltip": i18n.qtr("Download Subtitles"),
+                        "tooltip": I18n.qtr("Download Subtitles"),
                         "component": undefined
                     }, {
                         "icon": VLCIcons.time,
-                        "tooltip": i18n.qtr("Delay"),
+                        "tooltip": I18n.qtr("Delay"),
                         "component": delayPage
                     }, {
                         "icon": VLCIcons.sync,
-                        "tooltip": i18n.qtr("Sync"),
+                        "tooltip": I18n.qtr("Sync"),
                         "component": syncPage
                     }, {
                         "icon": VLCIcons.multiselect,
-                        "tooltip": i18n.qtr("Select Multiple Subtitles"),
+                        "tooltip": I18n.qtr("Select Multiple Subtitles"),
                         "component": undefined
                     }]
 
@@ -184,13 +184,13 @@ T.Popup {
                 Navigation.leftItem: btnsCol
 
                 model: [{
-                        "title": i18n.qtr("Subtitle"),
+                        "title": I18n.qtr("Subtitle"),
                         "tracksModel": Player.subtitleTracks
                     }, {
-                        "title": i18n.qtr("Audio"),
+                        "title": I18n.qtr("Audio"),
                         "tracksModel": Player.audioTracks
                     }, {
-                        "title": i18n.qtr("Video Tracks"),
+                        "title": I18n.qtr("Video Tracks"),
                         "tracksModel": Player.videoTracks
                     }]
 
@@ -360,7 +360,7 @@ T.Popup {
 
                 Widgets.SubtitleLabel {
                     Layout.fillWidth: true
-                    text: i18n.qtr("Audio track synchronization")
+                    text: I18n.qtr("Audio track synchronization")
                     color: "white"
                 }
                 RowLayout {
@@ -368,7 +368,7 @@ T.Popup {
                     spacing: VLCStyle.margin_xsmall
 
                     Widgets.MenuCaption {
-                        text: i18n.qtr("Audio track delay")
+                        text: I18n.qtr("Audio track delay")
                         color: "white"
 
                         Layout.fillWidth: true
@@ -381,7 +381,7 @@ T.Popup {
                         property bool inhibitUpdate: true
 
                         textFromValue: function (value, locale) {
-                            return i18n.qtr("%1 ms").arg(
+                            return I18n.qtr("%1 ms").arg(
                                         Number(value).toLocaleString(locale,
                                                                      'f', 0))
                         }
@@ -421,7 +421,7 @@ T.Popup {
                     Widgets.ActionButtonOverlay {
                         id: audioDelaySpinReset
 
-                        text: i18n.qtr("Reset")
+                        text: I18n.qtr("Reset")
 
                         onClicked: audioDelaySpin.value = 0
                         Navigation.leftItem: audioDelaySpin
@@ -433,7 +433,7 @@ T.Popup {
                 Widgets.SubtitleLabel {
                     Layout.fillWidth: true
                     Layout.topMargin: VLCStyle.margin_large
-                    text: i18n.qtr("Subtitle synchronization")
+                    text: I18n.qtr("Subtitle synchronization")
                     color: "white"
                 }
 
@@ -442,7 +442,7 @@ T.Popup {
                     spacing: VLCStyle.margin_xsmall
 
                     Widgets.MenuCaption {
-                        text: i18n.qtr("Primary subtitle delay")
+                        text: I18n.qtr("Primary subtitle delay")
                         color: "white"
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
@@ -486,7 +486,7 @@ T.Popup {
                     Widgets.ActionButtonOverlay {
                         id: primarySubSpinReset
 
-                        text: i18n.qtr("Reset")
+                        text: I18n.qtr("Reset")
                         focus: true
                         onClicked: primarySubSpin.value = 0
                         Navigation.leftItem: primarySubSpin
@@ -501,7 +501,7 @@ T.Popup {
                     spacing: VLCStyle.margin_xsmall
 
                     Widgets.MenuCaption {
-                        text: i18n.qtr("Secondary subtitle delay")
+                        text: I18n.qtr("Secondary subtitle delay")
                         color: "white"
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
@@ -545,7 +545,7 @@ T.Popup {
                     Widgets.ActionButtonOverlay {
                         id: secondarySubSpinReset
 
-                        text: i18n.qtr("Reset")
+                        text: I18n.qtr("Reset")
                         onClicked: secondarySubSpin.value = 0
                         Navigation.leftItem: secondarySubSpin
                         Navigation.upItem: primarySubSpinReset
@@ -608,7 +608,7 @@ T.Popup {
 
                 Widgets.SubtitleLabel {
                     Layout.fillWidth: true
-                    text: i18n.qtr("Subtitles")
+                    text: I18n.qtr("Subtitles")
                     color: "white"
                 }
                 RowLayout {
@@ -616,7 +616,7 @@ T.Popup {
                     spacing: VLCStyle.margin_xsmall
 
                     Widgets.MenuCaption {
-                        text: i18n.qtr("Subtitle Speed")
+                        text: I18n.qtr("Subtitle Speed")
                         color: "white"
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
@@ -629,7 +629,7 @@ T.Popup {
 
                         stepSize: 1
                         textFromValue: function (value, locale) {
-                            return i18n.qtr("%1 fps").arg(
+                            return I18n.qtr("%1 fps").arg(
                                         Number(value / 10).toLocaleString(
                                             locale, 'f', 3))
                         }
@@ -668,7 +668,7 @@ T.Popup {
                     Widgets.ActionButtonOverlay {
                         id: subSpeedSpinReset
 
-                        text: i18n.qtr("Reset")
+                        text: I18n.qtr("Reset")
                         onClicked: subSpeedSpin.value = 10
 
 

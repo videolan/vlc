@@ -20,6 +20,7 @@ import QtQuick.Controls 2.4
 import QtQml.Models 2.2
 import QtQuick.Layouts 1.11
 
+import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
 import "qrc:///util/" as Util
@@ -30,27 +31,27 @@ Widgets.KeyNavigableTableView {
     id: root
 
     property var sortModelSmall: [
-        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(1), text: i18n.qtr("Title"),    showSection: "title", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
-        { criteria: "album_title", width: VLCStyle.colWidth(1), text: i18n.qtr("Album"),    showSection: "album_title" },
-        { criteria: "main_artist", width: VLCStyle.colWidth(1), text: i18n.qtr("Artist"),   showSection: "main_artist" },
-        { criteria: "duration", width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
+        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(1), text: I18n.qtr("Title"),    showSection: "title", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
+        { criteria: "album_title", width: VLCStyle.colWidth(1), text: I18n.qtr("Album"),    showSection: "album_title" },
+        { criteria: "main_artist", width: VLCStyle.colWidth(1), text: I18n.qtr("Artist"),   showSection: "main_artist" },
+        { criteria: "duration", width: VLCStyle.colWidth(1), text: I18n.qtr("Duration"), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
     ]
 
     property var sortModelMedium: [
-        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
-        { criteria: "album_title", width: VLCStyle.colWidth(2), text: i18n.qtr("Album"),    showSection: "album_title" },
-        { criteria: "main_artist", width: VLCStyle.colWidth(1), text: i18n.qtr("Artist"),   showSection: "main_artist" },
-        { criteria: "duration", width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
+        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: I18n.qtr("Title"),    showSection: "title", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
+        { criteria: "album_title", width: VLCStyle.colWidth(2), text: I18n.qtr("Album"),    showSection: "album_title" },
+        { criteria: "main_artist", width: VLCStyle.colWidth(1), text: I18n.qtr("Artist"),   showSection: "main_artist" },
+        { criteria: "duration", width: VLCStyle.colWidth(1), text: I18n.qtr("Duration"), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
     ]
 
     readonly property int _expandingColsSpan: Math.floor((VLCStyle.gridColumnsForWidth(root.availableRowWidth) - 3 /* static cols (track_number, etc)*/) / 3)
     property var sortModelLarge: [
-        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(root._expandingColsSpan), text: i18n.qtr("Title"),    showSection: "title", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
-        { criteria: "album_title", width: VLCStyle.colWidth(root._expandingColsSpan), text: i18n.qtr("Album"),    showSection: "album_title" },
-        { criteria: "main_artist", width: VLCStyle.colWidth(root._expandingColsSpan), text: i18n.qtr("Artist"),   showSection: "main_artist" },
-        { criteria: "duration", width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
-        { criteria: "track_number",width: VLCStyle.colWidth(1), text: i18n.qtr("Track"), showSection: "" },
-        { criteria: "disc_number", width: VLCStyle.colWidth(1), text: i18n.qtr("Disc"),  showSection: "" },
+        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(root._expandingColsSpan), text: I18n.qtr("Title"),    showSection: "title", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
+        { criteria: "album_title", width: VLCStyle.colWidth(root._expandingColsSpan), text: I18n.qtr("Album"),    showSection: "album_title" },
+        { criteria: "main_artist", width: VLCStyle.colWidth(root._expandingColsSpan), text: I18n.qtr("Artist"),   showSection: "main_artist" },
+        { criteria: "duration", width: VLCStyle.colWidth(1), text: I18n.qtr("Duration"), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
+        { criteria: "track_number",width: VLCStyle.colWidth(1), text: I18n.qtr("Track"), showSection: "" },
+        { criteria: "disc_number", width: VLCStyle.colWidth(1), text: I18n.qtr("Disc"),  showSection: "" },
     ]
 
     sortModel: ( availableRowWidth < VLCStyle.colWidth(6) ) ? sortModelSmall

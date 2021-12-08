@@ -41,8 +41,8 @@ FocusScope {
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
     property var sortModel: [
-        { text: i18n.qtr("Alphabetic"), criteria: "name"},
-        { text: i18n.qtr("Url"), criteria: "mrl" }
+        { text: I18n.qtr("Alphabetic"), criteria: "name"},
+        { text: I18n.qtr("Url"), criteria: "mrl" }
     ]
 
     property alias _currentView: view.currentItem
@@ -83,7 +83,7 @@ FocusScope {
 
         titleRole: "name"
 
-        defaultText:  i18n.qtr("Unknown Share")
+        defaultText:  I18n.qtr("Unknown Share")
 
         coverProvider: function(index, data) {
             return {artwork: data.artwork, cover: custom_cover, type: data.type}
@@ -179,7 +179,7 @@ FocusScope {
 
                         focus: true
                         iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
-                        text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
+                        text:  providerModel.indexed ?  I18n.qtr("Remove from medialibrary") : I18n.qtr("Add to medialibrary")
                         visible: !providerModel.is_on_provider_list && !!providerModel.canBeIndexed
                         onClicked: providerModel.indexed = !providerModel.indexed
 
@@ -306,7 +306,7 @@ FocusScope {
 
                         focus: true
                         iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
-                        text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
+                        text:  providerModel.indexed ?  I18n.qtr("Remove from medialibrary") : I18n.qtr("Add to medialibrary")
                         visible: !providerModel.is_on_provider_list && !!providerModel.canBeIndexed
                         onClicked: providerModel.indexed = !providerModel.indexed
 
@@ -323,8 +323,8 @@ FocusScope {
 
             sortModel: [
                 { criteria: "thumbnail", width: VLCStyle.colWidth(1), headerDelegate: tableView.thumbnailHeader, colDelegate: tableView.thumbnailColumn },
-                { isPrimary: true, criteria: "name", width: VLCStyle.colWidth(tableView._nameColSpan), text: i18n.qtr("Name") },
-                { criteria: "mrl", width: VLCStyle.colWidth(Math.max(tableView._nbCols - tableView._nameColSpan - 1), 1), text: i18n.qtr("Url"), showContextButton: true },
+                { isPrimary: true, criteria: "name", width: VLCStyle.colWidth(tableView._nameColSpan), text: I18n.qtr("Name") },
+                { criteria: "mrl", width: VLCStyle.colWidth(Math.max(tableView._nbCols - tableView._nameColSpan - 1), 1), text: I18n.qtr("Url"), showContextButton: true },
             ]
 
             onActionForSelection: _actionAtIndex(selection[0].row)

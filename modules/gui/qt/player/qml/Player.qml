@@ -423,7 +423,7 @@ FocusScope {
                 font.pixelSize: VLCStyle.fontSize_xxlarge
                 horizontalAlignment: Text.AlignHCenter
                 color: rootPlayer.colors.playerFg
-                Accessible.description: i18n.qtr("album")
+                Accessible.description: I18n.qtr("album")
             }
 
             Widgets.MenuLabel {
@@ -437,7 +437,7 @@ FocusScope {
                 font.weight: Font.Light
                 horizontalAlignment: Text.AlignHCenter
                 color: rootPlayer.colors.playerFg
-                Accessible.description: i18n.qtr("artist")
+                Accessible.description: I18n.qtr("artist")
             }
 
             Widgets.NavigableRow {
@@ -458,7 +458,7 @@ FocusScope {
                         size: VLCIcons.pixelSize(VLCStyle.icon_large)
                         iconText: VLCIcons.skip_back
                         onClicked: Player.jumpBwd()
-                        text: i18n.qtr("Step back")
+                        text: I18n.qtr("Step back")
                         color: rootPlayer.colors.playerFg
                         colorHover: rootPlayer.colors.buttonTextHover
                         colorFocus: rootPlayer.colors.bgFocus
@@ -468,7 +468,7 @@ FocusScope {
                         size: VLCIcons.pixelSize(VLCStyle.icon_large)
                         iconText: VLCIcons.visualization
                         onClicked: Player.toggleVisualization()
-                        text: i18n.qtr("Visualization")
+                        text: I18n.qtr("Visualization")
                         color: rootPlayer.colors.playerFg
                         colorHover: rootPlayer.colors.buttonTextHover
                         colorFocus: rootPlayer.colors.bgFocus
@@ -478,7 +478,7 @@ FocusScope {
                         size: VLCIcons.pixelSize(VLCStyle.icon_large)
                         iconText: VLCIcons.skip_for
                         onClicked: Player.jumpFwd()
-                        text: i18n.qtr("Step forward")
+                        text: I18n.qtr("Step forward")
                         color: rootPlayer.colors.playerFg
                         colorHover: rootPlayer.colors.buttonTextHover
                         colorFocus: rootPlayer.colors.bgFocus

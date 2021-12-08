@@ -28,112 +28,112 @@ Widgets.OverlayMenu {
 
     Action {
         id: playAction
-        text: i18n.qtr("Play")
+        text: I18n.qtr("Play")
         onTriggered: mainPlaylistController.goTo(root.model.getSelection()[0], true)
         property string fontIcon: VLCIcons.play
     }
 
     Action {
         id: streamAction
-        text: i18n.qtr("Stream")
+        text: I18n.qtr("Stream")
         onTriggered: dialogProvider.streamingDialog(root.model.getSelection().map(function(i) { return root.model.itemAt(i).url; }), false)
         property string fontIcon: VLCIcons.stream
     }
 
     Action {
         id: saveAction
-        text: i18n.qtr("Save")
+        text: I18n.qtr("Save")
         onTriggered: dialogProvider.streamingDialog(root.model.getSelection().map(function(i) { return root.model.itemAt(i).url; }))
     }
 
     Action {
         id: infoAction
-        text: i18n.qtr("Information")
+        text: I18n.qtr("Information")
         onTriggered: dialogProvider.mediaInfoDialog(root.model.itemAt(root.model.getSelection()[0]))
         icon.source: "qrc:/menu/info.svg"
     }
 
     Action {
         id: exploreAction
-        text: i18n.qtr("Show Containing Directory")
+        text: I18n.qtr("Show Containing Directory")
         onTriggered: mainPlaylistController.explore(root.model.itemAt(root.model.getSelection()[0]))
         icon.source: "qrc:/type/folder-grey.svg"
     }
 
     Action {
         id: addFileAction
-        text: i18n.qtr("Add File...")
+        text: I18n.qtr("Add File...")
         onTriggered: dialogProvider.simpleOpenDialog(false)
         property string fontIcon: VLCIcons.add
     }
 
     Action {
         id: addDirAction
-        text: i18n.qtr("Add Directory...")
+        text: I18n.qtr("Add Directory...")
         onTriggered: dialogProvider.PLAppendDir()
         property string fontIcon: VLCIcons.add
     }
 
     Action {
         id: addAdvancedAction
-        text: i18n.qtr("Advanced Open...")
+        text: I18n.qtr("Advanced Open...")
         onTriggered: dialogProvider.PLAppendDialog()
         property string fontIcon: VLCIcons.add
     }
 
     Action {
         id: savePlAction
-        text: i18n.qtr("Save Playlist to File...")
+        text: I18n.qtr("Save Playlist to File...")
         onTriggered: dialogProvider.savePlayingToPlaylist();
     }
 
     Action {
         id: clearAllAction
-        text: i18n.qtr("Clear Playlist")
+        text: I18n.qtr("Clear Playlist")
         onTriggered: mainPlaylistController.clear()
         icon.source: "qrc:/toolbar/clear.svg"
     }
 
     Action {
         id: selectAllAction
-        text: i18n.qtr("Select All")
+        text: I18n.qtr("Select All")
         onTriggered: root.model.selectAll()
     }
 
     Action {
         id: shuffleAction
-        text: i18n.qtr("Shuffle Playlist")
+        text: I18n.qtr("Shuffle Playlist")
         onTriggered: mainPlaylistController.shuffle()
         property string fontIcon: VLCIcons.shuffle_on
     }
 
     Action {
         id: sortAction
-        text: i18n.qtr("Sort")
+        text: I18n.qtr("Sort")
         property alias model: overlayMenu.sortMenu
     }
 
     Action {
         id: selectTracksAction
-        text: i18n.qtr("Select Tracks")
+        text: I18n.qtr("Select Tracks")
         onTriggered: listView.mode = PlaylistListView.Mode.Select
     }
 
     Action {
         id: moveTracksAction
-        text: i18n.qtr("Move Selection")
+        text: I18n.qtr("Move Selection")
         onTriggered: listView.mode = PlaylistListView.Mode.Move
     }
 
     Action {
         id: deleteAction
-        text: i18n.qtr("Remove Selected")
+        text: I18n.qtr("Remove Selected")
         onTriggered: listView.onDelete()
     }
 
     property var rootMenu: ({
 
-                                title: i18n.qtr("Playlist Menu"),
+                                title: I18n.qtr("Playlist Menu"),
                                 entries: [
                                     playAction,
                                     streamAction,
@@ -155,7 +155,7 @@ Widgets.OverlayMenu {
                             })
 
     property var rootMenu_PLEmpty: ({
-                                        title: i18n.qtr("Playlist Menu"),
+                                        title: I18n.qtr("Playlist Menu"),
                                         entries: [
                                             addFileAction,
                                             addDirAction,
@@ -164,7 +164,7 @@ Widgets.OverlayMenu {
                                     })
 
     property var rootMenu_noSelection: ({
-                                            title: i18n.qtr("Playlist Menu"),
+                                            title: I18n.qtr("Playlist Menu"),
                                             entries: [
                                                 addFileAction,
                                                 addDirAction,
@@ -188,7 +188,7 @@ Widgets.OverlayMenu {
     // Sort menu:
 
     property var sortMenu: ({
-                                title: i18n.qtr("Sort Menu"),
+                                title: I18n.qtr("Sort Menu"),
                                 entries: []
                             })
 

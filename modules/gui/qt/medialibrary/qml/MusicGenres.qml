@@ -31,7 +31,7 @@ FocusScope {
     id: root
     property alias model: genreModel
     property var sortModel: [
-        { text: i18n.qtr("Alphabetic"), criteria: "title" }
+        { text: I18n.qtr("Alphabetic"), criteria: "title" }
     ]
 
     readonly property var currentIndex: _currentView.currentIndex
@@ -196,14 +196,14 @@ FocusScope {
                              elide: Text.ElideRight
                              font.pixelSize: VLCStyle.fontSize_large
                              font.weight: Font.DemiBold
-                             text: model.name || i18n.qtr("Unknown genre")
+                             text: model.name || I18n.qtr("Unknown genre")
                              color: "white"
                              horizontalAlignment: Text.AlignHCenter
                         }
 
                         Widgets.CaptionLabel {
                             width: item.width
-                            text: model.nb_tracks > 1 ? i18n.qtr("%1 Tracks").arg(model.nb_tracks) : i18n.qtr("%1 Track").arg(model.nb_tracks)
+                            text: model.nb_tracks > 1 ? I18n.qtr("%1 Tracks").arg(model.nb_tracks) : I18n.qtr("%1 Track").arg(model.nb_tracks)
                             opacity: .7
                             color: "white"
                             horizontalAlignment: Text.AlignHCenter
@@ -259,8 +259,8 @@ FocusScope {
 
             sortModel:  [
                 { isPrimary: true, criteria: "cover", width: VLCStyle.listAlbumCover_width, headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
-                { criteria: "name", width: VLCStyle.colWidth(tableView_id._nameColSpan), text: i18n.qtr("Name") },
-                { criteria: "nb_tracks", width: VLCStyle.colWidth(1), text: i18n.qtr("Tracks") }
+                { criteria: "name", width: VLCStyle.colWidth(tableView_id._nameColSpan), text: I18n.qtr("Name") },
+                { criteria: "nb_tracks", width: VLCStyle.colWidth(1), text: I18n.qtr("Tracks") }
             ]
 
             onItemDoubleClicked: {
@@ -305,7 +305,7 @@ FocusScope {
         anchors.fill: parent
         visible: genreModel.count === 0
         focus: genreModel.count === 0
-        text: i18n.qtr("No genres found\nPlease try adding sources, by going to the Network tab")
+        text: I18n.qtr("No genres found\nPlease try adding sources, by going to the Network tab")
         Navigation.parentItem: root
         cover: VLCStyle.noArtAlbumCover
     }

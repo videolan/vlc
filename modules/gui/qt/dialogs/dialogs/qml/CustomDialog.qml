@@ -36,8 +36,8 @@ ModalDialog {
 
     function ask(text, acceptCb, rejectCb, buttons) {
         //TODO: use a Promise here when dropping support of Qt 5.11
-        var okTxt = i18n.qtr("OK")
-        var cancelTxt = i18n.qtr("cancel")
+        var okTxt = I18n.qtr("OK")
+        var cancelTxt = I18n.qtr("cancel")
         if (buttons) {
             if (buttons.cancel) {
                 cancelTxt = buttons.cancel

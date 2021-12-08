@@ -114,7 +114,7 @@ AbstractButton {
                              && (artworkInfoItem.hovered || artworkInfoItem.visualFocus)
                     delay: 500
 
-                    text: i18n.qtr("%1\n%2\n%3").arg(titleLabel.text).arg(artistLabel.text).arg(progressIndicator.text)
+                    text: I18n.qtr("%1\n%2\n%3").arg(titleLabel.text).arg(artistLabel.text).arg(progressIndicator.text)
 
                     colors: artworkInfoItem.colors
                 }
@@ -137,7 +137,7 @@ AbstractButton {
 
                 text: {
                     if (paintOnly)
-                        i18n.qtr("Title")
+                        I18n.qtr("Title")
                     else
                         mainPlaylistController.currentItem.title
                 }
@@ -152,7 +152,7 @@ AbstractButton {
 
                 text: {
                     if (paintOnly)
-                        i18n.qtr("Artist")
+                        I18n.qtr("Artist")
                     else
                         mainPlaylistController.currentItem.artist
                 }

@@ -23,6 +23,7 @@ import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 
 import org.videolan.controls 0.1
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -156,7 +157,7 @@ T.Control {
 
             Widgets.ListLabel {
                 text: (model.name) ? model.name
-                                   : i18n.qtr("Unknown artist")
+                                   : I18n.qtr("Unknown artist")
 
                 color: background.foregroundColor
 

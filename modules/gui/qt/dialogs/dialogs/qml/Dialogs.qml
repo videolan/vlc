@@ -199,7 +199,7 @@ Item {
             columns: 2
 
             Text {
-                text: i18n.qtr("User")
+                text: I18n.qtr("User")
                 color: VLCStyle.colors.text
                 font.pixelSize: VLCStyle.fontSize_normal
             }
@@ -219,7 +219,7 @@ Item {
             }
 
             Text {
-                text: i18n.qtr("Password")
+                text: I18n.qtr("Password")
                 color: VLCStyle.colors.text
                 font.pixelSize: VLCStyle.fontSize_normal
             }
@@ -238,7 +238,7 @@ Item {
             }
 
             Text {
-                text: i18n.qtr("Save password")
+                text: I18n.qtr("Save password")
                 color: VLCStyle.colors.text
                 font.pixelSize: VLCStyle.fontSize_normal
             }
@@ -268,7 +268,7 @@ Item {
                     Widgets.TextToolButton {
                         id: loginCancel
                         Layout.fillWidth: true
-                        text: i18n.qtr("cancel")
+                        text: I18n.qtr("cancel")
 
                         Navigation.upItem: savePassword
                         Navigation.rightItem: loginOk
@@ -284,7 +284,7 @@ Item {
                     Widgets.TextToolButton {
                         id: loginOk
                         Layout.fillWidth: true
-                        text: i18n.qtr("Ok")
+                        text: I18n.qtr("Ok")
                         focus: true
 
                         Navigation.upItem: savePassword

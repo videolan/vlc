@@ -36,14 +36,14 @@ Item {
     property color highlightedBgColor: VLCStyle.colors.bgHover
     property color highlightedTextColor: VLCStyle.colors.bgHoverText
 
-    Action{ id: mediaMenu;    text: i18n.qtr("&Media")    ; onTriggered: menubar.popupMediaMenu(source);   }
-    Action{ id: playbackMenu; text: i18n.qtr("&Playback") ; onTriggered: menubar.popupPlaybackMenu(source);}
-    Action{ id: videoMenu;    text: i18n.qtr("&Video")    ; onTriggered: menubar.popupVideoMenu(source);   }
-    Action{ id: audioMenu;    text: i18n.qtr("&Audio")    ; onTriggered: menubar.popupAudioMenu(source);   }
-    Action{ id: subtitleMenu; text: i18n.qtr("&Subtitle") ; onTriggered: menubar.popupSubtitleMenu(source);}
-    Action{ id: toolMenu;     text: i18n.qtr("&Tools")    ; onTriggered: menubar.popupToolsMenu(source);   }
-    Action{ id: viewMenu;     text: i18n.qtr("V&iew")     ; onTriggered: menubar.popupViewMenu(source);    }
-    Action{ id: helpMenu;     text: i18n.qtr("&Help")     ; onTriggered: menubar.popupHelpMenu(source);    }
+    Action{ id: mediaMenu;    text: I18n.qtr("&Media")    ; onTriggered: menubar.popupMediaMenu(source);   }
+    Action{ id: playbackMenu; text: I18n.qtr("&Playback") ; onTriggered: menubar.popupPlaybackMenu(source);}
+    Action{ id: videoMenu;    text: I18n.qtr("&Video")    ; onTriggered: menubar.popupVideoMenu(source);   }
+    Action{ id: audioMenu;    text: I18n.qtr("&Audio")    ; onTriggered: menubar.popupAudioMenu(source);   }
+    Action{ id: subtitleMenu; text: I18n.qtr("&Subtitle") ; onTriggered: menubar.popupSubtitleMenu(source);}
+    Action{ id: toolMenu;     text: I18n.qtr("&Tools")    ; onTriggered: menubar.popupToolsMenu(source);   }
+    Action{ id: viewMenu;     text: I18n.qtr("V&iew")     ; onTriggered: menubar.popupViewMenu(source);    }
+    Action{ id: helpMenu;     text: I18n.qtr("&Help")     ; onTriggered: menubar.popupHelpMenu(source);    }
 
     property var toolbarModel: [
         mediaMenu,

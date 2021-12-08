@@ -30,5 +30,5 @@ Widgets.IconControlButton {
     enabled: Player.isPlaying
     checked: Player.isRecording
     onClicked: Player.toggleRecord()
-    text: i18n.qtr("record")
+    text: I18n.qtr("record")
 }

@@ -104,31 +104,31 @@ FocusScope {
     readonly property var pageModel: [
         {
             listed: !!medialib,
-            displayText: i18n.qtr("Video"),
+            displayText: I18n.qtr("Video"),
             icon: VLCIcons.topbar_video,
             name: "video",
             url: "qrc:///medialibrary/VideoDisplay.qml"
         }, {
             listed: !!medialib,
-            displayText: i18n.qtr("Music"),
+            displayText: I18n.qtr("Music"),
             icon: VLCIcons.topbar_music,
             name: "music",
             url: "qrc:///medialibrary/MusicDisplay.qml"
         }, {
             listed: !medialib,
-            displayText: i18n.qtr("Home"),
+            displayText: I18n.qtr("Home"),
             icon: VLCIcons.home,
             name: "home",
             url: "qrc:///main/NoMedialibHome.qml"
         }, {
             listed: true,
-            displayText: i18n.qtr("Browse"),
+            displayText: I18n.qtr("Browse"),
             icon: VLCIcons.topbar_network,
             name: "network",
             url: "qrc:///network/NetworkDisplay.qml"
         }, {
             listed: true,
-            displayText: i18n.qtr("Discover"),
+            displayText: I18n.qtr("Discover"),
             icon: VLCIcons.topbar_discover,
             name: "discover",
             url: "qrc:///network/DiscoverDisplay.qml"

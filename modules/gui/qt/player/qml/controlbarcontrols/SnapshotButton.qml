@@ -29,5 +29,5 @@ Widgets.IconControlButton {
     enabled: Player.isPlaying
     iconText: VLCIcons.snapshot
     onClicked: Player.snapshot()
-    text: i18n.qtr("Snapshot")
+    text: I18n.qtr("Snapshot")
 }

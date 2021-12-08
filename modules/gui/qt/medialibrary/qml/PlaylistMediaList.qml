@@ -42,7 +42,7 @@ FocusScope {
 
     property int initialIndex: 0
 
-    property var sortModel: [{ text: i18n.qtr("Alphabetic"), criteria: "title" }]
+    property var sortModel: [{ text: I18n.qtr("Alphabetic"), criteria: "title" }]
 
     //---------------------------------------------------------------------------------------------
     // Private
@@ -152,7 +152,7 @@ FocusScope {
         if (count < 100)
             return count;
         else
-            return i18n.qtr("99+");
+            return I18n.qtr("99+");
     }
 
     function _onNavigationCancel() {
@@ -260,10 +260,10 @@ FocusScope {
                 pictureHeight: _heightCover
 
                 title: (model.name) ? model.name
-                                    : i18n.qtr("Unknown title")
+                                    : I18n.qtr("Unknown title")
 
-                labels: (model.count > 1) ? [ i18n.qtr("%1 Tracks").arg(_getCount(model)) ]
-                                          : [ i18n.qtr("%1 Track") .arg(_getCount(model)) ]
+                labels: (model.count > 1) ? [ I18n.qtr("%1 Tracks").arg(_getCount(model)) ]
+                                          : [ I18n.qtr("%1 Track") .arg(_getCount(model)) ]
 
                 dragItem: dragItemPlaylist
 
@@ -364,13 +364,13 @@ FocusScope {
 
                 width: VLCStyle.colWidth(_widthName),
 
-                text: i18n.qtr("Name")
+                text: I18n.qtr("Name")
             }, {
                 criteria: "count",
 
                 width: VLCStyle.colWidth(1),
 
-                text: i18n.qtr("Tracks")
+                text: I18n.qtr("Tracks")
             }]
 
             Navigation.parentItem: root
@@ -425,7 +425,7 @@ FocusScope {
 
         focus: visible
 
-        text: i18n.qtr("No playlists found")
+        text: I18n.qtr("No playlists found")
 
         cover: VLCStyle.noArtAlbumCover
 

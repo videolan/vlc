@@ -37,11 +37,11 @@ Widgets.PageLoader {
     defaultPage: "services"
 
     pageModel: [{
-            displayText: i18n.qtr("Services"),
+            displayText: I18n.qtr("Services"),
             name: "services",
             url: "qrc:///network/ServicesHomeDisplay.qml"
         }, {
-            displayText: i18n.qtr("URL"),
+            displayText: I18n.qtr("URL"),
             name: "url",
             url: "qrc:///network/DiscoverUrlDisplay.qml"
         }

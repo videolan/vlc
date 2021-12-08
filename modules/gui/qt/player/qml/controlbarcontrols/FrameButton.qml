@@ -29,5 +29,5 @@ Widgets.IconControlButton {
     enabled: Player.isPlaying
     iconText: VLCIcons.frame_by_frame
     onClicked: Player.frameNext()
-    text: i18n.qtr("Next frame")
+    text: I18n.qtr("Next frame")
 }

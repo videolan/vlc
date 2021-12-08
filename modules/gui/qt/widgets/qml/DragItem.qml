@@ -48,7 +48,7 @@ Item {
 
     property string defaultCover: VLCStyle.noArtCover
 
-    property string defaultText: i18n.qtr("Unknown")
+    property string defaultText: I18n.qtr("Unknown")
 
     // function(index, data) - returns cover for the index in the model in the form {artwork: <string> (file-name), cover: <component>}
     property var coverProvider: null
@@ -342,7 +342,7 @@ Item {
 
             visible: text && text !== ""
             width: parent.width
-            text: i18n.qtr("%1 selected").arg(dragItem._indexesSize)
+            text: I18n.qtr("%1 selected").arg(dragItem._indexesSize)
             color: colors.menuCaption
         }
     }

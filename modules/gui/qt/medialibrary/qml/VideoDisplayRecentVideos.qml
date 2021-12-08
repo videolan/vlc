@@ -97,7 +97,7 @@ FocusScope {
             // NOTE: We want this to be properly aligned with the grid items.
             anchors.leftMargin: VLCStyle.margin_normal
 
-            text: i18n.qtr("Continue Watching")
+            text: I18n.qtr("Continue Watching")
         }
 
         Widgets.KeyNavigableListView {

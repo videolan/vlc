@@ -51,7 +51,7 @@ Popup {
         spacing: VLCStyle.margin_xsmall
 
         Widgets.ListLabel {
-            text: i18n.qtr("Playback Speed")
+            text: I18n.qtr("Playback Speed")
             color: root.colors.text
             font.pixelSize: VLCStyle.fontSize_large
 
@@ -165,7 +165,7 @@ Popup {
                 T.Label {
                     anchors.centerIn: parent
                     font.pixelSize: VLCStyle.fontSize_normal
-                    text: i18n.qtr("1x")
+                    text: I18n.qtr("1x")
                     color: resetButton.background.foregroundColor // IconToolButton.background is a AnimatedBackground
                 }
             }

@@ -28,5 +28,5 @@ Widgets.IconControlButton {
     size: VLCStyle.icon_medium
     iconText: VLCIcons.slower
     onClicked: Player.slower()
-    text: i18n.qtr("Slower")
+    text: I18n.qtr("Slower")
 }

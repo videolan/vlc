@@ -57,7 +57,7 @@ FocusScope {
         visible: (deviceSection.model.count === 0 && lanSection.model.count === 0 )
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: topFocusScope.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        text: i18n.qtr("No network shares found")
+        text: I18n.qtr("No network shares found")
     }
 
     ScrollView {
@@ -74,7 +74,7 @@ FocusScope {
 
             Widgets.SubtitleLabel {
                 id: deviceLabel
-                text: i18n.qtr("My Machine")
+                text: I18n.qtr("My Machine")
                 width: flickable.width
                 visible: deviceSection.model.count !== 0
                 leftPadding: VLCStyle.margin_xlarge
@@ -108,7 +108,7 @@ FocusScope {
 
             Widgets.SubtitleLabel {
                 id: lanLabel
-                text: i18n.qtr("My LAN")
+                text: I18n.qtr("My LAN")
                 width: flickable.width
                 visible: lanSection.model.count !== 0
                 leftPadding: VLCStyle.margin_xlarge

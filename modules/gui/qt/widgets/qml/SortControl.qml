@@ -81,7 +81,7 @@ FocusScope {
 
         size: VLCStyle.icon_normal
         iconText: VLCIcons.topbar_sort
-        text: i18n.qtr("Sort")
+        text: I18n.qtr("Sort")
 
         focus: true
 

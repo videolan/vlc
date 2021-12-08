@@ -41,9 +41,9 @@ FocusScope {
     property int initialIndex: 0
 
     property var sortModel: [
-        { text: i18n.qtr("Alphabetic"), criteria: "name"     },
-        { text: i18n.qtr("Duration"),   criteria: "duration" },
-        { text: i18n.qtr("Date"),       criteria: "date"     }
+        { text: I18n.qtr("Alphabetic"), criteria: "name"     },
+        { text: I18n.qtr("Duration"),   criteria: "duration" },
+        { text: I18n.qtr("Date"),       criteria: "date"     }
     ]
 
     //---------------------------------------------------------------------------------------------
@@ -265,9 +265,9 @@ FocusScope {
                           gridView.expandIndex !== gridItem.index) ? 0.7 : 1
 
                 title: (model.name) ? model.name
-                                    : i18n.qtr("Unknown title")
+                                    : I18n.qtr("Unknown title")
 
-                labels: _getLabels(model, i18n.qtr("%1 Videos"))
+                labels: _getLabels(model, I18n.qtr("%1 Videos"))
 
                 // NOTE: We don't want to show the indicator for a group.
                 // FIXME: Sometimes MLBaseModel::getDataAt returns {} so we use 'isNew === true'.
@@ -395,7 +395,7 @@ FocusScope {
 
         visible: (model.count === 0)
 
-        text: i18n.qtr("No video found\nPlease try adding sources, by going to the Network tab")
+        text: I18n.qtr("No video found\nPlease try adding sources, by going to the Network tab")
 
         cover: VLCStyle.noArtVideoCover
 

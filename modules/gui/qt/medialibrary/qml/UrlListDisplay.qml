@@ -47,7 +47,7 @@ Widgets.KeyNavigableTableView {
             "criteria": "url",
             "width": VLCStyle.colWidth(Math.max(listView_id._nbCols - 1,
                                                 1)),
-            "text": i18n.qtr("Url"),
+            "text": I18n.qtr("Url"),
             "showSection": "url",
             headerDelegate: urlHeaderDelegate
         }, {

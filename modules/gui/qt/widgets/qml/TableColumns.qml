@@ -19,6 +19,8 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
@@ -85,7 +87,7 @@ Item {
         }
 
         Widgets.ListLabel {
-            text: (!rowModel || !root.showTitleText) ? "" : (rowModel[model.criteria] || i18n.qtr("Unknown Title"))
+            text: (!rowModel || !root.showTitleText) ? "" : (rowModel[model.criteria] || I18n.qtr("Unknown Title"))
             visible: root.showTitleText
             color: foregroundColor
 
