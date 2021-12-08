@@ -110,13 +110,9 @@ public:
     Q_INVOKABLE bool matchSearch( QObject* event ) { return call(&KeyHelper::matchSearch, event); }
     Q_INVOKABLE bool matchCancel(QObject* event)   { return call(&KeyHelper::matchCancel, event); }
 
-    static QObject* getSingletonInstance(QQmlEngine* engine, QJSEngine*);
-
 private:
     //convert arguments and call the right function
     bool call(bool (*fun)(const QKeyEvent*), const QObject *event);
-
-    static QmlKeyHelper* M_instance;
 };
 
 #endif // KEYHELPER_HPP

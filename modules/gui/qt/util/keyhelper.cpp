@@ -19,20 +19,9 @@
 
 #include <QQmlEngine>
 
-QmlKeyHelper* QmlKeyHelper::M_instance = nullptr;
-
 QmlKeyHelper::QmlKeyHelper(QObject* parent)
     : QObject(parent)
 {}
-
-QObject* QmlKeyHelper::getSingletonInstance(QQmlEngine *engine, QJSEngine *)
-{
-    if (M_instance == nullptr)
-    {
-        M_instance = new QmlKeyHelper(engine);
-    }
-    return M_instance;
-}
 
 bool QmlKeyHelper::call(bool (*fun)(const QKeyEvent *), const QObject *event)
 {

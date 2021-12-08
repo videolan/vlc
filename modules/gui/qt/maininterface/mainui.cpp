@@ -235,6 +235,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
         qmlRegisterSingletonType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette", SingletonRegisterHelper<SystemPalette>::getCallback());
         qmlRegisterSingletonType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel", SingletonRegisterHelper<DialogModel>::getCallback(m_intf));
+        qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", SingletonRegisterHelper<QmlKeyHelper>::getCallback());
 
         qRegisterMetaType<VLCTick>();
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
@@ -290,7 +291,6 @@ void MainUI::registerQMLTypes()
         qRegisterMetaType<QList<QQmlError>>("QList<QQmlError>");
 
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
-        qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", &QmlKeyHelper::getSingletonInstance);
     }
 
     {
