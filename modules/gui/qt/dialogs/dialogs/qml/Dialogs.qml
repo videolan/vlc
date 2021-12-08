@@ -37,7 +37,7 @@ Item {
     //---------------------------------------------------------------------------------------------
     // Private
 
-    property var _model: dialogModel.model
+    property var _model: DialogModel.model
 
     //---------------------------------------------------------------------------------------------
     // Signal
@@ -53,10 +53,10 @@ Item {
 
     Component.onDestruction: {
         if (questionDialog.dialogId !== undefined) {
-            dialogModel.dismiss(questionDialog.dialogId)
+            DialogModel.dismiss(questionDialog.dialogId)
             questionDialog.dialogId = undefined
         } if (loginDialog.dialogId !== undefined) {
-            dialogModel.dismiss(loginDialog.dialogId)
+            DialogModel.dismiss(loginDialog.dialogId)
             loginDialog.dialogId = undefined
         }
     }
@@ -75,7 +75,7 @@ Item {
 
     Connections
     {
-        target: dialogModel
+        target: DialogModel
 
         onLogin: {
             loginDialog.dialogId = dialogId
@@ -106,13 +106,13 @@ Item {
             if (questionDialog.dialogId === dialogId) {
                 questionDialog.close()
                 questionDialog.dialogId = undefined
-                dialogModel.dismiss(dialogId)
+                DialogModel.dismiss(dialogId)
             } else if (loginDialog.dialogId === dialogId)  {
                 loginDialog.close()
                 loginDialog.dialogId = undefined
-                dialogModel.dismiss(dialogId)
+                DialogModel.dismiss(dialogId)
             } else {
-                dialogModel.dismiss(dialogId)
+                DialogModel.dismiss(dialogId)
             }
         }
     }
@@ -303,13 +303,13 @@ Item {
 
         onAccepted: {
             if (loginDialog.dialogId !== undefined) {
-                dialogModel.post_login(loginDialog.dialogId, username.text, password.text, savePassword.checked)
+                DialogModel.post_login(loginDialog.dialogId, username.text, password.text, savePassword.checked)
                 loginDialog.dialogId = undefined
             }
         }
         onRejected: {
             if (loginDialog.dialogId !== undefined) {
-                dialogModel.dismiss(loginDialog.dialogId)
+                DialogModel.dismiss(loginDialog.dialogId)
                 loginDialog.dialogId = undefined
             }
         }
@@ -363,7 +363,7 @@ Item {
                         Keys.onPressed: Navigation.defaultKeyAction(event)
 
                         onClicked: {
-                            dialogModel.dismiss(questionDialog.dialogId)
+                            DialogModel.dismiss(questionDialog.dialogId)
                             questionDialog.dialogId = undefined
                             questionDialog.close()
                         }
@@ -382,7 +382,7 @@ Item {
                         Keys.onPressed: Navigation.defaultKeyAction(event)
 
                         onClicked: {
-                            dialogModel.post_action1(questionDialog.dialogId)
+                            DialogModel.post_action1(questionDialog.dialogId)
                             questionDialog.dialogId = undefined
                             questionDialog.close()
                         }
@@ -399,7 +399,7 @@ Item {
                         Keys.onPressed: Navigation.defaultKeyAction(event)
 
                         onClicked: {
-                            dialogModel.post_action2(questionDialog.dialogId)
+                            DialogModel.post_action2(questionDialog.dialogId)
                             questionDialog.dialogId = undefined
                             questionDialog.close()
                         }

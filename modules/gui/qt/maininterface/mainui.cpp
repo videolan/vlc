@@ -169,8 +169,6 @@ bool MainUI::setup(QQmlEngine* engine)
 
     QQmlContext *rootCtx = engine->rootContext();
 
-    rootCtx->setContextProperty( "dialogModel", new DialogModel(m_intf, this));
-
     if (m_mainCtx->hasMediaLibrary())
         rootCtx->setContextProperty( "medialib", m_mainCtx->getMediaLibrary() );
     else
@@ -237,6 +235,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<InterfaceWindow>(uri, versionMajor, versionMinor, "IntfWindow", SingletonRegisterHelper<InterfaceWindow>::callback);
         qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
         qmlRegisterSingletonType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette", SingletonRegisterHelper<SystemPalette>::getCallback());
+        qmlRegisterSingletonType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel", SingletonRegisterHelper<DialogModel>::getCallback(m_intf));
 
         qRegisterMetaType<VLCTick>();
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
@@ -268,7 +267,6 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterType<AboutModel>( uri, versionMajor, versionMinor, "AboutModel" );
 
-        qmlRegisterUncreatableType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel", "");
         qmlRegisterUncreatableType<DialogErrorModel>( uri, versionMajor, versionMinor, "DialogErrorModel", "");
         qRegisterMetaType<DialogId>();
 
