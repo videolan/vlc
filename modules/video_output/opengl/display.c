@@ -82,6 +82,7 @@ typedef struct vout_display_sys_t
     struct {
         PFNGLFLUSHPROC Flush;
     } vt;
+    vlc_viewpoint_t viewpoint;
 } vout_display_sys_t;
 
 /* Display callbacks */
@@ -92,7 +93,38 @@ static int Control (vout_display_t *, int);
 static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 {
     vout_display_sys_t *sys = vd->sys;
-    return vout_display_opengl_SetViewpoint (sys->vgl, vp);
+    int ret = vout_display_opengl_SetViewpoint(sys->vgl, vp);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    sys->viewpoint = *vp;
+    return VLC_SUCCESS;
+}
+
+static int
+UpdateFormat(vout_display_t *vd, const video_format_t *fmt,
+             vlc_video_context *vctx)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    int ret = vlc_gl_MakeCurrent(sys->gl);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    ret = vout_display_opengl_UpdateFormat(sys->vgl, fmt, vctx);
+
+    /* Force to recompute the viewport on next picture */
+    sys->place_changed = true;
+
+    /* Restore viewpoint */
+    int vp_ret = vout_display_opengl_SetViewpoint(sys->vgl, &sys->viewpoint);
+    /* The viewpoint previously applied is necessarily valid */
+    assert(vp_ret == VLC_SUCCESS);
+    (void) vp_ret;
+
+    vlc_gl_ReleaseCurrent(sys->gl);
+
+    return ret;
 }
 
 static const struct vlc_display_operations ops = {
@@ -101,6 +133,7 @@ static const struct vlc_display_operations ops = {
     .display = PictureDisplay,
     .control = Control,
     .set_viewpoint = SetViewpoint,
+    .update_format = UpdateFormat,
 };
 
 static void
@@ -183,6 +216,8 @@ static int Open(vout_display_t *vd,
 
     if (sys->vgl == NULL)
         goto error;
+
+    vlc_viewpoint_init(&sys->viewpoint);
 
     vd->sys = sys;
     vd->info.subpicture_chromas = spu_chromas;
