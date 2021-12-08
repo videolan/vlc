@@ -228,7 +228,7 @@ FocusScope {
             Navigation.parentItem: root
             Navigation.upItem: gridView.headerItem
             Navigation.cancelAction: function() {
-                history.previous()
+                History.previous()
             }
 
             Widgets.GridShadows {
@@ -272,7 +272,7 @@ FocusScope {
             Navigation.parentItem: root
             Navigation.upItem: tableView.headerItem
             Navigation.cancelAction: function() {
-                history.previous()
+                History.previous()
             }
 
             rowHeight: VLCStyle.tableCoverRow_height

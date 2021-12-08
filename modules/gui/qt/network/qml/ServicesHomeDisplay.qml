@@ -73,7 +73,7 @@ Widgets.PageLoader {
                 path: [{display: deviceModel.name, tree: {}}]
 
                 onHomeButtonClicked: {
-                    history.push(["mc", "discover", "services"]);
+                    History.push(["mc", "discover", "services"]);
 
                     root.setCurrentItemFocus(reason);
                 }
@@ -83,7 +83,7 @@ Widgets.PageLoader {
             contextMenu: contextMenu
 
             onBrowse: {
-                history.push(["mc", "discover", "services", "source_browse",
+                History.push(["mc", "discover", "services", "source_browse",
                               { tree: tree, "root_name": deviceModel.name,
                                 "source_name": source_name }]);
 
@@ -120,17 +120,17 @@ Widgets.PageLoader {
                 }
 
                 onHomeButtonClicked: {
-                    history.push(["mc", "discover", "services"]);
+                    History.push(["mc", "discover", "services"]);
 
                     root.setCurrentItemFocus(reason);
                 }
 
                 onBrowse: {
                     if (!!tree.isRoot)
-                        history.push(["mc", "discover", "services", "source_root",
+                        History.push(["mc", "discover", "services", "source_root",
                                       { source_name: tree.source_name }]);
                     else
-                        history.push(["mc", "discover", "services", "source_browse",
+                        History.push(["mc", "discover", "services", "source_browse",
                                       { tree: tree, "root": root_name }]);
 
                     root.setCurrentItemFocus(reason);
@@ -138,7 +138,7 @@ Widgets.PageLoader {
             }
 
             onBrowse: {
-                history.push(["mc", "discover", "services", "source_browse",
+                History.push(["mc", "discover", "services", "source_browse",
                               { tree: tree, "root": root_name }]);
 
                 root.setCurrentItemFocus(reason);
@@ -325,9 +325,9 @@ Widgets.PageLoader {
 
                 onItemDoubleClicked: {
                     if (is_dummy)
-                        history.push(["mc", "discover", "services", "services_manage"]);
+                        History.push(["mc", "discover", "services", "services_manage"]);
                     else
-                        history.push(["mc", "discover", "services", "source_root",
+                        History.push(["mc", "discover", "services", "source_root",
                                       { source_name: model.name }]);
 
                     root.setCurrentItemFocus(Qt.MouseFocusReason);
@@ -402,9 +402,9 @@ Widgets.PageLoader {
                 var itemData = sourcesFilterModel.getDataAt(index);
 
                 if (itemData.type === NetworkSourcesModel.TYPE_DUMMY)
-                    history.push(["mc", "discover", "services", "services_manage"]);
+                    History.push(["mc", "discover", "services", "services_manage"]);
                 else
-                    history.push(["mc", "discover", "services", "source_root",
+                    History.push(["mc", "discover", "services", "source_root",
                                   { source_name: itemData.name }]);
 
                 root.setCurrentItemFocus(Qt.TabFocusReason);
@@ -413,7 +413,7 @@ Widgets.PageLoader {
             Navigation.parentItem: root
 
             Navigation.cancelAction: function() {
-                history.previous();
+                History.previous();
 
                 root.setCurrentItemFocus(Qt.TabFocusReason);
             }

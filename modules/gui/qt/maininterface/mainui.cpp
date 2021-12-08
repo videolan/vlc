@@ -159,7 +159,6 @@ bool MainUI::setup(QQmlEngine* engine)
 
     QQmlContext *rootCtx = engine->rootContext();
 
-    rootCtx->setContextProperty( "history", new NavigationHistory(this) );
     rootCtx->setContextProperty( "player", m_intf->p_mainPlayerController );
     rootCtx->setContextProperty( "i18n", new I18n(this) );
     rootCtx->setContextProperty( "topWindow", m_interfaceWindow);
@@ -227,6 +226,7 @@ void MainUI::registerQMLTypes()
         const int versionMinor = 1;
 
         qmlRegisterSingletonType<MainCtx>(uri, versionMajor, versionMinor, "MainCtx", SingletonRegisterHelper<MainCtx>::callback);
+        qmlRegisterSingletonType<NavigationHistory>(uri, versionMajor, versionMinor, "History", SingletonRegisterHelper<NavigationHistory>::getCallback());
 
         qRegisterMetaType<VLCTick>();
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
@@ -243,8 +243,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<ServicesDiscoveryModel>( uri, versionMajor, versionMinor, "ServicesDiscoveryModel");
         qmlRegisterType<MLFoldersModel>( uri, versionMajor, versionMinor, "MLFolderModel");
         qmlRegisterType<ImageLuminanceExtractor>( uri, versionMajor, versionMinor, "ImageLuminanceExtractor");
-
-        qmlRegisterUncreatableType<NavigationHistory>(uri, versionMajor, versionMinor, "History", "Type of global variable history" );
 
         qmlRegisterUncreatableType<TrackListModel>(uri, versionMajor, versionMinor, "TrackListModel", "available tracks of a media (audio/video/sub)" );
         qmlRegisterUncreatableType<TitleListModel>(uri, versionMajor, versionMinor, "TitleListModel", "available titles of a media" );

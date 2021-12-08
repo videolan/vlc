@@ -47,11 +47,11 @@ Widgets.PageLoader {
 
 
     function _updateGenresAllHistory(currentIndex) {
-        history.update(["mc", "music", "genres", "all", { "initialIndex": currentIndex }])
+        History.update(["mc", "music", "genres", "all", { "initialIndex": currentIndex }])
     }
 
     function _updateGenresAlbumsHistory(currentIndex, parentId, genreName) {
-        history.update(["mc","music", "genres", "albums", {
+        History.update(["mc","music", "genres", "albums", {
             "initialIndex": currentIndex,
             "parentId": parentId,
             "genreName": genreName,
@@ -65,7 +65,7 @@ Widgets.PageLoader {
             onCurrentIndexChanged: _updateGenresAllHistory(currentIndex)
 
             onShowAlbumView: {
-                history.push(["mc", "music", "genres", "albums",
+                History.push(["mc", "music", "genres", "albums",
                              { parentId: id, genreName: name }]);
 
                 stackView.currentItem.setCurrentItemFocus(reason);

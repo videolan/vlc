@@ -20,11 +20,12 @@ import QtQuick 2.11
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
+import org.videolan.vlc 0.1
 
 Widgets.IconControlButton {
     id: backBtn
     size: VLCStyle.icon_medium
     iconText: VLCIcons.exit
     text: i18n.qtr("Back")
-    onClicked: history.previous()
+    onClicked: History.previous()
 }

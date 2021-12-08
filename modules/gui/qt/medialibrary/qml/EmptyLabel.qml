@@ -78,7 +78,7 @@ FocusScope {
             focus: true
             iconTxt: VLCIcons.topbar_network
             anchors.horizontalCenter: parent.horizontalCenter
-            onClicked: history.push(["mc", "network"])
+            onClicked: History.push(["mc", "network"])
             width: VLCStyle.dp(84, VLCStyle.scale)
 
             Navigation.parentItem: root
@@ -89,7 +89,7 @@ FocusScope {
     Keys.onPressed: Navigation.defaultKeyAction(event)
     Keys.onReleased: {
         if (KeyHelper.matchOk(event)) {
-            history.push(["mc", "network"])
+            History.push(["mc", "network"])
         }
         Navigation.defaultKeyReleaseAction(event)
     }

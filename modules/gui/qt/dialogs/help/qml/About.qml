@@ -28,7 +28,7 @@ FocusScope {
     property alias columnLayout: columnLayout
 
     Navigation.onActionCancel: {
-        history.previous()
+        History.previous()
     }
 
     AboutModel {
@@ -102,7 +102,7 @@ FocusScope {
                     KeyNavigation.right: textScroll
 
                     onClicked: {
-                        history.previous()
+                        History.previous()
                     }
                 }
             }

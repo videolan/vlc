@@ -23,6 +23,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Layouts  1.11
 import QtQml.Models     2.2
 
+import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
@@ -73,11 +74,11 @@ Widgets.PageLoader {
     // Private
 
     function _updateHistoryAll(index) {
-        history.update(["mc", "video", "groups", "all", { "initialIndex": index }]);
+        History.update(["mc", "video", "groups", "all", { "initialIndex": index }]);
     }
 
     function _updateHistoryList(list) {
-        history.update(["mc", "video", "groups", "list", {
+        History.update(["mc", "video", "groups", "list", {
                             "initialIndex": list.currentIndex,
                             "initialId"   : list.parentId,
                             "initialName" : list.name
@@ -97,7 +98,7 @@ Widgets.PageLoader {
             onCurrentIndexChanged: _updateHistoryAll(currentIndex)
 
             onShowList: {
-                history.push(["mc", "video", "groups", "list",
+                History.push(["mc", "video", "groups", "list",
                              { parentId: model.id, name: model.name }]);
 
                 stackView.currentItem.setCurrentItemFocus(reason);

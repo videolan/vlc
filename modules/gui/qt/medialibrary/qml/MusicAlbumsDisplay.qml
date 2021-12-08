@@ -27,6 +27,6 @@ MusicAlbums {
     id: root
 
     onCurrentIndexChanged: {
-        history.update(["mc","music", "albums", {"initialIndex": currentIndex}])
+        History.update(["mc","music", "albums", {"initialIndex": currentIndex}])
     }
 }

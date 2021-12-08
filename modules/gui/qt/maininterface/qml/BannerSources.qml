@@ -134,8 +134,8 @@ FocusScope {
                                  height: VLCStyle.bannerButton_height
                                  width: VLCStyle.bannerButton_width
                                  colorDisabled: VLCStyle.colors.textDisabled
-                                 onClicked: history.previous()
-                                 enabled: !history.previousEmpty
+                                 onClicked: History.previous()
+                                 enabled: !History.previousEmpty
 
                                  Navigation.parentItem: root
                                  Navigation.rightItem: globalMenuGroup

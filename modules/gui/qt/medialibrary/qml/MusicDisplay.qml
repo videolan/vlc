@@ -64,7 +64,7 @@ Widgets.PageLoader {
     }
 
     function loadIndex(index) {
-        history.push(["mc", "music", root.pageModel[index].name])
+        History.push(["mc", "music", root.pageModel[index].name])
     }
 
     property var tabModel: ListModel {

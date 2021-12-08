@@ -22,6 +22,7 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 import "qrc:///player/" as Player
 
+import org.videolan.vlc 0.1
 
 Widgets.IconControlButton {
     id: playbackSpeedButton
@@ -40,7 +41,7 @@ Widgets.IconControlButton {
         focus: true
         parent: playbackSpeedButton.paintOnly
                 ? playbackSpeedButton // button is not part of main display (ToolbarEditorDialog)
-                : (history.current.view === "player") ? rootPlayer : g_mainDisplay
+                : (History.current.view === "player") ? rootPlayer : g_mainDisplay
 
         onOpened: {
             // update popup coordinates

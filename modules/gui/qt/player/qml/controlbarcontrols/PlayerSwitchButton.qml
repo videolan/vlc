@@ -20,14 +20,15 @@ import QtQuick 2.11
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
+import org.videolan.vlc 0.1
 
 Widgets.IconControlButton {
     size: VLCStyle.icon_medium
     iconText: VLCIcons.fullscreen
 
     onClicked: {
-        if (history.current.view === "player")
-            history.previous()
+        if (History.current.view === "player")
+            History.previous()
         else
             g_mainDisplay.showPlayer()
     }

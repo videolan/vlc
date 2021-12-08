@@ -88,7 +88,7 @@ FocusScope {
     }
 
     Navigation.cancelAction: function() {
-        history.previous()
+        History.previous()
     }
 
     Keys.onPressed: {
@@ -158,7 +158,7 @@ FocusScope {
 
     function showPlayer() {
         root._inhibitMiniPlayer = true
-        history.push(["player"])
+        History.push(["player"])
     }
 
     function play(backend, ids) {
@@ -200,9 +200,9 @@ FocusScope {
                         var name = root.tabModel.get(index).name
                         selectedIndex = index
                         if (_oldViewProperties[name] === undefined)
-                            history.push(["mc", name])
+                            History.push(["mc", name])
                         else
-                            history.push(["mc", name, _oldViewProperties[name]])
+                            History.push(["mc", name, _oldViewProperties[name]])
                     }
 
                     Navigation.parentItem: medialibId
@@ -460,7 +460,7 @@ FocusScope {
                 target: player
                 onHasVideoOutputChanged: {
                     if (player.hasVideoOutput && MainCtx.hasEmbededVideo) {
-                        if (history.current.view !== "player")
+                        if (History.current.view !== "player")
                             g_mainDisplay.showPlayer()
                     } else {
                         _showMiniPlayer = false;

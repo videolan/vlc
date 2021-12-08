@@ -131,7 +131,7 @@ Item {
                 font.pixelSize: VLCStyle.dp(20, VLCStyle.scale)
                 text: VLCIcons.fullscreen
 
-                onClicked: history.push(["player"])
+                onClicked: History.push(["player"])
             }
         }
     }

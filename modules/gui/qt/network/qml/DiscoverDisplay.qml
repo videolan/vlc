@@ -56,7 +56,7 @@ Widgets.PageLoader {
 
 
     function loadIndex(index) {
-        history.push(["mc", "discover", root.pageModel[index].name])
+        History.push(["mc", "discover", root.pageModel[index].name])
     }
 
 

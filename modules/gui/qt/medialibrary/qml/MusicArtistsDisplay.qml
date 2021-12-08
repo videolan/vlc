@@ -48,11 +48,11 @@ Widgets.PageLoader {
     }
 
     function _updateArtistsAllHistory(currentIndex) {
-        history.update(["mc", "music", "artists", "all", { "initialIndex": currentIndex }])
+        History.update(["mc", "music", "artists", "all", { "initialIndex": currentIndex }])
     }
 
     function _updateArtistsAlbumsHistory(currentIndex, initialAlbumIndex) {
-        history.update(["mc","music", "artists", "albums", {
+        History.update(["mc","music", "artists", "albums", {
             "initialIndex": currentIndex,
             "initialAlbumIndex": initialAlbumIndex,
         }])
@@ -65,7 +65,7 @@ Widgets.PageLoader {
             onCurrentIndexChanged: _updateArtistsAllHistory(currentIndex)
 
             onRequestArtistAlbumView: {
-                history.push(["mc", "music", "artists", "albums",
+                History.push(["mc", "music", "artists", "albums",
                               { initialIndex: currentIndex } ]);
 
                 stackView.currentItem.setCurrentItemFocus(reason);

@@ -103,7 +103,7 @@ FocusScope {
             if (MainCtx.hasEmbededVideo && !MainCtx.canShowVideoPIP) {
                mainPlaylistController.stop()
             }
-            history.previous()
+            History.previous()
         }
     }
 

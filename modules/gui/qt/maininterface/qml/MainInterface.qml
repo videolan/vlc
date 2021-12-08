@@ -80,7 +80,7 @@ Rectangle {
     ]
 
     function loadCurrentHistoryView() {
-        var current = history.current
+        var current = History.current
         if ( !current || !current.name  || !current.properties ) {
             console.warn("unable to load requested view, undefined")
             return
@@ -89,7 +89,7 @@ Rectangle {
     }
 
     Connections {
-        target: history
+        target: History
         onCurrentChanged: loadCurrentHistoryView()
     }
 
@@ -97,12 +97,12 @@ Rectangle {
         //set the initial view
         var loadPlayer = !mainPlaylistController.empty;
         if (medialib)
-            history.push(["mc", "video"], loadPlayer ? History.Stay : History.Go)
+            History.push(["mc", "video"], loadPlayer ? History.Stay : History.Go)
         else
-            history.push(["mc", "home"], loadPlayer ? History.Stay : History.Go)
+            History.push(["mc", "home"], loadPlayer ? History.Stay : History.Go)
 
         if (loadPlayer)
-            history.push(["player"])
+            History.push(["player"])
     }
 
 
@@ -137,16 +137,16 @@ Rectangle {
                 target: player
                 onPlayingStateChanged: {
                     if (player.playingState === PlayerController.PLAYING_STATE_STOPPED
-                            && history.current.name === "player") {
-                        if (history.previousEmpty)
+                            && History.current.name === "player") {
+                        if (History.previousEmpty)
                         {
                             if (medialib)
-                                history.push(["mc", "video"])
+                                History.push(["mc", "video"])
                             else
-                                history.push(["mc", "home"])
+                                History.push(["mc", "home"])
                         }
                         else
-                            history.previous()
+                            History.previous()
                     }
                 }
             }

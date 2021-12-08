@@ -54,7 +54,7 @@ Control {
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: root.Navigation.defaultKeyAction(event)
-    Navigation.cancelAction: function() { history.previous() }
+    Navigation.cancelAction: function() { History.previous() }
 
     onActiveFocusChanged: if (activeFocus) trackPositionSlider.forceActiveFocus(focusReason)
 
