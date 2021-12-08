@@ -2535,7 +2535,7 @@ vout_thread_t *vout_Create(vlc_object_t *object, void *owner,
                spu_Create(vout, vout) : NULL;
 
     vout_control_Init(&sys->control);
-    atomic_init(&sys->control_is_terminated, false);
+    atomic_init(&sys->control_is_terminated, true);
 
     sys->title.show     = var_InheritBool(vout, "video-title-show");
     sys->title.timeout  = var_InheritInteger(vout, "video-title-timeout");
