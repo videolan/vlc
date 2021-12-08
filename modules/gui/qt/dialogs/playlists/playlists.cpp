@@ -216,9 +216,6 @@ void PlaylistsDialog::onAccepted()
     if (text.isEmpty())
         id = m_model->getItemId(m_playlists->currentIndex().row());
     else
-        id = m_model->create(text);
-
-    m_model->append(id, m_ids);
-
+        m_model->create(text, m_ids);
     close();
 }

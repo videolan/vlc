@@ -37,6 +37,36 @@
 static const int MLPLAYLISTMODEL_COVER_WIDTH  = 512 * 2; // 16 / 10 ratio
 static const int MLPLAYLISTMODEL_COVER_HEIGHT = 320 * 2;
 
+namespace  {
+
+void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const std::vector<MLItemId>& itemList)
+{
+    vlc_ml_query_params_t query;
+    memset(&query, 0, sizeof(vlc_ml_query_params_t));
+
+    for (auto itemId : itemList)
+    {
+        // NOTE: When we have a parent it's a collection of media(s).
+        if (itemId.type != VLC_ML_PARENT_UNKNOWN)
+        {
+            ml_unique_ptr<vlc_ml_media_list_t> list;
+
+            list.reset(vlc_ml_list_media_of(ml, &query, itemId.type, itemId.id));
+
+            if (!list)
+                continue;
+
+            for (const vlc_ml_media_t & media : ml_range_iterate<vlc_ml_media_t>(list))
+                vlc_ml_playlist_append(ml, playlistId, media.i_id);
+        }
+        // NOTE: Otherwise we add the media directly.
+        else
+            vlc_ml_playlist_append(ml, playlistId, itemId.id);
+    }
+}
+
+} //anonymous namespace
+
 //=================================================================================================
 // MLPlaylistListModel
 //=================================================================================================
@@ -47,35 +77,56 @@ static const int MLPLAYLISTMODEL_COVER_HEIGHT = 320 * 2;
 
 //-------------------------------------------------------------------------------------------------
 
-/* Q_INVOKABLE */ MLItemId MLPlaylistListModel::create(const QString & name)
+/* Q_INVOKABLE */ void MLPlaylistListModel::create(const QString & name, const QVariantList& initialItems)
 {
-    assert(m_ml);
+    assert(m_mediaLib);
 
-    vlc_ml_playlist_t * playlist = vlc_ml_playlist_create(m_ml, qtu(name));
 
-    if (playlist)
-        return MLItemId(playlist->i_id, VLC_ML_PARENT_PLAYLIST);
-    else
-        return MLItemId();
+    std::vector<MLItemId> itemList;
+    for (const QVariant & id : initialItems)
+    {
+        if (id.canConvert<MLItemId>() == false)
+            continue;
+
+        const MLItemId & itemId = id.value<MLItemId>();
+
+        if (itemId.id == 0)
+            continue;
+        itemList.push_back(itemId);
+    }
+
+    m_mediaLib->runOnMLThread(this,
+    //ML thread
+    [name, itemList](vlc_medialibrary_t* ml)
+    {
+        vlc_ml_playlist_t * playlist = vlc_ml_playlist_create(ml, qtu(name));
+        if (playlist)
+        {
+            auto playlistId = playlist->i_id;
+            vlc_ml_playlist_release(playlist);
+
+            appendMediaIntoPlaylist(ml, playlistId, itemList);
+        }
+    });
 }
 
 /* Q_INVOKABLE */ bool MLPlaylistListModel::append(const MLItemId     & playlistId,
                                                    const QVariantList & ids)
 {
-    assert(m_ml);
+    assert(m_mediaLib);
+
+    if (unlikely(m_transactionPending))
+        return false;
+
+    m_transactionPending = true;
 
     bool result = true;
-
-    vlc_ml_query_params_t query;
-
-    memset(&query, 0, sizeof(vlc_ml_query_params_t));
-
+    std::vector<MLItemId> itemList;
     for (const QVariant & id : ids)
     {
         if (id.canConvert<MLItemId>() == false)
         {
             result = false;
-
             continue;
         }
 
@@ -84,34 +135,21 @@ static const int MLPLAYLISTMODEL_COVER_HEIGHT = 320 * 2;
         if (itemId.id == 0)
         {
             result = false;
-
             continue;
         }
-
-        // NOTE: When we have a parent it's a collection of media(s).
-        if (itemId.type != VLC_ML_PARENT_UNKNOWN)
-        {
-            ml_unique_ptr<vlc_ml_media_list_t> list;
-
-            list.reset(vlc_ml_list_media_of(m_ml, &query, itemId.type, itemId.id));
-
-            if (list == nullptr)
-            {
-                result = false;
-
-                continue;
-            }
-
-            for (const vlc_ml_media_t & media : ml_range_iterate<vlc_ml_media_t>(list))
-            {
-                if (vlc_ml_playlist_append(m_ml, playlistId.id, media.i_id) != VLC_SUCCESS)
-                    result = false;
-            }
-        }
-        // NOTE: Otherwise we add the media directly.
-        else if (vlc_ml_playlist_append(m_ml, playlistId.id, itemId.id) != VLC_SUCCESS)
-            result = false;
+        itemList.push_back(itemId);
     }
+
+    m_mediaLib->runOnMLThread(this,
+    //ML thread
+    [playlistId, itemList](vlc_medialibrary_t* ml)
+    {
+        appendMediaIntoPlaylist(ml, playlistId.id, itemList);
+    },
+    //UI thread
+    [this]() {
+        endTransaction();
+    });
 
     return result;
 }
@@ -120,24 +158,40 @@ static const int MLPLAYLISTMODEL_COVER_HEIGHT = 320 * 2;
 
 /* Q_INVOKABLE */ bool MLPlaylistListModel::deletePlaylists(const QVariantList & ids)
 {
-    assert(m_ml);
+    assert(m_mediaLib);
 
-    bool result = true;
+    if (unlikely(m_transactionPending))
+        return false;
 
+    m_transactionPending = true;
+
+    std::vector<MLItemId> itemList;
     for (const QVariant & id : ids)
     {
         if (id.canConvert<MLItemId>() == false)
-        {
-            result = false;
-
             continue;
-        }
 
-        if (vlc_ml_playlist_delete(m_ml, id.value<MLItemId>().id) != VLC_SUCCESS)
-            result = false;
+        const MLItemId & itemId = id.value<MLItemId>();
+
+        if (itemId.id == 0)
+            continue;
+
+        itemList.push_back(itemId);
     }
 
-    return result;
+    m_mediaLib->runOnMLThread(this,
+    //ML thread
+    [itemList](vlc_medialibrary_t* ml)
+    {
+        for (auto itemId : itemList)
+            vlc_ml_playlist_delete(ml, itemId.id);
+    },
+    //UI thread
+    [this](){
+        endTransaction();
+    });
+
+    return true;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -230,6 +284,16 @@ ListCacheLoader<std::unique_ptr<MLItem>> * MLPlaylistListModel::createLoader() c
 // Private functions
 //-------------------------------------------------------------------------------------------------
 
+void MLPlaylistListModel::endTransaction()
+{
+    m_transactionPending = false;
+    if (m_resetAfterTransaction)
+    {
+        m_resetAfterTransaction = false;
+        emit resetRequested();
+    }
+}
+
 QString MLPlaylistListModel::getCover(MLPlaylist * playlist) const
 {
     QString cover = playlist->getCover();
@@ -287,16 +351,24 @@ QString MLPlaylistListModel::getCover(MLPlaylist * playlist) const
 
 void MLPlaylistListModel::onVlcMlEvent(const MLEvent & event) /* override */
 {
-    int type = event.i_type;
-
-    if (type == VLC_ML_EVENT_PLAYLIST_ADDED || type == VLC_ML_EVENT_PLAYLIST_UPDATED
-        ||
-        type == VLC_ML_EVENT_PLAYLIST_DELETED)
+    switch (event.i_type)
     {
-        m_need_reset = true;
-
-        // NOTE: Maybe we should call this from MLBaseModel ?
-        emit resetRequested();
+    case VLC_ML_EVENT_PLAYLIST_UPDATED:
+    case VLC_ML_EVENT_PLAYLIST_ADDED:
+    case VLC_ML_EVENT_PLAYLIST_DELETED:
+    {
+        if(m_transactionPending)
+            m_resetAfterTransaction = true;
+        else
+        {
+            m_need_reset = true;
+            // NOTE: Maybe we should call this from MLBaseModel ?
+            emit resetRequested();
+        }
+        break;
+    }
+    default:
+        break;
     }
 
     MLBaseModel::onVlcMlEvent(event);

@@ -51,7 +51,7 @@ public:
     explicit MLPlaylistListModel(QObject * parent = nullptr);
 
 public: // Interface
-    Q_INVOKABLE MLItemId create(const QString & name);
+    Q_INVOKABLE void create(const QString & name, const QVariantList& initialItems);
 
     Q_INVOKABLE bool append(const MLItemId & playlistId, const QVariantList & ids);
 
@@ -75,6 +75,8 @@ protected: // MLBaseModel implementation
 
 private: // Functions
     QString getCover(MLPlaylist * playlist) const;
+
+    void endTransaction();
 
 private: // MLBaseModel implementation
     void onVlcMlEvent(const MLEvent & event) override;
@@ -100,6 +102,9 @@ private: // Variables
     QSize   m_coverSize;
     QString m_coverDefault;
     QString m_coverPrefix;
+
+    bool m_transactionPending = false;
+    bool m_resetAfterTransaction = false;
 
 private:
     struct Loader : public MLBaseModel::BaseLoader
