@@ -27,7 +27,7 @@ import "qrc:///style/"
 Window {
     visible: true
 
-    property var window: topWindow
+    property var window: IntfWindow
 
     width: 350
     minimumWidth: playlistView.minimumWidth

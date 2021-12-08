@@ -25,7 +25,7 @@ import org.videolan.vlc 0.1
 Item {
     id: root
 
-    property real uiTransluency: (enabled && topWindow.active) ? 1 : 0
+    property real uiTransluency: (enabled && IntfWindow.active) ? 1 : 0
 
     enabled: MainCtx.hasAcrylicSurface
 

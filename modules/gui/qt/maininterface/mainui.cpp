@@ -129,6 +129,8 @@ void registerAnonymousType( const char *uri, int versionMajor )
 #endif
 }
 
+class InterfaceWindow : public QWindow { };
+
 } // anonymous namespace
 
 
@@ -147,6 +149,8 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     assert(m_intf->p_mainPlayerController);
     SingletonRegisterHelper<PlayerController>::setInstance(*m_intf->p_mainPlayerController);
 
+    SingletonRegisterHelper<InterfaceWindow>::setInstance(*static_cast<InterfaceWindow*>(m_interfaceWindow));
+
     registerQMLTypes();
 }
 
@@ -162,7 +166,6 @@ bool MainUI::setup(QQmlEngine* engine)
 
     QQmlContext *rootCtx = engine->rootContext();
 
-    rootCtx->setContextProperty( "topWindow", m_interfaceWindow);
     rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
     rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));
     rootCtx->setContextProperty( "dialogModel", new DialogModel(m_intf, this));
@@ -230,6 +233,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<NavigationHistory>(uri, versionMajor, versionMinor, "History", SingletonRegisterHelper<NavigationHistory>::getCallback());
         qmlRegisterSingletonType<PlayerController>(uri, versionMajor, versionMinor, "Player", SingletonRegisterHelper<PlayerController>::callback);
         qmlRegisterSingletonType<I18n>(uri, versionMajor, versionMinor, "I18n", SingletonRegisterHelper<I18n>::getCallback());
+        qmlRegisterSingletonType<InterfaceWindow>(uri, versionMajor, versionMinor, "IntfWindow", SingletonRegisterHelper<InterfaceWindow>::callback);
 
         qRegisterMetaType<VLCTick>();
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
