@@ -151,7 +151,7 @@ T.Popup {
                     size: VLCStyle.dp(40, VLCStyle.scale)
                     x: (btnsCol.width - width) / 2
                     highlighted: index === 3
-                                 && player.subtitleTracks.multiSelect
+                                 && Player.subtitleTracks.multiSelect
 
                     toolTip.visible: (hovered || activeFocus)
                     toolTip.text: modelData.tooltip
@@ -162,9 +162,9 @@ T.Popup {
 
                     onClicked: {
                         if (index === 0) {
-                            player.openVLsub()
+                            Player.openVLsub()
                         } else if (index === 3) {
-                            player.subtitleTracks.multiSelect = !player.subtitleTracks.multiSelect
+                            Player.subtitleTracks.multiSelect = !Player.subtitleTracks.multiSelect
                             focus = false
                         } else {
                             control._updateWidth(false)
@@ -185,13 +185,13 @@ T.Popup {
 
                 model: [{
                         "title": i18n.qtr("Subtitle"),
-                        "tracksModel": player.subtitleTracks
+                        "tracksModel": Player.subtitleTracks
                     }, {
                         "title": i18n.qtr("Audio"),
-                        "tracksModel": player.audioTracks
+                        "tracksModel": Player.audioTracks
                     }, {
                         "title": i18n.qtr("Video Tracks"),
-                        "tracksModel": player.videoTracks
+                        "tracksModel": Player.videoTracks
                     }]
 
                 delegate: Column {
@@ -398,19 +398,19 @@ T.Popup {
                         onValueChanged: {
                             if (inhibitUpdate)
                                 return
-                            player.audioDelayMS = value
+                            Player.audioDelayMS = value
                         }
 
                         Component.onCompleted: {
-                            value = player.audioDelayMS
+                            value = Player.audioDelayMS
                             inhibitUpdate = false
                         }
 
                         Connections {
-                            target: player
+                            target: Player
                             onAudioDelayChanged: {
                                 inhibitUpdate = true
-                                value = player.audioDelayMS
+                                value = Player.audioDelayMS
                                 inhibitUpdate = false
                             }
                         }
@@ -463,19 +463,19 @@ T.Popup {
                         onValueChanged: {
                             if (inhibitUpdate)
                                 return
-                            player.subtitleDelayMS = value
+                            Player.subtitleDelayMS = value
                         }
 
                         Component.onCompleted: {
-                            value = player.subtitleDelayMS
+                            value = Player.subtitleDelayMS
                             inhibitUpdate = false
                         }
 
                         Connections {
-                            target: player
+                            target: Player
                             onSubtitleDelayChanged: {
                                 inhibitUpdate = true
-                                value = player.subtitleDelayMS
+                                value = Player.subtitleDelayMS
                                 inhibitUpdate = false
                             }
                         }
@@ -522,19 +522,19 @@ T.Popup {
                         onValueChanged: {
                             if (inhibitUpdate)
                                 return
-                            player.secondarySubtitleDelayMS = value
+                            Player.secondarySubtitleDelayMS = value
                         }
 
                         Component.onCompleted: {
-                            value = player.secondarySubtitleDelayMS
+                            value = Player.secondarySubtitleDelayMS
                             inhibitUpdate = false
                         }
 
                         Connections {
-                            target: player
+                            target: Player
                             onSecondarySubtitleDelayChanged: {
                                 inhibitUpdate = true
-                                value = player.secondarySubtitleDelayMS
+                                value = Player.secondarySubtitleDelayMS
                                 inhibitUpdate = false
                             }
                         }
@@ -644,19 +644,19 @@ T.Popup {
                         onValueChanged: {
                             if (inhibitUpdate)
                                 return
-                            player.subtitleFPS = value / 10
+                            Player.subtitleFPS = value / 10
                         }
 
                         Component.onCompleted: {
-                            value = player.subtitleFPS * 10
+                            value = Player.subtitleFPS * 10
                             inhibitUpdate = false
                         }
 
                         Connections {
-                            target: player
+                            target: Player
                             onSecondarySubtitleDelayChanged: {
                                 inhibitUpdate = true
-                                value = player.subtitleFPS / 10
+                                value = Player.subtitleFPS / 10
                                 inhibitUpdate = false
                             }
                         }

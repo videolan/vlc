@@ -106,17 +106,17 @@ Popup {
             onValueChanged:  {
                 if (_inhibitUpdate)
                     return
-                player.rate = value
+                Player.rate = value
             }
 
             function _updateFromPlayer() {
                 _inhibitUpdate = true
-                value = player.rate
+                value = Player.rate
                 _inhibitUpdate = false
             }
 
             Connections {
-                target: player
+                target: Player
                 onRateChanged: speedSlider._updateFromPlayer()
             }
 

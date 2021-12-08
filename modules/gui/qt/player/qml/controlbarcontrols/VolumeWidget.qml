@@ -35,7 +35,7 @@ FocusScope{
     property color color: colors.buttonText
     property VLCColors colors: VLCStyle.colors
 
-    readonly property var _player: paintOnly ? ({ muted: false, volume: .5 }) : player
+    readonly property var _player: paintOnly ? ({ muted: false, volume: .5 }) : Player
 
     RowLayout{
         id: volumeWidget
@@ -64,7 +64,7 @@ FocusScope{
             color: widgetfscope.color
             colorHover: colors.buttonTextHover
             colorFocus: colors.bgFocus
-            onClicked: player.muted = !player.muted
+            onClicked: Player.muted = !Player.muted
 
             Navigation.parentItem: widgetfscope
             Navigation.rightItem: volControl
@@ -96,7 +96,7 @@ FocusScope{
 
             Keys.onReleased: {
                 if (KeyHelper.matchOk(event)) {
-                    player.muted = !player.muted
+                    Player.muted = !Player.muted
                 }
             }
 
@@ -112,7 +112,7 @@ FocusScope{
             }
 
             Connections {
-                target: player
+                target: Player
                 enabled: !paintOnly
 
                 onVolumeChanged: volControl._syncVolumeWithPlayer()
@@ -151,10 +151,10 @@ FocusScope{
                     return
 
                 if (!volControl._inhibitPlayerVolumeUpdate) {
-                    if (player.muted)
-                        player.muted = false
+                    if (Player.muted)
+                        Player.muted = false
 
-                    player.volume = volControl.value
+                    Player.volume = volControl.value
                 }
             }
 

@@ -20,6 +20,8 @@ import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.11
 import QtGraphicalEffects 1.0
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -35,8 +37,8 @@ Slider {
 
     property VLCColors colors: VLCStyle.colors
 
-    Keys.onRightPressed: player.jumpFwd()
-    Keys.onLeftPressed: player.jumpBwd()
+    Keys.onRightPressed: Player.jumpFwd()
+    Keys.onLeftPressed: Player.jumpBwd()
 
     function showChapterMarks() {
         _isSeekPointsShown = true
@@ -45,7 +47,7 @@ Slider {
 
     Timer {
         id: seekpointTimer
-        running: player.hasChapters && !control.hovered && _isSeekPointsShown
+        running: Player.hasChapters && !control.hovered && _isSeekPointsShown
         interval: 3000
         onTriggered: control._isSeekPointsShown = false
     }
@@ -55,9 +57,9 @@ Slider {
 
         visible: control.hovered
 
-        text: player.length.scale(pos.x / control.width).toString() +
-              (player.hasChapters ?
-                   " - " + player.chapters.getNameAtPosition(timeTooltip.position) : "")
+        text: Player.length.scale(pos.x / control.width).toString() +
+              (Player.hasChapters ?
+                   " - " + Player.chapters.getNameAtPosition(timeTooltip.position) : "")
 
         pos: Qt.point(sliderRectMouseArea.mouseX, 0)
 
@@ -68,9 +70,9 @@ Slider {
         /* only update the control position when the player position actually change, this avoid the slider
          * to jump around when clicking
          */
-        target: player
+        target: Player
         enabled: !_isHold
-        onPositionChanged: control.value = player.position
+        onPositionChanged: control.value = Player.position
     }
 
     height: control.barHeight
@@ -102,7 +104,7 @@ Slider {
                 control.forceActiveFocus()
                 control._isHold = true
                 control.value = event.x / control.width
-                player.position = control.value
+                Player.position = control.value
             }
             onReleased: control._isHold = false
             onPositionChanged: function (event) {
@@ -111,15 +113,15 @@ Slider {
                     else if (event.x > control.width) event.x = control.width;
 
                     control.value = event.x / control.width
-                    player.position = control.value
+                    Player.position = control.value
                 }
             }
             onEntered: {
-                if(player.hasChapters)
+                if(Player.hasChapters)
                     control._isSeekPointsShown = true
             }
             onExited: {
-                if(player.hasChapters)
+                if(Player.hasChapters)
                     seekpointTimer.restart()
             }
         }
@@ -147,7 +149,7 @@ Slider {
             states: [
                 State {
                     name: "buffering not started"
-                    when: player.buffering === 0
+                    when: Player.buffering === 0
                     PropertyChanges {
                         target: bufferRect
                         width: bufferAnimWidth
@@ -158,10 +160,10 @@ Slider {
                 },
                 State {
                     name: "time to start playing known"
-                    when: player.buffering < 1
+                    when: Player.buffering < 1
                     PropertyChanges {
                         target: bufferRect
-                        width: player.buffering * parent.width
+                        width: Player.buffering * parent.width
                         visible: true
                         x: 0
                         animateLoading: false
@@ -169,10 +171,10 @@ Slider {
                 },
                 State {
                     name: "playing from buffer"
-                    when: player.buffering === 1
+                    when: Player.buffering === 1
                     PropertyChanges {
                         target: bufferRect
-                        width: player.buffering * parent.width
+                        width: Player.buffering * parent.width
                         visible: false
                         x: 0
                         animateLoading: false
@@ -210,11 +212,11 @@ Slider {
 
             width: parent.width
             height: control.barHeight
-            visible: player.hasChapters
+            visible: Player.hasChapters
 
             Repeater {
                 id: seekpointsRptr
-                model: player.chapters
+                model: Player.chapters
                 Rectangle {
                     id: seekpointsRect
                     property real position: model.position === undefined ? 0.0 : model.position

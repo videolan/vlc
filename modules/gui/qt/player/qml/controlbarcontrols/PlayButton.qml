@@ -59,7 +59,7 @@ T.Control {
             if (!event.isAutoRepeat) {
                 _keyOkPressed = false
                 keyHoldTimer.stop()
-                if (player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
+                if (Player.playingState !== Player.PLAYING_STATE_STOPPED)
                     mainPlaylistController.togglePlayPause()
             }
             event.accepted = true
@@ -166,11 +166,11 @@ T.Control {
         id: contentLabel
 
         text: {
-            var state = player.playingState
+            var state = Player.playingState
 
             if (!paintOnly
-                    && state !== PlayerController.PLAYING_STATE_PAUSED
-                    && state !== PlayerController.PLAYING_STATE_STOPPED)
+                    && state !== Player.PLAYING_STATE_PAUSED
+                    && state !== Player.PLAYING_STATE_STOPPED)
                 return VLCIcons.pause
             else
                 return VLCIcons.play

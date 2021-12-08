@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -25,15 +27,15 @@ Widgets.IconControlButton {
     id: abBtn
 
     size: VLCStyle.icon_medium
-    checked: player.ABloopState !== PlayerController.ABLOOP_STATE_NONE
-    onClicked: player.toggleABloopState()
+    checked: Player.ABloopState !== Player.ABLOOP_STATE_NONE
+    onClicked: Player.toggleABloopState()
     text: i18n.qtr("A to B")
 
     iconText: {
-        switch(player.ABloopState) {
-          case PlayerController.ABLOOP_STATE_A: return VLCIcons.atob_bg_b
-          case PlayerController.ABLOOP_STATE_B: return VLCIcons.atob_bg_none
-          case PlayerController.ABLOOP_STATE_NONE: return VLCIcons.atob_bg_ab
+        switch(Player.ABloopState) {
+          case Player.ABLOOP_STATE_A: return VLCIcons.atob_bg_b
+          case Player.ABLOOP_STATE_B: return VLCIcons.atob_bg_none
+          case Player.ABLOOP_STATE_NONE: return VLCIcons.atob_bg_ab
         }
     }
 
@@ -43,10 +45,10 @@ Widgets.IconControlButton {
         color: abBtn.colors.accent
 
         text: {
-            switch(player.ABloopState) {
-              case PlayerController.ABLOOP_STATE_A: return VLCIcons.atob_fg_a
-              case PlayerController.ABLOOP_STATE_B: return VLCIcons.atob_fg_ab
-              case PlayerController.ABLOOP_STATE_NONE: return ""
+            switch(Player.ABloopState) {
+              case Player.ABLOOP_STATE_A: return VLCIcons.atob_fg_a
+              case Player.ABLOOP_STATE_B: return VLCIcons.atob_fg_ab
+              case Player.ABLOOP_STATE_NONE: return ""
             }
         }
     }

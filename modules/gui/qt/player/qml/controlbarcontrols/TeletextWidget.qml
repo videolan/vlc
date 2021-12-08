@@ -32,7 +32,7 @@ FocusScope{
     width: teleWidget.width
     height: teleWidget.height
 
-    property bool autohide: !paintOnly && !player.isTeletextAvailable
+    property bool autohide: !paintOnly && !Player.isTeletextAvailable
     property bool paintOnly: false
     visible: !autohide
 
@@ -51,13 +51,13 @@ FocusScope{
             iconText: VLCIcons.tv
             text: i18n.qtr("Teletext activate")
             size: VLCStyle.icon_normal
-            onClicked: player.teletextEnabled = !player.teletextEnabled
+            onClicked: Player.teletextEnabled = !Player.teletextEnabled
             color: widgetfscope.color
-            checked: player.teletextEnabled
+            checked: Player.teletextEnabled
             focus: true
 
             Navigation.parentItem: widgetfscope
-            Navigation.rightItem: player.teletextEnabled ? teleTransparencyBtn : null
+            Navigation.rightItem: Player.teletextEnabled ? teleTransparencyBtn : null
         }
 
         Widgets.IconToolButton{
@@ -67,8 +67,8 @@ FocusScope{
             text: i18n.qtr("Teletext transparency")
             size: VLCStyle.icon_normal
             opacity: 0.5
-            enabled: player.teletextEnabled
-            onClicked: player.teletextTransparency = !player.teletextTransparency
+            enabled: Player.teletextEnabled
+            onClicked: Player.teletextTransparency = !Player.teletextTransparency
             color: widgetfscope.color
 
             Navigation.parentItem: widgetfscope
@@ -78,7 +78,7 @@ FocusScope{
 
         Widgets.SpinBoxExt{
             id: telePageNumber
-            enabled: player.teletextEnabled
+            enabled: Player.teletextEnabled
             from: 100
             to: 899
             editable: true
@@ -95,19 +95,19 @@ FocusScope{
             onValueChanged: {
                 if (inhibitPageUpdate)
                     return
-                player.teletextPage = value
+                Player.teletextPage = value
             }
 
             Component.onCompleted: {
-                value = player.teletextPage
+                value = Player.teletextPage
                 inhibitPageUpdate = false
             }
 
             Connections {
-                target: player
+                target: Player
                 onTeletextPageChanged: {
                     telePageNumber.inhibitPageUpdate = true
-                    telePageNumber.value = player.teletextPage
+                    telePageNumber.value = Player.teletextPage
                     telePageNumber.inhibitPageUpdate = false
                 }
             }
@@ -116,11 +116,11 @@ FocusScope{
         Widgets.IconToolButton{
             id: indexKeyBtn
             paintOnly: widgetfscope.paintOnly
-            enabled: player.teletextEnabled
+            enabled: Player.teletextEnabled
             size: VLCStyle.icon_normal
             iconText: VLCIcons.record
             text: i18n.qtr("Index key")
-            onClicked: player.teletextPage = PlayerController.TELE_INDEX
+            onClicked: Player.teletextPage = Player.TELE_INDEX
             color: "grey"
             colorDisabled: "grey"
 
@@ -131,11 +131,11 @@ FocusScope{
         Widgets.IconToolButton{
             id: redKeyBtn
             paintOnly: widgetfscope.paintOnly
-            enabled: player.teletextEnabled
+            enabled: Player.teletextEnabled
             size: VLCStyle.icon_normal
             iconText: VLCIcons.record
             text: i18n.qtr("Red key")
-            onClicked: player.teletextPage = PlayerController.TELE_RED
+            onClicked: Player.teletextPage = Player.TELE_RED
             color: "red"
             colorDisabled: "grey"
 
@@ -146,11 +146,11 @@ FocusScope{
         Widgets.IconToolButton{
             id: greenKeyBtn
             paintOnly: widgetfscope.paintOnly
-            enabled: player.teletextEnabled
+            enabled: Player.teletextEnabled
             size: VLCStyle.icon_normal
             iconText: VLCIcons.record
             text: i18n.qtr("Green key")
-            onClicked: player.teletextPage = PlayerController.TELE_GREEN
+            onClicked: Player.teletextPage = Player.TELE_GREEN
             color: "green"
             colorDisabled: "grey"
 
@@ -161,11 +161,11 @@ FocusScope{
         Widgets.IconToolButton{
             id: yellowKeyBtn
             paintOnly: widgetfscope.paintOnly
-            enabled: player.teletextEnabled
+            enabled: Player.teletextEnabled
             size: VLCStyle.icon_normal
             iconText: VLCIcons.record
             text: i18n.qtr("Yellow key")
-            onClicked: player.teletextPage = PlayerController.TELE_YELLOW
+            onClicked: Player.teletextPage = Player.TELE_YELLOW
             color: "yellow"
             colorDisabled: "grey"
 
@@ -176,11 +176,11 @@ FocusScope{
         Widgets.IconToolButton{
             id: blueKeyBtn
             paintOnly: widgetfscope.paintOnly
-            enabled: player.teletextEnabled
+            enabled: Player.teletextEnabled
             size: VLCStyle.icon_normal
             iconText: VLCIcons.record
             text: i18n.qtr("Blue key")
-            onClicked: player.teletextPage = PlayerController.TELE_BLUE
+            onClicked: Player.teletextPage = Player.TELE_BLUE
             color: "blue"
             colorDisabled: "grey"
 

@@ -151,7 +151,7 @@ Control {
         id: mediaTime
 
         visible: false
-        text: player.time.toString()
+        text: Player.time.toString()
         color: root.colors.playerFg
         font.pixelSize: VLCStyle.fontSize_normal
     }
@@ -161,9 +161,9 @@ Control {
         id: mediaRemainingTime
 
         visible: false
-        text: (MainCtx.showRemainingTime && player.remainingTime.valid())
-              ? "-" + player.remainingTime.toString()
-              : player.length.toString()
+        text: (MainCtx.showRemainingTime && Player.remainingTime.valid())
+              ? "-" + Player.remainingTime.toString()
+              : Player.length.toString()
         color: root.colors.playerFg
         font.pixelSize: VLCStyle.fontSize_normal
 
@@ -180,7 +180,7 @@ Control {
         backgroundColor: Qt.lighter(colors.playerBg, 1.6180)
         progressBarColor: activeFocus ? colors.accent : colors.playerControlBarFg
         barHeight: VLCStyle.heightBar_xxsmall
-        enabled: player.playingState == PlayerController.PLAYING_STATE_PLAYING || player.playingState == PlayerController.PLAYING_STATE_PAUSED
+        enabled: Player.playingState == Player.PLAYING_STATE_PLAYING || Player.playingState == Player.PLAYING_STATE_PAUSED
         colors: root.colors
 
         Navigation.parentItem: root

@@ -134,9 +134,9 @@ Rectangle {
             focus: true
 
             Connections {
-                target: player
+                target: Player
                 onPlayingStateChanged: {
-                    if (player.playingState === PlayerController.PLAYING_STATE_STOPPED
+                    if (Player.playingState === Player.PLAYING_STATE_STOPPED
                             && History.current.name === "player") {
                         if (History.previousEmpty)
                         {

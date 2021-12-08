@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -24,8 +26,8 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     id: fullScreenBtn
     size: VLCStyle.icon_medium
-    enabled: player.hasVideoOutput
-    iconText: player.fullscreen ? VLCIcons.defullscreen :VLCIcons.fullscreen
-    onClicked: player.fullscreen = !player.fullscreen
+    enabled: Player.hasVideoOutput
+    iconText: Player.fullscreen ? VLCIcons.defullscreen :VLCIcons.fullscreen
+    onClicked: Player.fullscreen = !Player.fullscreen
     text: i18n.qtr("fullscreen")
 }

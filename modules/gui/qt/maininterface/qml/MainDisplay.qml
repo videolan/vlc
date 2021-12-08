@@ -25,7 +25,7 @@ import "qrc:///style/"
 import "qrc:///main/" as Main
 import "qrc:///widgets/" as Widgets
 import "qrc:///playlist/" as PL
-import "qrc:///player/" as Player
+import "qrc:///player/" as P
 
 import "qrc:///util/Helpers.js" as Helpers
 
@@ -83,7 +83,7 @@ FocusScope {
                 return e.name === stackView.currentItem.view
             })
 
-        if (player.hasVideoOutput && MainCtx.hasEmbededVideo)
+        if (Player.hasVideoOutput && MainCtx.hasEmbededVideo)
             _showMiniPlayer = true
     }
 
@@ -397,7 +397,7 @@ FocusScope {
                 }
             }
 
-            Player.PIPPlayer {
+            P.PIPPlayer {
                 id: playerPip
                 anchors {
                     bottom: miniPlayer.top
@@ -432,7 +432,7 @@ FocusScope {
             }
 
 
-            Player.MiniPlayer {
+            P.MiniPlayer {
                 id: miniPlayer
 
                 Binding on state {
@@ -457,9 +457,9 @@ FocusScope {
             }
 
             Connections {
-                target: player
+                target: Player
                 onHasVideoOutputChanged: {
-                    if (player.hasVideoOutput && MainCtx.hasEmbededVideo) {
+                    if (Player.hasVideoOutput && MainCtx.hasEmbededVideo) {
                         if (History.current.view !== "player")
                             g_mainDisplay.showPlayer()
                     } else {

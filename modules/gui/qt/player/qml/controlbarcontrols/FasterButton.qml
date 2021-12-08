@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -25,6 +27,6 @@ Widgets.IconControlButton {
     id: fasterBtn
     size: VLCStyle.icon_medium
     iconText: VLCIcons.faster
-    onClicked: player.faster()
+    onClicked: Player.faster()
     text: i18n.qtr("Faster")
 }

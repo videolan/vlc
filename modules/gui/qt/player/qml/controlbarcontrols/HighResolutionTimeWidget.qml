@@ -42,9 +42,9 @@ Control {
             return
 
         if (add === true)
-            player.requestAddSMPTETimer()
+            Player.requestAddSMPTETimer()
         else if (add === false)
-            player.requestRemoveSMPTETimer()
+            Player.requestRemoveSMPTETimer()
     }
 
     Component.onCompleted: {
@@ -68,7 +68,7 @@ Control {
             id: label
             anchors.fill: parent
 
-            text: paintOnly ? "00:00:00:00" : player.highResolutionTime
+            text: paintOnly ? "00:00:00:00" : Player.highResolutionTime
             color: colors.text
 
             horizontalAlignment: Text.AlignHCenter

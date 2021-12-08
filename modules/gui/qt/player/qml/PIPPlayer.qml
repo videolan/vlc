@@ -97,8 +97,8 @@ Item {
                 anchors.centerIn: parent
 
                 font.pixelSize: VLCStyle.dp(60, VLCStyle.scale)
-                text: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
-                       && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
+                text: (Player.playingState !== Player.PLAYING_STATE_PAUSED
+                       && Player.playingState !== Player.PLAYING_STATE_STOPPED)
                       ? VLCIcons.pause
                       : VLCIcons.play
 

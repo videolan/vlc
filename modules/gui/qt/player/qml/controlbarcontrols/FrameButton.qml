@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -24,8 +26,8 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     id: frameBtn
     size: VLCStyle.icon_medium
-    enabled: player.isPlaying
+    enabled: Player.isPlaying
     iconText: VLCIcons.frame_by_frame
-    onClicked: player.frameNext()
+    onClicked: Player.frameNext()
     text: i18n.qtr("Next frame")
 }

@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -24,7 +26,7 @@ import "qrc:///style/"
 Widgets.IconControlButton {
     id: stopBtn
     size: VLCStyle.icon_medium
-    enabled: player.isPlaying
+    enabled: Player.isPlaying
     iconText: VLCIcons.stop
     onClicked: mainPlaylistController.stop()
     text: i18n.qtr("Stop")

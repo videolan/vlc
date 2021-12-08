@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -26,7 +28,7 @@ Widgets.ComboBoxExt {
     width: VLCStyle.combobox_width_normal
     height: VLCStyle.combobox_height_normal
     textRole: "display"
-    model: player.aspectRatio
+    model: Player.aspectRatio
     currentIndex: -1
     onCurrentIndexChanged: model.toggleIndex(currentIndex)
     Accessible.name: i18n.qtr("Aspect ratio")

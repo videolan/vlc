@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -25,7 +27,7 @@ Widgets.IconControlButton {
     id: chapterPreviousBtn
     size: VLCStyle.icon_medium
     iconText: VLCIcons.dvd_prev
-    onClicked: player.chapterPrev()
-    enabled: player.hasChapters
+    onClicked: Player.chapterPrev()
+    enabled: Player.hasChapters
     text: i18n.qtr("Previous chapter")
 }

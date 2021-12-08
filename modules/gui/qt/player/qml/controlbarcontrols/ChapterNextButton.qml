@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -25,7 +27,7 @@ Widgets.IconControlButton {
     id: chapterNextBtn
     size: VLCStyle.icon_medium
     iconText: VLCIcons.dvd_next
-    onClicked: player.chapterNext()
-    enabled: player.hasChapters
+    onClicked: Player.chapterNext()
+    enabled: Player.hasChapters
     text: i18n.qtr("Next chapter")
 }

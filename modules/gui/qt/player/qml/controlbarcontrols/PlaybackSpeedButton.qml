@@ -18,11 +18,11 @@
 import QtQuick 2.11
 import QtQuick.Templates 2.4 as T
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
-import "qrc:///player/" as Player
-
-import org.videolan.vlc 0.1
+import "qrc:///player/" as P
 
 Widgets.IconControlButton {
     id: playbackSpeedButton
@@ -33,7 +33,7 @@ Widgets.IconControlButton {
 
     onClicked: playbackSpeedPopup.open()
 
-    Player.PlaybackSpeed {
+    P.PlaybackSpeed {
         id: playbackSpeedPopup
 
         z: 1
@@ -80,7 +80,7 @@ Widgets.IconControlButton {
     T.Label {
         anchors.centerIn: parent
         font.pixelSize: VLCStyle.fontSize_normal
-        text: !playbackSpeedButton.paintOnly ? i18n.qtr("%1x").arg(+player.rate.toFixed(2)) : i18n.qtr("1x")
+        text: !playbackSpeedButton.paintOnly ? i18n.qtr("%1x").arg(+Player.rate.toFixed(2)) : i18n.qtr("1x")
         color: playbackSpeedButton.background.foregroundColor // IconToolButton.background is a AnimatedBackground
     }
 }

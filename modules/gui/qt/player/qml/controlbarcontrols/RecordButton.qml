@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick 2.11
 
+import org.videolan.vlc 0.1
+
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -25,8 +27,8 @@ Widgets.IconControlButton {
     id: recordBtn
     size: VLCStyle.icon_medium
     iconText: VLCIcons.record
-    enabled: player.isPlaying
-    checked: player.isRecording
-    onClicked: player.toggleRecord()
+    enabled: Player.isPlaying
+    checked: Player.isRecording
+    onClicked: Player.toggleRecord()
     text: i18n.qtr("record")
 }

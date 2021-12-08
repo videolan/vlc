@@ -35,7 +35,7 @@ FocusScope {
     property int _lockAutoHide: 0
     readonly property bool _autoHide: _lockAutoHide == 0
                                       && rootPlayer.hasEmbededVideo
-                                      && player.hasVideoOutput
+                                      && Player.hasVideoOutput
                                       && playlistpopup.state !== "visible"
 
     property bool pinVideoControls: rootPlayer.hasEmbededVideo && MainCtx.pinVideoControls
@@ -446,7 +446,7 @@ FocusScope {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: VLCStyle.margin_large
 
-                visible: player.videoTracks.count === 0 && centerContent.height > (audioControls.y + audioControls.height)
+                visible: Player.videoTracks.count === 0 && centerContent.height > (audioControls.y + audioControls.height)
                 focus: visible
                 spacing: VLCStyle.margin_xxsmall
                 Navigation.parentItem: rootPlayer
@@ -457,7 +457,7 @@ FocusScope {
                     Widgets.IconToolButton {
                         size: VLCIcons.pixelSize(VLCStyle.icon_large)
                         iconText: VLCIcons.skip_back
-                        onClicked: player.jumpBwd()
+                        onClicked: Player.jumpBwd()
                         text: i18n.qtr("Step back")
                         color: rootPlayer.colors.playerFg
                         colorHover: rootPlayer.colors.buttonTextHover
@@ -467,7 +467,7 @@ FocusScope {
                     Widgets.IconToolButton {
                         size: VLCIcons.pixelSize(VLCStyle.icon_large)
                         iconText: VLCIcons.visualization
-                        onClicked: player.toggleVisualization()
+                        onClicked: Player.toggleVisualization()
                         text: i18n.qtr("Visualization")
                         color: rootPlayer.colors.playerFg
                         colorHover: rootPlayer.colors.buttonTextHover
@@ -477,7 +477,7 @@ FocusScope {
                     Widgets.IconToolButton{
                         size: VLCIcons.pixelSize(VLCStyle.icon_large)
                         iconText: VLCIcons.skip_for
-                        onClicked: player.jumpFwd()
+                        onClicked: Player.jumpFwd()
                         text: i18n.qtr("Step forward")
                         color: rootPlayer.colors.playerFg
                         colorHover: rootPlayer.colors.buttonTextHover

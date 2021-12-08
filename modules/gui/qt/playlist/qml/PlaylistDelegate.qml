@@ -160,9 +160,9 @@ T.Control {
                 verticalAlignment: Text.AlignVCenter
                 color: colors.accent
                 text: {
-                    if (player.playingState === PlayerController.PLAYING_STATE_PLAYING)
+                    if (Player.playingState === Player.PLAYING_STATE_PLAYING)
                         return VLCIcons.volume_high
-                    if (player.playingState === PlayerController.PLAYING_STATE_PAUSED)
+                    if (Player.playingState === Player.PLAYING_STATE_PAUSED)
                         return VLCIcons.pause
                     return ""
                 }
