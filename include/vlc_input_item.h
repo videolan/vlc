@@ -345,6 +345,9 @@ VLC_API int input_item_DelInfo( input_item_t *p_i, const char *psz_cat, const ch
 VLC_API void input_item_ReplaceInfos( input_item_t *, info_category_t * );
 VLC_API void input_item_MergeInfos( input_item_t *, info_category_t * );
 
+#define input_item_AddStat(item, type, value) \
+    input_item_AddInfo(item, ".stat", type, "%" PRIu64, (uint64_t) value)
+
 /**
  * This function creates a new input_item_t with the provided information.
  *
