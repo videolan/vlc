@@ -29,27 +29,34 @@
 
 #include "qt.hpp"
 
+
 template <typename T>
-class       Singleton
+class Singleton
 {
 public:
-    static T*      getInstance( qt_intf_t *p_intf = NULL )
+    template <bool create, class = typename std::enable_if<!create>::type>
+    static T* getInstance( void )
     {
         vlc::threads::mutex_locker lock( m_mutex );
-        if ( m_instance == NULL )
-            m_instance = new T( p_intf );
         return m_instance;
     }
 
-    static void    killInstance()
+    template <class T2 = T, typename... Args>
+    static T* getInstance( Args&&... args )
     {
         vlc::threads::mutex_locker lock( m_mutex );
-        if ( m_instance != NULL )
-        {
-            delete m_instance;
-            m_instance = NULL;
-        }
+        if ( !m_instance )
+          m_instance = new T2( std::forward<Args>( args )... );
+        return m_instance;
     }
+
+    static void killInstance()
+    {
+        vlc::threads::mutex_locker lock( m_mutex );
+        delete m_instance;
+        m_instance = nullptr;
+    }
+
 protected:
     Singleton(){}
     virtual ~Singleton(){}
@@ -59,13 +66,11 @@ protected:
     Singleton<T>&   operator=(const Singleton<T>&);
 
 private:
-    static T*      m_instance;
+    static T* m_instance;
     static vlc::threads::mutex m_mutex;
 };
-
 template <typename T>
-T*  Singleton<T>::m_instance = NULL;
-
+T* Singleton<T>::m_instance = nullptr;
 template <typename T>
 vlc::threads::mutex Singleton<T>::m_mutex;
 
