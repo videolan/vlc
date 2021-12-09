@@ -34,7 +34,7 @@ public:
     MLGroup(const vlc_ml_group_t * data);
 
 public: // Interface
-    QString getName() const;
+    QString getTitle() const;
 
     int64_t getDuration() const;
 
@@ -43,7 +43,7 @@ public: // Interface
     unsigned int getCount() const;
 
 private:
-    QString m_name;
+    QString m_title;
 
     int64_t m_duration;
 

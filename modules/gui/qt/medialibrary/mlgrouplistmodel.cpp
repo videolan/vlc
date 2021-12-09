@@ -44,7 +44,7 @@ static const int MLGROUPLISTMODEL_COVER_HEIGHT = 320 * 2;
 
 static const QHash<QByteArray, vlc_ml_sorting_criteria_t> criterias =
 {
-    { "name",     VLC_ML_SORTING_ALPHA         },
+    { "title",    VLC_ML_SORTING_ALPHA         },
     { "duration", VLC_ML_SORTING_DURATION      },
     { "date",     VLC_ML_SORTING_INSERTIONDATE }
 };
@@ -65,20 +65,20 @@ QHash<int, QByteArray> MLGroupListModel::roleNames() const /* override */
     return
     {
         { GROUP_ID,                 "id"                 },
-        { GROUP_NAME,               "name"               },
+        { GROUP_TITLE,              "title"              },
         { GROUP_THUMBNAIL,          "thumbnail"          },
         { GROUP_DURATION,           "duration"           },
         { GROUP_DATE,               "date"               },
         { GROUP_COUNT,              "count"              },
         // NOTE: Media specific.
         { GROUP_IS_NEW,             "isNew"              },
-        { GROUP_TITLE,              "title"              },
+        { GROUP_FILENAME,           "fileName"           },
+        { GROUP_PROGRESS,           "progress"           },
+        { GROUP_PLAYCOUNT,          "playcount"          },
         { GROUP_RESOLUTION,         "resolution_name"    },
         { GROUP_CHANNEL,            "channel"            },
         { GROUP_MRL,                "mrl"                },
         { GROUP_MRL_DISPLAY,        "display_mrl"        },
-        { GROUP_PROGRESS,           "progress"           },
-        { GROUP_PLAYCOUNT,          "playcount"          },
         { GROUP_VIDEO_TRACK,        "videoDesc"          },
         { GROUP_AUDIO_TRACK,        "audioDesc"          },
         { GROUP_TITLE_FIRST_SYMBOL, "title_first_symbol" }
@@ -98,12 +98,12 @@ QVariant MLGroupListModel::itemRoleData(MLItem *item, const int role) const /* o
         {
             // NOTE: This is the condition for QWidget view(s).
             case Qt::DisplayRole:
-                return QVariant::fromValue(group->getName());
+                return QVariant::fromValue(group->getTitle());
             // NOTE: These are the conditions for QML view(s).
             case GROUP_ID:
                 return QVariant::fromValue(group->getId());
-            case GROUP_NAME:
-                return QVariant::fromValue(group->getName());
+            case GROUP_TITLE:
+                return QVariant::fromValue(group->getTitle());
             case GROUP_THUMBNAIL:
                 return getCover(group);
             case GROUP_DURATION:
@@ -126,7 +126,7 @@ QVariant MLGroupListModel::itemRoleData(MLItem *item, const int role) const /* o
                 return QVariant::fromValue(video->getTitle());
             case GROUP_ID:
                 return QVariant::fromValue(video->getId());
-            case GROUP_NAME:
+            case GROUP_TITLE:
                 return QVariant::fromValue(video->getTitle());
             case GROUP_THUMBNAIL:
             {
@@ -147,8 +147,12 @@ QVariant MLGroupListModel::itemRoleData(MLItem *item, const int role) const /* o
             // NOTE: Media specific.
             case GROUP_IS_NEW:
                 return QVariant::fromValue(video->isNew());
-            case GROUP_TITLE:
-                return QVariant::fromValue(video->getTitle());
+            case GROUP_FILENAME:
+                return QVariant::fromValue(video->getFileName());
+            case GROUP_PROGRESS:
+                return QVariant::fromValue(video->getProgress());
+            case GROUP_PLAYCOUNT:
+                return QVariant::fromValue(video->getPlayCount());
             case GROUP_RESOLUTION:
                 return QVariant::fromValue(video->getResolutionName());
             case GROUP_CHANNEL:
@@ -157,10 +161,6 @@ QVariant MLGroupListModel::itemRoleData(MLItem *item, const int role) const /* o
                 return QVariant::fromValue(video->getMRL());
             case GROUP_MRL_DISPLAY:
                 return QVariant::fromValue(video->getDisplayMRL());
-            case GROUP_PROGRESS:
-                return QVariant::fromValue(video->getProgress());
-            case GROUP_PLAYCOUNT:
-                return QVariant::fromValue(video->getPlayCount());
             case GROUP_VIDEO_TRACK:
                 return QVariant::fromValue(video->getVideoDesc());
             case GROUP_AUDIO_TRACK:
@@ -181,7 +181,7 @@ vlc_ml_sorting_criteria_t MLGroupListModel::roleToCriteria(int role) const /* ov
 {
     switch (role)
     {
-        case GROUP_NAME:
+        case GROUP_TITLE:
             return VLC_ML_SORTING_ALPHA;
         case GROUP_DURATION:
             return VLC_ML_SORTING_DURATION;

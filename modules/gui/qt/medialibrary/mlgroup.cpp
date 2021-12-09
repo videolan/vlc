@@ -29,7 +29,7 @@
 
 MLGroup::MLGroup(const vlc_ml_group_t * data)
     : MLItemCover(MLItemId(data->i_id, VLC_ML_PARENT_GROUP))
-    , m_name(qfu(data->psz_name))
+    , m_title(qfu(data->psz_name))
     , m_duration(data->i_duration)
     , m_date(data->i_creation_date)
     , m_count(data->i_nb_total_media)
@@ -41,9 +41,9 @@ MLGroup::MLGroup(const vlc_ml_group_t * data)
 // Interface
 //-------------------------------------------------------------------------------------------------
 
-QString MLGroup::getName() const
+QString MLGroup::getTitle() const
 {
-    return m_name;
+    return m_title;
 }
 
 //-------------------------------------------------------------------------------------------------

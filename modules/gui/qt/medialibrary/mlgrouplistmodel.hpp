@@ -36,22 +36,23 @@ public:
     enum Roles
     {
         GROUP_ID = Qt::UserRole + 1,
-        GROUP_NAME,
+        GROUP_TITLE,
         GROUP_THUMBNAIL,
         GROUP_DURATION,
         GROUP_DATE,
         GROUP_COUNT,
         // NOTE: Media specific.
         GROUP_IS_NEW,
-        GROUP_TITLE,
+        GROUP_FILENAME,
+        GROUP_PROGRESS,
+        GROUP_PLAYCOUNT,
         GROUP_RESOLUTION,
         GROUP_CHANNEL,
         GROUP_MRL,
         GROUP_MRL_DISPLAY,
-        GROUP_PROGRESS,
-        GROUP_PLAYCOUNT,
         GROUP_VIDEO_TRACK,
         GROUP_AUDIO_TRACK,
+
         GROUP_TITLE_FIRST_SYMBOL
     };
 
