@@ -36,16 +36,15 @@
 # define DEBUG_QT 1
 #endif
 
-OpenDialog *OpenDialog::instance = NULL;
-
 OpenDialog* OpenDialog::getInstance(  qt_intf_t *p_intf,
         bool b_rawInstance, int _action_flag, bool b_selectMode )
 {
-    /* Creation */
-    if( !instance )
-        instance = new OpenDialog( nullptr, p_intf, b_selectMode,
-                                   _action_flag );
-    else if( !b_rawInstance )
+    const auto instance = Singleton<OpenDialog>::getInstance(nullptr,
+                                                             p_intf,
+                                                             b_selectMode,
+                                                             _action_flag);
+
+    if( !b_rawInstance )
     {
         /* Request the instance but change small details:
            - Button menu */

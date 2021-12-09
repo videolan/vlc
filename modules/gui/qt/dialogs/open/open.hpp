@@ -32,6 +32,7 @@
 
 #include "widgets/native/qvlcframe.hpp"
 #include "dialogs/open/open_panels.hpp"
+#include "util/singleton.hpp"
 
 /* Auto-generated from .ui files */
 #include "ui_open.h"
@@ -55,19 +56,15 @@ enum {
 
 class QString;
 
-class OpenDialog : public QVLCDialog
+class OpenDialog : public QVLCDialog, public Singleton<OpenDialog>
 {
+    friend Singleton<OpenDialog>;
+
     Q_OBJECT
 public:
     static OpenDialog * getInstance(qt_intf_t *p_intf,
                                 bool b_rawInstance = false, int _action_flag = 0,
                                 bool b_selectMode = false );
-
-    static void killInstance()
-    {
-        delete instance;
-        instance = NULL;
-    }
 
     void showTab( int = OPEN_FILE_TAB );
     QString getMRL( bool b = true );
@@ -86,8 +83,6 @@ private:
     OpenDialog( QWindow *parent, qt_intf_t *, bool b_selectMode,
                 int _action_flag = 0 );
     virtual ~OpenDialog();
-
-    static OpenDialog *instance;
 
     QString optionsMRL;
     QString storedMethod;
