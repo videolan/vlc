@@ -25,102 +25,83 @@ import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
-import "qrc:///main/"    as MainInterface
-import "qrc:///util/"    as Util
 import "qrc:///style/"
 
-VideoAll {
+Widgets.PageLoader {
     id: root
+
+    // Properties
+
+    property var model
+    property var sortMenu
+    property var sortModel
+
+    // Settings
+
+    defaultPage: "base"
+
+    pageModel: [{
+        name: "base",
+        component: componentBase
+    }, {
+        name: "group",
+        component: componentGroup
+    }]
 
     // Events
 
-    onCurrentIndexChanged: {
-        History.update([ "mc", "video", { "initialIndex": currentIndex }])
+    onCurrentItemChanged: {
+        model     = currentItem.model
+        sortMenu  = currentItem.sortMenu
+        sortModel = currentItem.sortModel
+    }
+    // Functions private
+
+    function _updateHistoryAll(index) {
+        History.update(["mc", "video", "all", "base", { "initialIndex": index }])
     }
 
-    // Functions
-
-    function setCurrentItemFocus(reason) {
-        if (modelRecent.count)
-            headerItem.setCurrentItemFocus(reason);
-        else
-            _currentView.setCurrentItemFocus(reason);
+    function _updateHistoryGroup(group) {
+        History.update(["mc", "video", "all", "group", {
+                            "initialIndex": group.currentIndex,
+                            "initialId"   : group.parentId,
+                            "initialTitle": group.title
+                        }])
     }
 
     // Children
 
-    MLRecentsVideoModel {
-        id: modelRecent
+    Component {
+        id: componentBase
 
-        ml: MediaLib
+        VideoAllSubDisplay {
+            // Events
+
+            onShowList: {
+                History.push(["mc", "video", "all", "group",
+                             { parentId: model.id, title: model.title }])
+
+                root.stackView.currentItem.setCurrentItemFocus(reason)
+            }
+
+            // NOTE: The model can change over time.
+            onModelChanged: root.model = model
+
+            onCurrentIndexChanged: root._updateHistoryAll(currentIndex)
+        }
     }
 
-    header: Column {
-        property Item focusItem: (loader.status === Loader.Ready) ? loader.item.focusItem : null
+    Component {
+        id: componentGroup
 
-        property alias loader: loader
+        MediaGroupDisplay {
+            id: group
 
-        width: root.width
+            anchors.fill: parent
 
-        topPadding: VLCStyle.margin_normal
-        bottomPadding: VLCStyle.margin_normal
-
-        // NOTE: We want the header to be visible when we have at least one media visible.
-        //       Otherwise it overlaps the default caption.
-        visible: (model.count)
-
-        // NOTE: Making sure this item will be focused by VideoAll::_onNavigationUp().
-        focus: true
-
-        function setCurrentItemFocus(reason) {
-            var item = loader.item;
-
-            if (item)
-                item.setCurrentItemFocus(reason);
-        }
-
-        Loader {
-            id: loader
-
-            anchors.left : parent.left
-            anchors.right: parent.right
-
-            anchors.margins: root.contentMargin
-
-            height: (status === Loader.Ready) ? item.implicitHeight : 0
-
-            active: (modelRecent.count)
-
-            visible: active
-
-            sourceComponent: VideoDisplayRecentVideos {
-                id: component
-
-                width: parent.width
-
-                // NOTE: We want grid items to be visible on the sides.
-                displayMargins: root.contentMargin
-
-                model: modelRecent
-
-                focus: true
-
-                Navigation.parentItem: root
-
-                Navigation.downAction: function() {
-                    _currentView.setCurrentItemFocus(Qt.TabFocusReason);
-                }
-            }
-        }
-
-        Widgets.SubtitleLabel {
-            anchors.left: loader.left
-            anchors.right: loader.right
-
-            // NOTE: We want this to be properly aligned with the grid items.
-            anchors.leftMargin: VLCStyle.margin_normal
-
-            text: I18n.qtr("Videos")
+            onCurrentIndexChanged: root._updateHistoryGroup(group)
+            onParentIdChanged    : root._updateHistoryGroup(group)
+            onTitleChanged       : root._updateHistoryGroup(group)
         }
     }
 }
