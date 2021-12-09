@@ -88,12 +88,13 @@ Q_DECLARE_METATYPE(AudioDescription)
 class MLVideo : public MLItem
 {
 public:
-    MLVideo(vlc_medialibrary_t *ml, const vlc_ml_media_t *data);
+    MLVideo(vlc_medialibrary_t *, const vlc_ml_media_t *data);
 
     bool isNew() const;
     QString getFileName() const;
     QString getTitle() const;
-    QString getThumbnail();
+    QString getThumbnail(vlc_ml_thumbnail_status_t* status);
+    void setThumbnail(vlc_ml_thumbnail_status_t status, QString mrl);
     int64_t getDuration() const;
     QString getResolutionName() const;
     QString getChannel() const;
@@ -106,10 +107,6 @@ public:
     QList<VideoDescription> getVideoDesc() const;
 
 private:
-    static void onMlEvent( void* data, const vlc_ml_event_t* event );
-    void onMlEvent( const vlc_ml_event_t* event );
-
-    vlc_medialibrary_t* m_ml;
     QString m_fileName;
     QString m_title;
     QString m_thumbnail;
@@ -123,9 +120,6 @@ private:
     vlc_ml_thumbnail_status_t m_thumbnailStatus;
     QList<AudioDescription> m_audioDesc;
     QList<VideoDescription> m_videoDesc;
-
-    std::unique_ptr<vlc_ml_event_callback_t,
-                    std::function<void(vlc_ml_event_callback_t*)>> m_ml_event_handle;
 };
 
 #endif // MLVIDEO_H

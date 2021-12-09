@@ -129,7 +129,15 @@ QVariant MLGroupListModel::itemRoleData(MLItem *item, const int role) const /* o
             case GROUP_NAME:
                 return QVariant::fromValue(video->getTitle());
             case GROUP_THUMBNAIL:
-                return QVariant::fromValue(video->getThumbnail());
+            {
+                vlc_ml_thumbnail_status_t status;
+                const QString thumbnail = video->getThumbnail(&status);
+                if (status == VLC_ML_THUMBNAIL_STATUS_MISSING || status == VLC_ML_THUMBNAIL_STATUS_FAILURE)
+                {
+                    generateVideoThumbnail(item->getId().id);
+                }
+                return QVariant::fromValue( thumbnail );
+            }
             case GROUP_DURATION:
                 return QVariant::fromValue(video->getDuration());
             case GROUP_DATE:
@@ -256,6 +264,16 @@ QString MLGroupListModel::getCover(MLGroup * group) const
     return cover;
 }
 
+
+void MLGroupListModel::generateVideoThumbnail(uint64_t id) const
+{
+    m_mediaLib->runOnMLThread(this,
+    //ML thread
+    [id](vlc_medialibrary_t* ml){
+        vlc_ml_media_generate_thumbnail(ml, id, VLC_ML_THUMBNAIL_SMALL, 512, 320, .15 );
+    });
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private MLBaseModel reimplementation
 //-------------------------------------------------------------------------------------------------
@@ -264,17 +282,30 @@ void MLGroupListModel::onVlcMlEvent(const MLEvent & event) /* override */
 {
     int type = event.i_type;
 
-    if (type == VLC_ML_EVENT_GROUP_ADDED || type == VLC_ML_EVENT_GROUP_UPDATED
-        ||
-        type == VLC_ML_EVENT_GROUP_DELETED)
+    switch (type)
     {
-        m_need_reset = true;
+        case VLC_ML_EVENT_GROUP_ADDED:
+        case VLC_ML_EVENT_GROUP_UPDATED:
+        case VLC_ML_EVENT_GROUP_DELETED:
+        {
+            m_need_reset = true;
 
-        // NOTE: Maybe we should call this from MLBaseModel ?
-        emit resetRequested();
+            // NOTE: Maybe we should call this from MLBaseModel ?
+            emit resetRequested();
+            break;
+        }
+        default:
+            break;
     }
 
     MLBaseModel::onVlcMlEvent(event);
+}
+
+void MLGroupListModel::thumbnailUpdated(const QModelIndex& idx, MLItem* mlitem, const QString& mrl, vlc_ml_thumbnail_status_t status) /* override */
+{
+    auto videoItem = static_cast<MLVideo*>(mlitem);
+    videoItem->setThumbnail(status, mrl);
+    emit dataChanged(idx, idx, { GROUP_THUMBNAIL });
 }
 
 

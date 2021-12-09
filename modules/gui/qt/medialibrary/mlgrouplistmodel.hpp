@@ -72,11 +72,15 @@ protected: // MLBaseModel implementation
 
     ListCacheLoader<std::unique_ptr<MLItem>> * createLoader() const override;
 
+    void thumbnailUpdated(const QModelIndex& idx, MLItem* mlitem, const QString& mrl, vlc_ml_thumbnail_status_t status) override;
+
 private: // Functions
     QString getCover(MLGroup * group) const;
 
 private: // MLBaseModel implementation
     void onVlcMlEvent(const MLEvent & event) override;
+
+    void generateVideoThumbnail(uint64_t id) const;
 
 private:
     struct Loader : public MLBaseModel::BaseLoader

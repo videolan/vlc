@@ -60,7 +60,15 @@ QVariant MLVideoModel::itemRoleData(MLItem *item, int role) const
         case VIDEO_TITLE:
             return QVariant::fromValue( video->getTitle() );
         case VIDEO_THUMBNAIL:
-            return QVariant::fromValue( video->getThumbnail() );
+        {
+            vlc_ml_thumbnail_status_t status;
+            const QString thumbnail = video->getThumbnail(&status);
+            if (status == VLC_ML_THUMBNAIL_STATUS_MISSING || status == VLC_ML_THUMBNAIL_STATUS_FAILURE)
+            {
+                generateThumbnail(item->getId().id);
+            }
+            return QVariant::fromValue( thumbnail );
+        }
         case VIDEO_DURATION:
             return QVariant::fromValue( video->getDuration() );
         case VIDEO_PROGRESS:
@@ -148,6 +156,22 @@ void MLVideoModel::onVlcMlEvent(const MLEvent &event)
             break;
     }
     MLBaseModel::onVlcMlEvent( event );
+}
+
+void MLVideoModel::thumbnailUpdated(const QModelIndex& idx, MLItem* mlitem, const QString& mrl, vlc_ml_thumbnail_status_t status)
+{
+    auto videoItem = static_cast<MLVideo*>(mlitem);
+    videoItem->setThumbnail(status, mrl);
+    emit dataChanged(idx, idx, {VIDEO_THUMBNAIL});
+}
+
+void MLVideoModel::generateThumbnail(uint64_t id) const
+{
+    m_mediaLib->runOnMLThread(this,
+    //ML thread
+    [id](vlc_medialibrary_t* ml){
+        vlc_ml_media_generate_thumbnail(ml, id, VLC_ML_THUMBNAIL_SMALL, 512, 320, .15 );
+    });
 }
 
 ListCacheLoader<std::unique_ptr<MLItem>> *

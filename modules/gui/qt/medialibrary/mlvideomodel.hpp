@@ -65,12 +65,16 @@ public:
 protected:
     QVariant itemRoleData(MLItem *item, int role) const override;
 
+    void thumbnailUpdated(const QModelIndex& , MLItem* , const QString& , vlc_ml_thumbnail_status_t ) override;
+
     ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const override;
 
 protected: // MLBaseModel reimplementation
     virtual void onVlcMlEvent( const MLEvent &event ) override;
 
 private:
+    void generateThumbnail(uint64_t id) const;
+
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
 

@@ -72,19 +72,14 @@ unsigned int AudioDescription::getSampleRate() const
     return m_sampleRate;
 }
 
-MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data)
+MLVideo::MLVideo(vlc_medialibrary_t*, const vlc_ml_media_t* data)
     : MLItem( MLItemId( data->i_id, VLC_ML_PARENT_UNKNOWN ) )
-    , m_ml( ml )
     , m_title( QString::fromUtf8( data->psz_title ) )
     , m_thumbnail( QString::fromUtf8( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
     , m_duration( data->i_duration )
     , m_progress( data->f_progress )
     , m_playCount( data->i_playcount )
     , m_thumbnailStatus( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status )
-    , m_ml_event_handle( nullptr, [this](vlc_ml_event_callback_t* cb ) {
-        assert( m_ml != nullptr );
-        vlc_ml_event_unregister_callback( m_ml, cb );
-    })
 {
     assert( data->i_type == VLC_ML_MEDIA_TYPE_VIDEO || data->i_type == VLC_ML_MEDIA_TYPE_UNKNOWN );
 
@@ -136,31 +131,6 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data)
         m_resolution = "HD";
     else if ( maxWidth >= 720 && maxHeight >= 1280 )
         m_resolution = "720p";  
-    }
-
-void MLVideo::onMlEvent( void* data, const vlc_ml_event_t* event )
-{
-    auto self = static_cast<MLVideo*>(data);
-    self->onMlEvent(event);
-}
-
-void MLVideo::onMlEvent( const vlc_ml_event_t* event )
-{
-    if ( event->i_type != VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED ||
-         event->media_thumbnail_generated.i_size != VLC_ML_THUMBNAIL_SMALL )
-        return;
-    if ( event->media_thumbnail_generated.p_media->i_id != getId().id )
-        return;
-    if ( event->media_thumbnail_generated.b_success == false )
-    {
-        m_thumbnailStatus = VLC_ML_THUMBNAIL_STATUS_FAILURE;
-        return;
-    }
-    m_thumbnailStatus = VLC_ML_THUMBNAIL_STATUS_AVAILABLE;
-    auto thumbnailMrl = event->media_thumbnail_generated
-            .p_media->thumbnails[event->media_thumbnail_generated.i_size].psz_mrl;
-    m_thumbnail = QString::fromUtf8( thumbnailMrl );
-    vlc_ml_event_unregister_from_callback( m_ml, m_ml_event_handle.release() );
 }
 
 bool MLVideo::isNew() const
@@ -178,17 +148,17 @@ QString MLVideo::getTitle() const
     return m_title;
 }
 
-QString MLVideo::getThumbnail()
+QString MLVideo::getThumbnail(vlc_ml_thumbnail_status_t* status)
 {
-    if ( m_thumbnailStatus == VLC_ML_THUMBNAIL_STATUS_MISSING ||
-         m_thumbnailStatus == VLC_ML_THUMBNAIL_STATUS_FAILURE )
-    {
-        m_ml_event_handle.reset( vlc_ml_event_register_callback( m_ml, onMlEvent, this ) );
-        vlc_ml_media_generate_thumbnail( m_ml, getId().id, VLC_ML_THUMBNAIL_SMALL,
-                                         512, 320, .15 );
-    }
-
+    if (status)
+        *status = m_thumbnailStatus;
     return m_thumbnail;
+}
+
+void MLVideo::setThumbnail(vlc_ml_thumbnail_status_t status, QString mrl)
+{
+    m_thumbnailStatus = status;
+    m_thumbnail = mrl;
 }
 
 int64_t MLVideo::getDuration() const
