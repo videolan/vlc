@@ -36,15 +36,10 @@
 #define MENU_GET_ACTION(a) ( (uint16_t)( ((uint32_t)a) >> 16 ) )
 #define MENU_GET_EXTENSION(a) ( (uint16_t)( ((uint32_t)a) & 0xFFFF ) )
 
-ExtensionsManager* ExtensionsManager::instance = NULL;
-
 ExtensionsManager::ExtensionsManager( qt_intf_t *_p_intf, QObject *parent )
         : QObject( parent ), p_intf( _p_intf ), p_extensions_manager( NULL )
         , p_edp( NULL )
 {
-    assert( ExtensionsManager::instance == NULL );
-    instance = this;
-
     menuMapper = new QSignalMapper( this );
     connect( menuMapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL, this, &ExtensionsManager::triggerMenu );
     connect( THEMIM, &PlayerController::playingStateChanged, this, &ExtensionsManager::playingChanged );

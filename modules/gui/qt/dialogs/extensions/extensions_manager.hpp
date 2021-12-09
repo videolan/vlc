@@ -31,6 +31,7 @@
 
 #include "qt.hpp"
 #include <player/player_controller.hpp>
+#include "util/singleton.hpp"
 
 #include <QObject>
 
@@ -39,26 +40,12 @@ class QSignalMapper;
 
 class ExtensionsDialogProvider;
 
-class ExtensionsManager : public QObject
+class ExtensionsManager : public QObject, public Singleton<ExtensionsManager>
 {
+    friend class Singleton<ExtensionsManager>;
+
     Q_OBJECT
 public:
-    static ExtensionsManager *getInstance( qt_intf_t *_p_intf,
-                                           QObject *_parent = 0 )
-    {
-        if( !instance )
-            instance = new ExtensionsManager( _p_intf, _parent );
-        return instance;
-    }
-    static void killInstance()
-    {
-        delete instance;
-        instance = NULL;
-    }
-
-    ExtensionsManager( qt_intf_t *p_intf, QObject *parent );
-    virtual ~ExtensionsManager();
-
     inline bool isLoaded() { return p_extensions_manager != NULL; }
     inline bool cannotLoad() { return b_unloading || b_failed; }
     inline bool isUnloading() { return b_unloading; }
@@ -71,6 +58,10 @@ public:
     {
         return p_extensions_manager;
     }
+
+private:
+    ExtensionsManager( qt_intf_t *p_intf, QObject *parent = nullptr );
+    virtual ~ExtensionsManager();
 
 public slots:
     bool loadExtensions();
