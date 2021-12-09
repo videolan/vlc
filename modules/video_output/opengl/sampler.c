@@ -888,6 +888,8 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 
 #ifdef HAVE_LIBPLACEBO
     FREENULL(priv->uloc.pl_vars);
+    if (priv->pl_sh)
+        pl_shader_free(&priv->pl_sh);
     if (priv->pl_ctx)
         pl_context_destroy(&priv->pl_ctx);
 #endif
