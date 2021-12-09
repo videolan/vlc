@@ -52,7 +52,10 @@ struct MLEvent
         struct
         {
             int64_t i_media_id;
+            vlc_ml_thumbnail_size_t i_size;
             bool b_success;
+            vlc_ml_thumbnail_status_t i_status;
+            char* psz_mrl;
         } media_thumbnail_generated;
     };
 
@@ -105,9 +108,36 @@ struct MLEvent
                 background_idle_changed.b_idle = event->background_idle_changed.b_idle;
                 break;
             case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
+            {
+                vlc_ml_thumbnail_size_t thumbnailSize = event->media_thumbnail_generated.i_size;
+                const vlc_ml_thumbnail_t& thumbnail = event->media_thumbnail_generated.p_media->thumbnails[thumbnailSize];
+                const char* mrl = thumbnail.psz_mrl;
+
                 media_thumbnail_generated.i_media_id = event->media_thumbnail_generated.p_media->i_id;
                 media_thumbnail_generated.b_success = event->media_thumbnail_generated.b_success;
+                media_thumbnail_generated.i_size = thumbnailSize;
+                media_thumbnail_generated.i_status = thumbnail.i_status;
+                if (media_thumbnail_generated.b_success && mrl)
+                    media_thumbnail_generated.psz_mrl = strdup(mrl);
+                else
+                    media_thumbnail_generated.psz_mrl = nullptr;
                 break;
+            }
+        }
+    }
+
+    ~MLEvent()
+    {
+        switch (i_type)
+        {
+        case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
+        {
+            if (media_thumbnail_generated.psz_mrl)
+                free(media_thumbnail_generated.psz_mrl);
+            break;
+         }
+        default:
+            break;
         }
     }
 
