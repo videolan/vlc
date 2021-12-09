@@ -35,7 +35,6 @@
 #include <vlc_block.h>
 #include <vlc_vout.h>
 #include <vlc_aout.h>
-#include <vlc_vout.h>
 #include <vlc_sout.h>
 #include <vlc_codec.h>
 #include <vlc_spu.h>
@@ -409,22 +408,6 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
 
 static int CreateVoutIfNeeded(vlc_input_decoder_t *);
 
-static void decoder_vout_on_state_changed(
-        vout_thread_t *vout, enum vout_thread_state state, void *opaque)
-{
-    vlc_input_decoder_t *p_owner = opaque;
-
-    if (state == VOUT_THREAD_STATE_STARTED)
-    {
-        vlc_fifo_Lock( p_owner->p_fifo );
-        p_owner->reset_out_state = true;
-        vlc_fifo_Unlock( p_owner->p_fifo );
-        decoder_Notify(p_owner, on_vout_started, vout, p_owner->vout_order);
-    }
-    else
-        decoder_Notify(p_owner, on_vout_stopped, vout);
-}
-
 static void decoder_vout_on_frame_displayed(
         vout_thread_t *vout, vlc_tick_t pts, void *opaque)
 {
@@ -500,10 +483,8 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         vlc_mutex_unlock( &p_owner->lock );
 
     }
-
     static const struct vlc_video_output_callbacks vout_thread_cbs =
     {
-        .on_state_changed = decoder_vout_on_state_changed,
         .on_frame_displayed = decoder_vout_on_frame_displayed,
         .captions_to_display = decoder_vout_captions_to_display,
     };
@@ -521,12 +502,22 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
     bool has_started;
 
     vout_thread_t *p_vout =
-        input_resource_RequestVout(p_owner->p_resource, vctx, &cfg, NULL);
+        input_resource_RequestVout(p_owner->p_resource, vctx, &cfg, NULL,
+                                   &has_started);
     if (p_vout != NULL)
     {
         vlc_mutex_lock( &p_owner->lock );
         p_owner->vout_started = true;
         vlc_mutex_unlock( &p_owner->lock );
+
+        if (has_started)
+        {
+            vlc_fifo_Lock( p_owner->p_fifo );
+            p_owner->reset_out_state = true;
+            vlc_fifo_Unlock( p_owner->p_fifo );
+
+            decoder_Notify(p_owner, on_vout_started, p_vout, p_owner->vout_order);
+        }
         return 0;
     }
 
@@ -603,7 +594,7 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner)
 
     enum vlc_vout_order order;
     const vout_configuration_t cfg = { .vout = p_vout, .fmt = NULL };
-    p_vout = input_resource_RequestVout( p_owner->p_resource, NULL, &cfg, &order );
+    p_vout = input_resource_RequestVout( p_owner->p_resource, NULL, &cfg, &order, NULL );
 
     vlc_mutex_lock( &p_owner->lock );
     p_owner->p_vout = p_vout;
@@ -2060,7 +2051,18 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner )
             vout_thread_t *vout = p_owner->p_vout;
 
             if (vout != NULL)
-                input_resource_PutVout(p_owner->p_resource, vout);
+            {
+                /* Hold the vout since PutVout will likely release it and a
+                 * last reference is needed for notify callbacks */
+                vout_Hold(vout);
+
+                bool has_stopped;
+                input_resource_PutVout(p_owner->p_resource, vout, &has_stopped);
+                if (has_stopped)
+                    decoder_Notify(p_owner, on_vout_stopped, vout);
+
+                vout_Release(vout);
+            }
             break;
         }
         case SPU_ES:

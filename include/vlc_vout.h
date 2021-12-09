@@ -29,20 +29,8 @@
 #include "vlc_picture.h"
 #include "vlc_subpicture.h"
 
-enum vout_thread_state
-{
-    VOUT_THREAD_STATE_STOPPED,
-    VOUT_THREAD_STATE_STARTED,
-};
-
 struct vlc_video_output_callbacks
 {
-    /**
-     * Report a change on the vout state.
-     */
-    void (*on_state_changed)(vout_thread_t *vout,
-                             enum vout_thread_state state, void *owner);
-
     /* Event triggered when the first frame of the vout is being displayed. */
     void (*first_frame_reported)(vout_thread_t *vout, void *owner);
     void (*captions_to_display)(const void *, size_t, void *owner);
@@ -79,14 +67,6 @@ struct vout_thread_t {
     void *owner;
     const struct vlc_video_output_callbacks *cbs;
 };
-
-static inline void vout_ReportStateChange(
-    struct vout_thread_t *vout, enum vout_thread_state state)
-{
-    if (vout->cbs && vout->cbs->on_state_changed)
-        vout->cbs->on_state_changed(vout, state, vout->owner);
-}
-
 
 /* Alignment flags */
 #define VOUT_ALIGN_LEFT         0x0001
