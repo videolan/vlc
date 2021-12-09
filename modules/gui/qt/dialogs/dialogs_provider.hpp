@@ -36,6 +36,8 @@
 
 #include "playlist/playlist_item.hpp"
 
+#include "util/singleton.hpp"
+
 #include <QObject>
 #include <QStringList>
 
@@ -64,29 +66,23 @@ class QEvent;
 class QSignalMapper;
 class VLCMenuBar;
 
-class DialogsProvider : public QObject
+class DialogsProvider : public QObject, public Singleton<DialogsProvider>
 {
     Q_OBJECT
     friend class VLCMenuBar;
+    friend class Singleton<DialogsProvider>;
 
 public:
     static DialogsProvider *getInstance()
     {
+        const auto instance = Singleton<DialogsProvider>::getInstance<false>();
         assert( instance );
         return instance;
     }
     static DialogsProvider *getInstance( qt_intf_t *p_intf )
     {
-        if( !instance )
-            instance = new DialogsProvider( p_intf );
-        return instance;
+        return Singleton<DialogsProvider>::getInstance( p_intf );
     }
-    static void killInstance()
-    {
-        delete instance;
-        instance = NULL;
-    }
-
     QStringList showSimpleOpen( const QString& help = QString(),
                                 int filters = EXT_FILTER_MEDIA |
                                 EXT_FILTER_VIDEO | EXT_FILTER_AUDIO |
@@ -110,9 +106,8 @@ protected:
     void customEvent( QEvent *);
 
 private:
-    DialogsProvider( qt_intf_t *);
+    DialogsProvider( qt_intf_t * );
     virtual ~DialogsProvider();
-    static DialogsProvider *instance;
 
     void loadMediaFile( es_format_category_e category, int filter, const QString& dialogTitle );
 

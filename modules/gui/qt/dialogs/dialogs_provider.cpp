@@ -66,8 +66,6 @@
 #define I_OP_DIR_WINTITLE I_DIR_OR_FOLDER( N_("Open Directory"), \
                                            N_("Open Folder") )
 
-DialogsProvider* DialogsProvider::instance = NULL;
-
 DialogsProvider::DialogsProvider( qt_intf_t *_p_intf )
     : QObject( NULL ), p_intf( _p_intf )
 {
