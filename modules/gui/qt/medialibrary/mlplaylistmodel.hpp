@@ -75,7 +75,28 @@ protected: // MLBaseModel reimplementation
     void thumbnailUpdated(int idx) override;
 
 private: // Functions
-    QList<int> getRows(const QModelIndexList & indexes) const;
+    struct HighLowRanges {
+        int lowTo;
+        int highTo;
+        std::vector<std::pair<int, int>> lowRanges;
+        size_t lowRangeIt;
+        std::vector<std::pair<int, int>> highRanges;
+        size_t highRangeIt;
+    };
+
+    /**
+     * returns list of row indexes in decreasing order
+     */
+    std::vector<std::pair<int, int>> getSortedRowsRanges(const QModelIndexList & indexes, bool asc) const;
+
+    void removeImpl(int64_t playlistId, const std::vector<std::pair<int, int> >&& rangeList, size_t index);
+
+    void moveImpl(int64_t playlistId, HighLowRanges&& ranges);
+
+    void endTransaction();
+
+    bool m_transactionPending = false;
+    bool m_resetAfterTransaction = false;
 
 private:
     struct Loader : public MLBaseModel::BaseLoader
