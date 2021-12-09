@@ -50,6 +50,8 @@ struct hxxx_helper
     vlc_fourcc_t i_codec;
     uint8_t i_input_nal_length_size;
     uint8_t i_output_nal_length_size;
+    uint8_t i_config_version_prev;
+    uint8_t i_config_version;
     union {
         struct {
             struct hxxx_helper_nal sps_list[H264_SPS_ID_MAX + 1];
@@ -86,28 +88,24 @@ void hxxx_helper_init(struct hxxx_helper *hh, vlc_object_t *p_obj,
 void hxxx_helper_clean(struct hxxx_helper *hh);
 
 /* Process raw NAL buffer:
- * No framing prefix
- * If p_config_changed is not NULL, parse nals to detect a SPS/PPS or a video
- * size change. */
-int hxxx_helper_process_nal(struct hxxx_helper *hh, const uint8_t *, size_t, bool *);
+ * No framing prefix */
+int hxxx_helper_process_nal(struct hxxx_helper *hh, const uint8_t *, size_t);
 
-/* Process the buffer:
- * If p_config_changed is not NULL, parse nals to detect a SPS/PPS or a video
- * size change. */
-int hxxx_helper_process_buffer(struct hxxx_helper *hh,
-                               const uint8_t *, size_t, bool *p_config_changed);
+/* Process the buffer:*/
+int hxxx_helper_process_buffer(struct hxxx_helper *hh, const uint8_t *, size_t);
 
 /* Process the block:
- * Does AnnexB <-> xvcC conversion if needed.
- * If p_config_changed is not NULL, parse nals to detect a SPS/PPS or a video
- * size change. */
-block_t * hxxx_helper_process_block(struct hxxx_helper *hh, block_t *p_block,
-                                    bool *p_config_changed);
+ * Does AnnexB <-> xvcC conversion if needed. */
+block_t * hxxx_helper_process_block(struct hxxx_helper *hh, block_t *p_block);
 
 /* Set Extra:
  * Also changes/set the input to match xvcC nal_size of Annexb format */
 int hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                           size_t i_extra);
+
+/* returns if a configuration parameter has changed since last block/buffer
+ * processing */
+bool hxxx_helper_has_new_config(const struct hxxx_helper *hh);
 
 block_t *h264_helper_get_annexb_config(const struct hxxx_helper *hh);
 block_t *hevc_helper_get_annexb_config(const struct hxxx_helper *hh);

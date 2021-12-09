@@ -626,7 +626,7 @@ static block_t * HXXXProcessBlock(decoder_t *p_dec, block_t *p_block)
         p_sys->b_xps_pushed = true;
     }
 
-    return hxxx_helper_process_block(&p_sys->hh, p_block, NULL);
+    return hxxx_helper_process_block(&p_sys->hh, p_block);
 }
 
 static block_t * ProcessVC1Block(decoder_t *p_dec, block_t *p_block)

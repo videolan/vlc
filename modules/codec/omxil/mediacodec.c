@@ -1743,13 +1743,11 @@ static int VideoHXXX_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     struct hxxx_helper *hh = &p_sys->video.hh;
-    bool b_config_changed = false;
-    bool *p_config_changed = p_sys->b_adaptive ? NULL : &b_config_changed;
 
-    *pp_block = hxxx_helper_process_block(hh, *pp_block, p_config_changed);
+    *pp_block = hxxx_helper_process_block(hh, *pp_block);
     if (!*pp_block)
         return 0;
-    if (b_config_changed)
+    if (!p_sys->b_adaptive && hxxx_helper_has_new_config(hh))
     {
         bool b_size_changed;
         int i_ret;

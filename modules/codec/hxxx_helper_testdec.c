@@ -45,13 +45,12 @@ DecodeBlock(decoder_t *dec, block_t *block)
     if (block == NULL)
         return VLCDEC_SUCCESS;
 
-    bool config_changed;
-    block = hxxx_helper_process_block(&sys->hh, block, &config_changed);
+    block = hxxx_helper_process_block(&sys->hh, block);
 
     if (block == NULL)
         return VLCDEC_SUCCESS;
 
-    if (config_changed)
+    if (hxxx_helper_has_new_config(&sys->hh))
     {
         int ret;
         video_color_primaries_t primaries;

@@ -186,11 +186,11 @@ static int test_any(struct hxxx_helper *hlpr,
 
     dump_hex("in", b->p_buffer, b->i_buffer);
 
-    bool b_new_config;
-    b = hxxx_helper_process_block(hlpr, b, &b_new_config);
+    assert(!hxxx_helper_has_new_config(hlpr));
+    b = hxxx_helper_process_block(hlpr, b);
     if(!b)
         return 1;
-    assert(b_new_config);
+    assert(hxxx_helper_has_new_config(hlpr));
 
     dump_hex("out", b->p_buffer, b->i_buffer);
 
