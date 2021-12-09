@@ -139,10 +139,10 @@ static int test_extrainit(vlc_fourcc_t codec,
     struct hxxx_helper hlpr;
 
     fprintf(stderr,"AnnexB extra init\n");
-    hxxx_helper_init(&hlpr, NULL, codec, false);
+    hxxx_helper_init(&hlpr, NULL, codec, 0, 0);
     hxxx_helper_set_extra(&hlpr, p_annexb, i_annexb);
-    assert(!hlpr.b_is_xvcC);
-    assert(!hlpr.b_need_xvcC);
+    assert(hlpr.i_input_nal_length_size == 0);
+    assert(hlpr.i_output_nal_length_size == 0);
 
     block_t *b;
     if(codec == VLC_CODEC_H264)
@@ -156,10 +156,10 @@ static int test_extrainit(vlc_fourcc_t codec,
     hxxx_helper_clean(&hlpr);
 
     fprintf(stderr,"xVC1 extra init\n");
-    hxxx_helper_init(&hlpr, NULL, codec, false);
+    hxxx_helper_init(&hlpr, NULL, codec, 0, 0);
     hxxx_helper_set_extra(&hlpr, p_xvc, i_xvc);
-    assert(hlpr.b_is_xvcC);
-    assert(!hlpr.b_need_xvcC);
+    assert(hlpr.i_input_nal_length_size);
+    assert(hlpr.i_output_nal_length_size == 0);
     if(codec == VLC_CODEC_H264)
         b = h264_helper_get_annexb_config(&hlpr);
     else
@@ -194,8 +194,8 @@ static int test_any(struct hxxx_helper *hlpr,
 
     dump_hex("out", b->p_buffer, b->i_buffer);
 
-    if(compare_any(b->p_buffer, b->i_buffer, hlpr->b_need_xvcC ? 4 : 0,
-                   p_out, i_out, hlpr->b_need_xvcC ? 4 : 0))
+    if(compare_any(b->p_buffer, b->i_buffer, hlpr->i_output_nal_length_size,
+                   p_out, i_out, hlpr->i_output_nal_length_size))
     {
         block_Release(b);
         return 1;
@@ -203,7 +203,7 @@ static int test_any(struct hxxx_helper *hlpr,
 
     block_Release(b);
 
-    if(!hlpr->b_need_xvcC)
+    if(hlpr->i_output_nal_length_size == 0)
     {
         if(hlpr->i_codec == VLC_CODEC_H264)
             b = h264_helper_get_annexb_config(hlpr);
@@ -221,7 +221,7 @@ static int test_any(struct hxxx_helper *hlpr,
     }
 
     dump_hex("extra", b->p_buffer, b->i_buffer);
-    if(hlpr->b_need_xvcC)
+    if(hlpr->i_output_nal_length_size)
     {
         if(b->i_buffer != i_extraout || memcmp(b->p_buffer, p_extraout, i_extraout))
         {
@@ -240,14 +240,11 @@ static int test_any(struct hxxx_helper *hlpr,
     return 0;
 }
 
-#define RUN_TEST(codec, source0, source1, xvcc) \
+#define RUN_TEST(codec, source0, prefix0, source1, prefix1) \
     do\
     {\
         struct hxxx_helper hlpr;\
-        hxxx_helper_init(&hlpr, NULL, codec, xvcc);\
-        /* must prime it with extra first :/ */ \
-        hxxx_helper_set_extra(&hlpr, test_extradata_raw_##source0, sizeof(test_extradata_raw_##source0));\
-        hxxx_helper_clean(&hlpr);\
+        hxxx_helper_init(&hlpr, NULL, codec, prefix0, prefix1);\
         ret = test_any(&hlpr, \
                        test_samples_raw_##source0, sizeof(test_samples_raw_##source0),\
                        test_samples_raw_##source1, sizeof(test_samples_raw_##source1),\
@@ -261,13 +258,13 @@ static int test_annexb()
     int ret;
     fprintf(stderr,"H264\n");
     fprintf(stderr,"AnnexB -> AnnexB\n");
-    RUN_TEST(VLC_CODEC_H264, h264_annexb, h264_annexb, false);
+    RUN_TEST(VLC_CODEC_H264, h264_annexb, 0, h264_annexb, 0);
     fprintf(stderr,"AVC1 -> AVC1\n");
-    RUN_TEST(VLC_CODEC_H264, h264_avc1, h264_avc1, true);
+    RUN_TEST(VLC_CODEC_H264, h264_avc1, 4, h264_avc1, 4);
     fprintf(stderr,"AVC1 -> AnnexB\n");
-    RUN_TEST(VLC_CODEC_H264, h264_avc1, h264_annexb, false);
+    RUN_TEST(VLC_CODEC_H264, h264_avc1, 4, h264_annexb, 0);
     fprintf(stderr,"AnnexB -> AVC1\n");
-    RUN_TEST(VLC_CODEC_H264, h264_annexb, h264_avc1, true);
+    RUN_TEST(VLC_CODEC_H264, h264_annexb, 0, h264_avc1, 4);
 
     ret = test_extrainit(VLC_CODEC_H264,
                 test_extradata_raw_h264_annexb, sizeof(test_extradata_raw_h264_annexb),
@@ -276,13 +273,13 @@ static int test_annexb()
 
     fprintf(stderr,"HEVC\n");
     fprintf(stderr,"AnnexB -> AnnexB\n");
-    RUN_TEST(VLC_CODEC_HEVC, h265_annexb, h265_annexb, false);
+    RUN_TEST(VLC_CODEC_HEVC, h265_annexb, 0, h265_annexb, 0);
     fprintf(stderr,"HVC1 -> HVC1\n");
-    RUN_TEST(VLC_CODEC_HEVC, h265_hvc1, h265_hvc1, true);
+    RUN_TEST(VLC_CODEC_HEVC, h265_hvc1, 4, h265_hvc1, 4);
     fprintf(stderr,"HVC1 -> AnnexB\n");
-    RUN_TEST(VLC_CODEC_HEVC, h265_hvc1, h265_annexb, false);
+    RUN_TEST(VLC_CODEC_HEVC, h265_hvc1, 4, h265_annexb, 0);
     fprintf(stderr,"AnnexB -> HVC1\n");
-    RUN_TEST(VLC_CODEC_HEVC, h265_annexb, h265_hvc1, true);
+    RUN_TEST(VLC_CODEC_HEVC, h265_annexb, 0, h265_hvc1, 4);
 
     ret = test_extrainit(VLC_CODEC_HEVC,
                 test_extradata_raw_h265_annexb, sizeof(test_extradata_raw_h265_annexb),

@@ -249,7 +249,7 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
     decoder_sys_t *p_sys = p_dec->p_sys;
     hxxx_iterator_ctx_t itctx;
     hxxx_iterator_init(&itctx, p_block->p_buffer, p_block->i_buffer,
-                       p_sys->hh.i_nal_length_size);
+                       p_sys->hh.i_output_nal_length_size);
 
     const uint8_t *p_nal; size_t i_nal;
     struct
@@ -352,7 +352,7 @@ static bool InitH264(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
     h264_poc_context_init(&p_sys->h264_pocctx);
     hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
-                     p_dec->fmt_in.i_codec, true);
+                     p_dec->fmt_in.i_codec, 0, 4);
     return hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in.p_extra,
                                              p_dec->fmt_in.i_extra) == VLC_SUCCESS;
 }
@@ -368,7 +368,7 @@ static CFDictionaryRef CopyDecoderExtradataH264(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     CFDictionaryRef extradata = NULL;
-    if (p_dec->fmt_in.i_extra && p_sys->hh.b_is_xvcC)
+    if (p_dec->fmt_in.i_extra && p_sys->hh.i_input_nal_length_size)
     {
         /* copy DecoderConfiguration */
         extradata = ExtradataInfoCreate(CFSTR("avcC"),
@@ -542,7 +542,7 @@ static bool InitHEVC(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
     hevc_poc_cxt_init(&p_sys->hevc_pocctx);
     hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
-                     p_dec->fmt_in.i_codec, true);
+                     p_dec->fmt_in.i_codec, 0, 4);
     return hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in.p_extra,
                                              p_dec->fmt_in.i_extra) == VLC_SUCCESS;
 }
@@ -600,7 +600,7 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
     decoder_sys_t *p_sys = p_dec->p_sys;
     hxxx_iterator_ctx_t itctx;
     hxxx_iterator_init(&itctx, p_block->p_buffer, p_block->i_buffer,
-                       p_sys->hh.i_nal_length_size);
+                       p_sys->hh.i_output_nal_length_size);
 
     const uint8_t *p_nal; size_t i_nal;
     struct
@@ -720,7 +720,7 @@ static CFDictionaryRef CopyDecoderExtradataHEVC(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     CFDictionaryRef extradata = NULL;
-    if (p_dec->fmt_in.i_extra && p_sys->hh.b_is_xvcC)
+    if (p_dec->fmt_in.i_extra && p_sys->hh.i_input_nal_length_size)
     {
         /* copy DecoderConfiguration */
         extradata = ExtradataInfoCreate(CFSTR("hvcC"),

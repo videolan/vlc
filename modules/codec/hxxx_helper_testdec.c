@@ -127,8 +127,8 @@ OpenDecoder(vlc_object_t *this)
     if (sys == NULL)
         return VLC_EGENERIC;
 
-    hxxx_helper_init(&sys->hh, this, dec->fmt_in.i_codec,
-                     var_InheritBool(this, "hxxx-helper-testdec-xvcC"));
+    hxxx_helper_init(&sys->hh, this, dec->fmt_in.i_codec, 0,
+                     var_InheritBool(this, "hxxx-helper-testdec-xvcC") ? 4 : 0);
 
     int ret = hxxx_helper_set_extra(&sys->hh, dec->fmt_in.p_extra,
                                     dec->fmt_in.i_extra);

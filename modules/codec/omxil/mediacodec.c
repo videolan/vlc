@@ -900,7 +900,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
             hxxx_helper_init(&p_sys->video.hh, VLC_OBJECT(p_dec),
-                             p_dec->fmt_in.i_codec, false);
+                             p_dec->fmt_in.i_codec, 0, 0);
             break;
         }
         p_sys->pf_on_new_block = Video_OnNewBlock;

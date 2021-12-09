@@ -609,7 +609,7 @@ static int CuvidPushBlock(decoder_t *p_dec, block_t *p_block)
 static block_t * HXXXProcessBlock(decoder_t *p_dec, block_t *p_block)
 {
     nvdec_ctx_t *p_sys = p_dec->p_sys;
-    if (p_sys->hh.b_is_xvcC && !p_sys->b_xps_pushed) {
+    if (p_sys->hh.i_input_nal_length_size && !p_sys->b_xps_pushed) {
         block_t *p_xps_blocks;   // parameter set blocks (SPS/PPS/VPS)
         if (p_dec->fmt_in.i_codec == VLC_CODEC_H264) {
             p_xps_blocks = h264_helper_get_annexb_config(&p_sys->hh);
@@ -763,7 +763,7 @@ static int OpenDecoder(vlc_object_t *p_this)
             p_sys->b_is_hxxx = true;
             p_sys->i_nb_surface = MAX_HXXX_SURFACES;
             hxxx_helper_init(&p_sys->hh, VLC_OBJECT(p_dec),
-                             p_dec->fmt_in.i_codec, false);
+                             p_dec->fmt_in.i_codec, 0, 0);
             result = hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in.p_extra,
                                            p_dec->fmt_in.i_extra);
             if (result != VLC_SUCCESS) {

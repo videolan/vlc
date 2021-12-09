@@ -48,10 +48,8 @@ struct hxxx_helper
 {
     vlc_object_t *p_obj; /* for logs */
     vlc_fourcc_t i_codec;
-    bool b_need_xvcC; /* Need avcC or hvcC */
-
-    bool b_is_xvcC;
-    uint8_t i_nal_length_size;
+    uint8_t i_input_nal_length_size;
+    uint8_t i_output_nal_length_size;
     union {
         struct {
             struct hxxx_helper_nal sps_list[H264_SPS_ID_MAX + 1];
@@ -78,8 +76,13 @@ struct hxxx_helper
     };
 };
 
+/* Init:
+ * i_input_length_size set xvcC nal length or 0 for AnnexB (overriden by extradata)
+ * i_output_length_size set xvcC nal length or 0 for AnnexB */
 void hxxx_helper_init(struct hxxx_helper *hh, vlc_object_t *p_obj,
-                      vlc_fourcc_t i_codec, bool b_need_xvcC);
+                      vlc_fourcc_t i_codec, uint8_t i_input_length_size,
+                      uint8_t i_output_length_size);
+
 void hxxx_helper_clean(struct hxxx_helper *hh);
 
 /* Process raw NAL buffer:
@@ -101,6 +104,8 @@ int hxxx_helper_process_buffer(struct hxxx_helper *hh,
 block_t * hxxx_helper_process_block(struct hxxx_helper *hh, block_t *p_block,
                                     bool *p_config_changed);
 
+/* Set Extra:
+ * Also changes/set the input to match xvcC nal_size of Annexb format */
 int hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                           size_t i_extra);
 
