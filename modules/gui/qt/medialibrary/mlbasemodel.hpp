@@ -122,7 +122,7 @@ protected:
     // NOTE: This is faster because it only returns items available in cache.
     MLItem *itemCache(int signedidx) const;
 
-    MLItem *findInCache(int id, int *index = nullptr) const;
+    MLItem *findInCache(const MLItemId& id, int *index) const;
 
     virtual void onVlcMlEvent( const MLEvent &event );
 

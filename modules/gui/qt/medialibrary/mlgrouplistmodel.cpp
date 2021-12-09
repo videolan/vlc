@@ -283,7 +283,7 @@ void MLGroupListModel::onCover()
     int index = 0;
 
     // NOTE: We want to avoid calling 'MLBaseModel::item' for performance issues.
-    MLItem * item = this->findInCache(generator->getId().id, &index);
+    MLItem * item = this->findInCache(generator->getId(), &index);
 
     // NOTE: When the item is no longer cached or has been moved we return right away.
     if (!item)

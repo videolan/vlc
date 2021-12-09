@@ -163,7 +163,7 @@ void MLGenreModel::onCover()
 {
     CoverGenerator * generator = static_cast<CoverGenerator *> (sender());
 
-    const int mlId = generator->getId().id;
+    const MLItemId mlId = generator->getId();
 
     int itemIndex = 0;
 
@@ -179,7 +179,7 @@ void MLGenreModel::onCover()
     genre->setCover(generator->takeResult());
     genre->setGenerator(nullptr);
 
-    vlc_ml_media_set_genre_thumbnail(ml()->vlcMl(), mlId
+    vlc_ml_media_set_genre_thumbnail(ml()->vlcMl(), mlId.id
                                     , qtu(genre->getCover()), VLC_ML_THUMBNAIL_SMALL);
 
     thumbnailUpdated(itemIndex);

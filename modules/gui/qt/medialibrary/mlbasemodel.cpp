@@ -260,7 +260,8 @@ void MLBaseModel::onVlcMlEvent(const MLEvent &event)
                 int index = 0;
 
                 /* Only consider items available locally in cache */
-                const auto item = findInCache(event.media_thumbnail_generated.i_media_id, &index);
+                MLItemId itemId{ event.media_thumbnail_generated.i_media_id, VLC_ML_PARENT_UNKNOWN  };
+                const auto item = findInCache(itemId, &index);
                 if (item)
                     thumbnailUpdated(index);
             }
@@ -571,11 +572,11 @@ MLItem *MLBaseModel::itemCache(int signedidx) const
     return item->get();
 }
 
-MLItem *MLBaseModel::findInCache(const int id, int *index) const
+MLItem *MLBaseModel::findInCache(const MLItemId& id, int *index) const
 {
     const auto item = m_cache->find([id](const auto &item)
     {
-        return item->getId().id == id;
+        return item->getId() == id;
     }, index);
 
     return item ? item->get() : nullptr;
