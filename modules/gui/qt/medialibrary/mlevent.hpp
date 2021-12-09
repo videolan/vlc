@@ -110,4 +110,12 @@ struct MLEvent
                 break;
         }
     }
+
+    //allow move
+    MLEvent(MLEvent&&) = default;
+    MLEvent& operator=(MLEvent&&) = default;
+
+    //forbid copy
+    MLEvent(MLEvent const&) = delete;
+    MLEvent& operator=(MLEvent const&) = delete;
 };

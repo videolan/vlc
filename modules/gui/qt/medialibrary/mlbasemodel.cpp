@@ -248,8 +248,10 @@ QString MLBaseModel::getFirstSymbol(QString str)
 void MLBaseModel::onVlcMlEvent(void* data, const vlc_ml_event_t* event)
 {
     auto self = static_cast<MLBaseModel*>(data);
-    QMetaObject::invokeMethod(self, [self, event = MLEvent(event)] {
-        self->onVlcMlEvent(event);
+    //MLEvent is not copiable, but lambda needs to be copiable
+    auto  mlEvent = std::make_shared<MLEvent>(event);
+    QMetaObject::invokeMethod(self, [self, mlEvent] () mutable {
+        self->onVlcMlEvent(*mlEvent);
     });
 }
 
