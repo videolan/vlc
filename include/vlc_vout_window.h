@@ -549,6 +549,20 @@ VLC_API
 void vout_window_Disable(vout_window_t *window);
 
 /**
+ * \defgroup video_window_reporting Window event reporting
+ * Window provider event reporting
+ *
+ * The Window provider has to report some events to the core
+ * so that it can react appropriately to these events, for
+ * this the window provider calls the functions in this section
+ * when appropriate.
+ *
+ * \note These functions may only be called by the window provider
+ *       implementation.
+ * @{
+ */
+
+/**
  * Reports the current window size.
  *
  * This function is called by the window implementation and notifies the owner
