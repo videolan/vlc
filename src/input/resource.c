@@ -511,13 +511,14 @@ vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
         }
     }
 
-    if (vout_Request(&dcfg, vctx, p_resource->p_input)) {
-        input_resource_PutVoutLocked(p_resource, dcfg.vout, NULL);
+    if (vout_Request(&dcfg, vctx, p_resource->p_input, &vout_rsc->started)) {
+        if (vout_rsc->started)
+            input_resource_PutVoutLocked(p_resource, dcfg.vout, NULL);
         vlc_mutex_unlock(&p_resource->lock);
         return NULL;
     }
 
-    vout_rsc->started = true;
+    assert(vout_rsc->started);
     if (has_started != NULL)
         *has_started = true;
 

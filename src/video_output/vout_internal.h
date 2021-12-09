@@ -79,12 +79,14 @@ vlc_decoder_device *vout_GetDevice(vout_thread_t *vout);
  * You can release the returned value either by vout_Request() or vout_Close().
  *
  * \param cfg the video configuration requested.
- * \param input used to get attachments for spu filters
  * \param vctx pointer to the video context to use with the vout or NULL
+ * \param input used to get attachments for spu filters
+ * \param started [OUT] pointer to the started state, regardless of the return value 
  * \retval 0 on success
  * \retval -1 on error
  */
-int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input_thread_t *input);
+int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input_thread_t *input,
+                 bool *started);
 
 /**
  * Disables a vout.

@@ -2667,13 +2667,16 @@ static void vout_InitSource(vout_thread_sys_t *vout)
     }
 }
 
-int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input_thread_t *input)
+int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input_thread_t *input,
+                 bool *started)
 {
     vout_thread_sys_t *vout = VOUT_THREAD_TO_SYS(cfg->vout);
     vout_thread_sys_t *sys = vout;
 
     assert(cfg->fmt != NULL);
     assert(cfg->clock != NULL);
+
+    *started = sys->display != NULL;
 
     if (!VoutCheckFormat(cfg->fmt))
         /* don't stop the display and keep sys->original */
@@ -2685,6 +2688,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     if (vout_ChangeSource(cfg->vout, &original) == 0)
     {
         video_format_Clean(&original);
+        assert(*started == true);
         goto end;
     }
 
@@ -2717,18 +2721,22 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
         msg_Err(cfg->vout, "video output display creation failed");
         video_format_Clean(&sys->original);
         vout_DisableWindow(vout);
+        *started = false;
         return -1;
     }
     atomic_store(&sys->control_is_terminated, false);
     if (vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
         vout_ReleaseDisplay(vout);
         vout_DisableWindow(vout);
+        *started = false;
         return -1;
     }
 
     if (input != NULL && sys->spu)
         spu_Attach(sys->spu, input);
     vout_IntfReinit(cfg->vout);
+
+    *started = true;
 
 end:
     cfg->vout->owner = cfg->video.opaque;
