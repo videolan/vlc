@@ -329,7 +329,6 @@ static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     int i_ret = hxxx_helper_set_extra(hh, p_extra, i_extra);
     if (i_ret != VLC_SUCCESS)
         return i_ret;
-    assert(hh->pf_process_block != NULL);
 
     if (p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_ADAPTIVE)
         p_sys->b_adaptive = true;
@@ -349,7 +348,6 @@ static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     int i_ret = hxxx_helper_set_extra(hh, p_extra, i_extra);
     if (i_ret != VLC_SUCCESS)
         return i_ret;
-    assert(hh->pf_process_block != NULL);
 
     if (p_sys->api.i_quirks & MC_API_VIDEO_QUIRKS_ADAPTIVE)
         p_sys->b_adaptive = true;
@@ -1748,7 +1746,7 @@ static int VideoHXXX_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
     bool b_config_changed = false;
     bool *p_config_changed = p_sys->b_adaptive ? NULL : &b_config_changed;
 
-    *pp_block = hh->pf_process_block(hh, *pp_block, p_config_changed);
+    *pp_block = hxxx_helper_process_block(hh, *pp_block, p_config_changed);
     if (!*pp_block)
         return 0;
     if (b_config_changed)

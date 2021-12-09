@@ -343,7 +343,7 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
 static block_t *ProcessBlockH264(decoder_t *p_dec, block_t *p_block, bool *pb_config_changed)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    return p_sys->hh.pf_process_block(&p_sys->hh, p_block, pb_config_changed);
+    return hxxx_helper_process_block(&p_sys->hh, p_block, pb_config_changed);
 }
 
 

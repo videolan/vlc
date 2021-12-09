@@ -46,7 +46,7 @@ DecodeBlock(decoder_t *dec, block_t *block)
         return VLCDEC_SUCCESS;
 
     bool config_changed;
-    block = sys->hh.pf_process_block(&sys->hh, block, &config_changed);
+    block = hxxx_helper_process_block(&sys->hh, block, &config_changed);
 
     if (block == NULL)
         return VLCDEC_SUCCESS;
