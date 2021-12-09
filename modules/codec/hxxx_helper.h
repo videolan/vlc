@@ -76,24 +76,30 @@ struct hxxx_helper
             uint8_t i_previous_nal_type;
         } hevc;
     };
-
-    block_t * (*pf_process_block)(struct hxxx_helper *hh, block_t *p_block,
-                                  bool *p_config_changed);
 };
 
 void hxxx_helper_init(struct hxxx_helper *hh, vlc_object_t *p_obj,
                       vlc_fourcc_t i_codec, bool b_need_xvcC);
 void hxxx_helper_clean(struct hxxx_helper *hh);
 
+/* Process raw NAL buffer:
+ * No framing prefix
+ * If p_config_changed is not NULL, parse nals to detect a SPS/PPS or a video
+ * size change. */
+int hxxx_helper_process_nal(struct hxxx_helper *hh, const uint8_t *, size_t, bool *);
+
+/* Process the buffer:
+ * If p_config_changed is not NULL, parse nals to detect a SPS/PPS or a video
+ * size change. */
+int hxxx_helper_process_buffer(struct hxxx_helper *hh,
+                               const uint8_t *, size_t, bool *p_config_changed);
+
 /* Process the block:
  * Does AnnexB <-> xvcC conversion if needed.
  * If p_config_changed is not NULL, parse nals to detect a SPS/PPS or a video
  * size change. */
-static inline block_t * hxxx_helper_process_block(struct hxxx_helper *hh, block_t *p_block,
-                                                  bool *p_config_changed)
-{
-    return hh->pf_process_block(hh, p_block, p_config_changed);
-}
+block_t * hxxx_helper_process_block(struct hxxx_helper *hh, block_t *p_block,
+                                    bool *p_config_changed);
 
 int hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
                           size_t i_extra);
