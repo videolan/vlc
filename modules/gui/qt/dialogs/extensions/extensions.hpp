@@ -25,6 +25,7 @@
 
 #include "qt.hpp"
 #include <vlc_extensions.h>
+#include "util/singleton.hpp"
 
 #include "assert.h"
 
@@ -38,17 +39,16 @@ class QKeyEvent;
 class ExtensionsDialogProvider;
 class ExtensionDialog;
 
-class ExtensionsDialogProvider : public QObject
+class ExtensionsDialogProvider : public QObject, public Singleton<ExtensionsDialogProvider>
 {
     /** This is the dialog provider for Extensions dialogs
-     * @todo Make this class be a public Singleton<EDP>
      * @todo Add a setExtManager() function (with vlc_object_hold)
      **/
+    friend class Singleton<ExtensionsDialogProvider>;
 
     Q_OBJECT
 
 private:
-    static ExtensionsDialogProvider *instance;
     qt_intf_t *p_intf;
     extensions_manager_t *p_extensions_manager;
 
@@ -58,30 +58,15 @@ private slots:
     ExtensionDialog* UpdateExtDialog( extension_dialog_t *p_dialog );
 
 public:
-    ExtensionsDialogProvider( qt_intf_t *p_intf,
-                              extensions_manager_t *p_mgr );
-    virtual ~ExtensionsDialogProvider();
-
-    static ExtensionsDialogProvider* getInstance( qt_intf_t *p_intf = NULL,
-                                                  extensions_manager_t *p_mgr = NULL )
-    {
-        if( !instance )
-        {
-            assert( p_intf != NULL && p_mgr != NULL );
-            instance = new ExtensionsDialogProvider( p_intf, p_mgr );
-        }
-        return instance;
-    }
-    static void killInstance()
-    {
-        delete instance;
-        instance = NULL;
-    }
-
     void ManageDialog( extension_dialog_t *p_dialog );
 
 signals:
     void SignalDialog( extension_dialog_t *p_dialog );
+
+private:
+    ExtensionsDialogProvider( qt_intf_t *p_intf = nullptr,
+                             extensions_manager_t *p_mgr = nullptr );
+    virtual ~ExtensionsDialogProvider();
 };
 
 
