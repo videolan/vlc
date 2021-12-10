@@ -91,6 +91,7 @@ FocusScope {
     property alias fadeRectBottomHovered: fadeRectBottom.isHovered
     property alias fadeRectTopHovered: fadeRectTop.isHovered
 
+    property alias flickableDirection: view.flickableDirection
     property alias listScrollBar: scroll_id
 
     property alias buttonLeft: buttonLeft
