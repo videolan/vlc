@@ -399,6 +399,7 @@ FocusScope {
 
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth)
 
+            clip: true // content may overflow if not enough space is provided
             model: trackModel
             selectionDelegateModel: trackSelectionModel
             headerColor: VLCStyle.colors.bg
