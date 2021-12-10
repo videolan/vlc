@@ -68,7 +68,7 @@ Item {
 
     signal requestData(var identifier)
 
-    function getSelectedInputItem() {
+    function getSelectedInputItem(cb) {
         console.assert(false, "getSelectedInputItem is not implemented.")
 
         return undefined

@@ -95,8 +95,9 @@ FocusScope {
             }))
         }
 
-        function getSelectedInputItem() {
-            return providerModel.getItemsForIndexes(filterModel.mapIndexesToSource(selectionModel.selectedIndexes));
+        function getSelectedInputItem(cb) {
+            //directly call the callback
+            cb(providerModel.getItemsForIndexes(filterModel.mapIndexesToSource(selectionModel.selectedIndexes)))
         }
 
         Component {

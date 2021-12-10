@@ -31,17 +31,12 @@ DragItem {
     // string => role for medialib id, data[id] will be pass to Medialib::mlInputItem for QmlInputItem
     property string mlIDRole: "id"
 
-    function getSelectedInputItem() {
-        var inputs = []
-
-        for (var i in indexes) {
-            var inputItems = _getInputItem(i, indexesData[i])
-            console.assert(inputItems instanceof Array)
-
-            inputs = inputs.concat(inputItems)
-        }
-
-        return inputs
+    function getSelectedInputItem(cb) {
+        console.assert(mlIDRole)
+        var inputIdList = root.indexesData.map(function(obj){
+            return obj[root.mlIDRole]
+        })
+        Medialib.mlInputItem(inputIdList, cb)
     }
 
     onRequestData: {
@@ -49,10 +44,4 @@ DragItem {
             root.setData(identifier, data)
         })
     }
-
-    function _getInputItem(index, data) {
-        console.assert(mlIDRole)
-        return MediaLib.mlInputItem(data[mlIDRole])
-    }
-
 }

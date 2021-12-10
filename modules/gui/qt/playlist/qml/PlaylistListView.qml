@@ -91,7 +91,13 @@ Control {
 
         // NOTE: Dropping medialibrary content into the queue.
         } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
-            mainPlaylistController.insert(index, item.getSelectedInputItem());
+            item.getSelectedInputItem(function(inputItems) {
+                if (!Array.isArray(inputItems) || inputItems.length === 0) {
+                    console.warn("can't convert items to input items");
+                    return
+                }
+                mainPlaylistController.insert(index, inputItems)
+            })
 
         // NOTE: Dropping an external item (i.e. filesystem) into the queue.
         } else if (drop.hasUrls) {

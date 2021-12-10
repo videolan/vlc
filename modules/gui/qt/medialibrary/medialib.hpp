@@ -81,7 +81,7 @@ public:
 
     Q_INVOKABLE void reload();
 
-    Q_INVOKABLE QVariantList mlInputItem(MLItemId mlId);
+    Q_INVOKABLE void mlInputItem(const QVariantList& variantList, QJSValue callback);
 
     inline bool idle() const { return m_idle; }
     inline int discoveryPending() const { return m_discoveryPending; }
