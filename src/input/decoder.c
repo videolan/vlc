@@ -480,6 +480,9 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
                                    &vout_state);
     if (p_vout != NULL)
     {
+        assert(vout_state == INPUT_RESOURCE_VOUT_NOTCHANGED ||
+               vout_state == INPUT_RESOURCE_VOUT_STARTED);
+
         vlc_mutex_lock( &p_owner->lock );
         p_owner->vout_started = true;
         vlc_mutex_unlock( &p_owner->lock );
@@ -493,6 +496,14 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
             decoder_Notify(p_owner, on_vout_started, p_vout, p_owner->vout_order);
         }
         return 0;
+    }
+    else
+    {
+        assert(vout_state == INPUT_RESOURCE_VOUT_NOTCHANGED ||
+               vout_state == INPUT_RESOURCE_VOUT_STOPPED);
+
+        if (vout_state == INPUT_RESOURCE_VOUT_STOPPED)
+            decoder_Notify(p_owner, on_vout_stopped, p_owner->p_vout);
     }
 
 error:
