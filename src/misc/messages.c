@@ -322,15 +322,15 @@ static void vlc_logswitch_vaLog(void *d, int type, const vlc_log_t *item,
     vlc_rcu_read_unlock();
 }
 
+static void vlc_LogSwitch(vlc_logger_t *logger, vlc_logger_t *new_logger);
 static void vlc_logswitch_Close(void *d)
 {
     struct vlc_logger *logger = d;
     struct vlc_logger_switch *logswitch =
         container_of(logger, struct vlc_logger_switch, frontend);
-    struct vlc_logger *backend = atomic_load_explicit(&logswitch->backend,
-                                                      memory_order_relaxed);
 
-    backend->ops->destroy(backend);
+    /* Discard any further messages. */
+    vlc_LogSwitch(logger, &discard_log);
     free(logswitch);
 }
 
