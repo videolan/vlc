@@ -250,6 +250,7 @@ FocusScope {
                 }
             }
 
+            clip: true // content may overflow if not enough space is provided
             headerPositioning: ListView.InlineHeader
             section.property: ""
 
