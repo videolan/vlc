@@ -169,7 +169,6 @@ bool MainUI::setup(QQmlEngine* engine)
 
     QQmlContext *rootCtx = engine->rootContext();
 
-    rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));
     rootCtx->setContextProperty( "dialogModel", new DialogModel(m_intf, this));
 
     if (m_mainCtx->hasMediaLibrary())
@@ -237,6 +236,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<I18n>(uri, versionMajor, versionMinor, "I18n", SingletonRegisterHelper<I18n>::getCallback());
         qmlRegisterSingletonType<InterfaceWindow>(uri, versionMajor, versionMinor, "IntfWindow", SingletonRegisterHelper<InterfaceWindow>::callback);
         qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
+        qmlRegisterSingletonType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette", SingletonRegisterHelper<SystemPalette>::getCallback());
 
         qRegisterMetaType<VLCTick>();
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");

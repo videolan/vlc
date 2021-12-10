@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 
-import org.videolan.vlc 0.1
+import org.videolan.vlc 0.1 as VLC
 
 Item {
     id: colors_id
@@ -48,24 +48,24 @@ Item {
 
     property bool  isThemeDark: false
 
-    property color text: systemPalette.text;
-    property color textInactive: systemPalette.textInactive;
-    property color textDisabled: systemPalette.textDisabled;
+    property color text: VLC.SystemPalette.text;
+    property color textInactive: VLC.SystemPalette.textInactive;
+    property color textDisabled: VLC.SystemPalette.textDisabled;
 
     property color caption: setColorAlpha(text, .4)
     property color menuCaption: setColorAlpha(text, .6)
 
-    property color bg: systemPalette.base;
-    property color bgInactive: systemPalette.baseInactive;
+    property color bg: VLC.SystemPalette.base;
+    property color bgInactive: VLC.SystemPalette.baseInactive;
 
     //for alternate rows
-    property color bgAlt: systemPalette.alternateBase;
-    property color bgAltInactive: systemPalette.alternateBaseInactive;
+    property color bgAlt: VLC.SystemPalette.alternateBase;
+    property color bgAltInactive: VLC.SystemPalette.alternateBaseInactive;
 
-    property color bgHover: systemPalette.highlight;
-    property color bgHoverText: systemPalette.highlightText;
-    property color bgHoverInactive: systemPalette.highlightInactive;
-    property color bgHoverTextInactive: systemPalette.highlightTextInactive;
+    property color bgHover: VLC.SystemPalette.highlight;
+    property color bgHoverText: VLC.SystemPalette.highlightText;
+    property color bgHoverInactive: VLC.SystemPalette.highlightInactive;
+    property color bgHoverTextInactive: VLC.SystemPalette.highlightTextInactive;
 
     property color bgFocus: (isThemeDark) ? white : black
 
@@ -75,14 +75,14 @@ Item {
 
     // Button
 
-    property color button: systemPalette.button
+    property color button: VLC.SystemPalette.button
 
     property color buttonHover: (isThemeDark) ? "#303030" : "#f2f2f2"
 
-    property color buttonText: systemPalette.buttonText
+    property color buttonText: VLC.SystemPalette.buttonText
     property color buttonTextHover: bgFocus
 
-    property color buttonBorder: blendColors(systemPalette.button, systemPalette.buttonText, 0.8)
+    property color buttonBorder: blendColors(VLC.SystemPalette.button, VLC.SystemPalette.buttonText, 0.8)
 
     // ButtonBanner (BannerTabButton)
 
@@ -130,8 +130,8 @@ Item {
 
     property color textActiveSource: "red";
 
-    property color topBanner: systemPalette.window
-    property color topBannerHover: systemPalette.highlight
+    property color topBanner: VLC.SystemPalette.window
+    property color topBannerHover: VLC.SystemPalette.highlight
 
     property color lowerBanner: bg
 
@@ -187,12 +187,12 @@ Item {
     property color expandDelegate
 
     state: {
-        switch (MainCtx.colorScheme.scheme) {
-        case ColorSchemeModel.System:
+        switch (VLC.MainCtx.colorScheme.scheme) {
+        case VLC.ColorSchemeModel.System:
             return "system"
-        case ColorSchemeModel.Day:
+        case VLC.ColorSchemeModel.Day:
             return "day"
-        case ColorSchemeModel.Night:
+        case VLC.ColorSchemeModel.Night:
             return "night"
         default:
             console.assert(false, "Unknown color scheme")
@@ -280,41 +280,41 @@ Item {
             PropertyChanges {
                 target: colors_id
 
-                bg: systemPalette.base
-                bgInactive: systemPalette.baseInactive
+                bg: VLC.SystemPalette.base
+                bgInactive: VLC.SystemPalette.baseInactive
 
-                bgAlt: systemPalette.alternateBase
-                bgAltInactive: systemPalette.alternateBaseInactive
+                bgAlt: VLC.SystemPalette.alternateBase
+                bgAltInactive: VLC.SystemPalette.alternateBaseInactive
 
-                bgHover: systemPalette.highlight
-                bgHoverText: systemPalette.highlightText
-                bgHoverInactive: systemPalette.highlightInactive
-                bgHoverTextInactive: systemPalette.highlightTextInactive
+                bgHover: VLC.SystemPalette.highlight
+                bgHoverText: VLC.SystemPalette.highlightText
+                bgHoverInactive: VLC.SystemPalette.highlightInactive
+                bgHoverTextInactive: VLC.SystemPalette.highlightTextInactive
 
-                text: systemPalette.text
-                textDisabled: systemPalette.textDisabled
-                textInactive: systemPalette.textInactive
+                text: VLC.SystemPalette.text
+                textDisabled: VLC.SystemPalette.textDisabled
+                textInactive: VLC.SystemPalette.textInactive
 
-                button: systemPalette.button
-                buttonText: systemPalette.buttonText
+                button: VLC.SystemPalette.button
+                buttonText: VLC.SystemPalette.buttonText
                 buttonBorder: blendColors(button, buttonText, 0.8)
 
                 textActiveSource: accent
 
-                topBanner: systemPalette.window
-                topBannerHover: systemPalette.highlight
-                lowerBanner: systemPalette.base
+                topBanner: VLC.SystemPalette.window
+                topBannerHover: VLC.SystemPalette.highlight
+                lowerBanner: VLC.SystemPalette.base
 
                 separator: blendColors(bg, text, .95)
 
-                playerControlBarFg: systemPalette.text
+                playerControlBarFg: VLC.SystemPalette.text
 
                 expandDelegate: bg
 
-                isThemeDark: systemPalette.isDark
+                isThemeDark: VLC.SystemPalette.isDark
 
-                tooltipColor: systemPalette.tooltip
-                tooltipTextColor: systemPalette.tooltipText
+                tooltipColor: VLC.SystemPalette.tooltip
+                tooltipTextColor: VLC.SystemPalette.tooltipText
             }
         }
     ]
