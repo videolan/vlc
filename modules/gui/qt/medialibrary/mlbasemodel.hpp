@@ -162,7 +162,6 @@ public:
 protected:
     MLItemId m_parent;
 
-    vlc_medialibrary_t* m_ml = nullptr;
     MediaLib* m_mediaLib = nullptr;
     QString m_search_pattern;
     vlc_ml_sorting_criteria_t m_sort = VLC_ML_SORTING_DEFAULT;

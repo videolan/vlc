@@ -88,8 +88,6 @@ public:
     inline QString discoveryEntryPoint() const { return m_discoveryEntryPoint; }
     inline int parsingProgress() const { return m_parsingProgress; }
 
-    vlc_medialibrary_t* vlcMl();
-
     vlc_ml_event_callback_t* registerEventListener(void (*callback)(void*, const vlc_ml_event_t*), void* data);
     void unregisterEventListener(vlc_ml_event_callback_t*);
 

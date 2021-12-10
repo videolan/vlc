@@ -295,7 +295,6 @@ MediaLib* MLBaseModel::ml() const
 void MLBaseModel::setMl(MediaLib* medialib)
 {
     assert(medialib);
-    m_ml = medialib->vlcMl();
     m_mediaLib = medialib;
     if ( m_ml_event_handle == nullptr )
         m_ml_event_handle.reset( m_mediaLib->registerEventListener(onVlcMlEvent, this ) );

@@ -28,7 +28,7 @@
 MediaLib::MediaLib(qt_intf_t *_intf, QObject *_parent)
     : QObject( _parent )
     , m_intf( _intf )
-    , m_ml( vlcMl() )
+    , m_ml( vlc_ml_instance_get( _intf ) )
     , m_event_cb( nullptr, [this](vlc_ml_event_callback_t* cb ) {
         vlc_ml_event_unregister_callback( m_ml, cb );
       })
@@ -303,12 +303,7 @@ QVariantList MediaLib::mlInputItem(const MLItemId mlId)
     return items;
 }
 
-vlc_medialibrary_t* MediaLib::vlcMl()
-{
-    return vlc_ml_instance_get( m_intf );
-}
-
-vlc_ml_event_callback_t*  MediaLib::registerEventListener( void (*callback)(void*, const vlc_ml_event_t*), void* data)
+vlc_ml_event_callback_t* MediaLib::registerEventListener( void (*callback)(void*, const vlc_ml_event_t*), void* data)
 {
     return vlc_ml_event_register_callback( m_ml , callback , data ) ;
 }
