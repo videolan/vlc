@@ -70,8 +70,6 @@ public: // Interface
     Q_INVOKABLE virtual QVariantList getIdsForIndexes(const QVariantList    & indexes) const;
     Q_INVOKABLE virtual QVariantList getIdsForIndexes(const QModelIndexList & indexes) const;
 
-    Q_INVOKABLE virtual QVariantList getItemsForIndexes(const QModelIndexList & indexes) const;
-
     Q_INVOKABLE QMap<QString, QVariant> getDataAt(const QModelIndex & index);
     Q_INVOKABLE QMap<QString, QVariant> getDataAt(int idx);
 

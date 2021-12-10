@@ -422,56 +422,6 @@ QVariantList MLBaseModel::getIdsForIndexes(const QVariantList & indexes) const
 
 //-------------------------------------------------------------------------------------------------
 
-/* Q_INVOKABLE virtual */
-QVariantList MLBaseModel::getItemsForIndexes(const QModelIndexList & indexes) const
-{
-    assert(m_ml);
-
-    QVariantList items;
-
-    vlc_ml_query_params_t query;
-
-    memset(&query, 0, sizeof(vlc_ml_query_params_t));
-
-    for (const QModelIndex & index : indexes)
-    {
-        MLItem * item = this->item(index.row());
-
-        if (item == nullptr)
-            continue;
-
-        MLItemId itemId = item->getId();
-
-        // NOTE: When we have a parent it's a collection of media(s).
-        if (itemId.type == VLC_ML_PARENT_UNKNOWN)
-        {
-            QmlInputItem input(vlc_ml_get_input_item(m_ml, itemId.id), false);
-
-            items.append(QVariant::fromValue(input));
-        }
-        else
-        {
-            ml_unique_ptr<vlc_ml_media_list_t> list;
-
-            list.reset(vlc_ml_list_media_of(m_ml, &query, itemId.type, itemId.id));
-
-            if (list == nullptr)
-                continue;
-
-            for (const vlc_ml_media_t & media : ml_range_iterate<vlc_ml_media_t>(list))
-            {
-                QmlInputItem input(vlc_ml_get_input_item(m_ml, media.i_id), false);
-
-                items.append(QVariant::fromValue(input));
-            }
-        }
-    }
-
-    return items;
-}
-
-//-------------------------------------------------------------------------------------------------
-
 unsigned MLBaseModel::getCount() const
 {
     if (!m_mediaLib)
