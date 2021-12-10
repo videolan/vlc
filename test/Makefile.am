@@ -40,6 +40,7 @@ check_PROGRAMS = \
 	test_modules_packetizer_h264 \
 	test_modules_packetizer_hevc \
 	test_modules_packetizer_mpegvideo \
+	test_modules_codec_hxxx_helper \
 	test_modules_keystore \
 	test_modules_demux_timestamps_filter \
 	test_modules_demux_ts_pes \
@@ -159,6 +160,13 @@ test_modules_demux_ts_pes_SOURCES = modules/demux/ts_pes.c \
 test_modules_playlist_m3u_SOURCES = modules/demux/playlist/m3u.c
 test_modules_playlist_m3u_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
+test_modules_codec_hxxx_helper_SOURCES = modules/codec/hxxx_helper.c \
+                                      ../modules/codec/hxxx_helper.c \
+                                      ../modules/packetizer/hxxx_nal.c \
+                                      ../modules/packetizer/h264_slice.c \
+                                      ../modules/packetizer/h264_nal.c \
+                                      ../modules/packetizer/hevc_nal.c
+test_modules_codec_hxxx_helper_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 test_src_video_output_SOURCES = \
 	src/video_output/video_output.c \
