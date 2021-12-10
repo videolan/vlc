@@ -340,7 +340,16 @@ QVariant MLPlaylistModel::itemRoleData(MLItem *item, int role) const /* override
         case MEDIA_TITLE:
             return QVariant::fromValue(media->getTitle());
         case MEDIA_THUMBNAIL:
-            return QVariant::fromValue(media->getThumbnail());
+        {
+            vlc_ml_thumbnail_status_t status;
+            QString thumbnail = media->getThumbnail(&status);
+            if (media->getType() == VLC_ML_MEDIA_TYPE_AUDIO
+                && (status == VLC_ML_THUMBNAIL_STATUS_MISSING || status == VLC_ML_THUMBNAIL_STATUS_FAILURE))
+            {
+                generateThumbnail(item->getId());
+            }
+            return QVariant::fromValue(thumbnail);
+        }
         case MEDIA_DURATION:
             return QVariant::fromValue(media->getDuration());
         case MEDIA_PROGRESS:
@@ -429,6 +438,12 @@ void MLPlaylistModel::onVlcMlEvent(const MLEvent & event) /* override */
     MLBaseModel::onVlcMlEvent(event);
 }
 
+void MLPlaylistModel::thumbnailUpdated(const QModelIndex& idx, MLItem* mlitem, const QString& mrl, vlc_ml_thumbnail_status_t status) /* override */
+{
+    auto playlistItem = static_cast<MLPlaylistMedia*>(mlitem);
+    playlistItem->setThumbnail(mrl, status);
+    emit dataChanged(idx, idx, { MEDIA_THUMBNAIL });
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private functions
@@ -474,6 +489,17 @@ std::vector<std::pair<int, int>> MLPlaylistModel::getSortedRowsRanges(const QMod
         std::reverse(rangeList.begin(), rangeList.end());
 
     return rangeList;
+}
+
+void MLPlaylistModel::generateThumbnail(const MLItemId& itemid) const
+{
+    m_mediaLib->runOnMLThread(this,
+    //ML thread
+    [id = itemid.id](vlc_medialibrary_t* ml)
+    {
+        vlc_ml_media_generate_thumbnail(ml, id, VLC_ML_THUMBNAIL_SMALL,
+                                        512, 320, 0.15);
+    });
 }
 
 //=================================================================================================

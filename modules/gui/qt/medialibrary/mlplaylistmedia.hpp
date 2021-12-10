@@ -36,14 +36,17 @@ struct vlc_medialibrary_t;
 class MLPlaylistMedia : public MLItem
 {
 public:
-    MLPlaylistMedia(vlc_medialibrary_t * ml, const vlc_ml_media_t * data);
+    MLPlaylistMedia(vlc_medialibrary_t *, const vlc_ml_media_t * data);
 
 public: // Interface
     bool isNew() const;
 
+    vlc_ml_media_type_t getType() const;
+
     QString getTitle() const;
 
-    QString getThumbnail();
+    QString getThumbnail(vlc_ml_thumbnail_status_t* status = nullptr);
+    void setThumbnail(const QString& thumbnail, vlc_ml_thumbnail_status_t status);
 
     int64_t getDuration() const;
 
@@ -62,14 +65,13 @@ public: // Interface
     QList<VideoDescription> getVideo() const;
     QList<AudioDescription> getAudio() const;
 
+
 private: // Events
     static void onMlEvent(void * data, const vlc_ml_event_t * event);
 
     void onMlEvent(const vlc_ml_event_t * event);
 
 private: // Properties
-    vlc_medialibrary_t * m_ml;
-
     vlc_ml_media_type_t m_type;
 
     QString m_title;
@@ -92,9 +94,6 @@ private: // Properties
 
     QList<VideoDescription> m_video;
     QList<AudioDescription> m_audio;
-
-    std::unique_ptr<vlc_ml_event_callback_t,
-                    std::function<void(vlc_ml_event_callback_t*)>> m_handle;
 };
 
 #endif // MLPLAYLISTMEDIA_H

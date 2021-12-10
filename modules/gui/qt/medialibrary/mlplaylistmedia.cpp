@@ -25,9 +25,8 @@
 // Ctor / dtor
 //-------------------------------------------------------------------------------------------------
 
-MLPlaylistMedia::MLPlaylistMedia(vlc_medialibrary_t * ml, const vlc_ml_media_t * data)
+MLPlaylistMedia::MLPlaylistMedia(vlc_medialibrary_t*, const vlc_ml_media_t * data)
     : MLItem(MLItemId(data->i_id, VLC_ML_PARENT_UNKNOWN))
-    , m_ml(ml)
     , m_type(data->i_type)
     , m_title(qfu(data->psz_title))
     , m_thumbnail(qfu(data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl))
@@ -35,11 +34,6 @@ MLPlaylistMedia::MLPlaylistMedia(vlc_medialibrary_t * ml, const vlc_ml_media_t *
     , m_duration(data->i_duration)
     , m_progress(data->f_progress)
     , m_playCount(data->i_playcount)
-    , m_handle(nullptr, [this](vlc_ml_event_callback_t * cb) {
-        assert(m_ml != nullptr);
-
-        vlc_ml_event_unregister_callback(m_ml, cb);
-    })
 {
     for (const vlc_ml_file_t & file : ml_range_iterate<vlc_ml_file_t>(data->p_files))
     {
@@ -111,28 +105,28 @@ bool MLPlaylistMedia::isNew() const
     return (m_playCount == 1 && m_progress <= 0);
 }
 
+vlc_ml_media_type_t MLPlaylistMedia::getType() const
+{
+    return m_type;
+}
+
 QString MLPlaylistMedia::getTitle() const
 {
     return m_title;
 }
 
 // FIXME: We have the same code in MLVideo implementation.
-QString MLPlaylistMedia::getThumbnail()
+QString MLPlaylistMedia::getThumbnail(vlc_ml_thumbnail_status_t* status)
 {
-    // NOTE: We don't need to generate a cover for audio media(s).
-    if (m_type != VLC_ML_MEDIA_TYPE_AUDIO
-        &&
-        (m_thumbnailStatus == VLC_ML_THUMBNAIL_STATUS_MISSING
-         ||
-         m_thumbnailStatus == VLC_ML_THUMBNAIL_STATUS_FAILURE))
-    {
-        m_handle.reset(vlc_ml_event_register_callback(m_ml, onMlEvent, this));
-
-        vlc_ml_media_generate_thumbnail(m_ml, getId().id, VLC_ML_THUMBNAIL_SMALL,
-                                        512, 320, 0.15);
-    }
-
+    if (status)
+        *status = m_thumbnailStatus;
     return m_thumbnail;
+}
+
+void MLPlaylistMedia::setThumbnail(const QString& thumbnail, vlc_ml_thumbnail_status_t status)
+{
+    m_thumbnail = thumbnail;
+    m_thumbnailStatus = status;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -198,40 +192,4 @@ QList<VideoDescription> MLPlaylistMedia::getVideo() const
 QList<AudioDescription> MLPlaylistMedia::getAudio() const
 {
     return m_audio;
-}
-
-//-------------------------------------------------------------------------------------------------
-// Private events
-//-------------------------------------------------------------------------------------------------
-
-/* static */ void MLPlaylistMedia::onMlEvent(void * data, const vlc_ml_event_t * event)
-{
-    MLPlaylistMedia * self = static_cast<MLPlaylistMedia *>(data);
-
-    self->onMlEvent(event);
-}
-
-void MLPlaylistMedia::onMlEvent(const vlc_ml_event_t * event)
-{
-    if (event->i_type != VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED
-        ||
-        event->media_thumbnail_generated.i_size != VLC_ML_THUMBNAIL_SMALL
-        ||
-        event->media_thumbnail_generated.p_media->i_id != getId().id)
-        return;
-
-    if (event->media_thumbnail_generated.b_success == false)
-    {
-        m_thumbnailStatus = VLC_ML_THUMBNAIL_STATUS_FAILURE;
-
-        return;
-    }
-
-    vlc_ml_thumbnail_size_t size = event->media_thumbnail_generated.i_size;
-
-    m_thumbnail = qfu(event->media_thumbnail_generated.p_media->thumbnails[size].psz_mrl);
-
-    m_thumbnailStatus = VLC_ML_THUMBNAIL_STATUS_AVAILABLE;
-
-    vlc_ml_event_unregister_from_callback(m_ml, m_handle.release());
 }

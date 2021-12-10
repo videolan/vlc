@@ -72,6 +72,7 @@ protected: // MLBaseModel implementation
 protected: // MLBaseModel reimplementation
     void onVlcMlEvent(const MLEvent & event) override;
 
+    void thumbnailUpdated(const QModelIndex& idx, MLItem* item, const QString& mrl, vlc_ml_thumbnail_status_t status) override;
 
 private: // Functions
     struct HighLowRanges {
@@ -93,6 +94,8 @@ private: // Functions
     void moveImpl(int64_t playlistId, HighLowRanges&& ranges);
 
     void endTransaction();
+
+    void generateThumbnail(const MLItemId& itemid) const;
 
     bool m_transactionPending = false;
     bool m_resetAfterTransaction = false;
