@@ -362,14 +362,16 @@ void input_resource_SetInput( input_resource_t *p_resource, input_thread_t *p_in
 }
 
 static void input_resource_PutVoutLocked(input_resource_t *p_resource,
-                                         vout_thread_t *vout, bool *has_stopped)
+                                         vout_thread_t *vout,
+                                         enum input_resource_vout_state *vout_state)
 {
     assert(vout != NULL);
     struct vout_resource *vout_rsc = resource_GetVoutRsc(p_resource, vout);
     assert(vout_rsc != NULL);
 
-    if (has_stopped != NULL)
-        *has_stopped = vout_rsc->started;
+    if (vout_state != NULL)
+        *vout_state = vout_rsc->started ? INPUT_RESOURCE_VOUT_STOPPED
+                                        : INPUT_RESOURCE_VOUT_NOTCHANGED;
 
     if (vout_rsc->started)
     {
@@ -398,10 +400,11 @@ static void input_resource_PutVoutLocked(input_resource_t *p_resource,
 }
 
 void input_resource_PutVout(input_resource_t *p_resource,
-                                   vout_thread_t *vout, bool *stopped)
+                            vout_thread_t *vout,
+                            enum input_resource_vout_state *vout_state)
 {
     vlc_mutex_lock( &p_resource->lock );
-    input_resource_PutVoutLocked( p_resource, vout, stopped );
+    input_resource_PutVoutLocked( p_resource, vout, vout_state );
     vlc_mutex_unlock( &p_resource->lock );
 }
 
@@ -451,13 +454,13 @@ vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
                                           vlc_video_context *vctx,
                                           const vout_configuration_t *cfg,
                                           enum vlc_vout_order *order,
-                                          bool *has_started)
+                                          enum input_resource_vout_state *vout_state)
 {
     vlc_mutex_lock( &p_resource->lock );
     struct vout_resource *vout_rsc = NULL;
 
-    if (has_started != NULL)
-        *has_started = false;
+    if (vout_state != NULL)
+        *vout_state = INPUT_RESOURCE_VOUT_NOTCHANGED;
 
     vout_configuration_t dcfg = *cfg;
     if (dcfg.vout == NULL)
@@ -509,8 +512,8 @@ vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
     }
 
     vout_rsc->started = true;
-    if (has_started != NULL)
-        *has_started = true;
+    if (vout_state != NULL)
+        *vout_state = INPUT_RESOURCE_VOUT_STARTED;
 
     DisplayVoutTitle(p_resource, cfg->vout, &vout_rsc->psz_prev_title);
 

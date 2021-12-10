@@ -474,17 +474,17 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         .vout = p_owner->p_vout, .clock = p_owner->p_clock, .fmt = &p_dec->fmt_out.video,
         .mouse_event = MouseEvent, .mouse_opaque = p_dec,
     };
-    bool has_started;
+    enum input_resource_vout_state vout_state;
     vout_thread_t *p_vout =
         input_resource_RequestVout(p_owner->p_resource, vctx, &cfg, NULL,
-                                   &has_started);
+                                   &vout_state);
     if (p_vout != NULL)
     {
         vlc_mutex_lock( &p_owner->lock );
         p_owner->vout_started = true;
         vlc_mutex_unlock( &p_owner->lock );
 
-        if (has_started)
+        if (vout_state == INPUT_RESOURCE_VOUT_STARTED)
         {
             vlc_fifo_Lock( p_owner->p_fifo );
             p_owner->reset_out_state = true;
@@ -1999,9 +1999,9 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner )
                  * last reference is needed for notify callbacks */
                 vout_Hold(vout);
 
-                bool has_stopped;
-                input_resource_PutVout(p_owner->p_resource, vout, &has_stopped);
-                if (has_stopped)
+                enum input_resource_vout_state vout_state;
+                input_resource_PutVout(p_owner->p_resource, vout, &vout_state);
+                if (vout_state == INPUT_RESOURCE_VOUT_STOPPED)
                     decoder_Notify(p_owner, on_vout_stopped, vout);
 
                 vout_Release(vout);
