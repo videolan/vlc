@@ -132,10 +132,10 @@ WindowDialog {
                     iconText: VLCIcons.profile_new
 
                     onClicked: {
-                        var npDialog = dialogProvider.getTextDialog(null,
-                                                                    I18n.qtr("Profile Name"),
-                                                                    I18n.qtr("Please enter the new profile name:"),
-                                                                    I18n.qtr("Profile %1").arg(comboBox.count + 1))
+                        var npDialog = DialogsProvider.getTextDialog(null,
+                                                                     I18n.qtr("Profile Name"),
+                                                                     I18n.qtr("Please enter the new profile name:"),
+                                                                     I18n.qtr("Profile %1").arg(comboBox.count + 1))
                         if (!npDialog.ok)
                             return
 

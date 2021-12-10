@@ -27,6 +27,6 @@ Widgets.IconControlButton {
     id: openMediaBtn
     size: VLCStyle.icon_medium
     iconText: VLCIcons.eject
-    onClicked: dialogProvider.openDialog()
+    onClicked: DialogsProvider.openDialog()
     text: I18n.qtr("Open media")
 }

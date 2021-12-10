@@ -429,7 +429,7 @@ Item {
         }
 
         Connections {
-            target: dialogProvider
+            target: DialogsProvider
 
             onShowToolbarEditorDialog: {
                 toolbarEditorDialogLoader.active = true

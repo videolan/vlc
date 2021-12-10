@@ -16,10 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
+
+import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
 Item {
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+B"; onActivated: dialogProvider.bookmarksDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+B"; onActivated: DialogsProvider.bookmarksDialog(); }
 
     MLRecentModel {
         id: recentModel

@@ -21,26 +21,26 @@ import QtQuick 2.11
 import org.videolan.vlc 0.1
 
 Item {
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+O"; onActivated: dialogProvider.simpleOpenDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Shift+O"; onActivated: dialogProvider.openFileDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+F"; onActivated: dialogProvider.PLOpenDir(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+D"; onActivated: dialogProvider.openDiscDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+N"; onActivated: dialogProvider.openNetDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+C"; onActivated: dialogProvider.openCaptureDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+V"; onActivated: dialogProvider.openUrlDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Y"; onActivated: dialogProvider.savePlayingToPlaylist(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+R"; onActivated: dialogProvider.openAndTranscodingDialogs(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+S"; onActivated: dialogProvider.openAndStreamingDialogs(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Q"; onActivated: dialogProvider.quit(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+E"; onActivated: dialogProvider.extendedDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+I"; onActivated: dialogProvider.mediaInfoDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+J"; onActivated: dialogProvider.mediaCodecDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+M"; onActivated: dialogProvider.messagesDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+P"; onActivated: dialogProvider.prefsDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+T"; onActivated: dialogProvider.gotoTimeDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"F1";     onActivated: dialogProvider.helpDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+O"; onActivated: DialogsProvider.simpleOpenDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Shift+O"; onActivated: DialogsProvider.openFileDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+F"; onActivated: DialogsProvider.PLOpenDir(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+D"; onActivated: DialogsProvider.openDiscDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+N"; onActivated: DialogsProvider.openNetDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+C"; onActivated: DialogsProvider.openCaptureDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+V"; onActivated: DialogsProvider.openUrlDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Y"; onActivated: DialogsProvider.savePlayingToPlaylist(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+R"; onActivated: DialogsProvider.openAndTranscodingDialogs(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+S"; onActivated: DialogsProvider.openAndStreamingDialogs(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Q"; onActivated: DialogsProvider.quit(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+E"; onActivated: DialogsProvider.extendedDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+I"; onActivated: DialogsProvider.mediaInfoDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+J"; onActivated: DialogsProvider.mediaCodecDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+M"; onActivated: DialogsProvider.messagesDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+P"; onActivated: DialogsProvider.prefsDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+T"; onActivated: DialogsProvider.gotoTimeDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"F1";     onActivated: DialogsProvider.helpDialog(); }
 
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Shift+W"; onActivated: dialogProvider.vlmDialog(); enabled: MainCtx.hasVLM; }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+Shift+W"; onActivated: DialogsProvider.vlmDialog(); enabled: MainCtx.hasVLM; }
 
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+L"; onActivated: MainCtx.playlistVisible = !MainCtx.playlistVisible; }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"F11"; onActivated: MainCtx.toggleInterfaceFullScreen(); }

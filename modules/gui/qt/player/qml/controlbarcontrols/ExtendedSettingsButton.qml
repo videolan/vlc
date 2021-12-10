@@ -27,6 +27,6 @@ Widgets.IconControlButton {
     id: extdSettingsBtn
     size: VLCStyle.icon_medium
     iconText: VLCIcons.extended
-    onClicked: dialogProvider.extendedDialog()
+    onClicked: DialogsProvider.extendedDialog()
     Accessible.name: I18n.qtr("Extended settings")
 }

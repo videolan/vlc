@@ -36,20 +36,20 @@ Widgets.OverlayMenu {
     Action {
         id: streamAction
         text: I18n.qtr("Stream")
-        onTriggered: dialogProvider.streamingDialog(root.model.getSelection().map(function(i) { return root.model.itemAt(i).url; }), false)
+        onTriggered: DialogsProvider.streamingDialog(root.model.getSelection().map(function(i) { return root.model.itemAt(i).url; }), false)
         property string fontIcon: VLCIcons.stream
     }
 
     Action {
         id: saveAction
         text: I18n.qtr("Save")
-        onTriggered: dialogProvider.streamingDialog(root.model.getSelection().map(function(i) { return root.model.itemAt(i).url; }))
+        onTriggered: DialogsProvider.streamingDialog(root.model.getSelection().map(function(i) { return root.model.itemAt(i).url; }))
     }
 
     Action {
         id: infoAction
         text: I18n.qtr("Information")
-        onTriggered: dialogProvider.mediaInfoDialog(root.model.itemAt(root.model.getSelection()[0]))
+        onTriggered: DialogsProvider.mediaInfoDialog(root.model.itemAt(root.model.getSelection()[0]))
         icon.source: "qrc:/menu/info.svg"
     }
 
@@ -63,28 +63,28 @@ Widgets.OverlayMenu {
     Action {
         id: addFileAction
         text: I18n.qtr("Add File...")
-        onTriggered: dialogProvider.simpleOpenDialog(false)
+        onTriggered: DialogsProvider.simpleOpenDialog(false)
         property string fontIcon: VLCIcons.add
     }
 
     Action {
         id: addDirAction
         text: I18n.qtr("Add Directory...")
-        onTriggered: dialogProvider.PLAppendDir()
+        onTriggered: DialogsProvider.PLAppendDir()
         property string fontIcon: VLCIcons.add
     }
 
     Action {
         id: addAdvancedAction
         text: I18n.qtr("Advanced Open...")
-        onTriggered: dialogProvider.PLAppendDialog()
+        onTriggered: DialogsProvider.PLAppendDialog()
         property string fontIcon: VLCIcons.add
     }
 
     Action {
         id: savePlAction
         text: I18n.qtr("Save Playlist to File...")
-        onTriggered: dialogProvider.savePlayingToPlaylist();
+        onTriggered: DialogsProvider.savePlayingToPlaylist();
     }
 
     Action {

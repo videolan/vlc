@@ -250,13 +250,13 @@ T.Popup {
                             onClicked: {
                                 switch (index) {
                                 case 0:
-                                    dialogProvider.loadSubtitlesFile()
+                                    DialogsProvider.loadSubtitlesFile()
                                     break
                                 case 1:
-                                    dialogProvider.loadAudioFile()
+                                    DialogsProvider.loadAudioFile()
                                     break
                                 case 2:
-                                    dialogProvider.loadVideoFile()
+                                    DialogsProvider.loadVideoFile()
                                     break
                                 }
                             }

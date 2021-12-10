@@ -151,6 +151,9 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
 
     SingletonRegisterHelper<InterfaceWindow>::setInstance(*static_cast<InterfaceWindow*>(m_interfaceWindow));
 
+    assert(DialogsProvider::getInstance());
+    SingletonRegisterHelper<DialogsProvider>::setInstance(*DialogsProvider::getInstance());
+
     registerQMLTypes();
 }
 
@@ -166,7 +169,6 @@ bool MainUI::setup(QQmlEngine* engine)
 
     QQmlContext *rootCtx = engine->rootContext();
 
-    rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
     rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));
     rootCtx->setContextProperty( "dialogModel", new DialogModel(m_intf, this));
 
@@ -234,6 +236,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<PlayerController>(uri, versionMajor, versionMinor, "Player", SingletonRegisterHelper<PlayerController>::callback);
         qmlRegisterSingletonType<I18n>(uri, versionMajor, versionMinor, "I18n", SingletonRegisterHelper<I18n>::getCallback());
         qmlRegisterSingletonType<InterfaceWindow>(uri, versionMajor, versionMinor, "IntfWindow", SingletonRegisterHelper<InterfaceWindow>::callback);
+        qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
 
         qRegisterMetaType<VLCTick>();
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
