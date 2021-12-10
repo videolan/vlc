@@ -29,7 +29,9 @@ const MLListCache::ItemType* MLListCache::get(size_t index) const
 
 const MLListCache::ItemType* MLListCache::find(const std::function<bool (const MLListCache::ItemType&)> &&f, int *index) const
 {
-    assert(m_total_count >= 0);
+    if (m_total_count <= 0)
+        return nullptr;
+
     for (auto iter = std::begin(m_list); iter != std::end(m_list); ++iter)
     {
         if (f(*iter))
