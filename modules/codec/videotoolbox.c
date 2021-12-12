@@ -1391,7 +1391,7 @@ static int OpenDecoder(vlc_object_t *p_this, bool h264_support)
 
     if (!h264_support && p_dec->fmt_in.i_codec == VLC_CODEC_H264)
         return VLC_EGENERIC;
-
+#if 0
     msg_Info(p_dec, "DEBUGVT: opening VT extradata %p size %zu",
              p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra);
 
@@ -1402,7 +1402,7 @@ static int OpenDecoder(vlc_object_t *p_this, bool h264_support)
         msg_Info(p_dec, "DEBUGVT: opening VT with extradata %s",
                  buffer);
     }
-
+#endif
 
     /* check quickly if we can digest the offered data */
     CMVideoCodecType codec;
