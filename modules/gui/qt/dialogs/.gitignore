@@ -1,6 +1,7 @@
 extended/ui_equalizer.h
 extended/ui_video_effects.h
 fingerprint/ui_fingerprintdialog.h
+firstrun/ui_firstrunwizard.h
 help/ui_about.h
 help/ui_update.h
 open/ui_open.h
