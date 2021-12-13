@@ -89,7 +89,6 @@ private:
     QMenu *m_menu = nullptr;
 };
 
-
 //inherit VLCMenuBar so we can access menu creation functions
 class QmlGlobalMenu : public VLCMenuBar
 {
@@ -264,15 +263,22 @@ private:
 
 class GroupListContextMenu : public QObject {
     Q_OBJECT
+
     SIMPLE_MENU_PROPERTY(MLGroupListModel *, model, nullptr)
+
 public:
     GroupListContextMenu(QObject * parent = nullptr);
+
     ~GroupListContextMenu() /* override */;
 
 public slots:
     void popup(const QModelIndexList & selected, QPoint pos, QVariantMap options = {});
+
+signals:
+    void showMediaInformation(int index);
+
 private:
-    QMenu* m_menu = nullptr;
+    QMenu * m_menu = nullptr;
 };
 
 //-------------------------------------------------------------------------------------------------

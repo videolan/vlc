@@ -34,7 +34,6 @@
 #include "dialogs/dialogs_provider.hpp"
 #include "maininterface/mainctx.hpp"
 
-
 #include <QSignalMapper>
 
 namespace
@@ -498,7 +497,7 @@ GroupListContextMenu::~GroupListContextMenu() /* override */
         delete m_menu;
 }
 
-void GroupListContextMenu::popup(const QModelIndexList & selected, QPoint pos, QVariantMap)
+void GroupListContextMenu::popup(const QModelIndexList & selected, QPoint pos, QVariantMap options)
 {
     if (m_model == nullptr)
         return;
@@ -508,8 +507,8 @@ void GroupListContextMenu::popup(const QModelIndexList & selected, QPoint pos, Q
 
     QVariantList ids;
 
-    for (const QModelIndex & modelIndex : selected)
-        ids.push_back(m_model->data(modelIndex, MLGroupListModel::GROUP_ID));
+    for (const QModelIndex & index : selected)
+        ids.push_back(m_model->data(index, MLGroupListModel::GROUP_ID));
 
     m_menu = new QMenu();
 
@@ -517,15 +516,59 @@ void GroupListContextMenu::popup(const QModelIndexList & selected, QPoint pos, Q
 
     QAction * action = m_menu->addAction(qtr("Add and play"));
 
-    connect(action, &QAction::triggered, [ml, ids]() {
-        ml->addAndPlay(ids);
+    connect(action, &QAction::triggered, [ml, ids, options]()
+    {
+        ml->addAndPlay(ids, options["player-options"].toStringList());
     });
 
     action = m_menu->addAction(qtr("Enqueue"));
 
-    connect(action, &QAction::triggered, [ml, ids]() {
+    connect(action, &QAction::triggered, [ml, ids]()
+    {
         ml->addToPlaylist(ids);
     });
+
+    action = m_menu->addAction(qtr("Add to playlist"));
+
+    connect(action, &QAction::triggered, [ids]()
+    {
+        DialogsProvider::getInstance()->playlistsDialog(ids);
+    });
+
+    action = m_menu->addAction(qtr("Play as audio"));
+
+    connect(action, &QAction::triggered, [ml, ids, options]()
+    {
+        QStringList list = options["player-options"].toStringList();
+
+        list.prepend(":no-video");
+
+        ml->addAndPlay(ids, list);
+    });
+
+    // NOTE: At the moment informations are only available for single video(s).
+    if (selected.count() == 1
+        &&
+        m_model->data(selected.first(), MLGroupListModel::GROUP_IS_VIDEO) == true
+        &&
+        options.contains("information") && options["information"].type() == QVariant::Int)
+    {
+        action = m_menu->addAction(qtr("Information"));
+
+        QSignalMapper * mapper = new QSignalMapper(m_menu);
+
+        mapper->setMapping(action, options["information"].toInt());
+
+        connect(action, &QAction::triggered, mapper, QOverload<>::of(&QSignalMapper::map));
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+        connect(mapper, &QSignalMapper::mappedInt,
+                this, &GroupListContextMenu::showMediaInformation);
+#else
+        connect(mapper, QOverload<int>::of(&QSignalMapper::mapped),
+                this, &GroupListContextMenu::showMediaInformation);
+#endif
+    }
 
     m_menu->popup(pos);
 }
