@@ -544,6 +544,63 @@ static inline video_transform_t transform_Inverse( video_transform_t transform )
             return transform;
     }
 }
+
+/**
+ * Dolby Vision metadata description
+ */
+enum vlc_dovi_reshape_method_t
+{
+    VLC_DOVI_RESHAPE_POLYNOMIAL = 0,
+    VLC_DOVI_RESHAPE_MMR = 1,
+};
+
+enum vlc_dovi_nlq_method_t
+{
+    VLC_DOVI_NLQ_NONE = -1,
+    VLC_DOVI_NLQ_LINEAR_DZ = 0,
+};
+
+#define VLC_ANCILLARY_ID_DOVI VLC_FOURCC('D','o','V','i')
+
+typedef struct vlc_video_dovi_metadata_t
+{
+    /* Common header fields */
+    uint8_t coef_log2_denom;
+    uint8_t bl_bit_depth;
+    uint8_t el_bit_depth;
+    enum vlc_dovi_nlq_method_t nlq_method_idc;
+
+    /* Colorspace metadata */
+    float nonlinear_offset[3];
+    float nonlinear_matrix[9];
+    float linear_matrix[9];
+    uint16_t source_min_pq; /* 12-bit PQ values */
+    uint16_t source_max_pq;
+
+    /**
+     * Do not reorder or modify the following structs, they are intentionally
+     * specified to be identical to AVDOVIReshapingCurve / AVDOVINLQParams.
+     */
+    struct vlc_dovi_reshape_t {
+        uint8_t num_pivots;
+        uint16_t pivots[9];
+        enum vlc_dovi_reshape_method_t mapping_idc[8];
+        uint8_t poly_order[8];
+        int64_t poly_coef[8][3];
+        uint8_t mmr_order[8];
+        int64_t mmr_constant[8];
+        int64_t mmr_coef[8][3][7];
+    } curves[3];
+
+    struct vlc_dovi_nlq_t {
+        uint8_t offset_depth; /* bit depth of offset value */
+        uint16_t offset;
+        uint64_t hdr_in_max;
+        uint64_t dz_slope;
+        uint64_t dz_threshold;
+    } nlq[3];
+} vlc_video_dovi_metadata_t;
+
 /**
  * subtitles format description
  */
