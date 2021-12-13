@@ -1,3 +1,3 @@
-singleton VLCStyle 1.0 VLCStyle.qml
-singleton VLCIcons 1.0 VLCIcons.qml
-singleton AcrylicController 1.0 AcrylicController.qml
+singleton VLCStyle VLCStyle.qml
+singleton VLCIcons VLCIcons.qml
+singleton AcrylicController AcrylicController.qml
