@@ -38,12 +38,8 @@
 struct vlc_medialibrary_t;
 class MLItemId;
 
-class CoverGenerator : public QObject
+class CoverGenerator
 {
-    Q_OBJECT
-
-    Q_ENUMS(Split)
-
 public: // Enums
     enum Split
     {
@@ -55,26 +51,26 @@ public:
     CoverGenerator(vlc_medialibrary_t * ml, const MLItemId & itemId);
 
 public: // Interface
-    Q_INVOKABLE MLItemId getId();
+    MLItemId getId();
 
-    Q_INVOKABLE void setSize(const QSize & size);
+    void setSize(const QSize & size);
 
-    Q_INVOKABLE void setCountX(int x);
-    Q_INVOKABLE void setCountY(int y);
+    void setCountX(int x);
+    void setCountY(int y);
 
     // NOTE: Do we want to divide or duplicate thumbnails to reach the proper count ?
-    Q_INVOKABLE void setSplit(Split split);
+    void setSplit(Split split);
 
     // NOTE: Applies SmoothTransformation to thumbnails. Disabled by default.
-    Q_INVOKABLE void setSmooth(bool enabled);
+    void setSmooth(bool enabled);
 
     // NOTE: You need to specify a radius to enable blur, 8 looks good.
-    Q_INVOKABLE void setBlur(int radius);
+    void setBlur(int radius);
 
-    Q_INVOKABLE void setDefaultThumbnail(const QString & fileName);
+    void setDefaultThumbnail(const QString & fileName);
 
     // NOTE: This lets us enforce a specific prefix for the cover fileName.
-    Q_INVOKABLE void setPrefix(const QString & prefix);
+    void setPrefix(const QString & prefix);
 
     bool cachedFileAvailable() const;
 

@@ -60,49 +60,49 @@ CoverGenerator::CoverGenerator(vlc_medialibrary_t * ml, const MLItemId & itemId)
 // Interface
 //-------------------------------------------------------------------------------------------------
 
-/* Q_INVOKABLE */ MLItemId CoverGenerator::getId()
+MLItemId CoverGenerator::getId()
 {
     return m_id;
 }
 
 //-------------------------------------------------------------------------------------------------
 
-/* Q_INVOKABLE */ void CoverGenerator::setSize(const QSize & size)
+void CoverGenerator::setSize(const QSize & size)
 {
     m_size = size;
 }
 
-/* Q_INVOKABLE */ void CoverGenerator::setCountX(int x)
+void CoverGenerator::setCountX(int x)
 {
     m_countX = x;
 }
 
-/* Q_INVOKABLE */ void CoverGenerator::setCountY(int y)
+void CoverGenerator::setCountY(int y)
 {
     m_countY = y;
 }
 
-/* Q_INVOKABLE */ void CoverGenerator::setSplit(Split split)
+void CoverGenerator::setSplit(Split split)
 {
     m_split = split;
 }
 
-/* Q_INVOKABLE */ void CoverGenerator::setSmooth(bool enabled)
+void CoverGenerator::setSmooth(bool enabled)
 {
     m_smooth = enabled;
 }
 
-/* Q_INVOKABLE */ void CoverGenerator::setBlur(int radius)
+void CoverGenerator::setBlur(int radius)
 {
     m_blur = radius;
 }
 
-/* Q_INVOKABLE */ void CoverGenerator::setDefaultThumbnail(const QString & fileName)
+void CoverGenerator::setDefaultThumbnail(const QString & fileName)
 {
     m_default = fileName;
 }
 
-/* Q_INVOKABLE */ void CoverGenerator::setPrefix(const QString & prefix)
+void CoverGenerator::setPrefix(const QString & prefix)
 {
     m_prefix = prefix;
 }
