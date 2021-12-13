@@ -160,6 +160,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool mediaLibraryAvailable READ hasMediaLibrary CONSTANT FINAL)
     Q_PROPERTY(MediaLib* mediaLibrary READ getMediaLibrary CONSTANT FINAL)
     Q_PROPERTY(bool gridView READ hasGridView WRITE setGridView NOTIFY gridViewChanged FINAL)
+    Q_PROPERTY(Grouping grouping READ grouping WRITE setGrouping NOTIFY groupingChanged FINAL)
     Q_PROPERTY(ColorSchemeModel* colorScheme READ getColorScheme CONSTANT FINAL)
     Q_PROPERTY(bool hasVLM READ hasVLM CONSTANT FINAL)
     Q_PROPERTY(bool clientSideDecoration READ useClientSideDecoration NOTIFY useClientSideDecorationChanged FINAL)
@@ -211,6 +212,16 @@ public:
         RAISE_AUDIO,
         RAISE_AUDIOVIDEO,
     };
+
+    enum Grouping
+    {
+        GROUPING_NONE,
+        GROUPING_NAME,
+        GROUPING_FOLDER
+    };
+
+    Q_ENUM(Grouping)
+
     inline bool isInterfaceFullScreen() const { return m_windowVisibility == QWindow::FullScreen; }
     inline bool isInterfaceVisible() const { return m_windowVisibility != QWindow::Hidden; }
     bool isPlaylistDocked() { return b_playlistDocked; }
@@ -227,6 +238,7 @@ public:
     inline bool hasMediaLibrary() const { return b_hasMedialibrary; }
     inline MediaLib* getMediaLibrary() const { return m_medialib; }
     inline bool hasGridView() const { return m_gridView; }
+    inline Grouping grouping() const { return m_grouping; }
     inline ColorSchemeModel* getColorScheme() const { return m_colorScheme; }
     bool hasVLM() const;
     bool useClientSideDecoration() const;
@@ -304,6 +316,7 @@ protected:
     bool                 b_hasMedialibrary = false;
     MediaLib*            m_medialib = nullptr;
     bool                 m_gridView = false;
+    Grouping             m_grouping = GROUPING_NONE;
     ColorSchemeModel*    m_colorScheme = nullptr;
     bool                 m_windowTitlebar = true;
     bool                 m_hasToolbarMenu = false;
@@ -337,6 +350,7 @@ public slots:
     void setInterfaceAlwaysOnTop( bool );
     void setShowRemainingTime( bool );
     void setGridView( bool );
+    void setGrouping( Grouping );
     void incrementIntfUserScaleFactor( bool increment);
     void setIntfUserScaleFactor( double );
     void setPinVideoControls( bool );
@@ -380,6 +394,7 @@ signals:
     void hasEmbededVideoChanged(bool);
     void showRemainingTimeChanged(bool);
     void gridViewChanged( bool );
+    void groupingChanged( Grouping );
     void colorSchemeChanged( QString );
     void useClientSideDecorationChanged();
     void hasToolbarMenuChanged();

@@ -217,6 +217,8 @@ MainCtx::~MainCtx()
     settings->setValue( "playlist-width-factor", playlistWidthFactor);
 
     settings->setValue( "grid-view", m_gridView );
+    settings->setValue( "grouping", m_grouping );
+
     settings->setValue( "color-scheme", m_colorScheme->currentScheme() );
     /* Save the stackCentralW sizes */
     settings->endGroup();
@@ -321,6 +323,8 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
     loadFromSettings(playlistWidthFactor, "MainWindow/playlist-width-factor", 4.0 , &MainCtx::playlistWidthFactorChanged);
 
     loadFromSettings(m_gridView, "MainWindow/grid-view", true, &MainCtx::gridViewChanged);
+
+    loadFromSettings(m_grouping, "MainWindow/grouping", GROUPING_NONE, &MainCtx::groupingChanged);
 
     loadFromSettings(m_showRemainingTime, "MainWindow/ShowRemainingTime", false, &MainCtx::showRemainingTimeChanged);
 
@@ -479,6 +483,13 @@ void MainCtx::setGridView(bool asGrid)
 {
     m_gridView = asGrid;
     emit gridViewChanged( asGrid );
+}
+
+void MainCtx::setGrouping(Grouping grouping)
+{
+    m_grouping = grouping;
+
+    emit groupingChanged(grouping);
 }
 
 void MainCtx::setInterfaceAlwaysOnTop( bool on_top )
