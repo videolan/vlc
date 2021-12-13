@@ -123,7 +123,7 @@ struct vlc_input_decoder_t
      * aout/vouts.
      *
      * The input thread can read these variables in order to stop outputs, when
-     * both ModuleThread and DecoderThread are stopped (from DecoderDelete()).
+     * both ModuleThread and DecoderThread are stopped (from DeleteDecoder()).
      */
     audio_output_t *p_aout;
 
