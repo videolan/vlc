@@ -47,6 +47,13 @@ FocusScope {
         text: model.text || ""
     }
 
+    readonly property real usedRowSpace: {
+        var s = 0
+        for (var i in sortModel)
+            s += sortModel[i].width + root.horizontalSpacing
+        return s + root._contextButtonHorizontalSpace + (VLCStyle.margin_xxxsmall * 2)
+    }
+
     property Component header: Item{}
     property var headerItem: view.headerItem.loadedHeader
     property color headerColor
@@ -198,7 +205,7 @@ FocusScope {
         function _update() {
             root.availableRowWidth = root.width
                     - ( !!section.property ? VLCStyle.table_section_width * 2 : 0 )
-                    - _contextButtonHorizontalSpace
+                    - (root.horizontalSpacing + _contextButtonHorizontalSpace)
             root._availabeRowWidthLastUpdateTime = Date.now()
         }
 
@@ -242,7 +249,7 @@ FocusScope {
             readonly property alias contentWidth: row.width
             property alias loadedHeader: headerLoader.item
 
-            width: parent.width
+            width: view.width
             height: col.height
             color: headerColor
             visible: view.modelCount > 0
@@ -283,14 +290,12 @@ FocusScope {
                 Row {
                     id: row
 
-                    anchors {
-                        leftMargin: VLCStyle.margin_xxxsmall
-                        rightMargin: VLCStyle.margin_xxxsmall
-                        horizontalCenter: parent.horizontalCenter
-                    }
-                    height: implicitHeight
+                    x: Math.max(0, view.width - root.usedRowSpace) / 2
+                    leftPadding: VLCStyle.margin_xxxsmall
+                    rightPadding: VLCStyle.margin_xxxsmall
                     topPadding: root.headerTopPadding
                     bottomPadding: VLCStyle.margin_xsmall
+
                     spacing: root.horizontalSpacing
 
                     Repeater {
@@ -347,6 +352,9 @@ FocusScope {
         }
 
         delegate: TableViewDelegate {}
+
+        flickableDirection: Flickable.AutoFlickDirection
+        contentWidth: root.usedRowSpace
 
         onSelectAll: selectionDelegateModel.selectAll()
         onSelectionUpdated: selectionDelegateModel.updateSelection( keyModifiers, oldIndex, newIndex )

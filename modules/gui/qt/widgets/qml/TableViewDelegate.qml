@@ -40,10 +40,14 @@ T.Control {
 
     // Settings
 
-    width: view.width
+    width: Math.max(view.width, content.implicitWidth)
 
     height: root.rowHeight
 
+    leftPadding: Math.max(0, view.width - root.usedRowSpace) / 2
+
+    hoverEnabled: true
+    
     ListView.delayRemove: dragActive
 
     // Connections
@@ -70,143 +74,134 @@ T.Control {
         backgroundColor: {
             if (delegate.selected)
                 return VLCStyle.colors.gridSelect;
-            else if (hoverArea.containsMouse)
+            else if (delegate.hovered)
                 return VLCStyle.colors.listHover;
             else
                 return VLCStyle.colors.setColorAlpha(VLCStyle.colors.listHover, 0);
         }
+
+        MouseArea {
+            id: hoverArea
+
+            // Settings
+
+            anchors.fill: parent
+
+            hoverEnabled: false
+
+            Keys.onMenuPressed: root.contextMenuButtonClicked(contextButton,rowModel)
+
+            acceptedButtons: Qt.RightButton | Qt.LeftButton
+
+            drag.target: root.dragItem
+
+            drag.axis: Drag.XAndYAxis
+
+            // Events
+
+            onPressed: _modifiersOnLastPress = mouse.modifiers
+
+            onClicked: {
+                if (mouse.button === Qt.LeftButton
+                    ||
+                    selectionDelegateModel.isSelected(root.model.index(index, 0)) == false) {
+
+                    selectionDelegateModel.updateSelection(mouse.modifiers, view.currentIndex, index);
+
+                    view.currentIndex = index;
+
+                    delegate.forceActiveFocus();
+                }
+
+                if (mouse.button === Qt.RightButton)
+                    root.rightClick(delegate, rowModel, hoverArea.mapToGlobal(mouse.x, mouse.y));
+            }
+
+            onPositionChanged: {
+                if (drag.active == false)
+                    return;
+
+                var pos = drag.target.parent.mapFromItem(hoverArea, mouseX, mouseY);
+
+                drag.target.x = pos.x + VLCStyle.dragDelta;
+                drag.target.y = pos.y + VLCStyle.dragDelta;
+            }
+
+            onDoubleClicked: {
+                if (mouse.button === Qt.LeftButton)
+                    root.itemDoubleClicked(delegate._index, rowModel)
+            }
+
+            drag.onActiveChanged: {
+                // NOTE: Perform the "click" action because the click action is only executed on mouse
+                //       release (we are in the pressed state) but we will need the updated list on drop.
+                if (drag.active
+                    &&
+                    selectionDelegateModel.isSelected(root.model.index(index, 0)) == false) {
+
+                    selectionDelegateModel.updateSelection(_modifiersOnLastPress, view.currentIndex,
+                                                           index);
+                } else if (root.dragItem) {
+                    root.dragItem.Drag.drop();
+                }
+
+                root.dragItem.Drag.active = drag.active;
+            }
+        }
     }
 
-    contentItem: MouseArea {
-        id: hoverArea
+    contentItem: Row {
+        id: content
 
-        // Settings
+        leftPadding: VLCStyle.margin_xxxsmall
+        rightPadding: VLCStyle.margin_xxxsmall
 
-        anchors.fill: parent
+        spacing: root.horizontalSpacing
 
-        hoverEnabled: true
+        Repeater {
+            model: sortModel
 
-        Keys.onMenuPressed: root.contextMenuButtonClicked(contextButton,rowModel)
+            Loader{
+                property var rowModel: delegate.rowModel
 
-        acceptedButtons: Qt.RightButton | Qt.LeftButton
+                property var colModel: modelData
 
-        drag.target: root.dragItem
+                readonly property int index: delegate._index
 
-        drag.axis: Drag.XAndYAxis
+                readonly property bool currentlyFocused: delegate.activeFocus
 
-        // Events
+                readonly property bool containsMouse: hoverArea.containsMouse
 
-        onPressed: _modifiersOnLastPress = mouse.modifiers
+                readonly property color foregroundColor: background.foregroundColor
 
-        onClicked: {
-            if (mouse.button === Qt.LeftButton
-                ||
-                selectionDelegateModel.isSelected(root.model.index(index, 0)) == false) {
-
-                selectionDelegateModel.updateSelection(mouse.modifiers, view.currentIndex, index);
-
-                view.currentIndex = index;
-
-                delegate.forceActiveFocus();
-            }
-
-            if (mouse.button === Qt.RightButton)
-                root.rightClick(delegate, rowModel, hoverArea.mapToGlobal(mouse.x, mouse.y));
-        }
-
-        onPositionChanged: {
-            if (drag.active == false)
-                return;
-
-            var pos = drag.target.parent.mapFromItem(hoverArea, mouseX, mouseY);
-
-            drag.target.x = pos.x + VLCStyle.dragDelta;
-            drag.target.y = pos.y + VLCStyle.dragDelta;
-        }
-
-        onDoubleClicked: {
-            if (mouse.button === Qt.LeftButton)
-                root.itemDoubleClicked(delegate._index, rowModel)
-        }
-
-        drag.onActiveChanged: {
-            // NOTE: Perform the "click" action because the click action is only executed on mouse
-            //       release (we are in the pressed state) but we will need the updated list on drop.
-            if (drag.active
-                &&
-                selectionDelegateModel.isSelected(root.model.index(index, 0)) == false) {
-
-                selectionDelegateModel.updateSelection(_modifiersOnLastPress, view.currentIndex,
-                                                       index);
-            } else if (root.dragItem) {
-                root.dragItem.Drag.drop();
-            }
-
-            root.dragItem.Drag.active = drag.active;
-        }
-
-        // Childs
-
-        Row {
-            id: content
-
-            anchors.top   : parent.top
-            anchors.bottom: parent.bottom
-
-            anchors.leftMargin  : VLCStyle.margin_xxxsmall
-            anchors.rightMargin : VLCStyle.margin_xxxsmall
-            anchors.topMargin   : VLCStyle.margin_xxsmall
-            anchors.bottomMargin: VLCStyle.margin_xxsmall
-
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            spacing: root.horizontalSpacing
-
-            Repeater {
-                model: sortModel
-
-                Loader{
-                    property var rowModel: delegate.rowModel
-
-                    property var colModel: modelData
-
-                    readonly property int index: delegate._index
-
-                    readonly property bool currentlyFocused: delegate.activeFocus
-
-                    readonly property bool containsMouse: hoverArea.containsMouse
-
-                    readonly property color foregroundColor: background.foregroundColor
-
-                    width: (modelData.width) ? modelData.width : 0
-
-                    height: parent.height
-
-                    sourceComponent: (colModel.colDelegate) ? colModel.colDelegate
-                                                            : root.colDelegate
-                }
-            }
-
-            Item {
-                width: root._contextButtonHorizontalSpace
+                width: (modelData.width) ? modelData.width : 0
 
                 height: parent.height
 
-                ContextButton {
-                    id: contextButton
+                sourceComponent: (colModel.colDelegate) ? colModel.colDelegate
+                                                        : root.colDelegate
+            }
+        }
 
-                    anchors.verticalCenter: parent.verticalCenter
+        Item {
+            width: root._contextButtonHorizontalSpace
 
-                    color: background.foregroundColor
+            height: parent.height
 
-                    backgroundColor: (hovered || activeFocus)
-                                     ? VLCStyle.colors.getBgColor(delegate.selected, hovered, activeFocus)
-                                     : "transparent"
+            ContextButton {
+                id: contextButton
 
-                    visible: hoverArea.containsMouse
+                anchors.verticalCenter: parent.verticalCenter
 
-                    onClicked: root.contextMenuButtonClicked(this, delegate.rowModel)
-                }
+                color: background.foregroundColor
+
+                backgroundColor: (hovered || activeFocus)
+                                 ? VLCStyle.colors.getBgColor(delegate.selected, hovered, activeFocus)
+                                 : "transparent"
+
+                visible: delegate.hovered
+
+                onClicked: root.contextMenuButtonClicked(this, delegate.rowModel)
             }
         }
     }
