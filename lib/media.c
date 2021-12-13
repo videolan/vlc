@@ -866,10 +866,13 @@ libvlc_media_get_stat( libvlc_media_t *p_md, unsigned type, uint64_t *out )
 
     char *end;
     unsigned long long val = strtoull( str, &end, 10 );
-    free( str );
 
     if( *end != '\0' )
+    {
+        free( str );
         return -1;
+    }
+    free( str );
 
     *out = val;
     return 1;
