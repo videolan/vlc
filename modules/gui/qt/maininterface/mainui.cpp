@@ -63,6 +63,61 @@ using  namespace vlc::playlist;
 namespace {
 
 template<class T>
+class SingletonRegisterHelper
+{
+    static QObject* m_instance;
+    static QQmlEngine::ObjectOwnership m_ownership;
+
+    static void connect()
+    {
+        QObject::connect(m_instance, &QObject::destroyed, []() {
+            m_instance = nullptr;
+        });
+    }
+
+public:
+    static QObject* callback(QQmlEngine *engine, QJSEngine *)
+    {
+        assert(m_instance);
+        engine->setObjectOwnership(m_instance, m_ownership);
+        return m_instance;
+    }
+
+    template<typename... Args>
+    static auto getCallback(Args&&... args)
+    {
+        if (!m_instance)
+        {
+            m_ownership = QQmlEngine::ObjectOwnership::JavaScriptOwnership;
+            m_instance = new T(args...);
+            assert(!m_instance->parent());
+            connect();
+        }
+        else
+            assert(sizeof...(args) == 0);
+
+        return callback;
+    }
+
+    static void setInstance(T& instance)
+    {
+        assert(!m_instance);
+        m_ownership = QQmlEngine::ObjectOwnership::CppOwnership;
+        m_instance = &instance;
+        connect();
+    }
+
+    static auto getInstance()
+    {
+        return m_instance;
+    }
+};
+template<class T>
+QQmlEngine::ObjectOwnership SingletonRegisterHelper<T>::m_ownership = QQmlEngine::ObjectOwnership::JavaScriptOwnership;
+template<class T>
+QObject* SingletonRegisterHelper<T>::m_instance = nullptr;
+
+template<class T>
 void registerAnonymousType( const char *uri, int versionMajor )
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
