@@ -42,6 +42,7 @@ FocusScope {
 
     signal itemClicked(int index)
 
+    property alias sortMenu: sortControl.menu
     property alias sortModel: sortControl.model
     property var contentModel
     property alias isViewMultiView: list_grid_btn.visible
@@ -262,30 +263,32 @@ FocusScope {
                             Widgets.SortControl {
                                 id: sortControl
 
-                                textRole: "text"
-                                criteriaRole: "criteria"
-
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
+
                                 iconSize: VLCStyle.banner_icon_size
 
                                 visible: root.sortModel !== undefined && root.sortModel.length > 1
+
                                 enabled: visible
 
+                                textRole: "text"
+                                criteriaRole: "criteria"
+
+                                sortKey: contentModel ? contentModel.sortCriteria
+                                                      : PlaylistControllerModel.SORT_KEY_NONE
+
+                                sortOrder: contentModel ? contentModel.sortOrder : undefined
+
                                 onSortSelected: {
-                                    if (contentModel !== undefined) {
+                                    if (contentModel !== undefined)
                                         contentModel.sortCriteria = type
-                                    }
                                 }
 
                                 onSortOrderSelected: {
-                                    if (contentModel !== undefined) {
+                                    if (contentModel !== undefined)
                                         contentModel.sortOrder = type
-                                    }
                                 }
-
-                                sortKey: contentModel ? contentModel.sortCriteria : PlaylistControllerModel.SORT_KEY_NONE
-                                sortOrder: contentModel ? contentModel.sortOrder : undefined
                             }
                         }
 
