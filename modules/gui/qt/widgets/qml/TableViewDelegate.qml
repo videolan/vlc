@@ -36,11 +36,15 @@ T.Control {
 
     property int _modifiersOnLastPress: Qt.NoModifier
 
+    readonly property bool dragActive: hoverArea.drag.active
+
     // Settings
 
     width: view.width
 
     height: root.rowHeight
+
+    ListView.delayRemove: dragActive
 
     // Connections
 
@@ -139,8 +143,6 @@ T.Control {
             }
 
             root.dragItem.Drag.active = drag.active;
-
-            root.ListView.delayRemove = drag.active;
         }
 
         // Childs
