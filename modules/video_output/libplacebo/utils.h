@@ -38,6 +38,12 @@ struct pl_color_space vlc_placebo_ColorSpace(const video_format_t *);
 struct pl_color_repr vlc_placebo_ColorRepr(const video_format_t *);
 enum pl_chroma_location vlc_placebo_ChromaLoc(const video_format_t *);
 
+#if PL_API_VER >= 185
+// Map dolby vision metadata, using `data` as storage.
+void vlc_placebo_DoviMetadata(struct pl_frame *out, const picture_t *pic,
+                              struct pl_dovi_metadata *data);
+#endif
+
 int vlc_placebo_PlaneComponents(const video_format_t *, struct pl_plane[4]);
 
 // Fill a pl_plane_data array with various data. Returns the number of planes,

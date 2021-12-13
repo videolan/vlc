@@ -84,6 +84,10 @@ typedef struct vout_display_sys_t
 
     const struct pl_hook *hook;
     char *hook_path;
+
+#if PL_API_VER >= 185
+    struct pl_dovi_metadata dovi_metadata;
+#endif
 } vout_display_sys_t;
 
 // Display callbacks
@@ -238,6 +242,10 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
             .y1 = pic->format.i_y_offset + pic->format.i_visible_height,
         },
     };
+
+#if PL_API_VER >= 185
+    vlc_placebo_DoviMetadata(&img, pic, &sys->dovi_metadata);
+#endif
 
     // Upload the image data for each plane
     struct pl_plane_data data[4];

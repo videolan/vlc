@@ -27,6 +27,7 @@
 #include <stdlib.h>
 
 #include <vlc_common.h>
+#include <vlc_ancillary.h>
 #include "utils.h"
 
 static void Log(void *priv, enum pl_log_level level, const char *msg)
@@ -450,6 +451,71 @@ struct pl_color_repr vlc_placebo_ColorRepr(const video_format_t *fmt)
         },
     };
 }
+
+#if PL_API_VER >= 187
+void vlc_placebo_DoviMetadata(struct pl_frame *frame, const picture_t *pic,
+                              struct pl_dovi_metadata *dst)
+{
+    struct vlc_ancillary *ancillary = picture_GetAncillary(pic, VLC_ANCILLARY_ID_DOVI);
+    if (!ancillary)
+        return;
+
+    const vlc_video_dovi_metadata_t *src = vlc_ancillary_GetData(ancillary);
+    static_assert(sizeof(dst->nonlinear_offset) == sizeof(src->nonlinear_offset), "array mismatch");
+    static_assert(sizeof(dst->nonlinear) == sizeof(src->nonlinear_matrix), "matrix mismatch");
+    static_assert(sizeof(dst->linear) == sizeof(src->linear_matrix), "matrix mismatch");
+    memcpy(dst->nonlinear_offset, src->nonlinear_offset,
+           sizeof(dst->nonlinear_offset));
+    memcpy(dst->nonlinear.m[0], src->nonlinear_matrix, sizeof(dst->nonlinear.m));
+    memcpy(dst->linear.m[0], src->linear_matrix, sizeof(dst->linear.m));
+
+    for (int c = 0; c < ARRAY_SIZE(dst->comp); c++) {
+        const struct vlc_dovi_reshape_t *csrc = &src->curves[c];
+        struct pl_reshape_data *cdst = &dst->comp[c];
+        cdst->num_pivots = csrc->num_pivots;
+        assert(csrc->num_pivots <= ARRAY_SIZE(csrc->pivots));
+        for (int i = 0; i < csrc->num_pivots; i++) {
+            const float scale = 1.0f / ((1 << src->bl_bit_depth) - 1);
+            cdst->pivots[i] = scale * csrc->pivots[i];
+        }
+        for (int i = 0; i < csrc->num_pivots - 1; i++) {
+            const float scale = 1.0f / (1 << src->coef_log2_denom);
+            cdst->method[i] = csrc->mapping_idc[i];
+            switch (csrc->mapping_idc[i]) {
+            case VLC_DOVI_RESHAPE_POLYNOMIAL:
+                for (int k = 0; k < ARRAY_SIZE(cdst->poly_coeffs[i]); k++) {
+                    cdst->poly_coeffs[i][k] = (k <= csrc->poly_order[i])
+                        ? scale * csrc->poly_coef[i][k]
+                        : 0.0f;
+                }
+                break;
+            case VLC_DOVI_RESHAPE_MMR:
+                cdst->mmr_order[i] = csrc->mmr_order[i];
+                cdst->mmr_constant[i] = scale * csrc->mmr_constant[i];
+                for (int j = 0; j < csrc->mmr_order[i]; j++) {
+                    for (int k = 0; k < ARRAY_SIZE(cdst->mmr_coeffs[i][j]); k++)
+                        cdst->mmr_coeffs[i][j][k] = scale * csrc->mmr_coef[i][j][k];
+                }
+                break;
+            }
+        }
+    }
+
+    // The output of the Dolby Vision reshaping process is always BT.2020/PQ,
+    // no matter the color space of the base layer, so override these fields
+    frame->color.primaries = PL_COLOR_PRIM_BT_2020;
+    frame->color.transfer = PL_COLOR_TRC_PQ;
+    frame->repr.sys = PL_COLOR_SYSTEM_DOLBYVISION;
+    frame->repr.dovi = dst;
+
+    // These fields are specified to always have 12-bit precision
+    const float scale = 1.0f / ((1 << 12) - 1);
+    frame->color.hdr.min_luma = pl_hdr_rescale(PL_HDR_PQ, PL_HDR_NITS,
+                                               scale * src->source_min_pq);
+    frame->color.hdr.max_luma = pl_hdr_rescale(PL_HDR_PQ, PL_HDR_NITS,
+                                               scale * src->source_max_pq);
+}
+#endif
 
 enum pl_chroma_location vlc_placebo_ChromaLoc(const video_format_t *fmt)
 {
