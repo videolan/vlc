@@ -315,6 +315,7 @@ protobuf-$(PROTOBUF_VERSION).tar.gz:
 
 protobuf: protobuf-$(PROTOBUF_VERSION).tar.gz
 	$(UNPACK)
+	$(APPLY) $(TOOLS)/protobuf-fix-build.patch
 	$(MOVE)
 
 .buildprotoc: protobuf
