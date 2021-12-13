@@ -57,7 +57,6 @@ protected:
 
 private:
     void onVlcMlEvent(const MLEvent &event) override;
-    void thumbnailUpdated(int idx) override;
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
 

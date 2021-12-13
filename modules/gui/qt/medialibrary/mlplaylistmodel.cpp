@@ -429,10 +429,6 @@ void MLPlaylistModel::onVlcMlEvent(const MLEvent & event) /* override */
     MLBaseModel::onVlcMlEvent(event);
 }
 
-void MLPlaylistModel::thumbnailUpdated(int idx) /* override */
-{
-    emit dataChanged(index(idx), index(idx), { MEDIA_THUMBNAIL });
-}
 
 //-------------------------------------------------------------------------------------------------
 // Private functions

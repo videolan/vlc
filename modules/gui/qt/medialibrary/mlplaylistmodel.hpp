@@ -72,7 +72,6 @@ protected: // MLBaseModel implementation
 protected: // MLBaseModel reimplementation
     void onVlcMlEvent(const MLEvent & event) override;
 
-    void thumbnailUpdated(int idx) override;
 
 private: // Functions
     struct HighLowRanges {

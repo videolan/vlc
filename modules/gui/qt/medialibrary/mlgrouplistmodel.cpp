@@ -277,12 +277,6 @@ void MLGroupListModel::onVlcMlEvent(const MLEvent & event) /* override */
     MLBaseModel::onVlcMlEvent(event);
 }
 
-void MLGroupListModel::thumbnailUpdated(int idx) /* override */
-{
-    QModelIndex index = this->index(idx);
-
-    emit dataChanged(index, index, { GROUP_THUMBNAIL });
-}
 
 //=================================================================================================
 // Loader

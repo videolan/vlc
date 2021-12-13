@@ -78,8 +78,6 @@ private: // Functions
 private: // MLBaseModel implementation
     void onVlcMlEvent(const MLEvent & event) override;
 
-    void thumbnailUpdated(int idx) override;
-
 private:
     struct Loader : public MLBaseModel::BaseLoader
     {

@@ -123,7 +123,7 @@ protected:
 
     virtual ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const = 0;
 
-    virtual void thumbnailUpdated( int ) {}
+    virtual void thumbnailUpdated(const QModelIndex& , MLItem* , const QString& , vlc_ml_thumbnail_status_t )  {}
 
     /* Data loader for the cache */
     struct BaseLoader : public ListCacheLoader<std::unique_ptr<MLItem>>

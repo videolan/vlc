@@ -73,7 +73,6 @@ protected: // MLBaseModel reimplementation
 private:
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
-    virtual void thumbnailUpdated( int ) override;
 
     static QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
     QByteArray criteriaToName(vlc_ml_sorting_criteria_t criteria) const override;

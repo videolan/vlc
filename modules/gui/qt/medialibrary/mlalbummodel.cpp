@@ -83,11 +83,6 @@ void MLAlbumModel::onVlcMlEvent(const MLEvent &event)
     MLBaseModel::onVlcMlEvent( event );
 }
 
-void MLAlbumModel::thumbnailUpdated(int idx)
-{
-    emit dataChanged(index(idx), index(idx), {ALBUM_COVER});
-}
-
 vlc_ml_sorting_criteria_t MLAlbumModel::roleToCriteria(int role) const
 {
     switch (role)

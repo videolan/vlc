@@ -218,13 +218,22 @@ void MLBaseModel::onVlcMlEvent(const MLEvent &event)
                 if (stotal == COUNT_UNINITIALIZED)
                     break;
 
-                int index = 0;
+                int row = 0;
 
                 /* Only consider items available locally in cache */
-                MLItemId itemId{ event.media_thumbnail_generated.i_media_id, VLC_ML_PARENT_UNKNOWN  };
-                const auto item = findInCache(itemId, &index);
+                MLItemId itemId{event.media_thumbnail_generated.i_media_id, VLC_ML_PARENT_UNKNOWN};
+                MLItem* item = findInCache(itemId, &row);
                 if (item)
-                    thumbnailUpdated(index);
+                {
+                    vlc_ml_thumbnail_status_t status = VLC_ML_THUMBNAIL_STATUS_FAILURE;
+                    QString mrl;
+                    if (event.media_thumbnail_generated.b_success)
+                    {
+                        QString thumbnail = qfu(event.media_thumbnail_generated.psz_mrl);
+                        status = event.media_thumbnail_generated.i_status;
+                    }
+                    thumbnailUpdated(index(row), item, mrl, status);
+                }
             }
             break;
         }

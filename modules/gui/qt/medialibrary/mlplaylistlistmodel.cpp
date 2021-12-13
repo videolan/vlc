@@ -374,13 +374,6 @@ void MLPlaylistListModel::onVlcMlEvent(const MLEvent & event) /* override */
     MLBaseModel::onVlcMlEvent(event);
 }
 
-void MLPlaylistListModel::thumbnailUpdated(int idx) /* override */
-{
-    QModelIndex index = this->index(idx);
-
-    emit dataChanged(index, index, { PLAYLIST_THUMBNAIL });
-}
-
 //-------------------------------------------------------------------------------------------------
 // Properties
 //-------------------------------------------------------------------------------------------------

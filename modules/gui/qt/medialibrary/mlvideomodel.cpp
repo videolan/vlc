@@ -133,11 +133,6 @@ QByteArray MLVideoModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) cons
     return M_names_to_criteria.key(criteria, "");
 }
 
-void MLVideoModel::thumbnailUpdated(int idx)
-{
-    emit dataChanged(index(idx), index(idx), {VIDEO_THUMBNAIL});
-}
-
 // Protected MLBaseModel reimplementation
 
 void MLVideoModel::onVlcMlEvent(const MLEvent &event)

@@ -102,11 +102,6 @@ void MLArtistModel::onVlcMlEvent(const MLEvent &event)
     MLBaseModel::onVlcMlEvent(event);
 }
 
-void MLArtistModel::thumbnailUpdated(int idx)
-{
-    emit dataChanged(index(idx), index(idx), {ARTIST_COVER});
-}
-
 ListCacheLoader<std::unique_ptr<MLItem>> *
 MLArtistModel::createLoader() const
 {
