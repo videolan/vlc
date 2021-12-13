@@ -59,29 +59,48 @@ FocusScope {
     function loadView() {
         var found = stackView.loadView(root.pageModel, root.view.name, root.view.properties)
 
-        stackView.currentItem.Navigation.parentItem = medialibId
-        stackView.currentItem.Navigation.upItem = sourcesBanner
-        stackView.currentItem.Navigation.rightItem = playlistColumn
-        stackView.currentItem.Navigation.downItem = Qt.binding(function() {
+        var item = stackView.currentItem
+
+        item.Navigation.parentItem = medialibId
+        item.Navigation.upItem = sourcesBanner
+        item.Navigation.rightItem = playlistColumn
+
+        item.Navigation.downItem = Qt.binding(function() {
             return miniPlayer.visible ? miniPlayer : medialibId
         })
 
-        sourcesBanner.localMenuDelegate = Qt.binding(function () { return !!stackView.currentItem.localMenuDelegate ? stackView.currentItem.localMenuDelegate : null })
-        sourcesBanner.sortModel = Qt.binding(function () { return stackView.currentItem.sortModel  })
-        sourcesBanner.contentModel = Qt.binding(function () { return stackView.currentItem.contentModel })
-        sourcesBanner.extraLocalActions = Qt.binding(function () { return stackView.currentItem.extraLocalActions })
-        sourcesBanner.isViewMultiView = Qt.binding(function () {
-            return stackView.currentItem.isViewMultiView === undefined || stackView.currentItem.isViewMultiView
+        sourcesBanner.localMenuDelegate = Qt.binding(function () {
+            return !!item.localMenuDelegate ? item.localMenuDelegate : null
         })
+
+        // NOTE: sortMenu is declared with the SortMenu type, so when it's undefined we have to
+        //       return null to avoid a QML warning.
+        sourcesBanner.sortMenu = Qt.binding(function () {
+            if (item.sortMenu)
+                return item.sortMenu
+            else
+                return null
+        })
+
+        sourcesBanner.sortModel = Qt.binding(function () { return item.sortModel })
+        sourcesBanner.contentModel = Qt.binding(function () { return item.contentModel })
+
+        sourcesBanner.extraLocalActions = Qt.binding(function () { return item.extraLocalActions })
+
+        sourcesBanner.isViewMultiView = Qt.binding(function () {
+            return item.isViewMultiView === undefined || item.isViewMultiView
+        })
+
         // Restore sourcesBanner state
         sourcesBanner.selectedIndex = pageModel.filter(function (e) {
-            return e.listed;
+            return e.listed
         }).findIndex(function (e) {
             return e.name === root.view
         })
-        if (stackView.currentItem.pageModel !== undefined)
-            sourcesBanner.subSelectedIndex = stackView.currentItem.pageModel.findIndex(function (e) {
-                return e.name === stackView.currentItem.view
+
+        if (item.pageModel !== undefined)
+            sourcesBanner.subSelectedIndex = item.pageModel.findIndex(function (e) {
+                return e.name === item.view
             })
 
         if (Player.hasVideoOutput && MainCtx.hasEmbededVideo)
