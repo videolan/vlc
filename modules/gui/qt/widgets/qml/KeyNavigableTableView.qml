@@ -54,7 +54,7 @@ FocusScope {
 
     property var selectionDelegateModel
     property real rowHeight: VLCStyle.tableRow_height
-    readonly property int _contextButtonHorizontalSpace: VLCStyle.icon_normal + VLCStyle.margin_xxsmall * 2
+    readonly property int _contextButtonHorizontalSpace: VLCStyle.icon_normal
     property int horizontalSpacing: VLCStyle.column_margin_width
 
     property real availableRowWidth: 0
@@ -287,7 +287,6 @@ FocusScope {
                         leftMargin: VLCStyle.margin_xxxsmall
                         rightMargin: VLCStyle.margin_xxxsmall
                         horizontalCenter: parent.horizontalCenter
-                        horizontalCenterOffset: - root._contextButtonHorizontalSpace / 2
                     }
                     height: implicitHeight
                     topPadding: root.headerTopPadding
@@ -325,6 +324,14 @@ FocusScope {
                                     root.model.sortOrder = (root.model.sortOrder === Qt.AscendingOrder) ? Qt.DescendingOrder : Qt.AscendingOrder
                             }
                         }
+                    }
+
+                    Item {
+                        // placeholder for context button
+
+                        width: root._contextButtonHorizontalSpace
+
+                        height: 1
                     }
                 }
             }

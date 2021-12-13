@@ -160,8 +160,6 @@ T.Control {
 
             anchors.horizontalCenter: parent.horizontalCenter
 
-            anchors.horizontalCenterOffset: Math.round(-(root._contextButtonHorizontalSpace) / 2)
-
             spacing: root.horizontalSpacing
 
             Repeater {
@@ -188,24 +186,28 @@ T.Control {
                                                             : root.colDelegate
                 }
             }
-        }
 
-        ContextButton {
-            anchors.left: content.right
+            Item {
+                width: root._contextButtonHorizontalSpace
 
-            anchors.leftMargin: VLCStyle.margin_xxsmall
+                height: parent.height
 
-            anchors.verticalCenter: content.verticalCenter
+                ContextButton {
+                    id: contextButton
 
-            color: background.foregroundColor
+                    anchors.verticalCenter: parent.verticalCenter
 
-            backgroundColor: (hovered || activeFocus)
-                             ? VLCStyle.colors.getBgColor(delegate.selected, hovered, activeFocus)
-                             : "transparent"
+                    color: background.foregroundColor
 
-            visible: hoverArea.containsMouse
+                    backgroundColor: (hovered || activeFocus)
+                                     ? VLCStyle.colors.getBgColor(delegate.selected, hovered, activeFocus)
+                                     : "transparent"
 
-            onClicked: root.contextMenuButtonClicked(this, delegate.rowModel)
+                    visible: hoverArea.containsMouse
+
+                    onClicked: root.contextMenuButtonClicked(this, delegate.rowModel)
+                }
+            }
         }
     }
 }
