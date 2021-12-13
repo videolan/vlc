@@ -15,9 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 import QtQuick 2.11
-import QtQuick.Controls 2.4
-import QtQuick.Layouts 1.11
 
 import org.videolan.vlc 0.1
 
@@ -27,6 +26,47 @@ import "qrc:///widgets/" as Widgets
 FocusScope {
     id: root
 
+    // Properties
+
+    property var model: []
+
+    property string textRole
+    property string criteriaRole
+
+    property bool popupAbove: false
+
+    property real listWidth: VLCStyle.widthSortBox
+
+    property VLCColors colors: VLCStyle.colors
+
+    // NOTE: This allows us provide a custom menu and override sortMenu.
+    property SortMenu menu
+
+    // properties that should be handled by parent
+    // if they are not updated, tick mark and order mark will not be shown
+    property var sortKey: undefined
+    property var sortOrder: undefined
+
+    // Private
+
+    property SortMenu _menu: (menu) ? menu
+                                    : sortMenu
+
+    // Aliases
+
+    property alias focusPolicy: button.focusPolicy
+    property alias iconSize: button.size
+
+    // Signals
+
+    // sortSelected is triggered with new sorting key when a different sorting key is selected
+    // sortOrderSelected is triggered with Qt.AscendingOrder when different sorting key is selected
+    // sortOrderSelected is triggered with Qt.AscendingOrder or Qt.DescendingOrder when the same sorting key is selected
+    signal sortSelected(int type)
+    signal sortOrderSelected(int type)
+
+    // Settings
+
     // when height/width is explicitly set (force size), implicit values will not be used.
     // when height/width is not explicitly set, IconToolButton will set its ...
     // height and width to these implicit counterparts because ...
@@ -35,41 +75,55 @@ FocusScope {
     implicitWidth: button.implicitWidth
     implicitHeight: button.implicitHeight
 
-    property var model: []
-    property string textRole
-    property string criteriaRole
-    // provided for convenience:
-    property alias titleRole: root.textRole
-    property alias keyRole: root.criteriaRole
+    // Events
 
-    property bool popupAbove: false
+    onVisibleChanged: if (!visible) _menu.close()
+    onEnabledChanged: if (!enabled) _menu.close()
 
-    property real listWidth: VLCStyle.widthSortBox
-    property alias focusPolicy: button.focusPolicy
-    property alias iconSize: button.size
+    // Connections
 
-    property VLCColors colors: VLCStyle.colors
+    Connections {
+        target: (_menu) ? _menu : null
 
-    // properties that should be handled by parent
-    // if they are not updated, tick mark and order mark will not be shown
-    property var sortKey: undefined
-    property var sortOrder: undefined
+        onSelected: {
+            var selectedSortKey = root.model[index][root.criteriaRole]
 
-    // sortSelected is triggered with new sorting key when a different sorting key is selected
-    // sortOrderSelected is triggered with Qt.AscendingOrder when different sorting key is selected
-    // sortOrderSelected is triggered with Qt.AscendingOrder or Qt.DescendingOrder when the same sorting key is selected
-    signal sortSelected(int type)
-    signal sortOrderSelected(int type)
-
-    onVisibleChanged: {
-        if (!visible)
-            popup.close()
+            if (root.sortKey !== selectedSortKey) {
+                root.sortSelected(selectedSortKey)
+                root.sortOrderSelected(Qt.AscendingOrder)
+            } else {
+                root.sortOrderSelected(root.sortOrder === Qt.AscendingOrder ? Qt.DescendingOrder
+                                                                            : Qt.AscendingOrder)
+            }
+        }
     }
 
-    onEnabledChanged: {
-        if (!enabled)
-            popup.close()
+    // Functions
+
+    function show() {
+        var model = root.model.map(function(modelData) {
+            var checked = modelData[root.criteriaRole] === sortKey
+            var order = checked ? root.sortOrder : undefined
+            return {
+                "text": modelData[root.textRole],
+                "checked": checked,
+                "order": order
+            }
+        })
+
+        var point
+
+        if (root.popupAbove)
+            point = root.mapToGlobal(0, - VLCStyle.margin_xxsmall)
+        else
+            point = root.mapToGlobal(0, root.height + VLCStyle.margin_xxsmall)
+
+        root._menu.popup(point, root.popupAbove, model)
     }
+
+    // Children
+
+    SortMenu { id: sortMenu }
 
     Widgets.IconToolButton {
         id: button
@@ -80,50 +134,18 @@ FocusScope {
         width: root.width
 
         size: VLCStyle.icon_normal
-        iconText: VLCIcons.topbar_sort
-        text: I18n.qtr("Sort")
 
         focus: true
 
-        onClicked: popup.show()
+        text: I18n.qtr("Sort")
+
+        iconText: VLCIcons.topbar_sort
 
         Navigation.parentItem: root
+
         Keys.priority: Keys.AfterItem
         Keys.onPressed: Navigation.defaultKeyAction(event)
-    }
 
-    SortMenu {
-       id: popup
-
-        function show() {
-            var model = root.model.map(function(modelData) {
-                var checked = modelData[root.criteriaRole] === sortKey
-                var order = checked ? root.sortOrder : undefined
-                return {
-                    "text": modelData[root.textRole],
-                    "checked": checked,
-                    "order": order
-                }
-            })
-
-            var point
-
-            if (root.popupAbove)
-                point = root.mapToGlobal(0, - VLCStyle.margin_xxsmall)
-            else
-                point = root.mapToGlobal(0, root.height + VLCStyle.margin_xxsmall)
-
-            popup.popup(point, root.popupAbove, model)
-        }
-
-        onSelected: {
-            var selectedSortKey = root.model[index][root.criteriaRole]
-            if (root.sortKey !== selectedSortKey) {
-                root.sortSelected(selectedSortKey)
-                root.sortOrderSelected(Qt.AscendingOrder)
-            } else {
-                root.sortOrderSelected(root.sortOrder === Qt.AscendingOrder ? Qt.DescendingOrder : Qt.AscendingOrder)
-            }
-        }
+        onClicked: root.show()
     }
 }
