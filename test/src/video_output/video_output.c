@@ -73,18 +73,9 @@ static int DecoderDecode(decoder_t *dec, block_t *block)
     if (block == NULL)
         return VLC_SUCCESS;
 
-    const picture_resource_t resource = {
-        .p_sys = NULL,
-    };
-    picture_t *pic = picture_NewFromResource(&dec->fmt_out.video, &resource);
-    assert(pic);
-    pic->date = block->i_pts;
-    pic->b_progressive = true;
-    block_Release(block);
-
     struct vout_scenario *scenario = &vout_scenarios[current_scenario];
     assert(scenario->decoder_decode != NULL);
-    scenario->decoder_decode(dec, pic);
+    scenario->decoder_decode(dec, block);
 
     return VLC_SUCCESS;
 }

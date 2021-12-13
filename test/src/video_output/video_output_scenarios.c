@@ -41,6 +41,7 @@ static struct scenario_data
     unsigned display_picture_count;
     bool converter_opened;
     bool display_opened;
+    bool test_finished;
 
     vlc_fourcc_t display_chroma;
 } scenario_data;
@@ -62,8 +63,11 @@ static void decoder_fixed_size(decoder_t *dec, vlc_fourcc_t chroma,
 static void decoder_rgba_800_600(decoder_t *dec)
     { decoder_fixed_size(dec, VLC_CODEC_RGBA, 800, 600); }
 
-static void decoder_decode_change_chroma(decoder_t *dec, picture_t *pic)
+static void decoder_decode_change_chroma(decoder_t *dec, block_t *block)
 {
+    if (scenario_data.test_finished)
+        goto end;
+
     static const vlc_fourcc_t chroma_list[] = {
         VLC_CODEC_RGBA,
         VLC_CODEC_I420,
@@ -88,16 +92,26 @@ static void decoder_decode_change_chroma(decoder_t *dec, picture_t *pic)
         = chroma_list[index];
 
     int ret = decoder_UpdateVideoOutput(dec, NULL);
-    //assert(ret == VLC_SUCCESS);
     if (ret != VLC_SUCCESS)
     {
+        scenario_data.test_finished = true;
         vlc_sem_post(&scenario_data.wait_stop);
-        return;
+        goto end;
     }
+
+    const picture_resource_t resource = {
+        .p_sys = NULL,
+    };
+    picture_t *pic = picture_NewFromResource(&dec->fmt_out.video, &resource);
+    assert(pic);
+    pic->date = block->i_pts;
+    pic->b_progressive = true;
 
     /* Simulate the chroma change */
     pic->format.i_chroma = chroma_list[index];
     decoder_QueueVideo(dec, pic);
+end:
+    block_Release(block);
 }
 
 static int display_fixed_size(vout_display_t *vd, video_format_t *fmtp,
@@ -122,6 +136,7 @@ static int display_fail_second_time(vout_display_t *vd, video_format_t *fmtp,
     {
         msg_Info(vd, "Failing the display %4.4s: %ux%u",
                  (const char *)&chroma, width, height);
+        scenario_data.test_finished = true;
         return VLC_EGENERIC;
     }
 
@@ -149,6 +164,7 @@ void vout_scenario_init(void)
     scenario_data.display_picture_count = 0;
     scenario_data.converter_opened = false;
     scenario_data.display_opened = false;
+    scenario_data.test_finished = false;
     vlc_sem_init(&scenario_data.wait_stop, 0);
 }
 

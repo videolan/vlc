@@ -34,7 +34,7 @@
 struct vout_scenario {
     const char *source;
     void (*decoder_setup)(decoder_t *);
-    void (*decoder_decode)(decoder_t *, picture_t *);
+    void (*decoder_decode)(decoder_t *, block_t *);
     int  (*display_setup)(vout_display_t *, video_format_t *,
                           struct vlc_video_context *);
     void (*display_prepare)(vout_display_t *, picture_t *);
