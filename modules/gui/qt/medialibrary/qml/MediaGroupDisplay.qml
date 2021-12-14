@@ -28,35 +28,31 @@ import "qrc:///style/"
 VideoAll {
     id: root
 
-    //---------------------------------------------------------------------------------------------
     // Properties
-    //---------------------------------------------------------------------------------------------
 
-    property int    initialIndex: 0
-    property MLItemId    initialId
-    property string initialName
+    property int      initialIndex: 0
+    property MLItemId initialId
+    property string   initialName
 
-    //---------------------------------------------------------------------------------------------
     // Aliases
-    //---------------------------------------------------------------------------------------------
 
     // NOTE: This is used to determine which media(s) shall be displayed.
-    property alias parentId: modelGroup.parentId
+    property alias parentId: modelVideo.parentId
 
-    // NOTE: The name of the group.
-    property string name: initialName
+    // NOTE: The title of the group.
+    property string title: initialTitle
 
-    //---------------------------------------------------------------------------------------------
-    // Childs
-    //---------------------------------------------------------------------------------------------
+    // Children
 
     model: MLVideoModel {
-        id: modelGroup
+        id: modelVideo
 
         ml: MediaLib
 
         parentId: initialId
     }
+
+    contextMenu: VideoContextMenu { model: modelVideo }
 
     header: Column {
         width: root.width
@@ -71,7 +67,7 @@ VideoAll {
             // NOTE: We want this to be properly aligned with the grid items.
             anchors.leftMargin: contentMargin + VLCStyle.margin_normal
 
-            text: root.name
+            text: root.title
         }
     }
 }
