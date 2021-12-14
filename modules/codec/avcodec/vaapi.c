@@ -57,74 +57,6 @@ struct vaapi_vctx
     vlc_sem_t pool_sem;
 };
 
-static int GetVaProfile(const AVCodecContext *ctx, const es_format_t *fmt_in,
-                        VAProfile *va_profile, int *vlc_chroma,
-                        unsigned *pic_count)
-{
-    VAProfile i_profile;
-    unsigned count = 3;
-    int i_vlc_chroma = VLC_CODEC_VAAPI_420;
-
-    switch(ctx->codec_id)
-    {
-    case AV_CODEC_ID_MPEG1VIDEO:
-    case AV_CODEC_ID_MPEG2VIDEO:
-        i_profile = VAProfileMPEG2Main;
-        count = 4;
-        break;
-    case AV_CODEC_ID_MPEG4:
-        i_profile = VAProfileMPEG4AdvancedSimple;
-        break;
-    case AV_CODEC_ID_WMV3:
-        i_profile = VAProfileVC1Main;
-        break;
-    case AV_CODEC_ID_VC1:
-        i_profile = VAProfileVC1Advanced;
-        break;
-    case AV_CODEC_ID_H264:
-        i_profile = VAProfileH264High;
-        count = 18;
-        break;
-    case AV_CODEC_ID_HEVC:
-        if (fmt_in->i_profile == FF_PROFILE_HEVC_MAIN)
-            i_profile = VAProfileHEVCMain;
-        else if (fmt_in->i_profile == FF_PROFILE_HEVC_MAIN_10)
-        {
-            i_profile = VAProfileHEVCMain10;
-            i_vlc_chroma = VLC_CODEC_VAAPI_420_10BPP;
-        }
-        else
-            return VLC_EGENERIC;
-        count = 18;
-        break;
-    case AV_CODEC_ID_VP8:
-        i_profile = VAProfileVP8Version0_3;
-        count = 5;
-        break;
-    case AV_CODEC_ID_VP9:
-        if (ctx->profile == FF_PROFILE_VP9_0)
-            i_profile = VAProfileVP9Profile0;
-#if VA_CHECK_VERSION( 0, 39, 0 )
-        else if (ctx->profile == FF_PROFILE_VP9_2)
-        {
-            i_profile = VAProfileVP9Profile2;
-            i_vlc_chroma = VLC_CODEC_VAAPI_420_10BPP;
-        }
-#endif
-        else
-            return VLC_EGENERIC;
-        count = 10;
-        break;
-    default:
-        return VLC_EGENERIC;
-    }
-
-    *va_profile = i_profile;
-    *pic_count = count + ctx->thread_count;
-    *vlc_chroma = i_vlc_chroma;
-    return VLC_SUCCESS;
-}
-
 typedef struct {
     struct vaapi_pic_context ctx;
     AVFrame *avframe;
@@ -229,14 +161,9 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt,
                   video_format_t *fmt_out, vlc_video_context **vtcx_out)
 {
     VLC_UNUSED(desc);
+    VLC_UNUSED(fmt_in);
     if ( hwfmt != AV_PIX_FMT_VAAPI || dec_device == NULL ||
         dec_device->type != VLC_DECODER_DEVICE_VAAPI)
-        return VLC_EGENERIC;
-
-    VAProfile i_profile;
-    unsigned count;
-    int i_vlc_chroma;
-    if (GetVaProfile(ctx, fmt_in, &i_profile, &i_vlc_chroma, &count) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
     VADisplay va_dpy = dec_device->opaque;
