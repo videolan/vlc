@@ -282,6 +282,34 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt,
         return VLC_EGENERIC;
     }
 
+    int vlc_chroma = 0;
+    if (hwframes_ctx->format == AV_PIX_FMT_VAAPI)
+    {
+        switch (hwframes_ctx->sw_format)
+        {
+            case AV_PIX_FMT_YUV420P:
+            case AV_PIX_FMT_NV12:
+                vlc_chroma = VLC_CODEC_VAAPI_420;
+                break;
+            case AV_PIX_FMT_P010LE:
+            case AV_PIX_FMT_P010BE:
+            case AV_PIX_FMT_YUV420P10BE:
+            case AV_PIX_FMT_YUV420P10LE:
+                vlc_chroma = VLC_CODEC_VAAPI_420_10BPP;
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (vlc_chroma == 0)
+    {
+        msg_Warn(va, "ffmpeg chroma not compatible with vlc: hw: %d, sw: %d",
+                 hwframes_ctx->format, hwframes_ctx->sw_format);
+        av_buffer_unref(&hwframes_ref);
+        return VLC_EGENERIC;
+    }
+
     ctx->hw_frames_ctx = av_buffer_ref(hwframes_ref);
     if (!ctx->hw_frames_ctx)
     {
@@ -308,7 +336,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt,
 
     msg_Info(va, "Using %s", vaQueryVendorString(va_dpy));
 
-    fmt_out->i_chroma = i_vlc_chroma;
+    fmt_out->i_chroma = vlc_chroma;
 
     va->ops = &ops;
     va->sys = vctx;
