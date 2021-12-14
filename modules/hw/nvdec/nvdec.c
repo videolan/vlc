@@ -610,20 +610,14 @@ static block_t * HXXXProcessBlock(decoder_t *p_dec, block_t *p_block)
 {
     nvdec_ctx_t *p_sys = p_dec->p_sys;
     if (p_sys->hh.i_input_nal_length_size && !p_sys->b_xps_pushed) {
-        block_t *p_xps_blocks;   // parameter set blocks (SPS/PPS/VPS)
-        if (p_dec->fmt_in.i_codec == VLC_CODEC_H264) {
-            p_xps_blocks = h264_helper_get_annexb_config(&p_sys->hh);
-        } else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC) {
-            p_xps_blocks = hevc_helper_get_annexb_config(&p_sys->hh);
-        } else {
-            return NULL;
+        // parameter set blocks (SPS/PPS/VPS)
+        block_t *p_xps = hxxx_helper_get_extradata_block(&p_sys->hh);
+        if(p_xps)
+        {
+            CuvidPushRawBlock(p_dec, p_xps->p_buffer, p_xps->i_buffer);
+            block_Release(p_xps);
+            p_sys->b_xps_pushed = true;
         }
-        for (block_t *p_b = p_xps_blocks; p_b != NULL; p_b = p_b->p_next) {
-            CuvidPushRawBlock(p_dec, p_b->p_buffer, p_b->i_buffer);
-        }
-        if(p_xps_blocks)
-            block_ChainRelease(p_xps_blocks);
-        p_sys->b_xps_pushed = true;
     }
 
     return hxxx_helper_process_block(&p_sys->hh, p_block);

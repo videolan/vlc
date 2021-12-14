@@ -286,7 +286,7 @@ static int H264SetCSD(decoder_t *p_dec, bool *p_size_changed)
     struct hxxx_helper *hh = &p_sys->video.hh;
     assert(hh->h264.i_sps_count > 0 || hh->h264.i_pps_count > 0);
 
-    block_t *p_spspps_blocks = h264_helper_get_annexb_config(hh);
+    block_t *p_spspps_blocks = hxxx_helper_get_extradata_chain(hh);
 
     if (p_spspps_blocks != NULL && p_spspps_blocks->p_next)
         CSDInit(p_sys, p_spspps_blocks, 2);
@@ -305,17 +305,9 @@ static int HEVCSetCSD(decoder_t *p_dec, bool *p_size_changed)
     assert(hh->hevc.i_vps_count > 0 || hh->hevc.i_sps_count > 0 ||
            hh->hevc.i_pps_count > 0 );
 
-    block_t *p_xps_blocks = hevc_helper_get_annexb_config(hh);
-    if (p_xps_blocks != NULL)
-    {
-        block_t *p_monolith = block_ChainGather(p_xps_blocks);
-        if (p_monolith == NULL)
-        {
-            block_ChainRelease(p_xps_blocks);
-            return VLC_ENOMEM;
-        }
-        CSDInit(p_sys, p_monolith, 1);
-    }
+    block_t *p_xps = hxxx_helper_get_extradata_block(hh);
+    if (p_xps != NULL)
+        CSDInit(p_sys, p_xps, 1);
 
     HXXXInitSize(p_dec, p_size_changed);
     return VLC_SUCCESS;

@@ -380,7 +380,7 @@ static CFDictionaryRef CopyDecoderExtradataH264(decoder_t *p_dec)
     else if (p_sys->hh.h264.i_pps_count && p_sys->hh.h264.i_sps_count)
     {
         /* build DecoderConfiguration from gathered */
-        block_t *p_avcC = h264_helper_get_avcc_config(&p_sys->hh);
+        block_t *p_avcC = hxxx_helper_get_extradata_block(&p_sys->hh);
         if (p_avcC)
         {
             extradata = ExtradataInfoCreate(CFSTR("avcC"),
@@ -734,7 +734,7 @@ static CFDictionaryRef CopyDecoderExtradataHEVC(decoder_t *p_dec)
              p_sys->hh.hevc.i_vps_count)
     {
         /* build DecoderConfiguration from gathered */
-        block_t *p_hvcC = hevc_helper_get_hvcc_config(&p_sys->hh);
+        block_t *p_hvcC = hxxx_helper_get_extradata_block(&p_sys->hh);
         if (p_hvcC)
         {
             extradata = ExtradataInfoCreate(CFSTR("hvcC"),

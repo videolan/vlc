@@ -144,12 +144,8 @@ static int test_extrainit(vlc_fourcc_t codec,
     assert(hlpr.i_input_nal_length_size == 0);
     assert(hlpr.i_output_nal_length_size == 0);
 
-    block_t *b;
-    if(codec == VLC_CODEC_H264)
-        b = h264_helper_get_annexb_config(&hlpr);
-    else
-        b = hevc_helper_get_annexb_config(&hlpr);
-    if(!b || !(b = block_ChainGather(b)))
+    block_t *b = hxxx_helper_get_extradata_block(&hlpr);
+    if(!b)
         return 1;
     assert(compare_any(b->p_buffer, b->i_buffer, 0, p_annexb, i_annexb, 0) == 0);
     block_Release(b);
@@ -160,11 +156,8 @@ static int test_extrainit(vlc_fourcc_t codec,
     hxxx_helper_set_extra(&hlpr, p_xvc, i_xvc);
     assert(hlpr.i_input_nal_length_size);
     assert(hlpr.i_output_nal_length_size == 0);
-    if(codec == VLC_CODEC_H264)
-        b = h264_helper_get_annexb_config(&hlpr);
-    else
-        b = hevc_helper_get_annexb_config(&hlpr);
-    if(!b || !(b = block_ChainGather(b)))
+    b = hxxx_helper_get_extradata_block(&hlpr);
+    if(!b)
         return 1;
     assert(compare_any(b->p_buffer, b->i_buffer, 0, p_annexb, i_annexb, 0) == 0);
     block_Release(b);
@@ -203,22 +196,9 @@ static int test_any(struct hxxx_helper *hlpr,
 
     block_Release(b);
 
-    if(hlpr->i_output_nal_length_size == 0)
-    {
-        if(hlpr->i_codec == VLC_CODEC_H264)
-            b = h264_helper_get_annexb_config(hlpr);
-        else
-            b = hevc_helper_get_annexb_config(hlpr);
-        if(!b || !(b = block_ChainGather(b)))
-            return 1;
-    }
-    else
-    {
-        if(hlpr->i_codec == VLC_CODEC_H264)
-            b = h264_helper_get_avcc_config(hlpr);
-        else
-            b = hevc_helper_get_hvcc_config(hlpr);
-    }
+    b = hxxx_helper_get_extradata_block(hlpr);
+    if(!b)
+        return 1;
 
     dump_hex("extra", b->p_buffer, b->i_buffer);
     if(hlpr->i_output_nal_length_size)

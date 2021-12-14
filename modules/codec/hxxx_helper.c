@@ -638,7 +638,7 @@ bool hxxx_helper_has_new_config(const struct hxxx_helper *hh)
     return hh->i_config_version != hh->i_config_version_prev;
 }
 
-block_t *
+static block_t *
 h264_helper_get_annexb_config(const struct hxxx_helper *hh)
 {
     if (hh->h264.i_sps_count == 0 || hh->h264.i_pps_count == 0)
@@ -652,7 +652,7 @@ h264_helper_get_annexb_config(const struct hxxx_helper *hh)
     return hxxx_helper_get_annexb_config( pp_nal_lists, p_nal_counts, p_nal_maxs, 3 );
 }
 
-block_t *
+static block_t *
 hevc_helper_get_annexb_config(const struct hxxx_helper *hh)
 {
     if (hh->hevc.i_vps_count == 0 || hh->hevc.i_sps_count == 0 ||
@@ -668,7 +668,7 @@ hevc_helper_get_annexb_config(const struct hxxx_helper *hh)
     return hxxx_helper_get_annexb_config( pp_nal_lists, p_nal_counts, p_nal_maxs, 3 );
 }
 
-block_t *
+static block_t *
 h264_helper_get_avcc_config(const struct hxxx_helper *hh)
 {
     const struct hxxx_helper_nal *p_nal;
@@ -704,7 +704,7 @@ h264_helper_get_avcc_config(const struct hxxx_helper *hh)
                             pp_spsext_bufs, p_spsext_sizes, hh->h264.i_spsext_count);
 }
 
-block_t *
+static block_t *
 hevc_helper_get_hvcc_config(const struct hxxx_helper *hh)
 {
     struct hevc_dcr_params params = {};
@@ -752,6 +752,33 @@ hevc_helper_get_hvcc_config(const struct hxxx_helper *hh)
         return NULL;
 
     return block_heap_Alloc(p_dcr, i_dcr);
+}
+
+block_t * hxxx_helper_get_extradata_chain(const struct hxxx_helper *hh)
+{
+    if(hh->i_codec == VLC_CODEC_H264)
+    {
+        return hh->i_output_nal_length_size ? h264_helper_get_avcc_config(hh)
+                                            : h264_helper_get_annexb_config(hh);
+    }
+    else
+    {
+        return hh->i_output_nal_length_size ? hevc_helper_get_hvcc_config(hh)
+                                            : hevc_helper_get_annexb_config(hh);
+    }
+}
+
+block_t * hxxx_helper_get_extradata_block(const struct hxxx_helper *hh)
+{
+    block_t *b = hxxx_helper_get_extradata_chain(hh);
+    if(b)
+    {
+        block_t *g = block_ChainGather(b);
+        if(g)
+            return g;
+        block_Release(b);
+    }
+    return NULL;
 }
 
 static const struct hxxx_helper_nal *
