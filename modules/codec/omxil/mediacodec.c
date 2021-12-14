@@ -288,7 +288,7 @@ static int H264SetCSD(decoder_t *p_dec, bool *p_size_changed)
 
     block_t *p_spspps_blocks = h264_helper_get_annexb_config(hh);
 
-    if (p_spspps_blocks != NULL)
+    if (p_spspps_blocks != NULL && p_spspps_blocks->p_next)
         CSDInit(p_sys, p_spspps_blocks, 2);
 
     HXXXInitSize(p_dec, p_size_changed);
