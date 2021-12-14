@@ -202,10 +202,12 @@ libglblend_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
 endif
 endif
 
-if HAVE_ANDROID
+if !HAVE_GL
+if HAVE_GLES2
 libglblend_plugin_la_LIBADD = libvlc_opengles.la
 libglblend_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
 video_filter_LTLIBRARIES += libglblend_plugin.la
+endif
 endif
 
 libopencv_wrapper_plugin_la_SOURCES = video_filter/opencv_wrapper.c

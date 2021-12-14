@@ -122,10 +122,12 @@ libglfilter_draw_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
 endif
 endif
 
-if HAVE_ANDROID
+if !HAVE_GL
+if HAVE_GLES2
 libglfilter_draw_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
 libglfilter_draw_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
 vout_LTLIBRARIES += libglfilter_draw_plugin.la
+endif
 endif
 
 libglfilter_mock_plugin_la_SOURCES = video_output/opengl/filter_mock.c
@@ -153,10 +155,12 @@ libglfilter_mock_plugin_la_LIBADD += libvlc_opengl.la
 noinst_LTLIBRARIES += libglfilter_mock_plugin.la
 endif
 
-if HAVE_ANDROID
+if !HAVE_GL
+if HAVE_GLES2
 libglfilter_mock_plugin_la_LIBADD += libvlc_opengles.la $(GLES2_LIBS)
 libglfilter_mock_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
 noinst_LTLIBRARIES += libglfilter_mock_plugin.la
+endif
 endif
 
 if HAVE_LIBPLACEBO
@@ -180,10 +184,12 @@ libpl_scale_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2=1
 endif
 endif
 
-if HAVE_ANDROID
+if !HAVE_GL
+if HAVE_GLES2
 libpl_scale_plugin_la_LIBADD += libvlc_opengles.la
 libpl_scale_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2=1
 video_filter_LTLIBRARIES += libpl_scale_plugin.la
+endif
 endif
 
 endif
@@ -218,11 +224,12 @@ if HAVE_EGL
 if HAVE_GL
 libegl_pbuffer_filter_plugin_la_LIBADD += libvlc_opengl.la $(GL_LIBS)
 vout_LTLIBRARIES += libegl_pbuffer_filter_plugin.la
-endif
-if HAVE_ANDROID
+else
+if HAVE_GLES2
 libegl_pbuffer_filter_plugin_la_LIBADD += libvlc_opengles.la $(GLES2_LIBS)
 libegl_pbuffer_filter_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2=1
 vout_LTLIBRARIES += libegl_pbuffer_filter_plugin.la
+endif
 endif
 endif
 
