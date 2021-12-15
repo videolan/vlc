@@ -32,7 +32,6 @@
 #include "playlist/playlist_controller.hpp"
 #include "playlist/playlist_model.hpp"
 #include "dialogs/dialogs_provider.hpp"
-#include "maininterface/mainctx.hpp"
 
 #include <QSignalMapper>
 
@@ -83,11 +82,15 @@ void StringListMenu::popup(const QPoint &point, const QVariantList &stringList)
     m->popup(point);
 }
 
+// SortMenu
+
 SortMenu::~SortMenu()
 {
     if (m_menu)
         delete m_menu;
 }
+
+// Functions
 
 void SortMenu::popup(const QPoint &point, const bool popupAbovePoint, const QVariantList &model)
 {
@@ -116,6 +119,8 @@ void SortMenu::popup(const QPoint &point, const bool popupAbovePoint, const QVar
         });
     }
 
+    onPopup(m_menu);
+
     // m_menu->height() returns invalid height until initial popup call
     // so in case of 'popupAbovePoint', first show the menu and then reposition it
     m_menu->popup(point);
@@ -130,6 +135,57 @@ void SortMenu::close()
 {
     if (m_menu)
         m_menu->close();
+}
+
+// Protected functions
+
+/* virtual */ void SortMenu::onPopup(QMenu *) {}
+
+// SortMenuVideo
+
+// Protected SortMenu reimplementation
+
+void SortMenuVideo::onPopup(QMenu * menu) /* override */
+{
+    if (!m_ctx)
+        return;
+
+    menu->addSeparator();
+
+    struct
+    {
+        const char * title;
+
+        MainCtx::Grouping grouping;
+    }
+    entries[] =
+    {
+        { N_("Do not group videos"), MainCtx::GROUPING_NONE },
+        { N_("Group by name"), MainCtx::GROUPING_NAME },
+    };
+
+    QActionGroup * group = new QActionGroup(this);
+
+    int index = m_ctx->grouping();
+
+    for (size_t i = 0; i < ARRAY_SIZE(entries); i++)
+    {
+        QAction * action = menu->addAction(qtr(entries[i].title));
+
+        action->setCheckable(true);
+
+        MainCtx::Grouping grouping = entries[i].grouping;
+
+        connect(action, &QAction::triggered, this, [this, grouping]()
+        {
+            emit this->grouping(grouping);
+        });
+
+        group->addAction(action);
+
+        if (index == grouping)
+            action->setChecked(true);
+    }
 }
 
 QmlGlobalMenu::QmlGlobalMenu(QObject *parent)

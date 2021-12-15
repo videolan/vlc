@@ -24,6 +24,7 @@
 #include <QPoint>
 #include <QQuickItem>
 #include "menus.hpp"
+#include "maininterface/mainctx.hpp"
 
 class MediaLib;
 class MLAlbumModel;
@@ -82,11 +83,27 @@ public:
 
     Q_INVOKABLE void close();
 
+protected:
+    virtual void onPopup(QMenu * menu);
+
 signals:
     void selected(int index);
 
 private:
     QMenu *m_menu = nullptr;
+};
+
+class SortMenuVideo : public SortMenu
+{
+    Q_OBJECT
+
+    SIMPLE_MENU_PROPERTY(MainCtx *, ctx, nullptr)
+
+protected: // SortMenu reimplementation
+    void onPopup(QMenu * menu) override;
+
+signals:
+    void grouping(MainCtx::Grouping grouping);
 };
 
 //inherit VLCMenuBar so we can access menu creation functions
