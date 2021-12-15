@@ -464,7 +464,7 @@ static char* ASXToXML( char* psz_source )
         memstream_puts_xmlencoded(&stream_out, psz_source_old, psz_source_cur);
         psz_source_old = psz_source_cur;
 
-        //skip if comment, no need to copy them to the ouput.
+        //skip if comment, no need to copy them to the output.
         if( strncmp( psz_source_cur, "<!--", 4 ) == 0 )
         {
             psz_source_cur += 4;

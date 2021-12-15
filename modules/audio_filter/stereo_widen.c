@@ -232,7 +232,7 @@ static int paramCallback( vlc_object_t *p_this, char const *psz_var,
         if( MakeRingBuffer( &p_sys->pf_ringbuf, &p_sys->i_len, &p_sys->pf_write,
                             newval.f_float, p_filter->fmt_in.audio.i_rate ) != VLC_SUCCESS )
         {
-            msg_Dbg( p_filter, "Couldnt allocate buffer for delay" );
+            msg_Dbg( p_filter, "Couldn't allocate buffer for delay" );
         }
         else
         {

@@ -40,7 +40,7 @@
  *     Not present with Live streams
  * sgiLiveFeed=True|False
  *     Denounces if the stream is live or from assets (Canned?)
- *     Live appears as a little sattelite dish in the web interface of Kasenna
+ *     Live appears as a little satellite dish in the web interface of Kasenna
  * sgiFormatName=PARTNER_41_MPEG-4
  *     The type of stream. One of:
  *       PARTNER_41_MPEG-4 (RTSP MPEG-4 fully compliant)
@@ -332,7 +332,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *node )
 
     if( p_sys->psz_mcast_ip )
     {
-        /* Definetly schedules multicast session */
+        /* Definitely schedules multicast session */
         /* We don't care if it's live or not */
         free( p_sys->psz_uri );
         if( asprintf( &p_sys->psz_uri, "udp://@" "%s:%i", p_sys->psz_mcast_ip, p_sys->i_mcast_port ) == -1 )
@@ -357,7 +357,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *node )
 
     if( p_sys->b_concert )
     {
-        /* It's definetly a simulcasted scheduled stream */
+        /* It's definitely a simulcasted scheduled stream */
         /* We don't care if it's live or not */
         if( p_sys->psz_uri == NULL )
         {

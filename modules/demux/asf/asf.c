@@ -1318,7 +1318,7 @@ static int DemuxInit( demux_t *p_demux )
         }
     }
 
-    /// \tood Fix Child meta for ASF tracks
+    /// \todo Fix Child meta for ASF tracks
 #if 0
     for( i_stream = 0, i = 0; i < MAX_ASF_TRACKS; i++ )
     {

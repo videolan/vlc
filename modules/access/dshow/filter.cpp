@@ -253,7 +253,7 @@ HRESULT CapturePin::CustomGetSamples( std::deque<VLCMediaSample> &external_queue
  * Returns a sample from its sample queue. Proper locking must be done prior
  * to this call. Current dshow code protects the access to any sample queue
  * (audio and video) with the p_sys->lock
- * @param vlc_sample [out] Address of a sample if sucessfull. Undefined
+ * @param vlc_sample [out] Address of a sample if successful. Undefined
  * otherwise.
  * @return S_OK if a sample was available, S_FALSE if no sample was
  * available

@@ -54,7 +54,7 @@ static bool ReadWin32( HANDLE *hConsoleIn, unsigned char *p_buffer, int *pi_size
     DWORD i_dw;
 
     // Prefer to fail early when there's not enough space to store a 4 bytes
-    // UTF8 character. The function will be immediatly called again and we won't
+    // UTF8 character. The function will be immediately called again and we won't
     // lose an input
     while( *pi_size < MAX_LINE_LENGTH - 4 &&
            ReadConsoleInput( hConsoleIn, &input_record, 1, &i_dw ) )

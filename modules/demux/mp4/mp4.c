@@ -2396,7 +2396,7 @@ static int TrackCreateChunksIndex( demux_t *p_demux,
 
     /* now we read index for SampleEntry( soun vide mp4a mp4v ...)
         to be used for the sample XXX begin to 1
-        We construct it begining at the end */
+        We construct it beginning at the end */
     i_last = p_demux_track->i_chunk_count; /* last chunk proceded */
     i_index = BOXDATA(p_stsc)->i_entry_count;
 
@@ -4940,7 +4940,7 @@ static int DemuxFrag( demux_t *p_demux )
 
     if ( p_sys->context.i_current_box_type != ATOM_mdat )
     {
-        /* Othewise mdat is skipped. FIXME: mdat reading ! */
+        /* Otherwise mdat is skipped. FIXME: mdat reading ! */
         const uint8_t *p_peek;
         if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) != 8 )
         {

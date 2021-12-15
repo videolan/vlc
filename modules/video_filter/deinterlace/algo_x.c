@@ -346,7 +346,7 @@ static inline void XDeint8x8FieldMMXEXT( uint8_t *dst, int i_dst,
 }
 #endif
 
-/* NxN arbitray size (and then only use pixel in the NxN block)
+/* NxN arbitrary size (and then only use pixel in the NxN block)
  */
 static inline int XDeintNxNDetect( uint8_t *src, int i_src,
                                    int i_height, int i_width )

@@ -87,7 +87,7 @@ private:
     AnimBitmap m_imgUp2, m_imgOver2, m_imgDown2;
     /// Current set of images (pointing to 1 or 2)
     /// In fact, we consider here that a checkbox acts like 2 buttons, in a
-    /// symetric way; this is a small trick to avoid multiplicating the
+    /// symmetric way; this is a small trick to avoid multiplicating the
     /// callbacks (and it could be extended easily to support 3 buttons or
     /// more...)
     AnimBitmap *m_pImgUp, *m_pImgOver, *m_pImgDown;

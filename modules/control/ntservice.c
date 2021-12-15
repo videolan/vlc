@@ -251,7 +251,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     }
     else
     {
-        msg_Warn( p_intf, "service successfuly created" );
+        msg_Warn( p_intf, "service successfully created" );
     }
 
     free( path_stream.ptr );
@@ -291,7 +291,7 @@ static int NTServiceUninstall( intf_thread_t *p_intf )
     }
     else
     {
-        msg_Dbg( p_intf, "service deleted successfuly" );
+        msg_Dbg( p_intf, "service deleted successfully" );
     }
 
     CloseServiceHandle( service );

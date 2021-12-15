@@ -1236,7 +1236,7 @@ static int  ParseSSA( vlc_object_t *p_obj, subs_properties_t *p_props,
          * Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
          * Dialogue: Marked=0,0:02:40.65,0:02:41.79,Wolf main,Cher,0000,0000,0000,,Et les enregistrements de ses ondes delta ?
          *
-         * SSA-1 is similar but only has 8 commas up untill the subtitle text. Probably the Effect field is no present, but not 100 % sure.
+         * SSA-1 is similar but only has 8 commas up until the subtitle text. Probably the Effect field is no present, but not 100 % sure.
          */
 
         /* For ASS:
@@ -1910,7 +1910,7 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
             continue;
         }
         else
-            /* Unkown type line, probably a comment */
+            /* Unknown type line, probably a comment */
         {
             free( psz_orig );
             continue;
@@ -2125,7 +2125,7 @@ static int ParseRealText( vlc_object_t *p_obj, subs_properties_t *p_props,
         if( !psz_text )
             return VLC_ENOMEM;
 
-        /* Find the good begining. This removes extra spaces at the beginning
+        /* Find the good beginning. This removes extra spaces at the beginning
            of the line.*/
         char *psz_temp = strcasestr( s, "<time");
         if( psz_temp != NULL )

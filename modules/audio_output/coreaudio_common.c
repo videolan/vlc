@@ -538,7 +538,7 @@ au_NewOutputInstance(audio_output_t *p_aout, OSType comp_sub_type)
 }
 
 /*****************************************************************************
- * RenderCallback: This function is called everytime the AudioUnit wants
+ * RenderCallback: This function is called every time the AudioUnit wants
  * us to provide some more audio data.
  * Don't print anything during normal playback, calling blocking function from
  * this callback is not allowed.

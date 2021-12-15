@@ -24,7 +24,7 @@
 #include "mkv.hpp"
 
 /*****************************************************************************
- * Stream managment
+ * Stream management
  *****************************************************************************/
 class vlc_stream_io_callback: public IOCallback
 {

@@ -40,7 +40,7 @@ X11Graphics::X11Graphics( intf_thread_t *pIntf, X11Display &rDisplay,
     OSGraphics( pIntf ), m_rDisplay( rDisplay ), m_width( width ),
     m_height( height )
 {
-    // Get the display paramaters
+    // Get the display parameters
     int screen = DefaultScreen( XDISPLAY );
     int depth = DefaultDepth( XDISPLAY, screen );
 

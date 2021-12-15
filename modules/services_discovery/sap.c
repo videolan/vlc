@@ -793,7 +793,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
                  && !memcmp(p_announce->i_source, i_source, sizeof(i_source)) ) )
         {
             /* We don't support delete announcement as they can easily
-             * Be used to highjack an announcement by a third party.
+             * Be used to hijack an announcement by a third party.
              * Instead we cleverly implement Implicit Announcement removal.
              *
              * if( b_need_delete )

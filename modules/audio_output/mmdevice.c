@@ -1139,7 +1139,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
                     return -1;
                 else if (fmt->i_format == VLC_CODEC_DTS)
                     var_SetBool(aout, "dtshd", false );
-                /* falltrough */
+                /* fallthrough */
             case MM_PASSTHROUGH_ENABLED_HD:
                 break;
         }

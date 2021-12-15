@@ -83,7 +83,7 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker)
                                                      commandsqueue, factory);
             if(fakeesout)
             {
-                /* All successfull */
+                /* All successful */
                 fakeesout->setExtraInfoProvider( this );
                 const Role & streamRole = tracker->getStreamRole();
                 if(streamRole.isDefault() && streamRole.autoSelectable())

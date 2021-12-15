@@ -2406,7 +2406,7 @@ static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
     {
         return;
     }
-    /* Record the first data packet timestamp in case there wont be any PCR */
+    /* Record the first data packet timestamp in case there won't be any PCR */
     else if( !p_pmt->pcr.i_first_dts )
     {
         p_pmt->pcr.i_first_dts = p_block->i_dts;

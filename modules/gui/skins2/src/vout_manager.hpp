@@ -138,7 +138,7 @@ public:
     void discardVout( CtrlVideo* pCtrlVideo );
     void requestVout( CtrlVideo* pCtrlVideo );
 
-    // get a useable video Control
+    // get a usable video Control
     CtrlVideo* getBestCtrlVideo( );
 
     // get the VoutMainWindow

@@ -886,7 +886,7 @@ bool matroska_segment_c::Seek( demux_t &demuxer, vlc_tick_t i_absolute_mk_date, 
     if ( i_seek_position == std::numeric_limits<SegmentSeeker::fptr_t>::max() )
         return false;
 
-    // propogate seek information //
+    // propagate seek information //
 
     sys.i_pcr           = VLC_TICK_INVALID;
     sys.i_pts           = VLC_TICK_0 + i_mk_seek_time + i_mk_time_offset;
@@ -1355,7 +1355,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
 
         if( pp_simpleblock != NULL || ((el = ep.Get()) == NULL && pp_block != NULL) )
         {
-            /* Check blocks validity to protect againts broken files */
+            /* Check blocks validity to protect against broken files */
             const mkv_track_t *p_track = FindTrackByBlock( pp_block , pp_simpleblock );
             if( p_track == NULL )
             {
@@ -1405,7 +1405,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         }
 
         /* Verify that we are still inside our cluster
-         * It can happens whith broken files and when seeking
+         * It can happens with broken files and when seeking
          * without index */
         if( i_level > 1 )
         {

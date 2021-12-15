@@ -244,7 +244,7 @@ static const int DEFAULT_ALIGN = 0;
 static void probe_video_frame_rate( encoder_t *p_enc, AVCodecContext *p_context, AVC_MAYBE_CONST AVCodec *p_codec )
 {
     /* if we don't have i_frame_rate_base, we are probing and just checking if we can find codec
-     * so set fps to requested fps if asked by user or input fps is availabled */
+     * so set fps to requested fps if asked by user or input fps is available */
     p_context->time_base.num = p_enc->fmt_in.video.i_frame_rate_base ? p_enc->fmt_in.video.i_frame_rate_base : 1;
 
     // MP4V doesn't like CLOCK_FREQ denominator in time_base, so use 1/25 as default for that

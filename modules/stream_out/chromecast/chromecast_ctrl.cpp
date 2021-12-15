@@ -60,7 +60,7 @@ static const char* StateToStr( States s )
     case Connected:
         return "Connected";
     case Launching:
-        return "Lauching";
+        return "Launching";
     case Ready:
         return "Ready";
     case LoadFailed:
@@ -368,7 +368,7 @@ void intf_sys_t::tryLoad()
 
     m_request_load = false;
 
-    // We should now be in the ready state, and therefor have a valid transportId
+    // We should now be in the ready state, and therefore have a valid transportId
     assert( m_appTransportId.empty() == false );
     // Reset the mediaSessionID to allow the new session to become the current one.
     // we cannot start a new load when the last one is still processing
@@ -547,7 +547,7 @@ void intf_sys_t::sendInputEvent(enum cc_input_event event, union cc_input_arg ar
 /**
  * @brief Process a message received from the Chromecast
  * @param msg the CastMessage to process
- * @return 0 if the message has been successfuly processed else -1
+ * @return 0 if the message has been successfully processed else -1
  */
 bool intf_sys_t::processMessage(const castchannel::CastMessage &msg)
 {
@@ -661,11 +661,11 @@ void intf_sys_t::processAuthMessage( const castchannel::CastMessage& msg )
 
     if (authMessage.has_error())
     {
-        msg_Err( m_module, "Authentification error: %d", authMessage.error().error_type());
+        msg_Err( m_module, "Authentication error: %d", authMessage.error().error_type());
     }
     else if (!authMessage.has_response())
     {
-        msg_Err( m_module, "Authentification message has no response field");
+        msg_Err( m_module, "Authentication message has no response field");
     }
     else
     {
@@ -775,7 +775,7 @@ bool intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
                       "Checking media status",
                       StateToStr( m_state ) );
             // This is likely because the chromecast refused the playback, but
-            // let's check by explicitely probing the media status
+            // let's check by explicitly probing the media status
             if (m_last_request_id == 0)
                 m_last_request_id = m_communication->msgPlayerGetStatus( m_appTransportId );
             break;
@@ -841,7 +841,7 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
             /* Idle state is expected when the media receiver application is
              * started. In case the state is still Buffering, it denotes an error.
              * In most case, we'd receive a RECEIVER_STATUS message, which causes
-             * use to ask for the MEDIA_STATUS before assuming an error occured.
+             * use to ask for the MEDIA_STATUS before assuming an error occurred.
              * If the chromecast silently gave up on playing our stream, we also
              * might have an empty status array.
              * If the media load indeed failed, we need to try another
@@ -996,7 +996,7 @@ bool intf_sys_t::handleMessages()
         {
             if ( errno == EINTR )
                 return true;
-            // An error occured, we give up
+            // An error occurred, we give up
             msg_Err( m_module, "The connection to the Chromecast died (receiving).");
             vlc_mutex_locker locker(&m_lock);
             setState( Dead );

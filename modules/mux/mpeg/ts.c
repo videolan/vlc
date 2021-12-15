@@ -379,7 +379,7 @@ struct sout_mux_sys_t
 
     bool            b_use_key_frames;
 
-    vlc_tick_t      i_pcr;  /* last PCR emited */
+    vlc_tick_t      i_pcr;  /* last PCR emitted */
 
     csa_t           *csa;
     int             i_csa_pkt_size;
@@ -1356,7 +1356,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
             p_data->p_buffer[0] = ( (p_data->i_buffer - 2) >> 8) & 0xff;
             p_data->p_buffer[1] = ( (p_data->i_buffer - 2)     ) & 0xff;
 
-            /* remove trailling \0 if any */
+            /* remove trailing \0 if any */
             if( p_data->i_buffer > 2 && !p_data->p_buffer[p_data->i_buffer-1] )
                 p_data->i_buffer--;
 
@@ -1945,7 +1945,7 @@ void GetPAT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    pes_mapped_stream_t mappeds[p_mux->i_nb_inputs];
+    pes_mapped_stream_t mapped[p_mux->i_nb_inputs];
 
     for (int i_stream = 0; i_stream < p_mux->i_nb_inputs; i_stream++ )
     {
@@ -1957,10 +1957,10 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                                        p_sys->i_pmtslots, sizeof(pmt_map_t), intcompare );
 
         /* If there's an error somewhere, dump it to the first pmt */
-        mappeds[i_stream].i_mapped_prog = p_usepid ? p_usepid->i_prog : 0;
-        mappeds[i_stream].fmt = p_input->p_fmt;
-        mappeds[i_stream].pes = &p_stream->pes;
-        mappeds[i_stream].ts = &p_stream->ts;
+        mapped[i_stream].i_mapped_prog = p_usepid ? p_usepid->i_prog : 0;
+        mapped[i_stream].fmt = p_input->p_fmt;
+        mapped[i_stream].pes = &p_stream->pes;
+        mapped[i_stream].ts = &p_stream->ts;
     }
 
     BuildPMT( p_sys->p_dvbpsi, VLC_OBJECT(p_mux), p_sys->standard,
@@ -1969,5 +1969,5 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
               ((sout_input_sys_t *)p_sys->p_pcr_input->p_sys)->ts.i_pid,
               &p_sys->sdt,
               p_sys->i_num_pmt, p_sys->pmt, p_sys->i_pmt_program_number,
-              p_mux->i_nb_inputs, mappeds );
+              p_mux->i_nb_inputs, mapped );
 }

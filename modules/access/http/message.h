@@ -219,7 +219,7 @@ const char *vlc_http_msg_get_path(const struct vlc_http_msg *);
 /**
  * Looks up a token in a header field.
  *
- * Finds the first occurence of a token within a HTTP field header.
+ * Finds the first occurrence of a token within a HTTP field header.
  *
  * @param field HTTP header field name
  * @param token HTTP token name

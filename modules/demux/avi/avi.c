@@ -1099,7 +1099,7 @@ typedef struct
     int64_t i_toread;
 
     int64_t i_posf; /* where we will read :
-                   if i_idxposb == 0 : begining of chunk (+8 to acces data)
+                   if i_idxposb == 0 : beginning of chunk (+8 to access data)
                    else : point on data directly */
 } avi_track_toread_t;
 
@@ -1340,7 +1340,7 @@ static int Demux_Seekable( demux_t *p_demux )
         /* Set the track to use */
         tk = p_sys->track[i_track];
 
-        /* read thoses data */
+        /* read those data */
         if( tk->i_samplesize )
         {
             int64_t i_toread;
@@ -2057,7 +2057,7 @@ static int AVI_StreamBytesSet( demux_t    *p_demux,
                 p_stream->idx.p_entry[p_stream->idx.i_size - 1].i_length ) )
     {
         /* index is valid to find the ck */
-        /* uses dichototmie to be fast enougth */
+        /* uses dichototmie to be fast enough */
         int i_idxposc = __MIN( p_stream->i_idxposc, p_stream->idx.i_size - 1 );
         int i_idxmax  = p_stream->idx.i_size;
         int i_idxmin  = 0;

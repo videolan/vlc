@@ -703,7 +703,7 @@ static int avi_HeaderAdd_strh( bo_t *p_bo, avi_stream_t *p_stream )
                 bo_add_32be( p_bo, p_stream->p_bih->biCompression );
                 bo_add_32le( p_bo, 0 );   /* flags */
                 bo_add_16le(  p_bo, 0 );   /* priority */
-                bo_add_16le(  p_bo, 0 );   /* langage */
+                bo_add_16le(  p_bo, 0 );   /* language */
                 bo_add_32le( p_bo, 0 );   /* initial frame */
                 bo_add_32le( p_bo, 1000 );/* scale */
                 bo_add_32le( p_bo, (uint32_t)( 1000 * p_stream->f_fps ));
@@ -738,7 +738,7 @@ static int avi_HeaderAdd_strh( bo_t *p_bo, avi_stream_t *p_stream )
                 bo_add_32le( p_bo, 0 );   /* tag */
                 bo_add_32le( p_bo, 0 );   /* flags */
                 bo_add_16le(  p_bo, 0 );   /* priority */
-                bo_add_16le(  p_bo, 0 );   /* langage */
+                bo_add_16le(  p_bo, 0 );   /* language */
                 bo_add_32le( p_bo, 0 );   /* initial frame */
                 bo_add_32le( p_bo, i_scale );/* scale */
                 bo_add_32le( p_bo, i_rate );

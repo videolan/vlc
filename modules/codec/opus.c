@@ -310,7 +310,7 @@ static int ProcessHeaders( decoder_t *p_dec )
 }
 
 /*****************************************************************************
- * ProcessInitialHeader: processes the inital Opus header packet.
+ * ProcessInitialHeader: processes the initial Opus header packet.
  *****************************************************************************/
 static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {

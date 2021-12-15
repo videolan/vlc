@@ -698,7 +698,7 @@ typedef enum OMX_CAMERAIMAGEPOOLINPUTMODETYPE {
                                                anyway.
                                              */
    OMX_CAMERAIMAGEPOOLINPUTMODE_TWOPOOLS,    /*All stills & video input images are allocated
-                                               from two seperate pools.
+                                               from two separate pools.
                                                This ensures that parallel capture can work, but
                                                would consume more memory if used on a simple
                                                stills capture use case.
@@ -1407,7 +1407,7 @@ streams and continues with processing (to maintain a constant
 processing rate).
 */
 
-/** Enable or disable Supplemental Enhancment Information (SEI) messages to be inserted in
+/** Enable or disable Supplemental Enhancement Information (SEI) messages to be inserted in
   * the H.264 bitstream.
   */
 typedef struct OMX_PARAM_BRCMVIDEOAVCSEIENABLETYPE {
@@ -2025,11 +2025,11 @@ typedef struct OMX_CONFIG_BUFFERSTALLTYPE
    OMX_U32 nDelay;         /**< Delay in real time (us) from last buffer to current time */
 } OMX_CONFIG_BUFFERSTALLTYPE;
 /*
-Query/set the buffer stall threashold.  When set the \code{nDelay}
+Query/set the buffer stall threshold. When set the \code{nDelay}
 parameter specifies a time to class whether buffer output is stalled.
 When get, the \code{nDelay} parameter indicates the current buffer
 delay, and the {bStalled} parameter indicates whether this time is
-over a previously set threashold.  When
+over a previously set threshold. When
 \code{OMX_IndexConfigRequestCallback} is used with this index, a
 notification is given when \code{bStalled} changes.
 */
@@ -2083,7 +2083,7 @@ typedef struct OMX_PARAM_TIMESTAMPMODETYPE
    OMX_TIMESTAMPMODETYPE eTimestampMode;
 } OMX_PARAM_TIMESTAMPMODETYPE;
 /*
- Specifies what to use as timestamps in the abscence of a clock component.
+ Specifies what to use as timestamps in the absence of a clock component.
 */
 
 /* EGL image buffer for passing to video port.

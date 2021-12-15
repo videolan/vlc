@@ -603,7 +603,7 @@ ssize_t sout_access_out_sys_t::write(sout_access_out_t *p_access, block_t *p_blo
             /* XXX: Hackisk way to pace between the sout (controlled by the
              * decoder thread) and the demux filter (controlled by the input
              * thread). When the httpd FIFO reaches a specific size, we tell
-             * the demux filter to pace and wait a little before queing this
+             * the demux filter to pace and wait a little before queueing this
              * block, but not too long since we don't want to block decoder
              * thread controls. If the pacing fails (should not happen), we
              * drop the first block in order to make room. The demux filter

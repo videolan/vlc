@@ -743,7 +743,7 @@ bool matroska_script_codec_c::Enter()
         if ( (*index)->GetSize() )
         {
             msg_Dbg( &sys.demuxer, "Matroska Script enter command" );
-            f_result |= interpretor.Interpret( (*index)->GetBuffer(), (*index)->GetSize() );
+            f_result |= interpreter.Interpret( (*index)->GetBuffer(), (*index)->GetSize() );
         }
         ++index;
     }
@@ -759,7 +759,7 @@ bool matroska_script_codec_c::Leave()
         if ( (*index)->GetSize() )
         {
             msg_Dbg( &sys.demuxer, "Matroska Script leave command" );
-            f_result |= interpretor.Interpret( (*index)->GetBuffer(), (*index)->GetSize() );
+            f_result |= interpreter.Interpret( (*index)->GetBuffer(), (*index)->GetSize() );
         }
         ++index;
     }

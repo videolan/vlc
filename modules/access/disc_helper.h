@@ -52,7 +52,7 @@ inline static int DiscProbeMacOSPermission( vlc_object_t *p_this, const char *ps
     int retVal = access( psz_file, R_OK );
     if( retVal == -1 && errno == EPERM )
     {
-        msg_Err( p_this, "Path %s cannot be opened due to unsufficient permissions", psz_file );
+        msg_Err( p_this, "Path %s cannot be opened due to insufficient permissions", psz_file );
         vlc_dialog_display_error( p_this, _("Problem accessing a system resource"),
             _("Potentially, macOS blocks access to your disc. "
               "Please open \"System Preferences\" -> \"Security & Privacy\" "

@@ -782,7 +782,7 @@ static block_t *ConvertSUBT(block_t *p_block)
     p_block = block_Realloc(p_block, 2, p_block->i_buffer);
     if( !p_block )
         return NULL;
-    /* No trailling '\0' */
+    /* No trailing '\0' */
     if (p_block->i_buffer > 2 && p_block->p_buffer[p_block->i_buffer-1] == '\0')
         p_block->i_buffer--;
 

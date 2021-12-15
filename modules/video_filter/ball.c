@@ -6,7 +6,7 @@
  * Author: Adrien Maglo <magsoft@videolan.org>
  *
  * The Canny edge detection algorithm comes from gradient.c which was
- * writen by:
+ * written by:
  *         Samuel Hocevar <sam@zoy.org>
  *         Antoine Cellerier <dionoea -at- videolan -dot- org>
  *
@@ -774,7 +774,7 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
             *pf_lastVect_y = 0;
         }
         else
-            /* After a bouce, the first ball motion is always one pixel. */
+            /* After a bounce, the first ball motion is always one pixel. */
             i_motion = p_sys->i_ballSpeed - 1;
     }
     else

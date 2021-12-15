@@ -37,7 +37,7 @@
 // #define STREAM_DEBUG 1
 
 /*
- * Complex scheme using mutliple track to avoid seeking
+ * Complex scheme using multiple track to avoid seeking
  */
 
 /* How many tracks we have, currently only used for stream mode */

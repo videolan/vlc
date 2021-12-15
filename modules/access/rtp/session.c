@@ -442,7 +442,7 @@ bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
             if (deadline < (CLOCK_FREQ / 40))
                 deadline = CLOCK_FREQ / 40;
 
-            /* Additionnaly, we implicitly wait for the packetization time
+            /* Additionally, we implicitly wait for the packetization time
              * multiplied by the number of missing packets. block is the first
              * non-missing packet (lowest sequence number). We have no better
              * estimated time of arrival, as we do not know the RTP timestamp

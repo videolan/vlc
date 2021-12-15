@@ -35,7 +35,7 @@
 #include <map>
 
 
-/// Class used to instanciate OS2 specific objects
+/// Class used to instantiate OS2 specific objects
 class OS2Factory: public OSFactory
 {
 public:

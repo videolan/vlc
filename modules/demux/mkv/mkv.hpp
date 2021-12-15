@@ -220,7 +220,7 @@ class mkv_track_t
         uint8_t pi_chan_table[AOUT_CHAN_MAX];
 
 
-        /* Private track paramters */
+        /* Private track parameters */
         PrivateTrackData *p_sys;
 
         bool            b_discontinuity;

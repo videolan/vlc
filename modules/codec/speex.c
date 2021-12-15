@@ -466,7 +466,7 @@ static int ProcessHeaders( decoder_t *p_dec )
 }
 
 /*****************************************************************************
- * ProcessInitialHeader: processes the inital Speex header packet.
+ * ProcessInitialHeader: processes the initial Speex header packet.
  *****************************************************************************/
 static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {

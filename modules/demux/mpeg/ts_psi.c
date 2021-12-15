@@ -1181,7 +1181,7 @@ static void PMTSetupEs0xD1( demux_t *p_demux, ts_es_t *p_es,
     }
 
     /* registration descriptor for Dirac
-     * (backwards compatable with VC-2 (SMPTE Sxxxx:2008)) */
+     * (backwards compatible with VC-2 (SMPTE Sxxxx:2008)) */
     es_format_Change( &p_es->fmt, VIDEO_ES, VLC_CODEC_DIRAC );
 }
 

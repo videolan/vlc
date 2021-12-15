@@ -506,7 +506,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
              p_eit->i_segment_last_section_number, p_eit->i_last_table_id );
 
     /* Use table ID for segmenting our EPG tables updates. 1 table id has 256 sections which
-     * represents 8 segements of 32 sections each. Thus a max of 24 hours per table ID
+     * represents 8 segments of 32 sections each. Thus a max of 24 hours per table ID
      * (Should be even better with tableid+segmentid compound if dvbpsi would export segment id)
      * see TS 101 211, 4.1.4.2.1 */
     p_epg = vlc_epg_New( p_eit->i_table_id, p_eit->i_extension );

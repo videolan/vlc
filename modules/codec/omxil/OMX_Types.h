@@ -271,7 +271,7 @@ typedef struct OMX_BS32 {
 /** Structure representing some time or duration in microseconds. This structure
   *  must be interpreted as a signed 64 bit value. The quantity is signed to accommodate 
   *  negative deltas and preroll scenarios. The quantity is represented in microseconds 
-  *  to accomodate high resolution timestamps (e.g. DVD presentation timestamps based
+  *  to accommodate high resolution timestamps (e.g. DVD presentation timestamps based
   *  on a 90kHz clock) and to allow more accurate and synchronized delivery (e.g. 
   *  individual audio samples delivered at 192 kHz). The quantity is 64 bit to 
   *  accommodate a large dynamic range (signed 32 bit values would allow only for plus

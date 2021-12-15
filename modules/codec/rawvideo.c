@@ -167,7 +167,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t *p_block )
         return NULL;
     }
 
-    /* Date management: If there is a pts avaliable, use that. */
+    /* Date management: If there is a pts available, use that. */
     if( p_block->i_pts > VLC_TICK_INVALID )
     {
         date_Set( &p_sys->pts, p_block->i_pts );

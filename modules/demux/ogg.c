@@ -2647,7 +2647,7 @@ static bool Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
      * audio streams. */
     p_stream->b_force_backup = true;
 
-    /* Cheat and get additionnal info ;) */
+    /* Cheat and get additional info ;) */
     bs_init( &bitstream, p_oggpacket->packet, p_oggpacket->bytes );
     bs_skip( &bitstream, 56 );
 
@@ -2716,7 +2716,7 @@ static bool Ogg_ReadDaalaHeader( logical_stream_t *p_stream,
      * audio streams. */
     p_stream->b_force_backup = true;
 
-    /* Cheat and get additionnal info ;) */
+    /* Cheat and get additional info ;) */
     oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes );
     oggpack_adv( &opb, 48 );
 
@@ -2771,7 +2771,7 @@ static bool Ogg_ReadVorbisHeader( logical_stream_t *p_stream,
      * audio streams. */
     p_stream->b_force_backup = true;
 
-    /* Cheat and get additionnal info ;) */
+    /* Cheat and get additional info ;) */
     oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
     oggpack_adv( &opb, 88 );
     p_stream->fmt.audio.i_channels = oggpack_read( &opb, 8 );
@@ -2830,7 +2830,7 @@ static bool Ogg_ReadSpeexHeader( logical_stream_t *p_stream,
      * audio streams. */
     p_stream->b_force_backup = true;
 
-    /* Cheat and get additionnal info ;) */
+    /* Cheat and get additional info ;) */
     oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
     oggpack_adv( &opb, 224 );
     oggpack_adv( &opb, 32 ); /* speex_version_id */
@@ -2931,7 +2931,7 @@ static bool Ogg_ReadKateHeader( logical_stream_t *p_stream,
      * kate streams. */
     p_stream->b_force_backup = true;
 
-    /* Cheat and get additionnal info ;) */
+    /* Cheat and get additional info ;) */
     oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
     oggpack_adv( &opb, 11*8 ); /* packet type, kate magic, version */
     p_stream->special.kate.i_num_headers = oggpack_read( &opb, 8 );
@@ -3419,7 +3419,7 @@ static bool Ogg_ReadDiracHeader( logical_stream_t *p_stream,
     p_stream->i_granule_shift = 22; /* not 32 */
 
     /* Backing up stream headers is not required -- seqhdrs are repeated
-     * thoughout the stream at suitable decoding start points */
+     * throughout the stream at suitable decoding start points */
     p_stream->b_force_backup = false;
 
     /* read in useful bits from sequence header */
@@ -3495,7 +3495,7 @@ static bool Ogg_ReadOggSpotsHeader( logical_stream_t *p_stream,
      * audio streams. */
     p_stream->b_force_backup = true;
 
-    /* Cheat and get additionnal info ;) */
+    /* Cheat and get additional info ;) */
     if ( p_oggpacket->bytes != 52 )
     {
         /* The OggSpots header is always 52 bytes */

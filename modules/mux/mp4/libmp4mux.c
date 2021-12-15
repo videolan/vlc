@@ -1685,7 +1685,7 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
                 /* Try to find some defaults */
                 if ( p_stream->i_entry_count )
                 {
-                    // FIXME: find highest occurence
+                    // FIXME: find highest occurrence
                     p_stream->i_trex_default_length = p_stream->entry[0].i_length;
                     p_stream->i_trex_default_size = p_stream->entry[0].i_size;
                 }

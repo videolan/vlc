@@ -24,7 +24,7 @@
 /**
  * Helper class for wrappable text multi line text fields on 10.7.
  *
- * Makes sure to try to wrap the text while calulating an intrinsic size for
+ * Makes sure to try to wrap the text while calculating an intrinsic size for
  * the field.
  *
  * For this to work, make sure that:

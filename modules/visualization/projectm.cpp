@@ -226,7 +226,7 @@ static void Close( vlc_object_t *p_this )
 
     vlc_join( p_sys->thread, NULL );
 
-    /* Free the ressources */
+    /* Free the resources */
     vlc_gl_surface_Destroy( p_sys->gl );
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->p_buffer );

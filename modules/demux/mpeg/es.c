@@ -660,8 +660,8 @@ static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
     }
     const bool b_wav = i_skip > 0;
 
-    /* peek the begining
-     * It is common that wav files have some sort of garbage at the begining
+    /* peek the beginning
+     * It is common that wav files have some sort of garbage at the beginning
      * We will accept probing 0.5s of data in this case.
      */
     const int i_probe = i_skip + i_check_size + 8000 + ( b_wav ? (44000/2*2*2) : 0);
@@ -731,7 +731,7 @@ static int MpgaCheckSync( const uint8_t *p_peek )
         || (((h >> 19)&0x03) == 1 )         /* valid version ID ? */
         || (((h >> 17)&0x03) == 0 )         /* valid layer ?*/
         || (((h >> 12)&0x0F) == 0x0F )      /* valid bitrate ?*/
-        || (((h >> 10) & 0x03) == 0x03 )    /* valide sampling freq ? */
+        || (((h >> 10) & 0x03) == 0x03 )    /* valid sampling freq ? */
         || ((h & 0x03) == 0x02 ))           /* valid emphasis ? */
     {
         return false;
@@ -1078,7 +1078,7 @@ static int AacProbe( demux_t *p_demux, int64_t *pi_offset )
 
     i_offset = vlc_stream_Tell( p_demux->s );
 
-    /* peek the begining (10 is for adts header) */
+    /* peek the beginning (10 is for adts header) */
     if( vlc_stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
     {
         msg_Dbg( p_demux, "cannot peek" );
@@ -1167,7 +1167,7 @@ static int A52Init( demux_t *p_demux )
 
     const uint8_t *p_peek;
 
-    /* peek the begining */
+    /* peek the beginning */
     if( vlc_stream_Peek( p_demux->s, &p_peek, VLC_A52_HEADER_SIZE ) >= VLC_A52_HEADER_SIZE )
     {
         A52CheckSync( p_peek, &p_sys->b_big_endian, NULL, true );

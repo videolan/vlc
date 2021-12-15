@@ -160,7 +160,7 @@ static void PreparePlanar( filter_t *p_filter, picture_t *p_inpic )
     const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
 
     /**
-     * Substract Y planes
+     * Subtract Y planes
      */
     for( unsigned y = 0; y < p_fmt->i_height; y++ )
     {
@@ -231,7 +231,7 @@ static int PreparePacked( filter_t *p_filter, picture_t *p_inpic, int *pi_pix_of
     }
     *pi_pix_offset = i_y_offset;
 
-    /* Substract all planes at once */
+    /* Subtract all planes at once */
     uint8_t *p_oldpix   = p_sys->p_old->p[Y_PLANE].p_pixels;
     const int i_old_pitch = p_sys->p_old->p[Y_PLANE].i_pitch;
 
@@ -485,7 +485,7 @@ static int FindShapes( uint32_t *p_diff, uint32_t *p_smooth,
     }
 
     /**
-     * Merge overlaping rectangles
+     * Merge overlapping rectangles
      */
     for( int i = 1; i < last; i++ )
     {

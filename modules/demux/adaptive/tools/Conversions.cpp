@@ -33,7 +33,7 @@
   @param str A nullptr-terminated string to convert
   @return: The duration in seconds. -1 if an error occurred.
 
-  Exemple input string: "PT0H9M56.46S"
+  Example input string: "PT0H9M56.46S"
  */
 static vlc_tick_t str_duration( const char *psz_duration )
 {

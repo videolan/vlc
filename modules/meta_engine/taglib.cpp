@@ -719,7 +719,7 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
 
     if( mime_list.size() != 0 && art_list.size() != 0 )
     {
-        // We get only the first covert art
+        // We get only the first cover art
         if( mime_list.size() > 1 || art_list.size() > 1 )
             msg_Warn( p_demux_meta, "Found %i embedded arts, so using only the first one",
                     art_list.size() );

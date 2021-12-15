@@ -433,7 +433,7 @@ static subpicture_t * SubsdelayFilter( filter_t *p_filter, subpicture_t* p_subpi
 
     if( p_subpic->b_ephemer )
     {
-        /* set a relativly long delay in hope that the next subtitle
+        /* set a relatively long delay in hope that the next subtitle
            will arrive in this time and the real delay could be determined */
 
         p_subpic->i_stop = p_subpic->i_start + 20000000; /* start + 20 sec */

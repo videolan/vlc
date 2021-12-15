@@ -93,7 +93,7 @@ private:
     std::list<X11Timer*> m_timers;
 
     /// Sleep for delay milliseconds, unless an X11 event is received.
-    /// Returns true if the sleep has been interupted.
+    /// Returns true if the sleep has been interrupted.
     bool sleep( int delay );
 };
 

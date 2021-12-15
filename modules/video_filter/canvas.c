@@ -47,7 +47,7 @@ static picture_t *Filter( filter_t *, picture_t * );
  *  - The outer picture is called the canvas.
  *  - The innter picture is callsed the subpicture.
  *
- * NB, all of the following operatons take into account aspect ratio
+ * NB, all of the following operations take into account aspect ratio
  *
  * A canvas is of canvas_{width,height}.
  * In Pad mode:

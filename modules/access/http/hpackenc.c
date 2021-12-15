@@ -33,7 +33,7 @@
 #include "hpack.h"
 
 /*
- * This is curently the simplest possible HPACK compressor: it does not
+ * This is currently the simplest possible HPACK compressor: it does not
  * compress anything and is stateless.
  * TODO:
  *  - use static Huffman compression when useful,

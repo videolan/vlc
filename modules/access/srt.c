@@ -191,7 +191,7 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
         &(int) { SRT_EPOLL_ERR | SRT_EPOLL_IN });
 
     /* Schedule a connect */
-    msg_Dbg( p_stream, "Schedule SRT connect (dest addresss: %s, port: %d).",
+    msg_Dbg( p_stream, "Schedule SRT connect (dest address: %s, port: %d).",
         p_sys->psz_host, p_sys->i_port);
 
     stat = srt_connect( p_sys->sock, res->ai_addr, res->ai_addrlen );

@@ -173,7 +173,7 @@ typedef struct {
     const int    *p_profiles; // NULL or ends with 0
 } directx_va_mode_t;
 
-/* XXX Prefered modes must come first */
+/* XXX Preferred modes must come first */
 static const directx_va_mode_t DXVA_MODES[] = {
     /* MPEG-1/2 */
     { "MPEG-1 decoder, restricted profile A",                                         &DXVA_ModeMPEG1_A,                      0, NULL },
@@ -408,7 +408,7 @@ static int FindVideoServiceConversion(vlc_va_t *va, directx_sys_t *dx_sys,
     }
 
     err = VLC_EGENERIC;
-    /* Retreive supported modes from the decoder service */
+    /* Retrieve supported modes from the decoder service */
     for (unsigned i = 0; i < p_list.count; i++) {
         const GUID *g = &p_list.list[i];
         char *psz_decoder_name = directx_va_GetDecoderName(g);

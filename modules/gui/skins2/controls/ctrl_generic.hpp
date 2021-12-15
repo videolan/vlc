@@ -100,7 +100,7 @@ protected:
      * rectangle to repaint and its offset.
      * Use the default values to repaint the whole window
      */
-    virtual void notifyLayout( int witdh = -1, int height = -1,
+    virtual void notifyLayout( int width = -1, int height = -1,
                                int xOffSet = 0, int yOffSet = 0 );
 
     /**

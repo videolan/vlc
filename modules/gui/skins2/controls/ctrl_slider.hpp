@@ -72,7 +72,7 @@ public:
     virtual void onResize();
 
     /// Method called to notify are to be updated
-    virtual void notifyLayout( int witdh = -1, int height = -1,
+    virtual void notifyLayout( int width = -1, int height = -1,
                                int xOffSet = 0, int yOffSet = 0 );
 
     /// Get the text of the tooltip
@@ -158,7 +158,7 @@ public:
     virtual void onResize();
 
     /// Method called to notify are to be updated
-    virtual void notifyLayout( int witdh = -1, int height = -1,
+    virtual void notifyLayout( int width = -1, int height = -1,
                                int xOffSet = 0, int yOffSet = 0 );
 
     /// Get the type of control (custom RTTI)

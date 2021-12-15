@@ -184,10 +184,10 @@ static int parse_transport(stream_t *access, char *request_line) {
 
 /*
  * Semi-interruptible net_Gets replacement.
- * If an interruption is occuring it will fallback to non-interruptible read
+ * If an interruption is occurring it will fallback to non-interruptible read
  * with a given timeout before it returns.
  *
- * interrupted: Informs the caller whether an interrupt occured or not
+ * interrupted: Informs the caller whether an interrupt occurred or not
  */
 static char *net_readln_timeout(vlc_object_t *obj, int fd, int timeout, bool *interrupted)
 {

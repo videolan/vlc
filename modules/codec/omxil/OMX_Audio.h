@@ -709,7 +709,7 @@ typedef struct OMX_AUDIO_PARAM_QCELP8TYPE {
     OMX_U32 nBitRate;             /**< Bit rate of the input data.  Use 0 for variable
                                        rate or unknown bit rates */
     OMX_AUDIO_CDMARATETYPE eCDMARate; /**< Frame rate */
-    OMX_U32 nMinBitRate;          /**< minmal rate for the encoder = 1,2,3,4, default = 1 */
+    OMX_U32 nMinBitRate;          /**< minimal rate for the encoder = 1,2,3,4, default = 1 */
     OMX_U32 nMaxBitRate;          /**< maximal rate for the encoder = 1,2,3,4, default = 4 */
 } OMX_AUDIO_PARAM_QCELP8TYPE;
 
@@ -723,7 +723,7 @@ typedef struct OMX_AUDIO_PARAM_QCELP13TYPE {
                                        necessarily the same as the number of channels
                                        to be rendered. */
     OMX_AUDIO_CDMARATETYPE eCDMARate; /**< Frame rate */
-    OMX_U32 nMinBitRate;          /**< minmal rate for the encoder = 1,2,3,4, default = 1 */
+    OMX_U32 nMinBitRate;          /**< minimal rate for the encoder = 1,2,3,4, default = 1 */
     OMX_U32 nMaxBitRate;          /**< maximal rate for the encoder = 1,2,3,4, default = 4 */
 } OMX_AUDIO_PARAM_QCELP13TYPE;
 
@@ -738,7 +738,7 @@ typedef struct OMX_AUDIO_PARAM_EVRCTYPE {
                                        to be rendered. */
     OMX_AUDIO_CDMARATETYPE eCDMARate; /**< actual Frame rate */
     OMX_BOOL bRATE_REDUCon;       /**< RATE_REDUCtion is requested for this frame */
-    OMX_U32 nMinBitRate;          /**< minmal rate for the encoder = 1,2,3,4, default = 1 */
+    OMX_U32 nMinBitRate;          /**< minimal rate for the encoder = 1,2,3,4, default = 1 */
     OMX_U32 nMaxBitRate;          /**< maximal rate for the encoder = 1,2,3,4, default = 4 */
     OMX_BOOL bHiPassFilter;       /**< Enable encoder's High Pass Filter */
     OMX_BOOL bNoiseSuppressor;    /**< Enable encoder's noise suppressor pre-processing */
@@ -756,7 +756,7 @@ typedef struct OMX_AUDIO_PARAM_SMVTYPE {
                                        to be rendered. */
     OMX_AUDIO_CDMARATETYPE eCDMARate; /**< Frame rate */
     OMX_BOOL bRATE_REDUCon;           /**< RATE_REDUCtion is requested for this frame */
-    OMX_U32 nMinBitRate;          /**< minmal rate for the encoder = 1,2,3,4, default = 1 ??*/
+    OMX_U32 nMinBitRate;          /**< minimal rate for the encoder = 1,2,3,4, default = 1 ??*/
     OMX_U32 nMaxBitRate;          /**< maximal rate for the encoder = 1,2,3,4, default = 4 ??*/
     OMX_BOOL bHiPassFilter;       /**< Enable encoder's High Pass Filter ??*/
     OMX_BOOL bNoiseSuppressor;    /**< Enable encoder's noise suppressor pre-processing */
@@ -1260,7 +1260,7 @@ typedef struct OMX_AUDIO_CONFIG_REVERBERATIONTYPE {
 } OMX_AUDIO_CONFIG_REVERBERATIONTYPE;
 
 
-/** Possible settings for the Echo Cancelation structure to use 
+/** Possible settings for the Echo Cancelation structure to use
  * @ingroup effects
  */
 typedef enum OMX_AUDIO_ECHOCANTYPE {

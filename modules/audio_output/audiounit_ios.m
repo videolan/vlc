@@ -332,7 +332,7 @@ static int role2policy_cmp(const void *key, const void *val)
 static AVAudioSessionRouteSharingPolicy
 GetRouteSharingPolicy(audio_output_t *p_aout)
 {
-    /* LongFormAudio by defaut */
+    /* LongFormAudio by default */
     AVAudioSessionRouteSharingPolicy policy = AVAudioSessionRouteSharingPolicyLongFormAudio;
     AVAudioSessionRouteSharingPolicy video_policy;
 #if !TARGET_OS_TV

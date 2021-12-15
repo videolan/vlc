@@ -120,7 +120,7 @@ typedef struct OMX_TIME_CONFIG_TIMESTAMPTYPE {
 /** Enumeration of possible reference clocks to the media time. */
 typedef enum OMX_TIME_UPDATETYPE {
       OMX_TIME_UpdateRequestFulfillment,    /**< Update is the fulfillment of a media time request. */
-      OMX_TIME_UpdateScaleChanged,	        /**< Update was generated because the scale chagned. */
+      OMX_TIME_UpdateScaleChanged,	        /**< Update was generated because the scale changed. */
       OMX_TIME_UpdateClockStateChanged,     /**< Update was generated because the clock state changed. */
       OMX_TIME_UpdateKhronosExtensions = 0x6F000000, /**< Reserved region for introducing Khronos Standard Extensions */ 
       OMX_TIME_UpdateVendorStartUnused = 0x7F000000, /**< Reserved region for introducing Vendor Extensions */
@@ -198,7 +198,7 @@ typedef struct OMX_TIME_CONFIG_MEDIATIMEREQUESTTYPE {
  *   Upon scale changes the clock component clears the nClientPrivate data, sends the current
  *   media time and sets the nScale to the new scale via the client port. It emits a 
  *   OMX_TIME_MEDIATIMETYPE to all clients independent of any requests. This allows clients to 
- *   alter processing to accomodate scaling. For instance a video component might skip inter-frames 
+ *   alter processing to accommodate scaling. For instance a video component might skip inter-frames
  *   in the case of extreme fastforward. Likewise an audio component might add or remove samples 
  *   from an audio frame to scale audio data. 
  *
@@ -237,7 +237,7 @@ typedef struct OMX_TIME_MEDIATIMETYPE {
 
 /** Structure representing the current media time scale factor. Applicable only to clock 
  *  component, other components see scale changes via OMX_TIME_MEDIATIMETYPE buffers sent via
- *  the clock component client ports. Upon recieving this config the clock component changes 
+ *  the clock component client ports. Upon receiving this config the clock component changes
  *  the rate by which the media time increases or decreases effectively implementing trick modes. 
  */ 
 typedef struct OMX_TIME_CONFIG_SCALETYPE {

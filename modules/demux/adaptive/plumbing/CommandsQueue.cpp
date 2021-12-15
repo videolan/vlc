@@ -379,7 +379,7 @@ Times CommandsQueue::Process( Times barrier )
     /* We need to filter the current commands list
        We need to return on discontinuity or reset events if data was sent
        We must lookup every packet until end or PCR matching barrier,
-       because packets of multiple stream can arrive delayed (with intermidiate pcr)
+       because packets of multiple stream can arrive delayed (with intermediate pcr)
        ex: for a target time of 2, you must dequeue <= 2 until >= PCR2
        A0,A1,A2,B0,PCR0,B1,B2,PCR2,B3,A3,PCR3
     */

@@ -205,7 +205,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     /* The decoder fmt_out can be uninitialized here (since it can initialized
      * asynchronously). Fix audio_dec_out with default values in that case.
      * This should be enough to initialize the encoder for the first time (it
-     * will be reloaded when all informations from the decoder are available).
+     * will be reloaded when all information from the decoder are available).
      * */
     id->audio_dec_out = id->p_decoder->fmt_out.audio;
     id->audio_dec_out.i_format = id->p_decoder->fmt_out.i_codec;

@@ -58,11 +58,11 @@ public:
                              int width = -1, int height = -1,
                              bool blend = false );
 
-    /// Draw a filled rectangle on the grahics (color is #RRGGBB)
+    /// Draw a filled rectangle on the graphics (color is #RRGGBB)
     virtual void fillRect( int left, int top, int width, int height,
                            uint32_t color );
 
-    /// Draw an empty rectangle on the grahics (color is #RRGGBB)
+    /// Draw an empty rectangle on the graphics (color is #RRGGBB)
     virtual void drawRect( int left, int top, int width, int height,
                            uint32_t color );
 

@@ -288,7 +288,7 @@ static uint8_t* parse_asrt( vlc_object_t* p_this,
 
     if( 0 != memcmp( "asrt", data_p, 4 ) )
     {
-        msg_Err( p_this, "Cant find asrt in bootstrap" );
+        msg_Err( p_this, "Can't find asrt in bootstrap" );
         return NULL;
     }
     data_p += 4;
@@ -392,7 +392,7 @@ static uint8_t* parse_afrt( vlc_object_t* p_this,
 
     if( 0 != memcmp( data_p, "afrt", 4 ) )
     {
-        msg_Err( p_this, "Cant find afrt in bootstrap" );
+        msg_Err( p_this, "Can't find afrt in bootstrap" );
         return NULL;
     }
     data_p += 4;
@@ -522,7 +522,7 @@ static void parse_BootstrapData( vlc_object_t* p_this,
 
     if( 0 != memcmp( data_p, "abst", 4 ) )
     {
-        msg_Warn( p_this, "Cant find abst in bootstrap" );
+        msg_Warn( p_this, "Can't find abst in bootstrap" );
         return;
     }
     data_p += 4;

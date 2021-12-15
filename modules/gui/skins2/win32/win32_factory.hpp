@@ -38,7 +38,7 @@
 #include <map>
 
 
-/// Class used to instanciate Win32 specific objects
+/// Class used to instantiate Win32 specific objects
 class Win32Factory: public OSFactory
 {
 public:

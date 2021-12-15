@@ -178,7 +178,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     var_Create( pIntf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( pIntf, "interaction", onInteraction, this );
 
-    // initialize variables refering to libvlc and playlist objects
+    // initialize variables referring to libvlc and playlist objects
     init_variables();
 }
 

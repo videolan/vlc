@@ -965,7 +965,7 @@ static int vuMeter_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     i_value_l = fabsf(i_value_l);
     i_value_r = fabsf(i_value_r);
 
-    /* Stay under maximum value admited */
+    /* Stay under maximum value admitted */
     if ( i_value_l > 200 * M_PI_2 )
         i_value_l = 200 * M_PI_2;
     if ( i_value_r > 200 * M_PI_2 )

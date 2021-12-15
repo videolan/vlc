@@ -250,7 +250,7 @@ struct demux_cc
                 break;
             }
             case CC_PACE_OK_WAIT:
-                /* Yeld: return to let the input thread doing controls  */
+                /* Yield: return to let the input thread doing controls  */
                 return VLC_DEMUXER_SUCCESS;
             case CC_PACE_OK:
             case CC_PACE_OK_ENDED:
@@ -347,7 +347,7 @@ struct demux_cc
         case DEMUX_SET_POSITION:
         {
             double pos = va_arg( args, double );
-            /* Force unprecise seek */
+            /* Force imprecise seek */
             int ret = demux_Control( p_demux->p_next, DEMUX_SET_POSITION, pos, false );
             if( ret != VLC_SUCCESS )
                 return ret;
@@ -359,7 +359,7 @@ struct demux_cc
         case DEMUX_SET_TIME:
         {
             vlc_tick_t time = va_arg( args, int64_t );
-            /* Force unprecise seek */
+            /* Force imprecise seek */
             int ret = demux_Control( p_demux->p_next, DEMUX_SET_TIME, time, false );
             if( ret != VLC_SUCCESS )
                 return ret;

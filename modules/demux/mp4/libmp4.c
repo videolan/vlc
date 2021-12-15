@@ -303,7 +303,7 @@ static int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box )
     {
         if( i_read < 16 )
             return 0;
-        /* get extented type on 16 bytes */
+        /* get extended type on 16 bytes */
         GetUUID( &p_box->i_uuid, p_peek );
     }
 
@@ -418,7 +418,7 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
                MP4_Box_t *p_container, const uint32_t stoplist[],
                const uint32_t excludelist[], bool b_indexed )
 {
-    /* Size of root container is set to 0 when unknown, for exemple
+    /* Size of root container is set to 0 when unknown, for example
      * with a DASH stream. In that case, we skip the following check */
     if( (p_container->i_size || p_container->p_father)
             && ( vlc_stream_Tell( p_stream ) + ((b_indexed)?16:8) >
@@ -2681,7 +2681,7 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         }
         /* !Checks */
 
-        MP4_GET4BYTES( i_extoffset ); /* offset to stsd extentions */
+        MP4_GET4BYTES( i_extoffset ); /* offset to stsd extensions */
         MP4_GET8BYTES( i_dummy64 );
         memcpy( &f_sample_rate, &i_dummy64, 8 );
         msg_Dbg( p_stream, "read box: %f Hz", f_sample_rate );
@@ -5032,7 +5032,7 @@ MP4_Box_t *MP4_BoxGetNextChunk( stream_t *s )
  * MP4_BoxGetRoot : Parse the entire file, and create all boxes in memory
  *****************************************************************************
  *  The first box is a virtual box "root" and is the father for all first
- *  level boxes for the file, a sort of virtual contener
+ *  level boxes for the file, a sort of virtual container
  *****************************************************************************/
 MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
 {
@@ -5172,7 +5172,7 @@ void MP4_BoxDumpStructure( stream_t *s, const MP4_Box_t *p_box )
 /*****************************************************************************
  *****************************************************************************
  **
- **  High level methods to acces an MP4 file
+ **  High level methods to access an MP4 file
  **
  *****************************************************************************
  *****************************************************************************/

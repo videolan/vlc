@@ -186,7 +186,7 @@ IXML_Document* parseBrowseResult( IXML_Document* p_doc )
     IXML_Document* p_result_doc = ixmlParseBuffer( psz_raw_didl );
     if( !p_result_doc ) {
         /* Missing namespaces confuse the ixml parser. This is a very ugly
-         * hack but it is needeed until devices start sending valid XML.
+         * hack but it is needed until devices start sending valid XML.
          *
          * It works that way:
          *

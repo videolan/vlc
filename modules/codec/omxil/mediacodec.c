@@ -356,7 +356,7 @@ static int ParseVideoExtraVc1(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
         return VLC_EGENERIC;
 
     /* Initialisation data starts with : 0x00 0x00 0x01 0x0f */
-    /* Skipping unecessary data */
+    /* Skipping unnecessary data */
     static const uint8_t vc1_start_code[4] = {0x00, 0x00, 0x01, 0x0f};
     for (; offset < i_extra - 4 ; ++offset)
     {

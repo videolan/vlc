@@ -72,7 +72,7 @@ private:
     int m_frameRate;
     /// Number of Loops
     int m_nbLoops;
-    /// Curent frame
+    /// Current frame
     int m_curFrame;
     /// Current loop
     int m_curLoop;

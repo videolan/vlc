@@ -182,7 +182,7 @@ static void Close(vlc_object_t *p_this)
     vlc_cancel(p_sys->thread);
     vlc_join(p_sys->thread, NULL);
 
-    /* Free the ressources */
+    /* Free the resources */
     vlc_gl_surface_Destroy(p_sys->gl);
     block_FifoRelease(p_sys->fifo);
     free(p_sys->p_prev_s16_buff);

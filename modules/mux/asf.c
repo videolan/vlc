@@ -947,7 +947,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size min */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size max */
     /* NOTE: According to p6-9 of the ASF specification the bitrate cannot be 0,
-     * therefor apply this workaround to make sure it is not 0. If the bitrate is
+     * therefore apply this workaround to make sure it is not 0. If the bitrate is
      * 0 the file will play in WMP11, but not in Sliverlight and WMP12 */
     bo_addle_u32( &bo, p_sys->i_bitrate > 0 ? p_sys->i_bitrate : 1 ); /* maxbitrate */
 
@@ -1088,7 +1088,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
         {
             bo_add_u8( &bo, 0x1 ); /* span */
             bo_addle_u16( &bo, tk->i_blockalign );  /* virtual packet length */
-            bo_addle_u16( &bo, tk->i_blockalign );  /* virtual chunck length */
+            bo_addle_u16( &bo, tk->i_blockalign );  /* virtual chunk length */
             bo_addle_u16( &bo, 1 );  /* silence length */
             bo_add_u8( &bo, 0x0 ); /* data */
         }
@@ -1203,7 +1203,7 @@ static block_t *asf_packet_create( sout_mux_t *p_mux,
 
         if( tk->b_audio_correction && p_sys->i_pk_frame && i_payload < i_data )
         {
-            /* Don't know why yet but WMP doesn't like splitted WMA packets */
+            /* Don't know why yet but WMP doesn't like split WMA packets */
             *last = asf_packet_flush( p_mux );
             last  = &(*last)->p_next;
             continue;

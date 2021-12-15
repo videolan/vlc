@@ -277,7 +277,7 @@ GstVlcVideoPool* gst_vlc_video_pool_new(
 
     if( !GST_IS_VLC_PICTURE_PLANE_ALLOCATOR( p_allocator ))
     {
-        msg_Err( p_dec, "unspported allocator for pool" );
+        msg_Err( p_dec, "unsupported allocator for pool" );
         return NULL;
     }
 

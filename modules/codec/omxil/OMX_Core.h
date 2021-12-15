@@ -171,7 +171,7 @@ typedef enum OMX_ERRORTYPE
       lost resulting in the component returning to the loaded state */
   OMX_ErrorResourcesLost = (OMX_S32) 0x8000100D,
 
-  /** No more indicies can be enumerated */
+  /** No more indices can be enumerated */
   OMX_ErrorNoMore = (OMX_S32) 0x8000100E,
 
   /** The component detected a version mismatch */
@@ -208,7 +208,7 @@ typedef enum OMX_ERRORTYPE
       the non-supplier to return a buffer via an EmptyThisBuffer or FillThisBuffer call. */
   OMX_ErrorPortUnresponsiveDuringStop = (OMX_S32) 0x80001016,
 
-  /** Attempting a state transtion that is not allowed */
+  /** Attempting a state transition that is not allowed */
   OMX_ErrorIncorrectStateTransition = (OMX_S32) 0x80001017,
 
   /* Attempting a command that is not allowed during the present state. */
@@ -292,7 +292,7 @@ typedef struct OMX_PARAM_COMPONENTROLETYPE {
   * A component sets EOS when it has no more data to emit on a particular 
   * output port. Thus an output port shall set EOS on the last buffer it 
   * emits. A component's determination of when an output port should 
-  * cease sending data is implemenation specific.
+  * cease sending data is implementation specific.
   * @ingroup buf
   */
 
@@ -478,7 +478,7 @@ typedef struct OMX_PORT_PARAM_TYPE {
 /** @ingroup comp */
 typedef enum OMX_EVENTTYPE
 {
-    OMX_EventCmdComplete,         /**< component has sucessfully completed a command */
+    OMX_EventCmdComplete,         /**< component has successfully completed a command */
     OMX_EventError,               /**< component has detected an error condition */
     OMX_EventMark,                /**< component has detected a buffer mark */
     OMX_EventPortSettingsChanged, /**< component is reported a port settings change */
@@ -1191,7 +1191,7 @@ OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_Init(void);
 
 /** The OMX_Deinit method is used to deinitialize the OMX core.  It shall be 
     the last call made into OMX. In the event that the core determines that 
-    thare are components loaded when this call is made, the core may return 
+    there are components loaded when this call is made, the core may return
     with an error rather than try to unload the components.
         
     The core should return from this call within 20 msec.
@@ -1209,7 +1209,7 @@ OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_Deinit(void);
     as a means to detect all the components in the system run-time. There is
     no strict ordering to the enumeration order of component names, although
     each name will only be enumerated once.  If the OMX core supports run-time
-    installation of new components, it is only requried to detect newly
+    installation of new components, it is only required to detect newly
     installed components when the first call to enumerate component names
     is made (i.e. when nIndex is 0x0).
     
@@ -1225,7 +1225,7 @@ OMX_API OMX_ERRORTYPE OMX_APIENTRY OMX_Deinit(void);
     @param [in] nNameLength
         number of characters in the cComponentName string.  With all 
         component name strings restricted to less than 128 characters 
-        (including the trailing null) it is recomended that the caller
+        (including the trailing null) it is recommended that the caller
         provide a input string for the cComponentName of 128 characters.
     @param [in] nIndex
         number containing the enumeration index for the component. 

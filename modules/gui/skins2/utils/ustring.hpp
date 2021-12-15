@@ -66,7 +66,7 @@ public:
     const UString operator +( const char *pString ) const;
 
 
-    /// Search for the first occurance of the substring specified by str
+    /// Search for the first occurrence of the substring specified by str
     /// in this string, starting at position. If found, it returns the
     /// index of the first character of the matching substring. If not
     /// found, it returns npos

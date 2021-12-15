@@ -810,7 +810,7 @@ static int Demux( demux_t *p_demux )
     if( pkt.flags & AV_PKT_FLAG_KEY )
         p_frame->i_flags |= BLOCK_FLAG_TYPE_I;
 
-    /* Used to avoid timestamps overlow */
+    /* Used to avoid timestamps overflow */
     lldiv_t q;
     if( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE )
     {

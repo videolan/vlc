@@ -756,8 +756,8 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
             }
         }
         else
-        {   /* Overriden speaker configuration */
-            const char *name = "Non-existant";
+        {   /* Overridden speaker configuration */
+            const char *name = "Non-existent";
             switch( i )
             {
                 case 1: /* Mono */

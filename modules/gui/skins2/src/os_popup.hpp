@@ -37,7 +37,7 @@ class OSPopup: public SkinObject
 public:
     virtual ~OSPopup() { }
 
-    /// Show the popup menu at the given (absolute) corrdinates
+    /// Show the popup menu at the given (absolute) coordinates
     virtual void show( int xPos, int yPos ) = 0;
 
     /// Hide the popup menu

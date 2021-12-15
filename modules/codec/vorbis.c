@@ -894,7 +894,7 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
     block_t *p_block, *p_chain = NULL;
     float **buffer;
 
-    /* Packets are already flushed, see bellow. */
+    /* Packets are already flushed, see below. */
     if( unlikely( !p_aout_buf ) ) return NULL;
 
     vlc_tick_t i_pts = p_aout_buf->i_pts -

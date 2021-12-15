@@ -462,7 +462,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 
             /* The most common cause seems to be a server disconnect, resulting in a
                Socket Error which can only be fixed by closing and reconnecting.
-               Since we already began with a working connection, the most feasable
+               Since we already began with a working connection, the most feasible
                approach to get out of this error status is a (timed) reconnect approach. */
             shout_close( p_sys->p_shout );
             msg_Warn( p_access, "server unavailable? trying to reconnect..." );

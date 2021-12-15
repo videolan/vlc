@@ -962,7 +962,7 @@ static bool ConnectFilters( vlc_object_t *p_this, access_sys_t *p_sys,
 }
 
 /*
- * get fourcc priority from arbritary preference, the higher the better
+ * get fourcc priority from arbitrary preference, the higher the better
  */
 static int GetFourCCPriority( int i_fourcc )
 {
@@ -1075,7 +1075,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         }
     }
 
-    // Retreive acceptable media types supported by device
+    // Retrieve acceptable media types supported by device
     AM_MEDIA_TYPE media_types[MAX_MEDIA_TYPES];
     size_t media_count =
         EnumDeviceCaps( p_this, p_device_filter.Get(), b_audio ? 0 : p_sys->i_chroma,
@@ -1222,7 +1222,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
 /* FindCaptureDevices:: This Function had two purposes :
     Returns the list of capture devices when p_listdevices != NULL
     Creates an IBaseFilter when p_devicename corresponds to an existing devname
-   These actions *may* be requested whith a single call.
+   These actions *may* be requested with a single call.
 */
 static ComPtr<IBaseFilter>
 FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
@@ -1299,7 +1299,7 @@ FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
                 {
                     if( 0 == (*iter).compare( devname ) )
                     { /* devname is on the list. Try another name with sequence
-                         number apended and then rescan until a unique entry is found*/
+                         number appended and then rescan until a unique entry is found*/
                          char seq[16];
                          snprintf(seq, 16, " #%d", ++dup);
                          devname = ordevname + seq;

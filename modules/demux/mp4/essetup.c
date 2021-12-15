@@ -171,7 +171,7 @@ static int SetupRTPReceptionHintTrack( demux_t *p_demux, mp4_track_t *p_track, M
     {
         if( !( pch = strtok_r(NULL, " :=\n", &strtok_state) ) ) /* attribute type */
             return 0;
-        msg_Dbg(p_demux, "sdp: atrribute type:%s", pch);
+        msg_Dbg(p_demux, "sdp: attribute type:%s", pch);
 
         if( !strcmp(pch, "rtpmap") )
         {

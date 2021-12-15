@@ -46,7 +46,7 @@ public:
     static void destroy( intf_thread_t *pIntf );
 
     /// Parse an action tag and returns a pointer on a command
-    /// (the intepreter takes care of deleting it, don't do it
+    /// (the interpreter takes care of deleting it, don't do it
     ///  yourself !)
     CmdGeneric *parseAction( const std::string &rAction, Theme *pTheme );
 

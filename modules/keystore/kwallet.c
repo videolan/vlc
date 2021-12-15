@@ -58,7 +58,7 @@ vlc_module_end()
  * but we only use the "Password" category. *
  * It is juste a simple Entry name ( or key ) *
  * associated with a secret. *
- * Keys are urls formated with : *
+ * Keys are urls formatted with : *
  *     _ Protocol *
  *     _ User ( optional ) *
  *     _ Server *

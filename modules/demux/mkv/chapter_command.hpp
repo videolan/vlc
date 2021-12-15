@@ -286,14 +286,14 @@ class matroska_script_codec_c : public chapter_codec_cmds_c
 public:
     matroska_script_codec_c( demux_sys_t & sys )
     :chapter_codec_cmds_c( sys, 0 )
-    ,interpretor( sys )
+    ,interpreter( sys )
     {}
 
     bool Enter();
     bool Leave();
 
 protected:
-    matroska_script_interpretor_c interpretor;
+    matroska_script_interpretor_c interpreter;
 };
 
 

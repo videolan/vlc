@@ -255,7 +255,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm,
                 es_format_Change( &tk->fmt, VIDEO_ES, VLC_CODEC_HEVC );
             }
             else if( i_id == 0xe2 || /* Primary H.264 in evob */
-                     i_id == 0xe3 )  /* Seconday H.264 in evob */
+                     i_id == 0xe3 )  /* Secondary H.264 in evob */
             {
                 es_format_Change( &tk->fmt, VIDEO_ES, VLC_CODEC_H264 );
             }
@@ -460,7 +460,7 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
 {
     uint8_t *p = &p_pkt->p_buffer[6 + 3 + 1 + 1 + 1];
 
-    /* System header is not useable if it references private streams (0xBD)
+    /* System header is not usable if it references private streams (0xBD)
      * or 'all audio streams' (0xB8) or 'all video streams' (0xB9) */
     while( p < &p_pkt->p_buffer[p_pkt->i_buffer] && (p[0] & 0x80) )
     {

@@ -304,7 +304,7 @@ static int BuildChromaResize( filter_t *p_filter )
     if( i_ret == VLC_SUCCESS )
         return VLC_SUCCESS;
 
-    /* Lets try it the other way arround (chroma and then resize) */
+    /* Lets try it the other way around (chroma and then resize) */
     msg_Dbg( p_filter, "Trying to build chroma+resize" );
     EsFormatMergeSize( &fmt_mid, &p_filter->fmt_out, &p_filter->fmt_in );
     i_ret = CreateChain( p_filter, &fmt_mid );

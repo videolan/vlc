@@ -160,7 +160,7 @@ static int Open( vlc_object_t *p_this )
     else
     {
         p_dec->fmt_out.audio.i_physical_channels = 0;
-        /* Will be initalised from first frame */
+        /* Will be initialised from first frame */
         p_dec->fmt_out.audio.i_rate = 0;
         p_dec->fmt_out.audio.i_channels = 0;
         date_Set( &p_sys->date, VLC_TS_INVALID );

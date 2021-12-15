@@ -450,7 +450,7 @@ static int Reset( stream_t *p_access )
                        var_InheritBool( p_access, "audio" ),
                        var_InheritBool( p_access, "video" ) );
 
-    /* Check we have comptible asfh */
+    /* Check we have compatible asfh */
     for( i = 1; i < 128; i++ )
     {
         asf_stream_t *p_old = &old_asfh.stream[i];

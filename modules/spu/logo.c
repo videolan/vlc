@@ -279,7 +279,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     p_sys->i_pos_y = var_CreateGetIntegerCommand( p_filter, "logo-y" );
     p_sys->b_absolute = (p_sys->i_pos < 0);
 
-    /* Ignore aligment if a position is given for video filter */
+    /* Ignore alignment if a position is given for video filter */
     if( !b_sub && p_sys->i_pos_x >= 0 && p_sys->i_pos_y >= 0 )
         p_sys->i_pos = 0;
 
@@ -717,7 +717,7 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list,
 }
 
 /**
- * Unload a list of logo and release associated ressources.
+ * Unload a list of logo and release associated resources.
  */
 static void LogoListUnload( logo_list_t *p_list )
 {

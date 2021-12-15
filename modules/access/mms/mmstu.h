@@ -67,7 +67,7 @@ struct access_sys_t
     int         i_packet_seq_num;
 
     uint8_t     *p_cmd;     /* latest command read */
-    size_t      i_cmd;      /* allocated at the begining */
+    size_t      i_cmd;      /* allocated at the beginning */
 
     uint8_t     *p_header;  /* allocated by mms_ReadPacket */
     size_t      i_header;

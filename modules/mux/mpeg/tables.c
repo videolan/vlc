@@ -377,7 +377,7 @@ static void UpdateServiceType( uint8_t *pi_service_cat, uint8_t *pi_service_type
             case 0x0f:
             case 0x81:
             case 0x83:
-                i_type = 0x0A; /* Avanced codec digital radio */
+                i_type = 0x0A; /* Advanced codec digital radio */
                 break;
 
             default:
@@ -491,7 +491,7 @@ void BuildPMT( dvbpsi_t *p_dvbpsi, vlc_object_t *p_object,
             uint8_t data[512];
             size_t i_extra = __MIN( p_stream->fmt->i_extra, 502 );
 
-            /* private DIV3 descripor */
+            /* private DIV3 descriptor */
             memcpy( &data[0], &p_stream->fmt->i_codec, 4 );
             data[4] = ( p_stream->fmt->video.i_visible_width >> 8 )&0xff;
             data[5] = ( p_stream->fmt->video.i_visible_width      )&0xff;

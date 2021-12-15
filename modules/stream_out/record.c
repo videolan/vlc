@@ -610,7 +610,7 @@ static void OutputSend( sout_stream_t *p_stream, sout_stream_id_sys_t *id, block
     if( id->id )
     {
         /* We wait until the first key frame (if needed) and
-         * to be beyong i_dts_start (for stream without key frame) */
+         * to be beyond i_dts_start (for stream without key frame) */
         if( unlikely( id->b_wait_key ) )
         {
             if( p_block->i_flags & BLOCK_FLAG_TYPE_I )

@@ -1290,7 +1290,7 @@ static void HandleAudioConfig( demux_t *p_demux, const uint16_t *p_anc,
                         p_audio->i_delay = i_tmp;
                 }
                 if ( p_anc[13] & 0x1 )
-                    msg_Warn( p_demux, "asymetric audio is not supported" );
+                    msg_Warn( p_demux, "asymmetric audio is not supported" );
             }
             else
             {
@@ -1306,7 +1306,7 @@ static void HandleAudioConfig( demux_t *p_demux, const uint16_t *p_anc,
                         p_audio->i_delay = i_tmp;
                 }
                 if ( p_anc[10] & 0x1 )
-                    msg_Warn( p_demux, "asymetric audio is not supported" );
+                    msg_Warn( p_demux, "asymmetric audio is not supported" );
             }
 
             switch ( i_rate )

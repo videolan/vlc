@@ -77,7 +77,7 @@ public:
     virtual void draw( OSGraphics &rImage, int xDest, int yDest, int w, int h );
 
     /// Set the text of the control, with an optional color
-    /// This takes effect immediatly
+    /// This takes effect immediately
     void setText( const UString &rText, uint32_t color = 0xFFFFFFFF );
 
     /// Get the type of control (custom RTTI)
@@ -129,7 +129,7 @@ private:
     /// Method called when visibility is updated
     virtual void onUpdate( Subject<VarBool> &rVariable , void* );
 
-    /// Intialize the set of pictures
+    /// Initialize the set of pictures
     void setPictures( const UString &rText );
 
     /// Update object according to current context

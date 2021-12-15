@@ -38,7 +38,7 @@
 #include <vlc_charset.h>
 
 /*****************************************************************************
- * Module descriptior
+ * Module descriptor
  *****************************************************************************/
 static int  OpenAccess (vlc_object_t *);
 static void CloseAccess(vlc_object_t *);
@@ -360,7 +360,7 @@ static int ControlAccess(stream_t *access, int i_query, va_list args)
 }
 
 /**
- * It retreives data using the get() callback, copies them,
+ * It retrieves data using the get() callback, copies them,
  * and then release them using the release() callback.
  */
 static block_t *Block(stream_t *access, bool *restrict eof)
@@ -564,7 +564,7 @@ static int ControlDemux(demux_t *demux, int i_query, va_list args)
 }
 
 /**
- * It retreives data using the get() callback, sends them to es_out
+ * It retrieves data using the get() callback, sends them to es_out
  * and the release it using the release() callback.
  */
 static int Demux(demux_t *demux)

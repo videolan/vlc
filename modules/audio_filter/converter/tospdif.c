@@ -223,7 +223,7 @@ static int write_buffer_ac3( filter_t *p_filter, block_t *p_in_buf )
      || p_in_buf->i_nb_samples != A52_FRAME_NB ) )
     {
         /* Input is not correctly packetizer. Try to parse the buffer in order
-         * to get the mandatory informations to play AC3 over S/PDIF */
+         * to get the mandatory information to play AC3 over S/PDIF */
         vlc_a52_header_t a52;
         if( vlc_a52_header_Parse( &a52, p_in_buf->p_buffer, p_in_buf->i_buffer )
             != VLC_SUCCESS || a52.b_eac3 || a52.i_size > p_in_buf->i_buffer )

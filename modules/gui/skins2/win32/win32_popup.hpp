@@ -36,7 +36,7 @@ public:
 
     virtual ~Win32Popup();
 
-    /// Show the popup menu at the given (absolute) corrdinates
+    /// Show the popup menu at the given (absolute) coordinates
     virtual void show( int xPos, int yPos );
 
     /// Hide the popup menu

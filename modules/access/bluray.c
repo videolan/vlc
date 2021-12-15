@@ -1524,7 +1524,7 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
 
     /*
      * When this function is called, all p_subpic regions are gone.
-     * We need to duplicate our regions (stored internaly) to this subpic.
+     * We need to duplicate our regions (stored internally) to this subpic.
      */
     subpicture_region_t *p_src = p_overlay->p_regions;
     if (!p_src) {

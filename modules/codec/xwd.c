@@ -109,7 +109,7 @@ static int Decode (decoder_t *dec, block_t *block)
                 chroma = VLC_CODEC_ARGB;
             break;
     }
-    /* TODO: check image endianess, set RGB mask */
+    /* TODO: check image endianness, set RGB mask */
     if (!chroma)
         goto drop;
 

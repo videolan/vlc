@@ -26,7 +26,7 @@
  *****************************************************************************
  *
  * You should use this module in combination with the transcode module, to get
- * raw datas from it. This module does not make any conversion at all, so you
+ * raw data from it. This module does not make any conversion at all, so you
  * need to use the transcode module for this purpose.
  *
  * For example, you can use smem as it :

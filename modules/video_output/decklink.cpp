@@ -658,7 +658,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
                                           &vd->fmt, wanted_mode_id);
     if(p_display_mode == NULL)
     {
-        msg_Err(vd, "Could not negociate a compatible display mode");
+        msg_Err(vd, "Could not negotiate a compatible display mode");
         goto error;
     }
     else

@@ -109,7 +109,7 @@ enum
 /*
  * TTML Parsing and inheritance order:
  * Each time a text node is found and belongs to out time interval,
- * we backward merge attributes dictionnary up to root.
+ * we backward merge attributes dictionary up to root.
  * Then we convert attributes, merging with style by id or region
  * style, and sets from parent node.
  */

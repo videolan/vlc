@@ -609,7 +609,7 @@ static int Demux( demux_t *p_demux )
     PCM::FrameBuffer   AudioFrameBuff( p_sys->i_audio_buffer);
     AESDecContext video_aes_ctx, audio_aes_ctx;
 
-    /* swaping video reels */
+    /* swapping video reels */
     if  ( p_sys->frame_no == p_sys->p_dcp->video_reels[p_sys->i_video_reel].i_absolute_end )
     {
         if ( p_sys->i_video_reel + 1 == p_sys->v_videoReader.size() )
@@ -622,7 +622,7 @@ static int Demux( demux_t *p_demux )
         }
     }
 
-    /* swaping audio reels */
+    /* swapping audio reels */
     if  ( !p_sys->p_dcp->audio_reels.empty() && p_sys->frame_no == p_sys->p_dcp->audio_reels[p_sys->i_audio_reel].i_absolute_end )
      {
          if ( p_sys->i_audio_reel + 1 == p_sys->v_audioReader.size() )

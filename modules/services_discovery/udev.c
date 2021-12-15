@@ -264,7 +264,7 @@ static int Open (vlc_object_t *obj, const struct subsys *subsys)
 
     udev_monitor_enable_receiving (mon);
     /* Note that we enumerate _after_ monitoring is enabled so that we do not
-     * loose device events occuring while we are enumerating. We could still
+     * loose device events occurring while we are enumerating. We could still
      * loose events if the Netlink socket receive buffer overflows. */
     udev_enumerate_scan_devices (devenum);
     struct udev_list_entry *devlist = udev_enumerate_get_list_entry (devenum);

@@ -285,7 +285,7 @@ static int Open(vlc_object_t *p_this)
     p_dec->pf_flush  = Flush;
 
 bailout:
-    // Cleanup if error occured
+    // Cleanup if error occurred
     if (ret != VLC_SUCCESS) {
         if (p_sys->graph)
             DisposeAUGraph(p_sys->graph);

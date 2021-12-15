@@ -363,7 +363,7 @@ static void Play( audio_output_t *p_aout, block_t *block )
                         p_aout->sys->b_spdif ) != VLC_SUCCESS )
 
     {
-        msg_Warn( p_aout, "Couln't write frame... sleeping");
+        msg_Warn( p_aout, "Couldn't write frame... sleeping");
         msleep( block->i_length );
     }
 

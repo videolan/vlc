@@ -678,10 +678,10 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                 debug( vars, "Unsupported Colour Range=%d", static_cast<uint8>(range) );
             }
         }
-        E_CASE( KaxVideoColourTransferCharacter, tranfer )
+        E_CASE( KaxVideoColourTransferCharacter, transfer )
         {
             ONLY_FMT(VIDEO);
-            switch( static_cast<uint8>(tranfer) )
+            switch( static_cast<uint8>(transfer) )
             {
             case 1: // BT-709
                 vars.tk->fmt.video.transfer = TRANSFER_FUNC_BT709;
@@ -716,7 +716,7 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             case 15: // ITU-R BT.2020 12 bit
             case 17: // SMPTE ST 428-1
             default:
-                debug( vars, "Unsupported Colour Transfer=%d", static_cast<uint8>(tranfer) );
+                debug( vars, "Unsupported Colour Transfer=%d", static_cast<uint8>(transfer) );
             }
         }
         E_CASE( KaxVideoColourPrimaries, primaries )
