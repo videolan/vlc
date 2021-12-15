@@ -50,7 +50,7 @@ static bool preInit(qt_intf_t *p_intf) {
 
 struct {
     const char* name;
-    Compositor* (*instanciate)(qt_intf_t *p_intf);
+    Compositor* (*instantiate)(qt_intf_t *p_intf);
     bool (*preInit)(qt_intf_t *p_intf);
 } static compositorList[] = {
 #ifdef _WIN32
@@ -90,7 +90,7 @@ Compositor* CompositorFactory::createCompositor()
     {
         if (m_compositorName == "auto" || m_compositorName == compositorList[m_compositorIndex].name)
         {
-            Compositor* compositor = compositorList[m_compositorIndex].instanciate(m_intf);
+            Compositor* compositor = compositorList[m_compositorIndex].instantiate(m_intf);
             if (compositor->init())
             {
                 //avoid looping over the same compositor if the current ones fails further initialisation steps
