@@ -163,7 +163,7 @@ int main(void)
 {
     struct vlc_http_stream *s, *s2;
     struct vlc_http_msg *m;
-    struct block_t *b;
+    block_t *b;
     uint_fast32_t sid = -1; /* Second guessed stream IDs :-/ */
 
     conn_create();

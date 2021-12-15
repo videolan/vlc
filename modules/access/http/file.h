@@ -29,7 +29,6 @@
 
 struct vlc_http_mgr;
 struct vlc_http_resource;
-struct block_t;
 
 /**
  * Creates an HTTP file.
@@ -77,7 +76,7 @@ int vlc_http_file_seek(struct vlc_http_resource *, uintmax_t offset);
  *
  * Reads data from a file and update the file offset.
  */
-struct block_t *vlc_http_file_read(struct vlc_http_resource *);
+block_t *vlc_http_file_read(struct vlc_http_resource *);
 
 #define vlc_http_file_get_status vlc_http_res_get_status
 #define vlc_http_file_get_redirect vlc_http_res_get_redirect
