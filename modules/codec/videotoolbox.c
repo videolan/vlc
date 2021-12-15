@@ -377,7 +377,7 @@ static CFDictionaryRef CopyDecoderExtradataH264(decoder_t *p_dec)
                                         p_dec->fmt_in.p_extra,
                                         p_dec->fmt_in.i_extra);
     }
-    else if (p_sys->hh.h264.i_pps_count && p_sys->hh.h264.i_sps_count)
+    else if (hxxx_helper_has_config(&p_sys->hh))
     {
         /* build DecoderConfiguration from gathered */
         block_t *p_avcC = hxxx_helper_get_extradata_block(&p_sys->hh);
@@ -442,8 +442,7 @@ static bool CodecSupportedH264(decoder_t *p_dec)
 static bool LateStartH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    return (p_dec->fmt_in.i_extra == 0 &&
-            (!p_sys->hh.h264.i_pps_count || !p_sys->hh.h264.i_sps_count) );
+    return (p_dec->fmt_in.i_extra == 0 && !hxxx_helper_has_config(&p_sys->hh));
 }
 
 static bool ConfigureVoutH264(decoder_t *p_dec)
@@ -729,9 +728,7 @@ static CFDictionaryRef CopyDecoderExtradataHEVC(decoder_t *p_dec)
                                         p_dec->fmt_in.p_extra,
                                         p_dec->fmt_in.i_extra);
     }
-    else if (p_sys->hh.hevc.i_pps_count &&
-             p_sys->hh.hevc.i_sps_count &&
-             p_sys->hh.hevc.i_vps_count)
+    else if (hxxx_helper_has_config(&p_sys->hh))
     {
         /* build DecoderConfiguration from gathered */
         block_t *p_hvcC = hxxx_helper_get_extradata_block(&p_sys->hh);
@@ -749,10 +746,7 @@ static CFDictionaryRef CopyDecoderExtradataHEVC(decoder_t *p_dec)
 static bool LateStartHEVC(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    return (p_dec->fmt_in.i_extra == 0 &&
-            (!p_sys->hh.hevc.i_pps_count ||
-             !p_sys->hh.hevc.i_sps_count ||
-             !p_sys->hh.hevc.i_vps_count) );
+    return (p_dec->fmt_in.i_extra == 0 && !hxxx_helper_has_config(&p_sys->hh));
 }
 
 static bool CodecSupportedHEVC(decoder_t *p_dec)

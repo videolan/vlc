@@ -638,6 +638,21 @@ bool hxxx_helper_has_new_config(const struct hxxx_helper *hh)
     return hh->i_config_version != hh->i_config_version_prev;
 }
 
+bool hxxx_helper_has_config(const struct hxxx_helper *hh)
+{
+    if(hh->i_codec == VLC_CODEC_H264)
+    {
+        return hh->h264.i_sps_count &&
+               hh->h264.i_pps_count;
+    }
+    else
+    {
+        return hh->hevc.i_vps_count &&
+               hh->hevc.i_sps_count &&
+               hh->hevc.i_pps_count;
+    }
+}
+
 static block_t *
 h264_helper_get_annexb_config(const struct hxxx_helper *hh)
 {

@@ -106,6 +106,7 @@ int hxxx_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
 /* returns if a configuration parameter has changed since last block/buffer
  * processing */
 bool hxxx_helper_has_new_config(const struct hxxx_helper *hh);
+bool hxxx_helper_has_config(const struct hxxx_helper *hh);
 
 block_t * hxxx_helper_get_extradata_chain(const struct hxxx_helper *hh);
 block_t * hxxx_helper_get_extradata_block(const struct hxxx_helper *hh);

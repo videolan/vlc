@@ -284,7 +284,7 @@ static int H264SetCSD(decoder_t *p_dec, bool *p_size_changed)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     struct hxxx_helper *hh = &p_sys->video.hh;
-    assert(hh->h264.i_sps_count > 0 || hh->h264.i_pps_count > 0);
+    assert(hxxx_helper_has_config(hh));
 
     block_t *p_spspps_blocks = hxxx_helper_get_extradata_chain(hh);
 
@@ -302,8 +302,7 @@ static int HEVCSetCSD(decoder_t *p_dec, bool *p_size_changed)
     decoder_sys_t *p_sys = p_dec->p_sys;
     struct hxxx_helper *hh = &p_sys->video.hh;
 
-    assert(hh->hevc.i_vps_count > 0 || hh->hevc.i_sps_count > 0 ||
-           hh->hevc.i_pps_count > 0 );
+    assert(hxxx_helper_has_config(hh));
 
     block_t *p_xps = hxxx_helper_get_extradata_block(hh);
     if (p_xps != NULL)
@@ -327,7 +326,7 @@ static int ParseVideoExtraH264(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
 
     p_sys->pf_on_new_block = VideoHXXX_OnNewBlock;
 
-    if (hh->h264.i_sps_count > 0 || hh->h264.i_pps_count > 0)
+    if (hxxx_helper_has_config(hh))
         return H264SetCSD(p_dec, NULL);
     return VLC_SUCCESS;
 }
@@ -346,8 +345,7 @@ static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
 
     p_sys->pf_on_new_block = VideoHXXX_OnNewBlock;
 
-    if (hh->hevc.i_vps_count > 0 || hh->hevc.i_sps_count > 0 ||
-        hh->hevc.i_pps_count > 0 )
+    if (hxxx_helper_has_config(hh))
         return HEVCSetCSD(p_dec, NULL);
     return VLC_SUCCESS;
 }
@@ -1746,14 +1744,13 @@ static int VideoHXXX_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
         switch (p_dec->fmt_in.i_codec)
         {
         case VLC_CODEC_H264:
-            if (hh->h264.i_sps_count > 0 || hh->h264.i_pps_count > 0)
+            if (hxxx_helper_has_config(hh))
                 i_ret = H264SetCSD(p_dec, &b_size_changed);
             else
                 i_ret = VLC_EGENERIC;
             break;
         case VLC_CODEC_HEVC:
-            if (hh->hevc.i_vps_count > 0 || hh->hevc.i_sps_count > 0 ||
-                hh->hevc.i_pps_count > 0 )
+            if (hxxx_helper_has_config(hh))
                 i_ret = HEVCSetCSD(p_dec, &b_size_changed);
             else
                 i_ret = VLC_EGENERIC;
