@@ -53,6 +53,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_filter.h \
 	../include/vlc_fingerprinter.h \
 	../include/vlc_fourcc.h \
+	../include/vlc_frame.h \
 	../include/vlc_fs.h \
 	../include/vlc_gcrypt.h \
 	../include/vlc_hash.h \
