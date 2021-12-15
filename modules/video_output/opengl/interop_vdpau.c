@@ -228,6 +228,20 @@ DecoderDeviceOpen(vlc_decoder_device *device, vout_window_t *window)
         return VLC_EGENERIC;
     }
 
+    const char *infos;
+    VdpStatus status = vdp_get_information_string(sys->vdp, &infos);
+    /* Favor original backends. Example: don't use a VAAPI backend when we
+     * have VAAPI decoder devices. */
+    if (status != VDP_STATUS_OK
+     || strstr(infos, "VAAPI") != NULL)
+    {
+        if (status == VDP_STATUS_OK)
+            msg_Dbg(device, "Not using '%s', favor a decdev with a compatible backend",
+                    infos);
+        vdp_release_x11(sys->vdp);
+        return VLC_EGENERIC;
+    }
+
     device->ops = &dev_ops;
     device->type = VLC_DECODER_DEVICE_VDPAU;
     device->opaque = sys;
