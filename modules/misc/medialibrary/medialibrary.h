@@ -295,7 +295,7 @@ T* CreateAndConvert( const Input* input )
     // Override the pf_relase that each Convert<T> helper will assign.
     // The Convert function will use the ReleaseRef variant of the release function,
     // as it converts in place, and doesn't have to free the allocated pointer.
-    // When CreateAndConvert is used, we heap-allocate an instance of T, and therefor
+    // When CreateAndConvert is used, we heap-allocate an instance of T, and therefore
     // we also need to release it.
     return res.release();
 }

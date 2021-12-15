@@ -48,7 +48,7 @@ Widgets.IconControlButton {
             //
             // mapFromItem is affected by various properties of source and target objects
             // which can't be represented in a binding expression so a initial setting in
-            // object defination (x: clamp(...)) doesn't work, so we set x and y on initial open
+            // object definition (x: clamp(...)) doesn't work, so we set x and y on initial open
             x = Qt.binding(function () {
                 // coords are mapped through playbackSpeedButton.parent so that binding is generated based on playbackSpeedButton.x
                 var mappedParentCoordinates = parent.mapFromItem(playbackSpeedButton.parent, playbackSpeedButton.x, 0)

@@ -88,7 +88,7 @@ static void dtsgen_Resync(struct dtsgen_t *d)
  * While receiving the N first packets (N>max reorder):
  * - check if it needs reorder, or increase depth
  * - create slow increments in DTS while taking any frame as a start,
- *   substracting the total difference between first and last packet,
+ *   subtracting the total difference between first and last packet,
  *   and removing the possible offset after reorder,
  *   divided by max possible frames.
  *

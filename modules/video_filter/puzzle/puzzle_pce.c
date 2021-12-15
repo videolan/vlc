@@ -246,7 +246,7 @@ void puzzle_calculate_corners( filter_t *p_filter,  int32_t i_piece )
             ps_piece->ps_piece_in_plane[0].i_actual_y * p_sys->ps_desk_planes[i_plane].i_lines / p_sys->ps_desk_planes[0].i_lines;
     }
 
-    /* regen location of grabed piece's corners */
+    /* regen location of grabbed piece's corners */
     int32_t i_width = ps_piece->ps_piece_in_plane[0].i_width;
     int32_t i_lines = ps_piece->ps_piece_in_plane[0].i_lines;
 

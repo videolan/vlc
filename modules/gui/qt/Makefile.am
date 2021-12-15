@@ -6,9 +6,9 @@
 # For each UI
 #   - Add *.ui to ..._UI
 #   - Add *.h to nodist_..._SOURCES
-# For each ressource (icon, png, ...)
+# For each resource (icon, png, ...)
 #   - Add it to DEPS_res
-# For each qml and js ressource
+# For each qml and js resource
 #   - Add it to ..._QML
 
 SUFFIXES += .ui .h .hpp .moc.cpp .qml

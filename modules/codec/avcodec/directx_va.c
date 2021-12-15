@@ -153,7 +153,7 @@ DEFINE_GUID(DXVA_ModeAV1_VLD_12bit_Profile2, 0x17127009, 0xa00f, 0x4ce1, 0x99, 0
 DEFINE_GUID(DXVA_ModeAV1_VLD_12bit_Profile2_420, 0x2d80bed6, 0x9cac, 0x4835, 0x9e, 0x91, 0x32, 0x7b, 0xbc, 0x4f, 0x9e, 0xe8);
 #endif
 
-/* XXX Prefered modes must come first */
+/* XXX Preferred modes must come first */
 static const directx_va_mode_t DXVA_MODES[] = {
     /* MPEG-1/2 */
     { "MPEG-1 decoder, restricted profile A",                                         &DXVA_ModeMPEG1_A,                      8, {1, 1}, 0, NULL, 0 },
@@ -420,7 +420,7 @@ static const directx_va_mode_t * FindVideoServiceConversion(vlc_va_t *va, const 
     }
 
     const directx_va_mode_t *res = NULL;
-    /* Retreive supported modes from the decoder service */
+    /* Retrieve supported modes from the decoder service */
     for (unsigned i = 0; i < p_list.count; i++) {
         const GUID *g = &p_list.list[i];
         char *psz_decoder_name = directx_va_GetDecoderName(g);

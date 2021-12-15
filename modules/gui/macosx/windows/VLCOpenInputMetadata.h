@@ -35,7 +35,7 @@
  * Initialize the VLCOpenInputMetadata  with the given file path
  *
  * Initializes the new VLCOpenInputMetadata with the MRLString
- * refering to the file given by path. Note that it is not
+ * referring to the file given by path. Note that it is not
  * verified that the file actually exists, so it will succeed
  * regardless of the presence of the file.
  */

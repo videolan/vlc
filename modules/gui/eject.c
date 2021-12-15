@@ -61,7 +61,7 @@
  * \brief Ejects the CD /DVD using SCSI commands
  * \ingroup vlc_interface
  * This function is local
- * \param i_fd a device nummber
+ * \param i_fd a device number
  * \return 0 on success, VLC_EGENERIC on failure
  */
 static int EjectSCSI( int i_fd )

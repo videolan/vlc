@@ -32,7 +32,7 @@ struct protocol_info_t {
     protocol_info_t() = default;
     protocol_info_t(const protocol_info_t&) = default;
 
-    // aggreate initializers do not work in c++11
+    // aggregate initializers do not work in c++11
     // for class types with default member initializers
     protocol_info_t(dlna_transport_protocol_t transport,
             dlna_org_conversion_t ci,

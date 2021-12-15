@@ -184,7 +184,7 @@ extern NSString *VLCPlayerRecordingChanged;
 
 /**
  * Listen to VLCPlayerRendererChanged to be notified if the renderer (such as a Chromecast device) changes
- * @note the affected playser object will be the obejct of the notification
+ * @note the affected player object will be the object of the notification
  */
 extern NSString *VLCPlayerRendererChanged;
 
@@ -192,7 +192,7 @@ extern NSString *VLCPlayerInputStats;
 /**
  * Listen to VLCPlayerStatisticsUpdated to be notified if the playback statistics state of the current media update
  * @note the affected player object will be the object of the notification
- * @note the userInfo dictionary will have an instance of VLCInputStats for key VLCPlayerInputStats representating the new state
+ * @note the userInfo dictionary will have an instance of VLCInputStats for key VLCPlayerInputStats representing the new state
  */
 extern NSString *VLCPlayerStatisticsUpdated;
 
@@ -268,7 +268,7 @@ extern const CGFloat VLCVolumeDefault;
 - (void)resume;
 
 /**
- * Convinience method to either start or pause playback
+ * Convenience method to either start or pause playback
  */
 - (void)togglePlayPause;
 
@@ -519,7 +519,7 @@ extern const CGFloat VLCVolumeDefault;
 @property (readwrite, nonatomic) size_t selectedTitleIndex;
 
 /**
- * convinience method to get the current title
+ * convenience method to get the current title
  * @note this may return NULL if there is no title
  */
 - (const struct vlc_player_title * _Nullable)selectedTitle;
@@ -719,35 +719,35 @@ extern const CGFloat VLCVolumeDefault;
  * @param the track to select
  * @param indicate whether multiple tracks may be played (video and SPU only)
  * @note since tracks are unique, you do not need to specify the type
- * @note listen to VLCTrackSelectionChanged to be notified once the change occured
+ * @note listen to VLCTrackSelectionChanged to be notified once the change occurred
  */
 - (void)selectTrack:(VLCTrackMetaData *)track exclusively:(BOOL)exclusiveSelection;
 
 /**
  * unselect a track
  * @note since tracks are unique, you do not need to specify the type
- * @note listen to VLCTrackSelectionChanged to be notified once the change occured
+ * @note listen to VLCTrackSelectionChanged to be notified once the change occurred
  */
 - (void)unselectTrack:(VLCTrackMetaData *)track;
 
 /**
  * unselect any track of a certain category
  * @param the es_format_category_e category to unselect
- * @note listen to VLCTrackSelectionChanged to be notified once the change occured
+ * @note listen to VLCTrackSelectionChanged to be notified once the change occurred
  */
 - (void)unselectTracksFromCategory:(enum es_format_category_e)category;
 
 /**
  * cycle to the previous track of a certain category
  * @param the category, @see es_format_category_e
- * @note listen to VLCTrackSelectionChanged to be notified once the change occured
+ * @note listen to VLCTrackSelectionChanged to be notified once the change occurred
  */
 - (void)selectPreviousTrackForCategory:(enum es_format_category_e)category;
 
 /**
  * cycle to the next track of a certain category
  * @param the category, @see es_format_category_e
- * @note listen to VLCTrackSelectionChanged to be notified once the change occured
+ * @note listen to VLCTrackSelectionChanged to be notified once the change occurred
  */
 - (void)selectNextTrackForCategory:(enum es_format_category_e)category;
 

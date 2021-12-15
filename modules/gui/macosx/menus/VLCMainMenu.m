@@ -349,7 +349,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_show_all setTitle: _NS("Show All")];
     [_quit setTitle: _NS("Quit VLC")];
 
-    /* this special case is needed to due to archiac legacy translations of the File menu
+    /* this special case is needed to due to archaic legacy translations of the File menu
      * on the Mac to the German translation which resulted in 'Ablage' instead of 'Datei'.
      * This remains until the present day and does not affect the Windows world. */
      /* xgettext: Label for the macOS main "File" menu */

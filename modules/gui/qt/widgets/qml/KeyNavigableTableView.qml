@@ -133,7 +133,7 @@ FocusScope {
     }
 
     /*
-     *define the intial position/selection
+     *define the initial position/selection
      * This is done on activeFocus rather than Component.onCompleted because delegateModel.
      * selectedGroup update itself after this event
      */

@@ -142,7 +142,7 @@ int transcode_audio_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     /* The decoder fmt_out can be uninitialized here (since it can initialized
      * asynchronously). Fix decoder_out with default values in that case.
      * This should be enough to initialize the encoder for the first time (it
-     * will be reloaded when all informations from the decoder are available).
+     * will be reloaded when all information from the decoder are available).
      * */
     id->decoder_out.audio.i_format = FIRSTVALID( id->decoder_out.audio.i_format,
                                                  id->p_decoder->fmt_out.i_codec,
@@ -163,7 +163,7 @@ int transcode_audio_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     /* The decoder fmt_out can be uninitialized here (since it can initialized
      * asynchronously). Fix audio_dec_out with default values in that case.
      * This should be enough to initialize the encoder for the first time (it
-     * will be reloaded when all informations from the decoder are available).
+     * will be reloaded when all information from the decoder are available).
      * */
     if( transcode_encoder_test( sout_EncoderCreate(p_stream, sizeof(encoder_t)),
                                 id->p_enccfg,

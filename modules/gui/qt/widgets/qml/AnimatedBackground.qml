@@ -35,7 +35,7 @@ Rectangle {
     property color backgroundColor: "transparent"
 
     // `foregroundColor` property is not used in this component but is
-    // provided as a convienence as it gets animated with color property
+    // provided as a convenience as it gets animated with color property
     property color foregroundColor: {
         if (backgroundColor.a === 0)
             return VLCStyle.colors.text

@@ -25,7 +25,7 @@
 #define POINTER_HPP
 
 
-/// Reference couting pointer
+/// Reference counting pointer
 template <class T> class CountedPtr
 {
 public:

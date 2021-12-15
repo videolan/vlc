@@ -51,7 +51,7 @@ static void flush_range(void * const start, const size_t len)
     b->s[0] = (struct vcsm_user_clean_invalid2_block_s){
         .invalidate_mode = 3,   // wb + invalidate
         .block_count = 1,
-        .start_address = start, // Rely on clean inv to fix up align & size boundries
+        .start_address = start, // Rely on clean inv to fix up align & size boundaries
         .block_size = len,
         .inter_block_stride = 0
     };
@@ -209,7 +209,7 @@ static void do_detached(void *(*fn)(void *), void * v)
     pthread_detach(dothread);
 }
 
-// Destroy a ppr - aranged s.t. it has the correct prototype for a pthread
+// Destroy a ppr - arranged s.t. it has the correct prototype for a pthread
 static void * kill_ppr(void * v)
 {
     hw_mmal_port_pool_ref_t * const ppr = v;
@@ -802,7 +802,7 @@ static pool_ent_t * ent_extract(ent_list_hdr_t * const elh, pool_ent_t * const e
 
     --elh->n;
 
-    return ent;  // For convienience
+    return ent;  // For convenience
 }
 
 static pool_ent_t * ent_extract_tail(ent_list_hdr_t * const elh)

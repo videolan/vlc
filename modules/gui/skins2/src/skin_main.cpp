@@ -345,7 +345,7 @@ static void WindowDisable( vout_window_t *pWnd )
     // In the process of quitting vlc, the interfaces are destroyed first,
     // then comes the playlist along with the player and possible vouts.
     // problem: the interface is no longer active to properly deallocate
-    // ressources allocated as a vout window submodule.
+    // resources allocated as a vout window submodule.
     intf_thread_t *pIntf = skin_load_intf;
     if( pIntf == NULL )
     {

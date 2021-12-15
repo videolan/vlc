@@ -151,7 +151,7 @@ struct AWindowHandler
     (*p_env)->what(p_env, p_awh->jobj, p_awh->jfields.AWindow.method, ##__VA_ARGS__)
 
 /*
- * Andoid JNIEnv helper
+ * Android JNIEnv helper
  */
 
 static pthread_key_t jni_env_key;

@@ -112,7 +112,7 @@ static int OpenInternal( demux_t *p_demux, bool trust_cues )
     std::string         s_path, s_filename;
     bool                b_need_preload = false;
 
-    /* peek the begining */
+    /* peek the beginning */
     if( vlc_stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
     /* is a valid file */
@@ -214,7 +214,7 @@ static int OpenInternal( demux_t *p_demux, bool trust_cues )
                             stream_t      *p_file_stream = vlc_stream_NewURL(
                                                             p_demux,
                                                             psz_url );
-                            /* peek the begining */
+                            /* peek the beginning */
                             if( p_file_stream &&
                                 vlc_stream_Peek( p_file_stream, &p_peek, 4 ) >= 4
                                 && p_peek[0] == 0x1a && p_peek[1] == 0x45 &&

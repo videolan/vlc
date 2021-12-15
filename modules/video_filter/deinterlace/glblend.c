@@ -112,7 +112,7 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_picture *pic,
     /* If the direction matrix contains a 90° rotation, then the unit vector
      * should be divided by width rather than by height. Since up_vector is
      * always a unit vector with one of its components equal to 0, then we can
-     * always devide the horizontal component by width and the vertical
+     * always divide the horizontal component by width and the vertical
      * component by height. */
     GLsizei width = glfmt->tex_widths[meta->plane];
     GLsizei height = glfmt->tex_heights[meta->plane];

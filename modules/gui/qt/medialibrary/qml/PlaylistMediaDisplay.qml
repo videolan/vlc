@@ -42,7 +42,7 @@ FocusScope {
     property MLItemId initialId
     property string  initialName
 
-    // NOTE: Specify an optionnal header for the view.
+    // NOTE: Specify an optional header for the view.
     property Component header: undefined
 
     property Item headerItem: view.headerItem

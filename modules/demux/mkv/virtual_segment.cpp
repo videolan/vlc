@@ -544,7 +544,7 @@ bool virtual_segment_c::Seek( demux_t & demuxer, vlc_tick_t i_mk_date,
             msg_Dbg( &demuxer, "SWITCH CHAPTER uid=%" PRId64, p_vchapter->p_chapter ? p_vchapter->p_chapter->i_uid : 0 );
             p_current_vchapter = p_vchapter;
 
-            /* only use for soft linking, hard linking should be continous */
+            /* only use for soft linking, hard linking should be continuous */
             es_out_Control( demuxer.out, ES_OUT_RESET_PCR );
 
             p_sys->PreparePlayback( *this, i_mk_date );

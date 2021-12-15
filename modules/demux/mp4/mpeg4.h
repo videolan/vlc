@@ -55,7 +55,7 @@ static inline bool MPEG4_Codec_By_ObjectType(uint8_t oti,
             /* Theses are MPEG2-AAC */
         case 0x66: /* main profile */
         case 0x67: /* Low complexity profile */
-        case 0x68: /* Scaleable Sampling rate profile */
+        case 0x68: /* Scalable Sampling rate profile */
             *pi_codec = VLC_CODEC_MP4A;
             break;
             /* True MPEG 2 audio */

@@ -171,7 +171,7 @@ static void Close( filter_t *p_filter )
 
     vlc_join( p_sys->thread, NULL );
 
-    /* Free the ressources */
+    /* Free the resources */
     vlc_gl_surface_Destroy( p_sys->gl );
     delete p_sys->vsxu_cyclic_buffer;
     free( p_sys );

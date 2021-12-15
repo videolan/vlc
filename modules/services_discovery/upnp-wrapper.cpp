@@ -65,7 +65,7 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj)
         int i_res = UpnpInit2( psz_miface, 0 );
         free( psz_miface );
     #else
-        /* If UpnpInit2 isnt available, initialize on first IPv4-capable interface */
+        /* If UpnpInit2 isn't available, initialize on first IPv4-capable interface */
         char *psz_hostip = getIpv4ForMulticast();
         int i_res = UpnpInit( psz_hostip, 0 );
         free(psz_hostip);

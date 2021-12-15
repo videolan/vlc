@@ -83,7 +83,7 @@ FocusScope {
                     newIndex = Math.min(gridview_id.modelCount - 1, currentIndex + 1)
                 }
             } else if (KeyHelper.matchLeft(event)) {
-                if (currentIndex % _colCount !== 0) {//are we not at the begining of line
+                if (currentIndex % _colCount !== 0) {//are we not at the beginning of line
                     newIndex = Math.max(0, currentIndex - 1)
                 }
             } else if (KeyHelper.matchDown(event)) {

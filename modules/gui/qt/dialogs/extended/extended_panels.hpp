@@ -1,5 +1,5 @@
 /*****************************************************************************
- * extended_panels.hpp : Exentended Panels
+ * extended_panels.hpp : Extended Panels
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  *

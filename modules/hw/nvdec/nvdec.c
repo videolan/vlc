@@ -772,7 +772,7 @@ static int OpenDecoder(vlc_object_t *p_this)
             {
                 uint8_t *p_extra = p_dec->fmt_in.p_extra;
                 /* Initialisation data starts with : 0x00 0x00 0x01 0x0f */
-                /* Skipping unecessary data */
+                /* Skipping unnecessary data */
                 static const uint8_t vc1_start_code[4] = {0x00, 0x00, 0x01, 0x0f};
                 for (; p_sys->vc1_header_offset < p_dec->fmt_in.i_extra - 4 ; ++p_sys->vc1_header_offset)
                 {

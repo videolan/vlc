@@ -123,7 +123,7 @@ MediaInfoDialog::MediaInfoDialog( qt_intf_t *_p_intf,
     else
         msg_Dbg( p_intf, "Using an item specific info windows" );
 
-    /* Call update at start, so info is filled up at begginning */
+    /* Call update at start, so info is filled up at beginning */
     if( p_item )
         updateAllTabs( p_item );
 

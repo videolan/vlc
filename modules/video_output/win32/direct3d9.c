@@ -1895,7 +1895,7 @@ error:
 }
 
 /**
- * It destroyes a Direct3D vout display.
+ * It destroys a Direct3D vout display.
  */
 static void Close(vout_display_t *vd)
 {

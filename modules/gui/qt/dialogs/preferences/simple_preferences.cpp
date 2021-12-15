@@ -601,7 +601,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             optionWidgets["fileW"] = ui.fileControl;
             optionWidgets["audioOutCoB"] = ui.outputModule;
             optionWidgets["normalizerChB"] = ui.volNormBox;
-            /*Little mofification of ui.volumeValue to compile with Qt < 4.3 */
+            /*Little modification of ui.volumeValue to compile with Qt < 4.3 */
             ui.volumeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
             optionWidgets["volLW"] = ui.volumeValue;
             optionWidgets["spdifChB"] = ui.spdifBox;

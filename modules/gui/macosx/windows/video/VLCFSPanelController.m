@@ -170,7 +170,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [_volumeSlider setDefaultValue:VLCVolumeDefault];
 
     /* Identifier to store the state of the remaining or total time label,
-     * this is the same identifier as used for the window playback cotrols
+     * this is the same identifier as used for the window playback controls
      * so the state is shared between those.
      */
     [_remainingOrTotalTime setRemainingIdentifier:VLCTimeFieldDisplayTimeAsRemaining];
@@ -229,7 +229,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 
     switch([[NSApp currentEvent] type]) {
         case NSLeftMouseUp:
-            /* Ignore mouse up, as this is a continous slider and
+            /* Ignore mouse up, as this is a continuous slider and
              * when the user does a single click to a position on the slider,
              * the action is called twice, once for the mouse down and once
              * for the mouse up event. This results in two short seeks one

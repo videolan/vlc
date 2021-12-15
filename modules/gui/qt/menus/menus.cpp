@@ -61,7 +61,7 @@ using namespace vlc::playlist;
   This file defines the main menus and the pop-up menu (right-click menu)
   and the systray menu (in that order in the file)
 
-  There are 4 menus that have to be rebuilt everytime there are called:
+  There are 4 menus that have to be rebuilt every time there are called:
   Audio, Video, Navigation, view
   4 functions are building those menus: AudioMenu, VideoMenu, NavigMenu, View
 

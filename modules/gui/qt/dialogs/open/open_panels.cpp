@@ -349,7 +349,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
     psz_cddadiscpath = config_GetType("cd-audio") ?
                        var_InheritString( p_intf, "cd-audio" ) : NULL;
 
-    /* State to avoid overwritting the users changes with the configuration */
+    /* State to avoid overwriting the users changes with the configuration */
     m_discType = None;
 
     ui.browseDiscButton->setToolTip( qfut( I_DEVICE_TOOLTIP ));

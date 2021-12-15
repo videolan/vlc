@@ -203,7 +203,7 @@
                    afterDelay:0.40];
     } else {
         if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.16) {
-            // we just skipped 4 "continous" events, otherwise we are too fast
+            // we just skipped 4 "continuous" events, otherwise we are too fast
             [_playerController jumpBackwardExtraShort];
             last_bwd_event = [NSDate timeIntervalSinceReferenceDate];
             [self performSelector:@selector(resetBackwardSkip)
@@ -238,7 +238,7 @@
                    afterDelay:0.40];
     } else {
         if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.16) {
-            // we just skipped 4 "continous" events, otherwise we are too fast
+            // we just skipped 4 "continuous" events, otherwise we are too fast
             [_playerController jumpForwardExtraShort];
             last_fwd_event = [NSDate timeIntervalSinceReferenceDate];
             [self performSelector:@selector(resetForwardSkip)
@@ -256,7 +256,7 @@
 
     switch (theEventType) {
         case NSLeftMouseUp:
-            /* Ignore mouse up, as this is a continous slider and
+            /* Ignore mouse up, as this is a continuous slider and
              * when the user does a single click to a position on the slider,
              * the action is called twice, once for the mouse down and once
              * for the mouse up event. This results in two short seeks one

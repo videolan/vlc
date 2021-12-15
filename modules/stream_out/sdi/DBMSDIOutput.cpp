@@ -395,7 +395,7 @@ int DBMSDIOutput::ConfigureVideo(const video_format_t *vfmt)
                                                         p_output, vfmt, wanted_mode.id);
     if(p_display_mode == NULL)
     {
-        msg_Err(p_stream, "Could not negociate a compatible display mode");
+        msg_Err(p_stream, "Could not negotiate a compatible display mode");
         goto error;
     }
     else

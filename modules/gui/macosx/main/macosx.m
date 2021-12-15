@@ -48,7 +48,7 @@ int  WindowOpen   (vout_window_t *);
  *****************************************************************************/
 #define VDEV_TEXT N_("Video device")
 #define VDEV_LONGTEXT N_("Number of the screen to use by default to display " \
-                         "videos in 'fullscreen'. The screen number correspondance can be found in "\
+                         "videos in 'fullscreen'. The screen number correspondence can be found in "\
                          "the video device selection menu.")
 
 #define OPAQUENESS_TEXT N_("Opaqueness")

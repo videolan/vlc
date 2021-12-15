@@ -1187,7 +1187,7 @@ static int os2_vcd_open( vlc_object_t * p_this, const char *psz_dev,
 #define CDTEXT_PACK_HEADER 4
 #define CDTEXT_PACK_PAYLOAD 12
 #define CDTEXT_TEXT_BUFFER 160 /* arbitrary from the sony docs,
-                                  < theorical max 12 * (256 - 4) */
+                                  < theoretical max 12 * (256 - 4) */
 enum cdtext_charset_e
 {
     CDTEXT_CHARSET_ISO88591 = 0x00,

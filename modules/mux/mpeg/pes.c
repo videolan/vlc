@@ -152,7 +152,7 @@ static inline int PESHeader( uint8_t *p_hdr, int64_t i_pts, int64_t i_dts,
                 bits_write( &bits, 2, 0x02 ); // mpeg2 id
                 bits_write( &bits, 2, 0x00 ); // pes scrambling control
                 bits_write( &bits, 1, 0x00 ); // pes priority
-                bits_write( &bits, 1, b_data_alignment ); // data alignement indicator
+                bits_write( &bits, 1, b_data_alignment ); // data alignment indicator
                 bits_write( &bits, 1, 0x00 ); // copyright
                 bits_write( &bits, 1, 0x00 ); // original or copy
 

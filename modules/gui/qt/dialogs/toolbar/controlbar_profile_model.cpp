@@ -310,7 +310,7 @@ QString ControlbarProfileModel::generateUniqueName(const QString &name)
     };
 
     // Actually, the profile model inherently does not allow two
-    // profiles to have the same name so it could be sufficent
+    // profiles to have the same name so it could be sufficient
     // to check only for name existence but for cases when the
     // config file is edited explicitly, using count_if might
     // be helpful.

@@ -88,7 +88,7 @@ struct scan_service_t
     char *psz_name;     /* channel name in utf8 */
     char *psz_provider; /* service provider */
     uint16_t i_channel; /* logical channel number */
-    bool b_crypted;     /* True if potentially crypted */
+    bool b_crypted;     /* True if potentially encrypted */
 
     char *psz_original_network_name;
 
@@ -563,7 +563,7 @@ static int Scan_Next_DVBC( const scan_parameter_t *p_params, scan_enumeration_t 
         static const unsigned short symbolrates[] = {
             6900, 6875, 6950
             /* With DR_44 we can cover other symbolrates from NIT-info
-                    as all channel-seed files have atleast one channel that
+                    as all channel-seed files have at least one channel that
                     has one of these symbolrate
                   */
         };

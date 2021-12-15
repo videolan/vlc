@@ -1613,7 +1613,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->fmt.i_codec == VLC_CODEC_OPUS ||
             p_stream->fmt.i_codec == VLC_CODEC_SPEEX )
         {
-            /* number of sample from begining + current packet */
+            /* number of sample from beginning + current packet */
             op.granulepos =
                 samples_from_vlc_tick( p_data->i_dts - p_sys->i_start_dts + p_data->i_length,
                                        p_input->p_fmt->audio.i_rate );
@@ -1623,7 +1623,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         }
         else if( p_stream->p_oggds_header )
         {
-            /* number of sample from begining */
+            /* number of sample from beginning */
             op.granulepos = samples_from_vlc_tick( p_data->i_dts - p_sys->i_start_dts,
                                   p_stream->p_oggds_header->i_samples_per_unit );
         }

@@ -837,7 +837,7 @@ static int BossCallback(vlc_object_t *p_this,
     }
 }
 
-// Called when playback has truely ended and likely no subsequent media will start playing
+// Called when playback has truly ended and likely no subsequent media will start playing
 - (void)onPlaybackHasTruelyEnded:(id)sender
 {
     msg_Dbg(getIntf(), "Playback has been ended");

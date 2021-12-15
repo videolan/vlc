@@ -314,7 +314,7 @@ static inline NSString* CharsToNSString(char * _Nullable cStr)
         [notification setValue:@(YES) forKey:@"_showsButtons"];
     } @catch (NSException *exception) {
         if (exception.name == NSUndefinedKeyException)
-            NSLog(@"VLC macOS notifcations plugin failed to set private notification values.");
+            NSLog(@"VLC macOS notifications plugin failed to set private notification values.");
         else
             @throw exception;
     }

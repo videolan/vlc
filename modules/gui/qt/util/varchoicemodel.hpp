@@ -35,7 +35,7 @@ int VLCVarChoiceModel_on_variable_list_callback( vlc_object_t * object, char con
 }
 
 /**
- * @brief The VLCVarChoiceModel class contruct an Abstract List Model from a
+ * @brief The VLCVarChoiceModel class construct an Abstract List Model from a
  * vlc_var with the VLC_VAR_HASCHOICE flag and a type amongst string, int, float, bool
  *
  * available roles are DisplayRole and CheckStateRole

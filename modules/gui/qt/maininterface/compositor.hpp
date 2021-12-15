@@ -153,7 +153,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(CompositorVideo::Flags)
 
 
 /**
- * @brief The CompositorFactory class will instanciate a compositor
+ * @brief The CompositorFactory class will instantiate a compositor
  * in auto mode, compositor will be instantiated from the list by order declaration,
  * compositor can be explicitly defined by passing its name.
  *
@@ -174,7 +174,7 @@ public:
 
     /**
      * @brief preInit will check whether a compositor can be used, before starting Qt,
-     * each candidate will may perform some basic checks and can setup Qt enviroment variable if required
+     * each candidate may perform some basic checks and can setup Qt environment variable if required
      *
      * @note if a compositor return true on preinit but fails to initialize afterwards, next
      * compositor in chain will be initialized without the preinit phaze (as Qt will be already started)
@@ -187,7 +187,7 @@ public:
     /**
      * @brief createCompositor will instantiate a compositor
      *
-     * @return the instantaied compositor, null if no compsitor can be instanciated
+     * @return the compositor instance, null if no compositor can be instantiated
      */
     Compositor* createCompositor();
 

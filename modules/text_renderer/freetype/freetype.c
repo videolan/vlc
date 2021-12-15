@@ -1036,7 +1036,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     text_block.i_max_height = i_max_height;
     rv = LayoutTextBlock( p_filter, &text_block, &text_block.p_laid, &bbox, &i_max_face_height );
 
-    /* Don't attempt to render text that couldn't be layed out
+    /* Don't attempt to render text that couldn't be laid out
      * properly. */
     if( !rv && text_block.i_count > 0 && bbox.xMin < bbox.xMax && bbox.yMin < bbox.yMax )
     {
@@ -1230,7 +1230,7 @@ static int Create( filter_t *p_filter )
 
     p_sys->i_scale = 100;
 
-    /* default style to apply to uncomplete segmeents styles */
+    /* default style to apply to incomplete segments styles */
     p_sys->p_default_style = text_style_Create( STYLE_FULLY_SET );
     if(unlikely(!p_sys->p_default_style))
         goto error;

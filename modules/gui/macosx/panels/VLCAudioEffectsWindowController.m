@@ -124,7 +124,7 @@ static inline void enableTextField(NSTextField *const __unsafe_unretained textFi
             NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
             if ([defaults boolForKey:@"AudioEffectApplyProfileOnStartup"])
             {
-                // This does not reset the UI (which does not exist yet), but it initalizes needed playlist vars
+                // This does not reset the UI (which does not exist yet), but it initializes needed playlist vars
                 [self equalizerUpdated];
                 [self resetCompressor];
                 [self resetSpatializer];
@@ -453,7 +453,7 @@ static inline void enableTextField(NSTextField *const __unsafe_unretained textFi
     // FIXME: Current code does not allow auto save of equalizer profiles, those profiles currently need to be saved
     // individually with the popup menu, before saving the overall profile.
     // Below code for auto duplication is not enough to fix current behaviour and results in too many duplicated profiles
-    // For auto-saving of eq profiles, a different stragety needs to be found, involving save also once overall profile changes.
+    // For auto-saving of eq profiles, a different strategy needs to be found, involving save also once overall profile changes.
 /*
     NSString *newPresetString = [NSString stringWithCString:var_InheritString(p_playlist, "equalizer-bands") encoding:NSASCIIStringEncoding];
     float newPresetPreamp = var_InheritFloat(p_playlist, "equalizer-preamp");

@@ -872,7 +872,7 @@ vlc_font_select_t * FontSelectNew( filter_t *p_filter )
     fs->p_filter = p_filter;
     fs->p_obj = VLC_OBJECT(p_filter);
 
-    /* Dictionnaries for families */
+    /* Dictionaries for families */
     vlc_dictionary_init( &fs->family_map, 53 );
     vlc_dictionary_init( &fs->fallback_map, 23 );
 

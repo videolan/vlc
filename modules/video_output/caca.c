@@ -278,7 +278,7 @@ static const struct {
 #define INVALID_DEADLINE  INT64_MAX
 
 /**
- * Proccess pending event
+ * Process pending event
  */
 static void Manage(vout_display_t *vd)
 {

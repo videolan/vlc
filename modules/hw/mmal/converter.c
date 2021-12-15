@@ -291,7 +291,7 @@ static void conv_output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf)
         {
             buf_to_pic_copy_props(pic, buf);
 
-            buf->user_data = NULL;  // Responsability for this pic no longer with buffer
+            buf->user_data = NULL;  // Responsibility for this pic no longer with buffer
             conv_out_q_pic(sys, pic);
         }
     }
@@ -591,7 +591,7 @@ static picture_t *conv_filter(filter_t *p_filter, picture_t *p_pic)
         }
     }
 
-    // Reenable stuff if the last thing we did was flush
+    // Re-enable stuff if the last thing we did was flush
     if ((err = conv_enable_out(p_filter, sys)) != MMAL_SUCCESS ||
         (err = conv_enable_in(p_filter, sys)) != MMAL_SUCCESS)
         goto fail;
@@ -834,7 +834,7 @@ retry:
     }
     p_filter->p_sys = sys;
 
-    // Init stuff the we destroy unconditionaly in Close first
+    // Init stuff the we destroy unconditionally in Close first
     vlc_mutex_init(&sys->lock);
     vlc_sem_init(&sys->sem, 0);
     sys->err_stream = MMAL_SUCCESS;

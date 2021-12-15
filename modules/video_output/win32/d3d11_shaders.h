@@ -30,7 +30,7 @@
 
 #include <wrl/client.h>
 
-/* Vertex Shader compiled sructures */
+/* Vertex Shader compiled structures */
 struct d3d11_vertex_shader_t {
     Microsoft::WRL::ComPtr<ID3D11VertexShader> shader;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>  layout;

@@ -217,7 +217,7 @@ vlc_ftcache_t * vlc_ftcache_New( vlc_object_t *obj, FT_Library p_library,
         return NULL;
     ftcache->obj = obj;
 
-    /* Dictionnaries for fonts */
+    /* Dictionaries for fonts */
     vlc_dictionary_init( &ftcache->face_ids, 50 );
 
     ftcache->glyphs_lrucache = vlc_lru_New( 128, LRUGlyphRefRelease, ftcache );

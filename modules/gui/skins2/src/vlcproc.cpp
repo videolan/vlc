@@ -426,7 +426,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     var_AddCallback( vlc_object_instance(getIntf()), "intf-toggle-fscontrol",
                      genericCallback, this );
 
-    // initialize variables refering to libvlc and playlist objects
+    // initialize variables referring to libvlc and playlist objects
     init_variables();
 }
 

@@ -996,7 +996,7 @@ static void Close(vlc_object_t *obj)
 }
 
 /*****************************************************************************
- * Module descriptior
+ * Module descriptor
  *****************************************************************************/
 #define CDAUDIO_DEV_TEXT N_("Audio CD device")
 #if defined( _WIN32 ) || defined( __OS2__ )

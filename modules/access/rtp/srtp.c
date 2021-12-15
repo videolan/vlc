@@ -124,7 +124,7 @@ static int proto_create (srtp_proto_t *p, int gcipher, int gmd)
  * multiple simultaneous sessions with the same master key.
  *
  * @param encr encryption algorithm number
- * @param auth authentication algortihm number
+ * @param auth authentication algorithm number
  * @param tag_len authentication tag byte length (NOT including RCC)
  * @param flags OR'ed optional flags.
  *

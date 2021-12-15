@@ -111,7 +111,7 @@ static int OpenInhibit(vlc_object_t *obj)
 {
     vlc_inhibit_t *ih = (vlc_inhibit_t *)obj;
 
-    // Intialize module private storage
+    // Initialize module private storage
     vlc_inhibit_sys_t *sys = ih->p_sys =
             vlc_obj_malloc(obj, sizeof(vlc_inhibit_sys_t));
     if (unlikely(ih->p_sys == NULL))

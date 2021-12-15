@@ -1,5 +1,5 @@
 /*****************************************************************************
- * convert.cpp : Convertion dialogs
+ * convert.cpp : Conversion dialogs
  ****************************************************************************
  * Copyright (C) 2009 the VideoLAN team
  *
@@ -210,7 +210,7 @@ void ConvertDialog::close()
                 // Remove the file:// from the front of our MRL
                 newFileName = QUrl(newFileName).toLocalFile();
 
-                // Remote the existing extention (if any)
+                // Remote the existing extension (if any)
                 int extentionPos = newFileName.lastIndexOf('.');
                 if(extentionPos >= 0)
                 {
@@ -223,7 +223,7 @@ void ConvertDialog::close()
                     newFileName = newFileName.append("-converted");
                 }
 
-                // Stick our new extention on
+                // Stick our new extension on
                 newFileName = newFileName.append(fileExtension);
             }
 

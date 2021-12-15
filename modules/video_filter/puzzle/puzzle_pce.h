@@ -80,7 +80,7 @@ typedef struct {
     int32_t i_actual_mirror;                 /* +1 = without mirror ; -1 = with mirror                          */
     int32_t i_step_x_x, i_step_x_y, i_step_y_y, i_step_y_x;
     int32_t i_ORx, i_OTy, i_OLx, i_OBy;      /* location of original piece's edges                              */
-    int32_t i_TLx, i_TLy, i_TRx, i_TRy, i_BLx, i_BLy, i_BRx, i_BRy; /* location of grabed piece's corners       */
+    int32_t i_TLx, i_TLy, i_TRx, i_TRy, i_BLx, i_BLy, i_BRx, i_BRy; /* location of grabbed piece's corners       */
     int32_t i_max_x, i_min_x, i_max_y, i_min_y, i_center_x, i_center_y;
 
     uint32_t i_group_ID;

@@ -38,7 +38,7 @@ FocusScope {
                                           &&
                                           _currentView) ? _currentView.contentMargin : 0
 
-    // NOTE: Specify an optionnal header for the view.
+    // NOTE: Specify an optional header for the view.
     property Component header: undefined
 
     property Item headerItem: (_currentView) ? _currentView.headerItem : undefined

@@ -740,12 +740,12 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             }
             if (name != nullptr) debug( vars, "Range=%s", name );
         }
-        E_CASE( KaxVideoColourTransferCharacter, tranfer )
+        E_CASE( KaxVideoColourTransferCharacter, transfer )
         {
             ONLY_FMT(VIDEO);
-            vars.tk->fmt.video.transfer = iso_23001_8_tc_to_vlc_xfer( static_cast<uint8>(tranfer) );
+            vars.tk->fmt.video.transfer = iso_23001_8_tc_to_vlc_xfer( static_cast<uint8>(transfer) );
             const char *name = nullptr;
-            switch( static_cast<uint8>(tranfer) )
+            switch( static_cast<uint8>(transfer) )
             {
             case 1: name = "BT-709";
                 break;
@@ -776,9 +776,9 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                 break;
             }
             if (vars.tk->fmt.video.transfer == TRANSFER_FUNC_UNDEF)
-                debug( vars, "Unsupported Colour Transfer=%d", static_cast<uint8>(tranfer) );
+                debug( vars, "Unsupported Colour Transfer=%d", static_cast<uint8>(transfer) );
             else if (name == nullptr)
-                debug( vars, "Colour Transfer=%d", static_cast<uint8>(tranfer) );
+                debug( vars, "Colour Transfer=%d", static_cast<uint8>(transfer) );
             else
                 debug( vars, "Colour Transfer=%s", name );
         }

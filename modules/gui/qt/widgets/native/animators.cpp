@@ -110,7 +110,7 @@ const QPersistentModelIndex & DelegateAnimationHelper::getIndex() const
 
 void DelegateAnimationHelper::updateDelegate()
 {
-    /* Prevent running indefinitively if removed from model */
+    /* Prevent running indefinitely if removed from model */
     if ( !index.isValid() )
         run( false );
     else

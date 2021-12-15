@@ -251,7 +251,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
             p_pes->gather.i_data_size = GetWBE(&p_pkt->p_buffer[4]);
             if( p_pes->gather.i_data_size > 0 )
                 p_pes->gather.i_data_size += 6;
-            b_first_sync_done = true; /* Because if size is 0, we woud not look for second sync */
+            b_first_sync_done = true; /* Because if size is 0, we would not look for second sync */
         }
         else
         {

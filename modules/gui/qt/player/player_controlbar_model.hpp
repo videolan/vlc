@@ -44,7 +44,7 @@ public:
     // PlayerControlbarModel.Mainplayer`.
     // To make it translatable, add a corresponding entry to
     // the static member playerIdentifierDictionary which is
-    // initalized in the source file.
+    // initialized in the source file.
     enum PlayerIdentifier {
         Mainplayer = 0,
         Miniplayer

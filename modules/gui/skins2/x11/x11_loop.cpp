@@ -388,7 +388,7 @@ void X11Loop::handleX11Event()
             // Check XConvertSelection completion
             if( event.xselection.property == None )
             {
-                msg_Err( getIntf(), "Convertion failed for Drag&Drop" );
+                msg_Err( getIntf(), "Conversion failed for Drag&Drop" );
                 return;
             }
 

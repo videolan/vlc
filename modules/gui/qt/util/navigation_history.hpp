@@ -49,7 +49,7 @@ public slots:
     Q_INVOKABLE void push( QVariantMap, PostAction = PostAction::Go );
 
     /**
-     * provide a short version of the history push({k:v}), wich implicitly create a dictonnary tree from the input list
+     * provide a short version of the history push({k:v}), which implicitly create a dictonnary tree from the input list
      *
      * List items are interpreted as
      *   * strings will push a dict with "view" key to the value of the string and

@@ -82,9 +82,9 @@ static void Resize(vout_window_t *wnd, unsigned width, unsigned height)
     vout_window_sys_t *sys = wnd->sys;
 
     /* When you create a window you give the dimensions you wish it to
-     * have. Unfortunatly these dimensions will include the borders and
+     * have. Unfortunately these dimensions will include the borders and
      * titlebar. We use the following function to find out the size of
-     * the window corresponding to the useable surface we want */
+     * the window corresponding to the usable surface we want */
     RECT decorated_window = {
         .right = width,
         .bottom = height,

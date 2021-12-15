@@ -165,7 +165,7 @@ static inline NSString *B64DecNSStr(NSString *s) {
 
  Base64 encodes the given C string and frees it, returns and empty
  NSString in case of failure.
- The given string is freed regardless if an error occured or not.
+ The given string is freed regardless if an error occurred or not.
 
  \warning Compatibility function, do not use in new code!
  */

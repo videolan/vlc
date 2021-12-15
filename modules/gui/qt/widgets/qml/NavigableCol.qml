@@ -45,7 +45,7 @@ T.Control {
     onIndexFocusChanged: if (_hasFocus()) _applyFocus()
 
     onActiveFocusChanged: {
-        // NOTE: We try to restore the preferred focussed item.
+        // NOTE: We try to restore the preferred focused item.
         if (!activeFocus || _applyFocus())
             return;
 
@@ -81,7 +81,7 @@ T.Control {
                 var item = repeater.itemAt(i);
 
                 if (item.visible && item.enabled) {
-                    // NOTE: We already have a focussed item, so we keep it this way.
+                    // NOTE: We already have a focused item, so we keep it this way.
                     if (item.activeFocus)
                         return;
 

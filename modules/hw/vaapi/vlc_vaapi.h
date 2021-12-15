@@ -52,7 +52,7 @@ vlc_vaapi_CreateContext(vlc_object_t *o, VADisplay dpy, VAConfigID conf,
                         VASurfaceID *render_targets, int num_render_targets);
 
 /* Creates a VA buffer for 'num_elements' elements of 'size' bytes and
- * initalized with 'data'. If 'data' is NULL, then the content of the buffer is
+ * initialized with 'data'. If 'data' is NULL, then the content of the buffer is
  * undefined. */
 VABufferID
 vlc_vaapi_CreateBuffer(vlc_object_t *o, VADisplay dpy, VAContextID ctx,
@@ -173,12 +173,12 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_video_context *vctx,
                   VADisplay dpy, unsigned count, VASurfaceID **render_targets,
                   const video_format_t *restrict fmt);
 
-/* Attachs the VASurface to the picture context, the picture must be allocated
+/* Attaches the VASurface to the picture context, the picture must be allocated
  * by a vaapi pool (see vlc_vaapi_PoolNew()) */
 void
 vlc_vaapi_PicAttachContext(picture_t *pic);
 
-/* Attachs the VASurface to the picture context */
+/* Attaches the VASurface to the picture context */
 void
 vlc_vaapi_PicSetContext(picture_t *pic, struct vaapi_pic_context *);
 

@@ -244,7 +244,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             if( xssheader.syncword == DTS_SYNC_SUBSTREAM_LBR )
             {
                 /*
-                 * LBR exists as independant SUBSTREAM. It is seen valid
+                 * LBR exists as independent SUBSTREAM. It is seen valid
                  * only when SUBSTREAM[LBR]..SUBTREAM.
                  * CORE...SUBSTREAM is regular extension.
                  * SUBSTREAM...CORE is sync issue.

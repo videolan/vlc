@@ -218,7 +218,7 @@ private:
     void onItemRemoved( MediaSourcePtr mediaSource, input_item_node_t * node, input_item_node_t *const children[], size_t count ) override;
     void onItemPreparseEnded( MediaSourcePtr mediaSource, input_item_node_t* node, enum input_item_preparse_status status ) override;
 
-    void refreshMediaList(MediaSourcePtr s, std::vector<InputItemPtr> childrens , bool clear);
+    void refreshMediaList(MediaSourcePtr s, std::vector<InputItemPtr> children , bool clear);
 
     bool canBeIndexed(const QUrl& url , ItemType itemType );
 

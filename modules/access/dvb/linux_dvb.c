@@ -409,7 +409,7 @@ static int ScanParametersDvbC( vlc_object_t *p_access, dvb_sys_t *p_sys, scan_pa
 
     /* if frontend can do auto, don't scan them */
     p_scan->b_modulation_set = ( p_frontend->info.caps & FE_CAN_QAM_AUTO );
-    /* our scanning code flips modulation from 16..256 automaticly*/
+    /* our scanning code flips modulation from 16..256 automatically*/
 
     /* if user supplies symbolrate, don't scan those */
     p_scan->i_symbolrate = var_GetInteger( p_access, "dvb-srate" );

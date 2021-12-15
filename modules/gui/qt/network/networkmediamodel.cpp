@@ -35,7 +35,7 @@ NetworkMediaModel::NetworkMediaModel( QObject* parent )
 
 NetworkMediaModel::~NetworkMediaModel()
 {
-    //this can only be aquired from UI thread
+    //this can only be acquired from UI thread
     if (!m_preparseSem.tryAcquire())
     {
         auto libvlc = vlc_object_instance(m_ctx->getIntf());
@@ -549,11 +549,11 @@ void NetworkMediaModel::onItemPreparseEnded(MediaSourcePtr, input_item_node_t* n
 }
 
 void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
-                                       std::vector<InputItemPtr> childrens,
+                                       std::vector<InputItemPtr> children,
                                        bool clear )
 {
     std::vector<Item> items;
-    for ( auto it: childrens)
+    for ( auto it: children)
     {
         Item item;
         item.name = it->psz_name;

@@ -49,7 +49,7 @@ typedef struct
     int32_t *i_visible_pitch;
     int8_t  ***pi_freezed_picture;   /* records freezed pixels */
     int16_t **pi_freezing_countdown; /* freezed pixel delay    */
-    bool    **pb_update_cache;       /* update chache request  */
+    bool    **pb_update_cache;       /* update cache request  */
 
 } filter_sys_t;
 
@@ -264,7 +264,7 @@ static int freeze_mouse( filter_t *p_filter, vlc_mouse_t *p_new,
 
                 uint16_t i_timeout = __MAX(i_base_timeout - i_sq_dist, 0);
 
-                /* ask to update chache for pixel to be freezed just now */
+                /* ask to update cache for pixel to be freezed just now */
                 if ( p_sys->pi_freezing_countdown[i_r][i_c] == 0 && i_timeout > 0)
                      p_sys->pb_update_cache[i_r][i_c] = true;
 

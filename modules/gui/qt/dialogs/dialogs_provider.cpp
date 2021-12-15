@@ -530,7 +530,7 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
     }
     ADD_EXT_FILTER( fileTypes, EXTENSIONS_ALL );
     fileTypes.replace( ";*", " *");
-    fileTypes.chop(2); //remove trailling ";;"
+    fileTypes.chop(2); //remove trailing ";;"
 
     QList<QUrl> urls = QFileDialog::getOpenFileUrls( NULL,
         help.isEmpty() ? qfut(I_OP_SEL_FILES ) : help,

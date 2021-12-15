@@ -321,9 +321,9 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
     vlc_mutex_unlock(&widget->p_dialog->lock);
 }
 
-- (void)syncTextField:(NSNotification *)notifcation
+- (void)syncTextField:(NSNotification *)notification
 {
-    id sender = [notifcation object];
+    id sender = [notification object];
     assert([sender isKindOfClass:[VLCDialogTextField class]] ||
         [sender isKindOfClass:[VLCDialogSecureTextField class]]);
     NSTextField *field = sender;
@@ -342,9 +342,9 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
     vlc_mutex_unlock(&widget->p_dialog->lock);
 }
 
-- (void)tableViewSelectionDidChange:(NSNotification *)notifcation
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
-    id sender = [notifcation object];
+    id sender = [notification object];
     assert(sender && [sender isKindOfClass:[VLCDialogList class]]);
     VLCDialogList *list = sender;
 
@@ -401,7 +401,7 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
 
         BOOL shouldDestroy = widget->b_kill;
 
-        /* Ownership should not be transfered back to ARC here, as
+        /* Ownership should not be transferred back to ARC here, as
          * we might just want to update something.
          */
         NSView *control = (__bridge NSView *)widget->p_sys_intf;
@@ -443,7 +443,7 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
         if (shouldDestroy) {
             VLCDialogGridView *gridView = (VLCDialogGridView *)[dialogWindow contentView];
             [gridView removeSubview:control];
-            /* Explicitily release here, as we do not have transfered ownership to ARC,
+            /* Explicitly release here, as we do not have transferred ownership to ARC,
              * given that not in all cases we want to destroy the widget.
              */
             if (widget->p_sys_intf) {

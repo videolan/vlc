@@ -280,7 +280,7 @@ void MainCtx::loadPrefs(const bool callSignals)
     /* Are we in the enhanced always-video mode or not ? */
     loadFromVLCOption(b_minimalView, "qt-minimal-view", nullptr);
 
-    /* Do we want anoying popups or not */
+    /* Do we want annoying popups or not */
     loadFromVLCOption(i_notificationSetting, "qt-notification", nullptr);
 
     /* Should the UI stays on top of other windows */

@@ -417,7 +417,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id, IMFMediaType **resul
         {
             if (IsEqualGUID(&subtype, &MFVideoFormat_NV12) || IsEqualGUID(&subtype, &MFVideoFormat_YV12) || IsEqualGUID(&subtype, &MFVideoFormat_I420))
                 found = true;
-            /* Transform might offer output in a D3DFMT propietary FCC. If we can
+            /* Transform might offer output in a D3DFMT proprietary FCC. If we can
              * use it, fall back to it in case we do not find YV12 or I420 */
             else if(output_type_index < 0 && GUIDToFormat(d3d_format_table, &subtype) > 0)
                     output_type_index = i;
@@ -464,7 +464,7 @@ static int SetOutputType(decoder_t *p_dec, DWORD stream_id, IMFMediaType **resul
     {
         video_format_Copy( &p_dec->fmt_out.video, &p_dec->fmt_in.video );
 
-        /* Transform might offer output in a D3DFMT propietary FCC */
+        /* Transform might offer output in a D3DFMT proprietary FCC */
         vlc_fourcc_t fcc = GUIDToFormat(d3d_format_table, &subtype);
         if(fcc) {
             /* D3D formats are upside down */

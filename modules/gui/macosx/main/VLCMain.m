@@ -216,7 +216,7 @@ static VLCMain *sharedInstance = nil;
         _libraryController = [[VLCLibraryController alloc] init];
         _continuityController = [[VLCPlaybackContinuityController alloc] init];
 
-        // first initalize extensions dialog provider, then core dialog
+        // first initialize extensions dialog provider, then core dialog
         // provider which will register both at the core
         _extensionsManager = [[VLCExtensionsManager alloc] init];
         _coredialogs = [[VLCCoreDialogProvider alloc] init];

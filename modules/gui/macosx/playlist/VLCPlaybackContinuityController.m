@@ -160,7 +160,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
     }
 #endif
 
-    /* check for file existance before resuming */
+    /* check for file existence before resuming */
     if (![self isValidResumeItem:inputItem])
         return;
 

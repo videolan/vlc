@@ -26,7 +26,7 @@
 namespace mkv {
 
 /*****************************************************************************
- * Stream managment
+ * Stream management
  *****************************************************************************/
 vlc_stream_io_callback::vlc_stream_io_callback( stream_t *s_, bool b_owner_ )
                        : s( s_), b_owner( b_owner_ )

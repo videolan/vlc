@@ -616,7 +616,7 @@ static bool ReadWin32( intf_thread_t *p_intf, unsigned char *p_buffer, int *pi_s
                                 MS_FROM_VLC_TICK(INTF_IDLE_SLEEP), TRUE ) == WAIT_OBJECT_0 )
     {
         // Prefer to fail early when there's not enough space to store a 4 bytes
-        // UTF8 character. The function will be immediatly called again and we won't
+        // UTF8 character. The function will be immediately called again and we won't
         // lose an input
         while( *pi_size < MAX_LINE_LENGTH - 4 &&
                ReadConsoleInput( p_intf->p_sys->hConsoleIn, &input_record, 1, &i_dw ) )

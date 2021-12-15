@@ -165,7 +165,7 @@ static void Destroy( filter_t *p_filter )
 }
 
 /*****************************************************************************
- * GetLuminanceAvg : The funtion returns the luminance average for a picture
+ * GetLuminanceAvg : The function returns the luminance average for a picture
  *****************************************************************************/
 static int GetLuminanceAvg( picture_t *p_pic )
 {

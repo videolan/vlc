@@ -82,13 +82,13 @@ Rectangle {
                 void main() {
                    mediump float r = rand(qt_TexCoord0) - 0.5;
                    mediump vec4 noise = vec4(r,r,r,1.0) * noiseStrength;
-                   mediump vec4 blured  = texture2D(source, qt_TexCoord0);
+                   mediump vec4 blurred  = texture2D(source, qt_TexCoord0);
 
                    mediump vec4 exclColor = vec4(exclusionStrength, exclusionStrength, exclusionStrength, 0.0);
 
-                   blured = exclude(blured, exclColor);
+                   blurred = exclude(blurred, exclColor);
 
-                   gl_FragColor = mix(blured, tint, tintStrength) + noise;
+                   gl_FragColor = mix(blurred, tint, tintStrength) + noise;
                 }"
         }
     }

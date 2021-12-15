@@ -106,7 +106,7 @@ void EPGWidget::updateEPG( input_item_t *p_input_item )
     i_event_source_type = p_input_item->i_type;
     b_input_type_known = true;
 
-    /* Fixme: input could have dissapeared */
+    /* Fixme: input could have disappeared */
     vlc_mutex_lock(  & p_input_item->lock );
     m_epgView->updateEPG( p_input_item->pp_epg, p_input_item->i_epg );
     m_epgView->setEpgTime( ( p_input_item->i_epg_time ) ?

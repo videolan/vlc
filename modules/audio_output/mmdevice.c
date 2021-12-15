@@ -1119,7 +1119,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             case MM_PASSTHROUGH_ENABLED:
                 if (b_hdmi)
                     return -1;
-                /* falltrough */
+                /* fallthrough */
             case MM_PASSTHROUGH_ENABLED_HD:
                 break;
         }

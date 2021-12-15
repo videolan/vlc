@@ -533,7 +533,7 @@ static int OpenCommon(filter_t *p_filter, bool b_sub)
     p_BarGraph->barWidth = var_CreateGetInteger(p_filter, CFG_PREFIX "barWidth");
     p_BarGraph->scale = var_CreateGetInteger( p_filter, CFG_PREFIX "barHeight");
 
-    /* Ignore aligment if a position is given for video filter */
+    /* Ignore alignment if a position is given for video filter */
     if (!b_sub && p_sys->i_pos_x >= 0 && p_sys->i_pos_y >= 0)
         p_sys->i_pos = -1;
 

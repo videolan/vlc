@@ -69,7 +69,7 @@ VideoAll {
         //       Otherwise it overlaps the default caption.
         visible: (model.count)
 
-        // NOTE: Making sure this item will be focussed by VideoAll::_onNavigationUp().
+        // NOTE: Making sure this item will be focused by VideoAll::_onNavigationUp().
         focus: true
 
         function setCurrentItemFocus(reason) {

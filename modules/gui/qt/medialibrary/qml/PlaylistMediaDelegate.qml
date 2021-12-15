@@ -58,7 +58,7 @@ Widgets.TableViewDelegate {
     // Childs
     //---------------------------------------------------------------------------------------------
 
-    // NOTE: We are usng a single DropArea and a single line Rectangle in PlaylistMedia.
+    // NOTE: We are using a single DropArea and a single line Rectangle in PlaylistMedia.
     DropArea {
         anchors.fill: parent
 

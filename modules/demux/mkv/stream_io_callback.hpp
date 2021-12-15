@@ -37,7 +37,7 @@ using namespace LIBEBML_NAMESPACE;
 namespace mkv {
 
 /*****************************************************************************
- * Stream managment
+ * Stream management
  *****************************************************************************/
 class vlc_stream_io_callback: public IOCallback
 {

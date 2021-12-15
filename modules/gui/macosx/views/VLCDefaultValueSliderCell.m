@@ -225,7 +225,7 @@
     // Determine in which direction slider is moving
     BOOL sliderMovingForward = (oldValue > newValue) ? NO : YES;
 
-    // Claculate snap-threshhold
+    // Calculate snap-threshhold
     double thresh = 100 * (self.knobThickness/3) / self.trackRect.size.width;
 
     // Snap to default value

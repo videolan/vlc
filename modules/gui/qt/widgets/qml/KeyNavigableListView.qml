@@ -36,7 +36,7 @@ FocusScope {
 
     property var fadeColor: undefined
 
-    // NOTE: We want buttons to be centered verticaly but configurable.
+    // NOTE: We want buttons to be centered vertically but configurable.
     property int buttonMargin: height / 2 - buttonLeft.height / 2
 
     property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
@@ -413,7 +413,7 @@ FocusScope {
         }
     }
 
-    // FIXME: We propbably need to upgrade these RoundButton(s) eventually. And we probably need
+    // FIXME: We probably need to upgrade these RoundButton(s) eventually. And we probably need
     //        to have some kind of animation when switching pages.
 
     RoundButton {

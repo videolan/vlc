@@ -84,7 +84,7 @@ static void Close (vlc_object_t *p_in)
 static int Open (filter_t *p_filter)
 {
     if (p_filter->fmt_out.audio.i_channels < 2) {
-        msg_Err( p_filter, "Atleast 2 audio channels are required" );
+        msg_Err( p_filter, "At least 2 audio channels are required" );
         return VLC_EGENERIC;
     }
     vlc_object_t *p_aout = vlc_object_parent(p_filter);

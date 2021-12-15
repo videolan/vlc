@@ -226,7 +226,7 @@ Open(vlc_object_t *obj)
              * swizzling. Indeed, the Y, Cb and Cr color channels within the
              * GL_RGB_422_APPLE format are mapped into the existing green, blue
              * and red color channels, respectively. cf. APPLE_rgb_422 khronos
-             * extenstion. */
+             * extension. */
 
             ret = opengl_interop_init(interop, tex_target, VLC_CODEC_VYUY,
                                       interop->fmt_in.space);

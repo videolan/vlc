@@ -987,7 +987,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 
             /* there are no DV or ProRes decoders on iOS, so bailout early */
         case VLC_CODEC_PRORES:
-            /* the VT decoder can't differenciate between the ProRes flavors, so we do it */
+            /* the VT decoder can't differentiate between the ProRes flavors, so we do it */
             switch (p_dec->fmt_in.i_original_fourcc) {
                 case VLC_FOURCC( 'a','p','4','c' ):
                 case VLC_FOURCC( 'a','p','4','h' ):
@@ -1008,7 +1008,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
             }
 
         case VLC_CODEC_DV:
-            /* the VT decoder can't differenciate between PAL and NTSC, so we need to do it */
+            /* the VT decoder can't differentiate between PAL and NTSC, so we need to do it */
             switch (p_dec->fmt_in.i_original_fourcc) {
                 case VLC_FOURCC( 'd', 'v', 'c', ' '):
                 case VLC_FOURCC( 'd', 'v', ' ', ' '):
@@ -2262,7 +2262,7 @@ OpenDecDevice(vlc_decoder_device *device, vout_window_t *window)
 #define VT_FORCE_CVPX_CHROMA "Force the VideoToolbox output chroma"
 #define VT_FORCE_CVPX_CHROMA_LONG "Force the VideoToolbox decoder to output \
     CVPixelBuffers in the specified pixel format instead of the default. \
-    By Default, the best chroma is choosen by the VideoToolbox decoder."
+    By default, the best chroma is chosen by the VideoToolbox decoder."
 
 static const char *const chroma_list_values[] =
     {

@@ -121,7 +121,7 @@ bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &e
         sync();
         commitChanges();
 
-        requestReset(); // incase z-order changed
+        requestReset(); // in case z-order changed
         break;
     }
     case WM_SETTINGCHANGE:

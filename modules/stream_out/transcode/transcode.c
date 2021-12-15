@@ -118,7 +118,7 @@
 #define SFILTER_LONGTEXT N_( \
     "This allows you to add overlays (also known as \"subpictures\") on the "\
     "transcoded video stream. The subpictures produced by the filters will "\
-    "be overlayed directly onto the video. You can specify a colon-separated "\
+    "be overlaid directly onto the video. You can specify a colon-separated "\
     "list of subpicture modules." )
 
 #define THREADS_TEXT N_("Number of threads")
@@ -438,7 +438,7 @@ static int Open( vlc_object_t *p_this )
         free( psz_string );
     }
 
-    /* Subpictures SOURCES parameters (not releated to subtitles stream) */
+    /* Subpictures SOURCES parameters (not related to subtitles stream) */
     psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "sfilter" );
     if( psz_string && *psz_string )
         p_sys->vfilters_cfg.video.psz_spu_sources = psz_string;

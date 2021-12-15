@@ -40,7 +40,7 @@
 
 struct vlc_va_surface_t {
     size_t               index;
-    atomic_uintptr_t     refcount; // 1 ref for the surface existance, 1 per surface/clone in-flight
+    atomic_uintptr_t     refcount; // 1 ref for the surface existence, 1 per surface/clone in-flight
     va_pool_t            *va_pool;
 };
 

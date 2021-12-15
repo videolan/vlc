@@ -55,7 +55,7 @@
  *
  * Note that (2.) might not always be respected in practice, for example if the
  * data is retrieved from a database where content changes between calls. The
- * cache does not really care, the data will just be inconcistent for the user.
+ * cache does not really care, the data will just be inconsistent for the user.
  *
  * All its public methods must be called from the UI thread.
  */

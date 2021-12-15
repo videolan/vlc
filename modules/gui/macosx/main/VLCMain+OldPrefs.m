@@ -68,7 +68,7 @@ static const int kCurrentPreferencesVersion = 4;
     [defaults removeObjectForKey:@"SUFeedURL"];
 
     /*
-     * Store version explicitely in file, for ease of debugging.
+     * Store version explicitly in file, for ease of debugging.
      * Otherwise, the value will be just defined at app startup,
      * as initialized above.
      */

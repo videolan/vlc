@@ -232,12 +232,12 @@ static picture_t *deinterlace(filter_t * p_filter, picture_t * p_pic)
         mmal_log_dump_format(sys->input->format);
     }
 
-    // Reenable stuff if the last thing we did was flush
+    // Re-enable stuff if the last thing we did was flush
     // Output should always be enabled
     if (!sys->input->is_enabled &&
         (err = mmal_port_enable(sys->input, di_input_port_cb)) != MMAL_SUCCESS)
     {
-        msg_Err(p_filter, "Input port reenable failed");
+        msg_Err(p_filter, "Input port re-enable failed");
         goto fail;
     }
 
@@ -329,7 +329,7 @@ static void di_flush(filter_t *p_filter)
                 mmal_port_enable(sys->output, di_output_port_cb);
                 fill_output_from_q(p_filter, sys, sys->out_q);
                 mmal_port_disable(sys->output);
-                // Out q should now be empty & should remain so until the input is reenabled
+                // Out q should now be empty & should remain so until the input is re-enabled
             }
         }
         mmal_port_enable(sys->output, di_output_port_cb);

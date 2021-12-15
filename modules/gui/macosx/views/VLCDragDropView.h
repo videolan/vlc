@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /*****************************************************************************
  * Disables default drag / drop behaviour of an NSImageView.
- * set it for all sub image views withing an VLCDragDropView.
+ * set it for all sub image views within an VLCDragDropView.
  *****************************************************************************/
 @interface VLCDropDisabledImageView : NSImageView
 

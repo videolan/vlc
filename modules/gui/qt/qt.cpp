@@ -243,8 +243,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define FULLSCREEN_CONTROL_PIXELS N_( "Fullscreen controller mouse sensitivity" )
 
-#define QT_COMPOSITOR_TEXT N_("Select Qt video intergration backend")
-#define QT_COMPOSITOR_LONGTEXT N_("Select Qt video intergration backend. Use with care, the interface may not start if an incompatible compositor is selected")
+#define QT_COMPOSITOR_TEXT N_("Select Qt video integration backend")
+#define QT_COMPOSITOR_LONGTEXT N_("Select Qt video integration backend. Use with care, the interface may not start if an incompatible compositor is selected")
 
 #define SMOOTH_SCROLLING_TEXT N_( "Use smooth scrolling in Flickable based views" )
 #define SMOOTH_SCROLLING_LONGTEXT N_( "Deactivating this option will disable smooth scrolling in Flickable based views (such as the Playqueue)" )

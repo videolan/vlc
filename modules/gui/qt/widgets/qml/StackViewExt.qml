@@ -50,7 +50,7 @@ StackView {
 
     /**
      * viewModel: model with the definition of the available view
-     *            elemements should contains at least :
+     *            elements should contains at least :
      *     name: name of the view
      *     url or component: the url of the Component or the component to load
      * view: string (name of the view to load)

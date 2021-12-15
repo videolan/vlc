@@ -56,7 +56,7 @@ typedef struct
     /* SPU */
     transcode_encoder_config_t senc_cfg;
 
-    /* Shared betweeen streams */
+    /* Shared between streams */
     vlc_mutex_t     lock;
     /* Sync */
     bool            b_master_sync;

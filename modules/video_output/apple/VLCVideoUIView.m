@@ -260,7 +260,7 @@
 }
 
 /**
- * Vout window operations implemention, which are expected to be run on
+ * Vout window operations implementation, which are expected to be run on
  * the main thread only. Core C wrappers below must typically use
  * dispatch_async with dispatch_get_main_queue() to call them.
  *

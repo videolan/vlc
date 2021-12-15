@@ -467,7 +467,7 @@ static int decode(decoder_t *dec, block_t *block)
         return VLCDEC_SUCCESS;
     }
 
-    // Reenable stuff if the last thing we did was flush
+    // Re-enable stuff if the last thing we did was flush
     if (!sys->output->is_enabled &&
         (status = mmal_port_enable(sys->output, decoder_output_cb)) != MMAL_SUCCESS)
     {

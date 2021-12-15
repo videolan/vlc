@@ -312,7 +312,7 @@ static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
             memset( p_out, i_padd_color,
                         ( i_outwidth - i_xpadd - i_width ) * i_pixel_pitch );
 
-            /* Got to begining of the next line */
+            /* Got to beginning of the next line */
             p_in = p_in_next;
             p_out = p_out_next;
         }

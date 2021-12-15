@@ -37,7 +37,7 @@ class X11DragDrop;
 class X11TimerLoop;
 
 
-/// Class used to instanciate X11 specific objects
+/// Class used to instantiate X11 specific objects
 class X11Factory: public OSFactory
 {
 private:

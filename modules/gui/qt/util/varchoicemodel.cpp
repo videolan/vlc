@@ -111,7 +111,7 @@ bool VLCVarChoiceModel::setData(const QModelIndex &index, const QVariant &value,
 
 
 //update the choices of the variable, called on variable thread from the var_AddCallback callback
-//calling vlcValToVariant is safe here as m_type will only be modified when no callbacks is registred
+//calling vlcValToVariant is safe here as m_type will only be modified when no callbacks is registered
 int VLCVarChoiceModel::updateData(const vlc_object_t* object, const vlc_value_t& oldvalue, const vlc_value_t& newvalue)
 {
     QVariant oldvalueVariant = vlcValToVariant(oldvalue);
@@ -122,7 +122,7 @@ int VLCVarChoiceModel::updateData(const vlc_object_t* object, const vlc_value_t&
 }
 
 //update the choices of the variable, called on variable thread from the var_AddListCallback callback
-//calling vlcValToVariant is safe here as m_type will only be modified when no callbacks is registred
+//calling vlcValToVariant is safe here as m_type will only be modified when no callbacks is registered
 int VLCVarChoiceModel::updateList(const vlc_object_t* object, int action, const vlc_value_t* p_value)
 {
     QVariant valueVariant = p_value ? vlcValToVariant(*p_value) : QVariant();

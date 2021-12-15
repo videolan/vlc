@@ -2253,7 +2253,7 @@ bo_t * mp4mux_GetMoov(mp4mux_handle_t *h, vlc_object_t *p_obj, vlc_tick_t i_dura
                 /* Try to find some defaults */
                 if ( p_stream->i_samples_count )
                 {
-                    // FIXME: find highest occurence
+                    // FIXME: find highest occurrence
                     p_stream->i_trex_default_length = p_stream->samples[0].i_length;
                     p_stream->i_trex_default_size = p_stream->samples[0].i_size;
                 }

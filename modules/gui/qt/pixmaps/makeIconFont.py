@@ -7,7 +7,7 @@ import six
 from jinja2 import Template
 
 DOC= """
-tranform a batch of SVG to a font usable in QML. a QML object is generated to serve as an index
+transform a batch of SVG to a font usable in QML. a QML object is generated to serve as an index
 
 known issues:
 

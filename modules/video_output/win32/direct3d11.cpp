@@ -571,7 +571,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
             {
                 /* for performance reason we don't want to allocate this during
-                 * display, do it preferrably when creating the texture */
+                 * display, do it preferably when creating the texture */
                 assert(p_sys->renderSrc[0]!=NULL);
             }
             if ( sys->picQuad.generic.i_height != texDesc.Height ||
@@ -1015,7 +1015,7 @@ static bool BogusZeroCopy(const vout_display_t *vd)
 }
 
 /* TODO : handle errors better
-   TODO : seperate out into smaller functions like createshaders */
+   TODO : separate out into smaller functions like createshaders */
 static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);

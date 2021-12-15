@@ -110,8 +110,8 @@ private:
 };
 
 /**
- * @brief The X11DamageObserver class  allows to register and listen
- * damages on a X11 surface. This is performed on a separate X11 conection
+ * @brief The X11DamageObserver class  allows to register and listen to
+ * damages on a X11 surface. This is performed on a separate X11 connection
  * from Qt, as we want to be able to be able to continue refreshing the composition
  * when Qt main thread is stalled.
  */
