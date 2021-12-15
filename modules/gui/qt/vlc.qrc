@@ -282,14 +282,12 @@
     <qresource prefix="/medialibrary">
         <file alias="EmptyLabel.qml">medialibrary/qml/EmptyLabel.qml</file>
         <file alias="MediaGroupDisplay.qml">medialibrary/qml/MediaGroupDisplay.qml</file>
-        <file alias="MediaGroupList.qml">medialibrary/qml/MediaGroupList.qml</file>
         <file alias="MusicAlbums.qml">medialibrary/qml/MusicAlbums.qml</file>
         <file alias="MusicDisplay.qml">medialibrary/qml/MusicDisplay.qml</file>
         <file alias="MusicGenres.qml">medialibrary/qml/MusicGenres.qml</file>
         <file alias="VideoDisplay.qml">medialibrary/qml/VideoDisplay.qml</file>
         <file alias="VideoAll.qml">medialibrary/qml/VideoAll.qml</file>
         <file alias="VideoAllDisplay.qml">medialibrary/qml/VideoAllDisplay.qml</file>
-        <file alias="VideoGroupsDisplay.qml">medialibrary/qml/VideoGroupsDisplay.qml</file>
         <file alias="PlaylistMediaList.qml">medialibrary/qml/PlaylistMediaList.qml</file>
         <file alias="PlaylistMedia.qml">medialibrary/qml/PlaylistMedia.qml</file>
         <file alias="PlaylistMediaDelegate.qml">medialibrary/qml/PlaylistMediaDelegate.qml</file>

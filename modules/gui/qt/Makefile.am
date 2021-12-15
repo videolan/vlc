@@ -737,7 +737,6 @@ libqt_plugin_la_QML = \
 	gui/qt/medialibrary/qml/AudioGridItem.qml \
 	gui/qt/medialibrary/qml/EmptyLabel.qml \
 	gui/qt/medialibrary/qml/MediaGroupDisplay.qml \
-	gui/qt/medialibrary/qml/MediaGroupList.qml \
 	gui/qt/medialibrary/qml/MusicAlbums.qml \
 	gui/qt/medialibrary/qml/MusicAlbumsDisplay.qml \
 	gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml \
@@ -756,7 +755,6 @@ libqt_plugin_la_QML = \
 	gui/qt/medialibrary/qml/VideoDisplay.qml \
 	gui/qt/medialibrary/qml/VideoAll.qml \
 	gui/qt/medialibrary/qml/VideoAllDisplay.qml \
-	gui/qt/medialibrary/qml/VideoGroupsDisplay.qml \
 	gui/qt/medialibrary/qml/PlaylistMediaList.qml \
 	gui/qt/medialibrary/qml/PlaylistMedia.qml \
 	gui/qt/medialibrary/qml/PlaylistMediaDelegate.qml \

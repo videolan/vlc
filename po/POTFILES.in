@@ -824,7 +824,6 @@ modules/gui/qt/maininterface/qml/NoMedialibHome.qml
 modules/gui/qt/medialibrary/qml/ArtistTopBanner.qml
 modules/gui/qt/medialibrary/qml/AudioGridItem.qml
 modules/gui/qt/medialibrary/qml/MediaGroupDisplay.qml
-modules/gui/qt/medialibrary/qml/MediaGroupList.qml
 modules/gui/qt/medialibrary/qml/MusicAlbums.qml
 modules/gui/qt/medialibrary/qml/MusicAlbumsDisplay.qml
 modules/gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml
@@ -847,7 +846,6 @@ modules/gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml
 modules/gui/qt/medialibrary/qml/VideoListDisplay.qml
 modules/gui/qt/medialibrary/qml/VideoAll.qml
 modules/gui/qt/medialibrary/qml/VideoAllDisplay.qml
-modules/gui/qt/medialibrary/qml/VideoGroupsDisplay.qml
 modules/gui/qt/medialibrary/qml/PlaylistMediaList.qml
 modules/gui/qt/medialibrary/qml/PlaylistMedia.qml
 modules/gui/qt/medialibrary/qml/PlaylistMediaDelegate.qml
