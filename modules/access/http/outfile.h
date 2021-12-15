@@ -29,7 +29,6 @@
 
 struct vlc_http_mgr;
 struct vlc_http_outfile;
-struct block_t;
 
 /**
  * Creates an HTTP output file.

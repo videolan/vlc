@@ -307,7 +307,7 @@ char *vlc_http_res_get_type(struct vlc_http_resource *res)
     return (type != NULL) ? strdup(type) : NULL;
 }
 
-struct block_t *vlc_http_res_read(struct vlc_http_resource *res)
+block_t *vlc_http_res_read(struct vlc_http_resource *res)
 {
     int status = vlc_http_res_get_status(res);
     if (status < 200 || status >= 300)

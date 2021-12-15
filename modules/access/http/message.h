@@ -29,7 +29,6 @@
  */
 
 struct vlc_http_msg;
-struct block_t;
 struct vlc_http_cookie_jar_t;
 
 /**
@@ -296,7 +295,7 @@ struct vlc_http_msg *vlc_http_msg_get_final(struct vlc_http_msg *) VLC_USED;
  * @retval NULL on end-of-stream
  * @retval vlc_http_error on fatal error
  */
-struct block_t *vlc_http_msg_read(struct vlc_http_msg *) VLC_USED;
+block_t *vlc_http_msg_read(struct vlc_http_msg *) VLC_USED;
 
 /**
  * Sends HTTP data.
@@ -358,7 +357,7 @@ struct vlc_http_stream_cbs
 {
     struct vlc_http_msg *(*read_headers)(struct vlc_http_stream *);
     ssize_t (*write)(struct vlc_http_stream *, const void *, size_t, bool eos);
-    struct block_t *(*read)(struct vlc_http_stream *);
+    block_t *(*read)(struct vlc_http_stream *);
     void (*close)(struct vlc_http_stream *, bool abort);
 };
 
@@ -414,7 +413,7 @@ static inline ssize_t vlc_http_stream_write(struct vlc_http_stream *s,
  * @retval NULL The end of the stream was reached.
  * @retval vlc_http_error The stream encountered a fatal error.
  */
-static inline struct block_t *vlc_http_stream_read(struct vlc_http_stream *s)
+static inline block_t *vlc_http_stream_read(struct vlc_http_stream *s)
 {
     return s->cbs->read(s);
 }

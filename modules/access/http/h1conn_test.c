@@ -100,7 +100,7 @@ int main(void)
 {
     struct vlc_http_stream *s;
     struct vlc_http_msg *m;
-    struct block_t *b;
+    block_t *b;
 
     /* Dummy */
     conn_create();

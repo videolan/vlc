@@ -312,7 +312,7 @@ static struct vlc_http_msg *stream_read_headers(struct vlc_http_stream *s)
     return m;
 }
 
-static struct block_t *stream_read(struct vlc_http_stream *s)
+static block_t *stream_read(struct vlc_http_stream *s)
 {
     assert(s == &stream);
     return NULL;

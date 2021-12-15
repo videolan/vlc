@@ -74,7 +74,7 @@ struct vlc_http_resource *vlc_http_live_create(struct vlc_http_mgr *mgr,
 
 block_t *vlc_http_live_read(struct vlc_http_resource *res)
 {
-    struct block_t *block = vlc_http_res_read(res);
+    block_t *block = vlc_http_res_read(res);
     if (block != NULL && block != vlc_http_error)
         return block;
 
