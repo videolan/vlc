@@ -244,10 +244,8 @@ static void subitem_added(const libvlc_event_t *event, void *user_data)
 
             ret = libvlc_media_get_stat(m, libvlc_media_stat_size, &value);
             assert(ret == 1);
-            /* All files size are 0, directory size is either 4096 or 0 */
-            if (libvlc_media_get_type(m) == libvlc_media_type_directory)
-                assert(value == 4096 || value == 0);
-            else
+            /* All files size are 0, directory size depends on the FS. */
+            if (libvlc_media_get_type(m) != libvlc_media_type_directory)
                 assert(value == 0);
 
             ret = libvlc_media_get_stat(m, libvlc_media_stat_mtime, &value);
