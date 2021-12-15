@@ -1313,7 +1313,7 @@ LIBVLC_API void libvlc_media_player_set_video_title_display( libvlc_media_player
  * this function again to get the updated track.
  *
  *
- * The track list can be used to get track informations and to select specific
+ * The track list can be used to get track information and to select specific
  * tracks.
  *
  * \param p_mi the media player
@@ -1351,7 +1351,7 @@ libvlc_media_player_get_selected_track( libvlc_media_player_t *p_mi,
  *
  * \version LibVLC 4.0.0 and later.
  *
- * This function can be used to get the last updated informations of a track.
+ * This function can be used to get the last updated information of a track.
  *
  * \param p_mi the media player
  * \param psz_id valid string representing a track id (cf. psz_id from \ref
@@ -1598,7 +1598,7 @@ libvlc_media_player_get_program_from_id( libvlc_media_player_t *p_mi, int i_grou
  * function is called. If a program is updated after this call, the user will
  * need to call this function again to get the updated program.
  *
- * The program list can be used to get program informations and to select
+ * The program list can be used to get program information and to select
  * specific programs.
  *
  * \param p_mi the media player
@@ -2280,7 +2280,7 @@ LIBVLC_API void libvlc_audio_output_device_list_release(
 /**
  * Configures an explicit audio output device.
  *
- * If the module paramater is NULL, audio output will be moved to the device
+ * If the module parameter is NULL, audio output will be moved to the device
  * specified by the device identifier string immediately. This is the
  * recommended usage.
  *
@@ -2612,7 +2612,7 @@ typedef enum libvlc_media_player_role {
     libvlc_role_Game, /**< Video game */
     libvlc_role_Notification, /**< User interaction feedback */
     libvlc_role_Animation, /**< Embedded animation (e.g. in web page) */
-    libvlc_role_Production, /**< Audio editting/production */
+    libvlc_role_Production, /**< Audio editing/production */
     libvlc_role_Accessibility, /**< Accessibility */
     libvlc_role_Test /** Testing */
 #define libvlc_role_Last libvlc_role_Test

@@ -50,7 +50,7 @@ VLC_API picture_fifo_t * picture_fifo_New( void ) VLC_USED;
 VLC_API void picture_fifo_Delete( picture_fifo_t * );
 
 /**
- * It retreives a picture_t from the fifo.
+ * It retrieves a picture_t from the fifo.
  *
  * If the fifo is empty, it return NULL without waiting.
  */

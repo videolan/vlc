@@ -160,11 +160,11 @@ typedef enum libvlc_media_parse_flag_t
      */
     libvlc_media_parse_network  = 0x01,
     /**
-     * Fetch meta and covert art using local resources
+     * Fetch meta and cover art using local resources
      */
     libvlc_media_fetch_local    = 0x02,
     /**
-     * Fetch meta and covert art using network resources
+     * Fetch meta and cover art using network resources
      */
     libvlc_media_fetch_network  = 0x04,
     /**
@@ -496,7 +496,7 @@ LIBVLC_API void libvlc_media_set_meta( libvlc_media_t *p_md,
 /**
  * Save the meta previously set
  *
- * \param p_md the media desriptor
+ * \param p_md the media descriptor
  * \return true if the write operation was successful
  */
 LIBVLC_API int libvlc_media_save_meta( libvlc_media_t *p_md );
@@ -526,7 +526,7 @@ LIBVLC_API libvlc_state_t libvlc_media_get_state(
 LIBVLC_API bool libvlc_media_get_stats(libvlc_media_t *p_md,
                                        libvlc_media_stats_t *p_stats);
 
-/* The following method uses libvlc_media_list_t, however, media_list usage is optionnal
+/* The following method uses libvlc_media_list_t, however, media_list usage is optional
  * and this is here for convenience */
 #define VLC_FORWARD_DECLARE_OBJECT(a) struct a
 
@@ -737,8 +737,8 @@ typedef enum libvlc_thumbnailer_seek_speed_t
 /**
  * \brief libvlc_media_request_thumbnail_by_time Start an asynchronous thumbnail generation
  *
- * If the request is successfuly queued, the libvlc_MediaThumbnailGenerated
- * is guaranteed to be emited.
+ * If the request is successfully queued, the libvlc_MediaThumbnailGenerated
+ * is guaranteed to be emitted.
  * The resulting thumbnail size can either be:
  * - Hardcoded by providing both width & height. In which case, the image will
  *   be stretched to match the provided aspect ratio, or cropped if crop is true.
@@ -774,8 +774,8 @@ libvlc_media_thumbnail_request_by_time( libvlc_media_t *md,
 /**
  * \brief libvlc_media_request_thumbnail_by_pos Start an asynchronous thumbnail generation
  *
- * If the request is successfuly queued, the libvlc_MediaThumbnailGenerated
- * is guaranteed to be emited.
+ * If the request is successfully queued, the libvlc_MediaThumbnailGenerated
+ * is guaranteed to be emitted.
  * The resulting thumbnail size can either be:
  * - Hardcoded by providing both width & height. In which case, the image will
  *   be stretched to match the provided aspect ratio, or cropped if crop is true.
@@ -813,7 +813,7 @@ libvlc_media_thumbnail_request_by_pos( libvlc_media_t *md,
  * @param p_req An opaque thumbnail request object.
  *
  * Cancelling the request will still cause libvlc_MediaThumbnailGenerated event
- * to be emited, with a NULL libvlc_picture_t
+ * to be emitted, with a NULL libvlc_picture_t
  * If the request is cancelled after its completion, the behavior is undefined.
  */
 LIBVLC_API void

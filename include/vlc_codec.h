@@ -190,7 +190,7 @@ struct decoder_t
     vlc_frame_t *       ( * pf_get_cc )      ( decoder_t *, decoder_cc_desc_t * );
 
     /* Meta data at codec level
-     *  The decoder owner set it back to NULL once it has retreived what it needs.
+     *  The decoder owner set it back to NULL once it has retrieved what it needs.
      *  The decoder owner is responsible of its release except when you overwrite it.
      */
     vlc_meta_t          *p_description;

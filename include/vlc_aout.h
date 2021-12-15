@@ -268,7 +268,7 @@ struct audio_output
       */
 
     int (*mute_set)(audio_output_t *, bool mute);
-    /**< Changes muting (optinal, may be NULL).
+    /**< Changes muting (optional, may be NULL).
       *
       * \param mute true to mute, false to unmute
       * \warning The same constraints apply as with volume_set().
@@ -287,7 +287,7 @@ struct audio_output
         bool headphones; /**< Default to false, set it to true if the current
                               sink is using headphones */
     } current_sink_info;
-    /**< Current sink informations set by the module from the start() function */
+    /**< Current sink information set by the module from the start() function */
 
     const struct vlc_audio_output_events *events;
 };

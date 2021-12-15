@@ -131,7 +131,7 @@ typedef struct vout_window_mouse_event_t
     /**
      * Pressed button.
      *
-     * See \ref vlc_mouse_button for possible vaules.
+     * See \ref vlc_mouse_button for possible values.
      *
      * This is set if @c event does not equal \ref VOUT_WINDOW_MOUSE_MOVED.
      */

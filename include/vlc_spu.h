@@ -64,7 +64,7 @@ VLC_API void spu_PutSubpicture( spu_t *, subpicture_t * );
 
 /**
  * This function will return an unique subpicture containing the OSD and
- * subtitles visibles at the requested date.
+ * subtitles visible at the requested date.
  *
  * \param p_chroma_list is a list of supported chroma for the output (can be NULL)
  * \param p_fmt_dst is the format of the picture on which the return subpicture will be rendered.

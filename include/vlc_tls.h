@@ -300,7 +300,7 @@ VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 /**
  * Generates an event polling description.
  *
- * This function provides the necessary informations to make an event polling
+ * This function provides the necessary information to make an event polling
  * description for use with poll() or similar event multiplexing functions.
  *
  * This function is necessary both for receiving and sending data, therefore

@@ -78,7 +78,7 @@
  */
 #define vlc_vector_init(pv) (void) \
 ( \
-    /* cannot be implemened as do-while(0), called from vlc_vector_clear() */ \
+    /* cannot be implemented as do-while(0), called from vlc_vector_clear() */ \
     (pv)->cap = 0, \
     (pv)->size = 0, \
     (pv)->data = NULL \
@@ -99,7 +99,7 @@
  */
 #define vlc_vector_clear(pv) \
 ( \
-    /* cannot be implemened as do-while(0), called from vlc_vector_resize_() */ \
+    /* cannot be implemented as do-while(0), called from vlc_vector_resize_() */ \
     vlc_vector_destroy(pv), \
     vlc_vector_init(pv) \
 )

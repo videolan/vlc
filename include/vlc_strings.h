@@ -105,7 +105,7 @@ static inline int vlc_ascii_strncasecmp( const char *psz1, const char *psz2, siz
 VLC_API void vlc_xml_decode(char *st);
 
 /**
- * Encodes XML entites.
+ * Encodes XML entities.
  *
  * Substitutes unsafe characters in a null-terminated UTF-8 strings with an
  * XML entity or numerical character reference.
@@ -181,7 +181,7 @@ VLC_API char *vlc_strftime( const char * );
  * ----- | -------------------------------
  *  `a`  | Artist metadata
  *  `b`  | Album title metadata
- *  `c`  | Copyright infromation metadata
+ *  `c`  | Copyright information metadata
  *  `d`  | Description metadata
  *  `e`  | 'Encoded by' metadata
  *  `f`  | Displayed output frame (`-` if not available)

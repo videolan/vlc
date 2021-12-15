@@ -669,7 +669,7 @@ enum vlc_ml_event_type
      * The entry point that was added is stored in
      * vlc::ml_event_t::entry_point_added::psz_entry_point, and the success or failure
      * state is stored in vlc_ml_event_t::entry_point_added::b_success
-     * If successful, this event won't be emited again for this entry point.
+     * If successful, this event won't be emitted again for this entry point.
      * In case of failure, this event will be fired again if the same entry point
      * is queued for discovery again.
      */
@@ -829,7 +829,7 @@ struct vlc_medialibrary_module_t
      * \return VLC_SUCCESS or an error code
      *
      * Refer to the individual list of vlc_ml_list requests for the additional
-     * per-query input/ouput parameters values & types
+     * per-query input/output parameters values & types
      */
     int (*pf_list)( struct vlc_medialibrary_module_t* p_ml, int i_query,
                     const vlc_ml_query_params_t* p_params, va_list args );

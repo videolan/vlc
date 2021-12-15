@@ -126,7 +126,7 @@ typedef struct
  * @param p_sd: the Service Discovery
  * @param i_control: the command to issue
  * @param args: the argument list
- * @return VLC_SUCCESS in case of success, the error code overwise
+ * @return VLC_SUCCESS in case of success, the error code otherwise
  */
 static inline int vlc_sd_control( services_discovery_t *p_sd, int i_control, va_list args )
 {

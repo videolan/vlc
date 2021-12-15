@@ -52,16 +52,16 @@ typedef uint32_t vlc_ancillary_id;
  *      it depends where you receive the buffer (before/after a packetizer
  *      and the demux/packetizer implementations.
  * - i_dts/i_pts could be VLC_TICK_INVALID, it means no pts/dts
- * - i_length: length in microseond of the packet, can be null except in the
+ * - i_length: length in microsecond of the packet, can be null except in the
  *      sout where it is mandatory.
  *
  * - i_buffer number of valid data pointed by p_buffer
  *      you can freely decrease it but never increase it yourself
  *      (use vlc_frame_Realloc)
- * - p_buffer: pointer over datas. You should never overwrite it, you can
- *   only incremment it to skip datas, in others cases use vlc_frame_Realloc
+ * - p_buffer: pointer over data. You should never overwrite it, you can
+ *   only increment it to skip data, in others cases use vlc_frame_Realloc
  *   (don't duplicate yourself in a bigger buffer, vlc_frame_Realloc is
- *   optimised for preheader/postdatas increase)
+ *   optimised for preheader/postdata increase)
  ****************************************************************************/
 
 typedef struct vlc_frame_t vlc_frame_t;
@@ -186,7 +186,7 @@ VLC_API vlc_frame_t *vlc_frame_TryRealloc(vlc_frame_t *, ssize_t pre, size_t bod
  *            count of leading bytes to discard if negative
  * @param body new bytes size of the frame
  *
- * @return the reallocated frame on succes, NULL on error.
+ * @return the reallocated frame on success, NULL on error.
  *
  * @note Skipping leading bytes can be achieved directly by subtracting from
  * vlc_frame_t.i_buffer and adding vlc_frame_t.p_buffer.
@@ -477,7 +477,7 @@ static size_t vlc_frame_ChainExtract( vlc_frame_t *p_list, void *p_data, size_t 
 }
 
 /**
- * Retrives chain properties
+ * Retrieves chain properties
  *
  * Can be used to retrieve count of frames, number of bytes and the duration
  * of the chain.

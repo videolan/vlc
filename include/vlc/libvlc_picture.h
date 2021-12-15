@@ -138,7 +138,7 @@ LIBVLC_API libvlc_picture_t* libvlc_picture_list_at( const libvlc_picture_list_t
  * Destroys a picture list and releases the pictures it contains
  * \param list The list to destroy
  *
- * Calling this function with a NULL list is safe and will return immediatly
+ * Calling this function with a NULL list is safe and will return immediately
  */
 LIBVLC_API void libvlc_picture_list_destroy( libvlc_picture_list_t* list );
 

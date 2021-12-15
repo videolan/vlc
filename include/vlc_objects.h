@@ -25,7 +25,7 @@
  * \ingroup vlc
  * @{
  * \file
- * Common VLC object defintions
+ * Common VLC object definitions
  */
 
 struct vlc_logger;

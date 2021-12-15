@@ -459,7 +459,7 @@ static inline bool vout_display_cfg_IsWindowed(const vout_display_cfg_t *cfg)
  * Computes the default display size given the source and
  * the display configuration.
  *
- * This asssumes that the picture is already cropped.
+ * This assumes that the picture is already cropped.
  */
 VLC_API void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height, const video_format_t *source, const vout_display_cfg_t *);
 

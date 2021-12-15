@@ -197,7 +197,7 @@ static inline void vlc_rd_remove_item(vlc_renderer_discovery_t * p_rd,
 }
 
 /**
- * Renderer Discovery proble helpers
+ * Renderer Discovery probe helpers
  */
 VLC_API int
 vlc_rd_probe_add(vlc_probe_t *p_probe, const char *psz_name,
