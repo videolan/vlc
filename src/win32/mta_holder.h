@@ -56,7 +56,7 @@ static inline void* MtaMainLoop( void* opaque )
  * In the background, this will create a thread that does nothing but to keep the MTA
  * refcount greater than 0.
  *
- * This is usefull in order not to commit a thread to a specific concurrency model.
+ * This is useful in order not to commit a thread to a specific concurrency model.
  * This function is win32 specific.
  */
 static inline bool vlc_mta_acquire( vlc_object_t *p_parent )

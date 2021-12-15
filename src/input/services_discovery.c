@@ -99,7 +99,7 @@ char **vlc_sd_GetNames (vlc_object_t *obj, char ***pppsz_longnames, int **pp_cat
  * Services discovery
  * Basically you just listen to Service discovery event through the
  * sd's event manager.
- * That's how the playlist get's Service Discovery information
+ * That's how the playlist gets Service Discovery information
  */
 
 #undef vlc_sd_Create

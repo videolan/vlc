@@ -1,5 +1,5 @@
 /*****************************************************************************
- * input_clock.c: Input clock/System date convertions, stream management
+ * input_clock.c: Input clock/System date conversions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2018 VLC authors and VideoLAN
  * Copyright (C) 2008 Laurent Aimar
@@ -498,7 +498,7 @@ static vlc_tick_t ClockSystemToStream( input_clock_t *cl, vlc_tick_t i_system )
 }
 
 /**
- * It returns timestamp display offset due to ref/last modfied on rate changes
+ * It returns timestamp display offset due to ref/last modified on rate changes
  * It ensures that currently converted dates are not changed.
  */
 static vlc_tick_t ClockGetTsOffset( input_clock_t *cl )

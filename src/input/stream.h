@@ -37,7 +37,7 @@ void *vlc_stream_Private(stream_t *stream);
 void stream_CommonDelete( stream_t *s );
 
 stream_t *vlc_stream_AttachmentNew(vlc_object_t *p_this,
-                                   input_attachment_t *attachement);
+                                   input_attachment_t *attachment);
 
 /**
  * This function creates a raw stream_t from an URL.
@@ -58,7 +58,7 @@ stream_t *stream_AccessNew(vlc_object_t *, input_thread_t *, es_out_t *, bool,
  * so on. Any attempt to access the original stream filter directly is
  * explicitly undefined.
  *
- * If, and only if, no filters were probed succesfully, a pointer to the
+ * If, and only if, no filters were probed successfully, a pointer to the
  * unchanged source stream will be returned. Otherwise, this returns a stream
  * filter. The return value is thus guaranteed to be non-NULL.
  *

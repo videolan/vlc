@@ -572,7 +572,7 @@ httpd_redirect_t *httpd_RedirectNew(httpd_host_t *host, const char *psz_url_dst,
     }
     memcpy(rdir->dst, psz_url_dst, dstlen + 1);
 
-    /* Redirect apply for all HTTP request and RTSP DESCRIBE resquest */
+    /* Redirect apply for all HTTP request and RTSP DESCRIBE request */
     httpd_UrlCatch(rdir->url, HTTPD_MSG_HEAD, httpd_RedirectCallBack,
                     (httpd_callback_sys_t*)rdir);
     httpd_UrlCatch(rdir->url, HTTPD_MSG_GET, httpd_RedirectCallBack,
@@ -591,7 +591,7 @@ void httpd_RedirectDelete(httpd_redirect_t *rdir)
 }
 
 /*****************************************************************************
- * High Level Funtions: httpd_stream_t
+ * High Level Functions: httpd_stream_t
  *****************************************************************************/
 struct httpd_stream_t
 {

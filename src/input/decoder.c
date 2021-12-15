@@ -1011,7 +1011,7 @@ static void PacketizerGetCc( vlc_input_decoder_t *p_owner, decoder_t *p_dec_cc )
     vlc_frame_t *p_cc;
     decoder_cc_desc_t desc;
 
-    /* Do not try retreiving CC if not wanted (sout) or cannot be retreived */
+    /* Do not try retrieving CC if not wanted (sout) or cannot be retrieved */
     if( !p_owner->cc.b_supported )
         return;
 

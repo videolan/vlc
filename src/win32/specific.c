@@ -1,5 +1,5 @@
 /*****************************************************************************
- * specific.c: Win32 specific initilization
+ * specific.c: Win32 specific initialization
  *****************************************************************************
  * Copyright (C) 2001-2004, 2010 VLC authors and VideoLAN
  *

@@ -128,7 +128,7 @@ static void input_ChangeState( input_thread_t *p_input, int i_state, vlc_tick_t 
  *
  * \param p_parent a vlc_object
  * \param p_item an input item
- * \param p_resource an optional input ressource
+ * \param p_resource an optional input resource
  * \return a pointer to the spawned input thread
  */
 input_thread_t *input_Create( vlc_object_t *p_parent,
@@ -831,29 +831,29 @@ static void InitProperties( input_thread_t *input )
     input_source_t *master = priv->master;
     assert(master);
 
-    int capabilites = 0;
+    int capabilities = 0;
     bool b_can_seek;
 
     if( demux_Control( master->p_demux, DEMUX_CAN_SEEK, &b_can_seek ) )
         b_can_seek = false;
     if( b_can_seek )
-        capabilites |= VLC_INPUT_CAPABILITIES_SEEKABLE;
+        capabilities |= VLC_INPUT_CAPABILITIES_SEEKABLE;
 
     if( master->b_can_pause || !master->b_can_pace_control )
-        capabilites |= VLC_INPUT_CAPABILITIES_PAUSEABLE;
+        capabilities |= VLC_INPUT_CAPABILITIES_PAUSEABLE;
     if( !master->b_can_pace_control || master->b_can_rate_control )
-        capabilites |= VLC_INPUT_CAPABILITIES_CHANGE_RATE;
+        capabilities |= VLC_INPUT_CAPABILITIES_CHANGE_RATE;
     if( !master->b_rescale_ts && !master->b_can_pace_control && master->b_can_rate_control )
-        capabilites |= VLC_INPUT_CAPABILITIES_REWINDABLE;
+        capabilities |= VLC_INPUT_CAPABILITIES_REWINDABLE;
 
 #ifdef ENABLE_SOUT
-    capabilites |= VLC_INPUT_CAPABILITIES_RECORDABLE;
+    capabilities |= VLC_INPUT_CAPABILITIES_RECORDABLE;
 #else
     if( master->b_can_stream_record )
-        capabilites |= VLC_INPUT_CAPABILITIES_RECORDABLE;
+        capabilities |= VLC_INPUT_CAPABILITIES_RECORDABLE;
 #endif
 
-    input_SendEventCapabilities( input, capabilites );
+    input_SendEventCapabilities( input, capabilities );
 
     int i_attachment;
     input_attachment_t **attachment;
@@ -1203,7 +1203,7 @@ static void LoadSlaves( input_thread_t *p_input )
                                   SLAVE_ADD_FORCED );
 
             free( psz_mrl );
-            /* Don't update item slaves for attachements */
+            /* Don't update item slaves for attachments */
         }
         vlc_input_attachment_Release( a );
     }

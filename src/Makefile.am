@@ -570,7 +570,7 @@ libvlccore_la_LDFLAGS +=  -Wl,-framework,Foundation -Xlinker -install_name -Xlin
 endif
 
 # iOS and tvOS applications cannot install global shared libraries and
-# dylibs must be in frameworks so there's no need for libtool versionning.
+# dylibs must be in frameworks so there's no need for libtool versioning.
 if HAVE_IOS
 libvlccore_la_LDFLAGS += -avoid-version
 endif

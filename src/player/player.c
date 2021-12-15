@@ -1295,7 +1295,7 @@ vlc_player_ChangeRate(vlc_player_t *player, float rate)
     if (rate == 0.0)
         return;
 
-    /* Save rate accross inputs */
+    /* Save rate across inputs */
     var_SetFloat(player, "rate", rate);
 
     /* The event is sent from the thread processing the control */

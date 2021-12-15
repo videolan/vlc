@@ -1185,7 +1185,7 @@ static void EsOutFrameNext( es_out_t *out )
     vlc_tick_t i_duration;
     vlc_input_decoder_FrameNext( p_es_video->p_dec, &i_duration );
 
-    msg_Dbg( p_sys->p_input, "EsOutFrameNext consummed %d ms", (int)MS_FROM_VLC_TICK(i_duration) );
+    msg_Dbg( p_sys->p_input, "EsOutFrameNext consumed %d ms", (int)MS_FROM_VLC_TICK(i_duration) );
 
     if( i_duration <= 0 )
         i_duration = VLC_TICK_FROM_MS(40);
@@ -1407,7 +1407,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
                 EsOutUnselectEs(out, es, true);
 
             if( EsOutIsGroupSticky( out, es->id.source, es->fmt.i_group ) )
-                es->p_pgrm = NULL; /* Skip the DELETED event, cf. bellow */
+                es->p_pgrm = NULL; /* Skip the DELETED event, cf. below */
             else
             {
                 /* ES tracks are deleted (and unselected) when their programs

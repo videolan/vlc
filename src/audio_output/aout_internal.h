@@ -193,7 +193,7 @@ static inline void aout_SetWavePhysicalChannels(audio_sample_format_t *fmt)
 /* Extended version of aout_FiltersNew
  *
  * The clock, that is not mandatory, will be used to create a new slave clock
- * for the filter vizualisation plugins.
+ * for the filter visualization plugins.
  */
 aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *, const vlc_clock_t *,
                                          const audio_sample_format_t *,

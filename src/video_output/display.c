@@ -385,7 +385,7 @@ static void VoutDisplayCropRatio(int *left, int *top, int *right, int *bottom,
 }
 
 /**
- * It retreives a picture pool from the display
+ * It retrieves a picture pool from the display
  */
 picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
 {

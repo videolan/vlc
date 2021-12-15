@@ -1515,7 +1515,7 @@ test_request_remove_adapt(void)
         vlc_playlist_Get(playlist, 6),
         vlc_playlist_Get(playlist, 9),
         vlc_playlist_Get(playlist, 1),
-        dummy, /* inexistant */
+        dummy, /* inexistent */
         vlc_playlist_Get(playlist, 8),
     };
 
@@ -1713,7 +1713,7 @@ test_request_move_adapt(void)
         vlc_playlist_Get(playlist, 8),
         vlc_playlist_Get(playlist, 5),
         vlc_playlist_Get(playlist, 12),
-        dummy, /* inexistant */
+        dummy, /* inexistent */
         vlc_playlist_Get(playlist, 3),
         vlc_playlist_Get(playlist, 13),
         vlc_playlist_Get(playlist, 14),
@@ -1814,7 +1814,7 @@ test_request_move_to_end_adapt(void)
         vlc_playlist_Get(playlist, 8),
         vlc_playlist_Get(playlist, 5),
         vlc_playlist_Get(playlist, 12),
-        dummy, /* inexistant */
+        dummy, /* inexistent */
         vlc_playlist_Get(playlist, 3),
         vlc_playlist_Get(playlist, 13),
         vlc_playlist_Get(playlist, 14),

@@ -617,7 +617,7 @@ int (var_GetAndSet)(vlc_object_t *p_this, const char *psz_name, int i_action,
     /* Backup needed stuff */
     oldval = p_var->val;
 
-    /* depending of the action requiered */
+    /* depending of the action required */
     switch( i_action )
     {
     case VLC_VAR_BOOL_TOGGLE:

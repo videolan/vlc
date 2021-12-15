@@ -159,7 +159,7 @@ void vout_SetInterlacingState(vout_thread_t *vout, vout_thread_private_t *sys, b
     const bool interlacing_change =
         is_interlaced != sys->interlacing.is_interlaced;
 
-    /* Wait 30s before quiting interlacing mode */
+    /* Wait 30s before quitting interlacing mode */
     const bool is_after_deadline =
         sys->interlacing.date + VLC_TICK_FROM_SEC(30) < vlc_tick_now();
 

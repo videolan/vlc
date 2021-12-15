@@ -78,7 +78,7 @@ typedef struct VLC_VECTOR(subpicture_t *) spu_prerender_vector;
 #define SPU_CHROMALIST_COUNT 8
 
 struct spu_private_t {
-    vlc_mutex_t  lock;            /* lock to protect all followings fields */
+    vlc_mutex_t  lock;            /* lock to protect all following fields */
     input_thread_t *input;
 
     spu_channel_vector channels;
@@ -563,7 +563,7 @@ static int SSizeCmp(ssize_t i0, ssize_t i1)
 /**
  * This function compares 2 subpictures using the following properties
  * (ordered by priority)
- * 1. absolute positionning
+ * 1. absolute positioning
  * 2. start time (display time)
  * 3. creation order (per channel)
  *
@@ -1981,7 +1981,7 @@ subpicture_t *spu_Render(spu_t *spu,
     }
 
     /* Now order the subpicture array
-     * XXX The order is *really* important for overlap subtitles positionning */
+     * XXX The order is *really* important for overlap subtitles positioning */
     qsort(subpicture_array, subpicture_count, sizeof(*subpicture_array), SpuRenderCmp);
 
     /* Render the subpictures */

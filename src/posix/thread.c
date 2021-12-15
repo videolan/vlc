@@ -173,7 +173,7 @@ static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
 
 #ifdef VLC_STACKSIZE
     ret = pthread_attr_setstacksize (attr, VLC_STACKSIZE);
-    assert (ret == 0); /* fails iif VLC_STACKSIZE is invalid */
+    assert (ret == 0); /* fails iff VLC_STACKSIZE is invalid */
 #endif
 
     ret = pthread_create(&th->handle, attr, entry, data);

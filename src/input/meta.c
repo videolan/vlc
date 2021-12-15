@@ -86,7 +86,7 @@ const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
 
 
 /**
- * vlc_meta contructor.
+ * vlc_meta constructor.
  * vlc_meta_Delete() will free the returned pointer.
  */
 vlc_meta_t *vlc_meta_New( void )
@@ -100,7 +100,7 @@ vlc_meta_t *vlc_meta_New( void )
     return m;
 }
 
-/* Free a dictonary key allocated by strdup() in vlc_meta_AddExtra() */
+/* Free a dictionary key allocated by strdup() in vlc_meta_AddExtra() */
 static void vlc_meta_FreeExtraKey( void *p_data, void *p_obj )
 {
     VLC_UNUSED( p_obj );

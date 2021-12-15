@@ -574,7 +574,7 @@ static void AllocateAllPlugins (vlc_object_t *p_this)
     /* Windows Store Apps can not load external plugins with absolute paths. */
     AllocatePluginPath (p_this, "plugins", mode);
 #else
-    /* Contruct the special search path for system that have a relocatable
+    /* Construct the special search path for system that have a relocatable
      * executable. Set it to <vlc path>/plugins. */
     char *vlcpath = config_GetSysPath(VLC_PKG_LIB_DIR, "plugins");
     if (likely(vlcpath != NULL))

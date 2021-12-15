@@ -99,7 +99,7 @@ static void test__thread_create()
 
 
 /*
- * Test simple thread cancelation
+ * Test simple thread cancellation
  */
 static void *thread_func_loop(void *data)
 {

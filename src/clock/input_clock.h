@@ -73,7 +73,7 @@ vlc_tick_t input_clock_Update( input_clock_t *, vlc_object_t *p_log,
 /**
  * This function will reset the drift of a input_clock_t.
  *
- * The actual jitter estimation will not be reseted by it.
+ * The actual jitter estimation will not be reset by it.
  */
 void    input_clock_Reset( input_clock_t * );
 
@@ -102,7 +102,7 @@ void    input_clock_GetSystemOrigin( input_clock_t *, vlc_tick_t *pi_system, vlc
  * This function allows rebasing the original system value date (a valid
  * reference point must have been set).
  * When using the absolute mode, it will create a discontinuity unless
- * called imediatly after a input_clock_Update.
+ * called immediately after a input_clock_Update.
  */
 void    input_clock_ChangeSystemOrigin( input_clock_t *, bool b_absolute, vlc_tick_t i_system );
 

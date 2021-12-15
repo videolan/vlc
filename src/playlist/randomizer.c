@@ -64,7 +64,7 @@
  *    whole array;
  *  - if loop is enabled, the history of the last cycle can be kept in place.
  *
- * 'head' indicates the end of the items already determinated for the current
+ * 'head' indicates the end of the items already determined for the current
  * cycle (if loop is disabled, there is only one cycle).
  * (0 <= head <= size)
  *
@@ -73,7 +73,7 @@
  * The current item is the one returned by the previous call to _Prev() or
  * _Next(). Each call to _Next() makes 'next' (and possibly 'head') move
  * forward, each call to _Prev() makes it move back (modulo size).
- * 'next' is always in the determinated range (0 <= next <= head) or in the
+ * 'next' is always in the determined range (0 <= next <= head) or in the
  * "history" range (history < next < size).
  *
  * 'history' is only used in loop mode, and references the first item of the
@@ -104,10 +104,10 @@
  *                      |                   |
  *                 D    B    C    A    E
  *               <--->
- *            determinated range
+ *            determined range
  *
  * The playlist calls _Next() one more time. The randomizer selects one item
- * outside the determinated range (say, E). _Next() returns E.
+ * outside the determined range (say, E). _Next() returns E.
  *
  *                                          history
  *                           next           |
@@ -115,7 +115,7 @@
  *                           |              |
  *                 D    E    C    A    B
  *               <-------->
- *            determinated range
+ *            determined range
  *
  * The playlist calls _Next() one more time. The randomizer selects C (already
  * in place). _Next() returns C.
@@ -126,7 +126,7 @@
  *                                |         |
  *                 D    E    C    A    B
  *               <------------->
- *             determinated range
+ *             determined range
  *
  * The playlist then calls _Prev(). Since the "current" item is C, the previous
  * one is E, so _Prev() returns E, and 'next' moves back.
@@ -137,7 +137,7 @@
  *                           |    |         |
  *                 D    E    C    A    B
  *               <------------->
- *             determinated range
+ *             determined range
  *
  * The playlist calls _Next(), which returns C, as expected.
  *
@@ -147,7 +147,7 @@
  *                                |         |
  *                 D    E    C    A    B
  *               <------------->
- *             determinated range
+ *             determined range
  *
  * The playlist calls _Next(), the randomizer selects B, and returns it.
  *
@@ -157,7 +157,7 @@
  *                                     |    |
  *                 D    E    C    B    A
  *               <------------------>
- *                determinated range
+ *                determined range
  *
  * The playlist calls _Next(), the randomizer selects the last item (it has no
  * choice). 'next' and 'head' now point one item past the end (their value is
@@ -169,7 +169,7 @@
  *                                          |
  *                 D    E    C    B    A
  *               <----------------------->
- *                  determinated range
+ *                  determined range
  *
  * At this point, if loop is disabled, it is not possible to call _Next()
  * anymore (_HasNext() returns false). So let's enable it by calling
@@ -198,7 +198,7 @@
  *                 |    |
  *                 C    D    E    B    A
  *               <---><------------------>
- *       determinated     history range
+ *         determined     history range
  *              range
  *
  * Finally, it will actually select and return the first item (C).
@@ -209,7 +209,7 @@
  *                      |
  *                 C    D    E    B    A
  *               <---><------------------>
- *       determinated     history range
+ *         determined     history range
  *              range
  *
  * Then, the user adds an item to the playlist (F). This item is added in front
@@ -221,7 +221,7 @@
  *                      |    |
  *                 C    F    D    E    B    A
  *               <--->     <------------------>
- *       determinated          history range
+ *         determined          history range
  *              range
  *
  * The playlist calls _Next(), the randomizer randomly selects E. E
@@ -235,7 +235,7 @@
  *                           |    |
  *                 C    E    F    D    B    A
  *               <-------->     <-------------->
- *              determinated     history range
+ *               determined      history range
  *                 range
  *
  * The playlist then calls _Prev() 3 times, that yields C, then A, then B.
@@ -247,7 +247,7 @@
  *                           |    |    |
  *                 C    E    F    D    B    A
  *               <-------->     <-------------->
- *              determinated     history range
+ *               determined      history range
  *                 range
  */
 

@@ -589,7 +589,7 @@ static int ControlLockedSetPauseState( es_out_t *p_out, bool b_source_paused, bo
         else
         {
             /* XXX we may do it BUT it would be better to finish the clock clean up+improvements
-             * and so be able to advertize correctly pace control property in access
+             * and so be able to advertise correctly pace control property in access
              * module */
             msg_Err( p_sys->p_input, "EsOutTimeshift does not work with streams that have pace control" );
         }
@@ -624,7 +624,7 @@ static int ControlLockedSetRate( es_out_t *p_out, float src_rate, float rate )
         else
         {
             /* XXX we may do it BUT it would be better to finish the clock clean up+improvements
-             * and so be able to advertize correctly pace control property in access
+             * and so be able to advertise correctly pace control property in access
              * module */
             msg_Err( p_sys->p_input, "EsOutTimeshift does not work with streams that have pace control" );
         }

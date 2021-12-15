@@ -180,7 +180,7 @@ void vlc_object_Log(vlc_object_t *obj, int prio, const char *module,
  * @param tab base address to hold the list of children [OUT]
  * @param max size of the table
  *
- * @return the actual numer of children (may be larger than requested).
+ * @return the actual number of children (may be larger than requested).
  *
  * @warning The list of object can change asynchronously even before the
  * function returns. The list meant exclusively for debugging and tracing,

@@ -604,7 +604,7 @@ static int CacheSaveBank(FILE *file, vlc_plugin_t *const *cache, size_t n)
     if (fputs (CACHE_STRING, file) == EOF)
         goto error;
 #ifdef DISTRO_VERSION
-    /* Allow binary maintaner to pass a string to detect new binary version*/
+    /* Allow binary maintainer to pass a string to detect new binary version*/
     if (fputs( DISTRO_VERSION, file ) == EOF)
         goto error;
 #endif

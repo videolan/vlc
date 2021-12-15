@@ -51,7 +51,7 @@ static const char *const ppsz_snap_formats[] =
 { "png", "jpg", "tiff" };
 
 /*****************************************************************************
- * Configuration options for the core module. Each module will also separatly
+ * Configuration options for the core module. Each module will also separately
  * define its own configuration options.
  * Look into configuration.h if you need to know more about the following
  * macros.
@@ -909,7 +909,7 @@ static const char* const ppsz_restore_playback_desc[] = {
 
 #define HTTP_CERT_TEXT N_("HTTP/TLS server certificate")
 #define CERT_LONGTEXT N_( \
-   "This X.509 certicate file (PEM format) is used for server-side TLS. " \
+   "This X.509 certificate file (PEM format) is used for server-side TLS. " \
    "On OS X, the string is used as a label to search the certificate in the keychain." )
 
 #define HTTP_KEY_TEXT N_("HTTP/TLS server private key")

@@ -128,7 +128,7 @@ static void vlc_interrupt_prepare(vlc_interrupt_t *ctx,
 
 /**
  * Cleans up after an interruptible wait: waits for any pending invocations of
- * the callback previously registed with vlc_interrupt_prepare(), and rechecks
+ * the callback previously registered with vlc_interrupt_prepare(), and rechecks
  * for any pending interruption.
  *
  * @warning As this function waits for ongoing callback invocation to complete,

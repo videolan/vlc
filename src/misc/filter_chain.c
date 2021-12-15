@@ -338,7 +338,7 @@ void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
     es_format_Clean( &filter->fmt_in );
 
     vlc_object_delete(filter);
-    /* FIXME: check fmt_in/fmt_out consitency */
+    /* FIXME: check fmt_in/fmt_out consistency */
 }
 
 
