@@ -462,7 +462,7 @@ do
         --disable-debug)
             VLC_DISABLE_DEBUG=1
             ;;
-        --enable-bitcode|--enable-bitcode=full)
+        --enable-bitcode|--enable-bitcode=full|--enable-bitcode=bitcode)
             VLC_USE_BITCODE=1
             ;;
         --enable-bitcode=marker)
