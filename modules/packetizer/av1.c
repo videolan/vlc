@@ -90,7 +90,10 @@ static bool block_Differs(const block_t *a, const block_t *b)
 {\
     block_ChainLastAppend(&p_sys->name.pp_chain_last, b);\
     if(p_sys->tu.dts == VLC_TICK_INVALID)\
-        p_sys->tu.dts = b->i_dts; p_sys->tu.pts = b->i_pts;\
+    {\
+        p_sys->tu.dts = b->i_dts;\
+        p_sys->tu.pts = b->i_pts;\
+    }\
 }
 
 static void UpdateDecoderFormat(decoder_t *p_dec)
