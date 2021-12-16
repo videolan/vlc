@@ -460,7 +460,8 @@ typedef struct iso639_lang_t iso639_lang_t;
 
 /* block */
 typedef struct vlc_frame_t  block_t;
-typedef struct block_fifo_t block_fifo_t;
+typedef struct vlc_fifo_t vlc_fifo_t;
+typedef struct vlc_fifo_t block_fifo_t;
 
 /* Hashing */
 typedef struct vlc_hash_md5_ctx vlc_hash_md5_t;

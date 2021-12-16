@@ -37,10 +37,10 @@ vlc_audio_meter_AddPlugin
 vlc_audio_meter_RemovePlugin
 vlc_audio_meter_Process
 vlc_audio_meter_Flush
-block_FifoGet
-block_FifoNew
-block_FifoRelease
-block_FifoShow
+vlc_fifo_Get
+vlc_fifo_New
+vlc_fifo_Release
+vlc_fifo_Show
 vlc_frame_Alloc
 vlc_frame_File
 vlc_frame_FilePath

@@ -525,21 +525,21 @@ static inline vlc_frame_t *vlc_frame_ChainGather( vlc_frame_t *p_list )
 /**
  * Creates a thread-safe FIFO queue of blocks.
  *
- * See also block_FifoPut() and block_FifoGet().
- * The created queue must be released with block_FifoRelease().
+ * See also vlc_fifo_Put() and vlc_fifo_Get().
+ * The created queue must be released with vlc_fifo_Release().
  *
  * @return the FIFO or NULL on memory error
  */
-VLC_API block_fifo_t *block_FifoNew(void) VLC_USED VLC_MALLOC;
+VLC_API vlc_fifo_t *vlc_fifo_New(void) VLC_USED VLC_MALLOC;
 
 /**
- * Destroys a FIFO created by block_FifoNew().
+ * Destroys a FIFO created by vlc_fifo_New().
  *
  * @note Any queued blocks are also destroyed.
  * @warning No other threads may be using the FIFO when this function is
  * called. Otherwise, undefined behaviour will occur.
  */
-VLC_API void block_FifoRelease(block_fifo_t *);
+VLC_API void vlc_fifo_Release(vlc_fifo_t *);
 
 /**
  * Dequeue the first block from the FIFO. If necessary, wait until there is
@@ -547,7 +547,7 @@ VLC_API void block_FifoRelease(block_fifo_t *);
  *
  * @return a valid block
  */
-VLC_API vlc_frame_t *block_FifoGet(block_fifo_t *) VLC_USED;
+VLC_API vlc_frame_t *vlc_fifo_Get(vlc_fifo_t *) VLC_USED;
 
 /**
  * Peeks the first block in the FIFO.
@@ -560,9 +560,7 @@ VLC_API vlc_frame_t *block_FifoGet(block_fifo_t *) VLC_USED;
  *
  * @return a valid block.
  */
-VLC_API vlc_frame_t *block_FifoShow(block_fifo_t *);
-
-typedef struct block_fifo_t vlc_fifo_t;
+VLC_API vlc_frame_t *vlc_fifo_Show(vlc_fifo_t *);
 
 static inline vlc_queue_t *vlc_fifo_queue(const vlc_fifo_t *fifo)
 {
@@ -722,7 +720,7 @@ static inline void vlc_fifo_Cleanup(void *fifo)
 /**
  * Clears all blocks in a FIFO.
  */
-static inline void block_FifoEmpty(block_fifo_t *fifo)
+static inline void vlc_fifo_Empty(vlc_fifo_t *fifo)
 {
     vlc_frame_t *block;
 
@@ -738,7 +736,7 @@ static inline void block_FifoEmpty(block_fifo_t *fifo)
  * @param fifo queue
  * @param block head of a block list to queue (may be NULL)
  */
-static inline void block_FifoPut(block_fifo_t *fifo, vlc_frame_t *block)
+static inline void vlc_fifo_Put(vlc_fifo_t *fifo, vlc_frame_t *block)
 {
     vlc_fifo_Lock(fifo);
     vlc_fifo_QueueUnlocked(fifo, block);
@@ -747,7 +745,7 @@ static inline void block_FifoPut(block_fifo_t *fifo, vlc_frame_t *block)
 
 /* FIXME: not (really) thread-safe */
 VLC_USED VLC_DEPRECATED
-static inline size_t block_FifoSize (block_fifo_t *fifo)
+static inline size_t vlc_fifo_Size (vlc_fifo_t *fifo)
 {
     size_t size;
 
@@ -759,7 +757,7 @@ static inline size_t block_FifoSize (block_fifo_t *fifo)
 
 /* FIXME: not (really) thread-safe */
 VLC_USED VLC_DEPRECATED
-static inline size_t block_FifoCount (block_fifo_t *fifo)
+static inline size_t vlc_fifo_Count (vlc_fifo_t *fifo)
 {
     size_t depth;
 

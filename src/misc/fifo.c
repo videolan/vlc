@@ -35,7 +35,7 @@
 /**
  * Internal state for block queues
  */
-struct block_fifo_t
+struct vlc_fifo_t
 {
     vlc_queue_t         q;
     size_t              i_depth;
@@ -44,13 +44,13 @@ struct block_fifo_t
 
 static_assert (offsetof (block_fifo_t, q) == 0, "Problems in <vlc_block.h>");
 
-size_t vlc_fifo_GetCount(const vlc_fifo_t *fifo)
+size_t vlc_fifo_GetCount(const block_fifo_t *fifo)
 {
     vlc_mutex_assert(&fifo->q.lock);
     return fifo->i_depth;
 }
 
-size_t vlc_fifo_GetBytes(const vlc_fifo_t *fifo)
+size_t vlc_fifo_GetBytes(const block_fifo_t *fifo)
 {
     vlc_mutex_assert(&fifo->q.lock);
     return fifo->i_size;
@@ -87,7 +87,7 @@ block_t *vlc_fifo_DequeueAllUnlocked(block_fifo_t *fifo)
     return vlc_queue_DequeueAllUnlocked(&fifo->q);
 }
 
-block_fifo_t *block_FifoNew( void )
+block_fifo_t *vlc_fifo_New( void )
 {
     block_fifo_t *p_fifo = malloc( sizeof( block_fifo_t ) );
 
@@ -100,13 +100,13 @@ block_fifo_t *block_FifoNew( void )
     return p_fifo;
 }
 
-void block_FifoRelease( block_fifo_t *p_fifo )
+void vlc_fifo_Release( block_fifo_t *p_fifo )
 {
-    block_FifoEmpty(p_fifo);
+    vlc_fifo_Empty(p_fifo);
     free( p_fifo );
 }
 
-block_t *block_FifoGet(block_fifo_t *fifo)
+block_t *vlc_fifo_Get(block_fifo_t *fifo)
 {
     block_t *block;
 
@@ -125,7 +125,7 @@ block_t *block_FifoGet(block_fifo_t *fifo)
     return block;
 }
 
-block_t *block_FifoShow( block_fifo_t *p_fifo )
+block_t *vlc_fifo_Show( block_fifo_t *p_fifo )
 {
     block_t *b;
 

@@ -72,4 +72,13 @@
 #define block_ChainProperties vlc_frame_ChainProperties
 #define block_ChainGather vlc_frame_ChainGather
 
+#define block_FifoPut vlc_fifo_Put
+#define block_FifoNew vlc_fifo_New
+#define block_FifoRelease vlc_fifo_Release
+#define block_FifoSize vlc_fifo_Size
+#define block_FifoGet vlc_fifo_Get
+#define block_FifoCount vlc_fifo_Count
+#define block_FifoEmpty vlc_fifo_Empty
+#define block_FifoShow vlc_fifo_Show
+
 #endif /* VLC_BLOCK_H */
