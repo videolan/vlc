@@ -621,6 +621,8 @@ static block_t * HXXXProcessBlock(decoder_t *p_dec, block_t *p_block)
         for (block_t *p_b = p_xps_blocks; p_b != NULL; p_b = p_b->p_next) {
             CuvidPushRawBlock(p_dec, p_b->p_buffer, p_b->i_buffer);
         }
+        if(p_xps_blocks)
+            block_ChainRelease(p_xps_blocks);
         p_sys->b_xps_pushed = true;
     }
 
