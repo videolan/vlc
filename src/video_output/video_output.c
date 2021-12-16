@@ -78,6 +78,7 @@ typedef struct vout_thread_sys_t
 
     vlc_mutex_t clock_lock;
     bool clock_nowait; /* protected by vlc_clock_Lock()/vlc_clock_Unlock() */
+    bool wait_interrupted;
 
     vlc_clock_t     *clock;
     float           rate;
@@ -1329,6 +1330,7 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
             vlc_clock_Lock(sys->clock);
 
             bool timed_out = false;
+            sys->wait_interrupted = false;
             while (!timed_out)
             {
                 vlc_tick_t deadline;
@@ -1343,9 +1345,12 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
                 }
 
                 if (sys->clock_nowait)
+                {
                     /* A caller (the UI thread) awaits for the rendering to
                      * complete urgently, do not wait. */
+                    sys->wait_interrupted = true;
                     break;
+                }
 
                 system_pts = deadline;
                 timed_out = vlc_clock_Wait(sys->clock, deadline);
@@ -1418,7 +1423,7 @@ static bool UpdateCurrentPicture(vout_thread_sys_t *sys)
         return sys->displayed.current != NULL;
     }
 
-    if (sys->pause.is_on)
+    if (sys->pause.is_on || sys->wait_interrupted)
         return false;
 
     const vlc_tick_t system_now = vlc_tick_now();
@@ -1455,7 +1460,6 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
 
     UpdateDeinterlaceFilter(sys);
 
-
     bool current_changed = UpdateCurrentPicture(sys);
     if (current_changed)
     {
@@ -1468,6 +1472,12 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
         if (!render_now)
             /* Prepare the next picture immediately without waiting */
             return VLC_TICK_INVALID;
+    }
+    else if (sys->wait_interrupted)
+    {
+        sys->wait_interrupted = false;
+        RenderPicture(vout, true);
+        return VLC_TICK_INVALID;
     }
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
     {
@@ -2039,6 +2049,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
 
     vlc_mutex_init(&sys->clock_lock);
     sys->clock_nowait = false;
+    sys->wait_interrupted = false;
 
     /* Display */
     sys->display = NULL;
