@@ -26,6 +26,35 @@
 
 #include <vlc_frame.h>
 
+/**
+ * \defgroup block
+ * \ingroup input
+ *
+ * Blocks of binary data.
+ *
+ * @ref block_t is a generic structure to represent a binary blob within VLC.
+ * The primary goal of the structure is to avoid memory copying as data is
+ * passed around.
+ *
+ * It is notably used in:
+ *  - access_t
+ *  - stream_t
+ *  - demux_t (read block_t but send vlc_frame_t from es_out_Send)A
+ *
+ * TODO: remove the vlc_frame_t typedef and create a block_t struct like the
+ * following:
+ * @verbatim
+ * struct block_t
+ * {
+ *     struct block_t *p_next;
+ *     uint8_t    *p_buffer;
+ *     size_t      i_buffer;
+ *     uint8_t    *p_start;
+ *     size_t      i_size;
+ *     const struct block_callbacks *cbs;
+ * } @endverbatim
+ */
+
 #define BLOCK_FLAG_DISCONTINUITY VLC_FRAME_FLAG_DISCONTINUITY
 
 #define BLOCK_FLAG_TYPE_I VLC_FRAME_FLAG_TYPE_I
