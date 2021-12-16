@@ -1258,7 +1258,8 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
             vlc_clock_Lock(sys->clock);
 
             bool timed_out = false;
-            while (!timed_out) {
+            while (!timed_out)
+            {
                 vlc_tick_t deadline;
                 if (vlc_clock_IsPaused(sys->clock))
                     deadline = max_deadline;
@@ -1272,7 +1273,7 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
 
                 system_pts = deadline;
                 timed_out = vlc_clock_Wait(sys->clock, deadline);
-            };
+            }
 
             vlc_clock_Unlock(sys->clock);
         }
