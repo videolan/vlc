@@ -59,6 +59,7 @@
 #if BLACKMAGIC_DECKLINK_API_VERSION < 0x0b010000
  #define IID_IDeckLinkProfileAttributes IID_IDeckLinkAttributes
  #define IDeckLinkProfileAttributes IDeckLinkAttributes
+ #define bmdVideoConnectionUnspecified 0
 #endif
 
 #define FRAME_SIZE 1920
