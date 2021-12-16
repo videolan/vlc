@@ -4131,11 +4131,6 @@ AS_IF([test "${enable_lirc}" = "yes"], [
 AM_CONDITIONAL([HAVE_LIRC], [test "${have_lirc}" = "yes"])
 
 dnl
-dnl  Bitstream
-dnl
-PKG_HAVE_WITH_MODULES([BITSTREAM], [bitstream > 1.4])
-
-dnl
 dnl  SRT plugin
 dnl
 PKG_ENABLE_MODULES_VLC([SRT], [access_srt access_output_srt], [srt >= 1.3.0], [SRT input/output plugin], [auto], [], [], [-DENABLE_SRT])
