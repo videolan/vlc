@@ -31,7 +31,7 @@ vlc_fourcc_t GetVlcAudioFormat( int i_sample_fmt );
 
 /* Video encoder module */
 int  InitVideoEnc ( vlc_object_t * );
-void EndVideoEnc( vlc_object_t * );
+void EndVideoEnc( encoder_t * );
 
 /* Video Decoder */
 int InitVideoDec( vlc_object_t * );

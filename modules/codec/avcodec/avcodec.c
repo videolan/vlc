@@ -126,21 +126,14 @@ vlc_module_begin ()
     set_section( N_("Encoding") , NULL )
     set_description( N_("FFmpeg video encoder") )
     set_capability( "video encoder", 100 )
-    set_callbacks( InitVideoEnc, EndVideoEnc )
+    set_callback( InitVideoEnc )
 
     add_submodule()
     add_shortcut( "ffmpeg" )
     set_section( N_("Encoding") , NULL )
     set_description( N_("FFmpeg audio encoder") )
     set_capability( "audio encoder", 100 )
-    set_callbacks( InitVideoEnc, EndVideoEnc )
-
-    add_submodule()
-    add_shortcut( "ffmpeg" )
-    set_section( N_("Encoding") , NULL )
-    set_description( N_("FFmpeg spu encoder") )
-    set_capability( "spu encoder", 100 )
-    set_callbacks( InitVideoEnc, EndVideoEnc )
+    set_callback( InitVideoEnc )
 
     add_string( ENC_CFG_PREFIX "codec", NULL, CODEC_TEXT, CODEC_LONGTEXT )
     add_string( ENC_CFG_PREFIX "hq", "rd", ENC_HQ_TEXT,

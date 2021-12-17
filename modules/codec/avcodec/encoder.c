@@ -302,6 +302,20 @@ int InitVideoEnc( vlc_object_t *p_this )
     float f_val;
     char *psz_val;
 
+    static const struct vlc_encoder_operations audio_ops =
+    {
+        .close = EndVideoEnc,
+        .encode_audio = EncodeAudio,
+    };
+
+    static const struct vlc_encoder_operations video_ops =
+    {
+        .close = EndVideoEnc,
+        .encode_video = EncodeVideo,
+    };
+
+    const struct vlc_encoder_operations *encoder_ops;
+
     msg_Dbg( p_this, "using %s %s", AVPROVIDER(LIBAVCODEC), LIBAVCODEC_IDENT );
 
     /* Initialization must be done before avcodec_find_encoder() */
@@ -312,6 +326,7 @@ int InitVideoEnc( vlc_object_t *p_this )
     switch( p_enc->fmt_out.i_cat )
     {
         case VIDEO_ES:
+            encoder_ops = &video_ops;
             if( p_enc->fmt_out.i_codec == VLC_CODEC_MP1V )
             {
                 i_codec_id = AV_CODEC_ID_MPEG1VIDEO;
@@ -330,6 +345,7 @@ int InitVideoEnc( vlc_object_t *p_this )
             return VLC_EGENERIC;
 
         case AUDIO_ES:
+            encoder_ops = &audio_ops;
             if( GetFfmpegCodec( AUDIO_ES, p_enc->fmt_out.i_codec, &i_codec_id,
                                 &psz_namecodec ) )
                 break;
@@ -1050,8 +1066,8 @@ errmsg:
     }
     msg_Dbg( p_enc, "found encoder %s", psz_namecodec );
 
-    p_enc->pf_encode_video = EncodeVideo;
-    p_enc->pf_encode_audio = EncodeAudio;
+    assert(encoder_ops != NULL);
+    p_enc->ops = encoder_ops;
 
 
     return VLC_SUCCESS;
@@ -1469,9 +1485,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
 /*****************************************************************************
  * EndVideoEnc: libavcodec encoder destruction
  *****************************************************************************/
-void EndVideoEnc( vlc_object_t *p_this )
+void EndVideoEnc( encoder_t *p_enc )
 {
-    encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     av_frame_free( &p_sys->frame );
