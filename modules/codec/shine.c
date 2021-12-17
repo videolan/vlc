@@ -56,7 +56,7 @@ typedef struct
  * Local prototypes
  *****************************************************************************/
 static int  OpenEncoder   ( vlc_object_t * );
-static void CloseEncoder  ( vlc_object_t * );
+static void CloseEncoder  ( encoder_t * );
 
 static block_t *EncodeFrame  ( encoder_t *, block_t * );
 
@@ -64,7 +64,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACODEC );
     set_description( N_("MP3 fixed point audio encoder") );
     set_capability( "audio encoder", 50 );
-    set_callbacks( OpenEncoder, CloseEncoder );
+    set_callback( OpenEncoder );
 vlc_module_end();
 
 static atomic_bool busy = ATOMIC_VAR_INIT(false);
@@ -129,10 +129,16 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->s = shine_initialise(&cfg);
     p_sys->samples_per_frame = shine_samples_per_pass(p_sys->s);
 
-    p_enc->pf_encode_audio = EncodeFrame;
     p_enc->fmt_out.i_cat = AUDIO_ES;
 
     p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
+
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = CloseEncoder,
+        .encode_audio = EncodeFrame,
+    };
+    p_enc->ops = &ops;
 
     return VLC_SUCCESS;
 
@@ -272,9 +278,9 @@ static block_t *EncodeFrame( encoder_t *p_enc, block_t *p_block )
     return p_chain;
 }
 
-static void CloseEncoder( vlc_object_t *p_this )
+static void CloseEncoder( encoder_t *p_enc )
 {
-    encoder_sys_t *p_sys = ((encoder_t*)p_this)->p_sys;
+    encoder_sys_t *p_sys = p_enc->p_sys;
 
     /* TODO: we should send the last PCM block padded with 0
      * But we don't know if other blocks will come before it's too late */
