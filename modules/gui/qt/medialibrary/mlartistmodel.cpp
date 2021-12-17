@@ -89,16 +89,27 @@ void MLArtistModel::onVlcMlEvent(const MLEvent &event)
     switch (event.i_type)
     {
         case VLC_ML_EVENT_ARTIST_ADDED:
+            emit resetRequested();
+            return;
         case VLC_ML_EVENT_ARTIST_UPDATED:
+        {
+            MLItemId itemId(event.deletion.i_entity_id, VLC_ML_PARENT_UNKNOWN);
+            updateItemInCache(itemId);
+            return;
+        }
         case VLC_ML_EVENT_ARTIST_DELETED:
-            m_need_reset = true;
-            break;
+        {
+            MLItemId itemId(event.deletion.i_entity_id, VLC_ML_PARENT_UNKNOWN);
+            deleteItemInCache(itemId);
+            return;
+        }
         case VLC_ML_EVENT_GENRE_DELETED:
             if ( m_parent.id != 0 && m_parent.type == VLC_ML_PARENT_GENRE &&
                  m_parent.id == event.deletion.i_entity_id )
-                m_need_reset = true;
-            break;
+                emit resetRequested();
+            return;
     }
+
     MLBaseModel::onVlcMlEvent(event);
 }
 

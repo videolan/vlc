@@ -351,20 +351,33 @@ QString MLPlaylistListModel::getCover(MLPlaylist * playlist) const
 
 void MLPlaylistListModel::onVlcMlEvent(const MLEvent & event) /* override */
 {
+    if (m_transactionPending
+        && (event.i_type == VLC_ML_EVENT_PLAYLIST_UPDATED
+            || event.i_type == VLC_ML_EVENT_PLAYLIST_DELETED
+            || event.i_type == VLC_ML_EVENT_PLAYLIST_ADDED))
+    {
+        m_resetAfterTransaction = true;
+        return;
+    }
+
     switch (event.i_type)
     {
-    case VLC_ML_EVENT_PLAYLIST_UPDATED:
-    case VLC_ML_EVENT_PLAYLIST_ADDED:
     case VLC_ML_EVENT_PLAYLIST_DELETED:
     {
-        if(m_transactionPending)
-            m_resetAfterTransaction = true;
-        else
-        {
-            m_need_reset = true;
-            // NOTE: Maybe we should call this from MLBaseModel ?
-            emit resetRequested();
-        }
+        MLItemId itemId(event.deletion.i_entity_id, VLC_ML_PARENT_PLAYLIST);
+        deleteItemInCache(itemId);
+        return;
+    }
+    case VLC_ML_EVENT_PLAYLIST_UPDATED:
+    {
+
+        MLItemId itemId(event.modification.i_entity_id, VLC_ML_PARENT_PLAYLIST);
+        updateItemInCache(itemId);
+        return;
+    }
+    case VLC_ML_EVENT_PLAYLIST_ADDED:
+    {
+        emit resetRequested();
         break;
     }
     default:

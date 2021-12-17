@@ -53,7 +53,7 @@ void MLRecentsVideoModel::onVlcMlEvent(const MLEvent & event) /* override */
     {
         case VLC_ML_EVENT_HISTORY_CHANGED:
             emit resetRequested();
-            break;
+            return;
         default:
             break;
     }

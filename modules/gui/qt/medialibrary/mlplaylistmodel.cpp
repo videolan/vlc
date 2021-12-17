@@ -420,17 +420,23 @@ void MLPlaylistModel::onVlcMlEvent(const MLEvent & event) /* override */
 {
     switch (event.i_type)
     {
+    case VLC_ML_EVENT_MEDIA_UPDATED:
+    {
+        MLItemId itemId(event.modification.i_entity_id, VLC_ML_PARENT_UNKNOWN);
+        updateItemInCache(itemId);
+        return;
+    }
     case VLC_ML_EVENT_PLAYLIST_UPDATED:
     {
-        if (m_transactionPending)
-            m_resetAfterTransaction = true;
-        else
+        MLItemId itemId(event.modification.i_entity_id, VLC_ML_PARENT_PLAYLIST);
+        if (m_parent == itemId)
         {
-            m_need_reset = true;
-            // NOTE: Maybe we should call this from MLBaseModel ?
-            emit resetRequested();
+            if (m_transactionPending)
+                m_resetAfterTransaction = true;
+            else
+                emit resetRequested();
         }
-        break;
+        return;
     }
     default:
         break;

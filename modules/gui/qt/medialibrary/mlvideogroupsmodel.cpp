@@ -164,18 +164,53 @@ void MLVideoGroupsModel::onVlcMlEvent(const MLEvent & event) /* override */
 
     switch (type)
     {
-        case VLC_ML_EVENT_GROUP_ADDED:
-        case VLC_ML_EVENT_GROUP_UPDATED:
-        case VLC_ML_EVENT_GROUP_DELETED:
+    case VLC_ML_EVENT_GROUP_ADDED:
+    {
+        emit resetRequested();
+        return;
+    }
+    case VLC_ML_EVENT_MEDIA_ADDED:
+    {
+        if (event.creation.media.i_type == VLC_ML_MEDIA_TYPE_VIDEO)
         {
-            m_need_reset = true;
-
-            // NOTE: Maybe we should call this from MLBaseModel ?
             emit resetRequested();
-            break;
+            return;
         }
-        default:
-            break;
+        break;
+    }
+    case VLC_ML_EVENT_GROUP_UPDATED:
+    {
+        MLItemId itemId(event.modification.i_entity_id, VLC_ML_PARENT_GROUP);
+        updateItemInCache(itemId);
+        return;
+    }
+    case VLC_ML_EVENT_MEDIA_UPDATED:
+    {
+        if (event.creation.media.i_type == VLC_ML_MEDIA_TYPE_VIDEO)
+        {
+            MLItemId itemId(event.modification.i_entity_id, VLC_ML_PARENT_UNKNOWN);
+            updateItemInCache(itemId);
+            return;
+        }
+        break;
+    }
+    case VLC_ML_EVENT_GROUP_DELETED:
+    {
+        MLItemId itemId(event.deletion.i_entity_id, VLC_ML_PARENT_GROUP);
+        deleteItemInCache(itemId);
+        return;
+    }
+    case VLC_ML_EVENT_MEDIA_DELETED:
+    {
+        if (event.creation.media.i_type == VLC_ML_MEDIA_TYPE_VIDEO)
+        {
+            MLItemId itemId(event.deletion.i_entity_id, VLC_ML_PARENT_UNKNOWN);
+            deleteItemInCache(itemId);
+        }
+        return;
+    }
+    default:
+        break;
     }
 
     MLBaseModel::onVlcMlEvent(event);

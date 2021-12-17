@@ -87,11 +87,22 @@ void MLGenreModel::onVlcMlEvent(const MLEvent &event)
     switch (event.i_type)
     {
         case VLC_ML_EVENT_GENRE_ADDED:
+            emit resetRequested();
+            return;
         case VLC_ML_EVENT_GENRE_UPDATED:
+        {
+            MLItemId itemId(event.modification.i_entity_id, VLC_ML_PARENT_UNKNOWN);
+            updateItemInCache(itemId);
+            return;
+        }
         case VLC_ML_EVENT_GENRE_DELETED:
-            m_need_reset = true;
-            break;
+        {
+            MLItemId itemId(event.deletion.i_entity_id, VLC_ML_PARENT_UNKNOWN);
+            deleteItemInCache(itemId);
+            return;
+        }
     }
+
     MLBaseModel::onVlcMlEvent(event);
 }
 

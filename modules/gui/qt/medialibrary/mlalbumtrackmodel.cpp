@@ -115,30 +115,37 @@ void MLAlbumTrackModel::onVlcMlEvent(const MLEvent &event)
     {
         case VLC_ML_EVENT_MEDIA_ADDED:
             if ( event.creation.media.i_subtype == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK )
-                m_need_reset = true;
-            break;
+                emit resetRequested();
+            return;
         case VLC_ML_EVENT_MEDIA_UPDATED:
+        {
+            MLItemId itemId(event.modification.i_entity_id, VLC_ML_PARENT_UNKNOWN);
+            updateItemInCache(itemId);
+            return;
+        }
         case VLC_ML_EVENT_MEDIA_DELETED:
-            // FIXME: Not optimal, this will trigger a clean/refresh for video
-            // media as well, but this needs fixing in the medialibrary
-            m_need_reset = true;
-            break;
+        {
+            MLItemId itemId(event.deletion.i_entity_id, VLC_ML_PARENT_UNKNOWN);
+            deleteItemInCache(itemId);
+            return;
+        }
         case VLC_ML_EVENT_ALBUM_UPDATED:
             if ( m_parent.id != 0 && m_parent.type == VLC_ML_PARENT_ALBUM &&
                  m_parent.id == event.modification.i_entity_id )
-                m_need_reset = true;
-            break;
+                emit resetRequested();
+            return;
         case VLC_ML_EVENT_ALBUM_DELETED:
             if ( m_parent.id != 0 && m_parent.type == VLC_ML_PARENT_ALBUM &&
                  m_parent.id == event.deletion.i_entity_id )
-                m_need_reset = true;
-            break;
+                emit resetRequested();
+            return;
         case VLC_ML_EVENT_GENRE_DELETED:
             if ( m_parent.id != 0 && m_parent.type == VLC_ML_PARENT_GENRE &&
                  m_parent.id == event.deletion.i_entity_id )
-                m_need_reset = true;
-            break;
+                emit resetRequested();
+            return;
     }
+
     MLBaseModel::onVlcMlEvent( event );
 }
 

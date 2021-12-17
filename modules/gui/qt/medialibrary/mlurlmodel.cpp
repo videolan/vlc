@@ -99,8 +99,8 @@ void MLUrlModel::onVlcMlEvent(const MLEvent &event)
     {
         case VLC_ML_EVENT_MEDIA_UPDATED:
         case VLC_ML_EVENT_HISTORY_CHANGED:
-            m_need_reset = true;
-            break;
+            emit resetRequested();
+            return;
     }
     MLBaseModel::onVlcMlEvent( event );
 }

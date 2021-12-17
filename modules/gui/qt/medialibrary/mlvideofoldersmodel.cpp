@@ -135,14 +135,21 @@ void MLVideoFoldersModel::onVlcMlEvent(const MLEvent & event) /* override */
     switch (type)
     {
         case VLC_ML_EVENT_FOLDER_ADDED:
+        {
+            emit resetRequested();
+            return;
+        }
         case VLC_ML_EVENT_FOLDER_UPDATED:
+        {
+            MLItemId itemId(event.modification.i_entity_id, VLC_ML_PARENT_FOLDER);
+            updateItemInCache(itemId);
+            return;
+        }
         case VLC_ML_EVENT_FOLDER_DELETED:
         {
-            m_need_reset = true;
-
-            emit resetRequested();
-
-            break;
+            MLItemId itemId(event.deletion.i_entity_id, VLC_ML_PARENT_FOLDER);
+            deleteItemInCache(itemId);
+            return;
         }
         default:
             break;
