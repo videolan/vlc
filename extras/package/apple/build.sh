@@ -739,6 +739,9 @@ hostenv "${VLC_SRC_DIR}/configure" \
     --prefix="$VLC_INSTALL_DIR" \
     --with-contrib="$VLC_CONTRIB_INSTALL_DIR" \
     "${VLC_CONFIG_OPTIONS[@]}" \
+    CFLAGS="${CFLAGS}" \
+    OBJCFLAGS="${OBJCFLAGS}" \
+    CXXFLAGS="${CXXFLAGS}" \
  || abort_err "Configuring VLC failed"
 
 if [ "$VLC_CONFIGURE_ONLY" != 1 ]; then
