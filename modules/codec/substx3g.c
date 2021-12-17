@@ -615,11 +615,16 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     p_enc->p_sys = NULL;
 
-    p_enc->pf_encode_sub = Encode;
     p_enc->fmt_out.i_cat = SPU_ES;
 
     if( !p_enc->fmt_out.i_extra )
         FillExtradataTx3g( &p_enc->fmt_out.p_extra, &p_enc->fmt_out.i_extra );
+
+    static const struct vlc_encoder_operations ops =
+    {
+        .encode_sub = Encode,
+    };
+    p_enc->ops = &ops;
 
     return VLC_SUCCESS;
 }
