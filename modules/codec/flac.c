@@ -145,7 +145,7 @@ static void CloseDecoder  ( vlc_object_t * );
 
 #ifdef ENABLE_SOUT
 static int OpenEncoder   ( vlc_object_t * );
-static void CloseEncoder ( vlc_object_t * );
+static void CloseEncoder ( encoder_t * );
 #endif
 
 static int DecodeBlock( decoder_t *, block_t * );
@@ -168,7 +168,7 @@ vlc_module_begin ()
     add_shortcut( "flac" )
     set_description( N_("Flac audio encoder") )
     set_capability( "audio encoder", 100 )
-    set_callbacks( OpenEncoder, CloseEncoder )
+    set_callback( OpenEncoder )
 #endif
 
 vlc_module_end ()
@@ -809,7 +809,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( ( p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
     p_enc->p_sys = p_sys;
-    p_enc->pf_encode_audio = Encode;
     p_enc->fmt_out.i_codec = VLC_CODEC_FLAC;
 
     p_sys->i_headers = 0;
@@ -860,6 +859,13 @@ static int OpenEncoder( vlc_object_t *p_this )
     FLAC__stream_encoder_init( p_sys->p_flac );
 #endif
 
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = CloseEncoder,
+        .encode_audio = Encode,
+    };
+    p_enc->ops = &ops;
+
     return VLC_SUCCESS;
 }
 
@@ -907,9 +913,8 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 /*****************************************************************************
  * CloseEncoder: encoder destruction
  *****************************************************************************/
-static void CloseEncoder( vlc_object_t *p_this )
+static void CloseEncoder( encoder_t *p_enc )
 {
-    encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     FLAC__stream_encoder_delete( p_sys->p_flac );
