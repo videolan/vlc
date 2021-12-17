@@ -46,11 +46,9 @@ MLBaseModel::~MLBaseModel() = default;
 
 void MLBaseModel::sortByColumn(QByteArray name, Qt::SortOrder order)
 {
-    beginResetModel();
     m_sort_desc = (order == Qt::SortOrder::DescendingOrder);
     m_sort = nameToCriteria(name);
     clear();
-    endResetModel();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -171,9 +169,7 @@ QVariant MLBaseModel::data(const QModelIndex &index, int role) const
 
 void MLBaseModel::onResetRequested()
 {
-    beginResetModel();
     clear();
-    endResetModel();
 }
 
 void MLBaseModel::onLocalSizeAboutToBeChanged(size_t size)
@@ -271,19 +267,15 @@ MLItemId MLBaseModel::parentId() const
 
 void MLBaseModel::setParentId(MLItemId parentId)
 {
-    beginResetModel();
     m_parent = parentId;
     clear();
-    endResetModel();
     emit parentIdChanged();
 }
 
 void MLBaseModel::unsetParentId()
 {
-    beginResetModel();
     m_parent = MLItemId();
     clear();
-    endResetModel();
     emit parentIdChanged();
 }
 
@@ -312,10 +304,8 @@ void MLBaseModel::setSearchPattern( const QString& pattern )
         /* No changes */
         return;
 
-    beginResetModel();
     m_search_pattern = patternToApply;
     clear();
-    endResetModel();
 }
 
 Qt::SortOrder MLBaseModel::getSortOrder() const
@@ -325,10 +315,8 @@ Qt::SortOrder MLBaseModel::getSortOrder() const
 
 void MLBaseModel::setSortOder(Qt::SortOrder order)
 {
-    beginResetModel();
     m_sort_desc = (order == Qt::SortOrder::DescendingOrder);
     clear();
-    endResetModel();
     emit sortOrderChanged();
 }
 
@@ -339,19 +327,15 @@ const QString MLBaseModel::getSortCriteria() const
 
 void MLBaseModel::setSortCriteria(const QString& criteria)
 {
-    beginResetModel();
     m_sort = nameToCriteria(criteria.toUtf8());
     clear();
-    endResetModel();
     emit sortCriteriaChanged();
 }
 
 void MLBaseModel::unsetSortCriteria()
 {
-    beginResetModel();
     m_sort = VLC_ML_SORTING_DEFAULT;
     clear();
-    endResetModel();
     emit sortCriteriaChanged();
 }
 
@@ -367,7 +351,9 @@ int MLBaseModel::rowCount(const QModelIndex &parent) const
 
 void MLBaseModel::clear()
 {
+    beginResetModel();
     invalidateCache();
+    endResetModel();
     emit countChanged( static_cast<unsigned int>(0) );
 }
 
