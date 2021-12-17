@@ -118,6 +118,13 @@ protected:
 
     MLItem *findInCache(const MLItemId& id, int *index) const;
 
+    //update and notify changes on an item if this item is in the cache
+    void updateItemInCache(const MLItemId& id);
+
+    //delete and notify deletion of an item if this item is in the cache
+    //this is only to reflect changes from the ML, it won't alter the database
+    void deleteItemInCache(const MLItemId& mlid);
+
     virtual void onVlcMlEvent( const MLEvent &event );
 
 
@@ -176,6 +183,9 @@ protected:
     bool m_need_reset = false;
 
     mutable std::unique_ptr<MLListCache> m_cache;
+
+    //loader used to load single items
+    std::shared_ptr<BaseLoader> m_itemLoader;
 
 private: // Friends
     friend QString getVideoListCover(const MLBaseModel*, MLItemCover*, int, int, int);

@@ -112,6 +112,19 @@ public:
      */
     const ItemType *find(const std::function<bool (const ItemType&)> &&f, int *index = nullptr) const;
 
+    /**
+     * replace item in the cache with the one provided. replacement is based on newItem MLItemId
+     *
+     * this returns the index of the replaced item, or -1 if the item is not in the cache
+     */
+    int updateItem(std::unique_ptr<MLItem>&& newItem);
+
+    /**
+     * Removes from the cache list given its item id
+     *
+     * it returns the index row when the id is found and removed, -1 otherwise
+     */
+    int deleteItem(const MLItemId& mlid);
 
     /**
      * Return the number of items or `COUNT_UNINITIALIZED`

@@ -502,6 +502,62 @@ MLItem *MLBaseModel::findInCache(const MLItemId& id, int *index) const
     return item ? item->get() : nullptr;
 }
 
+void MLBaseModel::updateItemInCache(const MLItemId& mlid)
+{
+    if (!m_cache)
+    {
+        emit resetRequested();
+        return;
+    }
+    MLItem* item = findInCache(mlid, nullptr);
+    if (!item) // items isn't loaded
+        return;
+
+    if (!m_itemLoader)
+        m_itemLoader = createLoader();
+    struct Ctx {
+        std::unique_ptr<MLItem> item;
+    };
+    m_mediaLib->runOnMLThread<Ctx>(this,
+    //ML thread
+    [mlid, itemLoader = m_itemLoader](vlc_medialibrary_t* ml, Ctx& ctx){
+        ctx.item = itemLoader->loadItemById(ml, mlid);
+    },
+    //UI thread
+    [this](qint64, Ctx& ctx) {
+        if (!ctx.item)
+            return;
+
+        int row = m_cache->updateItem(std::move(ctx.item));
+        if (row != -1)
+        {
+            //notify every roles
+            emit dataChanged(index(row), index(row));
+        }
+        //otherwise don't notify, it will be updated when the cache reload the corresponding segment
+    });
+}
+
+void MLBaseModel::deleteItemInCache(const MLItemId& mlid)
+{
+    if (!m_cache)
+    {
+        emit resetRequested();
+        return;
+    }
+    int row = m_cache->deleteItem(mlid);
+    if (row < 0)
+    {
+        // items isn't in cache, we don't know if it's before or after our cache, request a reset
+        emit resetRequested();
+    }
+    else
+    {
+        beginRemoveRows({}, row, row);
+        endRemoveRows();
+    }
+}
+
 //-------------------------------------------------------------------------------------------------
 
 MLBaseModel::BaseLoader::BaseLoader(MLItemId parent, QString searchPattern,

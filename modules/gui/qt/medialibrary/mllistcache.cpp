@@ -46,6 +46,35 @@ const MLListCache::ItemType* MLListCache::find(const std::function<bool (const M
     return nullptr;
 }
 
+int MLListCache::updateItem(std::unique_ptr<MLItem>&& newItem)
+{
+    MLItemId mlid = newItem->getId();
+    auto it = std::find_if(m_list.begin(), m_list.end(), [mlid](const ItemType& item) {
+        return (item->getId() == mlid);
+    });
+    //item not found
+    if (it == m_list.end())
+        return -1;
+
+    int pos = m_offset + std::distance(m_list.begin(), it);
+    *it = std::move(newItem);
+    return pos;
+}
+
+int MLListCache::deleteItem(const MLItemId& mlid)
+{
+    auto it = std::find_if(m_list.begin(), m_list.end(), [mlid](const ItemType& item) {
+        return (item->getId() == mlid);
+    });
+    //item not found
+    if (it == m_list.end())
+        return -1;
+    int pos = m_offset + std::distance(m_list.begin(), it);
+    m_list.erase(it, it);
+    m_total_count -= 1;
+    return pos;
+}
+
 ssize_t MLListCache::count() const
 {
     return m_total_count;
