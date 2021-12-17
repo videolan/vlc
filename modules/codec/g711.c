@@ -1157,7 +1157,10 @@ static int EncoderOpen( vlc_object_t *p_this )
     p_enc->fmt_out.audio.i_bitspersample = 8;
     p_enc->fmt_out.i_bitrate = 8 * p_enc->fmt_in.audio.i_channels
                                  * p_enc->fmt_in.audio.i_rate;
-    p_enc->pf_encode_audio = EncoderEncode;
+
+    static const struct vlc_encoder_operations ops =
+        { .encode_audio = EncoderEncode };
+    p_enc->ops = &ops;
 
     msg_Dbg( p_enc, "samplerate:%dHz channels:%d",
              p_enc->fmt_out.audio.i_rate, p_enc->fmt_out.audio.i_channels );
