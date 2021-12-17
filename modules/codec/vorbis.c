@@ -162,7 +162,7 @@ static void ConfigureChannelOrder(uint8_t *, int, uint32_t );
 
 #ifdef HAVE_VORBIS_ENCODER
 static int OpenEncoder   ( vlc_object_t * );
-static void CloseEncoder ( vlc_object_t * );
+static void CloseEncoder ( encoder_t * );
 static block_t *Encode   ( encoder_t *, block_t * );
 #endif
 
@@ -204,7 +204,7 @@ vlc_module_begin ()
     add_submodule ()
     set_description( N_("Vorbis audio encoder") )
     set_capability( "audio encoder", 130 )
-    set_callbacks( OpenEncoder, CloseEncoder )
+    set_callback( OpenEncoder )
 
     add_integer( ENC_CFG_PREFIX "quality", 0, ENC_QUALITY_TEXT,
                  ENC_QUALITY_LONGTEXT )
@@ -769,7 +769,6 @@ static int OpenEncoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_enc->p_sys = p_sys;
 
-    p_enc->pf_encode_audio = Encode;
     p_enc->fmt_in.i_codec  = VLC_CODEC_FL32;
     p_enc->fmt_out.i_codec = VLC_CODEC_VORBIS;
 
@@ -881,6 +880,13 @@ static int OpenEncoder( vlc_object_t *p_this )
     ConfigureChannelOrder(p_sys->pi_chan_table, p_sys->vi.channels,
             p_enc->fmt_in.audio.i_physical_channels);
 
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = CloseEncoder,
+        .encode_audio = Encode,
+    };
+    p_enc->ops = &ops;
+
     return VLC_SUCCESS;
 }
 
@@ -958,9 +964,8 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 /*****************************************************************************
  * CloseEncoder: vorbis encoder destruction
  *****************************************************************************/
-static void CloseEncoder( vlc_object_t *p_this )
+static void CloseEncoder( encoder_t *p_enc )
 {
-    encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     vorbis_block_clear( &p_sys->vb );
