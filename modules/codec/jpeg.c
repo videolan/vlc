@@ -98,7 +98,7 @@ static const char * const ppsz_enc_options[] = {
 };
 
 static int  OpenEncoder(vlc_object_t *);
-static void CloseEncoder(vlc_object_t *);
+static void CloseEncoder(encoder_t *);
 
 static block_t *EncodeBlock(encoder_t *, picture_t *);
 
@@ -119,7 +119,7 @@ vlc_module_begin()
     set_section(N_("Encoding"), NULL)
     set_description(N_("JPEG image encoder"))
     set_capability("video encoder", 1000)
-    set_callbacks(OpenEncoder, CloseEncoder)
+    set_callback(OpenEncoder)
     add_integer_with_range(ENC_CFG_PREFIX "quality", 95, 0, 100,
                            ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT)
 vlc_module_end()
@@ -634,7 +634,13 @@ static int OpenEncoder(vlc_object_t *p_this)
     p_sys->i_blocksize = 3 * p_enc->fmt_in.video.i_visible_width * p_enc->fmt_in.video.i_visible_height;
 
     p_enc->fmt_in.i_codec = VLC_CODEC_J420;
-    p_enc->pf_encode_video = EncodeBlock;
+
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = CloseEncoder,
+        .encode_video = EncodeBlock,
+    };
+    p_enc->ops = &ops;
 
     return VLC_SUCCESS;
 }
@@ -745,9 +751,8 @@ error:
 /*
  * jpeg encoder destruction
  */
-static void CloseEncoder(vlc_object_t *p_this)
+static void CloseEncoder(encoder_t *p_enc)
 {
-    encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     free(p_sys);
