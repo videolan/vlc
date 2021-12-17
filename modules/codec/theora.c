@@ -94,7 +94,7 @@ static void theora_CopyPicture( picture_t *, th_ycbcr_buffer );
 
 #ifdef ENABLE_SOUT
 static int  OpenEncoder( vlc_object_t *p_this );
-static void CloseEncoder( vlc_object_t *p_this );
+static void CloseEncoder( encoder_t *p_enc );
 static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
 #endif
 
@@ -128,7 +128,7 @@ vlc_module_begin ()
     add_submodule ()
     set_description( N_("Theora video encoder") )
     set_capability( "video encoder", 150 )
-    set_callbacks( OpenEncoder, CloseEncoder )
+    set_callback( OpenEncoder )
     add_shortcut( "theora" )
 
 #   define ENC_CFG_PREFIX "sout-theora-"
@@ -689,7 +689,6 @@ static int OpenEncoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_enc->p_sys = p_sys;
 
-    p_enc->pf_encode_video = Encode;
     p_enc->fmt_in.i_codec = VLC_CODEC_I420;
     p_enc->fmt_out.i_codec = VLC_CODEC_THEORA;
 
@@ -792,6 +791,13 @@ static int OpenEncoder( vlc_object_t *p_this )
             p_enc->fmt_out.p_extra = NULL;
         }
     }
+
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = CloseEncoder,
+        .encode_video = Encode,
+    };
+    p_enc->ops = &ops;
     return VLC_SUCCESS;
 }
 
@@ -904,9 +910,8 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 /*****************************************************************************
  * CloseEncoder: theora encoder destruction
  *****************************************************************************/
-static void CloseEncoder( vlc_object_t *p_this )
+static void CloseEncoder( encoder_t *p_enc )
 {
-    encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     th_info_clear(&p_sys->ti);
