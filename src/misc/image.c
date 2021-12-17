@@ -75,7 +75,6 @@ static picture_t *ImageConvert( image_handler_t *, picture_t *,
 static decoder_t *CreateDecoder( image_handler_t *, const es_format_t * );
 static encoder_t *CreateEncoder( vlc_object_t *, const video_format_t *,
                                  const video_format_t * );
-static void DeleteEncoder( encoder_t * );
 static filter_t *CreateConverter( vlc_object_t *, const es_format_t *,
                                   struct vlc_video_context *,
                                   const video_format_t * );
@@ -118,7 +117,8 @@ void image_HandlerDelete( image_handler_t *p_image )
     if( !p_image ) return;
 
     decoder_Destroy( p_image->p_dec );
-    if( p_image->p_enc ) DeleteEncoder( p_image->p_enc );
+    if( p_image->p_enc )
+        vlc_encoder_Destroy( p_image->p_enc );
     if( p_image->p_converter ) DeleteConverter( p_image->p_converter );
 
     picture_fifo_Delete( p_image->outfifo );
@@ -376,7 +376,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
           p_image->p_enc->fmt_out.video.i_width != p_fmt_out->i_width ||
           p_image->p_enc->fmt_out.video.i_height != p_fmt_out->i_height ) )
     {
-        DeleteEncoder( p_image->p_enc );
+        vlc_encoder_Destroy( p_image->p_enc );
         p_image->p_enc = 0;
     }
 
@@ -440,8 +440,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
         if( likely(p_tmp_pic != NULL) )
         {
             assert(!picture_HasChainedPics(p_tmp_pic)); // no chaining
-            p_block = p_image->p_enc->pf_encode_video( p_image->p_enc,
-                                                       p_tmp_pic );
+            p_block = vlc_encoder_EncodeVideo(p_image->p_enc, p_tmp_pic );
             picture_Release( p_tmp_pic );
         }
         else
@@ -449,7 +448,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
     }
     else
     {
-        p_block = p_image->p_enc->pf_encode_video( p_image->p_enc, p_pic );
+        p_block = vlc_encoder_EncodeVideo( p_image->p_enc, p_pic );
     }
 
     if( !p_block )
@@ -705,6 +704,9 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fm
     return p_dec;
 }
 
+static block_t *WrapperEncodeVideo( encoder_t *enc, picture_t *pic )
+    { return enc->pf_encode_video(enc, pic); }
+
 
 static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt_in,
                                  const video_format_t *fmt_out )
@@ -741,6 +743,7 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt
     es_format_InitFromVideo( &p_enc->fmt_out, fmt_out );
     p_enc->fmt_out.video.i_width = p_enc->fmt_in.video.i_width;
     p_enc->fmt_out.video.i_height = p_enc->fmt_in.video.i_height;
+    p_enc->ops = NULL;
 
     /* Find a suitable decoder module */
     p_enc->p_module = module_need( p_enc, "video encoder", NULL, false );
@@ -750,22 +753,20 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt
                  "VLC probably does not support this image format.",
                  (char*)&p_enc->fmt_out.i_codec );
 
-        DeleteEncoder( p_enc );
+        vlc_encoder_Destroy( p_enc );
         return NULL;
     }
     p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
 
+    static const struct vlc_encoder_operations wrapper_ops =
+    {
+        .encode_video = WrapperEncodeVideo,
+    };
+
+    if (p_enc->ops == NULL)
+        p_enc->ops = &wrapper_ops;
+
     return p_enc;
-}
-
-static void DeleteEncoder( encoder_t * p_enc )
-{
-    if( p_enc->p_module ) module_unneed( p_enc, p_enc->p_module );
-
-    es_format_Clean( &p_enc->fmt_in );
-    es_format_Clean( &p_enc->fmt_out );
-
-    vlc_object_delete(p_enc);
 }
 
 static filter_t *CreateConverter( vlc_object_t *p_this,
