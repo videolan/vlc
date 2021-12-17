@@ -42,7 +42,7 @@
  * Local prototypes
  ****************************************************************************/
 static int OpenEncoder   ( vlc_object_t * );
-static void CloseEncoder ( vlc_object_t * );
+static void CloseEncoder ( encoder_t * );
 static block_t *Encode   ( encoder_t *, block_t * );
 
 /*****************************************************************************
@@ -73,7 +73,7 @@ vlc_module_begin ()
     set_shortname( "Twolame")
     set_description( N_("Libtwolame audio encoder") )
     set_capability( "audio encoder", 120 )
-    set_callbacks( OpenEncoder, CloseEncoder )
+    set_callback( OpenEncoder )
     set_subcategory( SUBCAT_INPUT_ACODEC )
 
     add_float( ENC_CFG_PREFIX "quality", 0.0, ENC_QUALITY_TEXT,
@@ -235,7 +235,12 @@ static int OpenEncoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_enc->pf_encode_audio = Encode;
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = CloseEncoder,
+        .encode_audio = Encode,
+    };
+    p_enc->ops = &ops;
 
     p_sys->i_nb_samples = 0;
 
@@ -349,9 +354,8 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
 /*****************************************************************************
  * CloseEncoder: twolame encoder destruction
  *****************************************************************************/
-static void CloseEncoder( vlc_object_t *p_this )
+static void CloseEncoder( encoder_t *p_enc )
 {
-    encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     twolame_close( &p_sys->p_twolame );
