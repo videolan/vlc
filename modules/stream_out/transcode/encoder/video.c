@@ -447,9 +447,6 @@ void transcode_encoder_video_close( transcode_encoder_t *p_enc )
     p_enc->p_encoder->p_module = NULL;
 }
 
-static block_t *WrappedEncodeVideo(encoder_t *encoder, picture_t *pic)
-    { return encoder->pf_encode_video(encoder, pic); }
-
 int transcode_encoder_video_open( transcode_encoder_t *p_enc,
                                    const transcode_encoder_config_t *p_cfg )
 {
@@ -462,13 +459,7 @@ int transcode_encoder_video_open( transcode_encoder_t *p_enc,
     if( !p_enc->p_encoder->p_module )
         return VLC_EGENERIC;
 
-    static const struct vlc_encoder_operations wrapped_ops =
-    {
-        .encode_video = WrappedEncodeVideo,
-    };
-
-    if (p_enc->p_encoder->ops == NULL)
-        p_enc->p_encoder->ops = &wrapped_ops;
+    assert( p_enc->p_encoder->ops != NULL );
 
     p_enc->p_encoder->fmt_in.video.i_chroma = p_enc->p_encoder->fmt_in.i_codec;
 

@@ -704,9 +704,6 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fm
     return p_dec;
 }
 
-static block_t *WrapperEncodeVideo( encoder_t *enc, picture_t *pic )
-    { return enc->pf_encode_video(enc, pic); }
-
 
 static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt_in,
                                  const video_format_t *fmt_out )
@@ -756,15 +753,8 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt
         vlc_encoder_Destroy( p_enc );
         return NULL;
     }
+    assert( p_enc->ops != NULL );
     p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
-
-    static const struct vlc_encoder_operations wrapper_ops =
-    {
-        .encode_video = WrapperEncodeVideo,
-    };
-
-    if (p_enc->ops == NULL)
-        p_enc->ops = &wrapper_ops;
 
     return p_enc;
 }

@@ -264,10 +264,6 @@ struct encoder_t
     /* Properties of the output of the encoder */
     es_format_t         fmt_out;
 
-    block_t *           ( * pf_encode_video )( encoder_t *, picture_t * );
-    block_t *           ( * pf_encode_audio )( encoder_t *, block_t * );
-    block_t *           ( * pf_encode_sub )( encoder_t *, subpicture_t * );
-
     /* Common encoder options */
     int i_threads;               /* Number of threads to use during encoding */
     int i_iframes;               /* One I frame per i_iframes */

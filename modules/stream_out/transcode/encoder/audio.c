@@ -56,9 +56,6 @@ static const int pi_channels_maps[9] =
      | AOUT_CHAN_LFE,
 };
 
-static block_t *WrappedEncodeAudio( encoder_t *encoder, block_t *audio )
-    { return encoder->pf_encode_audio(encoder, audio); }
-
 int transcode_encoder_audio_open( transcode_encoder_t *p_enc,
                                   const transcode_encoder_config_t *p_cfg )
 {
@@ -66,20 +63,14 @@ int transcode_encoder_audio_open( transcode_encoder_t *p_enc,
     p_enc->p_encoder->fmt_out.i_codec = p_cfg->i_codec;
     p_enc->p_encoder->ops = NULL;
 
-    static const struct vlc_encoder_operations wrapped_ops =
-    {
-        .encode_audio = WrappedEncodeAudio,
-    };
-
     p_enc->p_encoder->p_module = module_need( p_enc->p_encoder, "audio encoder",
                                               p_cfg->psz_name, true );
 
     if( p_enc->p_encoder->p_module )
     {
+        assert( p_enc->p_encoder->ops != NULL );
         p_enc->p_encoder->fmt_out.i_codec =
                 vlc_fourcc_GetCodec( AUDIO_ES, p_enc->p_encoder->fmt_out.i_codec );
-        if (p_enc->p_encoder->ops == NULL)
-            p_enc->p_encoder->ops = &wrapped_ops;
     }
 
     return ( p_enc->p_encoder->p_module ) ? VLC_SUCCESS: VLC_EGENERIC;

@@ -35,9 +35,6 @@
 #include "encoder.h"
 #include "encoder_priv.h"
 
-static block_t *WrappedEncodeSub( encoder_t *encoder, subpicture_t *spu )
-    { return encoder->pf_encode_sub(encoder, spu); }
-
 int transcode_encoder_spu_open( transcode_encoder_t *p_enc,
                                 const transcode_encoder_config_t *p_cfg )
 {
@@ -45,19 +42,11 @@ int transcode_encoder_spu_open( transcode_encoder_t *p_enc,
     p_enc->p_encoder->ops = NULL;
     p_enc->p_encoder->fmt_out.i_codec = p_cfg->i_codec;
 
-    static const struct vlc_encoder_operations wrapped_ops =
-    {
-        .encode_sub = WrappedEncodeSub,
-    };
-
     p_enc->p_encoder->p_module = module_need( p_enc->p_encoder, "spu encoder",
                                               p_cfg->psz_name, true );
 
-    if (p_enc->p_encoder->p_module != NULL &&
-        p_enc->p_encoder->ops == NULL)
-    {
-        p_enc->p_encoder->ops = &wrapped_ops;
-    }
+    assert( p_enc->p_encoder->p_module == NULL ||
+            p_enc->p_encoder->ops != NULL);
 
     return ( p_enc->p_encoder->p_module ) ? VLC_SUCCESS: VLC_EGENERIC;
 }
