@@ -1431,10 +1431,8 @@ static int DisplayNextFrame(vout_thread_sys_t *sys)
     return RenderPicture(sys, true);
 }
 
-static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
+static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
 {
-    assert(deadline);
-
     vout_thread_sys_t *sys = vout;
     bool paused = sys->pause.is_on;
 
@@ -1460,17 +1458,12 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     */
     bool refresh = false;
 
-    vlc_tick_t date_refresh = VLC_TICK_INVALID;
-
     picture_t *next = NULL;
     if (first)
     {
         next = PreparePicture(vout, true, false);
         if (!next)
-        {
-            *deadline = VLC_TICK_INVALID;
-            return VLC_EGENERIC; // wait with no known deadline
-        }
+            return vlc_tick_now() + VOUT_REDISPLAY_DELAY; /* Unknown deadline */
     }
     else if (!paused)
     {
@@ -1487,6 +1480,8 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
             }
         }
     }
+
+    vlc_tick_t date_refresh = VLC_TICK_MAX;
 
     if (next != NULL)
     {
@@ -1512,19 +1507,21 @@ static int DisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         render_now = refresh;
     }
 
-    if (date_refresh != VLC_TICK_INVALID)
-        *deadline = date_refresh;
-
     if (!first && !refresh && !dropped_current_frame) {
         // nothing changed, wait until the next deadline or a control
-        return VLC_EGENERIC;
+        vlc_tick_t max_deadline = vlc_tick_now() + VOUT_REDISPLAY_DELAY;
+        return __MIN(date_refresh, max_deadline);
     }
 
     /* display the picture immediately */
     render_now |= sys->displayed.current->b_force;
 
     int ret = RenderPicture(vout, render_now);
-    return render_now ? VLC_EGENERIC : ret;
+    if (render_now || ret != VLC_SUCCESS)
+        return vlc_tick_now() + VOUT_REDISPLAY_DELAY;
+
+    /* Prepare the next picture immediately without waiting */
+    return VLC_TICK_INVALID;
 }
 
 void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
@@ -1819,17 +1816,8 @@ static void *Thread(void *object)
     vout_thread_sys_t *sys = vout;
 
     vlc_tick_t deadline = VLC_TICK_INVALID;
-    bool wait = false;
 
     for (;;) {
-        if (wait)
-        {
-            const vlc_tick_t max_deadline = vlc_tick_now() + VLC_TICK_FROM_MS(100);
-            deadline = deadline == VLC_TICK_INVALID ? max_deadline : __MIN(deadline, max_deadline);
-        } else {
-            deadline = VLC_TICK_INVALID;
-        }
-
         vlc_mouse_t video_mouse;
         while (vout_control_Pop(&sys->control, &video_mouse, deadline) == VLC_SUCCESS) {
             if (atomic_load(&sys->control_is_terminated))
@@ -1840,7 +1828,11 @@ static void *Thread(void *object)
         if (atomic_load(&sys->control_is_terminated))
             break;
 
-        wait = DisplayPicture(vout, &deadline) != VLC_SUCCESS;
+        /* A deadline of VLC_TICK_INVALID means "immediately" */
+        deadline = DisplayPicture(vout);
+
+        assert(deadline == VLC_TICK_INVALID ||
+               deadline <= vlc_tick_now() + VOUT_REDISPLAY_DELAY);
 
         if (atomic_load(&sys->control_is_terminated))
             break;
