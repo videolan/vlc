@@ -51,7 +51,7 @@ static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 #ifdef ENABLE_SOUT
 static int OpenEncoder(vlc_object_t *);
-static void CloseEncoder(vlc_object_t *);
+static void CloseEncoder(encoder_t *);
 static block_t *Encode(encoder_t *p_enc, picture_t *p_pict);
 
 static const int pi_enc_bitdepth_values_list[] =
@@ -81,7 +81,7 @@ vlc_module_begin ()
         set_shortname("aom")
         set_capability("video encoder", 101)
         set_description(N_("AOM video encoder"))
-        set_callbacks(OpenEncoder, CloseEncoder)
+        set_callback(OpenEncoder)
         add_integer( SOUT_CFG_PREFIX "profile", 0, "Profile", NULL )
             change_integer_range( 0, 3 )
         add_integer( SOUT_CFG_PREFIX "bitdepth", 8, "Bit Depth", NULL )
@@ -559,7 +559,12 @@ static int OpenEncoder(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    p_enc->pf_encode_video = Encode;
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = CloseEncoder,
+        .encode_video = Encode,
+    };
+    p_enc->ops = &ops;
 
     return VLC_SUCCESS;
 }
@@ -630,11 +635,10 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
 /*****************************************************************************
  * CloseEncoder: encoder destruction
  *****************************************************************************/
-static void CloseEncoder(vlc_object_t *p_this)
+static void CloseEncoder(encoder_t *p_enc)
 {
-    encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
-    destroy_context(p_this, &p_sys->ctx);
+    destroy_context(&p_enc->obj, &p_sys->ctx);
     free(p_sys);
 }
 
