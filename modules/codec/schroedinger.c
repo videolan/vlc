@@ -47,7 +47,7 @@
 static int        OpenDecoder  ( vlc_object_t * );
 static void       CloseDecoder ( vlc_object_t * );
 static int        OpenEncoder  ( vlc_object_t * );
-static void       CloseEncoder ( vlc_object_t * );
+static void       CloseEncoder ( encoder_t * );
 
 #define ENC_CFG_PREFIX "sout-schro-"
 
@@ -370,7 +370,7 @@ vlc_module_begin ()
     set_section( N_("Encoding") , NULL )
     set_description( N_("Dirac video encoder using libschroedinger") )
     set_capability( "video encoder", 110 )
-    set_callbacks( OpenEncoder, CloseEncoder )
+    set_callback( OpenEncoder )
     add_shortcut( "schroedinger", "schro" )
 
     add_string( ENC_CFG_PREFIX ENC_RATE_CONTROL, NULL,
@@ -1092,13 +1092,12 @@ static int OpenEncoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_enc->p_sys = p_sys;
-    p_enc->pf_encode_video = Encode;
     p_enc->fmt_out.i_codec = VLC_CODEC_DIRAC;
     p_enc->fmt_out.i_cat = VIDEO_ES;
 
     if( ( p_sys->p_dts_fifo = timestamp_FifoNew(32) ) == NULL )
     {
-        CloseEncoder( p_this );
+        CloseEncoder( p_enc );
         return VLC_ENOMEM;
     }
 
@@ -1300,9 +1299,16 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     p_sys->started = 0;
 
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = CloseEncoder,
+        .encode_video = Encode,
+    };
+    p_enc->ops = &ops;
+
     return VLC_SUCCESS;
 error:
-    CloseEncoder( p_this );
+    CloseEncoder( p_enc );
     return VLC_EGENERIC;
 }
 
@@ -1583,9 +1589,8 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
 /*****************************************************************************
  * CloseEncoder: Schro encoder destruction
  *****************************************************************************/
-static void CloseEncoder( vlc_object_t *p_this )
+static void CloseEncoder( encoder_t *p_enc )
 {
-    encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     /* Free the encoder resources */
