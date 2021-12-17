@@ -238,6 +238,17 @@ VLC_API vlc_decoder_device *vlc_encoder_GetDecoderDevice( encoder_t * );
  * @{
  */
 
+struct vlc_encoder_operations
+{
+    void (*close)(encoder_t *);
+
+    union {
+        block_t * (*encode_video)(encoder_t *, picture_t *);
+        block_t * (*encode_audio)(encoder_t *, block_t *);
+        block_t * (*encode_sub)(encoder_t *, subpicture_t *);
+    };
+};
+
 struct encoder_t
 {
     struct vlc_object_t obj;
@@ -267,8 +278,32 @@ struct encoder_t
     config_chain_t *p_cfg;
 
     /* Private structure for the owner of the encoder */
+    const struct vlc_encoder_operations *ops;
     const struct encoder_owner_callbacks *cbs;
 };
+
+VLC_API void vlc_encoder_Destroy(encoder_t *encoder);
+
+static inline block_t *
+vlc_encoder_EncodeVideo(encoder_t *encoder, picture_t *pic)
+{
+    assert(encoder->fmt_in.i_cat == VIDEO_ES);
+    return encoder->ops->encode_video(encoder, pic);
+}
+
+static inline block_t *
+vlc_encoder_EncodeAudio(encoder_t *encoder, block_t *audio)
+{
+    assert(encoder->fmt_in.i_cat == AUDIO_ES);
+    return encoder->ops->encode_audio(encoder, audio);
+}
+
+static inline block_t *
+vlc_encoder_EncodeSub(encoder_t *encoder, subpicture_t *sub)
+{
+    assert(encoder->fmt_in.i_cat == SPU_ES);
+    return encoder->ops->encode_sub(encoder, sub);
+}
 
 /**
  * @}
