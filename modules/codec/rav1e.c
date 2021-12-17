@@ -127,6 +127,13 @@ error:
     return NULL;
 }
 
+static void CloseEncoder(encoder_t* enc)
+{
+    encoder_sys_t *sys = enc->p_sys;
+    rav1e_context_unref(sys->ra_context);
+    free(sys);
+}
+
 static int OpenEncoder(vlc_object_t *this)
 {
     encoder_t *enc = (encoder_t *) this;
@@ -270,21 +277,19 @@ static int OpenEncoder(vlc_object_t *this)
               enc->fmt_out.video.i_frame_rate_base);
     sys->date_set = false;
 
-    enc->pf_encode_video = Encode;
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = CloseEncoder,
+        .encode_video = Encode,
+    };
+    enc->ops = &ops;
+
     return VLC_SUCCESS;
 
 error:
     rav1e_config_unref(ra_config);
     free(sys);
     return err;
-}
-
-static void CloseEncoder(vlc_object_t* this)
-{
-    encoder_t *enc = (encoder_t *) this;
-    encoder_sys_t *sys = enc->p_sys;
-    rav1e_context_unref(sys->ra_context);
-    free(sys);
 }
 
 static const int bitdepth_values_list[] = {8, 10};
@@ -294,7 +299,7 @@ vlc_module_begin()
     set_shortname("rav1e")
     set_description(N_("rav1e video encoder"))
     set_capability("video encoder", 105)
-    set_callbacks(OpenEncoder, CloseEncoder)
+    set_callback(OpenEncoder)
     set_subcategory(SUBCAT_INPUT_VCODEC)
     add_integer(SOUT_CFG_PREFIX "profile", 0, "Profile", NULL)
         change_integer_range(0, 3)
