@@ -40,12 +40,12 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static void Close(encoder_t *);
 
 vlc_module_begin ()
     set_description(N_("H.265/HEVC encoder (x265)"))
     set_capability("video encoder", 200)
-    set_callbacks(Open, Close)
+    set_callback(Open)
     set_subcategory(SUBCAT_INPUT_VCODEC)
 vlc_module_end ()
 
@@ -202,7 +202,7 @@ static int  Open (vlc_object_t *p_this)
     uint32_t i_nal;
     if (x265_encoder_headers(p_sys->h, &nal, &i_nal) < 0) {
         msg_Err(p_enc, "cannot get x265 headers");
-        Close(VLC_OBJECT(p_enc));
+        Close(p_enc);
         return VLC_EGENERIC;
     }
 
@@ -214,7 +214,7 @@ static int  Open (vlc_object_t *p_this)
 
     uint8_t *p_extra = p_enc->fmt_out.p_extra = malloc(i_extra);
     if (!p_extra) {
-        Close(VLC_OBJECT(p_enc));
+        Close(p_enc);
         return VLC_ENOMEM;
     }
 
@@ -226,15 +226,18 @@ static int  Open (vlc_object_t *p_this)
     p_sys->frame_count = 0;
     p_sys->initial_date = VLC_TICK_INVALID;
 
-    p_enc->pf_encode_video = Encode;
-    p_enc->pf_encode_audio = NULL;
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = Close,
+        .encode_video = Encode,
+    };
+    p_enc->ops = &ops;
 
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_object_t *p_this)
+static void Close(encoder_t *p_enc)
 {
-    encoder_t     *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     x265_encoder_close(p_sys->h);
