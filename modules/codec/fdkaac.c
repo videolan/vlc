@@ -60,7 +60,7 @@
 #include <vlc_codec.h>
 
 static int OpenEncoder(vlc_object_t *);
-static void CloseEncoder(vlc_object_t *);
+static void CloseEncoder(encoder_t *);
 
 #define ENC_CFG_PREFIX "sout-fdkaac-"
 
@@ -105,7 +105,7 @@ vlc_module_begin ()
     set_shortname(N_("FDKAAC"))
     set_description(N_("FDK-AAC Audio encoder"))
     set_capability("audio encoder", 150)
-    set_callbacks(OpenEncoder, CloseEncoder)
+    set_callback(OpenEncoder)
     add_shortcut("fdkaac")
     set_subcategory(SUBCAT_INPUT_ACODEC)
     add_integer(ENC_CFG_PREFIX "profile", PROFILE_AAC_LC, AOT_TEXT,
@@ -308,7 +308,12 @@ static int OpenEncoder(vlc_object_t *p_this)
         memcpy(p_enc->fmt_out.p_extra, info.confBuf, p_enc->fmt_out.i_extra);
     }
 
-    p_enc->pf_encode_audio = EncodeAudio;
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = CloseEncoder,
+        .encode_audio = EncodeAudio,
+    };
+    p_enc->ops = &ops;
 
 #ifndef NDEBUG
     // TODO: Add more debug info to this config printout
@@ -318,7 +323,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     return VLC_SUCCESS;
 
 error:
-    CloseEncoder(p_this);
+    CloseEncoder(p_enc);
     return VLC_EGENERIC;
 }
 
@@ -465,9 +470,8 @@ static block_t *EncodeAudio(encoder_t *p_enc, block_t *p_aout_buf)
 /*****************************************************************************
  * CloseDecoder: decoder destruction
  *****************************************************************************/
-static void CloseEncoder(vlc_object_t *p_this)
+static void CloseEncoder(encoder_t *p_enc)
 {
-    encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     aacEncClose(&p_sys->handle);
