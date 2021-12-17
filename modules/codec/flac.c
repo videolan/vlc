@@ -168,7 +168,7 @@ vlc_module_begin ()
     add_submodule ()
     add_shortcut( "flac" )
     set_description( N_("Flac audio encoder") )
-    set_capability( "encoder", 100 )
+    set_capability( "audio encoder", 100 )
     set_callbacks( OpenEncoder, CloseEncoder )
 #endif
 

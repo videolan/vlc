@@ -72,7 +72,7 @@ static const char *const ppsz_stereo_descriptions[] =
 vlc_module_begin ()
     set_shortname( "Twolame")
     set_description( N_("Libtwolame audio encoder") )
-    set_capability( "encoder", 120 )
+    set_capability( "audio encoder", 120 )
     set_callbacks( OpenEncoder, CloseEncoder )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACODEC )

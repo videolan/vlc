@@ -370,7 +370,7 @@ vlc_module_begin ()
     add_submodule()
     set_section( N_("Encoding") , NULL )
     set_description( N_("Dirac video encoder using libschroedinger") )
-    set_capability( "encoder", 110 )
+    set_capability( "video encoder", 110 )
     set_callbacks( OpenEncoder, CloseEncoder )
     add_shortcut( "schroedinger", "schro" )
 

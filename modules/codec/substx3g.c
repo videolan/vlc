@@ -53,7 +53,7 @@ vlc_module_begin ()
     add_submodule ()
         set_description( N_("tx3g subtitles encoder") )
         set_shortname( N_("tx3g subtitles encoder") )
-        set_capability( "encoder", 101 )
+        set_capability( "spu encoder", 101 )
         set_callback( OpenEncoder )
 #endif
 vlc_module_end ()

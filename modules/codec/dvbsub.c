@@ -133,7 +133,7 @@ vlc_module_begin ()
 #   define ENC_CFG_PREFIX "sout-dvbsub-"
     add_submodule ()
     set_description( N_("DVB subtitles encoder") )
-    set_capability( "encoder", 100 )
+    set_capability( "spu encoder", 100 )
     set_callbacks( OpenEncoder, CloseEncoder )
 
     add_integer( ENC_CFG_PREFIX "x", -1, ENC_POSX_TEXT, ENC_POSX_LONGTEXT )

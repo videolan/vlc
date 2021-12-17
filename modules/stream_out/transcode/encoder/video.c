@@ -325,7 +325,7 @@ int transcode_encoder_video_test( encoder_t *p_encoder,
     p_vfmt_out->i_width  = p_vfmt_in->i_width & ~1;
     p_vfmt_out->i_height = p_vfmt_in->i_height & ~1;
 
-    module_t *p_module = module_need( p_encoder, "encoder", p_cfg->psz_name, true );
+    module_t *p_module = module_need( p_encoder, "video encoder", p_cfg->psz_name, true );
     if( !p_module )
     {
         msg_Err( p_encoder, "cannot find video encoder (module:%s fourcc:%4.4s). "
@@ -456,7 +456,7 @@ int transcode_encoder_video_open( transcode_encoder_t *p_enc,
     p_enc->p_encoder->p_cfg = p_cfg->p_config_chain;
 
     p_enc->p_encoder->p_module =
-        module_need( p_enc->p_encoder, "encoder", p_cfg->psz_name, true );
+        module_need( p_enc->p_encoder, "video encoder", p_cfg->psz_name, true );
     if( !p_enc->p_encoder->p_module )
         return VLC_EGENERIC;
 

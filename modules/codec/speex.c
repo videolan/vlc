@@ -107,7 +107,7 @@ vlc_module_begin ()
 #ifdef ENABLE_SOUT
     add_submodule ()
     set_description( N_("Speex audio encoder") )
-    set_capability( "encoder", 100 )
+    set_capability( "audio encoder", 100 )
     set_callbacks( OpenEncoder, CloseEncoder )
 
     add_integer( ENC_CFG_PREFIX "mode", 0, ENC_MODE_TEXT,

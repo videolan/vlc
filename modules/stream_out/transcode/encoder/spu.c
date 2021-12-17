@@ -41,7 +41,7 @@ int transcode_encoder_spu_open( transcode_encoder_t *p_enc,
     p_enc->p_encoder->p_cfg = p_cfg->p_config_chain;
     p_enc->p_encoder->fmt_out.i_codec = p_cfg->i_codec;
 
-    p_enc->p_encoder->p_module = module_need( p_enc->p_encoder, "encoder",
+    p_enc->p_encoder->p_module = module_need( p_enc->p_encoder, "spu encoder",
                                               p_cfg->psz_name, true );
 
     return ( p_enc->p_encoder->p_module ) ? VLC_SUCCESS: VLC_EGENERIC;

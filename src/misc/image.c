@@ -743,7 +743,7 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt
     p_enc->fmt_out.video.i_height = p_enc->fmt_in.video.i_height;
 
     /* Find a suitable decoder module */
-    p_enc->p_module = module_need( p_enc, "encoder", NULL, false );
+    p_enc->p_module = module_need( p_enc, "video encoder", NULL, false );
     if( !p_enc->p_module )
     {
         msg_Err( p_enc, "no suitable encoder module for fourcc `%4.4s'.\n"

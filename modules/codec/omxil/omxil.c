@@ -98,7 +98,7 @@ vlc_module_begin ()
     add_submodule ()
     set_section( N_("Encoding") , NULL )
     set_description( N_("Video encoder (using OpenMAX IL)") )
-    set_capability( "encoder", 0 )
+    set_capability( "video encoder", 0 )
     set_callbacks( OpenEncoder, CloseGeneric )
 vlc_module_end ()
 

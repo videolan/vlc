@@ -95,7 +95,7 @@ vlc_module_begin ()
     add_shortcut("png")
     set_section(N_("Encoding"), NULL)
     set_description(N_("PNG video encoder"))
-    set_capability("encoder", 1000)
+    set_capability("video encoder", 1000)
     set_callback(OpenEncoder)
 vlc_module_end ()
 

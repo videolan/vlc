@@ -212,9 +212,16 @@ vlc_module_begin ()
     set_shortname( N_("Stats"))
 #ifdef ENABLE_SOUT
     set_description( N_("Stats encoder function") )
-    set_capability( "encoder", 0 )
+    set_capability( "video encoder", 0 )
     add_shortcut( "stats" )
     set_callback( OpenEncoder )
+
+    add_submodule ()
+    set_description( N_("Stats encoder function") )
+    set_capability( "audio encoder", 0 )
+    add_shortcut( "stats" )
+    set_callback( OpenEncoder )
+
     add_submodule ()
 #endif
         set_section( N_( "Stats decoder" ), NULL )

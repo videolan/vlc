@@ -67,7 +67,7 @@ vlc_module_begin ()
 #ifdef ENABLE_SOUT
     add_submodule ()
     set_description( N_("Linear PCM audio encoder") )
-    set_capability( "encoder", 100 )
+    set_capability( "audio encoder", 100 )
     set_callbacks( OpenEncoder, CloseEncoder )
     add_shortcut( "lpcm" )
 #endif

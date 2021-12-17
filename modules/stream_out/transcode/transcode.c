@@ -150,7 +150,7 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
     set_section( N_("Video"), NULL )
-    add_module(SOUT_CFG_PREFIX "venc", "encoder", NULL,
+    add_module(SOUT_CFG_PREFIX "venc", "video encoder", NULL,
                VENC_TEXT, VENC_LONGTEXT)
     add_string( SOUT_CFG_PREFIX "vcodec", NULL, VCODEC_TEXT,
                 VCODEC_LONGTEXT )
@@ -177,7 +177,7 @@ vlc_module_begin ()
                     VFILTER_TEXT, VFILTER_LONGTEXT)
 
     set_section( N_("Audio"), NULL )
-    add_module(SOUT_CFG_PREFIX "aenc", "encoder", NULL,
+    add_module(SOUT_CFG_PREFIX "aenc", "audio encoder", NULL,
                AENC_TEXT, AENC_LONGTEXT)
     add_string( SOUT_CFG_PREFIX "acodec", NULL, ACODEC_TEXT,
                 ACODEC_LONGTEXT )
@@ -195,7 +195,7 @@ vlc_module_begin ()
                     AFILTER_TEXT, AFILTER_LONGTEXT)
 
     set_section( N_("Overlays/Subtitles"), NULL )
-    add_module(SOUT_CFG_PREFIX "senc", "encoder", NULL,
+    add_module(SOUT_CFG_PREFIX "senc", "spu encoder", NULL,
                SENC_TEXT, SENC_LONGTEXT)
     add_string( SOUT_CFG_PREFIX "scodec", NULL, SCODEC_TEXT,
                 SCODEC_LONGTEXT )

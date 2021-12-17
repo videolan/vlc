@@ -119,7 +119,7 @@ vlc_module_begin()
     add_shortcut("jpeg")
     set_section(N_("Encoding"), NULL)
     set_description(N_("JPEG image encoder"))
-    set_capability("encoder", 1000)
+    set_capability("video encoder", 1000)
     set_callbacks(OpenEncoder, CloseEncoder)
     add_integer_with_range(ENC_CFG_PREFIX "quality", 95, 0, 100,
                            ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT)

@@ -62,7 +62,7 @@ int transcode_encoder_audio_open( transcode_encoder_t *p_enc,
     p_enc->p_encoder->p_cfg = p_cfg->p_config_chain;
     p_enc->p_encoder->fmt_out.i_codec = p_cfg->i_codec;
 
-    p_enc->p_encoder->p_module = module_need( p_enc->p_encoder, "encoder",
+    p_enc->p_encoder->p_module = module_need( p_enc->p_encoder, "audio encoder",
                                               p_cfg->psz_name, true );
 
     if( p_enc->p_encoder->p_module )
@@ -169,7 +169,7 @@ int transcode_encoder_audio_test( encoder_t *p_encoder,
         p_afmt_out->i_physical_channels = AOUT_CHANS_STEREO;
     }
 
-    module_t *p_module = module_need( p_encoder, "encoder", p_cfg->psz_name, true );
+    module_t *p_module = module_need( p_encoder, "audio encoder", p_cfg->psz_name, true );
     if( !p_module )
     {
         msg_Err( p_encoder, "cannot find audio encoder (module:%s fourcc:%4.4s). "

@@ -50,7 +50,7 @@ vlc_module_begin ()
 #ifdef ENABLE_SOUT
     add_submodule ()
     set_description( N_("G.711 encoder") )
-    set_capability( "encoder", 150 )
+    set_capability( "audio encoder", 150 )
     set_callback( EncoderOpen )
 #endif
 vlc_module_end ()

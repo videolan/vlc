@@ -61,7 +61,7 @@ vlc_module_begin ()
 #ifdef ENABLE_SOUT
     add_submodule()
         set_description( "WEBVTT text encoder" )
-        set_capability( "encoder", 101 )
+        set_capability( "spu encoder", 101 )
         set_subcategory( SUBCAT_INPUT_SCODEC )
         set_callback( webvtt_OpenEncoder )
 #endif

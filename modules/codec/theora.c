@@ -128,7 +128,7 @@ vlc_module_begin ()
 #ifdef ENABLE_SOUT
     add_submodule ()
     set_description( N_("Theora video encoder") )
-    set_capability( "encoder", 150 )
+    set_capability( "video encoder", 150 )
     set_callbacks( OpenEncoder, CloseEncoder )
     add_shortcut( "theora" )
 

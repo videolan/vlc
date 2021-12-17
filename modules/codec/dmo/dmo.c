@@ -83,8 +83,15 @@ vlc_module_begin ()
     add_submodule ()
     set_description( N_("DirectMedia Object encoder") )
     add_shortcut( "dmo" )
-    set_capability( "encoder", 10 )
+    set_capability( "video encoder", 10 )
     set_callbacks( EncoderOpen, EncoderClose )
+
+    add_submodule ()
+    set_description( N_("DirectMedia Object encoder") )
+    add_shortcut( "dmo" )
+    set_capability( "audio encoder", 10 )
+    set_callbacks( EncoderOpen, EncoderClose )
+
 
 vlc_module_end ()
 

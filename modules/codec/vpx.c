@@ -72,7 +72,7 @@ vlc_module_begin ()
 #ifdef ENABLE_SOUT
     add_submodule()
     set_shortname("vpx")
-    set_capability("encoder", 60)
+    set_capability("video encoder", 60)
     set_description(N_("WebM video encoder"))
     set_callbacks(OpenEncoder, CloseEncoder)
 #   define ENC_CFG_PREFIX "sout-vpx-"

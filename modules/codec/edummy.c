@@ -36,7 +36,12 @@ static int OpenEncoder( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( N_("Dummy") )
     set_description( N_("Dummy encoder") )
-    set_capability( "encoder", 0 )
+    set_capability( "video encoder", 0 )
+    set_callback( OpenEncoder )
+    add_shortcut( "dummy" )
+
+    add_submodule()
+    set_capability( "audio encoder", 0 )
     set_callback( OpenEncoder )
     add_shortcut( "dummy" )
 vlc_module_end ()

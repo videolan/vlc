@@ -80,7 +80,7 @@ vlc_module_begin ()
 #ifdef ENABLE_SOUT
     add_submodule()
         set_shortname("aom")
-        set_capability("encoder", 101)
+        set_capability("video encoder", 101)
         set_description(N_("AOM video encoder"))
         set_callbacks(OpenEncoder, CloseEncoder)
         add_integer( SOUT_CFG_PREFIX "profile", 0, "Profile", NULL )

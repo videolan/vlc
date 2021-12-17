@@ -66,7 +66,7 @@ vlc_module_begin ()
 #ifdef ENABLE_SOUT
     add_submodule ()
     set_description( N_("Opus audio encoder") )
-    set_capability( "encoder", 150 )
+    set_capability( "audio encoder", 150 )
     set_shortname( N_("Opus") )
     set_callbacks( OpenEncoder, CloseEncoder )
 #endif

@@ -204,7 +204,7 @@ vlc_module_begin ()
 #   define ENC_CFG_PREFIX "sout-vorbis-"
     add_submodule ()
     set_description( N_("Vorbis audio encoder") )
-    set_capability( "encoder", 130 )
+    set_capability( "audio encoder", 130 )
     set_callbacks( OpenEncoder, CloseEncoder )
 
     add_integer( ENC_CFG_PREFIX "quality", 0, ENC_QUALITY_TEXT,
