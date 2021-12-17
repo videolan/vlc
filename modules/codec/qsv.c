@@ -53,7 +53,7 @@
  * Modules descriptor
  *****************************************************************************/
 static int      Open(vlc_object_t *);
-static void     Close(vlc_object_t *);
+static void     Close(encoder_t *);
 
 #define SW_IMPL_TEXT N_("Enable software mode")
 #define SW_IMPL_LONGTEXT N_("Allow the use of the Intel Media SDK software " \
@@ -197,7 +197,7 @@ vlc_module_begin ()
     set_description(N_("Intel QuickSync Video encoder for MPEG4-Part10/MPEG2 (aka H.264/H.262)"))
     set_shortname("qsv")
     set_capability("video encoder", 0)
-    set_callbacks(Open, Close)
+    set_callback(Open)
 
     add_bool(SOUT_CFG_PREFIX "software", false, SW_IMPL_TEXT, SW_IMPL_LONGTEXT)
 
@@ -619,23 +619,27 @@ static int Open(vlc_object_t *this)
         goto nomem;
     }
 
-    enc->pf_encode_video = Encode;
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = Close,
+        .encode_video = Encode,
+    };
+    enc->ops = &ops;
 
     return VLC_SUCCESS;
 
  error:
-    Close(this);
+    Close(enc);
     enc->p_sys = NULL;
     return VLC_EGENERIC;
  nomem:
-    Close(this);
+    Close(enc);
     enc->p_sys = NULL;
     return VLC_ENOMEM;
 }
 
-static void Close(vlc_object_t *this)
+static void Close(encoder_t *enc)
 {
-    encoder_t *enc = (encoder_t *)this;
     encoder_sys_t *sys = enc->p_sys;
 
     MFXVideoENCODE_Close(sys->session);
