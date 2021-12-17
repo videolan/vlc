@@ -54,10 +54,13 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( p_enc->fmt_out.i_codec != VLC_CODEC_R420 && !p_enc->obj.force )
         return VLC_EGENERIC;
 
-    p_enc->pf_encode_video = Encode;
     p_enc->fmt_in.i_codec = VLC_CODEC_I420;
     p_enc->fmt_out.i_codec = VLC_CODEC_R420;
 
+    static const struct vlc_encoder_operations ops =
+        { .encode_video = Encode };
+
+    p_enc->ops = &ops;
     return VLC_SUCCESS;
 }
 
