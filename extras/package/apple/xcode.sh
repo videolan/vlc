@@ -17,7 +17,7 @@ BUILD_SUFFIX=""
 BITCODE_FLAG=""
 if [ "$(echo "${ENABLE_BITCODE}" | tr '[:upper:]' '[:lower:]')" = "yes" ]; then
     if [ -z "${BITCODE_GENERATION_MODE}" ]; then
-        BITCODE_GENERATION_MODE=full
+        BITCODE_GENERATION_MODE=bitcode
     fi
     BITCODE_FLAG="--enable-bitcode=${BITCODE_GENERATION_MODE}"
     BUILD_SUFFIX="-bitcode-${BITCODE_GENERATION_MODE}" #TODO forward

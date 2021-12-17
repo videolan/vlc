@@ -126,7 +126,7 @@ usage()
     echo " --arch=ARCH      Architecture to build for"
     echo "                   (i386|x86_64|armv7|arm64)"
     echo " --sdk=SDK        Name of the SDK to build with (see 'xcodebuild -showsdks')"
-    echo " --enable-bitcode        Enable bitcode for compilation, same as with =full"
+    echo " --enable-bitcode        Enable bitcode for compilation, same as with =bitcode/full"
     echo " --enable-bitcode=marker Enable bitcode marker for compilation"
     echo " --enable-merge-plugins Enable the merging of plugins into a single archive"
     echo " --disable-debug  Disable libvlc debug mode (for release)"
