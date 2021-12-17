@@ -327,7 +327,7 @@ set_host_envvars()
     local bitcode_flag=""
     if [ "$VLC_USE_BITCODE" -gt "0" ]; then
         clike_flags+=" $VLC_BITCODE_FLAG"
-        bitcode_flag=" $VLC_BTICODE_FLAG"
+        bitcode_flag=" $VLC_BITCODE_FLAG"
     fi
 
     export CPPFLAGS="-arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH"
