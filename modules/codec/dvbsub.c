@@ -111,7 +111,7 @@ static void Flush( decoder_t * );
 
 #ifdef ENABLE_SOUT
 static int OpenEncoder  ( vlc_object_t * );
-static void CloseEncoder( vlc_object_t * );
+static void CloseEncoder( encoder_t * );
 static block_t *Encode  ( encoder_t *, subpicture_t * );
 #endif
 
@@ -133,7 +133,7 @@ vlc_module_begin ()
     add_submodule ()
     set_description( N_("DVB subtitles encoder") )
     set_capability( "spu encoder", 100 )
-    set_callbacks( OpenEncoder, CloseEncoder )
+    set_callback( OpenEncoder )
 
     add_integer( ENC_CFG_PREFIX "x", -1, ENC_POSX_TEXT, ENC_POSX_LONGTEXT )
     add_integer( ENC_CFG_PREFIX "y", -1, ENC_POSY_TEXT, ENC_POSY_LONGTEXT )
@@ -1708,7 +1708,6 @@ static int OpenEncoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_enc->p_sys = p_sys;
 
-    p_enc->pf_encode_sub = Encode;
     p_enc->fmt_out.i_codec = VLC_CODEC_DVBS;
     p_enc->fmt_out.subs.dvb.i_id  = 1 << 16 | 1;
 
@@ -1722,6 +1721,13 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     p_sys->i_offset_x = var_CreateGetInteger( p_this, ENC_CFG_PREFIX "x" );
     p_sys->i_offset_y = var_CreateGetInteger( p_this, ENC_CFG_PREFIX "y" );
+
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = CloseEncoder,
+        .encode_sub = Encode,
+    };
+    p_enc->ops = &ops;
 
     return VLC_SUCCESS;
 }
@@ -2042,13 +2048,12 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
 /*****************************************************************************
  * CloseEncoder: encoder destruction
  *****************************************************************************/
-static void CloseEncoder( vlc_object_t *p_this )
+static void CloseEncoder( encoder_t *p_enc )
 {
-    encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
 
-    var_Destroy( p_this , ENC_CFG_PREFIX "x" );
-    var_Destroy( p_this , ENC_CFG_PREFIX "y" );
+    var_Destroy( p_enc , ENC_CFG_PREFIX "x" );
+    var_Destroy( p_enc , ENC_CFG_PREFIX "y" );
 
     if( p_sys->i_regions ) free( p_sys->p_regions );
     free( p_sys );
