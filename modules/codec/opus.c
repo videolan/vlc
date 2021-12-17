@@ -51,7 +51,7 @@ static int  OpenDecoder   ( vlc_object_t * );
 static void CloseDecoder  ( vlc_object_t * );
 #ifdef ENABLE_SOUT
 static int  OpenEncoder   ( vlc_object_t * );
-static void CloseEncoder  ( vlc_object_t * );
+static void CloseEncoder  ( encoder_t * );
 #endif
 
 vlc_module_begin ()
@@ -67,7 +67,7 @@ vlc_module_begin ()
     set_description( N_("Opus audio encoder") )
     set_capability( "audio encoder", 150 )
     set_shortname( N_("Opus") )
-    set_callbacks( OpenEncoder, CloseEncoder )
+    set_callback( OpenEncoder )
 #endif
 
 vlc_module_end ()
@@ -662,7 +662,6 @@ static int OpenEncoder(vlc_object_t *p_this)
     sys->buffer = NULL;
     sys->enc = NULL;
 
-    enc->pf_encode_audio = Encode;
     enc->fmt_in.i_codec = VLC_CODEC_FL32;
     enc->fmt_in.audio.i_rate = /* Only 48kHz */
     enc->fmt_out.audio.i_rate = 48000;
@@ -743,7 +742,17 @@ static int OpenEncoder(vlc_object_t *p_this)
         sys->padding = NULL;
     }
 
-    return status;
+
+    if (status != VLC_SUCCESS)
+        return status;
+
+    static const struct vlc_encoder_operations ops =
+    {
+        .close = CloseEncoder,
+        .encode_audio = Encode,
+    };
+    enc->ops = &ops;
+    return VLC_SUCCESS;
 
 error:
     if (sys->enc)
@@ -753,9 +762,8 @@ error:
     return status;
 }
 
-static void CloseEncoder(vlc_object_t *p_this)
+static void CloseEncoder(encoder_t *enc)
 {
-    encoder_t *enc = (encoder_t *)p_this;
     encoder_sys_t *sys = enc->p_sys;
 
     opus_multistream_encoder_destroy(sys->enc);
