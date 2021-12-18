@@ -598,13 +598,15 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
     int i_line = 0, i_boxline = 0;
     bool has_hotkey = false;
 
-    if( p_item ) do
+    if( p_item ) for ( ; p_item < p_end; ++p_item)
     {
-        if( p_item->i_type == CONFIG_SUBCATEGORY &&
-            ( node->node_type == PrefsTreeItem::SUBCATEGORY_NODE ||
-              node->node_type == PrefsTreeItem::CATEGORY_NODE ) &&
-            p_item->value.i != node->subcat_id )
-            break;
+        if( p_item->i_type == CONFIG_SUBCATEGORY )
+        {
+            if( node->node_type == PrefsTreeItem::PLUGIN_NODE )
+                continue;
+            else
+                break;
+        }
 
         if( p_item->i_type == CONFIG_SECTION )
         {
@@ -620,6 +622,7 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             box->hide();
             boxlayout = new QGridLayout();
         }
+
         /* Only one hotkey control */
         if( p_item->i_type == CONFIG_ITEM_KEY )
         {
@@ -642,10 +645,6 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
         else i_line++;
         controls.append( control );
     }
-    while( !( ( node->node_type == PrefsTreeItem::SUBCATEGORY_NODE ||
-               node->node_type == PrefsTreeItem::CATEGORY_NODE ) &&
-             p_item->i_type == CONFIG_SUBCATEGORY )
-        && ( ++p_item < p_end ) );
 
     if( box && i_boxline > 0 )
     {
