@@ -383,6 +383,25 @@ static int OpenWindow(vout_window_t *wnd)
         free(psz_device);
         goto error_end;
     }
+
+    drmVersionPtr version;
+    if ((version = drmGetVersion(sys->drm_fd)) != NULL)
+    {
+        const char *date = version->date ? version->date : "unknown";
+        const char *desc = version->desc ? version->desc : "unknown";
+
+        msg_Dbg(wnd, "Using DRM driver %s version %d.%d.%d (build %s): %s",
+                version->name, version->version_major, version->version_minor,
+                version->version_patchlevel, date, desc);
+
+        drmFreeVersion(version);
+    }
+    else
+    {
+        msg_Err(wnd, "device %s doesn't support DRM", psz_device);
+        free(psz_device);
+        goto error_drm;
+    }
     free(psz_device);
 
     drmSetClientCap(sys->drm_fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1);
