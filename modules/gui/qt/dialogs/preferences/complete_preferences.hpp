@@ -110,6 +110,7 @@ private:
     bool collapseUnselectedItems( PrefsTreeItem *item );
     void updateLoadedStatus( PrefsTreeItem *item , QSet<QString> *loaded );
     qt_intf_t *p_intf;
+    module_t *main_module;
     bool b_show_only_loaded;
     QTreeWidgetItem *catMap[ARRAY_SIZE(categories_array)] = { nullptr };
     QTreeWidgetItem *subcatMap[ARRAY_SIZE(subcategories_array)] = { nullptr };

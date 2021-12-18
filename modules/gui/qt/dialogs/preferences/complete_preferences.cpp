@@ -62,6 +62,9 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
     setUniformRowHeights( true );
     CONNECT( this, itemExpanded(QTreeWidgetItem*), this, resizeColumns() );
 
+    main_module = module_get_main();
+    assert( main_module );
+
     int cat = CAT_UNKNOWN;
     int subcat = SUBCAT_UNKNOWN;
     QTreeWidgetItem *cat_item = nullptr;
@@ -170,6 +173,7 @@ QTreeWidgetItem *PrefsTree::createCatNode( int cat )
 
     item->cat_id = cat;
     item->subcat_id = general_subcat;
+    item->p_module = this->main_module;
     item->name = qfu( vlc_config_subcat_GetName( general_subcat ) );
     item->help = qfu( vlc_config_subcat_GetHelp( general_subcat ) );
 
@@ -211,6 +215,7 @@ QTreeWidgetItem *PrefsTree::createSubcatNode( QTreeWidgetItem * cat, int subcat 
 
     item->cat_id = CAT_UNKNOWN;
     item->subcat_id = subcat;
+    item->p_module = this->main_module;
     item->name = qfu( vlc_config_subcat_GetName( subcat ) );
     item->help = qfu( vlc_config_subcat_GetHelp( subcat ) );
 
@@ -534,16 +539,8 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                         PrefsTreeItem * node ) :
                         QWidget( _parent ), p_intf( _p_intf )
 {
-    /* Find our module */
-    module_t *p_module = NULL;
+    module_t *p_module = node->p_module;
     p_config = NULL;
-    if( node->node_type == PrefsTreeItem::PLUGIN_NODE )
-        p_module = node->p_module;
-    else
-    {
-        p_module = module_get_main();
-        assert( p_module );
-    }
 
     unsigned confsize;
     p_config = module_config_get( p_module, &confsize );
