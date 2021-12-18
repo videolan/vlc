@@ -540,16 +540,18 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                         QWidget( _parent ), p_intf( _p_intf )
 {
     module_t *p_module = node->p_module;
-    p_config = NULL;
 
     unsigned confsize;
     p_config = module_config_get( p_module, &confsize );
     module_config_t *p_item = p_config,
                     *p_end = p_config + confsize;
 
-    if( node->node_type == PrefsTreeItem::SUBCATEGORY_NODE ||
-        node->node_type == PrefsTreeItem::CATEGORY_NODE )
+    QString heading;
+
+    if( node->node_type != PrefsTreeItem::PLUGIN_NODE  )
     {
+        heading = QString( node->name );
+        /* Skip to the relevant part of the core config */
         while (p_item < p_end)
         {
             if(  p_item->i_type == CONFIG_SUBCATEGORY &&
@@ -557,28 +559,18 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 break;
             p_item++;
         }
+        p_item++; // Skip past the subcat entry itself
+    }
+    else
+    {
+        heading = QString( qfut( module_GetLongName( p_module ) ) );
     }
 
     /* Widgets now */
     global_layout = new QVBoxLayout();
     global_layout->setMargin( 2 );
-    QString head;
-    QString help;
 
-    help = QString( node->help );
-
-    if( node->node_type == PrefsTreeItem::SUBCATEGORY_NODE ||
-        node->node_type == PrefsTreeItem::CATEGORY_NODE )
-    {
-        head = QString( node->name );
-        p_item++; // Why that ?
-    }
-    else
-    {
-        head = QString( qfut( module_GetLongName( p_module ) ) );
-    }
-
-    QLabel *titleLabel = new QLabel( head );
+    QLabel *titleLabel = new QLabel( heading );
     QFont titleFont = QApplication::font();
     titleFont.setPointSize( titleFont.pointSize() + 6 );
     titleLabel->setFont( titleFont );
@@ -588,7 +580,7 @@ AdvPrefsPanel::AdvPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
     title_line->setFrameShape(QFrame::HLine);
     title_line->setFrameShadow(QFrame::Sunken);
 
-    QLabel *helpLabel = new QLabel( help, this );
+    QLabel *helpLabel = new QLabel( node->help, this );
     helpLabel->setWordWrap( true );
 
     global_layout->addWidget( titleLabel );
