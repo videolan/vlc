@@ -381,7 +381,8 @@ void PrefsTree::updateLoadedStatus( PrefsTreeItem *item = NULL,
     }
     else
     {
-        item->module_is_loaded = loaded->contains( QString( item->module_name ) );
+        if( item->node_type == PrefsTreeItem::PLUGIN_NODE )
+            item->module_is_loaded = loaded->contains( QString( item->module_name ) );
 
         for( int i = 0; i < item->childCount(); i++ )
             updateLoadedStatus( item->child( i ), loaded );
