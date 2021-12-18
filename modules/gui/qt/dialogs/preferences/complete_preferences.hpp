@@ -57,31 +57,33 @@
 class AdvPrefsPanel;
 class QVBoxLayout;
 
-class PrefsItemData : public QObject
+class PrefsTreeItem : public QTreeWidgetItem
 {
-    Q_OBJECT
 public:
-    PrefsItemData( QObject * );
-    virtual ~PrefsItemData() { free( psz_shortcut ); }
-    bool contains( const QString &text, Qt::CaseSensitivity cs );
-    AdvPrefsPanel *panel;
-    int cat_id;
-    int subcat_id;
-    enum prefsType
+    enum PrefsTreeItemType
     {
-        TYPE_CATEGORY,
-        TYPE_SUBCATEGORY,
-        TYPE_PLUGIN
+        CATEGORY_NODE = QTreeWidgetItem::UserType,
+        SUBCATEGORY_NODE,
+        PLUGIN_NODE
     };
-    prefsType i_type;
-    char *psz_shortcut;
-    bool b_loaded;
+    PrefsTreeItem( PrefsTreeItemType );
+    virtual ~PrefsTreeItem() { free( module_name ); }
+    PrefsTreeItem *child(int index) const
+    {
+        return static_cast<PrefsTreeItem *>( QTreeWidgetItem::child( index ) );
+    }
+    /* Search filter helper */
+    bool contains( const QString &text, Qt::CaseSensitivity cs );
+    PrefsTreeItemType node_type;
+    AdvPrefsPanel *panel;
     QString name;
     QString help;
+    int cat_id;
+    int subcat_id;
     module_t *p_module;
+    char *module_name;
+    bool module_is_loaded;
 };
-
-Q_DECLARE_METATYPE( PrefsItemData* );
 
 class PrefsTree : public QTreeWidget
 {
@@ -93,6 +95,10 @@ public:
     void applyAll();
     void filter( const QString &text );
     void setLoadedOnly( bool );
+    PrefsTreeItem *topLevelItem(int index) const
+    {
+        return static_cast<PrefsTreeItem *>( QTreeWidget::topLevelItem( index ) );
+    }
 
 private:
     QTreeWidgetItem *createCatNode( int cat );
@@ -100,9 +106,9 @@ private:
     void createPluginNode( QTreeWidgetItem * parent, module_t *mod );
     QTreeWidgetItem *findCatItem( int cat );
     QTreeWidgetItem *findSubcatItem( int subcat );
-    bool filterItems( QTreeWidgetItem *item, const QString &text, Qt::CaseSensitivity cs );
-    bool collapseUnselectedItems( QTreeWidgetItem *item );
-    void updateLoadedStatus( QTreeWidgetItem *item , QSet<QString> *loaded );
+    bool filterItems( PrefsTreeItem *item, const QString &text, Qt::CaseSensitivity cs );
+    bool collapseUnselectedItems( PrefsTreeItem *item );
+    void updateLoadedStatus( PrefsTreeItem *item , QSet<QString> *loaded );
     qt_intf_t *p_intf;
     bool b_show_only_loaded;
     QTreeWidgetItem *catMap[ARRAY_SIZE(categories_array)] = { nullptr };
@@ -118,7 +124,7 @@ class AdvPrefsPanel : public QWidget
 {
     Q_OBJECT
 public:
-    AdvPrefsPanel( qt_intf_t *, QWidget *, PrefsItemData * );
+    AdvPrefsPanel( qt_intf_t *, QWidget *, PrefsTreeItem * );
     virtual ~AdvPrefsPanel();
     void apply();
     void clean();

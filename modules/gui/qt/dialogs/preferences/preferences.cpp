@@ -239,15 +239,15 @@ void PrefsDialog::changeSimplePanel( int number )
 void PrefsDialog::changeAdvPanel( QTreeWidgetItem *item )
 {
     if( item == NULL ) return;
-    PrefsItemData *data = item->data( 0, Qt::UserRole ).value<PrefsItemData*>();
+    PrefsTreeItem *node = static_cast<PrefsTreeItem *>( item );
 
-    if( !data->panel )
+    if( !node->panel )
     {
-        data->panel = new AdvPrefsPanel( p_intf, advanced_panels_stack, data );
+        node->panel = new AdvPrefsPanel( p_intf, advanced_panels_stack, node );
         advanced_panels_stack->insertWidget( advanced_panels_stack->count(),
-                                             data->panel );
+                                             node->panel );
     }
-    advanced_panels_stack->setCurrentWidget( data->panel );
+    advanced_panels_stack->setCurrentWidget( node->panel );
 }
 
 /* Actual apply and save for the preferences */
