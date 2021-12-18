@@ -57,6 +57,10 @@ static void Close( vlc_object_t* );
 #define PASS_TEXT N_("Password")
 #define PASS_LONGTEXT N_("Password that will be used for the connection, " \
         "if no username or password are set in URL.")
+#define PRIVATEKEY_TEXT N_("Private key file")
+#define PRIVATEKEY_LONGTEXT N_("Private-key file used for SSH public key authentication. "\
+        "Public-key file is assumed to be in the same directory with '.pub' appended. "\
+        "If unset, standard key paths will be attempted (e.g. '~/.ssh/id_rsa').")
 
 vlc_module_begin ()
     set_shortname( "SFTP" )
@@ -66,6 +70,7 @@ vlc_module_begin ()
     add_integer( "sftp-port", 22, PORT_TEXT, PORT_LONGTEXT )
     add_string( "sftp-user", NULL, USER_TEXT, USER_LONGTEXT )
     add_password("sftp-pwd", NULL, PASS_TEXT, PASS_LONGTEXT)
+    add_loadfile("sftp-privatekey", NULL, PRIVATEKEY_TEXT, PRIVATEKEY_LONGTEXT)
     add_shortcut( "sftp" )
     set_callbacks( Open, Close )
 vlc_module_end ()
@@ -145,30 +150,65 @@ bailout:
 static int AuthPublicKey( stream_t *p_access, const char *psz_home, const char *psz_username )
 {
     access_sys_t* p_sys = p_access->p_sys;
-    int i_result = VLC_EGENERIC;
     char *psz_keyfile1 = NULL;
     char *psz_keyfile2 = NULL;
 
+    static const char defaultkeys[4][8] = {
+        "rsa", "ed25519", "ecdsa", "dsa"
+    };
+
     if( !psz_username || !psz_username[0] )
-        return i_result;
+        return VLC_EGENERIC;
 
-    if( asprintf( &psz_keyfile1, "%s/.ssh/id_rsa.pub", psz_home ) == -1 ||
-        asprintf( &psz_keyfile2, "%s/.ssh/id_rsa",     psz_home ) == -1 )
-        goto bailout;
+    psz_keyfile2 = var_InheritString( p_access, "sftp-privatekey" );
 
-    if( libssh2_userauth_publickey_fromfile( p_sys->ssh_session, psz_username, psz_keyfile1, psz_keyfile2, NULL ) )
+    /* Attempt public key authentication using user specified key, if specified. */
+    if ( psz_keyfile2 )
     {
-        msg_Dbg( p_access, "Public key authentication failed" );
-        goto bailout;
+        if( asprintf( &psz_keyfile1, "%s.pub", psz_keyfile2 ) == -1 )
+        {
+            free( psz_keyfile2 );
+            return VLC_EGENERIC;
+        }
+
+        msg_Dbg( p_access, "Trying paths %s (public) and %s (private) as a possible key pair", psz_keyfile1, psz_keyfile2 );
+
+        int res = libssh2_userauth_publickey_fromfile( p_sys->ssh_session, psz_username, psz_keyfile1, psz_keyfile2, NULL );
+        free( psz_keyfile1 );
+        free( psz_keyfile2 );
+        if( !res )
+        {
+            msg_Info( p_access, "Public key authentication succeeded" );
+            return VLC_SUCCESS;
+        }
+        msg_Err( p_access, "Public key authentication failed" );
+        return VLC_EGENERIC;
     }
 
-    msg_Info( p_access, "Public key authentication succeeded" );
-    i_result = VLC_SUCCESS;
+    /* If no custom path is provided, try all standard key files. */
+    for( size_t i = 0; i < ARRAY_SIZE(defaultkeys); i++)
+    {
+        if( asprintf( &psz_keyfile1, "%s/.ssh/id_%s.pub", psz_home, defaultkeys[i] ) == -1 )
+            return VLC_EGENERIC;
+        if( asprintf( &psz_keyfile2, "%s/.ssh/id_%s", psz_home, defaultkeys[i] ) == -1 )
+        {
+            free( psz_keyfile1 );
+            return VLC_EGENERIC;
+        }
 
- bailout:
-    free( psz_keyfile1 );
-    free( psz_keyfile2 );
-    return i_result;
+        msg_Dbg( p_access, "Trying paths %s (public) and %s (private) as a possible key pair", psz_keyfile1, psz_keyfile2 );
+
+        int res = libssh2_userauth_publickey_fromfile( p_sys->ssh_session, psz_username, psz_keyfile1, psz_keyfile2, NULL );
+        free( psz_keyfile1 );
+        free( psz_keyfile2 );
+        if( !res )
+        {
+            msg_Info( p_access, "Public key authentication succeeded" );
+            return VLC_SUCCESS;
+        }
+        msg_Dbg( p_access, "Public key authentication failed" );
+    }
+    return VLC_EGENERIC;
 }
 
 static void SSHSessionDestroy( stream_t *p_access )
