@@ -332,8 +332,9 @@ libvlccore_la_SOURCES = \
 	video_output/vout_subpictures.c \
 	video_output/vout_spuregion_helper.h \
 	video_output/vout_wrapper.h \
+	video_output/video_window.c \
+	video_output/video_window.h \
 	video_output/window.c \
-	video_output/window.h \
 	video_output/opengl.c \
 	video_output/vout_intf.c \
 	video_output/vout_internal.h \

@@ -55,7 +55,7 @@
 #include "vout_internal.h"
 #include "display.h"
 #include "snapshot.h"
-#include "window.h"
+#include "video_window.h"
 #include "../misc/variables.h"
 #include "../clock/clock.h"
 #include "statistic.h"
