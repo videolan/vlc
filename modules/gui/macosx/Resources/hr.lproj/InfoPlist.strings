@@ -1,10 +1,10 @@
 /* Localized versions of Info.plist keys */
 
-"NSCameraUsageDescription" = "VLC wants to access the camera as requested by the user.";
-"NSMicrophoneUsageDescription" = "VLC wants to access the microphone as requested by the user.";
-"NSAppleEventsUsageDescription" = "VLC wants to pause and resume external media players.";
-"NSDesktopFolderUsageDescription" = "VLC wants to access the desktop folder as requested by the user.";
-"NSDocumentsFolderUsageDescription" = "VLC wants to access the documents folder as requested by the user.";
-"NSDownloadsFolderUsageDescription" = "VLC wants to access the downloads folder as requested by the user.";
-"NSNetworkVolumesUsageDescription" = "VLC wants to access a network volume as requested by the user.";
-"NSRemovableVolumesUsageDescription" = "VLC wants to access a removable volume as requested by the user.";
+"NSCameraUsageDescription" = "VLC želi pristupiti kameri na zahtjev korisnika.";
+"NSMicrophoneUsageDescription" = "VLC želi pristupiti mikrofonu na zahtjev korisnika.";
+"NSAppleEventsUsageDescription" = "VLC želi zaustaviti i nastaviti rad vanjskih izvođača medija.";
+"NSDesktopFolderUsageDescription" = "VLC želi pristupiti mapi radne površine na zahtjev korisnika.";
+"NSDocumentsFolderUsageDescription" = "VLC želi pristupiti mapi dokumenata na zahtjev korisnika.";
+"NSDownloadsFolderUsageDescription" = "VLC želi pristupiti mapi preuzimanja na zahtjev korisnika.";
+"NSNetworkVolumesUsageDescription" = "VLC želi pristupiti mreži na zahtjev korisnika.";
+"NSRemovableVolumesUsageDescription" = "VLC želi pristupiti prenosivom disku na zahtjev korisnika.";
