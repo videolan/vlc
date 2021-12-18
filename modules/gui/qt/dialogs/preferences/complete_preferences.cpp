@@ -147,8 +147,6 @@ PrefsTree::PrefsTree( qt_intf_t *_p_intf, QWidget *_parent,
             data->subcat_id = subcat;
             data->name = qfu( vlc_config_subcat_GetName( subcat ) );
             data->help = qfu( vlc_config_subcat_GetHelp( subcat ) );
-            current_item->setData( 0, Qt::UserRole,
-                                   QVariant::fromValue( data ) );
             continue;
         }
 
