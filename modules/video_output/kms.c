@@ -55,6 +55,11 @@
 #define DEVICE_LONGTEXT \
     "Framebuffer device to use for rendering (usually /dev/dri/card0)."
 
+#define KMS_CONNECTOR_TEXT "DRM Connector"
+#define KMS_CONNECTOR_LONGTEXT \
+    "The DRM connector to use, using the naming conn-i where <conn> is the " \
+    "connector type name and <i> is the connector type id"
+
 typedef enum { drvSuccess, drvTryNext, drvFail } deviceRval;
 
 static const char * const connector_type_names[] = {
@@ -185,6 +190,7 @@ static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     bool found_connector = false;
 
+    char *connector_request = var_InheritString(wnd, "kms-connector");
     msg_Info(wnd, "Looping over %d resources", modeRes->count_connectors);
     for (int c = 0; c < modeRes->count_connectors && sys->crtc == 0; c++) {
 
@@ -204,6 +210,13 @@ static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
                  connector_type_names[conn->connector_type],
                  conn->connector_type_id);
 
+        if (connector_request != NULL && strcmp(name, connector_request) != 0)
+        {
+            msg_Info(wnd, "connector %s skipped", name);
+            drmModeFreeConnector(conn);
+            continue;
+        }
+
         msg_Info(wnd, "connector %d: %s", c, name);
 
         found_connector = true;
@@ -216,6 +229,7 @@ static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
                 drmModeFreeConnector(conn);
                 drmModeFreeResources(modeRes);
+                free(connector_request);
                 return VLC_EGENERIC;
             }
             drmModeFreeConnector(conn);
@@ -227,6 +241,7 @@ static int WindowEnable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
         sys->conn = conn;
         break;
     }
+    free(connector_request);
 
     if (!found_connector)
     {
@@ -404,6 +419,7 @@ vlc_module_begin ()
 
     add_obsolete_string("kms") /* Since 4.0.0 */
     add_loadfile(KMS_DEVICE_VAR, "/dev/dri/card0", DEVICE_TEXT, DEVICE_LONGTEXT)
+    add_string("kms-connector", "", KMS_CONNECTOR_TEXT, KMS_CONNECTOR_LONGTEXT)
 
     set_description("Linux kernel mode setting window provider")
     set_callback(OpenWindow)
