@@ -91,7 +91,6 @@ public:
     PrefsTree( qt_intf_t *, QWidget *, module_t **, size_t );
 
     void applyAll();
-    void cleanAll();
     void filter( const QString &text );
     void setLoadedOnly( bool );
 
@@ -101,7 +100,6 @@ private:
     void createPluginNode( QTreeWidgetItem * parent, module_t *mod );
     QTreeWidgetItem *findCatItem( int cat );
     QTreeWidgetItem *findSubcatItem( int subcat );
-    void doAll( bool );
     bool filterItems( QTreeWidgetItem *item, const QString &text, Qt::CaseSensitivity cs );
     bool collapseUnselectedItems( QTreeWidgetItem *item );
     void updateLoadedStatus( QTreeWidgetItem *item , QSet<QString> *loaded );

@@ -271,16 +271,6 @@ QTreeWidgetItem *PrefsTree::findSubcatItem( int subcat )
 
 void PrefsTree::applyAll()
 {
-    doAll( false );
-}
-
-void PrefsTree::cleanAll()
-{
-    doAll( true );
-}
-
-void PrefsTree::doAll( bool doclean )
-{
     for( int i_cat_index = 0 ; i_cat_index < topLevelItemCount();
              i_cat_index++ )
     {
@@ -294,33 +284,15 @@ void PrefsTree::doAll( bool doclean )
             {
                 PrefsItemData *data = sc_item->child( i_module )->
                                data( 0, Qt::UserRole).value<PrefsItemData *>();
-                if( data->panel && doclean )
-                {
-                    delete data->panel;
-                    data->panel = NULL;
-                }
-                else if( data->panel )
-                    data->panel->apply();
+                data->panel->apply();
             }
             PrefsItemData *data = sc_item->data( 0, Qt::UserRole).
                                             value<PrefsItemData *>();
-            if( data->panel && doclean )
-            {
-                delete data->panel;
-                data->panel = NULL;
-            }
-            else if( data->panel )
-                data->panel->apply();
+            data->panel->apply();
         }
         PrefsItemData *data = cat_item->data( 0, Qt::UserRole).
                                             value<PrefsItemData *>();
-        if( data->panel && doclean )
-        {
-            delete data->panel;
-            data->panel = NULL;
-        }
-        else if( data->panel )
-            data->panel->apply();
+        data->panel->apply();
     }
 }
 
