@@ -518,6 +518,6 @@ void config_ResetAll(void)
                 vlc_param_SetString(param, p_config->orig.psz);
         }
     }
-    vlc_mutex_lock(&config_lock);
+    vlc_mutex_unlock(&config_lock);
     atomic_store_explicit(&config_dirty, true, memory_order_release);
 }
