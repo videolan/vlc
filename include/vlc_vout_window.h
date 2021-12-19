@@ -483,12 +483,8 @@ static inline void vout_window_SetState(vout_window_t *window, unsigned state)
  * \param width pixel width
  * \param height height width
  */
-static inline void vout_window_SetSize(vout_window_t *window,
-                                      unsigned width, unsigned height)
-{
-    if (window->ops->resize != NULL)
-        window->ops->resize(window, width, height);
-}
+VLC_API void vout_window_SetSize(vout_window_t *window,
+                                 unsigned width, unsigned height);
 
 /**
  * Requests fullscreen mode.
@@ -496,23 +492,14 @@ static inline void vout_window_SetSize(vout_window_t *window,
  * \param window window to be brought to fullscreen mode.
  * \param id nul-terminated output identifier, NULL for default
  */
-static inline void vout_window_SetFullScreen(vout_window_t *window,
-                                            const char *id)
-{
-    if (window->ops->set_fullscreen != NULL)
-        window->ops->set_fullscreen(window, id);
-}
+VLC_API void vout_window_SetFullScreen(vout_window_t *window, const char *id);
 
 /**
  * Requests windowed mode.
  *
  * \param window window to be brought into windowed mode.
  */
-static inline void vout_window_UnsetFullScreen(vout_window_t *window)
-{
-    if (window->ops->unset_fullscreen != NULL)
-        window->ops->unset_fullscreen(window);
-}
+VLC_API void vout_window_UnsetFullScreen(vout_window_t *window);
 
 /**
  * Request a new window title.

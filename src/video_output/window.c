@@ -119,6 +119,13 @@ void vout_window_Disable(vout_window_t *window)
         window->ops->disable(window);
 }
 
+void vout_window_SetSize(vout_window_t *window, unsigned width,
+                         unsigned height)
+{
+    if (window->ops->resize != NULL)
+        window->ops->resize(window, width, height);
+}
+
 void vout_window_Delete(vout_window_t *window)
 {
     if (!window)
@@ -197,4 +204,16 @@ void vout_window_ReportFullscreen(vout_window_t *window, const char *id)
 
     if (window->owner.cbs->fullscreened != NULL)
         window->owner.cbs->fullscreened(window, id);
+}
+
+void vout_window_UnsetFullScreen(vout_window_t *window)
+{
+    if (window->ops->unset_fullscreen != NULL)
+        window->ops->unset_fullscreen(window);
+}
+
+void vout_window_SetFullScreen(vout_window_t *window, const char *id)
+{
+    if (window->ops->set_fullscreen != NULL)
+        window->ops->set_fullscreen(window, id);
 }
