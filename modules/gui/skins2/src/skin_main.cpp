@@ -312,6 +312,8 @@ static void WindowCloseLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
     VoutManager::instance( pIntf )->releaseWnd( pWnd );
 }
 
+static void WindowSetFullscreen( vout_window_t *pWnd, const char * );
+
 static int WindowEnable( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 {
     vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
@@ -331,7 +333,7 @@ static int WindowEnable( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     }
 
     if (cfg->is_fullscreen)
-        vout_window_SetFullScreen( pWnd, NULL );
+        WindowSetFullscreen( pWnd, NULL );
     return VLC_SUCCESS;
 }
 
