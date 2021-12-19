@@ -100,7 +100,7 @@ static struct vlc_rtp_es *vlc_rtp_es_request(struct vlc_rtp_pt *pt,
     ei->id = es_out_Add(demux->out, fmt);
     if (ei->id == NULL) {
         free(ei);
-        return NULL;
+        return vlc_rtp_es_dummy;
     }
     return &ei->es;
 }
