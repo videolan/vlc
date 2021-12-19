@@ -272,7 +272,7 @@ static int Enable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
     if (cfg->is_decorated)
         return VLC_EGENERIC;
 #endif
-    vout_window_SetSize(wnd, cfg->width, cfg->height);
+    Resize(wnd, cfg->width, cfg->height);
     wl_surface_commit(wnd->handle.wl);
     wl_display_flush(display);
 #ifdef XDG_SHELL
