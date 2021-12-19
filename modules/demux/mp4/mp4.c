@@ -4547,9 +4547,6 @@ static int FragDemuxTrack( demux_t *p_demux, mp4_track_t *p_track,
     const MP4_Box_data_trun_t *p_trun =
             p_track->context.runs.p_array[p_track->context.runs.i_current].p_trun->data.p_trun;
 
-    if( p_track->context.i_trun_sample >= p_trun->i_sample_count )
-        return VLC_DEMUXER_EOS;
-
     uint32_t dur = p_track->context.i_default_sample_duration,
              len = p_track->context.i_default_sample_size;
 
