@@ -2175,8 +2175,11 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     assert(cfg->fmt != NULL);
     assert(cfg->clock != NULL);
 
-    if (!VoutCheckFormat(cfg->fmt))
-        goto error_stop_display;
+    if (!VoutCheckFormat(cfg->fmt)) {
+        if (sys->display != NULL)
+            vout_StopDisplay(cfg->vout);
+        return -1;
+    }
 
     video_format_t original;
     VoutFixFormat(&original, cfg->fmt);
@@ -2196,7 +2199,8 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
         msg_Err(cfg->vout, "failed to enable window");
         video_format_Clean(&original);
         vlc_mutex_unlock(&sys->window_lock);
-        goto error_stop_display;
+        assert(sys->display == NULL);
+        return -1;
     }
     vlc_mutex_unlock(&sys->window_lock);
 
@@ -2230,11 +2234,6 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
         spu_Attach(sys->spu, input);
     vout_IntfReinit(cfg->vout);
     return 0;
-
-error_stop_display:
-    if (sys->display != NULL)
-        vout_StopDisplay(cfg->vout);
-    return -1;
 }
 
 vlc_decoder_device *vout_GetDevice(vout_thread_t *vout)
