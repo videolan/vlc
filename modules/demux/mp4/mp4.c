@@ -4459,7 +4459,8 @@ static int DemuxMoof( demux_t *p_demux )
                 if( tk_tmp == tk ||
                     !tk_tmp->b_ok || tk_tmp->b_chapters_source ||
                    (!tk_tmp->b_selected && p_sys->b_seekable) ||
-                    tk_tmp->context.runs.i_current >= tk_tmp->context.runs.i_count )
+                    tk_tmp->context.runs.i_current >= tk_tmp->context.runs.i_count ||
+                    tk_tmp->context.i_temp != VLC_DEMUXER_SUCCESS )
                     continue;
 
                 mtime_t i_nzdts = MP4_rescale( tk_tmp->i_time, tk_tmp->i_timescale, CLOCK_FREQ );
