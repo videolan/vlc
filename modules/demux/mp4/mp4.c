@@ -4433,7 +4433,7 @@ static int DemuxMoof( demux_t *p_demux )
             mp4_track_t *tk_tmp = &p_sys->track[i];
 
             if( !tk_tmp->b_ok || tk_tmp->b_chapters_source ||
-               (!tk_tmp->b_selected && !p_sys->b_seekable) ||
+               (!tk_tmp->b_selected && p_sys->b_seekable) ||
                 tk_tmp->context.runs.i_current >= tk_tmp->context.runs.i_count ||
                 tk_tmp->context.i_temp != VLC_DEMUXER_SUCCESS )
                 continue;
@@ -4458,7 +4458,7 @@ static int DemuxMoof( demux_t *p_demux )
                 mp4_track_t *tk_tmp = &p_sys->track[i];
                 if( tk_tmp == tk ||
                     !tk_tmp->b_ok || tk_tmp->b_chapters_source ||
-                   (!tk_tmp->b_selected && !p_sys->b_seekable) ||
+                   (!tk_tmp->b_selected && p_sys->b_seekable) ||
                     tk_tmp->context.runs.i_current >= tk_tmp->context.runs.i_count )
                     continue;
 
