@@ -2025,7 +2025,6 @@ static int EnableWindowLocked(vout_thread_sys_t *vout, const video_format_t *ori
         vout_window_cfg_t wcfg = {
             .is_fullscreen = var_GetBool(&vout->obj, "fullscreen"),
             .is_decorated = var_InheritBool(&vout->obj, "video-deco"),
-        // TODO: take pixel A/R, crop and zoom into account
 #if defined(__APPLE__) || defined(_WIN32)
             .x = var_InheritInteger(&vout->obj, "video-x"),
             .y = var_InheritInteger(&vout->obj, "video-y"),
