@@ -186,6 +186,7 @@ static int Open( vlc_object_t * p_this )
     vout_window_cfg_t cfg;
 
     memset(&cfg, 0, sizeof (cfg));
+    cfg.is_decorated = true;
     cfg.width = var_CreateGetInteger( p_filter, "projectm-width" );
     cfg.height = var_CreateGetInteger( p_filter, "projectm-height" );
 
