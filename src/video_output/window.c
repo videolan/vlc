@@ -119,11 +119,12 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     return window;
 }
 
-int vout_window_Enable(vout_window_t *window,
-                       const vout_window_cfg_t *restrict cfg)
+int vout_window_Enable(vout_window_t *window)
 {
+    window_t *w = container_of(window, window_t, wnd);
+
     if (window->ops->enable != NULL) {
-        int err = window->ops->enable(window, cfg);
+        int err = window->ops->enable(window, &w->cfg);
         if (err)
             return err;
     }

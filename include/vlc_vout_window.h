@@ -527,7 +527,7 @@ static inline void vout_window_SetTitle(vout_window_t *window, const char *title
  * while the window is enabled.
  */
 VLC_API
-int vout_window_Enable(vout_window_t *window, const vout_window_cfg_t *cfg);
+int vout_window_Enable(vout_window_t *window);
 
 /**
  * Disables a window.

@@ -2020,27 +2020,15 @@ static int EnableWindowLocked(vout_thread_sys_t *vout, const video_format_t *ori
     assert(!sys->dummy);
     vlc_mutex_assert(&sys->window_lock);
     VoutGetDisplayCfg(vout, original, &sys->display_cfg);
+    vout_UpdateWindowSizeLocked(vout);
 
     if (!sys->window_enabled) {
-        vout_window_cfg_t wcfg = {
-            .is_fullscreen = var_GetBool(&vout->obj, "fullscreen"),
-            .is_decorated = var_InheritBool(&vout->obj, "video-deco"),
-#if defined(__APPLE__) || defined(_WIN32)
-            .x = var_InheritInteger(&vout->obj, "video-x"),
-            .y = var_InheritInteger(&vout->obj, "video-y"),
-#endif
-        };
-
-        vout_display_SizeWindow(&wcfg.width, &wcfg.height, original, &sys->source.dar,
-                        &sys->source.crop, &sys->display_cfg);
-
-        if (vout_window_Enable(sys->display_cfg.window, &wcfg)) {
+        if (vout_window_Enable(sys->display_cfg.window)) {
             msg_Err(&vout->obj, "failed to enable window");
             return -1;
         }
         sys->window_enabled = true;
-    } else
-        vout_UpdateWindowSizeLocked(vout);
+    }
     return 0;
 }
 
