@@ -271,13 +271,13 @@ static const char *const ppsz_replay_gain_mode_text[] = {
 
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_( \
-    "You can enforce the video width. By default (-1) VLC will " \
-    "adapt to the video characteristics.")
+    "This requests a specific pixel width for the video window. " \
+    "By default (-1), the width is requested according to the zoom setting.")
 
 #define HEIGHT_TEXT N_("Video height")
 #define HEIGHT_LONGTEXT N_( \
-    "You can enforce the video height. By default (-1) VLC will " \
-    "adapt to the video characteristics.")
+    "This requests a specific pixel height for the video window. " \
+    "By default (-1), the height is requested according to the zoom setting.")
 
 #define VIDEOX_TEXT N_("Video X coordinate")
 #define VIDEOX_LONGTEXT N_( \
