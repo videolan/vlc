@@ -40,9 +40,12 @@
 typedef struct
 {
     vout_window_t wnd;
+    vout_window_cfg_t cfg;
     module_t *module;
-    vlc_inhibit_t *inhibit;
     bool inhibit_windowed;
+
+    /* Screensaver inhibition state (protected by lock) */
+    vlc_inhibit_t *inhibit;
     bool active;
     bool fullscreen;
     vlc_mutex_t lock;
@@ -71,6 +74,11 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     window->sys = NULL;
     assert(owner != NULL);
     window->owner = *owner;
+
+    w->cfg.is_fullscreen = false;
+    w->cfg.is_decorated = true;
+    w->cfg.width = 0;
+    w->cfg.height = 0;
 
     int dss = var_InheritInteger(obj, "disable-screensaver");
 
@@ -122,6 +130,11 @@ void vout_window_Disable(vout_window_t *window)
 void vout_window_SetSize(vout_window_t *window, unsigned width,
                          unsigned height)
 {
+    window_t *w = container_of(window, window_t, wnd);
+
+    w->cfg.width = width;
+    w->cfg.height = height;
+
     if (window->ops->resize != NULL)
         window->ops->resize(window, width, height);
 }
@@ -208,12 +221,20 @@ void vout_window_ReportFullscreen(vout_window_t *window, const char *id)
 
 void vout_window_UnsetFullScreen(vout_window_t *window)
 {
+    window_t *w = container_of(window, window_t, wnd);
+
+    w->cfg.is_fullscreen = false;
+
     if (window->ops->unset_fullscreen != NULL)
         window->ops->unset_fullscreen(window);
 }
 
 void vout_window_SetFullScreen(vout_window_t *window, const char *id)
 {
+    window_t *w = container_of(window, window_t, wnd);
+
+    w->cfg.is_fullscreen = true;
+
     if (window->ops->set_fullscreen != NULL)
         window->ops->set_fullscreen(window, id);
 }
