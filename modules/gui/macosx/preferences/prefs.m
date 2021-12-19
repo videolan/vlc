@@ -477,6 +477,7 @@
         module_config_t *p_configs = NULL;
         int lastcat = CAT_UNKNOWN;
         int lastsubcat = SUBCAT_UNKNOWN;
+        bool subcat_is_general = false;
         unsigned int confsize;
 
         module_t * p_module = modules[i];
@@ -505,6 +506,7 @@
                     continue;
                 }
                 lastcat = vlc_config_cat_FromSubcat(lastsubcat);
+                subcat_is_general = vlc_config_subcat_IsGeneral(lastsubcat);
 
                 categoryItem = [self itemRepresentingCategory:lastcat];
                 if (!categoryItem) {
@@ -513,7 +515,7 @@
                         [[self children] addObject:categoryItem];
                 }
 
-                if (categoryItem && !vlc_config_subcat_IsGeneral(lastsubcat)) {
+                if (categoryItem && !subcat_is_general) {
                     subCategoryItem = [categoryItem itemRepresentingSubCategory:lastsubcat];
                     if (!subCategoryItem) {
                         subCategoryItem = [VLCTreeSubCategoryItem subCategoryTreeItemWithSubCategory:lastsubcat];
@@ -528,7 +530,7 @@
                 continue;
 
             if (mod_is_main) {
-                if (categoryItem && vlc_config_subcat_IsGeneral(lastsubcat)) {
+                if (categoryItem && subcat_is_general) {
                     [[categoryItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
                 } else if (subCategoryItem) {
                     [[subCategoryItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
