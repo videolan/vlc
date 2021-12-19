@@ -2118,6 +2118,7 @@ static int EnableWindowLocked(vout_thread_sys_t *vout, const video_format_t *ori
 
     assert(!sys->dummy);
     vlc_mutex_assert(&sys->window_lock);
+    VoutGetDisplayCfg(vout, original, &sys->display_cfg);
 
     if (!sys->window_enabled) {
         vout_window_cfg_t wcfg = {
@@ -2130,7 +2131,6 @@ static int EnableWindowLocked(vout_thread_sys_t *vout, const video_format_t *ori
 #endif
         };
 
-        VoutGetDisplayCfg(vout, original, &sys->display_cfg);
         vout_SizeWindow(vout, original, &wcfg.width, &wcfg.height);
 
         if (vout_window_Enable(sys->display_cfg.window, &wcfg)) {
