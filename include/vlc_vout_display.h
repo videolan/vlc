@@ -502,6 +502,21 @@ static inline bool vout_display_PlaceEquals(const vout_display_place_t *p1,
 VLC_API void vout_display_PlacePicture(vout_display_place_t *place, const video_format_t *source, const vout_display_cfg_t *cfg);
 
 /**
+ * Translates coordinates.
+ *
+ * This translates coordinates from window pixel coordinate space to
+ * original video sample coordinate space.
+ *
+ * \param x pointer to abscissa to be translated
+ * \param y pointer to ordinate to be translated
+ * \param fmt video format
+ * \param cfg display configuration
+ */
+void vout_display_TranslateCoordinates(int *x, int *y,
+                                       const video_format_t *fmt,
+                                       const vout_display_cfg_t *cfg);
+
+/**
  * Translates mouse state.
  *
  * This translates the mouse (pointer) state from window coordinates to

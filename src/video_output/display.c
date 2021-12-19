@@ -200,23 +200,22 @@ void vout_display_PlacePicture(vout_display_place_t *place,
     }
 }
 
-void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
-                                      const vlc_mouse_t *window)
+/** Translates window coordinates to video coordinates */
+void vout_display_TranslateCoordinates(int *restrict xp, int *restrict yp,
+                                       const video_format_t *restrict source,
+                                       const vout_display_cfg_t *restrict cfg)
 {
     vout_display_place_t place;
 
-    /* Translate window coordinates to video coordinates */
-    vout_display_PlacePicture(&place, vd->source, vd->cfg);
+    vout_display_PlacePicture(&place, source, cfg);
 
-    if (place.width <= 0 || place.height <= 0) {
-        memset(video, 0, sizeof (*video));
+    if (place.width <= 0 || place.height <= 0)
         return;
-    }
 
-    const int wx = window->i_x, wy = window->i_y;
+    const int wx = *xp, wy = *yp;
     int x, y;
 
-    switch (vd->source->orientation) {
+    switch (source->orientation) {
         case ORIENT_TOP_LEFT:
             x = wx;
             y = wy;
@@ -253,12 +252,20 @@ void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
             vlc_assert_unreachable();
     }
 
-    video->i_x = vd->source->i_x_offset
-        + (int64_t)(x - place.x) * vd->source->i_visible_width / place.width;
-    video->i_y = vd->source->i_y_offset
-        + (int64_t)(y - place.y) * vd->source->i_visible_height / place.height;
-    video->i_pressed = window->i_pressed;
-    video->b_double_click = window->b_double_click;
+    x = source->i_x_offset
+        + (int64_t)(x - place.x) * source->i_visible_width / place.width;
+    y = source->i_y_offset
+        + (int64_t)(y - place.y) * source->i_visible_height / place.height;
+    *xp = x;
+    *yp = y;
+}
+
+void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
+                                      const vlc_mouse_t *window)
+{
+    *video = *window;
+    vout_display_TranslateCoordinates(&video->i_x, &video->i_y, vd->source,
+                                      vd->cfg);
 }
 
 typedef struct {
