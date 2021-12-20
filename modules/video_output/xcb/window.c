@@ -550,12 +550,6 @@ static int Enable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
                             ARRAY_SIZE(motif_wm_hints), motif_wm_hints);
     }
 
-    const uint32_t values[] = { cfg->width, cfg->height };
-
-    xcb_configure_window(conn, window,
-                         XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
-                         values);
-
     /* Make the window visible */
     xcb_map_window(conn, window);
 
