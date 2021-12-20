@@ -1890,7 +1890,6 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
     if (sys->spu)
         spu_Detach(sys->spu);
     sys->clock = NULL;
-    video_format_Clean(&sys->original);
 }
 
 void vout_StopDisplay(vout_thread_t *vout)
@@ -2098,6 +2097,9 @@ int vout_ChangeSource( vout_thread_t *vout, const video_format_t *original )
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
 
+    if (sys->display == NULL)
+        return -1;
+
      /* TODO: If dimensions are equal or slightly smaller, update the aspect
      * ratio and crop settings, instead of recreating a display.
      */
@@ -2201,6 +2203,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
 
     vout_ReinitInterlacingSupport(cfg->vout, &sys->private);
 
+    video_format_Clean(&sys->original);
     sys->original = original;
 
     sys->delay = 0;
@@ -2211,7 +2214,6 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     if (vout_Start(vout, vctx, cfg))
     {
         msg_Err(cfg->vout, "video output display creation failed");
-        video_format_Clean(&sys->original);
         vout_DisableWindow(vout);
         return -1;
     }
