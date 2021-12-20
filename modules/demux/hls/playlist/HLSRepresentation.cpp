@@ -44,7 +44,7 @@ HLSRepresentation::HLSRepresentation  ( BaseAdaptationSet *set ) :
 {
     b_live = true;
     b_loaded = false;
-    b_failed = false;
+    updateFailureCount = 0;
     lastUpdateTime = 0;
     targetDuration = 0;
     streamFormat = StreamFormat::Type::Unknown;
@@ -127,7 +127,7 @@ void HLSRepresentation::scheduleNextUpdate(uint64_t, bool b_updated)
 
 bool HLSRepresentation::needsUpdate(uint64_t number) const
 {
-    if(b_failed)
+    if(updateFailureCount > MAX_UPDATE_FAILED_UPDATE_COUNT)
         return false;
     if(!b_loaded)
         return true;
@@ -155,10 +155,25 @@ bool HLSRepresentation::runLocalUpdates(SharedResources *res)
     BasePlaylist *playlist = getPlaylist();
     M3U8Parser parser(res);
     if(!parser.appendSegmentsFromPlaylistURI(playlist->getVLCObject(), this))
-        b_failed = true;
+    {
+        msg_Warn(playlist->getVLCObject(), "Failed to update %u/%u playlist ID %s",
+                 updateFailureCount, MAX_UPDATE_FAILED_UPDATE_COUNT,
+                 getID().str().c_str());
+        updateFailureCount++;
+        lastUpdateTime = vlc_tick_now();
+        return false;
+    }
     else
+    {
+        updateFailureCount = 0;
         b_loaded = true;
-    return true;
+        return true;
+    }
+}
+
+bool HLSRepresentation::canNoLongerUpdate() const
+{
+    return updateFailureCount > MAX_UPDATE_FAILED_UPDATE_COUNT;
 }
 
 uint64_t HLSRepresentation::translateSegmentNumber(uint64_t num, const BaseRepresentation *from) const
