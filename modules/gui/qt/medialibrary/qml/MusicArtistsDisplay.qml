@@ -32,7 +32,7 @@ import "qrc:///style/"
 Widgets.PageLoader {
     id: root
 
-    property var model
+    property MLModel model
 
     defaultPage: "all"
     pageModel: [{

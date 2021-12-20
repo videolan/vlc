@@ -39,7 +39,7 @@ Widgets.PageLoader {
     property var contentModel
     property var sortModel
 
-    property var tabModel: ListModel {
+    property ListModel tabModel: ListModel {
         Component.onCompleted: {
             pageModel.forEach(function(e) {
                 append({

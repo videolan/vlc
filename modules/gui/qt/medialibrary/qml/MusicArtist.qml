@@ -34,7 +34,7 @@ FocusScope {
     property var artist: ({})
 
     //the index to "go to" when the view is loaded
-    property var initialIndex: 0
+    property int initialIndex: 0
 
     property Item headerItem: _currentView ? _currentView.headerItem : null
 

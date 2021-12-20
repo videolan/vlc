@@ -33,7 +33,7 @@ Rectangle{
 
     property alias removeInfoRectVisible: buttonList.removeInfoRectVisible
 
-    property var _viewThatContainsDrag: undefined
+    property EditorDNDView _viewThatContainsDrag: null
 
     signal dragStarted(int controlId)
     signal dragStopped(int controlId)
@@ -107,11 +107,11 @@ Rectangle{
                     visible: root.dragActive || (bar.currentIdentifier === identifier)
 
                     readonly property int identifier: modelData.identifier
-                    readonly property var model: {
+                    readonly property PlayerControlbarModel model: {
                         if (!!MainCtx.controlbarProfileModel.currentModel)
                             return MainCtx.controlbarProfileModel.currentModel.getModel(identifier)
                         else
-                            return undefined
+                            return null
                     }
 
                     spacing: VLCStyle.margin_small

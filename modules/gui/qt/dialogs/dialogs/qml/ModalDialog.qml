@@ -27,7 +27,7 @@ import "qrc:///style/"
 Dialog {
     id: control
 
-    property var rootWindow: undefined
+    property Item rootWindow: null
 
     focus: true
     modal: true

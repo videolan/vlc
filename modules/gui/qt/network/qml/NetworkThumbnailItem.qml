@@ -35,7 +35,7 @@ Item {
     readonly property bool containsMouse: parent.containsMouse
     readonly property int index: parent.index
 
-    signal playClicked(var index)
+    signal playClicked(int index)
 
     Widgets.ListCoverShadow {
         anchors.fill: artwork.visible ? artwork : background

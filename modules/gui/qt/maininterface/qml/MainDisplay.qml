@@ -141,7 +141,7 @@ FocusScope {
     ]
 
 
-    property var tabModel: ListModel {
+    property ListModel tabModel: ListModel {
         id: tabModelid
         Component.onCompleted: {
             pageModel.forEach(function(e) {

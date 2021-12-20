@@ -66,7 +66,7 @@ T.Control {
     signal addToPlaylistClicked
     signal itemClicked(Item menuParent, int key, int modifier)
     signal itemDoubleClicked(Item menuParent, int keys, int modifier)
-    signal contextMenuButtonClicked(Item menuParent, var globalMousePos)
+    signal contextMenuButtonClicked(Item menuParent, point globalMousePos)
 
     // Settings
 

@@ -47,7 +47,7 @@ FocusScope {
 
     property int initialIndex: 0
 
-    property var model: MLVideoModel { ml: MediaLib }
+    property MLVideoModel model: MLVideoModel { ml: MediaLib }
 
     property var sortModel: [
         { text: I18n.qtr("Alphabetic"), criteria: "title"    },

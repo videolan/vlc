@@ -26,7 +26,7 @@ import org.videolan.medialib 0.1
 DragItem {
     id: root
 
-    /* required */ property var mlModel: null
+    /* required */ property MLModel mlModel: null
 
     // string => role for medialib id, data[id] will be pass to Medialib::mlInputItem for QmlInputItem
     property string mlIDRole: "id"

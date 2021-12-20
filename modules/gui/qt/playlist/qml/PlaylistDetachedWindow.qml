@@ -27,7 +27,7 @@ import "qrc:///style/"
 Window {
     visible: true
 
-    property var window: IntfWindow
+    property QtWindow window: IntfWindow
 
     width: 350
     minimumWidth: playlistView.minimumWidth
@@ -55,6 +55,6 @@ Window {
         focus: true
         anchors.fill: parent
 
-        readonly property var g_root: playlistView
+        readonly property PlaylistListView g_root: playlistView
     }
 }

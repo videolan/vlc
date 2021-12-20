@@ -46,7 +46,7 @@ T.MenuItem {
 
     leftPadding: VLCStyle.applicationHorizontalMargin
 
-    property var parentMenu: undefined
+    property Item parentMenu: null
 
     //workaround QTBUG-7018 for Qt < 5.12.2
     activeFocusOnTab: control.enabled

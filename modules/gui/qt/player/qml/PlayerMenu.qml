@@ -30,7 +30,7 @@ import "qrc:///widgets/" as Widgets
 T.Menu {
     id: control
 
-    property var parentMenu: undefined
+    property Item parentMenu: null
     property bool _emitMenuClose: true
     signal menuClosed()
 

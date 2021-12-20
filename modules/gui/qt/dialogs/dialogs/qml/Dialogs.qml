@@ -32,12 +32,12 @@ Item {
     // Properties
     //---------------------------------------------------------------------------------------------
 
-    property var bgContent: undefined
+    property Item bgContent: null
 
     //---------------------------------------------------------------------------------------------
     // Private
 
-    property var _model: DialogModel.model
+    readonly property DialogErrorModel _model: DialogModel.model
 
     //---------------------------------------------------------------------------------------------
     // Signal
@@ -52,12 +52,12 @@ Item {
     Component.onCompleted: if (_model.count) errorPopup.state = "visible"
 
     Component.onDestruction: {
-        if (questionDialog.dialogId !== undefined) {
+        if (questionDialog.dialogId !== null) {
             DialogModel.dismiss(questionDialog.dialogId)
-            questionDialog.dialogId = undefined
-        } if (loginDialog.dialogId !== undefined) {
+            questionDialog.dialogId = null
+        } if (loginDialog.dialogId !== null) {
             DialogModel.dismiss(loginDialog.dialogId)
-            loginDialog.dialogId = undefined
+            loginDialog.dialogId = null
         }
     }
 
@@ -105,11 +105,11 @@ Item {
         onCancelled: {
             if (questionDialog.dialogId === dialogId) {
                 questionDialog.close()
-                questionDialog.dialogId = undefined
+                questionDialog.dialogId = null
                 DialogModel.dismiss(dialogId)
             } else if (loginDialog.dialogId === dialogId)  {
                 loginDialog.close()
-                loginDialog.dialogId = undefined
+                loginDialog.dialogId = null
                 DialogModel.dismiss(dialogId)
             } else {
                 DialogModel.dismiss(dialogId)
@@ -189,7 +189,7 @@ Item {
 
     ModalDialog {
         id: loginDialog
-        property var dialogId: undefined
+        property DialogId dialogId: null
         property string defaultUsername: ""
 
         onAboutToHide: restoreFocus()
@@ -302,15 +302,15 @@ Item {
         }
 
         onAccepted: {
-            if (loginDialog.dialogId !== undefined) {
+            if (loginDialog.dialogId !== null) {
                 DialogModel.post_login(loginDialog.dialogId, username.text, password.text, savePassword.checked)
-                loginDialog.dialogId = undefined
+                loginDialog.dialogId = null
             }
         }
         onRejected: {
-            if (loginDialog.dialogId !== undefined) {
+            if (loginDialog.dialogId !== null) {
                 DialogModel.dismiss(loginDialog.dialogId)
-                loginDialog.dialogId = undefined
+                loginDialog.dialogId = null
             }
         }
     }
@@ -318,7 +318,7 @@ Item {
     ModalDialog {
         id: questionDialog
 
-        property var dialogId: undefined
+        property DialogId dialogId: null
         property alias text: content.text
         property alias cancelTxt: cancel.text
         property alias action1Txt: action1.text
@@ -364,7 +364,7 @@ Item {
 
                         onClicked: {
                             DialogModel.dismiss(questionDialog.dialogId)
-                            questionDialog.dialogId = undefined
+                            questionDialog.dialogId = null
                             questionDialog.close()
                         }
                     }
@@ -383,7 +383,7 @@ Item {
 
                         onClicked: {
                             DialogModel.post_action1(questionDialog.dialogId)
-                            questionDialog.dialogId = undefined
+                            questionDialog.dialogId = null
                             questionDialog.close()
                         }
                     }
@@ -400,7 +400,7 @@ Item {
 
                         onClicked: {
                             DialogModel.post_action2(questionDialog.dialogId)
-                            questionDialog.dialogId = undefined
+                            questionDialog.dialogId = null
                             questionDialog.close()
                         }
                     }

@@ -60,7 +60,7 @@ Widgets.PageLoader {
     }
 
 
-    property var tabModel: ListModel {
+    property ListModel tabModel: ListModel {
         Component.onCompleted: {
             pageModel.forEach(function(e) {
                 append({

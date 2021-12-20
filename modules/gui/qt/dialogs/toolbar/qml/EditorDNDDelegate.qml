@@ -32,7 +32,7 @@ Control {
     padding: background.border.width
 
     readonly property int controlId: model.id
-    property var dndView: null
+    property ListView dndView: null
 
     readonly property bool dragActive: loader.Drag.active
     property alias dropArea: dropArea

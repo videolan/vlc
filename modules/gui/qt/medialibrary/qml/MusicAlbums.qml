@@ -41,12 +41,12 @@ FocusScope {
     property alias parentId: albumModelId.parentId
     readonly property var currentIndex: _currentView.currentIndex
     //the index to "go to" when the view is loaded
-    property var initialIndex: 0
+    property int initialIndex: 0
     property int gridViewMarginTop: VLCStyle.margin_large
     property var gridViewRowX: MainCtx.gridView ? _currentView.rowX : undefined
 
     property Component header: Item{}
-    readonly property var headerItem: _currentView ? _currentView.headerItem : undefined
+    readonly property Item headerItem: _currentView ? _currentView.headerItem : null
 
     property alias _currentView: view.currentItem
 

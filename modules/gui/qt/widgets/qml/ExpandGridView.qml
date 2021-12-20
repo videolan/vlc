@@ -59,8 +59,8 @@ FocusScope {
                                                              /
                                                              _effectiveCellWidth), 1)
 
-    property var delegateModel
-    property var model
+    property Util.SelectableDelegateModel delegateModel
+    property QtAbstractItemModel model
 
     property int currentIndex: 0
 

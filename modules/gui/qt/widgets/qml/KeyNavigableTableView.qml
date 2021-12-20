@@ -55,11 +55,11 @@ FocusScope {
     }
 
     property Component header: Item{}
-    property var headerItem: view.headerItem.loadedHeader
+    property Item headerItem: view.headerItem.loadedHeader
     property color headerColor
     property int headerTopPadding: 0
 
-    property var selectionDelegateModel
+    property Util.SelectableDelegateModel selectionDelegateModel
     property real rowHeight: VLCStyle.tableRow_height
     readonly property int _contextButtonHorizontalSpace: VLCStyle.icon_normal
     property int horizontalSpacing: VLCStyle.column_margin_width
@@ -110,8 +110,8 @@ FocusScope {
 
     //forwarded from subview
     signal actionForSelection( var selection )
-    signal contextMenuButtonClicked(Item menuParent, var menuModel, var globalMousePos)
-    signal rightClick(Item menuParent, var menuModel, var globalMousePos)
+    signal contextMenuButtonClicked(Item menuParent, var menuModel, point globalMousePos)
+    signal rightClick(Item menuParent, var menuModel, point globalMousePos)
     signal itemDoubleClicked(var index, var model)
 
     // Settings

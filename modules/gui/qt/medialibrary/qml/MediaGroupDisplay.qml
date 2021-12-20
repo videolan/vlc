@@ -33,7 +33,7 @@ VideoAll {
     //---------------------------------------------------------------------------------------------
 
     property int    initialIndex: 0
-    property var    initialId
+    property MLItemId    initialId
     property string initialName
 
     //---------------------------------------------------------------------------------------------

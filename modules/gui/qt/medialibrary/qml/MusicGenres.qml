@@ -36,7 +36,7 @@ FocusScope {
 
     readonly property var currentIndex: _currentView.currentIndex
     //the index to "go to" when the view is loaded
-    property var initialIndex: 0
+    property int initialIndex: 0
 
     property alias _currentView: view.currentItem
 

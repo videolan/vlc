@@ -36,7 +36,7 @@ Rectangle {
     property bool _playlistReady: false
 
     property alias g_root: root
-    property var g_dialogs: dialogsLoader.item
+    property QtObject g_dialogs: dialogsLoader.item
 
     Binding {
         target: VLCStyle.self

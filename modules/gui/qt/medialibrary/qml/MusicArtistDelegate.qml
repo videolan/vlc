@@ -34,7 +34,7 @@ T.Control {
 
     // Properties
 
-    /* required */ property var mlModel
+    /* required */ property MLModel mlModel
 
     property bool isCurrent: false
 
@@ -45,9 +45,9 @@ T.Control {
 
     // Signals
 
-    signal itemClicked(variant mouse)
+    signal itemClicked(var mouse)
 
-    signal itemDoubleClicked(variant mouse)
+    signal itemDoubleClicked(var mouse)
 
     // Settings
 

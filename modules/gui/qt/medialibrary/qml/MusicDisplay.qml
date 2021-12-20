@@ -67,7 +67,7 @@ Widgets.PageLoader {
         History.push(["mc", "music", root.pageModel[index].name])
     }
 
-    property var tabModel: ListModel {
+    property ListModel tabModel: ListModel {
         Component.onCompleted: {
             pageModel.forEach(function(e) {
                 append({
