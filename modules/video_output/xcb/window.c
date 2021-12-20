@@ -539,15 +539,6 @@ static int Enable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
     xcb_window_t window = wnd->handle.xid;
 
     /* Set initial window state */
-    xcb_atom_t state[1];
-    uint32_t len = 0;
-
-    if (cfg->is_fullscreen)
-        state[len++] = sys->wm_state_fullscreen;
-
-    xcb_change_property (sys->conn, XCB_PROP_MODE_REPLACE, wnd->handle.xid,
-                         sys->wm_state, XA_ATOM, 32, len, state);
-
     if (cfg->is_decorated)
         xcb_delete_property(sys->conn, wnd->handle.xid, sys->motif_wm_hints);
     else
