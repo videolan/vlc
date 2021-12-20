@@ -173,8 +173,8 @@ T.Control {
             id: textInfoColumn
 
             Layout.fillWidth: true
+            Layout.fillHeight: true
             Layout.leftMargin: VLCStyle.margin_large
-            Layout.preferredHeight: artworkItem.height * 1.25
             spacing: 0
 
             Widgets.ListLabel {
@@ -186,6 +186,7 @@ T.Control {
                 font.weight: model.isCurrent ? Font.Bold : Font.DemiBold
                 text: model.title
                 color: colors.text
+                verticalAlignment: Text.AlignTop
             }
 
             Widgets.ListSubtitleLabel {
@@ -197,6 +198,7 @@ T.Control {
                 font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
                 text: (model.artist ? model.artist : I18n.qtr("Unknown Artist"))
                 color: colors.text
+                verticalAlignment: Text.AlignBottom
             }
         }
 
