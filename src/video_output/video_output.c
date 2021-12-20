@@ -2031,7 +2031,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
         var_SetString(vout, "window", "wdummy");
     }
 
-    sys->original.i_chroma = 0;
+    video_format_Init(&sys->original, 0);
     sys->source.dar.num = 0;
     sys->source.dar.den = 0;
     sys->source.crop.mode = VOUT_CROP_NONE;
