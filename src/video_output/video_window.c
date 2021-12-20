@@ -296,13 +296,21 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout)
         .cbs = &vout_display_window_cbs,
         .sys = state,
     };
+    vout_window_cfg_t cfg = {
+        .is_fullscreen = var_GetBool(&vout->obj, "fullscreen"),
+        .is_decorated = var_InheritBool(&vout->obj, "video-deco"),
+#if defined(__APPLE__) || defined(_WIN32)
+        .x = var_InheritInteger(&vout->obj, "video-x"),
+        .y = var_InheritInteger(&vout->obj, "video-y"),
+#endif
+    };
     vout_window_t *window;
 
     var_Create(vout, "window-state", VLC_VAR_INTEGER);
     var_Create(vout, "window-fullscreen", VLC_VAR_BOOL);
     var_Create(vout, "window-fullscreen-output", VLC_VAR_STRING);
 
-    window = vout_window_New((vlc_object_t *)vout, modlist, &owner, NULL);
+    window = vout_window_New((vlc_object_t *)vout, modlist, &owner, &cfg);
     free(modlist);
     if (window == NULL)
         free(state);
