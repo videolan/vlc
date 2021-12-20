@@ -46,9 +46,11 @@ vlc_fifo_New
 vlc_fifo_Release
 vlc_fifo_Show
 vlc_frame_Alloc
+vlc_frame_AttachAncillary
 vlc_frame_CopyProperties
 vlc_frame_File
 vlc_frame_FilePath
+vlc_frame_GetAncillary
 vlc_frame_heap_Alloc
 vlc_frame_Init
 vlc_frame_mmap_Alloc

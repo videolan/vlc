@@ -23,6 +23,9 @@
 #ifndef VLC_FRAME_H
 #define VLC_FRAME_H 1
 
+struct vlc_ancillary;
+typedef uint32_t vlc_ancillary_id;
+
 /**
  * \defgroup frame Frames
  * \ingroup input
@@ -131,6 +134,10 @@ struct vlc_frame_t
     vlc_tick_t  i_dts;
     vlc_tick_t  i_length;
 
+    /** Private ancillary struct. Don't use it directly, but use it via
+     * vlc_frame_AttachAncillary() and vlc_frame_GetAncillary(). */
+    struct vlc_ancillary **priv_ancillaries;
+
     const struct vlc_frame_callbacks *cbs;
 };
 
@@ -205,9 +212,38 @@ VLC_API vlc_frame_t *vlc_frame_Realloc(vlc_frame_t *, ssize_t pre, size_t body) 
 VLC_API void vlc_frame_Release(vlc_frame_t *frame);
 
 /**
+ * Attach an ancillary to the frame
+ *
+ * @warning the ancillary will be released only if the frame is allocated from
+ * a vlc_frame Alloc function (vlc_frame_Alloc(), vlc_frame_mmap_Alloc()...).
+ *
+ * @note Several ancillaries can be attached to a frame, but if two ancillaries
+ * are identified by the same ID, only the last one take precedence.
+ *
+ * @param frame the frame to attach an ancillary
+ * @param ancillary ancillary that will be held by the frame, can't be NULL
+ * @return VLC_SUCCESS in case of success, VLC_ENOMEM in case of alloc error
+ */
+VLC_API int
+vlc_frame_AttachAncillary(vlc_frame_t *frame, struct vlc_ancillary *ancillary);
+
+/**
+ * Return the ancillary identified by an ID
+ *
+ * @param id id of ancillary to request
+ * @return the ancillary or NULL if the ancillary for that particular id is
+ * not present
+ */
+VLC_API struct vlc_ancillary *
+vlc_frame_GetAncillary(vlc_frame_t *frame, vlc_ancillary_id id);
+
+/**
  * Copy frame properties from src to dst
  *
  * Copy i_flags, i_nb_samples, i_dts, i_pts, and i_length.
+ *
+ * @note if src has an ancillary, the ancillary will be copied and refcounted
+ * to dst.
  *
  * @param dst the frame to copy properties into
  * @param src the frame to copy properties from
