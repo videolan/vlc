@@ -86,7 +86,7 @@ namespace adaptive
         };
         BufferingStatus bufferize(Times, vlc_tick_t, vlc_tick_t,
                                   vlc_tick_t, bool = false);
-        BufferingStatus getLastBufferStatus() const;
+        BufferingStatus getBufferAndStatus(const Times &, vlc_tick_t, vlc_tick_t, vlc_tick_t *);
         Times getDemuxedAmount(Times) const;
         Status dequeue(Times, Times *);
         bool decodersDrained();

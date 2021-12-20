@@ -349,14 +349,38 @@ bool AbstractStream::decodersDrained()
     return fakeEsOut()->decodersDrained();
 }
 
-AbstractStream::BufferingStatus AbstractStream::getLastBufferStatus() const
-{
-    return last_buffer_status;
-}
-
 Times AbstractStream::getDemuxedAmount(Times from) const
 {
     return fakeEsOut()->commandsQueue()->getDemuxedAmount(from);
+}
+
+AbstractStream::BufferingStatus
+AbstractStream::getBufferAndStatus(const Times &deadline,
+                                   vlc_tick_t i_min_buffering,
+                                   vlc_tick_t i_max_buffering,
+                                   vlc_tick_t *pi_demuxed)
+{
+    if(last_buffer_status == BufferingStatus::End)
+        return BufferingStatus::End;
+    *pi_demuxed = getDemuxedAmount(deadline).continuous;
+    bool b_contiguous = isContiguousMux();
+
+    if(!b_contiguous &&
+       prevTimeContext.media != VLC_TICK_INVALID &&
+       deadline.segment.media != VLC_TICK_INVALID)
+    {
+        if(prevTimeContext.media - deadline.segment.media > *pi_demuxed)
+            *pi_demuxed = prevTimeContext.media - deadline.segment.media;
+    }
+
+    if(*pi_demuxed < i_max_buffering) /* need to read more */
+    {
+        if(*pi_demuxed < i_min_buffering)
+            return BufferingStatus::Lessthanmin; /* high prio */
+        return BufferingStatus::Ongoing;
+    }
+
+    return BufferingStatus::Full;
 }
 
 AbstractStream::BufferingStatus AbstractStream::bufferize(Times deadline,
