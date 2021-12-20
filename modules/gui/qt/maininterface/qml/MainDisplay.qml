@@ -320,11 +320,27 @@ FocusScope {
                             }
                         ]
 
+                        Rectangle {
+                            id: playlistLeftBorder
+
+                            anchors.top: parent.top
+                            anchors.bottom: parent.bottom
+                            anchors.left: parent.left
+
+                            width: VLCStyle.border
+                            color: VLCStyle.colors.border
+                        }
 
                         PL.PlaylistListView {
                             id: playlist
 
-                            anchors.fill: parent
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                                left: playlistLeftBorder.right
+                                right: parent.right
+                            }
+
                             focus: true
 
                             rightPadding: VLCStyle.applicationHorizontalMargin
@@ -341,17 +357,6 @@ FocusScope {
                             Navigation.cancelAction: function() {
                                 MainCtx.playlistVisible = false
                                 stackView.forceActiveFocus()
-                            }
-
-                            Rectangle {
-                                // id: playlistLeftBorder
-
-                                anchors.top: parent.top
-                                anchors.bottom: parent.bottom
-                                anchors.left: parent.left
-
-                                width: VLCStyle.border
-                                color: VLCStyle.colors.border
                             }
 
                             Widgets.HorizontalResizeHandle {
