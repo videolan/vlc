@@ -65,6 +65,7 @@ namespace adaptive
                 SegmentGap,
                 RepresentationSwitch,
                 RepresentationUpdated,
+                RepresentationUpdateFailed,
                 FormatChange,
                 SegmentChange,
                 BufferingStateUpdate,
@@ -114,6 +115,15 @@ namespace adaptive
         public:
             RepresentationUpdatedEvent(BaseRepresentation *);
             virtual ~RepresentationUpdatedEvent() = default;
+
+            BaseRepresentation *rep;
+    };
+
+    class RepresentationUpdateFailedEvent : public TrackerEvent
+    {
+        public:
+            RepresentationUpdateFailedEvent(BaseRepresentation *);
+            virtual ~RepresentationUpdateFailedEvent() = default;
 
             BaseRepresentation *rep;
     };

@@ -70,6 +70,7 @@ namespace adaptive
                 virtual bool        needsIndex              () const;
                 virtual bool        runLocalUpdates         (SharedResources *);
                 virtual void        scheduleNextUpdate      (uint64_t, bool);
+                virtual bool        canNoLongerUpdate       () const;
 
                 virtual void        debug                   (vlc_object_t *,int = 0) const;
 
