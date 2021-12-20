@@ -30,6 +30,10 @@ aout_FiltersPlay
 aout_FiltersAdjustResampling
 aout_Hold
 aout_Release
+vlc_ancillary_CreateWithFreeCb
+vlc_ancillary_Release
+vlc_ancillary_Hold
+vlc_ancillary_GetData
 vlc_audio_meter_Init
 vlc_audio_meter_Destroy
 vlc_audio_meter_Reset
