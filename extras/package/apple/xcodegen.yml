@@ -83,6 +83,7 @@ targets:
             lipo -create \
                 -output "${FRAMEWORK_BIN_PATH}" \
                 "${INPUT_FILES[@]}"
+            dsymutil -o "${FRAMEWORK_DIR}.dSYM" "${FRAMEWORK_BIN_PATH}"
 
   vlccore:
     type: "framework"
@@ -107,6 +108,12 @@ targets:
                 echo " + Adding input $input_file"
                 INPUT_FILES+=( "$input_file" )
             done
+            FRAMEWORK_DIR="${BUILT_PRODUCTS_DIR}/vlccore.framework"
+            FRAMEWORK_BIN_PATH="${FRAMEWORK_DIR}/vlccore"
             lipo -create \
-                -output "${BUILT_PRODUCTS_DIR}/vlccore.framework/vlccore" \
+                -output "${FRAMEWORK_BIN_PATH}" \
                 "${INPUT_FILES[@]}"
+            # We have to generate dSYM bundle here because Xcode might
+            # already have generated them before script execution
+            dsymutil -o "${FRAMEWORK_DIR}.dSYM" "${FRAMEWORK_BIN_PATH}"
+
