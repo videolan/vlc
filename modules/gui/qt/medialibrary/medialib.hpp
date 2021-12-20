@@ -93,8 +93,6 @@ public:
     vlc_ml_event_callback_t* registerEventListener(void (*callback)(void*, const vlc_ml_event_t*), void* data);
     void unregisterEventListener(vlc_ml_event_callback_t*);
 
-    QThreadPool &threadPool() { return m_threadPool; }
-
     /**
      * this function allows to run lambdas on the ML thread,
      * this should be used to perform operation that requires to call vlc_ml_xxx functions
@@ -218,7 +216,6 @@ private:
     vlc_medialibrary_t* m_ml;
     std::unique_ptr<vlc_ml_event_callback_t, std::function<void(vlc_ml_event_callback_t*)>> m_event_cb;
 
-    QThreadPool m_threadPool;
     MLThreadPool m_mlThreadPool;
 
     /* run on ml thread properties */

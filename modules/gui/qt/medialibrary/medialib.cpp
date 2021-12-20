@@ -37,7 +37,6 @@ MediaLib::MediaLib(qt_intf_t *_intf, QObject *_parent)
                                                       this ) );
 
     /* https://xkcd.com/221/ */
-    m_threadPool.setMaxThreadCount(4);
     m_mlThreadPool.setMaxThreadCount(4);
 }
 
