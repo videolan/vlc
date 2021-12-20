@@ -315,17 +315,13 @@ static void vout_UpdateWindowSizeLocked(vout_thread_sys_t *vout)
     vout_thread_sys_t *sys = vout;
     unsigned width, height;
 
+    if (unlikely(sys->original.i_chroma == 0))
+        return; /* not started yet, postpone size computaton */
+
     vlc_mutex_assert(&sys->window_lock);
-
-    vlc_mutex_lock(&sys->display_lock);
-    if (sys->display != NULL) {
-        vout_SizeWindow(vout, &sys->original, &width, &height);
-        vlc_mutex_unlock(&sys->display_lock);
-
-        msg_Dbg(&vout->obj, "requested window size: %ux%u", width, height);
-        vout_window_SetSize(sys->display_cfg.window, width, height);
-    } else
-        vlc_mutex_unlock(&sys->display_lock);
+    vout_SizeWindow(vout, &sys->original, &width, &height);
+    msg_Dbg(&vout->obj, "requested window size: %ux%u", width, height);
+    vout_window_SetSize(sys->display_cfg.window, width, height);
 }
 
 /* */
