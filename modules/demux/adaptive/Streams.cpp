@@ -142,6 +142,10 @@ bool AbstractStream::resetForNewPosition(vlc_tick_t seekMediaTime)
     eof = false;
     demuxfirstchunk = true;
     notfound_sequence = 0;
+    last_buffer_status = BufferingStatus::Lessthanmin;
+    inrestart = false;
+    needrestart = false;
+    discontinuity = false;
     if(!demuxer || demuxer->needsRestartOnSeek()) /* needs (re)start */
     {
         delete currentChunk;
