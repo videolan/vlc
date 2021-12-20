@@ -124,6 +124,7 @@ static inline int jaro_inner(const char *a, const char *b, size_t *ret_prefix_cc
         }
         a_char++;
     }
+    free(b_consumed);
 
     if (matches == 0) {
         *res = 0.0;
