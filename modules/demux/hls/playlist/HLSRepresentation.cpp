@@ -135,9 +135,11 @@ bool HLSRepresentation::needsUpdate(uint64_t number) const
     {
         const mtime_t now = mdate();
         const mtime_t elapsed = now - lastUpdateTime;
-        const mtime_t duration = targetDuration
-                                  ? CLOCK_FREQ * targetDuration
-                                  : CLOCK_FREQ * 2;
+        mtime_t duration = targetDuration
+                         ? CLOCK_FREQ * targetDuration
+                         : CLOCK_FREQ * 2;
+        if(updateFailureCount)
+            duration /= 2;
         if(elapsed < duration)
             return false;
 
