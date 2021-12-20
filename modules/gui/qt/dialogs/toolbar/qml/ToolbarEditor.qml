@@ -24,6 +24,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/" as Util
 
 Rectangle{
     id: root
@@ -269,75 +270,14 @@ Rectangle{
         x: -1
         y: -1
 
-        onXChanged: {
-            if (Drag.active)
-                handleScroll(this)
+        Drag.onActiveChanged: {
+            dragAutoScrollHandler.dragItem = Drag.active ? this : null
         }
     }
 
-    function handleScroll(dragItem) {
-        var view = _viewThatContainsDrag
+    Util.ViewDragAutoScrollHandler {
+        id: dragAutoScrollHandler
 
-        if (view === undefined || view === null) {
-            if (!!scrollAnimation.target)
-                view = scrollAnimation.target
-            else
-                return
-        }
-
-        var dragItemX = dragItem.x
-        var viewPos   = view.mapToItem(root, view.x, view.y)
-
-        var margin = VLCStyle.dp(25, VLCStyle.scale)
-
-        var leftMark  = (viewPos.x + margin)
-        var rightMark = (viewPos.x + view.width - margin)
-
-        scrollAnimation.target = view
-        scrollAnimation.dragItem = dragItem
-
-        if (!view.contains(view.mapFromItem(root, dragItemX, dragItem.y))) {
-            scrollAnimation.direction = 0
-        } else {
-            if (!view.atXBeginning && dragItemX <= leftMark) {
-                scrollAnimation.direction = -1
-            } else if (!view.atXEnd && dragItemX >= rightMark) {
-                scrollAnimation.direction = 1
-            } else {
-                scrollAnimation.direction = 0
-            }
-        }
-    }
-
-    SmoothedAnimation {
-        id: scrollAnimation
-
-        property var dragItem
-        property int direction: 0 // -1: left, 0: stop, 1: right
-
-        onDirectionChanged: {
-            if (direction === 0)
-                stop()
-        }
-
-        to: {
-            if (direction === -1)
-                0
-            else if (direction === 1 && !!target)
-                target.contentWidth - target.width + target.footerItem.width
-            else
-                0
-        }
-
-        running: {
-            if (!!dragItem && (direction === -1 || direction === 1))
-                dragItem.Drag.active
-            else
-                false
-        }
-
-        property: "contentX"
-        velocity: VLCStyle.dp(150, VLCStyle.scale)
-        reversingMode: SmoothedAnimation.Immediate
+        view: _viewThatContainsDrag ? _viewThatContainsDrag : null
     }
 }

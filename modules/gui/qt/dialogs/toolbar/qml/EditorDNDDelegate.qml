@@ -56,11 +56,13 @@ Control {
 
         drag.onActiveChanged: {
             if (drag.active) {
+                dragAutoScrollHandler.dragItem = loader
                 root.dragStarted(controlId)
                 removeInfoRectVisible = true
                 drag.target.Drag.start()
 
             } else {
+                dragAutoScrollHandler.dragItem = null
                 drag.target.Drag.drop()
                 removeInfoRectVisible = false
                 root.dragStopped(controlId)
@@ -153,11 +155,6 @@ Control {
             source: PlayerControlbarControls.control(model.id).source
 
             Drag.source: control
-
-            onXChanged: {
-                if (Drag.active)
-                    root.handleScroll(this)
-            }
 
             onLoaded: {
                 item.paintOnly = true

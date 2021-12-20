@@ -127,7 +127,7 @@ GridView {
 
         drag.onActiveChanged: {
             if (drag.active) {
-                root.dragStarted(mIndex)
+                dragStarted(mIndex)
 
                 buttonDragItem.text = PlayerControlbarControls.controlList[model.index].label
                 buttonDragItem.Drag.source = this
@@ -137,7 +137,7 @@ GridView {
             } else {
                 buttonDragItem.Drag.drop()
 
-                root.dragStopped(mIndex)
+                dragStopped(mIndex)
 
                 GridView.delayRemove = false
             }
