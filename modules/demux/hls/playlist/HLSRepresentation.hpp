@@ -51,14 +51,16 @@ namespace hls
                 virtual bool needsUpdate(uint64_t) const override;
                 virtual void debug(vlc_object_t *, int) const override;
                 virtual bool runLocalUpdates(SharedResources *) override;
+                virtual bool canNoLongerUpdate() const override;
 
                 virtual uint64_t translateSegmentNumber(uint64_t, const BaseRepresentation *) const override;
 
             private:
+                static const unsigned MAX_UPDATE_FAILED_UPDATE_COUNT = 3;
                 StreamFormat streamFormat;
                 bool b_live;
                 bool b_loaded;
-                bool b_failed;
+                unsigned updateFailureCount;
                 mtime_t lastUpdateTime;
                 time_t targetDuration;
                 Url playlistUrl;
