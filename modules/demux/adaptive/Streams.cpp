@@ -834,6 +834,13 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
         }
             break;
 
+        case TrackerEvent::Type::RepresentationUpdateFailed:
+        {
+            fakeEsOut()->commandsQueue()->setEOF(true);
+            msg_Err(p_realdemux, "Could not update %s anymore, disabling", description.c_str());
+        }
+            break;
+
         case TrackerEvent::Type::SegmentChange:
         {
             const SegmentChangedEvent &event =

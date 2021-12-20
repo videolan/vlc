@@ -141,6 +141,11 @@ void BaseRepresentation::scheduleNextUpdate(uint64_t, bool)
 
 }
 
+bool BaseRepresentation::canNoLongerUpdate() const
+{
+    return false;
+}
+
 void BaseRepresentation::pruneByPlaybackTime(vlc_tick_t time)
 {
     uint64_t num;

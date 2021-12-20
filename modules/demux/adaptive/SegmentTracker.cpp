@@ -79,6 +79,12 @@ RepresentationUpdatedEvent::RepresentationUpdatedEvent(BaseRepresentation * rep)
     this->rep = rep;
 }
 
+RepresentationUpdateFailedEvent::RepresentationUpdateFailedEvent(BaseRepresentation * rep)
+    : TrackerEvent(Type::RepresentationUpdateFailed)
+{
+    this->rep = rep;
+}
+
 FormatChangedEvent::FormatChangedEvent(const StreamFormat *f)
     : TrackerEvent(Type::FormatChange)
 {
@@ -610,6 +616,9 @@ void SegmentTracker::updateSelected()
         if(b_updated)
             notify(RepresentationUpdatedEvent(current.rep));
     }
+
+    if(current.rep && current.rep->canNoLongerUpdate())
+        notify(RepresentationUpdateFailedEvent(current.rep));
 }
 
 void SegmentTracker::notify(const TrackerEvent &event) const
