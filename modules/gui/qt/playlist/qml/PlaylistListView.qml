@@ -162,45 +162,6 @@ Control {
                 return {"title": item.title, "cover": item.artwork}
             }))
         }
-
-        property int _scrollingDirection: 0
-
-        onYChanged: {
-            var dragItemY = dragItem.y
-            var viewY     = root.mapFromItem(listView, listView.x, listView.y).y
-
-            var margin = VLCStyle.dp(20, VLCStyle.scale)
-
-            var topDiff    = (viewY + margin) - dragItemY
-            var bottomDiff = dragItemY - (viewY + listView.height - toolbar.height - margin)
-
-            if (topDiff > 0)
-                _scrollingDirection = -1
-            else if (bottomDiff > 0)
-                _scrollingDirection = 1
-            else
-                _scrollingDirection = 0
-        }
-
-        SmoothedAnimation {
-            id: upAnimation
-            target: listView
-            property: "contentY"
-            to: 0
-            running: dragItem._scrollingDirection === -1 && dragItem.visible && !target.listView.atYBeginning
-
-            velocity: VLCStyle.dp(225, VLCStyle.scale)
-        }
-
-        SmoothedAnimation {
-            id: downAnimation
-            target: listView
-            property: "contentY"
-            to: target.contentHeight - target.height + target.footerItem.height
-            running: dragItem._scrollingDirection === 1 && dragItem.visible && !target.listView.atYEnd
-
-            velocity: VLCStyle.dp(225, VLCStyle.scale)
-        }
     }
 
     PlaylistContextMenu {
@@ -328,13 +289,10 @@ Control {
                 playlistId: MainCtx.mainPlaylist
             }
 
+            dragAutoScrollDragItem: dragItem
+
             fadeColor: background.usingAcrylic ? undefined
                                                : background.alternativeColor
-
-            Binding on fadeColor {
-                when: downAnimation.running || upAnimation.running
-                value: undefined
-            }
 
             property int shiftIndex: -1
 

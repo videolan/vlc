@@ -22,6 +22,7 @@ import QtGraphicalEffects 1.0
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
+import "qrc:///util/" as Util
 import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///util/" as Util
 
@@ -98,6 +99,10 @@ FocusScope {
 
     property alias buttonLeft: buttonLeft
     property alias buttonRight: buttonRight
+
+    property alias dragAutoScrollDragItem: dragAutoScrollHandler.dragItem
+    property alias dragAutoScrollMargin: dragAutoScrollHandler.margin
+    property alias dragAutoScrolling: dragAutoScrollHandler.scrolling
 
     // Signals
 
@@ -287,6 +292,12 @@ FocusScope {
             }
         }
 
+        Util.ViewDragAutoScrollHandler {
+            id: dragAutoScrollHandler
+
+            view: view
+        }
+
         // NOTE: We always want a valid 'currentIndex' by default.
         onCountChanged: if (count && currentIndex === -1) currentIndex = 0
 
@@ -399,7 +410,8 @@ FocusScope {
             readonly property bool requestShow: !view.firstVisibleItem ||
                                                 (!view.firstVisibleItem.activeFocus &&
                                                  // TODO: Qt >5.12 use HoverHandler within the fade:
-                                                 !Helpers.get(view.firstVisibleItem, "hovered", false))
+                                                 !Helpers.get(view.firstVisibleItem, "hovered", false)) &&
+                                                (dragAutoScrollHandler.scrollingDirection !== Util.ViewDragAutoScrollHandler.Backward)
 
             state: (!!listview_id.fadeColor &&
                     view._fadeRectEnoughSize &&
@@ -473,7 +485,8 @@ FocusScope {
             readonly property bool requestShow: !view.lastVisibleItem ||
                                                 (!view.lastVisibleItem.activeFocus &&
                                                  // TODO: Qt >5.12 use HoverHandler within the fade:
-                                                 !Helpers.get(view.lastVisibleItem, "hovered", false))
+                                                 !Helpers.get(view.lastVisibleItem, "hovered", false)) &&
+                                                (dragAutoScrollHandler.scrollingDirection !== Util.ViewDragAutoScrollHandler.Forward)
 
             state: (!!listview_id.fadeColor &&
                     view._fadeRectEnoughSize &&

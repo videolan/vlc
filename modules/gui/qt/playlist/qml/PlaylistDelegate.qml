@@ -272,7 +272,7 @@ T.Control {
                 // FIXME: Override dragItem's position
                 var pos = mapToItem(dragItem.parent, mouseX, mouseY)
                 dragItem.x = pos.x + VLCStyle.dp(15)
-                dragItem.y = pos.y // y should be changed after x
+                dragItem.y = pos.y
             }
         }
     }
