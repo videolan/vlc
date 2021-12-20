@@ -830,6 +830,13 @@ void AbstractStream::trackerEvent(const TrackerEvent &ev)
         }
             break;
 
+        case TrackerEvent::Type::RepresentationUpdated:
+        {
+            if(last_buffer_status == BufferingStatus::Suspended)
+                last_buffer_status = BufferingStatus::Lessthanmin;
+        }
+            break;
+
         case TrackerEvent::Type::SegmentChange:
         {
             const SegmentChangedEvent &event =
