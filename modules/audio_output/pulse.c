@@ -962,8 +962,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
                                    cvolume, NULL) < 0
      || stream_wait(s, sys->mainloop)) {
         if (encoding != PA_ENCODING_PCM)
-            vlc_pa_error(aout, "digital pass-through stream connection failure",
-                         sys->context);
+            msg_Dbg(aout, "digital pass-through not available");
         else
             vlc_pa_error(aout, "stream connection failure", sys->context);
         goto fail;
