@@ -2185,6 +2185,8 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     }
 
     vlc_mutex_lock(&sys->window_lock);
+    video_format_Clean(&sys->original);
+    sys->original = original;
     vout_InitSource(vout);
 
     if (EnableWindowLocked(vout, &original) != 0)
@@ -2202,9 +2204,6 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
         vout_StopDisplay(cfg->vout);
 
     vout_ReinitInterlacingSupport(cfg->vout, &sys->private);
-
-    video_format_Clean(&sys->original);
-    sys->original = original;
 
     sys->delay = 0;
     sys->rate = 1.f;
