@@ -135,9 +135,11 @@ bool HLSRepresentation::needsUpdate(uint64_t number) const
     {
         const vlc_tick_t now = vlc_tick_now();
         const vlc_tick_t elapsed = now - lastUpdateTime;
-        const vlc_tick_t duration = targetDuration
-                                  ? vlc_tick_from_sec(targetDuration)
-                                  : VLC_TICK_FROM_SEC(2);
+        vlc_tick_t duration = targetDuration
+                            ? vlc_tick_from_sec(targetDuration)
+                            : VLC_TICK_FROM_SEC(2);
+        if(updateFailureCount)
+            duration /= 2;
         if(elapsed < duration)
             return false;
 
