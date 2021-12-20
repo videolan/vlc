@@ -64,6 +64,7 @@ namespace adaptive
                 Discontinuity,
                 SegmentGap,
                 RepresentationSwitch,
+                RepresentationUpdated,
                 FormatChange,
                 SegmentChange,
                 BufferingStateUpdate,
@@ -106,6 +107,15 @@ namespace adaptive
 
             BaseRepresentation *prev;
             BaseRepresentation *next;
+    };
+
+    class RepresentationUpdatedEvent : public TrackerEvent
+    {
+        public:
+            RepresentationUpdatedEvent(BaseRepresentation *);
+            virtual ~RepresentationUpdatedEvent() = default;
+
+            BaseRepresentation *rep;
     };
 
     class FormatChangedEvent : public TrackerEvent
