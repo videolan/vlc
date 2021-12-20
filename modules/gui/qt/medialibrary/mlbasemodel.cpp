@@ -48,7 +48,7 @@ void MLBaseModel::sortByColumn(QByteArray name, Qt::SortOrder order)
 {
     m_sort_desc = (order == Qt::SortOrder::DescendingOrder);
     m_sort = nameToCriteria(name);
-    clear();
+    resetCache();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -169,7 +169,7 @@ QVariant MLBaseModel::data(const QModelIndex &index, int role) const
 
 void MLBaseModel::onResetRequested()
 {
-    clear();
+    invalidateCache();
 }
 
 void MLBaseModel::onLocalSizeAboutToBeChanged(size_t size)
@@ -183,14 +183,6 @@ void MLBaseModel::onLocalSizeChanged(size_t size)
     (void) size;
     endResetModel();
     emit countChanged(size);
-}
-
-void MLBaseModel::onLocalDataChanged(size_t offset, size_t count)
-{
-    assert(count);
-    auto first = index(offset);
-    auto last = index(offset + count - 1);
-    emit dataChanged(first, last);
 }
 
 void MLBaseModel::onVlcMlEvent(const MLEvent &event)
@@ -268,14 +260,14 @@ MLItemId MLBaseModel::parentId() const
 void MLBaseModel::setParentId(MLItemId parentId)
 {
     m_parent = parentId;
-    clear();
+    invalidateCache();
     emit parentIdChanged();
 }
 
 void MLBaseModel::unsetParentId()
 {
     m_parent = MLItemId();
-    clear();
+    invalidateCache();
     emit parentIdChanged();
 }
 
@@ -305,7 +297,7 @@ void MLBaseModel::setSearchPattern( const QString& pattern )
         return;
 
     m_search_pattern = patternToApply;
-    clear();
+    invalidateCache();
 }
 
 Qt::SortOrder MLBaseModel::getSortOrder() const
@@ -316,7 +308,7 @@ Qt::SortOrder MLBaseModel::getSortOrder() const
 void MLBaseModel::setSortOder(Qt::SortOrder order)
 {
     m_sort_desc = (order == Qt::SortOrder::DescendingOrder);
-    clear();
+    resetCache();
     emit sortOrderChanged();
 }
 
@@ -328,14 +320,14 @@ const QString MLBaseModel::getSortCriteria() const
 void MLBaseModel::setSortCriteria(const QString& criteria)
 {
     m_sort = nameToCriteria(criteria.toUtf8());
-    clear();
+    resetCache();
     emit sortCriteriaChanged();
 }
 
 void MLBaseModel::unsetSortCriteria()
 {
     m_sort = VLC_ML_SORTING_DEFAULT;
-    clear();
+    resetCache();
     emit sortCriteriaChanged();
 }
 
@@ -347,14 +339,6 @@ int MLBaseModel::rowCount(const QModelIndex &parent) const
     validateCache();
 
     return m_cache->count();
-}
-
-void MLBaseModel::clear()
-{
-    beginResetModel();
-    invalidateCache();
-    endResetModel();
-    emit countChanged( static_cast<unsigned int>(0) );
 }
 
 QVariant MLBaseModel::getIdForIndex(QVariant index) const
@@ -417,26 +401,78 @@ unsigned MLBaseModel::getCount() const
     return static_cast<unsigned>(m_cache->count());
 }
 
+
+void MLBaseModel::onCacheDataChanged(int first, int last)
+{
+    emit dataChanged(index(first), index(last));
+}
+
+void MLBaseModel::onCacheBeginInsertRows(int first, int last)
+{
+    emit beginInsertRows({}, first, last);
+}
+
+void MLBaseModel::onCacheBeginRemoveRows(int first, int last)
+{
+    emit beginRemoveRows({}, first, last);
+}
+
+void MLBaseModel::onCacheBeginMoveRows(int first, int last, int destination)
+{
+    emit beginMoveRows({}, first, last, {}, destination);
+}
+
 void MLBaseModel::validateCache() const
 {
     if (m_cache)
         return;
 
+    if (!m_mediaLib)
+        return;
+
     auto loader = createLoader();
-    m_cache.reset(new MLListCache(m_mediaLib, loader.release()));
-    connect(&*m_cache, &MLListCache::localSizeAboutToBeChanged,
+    m_cache = std::make_unique<MLListCache>(m_mediaLib, std::move(loader));
+    connect(m_cache.get(), &MLListCache::localSizeAboutToBeChanged,
             this, &MLBaseModel::onLocalSizeAboutToBeChanged);
-    connect(&*m_cache, &MLListCache::localSizeChanged,
+    connect(m_cache.get(), &MLListCache::localSizeChanged,
             this, &MLBaseModel::onLocalSizeChanged);
-    connect(&*m_cache, &MLListCache::localDataChanged,
-            this, &MLBaseModel::onLocalDataChanged);
+
+    connect(m_cache.get(), &MLListCache::localDataChanged,
+            this, &MLBaseModel::onCacheDataChanged);
+
+    connect(m_cache.get(), &MLListCache::beginInsertRows,
+            this, &MLBaseModel::onCacheBeginInsertRows);
+    connect(m_cache.get(), &MLListCache::endInsertRows,
+            this, &MLBaseModel::endInsertRows);
+
+    connect(m_cache.get(), &MLListCache::beginRemoveRows,
+            this, &MLBaseModel::onCacheBeginRemoveRows);
+    connect(m_cache.get(), &MLListCache::endRemoveRows,
+            this, &MLBaseModel::endRemoveRows);
+
+    connect(m_cache.get(), &MLListCache::endMoveRows,
+            this, &MLBaseModel::endMoveRows);
+    connect(m_cache.get(), &MLListCache::beginMoveRows,
+            this, &MLBaseModel::onCacheBeginMoveRows);
 
     m_cache->initCount();
 }
 
+
+void MLBaseModel::resetCache()
+{
+    beginResetModel();
+    m_cache.reset();
+    endResetModel();
+    validateCache();
+}
+
 void MLBaseModel::invalidateCache()
 {
-    m_cache.reset();
+    if (m_cache)
+        m_cache->invalidate();
+    else
+        validateCache();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -445,9 +481,12 @@ MLItem *MLBaseModel::item(int signedidx) const
 {
     validateCache();
 
+    if (!m_cache)
+        return nullptr;
+
     ssize_t count = m_cache->count();
 
-    if (count == COUNT_UNINITIALIZED || signedidx < 0 || signedidx >= count)
+    if (count == 0 || signedidx < 0 || signedidx >= count)
         return nullptr;
 
     unsigned int idx = static_cast<unsigned int>(signedidx);
@@ -467,6 +506,9 @@ MLItem *MLBaseModel::item(int signedidx) const
 MLItem *MLBaseModel::itemCache(int signedidx) const
 {
     unsigned int idx = static_cast<unsigned int>(signedidx);
+
+    if (!m_cache)
+        return nullptr;
 
     const std::unique_ptr<MLItem> *item = m_cache->get(idx);
 
@@ -514,13 +556,7 @@ void MLBaseModel::updateItemInCache(const MLItemId& mlid)
         if (!ctx.item)
             return;
 
-        int row = m_cache->updateItem(std::move(ctx.item));
-        if (row != -1)
-        {
-            //notify every roles
-            emit dataChanged(index(row), index(row));
-        }
-        //otherwise don't notify, it will be updated when the cache reload the corresponding segment
+        m_cache->updateItem(std::move(ctx.item));
     });
 }
 
@@ -531,17 +567,7 @@ void MLBaseModel::deleteItemInCache(const MLItemId& mlid)
         emit resetRequested();
         return;
     }
-    int row = m_cache->deleteItem(mlid);
-    if (row < 0)
-    {
-        // items isn't in cache, we don't know if it's before or after our cache, request a reset
-        emit resetRequested();
-    }
-    else
-    {
-        beginRemoveRows({}, row, row);
-        endRemoveRows();
-    }
+    m_cache->deleteItem(mlid);
 }
 
 //-------------------------------------------------------------------------------------------------

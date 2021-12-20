@@ -91,13 +91,11 @@ protected slots:
     void onResetRequested();
     void onLocalSizeAboutToBeChanged(size_t size);
     void onLocalSizeChanged(size_t size);
-    void onLocalDataChanged(size_t index, size_t count);
 
 private:
     static void onVlcMlEvent( void* data, const vlc_ml_event_t* event );
 
 protected:
-    virtual void clear();
     virtual vlc_ml_sorting_criteria_t roleToCriteria(int role) const = 0;
     static QString getFirstSymbol(QString str);
     virtual vlc_ml_sorting_criteria_t nameToCriteria(QByteArray) const {
@@ -109,6 +107,7 @@ protected:
     }
 
     void validateCache() const;
+    void resetCache();
     void invalidateCache();
 
     MLItem *item(int signedidx) const;
@@ -169,6 +168,12 @@ public:
 
     int rowCount(const QModelIndex &parent = {}) const override;
     virtual unsigned int getCount() const;
+
+private:
+    void onCacheDataChanged(int first, int last);
+    void onCacheBeginInsertRows(int first, int last);
+    void onCacheBeginRemoveRows(int first, int last);
+    void onCacheBeginMoveRows(int first, int last, int destination);
 
 protected:
     MLItemId m_parent;

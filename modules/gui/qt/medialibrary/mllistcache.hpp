@@ -72,12 +72,43 @@ struct MLRange
     {
     }
 
-    bool isEmpty() {
+    MLRange(const MLRange& other)
+        : offset(other.offset)
+        , count(other.count)
+    {}
+
+    MLRange& operator=(const MLRange& other)
+    {
+        offset = other.offset;
+        count = other.count;
+        return *this;
+    }
+
+    bool isEmpty() const {
         return count == 0;
     }
 
-    bool contains(size_t index) {
+    bool contains(size_t index) const {
         return index >= offset && index < offset + count;
+    }
+
+    void reset()
+    {
+        offset = 0;
+        count = 0;
+    }
+
+    ///returns the overlapping range of the current range and @a other
+    MLRange overlap(const MLRange& other) const
+    {
+        if (isEmpty() || other.isEmpty())
+            return MLRange{};
+        if (contains(other.offset))
+            return MLRange(other.offset, (offset + count) - other.offset);
+        else if (other.contains(offset))
+            return MLRange(offset, (other.offset + other.count) - offset);
+        else
+            return MLRange{};
     }
 };
 
@@ -87,14 +118,12 @@ class MLListCache : public QObject
 
 public:
     typedef std::unique_ptr<MLItem> ItemType;
+
 public:
     static constexpr ssize_t COUNT_UNINITIALIZED = -1;
 
-    MLListCache(MediaLib* medialib, ListCacheLoader<ItemType> *loader,
-              size_t chunkSize = 100)
-        : m_medialib(medialib)
-        , m_loader(loader)
-        , m_chunkSize(chunkSize) {}
+    MLListCache(MediaLib* medialib, std::unique_ptr<ListCacheLoader<ItemType>>&& loader,
+              size_t chunkSize = 100);
 
     /**
      * Return the item at specified index
@@ -147,16 +176,30 @@ public:
      */
     void refer(size_t index);
 
-signals:
-    /* useful for signaling QAbstractItemModel::modelAboutToBeReset() */
-    void localSizeAboutToBeChanged(size_t size);
+    /*
+     * reload
+     */
+    void invalidate();
 
+signals:
+    void localSizeAboutToBeChanged(size_t size);
     void localSizeChanged(size_t size);
-    void localDataChanged(size_t index, size_t count);
+
+    void localDataChanged(int sourceFirst, int sourceLast);
+
+    void beginInsertRows(int sourceFirst, int sourceLast);
+    void endInsertRows();
+
+    void beginRemoveRows(int sourceFirst, int sourceLast);
+    void endRemoveRows();
+
+    void beginMoveRows(int sourceFirst, int sourceLast, int destination);
+    void endMoveRows();
 
 private:
-    void asyncLoad(size_t offset, size_t count);
-    void asyncCount();
+    void asyncFetchMore();
+    void asyncCountAndLoad();
+    void partialUpdate();
 
     MediaLib* m_medialib = nullptr;
 
@@ -165,15 +208,37 @@ private:
     QSharedPointer<ListCacheLoader<ItemType>> m_loader;
     size_t m_chunkSize;
 
-    std::vector<ItemType> m_list;
-    ssize_t m_total_count = COUNT_UNINITIALIZED;
-    size_t m_offset = 0;
+    //highest index requested by the view (1 based, 0 is nothing referenced)
+    size_t m_maxReferedIndex = 0;
 
-    bool m_countRequested = false;
-    MLRange m_lastRangeRequested;
+    bool m_needReload = false;
 
-    uint64_t m_loadTask = 0;
+    uint64_t m_appendTask = 0;
     uint64_t m_countTask = 0;
+
+    struct CacheData {
+        explicit CacheData(std::vector<ItemType>&& list_, size_t totalCount_)
+            : list(std::move(list_))
+            , totalCount(totalCount_)
+        {
+            loadedCount = list.size();
+        }
+
+        std::vector<ItemType> list;
+        size_t totalCount = 0;
+        size_t loadedCount = 0;
+    };
+
+    std::unique_ptr<CacheData> m_cachedData;
+    std::unique_ptr<CacheData> m_oldData;
+
+    MLRange m_rangeRequested;
+
+
+    //access the list while it's being updated
+    size_t m_partialIndex = 0;
+    size_t m_partialX = 0;
+    size_t m_partialLoadedCount = 0;
 };
 
 #endif

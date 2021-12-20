@@ -17,147 +17,403 @@
  *****************************************************************************/
 
 #include "mllistcache.hpp"
+#include "vlc_diffutil.h"
+
+namespace {
+
+//callbacks for the diff algorithm to access the data
+
+uint32_t cacheDataLength(const void* data)
+{
+    auto list = static_cast<const std::vector<MLListCache::ItemType>*>(data);
+    assert(list);
+    return list->size();
+}
+
+bool cacheDataCompare(const void* dataOld, uint32_t oldIndex, const void* dataNew,  uint32_t newIndex)
+{
+    auto listOld = static_cast<const std::vector<MLListCache::ItemType>*>(dataOld);
+    auto listNew = static_cast<const std::vector<MLListCache::ItemType>*>(dataNew);
+    assert(listOld);
+    assert(listNew);
+    assert(oldIndex < listOld->size());
+    assert(newIndex < listNew->size());
+    return listOld->at(oldIndex)->getId() == listNew->at(newIndex)->getId();
+}
+
+}
+
+MLListCache::MLListCache(MediaLib* medialib, std::unique_ptr<ListCacheLoader<MLListCache::ItemType>>&& loader, size_t chunkSize)
+    : m_medialib(medialib)
+    , m_loader(loader.release())
+    , m_chunkSize(chunkSize)
+{
+    assert(medialib);
+}
 
 const MLListCache::ItemType* MLListCache::get(size_t index) const
 {
-    assert(m_total_count >= 0 && index < static_cast<size_t>(m_total_count));
-    if (index < m_offset || index >= m_offset + m_list.size())
+    //the view may access the model while we're updating it
+    //everything before m_partialIndex is updated in the new model,
+    //everything after m_partialIndex is still valid in the old model
+    if (unlikely(m_oldData))
+    {
+        if (m_cachedData)
+        {
+            if (index >= m_partialLoadedCount)
+                return nullptr;
+            else if (index >= m_partialIndex)
+                return &m_oldData->list.at(index - m_partialIndex + m_partialX);
+            else
+                return &m_cachedData->list.at(index);
+        }
+        else
+        {
+            if (index >= m_oldData->loadedCount)
+                return nullptr;
+
+            return &m_oldData->list.at(index);
+        }
+    }
+
+    if (!m_cachedData)
         return nullptr;
 
-    return &m_list[index - m_offset];
+    if (index + 1 > m_cachedData->loadedCount)
+        return nullptr;
+
+    return &m_cachedData->list.at(index);
 }
 
 const MLListCache::ItemType* MLListCache::find(const std::function<bool (const MLListCache::ItemType&)> &&f, int *index) const
 {
-    if (m_total_count <= 0)
+
+    if (!m_cachedData || m_cachedData->totalCount == 0)
         return nullptr;
 
-    for (auto iter = std::begin(m_list); iter != std::end(m_list); ++iter)
-    {
-        if (f(*iter))
-        {
-            if (index)
-                *index = m_offset + std::distance(std::begin(m_list), iter);
+    auto it = std::find_if(m_cachedData->list.cbegin(), m_cachedData->list.cend(), f);
+    if (it == m_cachedData->list.cend())
+        return nullptr;
 
-            return &(*iter);
-        }
-    }
+    if (index)
+        *index = std::distance(m_cachedData->list.cbegin(), it);
 
-    return nullptr;
+    return &(*it);
 }
 
 int MLListCache::updateItem(std::unique_ptr<MLItem>&& newItem)
 {
+    //we can't update an item locally while the model has pending updates
+    //no worry, we'll receive the update once the actual model notifies us
+    if (m_oldData)
+        return -1;
+
     MLItemId mlid = newItem->getId();
-    auto it = std::find_if(m_list.begin(), m_list.end(), [mlid](const ItemType& item) {
+    //this may be inneficient to look at every items, maybe we can have a hashmap to access the items by id
+    auto it = std::find_if(m_cachedData->list.begin(), m_cachedData->list.end(), [mlid](const ItemType& item) {
         return (item->getId() == mlid);
     });
     //item not found
-    if (it == m_list.end())
+    if (it == m_cachedData->list.end())
         return -1;
 
-    int pos = m_offset + std::distance(m_list.begin(), it);
+    int pos = std::distance(m_cachedData->list.begin(), it);
     *it = std::move(newItem);
+    emit localDataChanged(pos, pos);
     return pos;
 }
 
 int MLListCache::deleteItem(const MLItemId& mlid)
 {
-    auto it = std::find_if(m_list.begin(), m_list.end(), [mlid](const ItemType& item) {
+    //we can't update an item locally while the model has pending updates
+    //no worry, we'll receive the update once the actual model notifies us
+    if (m_oldData)
+        return -1;
+
+    auto it = std::find_if(m_cachedData->list.begin(), m_cachedData->list.end(), [mlid](const ItemType& item) {
         return (item->getId() == mlid);
     });
+
     //item not found
-    if (it == m_list.end())
+    if (it == m_cachedData->list.end())
         return -1;
-    int pos = m_offset + std::distance(m_list.begin(), it);
-    m_list.erase(it, it);
-    m_total_count -= 1;
+
+    int pos = std::distance(m_cachedData->list.begin(), it);
+
+    emit beginRemoveRows(pos, pos);
+    m_cachedData->list.erase(it, it+1);
+    size_t delta = m_cachedData->loadedCount - m_cachedData->list.size();
+    m_cachedData->loadedCount -= delta;
+    m_cachedData->totalCount -= delta;
+    emit endRemoveRows();
+    emit localSizeChanged(m_cachedData->totalCount);
+
     return pos;
 }
 
 ssize_t MLListCache::count() const
 {
-    return m_total_count;
+    if (!m_cachedData)
+        return -1;
+    return m_cachedData->totalCount;
 }
 
 void MLListCache::initCount()
 {
-    assert(!m_countRequested);
-    asyncCount();
+    assert(!m_cachedData);
+    asyncCountAndLoad();
 }
 
 void MLListCache::refer(size_t index)
 {
-    if (m_total_count == -1 || index >= static_cast<size_t>(m_total_count))
-    {
-        /*
-         * The request is incompatible with the total count of the list.
-         *
-         * Either the count is not retrieved yet, or the content has changed in
-         * the loader source.
-         */
-        return;
-    }
+    //m_maxReferedIndex is in terms of number of item, not the index
+    index++;
 
-    /* index outside the known portion of the list */
-    if (!m_lastRangeRequested.contains(index))
+    if (!m_cachedData)
+        return;
+
+    if (index > m_cachedData->totalCount)
+        return;
+
+   /* index is already in the list */
+    if (index <= m_cachedData->loadedCount)
+        return;
+
+    if (index > m_maxReferedIndex)
     {
-        /* FIXME bad heuristic if the interval of visible items crosses a cache
-         * page boundary */
-        size_t offset = index - index % m_chunkSize;
-        size_t count = qMin(m_total_count - offset, m_chunkSize);
-        asyncLoad(offset, count);
+        m_maxReferedIndex = index;
+        if (!m_appendTask && !m_countTask)
+        {
+            if (m_cachedData)
+                asyncFetchMore();
+            else
+                asyncCountAndLoad();
+        }
     }
 }
 
-void MLListCache::asyncCount()
+void MLListCache::invalidate()
 {
-    assert(!m_countTask);
-
-    m_countRequested = true;
-    struct Ctx {
-        ssize_t totalCount;
-    };
-    m_medialib->runOnMLThread<Ctx>(this,
-        //ML thread
-        [loader = m_loader](vlc_medialibrary_t* ml, Ctx& ctx)
+    if (m_cachedData)
+    {
+        if (m_cachedData && !m_oldData)
         {
+            m_oldData = std::move(m_cachedData);
+            m_partialX = 0;
+        }
+        else
+            m_cachedData.reset();
+    }
+
+    if (m_appendTask)
+    {
+        m_medialib->cancelMLTask(this, m_appendTask);
+        m_appendTask = 0;
+    }
+
+    if (m_countTask)
+    {
+        m_needReload = true;
+    }
+    else
+    {
+        asyncCountAndLoad();
+    }
+}
+
+void MLListCache::partialUpdate()
+{
+    //compare the model the user have and the updated model
+    //and notify for changes
+
+    vlc_diffutil_callback_t diffOp = {
+        cacheDataLength,
+        cacheDataLength,
+        cacheDataCompare
+    };
+
+    diffutil_snake_t* snake = vlc_diffutil_build_snake(&diffOp, &m_oldData->list, &m_cachedData->list);
+    vlc_diffutil_changelist_t* changes = vlc_diffutil_build_change_list(
+        snake, &diffOp, &m_oldData->list, &m_cachedData->list,
+        VLC_DIFFUTIL_RESULT_AGGREGATE);
+
+    m_partialIndex = 0;
+    m_partialLoadedCount = m_oldData->loadedCount;
+    size_t partialTotalCount = m_oldData->totalCount;
+    for (size_t i = 0; i < changes->size; i++)
+    {
+        vlc_diffutil_change_t& op = changes->data[i];
+        switch (op.type)
+        {
+        case VLC_DIFFUTIL_OP_IGNORE:
+            break;
+        case VLC_DIFFUTIL_OP_INSERT:
+            m_partialX = op.op.insert.x;
+            m_partialIndex = op.op.insert.index;
+            emit beginInsertRows(op.op.insert.index, op.op.insert.index + op.count - 1);
+            m_partialIndex += op.count;
+            m_partialLoadedCount += op.count;
+            partialTotalCount += op.count;
+            emit endInsertRows();
+            emit localSizeChanged(partialTotalCount);
+            break;
+        case VLC_DIFFUTIL_OP_REMOVE:
+            m_partialX = op.op.remove.x;
+            m_partialIndex = op.op.remove.index + op.count - 1;
+            emit beginRemoveRows(op.op.remove.index, op.op.remove.index + op.count - 1);
+            m_partialLoadedCount -= op.count;
+            m_partialX += op.count;
+            m_partialIndex = op.op.remove.index + 1;
+            partialTotalCount -= op.count;
+            emit endRemoveRows();
+            emit localSizeChanged(partialTotalCount);
+            break;
+        case VLC_DIFFUTIL_OP_MOVE:
+            emit beginMoveRows(op.op.move.from, op.op.move.from + op.count - 1, op.op.move.to);
+            //TODO
+            emit endMoveRows();
+            break;
+        }
+    }
+    vlc_diffutil_free_change_list(changes);
+    vlc_diffutil_free_snake(snake);
+
+    //ditch old model
+    m_oldData.reset();
+
+    //if we have change outside our cache
+    //just notify for addition/removal at a the end of the list
+    if (partialTotalCount != m_cachedData->totalCount)
+    {
+        if (partialTotalCount > m_cachedData->totalCount)
+        {
+            emit beginRemoveRows(m_cachedData->totalCount - 1, partialTotalCount - 1);
+            emit endRemoveRows();
+            emit localSizeChanged(m_cachedData->totalCount);
+        }
+        else
+        {
+            emit beginInsertRows(partialTotalCount - 1, m_cachedData->totalCount - 1);
+            emit endInsertRows();
+            emit localSizeChanged(m_cachedData->totalCount);
+        }
+    }
+}
+
+void MLListCache::asyncCountAndLoad()
+{
+    if (m_countTask)
+        m_medialib->cancelMLTask(this, m_countTask);
+
+    size_t count = std::max(m_maxReferedIndex, m_chunkSize);
+
+    struct Ctx {
+        size_t totalCount;
+        std::vector<ItemType> list;
+    };
+
+    m_countTask = m_medialib->runOnMLThread<Ctx>(this,
+        //ML thread
+        [loader = m_loader, count = count](vlc_medialibrary_t* ml, Ctx& ctx)
+        {
+            ctx.list = loader->load(ml, 0, count);
             ctx.totalCount = loader->count(ml);
         },
         //UI thread
-        [this](quint64, Ctx& ctx){
-            m_total_count = ctx.totalCount;
+        [this](quint64 taskId, Ctx& ctx)
+        {
+            if (m_countTask != taskId)
+                return;
+
+            //quite unlikley but model may change between count and load
+            if (unlikely(ctx.list.size() > ctx.totalCount))
+            {
+                ctx.totalCount = ctx.list.size();
+                m_needReload = true;
+            }
+
+            m_cachedData = std::make_unique<CacheData>(std::move(ctx.list), ctx.totalCount);
+
+            if (m_oldData)
+            {
+                partialUpdate();
+            }
+            else
+            {
+                if (m_cachedData->totalCount > 0)
+                {
+                    //no previous data, we insert everything
+                    emit beginInsertRows(0, m_cachedData->totalCount - 1);
+                    emit endInsertRows();
+                    emit localSizeChanged(m_cachedData->totalCount);
+                }
+            }
+
             m_countTask = 0;
-            emit localSizeChanged(m_total_count);
+            if (m_needReload)
+            {
+                m_needReload  = false;
+                m_oldData = std::move(m_cachedData);
+                m_partialX = 0;
+                asyncCountAndLoad();
+            }
+            else if (m_maxReferedIndex < m_cachedData->loadedCount)
+            {
+                m_maxReferedIndex = m_cachedData->loadedCount;
+            }
+            else if (m_maxReferedIndex > m_cachedData->loadedCount
+                && m_maxReferedIndex <= m_cachedData->totalCount)
+            {
+                asyncFetchMore();
+            }
         }
     );
 }
 
-void MLListCache::asyncLoad(size_t offset, size_t count)
+void MLListCache::asyncFetchMore()
 {
-    if (m_loadTask)
-        m_medialib->cancelMLTask(this, m_loadTask);
+    if (m_maxReferedIndex <= m_cachedData->loadedCount)
+        return;
 
-    m_lastRangeRequested = { offset, count };
+    assert(m_cachedData);
+    if (m_appendTask)
+        m_medialib->cancelMLTask(this, m_appendTask);
+
+    m_maxReferedIndex = std::min(m_cachedData->totalCount, m_maxReferedIndex);
+    size_t count = ((m_maxReferedIndex - m_cachedData->loadedCount) / m_chunkSize + 1 ) * m_chunkSize;
+
     struct Ctx {
         std::vector<ItemType> list;
     };
-    m_loadTask = m_medialib->runOnMLThread<Ctx>(this,
+    m_appendTask = m_medialib->runOnMLThread<Ctx>(this,
         //ML thread
-        [loader = m_loader, offset, count]
+        [loader = m_loader, offset = m_cachedData->loadedCount, count]
         (vlc_medialibrary_t* ml, Ctx& ctx)
         {
             ctx.list = loader->load(ml, offset, count);
         },
         //UI thread
-        [this, offset](quint64, Ctx& ctx)
+        [this](quint64 taskId, Ctx& ctx)
         {
-            m_loadTask = 0;
+            if (taskId != m_appendTask)
+                return;
 
-            m_offset = offset;
-            m_list = std::move(ctx.list);
-            if (m_list.size())
-                emit localDataChanged(offset, m_list.size());
+            assert(m_cachedData);
+
+            int updatedCount = ctx.list.size();
+            if (updatedCount >= 0)
+            {
+                int updatedOffset = m_cachedData->loadedCount;
+                std::move(ctx.list.begin(), ctx.list.end(), std::back_inserter(m_cachedData->list));
+                m_cachedData->loadedCount += updatedCount;
+                emit localDataChanged(updatedOffset, updatedOffset + updatedCount - 1);
+            }
+
+            m_appendTask = 0;
+            if (m_maxReferedIndex > m_cachedData->loadedCount)
+            {
+                asyncFetchMore();
+            }
         }
     );
 }
