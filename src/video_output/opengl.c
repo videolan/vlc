@@ -226,7 +226,7 @@ vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
     };
     char *modlist = var_InheritString(obj, "window");
 
-    vout_window_t *surface = vout_window_New(obj, modlist, &owner);
+    vout_window_t *surface = vout_window_New(obj, modlist, &owner, cfg);
     free(modlist);
     if (surface == NULL)
         goto error;

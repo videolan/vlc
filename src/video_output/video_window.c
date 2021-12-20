@@ -302,7 +302,7 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout)
     var_Create(vout, "window-fullscreen", VLC_VAR_BOOL);
     var_Create(vout, "window-fullscreen-output", VLC_VAR_STRING);
 
-    window = vout_window_New((vlc_object_t *)vout, modlist, &owner);
+    window = vout_window_New((vlc_object_t *)vout, modlist, &owner, NULL);
     free(modlist);
     if (window == NULL)
         free(state);

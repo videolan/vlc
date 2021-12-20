@@ -216,7 +216,7 @@ static vout_window_t *video_splitter_CreateWindow(vlc_object_t *obj,
     vout_display_GetDefaultDisplaySize(&cfg.width, &cfg.height, source,
                                        vdcfg);
 
-    vout_window_t *window = vout_window_New(obj, NULL, &owner);
+    vout_window_t *window = vout_window_New(obj, NULL, &owner, &cfg);
     if (window != NULL) {
         if (vout_window_Enable(window, &cfg)) {
             vout_window_Delete(window);

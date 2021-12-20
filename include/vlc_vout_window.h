@@ -425,11 +425,13 @@ typedef struct vout_window_t {
  * \param obj parent VLC object
  * \param module plugin name, NULL for default
  * \param owner callbacks and private data
+ * \param cfg initial window configuration, NULL for defaults
  * \return a new window, or NULL on error.
  */
 VLC_API vout_window_t *vout_window_New(vlc_object_t *obj,
                                        const char *module,
-                                       const vout_window_owner_t *owner);
+                                       const vout_window_owner_t *owner,
+                                       const vout_window_cfg_t *cfg);
 
 /**
  * Deletes a window.

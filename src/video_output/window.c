@@ -64,7 +64,8 @@ static int vout_window_start(void *func, bool forced, va_list ap)
 }
 
 vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
-                               const vout_window_owner_t *owner)
+                               const vout_window_owner_t *owner,
+                               const vout_window_cfg_t *restrict cfg)
 {
     window_t *w = vlc_custom_create(obj, sizeof(*w), "window");
     vout_window_t *window = &w->wnd;
@@ -103,6 +104,18 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
         w->inhibit = inh;
         vlc_mutex_unlock(&w->lock);
     }
+
+    /* Apply initial configuration */
+    if (cfg != NULL) {
+        if (cfg->is_fullscreen)
+            vout_window_SetFullScreen(window, NULL);
+        if (cfg->width != 0 && cfg->height != 0)
+            vout_window_SetSize(window, cfg->width, cfg->height);
+
+        /* This will be applied whence the window is enabled. */
+        w->cfg.is_decorated = cfg->is_decorated;
+    }
+
     return window;
 }
 
