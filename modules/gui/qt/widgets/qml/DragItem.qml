@@ -162,9 +162,6 @@ Item {
 
     on_ActiveChanged: {
         if (_active) {
-            if (_indexesSize < 1)
-                return
-
             dragItem._currentRequest += 1
             dragItem.requestData(dragItem._currentRequest)
 
