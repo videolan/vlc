@@ -28,6 +28,7 @@
         <file alias="Helpers.js">util/qml/Helpers.js</file>
         <file alias="MultipleBinding.qml">util/qml/MultipleBinding.qml</file>
         <file alias="FlickableScrollHandler.qml">util/qml/FlickableScrollHandler.qml</file>
+        <file alias="ViewDragAutoScrollHandler.qml">util/qml/ViewDragAutoScrollHandler.qml</file>
     </qresource>
     <qresource prefix="/toolbar">
         <file alias="faster.svg">pixmaps/faster.svg</file>
