@@ -318,6 +318,10 @@ static int Open( vlc_object_t* p_this )
         case LIBSSH2_HOSTKEY_TYPE_ECDSA_521:
             knownhost_fingerprint_algo = LIBSSH2_KNOWNHOST_KEY_ECDSA_521;
             break;
+
+        case LIBSSH2_HOSTKEY_TYPE_ED25519:
+            knownhost_fingerprint_algo = LIBSSH2_KNOWNHOST_KEY_ED25519;
+            break;
 #endif
         default:
             msg_Err( p_access, "Host uses unrecognized session-key algorithm" );
