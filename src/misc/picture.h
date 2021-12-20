@@ -22,6 +22,7 @@
 #include <stddef.h>
 
 #include <vlc_picture.h>
+struct vlc_ancillary;
 
 typedef struct
 {
@@ -31,6 +32,10 @@ typedef struct
         void (*destroy)(picture_t *);
         void *opaque;
     } gc;
+
+    /** Private ancillary struct. Don't use it directly, but use it via
+     * picture_AttachAncillary() and picture_GetAncillary(). */
+    struct vlc_ancillary **ancillaries;
 } picture_priv_t;
 
 void *picture_Allocate(int *, size_t);

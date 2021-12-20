@@ -315,6 +315,7 @@ net_Read
 net_SetCSCov
 net_Write
 NTPtime64
+picture_AttachAncillary
 picture_BlendSubpicture
 picture_Clone
 picture_CopyPixels
@@ -328,6 +329,7 @@ picture_fifo_New
 picture_fifo_IsEmpty
 picture_fifo_Pop
 picture_fifo_Push
+picture_GetAncillary
 picture_New
 picture_NewFromFormat
 picture_NewFromResource

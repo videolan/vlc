@@ -28,6 +28,9 @@
 #include <assert.h>
 #include "vlc_atomic.h"
 
+struct vlc_ancillary;
+typedef uint32_t vlc_ancillary_id;
+
 /**
  * \file
  * This file defines picture structures and functions in vlc
@@ -418,6 +421,33 @@ VLC_API void picture_Copy( picture_t *p_dst, const picture_t *p_src );
  * \return A clone picture on success, NULL on error.
  */
 VLC_API picture_t *picture_Clone(picture_t *pic);
+
+/**
+ * Attach an ancillary to the picture
+ *
+ * @warning the ancillary will be released only if the picture is created from
+ * picture_New(), and picture_Clone().
+ *
+ * @note Several ancillaries can be attached to a picture, but if two
+ * ancillaries are identified by the same ID, only the last one take
+ * precedence.
+ *
+ * @param pic the picture to attach an ancillary
+ * @param ancillary ancillary that will be held by the frame, can't be NULL
+ * @return VLC_SUCCESS in case of success, VLC_ENOMEM in case of alloc error
+ */
+VLC_API int
+picture_AttachAncillary(picture_t *pic, struct vlc_ancillary *ancillary);
+
+/**
+ * Return the ancillary identified by an ID
+ *
+ * @param id id of ancillary to request
+ * @return the ancillary or NULL if the ancillary for that particular id is
+ * not present
+ */
+VLC_API struct vlc_ancillary *
+picture_GetAncillary(picture_t *pic, vlc_ancillary_id id);
 
 /**
  * This function will export a picture to an encoded bitstream.
