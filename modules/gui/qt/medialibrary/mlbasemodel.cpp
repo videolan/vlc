@@ -172,16 +172,8 @@ void MLBaseModel::onResetRequested()
     invalidateCache();
 }
 
-void MLBaseModel::onLocalSizeAboutToBeChanged(size_t size)
-{
-    (void) size;
-    beginResetModel();
-}
-
 void MLBaseModel::onLocalSizeChanged(size_t size)
 {
-    (void) size;
-    endResetModel();
     emit countChanged(size);
 }
 
@@ -432,8 +424,6 @@ void MLBaseModel::validateCache() const
 
     auto loader = createLoader();
     m_cache = std::make_unique<MLListCache>(m_mediaLib, std::move(loader));
-    connect(m_cache.get(), &MLListCache::localSizeAboutToBeChanged,
-            this, &MLBaseModel::onLocalSizeAboutToBeChanged);
     connect(m_cache.get(), &MLListCache::localSizeChanged,
             this, &MLBaseModel::onLocalSizeChanged);
 

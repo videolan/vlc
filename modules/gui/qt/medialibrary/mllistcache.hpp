@@ -182,7 +182,6 @@ public:
     void invalidate();
 
 signals:
-    void localSizeAboutToBeChanged(size_t size);
     void localSizeChanged(size_t size);
 
     void localDataChanged(int sourceFirst, int sourceLast);

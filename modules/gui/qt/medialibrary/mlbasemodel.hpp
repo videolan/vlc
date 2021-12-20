@@ -89,7 +89,6 @@ signals:
 
 protected slots:
     void onResetRequested();
-    void onLocalSizeAboutToBeChanged(size_t size);
     void onLocalSizeChanged(size_t size);
 
 private:
