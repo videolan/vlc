@@ -73,6 +73,12 @@ RepresentationSwitchEvent::RepresentationSwitchEvent(BaseRepresentation *prev,
     this->next = next;
 }
 
+RepresentationUpdatedEvent::RepresentationUpdatedEvent(BaseRepresentation * rep)
+    : TrackerEvent(Type::RepresentationUpdated)
+{
+    this->rep = rep;
+}
+
 FormatChangedEvent::FormatChangedEvent(const StreamFormat *f)
     : TrackerEvent(Type::FormatChange)
 {
@@ -452,17 +458,15 @@ bool SegmentTracker::setPositionByTime(mtime_t time, bool restarted, bool tryonl
     /* Stream might not have been loaded at all (HLS) or expired */
     if(pos.rep->needsUpdate(pos.number))
     {
-        if(pos.rep->runLocalUpdates(resources))
-        {
-            pos.rep->scheduleNextUpdate(pos.number, true);
-        }
-        else
+        if(!pos.rep->runLocalUpdates(resources))
         {
             msg_Err(adaptationSet->getPlaylist()->getVLCObject(),
                     "Failed to update Representation %s",
                     pos.rep->getID().str().c_str());
             return false;
         }
+        pos.rep->scheduleNextUpdate(pos.number, true);
+        notify(RepresentationUpdatedEvent(pos.rep));
     }
 
     if(pos.rep->getSegmentNumberByTime(time, &pos.number))
@@ -494,6 +498,8 @@ SegmentTracker::Position SegmentTracker::getStartPosition() const
         bool b_updated = pos.rep->needsUpdate(pos.number) && pos.rep->runLocalUpdates(resources);
         pos.number = bufferingLogic->getStartSegmentNumber(pos.rep);
         pos.rep->scheduleNextUpdate(pos.number, b_updated);
+        if(b_updated)
+            notify(RepresentationUpdatedEvent(pos.rep));
     }
     return pos;
 }
@@ -543,10 +549,13 @@ mtime_t SegmentTracker::getMinAheadTime() const
     if(rep)
     {
         /* Ensure ephemere content is updated/loaded */
-        rep->scheduleNextUpdate(next.number,
-                                rep->needsUpdate(next.number) &&
-                                rep->runLocalUpdates(resources));
-
+        if(rep->needsUpdate(next.number))
+        {
+            bool b_updated = rep->runLocalUpdates(resources);
+            rep->scheduleNextUpdate(next.number, b_updated);
+            if(b_updated)
+                notify(RepresentationUpdatedEvent(rep));
+        }
         uint64_t startnumber = current.number;
         if(startnumber == std::numeric_limits<uint64_t>::max())
             startnumber = bufferingLogic->getStartSegmentNumber(rep);
@@ -598,6 +607,8 @@ void SegmentTracker::updateSelected()
     {
         bool b_updated = current.rep->runLocalUpdates(resources);
         current.rep->scheduleNextUpdate(current.number, b_updated);
+        if(b_updated)
+            notify(RepresentationUpdatedEvent(current.rep));
     }
 }
 
