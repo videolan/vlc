@@ -101,6 +101,9 @@ static inline bool MPEG4_Codec_By_ObjectType(uint8_t oti,
             *pi_profile = PROFILE_DTS_EXPRESS;
             *pi_codec = VLC_CODEC_DTS;
             break;
+        case 0xad:
+            *pi_codec = VLC_CODEC_OPUS;
+            break;
         case 0xDD:
             *pi_codec = VLC_CODEC_VORBIS;
             break;
