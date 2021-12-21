@@ -515,9 +515,12 @@ vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
         return NULL;
     }
 
-    vout_rsc->started = true;
-    if (vout_state != NULL)
-        *vout_state = INPUT_RESOURCE_VOUT_STARTED;
+    if (!vout_rsc->started)
+    {
+        vout_rsc->started = true;
+        if (vout_state != NULL)
+            *vout_state = INPUT_RESOURCE_VOUT_STARTED;
+    }
 
     DisplayVoutTitle(p_resource, cfg->vout, &vout_rsc->psz_prev_title);
 
