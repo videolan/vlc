@@ -494,17 +494,6 @@ vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
         return dcfg.vout;
     }
 
-    if (vout_rsc->started)
-    {
-        assert(cfg->vout != NULL);
-        int ret = vout_ChangeSource(dcfg.vout, dcfg.fmt);
-        if (ret == 0)
-        {
-            vlc_mutex_unlock(&p_resource->lock);
-            return dcfg.vout;
-        }
-    }
-
     if (vout_Request(&dcfg, vctx, p_resource->p_input)) {
         if (vout_rsc->started && vout_state != NULL)
             *vout_state = INPUT_RESOURCE_VOUT_STOPPED;
