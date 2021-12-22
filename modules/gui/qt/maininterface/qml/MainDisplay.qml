@@ -116,7 +116,7 @@ FocusScope {
             name: "music",
             url: "qrc:///medialibrary/MusicDisplay.qml"
         }, {
-            listed: MainCtx.mediaLibraryAvailable,
+            listed: !MainCtx.mediaLibraryAvailable,
             displayText: I18n.qtr("Home"),
             icon: VLCIcons.home,
             name: "home",
