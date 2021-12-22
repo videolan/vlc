@@ -188,16 +188,14 @@ T.Control {
 
             height: parent.height
 
-            ContextButton {
+            Widgets.IconToolButton {
                 id: contextButton
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                color: background.foregroundColor
+                iconText: VLCIcons.ellipsis
 
-                backgroundColor: (hovered || activeFocus)
-                                 ? VLCStyle.colors.getBgColor(delegate.selected, hovered, activeFocus)
-                                 : "transparent"
+                size: VLCStyle.icon_medium
 
                 visible: delegate.hovered
 
