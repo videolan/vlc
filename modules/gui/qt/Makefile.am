@@ -855,7 +855,6 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/CaptionLabel.qml \
 	gui/qt/widgets/qml/CheckedDelegate.qml \
 	gui/qt/widgets/qml/ComboBoxExt.qml \
-	gui/qt/widgets/qml/ContextButton.qml \
 	gui/qt/widgets/qml/AcrylicBackground.qml \
 	gui/qt/widgets/qml/AnimatedBackground.qml \
 	gui/qt/widgets/qml/CoverShadow.qml \
