@@ -426,7 +426,7 @@ FocusScope {
             Navigation.cancelAction: root._onNavigationCancel
 
             onItemDoubleClicked: MediaLib.addAndPlay(model.id)
-            onContextMenuButtonClicked: trackContextMenu.popup(trackSelectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
+            onContextMenuButtonClicked: trackContextMenu.popup(trackSelectionModel.selectedIndexes, globalMousePos)
             onRightClick: trackContextMenu.popup(trackSelectionModel.selectedIndexes, globalMousePos)
 
             dragItem: Widgets.MLDragItem {

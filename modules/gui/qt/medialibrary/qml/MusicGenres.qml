@@ -267,7 +267,7 @@ FocusScope {
                 root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
             }
 
-            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
+            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
             onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
             Widgets.TableColumns {

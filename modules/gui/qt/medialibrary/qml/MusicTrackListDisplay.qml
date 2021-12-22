@@ -69,7 +69,7 @@ Widgets.KeyNavigableTableView {
 
     onActionForSelection:  MediaLib.addAndPlay(model.getIdsForIndexes( selection ))
     onItemDoubleClicked: MediaLib.addAndPlay(model.id)
-    onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
+    onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
     onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
     dragItem: Widgets.MLDragItem {

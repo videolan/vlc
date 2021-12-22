@@ -199,7 +199,8 @@ T.Control {
 
                 visible: delegate.hovered
 
-                onClicked: root.contextMenuButtonClicked(this, delegate.rowModel)
+                onClicked: root.contextMenuButtonClicked(this, delegate.rowModel
+                                                         , contextButton.mapToGlobal(VLCStyle.margin_xsmall, contextButton.height / 2 + VLCStyle.fontHeight_normal))
             }
         }
     }

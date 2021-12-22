@@ -110,7 +110,7 @@ FocusScope {
 
     //forwarded from subview
     signal actionForSelection( var selection )
-    signal contextMenuButtonClicked(Item menuParent, var menuModel)
+    signal contextMenuButtonClicked(Item menuParent, var menuModel, var globalMousePos)
     signal rightClick(Item menuParent, var menuModel, var globalMousePos)
     signal itemDoubleClicked(var index, var model)
 

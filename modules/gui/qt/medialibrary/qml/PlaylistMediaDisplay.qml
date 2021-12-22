@@ -194,7 +194,7 @@ FocusScope {
         // Events
 
         onContextMenuButtonClicked: contextMenu.popup(modelSelect.selectedIndexes,
-                                                      menuParent.mapToGlobal(0,0))
+                                                      globalMousePos)
 
         onRightClick: contextMenu.popup(modelSelect.selectedIndexes, globalMousePos)
 

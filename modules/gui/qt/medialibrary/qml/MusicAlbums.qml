@@ -237,7 +237,7 @@ FocusScope {
 
             Navigation.cancelAction: root._onNavigationCancel
 
-            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes,  menuParent.mapToGlobal(0,0))
+            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
             onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
             onItemDoubleClicked: MediaLib.addAndPlay( model.id )
 
