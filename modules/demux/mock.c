@@ -279,6 +279,7 @@ CreateTitle(demux_t *demux, size_t idx)
          && asprintf(&t->seekpoint[i]->psz_name, "Mock Chapter %zu-%zu", idx, i)
             == -1)
         {
+            t->seekpoint[i]->psz_name = NULL;
             vlc_input_title_Delete(t);
             return NULL;
         }
