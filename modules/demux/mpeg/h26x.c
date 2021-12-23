@@ -335,7 +335,7 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
 
     float f_fps = 0;
     char *psz_fpsvar;
-    if( asprintf( &psz_fpsvar, "%s-fps", psz_module ) )
+    if( asprintf( &psz_fpsvar, "%s-fps", psz_module ) != -1 )
     {
         f_fps = var_CreateGetFloat( p_demux, psz_fpsvar );
         free( psz_fpsvar );
