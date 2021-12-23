@@ -374,7 +374,7 @@ static int Retrieve( addons_finder_t *p_finder, addon_entry_t *p_entry )
     {
         /* Relative path */
         char *psz_uri;
-        if ( ! asprintf( &psz_uri, ADDONS_REPO_SCHEMEHOST"%s", psz_archive_uri ) )
+        if ( asprintf( &psz_uri, ADDONS_REPO_SCHEMEHOST"%s", psz_archive_uri ) == -1 )
         {
             free( psz_archive_uri );
             return VLC_ENOMEM;
