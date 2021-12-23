@@ -729,7 +729,7 @@ static void closeCurrentSegment( sout_access_out_t *p_access, sout_access_out_sy
         vlc_close( p_sys->i_handle );
         p_sys->i_handle = -1;
 
-        if( ! ( us_asprintf( &segment->psz_duration, "%.2f", secf_from_vlc_tick( p_sys->current_segment_length )) ) )
+        if( us_asprintf( &segment->psz_duration, "%.2f", secf_from_vlc_tick( p_sys->current_segment_length ) ) == -1 )
         {
             msg_Err( p_access, "Couldn't set duration on closed segment");
             return;
