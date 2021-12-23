@@ -568,7 +568,10 @@ static void* update_DownloadReal( void *obj )
     }
     psz_tmpdestfile++;
     if( asprintf( &psz_destfile, "%s%s", psz_destdir, psz_tmpdestfile ) == -1 )
+    {
+        psz_destfile = NULL;
         goto end;
+    }
 
     p_file = vlc_fopen( psz_destfile, "w" );
     if( !p_file )
