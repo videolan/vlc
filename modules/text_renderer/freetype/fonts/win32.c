@@ -655,7 +655,10 @@ int Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
             goto done;
 
         if( asprintf( &psz_linkname, "\xF0\x9F\x94\x97%s", psz_uniscribe ) < 0 )
+        {
+            psz_linkname = NULL;
             goto done;
+        }
 
         vlc_family_t *withlinked = NewFamily( fs, psz_linkname, NULL, NULL, NULL );
         if( withlinked )
