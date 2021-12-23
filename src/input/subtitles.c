@@ -191,10 +191,11 @@ static char **paths_to_list( const char *psz_dir, char *psz_path )
         if( *psz_subdir == '\0' )
             continue;
 
-        if( asprintf( &subdirs[i++], "%s%s",
+        if( asprintf( &subdirs[i], "%s%s",
                   psz_subdir[0] == '.' ? psz_dir : "",
                   psz_subdir ) == -1 )
             break;
+        i++;
     }
     subdirs[i] = NULL;
 
