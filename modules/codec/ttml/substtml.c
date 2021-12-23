@@ -775,7 +775,7 @@ static void BIDIConvert( text_segment_t *p_segment, int i_direction )
 
     char *psz_text = NULL;
     if( asprintf( &psz_text, "%s%s%s", p_bidi[i_direction].psz_uni_start,
-                  p_segment->psz_text, p_bidi[i_direction].psz_uni_end ) < 0 )
+                  p_segment->psz_text, p_bidi[i_direction].psz_uni_end ) != -1 )
     {
         free( p_segment->psz_text );
         p_segment->psz_text = psz_text;
