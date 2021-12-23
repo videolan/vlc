@@ -176,7 +176,10 @@ static void add_renderer( const char *psz_protocol, const char *psz_name,
         model = get_string_list_value( txt, "md" );
 
         if( asprintf( &uri, "%s://%s:%u", psz_protocol, psz_addr, i_port ) < 0 )
+        {
+            uri = NULL;
             goto error;
+        }
 
         extra_uri = renderer_flags & VLC_RENDERER_CAN_VIDEO ? NULL : "no-video";
         demux = "cc_demux";
