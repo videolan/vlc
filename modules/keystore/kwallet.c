@@ -236,7 +236,10 @@ key2values( char* psz_key, vlc_keystore_entry* p_entry )
         goto end;
     if ( url.i_port && asprintf( &p_entry->ppsz_values[KEY_PORT],
                                  "%d", url.i_port) == -1 )
+    {
+        p_entry->ppsz_values[KEY_PORT] = NULL;
         goto end;
+    }
     if ( url.psz_path && !( p_entry->ppsz_values[KEY_PATH] =
                             strdup( url.psz_path ) ) )
         goto end;
