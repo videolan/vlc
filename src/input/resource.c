@@ -208,8 +208,8 @@ static void DisplayVoutTitle( input_resource_t *p_resource,
             if( asprintf( &psz_string, "%s - %s", psz_name, psz_artist ) > 0 )
             {
                 VoutSetAndDeduplicateTitle( p_vout, &psz_string, ppsz_prev_title );
+                free( psz_string );
             }
-            free( psz_string );
         }
         else if( psz_name )
         {
