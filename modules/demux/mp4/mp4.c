@@ -2293,7 +2293,7 @@ static void LoadChapterGpac( demux_t  *p_demux, MP4_Box_t *p_chpl )
         s->psz_name = strdup( BOXDATA(p_chpl)->chapter[i].psz_name );
         if( s->psz_name == NULL)
         {
-            vlc_seekpoint_Delete( s );;
+            vlc_seekpoint_Delete( s );
             continue;
         }
 
@@ -2312,15 +2312,20 @@ static void LoadChapterGoPro( demux_t *p_demux, MP4_Box_t *p_hmmt )
         for( unsigned i = 0; i < BOXDATA(p_hmmt)->i_chapter_count; i++ )
         {
             seekpoint_t *s = vlc_seekpoint_New();
-            if( s )
-            {
-                if( asprintf( &s->psz_name, "HiLight tag #%u", i+1 ) != -1 )
-                    EnsureUTF8( s->psz_name );
+            if( s == NULL)
+                continue;
 
-                /* HiLights are stored in ms so we convert them to µs */
-                s->i_time_offset = VLC_TICK_FROM_MS( BOXDATA(p_hmmt)->pi_chapter_start[i] );
-                TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
+            if( asprintf( &s->psz_name, "HiLight tag #%u", i+1 ) == -1 )
+            {
+                s->psz_name = NULL;
+                vlc_seekpoint_Delete( s );
+                continue;
             }
+
+            EnsureUTF8( s->psz_name );
+            /* HiLights are stored in ms so we convert them to µs */
+            s->i_time_offset = VLC_TICK_FROM_MS( BOXDATA(p_hmmt)->pi_chapter_start[i] );
+            TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
         }
 }
 static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
