@@ -331,8 +331,9 @@ coverartarchive_t * coverartarchive_lookup_releasegroup(musicbrainz_config_t *cf
         return NULL;
 
     char *psz_url;
-    if(0 < asprintf(&psz_url, "https://%s/releasegroup/%s", cfg->psz_coverart_server, psz_id ))
+    if(asprintf(&psz_url, "https://%s/releasegroup/%s", cfg->psz_coverart_server, psz_id) < 0)
     {
+        free(c);
         return NULL;
     }
 
