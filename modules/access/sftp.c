@@ -475,6 +475,7 @@ static int Open( vlc_object_t* p_this )
     }
 
     /* No path, default to user Home */
+    char *base_url_tmp;
     if( !psz_path )
     {
         const size_t i_size = 1024;
@@ -500,11 +501,12 @@ static int Open( vlc_object_t* p_this )
         char *base = vlc_path2uri( psz_path, "sftp" );
         if( !base )
             goto error;
-        if( -1 == asprintf( &p_sys->psz_base_url, "sftp://%s%s", p_access->psz_location, base + 7 ) )
+        if( -1 == asprintf( &base_url_tmp, "sftp://%s%s", p_access->psz_location, base + 7 ) )
         {
             free( base );
             goto error;
         }
+        p_sys->psz_base_url = base_url_tmp;
         free( base );
     }
 
@@ -534,8 +536,9 @@ static int Open( vlc_object_t* p_this )
 
         if( !p_sys->psz_base_url )
         {
-            if( asprintf( &p_sys->psz_base_url, "sftp://%s", p_access->psz_location ) == -1 )
+            if( asprintf( &base_url_tmp, "sftp://%s", p_access->psz_location ) == -1 )
                 goto error;
+            p_sys->psz_base_url = base_url_tmp;
 
             /* trim trailing '/' */
             size_t len = strlen( p_sys->psz_base_url );
