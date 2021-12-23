@@ -661,10 +661,13 @@ void CacheSave(vlc_object_t *p_this, const char *dir,
     char *filename = NULL, *tmpname = NULL;
 
     if (asprintf (&filename, "%s"DIR_SEP CACHE_NAME, dir ) == -1)
-        goto out;
+        return;
 
     if (asprintf (&tmpname, "%s.%"PRIu32, filename, (uint32_t)getpid ()) == -1)
-        goto out;
+    {
+        free (filename);
+        return;
+    }
     msg_Dbg (p_this, "saving plugins cache %s", filename);
 
     FILE *file = vlc_fopen (tmpname, "wb");
