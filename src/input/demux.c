@@ -185,6 +185,8 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
             else
             if (likely(asprintf(&modbuf, "ext-%s", ext + 1) >= 0))
                 module = modbuf;
+            else
+                modbuf = NULL;
         }
         strict = false;
     }
