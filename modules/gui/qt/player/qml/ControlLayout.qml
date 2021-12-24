@@ -204,6 +204,9 @@ FocusScope {
                 }
 
                 function recoverFocus(_index) {
+                    if (!controlLayout.visible)
+                        return
+
                     if (_index === undefined)
                         _index = index
 
