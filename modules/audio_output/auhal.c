@@ -525,11 +525,19 @@ RebuildDeviceList(audio_output_t * p_aout, UInt32 *p_id_exists)
         CFArrayAppendValue(currentListOfDevices, deviceNumber);
         CFRelease(deviceNumber);
 
+        // TODO: only register once for each device
+        ManageAudioStreamsCallback(p_aout, i_id, true);
+
         if (AudioDeviceSupportsDigital(p_aout, i_id))
         {
             msg_Dbg(p_aout, "'%s' supports digital output", psz_name);
-            char *psz_encoded_name = nil;
-            asprintf(&psz_encoded_name, _("%s (Encoded Output)"), psz_name);
+            char *psz_encoded_name;
+            if( asprintf(&psz_encoded_name, _("%s (Encoded Output)"), psz_name) == -1 )
+            {
+                free(psz_name);
+                continue;
+            }
+
             i_id = i_id | AOUT_VAR_SPDIF_FLAG;
             ReportDevice(p_aout, i_id, psz_encoded_name);
             deviceNumber = CFNumberCreate(kCFAllocatorDefault,
@@ -542,10 +550,6 @@ RebuildDeviceList(audio_output_t * p_aout, UInt32 *p_id_exists)
             if (p_id_exists && i_id == i_id_exists)
                 *p_id_exists = i_id;
         }
-
-        // TODO: only register once for each device
-        ManageAudioStreamsCallback(p_aout, p_devices[i], true);
-
         free(psz_name);
     }
 
