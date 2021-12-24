@@ -75,7 +75,6 @@ FocusScope {
     Component.onCompleted: {
         visibleChanged.connect(_handleFocus)
         activeFocusChanged.connect(_handleFocus)
-        model.countChanged.connect(_handleFocus)
     }
 
     RowLayout {
@@ -143,8 +142,8 @@ FocusScope {
 
                 Component.onCompleted: {
                     repeater.countChanged.connect(loader.buildFocusChain)
-                    MainCtx.controlbarProfileModel.selectedProfileChanged.connect(loader.buildFocusChain)
-                    MainCtx.controlbarProfileModel.currentModel.dirtyChanged.connect(loader.buildFocusChain)
+                    repeater.modelChanged.connect(loader.buildFocusChain)
+                    repeater.countChanged.connect(controlLayout._handleFocus)
                 }
 
                 onActiveFocusChanged: {
