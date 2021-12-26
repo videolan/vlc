@@ -1,7 +1,7 @@
 /*****************************************************************************
  * upnp.cpp :  UPnP discovery module (libupnp)
  *****************************************************************************
- * Copyright (C) 2004-2018 VLC authors and VideoLAN
+ * Copyright (C) 2004-2021 VLC authors and VideoLAN
  *
  * Authors: Rémi Denis-Courmont (original plugin)
  *          Christian Henz <henz # c-lab.de>
@@ -9,6 +9,9 @@
  *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *          Shaleen Jain <shaleen@jain.sh>
  *          William Ung <william1.ung@epitech.eu>
+ *          Felix Paul Kühne <fkuehne # videolan.org>
+ *          Bastien Penavayre <swac31@gmail.com>
+ *          Andreas Krug <akrug@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -642,7 +645,7 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
 {
     SD::MediaServerDesc* p_server = NULL;
 
-    char *psz_satip_channellist = config_GetPsz("satip-channelist");
+    char *psz_satip_channellist = var_InheritString( m_sd, "satip-channelist");
 
     /* In Auto mode, default to MasterList list from satip.info */
     bool automode = false;
@@ -663,7 +666,7 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
 
     /* Part 1: a user may have provided a custom playlist url */
     if (strcmp(psz_satip_channellist, "CustomList") == 0) {
-        char *psz_satip_playlist_url = config_GetPsz( "satip-channellist-url" );
+        char *psz_satip_playlist_url = var_InheritString( m_sd, "satip-channellist-url" );
         if ( psz_satip_playlist_url ) {
             p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn, psz_friendly_name, psz_satip_playlist_url, iconUrl );
 
