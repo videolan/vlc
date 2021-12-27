@@ -257,7 +257,7 @@ T.Control {
         onClicked: {
             /* to receive keys events */
             listView.forceActiveFocus()
-            if (listView.mode === PlaylistListView.Mode.Move) {
+            if (root.mode === PlaylistListView.Mode.Move) {
                 var selectedIndexes = root.model.getSelection()
                 if (selectedIndexes.length === 0)
                     return
@@ -269,7 +269,7 @@ T.Control {
                 listView.currentIndex = selectedIndexes[0]
                 root.model.moveItemsPre(selectedIndexes, preTarget)
                 return
-            } else if (listView.mode === PlaylistListView.Mode.Select) {
+            } else if (root.mode === PlaylistListView.Mode.Select) {
             } else if (!(root.model.isSelected(index) && mouse.button === Qt.RightButton)) {
                 listView.updateSelection(mouse.modifiers, listView.currentIndex, index)
                 listView.currentIndex = index
@@ -280,7 +280,7 @@ T.Control {
         }
 
         onDoubleClicked: {
-            if (mouse.button !== Qt.RightButton && listView.mode === PlaylistListView.Mode.Normal)
+            if (mouse.button !== Qt.RightButton && root.mode === PlaylistListView.Mode.Normal)
                 mainPlaylistController.goTo(index, true)
         }
 

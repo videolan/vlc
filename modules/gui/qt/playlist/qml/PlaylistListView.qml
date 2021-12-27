@@ -47,6 +47,8 @@ Control {
 
     property VLCColors colors: VLCStyle.colors
 
+    property int mode: PlaylistListView.Mode.Normal
+
     enum Mode {
         Normal,
         Select, // Keyboard item selection mode, activated through PlaylistOverlayMenu
@@ -240,11 +242,11 @@ Control {
             }
 
             Widgets.CaptionLabel {
-                color: (listView.mode === PlaylistListView.Mode.Select || listView.mode === PlaylistListView.Mode.Move)
+                color: (root.mode === PlaylistListView.Mode.Select || root.mode === PlaylistListView.Mode.Move)
                        ? colors.accent : colors.caption
                 visible: model.count !== 0
                 text: {
-                    switch (listView.mode) {
+                    switch (root.mode) {
                     case PlaylistListView.Mode.Select:
                         return I18n.qtr("Selected tracks: %1").arg(model.selectedCount)
                     case PlaylistListView.Mode.Move:
@@ -338,7 +340,6 @@ Control {
                                                : background.alternativeColor
 
             property int shiftIndex: -1
-            property int mode: PlaylistListView.Mode.Normal
 
             signal setItemDropIndicatorVisible(int index, bool visible)
 
@@ -487,9 +488,9 @@ Control {
 
             onSelectAll: root.model.selectAll()
             onSelectionUpdated: {
-                if (listView.mode === PlaylistListView.Mode.Select) {
+                if (root.mode === PlaylistListView.Mode.Select) {
                     console.log("update selection select")
-                } else if (listView.mode === PlaylistListView.Mode.Move) {
+                } else if (root.mode === PlaylistListView.Mode.Move) {
                     var selectedIndexes = root.model.getSelection()
                     if (selectedIndexes.length === 0)
                         return
