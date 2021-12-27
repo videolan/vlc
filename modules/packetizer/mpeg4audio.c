@@ -1101,7 +1101,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
     return i_accumulated;
 
 truncated:
-    msg_Warn(p_dec,"Truncated LAOS packet. Wrong format ?");
+    msg_Warn(p_dec,"Truncated LOAS packet. Wrong format ?");
     return 0;
 }
 
