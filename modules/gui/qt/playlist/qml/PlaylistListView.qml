@@ -283,7 +283,7 @@ Control {
             Layout.leftMargin: VLCStyle.margin_normal
             Layout.rightMargin: Math.max(listView.scrollBarWidth, VLCStyle.margin_normal)
 
-            spacing: 0
+            spacing: VLCStyle.margin_large
 
             Widgets.IconLabel {
                 Layout.preferredWidth: VLCStyle.icon_normal
@@ -296,7 +296,6 @@ Control {
 
             Widgets.CaptionLabel {
                 Layout.fillWidth: true
-                Layout.leftMargin: VLCStyle.margin_large
 
                 verticalAlignment: Text.AlignVCenter
                 text: I18n.qtr("Title")
