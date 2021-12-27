@@ -35,9 +35,13 @@ T.Control {
 
     readonly property int selectionLength: root.model.selectedCount
 
-    readonly property bool isLastItem: (index === listView.modelCount - 1)
-
     readonly property bool selected : model.selected
+
+    readonly property bool topContainsDrag: higherDropArea.containsDrag
+
+    readonly property bool bottomContainsDrag: lowerDropArea.containsDrag
+
+    readonly property bool containsDrag: (topContainsDrag || bottomContainsDrag)
 
     // Settings
 
@@ -67,18 +71,6 @@ T.Control {
     onVisualFocusChanged: {
         if (visualFocus)
             adjustTooltip()
-    }
-
-    // Connections
-
-    Connections {
-        target: listView
-
-        onSetItemDropIndicatorVisible: {
-            if (index === model.index) {
-                topDropIndicator.visible = Qt.binding(function() { return visible || higherDropArea.containsDrag; })
-            }
-        }
     }
 
     // Functions
@@ -213,22 +205,6 @@ T.Control {
         }
     }
 
-    Rectangle {
-        id: topDropIndicator
-
-        anchors {
-            left: parent.left
-            right: parent.right
-            top: parent.top
-        }
-
-        visible: higherDropArea.containsDrag
-
-        height: VLCStyle.dp(1, VLCStyle.scale)
-
-        color: colors.accent
-    }
-
     MouseArea {
         id: mouseArea
 
@@ -345,29 +321,15 @@ T.Control {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            function handleDropIndicators(visible) {
-                if (isLastItem)
-                    listView.footerItem.setDropIndicatorVisible(visible)
-                else
-                    listView.setItemDropIndicatorVisible(index + 1, visible)
-            }
-
             onEntered: {
                 if (!isDropAcceptable(drag, index + 1)) {
                     drag.accepted = false
                     return
                 }
-
-                handleDropIndicators(true)
-            }
-
-            onExited: {
-                handleDropIndicators(false)
             }
 
             onDropped: {
                 root.acceptDrop(index + 1, drop)
-                handleDropIndicators(false)
             }
         }
     }

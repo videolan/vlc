@@ -341,7 +341,7 @@ Control {
 
             property int shiftIndex: -1
 
-            signal setItemDropIndicatorVisible(int index, bool visible)
+            property PlaylistDelegate delegateContainsDrag: null
 
             onDeselectAll: {
                 root.model.deselectAll()
@@ -391,21 +391,7 @@ Control {
 
                 property alias firstItemIndicatorVisible: firstItemIndicator.visible
 
-                function setDropIndicatorVisible(visible) {
-                    dropIndicator.visible = Qt.binding(function() { return (visible || dropArea.containsDrag); })
-                }
-
-                Rectangle {
-                    id: dropIndicator
-
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    height: VLCStyle.dp(1)
-                    anchors.top: parent.top
-
-                    visible: (root.model.count > 0 && dropArea.containsDrag)
-                    color: colors.accent
-                }
+                readonly property bool containsDrag: dropArea.containsDrag
 
                 Rectangle {
                     id: firstItemIndicator
@@ -459,13 +445,44 @@ Control {
                 colors: root.colors
             }
 
+            Rectangle {
+                id: dropIndicator
+
+                parent: visible ? (listView.delegateContainsDrag ? listView.delegateContainsDrag
+                                                                 : listView.footerItem)
+                                : null
+                z: 99
+
+                anchors {
+                    left: !!parent ? parent.left : undefined
+                    right: !!parent ? parent.right : undefined
+                    top: listView.delegateContainsDrag ? (parent.topContainsDrag ? parent.top : undefined)
+                                                       : (parent ? parent.top : undefined)
+                    bottom: listView.delegateContainsDrag ? (parent.bottomContainsDrag ? parent.bottom : undefined)
+                                                          : undefined
+                    bottomMargin: -height
+                }
+
+                implicitHeight: VLCStyle.dp(1)
+
+                visible: !!listView.delegateContainsDrag || (listView.footerItem.containsDrag && !listView.footerItem.firstItemIndicatorVisible)
+                color: colors.accent
+            }
+
             delegate: PlaylistDelegate {
                 id: delegate
 
-                // Instead of property forwarding, PlaylistDelegate is tightly coupled with PlaylistlistView
-                // since PlaylistDelegate is expected to be used only within PlaylistlistView
-
                 width: listView.width
+
+                onContainsDragChanged: {
+                    if (delegate.topContainsDrag || delegate.bottomContainsDrag) {
+                        console.assert(listView.delegateContainsDrag === null)
+                        listView.delegateContainsDrag = delegate
+                    } else {
+                        console.assert(listView.delegateContainsDrag === delegate)
+                        listView.delegateContainsDrag = null
+                    }
+                }
             }
 
             add: Transition {
