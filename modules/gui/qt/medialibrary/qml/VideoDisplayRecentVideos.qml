@@ -124,6 +124,8 @@ FocusScope {
 
             model: root.model
 
+            fadeColor: VLCStyle.colors.bg
+
             Navigation.parentItem: root
 
             header: Item {
