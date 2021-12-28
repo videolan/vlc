@@ -231,6 +231,8 @@ FocusScope {
 
         headerPositioning: ListView.OverlayHeader
 
+        fadeColor: VLCStyle.colors.bg
+
         onDeselectAll: {
             if (selectionDelegateModel) {
                 selectionDelegateModel.clear()
