@@ -214,22 +214,6 @@ T.Control {
 
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-        onContainsMouseChanged: {
-            if (containsMouse) {
-                var bottomItemIndex = listView.listView.indexAt(delegate.width / 2, (listView.listView.contentY + listView.height) + 1)
-                var topItemIndex = listView.listView.indexAt(delegate.width / 2, listView.listView.contentY - 1)
-
-                if(bottomItemIndex !== -1 && model.index >= bottomItemIndex - 1)
-                {
-                    listView.fadeRectBottomHovered = Qt.binding(function() {return delegate.hovered})
-                }
-                if(model.index <= topItemIndex + 1)
-                {
-                    listView.fadeRectTopHovered = Qt.binding(function() {return delegate.hovered})
-                }
-            }
-        }
-
         onClicked: {
             /* to receive keys events */
             listView.forceActiveFocus()

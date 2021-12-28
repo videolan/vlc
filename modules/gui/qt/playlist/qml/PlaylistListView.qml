@@ -190,10 +190,6 @@ Control {
             running: dragItem._scrollingDirection === -1 && dragItem.visible && !target.listView.atYBeginning
 
             velocity: VLCStyle.dp(225, VLCStyle.scale)
-
-            onRunningChanged: {
-                target.fadeRectTopHovered = running
-            }
         }
 
         SmoothedAnimation {
@@ -204,10 +200,6 @@ Control {
             running: dragItem._scrollingDirection === 1 && dragItem.visible && !target.listView.atYEnd
 
             velocity: VLCStyle.dp(225, VLCStyle.scale)
-
-            onRunningChanged: {
-                target.fadeRectBottomHovered = running
-            }
         }
     }
 
@@ -339,6 +331,11 @@ Control {
             fadeColor: background.usingAcrylic ? undefined
                                                : background.alternativeColor
 
+            Binding on fadeColor {
+                when: downAnimation.running || upAnimation.running
+                value: undefined
+            }
+
             property int shiftIndex: -1
 
             property PlaylistDelegate delegateContainsDrag: null
@@ -362,26 +359,6 @@ Control {
                 onModelReset: {
                     if (listView.currentIndex === -1 && root.model.count > 0)
                         listView.currentIndex = 0
-                }
-
-                onSelectedCountChanged: {
-                    var selectedIndexes = listView.model.getSelection()
-
-                    if (listView.modelCount === 0 || selectedIndexes.length === 0)
-                        return
-
-                    var bottomItemIndex = listView.listView.indexAt(listView.width / 2, (listView.listView.contentY + listView.height) + 1)
-                    var topItemIndex = listView.listView.indexAt(listView.width / 2, listView.listView.contentY - 1)
-
-                    if (listView.model.isSelected(topItemIndex) || (listView.model.isSelected(topItemIndex + 1)))
-                        listView.fadeRectTopHovered = true
-                    else
-                        listView.fadeRectTopHovered = false
-
-                    if (listView.model.isSelected(bottomItemIndex) || (bottomItemIndex !== -1 && listView.model.isSelected(bottomItemIndex - 1)))
-                        listView.fadeRectBottomHovered = true
-                    else
-                        listView.fadeRectBottomHovered = false
                 }
             }
 
