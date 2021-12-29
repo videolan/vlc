@@ -71,9 +71,10 @@ static const char no_password_fmt[] = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML
 "<!-- VLC_PASSWORD_NOT_SET --></body></html>";
 
 static const char no_password_body[] = N_(
-"<p>Password for Web interface has not been set.</p>"
-"<p>Please use --http-password, or set a password in "
-"Preferences &gt; All &gt; Interface &gt; Main interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p>"
+"<p>A password for the Web interface has not been set.</p>"
+"<p>Please either use the --http-password CLI option, or set a password in preferences.</p>"
+"<p>For the latter, the option can be found in the advanced view (&quot;all&quot;) under "
+"Interface → Main interfaces → Lua → Lua HTTP → Password.</p>"
 );
 
 static const char no_password_title[] = N_("VLC media player");
