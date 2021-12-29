@@ -1,5 +1,5 @@
---- libass-0.13.4/libass/ass_fontselect.c.orig	2016-07-11 23:29:00.000000000 +0200
-+++ libass-0.13.4/libass/ass_fontselect.c	2016-10-11 11:14:24.387661958 +0200
+--- a/libass/ass_fontselect.c.orig	2021-09-11 23:27:04.000000000 +0200
++++ b/libass/ass_fontselect.c	2021-12-29 17:18:47.535670604 +0100
 @@ -47,6 +47,9 @@
  #include "ass_font.h"
  #include "ass_string.h"
@@ -10,7 +10,7 @@
  #define ABS(x) ((x) < 0 ? -(x) : (x))
  #define MAX_FULLNAME 100
  
-@@ -161,28 +164,63 @@
+@@ -166,21 +169,55 @@
      .destroy_font      = destroy_font_ft,
  };
  
@@ -50,6 +50,9 @@
 +    free(dirw);
      if (!d)
          return;
+     size_t dirlen = strlen(dir);
+     size_t namemax = 0;
+     char *namebuf = NULL;
      while (1) {
 -        struct dirent *entry = readdir(d);
 +        struct _tdirent *entry = _treaddir(d);
@@ -60,13 +63,21 @@
 +        {
 +            free(d_name);
              continue;
+-        size_t namelen = dirlen + strlen(entry->d_name) + 2u;
 +        }
-         char fullname[4096];
--        snprintf(fullname, sizeof(fullname), "%s/%s", dir, entry->d_name);
-+        _snprintf(fullname, sizeof(fullname), "%s/%s", dir, d_name);
++        size_t namelen = dirlen + strlen(d_name) + 2u;
+         if (namelen < 2 || namelen - 2 < dirlen)
+             continue;
+         if (namelen > namemax) {
+@@ -190,17 +227,18 @@
+             else
+                 continue;
+         }
+-        snprintf(namebuf, namemax, "%s/%s", dir, entry->d_name);
++        _snprintf(namebuf, namemax, "%s/%s", dir, d_name);
          size_t bufsize = 0;
-         ass_msg(library, MSGL_INFO, "Loading font file '%s'", fullname);
-         void *data = read_file(library, fullname, &bufsize);
+         ass_msg(library, MSGL_INFO, "Loading font file '%s'", namebuf);
+         void *data = read_file(library, namebuf, &bufsize);
          if (data) {
 -            ass_add_font(library, entry->d_name, data, bufsize);
 +            ass_add_font(library, d_name, data, bufsize);
@@ -74,6 +85,7 @@
          }
 +        free(d_name);
      }
+     free(namebuf);
 -    closedir(d);
 +    _tclosedir(d);
  }

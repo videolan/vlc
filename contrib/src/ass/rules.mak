@@ -1,5 +1,5 @@
 # ASS
-ASS_VERSION := 0.14.0
+ASS_VERSION := 0.15.2
 ASS_URL := https://github.com/libass/libass/releases/download/$(ASS_VERSION)/libass-$(ASS_VERSION).tar.gz
 
 PKGS += ass
@@ -9,7 +9,7 @@ endif
 
 ifdef HAVE_ANDROID
 WITH_FONTCONFIG = 0
-WITH_HARFBUZZ = 0
+WITH_HARFBUZZ = 1
 ifeq ($(ANDROID_ABI), x86)
 WITH_ASS_ASM = 0
 endif
@@ -42,13 +42,7 @@ $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
 	$(APPLY) $(SRC)/ass/ass-macosx.patch
-	$(APPLY) $(SRC)/ass/coretext-errorhandling.patch
-ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/ass/use-topendir.patch
-ifdef HAVE_WINSTORE
-	$(APPLY) $(SRC)/ass/dwrite.patch
-endif
-endif
+	$(APPLY) $(SRC)/ass/0001-configure-add-Core-Text-and-DirectWrite-to-Libs.priv.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
@@ -83,5 +77,7 @@ endif
 .ass: libass
 	$(RECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) $(ASS_CFLAGS)" ./configure $(HOSTCONF) $(ASS_CONF)
+	cd $< && $(MAKE)
+	$(call pkg_static,"libass.pc")
 	cd $< && $(MAKE) install
 	touch $@
