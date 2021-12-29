@@ -44,10 +44,6 @@ FocusScope {
         PropertyChanges {
             target: root
             visible: true
-        }
-
-        PropertyChanges {
-            target: root
             height: implicitHeight
         }
     }
