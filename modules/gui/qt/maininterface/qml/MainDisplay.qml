@@ -228,7 +228,7 @@ FocusScope {
                             left: parent.left
                             bottom: parent.bottom
                             bottomMargin: miniPlayer.height
-                            right: playlistColumn.visible ? playlistColumn.left : playlistColumn.right
+                            right: playlistColumn.visible ? playlistColumn.left : parent.right
                             rightMargin: (MainCtx.playlistDocked && MainCtx.playlistVisible)
                                          ? 0
                                          : VLCStyle.applicationHorizontalMargin
@@ -259,66 +259,39 @@ FocusScope {
                         }
                         focus: false
 
+                        implicitWidth: Helpers.clamp(root.width / resizeHandle.widthFactor,
+                                                     playlist.minimumWidth,
+                                                     root.width / 2)
+                        width: 0
                         height: parent.height - miniPlayer.height
 
-                        property bool expanded: MainCtx.playlistDocked && MainCtx.playlistVisible
+                        visible: false
 
-                        state: playlistColumn.expanded ? "expanded" : "collapsed"
+                        state: (MainCtx.playlistDocked && MainCtx.playlistVisible) ? "expanded" : ""
 
-                        states: [
-                            State {
-                                name: "expanded"
-                                PropertyChanges {
-                                    target: playlistColumn
-                                    width: Helpers.clamp(root.width / resizeHandle.widthFactor,
-                                                         playlist.minimumWidth,
-                                                         root.width / 2)
-                                    visible: true
-                                }
-                            },
-                            State {
-                                name: "collapsed"
-                                PropertyChanges {
-                                    target: playlistColumn
-                                    width: 0
-                                    visible: false
+                        states: State {
+                            name: "expanded"
+                            PropertyChanges {
+                                target: playlistColumn
+                                width: playlistColumn.implicitWidth
+                                visible: true
+                            }
+                        }
+
+                        transitions: Transition {
+                            from: ""; to: "expanded";
+                            reversible: true
+
+                            SequentialAnimation {
+                                PropertyAction { property: "visible" }
+
+                                NumberAnimation {
+                                    property: "width"
+                                    duration: VLCStyle.duration_fast
+                                    easing.type: Easing.InOutSine
                                 }
                             }
-                        ]
-
-                        transitions: [
-                            Transition {
-                                from: "*"
-                                to: "collapsed"
-
-                                SequentialAnimation {
-                                    SmoothedAnimation {
-                                        target: playlistColumn; property: "width"
-
-                                        duration: VLCStyle.duration_fast
-                                        easing.type: Easing.OutSine
-                                    }
-
-                                    PropertyAction { target: playlistColumn; property: "visible" }
-                                }
-                            },
-
-                            Transition {
-                                from: "*"
-                                to: "expanded"
-
-                                SequentialAnimation {
-                                    PropertyAction { target: playlistColumn; property: "visible" }
-
-                                    SmoothedAnimation {
-                                        target: playlistColumn; property: "width"
-
-                                        duration: VLCStyle.duration_fast
-                                        easing.type: Easing.InSine
-                                    }
-                                }
-                            }
-                        ]
+                        }
 
                         Rectangle {
                             id: playlistLeftBorder
