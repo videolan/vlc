@@ -347,10 +347,9 @@ FocusScope {
                 event.accepted = true
             }
 
-            if (newIndex >= 0 && newIndex < modelCount) {
+            var oldIndex = currentIndex
+            if (newIndex >= 0 && newIndex < modelCount && newIndex !== oldIndex) {
                 event.accepted = true;
-
-                var oldIndex = currentIndex;
 
                 currentIndex = newIndex;
 
