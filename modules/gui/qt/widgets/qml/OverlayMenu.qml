@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
-import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.11
 import org.videolan.vlc 0.1
 
@@ -178,21 +178,30 @@ FocusScope {
                 bottomPadding: VLCStyle.margin_normal
             }
 
-            delegate: Button {
+            delegate: T.AbstractButton {
                 id: button
+
+                implicitWidth: Math.max(background ? background.implicitWidth : 0,
+                                        (contentItem ? contentItem.implicitWidth : 0) + leftPadding + rightPadding)
+                implicitHeight: Math.max(background ? background.implicitHeight : 0,
+                                         (contentItem ? contentItem.implicitHeight : 0) + topPadding + bottomPadding)
+                baselineOffset: contentItem ? contentItem.y + contentItem.baselineOffset : 0
 
                 readonly property bool yieldsAnotherModel: (!!modelData.model)
 
                 width: listView.width
 
+                topPadding: VLCStyle.margin_xsmall
+                bottomPadding: VLCStyle.margin_xsmall
                 leftPadding: root.leftPadding
                 rightPadding: root.rightPadding
+
+                spacing: VLCStyle.margin_xsmall
 
                 function trigger(triggerEnabled) {
                     if (yieldsAnotherModel) {
                         listView.loadModel(modelData.model)
-                    }
-                    else if (triggerEnabled) {
+                    } else if (triggerEnabled) {
                         modelData.trigger()
                         root.close()
                     }
@@ -204,12 +213,10 @@ FocusScope {
                     if (KeyHelper.matchRight(event)) {
                         trigger(false)
                         event.accepted = true
-                    }
-                    else if (KeyHelper.matchLeft(event)) {
+                    } else if (KeyHelper.matchLeft(event)) {
                         listView.goBack()
                         event.accepted = true
-                    }
-                    else if (KeyHelper.matchCancel(event)) {
+                    } else if (KeyHelper.matchCancel(event)) {
                         root.close()
                         event.accepted = true
                     }
@@ -218,51 +225,50 @@ FocusScope {
                 contentItem: RowLayout {
                     id: rowLayout
 
-                    Item {
+                    spacing: button.spacing
+
+                    Loader {
                         id: icon
 
                         Layout.preferredWidth: VLCStyle.icon_small
                         Layout.preferredHeight: VLCStyle.icon_small
                         Layout.alignment: Qt.AlignHCenter
 
-                        Loader {
-                            active: (!!modelData.icon.source || !!modelData.fontIcon || modelData.tickMark === true)
-                            anchors.fill: parent
+                        active: (!!modelData.icon.source || !!modelData.fontIcon || modelData.tickMark === true)
 
-                            Component {
-                                id: imageIcon
-                                Image {
-                                    sourceSize: Qt.size(icon.width, icon.height)
-                                    source: modelData.icon.source
-                                }
+                        Component {
+                            id: imageIcon
+                            Image {
+                                sourceSize: Qt.size(icon.width, icon.height)
+                                source: modelData.icon.source
                             }
+                        }
 
-                            Component {
-                                id: fontIcon
-                                IconLabel {
-                                    horizontalAlignment: Text.AlignHCenter
-                                    text: modelData.fontIcon
-                                    color: colors.text
-                                }
+                        Component {
+                            id: fontIcon
+                            IconLabel {
+                                horizontalAlignment: Text.AlignHCenter
+                                text: modelData.fontIcon
+                                color: colors.text
                             }
+                        }
 
-                            Component {
-                                id: tickMark
-                                ListLabel {
-                                    horizontalAlignment: Text.AlignHCenter
-                                    text: "✓"
-                                    color: colors.text
-                                }
+                        Component {
+                            id: tickMark
+                            ListLabel {
+                                horizontalAlignment: Text.AlignHCenter
+                                text: "✓"
+                                color: colors.text
                             }
+                        }
 
-                            sourceComponent: {
-                                if (modelData.tickMark === true)
-                                    tickMark
-                                else if (!!modelData.fontIcon)
-                                    fontIcon
-                                else
-                                    imageIcon
-                            }
+                        sourceComponent: {
+                            if (modelData.tickMark === true)
+                                tickMark
+                            else if (!!modelData.fontIcon)
+                                fontIcon
+                            else
+                                imageIcon
                         }
                     }
 
@@ -291,13 +297,15 @@ FocusScope {
                         color: colors.text
                     }
                 }
-
-                background: Rectangle {
-                    visible: button.activeFocus
-                    color: colors.accent
-                    opacity: 0.8
-                }
             }
+
+            listView.highlight: Rectangle {
+                color: colors.accent
+                opacity: 0.8
+            }
+
+            listView.highlightResizeDuration: 0
+            listView.highlightMoveDuration: 0
         }
     }
 
