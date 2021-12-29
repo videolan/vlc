@@ -1,6 +1,6 @@
 # freetype2
 
-FREETYPE2_VERSION := 2.10.4
+FREETYPE2_VERSION := 2.11.1
 FREETYPE2_URL := $(SF)/freetype/freetype2/$(FREETYPE2_VERSION)/freetype-$(FREETYPE2_VERSION).tar.xz
 
 PKGS += freetype2
@@ -15,6 +15,7 @@ $(TARBALLS)/freetype-$(FREETYPE2_VERSION).tar.xz:
 
 freetype: freetype-$(FREETYPE2_VERSION).tar.xz .sum-freetype2
 	$(UNPACK)
+	$(APPLY) $(SRC)/freetype2/uwpfixes.patch
 	$(call pkg_static, "builds/unix/freetype2.in")
 	$(MOVE)
 
