@@ -277,22 +277,18 @@ FocusScope {
                         color: colors.text
                     }
 
-                    Loader {
-                        active: (button.yieldsAnotherModel ||
-                                 ( (!!modelData.marking) && (modelData.marking.length >= 1) ))
+                    ListLabel {
+                        Layout.alignment: Qt.AlignHCenter
 
-                        sourceComponent: ListLabel {
-                            Layout.alignment: Qt.AlignHCenter
+                        horizontalAlignment: Text.AlignHCenter
 
-                            text: {
-                                if (button.yieldsAnotherModel)
-                                    "⮕"
-                                else if (!!modelData.marking)
-                                    modelData.marking
-                            }
+                        visible: text.length > 0
 
-                            color: colors.text
-                        }
+                        text: (typeof modelData.marking === 'string') ? modelData.marking
+                                                                      : button.yieldsAnotherModel ? "➜"
+                                                                                                  : ""
+
+                        color: colors.text
                     }
                 }
 
