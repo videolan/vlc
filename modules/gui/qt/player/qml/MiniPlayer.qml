@@ -68,10 +68,12 @@ FocusScope {
 
     Widgets.FrostedGlassEffect {
         id: effect
-        anchors.fill: controlBar
+        anchors.fill: parent
 
-        source: mainContent
-        sourceRect: Qt.rect(root.x, root.y, root.width, root.height)
+        sourceRect: Qt.rect(root.x,
+                            root.y,
+                            root.width,
+                            root.height)
 
         tint: VLCStyle.colors.lowerBanner
     }

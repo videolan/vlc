@@ -57,7 +57,7 @@ Item {
     }
 
     /* required */ property var itemParent
-    /* required */ property var backgroundItem
+    property alias effectSource: effect.source
 
     visible: false
 
@@ -116,12 +116,12 @@ Item {
         }
 
         FrostedGlassEffect {
-            source: backgroundItem
-
+            id: effect
             anchors.fill: parent
 
-            readonly property point overlayPos: backgroundItem.mapFromItem(root, parentItem.x, parentItem.y)
-            sourceRect: Qt.rect(overlayPos.x, overlayPos.y, width, height)
+            source: backgroundItem
+
+            color: VLCStyle.colors.topBanner
 
             tintStrength: 0.0
             exclusionStrength: 0.1

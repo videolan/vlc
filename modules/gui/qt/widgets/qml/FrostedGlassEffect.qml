@@ -24,88 +24,72 @@ import "qrc:///style/"
 Rectangle {
     id: effect
 
-    property var source
-    property var sourceRect: undefined
+    property alias source: effectSource.sourceItem
+    property alias sourceRect: effectSource.sourceRect
+    property alias recursive: effectSource.recursive
+    property alias blurRadius: blurEffect.radius
+    property alias tint: effect.color
 
-    property bool active: true
-
-    color: tint
-
-    property color tint: VLCStyle.colors.topBanner
     property real tintStrength: 0.7
     property real noiseStrength: 0.02
     property real exclusionStrength: 0.09
 
-    Item {
+    FastBlur {
+        id: blurEffect
+
         anchors.fill: parent
 
-        layer.enabled: effect.active
-        layer.effect: Item {
+        source: ShaderEffectSource {
+            id: effectSource
+            sourceItem: effect.source
+            sourceRect: effect.mapToItem(effect.source,
+                                         effect.x,
+                                         effect.y,
+                                         effect.width,
+                                         effect.height)
+            visible: false
+            samples: 0
+        }
 
-            FastBlur {
-                id: effect1
-                anchors.fill: parent
+        radius: 64
 
-                source: ShaderEffectSource {
-                    sourceItem: effect.source
-                    sourceRect: !!effect.sourceRect ? effect.sourceRect : effect.mapToItem(effect.source, Qt.rect(effect.x, effect.y, effect.width, effect.height))
-                    visible: false
+        layer.enabled: true
+        layer.effect: ShaderEffect {
+            readonly property color tint: effect.tint
+            readonly property real tintStrength: effect.tintStrength
+            readonly property real noiseStrength: effect.noiseStrength
+            readonly property real exclusionStrength: effect.exclusionStrength
+
+            fragmentShader: "
+                uniform lowp sampler2D source; // this item
+                varying highp vec2 qt_TexCoord0;
+
+                uniform lowp vec4  tint;
+
+                uniform lowp float exclusionStrength;
+                uniform lowp float noiseStrength;
+                uniform lowp float tintStrength;
+
+                mediump float rand(highp vec2 co){
+                    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
                 }
 
-                radius: 64
-                visible: false
-            }
-
-            ShaderEffect {
-                id: effect2
-
-                property var source: ShaderEffectSource {
-                    sourceItem: effect1
-                    visible: true
+                mediump vec4 exclude(mediump vec4 src, mediump vec4 dst)
+                {
+                    return src + dst - 2.0 * src * dst;
                 }
 
-                anchors.fill: parent
+                void main() {
+                   mediump float r = rand(qt_TexCoord0) - 0.5;
+                   mediump vec4 noise = vec4(r,r,r,1.0) * noiseStrength;
+                   mediump vec4 blured  = texture2D(source, qt_TexCoord0);
 
-                visible: true
+                   mediump vec4 exclColor = vec4(exclusionStrength, exclusionStrength, exclusionStrength, 0.0);
 
-                property color tint: effect.tint
-                property real  tintStrength: effect.tintStrength
-                property real  noiseStrength: effect.noiseStrength
-                property real  exclusionStrength: effect.exclusionStrength
+                   blured = exclude(blured, exclColor);
 
-                fragmentShader: "
-                    uniform lowp sampler2D source; // this item
-                    varying highp vec2 qt_TexCoord0;
-
-                    uniform lowp vec4  tint;
-
-                    uniform lowp float exclusionStrength;
-                    uniform lowp float noiseStrength;
-                    uniform lowp float tintStrength;
-
-
-                    mediump float rand(highp vec2 co){
-                        return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
-                    }
-
-
-                    mediump vec4 exclude(mediump vec4 src, mediump vec4 dst)
-                    {
-                        return src + dst - 2.0 * src * dst;
-                    }
-
-                    void main() {
-                       mediump float r = rand(qt_TexCoord0) - 0.5;
-                       mediump vec4 noise = vec4(r,r,r,1.0) * noiseStrength;
-                       mediump vec4 blured  = texture2D(source, qt_TexCoord0);
-
-                       mediump vec4 exclColor = vec4(exclusionStrength, exclusionStrength, exclusionStrength, 0.0);
-
-                       blured = exclude(blured, exclColor);
-
-                       gl_FragColor = mix(blured, tint, tintStrength) + noise;
-                    }"
-            }
+                   gl_FragColor = mix(blured, tint, tintStrength) + noise;
+                }"
         }
     }
 }

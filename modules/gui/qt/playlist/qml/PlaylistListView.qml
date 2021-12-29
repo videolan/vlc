@@ -139,7 +139,7 @@ Control {
             bottomPadding: VLCStyle.margin_large + root.bottomPadding
 
             itemParent: listView
-            backgroundItem: contentItem
+            effectSource: contentItem
         }
     }
 
