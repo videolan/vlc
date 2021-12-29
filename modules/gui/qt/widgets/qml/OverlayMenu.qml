@@ -71,6 +71,13 @@ FocusScope {
         focus = false
     }
 
+    Keys.onPressed: {
+        if (KeyHelper.matchCancel(event)) {
+            close()
+            event.accepted = true
+        }
+    }
+
     Rectangle {
         color: "black"
         anchors {
@@ -169,6 +176,14 @@ FocusScope {
                 listView.currentModel = _model
             }
 
+            Keys.onPressed: {
+                if (root.isRight ? KeyHelper.matchLeft(event)
+                                 : KeyHelper.matchRight(event)) {
+                    goBack()
+                    event.accepted = true
+                }
+            }
+
             header: MenuLabel {
                 font.pixelSize: VLCStyle.fontSize_xlarge
                 text: listView.currentModel.title
@@ -191,6 +206,8 @@ FocusScope {
 
                 readonly property bool yieldsAnotherModel: (!!modelData.model)
 
+                enabled: modelData.enabled
+
                 width: listView.width
 
                 topPadding: VLCStyle.margin_xsmall
@@ -212,17 +229,9 @@ FocusScope {
                 onClicked: trigger(true)
 
                 Keys.onPressed: {
-                    var right = KeyHelper.matchRight(event)
-                    var left = KeyHelper.matchLeft(event)
-
-                    if (root.isRight ? right : left) {
+                    if (root.isRight ? KeyHelper.matchRight(event)
+                                     : KeyHelper.matchLeft(event)) {
                         trigger(false)
-                        event.accepted = true
-                    } else if (root.isRight ? left : right) {
-                        listView.goBack()
-                        event.accepted = true
-                    } else if (KeyHelper.matchCancel(event)) {
-                        root.close()
                         event.accepted = true
                     }
                 }
@@ -230,6 +239,7 @@ FocusScope {
                 contentItem: RowLayout {
                     id: rowLayout
 
+                    opacity: enabled ? 1.0 : 0.5
                     spacing: button.spacing
 
                     Loader {
