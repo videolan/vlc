@@ -22,7 +22,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 
-Item {
+FocusScope {
     id: root
 
     property real widthRatio: (3 / 4)
@@ -56,23 +56,19 @@ Item {
         listView.resetStack()
     }
 
-    /* required */ property var itemParent
-    property alias effectSource: effect.source
+	property alias effectSource: effect.source
 
     visible: false
 
     function open() {
-        listView.currentModel = root.model;
-
-        visible = true;
-
-        listView.forceActiveFocus(Qt.TabFocusReason);
+        listView.currentModel = root.model
+        visible = true
+        focus = true
     }
 
     function close() {
-        visible = false;
-
-        itemParent.forceActiveFocus(Qt.BacktabFocusReason);
+        visible = false
+        focus = false
     }
 
     Rectangle {
@@ -133,6 +129,8 @@ Item {
             anchors.fill: parent
             anchors.topMargin: root.topPadding
             anchors.bottomMargin: root.bottomPadding
+
+            focus: true
 
             keyNavigationWraps: true
 

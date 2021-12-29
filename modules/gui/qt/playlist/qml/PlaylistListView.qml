@@ -124,6 +124,13 @@ Control {
 
         active: MainCtx.playlistDocked
 
+        focus: shown ? item.focus : false
+
+        onFocusChanged: {
+            if (!focus)
+                listView.forceActiveFocus(Qt.BacktabFocusReason)
+        }
+
         readonly property bool shown: (status === Loader.Ready) ? item.visible : false
 
         function open() {
@@ -138,7 +145,6 @@ Control {
             rightPadding: VLCStyle.margin_xsmall + VLCStyle.applicationHorizontalMargin
             bottomPadding: VLCStyle.margin_large + root.bottomPadding
 
-            itemParent: listView
             effectSource: contentItem
         }
     }
