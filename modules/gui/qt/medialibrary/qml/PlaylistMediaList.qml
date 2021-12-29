@@ -306,8 +306,6 @@ FocusScope {
 
             onSelectAll: modelSelect.selectAll()
 
-            onSelectionUpdated: modelSelect.updateSelection(keyModifiers, oldIndex, newIndex)
-
             onActionAtIndex: _actionAtIndex()
 
             //-------------------------------------------------------------------------------------

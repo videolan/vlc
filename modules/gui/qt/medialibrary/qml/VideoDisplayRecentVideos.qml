@@ -183,7 +183,6 @@ FocusScope {
                 width: VLCStyle.margin_normal
             }
 
-            onSelectionUpdated: recentVideoSelection.updateSelection( keyModifiers, oldIndex, newIndex )
             onActionAtIndex: {
                 g_mainDisplay.showPlayer()
                 MediaLib.addAndPlay( model.getIdsForIndexes( recentVideoSelection.selectedIndexes ), [":restore-playback-pos=2"] )

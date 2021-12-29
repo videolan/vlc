@@ -170,7 +170,7 @@ FocusScope {
                         }
 
                         onSelectAll: albumSelectionModel.selectAll()
-                        onSelectionUpdated: albumSelectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
+
                         onActionAtIndex: MediaLib.addAndPlay( albumModel.getIdForIndex( index ) )
 
                         Widgets.GridShadows {
@@ -367,7 +367,7 @@ FocusScope {
             }
 
             onSelectAll: albumSelectionModel.selectAll()
-            onSelectionUpdated: albumSelectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
+
             Navigation.parentItem: root
 
             Navigation.upAction: function() {

@@ -198,7 +198,6 @@ FocusScope {
             }
 
             onSelectAll: selectionModel.selectAll()
-            onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
 
             Navigation.parentItem: root
             Navigation.cancelAction: root._onNavigationCancel

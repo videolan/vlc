@@ -107,7 +107,6 @@ FocusScope {
     // Signals
 
     //signals emitted when selected items is updated from keyboard
-    signal selectionUpdated( int keyModifiers, int oldIndex,int newIndex )
     signal selectAll()
     signal actionAtIndex(int index)
 
@@ -186,7 +185,7 @@ FocusScope {
 
             var oldIndex = currentIndex;
             currentIndex = newIndex;
-            selectionUpdated(event.modifiers, oldIndex, newIndex);
+            delegateModel.updateSelection(event.modifiers, oldIndex, newIndex)
 
             // NOTE: We make sure we have the proper visual focus on components.
             if (oldIndex < currentIndex)

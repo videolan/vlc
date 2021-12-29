@@ -218,7 +218,7 @@ FocusScope {
             cellHeight: cellWidth / 2
 
             onSelectAll: selectionModel.selectAll()
-            onSelectionUpdated:  selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
+
             onActionAtIndex: _actionAtIndex(index)
 
             Navigation.parentItem: root

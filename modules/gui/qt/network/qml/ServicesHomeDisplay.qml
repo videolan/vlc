@@ -396,7 +396,6 @@ Widgets.PageLoader {
             }
 
             onSelectAll: selectionModel.selectAll()
-            onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
 
             onActionAtIndex: {
                 var itemData = sourcesFilterModel.getDataAt(index);
