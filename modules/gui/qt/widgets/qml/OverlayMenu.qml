@@ -136,6 +136,7 @@ FocusScope {
 
             property var stack: []
             property var currentModel: root.model
+            property int oldCurrentIndex
 
             model: currentModel.entries
 
@@ -156,13 +157,14 @@ FocusScope {
                 if (stack.length > 1) {
                     stack.pop()
                     currentModel = stack[stack.length - 1]
-                }
-                else {
+                    listView.currentIndex = listView.oldCurrentIndex
+                } else {
                     root.close()
                 }
             }
 
             function loadModel(_model) {
+                listView.oldCurrentIndex = listView.currentIndex
                 listView.stack.push(_model)
                 listView.currentModel = _model
             }
