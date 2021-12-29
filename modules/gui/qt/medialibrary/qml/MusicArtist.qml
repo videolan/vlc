@@ -366,8 +366,6 @@ FocusScope {
                 }
             }
 
-            onSelectAll: albumSelectionModel.selectAll()
-
             Navigation.parentItem: root
 
             Navigation.upAction: function() {

@@ -229,8 +229,6 @@ FocusScope {
                 modelSelect.select(model.index(0,0), ItemSelectionModel.ClearAndSelect);
             }
 
-            onSelectAll: modelSelect.selectAll()
-
             onActionAtIndex: _actionAtIndex()
 
             // Connections

@@ -222,8 +222,6 @@ FocusScope {
                 }
             }
 
-            onSelectAll: selectionModel.selectAll()
-
             onActionAtIndex: _actionAtIndex(index)
 
             Navigation.parentItem: root

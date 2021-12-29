@@ -197,8 +197,6 @@ FocusScope {
                 }
             }
 
-            onSelectAll: selectionModel.selectAll()
-
             Navigation.parentItem: root
             Navigation.cancelAction: root._onNavigationCancel
 

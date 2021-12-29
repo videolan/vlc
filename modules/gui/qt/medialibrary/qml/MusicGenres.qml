@@ -217,8 +217,6 @@ FocusScope {
             cellWidth: VLCStyle.colWidth(2)
             cellHeight: cellWidth / 2
 
-            onSelectAll: selectionModel.selectAll()
-
             onActionAtIndex: _actionAtIndex(index)
 
             Navigation.parentItem: root

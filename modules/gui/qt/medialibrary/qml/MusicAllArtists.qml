@@ -116,8 +116,6 @@ FocusScope {
             Navigation.parentItem: root
             Navigation.cancelAction: root._onNavigationCancel
 
-            onSelectAll: selectionModel.selectAll()
-
             onActionAtIndex: {
                 if (selectionModel.selectedIndexes.length > 1) {
                     MediaLib.addAndPlay( artistModel.getIdsForIndexes( selectionModel.selectedIndexes ) )

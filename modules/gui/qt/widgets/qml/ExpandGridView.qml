@@ -16,7 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
+import QtQml.Models 2.11
 import QtQuick.Controls 2.4
+
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
@@ -205,7 +207,7 @@ FocusScope {
 
         if (event.matches(StandardKey.SelectAll)) {
             event.accepted = true
-            selectAll()
+            delegateModel.select(model.index(0, 0), ItemSelectionModel.Select | ItemSelectionModel.Columns)
         } else if ( KeyHelper.matchOk(event) ) {
             event.accepted = true
             actionAtIndex(currentIndex)

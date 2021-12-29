@@ -123,8 +123,6 @@ FocusScope {
             }
         }
 
-        onSelectAll: deviceSelection.selectAll()
-
         onActionAtIndex: {
             _actionAtIndex(index, deviceModel, deviceSelection)
         }

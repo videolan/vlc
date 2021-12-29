@@ -395,8 +395,6 @@ Widgets.PageLoader {
 
             }
 
-            onSelectAll: selectionModel.selectAll()
-
             onActionAtIndex: {
                 var itemData = sourcesFilterModel.getDataAt(index);
 
