@@ -212,10 +212,13 @@ FocusScope {
                 onClicked: trigger(true)
 
                 Keys.onPressed: {
-                    if (KeyHelper.matchRight(event)) {
+                    var right = KeyHelper.matchRight(event)
+                    var left = KeyHelper.matchLeft(event)
+
+                    if (root.isRight ? right : left) {
                         trigger(false)
                         event.accepted = true
-                    } else if (KeyHelper.matchLeft(event)) {
+                    } else if (root.isRight ? left : right) {
                         listView.goBack()
                         event.accepted = true
                     } else if (KeyHelper.matchCancel(event)) {
