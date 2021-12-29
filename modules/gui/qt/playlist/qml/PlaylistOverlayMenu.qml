@@ -30,14 +30,14 @@ Widgets.OverlayMenu {
         id: playAction
         text: I18n.qtr("Play")
         onTriggered: mainPlaylistController.goTo(root.model.getSelection()[0], true)
-        property string fontIcon: VLCIcons.play
+        readonly property string fontIcon: VLCIcons.play
     }
 
     Action {
         id: streamAction
         text: I18n.qtr("Stream")
         onTriggered: DialogsProvider.streamingDialog(root.model.getSelection().map(function(i) { return root.model.itemAt(i).url; }), false)
-        property string fontIcon: VLCIcons.stream
+        readonly property string fontIcon: VLCIcons.stream
     }
 
     Action {
@@ -64,21 +64,21 @@ Widgets.OverlayMenu {
         id: addFileAction
         text: I18n.qtr("Add File...")
         onTriggered: DialogsProvider.simpleOpenDialog(false)
-        property string fontIcon: VLCIcons.add
+        readonly property string fontIcon: VLCIcons.add
     }
 
     Action {
         id: addDirAction
         text: I18n.qtr("Add Directory...")
         onTriggered: DialogsProvider.PLAppendDir()
-        property string fontIcon: VLCIcons.add
+        readonly property string fontIcon: VLCIcons.add
     }
 
     Action {
         id: addAdvancedAction
         text: I18n.qtr("Advanced Open...")
         onTriggered: DialogsProvider.PLAppendDialog()
-        property string fontIcon: VLCIcons.add
+        readonly property string fontIcon: VLCIcons.add
     }
 
     Action {
@@ -104,7 +104,7 @@ Widgets.OverlayMenu {
         id: shuffleAction
         text: I18n.qtr("Shuffle Playlist")
         onTriggered: mainPlaylistController.shuffle()
-        property string fontIcon: VLCIcons.shuffle_on
+        readonly property string fontIcon: VLCIcons.shuffle_on
     }
 
     Action {
@@ -131,50 +131,49 @@ Widgets.OverlayMenu {
         onTriggered: listView.onDelete()
     }
 
-    property var rootMenu: ({
-
-                                title: I18n.qtr("Playlist Menu"),
-                                entries: [
-                                    playAction,
-                                    streamAction,
-                                    saveAction,
-                                    infoAction,
-                                    exploreAction,
-                                    addFileAction,
-                                    addDirAction,
-                                    addAdvancedAction,
-                                    savePlAction,
-                                    clearAllAction,
-                                    selectAllAction,
-                                    shuffleAction,
-                                    sortAction,
-                                    selectTracksAction,
-                                    moveTracksAction,
-                                    deleteAction
-                                ]
-                            })
-
-    property var rootMenu_PLEmpty: ({
-                                        title: I18n.qtr("Playlist Menu"),
-                                        entries: [
-                                            addFileAction,
-                                            addDirAction,
-                                            addAdvancedAction
-                                        ]
+    readonly property var rootMenu: ({
+                                         title: I18n.qtr("Playlist Menu"),
+                                         entries: [
+                                             playAction,
+                                             streamAction,
+                                             saveAction,
+                                             infoAction,
+                                             exploreAction,
+                                             addFileAction,
+                                             addDirAction,
+                                             addAdvancedAction,
+                                             savePlAction,
+                                             clearAllAction,
+                                             selectAllAction,
+                                             shuffleAction,
+                                             sortAction,
+                                             selectTracksAction,
+                                             moveTracksAction,
+                                             deleteAction
+                                         ]
                                     })
 
-    property var rootMenu_noSelection: ({
-                                            title: I18n.qtr("Playlist Menu"),
-                                            entries: [
-                                                addFileAction,
-                                                addDirAction,
-                                                addAdvancedAction,
-                                                savePlAction,
-                                                clearAllAction,
-                                                sortAction,
-                                                selectTracksAction
-                                            ]
-                                        })
+    readonly property var rootMenu_PLEmpty: ({
+                                                 title: I18n.qtr("Playlist Menu"),
+                                                 entries: [
+                                                     addFileAction,
+                                                     addDirAction,
+                                                     addAdvancedAction
+                                                 ]
+                                            })
+
+    readonly property var rootMenu_noSelection: ({
+                                                     title: I18n.qtr("Playlist Menu"),
+                                                     entries: [
+                                                         addFileAction,
+                                                         addDirAction,
+                                                         addAdvancedAction,
+                                                         savePlAction,
+                                                         clearAllAction,
+                                                         sortAction,
+                                                         selectTracksAction
+                                                     ]
+                                                })
 
     model: {
         if (root.model.count === 0)
@@ -187,24 +186,25 @@ Widgets.OverlayMenu {
 
     // Sort menu:
 
-    property var sortMenu: ({
-                                title: I18n.qtr("Sort Menu"),
-                                entries: []
-                            })
+    readonly property var sortMenu: ({
+                                         title: I18n.qtr("Sort Menu"),
+                                         entries: []
+                                    })
 
     Component {
         id: sortActionDelegate
 
         Action {
-            property int key: undefined
+            property int key
+
             readonly property string marking: {
                 if (key === mainPlaylistController.sortKey) {
                     return (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_ASC ? "↓" : "↑")
-                }
-                else {
+                } else {
                     return null
                 }
             }
+
             readonly property bool tickMark: (key === mainPlaylistController.sortKey)
 
             onTriggered: mainPlaylistController.sort(key)
@@ -215,7 +215,6 @@ Widgets.OverlayMenu {
         model: mainPlaylistController.sortKeyTitleList
 
         delegate: Loader {
-            asynchronous: true
             sourceComponent: sortActionDelegate
 
             onLoaded: {
