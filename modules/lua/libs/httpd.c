@@ -72,8 +72,8 @@ static const char no_password_fmt[] = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML
 
 static const char no_password_body[] = N_(
 "<p>Password for Web interface has not been set.</p>"
-"<p>Please use --http-password, or set a password in </p>"
-"<p>Preferences &gt; All &gt; Main interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p>"
+"<p>Please use --http-password, or set a password in "
+"Preferences &gt; All &gt; Main interfaces &gt; Lua &gt; Lua HTTP &gt; Password.</p>"
 );
 
 static const char no_password_title[] = N_("VLC media player");
