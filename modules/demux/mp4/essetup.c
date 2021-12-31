@@ -1036,6 +1036,35 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
             break;
         }
 
+        case ATOM_ipcm:
+        case ATOM_fpcm:
+        {
+            const MP4_Box_t *p_pcmC = MP4_BoxGet( p_sample, "pcmC" );
+            if( p_pcmC )
+            {
+                const vlc_fourcc_t lookup = i_sample_type +
+                        BOXDATA(p_pcmC)->i_sample_size +
+                       (BOXDATA(p_pcmC)->i_format_flags & 0x01);
+                const vlc_fourcc_t lookuptable[10][2] =
+                {
+                    { ATOM_fpcm + 32 + 0, VLC_CODEC_F32B },
+                    { ATOM_fpcm + 32 + 1, VLC_CODEC_F32L },
+                    { ATOM_fpcm + 64 + 0, VLC_CODEC_F64B },
+                    { ATOM_fpcm + 64 + 1, VLC_CODEC_F64L },
+                    { ATOM_ipcm + 16 + 0, VLC_CODEC_S16B },
+                    { ATOM_ipcm + 16 + 1, VLC_CODEC_S16L },
+                    { ATOM_ipcm + 24 + 0, VLC_CODEC_S24B },
+                    { ATOM_ipcm + 24 + 1, VLC_CODEC_S24L },
+                    { ATOM_ipcm + 32 + 0, VLC_CODEC_S32B },
+                    { ATOM_ipcm + 32 + 1, VLC_CODEC_S32L },
+                };
+                for( size_t i = 0; i<10; i++ )
+                    if( lookuptable[i][0] == lookup )
+                        p_fmt->i_codec = lookuptable[i][1];
+            }
+            break;
+        }
+
         case ATOM_in24:
             p_fmt->i_original_fourcc =
             p_fmt->i_codec = p_enda && BOXDATA(p_enda)->i_little_endian == 1 ?
