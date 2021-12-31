@@ -204,6 +204,11 @@ typedef int64_t stime_t;
 #define ATOM_fLaC VLC_FOURCC( 'f', 'L', 'a', 'C' )
 #define ATOM_dfLa VLC_FOURCC( 'd', 'f', 'L', 'a' )
 
+/* ISO-IEC 23003-5 */
+#define ATOM_fpcm VLC_FOURCC( 'f', 'p', 'c', 'm' )
+#define ATOM_ipcm VLC_FOURCC( 'i', 'p', 'c', 'm' )
+#define ATOM_pcmC VLC_FOURCC( 'p', 'c', 'm', 'C' )
+
 /* XiphQT */
 #define ATOM_fCtS VLC_FOURCC( 'f', 'C', 't', 'S' )
 #define ATOM_vCtH VLC_FOURCC( 'v', 'C', 't', 'H' )
@@ -1478,6 +1483,12 @@ typedef struct
 
 typedef struct
 {
+    uint8_t i_format_flags;
+    uint8_t i_sample_size;
+} MP4_Box_data_pcmC_t;
+
+typedef struct
+{
     uint32_t i_entry_count;
     struct
     {
@@ -1703,6 +1714,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_fiel_t *p_fiel;
     MP4_Box_data_chan_t *p_chan;
     MP4_Box_data_enda_t *p_enda;
+    MP4_Box_data_pcmC_t *p_pcmC;
     MP4_Box_data_keys_t *p_keys;
     MP4_Box_data_iods_t *p_iods;
     MP4_Box_data_btrt_t *p_btrt;
