@@ -37,6 +37,8 @@
 #include <QPainterPath>
 #include <QQuickWindow>
 #include <QGuiApplication>
+#include <QSGImageNode>
+#include <QtQml>
 
 #ifdef QT_NETWORK_LIB
 #include <QNetworkAccessManager>
@@ -121,7 +123,7 @@ namespace
     }
 }
 
-RoundImage::RoundImage(QQuickItem *parent) : QQuickPaintedItem {parent}
+RoundImage::RoundImage(QQuickItem *parent) : QQuickItem {parent}
 {
     if (window() || qGuiApp)
         setDPR(window() ? window()->devicePixelRatio() : qGuiApp->devicePixelRatio());
@@ -130,30 +132,62 @@ RoundImage::RoundImage(QQuickItem *parent) : QQuickPaintedItem {parent}
     connect(this, &QQuickItem::widthChanged, this, &RoundImage::regenerateRoundImage);
 }
 
-void RoundImage::paint(QPainter *painter)
+QSGNode *RoundImage::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    if (m_roundImage.isNull())
-        return;
-    painter->drawImage(QPointF {0., 0.}, m_roundImage, m_roundImage.rect());
+    auto node = static_cast<QSGImageNode *>(oldNode);
+
+    if (!node)
+    {
+        assert(window());
+        node = window()->createImageNode();
+        assert(node);
+        node->setOwnsTexture(true);
+    }
+
+    if (m_dirty)
+    {
+        if (!m_roundImage.isNull())
+        {
+            assert(window());
+
+            QSGTexture* texture = window()->createTextureFromImage(m_roundImage,
+                QQuickWindow::TextureHasAlphaChannel);
+
+            if (texture)
+            {
+                // No need to delete the old texture manually as it is owned by the node.
+                node->setTexture(texture);
+                node->markDirty(QSGNode::DirtyMaterial);
+            }
+            else
+            {
+                qmlWarning(this) << "Could not generate texture from " << m_roundImage;
+            }
+        }
+
+        m_dirty = false;
+    }
+
+    node->setRect(boundingRect());
+
+    return node;
 }
 
 void RoundImage::classBegin()
 {
-    QQuickPaintedItem::classBegin();
+    QQuickItem::classBegin();
 
     m_isComponentComplete = false;
 }
 
 void RoundImage::componentComplete()
 {
-    QQuickPaintedItem::componentComplete();
+    QQuickItem::componentComplete();
 
     Q_ASSERT(!m_isComponentComplete); // classBegin is not called?
     m_isComponentComplete = true;
     if (!m_source.isEmpty())
         regenerateRoundImage();
-    else
-        m_roundImage = {};
 }
 
 QUrl RoundImage::source() const
@@ -191,7 +225,7 @@ void RoundImage::itemChange(QQuickItem::ItemChange change, const QQuickItem::Ite
     if (change == QQuickItem::ItemDevicePixelRatioHasChanged)
         setDPR(value.realValue);
 
-    QQuickPaintedItem::itemChange(change, value);
+    QQuickItem::itemChange(change, value);
 }
 
 void RoundImage::setDPR(const qreal value)
@@ -224,6 +258,8 @@ void RoundImage::regenerateRoundImage()
         if (auto image = imageCache.object(key)) // should only by called in mainthread
         {
             m_roundImage = *image;
+            m_dirty = true;
+            setFlag(ItemHasContents, true);
             update();
             return;
         }
@@ -233,12 +269,28 @@ void RoundImage::regenerateRoundImage()
         m_roundImageGenerator.reset(new RoundImageGenerator(m_source, scaleWidth, scaledHeight, scaledRadius));
         connect(m_roundImageGenerator.get(), &BaseAsyncTask::result, this, [this, key]()
         {
-            m_roundImage = m_roundImageGenerator->takeResult();
-            m_roundImage.setDevicePixelRatio(m_dpr);
+            const auto image = new QImage(m_roundImageGenerator->takeResult());
+
             m_roundImageGenerator.reset();
 
-            if (!m_roundImage.isNull())
-                imageCache.insert(key, new QImage(m_roundImage), m_roundImage.sizeInBytes());
+            if (!image->isNull())
+            {
+                image->setDevicePixelRatio(m_dpr);
+
+                imageCache.insert(key, image, image->sizeInBytes());
+
+                setFlag(ItemHasContents, true);
+
+                m_roundImage = *image;
+
+                m_dirty = true;
+            }
+            else
+            {
+                delete image;
+                m_dirty = false;
+                setFlag(ItemHasContents, false);
+            }
 
             update();
         });
