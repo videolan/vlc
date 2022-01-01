@@ -188,8 +188,6 @@ static char **paths_to_list( const char *psz_dir, char *psz_path )
             while( *psz_parser == ' ' )
                 psz_parser++;
         }
-        if( *psz_subdir == '\0' )
-            continue;
 
         if( asprintf( &subdirs[i], "%s%s",
                   psz_subdir[0] == '.' ? psz_dir : "",
