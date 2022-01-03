@@ -308,6 +308,11 @@ error:      wordfree(&we);
     }
 
     size_t count = we.we_wordc;
+    if (count == 0) {
+        ret = VLC_EGENERIC;
+        goto error;
+    }
+
     const char **args = vlc_alloc(count, sizeof (*args));
     if (unlikely(args == NULL))
     {
@@ -337,22 +342,19 @@ error:      wordfree(&we);
     }
 #endif
 
-    if (count > 0)
+    assert(count > 0);
+    const struct command **pp = tfind(&args[0], &sys->commands, cmdcmp);
+
+    if (pp != NULL)
     {
-        const struct command **pp = tfind(&args[0], &sys->commands, cmdcmp);
-
-        if (pp != NULL)
-        {
-            const struct command *c = *pp;
-
-            ret = c->handler.callback(cl, args, count, c->data);
-        }
-        else
-        {
-            cli_printf(cl, _("Unknown command `%s'. Type `help' for help."),
-                      args[0]);
-            ret = VLC_EGENERIC;
-        }
+        const struct command *c = *pp;;
+        ret = c->handler.callback(cl, args, count, c->data);
+    }
+    else
+    {
+        cli_printf(cl, _("Unknown command `%s'. Type `help' for help."),
+                  args[0]);
+        ret = VLC_EGENERIC;
     }
 
 #ifdef HAVE_WORDEXP
