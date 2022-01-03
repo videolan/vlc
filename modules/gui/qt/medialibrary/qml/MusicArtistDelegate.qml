@@ -86,7 +86,7 @@ T.Control {
                 setData(identifier, [model])
             }
 
-            function getSelectedInputItem() {
+            function getSelectedInputItem(cb) {
                 return MediaLib.mlInputItem([model.id], cb)
             }
         }

@@ -36,7 +36,7 @@ DragItem {
         var inputIdList = root.indexesData.map(function(obj){
             return obj[root.mlIDRole]
         })
-        Medialib.mlInputItem(inputIdList, cb)
+        MediaLib.mlInputItem(inputIdList, cb)
     }
 
     onRequestData: {
