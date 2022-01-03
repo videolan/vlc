@@ -64,6 +64,7 @@ vlc_osx_static_OBJCFLAGS = $(AM_OBJCFLAGS) \
 vlc_osx_static_LDFLAGS = $(vlc_osx_LDFLAGS) -static
 vlc_osx_static_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/../lib/.libs/"
 vlc_osx_static_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/../src/.libs/"
+vlc_osx_static_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/../Frameworks/"
 vlc_osx_static_LDADD = $(vlc_osx_LDADD)
 if HAVE_BREAKPAD
 vlc_osx_static_LDFLAGS += -Wl,-framework,Breakpad
