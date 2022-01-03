@@ -98,8 +98,7 @@ static inline int jaro_inner(const char *a, const char *b, size_t *ret_prefix_cc
 
     const char *a_char = a_suffix;
     for (size_t i = 0; *a_char; i++) {
-        ssize_t tmp = (ssize_t)i - (ssize_t)search_range;
-        size_t bound_start = (tmp >= 0) ? tmp : 0;
+        size_t bound_start = i > search_range ? i - search_range : 0;
         size_t bound_end = MIN(b_numchars, i + search_range + 1);
 
         if (bound_start >= bound_end) {
