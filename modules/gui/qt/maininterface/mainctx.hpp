@@ -177,6 +177,9 @@ class MainCtx : public QObject
     // This Property only works if hasAcrylicSurface is set
     Q_PROPERTY(bool acrylicActive READ acrylicActive WRITE setAcrylicActive NOTIFY acrylicActiveChanged FINAL)
 
+    // NOTE: This is useful when we want to prioritize player hotkeys over QML keyboard navigation.
+    Q_PROPERTY(bool preferHotkeys READ preferHotkeys WRITE setPreferHotkeys NOTIFY preferHotkeysChanged FINAL)
+
 public:
     /* tors */
     MainCtx(qt_intf_t *);
@@ -255,6 +258,9 @@ public:
     bool acrylicActive() const;
     void setAcrylicActive(bool newAcrylicActive);
 
+    bool preferHotkeys() const;
+    void setPreferHotkeys(bool enable);
+
 protected:
     /* Systray */
     void createSystray();
@@ -317,6 +323,8 @@ protected:
     bool m_acrylicActive = false;
 
     bool m_smoothScroll = true;
+
+    bool m_preferHotkeys = false;
 
 public slots:
     void toggleUpdateSystrayMenu();
@@ -390,6 +398,8 @@ signals:
     void acrylicActiveChanged();
 
     void smoothScrollChanged();
+
+    void preferHotkeysChanged();
 
 private:
     void loadPrefs(bool callSignals);

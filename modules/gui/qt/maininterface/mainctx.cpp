@@ -822,3 +822,18 @@ void MainCtx::setAcrylicActive(bool newAcrylicActive)
     m_acrylicActive = newAcrylicActive;
     emit acrylicActiveChanged();
 }
+
+bool MainCtx::preferHotkeys() const
+{
+    return m_preferHotkeys;
+}
+
+void MainCtx::setPreferHotkeys(bool enable)
+{
+    if (m_preferHotkeys == enable)
+        return;
+
+    m_preferHotkeys = enable;
+
+    emit preferHotkeysChanged();
+}
