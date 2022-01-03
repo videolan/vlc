@@ -71,7 +71,8 @@ static inline int jaro_inner(const char *a, const char *b, size_t *ret_prefix_cc
     *ret_prefix_cc = prefix_char_count;
 
     size_t a_numchars = strlen(a_suffix) + prefix_char_count;
-    size_t b_numchars = strlen(b_suffix) + prefix_char_count;
+    size_t b_suffix_len = strlen(b_suffix);
+    size_t b_numchars = b_suffix_len + prefix_char_count;
 
     // The check for lengths of one here is to prevent integer overflow when
     // calculating the search range.
@@ -104,6 +105,11 @@ static inline int jaro_inner(const char *a, const char *b, size_t *ret_prefix_cc
         if (bound_start >= bound_end) {
             a_char++;
             continue;
+        }
+
+        if (bound_start > b_suffix_len) {
+            // end of b string
+            break;
         }
 
         const char *b_char = b_suffix + bound_start;
