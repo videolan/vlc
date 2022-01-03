@@ -479,6 +479,27 @@ picture_AttachAncillary(picture_t *pic, struct vlc_ancillary *ancillary)
     return vlc_ancillary_array_Insert(&priv->ancillaries, ancillary);
 }
 
+void *
+picture_AttachNewAncillary(picture_t *pic, vlc_ancillary_id id, size_t size)
+{
+    void *data = malloc(size);
+    if (!data)
+        return NULL;
+
+    struct vlc_ancillary *ancillary = vlc_ancillary_Create(data, id);
+    if (!ancillary) {
+        free(data);
+        return NULL;
+    }
+
+    if (picture_AttachAncillary(pic, ancillary) != 0) {
+        vlc_ancillary_Release(ancillary);
+        return NULL;
+    }
+
+    return data;
+}
+
 struct vlc_ancillary *
 picture_GetAncillary(const picture_t *pic, vlc_ancillary_id id)
 {

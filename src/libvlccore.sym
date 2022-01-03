@@ -309,6 +309,7 @@ net_SetCSCov
 net_Write
 NTPtime64
 picture_AttachAncillary
+picture_AttachNewAncillary
 picture_BlendSubpicture
 picture_Clone
 picture_CopyPixels

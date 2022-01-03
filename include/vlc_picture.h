@@ -432,6 +432,19 @@ VLC_API int
 picture_AttachAncillary(picture_t *pic, struct vlc_ancillary *ancillary);
 
 /**
+ * Allocate a new ancillary and attach it to a picture. Helper equivalent to
+ * malloc + vlc_ancillary_Create + picture_AttachAncillary. The returned memory
+ * is not initialized.
+ *
+ * @param pic picture to attach created ancillary to
+ * @param id id of the ancillary to create
+ * @param size allocation size in bytes
+ * @return The allocated pointer on success, NULL on out-of-memory
+ */
+VLC_API void *
+picture_AttachNewAncillary(picture_t *pic, vlc_ancillary_id id, size_t size);
+
+/**
  * Return the ancillary identified by an ID
  *
  * @param id id of ancillary to request
