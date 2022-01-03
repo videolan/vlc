@@ -439,7 +439,7 @@ picture_AttachAncillary(picture_t *pic, struct vlc_ancillary *ancillary);
  * not present
  */
 VLC_API struct vlc_ancillary *
-picture_GetAncillary(picture_t *pic, vlc_ancillary_id id);
+picture_GetAncillary(const picture_t *pic, vlc_ancillary_id id);
 
 /**
  * This function will export a picture to an encoded bitstream.

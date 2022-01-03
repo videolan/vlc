@@ -480,7 +480,7 @@ picture_AttachAncillary(picture_t *pic, struct vlc_ancillary *ancillary)
 }
 
 struct vlc_ancillary *
-picture_GetAncillary(picture_t *pic, vlc_ancillary_id id)
+picture_GetAncillary(const picture_t *pic, vlc_ancillary_id id)
 {
     picture_priv_t *priv = container_of(pic, picture_priv_t, picture);
     return vlc_ancillary_array_Get(&priv->ancillaries, id);
