@@ -83,7 +83,7 @@ typedef struct
 {
     uni_char_t *p_uchars;       /*!< array of size \p i_count character codepoints */
     text_style_t **pp_styles;   /*!< array of size \p i_count character styles */
-    ruby_block_t **pp_ruby;     /*!< array of size \p  */
+    ruby_block_t **pp_ruby;     /*!< array of size \p i_count text-layout params*/
     size_t i_count;             /*!< length of the arrays */
 
     bool b_balanced;            /*!< true for grid-mode text */
