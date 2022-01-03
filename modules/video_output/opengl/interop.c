@@ -180,11 +180,13 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, vlc_video_context *context,
     if (desc->plane_count == 0)
     {
         /* Opaque chroma: load a module to handle it */
-        interop->vctx = context;
+        assert(context);
+        interop->vctx = vlc_video_context_Hold(context);
         interop->module = module_need_var(interop, "glinterop", "glinterop");
     }
     else
     {
+        interop->vctx = NULL;
         interop->module = module_need(interop, "opengl sw interop", NULL, false);
     }
 
@@ -233,6 +235,8 @@ vlc_gl_interop_Delete(struct vlc_gl_interop *interop)
 {
     if (interop->ops && interop->ops->close)
         interop->ops->close(interop);
+    if (interop->vctx)
+        vlc_video_context_Release(interop->vctx);
     if (interop->module)
         module_unneed(interop, interop->module);
     vlc_object_delete(interop);
