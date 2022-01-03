@@ -48,6 +48,7 @@ CHANGELOGS = \
 	ChangeLog-2019 \
 	ChangeLog-2020 \
 	ChangeLog-2021 \
+	ChangeLog-2022 \
 	$(NULL)
 
 man1_MANS = \
