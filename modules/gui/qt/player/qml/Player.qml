@@ -47,7 +47,12 @@ FocusScope {
 
     // NOTE: We force the night theme when playing a video.
     readonly property VLCColors colors: (MainCtx.hasEmbededVideo) ? VLCStyle.nightColors
-                                                                        : VLCStyle.colors
+                                                                  : VLCStyle.colors
+
+    // Events
+
+    Component.onCompleted: MainCtx.preferHotkeys = true
+    Component.onDestruction: MainCtx.preferHotkeys = false
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: {
