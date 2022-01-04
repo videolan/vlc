@@ -400,9 +400,9 @@ static int SetPictureProperties( demux_t *p_demux, uint32_t i_item_id,
                     {
                         default:
                         case 0:   fmt->video.orientation = ORIENT_NORMAL ; break;
-                        case 90:  fmt->video.orientation = ORIENT_ROTATED_90; break;
+                        case 90:  fmt->video.orientation = ORIENT_ROTATED_270; break;
                         case 180: fmt->video.orientation = ORIENT_ROTATED_180 ; break;
-                        case 270: fmt->video.orientation = ORIENT_ROTATED_270 ; break;
+                        case 270: fmt->video.orientation = ORIENT_ROTATED_90 ; break;
                     }
                     break;
                 case ATOM_colr:
