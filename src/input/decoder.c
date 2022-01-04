@@ -2092,7 +2092,8 @@ decoder_New( vlc_object_t *p_parent, const es_format_t *fmt, const char *psz_id,
     {
         DecoderUnsupportedCodec( p_dec, fmt, !p_sout );
 
-        DeleteDecoder( p_owner, p_dec->fmt_in.i_cat );
+        /* Don't use dec->fmt_in.i_cat since it may not be initialized here. */
+        DeleteDecoder( p_owner, fmt->i_cat );
         return NULL;
     }
 
