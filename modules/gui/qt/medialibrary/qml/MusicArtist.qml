@@ -302,7 +302,7 @@ FocusScope {
             cellWidth: VLCStyle.gridItem_music_width
             cellHeight: VLCStyle.gridItem_music_height
             headerDelegate: root.header
-            delegateModel: albumSelectionModel
+            selectionDelegateModel: albumSelectionModel
             model: albumModel
 
             Connections {

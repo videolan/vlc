@@ -130,7 +130,7 @@ FocusScope {
 
             headerDelegate: root.header
 
-            delegateModel: selectionModel
+            selectionDelegateModel: selectionModel
             model: albumModelId
 
             Widgets.GridShadows {

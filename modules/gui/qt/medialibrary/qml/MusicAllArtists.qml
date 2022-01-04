@@ -107,7 +107,7 @@ FocusScope {
 
             anchors.fill: parent
             topMargin: VLCStyle.margin_large
-            delegateModel: selectionModel
+            selectionDelegateModel: selectionModel
             model: artistModel
             focus: true
             cellWidth: VLCStyle.colWidth(1)

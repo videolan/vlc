@@ -300,7 +300,7 @@ Widgets.PageLoader {
 
             readonly property bool isViewMultiView: false
 
-            delegateModel: selectionModel
+            selectionDelegateModel: selectionModel
             model: sourcesFilterModel
             topMargin: VLCStyle.margin_large
             cellWidth: VLCStyle.gridItem_network_width

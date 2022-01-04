@@ -144,7 +144,7 @@ FocusScope {
         MainInterface.MainGridView {
             id: gridView
 
-            delegateModel: selectionModel
+            selectionDelegateModel: selectionModel
             model: filterModel
 
             headerDelegate: FocusScope {

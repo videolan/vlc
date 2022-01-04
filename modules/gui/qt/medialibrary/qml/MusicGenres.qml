@@ -133,7 +133,7 @@ FocusScope {
         MainInterface.MainGridView {
             id: gridView_id
 
-            delegateModel: selectionModel
+            selectionDelegateModel: selectionModel
             model: genreModel
             topMargin: VLCStyle.margin_large
 

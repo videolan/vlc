@@ -239,7 +239,7 @@ FocusScope {
 
             model: root.model
 
-            delegateModel: modelSelect
+            selectionDelegateModel: modelSelect
 
             Navigation.parentItem: root
 

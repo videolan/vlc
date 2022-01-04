@@ -224,7 +224,7 @@ FocusScope {
 
             model: root.model
 
-            delegateModel: modelSelect
+            selectionDelegateModel: modelSelect
 
             activeFocusOnTab: true
 
