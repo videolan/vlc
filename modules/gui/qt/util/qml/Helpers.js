@@ -55,6 +55,9 @@ function get(dict, key, defaultValue) {
 
 // NOTE: This allows us to force another 'reason' even when the item has activeFocus.
 function enforceFocus(item, reason) {
+    if (item.activeFocus && item.focusReason === reason)
+        return
+
     item.focus = false;
 
     item.forceActiveFocus(reason);
