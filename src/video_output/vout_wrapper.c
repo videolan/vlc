@@ -137,6 +137,8 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_thread_private_t *sys, vout_dis
 
 #ifdef _WIN32
     var_DelCallback(vout, "video-wallpaper", Forward, vd);
+#else
+    (void) vout;
 #endif
 
     vout_display_Delete(vd);
