@@ -1961,13 +1961,12 @@ CreateDecoder( vlc_object_t *p_parent, const es_format_t *fmt,
  * \param p_dec the decoder object
  * \return nothing
  */
-static void DeleteDecoder( vlc_input_decoder_t *p_owner )
+static void DeleteDecoder( vlc_input_decoder_t *p_owner, enum es_format_category_e i_cat )
 {
     decoder_t *p_dec = &p_owner->dec;
     msg_Dbg( p_dec, "killing decoder fourcc `%4.4s'",
              (char*)&p_dec->fmt_in.i_codec );
 
-    const enum es_format_category_e i_cat =p_dec->fmt_in.i_cat;
     decoder_Clean( p_dec );
     if ( p_owner->out_pool )
     {
@@ -2093,7 +2092,7 @@ decoder_New( vlc_object_t *p_parent, const es_format_t *fmt, const char *psz_id,
     {
         DecoderUnsupportedCodec( p_dec, fmt, !p_sout );
 
-        DeleteDecoder( p_owner );
+        DeleteDecoder( p_owner, p_dec->fmt_in.i_cat );
         return NULL;
     }
 
@@ -2125,7 +2124,7 @@ decoder_New( vlc_object_t *p_parent, const es_format_t *fmt, const char *psz_id,
     if( vlc_clone( &p_owner->thread, DecoderThread, p_owner, i_priority ) )
     {
         msg_Err( p_dec, "cannot spawn decoder thread" );
-        DeleteDecoder( p_owner );
+        DeleteDecoder( p_owner, p_dec->fmt_in.i_cat );
         return NULL;
     }
 
@@ -2227,7 +2226,7 @@ void vlc_input_decoder_Delete( vlc_input_decoder_t *p_owner )
     }
 
     /* Delete decoder */
-    DeleteDecoder( p_owner );
+    DeleteDecoder( p_owner, p_dec->fmt_in.i_cat );
 }
 
 /**
