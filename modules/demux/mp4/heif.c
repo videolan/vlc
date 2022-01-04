@@ -654,10 +654,8 @@ static int DerivedImageAssembleGrid( demux_t *p_demux, uint32_t i_grid_item_id,
     *pp_block = p_block;
 
     es_format_Init( fmt, VIDEO_ES, VLC_CODEC_RGBA );
-    fmt->video.i_sar_num =
     fmt->video.i_width =
     fmt->video.i_visible_width = derivation_data.ImageGrid.output_width;
-    fmt->video.i_sar_den =
     fmt->video.i_height =
     fmt->video.i_visible_height = derivation_data.ImageGrid.output_height;
 
