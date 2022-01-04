@@ -35,7 +35,8 @@ class MLGroupListModel : public MLBaseModel
 public:
     enum Roles
     {
-        GROUP_ID = Qt::UserRole + 1,
+        GROUP_IS_VIDEO = Qt::UserRole + 1,
+        GROUP_ID,
         GROUP_TITLE,
         GROUP_THUMBNAIL,
         GROUP_DURATION,
@@ -58,6 +59,7 @@ public:
 
 public:
     explicit MLGroupListModel(QObject * parent = nullptr);
+
 
 public: // QAbstractItemModel implementation
     QHash<int, QByteArray> roleNames() const override;

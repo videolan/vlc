@@ -64,6 +64,7 @@ QHash<int, QByteArray> MLGroupListModel::roleNames() const /* override */
 {
     return
     {
+        { GROUP_IS_VIDEO,           "isVideo"            },
         { GROUP_ID,                 "id"                 },
         { GROUP_TITLE,              "title"              },
         { GROUP_THUMBNAIL,          "thumbnail"          },
@@ -100,6 +101,8 @@ QVariant MLGroupListModel::itemRoleData(MLItem *item, const int role) const /* o
             case Qt::DisplayRole:
                 return QVariant::fromValue(group->getTitle());
             // NOTE: These are the conditions for QML view(s).
+            case GROUP_IS_VIDEO:
+                return false;
             case GROUP_ID:
                 return QVariant::fromValue(group->getId());
             case GROUP_TITLE:
@@ -124,6 +127,8 @@ QVariant MLGroupListModel::itemRoleData(MLItem *item, const int role) const /* o
         {
             case Qt::DisplayRole:
                 return QVariant::fromValue(video->getTitle());
+            case GROUP_IS_VIDEO:
+                return true;
             case GROUP_ID:
                 return QVariant::fromValue(video->getId());
             case GROUP_TITLE:
