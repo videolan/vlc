@@ -848,6 +848,8 @@ static size_t AddTextAndStyles( filter_sys_t *p_sys,
                                 const text_style_t *p_style,
                                 layout_text_block_t *p_text_block )
 {
+    text_style_t *p_mgstyle = NULL;
+
     /* Convert chars to unicode */
     size_t i_bytes;
     uni_char_t *p_ucs4 = ToUCS4( psz_text, &i_bytes );
@@ -887,7 +889,7 @@ static size_t AddTextAndStyles( filter_sys_t *p_sys,
     memcpy( &p_text_block->p_uchars[p_text_block->i_count], p_ucs4, i_newchars * 4 );
     free( p_ucs4 );
 
-    text_style_t *p_mgstyle = text_style_Duplicate( p_sys->p_default_style );
+    p_mgstyle = text_style_Duplicate( p_sys->p_default_style );
     if ( p_mgstyle == NULL )
         return 0;
 
@@ -907,7 +909,7 @@ static size_t AddTextAndStyles( filter_sys_t *p_sys,
     {
         p_ucs4 = ToUCS4( psz_rt, &i_bytes );
         if( !p_ucs4 )
-            return 0;
+            goto error;
         p_rubyblock = malloc(sizeof(ruby_block_t));
         if( p_rubyblock )
         {
@@ -934,6 +936,7 @@ static size_t AddTextAndStyles( filter_sys_t *p_sys,
     return i_newchars;
 error:
     free( p_ucs4 );
+    text_style_Delete( p_mgstyle );
     return 0;
 }
 
