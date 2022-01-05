@@ -462,8 +462,7 @@ FocusScope {
 
     function _repositionItem(id, x, y) {
         var item = _getItem(id)
-        if (item === undefined)
-            throw "wrong child: " + id
+        console.assert(item !== undefined, "wrong child: " + id)
 
         //theses properties are always defined in Item
         item.x = x
@@ -475,8 +474,7 @@ FocusScope {
 
     function _recycleItem(id, x, y) {
         var item = _unusedItemList.pop()
-        if (item === undefined)
-            throw "wrong toRecycle child " + id + ", len " + toUse.length
+        console.assert(item !== undefined, "incorrect _recycleItem call, id" + id + " ununsedItemList size" + _unusedItemList.length)
 
         item.index = id
         item.model = model.getDataAt(id)
@@ -498,10 +496,9 @@ FocusScope {
                         x: x,
                         y: y,
                         visible: true
-                    });
-        if (item === undefined)
-            throw "wrong unable to instantiate child " + id
+                    })
 
+        console.assert(item !== undefined, "unable to instantiate " + id)
         _setItem(id, item)
 
         return item
